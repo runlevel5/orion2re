@@ -3,7 +3,6 @@
 
 namespace hooks {
     static constexpr hook all_hooks[] = {
-        // platform
         { 0x005422e0, &platform::entry },
         { 0x005276f0, &platform::Parse_Ten_Cmd_Parameter },
         { 0x00527960, &platform::Create_Direct_Draw },
@@ -20,20 +19,28 @@ namespace hooks {
         { 0x00527D30, &platform::Cleanup_Surfaces },
         { 0x00528470, &platform::Lock_Primary_Surface },
         { 0x005277b0, &platform::WinMain_Proxy },
-        // exitm
         { 0x0052d310, &exitm::Exit_With_Message },
-        // FILEDEF
         { 0x0043ce10, &FILEDEF::Load_Game_Settings_ },
         { 0x0043cdb0, &FILEDEF::Save_Game_Settings_ },
         { 0x0043d300, &FILEDEF::Update_Game_Settings_Version_Number_ },
-        // MOX2
+        { 0x00478e80, &INITGAME::Set_Default_Game_Settings_ },
+        { 0x004f24d0, &HAROLD::Get_Font_File_ },
         { 0x00483470, &MOX2::main2_ },
+        { 0x005274d0, &mouse::Set_Mouse_List_ },
+        { 0x0052d580, &sound::Set_Audio_Buffer_ },
+        { 0x00500b20, &allocate::Allocate_Data_Space_ }
     };
 
-#define ASSERT(x, m) if (!x) { exitm::Exit_With_Message(m); }
+#define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
 
     void Assert_Types() {
-        ASSERT(sizeof(MOX::_settings) == 0x229, "MOX::_settings");
+        ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
+        ASSERT(sizeof(s_player) == 0xea9, "s_player");
+        ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");
+        ASSERT(sizeof(s_colony) == 0x169, "s_colony");
+        ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
+        ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
+        ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
     }
 
     void Install_Hooks()

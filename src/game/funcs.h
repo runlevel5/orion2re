@@ -212,3 +212,29 @@ inline int32_t __cdecl _fclose(FILE* stream) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005405f0 });
     return fn(stream);
 }
+
+inline int __cdecl _sprintf(char* o, const char* s, ...)
+{
+    using VFn = int(__cdecl*)(char*, const char*, va_list);
+    auto vfn = reinterpret_cast<VFn>(std::uintptr_t{ 0x00540550 });
+
+    va_list ap;
+    va_start(ap, s);
+    int rc = vfn(o, s, ap);
+    va_end(ap);
+
+    return rc;
+}
+
+inline int __cdecl _clock() {
+    using Fn = int(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540F20 });
+    return fn();
+}
+
+inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
+    using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
+    fn(dest, src, n);
+}
+

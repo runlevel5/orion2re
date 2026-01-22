@@ -9,7 +9,7 @@ namespace exitm {
         FUN_0052d290();
 
         // Show terminal error message to user
-        //MessageBoxA(g_mainWindow, message, s_Microprose, 0 /* MB_OK */);
+        MessageBoxA(platform::g_main_window, message, "Microprose", MB_OK);
 
         FUN_00533630();
 

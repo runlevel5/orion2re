@@ -54,6 +54,46 @@ namespace MOX {
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _mouse_list_arrow = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
+    
+    inline uint32_t& _special_names_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00595390 });
+
+    inline uint32_t& _global_data_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597410 });
+
+    inline uint32_t& _nebula =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597770 });
+
+    inline s_planet_data*& _planet =
+        *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
+
+    inline uint32_t& _techname_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B31C });
+
+    inline uint32_t& _global_screen_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B5A8 });
+
+    inline uint32_t& _global_cache_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B5B8 });
+
+    inline uint32_t& _global_cache_size =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA10 });
+
+    inline s_ship_data*& _ship =
+        *reinterpret_cast<s_ship_data**>(std::uintptr_t{ 0x0059BD3C });
+
+    inline s_leader_data*& _leaders =
+        *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });
+
+    inline s_colony*& _colony =
+        *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
+
+    inline s_star_data*& _star =
+        *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });
+
+    // Suggested name: g_extra_data_seg
+    inline uint32_t& DAT_005a2bec =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005A2BEC });
 
     // Funcs
     inline void Mox_Update_() {

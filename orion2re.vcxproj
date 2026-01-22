@@ -20,10 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\exit.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
+    <ClCompile Include="src\game\harold.cpp" />
+    <ClCompile Include="src\game\initgame.cpp" />
+    <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
+    <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\video.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\patch.cpp" />
@@ -47,11 +52,13 @@
     <ClInclude Include="src\game\mouse.h" />
     <ClInclude Include="src\game\mox.h" />
     <ClInclude Include="src\game\mox2.h" />
+    <ClInclude Include="src\game\multplay.h" />
     <ClInclude Include="src\game\platform.h" />
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\russ.h" />
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\strings.h" />
+    <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\ten.h" />
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />
