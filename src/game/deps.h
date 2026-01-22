@@ -1,0 +1,32 @@
+#pragma once
+
+#include <cstdint>
+#include <Windows.h>
+#include <ddraw.h>
+
+#include "helpers.h"
+#include "funcs.h"
+
+#include "types.h"
+#include "platform.h"
+#include "allocate.h"
+#include "dos.h"
+#include "init.h"
+#include "filedef.h"
+#include "video.h"
+#include "exit.h"
+#include "mox.h"
+#include "mox2.h"
+#include "initgame.h"
+#include "harold.h"
+#include "sound.h"
+#include "ten.h"
+#include "fields.h"
+#include "fonts.h"
+#include "mouse.h"
+#include "jim.h"
+#include "ken.h"
+#include "russ.h"
+#include "misc.h"
+#include "strings.h"
+#include "loader.h"

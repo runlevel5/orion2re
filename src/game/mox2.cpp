@@ -1,0 +1,143 @@
+#include "deps.h"
+
+namespace MOX2 {
+    void main2_() {
+        char font_file[16];
+        char loading_buffer[64];
+        char mox_set_dir[32];
+        uint32_t font_colors[2];
+
+        MOX::_previous_screen = 0xFF;
+        MOX::_max_debug_saves = 20;
+        MOX::_first_debug_save = 20;
+        MOX2::_user_wants_n_space_monsters = 0xFF;
+        MOX::_debug_saves_on = 1;
+        MOX::_turns_between_debug_saves = 1;
+
+        MOX2::Release_Version_();
+
+        MOX::_debug_saves_on = 1;
+        MOX::_max_debug_saves = 10;
+        MOX::_first_debug_save = 20;
+        MOX::_turns_between_debug_saves = 1;
+
+        MOX::_sound_buffer = allocate::Allocate_Space_(0x64000);
+
+        if (dos::DIR_(MOX2::s_MOX_SET, mox_set_dir) != 0) {
+            FILEDEF::Load_Game_Settings_();
+            if (MOX::_settings.version != 0x82) {
+                FILEDEF::Update_Game_Settings_Version_Number_();
+            }
+        }
+        else {
+            INITGAME::Set_Default_Game_Settings_();
+        }
+
+        MOX2::Set_Mox_Language_();
+        HAROLD::Get_Font_File_(font_file);
+        sound::Set_Audio_Buffer_(MOX::_sound_buffer);
+
+        if (init::Init_Drivers_(4, font_file) == 0) {
+            return;
+        }
+
+        MOX2::Set_Mox_Alt_Path_();
+        ten::init();
+        fields::Assign_Update_Function_(MOX::Mox_Update_);
+        fonts::Load_Palette_(5, 0, 0xFF);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        fonts::Set_PSTR_Style_(2);
+        MOX::_game_type = 0;
+
+        HAROLD::Set_Sound_Volume_To_Settings_();
+        allocate::Allocate_Data_Space_();
+        MOX2::_pan_main_menu_panel = 1;
+
+        if (MOX2::_skip_intro == 0) {
+            JIM::Draw_Logos_();
+            fields::Assign_Update_Function_(MOX::Mox_Update_);
+            fonts::Load_Palette_(5, 0, 0xFF);
+            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        }
+
+        JIM::Play_Background_Music_();
+        MOX::Mox_Update_();
+        MOX2::Set_Game_Seed();
+        MOX::_refresh_mode = 0;
+        video::Set_Refresh_Full_();
+        MOX::_mox_font_colors_offset = 0x75;
+
+        uint32_t* colors = MISC::Font_Colors2_(4, 0xD3, 0xDC);
+        font_colors[0] = colors[0];
+        font_colors[1] = colors[1];
+        fonts::Set_Font_Style_(4, reinterpret_cast<intptr_t>(font_colors));
+        video::Set_Page_Off_();
+
+        // Prepare loading message
+        const char* loading_src = nullptr;
+        int copy_len = 0;
+        switch (MOX::_settings.language) {
+        case 1: loading_src = MOX2::s_Loading_German; copy_len = 48 + 2; break; // 0xc * 4 + 2
+        case 2: loading_src = MOX2::s_Loading_French; copy_len = 64 + 2; break; // 0x10 * 4 + 2
+        case 3: loading_src = MOX2::s_Loading_Spanish; copy_len = 48 + 2; break; // 0xc * 4 + 2
+        case 4: loading_src = MOX2::s_Loading_Italian; copy_len = 52 + 3; break; // 0xd * 4 + 3
+        default: loading_src = MOX2::s_Loading_English; copy_len = 44; break;   // 0xb * 4
+        }
+
+        for (int i = 0; i < copy_len; ++i) {
+            loading_buffer[i] = loading_src[i];
+        }
+
+        fonts::Print_(5, 10, loading_buffer);
+        RUSS::Mox_Sync_Update_();
+        LOADER::Load_Pictures_();
+        strings::Load_Strings();
+        MOX::Mox_Update_();
+        MOX::_temp_string = 0;
+
+        if (MOX2::_quick_start != 0) {
+            // Struct size 0xEA9 (3753 bytes)
+            s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+            if (MOX::Read_Moo_Custom_Player_Data_(player)) {
+                INITGAME::Init_New_Game_(
+                    MOX::_settings.game_difficulty,
+                    MOX::_settings.galaxy_size,
+                    MOX::_settings.galaxy_age,
+                    MOX::_settings.number_of_players,
+                    MOX::_settings.strategic_combat_flag,
+                    MOX::_settings.starting_civilization_level
+                );
+                MOX::_current_screen = MOX::SCREEN_REPORTS; // 0x27
+            }
+            else {
+                MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+            }
+        }
+        else {
+            MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+        }
+
+        KEN::Ken_Init_();
+        FUN_004d7d80();
+        MOX2::Screen_Control_();
+        FUN_004d7da0();
+
+        // Copy leave message
+        const char* thanks_src = nullptr;
+        int thanks_len = 0;
+        switch (MOX::_settings.language) {
+        case 1: thanks_src = MOX2::s_Thanks_German; thanks_len = 48; break; // 0xc * 4
+        case 2: thanks_src = MOX2::s_Thanks_French; thanks_len = 36; break; // 0x9 * 4
+        case 3: thanks_src = MOX2::s_Thanks_Spanish; thanks_len = 40; break; // 0xa * 4
+        case 4: thanks_src = MOX2::s_Thanks_Italian; thanks_len = 44 + 3; break; // 0xb * 4 + 3
+        default: thanks_src = MOX2::s_Thanks_English; thanks_len = 36 + 2; break; // 0x9 * 4 + 2
+        }
+
+        for (int i = 0; i < thanks_len; ++i) {
+            MOX2::_leave_game_message[i] = thanks_src[i];
+        }
+
+        exitm::Exit_With_Message(MOX2::_leave_game_message);
+    }
+
+} // namespace MOX2
