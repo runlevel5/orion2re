@@ -1,6 +1,12 @@
 #pragma once
 
 namespace RUSS {
+    inline void Mox_Update_() {
+        using Fn = void(*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
+        fn();
+    }
+
     inline void Mox_Sync_Update_() {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483C80 });
@@ -12,4 +18,12 @@ namespace RUSS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7810 });
         fn();
     }
+
+    inline void __cdecl PFMT_(int x, int y, const char* format, int32_t value) {
+        using Fn = void(__cdecl*)(int, int, const char*, int32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7850 })(x, y, format, value);
+    }
+
+    inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
+    inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
 }

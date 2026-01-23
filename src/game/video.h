@@ -15,6 +15,11 @@ namespace video {
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578e60 });
 
 	// Functions
+	inline void __cdecl Fill_(int x1, int y1, int x2, int y2, uint8_t color) {
+		using Fn = void(__cdecl*)(int, int, int, int, uint8_t);
+		reinterpret_cast<Fn>(std::uintptr_t{ 0x00528CC0 })(x1, y1, x2, y2, color);
+	}
+
 	inline void __cdecl Set_Refresh_Stencil() {
 		using Fn = void(__cdecl*)();
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527CD0 });

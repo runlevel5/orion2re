@@ -56,7 +56,7 @@ namespace FILEDEF {
             MOX::_settings.version = 0x82;
 
             // If saving fails, we reset settings
-            if (Save_Game_Settings_() == 0) {
+            if (!Save_Game_Settings_()) {
                 needs_reset = true;
             }
         }

@@ -47,17 +47,21 @@ namespace MOX {
     inline void*& _sound_buffer = *reinterpret_cast<void**>(std::uintptr_t{ 0x005A1B34 });
     inline SCREEN& _current_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597302 });
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
+    inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
     inline uint8_t& _mox_font_colors_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059BA6E });
     inline char& _temp_string = *reinterpret_cast<char*>(std::uintptr_t{ 0x00596230 });
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
+    inline uint32_t* _antarans = reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA20 });
+    inline uint8_t (&_antarans_blob)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
+    inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _mouse_list_arrow = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
     
-    inline uint32_t& _special_names_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00595390 });
+    inline void*& _special_names_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
 
     inline uint32_t& _global_data_seg =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597410 });
@@ -65,20 +69,28 @@ namespace MOX {
     inline uint32_t& _nebula =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597770 });
 
+    inline uint16_t& _NUM_COLONIES =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00597856 });
+
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
-    inline uint32_t& _techname_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B31C });
+    inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
 
-    inline uint32_t& _global_screen_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B5A8 });
+    inline void*& _techname_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
+
+    inline void*& _global_screen_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
 
     inline uint32_t& _global_cache_seg =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B5B8 });
 
     inline uint32_t& _global_cache_size =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA10 });
+
+    inline uint16_t& _NUM_PLAYERS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005A2C1C });
+    inline uint16_t (&_star_fields_dim)[6] = *reinterpret_cast<uint16_t(*)[6]>(std::uintptr_t{ 0x005A47B0 });
 
     inline s_ship_data*& _ship =
         *reinterpret_cast<s_ship_data**>(std::uintptr_t{ 0x0059BD3C });

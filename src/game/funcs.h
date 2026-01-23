@@ -201,8 +201,8 @@ inline uint32_t __cdecl _fread(void* buffer, uint32_t size, uint32_t count, FILE
     return fn(buffer, size, count, stream);
 }
 
-inline uint32_t __cdecl _fwrite(const void* ptr, uint32_t size, uint32_t nmemb, void* stream) {
-    using Fn = uint32_t(__cdecl*)(const void*, uint32_t, uint32_t, void*);
+inline uint32_t __cdecl _fwrite(const void* ptr, uint32_t size, uint32_t nmemb, FILE* stream) {
+    using Fn = uint32_t(__cdecl*)(const void*, uint32_t, uint32_t, FILE*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540860 });
     return fn(ptr, size, nmemb, stream);
 }
@@ -210,6 +210,12 @@ inline uint32_t __cdecl _fwrite(const void* ptr, uint32_t size, uint32_t nmemb, 
 inline int32_t __cdecl _fclose(FILE* stream) {
     using Fn = int32_t(__cdecl*)(FILE*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005405f0 });
+    return fn(stream);
+}
+
+inline int __cdecl _fflush(FILE* stream) {
+    using Fn = int(__cdecl*)(FILE*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540690 });
     return fn(stream);
 }
 
@@ -255,8 +261,41 @@ inline void __cdecl Mox_Update_() {
     reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7820 })();
 }
 
+inline void __cdecl FUN_00443C60() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
+}
+
+// Suggested name: s_Null_Pointer
+inline const char* const s_Null_Pointer_0055b658 =
+    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B658 }); // "Null Pointer"
+
+// Suggested name: s_allocation_error_fmt
+inline const char* const s_Couldn_t_Allocate_0055B668 =
+    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B668 }); // "Couldn't Allocate %d. Increase Virtual Memory."
+
+inline const char* const s_Unable_to_Allocate_bytes =
+    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%s, %d)\n"
+
 // Suggested name: g_mouse_buttons_state
 inline uint16_t& g_mouse_buttons_state =
     *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578DE0 });
+
+inline int __cdecl __strcmpi(const char* s1, const char* s2) {
+    using Fn = int(__cdecl*)(const char*, const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005428d0 });
+    return fn(s1, s2);
+}
+
+inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
+    using Fn = int(__cdecl*)(FILE*, long, int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541770 });
+    return fn(stream, offset, origin);
+}
+
+inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); // "rb"
+inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
+inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"
+inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
 
 

@@ -1,6 +1,22 @@
 #pragma once
 
 namespace MOX2 {
+    inline void __cdecl Set_Game_Seed() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00483CC0 })();
+    }
+
+    // Suggested name: Init_Map_Defaults
+    inline void __cdecl Init_Map_Defaults_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478E30 })();
+    }
+
+    // Suggested name: Init_Map_Pictures_Default
+    inline void __cdecl Init_Map_Pictures_Default__() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478E20 })();
+    }
     inline uint8_t& _user_wants_n_space_monsters = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A6378 });
     inline uint8_t& _pan_main_menu_panel = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A6379 });
     inline uint8_t& _skip_intro = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005662B4 });
@@ -19,12 +35,6 @@ namespace MOX2 {
     inline void __stdcall Set_Mox_Alt_Path_() {
         using Fn = void(__stdcall*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483CE0 });
-        fn();
-    }
-
-    inline void __stdcall Set_Game_Seed() {
-        using Fn = void(__stdcall*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483CC0 });
         fn();
     }
 

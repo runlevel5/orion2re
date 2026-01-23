@@ -3,8 +3,8 @@
 #include <cstdint>
 
 namespace file_ani {
-    inline void __cdecl Set_File_Animation_Buffer_(uint32_t buffer) {
-        using Fn = void(__cdecl*)(uint32_t);
+    inline void __cdecl Set_File_Animation_Buffer_(void* buffer) {
+        using Fn = void(__cdecl*)(void*);
         reinterpret_cast<Fn>(std::uintptr_t{0x005317a0})(buffer);
     }
 

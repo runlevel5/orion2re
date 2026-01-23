@@ -1,8 +1,8 @@
 #pragma once
 
 namespace fonts {
-    inline int32_t& _palette_block =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x005787B8 });
+    inline void*& _palette_block =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x005787B8 });
 
     inline char* const _font_name =
         reinterpret_cast<char*>(std::uintptr_t{ 0x005787C0 });

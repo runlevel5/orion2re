@@ -8,6 +8,7 @@ variables:
 #  LLM_ARCHITECT_REASONING: high
   LLM_ARCHITECT_REASONING: medium
   LLM_CODER_MODEL: gpt-5-mini
+  LLM_DIFF_FORMAT: v4a
 # Gemini
 #  LLM_DISCOVERY_MODEL: gemini/gemini-3-flash-preview
 #  LLM_ARCHITECT_MODEL: gemini/gemini-3-pro-preview

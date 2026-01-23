@@ -12,7 +12,7 @@ namespace JIM {
 
         allocate::Push_Block_(MOX::_global_screen_seg);
         int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_global_screen_seg);
-        uint32_t ani_buffer = allocate::Allocate_Next_Block_(MOX::_global_screen_seg, remaining_space - 100);
+        void* ani_buffer = allocate::Allocate_Next_Block_(MOX::_global_screen_seg, remaining_space - 100);
         file_ani::Set_File_Animation_Buffer_(ani_buffer);
 
         int16_t skip_flag = 0;

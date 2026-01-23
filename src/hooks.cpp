@@ -39,6 +39,22 @@ namespace hooks {
         { 0x00531f80, &key::Keyboard_Status_ },
         { 0x00531f20, &key::Read_Key_ },
         { 0x00425a70, &JIM::Draw_Logos_ },
+        { 0x0052e880, &allocate::Allocate_Space_ },
+        { 0x0052ebb0, &allocate::Get_Remaining_Block_Space_ },
+        { 0x0052e9f0, &allocate::Allocation_Error_ },
+        { 0x0052eb30, &allocate::Push_Block_ },
+        { 0x0052eb70, &allocate::Pop_Block_ },
+        { 0x0052e950, &allocate::Allocate_Next_Block_ },
+        { 0x0052ea20, &allocate::Reallocation_Error_ },
+        { 0x0052e8e0, &allocate::Allocate_Dos_Space_ },
+        { 0x0052e9c0, &allocate::Allocate_Far_Space_ },
+        { 0x0052d360, &dos::DIR_ },
+        { 0x0051c7e0, &farload::Farload_Library_ },
+        { 0x0051c710, &farload::Far_Reload_ },
+        { 0x00478fb0, &INITGAME::Write_Game_Settings_ },
+        { 0x00478b30, &INITGAME::Init_Ships_Array_ },
+        { 0x00478d80, &INITGAME::Init_Colonies_Array_ },
+        { 0x00478820, &INITGAME::Init_New_Game_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

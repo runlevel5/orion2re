@@ -210,11 +210,17 @@ workflows:
                   LEA        ECX,[EAX + EAX*0x8]
                   ADD        ECX,EDX
  
+          * If you add or edit structures, make sure that they're packed using #pragma pack:
+
+            #pragma pack(push, 1)
+            struct s_foo {
+              uint32_t something;
+            };
+            #pragma pack(pop)
           * Output only the cleaned-up code (no extra explanation).
-          * Comment generation rules:
-            - If you identify a potential bug, mention it
-            - If code could benefit from logical grouping in blocks - add a block-level comment
-            - Otherwise, do not add comments
+          * NEVER add comments, unless it is one of the following exceptions:
+            - A potential bug was identified
+            - A complicated piece of logic was detected - add at most single line comment
         outcomes:
           - name: done
       - name: apply
@@ -397,8 +403,8 @@ workflows:
 
           * You must do the following:
             - For all external variable definitions:
-              1. If a variable is in a namespace, you must add it to the `src/game/<namespace>.h` file. Always lowercase the
-                namespace name.
+              1. If a variable is in a namespace, you must add it to the `src/game/<namespace>.h` file unless it is already
+                defined there. Always lowercase the namespace name.
               
                 Example, 
 
@@ -413,8 +419,8 @@ workflows:
                 2. If variable is not in the namespace, add it to `src/game/funcs.h
              
             - For all external functions:
-              1. If a function is in a namespace, you must add it to the `src/game/<namespace>.h` file. Always lowercase the
-                namespace name.
+              1. If a function is in a namespace, you must add it to the `src/game/<namespace>.h` file unless it is already
+                defined there. Always lowercase the namespace name.
               
                 Example:
 
@@ -431,7 +437,7 @@ workflows:
 
                 The `thunk_main2_` should be added to `src/game/mox2.h`
             
-              2. For external function stubs without namespace, put them to `src/funcs.h`.
+              2. For external function stubs without namespace, put them to `src/game/funcs.h`.
               3. If function is a standard Win32 API function (SendMessageA, MessageBoxA and so on) - do not generate
                  a stub.
 
@@ -456,14 +462,25 @@ workflows:
                 Also add `WPARAM __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)`
                 to `src/game/platform.h`.
 
-            - If you create a new header file for namespace that was not added before, add it as a include to `deps.h`.
-            - If function already exists in the header as an external reference, remove the old external reference.
+            - If you create a new header files for namespaces that were not added before, make sure to include them in `src/game/deps.h`.
+            - If the function already exists in the header as an external reference, remove the old external reference.
+            - If the function is already implemented, update the implementation with the newly decompiled version.
+            - If return or argument types don't match the old type - use the type from the new full function. Do not
+              create type wrappers.
             - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Example:
             
               // Patch: { 0x005277b0, &WinMain_Proxy },
 
               Add `{ 0x005277b0, &WinMain_Proxy },` to `src/hooks.cpp` as the very last item and before the closing brace of 
               the `all_hooks` list.
+          * If you add or edit structures, make sure that they're packed using #pragma pack:
+
+            #pragma pack(push, 1)
+            struct s_foo {
+              uint32_t something;
+            };
+            #pragma pack(pop)
+
           * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
 

@@ -6,15 +6,42 @@ namespace INITGAME {
 
     void Set_Default_Game_Settings_();
 
-    inline void Init_New_Game_(int16_t difficulty, int16_t galaxy_size, int16_t galaxy_age, int16_t num_players, uint8_t strategic_flag, int16_t starting_level) {
-        using Fn = void(*)(int16_t, int16_t, int16_t, int16_t, uint32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00478820 });
-        fn(difficulty, galaxy_size, galaxy_age, num_players, strategic_flag, starting_level);
+    void Init_Ships_Array_();
+
+    void Init_Colonies_Array_();
+
+    // Suggested name: Init_Leaders
+    inline void __cdecl Init_Leaders_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00479580 })();
     }
 
-    inline void __stdcall Write_Game_Settings_() {
-        using Fn = void(__stdcall*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00478FB0 });
-        fn();
+    // Suggested name: Init_Players
+    inline void __cdecl Init_Players_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00479000 })();
     }
+
+    // Suggested name: Make_System_Monsters_Into_Ships
+    inline void __cdecl Make_System_Monsters_Into_Ships_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478BC0 })();
+    }
+
+    // Suggested name: Set_Initial_Colony_Auto_Selects_
+    inline void __cdecl Set_Initial_Colony_Auto_Selects_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478D10 })();
+    }
+
+    // Suggested name: FUN_00443c60
+    inline void __cdecl FUN_00443c60() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
+    }
+
+    void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int32_t galaxy_age, int16_t num_players,
+                                int16_t strategic_combat_flag, int16_t starting_civ_level);
+
+    void Write_Game_Settings_();
 }
