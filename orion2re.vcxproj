@@ -22,11 +22,15 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\exit.cpp" />
+    <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
+    <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
+    <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
+    <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\video.cpp" />
@@ -38,6 +42,7 @@
     <ClInclude Include="src\game\deps.h" />
     <ClInclude Include="src\game\dos.h" />
     <ClInclude Include="src\game\exit.h" />
+    <ClInclude Include="src\game\farload.h" />
     <ClInclude Include="src\game\fields.h" />
     <ClInclude Include="src\game\filedef.h" />
     <ClInclude Include="src\game\fonts.h" />
@@ -53,6 +58,7 @@
     <ClInclude Include="src\game\mox.h" />
     <ClInclude Include="src\game\mox2.h" />
     <ClInclude Include="src\game\multplay.h" />
+    <ClInclude Include="src\game\palette.h" />
     <ClInclude Include="src\game\platform.h" />
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\russ.h" />
@@ -65,6 +71,13 @@
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\patch.h" />
     <ClInclude Include="src\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include=".vocode\config-ng.yaml" />
+    <None Include=".vocode\workflows\agent.yaml" />
+    <None Include=".vocode\workflows\chat.yaml" />
+    <None Include=".vocode\workflows\decompiler.yaml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

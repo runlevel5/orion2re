@@ -28,7 +28,9 @@ namespace hooks {
         { 0x00483470, &MOX2::main2_ },
         { 0x005274d0, &mouse::Set_Mouse_List_ },
         { 0x0052d580, &sound::Set_Audio_Buffer_ },
-        { 0x00500b20, &allocate::Allocate_Data_Space_ }
+        { 0x00500b20, &allocate::Allocate_Data_Space_ },
+        { 0x00525400, &fonts::Load_Palette_ },
+        { 0x004251d0, &JIM::Play_Background_Music_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

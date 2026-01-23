@@ -13,5 +13,53 @@ namespace sound {
         fn();
     }
 
+    inline void __cdecl Fade_Stream_Down_(uint32_t dur) {
+        using Fn = void(__cdecl*)(uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324E0 });
+        fn(dur);
+    }
+
+    inline int16_t __cdecl Get_Stream_Volume_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532080 });
+        return fn();
+    }
+
+    inline void __cdecl Stop_Stream_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FE0 });
+        fn();
+    }
+
+    inline void __cdecl Set_Stream_Filename_(const char* filename) {
+        using Fn = void(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FA0 });
+        fn(filename);
+    }
+
+    inline void __cdecl Play_Stream_(int32_t stream_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532130 });
+        fn(stream_id);
+    }
+
+    inline void __cdecl Loop_Stream_(int32_t loop_count) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FC0 });
+        fn(loop_count);
+    }
+
+    inline void __cdecl Set_Stream_Volume_(uint32_t volume) {
+        using Fn = void(__cdecl*)(uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005320E0 });
+        fn(volume);
+    }
+
+    inline void __cdecl Fade_Stream_Up_(uint32_t duration) {
+        using Fn = void(__cdecl*)(uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324C0 });
+        fn(duration);
+    }
+
     void __cdecl Set_Audio_Buffer_(void* buffer);
 }

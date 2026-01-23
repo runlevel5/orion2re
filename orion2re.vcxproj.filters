@@ -7,6 +7,12 @@
     <Filter Include="src\game">
       <UniqueIdentifier>{52b7f01e-f708-4dcf-8d93-1f86cc136aee}</UniqueIdentifier>
     </Filter>
+    <Filter Include=".vocode">
+      <UniqueIdentifier>{bcedb1cd-ef88-47cd-8b5c-59942ef4882a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include=".vocode\worklows">
+      <UniqueIdentifier>{f3c2feb0-9264-48b8-b732-5d02972d9c3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -46,6 +52,18 @@
       <Filter>src\game</Filter>
     </ClCompile>
     <ClCompile Include="src\game\allocate.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\palette.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\fonts.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\farload.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\jim.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,5 +161,26 @@
     <ClInclude Include="src\game\struct.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\palette.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\farload.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".vocode\workflows\agent.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include=".vocode\workflows\chat.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include=".vocode\workflows\decompiler.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include=".vocode\config-ng.yaml">
+      <Filter>.vocode</Filter>
+    </None>
+    <None Include=".gitignore" />
   </ItemGroup>
 </Project>

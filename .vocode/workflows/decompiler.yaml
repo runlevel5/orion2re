@@ -1,0 +1,463 @@
+workflows:
+  decompiler:
+    description: "A LLM enabled decompiler agentic loop."
+    need_input: False
+    nodes:
+      - name: input
+        type: http-input
+        message: "Waiting for Ghidra input..."
+        confirmation: auto
+        collapse: true
+        collapse_lines: 5
+        outcomes:
+          - name: done
+      - name: decompile
+        type: llm
+        model: gemini/gemini-3-flash-preview
+        reasoning_effort: high
+        #reset_policy: keep
+        #confirmation: auto
+        system: |
+          You are given Ghidra disassembly + Ghidra decompiler output. Produce cleaned-up C/C++ that is
+          semantically equivalent to the assembly.
+
+          IMPORTANT INPUT CONVENTION:
+          - Each disassembly line is formatted like:
+              <addr>  <raw_instruction>  ; <human_readable_instruction>
+          - Treat the COMMENT portion after ';' as the authoritative human-readable version that
+          contains Ghidra variable/symbol names and types (e.g. DAT_..., FUN_..., local vars).
+
+          NAMESPACE CONTEXT:
+          - The input may include a line like:
+              ;; Namespace (C++): A::B::C
+            This is the Ghidra function namespace path, already sanitized to valid C++ identifiers.
+          - When emitting the decompiled function and symbols without a namespace, prefer placing them inside
+            that C++ namespace block. 
+          - Symbols might also have :: in their name. Text to the left of the :: is the namespace and
+            text to the right is the symbol name. These symbols MUST go to their own namespace blocks. Examples:
+
+            _current_position - no namespace, use one provided via the comment:
+
+            namespace A::B::C {
+              char _current_position;
+            }
+
+            For "MOX2::Func" - MOX2 is namespace, Func is the function name:
+
+            namespace MOX2 {
+              // ... Func definition here
+            }
+
+            For "HAROLD::Load_Strings_" - HAROLD is namespace, Load_Strings_ is function name. Should look 
+            similar to MOX2::Func.
+ 
+            For "mouse::current_x" - mouse is namespace, current_x is variable name. Generate namespace for the symbol:
+
+            namespace mouse {
+              // ... current_x definition here 
+            }
+
+          - Keep in mind that code might reference symbols from other namespaces. When generating
+            stubs, you must correctly put symbols into correct namespace blocks deriving namespace
+            name from a symbol name.
+          - Namespaces might have similar names (MOX vs MOX) - these should be treated
+            as different namespaces.
+          - Combine all external symbols (variables and functions) that have same namespace name
+            into a single namespace block. Example to follow:
+
+             namespace video {
+               // ... all "video" namespace symbols
+               inline uint8_t& is_visible =
+                       *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00123456});
+             }
+
+             namespace MOX2 {
+               // ... all "MOX2" namespace variables and functions
+               inline uint8_t& is_visible =
+                       *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00123456});
+
+               inline void __stdcall Lookup_Something() {
+                 using Fn = void(*)();
+                 auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287A0});
+                 fn();
+               }
+             }
+
+          RULES:
+          * Correctness first: match control flow, calling convention, side effects, flags-dependent
+             behavior, and memory accesses.
+          * Cleanup:
+            - You are allowed to rename internal variables.
+            - You are allowed to remove superfluous variables, control logic, loops, etc.
+            - Generated code should resemble code written by a developer and not look like it was decompiled,
+               but the execution flow should be as close to original code as possible.
+          * Never introduce or call C stdlib helpers (memcpy/memset/strlen/strcmp/printf/etc).
+            If the binary calls an imported/external function, call that symbol directly as it exists
+            in the comment/symbols. Otherwise, implement the logic inline.
+          * External/global references by absolute address:
+            - Never inline absolute-address globals directly inside function bodies.
+            - Assembly might include both address and a name. You must use name, which will be in the comment
+              or decompiler output.
+            - For external variables, emit following structure with the address:
+
+             mov eax, [MOX2::is_visible]
+
+             should generate following stub:
+
+             namespace MOX2 {
+               inline uint8_t& is_visible =
+                       *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00123456});
+             }
+
+            - For external functions, emit inline wrapper function with namespace (if available) using the following patterns.
+              Make sure to include explicit calling convention. Do not change calling convention
+              in generated stubs.
+
+               Function with namespace, namespace block MUST be generated: 
+
+               call [MOX2::SomeFunc]
+
+               should produce:
+
+               namespace MOX2 {
+                 inline void __cdecl FUN_5287A0() {
+                   using Fn = void(_cdecl*)();
+                   auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287A0});
+                   fn();
+                 }
+               }
+
+               Function without namespace, no namespace block: 
+
+               call [FUN_123456]
+   
+               should produce:
+
+               inline void __cdecl FUN_123456() {
+                 using Fn = void(__cdecl*)();
+                 auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00123456});
+                 fn();
+               }
+
+            - The alias must match the best available symbol name from the human-readable comment.
+            - Use std::uintptr_t{0x...} (C++), and reinterpret_cast.
+            - For CALL/JMP targets, infer the correct function signature from usage and the human-readable comment.
+            - We use naming convention from the project - mixed Snake_Case for functions and lowercase snake_case for variables.
+          * Use explicit binary-faithful types (uint8_t/uint16_t/uint32_t/int32_t, pointers, structs) and casts where needed.
+          * Also output the following code that ties decompiled function to its base address, where 0x123456 is the raw function
+            start address and decompiled_func is the address of the decompiled function:
+
+            // Patch: { 0x123456, &Decompiled_Func },
+
+          * If you see automatically generated name starting with "sub_", "addr_", "DAT_", "LAB_", "FUN_" and similar - keep original
+            name, but you MUST suggest a new name in the comment. If name already matches, do no generate the comment. Examples:
+
+               namespace MOX2 {
+                   // Suggested name: MOX2::is_player_selected
+                   inline uint32_t& DAT_00578E04 =
+                       *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578E08});
+
+                   inline uint32_t& g_exampleVar =
+                       *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578E18});
+
+                   // Suggested name: MOX2::Cleanup_Game
+                   inline void __stdcall FUN_5287A0() {
+                     using Fn = void(__stdcall*)();
+                     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287A0});
+                     fn();
+                   }
+
+                   // Suggested name: Find_Needle
+                   void __cdecl FUN_00123456(char *input_str) {
+                     ...
+                   }
+               }
+
+          * If you see loops resembling standard functions, such as memset, strcmp and others,
+            prefer standard library functions over custom loop implementation.
+          * If you see string literals as pointers, reference original string address and 
+            provide potential text as a comment. Do not put address inline, create external
+            variable reference. 
+          * You might encounter a following pattern in this project: [var] + offset * size_t.
+            This usually represents a pointer a continuous region of space containing an
+            array of records. Examples:
+
+             MOVSX      EAX,word ptr [MOX::_PLAYER_NUM]                  = FFFFh
+             IMUL       EDX,EAX,0xea9
+             MOV        EAX,[MOX::_player]                               = ffffffff
+             ADD        EAX,EDX
+   
+             This is equivalent to having MOX::_player is a pointer to an array of
+             player structures of 0xea9 size and can be expressed in C++ code as:
+
+             plr = &MOX::_player[MOX::_PLAYER_NUM];
+
+             Please note that MOX::_player will have a correct type set and there
+             is NO need to multiply offset by structure size. Just add a comment about
+             structure size.
+
+             You also might see a variation of this pattern where offset is calculated via
+             bit shifting operations. It is exactly same behavior as a previous example
+             with more operations.
+
+                  MOVSX      ECX,word ptr [MOX::_PLAYER_NUM]
+                  MOV        EAX,ECX
+                  LEA        EDX,[ECX + ECX*0x2]
+                  LEA        ECX,[EAX + EDX*0x4]
+                  MOV        EDX,dword ptr [MOX::_player]                     = 00000000
+                  SHL        ECX,0x2
+                  LEA        EAX,[EAX + ECX*0x8]
+                  LEA        ECX,[EAX + EAX*0x8]
+                  ADD        ECX,EDX
+ 
+          * Output only the cleaned-up code (no extra explanation).
+        outcomes:
+          - name: done
+      - name: apply
+        type: llm
+        model: gemini/gemini-3-flash-preview
+        reasoning_effort: high
+        #confirmation: auto
+        tools:
+          - read_files
+          - list_files
+          - exec
+          - name: apply_patch
+            config:
+              format: patch
+        system: |
+          You are coding assistant and your goal is to implement requested changes. You will receive a C++ code snippet
+          that you will have to apply against the codebase of the project.
+
+          The snippet is a decompiled function with external references for variables and functions and the function 
+          body itself.
+
+          # Rules
+          * The input will resemble the following snippet:
+
+          ```
+          #include <cstdint>
+          #include <windows.h>
+          #include <process.h>
+
+          // External function pointers and symbols
+          inline void __cdecl parse_ten_cmd_parameter(char* cmd_line) {
+              using Fn = void(__cdecl*)(char*);
+              auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276f0});
+              fn(cmd_line);
+          }
+
+          inline void __cdecl __exit(int code) {
+              using Fn = void(__cdecl*)(int);
+              auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541630});
+              fn(code);
+          }
+
+          inline uintptr_t __cdecl __beginthread(void(__cdecl* start_address)(void*), unsigned int stack_size, void* arglist) {
+              using Fn = uintptr_t(__cdecl*)(void(__cdecl*)(void*), unsigned int, void*);
+              auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005424c0});
+              return fn(start_address, stack_size, arglist);
+          }
+
+          namespace platform {
+              // Suggested name: platform::Create_Direct_Draw
+              inline void __cdecl Create_Direct_Draw(int mode) {
+                  using Fn = void(__cdecl*)(int);
+                  auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527960});
+                  fn(mode);
+              }
+
+              // Suggested name: platform::Restore_Surfaces
+              inline void __cdecl Restore_Surfaces() {
+                  using Fn = void(__cdecl*)();
+                  auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528b30});
+                  fn();
+              }
+
+              // Suggested name: platform::Cleanup_Surfaces
+              inline void __cdecl Cleanup_Surfaces() {
+                  using Fn = void(__cdecl*)();
+                  auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527d30});
+                  fn();
+              }
+          }
+
+          namespace MOX2 {
+              // Suggested name: MOX2::worker_thread_main
+              inline void __cdecl thunk_main2_(void* arg) {
+                  using Fn = void(__cdecl*)(void*);
+                  auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1b20});
+                  fn(arg);
+              }
+          }
+
+          // Global variables
+          inline uint8_t& g_should_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B1A4});
+          inline uintptr_t& g_worker_thread_handle = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x0055B1BC});
+          inline char* const s_Moo2AlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{0x0055B1CC}); // "Moo2 is already running"
+          inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{0x0055B1E8});        // "Microprose"
+          
+          namespace platform {
+            inline MSG& g_main_msg = *reinterpret_cast<MSG*>(std::uintptr_t{0x00579300});
+            inline HWND& g_main_window = *reinterpret_cast<HWND*>(std::uintptr_t{0x00579320});
+            inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
+          }
+
+          // Suggested name: Main_WndProc
+          inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+              using Fn = LRESULT(CALLBACK*)(HWND, UINT, WPARAM, LPARAM);
+              auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00536710});
+              return fn(hwnd, uMsg, wParam, lParam);
+          }
+
+          namespace platform {
+            WPARAM __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow) {
+                parse_ten_cmd_parameter(lpCmdLine);
+
+                WNDCLASSA wc;
+                wc.cbClsExtra = 0;
+                wc.cbWndExtra = 0;
+                wc.hInstance = hInstance;
+                wc.style = CS_HREDRAW | CS_VREDRAW; // 3
+                wc.lpfnWndProc = Main_WndProc;
+                wc.hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(101));   // DAT_00000065
+                wc.hCursor = LoadCursorA(nullptr, MAKEINTRESOURCEA(32512)); // DAT_00007f00 (IDC_ARROW)
+                wc.hbrBackground = nullptr;
+                wc.lpszMenuName = s_Microprose;
+                wc.lpszClassName = s_Microprose;
+
+                RegisterClassA(&wc);
+
+                // Ensure single instance
+                if (FindWindowA(s_Microprose, s_Microprose)) {
+                    MessageBoxA(nullptr, s_Moo2AlreadyRunning, s_Microprose, MB_ICONHAND); // 0x10
+                    __exit(1);
+                }
+
+                int screen_height = GetSystemMetrics(SM_CYSCREEN); // 1
+                int screen_width = GetSystemMetrics(SM_CXSCREEN);  // 0
+
+                // Style 0x90080008: WS_VISIBLE | WS_POPUP | WS_BORDER | WS_SYSMENU
+                HWND hWnd = CreateWindowExA(0, s_Microprose, s_Microprose, 0x90080008, 
+                                            0, 0, screen_width, screen_height, 
+                                            nullptr, nullptr, hInstance, nullptr);
+
+                if (!hWnd) {
+                    return 0;
+                }
+
+                g_main_window = hWnd;
+                UpdateWindow(hWnd);
+                SetCursor(nullptr);
+
+                platform::Create_Direct_Draw(4);
+
+                bool needs_surface_restore = false;
+                g_worker_thread_handle = __beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr);
+
+                // Main Message Loop
+                while (true) {
+                    if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {
+                        return g_main_msg.wParam;
+                    }
+
+                    TranslateMessage(&g_main_msg);
+                    DispatchMessageA(&g_main_msg);
+
+                    // Handle focus changes for DirectDraw surface restoration
+                    if (g_window_focus_state == 0) {
+                        needs_surface_restore = true;
+                    }
+
+                    if (needs_surface_restore && g_window_focus_state == 1) {
+                        needs_surface_restore = false;
+                        platform::Restore_Surfaces();
+                    }
+
+                    if (g_should_exit == 1) {
+                        break;
+                    }
+                }
+
+                platform::Cleanup_Surfaces();
+                DestroyWindow(g_main_window);
+
+                return 0;
+            }
+          }
+
+          // Patch: { 0x005277b0, &WinMain_Proxy },
+          ```
+
+          * You must do the following:
+            - For all external variable definitions:
+              1. If a variable is in a namespace, you must add it to the `src/game/<namespace>.h` file. Always lowercase the
+                namespace name.
+              
+                Example, 
+
+                ```
+                namespace platform {
+                  inline MSG& g_main_msg = *reinterpret_cast<MSG*>(std::uintptr_t{0x00579300});
+                }
+                ```
+
+                The `g_main_msg` should be added inside of the src/game/platform.h
+              
+                2. If variable is not in the namespace, add it to `src/game/funcs.h
+             
+            - For all external functions:
+              1. If a function is in a namespace, you must add it to the `src/game/<namespace>.h` file. Always lowercase the
+                namespace name.
+              
+                Example:
+
+                ```
+                namespace MOX2 {
+                    // Suggested name: MOX2::worker_thread_main
+                    inline void __cdecl thunk_main2_(void* arg) {
+                        using Fn = void(__cdecl*)(void*);
+                        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1b20});
+                        fn(arg);
+                    }
+                }
+                ```
+
+                The `thunk_main2_` should be added to `src/game/mox2.h`
+            
+             - For the actual function body, you must put it under `src/game/<namespace>.cpp` and create a definition in
+               `src/game/<namespace>.h`
+
+               Example:
+
+               namespace platform {
+                  WPARAM __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow) {
+                  parse_ten_cmd_parameter(lpCmdLine);
+
+                  WNDCLASSA wc;
+                  wc.cbClsExtra = 0;
+
+                  ....
+                }
+
+                `WinMain_Proxy` should be added to `src/game/platform.cpp` inside of the `platform` namespace block.
+
+                Also add `WPARAM __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)`
+                to `src/game/platform.h`.
+
+            - If you create a new header file for namespace that was not added before, add it as a include to `deps.h`.
+            - If function already exists in the header as an external reference, remove the old external reference.
+            - Find a `// Patch: ` comment and add address to patch to `patch.cpp` at the bottom of the list. Example:
+            
+              // Patch: { 0x005277b0, &WinMain_Proxy },
+
+              Add `{ 0x005277b0, &WinMain_Proxy },` to `hooks.cpp` as the very last item and before the closing brace of 
+              the `all_hooks` list.
+          * Provide a very short summary of changes made.
+          * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
+        outcomes:
+          - name: done    
+    edges:
+      - input.done -> decompile
+      - decompile.done -> apply
+      - apply.done -> input

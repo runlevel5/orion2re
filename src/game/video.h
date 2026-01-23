@@ -5,6 +5,12 @@ namespace video {
 	inline uint32_t& screen_refresh_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1B4 });
 
+	inline uint32_t*& _mouse_palette =
+		*reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00578AB0 });
+
+	inline uint32_t* _current_palette =
+		reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00579350 });
+
 	// Functions
 	inline void __cdecl Set_Refresh_Stencil() {
 		using Fn = void(__cdecl*)();
