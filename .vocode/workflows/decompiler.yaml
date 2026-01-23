@@ -16,7 +16,7 @@ workflows:
         model: gemini/gemini-3-flash-preview
         reasoning_effort: high
         #reset_policy: keep
-        #confirmation: auto
+        confirmation: auto
         system: |
           You are given Ghidra disassembly + Ghidra decompiler output. Produce cleaned-up C/C++ that is
           semantically equivalent to the assembly.
@@ -217,7 +217,7 @@ workflows:
         type: llm
         model: gemini/gemini-3-flash-preview
         reasoning_effort: high
-        #confirmation: auto
+        confirmation: auto
         tools:
           - read_files
           - list_files
@@ -451,7 +451,7 @@ workflows:
             
               // Patch: { 0x005277b0, &WinMain_Proxy },
 
-              Add `{ 0x005277b0, &WinMain_Proxy },` to `hooks.cpp` as the very last item and before the closing brace of 
+              Add `{ 0x005277b0, &WinMain_Proxy },` to `src/hooks.cpp` as the very last item and before the closing brace of 
               the `all_hooks` list.
           * Provide a very short summary of changes made.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.

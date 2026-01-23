@@ -1,6 +1,28 @@
 #include "deps.h"
 
 namespace MOX2 {
+    void __stdcall Set_Mox_Language_() {
+        char dir_buffer[80];
+        char line_buffer[80];
+
+        // Check if language.ini exists
+        if (dos::DIR_(s_language_ini, dir_buffer) != 0) {
+            FILE* file = _wfopen(s_language_ini, s_rt);
+            if (file) {
+                // Read language code from file
+                _fgets(line_buffer, 0x3C, file);
+                _fclose(file);
+
+                // Convert value (offset 16 used in assembly, likely skipping a header)
+                // but the result is currently discarded in this implementation.
+                _atoi(line_buffer);
+            }
+        }
+
+        // Hardcoded language override to 0 (English)
+        MOX::_settings_language = 0;
+    }
+
     void main2_() {
         char font_file[16];
         char loading_buffer[64];

@@ -11,6 +11,9 @@ namespace video {
 	inline uint32_t* _current_palette =
 		reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00579350 });
 
+	inline uint16_t& _copy_to_on_page_flag =
+		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578e60 });
+
 	// Functions
 	inline void __cdecl Set_Refresh_Stencil() {
 		using Fn = void(__cdecl*)();
@@ -23,9 +26,5 @@ namespace video {
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527C80 });
 		fn();
 	}
-	inline void Set_Page_Off_() {
-		using Fn = void(*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528680 });
-		fn();
-	}
+	void Set_Page_Off_();
 }

@@ -14,11 +14,7 @@ namespace MOX2 {
         fn();
     }
 
-    inline void __stdcall Set_Mox_Language_() {
-        using Fn = void(__stdcall*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483EF0 });
-        fn();
-    }
+    void __stdcall Set_Mox_Language_();
 
     inline void __stdcall Set_Mox_Alt_Path_() {
         using Fn = void(__stdcall*)();
@@ -39,6 +35,8 @@ namespace MOX2 {
     }
 
     inline const char* s_MOX_SET = reinterpret_cast<const char*>(0x00556918); // "MOX.SET"
+    inline const char* s_language_ini = reinterpret_cast<const char*>(0x005576D8); // "language.ini"
+    inline const char* s_rt = reinterpret_cast<const char*>(0x00557BE8);           // "rt"
     inline const char* s_Thanks_English = reinterpret_cast<const char*>(0x005577A8);
     inline const char* s_Thanks_German = reinterpret_cast<const char*>(0x00557774);
     inline const char* s_Thanks_French = reinterpret_cast<const char*>(0x00557750);

@@ -213,6 +213,18 @@ inline int32_t __cdecl _fclose(FILE* stream) {
     return fn(stream);
 }
 
+inline char* __cdecl _fgets(char* str, int num, FILE* stream) {
+    using Fn = char*(__cdecl*)(char*, int, FILE*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541BB0 });
+    return fn(str, num, stream);
+}
+
+inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
+    using Fn = FILE*(__cdecl*)(const char*, const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540C00 });
+    return fn(filename, mode);
+}
+
 inline int __cdecl _sprintf(char* o, const char* s, ...)
 {
     using VFn = int(__cdecl*)(char*, const char*, va_list);
