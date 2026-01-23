@@ -14,5 +14,21 @@ namespace mouse {
         fn();
     }
 
+    inline uint16_t& _mouse_overide_flag =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B180 });
+
+    inline uint16_t& _mouse_overide_right_button =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B184 });
+
+    inline uint16_t& _mouse_overide_left_button =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B188 });
+
+    /**
+     * Returns the current mouse button state, allowing for button overrides.
+     * Usually, the return value represents a bitmask or sum of button states:
+     * 1 = Left, 2 = Right, 3 = Both.
+     */
+    uint16_t Mouse_Button_();
+
     void Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
 }

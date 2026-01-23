@@ -250,3 +250,13 @@ inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     fn(dest, src, n);
 }
 
+inline void __cdecl Mox_Update_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7820 })();
+}
+
+// Suggested name: g_mouse_buttons_state
+inline uint16_t& g_mouse_buttons_state =
+    *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578DE0 });
+
+

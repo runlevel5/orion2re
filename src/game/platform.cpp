@@ -786,6 +786,27 @@ namespace platform {
 #endif
     }
 
+    /**
+     * @brief Triggers a page toggle via a Windows message and waits for completion.
+     *
+     * This function sets a pending flag, sends a custom message (0x401, likely WM_USER + 1)
+     * to the main window, and spins until the flag is cleared by the message handler.
+     */
+    void __cdecl Toggle_Pages_Stub_() {
+        g_pending_toggle_pages = true;
+
+        // Send custom toggle message (0x401 = WM_USER + 1)
+        SendMessageA(g_main_window, 0x401, 0, 0);
+
+        // Busy wait until the message handler resets the pending flag.
+        // Note: The original assembly (0x00527ebc - 0x00527ec3) contains a bug where
+        // the variable is not reloaded from memory inside the loop, effectively
+        // creating an infinite spin if the flag remains true after SendMessageA returns.
+        while (g_pending_toggle_pages) {
+            // Spin
+        }
+    }
+
     int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd) {
         Parse_Ten_Cmd_Parameter(lpCmdLine);
 

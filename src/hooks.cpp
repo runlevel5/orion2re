@@ -27,12 +27,18 @@ namespace hooks {
         { 0x004f24d0, &HAROLD::Get_Font_File_ },
         { 0x00483470, &MOX2::main2_ },
         { 0x005274d0, &mouse::Set_Mouse_List_ },
+        { 0x00527680, &mouse::Mouse_Button_ },
         { 0x0052d580, &sound::Set_Audio_Buffer_ },
         { 0x00500b20, &allocate::Allocate_Data_Space_ },
         { 0x00525400, &fonts::Load_Palette_ },
         { 0x004251d0, &JIM::Play_Background_Music_ },
         { 0x00528680, &video::Set_Page_Off_ },
         { 0x00483ef0, &MOX2::Set_Mox_Language_ },
+        { 0x00527ea0, &platform::Toggle_Pages_Stub_ },
+        { 0x0052b220, &timer::Mark_Time_ },
+        { 0x00531f80, &key::Keyboard_Status_ },
+        { 0x00531f20, &key::Read_Key_ },
+        { 0x00425a70, &JIM::Draw_Logos_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

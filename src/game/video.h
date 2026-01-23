@@ -21,10 +21,21 @@ namespace video {
 		fn();
 	}
 
+	inline void __cdecl Set_Refresh_Stencil_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527CD0 });
+		fn();
+	}
+
 	inline void Set_Refresh_Full_() {
 		using Fn = void(*)();
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527C80 });
 		fn();
 	}
 	void Set_Page_Off_();
+
+	inline void __cdecl Copy_Off_To_Back_() {
+		using Fn = void(__cdecl*)();
+		reinterpret_cast<Fn>(std::uintptr_t{ 0x005286c0 })();
+	}
 }

@@ -34,3 +34,8 @@
 #include "strings.h"
 #include "loader.h"
 #include "multplay.h"
+#include "timer.h"
+#include "key.h"
+#include "file_ani.h"
+#include "palstore.h"
+#include "smack.h"

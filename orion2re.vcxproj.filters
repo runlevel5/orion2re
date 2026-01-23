@@ -66,6 +66,12 @@
     <ClCompile Include="src\game\jim.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\timer.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\key.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -165,6 +171,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\farload.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\key.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\timer.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

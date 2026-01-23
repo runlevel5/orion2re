@@ -23,6 +23,9 @@ namespace platform {
 	inline HWND& g_main_window =
 		*reinterpret_cast<HWND*>(std::uintptr_t{ 0x00579320 });
 
+	inline bool& g_pending_toggle_pages =
+		*reinterpret_cast<bool*>(std::uintptr_t{ 0x005792FC });
+
 	inline int16_t& g_video_mode =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578e5c });
 
@@ -120,5 +123,6 @@ namespace platform {
 	HRESULT Restore_Surfaces();
 	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
+	void __cdecl Toggle_Pages_Stub_();
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
 }

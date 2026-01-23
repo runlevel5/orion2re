@@ -28,11 +28,13 @@
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
+    <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
+    <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\video.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\patch.cpp" />
@@ -52,6 +54,7 @@
     <ClInclude Include="src\game\initgame.h" />
     <ClInclude Include="src\game\jim.h" />
     <ClInclude Include="src\game\ken.h" />
+    <ClInclude Include="src\game\key.h" />
     <ClInclude Include="src\game\loader.h" />
     <ClInclude Include="src\game\misc.h" />
     <ClInclude Include="src\game\mouse.h" />
@@ -66,6 +69,7 @@
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\ten.h" />
+    <ClInclude Include="src\game\timer.h" />
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />
     <ClInclude Include="src\hooks.h" />

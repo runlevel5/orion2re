@@ -211,6 +211,10 @@ workflows:
                   ADD        ECX,EDX
  
           * Output only the cleaned-up code (no extra explanation).
+          * Comment generation rules:
+            - If you identify a potential bug, mention it
+            - If code could benefit from logical grouping in blocks - add a block-level comment
+            - Otherwise, do not add comments
         outcomes:
           - name: done
       - name: apply
@@ -221,13 +225,15 @@ workflows:
         tools:
           - read_files
           - list_files
-          - exec
+          - name: exec
+            auto_approve: true
           - name: apply_patch
+            auto_approve: true
             config:
               format: patch
         system: |
           You are coding assistant and your goal is to implement requested changes. You will receive a C++ code snippet
-          that you will have to apply against the codebase of the project.
+          that you will have to apply against the codebase of the project using the `apply_patch` tool.
 
           The snippet is a decompiled function with external references for variables and functions and the function 
           body itself.
@@ -425,8 +431,13 @@ workflows:
 
                 The `thunk_main2_` should be added to `src/game/mox2.h`
             
+              2. For external function stubs without namespace, put them to `src/funcs.h`.
+              3. If function is a standard Win32 API function (SendMessageA, MessageBoxA and so on) - do not generate
+                 a stub.
+
              - For the actual function body, you must put it under `src/game/<namespace>.cpp` and create a definition in
-               `src/game/<namespace>.h`
+               `src/game/<namespace>.h`. If you need to create a new file, make sure you include "deps.h" at the top
+               of the file.
 
                Example:
 
@@ -447,14 +458,18 @@ workflows:
 
             - If you create a new header file for namespace that was not added before, add it as a include to `deps.h`.
             - If function already exists in the header as an external reference, remove the old external reference.
-            - Find a `// Patch: ` comment and add address to patch to `patch.cpp` at the bottom of the list. Example:
+            - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Example:
             
               // Patch: { 0x005277b0, &WinMain_Proxy },
 
               Add `{ 0x005277b0, &WinMain_Proxy },` to `src/hooks.cpp` as the very last item and before the closing brace of 
               the `all_hooks` list.
-          * Provide a very short summary of changes made.
+          * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
+
+          # Checklist
+          * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
+          * `src/patch.cpp` was updated
         outcomes:
           - name: done    
     edges:

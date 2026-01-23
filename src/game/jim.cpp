@@ -1,6 +1,145 @@
 #include "deps.h"
 
 namespace JIM {
+    void __cdecl Draw_Logos_(void) {
+        fields::Deactivate_Auto_Function_();
+        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+        _darken_palette_value = 0;
+        fields::Init_Fields_State_();
+        video::Set_Refresh_Stencil_();
+        video::Set_Page_Off_();
+        Fill_(0, 0, 0x27F, 0x1DF, 0);
+
+        allocate::Push_Block_(MOX::_global_screen_seg);
+        int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_global_screen_seg);
+        uint32_t ani_buffer = allocate::Allocate_Next_Block_(MOX::_global_screen_seg, remaining_space - 100);
+        file_ani::Set_File_Animation_Buffer_(ani_buffer);
+
+        int16_t skip_flag = 0;
+        bool user_interrupted = false;
+
+        if (Check_For_Simtex_Logo_() == 0) {
+            file_ani::Open_File_Animation_(s_logo_lbx, 0);
+            video::Set_Page_Off_();
+            palstore::Darken_Palette_(100);
+            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+            palette::Clear_Palette_Changes_(0, 0xFF);
+            platform::Toggle_Pages_Stub_();
+
+            int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
+            file_ani::Draw_File_Animation_();
+            video::Copy_Off_To_Back_();
+            Mox_Update_();
+            platform::Toggle_Pages_Stub_();
+            _darken_palette_value = 0;
+
+            // Slow fade in for the first logo
+            Slow_Fade_In_();
+
+            int16_t end_delay_counter = 15; // 0xF
+            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+
+            while (!user_interrupted) {
+                if (skip_flag != 0) break;
+
+                timer::Mark_Time_();
+                if (key::Keyboard_Status_()) {
+                    key::Read_Key_();
+                    skip_flag = 1;
+                    user_interrupted = true;
+                }
+
+                if (mouse::Mouse_Button_() != 0) {
+                    skip_flag = 1;
+                    user_interrupted = true;
+                }
+
+                if (user_interrupted) break;
+
+                video::Set_Page_Off_();
+                if (file_ani::Get_File_Animation_Frame_() == total_frames) {
+                    if (--end_delay_counter < 1) {
+                        user_interrupted = true;
+                    }
+                } else {
+                    file_ani::Draw_File_Animation_();
+                }
+
+                platform::Toggle_Pages_Stub_();
+                Mox_Update_();
+                timer::Release_Time_(1);
+            }
+        } else {
+            // Play Simtex cinematic if check failed
+            SMACK::Play_Cinematic_(s_simtex_lbx, 0, 0);
+            sound::Stop_Stream_();
+            _jim_current_stream = 0xFFFF;
+        }
+
+        // Second Logo (Master of Orion / Microprose)
+        if (skip_flag == 0) {
+            Logo_Fadeout_();
+            video::Set_Page_Off_();
+            Fill_(0, 0, 0x27F, 0x1DF, 0);
+
+            file_ani::Open_File_Animation_(s_logo_lbx, 1);
+            int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
+            file_ani::Draw_File_Animation_();
+            video::Copy_Off_To_Back_();
+            Mox_Update_();
+
+            int16_t end_delay_counter = 5;
+            platform::Toggle_Pages_Stub_();
+
+            user_interrupted = false;
+            Fast_Fade_In_();
+            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+
+            while (!user_interrupted) {
+                timer::Mark_Time_();
+                if (key::Keyboard_Status_()) {
+                    key::Read_Key_();
+                    skip_flag = 1;
+                    user_interrupted = true;
+                }
+
+                if (mouse::Mouse_Button_() != 0) {
+                    skip_flag = 1;
+                    user_interrupted = true;
+                }
+
+                if (user_interrupted) break;
+
+                video::Set_Page_Off_();
+                if (file_ani::Get_File_Animation_Frame_() == total_frames) {
+                    if (--end_delay_counter < 1) {
+                        user_interrupted = true;
+                    }
+                } else {
+                    file_ani::Draw_File_Animation_Stencil_();
+                }
+
+                platform::Toggle_Pages_Stub_();
+                Mox_Update_();
+                timer::Release_Time_(1);
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_global_screen_seg);
+        file_ani::Reset_File_Animation_Buffer_();
+        Logo_Fadeout_();
+        Mox_Update_();
+
+        video::Set_Page_Off_();
+        Fill_(0, 0, 0x27F, 0x1DF, 0);
+        video::Copy_Off_To_Back_();
+
+        // Finally play the intro cinematic unless the user requested a skip early on
+        if (skip_flag == 0) {
+            SMACK::Play_Cinematic_(s_intro_lbx, 0, 1);
+        }
+    }
+
     void Play_Background_Music_() {
         // Only proceed if music is enabled in settings
         if (MOX::_settings.music_on != 1) {
