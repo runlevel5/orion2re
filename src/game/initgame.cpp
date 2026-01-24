@@ -299,4 +299,179 @@ namespace INITGAME {
         random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
     }
 
+    void __cdecl Init_Players_() {
+        // Load race trait template data from RACESTUF.LBX
+        RACESEL::_race_specials = (void**)farload::Far_Reload_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, 0, 1, 31);
+        MOX::Mox_Update_();
+
+        for (int i = 1; i < 13; ++i) {
+            RACESEL::_race_specials[i] = farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, i, 1, 31);
+            MOX::Mox_Update_();
+        }
+
+        MOX::Mox_Update_();
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            s_player* plr = &MOX::_player[i];
+
+            if (plr->objectives == 100) {
+                // Predefined or special player setup: copy traits to evolutionary upgrades
+                struct_::Copy_Structure_(plr->evolutionary_upgrade_traits, plr->traits, 31);
+            } else {
+                int16_t race_idx;
+                bool unique_race;
+                do {
+                    race_idx = (int16_t)random::Random_(13) - 1;
+                    unique_race = true;
+                    for (int16_t j = 0; j < i; ++j) {
+                        if (MOX::_player[j].race == (char)race_idx) {
+                            unique_race = false;
+                            break;
+                        }
+                    }
+                } while (!unique_race);
+
+                plr->race = (char)race_idx;
+
+                // Copy race name
+                char* src_name = MOX::_race_names[race_idx];
+                for (int k = 0; k < 15; ++k) {
+                    plr->race_name[k] = src_name[k];
+                    if (src_name[k] == '\0') break;
+                }
+
+                // Copy default traits from template
+                struct_::Copy_Structure_(plr->traits, RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(plr->evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
+
+                MOX::Mox_Update_();
+                RACECUST::Race_Customization_(i);
+                MOX::Mox_Update_();
+
+                // Apply special trait bonuses (lookup table)
+                for (int k = TRAIT_POP_GROWTH_BONUS; k < TRAIT_LOW_G_WORLD; ++k) {
+                    if (plr->traits[k] != 0) {
+                        plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
+                    }
+                    if (plr->evolutionary_upgrade_traits[k] != 0) {
+                        plr->evolutionary_upgrade_traits[k] = MOX::_special_bonus[k][plr->evolutionary_upgrade_traits[k]];
+                    }
+                }
+                MOX::Mox_Update_();
+
+                // Assign unique player color
+                int16_t color = (int16_t)random::Random_(8) - 1;
+                bool duplicate_color;
+                do {
+                    duplicate_color = false;
+                    for (int16_t j = 0; j < i; ++j) {
+                        if (MOX::_player[j].color == (char)color) {
+                            duplicate_color = true;
+                            break;
+                        }
+                    }
+                    if (duplicate_color) {
+                        int val = color + 1;
+                        color = (val < 0 ? -val : val) % 8;
+                    }
+                } while (duplicate_color);
+
+                plr->color = (char)color;
+                MOX::Mox_Update_();
+
+                // Load a random race name string as the player name
+                allocate::Push_Block_(MOX::_screen_seg);
+                char* name_ptr = (char*)farload::Far_Reload_Next_Data_(s_RACENAME_LBX, 0, MOX::_screen_seg, (random::Random_(8) + i * 8) - 1, 1, 20);
+                MOX::Mox_Update_();
+                allocate::Pop_Block_(MOX::_screen_seg);
+
+                for (int k = 0; k < 20; ++k) {
+                    plr->name[k] = name_ptr[k];
+                    if (name_ptr[k] == '\0') break;
+                }
+            }
+        }
+
+        MOX::Mox_Update_();
+        KEN::Init_NPC_Personalities_Objectives_Themes_();
+        MOX::Mox_Update_();
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            s_player* plr = &MOX::_player[i];
+            plr->officer_for_hire = -1;
+            plr->offensive_stagepoint = -1;
+            plr->applied_evolutionary_upgrade = 1;
+            plr->player_done_flags = 0;
+            plr->bc = 50;
+
+            MOX::Mox_Update_();
+            plr->cheated = 0;
+            plr->history_btns = 'O'; // Hex 0x4F
+            plr->ignoring = 0;
+            plr->n_freighters = 0;
+
+            for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
+                plr->last_tech_report_date[j] = MOX::_stardate;
+            }
+
+            MOX::Mox_Update_();
+            TECHINIT::Init_Player_Tech_(i);
+            MOX::Mox_Update_();
+            INITSHIP::Init_Ship_Designs_(i);
+            
+            int16_t fuel_idx = INITSHIP::Best_Ship_Fuel_(i);
+            plr->ship_range = TECHDATA::_fuel[fuel_idx].ship_range;
+        }
+
+        // Ensure current human player evolution flag is set
+        MOX::_player[MOX::_PLAYER_NUM].applied_evolutionary_upgrade = 1;
+
+        MOX::Mox_Update_();
+        HOMEGEN::Assign_Home_Star_Names_();
+        MOX::Mox_Update_();
+        HOMEGEN::Init_Diplomatic_Relations_();
+        MOX::Mox_Update_();
+    }
+
+    /**
+     * Initializes leader data from LBX, sets random skills for specific officers,
+     * and calculates initial officer skill values.
+     */
+    void __cdecl Init_Leaders_() {
+        char lbx_filename[20];
+        HAROLD::Get_Officer_Data_LBX_Name_(lbx_filename);
+
+        // Loads 67 leader records (59 bytes each) into a temporary buffer.
+        void* loaded_data = farload::Far_Reload_Data_(lbx_filename, 0, MOX::_screen_seg, 0, 67, 59);
+
+        // Bulk copy loaded data into the global leaders array.
+        uint8_t* src = reinterpret_cast<uint8_t*>(loaded_data);
+        uint8_t* dst = reinterpret_cast<uint8_t*>(MOX::_leaders);
+        for (int32_t i = 0; i < (67 * 59); ++i) {
+            dst[i] = src[i];
+        }
+
+        for (int16_t i = 0; i < 67; ++i) {
+            if (i == 41) {
+                // Special handling for leader at index 41
+                officer::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 2, 5, 1);
+            }
+            else if (i == 52) {
+                // Special handling for leader at index 52
+                officer::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 1, 5, 1);
+            }
+            else if (i == 65) {
+                // Special randomized tech application for leader at index 65
+                MOX::_leaders[i].tech_application[0] = static_cast<uint8_t>(random::Random_(102)) - 1;
+                MOX::_leaders[i].tech_application[1] = static_cast<uint8_t>(random::Random_(102)) + 101;
+            }
+
+            // Calculate and set the skill value for this leader.
+            MOX::_leaders[i].skill_value = officer::Officer_Skill_Value_(i);
+
+            // Refresh systems after each leader update.
+            RUSS::Mox_Update_();
+        }
+    }
+
 }

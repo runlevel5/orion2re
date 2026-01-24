@@ -261,6 +261,12 @@ inline void __cdecl Mox_Update_() {
     reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7820 })();
 }
 
+inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
+inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
+inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
+inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
+inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
+
 inline void __cdecl FUN_00443C60() {
     using Fn = void(__cdecl*)();
     reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();

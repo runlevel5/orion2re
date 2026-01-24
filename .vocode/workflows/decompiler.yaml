@@ -482,10 +482,12 @@ workflows:
             #pragma pack(pop)
 
           * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
+          * You might have to update data types to match what is in the existing codebase
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
 
           # Checklist
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
+          * All mentioned namespaces were processed
           * `src/patch.cpp` was updated
         outcomes:
           - name: done    

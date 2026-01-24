@@ -55,6 +55,9 @@ namespace hooks {
         { 0x00478b30, &INITGAME::Init_Ships_Array_ },
         { 0x00478d80, &INITGAME::Init_Colonies_Array_ },
         { 0x00478820, &INITGAME::Init_New_Game_ },
+        { 0x00479580, &INITGAME::Init_Leaders_ },
+        { 0x004f2610, &HAROLD::Get_Officer_Data_LBX_Name_ },
+        { 0x00479000, &INITGAME::Init_Players_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

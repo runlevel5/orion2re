@@ -10,17 +10,9 @@ namespace INITGAME {
 
     void Init_Colonies_Array_();
 
-    // Suggested name: Init_Leaders
-    inline void __cdecl Init_Leaders_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00479580 })();
-    }
+    void __cdecl Init_Leaders_();
 
-    // Suggested name: Init_Players
-    inline void __cdecl Init_Players_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00479000 })();
-    }
+    void __cdecl Init_Players_();
 
     // Suggested name: Make_System_Monsters_Into_Ships
     inline void __cdecl Make_System_Monsters_Into_Ships_() {

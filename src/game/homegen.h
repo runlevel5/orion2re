@@ -11,4 +11,14 @@ namespace HOMEGEN {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0051C3F0})();
     }
+
+    inline void __cdecl Assign_Home_Star_Names_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00519ea0 })();
+    }
+
+    inline void __cdecl Init_Diplomatic_Relations_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00450480 })();
+    }
 }

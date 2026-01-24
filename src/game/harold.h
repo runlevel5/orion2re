@@ -2,6 +2,7 @@
 
 namespace HAROLD {
     void __cdecl Get_Font_File_(char* buffer);
+    void __cdecl Get_Officer_Data_LBX_Name_(char* out_name);
 
     inline void Set_Sound_Volume_To_Settings_() {
         using Fn = void(*)();
@@ -25,4 +26,10 @@ namespace HAROLD {
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
+
+    inline const char* s_HERODATI_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A808 }); // "HERODATI.LBX"
+    inline const char* s_HERODATS_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A818 }); // "HERODATS.LBX"
+    inline const char* s_HERODATF_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A828 }); // "HERODATF.LBX"
+    inline const char* s_HERODATG_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A838 }); // "HERODATG.LBX"
+    inline const char* s_HERODATA_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A848 }); // "HERODATA.LBX"
 }
