@@ -27,6 +27,7 @@
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
+    <ClCompile Include="src\game\homegen.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />

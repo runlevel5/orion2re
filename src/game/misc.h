@@ -1,9 +1,20 @@
 #pragma once
 
 namespace MISC {
-    inline uint32_t* Font_Colors2_(int32_t arg1, int32_t arg2, int32_t arg3) {
-        using Fn = uint32_t * (*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049DDB0 });
-        return fn(arg1, arg2, arg3);
+    struct ColorPair {
+        uint32_t c1;
+        uint32_t c2;
+    };
+
+    inline ColorPair* __cdecl Font_Colors2_(int32_t a1, int32_t a2, int32_t a3) {
+        using Fn = ColorPair*(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ddb0});
+        return fn(a1, a2, a3);
+    }
+
+    inline void __cdecl Draw_Advancing_Fill_Message_(int32_t a1, uint16_t* ctr, uint16_t max, ColorPair* c1, ColorPair* c2, int32_t x, int32_t y, char* msg, uint16_t* bitmap, int32_t flag) {
+        using Fn = void(__cdecl*)(int32_t, uint16_t*, uint16_t, ColorPair*, ColorPair*, int32_t, int32_t, char*, uint16_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e3f0});
+        fn(a1, ctr, max, c1, c2, x, y, msg, bitmap, flag);
     }
 }

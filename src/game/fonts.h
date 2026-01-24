@@ -1,4 +1,5 @@
 #pragma once
+#include "misc.h"
 
 namespace fonts {
     inline void*& _palette_block =
@@ -14,10 +15,16 @@ namespace fonts {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00526D00 });
         fn(style);
     }
-    inline void Set_Font_Style_(int32_t font, intptr_t color_ptr) {
-        using Fn = void(*)(int32_t, intptr_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005255A0 });
-        fn(font, color_ptr);
+    inline void __cdecl Set_Font_Style_(int32_t style, MISC::ColorPair* colors) {
+        using Fn = void(__cdecl*)(int32_t, MISC::ColorPair*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005255a0});
+        fn(style, colors);
+    }
+
+    inline int16_t __cdecl Get_String_Width_(const char* str) {
+        using Fn = int16_t(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525470});
+        return fn(str);
     }
     inline void Print_(int32_t x, int32_t y, const char* str) {
         using Fn = void(*)(int32_t, int32_t, const char*);

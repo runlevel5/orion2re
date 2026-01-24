@@ -73,4 +73,9 @@ namespace allocate {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eac0 });
         return fn(heap_idx, size);
     }
+
+    inline void* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
+        using Fn = void* (__cdecl*)(void*, uint32_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E930 })(seg, size);
+    }
 }

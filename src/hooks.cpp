@@ -61,6 +61,8 @@ namespace hooks {
         { 0x00479000, &INITGAME::Init_Players_ },
         { 0x00478bc0, &INITGAME::Make_System_Monsters_Into_Ships_ },
         { 0x00478d10, &INITGAME::Set_Initial_Colony_Auto_Selects_ },
+        { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },
+        { 0x0051a950, &HOMEGEN::Build_Home_Star_List_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

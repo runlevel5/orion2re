@@ -27,7 +27,7 @@ namespace MOX2 {
         char font_file[16];
         char loading_buffer[64];
         char mox_set_dir[32];
-        uint32_t font_colors[2];
+        MISC::ColorPair font_colors;
 
         MOX::_previous_screen = 0xFF;
         MOX::_max_debug_saves = 20;
@@ -89,10 +89,9 @@ namespace MOX2 {
         video::Set_Refresh_Full_();
         MOX::_mox_font_colors_offset = 0x75;
 
-        uint32_t* colors = MISC::Font_Colors2_(4, 0xD3, 0xDC);
-        font_colors[0] = colors[0];
-        font_colors[1] = colors[1];
-        fonts::Set_Font_Style_(4, reinterpret_cast<intptr_t>(font_colors));
+        MISC::ColorPair* colors = MISC::Font_Colors2_(4, 0xD3, 0xDC);
+        font_colors = *colors;
+        fonts::Set_Font_Style_(4, &font_colors);
         video::Set_Page_Off_();
 
         // Prepare loading message

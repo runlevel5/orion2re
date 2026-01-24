@@ -12,4 +12,10 @@ namespace struct_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D0FA });
         fn(dest, src, size);
     }
+
+    inline uint16_t __cdecl Test_Bit_Field_(uint8_t* field, int32_t bit) {
+        using Fn = uint16_t(__cdecl*)(uint8_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052cfb5 });
+        return fn(field, bit);
+    }
 }

@@ -341,8 +341,8 @@ namespace INITGAME {
                 }
 
                 // Copy default traits from template
-                struct_::Copy_Structure_(plr->traits, RACESEL::_race_specials[race_idx], 31);
-                struct_::Copy_Structure_(plr->evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->traits, RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
 
                 MOX::Mox_Update_();
                 RACECUST::Race_Customization_(i);

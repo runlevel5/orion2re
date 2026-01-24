@@ -218,6 +218,9 @@ workflows:
             };
             #pragma pack(pop)
           * Output only the cleaned-up code (no extra explanation).
+          * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
+            always prefer using library function. Our application does not have direct access to library functions - you
+            must check `src/game/helpers.h` and implement a function if it is missing.
           * NEVER add comments, unless it is one of the following exceptions:
             - A potential bug was identified
             - A complicated piece of logic was detected - add at most single line comment
@@ -484,6 +487,7 @@ workflows:
           * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
           * You might have to update data types to match what is in the existing codebase
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
+          * For `struct_` namespace - check the `src/game/struct.h` file (no underscore)
 
           # Checklist
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
