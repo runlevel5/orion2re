@@ -15,16 +15,10 @@ namespace INITGAME {
     void __cdecl Init_Players_();
 
     // Suggested name: Make_System_Monsters_Into_Ships
-    inline void __cdecl Make_System_Monsters_Into_Ships_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478BC0 })();
-    }
+    void __cdecl Make_System_Monsters_Into_Ships_();
 
     // Suggested name: Set_Initial_Colony_Auto_Selects_
-    inline void __cdecl Set_Initial_Colony_Auto_Selects_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478D10 })();
-    }
+    void __cdecl Set_Initial_Colony_Auto_Selects_();
 
     // Suggested name: FUN_00443c60
     inline void __cdecl FUN_00443c60() {

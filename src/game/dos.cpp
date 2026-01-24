@@ -9,7 +9,7 @@ namespace dos {
      */
     bool __cdecl DIR_(const char* pattern, char* output_name) {
         intptr_t result;
-        intptr_t search_handle; // local_4: Allocated but uninitialized in original assembly
+        intptr_t search_handle = NULL; // local_4: Allocated but uninitialized in original assembly
 
         if (pattern[0] == '\0') {
             // Note: search_handle is used uninitialized here in the original binary logic.
@@ -31,6 +31,7 @@ namespace dos {
         char* src = &DAT_0057b5ec;
         char* dst = output_name;
         while ((*dst++ = *src++) != '\0');
+        *dst = '\0';
 
         return true;
     }

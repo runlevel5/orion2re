@@ -474,4 +474,66 @@ namespace INITGAME {
         }
     }
 
+    /**
+     * @address 00478d10
+     */
+    void Set_Initial_Colony_Auto_Selects_() {
+        if (MOX::_NUM_STARS <= 0) {
+            return;
+        }
+
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            // Initialize selection history to none (-1) for all planets in this system
+            for (int planet_idx = 0; planet_idx < 8; ++planet_idx) {
+                MOX::_star[star_idx].last_planet_selected[planet_idx] = -1;
+            }
+
+            // Determine and set the default auto-selection logic for this star
+            int16_t temp_auto_select;
+            HACCESS::Set_Colony_Auto_Select_For_Star_(star_idx, MOX::_PLAYER_NUM, &temp_auto_select);
+        }
+    }
+
+    /**
+     * Iterates through all systems to spawn Space Monsters and Orion Guardians.
+     * Replaces monster star markers with their original values and upgrades guarded planets.
+     */
+    void __cdecl Make_System_Monsters_Into_Ships_() {
+        int16_t total_stars = MOX::num_stars;
+        s_star_data* star_ptr = MOX::_star;
+        s_star_data* end_ptr = &MOX::_star[total_stars];
+
+        // Process standard Space Monsters
+        while (star_ptr < end_ptr) {
+            if (star_ptr->system_special == MOX::SYSTEM_SPECIAL_SPACE_MONSTER) {
+                int32_t ship_type = random::Random_(5) + 9;
+                int16_t star_idx = static_cast<int16_t>(star_ptr - MOX::_star);
+                int16_t planet_idx = HOMEGEN::Random_Planet_(star_idx);
+
+                // Initialize monster ship owner to Neutral/Orion
+                MOX::_ship[MOX::_NUM_SHIPS].owner = 8;
+                SHIPS::Build_Nonplayer_Ship_(ship_type, star_idx, 0);
+
+                // Restore previous special status from backup field and clear backup
+                star_ptr->system_special = static_cast<MOX::SYSTEM_SPECIAL>(star_ptr->not_used1);
+                star_ptr->not_used1 = 0;
+
+                HOMEGEN::Upgrade_Planet_Guarded_By_Monster_(&MOX::_planet[planet_idx], static_cast<int16_t>(ship_type));
+            }
+            star_ptr++;
+        }
+
+        // Process Orion Star Guardian (Limit to one)
+        bool orion_spawned = false;
+        for (int16_t i = 0; i < total_stars; ++i) {
+            if (orion_spawned) break;
+
+            if (MOX::_star[i].system_special == MOX::SYSTEM_SPECIAL_ORION_STAR) {
+                orion_spawned = true;
+                MOX::_ship[MOX::_NUM_SHIPS].owner = 8;
+                SHIPS::Build_Nonplayer_Ship_(9, i, 0);
+            }
+        }
+    }
+
 }

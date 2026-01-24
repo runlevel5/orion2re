@@ -48,7 +48,8 @@ namespace hooks {
         { 0x0052ea20, &allocate::Reallocation_Error_ },
         { 0x0052e8e0, &allocate::Allocate_Dos_Space_ },
         { 0x0052e9c0, &allocate::Allocate_Far_Space_ },
-        { 0x0052d360, &dos::DIR_ },
+        // TODO: Why no games in menu when hooked?
+        //{ 0x0052d360, &dos::DIR_ },
         { 0x0051c7e0, &farload::Farload_Library_ },
         { 0x0051c710, &farload::Far_Reload_ },
         { 0x00478fb0, &INITGAME::Write_Game_Settings_ },
@@ -58,6 +59,8 @@ namespace hooks {
         { 0x00479580, &INITGAME::Init_Leaders_ },
         { 0x004f2610, &HAROLD::Get_Officer_Data_LBX_Name_ },
         { 0x00479000, &INITGAME::Init_Players_ },
+        { 0x00478bc0, &INITGAME::Make_System_Monsters_Into_Ships_ },
+        { 0x00478d10, &INITGAME::Set_Initial_Colony_Auto_Selects_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

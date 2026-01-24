@@ -1,6 +1,21 @@
 #pragma once
 
 namespace MOX {
+    enum SYSTEM_SPECIAL : uint8_t {
+        SYSTEM_SPECIAL_NO_SPECIAL = 0,
+        SYSTEM_SPECIAL_STABLE_WORMHOLE = 1,
+        SYSTEM_SPECIAL_SPACE_DEBRIS = 2,
+        SYSTEM_SPECIAL_PIRATE_CACHE = 3,
+        SYSTEM_SPECIAL_GOLD_DEPOSITS = 4,
+        SYSTEM_SPECIAL_GEM_DEPOSITS = 5,
+        SYSTEM_SPECIAL_NATIVES = 6,
+        SYSTEM_SPECIAL_SPLINTER_COLONY = 7,
+        SYSTEM_SPECIAL_MAROONED_HERO = 8,
+        SYSTEM_SPECIAL_SPACE_MONSTER = 9,
+        SYSTEM_SPECIAL_ANCIENT_ARTIFACTS = 10,
+        SYSTEM_SPECIAL_ORION_STAR = 11
+    };
+
     enum SCREEN : uint16_t {
         SCREEN_MAIN = 0,
         SCREEN_COLONY = 1,
@@ -39,6 +54,8 @@ namespace MOX {
     };
 
     // References
+    inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
+    inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline uint8_t& _previous_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
