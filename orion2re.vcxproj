@@ -62,6 +62,7 @@
     <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dos.h" />
     <ClInclude Include="src\game\eric.h" />
+    <ClInclude Include="src\game\events.h" />
     <ClInclude Include="src\game\exit.h" />
     <ClInclude Include="src\game\exitm.h" />
     <ClInclude Include="src\game\farload.h" />

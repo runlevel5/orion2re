@@ -65,4 +65,9 @@ namespace MAPGEN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b6650});
         fn(star_idx, need_new_flag, system_special, unknown, monster_mask);
     }
+
+    inline void __cdecl Load_Nebula_Pictures_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004B7040})();
+    }
 }

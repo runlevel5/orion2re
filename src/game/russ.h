@@ -38,6 +38,11 @@ namespace RUSS {
         fn(type, priority, format, args...);
     }
 
+    inline uint32_t __cdecl Release_All_Blocks_(void* seg) {
+        using Fn = uint32_t(__cdecl*)(void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004D7830})(seg);
+    }
+
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
     inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
 }

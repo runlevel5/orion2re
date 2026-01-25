@@ -16,4 +16,9 @@ namespace MAINSCR {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004C6780})();
     }
+
+    inline void __cdecl Update_Ship_Icons_In_Between_Turns_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004CD550})();
+    }
 }

@@ -44,6 +44,8 @@ namespace MOX {
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
+    inline uint16_t& _cur_map_x = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A18F0});
+    inline uint16_t& _cur_map_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A18F8});
     inline uint8_t& _previous_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
@@ -83,8 +85,10 @@ namespace MOX {
     inline void*& _global_data_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00597410 });
 
-    inline void*& _nebula =
-        *reinterpret_cast<void**>(std::uintptr_t{ 0x00597770 });
+    inline s_nebula_data*& _nebula =
+        *reinterpret_cast<s_nebula_data**>(std::uintptr_t{ 0x00597770 });
+
+    inline uint8_t& _NUM_NEBULAS = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D10});
 
     inline uint16_t& _NUM_COLONIES =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00597856 });
@@ -95,6 +99,9 @@ namespace MOX {
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
+    inline uint16_t& _max_zoom_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B448});
+    inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
+    inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
 
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
@@ -126,13 +133,18 @@ namespace MOX {
     inline s_star_data*& _star =
         *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });
 
+    inline uint32_t (&_bill_savegame)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x00559478});
+    inline uint16_t& _antaran_resource_level = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059790C});
+    inline uint16_t& _chance_for_antaran_invasion = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D24});
+    inline uint16_t& _disallow_saves_code = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597854});
+
     inline int16_t& _max_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00597768 });
     inline int16_t& _MAP_MAX_X = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00597998 });
     inline int16_t& _MAP_MAX_Y = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059799A });
     inline uint8_t& _g_galaxy_size = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597A88 });
 
     // Suggested name: g_extra_data_seg
-    inline uint32_t& DAT_005a2bec =
+    inline uint32_t& _nebula_screen_seg =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005A2BEC });
 
     // Suggested name: _planet_max_farms
@@ -171,6 +183,8 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline char (&_save_game_description)[10][37] = *reinterpret_cast<char(*)[10][37]>(std::uintptr_t{0x005974F0});
+
     // Suggested name: MOX::moveable_box_display_order
     inline uint16_t (&_moveable_box_order)[5] =
         *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059BD20});
@@ -190,5 +204,10 @@ namespace MOX {
         using Fn = bool(*)(s_player*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043D1C0 });
         return fn(player);
+    }
+
+    inline void __cdecl Apply_Save_Settings(s_settings* settings) {
+        using Fn = void(__cdecl*)(s_settings*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043D290})(settings);
     }
 }

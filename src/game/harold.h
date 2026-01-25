@@ -34,6 +34,12 @@ namespace HAROLD {
 
     char* __cdecl H_Message_(int16_t id);
 
+    inline void __cdecl Save_Mouse_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f2190});
+        fn();
+    }
+
     inline void __cdecl Init_Fleet_Movement_Box_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0e90});
@@ -49,6 +55,17 @@ namespace HAROLD {
     inline void __cdecl Harold_Init_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0DD0 })();
+    }
+
+    inline void __cdecl Restore_Mouse_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f21d0});
+        fn();
+    }
+
+    inline void __cdecl Load_Leader_Titles_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004F26F0})();
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"

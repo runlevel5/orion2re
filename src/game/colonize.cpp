@@ -2,6 +2,64 @@
 #include <cstring>
 
 namespace COLONIZE {
+    int16_t Star_N_Uncolonized_Planets_(s_star_data* star) {
+        int16_t uncolonized_count = 0;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+
+            if (planet_idx != -1) {
+                if (MOX::_planet[planet_idx].colony_index == -1) {
+                    uncolonized_count++;
+                }
+            }
+        }
+
+        return uncolonized_count;
+    }
+
+    int16_t Star_N_Outpostable_Planets_For_Player_(s_star_data* star, int16_t player_id) {
+        int16_t outpostable_count = 0;
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+            if (planet_idx != -1) {
+                if (MOX::_planet[planet_idx].colony_index == -1) {
+                    outpostable_count++;
+                }
+            }
+        }
+
+        return outpostable_count;
+    }
+
+    int16_t Star_N_Colonizable_Planets_For_Player_(s_star_data* star, int16_t player_id) {
+        int16_t colonizable_count = 0;
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+            if (planet_idx == -1) {
+                continue;
+            }
+
+            s_planet_data* planet = &MOX::_planet[planet_idx];
+
+            if (planet->planet_type == PLANET_TYPE_PLANET) {
+                int16_t colony_idx = planet->colony_index;
+                if (colony_idx == -1) {
+                    colonizable_count++;
+                } else {
+                    s_colony* colony = &MOX::_colony[colony_idx];
+                    if (colony->outpost_flag != 0 && (int16_t)colony->owner == player_id) {
+                        colonizable_count++;
+                    }
+                }
+            }
+        }
+
+        return colonizable_count;
+    }
+
     void Find_Colonize_Players_() {
         uint8_t outpost_bits[72]; // Bitmask: bit i set if player i has an outpost ship here
         uint8_t colony_bits[72];  // Bitmask: bit i set if player i has a colony ship or base here

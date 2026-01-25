@@ -146,16 +146,16 @@ inline void __cdecl FUN_528c90() {
     fn();
 }
 
-inline void __cdecl Fill_(short x1, short y1, short x2, short y2, short color) {
-    using Fn = void(__cdecl*)(short, short, short, short, short);
+inline void __cdecl Fill_(int x1, int y1, int x2, int y2, uint8_t color) {
+    using Fn = void(__cdecl*)(int, int, int, int, uint8_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528cc0 });
     fn(x1, y1, x2, y2, color);
 }
 
-inline void __cdecl hgetch_() {
-    using Fn = void(__cdecl*)();
+inline int __cdecl hgetch_() {
+    using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
-    fn();
+    return fn();
 }
 
 inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
@@ -239,18 +239,8 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
     return fn(filename, mode);
 }
 
-inline int __cdecl _sprintf(char* o, const char* s, ...)
-{
-    using VFn = int(__cdecl*)(char*, const char*, va_list);
-    auto vfn = reinterpret_cast<VFn>(std::uintptr_t{ 0x00540550 });
-
-    va_list ap;
-    va_start(ap, s);
-    int rc = vfn(o, s, ap);
-    va_end(ap);
-
-    return rc;
-}
+inline auto _sprintf =
+    reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
 inline int __cdecl _clock() {
     using Fn = int(__cdecl*)();
@@ -381,5 +371,3 @@ inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc110});
     return fn(player_idx);
 }
-
-

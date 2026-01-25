@@ -763,7 +763,7 @@ struct s_star_data {
 
 struct s_ship_data {
     struct s_ship_design d;
-    char owner;
+    int8_t owner;
     uint8_t status;
     short location;
     short x;
@@ -807,5 +807,9 @@ struct s_good_star {
     uint32_t star_distances[72]; // 288 bytes
     uint16_t star_count;        // Offset 0x129 (297 decimal)
 }; // Total size: 299 bytes (0x12B)
+
+struct s_nebula_data {
+    uint8_t data[20];
+};
 
 #pragma	pack(pop)

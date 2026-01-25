@@ -1,5 +1,12 @@
 #pragma once
 
+#define MAX_PLAYERS 8
+#define MAX_SHIPS 500
+#define MAX_COLONIES 250
+#define MAX_PLANETS 360
+#define MAX_STARS 72
+#define MAX_LEADERS 67
+
 enum TECH_FIELD {
     TECH_FIELD_STARTING_TECH = 0,  // Starting Tech
     TECH_FIELD_ADVANCED_BIOLOGY = 1,  // Advanced Biology

@@ -45,7 +45,7 @@ namespace allocate {
         MOX::_colony = reinterpret_cast<s_colony*>(Allocate_Space_(0x1608A));
         struct_::Clear_Structure_(MOX::_colony, 0x1608A);
 
-        MOX::DAT_005a2bec = reinterpret_cast<uint32_t>(Allocate_Space_(0x3E800));
+        MOX::_nebula_screen_seg = reinterpret_cast<uint32_t>(Allocate_Space_(0x3E800));
 
         // Global cache allocation
         MOX::_global_cache_seg = FUN_0052c200(0x174508);
@@ -54,7 +54,7 @@ namespace allocate {
         // DOS-space allocations for low-level segments
         MOX::_global_data_seg = Allocate_Dos_Space_(0x2800);
 
-        MOX::_nebula = Allocate_Dos_Space_(0x14);
+        MOX::_nebula = reinterpret_cast<s_nebula_data*>(Allocate_Dos_Space_(0x14));
         struct_::Clear_Structure_(MOX::_nebula, 0x14);
 
         MOX::_star = reinterpret_cast<s_star_data*>(Allocate_Dos_Space_(0x1FC8));

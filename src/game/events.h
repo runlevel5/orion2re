@@ -4,12 +4,12 @@
 namespace EVENTS {
 #pragma pack(push, 1)
     struct s_event_data {
-        int8_t field0_0x0;
-        int8_t field1_0x1;
-        uint8_t field2_0x2;
-        int16_t event_type;
-        int16_t field4_0x5;
-        int16_t field5_0x7;
+        uint8_t field0_0x0;
+        uint8_t field1_0x1;
+        undefined field2_0x2;
+        short event_type;
+        short field4_0x5;
+        short field5_0x7;
     };
 #pragma pack(pop)
 

@@ -2,6 +2,11 @@
 #include <cstdint>
 
 namespace MSG_ {
+    inline uint8_t (&_msgs)[1800] = *reinterpret_cast<uint8_t(*)[1800]>(std::uintptr_t{0x005A6700});
+    inline uint32_t& _first_msg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A66F0});
+    inline uint32_t& _n_msgs = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A66F8});
+    inline uint32_t& _max_msgs = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A6E08});
+
     #pragma pack(push, 1)
     struct Msg_ColonyBaseRemoved {
         uint16_t pad1;

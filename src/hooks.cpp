@@ -123,6 +123,13 @@ namespace hooks {
         { 0x004fc140, &COLCALC::Twiddle_Initial_Homeworlds_ },
         { 0x004b9ba0, &COLONIZE::Allocate_New_Colony_Slots_ },
         { 0x004b9d00, &COLONIZE::Find_Colonize_Players_ },
+        { 0x004b9ae0, &COLONIZE::Star_N_Colonizable_Planets_For_Player_ },
+        { 0x004b9b60, &COLONIZE::Star_N_Outpostable_Planets_For_Player_ },
+        { 0x004b9aa0, &COLONIZE::Star_N_Uncolonized_Planets_ },
+        { 0x004ba510, &ERIC::Get_Sint_Index_From_List_ },
+        { 0x0043c840, &FILEDEF::Save_Game_ },
+        { 0x0043c0f0, &FILEDEF::Load_Game_ },
+        { 0x0043d1b0, &FILEDEF::Save_Moo_Custom_Player_Data_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -130,6 +137,7 @@ namespace hooks {
     void Assert_Types() {
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
+        ASSERT(sizeof(s_nebula_data) == 0x14, "s_nebula_data")
         ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
         ASSERT(sizeof(s_player) == 0xea9, "s_player");
         ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");

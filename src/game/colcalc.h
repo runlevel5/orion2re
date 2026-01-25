@@ -7,4 +7,9 @@ namespace COLCALC {
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
 
     void __cdecl Init_Surrenders_();
+
+    inline void __cdecl No_Op1_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004FBEF0})();
+    }
 }

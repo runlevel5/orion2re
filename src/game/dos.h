@@ -22,11 +22,5 @@ namespace dos {
         return fn(handle, data);
     }
 
-    /**
-     * Finds files matching a pattern or continues a previous search.
-     * @param pattern The search pattern (e.g., "*.txt"). If empty, continues search with findnext.
-     * @param output_name Buffer to receive the filename of the found file.
-     * @return true if a file was found, false otherwise.
-     */
     bool __cdecl DIR_(const char* pattern, char* output_name);
 }
