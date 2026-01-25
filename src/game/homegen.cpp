@@ -311,9 +311,9 @@ namespace HOMEGEN {
                 MOX::_star[i].owner = -1;
             }
 
-            int32_t x_dist = ((int32_t)MOX::_max_map_scale * (int32_t)MOX::_MAP_MAX_X) / (adj_players * 10);
-            int32_t y_dist = ((int32_t)MOX::_MAP_MAX_Y * (int32_t)MOX::_MAP_MAX_X) / (adj_players * 10);
-            int32_t min_dist_sq = x_dist * x_dist + y_dist * y_dist;
+            int32_t dx = ((int32_t)MOX::_MAP_MAX_X * (int32_t)MOX::_max_map_scale) / (adj_players * 10);
+            int32_t dy = ((int32_t)MOX::_MAP_MAX_Y * (int32_t)MOX::_max_map_scale) / (adj_players * 10);
+            int32_t min_dist_sq = dx * dx + dy * dy;
 
             if (min_dist_sq < 15000) {
                 min_dist_sq = 15000;

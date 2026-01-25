@@ -1,6 +1,14 @@
 #pragma once
 
 namespace MISC {
+    inline uint8_t& _mouse_clock_image_num =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566578});
+
+    inline uint8_t* _mouse_list_clock =
+        reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558250});
+
+    void __cdecl Increment_Mouse_Clock_Image_();
+
     struct ColorPair {
         uint32_t c1;
         uint32_t c2;

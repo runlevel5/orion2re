@@ -27,6 +27,7 @@
     <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exit.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
+    <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\mapgen.cpp" />
+    <ClCompile Include="src\game\misc.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\palette.cpp" />

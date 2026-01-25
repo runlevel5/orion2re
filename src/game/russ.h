@@ -19,6 +19,12 @@ namespace RUSS {
         fn();
     }
 
+    inline void __cdecl Mox_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7820 });
+        fn();
+    }
+
     inline void __cdecl Assert_Settings_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7810 });

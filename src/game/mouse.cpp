@@ -1,7 +1,7 @@
 #include "deps.h"
 
 namespace mouse {
-    uint16_t Mouse_Button_() {
+    uint16_t __cdecl Mouse_Button_() {
         if (_mouse_overide_flag == 0) {
             return g_mouse_buttons_state;
         }
@@ -9,7 +9,7 @@ namespace mouse {
         return _mouse_overide_right_button + _mouse_overide_left_button;
     }
 
-    void Set_Mouse_List_(uint8_t* mouse_data, uint16_t count) {
+    void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count) {
         _current_mouse_list_count = count;
         _current_mouse_list = mouse_data;
 

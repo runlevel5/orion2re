@@ -23,12 +23,24 @@ namespace mouse {
     inline uint16_t& _mouse_overide_left_button =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B188 });
 
+    inline void __cdecl Mouse_Buffer_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527630 });
+        fn();
+    }
+
+    inline void __cdecl Mouse_Buffer2_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527640 });
+        fn();
+    }
+
     /**
      * Returns the current mouse button state, allowing for button overrides.
      * Usually, the return value represents a bitmask or sum of button states:
      * 1 = Left, 2 = Right, 3 = Both.
      */
-    uint16_t Mouse_Button_();
+    uint16_t __cdecl Mouse_Button_();
 
-    void Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
+    void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
 }
