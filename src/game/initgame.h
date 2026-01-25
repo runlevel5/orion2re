@@ -14,10 +14,8 @@ namespace INITGAME {
 
     void __cdecl Init_Players_();
 
-    // Suggested name: Make_System_Monsters_Into_Ships
     void __cdecl Make_System_Monsters_Into_Ships_();
 
-    // Suggested name: Set_Initial_Colony_Auto_Selects_
     void __cdecl Set_Initial_Colony_Auto_Selects_();
 
     // Suggested name: FUN_00443c60

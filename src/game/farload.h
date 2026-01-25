@@ -14,11 +14,20 @@ namespace farload {
 #pragma pack(pop)
 
     // Suggested name: farload::Error_Handler
-    inline void __cdecl Error_Handler_(char* lib_name, int code, int idx) {
-        using Fn = void(__cdecl*)(char*, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051cf00 });
-        fn(lib_name, code, idx);
-    }
+    void __cdecl Error_Handler_(char* lib_name, int code, int idx);
+
+    inline char* s_vga_frames_error = reinterpret_cast<char*>(std::uintptr_t{0x0055AE38});
+    inline char* s_error_defined_records = reinterpret_cast<char*>(std::uintptr_t{0x0055AE70});
+    inline char* s_error_record_size = reinterpret_cast<char*>(std::uintptr_t{0x0055AE94});
+    inline char* s_error_lbx_entries = reinterpret_cast<char*>(std::uintptr_t{0x0055AEB4});
+    inline char* s_error_not_lbx = reinterpret_cast<char*>(std::uintptr_t{0x0055AED4});
+    inline char* s_error_reload_failed = reinterpret_cast<char*>(std::uintptr_t{0x0055AEE8});
+    inline char* s_error_improper_entry = reinterpret_cast<char*>(std::uintptr_t{0x0055AF10});
+    inline char* s_error_insufficient_memory = reinterpret_cast<char*>(std::uintptr_t{0x0055AF30});
+    inline char* s_error_corrupted = reinterpret_cast<char*>(std::uintptr_t{0x0055AF7C});
+    inline char* s_error_not_found = reinterpret_cast<char*>(std::uintptr_t{0x0055AF94});
+    inline char* s_entry_suffix = reinterpret_cast<char*>(std::uintptr_t{0x0055AFAC});
+    inline char* s_entry_prefix = reinterpret_cast<char*>(std::uintptr_t{0x0055AFB0});
 
     inline uint32_t& _farload_file_flag = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055AE34 });
     inline char* _farload_file_name = reinterpret_cast<char*>(std::uintptr_t{ 0x005723B8 });

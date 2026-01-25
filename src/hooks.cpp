@@ -96,11 +96,29 @@ namespace hooks {
         { 0x0051bea0, &HOMEGEN::Random_Planet_ },
         { 0x0051c160, &HOMEGEN::Set_Special_For_Star_Guarded_By_Monster_ },
         { 0x0051bf50, &HOMEGEN::Upgrade_Planet_Guarded_By_Monster_ },
+        { 0x0051ad50, &HOMEGEN::Generate_Orion_ },
+        { 0x0051af90, &HOMEGEN::Get_Orion_Star_Id_ },
+        { 0x004f0a30, &HAROLD::Get_Scaled_Value_ },
+        { 0x004f1380, &HAROLD::N_Sattelites_ },
+        { 0x004f0860, &HAROLD::Empty_System_ },
+        { 0x004f1030, &HAROLD::Is_Home_Star_ },
+        { 0x004f1270, &HAROLD::N_Food_Planets_In_System_ },
+        { 0x004f1970, &HAROLD::Set_Sound_Volume_To_Settings_ },
+        { 0x004f18f0, &HAROLD::Set_All_Visited_Flags_ },
+        { 0x004f0ed0, &HAROLD::Init_Moving_Boxes_ },
+        { 0x004f14b0, &HAROLD::Planet_Number_ },
+        { 0x004f0640, &HAROLD::Confirm_Planet_And_Star_Index_Link_ },
+        { 0x004f2440, &HAROLD::H_Message_ },
+        { 0x0051cf00, &farload::Error_Handler_ },
+        { 0x004baa30, &ERIC::Eric_Init_ },
+        { 0x00473df0, &EVENTS::Init_Events_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
 
     void Assert_Types() {
+        ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
+        ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
         ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
         ASSERT(sizeof(s_player) == 0xea9, "s_player");
         ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");

@@ -88,4 +88,60 @@ void* __cdecl Far_Reload_(char* path, int32_t idx, void* param3) {
     return Farload_Library_(path, idx, param3, 1);
 }
 
+void __cdecl Error_Handler_(char* filename, int error_code, int entry_num) {
+    char message[120];
+    char itoa_buf[20];
+
+    auto strcpy_custom = [](char* dest, const char* src) -> char* {
+        while ((*dest = *src) != '\0') {
+            dest++;
+            src++;
+        }
+        return dest;
+    };
+
+    auto strcat_custom = [](char* dest, const char* src) -> char* {
+        while (*dest != '\0') dest++;
+        while ((*dest = *src) != '\0') {
+            dest++;
+            src++;
+        }
+        return dest;
+    };
+
+    char* current = strcpy_custom(message, filename);
+    current = strcat_custom(message, s_entry_prefix);
+
+    __itoa(entry_num, itoa_buf, 10);
+    current = strcat_custom(message, itoa_buf);
+    current = strcat_custom(message, s_entry_suffix);
+
+    const char* detail = nullptr;
+
+    if (error_code >= 1 && error_code <= 16) {
+        switch (error_code) {
+        case 1:  detail = s_error_not_found; break;
+        case 2:  detail = s_error_corrupted; break;
+        case 3:
+            strcpy_custom(message, s_error_insufficient_memory);
+            exitm::Exit_With_Message(message);
+            return;
+        case 4:  detail = s_error_improper_entry; break;
+        case 5:  detail = s_error_reload_failed; break;
+        case 7:  detail = s_error_not_lbx; break;
+        case 8:  detail = s_error_lbx_entries; break;
+        case 9:  detail = s_error_record_size; break;
+        case 10: detail = s_error_defined_records; break;
+        case 16: detail = s_vga_frames_error; break;
+        default: break;
+        }
+    }
+
+    if (detail) {
+        strcat_custom(message, detail);
+    }
+
+    exitm::Exit_With_Message(message);
+}
+
 }

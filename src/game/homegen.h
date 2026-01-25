@@ -7,6 +7,8 @@ namespace HOMEGEN {
     inline const char* s_Found_no_satellites_after_3_MIN_e_0055adc8 =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055ADC8}); // "Found no satellites after 3 MIN epochs for star %d"
 
+    inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055a738}); // "Orion"
+
     inline int32_t& _HOME_WORLD_GEN_MAX_CTR = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00572390 });
     inline s_good_star*& _good_stars = *reinterpret_cast<s_good_star**>(std::uintptr_t{ 0x00572398 });
     inline int16_t* _nearest_food_worlds = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005723A0 });
@@ -21,7 +23,17 @@ namespace HOMEGEN {
         uint16_t stars[20];
         uint16_t count;
     };
+
+    struct StarCandidate {
+        int32_t distance;
+        int16_t star_id;
+    };
     #pragma pack(pop)
+
+    inline int __cdecl qsort_1_(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0051C3E0})(a, b);
+    }
 
     uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist);
 
@@ -37,10 +49,9 @@ namespace HOMEGEN {
 
     void __cdecl Modify_Home_Worlds_();
 
-    inline void __cdecl FUN_0051ad50() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x0051AD50 })();
-    }
+    int16_t __cdecl Generate_Orion_();
+
+    int16_t __cdecl Get_Orion_Star_Id_();
 
     void __cdecl Make_System_Monsters_();
 

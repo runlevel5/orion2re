@@ -25,9 +25,11 @@ namespace RUSS {
         fn();
     }
 
-    inline void __cdecl PFMT_(int x, int y, const char* format, int32_t value) {
-        using Fn = void(__cdecl*)(int, int, const char*, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7850 })(x, y, format, value);
+    template<typename... Args>
+    inline void __cdecl PFMT_(int32_t type, int32_t priority, const char* format, Args... args) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, const char*, ...);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7850 });
+        fn(type, priority, format, args...);
     }
 
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"

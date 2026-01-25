@@ -13,6 +13,11 @@ namespace MAPGEN {
     uint8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index);
     uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
 
+    inline int8_t __cdecl Generate_Max_Farms_(int32_t star_index, int16_t planet_index) {
+        using Fn = int8_t(__cdecl*)(int32_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004b5c90})(star_index, planet_index);
+    }
+
     inline char __cdecl Generate_Orbit_(int16_t star_idx) {
         using Fn = char(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004B62A0 });

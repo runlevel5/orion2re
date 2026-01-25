@@ -23,6 +23,8 @@
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
+    <ClCompile Include="src\game\eric.cpp" />
+    <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exit.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />

@@ -27,8 +27,20 @@ namespace sound {
 
     inline void __cdecl Stop_Stream_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FE0 });
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532030 });
         fn();
+    }
+
+    inline void __cdecl Stream_On_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532040 });
+        fn();
+    }
+
+    inline void __cdecl Set_Stream_Max_Volume_(int32_t volume) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532060 });
+        fn(volume);
     }
 
     inline void __cdecl Set_Stream_Filename_(const char* filename) {
@@ -49,8 +61,8 @@ namespace sound {
         fn(loop_count);
     }
 
-    inline void __cdecl Set_Stream_Volume_(uint32_t volume) {
-        using Fn = void(__cdecl*)(uint32_t);
+    inline void __cdecl Set_Stream_Volume_(int32_t volume) {
+        using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005320E0 });
         fn(volume);
     }
@@ -62,4 +74,28 @@ namespace sound {
     }
 
     void __cdecl Set_Audio_Buffer_(void* buffer);
+
+    inline void __cdecl Sound_On_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E610 });
+        fn();
+    }
+
+    inline void __cdecl Stop_All_Sounds_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E710 });
+        fn();
+    }
+
+    inline void __cdecl Resume_Sound_(int32_t channel) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052DCC0 });
+        fn(channel);
+    }
+
+    inline void __cdecl Set_Sound_Max_Volume_(int32_t volume) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D500 });
+        fn(volume);
+    }
 }

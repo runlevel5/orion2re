@@ -17,4 +17,9 @@ namespace GEO {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004130F0});
         return fn(star_idx1, star_idx2);
     }
+
+    inline int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00413080})(x1, y1, x2, y2);
+    }
 }

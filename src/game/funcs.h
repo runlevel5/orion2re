@@ -150,6 +150,12 @@ inline void __cdecl Fill_(short x1, short y1, short x2, short y2, short color) {
     fn(x1, y1, x2, y2, color);
 }
 
+inline void __cdecl hgetch_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
+    fn();
+}
+
 inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
     using Fn = HRESULT(__stdcall*)(GUID*, LPDIRECTDRAW*, IUnknown*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0053a8ca });
@@ -250,6 +256,12 @@ inline int __cdecl _clock() {
     return fn();
 }
 
+inline char* __cdecl __itoa(int value, char* str, int radix) {
+    using Fn = char*(__cdecl*)(int, char*, int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542d10});
+    return fn(value, str, radix);
+}
+
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
@@ -278,6 +290,12 @@ inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_i
     using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519F90});
     return fn(star1_idx, star2_idx);
+}
+
+inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f17d0});
+    return fn(star_idx);
 }
 
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, uint32_t segment) {

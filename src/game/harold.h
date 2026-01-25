@@ -3,27 +3,17 @@
 namespace HAROLD {
     uint32_t __cdecl Is_Colony_Star_(int16_t star_idx);
 
-    inline int __cdecl Get_Scaled_Value_(int value) {
-        using Fn = int(__cdecl*)(int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f0a30})(value);
-    }
+    int32_t __cdecl Get_Scaled_Value_(int16_t value);
 
-    inline bool __cdecl Empty_System_(int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f0860})(star_idx);
-    }
+    bool __cdecl Empty_System_(int16_t star_idx);
 
-    inline bool __cdecl Is_Home_Star_(int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f1030})(star_idx);
-    }
+    bool __cdecl Is_Home_Star_(int16_t star_idx);
 
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx);
 
-    inline uint8_t __cdecl N_Food_Planets_In_System_(int16_t star_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1270 })(star_idx);
-    }
+    uint8_t __cdecl N_Sattelites_(int16_t star_index);
+
+    uint8_t __cdecl N_Food_Planets_In_System_(int16_t system_index);
 
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
@@ -32,20 +22,28 @@ namespace HAROLD {
     void __cdecl Get_Font_File_(char* buffer);
     void __cdecl Get_Officer_Data_LBX_Name_(char* out_name);
 
-    inline void Set_Sound_Volume_To_Settings_() {
-        using Fn = void(*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1970 });
+    void __cdecl Set_Sound_Volume_To_Settings_();
+
+    void __cdecl Confirm_Planet_And_Star_Index_Link_(const char* msg);
+
+    void __cdecl Planet_Number_(int16_t planet_index);
+
+    void __cdecl Set_All_Visited_Flags_();
+
+    void __cdecl Init_Moving_Boxes_();
+
+    char* __cdecl H_Message_(int16_t id);
+
+    inline void __cdecl Init_Fleet_Movement_Box_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0e90});
         fn();
     }
 
-    inline void __cdecl Confirm_Planet_And_Star_Index_Link_(const char* msg) {
-        using Fn = void(__cdecl*)(const char*);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0640 })(msg);
-    }
-
-    inline void __cdecl Set_All_Visited_Flags_() {
+    inline void __cdecl Init_System_Display_Box_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F18F0 })();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0f60});
+        fn();
     }
 
     inline void __cdecl Harold_Init_() {
@@ -53,13 +51,11 @@ namespace HAROLD {
         reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0DD0 })();
     }
 
-    inline const char* __cdecl H_Message_(int32_t message_id) {
-        using Fn = const char*(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F2440});
-        return fn(message_id);
-    }
-
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
+
+    inline const char* s___s__00556ae4 = reinterpret_cast<const char*>(0x00556AE4); // "(%s)"
+    inline const char* s_relate_game_conditions_EXACTLY_a_0055a6cc = reinterpret_cast<const char*>(0x0055A6CC); // "relate game conditions EXACTLY as they occurred to technical support"
+    inline const char* s_orbit__d_of_star__d_has_more_tha_0055a704 = reinterpret_cast<const char*>(0x0055A704); // "orbit %d of star %d has more than one planet linked to it"
 
     inline const char* s_HERODATI_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A808 }); // "HERODATI.LBX"
     inline const char* s_HERODATS_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A818 }); // "HERODATS.LBX"

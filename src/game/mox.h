@@ -43,6 +43,7 @@ namespace MOX {
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
+    inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
     inline uint8_t& _previous_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
@@ -64,6 +65,9 @@ namespace MOX {
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
+
+    inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
+    inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
 
     // Suggested name: MOX::_class_to_mineral
     inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
@@ -139,6 +143,41 @@ namespace MOX {
 
     // 4 groups per climate
     inline uint8_t (*_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x005595E0});
+
+    #pragma pack(push, 1)
+    struct s_movable_box {
+        uint16_t index;
+        int16_t off_flag;
+        uint16_t field2_0x4;
+        uint16_t field3_0x6;
+        int16_t field4_0x8;
+        int16_t field5_0xa;
+        uint8_t field6_0xc;
+        uint8_t field7_0xd;
+        uint16_t field8_0xe;
+        uint16_t field9_0x10;
+        uint8_t field10_0x12;
+        uint8_t field11_0x13;
+        uint8_t field12_0x14;
+        uint8_t field13_0x15;
+        uint8_t field14_0x16;
+        uint8_t field15_0x17;
+        uint16_t field16_0x18;
+        uint16_t field17_0x1a;
+    };
+    #pragma pack(pop)
+
+    // Array of movable box structures (size 0x1C each, total 0x8C/140 bytes)
+    inline s_movable_box (&_moveable_box)[5] =
+        *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
+
+    // Suggested name: MOX::moveable_box_display_order
+    inline uint16_t (&_moveable_box_order)[5] =
+        *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059BD20});
+
+    // Suggested name: MOX::box_visibility_flags
+    inline uint16_t (&_box_off_flag)[5] =
+        *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059C420});
 
     // Funcs
     inline void Mox_Update_() {
