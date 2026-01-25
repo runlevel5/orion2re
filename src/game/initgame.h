@@ -18,12 +18,6 @@ namespace INITGAME {
 
     void __cdecl Set_Initial_Colony_Auto_Selects_();
 
-    // Suggested name: FUN_00443c60
-    inline void __cdecl FUN_00443c60() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
-    }
-
     void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int32_t galaxy_age, int16_t num_players,
                                 int16_t strategic_combat_flag, int16_t starting_civ_level);
 

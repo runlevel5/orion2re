@@ -117,6 +117,12 @@ namespace hooks {
         { 0x00521080, &fields::Init_Fields_State_ },
         { 0x0049ea60, &MISC::Increment_Mouse_Clock_Image_ },
         { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },
+        { 0x004fbf00, &COLCALC::Compute_All_Star_Colony_Stuff_ },
+        { 0x004fbd40, &COLCALC::Compute_Star_Colony_Stuff_ },
+        { 0x004fb7f0, &COLCALC::Init_Surrenders_ },
+        { 0x004fc140, &COLCALC::Twiddle_Initial_Homeworlds_ },
+        { 0x004b9ba0, &COLONIZE::Allocate_New_Colony_Slots_ },
+        { 0x004b9d00, &COLONIZE::Find_Colonize_Players_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

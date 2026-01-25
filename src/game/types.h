@@ -648,13 +648,15 @@ struct s_planet_data {
 };
 
 struct Pop_Info {
-    byte player : 4;
-    byte loyalty : 3;
-    byte job : 2;
-    byte employed : 1;
-    byte conquered : 1;
-    undefined field5_0x2;
-    undefined field6_0x3;
+    uint8_t player : 4;
+    uint8_t loyalty : 3;
+    uint8_t : 1;
+    uint8_t job : 2;
+    uint8_t employed : 1;
+    uint8_t conquered : 1;
+    uint8_t : 4;
+    uint8_t field5_0x2;
+    uint8_t field6_0x3;
 };
 
 struct s_colony {
@@ -737,7 +739,7 @@ struct s_star_data {
     uint8_t just_visited;
     uint8_t ignore_colony_ships;
     uint8_t ignore_combat_ships;
-    uint8_t colonize_player;
+    int8_t colonize_player;
     uint8_t has_colony;
     uint8_t has_warp_field_interdictor;
     uint8_t next_wfi_in_list;

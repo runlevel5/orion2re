@@ -96,6 +96,12 @@
     <ClCompile Include="src\game\fields.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\colcalc.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\colonize.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -267,6 +273,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\diplodef.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\officer.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\techdata.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

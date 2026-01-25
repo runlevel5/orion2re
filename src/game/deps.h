@@ -43,6 +43,8 @@
 #include "loader.h"
 #include "multplay.h"
 #include "timer.h"
+#include "contact.h"
+#include "colbldg.h"
 #include "key.h"
 #include "file_ani.h"
 #include "palstore.h"

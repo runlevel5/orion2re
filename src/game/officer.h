@@ -1,7 +1,6 @@
 #pragma once
-#include <cstdint>
 
-namespace officer {
+namespace OFFICER {
     inline int16_t __cdecl Officer_Skill_Value_(int16_t leader_index) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043E410 });
@@ -12,5 +11,10 @@ namespace officer {
         using Fn = void(__cdecl*)(uint32_t*, uint32_t*, int32_t, int32_t, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043DF90 });
         fn(p_special, p_general, arg3, arg4, arg5);
+    }
+
+    inline void __cdecl Allocate_Adv_Civ_Game_Officers_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
     }
 }

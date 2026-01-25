@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
+    <ClCompile Include="src\game\colcalc.cpp" />
+    <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\eric.cpp" />
@@ -85,6 +87,7 @@
     <ClInclude Include="src\game\mox2.h" />
     <ClInclude Include="src\game\msg.h" />
     <ClInclude Include="src\game\multplay.h" />
+    <ClInclude Include="src\game\officer.h" />
     <ClInclude Include="src\game\palette.h" />
     <ClInclude Include="src\game\palstore.h" />
     <ClInclude Include="src\game\platform.h" />
@@ -97,6 +100,7 @@
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
+    <ClInclude Include="src\game\techdata.h" />
     <ClInclude Include="src\game\ten.h" />
     <ClInclude Include="src\game\timer.h" />
     <ClInclude Include="src\game\trade.h" />

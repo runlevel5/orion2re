@@ -244,7 +244,7 @@ namespace INITGAME {
         MOX::Mox_Update_();
 
         if (MOX::_settings.starting_civilization_level == 2) {
-            FUN_00443C60();
+            OFFICER::Allocate_Adv_Civ_Game_Officers_();
             MOX::Mox_Update_();
         }
 
@@ -454,11 +454,11 @@ namespace INITGAME {
         for (int16_t i = 0; i < 67; ++i) {
             if (i == 41) {
                 // Special handling for leader at index 41
-                officer::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 2, 5, 1);
+                OFFICER::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 2, 5, 1);
             }
             else if (i == 52) {
                 // Special handling for leader at index 52
-                officer::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 1, 5, 1);
+                OFFICER::Get_Random_Skills_(&MOX::_leaders[i].special_skills, &MOX::_leaders[i].general_skills, 1, 5, 1);
             }
             else if (i == 65) {
                 // Special randomized tech application for leader at index 65
@@ -467,7 +467,7 @@ namespace INITGAME {
             }
 
             // Calculate and set the skill value for this leader.
-            MOX::_leaders[i].skill_value = officer::Officer_Skill_Value_(i);
+            MOX::_leaders[i].skill_value = OFFICER::Officer_Skill_Value_(i);
 
             // Refresh systems after each leader update.
             MOX::Mox_Update_();

@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+struct s_colony;
+
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {
     using Fn = int(__cdecl*)();
@@ -274,6 +276,12 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
     fn(base, num, size, compar);
 }
 
+inline void __cdecl No_Op1_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });
+    fn();
+}
+
 inline bool __cdecl Star_Has_Planet_(int16_t star_idx) {
     using Fn = bool(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051BE20 });
@@ -349,5 +357,29 @@ inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const ch
 
 // "Orion"
 inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});
+
+inline void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
+    using Fn = void(__cdecl*)(s_colony*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc4b0});
+    fn(colony);
+}
+
+inline void __cdecl All_Colony_Calculations_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f91d0});
+    fn();
+}
+
+inline uint8_t __cdecl Monster_At_Star_(int star_idx) {
+    using Fn = uint8_t(__cdecl*)(int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc700});
+    return fn(star_idx);
+}
+
+inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
+    using Fn = int(__cdecl*)(int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc110});
+    return fn(player_idx);
+}
 
 

@@ -94,6 +94,8 @@ workflows:
           * Never introduce or call C stdlib helpers (memcpy/memset/strlen/strcmp/printf/etc).
             If the binary calls an imported/external function, call that symbol directly as it exists
             in the comment/symbols. Otherwise, implement the logic inline.
+          * If disassembly or decompiled output includes symbolic constant name, emit raw value and add a
+            comment with symbolic name.
           * External/global references by absolute address:
             - Never inline absolute-address globals directly inside function bodies.
             - Assembly might include both address and a name. You must use name, which will be in the comment
@@ -222,6 +224,7 @@ workflows:
             always prefer using library function. Our application does not have direct access to library functions - you
             must check `src/game/helpers.h` and implement a function if it is missing.
           * NEVER add comments, unless it is one of the following exceptions:
+            - A symbolic name for the value was provided in the input
             - A potential bug was identified
             - A complicated piece of logic was detected - add at most single line comment
         outcomes:
@@ -488,7 +491,8 @@ workflows:
           * Received input might be inaccurate and won't match existing codebase conventions or data types. In this case, follow
             existing codebase conventions.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
-          * For `struct_` namespace - check the `src/game/struct.h` file (no underscore)
+          * For `struct_` namespace - check the `src/game/struct.h` file (no underscore). Similarly, `MSG` is a reserved
+            name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * If you see values resembling enums or constants, especially if there is a comment - always check against 
             `src/game/consts.h` and use an enum or a constant.
           * Never put stubs to .cpp files - they should go to headers.
