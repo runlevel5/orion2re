@@ -11,5 +11,5 @@ namespace TECHDATA {
         int16_t unknown_08;
     };
 #pragma pack(pop)
-    inline s_fuel_info* _fuel = reinterpret_cast<s_fuel_info*>(std::uintptr_t{ 0x00555760 });
+    inline s_fuel_info* _fuel = reinterpret_cast<s_f
 }
