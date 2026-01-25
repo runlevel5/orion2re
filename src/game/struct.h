@@ -1,5 +1,12 @@
 #pragma once
 
+#pragma pack(push, 1)
+struct StarDist {
+    int16_t dist;
+    int16_t index;
+};
+#pragma pack(pop)
+
 namespace struct_ {
     inline void __cdecl Clear_Structure_(void* ptr, uint32_t size) {
         using Fn = void(__cdecl*)(void*, uint32_t);

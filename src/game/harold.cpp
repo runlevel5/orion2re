@@ -1,6 +1,22 @@
 #include "deps.h"
 
 namespace HAROLD {
+    uint32_t __cdecl Is_Colony_Star_(int16_t star_idx) {
+        uint32_t has_colony = 0;
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx > -1) {
+                if (MOX::_planet[planet_idx].colony_index != -1) {
+                    has_colony = 1;
+                }
+            }
+        }
+
+        return has_colony;
+    }
+
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx) {
         uint8_t count = 0;
 
@@ -43,6 +59,22 @@ namespace HAROLD {
         for (int32_t i = 0; i < 13; ++i) {
             out[i] = filename[i];
         }
+    }
+
+    /**
+     * Checks if a star system is Orion.
+     * Uses assembly REPE CMPSB with ECX=6 comparison.
+     */
+    bool __cdecl Star_Is_Orion_(int16_t star_idx) {
+        const char* orion_str = s_Orion_0055a738;
+        const char* star_name = MOX::_star[star_idx].name;
+
+        for (int i = 0; i < 6; ++i) {
+            if (star_name[i] != orion_str[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

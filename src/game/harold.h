@@ -1,7 +1,26 @@
 #pragma once
 
 namespace HAROLD {
+    uint32_t __cdecl Is_Colony_Star_(int16_t star_idx);
+
+    inline int __cdecl Get_Scaled_Value_(int value) {
+        using Fn = int(__cdecl*)(int);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f0a30})(value);
+    }
+
+    inline bool __cdecl Empty_System_(int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f0860})(star_idx);
+    }
+
+    inline bool __cdecl Is_Home_Star_(int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f1030})(star_idx);
+    }
+
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx);
+
+    bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx);
 

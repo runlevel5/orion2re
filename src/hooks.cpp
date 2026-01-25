@@ -71,6 +71,22 @@ namespace hooks {
         { 0x004f0a70, &HAROLD::Habitable_Spectral_Class_ },
         { 0x004b6610, &MAPGEN::Generate_Spectral_Class_ },
         { 0x0051b300, &HOMEGEN::Modify_Home_Worlds_ },
+        { 0x004f0fd0, &HAROLD::Is_Colony_Star_ },
+        { 0x004f19e0, &HAROLD::Star_Is_Orion_ },
+        { 0x0051b190, &HOMEGEN::Is_Added_Food_World_ },
+        { 0x0051c3f0, &HOMEGEN::Make_System_Monsters_ },
+        { 0x00519ea0, &HOMEGEN::Assign_Home_Star_Names_ },
+        { 0x004b5bf0, &MAPGEN::Generate_Food_Per_Farmer_ },
+        { 0x0051a170, &HOMEGEN::Enforce_Climate_ },
+        { 0x0051bc20, &HOMEGEN::Remove_Specials_ },
+        { 0x0051b570, &HOMEGEN::Set_Planet_Size },
+        { 0x0051a490, &HOMEGEN::Enforce_Medium_Planet_Size_ },
+        { 0x0051a5c0, &HOMEGEN::Enforce_Planet_Type_ },
+        { 0x0051a150, &HOMEGEN::Enforce_Planet_Abundant_Mineral_Class },
+        { 0x0051a4d0, &HOMEGEN::Enforce_Mineral_Richness_ },
+        { 0x0051a410, &HOMEGEN::Enforce_Gravity_ },
+        { 0x0051b8c0, &HOMEGEN::Guarantee_A_Planet_At_Min_Dist_ },
+        { 0x0051c3b0, &HOMEGEN::compare_star_dist },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

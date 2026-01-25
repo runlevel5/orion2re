@@ -1,9 +1,106 @@
 #include "deps.h"
+#include <cstdio>
 
 namespace HOMEGEN {
 
-    uint32_t __cdecl Dist_Between_Stars_(uint16_t star_a, uint16_t star_b) {
-        using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
+    int __cdecl compare_star_dist(const void* a, const void* b) {
+        const StarDist* s1 = static_cast<const StarDist*>(a);
+        const StarDist* s2 = static_cast<const StarDist*>(b);
+        if (s1->dist < s2->dist) return -1;
+        if (s1->dist > s2->dist) return 1;
+        return 0;
+    }
+
+    void __cdecl Guarantee_A_Planet_At_Min_Dist_(int16_t origin_star_idx, int16_t min_dist, int16_t* player_home_stars) {
+        _star_list = (StarDist*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x120);
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            _star_list[i].dist = 999;
+            _star_list[i].index = 999;
+        }
+
+        bool planet_found = false;
+        for (int16_t i = 1; i < MOX::_NUM_STARS; ++i) {
+            if (i == origin_star_idx) continue;
+
+            _star_list[i].index = i;
+            int16_t dist = GEO::Parsecs_Between_Stars_(origin_star_idx, i);
+            _star_list[i].dist = dist;
+
+            if (Star_Has_Planet_(i) && dist <= min_dist) {
+                planet_found = true;
+                break;
+            }
+        }
+
+        if (!planet_found) {
+            _qsort(_star_list, MOX::_NUM_STARS, sizeof(StarDist), compare_star_dist);
+
+            int16_t list_idx = 0;
+            bool target_found = false;
+            while (list_idx < MOX::_NUM_STARS) {
+                int16_t s_idx = _star_list[list_idx].index;
+                bool is_home_star = false;
+                for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                    if (player_home_stars[p] == s_idx) {
+                        is_home_star = true;
+                        break;
+                    }
+                }
+                if (!is_home_star) {
+                    target_found = true;
+                    break;
+                }
+                list_idx++;
+            }
+
+            if (!target_found) return;
+
+            int16_t target_star_idx = _star_list[list_idx].index;
+
+            if (!Star_Has_Planet_(target_star_idx)) {
+                s_star_data* s = &MOX::_star[target_star_idx];
+                s->spectral_class = 4; // M-class (Red)
+
+                int32_t r_size = random::Random_(10) - 1;
+                if (r_size < 3) s->size = 0;
+                else if (r_size < 7) s->size = 1;
+                else s->size = 2;
+
+                s->pict_type = (char)(random::Random_(3) - 1);
+
+                for (int j = 0; j < 5; ++j) {
+                    s->planet_index[j] = -1;
+                }
+
+                for (int j = 0; j < 2; ++j) {
+                    char orbit = MAPGEN::Generate_Orbit_(target_star_idx);
+                    s->planet_index[(uint8_t)orbit] = MOX::_planet_count;
+
+                    s_planet_data* p = &MOX::_planet[MOX::_planet_count];
+                    p->orbit = orbit;
+                    p->planet_type = 3; // Terran
+
+                    MAPGEN::Generate_Satellite_(target_star_idx);
+                    MOX::_planet_count++;
+                }
+            }
+
+            while (GEO::Parsecs_Between_Stars_(origin_star_idx, target_star_idx) > min_dist) {
+                int16_t delta_x, delta_y;
+                CMBTMIS::Coord_Movement_(
+                    MOX::_star[target_star_idx].x, MOX::_star[target_star_idx].y,
+                    MOX::_star[origin_star_idx].x, MOX::_star[origin_star_idx].y,
+                    10, &delta_x, &delta_y
+                );
+                MOX::_star[target_star_idx].x += delta_x;
+                MOX::_star[target_star_idx].y += delta_y;
+            }
+        }
+    }
+
+    uint32_t __cdecl Dist_Between_Stars_(int16_t star_a, int16_t star_b) {
+        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519f90});
         return fn(star_a, star_b);
     }
@@ -132,6 +229,29 @@ namespace HOMEGEN {
      *
      * @param arr Pointer to an array of world identifiers (shorts).
      */
+    /**
+     * Checks if a given world ID is already present in the nearest food worlds list.
+     * The list size is bounded by the number of players.
+     */
+    bool __cdecl Is_Added_Food_World_(int16_t world_id) {
+        int16_t num_players = static_cast<int16_t>(MOX::_NUM_PLAYERS);
+
+        // Initial check matches 0051b19e CMP SI,AX ; 0051b1a1 JLE ...
+        if (num_players <= 0) {
+            return false;
+        }
+
+        for (int16_t i = 0; i < num_players; ++i) {
+            // Disassembly uses a short-circuit check at the start of loop iterations (0051b1a8 TEST AL, AL)
+            // which is equivalent to returning true immediately upon finding the world.
+            if (_nearest_food_worlds[i] == world_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void __cdecl Randomize_Home_Worlds_(int16_t* arr) {
         for (int32_t i = 0; i < 100; ++i) {
             // Random_ likely returns a value from 1 to N, so we subtract 1 for 0-based indexing.
@@ -167,8 +287,8 @@ namespace HOMEGEN {
             p_stars[i] = 0;
         }
 
-        for (int i = 0; i < 4; ++i) {
-            _nearest_food_worlds[i] = 0xffffffff;
+        for (int i = 0; i < 8; ++i) {
+            _nearest_food_worlds[i] = -1;
         }
 
         MOX::Mox_Update_();
@@ -296,6 +416,139 @@ namespace HOMEGEN {
      * If the spectral class is not conducive to life/planets, it rerolls the star's class.
      * Then it populates empty orbits until the minimum count is met.
      */
+    void __cdecl Assign_Home_Star_Names_() {
+        uint8_t is_race_assigned[14];
+        for (int i = 0; i < 14; ++i) {
+            is_race_assigned[i] = 0;
+        }
+
+        char* star_names = (char*)farload::Far_Reload_Data_(s_starname::lbx_00558b30, 0, MOX::_screen_seg, 0, 0x0D, 0x0F);
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            s_player* plr = &MOX::_player[i];
+            int race_idx = (int)plr->race;
+
+            if (is_race_assigned[race_idx] == 0) {
+                char* src_name = &star_names[race_idx * 15];
+                int16_t home_planet_id = plr->home_planet_id;
+                int8_t star_idx = (int8_t)MOX::_planet[home_planet_id].star_index;
+                s_star_data* star = &MOX::_star[star_idx];
+
+                char* dst = star->name;
+                char* src = src_name;
+                while ((*dst++ = *src++) != '\0');
+
+                is_race_assigned[race_idx] = 1;
+            }
+        }
+    }
+
+    /**
+     * @brief Generates space monsters at eligible star systems based on user preferences and map scale.
+     */
+    void __cdecl Make_System_Monsters_() {
+        int scaled_x = HAROLD::Get_Scaled_Value_(MOX::_max_map_scale);
+        int scaled_y = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
+        uint32_t dist_limit_sq = static_cast<uint32_t>(scaled_x * scaled_x + scaled_y * scaled_y);
+
+        if (MOX2::_user_wants_n_space_monsters == 0xFF) {
+            if (MAPGEN::_n_space_monsters > 20) {
+                MAPGEN::_n_space_monsters = 20;
+            }
+        } else {
+            int invalid_stars_count = 0;
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                // Determine stars that are ineligible for monsters
+                if (HAROLD::Star_Is_Orion_(i) ||
+                    HAROLD::Is_Home_Star_(i) ||
+                    HAROLD::Is_Colony_Star_(i) ||
+                    Is_Added_Food_World_(i) ||
+                    HAROLD::Empty_System_(i) ||
+                    MOX::_star[i].spectral_class == 6) // Black Hole
+                {
+                    invalid_stars_count++;
+                }
+            }
+
+            int valid_stars_count = MOX::_NUM_STARS - invalid_stars_count;
+            int desired_monsters = static_cast<int>(MOX2::_user_wants_n_space_monsters);
+
+            if (desired_monsters > valid_stars_count) {
+                desired_monsters = valid_stars_count;
+            }
+
+            MAPGEN::_n_space_monsters = static_cast<uint8_t>(desired_monsters);
+            MOX2::_user_wants_n_space_monsters = MAPGEN::_n_space_monsters;
+            // Disable distance constraints for custom monster counts
+            dist_limit_sq = 0;
+        }
+
+        if (MAPGEN::_n_space_monsters == 0) {
+            return;
+        }
+
+        uint16_t weights[72];
+        uint8_t flags[72];
+        int16_t placed_monster_stars[72];
+
+        helpers::memset(weights, 0, sizeof(weights));
+        helpers::memset(flags, 0, sizeof(flags));
+        helpers::memset(placed_monster_stars, 0xFF, sizeof(placed_monster_stars));
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (!HAROLD::Star_Is_Orion_(i) &&
+                !Is_Added_Food_World_(i) &&
+                !HAROLD::Is_Home_Star_(i) &&
+                !HAROLD::Is_Colony_Star_(i) &&
+                !HAROLD::Empty_System_(i) &&
+                MOX::_star[i].spectral_class != 6)
+            {
+                weights[i] = 1;
+            }
+        }
+
+        for (int m = 0; m < static_cast<int>(MAPGEN::_n_space_monsters); ++m) {
+            int divisor = (m * 2 > 1) ? (m * 2) : 1;
+            uint32_t current_min_dist = dist_limit_sq / divisor;
+
+            int16_t selected_star = -1;
+            int attempts = 0;
+            bool success = false;
+
+            do {
+                int16_t star_idx = RUSS::Get_Weighted_Choice_Short_(weights, MOX::_NUM_STARS);
+                bool dist_ok = true;
+
+                for (int j = 0; j < m; ++j) {
+                    if (Dist_Between_Stars_(star_idx, placed_monster_stars[j]) < current_min_dist) {
+                        dist_ok = false;
+                        break;
+                    }
+                }
+
+                if (dist_ok || attempts > 250) {
+                    selected_star = star_idx;
+                    success = true;
+                } else {
+                    attempts++;
+                }
+            } while (!success);
+
+            if (selected_star == -1) {
+                return;
+            }
+
+            s_star_data& star = MOX::_star[selected_star];
+            // Store original system special for later use
+            star.not_used1 = static_cast<uint8_t>(star.system_special);
+            star.system_special = MOX::SYSTEM_SPECIAL_SPACE_MONSTER;
+
+            flags[selected_star] = 1;
+            weights[selected_star] = 0;
+            placed_monster_stars[m] = selected_star;
+        }
+    }
+
     void __cdecl Enforce_3_Planet_Minimum_(int16_t star_idx) {
         int8_t planets_in_system = HAROLD::N_Planets_In_System_(star_idx);
 
@@ -418,5 +671,214 @@ namespace HOMEGEN {
         MOX::_NUM_COLONIES = MOX::_NUM_PLAYERS;
         Assign_Home_Star_Names_();
         Ensure_At_Least_1_Food_Planet_();
+    }
+
+    void __cdecl Enforce_Climate_(int16_t star_idx, int16_t climate_id, int16_t* out_planet_idx) {
+        struct PlanetRef {
+            int16_t planet_idx;
+            int16_t orbit;
+        };
+
+        PlanetRef candidates[5];
+        int16_t candidate_count = 0;
+        bool found_climate = false;
+        *out_planet_idx = -1;
+
+        for (int16_t orbit = 0; orbit < 5; ++orbit) {
+            int16_t p_idx = MOX::_star[star_idx].planet_index[orbit];
+            if (p_idx != -1) {
+                candidates[candidate_count].planet_idx = p_idx;
+                candidates[candidate_count].orbit = orbit;
+                candidate_count++;
+
+                if (MOX::_planet[p_idx].climate == (int8_t)climate_id) {
+                    found_climate = true;
+                    *out_planet_idx = p_idx;
+                }
+            }
+        }
+
+        if (candidate_count == 0) {
+            char error_msg[128];
+            _sprintf(error_msg, s_Found_no_satellites_after_3_MIN_e_0055adc8, (int)star_idx);
+            exitm::Exit_With_Message(error_msg);
+            return;
+        }
+
+        if (found_climate) {
+            int16_t p_idx = *out_planet_idx;
+            MOX::_planet[p_idx].food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(star_idx, p_idx);
+            return;
+        }
+
+        // If no planet has the requested climate, we force one.
+        while (true) {
+            int16_t valid_groups[4];
+            int16_t valid_group_count = 0;
+
+            for (int16_t group_idx = 0; group_idx < 4; ++group_idx) {
+                if (MOX::_climate_roll_table[climate_id][group_idx] > 0) {
+                    valid_groups[valid_group_count++] = group_idx;
+                }
+            }
+
+            int8_t current_spectral = MOX::_star[star_idx].spectral_class;
+            bool possible_with_spectral = false;
+
+            for (int16_t i = 0; i < 5; ++i) {
+                uint8_t allowed_group = MOX::_class_to_group[current_spectral][i];
+                for (int16_t j = 0; j < valid_group_count; ++j) {
+                    if ((int16_t)allowed_group == valid_groups[j]) {
+                        possible_with_spectral = true;
+                        break;
+                    }
+                }
+                if (possible_with_spectral) break;
+            }
+
+            if (possible_with_spectral) {
+                // Pick a random planet from the candidates and force the climate/group
+                int16_t chosen_candidate = random::Random_(candidate_count) - 1;
+                int16_t p_idx = candidates[chosen_candidate].planet_idx;
+                *out_planet_idx = p_idx;
+
+                MOX::_planet[p_idx].climate = (int8_t)climate_id;
+
+                int16_t chosen_group_idx = random::Random_(valid_group_count) - 1;
+                MOX::_planet[p_idx].group = (int8_t)valid_groups[chosen_group_idx];
+
+                MOX::_planet[p_idx].food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(star_idx, p_idx);
+                return;
+            } else {
+                // If the current star's spectral class cannot support this climate, regenerate it
+                MOX::_star[star_idx].spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings_galaxy_age);
+            }
+        }
+    }
+
+    /**
+     * Resets the system-wide and planet-specific specials for a given star system.
+     * Clears the star system's special and wormhole ID, then iterates through
+     * up to 5 planets in the system to clear their individual specials.
+     */
+    void __cdecl Remove_Specials_(int16_t star_idx) {
+        s_star_data& star = MOX::_star[star_idx];
+
+        star.system_special = MOX::SYSTEM_SPECIAL_NO_SPECIAL;
+        star.wormhole_star_id = 0xFF;
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star.planet_index[i];
+            if (planet_idx > -1) {
+                MOX::_planet[planet_idx].planet_special = 0;
+            }
+        }
+    }
+
+    void __cdecl Set_Planet_Size(int16_t planet_index, int8_t size) {
+        // s_planet_data structure size is 17 (0x11) bytes
+        MOX::_planet[planet_index].size = size;
+    }
+
+    /**
+     * @brief Ensures a planet is of medium size and updates its max farm capacity accordingly.
+     *
+     * @param planet_idx The index of the planet in the global planet array.
+     */
+    void __cdecl Enforce_Medium_Planet_Size_(int16_t planet_idx) {
+        // Size 2 corresponds to PLANET_SIZE_MEDIUM
+        const int8_t PLANET_SIZE_MEDIUM = 2;
+
+        s_planet_data& planet = MOX::_planet[planet_idx];
+
+        if (planet.size != PLANET_SIZE_MEDIUM) {
+            planet.size = PLANET_SIZE_MEDIUM;
+            planet.max_farms = MOX::_planet_max_farms[planet.size];
+        }
+    }
+
+    void __cdecl Enforce_Planet_Type_(int16_t star_idx, int16_t planet_idx) {
+        // Search the star's planet indices to confirm membership
+        for (int i = 0; i < 5; ++i) {
+            if (MOX::_star[star_idx].planet_index[i] == planet_idx) {
+                break;
+            }
+        }
+
+        // Suggested name: PLANET_TYPE_PLANET (3)
+        MOX::_planet[planet_idx].planet_type = 3;
+    }
+
+    /**
+     * @address 0051a150
+     */
+    void __cdecl Enforce_Planet_Abundant_Mineral_Class(int16_t planet_idx) {
+        // Accessing planet data array (struct size 0x11/17 bytes)
+        if (MOX::_planet[planet_idx].mineral_class != MINERAL_RESOURCE_ABUNDANT) {
+            MOX::_planet[planet_idx].mineral_class = MINERAL_RESOURCE_ABUNDANT;
+        }
+    }
+
+    /**
+     * Ensures a planet's mineral richness is consistent with its star's spectral class.
+     * If the star is too young/old for the assigned richness, it regenerates the star's spectral class.
+     */
+    /**
+     * @brief Updates a planet's gravity and handles mineral resource redistribution for non-Heavy-G races on Ultra Rich worlds.
+     * 
+     * @param planet_idx Index of the planet to modify.
+     * @param gravity_class New gravity class to apply.
+     * @param player_idx Player index associated with this enforcement (often the player's home slot).
+     */
+    void __cdecl Enforce_Gravity_(int16_t planet_idx, int8_t gravity_class, int16_t player_idx) {
+        MOX::_planet[planet_idx].gravity_class = gravity_class;
+
+        // Mineral Class 4 = Ultra Rich
+        if (MOX::_planet[planet_idx].mineral_class == MINERAL_RESOURCE_ULTRA_RICH) {
+            // Trait index 0 corresponds to Heavy-G World
+            if (MOX::_player[player_idx].traits[0] == 0) {
+                uint8_t new_minerals = Get_Mineral_Class(MOX::_planet[planet_idx].star_index, planet_idx);
+                
+                // Logic quirk: The reassignment target is the planet at the player's slot index.
+                MOX::_planet[player_idx].mineral_class = (int8_t)new_minerals;
+            }
+        }
+    }
+
+    void __cdecl Enforce_Mineral_Richness_(int16_t planet_index, int16_t mineral_class) {
+        constexpr int8_t STAR_CLASS_DWARF = 5;
+
+        s_planet_data* planet = &MOX::_planet[planet_index];
+        planet->mineral_class = (int8_t)mineral_class;
+
+        int8_t star_idx = planet->star_index;
+        s_star_data* star = &MOX::_star[star_idx];
+
+        while (true) {
+            bool richness_is_valid = false;
+
+            // Only spectral classes 0-4 have specific mineral restrictions checked via table
+            if (star->spectral_class < STAR_CLASS_DWARF) {
+                for (int i = 0; i < 10; ++i) {
+                    // _class_to_mineral is a 10x6 table mapping star classes to valid minerals
+                    if (MOX::_class_to_mineral[i * 6 + star->spectral_class] == (uint8_t)mineral_class) {
+                        richness_is_valid = true;
+                        break;
+                    }
+                }
+            }
+
+            if (richness_is_valid) {
+                break;
+            }
+
+            // If class is Dwarf (>=5) or richness not allowed for this class, regenerate spectral class
+            star->spectral_class = MAPGEN::Generate_Spectral_Class_((int16_t)MOX::_settings_galaxy_age);
+        }
+
+        // Update gravity class based on mineral class and planet size
+        // _gravity_table is 5 columns wide (planet size categories)
+        int32_t gravity_idx = (planet->mineral_class * 5) + planet->size;
+        planet->gravity_class = MOX::_gravity_table[gravity_idx];
     }
 }

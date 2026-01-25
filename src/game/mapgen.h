@@ -2,6 +2,7 @@
 #include <cstdint>
 
 namespace MAPGEN {
+    inline uint8_t& _n_space_monsters = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4B56});
     inline char* _companion_star = reinterpret_cast<char*>(std::uintptr_t{0x0055632C});
     inline void*& _fill_msg_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x005A4B20});
     inline char (&_fill_msg)[36] = *reinterpret_cast<char (*)[36]>(std::uintptr_t{0x005A4B30});
@@ -9,6 +10,13 @@ namespace MAPGEN {
     inline const char* s_raceopt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B24}); // "RACEOPT.LBX"
 
     uint8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index);
+    uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+
+    inline char __cdecl Generate_Orbit_(int16_t star_idx) {
+        using Fn = char(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004B62A0 });
+        return fn(star_idx);
+    }
 
     inline void __cdecl Generate_Satellite_(int16_t star_idx) {
         using Fn = void(__cdecl*)(int16_t);

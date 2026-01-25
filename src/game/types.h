@@ -601,7 +601,7 @@ struct s_player {
     char diplomacy_demand_rejection_message[8];
     int8_t last_diplomacy_threat_turn[8];
     char delayed_diplomacy_orders[8];
-    uint8_t traits[31];
+    int8_t traits[31];
     char evolutionary_upgrade_traits[31];
     char picked_evolutionary_upgrade;
     char applied_evolutionary_upgrade;
@@ -629,22 +629,22 @@ struct s_player {
 };
 
 struct s_planet_data {
-    short colony_index;
-    char star_index;
-    char orbit;
-    char planet_type;
-    uint8_t size;
-    char gravity_class;
-    char group;
-    char climate;
-    char climate_bg_type;
-    char mineral_class;
-    char food_per_farmer;
-    char n_terraforms;
-    char max_farms;
-    char max_population;
-    char planet_special;
-    char environmental_alterations;
+    int16_t colony_index;
+    int8_t star_index;
+    int8_t orbit;
+    int8_t planet_type;
+    int8_t size;
+    int8_t gravity_class;
+    int8_t group;
+    int8_t climate;
+    int8_t climate_bg_type;
+    int8_t mineral_class;
+    uint8_t food_per_farmer;
+    int8_t n_terraforms;
+    int8_t max_farms;
+    int8_t max_population;
+    int8_t planet_special;
+    int8_t environmental_alterations;
 };
 
 struct Pop_Info {
@@ -727,7 +727,7 @@ struct s_star_data {
     int8_t owner;
     int8_t pict_type;
     int8_t spectral_class;
-    char last_planet_selected[8];
+    int8_t last_planet_selected[8];
     char black_hole_blocks[9];
     MOX::SYSTEM_SPECIAL system_special;
     uint8_t wormhole_star_id;

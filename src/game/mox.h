@@ -39,6 +39,7 @@ namespace MOX {
     };
 
     // References
+    inline uint8_t* _food_per_farmer_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559690});
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
@@ -62,16 +63,24 @@ namespace MOX {
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
+    inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
+
+    // Suggested name: MOX::_class_to_mineral
+    inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
+
+    // Suggested name: MOX::_gravity_table
+    inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
+
     inline uint8_t& _mouse_list_arrow = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
     
     inline void*& _special_names_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
 
-    inline uint32_t& _global_data_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597410 });
+    inline void*& _global_data_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x00597410 });
 
-    inline uint32_t& _nebula =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00597770 });
+    inline void*& _nebula =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x00597770 });
 
     inline uint16_t& _NUM_COLONIES =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00597856 });
@@ -121,6 +130,15 @@ namespace MOX {
     // Suggested name: g_extra_data_seg
     inline uint32_t& DAT_005a2bec =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005A2BEC });
+
+    // Suggested name: _planet_max_farms
+    inline uint8_t* _planet_max_farms = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00559660 });
+
+    // 5 groups per spectral class
+    inline uint8_t (*_class_to_group)[5] = reinterpret_cast<uint8_t(*)[5]>(std::uintptr_t{0x005595C0});
+
+    // 4 groups per climate
+    inline uint8_t (*_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x005595E0});
 
     // Funcs
     inline void Mox_Update_() {

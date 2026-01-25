@@ -36,15 +36,12 @@ namespace allocate {
         MOX::_techname_seg = Allocate_Space_(30000);
         MOX::_special_names_seg = Allocate_Space_(1000);
 
-        // Allocate and clear planet structures
         MOX::_planet = reinterpret_cast<s_planet_data*>(Allocate_Space_(0x17E8));
         struct_::Clear_Structure_(MOX::_planet, 0x17E8);
 
-        // Allocate and clear player structures
         MOX::_player = reinterpret_cast<s_player*>(Allocate_Space_(0x7548));
         struct_::Clear_Structure_(MOX::_player, 0x7548);
 
-        // Allocate and clear colony structures
         MOX::_colony = reinterpret_cast<s_colony*>(Allocate_Space_(0x1608A));
         struct_::Clear_Structure_(MOX::_colony, 0x1608A);
 
@@ -55,10 +52,10 @@ namespace allocate {
         MOX::_global_cache_size = 0x174508;
 
         // DOS-space allocations for low-level segments
-        MOX::_global_data_seg = reinterpret_cast<uint32_t>(Allocate_Dos_Space_(0x2800));
+        MOX::_global_data_seg = Allocate_Dos_Space_(0x2800);
 
-        MOX::_nebula = reinterpret_cast<uint32_t>(Allocate_Dos_Space_(0x14));
-        struct_::Clear_Structure_(reinterpret_cast<void*>(MOX::_nebula), 0x14);
+        MOX::_nebula = Allocate_Dos_Space_(0x14);
+        struct_::Clear_Structure_(MOX::_nebula, 0x14);
 
         MOX::_star = reinterpret_cast<s_star_data*>(Allocate_Dos_Space_(0x1FC8));
         struct_::Clear_Structure_(MOX::_star, 0x1FC8);

@@ -256,6 +256,24 @@ inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     fn(dest, src, n);
 }
 
+inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl* compar)(const void*, const void*)) {
+    using Fn = void(__cdecl*)(void*, uint32_t, uint32_t, int(__cdecl*)(const void*, const void*));
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540C20 });
+    fn(base, num, size, compar);
+}
+
+inline bool __cdecl Star_Has_Planet_(int16_t star_idx) {
+    using Fn = bool(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051BE20 });
+    return fn(star_idx);
+}
+
+inline uint8_t __cdecl Get_Mineral_Class(int16_t star_idx, int16_t planet_idx) {
+    using Fn = uint8_t(__cdecl*)(int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B5CF0});
+    return fn(star_idx, planet_idx);
+}
+
 inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
     using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519F90});
@@ -310,5 +328,8 @@ inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); //
 inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
 inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"
 inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
+
+// "Orion"
+inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});
 
 

@@ -2,9 +2,9 @@
 #include <cstdint>
 
 namespace exitm {
-    inline void __cdecl Exit_With_Message(void* msg_ptr) {
-        using Fn = void(__cdecl*)(void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052D310})(msg_ptr);
+    inline void __cdecl Exit_With_Message(const char* msg) {
+        using Fn = void(__cdecl*)(const char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052D310})(msg);
     }
 
     // Suggested name: g_MapCaptureMessage
