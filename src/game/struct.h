@@ -18,4 +18,10 @@ namespace struct_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052cfb5 });
         return fn(field, bit);
     }
+
+    inline void __cdecl Set_Bit_Field_(s_good_star* star, uint16_t field_idx) {
+        using Fn = void(__cdecl*)(s_good_star*, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052CFED });
+        fn(star, field_idx);
+    }
 }

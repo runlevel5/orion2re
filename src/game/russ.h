@@ -1,10 +1,10 @@
 #pragma once
 
 namespace RUSS {
-    inline void Mox_Update_() {
-        using Fn = void(*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
-        fn();
+    inline uint8_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int32_t count) {
+        using Fn = uint8_t(__cdecl*)(uint8_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7860});
+        return fn(weights, count);
     }
 
     inline void Mox_Sync_Update_() {

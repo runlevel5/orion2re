@@ -51,12 +51,15 @@ namespace platform {
         rt.bottom = scaleY + p.y;
 
         // Lock buffers
-        DDSURFACEDESC	srcDesc = { 0 };
+        DDSURFACEDESC	srcDesc;
+        helpers::memset(&srcDesc, 0, sizeof(srcDesc));
         srcDesc.dwSize = sizeof(srcDesc);
-        DDSURFACEDESC	dstDesc = { 0 };
+        DDSURFACEDESC	dstDesc;
+        helpers::memset(&dstDesc, 0, sizeof(dstDesc));
         dstDesc.dwSize = sizeof(dstDesc);
 
-        DDPIXELFORMAT DDpf = { 0 };
+        DDPIXELFORMAT DDpf;
+        helpers::memset(&DDpf, 0, sizeof(DDpf));
         int BytesPerPixel;
         DDpf.dwSize = sizeof(DDpf);
         l_temp_surface->GetPixelFormat(&DDpf);
@@ -293,7 +296,7 @@ namespace platform {
         DAT_0057931c = 0;
 
         DDSURFACEDESC surface_desc;
-        memset(&surface_desc, 0, sizeof(surface_desc));
+        helpers::memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(DDSURFACEDESC);
 
 #ifdef FULLSCREEN
@@ -314,7 +317,7 @@ namespace platform {
         }
 
         // Create "fake" primary surface for MOO2 with 8 bit palette
-        memset(&surface_desc, 0, sizeof(surface_desc));
+        helpers::memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(surface_desc);
         surface_desc.dwWidth = g_screen_res_x;
         surface_desc.dwHeight = g_screen_res_y;
@@ -337,14 +340,16 @@ namespace platform {
         l_primary_window_surface->SetClipper(pc_clipper);
 
         // Create additional surface with primary surface properties
-        DDSURFACEDESC	desc2 = { 0 };
+        DDSURFACEDESC	desc2;
+        helpers::memset(&desc2, 0, sizeof(desc2));
         desc2.dwSize = sizeof(desc2);
         desc2.dwWidth = g_screen_res_x;
         desc2.dwHeight = g_screen_res_y;
         desc2.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc2.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
 
-        DDPIXELFORMAT	pFormat = { 0 };
+        DDPIXELFORMAT	pFormat;
+        helpers::memset(&pFormat, 0, sizeof(pFormat));
         pFormat.dwSize = sizeof(pFormat);
         l_primary_window_surface->GetPixelFormat(&pFormat);
 
@@ -368,7 +373,7 @@ namespace platform {
 #endif
 
         // Initialize desc for offscreen surfaces
-        memset(&surface_desc, 0, sizeof(surface_desc));
+        helpers::memset(&surface_desc, 0, sizeof(surface_desc));
         surface_desc.dwSize = sizeof(DDSURFACEDESC);
         surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         surface_desc.dwWidth = g_screen_res_x;
@@ -543,7 +548,8 @@ namespace platform {
     HRESULT Lock_Appropriate_Render_Buffer()
     {
         HRESULT hr = S_OK;
-        DDSURFACEDESC	desc = { 0 };
+        DDSURFACEDESC	desc;
+        helpers::memset(&desc, 0, sizeof(desc));
         desc.dwSize = sizeof(desc);
         desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
         desc.lPitch = 0;
@@ -650,7 +656,8 @@ namespace platform {
     HRESULT Lock_Primary_Surface()
     {
         HRESULT hr = S_OK;
-        DDSURFACEDESC	desc = { 0 };
+        DDSURFACEDESC	desc;
+        helpers::memset(&desc, 0, sizeof(desc));
         desc.dwSize = sizeof(desc);
         desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
 
@@ -749,7 +756,8 @@ namespace platform {
 
     void Create_Cursor_Surfaces()
     {
-        DDSURFACEDESC	desc2 = { 0 };
+        DDSURFACEDESC	desc2;
+        helpers::memset(&desc2, 0, sizeof(desc2));
         desc2.dwSize = sizeof(desc2);
         desc2.dwWidth = 24;
         desc2.dwHeight = 24;

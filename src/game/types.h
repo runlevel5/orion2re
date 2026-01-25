@@ -1,4 +1,23 @@
 #pragma once
+#include <cstdint>
+
+namespace MOX {
+    enum SYSTEM_SPECIAL : uint8_t {
+        SYSTEM_SPECIAL_NO_SPECIAL = 0,
+        SYSTEM_SPECIAL_STABLE_WORMHOLE = 1,
+        SYSTEM_SPECIAL_SPACE_DEBRIS = 2,
+        SYSTEM_SPECIAL_PIRATE_CACHE = 3,
+        SYSTEM_SPECIAL_GOLD_DEPOSITS = 4,
+        SYSTEM_SPECIAL_GEM_DEPOSITS = 5,
+        SYSTEM_SPECIAL_NATIVES = 6,
+        SYSTEM_SPECIAL_SPLINTER_COLONY = 7,
+        SYSTEM_SPECIAL_MAROONED_HERO = 8,
+        SYSTEM_SPECIAL_SPACE_MONSTER = 9,
+        SYSTEM_SPECIAL_ANCIENT_ARTIFACTS = 10,
+        SYSTEM_SPECIAL_ORION_STAR = 11
+    };
+}
+
 #pragma pack(push, 1)
 
 typedef uint8_t undefined;
@@ -702,42 +721,42 @@ struct s_colony {
 
 struct s_star_data {
     char name[15];
-    short x;
-    short y;
-    char size;
-    char owner;
-    char pict_type;
-    uint8_t spectral_class;
+    int16_t x;
+    int16_t y;
+    int8_t size;
+    int8_t owner;
+    int8_t pict_type;
+    int8_t spectral_class;
     char last_planet_selected[8];
     char black_hole_blocks[9];
-    byte system_special;
-    byte wormhole_star_id;
-    byte blockaded;
+    MOX::SYSTEM_SPECIAL system_special;
+    uint8_t wormhole_star_id;
+    uint8_t blockaded;
     char blockaded_by[8];
-    byte visited;
-    byte just_visited;
-    byte ignore_colony_ships;
-    byte ignore_combat_ships;
-    byte colonize_player;
-    byte has_colony;
-    byte has_warp_field_interdictor;
-    byte next_wfi_in_list;
-    byte has_tachyon;
-    byte has_subspace;
-    byte has_stargate;
-    byte has_jumpgate;
-    byte has_artemis_net;
-    byte has_dimensional_portal;
-    byte is_stagepoint;
+    uint8_t visited;
+    uint8_t just_visited;
+    uint8_t ignore_colony_ships;
+    uint8_t ignore_combat_ships;
+    uint8_t colonize_player;
+    uint8_t has_colony;
+    uint8_t has_warp_field_interdictor;
+    uint8_t next_wfi_in_list;
+    uint8_t has_tachyon;
+    uint8_t has_subspace;
+    uint8_t has_stargate;
+    uint8_t has_jumpgate;
+    uint8_t has_artemis_net;
+    uint8_t has_dimensional_portal;
+    uint8_t is_stagepoint;
     char officer_index[8];
-    short planet_index[5];
-    short relocate_ship_to[8];
-    byte not_used1;
-    byte not_used2;
-    byte not_used3;
+    int16_t planet_index[5];
+    int16_t relocate_ship_to[8];
+    uint8_t not_used1;
+    uint8_t not_used2;
+    uint8_t not_used3;
     char surrender_to[8];
-    byte in_nebula;
-    byte artifacts_gave_app;
+    uint8_t in_nebula;
+    uint8_t artifacts_gave_app;
 };
 
 struct s_ship_data {
@@ -781,5 +800,10 @@ struct s_leader_data {
     char player_index;
 };
 
+struct s_good_star {
+    uint8_t unknown_0[9];
+    uint32_t star_distances[72]; // 288 bytes
+    uint16_t star_count;        // Offset 0x129 (297 decimal)
+}; // Total size: 299 bytes (0x12B)
 
 #pragma	pack(pop)

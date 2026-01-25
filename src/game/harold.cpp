@@ -1,6 +1,24 @@
 #include "deps.h"
 
 namespace HAROLD {
+    uint8_t __cdecl N_Planets_In_System_(int16_t star_idx) {
+        uint8_t count = 0;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            // Check if slot contains a valid planet (-1 is empty/gas giant in some contexts)
+            if (planet_idx != -1) {
+                // The assembly specifically checks if planet_type is 0x03
+                if (MOX::_planet[planet_idx].planet_type == 3) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
     void __cdecl Get_Officer_Data_LBX_Name_(char* out) {
         const char* filename;
 
@@ -25,6 +43,15 @@ namespace HAROLD {
         for (int32_t i = 0; i < 13; ++i) {
             out[i] = filename[i];
         }
+    }
+
+    /**
+     * Checks if a star system has a habitable spectral class (O, B, A, F, G, or K).
+     * Spectral classes are indexed such that habitable ones are < 6.
+     */
+    bool __cdecl Habitable_Spectral_Class_(int16_t star_idx) {
+        // Star data structure size is 113 bytes.
+        return MOX::_star[star_idx].spectral_class < 6;
     }
 
     void __cdecl Get_Font_File_(char* buffer) {

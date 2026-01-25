@@ -29,7 +29,7 @@ namespace JIM {
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
             file_ani::Draw_File_Animation_();
             video::Copy_Off_To_Back_();
-            Mox_Update_();
+            MOX::Mox_Update_();
             platform::Toggle_Pages_Stub_();
             _darken_palette_value = 0;
 
@@ -66,7 +66,7 @@ namespace JIM {
                 }
 
                 platform::Toggle_Pages_Stub_();
-                Mox_Update_();
+                MOX::Mox_Update_();
                 timer::Release_Time_(1);
             }
         } else {
@@ -86,7 +86,7 @@ namespace JIM {
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
             file_ani::Draw_File_Animation_();
             video::Copy_Off_To_Back_();
-            Mox_Update_();
+            MOX::Mox_Update_();
 
             int16_t end_delay_counter = 5;
             platform::Toggle_Pages_Stub_();
@@ -120,7 +120,7 @@ namespace JIM {
                 }
 
                 platform::Toggle_Pages_Stub_();
-                Mox_Update_();
+                MOX::Mox_Update_();
                 timer::Release_Time_(1);
             }
         }
@@ -128,7 +128,7 @@ namespace JIM {
         allocate::Pop_Block_(MOX::_global_screen_seg);
         file_ani::Reset_File_Animation_Buffer_();
         Logo_Fadeout_();
-        Mox_Update_();
+        MOX::Mox_Update_();
 
         video::Set_Page_Off_();
         Fill_(0, 0, 0x27F, 0x1DF, 0);

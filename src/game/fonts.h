@@ -32,6 +32,24 @@ namespace fonts {
         fn(x, y, str);
     }
 
+    inline void __cdecl Set_Font_Style_Outline_Heavy_(int32_t style, void* color_data) {
+        using Fn = void(__cdecl*)(int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005256D0});
+        fn(style, color_data);
+    }
+
+    inline void __cdecl Set_Outline_Color_(int32_t color1, int32_t color2) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005256F0});
+        fn(color1, color2);
+    }
+
+    inline void __cdecl Print_To_Bitmap_(int32_t x, int32_t y, uint8_t* text, void* bitmap) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, uint8_t*, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526610});
+        fn(x, y, text, bitmap);
+    }
+
     // Suggested name: fonts::Update_Palette_Internal
     inline void __cdecl FUN_00526f80() {
         using Fn = void(__cdecl*)();

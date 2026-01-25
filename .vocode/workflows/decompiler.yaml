@@ -488,6 +488,11 @@ workflows:
           * You might have to update data types to match what is in the existing codebase
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
           * For `struct_` namespace - check the `src/game/struct.h` file (no underscore)
+          * If you see values resembling enums or constants, especially if there is a comment - always check against 
+            `src/game/consts.h` and use an enum or a constant.
+          * Never put stubs to .cpp files - they should go to headers.
+          * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
+            Do not create a new settings header file.
 
           # Checklist
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool

@@ -162,26 +162,26 @@ namespace INITGAME {
         MOX::_NUM_PLAYERS = num_players;
 
         Init_Ships_Array_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         Init_Colonies_Array_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         // Clear antaran invasion data (66 bytes)
         for (int i = 0; i < 66; ++i) {
             MOX::_antarans_blob[i] = 0;
         }
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         if (MOX::_game_type != 2) {
             MOX::_PLAYER_NUM = 0;
         }
 
         Init_Leaders_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         Init_Players_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         BILL::Cache_Player_Scientist_Anim_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         MSG_::Allocate_Msg_Slots_();
 
         do {
@@ -189,10 +189,10 @@ namespace INITGAME {
             MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
 
             MAPGEN::Universe_Generation_(galaxy_size, galaxy_age, game_difficulty);
-            RUSS::Mox_Update_();
+            MOX::Mox_Update_();
 
             generation_success = HOMEGEN::Generate_Home_Worlds_();
-            RUSS::Mox_Update_();
+            MOX::Mox_Update_();
 
             if (generation_success != 0) {
                 video::Set_Page_Off_();
@@ -235,27 +235,27 @@ namespace INITGAME {
             exitm::Exit_With_Message("done");
         }
 
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         HOMEGEN::Make_System_Monsters_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         Make_System_Monsters_Into_Ships_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         MAPGEN::Generate_Wormhole_Links_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         if (MOX::_settings.starting_civilization_level == 2) {
             FUN_00443C60();
-            RUSS::Mox_Update_();
+            MOX::Mox_Update_();
         }
 
         MAPGEN::Assign_Marooned_Heroes_();
-        RUSS::Mox_Update_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
 
         GEO::Initialize_Black_Hole_Blocks_(45);
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         GEO::Initialize_Star_In_Nebula_Info_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         MOX2::Init_Map_Defaults_();
         KEN::Ken_Init_();
@@ -263,33 +263,33 @@ namespace INITGAME {
         ERIC::Eric_Init_();
         BILL::Bill_Init_();
         MAINSCR::Update_Star_Owners_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         COLONIZE::Allocate_New_Colony_Slots_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         COLCALC::Twiddle_Initial_Homeworlds_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         SHIPMOVE::Allocate_New_Ship_Slots_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         COLCALC::Compute_All_Star_Colony_Stuff_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         TRADE::Process_Trade_And_Research_Agreements_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
 
         if (MOX::_settings.auto_select_colony != 0) {
             Set_Initial_Colony_Auto_Selects_();
         }
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         REPORT::Initialize_Reports_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         COLCALC::Init_Surrenders_();
-        RUSS::Mox_Update_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
 
         FILEDEF::Save_Game_(9);
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         FILEDEF::Save_Game_Settings_();
-        RUSS::Mox_Update_();
+        MOX::Mox_Update_();
         MOX2::Init_Map_Pictures_Default__();
 
         if (MOX::_game_type == 0) {
@@ -316,7 +316,7 @@ namespace INITGAME {
 
             if (plr->objectives == 100) {
                 // Predefined or special player setup: copy traits to evolutionary upgrades
-                struct_::Copy_Structure_(plr->evolutionary_upgrade_traits, plr->traits, 31);
+                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &plr->traits, 31);
             } else {
                 int16_t race_idx;
                 bool unique_race;
@@ -341,8 +341,8 @@ namespace INITGAME {
                 }
 
                 // Copy default traits from template
-                struct_::Copy_Structure_(&plr->traits, RACESEL::_race_specials[race_idx], 31);
-                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->traits, &RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &RACESEL::_race_specials[race_idx], 31);
 
                 MOX::Mox_Update_();
                 RACECUST::Race_Customization_(i);
@@ -470,7 +470,7 @@ namespace INITGAME {
             MOX::_leaders[i].skill_value = officer::Officer_Skill_Value_(i);
 
             // Refresh systems after each leader update.
-            RUSS::Mox_Update_();
+            MOX::Mox_Update_();
         }
     }
 

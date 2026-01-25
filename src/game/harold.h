@@ -1,6 +1,10 @@
 #pragma once
 
 namespace HAROLD {
+    uint8_t __cdecl N_Planets_In_System_(int16_t star_idx);
+
+    bool __cdecl Habitable_Spectral_Class_(int16_t star_idx);
+
     void __cdecl Get_Font_File_(char* buffer);
     void __cdecl Get_Officer_Data_LBX_Name_(char* out_name);
 
@@ -23,6 +27,12 @@ namespace HAROLD {
     inline void __cdecl Harold_Init_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0DD0 })();
+    }
+
+    inline const char* __cdecl H_Message_(int32_t message_id) {
+        using Fn = const char*(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F2440});
+        return fn(message_id);
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"

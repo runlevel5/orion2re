@@ -31,6 +31,7 @@
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />
+    <ClCompile Include="src\game\mapgen.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\palette.cpp" />

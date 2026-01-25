@@ -63,6 +63,14 @@ namespace hooks {
         { 0x00478d10, &INITGAME::Set_Initial_Colony_Auto_Selects_ },
         { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },
         { 0x0051a950, &HOMEGEN::Build_Home_Star_List_ },
+        { 0x0051bc90, &HOMEGEN::Set_Up_Home_Gen_Msg_ },
+        { 0x0051aca0, &HOMEGEN::Build_Min_Star_Distances_ },
+        { 0x0051bbc0, &HOMEGEN::Randomize_Home_Worlds_ },
+        { 0x0051a010, &HOMEGEN::Enforce_3_Planet_Minimum_ },
+        { 0x004f12d0, &HAROLD::N_Planets_In_System_ },
+        { 0x004f0a70, &HAROLD::Habitable_Spectral_Class_ },
+        { 0x004b6610, &MAPGEN::Generate_Spectral_Class_ },
+        { 0x0051b300, &HOMEGEN::Modify_Home_Worlds_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

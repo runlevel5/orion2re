@@ -12,8 +12,8 @@ namespace MISC {
         return fn(a1, a2, a3);
     }
 
-    inline void __cdecl Draw_Advancing_Fill_Message_(int32_t a1, uint16_t* ctr, uint16_t max, ColorPair* c1, ColorPair* c2, int32_t x, int32_t y, char* msg, uint16_t* bitmap, int32_t flag) {
-        using Fn = void(__cdecl*)(int32_t, uint16_t*, uint16_t, ColorPair*, ColorPair*, int32_t, int32_t, char*, uint16_t*, int32_t);
+    inline void __cdecl Draw_Advancing_Fill_Message_(int32_t a1, void* ctr, uint16_t max, ColorPair* c1, ColorPair* c2, int32_t x, int32_t y, char* msg, void* bitmap, int32_t flag) {
+        using Fn = void(__cdecl*)(int32_t, void*, uint16_t, ColorPair*, ColorPair*, int32_t, int32_t, char*, void*, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e3f0});
         fn(a1, ctr, max, c1, c2, x, y, msg, bitmap, flag);
     }

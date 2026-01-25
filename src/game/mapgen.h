@@ -2,9 +2,18 @@
 #include <cstdint>
 
 namespace MAPGEN {
-    inline uint16_t*& _fill_msg_bitmap = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x005A4B20});
-    inline char (&_fill_msg)[32] = *reinterpret_cast<char (*)[32]>(std::uintptr_t{0x005A4B30});
-    inline uint16_t& _fill_msg_ctr = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A4B54});
+    inline char* _companion_star = reinterpret_cast<char*>(std::uintptr_t{0x0055632C});
+    inline void*& _fill_msg_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x005A4B20});
+    inline char (&_fill_msg)[36] = *reinterpret_cast<char (*)[36]>(std::uintptr_t{0x005A4B30});
+    inline int16_t& _fill_msg_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4B54});
+    inline const char* s_raceopt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B24}); // "RACEOPT.LBX"
+
+    uint8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index);
+
+    inline void __cdecl Generate_Satellite_(int16_t star_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(0x004b6360)(star_idx);
+    }
 
     inline void __cdecl Universe_Generation_(int16_t arg_1c, int32_t arg_20, int16_t arg_18) {
         using Fn = void(__cdecl*)(int16_t, int32_t, int16_t);

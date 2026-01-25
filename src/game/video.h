@@ -43,4 +43,14 @@ namespace video {
 		using Fn = void(__cdecl*)();
 		reinterpret_cast<Fn>(std::uintptr_t{ 0x005286c0 })();
 	}
+
+    inline void __cdecl Set_Page_Back_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x005286A0})();
+    }
+
+    inline void __cdecl Copy_Back_To_Off_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
+    }
 }

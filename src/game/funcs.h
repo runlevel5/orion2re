@@ -256,9 +256,16 @@ inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     fn(dest, src, n);
 }
 
-inline void __cdecl Mox_Update_() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x004d7820 })();
+inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
+    using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519F90});
+    return fn(star1_idx, star2_idx);
+}
+
+inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, uint32_t segment) {
+    using Fn = void*(__cdecl*)(const char*, int32_t, uint32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
+    return fn(filename, index, segment);
 }
 
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
