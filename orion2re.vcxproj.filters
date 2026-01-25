@@ -81,6 +81,9 @@
     <ClCompile Include="src\game\mapgen.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\diplomac.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -246,6 +249,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\consts.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\diplomac.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\diplodef.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

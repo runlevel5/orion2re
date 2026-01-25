@@ -68,3 +68,6 @@
 #include "techdata.h"
 #include "techinit.h"
 #include "haccess.h"
+#include "diplomac.h"
+#include "diplodef.h"
+#include "npcdiplo.h"

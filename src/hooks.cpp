@@ -86,7 +86,16 @@ namespace hooks {
         { 0x0051a4d0, &HOMEGEN::Enforce_Mineral_Richness_ },
         { 0x0051a410, &HOMEGEN::Enforce_Gravity_ },
         { 0x0051b8c0, &HOMEGEN::Guarantee_A_Planet_At_Min_Dist_ },
-        { 0x0051c3b0, &HOMEGEN::compare_star_dist },
+        { 0x0051c3b0, &HOMEGEN::qsort_star_dist_list_ },
+        { 0x0051b530, &HOMEGEN::Set_System_Planet_Artifact_Special },
+        { 0x0051b590, &HOMEGEN::Ensure_At_Least_1_Food_Planet_ },
+        { 0x0051c2b0, &HOMEGEN::Usable_Orbit_ },
+        { 0x0051b1d0, &HOMEGEN::Make_One_Planet_ },
+        { 0x00450480, &diplomac::Init_Diplomatic_Relations_ },
+        { 0x0051b870, &HOMEGEN::Add_Non_Food_Planets_To_List_ },
+        { 0x0051bea0, &HOMEGEN::Random_Planet_ },
+        { 0x0051c160, &HOMEGEN::Set_Special_For_Star_Guarded_By_Monster_ },
+        { 0x0051bf50, &HOMEGEN::Upgrade_Planet_Guarded_By_Monster_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

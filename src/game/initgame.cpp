@@ -429,7 +429,7 @@ namespace INITGAME {
         MOX::Mox_Update_();
         HOMEGEN::Assign_Home_Star_Names_();
         MOX::Mox_Update_();
-        HOMEGEN::Init_Diplomatic_Relations_();
+        diplomac::Init_Diplomatic_Relations_();
         MOX::Mox_Update_();
     }
 

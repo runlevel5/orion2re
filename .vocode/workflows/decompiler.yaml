@@ -485,7 +485,8 @@ workflows:
             #pragma pack(pop)
 
           * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
-          * You might have to update data types to match what is in the existing codebase
+          * Received input might be inaccurate and won't match existing codebase conventions or data types. In this case, follow
+            existing codebase conventions.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
           * For `struct_` namespace - check the `src/game/struct.h` file (no underscore)
           * If you see values resembling enums or constants, especially if there is a comment - always check against 

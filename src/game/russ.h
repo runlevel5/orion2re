@@ -1,9 +1,10 @@
 #pragma once
 
 namespace RUSS {
-    inline int16_t __cdecl Get_Weighted_Choice_Short_(const uint16_t* weights, int16_t num_stars) {
-        using Fn = int16_t(__cdecl*)(const uint16_t*, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004d78e0})(weights, num_stars);
+    inline uint16_t __cdecl Get_Weighted_Choice_Short_(uint16_t* weights, int count) {
+        using Fn = uint16_t(__cdecl*)(uint16_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D78E0});
+        return fn(weights, count);
     }
 
     inline uint8_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int32_t count) {

@@ -20,6 +20,11 @@ namespace HAROLD {
 
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx);
 
+    inline uint8_t __cdecl N_Food_Planets_In_System_(int16_t star_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1270 })(star_idx);
+    }
+
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx);

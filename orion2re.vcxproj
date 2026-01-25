@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
+    <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\exit.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
@@ -51,6 +52,8 @@
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\deps.h" />
+    <ClInclude Include="src\game\diplodef.h" />
+    <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dos.h" />
     <ClInclude Include="src\game\eric.h" />
     <ClInclude Include="src\game\exit.h" />

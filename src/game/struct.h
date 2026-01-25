@@ -1,7 +1,7 @@
 #pragma once
 
 #pragma pack(push, 1)
-struct StarDist {
+struct s_star_dist {
     int16_t dist;
     int16_t index;
 };
