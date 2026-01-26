@@ -2,6 +2,8 @@
 
 namespace video {
 	// Variables
+	inline uintptr_t& _current_video_page = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x005792F8});
+
 	inline uint32_t& screen_refresh_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1B4 });
 

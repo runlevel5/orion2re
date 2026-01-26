@@ -14,7 +14,7 @@ namespace farload {
 #pragma pack(pop)
 
     // Suggested name: farload::Error_Handler
-    void __cdecl Error_Handler_(char* lib_name, int code, int idx);
+    void __cdecl Error_Handler_(const char* lib_name, int code, int idx);
 
     inline char* s_vga_frames_error = reinterpret_cast<char*>(std::uintptr_t{0x0055AE38});
     inline char* s_error_defined_records = reinterpret_cast<char*>(std::uintptr_t{0x0055AE70});
@@ -35,19 +35,17 @@ namespace farload {
     inline s_lbx_header& _lbx_header = *reinterpret_cast<s_lbx_header*>(std::uintptr_t{ 0x005723D0 });
     inline char* _secondary_drive_path = reinterpret_cast<char*>(std::uintptr_t{ 0x0055AE00 });
 
-    void* __cdecl Far_Reload_(char* path, int32_t idx, void* param3);
+    void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
 
-    inline void* __cdecl Far_Reload_Data_(const char* filename, int32_t arg2, void* buffer, int32_t arg3, int32_t count, int32_t size) {
-        using Fn = void* (__cdecl*)(const char*, int32_t, void*, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051C750 });
-        return fn(filename, arg2, buffer, arg3, count, size);
+    inline void* __cdecl Farload_Library_Data_(const char* path, int32_t idx, void* out, int32_t mode, uint32_t param_4, uint16_t param_5, uint16_t param_6) {
+        using Fn = void*(__cdecl*)(const char*, int32_t, void*, int32_t, uint32_t, uint16_t, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ca30});
+        return fn(path, idx, out, mode, param_4, param_5, param_6);
     }
 
-    inline void* __cdecl Far_Reload_Next_Data_(const char* filename, int type, void* buffer, int record, int count, int size) {
-        using Fn = void* (__cdecl*)(const char*, int, void*, int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051C780 });
-        return fn(filename, type, buffer, record, count, size);
-    }
+    void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_t param_4, uint16_t param_5, uint16_t param_6);
 
-    void* __cdecl Farload_Library_(char* lib_name, int idx, void* param_3, int alloc_type);
+    void* __cdecl Far_Reload_Next_Data_(const char* path, int32_t idx, void* out, uint32_t param_4, uint16_t param_5, uint16_t param_6);
+
+    void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type);
 }

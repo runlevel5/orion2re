@@ -545,7 +545,7 @@ namespace platform {
         g_frame_count++;
     }
 
-    HRESULT Lock_Appropriate_Render_Buffer()
+    uint32_t Lock_Appropriate_Render_Buffer()
     {
         HRESULT hr = S_OK;
         DDSURFACEDESC	desc;
@@ -600,7 +600,7 @@ namespace platform {
             exitm::Exit_With_Message("lock Generic");
             return DDERR_WASSTILLDRAWING;
         }
-        return hr;
+        return 0;
     }
 
 
@@ -653,7 +653,7 @@ namespace platform {
         return hr;
     }
 
-    HRESULT Lock_Primary_Surface()
+    uint32_t Lock_Primary_Surface()
     {
         HRESULT hr = S_OK;
         DDSURFACEDESC	desc;

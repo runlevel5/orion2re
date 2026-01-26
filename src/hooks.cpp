@@ -130,6 +130,20 @@ namespace hooks {
         { 0x0043c840, &FILEDEF::Save_Game_ },
         { 0x0043c0f0, &FILEDEF::Load_Game_ },
         { 0x0043d1b0, &FILEDEF::Save_Moo_Custom_Player_Data_ },
+        { 0x00478e30, &MOX2::Init_Map_Defaults_ },
+        { 0x00478e20, &MOX2::Init_Map_Pictures_Default__ },
+        { 0x00483cc0, &MOX2::Set_Game_Seed },
+        { 0x00407910, &BILL::Cache_Player_Scientist_Anim_ },
+        { 0x00407920, &BILL::Cache_Player_Scientist_Anim_Imp_ },
+        { 0x004baa40, &ERIC::Eric_Defaults_ },
+        { 0x0051c750, &farload::Far_Reload_Data_ },
+        { 0x0051c780, &farload::Far_Reload_Next_Data_ },
+        { 0x00526d00, &fonts::Set_PSTR_Style_ },
+        { 0x005255a0, &fonts::Set_Font_Style_ },
+        { 0x00525470, &fonts::Get_String_Width_ },
+        { 0x00525cf0, &fonts::Print_String_ },
+        { 0x00525f60, &fonts::Print_Character_ },
+        { 0x0053665c, &fonts::Print_Character_ASM_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -145,6 +159,7 @@ namespace hooks {
         ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
+        ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
     }
 
     void Install_Hooks()

@@ -112,9 +112,9 @@ namespace platform {
 	void Parse_Ten_Cmd_Parameter(const char* input_str);
 	HWND Create_Direct_Draw(int16_t video_mode);
 	void __stdcall Flip_Surface();
-	HRESULT Lock_Appropriate_Render_Buffer();
+	uint32_t Lock_Appropriate_Render_Buffer();
 	HRESULT	Unlock_Appropriate_Render_Buffer();
-	HRESULT Lock_Primary_Surface();
+	uint32_t Lock_Primary_Surface();
 	void Unlock_Primary_Surface();
 	void Blit_To_Back_Buffer();
 	void Draw_Cursor_XY(int16_t x, int16_t y);

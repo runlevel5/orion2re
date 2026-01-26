@@ -57,6 +57,12 @@ namespace HAROLD {
         reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0DD0 })();
     }
 
+    inline void __cdecl Harold_Defaults_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0aa0});
+        fn();
+    }
+
     inline void __cdecl Restore_Mouse_List_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f21d0});

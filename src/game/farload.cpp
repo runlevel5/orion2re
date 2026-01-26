@@ -2,7 +2,7 @@
 
 namespace farload {
 
-void* __cdecl Farload_Library_(char* lib_name, int idx, void* param_3, int alloc_type) {
+void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type) {
     char temp_path[60];
     void* dest_buf = nullptr;
 
@@ -21,7 +21,7 @@ void* __cdecl Farload_Library_(char* lib_name, int idx, void* param_3, int alloc
 
     if (!file_already_open) {
         // Copy library name to global tracker
-        char* src = lib_name;
+        const char* src = lib_name;
         char* dst = farload::_farload_file_name;
         while ((*dst++ = *src++) != '\0');
 
@@ -84,11 +84,19 @@ void* __cdecl Farload_Library_(char* lib_name, int idx, void* param_3, int alloc
     return dest_buf;
 }
 
-void* __cdecl Far_Reload_(char* path, int32_t idx, void* param3) {
+void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3) {
     return Farload_Library_(path, idx, param3, 1);
 }
 
-void __cdecl Error_Handler_(char* filename, int error_code, int entry_num) {
+void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_t param_4, uint16_t param_5, uint16_t param_6) {
+    return Farload_Library_Data_(path, idx, out, 1, param_4, param_5, param_6);
+}
+
+void* __cdecl Far_Reload_Next_Data_(const char* path, int32_t idx, void* out, uint32_t param_4, uint16_t param_5, uint16_t param_6) {
+    return Farload_Library_Data_(path, idx, out, 2, param_4, param_5, param_6);
+}
+
+void __cdecl Error_Handler_(const char* filename, int error_code, int entry_num) {
     char message[120];
     char itoa_buf[20];
 

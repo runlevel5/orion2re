@@ -46,6 +46,7 @@ namespace MOX {
     inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
     inline uint16_t& _cur_map_x = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A18F0});
     inline uint16_t& _cur_map_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A18F8});
+    inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
     inline uint8_t& _previous_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
@@ -114,6 +115,9 @@ namespace MOX {
 
     inline uint32_t& _global_cache_size =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA10 });
+
+    inline uint32_t& _cmd_line_seed =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
 
     inline uint16_t& _NUM_PLAYERS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005A2C1C });
     inline char* (&_race_names)[20] =

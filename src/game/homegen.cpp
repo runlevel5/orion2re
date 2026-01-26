@@ -148,7 +148,7 @@ namespace HOMEGEN {
                 list->stars[0] = current_star;
 
                 if (MAPGEN::_fill_msg_ctr < _HOME_WORLD_GEN_MAX_CTR) {
-                    fonts::Set_Font_Style_(4, &colors1);
+                    fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(&colors1));
                     int16_t width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                     MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR,
                                                       &colors1, &colors2, (640 - width) / 2, 215,
@@ -320,7 +320,7 @@ namespace HOMEGEN {
             }
 
             if (MAPGEN::_fill_msg_ctr < (uint16_t)_HOME_WORLD_GEN_MAX_CTR) {
-                fonts::Set_Font_Style_(4, (MISC::ColorPair*)local_color1);
+                fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
                 int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                 int16_t x_pos = (0x280 - text_width) / 2;
                 MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
@@ -331,7 +331,7 @@ namespace HOMEGEN {
             Build_Min_Star_Distances_(min_dist_sq);
 
             if (MAPGEN::_fill_msg_ctr < (uint16_t)_HOME_WORLD_GEN_MAX_CTR) {
-                fonts::Set_Font_Style_(4, (MISC::ColorPair*)local_color1);
+                fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
                 int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                 int16_t x_pos = (0x280 - text_width) / 2;
                 MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
@@ -357,7 +357,7 @@ namespace HOMEGEN {
 
         Modify_Home_Worlds_();
 
-        fonts::Set_Font_Style_(4, (MISC::ColorPair*)local_color1);
+        fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
         int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
         int16_t x_pos = (0x280 - text_width) / 2;
         MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 1);

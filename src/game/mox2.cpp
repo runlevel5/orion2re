@@ -1,6 +1,36 @@
 #include "deps.h"
+#include "diplodef.h"
 
 namespace MOX2 {
+    void __cdecl Init_Map_Pictures_Default__() {
+        MAPGEN::Load_Nebula_Pictures_();
+        Init_Map_Defaults_();
+    }
+
+    void __cdecl Set_Game_Seed() {
+        capture::Check_Release_Version_();
+
+        if (MOX::_cmd_line_seed != 0) {
+            random::Set_Random_Seed_(MOX::_cmd_line_seed);
+        } else {
+            random::Randomize_();
+        }
+    }
+
+    void __cdecl Init_Map_Defaults_() {
+        MOX::_cur_map_x = 0;
+        MOX::_cur_map_y = 0;
+        MOX::_current_screen = MOX::SCREEN_REPORTS;
+        diplodef::_council_winner = -1;
+
+        KEN::Ken_Init2_();
+        HAROLD::Harold_Defaults_();
+        ERIC::Eric_Defaults_();
+        BILL::Bill_Default_();
+
+        MOX::_global_esc = 0;
+    }
+
     void __stdcall Set_Mox_Language_() {
         char dir_buffer[80];
         char line_buffer[80];
@@ -91,7 +121,7 @@ namespace MOX2 {
 
         MISC::ColorPair* colors = MISC::Font_Colors2_(4, 0xD3, 0xDC);
         font_colors = *colors;
-        fonts::Set_Font_Style_(4, &font_colors);
+        fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(&font_colors));
         video::Set_Page_Off_();
 
         // Prepare loading message

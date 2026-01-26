@@ -12,6 +12,11 @@ namespace random {
         reinterpret_cast<Fn>(std::uintptr_t{0x0052D4C0})(seed);
     }
 
+    inline void __cdecl Randomize_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052D4E0})();
+    }
+
     inline int32_t __cdecl Random_(int32_t max_val) {
         using Fn = int32_t(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D470 });

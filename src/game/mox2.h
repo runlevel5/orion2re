@@ -1,22 +1,10 @@
 #pragma once
 
 namespace MOX2 {
-    inline void __cdecl Set_Game_Seed() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00483CC0 })();
-    }
+    void __cdecl Set_Game_Seed();
 
-    // Suggested name: Init_Map_Defaults
-    inline void __cdecl Init_Map_Defaults_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478E30 })();
-    }
-
-    // Suggested name: Init_Map_Pictures_Default
-    inline void __cdecl Init_Map_Pictures_Default__() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00478E20 })();
-    }
+    void __cdecl Init_Map_Defaults_();
+    void __cdecl Init_Map_Pictures_Default__();
     inline uint8_t& _user_wants_n_space_monsters = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A6378 });
     inline uint8_t& _pan_main_menu_panel = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A6379 });
     inline uint8_t& _skip_intro = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005662B4 });
