@@ -3,13 +3,11 @@
 #include <cstdint>
 
 namespace palstore {
-    inline void __cdecl Darken_Palette_(int16_t level) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052b850})(level);
-    }
+    int16_t Slow_Fade_In_();
 
-    inline int16_t __cdecl Slow_Fade_In_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00425dc0})();
+    inline void __cdecl Darken_Palette_(int32_t amount) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052B850});
+        fn(amount);
     }
 }

@@ -2,23 +2,13 @@
 #include <cstdint>
 
 namespace MAINSCR {
-    inline void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* outX, int16_t* outY) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004c7440})(x, y, outX, outY);
-    }
+    inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
 
-    inline void __cdecl Update_Star_Owners_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004CD560})();
-    }
+    void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 
-    inline void __cdecl Draw_Mini_Main_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C6780})();
-    }
+    void __cdecl Update_Star_Owners_();
 
-    inline void __cdecl Update_Ship_Icons_In_Between_Turns_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004CD550})();
-    }
+    void __cdecl Draw_Mini_Main_Screen_();
+
+    void __cdecl Update_Ship_Icons_In_Between_Turns_();
 }

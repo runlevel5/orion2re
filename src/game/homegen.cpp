@@ -71,7 +71,7 @@ namespace HOMEGEN {
                     p->orbit = orbit;
                     p->planet_type = 3; // Terran
 
-                    MAPGEN::Generate_Satellite_(target_star_idx, orbit, 3);
+                    MAPGEN::Generate_Satellite_(target_star_idx);
                     MOX::_planet_count++;
                 }
             }
@@ -130,8 +130,8 @@ namespace HOMEGEN {
     }
 
     uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist) {
-        MISC::ColorPair colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
-        MISC::ColorPair colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
+        MISC::s_colors colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
+        MISC::s_colors colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
         CandidateList candidates[72];
         for (int i = 0; i < 72; ++i) {
@@ -148,7 +148,7 @@ namespace HOMEGEN {
                 list->stars[0] = current_star;
 
                 if (MAPGEN::_fill_msg_ctr < _HOME_WORLD_GEN_MAX_CTR) {
-                    fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(&colors1));
+                    fonts::Set_Font_Style_(4, &colors1);
                     int16_t width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                     MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR,
                                                       &colors1, &colors2, (640 - width) / 2, 215,
@@ -268,17 +268,10 @@ namespace HOMEGEN {
     }
 
     uint32_t __cdecl Generate_Home_Worlds_() {
-        uint32_t local_color1[2];
-        uint32_t local_color2[2];
         uint16_t home_star_ids[8] = {};
 
-        MISC::ColorPair* colors = MISC::Font_Colors2_(4, 0x77, 0x79);
-        local_color1[0] = colors->c1;
-        local_color1[1] = colors->c2;
-
-        colors = MISC::Font_Colors2_(4, 0x77, 0x7c);
-        local_color2[0] = colors->c1;
-        local_color2[1] = colors->c2;
+        MISC::s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
+        MISC::s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
         // TODO: 72 * 299 bitmap (const?)
         _good_stars = static_cast<s_good_star*>(allocate::Allocate_First_Block_(MOX::_screen_seg, 0x5418));
@@ -320,10 +313,10 @@ namespace HOMEGEN {
             }
 
             if (MAPGEN::_fill_msg_ctr < (uint16_t)_HOME_WORLD_GEN_MAX_CTR) {
-                fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
+                fonts::Set_Font_Style_(4, &local_color1);
                 int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                 int16_t x_pos = (0x280 - text_width) / 2;
-                MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
+                MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, &local_color1, &local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
                 RUSS::Mox_Sync_Update_();
             }
 
@@ -331,10 +324,10 @@ namespace HOMEGEN {
             Build_Min_Star_Distances_(min_dist_sq);
 
             if (MAPGEN::_fill_msg_ctr < (uint16_t)_HOME_WORLD_GEN_MAX_CTR) {
-                fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
+                fonts::Set_Font_Style_(4, &local_color1);
                 int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
                 int16_t x_pos = (0x280 - text_width) / 2;
-                MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
+                MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, &local_color1, &local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
                 RUSS::Mox_Sync_Update_();
             }
 
@@ -357,10 +350,10 @@ namespace HOMEGEN {
 
         Modify_Home_Worlds_();
 
-        fonts::Set_Font_Style_(4, reinterpret_cast<uint8_t*>(local_color1));
+        fonts::Set_Font_Style_(4, &local_color1);
         int16_t text_width = fonts::Get_String_Width_(MAPGEN::_fill_msg);
         int16_t x_pos = (0x280 - text_width) / 2;
-        MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, (MISC::ColorPair*)local_color1, (MISC::ColorPair*)local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 1);
+        MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, (uint16_t)_HOME_WORLD_GEN_MAX_CTR, &local_color1, &local_color2, x_pos, 215, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 1);
         RUSS::Mox_Sync_Update_();
 
         Generate_Orion_();
@@ -368,16 +361,9 @@ namespace HOMEGEN {
     }
 
     void __cdecl Set_Up_Home_Gen_Msg_() {
-        uint32_t font_style_data[4];
-
         // Retrieve and cache font colors for rendering
-        MISC::ColorPair* colors1 = MISC::Font_Colors2_(4, 0x77, 0x79);
-        font_style_data[0] = colors1->c1;
-        font_style_data[1] = colors1->c2;
-
-        MISC::ColorPair* colors2 = MISC::Font_Colors2_(4, 0x77, 0x7C);
-        font_style_data[2] = colors2->c1;
-        font_style_data[3] = colors2->c2;
+        MISC::s_colors* colors1 = MISC::Font_Colors2_(4, 0x77, 0x79);
+        MISC::s_colors* colors2 = MISC::Font_Colors2_(4, 0x77, 0x7C);
 
         // Determine home world generation counter limits
         _HOME_WORLD_GEN_MAX_CTR = (static_cast<int32_t>(MOX::_NUM_STARS) * 25) / 20;
@@ -407,9 +393,9 @@ namespace HOMEGEN {
         const char* msg_str = HAROLD::H_Message_(0xA1);
         helpers::strcpy(MAPGEN::_fill_msg, msg_str);
 
-        fonts::Set_Font_Style_Outline_Heavy_(4, font_style_data);
+        fonts::Set_Font_Style_Outline_Heavy_(4, colors1);
         fonts::Set_Outline_Color_(2, 1);
-        fonts::Print_To_Bitmap_(0, 0, reinterpret_cast<uint8_t*>(MAPGEN::_fill_msg), MAPGEN::_fill_msg_bitmap);
+        fonts::Print_To_Bitmap_(0, 0, MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap);
     }
 
     /**
@@ -581,7 +567,7 @@ namespace HOMEGEN {
         planet.orbit = (int8_t)orbit_idx;
         planet.planet_type = 3;
 
-        MAPGEN::Generate_Satellite_(star_idx, orbit_idx, 3);
+        MAPGEN::Generate_Satellite_(star_idx);
         MAPGEN::_make_food_planet = 0;
 
         if (MOX::_planet_count == planet_idx) {
@@ -810,7 +796,7 @@ namespace HOMEGEN {
                     MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
                     MOX::_planet[existing_planet_idx].planet_type = 3; // PLANET_TYPE_PLANET
 
-                    MAPGEN::Generate_Satellite_(star_idx, orbit, 3);
+                    MAPGEN::Generate_Satellite_(star_idx);
                     
                     MOX::_planet_count = saved_global_count;
                 }

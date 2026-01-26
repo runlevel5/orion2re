@@ -131,8 +131,8 @@ namespace HAROLD {
         _memcpy(buffer, src, 10);
     }
 
-    int32_t __cdecl Get_Scaled_Value_(int16_t value) {
-        return (static_cast<int32_t>(value) * 10) / static_cast<int32_t>(MOX::_cur_map_scale);
+    int16_t __cdecl Get_Scaled_Value_(int16_t value) {
+        return static_cast<int16_t>(static_cast<int32_t>(value * 10) / static_cast<int32_t>(MOX::_cur_map_scale));
     }
 
     uint8_t __cdecl N_Sattelites_(int16_t star_index) {
@@ -206,6 +206,39 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f0e90
+     */
+    void __cdecl Init_Fleet_Movement_Box_() {
+        auto& box = MOX::_moveable_box[2];
+
+        box.width = 200;
+        box.height = 0x110;
+        box.field4_0x8 = 0x16;
+        box.field5_0xa = 0x16;
+
+        box.field12_0x14 = box.width;
+        box.field13_0x16 = 0x27;
+    }
+
+    /**
+     * @address 004f0f60
+     */
+    void __cdecl Init_System_Display_Box_() {
+        MOX::_moveable_box_pict = Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg);
+
+        MOX::_moveable_box[0].width = sprite::Get_Sprite_Width_(MOX::_moveable_box_pict);
+        MOX::_moveable_box[0].height = sprite::Get_Sprite_Height_(MOX::_moveable_box_pict);
+
+        if (MOX::_moveable_box[0].field4_0x8 < 0) {
+            MOX::_moveable_box[0].field4_0x8 = 22;
+        }
+
+        if (MOX::_moveable_box[0].field5_0xa < 0) {
+            MOX::_moveable_box[0].field5_0xa = 22;
+        }
+    }
+
+    /**
      * @address 004f0ed0
      */
     void __cdecl Init_Moving_Boxes_() {
@@ -255,8 +288,37 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f2190
+     */
+    void __cdecl Save_Mouse_List_() {
+        uint16_t count = mouse::_current_mouse_list_count;
+
+        if (count > 10) {
+            count = 10;
+        }
+
+        _saved_mouse_list_count = count;
+
+        uint32_t dword_count = static_cast<uint32_t>(count) * 3;
+        uint32_t* src = reinterpret_cast<uint32_t*>(mouse::_current_mouse_list);
+        uint32_t* dest = reinterpret_cast<uint32_t*>(_saved_mouse_list);
+
+        for (uint32_t i = 0; i < dword_count; ++i) {
+            dest[i] = src[i];
+        }
+    }
+
+    /**
      * @address 004f0640
      */
+    /**
+     * @address 004f21d0
+     */
+    void __cdecl Restore_Mouse_List_() {
+        mouse::Set_Mouse_List_(_saved_mouse_list, _saved_mouse_list_count);
+        _saved_mouse_list_count = 0;
+    }
+
     void Confirm_Planet_And_Star_Index_Link_(const char* msg) {
         for (int16_t i = 0; i < MOX::_planet_count; ++i) {
             Planet_Number_(i);
@@ -281,6 +343,33 @@ namespace HAROLD {
                     orbit_taken[orbit_idx] = 1;
                 }
             }
+        }
+    }
+
+    void __cdecl Reload_Leader_Titles() {
+        char lbx_filename[20];
+        Get_Officer_Data_LBX_Name_(lbx_filename);
+
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            allocate::Push_Block_(MOX::_screen_seg);
+
+            void* record_ptr = farload::Far_Reload_Next_Data_(
+                lbx_filename,
+                0,
+                MOX::_screen_seg,
+                static_cast<uint32_t>(i),
+                1,
+                59
+            );
+
+            if (record_ptr != nullptr) {
+                char* src_title = reinterpret_cast<char*>(record_ptr) + 15;
+                char* dest_title = MOX::_leaders[i].title;
+
+                while ((*dest_title++ = *src_title++) != '\0');
+            }
+
+            allocate::Pop_Block_(MOX::_screen_seg);
         }
     }
 }

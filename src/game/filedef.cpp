@@ -331,7 +331,7 @@ namespace FILEDEF {
         RUSS::Assert_Settings_();
         MAINSCR::Update_Star_Owners_();
         RUSS::Assert_Settings_();
-        HAROLD::Load_Leader_Titles_();
+        HAROLD::Reload_Leader_Titles();
 
         for (int i = 0; i < 8; ++i) {
             if (MOX::_player[i].dead_field != 0) {

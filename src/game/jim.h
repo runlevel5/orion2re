@@ -17,27 +17,14 @@ namespace JIM {
     inline const char* s_intro_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555960 });   // "intro.lbx"
     inline const char* s_simtex_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055596C });  // "simtex.lbx"
     inline const char* s_logo_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555978 });    // "logo.lbx"
+    inline const char* s_fmt_ssimtex_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555984 }); // "%ssimtex.lbx"
 
     // External functions
-    inline int16_t __cdecl Check_For_Simtex_Logo_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00425e30 })();
-    }
+    bool __cdecl Check_For_Simtex_Logo_();
 
-    inline void __cdecl Slow_Fade_In_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00425dc0 })();
-    }
+    void __cdecl Logo_Fadeout_();
 
-    inline void __cdecl Logo_Fadeout_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00425d50 })();
-    }
-
-    inline void __cdecl Fast_Fade_In_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004ba740 })();
-    }
+    void __cdecl Fast_Fade_In_();
 
     void __cdecl Draw_Logos_(void);
     void Play_Background_Music_();

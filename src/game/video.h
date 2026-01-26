@@ -17,8 +17,8 @@ namespace video {
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578e60 });
 
 	// Functions
-	inline void __cdecl Fill_(int x1, int y1, int x2, int y2, uint8_t color) {
-		using Fn = void(__cdecl*)(int, int, int, int, uint8_t);
+	inline void __cdecl Fill_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color) {
+		using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
 		reinterpret_cast<Fn>(std::uintptr_t{ 0x00528CC0 })(x1, y1, x2, y2, color);
 	}
 
@@ -34,8 +34,8 @@ namespace video {
 		fn();
 	}
 
-	inline void Set_Refresh_Full_() {
-		using Fn = void(*)();
+	inline void __cdecl Set_Refresh_Full_() {
+		using Fn = void(__cdecl*)();
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527C80 });
 		fn();
 	}

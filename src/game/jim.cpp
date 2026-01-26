@@ -1,6 +1,40 @@
 #include "deps.h"
 
 namespace JIM {
+    void __cdecl Fast_Fade_In_() {
+        if (ERIC::_fade_percent != 0) {
+            video::Set_Refresh_Full_();
+
+            int16_t fade_level = static_cast<int16_t>(ERIC::_fade_percent);
+
+            while (fade_level >= 0) {
+                palstore::Darken_Palette_(static_cast<int32_t>(fade_level));
+                ERIC::_fade_percent = static_cast<uint8_t>(fade_level);
+                MOX::Mox_Update_();
+                fade_level -= 10;
+            }
+        }
+
+        video::Set_Refresh_Stencil_();
+    }
+
+    bool __cdecl Check_For_Simtex_Logo_() {
+        char find_buffer[80];
+        char secondary_path[80];
+
+        _sprintf(secondary_path, s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
+
+        if (dos::DIR_(s_simtex_lbx, find_buffer)) {
+            return true;
+        }
+
+        if (dos::DIR_(secondary_path, find_buffer)) {
+            return true;
+        }
+
+        return false;
+    }
+
     void __cdecl Draw_Logos_(void) {
         fields::Deactivate_Auto_Function_();
         mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
@@ -34,7 +68,7 @@ namespace JIM {
             _darken_palette_value = 0;
 
             // Slow fade in for the first logo
-            Slow_Fade_In_();
+            palstore::Slow_Fade_In_();
 
             int16_t end_delay_counter = 15; // 0xF
             mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
@@ -138,6 +172,22 @@ namespace JIM {
         if (skip_flag == 0) {
             SMACK::Play_Cinematic_(s_intro_lbx, 0, 1);
         }
+    }
+
+    void __cdecl Logo_Fadeout_() {
+        video::Set_Refresh_Full_();
+
+        for (int16_t current_fade = _darken_palette_value; current_fade <= 100; current_fade += 10) {
+            palstore::Darken_Palette_(static_cast<int32_t>(current_fade));
+            MOX::Mox_Update_();
+        }
+
+        video::Set_Page_Back_();
+        Fill_(0, 0, 639, 479, 0);
+        video::Copy_Back_To_Off_();
+        palette::Clear_Palette_Changes_(0, 255);
+        RUSS::Mox_Sync_Update_();
+        video::Set_Refresh_Stencil_();
     }
 
     void Play_Background_Music_() {

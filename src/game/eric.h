@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace ERIC {
+    inline uint8_t& _fade_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B40});
+
     void __cdecl Eric_Init_();
 
     void __cdecl Eric_Defaults_();

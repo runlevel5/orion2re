@@ -3,7 +3,7 @@
 namespace HAROLD {
     uint32_t __cdecl Is_Colony_Star_(int16_t star_idx);
 
-    int32_t __cdecl Get_Scaled_Value_(int16_t value);
+    int16_t __cdecl Get_Scaled_Value_(int16_t value);
 
     bool __cdecl Empty_System_(int16_t star_idx);
 
@@ -34,23 +34,20 @@ namespace HAROLD {
 
     char* __cdecl H_Message_(int16_t id);
 
-    inline void __cdecl Save_Mouse_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f2190});
-        fn();
-    }
+    void __cdecl Save_Mouse_List_();
 
-    inline void __cdecl Init_Fleet_Movement_Box_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0e90});
-        fn();
-    }
+    inline uint8_t (&_saved_mouse_list)[120] =
+        *reinterpret_cast<uint8_t(*)[120]>(std::uintptr_t{0x00571A40});
 
-    inline void __cdecl Init_System_Display_Box_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0f60});
-        fn();
-    }
+    inline uint32_t& _saved_mouse_list_offset_4 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00571A44});
+
+    inline uint16_t& _saved_mouse_list_count =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00571AB8});
+
+    void __cdecl Init_Fleet_Movement_Box_();
+
+    void __cdecl Init_System_Display_Box_();
 
     inline void __cdecl Harold_Init_() {
         using Fn = void(__cdecl*)();
@@ -63,15 +60,14 @@ namespace HAROLD {
         fn();
     }
 
-    inline void __cdecl Restore_Mouse_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f21d0});
-        fn();
-    }
+    void __cdecl Restore_Mouse_List_();
 
-    inline void __cdecl Load_Leader_Titles_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004F26F0})();
+    void __cdecl Reload_Leader_Titles();
+
+    inline int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_num) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1AB0});
+        return fn(star_idx, player_num);
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"

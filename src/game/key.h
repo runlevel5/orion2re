@@ -19,19 +19,7 @@ namespace key {
     inline uint8_t& _key_read =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057E128});
 
-    /**
-     * Checks if a key has been pressed since the last check.
-     * If pressed, resets the flag and returns 1.
-     * 
-     * @return 1 if a key was pressed, 0 otherwise.
-     */
     uint8_t Keyboard_Status_();
 
-    /**
-     * @address 00531f20
-     * Reads the next key code from the keyboard buffer and updates the buffer pointers.
-     * 
-     * @return The key code that was read from the buffer.
-     */
     int32_t Read_Key_();
 }

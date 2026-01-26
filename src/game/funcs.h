@@ -146,8 +146,8 @@ inline void __cdecl FUN_528c90() {
     fn();
 }
 
-inline void __cdecl Fill_(int x1, int y1, int x2, int y2, uint8_t color) {
-    using Fn = void(__cdecl*)(int, int, int, int, uint8_t);
+inline void __cdecl Fill_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color) {
+    using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528cc0 });
     fn(x1, y1, x2, y2, color);
 }
@@ -155,6 +155,12 @@ inline void __cdecl Fill_(int x1, int y1, int x2, int y2, uint8_t color) {
 inline int __cdecl hgetch_() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
+    return fn();
+}
+
+inline int16_t __cdecl Mouse_Button_() {
+    using Fn = int16_t(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527680});
     return fn();
 }
 
@@ -348,6 +354,8 @@ inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const ch
 // "Orion"
 inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});
 
+inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
+
 inline void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
     using Fn = void(__cdecl*)(s_colony*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc4b0});
@@ -357,6 +365,24 @@ inline void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
 inline void __cdecl All_Colony_Calculations_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f91d0});
+    fn();
+}
+
+inline void __cdecl Fade_Into_Main_Screen_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CD7F0});
+    fn();
+}
+
+inline void __cdecl Draw_Main_Screen_Filled_(int32_t filled_flag) {
+    using Fn = void(__cdecl*)(int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C6550});
+    fn(filled_flag);
+}
+
+inline void __cdecl Draw_Main_Main_Screen_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C5700});
     fn();
 }
 

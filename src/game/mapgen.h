@@ -12,21 +12,44 @@ namespace MAPGEN {
 
     uint8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index);
     uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+    uint8_t __cdecl Generate_Max_Farms_(int16_t star_idx, int16_t planet_idx);
+    int8_t __cdecl Generate_Orbit_(int16_t star_id);
+    void __cdecl Generate_Satellite_(int16_t star_idx);
 
-    inline int8_t __cdecl Generate_Max_Farms_(int32_t star_index, int16_t planet_index) {
-        using Fn = int8_t(__cdecl*)(int32_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004b5c90})(star_index, planet_index);
+    inline int8_t __cdecl Generate_Size_() {
+        using Fn = int8_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b65d0});
+        return fn();
     }
 
-    inline char __cdecl Generate_Orbit_(int16_t star_idx) {
-        using Fn = char(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004B62A0 });
-        return fn(star_idx);
+    inline int8_t __cdecl Generate_Mineral_Class_(int16_t star_index, int16_t planet_count) {
+        using Fn = int8_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5cf0});
+        return fn(star_index, planet_count);
     }
 
-    inline void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int32_t type) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004b6360})(star_idx, orbit, type);
+    inline void __cdecl Get_Climate_Modifier_(int8_t mineral_class) {
+        using Fn = void(__cdecl*)(int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b6b20});
+        fn(mineral_class);
+    }
+
+    inline int8_t __cdecl Generate_Gravity_Class_(int16_t planet_count) {
+        using Fn = int8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5c50});
+        return fn(planet_count);
+    }
+
+    inline int16_t __cdecl Get_Planet_Group_(int16_t planet_count) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b6b60});
+        return fn(planet_count);
+    }
+
+    inline int8_t __cdecl Generate_Climate_(int16_t group) {
+        using Fn = int8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5af0});
+        return fn(group);
     }
 
     inline void __cdecl Universe_Generation_(int16_t arg_1c, int32_t arg_20, int16_t arg_18) {

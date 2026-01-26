@@ -1,6 +1,24 @@
 #include "deps.h"
 
 namespace fonts {
+    void __cdecl Set_Normal_Colors_On_(void) {
+        for (int i = 0; i < 8; ++i) {
+            _font_header.selected_colors2[i] = _font_header.selected_colors1[i];
+        }
+    }
+
+    void __cdecl Set_Highlight_Colors_On_(void) {
+        for (int i = 0; i < 8; ++i) {
+            _font_header.selected_colors2[i] = _font_header.highlight_colors[i];
+        }
+    }
+
+    void __cdecl Set_Special_Colors_On_(void) {
+        for (int i = 0; i < 8; ++i) {
+            _font_header.selected_colors2[i] = _font_header.special_colors[i];
+        }
+    }
+
     void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, int16_t height) {
         uint8_t* current_row = static_cast<uint8_t*>(screen);
         const uint8_t* data = glyph_data;
@@ -51,11 +69,21 @@ namespace fonts {
         _PSTR_style = style;
     }
 
-    void __cdecl Set_Font_Style_(int font_style, uint8_t *new_colors) {
+    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, MISC::s_colors* style_data) {
+        Set_Font_Style_(static_cast<int32_t>(font_index), style_data);
+        _font_header.font_style = 5;
+    }
+
+    void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color) {
+        _outline_color = color;
+        _alias_outline_color = alias_color;
+    }
+
+    void __cdecl Set_Font_Style_(int font_style, MISC::s_colors *new_colors) {
         _current_font_style = static_cast<uint16_t>(font_style);
 
         for (int i = 0; i < 8; ++i) {
-            uint8_t color = new_colors[i];
+            uint8_t color = new_colors->colors[i];
             _font_header.selected_colors1[i] = color;
             _font_header.selected_colors2[i] = color;
             _current_font_color_array[i] = color;
@@ -203,5 +231,33 @@ namespace fonts {
         platform::Unlock_Appropriate_Render_Buffer();
 
         return next_x;
+    }
+
+    int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character) {
+        platform::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
+
+        uint8_t char_idx = static_cast<uint8_t>(character);
+
+        uint32_t pixel_offset = static_cast<uint32_t>(y) * (uint32_t)platform::g_screen_res_x + static_cast<uint32_t>(x);
+        uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + pixel_offset;
+
+        uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
+
+        Print_Character_No_Alias_ASM_(
+            dest_ptr, 
+            glyph_ptr, 
+            &_font_header, 
+            static_cast<int>(_font_header.current_height)
+        );
+
+        int16_t updated_x = x + static_cast<int16_t>(_font_header.font_style_widths[char_idx]) + _font_header.font_style_spacing;
+
+        platform::Unlock_Appropriate_Render_Buffer();
+
+        return updated_x;
+    }
+
+    void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap) {
+        Print_Display_To_Bitmap_(x, y, text, 0, bitmap);
     }
 }

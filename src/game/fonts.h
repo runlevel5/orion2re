@@ -8,7 +8,8 @@ struct s_font {
     int16_t font_style_height;        // 0x08
     int16_t font_style;               // 0x0A
     uint8_t selected_colors1[8];      // 0x0C
-    uint8_t field4_0x14[16];          // 0x14
+    uint8_t highlight_colors[8];      // 0x14
+    uint8_t special_colors[8];        // 0x1C
     uint16_t current_height;          // 0x24
     int16_t line_height;              // 0x26
     uint16_t field24_0x28;            // 0x28
@@ -51,32 +52,24 @@ struct s_font {
 
     void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
+    inline void __cdecl Print_Character_No_Alias_ASM_(void* dest, void* glyph, s_font* header, int height) {
+        using Fn = void(__cdecl*)(void*, void*, s_font*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005366AE});
+        fn(dest, glyph, header, height);
+    }
+
     void Set_PSTR_Style_(uint16_t style);
-    void __cdecl Set_Font_Style_(int font_style, uint8_t *new_colors);
+    void __cdecl Set_Font_Style_(int font_style, MISC::s_colors *new_colors);
 
     int16_t __cdecl Get_String_Width_(const char* str);
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);
 
-    inline int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char c) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, char);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00525FD0})(x, y, c);
-    }
+    int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character);
 
-    inline void __cdecl Set_Normal_Colors_On_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00525F00})();
-    }
-
-    inline void __cdecl Set_Highlight_Colors_On_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00525F20})();
-    }
-
-    inline void __cdecl Set_Special_Colors_On_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00525F40})();
-    }
+    void __cdecl Set_Normal_Colors_On_(void);
+    void __cdecl Set_Highlight_Colors_On_(void);
+    void __cdecl Set_Special_Colors_On_(void);
 
     int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
@@ -86,23 +79,23 @@ struct s_font {
         fn(x, y, str);
     }
 
-    inline void __cdecl Set_Font_Style_Outline_Heavy_(int32_t style, void* color_data) {
-        using Fn = void(__cdecl*)(int32_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005256D0});
-        fn(style, color_data);
+    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, MISC::s_colors* style_data);
+
+    inline uint16_t& _outline_color =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B148});
+
+    inline uint16_t& _alias_outline_color =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B14C});
+
+    void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
+
+    inline void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* text, int32_t param_4, void* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526630});
+        fn(x, y, text, param_4, bitmap);
     }
 
-    inline void __cdecl Set_Outline_Color_(int32_t color1, int32_t color2) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005256F0});
-        fn(color1, color2);
-    }
-
-    inline void __cdecl Print_To_Bitmap_(int32_t x, int32_t y, uint8_t* text, void* bitmap) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, uint8_t*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526610});
-        fn(x, y, text, bitmap);
-    }
+    void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap);
 
     // Suggested name: fonts::Update_Palette_Internal
     inline void __cdecl FUN_00526f80() {
