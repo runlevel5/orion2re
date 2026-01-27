@@ -794,7 +794,6 @@ struct s_good_star {
 struct s_nebula_data {
     uint8_t unknown[4];
     uint8_t type;
-    uint8_t pad[15];
 };
 
 #pragma	pack(pop)

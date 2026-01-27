@@ -346,30 +346,32 @@ namespace HAROLD {
         }
     }
 
-    void __cdecl Reload_Leader_Titles() {
-        char lbx_filename[20];
-        Get_Officer_Data_LBX_Name_(lbx_filename);
+    void __cdecl Load_Leader_Titles() {
+        if (MOX::_screen_seg != NULL) {
+            char lbx_filename[20];
+            Get_Officer_Data_LBX_Name_(lbx_filename);
 
-        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
-            allocate::Push_Block_(MOX::_screen_seg);
+            for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+                allocate::Push_Block_(MOX::_screen_seg);
 
-            void* record_ptr = farload::Far_Reload_Next_Data_(
-                lbx_filename,
-                0,
-                MOX::_screen_seg,
-                static_cast<uint32_t>(i),
-                1,
-                59
-            );
+                void* record_ptr = farload::Far_Reload_Next_Data_(
+                    lbx_filename,
+                    0,
+                    MOX::_screen_seg,
+                    static_cast<uint32_t>(i),
+                    1,
+                    59
+                );
 
-            if (record_ptr != nullptr) {
-                char* src_title = reinterpret_cast<char*>(record_ptr) + 15;
-                char* dest_title = MOX::_leaders[i].title;
+                if (record_ptr != nullptr) {
+                    char* src_title = reinterpret_cast<char*>(record_ptr) + 15;
+                    char* dest_title = MOX::_leaders[i].title;
 
-                while ((*dest_title++ = *src_title++) != '\0');
+                    while ((*dest_title++ = *src_title++) != '\0');
+                }
+
+                allocate::Pop_Block_(MOX::_screen_seg);
             }
-
-            allocate::Pop_Block_(MOX::_screen_seg);
         }
     }
 }

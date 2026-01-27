@@ -129,7 +129,7 @@ namespace hooks {
         { 0x004b9aa0, &COLONIZE::Star_N_Uncolonized_Planets_ },
         { 0x004ba510, &ERIC::Get_Sint_Index_From_List_ },
         { 0x0043c840, &FILEDEF::Save_Game_ },
-        //{ 0x0043c0f0, &FILEDEF::Load_Game_ },
+        { 0x0043c0f0, &FILEDEF::Load_Game_ },
         { 0x0043d1b0, &FILEDEF::Save_Moo_Custom_Player_Data_ },
         { 0x00478e30, &MOX2::Init_Map_Defaults_ },
         { 0x00478e20, &MOX2::Init_Map_Pictures_Default__ },
@@ -149,7 +149,7 @@ namespace hooks {
         { 0x004f0e90, &HAROLD::Init_Fleet_Movement_Box_ },
         { 0x004f0f60, &HAROLD::Init_System_Display_Box_ },
         { 0x004f21d0, &HAROLD::Restore_Mouse_List_ },
-        { 0x004f26fb, &HAROLD::Reload_Leader_Titles },
+        { 0x004f26f0, &HAROLD::Load_Leader_Titles },
         { 0x00525fd0, &fonts::Print_Character_No_Alias_ },
         { 0x00525f00, &fonts::Set_Normal_Colors_On_ },
         { 0x00525f20, &fonts::Set_Highlight_Colors_On_ },
@@ -161,8 +161,7 @@ namespace hooks {
         { 0x00425dc0, &palstore::Slow_Fade_In_ },
         { 0x004ba740, &JIM::Fast_Fade_In_ },
         { 0x004c7440, &MAINSCR::Get_PointXY_Draw_Coords_ },
-        // TODO: Investigate
-        //{ 0x004cd560, &MAINSCR::Update_Star_Owners_ },
+        { 0x004cd560, &MAINSCR::Update_Star_Owners_ },
         { 0x004c6780, &MAINSCR::Draw_Mini_Main_Screen_ },
         { 0x004cd550, &MAINSCR::Update_Ship_Icons_In_Between_Turns_ },
         { 0x004b5c90, &MAPGEN::Generate_Max_Farms_ },
@@ -179,8 +178,7 @@ namespace hooks {
         { 0x004b56b0, &MAPGEN::Assign_Marooned_Heroes_ },
         { 0x004b6490, &MAPGEN::Set_Secondary_Planet_Data_ },
         { 0x004b6650, &MAPGEN::Get_A_Planet_Or_Star_Special_ },
-        // TODO: Investigate
-        //{ 0x004b7040, &MAPGEN::Load_Nebula_Pictures_ },
+        { 0x004b7040, &MAPGEN::Load_Nebula_Pictures_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -188,7 +186,7 @@ namespace hooks {
     void Assert_Types() {
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
-        ASSERT(sizeof(s_nebula_data) == 0x14, "s_nebula_data")
+        ASSERT(sizeof(s_nebula_data) == 0x5, "s_nebula_data")
         ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
         ASSERT(sizeof(s_player) == 0xea9, "s_player");
         ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");

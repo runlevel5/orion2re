@@ -521,7 +521,7 @@ namespace MAPGEN {
             return;
         }
 
-        for (int16_t neb_idx = 0; neb_idx < (int16_t)num_nebulas; ++neb_idx) {
+        for (int8_t neb_idx = 0; neb_idx < num_nebulas; ++neb_idx) {
             int16_t entry_counter = 0;
             for (int16_t type_val = 0; type_val < 12; ++type_val) {
                 // Update system twice per inner loop set

@@ -1,11 +1,8 @@
 #include "deps.h"
 
 namespace MAINSCR {
-    /**
-     * @address 004cd560
-     */
     void __cdecl Update_Star_Owners_() {
-        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
             int16_t owner_id = HAROLD::Star_Owner_(i, MOX::_PLAYER_NUM);
             MOX::_star[i].owner = static_cast<int8_t>(owner_id);
         }
