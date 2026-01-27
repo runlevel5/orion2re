@@ -121,7 +121,7 @@ namespace platform {
     }
 
     // Hooks
-    void __stdcall entry() {
+    void __cdecl entry() {
         uint32_t version_info = GetVersion();
 
         g_os_ver = version_info;
@@ -528,7 +528,7 @@ namespace platform {
         }
     }
 
-    void __stdcall Flip_Surface()
+    void __cdecl Flip_Surface()
     {
 #ifdef FULLSCREEN
         HRESULT hr;

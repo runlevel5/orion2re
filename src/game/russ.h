@@ -1,15 +1,18 @@
 #pragma once
+#include <cstdint>
 
 namespace RUSS {
-    inline int16_t __cdecl Get_Weighted_Choice_Short_(int16_t* weights, uint16_t count) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D78E0});
+    inline auto PFMT_ = reinterpret_cast<void(__cdecl*)(int32_t, int32_t, const char*, ...)>(std::uintptr_t{0x004D7850});
+
+    inline uint8_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int32_t count) {
+        using Fn = uint8_t(__cdecl*)(uint8_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7860});
         return fn(weights, count);
     }
 
-    inline uint8_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, uint16_t count) {
-        using Fn = uint8_t(__cdecl*)(uint8_t*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7860});
+    inline int16_t __cdecl Get_Weighted_Choice_Short_(int16_t* weights, int32_t count) {
+        using Fn = int16_t(__cdecl*)(int16_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D78E0});
         return fn(weights, count);
     }
 
@@ -31,16 +34,9 @@ namespace RUSS {
         fn();
     }
 
-    template<typename... Args>
-    inline void __cdecl PFMT_(int32_t type, int32_t priority, const char* format, Args... args) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, const char*, ...);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7850 });
-        fn(type, priority, format, args...);
-    }
-
     inline uint32_t __cdecl Release_All_Blocks_(void* seg) {
         using Fn = uint32_t(__cdecl*)(void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004D7830})(seg);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7830 })(seg);
     }
 
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"

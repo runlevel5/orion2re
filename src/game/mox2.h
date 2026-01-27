@@ -12,22 +12,22 @@ namespace MOX2 {
     inline char* _leave_game_message = reinterpret_cast<char*>(std::uintptr_t{ 0x005A6380 });
 
     // Suggested name: MOX2::Release_Version_
-    inline void __stdcall Release_Version_() {
-        using Fn = void(__stdcall*)();
+    inline void __cdecl Release_Version_() {
+        using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00520200 });
         fn();
     }
 
-    void __stdcall Set_Mox_Language_();
+    void __cdecl Set_Mox_Language_();
 
-    inline void __stdcall Set_Mox_Alt_Path_() {
-        using Fn = void(__stdcall*)();
+    inline void __cdecl Set_Mox_Alt_Path_() {
+        using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483CE0 });
         fn();
     }
 
-    inline void __stdcall Screen_Control_() {
-        using Fn = void(__stdcall*)();
+    inline void __cdecl Screen_Control_() {
+        using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483830 });
         fn();
     }

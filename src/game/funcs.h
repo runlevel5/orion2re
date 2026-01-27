@@ -374,8 +374,8 @@ inline void __cdecl Fade_Into_Main_Screen_() {
     fn();
 }
 
-inline void __cdecl Draw_Main_Screen_Filled_(int32_t filled_flag) {
-    using Fn = void(__cdecl*)(int32_t);
+inline void __cdecl Draw_Main_Screen_Filled_(int16_t filled_flag) {
+    using Fn = void(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C6550});
     fn(filled_flag);
 }
@@ -397,3 +397,6 @@ inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc110});
     return fn(player_idx);
 }
+
+inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"

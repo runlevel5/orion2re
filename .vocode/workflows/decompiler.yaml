@@ -498,7 +498,7 @@ workflows:
           * Never put stubs to .cpp files - they should go to headers.
           * NEVER add comments, unless it is one of the following exceptions:
             - A potential bug was identified
-            - A complicated piece of logic was detected - add at most a single line comment
+            - A complicated piece of logic was detected - add at most a single line comment   
           * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
             Do not create a new settings header file.
 

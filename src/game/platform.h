@@ -108,10 +108,10 @@ namespace platform {
 		*reinterpret_cast<void**>(std::uintptr_t{ 0x005792F8 });
 
 	// Functions
-	void __stdcall entry();
+	void __cdecl entry();
 	void Parse_Ten_Cmd_Parameter(const char* input_str);
 	HWND Create_Direct_Draw(int16_t video_mode);
-	void __stdcall Flip_Surface();
+	void __cdecl Flip_Surface();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	HRESULT	Unlock_Appropriate_Render_Buffer();
 	uint32_t Lock_Primary_Surface();

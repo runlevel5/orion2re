@@ -31,7 +31,7 @@ namespace MOX2 {
         MOX::_global_esc = 0;
     }
 
-    void __stdcall Set_Mox_Language_() {
+    void __cdecl Set_Mox_Language_() {
         char dir_buffer[80];
         char line_buffer[80];
 

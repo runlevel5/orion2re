@@ -19,9 +19,6 @@ namespace MAINSCR {
         *out_y = scaled_y + 0x15;
     }
 
-    /**
-     * @address 004c6780
-     */
     void Draw_Mini_Main_Screen_() {
         if (MOX::_at_least_one_tactical_combat != 0) {
             MOX::_at_least_one_tactical_combat = 0;

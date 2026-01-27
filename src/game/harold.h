@@ -64,7 +64,7 @@ namespace HAROLD {
 
     void __cdecl Reload_Leader_Titles();
 
-    inline int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_num) {
+    inline int16_t __cdecl Star_Owner_(int32_t star_idx, int32_t player_num) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1AB0});
         return fn(star_idx, player_num);

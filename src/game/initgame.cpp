@@ -168,7 +168,7 @@ namespace INITGAME {
 
         // Clear antaran invasion data (66 bytes)
         for (int i = 0; i < 66; ++i) {
-            MOX::_antarans_blob[i] = 0;
+            MOX::_antarans[i] = 0;
         }
         MOX::Mox_Update_();
 
@@ -505,7 +505,7 @@ namespace INITGAME {
 
         // Process standard Space Monsters
         while (star_ptr < end_ptr) {
-            if (star_ptr->system_special == MOX::SYSTEM_SPECIAL_SPACE_MONSTER) {
+            if (star_ptr->system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
                 int32_t ship_type = random::Random_(5) + 9;
                 int16_t star_idx = static_cast<int16_t>(star_ptr - MOX::_star);
                 int16_t planet_idx = HOMEGEN::Random_Planet_(star_idx);
@@ -515,7 +515,7 @@ namespace INITGAME {
                 SHIPS::Build_Nonplayer_Ship_(ship_type, star_idx, 0);
 
                 // Restore previous special status from backup field and clear backup
-                star_ptr->system_special = static_cast<MOX::SYSTEM_SPECIAL>(star_ptr->not_used1);
+                star_ptr->system_special = star_ptr->not_used1;
                 star_ptr->not_used1 = 0;
 
                 HOMEGEN::Upgrade_Planet_Guarded_By_Monster_(&MOX::_planet[planet_idx], static_cast<int16_t>(ship_type));
@@ -528,7 +528,7 @@ namespace INITGAME {
         for (int16_t i = 0; i < total_stars; ++i) {
             if (orion_spawned) break;
 
-            if (MOX::_star[i].system_special == MOX::SYSTEM_SPECIAL_ORION_STAR) {
+            if (MOX::_star[i].system_special == SYSTEM_SPECIAL_ORION_STAR) {
                 orion_spawned = true;
                 MOX::_ship[MOX::_NUM_SHIPS].owner = 8;
                 SHIPS::Build_Nonplayer_Ship_(9, i, 0);

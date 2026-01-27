@@ -528,7 +528,7 @@ namespace HOMEGEN {
             s_star_data& star = MOX::_star[selected_star];
             // Store original system special for later use
             star.not_used1 = static_cast<uint8_t>(star.system_special);
-            star.system_special = MOX::SYSTEM_SPECIAL_SPACE_MONSTER;
+            star.system_special = SYSTEM_SPECIAL_SPACE_MONSTER;
 
             flags[selected_star] = 1;
             weights[selected_star] = 0;
@@ -649,7 +649,7 @@ namespace HOMEGEN {
     void __cdecl Set_Special_For_Star_Guarded_By_Monster_(s_star_data* star, int16_t monster_type) {
         char race_name[200];
         int16_t star_idx = static_cast<int16_t>(star - MOX::_star);
-        uint8_t need_new_special = 0;
+        int16_t need_new_special = 0;
 
         HACCESS::Race_Name_(monster_type, race_name);
 
@@ -686,7 +686,7 @@ namespace HOMEGEN {
         if (need_new_special) {
             do {
                 MAPGEN::Get_A_Planet_Or_Star_Special_(star_idx, &need_new_special, &star->system_special, 1, monster_mask);
-            } while (star->system_special <= MOX::SYSTEM_SPECIAL_NO_SPECIAL);
+            } while (star->system_special <= 0);
         }
     }
 
@@ -877,8 +877,8 @@ namespace HOMEGEN {
 
                 Guarantee_A_Planet_At_Min_Dist_(i, 4, &home_star_ids[1]);
 
-                if (MOX::_star[i].system_special == MOX::SYSTEM_SPECIAL_SPACE_MONSTER) {
-                    MOX::_star[i].system_special = MOX::SYSTEM_SPECIAL_NO_SPECIAL;
+                if (MOX::_star[i].system_special == SYSTEM_SPECIAL_SPACE_MONSTER) {
+                    MOX::_star[i].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                 }
             }
         }
@@ -941,7 +941,7 @@ namespace HOMEGEN {
             bool possible_with_spectral = false;
 
             for (int16_t i = 0; i < 5; ++i) {
-                uint8_t allowed_group = MOX::_class_to_group[current_spectral][i];
+                uint8_t allowed_group = MOX::_class_to_group[current_spectral].group[i];
                 for (int16_t j = 0; j < valid_group_count; ++j) {
                     if ((int16_t)allowed_group == valid_groups[j]) {
                         possible_with_spectral = true;
@@ -974,7 +974,7 @@ namespace HOMEGEN {
     void __cdecl Remove_Specials_(int16_t star_idx) {
         s_star_data& star = MOX::_star[star_idx];
 
-        star.system_special = MOX::SYSTEM_SPECIAL_NO_SPECIAL;
+        star.system_special = SYSTEM_SPECIAL_NO_SPECIAL;
         star.wormhole_star_id = 0xFF;
 
         for (int i = 0; i < 5; ++i) {
@@ -1022,8 +1022,8 @@ namespace HOMEGEN {
     }
 
     void __cdecl Set_System_Planet_Artifact_Special(int16_t planet_idx, int16_t star_idx) {
-        MOX::_planet[planet_idx].planet_special = (int8_t)MOX::SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
-        MOX::_star[star_idx].system_special = MOX::SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+        MOX::_planet[planet_idx].planet_special = (int8_t)SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
+        MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_ANCIENT_ARTIFACTS;
     }
 
     void __cdecl Enforce_Gravity_(int16_t planet_idx, int8_t gravity_class, int16_t player_idx) {
@@ -1240,7 +1240,7 @@ namespace HOMEGEN {
             }
         }
 
-        MOX::_star[0].system_special = MOX::SYSTEM_SPECIAL_ORION_STAR;
+        MOX::_star[0].system_special = SYSTEM_SPECIAL_ORION_STAR;
 
         for (int i = 0; i < 6; ++i) {
             MOX::_star[0].name[i] = s_Orion_0055a738[i];

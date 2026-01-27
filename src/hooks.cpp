@@ -129,7 +129,7 @@ namespace hooks {
         { 0x004b9aa0, &COLONIZE::Star_N_Uncolonized_Planets_ },
         { 0x004ba510, &ERIC::Get_Sint_Index_From_List_ },
         { 0x0043c840, &FILEDEF::Save_Game_ },
-        { 0x0043c0f0, &FILEDEF::Load_Game_ },
+        //{ 0x0043c0f0, &FILEDEF::Load_Game_ },
         { 0x0043d1b0, &FILEDEF::Save_Moo_Custom_Player_Data_ },
         { 0x00478e30, &MOX2::Init_Map_Defaults_ },
         { 0x00478e20, &MOX2::Init_Map_Pictures_Default__ },
@@ -161,12 +161,26 @@ namespace hooks {
         { 0x00425dc0, &palstore::Slow_Fade_In_ },
         { 0x004ba740, &JIM::Fast_Fade_In_ },
         { 0x004c7440, &MAINSCR::Get_PointXY_Draw_Coords_ },
-        { 0x004cd560, &MAINSCR::Update_Star_Owners_ },
+        // TODO: Investigate
+        //{ 0x004cd560, &MAINSCR::Update_Star_Owners_ },
         { 0x004c6780, &MAINSCR::Draw_Mini_Main_Screen_ },
         { 0x004cd550, &MAINSCR::Update_Ship_Icons_In_Between_Turns_ },
         { 0x004b5c90, &MAPGEN::Generate_Max_Farms_ },
         { 0x004b62a0, &MAPGEN::Generate_Orbit_ },
         { 0x004b6360, &MAPGEN::Generate_Satellite_ },
+        { 0x004b65d0, &MAPGEN::Generate_Size_ },
+        { 0x004b6b20, &MAPGEN::Get_Climate_Modifier_ },
+        { 0x004b5c50, &MAPGEN::Generate_Gravity_Class_ },
+        { 0x004b6b60, &MAPGEN::Get_Planet_Group_ },
+        { 0x004b5af0, &MAPGEN::Generate_Climate_ },
+        { 0x004b57e0, &MAPGEN::Enforce_Planet_Max_ },
+        { 0x004b6db0, &MAPGEN::Set_Black_Hole_Visited_Flags_ },
+        { 0x004b69f0, &MAPGEN::Generate_Wormhole_Links_ },
+        { 0x004b56b0, &MAPGEN::Assign_Marooned_Heroes_ },
+        { 0x004b6490, &MAPGEN::Set_Secondary_Planet_Data_ },
+        { 0x004b6650, &MAPGEN::Get_A_Planet_Or_Star_Special_ },
+        // TODO: Investigate
+        //{ 0x004b7040, &MAPGEN::Load_Nebula_Pictures_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

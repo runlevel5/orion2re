@@ -65,19 +65,22 @@ namespace MOX {
     inline char& _temp_string = *reinterpret_cast<char*>(std::uintptr_t{ 0x00596230 });
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
-    inline uint32_t* _antarans = reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA20 });
-    inline uint8_t (&_antarans_blob)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
+    inline uint8_t (&_antarans)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
+    inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
 
     inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
     inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
 
     // Suggested name: MOX::_class_to_mineral
     inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
+
+    // Suggested name: MOX::_planet_special_weighted_chance
+    inline uint8_t* _planet_special_weighted_chance = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596B0});
 
     // Suggested name: MOX::_gravity_table
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
@@ -99,6 +102,10 @@ namespace MOX {
         *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00597856 });
 
     inline uint16_t& _planet_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059700E });
+
+    // Suggested name: MOX::_climate_modifier_table
+    inline int8_t (&_climate_modifier_table)[5] =
+        *reinterpret_cast<int8_t(*)[5]>(std::uintptr_t{0x00559688});
 
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
@@ -157,18 +164,37 @@ namespace MOX {
     inline int16_t& _MAP_MAX_Y = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059799A });
     inline uint8_t& _g_galaxy_size = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597A88 });
 
-    // Suggested name: g_extra_data_seg
-    inline uint32_t& _nebula_screen_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005A2BEC });
+    inline void*& _nebula_screen_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x005A2BEC });
+
+    // Suggested name: MOX::nebula_pict_segments
+    // This represents a flat array of pointers (4 per nebula).
+    inline void** _nebula_pict_seg =
+        reinterpret_cast<void**>(std::uintptr_t{ 0x005979C0 });
 
     // Suggested name: _planet_max_farms
     inline uint8_t* _planet_max_farms = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00559660 });
 
+    inline uint8_t* _planet_size_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559658});
+
+    #pragma pack(push, 1)
+    struct s_class_group {
+        uint8_t group[5];
+    };
+    #pragma pack(pop)
+
     // 5 groups per spectral class
-    inline uint8_t (*_class_to_group)[5] = reinterpret_cast<uint8_t(*)[5]>(std::uintptr_t{0x005595C0});
+    inline s_class_group (&_class_to_group)[6] =
+        *reinterpret_cast<s_class_group(*)[6]>(std::uintptr_t{0x005595C0});
 
     // 4 groups per climate
     inline uint8_t (*_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x005595E0});
+
+    // Suggested name: MOX::normal_galaxy_climate_roll_table
+    inline uint8_t (*_normal_gal_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x00559608});
+
+    // Suggested name: MOX::old_galaxy_climate_roll_table
+    inline uint8_t (*_old_gal_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x00559630});
 
     #pragma pack(push, 1)
     struct s_movable_box {

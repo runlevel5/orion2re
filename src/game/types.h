@@ -1,23 +1,6 @@
 #pragma once
 #include <cstdint>
 
-namespace MOX {
-    enum SYSTEM_SPECIAL : uint8_t {
-        SYSTEM_SPECIAL_NO_SPECIAL = 0,
-        SYSTEM_SPECIAL_STABLE_WORMHOLE = 1,
-        SYSTEM_SPECIAL_SPACE_DEBRIS = 2,
-        SYSTEM_SPECIAL_PIRATE_CACHE = 3,
-        SYSTEM_SPECIAL_GOLD_DEPOSITS = 4,
-        SYSTEM_SPECIAL_GEM_DEPOSITS = 5,
-        SYSTEM_SPECIAL_NATIVES = 6,
-        SYSTEM_SPECIAL_SPLINTER_COLONY = 7,
-        SYSTEM_SPECIAL_MAROONED_HERO = 8,
-        SYSTEM_SPECIAL_SPACE_MONSTER = 9,
-        SYSTEM_SPECIAL_ANCIENT_ARTIFACTS = 10,
-        SYSTEM_SPECIAL_ORION_STAR = 11
-    };
-}
-
 #pragma pack(push, 1)
 
 typedef uint8_t undefined;
@@ -731,11 +714,11 @@ struct s_star_data {
     int8_t spectral_class;
     int8_t last_planet_selected[8];
     char black_hole_blocks[9];
-    MOX::SYSTEM_SPECIAL system_special;
+    int8_t system_special;
     uint8_t wormhole_star_id;
     uint8_t blockaded;
     char blockaded_by[8];
-    uint8_t visited;
+    int8_t visited;
     uint8_t just_visited;
     uint8_t ignore_colony_ships;
     uint8_t ignore_combat_ships;
@@ -798,7 +781,7 @@ struct s_leader_data {
     short location;
     int8_t eta;
     char display_level_popup;
-    uint8_t status;
+    int8_t status;
     char player_index;
 };
 
@@ -809,7 +792,9 @@ struct s_good_star {
 }; // Total size: 299 bytes (0x12B)
 
 struct s_nebula_data {
-    uint8_t data[20];
+    uint8_t unknown[4];
+    uint8_t type;
+    uint8_t pad[15];
 };
 
 #pragma	pack(pop)

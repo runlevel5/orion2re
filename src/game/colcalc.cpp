@@ -38,16 +38,16 @@ namespace COLCALC {
 
                 for (int s = 0; s < MOX::_NUM_STARS; ++s) {
                     s_star_data* star = &MOX::_star[s];
-                    if (star->system_special < MOX::SYSTEM_SPECIAL_SPLINTER_COLONY ||
-                        star->system_special > MOX::SYSTEM_SPECIAL_MAROONED_HERO) {
+                    if (star->system_special < SYSTEM_SPECIAL_SPLINTER_COLONY ||
+                        star->system_special > SYSTEM_SPECIAL_MAROONED_HERO) {
 
                         if (SHIPMOVE::Star_In_Normal_Range_Of_Player_(star, (int16_t)i)) {
                             star->visited |= (1 << i);
 
-                            if (star->system_special > MOX::SYSTEM_SPECIAL_STABLE_WORMHOLE &&
-                                star->system_special < MOX::SYSTEM_SPECIAL_GOLD_DEPOSITS) {
+                            if (star->system_special > SYSTEM_SPECIAL_STABLE_WORMHOLE &&
+                                star->system_special < SYSTEM_SPECIAL_GOLD_DEPOSITS) {
                                 if (Monster_At_Star_(s) == 0) {
-                                    star->system_special = MOX::SYSTEM_SPECIAL_NO_SPECIAL;
+                                    star->system_special = SYSTEM_SPECIAL_NO_SPECIAL;
                                 }
                             }
                         }

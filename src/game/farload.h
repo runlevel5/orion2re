@@ -37,6 +37,12 @@ namespace farload {
 
     void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
 
+    inline void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* buffer) {
+        using Fn = void*(__cdecl*)(const char*, int, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051C730 });
+        return fn(filename, entry, buffer);
+    }
+
     inline void* __cdecl Farload_Library_Data_(const char* path, int32_t idx, void* out, int32_t mode, uint32_t param_4, uint16_t param_5, uint16_t param_6) {
         using Fn = void*(__cdecl*)(const char*, int32_t, void*, int32_t, uint32_t, uint16_t, uint16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ca30});

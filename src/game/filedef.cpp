@@ -1,11 +1,6 @@
 #include "deps.h"
 
 namespace FILEDEF {
-
-    /**
-     * @brief Loads game settings from "MOX.SET".
-     * Reads exactly 0x229 bytes (553 bytes) into the global settings structure.
-     */
     void __cdecl Load_Game_Settings_() {
         RUSS::Assert_Settings_();
 
@@ -119,8 +114,8 @@ namespace FILEDEF {
         _fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp); // 0x81 per item
 
         MOX::Mox_Update_();
-        _fwrite(MOX::_moveable_box, 28, 5, fp); // 0x1c per item
-        _fwrite(MOX::_moveable_box_order, 2, 5, fp);
+        _fwrite(&MOX::_moveable_box, 28, 5, fp); // 0x1c per item
+        _fwrite(&MOX::_moveable_box_order, 2, 5, fp);
         _fwrite(&MOX::_PLAYER_NUM, 2, 1, fp);
         _fwrite(&MOX::_max_map_scale, 2, 1, fp);
         _fwrite(&MOX::_max_zoom_count, 2, 1, fp);
@@ -132,18 +127,18 @@ namespace FILEDEF {
         _fwrite(&MOX::_fleet_icon_button_count, 2, 1, fp);
         _fwrite(MOX::_nebula, 20, 1, fp); // 0x14 size
         _fwrite(&MOX::_NUM_NEBULAS, 1, 1, fp);
-        _fwrite(MOX::_bill_savegame, 12, 1, fp); // 0xc size
+        _fwrite(&MOX::_bill_savegame, 12, 1, fp); // 0xc size
 
         MOX::Mox_Update_();
         _fwrite(&REPORT::_n_reports, 2, 1, fp);
-        _fwrite(REPORT::_reports, 950, 1, fp); // 0x3b6 size
+        _fwrite(&REPORT::_reports, 950, 1, fp); // 0x3b6 size
         _fwrite(&REPORT::_done_player_reports, 1, 1, fp);
-        _fwrite(REPORT::_something_interesting_happened, 8, 1, fp);
-        _fwrite(REPORT::_done_colonize_check, 9, 1, fp);
-        _fwrite(EVENTS::_event_data, 9, 36, fp);
+        _fwrite(&REPORT::_something_interesting_happened, 8, 1, fp);
+        _fwrite(&REPORT::_done_colonize_check, 9, 1, fp);
+        _fwrite(&EVENTS::_event_data, 9, 36, fp);
 
         MOX::Mox_Update_();
-        _fwrite(MSG_::_msgs, 18, 100, fp); // 0x12 per item
+        _fwrite(&MSG_::_msgs, 18, 100, fp); // 0x12 per item
         _fwrite(&MSG_::_first_msg, 8, 1, fp);
         _fwrite(&MSG_::_max_msgs, 8, 1, fp);
         _fwrite(&MSG_::_n_msgs, 8, 1, fp);
@@ -158,13 +153,13 @@ namespace FILEDEF {
         _fwrite(&MOX::_disallow_saves_code, 2, 1, fp);
         _fwrite(&EVENTS::_last_event_year, 4, 1, fp);
         _fwrite(&EVENTS::_event_delay_count, 2, 1, fp);
-        _fwrite(MOX::_antarans_blob, 66, 1, fp);
+        _fwrite(&MOX::_antarans, 66, 1, fp);
 
         MOX::Mox_Update_();
         _fwrite(&MOX::_cur_map_scale, 2, 1, fp);
         _fwrite(&MOX::_cur_map_x, 2, 1, fp);
         _fwrite(&MOX::_cur_map_y, 2, 1, fp);
-        _fwrite(padding, 1000, 1, fp);
+        _fwrite(&padding, 1000, 1, fp);
 
         _fclose(fp);
 
@@ -259,8 +254,8 @@ namespace FILEDEF {
             _fread(&MOX::_ship[i], sizeof(s_ship_data), 1, file);
         }
 
-        _fread(MOX::_moveable_box, 0x1c, 5, file);
-        _fread(MOX::_moveable_box_order, 2, 5, file);
+        _fread(&MOX::_moveable_box, 0x1c, 5, file);
+        _fread(&MOX::_moveable_box_order, 2, 5, file);
         _fread(&MOX::_PLAYER_NUM, 2, 1, file);
         _fread(&MOX::_max_map_scale, 2, 1, file);
         _fread(&MOX::_max_zoom_count, 2, 1, file);
@@ -281,14 +276,14 @@ namespace FILEDEF {
         MOX::Mox_Update_();
 
         _fread(&REPORT::_n_reports, 2, 1, file);
-        _fread(REPORT::_reports, 0x3b6, 1, file);
+        _fread(&REPORT::_reports, 0x3b6, 1, file);
         _fread(&REPORT::_done_player_reports, 1, 1, file);
-        _fread(REPORT::_something_interesting_happened, 8, 1, file);
-        _fread(REPORT::_done_colonize_check, 9, 1, file);
-        _fread(EVENTS::_event_data, 9, 36, file);
+        _fread(&REPORT::_something_interesting_happened, 8, 1, file);
+        _fread(&REPORT::_done_colonize_check, 9, 1, file);
+        _fread(&EVENTS::_event_data, 9, 36, file);
 
         MOX::Mox_Update_();
-        _fread(MSG_::_msgs, 0x12, 100, file);
+        _fread(&MSG_::_msgs, 0x12, 100, file);
         _fread(&MSG_::_first_msg, 8, 1, file);
         _fread(&MSG_::_max_msgs, 8, 1, file);
         _fread(&MSG_::_n_msgs, 8, 1, file);
@@ -303,11 +298,11 @@ namespace FILEDEF {
         _fread(&MOX::_disallow_saves_code, 2, 1, file);
         _fread(&EVENTS::_last_event_year, 4, 1, file);
         _fread(&EVENTS::_event_delay_count, 2, 1, file);
-        _fread(MOX::_antarans_blob, 66, 1, file);
+        _fread(&MOX::_antarans, 66, 1, file);
         _fread(&MOX::_cur_map_scale, 2, 1, file);
         _fread(&MOX::_cur_map_x, 2, 1, file);
         _fread(&MOX::_cur_map_y, 2, 1, file);
-        _fread(buffer_1000, 1000, 1, file);
+        _fread(&buffer_1000, 1000, 1, file);
         _fclose(file);
 
         MOX2::Init_Map_Defaults_();
