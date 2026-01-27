@@ -34,16 +34,16 @@ namespace MAPGEN {
         fn(mineral_class);
     }
 
-    inline int8_t __cdecl Generate_Gravity_Class_(int16_t planet_count) {
+    inline int8_t __cdecl Generate_Gravity_Class_(int16_t planet_idx) {
         using Fn = int8_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5c50});
-        return fn(planet_count);
+        return fn(planet_idx);
     }
 
-    inline int16_t __cdecl Get_Planet_Group_(int16_t planet_count) {
+    inline int16_t __cdecl Get_Planet_Group_(int16_t planet_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b6b60});
-        return fn(planet_count);
+        return fn(planet_idx);
     }
 
     inline int8_t __cdecl Generate_Climate_(int16_t group) {
@@ -52,13 +52,13 @@ namespace MAPGEN {
         return fn(group);
     }
 
-    inline void __cdecl Universe_Generation_(int16_t arg_1c, int32_t arg_20, int16_t arg_18) {
-        using Fn = void(__cdecl*)(int16_t, int32_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004B7120})(arg_1c, arg_20, arg_18);
+    inline void __cdecl Universe_Generation_(int8_t gal_size, int8_t gal_age, int8_t difficulty) {
+        using Fn = void(__cdecl*)(int8_t, int8_t, int8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004B7120})(gal_size, gal_age, difficulty);
     }
 
-    inline void __cdecl Enforce_Planet_Max_(int limit) {
-        using Fn = void(__cdecl*)(int);
+    inline void __cdecl Enforce_Planet_Max_(short limit) {
+        using Fn = void(__cdecl*)(short);
         reinterpret_cast<Fn>(std::uintptr_t{0x004B57E0})(limit);
     }
 

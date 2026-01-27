@@ -474,7 +474,7 @@ namespace HOMEGEN {
             return;
         }
 
-        uint16_t weights[72];
+        int16_t weights[72];
         uint8_t flags[72];
         int16_t placed_monster_stars[72];
 
@@ -629,7 +629,7 @@ namespace HOMEGEN {
     }
 
     int16_t __cdecl Random_Planet_(int16_t star_idx) {
-        uint16_t weights[5] = {0, 0, 0, 0, 0};
+        int16_t weights[5] = {0, 0, 0, 0, 0};
         const int16_t* planet_indices = MOX::_star[star_idx].planet_index;
 
         for (int16_t i = 0; i < 5; ++i) {
@@ -692,9 +692,9 @@ namespace HOMEGEN {
 
     void __cdecl Upgrade_Planet_Guarded_By_Monster_(s_planet_data* planet, int16_t monster_type) {
         bool should_upgrade_climate = true;
-        uint16_t size_weights[5] = {0};
-        uint16_t mineral_weights[5] = {0};
-        uint16_t climate_weights[10] = {0};
+        int16_t size_weights[5] = {0};
+        int16_t mineral_weights[5] = {0};
+        int16_t climate_weights[10] = {0};
 
         switch (monster_type) {
         case 10:

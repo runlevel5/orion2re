@@ -19,7 +19,7 @@ namespace fonts {
         }
     }
 
-    void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, int16_t height) {
+    void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, uint32_t height) {
         uint8_t* current_row = static_cast<uint8_t*>(screen);
         const uint8_t* data = glyph_data;
 
@@ -86,7 +86,7 @@ namespace fonts {
             uint8_t color = new_colors->colors[i];
             _font_header.selected_colors1[i] = color;
             _font_header.selected_colors2[i] = color;
-            _current_font_color_array[i] = color;
+            _current_font_color_array.colors[i] = color;
         }
 
         _font_header.current_height = _font_header.font_heights[font_style];

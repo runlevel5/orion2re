@@ -23,7 +23,6 @@ struct s_font {
     uint32_t font_glyph_offsets[6][256];// 0xB5C
 };
 #pragma pack(pop)
-
     inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
 
     inline void*& _palette_block =
@@ -43,12 +42,12 @@ struct s_font {
     inline s_font& _font_header =
         *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});
 
-    void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, int16_t height);
+    void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, uint32_t height);
 
     inline int16_t& _draw_alias_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B150});
 
-    inline uint8_t (&_current_font_color_array)[8] =
-        *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x005787A8});
+    inline MISC::s_colors& _current_font_color_array =
+        *reinterpret_cast<MISC::s_colors*>(std::uintptr_t{0x005787A8});
 
     void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
@@ -58,7 +57,7 @@ struct s_font {
         fn(dest, glyph, header, height);
     }
 
-    void Set_PSTR_Style_(uint16_t style);
+    void __cdecl Set_PSTR_Style_(uint16_t style);
     void __cdecl Set_Font_Style_(int font_style, MISC::s_colors *new_colors);
 
     int16_t __cdecl Get_String_Width_(const char* str);

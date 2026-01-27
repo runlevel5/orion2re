@@ -150,7 +150,7 @@ namespace INITGAME {
         _fclose(file);
     }
 
-    void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int32_t galaxy_age, int16_t num_players,
+    void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int16_t galaxy_age, int16_t num_players,
                                 int16_t strategic_combat_flag, int16_t starting_civ_level) {
         bool extra_maps_generated = false;
         int map_index = 0;
@@ -188,7 +188,7 @@ namespace INITGAME {
             MOX2::Set_Game_Seed();
             MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
 
-            MAPGEN::Universe_Generation_(galaxy_size, galaxy_age, game_difficulty);
+            MAPGEN::Universe_Generation_((uint8_t)galaxy_size, (uint8_t)galaxy_age, (uint8_t)game_difficulty);
             MOX::Mox_Update_();
 
             generation_success = HOMEGEN::Generate_Home_Worlds_();

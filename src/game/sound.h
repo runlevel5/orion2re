@@ -13,8 +13,8 @@ namespace sound {
         fn();
     }
 
-    inline void __cdecl Fade_Stream_Down_(uint32_t dur) {
-        using Fn = void(__cdecl*)(uint32_t);
+    inline void __cdecl Fade_Stream_Down_(uint8_t dur) {
+        using Fn = void(__cdecl*)(uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324E0 });
         fn(dur);
     }
@@ -67,7 +67,7 @@ namespace sound {
         fn(volume);
     }
 
-    inline void __cdecl Fade_Stream_Up_(uint32_t duration) {
+    inline void __cdecl Fade_Stream_Up_(uint8_t duration) {
         using Fn = void(__cdecl*)(uint32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324C0 });
         fn(duration);
