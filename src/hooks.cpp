@@ -202,6 +202,22 @@ namespace hooks {
         { 0x00528cc0, &graphics::Fill_ },
         { 0x00527cd0, &video::Set_Refresh_Stencil_ },
         { 0x00527c80, &video::Set_Refresh_Full_ },
+        { 0x00466240, &TRADE::Process_Trade_And_Research_Agreements_ },
+        { 0x0052b270, &timer::Get_Time_Since_Mark_ },
+        { 0x0052b230, &timer::Release_Time_ },
+        { 0x0052d0b7, &struct_::Clear_Structure_ },
+        { 0x0052d0fa, &struct_::Copy_Structure_ },
+        { 0x0052cfb5, &struct_::Test_Bit_Field_ },
+        { 0x0052cfed, &struct_::Set_Bit_Field_ },
+        { 0x00437210, &SHIPMOVE::Update_Player_Ship_Range_ },
+        { 0x00436160, &SHIPMOVE::Star_In_Range_Of_Player_Aux1_ },
+        { 0x004360c0, &SHIPMOVE::Star_In_Range_Of_Player_Aux2_ },
+        { 0x00436030, &SHIPMOVE::Star_In_Range_Of_Player_ },
+        { 0x00477690, &EVENTS::Event_Check_Pirate_Activity_ },
+        { 0x00466160, &TRADE::Base_Trade_Agreement_Goal_ },
+        { 0x0043e730, &OFFICER::Get_Officer_Base_Level_ },
+        { 0x004664c0, &TRADE::Trade_Agreement_Goal_ },
+        { 0x0043e780, &OFFICER::Owned_Officer_Level_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

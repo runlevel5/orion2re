@@ -1,0 +1,81 @@
+#include "deps.h"
+
+namespace struct_ {
+    void __cdecl Clear_Structure_(void* s, uint32_t len) {
+        if (len == 0) {
+            return;
+        }
+
+        // TODO: Just use memset
+        uint8_t* ptr = static_cast<uint8_t*>(s);
+
+        // Align to 2-byte boundary if pointer is odd
+        if (reinterpret_cast<std::uintptr_t>(ptr) & 1) {
+            *ptr++ = 0;
+            len--;
+        }
+
+        // Fill memory in 4-byte chunks
+        uint32_t* dword_ptr = reinterpret_cast<uint32_t*>(ptr);
+        uint32_t dword_count = len >> 2;
+        for (uint32_t i = 0; i < dword_count; ++i) {
+            dword_ptr[i] = 0;
+        }
+
+        // Fill remaining bytes (0-3 bytes)
+        uint8_t* tail_ptr = reinterpret_cast<uint8_t*>(&dword_ptr[dword_count]);
+        uint32_t remaining_count = len & 3;
+        for (uint32_t i = 0; i < remaining_count; ++i) {
+            tail_ptr[i] = 0;
+        }
+    }
+
+    void __cdecl Copy_Structure_(void* dest, const void* src, uint32_t size) {
+        // TODO: Just use memcpy
+        uint8_t* d_ptr = static_cast<uint8_t*>(dest);
+        const uint8_t* s_ptr = static_cast<const uint8_t*>(src);
+
+        std::uintptr_t u_src = reinterpret_cast<std::uintptr_t>(s_ptr);
+        std::uintptr_t u_dest = reinterpret_cast<std::uintptr_t>(d_ptr);
+
+        if ((u_src & 1) == (u_dest & 1)) {
+            if ((u_src & 1) != 0) {
+                if (size > 0) {
+                    *d_ptr++ = *s_ptr++;
+                    size--;
+                }
+            }
+
+            uint32_t dword_count = size >> 2;
+            for (uint32_t i = 0; i < dword_count; ++i) {
+                *reinterpret_cast<uint32_t*>(d_ptr) = *reinterpret_cast<const uint32_t*>(s_ptr);
+                d_ptr += 4;
+                s_ptr += 4;
+            }
+
+            uint32_t remaining_bytes = size & 3;
+            for (uint32_t i = 0; i < remaining_bytes; ++i) {
+                *d_ptr++ = *s_ptr++;
+            }
+        }
+        else {
+            for (uint32_t i = 0; i < size; ++i) {
+                *d_ptr++ = *s_ptr++;
+            }
+        }
+    }
+
+    bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index) {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(field);
+        uint32_t byte_offset = bit_index >> 3;
+        uint32_t bit_in_byte = bit_index & 7;
+
+        return (data[byte_offset] >> bit_in_byte) & 1;
+    }
+
+    void __cdecl Set_Bit_Field_(void* field, uint16_t bit) {
+        uint8_t* data = reinterpret_cast<uint8_t*>(field);
+        // Calculate byte index and bit position within that byte
+        data[bit >> 3] |= static_cast<uint8_t>(1 << (bit & 0x7));
+    }
+}

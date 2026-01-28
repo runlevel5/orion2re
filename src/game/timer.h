@@ -11,8 +11,13 @@ namespace timer {
      */
     void __cdecl Mark_Time_();
 
-    inline void __cdecl Release_Time_(int16_t ticks) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b230 })(ticks);
-    }
+    /**
+     * @address 0052b270
+     */
+    int32_t __cdecl Get_Time_Since_Mark_();
+
+    /**
+     * @address 0052b230
+     */
+    void __cdecl Release_Time_(int16_t ticks);
 }

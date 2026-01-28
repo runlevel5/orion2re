@@ -1,6 +1,10 @@
 #pragma once
 
 namespace OFFICER {
+    int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, uint8_t warlord);
+
+    int16_t __cdecl Owned_Officer_Level_(int leader_idx);
+
     inline int16_t __cdecl Officer_Skill_Value_(int16_t leader_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043E410 });

@@ -1,0 +1,115 @@
+#include "deps.h"
+
+namespace SHIPMOVE {
+    /**
+     * Updates the movement range of the player's ships based on their researched fuel tech tiers.
+     * Iterates backwards through fuel tiers 5 down to 1, checking if the required tech is level 3.
+     */
+    void __cdecl Update_Player_Ship_Range_(s_player* player) {
+        for (int i = 5; i >= 1; --i) {
+            int16_t tech_idx = TECHDATA::_fuel[i].tech_index;
+
+            // Check if the tech application for this fuel tier is fully researched (level 3)
+            if (player->tech_applications[tech_idx] == 3) {
+                player->ship_range = TECHDATA::_fuel[i].ship_range;
+                return;
+            }
+        }
+
+        // If no fuel upgrades (tiers 1-5) are researched to level 3, range is set to 0.
+        player->ship_range = 0;
+    }
+
+    /**
+     * Checks if any star colonized by a specific player is within a given range of the target star.
+     * Considers black hole blockages.
+     * @param star The target star to check from.
+     * @param player_idx Index of the player to check colonies for.
+     * @param dist The maximum range (in parsecs, where 1 parsec is roughly 30 pixels).
+     */
+    bool __cdecl Star_In_Range_Of_Player_Aux1_(s_star_data* star, int16_t player_idx, int16_t dist) {
+        if (MOX::_NUM_STARS == 0) {
+            return false;
+        }
+
+        // Calculate the index of the input star in the star array
+        int16_t star_idx = static_cast<int16_t>(star - MOX::_star);
+        // dist is scaled by 30 pixels per unit (30^2 = 900)
+        int32_t dist_sq_limit = static_cast<int32_t>(dist) * dist * 900;
+
+        for (int i = 0; i < static_cast<int>(MOX::_NUM_STARS); ++i) {
+            s_star_data* current_star = &MOX::_star[i];
+
+            // Check if player_idx bit is set in has_colony bitmask
+            if ((current_star->has_colony >> (player_idx & 0x1F)) & 1) {
+                // Check if current_star can 'see' the target star through black hole blockages
+                if (!struct_::Test_Bit_Field_(current_star->black_hole_blocks, star_idx)) {
+                    int32_t dx = static_cast<int32_t>(star->x) - current_star->x;
+                    int32_t dy = static_cast<int32_t>(star->y) - current_star->y;
+
+                    if ((dx * dx + dy * dy) <= dist_sq_limit) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a star is in range of a player, considering colonies, direct range, and wormholes.
+     * @param star The target star to check.
+     * @param player_idx Index of the player.
+     * @param dist Maximum range in parsecs.
+     * @return True if the star is in range.
+     */
+    bool __cdecl Star_In_Range_Of_Player_Aux2_(s_star_data* star, int16_t player_idx, int16_t dist) {
+        // Check if player has a colony in this star system
+        if ((star->has_colony >> (static_cast<uint8_t>(player_idx) & 0x1F)) & 1) {
+            return true;
+        }
+
+        // Check range normally
+        if (Star_In_Range_Of_Player_Aux1_(star, player_idx, dist)) {
+            return true;
+        }
+
+        // Check range via wormhole if the destination star is visited
+        if (star->wormhole_star_id != -1) {
+            s_star_data* wormhole_star = &MOX::_star[star->wormhole_star_id];
+
+            if ((wormhole_star->visited >> (static_cast<uint8_t>(player_idx) & 0x1F)) & 1) {
+                if (Star_In_Range_Of_Player_Aux1_(wormhole_star, player_idx, dist)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a star is within the extended range of a player, considering alliances.
+     * @param star The target star.
+     * @param player_idx Index of the player.
+     * @param dist Maximum range in parsecs.
+     * @return True if in range for the player or any ally.
+     */
+    bool __cdecl Star_In_Range_Of_Player_(s_star_data* star, int16_t player_idx, int16_t dist) {
+        if (Star_In_Range_Of_Player_Aux2_(star, player_idx, dist)) {
+            return true;
+        }
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            // Check if player is an ally (treaty type 2) and the star is in their range
+            if (player_idx != i && MOX::_player[player_idx].treaty[i] == 2) {
+                if (Star_In_Range_Of_Player_Aux2_(star, (int16_t)i, dist)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+}
