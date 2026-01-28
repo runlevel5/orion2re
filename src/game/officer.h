@@ -5,10 +5,24 @@ namespace OFFICER {
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx);
 
-    inline int16_t __cdecl Officer_Skill_Value_(int16_t leader_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043E410 });
-        return fn(leader_idx);
+    int16_t __cdecl Officer_Skill_Value_(int16_t leader_index);
+
+    inline bool __cdecl Officer_Has_General_Skill_(int16_t player_num, int16_t leader_index, int16_t skill_id) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e390});
+        return fn(player_num, leader_index, skill_id);
+    }
+
+    inline bool __cdecl Officer_Has_Special_Skill_(int16_t player_num, int16_t leader_index, int16_t skill_id) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e3d0});
+        return fn(player_num, leader_index, skill_id);
+    }
+
+    inline int16_t __cdecl map_1000_5000(uint32_t cost) {
+        using Fn = int16_t(__cdecl*)(uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e570});
+        return fn(cost);
     }
 
     inline void __cdecl Get_Random_Skills_(uint32_t* p_special, uint32_t* p_general, int16_t arg3, int16_t arg4, uint8_t arg5) {

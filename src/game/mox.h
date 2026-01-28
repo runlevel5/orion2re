@@ -155,6 +155,21 @@ namespace MOX {
     inline s_leader_data*& _leaders =
         *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });
 
+    #pragma pack(push, 1)
+    struct s_skill_data {
+        uint8_t num;
+        uint32_t skill_mask;
+        uint8_t unknown1;
+        uint16_t skill_bonus;
+        uint8_t unknown2;
+        uint8_t unknown3;
+        void* name;
+        void* format_str;
+    };
+    #pragma pack(pop)
+
+    inline s_skill_data (&_skill_data)[54] = *reinterpret_cast<s_skill_data(*)[54]>(std::uintptr_t{0x0055905D});
+
     inline s_colony*& _colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
 

@@ -218,6 +218,7 @@ namespace hooks {
         { 0x0043e730, &OFFICER::Get_Officer_Base_Level_ },
         { 0x004664c0, &TRADE::Trade_Agreement_Goal_ },
         { 0x0043e780, &OFFICER::Owned_Officer_Level_ },
+        { 0x0043e410, &OFFICER::Officer_Skill_Value_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -233,6 +234,9 @@ namespace hooks {
         ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
+        ASSERT(sizeof(MOX::s_skill_data) == 18, "s_skill_data");
+        ASSERT(sizeof(TECHDATA::s_tech_app) == 13, "s_tech_app");
+        ASSERT(sizeof(TECHDATA::s_tech_field) == 23, "s_tech_field");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
     }
