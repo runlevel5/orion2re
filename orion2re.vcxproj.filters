@@ -117,6 +117,12 @@
     <ClCompile Include="src\game\capture.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\graphics.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\regions.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -297,6 +303,15 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\events.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\graphics.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\animate.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\regions.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

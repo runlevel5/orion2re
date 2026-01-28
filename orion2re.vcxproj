@@ -34,6 +34,7 @@
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
+    <ClCompile Include="src\game\graphics.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
@@ -48,6 +49,7 @@
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
+    <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\video.cpp" />
@@ -57,6 +59,7 @@
   <ItemGroup>
     <ClInclude Include="src\game\advciv.h" />
     <ClInclude Include="src\game\allocate.h" />
+    <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\bill.h" />
     <ClInclude Include="src\game\capture.h" />
     <ClInclude Include="src\game\colcalc.h" />
@@ -76,6 +79,7 @@
     <ClInclude Include="src\game\file_ani.h" />
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\geo.h" />
+    <ClInclude Include="src\game\graphics.h" />
     <ClInclude Include="src\game\harold.h" />
     <ClInclude Include="src\game\helpers.h" />
     <ClInclude Include="src\game\homegen.h" />
@@ -99,6 +103,7 @@
     <ClInclude Include="src\game\platform.h" />
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\random.h" />
+    <ClInclude Include="src\game\regions.h" />
     <ClInclude Include="src\game\report.h" />
     <ClInclude Include="src\game\russ.h" />
     <ClInclude Include="src\game\shipmove.h" />

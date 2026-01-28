@@ -198,6 +198,10 @@ namespace hooks {
         { 0x004b83f0, &MAPGEN::Copy_Name_To_Star_ },
         { 0x004b6960, &MAPGEN::Generate_Star_Special_ },
         { 0x004b8050, &MAPGEN::Black_Hole_Fix_ },
+        { 0x00536ee8, &regions::Fill_Column_ },
+        { 0x00528cc0, &graphics::Fill_ },
+        { 0x00527cd0, &video::Set_Refresh_Stencil_ },
+        { 0x00527c80, &video::Set_Refresh_Full_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

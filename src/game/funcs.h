@@ -37,7 +37,8 @@ inline void* __cdecl ___crtGetEnvironmentStringsA() {
 
 inline void __cdecl __exit(int code) {
     using Fn = void(__cdecl*)(int);
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00541630 })(code);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541630 });
+    fn(code);
 }
 
 inline void __cdecl __setargv() {
@@ -144,12 +145,6 @@ inline void __cdecl FUN_528c90() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528c90 });
     fn();
-}
-
-inline void __cdecl Fill_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color) {
-    using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528cc0 });
-    fn(x1, y1, x2, y2, color);
 }
 
 inline int __cdecl hgetch_() {
@@ -292,12 +287,6 @@ inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
     return fn(star_idx);
 }
 
-inline void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool hide_if_no_lore) {
-    using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, bool);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1190});
-    fn(star_idx, player_counts, total_count, hide_if_no_lore);
-}
-
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
@@ -396,3 +385,12 @@ inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
+
+inline char* const s_Moo2AlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
+inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
+
+inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    using Fn = LRESULT(CALLBACK*)(HWND, UINT, WPARAM, LPARAM);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00536710 });
+    return fn(hwnd, uMsg, wParam, lParam);
+}

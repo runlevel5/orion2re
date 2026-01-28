@@ -80,3 +80,6 @@
 #include "diplodef.h"
 #include "npcdiplo.h"
 #include "gendraw.h"
+#include "regions.h"
+#include "setvesa.h"
+#include "graphics.h"

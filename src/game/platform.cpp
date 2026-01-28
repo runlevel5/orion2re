@@ -1,4 +1,4 @@
-#include "../pch.h"
+#include "deps.h"
 
 //#define FULLSCREEN
 
@@ -424,9 +424,9 @@ namespace platform {
 
         DAT_00578e68 = 0;
         FUN_528680();
-        Fill_(0, 0, 639, 479, 0);
+        graphics::Fill_(0, 0, 639, 479, 0);
         FUN_5286a0();
-        Fill_(0, 0, 639, 479, 0);
+        graphics::Fill_(0, 0, 639, 479, 0);
         FUN_5287a0();
         FUN_5287c0();
         g_frame_count = 0;
@@ -465,7 +465,7 @@ namespace platform {
         g_frame_count = 0;
         if (video::screen_refresh_flag == 3)
         {
-            video::Set_Refresh_Stencil();
+            video::Set_Refresh_Stencil_();
         }
 
         return hr;

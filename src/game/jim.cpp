@@ -42,7 +42,7 @@ namespace JIM {
         fields::Init_Fields_State_();
         video::Set_Refresh_Stencil_();
         video::Set_Page_Off_();
-        Fill_(0, 0, 0x27F, 0x1DF, 0);
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
 
         allocate::Push_Block_(MOX::_global_screen_seg);
         int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_global_screen_seg);
@@ -114,7 +114,7 @@ namespace JIM {
         if (skip_flag == 0) {
             Logo_Fadeout_();
             video::Set_Page_Off_();
-            Fill_(0, 0, 0x27F, 0x1DF, 0);
+            graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
 
             file_ani::Open_File_Animation_(s_logo_lbx, 1);
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
@@ -165,7 +165,7 @@ namespace JIM {
         MOX::Mox_Update_();
 
         video::Set_Page_Off_();
-        Fill_(0, 0, 0x27F, 0x1DF, 0);
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
         video::Copy_Off_To_Back_();
 
         // Finally play the intro cinematic unless the user requested a skip early on
@@ -183,7 +183,7 @@ namespace JIM {
         }
 
         video::Set_Page_Back_();
-        Fill_(0, 0, 639, 479, 0);
+        graphics::Fill_(0, 0, 639, 479, 0);
         video::Copy_Back_To_Off_();
         palette::Clear_Palette_Changes_(0, 255);
         RUSS::Mox_Sync_Update_();

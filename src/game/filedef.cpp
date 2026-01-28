@@ -206,7 +206,7 @@ namespace FILEDEF {
                 GENDRAW::Warning_Box_(err_msg);
             }
             video::Set_Page_Off_();
-            video::Fill_(0, 0, 639, 479, 0);
+            graphics::Fill_(0, 0, 639, 479, 0);
             _fclose(file);
             return 0;
         }

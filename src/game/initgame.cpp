@@ -196,7 +196,7 @@ namespace INITGAME {
 
             if (generation_success != 0) {
                 video::Set_Page_Off_();
-                video::Fill_(0, 0, 0x27F, 0x1DF, 0);
+                graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
                 platform::Toggle_Pages_Stub_();
                 MAPGEN::Enforce_Planet_Max_(250);
                 MAPGEN::Set_Black_Hole_Visited_Flags_();

@@ -88,6 +88,12 @@ namespace HAROLD {
         return fn(star_idx, planet_idx);
     }
 
+    inline void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool hide_if_no_lore) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f1190 });
+        fn(star_idx, player_counts, total_count, hide_if_no_lore);
+    }
+
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
 
     inline const char* s___s__00556ae4 = reinterpret_cast<const char*>(0x00556AE4); // "(%s)"

@@ -471,8 +471,8 @@ workflows:
             - If you create a new header files for namespaces that were not added before, make sure to include them in `src/game/deps.h`.
             - If the function already exists in the header as an external reference, remove the old external reference.
             - If the function is already implemented, update the implementation with the newly decompiled version.
-            - If return or argument types don't match the old type - use the type from the new full function. Do not
-              create type wrappers.
+            - Do not modify existing stubs, never change their signatures. If you see an incompatible signature and you sure
+              about it - add a type cast and a comment.
             - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Example:
             
               // Patch: { 0x005277b0, &WinMain_Proxy },
@@ -499,7 +499,7 @@ workflows:
           * Never add any comments, unless it is one of the following exceptions:
             - A potential bug was identified, add a comment prefixed with `// BUG:`
             - A complicated piece of logic was detected - add at most a single line comment
-            - You identified a mismatching signature for one of the existing functions, add `// TYPE: <description>`
+            - You identified a mismatching signature for one of the existing stubs, add `// TYPE MISMATCH: <description>`
           * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
             Do not create a new settings header file.
 
