@@ -42,34 +42,35 @@ namespace OFFICER {
         int16_t total_value = 0;
         s_leader_data& leader = MOX::_leaders[leader_index];
 
-        for (int skill_id = 0; skill_id < 54; ++skill_id) {
-            const MOX::s_skill_data& skill = MOX::_skill_data[skill_id];
-            int8_t skill_bonus_byte = *reinterpret_cast<const int8_t*>(reinterpret_cast<std::uintptr_t>(&skill.skill_mask) + 3);
+        for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
+            MOX::s_skill_data& skill = MOX::_skill_data[skill_idx];
 
             if (skill.num == 0) {
-                if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, (int16_t)skill_id)) {
-                    int16_t bonus = (int16_t)skill_bonus_byte;
-
-                    if (skill_id == 2 || skill_id == 3) {
-                        bonus = (leader.type == 0) ? 3 : 1;
-                        if (skill_id == 3) {
-                            bonus *= 2;
+                if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
+                    int16_t val;
+                    if (skill_idx == 2 || skill_idx == 3) {
+                        // type 0 (Ship Officer) gets 3, type 1 (Colony Leader) gets 1
+                        val = (leader.type == 0) ? 3 : 1;
+                        if (skill_idx == 3) {
+                            val *= 2;
                         }
+                    } else {
+                        val = (int8_t)skill.skill_mask[3];
                     }
-                    total_value += bonus;
+                    total_value += val;
                 }
             }
 
-            if (leader.type == 0) {
+            if (leader.type == 0) { // Ship Officer
                 if (skill.num == 1) {
-                    if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, (int16_t)skill_id)) {
-                        total_value += (int16_t)skill_bonus_byte;
+                    if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
+                        total_value += (int8_t)skill.skill_mask[3];
                     }
                 }
-            } else if (leader.type == 1) {
+            } else if (leader.type == 1) { // Colony Leader
                 if (skill.num == 2) {
-                    if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, (int16_t)skill_id)) {
-                        total_value += (int16_t)skill_bonus_byte;
+                    if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
+                        total_value += (int8_t)skill.skill_mask[3];
                     }
                 }
             }
@@ -80,10 +81,10 @@ namespace OFFICER {
             if (app_idx != 0) {
                 int16_t field_id = TECHDATA::_technology_applications[app_idx].tech_field_id;
                 if (field_id < 0) {
+                    // Logic from disassembly: resets total_value to 1 if field_id is invalid/negative
                     total_value = 1;
                 } else {
-                    uint32_t cost = TECHDATA::_technology_fields[field_id].cost;
-                    total_value += OFFICER::map_1000_5000(cost);
+                    total_value += OFFICER::map_1000_5000(TECHDATA::_technology_fields[field_id].cost);
                 }
             }
         }

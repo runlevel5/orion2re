@@ -158,7 +158,7 @@ namespace MOX {
     #pragma pack(push, 1)
     struct s_skill_data {
         uint8_t num;
-        uint32_t skill_mask;
+        uint8_t skill_mask[4];
         uint8_t unknown1;
         uint16_t skill_bonus;
         uint8_t unknown2;

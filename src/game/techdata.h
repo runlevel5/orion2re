@@ -25,7 +25,7 @@ namespace TECHDATA {
     inline s_building_data* _buildings = reinterpret_cast<s_building_data*>(std::uintptr_t{0x005542f0});
 
     #pragma pack(push, 1)
-    struct s_tech_app {
+    struct s_tech_application {
         int16_t tech_field_id;
         uint8_t pad[11];
     };
@@ -36,6 +36,6 @@ namespace TECHDATA {
     };
     #pragma pack(pop)
 
-    inline s_tech_app* _technology_applications = reinterpret_cast<s_tech_app*>(std::uintptr_t{0x005537CE});
+    inline s_tech_application* _technology_applications = reinterpret_cast<s_tech_application*>(std::uintptr_t{0x005537CE});
     inline s_tech_field* _technology_fields = reinterpret_cast<s_tech_field*>(std::uintptr_t{0x00553062});
 }
