@@ -272,6 +272,8 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
     fn(base, num, size, compar);
 }
 
+inline char& DAT_00556dac = *reinterpret_cast<char*>(std::uintptr_t{ 0x00556DAC });
+
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });

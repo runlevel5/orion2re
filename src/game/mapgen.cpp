@@ -1,6 +1,141 @@
 #include "deps.h"
+#include <ctime>
+#include <cstdio>
 
 namespace MAPGEN {
+
+bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names) {
+    int16_t x_cell_size = MOX::_MAP_MAX_X / x_cells;
+    int16_t y_cell_size = MOX::_MAP_MAX_Y / y_cells;
+    int16_t scaled_max_x = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
+    int16_t scaled_max_y = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
+    int8_t y_collision_padding = 0;
+
+    MISC::s_colors font_colors_main;
+    MISC::s_colors* puVar = MISC::Font_Colors2_(4, 'w', 'y');
+    font_colors_main = *puVar;
+
+    MISC::s_colors font_colors_alt;
+    puVar = MISC::Font_Colors2_(4, 'w', '|');
+    font_colors_alt = *puVar;
+
+    HAROLD::Set_Player_Font_Style_(0, 0);
+    HAROLD::Map_Scale_To_Zoom_Level_();
+
+    int16_t collision_h = 0;
+    switch (MOX::_cur_map_scale) {
+    case 10:
+    case 15:
+        collision_h = 50;
+        y_collision_padding = 8;
+        break;
+    case 20:
+        collision_h = 36;
+        y_collision_padding = 6;
+        break;
+    case 30:
+        collision_h = 30;
+        y_collision_padding = 4;
+        break;
+    }
+
+    if (MOX::_NUM_STARS <= 0) return false;
+
+    for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+        MAPGEN::_star_count = i;
+        MOX::Mox_Update_();
+
+        if (MAPGEN::_num_maps_to_generate == 1) {
+            fonts::Set_Font_Style_(4, &font_colors_main);
+            int16_t str_w = fonts::Get_String_Width_(MAPGEN::_fill_msg);
+            MISC::Draw_Advancing_Fill_Message_(4, &MAPGEN::_fill_msg_ctr, MOX::_NUM_STARS * 2, &font_colors_main,
+                &font_colors_alt, (0x280 - str_w) / 2, 0xD7,
+                MAPGEN::_fill_msg, MAPGEN::_fill_msg_bitmap, 0);
+            RUSS::Mox_Sync_Update_();
+        }
+
+        if (generate_spectral) {
+            MOX::_star[i].spectral_class = MAPGEN::Generate_Spectral_Class_(param_3);
+        }
+
+        int16_t collision_w;
+        if (use_names) {
+            MAPGEN::Copy_Name_To_Star_(i);
+            HAROLD::Set_Player_Font_Style_(0, 0);
+            char formatted_name[32];
+            _sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
+
+            // Manual check for short names to append DAT_00556dac
+            uint32_t name_len = 0;
+            while (MOX::_star[i].name[name_len] != '\0') name_len++;
+
+            if (name_len < 7) {
+                char* src = &DAT_00556dac;
+                uint32_t src_len = 0;
+                while (src[src_len] != '\0') src_len++;
+
+                char* dst_end = formatted_name;
+                while (*dst_end != '\0') dst_end++;
+
+                for (uint32_t j = 0; j <= src_len; ++j) {
+                    dst_end[j] = src[j];
+                }
+            }
+
+            collision_w = fonts::Get_String_Width_(formatted_name);
+            if (MAPGEN::_n_maps_generated <= 2) goto START_POS_GEN;
+        }
+
+        collision_w = random::Random_(8) + random::Random_(8) + 0x20 + random::Random_(8);
+
+    START_POS_GEN:
+        int16_t retry_count = 0;
+        HAROLD::Set_Player_Font_Style_(0, 0);
+        HAROLD::Map_Scale_To_Zoom_Level_();
+
+        bool collision;
+        do {
+            int16_t rx, scaled_x;
+            do {
+                rx = (int16_t)(random::Random_(x_cell_size * 2) + (i % x_cells) * x_cell_size) % MOX::_MAP_MAX_X;
+                scaled_x = HAROLD::Get_Scaled_Value_(rx);
+            } while (scaled_x < 0x18 || (scaled_max_x - (MOX::_star_width / 2)) < scaled_x);
+            MOX::_star[i].x = rx;
+
+            int16_t ry, scaled_y;
+            do {
+                ry = (int16_t)(random::Random_(y_cell_size * 2) + (y_cell_size * i) / x_cells) % MOX::_MAP_MAX_Y;
+                scaled_y = HAROLD::Get_Scaled_Value_(ry);
+            } while (scaled_y < 0x16 || ((scaled_max_y - (MOX::_star_height / 2)) - y_collision_padding) < scaled_y);
+            MOX::_star[i].y = ry;
+
+            collision = MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, scaled_x);
+            if (!collision) break;
+
+            if (++retry_count > 0x96) {
+                int16_t fallback_retries = 0;
+                bool fallback_found = false;
+                do {
+                    MOX::Mox_Update_();
+                    int16_t fx = (int16_t)random::Random_(0x189) + 0x14;
+                    int16_t fy = (int16_t)random::Random_(0x155) + 0x14;
+                    MOX::_star[i].x = HAROLD::Get_Upscaled_Value_(fx);
+                    MOX::_star[i].y = HAROLD::Get_Upscaled_Value_(fy);
+
+                    if (!MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, fx)) {
+                        fallback_found = true;
+                    }
+                    else {
+                        if (++fallback_retries > 0x96) return true;
+                    }
+                } while (!fallback_found);
+                collision = false;
+            }
+        } while (collision);
+    }
+    return false;
+}
+
     void __cdecl Clear_Planets_In_Star_Structure_() {
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             for (int j = 0; j < 5; ++j) {
@@ -9,19 +144,19 @@ namespace MAPGEN {
         }
     }
 
-    uint8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index) {
+    int8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index) {
         uint8_t weights[7];
 
         for (int32_t i = 0; i < 7; ++i) {
             weights[i] = MOX::_star_class_table[i * 3 + star_type_index];
         }
 
-        return RUSS::Get_Weighted_Choice_Char_(weights, 7);
+        return (int8_t)RUSS::Get_Weighted_Choice_Char_(weights, 7);
     }
 
     /**
      * @brief Determines the base food production per farmer for a given planet.
-     * 
+     *
      * Planets in systems with non-habitable spectral classes produce no food
      * unless the system contains the Orion star special.
      */
@@ -35,7 +170,7 @@ namespace MAPGEN {
 
         s_planet_data* planet = &MOX::_planet[planet_index];
         uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
-        
+
         return MOX::_food_per_farmer_table[climate_idx];
     }
 
@@ -150,7 +285,7 @@ namespace MAPGEN {
     /**
      * Retrieves the climate modifier for a given climate index and logs debug information
      * if the modifier is positive.
-     * 
+     *
      * @param climate_index The index into the climate modifier table (0-4).
      * @return The climate modifier value, or 0 if out of bounds.
      */
@@ -163,10 +298,10 @@ namespace MAPGEN {
 
             if (modifier > 0) {
                 // Debug logging: arg1=0, arg2=0, fmt, modifier, planet_count, index
-                RUSS::PFMT_(0, 0, s_______CLIMATE_modifier_is__d_Pla_00558a58, 
-                            static_cast<int32_t>(modifier), 
-                            static_cast<int32_t>(MOX::_planet_count), 
-                            static_cast<int32_t>(climate_index));
+                RUSS::PFMT_(0, 0, s_______CLIMATE_modifier_is__d_Pla_00558a58,
+                    static_cast<int32_t>(modifier),
+                    static_cast<int32_t>(MOX::_planet_count),
+                    static_cast<int32_t>(climate_index));
             }
         }
 
@@ -217,12 +352,14 @@ namespace MAPGEN {
      */
     uint8_t __cdecl Generate_Climate_(int16_t star_type) {
         uint8_t weights[10];
+        helpers::memset(&weights, 0, sizeof(weights));
 
         // 1. Determine weights based on star type and galaxy age
         for (int i = 0; i < 10; ++i) {
             if (MOX::_g_galaxy_age <= 1) { // 0: Young, 1: Normal
                 weights[i] = MOX::_normal_gal_climate_roll_table[i][star_type];
-            } else if (MOX::_g_galaxy_age == 2) { // 2: Old
+            }
+            else if (MOX::_g_galaxy_age == 2) { // 2: Old
                 weights[i] = MOX::_old_gal_climate_roll_table[i][star_type];
             }
         }
@@ -251,7 +388,8 @@ namespace MAPGEN {
         if (result == 0xFF) {
             if (_make_food_planet == 0) {
                 result = RUSS::Get_Weighted_Choice_Char_(weights, 10);
-            } else {
+            }
+            else {
                 // If forced to be food planet but multiple options exist, loop until a valid choice is picked
                 do {
                     result = RUSS::Get_Weighted_Choice_Char_(weights, 10);
@@ -314,10 +452,10 @@ namespace MAPGEN {
                     }
 
                     RUSS::PFMT_(0, 10, s_Moving_planet_d_to_planet_d, (int32_t)old_idx, (int32_t)new_idx);
-                    
+
                     MOX::_planet[new_idx] = _pl[old_idx];
                     MOX::_star[(uint8_t)MOX::_planet[new_idx].star_index].planet_index[(uint8_t)MOX::_planet[new_idx].orbit] = new_idx;
-                    
+
                     new_idx++;
                 }
             }
@@ -351,12 +489,12 @@ namespace MAPGEN {
                 int16_t found_star_idx = -1;
                 for (int attempt = 0; attempt <= 200; ++attempt) {
                     int32_t star_idx = random::Random_(static_cast<int32_t>(MOX::_NUM_STARS) - 1);
-                    if (star_idx != 0 && 
+                    if (star_idx != 0 &&
                         star_used[star_idx] == 0 &&
                         MOX::_star[star_idx].system_special == SYSTEM_SPECIAL_NO_SPECIAL &&
                         !HAROLD::Empty_System_(static_cast<int16_t>(star_idx)) &&
                         MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE &&
-                        MOX::_star[star_idx].wormhole_star_id == 0xFF) 
+                        MOX::_star[star_idx].wormhole_star_id == 0xFF)
                     {
                         found_star_idx = (int16_t)star_idx;
                         break;
@@ -371,9 +509,9 @@ namespace MAPGEN {
     }
 
     void __cdecl Get_A_Planet_Or_Star_Special_(int16_t star_idx, int16_t* wormhole_out, int8_t* special_out, uint8_t commit_changes, int32_t excluded_mask) {
-        int16_t valid_planets[5] = {0};
-        int16_t large_planets[5] = {0};
-        int16_t habitable_planets[5] = {0};
+        int16_t valid_planets[5] = { 0 };
+        int16_t large_planets[5] = { 0 };
+        int16_t habitable_planets[5] = { 0 };
         bool has_large = false;
         bool has_habitable = false;
 
@@ -385,7 +523,7 @@ namespace MAPGEN {
                     valid_planets[i] = 1;
                     int8_t climate = planet->climate;
                     // Habitable climates: Desert, Arid, Tundra, Ocean, Swamp, Terran, Gaia
-                    if (climate == 3 || climate == 7 || climate == 4 || climate == 5 || 
+                    if (climate == 3 || climate == 7 || climate == 4 || climate == 5 ||
                         climate == 6 || climate == 8 || climate == 9) {
                         habitable_planets[i] = 1;
                         has_habitable = true;
@@ -406,19 +544,24 @@ namespace MAPGEN {
             for (int s = 1; s < 12; ++s) {
                 if ((excluded_mask >> s) & 1) {
                     system_weights[s] = 0;
-                } else if (s == 8) { // Marooned Hero
-                    system_weights[s] = (MOX::_zoom_count + 2 >= _n_marooned_heroes) ? 
-                                        MOX::_planet_special_weighted_chance[s] : 0;
-                } else if (s == 6 || s == 7) { // Natives, Splinter Colony
-                    system_weights[s] = (has_large) ? 
-                                        MOX::_planet_special_weighted_chance[s] : 0;
-                } else if (s == 10) { // Ancient Artifacts
-                    system_weights[s] = (has_habitable) ? 
-                                        MOX::_planet_special_weighted_chance[s] : 0;
-                } else if (s == 9) { // Space Monster
-                    system_weights[s] = (MOX2::_user_wants_n_space_monsters) ? 
-                                        MOX::_planet_special_weighted_chance[s] : 0;
-                } else {
+                }
+                else if (s == 8) { // Marooned Hero
+                    system_weights[s] = (MOX::_zoom_count + 2 >= _n_marooned_heroes) ?
+                        MOX::_planet_special_weighted_chance[s] : 0;
+                }
+                else if (s == 6 || s == 7) { // Natives, Splinter Colony
+                    system_weights[s] = (has_large) ?
+                        MOX::_planet_special_weighted_chance[s] : 0;
+                }
+                else if (s == 10) { // Ancient Artifacts
+                    system_weights[s] = (has_habitable) ?
+                        MOX::_planet_special_weighted_chance[s] : 0;
+                }
+                else if (s == 9) { // Space Monster
+                    system_weights[s] = (MOX2::_user_wants_n_space_monsters) ?
+                        MOX::_planet_special_weighted_chance[s] : 0;
+                }
+                else {
                     system_weights[s] = MOX::_planet_special_weighted_chance[s];
                 }
             }
@@ -429,74 +572,74 @@ namespace MAPGEN {
 
             if ((uint32_t)choice - 1 <= 9) { // Switch only handles specials 1-10
                 switch (choice) {
-                    case 1: // Stable Wormhole
-                        if (commit_changes && _n_wormholes < (MOX::_settings.galaxy_size * 4 + 4)) {
-                            *wormhole_out = 1;
-                            _n_wormholes++;
-                            success = true;
-                        }
-                        break;
+                case 1: // Stable Wormhole
+                    if (commit_changes && _n_wormholes < (MOX::_settings.galaxy_size * 4 + 4)) {
+                        *wormhole_out = 1;
+                        _n_wormholes++;
+                        success = true;
+                    }
+                    break;
 
-                    case 2: // Space Debris
-                    case 3: // Pirate Cache
-                    case 4: // System Special placeholder
-                    case 9: // Space Monster
+                case 2: // Space Debris
+                case 3: // Pirate Cache
+                case 4: // System Special placeholder
+                case 9: // Space Monster
+                    if (commit_changes) {
+                        MOX::_star[star_idx].system_special = (int8_t)choice;
+                    }
+                    success = true;
+                    break;
+
+                case 5: // Gold Deposits (and Gem Deposits if it were in the switch)
+                {
+                    int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(valid_planets, 5);
+                    if (p_idx >= 0) {
                         if (commit_changes) {
+                            int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
+                            MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
                             MOX::_star[star_idx].system_special = (int8_t)choice;
                         }
                         success = true;
-                        break;
-
-                    case 5: // Gold Deposits (and Gem Deposits if it were in the switch)
-                    {
-                        int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(valid_planets, 5);
-                        if (p_idx >= 0) {
-                            if (commit_changes) {
-                                int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
-                                MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
-                                MOX::_star[star_idx].system_special = (int8_t)choice;
-                            }
-                            success = true;
-                        }
-                        break;
                     }
+                    break;
+                }
 
-                    case 6: // Natives
-                    case 7: // Splinter Colony
-                    {
-                        int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(large_planets, 5);
-                        if (p_idx >= 0) {
-                            if (commit_changes) {
-                                int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
-                                MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
-                                MOX::_star[star_idx].system_special = (int8_t)choice;
-                            }
-                            success = true;
-                        }
-                        break;
-                    }
-
-                    case 8: // Marooned Hero
-                        _n_marooned_heroes++; // Increment global attempt counter
+                case 6: // Natives
+                case 7: // Splinter Colony
+                {
+                    int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(large_planets, 5);
+                    if (p_idx >= 0) {
                         if (commit_changes) {
+                            int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
+                            MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
                             MOX::_star[star_idx].system_special = (int8_t)choice;
                         }
                         success = true;
-                        break;
-
-                    case 10: // Ancient Artifacts
-                    {
-                        int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(habitable_planets, 5);
-                        if (p_idx >= 0) {
-                            if (commit_changes) {
-                                int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
-                                MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
-                                MOX::_star[star_idx].system_special = (int8_t)choice;
-                            }
-                            success = true;
-                        }
-                        break;
                     }
+                    break;
+                }
+
+                case 8: // Marooned Hero
+                    _n_marooned_heroes++; // Increment global attempt counter
+                    if (commit_changes) {
+                        MOX::_star[star_idx].system_special = (int8_t)choice;
+                    }
+                    success = true;
+                    break;
+
+                case 10: // Ancient Artifacts
+                {
+                    int16_t p_idx = RUSS::Get_Weighted_Choice_Short_(habitable_planets, 5);
+                    if (p_idx >= 0) {
+                        if (commit_changes) {
+                            int16_t actual_p_idx = MOX::_star[star_idx].planet_index[p_idx];
+                            MOX::_planet[actual_p_idx].planet_special = (int8_t)choice;
+                            MOX::_star[star_idx].system_special = (int8_t)choice;
+                        }
+                        success = true;
+                    }
+                    break;
+                }
                 }
             }
 
@@ -508,6 +651,31 @@ namespace MAPGEN {
                 break;
             }
         }
+    }
+
+    void __cdecl Generate_Star_Special_(int16_t star_idx, void* param_2, uint8_t* special_counts) {
+        uint8_t special_type = 0;
+
+        if ((int16_t)MOX::_planet_special < (int16_t)random::Random_(100)) {
+            Get_A_Planet_Or_Star_Special_(star_idx, (int16_t*)param_2, (int8_t*)&special_type, 1, 0);
+        } else {
+            special_type = 0;
+        }
+
+        int16_t monster_chance;
+        if (MOX::_settings.game_difficulty == 3) {
+            monster_chance = 8;
+        } else if (MOX::_settings.game_difficulty == 4) {
+            monster_chance = 12;
+        } else {
+            monster_chance = 5;
+        }
+
+        if (random::Random_(100) - 1 < (int32_t)monster_chance) {
+            _n_space_monsters++;
+        }
+
+        special_counts[special_type]++;
     }
 
     void __cdecl Assign_Marooned_Heroes_() {
@@ -522,7 +690,8 @@ namespace MAPGEN {
 
                     if (hero_candidate == 0x41 || MOX::_leaders[hero_candidate].status != -1) {
                         attempts++;
-                    } else {
+                    }
+                    else {
                         selected_hero_idx = hero_candidate;
                         stop_searching = true;
                     }
@@ -534,11 +703,37 @@ namespace MAPGEN {
 
                 if (selected_hero_idx == -1) {
                     MOX::_star[star_idx].system_special = SYSTEM_SPECIAL_NO_SPECIAL;
-                } else {
+                }
+                else {
                     MOX::_leaders[selected_hero_idx].status = 5;
                     MOX::_leaders[selected_hero_idx].location = star_idx;
                 }
             }
+        }
+    }
+
+    void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t nebula_freq) {
+        MOX::_NUM_NEBULAS = 0;
+
+        if (MOX::_nebula_screen_seg == nullptr) {
+            return;
+        }
+
+        switch (galaxy_size) {
+        case 0:
+            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(2) - 1);
+            break;
+        case 1:
+            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(2));
+            break;
+        case 2:
+            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(3));
+            break;
+        case 3:
+            MOX::_NUM_NEBULAS = static_cast<uint8_t>(random::Random_(3) + 1);
+            break;
+        default:
+            break;
         }
     }
 
@@ -566,7 +761,8 @@ namespace MAPGEN {
                         if (first_load) {
                             loaded_segment = farload::Far_Reload_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg);
                             first_load = false;
-                        } else {
+                        }
+                        else {
                             loaded_segment = farload::Far_Reload_Next_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg);
                         }
 
@@ -600,6 +796,19 @@ namespace MAPGEN {
      * @param planet_id The ID of the planet to search for.
      * @return The player index if found, otherwise -1.
      */
+    int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx) {
+        int32_t random_val = random::Random_(10);
+        int16_t result = 0;
+
+        if (MOX::_star[star_idx].spectral_class < STAR_CLASS_BLACK_HOLE) {
+            int32_t row_index = random_val - 1;
+            int8_t spectral_class = MOX::_star[star_idx].spectral_class;
+            result = (int16_t)MOX::_class_to_num_satellites[row_index][spectral_class];
+        }
+
+        return result;
+    }
+
     int16_t __cdecl Home_Planet_(int16_t planet_id) {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].home_planet_id == planet_id) {
@@ -609,218 +818,333 @@ namespace MAPGEN {
         return -1;
     }
 
-    void __cdecl Universe_Generation_(uint8_t gal_size, uint8_t gal_age, int8_t param_3) {
-        MISC::s_colors* colors1 = MISC::Font_Colors2_(4, 'w', 'y');
-        MISC::s_colors color_pair1 = *colors1;
+    bool __cdecl Star_XY_Invalid_(int16_t target_idx, int16_t limit_x, int16_t limit_y, int16_t offset_val) {
+        int16_t scaled_max_x = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
+        HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
 
-        MISC::s_colors* colors2 = MISC::Font_Colors2_(4, 'w', '|');
-        MISC::s_colors color_pair2 = *colors2;
+        bool is_invalid = false;
+        if (target_idx <= 0) {
+            return false;
+        }
 
-        MOX::Mox_Update_();
+        for (int16_t i = 0; i < target_idx; ++i) {
+            if (is_invalid) {
+                break;
+            }
 
-        MOX::_g_galaxy_size = gal_size;
+            const s_star_data& star_current = MOX::_star[i];
+            const s_star_data& star_target = MOX::_star[target_idx];
+
+            if (star_current.spectral_class == STAR_CLASS_BLACK_HOLE || star_target.spectral_class == STAR_CLASS_BLACK_HOLE) {
+                if (GEO::Parsecs_Between_Stars_(target_idx, i) < 5) {
+                    is_invalid = true;
+                }
+            } else {
+                int32_t x1 = HAROLD::Get_Scaled_Value_(star_current.x);
+                int32_t x2 = HAROLD::Get_Scaled_Value_(star_target.x);
+                int32_t y1 = HAROLD::Get_Scaled_Value_(star_current.y);
+                int32_t y2 = HAROLD::Get_Scaled_Value_(star_target.y);
+
+                int32_t dx = x1 - x2;
+                int32_t dy = y1 - y2;
+                int32_t dist_sq = dx * dx + dy * dy;
+
+                int32_t abs_dx = (dx < 0) ? -dx : dx;
+                int32_t abs_dy = (dy < 0) ? -dy : dy;
+
+                int16_t scaled_60 = HAROLD::Get_Scaled_Value_(60);
+
+                bool test0 = (dist_sq <= 800);
+                bool test1 = (abs_dy < limit_y && abs_dx < limit_x);
+                bool test2 = (abs_dy < 15 && abs_dx < scaled_60);
+                bool test3 = ((limit_x * 2 / 3) + offset_val > scaled_max_x);
+
+                if (test0 || test1 || test2 || test3) {
+                    _tests_failed[0] += (uint16_t)test0;
+                    _tests_failed[1] += (uint16_t)test1;
+                    _tests_failed[2] += (uint16_t)test2;
+                    _tests_failed[3] += (uint16_t)test3;
+                    is_invalid = true;
+                }
+            }
+        }
+
+        return is_invalid;
+    }
+
+    /**
+     * @brief Initializes and then shuffles an array of star name indices.
+     * 
+     * This function fills the star name index array with sequential values from 0 to 828,
+     * then performs 829 random swaps to shuffle the order.
+     */
+    void __cdecl Randomize_Star_Names_(uint16_t* star_name_indices) {
+        for (uint16_t i = 0; i < 829; ++i) {
+            star_name_indices[i] = i;
+        }
+
+        for (int i = 0; i < 829; ++i) {
+            int32_t idx1 = random::Random_(829) - 1;
+            int32_t idx2 = random::Random_(829) - 1;
+
+            if (idx1 != idx2) {
+                uint16_t temp = star_name_indices[idx1];
+                star_name_indices[idx1] = star_name_indices[idx2];
+                star_name_indices[idx2] = temp;
+            }
+        }
+    }
+
+    /**
+     * Corrects black holes that overlap nebulae by converting them to habitable stars.
+     */
+    void __cdecl Black_Hole_Fix_(int16_t param_1) {
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            s_star_data& star = MOX::_star[i];
+
+            if (star.spectral_class == STAR_CLASS_BLACK_HOLE) {
+                int16_t x = star.x;
+                int16_t y = star.y;
+
+                // Check points around the star for nebula presence
+                bool in_nebula = GEO::Point_Is_In_Some_Nebula_(x, y) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x + 24, y) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x, y + 24) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x + 24, y + 24) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x + 12, y) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x + 24, y + 12) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x + 12, y + 24) ||
+                                 GEO::Point_Is_In_Some_Nebula_(x, y + 12);
+
+                if (in_nebula) {
+                    int16_t attempts = 0;
+                    do {
+                        star.spectral_class = MAPGEN::Generate_Spectral_Class_(param_1);
+
+                        // Failsafe: if we can't find a habitable class after 200 attempts, force class M
+                        if (attempts > 200) {
+                            star.spectral_class = STAR_CLASS_M;
+                        }
+                        attempts++;
+                    } while (!HAROLD::Habitable_Spectral_Class_(i));
+
+                    Planet_Generation_(i);
+                    star.visited = 0;
+                }
+            }
+        }
+    }
+
+    void __cdecl Copy_Name_To_Star_(int16_t star_idx) {
+        int32_t name_id = static_cast<int16_t>(_name_index[star_idx]);
+        const char* src_name = reinterpret_cast<const char*>(reinterpret_cast<std::uintptr_t>(_name_seg) + (name_id * 15));
+        char* dest_name = MOX::_star[star_idx].name;
+
+        while ((*dest_name++ = *src_name++) != '\0');
+    }
+
+    void __cdecl Universe_Generation_(uint8_t gal_size, uint8_t gal_age, int8_t nebula_freq) {
+        MISC::s_colors local_colors1;
+        MISC::s_colors local_colors2;
+        uint32_t start_time;
+        char planets_per_star[80];
+        char error_buf[80];
+        int16_t grid_x, grid_y;
+
+        MISC::s_colors* p = MISC::Font_Colors2_(4, 'w', 'y');
         MOX::_g_galaxy_age = gal_age;
         _n_maps_generated = 0;
+        local_colors1 = *p;
+
+        p = MISC::Font_Colors2_(4, 'w', '|');
+        local_colors2 = *p;
         helpers::memset(_tests_failed, 0, 8);
         MOX::Mox_Update_();
 
-        int galaxy_size_idx = (int)gal_size;
+        _make_food_planet = 0;
+        MOX::Mox_Update_();
+        start_time = _clock();
+        _num_maps_to_generate = 1;
+        _n_maps_generated++;
+        MOX::_g_galaxy_size = gal_size;
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
 
-        while (true) {
-            __evan_ptr = MOX::_climate_modifier_table;
-            _make_food_planet = 0;
-            _num_maps_to_generate = 1;
-            _n_maps_generated++;
+        MOX::_star_width = 37;
+        MOX::_star_height = 37;
+        _is_companion_star = 0;
 
-            MOX::Mox_Update_();
-            MOX::Mox_Update_();
-            MOX::Mox_Update_();
+        helpers::memset(MOX::_planet, 0, 0x5fa * 4);
+        MOX::Mox_Update_();
 
-            MOX::_star_width = 37;
-            MOX::_star_height = 37;
-            _is_companion_star = 0;
-            helpers::memset(MOX::_planet, 0, 0x5fa * 4);
-            MOX::Mox_Update_();
+        _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
+        MOX::Mox_Update_();
+        _name_index = reinterpret_cast<uint16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xCF4));
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
 
-            _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
+        if (MOX::_n_stats_to_generate != 0) {
+            _num_maps_to_generate = MOX::_n_stats_to_generate;
+            start_time = _clock();
+        }
+
+        MOX::Mox_Update_();
+        Randomize_Star_Names_(_name_index);
+
+        if (_num_maps_to_generate == 1) {
+            if (ERIC::Get_Fade_Percent_() != 0) JIM::Fast_Fade_In_();
+            video::Set_Page_Back_();
             MOX::Mox_Update_();
-            _name_index = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xCF4);
+            void* raceopt_ptr = Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg);
+            animate::Draw_(0, 0, raceopt_ptr);
             MOX::Mox_Update_();
+            video::Copy_Back_To_Off_();
+
+            char* msg = (char*)HAROLD::H_Message_(0xF2);
+            helpers::strncpy(_fill_msg, msg, sizeof(_fill_msg));
+
+            uint32_t bsize = bitmap::Get_Bitmap_Size_(325, 30);
+            _fill_msg_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
+            bitmap::Create_Blank_Bitmap_(325, 30, _fill_msg_bitmap);
+            _fill_msg_ctr = 0;
             MOX::Mox_Update_();
+            fonts::Set_Font_Style_Outline_Heavy_(4, &local_colors1);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Print_To_Bitmap_(0, 0, _fill_msg, _fill_msg_bitmap);
+            MOX::Mox_Update_();
+        }
+
+        if (_first_time_map_is_generated != 0) {
+            random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
+            _first_time_map_is_generated = 0;
+        }
+
+        switch (gal_size) {
+        case 0:
+            MOX::_NUM_STARS = 20;
+            grid_x = 5; grid_y = 4;
+            break;
+        case 1:
+            MOX::_NUM_STARS = 36;
+            grid_x = 6; grid_y = 6;
+            break;
+        case 2:
+            MOX::_NUM_STARS = 54;
+            grid_x = 9; grid_y = 6;
+            break;
+        case 3:
+            MOX::_NUM_STARS = 71;
+            grid_x = 9; grid_y = 8;
+            break;
+        default:
+            _sprintf(error_buf, "Galaxy size %d is undefined", gal_size);
+            exitm::Exit_With_Message(error_buf);
+            return;
+        }
+
+        Init_Main_Screen_(gal_size);
+        MOX::Mox_Update_();
+        MOX::Mox_Update_();
+
+        MOX::_planet_count = 0;
+        Generate_Number_Of_Nebulas_(gal_size, nebula_freq);
+        if (MOX::_NUM_NEBULAS != 0) Generate_Nebulas_();
+
+        HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
+        HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
+
+        uint32_t map_idx = 0;
+        while (map_idx < _num_maps_to_generate) {
+            if (_num_maps_to_generate != 1) {
+                MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
+            }
+
+            _n_space_monsters = 0;
+            if (MOX::_n_stats_to_generate != 0) {
+                Generate_Number_Of_Nebulas_(gal_size, nebula_freq);
+            }
+
+            helpers::memset(_special_count, 0, 12);
+            _n_stars = 0;
+            _n_marooned_heroes = 0;
+            _n_wormholes = 0;
+            MOX::_NUM_COLONIES = 0;
+            MOX::_planet_count = 0;
+
+            helpers::memset(MOX::_planet, 0, 306 * sizeof(s_planet_data));
+            for (int i = 0; i < 80; ++i) {
+                helpers::memset(MOX::_star[i].name, 0, 15);
+            }
+            helpers::memset(planets_per_star, 0, 80);
+
+            if (Set_Star_XYs_(grid_x, grid_y, gal_age, 1, 1)) {
+                fonts::Set_Font_Style_(4, &local_colors1);
+                int16_t swidth = fonts::Get_String_Width_(_fill_msg);
+                MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, MOX::_NUM_STARS * 2, &local_colors1, &local_colors2, (640 - swidth) / 2, 215, _fill_msg, _fill_msg_bitmap, 1);
+                RUSS::Mox_Sync_Update_();
+                continue;
+            }
+
+            for (_star_count = 0; _star_count < MOX::_NUM_STARS; ++_star_count) {
+                MOX::Mox_Update_();
+                for (int i = 0; i < 8; ++i) MOX::_star[_star_count].relocate_ship_to[i] = -1;
+                for (int i = 0; i < 8; ++i) MOX::_star[_star_count].officer_index[i] = -1;
+                MOX::_star[_star_count].wormhole_star_id = -1;
+
+                if (_num_maps_to_generate == 1 && map_idx == 0) {
+                    fonts::Set_Font_Style_(4, &local_colors1);
+                    int16_t swidth = fonts::Get_String_Width_(_fill_msg);
+                    MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, MOX::_NUM_STARS * 2, &local_colors1, &local_colors2, (640 - swidth) / 2, 215, _fill_msg, _fill_msg_bitmap, 0);
+                    RUSS::Mox_Sync_Update_();
+                }
+
+                MOX::_star[_star_count].owner = -1;
+                int r_size = random::Random_(10) - 1;
+                if (r_size < 3) MOX::_star[_star_count].size = 0;
+                else if (r_size < 7) MOX::_star[_star_count].size = 1;
+                else MOX::_star[_star_count].size = 2;
+
+                MOX::_star[_star_count].pict_type = (int8_t)random::Random_(3) - 1;
+                for (int i = 0; i < 5; ++i) MOX::_star[_star_count].planet_index[i] = -1;
+
+                _is_companion_star = 0;
+                if (HAROLD::Habitable_Spectral_Class_(_star_count)) {
+                    int16_t n_sat = Generate_Number_Of_Satellites_(_star_count);
+                    planets_per_star[_star_count] = (char)n_sat;
+                    for (int i = 0; i < n_sat; ++i) {
+                        MOX::Mox_Update_();
+                        Planet_Generation_(_star_count);
+                    }
+                    if (MOX::_n_stats_to_generate != 0) {
+                        _satellite_stat[n_sat]++;
+                    }
+                }
+
+                if (MOX::_star[_star_count].spectral_class != 6 && planets_per_star[_star_count] > 0 && _star_count > 0) {
+                    Generate_Star_Special_(_star_count, &_special_count[4], &_special_count[4]);
+                }
+                _n_stars++;
+            }
+
+            bool connected = false;
+            do {
+                if (MOX::_NUM_NEBULAS != 0) Black_Hole_Fix_(gal_age);
+                GEO::Initialize_Black_Hole_Blocks_(45);
+                if (GEO::Map_Is_Connected_()) {
+                    connected = true;
+                }
+                else {
+                    Set_Star_XYs_(grid_x, grid_y, gal_age, 0, 0);
+                }
+            } while (!connected);
 
             if (MOX::_n_stats_to_generate != 0) {
-                _num_maps_to_generate = (uint32_t)MOX::_n_stats_to_generate;
-            }
-            MOX::Mox_Update_();
-
-            Randomize_Star_Names_((int)_name_index);
-
-            if (_num_maps_to_generate == 1) {
-                if (ERIC::Get_Fade_Percent_() != 0) {
-                    JIM::Fast_Fade_In_();
-                }
-                video::Set_Page_Back_();
-                MOX::Mox_Update_();
-
-                void* race_data = farload::Farload_Library_("raceopt.lbx", 0, MOX::_global_cache_seg, 1);
-                animate::Draw_(0, 0, race_data);
-                MOX::Mox_Update_();
-                video::Copy_Back_To_Off_();
-
-                char* progress_msg = HAROLD::H_Message_(0xF2);
-                helpers::strncpy(_fill_msg, progress_msg, 32);
-
-                uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(325, 30);
-                _fill_msg_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
-                bitmap::Create_Blank_Bitmap_(325, 30, _fill_msg_bitmap);
-                _fill_msg_ctr = 0;
-
-                MOX::Mox_Update_();
-                fonts::Set_Font_Style_Outline_Heavy_(4, &color_pair1);
-                fonts::Set_Outline_Color_(2, 1);
-                fonts::Print_To_Bitmap_(0, 0, _fill_msg, _fill_msg_bitmap);
-                MOX::Mox_Update_();
+                _nebula_stat[MOX::_NUM_NEBULAS]++;
             }
 
-            if (_first_time_map_is_generated != 0) {
-                random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
-                _first_time_map_is_generated = 0;
-            }
-
-            int16_t grid_x, grid_y;
-            switch (galaxy_size_idx) {
-            case 0: // Tiny
-                MOX::_NUM_STARS = 20;
-                grid_x = 5; grid_y = 4;
-                break;
-            case 1: // Small
-                MOX::_NUM_STARS = 36;
-                grid_x = 6; grid_y = 6;
-                break;
-            case 2: // Medium
-                MOX::_NUM_STARS = 54;
-                grid_x = 9; grid_y = 6;
-                break;
-            case 3: // Large
-                MOX::_NUM_STARS = 71;
-                grid_x = 9; grid_y = 8;
-                break;
-            default:
-                char err_buf[80];
-                _sprintf(err_buf, "Galaxy size %d is undefined", galaxy_size_idx);
-                exitm::Exit_With_Message(err_buf);
-                return;
-            }
-
-            Init_Main_Screen_();
-            MOX::Mox_Update_();
-            MOX::Mox_Update_();
-            MOX::_planet_count = 0;
-            Generate_Number_Of_Nebulas_(gal_size);
-            if (MOX::_NUM_NEBULAS != 0) {
-                Generate_Nebulas_();
-            }
-
-            // TODO: This does nothing and is in original code
-            HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_X);
-            HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
-
-            uint16_t map_idx = 0;
-            if ((int)_num_maps_to_generate < 1) return;
-
-            while (true) {
-                if (_num_maps_to_generate != 1) {
-                    MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
-                }
-
-                _n_space_monsters = 0;
-                if (MOX::_n_stats_to_generate != 0) {
-                    Generate_Number_Of_Nebulas_(gal_size);
-                }
-
-                helpers::memset(_special_count, 0, 16);
-                _n_stars = 0;
-                _n_marooned_heroes = 0;
-                _n_wormholes = 0;
-                MOX::_NUM_COLONIES = 0;
-                MOX::_planet_count = 0;
-
-                helpers::memset(MOX::_planet, 0, 0x5fa * 4);
-                helpers::memset(MOX::_star, 0, 0x7f2 * 4);
-
-                uint8_t n_sats_per_star[72];
-                helpers::memset(n_sats_per_star, 0, 72);
-
-                if (Set_Star_XYs_(grid_x, grid_y, gal_age, 1, 1)) {
-                    if (_num_maps_to_generate == 1) {
-                        fonts::Set_Font_Style_(4, &color_pair1);
-                        int16_t msg_w = fonts::Get_String_Width_(_fill_msg);
-                        MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, MOX::_NUM_STARS * 2, &color_pair1, &color_pair2, (uint16_t)((640 - msg_w) / 2), 215, _fill_msg, _fill_msg_bitmap, 1);
-                        RUSS::Mox_Sync_Update_();
-                    }
-                    break;
-                }
-
-                for (int16_t s = 0; s < MOX::_NUM_STARS; ++s) {
-                    MOX::Mox_Update_();
-                    for (int i = 0; i < 8; ++i) MOX::_star[s].relocate_ship_to[i] = -1;
-                    for (int i = 0; i < 8; ++i) MOX::_star[s].officer_index[i] = -1;
-                    MOX::_star[s].wormhole_star_id = -1;
-
-                    if (_num_maps_to_generate == 1 && map_idx < 1) {
-                        fonts::Set_Font_Style_(4, &color_pair1);
-                        int16_t msg_w = fonts::Get_String_Width_(_fill_msg);
-                        MISC::Draw_Advancing_Fill_Message_(4, &_fill_msg_ctr, MOX::_NUM_STARS * 2, &color_pair1, &color_pair2, (uint16_t)((640 - msg_w) / 2), 215, _fill_msg, _fill_msg_bitmap, 0);
-                        RUSS::Mox_Sync_Update_();
-                    }
-
-                    MOX::_star[s].owner = -1;
-                    int size_roll = random::Random_(10) - 1;
-                    if (size_roll < 3) MOX::_star[s].size = 0;
-                    else if (size_roll < 7) MOX::_star[s].size = 1;
-                    else MOX::_star[s].size = 2;
-
-                    MOX::_star[s].pict_type = (int8_t)random::Random_(3) - 1;
-                    for (int i = 0; i < 5; ++i) MOX::_star[s].planet_index[i] = -1;
-
-                    _is_companion_star = 0;
-                    if (HAROLD::Habitable_Spectral_Class_(s)) {
-                        uint8_t n_sats = Generate_Number_Of_Satellites_(s);
-                        n_sats_per_star[s] = n_sats;
-                        for (int i = 0; i < n_sats; ++i) {
-                            MOX::Mox_Update_();
-                            Planet_Generation_(s);
-                        }
-                        if (MOX::_n_stats_to_generate != 0) {
-                            (&_satellite_stat)[n_sats] += 1;
-                        }
-                    }
-
-                    if (MOX::_star[s].spectral_class != 6 && n_sats_per_star[s] > 0 && s > 0) {
-                        uint16_t local_bc;
-                        Generate_Star_Special_(s, &local_bc, (void*)0x0056CDC0);
-                    }
-                    _n_stars++;
-                }
-
-                bool connected = false;
-                do {
-                    if (MOX::_NUM_NEBULAS != 0) Black_Hole_Fix_(gal_age);
-                    GEO::Initialize_Black_Hole_Blocks_(0x2D);
-                    if (GEO::Map_Is_Connected_()) {
-                        connected = true;
-                    } else {
-                        Set_Star_XYs_(grid_x, grid_y, gal_age, 0, 0);
-                    }
-                } while (!connected);
-
-                if (MOX::_n_stats_to_generate != 0) {
-                    (&_nebula_stat)[(uint32_t)MOX::_NUM_NEBULAS] += 1;
-                }
-
-                map_idx++;
-                if ((int)map_idx >= (int)_num_maps_to_generate) return;
-            }
+            map_idx++;
         }
+        return;
     }
 }

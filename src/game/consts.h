@@ -6,6 +6,7 @@
 #define MAX_PLANETS 360
 #define MAX_STARS 72
 #define MAX_LEADERS 67
+#define MAX_NEBULAS 5
 
 enum TECH_FIELD {
     TECH_FIELD_STARTING_TECH = 0,  // Starting Tech

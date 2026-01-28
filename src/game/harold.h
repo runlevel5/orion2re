@@ -5,6 +5,8 @@ namespace HAROLD {
 
     int16_t __cdecl Get_Scaled_Value_(int16_t value);
 
+    int16_t __cdecl Get_Upscaled_Value_(int16_t value);
+
     bool __cdecl Empty_System_(int16_t star_idx);
 
     bool __cdecl Is_Home_Star_(int16_t star_idx);
@@ -34,7 +36,7 @@ namespace HAROLD {
 
     void __cdecl Init_Moving_Boxes_();
 
-    char* __cdecl H_Message_(int16_t id);
+    const char* __cdecl H_Message_(int16_t id);
 
     void __cdecl Save_Mouse_List_();
 
@@ -59,6 +61,18 @@ namespace HAROLD {
     inline void __cdecl Harold_Defaults_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0aa0});
+        fn();
+    }
+
+    inline void __cdecl Set_Player_Font_Style_(int16_t style, char param_2) {
+        using Fn = void(__cdecl*)(int16_t, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1930 });
+        fn(style, param_2);
+    }
+
+    inline void __cdecl Map_Scale_To_Zoom_Level_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1090 });
         fn();
     }
 

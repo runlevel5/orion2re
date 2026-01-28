@@ -189,6 +189,15 @@ namespace hooks {
         { 0x00520200, &capture::Release_Version_ },
         { 0x00473810, &MSG_::Add_Message },
         { 0x004B7120, &MAPGEN::Universe_Generation_ },
+        { 0x004b6d40, &MAPGEN::Randomize_Star_Names_ },
+        { 0x004b61d0, &MAPGEN::Generate_Number_Of_Nebulas_ },
+        { 0x004f0a50, &HAROLD::Get_Upscaled_Value_ },
+        { 0x004b7960, &MAPGEN::Set_Star_XYs_ },
+        { 0x004b6250, &MAPGEN::Generate_Number_Of_Satellites_ },
+        { 0x004b7e40, &MAPGEN::Star_XY_Invalid_ },
+        { 0x004b83f0, &MAPGEN::Copy_Name_To_Star_ },
+        { 0x004b6960, &MAPGEN::Generate_Star_Special_ },
+        { 0x004b8050, &MAPGEN::Black_Hole_Fix_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
