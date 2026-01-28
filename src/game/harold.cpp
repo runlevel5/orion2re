@@ -147,6 +147,78 @@ namespace HAROLD {
         return count;
     }
 
+    void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap) {
+        int16_t candidates[20];
+        for (int i = 0; i < 20; ++i) {
+            candidates[i] = -1;
+        }
+
+        int16_t count = 0;
+        bool buffer_full = false;
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (buffer_full) break;
+
+            uint32_t distance = (uint32_t)GEO::Parsecs_Between_Stars_(star_idx, i);
+
+            if (distance > (uint32_t)MOX::_settings.galaxy_size + 3 &&
+                star_bitmap[i] == 0 &&
+                MOX::_star[i].wormhole_star_id == -1 &&
+                MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE &&
+                MOX::_star[i].system_special == SYSTEM_SPECIAL_NO_SPECIAL &&
+                i != star_idx)
+            {
+                candidates[count++] = i;
+                if (count == 19) {
+                    buffer_full = true;
+                }
+            }
+        }
+
+        if (count > 0) {
+            int16_t invalidated_count = 0;
+            for (int i = 0; i < count; ++i) {
+                int16_t star_id = candidates[i];
+                if (MOX::_star[star_id].wormhole_star_id > 0 || N_Sattelites_(star_id) == 0) {
+                    candidates[i] = -1;
+                    invalidated_count++;
+                }
+            }
+
+            if (invalidated_count < count) {
+                int iters = (count * 5) / 3;
+                for (int i = 0; i < iters; ++i) {
+                    int idx1 = random::Random_(count) - 1;
+                    int idx2 = random::Random_(count) - 1;
+                    if (idx1 != idx2 && candidates[idx1] != -1 && candidates[idx2] != -1) {
+                        int16_t temp = candidates[idx1];
+                        candidates[idx1] = candidates[idx2];
+                        candidates[idx2] = temp;
+                    }
+                }
+
+                int16_t wormhole_exit_id = -1;
+                int pick_counter = 1;
+                for (int i = 0; i < count; ++i) {
+                    if (candidates[i] != -1) {
+                        if (random::Random_(pick_counter) == 1) {
+                            wormhole_exit_id = candidates[i];
+                            pick_counter++;
+                        }
+                    }
+                }
+
+                if (wormhole_exit_id != -1) {
+                    MOX::_star[wormhole_exit_id].wormhole_star_id = (int8_t)star_idx;
+                    MOX::_star[star_idx].wormhole_star_id = (int8_t)wormhole_exit_id;
+                    return;
+                }
+            }
+        }
+
+        MOX::_star[star_idx].wormhole_star_id = 0;
+    }
+
     /**
      * @address 004f0860
      */
@@ -373,5 +445,33 @@ namespace HAROLD {
                 allocate::Pop_Block_(MOX::_screen_seg);
             }
         }
+    }
+
+    /**
+     * @address 004f1ab0
+     */
+    int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx) {
+        int16_t player_counts[MAX_PLAYERS];
+        int16_t unk_val;
+
+        bool hide_unexplored = !OFFICER::One_Leader_With_Galactic_Lore_(player_idx);
+
+        Colony_Owners_(star_idx, player_counts, &unk_val, hide_unexplored);
+
+        if (player_counts[MOX::_PLAYER_NUM] > 0) {
+            return MOX::_PLAYER_NUM;
+        }
+
+        int16_t max_colonies = 0;
+        int16_t winner = -1;
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            if (player_counts[i] > max_colonies) {
+                max_colonies = player_counts[i];
+                winner = i;
+            }
+        }
+
+        return winner;
     }
 }

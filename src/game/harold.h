@@ -13,6 +13,8 @@ namespace HAROLD {
 
     uint8_t __cdecl N_Sattelites_(int16_t star_index);
 
+    void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap);
+
     uint8_t __cdecl N_Food_Planets_In_System_(int16_t system_index);
 
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
@@ -64,10 +66,12 @@ namespace HAROLD {
 
     void __cdecl Load_Leader_Titles();
 
-    inline int16_t __cdecl Star_Owner_(int32_t star_idx, int32_t player_num) {
-        using Fn = int16_t(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1AB0});
-        return fn(star_idx, player_num);
+    int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
+
+    inline int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t planet_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1520});
+        return fn(star_idx, planet_idx);
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"

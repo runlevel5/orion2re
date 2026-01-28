@@ -62,6 +62,8 @@ namespace MOX {
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
     inline uint8_t& _mox_font_colors_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059BA6E });
+    inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
+    inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});
     inline char& _temp_string = *reinterpret_cast<char*>(std::uintptr_t{ 0x00596230 });
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
@@ -123,8 +125,10 @@ namespace MOX {
     inline void*& _global_screen_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
 
-    inline uint32_t& _global_cache_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059B5B8 });
+    inline void*& _global_cache_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
+
+    inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
 
     inline uint32_t& _global_cache_size =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA10 });

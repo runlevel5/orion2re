@@ -17,4 +17,10 @@ namespace OFFICER {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
     }
+
+    inline bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1700});
+        return fn(player_idx);
+    }
 }

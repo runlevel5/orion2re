@@ -92,4 +92,12 @@ namespace HOMEGEN {
     void __cdecl Set_Special_For_Star_Guarded_By_Monster_(s_star_data* star, int16_t monster_type);
 
     void __cdecl Upgrade_Planet_Guarded_By_Monster_(s_planet_data* planet, int16_t monster_type);
+
+    inline bool __cdecl Star_Has_Planet_(int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051BE20 });
+        return fn(star_idx);
+    }
+
+
 }

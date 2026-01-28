@@ -715,7 +715,7 @@ struct s_star_data {
     int8_t last_planet_selected[8];
     char black_hole_blocks[9];
     int8_t system_special;
-    uint8_t wormhole_star_id;
+    int8_t wormhole_star_id;
     uint8_t blockaded;
     char blockaded_by[8];
     int8_t visited;

@@ -278,18 +278,6 @@ inline void __cdecl No_Op1_() {
     fn();
 }
 
-inline bool __cdecl Star_Has_Planet_(int16_t star_idx) {
-    using Fn = bool(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051BE20 });
-    return fn(star_idx);
-}
-
-inline uint8_t __cdecl Get_Mineral_Class(int16_t star_idx, int16_t planet_idx) {
-    using Fn = uint8_t(__cdecl*)(int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B5CF0});
-    return fn(star_idx, planet_idx);
-}
-
 inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
     using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519F90});
@@ -302,8 +290,14 @@ inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
     return fn(star_idx);
 }
 
-inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, uint32_t segment) {
-    using Fn = void*(__cdecl*)(const char*, int32_t, uint32_t);
+inline void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool hide_if_no_lore) {
+    using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, bool);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1190});
+    fn(star_idx, player_counts, total_count, hide_if_no_lore);
+}
+
+inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
+    using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
     return fn(filename, index, segment);
 }

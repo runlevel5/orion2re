@@ -13,6 +13,23 @@ namespace helpers {
         while ((*dest++ = *src++));
     }
 
+    inline char* strncpy(char* dest, const char* src, size_t n) {
+        char* d = dest;
+        size_t i = 0;
+
+        // Copy up to n characters from src, stopping at null terminator
+        for (; i < n && src[i] != '\0'; ++i) {
+            d[i] = src[i];
+        }
+
+        // Pad the rest with null bytes if src is shorter than n
+        for (; i < n; ++i) {
+            d[i] = '\0';
+        }
+
+        return dest;
+    }
+
     inline void strcat(char* dest, const char* src) {
         while (*dest) dest++;
         while ((*dest++ = *src++));

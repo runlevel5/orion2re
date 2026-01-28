@@ -174,11 +174,21 @@ namespace hooks {
         { 0x004b5af0, &MAPGEN::Generate_Climate_ },
         { 0x004b57e0, &MAPGEN::Enforce_Planet_Max_ },
         { 0x004b6db0, &MAPGEN::Set_Black_Hole_Visited_Flags_ },
+        { 0x004b6e00, &HAROLD::Set_Wormhole_Id_ },
         { 0x004b69f0, &MAPGEN::Generate_Wormhole_Links_ },
         { 0x004b56b0, &MAPGEN::Assign_Marooned_Heroes_ },
         { 0x004b6490, &MAPGEN::Set_Secondary_Planet_Data_ },
         { 0x004b6650, &MAPGEN::Get_A_Planet_Or_Star_Special_ },
         { 0x004b7040, &MAPGEN::Load_Nebula_Pictures_ },
+        { 0x004b5790, &MAPGEN::Clear_Planets_In_Star_Structure_ },
+        { 0x004f1ab0, &HAROLD::Star_Owner_ },
+        { 0x004b5a80, &MAPGEN::Gas_Giants_ },
+        { 0x004b6be0, &MAPGEN::Home_Planet_ },
+        { 0x004b5cf0, &MAPGEN::Generate_Mineral_Class_ },
+        { 0x00527630, &mouse::Mouse_Buffer_ },
+        { 0x00520200, &capture::Release_Version_ },
+        { 0x00473810, &MSG_::Add_Message },
+        { 0x004B7120, &MAPGEN::Universe_Generation_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -195,6 +205,7 @@ namespace hooks {
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
+        ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
     }
 
     void Install_Hooks()

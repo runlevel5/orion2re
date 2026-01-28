@@ -837,7 +837,7 @@ namespace HOMEGEN {
                 Enforce_3_Planet_Minimum_(i);
 
                 int16_t climate_threshold = 8;
-                if (player->traits[15] != 0) { // Aquatic
+                if (player->traits[TRAIT_AQUATIC] != 0) { // Aquatic
                     climate_threshold = 5;
                 }
 
@@ -846,7 +846,7 @@ namespace HOMEGEN {
 
                 player->home_planet_id = home_planet_id;
 
-                if (player->traits[17] == 0) { // Not Large Home World
+                if (player->traits[TRAIT_LARGE_HOME_WORLD] == 0) { // Not Large Home World
                     Enforce_Medium_Planet_Size_(home_planet_id);
                 } else {
                     Set_Planet_Size(home_planet_id, 3); // PLANET_SIZE_LARGE
@@ -855,13 +855,13 @@ namespace HOMEGEN {
                 Enforce_Planet_Type_(i, home_planet_id);
                 Enforce_Planet_Abundant_Mineral_Class(home_planet_id);
 
-                if (player->traits[18] > 0) { // Rich Home World
+                if (player->traits[TRAIT_RICH_HOME_WORLD] > 0) { // Rich Home World
                     Enforce_Mineral_Richness_(home_planet_id, 3);
-                } else if (player->traits[18] < 0) { // Poor Home World
+                } else if (player->traits[TRAIT_RICH_HOME_WORLD] < 0) { // Poor Home World
                     Enforce_Mineral_Richness_(home_planet_id, 1);
                 }
 
-                if (player->traits[19] != 0) { // Ancient Home World (Artifacts)
+                if (player->traits[TRAIT_ANCIENT_HOME_WORLD] != 0) { // Ancient Home World (Artifacts)
                     Set_System_Planet_Artifact_Special(home_planet_id, i);
                 }
 
@@ -1032,8 +1032,8 @@ namespace HOMEGEN {
         // Mineral Class 4 = Ultra Rich
         if (MOX::_planet[planet_idx].mineral_class == MINERAL_RESOURCE_ULTRA_RICH) {
             // Trait index 0 corresponds to Heavy-G World
-            if (MOX::_player[player_idx].traits[0] == 0) {
-                uint8_t new_minerals = Get_Mineral_Class(MOX::_planet[planet_idx].star_index, planet_idx);
+            if (MOX::_player[player_idx].traits[TRAIT_HEAVY_G_WORLD] == 0) {
+                uint8_t new_minerals = MAPGEN::Generate_Mineral_Class_(MOX::_planet[planet_idx].star_index, planet_idx);
                 
                 // Logic quirk: The reassignment target is the planet at the player's slot index.
                 MOX::_planet[player_idx].mineral_class = (int8_t)new_minerals;

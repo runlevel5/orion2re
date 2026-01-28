@@ -22,4 +22,9 @@ namespace GEO {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x00413080})(x1, y1, x2, y2);
     }
+
+    inline bool __cdecl Map_Is_Connected_() {
+        using Fn = bool(__cdecl*)();
+        return reinterpret_cast<Fn>(0x00412F40)();
+    }
 }

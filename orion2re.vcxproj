@@ -22,6 +22,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
+    <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\game\misc.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
+    <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
     <ClCompile Include="src\game\platform.cpp" />

@@ -1,6 +1,12 @@
 #include "deps.h"
 
 namespace mouse {
+    int16_t __cdecl Mouse_Buffer_() {
+        int16_t old_flag = _mouse_buffer_flag;
+        _mouse_buffer_flag = 0;
+        return old_flag;
+    }
+
     uint16_t __cdecl Mouse_Button_() {
         if (_mouse_overide_flag == 0) {
             return g_mouse_buttons_state;
