@@ -5,7 +5,7 @@
 
 namespace allocate {
 #pragma pack(push, 1)
-    struct AllocationHeader {
+    struct s_alloc_header {
         uint32_t current;
         uint32_t size;
         uint32_t reserved2;

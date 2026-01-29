@@ -240,6 +240,9 @@ def _collect_referenced_global_data_symbols(func):
             dt = None
             try:
                 data = listing.getDataAt(to)
+                if (data is None) or (not data.isDefined()):
+                    # Handle references into the middle of a defined array/struct
+                    data = listing.getDataContaining(to)
                 if data is not None and data.isDefined():
                     dt = data.getDataType()
             except Exception:

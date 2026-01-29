@@ -219,6 +219,22 @@ namespace hooks {
         { 0x004664c0, &TRADE::Trade_Agreement_Goal_ },
         { 0x0043e780, &OFFICER::Owned_Officer_Level_ },
         { 0x0043e410, &OFFICER::Officer_Skill_Value_ },
+        { 0x00436230, &SHIPMOVE::Star_In_Normal_Range_Of_Player_ },
+        { 0x00466430, &TRADE::Process_Trade_Agreement_ },
+        { 0x004661f0, &TRADE::Get_Combined_Research_Points_ },
+        { 0x00466690, &TRADE::Research_Agreement_Goal_ },
+        { 0x004662f0, &TRADE::Compute_N_Trade_And_Research_Pops_ },
+        { 0x00437170, &SHIPMOVE::Update_All_Ship_Ranges_ },
+        { 0x00436f50, &SHIPMOVE::Allocate_New_Ship_Slots_ },
+        { 0x0047f0f0, &INITSHIP::Init_Ship_Designs_ },
+        { 0x00481dd0, &INITSHIP::Best_Ship_Fuel_ },
+        { 0x00481e50, &INITSHIP::Update_Player_Ship_Designs_ },
+        { 0x00536f23, &regions::Fill_Region_ },
+        { 0x0052d4d0, &random::Get_Random_Seed_ },
+        { 0x0052d4e0, &random::Randomize_ },
+        { 0x00466600, &TRADE::Process_Research_Agreement_ },
+        { 0x0052ce60, &strings::Swap_Short_ },
+        { 0x004811d0, &INITSHIP::Best_Warp_Drive_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -235,8 +251,10 @@ namespace hooks {
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
         ASSERT(sizeof(MOX::s_skill_data) == 18, "s_skill_data");
-        ASSERT(sizeof(TECHDATA::s_tech_application) == 13, "s_tech_application");
-        ASSERT(sizeof(TECHDATA::s_tech_field) == 23, "s_tech_field");
+        ASSERT(sizeof(TECHDATA::s_tech_fuel_data) == 10, "s_tech_fuel_data");
+        ASSERT(sizeof(TECHDATA::s_tech_app_data) == 13, "s_tech_app_data");
+        ASSERT(sizeof(TECHDATA::s_tech_field_data) == 23, "s_tech_field_data");
+        ASSERT(sizeof(TECHDATA::s_tech_drive_data) == 0x2e, "s_tech_drive_data");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
     }

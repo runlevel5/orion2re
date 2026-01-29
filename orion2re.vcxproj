@@ -38,6 +38,7 @@
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
+    <ClCompile Include="src\game\initship.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\mainscr.cpp" />
@@ -50,9 +51,11 @@
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
+    <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
+    <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
@@ -89,6 +92,7 @@
     <ClInclude Include="src\game\homegen.h" />
     <ClInclude Include="src\game\init.h" />
     <ClInclude Include="src\game\initgame.h" />
+    <ClInclude Include="src\game\initship.h" />
     <ClInclude Include="src\game\jim.h" />
     <ClInclude Include="src\game\ken.h" />
     <ClInclude Include="src\game\key.h" />

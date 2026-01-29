@@ -2,8 +2,6 @@
 
 #include <stdio.h>
 
-struct s_colony;
-
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {
     using Fn = int(__cdecl*)();
@@ -95,6 +93,12 @@ inline int __cdecl _atoi(const char* str) {
     using Fn = int(__cdecl*)(const char*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005415a0 });
     return fn(str);
+}
+
+inline uint32_t __cdecl _time(uint32_t* timer) {
+    using Fn = uint32_t(__cdecl*)(uint32_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541a20});
+    return fn(timer);
 }
 
 // Function wrappers
@@ -341,12 +345,6 @@ inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr
 
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 
-inline void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
-    using Fn = void(__cdecl*)(s_colony*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc4b0});
-    fn(colony);
-}
-
 inline void __cdecl All_Colony_Calculations_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f91d0});
@@ -393,4 +391,10 @@ inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
     using Fn = LRESULT(CALLBACK*)(HWND, UINT, WPARAM, LPARAM);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00536710 });
     return fn(hwnd, uMsg, wParam, lParam);
+}
+
+inline void __cdecl Set_Default_Ship_Name(uint16_t race, int16_t size, int16_t picture_mod, char* name) {
+    using Fn = void(__cdecl*)(uint16_t, int16_t, int16_t, char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042f830});
+    fn(race, size, picture_mod, name);
 }

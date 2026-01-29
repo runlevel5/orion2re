@@ -415,6 +415,7 @@ struct Settler_Info {
     uint8_t player : 4;
     uint8_t eta : 4;
     uint8_t job : 2;
+    uint8_t padding : 6;
 };
 
 struct s_ship_weapons {
@@ -429,7 +430,7 @@ struct s_ship_weapons {
 struct s_ship_design {
     char name[16];
     int8_t size;
-    int8_t ship_type;
+    uint8_t ship_type;
     int8_t shield_type;
     int8_t ftl_type;
     int8_t speed;
@@ -585,7 +586,7 @@ struct s_player {
     int8_t last_diplomacy_threat_turn[8];
     char delayed_diplomacy_orders[8];
     int8_t traits[31];
-    char evolutionary_upgrade_traits[31];
+    int8_t evolutionary_upgrade_traits[31];
     char picked_evolutionary_upgrade;
     char applied_evolutionary_upgrade;
     char fleet_history[350];
@@ -631,15 +632,14 @@ struct s_planet_data {
 };
 
 struct Pop_Info {
-    uint8_t player : 4;
-    uint8_t loyalty : 3;
-    uint8_t : 1;
-    uint8_t job : 2;
-    uint8_t employed : 1;
-    uint8_t conquered : 1;
-    uint8_t : 4;
-    uint8_t field5_0x2;
-    uint8_t field6_0x3;
+    uint32_t player : 4;
+    uint32_t loyalty : 3;
+    uint32_t job : 2;
+    uint32_t employed : 1;
+    uint32_t conquered : 1;
+    uint32_t unknown1 : 4;
+    uint32_t starve_priority : 2;
+    uint32_t unknown2 : 15;
 };
 
 struct s_colony {

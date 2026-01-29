@@ -1,10 +1,70 @@
 #include "deps.h"
 
 namespace TRADE {
-    /**
-     * Iterates through all players and their active treaties, processing 
-     * incremental trade and research benefits.
-     */
+    void __cdecl Process_Research_Agreement_(s_player* plr, int16_t target_plr_idx) {
+        int16_t goal = Research_Agreement_Goal_(plr, target_plr_idx);
+        int16_t current_level = plr->current_research_agreement_level[target_plr_idx];
+
+        if (current_level < goal) {
+            int16_t increment = 0;
+            int16_t remainder = goal % 5;
+
+            // Determine if an additional progress point is gained based on the remainder of the goal
+            if (remainder != 0) {
+                if (random::Random_(5) <= (int32_t)remainder) {
+                    increment = 1;
+                }
+            }
+
+            // Calculate the new level based on progress speed (goal / 5) and random increment
+            int16_t next_level = (goal / 5) + current_level + increment;
+
+            // Cap the progress at the goal
+            if (next_level <= goal) {
+                current_level = next_level;
+            } else {
+                current_level = goal;
+            }
+        } else {
+            // If already at or past the goal, reset/cap to the current goal
+            current_level = goal;
+        }
+
+        plr->research_agreement_goal[target_plr_idx] = goal;
+        plr->current_research_agreement_level[target_plr_idx] = current_level;
+    }
+
+    void __cdecl Process_Trade_Agreement_(s_player* plr, int16_t target_plr_idx) {
+        int16_t goal = Trade_Agreement_Goal_(plr, target_plr_idx);
+        int16_t current_level = plr->current_trade_agreement_level[target_plr_idx];
+
+        if (current_level < goal) {
+            int16_t increment = 0;
+            int16_t remainder = goal % 5;
+
+            // Roll for a bonus increment based on the remainder of the goal
+            if (remainder != 0) {
+                if (random::Random_(5) <= remainder) {
+                    increment = 1;
+                }
+            }
+
+            // The trade level grows by 20% of the goal value per step plus a potential bonus
+            current_level += (goal / 5) + increment;
+
+            // Clamp the level to the goal
+            if (current_level > goal) {
+                current_level = goal;
+            }
+        } else {
+            // If the goal is lower than current level, the level is set to the goal immediately
+            current_level = goal;
+        }
+
+        plr->trade_agreement_goal[target_plr_idx] = goal;
+        plr->current_trade_agreement_level[target_plr_idx] = current_level;
+    }
+
     void __cdecl Process_Trade_And_Research_Agreements_() {
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             // MOX::_player is an array of s_player structures (size 0xEA9)
@@ -27,12 +87,6 @@ namespace TRADE {
         Compute_N_Trade_And_Research_Pops_();
     }
 
-    /**
-     * @address 00466160
-     * Calculates the base goal value for a trade agreement between two players.
-     * The goal is half the minimum of the trade population of both players,
-     * further halved if either player is experiencing pirate activity.
-     */
     int16_t __cdecl Base_Trade_Agreement_Goal_(s_player* player, int16_t player_idx) {
         int16_t pops1 = MOX::_player[player_idx].n_trade_pops;
         int16_t pops2 = player->n_trade_pops;
@@ -51,12 +105,18 @@ namespace TRADE {
         return goal;
     }
 
-    /**
-     * @address 004664c0
-     * Calculates the total trade agreement goal, applying multipliers from player 
-     * traits (Federation, Confederation, Fantastic Traders) and the best applicable 
-     * leader bonus (Trader or Diplomat skills).
-     */
+    int32_t __cdecl Get_Combined_Research_Points_(s_player* plr, int16_t target_plr_idx) {
+        int16_t target_research_pops = MOX::_player[target_plr_idx].n_research_pops;
+        int16_t source_research_pops = plr->n_research_pops;
+
+        int16_t min_research_pops = target_research_pops;
+        if (source_research_pops < target_research_pops) {
+            min_research_pops = source_research_pops;
+        }
+
+        return static_cast<int32_t>(min_research_pops) / 2;
+    }
+
     int16_t __cdecl Trade_Agreement_Goal_(s_player* player, int16_t player_idx) {
         int trait_multiplier = 100;
         int16_t base_goal = Base_Trade_Agreement_Goal_(player, player_idx);
@@ -97,5 +157,56 @@ namespace TRADE {
         }
 
         return (static_cast<int>(base_goal) * (max_leader_bonus + trait_multiplier)) / 100;
+    }
+
+    int16_t __cdecl Research_Agreement_Goal_(s_player* plr, int16_t target_plr_idx) {
+        int combined_points = Get_Combined_Research_Points_(plr, target_plr_idx);
+        // The original logic truncates the combined points to 16 bits before applying modifiers.
+        int16_t base_value = static_cast<int16_t>(combined_points);
+
+        switch (plr->traits[0]) {
+            case 0:
+                return static_cast<int16_t>(static_cast<int>(base_value) / 2);
+            case 1:
+                return static_cast<int16_t>((static_cast<int>(base_value) * 3) / 4);
+            case 4:
+                return static_cast<int16_t>((static_cast<int>(base_value) * 3) / 2);
+            case 5:
+                return static_cast<int16_t>((static_cast<int>(base_value) * 7) / 4);
+            default:
+                // For other traits (e.g., cases 2, 3 or values > 5), the original 32-bit result is returned.
+                return static_cast<int16_t>(combined_points);
+        }
+    }
+
+    void __cdecl Compute_N_Trade_And_Research_Pops_() {
+        for (int i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+            MOX::_player[i].n_trade_pops = 0;
+            MOX::_player[i].n_research_pops = 0;
+        }
+
+        for (int i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+
+            if (colony->owner != (int8_t)-1) {
+                int16_t trade_pops = 0;
+                int16_t research_pops = 0;
+
+                for (int p = 0; p < (uint8_t)colony->n_pops; ++p) {
+                    Pop_Info* pop = &colony->pop[p];
+
+                    if (pop->player < 8) {
+                        trade_pops++;
+                        research_pops++;
+                    } else if (pop->player == 8 && pop->job == 2) {
+                        research_pops++;
+                    }
+                }
+
+                uint8_t owner_idx = (uint8_t)colony->owner;
+                MOX::_player[owner_idx].n_trade_pops += trade_pops;
+                MOX::_player[owner_idx].n_research_pops += research_pops;
+            }
+        }
     }
 }

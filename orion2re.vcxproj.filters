@@ -135,6 +135,15 @@
     <ClCompile Include="src\game\officer.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\initship.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\random.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\strings.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -324,6 +333,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\regions.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\initship.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

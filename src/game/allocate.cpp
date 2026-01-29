@@ -10,7 +10,7 @@ namespace allocate {
             padded_size = (size & 0xFFFFFFFC) + 4;
         }
 
-        uint32_t total_alloc_size = padded_size + sizeof(AllocationHeader);
+        uint32_t total_alloc_size = padded_size + sizeof(s_alloc_header);
 
         uint32_t* block = static_cast<uint32_t*>(Allocate_Far_Space_(total_alloc_size));
         if (block == nullptr) {
@@ -22,13 +22,13 @@ namespace allocate {
             }
         }
 
-        AllocationHeader* header = reinterpret_cast<AllocationHeader*>(block);
+        s_alloc_header* header = reinterpret_cast<s_alloc_header*>(block);
         header->current = 0;
         header->size = size; // Stores the original requested size, not the padded size
         header->reserved2 = 0;
 
         // Return pointer to the data region following the header
-        return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(block) + sizeof(AllocationHeader));
+        return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(block) + sizeof(s_alloc_header));
     }
 
     void Allocate_Data_Space_() {
@@ -81,7 +81,7 @@ namespace allocate {
         }
 
         const auto block_addr = reinterpret_cast<std::uintptr_t>(addr);
-        const auto block = reinterpret_cast<AllocationHeader*>(block_addr - 12);
+        const auto block = reinterpret_cast<s_alloc_header*>(block_addr - 12);
         return block->size - block->current;
     }
 
@@ -149,7 +149,7 @@ namespace allocate {
         // Pool metadata is stored in an AllocationHeader directly before the block pointer:
         // header->current : Current used offset within the pool
         // header->size    : Total capacity of the pool
-        auto* pool_header = reinterpret_cast<AllocationHeader*>(pool_base - sizeof(AllocationHeader));
+        auto* pool_header = reinterpret_cast<s_alloc_header*>(pool_base - sizeof(s_alloc_header));
 
         int32_t current_offset = static_cast<int32_t>(pool_header->current);
         int32_t capacity = static_cast<int32_t>(pool_header->size);
@@ -169,7 +169,7 @@ namespace allocate {
         pool_header->current = static_cast<uint32_t>(total_required);
 
         // Initialize the sub-block header using AllocationHeader.
-        auto* sub_block_header = reinterpret_cast<AllocationHeader*>(sub_block_start);
+        auto* sub_block_header = reinterpret_cast<s_alloc_header*>(sub_block_start);
         sub_block_header->current = 0;
         sub_block_header->size = size;
         sub_block_header->reserved2 = 0;

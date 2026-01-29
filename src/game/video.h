@@ -29,6 +29,7 @@ namespace video {
 	void Set_Refresh_Full_();
 	void Set_Page_Off_();
 
+	// TODO: These were re-implemented in platform
 	inline void __cdecl Copy_Off_To_Back_() {
 		using Fn = void(__cdecl*)();
 		reinterpret_cast<Fn>(std::uintptr_t{ 0x005286c0 })();

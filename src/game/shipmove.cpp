@@ -2,12 +2,124 @@
 
 namespace SHIPMOVE {
     /**
+     * Allocates new ship slots for Antarans and players based on quotas.
+     */
+    void __cdecl Allocate_New_Ship_Slots_() {
+        int antaran_limit = 0;
+        int16_t* ant_ptr = MOX::_antarans_ship_counts;
+        while (ant_ptr < MOX::_antarans_ship_counts_end) {
+            antaran_limit += *ant_ptr;
+            ant_ptr++;
+        }
+
+        if (antaran_limit < 21) {
+            antaran_limit += 2;
+        } else {
+            antaran_limit = 20;
+        }
+
+        int player_colony_ship_quotas[8] = { 0 };
+        if (MOX::_NUM_COLONIES > 0) {
+            for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+                s_colony& colony = MOX::_colony[i];
+                if (colony.owner != -1 && colony.outpost_flag == 0) {
+                    for (int j = 0; j < 7; ++j) {
+                        if (colony.producing[j] > -100) {
+                            player_colony_ship_quotas[(uint8_t)colony.owner]++;
+                        }
+                    }
+                }
+            }
+        }
+
+        int local_player_quota = player_colony_ship_quotas[MOX::_PLAYER_NUM];
+        if (MOX::_game_type == 0) {
+            if (local_player_quota > 20) {
+                local_player_quota = 20;
+            }
+        }
+
+        int available_indices[500];
+        int num_available_slots = 0;
+        int antaran_count = 0;
+        int local_player_count = 0;
+
+        for (int i = 0; i < 500; ++i) {
+            s_ship_data& ship = MOX::_ship[i];
+            if (i >= (int)MOX::_NUM_SHIPS || ship.status == 5) {
+                if (antaran_count < antaran_limit) {
+                    ship.owner = 8;
+                    antaran_count++;
+                } else if (local_player_count < local_player_quota) {
+                    ship.owner = (int8_t)MOX::_PLAYER_NUM;
+                    local_player_count++;
+                } else {
+                    available_indices[num_available_slots++] = i;
+                }
+            }
+        }
+
+        int player_allocated_counts[8] = { 0 };
+        player_allocated_counts[MOX::_PLAYER_NUM] = local_player_count;
+
+        int current_player = (int)MOX::_stardate % (int)MOX::_NUM_PLAYERS;
+        int ships_distributed = 0;
+
+        if (num_available_slots > 0) {
+            int players_skipped = 0;
+            while (ships_distributed < num_available_slots && players_skipped < (int)MOX::_NUM_PLAYERS) {
+                if (player_allocated_counts[current_player] < player_colony_ship_quotas[current_player]) {
+                    int ship_idx = available_indices[ships_distributed++];
+                    MOX::_ship[ship_idx].owner = (int8_t)current_player;
+                    player_allocated_counts[current_player]++;
+                    players_skipped = 0;
+                } else {
+                    players_skipped++;
+                }
+
+                current_player++;
+                if (current_player >= (int)MOX::_NUM_PLAYERS) {
+                    current_player = 0;
+                }
+            }
+        }
+
+        while (ships_distributed < num_available_slots) {
+            if (MOX::_player[current_player].eliminated == 0) {
+                int ship_idx = available_indices[ships_distributed++];
+                MOX::_ship[ship_idx].owner = (int8_t)current_player;
+                player_allocated_counts[current_player]++;
+            }
+
+            current_player++;
+            if (current_player >= (int)MOX::_NUM_PLAYERS) {
+                current_player = 0;
+            }
+        }
+    }
+
+    /**
+     * Iterates through all players to refresh their ship ranges,
+     * best warp drive technology, and current FTL speed.
+     */
+    void __cdecl Update_All_Ship_Ranges_() {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            s_player* current_player = &MOX::_player[i];
+
+            Update_Player_Ship_Range_(current_player);
+
+            current_player->best_ftl_drive = (char)INITSHIP::Best_Warp_Drive_(i);
+            current_player->ship_speed = (char)INITSHIP::Calc_Player_FTL_Speed_(i);
+        }
+    }
+
+    /**
      * Updates the movement range of the player's ships based on their researched fuel tech tiers.
      * Iterates backwards through fuel tiers 5 down to 1, checking if the required tech is level 3.
      */
     void __cdecl Update_Player_Ship_Range_(s_player* player) {
         for (int i = 5; i >= 1; --i) {
-            int16_t tech_idx = TECHDATA::_fuel[i].tech_index;
+            int16_t tech_idx = TECHDATA::_fuel[i].tech_app;
 
             // Check if the tech application for this fuel tier is fully researched (level 3)
             if (player->tech_applications[tech_idx] == 3) {
@@ -87,6 +199,17 @@ namespace SHIPMOVE {
         }
 
         return false;
+    }
+
+    /**
+     * Checks if a star is within the normal ship range of a player.
+     * @param star The target star.
+     * @param player_idx Index of the player.
+     * @return True if in range.
+     */
+    bool __cdecl Star_In_Normal_Range_Of_Player_(s_star_data* star, int16_t player_idx) {
+        int16_t range = MOX::_player[player_idx].ship_range;
+        return Star_In_Range_Of_Player_(star, player_idx, range);
     }
 
     /**

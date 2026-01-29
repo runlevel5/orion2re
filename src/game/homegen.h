@@ -4,6 +4,13 @@
 struct s_planet_data;
 
 namespace HOMEGEN {
+#pragma pack(push, 1)
+    struct s_star_dist {
+        int16_t dist;
+        int16_t index;
+    };
+#pragma pack(pop)    
+    
     inline const char* s_Found_no_satellites_after_3_MIN_e_0055adc8 =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055ADC8}); // "Found no satellites after 3 MIN epochs for star %d"
 

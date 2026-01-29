@@ -70,6 +70,7 @@
 #include "msg.h"
 #include "capture.h"
 #include "initship.h"
+#include "aidesign.h"
 #include "ships.h"
 #include "racecust.h"
 #include "racesel.h"
