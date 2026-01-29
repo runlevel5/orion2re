@@ -13,8 +13,21 @@ namespace video {
 	inline uint32_t*& _mouse_palette =
 		*reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00578AB0 });
 
-	inline uint32_t* _current_palette =
-		reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00579350 });
+#pragma pack(push, 1)
+	struct s_palette_entry {
+		uint8_t changed;
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+	};
+#pragma pack(pop)
+
+	// Address 0x579350 is the base of the current palette status array
+	inline s_palette_entry* _current_palette =
+		reinterpret_cast<s_palette_entry*>(std::uintptr_t{ 0x00579350 });
+
+	inline uint8_t& DAT_00579354 =
+		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579354 });
 
 	inline uint16_t& _copy_to_on_page_flag =
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578e60 });

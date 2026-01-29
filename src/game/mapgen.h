@@ -18,7 +18,7 @@ namespace MAPGEN {
     inline char (&_fill_msg)[36] = *reinterpret_cast<char (*)[36]>(std::uintptr_t{0x005A4B30});
     inline int16_t& _fill_msg_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4B54});
     inline int8_t& _first_time_map_is_generated = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005589A4});
-    inline uint8_t (&_special_count)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x0056CDBC});
+    inline uint8_t (&_special_count)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x0056CDC0});
     inline uint32_t& _n_stars = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDB0});
     inline uint32_t& DAT_0056CDC8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDC8});
     inline uint32_t (&_satellite_stat)[6] = *reinterpret_cast<uint32_t (*)[6]>(std::uintptr_t{0x005A4B00});

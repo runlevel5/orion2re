@@ -17,10 +17,6 @@ namespace MSG_ {
     inline s_MSG (&_msgs)[100] = *reinterpret_cast<s_MSG(*)[100]>(std::uintptr_t{0x005A6700});
     inline uint8_t (&_max_msgs)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A6E08});
 
-    inline void __cdecl Allocate_Msg_Slots_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004726E0})();
-    }
-
+    void __cdecl Allocate_Msg_Slots_();
     void __cdecl Add_Message(uint32_t header, uint32_t p2, uint32_t p3, uint32_t p4, uint16_t p5, int16_t buffer_idx);
 }

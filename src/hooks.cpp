@@ -235,6 +235,9 @@ namespace hooks {
         { 0x00466600, &TRADE::Process_Research_Agreement_ },
         { 0x0052ce60, &strings::Swap_Short_ },
         { 0x004811d0, &INITSHIP::Best_Warp_Drive_ },
+        { 0x0052b280, &palette::Set_Palette_Changes_ },
+        { 0x0052b2b0, &palette::Clear_Palette_Changes_ },
+        { 0x004726e0, &MSG_::Allocate_Msg_Slots_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -257,6 +260,7 @@ namespace hooks {
         ASSERT(sizeof(TECHDATA::s_tech_drive_data) == 0x2e, "s_tech_drive_data");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
+        ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
     }
 
     void Install_Hooks()
