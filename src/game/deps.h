@@ -84,3 +84,4 @@
 #include "regions.h"
 #include "setvesa.h"
 #include "graphics.h"
+#include "line.h"

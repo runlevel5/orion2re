@@ -357,18 +357,6 @@ inline void __cdecl Fade_Into_Main_Screen_() {
     fn();
 }
 
-inline void __cdecl Draw_Main_Screen_Filled_(int16_t filled_flag) {
-    using Fn = void(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C6550});
-    fn(filled_flag);
-}
-
-inline void __cdecl Draw_Main_Main_Screen_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C5700});
-    fn();
-}
-
 inline uint8_t __cdecl Monster_At_Star_(int star_idx) {
     using Fn = uint8_t(__cdecl*)(int);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc700});

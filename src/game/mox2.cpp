@@ -145,7 +145,6 @@ namespace MOX2 {
         MOX::_temp_string = 0;
 
         if (MOX2::_quick_start != 0) {
-            // Struct size 0xEA9 (3753 bytes)
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             if (MOX::Read_Moo_Custom_Player_Data_(player)) {
                 INITGAME::Init_New_Game_(

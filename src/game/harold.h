@@ -82,6 +82,8 @@ namespace HAROLD {
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
+    bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
+
     inline int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t planet_idx) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1520});

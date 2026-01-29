@@ -135,6 +135,9 @@ namespace MOX {
     inline void*& _global_cache_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
 
+    // Suggested name: MOX::_star_seg
+    inline void** _star_seg = reinterpret_cast<void**>(std::uintptr_t{0x0059B4C0});
+
     inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
 
     inline uint32_t& _global_cache_size =

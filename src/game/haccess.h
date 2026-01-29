@@ -13,4 +13,16 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049AF30});
         fn(star_idx, player_num, out_val);
     }
+
+    inline bool __cdecl Star_Has_Relocation_(int16_t star_idx, int16_t player_num) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049b5e0});
+        return fn(star_idx, player_num);
+    }
+
+    inline int16_t __cdecl Relocation_(int16_t star_idx, int16_t player_num) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ada0});
+        return fn(star_idx, player_num);
+    }
 }

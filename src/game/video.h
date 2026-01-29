@@ -57,4 +57,10 @@ namespace video {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
     }
+
+    inline void __stdcall Clip_On_() {
+        using Fn = void(__stdcall*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D00});
+        fn();
+    }
 }

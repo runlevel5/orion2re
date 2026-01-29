@@ -16,4 +16,10 @@ namespace SHIPS {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0041ec00})();
     }
+
+    inline void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* colors, int16_t line_type) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f560});
+        fn(x1, y1, x2, y2, colors, line_type);
+    }
 }

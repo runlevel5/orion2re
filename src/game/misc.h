@@ -26,4 +26,16 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e3f0});
         fn(a1, ctr, max, c1, c2, x, y, msg, bitmap, flag);
     }
+
+    inline void __stdcall Save_Window_Status_(uint16_t* status) {
+        using Fn = void(__stdcall*)(uint16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDC0});
+        fn(status);
+    }
+
+    inline void __stdcall Restore_Window_Status_(uint16_t status) {
+        using Fn = void(__stdcall*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDA0});
+        fn(status);
+    }
 }

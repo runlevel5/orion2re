@@ -84,7 +84,7 @@ namespace OFFICER {
                     // Logic from disassembly: resets total_value to 1 if field_id is invalid/negative
                     total_value = 1;
                 } else {
-                    total_value += OFFICER::map_1000_5000(TECHDATA::_technology_fields[field_id].cost);
+                    total_value += OFFICER::Get_Research_Cost_Skill_Value_(TECHDATA::_technology_fields[field_id].cost);
                 }
             }
         }

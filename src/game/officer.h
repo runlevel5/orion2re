@@ -19,7 +19,7 @@ namespace OFFICER {
         return fn(player_num, leader_index, skill_id);
     }
 
-    inline int16_t __cdecl map_1000_5000(uint32_t cost) {
+    inline int16_t __cdecl Get_Research_Cost_Skill_Value_(uint32_t cost) {
         using Fn = int16_t(__cdecl*)(uint32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e570});
         return fn(cost);

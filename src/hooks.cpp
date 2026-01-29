@@ -238,6 +238,13 @@ namespace hooks {
         { 0x0052b280, &palette::Set_Palette_Changes_ },
         { 0x0052b2b0, &palette::Clear_Palette_Changes_ },
         { 0x004726e0, &MSG_::Allocate_Msg_Slots_ },
+        { 0x004f1750, &HAROLD::Player_Has_Visited_ },
+        { 0x004c7550, &MAINSCR::Get_Star_Draw_Coords_ },
+        { 0x004c6fe0, &MAINSCR::Draw_Wormhole_Links_ },
+        { 0x004c6c90, &MAINSCR::Draw_Relocation_Links_ },
+        { 0x004cd120, &MAINSCR::Star_On_Screen_ },
+        { 0x004c6e50, &MAINSCR::Draw_Stars_ },
+        { 0x004c43e0, &MAINSCR::Get_Star_Picture_Seg_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

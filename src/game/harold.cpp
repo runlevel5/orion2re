@@ -338,6 +338,13 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f1750
+     */
+    bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
+        return (MOX::_star[star_idx].visited & (1 << (static_cast<uint8_t>(player_idx) & 0x1F))) != 0;
+    }
+
+    /**
      * @address 004f18f0
      */
     void __cdecl Set_All_Visited_Flags_() {
