@@ -29,11 +29,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Wormhole_Links_();
 
-    inline void __cdecl Draw_Paralax_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c6930});
-        fn();
-    }
+    void __cdecl Draw_Paralax_();
 
     void __cdecl Draw_Relocation_Links_();
 
@@ -41,11 +37,26 @@ namespace MAINSCR {
 
     void __cdecl Draw_Main_Main_Screen_();
 
-    inline void __cdecl Print_Star_Names_() {
+    inline void __cdecl Print_A_Star_Name_(int16_t star_idx, int32_t type, char* name_str, uint32_t data) {
+        using Fn = void(__cdecl*)(int16_t, int32_t, char*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ca720 });
+        fn(star_idx, type, name_str, data);
+    }
+
+
+    inline void __cdecl Get_Star_Name_(int16_t star_idx, int8_t unknown, int8_t* out_type, char* out_name, uint32_t* out_data) {
+        using Fn = void(__cdecl*)(int16_t, int8_t, int8_t*, char*, uint32_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ca430 });
+        fn(star_idx, unknown, out_type, out_name, out_data);
+    }
+
+    inline void __cdecl Fade_Into_Main_Screen_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cba80});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004CD7F0 });
         fn();
     }
+
+    void __cdecl Print_Star_Names_();
 
     void __cdecl Draw_Diplomacy_Request_Lights_();
 
@@ -63,15 +74,9 @@ namespace MAINSCR {
 
     void __cdecl Draw_Ship_Icons_(bool force_draw);
 
-    inline void __cdecl Set_Post_Fitted_Font_Style_(char c1, char c2) {
-        using Fn = void(__cdecl*)(char, char);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004cb8b0})(c1, c2);
-    }
+    void __cdecl Set_Post_Fitted_Font_Style_(uint8_t param_1, uint8_t param_2);
 
-    inline void __cdecl Get_Research_Unit_String_(char* buffer) {
-        using Fn = void(__cdecl*)(char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004cd930})(buffer);
-    }
+    void __cdecl Get_Research_Unit_String_(char* buffer);
 
     void __cdecl Print_Main_Screen_Data_();
 }

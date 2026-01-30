@@ -272,18 +272,6 @@ inline void __cdecl No_Op1_() {
     fn();
 }
 
-inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
-    using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519F90});
-    return fn(star1_idx, star2_idx);
-}
-
-inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f17d0});
-    return fn(star_idx);
-}
-
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
@@ -352,30 +340,7 @@ inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const ch
 inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});
 
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
-
-inline void __cdecl All_Colony_Calculations_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f91d0});
-    fn();
-}
-
-inline void __cdecl Fade_Into_Main_Screen_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CD7F0});
-    fn();
-}
-
-inline uint8_t __cdecl Monster_At_Star_(int star_idx) {
-    using Fn = uint8_t(__cdecl*)(int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc700});
-    return fn(star_idx);
-}
-
-inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
-    using Fn = int(__cdecl*)(int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc110});
-    return fn(player_idx);
-}
+inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
@@ -397,3 +362,8 @@ inline void __cdecl Set_Default_Ship_Name(uint16_t race, int16_t size, int16_t p
 
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
+
+inline const char* s_PR_00558238 = reinterpret_cast<const char*>(std::uintptr_t{0x00558238}); // "PR"
+inline const char* s_FP_00558240 = reinterpret_cast<const char*>(std::uintptr_t{0x00558240}); // "FP"
+inline const char* s_RP_00558248 = reinterpret_cast<const char*>(std::uintptr_t{0x00558248}); // "RP"
+inline const char* s_PI_00559994 = reinterpret_cast<const char*>(std::uintptr_t{0x00559994}); // "PI"

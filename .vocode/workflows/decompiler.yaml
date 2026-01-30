@@ -475,7 +475,11 @@ workflows:
             - If you create a new header files for namespaces that were not added before, make sure to include them in `src/game/deps.h`.
             - If the decompiled function already exists in the header as an external reference, remove the old external reference.
             - If the decompiled function is already implemented, update the implementation with the newly decompiled version.
-            - If old stub has a different address, you must update the address with a newer one.
+            - If old stub has a different address, you must apply one of the following rules:
+              - If it is function reference, you are allowed to update the old address
+              - If it is structure reference, do not update as you might have an address of one of the inner fields.
+              - If it is reference to a primitive, non-composite type, such as int variable - you are allowed to update.
+              - Otherwise do not update.
             - Avoid changing signatures of stubs that already exist. If you see an incompatible signature and you sure
               about it - add a type cast and a comment.
             - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Example:

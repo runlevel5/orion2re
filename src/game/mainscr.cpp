@@ -154,6 +154,32 @@ namespace MAINSCR {
         }
     }
 
+    void __cdecl Print_Star_Names_() {
+        int16_t window_status;
+        int8_t star_type;
+        uint32_t star_data;
+        char star_name[32];
+
+        star_type = 0;
+        star_data = 0;
+
+        MISC::Save_Window_Status_(&window_status);
+        graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
+        video::Clip_On_();
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                Get_Star_Name_(i, 0, &star_type, star_name, &star_data);
+
+                if (star_name[0] != '\0') {
+                    Print_A_Star_Name_(i, (int32_t)star_type, star_name, star_data);
+                }
+            }
+        }
+
+        MISC::Restore_Window_Status_(window_status);
+    }
+
     void __cdecl Draw_Main_Main_Screen_() {
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
@@ -233,6 +259,38 @@ namespace MAINSCR {
                 }
             }
         }
+
+        MISC::Restore_Window_Status_(window_status);
+    }
+
+    void __cdecl Draw_Paralax_() {
+        int16_t window_status;
+        MISC::Save_Window_Status_(&window_status);
+
+        // Define active window for parallax background
+        graphics::Set_Window_(22, 22, 527, 421); // 0x16, 0x16, 0x20F, 0x1A5
+        video::Clip_On_();
+
+        // Far Stars - Layer 0
+        MOX::_far_star_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 0, MOX::_global_cache_seg));
+        animate::Draw_(MOX::_far_star_x, MOX::_far_star_y, MOX::_far_star_seg);
+        animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y, MOX::_far_star_seg);
+        animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y - 480, MOX::_far_star_seg);
+        animate::Draw_(MOX::_far_star_x, MOX::_far_star_y - 480, MOX::_far_star_seg);
+
+        // Mid Stars - Layer 1
+        MOX::_mid_star_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 1, MOX::_global_cache_seg));
+        animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y, MOX::_mid_star_seg);
+        animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y, MOX::_mid_star_seg);
+        animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
+        animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
+
+        // Near Stars - Layer 2
+        MOX::_near_star_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 2, MOX::_global_cache_seg));
+        animate::Draw_(MOX::_near_star_x, MOX::_near_star_y, MOX::_near_star_seg);
+        animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y, MOX::_near_star_seg);
+        animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y - 480, MOX::_near_star_seg);
+        animate::Draw_(MOX::_near_star_x, MOX::_near_star_y - 480, MOX::_near_star_seg);
 
         MISC::Restore_Window_Status_(window_status);
     }
@@ -317,6 +375,38 @@ namespace MAINSCR {
                 star_idx++;
             } while (star_idx < num_stars);
         }
+    }
+
+    /**
+     * @brief Returns a 3-character unit abbreviation string for research points based on current language.
+     * 
+     * @param out Buffer of at least 3 bytes to store the result (including null terminator).
+     */
+    void __cdecl Get_Research_Unit_String_(char *out) {
+        const char *src;
+
+        switch (MOX::_settings.language) {
+            case 1: // French?
+                src = s_FP_00558240;
+                break;
+            case 2: // German?
+                src = s_PR_00558238;
+                break;
+            case 3: // Italian?
+                src = s_PI_00559994;
+                break;
+            case 4: // Spanish?
+                src = s_PR_00558238;
+                break;
+            default: // English (0) or others
+                src = s_RP_00558248;
+                break;
+        }
+
+        // Copies 3 bytes, typically 2 letters and the null terminator
+        out[0] = src[0];
+        out[1] = src[1];
+        out[2] = src[2];
     }
 
     void __cdecl Draw_Diplomacy_Request_Lights_() {
@@ -448,6 +538,18 @@ namespace MAINSCR {
 
         Print_Star_Names_();
         Print_Main_Screen_Data_();
+    }
+
+    void __cdecl Set_Post_Fitted_Font_Style_(uint8_t param_1, uint8_t param_2) {
+        int16_t style = MISC::Get_Font_Style_();
+        int16_t spacing = MISC::Get_Font_Spacing_();
+        uint8_t colors[8];
+
+        MISC::Get_Mox_Font_Colors_(style, static_cast<char>(param_1), static_cast<char>(param_2), colors);
+
+        fonts::Set_Outline_Color_(2, 1);
+        fonts::Set_Font_Style_Outline_(style, colors);
+        fonts::Set_Font_Spacing_(spacing);
     }
 
     void __cdecl Print_Main_Screen_Data_(void) {

@@ -250,16 +250,15 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
     /**
      * @brief Generates initial data for a satellite (moon) in a star system.
-     * @param star_index Index of the star this satellite orbits.
      */
-    void __cdecl Generate_Satellite_(int16_t star_index) {
+    void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t type) {
         s_planet_data* planet = &MOX::_planet[MOX::_planet_count];
 
-        planet->star_index = (int8_t)star_index;
+        planet->star_index = (int8_t)star_idx;
 
         planet->size = Generate_Size_();
 
-        planet->mineral_class = Generate_Mineral_Class_(star_index, MOX::_planet_count);
+        planet->mineral_class = Generate_Mineral_Class_(star_idx, MOX::_planet_count);
 
         Get_Climate_Modifier_(planet->mineral_class);
 
@@ -271,7 +270,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         planet->climate_bg_type = (int8_t)(random::Random_(3) - 1);
 
-        Set_Secondary_Planet_Data_(star_index, MOX::_planet_count);
+        Set_Secondary_Planet_Data_(star_idx, MOX::_planet_count);
     }
 
     void __cdecl Set_Secondary_Planet_Data_(int16_t star_idx, int16_t planet_idx) {
@@ -737,6 +736,53 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
     }
 
+    /**
+     * @brief Initializes the main screen map dimensions and zoom levels based on galaxy size.
+     * 
+     * @param size The galaxy size (0-3). Note: the parameter is ignored in favor of 
+     *             HAROLD::Galaxy_Size_From_N_Stars_().
+     */
+    void __cdecl Init_Main_Screen_(uint8_t size) {
+        int16_t galaxy_size = HAROLD::Galaxy_Size_From_N_Stars_();
+
+        switch (galaxy_size) {
+        case 0:
+            MOX::_MAP_MAX_X = 0x1FA;
+            MOX::_MAP_MAX_Y = 0x190;
+            MOX::_cur_map_scale = 10;
+            MOX::_max_map_scale = 10;
+            MOX::_max_zoom_count = 0;
+            MOX::_zoom_count = 0;
+            break;
+        case 1:
+            MOX::_MAP_MAX_X = 0x2F7;
+            MOX::_MAP_MAX_Y = 0x258;
+            MOX::_cur_map_scale = 15;
+            MOX::_max_map_scale = 15;
+            MOX::_max_zoom_count = 1;
+            MOX::_zoom_count = 1;
+            break;
+        case 2:
+            MOX::_MAP_MAX_X = 0x3F4;
+            MOX::_MAP_MAX_Y = 0x320;
+            MOX::_cur_map_scale = 20;
+            MOX::_max_map_scale = 20;
+            MOX::_max_zoom_count = 2;
+            MOX::_zoom_count = 2;
+            break;
+        case 3:
+            MOX::_MAP_MAX_X = 0x5EE;
+            MOX::_MAP_MAX_Y = 0x4B0;
+            MOX::_cur_map_scale = 30;
+            MOX::_max_map_scale = 30;
+            MOX::_max_zoom_count = 3;
+            MOX::_zoom_count = 3;
+            break;
+        default:
+            break;
+        }
+    }
+
     void __cdecl Load_Nebula_Pictures_() {
         bool first_load = true;
         uint8_t num_nebulas = MOX::_NUM_NEBULAS;
@@ -807,6 +853,26 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         return result;
+    }
+
+    void __cdecl Planet_Generation_(int16_t star_idx) {
+        int16_t orbit_res = Generate_Orbit_(star_idx);
+        int8_t orbit = (int8_t)orbit_res;
+        int16_t type = Generate_Satellite_Type_(star_idx, orbit);
+
+        // Check if satellite type is Small (1), Medium (2), or Large (3)
+        if (type == 1 || type == 2 || type == 3) {
+            MOX::_star[star_idx].planet_index[orbit] = (int16_t)MOX::_planet_count;
+
+            s_planet_data& planet = MOX::_planet[MOX::_planet_count]; // size: 17
+            planet.orbit = orbit;
+            planet.planet_type = (int8_t)type;
+
+            Generate_Satellite_(star_idx, orbit, type);
+
+            MOX::_planet_count++;
+            _n_planets++;
+        }
     }
 
     int16_t __cdecl Home_Planet_(int16_t planet_id) {

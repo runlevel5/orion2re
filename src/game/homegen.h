@@ -106,5 +106,9 @@ namespace HOMEGEN {
         return fn(star_idx);
     }
 
-
+    inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
+        using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00519F90 });
+        return fn(star1_idx, star2_idx);
+    }
 }

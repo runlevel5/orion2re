@@ -623,4 +623,26 @@ namespace HAROLD {
 
         return MOX::_given_chance_to_rename_home_star;
     }
+
+    /**
+     * @address 004f1050
+     */
+    int16_t __cdecl Galaxy_Size_From_N_Stars_() {
+        int16_t default_galaxy_size = static_cast<int16_t>(static_cast<int8_t>(MOX::_settings.galaxy_size));
+
+        if (MOX::_NUM_STARS <= 20) {
+            return 0;
+        }
+        if (MOX::_NUM_STARS <= 36) {
+            return 1;
+        }
+        if (MOX::_NUM_STARS <= 54) {
+            return 2;
+        }
+        if (MOX::_NUM_STARS <= 72) {
+            return 3;
+        }
+
+        return default_galaxy_size;
+    }
 }

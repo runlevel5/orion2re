@@ -221,4 +221,22 @@ namespace COLCALC {
 
         return Chance_For_Research_Breakthrough_Aux_(accumulated_total, produced, cost);
     }
+
+    int32_t __cdecl Chance_For_Research_Breakthrough_Aux_(int32_t accumulated_total, int32_t produced, int32_t cost) {
+        int32_t chance = 0;
+
+        if (cost > 0 && cost < accumulated_total) {
+            chance = ((accumulated_total - cost) * 100) / cost;
+
+            if (chance > 100) {
+                return 100;
+            }
+
+            if (chance == 0) {
+                chance = 1;
+            }
+        }
+
+        return chance;
+    }
 }

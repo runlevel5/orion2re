@@ -71,7 +71,7 @@ namespace HOMEGEN {
                     p->orbit = orbit;
                     p->planet_type = 3; // Terran
 
-                    MAPGEN::Generate_Satellite_(target_star_idx);
+                    MAPGEN::Generate_Satellite_(target_star_idx, orbit, 3);
                     MOX::_planet_count++;
                 }
             }
@@ -567,7 +567,7 @@ namespace HOMEGEN {
         planet.orbit = (int8_t)orbit_idx;
         planet.planet_type = 3;
 
-        MAPGEN::Generate_Satellite_(star_idx);
+        MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit_idx, 3);
         MAPGEN::_make_food_planet = 0;
 
         if (MOX::_planet_count == planet_idx) {
@@ -796,7 +796,7 @@ namespace HOMEGEN {
                     MOX::_planet[existing_planet_idx].orbit = (int8_t)orbit;
                     MOX::_planet[existing_planet_idx].planet_type = 3; // PLANET_TYPE_PLANET
 
-                    MAPGEN::Generate_Satellite_(star_idx);
+                    MAPGEN::Generate_Satellite_(star_idx, (int8_t)orbit, 3);
                     
                     MOX::_planet_count = saved_global_count;
                 }

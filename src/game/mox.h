@@ -98,7 +98,15 @@ namespace MOX {
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
     inline uint8_t& _mouse_list_arrow = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
-    
+
+    inline int16_t& _mid_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059643C});
+    inline int16_t& _mid_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596444});
+    inline int16_t& _far_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAE});
+    inline int16_t& _far_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CB6});
+    inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
+    inline int16_t& _near_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA8});
+    inline animate::s_animation_header*& _near_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x00597424});
+
     inline void*& _special_names_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
 
@@ -140,6 +148,9 @@ namespace MOX {
 
     inline void*& _global_cache_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
+
+    inline animate::s_animation_header*& _mid_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B610});
+    inline animate::s_animation_header*& _far_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A17B0});
 
     // Suggested name: MOX::_star_seg
     inline animate::s_animation_header** _star_seg = reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B4C0});

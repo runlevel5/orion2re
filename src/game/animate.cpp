@@ -91,6 +91,14 @@ namespace animate {
         return anim->frame_count;
     }
 
+    int16_t __cdecl Get_Width_(s_animation_header* anim) {
+        return anim->width;
+    }
+
+    int16_t __cdecl Get_Height_(s_animation_header* animation) {
+        return animation->height;
+    }
+
     void __cdecl Reset_Animation_Frame_(s_animation_header* anim) {
         anim->current_frame = 0;
     }
@@ -302,6 +310,36 @@ namespace animate {
                 screen_offset += screen_stride;
                 rows_remaining--;
             } while (rows_remaining != 0);
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        uint32_t sprite_idx = 0;
+
+        for (uint32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+            uint32_t current_out_pos = page_offset;
+
+            while (true) {
+                int8_t skip_count = static_cast<int8_t>(sprite[sprite_idx]);
+                int8_t run_length = static_cast<int8_t>(sprite[sprite_idx + 1]);
+                sprite_idx += 2;
+
+                if (run_length == 0) {
+                    break;
+                }
+
+                current_out_pos += skip_count;
+
+                uint32_t bytes_to_copy = static_cast<uint32_t>(run_length) * 4;
+
+                for (uint32_t i = 0; i < bytes_to_copy; ++i) {
+                    video::_current_video_page[current_out_pos++] = sprite[sprite_idx++];
+                }
+            }
         }
 
         platform::Unlock_Appropriate_Render_Buffer();

@@ -20,6 +20,7 @@ namespace MAPGEN {
     inline int8_t& _first_time_map_is_generated = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005589A4});
     inline uint8_t (&_special_count)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x0056CDC0});
     inline uint32_t& _n_stars = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDB0});
+    inline uint32_t& _n_planets = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDBC});
     inline uint32_t& DAT_0056CDC8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDC8});
     inline uint32_t (&_satellite_stat)[6] = *reinterpret_cast<uint32_t (*)[6]>(std::uintptr_t{0x005A4B00});
     inline uint32_t (&_nebula_stat)[20] = *reinterpret_cast<uint32_t (*)[20]>(std::uintptr_t{0x005A4AE0});
@@ -42,7 +43,12 @@ namespace MAPGEN {
     uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
     uint8_t __cdecl Generate_Max_Farms_(int16_t star_idx, int16_t planet_idx);
     int8_t __cdecl Generate_Orbit_(int16_t star_id);
-    void __cdecl Generate_Satellite_(int16_t star_idx);
+    inline int16_t __cdecl Generate_Satellite_Type_(int16_t star_idx, int8_t orbit) {
+        using Fn = int16_t(__cdecl*)(int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B64E0});
+        return fn(star_idx, orbit);
+    }
+    void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t type);
     uint8_t __cdecl Generate_Size_();
 
     int8_t __cdecl Generate_Mineral_Class_(int16_t star_index, int16_t planet_count);
@@ -65,10 +71,7 @@ namespace MAPGEN {
 
     void __cdecl Randomize_Star_Names_(uint16_t* star_name_indices);
 
-    inline void __cdecl Init_Main_Screen_(uint8_t size) {
-        using Fn = void(__cdecl*)(uint8_t);
-        reinterpret_cast<Fn>(0x004B6C40)(size);
-    }
+    void __cdecl Init_Main_Screen_(uint8_t size);
     
     void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t nebula_freq);
 
@@ -82,10 +85,7 @@ namespace MAPGEN {
 
     void __cdecl Copy_Name_To_Star_(int16_t star_idx);
     int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx);
-    inline void __cdecl Planet_Generation_(int16_t star_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x004B81C0)(star_idx);
-    }
+    void __cdecl Planet_Generation_(int16_t star_idx);
     void __cdecl Generate_Star_Special_(int16_t star_idx, void* param_2, uint8_t* special_counts);
     void __cdecl Black_Hole_Fix_(int16_t gal_age);
 

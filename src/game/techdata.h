@@ -50,9 +50,9 @@ namespace TECHDATA {
     };
     #pragma pack(pop)
 
-    inline s_building_data* _buildings = reinterpret_cast<s_building_data*>(std::uintptr_t{ 0x005542f0 });
-    inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x0055575E });
-    inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{0x005537CE});
-    inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(std::uintptr_t{0x00553062});
+    inline s_building_data* _buildings = reinterpret_cast<s_building_data*>(std::uintptr_t{ 0x00554290 });
+    inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
+    inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
+    inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(std::uintptr_t{ 0x00553050 });
     inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
 }

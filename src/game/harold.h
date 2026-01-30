@@ -86,6 +86,8 @@ namespace HAROLD {
         return fn(star_idx);
     }
 
+    int16_t __cdecl Galaxy_Size_From_N_Stars_();
+
     void __cdecl Restore_Mouse_List_();
 
     void __cdecl Load_Leader_Titles();
@@ -118,6 +120,12 @@ namespace HAROLD {
         using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, bool);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f1190 });
         fn(star_idx, player_counts, total_count, hide_if_no_lore);
+    }
+
+    inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f17d0 });
+        return fn(star_idx);
     }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"

@@ -295,6 +295,18 @@ namespace hooks {
         { 0x0049af30, &HACCESS::Set_Colony_Auto_Select_For_Star_ },
         { 0x0049ada0, &HACCESS::Relocation_ },
         { 0x0049b1e0, &HACCESS::Ship_Icon_Owner_ },
+        { 0x00524d20, &animate::Get_Width_ },
+        { 0x00524d30, &animate::Get_Height_ },
+        { 0x00524BB0, &animate::Draw_Glassed_Screen_Background_Off_ },
+        { 0x004f7470, &COLCALC::Chance_For_Research_Breakthrough_Aux_ },
+        { 0x004ba680, &ERIC::Get_Fade_Percent_ },
+        { 0x004c6930, &MAINSCR::Draw_Paralax_ },
+        { 0x004b6c40, &MAPGEN::Init_Main_Screen_ },
+        { 0x004f1050, &HAROLD::Galaxy_Size_From_N_Stars_ },
+        { 0x004b81c0, &MAPGEN::Planet_Generation_ },
+        { 0x004cb8b0, &MAINSCR::Set_Post_Fitted_Font_Style_ },
+        { 0x004cd930, &MAINSCR::Get_Research_Unit_String_ },
+        { 0x004cba80, &MAINSCR::Print_Star_Names_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

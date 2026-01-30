@@ -30,15 +30,8 @@ namespace animate {
     int16_t __cdecl Get_Animation_Frame_Count_(s_animation_header* seg);
     int16_t __cdecl Get_Current_Frame_(s_animation_header* animation);
 
-    inline int16_t __cdecl Get_Width_(s_animation_header* anim) {
-        using Fn = int16_t(__cdecl*)(s_animation_header*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00524d20})(anim);
-    }
-
-    inline int16_t __cdecl Get_Height_(s_animation_header* anim) {
-        using Fn = int16_t(__cdecl*)(s_animation_header*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00524d30})(anim);
-    }
+    int16_t __cdecl Get_Width_(s_animation_header* anim);
+    int16_t __cdecl Get_Height_(s_animation_header* anim);
 
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* resource);
 
@@ -54,10 +47,7 @@ namespace animate {
 
     void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite);
 
-    inline void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* data) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        reinterpret_cast<Fn>(0x00524BB0)(data);
-    }
+    void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite);
 
     void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
 }

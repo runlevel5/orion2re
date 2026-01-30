@@ -1,6 +1,10 @@
 #include "deps.h"
 
 namespace ERIC {
+    uint16_t __cdecl Get_Fade_Percent_() {
+        return _fade_percent;
+    }
+
     void __cdecl Eric_Defaults_() {
     }
 

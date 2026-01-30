@@ -10,8 +10,5 @@ namespace ERIC {
 
     int16_t __cdecl Get_Sint_Index_From_List_(int16_t value, const int16_t* list, uint16_t count);
 
-    inline uint16_t __cdecl Get_Fade_Percent_() {
-        using Fn = uint16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004BA680)();
-    }
+    uint16_t __cdecl Get_Fade_Percent_();
 }

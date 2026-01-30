@@ -29,12 +29,27 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004f73e0})(plr, field_idx);
     }
 
-    inline int32_t __cdecl Chance_For_Research_Breakthrough_Aux_(int accumulated, int produced, int cost) {
-        using Fn = int32_t(__cdecl*)(int, int, int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f7470})(accumulated, produced, cost);
-    }
+    int32_t __cdecl Chance_For_Research_Breakthrough_Aux_(int32_t accumulated_total, int32_t produced, int32_t cost);
 
     int16_t __cdecl Player_N_Turns_Until_Research_Complete_(s_player* plr);
 
     int32_t __cdecl Chance_For_Research_Breakthrough_(s_player* plr);
+
+    inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
+        using Fn = int(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fc110 });
+        return fn(player_idx);
+    }
+
+    inline uint8_t __cdecl Monster_At_Star_(int star_idx) {
+        using Fn = uint8_t(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fc700 });
+        return fn(star_idx);
+    }
+
+    inline void __cdecl All_Colony_Calculations_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91d0 });
+        fn();
+    }
 }
