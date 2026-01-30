@@ -28,6 +28,7 @@
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
+    <ClCompile Include="src\game\draw.cpp" />
     <ClCompile Include="src\game\eric.cpp" />
     <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exitm.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\bill.h" />
     <ClInclude Include="src\game\capture.h" />
+    <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\colcalc.h" />
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\consts.h" />
@@ -79,6 +81,7 @@
     <ClInclude Include="src\game\diplodef.h" />
     <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dos.h" />
+    <ClInclude Include="src\game\draw.h" />
     <ClInclude Include="src\game\eric.h" />
     <ClInclude Include="src\game\events.h" />
     <ClInclude Include="src\game\exitm.h" />

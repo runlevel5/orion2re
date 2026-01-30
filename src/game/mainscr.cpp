@@ -26,7 +26,7 @@ namespace MAINSCR {
         *out_y = scaled_y + 0x15;
     }
 
-    void* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size) {
+    animate::s_animation_header* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size) {
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
         int16_t class_offset = (int16_t)spectral_class * 6;
 
@@ -38,11 +38,11 @@ namespace MAINSCR {
 
         int32_t final_index = (int32_t)result_ax;
 
-        MOX::_star_seg[final_index] = Buffer_Reload_(
+        MOX::_star_seg[final_index] = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(
             s_BUFFER0_LBX,
             final_index + 148,
             MOX::_global_cache_seg
-        );
+        ));
 
         return MOX::_star_seg[final_index];
     }
@@ -123,7 +123,7 @@ namespace MAINSCR {
         int16_t zoom_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
         s_star_data* star = &MOX::_star[star_idx];
 
-        void* star_seg = Get_Star_Picture_Seg_(star->spectral_class, star->pict_type, star->size);
+        animate::s_animation_header* star_seg = Get_Star_Picture_Seg_(star->spectral_class, star->pict_type, star->size);
 
         int16_t screen_x;
         int16_t screen_y;
@@ -133,12 +133,12 @@ namespace MAINSCR {
         screen_y -= zoom_size / 2;
 
         if (static_cast<int8_t>(star->not_used1) < 0) {
-            animate::Reset_Animation_Frame_(static_cast<int16_t*>(star_seg));
+            animate::Reset_Animation_Frame_(star_seg);
             animate::Draw_(screen_x, screen_y, star_seg);
         } else {
             star->not_used1++;
 
-            int16_t frame_count = animate::Get_Animation_Frame_Count_(static_cast<int16_t*>(star_seg));
+            int16_t frame_count = animate::Get_Animation_Frame_Count_(star_seg);
 
             if (static_cast<int8_t>(star->not_used2) <= static_cast<int8_t>(star->not_used1)) {
                 int32_t remaining = static_cast<int32_t>(_n_twinkling_stars) - 1;
@@ -149,8 +149,55 @@ namespace MAINSCR {
             }
 
             int32_t current_frame = (static_cast<int16_t>(star->not_used1) / 2) % frame_count;
-            animate::Set_Animation_Frame_(static_cast<int16_t*>(star_seg), current_frame);
+            animate::Set_Animation_Frame_(star_seg, current_frame);
             animate::Draw_(screen_x, screen_y, star_seg);
+        }
+    }
+
+    void __cdecl Draw_Main_Main_Screen_() {
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Wormhole_Links_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Relocation_Links_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Stars_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Gate_Icons_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Print_Star_Names_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Black_Holes_();
+        MOX::Mox_Update_();
+
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Ship_Icons_(true);
+        MOX::Mox_Update_();
+
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+        Print_Main_Screen_Data_();
+        MOX::Mox_Update_();
+
+        if (MOX::_game_type != 0) {
+            Draw_Diplomacy_Request_Lights_();
+            MOX::Mox_Update_();
         }
     }
 
@@ -236,7 +283,7 @@ namespace MAINSCR {
                     x -= offset;
                     y -= offset;
 
-                    void* seg = Get_Star_Picture_Seg_(star.spectral_class, star.pict_type, star.size);
+                    animate::s_animation_header* seg = Get_Star_Picture_Seg_(star.spectral_class, star.pict_type, star.size);
 
                     uint8_t count = MOX::_black_hole_anim_count[bh_anim_idx];
                     int16_t num_frames = animate::Get_Animation_Frame_Count_(seg);
@@ -272,6 +319,69 @@ namespace MAINSCR {
         }
     }
 
+    void __cdecl Draw_Diplomacy_Request_Lights_() {
+        int16_t drawn_count = 0;
+        uint8_t requesting_mask = NETMOX::Humans_Requesting_Diplomacy_();
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if ((requesting_mask >> (i & 0x1f)) & 1) {
+                uint8_t color_idx = static_cast<uint8_t>(MOX::_player[i].color);
+                animate::s_animation_header* light_anim = _player_lights_seg[color_idx];
+
+                // Calculate horizontal position based on width of first light segment
+                int16_t base_width = animate::Get_Width_(_player_lights_seg[0]);
+                int16_t x_pos = 0x1fa - (base_width * drawn_count);
+
+                // Discarded calls from original code
+                animate::Get_Width_(light_anim);
+                animate::Get_Height_(light_anim);
+
+                int16_t saved_frame = animate::Get_Current_Frame_(static_cast<animate::s_animation_header*>(light_anim));
+
+                // Render current animation frame for diplomacy alert
+                animate::Set_Animation_Frame_(light_anim, static_cast<uint8_t>(_diplo_lights_anim_frame[color_idx]));
+                animate::Draw_(x_pos, 5, light_anim);
+
+                // Advance animation frame
+                uint8_t next_frame = _diplo_lights_anim_frame[color_idx] + 1;
+                _diplo_lights_anim_frame[color_idx] = next_frame;
+
+                if (animate::Get_Animation_Frame_Count_(light_anim) <= static_cast<int16_t>(next_frame)) {
+                    _diplo_lights_anim_frame[color_idx] = 0;
+                }
+
+                drawn_count++;
+
+                // Restore previous animation frame for the segment
+                animate::Set_Animation_Frame_(light_anim, saved_frame);
+            }
+        }
+    }
+
+    void __cdecl Draw_Nebulae_() {
+        if (MOX::_NUM_NEBULAS == 0) {
+            return;
+        }
+
+        s_nebula* nebula_list = MOX::_nebula;
+
+        for (uint16_t i = 0; i < static_cast<uint16_t>(MOX::_NUM_NEBULAS); ++i) {
+            int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+            animate::s_animation_header* sprite_ptr = MOX::_nebula_pict_seg[i][zoom_level];
+
+            animate::Get_Width_(sprite_ptr);
+            animate::Get_Height_(sprite_ptr);
+
+            int16_t dx = nebula_list[i].x - MOX::_cur_map_x;
+            int16_t screen_x = HAROLD::Get_Scaled_Value_(dx) + 0x15;
+
+            int16_t dy = nebula_list[i].y - MOX::_cur_map_y;
+            int16_t screen_y = HAROLD::Get_Scaled_Value_(dy) + 0x15;
+
+            animate::Draw_(static_cast<int32_t>(screen_x), static_cast<int32_t>(screen_y), sprite_ptr);
+        }
+    }
+
     void __cdecl Draw_Ship_Icons_(bool force_draw) {
         int16_t selected_icon_id = -1;
 
@@ -285,7 +395,7 @@ namespace MAINSCR {
             SHIPS::Get_Ship_Icon_Coords_(i, &x, &y);
 
             int16_t owner = HACCESS::Ship_Icon_Owner_(i);
-            void* pict_seg = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 0);
+            animate::s_animation_header* pict_seg = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 0);
 
             MOX::_ship_icon[i].x = x;
             MOX::_ship_icon[i].y = y;
@@ -295,6 +405,49 @@ namespace MAINSCR {
                 animate::Draw_(x, y, pict_seg);
             }
         }
+    }
+
+    void __cdecl Draw_Main_Screen_Filled_(int16_t should_copy_to_back) {
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+        graphics::Set_Window_(0, 0, 0x27F, 0x1DF);
+        video::Clip_On_();
+
+        Draw_Paralax_();
+
+        MOX::_main_screen_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+        animate::Draw_(0, 0, MOX::_main_screen_seg);
+
+        Draw_Wormhole_Links_();
+        Draw_Relocation_Links_();
+
+        if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+            MOX::_mainscrn_diplo_lights_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            animate::Draw_(415, 0, MOX::_mainscrn_diplo_lights_seg);
+        }
+
+        if (MOX::_game_type == 2 || MOX::_game_type == 3 || MOX::_game_type == 1) {
+            MOX::_mainscrn_plyr_done_lights_seg = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            animate::Draw_(74, 0, MOX::_mainscrn_plyr_done_lights_seg);
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+
+        graphics::Set_Window_(22, 22, 527, 421);
+        video::Clip_On_();
+        Draw_Nebulae_();
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+
+        if (should_copy_to_back == 1) {
+            video::Copy_Off_To_Back_();
+        }
+
+        Print_Star_Names_();
+        Print_Main_Screen_Data_();
     }
 
     void __cdecl Print_Main_Screen_Data_(void) {

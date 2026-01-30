@@ -29,8 +29,8 @@ namespace video {
 	inline uint8_t& DAT_00579354 =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579354 });
 
-	inline uint16_t& _copy_to_on_page_flag =
-		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578e60 });
+	inline int16_t& _copy_to_on_page_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578e60 });
 
 	inline int16_t& _screen_window_y1 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DF4 });
 	inline int16_t& _screen_window_y2 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DF8 });
@@ -59,8 +59,8 @@ namespace video {
         reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
     }
 
-    inline void __stdcall Clip_On_() {
-        using Fn = void(__stdcall*)();
+    inline void __cdecl Clip_On_() {
+        using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D00});
         fn();
     }

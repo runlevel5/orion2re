@@ -1,4 +1,4 @@
 # Notes
-1. animate::Set_Animation_Frame_ and co seem to use some sort of header, create struct?
-1. 
 
+1. 1. animate::Draw_ uses bitmap flag check - add constants
+2. 

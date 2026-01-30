@@ -809,9 +809,10 @@ struct s_good_star {
     uint16_t star_count;        // Offset 0x129 (297 decimal)
 }; // Total size: 299 bytes (0x12B)
 
-struct s_nebula_data {
-    uint8_t unknown[4];
-    uint8_t type;
+struct s_nebula {
+    int16_t x;
+    int16_t y;
+    int8_t type;
 };
 
 #pragma	pack(pop)

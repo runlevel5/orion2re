@@ -379,7 +379,7 @@ namespace HOMEGEN {
         }
 
         video::Set_Page_Back_();
-        void* lbx_buf = Buffer_Reload_(MAPGEN::s_raceopt_lbx, 0, MOX::_global_cache_seg);
+        animate::s_animation_header* lbx_buf = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_(MAPGEN::s_raceopt_lbx, 0, MOX::_global_cache_seg));
         animate::Draw_(0, 0, lbx_buf);
         video::Copy_Back_To_Off_();
 

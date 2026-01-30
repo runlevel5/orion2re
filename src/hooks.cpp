@@ -245,8 +245,8 @@ namespace hooks {
         { 0x004cd120, &MAINSCR::Star_On_Screen_ },
         { 0x004c6e50, &MAINSCR::Draw_Stars_ },
         { 0x004c43e0, &MAINSCR::Get_Star_Picture_Seg_ },
+        { 0x00524d40, &animate::Get_Current_Frame_ },
         { 0x00524d90, &animate::Set_Animation_Frame_ },
-        { 0x00524d50, &animate::Get_Animation_Frame_Count_ },
         { 0x00524d80, &animate::Reset_Animation_Frame_ },
         { 0x004c6eb0, &MAINSCR::Draw_A_Star_ },
         { 0x004f16d0, &HAROLD::Player_Has_Stargate_ },
@@ -270,6 +270,13 @@ namespace hooks {
         { 0x00525820, &fonts::Print_Centered_ },
         { 0x00525740, &fonts::Set_Font_Spacing_ },
         { 0x005257f0, &fonts::Print_Right_ },
+        { 0x004c5700, &MAINSCR::Draw_Main_Main_Screen_ },
+        { 0x004c6550, &MAINSCR::Draw_Main_Screen_Filled_ },
+        { 0x004c6880, &MAINSCR::Draw_Nebulae_ },
+        { 0x004c5830, &MAINSCR::Draw_Diplomacy_Request_Lights_ },
+        //{ 0x005365b0, &draw::Draw_Bitmap_Sprite_ },
+        { 0x00524490, &animate::Draw_ },
+        //{ 0x00524d50, &animate::Get_Animation_Frame_Count_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -277,7 +284,7 @@ namespace hooks {
     void Assert_Types() {
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
-        ASSERT(sizeof(s_nebula_data) == 0x5, "s_nebula_data")
+        ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
         ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
         ASSERT(sizeof(s_player) == 0xea9, "s_player");
         ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");

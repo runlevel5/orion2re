@@ -6,10 +6,12 @@ namespace MAINSCR {
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
+    inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
+    inline animate::s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<animate::s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
 
     void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 
-    void* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size);
+    animate::s_animation_header* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size);
 
     void __cdecl Get_Star_Draw_Coords_(int16_t star_idx, int16_t* out_x, int16_t* out_y);
 
@@ -27,21 +29,27 @@ namespace MAINSCR {
 
     void __cdecl Draw_Wormhole_Links_();
 
+    inline void __cdecl Draw_Paralax_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c6930});
+        fn();
+    }
+
     void __cdecl Draw_Relocation_Links_();
 
     void __cdecl Draw_Black_Holes_();
 
-    inline void __cdecl Draw_Main_Main_Screen_() {
+    void __cdecl Draw_Main_Main_Screen_();
+
+    inline void __cdecl Print_Star_Names_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004C5700 });
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cba80});
         fn();
     }
 
-    inline void __cdecl Draw_Main_Screen_Filled_(int16_t filled_flag) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004C6550 });
-        fn(filled_flag);
-    }
+    void __cdecl Draw_Diplomacy_Request_Lights_();
+
+    void __cdecl Draw_Main_Screen_Filled_(int16_t should_copy_to_back);
 
     inline void __cdecl Draw_A_Gate_Icon_(int32_t star_idx) {
         using Fn = void(__cdecl*)(int32_t);
@@ -50,6 +58,8 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Gate_Icons_();
+
+    void __cdecl Draw_Nebulae_();
 
     void __cdecl Draw_Ship_Icons_(bool force_draw);
 

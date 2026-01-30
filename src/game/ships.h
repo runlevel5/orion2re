@@ -29,8 +29,8 @@ namespace SHIPS {
         fn(icon_id, x, y);
     }
 
-    inline void* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t owner, uint8_t flag) {
-        using Fn = void*(__cdecl*)(int16_t, uint8_t);
+    inline animate::s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t owner, uint8_t flag) {
+        using Fn = animate::s_animation_header*(__cdecl*)(int16_t, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f200});
         return fn(owner, flag);
     }

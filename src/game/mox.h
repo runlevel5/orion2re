@@ -57,7 +57,7 @@ namespace MOX {
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
-    inline void*& _moveable_box_pict = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B60});
+    inline animate::s_animation_header*& _moveable_box_pict = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
@@ -105,8 +105,8 @@ namespace MOX {
     inline void*& _global_data_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00597410 });
 
-    inline s_nebula_data*& _nebula =
-        *reinterpret_cast<s_nebula_data**>(std::uintptr_t{ 0x00597770 });
+    inline s_nebula*& _nebula =
+        *reinterpret_cast<s_nebula**>(std::uintptr_t{ 0x00597770 });
 
     inline uint8_t& _NUM_NEBULAS = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D10});
 
@@ -132,6 +132,9 @@ namespace MOX {
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
 
+    inline animate::s_animation_header*& _main_screen_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B400});
+    inline animate::s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B464});
+
     inline void*& _global_screen_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
 
@@ -139,7 +142,7 @@ namespace MOX {
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
 
     // Suggested name: MOX::_star_seg
-    inline void** _star_seg = reinterpret_cast<void**>(std::uintptr_t{0x0059B4C0});
+    inline animate::s_animation_header** _star_seg = reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B4C0});
 
     inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
 
@@ -182,7 +185,8 @@ namespace MOX {
     inline s_colony*& _colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
 
-    inline void*& _darkened_turn_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B30});
+    inline animate::s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A1B30});
+    inline animate::s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});
 
     inline s_star_data*& _star =
@@ -225,9 +229,9 @@ namespace MOX {
         *reinterpret_cast<void**>(std::uintptr_t{ 0x005A2BEC });
 
     // Suggested name: MOX::nebula_pict_segments
-    // This represents a flat array of pointers (4 per nebula).
-    inline void** _nebula_pict_seg =
-        reinterpret_cast<void**>(std::uintptr_t{ 0x005979C0 });
+    // This represents a 2D array of sprite pointers, dimensions [12][4].
+    inline animate::s_animation_header* (*_nebula_pict_seg)[4] =
+        reinterpret_cast<animate::s_animation_header* (*)[4]>(std::uintptr_t{ 0x005979C0 });
 
     // Suggested name: _planet_max_farms
     inline uint8_t* _planet_max_farms = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00559660 });

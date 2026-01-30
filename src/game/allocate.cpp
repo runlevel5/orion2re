@@ -54,7 +54,7 @@ namespace allocate {
         // DOS-space allocations for low-level segments
         MOX::_global_data_seg = Allocate_Dos_Space_(0x2800);
 
-        MOX::_nebula = reinterpret_cast<s_nebula_data*>(Allocate_Dos_Space_(0x14));
+        MOX::_nebula = reinterpret_cast<s_nebula*>(Allocate_Dos_Space_(0x14));
         struct_::Clear_Structure_(MOX::_nebula, 0x14);
 
         MOX::_star = reinterpret_cast<s_star_data*>(Allocate_Dos_Space_(0x1FC8));
