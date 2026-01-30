@@ -94,4 +94,53 @@ namespace HACCESS {
 
         return MOX::_ship_stack_start[index];
     }
+
+    bool __cdecl Star_Has_Relocation_(int16_t star_idx, int16_t player_idx) {
+        return MOX::_star[star_idx].relocate_ship_to[player_idx] != -1;
+    }
+
+    int16_t __cdecl Relocation_(int16_t star_idx, int16_t player_idx) {
+        return MOX::_star[star_idx].relocate_ship_to[player_idx];
+    }
+
+    void __cdecl Set_Colony_Auto_Select_For_Star_(int16_t star_idx, int16_t player_idx, int16_t* out_planet_idx) {
+        bool found = false;
+        int16_t status_colony_idx = -1;
+        *out_planet_idx = -1;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            if (found) {
+                break;
+            }
+
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+            if (planet_idx >= 0) {
+                *out_planet_idx = planet_idx;
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx >= 0) {
+                    auto& colony = MOX::_colony[colony_idx];
+                    // Check if the colony is not an outpost and belongs to the specified player
+                    if (colony.outpost_flag == 0 && (int16_t)colony.owner == player_idx) {
+                        MOX::_star[star_idx].last_planet_selected[player_idx] = (int8_t)i;
+                        found = true;
+                        status_colony_idx = colony_idx;
+                    } else {
+                        status_colony_idx = -1;
+                    }
+                }
+            }
+        }
+
+        // If no matching colony was found in the system, reset the output planet index
+        if (status_colony_idx == -1) {
+            *out_planet_idx = -1;
+        }
+    }
+
+    int16_t __cdecl Ship_Icon_Owner_(int16_t icon_id) {
+        int16_t node_idx = MOX::_ship_icon[icon_id].node_idx;
+
+        return Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
+    }
 }

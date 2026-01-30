@@ -47,22 +47,12 @@ namespace animate {
         reinterpret_cast<Fn>(0x00524930)();
     }
 
-    inline void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* data) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*);
-        reinterpret_cast<Fn>(0x00524830)(x, y, data);
-    }
-
-    inline void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* data) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*);
-        reinterpret_cast<Fn>(0x00524990)(x, y, data);
-    }
+    void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* data);
+    void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite);
 
     void __cdecl Draw_Screen_Background_On_(uint32_t* sprite);
 
-    inline void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* data) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        reinterpret_cast<Fn>(0x00524C30)(data);
-    }
+    void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite);
 
     inline void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* data) {
         using Fn = void(__cdecl*)(uint8_t*);

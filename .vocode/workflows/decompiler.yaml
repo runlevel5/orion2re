@@ -220,6 +220,8 @@ workflows:
               uint32_t something;
             };
             #pragma pack(pop)
+          * You are NOT allowed to rearrange fields in emitted structures. Fields must be in the same order as they were
+            provided to you.
           * Output only the cleaned-up code (no extra explanation).
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
             always prefer using library function. Our application does not have direct access to library functions - you

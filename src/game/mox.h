@@ -210,8 +210,8 @@ namespace MOX {
     inline int16_t& _fleet_box_ship_stack =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183E});
 
-    inline s_ship_icon* _ship_icon =
-            reinterpret_cast<s_ship_icon*>(std::uintptr_t{0x005A2CE8});
+    inline s_ship_icon (&_ship_icon)[572] =
+        *reinterpret_cast<s_ship_icon(*)[572]>(std::uintptr_t{0x005A2CE0});
 
     inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
 

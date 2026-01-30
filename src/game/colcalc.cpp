@@ -179,4 +179,46 @@ namespace COLCALC {
             MOX::_player[i].surrender_to = -1;
         }
     }
+
+    int16_t __cdecl Player_N_Turns_Until_Research_Complete_(s_player* plr) {
+        uint8_t field_idx = static_cast<uint8_t>(plr->current_research_field);
+
+        if (plr->tech_fields[field_idx] == 3) {
+            return 0;
+        }
+
+        int32_t produced = (int32_t)plr->research_produced;
+        int32_t cost = Player_Research_Cost_(plr, (uint16_t)field_idx);
+        int32_t accumulated = plr->research_accumulated;
+
+        if (produced == 0 && accumulated <= cost) {
+            return -1;
+        }
+
+        int16_t turns = 0;
+
+        while (accumulated <= cost) {
+            turns++;
+            accumulated += produced;
+        }
+
+        int32_t total_chance = 0;
+        do {
+            turns++;
+            accumulated += produced;
+            int32_t current_turn_chance = Chance_For_Research_Breakthrough_Aux_(accumulated, produced, cost);
+            total_chance += current_turn_chance;
+        } while (total_chance < 100);
+
+        return turns;
+    }
+
+    int32_t __cdecl Chance_For_Research_Breakthrough_(s_player* plr) {
+        int32_t cost = Player_Research_Cost_(plr, static_cast<uint16_t>(static_cast<uint8_t>(plr->current_research_field)));
+
+        int32_t produced = static_cast<int32_t>(plr->research_produced);
+        int32_t accumulated_total = plr->research_accumulated + produced;
+
+        return Chance_For_Research_Breakthrough_Aux_(accumulated_total, produced, cost);
+    }
 }

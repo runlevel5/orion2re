@@ -262,6 +262,7 @@ namespace hooks {
         { 0x0049b270, &HACCESS::Ship_Owner_ },
         { 0x0049b330, &HACCESS::Ship_Stack_From_Saved_Array_ },
         { 0x0049ab50, &HACCESS::Node_Ptr_From_Ship_Stack_ },
+        { 0x0049b5e0, &HACCESS::Star_Has_Relocation_ },
         { 0x0041eb20, &MAINSCR::Draw_Ship_Icons_ },
         { 0x004f0dd0, &HAROLD::Harold_Init_ },
         { 0x00513b90, &MOVEBOX::Moveable_Box_Selected_ },
@@ -285,6 +286,15 @@ namespace hooks {
         { 0x00524a50, &animate::Draw_Screen_Background_Off_ },
         { 0x00524ae0, &animate::Draw_Screen_Background_On_ },
         { 0x00535c00, &clipped::Clipped_Draw_Glassed_Bitmap_Sprite_ },
+        { 0x00524830, &animate::Draw_Glassed_Animated_Sprite_ },
+        { 0x00524990, &animate::Draw_Glassed_Bitmap_Sprite_ },
+        { 0x00524c30, &animate::Draw_Glassed_Screen_Background_On_ },
+        { 0x00535e50, &clipped::Clipped_Draw_Glassed_Animated_Sprite_ },
+        { 0x004f74b0, &COLCALC::Player_N_Turns_Until_Research_Complete_ },
+        { 0x004f7430, &COLCALC::Chance_For_Research_Breakthrough_ },
+        { 0x0049af30, &HACCESS::Set_Colony_Auto_Select_For_Star_ },
+        { 0x0049ada0, &HACCESS::Relocation_ },
+        { 0x0049b1e0, &HACCESS::Ship_Icon_Owner_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

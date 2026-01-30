@@ -353,8 +353,7 @@ namespace clipped {
                         uint8_t pixel = *current_sprite_row;
                         if (pixel != 0) {
                             if (pixel >= 0xF0) {
-                                uint32_t lookup_idx = ((uint32_t)pixel << 8) | (uint32_t)*current_screen_row;
-                                pixel = draw::_glass_lookup_table[lookup_idx];
+                                pixel = draw::_glass_lookup_table[pixel][*current_screen_row];
                             }
                             *current_screen_row = pixel;
                         }
@@ -368,6 +367,88 @@ namespace clipped {
                 sprite_data += animate::_animation_header->width;
                 draw_height--;
             } while (draw_height > 0);
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Clipped_Draw_Glassed_Animated_Sprite_(int32_t x, int32_t y, uint8_t* sprite) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        int min_x = (int)video::_screen_window_x1;
+        int min_y = (int)video::_screen_window_y1;
+        int max_x = 639; // 0x27f
+        int limit_y = 479; // 0x1df
+
+        int anim_height = (int)animate::_animation_header->height;
+        if (x + anim_height > (int)video::_screen_window_x2) {
+            max_x = (int)video::_screen_window_x2;
+        }
+
+        int sprite_bottom = y + anim_height;
+        if ((int)video::_screen_window_y2 < sprite_bottom) {
+            limit_y = (int)video::_screen_window_y2;
+        }
+
+        int y_offset = (int)*(int16_t*)(sprite + 2);
+        int current_y = y + y_offset;
+
+        uint8_t* row_base = video::_current_video_page + (current_y * platform::g_screen_res_x) + x;
+        uint8_t* data_ptr = sprite + 4;
+
+        if (sprite_bottom <= limit_y) {
+            limit_y = sprite_bottom;
+        }
+
+        while (current_y <= limit_y) {
+            int count = (int)*(int16_t*)data_ptr;
+            int x_skip = (int)*(int16_t*)(data_ptr + 2);
+            data_ptr += 4;
+
+            if (count == 0) {
+                current_y += x_skip;
+                row_base += x_skip * 640;
+            } else {
+                int current_x = x;
+                uint8_t* p = row_base;
+
+                if (current_y >= min_y && max_x > current_x) {
+                    current_x += x_skip;
+                    p += x_skip;
+
+                    int actual_count = count;
+                    uint8_t* actual_data = data_ptr;
+
+                    if (current_x < min_x) {
+                        int clip_left = min_x - current_x;
+                        actual_data += clip_left;
+                        p += clip_left;
+                        actual_count -= clip_left;
+                        current_x = min_x;
+                    }
+
+                    if (max_x < current_x + actual_count) {
+                        actual_count = max_x - current_x + 1;
+                    }
+
+                    if (actual_count > 0) {
+                        for (int i = 0; i < actual_count; ++i) {
+                            uint8_t pixel = actual_data[i];
+                            if (pixel != 0) {
+                                if (pixel >= 0xF0) {
+                                    pixel = draw::_glass_lookup_table[pixel][p[i]];
+                                }
+                                p[i] = pixel;
+                            }
+                        }
+                    }
+                }
+                data_ptr += count;
+            }
+
+            if (reinterpret_cast<uintptr_t>(data_ptr) & 1) {
+                data_ptr++;
+            }
         }
 
         platform::Unlock_Appropriate_Render_Buffer();

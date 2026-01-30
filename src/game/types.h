@@ -774,15 +774,13 @@ struct s_ship_node {
 };
 
 struct s_ship_icon {
-    int16_t x;
-    int16_t y;
-    int16_t field2_0x4;
-    uint8_t field3_0x6;
-    uint8_t field4_0x7;
-    uint8_t field5_0x8;
-    uint8_t field6_0x9;
-    uint8_t field7_0xa;
-    uint8_t field8_0xb;
+    short field0_0x0;
+    short node_idx;
+    short field2_0x4;
+    undefined field3_0x6;
+    undefined field4_0x7;
+    short x;
+    short y;
 };
 
 struct s_leader_data {

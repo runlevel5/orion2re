@@ -219,4 +219,134 @@ namespace animate {
             }
         }
     }
+
+    void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        int16_t current_y_offset = *reinterpret_cast<int16_t*>(&sprite[2]);
+        uint32_t word_idx = 2;
+
+        uint32_t dest_idx = (static_cast<int32_t>(y) + current_y_offset) * platform::g_screen_res_x + x;
+        uint32_t line_start_idx = dest_idx;
+
+        int32_t total_height = static_cast<int32_t>(_animation_header->height);
+        uint8_t* video_ptr = video::_current_video_page;
+
+        while (static_cast<int32_t>(current_y_offset) < total_height) {
+            int16_t* cmd_stream = reinterpret_cast<int16_t*>(&sprite[word_idx * 2]);
+            int16_t pixel_count = cmd_stream[0];
+            int16_t skip_val = cmd_stream[1];
+            word_idx += 2;
+
+            if (pixel_count == 0) {
+                current_y_offset += skip_val;
+                line_start_idx += static_cast<int32_t>(skip_val) * 640;
+                dest_idx = line_start_idx;
+            }
+            else {
+                dest_idx += skip_val;
+                uint8_t* pixel_data = &sprite[word_idx * 2];
+
+                for (int i = 0; i < static_cast<int32_t>(pixel_count); ++i) {
+                    uint8_t pixel = pixel_data[i];
+                    if (pixel < 0xF0) {
+                        video_ptr[dest_idx] = pixel;
+                    }
+                    else {
+                        uint8_t background_pixel = video_ptr[dest_idx];
+                        video_ptr[dest_idx] = draw::_glass_lookup_table[pixel][background_pixel];
+                    }
+                    dest_idx++;
+                }
+
+                word_idx += (static_cast<int32_t>(pixel_count) + 1) / 2;
+            }
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        s_animation_header* header = animate::_animation_header;
+        int16_t sprite_w = header->width;
+        int16_t sprite_h = header->height;
+
+        int32_t screen_stride = platform::g_screen_res_x - (int32_t)sprite_w;
+        uint8_t* v_page = video::_current_video_page;
+        uint32_t screen_offset = (int32_t)y * platform::g_screen_res_x + (int32_t)x;
+        uint32_t sprite_idx = 0;
+
+        if (sprite_h > 0) {
+            int32_t rows_remaining = (int32_t)sprite_h;
+            do {
+                if (sprite_w > 0) {
+                    int32_t cols_remaining = (int32_t)sprite_w;
+                    do {
+                        uint8_t pixel = sprite[sprite_idx];
+                        if (pixel != 0) {
+                            if (pixel < 0xF0) {
+                                v_page[screen_offset] = pixel;
+                            }
+                            else {
+                                uint8_t existing_pixel = v_page[screen_offset];
+                                v_page[screen_offset] = draw::_glass_lookup_table[pixel][existing_pixel];
+                            }
+                        }
+                        sprite_idx++;
+                        screen_offset++;
+                        cols_remaining--;
+                    } while (cols_remaining != 0);
+                }
+                screen_offset += screen_stride;
+                rows_remaining--;
+            } while (rows_remaining != 0);
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite) {
+        int32_t pitch = static_cast<int32_t>(platform::Lock_Primary_Surface());
+        uint32_t sprite_idx = 0;
+
+        for (int32_t base_pixel_offset = 0; base_pixel_offset < 0x50000; base_pixel_offset += 0x10000) {
+            int32_t current_pixel = base_pixel_offset;
+
+            while (true) {
+                int8_t skip = static_cast<int8_t>(sprite[sprite_idx]);
+                int8_t count = static_cast<int8_t>(sprite[sprite_idx + 1]);
+                sprite_idx += 2;
+
+                if (count == 0) {
+                    break;
+                }
+
+                current_pixel += skip;
+                uint32_t pixel_run_end = sprite_idx + (count * 4);
+
+                while (sprite_idx < pixel_run_end) {
+                    uint8_t color = sprite[sprite_idx];
+
+                    int32_t x = current_pixel % 640;
+                    int32_t y = current_pixel / 640;
+                    // TYPE MISMATCH: video::_video_memory is uint32_t* but used as uint8_t* here
+                    uint8_t* dst = reinterpret_cast<uint8_t*>(video::_video_memory) + (y * pitch) + x;
+
+                    if (color < 0xF0) {
+                        *dst = color;
+                    }
+                    else {
+                        *dst = draw::_glass_lookup_table[color][*dst];
+                    }
+
+                    current_pixel++;
+                    sprite_idx++;
+                }
+            }
+        }
+
+        platform::Unlock_Primary_Surface();
+    }
 }
