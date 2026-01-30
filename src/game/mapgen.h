@@ -65,7 +65,7 @@ namespace MAPGEN {
         fn();
     }
 
-    uint8_t __cdecl Generate_Climate_(int16_t star_type);
+    int8_t __cdecl Generate_Climate_(int16_t star_type);
 
     void __cdecl Universe_Generation_(uint8_t gal_size, uint8_t gal_age, int8_t nebula_freq);
 

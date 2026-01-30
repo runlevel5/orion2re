@@ -61,8 +61,9 @@ workflows:
           - Keep in mind that code might reference symbols from other namespaces. When generating
             stubs, you must correctly put symbols into correct namespace blocks deriving namespace
             name from a symbol name.
-          - Namespaces might have similar names (MOX vs MOX) - these should be treated
+          - Namespaces might have similar names (MOX vs MOX2) - these should be treated
             as different namespaces.
+          - Even if referenced symbol is in the same namespaces, you must include its namespace name.
           - Combine all external symbols (variables and functions) that have same namespace name
             into a single namespace block. Example to follow:
 

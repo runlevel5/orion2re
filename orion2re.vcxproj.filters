@@ -362,6 +362,9 @@
     <ClInclude Include="src\game\clipped.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\design.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

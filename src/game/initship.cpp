@@ -40,6 +40,30 @@ namespace INITSHIP {
         }
     }
 
+    void __cdecl Update_Player_Strategic_Ship_Designs_(int16_t player_idx) {
+        s_player* player = &MOX::_player[player_idx];
+
+        for (int16_t i = 0; i < 6; ++i) {
+            s_ship_design* design = &player->ship_designs[i];
+            int8_t old_picture_num = design->picture_num;
+
+            struct_::Clear_Structure_(design, sizeof(s_ship_design));
+            aidesign::Auto_Strategic_Design_Ship_(player_idx, i, design->name);
+
+            int8_t new_picture_num;
+            if (i == 5) {
+                new_picture_num = 0x2b; // '+'
+            } else {
+                new_picture_num = old_picture_num + 1;
+                // Each design slot has 8 associated picture indices
+                if (new_picture_num == (i * 8 + 8)) {
+                    new_picture_num = (int8_t)(i * 8);
+                }
+            }
+            design->picture_num = new_picture_num;
+        }
+    }
+
     void __cdecl Update_Player_Ship_Designs_(int16_t player_idx) {
         if (MOX::_settings.strategic_combat_flag == 1) {
             Update_Player_Strategic_Ship_Designs_(player_idx);
@@ -111,5 +135,34 @@ namespace INITSHIP {
         }
 
         return best_warp_index;
+    }
+
+    void __cdecl Update_Automatic_Design_Equipment_(int16_t player_idx) {
+        int16_t best_armor_type = Best_Armor_(player_idx);
+        int16_t best_ftl_type = Best_Warp_Drive_(player_idx);
+
+        s_player* player = &MOX::_player[player_idx];
+
+        for (int design_idx = 0; design_idx < 6; ++design_idx) {
+            s_ship_design* design = &player->ship_designs[design_idx];
+
+            design->armor_type = static_cast<int8_t>(best_armor_type);
+
+            if (static_cast<int16_t>(design->ftl_type) != best_ftl_type) {
+                int8_t old_ftl = design->ftl_type;
+                int8_t ship_size = design->size;
+
+                // Adjust combat speed based on the bonus difference between old and new drives
+                int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+
+                design->ftl_type = static_cast<int8_t>(best_ftl_type);
+                design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl_type));
+
+                int8_t new_bonus = TECHDATA::_drives[best_ftl_type].combat_speed_modifier[ship_size];
+                design->combat_speed = (design->combat_speed - old_bonus) + new_bonus;
+            }
+
+            design->cost = DESIGN::Cost_Of_Design_(player_idx, design->name);
+        }
     }
 }

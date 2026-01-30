@@ -349,7 +349,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      * If the galaxy is young or normal, it uses one weight table; if old, another.
      * If forced to be a food planet, it ensures the chosen climate supports agriculture.
      */
-    uint8_t __cdecl Generate_Climate_(int16_t star_type) {
+    int8_t __cdecl Generate_Climate_(int16_t star_type) {
         uint8_t weights[10];
         helpers::memset(&weights, 0, sizeof(weights));
 
@@ -363,7 +363,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
         }
 
-        uint8_t result = 0xFF; // Symbolic: NO_CLIMATE_SELECTED
+        int8_t result = -1; // Symbolic: NO_CLIMATE_SELECTED
 
         // 2. Specialized handling for food-producing planets
         if (_make_food_planet != 0) {
@@ -384,7 +384,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         // 3. Perform weighted selection if no unique result was forced
-        if (result == 0xFF) {
+        if (result == -1) {
             if (_make_food_planet == 0) {
                 result = RUSS::Get_Weighted_Choice_Char_(weights, 10);
             }

@@ -40,10 +40,7 @@ namespace HAROLD {
 
     const char* __cdecl H_Message_(int16_t id);
 
-    inline void __cdecl Get_Monetary_Unit_String_(char* buffer) {
-        using Fn = void(__cdecl*)(char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f27a0})(buffer);
-    }
+    void __cdecl Get_Monetary_Unit_String_(char* buffer);
 
     void __cdecl Save_Mouse_List_();
 
@@ -139,4 +136,7 @@ namespace HAROLD {
     inline const char* s_HERODATF_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A828 }); // "HERODATF.LBX"
     inline const char* s_HERODATG_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A838 }); // "HERODATG.LBX"
     inline const char* s_HERODATA_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A848 }); // "HERODATA.LBX"
+
+    inline const char* s_MC_0055823c = reinterpret_cast<const char*>(std::uintptr_t{0x0055823c}); // "MC"
+    inline const char* s_BC_00558244 = reinterpret_cast<const char*>(std::uintptr_t{0x00558244}); // "BC"
 }

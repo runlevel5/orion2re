@@ -95,6 +95,7 @@ namespace hooks {
         { 0x00450480, &diplomac::Init_Diplomatic_Relations_ },
         { 0x0051b870, &HOMEGEN::Add_Non_Food_Planets_To_List_ },
         { 0x0051bea0, &HOMEGEN::Random_Planet_ },
+        { 0x00519f90, &HOMEGEN::Dist_Between_Stars_ },
         { 0x0051c160, &HOMEGEN::Set_Special_For_Star_Guarded_By_Monster_ },
         { 0x0051bf50, &HOMEGEN::Upgrade_Planet_Guarded_By_Monster_ },
         { 0x0051ad50, &HOMEGEN::Generate_Orion_ },
@@ -235,6 +236,7 @@ namespace hooks {
         { 0x00466600, &TRADE::Process_Research_Agreement_ },
         { 0x0052ce60, &strings::Swap_Short_ },
         { 0x004811d0, &INITSHIP::Best_Warp_Drive_ },
+        { 0x00482160, &INITSHIP::Update_Player_Strategic_Ship_Designs_ },
         { 0x0052b280, &palette::Set_Palette_Changes_ },
         { 0x0052b2b0, &palette::Clear_Palette_Changes_ },
         { 0x004726e0, &MSG_::Allocate_Msg_Slots_ },
@@ -307,6 +309,10 @@ namespace hooks {
         { 0x004cb8b0, &MAINSCR::Set_Post_Fitted_Font_Style_ },
         { 0x004cd930, &MAINSCR::Get_Research_Unit_String_ },
         { 0x004cba80, &MAINSCR::Print_Star_Names_ },
+        { 0x004f27a0, &HAROLD::Get_Monetary_Unit_String_ },
+        { 0x0051be20, &HOMEGEN::Star_Has_Planet_ },
+        { 0x00519fe0, &HOMEGEN::Dist_Between_Points_ },
+        { 0x00482020, &INITSHIP::Update_Automatic_Design_Equipment_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

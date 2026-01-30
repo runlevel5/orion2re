@@ -79,6 +79,7 @@
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\deps.h" />
+    <ClInclude Include="src\game\design.h" />
     <ClInclude Include="src\game\diplodef.h" />
     <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dos.h" />

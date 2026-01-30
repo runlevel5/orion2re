@@ -1,6 +1,28 @@
 #include "deps.h"
 
 namespace HOMEGEN {
+    bool __cdecl Star_Has_Planet_(int16_t star_index) {
+        if (MOX::_star[star_index].spectral_class == STAR_CLASS_BLACK_HOLE) {
+            return false;
+        }
+
+        bool planet_found = false;
+        for (int i = 0; i < 5; ++i) {
+            if (planet_found) {
+                return true;
+            }
+
+            int16_t planet_idx = MOX::_star[star_index].planet_index[i];
+            if (planet_idx > -1) {
+                if (MOX::_planet[planet_idx].planet_type == PLANET_TYPE_PLANET) {
+                    planet_found = true;
+                }
+            }
+        }
+
+        return planet_found;
+    }
+
     void __cdecl Guarantee_A_Planet_At_Min_Dist_(int16_t origin_star_idx, int16_t min_dist, int16_t* player_home_stars) {
         _star_list = (s_star_dist*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x120);
 
@@ -89,10 +111,17 @@ namespace HOMEGEN {
         }
     }
 
-    uint32_t __cdecl Dist_Between_Stars_(int16_t star_a, int16_t star_b) {
-        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519f90});
-        return fn(star_a, star_b);
+    int32_t __cdecl Dist_Between_Stars_(int16_t star_idx_1, int16_t star_idx_2) {
+        s_star_data* star1 = &MOX::_star[star_idx_1];
+        s_star_data* star2 = &MOX::_star[star_idx_2];
+
+        return Dist_Between_Points_(star1->x, star1->y, star2->x, star2->y);
+    }
+
+    int32_t __cdecl Dist_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        int32_t dx = (int32_t)x1 - (int32_t)x2;
+        int32_t dy = (int32_t)y1 - (int32_t)y2;
+        return (dx * dx) + (dy * dy);
     }
 
     int32_t __cdecl qsort_star_dist_list_(const void* param_1, const void* param_2) {
@@ -116,9 +145,9 @@ namespace HOMEGEN {
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_STARS; ++j) {
                 MOX::Mox_Update_();
 
-                uint32_t dist = Dist_Between_Stars_(i, j);
+                int32_t dist = Dist_Between_Stars_(i, j);
 
-                if (dist >= (uint32_t)min_distance) {
+                if (dist >= min_distance) {
                     struct_::Set_Bit_Field_(current_star, j);
 
                     // Note: Potential out-of-bounds access if MOX::_NUM_STARS > 72
@@ -167,12 +196,12 @@ namespace HOMEGEN {
                         bool valid = true;
                         for (int k = 0; k < list->count; ++k) {
                             uint16_t existing_star = list->stars[k];
-                            uint32_t dist = Dist_Between_Stars_(existing_star, star_j);
+                            int32_t dist = Dist_Between_Stars_(existing_star, star_j);
                             uint8_t* field_k = (uint8_t*)&_good_stars[existing_star];
                             uint16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
 
                             MOX::Mox_Update_();
-                            if (existing_star != star_j && (bit == 0 || dist < (uint32_t)min_dist)) {
+                            if (existing_star != star_j && (bit == 0 || dist < min_dist)) {
                                 valid = false;
                                 break;
                             }
@@ -267,7 +296,7 @@ namespace HOMEGEN {
         }
     }
 
-    uint32_t __cdecl Generate_Home_Worlds_() {
+    int32_t __cdecl Generate_Home_Worlds_() {
         uint16_t home_star_ids[8] = {};
 
         MISC::s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
@@ -496,7 +525,7 @@ namespace HOMEGEN {
 
         for (int m = 0; m < static_cast<int>(MAPGEN::_n_space_monsters); ++m) {
             int divisor = (m * 2 > 1) ? (m * 2) : 1;
-            uint32_t current_min_dist = dist_limit_sq / divisor;
+            int32_t current_min_dist = dist_limit_sq / divisor;
 
             int16_t selected_star = -1;
             int attempts = 0;

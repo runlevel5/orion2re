@@ -7,17 +7,9 @@ namespace INITSHIP {
 
     void __cdecl Update_Player_Ship_Designs_(int16_t player_idx);
 
-    inline void __cdecl Update_Player_Strategic_Ship_Designs_(int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00482160});
-        fn(player_idx);
-    }
+    void __cdecl Update_Player_Strategic_Ship_Designs_(int16_t player_idx);
 
-    inline void __cdecl Update_Automatic_Design_Equipment_(int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00482020});
-        fn(player_idx);
-    }
+    void __cdecl Update_Automatic_Design_Equipment_(int16_t player_idx);
 
     inline void __cdecl Update_Equipment_On_Ships_Being_Built_(int16_t player_idx) {
         using Fn = void(__cdecl*)(int16_t);
@@ -31,5 +23,15 @@ namespace INITSHIP {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00482260});
         return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Best_Armor_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x00481380)(player_idx);
+    }
+
+    inline int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(0x004822c0)(player_idx, ftl_type);
     }
 }

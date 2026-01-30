@@ -645,4 +645,29 @@ namespace HAROLD {
 
         return default_galaxy_size;
     }
+
+    /**
+     * Copies the currency unit string (e.g., "MC" or "BC") into the provided buffer.
+     * The currency unit depends on the current game language setting.
+     */
+    void __cdecl Get_Monetary_Unit_String_(char* out) {
+        const char* src;
+
+        switch (MOX::_settings.language) {
+        case 1:
+            src = s_MC_0055823c;
+            break;
+        case 2:
+        case 3:
+        case 4:
+        default:
+            src = s_BC_00558244;
+            break;
+        }
+
+        // Binary-faithful copy of 3 bytes (including null terminator)
+        out[0] = src[0];
+        out[1] = src[1];
+        out[2] = src[2];
+    }
 }

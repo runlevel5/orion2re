@@ -23,7 +23,7 @@ namespace HOMEGEN {
 
     bool __cdecl Is_Added_Food_World_(int16_t world_id);
 
-    uint32_t __cdecl Generate_Home_Worlds_();
+    int32_t __cdecl Generate_Home_Worlds_();
 
     #pragma pack(push, 1)
     struct CandidateList {
@@ -46,7 +46,9 @@ namespace HOMEGEN {
 
     int32_t __cdecl qsort_star_dist_list_(const void* param_1, const void* param_2);
 
-    uint32_t __cdecl Dist_Between_Stars_(int16_t star_a, int16_t star_b);
+    int32_t __cdecl Dist_Between_Stars_(int16_t star_a, int16_t star_b);
+
+    int32_t __cdecl Dist_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     void __cdecl Set_Up_Home_Gen_Msg_();
 
@@ -100,15 +102,5 @@ namespace HOMEGEN {
 
     void __cdecl Upgrade_Planet_Guarded_By_Monster_(s_planet_data* planet, int16_t monster_type);
 
-    inline bool __cdecl Star_Has_Planet_(int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051BE20 });
-        return fn(star_idx);
-    }
-
-    inline uint32_t __cdecl Dist_Between_Stars_(uint16_t star1_idx, uint16_t star2_idx) {
-        using Fn = uint32_t(__cdecl*)(uint16_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00519F90 });
-        return fn(star1_idx, star2_idx);
-    }
+    bool __cdecl Star_Has_Planet_(int16_t star_index);
 }
