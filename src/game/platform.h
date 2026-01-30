@@ -101,9 +101,6 @@ namespace platform {
 	inline int16_t& g_cached_mouse_y =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578ab8 });
 
-	inline void*& DAT_5792F0 =
-		*reinterpret_cast<void**>(std::uintptr_t{ 0x005792f0 });
-
 	inline void*& g_surface_mem =
 		*reinterpret_cast<void**>(std::uintptr_t{ 0x005792F8 });
 

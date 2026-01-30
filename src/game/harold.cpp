@@ -86,25 +86,25 @@ namespace HAROLD {
         return MOX::_star[star_idx].spectral_class < 6;
     }
 
-    void __cdecl Planet_Number_(int16_t planet_index) {
-        s_planet_data* planet = &MOX::_planet[planet_index];
-        int8_t star_idx = planet->star_index;
+    int8_t __cdecl Planet_Number_(int16_t planet_index) {
+        int8_t star_idx = MOX::_planet[planet_index].star_index;
         s_star_data* star = &MOX::_star[star_idx];
 
-        char orbital_pos = 0;
+        int8_t relative_planet_num = 0;
         for (int i = 0; i < 5; ++i) {
-            int16_t current_p_idx = star->planet_index[i];
+            int16_t system_planet_id = star->planet_index[i];
 
-            if (current_p_idx == planet_index) {
-                return;
+            if (system_planet_id == planet_index) {
+                return relative_planet_num;
             }
 
-            if (current_p_idx > -1) {
-                orbital_pos++;
+            // Only increment the count if the slot contains a valid planet (not -1)
+            if (system_planet_id > -1) {
+                relative_planet_num++;
             }
         }
 
-        return;
+        return relative_planet_num;
     }
 
     void __cdecl Get_Font_File_(char* buffer) {

@@ -2,7 +2,9 @@
 
 namespace video {
 	// Variables
-	inline uintptr_t& _current_video_page = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x005792F8});
+	inline uint32_t*& _video_memory = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x005792F0 });
+
+	inline uint8_t*& _current_video_page = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005792F8});
 
 	inline uint32_t& screen_dump_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1A0 });
@@ -63,5 +65,11 @@ namespace video {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D00});
         fn();
+    }
+
+    inline void __cdecl Add_Line_To_Scan_List_(int32_t start_x, int32_t y, int32_t end_x) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528A30 });
+        fn(start_x, y, end_x);
     }
 }

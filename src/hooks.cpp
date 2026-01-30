@@ -274,9 +274,17 @@ namespace hooks {
         { 0x004c6550, &MAINSCR::Draw_Main_Screen_Filled_ },
         { 0x004c6880, &MAINSCR::Draw_Nebulae_ },
         { 0x004c5830, &MAINSCR::Draw_Diplomacy_Request_Lights_ },
-        //{ 0x005365b0, &draw::Draw_Bitmap_Sprite_ },
+        { 0x005365b0, &draw::Draw_Bitmap_Sprite_ },
         { 0x00524490, &animate::Draw_ },
-        //{ 0x00524d50, &animate::Get_Animation_Frame_Count_ },
+        { 0x00524d50, &animate::Get_Animation_Frame_Count_ },
+        { 0x00536508, &draw::Draw_Animated_Sprite_ },
+        { 0x00536040, &clipped::Clipped_Draw_Animated_Sprite_ },
+        { 0x00536623, &draw::Color_Stream_Copy_ },
+        { 0x00535d20, &clipped::Clipped_Draw_Bitmap_Sprite_ },
+        { 0x00536280, &clipped::Clipped_Draw_Stenciled_Animated_Sprite_ },
+        { 0x00524a50, &animate::Draw_Screen_Background_Off_ },
+        { 0x00524ae0, &animate::Draw_Screen_Background_On_ },
+        { 0x00535c00, &clipped::Clipped_Draw_Glassed_Bitmap_Sprite_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

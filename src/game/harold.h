@@ -32,7 +32,7 @@ namespace HAROLD {
 
     void __cdecl Confirm_Planet_And_Star_Index_Link_(const char* msg);
 
-    void __cdecl Planet_Number_(int16_t planet_index);
+    int8_t __cdecl Planet_Number_(int16_t planet_index);
 
     void __cdecl Set_All_Visited_Flags_();
 

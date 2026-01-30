@@ -57,10 +57,7 @@ namespace animate {
         reinterpret_cast<Fn>(0x00524990)(x, y, data);
     }
 
-    inline void __cdecl Draw_Screen_Background_On_(uint8_t* data) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        reinterpret_cast<Fn>(0x00524AE0)(data);
-    }
+    void __cdecl Draw_Screen_Background_On_(uint32_t* sprite);
 
     inline void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* data) {
         using Fn = void(__cdecl*)(uint8_t*);
@@ -72,8 +69,5 @@ namespace animate {
         reinterpret_cast<Fn>(0x00524BB0)(data);
     }
 
-    inline void __cdecl Draw_Screen_Background_Off_(uint8_t* data) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        reinterpret_cast<Fn>(0x00524A50)(data);
-    }
+    void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
 }

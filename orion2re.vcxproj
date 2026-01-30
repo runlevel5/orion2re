@@ -24,6 +24,7 @@
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
+    <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
