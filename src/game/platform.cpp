@@ -430,7 +430,7 @@ namespace platform {
         FUN_5287a0();
         FUN_5287c0();
         g_frame_count = 0;
-        FUN_528c90();
+        graphics::Reset_Window_();
         return g_main_window;
     }
 

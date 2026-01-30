@@ -261,6 +261,15 @@ namespace hooks {
         { 0x004c50c0, &MAINSCR::Draw_Black_Holes_ },
         { 0x0049b270, &HACCESS::Ship_Owner_ },
         { 0x0049b330, &HACCESS::Ship_Stack_From_Saved_Array_ },
+        { 0x0049ab50, &HACCESS::Node_Ptr_From_Ship_Stack_ },
+        { 0x0041eb20, &MAINSCR::Draw_Ship_Icons_ },
+        { 0x004f0dd0, &HAROLD::Harold_Init_ },
+        { 0x00513b90, &MOVEBOX::Moveable_Box_Selected_ },
+        { 0x004ca990, &MAINSCR::Print_Main_Screen_Data_ },
+        { 0x00524d10, &video::Clip_Off_ },
+        { 0x00525820, &fonts::Print_Centered_ },
+        { 0x00525740, &fonts::Set_Font_Spacing_ },
+        { 0x005257f0, &fonts::Print_Right_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -276,6 +285,7 @@ namespace hooks {
         ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
+        ASSERT(sizeof(s_ship_icon) == 12, "s_ship_icon");
         ASSERT(sizeof(s_ship_node) == 5, "s_ship_node");
         ASSERT(sizeof(MOX::s_skill_data) == 18, "s_skill_data");
         ASSERT(sizeof(TECHDATA::s_tech_fuel_data) == 10, "s_tech_fuel_data");

@@ -47,6 +47,7 @@
     <ClCompile Include="src\game\mapgen.cpp" />
     <ClCompile Include="src\game\misc.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
+    <ClCompile Include="src\game\movebox.cpp" />
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\officer.cpp" />
@@ -103,6 +104,7 @@
     <ClInclude Include="src\game\mapgen.h" />
     <ClInclude Include="src\game\misc.h" />
     <ClInclude Include="src\game\mouse.h" />
+    <ClInclude Include="src\game\movebox.h" />
     <ClInclude Include="src\game\mox.h" />
     <ClInclude Include="src\game\mox2.h" />
     <ClInclude Include="src\game\msg.h" />

@@ -601,7 +601,26 @@ namespace HAROLD {
         }
 
         // Returns uninitialized stack value as seen in the original assembly
-        int16_t uninitialized;
-        return uninitialized;
+        return 0;
+    }
+
+    /**
+     * @address 004f0dd0
+     */
+    uint8_t* __cdecl Harold_Init_() {
+        MOX::_box_off_flag[0] = -1;
+        MOX::_box_off_flag[1] = 0x0000;
+        MOX::_box_off_flag[2] = -1;
+        MOX::_box_off_flag[3] = 0x0000;
+        MOX::_box_off_flag[4] = 0x0000;
+
+        Init_Moving_Boxes_();
+
+        // Zero out the 8-byte array tracking home star rename status
+        for (int i = 0; i < 8; ++i) {
+            MOX::_given_chance_to_rename_home_star[i] = 0x00;
+        }
+
+        return MOX::_given_chance_to_rename_home_star;
     }
 }

@@ -22,4 +22,16 @@ namespace SHIPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f560});
         fn(x1, y1, x2, y2, colors, line_type);
     }
+
+    inline void __cdecl Get_Ship_Icon_Coords_(int16_t icon_id, int16_t* x, int16_t* y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041ee70});
+        fn(icon_id, x, y);
+    }
+
+    inline void* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t owner, uint8_t flag) {
+        using Fn = void*(__cdecl*)(int16_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f200});
+        return fn(owner, flag);
+    }
 }

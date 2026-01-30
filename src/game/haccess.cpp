@@ -77,4 +77,21 @@ namespace HACCESS {
 
         return stack_index;
     }
+
+    int16_t __cdecl Node_Ptr_From_Ship_Stack_(int16_t index) {
+        if (MOX::_ship_stack_count == 0) {
+            return 0;
+        }
+
+        if (MOX::_ship_stack_count < index) {
+            MOVEBOX::Vanish_Fleet_Movement_Box_();
+            return 0;
+        }
+
+        if (MOX::_ship_stack_count == index) {
+            return Ship_Stack_From_Saved_Array_();
+        }
+
+        return MOX::_ship_stack_start[index];
+    }
 }

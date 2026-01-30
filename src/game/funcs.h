@@ -144,13 +144,6 @@ inline void __cdecl FUN_5287c0() {
     fn();
 }
 
-// Suggested name: final_video_setup
-inline void __cdecl FUN_528c90() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528c90 });
-    fn();
-}
-
 inline int __cdecl hgetch_() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
@@ -309,6 +302,21 @@ inline void __cdecl FUN_00443C60() {
 }
 
 // Suggested name: s_Null_Pointer
+inline const char* const s__d_c_d_0055996c = reinterpret_cast<const char*>(0x0055996C); // "%d%c%d"
+inline const char* const s__s_s__s_00559964 = reinterpret_cast<const char*>(0x00559964); // "%s%s %s"
+inline const char* const s__s__s_00558014 = reinterpret_cast<const char*>(0x00558014); // "%s %s"
+inline const char* const s__s_d___d__00559958 = reinterpret_cast<const char*>(0x00559958); // "%s%d (%d)"
+inline const char* const s__s_d_00556134 = reinterpret_cast<const char*>(0x00556134); // "%s%d"
+inline const char* const s___d__00559950 = reinterpret_cast<const char*>(0x00559950); // " (%d)"
+inline const char* const s__s_s_00556aec = reinterpret_cast<const char*>(0x00556AEC); // "%s%s"
+inline const char* const s__d___0055612c = reinterpret_cast<const char*>(0x0055612C); // "%d%%"
+inline const char* const s___s_0055994c = reinterpret_cast<const char*>(0x0055994C); // "@%s"
+inline const char* const s___00559948 = reinterpret_cast<const char*>(0x00559948); // "@"
+inline const char* const s_0__s_00559940 = reinterpret_cast<const char*>(0x00559940); // "0 %s"
+inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x005569F0); // "%d %s"
+inline const char* const s___00551100 = reinterpret_cast<const char*>(0x00551100); // "-"
+inline const char* const s___00551118 = reinterpret_cast<const char*>(0x00551118); // "+"
+
 inline const char* const s_Null_Pointer_0055b658 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B658 }); // "Null Pointer"
 

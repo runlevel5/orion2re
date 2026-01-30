@@ -36,6 +36,7 @@ struct s_font {
 
     inline uint16_t& _current_font_style =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0057643C});
+    inline int16_t& _current_font_style_2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578e1c});
 
     inline uintptr_t& _font_data = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x00576434});
 
@@ -72,8 +73,8 @@ struct s_font {
 
     int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    inline void Print_(int32_t x, int32_t y, const char* str) {
-        using Fn = void(*)(int32_t, int32_t, const char*);
+    inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00525910 });
         fn(x, y, str);
     }
@@ -101,5 +102,31 @@ struct s_font {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F80 });
         fn();
+    }
+
+    inline int16_t __cdecl Get_Font_Height_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526060 })();
+    }
+
+    inline void __cdecl Set_Font_Style_Outline_(int16_t style, void* color_data) {
+        using Fn = void(__cdecl*)(int16_t, void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x005256b0})(style, color_data);
+    }
+
+    void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str);
+     
+    void __cdecl Print_Right_(int16_t x, int16_t y, const char* text);
+
+    void __cdecl Set_Font_Spacing_(int16_t spacing);
+
+    inline void __cdecl Print_ASM_(int16_t x, int16_t y, const char* text) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00525910})(x, y, text);
+    }
+
+    inline uint32_t __cdecl Get_String_Width_ASM_(const void* text) {
+        using Fn = uint32_t(__cdecl*)(const void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00454ae0})(text);
     }
 }

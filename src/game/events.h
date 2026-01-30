@@ -19,4 +19,9 @@ namespace EVENTS {
 
     void Init_Events_();
     int16_t __cdecl Event_Check_Pirate_Activity_(uint8_t player_idx);
+
+    inline int16_t __cdecl Event_Check_Hyperspace_Flux_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00477610})();
+    }
 }

@@ -40,6 +40,11 @@ namespace HAROLD {
 
     const char* __cdecl H_Message_(int16_t id);
 
+    inline void __cdecl Get_Monetary_Unit_String_(char* buffer) {
+        using Fn = void(__cdecl*)(char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004f27a0})(buffer);
+    }
+
     void __cdecl Save_Mouse_List_();
 
     inline uint8_t (&_saved_mouse_list)[120] =
@@ -55,10 +60,7 @@ namespace HAROLD {
 
     void __cdecl Init_System_Display_Box_();
 
-    inline void __cdecl Harold_Init_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F0DD0 })();
-    }
+    uint8_t* __cdecl Harold_Init_();
 
     inline void __cdecl Harold_Defaults_() {
         using Fn = void(__cdecl*)();

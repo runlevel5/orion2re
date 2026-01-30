@@ -271,4 +271,257 @@ namespace MAINSCR {
             } while (star_idx < num_stars);
         }
     }
+
+    void __cdecl Draw_Ship_Icons_(bool force_draw) {
+        int16_t selected_icon_id = -1;
+
+        if (MOVEBOX::Moveable_Box_Selected_(2)) {
+            int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+            selected_icon_id = HACCESS::Ship_Icon_Id_From_Node_Ptr_(node_ptr);
+        }
+
+        for (int16_t i = MOX::_ship_icon_count - 1; i >= 0; --i) {
+            int16_t x, y;
+            SHIPS::Get_Ship_Icon_Coords_(i, &x, &y);
+
+            int16_t owner = HACCESS::Ship_Icon_Owner_(i);
+            void* pict_seg = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 0);
+
+            MOX::_ship_icon[i].x = x;
+            MOX::_ship_icon[i].y = y;
+
+            if ((i != selected_icon_id && i != MAINSCR::_main_screen_ship_icon_scanned) || force_draw) {
+                animate::Reset_Animation_Frame_(pict_seg);
+                animate::Draw_(x, y, pict_seg);
+            }
+        }
+    }
+
+    void __cdecl Print_Main_Screen_Data_(void) {
+        char sep = (MOX::_settings.language == 1 || MOX::_settings.language == 2) ? ',' : '.';
+        uint8_t font_colors[16];
+        char buffer[128];
+        char monetary_unit[16];
+        char research_unit[16];
+
+        fonts::Set_Font_Style_(0, (MISC::s_colors*)&font_colors[0]);
+        fonts::Get_Font_Height_();
+        _sprintf(buffer, s__d_c_d_0055996c, MOX::_stardate / 10, sep, MOX::_stardate % 10);
+        MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, -1, 0x43, 1);
+        int16_t stardate_font_style = MISC::Get_Font_Style_();
+        MISC::s_colors* p_stardate_colors = MISC::Font_Colors2_(stardate_font_style, 14, 23);
+        helpers::memcpy(&font_colors[8], p_stardate_colors, 8);
+        fonts::Set_Outline_Color_(2, 1);
+        fonts::Set_Font_Style_Outline_(stardate_font_style, &font_colors[8]);
+        fonts::Print_Centered_(580, 29, buffer); // 0x244, 0x1d
+
+        if (EVENTS::Event_Check_Hyperspace_Flux_()) {
+            MISC::Get_Mox_Font_Colors_(3, 'I', 'L', &font_colors[0]);
+            fonts::Set_Font_Style_(3, (MISC::s_colors*)&font_colors[0]);
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value * 5) / 9);
+            const char* flux_msg = HAROLD::H_Message_(0xe0);
+            char flux_buffer[128];
+            helpers::strcpy(flux_buffer, flux_msg);
+            int16_t flux_width = fonts::Get_String_Width_(flux_buffer);
+            int16_t flux_x = 526 - flux_width; // 0x20e
+
+            uint32_t* p_font_colors_32 = (uint32_t*)font_colors;
+            uint32_t line_color1 = p_font_colors_32[0];
+            uint32_t line_color2 = p_font_colors_32[1];
+
+            line::Line_(flux_x, 21, 526, 21, line_color1);
+            line::Line_(flux_x, 22, 526, 22, line_color2);
+            fonts::Print_Right_(526, 24, flux_buffer);
+
+            int16_t fh = fonts::Get_Font_Height_();
+            line::Line_(flux_x, fh + 25, 526, fh + 25, line_color2);
+            line::Line_(flux_x, fh + 26, 526, fh + 26, line_color1);
+        }
+
+        fonts::Get_Font_Height_();
+        HAROLD::Get_Monetary_Unit_String_(monetary_unit);
+        s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
+
+        char* bc_comma = MISC::Get_Comma_String_(plr->bc);
+        _sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
+
+        if (plr->bc < 0) {
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[0], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_('K', 'M');
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value << 2) / 7);
+            fonts::Set_Outline_Color_(0x49, 0x49);
+        } else {
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            fonts::Set_Outline_Color_(2, 1);
+        }
+        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
+
+        char* surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
+        const char* bc_sign = (plr->surplus_bc < 0) ? s___00551100 : s___00551118;
+        _sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
+        MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+        int16_t bc_style = MISC::Get_Font_Style_();
+        int16_t bc_spacing = MISC::Get_Font_Spacing_();
+        MISC::Get_Mox_Font_Colors_(bc_style, 'K', 'M', &font_colors[0]);
+        MISC::Get_Mox_Font_Colors_(bc_style, 14, 23, &font_colors[8]);
+
+        if (plr->surplus_bc < 0) {
+            fonts::Set_Outline_Color_(0x49, 0x49);
+            fonts::Set_Font_Style_Outline_(bc_style, &font_colors[0]);
+            fonts::Set_Font_Spacing_(bc_spacing);
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value << 2) / 7);
+        } else {
+            fonts::Set_Font_Style_Outline_(bc_style, &font_colors[8]);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Set_Font_Spacing_(bc_spacing);
+        }
+        fonts::Print_Centered_(579, fonts::Get_Font_Height_() + 96, buffer);
+
+        int16_t cp_surplus = plr->command_points - plr->command_points_used;
+        const char* cp_sign = (cp_surplus < 0) ? s___00551100 : s___00551118;
+        _sprintf(buffer, s__s_d___d__00559958, cp_sign, cp_surplus, (int)plr->command_points);
+        MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 0);
+        int16_t current_style = fonts::_current_font_style;
+        int16_t current_spacing = MISC::Get_Font_Spacing_();
+        MISC::Get_Mox_Font_Colors_(current_style, 'K', 'M', &font_colors[0]);
+        MISC::Get_Mox_Font_Colors_(current_style, 14, 23, &font_colors[8]);
+
+        char cp_left[64];
+        _sprintf(cp_left, s__s_d_00556134, cp_sign, cp_surplus);
+        int16_t cp_left_w = fonts::Get_String_Width_(cp_left);
+        char cp_right[64];
+        _sprintf(cp_right, s___d__00559950, (int)plr->command_points);
+        int16_t cp_total_w = fonts::Get_String_Width_(cp_right) + cp_left_w + 4;
+
+        if (cp_surplus < 0) {
+            fonts::Set_Font_Style_Outline_(current_style, &font_colors[0]);
+            fonts::Set_Outline_Color_(0x49, 0x49);
+            fonts::Set_Font_Spacing_(current_spacing);
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value << 2) / 7);
+        } else {
+            fonts::Set_Font_Style_Outline_(current_style, &font_colors[8]);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Set_Font_Spacing_(current_spacing);
+        }
+        int16_t cp_half_w = cp_total_w / 2;
+        fonts::Print_(581 - cp_half_w, 181, cp_left);
+        fonts::Set_Font_Style_(current_style, (MISC::s_colors*)&font_colors[8]);
+        fonts::Set_Font_Spacing_(current_spacing);
+        fonts::Print_(581 + cp_left_w + 4 - cp_half_w, 181, cp_right);
+
+        fonts::Get_Font_Height_();
+        char* food_comma = MISC::Get_Comma_String_(plr->surplus_food);
+        const char* food_sign = (plr->surplus_food < 0) ? s___00551100 : s___00551118;
+        _sprintf(buffer, s__s_s_00556aec, food_sign, food_comma);
+        if (plr->surplus_food < 0) {
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[0], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_('K', 'M');
+            fonts::Set_Outline_Color_(0x49, 0x49);
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value << 2) / 7);
+        } else {
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Set_Outline_Color_(2, 1);
+        }
+        fonts::Print_Centered_(579, 255, buffer);
+
+        const char* fr_sign = (plr->surplus_freighters < 0) ? s___00551100 : s___00551118;
+        _sprintf(buffer, s__s_d___d__00559958, fr_sign, (int)plr->surplus_freighters, (int)plr->n_freighters);
+        MISC::Set_Fitted_Font_Style_(buffer, &font_colors[0], 2, 2, 4, 0x43, 1);
+        int16_t fr_style = MISC::Get_Font_Style_();
+        MISC::Get_Mox_Font_Colors_(fr_style, 'K', 'M', &font_colors[0]);
+        MISC::Get_Mox_Font_Colors_(fr_style, 14, 23, &font_colors[8]);
+        int16_t fr_spacing = MISC::Get_Font_Spacing_();
+        int16_t fr_total_w = fonts::Get_String_Width_(buffer);
+
+        _sprintf(buffer, s__s_d_00556134, fr_sign, (int)plr->surplus_freighters);
+        if (plr->surplus_freighters < 0) {
+            fonts::Set_Font_Style_Outline_(fr_style, &font_colors[0]);
+            fonts::Set_Font_Spacing_(fr_spacing);
+            MISC::Increase_Font_Color_Range_((MOX::_red_color_pulse_value << 2) / 7);
+            fonts::Set_Outline_Color_(0x49, 0x49);
+        } else {
+            fonts::Set_Font_Style_Outline_(fr_style, &font_colors[8]);
+            fonts::Set_Font_Spacing_(fr_spacing);
+            fonts::Set_Outline_Color_(2, 1);
+        }
+        int16_t fr_half_w = (fr_total_w + 4) / 2;
+        fonts::Print_(581 - fr_half_w, 330, buffer);
+
+        fonts::Set_Outline_Color_(2, 1);
+        int16_t fr_left_w = fonts::Get_String_Width_(buffer);
+        _sprintf(buffer, s___d__00559950, (int)plr->n_freighters);
+        fonts::Set_Font_Style_Outline_(fr_style, &font_colors[8]);
+        fonts::Set_Font_Spacing_(fr_spacing);
+        fonts::Print_(fr_left_w - fr_half_w + 583, 330, buffer);
+
+        Get_Research_Unit_String_(research_unit);
+        if (plr->research_breakthrough != 0) {
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Set_Font_Style_Outline_(0, &font_colors[8]);
+            fonts::Print_Centered_(579, 403, HAROLD::H_Message_(0x183));
+            return;
+        }
+        if (plr->current_research_field == 0) {
+            fonts::Set_Outline_Color_(2, 1);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Print_Centered_(579, 403, HAROLD::H_Message_(0x188));
+            return;
+        }
+
+        int16_t turns = COLCALC::Player_N_Turns_Until_Research_Complete_(plr);
+        if (turns > 0) {
+            int32_t chance = COLCALC::Chance_For_Research_Breakthrough_(plr);
+            if (chance > 0) {
+                _sprintf(buffer, s__d___0055612c, chance);
+                MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+                Set_Post_Fitted_Font_Style_(14, 23);
+                fonts::Set_Outline_Color_(2, 1);
+                fonts::Print_Centered_(579, 403 - 2 * fonts::Get_Font_Height_(), buffer);
+            }
+            const char* turns_msg = HAROLD::H_Message_(turns == 1 ? 0xe1 : 0xe2);
+            _sprintf(buffer, turns_msg, (int)turns);
+            char at_buffer[64];
+            _sprintf(at_buffer, s___s_0055994c, buffer);
+            MISC::Set_Fitted_Font_Style_(at_buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            int16_t fh = fonts::Get_Font_Height_();
+            int16_t turns_y = 403 - fh;
+            fonts::Set_Outline_Color_(2, 1);
+            int16_t msg_w = fonts::Get_String_Width_(buffer);
+            int16_t start_x = (62 - msg_w) / 2 + 548;
+            fonts::Print_(start_x, turns_y + 3, s___00559948);
+
+            const char* turns_msg2 = HAROLD::H_Message_(turns == 1 ? 0xe1 : 0xe2);
+            _sprintf(buffer, turns_msg2, (int)turns);
+            fonts::Print_(fonts::Get_String_Width_(s___00559948) + start_x, turns_y, buffer);
+
+            char* res_comma = MISC::Get_Comma_String_(plr->research_produced);
+            _sprintf(buffer, s__s__s_00558014, res_comma, research_unit);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Print_Centered_(579, turns_y + fonts::Get_Font_Height_(), buffer);
+        } else if (turns < 0) {
+            _sprintf(buffer, s_0__s_00559940, research_unit);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Print_Centered_(579, 403, buffer);
+        } else {
+            int32_t chance = COLCALC::Chance_For_Research_Breakthrough_(plr);
+            _sprintf(buffer, s__d___0055612c, chance);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Print_Centered_(579, 391, buffer);
+
+            _sprintf(buffer, s__d__s_005569f0, (int)plr->research_produced, research_unit);
+            MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_(14, 23);
+            fonts::Set_Outline_Color_(2, 1);
+            fonts::Print_Centered_(579, 391 + fonts::Get_Font_Height_(), buffer);
+        }
+    }
 }

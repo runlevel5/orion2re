@@ -4,6 +4,8 @@
 namespace MAINSCR {
     inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
+    inline int16_t& _main_screen_ship_icon_scanned =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
 
     void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 
@@ -48,4 +50,18 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Gate_Icons_();
+
+    void __cdecl Draw_Ship_Icons_(bool force_draw);
+
+    inline void __cdecl Set_Post_Fitted_Font_Style_(char c1, char c2) {
+        using Fn = void(__cdecl*)(char, char);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004cb8b0})(c1, c2);
+    }
+
+    inline void __cdecl Get_Research_Unit_String_(char* buffer) {
+        using Fn = void(__cdecl*)(char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004cd930})(buffer);
+    }
+
+    void __cdecl Print_Main_Screen_Data_();
 }

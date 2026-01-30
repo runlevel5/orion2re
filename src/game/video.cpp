@@ -15,4 +15,8 @@ namespace video {
 		screen_refresh_flag = 0;
 		screen_dump_flag = 0;
 	}
+
+	void Clip_Off_() {
+		animate::_clipping_flag = 0;
+	}
 }

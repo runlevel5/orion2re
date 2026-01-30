@@ -150,6 +150,9 @@
     <ClCompile Include="src\game\animate.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\movebox.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -342,6 +345,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\haccess.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\movebox.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

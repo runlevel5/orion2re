@@ -35,6 +35,35 @@ namespace helpers {
         while ((*dest++ = *src++));
     }
 
+    inline void* memcpy(void* dst, const void* src, size_t size)
+    {
+        auto* d = static_cast<std::uint8_t*>(dst);
+        auto* s = static_cast<const std::uint8_t*>(src);
+
+        // Align destination to 4 bytes for faster word copying
+        while (size && (reinterpret_cast<std::uintptr_t>(d) & 3u)) {
+            *d++ = *s++;
+            --size;
+        }
+
+        // Copy 4 bytes at a time where possible
+        auto* d32 = reinterpret_cast<std::uint32_t*>(d);
+        auto* s32 = reinterpret_cast<const std::uint32_t*>(s);
+        while (size >= 4) {
+            *d32++ = *s32++;
+            size -= 4;
+        }
+
+        // Tail bytes
+        d = reinterpret_cast<std::uint8_t*>(d32);
+        s = reinterpret_cast<const std::uint8_t*>(s32);
+        while (size--) {
+            *d++ = *s++;
+        }
+
+        return dst;
+    }
+
     inline void* memset(void* dst, int value, size_t size)
     {
         auto* p = static_cast<std::uint8_t*>(dst);

@@ -55,6 +55,8 @@ namespace MOX {
     inline void*& _sound_buffer = *reinterpret_cast<void**>(std::uintptr_t{ 0x005A1B34 });
     inline SCREEN& _current_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597302 });
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
+    inline uint8_t (&_given_chance_to_rename_home_star)[8] =
+        *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline void*& _moveable_box_pict = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
@@ -77,6 +79,7 @@ namespace MOX {
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
+    inline int16_t& _red_color_pulse_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059883c});
 
     inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
     inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
@@ -197,6 +200,15 @@ namespace MOX {
     inline uint32_t& _fleet_box_ship_ids =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059D610});
 
+    inline int16_t& _ship_icon_count =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597664});
+
+    inline int16_t& _fleet_box_ship_stack =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183E});
+
+    inline s_ship_icon* _ship_icon =
+            reinterpret_cast<s_ship_icon*>(std::uintptr_t{0x005A2CE8});
+
     inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
 
     inline uint32_t (&_bill_savegame)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x00559478});
@@ -249,12 +261,14 @@ namespace MOX {
         uint16_t width;
         int16_t field4_0x8;
         int16_t field5_0xa;
-        uint16_t field6_0xc;
-        uint16_t field7_0xe;
-        uint16_t field8_0x10;
-        uint16_t field9_0x12;
-        uint16_t field12_0x14;
-        uint16_t field13_0x16;
+        uint8_t field6_0xc;
+        uint8_t field7_0xd;
+        uint16_t field8_0xe;
+        uint16_t field9_0x10;
+        uint8_t field10_0x12;
+        uint8_t field11_0x13;
+        int16_t field12_0x14;
+        int16_t field13_0x16;
         uint16_t field14_0x18;
         uint16_t field15_0x1a;
     };
@@ -271,8 +285,8 @@ namespace MOX {
         *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059BD20});
 
     // Suggested name: MOX::box_visibility_flags
-    inline uint16_t (&_box_off_flag)[5] =
-        *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059C420});
+    inline int16_t (&_box_off_flag)[5] =
+        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x0059C420});
 
     // Funcs
     inline void Mox_Update_() {

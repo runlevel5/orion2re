@@ -975,7 +975,7 @@ namespace HOMEGEN {
         s_star_data& star = MOX::_star[star_idx];
 
         star.system_special = SYSTEM_SPECIAL_NO_SPECIAL;
-        star.wormhole_star_id = 0xFF;
+        star.wormhole_star_id = -1;
 
         for (int i = 0; i < 5; ++i) {
             int16_t planet_idx = star.planet_index[i];

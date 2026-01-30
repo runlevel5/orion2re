@@ -75,4 +75,13 @@ namespace graphics {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
+    void Reset_Window_()
+
+    {
+        video::_screen_window_x1 = 0;
+        video::_screen_window_y1 = 0;
+        video::_screen_window_x2 = (short)platform::g_screen_res_x + -1;
+        video::_screen_window_y2 = (short)platform::g_screen_res_y + -1;
+        return;
+    }
 }

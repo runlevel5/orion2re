@@ -2,6 +2,7 @@
 #include <cstdint>
 
 namespace graphics {
+    void Reset_Window_();
     void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color);
 
     inline void __cdecl Set_Window_(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {

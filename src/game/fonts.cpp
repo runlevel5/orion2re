@@ -69,6 +69,10 @@ namespace fonts {
         _PSTR_style = style;
     }
 
+    void __cdecl Set_Font_Spacing_(int16_t spacing) {
+        _font_header.font_style_spacing = spacing;
+    }
+
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, MISC::s_colors* style_data) {
         Set_Font_Style_(static_cast<int32_t>(font_index), style_data);
         _font_header.font_style = 5;
@@ -259,5 +263,16 @@ namespace fonts {
 
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap) {
         Print_Display_To_Bitmap_(x, y, text, 0, bitmap);
+    }
+
+    void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str) {
+        int16_t width = Get_String_Width_(str);
+        Print_(static_cast<int16_t>(x - (width / 2)), y, str);
+    }
+
+    void __cdecl Print_Right_(int16_t x, int16_t y, const char* text) {
+        int16_t width = Get_String_Width_(text);
+        int16_t adjusted_x = static_cast<int16_t>(x - (width - 1));
+        Print_(adjusted_x, y, text);
     }
 }
