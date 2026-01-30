@@ -185,6 +185,20 @@ namespace MOX {
     inline s_star_data*& _star =
         *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });
 
+    inline s_ship_node (&_ship_node)[500] =
+        *reinterpret_cast<s_ship_node(*)[500]>(std::uintptr_t{0x00597DA0});
+
+    inline uint16_t& _ship_stack_count =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B3F8});
+
+    inline int16_t (&_ship_stack_start)[500] =
+        *reinterpret_cast<int16_t(*)[500]>(std::uintptr_t{0x0059C030});
+
+    inline uint32_t& _fleet_box_ship_ids =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059D610});
+
+    inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
+
     inline uint32_t (&_bill_savegame)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x00559478});
     inline uint16_t& _antaran_resource_level = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059790C});
     inline uint16_t& _chance_for_antaran_invasion = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D24});

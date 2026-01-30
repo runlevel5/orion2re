@@ -1,12 +1,8 @@
 #pragma once
-#include <cstdint>
 
 namespace exitm {
-    inline void __cdecl Exit_With_Message(const char* msg) {
-        using Fn = void(__cdecl*)(const char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052D310})(msg);
-    }
+    // Suggested name: g_is_exiting_with_error
+    inline uint8_t& DAT_00578e68 = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578E68 });
 
-    // Suggested name: g_MapCaptureMessage
-    inline void*& DAT_005575b4 = *reinterpret_cast<void**>(std::uintptr_t{0x005575B4});
+    void Exit_With_Message(const char* str);
 }

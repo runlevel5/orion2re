@@ -27,14 +27,14 @@ namespace MISC {
         fn(a1, ctr, max, c1, c2, x, y, msg, bitmap, flag);
     }
 
-    inline void __stdcall Save_Window_Status_(uint16_t* status) {
-        using Fn = void(__stdcall*)(uint16_t*);
+    inline void __cdecl Save_Window_Status_(int16_t* status) {
+        using Fn = void(__cdecl*)(int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDC0});
         fn(status);
     }
 
-    inline void __stdcall Restore_Window_Status_(uint16_t status) {
-        using Fn = void(__stdcall*)(uint16_t);
+    inline void __cdecl Restore_Window_Status_(int16_t status) {
+        using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDA0});
         fn(status);
     }

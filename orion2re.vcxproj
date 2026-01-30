@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
+    <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
@@ -29,12 +30,13 @@
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\eric.cpp" />
     <ClCompile Include="src\game\events.cpp" />
-    <ClCompile Include="src\game\exit.cpp" />
+    <ClCompile Include="src\game\exitm.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />
+    <ClCompile Include="src\game\haccess.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
@@ -78,7 +80,6 @@
     <ClInclude Include="src\game\dos.h" />
     <ClInclude Include="src\game\eric.h" />
     <ClInclude Include="src\game\events.h" />
-    <ClInclude Include="src\game\exit.h" />
     <ClInclude Include="src\game\exitm.h" />
     <ClInclude Include="src\game\farload.h" />
     <ClInclude Include="src\game\fields.h" />
@@ -87,6 +88,7 @@
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\geo.h" />
     <ClInclude Include="src\game\graphics.h" />
+    <ClInclude Include="src\game\haccess.h" />
     <ClInclude Include="src\game\harold.h" />
     <ClInclude Include="src\game\helpers.h" />
     <ClInclude Include="src\game\homegen.h" />
@@ -135,6 +137,7 @@
     <None Include=".vocode\workflows\agent.yaml" />
     <None Include=".vocode\workflows\chat.yaml" />
     <None Include=".vocode\workflows\decompiler.yaml" />
+    <None Include="notes.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

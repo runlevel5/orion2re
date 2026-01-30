@@ -386,3 +386,6 @@ inline void __cdecl Set_Default_Ship_Name(uint16_t race, int16_t size, int16_t p
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042f830});
     fn(race, size, picture_mod, name);
 }
+
+inline const char* const s_Memory_Corruption_val_00558028 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"

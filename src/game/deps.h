@@ -22,7 +22,7 @@
 #include "palette.h"
 #include "filedef.h"
 #include "video.h"
-#include "exit.h"
+#include "exitm.h"
 #include "sprite.h"
 #include "mox.h"
 #include "mox2.h"

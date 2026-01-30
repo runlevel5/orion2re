@@ -195,10 +195,10 @@ namespace TRADE {
                 for (int p = 0; p < (uint8_t)colony->n_pops; ++p) {
                     Pop_Info* pop = &colony->pop[p];
 
-                    if (pop->player < 8) {
+                    if (pop->race < 8) {
                         trade_pops++;
                         research_pops++;
-                    } else if (pop->player == 8 && pop->job == 2) {
+                    } else if (pop->race == 8 && pop->job == 2) {
                         research_pops++;
                     }
                 }

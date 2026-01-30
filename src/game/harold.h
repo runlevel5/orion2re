@@ -13,6 +13,8 @@ namespace HAROLD {
 
     uint8_t __cdecl N_Planets_In_System_(int16_t star_idx);
 
+    int16_t __cdecl N_Colony_Owners_(int16_t star_idx);
+
     uint8_t __cdecl N_Sattelites_(int16_t star_index);
 
     void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap);
@@ -70,10 +72,16 @@ namespace HAROLD {
         fn(style, param_2);
     }
 
-    inline void __cdecl Map_Scale_To_Zoom_Level_() {
-        using Fn = void(__cdecl*)();
+    inline int16_t __cdecl Map_Scale_To_Zoom_Level_() {
+        using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1090 });
-        fn();
+        return fn();
+    }
+
+    inline int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c7510});
+        return fn(star_idx);
     }
 
     void __cdecl Restore_Mouse_List_();
@@ -82,7 +90,21 @@ namespace HAROLD {
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
+    int16_t __cdecl Zoom_Level_Font_Style_();
+
+    bool __cdecl Contact_With_Player_(int16_t player_idx, int16_t target_idx);
+
+    char __cdecl Contact_With_One_Colony_(int16_t star_idx);
+
+    bool __cdecl Player_Has_Stargate_(int16_t player_idx, int16_t star_idx);
+
+    bool __cdecl Player_Has_Jumpgate_(int16_t player_idx, int16_t star_idx);
+
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
+
+    bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star);
+
+    bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star);
 
     inline int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t planet_idx) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);

@@ -25,4 +25,7 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ada0});
         return fn(star_idx, player_num);
     }
+
+    int16_t __cdecl Ship_Owner_(int16_t ship_idx);
+    int16_t __cdecl Ship_Stack_From_Saved_Array_();
 }

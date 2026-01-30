@@ -151,6 +151,37 @@ namespace HAROLD {
         return count;
     }
 
+    /**
+     * @address 004f10f0
+     */
+    int16_t __cdecl N_Colony_Owners_(int16_t star_idx) {
+        uint8_t owners_seen[8];
+        int16_t unique_count = 0;
+
+        for (int i = 0; i < 8; ++i) {
+            owners_seen[i] = 0;
+        }
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx > -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx > -1) {
+                    uint8_t owner_id = static_cast<uint8_t>(MOX::_colony[colony_idx].owner);
+
+                    if (owners_seen[owner_id] == 0) {
+                        unique_count++;
+                        owners_seen[owner_id] = 1;
+                    }
+                }
+            }
+        }
+
+        return unique_count;
+    }
+
     void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap) {
         int16_t candidates[20];
         for (int i = 0; i < 20; ++i) {
@@ -338,10 +369,44 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f1610
+     */
+    bool __cdecl Player_Has_Jumpgate_(int16_t player_idx, int16_t star_idx) {
+        uint8_t jumpgate_bits = MOX::_star[star_idx].has_jumpgate;
+
+        return (bool)((jumpgate_bits >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1);
+    }
+
+    /**
+     * @address 004f16d0
+     */
+    bool __cdecl Player_Has_Stargate_(int16_t player_idx, int16_t star_idx) {
+        uint8_t stargate_bits = MOX::_star[star_idx].has_stargate;
+
+        return (bool)((stargate_bits >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1);
+    }
+
+    /**
      * @address 004f1750
      */
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
         return (MOX::_star[star_idx].visited & (1 << (static_cast<uint8_t>(player_idx) & 0x1F))) != 0;
+    }
+
+    /**
+     * @address 004f1560
+     */
+    bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star) {
+        int32_t player_index = static_cast<int32_t>(player - MOX::_player);
+        return (bool)((star->has_artemis_net >> (player_index & 0x1f)) & 1);
+    }
+
+    /**
+     * @address 004f15e0
+     */
+    bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star) {
+        int32_t player_index = static_cast<int32_t>(player - MOX::_player);
+        return (bool)((star->has_dimensional_portal >> (player_index & 0x1f)) & 1);
     }
 
     /**
@@ -459,6 +524,39 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f07f0
+     */
+    bool __cdecl Contact_With_Player_(int16_t player_idx, int16_t target_idx) {
+        if (target_idx >= 0 && target_idx < (int16_t)MOX::_NUM_PLAYERS) {
+            return MOX::_player[player_idx].contact[target_idx] != 0;
+        }
+        return false;
+    }
+
+    /**
+     * @address 004f0760
+     */
+    char __cdecl Contact_With_One_Colony_(int16_t star_idx) {
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx > -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx > -1) {
+                    int16_t colony_owner = static_cast<int16_t>(MOX::_colony[colony_idx].owner);
+
+                    if (Contact_With_Player_(MOX::_PLAYER_NUM, colony_owner)) {
+                        return 1;
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @address 004f1ab0
      */
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx) {
@@ -484,5 +582,26 @@ namespace HAROLD {
         }
 
         return winner;
+    }
+
+    int16_t __cdecl Zoom_Level_Font_Style_() {
+        int16_t scale = MOX::_cur_map_scale;
+
+        if (scale == 10) {
+            return 3;
+        }
+        if (scale == 15) { // 0xf
+            return 2;
+        }
+        if (scale == 20) { // 0x14
+            return 2;
+        }
+        if (scale == 30) { // 0x1e
+            return 1;
+        }
+
+        // Returns uninitialized stack value as seen in the original assembly
+        int16_t uninitialized;
+        return uninitialized;
     }
 }

@@ -245,6 +245,22 @@ namespace hooks {
         { 0x004cd120, &MAINSCR::Star_On_Screen_ },
         { 0x004c6e50, &MAINSCR::Draw_Stars_ },
         { 0x004c43e0, &MAINSCR::Get_Star_Picture_Seg_ },
+        { 0x00524d90, &animate::Set_Animation_Frame_ },
+        { 0x00524d50, &animate::Get_Animation_Frame_Count_ },
+        { 0x00524d80, &animate::Reset_Animation_Frame_ },
+        { 0x004c6eb0, &MAINSCR::Draw_A_Star_ },
+        { 0x004f16d0, &HAROLD::Player_Has_Stargate_ },
+        { 0x004f1610, &HAROLD::Player_Has_Jumpgate_ },
+        { 0x004f1560, &HAROLD::Player_Has_Artemis_Net_ },
+        { 0x004f15e0, &HAROLD::Player_Has_Dimensional_Portal_ },
+        { 0x004c5980, &MAINSCR::Draw_Gate_Icons_ },
+        { 0x004f07f0, &HAROLD::Contact_With_Player_ },
+        { 0x004f0760, &HAROLD::Contact_With_One_Colony_ },
+        { 0x004f1e30, &HAROLD::Zoom_Level_Font_Style_ },
+        { 0x004f10f0, &HAROLD::N_Colony_Owners_ },
+        { 0x004c50c0, &MAINSCR::Draw_Black_Holes_ },
+        { 0x0049b270, &HACCESS::Ship_Owner_ },
+        { 0x0049b330, &HACCESS::Ship_Stack_From_Saved_Array_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -260,6 +276,7 @@ namespace hooks {
         ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
+        ASSERT(sizeof(s_ship_node) == 5, "s_ship_node");
         ASSERT(sizeof(MOX::s_skill_data) == 18, "s_skill_data");
         ASSERT(sizeof(TECHDATA::s_tech_fuel_data) == 10, "s_tech_fuel_data");
         ASSERT(sizeof(TECHDATA::s_tech_app_data) == 13, "s_tech_app_data");

@@ -26,14 +26,13 @@ namespace MAINSCR {
         *out_y = scaled_y + 0x15;
     }
 
-    void __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, uint32_t param_2, int8_t param_3) {
-        // TYPE MISMATCH: Map_Scale_To_Zoom_Level_ is declared as returning void, but returns int16_t
-        int16_t zoom_level = reinterpret_cast<int16_t(__cdecl*)()>(std::uintptr_t{0x004F1090})();
+    void* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size) {
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
         int16_t class_offset = (int16_t)spectral_class * 6;
 
         int16_t result_ax = zoom_level;
         if (spectral_class != STAR_CLASS_BLACK_HOLE) {
-            result_ax += (int16_t)param_3;
+            result_ax += (int16_t)size;
         }
         result_ax += class_offset;
 
@@ -44,6 +43,8 @@ namespace MAINSCR {
             final_index + 148,
             MOX::_global_cache_seg
         );
+
+        return MOX::_star_seg[final_index];
     }
 
     void __cdecl Get_Star_Draw_Coords_(int16_t star_idx, int16_t* out_x, int16_t* out_y) {
@@ -118,6 +119,41 @@ namespace MAINSCR {
         }
     }
 
+    void __cdecl Draw_A_Star_(int16_t star_idx) {
+        int16_t zoom_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
+        s_star_data* star = &MOX::_star[star_idx];
+
+        void* star_seg = Get_Star_Picture_Seg_(star->spectral_class, star->pict_type, star->size);
+
+        int16_t screen_x;
+        int16_t screen_y;
+        Get_Star_Draw_Coords_(star_idx, &screen_x, &screen_y);
+
+        screen_x -= zoom_size / 2;
+        screen_y -= zoom_size / 2;
+
+        if (static_cast<int8_t>(star->not_used1) < 0) {
+            animate::Reset_Animation_Frame_(static_cast<int16_t*>(star_seg));
+            animate::Draw_(screen_x, screen_y, star_seg);
+        } else {
+            star->not_used1++;
+
+            int16_t frame_count = animate::Get_Animation_Frame_Count_(static_cast<int16_t*>(star_seg));
+
+            if (static_cast<int8_t>(star->not_used2) <= static_cast<int8_t>(star->not_used1)) {
+                int32_t remaining = static_cast<int32_t>(_n_twinkling_stars) - 1;
+                _n_twinkling_stars = static_cast<int16_t>((remaining < 1) ? 0 : remaining);
+
+                star->not_used1 = 0xFF;
+                star->not_used2 = 0xFF;
+            }
+
+            int32_t current_frame = (static_cast<int16_t>(star->not_used1) / 2) % frame_count;
+            animate::Set_Animation_Frame_(static_cast<int16_t*>(star_seg), current_frame);
+            animate::Draw_(screen_x, screen_y, star_seg);
+        }
+    }
+
     /**
      * @address 004cd550
      */
@@ -128,7 +164,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Wormhole_Links_() {
-        uint16_t window_status;
+        int16_t window_status;
         MISC::Save_Window_Status_(&window_status);
 
         graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
@@ -155,7 +191,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Draw_Relocation_Links_() {
-        uint16_t window_status;
+        int16_t window_status;
         uint8_t colors[8] = { 0x6e, 0x6f, 0x70, 0x70, 0x6e, 0x6f, 0x70, 0x70 };
 
         MISC::Save_Window_Status_(&window_status);
@@ -175,5 +211,64 @@ namespace MAINSCR {
         }
 
         MISC::Restore_Window_Status_(window_status);
+    }
+
+    void __cdecl Draw_Black_Holes_() {
+        int16_t zoom_dist[4] = { 0x27, 0x21, 0x21, 0x18 };
+        int16_t window_status;
+        int16_t star_idx;
+        int16_t bh_anim_idx = 0;
+        int16_t x, y;
+
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+        MISC::Save_Window_Status_(&window_status);
+        graphics::Set_Window_(22, 22, 527, 421); // 0x16, 0x16, 0x20f, 0x1a5
+        video::Clip_On_();
+
+        if (MOX::_NUM_STARS > 0) {
+            for (star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                auto& star = MOX::_star[star_idx];
+
+                if (star.spectral_class == STAR_CLASS_BLACK_HOLE) {
+                    Get_Star_Draw_Coords_(star_idx, &x, &y);
+
+                    int16_t offset = zoom_dist[zoom_level] / 2;
+                    x -= offset;
+                    y -= offset;
+
+                    void* seg = Get_Star_Picture_Seg_(star.spectral_class, star.pict_type, star.size);
+
+                    uint8_t count = MOX::_black_hole_anim_count[bh_anim_idx];
+                    int16_t num_frames = animate::Get_Animation_Frame_Count_(seg);
+
+                    // Update and wrap animation counter
+                    uint8_t new_count = (count + 1) % (num_frames * 2);
+                    MOX::_black_hole_anim_count[bh_anim_idx] = new_count;
+
+                    animate::Set_Animation_Frame_(seg, new_count / 2);
+                    animate::Draw_(x, y, seg);
+
+                    // Clamp black hole animation index for the next star to array capacity
+                    bh_anim_idx++;
+                    if (bh_anim_idx >= 10) {
+                        bh_anim_idx = 10;
+                    }
+                }
+            }
+        }
+
+        MISC::Restore_Window_Status_(window_status);
+    }
+
+    void __cdecl Draw_Gate_Icons_() {
+        int16_t star_idx = 0;
+        int16_t num_stars = MOX::_NUM_STARS;
+
+        if (num_stars > 0) {
+            do {
+                Draw_A_Gate_Icon_(static_cast<int32_t>(star_idx));
+                star_idx++;
+            } while (star_idx < num_stars);
+        }
     }
 }

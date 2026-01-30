@@ -33,7 +33,7 @@
     <ClCompile Include="src\game\mox2.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\exit.cpp">
+    <ClCompile Include="src\game\exitm.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
     <ClCompile Include="src\game\filedef.cpp">
@@ -144,6 +144,12 @@
     <ClCompile Include="src\game\strings.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\haccess.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\animate.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -165,9 +171,6 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\helpers.h">
-      <Filter>src\game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\exit.h">
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\video.h">
@@ -338,6 +341,9 @@
     <ClInclude Include="src\game\initship.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\haccess.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">
@@ -353,5 +359,6 @@
       <Filter>.vocode</Filter>
     </None>
     <None Include=".gitignore" />
+    <None Include="notes.md" />
   </ItemGroup>
 </Project>
