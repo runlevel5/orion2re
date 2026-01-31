@@ -202,7 +202,7 @@ namespace MOX {
     #pragma pack(push, 1)
     struct s_skill_data {
         uint8_t num;
-        uint8_t skill_mask[4];
+        uint32_t skill_mask;
         uint8_t unknown1;
         uint16_t skill_bonus;
         uint8_t unknown2;
@@ -212,7 +212,7 @@ namespace MOX {
     };
     #pragma pack(pop)
 
-    inline s_skill_data (&_skill_data)[54] = *reinterpret_cast<s_skill_data(*)[54]>(std::uintptr_t{0x0055905D});
+    inline s_skill_data (&skill_data)[54] = *reinterpret_cast<s_skill_data(*)[54]>(std::uintptr_t{0x00559058});
 
     inline s_colony*& _colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });

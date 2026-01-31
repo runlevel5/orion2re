@@ -640,6 +640,18 @@ namespace HAROLD {
         return 0;
     }
 
+    bool __cdecl Player_Is_Omniscient_(int16_t player_idx) {
+        if (OFFICER::One_Leader_With_Galactic_Lore_(player_idx)) {
+            return true;
+        }
+
+        if (MOX::_player[player_idx].traits[TRAIT_OMNISCIENCE] != 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @address 004f1ab0
      */
@@ -647,7 +659,7 @@ namespace HAROLD {
         int16_t player_counts[MAX_PLAYERS];
         int16_t unk_val;
 
-        bool hide_unexplored = !OFFICER::One_Leader_With_Galactic_Lore_(player_idx);
+        bool hide_unexplored = !HAROLD::Player_Is_Omniscient_(player_idx);
 
         Colony_Owners_(star_idx, player_counts, &unk_val, hide_unexplored);
 

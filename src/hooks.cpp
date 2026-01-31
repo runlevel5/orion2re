@@ -341,6 +341,9 @@ namespace hooks {
         { 0x0049eda0, &MISC::Restore_Window_Status_ },
         { 0x004c70e0, &MAINSCR::Set_Popup_Draw_XY_ },
         { 0x004c7160, &MAINSCR::Popup_XY_ },
+        { 0x0043df90, &OFFICER::Get_Random_Skills_ },
+        { 0x0043e630, &OFFICER::One_Leader_With_Galactic_Lore_ },
+        { 0x004f1700, &HAROLD::Player_Is_Omniscient_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -366,6 +369,7 @@ namespace hooks {
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
         ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
+        ASSERT(sizeof(MOX::s_skill_data) == 0x12, "MOX::s_skill_data");
     }
 
     void Install_Hooks()

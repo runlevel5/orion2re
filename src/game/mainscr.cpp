@@ -256,7 +256,7 @@ namespace MAINSCR {
             if (wormhole_id != -1) {
                 bool is_visible = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx);
                 if (!is_visible) {
-                    is_visible = OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM);
+                    is_visible = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
                 }
 
                 if (is_visible) {
@@ -932,7 +932,7 @@ namespace MAINSCR {
     }
 
     void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5) {
-        bool galactic_lore = OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM);
+        bool galactic_lore = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
         *str = '\0';
         *param_3 = 0;
         HAROLD::Map_Scale_To_Zoom_Level_();

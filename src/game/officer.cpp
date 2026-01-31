@@ -43,9 +43,9 @@ namespace OFFICER {
         s_leader_data& leader = MOX::_leaders[leader_index];
 
         for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
-            MOX::s_skill_data& skill = MOX::_skill_data[skill_idx];
+            MOX::s_skill_data& skill = MOX::skill_data[skill_idx];
 
-            if (skill.num == 0) {
+            if (skill.unknown1 == 0) {
                 if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                     int16_t val;
                     if (skill_idx == 2 || skill_idx == 3) {
@@ -55,22 +55,22 @@ namespace OFFICER {
                             val *= 2;
                         }
                     } else {
-                        val = (int8_t)skill.skill_mask[3];
+                        val = (int8_t)skill.unknown3;
                     }
                     total_value += val;
                 }
             }
 
             if (leader.type == 0) { // Ship Officer
-                if (skill.num == 1) {
+                if (skill.unknown1 == 1) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
-                        total_value += (int8_t)skill.skill_mask[3];
+                        total_value += (int8_t)skill.unknown3;
                     }
                 }
             } else if (leader.type == 1) { // Colony Leader
-                if (skill.num == 2) {
+                if (skill.unknown1 == 2) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
-                        total_value += (int8_t)skill.skill_mask[3];
+                        total_value += (int8_t)skill.unknown3;
                     }
                 }
             }
@@ -90,5 +90,73 @@ namespace OFFICER {
         }
 
         return total_value;
+    }
+
+    void __cdecl Get_Random_Skills_(uint32_t* primary_mask, uint32_t* secondary_mask, int16_t skill_class, int16_t count, int8_t randomize_class) {
+        *primary_mask = 0;
+        *secondary_mask = 0;
+
+        if (count <= 0) {
+            return;
+        }
+
+        int16_t remaining_count = count;
+        do {
+            int16_t selected_idx = 0;
+            int16_t options_found = 0;
+            int16_t current_class = skill_class;
+
+            if (randomize_class != 0) {
+                if (random::Random_(7) < 3) {
+                    current_class = 0;
+                }
+            }
+
+            for (int j = 0; j < 54; j += 2) {
+                if (current_class == 0) {
+                    // Search for secondary skills
+                    if (MOX::skill_data[j].unknown1 == 0 &&
+                        ((*secondary_mask & MOX::skill_data[j].skill_mask) == 0) &&
+                        ((*secondary_mask & MOX::skill_data[j + 1].skill_mask) == 0)) 
+                    {
+                        options_found++;
+                        if (random::Random_(options_found) == 1) {
+                            if (random::Random_(2) == 1) {
+                                selected_idx = (int16_t)j;
+                            } else {
+                                selected_idx = (int16_t)(j + 1);
+                            }
+                        }
+                    }
+                } else {
+                    // Search for primary skills of specific class
+                    if ((int16_t)MOX::skill_data[j].unknown1 == skill_class &&
+                        ((*primary_mask & MOX::skill_data[j].skill_mask) == 0) &&
+                        ((*primary_mask & MOX::skill_data[j + 1].skill_mask) == 0)) 
+                    {
+                        options_found++;
+                        if (random::Random_(options_found) == 1) {
+                            if (random::Random_(2) == 1) {
+                                selected_idx = (int16_t)j;
+                            } else {
+                                selected_idx = (int16_t)(j + 1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (current_class == 0) {
+                *secondary_mask += MOX::skill_data[selected_idx].skill_mask;
+            } else {
+                *primary_mask += MOX::skill_data[selected_idx].skill_mask;
+            }
+
+            remaining_count--;
+        } while (remaining_count != 0);
+    }
+
+    bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx) {
+        return (bool)MOX::_player[player_idx].has_galactic_lore;
     }
 }

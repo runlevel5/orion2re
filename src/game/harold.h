@@ -84,6 +84,8 @@ namespace HAROLD {
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
+    bool __cdecl Player_Is_Omniscient_(int16_t player_idx);
+
     int16_t __cdecl Zoom_Level_Font_Style_();
 
     void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, uint8_t* style_buf, bool param_2);
