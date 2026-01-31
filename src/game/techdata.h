@@ -3,10 +3,21 @@
 
 namespace TECHDATA {
     #pragma pack(push, 1)
-    struct s_building_data {
-        uint8_t filler[8];
-        int32_t cost; // 0x8
-        uint8_t filler2[37];
+
+    struct s_tech_building_data {
+        char* name;
+        undefined field1_0x4;
+        undefined field2_0x5;
+        undefined field3_0x6;
+        undefined field4_0x7;
+        int32_t cost;
+        undefined field6_0xc;
+        undefined field7_0xd;
+        undefined field8_0xe;
+        undefined field9_0xf;
+        undefined field10_0x10;
+        undefined field11_0x11;
+        undefined field12_0x12;
     };
 
     struct s_tech_app_data {
@@ -52,7 +63,7 @@ namespace TECHDATA {
     };
     #pragma pack(pop)
 
-    inline s_building_data* _buildings = reinterpret_cast<s_building_data*>(std::uintptr_t{ 0x00554290 });
+    inline s_tech_building_data* _buildings = reinterpret_cast<s_tech_building_data*>(std::uintptr_t{ 0x00554290 });
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
     inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
     inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(std::uintptr_t{ 0x00553050 });

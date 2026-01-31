@@ -223,6 +223,7 @@ workflows:
             #pragma pack(pop)
           * You are NOT allowed to rearrange fields in emitted structures. Fields must be in the same order as they were
             provided to you.
+          * You should NOT emit a new address for a structure if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
             always prefer using library function. Our application does not have direct access to library functions - you

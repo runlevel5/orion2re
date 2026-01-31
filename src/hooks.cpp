@@ -349,6 +349,13 @@ namespace hooks {
         { 0x005304a0, &bitmap::Get_Bitmap_Actual_Size_ },
         { 0x004c59b0, &MAINSCR::Draw_A_Gate_Icon_ },
         { 0x004fc4b0, &COLCALC::Twiddle_Initial_Homeworld_ },
+        { 0x004f8290, &COLCALC::Recalculate_Colony_ },
+        { 0x004f6bd0, &COLCALC::Colony_Environmental_Stuff_ },
+        { 0x004f4310, &COLCALC::Colony_Industry_Per_Worker_ },
+        { 0x004f3580, &COLCALC::Colony_Food2_Per_Farmer_ },
+        { 0x004f4d90, &COLCALC::Colony_Research_Per_Scientist_ },
+        { 0x004f6c50, &COLCALC::Pre_Import_Computing_ },
+        { 0x004f2f50, &COLCALC::Colony_Morale_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -361,6 +368,7 @@ namespace hooks {
         ASSERT(sizeof(s_player) == 0xea9, "s_player");
         ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");
         ASSERT(sizeof(s_colony) == 0x169, "s_colony");
+        ASSERT(sizeof(TECHDATA::s_tech_building_data) == 0x13, "s_building_data");
         ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
         ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
         ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
