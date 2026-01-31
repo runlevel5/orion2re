@@ -119,6 +119,14 @@ namespace MAINSCR {
         }
     }
 
+    void Draw_Mini_Main_Offscreen_() {
+        fields::Disable_Draw_All_Fields_();
+        video::Set_Page_Off_();
+        MAINSCR::Draw_Mini_Main_Screen_();
+        RUSS::Mox_Sync_Update_();
+        fields::Enable_Draw_All_Fields_();
+    }
+
     void __cdecl Draw_A_Star_(int16_t star_idx) {
         int16_t zoom_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
         s_star_data* star = &MOX::_star[star_idx];
@@ -552,6 +560,47 @@ namespace MAINSCR {
         fonts::Set_Font_Spacing_(spacing);
     }
 
+    /**
+     * @address 004c70e0
+     */
+    void __cdecl Set_Popup_Draw_XY_(int16_t popup_type, int16_t ship_icon_idx, int16_t* out_w, int16_t* out_h) {
+        int16_t draw_x;
+        int16_t draw_y;
+
+        if (popup_type == 2) {
+            draw_x = MOX::_ship_icon[ship_icon_idx].x - 21;
+            draw_y = MOX::_ship_icon[ship_icon_idx].y - 21;
+        } else {
+            Get_Star_Draw_Coords_(ship_icon_idx, &draw_x, &draw_y);
+        }
+
+        Popup_XY_(popup_type, draw_x, draw_y, out_w, out_h);
+    }
+
+    void __cdecl Popup_XY_(int16_t index, int16_t x, int16_t y, int16_t* out_w, int16_t* out_h) {
+        if (x < 253 && y < 200) {
+            *out_w = 527 - MOX::_moveable_box[index].width;
+            if (index == 0) {
+                *out_h = 421 - MOX::_moveable_box[0].height;
+            } else {
+                *out_h = 421;
+            }
+        } else if (x < 253 && y > 200) {
+            *out_w = 527 - MOX::_moveable_box[index].width;
+            *out_h = 22;
+        } else if (x > 253 && y < 200) {
+            *out_w = 22;
+            if (index == 0) {
+                *out_h = 421 - MOX::_moveable_box[0].height;
+            } else {
+                *out_h = 421;
+            }
+        } else {
+            *out_w = 22;
+            *out_h = 22;
+        }
+    }
+
     void __cdecl Print_Main_Screen_Data_(void) {
         char sep = (MOX::_settings.language == 1 || MOX::_settings.language == 2) ? ',' : '.';
         uint8_t font_colors[16];
@@ -612,7 +661,7 @@ namespace MAINSCR {
         fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
 
         char* surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
-        const char* bc_sign = (plr->surplus_bc < 0) ? s___00551100 : s___00551118;
+        const char* bc_sign = (plr->surplus_bc < 0) ? "-" : "+";
         _sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style_();
@@ -633,7 +682,7 @@ namespace MAINSCR {
         fonts::Print_Centered_(579, fonts::Get_Font_Height_() + 96, buffer);
 
         int16_t cp_surplus = plr->command_points - plr->command_points_used;
-        const char* cp_sign = (cp_surplus < 0) ? s___00551100 : s___00551118;
+        const char* cp_sign = (cp_surplus < 0) ? "-" : "+";
         _sprintf(buffer, s__s_d___d__00559958, cp_sign, cp_surplus, (int)plr->command_points);
         MISC::Set_Fitted_Font_Style_(buffer, &font_colors[8], 2, 2, 4, 0x43, 0);
         int16_t current_style = fonts::_current_font_style;
@@ -666,7 +715,7 @@ namespace MAINSCR {
 
         fonts::Get_Font_Height_();
         char* food_comma = MISC::Get_Comma_String_(plr->surplus_food);
-        const char* food_sign = (plr->surplus_food < 0) ? s___00551100 : s___00551118;
+        const char* food_sign = (plr->surplus_food < 0) ? "-" : "+";
         _sprintf(buffer, s__s_s_00556aec, food_sign, food_comma);
         if (plr->surplus_food < 0) {
             MISC::Set_Fitted_Font_Style_(buffer, &font_colors[0], 2, 2, 4, 0x43, 1);
@@ -680,7 +729,7 @@ namespace MAINSCR {
         }
         fonts::Print_Centered_(579, 255, buffer);
 
-        const char* fr_sign = (plr->surplus_freighters < 0) ? s___00551100 : s___00551118;
+        const char* fr_sign = (plr->surplus_freighters < 0) ? "-" : "+";
         _sprintf(buffer, s__s_d___d__00559958, fr_sign, (int)plr->surplus_freighters, (int)plr->n_freighters);
         MISC::Set_Fitted_Font_Style_(buffer, &font_colors[0], 2, 2, 4, 0x43, 1);
         int16_t fr_style = MISC::Get_Font_Style_();
@@ -778,6 +827,44 @@ namespace MAINSCR {
             fonts::Set_Outline_Color_(2, 1);
             fonts::Print_Centered_(579, 391 + fonts::Get_Font_Height_(), buffer);
         }
+    }
+
+    void __cdecl Do_System_Popup_(int16_t system_id) {
+        FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
+
+        MOX::_moveable_box[0].off_flag = system_id;
+
+        bool box_was_selected = (MOVEBOX::Moveable_Box_Selected_(2) != 0);
+
+        if (box_was_selected) {
+            MOVEBOX::Vanish_Fleet_Movement_Box_();
+            SYS::Clear_System_Display_Loaded_Flag_();
+        }
+
+        SYS::Init_System_Display_(MOX::_moveable_box[0].off_flag);
+
+        int16_t star_x, star_y;
+        Get_Star_Draw_Coords_(system_id, &star_x, &star_y);
+
+        Set_Popup_Draw_XY_(0, system_id, &MOX::_moveable_box[0].x, &MOX::_moveable_box[0].y);
+
+        if (MOX::_settings.expanding_help != 0) {
+            Draw_Exploding_Plasma_Box_(
+                star_x,
+                star_y,
+                MOX::_moveable_box[0].x,
+                MOX::_moveable_box[0].y,
+                MOX::_moveable_box[0].width,
+                MOX::_moveable_box[0].height,
+                0
+            );
+        } else if (box_was_selected) {
+            fields::Init_Fields_State_();
+            Clear_Main_Screen_Fields_();
+            Draw_Mini_Main_Offscreen_();
+        }
+
+        MOVEBOX::Move_Box_To_Top_(0);
     }
 
     void __cdecl Fade_Into_Main_Screen_() {
@@ -916,5 +1003,62 @@ namespace MAINSCR {
         if (HAROLD::N_Colony_Owners_(star_idx) > 1) {
             *param_3 = Print_Star_Name_To_Bitmap_(star_idx, str, param_5);
         }
+    }
+
+    void Add_Map_Fields_() {
+        if (MOX::_zoom_in == 1) {
+            Clear_Main_Screen_Fields_();
+            for (int i = 0; i < 5; ++i) {
+                MOX::_moveable_box[i].field8_0xe = 0xfc18;
+                MOX::_moveable_box[i].field9_0x10 = 0xfc18;
+            }
+
+            _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, s_plus_00551118, 0x28);
+            _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, s_minus_0055111c, 0x28);
+            _whole_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0x29);
+            return;
+        }
+
+        MOVEBOX::Moveable_Box_Selected_(2);
+        _whole_screen_field = (int16_t)0xfc18;
+
+        _game_button = fields::Add_Button_Field_(249, 5, s__00551100, MOX::_main_game_button_seg, s_G_0055241c, 0x29);
+        _next_button = fields::Add_Button_Field_(544, 441, s__00551100, MOX::_main_next_button_seg, s_T_005598f8, 0x28);
+        _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, "+", 0x28);
+        _zoom_out_button = fields::Add_Button_Field_(244, 455, s__00551100, MOX::_main_zoom_out_button_seg, "-", 0x28);
+
+        _colonies_button = fields::Add_Irregular_Button_Field_(17, 434, 79, 471, s__00551100, MOX::_main_colonies_button_seg, 0, 425, s_C_00552420, 0x28);
+        _planets_button = fields::Add_Irregular_Button_Field_(91, 434, 154, 471, s__00551100, MOX::_main_planets_button_seg, 0, 425, s_P_005569d8, 0x28);
+        _fleets_button = fields::Add_Irregular_Button_Field_(167, 434, 230, 471, s__00551100, MOX::_main_fleets_button_seg, 0, 425, s_F_005598f4, 0x28);
+        _leaders_button = fields::Add_Irregular_Button_Field_(312, 435, 379, 471, s__00551100, MOX::_main_leaders_button_seg, 306, 425, s_L_005560e8, 0x28);
+        _races_button = fields::Add_Irregular_Button_Field_(386, 435, 453, 471, s__00551100, MOX::_main_races_button_seg, 306, 425, s_R_0055824c, 0x28);
+        _info_button = fields::Add_Irregular_Button_Field_(462, 435, 526, 471, s__00551100, MOX::_main_info_button_seg, 306, 425, s_I_0055801c, 0x28);
+
+        _treasury_window_field = fields::Add_Hidden_Field_(545, 49, 613, 119, s__00551100, 0x29);
+        _command_points_window_field = fields::Add_Hidden_Field_(545, 122, 613, 192, s__00551100, 0x29);
+        _food_window_field = fields::Add_Hidden_Field_(545, 197, 613, 267, s__00551100, 0x29);
+        _freighters_window_field = fields::Add_Hidden_Field_(545, 270, 613, 340, s__00551100, 0x29);
+        _research_window_field = fields::Add_Hidden_Field_(545, 344, 613, 415, s__00551100, 0x29);
+
+        Add_Moveable_Box_Fields_();
+
+        int16_t window_status;
+        MISC::Save_Window_Status_(&window_status);
+        graphics::Set_Window_(22, 22, 527, 421);
+        video::Clip_On_();
+        MISC::Restore_Window_Status_(window_status);
+
+        _first_field = MOX::_star_button;
+
+        if (_debug_enabled) {
+            _debug_field = fields::Add_Hidden_Field_(630, 470, 639, 479, s__00551100, 0);
+        } else {
+            _debug_field = (int16_t)0xfc18;
+        }
+
+        graphics::Reset_Window_();
+        _exit_game_hot_key = fields::Add_Multi_Hot_Key_Field_(s_Q_005598f0);
+
+        MOX::_main_screen_grid_field = fields::Add_Grid_Field_(22, 22, 1, 1, 506, 400, &MOX::_main_screen_grid_x, &MOX::_main_screen_grid_y, 0);
     }
 }

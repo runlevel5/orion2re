@@ -58,6 +58,7 @@
     <ClCompile Include="src\game\platform.cpp" />
     <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
+    <ClCompile Include="src\game\russ.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\strings.cpp" />

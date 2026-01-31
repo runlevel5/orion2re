@@ -42,6 +42,7 @@
 #include "misc.h"
 #include "strings.h"
 #include "loader.h"
+#include "sys.h"
 #include "multplay.h"
 #include "netmox.h"
 #include "timer.h"

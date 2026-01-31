@@ -514,10 +514,10 @@ workflows:
             Do not create a new settings header file.
 
           # Checklist
+          * All patches were successfully applied by apply_patch tool and were not printed to the user
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
           * All mentioned namespaces were processed
           * No existing function signatures were changed
-          * All patches were successfully applied by apply_patch tool
           * `src/patch.cpp` was updated
         outcomes:
           - name: done    

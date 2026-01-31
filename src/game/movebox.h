@@ -9,4 +9,6 @@ namespace MOVEBOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513D30});
         fn();
     }
+
+    void __cdecl Move_Box_To_Top_(int16_t box_id);
 }

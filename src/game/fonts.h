@@ -34,8 +34,8 @@ struct s_font {
     inline int16_t& _print_xpos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576430});
     inline int16_t& _print_ypos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576440});
 
-    inline uint16_t& _current_font_style =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0057643C});
+    inline int16_t& _current_font_style =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057643C});
     inline int16_t& _current_font_style_2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578e1c});
 
     inline uintptr_t& _font_data = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x00576434});
@@ -129,4 +129,7 @@ struct s_font {
         using Fn = uint32_t(__cdecl*)(const void*);
         return reinterpret_cast<Fn>(std::uintptr_t{0x00454ae0})(text);
     }
+
+    void __cdecl Get_Colors_(uint8_t* colors);
+    void __cdecl Set_Colors_(const uint8_t* colors);
 }

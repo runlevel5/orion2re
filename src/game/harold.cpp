@@ -333,8 +333,8 @@ namespace HAROLD {
 
         box.width = 200;
         box.height = 0x110;
-        box.field4_0x8 = 0x16;
-        box.field5_0xa = 0x16;
+        box.x = 0x16;
+        box.y = 0x16;
 
         box.field12_0x14 = box.width;
         box.field13_0x16 = 0x27;
@@ -349,12 +349,12 @@ namespace HAROLD {
         MOX::_moveable_box[0].width = animate::Get_Width_(MOX::_moveable_box_pict);
         MOX::_moveable_box[0].height = animate::Get_Height_(MOX::_moveable_box_pict);
 
-        if (MOX::_moveable_box[0].field4_0x8 < 0) {
-            MOX::_moveable_box[0].field4_0x8 = 22;
+        if (MOX::_moveable_box[0].x < 0) {
+            MOX::_moveable_box[0].x = 22;
         }
 
-        if (MOX::_moveable_box[0].field5_0xa < 0) {
-            MOX::_moveable_box[0].field5_0xa = 22;
+        if (MOX::_moveable_box[0].y < 0) {
+            MOX::_moveable_box[0].y = 22;
         }
     }
 
@@ -373,8 +373,8 @@ namespace HAROLD {
 
             MOX::_moveable_box[i].off_flag = static_cast<int16_t>(MOX::_box_off_flag[i]);
 
-            MOX::_moveable_box[i].field4_0x8 = -1;
-            MOX::_moveable_box[i].field5_0xa = -1;
+            MOX::_moveable_box[i].x = -1;
+            MOX::_moveable_box[i].y = -1;
         }
 
         Init_Fleet_Movement_Box_();

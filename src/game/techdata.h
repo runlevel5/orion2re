@@ -46,7 +46,8 @@ namespace TECHDATA {
         uint8_t field2_0x5;
         int16_t tech_app;
         uint8_t padding[24];
-        int8_t combat_speed_modifier[12];
+        int8_t combat_speed_modifier[6];
+        uint8_t padding2[6];
         int16_t speed;
     };
     #pragma pack(pop)

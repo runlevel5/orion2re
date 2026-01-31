@@ -6,10 +6,7 @@ namespace random {
 
     uint32_t __cdecl Get_Random_Seed_();
 
-    inline void __cdecl Set_Random_Seed_(uint32_t seed) {
-        using Fn = void(__cdecl*)(uint32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052D4C0})(seed);
-    }
+    void __cdecl Set_Random_Seed_(uint32_t seed);
 
     void __cdecl Randomize_();
 

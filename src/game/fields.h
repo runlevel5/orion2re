@@ -15,6 +15,36 @@ namespace fields {
     void __cdecl Deactivate_Auto_Function_();
     void __cdecl Init_Fields_State_();
 
+    inline int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, void* seg, const char* label, int16_t key) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, const char*, void*, const char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051db80});
+        return fn(x, y, help, seg, label, key);
+    }
+
+    inline int16_t __cdecl Add_Hidden_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, const char* help, int16_t key) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d370});
+        return fn(x1, y1, x2, y2, help, key);
+    }
+
+    inline int16_t __cdecl Add_Irregular_Button_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, const char* help, void* seg, int16_t u1, int16_t u2, const char* label, int16_t key) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*, void*, int16_t, int16_t, const char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520220});
+        return fn(x1, y1, x2, y2, help, seg, u1, u2, label, key);
+    }
+
+    inline int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* keys) {
+        using Fn = int16_t(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520690});
+        return fn(keys);
+    }
+
+    inline int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t rows, int16_t cols, int16_t w, int16_t h, int16_t* px, int16_t* py, int16_t key) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d7f0});
+        return fn(x, y, rows, cols, w, h, px, py, key);
+    }
+
     inline void __cdecl Disable_Draw_All_Fields_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee80});

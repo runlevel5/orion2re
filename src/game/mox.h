@@ -168,6 +168,22 @@ namespace MOX {
     inline uint32_t& _cmd_line_seed =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
 
+    inline uint8_t& _zoom_in = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597704});
+    inline void*& _main_zoom_in_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B318});
+    inline void*& _main_zoom_out_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597910});
+    inline void*& _main_game_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC0});
+    inline void*& _main_next_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5EC});
+    inline void*& _main_colonies_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B4B4});
+    inline void*& _main_planets_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597844});
+    inline void*& _main_fleets_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597378});
+    inline void*& _main_leaders_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A2BF0});
+    inline void*& _main_races_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B42C});
+    inline void*& _main_info_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596E74});
+    inline int16_t& _star_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2C50});
+    inline int16_t& _main_screen_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977F2});
+    inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
+    inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
+
     inline uint16_t& _NUM_PLAYERS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005A2C1C });
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
     inline char* (&_race_names)[20] =
@@ -279,8 +295,8 @@ namespace MOX {
         int16_t off_flag;
         uint16_t height;
         uint16_t width;
-        int16_t field4_0x8;
-        int16_t field5_0xa;
+        int16_t x;
+        int16_t y;
         uint8_t field6_0xc;
         uint8_t field7_0xd;
         uint16_t field8_0xe;
@@ -300,9 +316,17 @@ namespace MOX {
 
     inline char (&_save_game_description)[10][37] = *reinterpret_cast<char(*)[10][37]>(std::uintptr_t{0x005974F0});
 
+    // Suggested name: MOX::DAT_0059bd1e
+    inline int16_t& DAT_0059bd1e =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD1E});
+
     // Suggested name: MOX::moveable_box_display_order
-    inline uint16_t (&_moveable_box_order)[5] =
-        *reinterpret_cast<uint16_t(*)[5]>(std::uintptr_t{0x0059BD20});
+    inline int16_t (&_moveable_box_order)[5] =
+        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x0059BD20});
+
+    // Suggested name: moveable_box_order_element_1
+    inline int16_t& DAT_0059bd22 =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD22});
 
     // Suggested name: MOX::box_visibility_flags
     inline int16_t (&_box_off_flag)[5] =

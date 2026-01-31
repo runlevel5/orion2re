@@ -26,35 +26,22 @@ namespace MISC {
         reinterpret_cast<Fn>(std::uintptr_t{0x0049ede0})(text, colors, p3, p4, p5, p6, p7);
     }
 
-    inline int16_t __cdecl Get_Font_Style_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0049e930})();
-    }
+    int16_t __cdecl Get_Font_Style_();
 
     inline void __cdecl Get_Mox_Font_Colors_(int16_t style, char c1, char c2, void* out_colors) {
         using Fn = void(__cdecl*)(int16_t, char, char, void*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0049e980})(style, c1, c2, out_colors);
     }
 
-    inline void __cdecl Increase_Font_Color_Range_(int16_t value) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049ea00})(value);
-    }
-
-    inline void __cdecl Decrease_Font_Color_Range_(int32_t amount) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049E0E0})(amount);
-    }
+    void __cdecl Increase_Font_Color_Range_(int16_t increment);
+    void __cdecl Decrease_Font_Color_Range_(int16_t amount);
 
     inline char* __cdecl Get_Comma_String_(int32_t value) {
         using Fn = char*(__cdecl*)(int32_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x0049df10})(value);
     }
 
-    inline int16_t __cdecl Get_Font_Spacing_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0049e920})();
-    }
+    int16_t __cdecl Get_Font_Spacing_();
 
     inline void __cdecl Draw_Advancing_Fill_Message_(int8_t a1, void* ctr, uint16_t max, s_colors* c1, s_colors* c2, int16_t x, int16_t y, const char* msg, void* bitmap, uint8_t flag) {
         using Fn = void(__cdecl*)(int8_t, void*, uint16_t, s_colors*, s_colors*, int32_t, int32_t, const char*, void*, uint8_t);
@@ -62,15 +49,7 @@ namespace MISC {
         fn(a1, ctr, max, c1, c2, x, y, msg, bitmap, flag);
     }
 
-    inline void __cdecl Save_Window_Status_(int16_t* status) {
-        using Fn = void(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDC0});
-        fn(status);
-    }
+    void __cdecl Save_Window_Status_(int16_t* status);
 
-    inline void __cdecl Restore_Window_Status_(int16_t status) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EDA0});
-        fn(status);
-    }
+    void __cdecl Restore_Window_Status_(int16_t clip_enabled);
 }

@@ -275,4 +275,18 @@ namespace fonts {
         int16_t adjusted_x = static_cast<int16_t>(x - (width - 1));
         Print_(adjusted_x, y, text);
     }
+
+    void __cdecl Get_Colors_(uint8_t* colors) {
+        for (int i = 0; i < 8; ++i) {
+            colors[i] = _font_header.selected_colors2[i];
+        }
+    }
+
+    void __cdecl Set_Colors_(const uint8_t* colors) {
+        for (int i = 0; i < 8; ++i) {
+            uint8_t color = colors[i];
+            _font_header.selected_colors1[i] = color;
+            _font_header.selected_colors2[i] = color;
+        }
+    }
 }

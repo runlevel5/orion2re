@@ -145,7 +145,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     int8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index) {
-        uint8_t weights[7];
+        int8_t weights[7];
 
         for (int32_t i = 0; i < 7; ++i) {
             weights[i] = MOX::_star_class_table[i * 3 + star_type_index];
@@ -186,7 +186,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     int8_t __cdecl Generate_Orbit_(int16_t star_id) {
-        uint8_t weights[5];
+        int8_t weights[5];
 
         static const uint8_t weight_table[15] = {
             25, 20, 10,
@@ -227,13 +227,6 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         return 0xFF;
     }
 
-    /**
-     * @brief Generates a mineral class based on the star's spectral class and a random roll.
-     *
-     * @param star_idx Index into the global star array.
-     * @param param_2 Unused parameter.
-     * @return int8_t The resulting mineral class, or -1 (0xFF) if the spectral class is invalid.
-     */
     int8_t __cdecl Generate_Mineral_Class_(int16_t star_idx, int16_t param_2) {
         int32_t random_roll = random::Random_(10);
         int8_t spectral_class = MOX::_star[star_idx].spectral_class;
@@ -281,13 +274,6 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         planet->colony_index = -1;
     }
 
-    /**
-     * Retrieves the climate modifier for a given climate index and logs debug information
-     * if the modifier is positive.
-     *
-     * @param climate_index The index into the climate modifier table (0-4).
-     * @return The climate modifier value, or 0 if out of bounds.
-     */
     int8_t __cdecl Get_Climate_Modifier_(int8_t climate_index) {
         int8_t modifier = 0;
 
@@ -350,7 +336,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      * If forced to be a food planet, it ensures the chosen climate supports agriculture.
      */
     int8_t __cdecl Generate_Climate_(int16_t star_type) {
-        uint8_t weights[10];
+        int8_t weights[10];
         helpers::memset(&weights, 0, sizeof(weights));
 
         // 1. Determine weights based on star type and galaxy age
