@@ -316,6 +316,11 @@ namespace MOX {
 
     inline char (&_save_game_description)[10][37] = *reinterpret_cast<char(*)[10][37]>(std::uintptr_t{0x005974F0});
 
+    // Suggested name: MOX::gate_portal_icons
+    inline animate::s_animation_header** gate_portal_icons = reinterpret_cast<animate::s_animation_header**>(0x0059BCD0);
+    // Suggested name: MOX::gate_artemis_icons
+    inline animate::s_animation_header** gate_artemis_icons = reinterpret_cast<animate::s_animation_header**>(0x0059BD00);
+
     // Suggested name: MOX::DAT_0059bd1e
     inline int16_t& DAT_0059bd1e =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD1E});

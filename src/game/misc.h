@@ -52,4 +52,16 @@ namespace MISC {
     void __cdecl Save_Window_Status_(int16_t* status);
 
     void __cdecl Restore_Window_Status_(int16_t clip_enabled);
+
+    inline void __cdecl Get_Bitmap_String_Range_(int16_t count, int16_t total, int16_t* out_width, int16_t* d1, int16_t* d2, int16_t* out_height, const char* str) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049E880});
+        fn(count, total, out_width, d1, d2, out_height, str);
+    }
+
+    inline void __cdecl Swap_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* colors1, uint8_t* colors2, int32_t count, void* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, uint8_t*, int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EEE0});
+        fn(x1, y1, x2, y2, colors1, colors2, count, bitmap);
+    }
 }

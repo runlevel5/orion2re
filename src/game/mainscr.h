@@ -60,16 +60,9 @@ namespace MAINSCR {
 
     void __cdecl Draw_Main_Main_Screen_();
 
-    inline void __cdecl Print_A_Star_Name_(int16_t star_idx, int32_t type, char* name_str, uint32_t data) {
-        using Fn = void(__cdecl*)(int16_t, int32_t, char*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ca720 });
-        fn(star_idx, type, name_str, data);
-    }
+    void __cdecl Print_Star_Name(int16_t star_id, int8_t simple_draw, char* star_name, void* buffer);
 
-    inline uint8_t __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* p3) {
-        using Fn = uint8_t(__cdecl*)(int16_t, char*, void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004CB910})(star_idx, str, p3);
-    }
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* out_bitmap_ptr);
 
     void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5);
 
@@ -107,11 +100,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Main_Screen_Filled_(int16_t should_copy_to_back);
 
-    inline void __cdecl Draw_A_Gate_Icon_(int32_t star_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c59b0});
-        fn(star_idx);
-    }
+    void __cdecl Draw_A_Gate_Icon_(int16_t star_idx);
 
     void __cdecl Draw_Gate_Icons_();
 

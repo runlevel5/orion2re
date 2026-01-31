@@ -27,6 +27,12 @@ namespace OFFICER {
 
     void __cdecl Get_Random_Skills_(uint32_t* primary_mask, uint32_t* secondary_mask, int16_t skill_class, int16_t count, int8_t randomize_class);
 
+    inline void __cdecl Deassign_Officer_(int16_t leader_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d5b0});
+        fn(leader_idx);
+    }
+
     inline void __cdecl Allocate_Adv_Civ_Game_Officers_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();

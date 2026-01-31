@@ -514,6 +514,7 @@ workflows:
             Do not create a new settings header file.
 
           # Checklist
+          * You used the patch_tool to apply changes
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
           * All mentioned namespaces were processed

@@ -7,10 +7,11 @@ struct s_star_data;
 
 namespace COLCALC {
     void __cdecl Twiddle_Initial_Homeworlds_();
+    void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony);
 
-    inline void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
+    inline void __cdecl Recalculate_Colony_(s_colony* colony) {
         using Fn = void(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fc4b0 });
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f8290});
         fn(colony);
     }
 

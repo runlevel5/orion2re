@@ -344,6 +344,11 @@ namespace hooks {
         { 0x0043df90, &OFFICER::Get_Random_Skills_ },
         { 0x0043e630, &OFFICER::One_Leader_With_Galactic_Lore_ },
         { 0x004f1700, &HAROLD::Player_Is_Omniscient_ },
+        { 0x004ca720, &MAINSCR::Print_Star_Name },
+        { 0x004cb910, &MAINSCR::Print_Star_Name_To_Bitmap_ },
+        { 0x005304a0, &bitmap::Get_Bitmap_Actual_Size_ },
+        { 0x004c59b0, &MAINSCR::Draw_A_Gate_Icon_ },
+        { 0x004fc4b0, &COLCALC::Twiddle_Initial_Homeworld_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

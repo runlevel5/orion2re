@@ -82,6 +82,7 @@ namespace diplomac {
             }
         }
 
+        // Initialize Galactic Council global flags/state.
         diplodef::_COUNCIL_FLAG = 0;
         diplodef::_council_winner = -1;
         diplodef::_next_council_meeting_turn = 25;

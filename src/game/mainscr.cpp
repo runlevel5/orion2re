@@ -180,7 +180,7 @@ namespace MAINSCR {
                 Get_Star_Name_(i, 0, &star_type, star_name, &star_data);
 
                 if (star_name[0] != '\0') {
-                    Print_A_Star_Name_(i, (int32_t)star_type, star_name, star_data);
+                    Print_Star_Name(i, star_type, star_name, reinterpret_cast<void*>(star_data));
                 }
             }
         }
@@ -373,13 +373,123 @@ namespace MAINSCR {
         MISC::Restore_Window_Status_(window_status);
     }
 
+    void __cdecl Draw_A_Gate_Icon_(int16_t star_idx) {
+        if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
+            return;
+        }
+
+        int16_t star_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+        int16_t zoom_offset = (zoom_level == 0) ? 2 : 3;
+
+        // These calls are in disassembly but return value is ignored.
+        HAROLD::Player_Has_Stargate_(MOX::_PLAYER_NUM, star_idx);
+        HAROLD::Player_Has_Jumpgate_(MOX::_PLAYER_NUM, star_idx);
+
+        bool has_artemis = HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_PLAYER_NUM], &MOX::_star[star_idx]);
+        bool has_portal = HAROLD::Player_Has_Dimensional_Portal_(&MOX::_player[MOX::_PLAYER_NUM], &MOX::_star[star_idx]);
+
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        animate::s_animation_header* temp_icons[4];
+        for (int i = 0; i < 4; ++i) {
+            uint32_t size = bitmap::Get_Bitmap_Size_(18, 18);
+            temp_icons[i] = (animate::s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+            bitmap::Create_Blank_Bitmap_(18, 18, &temp_icons[i]->width);
+        }
+
+        int8_t icon_count = 0;
+        int16_t max_icon_height = 0;
+
+        if (has_portal) {
+            void* portal_pic = Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
+            MOX::gate_portal_icons[zoom_offset] = static_cast<animate::s_animation_header*>(portal_pic);
+            bitmap::Draw_Picture_To_Bitmap_(temp_icons[0], portal_pic);
+            int16_t h = animate::Get_Height_((animate::s_animation_header*)portal_pic);
+            if (h > 0) {
+                max_icon_height = h;
+            }
+            icon_count = 1;
+        }
+
+        if (has_artemis) {
+            void* artemis_pic = Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
+            MOX::gate_artemis_icons[zoom_offset] = static_cast<animate::s_animation_header*>(artemis_pic);
+            bitmap::Draw_Picture_To_Bitmap_(temp_icons[icon_count], artemis_pic);
+            int16_t h = animate::Get_Height_((animate::s_animation_header*)artemis_pic);
+            if (h > max_icon_height) {
+                max_icon_height = h;
+            }
+            icon_count++;
+        }
+
+        if (icon_count != 0) {
+            int16_t star_x, star_y;
+            Get_Star_Draw_Coords_(star_idx, &star_x, &star_y);
+
+            int16_t draw_x, draw_y;
+            int16_t off_x, off_y, act_w, act_h;
+            int16_t y_base;
+
+            switch (icon_count) {
+            case 1:
+                bitmap::Get_Bitmap_Actual_Size_(temp_icons[0], &off_x, &off_y, &act_w, &act_h);
+                draw_x = star_x - act_w - 4;
+                draw_y = (star_size / 2) - max_icon_height + star_y;
+                if (has_portal) {
+                    draw_y += 2;
+                }
+                animate::Draw_(draw_x, draw_y, temp_icons[0]);
+                break;
+
+            case 2:
+                bitmap::Get_Bitmap_Actual_Size_(temp_icons[0], &off_x, &off_y, &act_w, &act_h);
+                y_base = (star_size / 2) - max_icon_height;
+                draw_y = y_base + star_y;
+                if (has_portal) {
+                    draw_y += 2;
+                }
+                animate::Draw_(star_x - act_w - 4, draw_y, temp_icons[0]);
+
+                bitmap::Get_Bitmap_Actual_Size_(temp_icons[1], &off_x, &off_y, &act_w, &act_h);
+                animate::Draw_(star_x + 4, y_base + star_y, temp_icons[1]);
+                break;
+
+            case 3:
+            case 4:
+            {
+                uint32_t size = bitmap::Get_Bitmap_Size_(75, 20);
+                animate::s_animation_header* composite = (animate::s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+                bitmap::Create_Blank_Bitmap_(75, 20, &composite->width);
+
+                int16_t cursor_x = 0;
+                for (int i = 0; i < icon_count; ++i) {
+                    bitmap::Add_Picture_To_Bitmap_(cursor_x, 0, temp_icons[i], composite);
+                    bitmap::Get_Bitmap_Actual_Size_(temp_icons[i], &off_x, &off_y, &act_w, &act_h);
+                    cursor_x += act_w + 1;
+                }
+
+                bitmap::Get_Bitmap_Actual_Size_(composite, &off_x, &off_y, &act_w, &act_h);
+                draw_x = star_x - (act_w / 2);
+                draw_y = (star_size / 2) - max_icon_height + star_y;
+                animate::Draw_(draw_x, draw_y, composite);
+                break;
+            }
+            default:
+                break;
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
     void __cdecl Draw_Gate_Icons_() {
         int16_t star_idx = 0;
         int16_t num_stars = MOX::_NUM_STARS;
 
         if (num_stars > 0) {
             do {
-                Draw_A_Gate_Icon_(static_cast<int32_t>(star_idx));
+                Draw_A_Gate_Icon_(star_idx);
                 star_idx++;
             } while (star_idx < num_stars);
         }
@@ -829,6 +939,73 @@ namespace MAINSCR {
         }
     }
 
+    void __cdecl Print_Star_Name(int16_t star_id, int8_t simple_draw, char* star_name, void* buffer) {
+        HAROLD::Map_Scale_To_Zoom_Level_();
+        int16_t zoom_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_id);
+
+        int16_t draw_x, draw_y;
+        Get_Star_Draw_Coords_(star_id, &draw_x, &draw_y);
+
+        int16_t text_center_x = draw_x + 1;
+        int16_t half_zoom_size = zoom_size / 2;
+        int16_t text_y = half_zoom_size + (draw_y - (int16_t)MOX::_star[star_id].size);
+
+        if (simple_draw != 0) {
+            int16_t width = fonts::Get_String_Width_(star_name);
+            animate::Draw_(text_center_x - (width / 2), text_y, (animate::s_animation_header*)buffer);
+            return;
+        }
+
+        int16_t style = HAROLD::Zoom_Level_Font_Style_();
+        uint8_t colors[8];
+        fonts::Get_Colors_(colors);
+        fonts::Set_Outline_Color_(2, 1);
+        fonts::Set_Font_Style_Outline_(style, colors);
+        fonts::Set_Font_Spacing_(1);
+
+        int16_t width = fonts::Get_String_Width_(star_name);
+        int16_t start_x = text_center_x - (width / 2);
+
+        if (MOX::_max_map_scale == MOX::_cur_map_scale) {
+            if (start_x < 22) { // 0x16
+                fonts::Print_(22, text_y, star_name);
+            } else if (start_x + width > 527) { // 0x20f
+                fonts::Print_Right_(527, text_y, star_name);
+            } else {
+                fonts::Print_Centered_(text_center_x, text_y, star_name);
+            }
+        } else {
+            fonts::Print_Centered_(text_center_x, text_y, star_name);
+        }
+
+        int8_t surrender_to = MOX::_star[star_id].surrender_to[MOX::_PLAYER_NUM];
+        if (static_cast<uint8_t>(surrender_to) < 8) {
+            // Player colors derived from stack-initialized byte array
+            static const uint8_t surrender_colors[8] = { 0x80, 0x7b, 0x78, 0x2c, 0x86, 0x9f, 0x83, 0x7e };
+
+            HAROLD::Set_Player_Font_Style_(0, false);
+            fonts::Set_Font_Spacing_(1);
+
+            int16_t line_width = fonts::Get_String_Width_(star_name);
+            uint8_t player_color_idx = (uint8_t)MOX::_player[surrender_to].color;
+            uint32_t draw_color = (uint32_t)surrender_colors[player_color_idx];
+
+            int16_t line_start_x = draw_x - (line_width / 2);
+            int16_t font_height = fonts::Get_Font_Height_();
+            int16_t line_y = half_zoom_size + (font_height - (int16_t)MOX::_star[star_id].size) + draw_y;
+
+            line::Line_(line_start_x, line_y, line_width + line_start_x, line_y, draw_color);
+
+            if (MOX::_cur_map_scale < 30) { // 0x1e
+                uint32_t secondary_color = draw_color + 1;
+                if (player_color_idx == 3 || player_color_idx == 5) {
+                    secondary_color = draw_color - 3;
+                }
+                line::Line_(line_start_x, line_y + 1, line_width + line_start_x, line_y + 1, secondary_color);
+            }
+        }
+    }
+
     void __cdecl Do_System_Popup_(int16_t system_id) {
         FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
 
@@ -1003,6 +1180,50 @@ namespace MAINSCR {
         if (HAROLD::N_Colony_Owners_(star_idx) > 1) {
             *param_3 = Print_Star_Name_To_Bitmap_(star_idx, str, param_5);
         }
+    }
+
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* out_bitmap_ptr) {
+        int16_t owner_counts[8];
+        int16_t num_owners;
+        uint8_t standard_colors[8];
+        uint8_t player_colors[8];
+
+        bool is_omniscient = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
+        HAROLD::Colony_Owners_(star_idx, owner_counts, &num_owners, !is_omniscient);
+
+        if (num_owners <= 1) {
+            return false;
+        }
+
+        int16_t total_colony_count = 0;
+        for (int i = 0; i < 8; ++i) {
+            total_colony_count += owner_counts[i];
+        }
+
+        fonts::Get_Colors_(standard_colors);
+        fonts::Set_Font_Spacing_(1);
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(200, 20);
+        void* bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+        *reinterpret_cast<void**>(out_bitmap_ptr) = bitmap;
+
+        bitmap::Create_Blank_Bitmap_(200, 20, bitmap);
+        fonts::Print_To_Bitmap_(0, 0, str, bitmap);
+
+        int16_t current_x = 0;
+        for (int16_t i = 0; i < 8; ++i) {
+            if (owner_counts[i] > 0) {
+                int16_t width, height, d1, d2;
+                MISC::Get_Bitmap_String_Range_(owner_counts[i], total_colony_count, &width, &d1, &d2, &height, str);
+                HAROLD::Get_Player_Font_Colors_(i, fonts::_current_font_style, player_colors, false);
+                MISC::Swap_Bitmap_Colors_(current_x, 0, current_x + width, height, standard_colors, player_colors, 8, bitmap);
+                current_x += width;
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+        return true;
     }
 
     void Add_Map_Fields_() {

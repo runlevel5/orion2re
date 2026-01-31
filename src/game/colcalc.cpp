@@ -239,4 +239,80 @@ namespace COLCALC {
 
         return chance;
     }
+
+    void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony) {
+        uint32_t* p_pop = (uint32_t*)colony->pop;
+        uint32_t* p_pop_end = &p_pop[colony->n_pops];
+
+        MOX::Mox_Update_();
+
+        // Convert all initial population to Scientists
+        for (uint32_t* p = p_pop; p < p_pop_end; ++p) {
+            *p = (*p & 0xffffff7f) | 0x00000100; // Scientist flag set, Worker flag cleared
+        }
+
+        int8_t star_idx = MOX::_planet[colony->planet].star_index;
+        MOX::_star[star_idx].ignore_colony_ships |= (1 << (colony->owner & 0x1F));
+
+        Recalculate_Colony_(colony);
+
+        // Convert Scientists to Workers to meet industry maintenance requirements
+        while (p_pop < p_pop_end && colony->industry_production < (int16_t)colony->industry_maintenance) {
+            *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
+            Recalculate_Colony_(colony);
+            p_pop++;
+        }
+
+        // Convert Pops to Farmers if colony has food multipliers and needs to meet maintenance
+        if (colony->food2_per_farmer != 0) {
+            while (p_pop < p_pop_end && (int16_t)colony->food_maintenance > colony->food_production) {
+                *p_pop = (*p_pop & 0xfffffe7f); // Clear Scientist and Worker flags -> Farmer
+                Recalculate_Colony_(colony);
+                p_pop++;
+            }
+        }
+
+        // Convert Scientists to Workers if Research production exceeds Industry
+        while (p_pop < p_pop_end && colony->research_production > colony->industry_production) {
+            *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
+            Recalculate_Colony_(colony);
+            p_pop++;
+        }
+
+        // If Industry is balanced or higher than Research, switch the last adjusted Pop back to Scientist
+        if (colony->industry_production >= colony->research_production) {
+            *(p_pop - 1) = (*(p_pop - 1) & 0xffffff7f) | 0x00000100;
+            Recalculate_Colony_(colony);
+        }
+
+        // Handle unique system specials (Orion/Guardians/Monsters/Artifacts)
+        switch (MOX::_star[star_idx].system_special) {
+            case 2:
+            case 3:
+                MOX::_star[star_idx].system_special = 0;
+                break;
+            case 6:
+            case 7:
+                MOX::_star[star_idx].system_special = 0;
+                for (int i = 0; i < 5; ++i) {
+                    int16_t p_idx = MOX::_star[star_idx].planet_index[i];
+                    if (p_idx != -1) {
+                        MOX::_planet[p_idx].planet_special = 0;
+                    }
+                }
+                break;
+            case 8:
+                // Deassign officers if the system special is removed (e.g., Orion conquered)
+                for (int16_t i = 0; i < 67; ++i) {
+                    if (MOX::_leaders[i].status == 5 && MOX::_leaders[i].location == star_idx) {
+                        OFFICER::Deassign_Officer_(i);
+                    }
+                }
+                MOX::_star[star_idx].system_special = 0;
+                break;
+            case 10:
+                MOX::_star[star_idx].artifacts_gave_app = 1;
+                break;
+        }
+    }
 }

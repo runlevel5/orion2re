@@ -200,7 +200,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             weights[i] = weight_table[i * 3 + MOX::_settings_galaxy_age];
         }
 
-        int8_t choice;
+        int16_t choice;
         bool found = false;
 
         do {
@@ -210,7 +210,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
         } while (!found);
 
-        return choice;
+        return (int8_t)choice;
     }
 
     uint8_t __cdecl Generate_Size_() {
@@ -349,7 +349,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
         }
 
-        int8_t result = -1; // Symbolic: NO_CLIMATE_SELECTED
+        int16_t result = -1; // Symbolic: NO_CLIMATE_SELECTED
 
         // 2. Specialized handling for food-producing planets
         if (_make_food_planet != 0) {
@@ -382,7 +382,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
         }
 
-        return result;
+        return (int8_t)result;
     }
 
     void __cdecl Enforce_Planet_Max_(int16_t max_planets) {
