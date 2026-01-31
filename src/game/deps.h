@@ -58,6 +58,7 @@
 #include "trade.h"
 #include "colonize.h"
 #include "mainscr.h"
+#include "mainscr2.h"
 #include "eric.h"
 #include "ericnet.h"
 #include "colony.h"

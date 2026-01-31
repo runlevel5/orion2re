@@ -84,4 +84,27 @@ namespace graphics {
         video::_screen_window_y2 = (short)platform::g_screen_res_y + -1;
         return;
     }
+
+    void __cdecl Set_Window_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        if (x1 < 0) {
+            x1 = 0;
+        }
+
+        if (y1 < 0) {
+            y1 = 0;
+        }
+
+        if (static_cast<int32_t>(x2) >= platform::g_screen_res_x) {
+            x2 = static_cast<int16_t>(platform::g_screen_res_x - 1);
+        }
+
+        if (static_cast<int32_t>(y2) >= platform::g_screen_res_y) {
+            y2 = static_cast<int16_t>(platform::g_screen_res_y - 1);
+        }
+
+        video::_screen_window_x1 = x1;
+        video::_screen_window_y1 = y1;
+        video::_screen_window_x2 = x2;
+        video::_screen_window_y2 = y2;
+    }
 }

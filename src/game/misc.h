@@ -41,6 +41,11 @@ namespace MISC {
         reinterpret_cast<Fn>(std::uintptr_t{0x0049ea00})(value);
     }
 
+    inline void __cdecl Decrease_Font_Color_Range_(int32_t amount) {
+        using Fn = void(__cdecl*)(int32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049E0E0})(amount);
+    }
+
     inline char* __cdecl Get_Comma_String_(int32_t value) {
         using Fn = char*(__cdecl*)(int32_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x0049df10})(value);

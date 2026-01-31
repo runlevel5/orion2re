@@ -43,18 +43,28 @@ namespace MAINSCR {
         fn(star_idx, type, name_str, data);
     }
 
-
-    inline void __cdecl Get_Star_Name_(int16_t star_idx, int8_t unknown, int8_t* out_type, char* out_name, uint32_t* out_data) {
-        using Fn = void(__cdecl*)(int16_t, int8_t, int8_t*, char*, uint32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ca430 });
-        fn(star_idx, unknown, out_type, out_name, out_data);
+    inline uint8_t __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* p3) {
+        using Fn = uint8_t(__cdecl*)(int16_t, char*, void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004CB910})(star_idx, str, p3);
     }
 
-    inline void __cdecl Fade_Into_Main_Screen_() {
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5);
+
+    inline uint8_t& _already_faded_into_main_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596180});
+
+    inline void __cdecl Add_Map_Fields_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004CD7F0 });
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c4430});
         fn();
     }
+
+    inline void __cdecl Do_System_Popup_(uint16_t off_flag) {
+        using Fn = void(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c4fe0});
+        fn(off_flag);
+    }
+
+    void __cdecl Fade_Into_Main_Screen_();
 
     void __cdecl Print_Star_Names_();
 

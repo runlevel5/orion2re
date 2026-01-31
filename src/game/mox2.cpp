@@ -96,7 +96,7 @@ namespace MOX2 {
         ten::init();
         fields::Assign_Update_Function_(MOX::Mox_Update_);
         fonts::Load_Palette_(5, 0, 0xFF);
-        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
         fonts::Set_PSTR_Style_(2);
         MOX::_game_type = 0;
 
@@ -108,7 +108,7 @@ namespace MOX2 {
             JIM::Draw_Logos_();
             fields::Assign_Update_Function_(MOX::Mox_Update_);
             fonts::Load_Palette_(5, 0, 0xFF);
-            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+            mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
         }
 
         JIM::Play_Background_Music_();

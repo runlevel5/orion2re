@@ -14,4 +14,16 @@ namespace fields {
     void __cdecl Assign_Update_Function_(void* update_func);
     void __cdecl Deactivate_Auto_Function_();
     void __cdecl Init_Fields_State_();
+
+    inline void __cdecl Disable_Draw_All_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee80});
+        fn();
+    }
+
+    inline void __cdecl Enable_Draw_All_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee90});
+        fn();
+    }
 }

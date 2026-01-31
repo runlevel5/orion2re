@@ -313,6 +313,16 @@ namespace hooks {
         { 0x0051be20, &HOMEGEN::Star_Has_Planet_ },
         { 0x00519fe0, &HOMEGEN::Dist_Between_Points_ },
         { 0x00482020, &INITSHIP::Update_Automatic_Design_Equipment_ },
+        { 0x00528ba0, &graphics::Set_Window_ },
+        { 0x004f1930, &HAROLD::Set_Player_Font_Style_ },
+        { 0x004f1090, &HAROLD::Map_Scale_To_Zoom_Level_ },
+        { 0x004c7510, &HAROLD::Map_Scale_Star_Size_To_Zoom_Level_ },
+        { 0x004f0910, &HAROLD::Get_Player_Font_Colors_ },
+        { 0x004f1520, &HAROLD::Planet_Type_ },
+        { 0x004f1190, &HAROLD::Colony_Owners_ },
+        { 0x004f17d0, &HAROLD::Players_Home_Star_ },
+        { 0x004ca430, &MAINSCR::Get_Star_Name_ },
+        { 0x004cd7f0, &MAINSCR::Fade_Into_Main_Screen_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

@@ -779,4 +779,142 @@ namespace MAINSCR {
             fonts::Print_Centered_(579, 391 + fonts::Get_Font_Height_(), buffer);
         }
     }
+
+    void __cdecl Fade_Into_Main_Screen_() {
+        int16_t box_status = MOVEBOX::Moveable_Box_Selected_(0);
+
+        if (_already_faded_into_main_screen != 0) {
+            _already_faded_into_main_screen = 0;
+            return;
+        }
+
+        MOX::Mox_Update_();
+        MAINSCR2::_main_screen_fade_in_flag = 0;
+        MAINSCR2::_force_main_screen_fade = 0;
+        _already_faded_into_main_screen = 1;
+
+        fields::Disable_Draw_All_Fields_();
+        video::Set_Refresh_Stencil_();
+        mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_none, 1);
+        ERIC::Fast_Fade_Out_();
+        MOX::Mox_Update_();
+
+        fonts::Load_Palette_(0, 0, 255);
+        MOX::Mox_Update_();
+        palstore::Darken_Palette_(100);
+        MOX::Mox_Update_();
+
+        MAINSCR::Add_Map_Fields_();
+        MOX::Mox_Update_();
+
+        if (static_cast<int8_t>(box_status) != 0) {
+            bool expanding_help_enabled = (MOX::_settings.expanding_help != 0);
+            if (expanding_help_enabled) {
+                MOX::_settings.expanding_help = 0;
+            }
+            MOX::Mox_Update_();
+            MAINSCR::Do_System_Popup_(MOX::_moveable_box[0].off_flag);
+            if (expanding_help_enabled) {
+                MOX::_settings.expanding_help = 1;
+            }
+        }
+
+        video::Set_Page_Off_();
+        MAINSCR::Draw_Mini_Main_Screen_();
+        MOX::Mox_Update_();
+        palette::Clear_Palette_Changes_(0, 255);
+        RUSS::Mox_Sync_Update_();
+
+        mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_arrow, 1);
+
+        bool skip_fade_in = false;
+        if (MOX::_reloaded_ship_palette != 0) {
+            if (MOVEBOX::Moveable_Box_Selected_(2) == 0) {
+                ERIC::Set_Fade_Percent_(0);
+                skip_fade_in = true;
+            }
+        }
+
+        if (!skip_fade_in) {
+            JIM::Fast_Fade_In_();
+            MOX::Mox_Update_();
+        }
+
+        MOX::_reloaded_ship_palette = 0;
+        fields::Enable_Draw_All_Fields_();
+    }
+
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5) {
+        bool galactic_lore = OFFICER::One_Leader_With_Galactic_Lore_(MOX::_PLAYER_NUM);
+        *str = '\0';
+        *param_3 = 0;
+        HAROLD::Map_Scale_To_Zoom_Level_();
+
+        int16_t color_offset = (is_selected != 0) ? (int16_t)MOX::_selected_star_color_offset : 0;
+        bool is_outpost = (bool)HAROLD::Star_Is_Outpost_Star_(star_idx);
+        s_star_data* star_ptr = &MOX::_star[star_idx];
+        int8_t owner = star_ptr->owner;
+
+        auto apply_font_offsets = [&](int16_t font_style) {
+            uint8_t local_colors[8];
+            MISC::s_colors* p_colors = MISC::Font_Colors2_(font_style, 1, 12);
+            for (int i = 0; i < 8; ++i) local_colors[i] = p_colors->colors[i];
+
+            if (color_offset > 0) {
+                int16_t shift = (color_offset * 9) / 5;
+                for (int i = 1; i < 8; ++i) {
+                    int val = (int)local_colors[i] + shift;
+                    if (val < (int)local_colors[0]) val = (int)local_colors[0];
+                    if (val > 16) val = 16;
+                    local_colors[i] = (uint8_t)val;
+                }
+            }
+            fonts::Set_Font_Style_(font_style, (MISC::s_colors*)local_colors);
+        };
+
+        if (!galactic_lore) {
+            bool has_contact = (owner >= 0 && owner <= 7) && HAROLD::Contact_With_One_Colony_(star_idx);
+            if (!has_contact) {
+                if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) return;
+
+                char* src = star_ptr->name;
+                char* dst = str;
+                while ((*dst++ = *src++));
+
+                int16_t font_style = HAROLD::Zoom_Level_Font_Style_();
+                apply_font_offsets(font_style);
+
+                if (is_outpost) {
+                    MISC::Decrease_Font_Color_Range_(2);
+                    strings::String_To_Lower_(str);
+                }
+                return;
+            }
+        }
+
+        // Logic for Lore or Contacted
+        if (galactic_lore && MOX::_PLAYER_NUM != owner && !HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
+            _sprintf(str, HAROLD::s___s__00556ae4, star_ptr->name);
+        } else {
+            char* src = star_ptr->name;
+            char* dst = str;
+            while ((*dst++ = *src++));
+        }
+
+        if (owner >= 0 && owner <= 7) {
+            HAROLD::Set_Player_Font_Style_(owner, (bool)is_selected);
+        } else {
+            int16_t font_style = HAROLD::Zoom_Level_Font_Style_();
+            apply_font_offsets(font_style);
+        }
+
+        if (is_outpost) {
+            MISC::Decrease_Font_Color_Range_(1);
+            strings::String_To_Lower_(str);
+        }
+
+        if (HAROLD::N_Colony_Owners_(star_idx) > 1) {
+            *param_3 = Print_Star_Name_To_Bitmap_(star_idx, str, param_5);
+        }
+    }
 }

@@ -284,6 +284,19 @@ namespace HAROLD {
         return food_planet_count;
     }
 
+    /**
+     * @address 004f1930
+     */
+    void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2) {
+        uint8_t style[8];
+
+        int16_t style_idx = Zoom_Level_Font_Style_();
+
+        Get_Player_Font_Colors_(player_idx, style_idx, style, param_2);
+
+        fonts::Set_Font_Style_(style_idx, (MISC::s_colors*)style);
+    }
+
     void __cdecl Set_Sound_Volume_To_Settings_() {
         uint8_t music_lvl = static_cast<uint8_t>(MOX::_settings.music_level);
         if (music_lvl > 100) {
@@ -391,6 +404,77 @@ namespace HAROLD {
      */
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx) {
         return (MOX::_star[star_idx].visited & (1 << (static_cast<uint8_t>(player_idx) & 0x1F))) != 0;
+    }
+
+    /**
+     * Finds the index of the player who has their home planet in the specified star system.
+     * Returns -1 if no home planet in the system belongs to any player.
+     * @address 004f17d0
+     */
+    int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
+        int16_t found_player_idx = -1;
+
+        for (int planet_slot = 0; planet_slot < 5; ++planet_slot) {
+            // Early exit if a home planet was already identified in an earlier slot
+            if (found_player_idx != -1) {
+                break;
+            }
+
+            int16_t planet_id = MOX::_star[star_idx].planet_index[planet_slot];
+            if (planet_id > -1) {
+                for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
+                    if (MOX::_player[p].home_planet_id == planet_id) {
+                        found_player_idx = p;
+                    }
+                }
+            }
+        }
+
+        return found_player_idx;
+    }
+
+    int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t star_planet) {
+        int16_t planet_idx = MOX::_star[star_idx].planet_index[star_planet];
+        return (int16_t)MOX::_planet[planet_idx].planet_type;
+    }
+
+    /**
+     * Calculates how many colonies each player owns in a specific star system.
+     *
+     * @param star_idx Index of the star system to check.
+     * @param player_counts Array of size 8 that receives colony count per player index.
+     * @param total_count Pointer to variable that receives the number of unique players owning colonies in this system.
+     * @param have_contact If true, only counts owners that the current player has diplomatic contact with.
+     */
+    void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool have_contact) {
+        *total_count = 0;
+        for (int i = 0; i < 8; ++i) {
+            player_counts[i] = 0;
+        }
+
+        // A star system in Master of Orion 2 has up to 5 planets.
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+            if (planet_idx > -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                if (colony_idx > -1) {
+                    int8_t owner = MOX::_colony[colony_idx].owner;
+                    if (owner > -1) {
+                        bool visible = true;
+                        if (have_contact && owner != MOX::_PLAYER_NUM) {
+                            visible = Contact_With_Player_(MOX::_PLAYER_NUM, (int16_t)owner);
+                        }
+
+                        if (visible) {
+                            if (player_counts[owner] == 0) {
+                                *total_count += 1;
+                            }
+                            player_counts[owner] += 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -590,17 +674,18 @@ namespace HAROLD {
         if (scale == 10) {
             return 3;
         }
-        if (scale == 15) { // 0xf
+
+        if (scale == 15 || scale == 20) {
             return 2;
         }
-        if (scale == 20) { // 0x14
-            return 2;
-        }
-        if (scale == 30) { // 0x1e
+
+        if (scale == 30) {
             return 1;
         }
 
-        // Returns uninitialized stack value as seen in the original assembly
+        // BUG: the function returns an uninitialized value if no conditions are met
+        //int16_t uninitialized_result;
+        //return uninitialized_result;
         return 0;
     }
 
@@ -646,6 +731,37 @@ namespace HAROLD {
         return default_galaxy_size;
     }
 
+    int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx) {
+        int8_t star_size = MOX::_star[star_idx].size;
+        int16_t zoom_offset = Map_Scale_To_Zoom_Level_();
+
+        int16_t combined_index = (int16_t)(zoom_offset + (int16_t)star_size);
+        return static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
+    }
+
+    int16_t __cdecl Map_Scale_To_Zoom_Level_() {
+        int16_t max_zoom = MOX::_max_zoom_count;
+        int16_t scale = MOX::_cur_map_scale;
+
+        if (scale == 10) {
+            if (max_zoom >= 0) {
+                return 0;
+            }
+        } else if (scale == 15) {
+            if (max_zoom >= 1) {
+                return 1;
+            }
+        } else if (scale == 20) {
+            if (max_zoom >= 2) {
+                return 2;
+            }
+        } else if (max_zoom >= 3) {
+            return 3;
+        }
+
+        return max_zoom;
+    }
+
     /**
      * Copies the currency unit string (e.g., "MC" or "BC") into the provided buffer.
      * The currency unit depends on the current game language setting.
@@ -669,5 +785,52 @@ namespace HAROLD {
         out[0] = src[0];
         out[1] = src[1];
         out[2] = src[2];
+    }
+
+    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, uint8_t* style_buf, bool param_2) {
+        uint8_t base_color_idx = 1;
+        uint8_t mode = 0;
+        int16_t limit_color = 14;
+        int16_t offset = param_2 ? static_cast<int16_t>(static_cast<int8_t>(MOX::_selected_star_color_offset)) : 0;
+
+        if (player_idx >= 8 && player_idx < 15) {
+            base_color_idx = 4;
+            mode = 1;
+            limit_color = 11;
+        } else {
+            uint8_t p_color = MOX::_player[player_idx].color;
+            if (p_color == 3) {
+                base_color_idx = 12;
+                mode = 2;
+                limit_color = 22;
+            } else if (player_idx < 8) {
+                uint8_t palette_val = MOX::_main_palette_player_colors[p_color];
+                base_color_idx = palette_val + 1;
+                limit_color = palette_val + 6;
+                if (p_color == 4) {
+                    limit_color = palette_val + 5;
+                }
+            }
+        }
+
+        MISC::Get_Mox_Font_Colors_(style_idx, static_cast<char>(base_color_idx), static_cast<char>(limit_color), style_buf);
+
+        for (int i = 1; i < 8; ++i) {
+            int8_t adj;
+            if (mode == 1) {
+                adj = static_cast<int8_t>(offset);
+            } else if (mode == 2) {
+                adj = static_cast<int8_t>((offset * 7) / 4);
+            } else {
+                adj = static_cast<int8_t>((offset * 3) / 2);
+            }
+
+            int8_t color_val = static_cast<int8_t>(style_buf[i]) + adj;
+            int16_t limit = limit_color + 8;
+            if (static_cast<int16_t>(color_val) > limit) {
+                color_val = static_cast<int8_t>(limit);
+            }
+            style_buf[i] = static_cast<uint8_t>(color_val);
+        }
     }
 }

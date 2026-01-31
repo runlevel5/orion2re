@@ -23,6 +23,11 @@ namespace HAROLD {
 
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
+    inline int32_t __cdecl Star_Is_Outpost_Star_(int16_t star_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004F1A20})(star_idx);
+    }
+
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx);
 
     void __cdecl Get_Font_File_(char* buffer);
@@ -65,23 +70,11 @@ namespace HAROLD {
         fn();
     }
 
-    inline void __cdecl Set_Player_Font_Style_(int16_t style, char param_2) {
-        using Fn = void(__cdecl*)(int16_t, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1930 });
-        fn(style, param_2);
-    }
+    void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2);
 
-    inline int16_t __cdecl Map_Scale_To_Zoom_Level_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1090 });
-        return fn();
-    }
+    int16_t __cdecl Map_Scale_To_Zoom_Level_();
 
-    inline int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c7510});
-        return fn(star_idx);
-    }
+    int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 
     int16_t __cdecl Galaxy_Size_From_N_Stars_();
 
@@ -92,6 +85,8 @@ namespace HAROLD {
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
     int16_t __cdecl Zoom_Level_Font_Style_();
+
+    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, uint8_t* style_buf, bool param_2);
 
     bool __cdecl Contact_With_Player_(int16_t player_idx, int16_t target_idx);
 
@@ -107,23 +102,11 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star);
 
-    inline int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t planet_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1520});
-        return fn(star_idx, planet_idx);
-    }
+    int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t star_planet);
 
-    inline void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool hide_if_no_lore) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f1190 });
-        fn(star_idx, player_counts, total_count, hide_if_no_lore);
-    }
+    void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool have_contact);
 
-    inline int16_t __cdecl Players_Home_Star_(int16_t star_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f17d0 });
-        return fn(star_idx);
-    }
+    int16_t __cdecl Players_Home_Star_(int16_t star_idx);
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
 

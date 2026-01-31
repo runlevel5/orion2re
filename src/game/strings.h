@@ -8,4 +8,9 @@ namespace strings {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483F60 });
         fn();
     }
+
+    inline void __cdecl String_To_Lower_(char* str) {
+        using Fn = void(__cdecl*)(char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052CDB0})(str);
+    }
 }
