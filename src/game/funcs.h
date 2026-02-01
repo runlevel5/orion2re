@@ -272,6 +272,11 @@ inline void __cdecl No_Op1_() {
     fn();
 }
 
+inline uint32_t __cdecl isqrt_(uint32_t val) {
+    using Fn = uint32_t(__cdecl*)(uint32_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
+}
+
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});

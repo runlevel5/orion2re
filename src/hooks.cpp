@@ -221,6 +221,7 @@ namespace hooks {
         { 0x0043e780, &OFFICER::Owned_Officer_Level_ },
         { 0x0043e410, &OFFICER::Officer_Skill_Value_ },
         { 0x00436230, &SHIPMOVE::Star_In_Normal_Range_Of_Player_ },
+        { 0x00477630, &EVENTS::Event_Check_Space_Anomaly_ },
         { 0x00466430, &TRADE::Process_Trade_Agreement_ },
         { 0x004661f0, &TRADE::Get_Combined_Research_Points_ },
         { 0x00466690, &TRADE::Research_Agreement_Goal_ },
@@ -356,6 +357,13 @@ namespace hooks {
         { 0x004f4d90, &COLCALC::Colony_Research_Per_Scientist_ },
         { 0x004f6c50, &COLCALC::Pre_Import_Computing_ },
         { 0x004f2f50, &COLCALC::Colony_Morale_ },
+        { 0x004f33b0, &COLCALC::Mixed_Race_Morale_Penalty_ },
+        { 0x004f2de0, &COLCALC::Colony_Officer_ },
+        { 0x004f4d50, &COLCALC::Colony_Is_Blockaded },
+        { 0x004f82b0, &COLCALC::Pass_Out_Imports_ },
+        { 0x004f8750, &COLCALC::Update_Colony_Pop_Specialty_ },
+        { 0x004f5cd0, &COLCALC::Colony_Race_Pop_Limit_ },
+        { 0x004f8770, &COLCALC::Colony_Pop_Grows_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

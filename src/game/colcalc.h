@@ -21,15 +21,11 @@ namespace COLCALC {
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
     inline const char*& _leader_bonus_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BE0});
 
-    inline int __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony) {
-        using Fn = int(__cdecl*)(s_colony*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f33b0})(colony);
-    }
+    int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
-    inline int __cdecl Colony_Officer_(s_colony* colony) {
-        using Fn = int(__cdecl*)(s_colony*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f2de0})(colony);
-    }
+    int __cdecl Colony_Officer_(s_colony* colony);
+
+    short __cdecl Colony_Race_Pop_Limit_(s_colony* colony, int16_t player_idx);
 
     inline int16_t __cdecl Owned_Officer_Level_(int officer_idx) {
         using Fn = int16_t(__cdecl*)(int);
@@ -45,11 +41,7 @@ namespace COLCALC {
 
     void __cdecl Pre_Import_Computing_(s_colony* colony);
 
-    inline void __cdecl Pass_Out_Imports_(int16_t owner, s_colony* colony) {
-        using Fn = void(__cdecl*)(int16_t, s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f82b0 });
-        fn(owner, colony);
-    }
+    void __cdecl Pass_Out_Imports_(int16_t owner, s_colony* colony);
 
     void __cdecl Recalculate_Colony_(s_colony* colony);
 
@@ -91,6 +83,16 @@ namespace COLCALC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91d0 });
         fn();
     }
+
+    void __cdecl Colony_Pop_Grows_(s_colony* colony);
+
+    inline void __cdecl Colony_Specialty_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f8d00});
+        fn(colony);
+    }
+
+    void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony);
 
     void __cdecl Colony_Environmental_Stuff_(s_colony* colony);
 
@@ -139,5 +141,13 @@ namespace COLCALC {
     inline void __cdecl Colony_BC_Maintenance_(s_colony* colony) {
         using Fn = void(__cdecl*)(s_colony*);
         reinterpret_cast<Fn>(std::uintptr_t{0x004f7310})(colony);
+    }
+
+    bool __cdecl Colony_Is_Blockaded(s_colony* colony);
+
+    inline int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, uint32_t climate, int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int8_t, uint32_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f5b90 });
+        return fn(size, climate, player_idx);
     }
 }

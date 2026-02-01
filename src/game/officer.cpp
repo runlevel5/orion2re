@@ -21,21 +21,23 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
-        int8_t warlord = 0;
+        int8_t warlord_trait = 0;
 
         if (leader_idx != 0x42) {
-            int8_t player_idx = MOX::_leaders[leader_idx].player_index;
-            warlord = MOX::_player[player_idx].traits[0];
+            // Sign-extend the player index and fetch the Warlord trait from the player structure.
+            int32_t player_idx = (int32_t)MOX::_leaders[leader_idx].player_index;
+            warlord_trait = MOX::_player[player_idx].traits[TRAIT_WARLORD];
         }
 
-        int16_t xp = MOX::_leaders[leader_idx].xp;
-        int16_t level = OFFICER::Get_Officer_Base_Level_(xp, warlord);
+        int16_t leader_xp = MOX::_leaders[leader_idx].xp;
+        int16_t base_level = OFFICER::Get_Officer_Base_Level_(leader_xp, warlord_trait);
 
-        if (level > 5) {
-            level = 5;
+        // Clamp the level at a maximum of 5.
+        if (base_level > 5) {
+            base_level = 5;
         }
 
-        return level;
+        return base_level;
     }
 
     int16_t __cdecl Officer_Skill_Value_(int16_t leader_index) {

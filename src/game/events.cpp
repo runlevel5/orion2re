@@ -20,6 +20,22 @@ namespace EVENTS {
     }
 
     /**
+     * @address 00477630
+     */
+    int16_t __cdecl Event_Check_Space_Anomaly_(int16_t colony_idx) {
+        auto& event = _event_data[25];
+
+        if (event.field1_0x1 == 2 || event.field1_0x1 == 4 || event.field1_0x1 == 6) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+            if ((int16_t)MOX::_planet[planet_idx].star_index == event.event_type) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @address 00477690
      */
     int16_t __cdecl Event_Check_Pirate_Activity_(uint8_t player_idx) {

@@ -14,7 +14,6 @@ workflows:
       - name: decompile
         type: llm
         model: gemini/gemini-3-flash-preview
-        #model: gemini/gemini-3-pro-preview
         temperature: 1
         reasoning_effort: high
         #reset_policy: keep
@@ -514,6 +513,7 @@ workflows:
             - You identified a mismatching signature for one of the existing stubs, add `// TYPE MISMATCH: <description>`
           * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
             Do not create a new settings header file.
+          * Be VERY conservative with file reads.
 
           # Checklist
           * You used the patch_tool to apply changes
