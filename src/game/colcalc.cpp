@@ -300,9 +300,7 @@ namespace COLCALC {
             total_cost = TECHDATA::_technology_fields[tech_field].cost;
 
             if (tech_field >= 75) {
-                // TODO: What is this? Points to a portion of s_player.tech_applications
-                uint8_t* raw_player = reinterpret_cast<uint8_t*>(plr);
-                uint32_t modifier = static_cast<uint32_t>(raw_player[0x1d1 + tech_field]);
+                uint32_t modifier = static_cast<uint32_t>(plr->hyper_advanced_tech[tech_field - 75]);
 
                 total_cost += modifier * 10000;
             }
