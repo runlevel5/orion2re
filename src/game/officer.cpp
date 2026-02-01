@@ -21,18 +21,20 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
+        s_leader_data& leader = MOX::_leaders[leader_idx];
         int8_t warlord_trait = 0;
 
+        // Index 66 (0x42) is reserved (likely for Orion Guardian or similar entities),
+        // where player-based traits like Warlord do not apply.
         if (leader_idx != 0x42) {
-            // Sign-extend the player index and fetch the Warlord trait from the player structure.
-            int32_t player_idx = (int32_t)MOX::_leaders[leader_idx].player_index;
-            warlord_trait = MOX::_player[player_idx].traits[TRAIT_WARLORD];
+            int8_t player_idx = leader.player_index;
+            // Warlord trait is at index 13 within the traits array
+            warlord_trait = MOX::_player[player_idx].traits[13];
         }
 
-        int16_t leader_xp = MOX::_leaders[leader_idx].xp;
-        int16_t base_level = OFFICER::Get_Officer_Base_Level_(leader_xp, warlord_trait);
+        int16_t base_level = OFFICER::Get_Officer_Base_Level_(leader.xp, warlord_trait);
 
-        // Clamp the level at a maximum of 5.
+        // Clamp officer level to a maximum of 5 (Ultra-Elite)
         if (base_level > 5) {
             base_level = 5;
         }

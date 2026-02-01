@@ -364,6 +364,15 @@ namespace hooks {
         { 0x004f8750, &COLCALC::Update_Colony_Pop_Specialty_ },
         { 0x004f5cd0, &COLCALC::Colony_Race_Pop_Limit_ },
         { 0x004f8770, &COLCALC::Colony_Pop_Grows_ },
+        { 0x004f73e0, &COLCALC::Player_Research_Cost_ },
+        { 0x004fc110, &COLCALC::Get_First_Player_Colony_Idx },
+        { 0x004f8d00, &COLCALC::Colony_Specialty_ },
+        { 0x004f8df0, &COLCALC::All_Colony_Calculations_ },
+        { 0x004f6ed0, &COLCALC::Colony_Industry_Maintenance_ },
+        { 0x004f7030, &COLCALC::Colony_Replicators_ },
+        { 0x004f72a0, &COLCALC::Colony_Industry_To_Tax_ },
+        { 0x004f5520, &COLCALC::Colony_BC_Production_ },
+        { 0x004f6d50, &COLCALC::Colony_Food_Maintenance_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

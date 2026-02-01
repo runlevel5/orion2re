@@ -256,10 +256,10 @@ namespace COLCALC {
 
     void __cdecl Pre_Import_Computing_(s_colony* colony) {
         // Reset maintenance accumulators
-        colony->food_maintenance = 0;
-        colony->industry_maintenance = 0;
-        colony->research_maintenance = 0;
-        colony->bc_maintenance = 0;
+        colony->maintenance[ECON_FOOD] = 0;
+        colony->maintenance[ECON_INDUSTRY] = 0;
+        colony->maintenance[ECON_RESEARCH] = 0;
+        colony->maintenance[ECON_BC] = 0;
 
         colony->food2_per_farmer = (int8_t)Colony_Food2_Per_Farmer_(colony, static_cast<int16_t>(static_cast<int8_t>(colony->owner)), nullptr);
         Colony_Environmental_Stuff_(colony);
@@ -274,10 +274,10 @@ namespace COLCALC {
         Colony_Replicators_(colony);
 
         // Calculate industry imports needed to cover maintenance, capped by production capacity
-        int16_t maintenance_val = static_cast<int16_t>(static_cast<uint8_t>(colony->industry_maintenance));
-        colony->imports_industry = maintenance_val;
-        if (colony->industry_production <= maintenance_val) {
-            colony->imports_industry = colony->industry_production;
+        int16_t maintenance_val = static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[ECON_INDUSTRY]));
+        colony->imports[ECON_INDUSTRY] = maintenance_val;
+        if (colony->production[ECON_INDUSTRY] <= maintenance_val) {
+            colony->imports[ECON_INDUSTRY] = colony->production[ECON_INDUSTRY];
         }
 
         Colony_Research_Production_(colony, nullptr);
@@ -291,6 +291,24 @@ namespace COLCALC {
 
         int16_t owner_id = static_cast<int16_t>(colony->owner);
         Pass_Out_Imports_(owner_id, colony);
+    }
+
+    int __cdecl Player_Research_Cost_(s_player* plr, int16_t tech_field) {
+        uint32_t total_cost = 0;
+
+        if (tech_field > 0) {
+            total_cost = TECHDATA::_technology_fields[tech_field].cost;
+
+            if (tech_field >= 75) {
+                // TODO: What is this? Points to a portion of s_player.tech_applications
+                uint8_t* raw_player = reinterpret_cast<uint8_t*>(plr);
+                uint32_t modifier = static_cast<uint32_t>(raw_player[0x1d1 + tech_field]);
+
+                total_cost += modifier * 10000;
+            }
+        }
+
+        return static_cast<int>(total_cost);
     }
 
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out) {
@@ -615,7 +633,7 @@ namespace COLCALC {
         Recalculate_Colony_(colony);
 
         // Convert Scientists to Workers to meet industry maintenance requirements
-        while (p_pop < p_pop_end && colony->industry_production < (int16_t)colony->industry_maintenance) {
+        while (p_pop < p_pop_end && colony->production[ECON_INDUSTRY] < (int16_t)colony->maintenance[ECON_INDUSTRY]) {
             *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
             Recalculate_Colony_(colony);
             p_pop++;
@@ -623,7 +641,7 @@ namespace COLCALC {
 
         // Convert Pops to Farmers if colony has food multipliers and needs to meet maintenance
         if (colony->food2_per_farmer != 0) {
-            while (p_pop < p_pop_end && (int16_t)colony->food_maintenance > colony->food_production) {
+            while (p_pop < p_pop_end && (int16_t)colony->maintenance[ECON_FOOD] > colony->production[ECON_FOOD]) {
                 *p_pop = (*p_pop & 0xfffffe7f); // Clear Scientist and Worker flags -> Farmer
                 Recalculate_Colony_(colony);
                 p_pop++;
@@ -631,14 +649,14 @@ namespace COLCALC {
         }
 
         // Convert Scientists to Workers if Research production exceeds Industry
-        while (p_pop < p_pop_end && colony->research_production > colony->industry_production) {
+        while (p_pop < p_pop_end && colony->production[ECON_RESEARCH] > colony->production[ECON_INDUSTRY]) {
             *p_pop = (*p_pop & 0xfffffeff) | 0x00000080; // Worker flag set, Scientist flag cleared
             Recalculate_Colony_(colony);
             p_pop++;
         }
 
         // If Industry is balanced or higher than Research, switch the last adjusted Pop back to Scientist
-        if (colony->industry_production >= colony->research_production) {
+        if (colony->production[ECON_INDUSTRY] >= colony->production[ECON_RESEARCH]) {
             *(p_pop - 1) = (*(p_pop - 1) & 0xffffff7f) | 0x00000100;
             Recalculate_Colony_(colony);
         }
@@ -704,15 +722,15 @@ namespace COLCALC {
             s_colony* c = &MOX::_colony[i];
             if (c->owner == player_idx && c->outpost_flag == 0) {
                 if (EVENTS::Event_Check_Space_Anomaly_(i) == 0) {
-                    int16_t balance = c->food_production - (uint8_t)c->food_maintenance;
+                    int16_t balance = c->production[ECON_FOOD] - (uint8_t)c->maintenance[ECON_FOOD];
                     if (balance < 0) {
-                        c->imports_food = 0;
+                        c->imports[ECON_FOOD] = 0;
                         if (!Colony_Is_Blockaded(c)) {
                             needy_colony_indices[num_needy++] = i;
                             total_deficit -= balance; // Make positive
                         }
                     } else {
-                        c->imports_food = -balance; // Negative means exporting
+                        c->imports[ECON_FOOD] = -balance; // Negative means exporting
                         if (!Colony_Is_Blockaded(c)) {
                             total_surplus += balance;
                         }
@@ -735,10 +753,10 @@ namespace COLCALC {
             while (remaining_capacity > 0 && consecutive_skips < num_needy) {
                 int16_t c_idx = needy_colony_indices[needy_idx];
                 s_colony* c = &MOX::_colony[c_idx];
-                if (remaining_food > 0 && (uint8_t)c->food2_needed_for_our_empire > (c->food_production + c->imports_food) * 2) {
+                if (remaining_food > 0 && (uint8_t)c->food2_needed_for_our_empire > (c->production[ECON_FOOD] + c->imports[ECON_FOOD]) * 2) {
                     remaining_food--;
                     remaining_capacity--;
-                    c->imports_food++;
+                    c->imports[ECON_FOOD]++;
                     consecutive_skips = 0;
                 } else {
                     consecutive_skips++;
@@ -753,10 +771,10 @@ namespace COLCALC {
                 int16_t c_idx = needy_colony_indices[needy_idx];
                 s_colony* c = &MOX::_colony[c_idx];
                 int needs = (uint8_t)c->food2_needed_for_our_empire + (uint8_t)c->food2_needed_for_assimilated;
-                if (remaining_food > 0 && needs > (c->food_production + c->imports_food) * 2) {
+                if (remaining_food > 0 && needs > (c->production[ECON_FOOD] + c->imports[ECON_FOOD]) * 2) {
                     remaining_food--;
                     remaining_capacity--;
-                    c->imports_food++;
+                    c->imports[ECON_FOOD]++;
                     consecutive_skips = 0;
                 } else {
                     consecutive_skips++;
@@ -771,10 +789,10 @@ namespace COLCALC {
                 int16_t c_idx = needy_colony_indices[needy_idx];
                 s_colony* c = &MOX::_colony[c_idx];
                 int needs = (uint8_t)c->food2_needed_for_our_empire + (uint8_t)c->food2_needed_for_assimilated + (uint8_t)c->food2_needed_for_conquered;
-                if (remaining_food > 0 && needs > (c->food_production + c->imports_food) * 2) {
+                if (remaining_food > 0 && needs > (c->production[ECON_FOOD] + c->imports[ECON_FOOD]) * 2) {
                     remaining_food--;
                     remaining_capacity--;
-                    c->imports_food++;
+                    c->imports[ECON_FOOD]++;
                     consecutive_skips = 0;
                 } else {
                     consecutive_skips++;
@@ -788,10 +806,10 @@ namespace COLCALC {
             while (remaining_capacity > 0 && consecutive_skips < num_needy) {
                 int16_t c_idx = needy_colony_indices[needy_idx];
                 s_colony* c = &MOX::_colony[c_idx];
-                if (remaining_food > 0 && (uint8_t)c->food_maintenance > (c->food_production + c->imports_food)) {
+                if (remaining_food > 0 && c->maintenance[ECON_FOOD] > (c->production[ECON_FOOD] + c->imports[ECON_FOOD])) {
                     remaining_food--;
                     remaining_capacity--;
-                    c->imports_food++;
+                    c->imports[ECON_FOOD]++;
                     consecutive_skips = 0;
                 } else {
                     consecutive_skips++;
@@ -812,7 +830,7 @@ namespace COLCALC {
             for (int16_t i = 0; i < num_needy; ++i) {
                 int16_t c_idx = needy_colony_indices[i];
                 s_colony* c = &MOX::_colony[c_idx];
-                c->imports_food = (uint8_t)c->food_maintenance - c->food_production;
+                c->imports[ECON_FOOD] = (uint8_t)c->maintenance[ECON_FOOD] - c->production[ECON_FOOD];
             }
             player->food_freighted = total_deficit;
             player->surplus_freighters = capacity - total_deficit;
@@ -854,17 +872,17 @@ namespace COLCALC {
         bool pop_boom = static_cast<bool>(EVENTS::Event_Check_Population_Boom_(colony_idx));
         bool plague = static_cast<bool>(EVENTS::Event_Check_Plague_(colony_idx));
 
-        int food_pool = (static_cast<int>(colony->imports_food) + static_cast<int>(colony->food_production)) * 2;
-        int industry_pool = static_cast<int>(colony->industry_production) * 2;
+        int food_pool = colony->imports[ECON_FOOD] + colony->production[ECON_FOOD] * 2;
+        int industry_pool = colony->production[ECON_INDUSTRY] * 2;
 
-        int food_needs_empire = static_cast<uint8_t>(colony->food2_needed_for_our_empire);
-        int food_needs_assimilated = static_cast<uint8_t>(colony->food2_needed_for_assimilated);
-        int food_needs_conquered = static_cast<uint8_t>(colony->food2_needed_for_conquered);
-        int food_needs_natives = static_cast<uint8_t>(colony->food2_needed_for_natives);
-        int ind_needs_empire = static_cast<uint8_t>(colony->industry2_needed_for_our_empire);
-        int ind_needs_androids = static_cast<uint8_t>(colony->industry2_needed_for_androids);
-        int ind_needs_assimilated = static_cast<uint8_t>(colony->industry2_needed_for_assimilated);
-        int ind_needs_conquered = static_cast<uint8_t>(colony->industry2_needed_for_conquered);
+        int food_needs_empire = colony->food2_needed_for_our_empire;
+        int food_needs_assimilated = colony->food2_needed_for_assimilated;
+        int food_needs_conquered = colony->food2_needed_for_conquered;
+        int food_needs_natives = colony->food2_needed_for_natives;
+        int ind_needs_empire = colony->industry2_needed_for_our_empire;
+        int ind_needs_androids = colony->industry2_needed_for_androids;
+        int ind_needs_assimilated = colony->industry2_needed_for_assimilated;
+        int ind_needs_conquered = colony->industry2_needed_for_conquered;
 
         // Prioritize food needs
         while (food_pool > 0 && food_needs_empire > 0) { food_pool--; food_needs_empire--; }
@@ -942,7 +960,7 @@ namespace COLCALC {
                 if (plague) growth_modifier -= 200;
 
                 if (colony->producing[0] == -3) { // Housing
-                    growth_modifier += ((colony->industry_production - static_cast<uint8_t>(colony->industry_maintenance)) * 40) / total_pops;
+                    growth_modifier += ((colony->production[ECON_INDUSTRY] - colony->maintenance[ECON_INDUSTRY]) * 40) / total_pops;
                 }
 
                 if (i == static_cast<uint8_t>(colony->owner) || race_conquered_count[i] == 0) {
@@ -959,9 +977,85 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Colony_Specialty_(s_colony* colony) {
+        int16_t total_production = 0;
+        int16_t max_production = 0;
+        int16_t best_index = 0;
+        int16_t* production = colony->production;
+
+        for (int16_t i = 0; i < ECON_BC; ++i) {
+            int16_t current_val = production[i];
+            total_production += current_val;
+
+            if (current_val > max_production) {
+                max_production = current_val;
+                best_index = i;
+            }
+        }
+
+        // Logic equivalent to: max_production > floor(total_production / 2)
+        if ((total_production / 2) < max_production) {
+            colony->specialty = static_cast<int8_t>(best_index);
+        } else {
+            colony->specialty = -1;
+        }
+    }
+
     void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony) {
         COLCALC::Colony_Pop_Grows_(colony);
         COLCALC::Colony_Specialty_(colony);
+    }
+
+    void __cdecl All_Colony_Calculations_() {
+        RUSS::Assert_Settings_();
+
+        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner != -1 && colony->outpost_flag == 0) {
+                Pre_Import_Computing_(colony);
+            }
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            Pass_Out_Imports_(i, nullptr);
+        }
+
+        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner != -1 && colony->outpost_flag == 0) {
+                Update_Colony_Pop_Specialty_(colony);
+            }
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            Update_Player_Stats_(&MOX::_player[i]);
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            s_player* player = &MOX::_player[i];
+            player->total_research = 0;
+            for (int32_t j = 0; j < 83; ++j) {
+                if (player->tech_fields[j] == 3) {
+                    player->total_research++;
+                }
+            }
+            player->total_ships = 0;
+            player->total_colonies = 0;
+        }
+
+        for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner >= 0 && (uint8_t)colony->n_pops > 4) {
+                MOX::_player[colony->owner].total_colonies++;
+            }
+        }
+
+        for (int32_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->owner < 8 && ship->status < 5 && ship->d.ship_type == 0) {
+                MOX::_player[ship->owner].total_ships += (1 << (ship->d.size & 0x1F));
+            }
+        }
     }
 
     short __cdecl Colony_Race_Pop_Limit_(s_colony* colony, int16_t player_idx) {
@@ -983,5 +1077,393 @@ namespace COLCALC {
         }
 
         return pop_limit;
+    }
+
+    short __cdecl Get_First_Player_Colony_Idx(int player_idx) {
+        short index = 0;
+        while (MOX::_colony[index].owner != (int8_t)player_idx) {
+            index++;
+        }
+        return index;
+    }
+
+    void __cdecl Colony_Industry_Maintenance_(s_colony* colony) {
+        int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / sizeof(s_colony));
+
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+            colony->maintenance[ECON_INDUSTRY] = 0;
+            return;
+        }
+
+        // Initialize industry requirement fields
+        colony->industry2_needed_for_our_empire = 0;
+        colony->industry2_needed_for_androids = 0;
+        colony->industry2_needed_for_assimilated = 0;
+        colony->industry2_needed_for_conquered = 0;
+        for (int i = 0; i < 8; ++i) {
+            colony->industry2_needed_for_empire[i] = 0;
+        }
+
+        int8_t owner_race_idx = colony->owner;
+        int n_pops = (uint8_t)colony->n_pops;
+
+        if (n_pops != 0) {
+            for (int i = 0; i < n_pops; ++i) {
+                // Accessing Pop_Info as a uint32 for manual bit extraction as per assembly
+                uint32_t pop_data = *reinterpret_cast<uint32_t*>(&colony->pop[i]);
+                uint32_t race = pop_data & 0xF;
+
+                if (race < 8) {
+                    // If trait is set, the population adds 1 to its industry maintenance requirement
+                    int8_t cost = (MOX::_player[race].traits[TRAIT_PRODUCTION_BONUS] != 0) ? 1 : 0;
+
+                    if (race == owner_race_idx) {
+                        colony->industry2_needed_for_our_empire += cost;
+                    } else if (((pop_data >> 10) & 1) == 0) {
+                        // Bit 10 determines non-conquered (assimilated) vs conquered status
+                        colony->industry2_needed_for_assimilated += cost;
+                    } else {
+                        colony->industry2_needed_for_conquered += cost;
+                    }
+                    colony->industry2_needed_for_empire[race] += cost;
+                } else if (race == 8) {
+                    // Androids (race index 8) always contribute 2 to industry maintenance
+                    colony->industry2_needed_for_androids += 2;
+                }
+            }
+        }
+
+        // Final colony maintenance is (total_industry_needed + 1) / 2
+        int total_needed = (uint8_t)colony->industry2_needed_for_our_empire +
+                           (uint8_t)colony->industry2_needed_for_androids +
+                           (uint8_t)colony->industry2_needed_for_assimilated +
+                           (uint8_t)colony->industry2_needed_for_conquered;
+
+        colony->maintenance[ECON_INDUSTRY] = (int8_t)((total_needed + 1) / 2);
+    }
+
+    void __cdecl Colony_Replicators_(s_colony* colony) {
+        colony->n_food_replicated = 0;
+
+        if (colony->buildings[BUILDING_FOOD_REPLICATORS] == 0) {
+            return;
+        }
+
+        int16_t industry_spent = 0;
+        int16_t industry_pool = colony->production[ECON_INDUSTRY] * 2;
+        int16_t food_pool = colony->production[ECON_FOOD] * 2;
+
+        int16_t ind_our = colony->industry2_needed_for_our_empire;
+        int16_t ind_androids = colony->industry2_needed_for_androids;
+        int16_t ind_assimilated = colony->industry2_needed_for_assimilated;
+        int16_t ind_conquered = colony->industry2_needed_for_conquered;
+
+        // Tier 1: Our Empire requirements
+        int16_t surplus_ind = (industry_pool - ind_our) / 2;
+        if (surplus_ind > 0) {
+            int16_t food_goal = colony->food2_needed_for_our_empire;
+            int16_t deficit = (food_goal - food_pool + 1) / 2;
+            if (deficit > 0) {
+                int16_t cost = (surplus_ind < (deficit * 2)) ? surplus_ind : (deficit * 2);
+                cost = (cost / 2) * 2;
+                industry_spent = cost;
+                food_pool += cost;
+                industry_pool -= (cost / 2);
+            }
+
+            // Tier 2: Androids and Assimilated populations
+            surplus_ind = (industry_pool - ind_our - ind_androids - ind_assimilated) / 2;
+            if (surplus_ind > 0) {
+                int16_t food_goal_t2 = (int16_t)static_cast<uint8_t>(colony->food2_needed_for_our_empire) + (int16_t)static_cast<uint8_t>(colony->food2_needed_for_assimilated);
+                int16_t deficit_t2 = (food_goal_t2 - food_pool + 1) / 2;
+                if (deficit_t2 > 0) {
+                    int16_t cost = (surplus_ind < (deficit_t2 * 2)) ? surplus_ind : (deficit_t2 * 2);
+                    cost = (cost / 2) * 2;
+                    industry_spent += cost;
+                    food_pool += cost;
+                    industry_pool -= (cost / 2);
+                }
+
+                // Tier 3: Conquered populations
+                surplus_ind = (industry_pool - ind_conquered - ind_our - ind_androids - ind_assimilated) / 2;
+                if (surplus_ind > 0) {
+                    int16_t food_goal_t3 = (int16_t)colony->food2_needed_for_our_empire + 
+                                          (int16_t)colony->food2_needed_for_assimilated + 
+                                          (int16_t)colony->food2_needed_for_conquered;
+                    int16_t deficit_t3 = (food_goal_t3 - food_pool + 1) / 2;
+                    if (deficit_t3 > 0) {
+                        int16_t cost = (surplus_ind < (deficit_t3 * 2)) ? surplus_ind : (deficit_t3 * 2);
+                        cost = (cost / 2) * 2;
+                        industry_spent += cost;
+                        food_pool += cost;
+                        industry_pool -= (cost / 2);
+                    }
+
+                    // Tier 4: Native populations
+                    surplus_ind = (industry_pool - ind_conquered - ind_our - ind_androids - ind_assimilated) / 2;
+                    if (surplus_ind > 0) {
+                        int16_t food_goal_t4 = (int16_t)colony->food2_needed_for_our_empire + 
+                                              (int16_t)colony->food2_needed_for_assimilated + 
+                                              (int16_t)colony->food2_needed_for_conquered + 
+                                              (int16_t)colony->food2_needed_for_natives;
+                        int16_t deficit_t4 = (food_goal_t4 - food_pool + 1) / 2;
+                        if (deficit_t4 > 0) {
+                            int16_t cost = (surplus_ind < (deficit_t4 * 2)) ? surplus_ind : (deficit_t4 * 2);
+                            industry_spent += (cost / 2) * 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Apply final changes. Replicator ratio is 2 Industry : 1 Food
+        int16_t final_food_gain = industry_spent / 2;
+        colony->n_food_replicated = (int8_t)final_food_gain;
+        colony->production[ECON_FOOD] += final_food_gain;
+        colony->production[ECON_INDUSTRY] -= industry_spent;
+    }
+
+    void __cdecl Colony_Industry_To_Tax_(s_colony* colony) {
+        int16_t industry_prod = colony->production[ECON_INDUSTRY];
+        int32_t taxable_industry = (int32_t)industry_prod - (int32_t)colony->maintenance[ECON_INDUSTRY];
+
+        if (taxable_industry < 1) {
+            colony->n_industry_taxed = 0;
+            return;
+        }
+
+        uint8_t tax_rate = (uint8_t)MOX::_player[(uint8_t)colony->owner].tax_rate;
+        int16_t taxed_amount = (int16_t)((tax_rate * taxable_industry) / 100);
+
+        colony->n_industry_taxed = taxed_amount;
+        colony->production[ECON_INDUSTRY] = industry_prod - taxed_amount;
+    }
+
+    bool __cdecl Monster_At_Star_(int star_idx) {
+        s_ship_data* ship_list = MOX::_ship;
+        int num_ships = static_cast<int>(MOX::_NUM_SHIPS);
+
+        for (int i = 0; i < num_ships; ++i) {
+            s_ship_data* current_ship = &ship_list[i];
+
+            // In MoO2, owner indices 8 and above typically represent monsters or guardians
+            if (current_ship->owner >= 8 && current_ship->location == star_idx) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf) {
+        if (colony->n_pops == 0) {
+            colony->production[ECON_BC] = 0;
+            return;
+        }
+
+        int16_t colony_idx = (int16_t)((uintptr_t)colony - (uintptr_t)MOX::_colony) / sizeof(s_colony);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+            colony->production[ECON_BC] = 0;
+            if (debug_buf) {
+                char* src = _colony_debug_msg;
+                while ((*debug_buf++ = *src++) != '\0');
+            }
+            return;
+        }
+
+        s_player* owner_ptr = &MOX::_player[colony->owner];
+        int officer_idx = Colony_Officer_(colony);
+
+        int morale_bonus = 0;
+        int trade_goods_bc = 0;
+        int galactic_currency_bc = 0;
+        int stock_exchange_bc = 0;
+        int spaceport_bc = 0;
+        int gov_bonus_bc = 0;
+        int leader_bonus_bc = 0;
+
+        int total_normal_pops = 0;
+        int total_immune_pops = 0;
+
+        int base_tax_per_pop = owner_ptr->traits[TRAIT_TAX_BONUS] * 2 + 4;
+
+        for (int i = 0; i < (uint8_t)colony->n_pops; ++i) {
+            Pop_Info* p = &colony->pop[i];
+            uint32_t race_idx = (uint32_t)p->race;
+            if (race_idx < 8) {
+                if (MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
+                    total_normal_pops++;
+                } else {
+                    total_immune_pops++;
+                }
+            }
+        }
+
+        int owner_idx = (int)colony->owner;
+        if (MOX::_player[owner_idx].objectives != 'd') {
+            base_tax_per_pop += (int)_difficulty_bc_lookup_table[MOX::_settings.game_difficulty];
+        }
+
+        int total_pops = total_normal_pops + total_immune_pops;
+        int taxes_collected = (base_tax_per_pop * total_pops + 2) / 4;
+
+        if (total_pops > 0 && MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 3) {
+            morale_bonus = colony->morale * taxes_collected;
+            morale_bonus = (morale_bonus + (morale_bonus < 0 ? -10 : 10)) / 20;
+        }
+
+        int special_planet_bc = 0;
+        int8_t planet_special = MOX::_planet[colony->planet].planet_special;
+        if (planet_special == SYSTEM_SPECIAL_GOLD_DEPOSITS) {
+            special_planet_bc = 5;
+        } else if (planet_special == SYSTEM_SPECIAL_GEM_DEPOSITS) {
+            special_planet_bc = 10;
+        }
+
+        int16_t producing = colony->producing[0];
+        if (producing == -37 || (producing < 0 && producing > -3)) {
+            int surplus_ind = (int)colony->production[ECON_INDUSTRY] - (int)colony->maintenance[ECON_INDUSTRY];
+            if (surplus_ind > 0) {
+                trade_goods_bc = surplus_ind;
+                if (owner_ptr->traits[TRAIT_FANTASTIC_TRADERS] == 0) {
+                    trade_goods_bc = (surplus_ind + 1) / 2;
+                }
+            }
+        }
+
+        int income_base = taxes_collected + special_planet_bc;
+
+        if (MOX::_player[owner_idx].tech_applications[TECH_APP_GALACTIC_CURRENCY_EXCHANGE] == 3) {
+            galactic_currency_bc = income_base / 2;
+        }
+
+        if (colony->buildings[BUILDING_STOCK_EXCHANGE] != 0) {
+            stock_exchange_bc = income_base;
+        }
+
+        if (colony->buildings[BUILDING_SPACEPORT] != 0) {
+            spaceport_bc = income_base / 2;
+        }
+
+        if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 4) {
+            gov_bonus_bc = income_base / 2;
+        } else if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 5) {
+            gov_bonus_bc = (income_base * 3 + (income_base * 3 < 0 ? 3 : 0)) / 4;
+        }
+
+        if (officer_idx != -1) {
+            if (MOX::_leaders[officer_idx].special_skills & 0x20) {
+                int16_t lvl = Owned_Officer_Level_(officer_idx);
+                leader_bonus_bc = ((lvl + 1) * income_base * 3 + 10) / 20;
+            } else if (MOX::_leaders[officer_idx].special_skills & 0x10) {
+                int16_t lvl = Owned_Officer_Level_(officer_idx);
+                leader_bonus_bc = ((lvl + 1) * income_base + 5) / 10;
+            }
+        }
+
+        colony->production[ECON_BC] = (int16_t)(colony->n_industry_taxed + stock_exchange_bc +
+                                         galactic_currency_bc + trade_goods_bc + 
+                                         special_planet_bc + morale_bonus + taxes_collected + 
+                                         leader_bonus_bc + gov_bonus_bc + spaceport_bc);
+
+        if (debug_buf) {
+            char* ptr = debug_buf;
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_T_15_65);
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_0);
+            
+            if (taxes_collected != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, taxes_collected, _taxes_collected_msg);
+            }
+            if (morale_bonus > 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_bonus_msg);
+            } else if (morale_bonus < 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_penalty_msg);
+            }
+            if (special_planet_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, special_planet_bc, _special_income_msg);
+            }
+            if (leader_bonus_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, leader_bonus_bc, _leader_bonus_msg);
+            }
+            if (galactic_currency_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
+            }
+            if (stock_exchange_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
+            }
+            if (spaceport_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
+            }
+            if (gov_bonus_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, gov_bonus_bc, _government_bonus_msg);
+            }
+            if (trade_goods_bc != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, trade_goods_bc, _trade_goods_msg);
+            }
+            if (colony->n_industry_taxed != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+            }
+            ptr += _sprintf(ptr, "%s", s_newline_0055136c);
+            _sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[ECON_BC], _total_income_msg);
+        }
+    }
+
+    void __cdecl Colony_Food_Maintenance_(s_colony* colony) {
+        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
+
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+            colony->maintenance[ECON_FOOD] = 0;
+            return;
+        }
+
+        // Initialize food requirement trackers
+        for (int i = 0; i < 8; ++i) {
+            colony->food2_needed_for_empire[i] = 0;
+        }
+        colony->food2_needed_for_our_empire = 0;
+        colony->food2_needed_for_assimilated = 0;
+        colony->food2_needed_for_conquered = 0;
+        colony->food2_needed_for_natives = 0;
+
+        for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
+            // Read 4-byte pop structure to access bitfields efficiently
+            uint32_t pop_bits = *reinterpret_cast<uint32_t*>(&colony->pop[i]);
+            uint32_t race = pop_bits & 0xF;
+            uint32_t bit_10_flag = (pop_bits >> 10) & 1;
+
+            if (race < 8) {
+                s_player* player_ptr = &MOX::_player[race];
+                uint8_t food_rate_half;
+
+                if (player_ptr->traits[TRAIT_CYBERNETIC] != 0) {
+                    food_rate_half = 1;
+                } else if (player_ptr->traits[TRAIT_EATS_MINERALS] != 0) {
+                    food_rate_half = 0;
+                } else {
+                    food_rate_half = 2;
+                }
+
+                if (race == (uint32_t)(uint8_t)colony->owner) {
+                    colony->food2_needed_for_our_empire += food_rate_half;
+                } else if (bit_10_flag == 0) {
+                    colony->food2_needed_for_assimilated += food_rate_half;
+                } else {
+                    colony->food2_needed_for_conquered += food_rate_half;
+                }
+
+                colony->food2_needed_for_empire[race] += food_rate_half;
+            } else if (race == 9) {
+                // Natives consume fixed amount (2 units half-food = 1.0 food)
+                colony->food2_needed_for_natives += 2;
+            }
+        }
+
+        int32_t sum_food2 = (uint8_t)colony->food2_needed_for_our_empire +
+                            (uint8_t)colony->food2_needed_for_assimilated +
+                            (uint8_t)colony->food2_needed_for_conquered +
+                            (uint8_t)colony->food2_needed_for_natives;
+
+        // Final food maintenance is half the total required half-units, rounded up
+        colony->maintenance[ECON_FOOD] = (int8_t)((sum_food2 + 1) / 2);
     }
 }

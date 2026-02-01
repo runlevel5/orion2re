@@ -32,6 +32,23 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0043e780})(officer_idx);
     }
 
+    inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
+    inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});
+    inline char*& _special_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B08});
+    inline char*& _taxed_from_industry_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B30});
+    inline char*& _colony_debug_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
+    inline char*& _morale_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B54});
+    inline char*& _taxes_collected_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B7C});
+    inline char*& _trade_goods_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BD4});
+    inline char*& _total_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BDC});
+    inline char*& _morale_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BEC});
+
+    inline const char* const s_T_15_65 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8A4}); // "T+15,+65."
+    inline const char* const s_0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // "0"
+    inline const char* const s_fmt_s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
+    inline const char* const s_fmt_plus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "%+d %s"
+    inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // "\n"
+
     int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
     int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, void* out);
@@ -55,10 +72,7 @@ namespace COLCALC {
         reinterpret_cast<Fn>(std::uintptr_t{0x004FBEF0})();
     }
 
-    inline int32_t __cdecl Player_Research_Cost_(s_player* plr, uint16_t field_idx) {
-        using Fn = int32_t(__cdecl*)(s_player*, uint16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f73e0})(plr, field_idx);
-    }
+    int __cdecl Player_Research_Cost_(s_player* plr, int16_t tech_field);
 
     int32_t __cdecl Chance_For_Research_Breakthrough_Aux_(int32_t accumulated_total, int32_t produced, int32_t cost);
 
@@ -66,42 +80,29 @@ namespace COLCALC {
 
     int32_t __cdecl Chance_For_Research_Breakthrough_(s_player* plr);
 
-    inline int __cdecl Get_First_Player_Colony_Idx(int player_idx) {
-        using Fn = int(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fc110 });
-        return fn(player_idx);
-    }
+    short __cdecl Get_First_Player_Colony_Idx(int player_idx);
 
-    inline uint8_t __cdecl Monster_At_Star_(int star_idx) {
-        using Fn = uint8_t(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fc700 });
-        return fn(star_idx);
-    }
+    inline bool __cdecl Monster_At_Star_(int star_idx);
 
-    inline void __cdecl All_Colony_Calculations_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91d0 });
-        fn();
-    }
+    void __cdecl All_Colony_Calculations_();
 
     void __cdecl Colony_Pop_Grows_(s_colony* colony);
 
-    inline void __cdecl Colony_Specialty_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f8d00});
-        fn(colony);
-    }
+    void __cdecl Colony_Specialty_(s_colony* colony);
 
     void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony);
+
+    inline void __cdecl Update_Player_Stats_(s_player* player) {
+        using Fn = void(__cdecl*)(s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f7e60});
+        fn(player);
+    }
 
     void __cdecl Colony_Environmental_Stuff_(s_colony* colony);
 
     void __cdecl Colony_Morale_(s_colony* colony, char* debug);
 
-    inline void __cdecl Colony_Industry_Maintenance_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f6ed0})(colony);
-    }
+    void __cdecl Colony_Industry_Maintenance_(s_colony* colony);
 
     inline void __cdecl Colony_Industry_Production_(s_colony* colony, void* unused) {
         using Fn = void(__cdecl*)(s_colony*, void*);
@@ -113,30 +114,18 @@ namespace COLCALC {
         reinterpret_cast<Fn>(std::uintptr_t{0x004f37f0})(colony, unused);
     }
 
-    inline void __cdecl Colony_Food_Maintenance_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f6d50})(colony);
-    }
+    void __cdecl Colony_Food_Maintenance_(s_colony* colony);
 
-    inline void __cdecl Colony_Replicators_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f7030})(colony);
-    }
+    void __cdecl Colony_Replicators_(s_colony* colony);
 
     inline void __cdecl Colony_Research_Production_(s_colony* colony, void* unused) {
         using Fn = void(__cdecl*)(s_colony*, void*);
         reinterpret_cast<Fn>(std::uintptr_t{0x004f4fb0})(colony, unused);
     }
 
-    inline void __cdecl Colony_Industry_To_Tax_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f72a0})(colony);
-    }
+    void __cdecl Colony_Industry_To_Tax_(s_colony* colony);
 
-    inline void __cdecl Colony_BC_Production_(s_colony* colony, void* unused) {
-        using Fn = void(__cdecl*)(s_colony*, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f5520})(colony, unused);
-    }
+    void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf);
 
     inline void __cdecl Colony_BC_Maintenance_(s_colony* colony) {
         using Fn = void(__cdecl*)(s_colony*);
