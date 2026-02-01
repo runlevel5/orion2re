@@ -9,7 +9,7 @@ struct s_leader_data;
 namespace COLCALC {
     #pragma pack(push, 1)
     struct ProductionBreakdown {
-        int32_t workers;             // Offset 0x00
+        int32_t scientist_prod;      // Offset 0x00
         int16_t race_bonus[8];       // Offset 0x04
         int16_t android_bonus;       // Offset 0x14
         int16_t other_bonus;         // Offset 0x16
@@ -27,7 +27,7 @@ namespace COLCALC {
         int32_t government_modifier; // Offset 0x242
         int32_t blockade_penalty;    // Offset 0x246
         int32_t leader_bonus;        // Offset 0x24A
-        int32_t field_24E[2];
+        int32_t field_24E[2];        // Offset 0x24E
     };
     #pragma pack(pop)
 
