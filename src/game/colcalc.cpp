@@ -1004,6 +1004,121 @@ namespace COLCALC {
         COLCALC::Colony_Specialty_(colony);
     }
 
+    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out) {
+        if (colony->n_pops == 0) {
+            colony->production[ECON_FOOD] = 0;
+            return;
+        }
+
+        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+            colony->production[ECON_FOOD] = 0;
+            if (debug_out) {
+                char* src = _colony_debug_msg;
+                while ((*debug_out++ = *src++));
+            }
+            return;
+        }
+
+        ProductionBreakdown breakdown;
+        int job_food = 0;
+        if (colony->food2_per_farmer == 0) {
+            uint32_t* ptr = reinterpret_cast<uint32_t*>(&breakdown);
+            for (int i = 0; i < 0x95; ++i) { ptr[i] = 0; }
+            reinterpret_cast<uint16_t*>(&ptr[0x95])[0] = 0;
+        } else {
+            job_food = Colony_Job_Production_(colony, 0, debug_out ? &breakdown : nullptr);
+        }
+
+        int16_t hydro_bonus = (colony->buildings[BUILDING_HYDROPONIC_FARM] != 0) ? 2 : 0;
+        int16_t subterranean_bonus = (colony->buildings[BUILDING_SUBTERRANEAN_FARMS] != 0) ? 4 : 0;
+        colony->production[ECON_FOOD] = hydro_bonus + subterranean_bonus + (int16_t)job_food;
+
+        if (debug_out) {
+            char* ptr = debug_out;
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_T_15_65);
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_0);
+
+            if (breakdown.workers != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, breakdown.workers / 2, _produced_by_workers_msg);
+            }
+            if (breakdown.field_222 != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, breakdown.field_226 / 2, DAT_00571bc0);
+            }
+
+            for (int i = 0; i < 8; ++i) {
+                int16_t bonus = breakdown.race_bonus[i];
+                if (bonus > 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s_s, (int)(bonus / 2), 
+                                    MOX::_player[i].race_name, 
+                                    _bonus_msg);
+                }
+                if (bonus < 0) {
+                    ptr += _sprintf(ptr, s_fmt_s_s_s, Format_Quotient_(bonus, 2), 
+                                    MOX::_player[i].race_name, 
+                                    _bonus_msg);
+                }
+            }
+
+            if (breakdown.other_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s_2, (int)(breakdown.other_bonus / 2), DAT_00571afc);
+            }
+            if (breakdown.android_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)(breakdown.android_bonus / 2), _android_bonus_msg);
+            }
+
+            for (int i = 0; i < 204; ++i) {
+                if (breakdown.tech_bonus[i] != 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)(breakdown.tech_bonus[i] / 2), TECHDATA::_technology_applications[i].name);
+                }
+            }
+
+            for (int i = 0; i < 49; ++i) {
+                if (breakdown.building_bonus[i] != 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)(breakdown.building_bonus[i] / 2), TECHDATA::_buildings[i].name);
+                }
+            }
+
+            if (breakdown.gravity_penalty != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 0x28), _gravity_penalty_msg);
+            }
+            if (breakdown.conquered_penalty != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 0x28), _conquered_penalty_msg);
+            }
+            if (breakdown.blockade_penalty != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.blockade_penalty, 0x28), _blockaded_penalty_msg);
+            }
+            if (breakdown.morale_modifier > 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.morale_modifier, 0x28), _morale_bonus_msg);
+            } else if (breakdown.morale_modifier < 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.morale_modifier, 0x28), _morale_penalty_msg);
+            }
+            if (breakdown.government_modifier > 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.government_modifier, 0x28), _government_bonus_msg);
+            } else if (breakdown.government_modifier < 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.government_modifier, 0x28), _government_penalty_msg);
+            }
+            if (breakdown.leader_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(breakdown.leader_bonus, 0x28), _leader_bonus_msg);
+            }
+
+            if (hydro_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)hydro_bonus, TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
+            }
+            if (subterranean_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)subterranean_bonus, TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
+            }
+
+            if (colony->n_food_replicated != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)colony->n_food_replicated, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
+                colony->production[ECON_FOOD] += (int16_t)colony->n_food_replicated;
+            }
+
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_newline_0055136c);
+            _sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[ECON_FOOD], DAT_00571b80);
+        }
+    }
+
     void __cdecl All_Colony_Calculations_() {
         RUSS::Assert_Settings_();
 
@@ -1253,6 +1368,211 @@ namespace COLCALC {
         return false;
     }
 
+    void __cdecl Colony_Industry_Production_(struct s_colony* colony, char* debug_out) {
+        int worker_prod;
+        uint32_t android_recycler_bonus = 0;
+        uint32_t automated_factory_bonus = 0;
+        uint32_t robo_miner_bonus = 0;
+        uint32_t deep_core_mine_bonus = 0;
+        uint32_t robotic_factory_bonus = 0;
+        uint32_t recycler_bonus = 0;
+        int pollution_val = 0;
+        
+        struct DebugBuffers {
+            int worker_prod_debug;
+            int16_t racial_bonuses[8];
+            int16_t android_bonus[2];
+            int16_t tech_app_bonuses[204];
+            int16_t building_bonuses[49];
+            int gravity_pct;
+            int conquered_pct;
+            int blockaded_pct;
+            int morale_pct;
+            int government_pct;
+            int leader_pct;
+            int pollution_pct;
+        } dbg;
+
+        colony->n_industry_recyclers = 0;
+        if (colony->n_pops == 0) {
+            colony->production[ECON_INDUSTRY] = 0;
+            return;
+        }
+
+        int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / 361 /* sizeof(s_colony) */);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
+            colony->production[1] = 0;
+            if (debug_out) {
+                char* src = _colony_debug_msg;
+                char* dst = debug_out;
+                while ((*dst++ = *src++));
+            }
+            return;
+        }
+
+        worker_prod = Colony_Job_Production_(colony, 1, debug_out ? (char*)&dbg.worker_prod_debug : nullptr);
+        
+        if (colony->buildings[BUILDING_AUTOMATED_FACTORY]) automated_factory_bonus = 5;
+        if (colony->buildings[BUILDING_ROBO_MINER_PLANT]) robo_miner_bonus = 10;
+        if (colony->buildings[BUILDING_DEEP_CORE_MINE]) deep_core_mine_bonus = 15;
+        
+        if (colony->buildings[BUILDING_ROBOTIC_FACTORY]) {
+            robotic_factory_bonus = (uint32_t)_planet_robotic_factory_lookup[(uint8_t)MOX::_planet[colony->planet].planet_type];
+        }
+
+        if (colony->buildings[BUILDING_RECYCLOTRON]) {
+            colony->n_industry_recyclers = colony->n_pops;
+            recycler_bonus = (uint32_t)(uint8_t)colony->n_pops;
+        }
+
+        if (MOX::_player[colony->owner].objectives != 100) {
+            int base_recycler = (int)MOX::_settings.game_difficulty * (int)(uint8_t)colony->n_pops + 4;
+            colony->n_industry_recyclers += (int8_t)(base_recycler >> 3);
+        }
+
+        int total_prod = (int)worker_prod + (int)recycler_bonus + (int)automated_factory_bonus + 
+                         (int)robo_miner_bonus + (int)deep_core_mine_bonus + (int)robotic_factory_bonus;
+
+        if (colony->buildings[BUILDING_CORE_WASTE_DUMP]) {
+            colony->pollution = 0;
+        } else {
+            int leader_idx = Colony_Officer_(colony);
+            int poll_base = worker_prod + robotic_factory_bonus;
+            int threshold = (uint8_t)_industry_planet_size_lookup[(uint8_t)MOX::_planet[colony->planet].size];
+            
+            if (MOX::_player[colony->owner].tech_applications[TECH_APP_NANO_DISASSEMBLERS] == 3) {
+                threshold *= 2;
+            }
+
+            if (colony->buildings[BUILDING_POLLUTION_PROCESSOR]) {
+                poll_base = (poll_base + 1) / 2;
+            }
+            if (colony->buildings[BUILDING_ATMOSPHERE_RENEWER]) {
+                poll_base = (poll_base + 3) / 4;
+            }
+
+            if (leader_idx != -1) {
+                int modifier = 0;
+                if (MOX::_leaders[leader_idx].special_skills & 2) { // Environmentalist (Mega)
+                    modifier = (Owned_Officer_Level_(leader_idx) * 3 + 3) * 5;
+                } else if (MOX::_leaders[leader_idx].special_skills & 1) { // Environmentalist
+                    modifier = (Owned_Officer_Level_(leader_idx) * 5 + 5) * 2;
+                }
+                poll_base -= (modifier * poll_base) / 100;
+            }
+
+            int calc_pollution = (poll_base - threshold + 1) / 2;
+            if (calc_pollution < 1) {
+                pollution_val = 0;
+            } else {
+                int immune_pops = 0;
+                for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
+                    uint32_t race_idx = colony->pop[i].race;
+                    if (race_idx == 8 /* Android */ || MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE]) {
+                        immune_pops++;
+                    }
+                }
+                if (immune_pops != 0) {
+                    calc_pollution = ((int)(uint8_t)colony->n_pops / 2 + ((int)(uint8_t)colony->n_pops - immune_pops) * calc_pollution) / (int)(uint8_t)colony->n_pops;
+                }
+                pollution_val = (calc_pollution < 1) ? 0 : calc_pollution;
+                total_prod -= pollution_val;
+                dbg.pollution_pct = pollution_val * -20;
+            }
+            colony->pollution = (int16_t)pollution_val;
+        }
+
+        colony->production[1] = (int16_t)total_prod;
+
+        if (debug_out) {
+            int off = _sprintf(debug_out, s_fmt_s_00551130, s_T_15_65);
+            off += _sprintf(debug_out + off, s_fmt_s_00551130, s_0);
+            
+            char* ptr = debug_out + off;
+            if (dbg.worker_prod_debug != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, dbg.worker_prod_debug, _produced_by_workers_msg);
+            }
+            
+            for (int i = 0; i < 8; ++i) {
+                if (dbg.racial_bonuses[i] != 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s_s, (int)dbg.racial_bonuses[i], MOX::_player[0].race_name + (i * 0xea9), _bonus_msg);
+                }
+            }
+            
+            if (dbg.android_bonus[0] != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)dbg.android_bonus[0], _android_bonus_msg);
+            }
+
+            for (int i = 0; i < 204; ++i) {
+                if (dbg.tech_app_bonuses[i] != 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)dbg.tech_app_bonuses[i], TECHDATA::_technology_applications[i].name);
+                }
+            }
+
+            for (int i = 0; i < 49; ++i) {
+                if (dbg.building_bonuses[i] != 0) {
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)dbg.building_bonuses[i], TECHDATA::_buildings[i].name);
+                }
+            }
+
+            if (dbg.gravity_pct != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.gravity_pct, 20), _gravity_penalty_msg);
+            }
+            if (dbg.conquered_pct != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.conquered_pct, 20), _conquered_penalty_msg);
+            }
+            if (dbg.blockaded_pct != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.blockaded_pct, 20), _blockaded_penalty_msg);
+            }
+            if (dbg.morale_pct > 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.morale_pct, 20), _morale_bonus_msg);
+            } else if (dbg.morale_pct < 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.morale_pct, 20), _morale_penalty_msg);
+            }
+            if (dbg.government_pct > 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.government_pct, 20), _government_bonus_msg);
+            } else if (dbg.government_pct < 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.government_pct, 20), _government_penalty_msg);
+            }
+            if (dbg.leader_pct != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.leader_pct, 20), _leader_bonus_msg);
+            }
+            if (recycler_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, recycler_bonus, TECHDATA::_buildings[33].name);
+            }
+            if (automated_factory_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, automated_factory_bonus, TECHDATA::_buildings[7].name);
+            }
+            if (robo_miner_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, robo_miner_bonus, TECHDATA::_buildings[36].name);
+            }
+            if (deep_core_mine_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s, deep_core_mine_bonus, TECHDATA::_buildings[12].name);
+            }
+            if (robotic_factory_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_plus_d_s_s, robotic_factory_bonus, TECHDATA::_buildings[34].name, _used_msg);
+            }
+            if (dbg.pollution_pct != 0) {
+                ptr += _sprintf(ptr, s_fmt_s_s, Format_Quotient_(dbg.pollution_pct, 20), _pollution_penalty_msg);
+            }
+
+            if (colony->n_food_replicated != 0) {
+                char temp_buf[64];
+                _sprintf(temp_buf, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
+                ptr += _sprintf(ptr, s_fmt_d_s, (uint32_t)(uint8_t)colony->n_food_replicated * -2, temp_buf);
+                colony->production[1] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
+            }
+
+            if (colony->n_industry_taxed != 0) {
+                ptr += _sprintf(ptr, s_fmt_minus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                colony->production[1] -= (int16_t)colony->n_industry_taxed;
+            }
+
+            ptr += _sprintf(ptr, s_fmt_s_00551130, s_newline_0055136c);
+            _sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[1], _total_industry_produced_msg);
+        }
+    }
+
     void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf) {
         if (colony->n_pops == 0) {
             colony->production[ECON_BC] = 0;
@@ -1463,5 +1783,171 @@ namespace COLCALC {
 
         // Final food maintenance is half the total required half-units, rounded up
         colony->maintenance[ECON_FOOD] = (int8_t)((sum_food2 + 1) / 2);
+    }
+
+    /**
+     * @address 004f7560
+     */
+    uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader) {
+        uint8_t result = 0;
+
+        // Status 1 = Active/At Location, Type 1 = Scientist? (Context dependent)
+        if (leader->status == 1 && leader->eta == 0 && leader->type == 1) {
+            if (EVENTS::Event_Check_Space_Anomaly_At_Star_(leader->location) != 0) {
+                result = 1;
+            }
+        }
+
+        return result;
+    }
+
+    int32_t __cdecl Tribute_Received_From_(int32_t receiver_idx, int32_t payer_idx) {
+        s_player* receiver = &MOX::_player[receiver_idx];
+
+        int32_t tribute_percent = static_cast<int32_t>(receiver->tribute_treaty[payer_idx]);
+
+        int32_t net_production = static_cast<int32_t>(receiver->bc_produced) - receiver->tribute_income;
+
+        int32_t result = (tribute_percent * net_production) / 20;
+
+        if (result < 0) {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader) {
+        if ((plr - MOX::_player) == static_cast<intptr_t>(leader->player_index)) {
+            if (leader->status == 0 || leader->status == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void __cdecl Update_Player_Stats_(s_player* plr) {
+        int player_idx = static_cast<int>(plr - MOX::_player);
+
+        int total_research = 0;
+        int total_bc = 0;
+        int total_pop = 0;
+        int total_food = 0;
+        int total_industry = 0;
+        int total_surplus_food = 0;
+        int total_food_maintenance = 0;
+
+        // Process Colonies
+        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner == player_idx && colony->outpost_flag == 0) {
+                total_pop += static_cast<uint8_t>(colony->n_pops);
+                total_food += colony->production[ECON_FOOD];
+
+                if (!Colony_Is_Blockaded(colony)) {
+                    total_surplus_food += colony->production[ECON_FOOD];
+                    total_food_maintenance += static_cast<uint8_t>(colony->maintenance[ECON_FOOD]);
+                }
+
+                total_industry += colony->production[ECON_INDUSTRY];
+
+                if (EVENTS::Event_Check_Colony_Researching_(static_cast<int16_t>(i)) == 0) {
+                    total_research += colony->production[2];
+                }
+                total_bc += colony->production[ECON_BC];
+            }
+        }
+
+        // Process Ships (Science Labs)
+        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->owner == player_idx) {
+                // Check for Science Lab bit (0x1c = 28)?
+                if (struct_::Test_Bit_Field_(ship->d.special_device_flags, 0x1c) && ship->status < 4) {
+                    total_research += (1 << (ship->d.size & 0x1F));
+                }
+            }
+        }
+
+        // Process Leaders
+        for (int i = 0; i < 67; ++i) {
+            s_leader_data* leader = &MOX::_leaders[i];
+            if (Player_Owns_Officer_(plr, leader) && Leader_At_Anomaly_(leader) == 0) {
+                uint32_t skills = leader->general_skills;
+
+                // Financial skills (Famous, Charismatic)
+                if (skills & 0x200) {
+                    total_bc += 15;
+                }
+                else if (skills & 0x100) {
+                    total_bc += 10;
+                }
+
+                // Science skills
+                if (skills & 0x2000) {
+                    int level_bonus = Owned_Officer_Level_(i) * 5 + 5;
+                    total_research += (level_bonus * 15) / 10;
+                }
+                else if (skills & 0x1000) {
+                    int level_bonus = Owned_Officer_Level_(i) * 5 + 5;
+                    total_research += level_bonus;
+                }
+            }
+        }
+
+        // Process Diplomacy & Agreements
+        plr->tribute_income = 0;
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (plr->trade_treaty[i]) {
+                total_bc += plr->current_trade_agreement_level[i];
+            }
+
+            if (plr->research_treaty[i]) {
+                int16_t res_level = plr->current_research_agreement_level[i];
+                if (res_level < 0) {
+                    total_bc += res_level;
+                }
+                else {
+                    total_research += res_level;
+                }
+            }
+
+            if (plr->tribute_treaty[i] != 0) {
+                int tribute = Tribute_Received_From_(player_idx, i);
+                plr->tribute_income += tribute;
+            }
+        }
+
+        total_bc += plr->tribute_income;
+
+        // Update Player Record
+        plr->total_pop = static_cast<int16_t>(total_pop);
+        plr->food_produced = static_cast<int16_t>(total_food);
+        plr->industry_produced = static_cast<int16_t>(total_industry);
+
+        if (total_research > 0x7FFF) {
+            plr->research_produced = 0x7FFF;
+        }
+        else {
+            plr->research_produced = static_cast<int16_t>(total_research);
+        }
+
+        int surplus_food = total_surplus_food - total_food_maintenance;
+        plr->surplus_food = static_cast<int16_t>(surplus_food);
+
+        if (surplus_food > 0) {
+            if (plr->traits[TRAIT_FANTASTIC_TRADERS] == 0) {
+                surplus_food /= 2;
+            }
+            total_bc += surplus_food;
+        }
+
+        if (total_bc > 0x7FFF) {
+            total_bc = 0x7FFF;
+        }
+        plr->bc_produced = static_cast<int16_t>(total_bc);
+
+        Compute_Player_Maintenance_(plr, nullptr);
+        plr->surplus_bc = plr->bc_produced - static_cast<int16_t>(plr->total_maintenance);
     }
 }

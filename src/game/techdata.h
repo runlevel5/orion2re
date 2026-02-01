@@ -6,18 +6,10 @@ namespace TECHDATA {
 
     struct s_tech_building_data {
         char* name;
-        undefined field1_0x4;
-        undefined field2_0x5;
-        undefined field3_0x6;
-        undefined field4_0x7;
+        uint8_t field1_0x4[4];
         int32_t cost;
-        undefined field6_0xc;
-        undefined field7_0xd;
-        undefined field8_0xe;
-        undefined field9_0xf;
-        undefined field10_0x10;
-        undefined field11_0x11;
-        undefined field12_0x12;
+        int16_t maintenance;
+        uint8_t field7_0xe[5];
     };
 
     struct s_tech_app_data {

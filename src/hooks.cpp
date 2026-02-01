@@ -373,6 +373,17 @@ namespace hooks {
         { 0x004f72a0, &COLCALC::Colony_Industry_To_Tax_ },
         { 0x004f5520, &COLCALC::Colony_BC_Production_ },
         { 0x004f6d50, &COLCALC::Colony_Food_Maintenance_ },
+        { 0x0043e390, &OFFICER::Officer_Has_General_Skill_ },
+        { 0x0043e3d0, &OFFICER::Officer_Has_Special_Skill_ },
+        { 0x0043e570, &OFFICER::Get_Research_Cost_Skill_Value_ },
+        { 0x0043d5b0, &OFFICER::Deassign_Officer_ },
+        { 0x00443c60, &OFFICER::Allocate_Adv_Civ_Game_Officers_ },
+        { 0x00478110, &EVENTS::Event_Check_Colony_Researching_ },
+        { 0x004f7560, &COLCALC::Leader_At_Anomaly_ },
+        { 0x004f7ce0, &COLCALC::Tribute_Received_From_ },
+        { 0x004f7e20, &COLCALC::Player_Owns_Officer_ },
+        { 0x004f4520, &COLCALC::Colony_Industry_Production_ },
+        { 0x004f37f0, &COLCALC::Colony_Food_Production_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

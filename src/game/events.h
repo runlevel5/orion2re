@@ -20,6 +20,12 @@ namespace EVENTS {
     void Init_Events_();
     int16_t __cdecl Event_Check_Space_Anomaly_(int16_t colony_idx);
 
+    inline int16_t __cdecl Event_Check_Space_Anomaly_At_Star_(uint16_t star_idx) {
+        using Fn = int16_t(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004784b0});
+        return fn(star_idx);
+    }
+
     inline int16_t __cdecl Event_Check_Population_Boom_(int16_t colony_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x00477720})(colony_idx);
@@ -31,6 +37,7 @@ namespace EVENTS {
     }
 
     int16_t __cdecl Event_Check_Pirate_Activity_(uint8_t player_idx);
+    int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx);
 
     inline int16_t __cdecl Event_Check_Hyperspace_Flux_() {
         using Fn = int16_t(__cdecl*)();

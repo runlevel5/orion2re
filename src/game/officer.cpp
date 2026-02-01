@@ -1,7 +1,7 @@
 #include "deps.h"
 
 namespace OFFICER {
-    int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, uint8_t warlord) {
+    int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord) {
         if (xp < 60) {
             return 0;
         }
@@ -21,20 +21,22 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
+        // The size of s_leader_data is 59 bytes.
         s_leader_data& leader = MOX::_leaders[leader_idx];
         int8_t warlord_trait = 0;
 
-        // Index 66 (0x42) is reserved (likely for Orion Guardian or similar entities),
-        // where player-based traits like Warlord do not apply.
+        // Index 0x42 (66) likely refers to a special case (e.g., neutral hero)
         if (leader_idx != 0x42) {
             int8_t player_idx = leader.player_index;
-            // Warlord trait is at index 13 within the traits array
-            warlord_trait = MOX::_player[player_idx].traits[13];
+            // Offset 0x8bd within s_player struct points to the traits array.
+            // Index 0 within traits array corresponds to TRAIT_WARLORD based on disassembly offset.
+            warlord_trait = MOX::_player[player_idx].traits[0];
         }
 
+        // Call internal logic to derive level from XP and Warlord trait.
         int16_t base_level = OFFICER::Get_Officer_Base_Level_(leader.xp, warlord_trait);
 
-        // Clamp officer level to a maximum of 5 (Ultra-Elite)
+        // Clamp effective officer level to a maximum of 5.
         if (base_level > 5) {
             base_level = 5;
         }
@@ -162,5 +164,131 @@ namespace OFFICER {
 
     bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx) {
         return (bool)MOX::_player[player_idx].has_galactic_lore;
+    }
+
+    bool __cdecl Officer_Has_General_Skill_(int16_t player_num, int16_t leader_index, int16_t skill_id) {
+        return (MOX::skill_data[skill_id].skill_mask & MOX::_leaders[leader_index].general_skills) != 0;
+    }
+
+    bool __cdecl Officer_Has_Special_Skill_(int16_t player_num, int16_t leader_idx, int16_t skill_idx) {
+        uint32_t mask = MOX::skill_data[skill_idx].skill_mask;
+        uint32_t leader_skills = MOX::_leaders[leader_idx].special_skills;
+
+        return (mask & leader_skills) != 0;
+    }
+
+    int16_t __cdecl Get_Research_Cost_Skill_Value_(uint32_t cost) {
+        if (cost < 1000) {
+            return 1;
+        }
+
+        if (cost >= 5000) {
+            return 4;
+        }
+
+        return 3;
+    }
+
+    void __cdecl Deassign_Officer_(int16_t leader_idx) {
+        s_leader_data& leader = MOX::_leaders[leader_idx];
+        int16_t player_idx = (int16_t)leader.player_index;
+
+        OFFICER::Increase_Officer_Level_By_One_(leader_idx);
+
+        if (leader.type == 1) { // Colony Administrator
+            int16_t star_idx = leader.location;
+            if (star_idx != -1) {
+                if (leader.status == 5) { // Active/Assigned status
+                    MOX::_star[star_idx].system_special = 0;
+                }
+                if (player_idx != -1 && MOX::_star[star_idx].officer_index[player_idx] == (int8_t)leader_idx) {
+                    MOX::_star[star_idx].officer_index[player_idx] = -1;
+                }
+            }
+        } else if (leader.type == 0 && player_idx != -1) { // Ship Officer
+            int16_t ship_idx = leader.location;
+            if (ship_idx != -1) {
+                if (HACCESS::Ship_Owner_(ship_idx) == player_idx && MOX::_ship[ship_idx].officer_index == leader_idx) {
+                    MOX::_ship[ship_idx].officer_index = -1;
+                }
+            }
+        }
+
+        // Reset leader state to unassigned
+        leader.eta = 0;
+        leader.status = -1;
+        leader.location = -1;
+        leader.player_index = -1;
+    }
+
+    void __cdecl Allocate_Adv_Civ_Game_Officers_() {
+        int16_t leader_indices[MAX_LEADERS];
+        uint8_t is_leader_assigned[MAX_LEADERS];
+
+        for (int i = 0; i < MAX_LEADERS; ++i) {
+            is_leader_assigned[i] = 0;
+        }
+
+        // Phase 1: Assign one leader to each Repulsive player from a shuffled pool of 10
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            leader_indices[i] = i;
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            int16_t idx1 = (int16_t)random::Random_(10) - 1;
+            int16_t idx2 = (int16_t)random::Random_(10) - 1;
+            if (idx1 != idx2) {
+                int16_t tmp = leader_indices[idx1];
+                leader_indices[idx1] = leader_indices[idx2];
+                leader_indices[idx2] = tmp;
+            }
+        }
+
+        int16_t repulsive_pool_idx = 0;
+        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+            if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE] != 0) {
+                int16_t leader_idx = leader_indices[repulsive_pool_idx++];
+                if (leader_idx >= 0) {
+                    MOX::_leaders[leader_idx].status = 4;
+                    MOX::_leaders[leader_idx].player_index = (char)player_idx;
+                    is_leader_assigned[leader_idx] = 1;
+                }
+            }
+        }
+
+        // Phase 2: Assign two leaders to each non-Repulsive player from a shuffled pool of 25
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            leader_indices[i] = i;
+        }
+
+        for (int i = 0; i < 25; ++i) {
+            int16_t idx1 = (int16_t)random::Random_(25) - 1;
+            int16_t idx2 = (int16_t)random::Random_(25) - 1;
+            if (idx1 != idx2) {
+                int16_t tmp = leader_indices[idx1];
+                leader_indices[idx1] = leader_indices[idx2];
+                leader_indices[idx2] = tmp;
+            }
+        }
+
+        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+            if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE] == 0) {
+                for (int count = 0; count < 2; ++count) {
+                    int16_t pool_idx = 0;
+                    int16_t leader_idx;
+                    while (true) {
+                        leader_idx = leader_indices[pool_idx];
+                        if (is_leader_assigned[leader_idx] == 0) break;
+                        pool_idx++;
+                    }
+
+                    if (leader_idx >= 0) {
+                        MOX::_leaders[leader_idx].status = 4;
+                        MOX::_leaders[leader_idx].player_index = (char)player_idx;
+                        is_leader_assigned[leader_idx] = 1;
+                    }
+                }
+            }
+        }
     }
 }

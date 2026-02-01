@@ -4,8 +4,33 @@
 struct s_player;
 struct s_colony;
 struct s_star_data;
+struct s_leader_data;
 
 namespace COLCALC {
+    #pragma pack(push, 1)
+    struct ProductionBreakdown {
+        int32_t workers;             // Offset 0x00
+        int16_t race_bonus[8];       // Offset 0x04
+        int16_t android_bonus;       // Offset 0x14
+        int16_t other_bonus;         // Offset 0x16
+        int16_t tech_bonus[204];     // Offset 0x18
+        int16_t building_bonus[49];  // Offset 0x1B0
+        int32_t unknown_36[4];       // Offset 0x212
+        int32_t field_222;           // Offset 0x222
+        int32_t field_226;           // Offset 0x226
+        int32_t field_22A;           // Offset 0x22A
+        int32_t field_22E;           // Offset 0x22E
+        int32_t gravity_penalty;     // Offset 0x232
+        int32_t conquered_penalty;   // Offset 0x236
+        int32_t field_23A;           // Offset 0x23A
+        int32_t morale_modifier;     // Offset 0x23E
+        int32_t government_modifier; // Offset 0x242
+        int32_t blockade_penalty;    // Offset 0x246
+        int32_t leader_bonus;        // Offset 0x24A
+        int32_t field_24E[2];
+    };
+    #pragma pack(pop)
+
     inline int8_t (&_minerals_per_mine)[8] =
         *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F160});
 
@@ -19,7 +44,6 @@ namespace COLCALC {
     inline const char*& _no_capital_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B10});
     inline const char*& _no_barracks_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B38});
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
-    inline const char*& _leader_bonus_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BE0});
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
@@ -34,20 +58,44 @@ namespace COLCALC {
 
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});
+    inline char*& _produced_by_workers_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD8});
+    inline char*& _government_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AF4});
+    inline char*& DAT_00571afc = *reinterpret_cast<char**>(std::uintptr_t{0x00571AFC});
+    inline char*& _conquered_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B0C});
+    inline char*& _colony_debug_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
+    inline char*& _bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B48});
+    inline char*& _blockaded_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B50});
+    inline char*& _morale_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B54});
+    inline char*& DAT_00571b80 = *reinterpret_cast<char**>(std::uintptr_t{0x00571B80});
+    inline char*& _gravity_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B98});
+    inline char*& DAT_00571bc0 = *reinterpret_cast<char**>(std::uintptr_t{0x00571BC0});
+    inline char*& _leader_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BE0});
+    inline char*& _android_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BE4});
+    inline char*& _morale_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BEC});
     inline char*& _special_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B08});
     inline char*& _taxed_from_industry_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B30});
-    inline char*& _colony_debug_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
-    inline char*& _morale_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B54});
+    inline char*& _used_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B20});
+    inline char*& _pollution_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BD8});
+    inline char*& _replicated_to_d_food_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B28});
     inline char*& _taxes_collected_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B7C});
     inline char*& _trade_goods_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BD4});
+    inline char*& _total_industry_produced_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B70});
     inline char*& _total_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BDC});
-    inline char*& _morale_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BEC});
+
+    inline int8_t* _planet_robotic_factory_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F198});
+    inline int8_t* _industry_planet_size_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A0});
 
     inline const char* const s_T_15_65 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8A4}); // "T+15,+65."
-    inline const char* const s_0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // "0"
     inline const char* const s_fmt_s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
+    inline const char* const s_0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // "0"
     inline const char* const s_fmt_plus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "%+d %s"
-    inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // "\n"
+    inline const char* const s_fmt_plus_d_s_2 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B8}); // "%+d %s"
+    inline const char* const s_fmt_plus_d_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8D0}); // "%+d %s %s"
+    inline const char* const s_fmt_s_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8C4}); // "%s %s %s"
+    inline const char* const s_fmt_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B0}); // "%s %s"
+    inline const char* const s_fmt_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8F4}); // "%d %s"
+    inline const char* const s_fmt_minus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8E8}); // "-%d %s"
+    inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // ""
 
     int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
@@ -84,6 +132,8 @@ namespace COLCALC {
 
     inline bool __cdecl Monster_At_Star_(int star_idx);
 
+    uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader);
+
     void __cdecl All_Colony_Calculations_();
 
     void __cdecl Colony_Pop_Grows_(s_colony* colony);
@@ -92,11 +142,7 @@ namespace COLCALC {
 
     void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony);
 
-    inline void __cdecl Update_Player_Stats_(s_player* player) {
-        using Fn = void(__cdecl*)(s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f7e60});
-        fn(player);
-    }
+    void __cdecl Update_Player_Stats_(s_player* player);
 
     void __cdecl Colony_Environmental_Stuff_(s_colony* colony);
 
@@ -104,15 +150,19 @@ namespace COLCALC {
 
     void __cdecl Colony_Industry_Maintenance_(s_colony* colony);
 
-    inline void __cdecl Colony_Industry_Production_(s_colony* colony, void* unused) {
-        using Fn = void(__cdecl*)(s_colony*, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f4520})(colony, unused);
+    void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out);
+
+    inline int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown) {
+        using Fn = int16_t(__cdecl*)(struct s_colony*, int, void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f3d50})(colony, job_type, breakdown);
     }
 
-    inline void __cdecl Colony_Food_Production_(s_colony* colony, void* unused) {
-        using Fn = void(__cdecl*)(s_colony*, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f37f0})(colony, unused);
+    inline char* __cdecl Format_Quotient_(int value, int divisor) {
+        using Fn = char*(__cdecl*)(int, int);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f2e40})(value, divisor);
     }
+
+    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out);
 
     void __cdecl Colony_Food_Maintenance_(s_colony* colony);
 
@@ -138,5 +188,15 @@ namespace COLCALC {
         using Fn = int16_t(__cdecl*)(int8_t, uint32_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f5b90 });
         return fn(size, climate, player_idx);
+    }
+
+    int32_t __cdecl Tribute_Received_From_(int32_t receiver_idx, int32_t payer_idx);
+
+    bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader);
+
+    inline void __cdecl Compute_Player_Maintenance_(s_player* plr, char* param) {
+        using Fn = void(__cdecl*)(s_player*, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F75A0 });
+        fn(plr, param);
     }
 }

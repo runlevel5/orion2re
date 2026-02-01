@@ -102,6 +102,7 @@ workflows:
             - Never inline absolute-address globals directly inside function bodies.
             - Assembly might include both address and a name. You must use name, which will be in the comment
               or decompiler output.
+              For example, if you see ECON_INDUSTRY with value of 1, emit 1 with ECON_INDUSTRY in the comment.
             - For external variables, emit following structure with the address:
 
              mov eax, [MOX2::is_visible]
@@ -214,15 +215,7 @@ workflows:
                   LEA        ECX,[EAX + EAX*0x8]
                   ADD        ECX,EDX
  
-          * If you add or edit structures, make sure that they're packed using #pragma pack:
-
-            #pragma pack(push, 1)
-            struct s_foo {
-              uint32_t something;
-            };
-            #pragma pack(pop)
-          * You are NOT allowed to rearrange fields in emitted structures. Fields must be in the same order as they were
-            provided to you.
+          * Do not output complex data types, such as structures
           * You should NOT emit a new address for a structure if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),

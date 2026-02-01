@@ -52,4 +52,23 @@ namespace EVENTS {
 
         return 0;
     }
+
+    /**
+     * @address 00478110
+     */
+    int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx) {
+        if ((_event_data[16].field1_0x1 == 2 || _event_data[16].field1_0x1 == 6) &&
+            (_event_data[16].event_type == colony_idx)) {
+            return 1;
+        }
+
+        if ((_event_data[24].field1_0x1 == 2 || _event_data[24].field1_0x1 == 6)) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+            if (MOX::_planet[planet_idx].star_index == _event_data[24].event_type) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
 }
