@@ -279,7 +279,7 @@ namespace hooks {
         { 0x004c5830, &MAINSCR::Draw_Diplomacy_Request_Lights_ },
         { 0x005365b0, &draw::Draw_Bitmap_Sprite_ },
         { 0x00524490, &animate::Draw_ },
-        { 0x00524d50, &animate::Get_Animation_Frame_Count_ },
+        { 0x00524d50, &animate::Get_Animation_Frame_Count_},
         { 0x00536508, &draw::Draw_Animated_Sprite_ },
         { 0x00536040, &clipped::Clipped_Draw_Animated_Sprite_ },
         { 0x00536623, &draw::Color_Stream_Copy_ },
