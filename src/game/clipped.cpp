@@ -1,106 +1,117 @@
 #include "deps.h"
 
 namespace clipped {
+    // TODO: This can be greatly simplified
     void __cdecl Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int16_t x_skip_px = 0;
-        int16_t start_x = x;
+        int16_t clip_x_skip_count;
+        int16_t draw_x_start;
         if (x < video::_screen_window_x1) {
-            x_skip_px = video::_screen_window_x1 - x;
-            start_x = video::_screen_window_x1;
+            clip_x_skip_count = video::_screen_window_x1 - x;
+            draw_x_start = video::_screen_window_x1;
+        }
+        else {
+            clip_x_skip_count = 0;
+            draw_x_start = x;
         }
 
-        int16_t y_skip_lines = 0;
-        int16_t start_y = y;
+        int16_t clip_y_skip_count;
+        int16_t draw_y_start;
         if (y < video::_screen_window_y1) {
-            y_skip_lines = video::_screen_window_y1 - y;
-            start_y = video::_screen_window_y1;
+            clip_y_skip_count = video::_screen_window_y1 - y;
+            draw_y_start = video::_screen_window_y1;
+        }
+        else {
+            clip_y_skip_count = 0;
+            draw_y_start = y;
         }
 
-        int16_t end_x = x + animate::_animation_header->width - 1;
-        if (end_x > video::_screen_window_x2) {
-            end_x = video::_screen_window_x2;
+        int16_t draw_x_end = animate::_animation_header->width + x - 1;
+        if (draw_x_end > video::_screen_window_x2) {
+            draw_x_end = video::_screen_window_x2;
         }
 
-        int16_t end_y = y + animate::_animation_header->height - 1;
-        if (end_y > video::_screen_window_y2) {
-            end_y = video::_screen_window_y2;
+        int16_t draw_y_end = animate::_animation_header->height + y - 1;
+        if (draw_y_end > video::_screen_window_y2) {
+            draw_y_end = video::_screen_window_y2;
         }
 
-        uint32_t current_line_in_sprite = *reinterpret_cast<uint16_t*>(sprite + 2);
-        uint32_t sprite_word_idx = 2; // Index into int16_t array
+        int32_t draw_width = draw_x_end - draw_x_start + 1;
+        int32_t draw_height = draw_y_end - draw_y_start + 1;
 
-        // Seek sprite data to the first visible line
-        while ((int32_t)current_line_in_sprite < (int32_t)y_skip_lines) {
-            int16_t run_type = *reinterpret_cast<int16_t*>(sprite + sprite_word_idx * 2);
-            if (run_type == 0) {
-                current_line_in_sprite += *reinterpret_cast<uint16_t*>(sprite + sprite_word_idx * 2 + 2);
-            } else {
-                sprite_word_idx += (run_type + 1) / 2;
+        int16_t current_sprite_y = *(int16_t*)(sprite + 2);
+        int32_t line_base = x + (int32_t)draw_y_start * platform::g_screen_res_x;
+        int32_t sprite_word_idx = 2;
+
+        // Skip segments above the clipping window
+        while (current_sprite_y < clip_y_skip_count) {
+            int16_t count = *(int16_t*)&sprite[sprite_word_idx * 2];
+            if (count == 0) {
+                current_sprite_y += *(uint16_t*)&sprite[sprite_word_idx * 2 + 2];
+            }
+            else {
+                sprite_word_idx += (count + 1) / 2;
             }
             sprite_word_idx += 2;
         }
 
-        uint32_t screen_pitch = platform::g_screen_res_x;
-        int32_t current_screen_offset = (int32_t)x + (int32_t)start_y * (int32_t)screen_pitch;
-
-        // If the seeking loop overshot the start_y, adjust the screen pointer accordingly
-        if ((int32_t)y_skip_lines < (int32_t)current_line_in_sprite) {
-            current_screen_offset += (current_line_in_sprite - y_skip_lines) * screen_pitch;
+        // Adjust buffer pointer if first visible segment starts below initial drawing line
+        if (clip_y_skip_count < current_sprite_y) {
+            line_base += (current_sprite_y - clip_y_skip_count) * platform::g_screen_res_x;
         }
 
-        int32_t rel_x_skip = (int32_t)x_skip_px;
-        int32_t right_limit_px = (int32_t)(end_x - start_x + 1);
-        int32_t line_clip_left = current_screen_offset + rel_x_skip;
-        int32_t line_clip_right = current_screen_offset + rel_x_skip + right_limit_px;
+        int16_t current_line_idx = current_sprite_y - clip_y_skip_count;
+        int32_t win_start_abs = line_base + clip_x_skip_count;
+        int32_t win_end_abs = win_start_abs + draw_width;
+        int32_t cursor_abs = line_base + clip_x_skip_count;
 
-        int32_t current_rel_y = (int32_t)current_line_in_sprite - (int32_t)y_skip_lines;
-        int32_t target_lines_to_process = (int32_t)(end_y - start_y + 1);
-
-        while (current_rel_y < target_lines_to_process) {
-            uint8_t* run_header = sprite + sprite_word_idx * 2;
-            int16_t run_type = *reinterpret_cast<int16_t*>(run_header);
-            int16_t x_offset = *reinterpret_cast<int16_t*>(run_header + 2);
+        while (current_line_idx < draw_height) {
+            int16_t count = *(int16_t*)&sprite[sprite_word_idx * 2];
+            int16_t val = *(int16_t*)&sprite[sprite_word_idx * 2 + 2];
             sprite_word_idx += 2;
 
-            if (run_type == 0) {
-                // Command: Skip lines
-                current_rel_y += x_offset;
-                // Original code uses hardcoded 640 width here
-                current_screen_offset += (int32_t)x_offset * 640;
-                line_clip_left = current_screen_offset + rel_x_skip;
-                line_clip_right = current_screen_offset + rel_x_skip + right_limit_px;
-            } else {
-                // Command: Draw pixel run
-                int32_t run_pos_scr = current_screen_offset + (int32_t)x_offset;
-                int32_t run_end_scr = run_pos_scr + (int32_t)run_type;
-                int32_t pixel_src_idx = sprite_word_idx * 2;
+            if (count == 0) {
+                // Vertical skip
+                current_line_idx += val;
+                // Note: Assembly uses hardcoded 640 for vertical skips
+                line_base += (int32_t)val * platform::g_screen_res_x;
+                win_start_abs = line_base + clip_x_skip_count;
+                cursor_abs = line_base;
+                win_end_abs = win_start_abs + draw_width;
+            }
+            else {
+                // Horizontal segment
+                cursor_abs += val;
+                int32_t run_start_abs = cursor_abs;
+                int32_t run_end_abs = run_start_abs + count;
+                uint32_t pixel_ptr = sprite_word_idx * 2;
 
-                if (run_pos_scr < line_clip_right) {
-                    int32_t draw_start = run_pos_scr;
-                    if (draw_start < line_clip_left) {
-                        int16_t skip_in_run = (int16_t)(line_clip_left - draw_start);
-                        if (run_type < skip_in_run) {
-                            skip_in_run = run_type;
+                if (run_start_abs < win_end_abs) {
+                    // Clip left
+                    if (run_start_abs < win_start_abs) {
+                        int32_t skip_px = win_start_abs - run_start_abs;
+                        if (count < skip_px) {
+                            skip_px = count;
                         }
-                        pixel_src_idx += (int32_t)skip_in_run;
-                        draw_start += (int32_t)skip_in_run;
+                        pixel_ptr += skip_px;
+                        run_start_abs += skip_px;
                     }
 
-                    int32_t draw_end = run_end_scr;
-                    if (draw_end > line_clip_right) {
-                        draw_end = line_clip_right;
+                    // Clip right
+                    int32_t run_clipped_end = win_end_abs;
+                    if (run_end_abs < win_end_abs) {
+                        run_clipped_end = run_end_abs;
                     }
 
-                    // Copy visible pixels to video page
-                    while (draw_start < draw_end) {
-                        video::_current_video_page[draw_start] = sprite[pixel_src_idx];
-                        draw_start++;
-                        pixel_src_idx++;
+                    // Draw visible run
+                    uint8_t* screen_ptr = (uint8_t*)(video::_current_video_page + run_start_abs);
+                    while (run_start_abs < run_clipped_end) {
+                        *screen_ptr++ = sprite[pixel_ptr++];
+                        run_start_abs++;
                     }
                 }
-                sprite_word_idx += (run_type + 1) / 2;
+                sprite_word_idx += (count + 1) / 2;
             }
         }
 
@@ -372,82 +383,125 @@ namespace clipped {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
+    // This is updated version of Clipped_Draw_Animated_Sprite_ because original implementation was not
+    // handling clipping correctly.
     void __cdecl Clipped_Draw_Glassed_Animated_Sprite_(int32_t x, int32_t y, uint8_t* sprite) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int min_x = (int)video::_screen_window_x1;
-        int min_y = (int)video::_screen_window_y1;
-        int max_x = 639; // 0x27f
-        int limit_y = 479; // 0x1df
-
-        int anim_height = (int)animate::_animation_header->height;
-        if (x + anim_height > (int)video::_screen_window_x2) {
-            max_x = (int)video::_screen_window_x2;
+        int16_t clip_x_skip_count;
+        int16_t draw_x_start;
+        if (x < video::_screen_window_x1) {
+            clip_x_skip_count = video::_screen_window_x1 - x;
+            draw_x_start = video::_screen_window_x1;
+        }
+        else {
+            clip_x_skip_count = 0;
+            draw_x_start = x;
         }
 
-        int sprite_bottom = y + anim_height;
-        if ((int)video::_screen_window_y2 < sprite_bottom) {
-            limit_y = (int)video::_screen_window_y2;
+        int16_t clip_y_skip_count;
+        int16_t draw_y_start;
+        if (y < video::_screen_window_y1) {
+            clip_y_skip_count = video::_screen_window_y1 - y;
+            draw_y_start = video::_screen_window_y1;
+        }
+        else {
+            clip_y_skip_count = 0;
+            draw_y_start = y;
         }
 
-        int y_offset = (int)*(int16_t*)(sprite + 2);
-        int current_y = y + y_offset;
-
-        uint8_t* row_base = video::_current_video_page + (current_y * platform::g_screen_res_x) + x;
-        uint8_t* data_ptr = sprite + 4;
-
-        if (sprite_bottom <= limit_y) {
-            limit_y = sprite_bottom;
+        int16_t draw_x_end = animate::_animation_header->width + x - 1;
+        if (draw_x_end > video::_screen_window_x2) {
+            draw_x_end = video::_screen_window_x2;
         }
 
-        while (current_y <= limit_y) {
-            int count = (int)*(int16_t*)data_ptr;
-            int x_skip = (int)*(int16_t*)(data_ptr + 2);
-            data_ptr += 4;
+        int16_t draw_y_end = animate::_animation_header->height + y - 1;
+        if (draw_y_end > video::_screen_window_y2) {
+            draw_y_end = video::_screen_window_y2;
+        }
+
+        int32_t draw_width = draw_x_end - draw_x_start + 1;
+        int32_t draw_height = draw_y_end - draw_y_start + 1;
+
+        int16_t current_sprite_y = *(int16_t*)(sprite + 2);
+        int32_t line_base = x + (int32_t)draw_y_start * platform::g_screen_res_x;
+        int32_t sprite_word_idx = 2;
+
+        // Skip segments above the clipping window
+        while (current_sprite_y < clip_y_skip_count) {
+            int16_t count = *(int16_t*)&sprite[sprite_word_idx * 2];
+            if (count == 0) {
+                current_sprite_y += *(uint16_t*)&sprite[sprite_word_idx * 2 + 2];
+            }
+            else {
+                sprite_word_idx += (count + 1) / 2;
+            }
+            sprite_word_idx += 2;
+        }
+
+        // Adjust buffer pointer if first visible segment starts below initial drawing line
+        if (clip_y_skip_count < current_sprite_y) {
+            line_base += (current_sprite_y - clip_y_skip_count) * platform::g_screen_res_x;
+        }
+
+        int16_t current_line_idx = current_sprite_y - clip_y_skip_count;
+        int32_t win_start_abs = line_base + clip_x_skip_count;
+        int32_t win_end_abs = win_start_abs + draw_width;
+        int32_t cursor_abs = line_base + clip_x_skip_count;
+
+        while (current_line_idx < draw_height) {
+            int16_t count = *(int16_t*)&sprite[sprite_word_idx * 2];
+            int16_t val = *(int16_t*)&sprite[sprite_word_idx * 2 + 2];
+            sprite_word_idx += 2;
 
             if (count == 0) {
-                current_y += x_skip;
-                row_base += x_skip * 640;
-            } else {
-                int current_x = x;
-                uint8_t* p = row_base;
+                // Vertical skip
+                current_line_idx += val;
+                // Note: Assembly uses hardcoded 640 for vertical skips
+                line_base += (int32_t)val * platform::g_screen_res_x;
+                win_start_abs = line_base + clip_x_skip_count;
+                cursor_abs = line_base;
+                win_end_abs = win_start_abs + draw_width;
+            }
+            else {
+                // Horizontal segment
+                cursor_abs += val;
+                int32_t run_start_abs = cursor_abs;
+                int32_t run_end_abs = run_start_abs + count;
+                uint32_t pixel_ptr = sprite_word_idx * 2;
 
-                if (current_y >= min_y && max_x > current_x) {
-                    current_x += x_skip;
-                    p += x_skip;
-
-                    int actual_count = count;
-                    uint8_t* actual_data = data_ptr;
-
-                    if (current_x < min_x) {
-                        int clip_left = min_x - current_x;
-                        actual_data += clip_left;
-                        p += clip_left;
-                        actual_count -= clip_left;
-                        current_x = min_x;
-                    }
-
-                    if (max_x < current_x + actual_count) {
-                        actual_count = max_x - current_x + 1;
-                    }
-
-                    if (actual_count > 0) {
-                        for (int i = 0; i < actual_count; ++i) {
-                            uint8_t pixel = actual_data[i];
-                            if (pixel != 0) {
-                                if (pixel >= 0xF0) {
-                                    pixel = draw::_glass_lookup_table[pixel][p[i]];
-                                }
-                                p[i] = pixel;
-                            }
+                if (run_start_abs < win_end_abs) {
+                    // Clip left
+                    if (run_start_abs < win_start_abs) {
+                        int32_t skip_px = win_start_abs - run_start_abs;
+                        if (count < skip_px) {
+                            skip_px = count;
                         }
+                        pixel_ptr += skip_px;
+                        run_start_abs += skip_px;
+                    }
+
+                    // Clip right
+                    int32_t run_clipped_end = win_end_abs;
+                    if (run_end_abs < win_end_abs) {
+                        run_clipped_end = run_end_abs;
+                    }
+
+                    // Draw visible run
+                    uint8_t* screen_ptr = (uint8_t*)(video::_current_video_page + run_start_abs);
+                    while (run_start_abs < run_clipped_end) {
+                        uint8_t pixel = sprite[pixel_ptr++];
+                        if (pixel < 0xF0) {
+                            *screen_ptr++ = pixel;
+                        }
+                        else {
+                            uint8_t background_pixel = *screen_ptr;
+                            *screen_ptr++ = draw::_glass_lookup_table[pixel][background_pixel];
+                        }
+                        run_start_abs++;
                     }
                 }
-                data_ptr += count;
-            }
-
-            if (reinterpret_cast<uintptr_t>(data_ptr) & 1) {
-                data_ptr++;
+                sprite_word_idx += (count + 1) / 2;
             }
         }
 

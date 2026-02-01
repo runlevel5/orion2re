@@ -14,6 +14,7 @@ workflows:
       - name: decompile
         type: llm
         model: gemini/gemini-3-flash-preview
+        #model: gemini/gemini-3-pro-preview
         temperature: 1
         reasoning_effort: high
         #reset_policy: keep
