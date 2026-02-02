@@ -116,7 +116,7 @@ namespace hooks {
         { 0x00473df0, &EVENTS::Init_Events_ },
         { 0x00523e00, &fields::Assign_Update_Function_ },
         { 0x0051ff00, &fields::Deactivate_Auto_Function_ },
-        { 0x00521080, &fields::Init_Fields_State_ },
+        { 0x00521080, &fields::Clear_Fields_ },
         { 0x0049ea60, &MISC::Increment_Mouse_Clock_Image_ },
         { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },
         { 0x004fbf00, &COLCALC::Compute_All_Star_Colony_Stuff_ },
