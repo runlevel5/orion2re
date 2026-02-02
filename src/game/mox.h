@@ -49,6 +49,9 @@ namespace MOX {
     inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
     inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
     inline uint16_t& _return_screen = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005977F0});
+    inline uint32_t& _save_game_dates = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005a1ca8});
+    inline uint32_t& _save_game_stardates = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005974e8});
+    inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a9a});
     inline SCREEN& _previous_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
@@ -345,6 +348,12 @@ namespace MOX {
     inline void Mox_Update_() {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
+        fn();
+    }
+
+    inline void Load_Credits_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e9b70});
         fn();
     }
 

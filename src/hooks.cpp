@@ -399,12 +399,13 @@ namespace hooks {
         { 0x00483830, &MOX2::Screen_Control_ },
         { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
         { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
+        { 0x004e8c90, &MAINMENU::Main_Menu_Screen_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
 
     void Assert_Types() {
-        ASSERT(sizeof(s_main_menu) == 0xd2, "s_main_menu");
+        ASSERT(sizeof(MAINMENU::s_main_menu) == 0xd2, "s_main_menu");
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
         ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");

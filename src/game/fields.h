@@ -15,6 +15,30 @@ namespace fields {
     void __cdecl Deactivate_Auto_Function_();
     void __cdecl Init_Fields_State_();
 
+    inline int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
+        using Fn = int16_t(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d6c0});
+        return fn(hotkey_str);
+    }
+
+    inline void __cdecl Assign_Auto_Function_(void (*func)(), int16_t priority) {
+        using Fn = void(__cdecl*)(void (*)(), int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fe90});
+        fn(func, priority);
+    }
+
+    inline int32_t __cdecl Get_Input_() {
+        using Fn = int32_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051edf0});
+        return fn();
+    }
+
+    inline int16_t __cdecl Scan_Input_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d290});
+        return fn();
+    }
+
     inline int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, void* seg, const char* label, int16_t key) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, const char*, void*, const char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051db80});
