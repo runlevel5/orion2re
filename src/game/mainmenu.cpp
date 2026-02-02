@@ -25,7 +25,7 @@ namespace MAINMENU {
         palette::Set_Palette_Changes_(0, 0xFF);
         animate::Draw_Palette_(_main_menu_background);
 
-        fields::Init_Fields_State_();
+        fields::Clear_Fields_();
 
         int16_t button_fields[6];
         button_fields[0] = fields::Add_Hidden_Field_(10, 20, 25, 35, s_C_00552420, ')');
@@ -94,7 +94,7 @@ namespace MAINMENU {
 
         uint8_t game_type = FILEDEF::Get_Game_Type_From_Saved_Game_(9);
         _sprintf(save_filename, s_save_percent_d_gam, 10);
-        fields::Init_Fields_State_();
+        fields::Clear_Fields_();
 
         bool can_continue = false;
         if (game_type == 0 || game_type == 1) {
@@ -327,7 +327,7 @@ namespace MAINMENU {
         int16_t last_input_scan = -1;
 
         video::Set_Refresh_Full_();
-        fields::Init_Fields_State_();
+        fields::Clear_Fields_();
         MOX::Mox_Update_();
 
         _mainmenu_first_seg = (uint32_t)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);

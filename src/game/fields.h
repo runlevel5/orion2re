@@ -13,7 +13,7 @@ namespace fields {
 
     void __cdecl Assign_Update_Function_(void* update_func);
     void __cdecl Deactivate_Auto_Function_();
-    void __cdecl Init_Fields_State_();
+    void __cdecl Clear_Fields_();
 
     inline int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
         using Fn = int16_t(__cdecl*)(const char*);

@@ -9,7 +9,7 @@ namespace fields {
         _auto_active_flag = 0;
     }
 
-    void __cdecl Init_Fields_State_() {
+    void __cdecl Clear_Fields_() {
         _fields_count = 1;
         _input_delay = 0;
         _down_mouse_button = 0xFFFF;

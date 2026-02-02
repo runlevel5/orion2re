@@ -1036,7 +1036,7 @@ namespace MAINSCR {
                 0
             );
         } else if (box_was_selected) {
-            fields::Init_Fields_State_();
+            fields::Clear_Fields_();
             Clear_Main_Screen_Fields_();
             Draw_Mini_Main_Offscreen_();
         }

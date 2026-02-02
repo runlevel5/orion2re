@@ -39,7 +39,7 @@ namespace JIM {
         fields::Deactivate_Auto_Function_();
         mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
         _darken_palette_value = 0;
-        fields::Init_Fields_State_();
+        fields::Clear_Fields_();
         video::Set_Refresh_Stencil_();
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
