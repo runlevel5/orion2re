@@ -17,6 +17,175 @@ namespace MOX2 {
         }
     }
 
+    void __cdecl Screen_Control_() {
+        while (true) {
+            MOX::_global_esc = 0;
+            MOX::SCREEN current = MOX::_current_screen;
+
+            switch (current) {
+                case MOX::SCREEN_MAIN:
+                    MAINSCR::Main_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_MAIN;
+                    break;
+                case MOX::SCREEN_COLONY:
+                    COLONY::Colony_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_COLONY;
+                    break;
+                case MOX::SCREEN_DESIGN:
+                    DESIGN::Design_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_DESIGN;
+                    break;
+                case MOX::SCREEN_FLEET:
+                    FLT1::Fleet_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_FLEET;
+                    break;
+                case MOX::SCREEN_RACE:
+                    RACESCRN::Race_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_RACE;
+                    break;
+                case MOX::SCREEN_EXIT:
+                    return;
+                case MOX::SCREEN_GAME:
+                    LOADSAVE::_Game_Popup_();
+                    MOX::_previous_screen = MOX::SCREEN_GAME;
+                    break;
+                case MOX::SCREEN_INFO:
+                    INFO::Info_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_INFO;
+                    break;
+                case MOX::SCREEN_MAIN_MENU:
+                    MAINMENU::Main_Menu_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_MAIN_MENU;
+                    break;
+                case MOX::SCREEN_MAIN_NEXT_TURN:
+                    NEXTTURN::Next_Turn_();
+                    MOX::_previous_screen = MOX::SCREEN_MAIN_NEXT_TURN;
+                    break;
+                case MOX::SCREEN_NEW_GAME:
+                    if (MOX::_game_type == 0) {
+                        if (NEWGAME::Newgame_Screen_() == 0) {
+                            MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                        } else {
+                            INITGAME::Init_New_Game_(
+                                MOX::_settings.game_difficulty,
+                                MOX::_settings.galaxy_size,
+                                MOX::_settings.galaxy_age,
+                                MOX::_settings.number_of_players,
+                                MOX::_settings.strategic_combat_flag,
+                                MOX::_settings.starting_civilization_level
+                            );
+                        }
+                    } else {
+                        MOX::_return_screen = MOX::SCREEN_MULTI_PLAYER;
+                        NEWGAME::Newgame_Screen_();
+                    }
+                    MOX::_previous_screen = MOX::SCREEN_NEW_GAME;
+                    break;
+                case MOX::SCREEN_HALL_OF_FAME:
+                    SCORE::Hall_Of_Fame_Screen_(-1);
+                    MOX::_previous_screen = MOX::SCREEN_HALL_OF_FAME;
+                    MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                    break;
+                case MOX::SCREEN_MULTI_PLAYER:
+                    MULTPLAY::Multi_Player_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_MULTI_PLAYER;
+                    break;
+                case MOX::SCREEN_HOTSEAT:
+                    HOTPOP::Hotseat_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_HOTSEAT;
+                    break;
+                case MOX::SCREEN_HOTSEAT_SELECT_PLAYER:
+                    MULTPLAY::Hotseat_Select_Player_();
+                    MOX::_previous_screen = MOX::SCREEN_HOTSEAT_SELECT_PLAYER;
+                    break;
+                case MOX::SCREEN_PLANET_DATA:
+                    HAROLD::Planet_Data_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_PLANET_DATA;
+                    break;
+                case MOX::SCREEN_COLONY_SUMMARY:
+                    COLSUM::Colony_Summary_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_COLONY_SUMMARY;
+                    break;
+                case MOX::SCREEN_START_NET:
+                    if (NETSTART::Start_Net_Screen_()) {
+                        MOX::_current_screen = MOX::SCREEN_REPORTS; // 0x27
+                    }
+                    MOX::_previous_screen = MOX::SCREEN_START_NET;
+                    break;
+                case MOX::SCREEN_JOIN_NET:
+                    if (NETSTART::Join_Net_Screen_()) {
+                        MOX::_current_screen = MOX::SCREEN_REPORTS; // 0x27
+                    }
+                    MOX::_previous_screen = MOX::SCREEN_JOIN_NET;
+                    break;
+                case MOX::SCREEN_QUEUE_POPUP:
+                    COLBLDG::Build_Queue_Popup_();
+                    MOX::_previous_screen = MOX::SCREEN_QUEUE_POPUP;
+                    break;
+                case MOX::SCREEN_DISTANCE_BETWEEN_STARS:
+                    MAINSCR2::Distance_Between_Stars_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_DISTANCE_BETWEEN_STARS;
+                    MOX::_current_screen = (MOX::SCREEN)MOX::_return_screen;
+                    break;
+                case MOX::SCREEN_OFFICERS:
+                    OFFICER::Officers_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_OFFICERS;
+                    break;
+                case MOX::SCREEN_COLONIZATION_IN_MAIN:
+                    MAINSCR2::Planet_Colonization_In_Main_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_COLONIZATION_IN_MAIN;
+                    break;
+                case MOX::SCREEN_BUILDING_OUTPOSTS_IN_MAIN:
+                    MAINSCR2::Building_Outposts_In_Main_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_BUILDING_OUTPOSTS_IN_MAIN;
+                    break;
+                case MOX::SCREEN_PLANET_SUMMARY:
+                    PLNTSUM::Planet_Summary_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_PLANET_SUMMARY;
+                    break;
+                case MOX::SCREEN_COLONY_LANDING:
+                    COLLAND::Colony_Landing_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_COLONY_LANDING;
+                    break;
+                case MOX::SCREEN_UNLOADING_TRANSPORTS_IN_MAIN:
+                    MAINSCR2::Unloading_Transports_In_Main_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_UNLOADING_TRANSPORTS_IN_MAIN;
+                    break;
+                case MOX::SCREEN_SCRAP_FREIGHTERS:
+                    MAINSCR2::Scrap_Freighters_();
+                    MOX::_previous_screen = MOX::SCREEN_SCRAP_FREIGHTERS;
+                    break;
+                case MOX::SCREEN_TECH_CHANGE:
+                    TECH::Tech_Change_();
+                    MOX::_previous_screen = MOX::SCREEN_TECH_CHANGE;
+                    break;
+                case MOX::SCREEN_NET_NEXT_TURN:
+                    NETTURN::Net_Next_Turn_();
+                    break;
+                case MOX::SCREEN_REPORTS:
+                    MAINSCR2::Reports_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_REPORTS;
+                    break;
+                case MOX::SCREEN_TURN_SUMMARY:
+                    TURNSUM::Turn_Summary_Popup_();
+                    MOX::_previous_screen = MOX::SCREEN_TURN_SUMMARY;
+                    break;
+                case MOX::SCREEN_LOAD_NET:
+                    if (NETSTART::Load_Net_Screen_()) {
+                        MOX::_current_screen = MOX::SCREEN_REPORTS; // 0x27
+                    }
+                    MOX::_previous_screen = MOX::SCREEN_JOIN_NET; // Note: Original code set it to 0x16
+                    break;
+                case MOX::SCREEN_SHOW_COMMAND_POINTS:
+                    MAINSCR2::Show_Command_Points_Screen_();
+                    MOX::_previous_screen = MOX::SCREEN_SHOW_COMMAND_POINTS;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     void __cdecl Init_Map_Defaults_() {
         MOX::_cur_map_x = 0;
         MOX::_cur_map_y = 0;
@@ -58,7 +227,7 @@ namespace MOX2 {
         char loading_buffer[64];
         char mox_set_dir[32];
 
-        MOX::_previous_screen = 0xFF;
+        MOX::_previous_screen = MOX::SCREEN_UNKNOWN;
         MOX::_max_debug_saves = 20;
         MOX::_first_debug_save = 20;
         MOX2::_user_wants_n_space_monsters = 0xFF;

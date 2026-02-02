@@ -306,6 +306,10 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         return 0;
     }
 
+    void __cdecl Update_Planet_Group_Cache() {
+        return;
+    }
+
     int16_t __cdecl Get_Planet_Group_(int16_t planet_index) {
         s_planet_data& planet = MOX::_planet[planet_index];
         int16_t orbit = static_cast<int16_t>(planet.orbit);

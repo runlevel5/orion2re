@@ -8,8 +8,8 @@ struct s_leader_data;
 
 namespace COLCALC {
     #pragma pack(push, 1)
-    struct ProductionBreakdown {
-        int32_t scientist_prod;      // Offset 0x00
+    struct s_food_production_breakdown {
+        int32_t workers;             // Offset 0x00
         int16_t race_bonus[8];       // Offset 0x04
         int16_t android_bonus;       // Offset 0x14
         int16_t other_bonus;         // Offset 0x16
@@ -22,7 +22,7 @@ namespace COLCALC {
         int32_t field_22E;           // Offset 0x22E
         int32_t gravity_penalty;     // Offset 0x232
         int32_t conquered_penalty;   // Offset 0x236
-        int32_t field_23A;           // Offset 0x23A
+        int32_t unk_23A;             // Offset 0x23A
         int32_t morale_modifier;     // Offset 0x23E
         int32_t government_modifier; // Offset 0x242
         int32_t blockade_penalty;    // Offset 0x246
@@ -34,9 +34,15 @@ namespace COLCALC {
     inline int8_t (&_minerals_per_mine)[8] =
         *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F160});
 
+    inline uint8_t (&_climate_maintenance_modifier)[10] =
+        *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x0054F168});
+
     inline int8_t* _morale_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F178});
     inline int8_t* _non_capital_morale_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F180});
     inline int8_t* _barracks_morale_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F188});
+
+    inline int8_t* _colony_job_production_difficulty_lookup =
+        reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F190});
 
     inline const char*& _government_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE0});
     inline const char*& _mixed_races_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE4});
@@ -44,6 +50,29 @@ namespace COLCALC {
     inline const char*& _no_capital_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B10});
     inline const char*& _no_barracks_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B38});
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
+    inline const char*& _ship_maintenance_costs_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571ADC});
+    inline const char*& _d_from_1_s_ship_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AEC});
+    inline const char*& _d_from_d_battlestations_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AF0});
+    inline const char*& _from_warlord_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AF8});
+    inline const char*& _d_from_1_star_base_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B18});
+    inline const char*& _d_from_1_noncombat_ship_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B1C});
+    inline const char*& _d_from_d_fortresses_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B34});
+    inline const char*& _d_from_1_fortress_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B3C});
+    inline const char*& _d_from_d_star_bases_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B44});
+    inline const char*& _total_command_point_used_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B58});
+    inline const char*& _d_from_d_s_ships_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B60});
+    inline const char*& _d_from_d_noncombat_ships_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B64});
+    inline const char*& _total_command_points_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B68});
+    inline const char*& _total_command_points_used_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B74});
+    inline const char*& _from_imperium_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B84});
+    inline const char*& _d_from_1_battlestation_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B94});
+    inline const char*& _d_from_1_fortress_msg_alt = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC4});
+
+    inline const char* s_msg_bc_calc = reinterpret_cast<const char*>(std::uintptr_t{0x0055A908});
+    inline const char* s_msg_bc_zero = reinterpret_cast<const char*>(std::uintptr_t{0x0055A928});
+    inline const char* s_separator = reinterpret_cast<const char*>(std::uintptr_t{0x0055A934});
+    inline const char* s_fmt_val_name = reinterpret_cast<const char*>(std::uintptr_t{0x0055A94C});
+    inline const char* s_fmt_val_msg = reinterpret_cast<const char*>(std::uintptr_t{0x0055A958});
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
@@ -56,21 +85,32 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0043e780})(officer_idx);
     }
 
+    inline int16_t __cdecl Officer_Maintenance_(int16_t player_idx, int16_t leader_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0043E8C0})(player_idx, leader_idx);
+    }
+
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
+    inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});
     inline char*& _produced_by_workers_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD8});
     inline char*& _government_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AF4});
     inline char*& DAT_00571afc = *reinterpret_cast<char**>(std::uintptr_t{0x00571AFC});
     inline char*& _conquered_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B0C});
+    inline char*& _produced_by_scientists_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B14});
     inline char*& _colony_debug_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
+    inline char*& _anomaly_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
     inline char*& _bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B48});
     inline char*& _blockaded_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B50});
     inline char*& _morale_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B54});
+    inline char*& _total_research_produced_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B5C});
+    inline char*& _artifacts_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B78});
     inline char*& DAT_00571b80 = *reinterpret_cast<char**>(std::uintptr_t{0x00571B80});
     inline char*& _gravity_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B98});
     inline char*& DAT_00571bc0 = *reinterpret_cast<char**>(std::uintptr_t{0x00571BC0});
     inline char*& _leader_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BE0});
     inline char*& _android_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BE4});
+    inline char*& _intelligence_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BE8});
     inline char*& _morale_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BEC});
     inline char*& _special_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B08});
     inline char*& _taxed_from_industry_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B30});
@@ -95,6 +135,7 @@ namespace COLCALC {
     inline const char* const s_fmt_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B0}); // "%s %s"
     inline const char* const s_fmt_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8F4}); // "%d %s"
     inline const char* const s_fmt_minus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8E8}); // "-%d %s"
+    inline const char* const s_fmt_plus_d_s_3 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8FC}); // "+%d %s"
     inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // ""
 
     int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out);
@@ -152,9 +193,11 @@ namespace COLCALC {
 
     void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out);
 
-    inline int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown) {
-        using Fn = int16_t(__cdecl*)(struct s_colony*, int, void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f3d50})(colony, job_type, breakdown);
+    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown);
+
+    inline int16_t __cdecl Colony_Pop_Base_Prod_Produced_(void* colony, void* pop_ptr, int16_t job, void* debug_struct) {
+        using Fn = int16_t(__cdecl*)(void*, void*, int16_t, void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f42b0})(colony, pop_ptr, job, debug_struct);
     }
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
@@ -168,35 +211,29 @@ namespace COLCALC {
 
     void __cdecl Colony_Replicators_(s_colony* colony);
 
-    inline void __cdecl Colony_Research_Production_(s_colony* colony, void* unused) {
-        using Fn = void(__cdecl*)(s_colony*, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f4fb0})(colony, unused);
-    }
+    void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out);
 
     void __cdecl Colony_Industry_To_Tax_(s_colony* colony);
 
     void __cdecl Colony_BC_Production_(s_colony* colony, char* debug_buf);
 
-    inline void __cdecl Colony_BC_Maintenance_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f7310})(colony);
-    }
+    void __cdecl Colony_BC_Maintenance_(s_colony* colony);
 
     bool __cdecl Colony_Is_Blockaded(s_colony* colony);
 
-    inline int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, uint32_t climate, int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int8_t, uint32_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f5b90 });
-        return fn(size, climate, player_idx);
-    }
+    int __cdecl Calc_Player_Climate_(int player_idx, int climate);
+
+    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, bool is_immune);
+
+    short __cdecl Double_Add_Two_(short value);
+
+    int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx);
 
     int32_t __cdecl Tribute_Received_From_(int32_t receiver_idx, int32_t payer_idx);
 
     bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader);
 
-    inline void __cdecl Compute_Player_Maintenance_(s_player* plr, char* param) {
-        using Fn = void(__cdecl*)(s_player*, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F75A0 });
-        fn(plr, param);
-    }
+    void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
+
+    int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx);
 }

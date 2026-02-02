@@ -7,4 +7,9 @@ namespace COLBLDG {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005094a0});
         fn(player_idx, design_idx, colony_idx);
     }
+
+    inline void __cdecl Build_Queue_Popup_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0050e490})();
+    }
 }

@@ -174,13 +174,6 @@ inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsig
     return fn(start_address, stack_size, arglist);
 }
 
-// Suggested name: Release_Resources
-inline void __cdecl FUN_00521080() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00521080 });
-    fn();
-}
-
 // Suggested name: Reset_Graphics_State
 inline void __cdecl FUN_0052d290() {
     using Fn = void(__cdecl*)();

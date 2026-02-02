@@ -794,12 +794,6 @@ namespace platform {
 #endif
     }
 
-    /**
-     * @brief Triggers a page toggle via a Windows message and waits for completion.
-     *
-     * This function sets a pending flag, sends a custom message (0x401, likely WM_USER + 1)
-     * to the main window, and spins until the flag is cleared by the message handler.
-     */
     void __cdecl Toggle_Pages_Stub_() {
         g_pending_toggle_pages = true;
 

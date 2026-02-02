@@ -59,11 +59,7 @@ namespace MAPGEN {
 
     int16_t __cdecl Get_Planet_Group_(int16_t planet_idx);
 
-    inline void __cdecl Update_Planet_Group_Cache() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b56a0});
-        fn();
-    }
+    void __cdecl Update_Planet_Group_Cache();
 
     int8_t __cdecl Generate_Climate_(int16_t star_type);
 

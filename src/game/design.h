@@ -6,4 +6,9 @@ namespace DESIGN {
         using Fn = int16_t(__cdecl*)(int16_t, char*);
         return reinterpret_cast<Fn>(0x0042e320)(player_idx, design_name);
     }
+
+    inline void __cdecl Design_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0042e6b0})();
+    }
 }

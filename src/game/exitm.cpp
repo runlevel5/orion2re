@@ -2,7 +2,7 @@
 
 namespace exitm {
     void Exit_With_Message(const char* message) {
-        FUN_00521080();
+        fields::Init_Fields_State_();
 
         DAT_00578e68 = 1;
 

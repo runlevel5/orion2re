@@ -165,6 +165,9 @@
     <ClCompile Include="src\game\bitmap.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\mainmenu.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -372,6 +375,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\bitmap.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\mainmenu.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\mainscr2.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

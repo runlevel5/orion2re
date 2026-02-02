@@ -46,6 +46,7 @@
     <ClCompile Include="src\game\initship.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />
+    <ClCompile Include="src\game\mainmenu.cpp" />
     <ClCompile Include="src\game\mainscr.cpp" />
     <ClCompile Include="src\game\mapgen.cpp" />
     <ClCompile Include="src\game\misc.cpp" />
@@ -108,7 +109,9 @@
     <ClInclude Include="src\game\ken.h" />
     <ClInclude Include="src\game\key.h" />
     <ClInclude Include="src\game\loader.h" />
+    <ClInclude Include="src\game\mainmenu.h" />
     <ClInclude Include="src\game\mainscr.h" />
+    <ClInclude Include="src\game\mainscr2.h" />
     <ClInclude Include="src\game\mapgen.h" />
     <ClInclude Include="src\game\misc.h" />
     <ClInclude Include="src\game\mouse.h" />

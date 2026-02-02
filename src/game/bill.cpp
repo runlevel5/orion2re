@@ -30,4 +30,8 @@ namespace BILL {
 
         return BILL::_dest_file_name;
     }
+
+    int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx) {
+        return static_cast<int16_t>(MOX::_player[player_idx].spies[target_idx] & 0x3F);
+    }
 }

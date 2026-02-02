@@ -350,6 +350,12 @@ namespace FILEDEF {
     void __cdecl Save_Moo_Custom_Player_Data_(s_player* player) {
     }
 
+    uint8_t __cdecl Get_Game_Type_From_Saved_Game_(int slot) {
+        using Fn = uint8_t(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d140});
+        return fn(slot);
+    }
+
     void Update_Game_Settings_Version_Number_() {
         bool needs_reset = false;
         FILE* file = FID_conflict_wfopen("MOX.SET", "rb");

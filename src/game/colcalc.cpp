@@ -1,6 +1,22 @@
 #include "deps.h"
 
 namespace COLCALC {
+    int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
+        if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
+            switch (climate) {
+                case PLANET_CLIMAGE_TUNDRA: // 4
+                case PLANET_CLIMAGE_SWAMP: // 6
+                    return PLANET_CLIMAGE_TERRAN; // 8
+                case PLANET_CLIMAGE_OCEAN: // 5
+                case PLANET_CLIMAGE_TERRAN: // 8
+                    return PLANET_CLIMAGE_GAIA; // 9
+                default:
+                    break;
+            }
+        }
+        return climate;
+    }
+
     int __cdecl Colony_Officer_(s_colony* colony) {
         int8_t star_idx = MOX::_planet[colony->planet].star_index;
 
@@ -1004,6 +1020,30 @@ namespace COLCALC {
         COLCALC::Colony_Specialty_(colony);
     }
 
+    int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx) {
+        bool is_immune = false;
+
+        if (player_idx < 8) {
+            // TRAIT_ENVIRONMENT_IMMUNE is at index 16
+            if (MOX::_player[player_idx].traits[16] != 0) {
+                is_immune = true;
+            }
+        } else if (player_idx == 8) {
+            // Player index 8 is considered immune (e.g., Neutral/Orion)
+            is_immune = true;
+        }
+
+        int adjusted_climate = COLCALC::Calc_Player_Climate_(static_cast<int>(player_idx), climate);
+        int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
+
+        // TRAIT_SUBTERRANEAN is at index 6
+        if (player_idx < 8 && MOX::_player[player_idx].traits[6] != 0) {
+            max_pop += static_cast<int>(COLCALC::Double_Add_Two_(static_cast<short>(size)));
+        }
+
+        return static_cast<short>(max_pop);
+    }
+
     void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out) {
         if (colony->n_pops == 0) {
             colony->production[ECON_FOOD] = 0;
@@ -1020,12 +1060,10 @@ namespace COLCALC {
             return;
         }
 
-        ProductionBreakdown breakdown;
+        s_food_production_breakdown breakdown;
         int job_food = 0;
         if (colony->food2_per_farmer == 0) {
-            uint32_t* ptr = reinterpret_cast<uint32_t*>(&breakdown);
-            for (int i = 0; i < 0x95; ++i) { ptr[i] = 0; }
-            reinterpret_cast<uint16_t*>(&ptr[0x95])[0] = 0;
+            helpers::memset(&breakdown, 0, sizeof(breakdown));
         } else {
             job_food = Colony_Job_Production_(colony, 0, debug_out ? &breakdown : nullptr);
         }
@@ -1726,6 +1764,130 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out) {
+        if (colony->n_pops == 0) {
+            colony->production[ECON_RESEARCH] = 0;
+            return;
+        }
+
+        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
+            colony->production[ECON_RESEARCH] = 0;
+            if (debug_out) {
+                char* msg = _anomaly_msg;
+                while ((*debug_out++ = *msg++) != '\0');
+            }
+            return;
+        }
+
+        struct {
+            int scientist_prod;         // Offset 0
+            int16_t race_bonuses[8];    // Offset 4
+            int16_t android_bonus;      // Offset 20
+            int16_t tech_apps[212];     // Offset 24
+            int16_t building_prods[49]; // Offset 448
+            int32_t padding_0x222;      // Offset 546
+            int32_t artifacts_bonus;    // Offset 550
+            int32_t intelligence_bonus; // Offset 554
+            int32_t padding_0x22E;      // Offset 558
+            int32_t gravity_penalty;    // Offset 562
+            int32_t conquered_penalty;  // Offset 566
+            int32_t morale_mod;         // Offset 574
+            int32_t gov_mod;            // Offset 578
+            int32_t blockaded_penalty;  // Offset 582
+            int32_t leader_bonus;       // Offset 586
+        } debug_data;
+        helpers::memset(&debug_data, 0, sizeof(debug_data));
+
+        void* debug_ptr = debug_out ? &debug_data : nullptr;
+        int base_research = Colony_Job_Production_(colony, ECON_RESEARCH, debug_ptr);
+
+        int res_lab_bonus = (colony->buildings[BUILDING_RESEARCH_LAB] != 0) ? 5 : 0;
+        int supercomp_bonus = (colony->buildings[BUILDING_SUPERCOMPUTER] != 0) ? 10 : 0;
+        int cybernet_bonus = (colony->buildings[BUILDING_GALACTIC_CYBERNET] != 0) ? 15 : 0;
+        int autolab_bonus = (colony->buildings[BUILDING_AUTOLAB] != 0) ? 30 : 0;
+
+        int total_research = base_research + res_lab_bonus + supercomp_bonus + cybernet_bonus + autolab_bonus;
+        colony->production[ECON_RESEARCH] = static_cast<int16_t>(total_research);
+
+        if (debug_out) {
+            char* p = debug_out;
+            p += _sprintf(p, s_fmt_s_00551130, s_T_15_65);
+            p += _sprintf(p, s_fmt_s_00551130, s_0);
+
+            if (debug_data.scientist_prod != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s, debug_data.scientist_prod, _produced_by_scientists_msg);
+            }
+            if (debug_data.artifacts_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s, debug_data.artifacts_bonus, _artifacts_bonus_msg);
+            }
+            if (debug_data.intelligence_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s, debug_data.intelligence_bonus, _intelligence_bonus_msg);
+            }
+
+            for (int i = 0; i < 8; ++i) {
+                if (debug_data.race_bonuses[i] != 0) {
+                    p += _sprintf(p, s_fmt_plus_d_s_s, static_cast<int>(debug_data.race_bonuses[i]), MOX::_player[i].race_name, _bonus_msg);
+                }
+            }
+
+            if (debug_data.android_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s, static_cast<int>(debug_data.android_bonus), _android_bonus_msg);
+            }
+
+            for (int i = 0; i < 212; ++i) {
+                if (debug_data.tech_apps[i] != 0) {
+                    p += _sprintf(p, s_fmt_plus_d_s, static_cast<int>(debug_data.tech_apps[i]), TECHDATA::_technology_applications[i].name);
+                }
+            }
+
+            for (int i = 0; i < 49; ++i) {
+                if (debug_data.building_prods[i] != 0) {
+                    p += _sprintf(p, s_fmt_plus_d_s, static_cast<int>(debug_data.building_prods[i]), TECHDATA::_buildings[i].name);
+                }
+            }
+
+            if (debug_data.gravity_penalty != 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.gravity_penalty, 20), _gravity_penalty_msg);
+            }
+            if (debug_data.conquered_penalty != 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.conquered_penalty, 20), _conquered_penalty_msg);
+            }
+            if (debug_data.blockaded_penalty != 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.blockaded_penalty, 20), _blockaded_penalty_msg);
+            }
+            if (debug_data.morale_mod > 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.morale_mod, 20), _morale_bonus_msg);
+            } else if (debug_data.morale_mod < 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.morale_mod, 20), _morale_penalty_msg);
+            }
+            if (debug_data.gov_mod > 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.gov_mod, 20), _government_bonus_msg);
+            } else if (debug_data.gov_mod < 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.gov_mod, 20), _government_penalty_msg);
+            }
+            if (debug_data.leader_bonus != 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(debug_data.leader_bonus, 20), _leader_bonus_msg);
+            }
+
+            if (res_lab_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s_3, res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
+            }
+            if (supercomp_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s_3, supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
+            }
+            if (cybernet_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s_3, cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
+            }
+            if (autolab_bonus != 0) {
+                p += _sprintf(p, s_fmt_plus_d_s_3, autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
+            }
+
+            p += _sprintf(p, s_fmt_s_00551130, s_newline_0055136c);
+            _sprintf(p, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_RESEARCH]), _total_research_produced_msg);
+        }
+    }
+
     void __cdecl Colony_Food_Maintenance_(s_colony* colony) {
         int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
 
@@ -1824,6 +1986,32 @@ namespace COLCALC {
             }
         }
         return false;
+    }
+
+    void __cdecl Colony_BC_Maintenance_(s_colony* colony) {
+        if (colony->n_pops == 0) {
+            colony->maintenance[ECON_BC] = 0;
+        } else {
+            int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / sizeof(s_colony));
+            if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+                colony->maintenance[ECON_BC] = 0;
+            } else {
+                int32_t total_building_maintenance = 0;
+                for (int32_t i = 0; i < 49; ++i) {
+                    if (colony->buildings[i] != 0) {
+                        total_building_maintenance += TECHDATA::_buildings[i].maintenance;
+                    }
+                }
+
+                int32_t climate_modifier = static_cast<int32_t>(_climate_maintenance_modifier[static_cast<uint8_t>(colony->climate)]) + 100;
+                int32_t base_cost = static_cast<uint8_t>(colony->n_food_replicated) + total_building_maintenance;
+
+                int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
+                colony->maintenance[ECON_BC] = static_cast<int8_t>(calculated_bc);
+            }
+        }
+
+        colony->imports[ECON_BC] = static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[ECON_BC])) - colony->production[ECON_BC];
     }
 
     void __cdecl Update_Player_Stats_(s_player* plr) {
@@ -1949,5 +2137,377 @@ namespace COLCALC {
 
         Compute_Player_Maintenance_(plr, nullptr);
         plr->surplus_bc = plr->bc_produced - static_cast<int16_t>(plr->total_maintenance);
+    }
+
+    short __cdecl Double_Add_Two_(short value) {
+        return (value * 2) + 2;
+    }
+
+    int __cdecl Size_And_Climate_Max_Population_(int8_t size, int climate, bool is_immune) {
+        // Calculate population factor based on size and climate
+        int32_t population_factor = (int32_t)(is_immune ? 1 : 0) * 25 + _size_climate_max_pop_lookup[climate];
+
+        // Cap the factor at 100%
+        if (population_factor > 100) {
+            population_factor = 100;
+        }
+
+        // Multiply by the planet's specific max population and round to nearest integer
+        // Equivalent to: (factor * max_pop + 50) / 100
+        int32_t planet_max_val = (int32_t)MOX::_planet_max_population[size];
+        int32_t result = (int32_t)(population_factor * planet_max_val + 50) / 100;
+
+        return result;
+    }
+
+    /**
+     * @address 004f75a0
+     */
+    /**
+     * Calculates the gravity-based production factor for a colony and player.
+     * 
+     * @param colony Pointer to the colony data.
+     * @param player_idx Index of the player (0-7).
+     * @return A production factor (e.g., 4 for 100%, 3 for 75%, 2 for 50%).
+     */
+    int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx) {
+        s_colony* c = static_cast<s_colony*>(colony);
+        if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
+            return 4;
+        }
+
+        int16_t planet_idx = c->planet;
+        int8_t gravity_class = MOX::_planet[planet_idx].gravity_class;
+        
+        auto& player = MOX::_player[player_idx];
+
+        if (gravity_class == PLANET_GRAVITY_LOW_G) { // Low Gravity
+            return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 3 : 4;
+        }
+
+        if (gravity_class == PLANET_GRAVITY_NORMAL_G) { // Normal Gravity
+            return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 4 : 3;
+        }
+
+        if (gravity_class == PLANET_GRAVITY_HEAVY_G) { // Heavy Gravity
+            return (player.traits[TRAIT_HEAVY_G_WORLD] == 0) ? 2 : 4;
+        }
+
+        return 4; 
+    }
+
+    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown) {
+        char* debug_out = (char*)breakdown;
+        bool is_blockaded = Colony_Is_Blockaded(colony);
+        int officer_idx = Colony_Officer_(colony);
+        
+        s_player* player = &MOX::_player[colony->owner];
+        int8_t race_trait_0 = player->traits[0];
+        bool is_uncreative = (race_trait_0 / 2) != 3;
+
+        int16_t officer_bonus = 0;
+        if (officer_idx != -1) {
+            s_leader_data* leader = &MOX::_leaders[officer_idx];
+            if (job_type == 0) { // Farming
+                if (leader->special_skills & 0x8) {
+                    officer_bonus = (Owned_Officer_Level_(officer_idx) + 1) * 3;
+                } else if (leader->special_skills & 0x4) {
+                    officer_bonus = Owned_Officer_Level_(officer_idx) * 2 + 2;
+                }
+            } else if (job_type == 1) { // Industry
+                if (leader->special_skills & 0x200) {
+                    officer_bonus = (Owned_Officer_Level_(officer_idx) + 1) * 3;
+                } else if (leader->special_skills & 0x100) {
+                    officer_bonus = Owned_Officer_Level_(officer_idx) * 2 + 2;
+                }
+            } else if (job_type == 2) { // Research
+                if (leader->special_skills & 0x2000) {
+                    officer_bonus = (Owned_Officer_Level_(officer_idx) + 1) * 3;
+                } else if (leader->special_skills & 0x1000) {
+                    officer_bonus = Owned_Officer_Level_(officer_idx) * 2 + 2;
+                }
+            }
+        }
+
+        s_food_production_breakdown total_debug, current_pop_debug;
+
+        if (debug_out) {
+            helpers::memset(&total_debug, 0, sizeof(total_debug));
+        }
+
+        int total_accumulated_prod = 0;
+        int n_pops = (uint8_t)colony->n_pops;
+
+        for (int i = 0; i < n_pops; ++i) {
+            Pop_Info* p = &colony->pop[i];
+            uint32_t pop_data = *reinterpret_cast<uint32_t*>(p);
+            
+            // Check if population is assigned to this job
+            if ((pop_data & 0x200) && ((pop_data & 0x180) >> 7) == (uint32_t)job_type) {
+                uint8_t pop_race = pop_data & 0xF;
+                int16_t gravity_penalty = (int16_t)Gravity_Player_Production_Factor_(colony, (int16_t)pop_race);
+
+                if (debug_out) {
+                    helpers::memset(&current_pop_debug, 0, sizeof(current_pop_debug));
+                }
+
+                int16_t base_prod = Colony_Pop_Base_Prod_Produced_(colony, p, (int16_t)job_type, debug_out ? &current_pop_debug : nullptr);
+                
+                int32_t pop_total = 0;
+                int32_t base_scaled = (int32_t)base_prod * 20;
+                int32_t gravity_mod = (4 - gravity_penalty) * (int32_t)base_prod * -5;
+                int32_t off_mod = (int32_t)officer_bonus * base_prod;
+                int32_t captive_mod = 0;
+                if (pop_data & 0x400) captive_mod = (int32_t)base_prod * -5;
+                
+                int32_t morale_mod = 0;
+                bool calc_morale = is_uncreative;
+                if (job_type != 1 && (pop_race > 7 && pop_race != 9 && pop_race == 8)) {
+                    calc_morale = false;
+                }
+                if (calc_morale) morale_mod = (int32_t)colony->morale * base_prod;
+
+                int32_t race_mod = 0;
+                int32_t blockade_mod = 0;
+                if (job_type < 2) {
+                    if (race_trait_0 == 6) race_mod = (int32_t)base_prod * 10;
+                    else if (race_trait_0 == 7) race_mod = base_scaled;
+                    if (is_blockaded) blockade_mod = (int32_t)base_prod * -10;
+                } else if (job_type == 2) {
+                    if (race_trait_0 == 0) race_mod = (int32_t)base_prod * -10;
+                    else if (race_trait_0 == 1) race_mod = (int32_t)base_prod * -5;
+                    else if (race_trait_0 == 4) race_mod = (int32_t)base_prod * 10;
+                    else if (race_trait_0 == 5) race_mod = (int32_t)base_prod * 15;
+                }
+
+                int32_t difficulty_mod = 0;
+                if (player->objectives != 100) {
+                    difficulty_mod = (int32_t)_colony_job_production_difficulty_lookup[MOX::_settings.game_difficulty];
+                }
+
+                pop_total = base_scaled + gravity_mod + off_mod + captive_mod + morale_mod + race_mod + blockade_mod + difficulty_mod;
+                
+                if (pop_total > 0) total_accumulated_prod += pop_total;
+
+                if (debug_out) {
+                    total_debug.workers += current_pop_debug.workers;
+                    for (int k = 0; k < 204; ++k) {
+                        reinterpret_cast<int16_t*>(&total_debug.race_bonus[0])[k] += 
+                            reinterpret_cast<int16_t*>(&current_pop_debug.race_bonus[0])[k];
+                    }
+                    total_debug.gravity_penalty += gravity_mod;
+                    total_debug.conquered_penalty += captive_mod;
+                    total_debug.morale_modifier += morale_mod;
+                    total_debug.blockade_penalty += blockade_mod;
+                    total_debug.leader_bonus += off_mod;
+                }
+            }
+        }
+
+        if (debug_out) {
+            helpers::memcpy(debug_out, &total_debug, sizeof(total_debug));
+        }
+
+        if (job_type == 0) return (int16_t)((total_accumulated_prod + 20) / 40);
+        return (int16_t)((total_accumulated_prod + 10) / 20);
+    }
+
+    void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out) {
+        int16_t player_idx = static_cast<int16_t>(plr - MOX::_player);
+        
+        plr->command_points = 0;
+        plr->command_points_used = 0;
+        for (int i = 0; i < 6; ++i) {
+            plr->maintenance[i] = 0;
+        }
+
+        // 1. Leader Maintenance
+        int leader_bonus_cp = 0;
+        int best_leader_idx = -1;
+        for (int i = 0; i < 67 /* MAX_LEADERS */; ++i) {
+            s_leader_data* leader = &MOX::_leaders[i];
+            if (leader->player_index == player_idx && leader->status >= 0 && leader->status < 3) {
+                if (!Leader_At_Anomaly_(leader)) {
+                    plr->maintenance[5] += Officer_Maintenance_(player_idx, (int16_t)i);
+                    
+                    int cp_provided = 0;
+                    if (leader->general_skills & 0x800) {
+                        cp_provided = Owned_Officer_Level_(i) * 3 + 3;
+                    } else if (leader->general_skills & 0x400) {
+                        cp_provided = Owned_Officer_Level_(i) * 2 + 2;
+                    }
+                    
+                    if (cp_provided > leader_bonus_cp) {
+                        leader_bonus_cp = cp_provided;
+                        best_leader_idx = i;
+                    }
+                }
+            }
+        }
+
+        // 2. Colony Defense & Warlord CP
+        int star_bases = 0;
+        int battlestations = 0;
+        int fortresses = 0;
+        int warlord_bonus = 0;
+        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* col = &MOX::_colony[i];
+            if (col->owner == player_idx && col->outpost_flag == 0) {
+                plr->maintenance[0] += static_cast<uint16_t>(col->maintenance[ECON_BC]);
+                if (plr->traits[TRAIT_WARLORD] != 0) {
+                    warlord_bonus += 2;
+                }
+                if (col->buildings[BUILDING_STAR_BASE]) {
+                    star_bases++;
+                } else if (col->buildings[BUILDING_BATTLESTATION]) {
+                    battlestations++;
+                } else if (col->buildings[BUILDING_STAR_FORTRESS]) {
+                    fortresses++;
+                }
+            }
+        }
+
+        // 3. Tech CP Bonus
+        int tech_cp_val = 0;
+        int tech_app_idx = -1;
+        int tech_multiplier = 0;
+        if (plr->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
+            tech_app_idx = TECH_APP_HYPERSPACE_COMMUNICATIONS;
+            tech_multiplier = 3;
+        } else if (plr->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
+            tech_app_idx = TECH_APP_SUB_SPACE_COMMUNICATIONS;
+            tech_multiplier = 2;
+        } else if (plr->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
+            tech_app_idx = TECH_APP_TACHYON_COMMUNICATIONS;
+            tech_multiplier = 1;
+        }
+        tech_cp_val = tech_multiplier * (star_bases + battlestations + fortresses);
+
+        // 4. Final CP Calculation
+        int total_cp = fortresses * 3 + battlestations * 2 + warlord_bonus + tech_cp_val + star_bases + 5 + leader_bonus_cp;
+        plr->command_points = static_cast<int16_t>(total_cp);
+        
+        int imperium_bonus = 0;
+        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 3) {
+            imperium_bonus = total_cp / 2;
+            plr->command_points += static_cast<int16_t>(imperium_bonus);
+        }
+
+        // Debug Output Phase 1
+        char* cur_debug = debug_out;
+        if (cur_debug) {
+            cur_debug += _sprintf(cur_debug, s_fmt_val_msg, 5, _d_from_1_fortress_msg);
+            if (star_bases > 0) {
+                if (star_bases == 1) cur_debug += _sprintf(cur_debug, _d_from_1_star_base_msg, 1);
+                else cur_debug += _sprintf(cur_debug, _d_from_d_star_bases_msg, star_bases, star_bases);
+            }
+            if (battlestations > 0) {
+                if (battlestations == 1) cur_debug += _sprintf(cur_debug, _d_from_1_battlestation_msg, 2);
+                else cur_debug += _sprintf(cur_debug, _d_from_d_battlestations_msg, battlestations * 2, battlestations);
+            }
+            if (fortresses > 0) {
+                if (fortresses == 1) cur_debug += _sprintf(cur_debug, _d_from_1_fortress_msg_alt, 3);
+                else cur_debug += _sprintf(cur_debug, _d_from_d_fortresses_msg, fortresses * 3, fortresses);
+            }
+            if (tech_cp_val != 0) {
+                cur_debug += _sprintf(cur_debug, s_fmt_val_name, tech_cp_val, TECHDATA::_technology_applications[tech_app_idx].name);
+            }
+            if (leader_bonus_cp != 0) {
+                cur_debug += _sprintf(cur_debug, s_fmt_val_name, leader_bonus_cp, MOX::_leaders[best_leader_idx].name);
+            }
+            if (warlord_bonus != 0) {
+                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
+            }
+            if (imperium_bonus != 0) {
+                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
+            }
+            if (plr->command_points > 5) {
+                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
+            }
+            cur_debug += _sprintf(cur_debug, s_separator);
+        }
+
+        // 5. Freighter Maintenance
+        int freighter_count = plr->n_freighters;
+        if (plr->surplus_freighters > 0) {
+            freighter_count -= plr->surplus_freighters;
+        }
+        plr->maintenance[1] = static_cast<int16_t>(freighter_count / 2);
+
+        // 6. Ship CP Usage
+        int ships_by_hull[9] = {0};
+        int noncombat_ships = 0;
+        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->owner == player_idx && ship->status < 3) {
+                if (ship->d.ship_type != SHIP_TYPE_COMBAT) {
+                    noncombat_ships++;
+                } else {
+                    if (ship->d.size < 9) {
+                        ships_by_hull[ship->d.size]++;
+                    }
+                }
+                plr->command_points_used += (int16_t)(ship->d.size + 1);
+            }
+        }
+
+        // Debug Output Phase 2
+        if (cur_debug) {
+            for (int i = 0; i < 9; ++i) {
+                if (ships_by_hull[i] > 0) {
+                    if (ships_by_hull[i] == 1) {
+                        cur_debug += _sprintf(cur_debug, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
+                    } else {
+                        cur_debug += _sprintf(cur_debug, _d_from_d_s_ships_msg, (i + 1) * ships_by_hull[i], ships_by_hull[i], TECHDATA::_hull_data[i].size_name);
+                    }
+                }
+            }
+            if (noncombat_ships > 0) {
+                if (noncombat_ships == 1) cur_debug += _sprintf(cur_debug, _d_from_1_noncombat_ship_msg, 1);
+                else cur_debug += _sprintf(cur_debug, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
+            }
+            const char* cp_used_label = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
+            cur_debug += _sprintf(cur_debug, s_fmt_val_msg, (int)plr->command_points_used, cp_used_label);
+            cur_debug += _sprintf(cur_debug, s_separator);
+        }
+
+        // 7. Excess Ship Maintenance
+        if (plr->command_points_used > 0) {
+            if (plr->command_points < plr->command_points_used) {
+                int excess = plr->command_points_used - plr->command_points;
+                int cost_per_point = (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 100 /* 'd' */) ? 10 : (12 - MOX::_settings.game_difficulty);
+                plr->maintenance[2] = static_cast<int16_t>(cost_per_point * excess);
+                if (cur_debug) {
+                    _sprintf(cur_debug, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, cost_per_point, excess, (int)plr->maintenance[2]);
+                }
+            } else {
+                plr->maintenance[2] = 0;
+                if (cur_debug) {
+                    _sprintf(cur_debug, s_msg_bc_zero, _ship_maintenance_costs_msg);
+                }
+            }
+        } else {
+            plr->maintenance[2] = 0;
+        }
+
+        // 8. Spy Maintenance
+        plr->maintenance[3] = 0;
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            plr->maintenance[3] += static_cast<int16_t>(BILL::Get_Their_Spy_Number_(player_idx, (int16_t)i));
+        }
+
+        // 9. Tribute Income
+        plr->maintenance[4] = 0;
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (plr->tribute_treaty[i] != 0) {
+                plr->maintenance[4] += static_cast<int16_t>(Tribute_Received_From_(player_idx, i));
+            }
+        }
+
+        // 10. Total
+        plr->total_maintenance = 0;
+        for (int i = 0; i < 6; ++i) {
+            plr->total_maintenance += plr->maintenance[i];
+        }
     }
 }

@@ -21,27 +21,23 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
-        // The size of s_leader_data is 59 bytes.
-        s_leader_data& leader = MOX::_leaders[leader_idx];
         int8_t warlord_trait = 0;
 
-        // Index 0x42 (66) likely refers to a special case (e.g., neutral hero)
+        // leader_idx 0x42 (66) likely refers to a special entity or unassigned leader
         if (leader_idx != 0x42) {
-            int8_t player_idx = leader.player_index;
-            // Offset 0x8bd within s_player struct points to the traits array.
-            // Index 0 within traits array corresponds to TRAIT_WARLORD based on disassembly offset.
-            warlord_trait = MOX::_player[player_idx].traits[0];
+            int8_t player_idx = MOX::_leaders[leader_idx].player_index;
+            // TRAIT_WARLORD is index 20 in the traits array
+            warlord_trait = MOX::_player[player_idx].traits[20];
         }
 
-        // Call internal logic to derive level from XP and Warlord trait.
-        int16_t base_level = OFFICER::Get_Officer_Base_Level_(leader.xp, warlord_trait);
+        int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord_trait);
 
-        // Clamp effective officer level to a maximum of 5.
-        if (base_level > 5) {
-            base_level = 5;
+        // Cap the maximum level at 5
+        if (level > 5) {
+            level = 5;
         }
 
-        return base_level;
+        return level;
     }
 
     int16_t __cdecl Officer_Skill_Value_(int16_t leader_index) {
@@ -290,5 +286,23 @@ namespace OFFICER {
                 }
             }
         }
+    }
+
+    int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx) {
+        int16_t base_value = OFFICER::Get_Maintenance_Base_(player_num, leader_idx);
+
+        int16_t maintenance_cost = (int16_t)((base_value + 99) / 100);
+
+        bool has_cost_reduction_skill = OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 28) ||
+                                         OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 29);
+
+        if (leader_idx != 65 && !has_cost_reduction_skill) {
+            if (maintenance_cost < 1) {
+                maintenance_cost = 1;
+            }
+            return maintenance_cost;
+        }
+
+        return 0;
     }
 }

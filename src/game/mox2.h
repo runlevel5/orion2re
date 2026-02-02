@@ -26,11 +26,7 @@ namespace MOX2 {
         fn();
     }
 
-    inline void __cdecl Screen_Control_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483830 });
-        fn();
-    }
+    void __cdecl Screen_Control_();
 
     inline const char* s_MOX_SET = reinterpret_cast<const char*>(0x00556918); // "MOX.SET"
     inline const char* s_language_ini = reinterpret_cast<const char*>(0x005576D8); // "language.ini"

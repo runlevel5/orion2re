@@ -23,6 +23,11 @@ namespace MAINSCR {
     inline int16_t& _debug_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F4});
     inline int16_t& _exit_game_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619A});
 
+    inline void __cdecl Main_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004c7720})();
+    }
+
     inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =

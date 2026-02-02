@@ -1,7 +1,7 @@
 #pragma once
 
 namespace MOX {
-    enum SCREEN : uint16_t {
+    enum SCREEN : int16_t {
         SCREEN_MAIN = 0,
         SCREEN_COLONY = 1,
         SCREEN_DESIGN = 3,
@@ -35,7 +35,8 @@ namespace MOX {
         SCREEN_REPORTS = 39,
         SCREEN_TURN_SUMMARY = 40,
         SCREEN_LOAD_NET = 41,
-        SCREEN_SHOW_COMMAND_POINTS = 43
+        SCREEN_SHOW_COMMAND_POINTS = 43,
+        SCREEN_UNKNOWN = -1,
     };
 
     // References
@@ -47,7 +48,8 @@ namespace MOX {
     inline int16_t& _cur_map_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F0});
     inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
     inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
-    inline uint8_t& _previous_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597AD0 });
+    inline uint16_t& _return_screen = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005977F0});
+    inline SCREEN& _previous_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
     inline int16_t& _first_debug_save = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A1830 });
     inline int16_t& _debug_saves_on = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D6C2 });
@@ -267,6 +269,8 @@ namespace MOX {
 
     // Suggested name: _planet_max_farms
     inline uint8_t* _planet_max_farms = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00559660 });
+
+    inline int8_t* _planet_max_population = reinterpret_cast<int8_t*>(std::uintptr_t{0x00559670});
 
     inline uint8_t* _planet_size_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559658});
 

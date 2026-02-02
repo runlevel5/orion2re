@@ -6,10 +6,17 @@ namespace TECHDATA {
 
     struct s_tech_building_data {
         char* name;
-        uint8_t field1_0x4[4];
+        uint8_t field1_0x4;
+        uint8_t field2_0x5;
+        uint8_t field3_0x6;
+        uint8_t field4_0x7;
         int32_t cost;
         int16_t maintenance;
-        uint8_t field7_0xe[5];
+        uint8_t field7_0xe;
+        uint8_t field8_0xf;
+        uint8_t field9_0x10;
+        uint8_t field10_0x11;
+        uint8_t field11_0x12;
     };
 
     struct s_tech_app_data {
@@ -53,9 +60,16 @@ namespace TECHDATA {
         uint8_t padding2[6];
         int16_t speed;
     };
+
+    struct s_hull_data {
+        char* name;
+        char* size_name;
+        uint8_t unknown[20];
+    };
     #pragma pack(pop)
 
     inline s_tech_building_data* _buildings = reinterpret_cast<s_tech_building_data*>(std::uintptr_t{ 0x00554290 });
+    inline s_hull_data* _hull_data = reinterpret_cast<s_hull_data*>(std::uintptr_t{ 0x005557B4 });
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
     inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
     inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(std::uintptr_t{ 0x00553050 });

@@ -7,5 +7,6 @@ namespace FILEDEF {
 
     void __cdecl Save_Game_(short slot_index);
     uint32_t __cdecl Load_Game_(int16_t slot_index);
+    uint8_t __cdecl Get_Game_Type_From_Saved_Game_(int slot);
     void __cdecl Save_Moo_Custom_Player_Data_(s_player* player);
 }

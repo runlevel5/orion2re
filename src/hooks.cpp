@@ -384,11 +384,27 @@ namespace hooks {
         { 0x004f7e20, &COLCALC::Player_Owns_Officer_ },
         { 0x004f4520, &COLCALC::Colony_Industry_Production_ },
         { 0x004f37f0, &COLCALC::Colony_Food_Production_ },
+        { 0x004f4fb0, &COLCALC::Colony_Research_Production_ },
+        { 0x004f7310, &COLCALC::Colony_BC_Maintenance_ },
+        { 0x004f5b90, &COLCALC::Size_And_Climate_Race_Pop_Limit_ },
+        { 0x004f5c70, &COLCALC::Calc_Player_Climate_ },
+        { 0x004f5c30, &COLCALC::Size_And_Climate_Max_Population_ },
+        { 0x004f5a80, &COLCALC::Double_Add_Two_ },
+        { 0x004f75a0, &COLCALC::Compute_Player_Maintenance_ },
+        { 0x004f3410, &COLCALC::Gravity_Player_Production_Factor_ },
+        { 0x004f3d50, &COLCALC::Colony_Job_Production_ },
+        { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
+        { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
+        { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
+        { 0x00483830, &MOX2::Screen_Control_ },
+        { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
+        { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
 
     void Assert_Types() {
+        ASSERT(sizeof(s_main_menu) == 0xd2, "s_main_menu");
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
         ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
