@@ -38,7 +38,12 @@ namespace MAINMENU {
     inline uint32_t& _mainmenu_first_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00595c58});
     inline uint32_t& _mainmenu_last_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00595C5C});
     inline void*& __gametype = *reinterpret_cast<void**>(std::uintptr_t{0x0056ece8});
+    inline int16_t& _max_credits = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECE0});
+    inline int32_t& DAT_0056ece4 = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ECE4});
+    inline uint16_t& DAT_0056ecf4 = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056ECF4});
     inline uint8_t& _credit_num = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECF8});
+    inline uint8_t& _credits_font_spacing = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECFC});
+    inline void*& _bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x0056ED00});
     inline int32_t& _credit_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed0c});
     inline int32_t& _credit_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed10});
     inline int16_t& _delay_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ed18});
@@ -70,11 +75,19 @@ namespace MAINMENU {
         fn();
     }
 
-    inline void __cdecl Draw_Credits_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E9780});
-        fn();
+    inline void __cdecl Fade_Credit_Colors_(int8_t intensity, uint8_t* colors) {
+        using Fn = void(__cdecl*)(int8_t, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E9A20});
+        fn(intensity, colors);
     }
+
+    inline void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, void* bmp) {
+        using Fn = void(__cdecl*)(int16_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E9A40});
+        fn(index, bmp);
+    }
+
+    void __cdecl Draw_Credits_();
 
     void __cdecl Draw_Main_Menu_Screen_();
 

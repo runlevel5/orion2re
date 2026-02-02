@@ -242,6 +242,80 @@ namespace MAINMENU {
         fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
     }
 
+    void __cdecl Draw_Credits_() {
+        uint8_t local_colors[8];
+
+        if (_delay_count <= 0) {
+            _credit_y -= 2;
+            DAT_0056ece4 = 0x1A6 - _credit_y;
+
+            int16_t start_fade_idx = (_credit_y < 0xB3) ? (int16_t)((0xB3 - _credit_y) / 14) : (int16_t)-1;
+            int16_t end_fade_idx = (int16_t)(DAT_0056ece4 / 14);
+            int16_t current_y = (int16_t)_credit_y;
+
+            for (int16_t i = 0; i < _max_credits; ++i) {
+                if (i == start_fade_idx) {
+                    local_colors[0] = 0xD4;
+                    local_colors[1] = 0xD9;
+                    local_colors[2] = 0xD7;
+                    local_colors[3] = 0xD9;
+                    local_colors[4] = 0xD9;
+                    local_colors[5] = 0xD9;
+                    local_colors[6] = 0xD9;
+                    local_colors[7] = 0xD9;
+                    int8_t intensity = (int8_t)((((_credit_y - 0xB3) % 14) / 3) * 2);
+                    Fade_Credit_Colors_(intensity, local_colors);
+                } else if (i == end_fade_idx) {
+                    int32_t rem = (0x1A6 - _credit_y) % 14;
+                    local_colors[0] = 0xD3;
+                    local_colors[1] = 0xD5;
+                    local_colors[2] = 0xD4;
+                    local_colors[3] = 0xD5;
+                    local_colors[4] = 0xD5;
+                    local_colors[5] = 0xD5;
+                    local_colors[6] = 0xD5;
+                    local_colors[7] = 0xD5;
+                    int8_t intensity = (int8_t)(((rem + (rem < 0 ? 3 : 0)) / 4) * 2);
+                    Fade_Credit_Colors_(intensity, local_colors);
+                } else {
+                    local_colors[0] = 0xD5;
+                    local_colors[1] = 0xDC;
+                    local_colors[2] = 0xDA;
+                    local_colors[3] = 0xDC;
+                    local_colors[4] = 0xDC;
+                    local_colors[5] = 0xDC;
+                    local_colors[6] = 0xDC;
+                    local_colors[7] = 0xDC;
+                }
+
+                fonts::Set_Outline_Color_(0xFD, 0xFD);
+                fonts::Set_Font_Style_Outline_((int16_t)DAT_0056ecf4, local_colors);
+                fonts::Set_Font_Spacing_((int16_t)_credits_font_spacing);
+                
+                bitmap::Create_Blank_Bitmap_(0x121, 14, _bitmap);
+                Copy_Credit_String_To_Bitmap_(i, _bitmap);
+                
+                graphics::Set_Window_(0x42, 0xB3, 0x162, 0x1A6);
+                video::Clip_On_();
+                animate::Draw_(0x42, current_y, (animate::s_animation_header*)_bitmap);
+                video::Clip_Off_();
+                
+                current_y += 14;
+            }
+        } else {
+            _delay_count--;
+        }
+
+        int32_t abs_offset = _credit_y - 0xB3;
+        if (abs_offset < 0) abs_offset = -abs_offset;
+
+        if (abs_offset > (int32_t)(_max_credits * 14)) {
+            _credit_x = 0x42;
+            _credit_y = 0x1A6;
+            _delay_count = 10;
+        }
+    }
+
     void __cdecl Main_Menu_Screen_() {
         uint8_t fade_data;
         int16_t last_input_scan = -1;

@@ -40,6 +40,12 @@ namespace animate {
         reinterpret_cast<Fn>(0x00524930)();
     }
 
+    inline void __cdecl Draw_Animated_Sprite_Back_Diff_(int32_t x, int32_t y, uint8_t* buffer) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523E70});
+        fn(x, y, buffer);
+    }
+
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* data);
 
     void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite);

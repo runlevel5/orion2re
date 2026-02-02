@@ -409,6 +409,11 @@ namespace hooks {
         { 0x004e94d0, &MAINMENU::Do_Mainmenu_Load_Screen_ },
         { 0x00530db0, &file_ani::Draw_File_Animation_ },
         { 0x00524db0, &animate::Draw_Palette_ },
+        { 0x0050fa10, &LOADSAVE::Load_Month_Names_ },
+        { 0x005317a0, &file_ani::Set_File_Animation_Buffer_ },
+        { 0x00530bf0, &file_ani::Open_File_Animation_ },
+        { 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
+        { 0x004e9780, &MAINMENU::Draw_Credits_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
