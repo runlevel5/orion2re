@@ -1,6 +1,14 @@
 #include "deps.h"
 
 namespace animate {
+    void __cdecl Draw_Palette_(s_animation_header* header) {
+        _animation_header = header;
+
+        if (header->flags & 0x10) {
+            Set_Animation_Palette_();
+        }
+    }
+
     void __cdecl Draw_Screen_Background_On_(uint32_t* sprite) {
         int pitch = platform::Lock_Primary_Surface();
         int stride = (pitch + (pitch < 0 ? 3 : 0)) >> 2;

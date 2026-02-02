@@ -18,6 +18,11 @@ namespace allocate {
 
     int32_t __cdecl Get_Remaining_Block_Space_(void* block);
 
+    inline int32_t __cdecl Get_Max_Block_Space_(uint8_t* buffer) {
+        using Fn = int32_t(__cdecl*)(uint8_t*);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052ebc0 })(buffer);
+    }
+
     void __cdecl Allocation_Error_(int bytes_requested);
 
     int32_t __cdecl Get_Remaining_Block_Space_(void* addr);

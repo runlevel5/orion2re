@@ -80,4 +80,16 @@ namespace fields {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee90});
         fn();
     }
+
+    inline void __cdecl Deactivate_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520060});
+        fn();
+    }
+
+    inline void __cdecl Set_Help_List_(void* help_data, int16_t count) {
+        using Fn = void(__cdecl*)(void*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520040});
+        fn(help_data, count);
+    }
 }

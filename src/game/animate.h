@@ -41,13 +41,16 @@ namespace animate {
     }
 
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* data);
+
     void __cdecl Draw_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* sprite);
 
     void __cdecl Draw_Screen_Background_On_(uint32_t* sprite);
 
     void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite);
 
-    void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite);
+    inline void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite);
 
-    void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
+    inline void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
+
+    void __cdecl Draw_Palette_(s_animation_header* header);
 }

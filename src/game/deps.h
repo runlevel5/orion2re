@@ -64,6 +64,7 @@
 #include "racescrn.h"
 #include "loadsave.h"
 #include "info.h"
+#include "evanhelp.h"
 #include "mainmenu.h"
 #include "nextturn.h"
 #include "newgame.h"

@@ -362,6 +362,9 @@ inline void __cdecl Set_Default_Ship_Name(uint16_t race, int16_t size, int16_t p
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
 
+inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
+    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
+
 inline const char* s_PR_00558238 = reinterpret_cast<const char*>(std::uintptr_t{0x00558238}); // "PR"
 inline const char* s_FP_00558240 = reinterpret_cast<const char*>(std::uintptr_t{0x00558240}); // "FP"
 inline const char* s_RP_00558248 = reinterpret_cast<const char*>(std::uintptr_t{0x00558248}); // "RP"

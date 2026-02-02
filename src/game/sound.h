@@ -98,4 +98,16 @@ namespace sound {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D500 });
         fn(volume);
     }
+
+    inline void __cdecl Stop_Sound_(int32_t handle) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052e6b0});
+        fn(handle);
+    }
+
+    inline int32_t __cdecl Mox_Play_Sound_(int32_t sound_id) {
+        using Fn = int32_t(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
+        return fn(sound_id);
+    }
 }

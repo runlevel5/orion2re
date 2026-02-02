@@ -2,7 +2,90 @@
 
 namespace MAINMENU {
     void __cdecl Main_Menu_Fade_Function_() {
-        animate::Draw_(0, 0, reinterpret_cast<animate::s_animation_header*>(_main_menu_background));
+        animate::Draw_(0, 0, _main_menu_background);
+    }
+
+    void __cdecl Main_Menu_Fade_Function2_() {
+        animate::Draw_(0, 0, reinterpret_cast<animate::s_animation_header*>(_mainmenu_first_seg));
+    }
+
+    uint16_t __cdecl Do_Main_Menu_File_Animation_() {
+        bool finished = false;
+        bool input_detected = false;
+        uint16_t result_code = 0xFFFF;
+        int32_t current_sound_handle = 0;
+
+        file_ani::Open_File_Animation_(s_MAINMENU_LBX_0055a630, 0);
+        uint32_t buffer_size = file_ani::Get_File_Animation_Block_Space_();
+        uint16_t total_frames = (uint16_t)file_ani::Get_File_Animation_Total_Frames_();
+
+        void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, buffer_size);
+        file_ani::Set_File_Animation_Buffer_(buffer);
+
+        palette::Set_Palette_Changes_(0, 0xFF);
+        animate::Draw_Palette_(_main_menu_background);
+
+        fields::Init_Fields_State_();
+
+        int16_t button_fields[6];
+        button_fields[0] = fields::Add_Hidden_Field_(10, 20, 25, 35, s_C_00552420, ')');
+        button_fields[1] = fields::Add_Hidden_Field_(20, 30, 35, 45, s_S_005569CC, ')');
+        button_fields[2] = fields::Add_Hidden_Field_(30, 40, 45, 55, s_L_005560E8, ')');
+        button_fields[3] = fields::Add_Hidden_Field_(40, 50, 55, 65, s_M_00557ED8, ')');
+        button_fields[4] = fields::Add_Hidden_Field_(50, 60, 65, 75, s_H_005569D4, ')');
+        button_fields[5] = fields::Add_Hidden_Field_(60, 70, 75, 85, s_Q_005598F0, ')');
+
+        int16_t hotkey_field = fields::Add_Hot_Key_(s_hotkeys_005510f0);
+        int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_00551120, ')');
+
+        fields::Assign_Auto_Function_(Draw_File_Animation_, 1);
+
+        while (!finished) {
+            timer::Mark_Time_();
+
+            int32_t input_raw = fields::Get_Input_();
+            int16_t input = (int16_t)input_raw;
+            uint16_t current_frame = (uint16_t)file_ani::Get_File_Animation_Frame_();
+
+            if (current_frame == 5) {
+                current_sound_handle = sound::Mox_Play_Sound_(0x35); // 53
+            } else if (current_frame == 46) {
+                sound::Stop_Sound_(current_sound_handle);
+                current_sound_handle = sound::Mox_Play_Sound_(0x36); // 54
+            }
+
+            if (input == fullscreen_field || input == hotkey_field) {
+                finished = true;
+                input_detected = true;
+            } else if (current_frame == total_frames) {
+                finished = true;
+            } else {
+                for (int i = 0; i < 6; ++i) {
+                    if (input == button_fields[i]) {
+                        static const uint16_t mapping[] = { 0x43, 0x53, 0x4C, 0x4D, 0x48, 0x51 }; // C, S, L, M, H, Q
+                        result_code = mapping[i];
+                        finished = true;
+                        input_detected = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!finished) {
+                video::Set_Page_Off_();
+                Draw_File_Animation_();
+                RUSS::Mox_Sync_Update_();
+            }
+
+            timer::Release_Time_(1);
+        }
+
+        if (input_detected) {
+            sound::Stop_Sound_(current_sound_handle);
+            sound::Mox_Play_Sound_(0x36);
+        }
+
+        return result_code;
     }
 
     void __cdecl Add_Main_Menu_Fields_() {
@@ -36,6 +119,127 @@ namespace MAINMENU {
         _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field = fields::Add_Hidden_Field_(0x19F, 0xF0, 0x237, 0x104, s_M_00557ED8, 0x29);
         _mainmenu->fields[MAIN_MENU_BTN_HELP].field = fields::Add_Hidden_Field_(0x19F, 0x106, 0x237, 0x11B, s_H_005569D4, 0x29);
         _mainmenu->fields[MAIN_MENU_BTN_QUIT].field = fields::Add_Hidden_Field_(0x19F, 0x11D, 0x237, 0x132, s_Q_005598f0, 0x29);
+    }
+
+    void __cdecl Reload_Main_Menu_Screen_() {
+        int16_t entry_index = 3;
+
+        MOX::Mox_Update_();
+
+        _main_menu_background = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, 2, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        for (int i = 0; i < 6; ++i) {
+            _mainmenu->fields[i].field0_0x0 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index, MOX::_screen_seg);
+            _mainmenu->fields[i].field1_0x4 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 1, MOX::_screen_seg);
+            _mainmenu->fields[i].field2_0x8 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 2, MOX::_screen_seg);
+
+            _mainmenu->fields[i].field = -1000;
+
+            entry_index += 3;
+            MOX::Mox_Update_();
+        }
+    }
+
+    void __cdecl Set_Main_Menu_Screen_Help_List_Aux_(void* help_data, int16_t count) {
+        fields::Deactivate_Help_List_();
+        fields::Set_Help_List_(help_data, count);
+    }
+
+    void __cdecl Set_Main_Menu_Screen_Help_List_() {
+        Set_Main_Menu_Screen_Help_List_Aux_(&EVANHELP::_main_menu_screen_help_list, 6);
+    }
+
+    /**
+     * Loads and displays the main menu load game screen popup until a selection is confirmed.
+     */
+    uint8_t __cdecl Do_Mainmenu_Load_Screen_() {
+        int16_t status = 0;
+
+        _mainmenu_last_seg = (uint32_t)(uintptr_t)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 21, MOX::_screen_seg);
+
+        video::Set_Refresh_Stencil_();
+        video::Set_Page_Back_();
+
+        // Clear background with black (0)
+        graphics::Fill_(0, 0, 649, 479, 0);
+
+        animate::Draw_(0, 0, (animate::s_animation_header*)(uintptr_t)_mainmenu_last_seg);
+        video::Copy_Back_To_Off_();
+        RUSS::Mox_Sync_Update_();
+        fields::Deactivate_Help_List_();
+
+        MOX::_previous_screen = MOX::SCREEN_MAIN_MENU;
+
+        // Loop until the popup returns 1 (selection made or closed)
+        do {
+            Mainmenu_Load_Game_Popup_(&status);
+        } while (status != 1);
+
+        return (MOX::_game_type != 0);
+    }
+
+    void __cdecl Draw_Main_Menu_Screen_() {
+        uint8_t color_buffer[8];
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            video::Set_Page_Off_();
+            graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+            animate::Draw_(0, 0, _main_menu_background);
+            video::Copy_Off_To_Back_();
+            RUSS::Mox_Sync_Update_();
+            _credit_x = 0x42;
+            _credit_y = 0x1A6;
+            _delay_count = 10;
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+
+        animate::s_animation_header* anim_to_draw = nullptr;
+        int16_t draw_y = 0;
+
+        if (_mainmenu->fields[0].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[0].field1_0x4;
+            draw_y = 0xAC;
+        } else if (_mainmenu->fields[1].field == MOX::_scanned_field) {
+            anim_to_draw = _mainmenu->fields[1].field1_0x4;
+            draw_y = 0xC3;
+        } else if (_mainmenu->fields[2].field == MOX::_scanned_field) { // MAIN_MENU_BTN_NEW
+            anim_to_draw = _mainmenu->fields[2].field1_0x4;
+            draw_y = 0xD9;
+        } else if (_mainmenu->fields[3].field == MOX::_scanned_field) { // MAIN_MENU_BTN_MULTIPLAY
+            anim_to_draw = _mainmenu->fields[3].field1_0x4;
+            draw_y = 0xF0;
+        } else if (_mainmenu->fields[4].field == MOX::_scanned_field) { // MAIN_MENU_BTN_HELP
+            anim_to_draw = _mainmenu->fields[4].field1_0x4;
+            draw_y = 0x106;
+        } else if (_mainmenu->fields[5].field == MOX::_scanned_field) { // MAIN_MENU_BTN_QUIT
+            anim_to_draw = _mainmenu->fields[5].field1_0x4;
+            draw_y = 0x11D;
+        }
+
+        if (anim_to_draw != nullptr) {
+            animate::Draw_(0x19F, draw_y, anim_to_draw);
+        }
+
+        // Special handling for disabled/state-specific buttons (ID -1000)
+        if (_mainmenu->fields[0].field == (int16_t)0xFC18) { // -1000
+            animate::Draw_(0x19F, 0xAC, _mainmenu->fields[0].field2_0x8);
+        }
+        if (_mainmenu->fields[1].field == (int16_t)0xFC18) { // -1000
+            animate::Draw_(0x19F, 0xC3, _mainmenu->fields[1].field2_0x8);
+        }
+
+        if (_credit_num != 0) {
+            Draw_Credits_();
+        }
+
+        MISC::s_colors* colors = MISC::Font_Colors2_(1, 0xD2, 0xD7);
+        _memcpy(color_buffer, colors, 8);
+
+        fonts::Set_Font_Style_(1, (MISC::s_colors*)color_buffer);
+        int16_t font_h = fonts::Get_Font_Height_();
+        fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
     }
 
     void __cdecl Main_Menu_Screen_() {
@@ -113,7 +317,7 @@ namespace MAINMENU {
 
         fields::Assign_Auto_Function_(Draw_Main_Menu_Screen_, 2);
         Set_Main_Menu_Screen_Help_List_();
-        __credit_x = 66; // 0x42
+        _credit_x = 66; // 0x42
         _credit_y = 422; // 0x1a6
         _delay_count = 10;
 

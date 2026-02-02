@@ -400,6 +400,15 @@ namespace hooks {
         { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
         { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
         { 0x004e8c90, &MAINMENU::Main_Menu_Screen_ },
+        { 0x004e9d50, &MAINMENU::Reload_Main_Menu_Screen_ },
+        { 0x004e9580, &MAINMENU::Main_Menu_Fade_Function2_ },
+        { 0x004e9250, &MAINMENU::Do_Main_Menu_File_Animation_ },
+        { 0x004e95b0, &MAINMENU::Draw_Main_Menu_Screen_ },
+        { 0x0041e650, &MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_ },
+        { 0x0041E3A0, &MAINMENU::Set_Main_Menu_Screen_Help_List_ },
+        { 0x004e94d0, &MAINMENU::Do_Mainmenu_Load_Screen_ },
+        { 0x00530db0, &file_ani::Draw_File_Animation_ },
+        { 0x00524db0, &animate::Draw_Palette_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
