@@ -54,9 +54,9 @@ namespace animate {
 
     void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite);
 
-    inline void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite);
+    void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite);
 
-    inline void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
+    void __cdecl Draw_Screen_Background_Off_(uint8_t* data);
 
     void __cdecl Draw_Palette_(s_animation_header* header);
 }

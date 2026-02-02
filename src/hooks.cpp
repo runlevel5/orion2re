@@ -414,6 +414,7 @@ namespace hooks {
         { 0x00530bf0, &file_ani::Open_File_Animation_ },
         { 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
         { 0x004e9780, &MAINMENU::Draw_Credits_ },
+        { 0x004e9a20, &MAINMENU::Fade_Credit_Colors_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

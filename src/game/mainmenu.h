@@ -75,11 +75,7 @@ namespace MAINMENU {
         fn();
     }
 
-    inline void __cdecl Fade_Credit_Colors_(int8_t intensity, uint8_t* colors) {
-        using Fn = void(__cdecl*)(int8_t, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E9A20});
-        fn(intensity, colors);
-    }
+    void __cdecl Fade_Credit_Colors_(int8_t amount, uint8_t* colors);
 
     inline void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, void* bmp) {
         using Fn = void(__cdecl*)(int16_t, void*);

@@ -199,9 +199,9 @@ namespace MAINMENU {
         int16_t draw_y = 0;
 
         if (_mainmenu->fields[0].field == MOX::_scanned_field) {
-            anim_to_draw = _mainmenu->fields[0].field1_0x4;
+            anim_to_draw = _mainmenu->fields[0].field1_0x4; // MAIN_MENU_BTN_CONTINUE
             draw_y = 0xAC;
-        } else if (_mainmenu->fields[1].field == MOX::_scanned_field) {
+        } else if (_mainmenu->fields[1].field == MOX::_scanned_field) { // MAIN_MENU_BTN_LOAD
             anim_to_draw = _mainmenu->fields[1].field1_0x4;
             draw_y = 0xC3;
         } else if (_mainmenu->fields[2].field == MOX::_scanned_field) { // MAIN_MENU_BTN_NEW
@@ -223,10 +223,10 @@ namespace MAINMENU {
         }
 
         // Special handling for disabled/state-specific buttons (ID -1000)
-        if (_mainmenu->fields[0].field == (int16_t)0xFC18) { // -1000
+        if (_mainmenu->fields[0].field == -1000) { // -1000
             animate::Draw_(0x19F, 0xAC, _mainmenu->fields[0].field2_0x8);
         }
-        if (_mainmenu->fields[1].field == (int16_t)0xFC18) { // -1000
+        if (_mainmenu->fields[1].field == -1000) { // -1000
             animate::Draw_(0x19F, 0xC3, _mainmenu->fields[1].field2_0x8);
         }
 
@@ -240,6 +240,12 @@ namespace MAINMENU {
         fonts::Set_Font_Style_(1, (MISC::s_colors*)color_buffer);
         int16_t font_h = fonts::Get_Font_Height_();
         fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
+    }
+
+    void __cdecl Fade_Credit_Colors_(int8_t amount, uint8_t* colors) {
+        for (int16_t i = 1; i < 8; ++i) {
+            colors[i] += amount;
+        }
     }
 
     void __cdecl Draw_Credits_() {

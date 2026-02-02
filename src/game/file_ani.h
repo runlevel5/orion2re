@@ -24,6 +24,9 @@ namespace file_ani {
     inline uint32_t& _file_animation_start =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E0F4 });
 
+    inline const char* s_File_Animation_Frame_Too_Large = reinterpret_cast<const char*>(0x0055B804);
+    inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
+
     inline const char* s_Differential_Error_868 = reinterpret_cast<const char*>(0x0055B868);
     inline const char* s_Differential_Error_898 = reinterpret_cast<const char*>(0x0055B898);
     inline const char* s_Differential_Error_8C8 = reinterpret_cast<const char*>(0x0055B8C8);

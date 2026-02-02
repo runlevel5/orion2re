@@ -60,34 +60,36 @@ namespace file_ani {
     }
 
     void __cdecl Draw_File_Animation_() {
-        animate::_animation_header = init::_io_buffer;
-        animate::s_animation_header* header = animate::_animation_header;
+        animate::s_animation_header* header = init::_io_buffer;
+        animate::_animation_header = header;
 
         if (header->flags & 0x10) {
             animate::Set_Animation_Palette_();
         }
 
-        uint32_t frame_start = header->frame_offsets[header->current_frame];
-        uint32_t frame_end = header->frame_offsets[header->current_frame + 1];
-        uint32_t frame_size = frame_end - frame_start;
+        int32_t current_frame = header->current_frame;
+        uint32_t offset = _file_animation_start + header->frame_offsets[current_frame];
+        uint32_t next_offset = header->frame_offsets[current_frame + 1];
+        uint32_t frame_size = next_offset - header->frame_offsets[current_frame];
 
         if (allocate::Get_Max_Block_Space_(_file_animation_buffer) < (int32_t)frame_size) {
-            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large_0055b804);
+            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large);
         }
 
         uint8_t* sprite = _file_animation_buffer;
-        _fseek((FILE*)_file_animation_fptr, _file_animation_start + frame_start, 0);
-        _fread(sprite, frame_size, 1, (FILE*)_file_animation_fptr);
+        _fseek(_file_animation_fptr, offset, 0 /* SEEK_SET */);
+
+        _fread(sprite, frame_size, 1, _file_animation_fptr);
 
         if (video::screen_refresh_flag >= 2) {
-            setvesa::Add_Square_To_Scan_List_(0, 0, (int32_t)header->width - 1, (int32_t)header->height - 1);
+            setvesa::Add_Square_To_Scan_List_(0, 0, header->width - 1, header->height - 1);
         }
 
-        uint8_t drawing_type = header->flags & 0x03;
-        bool is_glassed = (header->flags & 0x08) != 0;
+        uint8_t flags = header->flags;
+        uint8_t type = flags & 0x03;
 
-        if (is_glassed) {
-            switch (drawing_type) {
+        if (flags & 0x08) { // Glassed rendering
+            switch (type) {
             case 0:
                 animate::Draw_Glassed_Animated_Sprite_(0, 0, sprite);
                 break;
@@ -102,12 +104,12 @@ namespace file_ani {
                     setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                 }
                 break;
-            case 3:
-                exitm::Exit_With_Message(animate::s_Refresh_Mask_cant_be_drawn);
+            default:
+                exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                 break;
             }
-        } else {
-            switch (drawing_type) {
+        } else { // Normal rendering
+            switch (type) {
             case 0:
                 platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
                 draw::Draw_Animated_Sprite_(0, 0, sprite);
@@ -126,15 +128,15 @@ namespace file_ani {
                     setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
                 }
                 break;
-            case 3:
-                exitm::Exit_With_Message(animate::s_Refresh_Mask_cant_be_drawn);
+            default:
+                exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
                 break;
             }
         }
 
         header->current_frame++;
         if (header->current_frame >= header->frame_count) {
-            header->current_frame = (int16_t)header->loop_frame;
+            header->current_frame = (int16_t)(int8_t)header->loop_frame;
         }
     }
 
