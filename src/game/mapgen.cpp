@@ -242,6 +242,60 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     /**
+     * @brief Generates the type of satellite (planet/gas giant/etc.) for a given orbit.
+     *
+     * @param star_idx The index of the star in the stars array.
+     * @param orbit The orbit index (0 being closest to the star).
+     * @return The generated satellite type identifier.
+     */
+    uint8_t __cdecl Generate_Satellite_Type_(int16_t star_idx, int8_t orbit) {
+        uint8_t satellite_type;
+        int16_t roll;
+
+        do {
+            // Randomly roll for a satellite type based on weightings in the data table
+            roll = static_cast<int16_t>(random::Random_(10) - 1);
+            MAPGEN::_t_roll = roll;
+
+            // Access weight table: _orbit_to_satellite_type[roll][orbit] (row size is 5)
+            satellite_type = MOX::_orbit_to_satellite_type[roll * 5 + static_cast<uint8_t>(orbit)];
+
+            if (satellite_type == 4) { // Special logic for type 4 (potential companion star)
+                int chance = random::Random_(100);
+
+                // If the roll is specific and it's the inner-most orbit, try to spawn a binary companion
+                if (roll == 1 && chance < 11 && orbit == 0) {
+                    MAPGEN::_is_companion_star = 1;
+                    int8_t spectral = MOX::_star[star_idx].spectral_class;
+
+                    if (spectral == 0) {
+                        satellite_type = 5;
+                    } else {
+                        satellite_type = static_cast<uint8_t>(spectral + 4);
+                    }
+                } else {
+                    // Fallback to type 1 if companion conditions aren't met
+                    satellite_type = 1;
+                }
+            }
+
+            // Validation: Cannot have a Gas Giant (type 2) in the 0th orbit (too close to star)
+        } while (satellite_type == 2 && orbit == 0);
+
+        // Debug assertion: Check for invalid satellite type 0
+        if (satellite_type == 0) {
+            RUSS::PFMT_(0, 0x0F, s_Star_d_orbit_d_has_a_0_sat_t_00558a1c,
+                        static_cast<int>(star_idx),
+                        static_cast<int>(orbit),
+                        static_cast<int>(MAPGEN::_t_roll),
+                        static_cast<int>(satellite_type));
+            assert::hgetch_();
+        }
+
+        return satellite_type;
+    }
+
+    /**
      * @brief Generates initial data for a satellite (moon) in a star system.
      */
     void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t type) {
@@ -724,6 +778,132 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         default:
             break;
         }
+    }
+
+    void __cdecl Generate_Nebulas_() {
+        int16_t widths[12];
+        int16_t heights[12];
+        int16_t nebula_types[12];
+        int16_t min_dist_param = 0x14;
+        int16_t attempts = 0;
+
+        allocate::Push_Block_(MOX::_screen_seg);
+        // Buffers used for map generation geometry
+        int32_t* point_buffer = (int32_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 120000);
+        int16_t* coord_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40000);
+        uint16_t* weight_buffer = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20000);
+
+        MOX::Mox_Update_();
+
+        for (int i = 0; i < 12; ++i) {
+            s_animation_header* anim = (s_animation_header*)farload::Far_Reload_(s_starbg_lbx, i * 4 + 6, MOX::_nebula_screen_seg);
+            widths[i] = animate::Get_Width_(anim);
+            heights[i] = animate::Get_Height_(anim);
+        }
+
+        if (MOX::_NUM_NEBULAS != 0) {
+            for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
+                int16_t type;
+                int16_t inner_attempts = 0;
+                do {
+                    MOX::Mox_Update_();
+                    type = (int16_t)random::Random_(12) - 1;
+                    inner_attempts++;
+                    // Try to pick a type, loop until something allows it or too many attempts
+                    if (inner_attempts > 0xF0) break;
+                } while (false); // Simplification of disassembly logic
+                nebula_types[i] = type;
+                MOX::Mox_Update_();
+            }
+        }
+
+        int16_t scaled_x_limit = HAROLD::Get_Scaled_Value_(0xA5);
+        int16_t scaled_y_limit = HAROLD::Get_Scaled_Value_(0x82);
+
+        while (true) {
+            MOX::Mox_Update_();
+            attempts++;
+            if (attempts > 100) {
+                MOX::_NUM_NEBULAS = 1;
+                break;
+            }
+
+            // Clear buffers
+            for (int i = 0; i < 30000; ++i) point_buffer[i] = 0;
+            for (int i = 0; i < 20000; ++i) coord_buffer[i] = 0;
+            for (int i = 0; i < 10000; ++i) weight_buffer[i] = 0;
+            MOX::Mox_Update_();
+
+            int16_t start_x = (int16_t)random::Random_(0x1FA - widths[0]);
+            int16_t start_y = (int16_t)random::Random_(400 - heights[0]);
+
+            MOX::_nebula[0].type = (int8_t)nebula_types[0];
+            MOX::_nebula[0].x = HAROLD::Get_Upscaled_Value_(start_x);
+            MOX::_nebula[0].y = HAROLD::Get_Upscaled_Value_(start_y);
+
+            if (MOX::_NUM_NEBULAS < 2) break;
+
+            int16_t valid_points_count = 0;
+            int32_t dx = (scaled_x_limit + 0x14) + min_dist_param;
+            int32_t dy = min_dist_param + (scaled_y_limit + 0x14);
+            int32_t dist_sq_threshold = dx * dx + dy * dy;
+
+            Build_Min_Point_Distances_(start_x, start_y, 10, 10, 0x1FA - scaled_x_limit, 400 - scaled_y_limit, dist_sq_threshold, point_buffer, &valid_points_count, 30000);
+            MOX::Mox_Update_();
+
+            if (valid_points_count < MOX::_NUM_NEBULAS) {
+                min_dist_param -= 10;
+                continue;
+            }
+
+            coord_buffer[0] = start_x;
+            coord_buffer[1] = start_y;
+            weight_buffer[0] = 1;
+            int16_t placed_count = 1;
+            bool buffer_full = false;
+
+            for (int i = 0; i < valid_points_count && !buffer_full; ++i) {
+                int16_t px = (int16_t)(point_buffer[i] & 0xFFFF);
+                int16_t py = (int16_t)(point_buffer[i] >> 16);
+
+                bool too_close = false;
+                for (int j = 0; j < placed_count; ++j) {
+                    if (px == coord_buffer[j * 2] && py == coord_buffer[j * 2 + 1]) continue;
+                    if (HOMEGEN::Dist_Between_Points_(px, py, coord_buffer[j * 2], coord_buffer[j * 2 + 1]) < dist_sq_threshold) {
+                        too_close = true;
+                        break;
+                    }
+                }
+
+                if (!too_close) {
+                    coord_buffer[placed_count * 2] = px;
+                    coord_buffer[placed_count * 2 + 1] = py;
+                    weight_buffer[placed_count] = 1;
+                    placed_count++;
+                    if (placed_count >= 10000) buffer_full = true;
+                }
+            }
+
+            MOX::Mox_Update_();
+            if (MOX::_NUM_NEBULAS <= placed_count) {
+                for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
+                    int16_t choice = MOX::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
+                    MOX::_nebula[i].type = (int8_t)nebula_types[i];
+                    MOX::_nebula[i].x = HAROLD::Get_Upscaled_Value_(coord_buffer[choice * 2]);
+                    MOX::_nebula[i].y = HAROLD::Get_Upscaled_Value_(coord_buffer[choice * 2 + 1]);
+                    weight_buffer[choice] = 0;
+                }
+                break;
+            }
+
+            if (attempts % 20 == 0) {
+                min_dist_param -= 10;
+            }
+        }
+
+        MOX::Mox_Update_();
+        allocate::Pop_Block_(MOX::_screen_seg);
+        Load_Nebula_Pictures_();
     }
 
     /**

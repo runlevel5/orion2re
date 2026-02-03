@@ -199,6 +199,7 @@ namespace hooks {
         { 0x004b83f0, &MAPGEN::Copy_Name_To_Star_ },
         { 0x004b6960, &MAPGEN::Generate_Star_Special_ },
         { 0x004b8050, &MAPGEN::Black_Hole_Fix_ },
+        { 0x004b5d40, &MAPGEN::Generate_Nebulas_ },
         { 0x00536ee8, &regions::Fill_Column_ },
         { 0x00528cc0, &graphics::Fill_ },
         { 0x00527cd0, &video::Set_Refresh_Stencil_ },
@@ -421,6 +422,12 @@ namespace hooks {
         { 0x005120e0, &LOADSAVE::Set_Up_Load_Save_Popup_ },
         { 0x0050ebf0, &LOADSAVE::Add_Game_Popup_Fields_ },
         { 0x00511ff0, &MAINMENU::Load_Mainmenu_Load_Game_Popup_ },
+        { 0x00511f40, &MAINMENU::Mainmenu_Load_Game_Popup_ },
+        { 0x0050e7e0, &LOADSAVE::Check_For_Saved_Games_ },
+        { 0x0050e910, &LOADSAVE::Do_Load_Game_Popup_ },
+        { 0x0050f8d0, &LOADSAVE::Get_Star_Date_Strings_ },
+        { 0x0050f7d0, &LOADSAVE::Get_Save_Game_Date_Strings_ },
+        { 0x004b64e0, &MAPGEN::Generate_Satellite_Type_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

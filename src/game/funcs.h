@@ -245,6 +245,11 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
     return fn(value, str, radix);
 }
 
+inline void __cdecl Get_File_Date_String_(const char* filename, char* date_out) {
+    using Fn = void(__cdecl*)(const char*, char*);
+    reinterpret_cast<Fn>(std::uintptr_t{0x0050f650})(filename, date_out);
+}
+
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
@@ -330,6 +335,8 @@ inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
     return fn(stream, offset, origin);
 }
 
+inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
+inline const char* s__GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4); // ".GAM"
 inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); // "rb"
 inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
 inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"

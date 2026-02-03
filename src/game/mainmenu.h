@@ -90,11 +90,7 @@ namespace MAINMENU {
 
     void __cdecl Load_Mainmenu_Load_Game_Popup_();
 
-    inline int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* result) {
-        using Fn = int8_t(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00511F40});
-        return fn(result);
-    }
+    int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list);
 
     void __cdecl Main_Menu_Screen_();
 }

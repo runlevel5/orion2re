@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace LOADSAVE {
+    inline const char* s_INVALID_STR = reinterpret_cast<const char*>(0x0055AC58);
+
     inline char (&_months)[12][6] = *reinterpret_cast<char(*)[12][6]>(std::uintptr_t{0x005722F8});
 
     void __cdecl Load_Month_Names_();
@@ -14,6 +16,8 @@ namespace LOADSAVE {
 
     inline uint8_t& _draw_game_popup_to_back =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722F4});
+    inline uint8_t& _draw_down = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AC50});
+    inline char (&_empty_save_slot_message)[20] = *reinterpret_cast<char(*)[20]>(std::uintptr_t{0x005722D8});
 
     #pragma pack(push, 1)
     struct s_game_anims {
@@ -22,7 +26,7 @@ namespace LOADSAVE {
     };
 
     struct s_game_popup_fields {
-        int32_t field0_0x0[10];
+        int32_t values[10];
         short field_l;
         short field_s;
         short field_q;
@@ -502,11 +506,22 @@ namespace LOADSAVE {
     inline s_game_anims*& _game_anims = *reinterpret_cast<s_game_anims**>(std::uintptr_t{0x00572354});
 
     inline s_game_popup_fields*& _game_popup_fields = *reinterpret_cast<s_game_popup_fields**>(std::uintptr_t{0x0059537c});
+    inline uint8_t& _loaded_new_game = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572340});
+    inline uint8_t& _loaded_debug_save = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572341});
 
-    inline void __cdecl Check_For_Saved_Games_(int8_t* list) {
-        using Fn = void(__cdecl*)(int8_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050e7e0})(list);
+    inline int32_t __cdecl Check_Magic_Number_(const char* filename) {
+        using Fn = int32_t(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d0d0});
+        return fn(filename);
     }
+
+    inline bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
+        using Fn = bool(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d070});
+        return fn(filename);
+    }
+
+    void __cdecl Check_For_Saved_Games_(int8_t* list);
 
     inline void __cdecl Get_Game_Popup_Colors_(int type, int* col1, int* col2) {
         using Fn = void(__cdecl*)(int, int*, int*);
@@ -519,22 +534,39 @@ namespace LOADSAVE {
 
     void __cdecl Set_Up_Load_Save_Popup_();
 
+    int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag);
+
+    inline void __cdecl _Draw_Load_Save_Game_Popup_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0050fee0})();
+    }
+
+    inline void __cdecl Save_Session_Related_Settings_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043d1d0})();
+    }
+
+    inline void __cdecl Bad_Game_File_Message_(uint16_t error_code, int16_t slot) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0050f4c0})(error_code, slot);
+    }
+
+    inline void __cdecl Animate_Game_Popup_(void* picture, int32_t speed) {
+        using Fn = void(__cdecl*)(void*, int32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0050fc70})(picture, speed);
+    }
+
     inline void __cdecl _Game_Popup_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00510db0})();
     }
 
-    inline void __cdecl Get_Star_Date_Strings_(struct s_game_popup_fields* fields, char* stardates_ptr) {
-        using Fn = void(__cdecl*)(struct s_game_popup_fields*, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0050F8D0 });
-        fn(fields, stardates_ptr);
-    }
+    void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf);
 
-    inline void __cdecl Get_Save_Game_Date_Strings_(void* dates_ptr) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0050F7D0 });
-        fn(dates_ptr);
-    }
+    inline const char* const s_dot_GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4);
+    inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);
+
+    void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
 
     inline void __cdecl Embed_Special_Color_Codes_(char* str, int code) {
         using Fn = void(__cdecl*)(char*, int);

@@ -141,6 +141,7 @@ namespace MOX {
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
+    inline uint8_t& _draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E98});
     inline uint8_t& _dont_draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BFB2});
     inline uint16_t& _zoom_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFDC});
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
@@ -190,6 +191,8 @@ namespace MOX {
     inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
 
     inline uint16_t& _NUM_PLAYERS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005A2C1C });
+    inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
+    inline int8_t& _global_var = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
     inline char* (&_race_names)[20] =
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
@@ -228,6 +231,9 @@ namespace MOX {
 
     inline s_star_data*& _star =
         *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });
+
+    // Suggested name: MOX::orbit_to_satellite_type
+    inline uint8_t* _orbit_to_satellite_type = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559508});
 
     inline s_ship_node (&_ship_node)[500] =
         *reinterpret_cast<s_ship_node(*)[500]>(std::uintptr_t{0x00597DA0});
@@ -358,6 +364,11 @@ namespace MOX {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
         fn();
+    }
+
+    inline int16_t __cdecl Get_Weighted_Choice_Short_(uint16_t* weights, int16_t count) {
+        using Fn = int16_t(__cdecl*)(uint16_t*, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004D78E0 })(weights, count);
     }
 
     inline void Load_Credits_() {

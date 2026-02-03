@@ -21,6 +21,7 @@ namespace MAPGEN {
     inline uint8_t (&_special_count)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x0056CDC0});
     inline uint32_t& _n_stars = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDB0});
     inline uint32_t& _n_planets = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDBC});
+    inline int16_t& _t_roll = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CDA4});
     inline uint32_t& DAT_0056CDC8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDC8});
     inline uint32_t (&_satellite_stat)[6] = *reinterpret_cast<uint32_t (*)[6]>(std::uintptr_t{0x005A4B00});
     inline uint32_t (&_nebula_stat)[20] = *reinterpret_cast<uint32_t (*)[20]>(std::uintptr_t{0x005A4AE0});
@@ -32,6 +33,7 @@ namespace MAPGEN {
         reinterpret_cast<const char*>(std::uintptr_t{0x005589AC}); // "Moving planet %d to planet %d"
     inline const char* s_Colony_Planets_d_Max_d = 
         reinterpret_cast<const char*>(std::uintptr_t{0x005589CC}); // "Colony Planets: %d Max: %d Plane..."
+    inline const char* s_Star_d_orbit_d_has_a_0_sat_t_00558a1c = reinterpret_cast<const char*>(std::uintptr_t{0x00558A1C}); // "Star %d, orbit %d, has a 0 sat t"
 
     void __cdecl Clear_Planets_In_Star_Structure_();
 
@@ -43,11 +45,7 @@ namespace MAPGEN {
     uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
     uint8_t __cdecl Generate_Max_Farms_(int16_t star_idx, int16_t planet_idx);
     int8_t __cdecl Generate_Orbit_(int16_t star_id);
-    inline int16_t __cdecl Generate_Satellite_Type_(int16_t star_idx, int8_t orbit) {
-        using Fn = int16_t(__cdecl*)(int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B64E0});
-        return fn(star_idx, orbit);
-    }
+    uint8_t __cdecl Generate_Satellite_Type_(int16_t star_idx, int8_t orbit);
     void __cdecl Generate_Satellite_(int16_t star_idx, int16_t orbit, int16_t type);
     uint8_t __cdecl Generate_Size_();
 
@@ -71,10 +69,13 @@ namespace MAPGEN {
     
     void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t nebula_freq);
 
-    inline void __cdecl Generate_Nebulas_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004B5D40)();
+    void __cdecl Generate_Nebulas_();
+
+    inline void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, void* out_points, int16_t* count, int max_count) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int32_t, void*, int16_t*, int);
+        reinterpret_cast<Fn>(0x004B8270)(x, y, min_x, min_y, max_x, max_y, dist_sq, out_points, count, max_count);
     }
+
     bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names);
 
     bool __cdecl Star_XY_Invalid_(int16_t star_idx, int16_t width, int16_t height, int16_t x_scaled);

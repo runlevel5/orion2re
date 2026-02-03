@@ -1,4 +1,5 @@
 #include "deps.h"
+#include <cstring>
 
 namespace LOADSAVE {
     /**
@@ -124,7 +125,7 @@ namespace LOADSAVE {
         }
 
         sound::Sound_Update_();
-        Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
+        Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
         sound::Sound_Update_();
 
         Get_Star_Date_Strings_(LOADSAVE::_game_popup_fields, MOX::_save_game_stardates);
@@ -268,5 +269,243 @@ namespace LOADSAVE {
 
         _game_popup_fields->field_space = fields::Add_Hidden_Field_(MOX::_popup_base_x, MOX::_popup_base_y, *out_x + MOX::_popup_base_x, *out_y + MOX::_popup_base_y, s__00551100, '\0');
         _game_popup_fields->field_esc_2 = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, ')');
+    }
+
+    /**
+     * @address 0050e910
+     */
+    int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag) {
+        int16_t status = 0;
+        int8_t loaded_success = 0;
+        char msg_buffer[80];
+        int16_t unused1, unused2;
+
+        Load_Month_Names_();
+
+        const char* empty_msg = HAROLD::H_Message_(0x184);
+        int32_t len = 0;
+        while (empty_msg[len] != '\0') len++;
+        for (int i = 0; i <= len; i++) {
+            _empty_save_slot_message[i] = empty_msg[i];
+        }
+
+        bool not_main_menu = (MOX::_current_screen != MOX::SCREEN_MAIN_MENU);
+        _loaded_debug_save = 0;
+
+        if (not_main_menu) {
+            EVANHELP::Set_Load_Game_Screen_Help_List_();
+            fields::Clear_Fields_();
+            MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29); // 0x29 = ')'
+        }
+
+        fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
+        fields::Clear_Fields_();
+        Add_Game_Popup_Fields_(&unused1, &unused2);
+        MOX::_global_var = 0;
+
+        while (true) {
+            int32_t input = fields::Get_Input_();
+            int16_t clicked_slot = -1;
+
+            for (int16_t i = 0; i < 10; i++) {
+                if (_game_popup_fields->saved_game_fields[i] == (int16_t)input) {
+                    clicked_slot = i;
+                    break;
+                }
+            }
+
+            if (_game_popup_fields->field_l == (int16_t)input) {
+                if (clicked_slot == -1) {
+                    uint8_t active_slot = (uint8_t)MOX::_settings.active_save_slot;
+                    if (active_slot < 10) {
+                        _draw_down = 1;
+                        clicked_slot = (int16_t)active_slot;
+                    }
+                }
+            }
+
+            if (clicked_slot >= 0 && clicked_slot < 10) {
+                if (_game_popup_fields->saved_games[clicked_slot] == 0) {
+                    if (MOX::_settings.animations_on && MOX::_previous_screen == MOX::SCREEN_MAIN) {
+                        fields::Clear_Fields_();
+                        _game_anims->field1_0x64 = 1;
+                        video::Set_Page_Off_();
+                        Animate_Game_Popup_(_game_anims->pictures[11], 1);
+                    }
+
+                    loaded_success = (int8_t)FILEDEF::Load_Game_(clicked_slot);
+                    MOX::_settings.active_save_slot = (char)clicked_slot;
+                    Save_Session_Related_Settings_();
+
+                    if (loaded_success == 0) {
+                        const char* load_err_msg = HAROLD::H_Message_(0xB8);
+                        _sprintf(msg_buffer, load_err_msg, (int32_t)clicked_slot);
+                        Game_Popup_User_Box_(msg_buffer, 3);
+                        MOX::_return_screen = (uint16_t)MOX::_previous_screen;
+                    } else {
+                        _loaded_new_game = 1;
+                        MOX::_return_screen = (MOX::_game_type == 1) ? 0x11 : 0x27;
+                    }
+
+                    if (not_main_menu && MOX::_stardate_at_beg_of_turn != 0) {
+                        MISC::Fade_Into_Screen_(MAINSCR::Draw_Mini_Main_Screen_, &MOX::_draw_main_screen_to_back, 0);
+                    }
+
+                    status = 1;
+                    *exit_flag = 1;
+                } else {
+                    Bad_Game_File_Message_((uint16_t)_game_popup_fields->saved_games[clicked_slot], clicked_slot);
+                    status = 2;
+                }
+            }
+
+            if (_game_popup_fields->field_o == (int16_t)input) {
+                MOX::_screen_data = 0;
+                status = 1;
+                if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+                    *exit_flag = 1;
+                }
+            } else if (_game_popup_fields->field_esc == (int16_t)input) {
+                loaded_success = 0;
+                status = 1;
+                *exit_flag = 1;
+            }
+
+            if (status != 0) break;
+
+            video::Set_Page_Off_();
+            fields::Invoke_Auto_Function_();
+            RUSS::Mox_Sync_Update_();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
+        }
+
+        return loaded_success;
+    }
+
+    /**
+     * @address 0050e7e0
+     */
+    void __cdecl Check_For_Saved_Games_(int8_t* games) {
+        char filename_buffer[20];
+        char itoa_buffer[12];
+        int16_t game_index = 0;
+
+        do {
+            __itoa(game_index + 1, itoa_buffer, 10);
+
+            char* dest = filename_buffer;
+            const char* src = s_SAVE_005568fc;
+            while ((*dest++ = *src++) != '\0');
+            dest--;
+
+            src = itoa_buffer;
+            while ((*dest++ = *src++) != '\0');
+            dest--;
+
+            src = s__GAM_005568f4;
+            while ((*dest++ = *src++) != '\0');
+
+            games[game_index] = 0;
+
+            if (!dos::DIR_(filename_buffer, filename_buffer)) {
+                games[game_index] = 1;
+            } else {
+                if (LOADSAVE::Check_Magic_Number_(filename_buffer) < 1) {
+                    games[game_index] = 2;
+                } else {
+                    if (LOADSAVE::Get_Game_Type_From_Saved_Game_(filename_buffer)) {
+                        int8_t game_type = (int8_t)FILEDEF::Get_Game_Type_From_Saved_Game_(game_index);
+                        if (game_type == 3 || game_type == 2) {
+                            games[game_index] = 3;
+                        }
+                    } else {
+                        games[game_index] = 2;
+                    }
+                }
+            }
+
+            game_index++;
+        } while (game_index < 10);
+    }
+
+    /**
+     * @address 0050f8d0
+     */
+    void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf) {
+        for (int16_t i = 0; i < 10; ++i) {
+            char local_str_buf[25];
+            helpers::memset(local_str_buf, 0, 25);
+
+            int32_t star_date_value = fields->values[i];
+
+            if (star_date_value > 0) {
+                // Fetch the prefix (e.g., "Stardate " or "D ")
+                const char* prefix = HAROLD::H_Message_(202);
+                helpers::strcpy(local_str_buf, prefix);
+
+                char itoa_buf[12];
+                __itoa(star_date_value, itoa_buf, 10);
+
+                size_t current_len = helpers::strlen(local_str_buf);
+                size_t itoa_len = helpers::strlen(itoa_buf);
+
+                // Append itoa result while inserting a decimal point before the last digit
+                for (size_t j = 0; j < itoa_len; ++j) {
+                    if ((itoa_len - j) == 1) {
+                        local_str_buf[current_len++] = '.';
+                    }
+                    local_str_buf[current_len++] = itoa_buf[j];
+                }
+                local_str_buf[current_len] = '\0';
+
+            } else if (star_date_value < 0) {
+                // If the value is negative, mark it as invalid
+                helpers::memcpy(local_str_buf, s_INVALID_STR, 12);
+            }
+
+            // Copy the resulting string (25 bytes) to the correct slot in the output buffer
+            helpers::memcpy(output_buf + (i * 25), local_str_buf, 25);
+        }
+    }
+
+    /**
+     * @address 0050f7d0
+     */
+    void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer) {
+        char slot_num_str[12];
+        char filename[20];
+        char date_str[28];
+
+        for (int16_t i = 0; i < 10; ++i) {
+            __itoa(i + 1, slot_num_str, 10);
+
+            char* dest = filename;
+            const char* src = s_SAVE_005568fc;
+            while ((*dest++ = *src++) != '\0');
+            dest--;
+
+            src = slot_num_str;
+            while ((*dest++ = *src++) != '\0');
+            dest--;
+
+            src = s_dot_GAM_005568f4;
+            while ((*dest++ = *src++) != '\0');
+
+            for (int j = 0; j < 25; ++j) {
+                date_str[j] = 0;
+            }
+
+            if (accss::_access_(filename, 0) == 0) {
+                Get_File_Date_String_(filename, date_str);
+            }
+
+            char* out_dest = &output_buffer[i * 25];
+            for (int j = 0; j < 25; ++j) {
+                out_dest[j] = date_str[j];
+            }
+        }
     }
 }
