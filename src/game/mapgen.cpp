@@ -791,15 +791,15 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
                     // If the current nebula matches this nebula type index (0-11)
                     if (MOX::_nebula[neb_idx].type == (int8_t)type_val) {
-                        animate::s_animation_header* loaded_segment;
+                        s_animation_header* loaded_segment;
                         int entry_num = entry_counter + 6;
 
                         if (first_load) {
-                            loaded_segment = reinterpret_cast<animate::s_animation_header*>(farload::Far_Reload_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
+                            loaded_segment = reinterpret_cast<s_animation_header*>(farload::Far_Reload_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
                             first_load = false;
                         }
                         else {
-                            loaded_segment = reinterpret_cast<animate::s_animation_header*>(farload::Far_Reload_Next_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
+                            loaded_segment = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(s_starbg_lbx, entry_num, MOX::_nebula_screen_seg));
                         }
 
                         // Store the segment for the specific frame of this nebula
@@ -1052,7 +1052,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             if (ERIC::Get_Fade_Percent_() != 0) JIM::Fast_Fade_In_();
             video::Set_Page_Back_();
             MOX::Mox_Update_();
-            animate::s_animation_header* raceopt_ptr = reinterpret_cast<animate::s_animation_header*>(Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));
+            s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));
             animate::Draw_(0, 0, raceopt_ptr);
             MOX::Mox_Update_();
             video::Copy_Back_To_Off_();

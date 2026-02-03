@@ -12,10 +12,10 @@ namespace fields {
     void __cdecl Clear_Fields_() {
         _fields_count = 1;
         _input_delay = 0;
-        _down_mouse_button = 0xFFFF;
+        _down_mouse_button = -1;
         _auto_input_variable = 0;
         _input_field_active = 0;
-        _active_input_field_number = 0xFFFF;
+        _active_input_field_number = -1;
         _multi_hotkey_active_field = 0;
 
         mouse::Mouse_Buffer_();

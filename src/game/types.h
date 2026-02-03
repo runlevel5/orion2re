@@ -804,4 +804,16 @@ struct s_nebula {
     int8_t type;
 };
 
+struct s_animation_header {
+    int16_t width;
+    int16_t height;
+    int16_t current_frame;
+    int16_t frame_count;
+    uint8_t loop_frame;
+    uint8_t field5_0x9;
+    uint8_t field6_0xa;
+    uint8_t flags;
+    uint32_t frame_offsets[1]; // Dynamic length array
+};
+
 #pragma	pack(pop)

@@ -110,4 +110,10 @@ namespace sound {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
         return fn(sound_id);
     }
+
+    inline void __cdecl Sound_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E630});
+        fn();
+    }
 }

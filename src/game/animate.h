@@ -2,20 +2,6 @@
 #include <cstdint>
 
 namespace animate {
-#pragma pack(push, 1)
-    struct s_animation_header {
-        int16_t width;
-        int16_t height;
-        int16_t current_frame;
-        int16_t frame_count;
-        uint8_t loop_frame;
-        uint8_t field5_0x9;
-        uint8_t field6_0xa;
-        uint8_t flags;
-        uint32_t frame_offsets[1]; // Dynamic length array
-    };
-#pragma pack(pop)
-
     inline s_animation_header*& _animation_header =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0057632C });
 

@@ -60,7 +60,7 @@ namespace file_ani {
     }
 
     void __cdecl Draw_File_Animation_() {
-        animate::s_animation_header* header = init::_io_buffer;
+        s_animation_header* header = init::_io_buffer;
         animate::_animation_header = header;
 
         if (header->flags & 0x10) {

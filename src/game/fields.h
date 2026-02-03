@@ -3,10 +3,10 @@
 namespace fields {
     inline void*& _update_function = *reinterpret_cast<void**>(std::uintptr_t{ 0x0055AFD8 });
     inline uint16_t& _auto_active_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFDC });
-    inline uint16_t& _down_mouse_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055AFE4});
+    inline int16_t& _down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE4});
     inline uint16_t& _auto_input_variable = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B004});
     inline uint16_t& _input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B040});
-    inline uint16_t& _active_input_field_number = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B04C});
+    inline int16_t& _active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B04C});
     inline uint16_t& _multi_hotkey_active_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B064});
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline uint16_t& _fields_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572D18});
@@ -69,6 +69,18 @@ namespace fields {
         return fn(x, y, rows, cols, w, h, px, py, key);
     }
 
+    inline int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int v1, int v2, int v3, int v4, int v5, int v6, int16_t* out, const char* label, char type) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int, int, int, int, int, int, int16_t*, const char*, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051de80});
+        return fn(x, y, v1, v2, v3, v4, v5, v6, out, label, type);
+    }
+
+    inline int32_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int w, int h, MOX::s_save_game_description* desc, int max_len, uint16_t v1, uint32_t v2, char hotkey, uint16_t v3) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int, int, MOX::s_save_game_description*, int, uint16_t, uint32_t, char, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e2b0});
+        return fn(x, y, w, h, desc, max_len, v1, v2, hotkey, v3);
+    }
+
     inline void __cdecl Disable_Draw_All_Fields_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee80});
@@ -91,5 +103,11 @@ namespace fields {
         using Fn = void(__cdecl*)(void*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520040});
         fn(help_data, count);
+    }
+
+    inline void __cdecl Invoke_Auto_Function_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ff20});
+        fn();
     }
 }

@@ -6,7 +6,7 @@ namespace MAINMENU {
     }
 
     void __cdecl Main_Menu_Fade_Function2_() {
-        animate::Draw_(0, 0, reinterpret_cast<animate::s_animation_header*>(_mainmenu_first_seg));
+        animate::Draw_(0, 0, reinterpret_cast<s_animation_header*>(_mainmenu_first_seg));
     }
 
     uint16_t __cdecl Do_Main_Menu_File_Animation_() {
@@ -126,14 +126,14 @@ namespace MAINMENU {
 
         MOX::Mox_Update_();
 
-        _main_menu_background = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, 2, MOX::_screen_seg);
+        _main_menu_background = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, 2, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
         for (int i = 0; i < 6; ++i) {
-            _mainmenu->fields[i].field0_0x0 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index, MOX::_screen_seg);
-            _mainmenu->fields[i].field1_0x4 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 1, MOX::_screen_seg);
-            _mainmenu->fields[i].field2_0x8 = (animate::s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 2, MOX::_screen_seg);
+            _mainmenu->fields[i].field0_0x0 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index, MOX::_screen_seg);
+            _mainmenu->fields[i].field1_0x4 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 1, MOX::_screen_seg);
+            _mainmenu->fields[i].field2_0x8 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index + 2, MOX::_screen_seg);
 
             _mainmenu->fields[i].field = -1000;
 
@@ -151,13 +151,29 @@ namespace MAINMENU {
         Set_Main_Menu_Screen_Help_List_Aux_(&EVANHELP::_main_menu_screen_help_list, 6);
     }
 
+    void __cdecl Load_Mainmenu_Load_Game_Popup_() {
+        LOADSAVE::s_game_anims* anims = LOADSAVE::_game_anims;
+        const char* lbx = PTR_s_GAME_LBX_0055ac4c;
+        void* seg = MOX::_screen_seg;
+
+        anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x14, seg);
+        anims->pictures[12] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x15, seg);
+        anims->pictures[13] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x16, seg);
+        anims->pictures[16] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x17, seg);
+        anims->pictures[17] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x18, seg);
+        anims->pictures[18] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x19, seg);
+        anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x1a, seg);
+    }
+
     /**
      * Loads and displays the main menu load game screen popup until a selection is confirmed.
+     * @address 004e94d0
      */
-    uint8_t __cdecl Do_Mainmenu_Load_Screen_() {
+    int8_t __cdecl Do_Mainmenu_Load_Screen_() {
+        int8_t result;
         int16_t status = 0;
 
-        _mainmenu_last_seg = (uint32_t)(uintptr_t)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 21, MOX::_screen_seg);
+        _mainmenu_last_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 21, MOX::_screen_seg);
 
         video::Set_Refresh_Stencil_();
         video::Set_Page_Back_();
@@ -165,7 +181,7 @@ namespace MAINMENU {
         // Clear background with black (0)
         graphics::Fill_(0, 0, 649, 479, 0);
 
-        animate::Draw_(0, 0, (animate::s_animation_header*)(uintptr_t)_mainmenu_last_seg);
+        animate::Draw_(0, 0, _mainmenu_last_seg);
         video::Copy_Back_To_Off_();
         RUSS::Mox_Sync_Update_();
         fields::Deactivate_Help_List_();
@@ -174,10 +190,10 @@ namespace MAINMENU {
 
         // Loop until the popup returns 1 (selection made or closed)
         do {
-            Mainmenu_Load_Game_Popup_(&status);
+            result = Mainmenu_Load_Game_Popup_(&status);
         } while (status != 1);
 
-        return (MOX::_game_type != 0);
+        return result;
     }
 
     void __cdecl Draw_Main_Menu_Screen_() {
@@ -195,7 +211,7 @@ namespace MAINMENU {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         }
 
-        animate::s_animation_header* anim_to_draw = nullptr;
+        s_animation_header* anim_to_draw = nullptr;
         int16_t draw_y = 0;
 
         if (_mainmenu->fields[0].field == MOX::_scanned_field) {
@@ -303,7 +319,7 @@ namespace MAINMENU {
                 
                 graphics::Set_Window_(0x42, 0xB3, 0x162, 0x1A6);
                 video::Clip_On_();
-                animate::Draw_(0x42, current_y, (animate::s_animation_header*)_bitmap);
+                animate::Draw_(0x42, current_y, (s_animation_header*)_bitmap);
                 video::Clip_Off_();
                 
                 current_y += 14;
@@ -330,7 +346,7 @@ namespace MAINMENU {
         fields::Clear_Fields_();
         MOX::Mox_Update_();
 
-        _mainmenu_first_seg = (uint32_t)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);
+        _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);
         MOX::Mox_Update_();
         MOX::Load_Credits_();
         MOX::Mox_Update_();
@@ -341,16 +357,11 @@ namespace MAINMENU {
         MOX::Mox_Update_();
 
         // Initialize main menu structure fields to -1
-        {
-            int16_t* ptr = (int16_t*)_mainmenu;
-            for (int i = 0; i < 105; ++i) {
-                ptr[i] = -1;
-            }
-        }
+        helpers::memset(_mainmenu, 0, sizeof(s_main_menu));
 
-        LOADSAVE::_game_popup_fields = (uint32_t)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
-        MOX::_save_game_dates = (uint32_t)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
-        MOX::_save_game_stardates = (uint32_t)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
+        LOADSAVE::_game_popup_fields = (LOADSAVE::s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
+        MOX::_save_game_dates = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
+        MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::Mox_Update_();
 
         if (MOX2::_pan_main_menu_panel != 0) {
@@ -375,7 +386,7 @@ namespace MAINMENU {
                 Reload_Main_Menu_Screen_();
                 video::Set_Page_Off_();
                 graphics::Fill_(0, 0, 639, 479, 0);
-                animate::Draw_(0, 0, (animate::s_animation_header*)_main_menu_background);
+                animate::Draw_(0, 0, (s_animation_header*)_main_menu_background);
                 RUSS::Mox_Sync_Update_();
             } else {
                 goto STENCIL_SETUP;
@@ -388,7 +399,7 @@ namespace MAINMENU {
         video::Set_Refresh_Stencil_();
         video::Set_Page_Back_();
         graphics::Fill_(0, 0, 639, 479, 0);
-        animate::Draw_(0, 0, (animate::s_animation_header*)_main_menu_background);
+        animate::Draw_(0, 0, (s_animation_header*)_main_menu_background);
         video::Copy_Back_To_Off_();
         RUSS::Mox_Sync_Update_();
 

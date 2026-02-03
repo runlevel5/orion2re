@@ -49,8 +49,8 @@ namespace MOX {
     inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
     inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
     inline uint16_t& _return_screen = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005977F0});
-    inline uint32_t& _save_game_dates = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005a1ca8});
-    inline uint32_t& _save_game_stardates = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005974e8});
+    inline void*& _save_game_dates = *reinterpret_cast<void**>(std::uintptr_t{0x005a1ca8});
+    inline char*& _save_game_stardates = *reinterpret_cast<char**>(std::uintptr_t{0x005974e8});
     inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a9a});
     inline SCREEN& _previous_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
@@ -62,7 +62,7 @@ namespace MOX {
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
-    inline animate::s_animation_header*& _moveable_box_pict = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A1B60});
+    inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
@@ -115,7 +115,7 @@ namespace MOX {
     inline int16_t& _far_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CB6});
     inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
     inline int16_t& _near_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA8});
-    inline animate::s_animation_header*& _near_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x00597424});
+    inline s_animation_header*& _near_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597424});
 
     inline void*& _special_names_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
@@ -150,8 +150,8 @@ namespace MOX {
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
 
-    inline animate::s_animation_header*& _main_screen_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B400});
-    inline animate::s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B464});
+    inline s_animation_header*& _main_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B400});
+    inline s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B464});
 
     inline void*& _global_screen_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
@@ -159,11 +159,11 @@ namespace MOX {
     inline void*& _global_cache_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5B8 });
 
-    inline animate::s_animation_header*& _mid_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B610});
-    inline animate::s_animation_header*& _far_star_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A17B0});
+    inline s_animation_header*& _mid_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B610});
+    inline s_animation_header*& _far_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B0});
 
     // Suggested name: MOX::_star_seg
-    inline animate::s_animation_header** _star_seg = reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x0059B4C0});
+    inline s_animation_header** _star_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4C0});
 
     inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
 
@@ -222,8 +222,8 @@ namespace MOX {
     inline s_colony*& _colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
 
-    inline animate::s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A1B30});
-    inline animate::s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{0x005A4A9C});
+    inline s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B30});
+    inline s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});
 
     inline s_star_data*& _star =
@@ -267,8 +267,8 @@ namespace MOX {
 
     // Suggested name: MOX::nebula_pict_segments
     // This represents a 2D array of sprite pointers, dimensions [12][4].
-    inline animate::s_animation_header* (*_nebula_pict_seg)[4] =
-        reinterpret_cast<animate::s_animation_header* (*)[4]>(std::uintptr_t{ 0x005979C0 });
+    inline s_animation_header* (*_nebula_pict_seg)[4] =
+        reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{ 0x005979C0 });
 
     // Suggested name: _planet_max_farms
     inline uint8_t* _planet_max_farms = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00559660 });
@@ -321,12 +321,21 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
-    inline char (&_save_game_description)[10][37] = *reinterpret_cast<char(*)[10][37]>(std::uintptr_t{0x005974F0});
+    #pragma pack(push, 1)
+    struct s_save_game_description {
+        char description[37];
+    };
+    #pragma pack(pop)
+    inline s_save_game_description (&_save_game_description)[10] = *reinterpret_cast<s_save_game_description(*)[10]>(std::uintptr_t{0x005974F0});
+
+    inline int16_t& _popup_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597710});
+    inline int16_t& _popup_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059770E});
+    inline int16_t& _screen_data = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B20});
 
     // Suggested name: MOX::gate_portal_icons
-    inline animate::s_animation_header** gate_portal_icons = reinterpret_cast<animate::s_animation_header**>(0x0059BCD0);
+    inline s_animation_header** gate_portal_icons = reinterpret_cast<s_animation_header**>(0x0059BCD0);
     // Suggested name: MOX::gate_artemis_icons
-    inline animate::s_animation_header** gate_artemis_icons = reinterpret_cast<animate::s_animation_header**>(0x0059BD00);
+    inline s_animation_header** gate_artemis_icons = reinterpret_cast<s_animation_header**>(0x0059BD00);
 
     // Suggested name: MOX::DAT_0059bd1e
     inline int16_t& DAT_0059bd1e =

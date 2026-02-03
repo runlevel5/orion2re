@@ -1,16 +1,12 @@
 #pragma once
 #include <cstdint>
 
-namespace animate {
-    struct s_animation_header;
-}
-
 namespace MAINMENU {
 #pragma pack(push, 1)
     struct s_field_button {
-        animate::s_animation_header* field0_0x0;
-        animate::s_animation_header* field1_0x4;
-        animate::s_animation_header* field2_0x8;
+        s_animation_header* field0_0x0;
+        s_animation_header* field1_0x4;
+        s_animation_header* field2_0x8;
         int16_t field;
     };
 
@@ -32,11 +28,11 @@ namespace MAINMENU {
     inline s_main_menu*& _mainmenu =
         *reinterpret_cast<s_main_menu**>(std::uintptr_t{0x0056ECF0});
 
-    inline animate::s_animation_header*& _main_menu_background =
-        *reinterpret_cast<animate::s_animation_header**>(std::uintptr_t{ 0x0056ECDC });
+    inline s_animation_header*& _main_menu_background =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0056ECDC });
 
-    inline uint32_t& _mainmenu_first_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00595c58});
-    inline uint32_t& _mainmenu_last_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00595C5C});
+    inline s_animation_header*& _mainmenu_first_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595c58});
+    inline s_animation_header*& _mainmenu_last_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595C5C});
     inline void*& __gametype = *reinterpret_cast<void**>(std::uintptr_t{0x0056ece8});
     inline int16_t& _max_credits = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECE0});
     inline int32_t& DAT_0056ece4 = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ECE4});
@@ -90,12 +86,14 @@ namespace MAINMENU {
     void __cdecl Set_Main_Menu_Screen_Help_List_Aux_(void* help_data, int16_t count);
     void __cdecl Set_Main_Menu_Screen_Help_List_();
 
-    uint8_t __cdecl Do_Mainmenu_Load_Screen_();
+    int8_t __cdecl Do_Mainmenu_Load_Screen_();
 
-    inline void __cdecl Mainmenu_Load_Game_Popup_(int16_t* result) {
-        using Fn = void(__cdecl*)(int16_t*);
+    void __cdecl Load_Mainmenu_Load_Game_Popup_();
+
+    inline int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* result) {
+        using Fn = int8_t(__cdecl*)(int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00511F40});
-        fn(result);
+        return fn(result);
     }
 
     void __cdecl Main_Menu_Screen_();

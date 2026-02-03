@@ -249,7 +249,7 @@ namespace clipped {
     void __cdecl Clipped_Draw_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* pixels) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        animate::s_animation_header* header = animate::_animation_header;
+        s_animation_header* header = animate::_animation_header;
         int32_t sprite_width = (int32_t)header->width;
         int32_t sprite_height = (int32_t)header->height;
 

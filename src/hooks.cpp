@@ -415,6 +415,12 @@ namespace hooks {
         { 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
         { 0x004e9780, &MAINMENU::Draw_Credits_ },
         { 0x004e9a20, &MAINMENU::Fade_Credit_Colors_ },
+        { 0x0050f630, &LOADSAVE::Restore_Main_Screen_ },
+        { 0x0050f5d0, &LOADSAVE::Restore_Game_Popup_ },
+        { 0x0050f530, &LOADSAVE::Game_Popup_User_Box_ },
+        { 0x005120e0, &LOADSAVE::Set_Up_Load_Save_Popup_ },
+        { 0x0050ebf0, &LOADSAVE::Add_Game_Popup_Fields_ },
+        { 0x00511ff0, &MAINMENU::Load_Mainmenu_Load_Game_Popup_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -423,6 +429,8 @@ namespace hooks {
         ASSERT(sizeof(MAINMENU::s_main_menu) == 0xd2, "s_main_menu");
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
+        ASSERT(sizeof(LOADSAVE::s_game_popup_fields) == 0x278, "s_game_popup_fields");
+        ASSERT(sizeof(LOADSAVE::s_game_anims) == 0x65, "s_game_anims");
         ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
         ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
         ASSERT(sizeof(s_player) == 0xea9, "s_player");

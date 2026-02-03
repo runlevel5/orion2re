@@ -132,4 +132,9 @@ struct s_font {
 
     void __cdecl Get_Colors_(uint8_t* colors);
     void __cdecl Set_Colors_(const uint8_t* colors);
+
+    inline void __cdecl Set_Font_Special_Colors_(uint8_t* colors) {
+        using Fn = void(__cdecl*)(uint8_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00525770})(colors);
+    }
 }

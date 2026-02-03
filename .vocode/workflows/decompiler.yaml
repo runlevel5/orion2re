@@ -58,7 +58,10 @@ workflows:
             namespace mouse {
               // ... current_x definition here 
             }
-
+          
+          - If symbol does not seem to have namespace, check both disassembly comment and decompiled code to see 
+            if namespace is set. Decompiler might not emit namespace if decompiled function is in same namespace
+            as a referenced symbol.
           - Keep in mind that code might reference symbols from other namespaces. When generating
             stubs, you must correctly put symbols into correct namespace blocks deriving namespace
             name from a symbol name.

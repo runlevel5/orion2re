@@ -33,11 +33,11 @@ namespace MAINSCR {
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
     inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
-    inline animate::s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<animate::s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
+    inline s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
 
     void __cdecl Get_PointXY_Draw_Coords_(int16_t x, int16_t y, int16_t* out_x, int16_t* out_y);
 
-    animate::s_animation_header* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size);
+    s_animation_header* __cdecl Get_Star_Picture_Seg_(int8_t spectral_class, int8_t pict_type, int8_t size);
 
     void __cdecl Get_Star_Draw_Coords_(int16_t star_idx, int16_t* out_x, int16_t* out_y);
 

@@ -378,3 +378,12 @@ inline const char* s_R_0055824c = reinterpret_cast<const char*>(0x0055824C);  //
 inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  // "Q"
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
+inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
+inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
+inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
+inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
+inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // "N"
+inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
+inline char*& PTR_s_GAME_LBX_0055ac4c =
+    *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
+inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
