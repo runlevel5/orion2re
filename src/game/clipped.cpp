@@ -41,7 +41,7 @@ namespace clipped {
         int32_t draw_height = draw_y_end - draw_y_start + 1;
 
         int16_t current_sprite_y = *(int16_t*)(sprite + 2);
-        int32_t line_base = x + (int32_t)draw_y_start * platform::g_screen_res_x;
+        int32_t line_base = (int32_t)x + (int32_t)draw_y_start * platform::g_screen_res_x;
         int32_t sprite_word_idx = 2;
 
         // Skip segments above the clipping window
@@ -64,7 +64,7 @@ namespace clipped {
         int16_t current_line_idx = current_sprite_y - clip_y_skip_count;
         int32_t win_start_abs = line_base + clip_x_skip_count;
         int32_t win_end_abs = win_start_abs + draw_width;
-        int32_t cursor_abs = line_base + clip_x_skip_count;
+        int32_t cursor_abs = line_base;
 
         while (current_line_idx < draw_height) {
             int16_t count = *(int16_t*)&sprite[sprite_word_idx * 2];
@@ -96,6 +96,7 @@ namespace clipped {
                         }
                         pixel_ptr += skip_px;
                         run_start_abs += skip_px;
+                        cursor_abs += skip_px;
                     }
 
                     // Clip right
@@ -109,6 +110,7 @@ namespace clipped {
                     while (run_start_abs < run_clipped_end) {
                         *screen_ptr++ = sprite[pixel_ptr++];
                         run_start_abs++;
+                        cursor_abs++;
                     }
                 }
                 sprite_word_idx += (count + 1) / 2;
@@ -479,6 +481,7 @@ namespace clipped {
                         }
                         pixel_ptr += skip_px;
                         run_start_abs += skip_px;
+                        cursor_abs += skip_px;
                     }
 
                     // Clip right
@@ -499,6 +502,7 @@ namespace clipped {
                             *screen_ptr++ = draw::_glass_lookup_table[pixel][background_pixel];
                         }
                         run_start_abs++;
+                        cursor_abs++;
                     }
                 }
                 sprite_word_idx += (count + 1) / 2;
