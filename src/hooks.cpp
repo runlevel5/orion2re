@@ -316,6 +316,7 @@ namespace hooks {
         { 0x00519fe0, &HOMEGEN::Dist_Between_Points_ },
         { 0x00482020, &INITSHIP::Update_Automatic_Design_Equipment_ },
         { 0x00528ba0, &graphics::Set_Window_ },
+        { 0x00528c90, &graphics::Reset_Window_ },
         { 0x004f1930, &HAROLD::Set_Player_Font_Style_ },
         { 0x004f1090, &HAROLD::Map_Scale_To_Zoom_Level_ },
         { 0x004c7510, &HAROLD::Map_Scale_Star_Size_To_Zoom_Level_ },
@@ -428,6 +429,29 @@ namespace hooks {
         { 0x0050f8d0, &LOADSAVE::Get_Star_Date_Strings_ },
         { 0x0050f7d0, &LOADSAVE::Get_Save_Game_Date_Strings_ },
         { 0x004b64e0, &MAPGEN::Generate_Satellite_Type_ },
+        { 0x0052cdb0, &strings::String_To_Lower_ },
+        { 0x00442bb0, &OFFICER::Increase_Officer_Level_By_One_ },
+        { 0x0043e6f0, &OFFICER::Get_Officer_Level_ },
+        { 0x0043e5a0, &OFFICER::Officer_Cost_ },
+        { 0x0043e930, &OFFICER::Officer_Skill_Bonus_ },
+        { 0x0043e660, &OFFICER::Bonus_For_Famous_Heroes_ },
+        { 0x0049e630, &MISC::Fade_Into_Screen_ },
+        { 0x0043d0d0, &LOADSAVE::Check_Magic_Number_ },
+        { 0x0043d070, &LOADSAVE::Get_Game_Type_From_Saved_Game_ },
+        { 0x0050f730, &LOADSAVE::Get_Game_Popup_Colors_ },
+        { 0x0043d1d0, &LOADSAVE::Save_Session_Related_Settings_ },
+        { 0x0050f4c0, &LOADSAVE::Bad_Game_File_Message_ },
+        { 0x0051fe90, &fields::Assign_Auto_Function_ },
+        { 0x0051ee80, &fields::Disable_Draw_All_Fields_ },
+        { 0x0051ee90, &fields::Enable_Draw_All_Fields_ },
+        { 0x00520040, &fields::Set_Help_List_ },
+        { 0x00520060, &fields::Deactivate_Help_List_ },
+        { 0x0051ff20, &fields::Invoke_Auto_Function_ },
+        { 0x00481ef0, &INITSHIP::Update_Equipment_On_Ships_Being_Built_ },
+        { 0x00482260, &INITSHIP::Calc_Player_FTL_Speed_ },
+        { 0x00481380, &INITSHIP::Best_Armor_ },
+        { 0x004822c0, &INITSHIP::Get_FTL_Speed_ },
+        { 0x005127b0, &MAINSCR::Add_Moveable_Box_Fields_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -454,6 +478,7 @@ namespace hooks {
         ASSERT(sizeof(TECHDATA::s_tech_app_data) == 13, "s_tech_app_data");
         ASSERT(sizeof(TECHDATA::s_tech_field_data) == 23, "s_tech_field_data");
         ASSERT(sizeof(TECHDATA::s_tech_drive_data) == 0x2e, "s_tech_drive_data");
+        ASSERT(sizeof(TECHDATA::s_armor_data) == 15, "s_armor_data");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
         ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");

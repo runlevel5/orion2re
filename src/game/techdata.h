@@ -66,8 +66,14 @@ namespace TECHDATA {
         char* size_name;
         uint8_t unknown[20];
     };
+
+    struct s_armor_data {
+        int16_t tech_app_id;
+        char pad[13];
+    };
     #pragma pack(pop)
 
+    inline s_armor_data* _armor = reinterpret_cast<s_armor_data*>(std::uintptr_t{ 0x00554D96 });
     inline s_tech_building_data* _buildings = reinterpret_cast<s_tech_building_data*>(std::uintptr_t{ 0x00554290 });
     inline s_hull_data* _hull_data = reinterpret_cast<s_hull_data*>(std::uintptr_t{ 0x005557B4 });
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });

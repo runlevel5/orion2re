@@ -585,8 +585,7 @@ struct s_player {
     char diplomacy_demand_rejection_message[8];
     int8_t last_diplomacy_threat_turn[8];
     char delayed_diplomacy_orders[8];
-    int8_t traits[31];
-    int8_t evolutionary_upgrade_traits[31];
+    int8_t traits[62];
     char picked_evolutionary_upgrade;
     char applied_evolutionary_upgrade;
     char fleet_history[350];
@@ -810,8 +809,7 @@ struct s_animation_header {
     int16_t current_frame;
     int16_t frame_count;
     uint8_t loop_frame;
-    uint8_t field5_0x9;
-    uint8_t field6_0xa;
+    int16_t field5_0x9;
     uint8_t flags;
     uint32_t frame_offsets[1]; // Dynamic length array
 };

@@ -217,7 +217,7 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(main_pic);
 
             Check_For_Saved_Games_(_game_popup_fields->saved_games);
-            int colors_style[2], colors_special[2];
+            int32_t colors_style[2], colors_special[2];
             Get_Game_Popup_Colors_(2, colors_style, colors_special);
             fonts::Set_Font_Special_Colors_(reinterpret_cast<uint8_t*>(colors_special));
 
@@ -506,6 +506,132 @@ namespace LOADSAVE {
             for (int j = 0; j < 25; ++j) {
                 out_dest[j] = date_str[j];
             }
+        }
+    }
+
+    /**
+     * @address 0043d0d0
+     */
+    int32_t __cdecl Check_Magic_Number_(const char* filename) {
+        int32_t magic_number = 0;
+        FILE* file_ptr = _wfopen(filename, s_rb_0055117c);
+
+        if (file_ptr != nullptr) {
+            if (_fseek(file_ptr, 0x29, SEEK_SET) == 0) {
+                _fread(&magic_number, 4, 1, file_ptr);
+            }
+            _fclose(file_ptr);
+        }
+
+        return magic_number;
+    }
+
+    /**
+     * @address 0043d070
+     */
+    bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
+        bool is_valid = false;
+        FILE* file = _wfopen(filename, s_rb_0055117c);
+
+        if (file != nullptr) {
+            uint32_t game_type_header;
+            _fread(&game_type_header, 4, 1, file);
+
+            if (Is_Valid_Game_Type_(game_type_header)) {
+                is_valid = true;
+            }
+
+            _fclose(file);
+        }
+
+        return is_valid;
+    }
+
+    /**
+     * @address 0050f730
+     */
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, int32_t* out_colors_primary, int32_t* out_colors_secondary) {
+        int32_t* colors;
+
+        if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+            // Colors for main menu context
+            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0xFE, 0xFF);
+            out_colors_primary[0] = colors[0];
+            out_colors_primary[1] = colors[1];
+
+            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0xFB, 0xFC);
+            out_colors_secondary[0] = colors[0];
+            out_colors_secondary[1] = colors[1];
+        } else {
+            // Colors for general game context
+            MOX::_mox_font_colors_offset = 0x59; // 'Y'
+            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0x56, 0x5B); // 'V', '['
+            out_colors_primary[0] = colors[0];
+            out_colors_primary[1] = colors[1];
+
+            MOX::_mox_font_colors_offset = 0x5B; // '['
+            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0x59, 0x7E); // 'Y', '~'
+            out_colors_secondary[0] = colors[0];
+            out_colors_secondary[1] = colors[1];
+        }
+    }
+
+    /**
+     * @address 0050f4c0
+     */
+    void __cdecl Bad_Game_File_Message_(int16_t type, int16_t file_index) {
+        char buffer[256];
+        int16_t message_id = 0;
+
+        if (type == 1) {
+            message_id = 0xB2; // 178
+        } else if (type == 2) {
+            message_id = 0xB3; // 179
+        } else if (type == 3) {
+            message_id = 0xB4; // 180
+        }
+
+        if (message_id != 0) {
+            const char* format = HAROLD::H_Message_(message_id);
+            _sprintf(buffer, format, (int)(file_index + 1));
+        }
+
+        Game_Popup_User_Box_(buffer, 3);
+    }
+
+    /**
+     * @address 0043d1d0
+     */
+    void __cdecl Save_Session_Related_Settings_() {
+        uint8_t file_buffer[553]; // 0x229 bytes
+        bool success = false;
+
+        FILE* file = _wfopen(s_MOX_SET_00556918, s_rb_0055117c);
+        if (file != nullptr) {
+            _fread(file_buffer, 0x229, 1, file);
+            _fclose(file);
+
+            RUSS::Assert_Settings_();
+
+            // Update the session-related portion of the settings (211 bytes)
+            for (int i = 0; i < 211; ++i) {
+                file_buffer[i] = reinterpret_cast<uint8_t*>(&MOX::_settings)[i];
+            }
+
+            success = true;
+            RUSS::Assert_Settings_();
+
+            file = _wfopen(s_MOX_SET_00556918, s_wb_00551178);
+            if (file != nullptr) {
+                _fwrite(file_buffer, 0x229, 1, file);
+                _fclose(file);
+            } else {
+                success = false;
+            }
+        }
+
+        if (!success) {
+            exitm::Exit_With_Message(s_Settings_file_error_00556950);
         }
     }
 }

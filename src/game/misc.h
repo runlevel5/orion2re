@@ -15,11 +15,7 @@ namespace MISC {
     };
 #pragma pack(pop)
 
-    inline void __cdecl Fade_Into_Screen_(void (*fade_fn)(), void* data, int16_t steps) {
-        using Fn = void(__cdecl*)(void (*)(), void*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e630});
-        fn(fade_fn, data, steps);
-    }
+    void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
     inline s_colors* __cdecl Font_Colors2_(uint16_t a1, uint8_t a2, uint8_t a3) {
         using Fn = s_colors*(__cdecl*)(int16_t, uint8_t, uint8_t);

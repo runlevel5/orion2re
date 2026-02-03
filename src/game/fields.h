@@ -3,13 +3,19 @@
 namespace fields {
     inline void*& _update_function = *reinterpret_cast<void**>(std::uintptr_t{ 0x0055AFD8 });
     inline uint16_t& _auto_active_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFDC });
+    inline uint16_t& _auto_function_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFF4 });
     inline int16_t& _down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE4});
     inline uint16_t& _auto_input_variable = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B004});
     inline uint16_t& _input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B040});
     inline int16_t& _active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B04C});
+    inline uint16_t& _help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B05C});
+    inline uint16_t& _help_list_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B060});
     inline uint16_t& _multi_hotkey_active_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B064});
+    inline uint16_t& _draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B078});
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline uint16_t& _fields_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572D18});
+    inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
+    inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
 
     void __cdecl Assign_Update_Function_(void* update_func);
     void __cdecl Deactivate_Auto_Function_();
@@ -21,11 +27,7 @@ namespace fields {
         return fn(hotkey_str);
     }
 
-    inline void __cdecl Assign_Auto_Function_(void (*func)(), int16_t priority) {
-        using Fn = void(__cdecl*)(void (*)(), int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fe90});
-        fn(func, priority);
-    }
+    void __cdecl Assign_Auto_Function_(void* function_ptr, int16_t delay);
 
     inline int32_t __cdecl Get_Input_() {
         using Fn = int32_t(__cdecl*)();
@@ -81,33 +83,12 @@ namespace fields {
         return fn(x, y, w, h, desc, max_len, v1, v2, hotkey, v3);
     }
 
-    inline void __cdecl Disable_Draw_All_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee80});
-        fn();
-    }
+    void __cdecl Disable_Draw_All_Fields_();
+    void __cdecl Enable_Draw_All_Fields_();
 
-    inline void __cdecl Enable_Draw_All_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ee90});
-        fn();
-    }
+    void __cdecl Deactivate_Help_List_();
 
-    inline void __cdecl Deactivate_Help_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520060});
-        fn();
-    }
+    void __cdecl Set_Help_List_(void* help_data, int16_t count);
 
-    inline void __cdecl Set_Help_List_(void* help_data, int16_t count) {
-        using Fn = void(__cdecl*)(void*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520040});
-        fn(help_data, count);
-    }
-
-    inline void __cdecl Invoke_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ff20});
-        fn();
-    }
+    void __cdecl Invoke_Auto_Function_();
 }

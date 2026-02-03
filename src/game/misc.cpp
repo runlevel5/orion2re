@@ -67,4 +67,40 @@ namespace MISC {
             video::Clip_Off_();
         }
     }
+
+    void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id) {
+        fields::Disable_Draw_All_Fields_();
+
+        *status_flag = 1;
+        palette::Clear_Palette_Changes_(0, 0xff);
+        mouse::Set_Mouse_List_(mouse::_mouse_list_none, 1);
+
+        ERIC::Fast_Fade_Out_();
+        fonts::Load_Palette_(palette_id, 0, 0xff);
+        palette::Set_Palette_Changes_(0, 0xff);
+
+        FUN_0052b660();
+        palstore::Darken_Palette_(100);
+
+        mouse::Set_Mouse_List_(mouse::_mouse_list_arrow, 1);
+        video::Set_Page_Off_();
+
+        if (draw_callback) {
+            draw_callback();
+        }
+
+        palette::Clear_Palette_Changes_(0, 0xff);
+
+        if (MOX::_reloaded_ship_palette == 0) {
+            JIM::Fast_Fade_In_();
+        } else {
+            ERIC::Set_Fade_Percent_(0);
+            palstore::Darken_Palette_(0);
+        }
+
+        RUSS::Mox_Sync_Update_();
+        MOX::_reloaded_ship_palette = 0;
+
+        fields::Enable_Draw_All_Fields_();
+    }
 }

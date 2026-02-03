@@ -1282,4 +1282,35 @@ namespace MAINSCR {
 
         MOX::_main_screen_grid_field = fields::Add_Grid_Field_(22, 22, 1, 1, 506, 400, &MOX::_main_screen_grid_x, &MOX::_main_screen_grid_y, 0);
     }
+
+    void __cdecl Add_Moveable_Box_Fields_() {
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t order_id = MOX::_moveable_box_order[i];
+            MOVEBOX::Clear_Moveable_Box_Fields_(order_id);
+
+            if (order_id == 0) {
+                if (MOVEBOX::Moveable_Box_Selected_(0) != 0) {
+                    Wrapper_For_Normal_System_Fields_();
+                }
+            }
+
+            if (order_id == 2) {
+                if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+                    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+                    if (node_ptr == -1) {
+                        MOVEBOX::Vanish_Fleet_Movement_Box_();
+                    } else {
+                        int32_t flag = (MOX::_moveable_box[2].field6_0xc < 1) ? 1 : 0;
+                        Add_Fleet_Movement_Box_Fields_(node_ptr, flag);
+                    }
+                }
+            }
+        }
+
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+    }
 }

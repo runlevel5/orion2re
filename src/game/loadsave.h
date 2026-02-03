@@ -509,24 +509,19 @@ namespace LOADSAVE {
     inline uint8_t& _loaded_new_game = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572340});
     inline uint8_t& _loaded_debug_save = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572341});
 
-    inline int32_t __cdecl Check_Magic_Number_(const char* filename) {
-        using Fn = int32_t(__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d0d0});
-        return fn(filename);
-    }
+    int32_t __cdecl Check_Magic_Number_(const char* filename);
 
-    inline bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
-        using Fn = bool(__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d070});
-        return fn(filename);
+    bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename);
+
+    inline bool __cdecl Is_Valid_Game_Type_(uint32_t game_type) {
+        using Fn = bool(__cdecl*)(uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043D130 });
+        return fn(game_type);
     }
 
     void __cdecl Check_For_Saved_Games_(int8_t* list);
 
-    inline void __cdecl Get_Game_Popup_Colors_(int type, int* col1, int* col2) {
-        using Fn = void(__cdecl*)(int, int*, int*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050f730})(type, col1, col2);
-    }
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, int32_t* out_colors_primary, int32_t* out_colors_secondary);
 
     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y);
 
@@ -541,15 +536,9 @@ namespace LOADSAVE {
         reinterpret_cast<Fn>(std::uintptr_t{0x0050fee0})();
     }
 
-    inline void __cdecl Save_Session_Related_Settings_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043d1d0})();
-    }
+    void __cdecl Save_Session_Related_Settings_();
 
-    inline void __cdecl Bad_Game_File_Message_(uint16_t error_code, int16_t slot) {
-        using Fn = void(__cdecl*)(uint16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050f4c0})(error_code, slot);
-    }
+    void __cdecl Bad_Game_File_Message_(int16_t type, int16_t file_index);
 
     inline void __cdecl Animate_Game_Popup_(void* picture, int32_t speed) {
         using Fn = void(__cdecl*)(void*, int32_t);

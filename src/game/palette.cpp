@@ -7,9 +7,9 @@ namespace palette {
      * @param start_index The starting index of the palette range (0-255).
      * @param end_index The ending index of the palette range (0-255).
      */
-    void __cdecl Set_Palette_Changes_(int16_t start_index, int16_t end_index) {
-        int32_t start = static_cast<int32_t>(start_index);
-        int32_t end = static_cast<int32_t>(end_index);
+    void __cdecl Set_Palette_Changes_(int32_t start_index, int32_t end_index) {
+        int32_t start = start_index;
+        int32_t end = end_index;
 
         if (start <= end) {
             // Pointer to the first palette status entry to modify
@@ -35,7 +35,7 @@ namespace palette {
      * @param start The starting index of the palette entry range (inclusive).
      * @param end The ending index of the palette entry range (inclusive).
      */
-    void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end) {
+    void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end) {
         if (start <= end) {
             // Calculate how many entries to clear
             int count = (int)end - (int)start + 1;

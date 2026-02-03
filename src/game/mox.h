@@ -212,7 +212,7 @@ namespace MOX {
         uint8_t num;
         uint32_t skill_mask;
         uint8_t unknown1;
-        uint16_t skill_bonus;
+        int16_t skill_bonus;
         uint8_t unknown2;
         uint8_t unknown3;
         void* name;

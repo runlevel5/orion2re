@@ -168,6 +168,12 @@ inline void __cdecl FUN_526F80() {
     fn();
 }
 
+inline void __cdecl FUN_0052b660() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b660 });
+    fn();
+}
+
 inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsigned stack_size, void* arglist) {
     using Fn = uintptr_t(__cdecl*)(void(__cdecl*)(void*), unsigned, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005424C0 });
@@ -248,6 +254,18 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
 inline void __cdecl Get_File_Date_String_(const char* filename, char* date_out) {
     using Fn = void(__cdecl*)(const char*, char*);
     reinterpret_cast<Fn>(std::uintptr_t{0x0050f650})(filename, date_out);
+}
+
+inline void __cdecl Wrapper_For_Normal_System_Fields_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497540 });
+    fn();
+}
+
+inline void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int32_t flag) {
+    using Fn = void(__cdecl*)(int16_t, int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004039A0 });
+    fn(node_ptr, flag);
 }
 
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
@@ -341,6 +359,8 @@ inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); //
 inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
 inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"
 inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
+inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"
+inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*>(std::uintptr_t{0x00556950}); // "Settings file (MOX.SET) is missing..."
 
 // "Orion"
 inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});

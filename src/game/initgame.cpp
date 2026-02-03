@@ -47,11 +47,8 @@ namespace INITGAME {
         for (MOX::_NUM_COLONIES = 0; MOX::_NUM_COLONIES < 250; ++MOX::_NUM_COLONIES) {
             s_colony& colony = MOX::_colony[MOX::_NUM_COLONIES];
 
-            // Set planet index to -1 (unassigned/none)
             colony.planet = -1;
-            // Set owner index to -1 (no owner)
             colony.owner = -1;
-            // Set officer index to -1 (no officer assigned)
             colony.officer = -1;
         }
 
@@ -316,7 +313,7 @@ namespace INITGAME {
 
             if (plr->objectives == 100) {
                 // Predefined or special player setup: copy traits to evolutionary upgrades
-                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &plr->traits, 31);
+                struct_::Copy_Structure_(&plr->traits[31], &plr->traits[0], 31);
             } else {
                 int16_t race_idx;
                 bool unique_race;
@@ -341,8 +338,8 @@ namespace INITGAME {
                 }
 
                 // Copy default traits from template
-                struct_::Copy_Structure_(&plr->traits, &RACESEL::_race_specials[race_idx], 31);
-                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->traits[0], &RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->traits[31], &RACESEL::_race_specials[race_idx], 31);
 
                 MOX::Mox_Update_();
                 RACECUST::Race_Customization_(i);
@@ -353,8 +350,8 @@ namespace INITGAME {
                     if (plr->traits[k] != 0) {
                         plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
                     }
-                    if (plr->evolutionary_upgrade_traits[k] != 0) {
-                        plr->evolutionary_upgrade_traits[k] = MOX::_special_bonus[k][plr->evolutionary_upgrade_traits[k]];
+                    if (plr->traits[31 + k] != 0) {
+                        plr->traits[31 + k] = MOX::_special_bonus[k][plr->traits[31 + k]];
                     }
                 }
                 MOX::Mox_Update_();

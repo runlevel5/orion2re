@@ -137,6 +137,57 @@ namespace INITSHIP {
         return best_warp_index;
     }
 
+    int16_t __cdecl Calc_Player_FTL_Speed_(int16_t player_idx) {
+        int16_t drive_idx = Best_Warp_Drive_(player_idx);
+        return Get_FTL_Speed_(player_idx, drive_idx);
+    }
+
+    int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t drive_idx) {
+        int16_t speed = 0;
+
+        if (player_idx < 8) {
+            speed = TECHDATA::_drives[drive_idx].speed;
+
+            if (MOX::_player[player_idx].traits[32] != 0) { // 32: TRAIT_TRANS_DIMENSIONAL
+                return speed + 2;
+            }
+        } else if (drive_idx > 0) {
+            speed = 1;
+        }
+
+        return speed;
+    }
+
+    void __cdecl Update_Equipment_On_Ships_Being_Built_(int16_t player_idx) {
+        if (MOX::_player[player_idx].eliminated != 0) {
+            return;
+        }
+
+        int16_t best_armor = Best_Armor_(player_idx);
+        int16_t best_ftl = Best_Warp_Drive_(player_idx);
+
+        for (int16_t ship_idx = 0; ship_idx < static_cast<int16_t>(MOX::_NUM_SHIPS); ++ship_idx) {
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (ship->owner == static_cast<int8_t>(player_idx) && (ship->status == 4 || ship->status == 6)) {
+                if (static_cast<int16_t>(ship->d.ftl_type) != best_ftl) {
+                    int16_t old_ftl = static_cast<int16_t>(ship->d.ftl_type);
+                    int8_t ship_size = ship->d.size;
+
+                    int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+
+                    ship->d.ftl_type = static_cast<int8_t>(best_ftl);
+                    ship->d.speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl));
+
+                    int8_t new_bonus = TECHDATA::_drives[best_ftl].combat_speed_modifier[ship_size];
+                    ship->d.combat_speed = (ship->d.combat_speed - old_bonus) + new_bonus;
+                }
+
+                ship->d.armor_type = static_cast<int8_t>(best_armor);
+            }
+        }
+    }
+
     void __cdecl Update_Automatic_Design_Equipment_(int16_t player_idx) {
         int16_t best_armor_type = Best_Armor_(player_idx);
         int16_t best_ftl_type = Best_Warp_Drive_(player_idx);
@@ -164,5 +215,32 @@ namespace INITSHIP {
 
             design->cost = DESIGN::Cost_Of_Design_(player_idx, design->name);
         }
+    }
+
+    int16_t __cdecl Best_Armor_(int16_t player_idx) {
+        if (player_idx > 7) {
+            // Antarans or Space Monsters
+            if (player_idx == 8 || player_idx == 9) {
+                return 6; // Xentronium
+            }
+            if (player_idx >= 10 && player_idx <= 14) {
+                return 0; // No armor?
+            }
+            return 1; // Default: Titanium
+        }
+
+        int16_t best_armor_idx = 1; // Start with Titanium Armor
+
+        // Check for Tritanium (2) through Xentronium (6)
+        for (int16_t i = 2; i < 7; ++i) {
+            int16_t tech_id = TECHDATA::_armor[i].tech_app_id;
+
+            // 3 indicates the tech application is fully researched/available
+            if (MOX::_player[player_idx].tech_applications[tech_id] == 3) {
+                best_armor_idx = i;
+            }
+        }
+
+        return best_armor_idx;
     }
 }

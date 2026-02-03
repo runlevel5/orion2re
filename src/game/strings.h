@@ -9,8 +9,5 @@ namespace strings {
         fn();
     }
 
-    inline void __cdecl String_To_Lower_(char* str) {
-        using Fn = void(__cdecl*)(char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052CDB0})(str);
-    }
+    void __cdecl String_To_Lower_(char* str);
 }

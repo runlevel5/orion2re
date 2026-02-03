@@ -26,6 +26,9 @@ namespace mouse {
     inline int16_t& _mouse_buffer_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DD8 });
 
+    inline uint8_t* _mouse_list_none = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D70 });
+    inline uint8_t* _mouse_list_arrow = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
+
     int16_t __cdecl Mouse_Buffer_();
 
     inline void __cdecl Mouse_Buffer2_() {

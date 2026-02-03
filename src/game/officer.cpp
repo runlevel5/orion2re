@@ -1,6 +1,18 @@
 #include "deps.h"
 
 namespace OFFICER {
+    int16_t __cdecl Get_Officer_Level_(int16_t leader_idx) {
+        int16_t current_xp = MOX::_leaders[leader_idx].xp;
+
+        int16_t level = Get_Officer_Base_Level_(current_xp, 0);
+
+        if (level > 5) {
+            level = 5;
+        }
+
+        return level;
+    }
+
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord) {
         if (xp < 60) {
             return 0;
@@ -20,14 +32,31 @@ namespace OFFICER {
         return (warlord != 0) ? 5 : 4;
     }
 
+    int32_t __cdecl Officer_Skill_Bonus_(uint32_t param_1, int16_t leader_idx, int16_t skill_idx) {
+        int16_t level;
+
+        if (MOX::_leaders[leader_idx].player_index == -1) {
+            level = Get_Officer_Level_(leader_idx);
+        } else {
+            level = Owned_Officer_Level_(static_cast<int32_t>(leader_idx));
+        }
+
+        int32_t current_level_val = static_cast<int32_t>(level) + 1;
+        int32_t skill_div = static_cast<int32_t>(MOX::skill_data[skill_idx].unknown2);
+        int32_t bonus_base = static_cast<int32_t>(MOX::skill_data[skill_idx].skill_bonus);
+
+        int32_t intermediate = (current_level_val + skill_div - 1) / skill_div;
+
+        return (intermediate * bonus_base) / 10;
+    }
+
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
         int8_t warlord_trait = 0;
 
         // leader_idx 0x42 (66) likely refers to a special entity or unassigned leader
         if (leader_idx != 0x42) {
             int8_t player_idx = MOX::_leaders[leader_idx].player_index;
-            // TRAIT_WARLORD is index 20 in the traits array
-            warlord_trait = MOX::_player[player_idx].traits[20];
+            warlord_trait = MOX::_player[player_idx].traits[TRAIT_WARLORD];
         }
 
         int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord_trait);
@@ -185,6 +214,34 @@ namespace OFFICER {
         return 3;
     }
 
+    /**
+     * Increases an officer's experience to the minimum required for the next level.
+     * The experience thresholds are 60, 150, 300, 500, and 1000 for levels 1 through 5.
+     * If the officer is already at the maximum level (5), no change is made.
+     */
+    void __cdecl Increase_Officer_Level_By_One_(int16_t leader_index) {
+        // Experience thresholds for levels 1, 2, 3, 4, 5
+        const int16_t level_thresholds[] = { 60, 150, 300, 500, 1000 };
+
+        s_leader_data& leader = MOX::_leaders[leader_index];
+        int8_t warlord = 0;
+
+        // Check if the officer's owner has the Warlord trait
+        if (leader.player_index != -1) {
+            if (MOX::_player[(uint8_t)leader.player_index].traits[TRAIT_WARLORD] != 0) {
+                warlord = 1;
+            }
+        }
+
+        // Calculate the current level based on XP and Warlord status
+        int16_t current_level = Get_Officer_Base_Level_(leader.xp, warlord);
+
+        // Increase level if not already at max (level 5 / Elite)
+        if (current_level >= 0 && current_level < 5) {
+            leader.xp = level_thresholds[current_level];
+        }
+    }
+
     void __cdecl Deassign_Officer_(int16_t leader_idx) {
         s_leader_data& leader = MOX::_leaders[leader_idx];
         int16_t player_idx = (int16_t)leader.player_index;
@@ -288,10 +345,33 @@ namespace OFFICER {
         }
     }
 
-    int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx) {
-        int16_t base_value = OFFICER::Get_Maintenance_Base_(player_num, leader_idx);
+    int32_t __cdecl Officer_Cost_(int16_t player_idx, int16_t leader_idx) {
+        uint16_t level_data = Get_Officer_Level_(leader_idx);
+        int16_t level_multiplier = (int16_t)((level_data & 0xFF) + 1);
 
-        int16_t maintenance_cost = (int16_t)((base_value + 99) / 100);
+        int16_t base_calc = MOX::_leaders[leader_idx].skill_value * level_multiplier;
+        int16_t bonus = Bonus_For_Famous_Heroes_(player_idx);
+
+        int16_t total_cost = base_calc * 10;
+
+        if (Officer_Has_General_Skill_(player_idx, leader_idx, 28) ||
+            Officer_Has_General_Skill_(player_idx, leader_idx, 29)) {
+            total_cost = base_calc * 20;
+        }
+
+        int32_t final_cost = (int32_t)total_cost - (int32_t)bonus;
+
+        if (final_cost < 1) {
+            return 0;
+        }
+
+        return final_cost;
+    }
+
+    int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx) {
+        int32_t cost = OFFICER::Officer_Cost_(player_num, leader_idx);
+
+        int16_t maintenance_cost = (int16_t)((cost + 99) / 100);
 
         bool has_cost_reduction_skill = OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 28) ||
                                          OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 29);
@@ -304,5 +384,41 @@ namespace OFFICER {
         }
 
         return 0;
+    }
+
+    /**
+     * Calculates the maximum bonus for "Famous" or "Super Famous" skills among the player's active leaders.
+     *
+     * @param player_idx The index of the player whose leaders are being checked.
+     * @return The highest bonus value found, or 0 if no leaders have these skills or meet status criteria.
+     */
+    int16_t __cdecl Bonus_For_Famous_Heroes_(int16_t player_idx) {
+        int16_t max_bonus = 0;
+        int16_t current_skill_bonus = 0;
+
+        for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
+            auto& leader = MOX::_leaders[leader_idx];
+
+            // Check if the leader belongs to the player and is in a valid status (0 or 1)
+            if (leader.player_index == player_idx && (leader.status == 0 || leader.status == 1)) {
+
+                bool has_famous = Officer_Has_General_Skill_(player_idx, leader_idx, 10 /* FAMOUS */);
+                if (has_famous) {
+                    current_skill_bonus = (int16_t)Officer_Skill_Bonus_(player_idx, leader_idx, 10 /* FAMOUS */);
+                } else {
+                    bool has_super_famous = Officer_Has_General_Skill_(player_idx, leader_idx, 11 /* SUPER_FAMOUS */);
+                    if (has_super_famous) {
+                        current_skill_bonus = (int16_t)Officer_Skill_Bonus_(player_idx, leader_idx, 11 /* SUPER_FAMOUS */);
+                    }
+                }
+
+                // Track the maximum bonus found across all valid leaders
+                if (current_skill_bonus > max_bonus) {
+                    max_bonus = current_skill_bonus;
+                }
+            }
+        }
+
+        return max_bonus;
     }
 }

@@ -3,7 +3,13 @@
 namespace OFFICER {
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
+    int16_t __cdecl Get_Officer_Level_(int16_t leader_idx);
+
+    int16_t __cdecl Bonus_For_Famous_Heroes_(int16_t player_idx);
+
     int16_t __cdecl Owned_Officer_Level_(int leader_idx);
+
+    int32_t __cdecl Officer_Skill_Bonus_(uint32_t param_1, int16_t leader_idx, int16_t skill_idx);
 
     int16_t __cdecl Officer_Skill_Value_(int16_t leader_index);
 
@@ -15,11 +21,7 @@ namespace OFFICER {
 
     void __cdecl Get_Random_Skills_(uint32_t* primary_mask, uint32_t* secondary_mask, int16_t skill_class, int16_t count, int8_t randomize_class);
 
-    inline void __cdecl Increase_Officer_Level_By_One_(int16_t leader_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442BB0});
-        fn(leader_idx);
-    }
+    void __cdecl Increase_Officer_Level_By_One_(int16_t leader_idx);
 
     inline void __cdecl Officers_Screen_() {
         using Fn = void(__cdecl*)();
@@ -34,9 +36,5 @@ namespace OFFICER {
 
     int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx);
 
-    inline int16_t __cdecl Get_Maintenance_Base_(int16_t player_num, int16_t leader_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e5a0});
-        return fn(player_num, leader_idx);
-    }
+    int32_t __cdecl Officer_Cost_(int16_t player_idx, int16_t leader_idx);
 }

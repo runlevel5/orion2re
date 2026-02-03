@@ -75,11 +75,7 @@ namespace MAINSCR {
 
     void __cdecl Add_Map_Fields_();
 
-    inline void __cdecl Add_Moveable_Box_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005127b0});
-        fn();
-    }
+    void __cdecl Add_Moveable_Box_Fields_();
 
     void __cdecl Do_System_Popup_(int16_t system_id);
 
