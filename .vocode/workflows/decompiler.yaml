@@ -222,6 +222,7 @@ workflows:
           * Do not output complex data types, such as structures
           * You should NOT emit a new address for a structure if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
+          * If you see a new structure, before adding to local namespace - it check if it already exists in src/game/types.h
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
             always prefer using library function. Our application does not have direct access to library functions - you
             must check `src/game/helpers.h` and implement a function if it is missing.

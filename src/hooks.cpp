@@ -250,6 +250,7 @@ namespace hooks {
         { 0x004c6e50, &MAINSCR::Draw_Stars_ },
         { 0x004c43e0, &MAINSCR::Get_Star_Picture_Seg_ },
         { 0x00524d40, &animate::Get_Current_Frame_ },
+        { 0x00524d60, &animate::Get_Full_Store_Flag_ },
         { 0x00524d90, &animate::Set_Animation_Frame_ },
         { 0x00524d80, &animate::Reset_Animation_Frame_ },
         { 0x004c6eb0, &MAINSCR::Draw_A_Star_ },
@@ -452,6 +453,16 @@ namespace hooks {
         { 0x00481380, &INITSHIP::Best_Armor_ },
         { 0x004822c0, &INITSHIP::Get_FTL_Speed_ },
         { 0x005127b0, &MAINSCR::Add_Moveable_Box_Fields_ },
+        { 0x0051edf0, &fields::Get_Input_ },
+        { 0x00526F20, &mouse::Pointer_X_ },
+        { 0x00526F70, &mouse::Pointer_Y_ },
+        { 0x0051db80, &fields::Add_Button_Field_ },
+        { 0x0051d370, &fields::Add_Hidden_Field_ },
+        { 0x00520220, &fields::Add_Irregular_Button_Field_ },
+        { 0x00520690, &fields::Add_Multi_Hot_Key_Field_ },
+        { 0x0051d7f0, &fields::Add_Grid_Field_ },
+        { 0x0051d9d0, &fields::Add_Button_Info_ },
+        { 0x0051d6c0, &fields::Add_Hot_Key_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -483,6 +494,7 @@ namespace hooks {
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
         ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
         ASSERT(sizeof(MOX::s_skill_data) == 0x12, "MOX::s_skill_data");
+        ASSERT(sizeof(fields::s_field) == 0x37, "s_field");
     }
 
     void Install_Hooks()

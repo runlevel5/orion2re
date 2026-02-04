@@ -45,4 +45,7 @@ namespace mouse {
     uint16_t __cdecl Mouse_Button_();
 
     void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
+
+    int32_t Pointer_X_();
+    int32_t Pointer_Y_();
 }

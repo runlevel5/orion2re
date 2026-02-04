@@ -175,16 +175,16 @@ namespace MOX {
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
 
     inline uint8_t& _zoom_in = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597704});
-    inline void*& _main_zoom_in_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B318});
-    inline void*& _main_zoom_out_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597910});
-    inline void*& _main_game_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC0});
-    inline void*& _main_next_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5EC});
-    inline void*& _main_colonies_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B4B4});
-    inline void*& _main_planets_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597844});
-    inline void*& _main_fleets_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597378});
-    inline void*& _main_leaders_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A2BF0});
-    inline void*& _main_races_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B42C});
-    inline void*& _main_info_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596E74});
+    inline s_animation_header*& _main_zoom_in_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B318});
+    inline s_animation_header*& _main_zoom_out_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597910});
+    inline s_animation_header*& _main_game_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596DC0});
+    inline s_animation_header*& _main_next_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5EC});
+    inline s_animation_header*& _main_colonies_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4B4});
+    inline s_animation_header*& _main_planets_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597844});
+    inline s_animation_header*& _main_fleets_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597378});
+    inline s_animation_header*& _main_leaders_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A2BF0});
+    inline s_animation_header*& _main_races_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B42C});
+    inline s_animation_header*& _main_info_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596E74});
     inline int16_t& _star_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2C50});
     inline int16_t& _main_screen_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977F2});
     inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});

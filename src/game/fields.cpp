@@ -49,6 +49,31 @@ namespace fields {
         }
     }
 
+    int16_t __cdecl Get_Input_() {
+        if (_input_delay > 0) {
+            _input_delay--;
+            return 0;
+        }
+
+        if (_input_delay < 0) {
+            _input_delay = 0;
+        }
+
+        if (_fields_count < 2) {
+            return 0;
+        }
+
+        int16_t input_result = Interpret_Mouse_Input_();
+        video::Set_Page_Off_();
+
+        if (input_result != 0) {
+            int16_t field_idx = (input_result < 0) ? -input_result : input_result;
+            sound::Play_Sound_(_fields[field_idx].sound);
+        }
+
+        return input_result;
+    }
+
     void __cdecl Clear_Fields_() {
         _fields_count = 1;
         _input_delay = 0;
@@ -60,5 +85,238 @@ namespace fields {
 
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
+    }
+
+    int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
+        if (_fields_count >= _max_fields_count) {
+            char error_msg[80];
+            const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+            uint32_t* dst = reinterpret_cast<uint32_t*>(error_msg);
+
+            for (int i = 0; i < 11; ++i) {
+                dst[i] = src[i];
+            }
+            for (int i = 11; i < 20; ++i) {
+                dst[i] = 0;
+            }
+
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        s_field& field = _fields[_fields_count];
+
+        field.x = 5000;
+        field.y = 5000;
+        field.x_end = 5000;
+        field.y_end = 5000;
+        field.field_type = 7;
+
+        char hk = *hotkey_str;
+        if (hk > 0x60 && hk < 0x7B) {
+            hk -= 0x20;
+        }
+        field.hotkey = hk;
+
+        int16_t result_index = _fields_count;
+        _fields_count++;
+        return result_index;
+    }
+
+    void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
+        s_field* field = &_fields[_fields_count];
+
+        field->x = x;
+        field->y = y;
+        field->help = help;
+
+        field->x_end = x + animate::Get_Width_(pic) - 1;
+        field->y_end = y + animate::Get_Height_(pic) - 1;
+
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = fonts::Get_Current_Font_Color_();
+
+        field->sound = (int16_t)(int8_t)sound;
+        field->pic = pic;
+        field->full_store_flag = animate::Get_Full_Store_Flag_(pic);
+
+        char key = *hotkey;
+        if (key > '`' && key < '{') {
+            key -= 0x20;
+        }
+        field->hotkey = key;
+    }
+
+    int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
+        char error_msg[80];
+
+        const uint32_t* src = reinterpret_cast<const uint32_t*>("You exceeded the max number of fields (150)");
+        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
+        for (int i = 0; i < 11; ++i) {
+            dest[i] = src[i];
+        }
+        for (int i = 11; i < 20; ++i) {
+            dest[i] = 0;
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        s_field* field = &_fields[_fields_count];
+
+        field->x = x;
+        field->y = y;
+        field->x_end = x_end;
+        field->y_end = y_end;
+        field->field_type = 7;
+        field->sound = sound;
+        field->hotkey = *hotkey;
+
+        if (field->hotkey > '`' && field->hotkey < '{') {
+            field->hotkey -= 0x20;
+        }
+
+        int16_t added_index = _fields_count;
+        _fields_count++;
+
+        return added_index;
+    }
+
+    int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
+        char error_msg[80];
+
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
+        for (int i = 0; i < 11; ++i) {
+            dest[i] = src[i];
+        }
+        for (int i = 11; i < 20; ++i) {
+            dest[i] = 0;
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+
+        _fields[_fields_count].field_type = 0;
+
+        int16_t current_id = _fields_count;
+        _fields_count++;
+
+        return current_id;
+    }
+
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t param_7, int16_t param_8, const char* hotkey_ptr, short sound) {
+        char error_msg[80];
+
+        if (_fields_count > _max_fields_count) {
+            _sprintf(error_msg, s_Maximum_number_of_button_fields_e_0055b0b0, _max_fields_count);
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        s_field& field = _fields[_fields_count];
+
+        field.x = x;
+        field.y = y;
+        field.help = help;
+        field.x_end = x_end;
+        field.y_end = y_end;
+        field.font_style = fonts::Get_Current_Font_Style_();
+        field.font_color = fonts::Get_Current_Font_Color_();
+        field.sound = sound;
+        field.pic = pic;
+        field.full_store_flag = animate::Get_Full_Store_Flag_(field.pic);
+
+        field.hotkey = *hotkey_ptr;
+        if (field.hotkey > 0x60 && field.hotkey < 0x7B) {
+            field.hotkey -= 0x20;
+        }
+
+        field.step_x = param_7;
+        field.step_y = param_8;
+        field.field_type = 0x0D;
+
+        int16_t added_index = _fields_count;
+        _fields_count++;
+
+        return added_index;
+    }
+
+    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, int16_t* param_7, int16_t* param_8, int16_t sound) {
+        char error_msg[80];
+
+        // Manual copy of error string and zeroing of remaining buffer space
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+        uint32_t* dst = reinterpret_cast<uint32_t*>(error_msg);
+        for (int i = 0; i < 11; ++i) {
+            dst[i] = src[i];
+        }
+        for (int i = 11; i < 20; ++i) {
+            dst[i] = 0;
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        s_field& field = _fields[_fields_count];
+
+        field.x = x;
+        field.y = y;
+        field.x_end = cols * step_x + x - 1;
+        field.y_end = rows * step_y + y - 1;
+        field.sound = static_cast<int16_t>(sound);
+        field.field_type = 12; // 0xC
+        field.step_x = step_x;
+        field.step_y = step_y;
+        field.hotkey = '\0';
+        // TODO: Union type?
+        *reinterpret_cast<int16_t**>(&field.full_store_flag) = param_7;
+        *reinterpret_cast<int16_t**>(&field.field21_0x28) = param_8;
+
+        // Convert hotkey to uppercase if it's a lowercase letter
+        if (field.hotkey > '`' && field.hotkey < '{') {
+            field.hotkey -= 0x20;
+        }
+
+        int16_t current_idx = _fields_count;
+        _fields_count++;
+        return current_idx;
+    }
+
+    int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text) {
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
+        }
+
+        // Access the next available field slot
+        s_field* field = &_fields[_fields_count];
+
+        field->x = -1;
+        field->y = -1;
+        field->x_end = -1;
+        field->y_end = -1;
+        field->hotkey = '\0';
+        field->field_type = 8;
+        field->help = help_text;
+        field->step_x = 0;
+
+        // Calculate string length of help_text and store in step_y
+        uint32_t len = 0;
+        if (help_text != nullptr) {
+            while (help_text[len] != '\0') {
+                len++;
+            }
+        }
+        field->step_y = static_cast<int16_t>(len);
+
+        _multi_hotkey_active_field = 1;
+
+        int16_t current_index = _fields_count;
+        _fields_count++;
+
+        return current_index;
     }
 }

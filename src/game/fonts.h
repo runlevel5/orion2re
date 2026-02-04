@@ -104,6 +104,16 @@ struct s_font {
         fn();
     }
 
+    inline int16_t __cdecl Get_Current_Font_Style_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00526040})();
+    }
+
+    inline uint8_t* __cdecl Get_Current_Font_Color_() {
+        using Fn = uint8_t*(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00526050})();
+    }
+
     inline int16_t __cdecl Get_Font_Height_() {
         using Fn = int16_t(__cdecl*)();
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526060 })();
