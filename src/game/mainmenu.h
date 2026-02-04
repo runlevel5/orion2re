@@ -3,7 +3,7 @@
 
 namespace MAINMENU {
 #pragma pack(push, 1)
-    struct s_field_button {
+    struct s_main_menu_button {
         s_animation_header* field0_0x0;
         s_animation_header* field1_0x4;
         s_animation_header* field2_0x8;
@@ -11,7 +11,7 @@ namespace MAINMENU {
     };
 
     struct s_main_menu {
-        s_field_button fields[6];
+        s_main_menu_button fields[6];
         uint8_t field13_0x54[126];
     };
 #pragma pack(pop)

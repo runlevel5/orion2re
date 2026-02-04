@@ -15,11 +15,11 @@ namespace fields {
     inline const char* s_You_exceeded_the_max_number_of_fields = reinterpret_cast<const char*>(std::uintptr_t{0x0055B080});
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
 
-    enum FIELD_TYPE : int16_t {
+    typedef enum FIELD_TYPE : int16_t {
         FIELD_TYPE_BUTTON = 0,
-        FIELD_TYPE_1 = 1,
-        FIELD_TYPE_2 = 2,
-        FIELD_TYPE_3 = 3,
+        FIELD_TYPE_RADIO = 1,
+        FIELD_TYPE_LOCKED = 2,
+        FIELD_TYPE_MULTI_BUTTON = 3,
         FIELD_TYPE_4 = 4,
         FIELD_TYPE_5 = 5,
         FIELD_TYPE_SCROLL = 6,
@@ -30,38 +30,115 @@ namespace fields {
         FIELD_TYPE_CONTINUOUS_INPUT = 11,
         FIELD_TYPE_GRID = 12,
         FIELD_TYPE_IRREGULAR_INPUT = 13
-    };
+    } FIELD_TYPE;
 
 #pragma pack(push, 1)
-    struct s_field {
-        int16_t x;
-        int16_t y;
-        int16_t x_end;
-        int16_t y_end;
-        FIELD_TYPE field_type;
-        int16_t font_style;
-        uint8_t* font_color;
-        uint8_t field7_0x10;
-        uint8_t field8_0x11;
-        int16_t field9_0x12;
-        uint8_t* highlight_color;
+    struct s_field_grid {
+        undefined field0_0x0;
+        undefined field1_0x1;
+        short field2_0x2;
+        byte* highlight_color;
         const char* help;
-        int16_t step_x;
-        uint8_t field13_0x1e;
-        uint8_t field14_0x1f;
-        int16_t step_y;
-        uint8_t field16_0x22;
-        uint8_t field17_0x23;
-        int16_t full_store_flag;
-        uint8_t field19_0x26;
-        uint8_t field20_0x27;
-        int32_t field21_0x28;
-        s_animation_header* pic;
-        int16_t field23_0x30;
-        uint8_t field24_0x32;
-        uint8_t field25_0x33;
+        short step_x;
+        undefined field6_0xe;
+        undefined field7_0xf;
+        short step_y;
+        undefined field9_0x12;
+        undefined field10_0x13;
+        short* grid_x_ptr;
+        short* grid_y_ptr;
+        struct s_animation_header* pic;
+        short field14_0x20;
+        undefined field15_0x22;
+        undefined field16_0x23;
+    };
+
+    struct s_field_scroll {
+        undefined field0_0x0;
+        undefined field1_0x1;
+        short field2_0x2;
+        byte* highlight_color;
+        short field4_0x8;
+        undefined field5_0xa;
+        undefined field6_0xb;
+        short field7_0xc;
+        undefined field8_0xe;
+        undefined field9_0xf;
+        int field10_0x10;
+        short field11_0x14;
+        undefined field12_0x16;
+        undefined field13_0x17;
+        short field14_0x18;
+        undefined field15_0x1a;
+        undefined field16_0x1b;
+        short field17_0x1c;
+        undefined field18_0x1e;
+        undefined field19_0x1f;
+        short field20_0x20;
+        undefined field21_0x22;
+        undefined field22_0x23;
+    };
+
+    struct s_field_button {
+        undefined field0_0x0;
+        undefined field1_0x1;
+        short field2_0x2;
+        byte* highlight_color;
+        const char* help;
+        short help_start;
+        undefined field6_0xe;
+        undefined field7_0xf;
+        short help_end;
+        undefined field9_0x12;
+        undefined field10_0x13;
+        short full_store_flag;
+        undefined field12_0x16;
+        undefined field13_0x17;
+        int field14_0x18;
+        struct s_animation_header* pic;
+        short field16_0x20;
+        undefined field17_0x22;
+        undefined field18_0x23;
+    };
+
+    struct s_field_radio {
+        undefined field0_0x0;
+        undefined field1_0x1;
+        short field2_0x2;
+        byte* highlight_color;
+        const char* help;
+        short help_start;
+        undefined field6_0xe;
+        undefined field7_0xf;
+        char* selection;
+        short field9_0x14;
+        undefined field10_0x16;
+        undefined field11_0x17;
+        int field12_0x18;
+        struct s_animation_header* pic;
+        short field14_0x20;
+        undefined field15_0x22;
+        undefined field16_0x23;
+    };
+
+    union s_field_detail {
+        struct s_field_button button;
+        struct s_field_grid grid;
+        struct s_field_radio radio;
+        struct s_field_scroll scroll;
+    };
+
+    struct s_field {
+        short x;
+        short y;
+        short x_end;
+        short y_end;
+        enum FIELD_TYPE field_type;
+        short font_style;
+        byte* font_color;
+        union s_field_detail detail;
         char hotkey;
-        int16_t sound;
+        short sound;
     };
 #pragma pack(pop)
 
@@ -99,13 +176,13 @@ namespace fields {
 
     int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t param_7, int16_t param_8, const char* hotkey_ptr, int16_t sound);
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t help_start, int16_t help_end, const char* hotkey_ptr, int16_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
 
     int16_t __cdecl Auto_Input_();
 
-    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, int16_t* param_7, int16_t* param_8, int16_t sound);
+    int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
 
     inline int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int v1, int v2, int v3, int v4, int v5, int v6, int16_t* out, const char* label, char type) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, int, int, int, int, int, int, int16_t*, const char*, char);
