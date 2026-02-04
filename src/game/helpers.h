@@ -35,6 +35,16 @@ namespace helpers {
         while ((*dest++ = *src++));
     }
 
+    inline int strcmp(const char* s1, const char* s2)
+    {
+        while (*s1 && (*s1 == *s2)) {
+            ++s1;
+            ++s2;
+        }
+
+        return static_cast<unsigned char>(*s1) - static_cast<unsigned char>(*s2);
+    }
+
     inline void* memcpy(void* dst, const void* src, size_t size)
     {
         auto* d = static_cast<std::uint8_t*>(dst);

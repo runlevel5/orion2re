@@ -83,4 +83,9 @@ namespace allocate {
         using Fn = void* (__cdecl*)(void*, uint32_t);
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E930 })(seg, size);
     }
+
+    inline void __cdecl Allocate_First_Screen_Seg_() {
+        using Fn = void(__cdecl*)(int32_t);
+        reinterpret_cast<Fn>(0x004c4980)(5);
+    }
 }

@@ -3,6 +3,26 @@
 
 namespace LOADSAVE {
     /**
+     * @address 00511020
+     */
+    void __cdecl Allocate_Data_Space_For_Game_Popup_() {
+        // Allocate space for game animations and clear the block
+        _game_anims = (s_game_anims*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x65);
+
+        uint8_t* anim_ptr = reinterpret_cast<uint8_t*>(_game_anims);
+        for (int i = 0; i < 0x65; ++i) {
+            anim_ptr[i] = 0;
+        }
+
+        // Allocate buffers for game dates and stardates (1000 bytes each)
+        MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 1000);
+        MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 1000);
+
+        // Allocate space for the popup fields structure (0x278 = 632 bytes)
+        _game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
+    }
+
+    /**
      * @address 0050fa10
      */
     void __cdecl Load_Month_Names_() {
@@ -189,7 +209,7 @@ namespace LOADSAVE {
                 s_animation_header* pic = _game_anims->pictures[9];
                 _game_popup_fields->field17_0x52[i] = fields::Add_Hidden_Field_(bx, by, animate::Get_Width_(pic) + bx, animate::Get_Height_(pic) + by, s__00551100, '(');
 
-                _game_popup_fields->field445_0x244[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
+                _game_popup_fields->field431_0x244[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
                 offset_y += 0x11;
             }
             _game_popup_fields->field_A = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], s_A_00557ed4, '(');
@@ -217,7 +237,7 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(main_pic);
 
             Check_For_Saved_Games_(_game_popup_fields->saved_games);
-            int32_t colors_style[2], colors_special[2];
+            byte colors_style[8], colors_special[8];
             Get_Game_Popup_Colors_(2, colors_style, colors_special);
             fonts::Set_Font_Special_Colors_(reinterpret_cast<uint8_t*>(colors_special));
 
@@ -330,7 +350,7 @@ namespace LOADSAVE {
                         fields::Clear_Fields_();
                         _game_anims->field1_0x64 = 1;
                         video::Set_Page_Off_();
-                        Animate_Game_Popup_(_game_anims->pictures[11], 1);
+                        Animate_Game_Popup_Pic_Height_(_game_anims->pictures[11], 1);
                     }
 
                     loaded_success = (int8_t)FILEDEF::Load_Game_(clicked_slot);
@@ -341,10 +361,10 @@ namespace LOADSAVE {
                         const char* load_err_msg = HAROLD::H_Message_(0xB8);
                         _sprintf(msg_buffer, load_err_msg, (int32_t)clicked_slot);
                         Game_Popup_User_Box_(msg_buffer, 3);
-                        MOX::_return_screen = (uint16_t)MOX::_previous_screen;
+                        MOX::_return_screen = MOX::_previous_screen;
                     } else {
                         _loaded_new_game = 1;
-                        MOX::_return_screen = (MOX::_game_type == 1) ? 0x11 : 0x27;
+                        MOX::_return_screen = (MOX::_game_type == 1) ? MOX::SCREEN_HOTSEAT_SELECT_PLAYER : MOX::SCREEN_REPORTS;
                     }
 
                     if (not_main_menu && MOX::_stardate_at_beg_of_turn != 0) {
@@ -439,7 +459,7 @@ namespace LOADSAVE {
             char local_str_buf[25];
             helpers::memset(local_str_buf, 0, 25);
 
-            int32_t star_date_value = fields->values[i];
+            int32_t star_date_value = fields->field0_0x0[i];
 
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
@@ -527,6 +547,45 @@ namespace LOADSAVE {
     }
 
     /**
+     * @address 0050fe70
+     */
+    void __cdecl _Draw_Main_Game_Popup_To_Bitmap_(s_animation_header* bitmap_ptr) {
+        int16_t saved_x = MOX::_popup_base_x;
+        int16_t saved_y = MOX::_popup_base_y;
+
+        _bitmap = bitmap_ptr;
+        _print_data_to_bitmap = 1;
+        MOX::_popup_base_x = 0;
+        MOX::_popup_base_y = 0;
+
+        _Draw_Main_Game_Popup_();
+
+        _print_data_to_bitmap = 0;
+        MOX::_popup_base_x = saved_x;
+        MOX::_popup_base_y = saved_y;
+    }
+
+    /**
+     * @address 0050fe50
+     */
+    void __cdecl _Draw_Load_Save_Game_Popup_To_Bitmap_(s_animation_header* bitmap) {
+        _print_data_to_bitmap = 1;
+        _bitmap = bitmap;
+        _Draw_Load_Save_Game_Popup_();
+        _print_data_to_bitmap = 0;
+    }
+
+    /**
+     * @address 0050fec0
+     */
+    void __cdecl _Draw_Options_Game_Popup_To_Bitmap_(s_animation_header* bitmap) {
+        _print_data_to_bitmap = 1;
+        _bitmap = bitmap;
+        _Draw_Options_Game_Popup_();
+        _print_data_to_bitmap = 0;
+    }
+
+    /**
      * @address 0043d070
      */
     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
@@ -547,10 +606,115 @@ namespace LOADSAVE {
         return is_valid;
     }
 
+    void __cdecl _Draw_Load_Save_Game_Popup_() {
+        void* popup_frame;
+        if (MOX::_screen_data == 2) {
+            popup_frame = _game_anims->pictures[0xB];
+        } else {
+            popup_frame = _game_anims->pictures[0xE];
+        }
+
+        if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+            animate::Draw_(0, 0, (s_animation_header*)MAINMENU::_mainmenu_first_seg);
+            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, (s_animation_header*)popup_frame);
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        } else if (_print_data_to_bitmap == 0) {
+            if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                Restore_Main_Screen_();
+                MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+            }
+            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, (s_animation_header*)popup_frame);
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            char stardate_buf[25];
+            char date_buf[25];
+
+            _memcpy(stardate_buf, MOX::_save_game_stardates + (i * 25), 25);
+
+            bool is_valid_slot = (_game_popup_fields->saved_games[i] != 2);
+            int16_t x_icon, y_icon;
+            if (_print_data_to_bitmap == 0) {
+                x_icon = MOX::_popup_base_x + 0xE4;
+                y_icon = MOX::_popup_base_y + 0x24 + (i * 31);
+            } else {
+                x_icon = 0xE4;
+                y_icon = (i * 31) + 0x24;
+            }
+
+            void* game_type_icon = nullptr;
+            switch (_game_popup_fields->saved_game_types[i]) {
+            case 0: game_type_icon = _game_anims->pictures[0x10]; break;
+            case 1: game_type_icon = _game_anims->pictures[0x11]; break;
+            case 2:
+            case 3: game_type_icon = _game_anims->pictures[0x12]; break;
+            }
+
+            if (game_type_icon) {
+                if (_print_data_to_bitmap == 0) {
+                    animate::Draw_(x_icon, y_icon, (s_animation_header*)game_type_icon);
+                } else {
+                    bitmap::Add_Picture_To_Bitmap_(x_icon, y_icon, (s_animation_header*)game_type_icon, _bitmap);
+                }
+            }
+
+            int16_t text_x, text_y;
+            if (_print_data_to_bitmap == 0) {
+                text_x = MOX::_popup_base_x + 0x20;
+                text_y = MOX::_popup_base_y + 0x18 + (i * 31);
+                if (MOX::_screen_data == 2) {
+                    Get_Game_Popup_Colors_(2, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
+                    void* color = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
+                    fonts::Set_Font_Style_(2, (MISC::s_colors*)color);
+                    const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
+                    fonts::Print_(text_x, text_y, desc);
+                }
+            } else {
+                text_x = 0x20;
+                text_y = (i * 31) + 0x18;
+                Get_Game_Popup_Colors_(2, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
+                void* color = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
+                fonts::Set_Font_Style_(2, (MISC::s_colors*)color);
+
+                int16_t print_x = (MOX::_screen_data == 3) ? 0x24 : 0x20;
+                if (is_valid_slot) {
+                    if (MOX::_save_game_description[i].description[0] != '\0') {
+                        fonts::Print_To_Bitmap_(print_x, text_y, MOX::_save_game_description[i].description, _bitmap);
+                    }
+                } else {
+                    fonts::Print_To_Bitmap_(print_x, text_y, s_INVALID_STR, _bitmap);
+                }
+            }
+
+            // Print stardate and real-world date
+            Get_Game_Popup_Colors_(1, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
+            void* color_1 = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
+            fonts::Set_Font_Style_(1, (MISC::s_colors*)color_1);
+
+            if (MOX::_screen_data == 3) text_x += 2;
+
+            if (_print_data_to_bitmap == 0) {
+                if (helpers::strcmp(_empty_save_slot_message, MOX::_save_game_description[i].description) != 0) {
+                    fonts::Print_(text_x, text_y + 14, stardate_buf);
+                }
+            } else {
+                fonts::Print_To_Bitmap_(text_x, text_y + 14, stardate_buf, _bitmap);
+            }
+
+            _memcpy(date_buf, MOX::_save_game_dates + (i * 25), 25);
+
+            if (_print_data_to_bitmap == 0) {
+                fonts::Print_(text_x + 100, text_y + 14, date_buf);
+            } else {
+                fonts::Print_To_Bitmap_(text_x + 100, text_y + 14, date_buf, _bitmap);
+            }
+        }
+    }
+
     /**
      * @address 0050f730
      */
-    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, int32_t* out_colors_primary, int32_t* out_colors_secondary) {
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, byte* out_colors_primary, byte* out_colors_secondary) {
         int32_t* colors;
 
         if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
@@ -600,6 +764,97 @@ namespace LOADSAVE {
     }
 
     /**
+     * @address 0043d130
+     */
+    bool __cdecl Is_Valid_Game_Type_(uint32_t game_type) {
+        return game_type == 0xe0;
+    }
+
+    /**
+     * @address 0050fc70
+     */
+    void __cdecl Animate_Game_Popup_Pic_Height_(s_animation_header* animation, uint16_t type) {
+        int16_t height = animate::Get_Height_(animation);
+        LOADSAVE::Animate_Game_Popup_(animation, height, -1, type);
+    }
+
+    /**
+     * @address 0050fca0
+     */
+    void __cdecl Animate_Game_Popup_(s_animation_header* header, int16_t y_offset, int16_t direction, uint16_t type) {
+        uint16_t w = animate::Get_Width_(header);
+        uint16_t h = animate::Get_Height_(header);
+
+        allocate::Push_Block_(MOX::_screen_seg);
+        int32_t bitmap_size = bitmap::Get_Bitmap_Size_(w, h);
+        s_animation_header* temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size + 100);
+
+        bitmap::Create_Blank_Bitmap_(w, h, temp_bitmap);
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, header);
+
+        switch (type) {
+            case 0:
+                LOADSAVE::_Draw_Main_Game_Popup_To_Bitmap_(temp_bitmap);
+                break;
+            case 1:
+            case 2:
+                LOADSAVE::_Draw_Load_Save_Game_Popup_To_Bitmap_(temp_bitmap);
+                break;
+            case 3:
+                LOADSAVE::_Draw_Options_Game_Popup_To_Bitmap_(temp_bitmap);
+                break;
+            default:
+                break;
+        }
+
+        MAINSCR::Draw_Main_Main_Screen_();
+        video::Copy_Off_To_Back_();
+        video::Set_Refresh_Stencil_();
+
+        int16_t frame_index = 1;
+        bool finished = false;
+
+        do {
+            // Calculate the step progress based on percentage (frame_index / 100)
+            y_offset += (int16_t)((frame_index * (int32_t)h) / 100) * direction;
+
+            // Clamp to height if sliding in
+            if (direction > 0 && y_offset > h) {
+                y_offset = h;
+            }
+
+            int16_t window_bottom = y_offset + 0x1A; // 26 pixels offset
+            video::Set_Page_Off_();
+            graphics::Set_Window_(0x90, 0x19, w + 0x90, window_bottom);
+            video::Clip_On_();
+
+            int16_t draw_y;
+            if (frame_index == 14 && direction > 0) {
+                draw_y = 0x19; // Draw at fixed top (25)
+            } else {
+                draw_y = (y_offset - h) + 0x15; // Vertical slide calculation
+            }
+
+            animate::Draw_(0x90, draw_y, (s_animation_header*)temp_bitmap);
+            video::Clip_Off_();
+
+            if (direction < 1) {
+                // Sliding out condition: window has moved up past boundary
+                finished = (window_bottom - 0x19) <= 0x19;
+            } else {
+                // Sliding in condition: full height reached
+                finished = (window_bottom - 0x19) > h;
+            }
+
+            RUSS::Mox_Sync_Update_();
+            frame_index++;
+        } while (!finished);
+
+        video::Copy_Off_To_Back_();
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    /**
      * @address 0043d1d0
      */
     void __cdecl Save_Session_Related_Settings_() {
@@ -632,6 +887,218 @@ namespace LOADSAVE {
 
         if (!success) {
             exitm::Exit_With_Message(s_Settings_file_error_00556950);
+        }
+    }
+
+    /**
+     * @address 00512490
+     */
+    void __cdecl Draw_Popup_Pic1_() {
+        animate::Draw_(
+            (int16_t)MOX::_popup_base_x + 147,
+            (int16_t)MOX::_popup_base_y + 43,
+            _game_anims->pictures[23]
+        );
+    }
+
+    /**
+     * @address 005124C0
+     */
+    void __cdecl Draw_Popup_Pic2_() {
+        animate::Draw_(
+            (int16_t)MOX::_popup_base_x + 40,
+            (int16_t)MOX::_popup_base_y + 88,
+            _game_anims->pictures[24]
+        );
+    }
+
+    /**
+     * @address 00510420
+     */
+    void __cdecl _Draw_Main_Game_Popup_() {
+        int16_t input_result = fields::Auto_Input_();
+
+        int16_t x1 = MOX::_popup_base_x + 62;      // 0x3e
+        int16_t y1 = MOX::_popup_base_y + 194;     // 0xc2
+        int16_t y1_end = MOX::_popup_base_y + 207; // 0xcf
+        int16_t x1_end = _game_popup_fields->field22_0x74 + x1;
+
+        int16_t x2 = x1;
+        int16_t y2 = MOX::_popup_base_y + 216;     // 0xd8
+        int16_t y2_end = MOX::_popup_base_y + 229; // 0xe5
+        int16_t x2_end = _game_popup_fields->field23_0x76 + x1;
+
+        // Junk/Optimization artifact loop detected in assembly
+        volatile char stack_buf[8];
+        for (int i = 1; i < 8; ++i) {
+            stack_buf[i] = static_cast<char>(i / 2) - 103;
+        }
+
+        if (_print_data_to_bitmap == 0) {
+            MAINSCR::Draw_Mini_Main_Screen_();
+            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, _game_anims->pictures[0]);
+
+            if (_dont_draw_darkened_buttons == 0) {
+                Draw_Popup_Pic1_();
+                Draw_Popup_Pic2_();
+                _dont_draw_darkened_buttons = 0;
+            }
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+
+        if (MOX::_game_type != 0) {
+            if (_print_data_to_bitmap != 0) {
+                // Draw picture 0x17 (23)
+                s_animation_header* pic23 = _game_anims->pictures[23];
+                int16_t h23 = animate::Get_Height_(pic23);
+                int16_t w23 = animate::Get_Width_(pic23);
+                bitmap::Create_Blank_Bitmap_(w23, h23, MAINSCR::_temp_bitmap);
+                bitmap::Add_Picture_To_Bitmap_(0, 0, pic23, (s_animation_header*)MAINSCR::_temp_bitmap);
+                bitmap::Add_Picture_To_Bitmap_(147, 43, (s_animation_header*)MAINSCR::_temp_bitmap, _bitmap); // 0x93, 0x2b
+
+                // Draw picture 0x18 (24)
+                s_animation_header* pic24 = _game_anims->pictures[24];
+                int16_t h24 = animate::Get_Height_(pic24);
+                int16_t w24 = animate::Get_Width_(pic24);
+                bitmap::Create_Blank_Bitmap_(w24, h24, MAINSCR::_temp_bitmap);
+                bitmap::Add_Picture_To_Bitmap_(0, 0, pic24, (s_animation_header*)MAINSCR::_temp_bitmap);
+                bitmap::Add_Picture_To_Bitmap_(40, 88, (s_animation_header*)MAINSCR::_temp_bitmap, _bitmap); // 0x28, 0x58
+            }
+        }
+
+        // Draw picture 7 in Window 1
+        if (_print_data_to_bitmap != 0) {
+            bitmap::Create_Blank_Bitmap_(x1_end - x1 + 1, y1_end - y1 + 1, MAINSCR::_temp_bitmap);
+            bitmap::Add_Picture_To_Bitmap_(0, 0, _game_anims->pictures[7], (s_animation_header*)MAINSCR::_temp_bitmap);
+            bitmap::Add_Picture_To_Bitmap_(x1, y1, (s_animation_header*)MAINSCR::_temp_bitmap, _bitmap);
+        } else {
+            graphics::Set_Window_(x1, y1, x1_end, y1_end);
+            video::Clip_On_();
+            animate::Draw_(x1, y1, _game_anims->pictures[7]);
+            graphics::Reset_Window_();
+            video::Clip_Off_();
+        }
+
+        // Draw picture 7 in Window 2
+        if (_print_data_to_bitmap != 0) {
+            bitmap::Create_Blank_Bitmap_(x2_end - x1 + 1, y2_end - y2 + 1, MAINSCR::_temp_bitmap);
+            bitmap::Add_Picture_To_Bitmap_(0, 0, _game_anims->pictures[7], (s_animation_header*)MAINSCR::_temp_bitmap);
+            bitmap::Add_Picture_To_Bitmap_(x1, y2, (s_animation_header*)MAINSCR::_temp_bitmap, _bitmap);
+        } else {
+            graphics::Set_Window_(x1, y2, x2_end, y2_end);
+            video::Clip_On_();
+            animate::Draw_(x1, y2, _game_anims->pictures[7]);
+            graphics::Reset_Window_();
+            video::Clip_Off_();
+        }
+
+        if (_music_level_field == input_result) {
+            Set_Music_For_Game_Popup_();
+            return;
+        }
+
+        if (_sfx_level_field == input_result) {
+            Set_Sound_For_Game_Popup_(0);
+        }
+    }
+
+    /**
+     * @address 00510db0
+     */
+    void __cdecl _Game_Popup_() {
+        int16_t exit_condition = 0;
+        bool first_loop_drawn = true;
+        int16_t dummy_p1;
+        int16_t dummy_p2;
+        s_settings settings_copy;
+
+        MOX::_first_time_drawn = 1;
+        _loaded_new_game = 0;
+        fields::Clear_Fields_();
+        MOX::_global_var = 0;
+
+        _memcpy(&settings_copy, &MOX::_settings, sizeof(s_settings));
+
+        if (MOX::_screen_data < 0 || MOX::_screen_data > 3) {
+            MOX::_screen_data = 0;
+        }
+
+        Allocate_Data_Space_For_Game_Popup_();
+        Restore_Main_Screen_();
+        Load_Game_Popup_Pictures_();
+        allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+
+        for (int i = 0; i < 158; ++i) {
+            ((int32_t*)_game_popup_fields)[i] = -1;
+        }
+
+        Set_Current_Game_Option_Flags_();
+
+        do {
+            fields::Deactivate_Auto_Function_();
+            _draw_game_popup_to_back = 1;
+
+            if (first_loop_drawn) {
+                if (MOX::_settings.animations_on == 0) {
+                    first_loop_drawn = false;
+                    Restore_Main_Screen_();
+                } else {
+                    first_loop_drawn = false;
+                    video::Set_Page_Off_();
+                    Animate_Game_Popup_Pic_(LOADSAVE::_game_anims->pictures[0]);
+                }
+            } else {
+                Restore_Main_Screen_();
+            }
+
+            if (MOX::_screen_data == 2 || MOX::_screen_data == 3) {
+                sound::Sound_Update_();
+                Set_Up_Load_Save_Popup_();
+                MOX::_return_screen = static_cast<MOX::SCREEN>(static_cast<int8_t>(MOX::_previous_screen));
+            }
+
+            fields::Clear_Fields_();
+            Add_Game_Popup_Fields_(&dummy_p1, &dummy_p2);
+
+            switch (MOX::_screen_data) {
+                case 0: Do_Main_Game_Popup_(&exit_condition); break;
+                case 1: Do_Options_Game_Popup_(&exit_condition); break;
+                case 2: Do_Load_Game_Popup_(&exit_condition); break;
+                case 3: Do_Save_Game_Popup_(&exit_condition); break;
+            }
+        } while (exit_condition == 0);
+
+        if (_loaded_debug_save == 0) {
+            Update_Game_Settings_();
+            Save_Session_Related_Settings_();
+        }
+
+        MOX::_current_screen = MOX::_return_screen;
+        fields::Deactivate_Auto_Function_();
+        fields::Clear_Fields_();
+
+        if (MOX::_settings.animations_on != 0 && _game_anims->field1_0x64 == 0 && _loaded_debug_save == 0) {
+            _dont_draw_darkened_buttons = 1;
+            video::Set_Page_Off_();
+            _Draw_Main_Game_Popup_();
+            RUSS::Mox_Sync_Update_();
+            timer::Mark_Time_();
+            timer::Release_Time_(7);
+            video::Set_Page_Off_();
+            Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
+        }
+
+        if (MOX::_current_screen == MOX::SCREEN_NEW_GAME) {
+            ERIC::Fast_Fade_Out_();
+        } else if (_loaded_new_game == 0) {
+            fields::Clear_Fields_();
+            fields::Disable_Draw_All_Fields_();
+            MOX::_draw_main_screen_to_back = 1;
+            allocate::Allocate_First_Screen_Seg_();
+            video::Set_Page_Off_();
+            MAINSCR::Draw_Mini_Main_Screen_();
+            RUSS::Mox_Sync_Update_();
+            fields::Enable_Draw_All_Fields_();
         }
     }
 }

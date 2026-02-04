@@ -48,4 +48,9 @@ namespace mouse {
 
     int32_t Pointer_X_();
     int32_t Pointer_Y_();
+
+    inline int16_t __cdecl Get_Pointer_Offset_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F30 })();
+    }
 }

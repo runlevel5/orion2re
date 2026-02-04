@@ -463,6 +463,20 @@ namespace hooks {
         { 0x0051d7f0, &fields::Add_Grid_Field_ },
         { 0x0051d9d0, &fields::Add_Button_Info_ },
         { 0x0051d6c0, &fields::Add_Hot_Key_ },
+        { 0x0051d1e0, &fields::Scan_Field_ },
+        { 0x0043d130, &LOADSAVE::Is_Valid_Game_Type_ },
+        { 0x0050fc70, &LOADSAVE::Animate_Game_Popup_Pic_Height_ },
+        { 0x0050fca0, &LOADSAVE::Animate_Game_Popup_ },
+        { 0x0050fee0, &LOADSAVE::_Draw_Load_Save_Game_Popup_ },
+        { 0x0050fe70, &LOADSAVE::_Draw_Main_Game_Popup_To_Bitmap_ },
+        { 0x0050fe50, &LOADSAVE::_Draw_Load_Save_Game_Popup_To_Bitmap_ },
+        { 0x0050fec0, &LOADSAVE::_Draw_Options_Game_Popup_To_Bitmap_ },
+        { 0x0051d1d0, &fields::Auto_Input_ },
+        { 0x00512490, &LOADSAVE::Draw_Popup_Pic1_ },
+        { 0x005124C0, &LOADSAVE::Draw_Popup_Pic2_ },
+        { 0x00510420, &LOADSAVE::_Draw_Main_Game_Popup_ },
+        { 0x00511020, &LOADSAVE::Allocate_Data_Space_For_Game_Popup_ },
+        { 0x00510db0, &LOADSAVE::_Game_Popup_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

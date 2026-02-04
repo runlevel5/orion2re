@@ -5,7 +5,7 @@ namespace fields {
     inline uint16_t& _auto_active_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFDC });
     inline uint16_t& _auto_function_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFF4 });
     inline int16_t& _down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE4});
-    inline uint16_t& _auto_input_variable = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B004});
+    inline int16_t& _auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B004});
     inline uint16_t& _input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B040});
     inline int16_t& _active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B04C});
     inline uint16_t& _help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B05C});
@@ -15,13 +15,30 @@ namespace fields {
     inline const char* s_You_exceeded_the_max_number_of_fields = reinterpret_cast<const char*>(std::uintptr_t{0x0055B080});
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
 
+    enum FIELD_TYPE : int16_t {
+        FIELD_TYPE_BUTTON = 0,
+        FIELD_TYPE_1 = 1,
+        FIELD_TYPE_2 = 2,
+        FIELD_TYPE_3 = 3,
+        FIELD_TYPE_4 = 4,
+        FIELD_TYPE_5 = 5,
+        FIELD_TYPE_SCROLL = 6,
+        FIELD_TYPE_HIDDEN = 7,
+        FIELD_TYPE_MULTI_HOTKEY = 8,
+        FIELD_TYPE_9 = 9,
+        FIELD_TYPE_10 = 10,
+        FIELD_TYPE_CONTINUOUS_INPUT = 11,
+        FIELD_TYPE_GRID = 12,
+        FIELD_TYPE_IRREGULAR_INPUT = 13
+    };
+
 #pragma pack(push, 1)
     struct s_field {
         int16_t x;
         int16_t y;
         int16_t x_end;
         int16_t y_end;
-        int16_t field_type;
+        FIELD_TYPE field_type;
         int16_t font_style;
         uint8_t* font_color;
         uint8_t field7_0x10;
@@ -50,6 +67,7 @@ namespace fields {
 
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
+    inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
     inline int16_t& _input_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
@@ -85,6 +103,8 @@ namespace fields {
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
 
+    int16_t __cdecl Auto_Input_();
+
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, int16_t* param_7, int16_t* param_8, int16_t sound);
 
     inline int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int v1, int v2, int v3, int v4, int v5, int v6, int16_t* out, const char* label, char type) {
@@ -109,4 +129,6 @@ namespace fields {
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound);
 
     void __cdecl Invoke_Auto_Function_();
+
+    int16_t __cdecl Scan_Field_();
 }

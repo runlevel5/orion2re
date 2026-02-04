@@ -392,7 +392,7 @@ namespace MAINMENU {
         helpers::memset(_mainmenu, 0, sizeof(s_main_menu));
 
         LOADSAVE::_game_popup_fields = (LOADSAVE::s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
-        MOX::_save_game_dates = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
+        MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::Mox_Update_();
 
@@ -467,7 +467,7 @@ namespace MAINMENU {
             // New Game
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_NEW].field || input_field == hotkey_n || last_input_scan == 0x4e) {
                 MOX::_current_screen = MOX::SCREEN_NEW_GAME;
-                MOX::_return_screen = 0;
+                MOX::_return_screen = MOX::SCREEN_MAIN;
                 screen_exit = true;
             }
             // Load Game
@@ -491,13 +491,13 @@ namespace MAINMENU {
             // Multi-player
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field || last_input_scan == 0x4d) {
                 MOX::_current_screen = MOX::SCREEN_MULTI_PLAYER;
-                MOX::_return_screen = 10;
+                MOX::_return_screen = MOX::SCREEN_MAIN_MENU;
                 screen_exit = true;
             }
             // Hall of Fame
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_HELP].field || last_input_scan == 0x48) {
                 MOX::_current_screen = MOX::SCREEN_HALL_OF_FAME;
-                MOX::_return_screen = 10;
+                MOX::_return_screen = MOX::SCREEN_MAIN_MENU;
                 screen_exit = true;
             }
             // Quit

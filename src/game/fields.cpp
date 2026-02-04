@@ -20,6 +20,10 @@ namespace fields {
         _auto_active_flag = 0;
     }
 
+    int16_t __cdecl Auto_Input_() {
+        return _auto_input_variable;
+    }
+
     void __cdecl Set_Help_List_(void* help_data, int16_t count) {
         _help_list_count = count;
         _help_struct_pointer = help_data;
@@ -109,7 +113,7 @@ namespace fields {
         field.y = 5000;
         field.x_end = 5000;
         field.y_end = 5000;
-        field.field_type = 7;
+        field.field_type = FIELD_TYPE_HIDDEN;
 
         char hk = *hotkey_str;
         if (hk > 0x60 && hk < 0x7B) {
@@ -168,7 +172,7 @@ namespace fields {
         field->y = y;
         field->x_end = x_end;
         field->y_end = y_end;
-        field->field_type = 7;
+        field->field_type = FIELD_TYPE_HIDDEN;
         field->sound = sound;
         field->hotkey = *hotkey;
 
@@ -200,7 +204,7 @@ namespace fields {
 
         Add_Button_Info_(x, y, help, pic, hotkey, sound);
 
-        _fields[_fields_count].field_type = 0;
+        _fields[_fields_count].field_type = FIELD_TYPE_BUTTON;
 
         int16_t current_id = _fields_count;
         _fields_count++;
@@ -236,7 +240,7 @@ namespace fields {
 
         field.step_x = param_7;
         field.step_y = param_8;
-        field.field_type = 0x0D;
+        field.field_type = FIELD_TYPE_IRREGULAR_INPUT;
 
         int16_t added_index = _fields_count;
         _fields_count++;
@@ -268,7 +272,7 @@ namespace fields {
         field.x_end = cols * step_x + x - 1;
         field.y_end = rows * step_y + y - 1;
         field.sound = static_cast<int16_t>(sound);
-        field.field_type = 12; // 0xC
+        field.field_type = FIELD_TYPE_GRID;
         field.step_x = step_x;
         field.step_y = step_y;
         field.hotkey = '\0';
@@ -299,7 +303,7 @@ namespace fields {
         field->x_end = -1;
         field->y_end = -1;
         field->hotkey = '\0';
-        field->field_type = 8;
+        field->field_type = FIELD_TYPE_MULTI_HOTKEY;
         field->help = help_text;
         field->step_x = 0;
 
@@ -318,5 +322,28 @@ namespace fields {
         _fields_count++;
 
         return current_index;
+    }
+
+    int16_t __cdecl Scan_Field_() {
+        int16_t mouse_x = static_cast<int16_t>(mouse::Pointer_X_());
+        int16_t mouse_y = static_cast<int16_t>(mouse::Pointer_Y_());
+        mouse::Check_Mouse_Shape_();
+        _pointer_offset = mouse::Get_Pointer_Offset_();
+
+        if (_fields_count > 1) {
+            int32_t adj_x = static_cast<int32_t>(mouse_x) + _pointer_offset;
+            int32_t adj_y = static_cast<int32_t>(mouse_y) + _pointer_offset;
+
+            for (int16_t i = 1; i < _fields_count; ++i) {
+                s_field* field = &_fields[i];
+
+                if (field->x <= adj_x && adj_x <= field->x_end &&
+                    field->y <= adj_y && adj_y <= field->y_end) {
+                    return i;
+                }
+            }
+        }
+
+        return 0;
     }
 }

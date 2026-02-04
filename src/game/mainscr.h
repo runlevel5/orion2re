@@ -22,6 +22,7 @@ namespace MAINSCR {
     inline uint8_t& _debug_enabled = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596136});
     inline int16_t& _debug_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F4});
     inline int16_t& _exit_game_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619A});
+    inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});
 
     inline void __cdecl Main_Screen_() {
         using Fn = void(__cdecl*)();

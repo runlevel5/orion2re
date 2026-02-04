@@ -8,6 +8,8 @@ namespace LOADSAVE {
 
     void __cdecl Load_Month_Names_();
 
+    void __cdecl Allocate_Data_Space_For_Game_Popup_();
+
     void __cdecl Restore_Main_Screen_();
 
     void __cdecl Restore_Game_Popup_();
@@ -16,6 +18,7 @@ namespace LOADSAVE {
 
     inline uint8_t& _draw_game_popup_to_back =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722F4});
+    inline uint8_t& _dont_draw_darkened_buttons = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722C4});
     inline uint8_t& _draw_down = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AC50});
     inline char (&_empty_save_slot_message)[20] = *reinterpret_cast<char(*)[20]>(std::uintptr_t{0x005722D8});
 
@@ -26,7 +29,7 @@ namespace LOADSAVE {
     };
 
     struct s_game_popup_fields {
-        int32_t values[10];
+        int32_t field0_0x0[10];
         short field_l;
         short field_s;
         short field_q;
@@ -455,73 +458,58 @@ namespace LOADSAVE {
         int8_t saved_game_types[10];
         short field_l2; /* Created by Rename Structure Field action */
         short field_s2;
-        undefined field429_0x234;
-        undefined field430_0x235;
-        undefined field431_0x236;
-        undefined field432_0x237;
-        undefined field433_0x238;
-        undefined field434_0x239;
-        undefined field435_0x23a;
-        undefined field436_0x23b;
-        undefined field437_0x23c;
-        undefined field438_0x23d;
-        undefined field439_0x23e;
-        undefined field440_0x23f;
-        undefined field441_0x240;
-        undefined field442_0x241;
-        undefined field443_0x242;
-        undefined field444_0x243;
-        short field445_0x244[13];
-        undefined field446_0x25e;
-        undefined field447_0x25f;
-        undefined field448_0x260;
-        undefined field449_0x261;
-        undefined field450_0x262;
-        undefined field451_0x263;
-        undefined field452_0x264;
-        undefined field453_0x265;
-        undefined field454_0x266;
-        undefined field455_0x267;
-        undefined field456_0x268;
-        undefined field457_0x269;
-        undefined field458_0x26a;
-        undefined field459_0x26b;
-        undefined field460_0x26c;
-        undefined field461_0x26d;
-        undefined field462_0x26e;
-        undefined field463_0x26f;
-        undefined field464_0x270;
-        undefined field465_0x271;
-        undefined field466_0x272;
-        undefined field467_0x273;
-        undefined field468_0x274;
-        undefined field469_0x275;
-        undefined field470_0x276;
-        undefined field471_0x277;
+        byte popup_color1[8];
+        byte popup_color2[8];
+        short field431_0x244[13];
+        undefined field432_0x25e;
+        undefined field433_0x25f;
+        undefined field434_0x260;
+        undefined field435_0x261;
+        undefined field436_0x262;
+        undefined field437_0x263;
+        undefined field438_0x264;
+        undefined field439_0x265;
+        undefined field440_0x266;
+        undefined field441_0x267;
+        undefined field442_0x268;
+        undefined field443_0x269;
+        undefined field444_0x26a;
+        undefined field445_0x26b;
+        undefined field446_0x26c;
+        undefined field447_0x26d;
+        undefined field448_0x26e;
+        undefined field449_0x26f;
+        undefined field450_0x270;
+        undefined field451_0x271;
+        undefined field452_0x272;
+        undefined field453_0x273;
+        undefined field454_0x274;
+        undefined field455_0x275;
+        undefined field456_0x276;
+        undefined field457_0x277;
     };
-    #pragma pack(pop)
+#pragma pack(pop)
 
     inline int16_t& _music_level_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572344});
     inline int16_t& _sfx_level_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005722B8});
+    inline uint8_t& _print_data_to_bitmap = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722EC});
+    inline struct s_animation_header*& _bitmap = *reinterpret_cast<struct s_animation_header**>(std::uintptr_t{0x005722F0});
+
     inline s_game_anims*& _game_anims = *reinterpret_cast<s_game_anims**>(std::uintptr_t{0x00572354});
 
     inline s_game_popup_fields*& _game_popup_fields = *reinterpret_cast<s_game_popup_fields**>(std::uintptr_t{0x0059537c});
     inline uint8_t& _loaded_new_game = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572340});
-    inline uint8_t& _loaded_debug_save = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572341});
+    inline uint8_t& _loaded_debug_save = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572350});
 
     int32_t __cdecl Check_Magic_Number_(const char* filename);
 
     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename);
 
-    inline bool __cdecl Is_Valid_Game_Type_(uint32_t game_type) {
-        using Fn = bool(__cdecl*)(uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043D130 });
-        return fn(game_type);
-    }
+    bool __cdecl Is_Valid_Game_Type_(uint32_t game_type);
 
     void __cdecl Check_For_Saved_Games_(int8_t* list);
 
-    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, int32_t* out_colors_primary, int32_t* out_colors_secondary);
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, byte* out_colors_primary, byte* out_colors_secondary);
 
     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y);
 
@@ -531,24 +519,46 @@ namespace LOADSAVE {
 
     int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag);
 
-    inline void __cdecl _Draw_Load_Save_Game_Popup_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050fee0})();
+    inline void __cdecl Do_Main_Game_Popup_(int16_t* out_val) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(0x005110a0)(out_val);
     }
+
+    inline void __cdecl Do_Options_Game_Popup_(int16_t* out_val) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(0x005113f0)(out_val);
+    }
+
+    inline void __cdecl Do_Save_Game_Popup_(int16_t* out_val) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(0x00511530)(out_val);
+    }
+
+    void __cdecl _Draw_Load_Save_Game_Popup_();
+
+    void __cdecl _Draw_Main_Game_Popup_();
+
+    void __cdecl _Draw_Main_Game_Popup_To_Bitmap_(struct s_animation_header* bitmap);
+
+    void __cdecl _Draw_Load_Save_Game_Popup_To_Bitmap_(struct s_animation_header* bitmap);
+
+    void __cdecl _Draw_Options_Game_Popup_To_Bitmap_(struct s_animation_header* bitmap);
+
+    void __cdecl Animate_Game_Popup_(s_animation_header* header, int16_t y_offset, int16_t direction, uint16_t type);
+
+    void __cdecl Animate_Game_Popup_Pic_Height_(s_animation_header* animation, uint16_t type);
 
     void __cdecl Save_Session_Related_Settings_();
 
     void __cdecl Bad_Game_File_Message_(int16_t type, int16_t file_index);
 
-    inline void __cdecl Animate_Game_Popup_(void* picture, int32_t speed) {
-        using Fn = void(__cdecl*)(void*, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050fc70})(picture, speed);
+    inline void __cdecl _Draw_Options_Game_Popup_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00510750});
+        fn();
     }
 
-    inline void __cdecl _Game_Popup_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00510db0})();
-    }
+    void __cdecl _Game_Popup_();
 
     void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf);
 
@@ -565,5 +575,40 @@ namespace LOADSAVE {
     inline void __cdecl Remove_Embedded_Special_Codes_(char* str) {
         using Fn = void(__cdecl*)(char*);
         reinterpret_cast<Fn>(std::uintptr_t{ 0x00512230 })(str);
+    }
+
+    void __cdecl Draw_Popup_Pic1_();
+    void __cdecl Draw_Popup_Pic2_();
+
+    inline void __cdecl Set_Music_For_Game_Popup_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005124F0});
+        fn();
+    }
+
+    inline void __cdecl Set_Sound_For_Game_Popup_(uint8_t param) {
+        using Fn = void(__cdecl*)(uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512590});
+        fn(param);
+    }
+
+    inline void __cdecl Load_Game_Popup_Pictures_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00511930)();
+    }
+
+    inline void __cdecl Set_Current_Game_Option_Flags_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00511c70)();
+    }
+
+    inline void __cdecl Animate_Game_Popup_Pic_(s_animation_header* pic) {
+        using Fn = void(__cdecl*)(s_animation_header*);
+        reinterpret_cast<Fn>(0x00511c50)(pic);
+    }
+
+    inline void __cdecl Update_Game_Settings_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00511e80)();
     }
 }

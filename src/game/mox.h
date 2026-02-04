@@ -48,8 +48,8 @@ namespace MOX {
     inline int16_t& _cur_map_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F0});
     inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
     inline uint16_t& _global_esc = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597774});
-    inline uint16_t& _return_screen = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005977F0});
-    inline void*& _save_game_dates = *reinterpret_cast<void**>(std::uintptr_t{0x005a1ca8});
+    inline SCREEN& _return_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{0x005977F0});
+    inline char*& _save_game_dates = *reinterpret_cast<char**>(std::uintptr_t{0x005A1CA8});
     inline char*& _save_game_stardates = *reinterpret_cast<char**>(std::uintptr_t{0x005974e8});
     inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a9a});
     inline SCREEN& _previous_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597AD0 });
@@ -141,6 +141,7 @@ namespace MOX {
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
+    inline uint8_t& _first_time_drawn = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D1A});
     inline uint8_t& _draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E98});
     inline uint8_t& _dont_draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BFB2});
     inline uint16_t& _zoom_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFDC});
