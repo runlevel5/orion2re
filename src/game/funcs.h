@@ -251,6 +251,16 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
     return fn(value, str, radix);
 }
 
+inline void __cdecl Reload_Language_Strings_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(std::uintptr_t{0x004f2470})();
+}
+
+inline void __cdecl Write_Language_Setting_File_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(std::uintptr_t{0x004f25c0})();
+}
+
 inline void __cdecl Get_File_Date_String_(const char* filename, char* date_out) {
     using Fn = void(__cdecl*)(const char*, char*);
     reinterpret_cast<Fn>(std::uintptr_t{0x0050f650})(filename, date_out);

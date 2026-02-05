@@ -9,4 +9,14 @@ namespace EVANHELP {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e130})();
     }
+
+    inline void __cdecl Set_Options_Game_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0041e150})();
+    }
+
+    inline void __cdecl Set_Save_Game_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0041e140})();
+    }
 }

@@ -223,6 +223,7 @@ workflows:
           * You should NOT emit a new address for a structure if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
           * If you see a new structure, before adding to local namespace - it check if it already exists in src/game/types.h
+          * You are not allowed to rename struct fields or modify their shapes
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
             always prefer using library function. Our application does not have direct access to library functions - you
             must check `src/game/helpers.h` and implement a function if it is missing.
@@ -511,6 +512,7 @@ workflows:
             - You identified a mismatching signature for one of the existing stubs, add `// TYPE MISMATCH: <description>`
           * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
             Do not create a new settings header file.
+          * You are not allowed to rename struct fields or modify their shapes
           * Be VERY conservative with file reads.
 
           # Checklist

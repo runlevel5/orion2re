@@ -28,6 +28,7 @@
     <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
+    <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\draw.cpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\colcalc.h" />
     <ClInclude Include="src\game\colonize.h" />
+    <ClInclude Include="src\game\colxport.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\deps.h" />
     <ClInclude Include="src\game\design.h" />

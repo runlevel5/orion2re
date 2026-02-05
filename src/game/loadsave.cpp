@@ -79,38 +79,33 @@ namespace LOADSAVE {
 
     /**
      * @address 0050f530
+     * @brief Displays a popup message box based on the specified type.
+     * 
+     * @param message The message content.
+     * @param type The type of popup: 0 = Message, 1 = Warning with result (Yes/No), 3 = Warning Notification.
+     * @return For type 1, returns the user selection; otherwise returns 0.
      */
-    bool __cdecl Game_Popup_User_Box_(char* text, int16_t box_type) {
-        bool result = false;
+    int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type) {
+        int16_t result = 0;
 
-        switch (box_type) {
-        case 0:
+        if (type == 0) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            GENDRAW::Message_Box_(text);
+            GENDRAW::Message_Box_(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
-            break;
-
-        case 1:
+        } else if (type == 1) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            result = GENDRAW::Warning_Box_00479700(text);
+            result = GENDRAW::Warning_Box_00479700(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
-            break;
-
-        case 3:
+        } else if (type == 3) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            GENDRAW::Warning_Box_004796e0(text);
+            GENDRAW::Warning_Box_004796E0(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
-            break;
-
-        default:
-            // Do nothing
-            break;
         }
 
         return result;
@@ -295,27 +290,27 @@ namespace LOADSAVE {
      * @address 0050e910
      */
     int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag) {
-        int16_t status = 0;
-        int8_t loaded_success = 0;
-        char msg_buffer[80];
+        int16_t exit_loop = 0;
+        int8_t load_success = 0;
         int16_t unused1, unused2;
+        char msg_buffer[80];
 
         Load_Month_Names_();
 
-        const char* empty_msg = HAROLD::H_Message_(0x184);
-        int32_t len = 0;
-        while (empty_msg[len] != '\0') len++;
-        for (int i = 0; i <= len; i++) {
-            _empty_save_slot_message[i] = empty_msg[i];
+        const char* empty_msg_src = HAROLD::H_Message_(388); // 0x184
+        char* empty_msg_dst = _empty_save_slot_message;
+        while (*empty_msg_src) {
+            *empty_msg_dst++ = *empty_msg_src++;
         }
+        *empty_msg_dst = '\0';
 
-        bool not_main_menu = (MOX::_current_screen != MOX::SCREEN_MAIN_MENU);
+        bool from_menu = (MOX::_current_screen == MOX::SCREEN_MAIN_MENU);
         _loaded_debug_save = 0;
 
-        if (not_main_menu) {
+        if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
             fields::Clear_Fields_();
-            MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29); // 0x29 = ')'
+            MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
         }
 
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
@@ -323,43 +318,42 @@ namespace LOADSAVE {
         Add_Game_Popup_Fields_(&unused1, &unused2);
         MOX::_global_var = 0;
 
-        while (true) {
-            int32_t input = fields::Get_Input_();
-            int16_t clicked_slot = -1;
+        do {
+            int16_t input_id = fields::Get_Input_();
+            int16_t selected_slot = -1;
 
-            for (int16_t i = 0; i < 10; i++) {
-                if (_game_popup_fields->saved_game_fields[i] == (int16_t)input) {
-                    clicked_slot = i;
+            for (int16_t i = 0; i < 10; ++i) {
+                if (_game_popup_fields->saved_game_fields[i] == input_id) {
+                    selected_slot = i;
                     break;
                 }
             }
 
-            if (_game_popup_fields->field_l == (int16_t)input) {
-                if (clicked_slot == -1) {
-                    uint8_t active_slot = (uint8_t)MOX::_settings.active_save_slot;
-                    if (active_slot < 10) {
+            if (_game_popup_fields->field_esc_2 + 256 == input_id || _game_popup_fields->field_l2 == input_id) {
+                if (selected_slot == -1) {
+                    if (MOX::_settings.active_save_slot < 10) {
                         _draw_down = 1;
-                        clicked_slot = (int16_t)active_slot;
+                        selected_slot = static_cast<int16_t>((uint8_t)MOX::_settings.active_save_slot);
                     }
                 }
             }
 
-            if (clicked_slot >= 0 && clicked_slot < 10) {
-                if (_game_popup_fields->saved_games[clicked_slot] == 0) {
-                    if (MOX::_settings.animations_on && MOX::_previous_screen == MOX::SCREEN_MAIN) {
+            if (selected_slot >= 0 && selected_slot < 10) {
+                if (_game_popup_fields->saved_games[selected_slot] == 0) {
+                    if (MOX::_settings.animations_on != 0 && MOX::_previous_screen == MOX::SCREEN_MAIN) {
                         fields::Clear_Fields_();
                         _game_anims->field1_0x64 = 1;
                         video::Set_Page_Off_();
                         Animate_Game_Popup_Pic_Height_(_game_anims->pictures[11], 1);
                     }
 
-                    loaded_success = (int8_t)FILEDEF::Load_Game_(clicked_slot);
-                    MOX::_settings.active_save_slot = (char)clicked_slot;
+                    load_success = static_cast<int8_t>(FILEDEF::Load_Game_(selected_slot));
+                    MOX::_settings.active_save_slot = static_cast<char>(selected_slot);
                     Save_Session_Related_Settings_();
 
-                    if (loaded_success == 0) {
-                        const char* load_err_msg = HAROLD::H_Message_(0xB8);
-                        _sprintf(msg_buffer, load_err_msg, (int32_t)clicked_slot);
+                    if (load_success == 0) {
+                        const char* msg = HAROLD::H_Message_(184); // 0xb8
+                        _sprintf(msg_buffer, msg, static_cast<int>(selected_slot));
                         Game_Popup_User_Box_(msg_buffer, 3);
                         MOX::_return_screen = MOX::_previous_screen;
                     } else {
@@ -367,42 +361,261 @@ namespace LOADSAVE {
                         MOX::_return_screen = (MOX::_game_type == 1) ? MOX::SCREEN_HOTSEAT_SELECT_PLAYER : MOX::SCREEN_REPORTS;
                     }
 
-                    if (not_main_menu && MOX::_stardate_at_beg_of_turn != 0) {
+                    if (!from_menu && MOX::_stardate_at_beg_of_turn != 0) {
                         MISC::Fade_Into_Screen_(MAINSCR::Draw_Mini_Main_Screen_, &MOX::_draw_main_screen_to_back, 0);
                     }
-
-                    status = 1;
+                    exit_loop = 1;
                     *exit_flag = 1;
                 } else {
-                    Bad_Game_File_Message_((uint16_t)_game_popup_fields->saved_games[clicked_slot], clicked_slot);
-                    status = 2;
+                    Bad_Game_File_Message_(static_cast<uint16_t>(static_cast<uint8_t>(_game_popup_fields->saved_games[selected_slot])), selected_slot);
+                    exit_loop = 2;
                 }
             }
 
-            if (_game_popup_fields->field_o == (int16_t)input) {
+            if (_game_popup_fields->field19_0x6e == input_id) {
                 MOX::_screen_data = 0;
-                status = 1;
-                if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+                exit_loop = 1;
+                if (from_menu) {
                     *exit_flag = 1;
                 }
-            } else if (_game_popup_fields->field_esc == (int16_t)input) {
-                loaded_success = 0;
-                status = 1;
+            } else if (_game_popup_fields->field_esc_2 == input_id) {
+                load_success = 0;
+                exit_loop = 1;
                 *exit_flag = 1;
             }
 
-            if (status != 0) break;
+            if (exit_loop == 0) {
+                video::Set_Page_Off_();
+                fields::Invoke_Auto_Function_();
+                RUSS::Mox_Sync_Update_();
+            }
+        } while (exit_loop == 0);
 
-            video::Set_Page_Off_();
-            fields::Invoke_Auto_Function_();
-            RUSS::Mox_Sync_Update_();
+        for (int i = 0; i < 10; ++i) {
+            Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description, 37);
         }
 
-        for (int i = 0; i < 10; i++) {
+        return load_success;
+    }
+
+    /**
+     * @address 005113f0
+     */
+    void __cdecl Do_Options_Game_Popup_(int16_t* out_val) {
+        int8_t original_language = MOX::_settings.language;
+        bool should_exit = false;
+
+        EVANHELP::Set_Options_Game_Screen_Help_List_();
+        fields::Clear_Fields_();
+
+        MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29));
+
+        fields::Clear_Fields_();
+        fields::Assign_Auto_Function_(reinterpret_cast<void*>(_Draw_Options_Game_Popup_), 1);
+
+        int16_t dummy1, dummy2;
+        Add_Game_Popup_Fields_(&dummy1, &dummy2);
+        MOX::_global_var = 0;
+
+        while (true) {
+            int16_t input = fields::Get_Input_();
+
+            for (int16_t i = 0; i < 13; ++i) {
+                if (_game_popup_fields->field17_0x52[i] == input || _game_popup_fields->field431_0x244[i] == input) {
+                    _game_popup_fields->field28_0x7c[i] = (_game_popup_fields->field28_0x7c[i] == 0);
+                    break;
+                }
+            }
+
+            if (_game_popup_fields->field_esc_2 == input) {
+                should_exit = true;
+                *out_val = 1;
+            } else if (_game_popup_fields->field_A == input) {
+                should_exit = true;
+                MOX::_screen_data = 0;
+            }
+
+            if (should_exit) {
+                if (static_cast<uint8_t>(original_language) != static_cast<uint8_t>(_game_popup_fields->language)) {
+                    MOX::_settings.language = static_cast<int8_t>(_game_popup_fields->language);
+                    if (static_cast<uint8_t>(MOX::_settings.language) >= 5) {
+                        MOX::_settings.language = 0;
+                    }
+                    Reload_Language_Strings_();
+                    Write_Language_Setting_File_();
+                }
+                return;
+            }
+
+            video::Set_Page_Off_();
+            _Draw_Options_Game_Popup_();
+            RUSS::Mox_Sync_Update_();
+        }
+    }
+
+    /**
+     * @address 00511530
+     */
+    void __cdecl Do_Save_Game_Popup_(int16_t* out_should_close) {
+        char temp_buffer[36];
+        int16_t sStack_6c, sStack_6a;
+        bool saved_successfully = false;
+        bool confirm_save = false;
+        bool trigger_save = false;
+        int16_t active_slot_idx = -1;
+
+        const char* msg = HAROLD::H_Message_(0x184); // "Empty Slot" message
+        // Inline strcpy for _empty_save_slot_message
+        {
+            char* dst = _empty_save_slot_message;
+            const char* src = msg;
+            while ((*dst++ = *src++) != '\0');
+        }
+
+        Load_Month_Names_();
+        EVANHELP::Set_Save_Game_Screen_Help_List_();
+        fields::Clear_Fields_();
+
+        MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
+        fields::Clear_Fields_();
+        fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
+        Add_Game_Popup_Fields_(&sStack_6c, &sStack_6a);
+        MOX::_global_var = 0;
+
+        bool exit_popup = false;
+        do {
+            int16_t input_id = fields::Get_Input_();
+            if (input_id != 0) {
+                for (int16_t i = 0; i < 10; ++i) {
+                    if (input_id == _game_popup_fields->saved_game_fields[i]) {
+                        if (active_slot_idx == i) {
+                            confirm_save = true;
+                            trigger_save = true;
+                        }
+                        active_slot_idx = i;
+                        break;
+                    }
+                    if (input_id == _game_popup_fields->field28_0x7c[i]) {
+                        if (active_slot_idx == i) {
+                            trigger_save = true;
+                            _draw_down = 2;
+                            break;
+                        }
+                        fields::_input_field_active = 1;
+                        fields::_cursor_position = 0;
+                        fields::_cursor_on = 0;
+                        fields::_active_input_field_number = _game_popup_fields->saved_game_fields[i];
+                        
+                        // Inline strcpy to fields::_continuous_string
+                        {
+                            char* dst = reinterpret_cast<char*>(&fields::_continuous_string);
+                            char* src = MOX::_save_game_description[i].description;
+                            while ((*dst++ = *src++) != '\0');
+                        }
+                        
+                        fields::_active_input_field_first = 1;
+                        active_slot_idx = i;
+                        break;
+                    }
+                }
+            }
+
+            if (input_id == _game_popup_fields->field_s) { // Save button / Space
+                if (active_slot_idx < 0 || active_slot_idx >= 10) {
+                    if (MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10) {
+                        active_slot_idx = (int16_t)MOX::_settings.active_save_slot;
+                        trigger_save = true;
+                    }
+                } else {
+                    trigger_save = true;
+                }
+            }
+
+            if (trigger_save && active_slot_idx >= 0 && active_slot_idx < 10) {
+                trigger_save = false;
+                MOX::_settings.active_save_slot = (char)active_slot_idx;
+                char* target_desc = MOX::_save_game_description[active_slot_idx].description;
+
+                bool is_empty = (target_desc[0] == '\0');
+                if (!is_empty) {
+                    // Manual strcmp logic with _empty_save_slot_message
+                    const char* empty_msg = _empty_save_slot_message;
+                    char* ptr1 = target_desc;
+                    const char* ptr2 = empty_msg;
+                    int diff = 0;
+                    while (true) {
+                        if (*ptr1 != *ptr2) {
+                            diff = (*ptr1 < *ptr2) ? -1 : 1;
+                            break;
+                        }
+                        if (*ptr1 == '\0') break;
+                        if (ptr1[1] != ptr2[1]) {
+                            diff = (ptr1[1] < ptr2[1]) ? -1 : 1;
+                            break;
+                        }
+                        ptr1 += 2; ptr2 += 2;
+                        if (ptr1[-1] == '\0') break;
+                    }
+                    if (diff == 0) is_empty = true;
+                }
+
+                if (is_empty) {
+                    int16_t colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+                    s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
+                    const char* colony_str = HAROLD::H_Message_(colonies == 1 ? 0xbc : 0xbd);
+                    
+                    _sprintf(temp_buffer, s_format_0055ad30, plr->name, plr->race_name, (int)colonies, colony_str);
+                    
+                    // Length check (max 36 chars)
+                    int len = 0;
+                    while (temp_buffer[len] != '\0') len++;
+                    if (len > 0x24) temp_buffer[0x24] = '\0';
+                    
+                    // strcpy result to target_desc
+                    char* src = temp_buffer;
+                    char* dst = target_desc;
+                    while ((*dst++ = *src++) != '\0');
+                } else if (confirm_save) {
+                    // strcpy from fields::_continuous_string to target_desc
+                    char* src = reinterpret_cast<char*>(&fields::_continuous_string);
+                    char* dst = target_desc;
+                    while ((*dst++ = *src++) != '\0');
+                }
+
+                FILEDEF::Save_Game_(active_slot_idx);
+                Save_Session_Related_Settings_();
+                saved_successfully = true;
+                Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
+                Get_Star_Date_Strings_(_game_popup_fields, (char*)MOX::_save_game_stardates);
+                exit_popup = true;
+                *out_should_close = 1;
+            }
+
+            if (input_id == _game_popup_fields->field_o || (input_id < 0 && (active_slot_idx = -input_id) >= 0)) {
+                // Potential check against popup field range omitted for clarity as per decompiler
+                MOX::_screen_data = 0;
+                exit_popup = true;
+            } else if (input_id == _game_popup_fields->field_esc) {
+                exit_popup = true;
+                *out_should_close = 1;
+            }
+
+            if (!exit_popup) {
+                video::Set_Page_Off_();
+                _Draw_Load_Save_Game_Popup_();
+                RUSS::Mox_Sync_Update_();
+            }
+        } while (!exit_popup);
+
+        for (int i = 0; i < 10; ++i) {
             Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
         }
 
-        return loaded_success;
+        if (saved_successfully && MOX::_settings.animations_on != '\0') {
+            fields::Clear_Fields_();
+            Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0xe], 1);
+            _game_anims->field1_0x64 = 1;
+        }
     }
 
     /**

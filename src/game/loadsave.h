@@ -14,7 +14,14 @@ namespace LOADSAVE {
 
     void __cdecl Restore_Game_Popup_();
 
-    bool __cdecl Game_Popup_User_Box_(char* text, int16_t box_type);
+    /**
+     * @brief Displays a popup message box based on the specified type.
+     * 
+     * @param message The message content.
+     * @param type The type of popup: 0 = Message, 1 = Warning with result (Yes/No), 3 = Warning Notification.
+     * @return For type 1, returns the user selection; otherwise returns 0.
+     */
+    int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type);
 
     inline uint8_t& _draw_game_popup_to_back =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722F4});
@@ -27,6 +34,7 @@ namespace LOADSAVE {
         struct s_animation_header* pictures[25];
         int8_t field1_0x64;
     };
+
 
     struct s_game_popup_fields {
         int32_t field0_0x0[10];
@@ -458,35 +466,34 @@ namespace LOADSAVE {
         int8_t saved_game_types[10];
         short field_l2; /* Created by Rename Structure Field action */
         short field_s2;
-        s_colors popup_color1;
-        s_colors popup_color2;
+        struct s_colors popup_color1;
+        struct s_colors popup_color2;
         short field431_0x244[13];
-        undefined field432_0x25e;
-        undefined field433_0x25f;
-        undefined field434_0x260;
-        undefined field435_0x261;
-        undefined field436_0x262;
-        undefined field437_0x263;
-        undefined field438_0x264;
-        undefined field439_0x265;
-        undefined field440_0x266;
-        undefined field441_0x267;
-        undefined field442_0x268;
-        undefined field443_0x269;
-        undefined field444_0x26a;
-        undefined field445_0x26b;
-        undefined field446_0x26c;
-        undefined field447_0x26d;
-        undefined field448_0x26e;
-        undefined field449_0x26f;
-        undefined field450_0x270;
-        undefined field451_0x271;
-        undefined field452_0x272;
-        undefined field453_0x273;
-        undefined field454_0x274;
-        undefined field455_0x275;
-        undefined field456_0x276;
-        undefined field457_0x277;
+        short language;
+        undefined field433_0x260;
+        undefined field434_0x261;
+        undefined field435_0x262;
+        undefined field436_0x263;
+        undefined field437_0x264;
+        undefined field438_0x265;
+        undefined field439_0x266;
+        undefined field440_0x267;
+        undefined field441_0x268;
+        undefined field442_0x269;
+        undefined field443_0x26a;
+        undefined field444_0x26b;
+        undefined field445_0x26c;
+        undefined field446_0x26d;
+        undefined field447_0x26e;
+        undefined field448_0x26f;
+        undefined field449_0x270;
+        undefined field450_0x271;
+        undefined field451_0x272;
+        undefined field452_0x273;
+        undefined field453_0x274;
+        undefined field454_0x275;
+        undefined field455_0x276;
+        undefined field456_0x277;
     };
 #pragma pack(pop)
 
@@ -524,15 +531,9 @@ namespace LOADSAVE {
         reinterpret_cast<Fn>(0x005110a0)(out_val);
     }
 
-    inline void __cdecl Do_Options_Game_Popup_(int16_t* out_val) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(0x005113f0)(out_val);
-    }
+    void __cdecl Do_Options_Game_Popup_(int16_t* out_val);
 
-    inline void __cdecl Do_Save_Game_Popup_(int16_t* out_val) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(0x00511530)(out_val);
-    }
+    void __cdecl Do_Save_Game_Popup_(int16_t* out_val);
 
     void __cdecl _Draw_Load_Save_Game_Popup_();
 
@@ -564,6 +565,7 @@ namespace LOADSAVE {
 
     inline const char* const s_dot_GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4);
     inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);
+    inline const char* s_format_0055ad30 = reinterpret_cast<const char*>(0x0055AD30); // "%s, %s, %d %s"
 
     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
 
@@ -572,9 +574,9 @@ namespace LOADSAVE {
         reinterpret_cast<Fn>(std::uintptr_t{ 0x00512290 })(str, code);
     }
 
-    inline void __cdecl Remove_Embedded_Special_Codes_(char* str) {
-        using Fn = void(__cdecl*)(char*);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00512230 })(str);
+    inline void __cdecl Remove_Embedded_Special_Codes_(char* str, int max_len = 37) {
+        using Fn = void(__cdecl*)(char*, int);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00512230 })(str, max_len);
     }
 
     void __cdecl Draw_Popup_Pic1_();
