@@ -193,7 +193,7 @@ namespace MOX {
 
     inline uint16_t& _NUM_PLAYERS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005A2C1C });
     inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
-    inline int8_t& _global_var = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
+    inline int16_t& _global_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4AA});
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
     inline char* (&_race_names)[20] =
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });

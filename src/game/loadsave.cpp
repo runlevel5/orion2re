@@ -187,8 +187,8 @@ namespace LOADSAVE {
             _game_popup_fields->field_o = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], s_O_00556afc, '(');
             _game_popup_fields->field_esc = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
 
-            _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->field22_0x74, s__00551100, '\0');
-            _sfx_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xd8, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->field23_0x76, s__00551100, '\0');
+            _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->music_level, s__00551100, '\0');
+            _sfx_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xd8, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->sound_fx_level, s__00551100, '\0');
             break;
         }
         case 1: {
@@ -202,9 +202,9 @@ namespace LOADSAVE {
                 int16_t bx = MOX::_popup_base_x + 0x1a;
                 int16_t by = MOX::_popup_base_y + 0x29 + offset_y;
                 s_animation_header* pic = _game_anims->pictures[9];
-                _game_popup_fields->field17_0x52[i] = fields::Add_Hidden_Field_(bx, by, animate::Get_Width_(pic) + bx, animate::Get_Height_(pic) + by, s__00551100, '(');
+                _game_popup_fields->option_names[i] = fields::Add_Hidden_Field_(bx, by, animate::Get_Width_(pic) + bx, animate::Get_Height_(pic) + by, s__00551100, '(');
 
-                _game_popup_fields->field431_0x244[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
+                _game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
                 offset_y += 0x11;
             }
             _game_popup_fields->field_A = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], s_A_00557ed4, '(');
@@ -270,7 +270,7 @@ namespace LOADSAVE {
                 for (int16_t i = 0; i < 10; ++i) {
                     int16_t y_start = MOX::_popup_base_y + 0x18 + i * 0x1f;
                     int16_t font_h = fonts::Get_Font_Height_();
-                    _game_popup_fields->field28_0x7c[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, s__00551100, ')');
+                    _game_popup_fields->save_slot_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, s__00551100, ')');
                 }
                 _game_popup_fields->field_d = -1000;
                 _game_popup_fields->field_s2 = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], s_S_005569cc, '(');
@@ -401,44 +401,45 @@ namespace LOADSAVE {
     /**
      * @address 005113f0
      */
-    void __cdecl Do_Options_Game_Popup_(int16_t* out_val) {
-        int8_t original_language = MOX::_settings.language;
-        bool should_exit = false;
+    void __cdecl Do_Options_Game_Popup_(int16_t* exit_code) {
+        int8_t initial_language = MOX::_settings.language;
+        bool exit_loop = false;
+        int16_t dummy_x;
+        int16_t dummy_y;
 
         EVANHELP::Set_Options_Game_Screen_Help_List_();
         fields::Clear_Fields_();
-
-        MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29));
+        int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
+        MOX::_global_var = hidden_field;
 
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(reinterpret_cast<void*>(_Draw_Options_Game_Popup_), 1);
+        Add_Game_Popup_Fields_(&dummy_x, &dummy_y);
 
-        int16_t dummy1, dummy2;
-        Add_Game_Popup_Fields_(&dummy1, &dummy2);
         MOX::_global_var = 0;
 
         while (true) {
             int16_t input = fields::Get_Input_();
 
             for (int16_t i = 0; i < 13; ++i) {
-                if (_game_popup_fields->field17_0x52[i] == input || _game_popup_fields->field431_0x244[i] == input) {
-                    _game_popup_fields->field28_0x7c[i] = (_game_popup_fields->field28_0x7c[i] == 0);
+                if (_game_popup_fields->option_names[i] == input || _game_popup_fields->option_toggles[i] == input) {
+                    _game_popup_fields->options[i] = (_game_popup_fields->options[i] == 0) ? 1 : 0;
                     break;
                 }
             }
 
             if (_game_popup_fields->field_esc_2 == input) {
-                should_exit = true;
-                *out_val = 1;
+                exit_loop = true;
+                *exit_code = 1;
             } else if (_game_popup_fields->field_A == input) {
-                should_exit = true;
+                exit_loop = true;
                 MOX::_screen_data = 0;
             }
 
-            if (should_exit) {
-                if (static_cast<uint8_t>(original_language) != static_cast<uint8_t>(_game_popup_fields->language)) {
-                    MOX::_settings.language = static_cast<int8_t>(_game_popup_fields->language);
-                    if (static_cast<uint8_t>(MOX::_settings.language) >= 5) {
+            if (exit_loop) {
+                if ((uint16_t)(uint8_t)initial_language != _game_popup_fields->language) {
+                    MOX::_settings.language = (int8_t)_game_popup_fields->language;
+                    if (MOX::_settings.language > 4) {
                         MOX::_settings.language = 0;
                     }
                     Reload_Language_Strings_();
@@ -495,7 +496,7 @@ namespace LOADSAVE {
                         active_slot_idx = i;
                         break;
                     }
-                    if (input_id == _game_popup_fields->field28_0x7c[i]) {
+                    if (input_id == _game_popup_fields->save_slot_fields[i]) {
                         if (active_slot_idx == i) {
                             trigger_save = true;
                             _draw_down = 2;
@@ -1122,6 +1123,92 @@ namespace LOADSAVE {
     }
 
     /**
+     * @address 00511c70
+     */
+    void __cdecl Set_Current_Game_Option_Flags_() {
+        // Scaling logic for levels: ((level * 100) / 100) * 155) / 100
+        // Simplifies to (level * 155) / 100
+        _game_popup_fields->music_level = (int16_t)(((int32_t)MOX::_settings.music_level * 155) / 100);
+        _game_popup_fields->sound_fx_level = (int16_t)(((int32_t)MOX::_settings.sound_fx_level * 155) / 100);
+
+        _game_popup_fields->music_on = (int16_t)MOX::_settings.music_on;
+        _game_popup_fields->sound_fx_on = (uint16_t)MOX::_settings.sound_fx_on;
+
+        _game_popup_fields->options[0] = (uint16_t)MOX::_settings.end_of_turn_summary;
+
+        if (MOX::_game_type == 0) {
+            _game_popup_fields->options[1] = (uint16_t)MOX::_settings.end_of_turn_wait;
+        } else {
+            _game_popup_fields->options[1] = 0;
+        }
+
+        _game_popup_fields->options[2] = (uint16_t)MOX::_settings.enemy_moves;
+        _game_popup_fields->options[3] = (uint16_t)MOX::_settings.expanding_help;
+        _game_popup_fields->options[4] = (uint16_t)MOX::_settings.auto_select_ships;
+        _game_popup_fields->options[5] = (uint16_t)MOX::_settings.animations_on;
+        _game_popup_fields->options[6] = (uint16_t)MOX::_settings.auto_select_colony;
+        _game_popup_fields->options[7] = (uint16_t)MOX::_settings.show_relocation_lines;
+        _game_popup_fields->options[8] = (uint16_t)MOX::_settings.show_gnn_report;
+        _game_popup_fields->options[9] = (uint16_t)MOX::_settings.auto_delete_tg_housing;
+        _game_popup_fields->options[10] = (uint16_t)MOX::_settings.auto_saves;
+        _game_popup_fields->options[11] = (uint16_t)MOX::_settings.only_show_serious_turn_summary_reports;
+        _game_popup_fields->options[12] = (uint16_t)MOX::_settings.ship_initiative;
+
+        _game_popup_fields->language = (uint16_t)MOX::_settings.language;
+        if (_game_popup_fields->language >= 5) {
+            _game_popup_fields->language = 0;
+        }
+    }
+
+    /**
+     * @address 00511930
+     */
+    void __cdecl Load_Game_Popup_Pictures_() {
+        MOX::Mox_Update_();
+
+        _game_anims->pictures[0] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 0, MOX::_screen_seg);
+        _game_anims->pictures[1] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 1, MOX::_screen_seg);
+        _game_anims->pictures[2] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 2, MOX::_screen_seg);
+        _game_anims->pictures[3] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 3, MOX::_screen_seg);
+        _game_anims->pictures[4] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 4, MOX::_screen_seg);
+        _game_anims->pictures[5] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 5, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        _game_anims->pictures[6] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 6, MOX::_screen_seg);
+        _game_anims->pictures[7] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 7, MOX::_screen_seg);
+        _game_anims->pictures[8] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 29, MOX::_screen_seg);
+        _game_anims->pictures[9] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 9, MOX::_screen_seg);
+        _game_anims->pictures[10] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 10, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        _game_anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 11, MOX::_screen_seg);
+        _game_anims->pictures[12] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 12, MOX::_screen_seg);
+        _game_anims->pictures[13] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 13, MOX::_screen_seg);
+        _game_anims->pictures[14] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 14, MOX::_screen_seg);
+        _game_anims->pictures[15] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 15, MOX::_screen_seg);
+        _game_anims->pictures[16] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 16, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        _game_anims->pictures[17] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 17, MOX::_screen_seg);
+        _game_anims->pictures[18] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 18, MOX::_screen_seg);
+        _game_anims->pictures[19] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 19, MOX::_screen_seg);
+        _game_anims->pictures[23] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 27, MOX::_screen_seg);
+        _game_anims->pictures[24] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 28, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        s_animation_header* first_pic = _game_anims->pictures[0];
+        int16_t h = animate::Get_Height_(first_pic) + 1;
+        int16_t w = animate::Get_Width_(first_pic) + 1;
+        uint32_t size = bitmap::Get_Bitmap_Size_(w, h);
+
+        MAINSCR::_temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+    }
+
+    /**
      * @address 00510420
      */
     void __cdecl _Draw_Main_Game_Popup_() {
@@ -1130,12 +1217,12 @@ namespace LOADSAVE {
         int16_t x1 = MOX::_popup_base_x + 62;      // 0x3e
         int16_t y1 = MOX::_popup_base_y + 194;     // 0xc2
         int16_t y1_end = MOX::_popup_base_y + 207; // 0xcf
-        int16_t x1_end = _game_popup_fields->field22_0x74 + x1;
+        int16_t x1_end = _game_popup_fields->music_level + x1;
 
         int16_t x2 = x1;
         int16_t y2 = MOX::_popup_base_y + 216;     // 0xd8
         int16_t y2_end = MOX::_popup_base_y + 229; // 0xe5
-        int16_t x2_end = _game_popup_fields->field23_0x76 + x1;
+        int16_t x2_end = _game_popup_fields->sound_fx_level + x1;
 
         // Junk/Optimization artifact loop detected in assembly
         volatile char stack_buf[8];
@@ -1208,6 +1295,113 @@ namespace LOADSAVE {
 
         if (_sfx_level_field == input_result) {
             Set_Sound_For_Game_Popup_(0);
+        }
+    }
+
+    /**
+     * @address 00510750
+     */
+    void __cdecl _Draw_Options_Game_Popup_() {
+        s_colors local_8;
+        MOX::_mox_font_colors_offset = 0x55; // 'U'
+        s_colors* palette = MISC::Font_Colors2_(2, 0x55, 0x7E); // 'U', '~'
+
+        // Copy the palette colors locally
+        *reinterpret_cast<uint32_t*>(&local_8.colors[0]) = *reinterpret_cast<uint32_t*>(&palette->colors[0]);
+        *reinterpret_cast<uint32_t*>(&local_8.colors[4]) = *reinterpret_cast<uint32_t*>(&palette->colors[4]);
+
+        if (_print_data_to_bitmap == 0) {
+            if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                Restore_Main_Screen_();
+            }
+            if (_print_data_to_bitmap == 0) {
+                animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, _game_anims->pictures[8]);
+            }
+        }
+
+        fonts::Set_Font_Style_Outline_(2, &local_8);
+        fonts::Set_Outline_Color_(0, static_cast<uint16_t>(local_8.colors[0]));
+        fonts::Set_Font_Spacing_(1);
+
+        for (int i = 0; i < 13; ++i) {
+            int16_t x = MOX::_popup_base_x + 0x1A;
+            int16_t y = MOX::_popup_base_y + 0x29 + (i * 0x11);
+
+            animate::Set_Animation_Frame_(_game_anims->pictures[9], _game_popup_fields->options[i]);
+
+            if (_print_data_to_bitmap == 0) {
+                animate::Draw_(x, y, _game_anims->pictures[9]);
+            } else {
+                bitmap::Add_Picture_To_Bitmap_(0, 0, _game_anims->pictures[9], reinterpret_cast<s_animation_header*>(MAINSCR::_temp_bitmap));
+                bitmap::Add_Picture_To_Bitmap_(x - MOX::_popup_base_x, y - MOX::_popup_base_y, reinterpret_cast<s_animation_header*>(MAINSCR::_temp_bitmap), _bitmap);
+            }
+        }
+
+        int16_t draw_x, draw_y;
+        if (_print_data_to_bitmap == 0) {
+            draw_x = MOX::_popup_base_x + 0x1A;
+            draw_y = MOX::_popup_base_y + 0x29;
+        } else {
+            draw_x = 0x1A;
+            draw_y = 0x29;
+        }
+
+        if (_print_data_to_bitmap != 0) {
+            int16_t btn_width = animate::Get_Width_(_game_anims->pictures[9]);
+            int16_t text_x1 = draw_x + 4 + btn_width;
+            int16_t text_x2 = text_x1 + 0x96;
+
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x02, s__ALT_F1__0055ad24, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x13, s__ALT_F2__0055ad18, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x24, s__ALT_F3__0055ad0c, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x46, s__ALT_F5__0055ad00, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x57, s__ALT_F6__0055acf4, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, s__ALT_F7__0055ace8, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055addc, &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xBD, HAROLD::H_Message_(0xB1), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xCE, HAROLD::H_Message_(0x187), &_bitmap->width);
+
+            for (int i = 0; i < 13; ++i) {
+                animate::Set_Animation_Frame_(_game_anims->pictures[9], _game_popup_fields->options[i]);
+                bitmap::Add_Picture_To_Bitmap_(0x1A, draw_y + (i * 0x11), _game_anims->pictures[9], _bitmap);
+            }
+        } else {
+            int16_t btn_width = animate::Get_Width_(_game_anims->pictures[9]);
+            int16_t text_x1 = draw_x + 4 + btn_width;
+            int16_t text_x2 = text_x1 + 0x96;
+
+            fonts::Print_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6));
+            fonts::Print_(text_x2, draw_y + 0x02, s__ALT_F1__0055acd0);
+            fonts::Print_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7));
+            fonts::Print_(text_x2, draw_y + 0x13, s__ALT_F2__0055acc4);
+            fonts::Print_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8));
+            fonts::Print_(text_x2, draw_y + 0x24, s__ALT_F3__0055acb8);
+            fonts::Print_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9));
+            fonts::Print_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA));
+            fonts::Print_(text_x2, draw_y + 0x46, s__ALT_F4__0055acac);
+            fonts::Print_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB));
+            fonts::Print_(text_x2, draw_y + 0x57, s__ALT_F5__0055aca0);
+            fonts::Print_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC));
+            fonts::Print_(text_x2, draw_y + 0x68, s__ALT_F6__0055ac94);
+            fonts::Print_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD));
+            fonts::Print_(text_x2, draw_y + 0x79, s__ALT_F7__0055ac88);
+            fonts::Print_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE));
+            fonts::Print_(text_x2, draw_y + 0x8A, s__ALT_F8__0055ac7c);
+            fonts::Print_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF));
+            fonts::Print_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0));
+            fonts::Print_(text_x1, draw_y + 0xBD, HAROLD::H_Message_(0xB1));
+            fonts::Print_(text_x1, draw_y + 0xCE, HAROLD::H_Message_(0x187));
         }
     }
 

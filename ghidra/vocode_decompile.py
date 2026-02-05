@@ -14,7 +14,7 @@ Ghidra 12.x (PyGhidra / Python 3) script:
      - comment: human-readable version with variable/symbol names (Listing-like formatting)
   2) Ghidra decompiler output
   3) externals/globals + type definitions (via DataTypeWriter)
-- Sends a single HTTP POST to http://127.0.0.1/input with JSON payload:
+- Sends a single HTTP POST to http://127.0.0.1:5050/input with JSON payload:
     { "text": "<whole input>" }
 - Prints HTTP status + response body to the Ghidra console (response is expected to be "OK")
 """
@@ -194,12 +194,54 @@ def _get_symbol_fullname_cpp(sym) -> str:
     return (ns_cpp + "::" + name) if ns_cpp else name
 
 
+def _escape_string_for_comment(s: str, max_len: int = 200) -> str:
+    """
+    Escape a string so it is safe to embed in a single-line comment as: ; "..."
+    """
+    if s is None:
+        return ""
+    try:
+        s = str(s)
+    except Exception:
+        return ""
+    s = s.replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t")
+    # Escape backslash first, then quotes
+    s = s.replace("\\", "\\\\").replace('"', '\\"')
+    if len(s) > max_len:
+        s = s[:max_len] + "..."
+    return s
+
+
+def _try_get_string_at_address(addr):
+    """
+    If 'addr' resolves to a defined string in the Listing, return its value as Python str.
+    Otherwise return None.
+    """
+    listing = currentProgram.getListing()
+    try:
+        data = listing.getDataAt(addr)
+        if (data is None) or (not data.isDefined()):
+            data = listing.getDataContaining(addr)
+        if data is None or (not data.isDefined()):
+            return None
+
+        if hasattr(data, "hasStringValue") and data.hasStringValue():
+            v = data.getValue()
+            if v is None:
+                return None
+            return str(v)
+    except Exception:
+        return None
+    return None
+
+
 def _collect_referenced_global_data_symbols(func):
     listing = currentProgram.getListing()
     rm = currentProgram.getReferenceManager()
     symtab = currentProgram.getSymbolTable()
     fm = currentProgram.getFunctionManager()
 
+    # map int(addr)->(to, sym, dt, str_value_or_none)
     by_addr = {}
 
     instr_iter = listing.getInstructions(func.getBody(), True)
@@ -218,9 +260,9 @@ def _collect_referenced_global_data_symbols(func):
             if to is None or (not to.isMemoryAddress()):
                 continue
 
+            # Skip code references
             if listing.getInstructionAt(to) is not None:
                 continue
-
             if fm.getFunctionAt(to) is not None:
                 continue
 
@@ -230,6 +272,7 @@ def _collect_referenced_global_data_symbols(func):
             except Exception:
                 sym = None
 
+            # Skip symbols local to the function namespace (rare)
             if sym is not None:
                 try:
                     if sym.getParentNamespace() == func:
@@ -248,7 +291,9 @@ def _collect_referenced_global_data_symbols(func):
             except Exception:
                 dt = None
 
-            by_addr[int(to.getOffset())] = (to, sym, dt)
+            s_val = _try_get_string_at_address(to)
+
+            by_addr[int(to.getOffset())] = (to, sym, dt, s_val)
 
     return [by_addr[k] for k in sorted(by_addr.keys())]
 
@@ -351,7 +396,7 @@ def _format_externals_for_input(func):
     seen = set()
 
     MAX_ITEMS = 64
-    for (to, sym, dt) in refs[:MAX_ITEMS]:
+    for (to, sym, dt, s_val) in refs[:MAX_ITEMS]:
         try:
             addr_hex = "0x%08X" % int(to.getOffset())
         except Exception:
@@ -368,7 +413,11 @@ def _format_externals_for_input(func):
             except Exception:
                 type_str = str(dt)
 
-        lines.append("- %s @ %s : %s" % (name, addr_hex, type_str))
+        comment = ""
+        if s_val:
+            comment = ' ; "%s"' % _escape_string_for_comment(s_val)
+
+        lines.append("- %s @ %s : %s%s" % (name, addr_hex, type_str, comment))
 
         if dt is not None:
             _collect_complex_datatypes_recursive(dt, complex_set, seen)
@@ -459,8 +508,6 @@ def main():
         "=== GHIDRA DECOMPILER OUTPUT ===\n"
         f"{decomp_c}\n"
     )
-
-    #print(user_text)
 
     monitor.setMessage("HTTP POST to localhost...")
     resp_text = _http_post_text(POST_URL, user_text)
