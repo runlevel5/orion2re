@@ -28,6 +28,12 @@ namespace RUSS {
 
     void __cdecl Release_All_Blocks_(void* seg);
 
+    inline void Load_Russ_Strings_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7ed0});
+        fn();
+    }
+
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
     inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
 }

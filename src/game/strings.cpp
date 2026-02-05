@@ -1,6 +1,12 @@
 #include "deps.h"
 
 namespace strings {
+    void Load_Strings() {
+        HAROLD::Load_H_Strings_();
+        RUSS::Load_Russ_Strings_();
+        ESTRINGS::Load_E_Strings_();
+    }
+
     void __cdecl String_To_Lower_(char* str) {
         if (str == nullptr || *str == '\0') {
             return;

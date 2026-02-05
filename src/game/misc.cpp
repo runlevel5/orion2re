@@ -18,6 +18,16 @@ namespace MISC {
         return fonts::_current_font_style;
     }
 
+    void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors) {
+        s_colors* colors_ptr = MISC::Font_Colors2_(font_idx, color_idx_1, color_idx_2);
+
+        uint32_t* src = reinterpret_cast<uint32_t*>(colors_ptr);
+        uint32_t* dst = reinterpret_cast<uint32_t*>(out_colors);
+
+        dst[0] = src[0];
+        dst[1] = src[1];
+    }
+
     int16_t __cdecl Get_Font_Spacing_() {
         return fonts::_font_header.font_style_spacing;
     }

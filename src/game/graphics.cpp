@@ -107,4 +107,18 @@ namespace graphics {
         video::_screen_window_x2 = x2;
         video::_screen_window_y2 = y2;
     }
+
+    void __cdecl Save_Window_() {
+        _old_screen_window_x1 = video::_screen_window_x1;
+        _old_screen_window_y1 = video::_screen_window_y1;
+        _old_screen_window_x2 = video::_screen_window_x2;
+        _old_screen_window_y2 = video::_screen_window_y2;
+    }
+
+    void __cdecl Restore_Window_() {
+        video::_screen_window_x1 = _old_screen_window_x1;
+        video::_screen_window_y1 = _old_screen_window_y1;
+        video::_screen_window_x2 = _old_screen_window_x2;
+        video::_screen_window_y2 = _old_screen_window_y2;
+    }
 }

@@ -424,3 +424,15 @@ inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // 
 inline char*& PTR_s_GAME_LBX_0055ac4c =
     *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
+
+inline int16_t __cdecl Collect_Black_Holes_(int16_t* star_indices) {
+    using Fn = int16_t(__cdecl*)(int16_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004127F0});
+    return fn(star_indices);
+}
+
+inline bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+    using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004124B0});
+    return fn(px, py, d, x1, y1, x2, y2);
+}

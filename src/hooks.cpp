@@ -74,6 +74,7 @@ namespace hooks {
         { 0x0051b300, &HOMEGEN::Modify_Home_Worlds_ },
         { 0x004f0fd0, &HAROLD::Is_Colony_Star_ },
         { 0x004f19e0, &HAROLD::Star_Is_Orion_ },
+        { 0x004f1a20, &HAROLD::Star_Is_Outpost_Star_ },
         { 0x0051b190, &HOMEGEN::Is_Added_Food_World_ },
         { 0x0051c3f0, &HOMEGEN::Make_System_Monsters_ },
         { 0x00519ea0, &HOMEGEN::Assign_Home_Star_Names_ },
@@ -498,6 +499,15 @@ namespace hooks {
         { 0x00510750, &LOADSAVE::_Draw_Options_Game_Popup_ },
         { 0x00511930, &LOADSAVE::Load_Game_Popup_Pictures_ },
         { 0x00511c70, &LOADSAVE::Set_Current_Game_Option_Flags_ },
+        { 0x00483f60, &strings::Load_Strings },
+        { 0x0049e980, &MISC::Get_Mox_Font_Colors_ },
+        { 0x00528c10, &graphics::Save_Window_ },
+        { 0x00528c50, &graphics::Restore_Window_ },
+        { 0x004128e0, &GEO::Initialize_Black_Hole_Blocks_ },
+        { 0x00412ba0, &GEO::Initialize_Star_In_Nebula_Info_ },
+        { 0x004130f0, &GEO::Parsecs_Between_Stars_ },
+        { 0x00413080, &GEO::Parsecs_Between_Points_ },
+        { 0x00412b10, &GEO::Point_Is_In_Some_Nebula_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

@@ -23,10 +23,7 @@ namespace HAROLD {
 
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
-    inline int32_t __cdecl Star_Is_Outpost_Star_(int16_t star_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004F1A20})(star_idx);
-    }
+    bool __cdecl Star_Is_Outpost_Star_(int16_t star_idx);
 
     bool __cdecl Habitable_Spectral_Class_(int16_t star_idx);
 
@@ -86,6 +83,12 @@ namespace HAROLD {
     void __cdecl Restore_Mouse_List_();
 
     void __cdecl Load_Leader_Titles();
+
+    inline void Load_H_Strings_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f2210});
+        fn();
+    }
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 

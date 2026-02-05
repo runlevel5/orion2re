@@ -80,6 +80,7 @@
 #include "turnsum.h"
 #include "eric.h"
 #include "ericnet.h"
+#include "estrings.h"
 #include "colony.h"
 #include "events.h"
 #include "bill.h"

@@ -138,6 +138,49 @@ namespace HACCESS {
         }
     }
 
+    // BUG: The original implementation contains a potential bug where it skips every 
+    // second node in the linked list chain during traversal.
+    int16_t __cdecl Ship_Icon_Id_From_Node_Ptr_(int16_t node_ptr) {
+        int16_t found_icon_idx = 0;
+        bool found = false;
+        int16_t i = 0;
+
+        if (MOX::_ship_icon_count > 0) {
+            do {
+                if (found) {
+                    break;
+                }
+
+                int16_t current_node_idx = MOX::_ship_icon[i].node_idx;
+
+                if (current_node_idx == node_ptr) {
+                    found = true;
+                    found_icon_idx = i;
+                } else {
+                    // Traverse the node chain.
+                    while (!found) {
+                        if (current_node_idx == -1) {
+                            break;
+                        }
+
+                        // Advance to next node and compare
+                        current_node_idx = MOX::_ship_node[current_node_idx].field1_0x2;
+                        if (current_node_idx == node_ptr) {
+                            found = true;
+                            found_icon_idx = i;
+                        } else if (current_node_idx != -1) {
+                            // Advance to the next node again without comparing in this iteration.
+                            current_node_idx = MOX::_ship_node[current_node_idx].field1_0x2;
+                        }
+                    }
+                }
+                i++;
+            } while (i < MOX::_ship_icon_count);
+        }
+
+        return found_icon_idx;
+    }
+
     int16_t __cdecl Ship_Icon_Owner_(int16_t icon_id) {
         int16_t node_idx = MOX::_ship_icon[icon_id].node_idx;
 

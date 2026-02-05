@@ -11,10 +11,10 @@ namespace MISC {
 
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
-    inline s_colors* __cdecl Font_Colors2_(uint16_t a1, uint8_t a2, uint8_t a3) {
+    inline s_colors* __cdecl Font_Colors2_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2) {
         using Fn = s_colors*(__cdecl*)(int16_t, uint8_t, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ddb0});
-        return fn(a1, a2, a3);
+        return fn(font_idx, color_idx_1, color_idx_2);
     }
 
     inline void __cdecl Set_Fitted_Font_Style_(const char* text, s_colors* colors, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
@@ -24,10 +24,7 @@ namespace MISC {
 
     int16_t __cdecl Get_Font_Style_();
 
-    inline void __cdecl Get_Mox_Font_Colors_(int16_t style, char c1, char c2, void* out_colors) {
-        using Fn = void(__cdecl*)(int16_t, char, char, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049e980})(style, c1, c2, out_colors);
-    }
+    void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors);
 
     void __cdecl Increase_Font_Color_Range_(int16_t increment);
     void __cdecl Decrease_Font_Color_Range_(int16_t amount);

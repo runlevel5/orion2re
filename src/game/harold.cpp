@@ -86,6 +86,42 @@ namespace HAROLD {
         return MOX::_star[star_idx].spectral_class < 6;
     }
 
+    /**
+     * Determines if a star system contains only outposts (no full colonies).
+     * Returns true if there is at least one outpost and zero established colonies.
+     * @address 004f1a20
+     */
+    bool __cdecl Star_Is_Outpost_Star_(int16_t star_idx) {
+        int8_t outpost_count = 0;
+        int8_t colony_count = 0;
+
+        for (int32_t i = 0; i < 5; ++i) {
+            // Planet index at offset 0x4a in s_star_data
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx != -1) {
+                // Colony index at offset 0x0 in s_planet_data
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx != -1) {
+                    // outpost_flag at offset 0x6 in s_colony
+                    if (MOX::_colony[colony_idx].outpost_flag == 0) {
+                        colony_count++;
+                    } else {
+                        outpost_count++;
+                    }
+                }
+            }
+        }
+
+        // Returns true only if the star system is occupied solely by outposts
+        if (outpost_count > 0 && colony_count == 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     int8_t __cdecl Planet_Number_(int16_t planet_index) {
         int8_t star_idx = MOX::_planet[planet_index].star_index;
         s_star_data* star = &MOX::_star[star_idx];
