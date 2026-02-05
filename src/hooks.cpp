@@ -25,7 +25,7 @@ namespace hooks {
         { 0x0043d300, &FILEDEF::Update_Game_Settings_Version_Number_ },
         { 0x00478e80, &INITGAME::Set_Default_Game_Settings_ },
         { 0x004f24d0, &HAROLD::Get_Font_File_ },
-        //{ 0x00483470, &MOX2::main2_ },
+        { 0x00483470, &MOX2::main2_ },
         { 0x005274d0, &mouse::Set_Mouse_List_ },
         { 0x00527680, &mouse::Mouse_Button_ },
         { 0x0052d580, &sound::Set_Audio_Buffer_ },
@@ -400,7 +400,7 @@ namespace hooks {
         { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
         { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
         { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
-        //{ 0x00483830, &MOX2::Screen_Control_ },
+        { 0x00483830, &MOX2::Screen_Control_ },
         { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
         { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
         { 0x004e8c90, &MAINMENU::Main_Menu_Screen_ },
@@ -476,7 +476,7 @@ namespace hooks {
         { 0x005124C0, &LOADSAVE::Draw_Popup_Pic2_ },
         { 0x00510420, &LOADSAVE::_Draw_Main_Game_Popup_ },
         { 0x00511020, &LOADSAVE::Allocate_Data_Space_For_Game_Popup_ },
-        //{ 0x00510db0, &LOADSAVE::_Game_Popup_ },
+        { 0x00510db0, &LOADSAVE::_Game_Popup_ },
         { 0x0051de80, &fields::Add_Scroll_Field_ },
         { 0x0051e2b0, &fields::Add_Continuous_String_Input_Field_ },
         { 0x00531740, &file_ani::Get_File_Animation_Frame_ },
@@ -508,6 +508,11 @@ namespace hooks {
         { 0x004130f0, &GEO::Parsecs_Between_Stars_ },
         { 0x00413080, &GEO::Parsecs_Between_Points_ },
         { 0x00412b10, &GEO::Point_Is_In_Some_Nebula_ },
+        { 0x005110a0, &LOADSAVE::Do_Main_Game_Popup_ },
+        { 0x00511c50, &LOADSAVE::Animate_Game_Popup_Pic_ },
+        { 0x00511e80, &LOADSAVE::Update_Game_Settings_ },
+        { 0x004ba660, &ERIC::Set_Fade_Percent_ },
+        { 0x004ba690, &ERIC::Fast_Fade_Out_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

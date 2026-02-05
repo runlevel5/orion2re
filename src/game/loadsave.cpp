@@ -1123,6 +1123,40 @@ namespace LOADSAVE {
     }
 
     /**
+     * @address 00511c50
+     */
+    void __cdecl Animate_Game_Popup_Pic_(s_animation_header* animation_header) {
+        LOADSAVE::Animate_Game_Popup_(animation_header, 0, 1, 0);
+    }
+
+    /**
+     * @address 00511e80
+     */
+    void __cdecl Update_Game_Settings_() {
+        s_game_popup_fields* fields = LOADSAVE::_game_popup_fields;
+
+        MOX::_settings.end_of_turn_summary = static_cast<int8_t>(fields->options[0]);
+        MOX::_settings.end_of_turn_wait = static_cast<int8_t>(fields->options[1]);
+        MOX::_settings.enemy_moves = static_cast<int8_t>(fields->options[2]);
+        MOX::_settings.expanding_help = static_cast<int8_t>(fields->options[3]);
+        MOX::_settings.auto_select_ships = static_cast<int8_t>(fields->options[4]);
+        MOX::_settings.animations_on = static_cast<int8_t>(fields->options[5]);
+        MOX::_settings.auto_select_colony = static_cast<int8_t>(fields->options[6]);
+        MOX::_settings.show_relocation_lines = static_cast<int8_t>(fields->options[7]);
+        MOX::_settings.show_gnn_report = static_cast<int8_t>(fields->options[8]);
+        MOX::_settings.auto_delete_tg_housing = static_cast<int8_t>(fields->options[9]);
+        MOX::_settings.auto_saves = static_cast<int8_t>(fields->options[10]);
+        MOX::_settings.only_show_serious_turn_summary_reports = static_cast<int8_t>(fields->options[11]);
+        MOX::_settings.ship_initiative = static_cast<int8_t>(fields->options[12]);
+
+        MOX::_settings.language = (int8_t)fields->language;
+
+        if (static_cast<uint8_t>(MOX::_settings.language) >= 5) {
+            MOX::_settings.language = 0;
+        }
+    }
+
+    /**
      * @address 00511c70
      */
     void __cdecl Set_Current_Game_Option_Flags_() {
@@ -1206,6 +1240,116 @@ namespace LOADSAVE {
         uint32_t size = bitmap::Get_Bitmap_Size_(w, h);
 
         MAINSCR::_temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+    }
+
+    /**
+     * @address 005110a0
+     */
+    void __cdecl Do_Main_Game_Popup_(int16_t* out_finished) {
+        bool closed_with_exit = false;
+        bool event_processed = false;
+        char text_buffer[200];
+
+        fields::Assign_Auto_Function_((void*)LOADSAVE::_Draw_Main_Game_Popup_, 1);
+        EVANHELP::Set_Main_Game_Screen_Help_List_();
+
+        while (true) {
+            int16_t input = fields::Get_Input_();
+
+            if (input == _game_popup_fields->field_esc) {
+                _draw_game_popup_to_back = 1;
+                event_processed = true;
+                if (MOX::_screen_data == 0) {
+                    *out_finished = 1;
+                }
+            } else if (input == _game_popup_fields->field_n) {
+                char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
+                std::strcpy(text_buffer, msg);
+
+                if (Game_Popup_User_Box_(text_buffer, 1)) {
+                    MOX::_game_type = 0;
+                    MOX::_return_screen = MOX::SCREEN_NEW_GAME;
+                    event_processed = true;
+                    *out_finished = 1;
+                } else {
+                    event_processed = true;
+                    video::Set_Page_Back_();
+                    graphics::Fill_(0, 0, 639, 479, 0);
+                    MAINSCR::Draw_Mini_Main_Screen_();
+                    MAINSCR::Draw_Main_Main_Screen_();
+                    video::Copy_Back_To_Off_();
+                }
+            } else if (input == _game_popup_fields->field_q) {
+                char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
+                std::strcpy(text_buffer, msg);
+
+                if (Game_Popup_User_Box_(text_buffer, 1)) {
+                    FILEDEF::Save_Game_(9);
+                    MOX::_settings.active_save_slot = 10;
+                    Save_Session_Related_Settings_();
+
+                    if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+                        NETMOX::Human_Abdicates_(static_cast<int32_t>(MOX::_PLAYER_NUM));
+                        netcode::Net_Uninit_();
+                    }
+
+                    MOX::_return_screen = MOX::SCREEN_EXIT;
+                    event_processed = true;
+                    *out_finished = 1;
+                } else {
+                    event_processed = true;
+                    video::Set_Page_Back_();
+                    graphics::Fill_(0, 0, 639, 479, 0);
+                    MAINSCR::Draw_Mini_Main_Screen_();
+                    MAINSCR::Draw_Main_Main_Screen_();
+                    video::Copy_Back_To_Off_();
+                }
+            } else if (input == _game_popup_fields->field_o) {
+                _draw_game_popup_to_back = 1;
+                MOX::_screen_data = 1;
+                event_processed = true;
+            } else if (input == _game_popup_fields->field_l) {
+                event_processed = true;
+                fields::Assign_Auto_Function_((void*)LOADSAVE::_Draw_Load_Save_Game_Popup_, 1);
+                _draw_game_popup_to_back = 1;
+                MOX::_screen_data = 2;
+            } else if (input == _game_popup_fields->field_s) {
+                if (MOX::_disallow_saves_code == 0) {
+                    _draw_game_popup_to_back = 1;
+                    MOX::_screen_data = 3;
+                    event_processed = true;
+                } else {
+                    char* msg = HAROLD::H_Message_(0xB9); // "CAN'T SAVE NOW"
+                    std::strcpy(text_buffer, msg);
+                    event_processed = true;
+                    Game_Popup_User_Box_(text_buffer, 0);
+                    *out_finished = 1;
+                }
+            } else if (input == _music_level_field) {
+                Set_Music_For_Game_Popup_();
+            } else if (input == _sfx_level_field) {
+                Set_Sound_For_Game_Popup_(1);
+            }
+
+            if (input == _game_popup_fields->field_esc_2) {
+                closed_with_exit = true;
+                event_processed = true;
+                *out_finished = 1;
+            }
+
+            if (event_processed) {
+                if (closed_with_exit && MOX::_settings.animations_on != 0) {
+                    fields::Clear_Fields_();
+                    Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
+                    _game_anims->field1_0x64 = 1;
+                }
+                return;
+            }
+
+            video::Set_Page_Off_();
+            LOADSAVE::_Draw_Main_Game_Popup_();
+            RUSS::Mox_Sync_Update_();
+        }
     }
 
     /**

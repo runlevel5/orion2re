@@ -4,6 +4,8 @@
 namespace ERIC {
     inline uint8_t& _fade_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B40});
 
+    inline uint8_t& fade_step = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B44});
+
     void __cdecl Eric_Init_();
 
     void __cdecl Eric_Defaults_();
@@ -12,15 +14,7 @@ namespace ERIC {
 
     uint16_t __cdecl Get_Fade_Percent_();
 
-    inline void __cdecl Fast_Fade_Out_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba690});
-        fn();
-    }
+    void Fast_Fade_Out_();
 
-    inline void __cdecl Set_Fade_Percent_(int32_t percent) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba660});
-        fn(percent);
-    }
+    void __cdecl Set_Fade_Percent_(int16_t percent);
 }

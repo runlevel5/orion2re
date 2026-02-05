@@ -14,13 +14,6 @@ namespace LOADSAVE {
 
     void __cdecl Restore_Game_Popup_();
 
-    /**
-     * @brief Displays a popup message box based on the specified type.
-     * 
-     * @param message The message content.
-     * @param type The type of popup: 0 = Message, 1 = Warning with result (Yes/No), 3 = Warning Notification.
-     * @return For type 1, returns the user selection; otherwise returns 0.
-     */
     int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type);
 
     inline uint8_t& _draw_game_popup_to_back =
@@ -499,10 +492,7 @@ namespace LOADSAVE {
 
     int8_t __cdecl Do_Load_Game_Popup_(int16_t* exit_flag);
 
-    inline void __cdecl Do_Main_Game_Popup_(int16_t* out_val) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(0x005110a0)(out_val);
-    }
+    void __cdecl Do_Main_Game_Popup_(int16_t* out_val);
 
     void __cdecl Do_Options_Game_Popup_(int16_t* out_val);
 
@@ -584,13 +574,7 @@ namespace LOADSAVE {
 
     void __cdecl Set_Current_Game_Option_Flags_();
 
-    inline void __cdecl Animate_Game_Popup_Pic_(s_animation_header* pic) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        reinterpret_cast<Fn>(0x00511c50)(pic);
-    }
+    void __cdecl Animate_Game_Popup_Pic_(s_animation_header* animation_header);
 
-    inline void __cdecl Update_Game_Settings_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x00511e80)();
-    }
+    void __cdecl Update_Game_Settings_();
 }

@@ -110,3 +110,4 @@
 #include "draw.h"
 #include "design.h"
 #include "colxport.h"
+#include "netcode.h"
