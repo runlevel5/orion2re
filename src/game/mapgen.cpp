@@ -11,11 +11,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     int16_t scaled_max_y = HAROLD::Get_Scaled_Value_(MOX::_MAP_MAX_Y);
     int8_t y_collision_padding = 0;
 
-    MISC::s_colors font_colors_main;
-    MISC::s_colors* puVar = MISC::Font_Colors2_(4, 'w', 'y');
+    s_colors font_colors_main;
+    s_colors* puVar = MISC::Font_Colors2_(4, 'w', 'y');
     font_colors_main = *puVar;
 
-    MISC::s_colors font_colors_alt;
+    s_colors font_colors_alt;
     puVar = MISC::Font_Colors2_(4, 'w', '|');
     font_colors_alt = *puVar;
 
@@ -1180,14 +1180,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     void __cdecl Universe_Generation_(uint8_t gal_size, uint8_t gal_age, int8_t nebula_freq) {
-        MISC::s_colors local_colors1;
-        MISC::s_colors local_colors2;
+        s_colors local_colors1;
+        s_colors local_colors2;
         uint32_t start_time;
         char planets_per_star[80];
         char error_buf[80];
         int16_t grid_x, grid_y;
 
-        MISC::s_colors* p = MISC::Font_Colors2_(4, 'w', 'y');
+        s_colors* p = MISC::Font_Colors2_(4, 'w', 'y');
         MOX::_g_galaxy_age = gal_age;
         _n_maps_generated = 0;
         local_colors1 = *p;

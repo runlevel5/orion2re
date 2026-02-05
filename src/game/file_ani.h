@@ -24,6 +24,9 @@ namespace file_ani {
     inline uint32_t& _file_animation_start =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E0F4 });
 
+    inline uint8_t*& _file_animation_header =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x0057E080 });
+
     inline const char* s_File_Animation_Frame_Too_Large = reinterpret_cast<const char*>(0x0055B804);
     inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
 
@@ -44,18 +47,9 @@ namespace file_ani {
 
     void __cdecl Draw_File_Animation_Stencil_();
 
-    inline int16_t __cdecl Get_File_Animation_Frame_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00531740})();
-    }
+    int16_t __cdecl Get_File_Animation_Frame_();
 
-    inline int16_t __cdecl Get_File_Animation_Total_Frames_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004e8c60})();
-    }
+    int16_t __cdecl Get_File_Animation_Total_Frames_();
 
-    inline uint32_t __cdecl Get_File_Animation_Block_Space_() {
-        using Fn = uint32_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004e8c40})();
-    }
+    int32_t __cdecl Get_File_Animation_Block_Space_();
 }

@@ -814,4 +814,8 @@ struct s_animation_header {
     uint32_t frame_offsets[1]; // Dynamic length array
 };
 
+struct s_colors {
+    uint8_t colors[8];
+};
+
 #pragma	pack(pop)

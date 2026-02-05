@@ -159,8 +159,8 @@ namespace HOMEGEN {
     }
 
     uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist) {
-        MISC::s_colors colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
-        MISC::s_colors colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
+        s_colors colors1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
+        s_colors colors2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
         CandidateList candidates[72];
         for (int i = 0; i < 72; ++i) {
@@ -299,8 +299,8 @@ namespace HOMEGEN {
     int32_t __cdecl Generate_Home_Worlds_() {
         uint16_t home_star_ids[8] = {};
 
-        MISC::s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
-        MISC::s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
+        s_colors local_color1 = *MISC::Font_Colors2_(4, 0x77, 0x79);
+        s_colors local_color2 = *MISC::Font_Colors2_(4, 0x77, 0x7c);
 
         // TODO: 72 * 299 bitmap (const?)
         _good_stars = static_cast<s_good_star*>(allocate::Allocate_First_Block_(MOX::_screen_seg, 0x5418));
@@ -391,8 +391,8 @@ namespace HOMEGEN {
 
     void __cdecl Set_Up_Home_Gen_Msg_() {
         // Retrieve and cache font colors for rendering
-        MISC::s_colors* colors1 = MISC::Font_Colors2_(4, 0x77, 0x79);
-        MISC::s_colors* colors2 = MISC::Font_Colors2_(4, 0x77, 0x7C);
+        s_colors* colors1 = MISC::Font_Colors2_(4, 0x77, 0x79);
+        s_colors* colors2 = MISC::Font_Colors2_(4, 0x77, 0x7C);
 
         // Determine home world generation counter limits
         _HOME_WORLD_GEN_MAX_CTR = (static_cast<int32_t>(MOX::_NUM_STARS) * 25) / 20;

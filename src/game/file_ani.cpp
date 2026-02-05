@@ -2,6 +2,11 @@
 
 namespace file_ani {
 
+    int16_t __cdecl Get_File_Animation_Frame_() {
+        _file_animation_header = reinterpret_cast<uint8_t*>(init::_io_buffer);
+        return *reinterpret_cast<int16_t*>(_file_animation_header + 4);
+    }
+
     void __cdecl Set_File_Animation_Buffer_(void* buffer) {
         _file_animation_buffer = (uint8_t*)buffer;
     }
@@ -202,6 +207,23 @@ namespace file_ani {
         }
 
         video::screen_refresh_flag = saved_refresh_flag;
+    }
+
+    int16_t __cdecl Get_File_Animation_Total_Frames_() {
+        if (!_file_animation_open) {
+            const char* message = HAROLD::H_Message_(206);
+            exitm::Exit_With_Message(message);
+        }
+
+        return init::_io_buffer->frame_count - 1;
+    }
+
+    int32_t __cdecl Get_File_Animation_Block_Space_() {
+        s_animation_header* header = init::_io_buffer;
+        int16_t index = header->current_frame;
+        int32_t current_val = header->frame_offsets[index];
+        int32_t next_val = header->frame_offsets[index + 1];
+        return (next_val - current_val) + 1;
     }
 
 }

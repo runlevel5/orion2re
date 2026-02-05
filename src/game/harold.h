@@ -93,7 +93,7 @@ namespace HAROLD {
 
     int16_t __cdecl Zoom_Level_Font_Style_();
 
-    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, uint8_t* style_buf, bool param_2);
+    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2);
 
     bool __cdecl Contact_With_Player_(int16_t player_idx, int16_t target_idx);
 

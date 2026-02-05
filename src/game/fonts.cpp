@@ -73,7 +73,7 @@ namespace fonts {
         _font_header.font_style_spacing = spacing;
     }
 
-    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, MISC::s_colors* style_data) {
+    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data) {
         Set_Font_Style_(static_cast<int32_t>(font_index), style_data);
         _font_header.font_style = 5;
     }
@@ -83,7 +83,7 @@ namespace fonts {
         _alias_outline_color = alias_color;
     }
 
-    void __cdecl Set_Font_Style_(int font_style, MISC::s_colors *new_colors) {
+    void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors) {
         _current_font_style = static_cast<uint16_t>(font_style);
 
         for (int i = 0; i < 8; ++i) {
@@ -265,6 +265,10 @@ namespace fonts {
         Print_Display_To_Bitmap_(x, y, text, 0, bitmap);
     }
 
+    void __cdecl Print_(int16_t x, int16_t y, const char* text) {
+        Print_Display_(x, y, text, 0);
+    }
+
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str) {
         int16_t width = Get_String_Width_(str);
         Print_(static_cast<int16_t>(x - (width / 2)), y, str);
@@ -276,17 +280,40 @@ namespace fonts {
         Print_(adjusted_x, y, text);
     }
 
-    void __cdecl Get_Colors_(uint8_t* colors) {
+    void __cdecl Get_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            colors[i] = _font_header.selected_colors2[i];
+            colors->colors[i] = _font_header.selected_colors2[i];
         }
     }
 
-    void __cdecl Set_Colors_(const uint8_t* colors) {
+    void __cdecl Set_Colors_(const s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            uint8_t color = colors[i];
+            uint8_t color = colors->colors[i];
             _font_header.selected_colors1[i] = color;
             _font_header.selected_colors2[i] = color;
+        }
+    }
+
+    int16_t __cdecl Get_Current_Font_Style_() {
+        return _current_font_style;
+    }
+
+    s_colors* __cdecl Get_Current_Font_Color_() {
+        return &_current_font_color_array;
+    }
+
+    int16_t __cdecl Get_Font_Height_() {
+        return _font_header.font_style_height;
+    }
+
+    void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors) {
+        Set_Font_Style_(style, colors);
+        _font_header.font_style = 4;
+    }
+
+    void __cdecl Set_Font_Special_Colors_(s_colors* colors) {
+        for (int i = 0; i < 8; ++i) {
+            _font_header.special_colors[i] = colors->colors[i];
         }
     }
 }

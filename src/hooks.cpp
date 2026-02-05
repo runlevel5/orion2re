@@ -477,6 +477,21 @@ namespace hooks {
         { 0x00510420, &LOADSAVE::_Draw_Main_Game_Popup_ },
         { 0x00511020, &LOADSAVE::Allocate_Data_Space_For_Game_Popup_ },
         { 0x00510db0, &LOADSAVE::_Game_Popup_ },
+        { 0x0051de80, &fields::Add_Scroll_Field_ },
+        { 0x0051e2b0, &fields::Add_Continuous_String_Input_Field_ },
+        { 0x00531740, &file_ani::Get_File_Animation_Frame_ },
+        { 0x004e8c60, &file_ani::Get_File_Animation_Total_Frames_ },
+        { 0x004e8c40, &file_ani::Get_File_Animation_Block_Space_ },
+        { 0x00525910, &fonts::Print_ },
+        { 0x00526040, &fonts::Get_Current_Font_Style_ },
+        { 0x00526050, &fonts::Get_Current_Font_Color_ },
+        { 0x00526060, &fonts::Get_Font_Height_ },
+        { 0x005256b0, &fonts::Set_Font_Style_Outline_ },
+        { 0x00525770, &fonts::Set_Font_Special_Colors_ },
+        { 0x004784b0, &EVENTS::Event_Check_Space_Anomaly_At_Star_ },
+        { 0x00477720, &EVENTS::Event_Check_Population_Boom_ },
+        { 0x004776d0, &EVENTS::Event_Check_Plague_ },
+        { 0x00477610, &EVENTS::Event_Check_Hyperspace_Flux_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

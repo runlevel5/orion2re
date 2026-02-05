@@ -229,7 +229,7 @@ namespace MAINMENU {
     }
 
     void __cdecl Draw_Main_Menu_Screen_() {
-        uint8_t color_buffer[8];
+        s_colors color_buffer;
 
         if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
             video::Set_Page_Off_();
@@ -282,22 +282,22 @@ namespace MAINMENU {
             Draw_Credits_();
         }
 
-        MISC::s_colors* colors = MISC::Font_Colors2_(1, 0xD2, 0xD7);
-        _memcpy(color_buffer, colors, 8);
+        s_colors* colors = MISC::Font_Colors2_(1, 0xD2, 0xD7);
+        color_buffer = *colors;
 
-        fonts::Set_Font_Style_(1, (MISC::s_colors*)color_buffer);
+        fonts::Set_Font_Style_(1, &color_buffer);
         int16_t font_h = fonts::Get_Font_Height_();
         fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
     }
 
-    void __cdecl Fade_Credit_Colors_(int8_t amount, uint8_t* colors) {
+    void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors) {
         for (int16_t i = 1; i < 8; ++i) {
-            colors[i] += amount;
+            colors->colors[i] += amount;
         }
     }
 
     void __cdecl Draw_Credits_() {
-        uint8_t local_colors[8];
+        s_colors local_colors;
 
         if (_delay_count <= 0) {
             _credit_y -= 2;
@@ -309,41 +309,41 @@ namespace MAINMENU {
 
             for (int16_t i = 0; i < _max_credits; ++i) {
                 if (i == start_fade_idx) {
-                    local_colors[0] = 0xD4;
-                    local_colors[1] = 0xD9;
-                    local_colors[2] = 0xD7;
-                    local_colors[3] = 0xD9;
-                    local_colors[4] = 0xD9;
-                    local_colors[5] = 0xD9;
-                    local_colors[6] = 0xD9;
-                    local_colors[7] = 0xD9;
+                    local_colors.colors[0] = 0xD4;
+                    local_colors.colors[1] = 0xD9;
+                    local_colors.colors[2] = 0xD7;
+                    local_colors.colors[3] = 0xD9;
+                    local_colors.colors[4] = 0xD9;
+                    local_colors.colors[5] = 0xD9;
+                    local_colors.colors[6] = 0xD9;
+                    local_colors.colors[7] = 0xD9;
                     int8_t intensity = (int8_t)((((_credit_y - 0xB3) % 14) / 3) * 2);
-                    Fade_Credit_Colors_(intensity, local_colors);
+                    Fade_Credit_Colors_(intensity, &local_colors);
                 } else if (i == end_fade_idx) {
                     int32_t rem = (0x1A6 - _credit_y) % 14;
-                    local_colors[0] = 0xD3;
-                    local_colors[1] = 0xD5;
-                    local_colors[2] = 0xD4;
-                    local_colors[3] = 0xD5;
-                    local_colors[4] = 0xD5;
-                    local_colors[5] = 0xD5;
-                    local_colors[6] = 0xD5;
-                    local_colors[7] = 0xD5;
+                    local_colors.colors[0] = 0xD3;
+                    local_colors.colors[1] = 0xD5;
+                    local_colors.colors[2] = 0xD4;
+                    local_colors.colors[3] = 0xD5;
+                    local_colors.colors[4] = 0xD5;
+                    local_colors.colors[5] = 0xD5;
+                    local_colors.colors[6] = 0xD5;
+                    local_colors.colors[7] = 0xD5;
                     int8_t intensity = (int8_t)(((rem + (rem < 0 ? 3 : 0)) / 4) * 2);
-                    Fade_Credit_Colors_(intensity, local_colors);
+                    Fade_Credit_Colors_(intensity, &local_colors);
                 } else {
-                    local_colors[0] = 0xD5;
-                    local_colors[1] = 0xDC;
-                    local_colors[2] = 0xDA;
-                    local_colors[3] = 0xDC;
-                    local_colors[4] = 0xDC;
-                    local_colors[5] = 0xDC;
-                    local_colors[6] = 0xDC;
-                    local_colors[7] = 0xDC;
+                    local_colors.colors[0] = 0xD5;
+                    local_colors.colors[1] = 0xDC;
+                    local_colors.colors[2] = 0xDA;
+                    local_colors.colors[3] = 0xDC;
+                    local_colors.colors[4] = 0xDC;
+                    local_colors.colors[5] = 0xDC;
+                    local_colors.colors[6] = 0xDC;
+                    local_colors.colors[7] = 0xDC;
                 }
 
                 fonts::Set_Outline_Color_(0xFD, 0xFD);
-                fonts::Set_Font_Style_Outline_((int16_t)DAT_0056ecf4, local_colors);
+                fonts::Set_Font_Style_Outline_((int16_t)DAT_0056ecf4, &local_colors);
                 fonts::Set_Font_Spacing_((int16_t)_credits_font_spacing);
                 
                 bitmap::Create_Blank_Bitmap_(0x121, 14, _bitmap);

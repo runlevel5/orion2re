@@ -287,7 +287,7 @@ namespace MOX2 {
         video::Set_Refresh_Full_();
         MOX::_mox_font_colors_offset = 0x75;
 
-        MISC::s_colors font_colors = *MISC::Font_Colors2_(4, 0xD3, 0xDC);
+        s_colors font_colors = *MISC::Font_Colors2_(4, 0xD3, 0xDC);
         fonts::Set_Font_Style_(4, &font_colors);
         video::Set_Page_Off_();
 

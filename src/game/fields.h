@@ -64,7 +64,7 @@ namespace fields {
         short field7_0xc;
         undefined field8_0xe;
         undefined field9_0xf;
-        int field10_0x10;
+        short* field10_0x10;
         short field11_0x14;
         undefined field12_0x16;
         undefined field13_0x17;
@@ -121,11 +121,34 @@ namespace fields {
         undefined field16_0x23;
     };
 
+    struct s_field_cont_input {
+        undefined field0_0x0;
+        undefined field1_0x1;
+        short field2_0x2;
+        s_colors* highlight_color;
+        char* help;
+        int field5_0xc;
+        short help_end;
+        undefined field7_0x12;
+        undefined field8_0x13;
+        short full_store_flag;
+        undefined field10_0x16;
+        undefined field11_0x17;
+        int field12_0x18;
+        short field13_0x1c;
+        undefined field14_0x1e;
+        undefined field15_0x1f;
+        short field16_0x20;
+        undefined field17_0x22;
+        undefined field18_0x23;
+    };
+
     union s_field_detail {
         struct s_field_button button;
         struct s_field_grid grid;
         struct s_field_radio radio;
         struct s_field_scroll scroll;
+        struct s_field_cont_input cont_input;
     };
 
     struct s_field {
@@ -135,7 +158,7 @@ namespace fields {
         short y_end;
         enum FIELD_TYPE field_type;
         short font_style;
-        byte* font_color;
+        s_colors* font_color;
         union s_field_detail detail;
         char hotkey;
         short sound;
@@ -146,6 +169,8 @@ namespace fields {
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
     inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
+    inline s_colors (&_list_normal_color) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572C08});
+    inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
     inline int16_t& _input_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
@@ -184,17 +209,9 @@ namespace fields {
 
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
 
-    inline int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int v1, int v2, int v3, int v4, int v5, int v6, int16_t* out, const char* label, char type) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int, int, int, int, int, int, int16_t*, const char*, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051de80});
-        return fn(x, y, v1, v2, v3, v4, v5, v6, out, label, type);
-    }
+    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t min_val, int16_t max_val, int16_t pos, int16_t step, int16_t width, int16_t height, short* context_ptr, const char* hotkey_ptr, char sound);
 
-    inline int32_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int w, int h, MOX::s_save_game_description* desc, int max_len, uint16_t v1, uint32_t v2, char hotkey, uint16_t v3) {
-        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int, int, MOX::s_save_game_description*, int, uint16_t, uint32_t, char, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e2b0});
-        return fn(x, y, w, h, desc, max_len, v1, v2, hotkey, v3);
-    }
+    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* help, int16_t max_len, int16_t help_end, int32_t buffer_ptr, int16_t sound, int16_t param_10);
 
     void __cdecl Disable_Draw_All_Fields_();
     void __cdecl Enable_Draw_All_Fields_();

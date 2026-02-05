@@ -86,7 +86,7 @@ namespace MOX {
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
-    inline int16_t& _red_color_pulse_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059883c});
+    inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
 
     inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
 

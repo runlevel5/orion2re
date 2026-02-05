@@ -9,12 +9,6 @@ namespace MISC {
 
     void __cdecl Increment_Mouse_Clock_Image_();
 
-#pragma pack(push, 1)
-    struct s_colors {
-        uint8_t colors[8];
-    };
-#pragma pack(pop)
-
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
     inline s_colors* __cdecl Font_Colors2_(uint16_t a1, uint8_t a2, uint8_t a3) {
@@ -23,8 +17,8 @@ namespace MISC {
         return fn(a1, a2, a3);
     }
 
-    inline void __cdecl Set_Fitted_Font_Style_(const char* text, uint8_t* colors, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
-        using Fn = void(__cdecl*)(const char*, uint8_t*, int16_t, int16_t, int16_t, int16_t, int16_t);
+    inline void __cdecl Set_Fitted_Font_Style_(const char* text, s_colors* colors, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
+        using Fn = void(__cdecl*)(const char*, s_colors*, int16_t, int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0049ede0})(text, colors, p3, p4, p5, p6, p7);
     }
 
@@ -61,8 +55,8 @@ namespace MISC {
         fn(count, total, out_width, d1, d2, out_height, str);
     }
 
-    inline void __cdecl Swap_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* colors1, uint8_t* colors2, int32_t count, void* bitmap) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, uint8_t*, int32_t, void*);
+    inline void __cdecl Swap_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors1, s_colors* colors2, int32_t count, void* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, s_colors*, s_colors*, int32_t, void*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EEE0});
         fn(x1, y1, x2, y2, colors1, colors2, count, bitmap);
     }

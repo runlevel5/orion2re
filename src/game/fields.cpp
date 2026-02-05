@@ -291,6 +291,99 @@ namespace fields {
         return current_index;
     }
 
+    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* help, int16_t max_len, int16_t help_end, int32_t buffer_ptr, int16_t sound, int16_t param_10) {
+        if (_fields_count >= _max_fields_count) {
+            char error_buffer[80];
+            const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+            uint32_t* dst = reinterpret_cast<uint32_t*>(error_buffer);
+
+            for (int i = 0; i < 11; ++i) {
+                dst[i] = src[i];
+            }
+            for (int i = 11; i < 20; ++i) {
+                dst[i] = 0;
+            }
+
+            exitm::Exit_With_Message(error_buffer);
+        }
+
+        s_colors* normal_src = fonts::Get_Current_Font_Color_();
+        s_colors* highlight_src = fonts::Get_Current_Font_Color_();
+
+        for (int i = 0; i < 8; ++i) {
+            _list_normal_color.colors[i] = normal_src->colors[i];
+            _list_highlight_colors.colors[i] = highlight_src->colors[i];
+        }
+
+        s_field* field = &_fields[_fields_count];
+
+        field->x = x;
+        field->y = y;
+        field->x_end = x + width;
+        field->y_end = y + height;
+        field->field_type = FIELD_TYPE_CONTINUOUS_INPUT;
+        field->font_style = fonts::Get_Current_Font_Style_();
+        field->font_color = &_list_normal_color;
+
+        field->detail.cont_input.highlight_color = &_list_highlight_colors;
+        field->detail.cont_input.help = help;
+        field->detail.cont_input.field5_0xc = buffer_ptr;
+        field->detail.cont_input.help_end = help_end;
+        field->detail.cont_input.full_store_flag = 0;
+
+        if (max_len > 256) {
+            max_len = 256;
+        }
+        field->detail.cont_input.field13_0x1c = max_len;
+        field->detail.cont_input.field16_0x20 = param_10;
+
+        field->hotkey = '\0';
+        field->sound = (int16_t)(int8_t)sound;
+
+        int16_t current_index = _fields_count;
+        _fields_count++;
+
+        return current_index;
+    }
+
+    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t min_val, int16_t max_val, int16_t pos, int16_t step, int16_t width, int16_t height, short* context_ptr, const char* hotkey_ptr, char sound) {
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
+        }
+
+        s_field& field = _fields[_fields_count];
+
+        field.x = x;
+        field.y = y;
+        field.x_end = field.x + width;
+        field.y_end = field.y + height;
+
+        field.detail.scroll.field4_0x8 = pos;
+        field.detail.scroll.field7_0xc = step;
+        field.detail.scroll.field11_0x14 = min_val;
+        field.detail.scroll.field14_0x18 = max_val;
+        field.sound = static_cast<int16_t>(sound);
+
+        if (height < width) {
+            field.detail.scroll.field17_0x1c = 0;
+        } else {
+            field.detail.scroll.field17_0x1c = 1;
+        }
+
+        field.field_type = FIELD_TYPE_SCROLL;
+        field.detail.scroll.field10_0x10 = context_ptr;
+
+        char hk = *hotkey_ptr;
+        if (hk > 0x60 && hk < 0x7B) {
+            hk -= 0x20;
+        }
+        field.hotkey = hk;
+
+        int16_t index = _fields_count;
+        _fields_count++;
+        return index;
+    }
+
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text) {
         if (_fields_count >= _max_fields_count) {
             exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);

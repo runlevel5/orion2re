@@ -47,8 +47,8 @@ struct s_font {
 
     inline int16_t& _draw_alias_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B150});
 
-    inline MISC::s_colors& _current_font_color_array =
-        *reinterpret_cast<MISC::s_colors*>(std::uintptr_t{0x005787A8});
+    inline s_colors& _current_font_color_array =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x005787A8});
 
     void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
@@ -59,7 +59,7 @@ struct s_font {
     }
 
     void __cdecl Set_PSTR_Style_(uint16_t style);
-    void __cdecl Set_Font_Style_(int font_style, MISC::s_colors *new_colors);
+    void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors);
 
     int16_t __cdecl Get_String_Width_(const char* str);
 
@@ -73,13 +73,15 @@ struct s_font {
 
     int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00525910 });
-        fn(x, y, str);
+    inline void __cdecl Print_Display_(int16_t x, int16_t y, const char* text, int32_t flags) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525930});
+        fn(x, y, text, flags);
     }
 
-    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, MISC::s_colors* style_data);
+    void __cdecl Print_(int16_t x, int16_t y, const char* str);
+
+    void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
     inline uint16_t& _outline_color =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B148});
@@ -104,25 +106,13 @@ struct s_font {
         fn();
     }
 
-    inline int16_t __cdecl Get_Current_Font_Style_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00526040})();
-    }
+    int16_t __cdecl Get_Current_Font_Style_();
 
-    inline uint8_t* __cdecl Get_Current_Font_Color_() {
-        using Fn = uint8_t*(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00526050})();
-    }
+    s_colors* __cdecl Get_Current_Font_Color_();
 
-    inline int16_t __cdecl Get_Font_Height_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526060 })();
-    }
+    int16_t __cdecl Get_Font_Height_();
 
-    inline void __cdecl Set_Font_Style_Outline_(int16_t style, void* color_data) {
-        using Fn = void(__cdecl*)(int16_t, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x005256b0})(style, color_data);
-    }
+    void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors);
 
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str);
      
@@ -130,21 +120,7 @@ struct s_font {
 
     void __cdecl Set_Font_Spacing_(int16_t spacing);
 
-    inline void __cdecl Print_ASM_(int16_t x, int16_t y, const char* text) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00525910})(x, y, text);
-    }
-
-    inline uint32_t __cdecl Get_String_Width_ASM_(const void* text) {
-        using Fn = uint32_t(__cdecl*)(const void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00454ae0})(text);
-    }
-
-    void __cdecl Get_Colors_(uint8_t* colors);
-    void __cdecl Set_Colors_(const uint8_t* colors);
-
-    inline void __cdecl Set_Font_Special_Colors_(uint8_t* colors) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00525770})(colors);
-    }
+    void __cdecl Get_Colors_(s_colors* colors);
+    void __cdecl Set_Colors_(const s_colors* colors);
+    void __cdecl Set_Font_Special_Colors_(s_colors* colors);
 }

@@ -458,8 +458,8 @@ namespace LOADSAVE {
         int8_t saved_game_types[10];
         short field_l2; /* Created by Rename Structure Field action */
         short field_s2;
-        byte popup_color1[8];
-        byte popup_color2[8];
+        s_colors popup_color1;
+        s_colors popup_color2;
         short field431_0x244[13];
         undefined field432_0x25e;
         undefined field433_0x25f;
@@ -509,7 +509,7 @@ namespace LOADSAVE {
 
     void __cdecl Check_For_Saved_Games_(int8_t* list);
 
-    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, byte* out_colors_primary, byte* out_colors_secondary);
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary);
 
     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y);
 

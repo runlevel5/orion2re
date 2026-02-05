@@ -237,9 +237,9 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(main_pic);
 
             Check_For_Saved_Games_(_game_popup_fields->saved_games);
-            byte colors_style[8], colors_special[8];
-            Get_Game_Popup_Colors_(2, colors_style, colors_special);
-            fonts::Set_Font_Special_Colors_(reinterpret_cast<uint8_t*>(colors_special));
+            s_colors colors_style, colors_special;
+            Get_Game_Popup_Colors_(2, &colors_style, &colors_special);
+            fonts::Set_Font_Special_Colors_(&colors_special);
 
             for (int16_t i = 0; i < 10; ++i) {
                 if (MOX::_settings.active_save_slot == i) {
@@ -263,14 +263,14 @@ namespace LOADSAVE {
                 _game_popup_fields->field_l2 = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], s_L_005560e8, '(');
             } else {
                 for (int16_t i = 0; i < 10; ++i) {
-                    fonts::Set_Font_Style_(2, reinterpret_cast<MISC::s_colors*>(colors_style));
+                    fonts::Set_Font_Style_(2, &colors_style);
                     if (_game_popup_fields->saved_games[i] == 2) {
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 4) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 4);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 8) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 8);
                     }
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
-                    _game_popup_fields->saved_game_fields[i] = (int16_t)fields::Add_Continuous_String_Input_Field_(MOX::_popup_base_x + 0x1a, MOX::_popup_base_y + 0x18 + i * 0x1f, 200, fonts::Get_Font_Height_(), &MOX::_save_game_description[i], 0x1e, 0, 0, ')', 0);
+                    _game_popup_fields->saved_game_fields[i] = (int16_t)fields::Add_Continuous_String_Input_Field_(MOX::_popup_base_x + 0x1a, MOX::_popup_base_y + 0x18 + i * 0x1f, 200, fonts::Get_Font_Height_(), (char*)&MOX::_save_game_description[i], 0x1e, 0, 0, ')', 0);
                 }
                 for (int16_t i = 0; i < 10; ++i) {
                     int16_t y_start = MOX::_popup_base_y + 0x18 + i * 0x1f;
@@ -663,18 +663,18 @@ namespace LOADSAVE {
                 text_x = MOX::_popup_base_x + 0x20;
                 text_y = MOX::_popup_base_y + 0x18 + (i * 31);
                 if (MOX::_screen_data == 2) {
-                    Get_Game_Popup_Colors_(2, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
-                    void* color = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
-                    fonts::Set_Font_Style_(2, (MISC::s_colors*)color);
+                    Get_Game_Popup_Colors_(2, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
+                    s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+                    fonts::Set_Font_Style_(2, color);
                     const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
                     fonts::Print_(text_x, text_y, desc);
                 }
             } else {
                 text_x = 0x20;
                 text_y = (i * 31) + 0x18;
-                Get_Game_Popup_Colors_(2, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
-                void* color = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
-                fonts::Set_Font_Style_(2, (MISC::s_colors*)color);
+                Get_Game_Popup_Colors_(2, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
+                s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+                fonts::Set_Font_Style_(2, color);
 
                 int16_t print_x = (MOX::_screen_data == 3) ? 0x24 : 0x20;
                 if (is_valid_slot) {
@@ -687,9 +687,9 @@ namespace LOADSAVE {
             }
 
             // Print stardate and real-world date
-            Get_Game_Popup_Colors_(1, _game_popup_fields->popup_color1, _game_popup_fields->popup_color2);
-            void* color_1 = (MOX::_settings.active_save_slot == (char)i) ? _game_popup_fields->popup_color1 : _game_popup_fields->popup_color2;
-            fonts::Set_Font_Style_(1, (MISC::s_colors*)color_1);
+            Get_Game_Popup_Colors_(1, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
+            s_colors* color_1 = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+            fonts::Set_Font_Style_(1, color_1);
 
             if (MOX::_screen_data == 3) text_x += 2;
 
@@ -714,29 +714,25 @@ namespace LOADSAVE {
     /**
      * @address 0050f730
      */
-    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, byte* out_colors_primary, byte* out_colors_secondary) {
-        int32_t* colors;
+    void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary) {
+        s_colors* colors;
 
         if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
             // Colors for main menu context
-            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0xFE, 0xFF);
-            out_colors_primary[0] = colors[0];
-            out_colors_primary[1] = colors[1];
+            colors = MISC::Font_Colors2_(font_idx, 0xFE, 0xFF);
+            *out_colors_primary = *colors;
 
-            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0xFB, 0xFC);
-            out_colors_secondary[0] = colors[0];
-            out_colors_secondary[1] = colors[1];
+            colors = MISC::Font_Colors2_(font_idx, 0xFB, 0xFC);
+            *out_colors_secondary = *colors;
         } else {
             // Colors for general game context
             MOX::_mox_font_colors_offset = 0x59; // 'Y'
-            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0x56, 0x5B); // 'V', '['
-            out_colors_primary[0] = colors[0];
-            out_colors_primary[1] = colors[1];
+            colors = MISC::Font_Colors2_(font_idx, 0x56, 0x5B); // 'V', '['
+            *out_colors_primary = *colors;
 
             MOX::_mox_font_colors_offset = 0x5B; // '['
-            colors = (int32_t*)MISC::Font_Colors2_(font_idx, 0x59, 0x7E); // 'Y', '~'
-            out_colors_secondary[0] = colors[0];
-            out_colors_secondary[1] = colors[1];
+            colors = MISC::Font_Colors2_(font_idx, 0x59, 0x7E); // 'Y', '~'
+            *out_colors_secondary = *colors;
         }
     }
 

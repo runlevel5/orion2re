@@ -71,7 +71,7 @@ namespace MAINMENU {
         fn();
     }
 
-    void __cdecl Fade_Credit_Colors_(int8_t amount, uint8_t* colors);
+    void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
     inline void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, void* bmp) {
         using Fn = void(__cdecl*)(int16_t, void*);

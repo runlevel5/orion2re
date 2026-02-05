@@ -288,13 +288,13 @@ namespace HAROLD {
      * @address 004f1930
      */
     void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2) {
-        uint8_t style[8];
+        s_colors style;
 
         int16_t style_idx = Zoom_Level_Font_Style_();
 
-        Get_Player_Font_Colors_(player_idx, style_idx, style, param_2);
+        Get_Player_Font_Colors_(player_idx, style_idx, &style, param_2);
 
-        fonts::Set_Font_Style_(style_idx, (MISC::s_colors*)style);
+        fonts::Set_Font_Style_(style_idx, &style);
     }
 
     void __cdecl Set_Sound_Volume_To_Settings_() {
@@ -799,7 +799,7 @@ namespace HAROLD {
         out[2] = src[2];
     }
 
-    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, uint8_t* style_buf, bool param_2) {
+    void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2) {
         uint8_t base_color_idx = 1;
         uint8_t mode = 0;
         int16_t limit_color = 14;
@@ -837,12 +837,12 @@ namespace HAROLD {
                 adj = static_cast<int8_t>((offset * 3) / 2);
             }
 
-            int8_t color_val = static_cast<int8_t>(style_buf[i]) + adj;
+            int8_t color_val = static_cast<int8_t>(style_buf->colors[i]) + adj;
             int16_t limit = limit_color + 8;
             if (static_cast<int16_t>(color_val) > limit) {
                 color_val = static_cast<int8_t>(limit);
             }
-            style_buf[i] = static_cast<uint8_t>(color_val);
+            style_buf->colors[i] = static_cast<uint8_t>(color_val);
         }
     }
 }

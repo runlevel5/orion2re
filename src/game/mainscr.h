@@ -110,7 +110,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Ship_Icons_(bool force_draw);
 
-    void __cdecl Set_Post_Fitted_Font_Style_(uint8_t param_1, uint8_t param_2);
+    void __cdecl Set_Post_Fitted_Font_Style_(uint8_t c1, uint8_t c2);
 
     void __cdecl Get_Research_Unit_String_(char* buffer);
 
