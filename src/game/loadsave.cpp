@@ -1263,8 +1263,8 @@ namespace LOADSAVE {
                     *out_finished = 1;
                 }
             } else if (input == _game_popup_fields->field_n) {
-                char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
-                std::strcpy(text_buffer, msg);
+                const char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
+                helpers::strcpy(text_buffer, msg);
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     MOX::_game_type = 0;
@@ -1280,8 +1280,8 @@ namespace LOADSAVE {
                     video::Copy_Back_To_Off_();
                 }
             } else if (input == _game_popup_fields->field_q) {
-                char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
-                std::strcpy(text_buffer, msg);
+                const char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
+                helpers::strcpy(text_buffer, msg);
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     FILEDEF::Save_Game_(9);
@@ -1319,8 +1319,8 @@ namespace LOADSAVE {
                     MOX::_screen_data = 3;
                     event_processed = true;
                 } else {
-                    char* msg = HAROLD::H_Message_(0xB9); // "CAN'T SAVE NOW"
-                    std::strcpy(text_buffer, msg);
+                    const char* msg = HAROLD::H_Message_(0xB9); // "CAN'T SAVE NOW"
+                    helpers::strcpy(text_buffer, msg);
                     event_processed = true;
                     Game_Popup_User_Box_(text_buffer, 0);
                     *out_finished = 1;

@@ -713,20 +713,23 @@ namespace MAINSCR {
 
     void __cdecl Print_Main_Screen_Data_() {
         char sep = (MOX::_settings.language == 1 || MOX::_settings.language == 2) ? ',' : '.';
-        s_colors colors1, colors2, colors3;
+        s_colors colors1, colors2;
         char buffer[128];
         char monetary_unit[16];
         char research_unit[16];
 
+        helpers::memset(&colors1, 0, sizeof(colors1));
+        helpers::memset(&colors2, 0, sizeof(colors2));
+
         fonts::Set_Font_Style_(0, &colors1);
         fonts::Get_Font_Height_();
         _sprintf(buffer, s__d_c_d_0055996c, (int)(MOX::_stardate / 10), (int)sep, (int)(MOX::_stardate % 10));
-        MISC::Set_Fitted_Font_Style_(buffer, &colors3, 2, 2, -1, 0x43, 1);
+        MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, -1, 0x43, 1);
         int16_t stardate_font_style = MISC::Get_Font_Style_();
         s_colors* p_stardate_colors = MISC::Font_Colors2_(stardate_font_style, 14, 23);
-        helpers::memcpy(&colors3, p_stardate_colors, 8);
+        helpers::memcpy(&colors2, p_stardate_colors, 8);
         fonts::Set_Outline_Color_(2, 1);
-        fonts::Set_Font_Style_Outline_(stardate_font_style, &colors3);
+        fonts::Set_Font_Style_Outline_(stardate_font_style, &colors2);
         fonts::Print_Centered_(580, 29, buffer); // 0x244, 0x1d
 
         if (EVENTS::Event_Check_Hyperspace_Flux_()) {
@@ -775,7 +778,7 @@ namespace MAINSCR {
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style_();
         int16_t bc_spacing = MISC::Get_Font_Spacing_();
-        MISC::Get_Mox_Font_Colors_(bc_style, 'K', 'M', &colors1);
+        MISC::Get_Mox_Font_Colors_(bc_style, 75, 77, &colors1);
         MISC::Get_Mox_Font_Colors_(bc_style, 14, 23, &colors2);
 
         if (plr->surplus_bc < 0) {
