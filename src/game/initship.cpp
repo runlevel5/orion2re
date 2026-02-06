@@ -213,7 +213,7 @@ namespace INITSHIP {
                 design->combat_speed = (design->combat_speed - old_bonus) + new_bonus;
             }
 
-            design->cost = DESIGN::Cost_Of_Design_(player_idx, design->name);
+            design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
         }
     }
 

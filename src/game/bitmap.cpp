@@ -43,4 +43,30 @@ namespace bitmap {
         *out_actual_height = (max_y - *out_min_y) + 1;
         *out_actual_width = (max_x - *out_min_x) + 1;
     }
+
+    int32_t __cdecl Get_Bitmap_Size_(int16_t width, int16_t height) {
+        int32_t size_with_offset = (int32_t)height * (int32_t)width + 0x13;
+        return (size_with_offset / 4) * 4;
+    }
+
+    void __cdecl Create_Bitmap_Header_(int16_t width, int16_t height, s_animation_header* h) {
+        animate::_animation_header = h;
+        h->width = width;
+        h->height = height;
+        h->current_frame = 0;
+        h->frame_count = 1;
+        h->loop_frame = 0;
+        h->field5_0x9 = 0;
+        h->field6_0xa = 0;
+        h->flags = 1;
+        h->frame_offsets[0] = 0x00000010;
+    }
+
+    void __cdecl Create_Blank_Bitmap_(int16_t w, int16_t h, void* sprite) {
+        Create_Bitmap_Header_(w, h, (s_animation_header*)sprite);
+
+        uint8_t* pixels = reinterpret_cast<uint8_t*>(sprite) + 0x10;
+        uint32_t pixel_count = static_cast<uint32_t>(static_cast<int32_t>(w) * static_cast<int32_t>(h));
+        Set_Memory_(pixels, pixel_count, 0);
+    }
 }

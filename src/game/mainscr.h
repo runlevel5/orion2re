@@ -29,6 +29,12 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(std::uintptr_t{0x004c7720})();
     }
 
+    inline void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int32_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004039A0 });
+        fn(node_ptr, flag);
+    }
+
     inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =

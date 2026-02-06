@@ -1,6 +1,8 @@
 #include "pch.h"
 #include <array>
 
+#define STOP_MAIN
+
 namespace hooks {
     static constexpr hook all_hooks[] = {
         { 0x005422e0, &platform::entry },
@@ -25,7 +27,9 @@ namespace hooks {
         { 0x0043d300, &FILEDEF::Update_Game_Settings_Version_Number_ },
         { 0x00478e80, &INITGAME::Set_Default_Game_Settings_ },
         { 0x004f24d0, &HAROLD::Get_Font_File_ },
+#ifndef SKIP_MAIN
         { 0x00483470, &MOX2::main2_ },
+#endif
         { 0x005274d0, &mouse::Set_Mouse_List_ },
         { 0x00527680, &mouse::Mouse_Button_ },
         { 0x0052d580, &sound::Set_Audio_Buffer_ },
@@ -400,10 +404,14 @@ namespace hooks {
         { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
         { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
         { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
+#ifndef SKIP_MAIN
         { 0x00483830, &MOX2::Screen_Control_ },
+#endif
         { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
         { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
+#ifndef SKIP_MAIN
         { 0x004e8c90, &MAINMENU::Main_Menu_Screen_ },
+#endif
         { 0x004e9d50, &MAINMENU::Reload_Main_Menu_Screen_ },
         { 0x004e9580, &MAINMENU::Main_Menu_Fade_Function2_ },
         { 0x004e9250, &MAINMENU::Do_Main_Menu_File_Animation_ },
@@ -513,11 +521,21 @@ namespace hooks {
         { 0x00511e80, &LOADSAVE::Update_Game_Settings_ },
         { 0x004ba660, &ERIC::Set_Fade_Percent_ },
         { 0x004ba690, &ERIC::Fast_Fade_Out_ },
+        { 0x0052a200, &line::Draw_Vertical_Run_ },
+        { 0x0052a1d0, &line::Draw_Horizontal_Run_ },
+        { 0x00529950, &line::Line_ },
+        { 0x00529f40, &line::Clip_Line_ },
+        { 0x0052ef80, &bitmap::Get_Bitmap_Size_ },
+        { 0x0052eed0, &bitmap::Create_Blank_Bitmap_ },
+        { 0x0052ef10, &bitmap::Create_Bitmap_Header_ },
+        { 0x0042e320, &DESIGN::Cost_Of_Design_ },
+        { 0x0042e540, &DESIGN::Get_Base_Combat_Speed_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
 
     void Assert_Types() {
+        ASSERT(sizeof(DESIGN::s_current_design) == 0x125, "s_current_design");
         ASSERT(sizeof(MAINMENU::s_main_menu) == 0xd2, "s_main_menu");
         ASSERT(sizeof(EVENTS::s_event_data) == 9, "s_event_data");
         ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
@@ -537,9 +555,9 @@ namespace hooks {
         ASSERT(sizeof(MOX::s_skill_data) == 18, "s_skill_data");
         ASSERT(sizeof(TECHDATA::s_tech_fuel_data) == 10, "s_tech_fuel_data");
         ASSERT(sizeof(TECHDATA::s_tech_app_data) == 13, "s_tech_app_data");
-        ASSERT(sizeof(TECHDATA::s_tech_field_data) == 23, "s_tech_field_data");
+        ASSERT(sizeof(TECHDATA::s_tech_field_data) == 0x17, "s_tech_field_data");
         ASSERT(sizeof(TECHDATA::s_tech_drive_data) == 0x2e, "s_tech_drive_data");
-        ASSERT(sizeof(TECHDATA::s_armor_data) == 15, "s_armor_data");
+        ASSERT(sizeof(TECHDATA::s_tech_armor_data) == 15, "s_armor_data");
         ASSERT(sizeof(fonts::s_font) == 0x235c, "s_font");
         ASSERT(sizeof(MSG_::s_MSG) == 18, "s_MSG");
         ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");

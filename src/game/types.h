@@ -421,10 +421,10 @@ struct Settler_Info {
 struct s_ship_weapons {
     int16_t type;
     int8_t count;
-    int8_t current_count;
     int8_t firing_arc;
     int16_t specials;
     int8_t ammo;
+    int8_t field_7;
 };
 
 struct s_ship_design {
@@ -809,7 +809,8 @@ struct s_animation_header {
     int16_t current_frame;
     int16_t frame_count;
     uint8_t loop_frame;
-    int16_t field5_0x9;
+    int8_t field5_0x9;
+    int8_t field6_0xa;
     uint8_t flags;
     uint32_t frame_offsets[1]; // Dynamic length array
 };

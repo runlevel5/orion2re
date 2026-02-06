@@ -4,6 +4,11 @@ namespace INITGAME {
     inline uint8_t& DAT_005974f0 = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974F0 });
     inline uint8_t& DAT_00597662 = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597662 });
 
+    inline int32_t __cdecl Get_Design_Hull_Size_() {
+        using Fn = int32_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00432100})();
+    }
+
     void Set_Default_Game_Settings_();
 
     void Init_Ships_Array_();

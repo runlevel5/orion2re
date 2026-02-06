@@ -29,6 +29,7 @@
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
+    <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\draw.cpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="src\game\initship.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\key.cpp" />
+    <ClCompile Include="src\game\line.cpp" />
     <ClCompile Include="src\game\loadsave.cpp" />
     <ClCompile Include="src\game\mainmenu.cpp" />
     <ClCompile Include="src\game\mainscr.cpp" />
@@ -114,6 +116,7 @@
     <ClInclude Include="src\game\jim.h" />
     <ClInclude Include="src\game\ken.h" />
     <ClInclude Include="src\game\key.h" />
+    <ClInclude Include="src\game\line.h" />
     <ClInclude Include="src\game\loader.h" />
     <ClInclude Include="src\game\loadsave.h" />
     <ClInclude Include="src\game\mainmenu.h" />

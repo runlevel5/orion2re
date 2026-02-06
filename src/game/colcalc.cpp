@@ -2314,197 +2314,190 @@ namespace COLCALC {
 
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out) {
         int16_t player_idx = static_cast<int16_t>(plr - MOX::_player);
-        
+
         plr->command_points = 0;
         plr->command_points_used = 0;
         for (int i = 0; i < 6; ++i) {
             plr->maintenance[i] = 0;
         }
 
-        // 1. Leader Maintenance
-        int leader_bonus_cp = 0;
-        int best_leader_idx = -1;
-        for (int i = 0; i < 67 /* MAX_LEADERS */; ++i) {
+        int32_t leader_cp_bonus = 0;
+        int32_t bonus_leader_idx = -1;
+
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
             if (leader->player_index == player_idx && leader->status >= 0 && leader->status < 3) {
-                if (!Leader_At_Anomaly_(leader)) {
-                    plr->maintenance[5] += Officer_Maintenance_(player_idx, (int16_t)i);
+                if (Leader_At_Anomaly_(leader) == 0) {
+                    plr->maintenance[5] += OFFICER::Officer_Maintenance_(player_idx, i);
                     
-                    int cp_provided = 0;
+                    int32_t cp_val = 0;
                     if (leader->general_skills & 0x800) {
-                        cp_provided = Owned_Officer_Level_(i) * 3 + 3;
+                        cp_val = OFFICER::Owned_Officer_Level_(i) * 3 + 3;
                     } else if (leader->general_skills & 0x400) {
-                        cp_provided = Owned_Officer_Level_(i) * 2 + 2;
+                        cp_val = OFFICER::Owned_Officer_Level_(i) * 2 + 2;
                     }
-                    
-                    if (cp_provided > leader_bonus_cp) {
-                        leader_bonus_cp = cp_provided;
-                        best_leader_idx = i;
+
+                    if (leader_cp_bonus < cp_val) {
+                        leader_cp_bonus = cp_val;
+                        bonus_leader_idx = i;
                     }
                 }
             }
         }
 
-        // 2. Colony Defense & Warlord CP
-        int star_bases = 0;
-        int battlestations = 0;
-        int fortresses = 0;
-        int warlord_bonus = 0;
+        int32_t n_star_bases = 0;
+        int32_t n_battlestations = 0;
+        int32_t n_fortresses = 0;
+        int32_t warlord_bonus = 0;
+
         for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* col = &MOX::_colony[i];
             if (col->owner == player_idx && col->outpost_flag == 0) {
-                plr->maintenance[0] += static_cast<uint16_t>(col->maintenance[ECON_BC]);
+                plr->maintenance[0] += (uint16_t)(uint8_t)col->maintenance[ECON_BC];
+                
                 if (plr->traits[TRAIT_WARLORD] != 0) {
                     warlord_bonus += 2;
                 }
-                if (col->buildings[BUILDING_STAR_BASE]) {
-                    star_bases++;
-                } else if (col->buildings[BUILDING_BATTLESTATION]) {
-                    battlestations++;
-                } else if (col->buildings[BUILDING_STAR_FORTRESS]) {
-                    fortresses++;
+
+                if (col->buildings[BUILDING_STAR_BASE] != 0) {
+                    n_star_bases++;
+                } else if (col->buildings[BUILDING_BATTLESTATION] != 0) {
+                    n_battlestations++;
+                } else if (col->buildings[BUILDING_STAR_FORTRESS] != 0) {
+                    n_fortresses++;
                 }
             }
         }
 
-        // 3. Tech CP Bonus
-        int tech_cp_val = 0;
-        int tech_app_idx = -1;
-        int tech_multiplier = 0;
+        int32_t comm_tech_idx = -1;
+        int32_t comm_tech_bonus_per_base = 0;
         if (plr->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
-            tech_app_idx = TECH_APP_HYPERSPACE_COMMUNICATIONS;
-            tech_multiplier = 3;
+            comm_tech_idx = TECH_APP_HYPERSPACE_COMMUNICATIONS;
+            comm_tech_bonus_per_base = 3;
         } else if (plr->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
-            tech_app_idx = TECH_APP_SUB_SPACE_COMMUNICATIONS;
-            tech_multiplier = 2;
+            comm_tech_idx = TECH_APP_SUB_SPACE_COMMUNICATIONS;
+            comm_tech_bonus_per_base = 2;
         } else if (plr->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
-            tech_app_idx = TECH_APP_TACHYON_COMMUNICATIONS;
-            tech_multiplier = 1;
-        }
-        tech_cp_val = tech_multiplier * (star_bases + battlestations + fortresses);
-
-        // 4. Final CP Calculation
-        int total_cp = fortresses * 3 + battlestations * 2 + warlord_bonus + tech_cp_val + star_bases + 5 + leader_bonus_cp;
-        plr->command_points = static_cast<int16_t>(total_cp);
-        
-        int imperium_bonus = 0;
-        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 3) {
-            imperium_bonus = total_cp / 2;
-            plr->command_points += static_cast<int16_t>(imperium_bonus);
+            comm_tech_idx = TECH_APP_TACHYON_COMMUNICATIONS;
+            comm_tech_bonus_per_base = 1;
         }
 
-        // Debug Output Phase 1
-        char* cur_debug = debug_out;
-        if (cur_debug) {
-            cur_debug += _sprintf(cur_debug, s_fmt_val_msg, 5, _d_from_1_fortress_msg);
-            if (star_bases > 0) {
-                if (star_bases == 1) cur_debug += _sprintf(cur_debug, _d_from_1_star_base_msg, 1);
-                else cur_debug += _sprintf(cur_debug, _d_from_d_star_bases_msg, star_bases, star_bases);
+        int32_t comm_tech_total = comm_tech_bonus_per_base * (n_star_bases + n_battlestations + n_fortresses);
+        int16_t base_cp = (int16_t)(n_fortresses * 3 + n_battlestations * 2 + warlord_bonus + comm_tech_total + n_star_bases + 5 + leader_cp_bonus);
+        plr->command_points = base_cp;
+
+        int32_t imperium_bonus = 0;
+        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 3) { // FEAT_GOVERNMENT_IMPERIUM
+            imperium_bonus = base_cp / 2;
+            plr->command_points = base_cp + (int16_t)imperium_bonus;
+        }
+
+        if (debug_out) {
+            char* ptr = debug_out;
+            ptr += _sprintf(ptr, s_fmt_val_msg, 5, _d_from_1_fortress_msg);
+            
+            if (n_star_bases > 0) {
+                if (n_star_bases == 1) ptr += _sprintf(ptr, _d_from_1_star_base_msg, 1);
+                else ptr += _sprintf(ptr, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
             }
-            if (battlestations > 0) {
-                if (battlestations == 1) cur_debug += _sprintf(cur_debug, _d_from_1_battlestation_msg, 2);
-                else cur_debug += _sprintf(cur_debug, _d_from_d_battlestations_msg, battlestations * 2, battlestations);
+            if (n_battlestations > 0) {
+                if (n_battlestations == 1) ptr += _sprintf(ptr, _d_from_1_battlestation_msg, 2);
+                else ptr += _sprintf(ptr, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
             }
-            if (fortresses > 0) {
-                if (fortresses == 1) cur_debug += _sprintf(cur_debug, _d_from_1_fortress_msg_alt, 3);
-                else cur_debug += _sprintf(cur_debug, _d_from_d_fortresses_msg, fortresses * 3, fortresses);
+            if (n_fortresses > 0) {
+                if (n_fortresses == 1) ptr += _sprintf(ptr, _d_from_1_fortress_msg_alt, 3);
+                else ptr += _sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
             }
-            if (tech_cp_val != 0) {
-                cur_debug += _sprintf(cur_debug, s_fmt_val_name, tech_cp_val, TECHDATA::_technology_applications[tech_app_idx].name);
+            if (comm_tech_total != 0) {
+                ptr += _sprintf(ptr, s_fmt_val_name, comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
             }
-            if (leader_bonus_cp != 0) {
-                cur_debug += _sprintf(cur_debug, s_fmt_val_name, leader_bonus_cp, MOX::_leaders[best_leader_idx].name);
+            if (leader_cp_bonus != 0) {
+                ptr += _sprintf(ptr, s_fmt_val_name, leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
             }
             if (warlord_bonus != 0) {
-                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
+                ptr += _sprintf(ptr, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
             }
             if (imperium_bonus != 0) {
-                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
+                ptr += _sprintf(ptr, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
             }
             if (plr->command_points > 5) {
-                cur_debug += _sprintf(cur_debug, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
+                ptr += _sprintf(ptr, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
             }
-            cur_debug += _sprintf(cur_debug, s_separator);
+            ptr += _sprintf(ptr, s_separator);
+            debug_out = ptr;
         }
 
-        // 5. Freighter Maintenance
-        int freighter_count = plr->n_freighters;
+        int32_t active_freighters = plr->n_freighters;
         if (plr->surplus_freighters > 0) {
-            freighter_count -= plr->surplus_freighters;
+            active_freighters -= plr->surplus_freighters;
         }
-        plr->maintenance[1] = static_cast<int16_t>(freighter_count / 2);
+        plr->maintenance[1] = (int16_t)(active_freighters / 2);
 
-        // 6. Ship CP Usage
-        int ships_by_hull[9] = {0};
-        int noncombat_ships = 0;
+        int32_t ship_counts[9] = {0};
+        int32_t noncombat_ships = 0;
+
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
-            s_ship_data* ship = &MOX::_ship[i];
-            if (ship->owner == player_idx && ship->status < 3) {
-                if (ship->d.ship_type != SHIP_TYPE_COMBAT) {
-                    noncombat_ships++;
-                } else {
-                    if (ship->d.size < 9) {
-                        ships_by_hull[ship->d.size]++;
+            s_ship_data* s = &MOX::_ship[i];
+            if (s->owner == player_idx && s->status < 3 && s->just_built == 0) {
+                if (s->d.ship_type == SHIP_TYPE_COMBAT) {
+                    if (s->d.size < 9) {
+                        ship_counts[s->d.size]++;
                     }
+                } else {
+                    noncombat_ships++;
                 }
-                plr->command_points_used += (int16_t)(ship->d.size + 1);
+                plr->command_points_used += (int16_t)(s->d.size + 1);
             }
         }
 
-        // Debug Output Phase 2
-        if (cur_debug) {
+        if (debug_out) {
+            char* ptr = debug_out;
             for (int i = 0; i < 9; ++i) {
-                if (ships_by_hull[i] > 0) {
-                    if (ships_by_hull[i] == 1) {
-                        cur_debug += _sprintf(cur_debug, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
+                if (ship_counts[i] > 0) {
+                    if (ship_counts[i] == 1) {
+                        ptr += _sprintf(ptr, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
                     } else {
-                        cur_debug += _sprintf(cur_debug, _d_from_d_s_ships_msg, (i + 1) * ships_by_hull[i], ships_by_hull[i], TECHDATA::_hull_data[i].size_name);
+                        ptr += _sprintf(ptr, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
                     }
                 }
             }
             if (noncombat_ships > 0) {
-                if (noncombat_ships == 1) cur_debug += _sprintf(cur_debug, _d_from_1_noncombat_ship_msg, 1);
-                else cur_debug += _sprintf(cur_debug, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
+                if (noncombat_ships == 1) ptr += _sprintf(ptr, _d_from_1_noncombat_ship_msg, 1);
+                else ptr += _sprintf(ptr, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
             }
-            const char* cp_used_label = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
-            cur_debug += _sprintf(cur_debug, s_fmt_val_msg, (int)plr->command_points_used, cp_used_label);
-            cur_debug += _sprintf(cur_debug, s_separator);
+            const char* used_msg = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
+            ptr += _sprintf(ptr, s_fmt_val_msg, (int)plr->command_points_used, used_msg);
+            ptr += _sprintf(ptr, s_separator);
+            debug_out = ptr;
         }
 
-        // 7. Excess Ship Maintenance
-        if (plr->command_points_used > 0) {
+        if (plr->command_points_used != 0) {
             if (plr->command_points < plr->command_points_used) {
-                int excess = plr->command_points_used - plr->command_points;
-                int cost_per_point = (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 100 /* 'd' */) ? 10 : (12 - MOX::_settings.game_difficulty);
-                plr->maintenance[2] = static_cast<int16_t>(cost_per_point * excess);
-                if (cur_debug) {
-                    _sprintf(cur_debug, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, cost_per_point, excess, (int)plr->maintenance[2]);
+                int32_t diff = plr->command_points_used - plr->command_points;
+                int32_t cost_mult = (plr->objectives == 'd') ? 10 : (12 - MOX::_settings.game_difficulty);
+                plr->maintenance[2] = (int16_t)(cost_mult * diff);
+                if (debug_out) {
+                    _sprintf(debug_out, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
                 }
             } else {
                 plr->maintenance[2] = 0;
-                if (cur_debug) {
-                    _sprintf(cur_debug, s_msg_bc_zero, _ship_maintenance_costs_msg);
+                if (debug_out) {
+                    _sprintf(debug_out, s_msg_bc_zero, _ship_maintenance_costs_msg);
                 }
             }
-        } else {
-            plr->maintenance[2] = 0;
         }
 
-        // 8. Spy Maintenance
-        plr->maintenance[3] = 0;
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            plr->maintenance[3] += static_cast<int16_t>(BILL::Get_Their_Spy_Number_(player_idx, (int16_t)i));
+            plr->maintenance[3] += (int16_t)BILL::Get_Their_Spy_Number_(player_idx, (int16_t)i);
         }
 
-        // 9. Tribute Income
         plr->maintenance[4] = 0;
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (plr->tribute_treaty[i] != 0) {
-                plr->maintenance[4] += static_cast<int16_t>(Tribute_Received_From_(player_idx, i));
+                plr->maintenance[4] += (int16_t)Tribute_Received_From_(player_idx, i);
             }
         }
 
-        // 10. Total
         plr->total_maintenance = 0;
         for (int i = 0; i < 6; ++i) {
             plr->total_maintenance += plr->maintenance[i];

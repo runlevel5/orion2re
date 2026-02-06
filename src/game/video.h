@@ -72,4 +72,10 @@ namespace video {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528A30 });
         fn(start_x, y, end_x);
     }
+
+    inline void __cdecl Add_Dot_To_Scan_List_(int32_t x, int32_t y) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528970 });
+        fn(x, y);
+    }
 }

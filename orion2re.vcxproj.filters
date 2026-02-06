@@ -180,6 +180,12 @@
     <ClCompile Include="src\game\geo.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\line.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\design.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -402,6 +408,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\colxport.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\line.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

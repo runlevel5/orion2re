@@ -272,12 +272,6 @@ inline void __cdecl Wrapper_For_Normal_System_Fields_() {
     fn();
 }
 
-inline void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int32_t flag) {
-    using Fn = void(__cdecl*)(int16_t, int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004039A0 });
-    fn(node_ptr, flag);
-}
-
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
@@ -301,6 +295,12 @@ inline void __cdecl No_Op1_() {
 inline uint32_t __cdecl isqrt_(uint32_t val) {
     using Fn = uint32_t(__cdecl*)(uint32_t);
     return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
+}
+
+inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
+    using Fn = void(__cdecl*)(void*, uint32_t, uint8_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052ced8});
+    fn(dest, size, value);
 }
 
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
@@ -429,10 +429,4 @@ inline int16_t __cdecl Collect_Black_Holes_(int16_t* star_indices) {
     using Fn = int16_t(__cdecl*)(int16_t*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004127F0});
     return fn(star_indices);
-}
-
-inline bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-    using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004124B0});
-    return fn(px, py, d, x1, y1, x2, y2);
 }
