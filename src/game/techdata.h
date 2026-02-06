@@ -71,19 +71,14 @@ namespace TECHDATA {
 
     struct s_tech_drive_data {
         char* name;
-        undefined field1_0x4;
-        undefined field2_0x5;
-        short tech_app;
-        short space_per_ship_type[6];
-        short cost_per_ship_type[6];
+        uint8_t field1_0x4;
+        uint8_t field2_0x5;
+        int16_t tech_app;
+        int16_t space_per_ship_type[6];
+        int16_t cost_per_ship_type[6];
         int8_t combat_speed_modifier[6];
-        undefined field7_0x26;
-        undefined field8_0x27;
-        undefined field9_0x28;
-        undefined field10_0x29;
-        undefined field11_0x2a;
-        undefined field12_0x2b;
-        short speed;
+        int8_t speed_modifier[6];
+        int16_t speed;
     };
 
     typedef struct s_tech_field_data s_tech_field_data, * Ps_tech_field_data;
@@ -114,8 +109,7 @@ namespace TECHDATA {
 
     struct s_tech_hull_data {
         short hull_space;
-        undefined field1_0x2;
-        undefined field2_0x3;
+        short hull_size;
         undefined field3_0x4;
         undefined field4_0x5;
         undefined field5_0x6;
@@ -184,30 +178,11 @@ namespace TECHDATA {
     typedef struct s_tech_specials_data s_tech_specials_data, * Ps_tech_specials_data;
 
     struct s_tech_specials_data {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        undefined field2_0x2;
-        undefined field3_0x3;
-        undefined field4_0x4;
-        undefined field5_0x5;
-        short tech_application_id;
-        short space_per_ship_type[6];
-        short cost_per_ship_type[6];
-        undefined field20_0x15;
-        undefined field21_0x16;
-        undefined field22_0x17;
-        undefined field23_0x18;
-        undefined field24_0x19;
-        undefined field25_0x1a;
-        undefined field26_0x1b;
-        undefined field27_0x1c;
-        undefined field28_0x1d;
-        undefined field29_0x1e;
-        undefined field30_0x1f;
-        undefined field31_0x20;
-        undefined field32_0x21;
-        undefined field33_0x22;
-        undefined field34_0x23;
+        uint8_t pad[6];
+        int16_t tech_application_id;
+        int16_t space_per_ship_type[6];
+        int16_t cost_per_ship_type[6];
+        uint8_t field20_0x15[15];
     };
     #pragma pack(pop)
 
@@ -219,4 +194,7 @@ namespace TECHDATA {
     inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
     inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(std::uintptr_t{ 0x00553050 });
     inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
+    inline s_tech_shield_data* _shields = reinterpret_cast<s_tech_shield_data*>(std::uintptr_t{ 0x00554e00 });
+    inline s_tech_computer_data* _computers = reinterpret_cast<s_tech_computer_data*>(std::uintptr_t{ 0x00555558 });
+    inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
 }

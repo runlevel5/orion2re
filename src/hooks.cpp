@@ -404,6 +404,7 @@ namespace hooks {
         { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
         { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
         { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
+        { 0x00432100, &INITGAME::Get_Design_Hull_Size_ },
 #ifndef SKIP_MAIN
         { 0x00483830, &MOX2::Screen_Control_ },
 #endif
@@ -529,7 +530,24 @@ namespace hooks {
         { 0x0052eed0, &bitmap::Create_Blank_Bitmap_ },
         { 0x0052ef10, &bitmap::Create_Bitmap_Header_ },
         { 0x0042e320, &DESIGN::Cost_Of_Design_ },
-        { 0x0042e540, &DESIGN::Get_Base_Combat_Speed_ },
+        { 0x0042e540, &DESIGN::Get_Modified_Combat_Speed_ },
+        { 0x0042e580, &DESIGN::Current_Design_Has_Special_System_ },
+        { 0x004303a0, &DESIGN::Count_Special_Devices_ },
+        { 0x004303d0, &DESIGN::Count_Weapons_Loaded_ },
+        { 0x004321e0, &DESIGN::Update_Calculated_Design_Data_ },
+        { 0x0042da90, &DESIGN::Has_Damper_Field_ },
+        { 0x0042E680, &DESIGN::Current_Design_Shield_ },
+        { 0x0042e690, &DESIGN::Base_Shield_Cost },
+        { 0x0042edd0, &DESIGN::Design_Template_Costs_ },
+        { 0x0042efc0, &DESIGN::Design_Template_Space_Requirements_ },
+        { 0x00432040, &DESIGN::Total_Design_Cost_ },
+        { 0x004322c0, &DESIGN::Update_Weapon_Count_ },
+        { 0x00432300, &DESIGN::Update_N_Spec_Systems_In_Design_ },
+        { 0x0042e6a0, &DESIGN::Get_Shild_Space_ },
+        { 0x00432160, &DESIGN::Total_Space_Used_ },
+        { 0x0042e620, &DESIGN::Get_Base_Combat_Speed_ },
+        { 0x0042e650, &DESIGN::Get_Ship_Speed_Modifier_ },
+        { 0x0042e5b0, &DESIGN::Current_Design_Base_Combat_Speed_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

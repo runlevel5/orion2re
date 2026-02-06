@@ -430,3 +430,53 @@ inline int16_t __cdecl Collect_Black_Holes_(int16_t* star_indices) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004127F0});
     return fn(star_indices);
 }
+
+inline void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_num, int* total_cost) {
+    using Fn = void(__cdecl*)(int16_t, int*);
+    reinterpret_cast<Fn>(std::uintptr_t{0x00431970})(player_num, total_cost);
+}
+
+inline int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_app_id) {
+    using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00431FB0})(player_idx, tech_app_id);
+}
+
+inline int16_t __cdecl Shield_Base_Cost_(int16_t shield_type) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00431B10})(shield_type);
+}
+
+inline int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t tech_level) {
+    using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x0042E2B0})(base_cost, tech_level);
+}
+
+inline int16_t __cdecl Base_Computer_Cost_(int16_t computer_type) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x0042E270})(computer_type);
+}
+
+inline int32_t __cdecl Weapon_Cost_(int16_t type, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+    using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00432620})(type, count, arc, ammo, specials);
+}
+
+inline uint32_t __cdecl Miniaturization_Category_(int16_t tech_app) {
+    using Fn = uint32_t(__cdecl*)(int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00432BC0})(tech_app);
+}
+
+inline int32_t __cdecl Space_Given_M_Level_(int16_t base_space, int16_t tech_level, uint8_t min_cat) {
+    using Fn = int32_t(__cdecl*)(int16_t, int16_t, uint32_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00431E60})(base_space, tech_level, static_cast<uint32_t>(min_cat));
+}
+
+inline int32_t __cdecl Weapon_Space_(int16_t player_num, int16_t weapon_type, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+    using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00432830})(player_num, weapon_type, count, arc, ammo, specials);
+}
+
+inline int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num) {
+    using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00431B90})(shield_type, ship_size, player_num);
+}

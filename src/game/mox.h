@@ -1,6 +1,14 @@
 #pragma once
 
+namespace DESIGN { struct s_current_design; }
+
 namespace MOX {
+    inline DESIGN::s_current_design*& _design =
+        *reinterpret_cast<DESIGN::s_current_design**>(std::uintptr_t{0x0059B330});
+
+    inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
+    inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
+
     enum SCREEN : int16_t {
         SCREEN_MAIN = 0,
         SCREEN_COLONY = 1,
