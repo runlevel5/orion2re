@@ -29,4 +29,9 @@ namespace EVANHELP {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0041DE00})(help1, help2);
     }
+    inline void __cdecl Get_Application_Description_(char* buffer, int16_t tech_id) {
+        using Fn = void(__cdecl*)(char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041E4F0});
+        fn(buffer, tech_id);
+    }
 }

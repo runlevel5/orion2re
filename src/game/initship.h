@@ -21,6 +21,11 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Computer_(int16_t player_idx);
 
+    inline uint32_t __cdecl Any_Equipment_Available_(int32_t type) {
+        using Fn = uint32_t(__cdecl*)(int32_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00430360})(type);
+    }
+
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
@@ -32,10 +37,10 @@ namespace INITSHIP {
     };
 #pragma pack(pop)
 
-    inline void __cdecl Get_Design_Combat_Bonuses_(s_current_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
+    inline void __cdecl Get_Design_Combat_Bonuses_(s_ship_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
         // ABI is weird when passed by value, so just call in assembly
         /*
-        using Fn = void(__cdecl*)(s_current_design, int16_t*, int16_t*, int16_t*);
+        using Fn = void(__cdecl*)(s_ship_design, int16_t*, int16_t*, int16_t*);
         reinterpret_cast<Fn>(std::uintptr_t{ 0x0047ee30 })(design, bonus1, bonus2, bonus3);
         */
         __asm {

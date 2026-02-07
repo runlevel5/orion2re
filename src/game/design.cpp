@@ -210,7 +210,7 @@ namespace DESIGN {
         return device_count;
     }
 
-    void __cdecl Has_Damper_Field_() {
+    bool __cdecl Has_Damper_Field_() {
         bool found_damper = false;
 
         for (int16_t i = 0; i < 8; ++i) {
@@ -223,6 +223,8 @@ namespace DESIGN {
         if (found_damper) {
             _design->shield = 0;
         }
+
+        return found_damper;
     }
 
     uint8_t __cdecl Current_Design_Shield_() {
@@ -417,6 +419,33 @@ namespace DESIGN {
                 }
             }
         }
+    }
+
+    int16_t __cdecl Current_Design_Armor_Absorption_() {
+        s_current_design* design = MOX::_design;
+
+        int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_absorption;
+
+        int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].armor_absorption_percent;
+        int16_t total_absorption = base_absorption + (int16_t)((int32_t)base_absorption * bonus_percent / 100);
+
+        if (Current_Design_Has_Special_System_(design, SPECIAL_HEAVY_ARMOR)) {
+            total_absorption *= 3;
+        }
+
+        return total_absorption;
+    }
+
+    int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {
+        int16_t shield_idx = MOX::_design->shield;
+
+        int16_t blocked_points = TECHDATA::_shields[shield_idx].points_blocked;
+
+        if (Current_Design_Has_Special_System_(MOX::_design, SPECIAL_HARD_SHIELDS)) {
+            blocked_points += 3;
+        }
+
+        return blocked_points;
     }
 
     void __cdecl Print_Ship_Size_Error_Message_(int size_idx) {
@@ -694,6 +723,10 @@ namespace DESIGN {
         return INITGAME::Get_Design_Hull_Size_();
     }
 
+    int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx) {
+        return TECHDATA::Weapon_Rack_(weapon_idx) == 1;
+    }
+
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
                                   uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size) {
         int16_t base_size = TECHDATA::_weapons[weapon_idx].base_size;
@@ -794,6 +827,170 @@ namespace DESIGN {
         target_design->speed = (int8_t)INITSHIP::Get_FTL_Speed_(player_idx, MOX::_design->ftl_type);
     }
 
+    void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
+        if (_design_computer_replacement_field == field) {
+            if (INITSHIP::Any_Equipment_Available_(8) == 0) {
+                const char* msg = HAROLD::H_Message_(HESTR_050_YOU_MAY_NOT_UPGRADE_TH);
+                GENDRAW::Warning_Box_(msg);
+            } else {
+                MOX::_design_screen_replacement_item = MOX::_design->computer_type;
+                MOX::_design_screen_replacement_type = 8;
+                _printed_cost -= MOX::_design->computer_cost;
+                DESBOX::Generic_Replacement_Box_();
+                MOX::_design->show_help = 1;
+                MOX::_current_screen = SCREEN_DESIGN;
+                *refresh = 1;
+                *flag = 99;
+            }
+        }
+
+        if (_design_shield_replacement_field == field) {
+            if (Has_Damper_Field_()) {
+                const char* msg = HAROLD::H_Message_(HESTR_051_YOU_MAY_NOT_PLACE_SHIE);
+                GENDRAW::Warning_Box_(msg);
+                return;
+            }
+
+            if (INITSHIP::Any_Equipment_Available_(2) != 0) {
+                MOX::_design_screen_replacement_item = MOX::_design->shield;
+                MOX::_design_screen_replacement_type = 2;
+                _printed_cost -= MOX::_design->shield_cost;
+                _printed_space_avail += MOX::_design->shield_space;
+                DESBOX::Generic_Replacement_Box_();
+                MOX::_design->show_help = 1;
+                MOX::_current_screen = SCREEN_DESIGN;
+                *refresh = 1;
+                *flag = 99;
+            } else {
+                const char* msg = HAROLD::H_Message_(HESTR_052_YOU_MAY_NOT_UPGRADE_TH);
+                GENDRAW::Warning_Box_(msg);
+            }
+        }
+    }
+
+    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* refresh, int16_t* out_flag) {
+        char description_buffer[1332];
+
+        for (int16_t i = 0; i < 8; ++i) {
+            int16_t weapon_field_id = MOX::_weapons_field[i];
+            int16_t design_weapon_index = i;
+
+            if (MOX::_scanned_field == weapon_field_id) {
+                MOX::_scanned_field = i + 1000;
+            }
+
+            if (clicked_field == weapon_field_id) {
+                fields::Clear_Mouse_Buffer_();
+                fields::Set_Input_Delay_(20);
+
+                if (MOX::_design->weapon_type[i] == 0) {
+                    for (int16_t j = 0; j < 8; ++j) {
+                        if (MOX::_design->weapon_type[j] == 0) {
+                            design_weapon_index = j;
+                            break;
+                        }
+                    }
+                }
+
+                MOX::_design_screen_replacement_type = 3;
+                _printed_space_avail += MOX::_design->weapon_space[design_weapon_index];
+                _printed_cost -= MOX::_design->weapon_cost[design_weapon_index];
+                _selected_weapon_index = design_weapon_index;
+
+                fields::Deactivate_Help_List_();
+                DESBOX::Weapons_Replacement_Box_();
+
+                MOX::_design->show_help = 1;
+                MOX::_current_screen = SCREEN_DESIGN;
+                *out_flag = 99;
+                return;
+            } else if (clicked_field + weapon_field_id == 0) {
+                int16_t weapon_type = MOX::_design->weapon_type[i];
+                if (weapon_type > 0) {
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_application_id);
+                    TEXTBOX::Text_Box_(TECHDATA::_weapons[weapon_type].name, description_buffer);
+                }
+            }
+        }
+    }
+
+    void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t* refresh, int16_t* out_status) {
+        char description_buffer[1332];
+
+        for (int16_t i = 0; i < 8; ++i) {
+            int16_t slot_idx = (int16_t)MOX::_first_special_system_ctr + i;
+            int16_t field_id = MOX::_special_system_field[i];
+
+            if (MOX::_scanned_field == field_id) {
+                MOX::_scanned_field = i + 2000;
+            }
+
+            if (field_id == clicked_field_id) {
+                if (MOX::_design->special_devices[slot_idx] == 0) {
+                    for (int16_t search_idx = 0; search_idx < 8; ++search_idx) {
+                        if (MOX::_design->special_devices[search_idx] == 0) {
+                            slot_idx = search_idx;
+                            break;
+                        }
+                    }
+                }
+
+                MOX::_design_screen_replacement_type = 9;
+                _printed_space_avail += MOX::_design->special_device_space[slot_idx];
+                _printed_cost -= MOX::_design->special_device_cost[slot_idx];
+                MOX::_design_screen_replacement_slot = slot_idx;
+
+                fields::Deactivate_Help_List_();
+                DESBOX::Special_Systems_Box_();
+
+                MOX::_current_screen = SCREEN_DESIGN;
+                MOX::_design->show_help = 1;
+                *out_status = 99;
+            } else if ((field_id + clicked_field_id == 0)) {
+                int16_t special_id = MOX::_design->special_devices[i];
+                if (special_id > 0) {
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_application_id);
+
+                    const char* title = *reinterpret_cast<const char**>(&TECHDATA::_specials[special_id]);
+                    TEXTBOX::Text_Box_(title, description_buffer);
+                }
+            }
+        }
+    }
+
+    void __cdecl Check_Plus_Minus_Buttons_(int16_t field) {
+        uint8_t player_race = MOX::_player[MOX::_PLAYER_NUM].race;
+        int16_t icon_index = 0;
+
+        if (MOX::_ship_icon_lf_button == static_cast<uint16_t>(field)) {
+            int16_t ship_size = MOX::_design->ship_size;
+            if (ship_size != 5) {
+                MOX::_design->picture_type--;
+                if (MOX::_design->picture_type < ship_size * 8) {
+                    MOX::_design->picture_type = ship_size * 8 + 7;
+                }
+                icon_index = MOX::_design->picture_type % 8;
+            }
+
+            if (_changed_design_name == 0) {
+                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name);
+            }
+        } else if (MOX::_ship_icon_rt_button == static_cast<uint16_t>(field)) {
+            int16_t ship_size = MOX::_design->ship_size;
+            if (ship_size != 5) {
+                MOX::_design->picture_type++;
+                if (MOX::_design->picture_type > (ship_size * 8 + 7)) {
+                    MOX::_design->picture_type = ship_size * 8;
+                }
+                icon_index = MOX::_design->picture_type % 8;
+            }
+
+            if (_changed_design_name == 0) {
+                Get_Ship_Design_Name_(player_race, ship_size, icon_index, MOX::_design->name);
+            }
+        }
+    }
+
     void __cdecl Clear_Design_() {
         int16_t player_num = MOX::_PLAYER_NUM;
         s_current_design* design = _design;
@@ -822,6 +1019,32 @@ namespace DESIGN {
         }
 
         Update_Calculated_Design_Data_(player_num);
+    }
+
+    void __cdecl Get_Tech_Description_Lbx_Name_(char* buffer) {
+        const char* src;
+
+        switch (MOX::_settings.language) {
+            case 1: // German
+                src = s_GERTECD_LBX;
+                break;
+            case 2: // French
+                src = s_FRETECD_LBX;
+                break;
+            case 3: // Spanish
+                src = s_SPATECD_LBX;
+                break;
+            case 4: // Italian
+                src = s_ITATECD_LBX;
+                break;
+            default: // English or other
+                src = s_TECHDESC_LBX;
+                break;
+        }
+
+        char* d = buffer;
+        const char* s = src;
+        while ((*d++ = *s++));
     }
 
     void __cdecl Load_Design_Screen_Pictures_() {
@@ -912,8 +1135,45 @@ namespace DESIGN {
         }
     }
 
+    void __cdecl Build_Design_Template_(s_ship_design* template_out) {
+        s_current_design* d = MOX::_design;
+
+        char* src = d->name;
+        char* dest = template_out->name;
+        while ((*dest++ = *src++) != '\0');
+
+        template_out->size = (int8_t)d->ship_size;
+        template_out->shield_type = 0;
+        template_out->ftl_type = (int8_t)d->ftl_type;
+        template_out->computer_type = (int8_t)d->computer_type;
+        template_out->armor_type = (int8_t)d->armor_type;
+
+        for (int i = 0; i < 5; ++i) {
+            template_out->special_device_flags[i] = 0;
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            if (d->special_devices[i] > 0) {
+                struct_::Set_Bit_Field_(template_out->special_device_flags, (uint16_t)d->special_devices[i]);
+            }
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            template_out->ship_weapon[i].type = d->weapon_type[i];
+            template_out->ship_weapon[i].count = (int8_t)d->weapon_count[i];
+            template_out->ship_weapon[i].firing_arc = d->weapon_firing_arc[i];
+            template_out->ship_weapon[i].specials = d->weapon_specials[i];
+            template_out->ship_weapon[i].ammo = d->weapon_ammo[i];
+        }
+
+        template_out->picture_num = (int8_t)d->picture_type;
+        template_out->cost = (int16_t)d->total_cost;
+        template_out->date_of_design = (uint16_t)MOX::_stardate;
+        template_out->combat_speed = Get_Modified_Combat_Speed_(d);
+    }
+
     void __cdecl Print_Current_Design_() {
-        s_current_design local_design;
+        s_ship_design local_design;
         int16_t missile_evasion, beam_defense, beam_attack_bonus;
         char buffer[256];
         s_colors colors_primary, colors_secondary;
@@ -1160,6 +1420,127 @@ namespace DESIGN {
         fonts::Print_Integer_Right_(0x87, footer_y, (int)Printed_Design_Cost_());
         fonts::Print_(0xA3, footer_y, HAROLD::H_Message_(0x63 /* HESTR_063_SPACE_AVAILABLE */));
         fonts::Print_Integer_Right_(0x160, footer_y, _printed_space_avail);
+    }
+
+    void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2) {
+        if (size_idx >= 0 && size_idx <= 5) {
+            *x1 = 118;
+            *x2 = 227;
+
+            switch (size_idx) {
+                case 0:
+                    *y1 = 54;
+                    *y2 = 69;
+                    break;
+                case 1:
+                    *y1 = 70;
+                    *y2 = 84;
+                    break;
+                case 2:
+                    *y1 = 85;
+                    *y2 = 102;
+                    break;
+                case 3:
+                    *y1 = 103;
+                    *y2 = 117;
+                    break;
+                case 4:
+                    *y1 = 118;
+                    *y2 = 132;
+                    break;
+                case 5:
+                    *y1 = 133;
+                    *y2 = 149;
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            *x1 = 0;
+            *y1 = 0;
+            *x2 = 0;
+            *y2 = 0;
+        }
+    }
+
+    /**
+     * Retrieves a ship design name from shipname.lbx based on race, hull, and design indices.
+     */
+    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t hull_idx, int16_t design_idx, char* out_name) {
+        allocate::Push_Block_(MOX::_global_data_seg);
+
+        // entry_index = design_idx + (race_idx * 6 + hull_idx) * 8
+        int16_t calculated_index = (int16_t)(race_idx * 6);
+        calculated_index += hull_idx;
+        int32_t entry_index = (int32_t)(int16_t)(design_idx + (calculated_index * 8));
+
+        char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
+            PTR_s_SHIPNAME_LBX_0055610C,
+            0,
+            MOX::_global_data_seg,
+            entry_index,
+            1,
+            0x10
+        );
+
+        allocate::Pop_Block_(MOX::_global_data_seg);
+
+        if (loaded_name != nullptr && out_name != nullptr) {
+            char* src = loaded_name;
+            char* dst = out_name;
+            while ((*dst++ = *src++) != '\0');
+        }
+    }
+
+    void __cdecl Set_Flashing_Colors_(int16_t font_style, int16_t spacing) {
+        s_colors local_colors;
+        fonts::Get_Colors_(&local_colors);
+
+        for (int i = 1; i < 8; ++i) {
+            int adjusted_color = (int)local_colors.colors[i] + (int)MOX::_multi_colored_line_start;
+            if (adjusted_color <= (int)local_colors.colors[0]) {
+                adjusted_color = (int)local_colors.colors[0];
+            }
+            local_colors.colors[i] = (uint8_t)adjusted_color;
+        }
+
+        fonts::Set_Font_Style_(font_style, &local_colors);
+        fonts::Set_Font_Spacing_(spacing);
+
+        MOX::_multi_colored_line_start += (int16_t)DESBOX::_incr_value;
+
+        if (MOX::_multi_colored_line_start >= 3) {
+            DESBOX::_incr_value = -DESBOX::_incr_value;
+            MOX::_multi_colored_line_start = 3;
+        } else if (MOX::_multi_colored_line_start <= -2) {
+            DESBOX::_incr_value = -DESBOX::_incr_value;
+            MOX::_multi_colored_line_start = -2;
+        }
+    }
+
+    bool __cdecl Space_For_Weapon_Replacement_() {
+        bool space_found = false;
+        int16_t app_idx = 0;
+
+        do {
+            if (space_found) {
+                return true;
+            }
+
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == 3) {
+                if ((int16_t)DESBOX::Application_Type_(app_idx) == 3) {
+                    int16_t tech_id = DESIGN::Tech_App_To_Tech_Id_(app_idx, 3);
+                    uint32_t space_req = DESIGN::One_Weapon_Space_(tech_id);
+
+                    if ((int16_t)space_req <= DESIGN::_printed_space_avail) {
+                        space_found = true;
+                    }
+                }
+            }
+            app_idx++;
+        } while (app_idx < 212);
+
+        return space_found;
     }
 
     void __cdecl Draw_Down_Buttons_() {

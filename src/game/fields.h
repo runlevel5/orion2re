@@ -84,4 +84,15 @@ namespace fields {
     void __cdecl Invoke_Auto_Function_();
 
     int16_t __cdecl Scan_Field_();
+
+    inline void __cdecl Clear_Mouse_Buffer_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FFF0});
+        fn();
+    }
+    inline void __cdecl Set_Input_Delay_(int32_t delay) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EDD0});
+        fn(delay);
+    }
 }

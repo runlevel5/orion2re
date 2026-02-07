@@ -15,8 +15,9 @@ namespace TECHDATA {
     inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
     inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
 
-    inline int16_t __cdecl Weapon_Rack_(int16_t weapon_type) {
+    inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00432940)(weapon_type);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432940});
+        return fn(weapon_idx);
     }
 }

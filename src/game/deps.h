@@ -114,5 +114,7 @@
 #include "line.h"
 #include "draw.h"
 #include "design.h"
+#include "aibuild.h"
 #include "colxport.h"
 #include "netcode.h"
+#include "textbox.h"

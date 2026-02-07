@@ -560,6 +560,20 @@ namespace hooks {
         { 0x00432360, &DESIGN::Update_Player_Design_ },
         { 0x0042f670, &DESIGN::Draw_Down_Buttons_ },
         //{ 0x004307d0, &DESIGN::Print_Current_Design_ },
+        { 0x00432d00, &DESIGN::Get_Tech_Description_Lbx_Name_ },
+        { 0x0042d930, &DESIGN::Check_Generic_Replacement_Fields_ },
+        { 0x0042dda0, &DESIGN::Check_Weapon_Fields_ },
+        { 0x0042dc20, &DESIGN::Check_Special_System_Fields_ },
+        { 0x0042dad0, &DESIGN::Check_Plus_Minus_Buttons_ },
+        { 0x0042f830, &DESIGN::Get_Ship_Design_Name_ },
+        { 0x0042f8b0, &DESIGN::Get_Ship_Size_Button_Field_XY_ },
+        { 0x004315d0, &DESIGN::Build_Design_Template_ },
+        { 0x00431a50, &DESIGN::Set_Flashing_Colors_ },
+        { 0x00431700, &DESIGN::Current_Design_Armor_Absorption_ },
+        { 0x00431760, &DESIGN::Current_Shield_Damage_Points_Blocked_ },
+        { 0x00432720, &DESIGN::Weapon_Needs_Racks_ },
+        { 0x00431dd0, &DESIGN::Space_For_Weapon_Replacement_ },
+        { 0x0047bdb0, &AIBUILD::Refit_Cost_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

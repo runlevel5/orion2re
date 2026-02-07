@@ -27,6 +27,9 @@ namespace MOX {
     inline uint8_t& _turns_between_debug_saves = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A49F0 });
     inline void*& _sound_buffer = *reinterpret_cast<void**>(std::uintptr_t{ 0x005A1B34 });
     inline SCREEN& _current_screen = *reinterpret_cast<SCREEN*>(std::uintptr_t{ 0x00597302 });
+    inline int16_t& _design_screen_replacement_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597402});
+    inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
+    inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
@@ -36,6 +39,7 @@ namespace MOX {
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
+    inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
     inline uint8_t& _first_design_screen_call = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5C9});
     inline int16_t& _design_size = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B434});
     inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
@@ -91,6 +95,7 @@ namespace MOX {
 
     inline int16_t& _mid_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059643C});
     inline int16_t& _mid_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596444});
+    inline int16_t& _design_screen_replacement_item = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C41C});
     inline int16_t& _far_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAE});
     inline int16_t& _far_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CB6});
     inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
@@ -197,6 +202,9 @@ namespace MOX {
 
     inline uint32_t& _cmd_line_seed =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
+
+    inline uint16_t& _ship_icon_lf_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BA14});
+    inline uint16_t& _ship_icon_rt_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597374});
 
     inline uint8_t& _zoom_in = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597704});
     inline s_animation_header*& _main_zoom_in_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B318});

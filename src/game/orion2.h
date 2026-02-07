@@ -2902,10 +2902,9 @@ struct s_tech_armor_data {
     short tech_app_id; /* Type 'TECH_APP' was deleted */
     undefined field4_0x8;
     undefined field5_0x9;
-    undefined field6_0xa;
-    undefined field7_0xb;
+    short armor_absorption_percent;
     short cost;
-    undefined field9_0xe;
+    undefined field8_0xe;
 };
 
 typedef struct s_tech_building_data s_tech_building_data, *Ps_tech_building_data;
@@ -2933,8 +2932,7 @@ struct s_tech_computer_data {
     undefined field2_0x5;
     short tech_app;
     short cost_by_ship_type[6];
-    undefined field5_0x14;
-    undefined field6_0x15;
+    short field5_0x14;
 };
 
 typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;
@@ -2982,24 +2980,23 @@ struct s_tech_hull_data {
     short hull_size;
     undefined field2_0x4;
     undefined field3_0x5;
-    undefined field4_0x6;
-    undefined field5_0x7;
-    undefined field6_0x8;
-    undefined field7_0x9;
-    undefined field8_0xa;
-    undefined field9_0xb;
-    undefined field10_0xc;
-    undefined field11_0xd;
-    undefined field12_0xe;
-    undefined field13_0xf;
+    short armor_absorption;
+    undefined field5_0x8;
+    undefined field6_0x9;
+    undefined field7_0xa;
+    undefined field8_0xb;
+    undefined field9_0xc;
+    undefined field10_0xd;
+    undefined field11_0xe;
+    undefined field12_0xf;
     short beam_weapon_count;
     short missle_weapon_count;
     short special_weapon_count;
     short bomb_weapon_count;
-    undefined field18_0x18;
-    undefined field19_0x19;
-    undefined field20_0x1a;
-    undefined field21_0x1b;
+    undefined field17_0x18;
+    undefined field18_0x19;
+    undefined field19_0x1a;
+    undefined field20_0x1b;
     char *name;
     char *size_name;
 };

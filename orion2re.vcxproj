@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\game\aibuild.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
@@ -79,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game\advciv.h" />
+    <ClInclude Include="src\game\aibuild.h" />
     <ClInclude Include="src\game\allocate.h" />
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\bill.h" />
