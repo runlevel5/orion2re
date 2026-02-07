@@ -22,4 +22,9 @@ namespace KEN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C1B30});
         fn(player);
     }
+
+    inline void* __cdecl Get_Ship_Picture_Seg_(int16_t player, int16_t picture) {
+        using Fn = void*(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004c1cc0 })(player, picture);
+    }
 }

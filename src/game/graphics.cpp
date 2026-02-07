@@ -76,7 +76,6 @@ namespace graphics {
     }
 
     void Reset_Window_()
-
     {
         video::_screen_window_x1 = 0;
         video::_screen_window_y1 = 0;

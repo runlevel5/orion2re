@@ -28,4 +28,10 @@ namespace JIM {
 
     void __cdecl Draw_Logos_(void);
     void Play_Background_Music_();
+
+    inline void __cdecl Play_Streaming_Music_(int32_t music_id, int32_t p2, int32_t p3) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00424FB0});
+        fn(music_id, p2, p3);
+    }
 }

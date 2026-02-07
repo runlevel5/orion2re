@@ -136,6 +136,46 @@ namespace MOX {
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
 
     inline s_animation_header*& _main_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B400});
+    inline s_animation_header*& _design_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059D6CC});
+    inline s_animation_header*& _design_icon_lf_arrow_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B33C});
+    inline s_animation_header*& _design_icon_rt_arrow_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BAB4});
+    inline s_animation_header*& _clear_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597004});
+    inline s_animation_header*& _cancel_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005978F0});
+    inline s_animation_header*& _build_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596EAC});
+    inline s_animation_header*& _plus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005973F8});
+    inline s_animation_header*& _minus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4AC});
+    inline s_animation_header*& _d_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597714});
+    inline s_animation_header*& _d_scroll_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1868});
+    inline s_animation_header*& _dull_d_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596F7C});
+    inline s_animation_header*& _dull_d_scroll_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597404});
+    inline s_animation_header*& _beam_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF3C});
+    inline s_animation_header*& _missile_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005972FC});
+    inline s_animation_header*& _bomb_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B334});
+    inline s_animation_header*& _special_filter_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1834});
+    inline s_animation_header*& _weapons_cancel_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005974A0});
+    inline s_animation_header*& _weapons_accept_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059783C});
+    inline s_animation_header*& _weapons_top_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4B0});
+    inline s_animation_header*& _weapons_mid_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FD4});
+    inline s_animation_header*& _weapons_bot_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BCC4});
+    inline s_animation_header*& _weapons_selected_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C024});
+    inline s_animation_header*& _weapons_blank_mods_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597000});
+    inline s_animation_header*& _system_repl_scroll_bar_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597418});
+    inline s_animation_header*& _system_repl_box_top_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1824});
+    inline s_animation_header*& _system_repl_box_mid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B3C});
+    inline s_animation_header*& _system_repl_box_btm_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FA4});
+    inline s_animation_header*& _system_repl_box_cancel_btn = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD30});
+    inline s_animation_header** _design_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597740});
+    inline s_animation_header** _darkened_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B410});
+    inline s_animation_header** _weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
+    inline s_animation_header** _weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
+    inline s_animation_header** _weapons_rack_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597980});
+    inline s_animation_header** _weapons_special_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597930});
+    inline void*& _weapon_filter = *reinterpret_cast<void**>(std::uintptr_t{0x0059BA0C});
+    inline char** _special_desc_string = reinterpret_cast<char**>(std::uintptr_t{0x00596EB0});
+    inline char** _weapon_notes_string = reinterpret_cast<char**>(std::uintptr_t{0x00596DD0});
+    inline void*& DAT_00597994 = *reinterpret_cast<void**>(std::uintptr_t{0x00597994});
+    inline void*& _weapons_rack_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005979A0});
+
     inline s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B464});
 
     inline void*& _global_screen_seg =
@@ -348,6 +388,40 @@ namespace MOX {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
         fn();
+    }
+
+    namespace farload {
+        inline void* __cdecl Far_Reload_(const char* filename, int entry, void* seg) {
+            using Fn = void*(__cdecl*)(const char*, int, void*);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C710})(filename, entry, seg);
+        }
+
+        inline void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* seg) {
+            using Fn = void*(__cdecl*)(const char*, int, void*);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C730})(filename, entry, seg);
+        }
+
+        inline char* __cdecl Far_Reload_Next_Data_(const char* filename, int type, void* seg, int entry, int field, int size) {
+            using Fn = char*(__cdecl*)(const char*, int, void*, int, int, int);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C780})(filename, type, seg, entry, field, size);
+        }
+    }
+
+    namespace allocate {
+        inline uint32_t __cdecl Get_Remaining_Block_Space_(void* seg) {
+            using Fn = uint32_t(__cdecl*)(void*);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0052EBB0})(seg);
+        }
+
+        inline s_current_design* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
+            using Fn = s_current_design*(__cdecl*)(void*, uint32_t);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0052E930})(seg, size);
+        }
+
+        inline void* __cdecl Allocate_Next_Block_(void* seg, uint32_t size) {
+            using Fn = void*(__cdecl*)(void*, uint32_t);
+            return reinterpret_cast<Fn>(std::uintptr_t{0x0052E950})(seg, size);
+        }
     }
 
     inline int16_t __cdecl Get_Weighted_Choice_Short_(uint16_t* weights, int16_t count) {

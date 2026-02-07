@@ -454,7 +454,7 @@ namespace DESIGN {
             MOX::_design_size = MOX::_design->ship_size;
             fields::Clear_Fields_();
             _design_size_field = -1000;
-            Add_Design_Buttons__();
+            Add_Design_Buttons_();
             MOX::_draw_design_screen_to_back = 1;
             video::Set_Page_Off_();
             _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
@@ -474,7 +474,7 @@ namespace DESIGN {
             MOX::_design_size = MOX::_design->ship_size;
             fields::Clear_Fields_();
             _design_size_field = -1000;
-            Add_Design_Buttons__();
+            Add_Design_Buttons_();
             fields::Disable_Draw_All_Fields_();
             video::Set_Refresh_Full_();
             ERIC::Fast_Fade_Out_();
@@ -614,7 +614,7 @@ namespace DESIGN {
             if (rebuild_buttons) {
                 fields::Clear_Fields_();
                 _design_size_field = -1000;
-                Add_Design_Buttons__();
+                Add_Design_Buttons_();
             }
 
             for (int i = 0; i < 6; ++i) {
@@ -732,5 +732,474 @@ namespace DESIGN {
         }
 
         return total_space;
+    }
+
+    void __cdecl Draw_Design_Screen_() {
+        animate::Draw_(0, 0, MOX::_design_screen_seg);
+        Draw_Down_Buttons_();
+        Print_Current_Design_();
+        Check_For_Auto_Repeat_();
+        JIM::Play_Streaming_Music_(8, -1, 1);
+    }
+
+    void __cdecl Update_Player_Design_(int16_t player_idx, int16_t design_idx) {
+        Current_Design_Shield_();
+        strings::Trim_(MOX::_design->name);
+
+        if (MOX::_design->name[0] == '\0') {
+            char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design_idx);
+            char* dest = MOX::_design->name;
+            while ((*dest++ = *default_name++) != '\0');
+        }
+
+        s_player* plr = &MOX::_player[player_idx];
+        s_ship_design* target_design = &plr->ship_designs[design_idx];
+
+        // Copy name from current design to player record
+        char* src_name = MOX::_design->name;
+        char* dest_name = target_design->name;
+        while ((*dest_name++ = *src_name++) != '\0');
+
+        target_design->size = (int8_t)MOX::_design->ship_size;
+        target_design->shield_type = (int8_t)MOX::_design->shield;
+        target_design->ftl_type = (int8_t)MOX::_design->ftl_type;
+        target_design->computer_type = (int8_t)MOX::_design->computer_type;
+        target_design->armor_type = (int8_t)MOX::_design->armor_type;
+
+        for (int i = 0; i < 5; ++i) {
+            target_design->special_device_flags[i] = 0;
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            if (MOX::_design->special_devices[i] > 0) {
+                struct_::Set_Bit_Field_(target_design->special_device_flags, (uint16_t)MOX::_design->special_devices[i]);
+            }
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            target_design->ship_weapon[i].type = MOX::_design->weapon_type[i];
+            target_design->ship_weapon[i].count = (int8_t)MOX::_design->weapon_count[i];
+            target_design->ship_weapon[i].current_count = (int8_t)MOX::_design->weapon_count[i];
+            target_design->ship_weapon[i].firing_arc = MOX::_design->weapon_firing_arc[i];
+            target_design->ship_weapon[i].specials = MOX::_design->weapon_specials[i];
+            target_design->ship_weapon[i].ammo = MOX::_design->weapon_ammo[i];
+        }
+
+        target_design->picture_num = (int8_t)MOX::_design->picture_type;
+        target_design->cost = (int16_t)MOX::_design->total_cost;
+        target_design->date_of_design = (uint16_t)MOX::_stardate;
+
+        _use_augmented_engines = 0;
+        target_design->combat_speed = (int8_t)Get_Modified_Combat_Speed_(MOX::_design);
+        target_design->speed = (int8_t)INITSHIP::Get_FTL_Speed_(player_idx, MOX::_design->ftl_type);
+    }
+
+    void __cdecl Clear_Design_() {
+        int16_t player_num = MOX::_PLAYER_NUM;
+        s_current_design* design = _design;
+
+        design->ftl_type = INITSHIP::Best_Warp_Drive_(player_num);
+        design->drive_speed = TECHDATA::_drives[design->ftl_type].speed;
+
+        design->computer_type = INITSHIP::Best_Computer_(player_num);
+        design->armor_type = INITSHIP::Best_Armor_(player_num);
+        design->fuel_type = INITSHIP::Best_Ship_Fuel_(player_num);
+
+        for (int i = 0; i < 8; ++i) {
+            design->weapon_type[i] = 0;
+            design->weapon_count[i] = 0;
+            design->weapon_firing_arc[i] = 0;
+            design->weapon_specials[i] = 0;
+            design->weapon_ammo[i] = 0;
+            design->weapon_cost[i] = 0;
+            design->weapon_space[i] = 0;
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            design->special_devices[i] = 0;
+            design->special_device_cost[i] = 0;
+            design->special_device_space[i] = 0;
+        }
+
+        Update_Calculated_Design_Data_(player_num);
+    }
+
+    void __cdecl Load_Design_Screen_Pictures_() {
+        MOX::Mox_Update_();
+        MOX::_design_screen_seg = (s_animation_header*)MOX::farload::Far_Reload_(PTR_s_DESIGN_LBX_005560D8, 0, MOX::_screen_seg);
+        MOX::_design_icon_lf_arrow_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 1, MOX::_screen_seg);
+        MOX::_design_icon_rt_arrow_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 2, MOX::_screen_seg);
+        MOX::_clear_design_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 3, MOX::_screen_seg);
+        MOX::_cancel_design_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 4, MOX::_screen_seg);
+        MOX::_build_design_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 5, MOX::_screen_seg);
+        MOX::Mox_Update_();
+
+        for (int i = 0; i < 6; ++i) {
+            MOX::_design_size_button_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 6 + i, MOX::_screen_seg);
+        }
+        for (int i = 0; i < 6; ++i) {
+            MOX::_darkened_size_button_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 6 + i, MOX::_screen_seg);
+        }
+
+        int idx = 12;
+        _dark_build_design_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::Mox_Update_();
+
+        MOX::_plus_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_minus_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_d_scroll_up_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_d_scroll_dn_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        _dull_plus_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        _dull_minus_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_dull_d_scroll_up_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_dull_d_scroll_dn_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+
+        MOX::DAT_00597994 = MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+
+        MOX::_beam_filter_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_missile_filter_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_bomb_filter_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_special_filter_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_cancel_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_accept_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::Mox_Update_();
+
+        MOX::_weapons_top_box_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_mid_box_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_bot_box_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_selected_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::Mox_Update_();
+
+        MOX::_weapons_rack_seg = MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+
+        for (int i = 0; i < 5; ++i) {
+            MOX::_weapons_arc_pict_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        }
+        for (int i = 0; i < 5; ++i) {
+            MOX::_weapons_arc_text_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        }
+        MOX::Mox_Update_();
+        for (int i = 0; i < 5; ++i) {
+            MOX::_weapons_rack_text_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        }
+
+        MOX::_weapons_blank_mods_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        for (int i = 0; i < 18; ++i) {
+            MOX::_weapons_special_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        }
+        MOX::Mox_Update_();
+
+        MOX::_system_repl_scroll_bar_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_top_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_mid_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_btm_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_system_repl_box_cancel_btn = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+
+        MOX::allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+        MOX::_design = MOX::allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125);
+        MOX::_weapon_filter = MOX::allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
+
+        char tech_lbx[20];
+        Get_Tech_Description_Lbx_Name_(tech_lbx);
+
+        for (int i = 0; i < 39; ++i) {
+            MOX::_special_desc_string[i] = (char*)MOX::farload::Far_Reload_Next_Data_(tech_lbx, 1, MOX::_global_data_seg, i, 1, 100);
+            MOX::Mox_Update_();
+        }
+        for (int i = 0; i < 40; ++i) {
+            MOX::_weapon_notes_string[i] = (char*)MOX::farload::Far_Reload_Next_Data_(tech_lbx, 3, MOX::_global_data_seg, i, 1, 100);
+            MOX::Mox_Update_();
+        }
+    }
+
+    void __cdecl Print_Current_Design_() {
+        s_current_design local_design;
+        int16_t missile_evasion, beam_defense, beam_attack_bonus;
+        char buffer[256];
+        s_colors colors_primary, colors_secondary;
+        char arc_str[32], mod_str[128];
+
+        helpers::memset(&local_design, 0, sizeof(local_design));
+
+        Build_Design_Template_(&local_design);
+        INITSHIP::Get_Design_Combat_Bonuses_(&local_design, &missile_evasion, &beam_defense, &beam_attack_bonus);
+
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+        fonts::Set_Outline_Color_(0, 0);
+
+        MISC::Get_Mox_Font_Colors_(3, 'U', '[', &colors_primary);
+        MISC::Get_Mox_Font_Colors_(2, 'U', '[', &colors_secondary);
+
+        for (int i = 1; i < 8; ++i) {
+            colors_primary.colors[i] += 2;
+            colors_secondary.colors[i] += 2;
+        }
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Spacing_(1);
+        fonts::Print_(0xEC, 0x38, TECHDATA::_drives[MOX::_design->ftl_type].name);
+
+        fonts::Set_Font_Style_(2, &colors_secondary);
+        fonts::Set_Font_Spacing_(1);
+        _sprintf(buffer, HAROLD::H_Message_(0x17E /* HESTR_17E_D_PARSECS_TURN */), TECHDATA::_drives[MOX::_design->ftl_type].speed);
+        fonts::Print_(0xFB, 0x47, buffer);
+
+        _sprintf(buffer, HAROLD::H_Message_(0x54 /* HESTR_054_D_COMBAT_SPEED */), (int)Get_Base_Combat_Speed_(MOX::_design));
+        fonts::Print_(0xFB, 0x56, buffer);
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Print_(0xEC, 0x6B, TECHDATA::_armor[MOX::_design->armor_type].name);
+
+        fonts::Set_Font_Style_(2, &colors_secondary);
+        _sprintf(buffer, HAROLD::H_Message_(0x55 /* HESTR_055_D_STRUCTURE_POINTS */), (int)Current_Design_Has_Special_System_Count_());
+        fonts::Print_(0xFB, 0x7A, buffer);
+
+        _sprintf(buffer, HAROLD::H_Message_(0x56 /* HESTR_056_D_ARMOR_POINTS */), (int)Current_Design_Armor_Absorption_());
+        fonts::Print_(0xFB, 0x89, buffer);
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        if (_design_shield_replacement_field == MOX::_scanned_field) {
+            Set_Flashing_Colors_(3, 1);
+        }
+
+        if (MOX::_design->shield == 0) {
+            fonts::Print_(0x1B5, 0x38, HAROLD::H_Message_(0x36 /* HESTR_036_NO_SHIELD */));
+            fonts::Set_Font_Style_(2, &colors_secondary);
+            fonts::Print_(0x1C5, 0x47, HAROLD::H_Message_(0x57 /* HESTR_057_NO_STRENGTH */));
+            _sprintf(buffer, "%s", HAROLD::H_Message_(0x58 /* HESTR_058_NO_DAMAGE_POINTS_BLOCK */));
+        } else {
+            fonts::Print_(0x1B5, 0x38, TECHDATA::_shields[MOX::_design->shield].name);
+            fonts::Get_String_Width_(TECHDATA::_shields[MOX::_design->shield].name);
+            fonts::Set_Font_Style_(2, &colors_secondary);
+            _sprintf(buffer, HAROLD::H_Message_(0x59 /* HESTR_059_D_STRENGTH */), (int)Shield_Strength_());
+            fonts::Print_(0x1C5, 0x47, buffer);
+
+            int block = Current_Shield_Damage_Points_Blocked_();
+            const char* suffix = (block == 1) ? "" : "s";
+            _sprintf(buffer, HAROLD::H_Message_(0x5A /* HESTR_05A_D_DAMAGE_POINTS_BLOCKE */), block, suffix);
+        }
+        fonts::Print_(0x1C5, 0x55, buffer);
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        if (_design_computer_replacement_field == MOX::_scanned_field) {
+            Set_Flashing_Colors_(3, 1);
+        }
+        fonts::Print_(0x1B5, 0x61, TECHDATA::_computers[MOX::_design->computer_type].name);
+
+        fonts::Set_Font_Style_(2, &colors_secondary);
+        _sprintf(buffer, HAROLD::H_Message_(0x5B /* HESTR_05B_D_BEAM_ATTACK */), (int)TECHDATA::_computers[MOX::_design->computer_type].field5_0x14);
+        fonts::Print_(0x1C5, 0x70, buffer);
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(0x5C /* HESTR_05C_BEAM_DEFENSE */));
+        _sprintf(buffer, s_pct_s_pct_d, (beam_defense >= 0 ? s_plus : s_minus), (int)beam_defense);
+        fonts::Print_Right_(0x26A, 0x7D, buffer);
+
+        fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(0x5D /* HESTR_05D_MISSILE_EVASION */));
+        _sprintf(buffer, s_pct_d_pct, (int)missile_evasion);
+        fonts::Print_Right_(0x26A, 0x89, buffer);
+
+        fonts::Set_Font_Spacing_(2);
+        graphics::Set_Window_(0x10, 0x9B, 0x272, 0x11C);
+        video::Clip_On_();
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Print_(0x53, 0x9C, HAROLD::H_Message_(0x5E /* HESTR_05E_WEAPON_TYPE */));
+        fonts::Print_(0xF9, 0x9C, HAROLD::H_Message_(0x5F /* HESTR_05F_DAMAGE */));
+        fonts::Print_(0x13C, 0x9C, HAROLD::H_Message_(0x60 /* HESTR_060_ARC */));
+        fonts::Print_(0x19E, 0x9C, HAROLD::H_Message_(0x30 /* HESTR_030_SPACE */));
+        fonts::Print_(0x167, 0x9C, HAROLD::H_Message_(0x185 /* HESTR_185_COST */));
+        fonts::Print_(0x1DF, 0x9C, HAROLD::H_Message_(0x61 /* HESTR_061_MODIFICATIONS */));
+
+        bool show_weapon_replacement = false;
+        int y_cursor = 0xAA;
+        for (int i = 0; i < 8; ++i) {
+            int weapon_slot = i + MOX::_first_weapon_ctr;
+
+            if ((i - (int)MOX::_scanned_field) == -1000) {
+                if (MOX::_design->weapon_type[weapon_slot] <= 0) {
+                    show_weapon_replacement = true;
+                    fonts::Set_Font_Style_(2, &colors_secondary);
+                } else {
+                    Set_Flashing_Colors_(2, 2);
+                }
+            } else {
+                fonts::Set_Font_Style_(2, &colors_secondary);
+            }
+
+            if (MOX::_design->weapon_type[weapon_slot] > 0) {
+                Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str, 1);
+                Weapon_Arc_String_((int16_t)MOX::_design->weapon_firing_arc[i], arc_str);
+
+                const char* w_name = (MOX::_design->weapon_count[weapon_slot] > 1)
+                                     ? TECHDATA::_weapons[MOX::_design->weapon_type[weapon_slot]].name_plural
+                                     : TECHDATA::_weapons[MOX::_design->weapon_type[weapon_slot]].name;
+
+                if (Weapon_Needs_Racks_(MOX::_design->weapon_type[weapon_slot])) {
+                    _sprintf(buffer, s_pct_s_bracket_pct_d, w_name, (int)MOX::_design->weapon_ammo[i]);
+                    fonts::Print_(0x55, y_cursor, buffer);
+                } else {
+                    fonts::Print_(0x55, y_cursor, w_name);
+                }
+
+                fonts::Print_Integer_Right_(0x31, y_cursor, MOX::_design->weapon_count[weapon_slot]);
+                Design_Weapon_Damage_String_(weapon_slot, buffer, -1, -1);
+
+                if (helpers::strcmp(buffer, s_special_tag) == 0) {
+                    MISC::Change_Font_Style_(1);
+                    fonts::Print_Centered_(0x10B, y_cursor, buffer);
+                    MISC::Change_Font_Style_(2);
+                } else {
+                    fonts::Print_Centered_(0x10B, y_cursor, buffer);
+                }
+
+                fonts::Print_Centered_(0x149, y_cursor, arc_str);
+                _sprintf(buffer, s_pct_d, (MOX::_design->weapon_count[weapon_slot] > 0) ? (MOX::_design->weapon_space[i] / MOX::_design->weapon_count[weapon_slot]) : 0);
+                fonts::Print_Centered_(0x1B4, y_cursor, buffer);
+                _sprintf(buffer, s_pct_d, (MOX::_design->weapon_count[weapon_slot] > 0) ? (MOX::_design->weapon_cost[i] / MOX::_design->weapon_count[weapon_slot]) : 0);
+                fonts::Print_Centered_(0x179, y_cursor, buffer);
+                fonts::Print_Centered_(0x211, y_cursor, mod_str);
+
+                y_cursor += 0x0D;
+            }
+        }
+
+        if (show_weapon_replacement) {
+            int slots_left = 8 - MOX::_n_weapons_loaded;
+            if (slots_left > 0) {
+                if (slots_left > 1) {
+                    y_cursor += ((MOX::_n_weapons_loaded * -13 + 127) / 2) - 14;
+                }
+                if (Space_For_Weapon_Replacement_()) {
+                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    Set_Flashing_Colors_(2, 2);
+                    fonts::Print_Centered_(0x136, y_cursor, HAROLD::H_Message_(0x17F));
+                } else {
+                    s_colors* custom_colors = MISC::Font_Colors2_(2, 'I', 'M');
+                    fonts::Set_Font_Style_(2, custom_colors);
+                    Set_Flashing_Colors_(2, 2);
+                    int msg = (_printed_space_avail < 1) ? 0x1A /* HESTR_01A_NOT_ENOUGH_SPACE_TO_AD */ : 0x18 /* HESTR_018_NO_NEW_WEAPONS_CAN_BE_ */;
+                    fonts::Print_Centered_(0x136, y_cursor, HAROLD::H_Message_(msg));
+                }
+            }
+        }
+
+        video::Clip_Off_();
+        graphics::Set_Window_(0x11, 0x131, 0x272, 0x1B0);
+        video::Clip_On_();
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Print_(0x1E, 0x132, HAROLD::H_Message_(0x62 /* HESTR_062_SPECIAL_SYSTEM */));
+        fonts::Print_(0x118, 0x132, HAROLD::H_Message_(0x38 /* HESTR_038_DESCRIPTION */));
+
+        bool show_system_replacement = false;
+        int y_special = 0x140;
+        for (int i = 0; i < 8; ++i) {
+            int special_slot = i + MOX::_first_special_system_ctr;
+            if ((i - (int)MOX::_scanned_field) == -2000) {
+                if (MOX::_design->special_devices[special_slot] <= 0) {
+                    show_system_replacement = true;
+                    fonts::Set_Font_Style_(2, &colors_secondary);
+                } else {
+                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    Set_Flashing_Colors_(2, 2);
+                }
+            } else {
+                fonts::Set_Font_Style_(2, &colors_secondary);
+            }
+
+            if (MOX::_design->special_devices[special_slot] > 0) {
+                int dev_idx = MOX::_design->special_devices[special_slot];
+                const char* dev_name = *reinterpret_cast<const char**>(reinterpret_cast<uint8_t*>(TECHDATA::_specials) + dev_idx * 0x30);
+                fonts::Print_(0x23, y_special, dev_name);
+                fonts::Print_(0x10E, y_special, MOX::_special_desc_string[dev_idx]);
+                y_special += 0x0D;
+            }
+        }
+
+        if (show_system_replacement) {
+            int slots_left = 8 - MOX::_n_special_systems;
+            if (slots_left > 0) {
+                if (slots_left > 1) {
+                    y_special += ((MOX::_n_special_systems * -13 + 125) / 2) - 14;
+                }
+                if (Space_For_System_Replacement_()) {
+                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    Set_Flashing_Colors_(2, 2);
+                    fonts::Print_Centered_(0x136, y_special, HAROLD::H_Message_(0x180));
+                } else {
+                    s_colors* custom_colors = MISC::Font_Colors2_(2, 'I', 'N');
+                    fonts::Set_Font_Style_(2, custom_colors);
+                    Set_Flashing_Colors_(2, 2);
+                    int msg = (_printed_space_avail < 1) ? 0x1B : 0x19;
+                    fonts::Print_Centered_(0x136, y_special, HAROLD::H_Message_(msg));
+                }
+            }
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+        void* ship_pic = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, MOX::_design->picture_type);
+        int pic_w = animate::Get_Width_((s_animation_header*)ship_pic);
+        int pic_h = animate::Get_Height_((s_animation_header*)ship_pic);
+        animate::Draw_(((0x36 - pic_w) / 2) + 0x27, ((0x3A - pic_h) / 2) + 0x3A, (s_animation_header*)ship_pic);
+
+        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Get_Font_Height_();
+        fonts::Print_(0x19, 0x81, HAROLD::H_Message_(0x30 /* HESTR_030_SPACE */));
+        fonts::Print_Integer_Right_(0x6A, 0x81, MOX::_design->hull_space);
+
+        s_colors footer_colors;
+        MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &footer_colors);
+        fonts::Set_Font_Style_(4, &footer_colors);
+        int f_h = fonts::Get_Font_Height_();
+        int footer_y = ((0x18 - f_h) / 2) + 0x1BC;
+
+        fonts::Print_(0x18, footer_y, HAROLD::H_Message_(0x185 /* HESTR_185_COST */));
+        fonts::Print_Integer_Right_(0x87, footer_y, (int)Printed_Design_Cost_());
+        fonts::Print_(0xA3, footer_y, HAROLD::H_Message_(0x63 /* HESTR_063_SPACE_AVAILABLE */));
+        fonts::Print_Integer_Right_(0x160, footer_y, _printed_space_avail);
+    }
+
+    void __cdecl Draw_Down_Buttons_() {
+        int16_t y = 169;
+        int8_t first_weapon_idx = (int8_t)MOX::_first_weapon_ctr;
+
+        for (int i = 0; i < 8; ++i) {
+            if (MOX::_weapons_count_minus_button[i] == -1000) {
+                if (MOX::_design->weapon_type[first_weapon_idx + i] > 0) {
+                    animate::Draw_(55, y, _dull_minus_button_seg);
+                }
+            }
+            if (MOX::_weapons_count_plus_button[i] == -1000) {
+                if (MOX::_design->weapon_type[first_weapon_idx + i] > 0) {
+                    animate::Draw_(19, y, _dull_plus_button_seg);
+                }
+            }
+            y += 13;
+        }
+
+        if (MOX::_design_build_button == -1000) {
+            animate::Draw_(544, 439, _dark_build_design_button_seg);
+        }
+
+        for (int size_idx = 0; size_idx < 6; ++size_idx) {
+            int16_t btn_x, btn_y, btn_w, btn_h;
+            if (MOX::_refit_ship == 0) {
+                if (_add_size_button_flag[size_idx] != 1) {
+                    Get_Ship_Size_Button_Field_XY_(size_idx, &btn_x, &btn_y, &btn_w, &btn_h);
+                    animate::Reset_Animation_Frame_(MOX::_darkened_size_button_seg[size_idx]);
+                    animate::Draw_(btn_x, btn_y, MOX::_darkened_size_button_seg[size_idx]);
+                }
+            } else {
+                if (MOX::_design->ship_size == size_idx) {
+                    Get_Ship_Size_Button_Field_XY_(size_idx, &btn_x, &btn_y, &btn_w, &btn_h);
+                    animate::Reset_Animation_Frame_(MOX::_darkened_size_button_seg[size_idx]);
+                    animate::Draw_(btn_x, btn_y, MOX::_darkened_size_button_seg[size_idx]);
+                    return;
+                }
+            }
+        }
     }
 }

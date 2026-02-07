@@ -11,6 +11,11 @@ namespace MISC {
 
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
+    inline void __cdecl Change_Font_Style_(int16_t style) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0049e0a0 })(style);
+    }
+
     inline s_colors* __cdecl Font_Colors2_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2) {
         using Fn = s_colors*(__cdecl*)(int16_t, uint8_t, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ddb0});

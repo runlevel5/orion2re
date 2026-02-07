@@ -97,6 +97,11 @@ namespace fonts {
      
     void __cdecl Print_Right_(int16_t x, int16_t y, const char* text);
 
+    inline void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int val) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00525860 })(x, y, val);
+    }
+
     void __cdecl Set_Font_Spacing_(int16_t spacing);
 
     void __cdecl Get_Colors_(s_colors* colors);

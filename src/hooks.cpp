@@ -554,6 +554,12 @@ namespace hooks {
         { 0x00432830, &DESIGN::Weapon_Space_ },
         { 0x0049a490, &DESIGN::Current_Design_Size_ },
         { 0x0042d5d0, &DESIGN::Build_Initial_Design_Template_ },
+        { 0x0042f470, &DESIGN::Draw_Design_Screen_ },
+        { 0x0042f9a0, &DESIGN::Load_Design_Screen_Pictures_ },
+        { 0x0042df20, &DESIGN::Clear_Design_ },
+        { 0x00432360, &DESIGN::Update_Player_Design_ },
+        { 0x0042f670, &DESIGN::Draw_Down_Buttons_ },
+        //{ 0x004307d0, &DESIGN::Print_Current_Design_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

@@ -507,6 +507,8 @@ workflows:
             name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * If you see values resembling enums or constants, especially if there is a comment - always check against 
             `src/game/orion2.h` and use an enum or a constant.
+          * If there is a comment next to a number with a name that matches one of the enums in src/game/orion2.h - use symbolic
+            name.
           * Never put stubs to .cpp files - they should go to headers.
           * Never add any comments, unless it is one of the following exceptions:
             - A potential bug was identified, add a comment prefixed with `// BUG:`
