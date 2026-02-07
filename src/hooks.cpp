@@ -550,7 +550,9 @@ namespace hooks {
         { 0x0042e620, &DESIGN::Get_Base_Combat_Speed_ },
         { 0x0042e650, &DESIGN::Get_Ship_Speed_Modifier_ },
         { 0x0042e5b0, &DESIGN::Current_Design_Base_Combat_Speed_ },
+#ifndef SKIP_MAIN
         { 0x0042e6b0, &DESIGN::Design_Screen_ },
+#endif
         { 0x00432830, &DESIGN::Weapon_Space_ },
         { 0x0049a490, &DESIGN::Current_Design_Size_ },
         { 0x0042d5d0, &DESIGN::Build_Initial_Design_Template_ },
@@ -559,7 +561,7 @@ namespace hooks {
         { 0x0042df20, &DESIGN::Clear_Design_ },
         { 0x00432360, &DESIGN::Update_Player_Design_ },
         { 0x0042f670, &DESIGN::Draw_Down_Buttons_ },
-        //{ 0x004307d0, &DESIGN::Print_Current_Design_ },
+        { 0x004307d0, &DESIGN::Print_Current_Design_ },
         { 0x00432d00, &DESIGN::Get_Tech_Description_Lbx_Name_ },
         { 0x0042d930, &DESIGN::Check_Generic_Replacement_Fields_ },
         { 0x0042dda0, &DESIGN::Check_Weapon_Fields_ },

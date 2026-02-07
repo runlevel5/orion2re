@@ -20,7 +20,7 @@ namespace MOX2 {
     void __cdecl Screen_Control_() {
         while (true) {
             MOX::_global_esc = 0;
-            SCREEN current = MOX::_current_screen;
+            short current = MOX::_current_screen;
 
             switch (current) {
                 case SCREEN_MAIN:

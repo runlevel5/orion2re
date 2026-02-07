@@ -79,6 +79,12 @@ namespace DESIGN {
 
     void __cdecl Update_Calculated_Design_Data_(int16_t player_idx);
 
+    inline void __cdecl Print_Ship_Size_Error_Message_(int16_t index) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00431850});
+        fn(index);
+    }
+
     void __cdecl Design_Screen_();
 
     int32_t __cdecl Get_Design_Hull_Size_();

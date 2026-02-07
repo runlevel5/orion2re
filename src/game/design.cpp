@@ -448,21 +448,9 @@ namespace DESIGN {
         return blocked_points;
     }
 
-    void __cdecl Print_Ship_Size_Error_Message_(int size_idx) {
-        using Fn = void(__cdecl*)(int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00431850})(size_idx);
-    }
-
     void __cdecl Design_Screen_() {
-        int16_t input_field;
-        int16_t design_idx_snapshot;
-        bool rebuild_buttons = true;
-        int16_t exit_flag = 0;
-        int16_t refresh_needed = 0;
+        int16_t current_design_idx = _player_design_num;
         char log_buf[100];
-
-        video::Set_Refresh_Full_();
-        design_idx_snapshot = _player_design_num;
         MOX::_first_weapon_ctr = 0;
         MOX::_multi_colored_line_start = 0;
         MOX::_first_special_system_ctr = 0;
@@ -487,7 +475,7 @@ namespace DESIGN {
             MOX::_draw_design_screen_to_back = 1;
             video::Set_Page_Off_();
             _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
-            _printed_cost = static_cast<uint16_t>(MOX::_design->total_cost);
+            _printed_cost = MOX::_design->total_cost;
             Draw_Design_Screen_();
             RUSS::Mox_Sync_Update_();
         } else {
@@ -499,7 +487,7 @@ namespace DESIGN {
                 MOX::_design->total_cost = 0;
             }
             _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
-            _printed_cost = static_cast<uint16_t>(MOX::_design->total_cost);
+            _printed_cost = MOX::_design->total_cost;
             MOX::_design_size = MOX::_design->ship_size;
             fields::Clear_Fields_();
             _design_size_field = -1000;
@@ -523,50 +511,34 @@ namespace DESIGN {
             video::Clip_Off_();
         }
 
-        rebuild_buttons = true;
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        bool update_buttons = true;
+        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(MOX::_mouse_list_arrow), 1);
         EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->help1, MOX::_design->help2);
-        exit_flag = 0;
 
+        int16_t screen_exit_flag = 0;
         do {
             timer::Mark_Time_();
-            input_field = fields::Get_Input_();
+            int16_t input_field = fields::Get_Input_();
             MOX::_scanned_field = fields::Scan_Input_();
-            s_current_design* d = MOX::_design;
 
             if (_changed_design_name == 0) {
                 char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, _player_design_num);
-                // Manual strcmp implementation
-                char* d_name_ptr = d->name;
-                char* def_name_ptr = default_name;
-                int name_cmp = 0;
-                while (true) {
-                    if (*d_name_ptr != *def_name_ptr) {
-                        name_cmp = (*d_name_ptr < *def_name_ptr) ? -1 : 1;
-                        break;
-                    }
-                    if (*d_name_ptr == 0) break;
-                    if (d_name_ptr[1] != def_name_ptr[1]) {
-                        name_cmp = (d_name_ptr[1] < def_name_ptr[1]) ? -1 : 1;
-                        break;
-                    }
-                    if (d_name_ptr[1] == 0) break;
-                    d_name_ptr += 2;
-                    def_name_ptr += 2;
-                }
-                if (name_cmp != 0) {
+                char* p1 = MOX::_design->name;
+                char* p2 = default_name;
+                while (*p1 && *p1 == *p2) { p1++; p2++; }
+                if (*p1 != *p2) {
                     _changed_design_name = 1;
                 }
             }
 
             if (MOX::_design_name_field == input_field) {
-                rebuild_buttons = false;
+                update_buttons = false;
             } else if (input_field != 0) {
-                rebuild_buttons = true;
+                update_buttons = true;
             }
 
             if (MOX::_design_cancel_button == input_field) {
-                exit_flag = 1;
+                screen_exit_flag = 1;
                 _player_design_num = 0;
                 MOX::_current_screen = static_cast<SCREEN>(MOX::_return_screen);
             }
@@ -577,9 +549,9 @@ namespace DESIGN {
             }
 
             if (MOX::_design_build_button == input_field) {
-                Update_Player_Design_(MOX::_PLAYER_NUM, design_idx_snapshot);
+                Update_Player_Design_(MOX::_PLAYER_NUM, current_design_idx);
                 MOX::_current_screen = static_cast<SCREEN>(MOX::_return_screen);
-                exit_flag = 1;
+                screen_exit_flag = 1;
                 _player_design_num = 1;
             }
 
@@ -587,105 +559,90 @@ namespace DESIGN {
                 _sprintf(log_buf, s_cstdes_log, (int)MOX::_design->ship_size);
             }
 
-            refresh_needed = 0;
-            Check_Generic_Replacement_Fields_(input_field, &refresh_needed, &exit_flag);
-            Check_Weapon_Fields_(input_field, &refresh_needed, &exit_flag);
-            Check_Special_System_Fields_(input_field, &refresh_needed, &exit_flag);
+            int16_t needs_refresh = 0;
+            Check_Generic_Replacement_Fields_(input_field, &needs_refresh, &screen_exit_flag);
+            Check_Weapon_Fields_(input_field, &needs_refresh, &screen_exit_flag);
+            Check_Special_System_Fields_(input_field, &needs_refresh, &screen_exit_flag);
             Check_Plus_Minus_Buttons_(input_field);
 
             if (MOX::_design->ship_size != MOX::_design_size) {
                 MOX::_design->ship_size = MOX::_design_size;
-                MOX::_design->hull_space = (int)TECHDATA::_hull_data[MOX::_design->ship_size].hull_size;
-                refresh_needed = 1;
+                MOX::_design->hull_space = TECHDATA::_hull_data[MOX::_design->ship_size].hull_size;
+                needs_refresh = 1;
                 if (MOX::_design->ship_size == 5) {
-                    MOX::_design->picture_type = 0x2B;
+                    MOX::_design->picture_type = 43;
                 } else {
                     MOX::_design->picture_type = MOX::_design->ship_size * 8;
                 }
             }
 
-            bool weapon_handled = false;
-            for (int i = 0; i < 8; ++i) {
-                if (weapon_handled) break;
-                int weapon_idx = MOX::_first_weapon_ctr + i;
+            for (int16_t i = 0; i < 8; ++i) {
+                int16_t weapon_slot = MOX::_first_weapon_ctr + i;
                 if (MOX::_weapons_count_plus_button[i] == input_field) {
-                    int new_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_idx],
-                                                  MOX::_design->weapon_count[weapon_idx] + 1,
-                                                  MOX::_design->weapon_specials[weapon_idx],
-                                                  static_cast<uint16_t>(MOX::_design->weapon_firing_arc[weapon_idx]),
-                                                  MOX::_design->ship_size);
-                    weapon_handled = true;
-                    int space_diff = (int16_t)new_space - (int16_t)MOX::_design->weapon_space[weapon_idx];
-                    if ((int)(int16_t)((int16_t)MOX::_design->space_used + space_diff) <= MOX::_design->hull_space) {
-                        MOX::_design->weapon_count[weapon_idx]++;
-                        if (MOX::_design->weapon_count[weapon_idx] > 99) {
-                            MOX::_design->weapon_count[weapon_idx] = 99;
+                    int32_t new_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_slot],
+                                                       MOX::_design->weapon_count[weapon_slot] + 1,
+                                                       MOX::_design->weapon_specials[weapon_slot],
+                                                       static_cast<uint16_t>(MOX::_design->weapon_firing_arc[weapon_slot]),
+                                                       MOX::_design->ship_size);
+                    if (MOX::_design->space_used + (new_space - MOX::_design->weapon_space[weapon_slot]) <= MOX::_design->hull_space) {
+                        if (MOX::_design->weapon_count[weapon_slot] < 99) {
+                            MOX::_design->weapon_count[weapon_slot]++;
                         }
                         _replacement_wait_ctr = 0;
-                        refresh_needed = 1;
+                        needs_refresh = 1;
                     }
+                    break;
                 } else if (MOX::_weapons_count_minus_button[i] == input_field) {
-                    MOX::_design->weapon_count[weapon_idx]--;
-                    if (MOX::_design->weapon_count[weapon_idx] < 1) {
-                        MOX::_design->weapon_count[weapon_idx] = 1;
+                    if (MOX::_design->weapon_count[weapon_slot] > 1) {
+                        MOX::_design->weapon_count[weapon_slot]--;
                     }
                     _replacement_wait_ctr = 0;
-                    refresh_needed = 1;
-                    weapon_handled = true;
+                    needs_refresh = 1;
+                    break;
                 }
             }
 
-            if (refresh_needed != 0) {
+            if (needs_refresh != 0) {
                 Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
-                refresh_needed = 0;
+                needs_refresh = 0;
             }
 
-            if (rebuild_buttons) {
+            if (update_buttons) {
                 fields::Clear_Fields_();
                 _design_size_field = -1000;
                 Add_Design_Buttons_();
             }
 
-            for (int i = 0; i < 6; ++i) {
+            for (int16_t i = 0; i < 6; ++i) {
                 if (MOX::_design_ship_size_field[i] == input_field) {
-                    if (_add_size_button_flag[i] < 0xF1) {
+                    if (_add_size_button_flag[i] < 241) {
                         _changed_design_name = 0;
-                        int pic_logic = MOX::_design->picture_type;
-                        int pic_val = (pic_logic ^ (pic_logic >> 15)) - (pic_logic >> 15);
-                        Get_Ship_Design_Name_(
-                            (uint16_t)MOX::_player[MOX::_PLAYER_NUM].race,
-                            MOX::_design->ship_size,
-                            (pic_val & 7),
-                            MOX::_design->name
-                        );
+                        int16_t pic_val = (MOX::_design->picture_type & 7);
+                        Get_Ship_Design_Name_(MOX::_player[MOX::_PLAYER_NUM].race, MOX::_design->ship_size, pic_val, MOX::_design->name);
                     } else {
                         Print_Ship_Size_Error_Message_(i);
                     }
                 }
             }
 
-            if (exit_flag == 0) {
+            if (screen_exit_flag == 0 || screen_exit_flag == 99) {
                 video::Set_Page_Off_();
                 _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
-                _printed_cost = static_cast<uint16_t>(MOX::_design->total_cost);
-                Draw_Design_Screen_();
-                RUSS::Mox_Sync_Update_();
-            } else if (exit_flag == 99) {
-                video::Set_Page_Off_();
+                _printed_cost = MOX::_design->total_cost;
                 Draw_Design_Screen_();
                 RUSS::Mox_Sync_Update_();
             }
 
             strings::Trim_(MOX::_design->name);
             if (MOX::_design->name[0] == '\0') {
-                char* def_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design_idx_snapshot);
-                char* src = def_name;
+                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, current_design_idx);
                 char* dst = MOX::_design->name;
-                while ((*dst++ = *src++) != '\0');
+                while ((*dst++ = *default_name++));
             }
 
             timer::Release_Time_(2);
-            if (exit_flag != 0) {
+
+            if (screen_exit_flag != 0) {
                 fields::Enable_Mouse_Wait_();
                 fields::Clear_Fields_();
                 MOX::_reloaded_ship_palette = 0;
