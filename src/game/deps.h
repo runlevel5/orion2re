@@ -9,7 +9,11 @@
 #include "accss.h"
 
 #include "consts.h"
-#include "types.h"
+
+#pragma pack(push, 1)
+#include "orion2.h"
+#pragma pack(pop)
+
 #include "random.h"
 #include "platform.h"
 #include "allocate.h"
@@ -98,6 +102,7 @@
 #include "racesel.h"
 #include "techdata.h"
 #include "techinit.h"
+#include "desbox.h"
 #include "haccess.h"
 #include "diplomac.h"
 #include "diplodef.h"

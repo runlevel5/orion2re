@@ -193,7 +193,7 @@ namespace TRADE {
                 int16_t research_pops = 0;
 
                 for (int p = 0; p < (uint8_t)colony->n_pops; ++p) {
-                    Pop_Info* pop = &colony->pop[p];
+                    s_pop_info* pop = &colony->pop[p];
 
                     if (pop->race < 8) {
                         trade_pops++;

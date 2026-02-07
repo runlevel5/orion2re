@@ -2,62 +2,22 @@
 #include <cstdint>
 
 namespace DESIGN {
-
-#pragma pack(push, 1)
-    struct s_current_design {
-        char name[16];
-        uint8_t field1_0x10;
-        int16_t shield;
-        int16_t shield_cost;
-        int16_t shield_space;
-        uint8_t field5_0x17;
-        uint8_t field6_0x18;
-        uint8_t field7_0x19;
-        uint8_t field8_0x1a;
-        int16_t ftl_type;
-        int16_t drive_speed;
-        int16_t drive_cost;
-        int16_t base_space;
-        uint8_t field14_0x23;
-        uint8_t field15_0x24;
-        int16_t base_combat_speed;
-        uint8_t field17_0x27;
-        uint8_t field18_0x28;
-        int16_t field19_0x29;
-        int16_t computer_type;
-        int16_t computer_cost;
-        int16_t fuel_type;
-        int16_t armor_type;
-        int16_t armor_cost;
-        int16_t weapon_type[8];
-        int16_t weapon_count[8];
-        int8_t weapon_firing_arc[8];
-        int16_t weapon_specials[8];
-        int32_t weapon_cost[8];
-        int32_t weapon_space[8];
-        int8_t weapon_ammo[8];
-        int16_t special_devices[8];
-        int16_t special_device_cost[8];
-        int16_t special_device_space[8];
-        int16_t ship_size;
-        int16_t picture_type;
-        int32_t hull_space;
-        int32_t space_used;
-        int32_t total_cost;
-        int8_t show_help;
-        int16_t help1;
-        int16_t help2;
-        uint8_t field43_0xfa[0x125 - 0xfa];
-    };
-#pragma pack(pop)
-
     inline s_current_design*& _design = *reinterpret_cast<s_current_design**>(std::uintptr_t{ 0x0059B330 });
+    inline uint8_t& _replacement_wait_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B6E});
+    inline int16_t& _design_size_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565040});
     inline uint8_t& _use_augmented_engines = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056503C});
 
     inline uint32_t& _printed_space_avail = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565054});
     inline uint16_t& _printed_cost = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565058});
+    inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
+    inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
+    inline uint8_t* _add_size_button_flag = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565064});
+
+    inline const char* s_cstdes_log = reinterpret_cast<const char*>(0x005560ec);
 
     int16_t __cdecl Cost_Of_Design_(int16_t player_idx, struct s_ship_design* ship_design);
+
+    uint8_t __cdecl Current_Design_Size_(int16_t player_idx, int16_t design_idx);
 
     int8_t __cdecl Count_Weapons_Loaded_();
 
@@ -85,6 +45,8 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_();
 
+    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size);
+
     int32_t __cdecl Total_Space_Used_();
 
     int32_t __cdecl Get_Design_Hull_Size_();
@@ -97,8 +59,59 @@ namespace DESIGN {
 
     void __cdecl Update_Calculated_Design_Data_(int16_t player_idx);
 
-    inline void __cdecl Design_Screen_() {
+    void __cdecl Design_Screen_();
+
+    int32_t __cdecl Get_Design_Hull_Size_();
+
+    inline void __cdecl Draw_Design_Screen_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0042e6b0})();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042f470 })();
+    }
+
+    inline void __cdecl Load_Design_Screen_Pictures_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042f9a0 })();
+    }
+
+    void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx);
+
+    inline void __cdecl Add_Design_Buttons__() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042d080 })();
+    }
+
+    inline void __cdecl Clear_Design_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042df20 })();
+    }
+
+    inline void __cdecl Update_Player_Design_(int16_t player, int16_t design_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00432360 })(player, design_idx);
+    }
+
+    inline void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042d930 })(field, refresh, flag);
+    }
+
+    inline void __cdecl Check_Weapon_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042dda0 })(field, refresh, flag);
+    }
+
+    inline void __cdecl Check_Special_System_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042dc20 })(field, refresh, flag);
+    }
+
+    inline void __cdecl Check_Plus_Minus_Buttons_(int16_t field) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042dad0 })(field);
+    }
+
+    inline void __cdecl Get_Ship_Design_Name_(uint16_t race, int16_t size, int picture_idx, char* out_name) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t, int, char*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042f830 })(race, size, picture_idx, out_name);
     }
 }

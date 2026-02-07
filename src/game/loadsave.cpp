@@ -64,7 +64,7 @@ namespace LOADSAVE {
      * @address 0050f5d0
      */
     void __cdecl Restore_Game_Popup_() {
-        if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+        if (MOX::_current_screen == SCREEN_MAIN_MENU) {
             video::Set_Page_Back_();
             graphics::Fill_(0, 0, 639, 479, 0);
             animate::Draw_(0, 0, reinterpret_cast<s_animation_header*>(MAINMENU::_mainmenu_first_seg));
@@ -212,7 +212,7 @@ namespace LOADSAVE {
         }
         case 2:
         case 3: {
-            if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+            if (MOX::_current_screen == SCREEN_MAIN_MENU) {
                 int16_t w = animate::Get_Width_(_game_anims->pictures[0xb]);
                 MOX::_popup_base_x = (0x280 - w) / 2;
                 int16_t h = animate::Get_Height_(_game_anims->pictures[0xb]);
@@ -304,7 +304,7 @@ namespace LOADSAVE {
         }
         *empty_msg_dst = '\0';
 
-        bool from_menu = (MOX::_current_screen == MOX::SCREEN_MAIN_MENU);
+        bool from_menu = (MOX::_current_screen == SCREEN_MAIN_MENU);
         _loaded_debug_save = 0;
 
         if (!from_menu) {
@@ -340,7 +340,7 @@ namespace LOADSAVE {
 
             if (selected_slot >= 0 && selected_slot < 10) {
                 if (_game_popup_fields->saved_games[selected_slot] == 0) {
-                    if (MOX::_settings.animations_on != 0 && MOX::_previous_screen == MOX::SCREEN_MAIN) {
+                    if (MOX::_settings.animations_on != 0 && MOX::_previous_screen == SCREEN_MAIN) {
                         fields::Clear_Fields_();
                         _game_anims->field1_0x64 = 1;
                         video::Set_Page_Off_();
@@ -358,7 +358,7 @@ namespace LOADSAVE {
                         MOX::_return_screen = MOX::_previous_screen;
                     } else {
                         _loaded_new_game = 1;
-                        MOX::_return_screen = (MOX::_game_type == 1) ? MOX::SCREEN_HOTSEAT_SELECT_PLAYER : MOX::SCREEN_REPORTS;
+                        MOX::_return_screen = (MOX::_game_type == 1) ? SCREEN_HOTSEAT_SELECT_PLAYER : SCREEN_REPORTS;
                     }
 
                     if (!from_menu && MOX::_stardate_at_beg_of_turn != 0) {
@@ -828,7 +828,7 @@ namespace LOADSAVE {
             popup_frame = _game_anims->pictures[0xE];
         }
 
-        if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+        if (MOX::_current_screen == SCREEN_MAIN_MENU) {
             animate::Draw_(0, 0, (s_animation_header*)MAINMENU::_mainmenu_first_seg);
             animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, (s_animation_header*)popup_frame);
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
@@ -931,7 +931,7 @@ namespace LOADSAVE {
     void __cdecl Get_Game_Popup_Colors_(int16_t font_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary) {
         s_colors* colors;
 
-        if (MOX::_current_screen == MOX::SCREEN_MAIN_MENU) {
+        if (MOX::_current_screen == SCREEN_MAIN_MENU) {
             // Colors for main menu context
             colors = MISC::Font_Colors2_(font_idx, 0xFE, 0xFF);
             *out_colors_primary = *colors;
@@ -1268,7 +1268,7 @@ namespace LOADSAVE {
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     MOX::_game_type = 0;
-                    MOX::_return_screen = MOX::SCREEN_NEW_GAME;
+                    MOX::_return_screen = SCREEN_NEW_GAME;
                     event_processed = true;
                     *out_finished = 1;
                 } else {
@@ -1293,7 +1293,7 @@ namespace LOADSAVE {
                         netcode::Net_Uninit_();
                     }
 
-                    MOX::_return_screen = MOX::SCREEN_EXIT;
+                    MOX::_return_screen = SCREEN_EXIT;
                     event_processed = true;
                     *out_finished = 1;
                 } else {
@@ -1601,7 +1601,7 @@ namespace LOADSAVE {
             if (MOX::_screen_data == 2 || MOX::_screen_data == 3) {
                 sound::Sound_Update_();
                 Set_Up_Load_Save_Popup_();
-                MOX::_return_screen = static_cast<MOX::SCREEN>(static_cast<int8_t>(MOX::_previous_screen));
+                MOX::_return_screen = static_cast<SCREEN>(static_cast<int8_t>(MOX::_previous_screen));
             }
 
             fields::Clear_Fields_();
@@ -1635,7 +1635,7 @@ namespace LOADSAVE {
             Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
         }
 
-        if (MOX::_current_screen == MOX::SCREEN_NEW_GAME) {
+        if (MOX::_current_screen == SCREEN_NEW_GAME) {
             ERIC::Fast_Fade_Out_();
         } else if (_loaded_new_game == 0) {
             fields::Clear_Fields_();

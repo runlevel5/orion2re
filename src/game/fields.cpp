@@ -131,7 +131,7 @@ namespace fields {
 
         field->x = x;
         field->y = y;
-        field->detail.button.help = help;
+        field->detail.button.help = const_cast<char*>(help);
 
         field->x_end = field->x + animate::Get_Width_(pic) - 1;
         field->y_end = field->y + animate::Get_Height_(pic) - 1;
@@ -225,7 +225,7 @@ namespace fields {
         field.y = y;
         field.x_end = x_end;
         field.y_end = y_end;
-        field.detail.button.help = help;
+        field.detail.button.help = const_cast<char*>(help);
         field.detail.button.pic = pic;
         field.detail.button.help_start = help_start;
         field.detail.button.help_end = help_end;
@@ -371,7 +371,7 @@ namespace fields {
         }
 
         field.field_type = FIELD_TYPE_SCROLL;
-        field.detail.scroll.field10_0x10 = context_ptr;
+        field.detail.scroll.value = context_ptr;
 
         char hk = *hotkey_ptr;
         if (hk > 0x60 && hk < 0x7B) {
@@ -399,7 +399,7 @@ namespace fields {
         field.hotkey = '\0';
         field.field_type = FIELD_TYPE_MULTI_HOTKEY;
 
-        field.detail.button.help = help_text;
+        field.detail.button.help = const_cast<char*>(help_text);
         field.detail.button.help_start = 0;
 
         // Calculate length of help string manually as seen in the assembly (SCASB)

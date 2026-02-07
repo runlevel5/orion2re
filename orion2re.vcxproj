@@ -90,6 +90,7 @@
     <ClInclude Include="src\game\colxport.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\deps.h" />
+    <ClInclude Include="src\game\desbox.h" />
     <ClInclude Include="src\game\design.h" />
     <ClInclude Include="src\game\diplodef.h" />
     <ClInclude Include="src\game\diplomac.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="src\game\msg.h" />
     <ClInclude Include="src\game\multplay.h" />
     <ClInclude Include="src\game\officer.h" />
+    <ClInclude Include="src\game\orion2.h" />
     <ClInclude Include="src\game\palette.h" />
     <ClInclude Include="src\game\palstore.h" />
     <ClInclude Include="src\game\platform.h" />

@@ -1644,7 +1644,7 @@ namespace COLCALC {
         int base_tax_per_pop = owner_ptr->traits[TRAIT_TAX_BONUS] * 2 + 4;
 
         for (int i = 0; i < (uint8_t)colony->n_pops; ++i) {
-            Pop_Info* p = &colony->pop[i];
+            s_pop_info* p = &colony->pop[i];
             uint32_t race_idx = (uint32_t)p->race;
             if (race_idx < 8) {
                 if (MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
@@ -2239,7 +2239,7 @@ namespace COLCALC {
         int n_pops = (uint8_t)colony->n_pops;
 
         for (int i = 0; i < n_pops; ++i) {
-            Pop_Info* p = &colony->pop[i];
+            s_pop_info* p = &colony->pop[i];
             uint32_t pop_data = *reinterpret_cast<uint32_t*>(p);
             
             // Check if population is assigned to this job

@@ -4,15 +4,6 @@
 #include <cstdio>
 
 namespace farload {
-#pragma pack(push, 1)
-    struct s_lbx_header {
-        uint16_t entry_count;
-        uint16_t magic;
-        uint32_t unknown4;
-        uint32_t offsets[510];
-    };
-#pragma pack(pop)
-
     // Suggested name: farload::Error_Handler
     void __cdecl Error_Handler_(const char* lib_name, int code, int idx);
 

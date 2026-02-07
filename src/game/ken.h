@@ -16,4 +16,10 @@ namespace KEN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1d50});
         fn();
     }
+
+    inline void __cdecl Load_Player_Ship_Palette_(int16_t player) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C1B30});
+        fn(player);
+    }
 }

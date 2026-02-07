@@ -217,6 +217,16 @@ namespace INITSHIP {
         }
     }
 
+    int16_t __cdecl Best_Computer_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x00481310)(player_idx);
+    }
+
+    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x00481280)(player_idx);
+    }
+
     int16_t __cdecl Best_Armor_(int16_t player_idx) {
         if (player_idx > 7) {
             // Antarans or Space Monsters

@@ -3,19 +3,19 @@
 namespace fonts {
     void __cdecl Set_Normal_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors2[i] = _font_header.selected_colors1[i];
+            _font_header.selected_colors[i] = _font_header.normal_colors[i];
         }
     }
 
     void __cdecl Set_Highlight_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors2[i] = _font_header.highlight_colors[i];
+            _font_header.selected_colors[i] = _font_header.highlight_colors[i];
         }
     }
 
     void __cdecl Set_Special_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors2[i] = _font_header.special_colors[i];
+            _font_header.selected_colors[i] = _font_header.special_colors[i];
         }
     }
 
@@ -88,8 +88,8 @@ namespace fonts {
 
         for (int i = 0; i < 8; ++i) {
             uint8_t color = new_colors->colors[i];
-            _font_header.selected_colors1[i] = color;
-            _font_header.selected_colors2[i] = color;
+            _font_header.selected_colors[i] = color;
+            _font_header.normal_colors[i] = color;
             _current_font_color_array.colors[i] = color;
         }
 
@@ -282,15 +282,15 @@ namespace fonts {
 
     void __cdecl Get_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            colors->colors[i] = _font_header.selected_colors2[i];
+            colors->colors[i] = _font_header.normal_colors[i];
         }
     }
 
     void __cdecl Set_Colors_(const s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
             uint8_t color = colors->colors[i];
-            _font_header.selected_colors1[i] = color;
-            _font_header.selected_colors2[i] = color;
+            _font_header.selected_colors[i] = color;
+            _font_header.normal_colors[i] = color;
         }
     }
 

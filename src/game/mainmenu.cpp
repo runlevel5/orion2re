@@ -152,7 +152,7 @@ namespace MAINMENU {
     }
 
     void __cdecl Load_Mainmenu_Load_Game_Popup_() {
-        LOADSAVE::s_game_anims* anims = LOADSAVE::_game_anims;
+        s_game_anims* anims = LOADSAVE::_game_anims;
         const char* lbx = PTR_s_GAME_LBX_0055ac4c;
         void* seg = MOX::_screen_seg;
 
@@ -174,13 +174,13 @@ namespace MAINMENU {
 
         _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 0x15, MOX::_screen_seg);
 
-        LOADSAVE::_game_anims = (LOADSAVE::s_game_anims*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x65);
+        LOADSAVE::_game_anims = (s_game_anims*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x65);
         uint8_t* anims_ptr = (uint8_t*)LOADSAVE::_game_anims;
         for (int i = 0; i < 0x65; ++i) {
             anims_ptr[i] = 0;
         }
 
-        LOADSAVE::_game_popup_fields = (LOADSAVE::s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
+        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x278);
         uint32_t* fields_ptr = (uint32_t*)LOADSAVE::_game_popup_fields;
         for (int i = 0; i < 0x9E; ++i) {
             fields_ptr[i] = 0xFFFFFFFF;
@@ -218,7 +218,7 @@ namespace MAINMENU {
         RUSS::Mox_Sync_Update_();
         fields::Deactivate_Help_List_();
 
-        MOX::_previous_screen = MOX::SCREEN_MAIN_MENU;
+        MOX::_previous_screen = SCREEN_MAIN_MENU;
 
         // Loop until the popup returns 1 (selection made or closed)
         do {
@@ -391,7 +391,7 @@ namespace MAINMENU {
         // Initialize main menu structure fields to -1
         helpers::memset(_mainmenu, 0, sizeof(s_main_menu));
 
-        LOADSAVE::_game_popup_fields = (LOADSAVE::s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
+        LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
         MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::Mox_Update_();
@@ -403,18 +403,18 @@ namespace MAINMENU {
             video::Set_Refresh_Full_();
             last_input_scan = Do_Main_Menu_File_Animation_();
         } else {
-            bool full_redraw = (MOX::_previous_screen == MOX::SCREEN_GAME ||
-                                MOX::_previous_screen == MOX::SCREEN_HALL_OF_FAME ||
-                                MOX::_previous_screen == MOX::SCREEN_MULTI_PLAYER ||
-                                MOX::_previous_screen == MOX::SCREEN_MAIN_NEXT_TURN ||
-                                MOX::_previous_screen == MOX::SCREEN_NEW_GAME ||
+            bool full_redraw = (MOX::_previous_screen == SCREEN_GAME ||
+                                MOX::_previous_screen == SCREEN_HALL_OF_FAME ||
+                                MOX::_previous_screen == SCREEN_MULTI_PLAYER ||
+                                MOX::_previous_screen == SCREEN_MAIN_NEXT_TURN ||
+                                MOX::_previous_screen == SCREEN_NEW_GAME ||
                                 MOX::_FULL_DRAW_SCREEN_FLAG != 0);
 
             if (full_redraw) {
                 MOX::_FULL_DRAW_SCREEN_FLAG = 0;
                 Reload_Main_Menu_Screen_();
                 MISC::Fade_Into_Screen_(Main_Menu_Fade_Function_, &fade_data, 5);
-            } else if (MOX::_previous_screen == MOX::SCREEN_MAIN_MENU) {
+            } else if (MOX::_previous_screen == SCREEN_MAIN_MENU) {
                 Reload_Main_Menu_Screen_();
                 video::Set_Page_Off_();
                 graphics::Fill_(0, 0, 639, 479, 0);
@@ -454,20 +454,20 @@ namespace MAINMENU {
             if (input_field == _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field || (last_input_scan == 0x43 && _mainmenu->fields[MAIN_MENU_BTN_CONTINUE].field != -1000)) {
                 if (FILEDEF::Load_Game_(9) != 0) {
                     if (MOX::_game_type != 2 && MOX::_game_type != 3) {
-                        MOX::_current_screen = (MOX::_game_type == 1) ? MOX::SCREEN_HOTSEAT_SELECT_PLAYER : MOX::SCREEN_REPORTS;
+                        MOX::_current_screen = (MOX::_game_type == 1) ? SCREEN_HOTSEAT_SELECT_PLAYER : SCREEN_REPORTS;
                     } else {
                         GENDRAW::Warning_Box_(HAROLD::H_Message_(207)); // 0xcf
-                        MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                        MOX::_current_screen = SCREEN_MAIN_MENU;
                     }
                 } else {
-                    MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                    MOX::_current_screen = SCREEN_MAIN_MENU;
                 }
                 screen_exit = true;
             }
             // New Game
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_NEW].field || input_field == hotkey_n || last_input_scan == 0x4e) {
-                MOX::_current_screen = MOX::SCREEN_NEW_GAME;
-                MOX::_return_screen = MOX::SCREEN_MAIN;
+                MOX::_current_screen = SCREEN_NEW_GAME;
+                MOX::_return_screen = SCREEN_MAIN;
                 screen_exit = true;
             }
             // Load Game
@@ -475,34 +475,34 @@ namespace MAINMENU {
                 if (Do_Mainmenu_Load_Screen_() != 0) {
                     if (MOX::_game_type == 2 || MOX::_game_type == 3) {
                         GENDRAW::Warning_Box_(HAROLD::H_Message_(208)); // 0xd0
-                        MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                        MOX::_current_screen = SCREEN_MAIN_MENU;
                     } else {
-                        MOX::_current_screen = (MOX::_game_type == 1) ? MOX::SCREEN_HOTSEAT_SELECT_PLAYER : MOX::SCREEN_REPORTS;
+                        MOX::_current_screen = (MOX::_game_type == 1) ? SCREEN_HOTSEAT_SELECT_PLAYER : SCREEN_REPORTS;
                     }
                 } else {
-                    if (MOX::_previous_screen == MOX::SCREEN_MAIN) {
-                        MOX::_current_screen = MOX::SCREEN_MAIN;
+                    if (MOX::_previous_screen == SCREEN_MAIN) {
+                        MOX::_current_screen = SCREEN_MAIN;
                     } else {
-                        MOX::_current_screen = MOX::SCREEN_MAIN_MENU;
+                        MOX::_current_screen = SCREEN_MAIN_MENU;
                     }
                 }
                 screen_exit = true;
             }
             // Multi-player
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_MULTIPLAY].field || last_input_scan == 0x4d) {
-                MOX::_current_screen = MOX::SCREEN_MULTI_PLAYER;
-                MOX::_return_screen = MOX::SCREEN_MAIN_MENU;
+                MOX::_current_screen = SCREEN_MULTI_PLAYER;
+                MOX::_return_screen = SCREEN_MAIN_MENU;
                 screen_exit = true;
             }
             // Hall of Fame
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_HELP].field || last_input_scan == 0x48) {
-                MOX::_current_screen = MOX::SCREEN_HALL_OF_FAME;
-                MOX::_return_screen = MOX::SCREEN_MAIN_MENU;
+                MOX::_current_screen = SCREEN_HALL_OF_FAME;
+                MOX::_return_screen = SCREEN_MAIN_MENU;
                 screen_exit = true;
             }
             // Quit
             else if (input_field == _mainmenu->fields[MAIN_MENU_BTN_QUIT].field || last_input_scan == 0x51) {
-                MOX::_current_screen = MOX::SCREEN_EXIT;
+                MOX::_current_screen = SCREEN_EXIT;
                 screen_exit = true;
             }
 

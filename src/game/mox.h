@@ -1,51 +1,11 @@
 #pragma once
 
-namespace DESIGN { struct s_current_design; }
-
 namespace MOX {
-    inline DESIGN::s_current_design*& _design =
-        *reinterpret_cast<DESIGN::s_current_design**>(std::uintptr_t{0x0059B330});
+    inline s_current_design*& _design =
+        *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
 
     inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
-
-    enum SCREEN : int16_t {
-        SCREEN_MAIN = 0,
-        SCREEN_COLONY = 1,
-        SCREEN_DESIGN = 3,
-        SCREEN_FLEET = 4,
-        SCREEN_RACE = 6,
-        SCREEN_EXIT = 7,
-        SCREEN_GAME = 8,
-        SCREEN_INFO = 9,
-        SCREEN_MAIN_MENU = 10,
-        SCREEN_MAIN_NEXT_TURN = 12,
-        SCREEN_NEW_GAME = 13,
-        SCREEN_HALL_OF_FAME = 14,
-        SCREEN_MULTI_PLAYER = 15,
-        SCREEN_HOTSEAT = 16,
-        SCREEN_HOTSEAT_SELECT_PLAYER = 17,
-        SCREEN_PLANET_DATA = 18,
-        SCREEN_COLONY_SUMMARY = 20,
-        SCREEN_START_NET = 21,
-        SCREEN_JOIN_NET = 22,
-        SCREEN_QUEUE_POPUP = 25,
-        SCREEN_DISTANCE_BETWEEN_STARS = 28,
-        SCREEN_OFFICERS = 29,
-        SCREEN_COLONIZATION_IN_MAIN = 30,
-        SCREEN_BUILDING_OUTPOSTS_IN_MAIN = 31,
-        SCREEN_PLANET_SUMMARY = 32,
-        SCREEN_COLONY_LANDING = 33,
-        SCREEN_UNLOADING_TRANSPORTS_IN_MAIN = 34,
-        SCREEN_SCRAP_FREIGHTERS = 35,
-        SCREEN_TECH_CHANGE = 36,
-        SCREEN_NET_NEXT_TURN = 37,
-        SCREEN_REPORTS = 39,
-        SCREEN_TURN_SUMMARY = 40,
-        SCREEN_LOAD_NET = 41,
-        SCREEN_SHOW_COMMAND_POINTS = 43,
-        SCREEN_UNKNOWN = -1,
-    };
 
     // References
     inline uint8_t* _food_per_farmer_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559690});
@@ -75,12 +35,22 @@ namespace MOX {
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
+    inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
+    inline uint8_t& _first_design_screen_call = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5C9});
+    inline int16_t& _design_size = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B434});
     inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
     inline uint8_t& _mox_font_colors_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059BA6E });
     inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
     inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});
     inline char& _temp_string = *reinterpret_cast<char*>(std::uintptr_t{ 0x00596230 });
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
+    inline uint8_t& _draw_design_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1B44});
+    inline uint8_t& _refit_ship = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597A80});
+    inline int& _original_cost = *reinterpret_cast<int*>(std::uintptr_t{0x0059B324});
+    inline int16_t& _design_name_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597490});
+    inline int16_t& _design_cancel_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597010});
+    inline int16_t& _design_clear_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B4C});
+    inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
     inline uint8_t& _selected_star_color_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059C454});
     inline uint8_t (&_antarans)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
@@ -89,6 +59,7 @@ namespace MOX {
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
+    inline uint8_t& _first_weapon_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6C8});
     inline uint8_t& _reloaded_ship_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6BC});
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
@@ -115,6 +86,7 @@ namespace MOX {
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
     inline uint8_t* _mouse_list_arrow = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
+    inline void* _mouse_list_variable = reinterpret_cast<void*>(std::uintptr_t{0x00558D20});
     inline uint8_t* _mouse_list_none = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558D70});
 
     inline int16_t& _mid_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059643C});
@@ -156,6 +128,9 @@ namespace MOX {
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
     inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
     inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
+    inline int16_t* _weapons_count_plus_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D50});
+    inline int16_t* _weapons_count_minus_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1810});
+    inline int16_t* _design_ship_size_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAC0});
 
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });

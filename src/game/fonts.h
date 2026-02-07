@@ -2,27 +2,6 @@
 #include "misc.h"
 
 namespace fonts {
-#pragma pack(push, 1)
-struct s_font {
-    uint8_t selected_colors2[8];      // 0x00
-    int16_t font_style_height;        // 0x08
-    int16_t font_style;               // 0x0A
-    uint8_t selected_colors1[8];      // 0x0C
-    uint8_t highlight_colors[8];      // 0x14
-    uint8_t special_colors[8];        // 0x1C
-    uint16_t current_height;          // 0x24
-    int16_t line_height;              // 0x26
-    uint16_t field24_0x28;            // 0x28
-    int16_t font_style_spacing;       // 0x2A
-    int8_t font_style_widths[256];    // 0x2C
-    uint32_t font_style_offsets[256]; // 0x12C
-    int16_t font_heights[8];          // 0x52C
-    int16_t font_spacing[8];          // 0x53C
-    int16_t field31_0x54c[8];         // 0x54C
-    uint8_t font_glyph_widths[6][256];// 0x55C
-    uint32_t font_glyph_offsets[6][256];// 0xB5C
-};
-#pragma pack(pop)
     inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
 
     inline void*& _palette_block =

@@ -413,6 +413,12 @@
     <ClInclude Include="src\game\line.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\desbox.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\orion2.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

@@ -16,157 +16,6 @@ namespace fields {
     inline uint16_t& _draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B078});
     inline const char* s_You_exceeded_the_max_number_of_fields = reinterpret_cast<const char*>(std::uintptr_t{0x0055B080});
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
-
-    typedef enum FIELD_TYPE : int16_t {
-        FIELD_TYPE_BUTTON = 0,
-        FIELD_TYPE_RADIO = 1,
-        FIELD_TYPE_LOCKED = 2,
-        FIELD_TYPE_MULTI_BUTTON = 3,
-        FIELD_TYPE_4 = 4,
-        FIELD_TYPE_5 = 5,
-        FIELD_TYPE_SCROLL = 6,
-        FIELD_TYPE_HIDDEN = 7,
-        FIELD_TYPE_MULTI_HOTKEY = 8,
-        FIELD_TYPE_9 = 9,
-        FIELD_TYPE_10 = 10,
-        FIELD_TYPE_CONTINUOUS_INPUT = 11,
-        FIELD_TYPE_GRID = 12,
-        FIELD_TYPE_IRREGULAR_INPUT = 13
-    } FIELD_TYPE;
-
-#pragma pack(push, 1)
-    struct s_field_grid {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        short field2_0x2;
-        byte* highlight_color;
-        const char* help;
-        short step_x;
-        undefined field6_0xe;
-        undefined field7_0xf;
-        short step_y;
-        undefined field9_0x12;
-        undefined field10_0x13;
-        short* grid_x_ptr;
-        short* grid_y_ptr;
-        struct s_animation_header* pic;
-        short field14_0x20;
-        undefined field15_0x22;
-        undefined field16_0x23;
-    };
-
-    struct s_field_scroll {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        short field2_0x2;
-        byte* highlight_color;
-        short field4_0x8;
-        undefined field5_0xa;
-        undefined field6_0xb;
-        short field7_0xc;
-        undefined field8_0xe;
-        undefined field9_0xf;
-        short* field10_0x10;
-        short field11_0x14;
-        undefined field12_0x16;
-        undefined field13_0x17;
-        short field14_0x18;
-        undefined field15_0x1a;
-        undefined field16_0x1b;
-        short field17_0x1c;
-        undefined field18_0x1e;
-        undefined field19_0x1f;
-        short field20_0x20;
-        undefined field21_0x22;
-        undefined field22_0x23;
-    };
-
-    struct s_field_button {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        short field2_0x2;
-        byte* highlight_color;
-        const char* help;
-        short help_start;
-        undefined field6_0xe;
-        undefined field7_0xf;
-        short help_end;
-        undefined field9_0x12;
-        undefined field10_0x13;
-        short full_store_flag;
-        undefined field12_0x16;
-        undefined field13_0x17;
-        int field14_0x18;
-        struct s_animation_header* pic;
-        short field16_0x20;
-        undefined field17_0x22;
-        undefined field18_0x23;
-    };
-
-    struct s_field_radio {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        short field2_0x2;
-        byte* highlight_color;
-        const char* help;
-        short help_start;
-        undefined field6_0xe;
-        undefined field7_0xf;
-        char* selection;
-        short field9_0x14;
-        undefined field10_0x16;
-        undefined field11_0x17;
-        int field12_0x18;
-        struct s_animation_header* pic;
-        short field14_0x20;
-        undefined field15_0x22;
-        undefined field16_0x23;
-    };
-
-    struct s_field_cont_input {
-        undefined field0_0x0;
-        undefined field1_0x1;
-        short field2_0x2;
-        s_colors* highlight_color;
-        char* help;
-        int field5_0xc;
-        short help_end;
-        undefined field7_0x12;
-        undefined field8_0x13;
-        short full_store_flag;
-        undefined field10_0x16;
-        undefined field11_0x17;
-        int field12_0x18;
-        short field13_0x1c;
-        undefined field14_0x1e;
-        undefined field15_0x1f;
-        short field16_0x20;
-        undefined field17_0x22;
-        undefined field18_0x23;
-    };
-
-    union s_field_detail {
-        struct s_field_button button;
-        struct s_field_grid grid;
-        struct s_field_radio radio;
-        struct s_field_scroll scroll;
-        struct s_field_cont_input cont_input;
-    };
-
-    struct s_field {
-        short x;
-        short y;
-        short x_end;
-        short y_end;
-        enum FIELD_TYPE field_type;
-        short font_style;
-        s_colors* font_color;
-        union s_field_detail detail;
-        char hotkey;
-        short sound;
-    };
-#pragma pack(pop)
-
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
     inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
@@ -188,6 +37,12 @@ namespace fields {
     void __cdecl Assign_Auto_Function_(void* function_ptr, int16_t delay);
 
     int16_t __cdecl Get_Input_();
+
+    inline void __cdecl Enable_Mouse_Wait_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1A0});
+        fn();
+    }
 
     inline int16_t __cdecl Interpret_Mouse_Input_() {
         using Fn = int16_t(__cdecl*)();

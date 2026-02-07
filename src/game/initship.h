@@ -19,5 +19,9 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Armor_(int16_t player_idx);
 
+    int16_t __cdecl Best_Computer_(int16_t player_idx);
+
+    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
+
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 }
