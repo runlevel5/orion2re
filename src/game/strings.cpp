@@ -25,4 +25,43 @@ namespace strings {
         *a = *b;
         *b = temp;
     }
+
+    void __cdecl Trim_(char* str) {
+        if (!str) {
+            return;
+        }
+
+        // Skip leading spaces
+        int first_non_space = 0;
+        while (str[first_non_space] == ' ') {
+            first_non_space++;
+        }
+
+        // If there are leading spaces, shift the string to the left (including null terminator)
+        if (first_non_space > 0) {
+            int i = 0;
+            while (true) {
+                str[i] = str[first_non_space + i];
+                if (str[i] == '\0') {
+                    break;
+                }
+                i++;
+            }
+        }
+
+        // Find the new end of the string
+        int length = 0;
+        while (str[length] != '\0') {
+            length++;
+        }
+
+        // Iterate backwards from the end, replacing trailing spaces with null terminators
+        for (int i = length - 1; i >= 0; --i) {
+            if (str[i] == ' ') {
+                str[i] = '\0';
+            } else {
+                break;
+            }
+        }
+    }
 }

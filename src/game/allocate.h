@@ -49,9 +49,15 @@ namespace allocate {
     inline const char* s_Mark_Block_Stack_Empty_0055b6fc =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B6FC }); // "Mark Block Stack Empty"
 
-    void __cdecl Push_Block_(void* block);
+    inline void __cdecl Push_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eb30 })(block);
+    }
 
-    void __cdecl Pop_Block_(void* block);
+    inline void __cdecl Pop_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eb70 })(block);
+    }
 
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
 

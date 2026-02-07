@@ -25,6 +25,9 @@ namespace DESIGN {
     inline const char* s_pct_s_bracket_pct_d = reinterpret_cast<const char*>(0x00556124); // "%s (%d)"
     inline const char* s_special_tag = reinterpret_cast<const char*>(0x0055611C); // "special"
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
+    inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // " "
+    inline const char* s_B_005560e4 = reinterpret_cast<const char*>(0x005560E4); // "B"
+    inline const char* s_L_005560e8 = reinterpret_cast<const char*>(0x005560E8); // "L"
     inline const char* s_360_00556164 = reinterpret_cast<const char*>(std::uintptr_t{0x00556164}); // "360"
     inline const char* s_comma_space = reinterpret_cast<const char*>(std::uintptr_t{ 0x00556168 }); // ", "
     inline const char* s_ITATECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055616C}); // "ITATECD.LBX"
@@ -33,7 +36,7 @@ namespace DESIGN {
     inline const char* s_GERTECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556190}); // "GERTECD.LBX"
     inline const char* s_TECHDESC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055619C}); // "TECHDESC.LBX"
     inline const char*& PTR_s_DESIGN_LBX_005560D8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005560D8}); // "DESIGN.LBX"
-    inline const char*& PTR_s_SHIPNAME_LBX_0055610C = *reinterpret_cast<const char**>(std::uintptr_t{0x0055610C}); // "shipname.lbx"
+    inline const char* s_SHIPNAME_LBX_0055610C = reinterpret_cast<const char*>(std::uintptr_t{0x0055610C}); // "shipname.lbx"
     inline s_animation_header*& _dull_plus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565044});
     inline s_animation_header*& _dull_minus_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565048});
     inline s_animation_header*& _dark_build_design_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565050});
@@ -106,9 +109,11 @@ namespace DESIGN {
 
     void __cdecl Build_Initial_Design_Template_(int16_t player_idx, int16_t design_idx);
 
-    inline void __cdecl Add_Design_Buttons_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x0042d080 })();
+    void __cdecl Add_Design_Buttons_();
+
+    inline uint8_t __cdecl Add_Size_Button_() {
+        using Fn = uint8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x0042d5b0)();
     }
 
     void __cdecl Clear_Design_();
@@ -123,7 +128,7 @@ namespace DESIGN {
 
     void __cdecl Check_Plus_Minus_Buttons_(int16_t field);
 
-    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t hull_idx, int16_t design_idx, char* out_name);
+    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name);
 
     void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2);
 
@@ -133,18 +138,11 @@ namespace DESIGN {
 
     int16_t __cdecl Current_Design_Ship_Structure_();
 
-    inline void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost) {
-        using Fn = void(__cdecl*)(int16_t, int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00431970});
-        fn(player_idx, cost);
-    }
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost);
 
     int16_t __cdecl Current_Design_Armor_Absorption_();
 
-    inline int16_t __cdecl Shield_Strength_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431be0 })();
-    }
+    int16_t __cdecl Shield_Strength_();
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_();
 
@@ -165,10 +163,11 @@ namespace DESIGN {
 
     int16_t __cdecl One_Weapon_Space_(int16_t weapon_id);
 
-    inline bool __cdecl Space_For_System_Replacement_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431c50 })();
-    }
+    bool __cdecl Space_For_System_Replacement_();
 
     int16_t __cdecl Printed_Design_Cost_();
+
+    int16_t __cdecl N_Replacements_For_Generic_Item_(int16_t item_type);
+
+    bool __cdecl Replacement_Exists_(int16_t application_type);
 }

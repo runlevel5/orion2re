@@ -391,12 +391,6 @@ inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
     return fn(hwnd, uMsg, wParam, lParam);
 }
 
-inline void __cdecl Set_Default_Ship_Name(uint16_t race, int16_t size, int16_t picture_mod, char* name) {
-    using Fn = void(__cdecl*)(uint16_t, int16_t, int16_t, char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042f830});
-    fn(race, size, picture_mod, name);
-}
-
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
 
@@ -473,8 +467,8 @@ inline uint32_t __cdecl Miniaturization_Category_(int16_t tech_app) {
 }
 
 inline int32_t __cdecl Space_Given_M_Level_(int16_t base_space, int16_t tech_level, uint8_t min_cat) {
-    using Fn = int32_t(__cdecl*)(int16_t, int16_t, uint32_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x00431E60})(base_space, tech_level, static_cast<uint32_t>(min_cat));
+    using Fn = int32_t(__cdecl*)(int16_t, int16_t, uint8_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00431E60})(base_space, tech_level, min_cat);
 }
 
 inline int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num) {

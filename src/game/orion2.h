@@ -1140,6 +1140,8 @@ typedef struct s_field_scroll s_field_scroll, *Ps_field_scroll;
 
 typedef struct s_field_cont_input s_field_cont_input, *Ps_field_cont_input;
 
+typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button;
+
 struct s_field_grid {
     undefined field0_0x0;
     undefined field1_0x1;
@@ -1169,6 +1171,32 @@ struct s_field_scroll {
     undefined field5_0xa;
     undefined field6_0xb;
     short field7_0xc;
+    undefined field8_0xe;
+    undefined field9_0xf;
+    short *value;
+    short field11_0x14;
+    undefined field12_0x16;
+    undefined field13_0x17;
+    short field14_0x18;
+    undefined field15_0x1a;
+    undefined field16_0x1b;
+    short field17_0x1c;
+    undefined field18_0x1e;
+    undefined field19_0x1f;
+    short field20_0x20;
+    undefined field21_0x22;
+    undefined field22_0x23;
+};
+
+struct s_field_multi_button {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    short field2_0x2;
+    struct s_colors *highlight_color;
+    short field4_0x8;
+    undefined field5_0xa;
+    undefined field6_0xb;
+    short count;
     undefined field8_0xe;
     undefined field9_0xf;
     short *value;
@@ -1256,6 +1284,7 @@ union s_field_detail {
     struct s_field_radio radio;
     struct s_field_scroll scroll;
     struct s_field_cont_input cont_input;
+    struct s_field_multi_button multibtn;
 };
 
 struct s_field {
@@ -1974,12 +2003,11 @@ struct s_movable_box {
     undefined field7_0xd;
     short field8_0xe;
     short field9_0x10;
-    undefined field10_0x12;
-    undefined field11_0x13;
-    int16_t field12_0x14;
-    int16_t field13_0x16;
-    undefined2 field14_0x18;
-    undefined2 field15_0x1a;
+    short field10_0x12;
+    int16_t field11_0x14;
+    int16_t field12_0x16;
+    undefined2 field13_0x18;
+    undefined2 field14_0x1a;
 };
 
 typedef struct s_MSG s_MSG, *Ps_MSG;

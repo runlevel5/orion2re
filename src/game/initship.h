@@ -21,27 +21,11 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Computer_(int16_t player_idx);
 
-    inline uint32_t __cdecl N_Replacements_For_Generic_Item_(int16_t type) {
-        using Fn = uint32_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00430360})(type);
-    }
-
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 
-    inline int16_t __cdecl Get_Structure_(int16_t ship_size, bool has_reinforced_hull, int16_t player_num) {
-        using Fn = int16_t(__cdecl*)(int16_t, bool, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004831A0});
-        return fn(ship_size, has_reinforced_hull, player_num);
-    }
-
-#pragma pack(push, 1)
-    struct DesignArg64 {
-        s_current_design design; // 0x63
-        uint8_t pad;             // +1 => 0x64 total
-    };
-#pragma pack(pop)
+    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech);
 
     inline void __cdecl Get_Design_Combat_Bonuses_(s_ship_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
         // ABI is weird when passed by value, so just call in assembly

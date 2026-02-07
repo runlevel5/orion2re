@@ -7,9 +7,5 @@ namespace strings {
 
     void __cdecl String_To_Lower_(char* str);
 
-    inline void __cdecl Trim_(char* str) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CDE0});
-        fn(str);
-    }
+    void __cdecl Trim_(char* str);
 }

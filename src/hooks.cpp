@@ -47,8 +47,6 @@ namespace hooks {
         { 0x0052e880, &allocate::Allocate_Space_ },
         { 0x0052ebb0, &allocate::Get_Remaining_Block_Space_ },
         { 0x0052e9f0, &allocate::Allocation_Error_ },
-        { 0x0052eb30, &allocate::Push_Block_ },
-        { 0x0052eb70, &allocate::Pop_Block_ },
         { 0x0052e950, &allocate::Allocate_Next_Block_ },
         { 0x0052ea20, &allocate::Reallocation_Error_ },
         { 0x0052e8e0, &allocate::Allocate_Dos_Space_ },
@@ -144,7 +142,6 @@ namespace hooks {
         { 0x00407920, &BILL::Cache_Player_Scientist_Anim_Imp_ },
         { 0x004baa40, &ERIC::Eric_Defaults_ },
         { 0x0051c750, &farload::Far_Reload_Data_ },
-        { 0x0051c780, &farload::Far_Reload_Next_Data_ },
         { 0x00526d00, &fonts::Set_PSTR_Style_ },
         { 0x005255a0, &fonts::Set_Font_Style_ },
         { 0x00525470, &fonts::Get_String_Width_ },
@@ -464,6 +461,7 @@ namespace hooks {
         { 0x00482260, &INITSHIP::Calc_Player_FTL_Speed_ },
         { 0x00481380, &INITSHIP::Best_Armor_ },
         { 0x004822c0, &INITSHIP::Get_FTL_Speed_ },
+        { 0x004831a0, &INITSHIP::Get_Structure_ },
         { 0x005127b0, &MAINSCR::Add_Moveable_Box_Fields_ },
         { 0x0051edf0, &fields::Get_Input_ },
         { 0x00526F20, &mouse::Pointer_X_ },
@@ -489,6 +487,7 @@ namespace hooks {
         { 0x00511020, &LOADSAVE::Allocate_Data_Space_For_Game_Popup_ },
         { 0x00510db0, &LOADSAVE::_Game_Popup_ },
         { 0x0051de80, &fields::Add_Scroll_Field_ },
+        { 0x0051dda0, &fields::Add_Multi_Button_Field_ },
         { 0x0051e2b0, &fields::Add_Continuous_String_Input_Field_ },
         { 0x00531740, &file_ani::Get_File_Animation_Frame_ },
         { 0x004e8c60, &file_ani::Get_File_Animation_Total_Frames_ },
@@ -587,6 +586,15 @@ namespace hooks {
         { 0x00432960, &DESIGN::Weapon_Arc_String_ },
         { 0x004c1cc0, &KEN::Get_Ship_Picture_Seg_ },
         { 0x004c1ce0, &KEN::Do_Get_Ship_Picture_Seg },
+        { 0x0052cde0, &strings::Trim_ },
+        { 0x00431be0, &DESIGN::Shield_Strength_ },
+        { 0x00431c50, &DESIGN::Space_For_System_Replacement_ },
+        { 0x00430360, &DESIGN::N_Replacements_For_Generic_Item_ },
+        { 0x0051edd0, &fields::Set_Input_Delay_ },
+        { 0x00431970, &DESIGN::Cost_Reduction_For_Govt_Type_ },
+        { 0x004319d0, &DESIGN::Replacement_Exists_ },
+        { 0x0042d080, &DESIGN::Add_Design_Buttons_ },
+        { 0x0051c780, &farload::Far_Reload_Next_Data_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -615,6 +623,7 @@ namespace hooks {
         ASSERT(sizeof(s_tech_field_data) == 0x17, "s_tech_field_data");
         ASSERT(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data");
         ASSERT(sizeof(s_tech_armor_data) == 15, "s_armor_data");
+        ASSERT(sizeof(TECHDATA::s_tech_hull_data) == 36, "s_tech_hull_data");
         ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
         ASSERT(sizeof(s_font) == 0x235c, "s_font");
         ASSERT(sizeof(s_MSG) == 18, "s_MSG");

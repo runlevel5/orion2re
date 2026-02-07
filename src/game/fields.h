@@ -22,7 +22,7 @@ namespace fields {
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
     inline s_colors (&_list_normal_color) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572C08});
     inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
-    inline int16_t& _input_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572C00});
+    inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
     inline uint32_t& _continuous_string = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00572c18});
@@ -70,7 +70,9 @@ namespace fields {
 
     int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t min_val, int16_t max_val, int16_t pos, int16_t step, int16_t width, int16_t height, short* context_ptr, const char* hotkey_ptr, char sound);
 
-    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* help, int16_t max_len, int16_t help_end, int32_t buffer_ptr, int16_t sound, int16_t param_10);
+    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* help, int16_t max_len, int16_t unk1, int32_t unk2, int16_t sound, int16_t unk3);
+
+    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound);
 
     void __cdecl Disable_Draw_All_Fields_();
     void __cdecl Enable_Draw_All_Fields_();
@@ -90,9 +92,5 @@ namespace fields {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FFF0});
         fn();
     }
-    inline void __cdecl Set_Input_Delay_(int32_t delay) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EDD0});
-        fn(delay);
-    }
+    void __cdecl Set_Input_Delay_(uint16_t delay);
 }

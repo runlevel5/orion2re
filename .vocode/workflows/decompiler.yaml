@@ -100,6 +100,7 @@ workflows:
           * Never introduce or call C stdlib helpers (memcpy/memset/strlen/strcmp/printf/etc).
             If the binary calls an imported/external function, call that symbol directly as it exists
             in the comment/symbols. Otherwise, implement the logic inline.
+          * Do not put `goto` constructs into the generated code, implement code in a way where `goto` is not necessary.
           * If disassembly or decompiled output includes symbolic constant name, emit raw value and add a
             comment with symbolic name. Make sure to emit correct raw value.
           * External/global references by absolute address:

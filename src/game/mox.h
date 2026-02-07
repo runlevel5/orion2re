@@ -133,9 +133,9 @@ namespace MOX {
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
     inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
     inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
-    inline int16_t* _weapons_count_plus_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D50});
-    inline int16_t* _weapons_count_minus_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1810});
-    inline int16_t* _design_ship_size_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAC0});
+    inline int16_t (&_weapons_count_plus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597D50});
+    inline int16_t (&_weapons_count_minus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005A1810});
+    inline int16_t (&_design_ship_size_field)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x0059BAC0});
 
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
@@ -169,7 +169,9 @@ namespace MOX {
     inline s_animation_header*& _system_repl_box_mid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B3C});
     inline s_animation_header*& _system_repl_box_btm_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596FA4});
     inline s_animation_header*& _system_repl_box_cancel_btn = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD30});
-    inline s_animation_header** _design_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597740});
+    inline int16_t (&_weapons_clear_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005974B0});
+    inline int16_t (&_special_system_clear_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597480});
+    inline s_animation_header* (&_design_size_button_seg)[6] = *reinterpret_cast<s_animation_header*(*)[6]>(std::uintptr_t{0x00597740});
     inline s_animation_header** _darkened_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B410});
     inline s_animation_header** _weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
     inline s_animation_header** _weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
@@ -203,8 +205,8 @@ namespace MOX {
     inline uint32_t& _cmd_line_seed =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA08 });
 
-    inline uint16_t& _ship_icon_lf_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BA14});
-    inline uint16_t& _ship_icon_rt_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597374});
+    inline int16_t& _ship_icon_lf_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA14});
+    inline int16_t& _ship_icon_rt_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597374});
 
     inline uint8_t& _zoom_in = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597704});
     inline s_animation_header*& _main_zoom_in_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B318});

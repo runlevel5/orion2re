@@ -421,6 +421,25 @@ namespace DESIGN {
         }
     }
 
+    /**
+     * @brief Applies cost reduction to the provided cost based on the player's government type (trait 0).
+     * 
+     * @param player_idx Index of the player in the global player array.
+     * @param cost Pointer to the cost value to be modified.
+     */
+    void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t *cost) {
+        s_player *player = &MOX::_player[player_idx];
+        int8_t govt_trait = player->traits[0];
+
+        if (govt_trait == 0) {
+            // Reduction for government trait value 0
+            *cost = (*cost * 2 + 2) / 3;
+        } else if (govt_trait == 1) {
+            // Reduction for government trait value 1
+            *cost = (*cost + 2) / 3;
+        }
+    }
+
     int16_t __cdecl Current_Design_Ship_Structure_() {
         int16_t player_num = MOX::_PLAYER_NUM;
         uint8_t has_reinforced_hull = Current_Design_Has_Special_System_(_design, SPECIAL_REINFORCED_HULL);
@@ -440,6 +459,25 @@ namespace DESIGN {
         }
 
         return total_absorption;
+    }
+
+    int16_t __cdecl Shield_Strength_() {
+        s_current_design* design = MOX::_design;
+        int16_t multiplier;
+
+        if (design->ship_size < 5) {
+            multiplier = design->ship_size + 1;
+        } else {
+            multiplier = design->ship_size + 2;
+        }
+
+        int16_t strength = TECHDATA::_shields[design->shield].points_blocked * multiplier * 5;
+
+        if (Current_Design_Has_Special_System_(design, SPECIAL_MULTI_PHASED_SHIELDS)) {
+            strength = (int16_t)((strength * 3) / 2);
+        }
+
+        return strength;
     }
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {
@@ -792,7 +830,7 @@ namespace DESIGN {
 
     void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
         if (_design_computer_replacement_field == field) {
-            if (INITSHIP::N_Replacements_For_Generic_Item_(8) == 0) {
+            if (N_Replacements_For_Generic_Item_(8) == 0) {
                 const char* msg = HAROLD::H_Message_(HESTR_050_YOU_MAY_NOT_UPGRADE_TH);
                 GENDRAW::Warning_Box_(msg);
             } else {
@@ -814,7 +852,7 @@ namespace DESIGN {
                 return;
             }
 
-            if (INITSHIP::N_Replacements_For_Generic_Item_(2) != 0) {
+            if (N_Replacements_For_Generic_Item_(2) != 0) {
                 MOX::_design_screen_replacement_item = MOX::_design->shield;
                 MOX::_design_screen_replacement_type = 2;
                 _printed_cost -= MOX::_design->shield_cost;
@@ -1441,27 +1479,32 @@ namespace DESIGN {
     }
 
     /**
-     * Retrieves a ship design name from shipname.lbx based on race, hull, and design indices.
+     * @brief Retrieves a ship design name from the shipname.lbx resource.
+     * 
+     * @param race_idx The index of the race.
+     * @param design_idx The index of the ship design (0-5).
+     * @param variant_idx The index of the name variant (0-7).
+     * @param out_name Destination buffer for the design name string.
      */
-    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t hull_idx, int16_t design_idx, char* out_name) {
+    void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name) {
         allocate::Push_Block_(MOX::_global_data_seg);
 
-        // entry_index = design_idx + (race_idx * 6 + hull_idx) * 8
-        int16_t calculated_index = (int16_t)(race_idx * 6);
-        calculated_index += hull_idx;
-        int32_t entry_index = (int32_t)(int16_t)(design_idx + (calculated_index * 8));
+        // The index in shipname.lbx is calculated based on race, design slot, and a variant offset.
+        // Each race has 6 design slots, and each slot appears to have 8 name variants.
+        int32_t entry_idx = (int16_t)(variant_idx + race_idx * 48 + design_idx * 8);
 
         char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
-            PTR_s_SHIPNAME_LBX_0055610C,
+            s_SHIPNAME_LBX_0055610C,
             0,
             MOX::_global_data_seg,
-            entry_index,
+            entry_idx,
             1,
             0x10
         );
 
         allocate::Pop_Block_(MOX::_global_data_seg);
 
+        // Copy the retrieved string to the output buffer.
         if (loaded_name != nullptr && out_name != nullptr) {
             char* src = loaded_name;
             char* dst = out_name;
@@ -1632,6 +1675,153 @@ namespace DESIGN {
         }
     }
 
+    bool __cdecl Space_For_System_Replacement_() {
+        int16_t found_count = 0;
+
+        for (int16_t app_idx = 0; app_idx < 212; ++app_idx) {
+            if (found_count != 0) break;
+
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[app_idx] == 3) {
+                if ((int16_t)DESBOX::Application_Type_(app_idx) == 9) {
+                    bool device_fits = false;
+
+                    for (int16_t special_idx = 1; special_idx < 39; ++special_idx) {
+                        if (device_fits) break;
+
+                        if (TECHDATA::_technology_applications[app_idx].id == TECHDATA::_specials[special_idx].tech_application_id) {
+                            bool already_on_ship = false;
+                            for (int i = 0; i < 8; ++i) {
+                                if (MOX::_design->special_devices[i] == special_idx) {
+                                    already_on_ship = true;
+                                    break;
+                                }
+                            }
+
+                            if (!already_on_ship) {
+                                uint16_t tech_id = TECHDATA::_specials[special_idx].tech_application_id;
+                                uint8_t category = (uint8_t)Miniaturization_Category_(tech_id);
+                                int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
+
+                                int16_t base_space = TECHDATA::_specials[special_idx].space_per_ship_type[MOX::_design->ship_size];
+                                int32_t required_space = Space_Given_M_Level_(base_space, tech_lvl, category);
+
+                                if (MOX::_design->space_used + required_space <= MOX::_design->hull_space) {
+                                    device_fits = true;
+                                    found_count++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return found_count > 0;
+    }
+
+    void __cdecl Add_Design_Buttons_() {
+        for (int16_t i = 0; i < 6; ++i) {
+            _add_size_button_flag[i] = Add_Size_Button_();
+        }
+
+        int16_t x1, y1, x2, y2;
+        for (int16_t i = 0; i < 6; ++i) {
+            Get_Ship_Size_Button_Field_XY_(i, &x2, &y1, &x1, &y2);
+            if (_add_size_button_flag[i] == 1) {
+                MOX::_design_ship_size_field[i] = fields::Add_Multi_Button_Field_(x2, y1, s__00551100, MOX::_design_size_button_seg[i], &MOX::_design_size, i, s__00551100, 0x29 /* ) */);
+            } else {
+                MOX::_design_ship_size_field[i] = fields::Add_Hidden_Field_(x2, y1, x1, y2, s__00551100, 0x29 /* ) */);
+            }
+        }
+
+        bool replacement_exists_3 = Replacement_Exists_(3);
+        int16_t weapon_y = 0xA9;
+        for (int16_t i = 0; i < 8; ++i) {
+            int16_t weapon_idx = i + MOX::_first_weapon_ctr;
+            MOX::_weapons_clear_button[i] = -1000;
+
+            if (((i < 1) || (MOX::_design->weapon_type[weapon_idx] < 1)) && !replacement_exists_3) {
+                MOX::_weapons_count_minus_button[i] = -1000;
+                MOX::_weapons_count_plus_button[i] = -1000;
+                MOX::_weapons_field[i] = -1000;
+            } else {
+                if (MOX::_design->weapon_type[weapon_idx] < 1 || MOX::_design->weapon_count[weapon_idx] < 2) {
+                    MOX::_weapons_count_minus_button[i] = -1000;
+                    if (MOX::_design->weapon_type[weapon_idx] > 0) {
+                        fields::Add_Hidden_Field_(0x37, weapon_y, 0x44, weapon_y + 12, s__00551100, 0);
+                    }
+                } else {
+                    MOX::_weapons_count_minus_button[i] = fields::Add_Button_Field_(0x37, weapon_y, s__00551100, MOX::_minus_button_seg, s__00551100, 0x28 /* ( */);
+                }
+
+                int32_t next_weapon_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_idx], 
+                                                         MOX::_design->weapon_count[weapon_idx] + 1, 
+                                                         MOX::_design->weapon_specials[weapon_idx], 
+                                                         MOX::_design->weapon_firing_arc[weapon_idx], 
+                                                         MOX::_design->ship_size);
+
+                if (MOX::_design->weapon_type[weapon_idx] < 1 || 
+                    ((MOX::_design->hull_space - MOX::_design->space_used) - (int32_t)next_weapon_space + (int32_t)MOX::_design->weapon_space[weapon_idx] < 0)) {
+                    MOX::_weapons_count_plus_button[i] = -1000;
+                    if (MOX::_design->weapon_type[weapon_idx] > 0) {
+                        fields::Add_Hidden_Field_(0x13, weapon_y, 0x20, weapon_y + 12, s__00551100, 0x29 /* ) */);
+                    }
+                } else {
+                    MOX::_weapons_count_plus_button[i] = fields::Add_Button_Field_(0x13, weapon_y, s__00551100, MOX::_plus_button_seg, s__00551100, 0x28 /* ( */);
+                }
+
+                int16_t h_x, h_w;
+                if (MOX::_design->weapon_type[weapon_idx] < 1) {
+                    h_x = 0x10;
+                    h_w = 0x26F;
+                } else {
+                    h_x = 0x4D;
+                    h_w = 0x22C;
+                }
+                MOX::_weapons_field[i] = fields::Add_Hidden_Field_(h_x, weapon_y, h_w, weapon_y + 13, s__00551100, 0x29 /* ) */);
+            }
+            weapon_y += 13;
+        }
+
+        bool replacement_exists_9 = Replacement_Exists_(9);
+        int16_t special_y = 0x13F;
+        for (int16_t i = 0; i < 8; ++i) {
+            MOX::_special_system_clear_button[i] = -1000;
+            if (replacement_exists_9) {
+                MOX::_special_system_field[i] = fields::Add_Hidden_Field_(0x11, special_y, 0x26F, special_y + 13, s__00551100, 0x29 /* ) */);
+            } else {
+                MOX::_special_system_field[i] = -1000;
+            }
+            special_y += 13;
+        }
+
+        MOX::_ship_icon_lf_button = fields::Add_Button_Field_(0x11, 0x52, s__00551100, MOX::_design_icon_lf_arrow_seg, s__00551100, 0x28 /* ( */);
+        MOX::_ship_icon_rt_button = fields::Add_Button_Field_(0x5E, 0x52, s__00551100, MOX::_design_icon_rt_arrow_seg, s__00551100, 0x28 /* ( */);
+
+        s_colors colors;
+        MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &colors);
+        fonts::Set_Font_Style_(4, &colors);
+
+        int16_t line_height = fonts::Get_Font_Height_();
+        int16_t name_y = ((0x1B - line_height) / 2) + 0x11;
+        MOX::_design_name_field = fields::Add_Continuous_String_Input_Field_(0x12, name_y, 0x86, line_height + 2, MOX::_design->name, 15, 0, 0, 0x29 /* ) */, 0);
+
+        _design_shield_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x38, 0x273, 0x5F, s__00551100, 0x29 /* ) */);
+        _design_computer_replacement_field = fields::Add_Hidden_Field_(0x1B5, 0x61, 0x273, 0x7B, s__00551100, 0x29 /* ) */);
+
+        MOX::_design_cancel_button = fields::Add_Button_Field_(0x1CD, 0x1BB, s__00551100, MOX::_cancel_design_button_seg, s__00551120, 0x28 /* ( */);
+        MOX::_design_clear_button = fields::Add_Button_Field_(0x176, 0x1BB, s__00551100, MOX::_clear_design_button_seg, s_L_005560e8, 0x28 /* ( */);
+
+        if (MOX::_design->hull_space < MOX::_design->space_used) {
+            MOX::_design_build_button = -1000;
+        } else {
+            MOX::_design_build_button = fields::Add_Button_Field_(0x223, 0x1BB, s__00551100, MOX::_build_design_button_seg, s_B_005560e4, 0x28 /* ( */);
+        }
+
+        MAINSCR::_debug_field = fields::Add_Hidden_Field_(0, 0x1D6, 10, 0x1DF, s__00551100, 0x29 /* ) */);
+        fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+    }
+
     int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category) {
         int16_t result_id = -1;
 
@@ -1694,6 +1884,45 @@ namespace DESIGN {
         if (arc_flags & 0x10) {
             *reinterpret_cast<uint32_t*>(dest_str) = *reinterpret_cast<const uint32_t*>(s_360_00556164);
         }
+    }
+
+    /**
+     * @brief Checks if a replacement for a specific technology application type exists for the current player.
+     * 
+     * @param application_type The technology application type to check for replacements.
+     * @return true if at least one replacement exists, false otherwise.
+     */
+    bool __cdecl Replacement_Exists_(int16_t application_type) {
+        // Certain application types start with an initial count.
+        int16_t replacement_count = (application_type == 2 || application_type == 5) ? 1 : 0;
+
+        // MOX::_player is a pointer to an array of s_player structures (size 0xEA9).
+        s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+
+        // Iterate through all possible technology applications (212 entries).
+        for (int16_t i = 0; i < 212; ++i) {
+            // Check if the current player has this tech application (status 3 indicates learned/available).
+            if (player->tech_applications[i] == 3) {
+                // If the application's base type matches the requested type, increment count.
+                if ((int16_t)DESBOX::Application_Type_(i) == application_type) {
+                    replacement_count++;
+                }
+            }
+        }
+
+        return replacement_count > 0;
+    }
+
+    int16_t __cdecl N_Replacements_For_Generic_Item_(int16_t item_type) {
+        if (item_type == 2) {
+            return INITSHIP::Best_Ship_Shield_(MOX::_PLAYER_NUM);
+        }
+
+        if (item_type == 8) {
+            return INITSHIP::Best_Computer_(MOX::_PLAYER_NUM);
+        }
+
+        return 0;
     }
 
     void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {

@@ -85,47 +85,6 @@ namespace allocate {
         return block->size - block->current;
     }
 
-    void __cdecl Push_Block_(void* block) {
-        // Verify stack capacity (Limit is 40 entries)
-        if (_mark_stack_pos[0] >= 40) {
-            exitm::Exit_With_Message(s_Mark_Block_Stack_Size_Exceeded_0055b6dc);
-        }
-
-        uint32_t current_index = _mark_stack_pos[0];
-
-        // Store the pointer to the block in the first column
-        _mark_stack[current_index][0] = reinterpret_cast<uint32_t>(block);
-
-        // Store metadata located 12 bytes before the block's data start in the second column
-        uintptr_t metadata_addr = reinterpret_cast<uintptr_t>(block) - 12;
-        _mark_stack[current_index][1] = *reinterpret_cast<uint32_t*>(metadata_addr);
-
-        // Advance stack pointer
-        _mark_stack_pos[0]++;
-    }
-
-    /**
-     * @brief Pops a memory block marker and restores the previously saved value at the block's header.
-     *
-     * The function decrements the stack pointer, retrieves the saved block pointer and value,
-     * and restores the value at an offset of -12 bytes (0xC) from the block address.
-     */
-    void __cdecl Pop_Block_(void* block) {
-        if (static_cast<int32_t>(_mark_stack_pos[0]) < 1) {
-            exitm::Exit_With_Message(s_Mark_Block_Stack_Empty_0055b6fc);
-        }
-
-        // Decrement stack pointer first
-        _mark_stack_pos[0]--;
-        uint32_t current_index = _mark_stack_pos[0];
-
-        uint32_t block_base_addr = _mark_stack[current_index][0];
-        uint32_t saved_value = _mark_stack[current_index][1];
-
-        // Restore the value at the specified offset (-0xC bytes) relative to the stored address
-        *reinterpret_cast<uint32_t*>(block_base_addr - 0x0C) = saved_value;
-    }
-
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line) {
         char buffer[100];
 

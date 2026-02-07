@@ -53,6 +53,12 @@ namespace fields {
         }
     }
 
+    void __cdecl Set_Input_Delay_(uint16_t delay) {
+        _input_delay = delay;
+        mouse::Mouse_Buffer_();
+        mouse::Mouse_Buffer2_();
+    }
+
     int16_t __cdecl Get_Input_() {
         if (_input_delay > 0) {
             _input_delay--;
@@ -184,6 +190,36 @@ namespace fields {
         _fields_count++;
 
         return added_index;
+    }
+
+    int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound) {
+        char error_msg[80];
+
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
+        for (int i = 0; i < 11; ++i) {
+            dest[i] = src[i];
+        }
+        for (int i = 11; i < 20; ++i) {
+            dest[i] = 0;
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+
+        s_field* field = &_fields[_fields_count];
+
+        field->field_type = FIELD_TYPE_MULTI_BUTTON;
+        field->detail.multibtn.value = value;
+        field->detail.multibtn.count = count;
+
+        int16_t current_index = _fields_count;
+        _fields_count++;
+
+        return current_index;
     }
 
     int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {

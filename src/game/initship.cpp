@@ -33,7 +33,7 @@ namespace INITSHIP {
             aidesign::Auto_Design_Ship_(player_idx, player->ship_designs[5].name, 5);
 
             int16_t picture_mod = (int16_t)(player->ship_designs[5].picture_num % 8);
-            Set_Default_Ship_Name((uint16_t)(uint8_t)player->race,
+            DESIGN::Get_Ship_Design_Name_((int16_t)(uint8_t)player->race,
                          (int16_t)player->ship_designs[5].size,
                          picture_mod,
                          player->ship_designs[5].name);
@@ -252,5 +252,22 @@ namespace INITSHIP {
         }
 
         return best_armor_idx;
+    }
+
+    int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech) {
+        int16_t armor_idx = Best_Armor_(armor_tech);
+
+        int16_t base_structure = TECHDATA::_hull_data[hull_index].structure;
+        int16_t absorption_pct = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+
+        // Formula: base_structure + (absorption_pct * base_structure) / 100
+        int32_t bonus = (static_cast<int32_t>(absorption_pct) * static_cast<int32_t>(base_structure)) / 100;
+        int16_t total_structure = base_structure + static_cast<int16_t>(bonus);
+
+        if (is_fort) {
+            total_structure *= 3;
+        }
+
+        return total_structure;
     }
 }
