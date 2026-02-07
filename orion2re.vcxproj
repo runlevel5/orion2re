@@ -50,6 +50,7 @@
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\initship.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
+    <ClCompile Include="src\game\ken.cpp" />
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\line.cpp" />
     <ClCompile Include="src\game\loadsave.cpp" />

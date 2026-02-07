@@ -46,7 +46,7 @@ namespace MOX {
     inline uint8_t& _mox_font_colors_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059BA6E });
     inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
     inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});
-    inline char& _temp_string = *reinterpret_cast<char*>(std::uintptr_t{ 0x00596230 });
+    inline char (&_temp_string)[512] = *reinterpret_cast<char(*)[512]>(std::uintptr_t{0x00596230});
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
     inline uint8_t& _draw_design_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1B44});
     inline uint8_t& _refit_ship = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597A80});

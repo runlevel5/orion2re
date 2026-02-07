@@ -311,7 +311,7 @@ namespace MOX2 {
         LOADER::Load_Pictures_();
         strings::Load_Strings();
         MOX::Mox_Update_();
-        MOX::_temp_string = 0;
+        MOX::_temp_string[0] = 0;
 
         if (MOX2::_quick_start != 0) {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];

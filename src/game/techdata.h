@@ -15,6 +15,15 @@ namespace TECHDATA {
     inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
     inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
 
+    struct s_weapon_mod_data {
+        uint32_t field0_0x0;
+        char* name;
+        uint32_t field6_0x9;
+        uint16_t field10_0xd;
+    };
+
+    inline s_weapon_mod_data* _weapon_modifications = reinterpret_cast<s_weapon_mod_data*>(std::uintptr_t{ 0x00555474 });
+
     inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432940});

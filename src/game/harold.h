@@ -59,6 +59,11 @@ namespace HAROLD {
 
     void __cdecl Init_System_Display_Box_();
 
+    inline int16_t __cdecl Planet_Index_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0042F800})();
+    }
+
     inline void __cdecl Planet_Data_Screen_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004f1420})();

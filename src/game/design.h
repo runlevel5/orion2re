@@ -14,7 +14,7 @@ namespace DESIGN {
     inline int16_t& _selected_weapon_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
     inline int16_t& _player_design_num = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B28});
-    inline uint8_t* _add_size_button_flag = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565064});
+    inline uint8_t (&_add_size_button_flag)[12] = *reinterpret_cast<uint8_t(*)[12]>(std::uintptr_t{0x00565064});
 
     inline const char* s_cstdes_log = reinterpret_cast<const char*>(0x005560ec);
     inline const char* s_plus = reinterpret_cast<const char*>(0x00551118); // "+"
@@ -24,6 +24,9 @@ namespace DESIGN {
     inline const char* s_pct_d_pct = reinterpret_cast<const char*>(0x0055612C); // "%d%%"
     inline const char* s_pct_s_bracket_pct_d = reinterpret_cast<const char*>(0x00556124); // "%s (%d)"
     inline const char* s_special_tag = reinterpret_cast<const char*>(0x0055611C); // "special"
+    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
+    inline const char* s_360_00556164 = reinterpret_cast<const char*>(std::uintptr_t{0x00556164}); // "360"
+    inline const char* s_comma_space = reinterpret_cast<const char*>(std::uintptr_t{ 0x00556168 }); // ", "
     inline const char* s_ITATECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055616C}); // "ITATECD.LBX"
     inline const char* s_SPATECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556178}); // "SPATECD.LBX"
     inline const char* s_FRETECD_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00556184}); // "FRETECD.LBX"
@@ -79,11 +82,7 @@ namespace DESIGN {
 
     void __cdecl Update_Calculated_Design_Data_(int16_t player_idx);
 
-    inline void __cdecl Print_Ship_Size_Error_Message_(int16_t index) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00431850});
-        fn(index);
-    }
+    void __cdecl Print_Ship_Size_Error_Message_(int16_t ship_size_index);
 
     void __cdecl Design_Screen_();
 
@@ -132,10 +131,7 @@ namespace DESIGN {
 
     void __cdecl Set_Flashing_Colors_(int16_t font_style, int16_t spacing);
 
-    inline int16_t __cdecl Current_Design_Has_Special_System_Count_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004317a0 })();
-    }
+    int16_t __cdecl Current_Design_Ship_Structure_();
 
     inline void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost) {
         using Fn = void(__cdecl*)(int16_t, int32_t*);
@@ -152,15 +148,9 @@ namespace DESIGN {
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_();
 
-    inline void __cdecl Weapon_Mod_String_(int16_t specials, char* out, int p3) {
-        using Fn = void(__cdecl*)(int16_t, char*, int);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00432ac0 })(specials, out, p3);
-    }
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3);
 
-    inline void __cdecl Weapon_Arc_String_(int16_t arc, char* out) {
-        using Fn = void(__cdecl*)(int16_t, char*);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00432960 })(arc, out);
-    }
+    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str);
 
     int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx);
 
@@ -171,23 +161,14 @@ namespace DESIGN {
 
     bool __cdecl Space_For_Weapon_Replacement_();
 
-    inline int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_idx, int type) {
-        using Fn = int16_t(__cdecl*)(int16_t, int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00431F30})(app_idx, type);
-    }
+    int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category);
 
-    inline uint32_t __cdecl One_Weapon_Space_(int16_t tech_id) {
-        using Fn = uint32_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00432740})(tech_id);
-    }
+    int16_t __cdecl One_Weapon_Space_(int16_t weapon_id);
 
     inline bool __cdecl Space_For_System_Replacement_() {
         using Fn = bool(__cdecl*)();
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431c50 })();
     }
 
-    inline int16_t __cdecl Printed_Design_Cost_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004317d0 })();
-    }
+    int16_t __cdecl Printed_Design_Cost_();
 }

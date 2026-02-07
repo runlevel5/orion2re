@@ -377,6 +377,7 @@ inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr
 
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
+inline const char* s_ships_lbx_005597b4 = reinterpret_cast<const char*>(std::uintptr_t{0x005597B4}); // "ships.lbx"
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"

@@ -57,4 +57,12 @@ namespace HACCESS {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);
         return reinterpret_cast<Fn>(0x0049A450)(player_idx, design_idx);
     }
+
+    inline void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* buffer, uint8_t param_3) {
+        using Fn = void(__cdecl*)(int16_t, char*, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049a610});
+        fn(planet_idx, buffer, param_3);
+    }
+
+    char* __cdecl Get_Planet_Name_(int16_t planet_idx);
 }

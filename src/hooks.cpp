@@ -576,6 +576,17 @@ namespace hooks {
         { 0x00432720, &DESIGN::Weapon_Needs_Racks_ },
         { 0x00431dd0, &DESIGN::Space_For_Weapon_Replacement_ },
         { 0x0047bdb0, &AIBUILD::Refit_Cost_ },
+        { 0x00432740, &DESIGN::One_Weapon_Space_ },
+        { 0x004317a0, &DESIGN::Current_Design_Ship_Structure_ },
+        { 0x00431f30, &DESIGN::Tech_App_To_Tech_Id_ },
+        { 0x004317d0, &DESIGN::Printed_Design_Cost_ },
+        { 0x00431850, &DESIGN::Print_Ship_Size_Error_Message_ },
+        { 0x0049a320, &HACCESS::Get_Planet_Name_ },
+        { 0x0049e940, &MISC::Get_LBX_Message_ },
+        { 0x00432ac0, &DESIGN::Weapon_Mod_String_ },
+        { 0x00432960, &DESIGN::Weapon_Arc_String_ },
+        { 0x004c1cc0, &KEN::Get_Ship_Picture_Seg_ },
+        { 0x004c1ce0, &KEN::Do_Get_Ship_Picture_Seg },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

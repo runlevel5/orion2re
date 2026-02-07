@@ -78,6 +78,15 @@ namespace MISC {
         }
     }
 
+    void __cdecl Get_LBX_Message_(int16_t message_id, char* buffer) {
+        const char* src = HAROLD::H_Message_(message_id);
+
+        if (src != nullptr) {
+            char* dst = buffer;
+            while ((*dst++ = *src++) != '\0');
+        }
+    }
+
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id) {
         fields::Disable_Draw_All_Fields_();
 

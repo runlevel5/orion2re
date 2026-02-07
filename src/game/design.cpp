@@ -421,6 +421,12 @@ namespace DESIGN {
         }
     }
 
+    int16_t __cdecl Current_Design_Ship_Structure_() {
+        int16_t player_num = MOX::_PLAYER_NUM;
+        uint8_t has_reinforced_hull = Current_Design_Has_Special_System_(_design, SPECIAL_REINFORCED_HULL);
+        return INITSHIP::Get_Structure_(_design->ship_size, has_reinforced_hull != 0, player_num);
+    }
+
     int16_t __cdecl Current_Design_Armor_Absorption_() {
         s_current_design* design = MOX::_design;
 
@@ -786,7 +792,7 @@ namespace DESIGN {
 
     void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag) {
         if (_design_computer_replacement_field == field) {
-            if (INITSHIP::Any_Equipment_Available_(8) == 0) {
+            if (INITSHIP::N_Replacements_For_Generic_Item_(8) == 0) {
                 const char* msg = HAROLD::H_Message_(HESTR_050_YOU_MAY_NOT_UPGRADE_TH);
                 GENDRAW::Warning_Box_(msg);
             } else {
@@ -808,7 +814,7 @@ namespace DESIGN {
                 return;
             }
 
-            if (INITSHIP::Any_Equipment_Available_(2) != 0) {
+            if (INITSHIP::N_Replacements_For_Generic_Item_(2) != 0) {
                 MOX::_design_screen_replacement_item = MOX::_design->shield;
                 MOX::_design_screen_replacement_type = 2;
                 _printed_cost -= MOX::_design->shield_cost;
@@ -1092,6 +1098,20 @@ namespace DESIGN {
         }
     }
 
+    int16_t __cdecl Printed_Design_Cost_() {
+        if (MOX::_refit_ship != 0) {
+            s_ship_design new_design;
+            Build_Design_Template_(&new_design);
+
+            s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+            s_ship_design* old_design = &player->ship_designs[_player_design_num];
+
+            return AIBUILD::Refit_Cost_(MOX::_PLAYER_NUM, old_design, &new_design);
+        }
+
+        return static_cast<int16_t>(_printed_cost);
+    }
+
     void __cdecl Build_Design_Template_(s_ship_design* template_out) {
         s_current_design* d = MOX::_design;
 
@@ -1131,173 +1151,174 @@ namespace DESIGN {
 
     void __cdecl Print_Current_Design_() {
         s_ship_design local_design;
-        int16_t missile_evasion, beam_defense, beam_attack_bonus;
-        char buffer[256];
-        s_colors colors_primary, colors_secondary;
-        char arc_str[32], mod_str[128];
-
-        helpers::memset(&local_design, 0, sizeof(local_design));
+        int16_t bonus_mis_evade, bonus_beam_def, bonus_beam_atk;
+        s_colors style3_colors, style2_colors;
+        char buffer[128];
+        char mod_str[128];
+        char arc_str[128];
 
         Build_Design_Template_(&local_design);
-        INITSHIP::Get_Design_Combat_Bonuses_(&local_design, &missile_evasion, &beam_defense, &beam_attack_bonus);
+        INITSHIP::Get_Design_Combat_Bonuses_(&local_design, &bonus_beam_atk, &bonus_beam_def, &bonus_mis_evade);
 
         graphics::Reset_Window_();
         video::Clip_Off_();
         fonts::Set_Outline_Color_(0, 0);
 
-        MISC::Get_Mox_Font_Colors_(3, 'U', '[', &colors_primary);
-        MISC::Get_Mox_Font_Colors_(2, 'U', '[', &colors_secondary);
+        MISC::Get_Mox_Font_Colors_(3, 'U', '[', &style3_colors);
+        MISC::Get_Mox_Font_Colors_(2, 'U', '[', &style2_colors);
 
         for (int i = 1; i < 8; ++i) {
-            colors_primary.colors[i] += 2;
-            colors_secondary.colors[i] += 2;
+            style3_colors.colors[i] += 2;
+            style2_colors.colors[i] += 2;
         }
 
-        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Set_Font_Spacing_(1);
         fonts::Print_(0xEC, 0x38, TECHDATA::_drives[MOX::_design->ftl_type].name);
 
-        fonts::Set_Font_Style_(2, &colors_secondary);
+        fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(0x17E /* HESTR_17E_D_PARSECS_TURN */), TECHDATA::_drives[MOX::_design->ftl_type].speed);
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].speed);
         fonts::Print_(0xFB, 0x47, buffer);
 
-        _sprintf(buffer, HAROLD::H_Message_(0x54 /* HESTR_054_D_COMBAT_SPEED */), (int)Get_Base_Combat_Speed_(MOX::_design));
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), (int)Get_Base_Combat_Speed_(MOX::_design));
         fonts::Print_(0xFB, 0x56, buffer);
 
-        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Set_Font_Spacing_(1);
         fonts::Print_(0xEC, 0x6B, TECHDATA::_armor[MOX::_design->armor_type].name);
 
-        fonts::Set_Font_Style_(2, &colors_secondary);
-        _sprintf(buffer, HAROLD::H_Message_(0x55 /* HESTR_055_D_STRUCTURE_POINTS */), (int)Current_Design_Has_Special_System_Count_());
+        fonts::Set_Font_Style_(2, &style2_colors);
+        fonts::Set_Font_Spacing_(1);
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_055_D_STRUCTURE_POINTS), (int)Current_Design_Ship_Structure_());
         fonts::Print_(0xFB, 0x7A, buffer);
 
-        _sprintf(buffer, HAROLD::H_Message_(0x56 /* HESTR_056_D_ARMOR_POINTS */), (int)Current_Design_Armor_Absorption_());
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_056_D_ARMOR_POINTS), (int)Current_Design_Armor_Absorption_());
         fonts::Print_(0xFB, 0x89, buffer);
 
-        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Set_Font_Spacing_(1);
         if (_design_shield_replacement_field == MOX::_scanned_field) {
             Set_Flashing_Colors_(3, 1);
         }
 
         if (MOX::_design->shield == 0) {
-            fonts::Print_(0x1B5, 0x38, HAROLD::H_Message_(0x36 /* HESTR_036_NO_SHIELD */));
-            fonts::Set_Font_Style_(2, &colors_secondary);
-            fonts::Print_(0x1C5, 0x47, HAROLD::H_Message_(0x57 /* HESTR_057_NO_STRENGTH */));
-            _sprintf(buffer, "%s", HAROLD::H_Message_(0x58 /* HESTR_058_NO_DAMAGE_POINTS_BLOCK */));
+            fonts::Print_(0x1B5, 0x38, HAROLD::H_Message_(HESTR_036_NO_SHIELD));
+            fonts::Set_Font_Style_(2, &style2_colors);
+            fonts::Set_Font_Spacing_(1);
+            fonts::Print_(0x1C5, 0x47, HAROLD::H_Message_(HESTR_057_NO_STRENGTH));
+            fonts::Print_(0x1C5, 0x55, HAROLD::H_Message_(HESTR_058_NO_DAMAGE_POINTS_BLOCK));
         } else {
             fonts::Print_(0x1B5, 0x38, TECHDATA::_shields[MOX::_design->shield].name);
             fonts::Get_String_Width_(TECHDATA::_shields[MOX::_design->shield].name);
-            fonts::Set_Font_Style_(2, &colors_secondary);
-            _sprintf(buffer, HAROLD::H_Message_(0x59 /* HESTR_059_D_STRENGTH */), (int)Shield_Strength_());
+            fonts::Set_Font_Style_(2, &style2_colors);
+            fonts::Set_Font_Spacing_(1);
+            _sprintf(buffer, HAROLD::H_Message_(HESTR_059_D_STRENGTH), (int)Shield_Strength_());
             fonts::Print_(0x1C5, 0x47, buffer);
 
-            int block = Current_Shield_Damage_Points_Blocked_();
-            const char* suffix = (block == 1) ? "" : "s";
-            _sprintf(buffer, HAROLD::H_Message_(0x5A /* HESTR_05A_D_DAMAGE_POINTS_BLOCKE */), block, suffix);
+            int points = Current_Shield_Damage_Points_Blocked_();
+            _sprintf(buffer, HAROLD::H_Message_(HESTR_05A_D_DAMAGE_POINTS_BLOCKE), points, points == 1 ? "" : "s");
+            fonts::Print_(0x1C5, 0x55, buffer);
         }
-        fonts::Print_(0x1C5, 0x55, buffer);
 
-        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Set_Font_Spacing_(1);
         if (_design_computer_replacement_field == MOX::_scanned_field) {
             Set_Flashing_Colors_(3, 1);
         }
         fonts::Print_(0x1B5, 0x61, TECHDATA::_computers[MOX::_design->computer_type].name);
 
-        fonts::Set_Font_Style_(2, &colors_secondary);
-        _sprintf(buffer, HAROLD::H_Message_(0x5B /* HESTR_05B_D_BEAM_ATTACK */), (int)TECHDATA::_computers[MOX::_design->computer_type].field5_0x14);
+        fonts::Set_Font_Style_(2, &style2_colors);
+        fonts::Set_Font_Spacing_(1);
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_05B_D_BEAM_ATTACK), (int)TECHDATA::_computers[MOX::_design->computer_type].field5_0x14);
         fonts::Print_(0x1C5, 0x70, buffer);
 
-        fonts::Set_Font_Style_(3, &colors_primary);
-        fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(0x5C /* HESTR_05C_BEAM_DEFENSE */));
-        _sprintf(buffer, s_pct_s_pct_d, (beam_defense >= 0 ? s_plus : s_minus), (int)beam_defense);
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Set_Font_Spacing_(1);
+        fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(HESTR_05C_BEAM_DEFENSE));
+        _sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int)bonus_beam_def);
         fonts::Print_Right_(0x26A, 0x7D, buffer);
 
-        fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(0x5D /* HESTR_05D_MISSILE_EVASION */));
-        _sprintf(buffer, s_pct_d_pct, (int)missile_evasion);
+        fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(HESTR_05D_MISSILE_EVASION));
+        _sprintf(buffer, "%d%%", (int)bonus_mis_evade);
         fonts::Print_Right_(0x26A, 0x89, buffer);
 
         fonts::Set_Font_Spacing_(2);
         graphics::Set_Window_(0x10, 0x9B, 0x272, 0x11C);
         video::Clip_On_();
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Print_(0x53, 0x9C, HAROLD::H_Message_(HESTR_05E_WEAPON_TYPE));
+        fonts::Print_(0xF9, 0x9C, HAROLD::H_Message_(HESTR_05F_DAMAGE));
+        fonts::Print_(0x13C, 0x9C, HAROLD::H_Message_(HESTR_060_ARC));
+        fonts::Print_(0x19E, 0x9C, HAROLD::H_Message_(HESTR_030_SPACE));
+        fonts::Print_(0x167, 0x9C, HAROLD::H_Message_(HESTR_185_COST));
+        fonts::Print_(0x1DF, 0x9C, HAROLD::H_Message_(HESTR_061_MODIFICATIONS));
 
-        fonts::Set_Font_Style_(3, &colors_primary);
-        fonts::Print_(0x53, 0x9C, HAROLD::H_Message_(0x5E /* HESTR_05E_WEAPON_TYPE */));
-        fonts::Print_(0xF9, 0x9C, HAROLD::H_Message_(0x5F /* HESTR_05F_DAMAGE */));
-        fonts::Print_(0x13C, 0x9C, HAROLD::H_Message_(0x60 /* HESTR_060_ARC */));
-        fonts::Print_(0x19E, 0x9C, HAROLD::H_Message_(0x30 /* HESTR_030_SPACE */));
-        fonts::Print_(0x167, 0x9C, HAROLD::H_Message_(0x185 /* HESTR_185_COST */));
-        fonts::Print_(0x1DF, 0x9C, HAROLD::H_Message_(0x61 /* HESTR_061_MODIFICATIONS */));
-
-        bool show_weapon_replacement = false;
-        int y_cursor = 0xAA;
+        bool show_replacement_msg = false;
+        int y_pos = 0xAA;
         for (int i = 0; i < 8; ++i) {
-            int weapon_slot = i + MOX::_first_weapon_ctr;
-
-            if ((i - (int)MOX::_scanned_field) == -1000) {
-                if (MOX::_design->weapon_type[weapon_slot] <= 0) {
-                    show_weapon_replacement = true;
-                    fonts::Set_Font_Style_(2, &colors_secondary);
+            int slot = i + MOX::_first_weapon_ctr;
+            if (i - (int)MOX::_scanned_field == -1000) {
+                if (MOX::_design->weapon_type[slot] < 1) {
+                    show_replacement_msg = true;
                 } else {
                     Set_Flashing_Colors_(2, 2);
                 }
             } else {
-                fonts::Set_Font_Style_(2, &colors_secondary);
+                fonts::Set_Font_Style_(2, &style2_colors);
             }
 
-            if (MOX::_design->weapon_type[weapon_slot] > 0) {
+            if (MOX::_design->weapon_type[slot] > 0) {
                 Weapon_Mod_String_(MOX::_design->weapon_specials[i], mod_str, 1);
-                Weapon_Arc_String_((int16_t)MOX::_design->weapon_firing_arc[i], arc_str);
+                Weapon_Arc_String_(MOX::_design->weapon_firing_arc[i], arc_str);
+                
+                const char* base_name = (MOX::_design->weapon_count[slot] < 2) ? 
+                                         TECHDATA::_weapons[MOX::_design->weapon_type[slot]].name :
+                                         TECHDATA::_weapons[MOX::_design->weapon_type[slot]].name_plural;
 
-                const char* w_name = (MOX::_design->weapon_count[weapon_slot] > 1)
-                                     ? TECHDATA::_weapons[MOX::_design->weapon_type[weapon_slot]].name_plural
-                                     : TECHDATA::_weapons[MOX::_design->weapon_type[weapon_slot]].name;
-
-                if (Weapon_Needs_Racks_(MOX::_design->weapon_type[weapon_slot])) {
-                    _sprintf(buffer, s_pct_s_bracket_pct_d, w_name, (int)MOX::_design->weapon_ammo[i]);
-                    fonts::Print_(0x55, y_cursor, buffer);
+                if (Weapon_Needs_Racks_(MOX::_design->weapon_type[slot])) {
+                    _sprintf(buffer, "%s (%d)", base_name, (int)MOX::_design->weapon_ammo[i]);
+                    fonts::Print_(0x55, y_pos, buffer);
                 } else {
-                    fonts::Print_(0x55, y_cursor, w_name);
+                    fonts::Print_(0x55, y_pos, base_name);
                 }
 
-                fonts::Print_Integer_Right_(0x31, y_cursor, MOX::_design->weapon_count[weapon_slot]);
-                Design_Weapon_Damage_String_(weapon_slot, buffer, -1, -1);
-
+                fonts::Print_Integer_Right_(0x31, y_pos, MOX::_design->weapon_count[slot]);
+                Design_Weapon_Damage_String_(slot, buffer, -1, -1);
+                
                 if (helpers::strcmp(buffer, s_special_tag) == 0) {
                     MISC::Change_Font_Style_(1);
-                    fonts::Print_Centered_(0x10B, y_cursor, buffer);
+                    fonts::Print_Centered_(0x10B, y_pos, buffer);
                     MISC::Change_Font_Style_(2);
                 } else {
-                    fonts::Print_Centered_(0x10B, y_cursor, buffer);
+                    fonts::Print_Centered_(0x10B, y_pos, buffer);
                 }
 
-                fonts::Print_Centered_(0x149, y_cursor, arc_str);
-                _sprintf(buffer, s_pct_d, (MOX::_design->weapon_count[weapon_slot] > 0) ? (MOX::_design->weapon_space[i] / MOX::_design->weapon_count[weapon_slot]) : 0);
-                fonts::Print_Centered_(0x1B4, y_cursor, buffer);
-                _sprintf(buffer, s_pct_d, (MOX::_design->weapon_count[weapon_slot] > 0) ? (MOX::_design->weapon_cost[i] / MOX::_design->weapon_count[weapon_slot]) : 0);
-                fonts::Print_Centered_(0x179, y_cursor, buffer);
-                fonts::Print_Centered_(0x211, y_cursor, mod_str);
-
-                y_cursor += 0x0D;
+                fonts::Print_Centered_(0x149, y_pos, arc_str);
+                _sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_space[slot] / MOX::_design->weapon_count[slot]) : 0);
+                fonts::Print_Centered_(0x1B4, y_pos, buffer);
+                _sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_cost[slot] / MOX::_design->weapon_count[slot]) : 0);
+                fonts::Print_Centered_(0x179, y_pos, buffer);
+                fonts::Print_Centered_(0x211, y_pos, mod_str);
+                y_pos += 13;
             }
         }
 
-        if (show_weapon_replacement) {
-            int slots_left = 8 - MOX::_n_weapons_loaded;
-            if (slots_left > 0) {
-                if (slots_left > 1) {
-                    y_cursor += ((MOX::_n_weapons_loaded * -13 + 127) / 2) - 14;
-                }
+        if (show_replacement_msg) {
+            int remaining = 8 - MOX::_n_weapons_loaded;
+            if (remaining > 0) {
+                int centered_y = y_pos;
+                if (remaining > 1) centered_y += (remaining * -13 + 0x7F) / 2 - 14;
+
                 if (Space_For_Weapon_Replacement_()) {
-                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    fonts::Set_Font_Style_(2, &style2_colors);
                     Set_Flashing_Colors_(2, 2);
-                    fonts::Print_Centered_(0x136, y_cursor, HAROLD::H_Message_(0x17F));
+                    fonts::Print_Centered_(0x136, centered_y, HAROLD::H_Message_(HESTR_17F_ADD_NEW_WEAPON));
                 } else {
-                    s_colors* custom_colors = MISC::Font_Colors2_(2, 'I', 'M');
-                    fonts::Set_Font_Style_(2, custom_colors);
+                    s_colors* colors = MISC::Font_Colors2_(2, 'I', 'M');
+                    fonts::Set_Font_Style_(2, colors);
                     Set_Flashing_Colors_(2, 2);
-                    int msg = (_printed_space_avail < 1) ? 0x1A /* HESTR_01A_NOT_ENOUGH_SPACE_TO_AD */ : 0x18 /* HESTR_018_NO_NEW_WEAPONS_CAN_BE_ */;
-                    fonts::Print_Centered_(0x136, y_cursor, HAROLD::H_Message_(msg));
+                    fonts::Print_Centered_(0x136, centered_y, HAROLD::H_Message_(_printed_space_avail < 1 ? HESTR_01A_NOT_ENOUGH_SPACE_TO_AD : HESTR_018_NO_NEW_WEAPONS_CAN_BE_));
                 }
             }
         }
@@ -1305,78 +1326,77 @@ namespace DESIGN {
         video::Clip_Off_();
         graphics::Set_Window_(0x11, 0x131, 0x272, 0x1B0);
         video::Clip_On_();
+        fonts::Set_Font_Style_(3, &style3_colors);
+        fonts::Print_(0x1E, 0x132, HAROLD::H_Message_(HESTR_062_SPECIAL_SYSTEM));
+        fonts::Print_(0x118, 0x132, HAROLD::H_Message_(HESTR_038_DESCRIPTION));
 
-        fonts::Set_Font_Style_(3, &colors_primary);
-        fonts::Print_(0x1E, 0x132, HAROLD::H_Message_(0x62 /* HESTR_062_SPECIAL_SYSTEM */));
-        fonts::Print_(0x118, 0x132, HAROLD::H_Message_(0x38 /* HESTR_038_DESCRIPTION */));
-
-        bool show_system_replacement = false;
-        int y_special = 0x140;
+        fonts::Set_Font_Style_(2, &style2_colors);
+        y_pos = 0x140;
+        show_replacement_msg = false;
         for (int i = 0; i < 8; ++i) {
-            int special_slot = i + MOX::_first_special_system_ctr;
-            if ((i - (int)MOX::_scanned_field) == -2000) {
-                if (MOX::_design->special_devices[special_slot] <= 0) {
-                    show_system_replacement = true;
-                    fonts::Set_Font_Style_(2, &colors_secondary);
+            int slot = i + MOX::_first_special_system_ctr;
+            if (i - (int)MOX::_scanned_field == -2000) {
+                if (MOX::_design->special_devices[slot] < 1) {
+                    show_replacement_msg = true;
                 } else {
-                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    fonts::Set_Font_Style_(2, &style2_colors);
                     Set_Flashing_Colors_(2, 2);
                 }
             } else {
-                fonts::Set_Font_Style_(2, &colors_secondary);
+                fonts::Set_Font_Style_(2, &style2_colors);
             }
 
-            if (MOX::_design->special_devices[special_slot] > 0) {
-                int dev_idx = MOX::_design->special_devices[special_slot];
-                const char* dev_name = *reinterpret_cast<const char**>(reinterpret_cast<uint8_t*>(TECHDATA::_specials) + dev_idx * 0x30);
-                fonts::Print_(0x23, y_special, dev_name);
-                fonts::Print_(0x10E, y_special, MOX::_special_desc_string[dev_idx]);
-                y_special += 0x0D;
+            if (MOX::_design->special_devices[slot] > 0) {
+                int dev_idx = MOX::_design->special_devices[slot];
+                const char* dev_name = TECHDATA::_specials[dev_idx].name;
+                fonts::Print_(0x23, y_pos, dev_name);
+                fonts::Print_(0x10E, y_pos, MOX::_special_desc_string[dev_idx]);
+                y_pos += 13;
             }
         }
 
-        if (show_system_replacement) {
-            int slots_left = 8 - MOX::_n_special_systems;
-            if (slots_left > 0) {
-                if (slots_left > 1) {
-                    y_special += ((MOX::_n_special_systems * -13 + 125) / 2) - 14;
-                }
+        if (show_replacement_msg) {
+            int remaining = 8 - MOX::_n_special_systems;
+            if (remaining > 0) {
+                int centered_y = y_pos;
+                if (remaining > 1) centered_y += (remaining * -13 + 0x7D) / 2 - 14;
+
                 if (Space_For_System_Replacement_()) {
-                    fonts::Set_Font_Style_(2, &colors_secondary);
+                    fonts::Set_Font_Style_(2, &style2_colors);
                     Set_Flashing_Colors_(2, 2);
-                    fonts::Print_Centered_(0x136, y_special, HAROLD::H_Message_(0x180));
+                    fonts::Print_Centered_(0x136, centered_y, HAROLD::H_Message_(HESTR_180_ADD_NEW_SPECIAL_SYSTEM));
                 } else {
-                    s_colors* custom_colors = MISC::Font_Colors2_(2, 'I', 'N');
-                    fonts::Set_Font_Style_(2, custom_colors);
+                    s_colors* colors = MISC::Font_Colors2_(2, 'I', 'N');
+                    fonts::Set_Font_Style_(2, colors);
                     Set_Flashing_Colors_(2, 2);
-                    int msg = (_printed_space_avail < 1) ? 0x1B : 0x19;
-                    fonts::Print_Centered_(0x136, y_special, HAROLD::H_Message_(msg));
+                    fonts::Print_Centered_(0x136, centered_y, HAROLD::H_Message_(_printed_space_avail < 1 ? HESTR_01B_NOT_ENOUGH_SPACE_TO_AD : HESTR_019_NO_NEW_SPECIAL_SYSTEMS));
                 }
             }
         }
 
         video::Clip_Off_();
         graphics::Reset_Window_();
+
         void* ship_pic = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, MOX::_design->picture_type);
         int pic_w = animate::Get_Width_((s_animation_header*)ship_pic);
         int pic_h = animate::Get_Height_((s_animation_header*)ship_pic);
         animate::Draw_(((0x36 - pic_w) / 2) + 0x27, ((0x3A - pic_h) / 2) + 0x3A, (s_animation_header*)ship_pic);
 
-        fonts::Set_Font_Style_(3, &colors_primary);
+        fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Get_Font_Height_();
-        fonts::Print_(0x19, 0x81, HAROLD::H_Message_(0x30 /* HESTR_030_SPACE */));
+        fonts::Print_(0x19, 0x81, HAROLD::H_Message_(HESTR_030_SPACE));
         fonts::Print_Integer_Right_(0x6A, 0x81, MOX::_design->hull_space);
 
-        s_colors footer_colors;
-        MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &footer_colors);
-        fonts::Set_Font_Style_(4, &footer_colors);
+        s_colors style4_colors;
+        MISC::Get_Mox_Font_Colors_(4, 'U', 'Y', &style4_colors);
+        fonts::Set_Font_Style_(4, &style4_colors);
         int f_h = fonts::Get_Font_Height_();
-        int footer_y = ((0x18 - f_h) / 2) + 0x1BC;
+        int bottom_y = (0x18 - f_h) / 2 + 0x1BC;
 
-        fonts::Print_(0x18, footer_y, HAROLD::H_Message_(0x185 /* HESTR_185_COST */));
-        fonts::Print_Integer_Right_(0x87, footer_y, (int)Printed_Design_Cost_());
-        fonts::Print_(0xA3, footer_y, HAROLD::H_Message_(0x63 /* HESTR_063_SPACE_AVAILABLE */));
-        fonts::Print_Integer_Right_(0x160, footer_y, _printed_space_avail);
+        fonts::Print_(0x18, bottom_y, HAROLD::H_Message_(HESTR_185_COST));
+        fonts::Print_Integer_Right_(0x87, bottom_y, (int)Printed_Design_Cost_());
+        fonts::Print_(0xA3, bottom_y, HAROLD::H_Message_(HESTR_063_SPACE_AVAILABLE));
+        fonts::Print_Integer_Right_(0x160, bottom_y, _printed_space_avail);
     }
 
     void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2) {
@@ -1500,6 +1520,25 @@ namespace DESIGN {
         return space_found;
     }
 
+    int16_t __cdecl One_Weapon_Space_(int16_t weapon_id) {
+        int16_t needs_racks = Weapon_Needs_Racks_(weapon_id);
+
+        int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_application_id;
+        uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));
+        int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
+
+        int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].base_size;
+        int16_t space_req = static_cast<int16_t>(Space_Given_M_Level_(base_weapon_size, tech_lvl, category));
+
+        if (needs_racks != 0) {
+            int16_t rack_base_size = Weapon_Rack_Size_(2);
+            int16_t rack_space = static_cast<int16_t>(Space_Given_M_Level_(rack_base_size, tech_lvl, category));
+            return space_req + rack_space;
+        }
+
+        return space_req;
+    }
+
     void __cdecl Draw_Down_Buttons_() {
         int16_t y = 169;
         int8_t first_weapon_idx = (int8_t)MOX::_first_weapon_ctr;
@@ -1538,6 +1577,159 @@ namespace DESIGN {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * @brief Prints an error message box when the ship size cannot be changed.
+     * 
+     * @param ship_size_index The index related to the ship size button.
+     */
+    void __cdecl Print_Ship_Size_Error_Message_(int16_t ship_size_index) {
+        bool is_formatted = false;
+        int16_t message_id = -1;
+        char planet_name_buf[80];
+        char formatted_msg[100];
+        char lbx_msg[200];
+
+        planet_name_buf[0] = '\0';
+
+        switch (DESIGN::_add_size_button_flag[ship_size_index]) {
+            case 0xF1:
+                message_id = ship_size_index - 3;
+                break;
+            case 0xF2:
+                message_id = ship_size_index + 1;
+                break;
+            case 0xF3:
+                message_id = ship_size_index + 7;
+                break;
+            case 0xF4:
+                message_id = HESTR_00D_YOU_MAY_NOT_CHANGE_HUL;
+                break;
+            case 0xF5:
+                message_id = HESTR_00E_SINCE_S_CANNOT_BUILD_S;
+                if (MOX::_return_screen == 0x19) {
+                    int16_t colony_idx = HAROLD::Planet_Index_();
+                    char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
+                    is_formatted = true;
+                    _sprintf(planet_name_buf, "%s", planet_name);
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (message_id >= 0) {
+            MISC::Get_LBX_Message_(message_id, lbx_msg);
+            if (is_formatted) {
+                const char* hull_name = TECHDATA::_hull_data[MOX::_design->ship_size].name;
+                _sprintf(formatted_msg, lbx_msg, planet_name_buf, hull_name);
+                GENDRAW::Message_Box_(formatted_msg);
+            } else {
+                GENDRAW::Message_Box_(lbx_msg);
+            }
+        }
+    }
+
+    int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category) {
+        int16_t result_id = -1;
+
+        if (category == 3) { // Weapon Category
+            for (int16_t i = 0; i < 40; ++i) {
+                if (TECHDATA::_weapons[i].tech_application_id == app_id) {
+                    result_id = i;
+                    break;
+                }
+            }
+        } else if (category == 9) { // Special Equipment Category
+            for (int16_t i = 0; i < 39; ++i) {
+                if (TECHDATA::_specials[i].tech_application_id == app_id) {
+                    result_id = i;
+                    break;
+                }
+            }
+        }
+
+        return result_id;
+    }
+
+    void __cdecl Weapon_Arc_String_(uint16_t arc_flags, char* dest_str) {
+        char buffer[8];
+        dest_str[0] = s__00551100[0];
+
+        auto copy_buffer_to_dest = [&]() {
+            char* d = dest_str;
+            while (*d != '\0') {
+                d++;
+            }
+            char* s = buffer;
+            while ((*d++ = *s++) != '\0');
+        };
+
+        if (arc_flags & 0x01) {
+            KEN::Ken_Get_Text_Message_(3, buffer, 6);
+            copy_buffer_to_dest();
+            return;
+        }
+
+        if (arc_flags & 0x02) {
+            KEN::Ken_Get_Text_Message_(4, buffer, 6);
+            copy_buffer_to_dest();
+            return;
+        }
+
+        if (arc_flags & 0x04) {
+            KEN::Ken_Get_Text_Message_(6, buffer, 6);
+            copy_buffer_to_dest();
+            return;
+        }
+
+        if (arc_flags & 0x08) {
+            KEN::Ken_Get_Text_Message_(5, buffer, 6);
+            copy_buffer_to_dest();
+            return;
+        }
+
+        if (arc_flags & 0x10) {
+            *reinterpret_cast<uint32_t*>(dest_str) = *reinterpret_cast<const uint32_t*>(s_360_00556164);
+        }
+    }
+
+    void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {
+        bool any_mod = false;
+        out_buffer[0] = '\0';
+
+        for (int16_t i = 0; i < 15; ++i) {
+            if ((mod_mask >> (i & 0x1f)) & 1) {
+                const char* mod_name = TECHDATA::_weapon_modifications[i].name;
+
+                char* p = out_buffer;
+                while (*p) p++;
+                while ((*p++ = *mod_name++));
+
+                const char* sep = s_comma_space;
+                p = out_buffer;
+                while (*p) p++;
+                while ((*p++ = *sep++));
+
+                any_mod = true;
+            }
+        }
+
+        if (!any_mod) {
+            const char* no_mods = HAROLD::H_Message_(HESTR_064_NO_MODIFICATIONS);
+            char* p = out_buffer;
+            while ((*p++ = *no_mods++));
+        }
+
+        uint32_t len = 0;
+        while (out_buffer[len] != '\0') {
+            len++;
+        }
+
+        if (len > 2 && out_buffer[len - 2] == ',') {
+            out_buffer[len - 2] = '\0';
         }
     }
 }
