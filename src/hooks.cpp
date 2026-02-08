@@ -624,6 +624,8 @@ namespace hooks {
         { 0x0042e2b0, &DESIGN::Cost_Given_M_Level_ },
         { 0x00431b50, &DESIGN::Shield_Space_ },
         { 0x00430290, &DESIGN::Miniaturization_Level_ },
+        { 0x004c76e0, &MAINSCR::Is_Main_Screen_Palette_ },
+        { 0x004c7680, &MAINSCR::Highlight_Star_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

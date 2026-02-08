@@ -58,7 +58,9 @@ namespace MOX {
     inline int16_t& _design_clear_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B4C});
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
-    inline uint8_t& _selected_star_color_offset = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059C454});
+    inline int8_t& _selected_star_color_mod =
+        *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596C50});
+    inline int8_t& _selected_star_color_offset = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059C454});
     inline uint8_t (&_antarans)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
     inline int16_t* _antarans_ship_counts = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA38 });
     inline int16_t* _antarans_ship_counts_end = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA4A });

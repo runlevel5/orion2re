@@ -39,10 +39,7 @@ namespace MAINSCR {
     inline uint16_t& _zoom_box_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596192});
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
 
-    inline bool __cdecl Is_Main_Screen_Palette_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004C76E0})();
-    }
+    bool __cdecl Is_Main_Screen_Palette_();
 
     inline void __cdecl Draw_Main_Screen_() {
         using Fn = void(__cdecl*)();
@@ -296,4 +293,12 @@ namespace MAINSCR {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(0x004CD0D0)();
     }
+
+    inline void __cdecl Print_Highlighted_Star_Name_(short star_idx) {
+        using Fn = void(__cdecl*)(short);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ca360});
+        fn(star_idx);
+    }
+
+    void __cdecl Highlight_Star_(short star_idx);
 }
