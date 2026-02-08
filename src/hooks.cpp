@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
     static constexpr hook all_hooks[] = {
@@ -608,8 +608,22 @@ namespace hooks {
         { 0x004c8b80, &MAINSCR::Add_Cheats_ },
         { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
         { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
-        //{ 0x004c7720, &MAINSCR::Main_Screen_ },
+        { 0x004c7720, &MAINSCR::Main_Screen_ },
         { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
+        { 0x00431fb0, &DESIGN::Tech_Level_ },
+        { 0x00431b10, &DESIGN::Shield_Cost_ },
+        { 0x0042e270, &DESIGN::Computer_Cost_ },
+        { 0x00432620, &DESIGN::Weapon_Cost_ },
+        { 0x00432bc0, &DESIGN::Miniaturization_Category_ },
+        { 0x00431e60, &DESIGN::Space_Given_M_Level_ },
+        { 0x00431b90, &DESIGN::Shield_Space_Per_Tech_ },
+        { 0x00432c90, &DESIGN::Weapon_Rack_Size_ },
+        { 0x00430730, &DESIGN::Bonus_For_Special_Mods_ },
+        { 0x004307b0, &DESIGN::Get_Weapon_Mod_Space_Bonus_ },
+        { 0x004304c0, &DESIGN::Bonus_For_Regular_Mods_ },
+        { 0x0042e2b0, &DESIGN::Cost_Given_M_Level_ },
+        { 0x00431b50, &DESIGN::Shield_Space_ },
+        { 0x00430290, &DESIGN::Miniaturization_Level_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
@@ -639,6 +653,7 @@ namespace hooks {
         ASSERT(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data");
         ASSERT(sizeof(s_tech_armor_data) == 15, "s_armor_data");
         ASSERT(sizeof(TECHDATA::s_tech_hull_data) == 36, "s_tech_hull_data");
+        ASSERT(sizeof(TECHDATA::s_tech_computer_data) == 22, "s_tech_computer_data");
         ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
         ASSERT(sizeof(s_font) == 0x235c, "s_font");
         ASSERT(sizeof(s_MSG) == 18, "s_MSG");

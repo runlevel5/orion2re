@@ -15,6 +15,15 @@ namespace TECHDATA {
         uint8_t field8_0xe;
     };
 
+    struct s_tech_computer_data {
+        char* name;
+        uint8_t field1_0x4;
+        uint8_t field2_0x5;
+        int16_t tech_app;
+        int16_t cost_by_ship_type[6];
+        int16_t field5_0x14;
+    };
+
     struct s_tech_hull_data {
         int16_t hull_space;
         int16_t hull_size;
@@ -54,14 +63,23 @@ namespace TECHDATA {
     inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
     inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
 
-    struct s_weapon_mod_data {
-        uint32_t field0_0x0;
+#pragma pack(push, 1)
+    struct s_tech_weapon_mod_data {
+        uint8_t field_0;
+        uint8_t field_1;
+        uint8_t field_2;
+        uint8_t field_3;
         char* name;
-        uint32_t field6_0x9;
-        uint16_t field10_0xd;
+        uint8_t field_8;
+        uint8_t field_9;
+        int16_t bonus1;
+        int16_t bonus2;
+        uint8_t field_e;
     };
+#pragma pack(pop)
 
-    inline s_weapon_mod_data* _weapon_modifications = reinterpret_cast<s_weapon_mod_data*>(std::uintptr_t{ 0x00555474 });
+    inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
+        *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 
     inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);

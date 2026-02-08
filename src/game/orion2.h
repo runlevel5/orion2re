@@ -2947,18 +2947,32 @@ struct s_star_data {
     byte artifacts_gave_app;
 };
 
+typedef struct s_sys_disp s_sys_disp, *Ps_sys_disp;
+
+struct s_sys_disp {
+    short orbit;
+    undefined field1_0x2;
+    undefined field2_0x3;
+    undefined field3_0x4;
+    undefined field4_0x5;
+    undefined field5_0x6;
+    undefined field6_0x7;
+    undefined field7_0x8;
+    undefined field8_0x9;
+    undefined field9_0xa;
+    undefined field10_0xb;
+    undefined field11_0xc;
+    undefined field12_0xd;
+};
+
 typedef struct s_system_display_ships s_system_display_ships, *Ps_system_display_ships;
 
 struct s_system_display_ships {
     short field0_0x0;
     short field1_0x2;
     short button;
-    undefined field3_0x6;
-    undefined field4_0x7;
-    undefined field5_0x8;
-    undefined field6_0x9;
-    undefined field7_0xa;
-    undefined field8_0xb;
+    short ship_idx;
+    int field4_0x8;
 };
 
 typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;
@@ -3155,16 +3169,15 @@ struct s_tech_weapon_data {
     sbyte rack;
     undefined field6_0xd;
     short base_size;
-    undefined field8_0x10;
-    undefined field9_0x11;
-    undefined field10_0x12;
-    undefined field11_0x13;
-    short field12_0x14;
-    short field13_0x16;
-    undefined field14_0x18;
-    undefined field15_0x19;
-    undefined field16_0x1a;
-    undefined field17_0x1b;
+    short cost;
+    undefined field9_0x12;
+    undefined field10_0x13;
+    short field11_0x14;
+    short field12_0x16;
+    undefined field13_0x18;
+    undefined field14_0x19;
+    undefined field15_0x1a;
+    undefined field16_0x1b;
 };
 
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
@@ -3177,11 +3190,9 @@ struct s_tech_weapon_mod_data {
     char *name;
     undefined field5_0x8;
     undefined field6_0x9;
-    undefined field7_0xa;
-    undefined field8_0xb;
-    undefined field9_0xc;
-    undefined field10_0xd;
-    undefined field11_0xe;
+    short bonus1;
+    short bonus2;
+    undefined field9_0xe;
 };
 
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;

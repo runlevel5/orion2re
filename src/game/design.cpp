@@ -270,7 +270,7 @@ namespace DESIGN {
         // Calculate Shield Cost
         int16_t shield_idx = design->shield;
         int16_t shield_tech_level = Tech_Level_(player_idx, TECHDATA::_shields[shield_idx].tech_app_id);
-        int16_t shield_base = Shield_Base_Cost_(shield_idx);
+        int16_t shield_base = Shield_Cost_(shield_idx);
         design->shield_cost = Cost_Given_M_Level_(shield_base, shield_tech_level);
 
         // Calculate Drive Cost
@@ -314,7 +314,7 @@ namespace DESIGN {
         // Calculate Computer Cost
         int16_t computer_idx = design->computer_type;
         int16_t comp_tech_level = Tech_Level_(player_idx, TECHDATA::_computers[computer_idx].tech_app);
-        int16_t comp_base = Base_Computer_Cost_(computer_idx);
+        int16_t comp_base = Computer_Cost_(computer_idx);
         design->computer_cost = Cost_Given_M_Level_(comp_base, comp_tech_level);
     }
 
@@ -480,6 +480,23 @@ namespace DESIGN {
         return strength;
     }
 
+    int16_t __cdecl Shield_Space_(int16_t shield_idx, int16_t ship_size) {
+        int16_t space = TECHDATA::_shields[shield_idx].space_per_ship_type[ship_size];
+
+        if (shield_idx > 0 && space == 0) {
+            return 1;
+        }
+
+        return space;
+    }
+
+    int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num) {
+        int16_t base_space = Shield_Space_(shield_type, ship_size);
+        int16_t tech_level = Tech_Level_(player_num, TECHDATA::_shields[shield_type].tech_app_id);
+
+        return Space_Given_M_Level_(base_space, tech_level, 0);
+    }
+
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {
         int16_t shield_idx = MOX::_design->shield;
 
@@ -490,6 +507,16 @@ namespace DESIGN {
         }
 
         return blocked_points;
+    }
+
+    int16_t __cdecl Computer_Cost_(int16_t computer_idx) {
+        int16_t cost = TECHDATA::_computers[computer_idx].cost_by_ship_type[MOX::_design->ship_size];
+
+        if (cost == 0 && computer_idx > 0) {
+            return 1;
+        }
+
+        return cost;
     }
 
     void __cdecl Design_Screen_() {
@@ -728,6 +755,28 @@ namespace DESIGN {
         return TECHDATA::Weapon_Rack_(weapon_idx) == 1;
     }
 
+    /**
+     * Returns the weapon rack size based on the provided quantity.
+     * @param count The weapon quantity identifier.
+     * @return The rack size value, or 0 if the input is not recognized.
+     */
+    int16_t __cdecl Weapon_Rack_Size_(int16_t count) {
+        switch (count) {
+            case 2:
+                return 10;
+            case 5:
+                return 20;
+            case 10:
+                return 30;
+            case 15: // 0x0F
+                return 35; // 0x23
+            case 20: // 0x14
+                return 40; // 0x28
+            default:
+                return 0;
+        }
+    }
+
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
                                   uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size) {
         int16_t base_size = TECHDATA::_weapons[weapon_idx].base_size;
@@ -739,7 +788,7 @@ namespace DESIGN {
 
         int16_t dummy_out;
         int16_t special_mod_mult;
-        Bonus_For_Special_Mods_(ship_size, &dummy_out, &special_mod_mult);
+        Bonus_For_Special_Mods_(mod_flags, &dummy_out, &special_mod_mult);
 
         int16_t mod_rack_offset = 0;
         if (TECHDATA::Weapon_Rack_(weapon_idx) == 0) {
@@ -747,7 +796,7 @@ namespace DESIGN {
         }
 
         int16_t regular_mod_add;
-        Bonus_For_Regular_Mods_(ship_size, &dummy_out, &regular_mod_add);
+        Bonus_For_Regular_Mods_(mod_flags, &dummy_out, &regular_mod_add);
 
         int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_application_id;
         uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
@@ -766,6 +815,35 @@ namespace DESIGN {
         }
 
         return total_space;
+    }
+
+    int32_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+        int32_t rack_size = 0;
+        if (Weapon_Needs_Racks_(weapon_idx) != 0) {
+            rack_size = static_cast<int32_t>(Weapon_Rack_Size_(ammo));
+        }
+
+        int16_t special_bonus_pct;
+        int16_t local_4;
+        Bonus_For_Special_Mods_(specials, &special_bonus_pct, &local_4);
+
+        int16_t space_bonus = 0;
+        if (TECHDATA::Weapon_Rack_(weapon_idx) == 0) {
+            space_bonus = Get_Weapon_Mod_Space_Bonus_(arc);
+        }
+
+        int16_t regular_bonus_pct;
+        Bonus_For_Regular_Mods_(specials, &regular_bonus_pct, &local_4);
+
+        const auto& weapon = TECHDATA::_weapons[weapon_idx];
+
+        int32_t base_scaled_cost = (static_cast<int32_t>(special_bonus_pct) * (static_cast<int32_t>(weapon.cost) + rack_size)) / 100;
+
+        int32_t total_modified_cost = (static_cast<int32_t>(space_bonus) + regular_bonus_pct + 100) * base_scaled_cost / 100;
+
+        int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_application_id);
+
+        return (int32_t)Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
     }
 
     void __cdecl Draw_Design_Screen_() {
@@ -1877,6 +1955,24 @@ namespace DESIGN {
         fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
     }
 
+    int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_idx) {
+        if (player_idx > -1 && player_idx < MOX::_NUM_PLAYERS) {
+            // Validate tech index range [0, 212)
+            if (tech_idx < 0 || tech_idx >= 212 /* 0xd4 */) {
+                RUSS::PFMT_(0, 2, s_Bad_required_tech_in_Tech_Level, (int32_t)tech_idx);
+                assert::hgetch_();
+            }
+
+            // If tech_idx is 0 or player already has the tech (value 1), return level 0.
+            // Otherwise, calculate miniaturization level based on player's specific research progress.
+            if (tech_idx != 0 && MOX::_player[player_idx].tech_applications[tech_idx] != 1) {
+                return Miniaturization_Level_(player_idx, tech_idx);
+            }
+        }
+
+        return 0;
+    }
+
     int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category) {
         int16_t result_id = -1;
 
@@ -1941,24 +2037,13 @@ namespace DESIGN {
         }
     }
 
-    /**
-     * @brief Checks if a replacement for a specific technology application type exists for the current player.
-     * 
-     * @param application_type The technology application type to check for replacements.
-     * @return true if at least one replacement exists, false otherwise.
-     */
     bool __cdecl Replacement_Exists_(int16_t application_type) {
-        // Certain application types start with an initial count.
         int16_t replacement_count = (application_type == 2 || application_type == 5) ? 1 : 0;
 
-        // MOX::_player is a pointer to an array of s_player structures (size 0xEA9).
         s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
 
-        // Iterate through all possible technology applications (212 entries).
         for (int16_t i = 0; i < 212; ++i) {
-            // Check if the current player has this tech application (status 3 indicates learned/available).
             if (player->tech_applications[i] == 3) {
-                // If the application's base type matches the requested type, increment count.
                 if ((int16_t)DESBOX::Application_Type_(i) == application_type) {
                     replacement_count++;
                 }
@@ -1980,16 +2065,54 @@ namespace DESIGN {
         return 0;
     }
 
-    /**
-     * @brief Determines the initial state or count for the size button in the design screen.
-     *
-     * If the ship being designed is a refit, it returns 0xF4 (-12), otherwise 1.
-     */
     int8_t __cdecl Add_Size_Button_() {
         if (MOX::_refit_ship != 0) {
             return (int8_t)0xF4;
         }
         return 1;
+    }
+
+    int16_t __cdecl Shield_Cost_(int16_t shield_type) {
+        int16_t cost = TECHDATA::_shields[shield_type].cost_per_ship_type[MOX::_design->ship_size];
+
+        if (shield_type > 0 && cost == 0) {
+            return 1;
+        }
+
+        return cost;
+    }
+
+    int16_t __cdecl Cost_Given_M_Level_(int32_t base_cost, int16_t m_level) {
+        int16_t multiplier;
+
+        switch (m_level) {
+            case 0:
+                multiplier = 100;
+                break;
+            case 1:
+                multiplier = 75;
+                break;
+            case 2:
+                multiplier = 55;
+                break;
+            case 3:
+                multiplier = 40;
+                break;
+            case 4:
+                multiplier = 30;
+                break;
+            default:
+                multiplier = 25;
+                break;
+        }
+
+        int16_t result = (int16_t)((multiplier * base_cost) / 100);
+
+        if (result == 0 && base_cost > 0) {
+            result = 1;
+        }
+
+        return result;
     }
 
     void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {
@@ -2027,5 +2150,223 @@ namespace DESIGN {
         if (len > 2 && out_buffer[len - 2] == ',') {
             out_buffer[len - 2] = '\0';
         }
+    }
+
+    int32_t __cdecl Space_Given_M_Level_(int16_t amount, int16_t miniaturization_level, int8_t mode) {
+        int multiplier;
+
+        if (mode == 0) {
+            switch (miniaturization_level) {
+                case 0:
+                    multiplier = 1000;
+                    break;
+                case 1:
+                    multiplier = 800;
+                    break;
+                case 2:
+                    multiplier = 650;
+                    break;
+                case 3:
+                    multiplier = 500;
+                    break;
+                case 4:
+                    multiplier = 350;
+                    break;
+                default:
+                    multiplier = 250;
+                    break;
+            }
+        } else if (mode == 1) {
+            switch (miniaturization_level) {
+                case 0:
+                    multiplier = 1000;
+                    break;
+                case 1:
+                    multiplier = 800;
+                    break;
+                case 2:
+                    multiplier = 700;
+                    break;
+                case 3:
+                    multiplier = 600;
+                    break;
+                case 4:
+                    multiplier = 500;
+                    break;
+                default:
+                    multiplier = 400;
+                    break;
+            }
+        } else {
+            multiplier = 1000;
+        }
+
+        int result = (static_cast<int>(amount) * multiplier + 500) / 1000;
+
+        if (result == 0 && amount > 0) {
+            result = 1;
+        }
+
+        return result;
+    }
+
+    int8_t __cdecl Miniaturization_Category_(int16_t tech_app) {
+        auto& app = TECHDATA::_technology_applications[tech_app];
+
+        if (app.type == 3) {
+            if (tech_app == TECHDATA::_weapons[31].tech_application_id ||
+                tech_app == TECHDATA::_weapons[30].tech_application_id ||
+                tech_app == TECHDATA::_weapons[28].tech_application_id ||
+                tech_app == TECHDATA::_weapons[29].tech_application_id) {
+                return 2;
+            }
+
+            int16_t weapon_idx = HACCESS::Weapons_Index_From_Tech_App_(tech_app);
+            int8_t rack = TECHDATA::_weapons[weapon_idx].rack;
+
+            if (rack == 3 || rack == 1 || rack == 0) {
+                return 0;
+            }
+        } else if (app.type == 9) {
+            if (tech_app == TECHDATA::_specials[2].tech_application_id ||
+                tech_app == TECHDATA::_specials[27].tech_application_id ||
+                tech_app == TECHDATA::_specials[11].tech_application_id ||
+                tech_app == TECHDATA::_specials[14].tech_application_id ||
+                tech_app == TECHDATA::_specials[36].tech_application_id) {
+                return 2;
+            }
+            return 1;
+        }
+
+        return 1;
+    }
+
+    void __cdecl Bonus_For_Special_Mods_(int16_t flags, int16_t *bonus1_out, int16_t *bonus2_out) {
+        *bonus1_out = 100;
+        *bonus2_out = 100;
+
+        if ((flags & 0x2) != 0) {
+            int16_t index = MISC::Bit_Value_To_Num_(2, 15);
+            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+            return;
+        }
+
+        if ((flags & 0x4) != 0) {
+            int16_t index = MISC::Bit_Value_To_Num_(4, 15);
+            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+        }
+    }
+
+    int16_t __cdecl Get_Weapon_Mod_Space_Bonus_(int16_t flags) {
+        if ((flags & 0x0006) != 0) {
+            return 25;
+        }
+
+        if ((flags & 0x0010) != 0) {
+            return 50;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Bonus_For_Regular_Mods_(int16_t mods, int16_t* bonus1, int16_t* bonus2) {
+        *bonus1 = 0;
+        *bonus2 = 0;
+
+        if (mods & 0x4000 /* WEAPON_MOD_FLAG_OVERLOADED */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x4000, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0008 /* WEAPON_MOD_FLAG_ARMOR_PIERCING */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0008, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0010 /* WEAPON_MOD_FLAG_CONTINUOUS */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0010, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0020 /* WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0020, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0040 /* WEAPON_MOD_FLAG_SHIELD_PIERCING */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0040, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0080 /* WEAPON_MOD_FLAG_AUTO_FIRE */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0080, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0100 /* WEAPON_MOD_FLAG_ENVELOPING */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0100, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0200 /* WEAPON_MOD_FLAG_MIRV */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0200, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0400 /* WEAPON_MOD_FLAG_ECCM */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0400, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x0800 /* WEAPON_MOD_FLAG_HEAVILY_ARMORED */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x0800, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x1000 /* WEAPON_MOD_FLAG_FAST */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x1000, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+
+        if (mods & 0x2000 /* WEAPON_MOD_FLAG_EMISSION_GUIDANCE */) {
+            int16_t idx = MISC::Bit_Value_To_Num_(0x2000, 15);
+            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+        }
+    }
+
+    int16_t __cdecl Miniaturization_Level_(int16_t player_idx, int16_t app_id) {
+        int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
+        int16_t next_id = TECHDATA::_technology_fields[field_id].next_field_id;
+        int16_t level = 0;
+
+        while (next_id != 0) {
+            if (next_id >= 75) {
+                level += (int16_t)(uint8_t)MOX::_player[player_idx].hyper_advanced_tech[next_id - 75];
+                break;
+            }
+
+            if (MOX::_player[player_idx].tech_fields[next_id] != 3) {
+                break;
+            }
+
+            level++;
+            next_id = TECHDATA::_technology_fields[next_id].next_field_id;
+        }
+
+        return level;
     }
 }

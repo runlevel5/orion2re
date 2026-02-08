@@ -74,4 +74,10 @@ namespace MISC {
         using Fn = void(__cdecl*)(int, int, int, int);
         reinterpret_cast<Fn>(0x0049F060)(x, y, w, h);
     }
+
+    inline int16_t __cdecl Bit_Value_To_Num_(int32_t bit_value, int32_t limit) {
+        using Fn = int16_t(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e060});
+        return fn(bit_value, limit);
+    }
 }
