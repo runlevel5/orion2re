@@ -64,4 +64,14 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EEE0});
         fn(x1, y1, x2, y2, colors1, colors2, count, bitmap);
     }
+
+    inline void __cdecl Set_Field_Outline_Color_(int color) {
+        using Fn = void(__cdecl*)(int);
+        reinterpret_cast<Fn>(0x00520000)(color);
+    }
+
+    inline void __cdecl _Darken_Fill_(int x, int y, int w, int h) {
+        using Fn = void(__cdecl*)(int, int, int, int);
+        reinterpret_cast<Fn>(0x0049F060)(x, y, w, h);
+    }
 }

@@ -413,7 +413,7 @@ namespace LOADSAVE {
         MOX::_global_var = hidden_field;
 
         fields::Clear_Fields_();
-        fields::Assign_Auto_Function_(reinterpret_cast<void*>(_Draw_Options_Game_Popup_), 1);
+        fields::Assign_Auto_Function_(_Draw_Options_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&dummy_x, &dummy_y);
 
         MOX::_global_var = 0;
@@ -1250,7 +1250,7 @@ namespace LOADSAVE {
         bool event_processed = false;
         char text_buffer[200];
 
-        fields::Assign_Auto_Function_((void*)LOADSAVE::_Draw_Main_Game_Popup_, 1);
+        fields::Assign_Auto_Function_(LOADSAVE::_Draw_Main_Game_Popup_, 1);
         EVANHELP::Set_Main_Game_Screen_Help_List_();
 
         while (true) {
@@ -1310,7 +1310,7 @@ namespace LOADSAVE {
                 event_processed = true;
             } else if (input == _game_popup_fields->field_l) {
                 event_processed = true;
-                fields::Assign_Auto_Function_((void*)LOADSAVE::_Draw_Load_Save_Game_Popup_, 1);
+                fields::Assign_Auto_Function_(LOADSAVE::_Draw_Load_Save_Game_Popup_, 1);
                 _draw_game_popup_to_back = 1;
                 MOX::_screen_data = 2;
             } else if (input == _game_popup_fields->field_s) {
@@ -1641,7 +1641,7 @@ namespace LOADSAVE {
             fields::Clear_Fields_();
             fields::Disable_Draw_All_Fields_();
             MOX::_draw_main_screen_to_back = 1;
-            allocate::Allocate_First_Screen_Seg_();
+            allocate::Allocate_First_Screen_Seg_(5);
             video::Set_Page_Off_();
             MAINSCR::Draw_Mini_Main_Screen_();
             RUSS::Mox_Sync_Update_();

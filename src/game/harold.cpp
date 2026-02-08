@@ -171,7 +171,7 @@ namespace HAROLD {
         return static_cast<int16_t>(static_cast<int32_t>(value * 10) / static_cast<int32_t>(MOX::_cur_map_scale));
     }
 
-    int16_t __cdecl Get_Upscaled_Value_(int16_t value) {
+    int32_t __cdecl Get_Upscaled_Value_(int16_t value) {
         return (static_cast<int32_t>(value) * static_cast<int32_t>(MOX::_cur_map_scale)) / 10;
     }
 

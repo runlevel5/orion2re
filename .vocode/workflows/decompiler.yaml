@@ -14,9 +14,10 @@ workflows:
       - name: decompile
         type: llm
         model: gemini/gemini-3-flash-preview
+        #model: gemini/gemini-3-pro-preview
         temperature: 1
-        #reasoning_effort: high
-        reasoning_effort: medium
+        reasoning_effort: high
+        #reasoning_effort: medium
         #reset_policy: keep
         confirmation: auto
         system: |
@@ -92,6 +93,8 @@ workflows:
           RULES:
           * Correctness first: match control flow, calling convention, side effects, flags-dependent
              behavior, and memory accesses.
+          * You must decompile and output whole function. You are NOT allowed to remove portions of the function from
+            the output.
           * Cleanup:
             - You are allowed to rename internal variables.
             - You are allowed to remove superfluous variables, control logic, loops, etc.
@@ -100,7 +103,7 @@ workflows:
           * Never introduce or call C stdlib helpers (memcpy/memset/strlen/strcmp/printf/etc).
             If the binary calls an imported/external function, call that symbol directly as it exists
             in the comment/symbols. Otherwise, implement the logic inline.
-          * Do not put `goto` constructs into the generated code, implement code in a way where `goto` is not necessary.
+          * Do not generate code that uses `goto`, implement code in a way where `goto` is not necessary.
           * If disassembly or decompiled output includes symbolic constant name, emit raw value and add a
             comment with symbolic name. Make sure to emit correct raw value.
           * External/global references by absolute address:
@@ -238,6 +241,7 @@ workflows:
       - name: apply
         type: llm
         model: gemini/gemini-3-flash-preview
+        #model: gemini/gemini-3-pro-preview
         temperature: 1
         reasoning_effort: high
         confirmation: auto
@@ -341,71 +345,8 @@ workflows:
 
                 WNDCLASSA wc;
                 wc.cbClsExtra = 0;
-                wc.cbWndExtra = 0;
-                wc.hInstance = hInstance;
-                wc.style = CS_HREDRAW | CS_VREDRAW; // 3
-                wc.lpfnWndProc = Main_WndProc;
-                wc.hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(101));   // DAT_00000065
-                wc.hCursor = LoadCursorA(nullptr, MAKEINTRESOURCEA(32512)); // DAT_00007f00 (IDC_ARROW)
-                wc.hbrBackground = nullptr;
-                wc.lpszMenuName = s_Microprose;
-                wc.lpszClassName = s_Microprose;
-
-                RegisterClassA(&wc);
-
-                // Ensure single instance
-                if (FindWindowA(s_Microprose, s_Microprose)) {
-                    MessageBoxA(nullptr, s_Moo2AlreadyRunning, s_Microprose, MB_ICONHAND); // 0x10
-                    __exit(1);
-                }
-
-                int screen_height = GetSystemMetrics(SM_CYSCREEN); // 1
-                int screen_width = GetSystemMetrics(SM_CXSCREEN);  // 0
-
-                // Style 0x90080008: WS_VISIBLE | WS_POPUP | WS_BORDER | WS_SYSMENU
-                HWND hWnd = CreateWindowExA(0, s_Microprose, s_Microprose, 0x90080008, 
-                                            0, 0, screen_width, screen_height, 
-                                            nullptr, nullptr, hInstance, nullptr);
-
-                if (!hWnd) {
-                    return 0;
-                }
-
-                g_main_window = hWnd;
-                UpdateWindow(hWnd);
-                SetCursor(nullptr);
-
-                platform::Create_Direct_Draw(4);
-
-                bool needs_surface_restore = false;
-                g_worker_thread_handle = __beginthread(MOX2::thunk_main2_, 0xFFFF, nullptr);
-
-                // Main Message Loop
-                while (true) {
-                    if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {
-                        return g_main_msg.wParam;
-                    }
-
-                    TranslateMessage(&g_main_msg);
-                    DispatchMessageA(&g_main_msg);
-
-                    // Handle focus changes for DirectDraw surface restoration
-                    if (g_window_focus_state == 0) {
-                        needs_surface_restore = true;
-                    }
-
-                    if (needs_surface_restore && g_window_focus_state == 1) {
-                        needs_surface_restore = false;
-                        platform::Restore_Surfaces();
-                    }
-
-                    if (g_should_exit == 1) {
-                        break;
-                    }
-                }
-
-                platform::Cleanup_Surfaces();
-                DestroyWindow(g_main_window);
+                
+                ...
 
                 return 0;
             }
@@ -483,6 +424,7 @@ workflows:
               - If it is structure reference, do not update as you might have an address of one of the inner fields.
               - If it is reference to a primitive, non-composite type, such as int variable - you are allowed to update.
               - Otherwise do not update.
+            - If function for a stub already exists (as a stub or as an re-implemented function) - do not add the stub again.
             - Avoid changing signatures of stubs that already exist. If you see an incompatible signature and you sure
               about it - add a type cast and a comment.
             - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Example:
@@ -521,7 +463,7 @@ workflows:
           * Be VERY conservative with file reads.
 
           # Checklist
-          * You used the patch_tool to apply changes
+          * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
           * All mentioned namespaces were processed

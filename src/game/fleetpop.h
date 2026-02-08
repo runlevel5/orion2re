@@ -2,14 +2,57 @@
 #include <cstdint>
 
 namespace FLEETPOP {
+    inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
+
     inline void __cdecl Reload_Fleet_Box_Data_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00405990})();
     }
 
-    inline void __cdecl Set_Fleet_Movement_Icon_Selections_(uint8_t p1, uint8_t p2) {
-        using Fn = void(__cdecl*)(uint8_t, uint8_t);
+    inline int16_t __cdecl Fleet_Buttons_Chosen_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x00405070)();
+    }
+
+    inline void __cdecl Set_Fleet_Movement_Icon_Selections_(int a, uint8_t b) {
+        using Fn = void(__cdecl*)(int, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406330});
-        fn(p1, p2);
+        fn(a, b);
+    }
+
+    inline bool __cdecl Some_Icon_Selected_() {
+        using Fn = bool(__cdecl*)();
+        return reinterpret_cast<Fn>(0x00406700)();
+    }
+
+    inline void __cdecl Reload_Ship_Selection_Status_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004059E0)();
+    }
+
+    inline int16_t __cdecl First_Unselected_Icon_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00404CC0})();
+    }
+
+    inline void __cdecl Save_Ship_Selection_Status_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00405A60})();
+    }
+
+    int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type);
+    int16_t __cdecl Fleet_Box_Width_();
+
+    inline uint16_t __cdecl Fleet_Box_Height_(int16_t count) {
+        using Fn = uint16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404F40});
+        return fn(count);
+    }
+
+    void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
+
+    inline int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* ship_ids, int16_t max_count, uint8_t player_id) {
+        using Fn = int16_t(__cdecl*)(int16_t*, int16_t, uint8_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004052a0})(ship_ids, max_count, player_id);
     }
 }

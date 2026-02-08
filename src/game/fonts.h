@@ -23,13 +23,12 @@ namespace fonts {
         *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});
 
     void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, uint32_t height);
+    void __cdecl Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
     inline int16_t& _draw_alias_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B150});
 
     inline s_colors& _current_font_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x005787A8});
-
-    void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index);
 
     inline void __cdecl Print_Character_No_Alias_ASM_(void* dest, void* glyph, s_font* header, int height) {
         using Fn = void(__cdecl*)(void*, void*, s_font*, int);

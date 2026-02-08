@@ -1,11 +1,11 @@
 #include "deps.h"
 
 namespace fields {
-    void __cdecl Assign_Update_Function_(void* update_func) {
-        _update_function = update_func;
+    void __cdecl Assign_Update_Function_(void (*function_ptr)()) {
+        _update_function = function_ptr;
     }
 
-    void __cdecl Assign_Auto_Function_(void* function_ptr, int16_t delay) {
+    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int16_t delay) {
         _auto_active_flag = 1;
         _function = function_ptr;
 

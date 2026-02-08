@@ -65,4 +65,41 @@ namespace HACCESS {
     }
 
     char* __cdecl Get_Planet_Name_(int16_t planet_idx);
+
+    int16_t __cdecl Last_Colony_Selected_(int16_t star_idx, int16_t player_idx);
+
+    inline void __cdecl Set_All_Star_Relocations_(int16_t star_idx, int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x0049AEE0)(star_idx, player_idx);
+    }
+
+    inline int16_t __cdecl Fleet_Movement_Ship_Id_(int16_t unk) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x0049A7D0)(unk);
+    }
+
+    inline int16_t __cdecl Ship_Stack_From_Ship_Id_(int16_t id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x0049B490)(id);
+    }
+
+    inline uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_() {
+        using Fn = uint8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049A8B0})();
+    }
+
+    inline void __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int max, int filter) {
+        using Fn = void(__cdecl*)(int16_t*, int, int);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049A7F0})(out, max, filter);
+    }
+
+    inline int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00405070})();
+    }
+
+    inline void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049A400})();
+    }
 }

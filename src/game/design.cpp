@@ -502,7 +502,7 @@ namespace DESIGN {
         DESBOX::_incr_value = 1;
         _use_augmented_engines = 1;
 
-        fields::Assign_Auto_Function_(reinterpret_cast<void*>(Draw_Design_Screen_), 2);
+        fields::Assign_Auto_Function_(Draw_Design_Screen_, 2);
         fields::Clear_Fields_();
         _design_size_field = -1000;
         mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(MOX::_mouse_list_variable), 1);
@@ -774,6 +774,61 @@ namespace DESIGN {
         Print_Current_Design_();
         Check_For_Auto_Repeat_();
         JIM::Play_Streaming_Music_(8, -1, 1);
+    }
+
+    void __cdecl Check_For_Auto_Repeat_() {
+        int16_t mouse_btn = mouse::Mouse_Button_();
+        if (mouse_btn != 1) {
+            _repeat_count = 0;
+            return;
+        }
+
+        _repeat_count++;
+        int16_t input_id = fields::Auto_Input_();
+        bool updated = false;
+        bool done = false;
+
+        for (int i = 0; i < 8 && !done; ++i) {
+            int slot_idx = (int16_t)MOX::_first_weapon_ctr + i;
+            if (MOX::_weapons_count_plus_button[i] != -1000 && input_id == MOX::_weapons_count_plus_button[i]) {
+                if (MOX::_design->weapon_type[slot_idx] > 0 && _repeat_count > 4) {
+                    int32_t space = Weapon_Space_(
+                        MOX::_PLAYER_NUM,
+                        MOX::_design->weapon_type[slot_idx],
+                        1,
+                        MOX::_design->weapon_specials[slot_idx],
+                        (uint16_t)MOX::_design->weapon_firing_arc[slot_idx],
+                        MOX::_design->ship_size
+                    );
+
+                    if (MOX::_design->space_used + space <= MOX::_design->hull_space) {
+                        if (MOX::_design->weapon_count[slot_idx] < 99) {
+                            MOX::_design->weapon_count[slot_idx]++;
+                        } else {
+                            MOX::_design->weapon_count[slot_idx] = 99;
+                        }
+                        updated = true;
+                        done = true;
+                    }
+                }
+            } else if (MOX::_weapons_count_minus_button[i] != -1000 && input_id == MOX::_weapons_count_minus_button[i]) {
+                if (MOX::_design->weapon_type[slot_idx] > 0 && _repeat_count > 5) {
+                    if (MOX::_design->weapon_count[slot_idx] > 1) {
+                        MOX::_design->weapon_count[slot_idx]--;
+                    } else {
+                        MOX::_design->weapon_count[slot_idx] = 1;
+                    }
+                    updated = true;
+                    done = true;
+                }
+            }
+        }
+
+        _replacement_wait_ctr++;
+
+        if (updated) {
+            Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
+        }
     }
 
     void __cdecl Update_Player_Design_(int16_t player_idx, int16_t design_idx) {
@@ -1653,7 +1708,7 @@ namespace DESIGN {
             case 0xF5:
                 message_id = HESTR_00E_SINCE_S_CANNOT_BUILD_S;
                 if (MOX::_return_screen == 0x19) {
-                    int16_t colony_idx = HAROLD::Planet_Index_();
+                    int16_t colony_idx = MAINSCR::Current_Colony_();
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
                     is_formatted = true;
                     _sprintf(planet_name_buf, "%s", planet_name);
@@ -1923,6 +1978,18 @@ namespace DESIGN {
         }
 
         return 0;
+    }
+
+    /**
+     * @brief Determines the initial state or count for the size button in the design screen.
+     *
+     * If the ship being designed is a refit, it returns 0xF4 (-12), otherwise 1.
+     */
+    int8_t __cdecl Add_Size_Button_() {
+        if (MOX::_refit_ship != 0) {
+            return (int8_t)0xF4;
+        }
+        return 1;
     }
 
     void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {

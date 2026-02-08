@@ -181,4 +181,39 @@ namespace allocate {
 
         return ptr;
     }
+
+    void __cdecl Push_Block_(void* block) {
+        if (_mark_stack_pos[0] >= 40) {
+            exitm::Exit_With_Message(s_Mark_Block_Stack_Size_Exceeded_0055b6dc);
+        }
+
+        uint32_t pos = _mark_stack_pos[0];
+        _mark_stack[pos][0] = reinterpret_cast<uint32_t>(block);
+
+        // Accessing metadata at block - 12 bytes
+        uint32_t metadata = *reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(block) - 0xC);
+        _mark_stack[pos][1] = metadata;
+
+        _mark_stack_pos[0]++;
+    }
+
+    /**
+     * @brief Pops a block marker from the stack and restores the original value at the target address.
+     * The target address is stored at _mark_stack[idx][0], and the value to restore is at _mark_stack[idx][1].
+     * The restoration occurs at (target_address - 12).
+     */
+    void __cdecl Pop_Block_(void* block) {
+        if (static_cast<int32_t>(_mark_stack_pos[0]) < 1) {
+            exitm::Exit_With_Message(s_Mark_Block_Stack_Empty_0055b6fc);
+        }
+
+        _mark_stack_pos[0]--;
+        uint32_t index = _mark_stack_pos[0];
+
+        uint32_t target_base = _mark_stack[index][0];
+        uint32_t original_value = _mark_stack[index][1];
+
+        // Restore the value at the calculated offset relative to the block address
+        *reinterpret_cast<uint32_t*>(static_cast<uintptr_t>(target_base) - 0x0C) = original_value;
+    }
 }

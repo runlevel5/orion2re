@@ -498,13 +498,21 @@ typedef enum PLANET_TYPE {
     PLANET_TYPE_NOT_USED9=9
 } PLANET_TYPE;
 
+typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
+
+typedef uint uint32_t;
+
+struct s_alloc_header {
+    uint32_t current;
+    uint32_t size;
+    uint32_t reserved;
+};
+
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
 typedef short int16_t;
 
 typedef uchar uint8_t;
-
-typedef uint uint32_t;
 
 struct s_animation_header {
     int16_t width;
@@ -1300,6 +1308,18 @@ struct s_field {
     short sound;
 };
 
+typedef struct s_fleet_box s_fleet_box, *Ps_fleet_box;
+
+struct s_fleet_box {
+    short x;
+    short y;
+    short height;
+    short width;
+    undefined2 map_height;
+    undefined field5_0xa;
+    undefined field6_0xb;
+};
+
 typedef struct s_font s_font, *Ps_font;
 
 typedef ushort uint16_t;
@@ -1988,6 +2008,16 @@ struct s_missle {
     undefined field19_0x17;
     undefined field20_0x18;
     undefined field21_0x19;
+};
+
+typedef struct s_mouse_xy s_mouse_xy, *Ps_mouse_xy;
+
+struct s_mouse_xy {
+    short field0_0x0;
+    short field1_0x2;
+    short field2_0x4;
+    short field3_0x6;
+    int8_t field4_0x8;
 };
 
 typedef struct s_movable_box s_movable_box, *Ps_movable_box;
@@ -2829,6 +2859,31 @@ struct s_ship_icon {
     short y;
 };
 
+typedef struct s_ship_move_info s_ship_move_info, *Ps_ship_move_info;
+
+struct s_ship_move_info {
+    int8_t field0_0x0;
+    int8_t field1_0x1;
+    int8_t field2_0x2;
+    undefined field3_0x3;
+    undefined field4_0x4;
+    int8_t field5_0x5;
+    undefined field6_0x6;
+    undefined field7_0x7;
+    undefined field8_0x8;
+    undefined field9_0x9;
+    undefined field10_0xa;
+    undefined field11_0xb;
+    undefined field12_0xc;
+    int8_t field13_0xd;
+    undefined field14_0xe;
+    undefined field15_0xf;
+    undefined field16_0x10;
+    undefined field17_0x11;
+    undefined field18_0x12;
+    undefined field19_0x13;
+};
+
 typedef struct s_ship_node s_ship_node, *Ps_ship_node;
 
 struct s_ship_node {
@@ -2884,8 +2939,8 @@ struct s_star_data {
     char officer_index[8];
     short planet_index[5];
     short relocate_ship_to[8];
-    byte not_used1;
-    byte not_used2;
+    int8_t twinkling1;
+    int8_t twinkling2;
     byte not_used3;
     char surrender_to[8];
     byte in_nebula;

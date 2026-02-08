@@ -104,8 +104,8 @@ namespace HACCESS {
     }
 
     void __cdecl Set_Colony_Auto_Select_For_Star_(int16_t star_idx, int16_t player_idx, int16_t* out_planet_idx) {
+        int16_t colony_found = -1;
         bool found = false;
-        int16_t status_colony_idx = -1;
         *out_planet_idx = -1;
 
         for (int16_t i = 0; i < 5; ++i) {
@@ -114,26 +114,24 @@ namespace HACCESS {
             }
 
             int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
-            if (planet_idx >= 0) {
+            if (planet_idx > -1) {
                 *out_planet_idx = planet_idx;
                 int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
-                if (colony_idx >= 0) {
-                    auto& colony = MOX::_colony[colony_idx];
-                    // Check if the colony is not an outpost and belongs to the specified player
-                    if (colony.outpost_flag == 0 && (int16_t)colony.owner == player_idx) {
+                if (colony_idx > -1) {
+                    colony_found = colony_idx;
+                    // Check if colony belongs to the player and is not an outpost
+                    if (MOX::_colony[colony_idx].outpost_flag == 0 && MOX::_colony[colony_idx].owner == (char)player_idx) {
                         MOX::_star[star_idx].last_planet_selected[player_idx] = (int8_t)i;
                         found = true;
-                        status_colony_idx = colony_idx;
                     } else {
-                        status_colony_idx = -1;
+                        colony_found = -1;
                     }
                 }
             }
         }
 
-        // If no matching colony was found in the system, reset the output planet index
-        if (status_colony_idx == -1) {
+        if (colony_found == -1) {
             *out_planet_idx = -1;
         }
     }
@@ -190,5 +188,31 @@ namespace HACCESS {
     char* __cdecl Get_Planet_Name_(int16_t planet_idx) {
         Do_Get_Planet_Name_(planet_idx, MOX::_temp_string, 1);
         return MOX::_temp_string;
+    }
+
+    int16_t __cdecl Last_Colony_Selected_(int16_t star_idx, int16_t player_idx) {
+        int16_t colony_idx = -1;
+        int16_t planet_idx = -1;
+
+        int8_t last_sel_idx = MOX::_star[star_idx].last_planet_selected[player_idx];
+
+        if (last_sel_idx >= 0 && last_sel_idx < 5) {
+            planet_idx = MOX::_star[star_idx].planet_index[last_sel_idx];
+        }
+
+        if (planet_idx >= 0 && planet_idx < (int16_t)MOX::_planet_count) {
+            colony_idx = MOX::_planet[planet_idx].colony_index;
+        }
+
+        if (colony_idx == -1 || MOX::_colony[colony_idx].owner != (int8_t)player_idx) {
+            Set_Colony_Auto_Select_For_Star_(star_idx, player_idx, &planet_idx);
+
+            if (planet_idx >= 0 && planet_idx < (int16_t)MOX::_planet_count) {
+                return MOX::_planet[planet_idx].colony_index;
+            }
+            return -1;
+        }
+
+        return colony_idx;
     }
 }

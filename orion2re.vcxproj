@@ -35,12 +35,14 @@
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\draw.cpp" />
     <ClCompile Include="src\game\eric.cpp" />
+    <ClCompile Include="src\game\evanhelp.cpp" />
     <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exitm.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
+    <ClCompile Include="src\game\fleetpop.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />
@@ -107,6 +109,7 @@
     <ClInclude Include="src\game\fields.h" />
     <ClInclude Include="src\game\filedef.h" />
     <ClInclude Include="src\game\file_ani.h" />
+    <ClInclude Include="src\game\fleetpop.h" />
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\geo.h" />
     <ClInclude Include="src\game\graphics.h" />

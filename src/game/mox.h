@@ -1,6 +1,7 @@
 #pragma once
 
 namespace MOX {
+    inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
     inline s_current_design*& _design =
         *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
 
@@ -40,6 +41,7 @@ namespace MOX {
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
+    inline int16_t(&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{ 0x00597470 });
     inline uint8_t& _first_design_screen_call = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5C9});
     inline int16_t& _design_size = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B434});
     inline uint8_t& _refresh_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059B5A4 });
@@ -70,6 +72,29 @@ namespace MOX {
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
+    inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
+    inline uint16_t& _galaxy_map_scanned_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597762});
+    inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
+    inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
+    inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
+    inline uint16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597AC8});
+    inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
+    inline int8_t& _draw_fleet_screen_to_back = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059770C});
+    inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005960E9});
+    inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
+    inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
+    inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});
+    inline uint16_t& _global_exit_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D7A});
+    inline int8_t& _officer_scrn_type = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597414});
+    inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
+    inline uint16_t& _eta_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BAAE});
+    inline uint16_t& _stencil_box_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B2C});
+    inline uint16_t& _draw_main_screen_stencilled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1864});
+    inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
+    inline void* _mouse_list_zoom_mode = reinterpret_cast<void*>(std::uintptr_t{0x00559898});
+    inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
+    inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
+    inline uint16_t& _first_fleet_movement_icon = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D4A});
 
     inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
 
@@ -281,6 +306,8 @@ namespace MOX {
     inline uint32_t& _fleet_box_ship_ids =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059D610});
 
+    inline void*& _fleet_box_grid_sm_seg4 = *reinterpret_cast<void**>(std::uintptr_t{0x005A47E0});
+
     inline int16_t& _ship_icon_count =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597664});
 
@@ -361,6 +388,9 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline s_animation_header*& _fleet_box_name_sm_seg3 =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977D2});
+
     #pragma pack(push, 1)
     struct s_save_game_description {
         char description[37];
@@ -371,6 +401,9 @@ namespace MOX {
     inline int16_t& _popup_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597710});
     inline int16_t& _popup_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059770E});
     inline int16_t& _screen_data = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B20});
+    inline uint8_t& _moving_a_stack = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEB4});
+    inline uint8_t& _track_time_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEC0});
+    inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});
 
     // Suggested name: MOX::gate_portal_icons
     inline s_animation_header** gate_portal_icons = reinterpret_cast<s_animation_header**>(0x0059BCD0);

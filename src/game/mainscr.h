@@ -22,12 +22,34 @@ namespace MAINSCR {
     inline uint8_t& _debug_enabled = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596136});
     inline int16_t& _debug_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F4});
     inline int16_t& _exit_game_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619A});
+    inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
+    inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
     inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});
+    inline int16_t& _main_screen_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEB0});
+    inline int8_t& _moving_a_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEB4});
+    inline int8_t& _track_time_flag = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC0});
+    inline int8_t& _clear_fleet_fields = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC4});
+    inline int8_t& _mouse_btn_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC8});
+    inline int8_t& _merging_relocations = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED0});
+    inline int8_t& _warn_about_cheaters = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED4});
+    inline int8_t& _zoom_box_increment_value = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED8});
+    inline int8_t& _officer_screen_return_screen = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596184});
+    inline int8_t& _next_turn_hit = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059618C});
+    inline uint16_t& _zoom_box_x = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059618E});
+    inline uint16_t& _zoom_box_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596192});
+    inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
 
-    inline void __cdecl Main_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004c7720})();
+    inline bool __cdecl Is_Main_Screen_Palette_() {
+        using Fn = bool(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004C76E0})();
     }
+
+    inline void __cdecl Draw_Main_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C5E20})();
+    }
+
+    void __cdecl Main_Screen_();
 
     inline void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int32_t flag) {
         using Fn = void(__cdecl*)(int16_t, int32_t);
@@ -123,4 +145,155 @@ namespace MAINSCR {
     void __cdecl Print_Main_Screen_Data_();
 
     void __cdecl Popup_XY_(int16_t index, int16_t x, int16_t y, int16_t* out_w, int16_t* out_h);
+
+    void __cdecl Set_Player_Cheated_Flag_(int16_t player_idx, int8_t cheated_this_turn);
+
+    void __cdecl Give_Me_All_Tech_Advances_();
+
+    inline uint16_t& _omniscience_cheat_alt = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00559860});
+    inline int16_t& _all_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559864});
+    inline int16_t& _more_money_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055986C});
+    inline int16_t& _get_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559870});
+    inline int16_t& _omniscience_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559874});
+    inline int16_t& _all_ai_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559878});
+    inline int16_t& _hi_score_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559880});
+    inline int16_t& _last_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEDC});
+
+    inline const char* const s_EINSTEIN_005597e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005597E8});
+    inline const char* const s_MOOLA_005597f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005597F8});
+    inline const char* const s_MENLO_00559800 = reinterpret_cast<const char*>(std::uintptr_t{0x00559800});
+    inline const char* const s_ISEEALL_00559808 = reinterpret_cast<const char*>(std::uintptr_t{0x00559808});
+    inline const char* const s_SCORE_00559820 = reinterpret_cast<const char*>(std::uintptr_t{0x00559820});
+    inline const char* s_Current_score_for_s_is_d = reinterpret_cast<const char*>(std::uintptr_t{0x00559908});
+
+    void __cdecl Check_Hot_Keys_(int16_t key, int param_2);
+
+    void __cdecl Add_Cheats_();
+
+    void __cdecl Do_Colony_Screen_(int16_t colony_idx, int16_t* status_flag);
+
+    inline int16_t __cdecl Current_Colony_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0042F800 })();
+    }
+
+    inline void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
+        reinterpret_cast<Fn>(0x004C9500)(x, y, flag);
+    }
+
+    inline void __cdecl Check_Ships_XY_(int16_t x, int16_t y, int8_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
+        reinterpret_cast<Fn>(0x004C9410)(x, y, flag);
+    }
+
+    inline int16_t __cdecl Get_Mouse_Field_(int8_t type, int16_t* out1, int16_t* out2) {
+        using Fn = int16_t(__cdecl*)(int8_t, int16_t*, int16_t*);
+        return reinterpret_cast<Fn>(0x004C9F20)(type, out1, out2);
+    }
+
+    inline void __cdecl Exit_Zooming_Mode_(int16_t* ptr) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(0x004CD170)(ptr);
+    }
+
+    inline void __cdecl Do_Fleet_Popup_(int16_t id, int8_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int8_t);
+        reinterpret_cast<Fn>(0x004C9740)(id, flag);
+    }
+
+    inline int16_t __cdecl Scan_System_Display_Fields_(int16_t key, int16_t scan, int16_t* p3, int16_t* p4, int16_t* p5, int16_t* p6, int16_t* p7, int16_t* p8) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+        return reinterpret_cast<Fn>(0x004CC920)(key, scan, p3, p4, p5, p6, p7, p8);
+    }
+
+    inline void __cdecl Scan_Moveable_Box_Fields(int16_t skip, int16_t key, int16_t scan, uint16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t*);
+        reinterpret_cast<Fn>(0x004CBED0)(skip, key, scan, flag);
+    }
+
+    inline void __cdecl Decrement_Zoom_Count_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004F0840)();
+    }
+
+    inline int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x004F0E50)();
+    }
+
+    inline void __cdecl Increment_Zoom_Count_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004F0E20)();
+    }
+
+    inline int16_t __cdecl Get_Map_Scale_(int16_t zoom) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x004F0880)(zoom);
+    }
+
+    inline void __cdecl Draw_Main_Screen_For_Zooming_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004C9C30)();
+    }
+
+    inline void __cdecl Get_New_Paralax_XYs_(int16_t dx, int16_t dy, int8_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
+        reinterpret_cast<Fn>(0x004C7260)(dx, dy, flag);
+    }
+
+    inline void __cdecl Clear_Twinkling_Star_Data_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004C4B10)();
+    }
+
+    inline void __cdecl Change_Home_Star_Name_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004C8BF0)();
+    }
+
+    inline void __cdecl Warn_About_Cheating_Players_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004CD630)();
+    }
+
+    inline int16_t __cdecl Check_For_Diplomacy_Request_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x004C8C70)();
+    }
+
+    inline void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*);
+        reinterpret_cast<Fn>(0x004C8D00)(key, flag);
+    }
+
+    inline void __cdecl Do_Next_Turn_(int16_t* ptr, int8_t unk) {
+        using Fn = void(__cdecl*)(int16_t*, int8_t);
+        reinterpret_cast<Fn>(0x004C4E90)(ptr, unk);
+    }
+
+    inline int16_t __cdecl Get_Ship_Stack_For_Officers_Screen_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x004C7490)();
+    }
+
+    inline int16_t __cdecl Get_Star_Id_For_Officers_Screen_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x004C75B0)();
+    }
+
+    inline void __cdecl Tax_Rate_Popup_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x0045F3F0)();
+    }
+
+    inline void __cdecl Scroll_Map_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x004CCD90)(x, y);
+    }
+
+    inline void __cdecl Set_Reload_Fleet_Box_Palette_Flag_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004CD0D0)();
+    }
 }

@@ -192,6 +192,12 @@
     <ClCompile Include="src\game\ken.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\evanhelp.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\fleetpop.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -426,6 +432,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\aibuild.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\fleetpop.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

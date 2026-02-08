@@ -231,6 +231,23 @@ namespace COLCALC {
 
     int32_t __cdecl Tribute_Received_From_(int32_t receiver_idx, int32_t payer_idx);
 
+    inline bool __cdecl Player_May_Get_Tech_App_(s_player* player, int tech_app_idx) {
+        using Fn = bool(__cdecl*)(s_player*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FA600});
+        return fn(player, tech_app_idx);
+    }
+
+    inline void __cdecl Player_Gets_Tech_App_(s_player* player, int16_t tech_app_idx) {
+        using Fn = void(__cdecl*)(s_player*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FA790});
+        fn(player, tech_app_idx);
+    }
+
+    inline void __cdecl Do_Player_Colony_Calculations_(int16_t player) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(0x004F9140)(player);
+    }
+
     bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader);
 
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);

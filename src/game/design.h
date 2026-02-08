@@ -3,6 +3,7 @@
 
 namespace DESIGN {
     inline s_current_design*& _design = *reinterpret_cast<s_current_design**>(std::uintptr_t{ 0x0059B330 });
+    inline int16_t& _repeat_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005560DC});
     inline uint8_t& _replacement_wait_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B6E});
     inline int16_t& _design_size_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565040});
     inline uint8_t& _use_augmented_engines = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056503C});
@@ -97,11 +98,7 @@ namespace DESIGN {
 
     void __cdecl Print_Current_Design_();
 
-    inline void __cdecl Check_For_Auto_Repeat_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042F4A0});
-        fn();
-    }
+    void __cdecl Check_For_Auto_Repeat_();
 
     void __cdecl Load_Design_Screen_Pictures_();
 
@@ -111,10 +108,7 @@ namespace DESIGN {
 
     void __cdecl Add_Design_Buttons_();
 
-    inline uint8_t __cdecl Add_Size_Button_() {
-        using Fn = uint8_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x0042d5b0)();
-    }
+    int8_t __cdecl Add_Size_Button_();
 
     void __cdecl Clear_Design_();
 

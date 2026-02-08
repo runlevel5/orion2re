@@ -20,4 +20,9 @@ namespace bitmap {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052FAC0});
         fn(x, y, src, dest);
     }
+
+    inline void __cdecl Screen_Bitmap_Capture_(int x, int y, int w, int h, void* bmp) {
+        using Fn = void(__cdecl*)(int, int, int, int, void*);
+        reinterpret_cast<Fn>(0x0052F0C0)(x, y, w, h, bmp);
+    }
 }

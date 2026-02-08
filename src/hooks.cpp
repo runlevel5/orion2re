@@ -595,6 +595,21 @@ namespace hooks {
         { 0x004319d0, &DESIGN::Replacement_Exists_ },
         { 0x0042d080, &DESIGN::Add_Design_Buttons_ },
         { 0x0051c780, &farload::Far_Reload_Next_Data_ },
+        { 0x0052eb30, &allocate::Push_Block_ },
+        { 0x0052eb70, &allocate::Pop_Block_ },
+        { 0x0042d5b0, &DESIGN::Add_Size_Button_ },
+        { 0x0042f4a0, &DESIGN::Check_For_Auto_Repeat_ },
+        { 0x00404ef0, &FLEETPOP::Fleet_Box_Grid_Height_ },
+        { 0x004062f0, &FLEETPOP::Set_Fleet_Movement_Box_Dimensions_ },
+        { 0x00405060, &FLEETPOP::Fleet_Box_Width_ },
+        { 0x004cd5f0, &MAINSCR::Set_Player_Cheated_Flag_ },
+        { 0x004ca090, &MAINSCR::Give_Me_All_Tech_Advances_ },
+        { 0x004c90c0, &MAINSCR::Check_Hot_Keys_ },
+        { 0x004c8b80, &MAINSCR::Add_Cheats_ },
+        { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
+        { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
+        { 0x004c7720, &MAINSCR::Main_Screen_ },
+        { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
     };
 
 #define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }

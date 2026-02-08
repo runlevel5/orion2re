@@ -556,7 +556,7 @@ namespace HOMEGEN {
 
             s_star_data& star = MOX::_star[selected_star];
             // Store original system special for later use
-            star.not_used1 = static_cast<uint8_t>(star.system_special);
+            star.twinkling1 = static_cast<uint8_t>(star.system_special);
             star.system_special = SYSTEM_SPECIAL_SPACE_MONSTER;
 
             flags[selected_star] = 1;

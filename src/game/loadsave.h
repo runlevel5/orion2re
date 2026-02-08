@@ -85,6 +85,16 @@ namespace LOADSAVE {
     inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);
     inline const char* s_format_0055ad30 = reinterpret_cast<const char*>(0x0055AD30); // "%s, %s, %d %s"
 
+    inline void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x005123D0})(flag);
+    }
+
+    inline void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag) {
+        using Fn = void(__cdecl*)(int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00512320})(flag);
+    }
+
     inline const char* s__ALT_F1__0055ad24 = reinterpret_cast<const char*>(0x0055AD24); // "(ALT F1)"
     inline const char* s__ALT_F2__0055ad18 = reinterpret_cast<const char*>(0x0055AD18); // "(ALT F2)"
     inline const char* s__ALT_F3__0055ad0c = reinterpret_cast<const char*>(0x0055AD0C); // "(ALT F3)"

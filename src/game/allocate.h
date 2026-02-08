@@ -37,9 +37,6 @@ namespace allocate {
     inline uint32_t (&_mark_stack_pos)[2] =
         *reinterpret_cast<uint32_t (*)[2]>(std::uintptr_t{ 0x0055B650 });
 
-    // BUG: The provided type definition for _mark_stack is uint32_t[39][2], meaning valid indices 
-    // are 0-38. However, the bounds check allows indices up to 39 (pos < 40), 
-    // which will cause a buffer overflow on the 40th push.
     inline uint32_t (&_mark_stack)[39][2] =
         *reinterpret_cast<uint32_t (*)[39][2]>(std::uintptr_t{ 0x0057DF00 });
 
@@ -49,15 +46,9 @@ namespace allocate {
     inline const char* s_Mark_Block_Stack_Empty_0055b6fc =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B6FC }); // "Mark Block Stack Empty"
 
-    inline void __cdecl Push_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eb30 })(block);
-    }
+    void __cdecl Push_Block_(void* block);
 
-    inline void __cdecl Pop_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eb70 })(block);
-    }
+    void __cdecl Pop_Block_(void* block);
 
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
 
@@ -90,8 +81,8 @@ namespace allocate {
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E930 })(seg, size);
     }
 
-    inline void __cdecl Allocate_First_Screen_Seg_() {
+    inline void __cdecl Allocate_First_Screen_Seg_(int32_t count) {
         using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(0x004c4980)(5);
+        reinterpret_cast<Fn>(0x004c4980)(count);
     }
 }

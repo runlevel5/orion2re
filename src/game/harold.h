@@ -5,7 +5,7 @@ namespace HAROLD {
 
     int16_t __cdecl Get_Scaled_Value_(int16_t value);
 
-    int16_t __cdecl Get_Upscaled_Value_(int16_t value);
+    int32_t __cdecl Get_Upscaled_Value_(int16_t value);
 
     bool __cdecl Empty_System_(int16_t star_idx);
 
@@ -59,11 +59,6 @@ namespace HAROLD {
 
     void __cdecl Init_System_Display_Box_();
 
-    inline int16_t __cdecl Planet_Index_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0042F800})();
-    }
-
     inline void __cdecl Planet_Data_Screen_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004f1420})();
@@ -81,6 +76,26 @@ namespace HAROLD {
 
     int16_t __cdecl Map_Scale_To_Zoom_Level_();
 
+    inline void __cdecl Decrement_Zoom_Count_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004F0840})();
+    }
+
+    inline int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004F0E50})();
+    }
+
+    inline void __cdecl Increment_Zoom_Count_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004F0E20})();
+    }
+
+    inline uint16_t __cdecl Get_Map_Scale_(int16_t count) {
+        using Fn = uint16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004F0880})(count);
+    }
+
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 
     int16_t __cdecl Galaxy_Size_From_N_Stars_();
@@ -93,6 +108,12 @@ namespace HAROLD {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f2210});
         fn();
+    }
+
+    inline void __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int unknown) {
+        using Fn = void(__cdecl*)(uint8_t*, const char*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1B50});
+        fn(screen_ptr, message, unknown);
     }
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
@@ -122,6 +143,11 @@ namespace HAROLD {
     void __cdecl Colony_Owners_(int16_t star_idx, int16_t* player_counts, int16_t* total_count, bool have_contact);
 
     int16_t __cdecl Players_Home_Star_(int16_t star_idx);
+
+    inline int16_t __cdecl Planet_Index_(int16_t star_idx, int16_t planet_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(0x004F1480)(star_idx, planet_idx);
+    }
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
 

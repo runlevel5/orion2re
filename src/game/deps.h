@@ -59,6 +59,7 @@
 #include "smack.h"
 #include "report.h"
 #include "colcalc.h"
+#include "remap.h"
 #include "movebox.h"
 #include "fleetpop.h"
 #include "trade.h"

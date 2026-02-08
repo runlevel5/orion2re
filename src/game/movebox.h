@@ -16,5 +16,15 @@ namespace MOVEBOX {
         fn();
     }
 
+    inline void __cdecl Save_And_Remove_Boxes_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00513C90})();
+    }
+
+    inline void __cdecl Restore_Boxes_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00513C00})();
+    }
+
     void __cdecl Move_Box_To_Top_(int16_t box_id);
 }

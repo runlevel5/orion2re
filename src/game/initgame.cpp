@@ -529,8 +529,8 @@ namespace INITGAME {
                 SHIPS::Build_Nonplayer_Ship_(ship_type, star_idx, 0);
 
                 // Restore previous special status from backup field and clear backup
-                star_ptr->system_special = star_ptr->not_used1;
-                star_ptr->not_used1 = 0;
+                star_ptr->system_special = star_ptr->twinkling1;
+                star_ptr->twinkling1 = 0;
 
                 HOMEGEN::Upgrade_Planet_Guarded_By_Monster_(&MOX::_planet[planet_idx], static_cast<int16_t>(ship_type));
             }

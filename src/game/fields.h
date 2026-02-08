@@ -28,13 +28,13 @@ namespace fields {
     inline uint32_t& _continuous_string = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
 
-    void __cdecl Assign_Update_Function_(void* update_func);
+    void __cdecl Assign_Update_Function_(void (*function_ptr)());
     void __cdecl Deactivate_Auto_Function_();
     void __cdecl Clear_Fields_();
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str);
 
-    void __cdecl Assign_Auto_Function_(void* function_ptr, int16_t delay);
+    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int16_t delay);
 
     int16_t __cdecl Get_Input_();
 
@@ -76,6 +76,21 @@ namespace fields {
 
     void __cdecl Disable_Draw_All_Fields_();
     void __cdecl Enable_Draw_All_Fields_();
+
+    inline void __cdecl Disable_Cancel_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0051D180})();
+    }
+
+    inline void __cdecl Clear_Fields_Above_(int16_t f) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0051FFD0})(f);
+    }
+
+    inline void __cdecl Enable_Mouse_Pressed_Field_Update_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00520010})();
+    }
 
     void __cdecl Deactivate_Help_List_();
 

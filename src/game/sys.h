@@ -2,6 +2,7 @@
 #include <cstdint>
 
 namespace SYS {
+    inline int8_t& _skip_draw_system_planets = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A57CC});
     inline void __cdecl Clear_System_Display_Loaded_Flag_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493f30});

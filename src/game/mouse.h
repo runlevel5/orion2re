@@ -46,8 +46,14 @@ namespace mouse {
 
     void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
 
-    int32_t Pointer_X_();
-    int32_t Pointer_Y_();
+    int16_t Pointer_X_();
+
+    int16_t Pointer_Y_();
+
+    inline void __cdecl Clear_Mouse_XY_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004C9650)();
+    }
 
     inline int16_t __cdecl Get_Pointer_Offset_() {
         using Fn = int16_t(__cdecl*)();

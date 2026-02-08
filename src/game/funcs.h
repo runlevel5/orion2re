@@ -495,3 +495,103 @@ inline void __cdecl Bonus_For_Regular_Mods_(uint16_t weapon_mods, int16_t* out_b
     using Fn = void(__cdecl*)(uint16_t, int16_t*, int16_t*);
     reinterpret_cast<Fn>(std::uintptr_t{0x004304c0})(weapon_mods, out_bonus_1, out_bonus_2);
 }
+
+inline void __cdecl Allocate_First_Screen_Seg_(int val) {
+    using Fn = void(__cdecl*)(int);
+    reinterpret_cast<Fn>(0x004C4980)(val);
+}
+
+inline void __cdecl Clear_Mouse_XY_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x004C9650)();
+}
+
+inline void __cdecl Disable_Cancel_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x0051D180)();
+}
+
+inline uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_() {
+    using Fn = uint8_t(__cdecl*)();
+    return reinterpret_cast<Fn>(0x0049A8B0)();
+}
+
+inline uint8_t __cdecl Some_Icon_Selected_() {
+    using Fn = uint8_t(__cdecl*)();
+    return reinterpret_cast<Fn>(0x00406700)();
+}
+
+inline void __cdecl Reload_Ship_Selection_Status_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x004059E0)();
+}
+
+inline short __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* buffer, int size, int8_t player) {
+    using Fn = short(__cdecl*)(int16_t*, int, int8_t);
+    return reinterpret_cast<Fn>(0x0049A7F0)(buffer, size, player);
+}
+
+inline int16_t __cdecl First_Unselected_Icon_() {
+    using Fn = int16_t(__cdecl*)();
+    return reinterpret_cast<Fn>(0x00404CC0)();
+}
+
+inline void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x0049A400)();
+}
+
+inline void __cdecl Auto_Save_Last_Saved_Game_(uint16_t* ptr) {
+    using Fn = void(__cdecl*)(uint16_t*);
+    reinterpret_cast<Fn>(0x005123D0)(ptr);
+}
+
+inline void __cdecl Auto_Load_Last_Saved_Game_(uint16_t* ptr) {
+    using Fn = void(__cdecl*)(uint16_t*);
+    reinterpret_cast<Fn>(0x00512320)(ptr);
+}
+
+inline void __cdecl Do_Player_Colony_Calculations_(int16_t player) {
+    using Fn = void(__cdecl*)(int16_t);
+    reinterpret_cast<Fn>(0x004F9140)(player);
+}
+
+inline void __cdecl Save_And_Remove_Boxes_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x00513C90)();
+}
+
+inline void __cdecl Update_Glass_Remap_Colors_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x0052BC90)();
+}
+
+inline void __cdecl Screen_Bitmap_Capture_(int x, int y, int w, int h, void* bmp) {
+    using Fn = void(__cdecl*)(int, int, int, int, void*);
+    reinterpret_cast<Fn>(0x0052F0C0)(x, y, w, h, bmp);
+}
+
+inline void __cdecl _Darken_Fill_(int x, int y, int w, int h) {
+    using Fn = void(__cdecl*)(int, int, int, int);
+    reinterpret_cast<Fn>(0x0049F060)(x, y, w, h);
+}
+
+inline void __cdecl Clear_Fields_Above_(int16_t field) {
+    using Fn = void(__cdecl*)(int16_t);
+    reinterpret_cast<Fn>(0x0051FFD0)(field);
+}
+
+inline void __cdecl Restore_Boxes_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x00513C00)();
+}
+
+inline void __cdecl Enable_Mouse_Pressed_Field_Update_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x00520010)();
+}
+
+inline void __cdecl Save_Ship_Selection_Status_() {
+    using Fn = void(__cdecl*)();
+    reinterpret_cast<Fn>(0x00405A60)();
+}

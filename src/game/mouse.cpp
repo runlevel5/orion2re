@@ -25,11 +25,11 @@ namespace mouse {
         SendMessageA(platform::g_main_window, 0x402, 0, 0);
     }
 
-    int32_t Pointer_X_() {
-        return static_cast<int32_t>(platform::g_mouse_x);
+    int16_t Pointer_X_() {
+        return platform::g_mouse_x;
     }
 
-    int32_t Pointer_Y_() {
-        return static_cast<int32_t>(platform::g_mouse_y);
+    int16_t Pointer_Y_() {
+        return platform::g_mouse_y;
     }
 }
