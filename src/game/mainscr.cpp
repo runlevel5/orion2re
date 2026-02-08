@@ -209,6 +209,43 @@ namespace MAINSCR {
         MISC::Restore_Window_Status_(window_status);
     }
 
+    void __cdecl Draw_ETA_Destination_Line_() {
+        int16_t x, y;
+        int16_t dest_x, dest_y;
+        uint8_t color_buffer[8];
+
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+        int32_t zoom_scale = 3 - (int32_t)zoom_level;
+        if (zoom_scale < 0) {
+            zoom_scale = 0;
+        }
+
+        int16_t ship_stack_node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+        int16_t ship_icon_id = HACCESS::Ship_Icon_Id_From_Node_Ptr_(ship_stack_node);
+
+        SHIPS::Get_Ship_Icon_Coords_(ship_icon_id, &x, &y);
+
+        SHIPS::Get_Ship_Icon_Dimensions_(zoom_scale, &MOX::_ship_icon_width[zoom_scale], &MOX::_ship_icon_height[zoom_scale]);
+
+        x += (uint8_t)MOX::_ship_icon_width[zoom_scale] / 2;
+        y += (uint8_t)MOX::_ship_icon_height[zoom_scale] / 2;
+
+        Get_Star_Draw_Coords_(MOX::_eta_star_id, &dest_x, &dest_y);
+
+        if (MOX::_g_ship_move_info.field5_0x5 != 0 && MOX::_g_ship_move_info.field4_0x4 != 0) {
+            *reinterpret_cast<uint32_t*>(&color_buffer[0]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_red_colors[0]);
+            *reinterpret_cast<uint32_t*>(&color_buffer[4]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_red_colors[4]);
+
+            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, color_buffer, MOX::_multi_colored_line_start);
+        } else if ((MOX::_g_ship_move_info.field0_0x0 != 0 || MOX::_g_ship_move_info.field13_0xd != 0) ||
+                 (MOX::_g_ship_move_info.field6_0x6 != 0 && MOX::_g_ship_move_info.field2_0x2 == 0)) {
+            *reinterpret_cast<uint32_t*>(&color_buffer[0]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_green_colors[0]);
+            *reinterpret_cast<uint32_t*>(&color_buffer[4]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_green_colors[4]);
+
+            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, color_buffer, MOX::_multi_colored_line_start);
+        }
+    }
+
     void __cdecl Draw_Main_Main_Screen_() {
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
@@ -434,10 +471,10 @@ namespace MAINSCR {
         }
 
         if (has_artemis) {
-            void* artemis_pic = Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
-            MOX::gate_artemis_icons[zoom_offset] = static_cast<s_animation_header*>(artemis_pic);
+            s_animation_header* artemis_pic = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
+            MOX::gate_artemis_icons[zoom_offset] = artemis_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[icon_count], artemis_pic);
-            int16_t h = animate::Get_Height_((s_animation_header*)artemis_pic);
+            int16_t h = animate::Get_Height_(artemis_pic);
             if (h > max_icon_height) {
                 max_icon_height = h;
             }

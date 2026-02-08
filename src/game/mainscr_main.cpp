@@ -930,4 +930,132 @@ namespace MAINSCR {
         _already_faded_into_main_screen = 0;
         MOX::_reloaded_ship_palette = 0;
     }
+
+    void __cdecl Draw_Main_Screen_() {
+        if (MOX::_stencil_box_id <= 4) {
+            Draw_Main_Screen_While_Moving_Boxes_();
+            video::Clip_Off_();
+            graphics::Reset_Window_();
+        }
+        else {
+            graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
+            video::Clip_On_();
+
+            if (MOX::_draw_main_screen_to_back == 1 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                Draw_Main_Screen_Filled_(1);
+                MOX::_draw_main_screen_to_back = 0;
+            }
+            else {
+                Draw_Wormhole_Links_();
+                Draw_Relocation_Links_();
+                Print_Star_Names_();
+            }
+
+            graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
+            video::Clip_On_();
+
+            if (MOX::_settings.end_of_turn_wait != 0) {
+                s_colors colors = { {0, 10, 12, 14, 16, 18, 20, 22} };
+                char text_buffer[80];
+                int32_t stardate = (int32_t)MOX::_stardate;
+                const char* format = HAROLD::H_Message_(0xDA);
+
+                _sprintf(text_buffer, format, stardate / 10, stardate % 10);
+
+                fonts::Set_Font_Style_(1, &colors);
+                fonts::Print_Right_(0x27F, 0, text_buffer);
+            }
+
+            Draw_Black_Holes_();
+            Draw_Gate_Icons_();
+            SHIPS::Do_Ship_Destination_Lines_();
+
+            if ((int16_t)MOX::_eta_star_id > -1 && (int16_t)MOX::_fleet_ship_scanned == -1) {
+                Draw_ETA_Destination_Line_();
+                Highlight_Star_((int16_t)MOX::_eta_star_id);
+            }
+
+            if (_main_screen_scanned_star != -1) {
+                Highlight_Star_(_main_screen_scanned_star);
+            }
+
+            Draw_Stars_();
+            Draw_Ship_Icons_(false);
+
+            if (Mouse_Button_() == 1) {
+                if (MOVEBOX::Moveable_Box_Selected_(2)) {
+                    if (FLEETPOP::Can_Select_Fleet_Box_Ship_(0) && MOVEBOX::Mouse_Within_Fleet_Box_()) {
+                        int16_t scanned_field = fields::Scan_Input_();
+                        if (scanned_field != MOX::_moveable_box[2].field8_0xe) {
+                            if (_mouse_btn_pressed == 0) {
+                                _fltpop_field_selection_status = (FLEETPOP::Icon_Selection_Status_(scanned_field) == 0);
+                            }
+                            Set_Painted_Fleet_Fields_(scanned_field);
+                        }
+                        _mouse_btn_pressed = 1;
+                    }
+                }
+            }
+
+            for (int16_t i = 4; i >= 0; --i) {
+                int16_t box_id = MOX::_moveable_box_order[i];
+                if (MOVEBOX::Moveable_Box_Selected_(box_id)) {
+                    if (box_id == 0) {
+                        Highlight_Star_(MOX::_moveable_box[0].off_flag);
+                    }
+                    if (box_id == 2) {
+                        Draw_Fleet_Box_Selected_Ship_Seg_();
+                    }
+                }
+            }
+
+            if (_main_screen_ship_icon_scanned > -1 && _main_screen_ship_icon_scanned < MOX::_ship_icon_count) {
+                Draw_Scanned_Ship_Seg_();
+            }
+
+            for (int16_t i = 4; i >= 0; --i) {
+                int16_t box_id = MOX::_moveable_box_order[i];
+                if (MOVEBOX::Moveable_Box_Selected_(box_id) && box_id != (int16_t)MOX::_stencil_box_id) {
+                    int16_t btn = Mouse_Button_();
+                    if (btn != 0) {
+                        int16_t target_field = MOX::_moveable_box[box_id].field8_0xe;
+                        if (target_field == fields::Auto_Input_() || MOX::_moveable_box[box_id].field6_0xc == 1) {
+                            MOVEBOX::Move_Moveable_Box_(box_id, btn);
+                        }
+                    }
+                    MOVEBOX::Draw_Moveable_Box_(box_id);
+                }
+            }
+
+            if ((int16_t)MOX::_galaxy_map_scanned_star > -1 && (int16_t)MOX::_galaxy_map_scanned_star < MOX::_NUM_STARS) {
+                Print_Galaxy_Map_Scanned_Star_();
+            }
+
+            video::Clip_Off_();
+            graphics::Reset_Window_();
+            Print_Main_Screen_Data_();
+
+            int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
+            MOX::_multi_colored_line_start = (int16_t)(next_idx % 8);
+        }
+
+        if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+            Draw_Diplomacy_Request_Lights_();
+        }
+        if (MOX::_game_type == 1 || MOX::_game_type == 2 || MOX::_game_type == 3) {
+            Draw_Player_Done_Lights_();
+        }
+
+        Check_Mouse_XY_Fields_();
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MOX::_skip_fields = 1;
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+
+        MOX::_red_color_pulse_value += MOX::_red_color_pulse_incr;
+        if (MOX::_red_color_pulse_value == 0 || MOX::_red_color_pulse_value == 8) {
+            MOX::_red_color_pulse_incr = -MOX::_red_color_pulse_incr;
+        }
+    }
 }

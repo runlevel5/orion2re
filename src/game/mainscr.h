@@ -41,10 +41,7 @@ namespace MAINSCR {
 
     bool __cdecl Is_Main_Screen_Palette_();
 
-    inline void __cdecl Draw_Main_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C5E20})();
-    }
+    void __cdecl Draw_Main_Screen_();
 
     void __cdecl Main_Screen_();
 
@@ -58,6 +55,9 @@ namespace MAINSCR {
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
+    inline uint8_t (&_ship_direction_line_red_colors)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00559830});
+    inline uint8_t (&_ship_direction_line_green_colors)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00559838});
+    inline uint8_t& _fltpop_field_selection_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CECC});
     inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
     inline s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
 
@@ -123,7 +123,14 @@ namespace MAINSCR {
 
     void __cdecl Print_Star_Names_();
 
+    void __cdecl Draw_ETA_Destination_Line_();
+
     void __cdecl Draw_Diplomacy_Request_Lights_();
+
+    inline void __cdecl Draw_Player_Done_Lights_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C6B40})();
+    }
 
     void __cdecl Draw_Main_Screen_Filled_(int16_t should_copy_to_back);
 
@@ -197,6 +204,41 @@ namespace MAINSCR {
     inline void __cdecl Do_Fleet_Popup_(int16_t id, int8_t flag) {
         using Fn = void(__cdecl*)(int16_t, int8_t);
         reinterpret_cast<Fn>(0x004C9740)(id, flag);
+    }
+
+    inline int16_t __cdecl Mouse_Button_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00527680})();
+    }
+
+    inline void __cdecl Set_Painted_Fleet_Fields_(int16_t field) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004CD040})(field);
+    }
+
+    inline void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C6430})();
+    }
+
+    inline void __cdecl Draw_Scanned_Ship_Seg_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C6DA0})();
+    }
+
+    inline void __cdecl Print_Galaxy_Map_Scanned_Star_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004CA210})();
+    }
+
+    inline void __cdecl Draw_Main_Screen_While_Moving_Boxes_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C6690})();
+    }
+
+    inline void __cdecl Check_Mouse_XY_Fields_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C61D0})();
     }
 
     inline int16_t __cdecl Scan_System_Display_Fields_(int16_t key, int16_t scan, int16_t* p3, int16_t* p4, int16_t* p5, int16_t* p6, int16_t* p7, int16_t* p8) {

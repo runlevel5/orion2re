@@ -248,6 +248,43 @@ namespace fields {
         return current_id;
     }
 
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, void* highlight_color, char hotkey) {
+        char error_msg[80];
+        // The original code manually copies the error message into a local buffer.
+        for (int i = 0; i < 11; ++i) {
+            reinterpret_cast<uint32_t*>(error_msg)[i] = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields)[i];
+        }
+        for (int i = 0; i < 9; ++i) {
+            reinterpret_cast<uint32_t*>(error_msg + 44)[i] = 0;
+        }
+
+        if (animate::_clipping_flag == 1) {
+            int16_t width = animate::Get_Width_(pic);
+            int16_t height = animate::Get_Height_(pic);
+
+            if (x < video::_screen_window_x1 || 
+                (x + width) > video::_screen_window_x2 || 
+                y < video::_screen_window_y1 || 
+                (y + height) > video::_screen_window_y2) 
+            {
+                return -1000;
+            }
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        Add_Button_Info_(x, y, help, pic, (const char*)highlight_color, (int16_t)hotkey);
+
+        _fields[_fields_count].field_type = FIELD_TYPE_BUTTON;
+        
+        int16_t current_index = _fields_count;
+        _fields_count++;
+
+        return current_index;
+    }
+
     int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t help_start, int16_t help_end, const char* hotkey_ptr, int16_t sound) {
         if (_fields_count > _max_fields_count) {
             char error_buffer[80];

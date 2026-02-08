@@ -50,4 +50,16 @@ namespace FLEETPOP {
     }
 
     void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
+
+    inline int8_t __cdecl Can_Select_Fleet_Box_Ship_(int32_t param_1) {
+        using Fn = int8_t(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406750});
+        return fn(param_1);
+    }
+
+    inline uint32_t __cdecl Icon_Selection_Status_(int16_t field) {
+        using Fn = uint32_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406610});
+        return fn(field);
+    }
 }

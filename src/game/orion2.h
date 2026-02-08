@@ -2029,15 +2029,14 @@ struct s_movable_box {
     undefined2 width;
     int16_t x;
     int16_t y;
-    undefined field6_0xc;
-    undefined field7_0xd;
-    short field8_0xe;
-    short field9_0x10;
-    short field10_0x12;
-    int16_t field11_0x14;
-    int16_t field12_0x16;
-    undefined2 field13_0x18;
-    undefined2 field14_0x1a;
+    short active;
+    short field;
+    short field8_0x10;
+    short field9_0x12;
+    int16_t field10_0x14;
+    int16_t field11_0x16;
+    undefined2 field12_0x18;
+    undefined2 field13_0x1a;
 };
 
 typedef struct s_MSG s_MSG, *Ps_MSG;
@@ -3220,6 +3219,7 @@ typedef enum SCREEN {
     SCREEN_GAME=8,
     SCREEN_INFO=9,
     SCREEN_MAIN_MENU=10,
+    SCREEN_UNK2=11,
     SCREEN_MAIN_NEXT_TURN=12,
     SCREEN_NEW_GAME=13,
     SCREEN_HALL_OF_FAME=14,
@@ -3290,20 +3290,20 @@ typedef enum SYSTEM_SPECIAL {
 } SYSTEM_SPECIAL;
 
 typedef enum WEAPON_MOD_FLAG {
-    NO_MODS=1,
-    HEAVY_MOUNT=2,
-    POINT_DEFENCE=4,
-    ARMOR_PIERCING=8,
-    CONTINUOUS=16,
-    NO_RANGE_DISSIPATION=32,
-    SHIELD_PIERCING=64,
-    AUTO_FIRE=128,
-    ENVELOPING=256,
-    MIRV=512,
-    ECCM=1024,
-    HEAVILY_ARMORED=2048,
-    FAST=4096,
-    EMISSION_GUIDANCE=8192,
-    OVERLOADED=16384
+    WEAPON_MOD_FLAG_NO_MODS=1,
+    WEAPON_MOD_FLAG_HEAVY_MOUNT=2,
+    WEAPON_MOD_FLAG_POINT_DEFENCE=4,
+    WEAPON_MOD_FLAG_ARMOR_PIERCING=8,
+    WEAPON_MOD_FLAG_CONTINUOUS=16,
+    WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION=32,
+    WEAPON_MOD_FLAG_SHIELD_PIERCING=64,
+    WEAPON_MOD_FLAG_AUTO_FIRE=128,
+    WEAPON_MOD_FLAG_ENVELOPING=256,
+    WEAPON_MOD_FLAG_MIRV=512,
+    WEAPON_MOD_FLAG_ECCM=1024,
+    WEAPON_MOD_FLAG_HEAVILY_ARMORED=2048,
+    WEAPON_MOD_FLAG_FAST=4096,
+    WEAPON_MOD_FLAG_EMISSION_GUIDANCE=8192,
+    WEAPON_MOD_FLAG_OVERLOADED=16384
 } WEAPON_MOD_FLAG;
 

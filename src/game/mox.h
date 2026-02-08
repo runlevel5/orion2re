@@ -74,6 +74,7 @@ namespace MOX {
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
+    inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
     inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
     inline uint16_t& _galaxy_map_scanned_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
@@ -289,6 +290,10 @@ namespace MOX {
     inline s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B30});
     inline s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});
+
+    inline int8_t (&_ship_icon_width)[4] = *reinterpret_cast<int8_t(*)[4]>(std::uintptr_t{0x005a49ec});
+    inline int8_t (&_ship_icon_height)[4] = *reinterpret_cast<int8_t(*)[4]>(std::uintptr_t{0x0059c460});
+    inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059c440});
 
     inline s_star_data*& _star =
         *reinterpret_cast<s_star_data**>(std::uintptr_t{ 0x005A18F4 });

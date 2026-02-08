@@ -29,9 +29,20 @@ namespace SHIPS {
         fn(icon_id, x, y);
     }
 
+    inline void __cdecl Get_Ship_Icon_Dimensions_(int32_t scale, int8_t* width, int8_t* height) {
+        using Fn = void(__cdecl*)(int32_t, int8_t*, int8_t*);
+        reinterpret_cast<Fn>(0x0041fef0)(scale, width, height);
+    }
+
     inline s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t owner, uint8_t flag) {
         using Fn = s_animation_header*(__cdecl*)(int16_t, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f200});
         return fn(owner, flag);
+    }
+
+    inline void __cdecl Do_Ship_Destination_Lines_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041EC60});
+        fn();
     }
 }

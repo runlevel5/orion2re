@@ -27,4 +27,22 @@ namespace MOVEBOX {
     }
 
     void __cdecl Move_Box_To_Top_(int16_t box_id);
+
+    inline int8_t __cdecl Mouse_Within_Fleet_Box_() {
+        using Fn = int8_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513E10});
+        return fn();
+    }
+
+    inline void __cdecl Move_Moveable_Box_(int16_t box_id, int16_t mouse_btn) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513740});
+        fn(box_id, mouse_btn);
+    }
+
+    inline void __cdecl Draw_Moveable_Box_(int16_t box_id) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513440});
+        fn(box_id);
+    }
 }
