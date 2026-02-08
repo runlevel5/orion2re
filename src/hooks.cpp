@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
     static constexpr hook all_hooks[] = {

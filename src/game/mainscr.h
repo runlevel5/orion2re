@@ -187,8 +187,8 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(0x004C9410)(x, y, flag);
     }
 
-    inline int16_t __cdecl Get_Mouse_Field_(int8_t type, int16_t* out1, int16_t* out2) {
-        using Fn = int16_t(__cdecl*)(int8_t, int16_t*, int16_t*);
+    inline int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out1, int16_t* out2) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t*);
         return reinterpret_cast<Fn>(0x004C9F20)(type, out1, out2);
     }
 

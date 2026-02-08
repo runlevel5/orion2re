@@ -110,10 +110,10 @@ namespace HAROLD {
         fn();
     }
 
-    inline void __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int unknown) {
-        using Fn = void(__cdecl*)(uint8_t*, const char*, int);
+    inline short __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int unknown) {
+        using Fn = short(__cdecl*)(uint8_t*, const char*, int);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1B50});
-        fn(screen_ptr, message, unknown);
+        return fn(screen_ptr, message, unknown);
     }
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);

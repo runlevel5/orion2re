@@ -1493,7 +1493,7 @@ namespace MAINSCR {
 
         video::Set_Refresh_Stencil_();
         MOX::_draw_main_screen_to_back = 1;
-        boxes_saved_flag = 0;
+        icon_selected_flag = 0;
         MOX::_zoom_count = HAROLD::Map_Scale_To_Zoom_Level_();
         exit_flag = 0;
         
@@ -1634,6 +1634,8 @@ namespace MAINSCR {
                 MOX::_mouse_XY.field2_0x4 = -1;
             }
 
+            bool process_star_eta = false;
+
             if (MOX::_skip_fields == 0) {
                 icon_selected_flag = 0;
 
@@ -1641,54 +1643,60 @@ namespace MAINSCR {
                 _main_screen_scanned_star = mouse_field_1;
 
                 if ((mouse_status == 0 || mouse_status == 4) && MOVEBOX::Moveable_Box_Selected_(2)) {
-                    if (FLEETPOP::Some_Icon_Selected_()) {
-                        icon_selected_flag = 1;
-                    }
+                    icon_selected_flag = FLEETPOP::Some_Icon_Selected_();
                 }
 
-                if (mouse_status == 0) { // Star field
-                     if (MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE && _merging_relocations != 0) {
-                        _merging_relocations = 0;
-                        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
-                        HACCESS::Set_All_Star_Relocations_(mouse_field_2, MOX::_PLAYER_NUM);
+                if (mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE && _merging_relocations != 0) {
+                    _merging_relocations = 0;
+                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    HACCESS::Set_All_Star_Relocations_(mouse_field_2, MOX::_PLAYER_NUM);
                         
-                        const char* msg = HAROLD::H_Message_(HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI);
-                        _sprintf(text_buffer, msg, &MOX::_star[mouse_field_2]);
-                        HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, text_buffer, 0);
-                     } else {
-                        if (mouse_field_2 >= 0) {
-                             if (!icon_selected_flag) {
-                                 int16_t colony_idx = -1;
-                                 if (MOX::_settings.auto_select_colony && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                                     colony_idx = HACCESS::Last_Colony_Selected_(mouse_field_2, MOX::_PLAYER_NUM);
-                                 }
-                                 if (colony_idx == -1) {
-                                     MAINSCR::Do_System_Popup_(mouse_field_2);
-                                 } else {
-                                     MAINSCR::Do_Colony_Screen_(colony_idx, &boxes_saved_flag);
-                                 }
-                             }
+                    const char* msg = HAROLD::H_Message_(HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI);
+                    _sprintf(text_buffer, msg, &MOX::_star[mouse_field_2]);
+                    HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, text_buffer, 0);
+                }
+                else {
+                    if (mouse_status == 0 && mouse_field_2 >= 0) {
+                        if (!icon_selected_flag) {
+                            int16_t colony_idx = -1;
+                            if (MOX::_settings.auto_select_colony && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                                colony_idx = HACCESS::Last_Colony_Selected_(mouse_field_2, MOX::_PLAYER_NUM);
+                            }
+                            if (colony_idx == -1) {
+                                MAINSCR::Do_System_Popup_(mouse_field_2);
+                            }
+                            else {
+                                MAINSCR::Do_Colony_Screen_(colony_idx, &exit_flag);
+                            }
                         }
-                     }
+                        else {
+                            process_star_eta = true;
+                        }
+                    }
+                    else {
+                        process_star_eta = true;
+                    }
                 }
                 
                 // Icon selected processing
                 if (icon_selected_flag) {
+                    process_star_eta = true;
+                }
+
+                if (process_star_eta) {
                     bool valid_target = false;
-                    if (mouse_field_2 >= 0 && mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
-                        if (mouse_status == 4 && MOVEBOX::Moveable_Box_Selected_(2)) {
+                    if (mouse_field_2 < 0 || mouse_status != 0 || MOX::_star[mouse_field_2].spectral_class == STAR_CLASS_BLACK_HOLE) {
+                        if (icon_selected_flag && mouse_status != 0 && MOVEBOX::Moveable_Box_Selected_(2)) {
                             MOX::_fleet_ship_scanned = -1;
                             if (MOX::_star[mouse_field_1].spectral_class == STAR_CLASS_BLACK_HOLE) {
                                 MOX::_eta_star_id = -1;
                             }
                             else {
                                 MOX::_eta_star_id = mouse_field_1;
-                                valid_target = true;
                             }
                         }
-                        else {
-                            valid_target = true;
-                        }
+                    } else {
+                        valid_target = true;
                     }
 
                     if (valid_target) {
@@ -1741,14 +1749,6 @@ namespace MAINSCR {
                             MOX::_first_node_ptr_in_stack_ = -1;
                         }
                     }
-                } else if (mouse_status == 4 && MOVEBOX::Moveable_Box_Selected_(2)) {
-                     // ETA check logic when dragging over stars
-                     MOX::_fleet_ship_scanned = -1;
-                     if (MOX::_star[mouse_field_1].spectral_class == STAR_CLASS_BLACK_HOLE) {
-                         MOX::_eta_star_id = -1;
-                     } else {
-                         MOX::_eta_star_id = mouse_field_1;
-                     }
                 }
             }
             
@@ -1788,7 +1788,7 @@ namespace MAINSCR {
                 }
             }
 
-            MAINSCR::Scan_Moveable_Box_Fields(MOX::_skip_fields, input, mouse_input, (uint16_t*)&boxes_saved_flag);
+            MAINSCR::Scan_Moveable_Box_Fields(MOX::_skip_fields, input, mouse_input, (uint16_t*)&exit_flag);
             
             if (MOX::_skip_fields == 0) {
                 int field_res = MAINSCR::Get_Mouse_Field_(1, &mouse_field_1, &mouse_field_2);
@@ -1800,8 +1800,8 @@ namespace MAINSCR {
                     MAINSCR::Do_Fleet_Popup_(mouse_field_2, 1);
                 }
                 
-                MAINSCR::Check_Function_Keys_(input, &boxes_saved_flag);
-                MAINSCR::Check_Hot_Keys_(input, (int)&boxes_saved_flag);
+                MAINSCR::Check_Function_Keys_(input, &exit_flag);
+                MAINSCR::Check_Hot_Keys_(input, (int)&exit_flag);
             }
 
             if (input == _exit_game_hot_key && MOX::_skip_fields == 0) {
@@ -1818,7 +1818,7 @@ namespace MAINSCR {
 
             if (MOX::_skip_fields == 0 && MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10 && input == -0x455) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                    LOADSAVE::Auto_Save_Last_Saved_Game_(&boxes_saved_flag);
+                    LOADSAVE::Auto_Save_Last_Saved_Game_(&exit_flag);
                 } else {
                     const char* msg = HAROLD::H_Message_(0x20);
                     helpers::strcpy(msg_buffer, msg);
@@ -1827,7 +1827,7 @@ namespace MAINSCR {
             }
             
             if (MOX::_skip_fields == 0 && MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10 && input == -0x456) {
-                LOADSAVE::Auto_Load_Last_Saved_Game_(&boxes_saved_flag);
+                LOADSAVE::Auto_Load_Last_Saved_Game_(&exit_flag);
             }
 
             if (input == _fleets_button && MOX::_skip_fields == 0) {
@@ -1860,7 +1860,7 @@ namespace MAINSCR {
                 MOX::_auto_turn_exit = 0;
                 _next_turn_hit = 1;
                 MOX::_global_exit_field = -1000;
-                MAINSCR::Do_Next_Turn_(&boxes_saved_flag, 0);
+                MAINSCR::Do_Next_Turn_(&exit_flag, 0);
             }
 
             if (input == _races_button && MOX::_skip_fields == 0) {
@@ -1955,7 +1955,6 @@ namespace MAINSCR {
                     if (boxes_saved_flag == 0) {
                         MOVEBOX::Save_And_Remove_Boxes_();
                     }
-                    boxes_saved_flag++;
                     
                     if (MOX::_zoom_in == 0) {
                         fields::Deactivate_Help_List_();
