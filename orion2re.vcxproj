@@ -145,6 +145,7 @@
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\random.h" />
     <ClInclude Include="src\game\regions.h" />
+    <ClInclude Include="src\game\remap.h" />
     <ClInclude Include="src\game\report.h" />
     <ClInclude Include="src\game\russ.h" />
     <ClInclude Include="src\game\shipmove.h" />

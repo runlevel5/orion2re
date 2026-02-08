@@ -164,4 +164,65 @@ namespace DESIGN {
     int16_t __cdecl N_Replacements_For_Generic_Item_(int16_t item_type);
 
     bool __cdecl Replacement_Exists_(int16_t application_type);
+
+    inline int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_app_id) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431FB0 })(player_idx, tech_app_id);
+    }
+
+    inline int16_t __cdecl Shield_Base_Cost_(int16_t shield_type) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431B10 })(shield_type);
+    }
+
+    inline int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t tech_level) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0042E2B0 })(base_cost, tech_level);
+    }
+
+    inline int16_t __cdecl Base_Computer_Cost_(int16_t computer_type) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0042E270 })(computer_type);
+    }
+
+    inline int32_t __cdecl Weapon_Cost_(int16_t type, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00432620 })(type, count, arc, ammo, specials);
+    }
+
+
+    inline uint32_t __cdecl Miniaturization_Category_(int16_t tech_app) {
+        using Fn = uint32_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00432BC0 })(tech_app);
+    }
+
+    inline int32_t __cdecl Space_Given_M_Level_(int16_t base_space, int16_t tech_level, uint8_t min_cat) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, uint8_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431E60 })(base_space, tech_level, min_cat);
+    }
+
+    inline int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00431B90 })(shield_type, ship_size, player_num);
+    }
+
+    inline int16_t __cdecl Weapon_Rack_Size_(uint16_t rack_idx) {
+        using Fn = int16_t(__cdecl*)(uint16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00432c90 })(rack_idx);
+    }
+
+    inline void __cdecl Bonus_For_Special_Mods_(uint16_t weapon_mods, int16_t* out_bonus_1, int16_t* out_bonus_2) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00430730 })(weapon_mods, out_bonus_1, out_bonus_2);
+    }
+
+    inline int16_t __cdecl Get_Weapon_Mod_Space_Bonus_(uint16_t special_mods) {
+        using Fn = int16_t(__cdecl*)(uint16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004307b0 })(special_mods);
+    }
+
+    inline void __cdecl Bonus_For_Regular_Mods_(uint16_t weapon_mods, int16_t* out_bonus_1, int16_t* out_bonus_2) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x004304c0 })(weapon_mods, out_bonus_1, out_bonus_2);
+    }
 }

@@ -91,8 +91,8 @@ namespace HAROLD {
         reinterpret_cast<Fn>(std::uintptr_t{0x004F0E20})();
     }
 
-    inline uint16_t __cdecl Get_Map_Scale_(int16_t count) {
-        using Fn = uint16_t(__cdecl*)(int16_t);
+    inline int16_t __cdecl Get_Map_Scale_(int16_t count) {
+        using Fn = int16_t(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004F0880})(count);
     }
 

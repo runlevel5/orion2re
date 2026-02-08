@@ -14,6 +14,12 @@ namespace GEO {
     int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
     int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
+    inline int16_t __cdecl Collect_Black_Holes_(int16_t* star_indices) {
+        using Fn = int16_t(__cdecl*)(int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004127F0 });
+        return fn(star_indices);
+    }
+
     inline bool __cdecl Map_Is_Connected_() {
         using Fn = bool(__cdecl*)();
         return reinterpret_cast<Fn>(0x00412F40)();

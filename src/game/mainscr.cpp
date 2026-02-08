@@ -1611,7 +1611,7 @@ namespace MAINSCR {
             }
 
             int16_t mouse_input = fields::Scan_Input_();
-            if (MOX::_main_screen_grid_field == input || (MOX::_main_screen_grid_field + input == 0)) {
+            if (MOX::_main_screen_grid_field == input || (-MOX::_main_screen_grid_field == input)) {
                 int mx = mouse::Pointer_X_();
                 int my = mouse::Pointer_Y_();
                 int box_mode = (input <= 0) + 1;
@@ -1947,118 +1947,113 @@ namespace MAINSCR {
             }
             
             // Zoom Logic
-            bool zoom_changed = false;
             if ((input == _zoom_out_button && MOX::_cur_map_scale < MOX::_max_map_scale) ||
                 (input == _zoom_in_button && MOX::_cur_map_scale > 10)) {
-                
-                if (MOX::_skip_fields == 0) {
-                    if (boxes_saved_flag == 0) {
-                        MOVEBOX::Save_And_Remove_Boxes_();
-                    }
-                    
-                    if (MOX::_zoom_in == 0) {
-                        fields::Deactivate_Help_List_();
-                        MOX::_zoom_in = 1;
-                        palette::Set_Palette_Changes_(0, 0xff);
-                        remap::Update_Glass_Remap_Colors_();
-                        video::Set_Refresh_Full_();
-                        video::Set_Page_Off_();
-                        MAINSCR::Draw_Mini_Main_Screen_();
-                        allocate::Push_Block_(MOX::_screen_seg);
-                        uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(0x1fb, 0x191);
-                        _temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
-                        bitmap::Screen_Bitmap_Capture_(0x16, 0x16, 0x20f, 0x1a5, _temp_bitmap);
-                        allocate::Pop_Block_(MOX::_screen_seg);
-                        MISC::_Darken_Fill_(0x16, 0x16, 0x20f, 0x1a5);
-                        video::Copy_Off_To_Back_();
-                        video::Set_Refresh_Stencil_();
-                        fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_For_Zooming_, 1);
-                    }
-                    
-                    MOX::_zoom_in = 1;
-                    fields::Clear_Fields_Above_(_last_field);
-                    MAINSCR::Add_Map_Fields_();
-                    mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_zoom_mode, 5);
-                    
-                    if (input == _zoom_out_button) {
-                        HAROLD::Decrement_Zoom_Count_();
-                    } else {
-                        HAROLD::Increment_Zoom_Count_();
-                    }
-                    
-                    MOX::_draw_main_screen_to_back = 1;
-                    zoom_changed = true;
-                }
+                Clear_Twinkling_Star_Data_();
+                fields::Deactivate_Help_List_();
             }
-            
-            if (!zoom_changed) {
-                if (input == _zoom_out_button && MOX::_zoom_in == 1 && MOX::_skip_fields == 0) {
-                    if (HAROLD::Increment_Zoom_Count_With_Limit_() == 0) {
-                        MAINSCR::Exit_Zooming_Mode_(&boxes_saved_flag);
-                    }
-                } else if (input == _zoom_in_button && MOX::_cur_map_scale < MOX::_max_map_scale && MOX::_skip_fields == 0) {
-                    // Manually handle zoom in calculation (similar to assembly block 004c8746)
-                    // This seems to be inverse zoom or specific zoom step logic
-                    int old_x = MOX::_cur_map_x;
-                    int old_y = MOX::_cur_map_y;
-                    int z1 = HAROLD::Map_Scale_To_Zoom_Level_();
-                    HAROLD::Increment_Zoom_Count_();
-                    MOX::_cur_map_scale = HAROLD::Get_Map_Scale_(MOX::_zoom_count);
-                    int z2 = HAROLD::Map_Scale_To_Zoom_Level_();
-                    
-                    // Centering logic
-                    int diff_w = (z1 - z2) * 0x1fa;
-                    MOX::_cur_map_x += (diff_w + ((diff_w < 0) ? 3 : 0)) / 4;
-                    
-                    int diff_h = (z1 - z2) * 400;
-                    MOX::_cur_map_y += (diff_h + ((diff_h < 0) ? 3 : 0)) / 4;
-                    
-                    // Boundaries
-                    int scale_diff = MOX::_max_map_scale - MOX::_cur_map_scale;
-                    int max_x = (scale_diff * 0x1fa) / 10;
-                    int max_y = (scale_diff * 400) / 10;
-                    
-                    if (max_x < MOX::_cur_map_x) MOX::_cur_map_x = max_x;
-                    if (max_y < MOX::_cur_map_y) MOX::_cur_map_y = max_y;
-                    if (MOX::_cur_map_x < 0) MOX::_cur_map_x = 0;
-                    if (MOX::_cur_map_y < 0) MOX::_cur_map_y = 0;
-                    if (MOX::_max_map_scale == MOX::_cur_map_scale) {
-                        MOX::_cur_map_x = 0;
-                        MOX::_cur_map_y = 0;
-                    }
-                    
-                    int limit_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
-                    if (limit_x < MOX::_cur_map_x) {
-                        MOX::_cur_map_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
-                    }
-                    
-                    int limit_y = MOX::_MAP_MAX_Y - HAROLD::Get_Upscaled_Value_(400);
-                    if (limit_y < MOX::_cur_map_y) {
-                        MOX::_cur_map_y = limit_y;
-                    }
-                    
-                    MOX::_draw_main_screen_to_back = 1;
-                    MAINSCR::Get_New_Paralax_XYs_(MOX::_cur_map_x - old_x, MOX::_cur_map_y - old_y, 1);
-                } else if (input == MAINSCR::_whole_screen_field && MOX::_zoom_in == 1 && MOX::_skip_fields == 0) {
-                     MOVEBOX::Restore_Boxes_();
-                     boxes_saved_flag = 0;
-                     MOX::_zoom_in = 0;
-                     EVANHELP::Set_Main_Game_Screen_Help_List_();
-                     mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
-                     fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
-                     
-                     MOX::_cur_map_x += HAROLD::Get_Upscaled_Value_(_zoom_box_x - 0x15);
-                     MOX::_cur_map_y += HAROLD::Get_Upscaled_Value_(_zoom_box_y - 0x15);
-                     MOX::_cur_map_scale = HAROLD::Get_Map_Scale_(MOX::_zoom_count);
-                     
-                     MOX::_far_star_x = 0x16; MOX::_mid_star_x = 0x16; MOX::_near_star_x = 0x16;
-                     MOX::_far_star_y = 0x16; MOX::_mid_star_y = 0x16; MOX::_near_star_y = 0x16;
-                     MOX::_draw_main_screen_to_back = 1;
+                
+            if (input == _zoom_in_button && MOX::_cur_map_scale > 10 && MOX::_skip_fields == 0) {
+                if (boxes_saved_flag == 0) {
+                    MOVEBOX::Save_And_Remove_Boxes_();
                 }
+                boxes_saved_flag += 1;
+                    
+                if (MOX::_zoom_in == 0) {
+                    fields::Deactivate_Help_List_();
+                    MOX::_zoom_in = 1;
+                    palette::Set_Palette_Changes_(0, 0xff);
+                    remap::Update_Glass_Remap_Colors_();
+                    video::Set_Refresh_Full_();
+                    video::Set_Page_Off_();
+                    MAINSCR::Draw_Mini_Main_Screen_();
+                    allocate::Push_Block_(MOX::_screen_seg);
+                    uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(0x1fb, 0x191);
+                    _temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+                    bitmap::Screen_Bitmap_Capture_(0x16, 0x16, 0x20f, 0x1a5, _temp_bitmap);
+                    allocate::Pop_Block_(MOX::_screen_seg);
+                    MISC::_Darken_Fill_(0x16, 0x16, 0x20f, 0x1a5);
+                    video::Copy_Off_To_Back_();
+                    video::Set_Refresh_Stencil_();
+                    fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_For_Zooming_, 1);
+                }
+                    
+                MOX::_zoom_in = 1;
+                fields::Clear_Fields_Above_(_last_field);
+                MAINSCR::Add_Map_Fields_();
+                mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_zoom_mode, 5);
+                    
+                HAROLD::Decrement_Zoom_Count_();
+                    
+                MOX::_draw_main_screen_to_back = 1;
+            } else
+            if (input == _zoom_out_button && MOX::_zoom_in == 1 && MOX::_skip_fields == 0) {
+                if (HAROLD::Increment_Zoom_Count_With_Limit_() == 0) {
+                    MAINSCR::Exit_Zooming_Mode_(&boxes_saved_flag);
+                }
+            } else
+            if (input == _zoom_out_button && MOX::_cur_map_scale < MOX::_max_map_scale && MOX::_skip_fields == 0) {
+                int old_x = MOX::_cur_map_x;
+                int old_y = MOX::_cur_map_y;
+                int z1 = HAROLD::Map_Scale_To_Zoom_Level_();
+                HAROLD::Increment_Zoom_Count_();
+                MOX::_cur_map_scale = HAROLD::Get_Map_Scale_(MOX::_zoom_count);
+                int z2 = HAROLD::Map_Scale_To_Zoom_Level_();
+                    
+                // Centering logic
+                int diff_w = (z1 - z2) * 0x1fa;
+                MOX::_cur_map_x += (diff_w + ((diff_w < 0) ? 3 : 0)) / 4;
+                    
+                int diff_h = (z1 - z2) * 400;
+                MOX::_cur_map_y += (diff_h + ((diff_h < 0) ? 3 : 0)) / 4;
+                    
+                // Boundaries
+                int scale_diff = MOX::_max_map_scale - MOX::_cur_map_scale;
+                int max_x = (scale_diff * 0x1fa) / 10;
+                int max_y = (scale_diff * 400) / 10;
+                    
+                if (max_x < MOX::_cur_map_x) MOX::_cur_map_x = max_x;
+                if (max_y < MOX::_cur_map_y) MOX::_cur_map_y = max_y;
+                if (MOX::_cur_map_x < 0) MOX::_cur_map_x = 0;
+                if (MOX::_cur_map_y < 0) MOX::_cur_map_y = 0;
+                if (MOX::_max_map_scale == MOX::_cur_map_scale) {
+                    MOX::_cur_map_x = 0;
+                    MOX::_cur_map_y = 0;
+                }
+                    
+                int limit_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
+                if (limit_x < MOX::_cur_map_x) {
+                    MOX::_cur_map_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
+                }
+                    
+                int limit_y = MOX::_MAP_MAX_Y - HAROLD::Get_Upscaled_Value_(400);
+                if (limit_y < MOX::_cur_map_y) {
+                    MOX::_cur_map_y = limit_y;
+                }
+                    
+                MOX::_draw_main_screen_to_back = 1;
+                MAINSCR::Get_New_Paralax_XYs_(MOX::_cur_map_x - old_x, MOX::_cur_map_y - old_y, 1);
+            } else    
+            if (input == _whole_screen_field && MOX::_zoom_in == 1 && MOX::_skip_fields == 0) {
+                    MOVEBOX::Restore_Boxes_();
+                    boxes_saved_flag = 0;
+                    MOX::_zoom_in = 0;
+                    EVANHELP::Set_Main_Game_Screen_Help_List_();
+                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
+                     
+                    MOX::_cur_map_x += HAROLD::Get_Upscaled_Value_(_zoom_box_x - 0x15);
+                    MOX::_cur_map_y += HAROLD::Get_Upscaled_Value_(_zoom_box_y - 0x15);
+                    MOX::_cur_map_scale = HAROLD::Get_Map_Scale_(MOX::_zoom_count);
+                     
+                    MOX::_far_star_x = 0x16; MOX::_mid_star_x = 0x16; MOX::_near_star_x = 0x16;
+                    MOX::_far_star_y = 0x16; MOX::_mid_star_y = 0x16; MOX::_near_star_y = 0x16;
+                    MOX::_draw_main_screen_to_back = 1;
             }
             
             // Scroll map logic
-            if (MOX::_main_screen_grid_field + input != 0 && MOX::_skip_fields == 0 && MOX::_max_map_scale != MOX::_cur_map_scale) {
+            // TODO: Why this is -main_screen_grid_field?
+            if (-MOX::_main_screen_grid_field == input && MOX::_skip_fields == 0 && MOX::_max_map_scale != MOX::_cur_map_scale) {
                  int target_y = HAROLD::Get_Upscaled_Value_(MOX::_main_screen_grid_y) + MOX::_cur_map_y;
                  int target_x = HAROLD::Get_Upscaled_Value_(MOX::_main_screen_grid_x) + MOX::_cur_map_x;
                  MAINSCR::Scroll_Map_(target_x, target_y);

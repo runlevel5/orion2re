@@ -50,9 +50,4 @@ namespace FLEETPOP {
     }
 
     void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
-
-    inline int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* ship_ids, int16_t max_count, uint8_t player_id) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t, uint8_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004052a0})(ship_ids, max_count, player_id);
-    }
 }

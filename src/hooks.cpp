@@ -608,7 +608,7 @@ namespace hooks {
         { 0x004c8b80, &MAINSCR::Add_Cheats_ },
         { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
         { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
-        { 0x004c7720, &MAINSCR::Main_Screen_ },
+        //{ 0x004c7720, &MAINSCR::Main_Screen_ },
         { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
     };
 
