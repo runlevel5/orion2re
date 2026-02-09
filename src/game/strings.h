@@ -7,5 +7,7 @@ namespace strings {
 
     void __cdecl String_To_Lower_(char* str);
 
+    void __cdecl String_To_Upper_(char* str);
+
     void __cdecl Trim_(char* str);
 }

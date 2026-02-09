@@ -20,6 +20,20 @@ namespace strings {
         }
     }
 
+    void __cdecl String_To_Upper_(char* str) {
+        if (str[0] == '\0') {
+            return;
+        }
+
+        int32_t i = 0;
+        do {
+            if (str[i] >= 0x61 && str[i] <= 0x7f) {
+                str[i] -= 0x20;
+            }
+            i++;
+        } while (str[i] != '\0');
+    }
+
     void __cdecl Swap_Short_(int16_t* a, int16_t* b) {
         int16_t temp = *a;
         *a = *b;

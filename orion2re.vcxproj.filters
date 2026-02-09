@@ -204,6 +204,9 @@
     <ClCompile Include="src\game\design_main.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\namestar.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -447,6 +450,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\sys.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\namestar.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

@@ -78,4 +78,10 @@ namespace video {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528970 });
         fn(x, y);
     }
+
+    inline void __cdecl Set_Refresh_Differential_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527D00});
+        fn();
+    }
 }

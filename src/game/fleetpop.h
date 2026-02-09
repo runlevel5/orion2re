@@ -4,9 +4,18 @@
 namespace FLEETPOP {
     inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
 
-    inline void __cdecl Reload_Fleet_Box_Data_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00405990})();
+    void __cdecl Reload_Fleet_Box_Data_(void);
+
+    inline int16_t __cdecl N_Fleet_Icons_(int16_t node_ptr) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004051E0});
+        return fn(node_ptr);
+    }
+
+    inline void __cdecl Fleet_Box_Data_(int16_t icon_count) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404D10});
+        fn(icon_count);
     }
 
     inline int16_t __cdecl Fleet_Buttons_Chosen_() {
@@ -68,8 +77,8 @@ namespace FLEETPOP {
         reinterpret_cast<Fn>(std::uintptr_t{0x00403ec0})();
     }
 
-    inline void __cdecl Reload_Fleet_Box_Palette_(int16_t player_id, int16_t force_reload) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004059c0})(player_id, force_reload);
+    inline void __cdecl Reload_Fleet_Box_Palette_(int16_t owner, uint32_t is_not_player) {
+        using Fn = void(__cdecl*)(int16_t, uint32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004059c0})(owner, is_not_player);
     }
 }

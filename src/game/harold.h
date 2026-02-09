@@ -76,25 +76,13 @@ namespace HAROLD {
 
     int16_t __cdecl Map_Scale_To_Zoom_Level_();
 
-    inline void __cdecl Decrement_Zoom_Count_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004F0840})();
-    }
+    void __cdecl Decrement_Zoom_Count_();
 
-    inline int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004F0E50})();
-    }
+    int16_t __cdecl Increment_Zoom_Count_With_Limit_();
 
-    inline void __cdecl Increment_Zoom_Count_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004F0E20})();
-    }
+    void __cdecl Increment_Zoom_Count_();
 
-    inline int16_t __cdecl Get_Map_Scale_(int16_t count) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004F0880})(count);
-    }
+    int16_t __cdecl Get_Map_Scale_(int16_t param_1);
 
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 
@@ -110,10 +98,10 @@ namespace HAROLD {
         fn();
     }
 
-    inline short __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int unknown) {
-        using Fn = short(__cdecl*)(uint8_t*, const char*, int);
+    inline short __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int16_t type) {
+        using Fn = short(__cdecl*)(uint8_t*, const char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1B50});
-        return fn(screen_ptr, message, unknown);
+        return fn(screen_ptr, message, type);
     }
 
     int16_t __cdecl Get_N_Remaining_Humans_();
@@ -136,6 +124,8 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Jumpgate_(int16_t player_idx, int16_t star_idx);
 
+    bool __cdecl Player_Has_Colony_(short player_num, short star_idx);
+
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 
     bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star);
@@ -148,10 +138,7 @@ namespace HAROLD {
 
     int16_t __cdecl Players_Home_Star_(int16_t star_idx);
 
-    inline int16_t __cdecl Planet_Index_(int16_t star_idx, int16_t planet_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(0x004F1480)(star_idx, planet_idx);
-    }
+    int16_t __cdecl Planet_Index_(int16_t star_idx, int16_t planet_idx);
 
     inline const char* s_after_home_world_gen = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575D4 }); // "after home world gen"
 

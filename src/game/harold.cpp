@@ -143,6 +143,10 @@ namespace HAROLD {
         return relative_planet_num;
     }
 
+    int16_t __cdecl Planet_Index_(int16_t star_idx, int16_t planet_idx) {
+        return MOX::_star[star_idx].planet_index[planet_idx];
+    }
+
     void __cdecl Get_Font_File_(char* buffer) {
         const char* src;
 
@@ -415,6 +419,13 @@ namespace HAROLD {
 
         Init_Fleet_Movement_Box_();
         Init_System_Display_Box_();
+    }
+
+    /**
+     * @address 004f1590
+     */
+    bool __cdecl Player_Has_Colony_(short player_num, short star_idx) {
+        return struct_::Test_Bit_Field_(&MOX::_star[star_idx].has_colony, player_num) != 0;
     }
 
     /**
@@ -802,6 +813,16 @@ namespace HAROLD {
         return static_cast<int16_t>(MOX::_star_fields_dim[combined_index]);
     }
 
+    /**
+     * @address 004f0840
+     */
+    void __cdecl Decrement_Zoom_Count_() {
+        MOX::_zoom_count--;
+        if (MOX::_zoom_count < 1) {
+            MOX::_zoom_count = 0;
+        }
+    }
+
     int16_t __cdecl Map_Scale_To_Zoom_Level_() {
         int16_t max_zoom = MOX::_max_zoom_count;
         int16_t scale = MOX::_cur_map_scale;
@@ -823,6 +844,82 @@ namespace HAROLD {
         }
 
         return max_zoom;
+    }
+
+    /**
+     * @brief Increments the zoom count up to the maximum zoom limit,
+     * then caps it further based on the current map scale.
+     *
+     * @return int16_t 0 if zoom was capped by the map scale limit, 1 otherwise.
+     */
+    /**
+     * @address 004f0e20
+     */
+    void __cdecl Increment_Zoom_Count_() {
+        MOX::_zoom_count++;
+        if (MOX::_zoom_count >= MOX::_max_zoom_count) {
+            MOX::_zoom_count = MOX::_max_zoom_count;
+        }
+    }
+
+    int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
+        int32_t next_zoom = static_cast<int32_t>(MOX::_zoom_count) + 1;
+        int32_t max_allowed = static_cast<int32_t>(MOX::_max_zoom_count);
+
+        if (next_zoom >= max_allowed) {
+            next_zoom = max_allowed;
+        }
+        MOX::_zoom_count = static_cast<int16_t>(next_zoom);
+
+        // Fetch a dynamic limit based on the current map scale
+        int16_t scaled_limit = static_cast<int16_t>(static_cast<int8_t>(HAROLD::Map_Scale_To_Zoom_Level_()));
+
+        if (scaled_limit <= MOX::_zoom_count) {
+            MOX::_zoom_count = scaled_limit;
+            return 0;
+        }
+
+        return 1;
+    }
+
+    int16_t __cdecl Get_Map_Scale_(int16_t param_1) {
+        int16_t result = MOX::_max_map_scale;
+
+        if (param_1 == 0) {
+            if (result > 10) {
+                result = 10;
+            }
+        }
+        else if (param_1 == 1) {
+            if (result > 15) {
+                result = 15;
+            }
+        }
+        else if (param_1 == 2) {
+            if (result > 20) {
+                result = 20;
+            }
+        }
+        else {
+            if (result > 30) {
+                result = 30;
+            }
+        }
+
+        // If no truncation occurred, reset star coordinates
+        if (result == MOX::_max_map_scale) {
+            MOX::_far_star_x = 0;
+            MOX::_far_star_y = 0;
+            MOX::_mid_star_x = 0;
+            MOX::_mid_star_y = 0;
+            MOX::_near_star_x = 0;
+            MOX::_near_star_y = 0;
+
+            // Re-load result as per original binary's return sequence
+            result = MOX::_max_map_scale;
+        }
+
+        return result;
     }
 
     /**

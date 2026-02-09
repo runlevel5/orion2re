@@ -2,6 +2,30 @@
 #include <cstdint>
 
 namespace NETMOX {
+    inline int16_t __cdecl Human_Requesting_Diplomacy_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519a00});
+        return fn();
+    }
+
+    inline void __cdecl Accept_Diplomacy_Request_(int32_t requester_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519a80});
+        fn(requester_id);
+    }
+
+    inline void __cdecl Refuse_Diplomacy_Request_(int32_t requester_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519b80});
+        fn(requester_id);
+    }
+
+    inline void __cdecl Tell_Diplomacy_Requester_To_Wait_(int32_t requester_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519c10});
+        fn(requester_id);
+    }
+
     // Suggested name: NETMOX::Humans_Requesting_Diplomacy
     inline uint8_t __cdecl Humans_Requesting_Diplomacy_() {
         using Fn = uint8_t(__cdecl*)();

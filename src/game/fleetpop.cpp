@@ -33,4 +33,18 @@ int16_t __cdecl Fleet_Box_Width_() {
     return animate::Get_Width_(MOX::_fleet_box.name_sm_seg);
 }
 
+/**
+ * @address 00405990
+ */
+void __cdecl Reload_Fleet_Box_Data_(void) {
+    if (HACCESS::Get_Stack_Start_From_Saved_Ship_Array_() == 0) {
+        MOVEBOX::Vanish_Fleet_Movement_Box_();
+        return;
+    }
+
+    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(static_cast<int16_t>(MOX::_fleet_box_ship_stack));
+    int16_t num_icons = FLEETPOP::N_Fleet_Icons_(node_ptr);
+    FLEETPOP::Fleet_Box_Data_(num_icons);
+}
+
 }

@@ -260,30 +260,17 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(0x004C9C30)();
     }
 
-    inline void __cdecl Get_New_Paralax_XYs_(int16_t dx, int16_t dy, int8_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
-        reinterpret_cast<Fn>(0x004C7260)(dx, dy, flag);
-    }
+    int16_t __cdecl Get_New_Paralax_XYs_(int16_t target_map_x, int16_t target_map_y, int16_t scale);
 
-    inline void __cdecl Clear_Twinkling_Star_Data_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004C4B10)();
-    }
+    void __cdecl Clear_Twinkling_Star_Data_();
 
-    inline void __cdecl Change_Home_Star_Name_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004C8BF0)();
-    }
+    void __cdecl Change_Home_Star_Name_();
 
-    inline void __cdecl Warn_About_Cheating_Players_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004CD630)();
-    }
+    void __cdecl Warn_About_Cheating_Players_();
 
-    inline int16_t __cdecl Check_For_Diplomacy_Request_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004C8C70)();
-    }
+    int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t requester_id);
+
+    int16_t __cdecl Check_For_Diplomacy_Request_();
 
     inline void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag) {
         using Fn = void(__cdecl*)(int16_t, int16_t*);
@@ -295,30 +282,15 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(0x004C4E90)(ptr, unk);
     }
 
-    inline int16_t __cdecl Get_Ship_Stack_For_Officers_Screen_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004C7490)();
-    }
+    int16_t __cdecl Get_Ship_Stack_For_Officers_Screen_();
 
-    inline int16_t __cdecl Get_Star_Id_For_Officers_Screen_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004C75B0)();
-    }
+    int16_t __cdecl Get_Star_Id_For_Officers_Screen_();
 
-    inline void __cdecl Tax_Rate_Popup_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x0045F3F0)();
-    }
+    void __cdecl Tax_Rate_Popup_();
 
-    inline void __cdecl Scroll_Map_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004CCD90)(x, y);
-    }
+    void __cdecl Scroll_Map_(int16_t x, int16_t y);
 
-    inline void __cdecl Set_Reload_Fleet_Box_Palette_Flag_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004CD0D0)();
-    }
+    void __cdecl Set_Reload_Fleet_Box_Palette_Flag_();
 
     inline void __cdecl Print_Highlighted_Star_Name_(short star_idx) {
         using Fn = void(__cdecl*)(short);
@@ -328,8 +300,5 @@ namespace MAINSCR {
 
     void __cdecl Highlight_Star_(short star_idx);
 
-    inline void __cdecl Redraw_Main_Screen_(char unk) {
-        using Fn = void(__cdecl*)(char);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004cbb40})(unk);
-    }
+    void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 }

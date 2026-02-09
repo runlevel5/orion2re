@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
+
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {
     using Fn = int(__cdecl*)();
