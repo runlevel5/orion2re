@@ -2013,11 +2013,11 @@ struct s_missle {
 typedef struct s_mouse_xy s_mouse_xy, *Ps_mouse_xy;
 
 struct s_mouse_xy {
-    short field0_0x0;
+    short ship_icon_idx;
     short field1_0x2;
-    short field2_0x4;
+    short star_idx;
     short field3_0x6;
-    int8_t field4_0x8;
+    int8_t selected;
 };
 
 typedef struct s_movable_box s_movable_box, *Ps_movable_box;
@@ -2865,7 +2865,7 @@ struct s_ship_move_info {
     int8_t field1_0x1;
     int8_t field2_0x2;
     undefined field3_0x3;
-    undefined field4_0x4;
+    int8_t field4_0x4;
     int8_t field5_0x5;
     undefined field6_0x6;
     undefined field7_0x7;

@@ -4,7 +4,44 @@
 //#define SKIP_MAIN
 
 namespace hooks {
-    static constexpr hook all_hooks[] = {
+
+#define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
+
+    void Assert_Types() {
+        ASSERT(sizeof(s_current_design) == 0x125, "s_current_design");
+        ASSERT(sizeof(s_main_menu) == 0xd2, "s_main_menu");
+        ASSERT(sizeof(s_event_data) == 9, "s_event_data");
+        ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
+        ASSERT(sizeof(s_game_popup_fields) == 0x278, "s_game_popup_fields");
+        ASSERT(sizeof(s_game_anims) == 0x65, "s_game_anims");
+        ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
+        ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
+        ASSERT(sizeof(s_player) == 0xea9, "s_player");
+        ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");
+        ASSERT(sizeof(s_colony) == 0x169, "s_colony");
+        ASSERT(sizeof(s_tech_building_data) == 0x13, "s_building_data");
+        ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
+        ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
+        ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
+        ASSERT(sizeof(s_ship_icon) == 12, "s_ship_icon");
+        ASSERT(sizeof(s_ship_node) == 5, "s_ship_node");
+        ASSERT(sizeof(s_skill_data) == 18, "s_skill_data");
+        ASSERT(sizeof(s_tech_fuel_data) == 10, "s_tech_fuel_data");
+        ASSERT(sizeof(s_tech_app_data) == 13, "s_tech_app_data");
+        ASSERT(sizeof(s_tech_field_data) == 0x17, "s_tech_field_data");
+        ASSERT(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data");
+        ASSERT(sizeof(s_tech_armor_data) == 15, "s_armor_data");
+        ASSERT(sizeof(TECHDATA::s_tech_hull_data) == 36, "s_tech_hull_data");
+        ASSERT(sizeof(TECHDATA::s_tech_computer_data) == 22, "s_tech_computer_data");
+        ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
+        ASSERT(sizeof(s_font) == 0x235c, "s_font");
+        ASSERT(sizeof(s_MSG) == 18, "s_MSG");
+        ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
+        ASSERT(sizeof(s_skill_data) == 0x12, "MOX::s_skill_data");
+        ASSERT(sizeof(s_field) == 0x37, "s_field");
+    }
+
+    static hook all_hooks[] = {
         { 0x005422e0, &platform::entry },
         { 0x005276f0, &platform::Parse_Ten_Cmd_Parameter },
         { 0x00527960, &platform::Create_Direct_Draw },
@@ -629,50 +666,12 @@ namespace hooks {
         { 0x004c5e20, &MAINSCR::Draw_Main_Screen_ },
         { 0x00521100, &fields::Add_Clipped_Button_Field_ },
         { 0x004c62d0, &MAINSCR::Draw_ETA_Destination_Line_ },
+        { 0x004f1f50, &HAROLD::Get_N_Remaining_Humans_ },
+        { 0x0042f800, &MAINSCR::Current_Colony_ },
     };
-
-#define ASSERT(x, m) if (!(x)) { MessageBoxA(platform::g_main_window, m, "Microprose", MB_OK); __exit(1); }
-
-    void Assert_Types() {
-        ASSERT(sizeof(s_current_design) == 0x125, "s_current_design");
-        ASSERT(sizeof(s_main_menu) == 0xd2, "s_main_menu");
-        ASSERT(sizeof(s_event_data) == 9, "s_event_data");
-        ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
-        ASSERT(sizeof(s_game_popup_fields) == 0x278, "s_game_popup_fields");
-        ASSERT(sizeof(s_game_anims) == 0x65, "s_game_anims");
-        ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
-        ASSERT(sizeof(s_settings) == 0x229, "MOX::_settings");
-        ASSERT(sizeof(s_player) == 0xea9, "s_player");
-        ASSERT(sizeof(s_planet_data) == 0x11, "s_planet_data");
-        ASSERT(sizeof(s_colony) == 0x169, "s_colony");
-        ASSERT(sizeof(s_tech_building_data) == 0x13, "s_building_data");
-        ASSERT(sizeof(s_star_data) == 0x71, "s_star_data");
-        ASSERT(sizeof(s_ship_data) == 0x81, "s_ship_data");
-        ASSERT(sizeof(s_leader_data) == 0x3b, "s_leader_data");
-        ASSERT(sizeof(s_ship_icon) == 12, "s_ship_icon");
-        ASSERT(sizeof(s_ship_node) == 5, "s_ship_node");
-        ASSERT(sizeof(s_skill_data) == 18, "s_skill_data");
-        ASSERT(sizeof(s_tech_fuel_data) == 10, "s_tech_fuel_data");
-        ASSERT(sizeof(s_tech_app_data) == 13, "s_tech_app_data");
-        ASSERT(sizeof(s_tech_field_data) == 0x17, "s_tech_field_data");
-        ASSERT(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data");
-        ASSERT(sizeof(s_tech_armor_data) == 15, "s_armor_data");
-        ASSERT(sizeof(TECHDATA::s_tech_hull_data) == 36, "s_tech_hull_data");
-        ASSERT(sizeof(TECHDATA::s_tech_computer_data) == 22, "s_tech_computer_data");
-        ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
-        ASSERT(sizeof(s_font) == 0x235c, "s_font");
-        ASSERT(sizeof(s_MSG) == 18, "s_MSG");
-        ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
-        ASSERT(sizeof(s_skill_data) == 0x12, "MOX::s_skill_data");
-        ASSERT(sizeof(s_field) == 0x37, "s_field");
-    }
 
     void Install_Hooks()
     {
-        for (const auto& h : all_hooks) {
-            patch::Create_Jmp(reinterpret_cast<void*>(h.address), h.handler);
-        }
-
-        Assert_Types();
+        for (const auto& h : all_hooks) patch::Create_Jmp(reinterpret_cast<void*>(h.address), h.handler);
     }
 };

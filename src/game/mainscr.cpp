@@ -1272,6 +1272,12 @@ namespace MAINSCR {
         _last_field = fields::_fields_count - 1;
     }
 
+    int16_t __cdecl Current_Colony_() {
+        int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+
+        return MOX::_planet[planet_idx].colony_index;
+    }
+
     void __cdecl Highlight_Star_(short star_idx) {
         if (MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE) {
             Print_Highlighted_Star_Name_(star_idx);

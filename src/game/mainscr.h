@@ -176,10 +176,7 @@ namespace MAINSCR {
 
     void __cdecl Do_Colony_Screen_(int16_t colony_idx, int16_t* status_flag);
 
-    inline int16_t __cdecl Current_Colony_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0042F800 })();
-    }
+    int16_t __cdecl Current_Colony_();
 
     inline void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t flag) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);

@@ -415,20 +415,20 @@ namespace MAINSCR {
 
                 if (MOVEBOX::Moveable_Box_Selected_(box_mode)) {
                     MAINSCR::Check_Ships_XY_(mx, my, icon_selected_flag);
-                    if (MOX::_mouse_XY.field0_0x0 == -1) {
+                    if (MOX::_mouse_XY.ship_icon_idx == -1) {
                         MAINSCR::Check_Stars_XY_(mx, my, icon_selected_flag);
                     }
                 }
                 else {
                     MAINSCR::Check_Stars_XY_(mx, my, icon_selected_flag);
-                    if (MOX::_mouse_XY.field2_0x4 == -1) {
+                    if (MOX::_mouse_XY.star_idx == -1) {
                         MAINSCR::Check_Ships_XY_(mx, my, icon_selected_flag);
                     }
                 }
             }
             else {
-                MOX::_mouse_XY.field0_0x0 = -1;
-                MOX::_mouse_XY.field2_0x4 = -1;
+                MOX::_mouse_XY.ship_icon_idx = -1;
+                MOX::_mouse_XY.star_idx = -1;
             }
 
             bool process_star_eta = false;

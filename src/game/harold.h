@@ -116,6 +116,8 @@ namespace HAROLD {
         return fn(screen_ptr, message, unknown);
     }
 
+    int16_t __cdecl Get_N_Remaining_Humans_();
+
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
     bool __cdecl Player_Is_Omniscient_(int16_t player_idx);

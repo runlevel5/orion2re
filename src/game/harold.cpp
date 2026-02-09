@@ -676,6 +676,21 @@ namespace HAROLD {
         return 0;
     }
 
+    /**
+     * Counts the number of non-eliminated players with human objectives.
+     */
+    int16_t __cdecl Get_N_Remaining_Humans_() {
+        int16_t count = 0;
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            if (MOX::_player[i].objectives == 0x64 /* 'd' */ && MOX::_player[i].eliminated == 0) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     bool __cdecl Player_Is_Omniscient_(int16_t player_idx) {
         if (OFFICER::One_Leader_With_Galactic_Lore_(player_idx)) {
             return true;
