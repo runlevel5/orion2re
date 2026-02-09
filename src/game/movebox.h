@@ -16,6 +16,11 @@ namespace MOVEBOX {
         fn();
     }
 
+    inline void __cdecl Vanish_System_Display_Box_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00513db0})();
+    }
+
     inline void __cdecl Save_And_Remove_Boxes_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00513C90})();

@@ -372,8 +372,8 @@ namespace HAROLD {
         box.x = 0x16;
         box.y = 0x16;
 
-        box.field12_0x14 = box.width;
-        box.field13_0x16 = 0x27;
+        box.field10_0x14 = box.width;
+        box.field11_0x16 = 0x27;
     }
 
     /**

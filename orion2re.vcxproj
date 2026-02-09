@@ -155,6 +155,7 @@
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
+    <ClInclude Include="src\game\sys.h" />
     <ClInclude Include="src\game\techdata.h" />
     <ClInclude Include="src\game\ten.h" />
     <ClInclude Include="src\game\timer.h" />

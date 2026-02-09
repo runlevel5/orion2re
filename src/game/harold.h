@@ -122,6 +122,8 @@ namespace HAROLD {
 
     bool __cdecl Player_Is_Omniscient_(int16_t player_idx);
 
+    inline uint8_t& _set_fade_for_first_fltpop = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595394});
+
     int16_t __cdecl Zoom_Level_Font_Style_();
 
     void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2);

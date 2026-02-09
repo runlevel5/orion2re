@@ -446,6 +446,9 @@
     <ClInclude Include="src\game\remap.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\sys.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

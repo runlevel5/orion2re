@@ -7,4 +7,10 @@ namespace ERICNET {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408970});
         fn(planet_idx, owner_idx);
     }
+
+    inline void __cdecl Mox_Play_Sound_(int32_t sound_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
+        fn(sound_id);
+    }
 }

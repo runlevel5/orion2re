@@ -14,4 +14,10 @@ namespace SYS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00496250});
         fn(system_id);
     }
+
+    inline void __cdecl Potential_Colony_Info_Popup_(int16_t orbit) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004967f0 });
+        fn(orbit);
+    }
 }

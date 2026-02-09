@@ -1315,9 +1315,21 @@ struct s_fleet_box {
     short y;
     short height;
     short width;
-    undefined2 map_height;
+    short map_height;
     undefined field5_0xa;
     undefined field6_0xb;
+    short field7_0xc;
+    short field8_0xe;
+    short field9_0x10;
+    struct s_animation_header *name_sm_seg;
+    struct s_animation_header *field11_0x16;
+    int8_t field12_0x1a;
+    int8_t field13_0x1b;
+    int8_t field14_0x1c;
+    int8_t field15_0x1d;
+    int8_t field16_0x1e;
+    int8_t field17_0x1f;
+    int8_t field18_0x20;
 };
 
 typedef struct s_font s_font, *Ps_font;
@@ -2035,8 +2047,8 @@ struct s_movable_box {
     short field9_0x12;
     int16_t field10_0x14;
     int16_t field11_0x16;
-    undefined2 field12_0x18;
-    undefined2 field13_0x1a;
+    short field12_0x18;
+    short field13_0x1a;
 };
 
 typedef struct s_MSG s_MSG, *Ps_MSG;

@@ -55,7 +55,7 @@ inline void __cdecl __cinit() {
 }
 
 inline int __cdecl __ismbblead(uint32_t c) {
-    using Fn = int(__cdecl*)(uint32_t);
+    using Fn = int(__cdecl*)(uint32_t c);
     return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547ad0 })(c);
 }
 

@@ -2,12 +2,6 @@
 
 namespace FLEETPOP {
 
-/**
- * Calculates the grid height for the fleet box based on a provided type identifier.
- * 
- * @param grid_type The type of grid (1, 2, or 3).
- * @return The calculated height, or 0 if the type is unknown.
- */
 int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type) {
     if (grid_type == 1) {
         return 0x38;
@@ -36,7 +30,7 @@ void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count) {
 }
 
 int16_t __cdecl Fleet_Box_Width_() {
-    return animate::Get_Width_(MOX::_fleet_box_name_sm_seg3);
+    return animate::Get_Width_(MOX::_fleet_box.name_sm_seg);
 }
 
 }

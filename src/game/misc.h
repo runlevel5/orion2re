@@ -80,4 +80,9 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e060});
         return fn(bit_value, limit);
     }
+
+    inline bool __cdecl Occluded_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ox1, int16_t oy1, int16_t ox2, int16_t oy2) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049ebd0})(x1, y1, x2, y2, ox1, oy1, ox2, oy2);
+    }
 }

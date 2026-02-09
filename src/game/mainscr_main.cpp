@@ -553,7 +553,7 @@ namespace MAINSCR {
             }
 
             if (MOVEBOX::Moveable_Box_Selected_(0) && MOX::_skip_fields == 0) {
-                if (MOX::_system_star_id > -1 && MOX::_system_star_id < MOX::_NUM_STARS && input != MOX::_moveable_box[0].field9_0x10) {
+                if (MOX::_system_star_id > -1 && MOX::_system_star_id < MOX::_NUM_STARS && input != MOX::_moveable_box[0].field8_0x10) {
                     int mx = mouse::Pointer_X_();
                     int my = mouse::Pointer_Y_();
 
@@ -931,8 +931,9 @@ namespace MAINSCR {
         MOX::_reloaded_ship_palette = 0;
     }
 
+
     void __cdecl Draw_Main_Screen_() {
-        if (MOX::_stencil_box_id <= 4) {
+        if (MOX::_stencil_box_id >= 0 && MOX::_stencil_box_id <= 4) {
             Draw_Main_Screen_While_Moving_Boxes_();
             video::Clip_Off_();
             graphics::Reset_Window_();
@@ -986,7 +987,7 @@ namespace MAINSCR {
                 if (MOVEBOX::Moveable_Box_Selected_(2)) {
                     if (FLEETPOP::Can_Select_Fleet_Box_Ship_(0) && MOVEBOX::Mouse_Within_Fleet_Box_()) {
                         int16_t scanned_field = fields::Scan_Input_();
-                        if (scanned_field != MOX::_moveable_box[2].field8_0xe) {
+                        if (scanned_field != MOX::_moveable_box[2].field) {
                             if (_mouse_btn_pressed == 0) {
                                 _fltpop_field_selection_status = (FLEETPOP::Icon_Selection_Status_(scanned_field) == 0);
                             }
@@ -1018,8 +1019,8 @@ namespace MAINSCR {
                 if (MOVEBOX::Moveable_Box_Selected_(box_id) && box_id != (int16_t)MOX::_stencil_box_id) {
                     int16_t btn = Mouse_Button_();
                     if (btn != 0) {
-                        int16_t target_field = MOX::_moveable_box[box_id].field8_0xe;
-                        if (target_field == fields::Auto_Input_() || MOX::_moveable_box[box_id].field6_0xc == 1) {
+                        int16_t target_field = MOX::_moveable_box[box_id].field;
+                        if (target_field == fields::Auto_Input_() || MOX::_moveable_box[box_id].active == 1) {
                             MOVEBOX::Move_Moveable_Box_(box_id, btn);
                         }
                     }

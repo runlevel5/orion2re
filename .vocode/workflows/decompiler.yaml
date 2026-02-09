@@ -228,8 +228,11 @@ workflows:
                   LEA        ECX,[EAX + EAX*0x8]
                   ADD        ECX,EDX
  
-          * NEVER output structure definitions with fields. You are allowed to output structure name as a reference:
+          * NEVER output structure definitions. You are allowed to output structure name as a reference without the body:
+            
             struct s_player;
+            string s_settings;
+
           * You are not allowed to rename struct fields or modify their shapes
           * You should NOT emit a new address for any structure variables, if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).

@@ -98,9 +98,25 @@ namespace HACCESS {
         reinterpret_cast<Fn>(std::uintptr_t{0x0049A400})();
     }
 
+    inline int16_t __cdecl Ship_Stack_Owner_(int16_t ship_stack_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049b530})(ship_stack_id);
+    }
+
+    inline int16_t __cdecl Ship_Stack_From_Ship_Icon_(int16_t ship_icon_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049b430})(ship_icon_id);
+    }
+
     inline int16_t __cdecl Weapons_Index_From_Tech_App_(int16_t tech_app) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B650});
         return fn(tech_app);
+    }
+
+    inline char* __cdecl Race_Name_String_(int16_t owner) {
+        using Fn = char*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ac80});
+        return fn(owner);
     }
 }

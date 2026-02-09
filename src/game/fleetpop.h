@@ -62,4 +62,14 @@ namespace FLEETPOP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406610});
         return fn(field);
     }
+
+    inline void __cdecl Clear_Ship_Node_Selection_Flags_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00403ec0})();
+    }
+
+    inline void __cdecl Reload_Fleet_Box_Palette_(int16_t player_id, int16_t force_reload) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004059c0})(player_id, force_reload);
+    }
 }

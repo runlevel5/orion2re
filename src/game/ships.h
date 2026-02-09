@@ -45,4 +45,9 @@ namespace SHIPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041EC60});
         fn();
     }
+
+    inline int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* ship_icon_id, int16_t x_offset, int16_t y_offset) {
+        using Fn = int16_t(__cdecl*)(int16_t*, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0041f370})(ship_icon_id, x_offset, y_offset);
+    }
 }

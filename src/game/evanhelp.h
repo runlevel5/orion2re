@@ -25,6 +25,11 @@ namespace EVANHELP {
 
     void __cdecl Set_Main_Game_Screen_Help_List_();
 
+    inline void __cdecl Set_Main_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0041dbb0})();
+    }
+
     inline void __cdecl Set_Design_Screen_Help_List_(int16_t help1, int16_t help2) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0041DE00})(help1, help2);

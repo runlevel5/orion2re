@@ -148,6 +148,12 @@ namespace MAINSCR {
 
     void __cdecl Print_Main_Screen_Data_();
 
+    inline void __cdecl Draw_Main_Screen_Before_Stencil_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C64B0});
+        fn();
+    }
+
     void __cdecl Popup_XY_(int16_t index, int16_t x, int16_t y, int16_t* out_w, int16_t* out_h);
 
     void __cdecl Set_Player_Cheated_Flag_(int16_t player_idx, int8_t cheated_this_turn);
@@ -178,30 +184,27 @@ namespace MAINSCR {
 
     int16_t __cdecl Current_Colony_();
 
-    inline void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
-        reinterpret_cast<Fn>(0x004C9500)(x, y, flag);
+    void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t flag);
+
+    void __cdecl Check_Ships_XY_(int16_t mouse_x, int16_t mouse_y, int8_t selection_id);
+
+    inline void __cdecl Scan_Stars_XY_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cc700});
+        fn(x, y);
     }
 
-    inline void __cdecl Check_Ships_XY_(int16_t x, int16_t y, int8_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
-        reinterpret_cast<Fn>(0x004C9410)(x, y, flag);
+    inline void __cdecl Scan_Ships_XY_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cc5b0});
+        fn(x, y);
     }
 
-    inline int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out1, int16_t* out2) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t*);
-        return reinterpret_cast<Fn>(0x004C9F20)(type, out1, out2);
-    }
+    int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out_field, int16_t* out_index);
 
-    inline void __cdecl Exit_Zooming_Mode_(int16_t* ptr) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(0x004CD170)(ptr);
-    }
+    void __cdecl Exit_Zooming_Mode_(int16_t* ptr);
 
-    inline void __cdecl Do_Fleet_Popup_(int16_t id, int8_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int8_t);
-        reinterpret_cast<Fn>(0x004C9740)(id, flag);
-    }
+    void __cdecl Do_Fleet_Popup_(int16_t ship_icon_id, int8_t check_overlap);
 
     inline int16_t __cdecl Mouse_Button_() {
         using Fn = int16_t(__cdecl*)();
@@ -213,35 +216,19 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(std::uintptr_t{0x004CD040})(field);
     }
 
-    inline void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C6430})();
-    }
+    void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_();
 
-    inline void __cdecl Draw_Scanned_Ship_Seg_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C6DA0})();
-    }
+    void __cdecl Draw_Scanned_Ship_Seg_();
 
-    inline void __cdecl Print_Galaxy_Map_Scanned_Star_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004CA210})();
-    }
+    void __cdecl Print_Galaxy_Map_Scanned_Star_();
 
-    inline void __cdecl Draw_Main_Screen_While_Moving_Boxes_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C6690})();
-    }
+    void __cdecl Draw_Main_Screen_While_Moving_Boxes_();
 
-    inline void __cdecl Check_Mouse_XY_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C61D0})();
-    }
+    void __cdecl Check_Mouse_XY_Fields_();
 
-    inline int16_t __cdecl Scan_System_Display_Fields_(int16_t key, int16_t scan, int16_t* p3, int16_t* p4, int16_t* p5, int16_t* p6, int16_t* p7, int16_t* p8) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
-        return reinterpret_cast<Fn>(0x004CC920)(key, scan, p3, p4, p5, p6, p7, p8);
-    }
+    int16_t __cdecl Scan_System_Display_Fields_(int16_t mouse_input, int16_t input, int16_t *colony_btns, 
+                                                int16_t *m_planet_idx, int16_t *planet_idx, 
+                                                int16_t *m_ship_idx, int16_t *ship_idx, int16_t *selection);
 
     inline void __cdecl Scan_Moveable_Box_Fields(int16_t skip, int16_t key, int16_t scan, uint16_t* flag) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t*);
@@ -340,4 +327,9 @@ namespace MAINSCR {
     }
 
     void __cdecl Highlight_Star_(short star_idx);
+
+    inline void __cdecl Redraw_Main_Screen_(char unk) {
+        using Fn = void(__cdecl*)(char);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004cbb40})(unk);
+    }
 }

@@ -1,6 +1,12 @@
 #pragma once
 
 namespace MOX {
+    inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});
+    inline uint8_t& _first_time = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059749C});
+    inline int16_t& _fleet_movement_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597820});
+    inline uint8_t& _draw_expanding_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BF32});
+    inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
+
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
     inline s_current_design*& _design =
         *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
@@ -91,8 +97,8 @@ namespace MOX {
     inline int8_t& _officer_scrn_type = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597414});
     inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
     inline uint16_t& _eta_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BAAE});
-    inline uint16_t& _stencil_box_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B2C});
-    inline uint16_t& _draw_main_screen_stencilled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1864});
+    inline int16_t& _stencil_box_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2C});
+    inline int16_t& _draw_main_screen_stencilled = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1864});
     inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
     inline void* _mouse_list_zoom_mode = reinterpret_cast<void*>(std::uintptr_t{0x00559898});
     inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
@@ -129,6 +135,15 @@ namespace MOX {
     inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
     inline int16_t& _near_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA8});
     inline s_animation_header*& _near_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597424});
+
+    inline const char* s_fmt_s =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
+
+    inline const char* s_fmt_scanned_star_info =
+        reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
+
+    inline const char* s_fmt_contested =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00559930}); // "%s (contested)"
 
     inline void*& _special_names_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x00595390 });
@@ -256,6 +271,12 @@ namespace MOX {
     inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
     inline int16_t& _global_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4AA});
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
+    inline int16_t* _gate_icon_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D68});
+    inline int16_t& _system_display_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A6});
+    inline int16_t& _system_display_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A8});
+    inline s_sys_disp*& _sys_disp = *reinterpret_cast<s_sys_disp**>(std::uintptr_t{0x0059B5F4});
+    inline s_system_display_ships* _system_display_ships = reinterpret_cast<s_system_display_ships*>(std::uintptr_t{0x0059B624});
+    inline int16_t& _system_display_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA6C});
     inline char* (&_race_names)[20] =
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
     inline int8_t (&_class_to_num_satellites)[10][6] =
@@ -370,33 +391,12 @@ namespace MOX {
     // Suggested name: MOX::old_galaxy_climate_roll_table
     inline uint8_t (*_old_gal_climate_roll_table)[4] = reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x00559630});
 
-    #pragma pack(push, 1)
-    struct s_movable_box {
-        uint16_t index;
-        int16_t off_flag;
-        uint16_t height;
-        uint16_t width;
-        int16_t x;
-        int16_t y;
-        uint8_t field6_0xc;
-        uint8_t field7_0xd;
-        uint16_t field8_0xe;
-        uint16_t field9_0x10;
-        uint8_t field10_0x12;
-        uint8_t field11_0x13;
-        int16_t field12_0x14;
-        int16_t field13_0x16;
-        uint16_t field14_0x18;
-        uint16_t field15_0x1a;
-    };
-    #pragma pack(pop)
-
     // Array of movable box structures (size 0x1C each, total 0x8C/140 bytes)
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
-    inline s_animation_header*& _fleet_box_name_sm_seg3 =
-        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977D2});
+    inline s_fleet_box& _fleet_box =
+        *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
 
     #pragma pack(push, 1)
     struct s_save_game_description {

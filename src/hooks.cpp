@@ -11,7 +11,7 @@ namespace hooks {
         ASSERT(sizeof(s_current_design) == 0x125, "s_current_design");
         ASSERT(sizeof(s_main_menu) == 0xd2, "s_main_menu");
         ASSERT(sizeof(s_event_data) == 9, "s_event_data");
-        ASSERT(sizeof(MOX::s_movable_box) == 0x1c, "s_movable_box");
+        ASSERT(sizeof(s_movable_box) == 0x1c, "s_movable_box");
         ASSERT(sizeof(s_game_popup_fields) == 0x278, "s_game_popup_fields");
         ASSERT(sizeof(s_game_anims) == 0x65, "s_game_anims");
         ASSERT(sizeof(s_nebula) == 0x5, "s_nebula");
@@ -645,7 +645,9 @@ namespace hooks {
         { 0x004c8b80, &MAINSCR::Add_Cheats_ },
         { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
         { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
+#ifndef SKIP_MAIN
         { 0x004c7720, &MAINSCR::Main_Screen_ },
+#endif
         { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
         { 0x00431fb0, &DESIGN::Tech_Level_ },
         { 0x00431b10, &DESIGN::Shield_Cost_ },
@@ -667,7 +669,19 @@ namespace hooks {
         { 0x00521100, &fields::Add_Clipped_Button_Field_ },
         { 0x004c62d0, &MAINSCR::Draw_ETA_Destination_Line_ },
         { 0x004f1f50, &HAROLD::Get_N_Remaining_Humans_ },
-        { 0x0042f800, &MAINSCR::Current_Colony_ },
+        { 0x0042f800, &MAINSCR::Current_Colony_ },  
+        { 0x004c9500, &MAINSCR::Check_Stars_XY_ },
+        { 0x004c9410, &MAINSCR::Check_Ships_XY_ },
+        { 0x004c9f20, &MAINSCR::Get_Mouse_Field_ },
+        { 0x004cd170, &MAINSCR::Exit_Zooming_Mode_ },
+        { 0x004c9740, &MAINSCR::Do_Fleet_Popup_ },
+        { 0x004c6430, &MAINSCR::Draw_Fleet_Box_Selected_Ship_Seg_ },
+        { 0x004c6da0, &MAINSCR::Draw_Scanned_Ship_Seg_ },
+        { 0x004ca210, &MAINSCR::Print_Galaxy_Map_Scanned_Star_ },
+        { 0x004c6690, &MAINSCR::Draw_Main_Screen_While_Moving_Boxes_ },
+        { 0x004c61d0, &MAINSCR::Check_Mouse_XY_Fields_ },
+        { 0x004cc920, &MAINSCR::Scan_System_Display_Fields_ },
+        { 0x00405060, &FLEETPOP::Fleet_Box_Width_ },
     };
 
     void Install_Hooks()

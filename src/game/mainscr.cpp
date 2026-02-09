@@ -1057,8 +1057,8 @@ namespace MAINSCR {
         if (MOX::_zoom_in == 1) {
             Clear_Main_Screen_Fields_();
             for (int i = 0; i < 5; ++i) {
-                MOX::_moveable_box[i].field8_0xe = 0xfc18;
-                MOX::_moveable_box[i].field9_0x10 = 0xfc18;
+                MOX::_moveable_box[i].field = -1000;
+                MOX::_moveable_box[i].field8_0x10 = -1000;
             }
 
             _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, s_plus_00551118, 0x28);
@@ -1223,7 +1223,7 @@ namespace MAINSCR {
                     if (node_ptr == -1) {
                         MOVEBOX::Vanish_Fleet_Movement_Box_();
                     } else {
-                        int32_t flag = (MOX::_moveable_box[2].field6_0xc < 1) ? 1 : 0;
+                        int32_t flag = (MOX::_moveable_box[2].active < 1) ? 1 : 0;
                         Add_Fleet_Movement_Box_Fields_(node_ptr, flag);
                     }
                 }
@@ -1288,5 +1288,477 @@ namespace MAINSCR {
                 MOX::_selected_star_color_mod = -MOX::_selected_star_color_mod;
             }
         }
+    }
+
+    int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out_field, int16_t* out_index) {
+        bool is_box_selected = MOVEBOX::Moveable_Box_Selected_(2);
+
+        *out_field = -1;
+        *out_index = -1;
+
+        if (is_box_selected) {
+            if (MOX::_mouse_XY.star_idx > -1 && type == 0) {
+                *out_index = MOX::_mouse_XY.star_idx;
+                return (int16_t)(MOX::_mouse_XY.selected != 1);
+            }
+            if (MOX::_mouse_XY.ship_icon_idx > -1 && type == 1) {
+                *out_index = MOX::_mouse_XY.ship_icon_idx;
+                return (int16_t)(MOX::_mouse_XY.selected != 1);
+            }
+            if (MOX::_mouse_XY.field3_0x6 > -1 && type == 0) {
+                *out_field = MOX::_mouse_XY.field3_0x6;
+                return 4;
+            }
+            if (MOX::_mouse_XY.field1_0x2 > -1 && type == 1) {
+                *out_field = MOX::_mouse_XY.field1_0x2;
+                return 4;
+            }
+        } else {
+            if (MOX::_mouse_XY.ship_icon_idx > -1 && type == 1) {
+                *out_index = MOX::_mouse_XY.ship_icon_idx;
+                return (int16_t)(MOX::_mouse_XY.selected != 1);
+            }
+            if (MOX::_mouse_XY.star_idx > -1 && type == 0) {
+                *out_index = MOX::_mouse_XY.star_idx;
+                return (int16_t)(MOX::_mouse_XY.selected != 1);
+            }
+            if (MOX::_mouse_XY.field1_0x2 > -1 && type == 1) {
+                *out_field = MOX::_mouse_XY.field1_0x2;
+                return 4;
+            }
+            if (MOX::_mouse_XY.field3_0x6 > -1 && type == 0) {
+                *out_field = MOX::_mouse_XY.field3_0x6;
+                return 4;
+            }
+        }
+
+        return -1;
+    }
+
+    void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t selected) {
+        static const int32_t thresholds[3] = { 12, 10, 8 };
+
+        MOX::_mouse_XY.star_idx = -1;
+        MOX::_mouse_XY.ship_icon_idx = -1;
+
+        if (MOX::_NUM_STARS <= 0) {
+            return;
+        }
+
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            int16_t screen_x, screen_y;
+            Get_Star_Draw_Coords_(star_idx, &screen_x, &screen_y);
+            HAROLD::Map_Scale_To_Zoom_Level_();
+
+            const s_star_data& star = MOX::_star[star_idx];
+
+            if (star.spectral_class != STAR_CLASS_BLACK_HOLE) {
+                HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
+            }
+
+            int32_t dx = (int32_t)screen_x - (int32_t)x;
+            int32_t dy = (int32_t)screen_y - (int32_t)y;
+            int32_t dist_sq = dx * dx + dy * dy;
+
+            int32_t threshold = thresholds[static_cast<uint8_t>(star.size)];
+            if (dist_sq <= threshold * threshold) {
+                MOX::_mouse_XY.star_idx = star_idx;
+                MOX::_mouse_XY.selected = selected;
+                ERICNET::Mox_Play_Sound_(0x29);
+                return;
+            }
+        }
+    }
+
+    void __cdecl Exit_Zooming_Mode_(int16_t* zooming_state) {
+        *zooming_state = 0;
+        MOX::_zoom_in = 0;
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
+        EVANHELP::Set_Main_Screen_Help_List_();
+    }
+
+    void __cdecl Check_Ships_XY_(int16_t mouse_x, int16_t mouse_y, int8_t selection_id) {
+        MOX::_mouse_XY.star_idx = -1;
+        MOX::_mouse_XY.ship_icon_idx = -1;
+
+        if (MOX::_ship_icon_count <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
+            s_ship_icon* icon = &MOX::_ship_icon[i];
+            int16_t ship_idx = MOX::_ship_node[icon->node_idx].ship_idx;
+
+            int16_t owner = HACCESS::Ship_Owner_(ship_idx);
+            s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 0);
+
+            if (mouse_x >= icon->x) {
+                int16_t width = animate::Get_Width_(anim);
+                if (mouse_x <= icon->x + width) {
+                    if (mouse_y >= icon->y) {
+                        int16_t height = animate::Get_Height_(anim);
+                        if (mouse_y <= icon->y + height) {
+                            MOX::_mouse_XY.ship_icon_idx = i;
+                            MOX::_mouse_XY.selected = selection_id;
+                            ERICNET::Mox_Play_Sound_(0x29);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Do_Fleet_Popup_(int16_t ship_icon_id, int8_t check_overlap) {
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+        SYS::Clear_System_Display_Loaded_Flag_();
+        
+        MOX::_ship_icon_player_id = -1;
+        MOX::_fleet_ship_scanned = -1;
+        MOX::_eta_star_id = -1;
+        
+        HACCESS::Clear_Fleet_Box_Selected_Ship_Status_();
+        FLEETPOP::Clear_Ship_Node_Selection_Flags_();
+        
+        MOX::_first_time = 1;
+        MOX::_just_moved_stack = 0;
+
+        if (check_overlap != 0) {
+            if (SHIPS::Overlapped_Ship_Icon_Button_(&ship_icon_id, 13 - zoom_level, 9 - zoom_level) != 0) {
+                MOX::_draw_main_screen_to_back = 1;
+            }
+        }
+
+        int16_t old_stack_owner = -1;
+        if (MOVEBOX::Moveable_Box_Selected_(0)) {
+            MOVEBOX::Vanish_System_Display_Box_();
+            MAINSCR::Draw_Mini_Main_Offscreen_();
+            MOX::_first_node_ptr_in_stack_ = -1;
+        } else if (MOVEBOX::Moveable_Box_Selected_(2)) {
+            old_stack_owner = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+        }
+
+        MOX::_moveable_box[2].off_flag = 1;
+        MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Icon_(ship_icon_id);
+
+        if (MOX::_fleet_box_ship_stack == -1) {
+            MOVEBOX::Vanish_Fleet_Movement_Box_();
+            return;
+        }
+
+        MAINSCR::Set_Popup_Draw_XY_(2, ship_icon_id, &MOX::_moveable_box[2].x, &MOX::_moveable_box[2].y);
+
+        if (MOX::_settings.expanding_help != 0) {
+            MOX::_draw_expanding_box = 1;
+        }
+
+        int16_t new_stack_owner = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+        if (new_stack_owner != old_stack_owner || MOX::_mainscr_palette != 2) {
+            if (HAROLD::_set_fade_for_first_fltpop == 0) {
+                fields::Disable_Draw_All_Fields_();
+                MOVEBOX::Vanish_Fleet_Movement_Box_();
+                MAINSCR::Redraw_Main_Screen_(0);
+                fields::Enable_Draw_All_Fields_();
+            } else {
+                ERIC::Set_Fade_Percent_(0);
+                HAROLD::_set_fade_for_first_fltpop = 0;
+                MAINSCR::Draw_Mini_Main_Screen_();
+            }
+            MOX::_moveable_box[2].off_flag = 1;
+            int16_t force_reload = (new_stack_owner != MOX::_PLAYER_NUM);
+            FLEETPOP::Reload_Fleet_Box_Palette_(new_stack_owner, force_reload);
+        }
+
+        MOVEBOX::Move_Box_To_Top_(2);
+        MOX::_add_help_fields = 0;
+        MOX::_fleet_movement_bar_value = 0x66;
+
+        if (MOX::_fleet_box_ship_stack > -1 && MOX::_moveable_box[2].x < 32 && MOX::_moveable_box[2].y < 32) {
+            int16_t icon_x, icon_y;
+            SHIPS::Get_Ship_Icon_Coords_(ship_icon_id, &icon_x, &icon_y);
+            
+            int16_t box_x1 = MOX::_moveable_box[2].x;
+            int16_t box_y1 = MOX::_moveable_box[2].y;
+            int16_t box_x2 = box_x1 + (int16_t)MOX::_moveable_box[2].width;
+            int16_t box_y2 = box_y1 + (int16_t)MOX::_moveable_box[2].height;
+
+            if (MISC::Occluded_(box_x1, box_y1, box_x2, box_y2, icon_x, icon_y, icon_x + 10, icon_y + 13)) {
+                MOX::_moveable_box[2].x = 619;
+                MOX::_moveable_box[2].y = 421;
+            }
+        }
+    }
+
+    /**
+     * @address 004c6da0
+     */
+    void __cdecl Draw_Scanned_Ship_Seg_() {
+        int16_t icon_idx = _main_screen_ship_icon_scanned;
+        int16_t owner_idx = HACCESS::Ship_Icon_Owner_(icon_idx);
+
+        s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(owner_idx, 1);
+
+        int16_t local_y, local_x;
+        SHIPS::Get_Ship_Icon_Coords_(icon_idx, &local_y, &local_x);
+
+        int16_t final_x = MOX::_ship_icon[icon_idx].x;
+        int16_t final_y = MOX::_ship_icon[icon_idx].y;
+
+        animate::Draw_(final_x, final_y, anim);
+    }
+
+    void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_() {
+        int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+        int16_t ship_icon_id = HACCESS::Ship_Icon_Id_From_Node_Ptr_(node_ptr);
+
+        int16_t owner = HACCESS::Ship_Icon_Owner_(ship_icon_id);
+        s_animation_header* anim = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 1);
+
+        int16_t local_x;
+        int16_t local_y;
+        SHIPS::Get_Ship_Icon_Coords_(ship_icon_id, &local_x, &local_y);
+
+        animate::Draw_(MOX::_ship_icon[ship_icon_id].x, MOX::_ship_icon[ship_icon_id].y, anim);
+    }
+
+    void __cdecl Print_Galaxy_Map_Scanned_Star_() {
+        s_colors text_colors;
+        char print_buffer[80];
+
+        int16_t star_idx = (int16_t)MOX::_galaxy_map_scanned_star;
+        s_star_data* star = &MOX::_star[star_idx];
+        int16_t owner = (int16_t)star->owner;
+
+        if (owner >= 0 && owner < 8) {
+            HAROLD::Set_Player_Font_Style_(owner, 0);
+            char* race_name = HACCESS::Race_Name_String_(owner);
+
+            _sprintf(print_buffer, MOX::s_fmt_scanned_star_info, star->name, race_name);
+        } else if (owner == -1) {
+            for (int16_t i = 0; i < 8; ++i) {
+                if (i / 2 == 0) {
+                    text_colors.colors[i] = 0x08;
+                } else {
+                    text_colors.colors[i] = 0x0C;
+                }
+            }
+            _sprintf(print_buffer, MOX::s_fmt_s, star->name);
+        } else if (owner == -2) {
+            for (int16_t i = 0; i < 8; ++i) {
+                if (i / 2 == 0) {
+                    text_colors.colors[i] = 0x14;
+                } else {
+                    text_colors.colors[i] = 0x1F;
+                }
+            }
+            _sprintf(print_buffer, MOX::s_fmt_contested, star->name);
+        }
+
+        fonts::Set_Font_Style_(2, &text_colors);
+
+        s_movable_box box = MOX::_moveable_box[1];
+        int16_t final_x = box.x + (int16_t)box.field12_0x18 + 15;
+        int16_t final_y = (int16_t)box.height + (box.y + (int16_t)box.field13_0x1a) - 25;
+
+        fonts::Print_(final_x, final_y, print_buffer);
+    }
+
+    void Draw_Main_Screen_While_Moving_Boxes_() {
+        if (MOX::_draw_main_screen_stencilled == 1) {
+            Draw_Main_Screen_Before_Stencil_();
+            MOX::_draw_main_screen_stencilled = 0;
+            return;
+        }
+
+        graphics::Set_Window_(0x16 /* 22 */, 0x16 /* 22 */, 0x20F /* 527 */, 0x1A5 /* 421 */);
+        video::Clip_On_();
+
+        for (int16_t i = 4; i >= 0; --i) {
+            int16_t box_id = MOX::_moveable_box_order[i];
+            if (MOVEBOX::Moveable_Box_Selected_(box_id) != 0 && MOX::_stencil_box_id != box_id) {
+                MOVEBOX::Draw_Moveable_Box_(box_id);
+            }
+        }
+
+        if (MOX::_stencil_box_id > -1) {
+            if (MOX::_stencil_box_id < 5) {
+                int16_t button = Mouse_Button_();
+                MOVEBOX::Move_Moveable_Box_(MOX::_stencil_box_id, button);
+            }
+            if (MOX::_stencil_box_id > -1 && MOX::_stencil_box_id < 5) {
+                MOVEBOX::Draw_Moveable_Box_(MOX::_stencil_box_id);
+            }
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+        Print_Main_Screen_Data_();
+
+        if (MOX::_stencil_box_id == -2) {
+            video::Set_Page_Off_();
+            Draw_Main_Screen_();
+            MOX::_stencil_box_id = -1;
+        }
+    }
+
+    void __cdecl Check_Mouse_XY_Fields_() {
+        int16_t mouse_x = mouse::Pointer_X_();
+        int16_t mouse_y = mouse::Pointer_Y_();
+
+        MOX::_mouse_XY.selected = 0;
+        MOX::_mouse_XY.field3_0x6 = -1;
+        MOX::_mouse_XY.field1_0x2 = -1;
+
+        bool is_in_box = false;
+
+        if (MOVEBOX::Moveable_Box_Selected_(0)) {
+            if (mouse_x > MOX::_moveable_box[0].x &&
+                mouse_x < (MOX::_moveable_box[0].x + (int16_t)MOX::_moveable_box[0].width) &&
+                mouse_y > MOX::_moveable_box[0].y &&
+                mouse_y < (MOX::_moveable_box[0].y + (int16_t)MOX::_moveable_box[0].height)) {
+                is_in_box = true;
+            }
+        } else if (MOVEBOX::Moveable_Box_Selected_(2)) {
+            if (mouse_x > MOX::_moveable_box[2].x &&
+                mouse_x < (MOX::_moveable_box[2].x + (int16_t)MOX::_moveable_box[2].width) &&
+                mouse_y > MOX::_moveable_box[2].y &&
+                mouse_y < (MOX::_moveable_box[2].y + (int16_t)MOX::_moveable_box[2].height)) {
+                is_in_box = true;
+            }
+        }
+
+        if (mouse_x > 21 && mouse_x < 527 &&
+            mouse_y > 21 && mouse_y < 421) {
+            if (!is_in_box) {
+                Scan_Stars_XY_(mouse_x, mouse_y);
+                Scan_Ships_XY_(mouse_x, mouse_y);
+            }
+        }
+    }
+
+    int16_t __cdecl Scan_System_Display_Fields_(int16_t mouse_input, int16_t input, int16_t *colony_btns, 
+                                                int16_t *m_planet_idx, int16_t *planet_idx, 
+                                                int16_t *m_ship_idx, int16_t *ship_idx, int16_t *selection) {
+        int16_t ret_val = -1;
+        int16_t gate_idx = -1;
+
+        *planet_idx = -1;
+        *m_planet_idx = -1;
+        *ship_idx = -1;
+        *m_ship_idx = -1;
+        *selection = -1;
+
+        // 1. Check for clicked ships
+        for (int i = 0; i < 15; ++i) {
+            if (MOX::_system_display_ships[i].field4_0x8 != 0 && MOX::_system_display_ships[i].button == input) {
+                *ship_idx = MOX::_system_display_ships[i].ship_idx;
+                ret_val = 0;
+                break;
+            }
+        }
+
+        // 2. Check for hovered ships if no click hit
+        if (ret_val == -1) {
+            for (int i = 0; i < 15; ++i) {
+                if (MOX::_system_display_ships[i].field4_0x8 != 0 && MOX::_system_display_ships[i].button == mouse_input) {
+                    *m_ship_idx = MOX::_system_display_ships[i].ship_idx;
+                    ret_val = 4;
+                    break;
+                }
+            }
+        }
+
+        // 3. Check for colony button interactions (Click, Right-Click popup, or Hover)
+        if (ret_val == -1) {
+            for (int i = 0; i < 5; ++i) {
+                int16_t btn_id = colony_btns[i];
+                if (input == btn_id) {
+                    *planet_idx = ERIC::Get_Sint_Index_From_List_(MOX::_sys_disp[i].orbit, MOX::_star[MOX::_system_star_id].planet_index, 5);
+                    ret_val = 0;
+                    break;
+                }
+                if ((int)input + (int)btn_id == 0) { // Right-click or special interaction
+                    if (MOX::_planet[MOX::_sys_disp[i].orbit].planet_type != PLANET_TYPE_GAS_GIANT) {
+                        SYS::Potential_Colony_Info_Popup_(MOX::_sys_disp[i].orbit);
+                        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+                    }
+                    return -1;
+                }
+                if (mouse_input == btn_id) {
+                    *m_planet_idx = ERIC::Get_Sint_Index_From_List_(MOX::_sys_disp[i].orbit, MOX::_star[MOX::_system_star_id].planet_index, 5);
+                    ret_val = 4;
+                }
+            }
+        }
+
+        // 4. Check for system grid interactions if still no hit
+        if (ret_val == -1) {
+            int16_t center_x = MOX::_system_display_base_x + 171; // 0xab
+            int16_t center_y = MOX::_system_display_base_y + 134; // 0x86
+            int16_t ptr_x = mouse::Pointer_X_();
+            int16_t ptr_y = mouse::Pointer_Y_();
+
+            // Grid click scan
+            if (input == MOX::_system_display_grid_field) {
+                int16_t orbit_id = GEO::Get_Orbit_From_X_Y_(center_x - ptr_x, center_y - ptr_y);
+                if (orbit_id >= 0) {
+                    for (int i = 0; i < 5; ++i) {
+                        int16_t p_idx = MOX::_star[MOX::_system_star_id].planet_index[i];
+                        if (p_idx > -1 && MOX::_planet[p_idx].orbit == orbit_id && MOX::_planet[p_idx].planet_type == PLANET_TYPE_ASTEROID) {
+                            *planet_idx = i;
+                            ret_val = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Grid hover scan
+            if (ret_val == -1) {
+                int16_t orbit_id = -1;
+                if (ptr_x > MOX::_system_display_base_x && 
+                    ptr_x < MOX::_system_display_base_x + (int16_t)MOX::_moveable_box[0].width &&
+                    ptr_y > MOX::_system_display_base_y && 
+                    ptr_y < MOX::_system_display_base_y + (int16_t)MOX::_moveable_box[0].height) 
+                {
+                    orbit_id = GEO::Get_Orbit_From_X_Y_(center_x - ptr_x, center_y - ptr_y);
+                }
+
+                if (orbit_id >= 0) {
+                    for (int i = 0; i < 5; ++i) {
+                        int16_t p_idx = MOX::_star[MOX::_system_star_id].planet_index[i];
+                        if (p_idx > -1 && MOX::_planet[p_idx].orbit == orbit_id && MOX::_planet[p_idx].planet_type == PLANET_TYPE_ASTEROID) {
+                            *m_planet_idx = i;
+                            ret_val = 4;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 5. Check for gate icon hover
+        if (ret_val == -1) {
+            for (int i = 0; i < 4; ++i) {
+                if (MOX::_gate_icon_field[i] == mouse_input) {
+                    gate_idx = i;
+                    ret_val = 4;
+                    break;
+                }
+            }
+        }
+
+        // Determine final selection result for UI feedback
+        *selection = -1;
+        if (*m_planet_idx > -1) {
+            *selection = *m_planet_idx;
+        } else if (*m_ship_idx >= 0) {
+            *selection = *m_ship_idx + 1000;
+        } else if (gate_idx > -1) {
+            *selection = gate_idx + 2000;
+        }
+
+        return ret_val;
     }
 }

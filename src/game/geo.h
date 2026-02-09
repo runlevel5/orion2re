@@ -26,11 +26,18 @@ namespace GEO {
     }
 
     bool __cdecl Point_Is_In_Some_Nebula_(int16_t x, int16_t y);
+    int16_t __cdecl Get_Orbit_From_X_Y_(int16_t rel_x, int16_t rel_y);
 
     inline bool __cdecl Point_Is_In_Nebula_N_(int16_t x, int16_t y, int16_t nebula_index) {
         using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412A90});
         return fn(x, y, nebula_index);
+    }
+
+    inline int32_t __cdecl Get_Orbit_From_X_Y_(int32_t x, int32_t y) {
+        using Fn = int32_t(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00413220 });
+        return fn(x, y);
     }
 
     inline bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
