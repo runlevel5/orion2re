@@ -58,6 +58,8 @@ namespace HACCESS {
         return reinterpret_cast<Fn>(0x0049A450)(player_idx, design_idx);
     }
 
+    bool __cdecl Fleet_Movement_Icon_Selected_(int16_t icon_idx);
+
     inline void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* buffer, uint8_t param_3) {
         using Fn = void(__cdecl*)(int16_t, char*, uint8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049a610});
@@ -88,9 +90,9 @@ namespace HACCESS {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0049A8B0})();
     }
 
-    inline void __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int max, int filter) {
-        using Fn = void(__cdecl*)(int16_t*, int, int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049A7F0})(out, max, filter);
+    inline int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int max, int filter) {
+        using Fn = int16_t(__cdecl*)(int16_t*, int, int);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049A7F0})(out, max, filter);
     }
 
     inline void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {

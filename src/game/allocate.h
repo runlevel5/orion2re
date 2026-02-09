@@ -25,8 +25,6 @@ namespace allocate {
 
     void __cdecl Allocation_Error_(int bytes_requested);
 
-    int32_t __cdecl Get_Remaining_Block_Space_(void* addr);
-
     // Suggested name: Allocate_Cache_
     inline void* __cdecl FUN_0052c200(uint32_t size) {
         using Fn = void*(__cdecl*)(uint32_t);
@@ -58,31 +56,14 @@ namespace allocate {
 
     void* __cdecl Allocate_Far_Space_(size_t size);
 
-    inline void* __cdecl Allocate_Space_No_Header_(uint32_t size) {
-        using Fn = void* (__cdecl*)(uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052ea60 });
-        return fn(size);
-    }
+    void* __cdecl Allocate_Space_No_Header_(uint32_t size);
 
-    inline void* __cdecl Allocate_First_Block_No_Header_(int heap_idx, uint32_t size) {
-        using Fn = void* (__cdecl*)(int, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eaa0 });
-        return fn(heap_idx, size);
-    }
+    void* __cdecl Allocate_First_Block_No_Header_(void* block_ptr, uint32_t size);
 
-    inline void* __cdecl Allocate_Next_Block_No_Header_(int heap_idx, uint32_t size) {
-        using Fn = void* (__cdecl*)(int, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052eac0 });
-        return fn(heap_idx, size);
-    }
+    void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size);
 
     inline void* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
         using Fn = void* (__cdecl*)(void*, uint32_t);
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E930 })(seg, size);
-    }
-
-    inline void __cdecl Allocate_First_Screen_Seg_(int32_t count) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(0x004c4980)(count);
     }
 }

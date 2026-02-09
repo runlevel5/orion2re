@@ -6,6 +6,12 @@ namespace FLEETPOP {
 
     void __cdecl Reload_Fleet_Box_Data_(void);
 
+    inline uint8_t __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406590});
+        return fn(ship_idx);
+    }
+
     inline int16_t __cdecl N_Fleet_Icons_(int16_t node_ptr) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004051E0});
@@ -18,36 +24,17 @@ namespace FLEETPOP {
         fn(icon_count);
     }
 
-    inline int16_t __cdecl Fleet_Buttons_Chosen_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x00405070)();
-    }
+    int16_t __cdecl Fleet_Buttons_Chosen_();
 
-    inline void __cdecl Set_Fleet_Movement_Icon_Selections_(int a, uint8_t b) {
-        using Fn = void(__cdecl*)(int, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406330});
-        fn(a, b);
-    }
+    void __cdecl Set_Fleet_Movement_Icon_Selections_(int16_t state, uint8_t auto_select_flag);
 
-    inline bool __cdecl Some_Icon_Selected_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(0x00406700)();
-    }
+    bool __cdecl Some_Icon_Selected_();
 
-    inline void __cdecl Reload_Ship_Selection_Status_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004059E0)();
-    }
+    void __cdecl Reload_Ship_Selection_Status_();
 
-    inline int16_t __cdecl First_Unselected_Icon_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00404CC0})();
-    }
+    int16_t __cdecl First_Unselected_Icon_();
 
-    inline void __cdecl Save_Ship_Selection_Status_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00405A60})();
-    }
+    void __cdecl Save_Ship_Selection_Status_();
 
     int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type);
     int16_t __cdecl Fleet_Box_Width_();
@@ -60,25 +47,11 @@ namespace FLEETPOP {
 
     void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
 
-    inline int8_t __cdecl Can_Select_Fleet_Box_Ship_(int32_t param_1) {
-        using Fn = int8_t(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406750});
-        return fn(param_1);
-    }
+    bool __cdecl Can_Select_Fleet_Box_Ship_(int16_t index);
 
-    inline uint32_t __cdecl Icon_Selection_Status_(int16_t field) {
-        using Fn = uint32_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406610});
-        return fn(field);
-    }
+    int16_t __cdecl Icon_Selection_Status_(int16_t icon_field_id);
 
-    inline void __cdecl Clear_Ship_Node_Selection_Flags_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00403ec0})();
-    }
+    void __cdecl Clear_Ship_Node_Selection_Flags_();
 
-    inline void __cdecl Reload_Fleet_Box_Palette_(int16_t owner, uint32_t is_not_player) {
-        using Fn = void(__cdecl*)(int16_t, uint32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004059c0})(owner, is_not_player);
-    }
+    void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t is_not_player);
 }

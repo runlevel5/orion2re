@@ -39,7 +39,15 @@ namespace MAINSCR {
     inline uint16_t& _zoom_box_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596192});
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
 
+    void* __cdecl Allocate_First_Screen_Seg_(int32_t p);
+
     bool __cdecl Is_Main_Screen_Palette_();
+
+    inline uint8_t __cdecl Ship_Can_Be_Selected_(int16_t ship_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CD0F0});
+        return fn(ship_idx);
+    }
 
     void __cdecl Draw_Main_Screen_();
 

@@ -1641,7 +1641,7 @@ namespace LOADSAVE {
             fields::Clear_Fields_();
             fields::Disable_Draw_All_Fields_();
             MOX::_draw_main_screen_to_back = 1;
-            allocate::Allocate_First_Screen_Seg_(5);
+            MAINSCR::Allocate_First_Screen_Seg_(5);
             video::Set_Page_Off_();
             MAINSCR::Draw_Mini_Main_Screen_();
             RUSS::Mox_Sync_Update_();

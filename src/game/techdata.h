@@ -3,6 +3,17 @@
 
 namespace TECHDATA {
 #pragma pack(push, 1)
+    struct s_tech_app_data {
+        char* name;
+        uint16_t id;
+        int16_t tech_field_id;
+        uint8_t unk_class;
+        uint8_t ai_group;
+        uint8_t unknown1;
+        uint8_t in_strategic;
+        uint8_t type;
+    };
+
     struct s_tech_armor_data {
         char* name;
         uint8_t field1_0x4;

@@ -185,6 +185,11 @@ namespace HACCESS {
         return Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
     }
 
+    bool __cdecl Fleet_Movement_Icon_Selected_(int16_t icon_idx) {
+        int16_t node_idx = MOX::_fleet_movement_icon[icon_idx].ship_node_idx;
+        return (bool)MOX::_ship_node[node_idx].selected;
+    }
+
     char* __cdecl Get_Planet_Name_(int16_t planet_idx) {
         Do_Get_Planet_Name_(planet_idx, MOX::_temp_string, 1);
         return MOX::_temp_string;

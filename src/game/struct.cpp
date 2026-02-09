@@ -78,4 +78,15 @@ namespace struct_ {
         // Calculate byte index and bit position within that byte
         data[bit >> 3] |= static_cast<uint8_t>(1 << (bit & 0x7));
     }
+
+    void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index) {
+        uint8_t* field_ptr = reinterpret_cast<uint8_t*>(bit_field);
+
+        // Bit index is treated as unsigned 16-bit to calculate byte offset.
+        uint16_t unsigned_index = static_cast<uint16_t>(bit_index);
+        uint32_t byte_offset = unsigned_index >> 3;
+        uint32_t bit_in_byte = unsigned_index & 7;
+
+        field_ptr[byte_offset] &= ~(static_cast<uint8_t>(1 << bit_in_byte));
+    }
 }

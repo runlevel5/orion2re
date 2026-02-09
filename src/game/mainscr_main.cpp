@@ -258,7 +258,7 @@ namespace MAINSCR {
         _moving_a_stack = 0;
         _track_time_flag = 1;
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
-        allocate::Allocate_First_Screen_Seg_(5);
+        MAINSCR::Allocate_First_Screen_Seg_(5);
         SYS::Clear_System_Display_Loaded_Flag_();
         mouse::Clear_Mouse_XY_();
         EVANHELP::Set_Main_Game_Screen_Help_List_();

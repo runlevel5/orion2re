@@ -5,4 +5,5 @@ namespace struct_ {
     void __cdecl Copy_Structure_(void* dest, const void* src, uint32_t size);
     bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index);
     void __cdecl Set_Bit_Field_(void* field, uint16_t bit);
+    void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index);
 }

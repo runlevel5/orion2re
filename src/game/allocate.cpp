@@ -216,4 +216,68 @@ namespace allocate {
         // Restore the value at the calculated offset relative to the block address
         *reinterpret_cast<uint32_t*>(static_cast<uintptr_t>(target_base) - 0x0C) = original_value;
     }
+
+    void* __cdecl Allocate_Space_No_Header_(uint32_t size) {
+        void* ptr = Allocate_Far_Space_(size);
+
+        if (ptr == nullptr) {
+            ptr = Allocate_Dos_Space_(size);
+
+            if (ptr == nullptr) {
+                Allocation_Error_(size);
+            }
+        }
+
+        return ptr;
+    }
+
+    void* __cdecl Allocate_First_Block_No_Header_(void* block_ptr, uint32_t size) {
+        // Clear a field at offset -12 relative to the block pointer
+        *reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(block_ptr) - 0xc) = 0;
+
+        return Allocate_Next_Block_No_Header_(block_ptr, size);
+    }
+
+    /**
+     * @brief Allocates a block of memory from a pool, aligning the size if it's odd.
+     * 
+     * @param block_ptr Start address of the memory pool. A header exists 12 bytes before this address.
+     * @param size The requested size of the block.
+     * @return void* Pointer to the newly allocated block, or nullptr if capacity is exceeded.
+     */
+    void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size) {
+        uint8_t* base_ptr = reinterpret_cast<uint8_t*>(block_ptr);
+        auto* pool_header = reinterpret_cast<s_alloc_header*>(base_ptr - sizeof(s_alloc_header));
+
+        uint32_t aligned_size = size;
+
+        // Alignment logic: if size is odd, align it to the next 4-byte boundary.
+        // Even sizes are used as-is.
+        if ((size & 1) != 0) {
+            aligned_size = (size & 0xFFFFFFFC) + 4;
+        }
+
+        uint32_t current_offset = pool_header->current;
+        uint32_t pool_capacity = pool_header->size;
+        uint32_t next_offset = current_offset + aligned_size;
+
+        // Capacity check
+        if (next_offset > pool_capacity) {
+            return nullptr;
+        }
+
+        // Pointer to the start of the new block within the pool.
+        uint8_t* new_block_ptr = base_ptr + current_offset;
+
+        // Update the current offset in the pool header.
+        pool_header->current = next_offset;
+
+        // Initialize the new block's internal structure (12 bytes).
+        auto* new_block_header = reinterpret_cast<s_alloc_header*>(new_block_ptr);
+        new_block_header->current = 0;
+        new_block_header->size = size;   // Stores the original requested size
+        new_block_header->reserved2 = 0;
+
+        return static_cast<void*>(new_block_ptr);
+    }
 }

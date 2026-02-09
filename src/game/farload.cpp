@@ -66,12 +66,12 @@ void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int
             farload::Error_Handler_(lib_name, 3, idx);
         }
     } else if (alloc_type == 1) {
-        dest_buf = allocate::Allocate_First_Block_No_Header_((int)param_3, size);
+        dest_buf = allocate::Allocate_First_Block_No_Header_(param_3, size);
         if (dest_buf == nullptr) {
             farload::Error_Handler_(lib_name, 5, idx);
         }
     } else if (alloc_type == 2) {
-        dest_buf = allocate::Allocate_Next_Block_No_Header_((int)param_3, size);
+        dest_buf = allocate::Allocate_Next_Block_No_Header_(param_3, size);
         if (dest_buf == nullptr) {
             farload::Error_Handler_(lib_name, 5, idx);
         }

@@ -2149,4 +2149,21 @@ namespace MAINSCR {
             MOX::_cur_map_y = target_y;
         }
     }
+
+    /**
+     * @address 004c4980
+     */
+    void* __cdecl Allocate_First_Screen_Seg_(int32_t param) {
+        // Allocate 76,000 bytes (0x128E0) for other ships
+        MOX::_other_ships_screen_seg = allocate::Allocate_First_Block_(MOX::_screen_seg, 76000 /* 0x128E0 */);
+
+        // Update block metrics (return value is unused in assembly)
+        allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+
+        // Determine space required for a 60x60 bitmap and allocate it next
+        uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(60 /* 0x3C */, 60 /* 0x3C */);
+        MOX::_global_bitmap_seg = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+
+        return MOX::_global_bitmap_seg;
+    }
 }

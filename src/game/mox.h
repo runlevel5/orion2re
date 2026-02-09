@@ -169,6 +169,7 @@ namespace MOX {
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
+    inline void*& _global_bitmap_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC4});
     inline uint8_t& _first_time_drawn = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D1A});
     inline uint8_t& _draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E98});
     inline uint8_t& _dont_draw_main_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BFB2});
@@ -236,6 +237,7 @@ namespace MOX {
 
     inline s_animation_header*& _mid_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B610});
     inline s_animation_header*& _far_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B0});
+    inline uint32_t& _black_hole_anim_bitfield = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A17C0});
 
     // Suggested name: MOX::_star_seg
     inline s_animation_header** _star_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4C0});
@@ -334,6 +336,8 @@ namespace MOX {
     inline uint32_t& _fleet_box_ship_ids =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059D610});
 
+    inline void*& _other_ships_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059D6B0});
+
     inline void*& _fleet_box_grid_sm_seg4 = *reinterpret_cast<void**>(std::uintptr_t{0x005A47E0});
 
     inline int16_t& _ship_icon_count =
@@ -395,8 +399,16 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline uint8_t& _fleet_movement_icons_on =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596C9C});
+
+    inline uint16_t& _fleet_icon_buttons_added = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B38});
+
     inline s_fleet_box& _fleet_box =
         *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+
+    inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
+        *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
 
     #pragma pack(push, 1)
     struct s_save_game_description {

@@ -437,7 +437,7 @@ workflows:
             - If function for a stub already exists (as a stub or as an re-implemented function) - do not add the stub again.
             - Avoid changing signatures of stubs that already exist. If you see an incompatible signature and you sure
               about it - add a type cast and a comment.
-            - Find a `// Patch: ` comment and add address to patch to `src/patch.cpp` at the bottom of the list. Read last 20
+            - Find a `// Patch: ` comment and add address to patch to `src/hooks.cpp` at the bottom of the list. Read last 20
               lines of the file - never read whole file as it is too big.
             
               Example:
@@ -472,7 +472,7 @@ workflows:
           * External variables and functions were added to correct files with correct namespaces using the `apply_patch` tool
           * All mentioned namespaces were processed
           * No existing function signatures were changed
-          * `src/patch.cpp` was updated by reading last 20 lines and appending decompiled function address
+          * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address
         outcomes:
           - name: done    
     edges:

@@ -1318,7 +1318,7 @@ struct s_fleet_box {
     short map_height;
     undefined field5_0xa;
     undefined field6_0xb;
-    short field7_0xc;
+    short count;
     short field8_0xe;
     short field9_0x10;
     struct s_animation_header *name_sm_seg;
@@ -1330,6 +1330,18 @@ struct s_fleet_box {
     int8_t field16_0x1e;
     int8_t field17_0x1f;
     int8_t field18_0x20;
+};
+
+typedef struct s_fleet_movement_icon s_fleet_movement_icon, *Ps_fleet_movement_icon;
+
+struct s_fleet_movement_icon {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    undefined field4_0x4;
+    short field;
+    short ship_node_idx;
 };
 
 typedef struct s_font s_font, *Ps_font;
@@ -2035,20 +2047,20 @@ struct s_mouse_xy {
 typedef struct s_movable_box s_movable_box, *Ps_movable_box;
 
 struct s_movable_box {
-    uint16_t index;
+    int16_t index;
     int16_t off_flag;
-    undefined2 height;
-    undefined2 width;
+    int16_t height;
+    int16_t width;
     int16_t x;
     int16_t y;
-    short active;
-    short field;
-    short field8_0x10;
-    short field9_0x12;
+    int16_t active;
+    int16_t field;
+    int16_t field8_0x10;
+    int16_t field9_0x12;
     int16_t field10_0x14;
     int16_t field11_0x16;
-    short field12_0x18;
-    short field13_0x1a;
+    int16_t field12_0x18;
+    int16_t field13_0x1a;
 };
 
 typedef struct s_MSG s_MSG, *Ps_MSG;
@@ -2900,7 +2912,7 @@ typedef struct s_ship_node s_ship_node, *Ps_ship_node;
 struct s_ship_node {
     short ship_idx;
     short field1_0x2;
-    char field2_0x4;
+    char selected;
 };
 
 typedef struct s_skill_data s_skill_data, *Ps_skill_data;

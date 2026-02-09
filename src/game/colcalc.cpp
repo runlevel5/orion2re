@@ -2170,6 +2170,85 @@ namespace COLCALC {
      * @param player_idx Index of the player (0-7).
      * @return A production factor (e.g., 4 for 100%, 3 for 75%, 2 for 50%).
      */
+    void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx) {
+        MOX::Mox_Update_();
+
+        s_colony* colony = MOX::_colony;
+
+        while (colony < MOX::_colony + MOX::_NUM_COLONIES) {
+            if (colony->owner == (int8_t)player_idx && colony->outpost_flag == 0) {
+                Pre_Import_Computing_(colony);
+                MOX::Mox_Update_();
+            }
+            colony++;
+        }
+
+        Do_Player_Colony_Post_Production_(player_idx);
+        MOX::Mox_Update_();
+    }
+
+    /**
+     * Determines if a player is eligible to acquire a specific technology application.
+     * Checks requirements based on player traits, game settings (Xenons, Strategic Combat),
+     * and technology metadata.
+     */
+    bool __cdecl Player_May_Get_Tech_App_(s_player* plr, int tech_app) {
+        if (plr->tech_applications[tech_app] == 3) {
+            return false;
+        }
+
+        switch (tech_app) {
+            case TECH_APP_NO_TECH:
+            case TECH_APP_CAPITOL:
+                return false;
+
+            case TECH_APP_CONFEDERATION:
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 0) {
+                    return false;
+                }
+                break;
+
+            case TECH_APP_DIMENSIONAL_PORTAL:
+                return (bool)MOX::_settings.xenons_exist;
+
+            case TECH_APP_FEDERATION:
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 4) {
+                    return false;
+                }
+                break;
+
+            case TECH_APP_GALACTIC_UNIFICATION:
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 6) {
+                    return false;
+                }
+                break;
+
+            case TECH_APP_IMPERIUM:
+                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 2) {
+                    return false;
+                }
+                break;
+
+            default:
+                if (MOX::_settings.strategic_combat_flag != 0) {
+                    if (TECHDATA::_technology_applications[tech_app].in_strategic == 0) {
+                        return false;
+                    }
+                }
+
+                if (tech_app >= 204) {
+                    return false;
+                }
+
+                if (TECHDATA::_technology_applications[tech_app].tech_field_id == -1) {
+                    return false;
+                }
+                break;
+        }
+
+        return true;
+    }
+
     int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx) {
         s_colony* c = static_cast<s_colony*>(colony);
         if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
