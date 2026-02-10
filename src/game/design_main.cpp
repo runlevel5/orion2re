@@ -142,7 +142,7 @@ namespace DESIGN {
                 fonts::Print_Integer_Right_(0x31, y_pos, MOX::_design->weapon_count[slot]);
                 Design_Weapon_Damage_String_(slot, buffer, -1, -1);
 
-                if (helpers::strcmp(buffer, s_special_tag) == 0) {
+                if (strcmp(buffer, s_special_tag) == 0) {
                     MISC::Change_Font_Style_(1);
                     fonts::Print_Centered_(0x10B, y_pos, buffer);
                     MISC::Change_Font_Style_(2);

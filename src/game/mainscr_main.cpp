@@ -8,8 +8,8 @@ namespace MAINSCR {
         char monetary_unit[16];
         char research_unit[16];
 
-        helpers::memset(&colors1, 0, sizeof(colors1));
-        helpers::memset(&colors2, 0, sizeof(colors2));
+        memset(&colors1, 0, sizeof(colors1));
+        memset(&colors2, 0, sizeof(colors2));
 
         fonts::Set_Font_Style_(0, &colors1);
         fonts::Get_Font_Height_();
@@ -17,7 +17,7 @@ namespace MAINSCR {
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, -1, 0x43, 1);
         int16_t stardate_font_style = MISC::Get_Font_Style_();
         s_colors* p_stardate_colors = MISC::Font_Colors2_(stardate_font_style, 14, 23);
-        helpers::memcpy(&colors2, p_stardate_colors, 8);
+        memcpy(&colors2, p_stardate_colors, 8);
         fonts::Set_Outline_Color_(2, 1);
         fonts::Set_Font_Style_Outline_(stardate_font_style, &colors2);
         fonts::Print_Centered_(580, 29, buffer); // 0x244, 0x1d
@@ -28,7 +28,7 @@ namespace MAINSCR {
             MISC::Increase_Font_Color_Range_(((int)MOX::_red_color_pulse_value * 5) / 9);
             const char* flux_msg = HAROLD::H_Message_(0xe0);
             char flux_buffer[128];
-            helpers::strcpy(flux_buffer, flux_msg);
+            strcpy(flux_buffer, flux_msg);
             int16_t flux_width = fonts::Get_String_Width_(flux_buffer);
             int16_t flux_x = 526 - flux_width; // 0x20e
 
@@ -510,7 +510,7 @@ namespace MAINSCR {
 
                             if (msg_id != 0) {
                                 const char* msg = HAROLD::H_Message_(msg_id);
-                                helpers::strcpy(msg_buffer, msg);
+                                strcpy(msg_buffer, msg);
                                 HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, msg_buffer, 3);
                             }
                         }
@@ -624,7 +624,7 @@ namespace MAINSCR {
                 }
                 else {
                     const char* msg = HAROLD::H_Message_(0x20);
-                    helpers::strcpy(msg_buffer, msg);
+                    strcpy(msg_buffer, msg);
                     HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, msg_buffer, 3);
                 }
             }
@@ -718,7 +718,7 @@ namespace MAINSCR {
             else if (input == _freighters_window_field) {
                 if (MOX::_player[MOX::_PLAYER_NUM].n_freighters < 1) {
                     const char* msg = HAROLD::H_Message_(HESTR_0DF_YOU_DO_NOT_HAVE_ANY_FR);
-                    helpers::strcpy(msg_buffer, msg);
+                    strcpy(msg_buffer, msg);
                     HAROLD::User_Box_((uint8_t*)&MOX::_draw_main_screen_to_back, msg_buffer, 3);
                     exit_flag = 1;
                 }

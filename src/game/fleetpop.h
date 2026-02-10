@@ -38,12 +38,7 @@ namespace FLEETPOP {
 
     int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type);
     int16_t __cdecl Fleet_Box_Width_();
-
-    inline uint16_t __cdecl Fleet_Box_Height_(int16_t count) {
-        using Fn = uint16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404F40});
-        return fn(count);
-    }
+    int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count);
 
     void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
 

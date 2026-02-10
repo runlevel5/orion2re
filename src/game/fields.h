@@ -27,6 +27,9 @@ namespace fields {
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
     inline uint32_t& _continuous_string = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
+    inline uint16_t& _field_outline_color = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B020});
+    inline uint16_t& _mouse_cancel_disabled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B018});
+    inline uint16_t& _dynamic_field_refresh = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B074});
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
     void __cdecl Deactivate_Auto_Function_();
@@ -79,20 +82,11 @@ namespace fields {
     void __cdecl Disable_Draw_All_Fields_();
     void __cdecl Enable_Draw_All_Fields_();
 
-    inline void __cdecl Disable_Cancel_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0051D180})();
-    }
+    void __cdecl Disable_Cancel_();
 
-    inline void __cdecl Clear_Fields_Above_(int16_t f) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0051FFD0})(f);
-    }
+    void __cdecl Clear_Fields_Above_(int16_t f);
 
-    inline void __cdecl Enable_Mouse_Pressed_Field_Update_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00520010})();
-    }
+    void __cdecl Enable_Mouse_Pressed_Field_Update_();
 
     void __cdecl Deactivate_Help_List_();
 
@@ -104,10 +98,7 @@ namespace fields {
 
     int16_t __cdecl Scan_Field_();
 
-    inline void __cdecl Clear_Mouse_Buffer_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FFF0});
-        fn();
-    }
+    void __cdecl Clear_Mouse_Buffer_();
     void __cdecl Set_Input_Delay_(uint16_t delay);
+    void __cdecl Set_Field_Outline_Color_(uint16_t color);
 }

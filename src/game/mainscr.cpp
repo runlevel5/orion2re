@@ -814,8 +814,8 @@ namespace MAINSCR {
             fonts::Set_Font_Spacing_(1);
 
             int16_t line_width = fonts::Get_String_Width_(star_name);
-            uint8_t player_color_idx = (uint8_t)MOX::_player[surrender_to].color;
-            uint32_t draw_color = (uint32_t)surrender_colors[player_color_idx];
+            uint8_t player_color_idx = MOX::_player[surrender_to].color;
+            uint8_t draw_color = surrender_colors[player_color_idx];
 
             int16_t line_start_x = draw_x - (line_width / 2);
             int16_t font_height = fonts::Get_Font_Height_();
@@ -1155,7 +1155,7 @@ namespace MAINSCR {
                     Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 1);
                 }
 
-                helpers::strcpy(buffer, msg_src);
+                strcpy(buffer, msg_src);
                 HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
                 MOX::_draw_main_screen_to_back = 1;
                 Update_Star_Owners_();

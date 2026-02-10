@@ -1063,7 +1063,7 @@ namespace COLCALC {
         s_food_production_breakdown breakdown;
         int job_food = 0;
         if (colony->food2_per_farmer == 0) {
-            helpers::memset(&breakdown, 0, sizeof(breakdown));
+            memset(&breakdown, 0, sizeof(breakdown));
         } else {
             job_food = Colony_Job_Production_(colony, 0, debug_out ? &breakdown : nullptr);
         }
@@ -1797,7 +1797,7 @@ namespace COLCALC {
             int32_t blockaded_penalty;  // Offset 582
             int32_t leader_bonus;       // Offset 586
         } debug_data;
-        helpers::memset(&debug_data, 0, sizeof(debug_data));
+        memset(&debug_data, 0, sizeof(debug_data));
 
         void* debug_ptr = debug_out ? &debug_data : nullptr;
         int base_research = Colony_Job_Production_(colony, ECON_RESEARCH, debug_ptr);
@@ -2311,7 +2311,7 @@ namespace COLCALC {
         s_food_production_breakdown total_debug, current_pop_debug;
 
         if (debug_out) {
-            helpers::memset(&total_debug, 0, sizeof(total_debug));
+            memset(&total_debug, 0, sizeof(total_debug));
         }
 
         int total_accumulated_prod = 0;
@@ -2327,7 +2327,7 @@ namespace COLCALC {
                 int16_t gravity_penalty = (int16_t)Gravity_Player_Production_Factor_(colony, (int16_t)pop_race);
 
                 if (debug_out) {
-                    helpers::memset(&current_pop_debug, 0, sizeof(current_pop_debug));
+                    memset(&current_pop_debug, 0, sizeof(current_pop_debug));
                 }
 
                 int16_t base_prod = Colony_Pop_Base_Prod_Produced_(colony, p, (int16_t)job_type, debug_out ? &current_pop_debug : nullptr);
@@ -2384,7 +2384,7 @@ namespace COLCALC {
         }
 
         if (debug_out) {
-            helpers::memcpy(debug_out, &total_debug, sizeof(total_debug));
+            memcpy(debug_out, &total_debug, sizeof(total_debug));
         }
 
         if (job_type == 0) return (int16_t)((total_accumulated_prod + 20) / 40);

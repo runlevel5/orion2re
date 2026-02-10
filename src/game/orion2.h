@@ -1322,7 +1322,7 @@ struct s_fleet_box {
     short field8_0xe;
     short field9_0x10;
     struct s_animation_header *name_sm_seg;
-    struct s_animation_header *field11_0x16;
+    struct s_animation_header *name_sm_seg2;
     int8_t field12_0x1a;
     int8_t field13_0x1b;
     int8_t field14_0x1c;

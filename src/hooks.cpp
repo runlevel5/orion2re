@@ -721,6 +721,20 @@ namespace hooks {
         { 0x004c4980, &MAINSCR::Allocate_First_Screen_Seg_ },
         { 0x004f9140, &COLCALC::Do_Player_Colony_Calculations_ },
         { 0x004fa600, &COLCALC::Player_May_Get_Tech_App_ },
+        { 0x0049e060, &MISC::Bit_Value_To_Num_ },
+        { 0x0049f060, &MISC::_Darken_Fill_ },
+        { 0x0049e0a0, &MISC::Change_Font_Style_ },
+        { 0x0049ddb0, &MISC::Font_Colors2_ },
+        { 0x00520000, &fields::Set_Field_Outline_Color_ },
+        { 0x00513d30, &MOVEBOX::Vanish_Fleet_Movement_Box_ },
+        { 0x00513db0, &MOVEBOX::Vanish_System_Display_Box_ },
+        { 0x00513e10, &MOVEBOX::Mouse_Within_Fleet_Box_ },
+        { 0x0051d180, &fields::Disable_Cancel_ },
+        { 0x0051ffd0, &fields::Clear_Fields_Above_ },
+        { 0x00520010, &fields::Enable_Mouse_Pressed_Field_Update_ },
+        { 0x0051fff0, &fields::Clear_Mouse_Buffer_ },
+        { 0x00404f40, &FLEETPOP::Fleet_Box_Height_ },
+        { 0x00525860, &fonts::Print_Integer_Right_ },
     };
 
     void Install_Hooks()

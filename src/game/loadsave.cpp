@@ -671,20 +671,20 @@ namespace LOADSAVE {
     void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf) {
         for (int16_t i = 0; i < 10; ++i) {
             char local_str_buf[25];
-            helpers::memset(local_str_buf, 0, 25);
+            memset(local_str_buf, 0, 25);
 
             int32_t star_date_value = fields->field0_0x0[i];
 
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
                 const char* prefix = HAROLD::H_Message_(202);
-                helpers::strcpy(local_str_buf, prefix);
+                strcpy(local_str_buf, prefix);
 
                 char itoa_buf[12];
                 __itoa(star_date_value, itoa_buf, 10);
 
-                size_t current_len = helpers::strlen(local_str_buf);
-                size_t itoa_len = helpers::strlen(itoa_buf);
+                size_t current_len = strlen(local_str_buf);
+                size_t itoa_len = strlen(itoa_buf);
 
                 // Append itoa result while inserting a decimal point before the last digit
                 for (size_t j = 0; j < itoa_len; ++j) {
@@ -697,11 +697,11 @@ namespace LOADSAVE {
 
             } else if (star_date_value < 0) {
                 // If the value is negative, mark it as invalid
-                helpers::memcpy(local_str_buf, s_INVALID_STR, 12);
+                memcpy(local_str_buf, s_INVALID_STR, 12);
             }
 
             // Copy the resulting string (25 bytes) to the correct slot in the output buffer
-            helpers::memcpy(output_buf + (i * 25), local_str_buf, 25);
+            memcpy(output_buf + (i * 25), local_str_buf, 25);
         }
     }
 
@@ -908,7 +908,7 @@ namespace LOADSAVE {
             if (MOX::_screen_data == 3) text_x += 2;
 
             if (_print_data_to_bitmap == 0) {
-                if (helpers::strcmp(_empty_save_slot_message, MOX::_save_game_description[i].description) != 0) {
+                if (strcmp(_empty_save_slot_message, MOX::_save_game_description[i].description) != 0) {
                     fonts::Print_(text_x, text_y + 14, stardate_buf);
                 }
             } else {
@@ -1264,7 +1264,7 @@ namespace LOADSAVE {
                 }
             } else if (input == _game_popup_fields->field_n) {
                 const char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
-                helpers::strcpy(text_buffer, msg);
+                strcpy(text_buffer, msg);
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     MOX::_game_type = 0;
@@ -1281,7 +1281,7 @@ namespace LOADSAVE {
                 }
             } else if (input == _game_popup_fields->field_q) {
                 const char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
-                helpers::strcpy(text_buffer, msg);
+                strcpy(text_buffer, msg);
 
                 if (Game_Popup_User_Box_(text_buffer, 1)) {
                     FILEDEF::Save_Game_(9);
@@ -1320,7 +1320,7 @@ namespace LOADSAVE {
                     event_processed = true;
                 } else {
                     const char* msg = HAROLD::H_Message_(0xB9); // "CAN'T SAVE NOW"
-                    helpers::strcpy(text_buffer, msg);
+                    strcpy(text_buffer, msg);
                     event_processed = true;
                     Game_Popup_User_Box_(text_buffer, 0);
                     *out_finished = 1;

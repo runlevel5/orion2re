@@ -10,16 +10,9 @@ namespace MOVEBOX {
 
     bool __cdecl Moveable_Box_Selected_(int16_t index);
 
-    inline void __cdecl Vanish_Fleet_Movement_Box_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513D30});
-        fn();
-    }
+    void __cdecl Vanish_Fleet_Movement_Box_();
 
-    inline void __cdecl Vanish_System_Display_Box_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00513db0})();
-    }
+    void __cdecl Vanish_System_Display_Box_();
 
     inline void __cdecl Save_And_Remove_Boxes_() {
         using Fn = void(__cdecl*)();
@@ -33,11 +26,7 @@ namespace MOVEBOX {
 
     void __cdecl Move_Box_To_Top_(int16_t box_id);
 
-    inline int8_t __cdecl Mouse_Within_Fleet_Box_() {
-        using Fn = int8_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513E10});
-        return fn();
-    }
+    bool __cdecl Mouse_Within_Fleet_Box_();
 
     inline void __cdecl Move_Moveable_Box_(int16_t box_id, int16_t mouse_btn) {
         using Fn = void(__cdecl*)(int16_t, int16_t);

@@ -389,7 +389,7 @@ namespace MAINMENU {
         MOX::Mox_Update_();
 
         // Initialize main menu structure fields to -1
-        helpers::memset(_mainmenu, 0, sizeof(s_main_menu));
+        memset(_mainmenu, 0, sizeof(s_main_menu));
 
         LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
         MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);

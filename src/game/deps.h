@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <Windows.h>
 #include <ddraw.h>
-
 #include "helpers.h"
+
 #include "funcs.h"
 #include "accss.h"
 

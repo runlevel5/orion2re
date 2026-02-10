@@ -14,4 +14,10 @@ namespace graphics {
 
     void __cdecl Save_Window_();
     void __cdecl Restore_Window_();
+
+    inline void __cdecl Tint_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00529660});
+        fn(x1, y1, x2, y2, color);
+    }
 }

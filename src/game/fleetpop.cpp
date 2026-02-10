@@ -2,6 +2,44 @@
 
 namespace FLEETPOP {
 
+int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count) {
+    int16_t close_btn_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
+    int16_t name_height;
+    int16_t bottom_height;
+
+    if (MOX::_fleet_box.field12_0x1a == 0) {
+        MOX::_fleet_box_name_sm_seg_0059736C = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+        MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059736C;
+        name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
+
+        MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+        MOX::_fleet_box_bottom_sm_seg2 = MOX::_fleet_box.name_sm_seg2;
+    } else {
+        MOX::_fleet_box_name_sm_seg_0059B430 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+        MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059B430;
+        name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
+
+        MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+        MOX::_fleet_box_bottom_sm_seg_0059BA00 = MOX::_fleet_box.name_sm_seg2;
+    }
+
+    bottom_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg2);
+
+    int16_t grid_height;
+    if (fleet_count > 9) {
+        MOX::_fleet_box_grid_lg_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
+        grid_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
+    } else {
+        int32_t rows = (static_cast<int32_t>(fleet_count) - 1) / 3 + 1;
+        if (rows > 3) {
+            rows = 3;
+        }
+        grid_height = FLEETPOP::Fleet_Box_Grid_Height_(static_cast<int16_t>(rows));
+    }
+
+    return grid_height + close_btn_height + bottom_height + name_height;
+}
+
 int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type) {
     if (grid_type == 1) {
         return 0x38;

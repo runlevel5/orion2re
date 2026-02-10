@@ -38,6 +38,10 @@ namespace fields {
         _draw_fields_flag = 1;
     }
 
+    void __cdecl Disable_Cancel_() {
+        _mouse_cancel_disabled = 1;
+    }
+
     void __cdecl Deactivate_Help_List_() {
         _help_list_active = 0;
         _help_struct_pointer = nullptr;
@@ -55,6 +59,15 @@ namespace fields {
 
     void __cdecl Set_Input_Delay_(uint16_t delay) {
         _input_delay = delay;
+        mouse::Mouse_Buffer_();
+        mouse::Mouse_Buffer2_();
+    }
+
+    void __cdecl Set_Field_Outline_Color_(uint16_t color) {
+        _field_outline_color = color;
+    }
+
+    void __cdecl Clear_Mouse_Buffer_() {
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
     }
@@ -93,6 +106,19 @@ namespace fields {
         _active_input_field_number = -1;
         _multi_hotkey_active_field = 0;
 
+        mouse::Mouse_Buffer_();
+        mouse::Mouse_Buffer2_();
+    }
+
+    void __cdecl Clear_Fields_Above_(int16_t param_1) {
+        _down_mouse_button = -1;
+        _fields_count = param_1 + 1;
+        mouse::Mouse_Buffer_();
+        mouse::Mouse_Buffer2_();
+    }
+
+    void __cdecl Enable_Mouse_Pressed_Field_Update_() {
+        _dynamic_field_refresh = 1;
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
     }

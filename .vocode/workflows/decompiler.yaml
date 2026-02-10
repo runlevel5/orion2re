@@ -100,9 +100,7 @@ workflows:
             - You are allowed to remove superfluous variables, control logic, loops, etc.
             - Generated code should resemble code written by a developer and not look like it was decompiled,
                but the execution flow should be as close to original code as possible.
-          * Never introduce or call C stdlib helpers (memcpy/memset/strlen/strcmp/printf/etc).
-            If the binary calls an imported/external function, call that symbol directly as it exists
-            in the comment/symbols. Otherwise, implement the logic inline.
+          * Always prefer stdlib functions over hand-rolled loops. Never prefix stdlib functions with `std::` namespace.
           * Do not generate code that uses `goto`, implement code in a way where `goto` is not necessary.
           * If disassembly or decompiled output includes symbolic constant name, emit raw value and add a
             symbolic name in the comment. Make sure to emit correct raw value. For example:
@@ -237,8 +235,7 @@ workflows:
           * You should NOT emit a new address for any structure variables, if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
-            always prefer using library function. Our application does not have direct access to library functions - you
-            must check `src/game/helpers.h` and implement a function if it is missing.
+            always prefer using library function. Never append `std::` namespace to these functions.
           * NEVER add comments, unless it is one of the following exceptions:
             - A symbolic name for the value was provided in the input
             - A potential bug was identified
@@ -252,6 +249,7 @@ workflows:
         temperature: 1
         reasoning_effort: high
         confirmation: auto
+        start_timeout: 60
         tools:
           - read_files
           - list_files

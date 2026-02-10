@@ -1,6 +1,4 @@
 #include "deps.h"
-#include <ctime>
-#include <cstdio>
 
 namespace MAPGEN {
 
@@ -395,7 +393,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      */
     int8_t __cdecl Generate_Climate_(int16_t star_type) {
         int8_t weights[10];
-        helpers::memset(&weights, 0, sizeof(weights));
+        memset(&weights, 0, sizeof(weights));
 
         // 1. Determine weights based on star type and galaxy age
         for (int i = 0; i < 10; ++i) {
@@ -1194,7 +1192,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         p = MISC::Font_Colors2_(4, 'w', '|');
         local_colors2 = *p;
-        helpers::memset(_tests_failed, 0, 8);
+        memset(_tests_failed, 0, 8);
         MOX::Mox_Update_();
 
         _make_food_planet = 0;
@@ -1211,7 +1209,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         MOX::_star_height = 37;
         _is_companion_star = 0;
 
-        helpers::memset(MOX::_planet, 0, 0x5fa * 4);
+        memset(MOX::_planet, 0, 0x5fa * 4);
         MOX::Mox_Update_();
 
         _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
@@ -1238,7 +1236,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             video::Copy_Back_To_Off_();
 
             char* msg = (char*)HAROLD::H_Message_(0xF2);
-            helpers::strncpy(_fill_msg, msg, sizeof(_fill_msg));
+            strncpy(_fill_msg, msg, sizeof(_fill_msg));
 
             uint32_t bsize = bitmap::Get_Bitmap_Size_(325, 30);
             _fill_msg_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
@@ -1301,18 +1299,18 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 Generate_Number_Of_Nebulas_(gal_size, nebula_freq);
             }
 
-            helpers::memset(_special_count, 0, 12);
+            memset(_special_count, 0, 12);
             _n_stars = 0;
             _n_marooned_heroes = 0;
             _n_wormholes = 0;
             MOX::_NUM_COLONIES = 0;
             MOX::_planet_count = 0;
 
-            helpers::memset(MOX::_planet, 0, 306 * sizeof(s_planet_data));
+            memset(MOX::_planet, 0, 306 * sizeof(s_planet_data));
             for (int i = 0; i < 80; ++i) {
-                helpers::memset(MOX::_star[i].name, 0, 15);
+                memset(MOX::_star[i].name, 0, 15);
             }
-            helpers::memset(planets_per_star, 0, 80);
+            memset(planets_per_star, 0, 80);
 
             if (Set_Star_XYs_(grid_x, grid_y, gal_age, 1, 1)) {
                 fonts::Set_Font_Style_(4, &local_colors1);

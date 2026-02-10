@@ -316,4 +316,10 @@ namespace fonts {
             _font_header.special_colors[i] = colors->colors[i];
         }
     }
+
+    void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int32_t value) {
+        char buffer[12];
+        __itoa(value, buffer, 10);
+        Print_Right_(x, y, buffer);
+    }
 }

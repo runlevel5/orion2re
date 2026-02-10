@@ -74,6 +74,7 @@ namespace MOX {
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
     inline uint8_t& _first_weapon_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6C8});
+    inline int16_t& _fleet_box_colonize_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6BA});
     inline uint8_t& _reloaded_ship_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6BC});
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
@@ -82,6 +83,7 @@ namespace MOX {
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
     inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
     inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
+    inline int16_t& _fleet_movement_all_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597466});
     inline uint16_t& _galaxy_map_scanned_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
@@ -390,6 +392,24 @@ namespace MOX {
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596C9C});
 
     inline uint16_t& _fleet_icon_buttons_added = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B38});
+
+    inline s_animation_header*& _fleet_box_name_sm_seg_0059736C =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059736C});
+
+    inline s_animation_header*& _fleet_box_name_sm_seg_0059B430 =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B430});
+
+    inline s_animation_header*& _fleet_box_bottom_sm_seg2 =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059782C});
+
+    inline s_animation_header*& _fleet_box_close_lg_button_seg =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597924});
+
+    inline s_animation_header*& _fleet_box_bottom_sm_seg_0059BA00 =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BA00});
+
+    inline s_animation_header*& _fleet_box_grid_lg_seg =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BEEC});
 
     inline s_fleet_box& _fleet_box =
         *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});

@@ -403,8 +403,8 @@ namespace HOMEGEN {
         // Potential redundant logic preserved from binary: 
         // concatenates companion star name if fill_msg is short, 
         // but fill_msg is completely overwritten later by H_Message.
-        if (helpers::strlen(MAPGEN::_fill_msg) < 35) {
-            helpers::strcat(MAPGEN::_fill_msg, MAPGEN::_companion_star);
+        if (strlen(MAPGEN::_fill_msg) < 35) {
+            strcat(MAPGEN::_fill_msg, MAPGEN::_companion_star);
         }
 
         video::Set_Page_Back_();
@@ -420,7 +420,7 @@ namespace HOMEGEN {
 
         // Load specific UI string and render it to the cached bitmap
         const char* msg_str = HAROLD::H_Message_(0xA1);
-        helpers::strcpy(MAPGEN::_fill_msg, msg_str);
+        strcpy(MAPGEN::_fill_msg, msg_str);
 
         fonts::Set_Font_Style_Outline_Heavy_(4, colors1);
         fonts::Set_Outline_Color_(2, 1);
@@ -507,9 +507,9 @@ namespace HOMEGEN {
         uint8_t flags[72];
         int16_t placed_monster_stars[72];
 
-        helpers::memset(weights, 0, sizeof(weights));
-        helpers::memset(flags, 0, sizeof(flags));
-        helpers::memset(placed_monster_stars, 0xFF, sizeof(placed_monster_stars));
+        memset(weights, 0, sizeof(weights));
+        memset(flags, 0, sizeof(flags));
+        memset(placed_monster_stars, 0xFF, sizeof(placed_monster_stars));
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (!HAROLD::Star_Is_Orion_(i) &&
@@ -1184,7 +1184,7 @@ namespace HOMEGEN {
         MAINSCR::Get_PointXY_Draw_Coords_(center_x, center_y, &map_x, &map_y);
 
         uint8_t visited[72];
-        helpers::memset(&visited, 0, sizeof(visited));
+        memset(&visited, 0, sizeof(visited));
 
         StarCandidate candidates[72];
         for (int i = 0; i < 72; ++i) {
@@ -1292,7 +1292,7 @@ namespace HOMEGEN {
         MOX::_star[0].y = backed_up_star.y;
 
         s_planet_data* p = &MOX::_planet[orion_planet_idx];
-        helpers::memset(p, 0, sizeof(s_planet_data));
+        memset(p, 0, sizeof(s_planet_data));
 
         p->colony_index = -1;
         p->orbit = (int8_t)orion_orbit;

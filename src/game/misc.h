@@ -11,16 +11,12 @@ namespace MISC {
 
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
-    inline void __cdecl Change_Font_Style_(int16_t style) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x0049e0a0 })(style);
-    }
+    void __cdecl Change_Font_Style_(int16_t font_id);
 
-    inline s_colors* __cdecl Font_Colors2_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2) {
-        using Fn = s_colors*(__cdecl*)(int16_t, uint8_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ddb0});
-        return fn(font_idx, color_idx_1, color_idx_2);
-    }
+    inline s_colors& _mox_font_colors =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x005A5328});
+
+    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3);
 
     inline void __cdecl Set_Fitted_Font_Style_(const char* text, s_colors* colors, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
         using Fn = void(__cdecl*)(const char*, s_colors*, int16_t, int16_t, int16_t, int16_t, int16_t);
@@ -70,16 +66,9 @@ namespace MISC {
         reinterpret_cast<Fn>(0x00520000)(color);
     }
 
-    inline void __cdecl _Darken_Fill_(int x, int y, int w, int h) {
-        using Fn = void(__cdecl*)(int, int, int, int);
-        reinterpret_cast<Fn>(0x0049F060)(x, y, w, h);
-    }
+    void __cdecl _Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
-    inline int16_t __cdecl Bit_Value_To_Num_(int32_t bit_value, int32_t limit) {
-        using Fn = int16_t(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e060});
-        return fn(bit_value, limit);
-    }
+    int16_t __cdecl Bit_Value_To_Num_(int32_t value, int16_t bit_limit);
 
     inline bool __cdecl Occluded_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ox1, int16_t oy1, int16_t ox2, int16_t oy2) {
         using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);

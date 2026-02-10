@@ -192,9 +192,9 @@ namespace COLONIZE {
         uint16_t allocated_counts[8];
         uint8_t free_slots_indices[250];
 
-        helpers::memset(&uncolonized_counts, 0, sizeof(uncolonized_counts));
-        helpers::memset(&allocated_counts, 0, sizeof(allocated_counts));
-        helpers::memset(&free_slots_indices, 0, sizeof(free_slots_indices));
+        memset(&uncolonized_counts, 0, sizeof(uncolonized_counts));
+        memset(&allocated_counts, 0, sizeof(allocated_counts));
+        memset(&free_slots_indices, 0, sizeof(free_slots_indices));
 
         int16_t free_slots_count = 0;
 

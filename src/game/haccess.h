@@ -97,7 +97,7 @@ namespace HACCESS {
 
     inline void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049A400})();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00403ee0})();
     }
 
     inline int16_t __cdecl Ship_Stack_Owner_(int16_t ship_stack_id) {

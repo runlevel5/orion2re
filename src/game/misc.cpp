@@ -18,6 +18,67 @@ namespace MISC {
         return fonts::_current_font_style;
     }
 
+    s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3) {
+        for (int i = 0; i < 8; ++i) {
+            _mox_font_colors.colors[i] = 0;
+        }
+
+        switch (mode) {
+        case 0:
+        case 1:
+            _mox_font_colors.colors[0] = param_2;
+            for (int i = 1; i < 8; ++i) {
+                _mox_font_colors.colors[i] = param_3;
+            }
+            break;
+
+        case 2:
+        case 3:
+            _mox_font_colors.colors[0] = param_2;
+            for (int i = 1; i < 8; ++i) {
+                _mox_font_colors.colors[i] = param_3;
+            }
+            if (MOX::_mox_font_colors_offset != 0) {
+                _mox_font_colors.colors[2] = MOX::_mox_font_colors_offset;
+            } else {
+                int val = (int)param_2 + 1;
+                if (val > (int)param_3) {
+                    val = (int)param_3;
+                }
+                _mox_font_colors.colors[2] = static_cast<uint8_t>(val);
+            }
+            break;
+
+        case 4:
+            _mox_font_colors.colors[0] = param_2;
+            for (int i = 1; i < 8; ++i) {
+                _mox_font_colors.colors[i] = param_3;
+            }
+            if (MOX::_mox_font_colors_offset != 0) {
+                _mox_font_colors.colors[2] = MOX::_mox_font_colors_offset;
+            } else {
+                _mox_font_colors.colors[2] = param_3 - 1;
+            }
+            break;
+
+        case 5:
+            _mox_font_colors.colors[1] = param_2;
+            _mox_font_colors.colors[2] = param_3 - 1;
+            _mox_font_colors.colors[3] = param_3 - 1;
+            _mox_font_colors.colors[4] = param_3 - 1;
+            _mox_font_colors.colors[5] = param_3;
+            _mox_font_colors.colors[6] = param_3;
+            _mox_font_colors.colors[7] = param_3;
+            break;
+
+        default:
+            break;
+        }
+
+        MOX::_mox_font_colors_offset = 0;
+        return &_mox_font_colors;
+    }
+
     void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors) {
         s_colors* colors_ptr = MISC::Font_Colors2_(font_idx, color_idx_1, color_idx_2);
 
@@ -121,5 +182,57 @@ namespace MISC {
         MOX::_reloaded_ship_palette = 0;
 
         fields::Enable_Draw_All_Fields_();
+    }
+
+    void __cdecl _Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        if (animate::_clipping_flag == 1) {
+            if (x1 < video::_screen_window_x1) {
+                x1 = video::_screen_window_x1;
+            }
+            if (y1 < video::_screen_window_y1) {
+                y1 = video::_screen_window_y1;
+            }
+            if (x2 > video::_screen_window_x2) {
+                x2 = video::_screen_window_x2;
+            }
+            if (y2 > video::_screen_window_y2) {
+                y2 = video::_screen_window_y2;
+            }
+        }
+
+        graphics::Tint_Fill_(x1, y1, x2, y2, 0);
+    }
+
+    void __cdecl Change_Font_Style_(int16_t font_id) {
+        s_colors colors;
+        int16_t saved_style = fonts::_font_header.font_style;
+
+        fonts::Get_Colors_(&colors);
+        fonts::Set_Font_Style_(static_cast<int32_t>(font_id), &colors);
+
+        fonts::_font_header.font_style = saved_style;
+    }
+
+    int16_t __cdecl Bit_Value_To_Num_(int32_t value, int16_t bit_limit) {
+        int16_t first_bit_index = 0;
+        bool bit_found = false;
+        int16_t current_bit = 0;
+
+        if (bit_limit > 0) {
+            do {
+                if (bit_found) {
+                    break;
+                }
+
+                if ((value >> (current_bit & 0x1F)) & 1) {
+                    first_bit_index = current_bit;
+                    bit_found = true;
+                }
+
+                current_bit++;
+            } while (current_bit < bit_limit);
+        }
+
+        return first_bit_index;
     }
 }
