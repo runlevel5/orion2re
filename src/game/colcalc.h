@@ -138,6 +138,12 @@ namespace COLCALC {
     inline const char* const s_fmt_plus_d_s_3 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8FC}); // "+%d %s"
     inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // ""
 
+    inline char* __cdecl Load_Colcalc_Strings_(void* data) {
+        using Fn = char*(__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F28E0});
+        return fn(data);
+    }
+
     int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
     int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, void* out);
@@ -153,6 +159,8 @@ namespace COLCALC {
 
     void __cdecl Compute_All_Star_Colony_Stuff_();
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
+
+    void __cdecl Star_Colony_Calculation_(short star_idx, short player_idx);
 
     void __cdecl Init_Surrenders_();
 

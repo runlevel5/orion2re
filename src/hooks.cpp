@@ -735,6 +735,15 @@ namespace hooks {
         { 0x0051fff0, &fields::Clear_Mouse_Buffer_ },
         { 0x00404f40, &FLEETPOP::Fleet_Box_Height_ },
         { 0x00525860, &fonts::Print_Integer_Right_ },
+        { 0x004d7e70, &RUSS::Make_All_AI_Game_ },
+        { 0x004d7ed0, &RUSS::Load_Russ_Strings_ },
+        { 0x0043e100, &OFFICER::Is_Fleet_Officer_Screen_ },
+        { 0x0049a960, &HACCESS::Is_Combat_Ship_ },
+        { 0x0049b690, &HACCESS::Player_Has_Colony_In_System_ },
+        { 0x004f8d50, &COLCALC::Star_Colony_Calculation_ },
+        { 0x0043f890, &OFFICER::Check_For_Colony_Calculation_Update_ },
+        { 0x0043e280, &OFFICER::Move_From_Limbo_To_Pool_ },
+        { 0x00496790, &SYS::Ok_To_View_System_ },
     };
 
     void Install_Hooks()

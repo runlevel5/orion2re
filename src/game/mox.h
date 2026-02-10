@@ -291,6 +291,9 @@ namespace MOX {
     inline s_ship_data*& _ship =
         *reinterpret_cast<s_ship_data**>(std::uintptr_t{ 0x0059BD3C });
 
+    inline int16_t*& _officers_original_star_id =
+        *reinterpret_cast<int16_t**>(std::uintptr_t{0x0059BF38});
+
     inline s_leader_data*& _leaders =
         *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });
 

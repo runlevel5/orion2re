@@ -28,6 +28,12 @@ namespace farload {
 
     void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
 
+    inline void __cdecl Farload_Data_Static_(const char* filename, int32_t arg2, void* dest, int32_t arg4, int32_t arg5, int32_t arg6) {
+        using Fn = void(__cdecl*)(const char*, int32_t, void*, int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051C7B0});
+        fn(filename, arg2, dest, arg4, arg5, arg6);
+    }
+
     inline void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* buffer) {
         using Fn = void*(__cdecl*)(const char*, int, void*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0051C730 });

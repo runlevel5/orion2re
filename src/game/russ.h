@@ -28,17 +28,24 @@ namespace RUSS {
 
     void __cdecl Release_All_Blocks_(void* seg);
 
-    inline void __cdecl Make_All_AI_Game_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004D7E70})();
+    void __cdecl Make_All_AI_Game_();
+
+    inline void __cdecl Make_Player_Into_AI_(int32_t player_idx) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7DC0});
+        fn(player_idx);
     }
 
-    inline void Load_Russ_Strings_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7ed0});
-        fn();
-    }
+    void __cdecl Load_Russ_Strings_();
+
+    inline uint8_t& _russ_strings = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CF08});
 
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
     inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
+
+    inline uint8_t& _all_ai_game =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059533F});
+
+    inline const char* s_This_isnt_a_single_player_game =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00559A08}); // "This isn't a single player game, cheeky monkey!"
 }

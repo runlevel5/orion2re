@@ -37,4 +37,10 @@ namespace NETMOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519D50});
         fn(player_num);
     }
+
+    inline char* __cdecl Load_Netmox_Strings_(char* data) {
+        using Fn = char*(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513E80});
+        return fn(data);
+    }
 }

@@ -392,6 +392,36 @@ namespace OFFICER {
      * @param player_idx The index of the player whose leaders are being checked.
      * @return The highest bonus value found, or 0 if no leaders have these skills or meet status criteria.
      */
+    bool Is_Fleet_Officer_Screen_() {
+        return MOX::_officer_scrn_type == 0;
+    }
+
+    void __cdecl Check_For_Colony_Calculation_Update_() {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            s_leader_data& leader = MOX::_leaders[i];
+
+            if (leader.type == 1) {
+                int16_t original_star_id = MOX::_officers_original_star_id[i];
+
+                if (leader.location != original_star_id && leader.status == 0) {
+                    COLCALC::Star_Colony_Calculation_(original_star_id, MOX::_PLAYER_NUM);
+                }
+            }
+        }
+    }
+
+    /**
+     * @address 0043e280
+     */
+    void __cdecl Move_From_Limbo_To_Pool_() {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            if (MOX::_leaders[i].status == 2) {
+                MOX::_leaders[i].status = 0;
+                MOX::_leaders[i].eta = 0;
+            }
+        }
+    }
+
     int16_t __cdecl Bonus_For_Famous_Heroes_(int16_t player_idx) {
         int16_t max_bonus = 0;
         int16_t current_skill_bonus = 0;

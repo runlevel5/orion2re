@@ -14,4 +14,10 @@ namespace REPORT {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004C1D40})();
     }
+
+    inline void __cdecl Load_Report_Strings_(char* data) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A9D80});
+        fn(data);
+    }
 }

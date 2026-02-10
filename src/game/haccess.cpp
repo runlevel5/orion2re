@@ -195,6 +195,10 @@ namespace HACCESS {
         return MOX::_temp_string;
     }
 
+    bool __cdecl Is_Combat_Ship_(int16_t ship_index) {
+        return MOX::_ship[ship_index].d.ship_type == SHIP_TYPE_COMBAT;
+    }
+
     int16_t __cdecl Last_Colony_Selected_(int16_t star_idx, int16_t player_idx) {
         int16_t colony_idx = -1;
         int16_t planet_idx = -1;
@@ -219,5 +223,9 @@ namespace HACCESS {
         }
 
         return colony_idx;
+    }
+
+    bool __cdecl Player_Has_Colony_In_System_(int16_t player_idx, int16_t system_idx) {
+        return HAROLD::Player_Has_Colony_(player_idx, system_idx);
     }
 }

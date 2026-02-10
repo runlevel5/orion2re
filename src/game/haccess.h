@@ -121,4 +121,8 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ac80});
         return fn(owner);
     }
+
+    bool __cdecl Player_Has_Colony_In_System_(int16_t player_idx, int16_t system_idx);
+
+    bool __cdecl Is_Combat_Ship_(int16_t ship_index);
 }

@@ -9,4 +9,9 @@ namespace MSG_ {
 
     void __cdecl Allocate_Msg_Slots_();
     void __cdecl Add_Message(uint32_t header, uint32_t p2, uint32_t p3, uint32_t p4, uint16_t p5, int16_t buffer_idx);
+    inline char* __cdecl Load_Msg_Strings_(char* data) {
+        using Fn = char*(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00472040});
+        return fn(data);
+    }
 }

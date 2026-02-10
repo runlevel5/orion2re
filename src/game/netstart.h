@@ -14,4 +14,10 @@ namespace NETSTART {
         using Fn = uint8_t(__cdecl*)();
         return reinterpret_cast<Fn>(std::uintptr_t{0x004c2fb0})();
     }
+
+    inline char* __cdecl Load_Netstart_Strings_(char* data) {
+        using Fn = char*(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C2670});
+        return fn(data);
+    }
 }

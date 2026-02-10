@@ -37,4 +37,10 @@ namespace OFFICER {
     int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx);
 
     int32_t __cdecl Officer_Cost_(int16_t player_idx, int16_t leader_idx);
+
+    bool Is_Fleet_Officer_Screen_();
+
+    void __cdecl Check_For_Colony_Calculation_Update_();
+
+    void __cdecl Move_From_Limbo_To_Pool_();
 }

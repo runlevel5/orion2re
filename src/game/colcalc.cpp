@@ -135,6 +135,26 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Star_Colony_Calculation_(short star_idx, short player_idx) {
+        s_star_data* star = &MOX::_star[star_idx];
+
+        for (int i = 0; i < 5; ++i) {
+            short planet_idx = star->planet_index[i];
+            if (planet_idx != -1) {
+                short colony_idx = MOX::_planet[planet_idx].colony_index;
+                if (colony_idx != -1) {
+                    s_colony* colony = &MOX::_colony[colony_idx];
+
+                    if (colony->owner == player_idx && colony->outpost_flag == 0) {
+                        Recalculate_Colony_(colony);
+                    }
+                }
+            }
+        }
+
+        Update_Player_Stats_(&MOX::_player[player_idx]);
+    }
+
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* col) {
         uint8_t old_interdictor_state = col->has_warp_field_interdictor;
 

@@ -70,4 +70,37 @@ namespace RUSS {
     void __cdecl Release_All_Blocks_(void* seg) {
         allocate::Allocate_First_Block_(seg, 1);
     }
+
+    void __cdecl Load_Russ_Strings_() {
+        char filename_buffer[20];
+
+        uint8_t language = MOX::_settings_language;
+
+        _sprintf(filename_buffer, s_rstring_d_lbx, (uint32_t)language);
+
+        farload::Farload_Data_Static_(filename_buffer, 0, &RUSS::_russ_strings, 0, 1, 0x1964);
+
+        char* string_ptr;
+        string_ptr = COLCALC::Load_Colcalc_Strings_(&RUSS::_russ_strings);
+        string_ptr = COMBFIND::Load_Combfind_Strings_(string_ptr);
+        string_ptr = MSG_::Load_Msg_Strings_(string_ptr);
+        string_ptr = NETMOX::Load_Netmox_Strings_(string_ptr);
+        string_ptr = NETSTART::Load_Netstart_Strings_(string_ptr);
+        string_ptr = NETTURN::Load_Netturn_Strings_(string_ptr);
+        REPORT::Load_Report_Strings_(string_ptr);
+    }
+
+    void __cdecl Make_All_AI_Game_() {
+        if (MOX::_game_type == 0) {
+            MOX::_all_ai_game = 1;
+
+            if (MOX::_player[MOX::_PLAYER_NUM].objectives == 0x64 /* 'd' */) {
+                Make_Player_Into_AI_(static_cast<int32_t>(MOX::_PLAYER_NUM));
+            }
+
+            _all_ai_game = 1;
+        } else {
+            GENDRAW::Message_Box_(const_cast<char*>(s_This_isnt_a_single_player_game));
+        }
+    }
 }

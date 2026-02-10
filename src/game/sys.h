@@ -20,4 +20,6 @@ namespace SYS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004967f0 });
         fn(orbit);
     }
+
+    bool __cdecl Ok_To_View_System_(int16_t star_idx, int16_t player_idx);
 }
