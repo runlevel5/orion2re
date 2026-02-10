@@ -291,8 +291,8 @@ namespace platform {
             break;
         }
 
-        g_screen_stride = g_screen_res_x * g_screen_res_y;
-        FUN_528740(g_screen_stride, g_screen_res_y);
+        video::_screen_pixel_size = g_screen_res_x * g_screen_res_y;
+        FUN_528740(video::_screen_pixel_size, g_screen_res_y);
         DAT_0057931c = 0;
 
         DDSURFACEDESC surface_desc;

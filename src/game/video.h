@@ -15,6 +15,9 @@ namespace video {
 	inline uint32_t*& _mouse_palette =
 		*reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00578AB0 });
 
+	inline uint32_t& _screen_pixel_size =
+		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b0 });
+
 #pragma pack(push, 1)
 	struct s_palette_entry {
 		uint8_t changed;

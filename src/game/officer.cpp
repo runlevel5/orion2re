@@ -42,8 +42,8 @@ namespace OFFICER {
         }
 
         int32_t current_level_val = static_cast<int32_t>(level) + 1;
-        int32_t skill_div = static_cast<int32_t>(MOX::skill_data[skill_idx].unknown2);
-        int32_t bonus_base = static_cast<int32_t>(MOX::skill_data[skill_idx].skill_bonus);
+        int32_t skill_div = static_cast<int32_t>(MOX::_skill_data[skill_idx].unknown2);
+        int32_t bonus_base = static_cast<int32_t>(MOX::_skill_data[skill_idx].skill_bonus);
 
         int32_t intermediate = (current_level_val + skill_div - 1) / skill_div;
 
@@ -74,7 +74,7 @@ namespace OFFICER {
         s_leader_data& leader = MOX::_leaders[leader_index];
 
         for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
-            MOX::s_skill_data& skill = MOX::skill_data[skill_idx];
+            s_skill_data& skill = MOX::_skill_data[skill_idx];
 
             if (skill.unknown1 == 0) {
                 if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
@@ -146,9 +146,9 @@ namespace OFFICER {
             for (int j = 0; j < 54; j += 2) {
                 if (current_class == 0) {
                     // Search for secondary skills
-                    if (MOX::skill_data[j].unknown1 == 0 &&
-                        ((*secondary_mask & MOX::skill_data[j].skill_mask) == 0) &&
-                        ((*secondary_mask & MOX::skill_data[j + 1].skill_mask) == 0)) 
+                    if (MOX::_skill_data[j].unknown1 == 0 &&
+                        ((*secondary_mask & MOX::_skill_data[j].skill_mask) == 0) &&
+                        ((*secondary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {
                         options_found++;
                         if (random::Random_(options_found) == 1) {
@@ -161,9 +161,9 @@ namespace OFFICER {
                     }
                 } else {
                     // Search for primary skills of specific class
-                    if ((int16_t)MOX::skill_data[j].unknown1 == skill_class &&
-                        ((*primary_mask & MOX::skill_data[j].skill_mask) == 0) &&
-                        ((*primary_mask & MOX::skill_data[j + 1].skill_mask) == 0)) 
+                    if ((int16_t)MOX::_skill_data[j].unknown1 == skill_class &&
+                        ((*primary_mask & MOX::_skill_data[j].skill_mask) == 0) &&
+                        ((*primary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {
                         options_found++;
                         if (random::Random_(options_found) == 1) {
@@ -178,9 +178,9 @@ namespace OFFICER {
             }
 
             if (current_class == 0) {
-                *secondary_mask += MOX::skill_data[selected_idx].skill_mask;
+                *secondary_mask += MOX::_skill_data[selected_idx].skill_mask;
             } else {
-                *primary_mask += MOX::skill_data[selected_idx].skill_mask;
+                *primary_mask += MOX::_skill_data[selected_idx].skill_mask;
             }
 
             remaining_count--;
@@ -192,11 +192,11 @@ namespace OFFICER {
     }
 
     bool __cdecl Officer_Has_General_Skill_(int16_t player_num, int16_t leader_index, int16_t skill_id) {
-        return (MOX::skill_data[skill_id].skill_mask & MOX::_leaders[leader_index].general_skills) != 0;
+        return (MOX::_skill_data[skill_id].skill_mask & MOX::_leaders[leader_index].general_skills) != 0;
     }
 
     bool __cdecl Officer_Has_Special_Skill_(int16_t player_num, int16_t leader_idx, int16_t skill_idx) {
-        uint32_t mask = MOX::skill_data[skill_idx].skill_mask;
+        uint32_t mask = MOX::_skill_data[skill_idx].skill_mask;
         uint32_t leader_skills = MOX::_leaders[leader_idx].special_skills;
 
         return (mask & leader_skills) != 0;

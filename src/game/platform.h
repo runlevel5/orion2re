@@ -38,9 +38,6 @@ namespace platform {
 	inline int32_t& g_screen_res_y =
 		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055b1ac });
 
-	inline uint32_t& g_screen_stride =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b0 });
-
 	inline LPDIRECTDRAWSURFACE& g_primary_surface =
 		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x005792ec });
 
