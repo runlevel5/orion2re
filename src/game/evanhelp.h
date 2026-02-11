@@ -23,7 +23,11 @@ namespace EVANHELP {
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e140})();
     }
 
-    void __cdecl Set_Main_Game_Screen_Help_List_();
+    inline void __cdecl Set_Officer_Screen_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00443E70 });
+        fn();
+    }
 
     inline void __cdecl Set_Main_Screen_Help_List_() {
         using Fn = void(__cdecl*)();
@@ -34,9 +38,13 @@ namespace EVANHELP {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0041DE00})(help1, help2);
     }
+
+    void __cdecl Set_Officer_Screen_Help_();
     inline void __cdecl Get_Application_Description_(char* buffer, int16_t tech_id) {
         using Fn = void(__cdecl*)(char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041E4F0});
         fn(buffer, tech_id);
     }
+
+    void __cdecl Set_Main_Game_Screen_Help_List_();
 }

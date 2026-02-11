@@ -579,6 +579,24 @@ struct s_antaran {
     undefined1 field47_0x41;
 };
 
+typedef struct s_big_icon s_big_icon, *Ps_big_icon;
+
+
+struct s_big_icon {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    int8_t selected; /* Created by Rename Structure Field action */
+    undefined field5_0x5;
+    undefined field6_0x6;
+    undefined field7_0x7;
+    undefined field8_0x8;
+    undefined field9_0x9;
+    undefined field10_0xa;
+    short ship_idx;
+};
+
 typedef struct s_bomb s_bomb, *Ps_bomb;
 
 typedef char sbyte;
@@ -716,7 +734,6 @@ struct s_colors {
 };
 
 typedef struct s_combat_data s_combat_data, *Ps_combat_data;
-
 
 struct s_combat_data {
     undefined field0_0x0;
@@ -1034,6 +1051,15 @@ struct s_combat_data {
     undefined field312_0x138;
 };
 
+typedef struct s_crew_data s_crew_data, *Ps_crew_data;
+
+struct s_crew_data {
+    ushort experience;
+    short attack;
+    short defense;
+    short ground;
+};
+
 typedef struct s_current_design s_current_design, *Ps_current_design;
 
 struct s_current_design {
@@ -1306,6 +1332,20 @@ struct s_field {
     union s_field_detail detail;
     char hotkey;
     short sound;
+};
+
+typedef struct s_first_field_in_group s_first_field_in_group, *Ps_first_field_in_group;
+
+struct s_first_field_in_group {
+    uint8_t biology_field1;
+    uint8_t power_field1;
+    uint8_t physics_field1;
+    uint8_t construction_field1;
+    uint8_t force_fields_field1;
+    uint8_t chemistry_field1;
+    uint8_t computers_field1;
+    uint8_t sociology_field1;
+    uint8_t xenon_field1;
 };
 
 typedef struct s_fleet_box s_fleet_box, *Ps_fleet_box;
@@ -2403,6 +2443,29 @@ struct s_save_game_description {
     undefined field25_0x24;
 };
 
+typedef struct s_scroll_bar s_scroll_bar, *Ps_scroll_bar;
+
+struct s_scroll_bar {
+    short thumb_center_y;
+    short last_thumb_center_y;
+    short thumb_center_y_copy;
+    short thumb_height_px;
+    short total_items;
+    short page_items;
+    short first_visible_idx;
+    short track_len_px;
+    short field8_0x10;
+    short field9_0x12;
+    undefined field10_0x14;
+    undefined field11_0x15;
+    undefined field12_0x16;
+    undefined field13_0x17;
+    int8_t field14_0x18;
+    undefined field15_0x19;
+    int8_t line_step;
+    short thumb_y_snapshot;
+};
+
 typedef struct s_settings s_settings, *Ps_settings;
 
 struct s_settings {
@@ -2901,10 +2964,7 @@ struct s_ship_move_info {
     int8_t field13_0xd;
     undefined field14_0xe;
     undefined field15_0xf;
-    undefined field16_0x10;
-    undefined field17_0x11;
-    undefined field18_0x12;
-    undefined field19_0x13;
+    struct s_animation_header *field16_0x10;
 };
 
 typedef struct s_ship_node s_ship_node, *Ps_ship_node;
@@ -2926,6 +2986,15 @@ struct s_skill_data {
     byte unknown3;
     char *name;
     char *format_str;
+};
+
+typedef struct s_spcl s_spcl, *Ps_spcl;
+
+struct s_spcl {
+    uint8_t id;
+    undefined field1_0x1;
+    uint8_t type;
+    undefined field3_0x3;
 };
 
 typedef struct s_star_data s_star_data, *Ps_star_data;
@@ -3015,14 +3084,13 @@ typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
 
 struct s_tech_armor_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
+    short armor_id;
     short tech_app_id; /* Type 'TECH_APP' was deleted */
-    undefined field4_0x8;
-    undefined field5_0x9;
+    undefined field3_0x8;
+    uint8_t troops_bonus;
     short armor_absorption_percent;
     short cost;
-    undefined field8_0xe;
+    uint8_t strategic_hp;
 };
 
 typedef struct s_tech_building_data s_tech_building_data, *Ps_tech_building_data;
@@ -3046,19 +3114,17 @@ typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data
 
 struct s_tech_computer_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
+    short copmuter_id;
     short tech_app;
     short cost_by_ship_type[6];
-    short field5_0x14;
+    short bonus;
 };
 
 typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;
 
 struct s_tech_drive_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
+    short drive_id;
     short tech_app;
     short space_per_ship_type[6];
     short cost_per_ship_type[6];
@@ -3086,7 +3152,7 @@ typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
 
 struct s_tech_fuel_data {
     char *name;
-    short field4;
+    short fuel_id;
     short tech_app;
     short ship_range;
 };
@@ -3122,37 +3188,36 @@ typedef struct s_tech_shield_data s_tech_shield_data, *Ps_tech_shield_data;
 
 struct s_tech_shield_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
+    ushort shield_id;
     short tech_app_id;
     short space_per_ship_type[6];
     short cost_per_ship_type[6];
     short points_blocked;
-    undefined field7_0x22;
-    undefined field8_0x23;
-    undefined field9_0x24;
-    undefined field10_0x25;
-    undefined field11_0x26;
-    undefined field12_0x27;
-    undefined field13_0x28;
-    undefined field14_0x29;
-    undefined field15_0x2a;
-    undefined field16_0x2b;
-    undefined field17_0x2c;
-    undefined field18_0x2d;
-    undefined field19_0x2e;
-    undefined field20_0x2f;
-    undefined field21_0x30;
-    undefined field22_0x31;
-    undefined field23_0x32;
-    undefined field24_0x33;
-    undefined field25_0x34;
-    undefined field26_0x35;
-    undefined field27_0x36;
-    undefined field28_0x37;
-    undefined field29_0x38;
-    undefined field30_0x39;
-    undefined field31_0x3a;
+    undefined field6_0x22;
+    undefined field7_0x23;
+    undefined field8_0x24;
+    undefined field9_0x25;
+    undefined field10_0x26;
+    undefined field11_0x27;
+    undefined field12_0x28;
+    undefined field13_0x29;
+    undefined field14_0x2a;
+    undefined field15_0x2b;
+    undefined field16_0x2c;
+    undefined field17_0x2d;
+    undefined field18_0x2e;
+    undefined field19_0x2f;
+    undefined field20_0x30;
+    undefined field21_0x31;
+    undefined field22_0x32;
+    undefined field23_0x33;
+    undefined field24_0x34;
+    undefined field25_0x35;
+    undefined field26_0x36;
+    undefined field27_0x37;
+    undefined field28_0x38;
+    undefined field29_0x39;
+    byte unk_strat_value;
 };
 
 typedef struct s_tech_specials_data s_tech_specials_data, *Ps_tech_specials_data;
@@ -3206,16 +3271,13 @@ struct s_tech_weapon_data {
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
 
 struct s_tech_weapon_mod_data {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
+    char *name0;
     char *name;
-    undefined field5_0x8;
-    undefined field6_0x9;
+    uint8_t mod_id;
+    uint8_t level;
     short bonus1;
     short bonus2;
-    undefined field9_0xe;
+    undefined field6_0xe;
 };
 
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;

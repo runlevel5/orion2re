@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -744,6 +744,10 @@ namespace hooks {
         { 0x0043f890, &OFFICER::Check_For_Colony_Calculation_Update_ },
         { 0x0043e280, &OFFICER::Move_From_Limbo_To_Pool_ },
         { 0x00496790, &SYS::Ok_To_View_System_ },
+        { 0x0043d780, &OFFICER::Draw_Officer_Screen_ },
+        { 0x00441D70, &OFFICER::Set_Original_Stars_ },
+        { 0x00441db0, &OFFICER::Set_Original_Ships_ },
+        { 0x0043e9a0, &OFFICER::Officers_Screen_ },
     };
 
     void Install_Hooks()

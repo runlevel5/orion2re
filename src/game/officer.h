@@ -1,6 +1,21 @@
 #pragma once
 
 namespace OFFICER {
+    inline s_colors& _normal_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569A0});
+    inline int16_t& _officer_dismiss_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056566C});
+    inline uint8_t& _offscrn_skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565670});
+    inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005656C8});
+    inline int8_t& _officer_button_mode = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056573C});
+    inline int16_t& _officer_pool_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657B8});
+    inline uint8_t& _offscrn_flash_incr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A77A0});
+    inline uint8_t& _offscrn_ask_for_hire_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565668});
+    inline int16_t& _fleet_icon_ship_id_to_move = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77A2});
+    inline int8_t& _offscrn_flash_dir = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A77A4});
+    inline int16_t& _officer_star_displayed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77A6});
+    inline uint8_t& _offscrn_flash_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A77A8});
+    inline int16_t& _officer_star_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77AA});
+    inline uint32_t& _prev_leaders = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565740});
+
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
     int16_t __cdecl Get_Officer_Level_(int16_t leader_idx);
@@ -23,10 +38,7 @@ namespace OFFICER {
 
     void __cdecl Increase_Officer_Level_By_One_(int16_t leader_idx);
 
-    inline void __cdecl Officers_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043e9a0})();
-    }
+    void __cdecl Officers_Screen_();
 
     void __cdecl Deassign_Officer_(int16_t leader_idx);
 
@@ -40,7 +52,101 @@ namespace OFFICER {
 
     bool Is_Fleet_Officer_Screen_();
 
+    void __cdecl Draw_Officer_Screen_();
+
+    inline void __cdecl Draw_Officer_Screen_To_Back_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043dca0})();
+    }
+
+    inline void __cdecl Reload_Officer_Screen_Pictures_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004415E0})();
+    }
+    inline void __cdecl Add_Officer_Screen_Fields_(int16_t* p1, int16_t* p2, int16_t* p3, int16_t* p4, int16_t* p5, int p6, int p7, int16_t* p8, int16_t* p9, int16_t* p10, int16_t* p11, int16_t* p12) {
+        using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int, int, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043F440})(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+    }
+    inline void __cdecl Fade_Into_Leaders_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043FE00})();
+    }
+    inline void __cdecl Do_Hire_Officer_(int16_t officer_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00443380})(officer_idx);
+    }
+    inline void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, int* p3, int* p4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int*, int*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043F8F0})(input, scanned, p3, p4);
+    }
+    inline int __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t scanned, int16_t input, int16_t* out_scanned, uint16_t* out_idx) {
+        using Fn = int(__cdecl*)(int16_t, int16_t, int16_t*, uint16_t*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00441F90})(scanned, input, out_scanned, out_idx);
+    }
+    inline void __cdecl Officer_Screen_User_Box_(const char* msg, int16_t mode) {
+        using Fn = void(__cdecl*)(const char*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004401A0})(msg, mode);
+    }
+    inline void __cdecl Officer_Screen_User_Box_(int16_t officer_idx, int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00444080})(officer_idx, ship_idx);
+    }
+    inline int __cdecl Leader_Can_Be_Assigned_(int16_t officer_idx) {
+        using Fn = int(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0043FED0})(officer_idx);
+    }
+    inline char* __cdecl Leader_Name_(int16_t officer_idx, char flag) {
+        using Fn = char*(__cdecl*)(int16_t, char);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00442710})(officer_idx, flag);
+    }
+    inline void __cdecl Reset_Officer_Selection_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043D750})();
+    }
+    inline void __cdecl Move_Officer_To_Limbo_(int16_t officer_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043FF00})(officer_idx);
+    }
+    inline void __cdecl Change_Screen_Type_(char* p1) {
+        using Fn = void(__cdecl*)(char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00440040})(p1);
+    }
+
+    inline void __cdecl Wrapper_For_Offscrn_System_Popup_(int16_t star_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00442640})(star_idx);
+    }
+
+    inline void __cdecl Print_Galmap_Scanned_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00440340})(ship_idx);
+    }
+
+    inline void __cdecl Print_Scanned_Ship_Name_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004414a0})();
+    }
+
+    inline void __cdecl Wrapper_For_Offscrn_Data_(int16_t slot, int16_t officer_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00442370})(slot, officer_idx);
+    }
+
+    inline int8_t __cdecl Leaders_In_Hiring_Pool_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0043e1d0})();
+    }
+
+    inline void __cdecl Get_Officer_Costs_(int16_t officer_idx, int16_t* hire, int16_t* maint) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043df20})(officer_idx, hire, maint);
+    }
+
     void __cdecl Check_For_Colony_Calculation_Update_();
 
     void __cdecl Move_From_Limbo_To_Pool_();
+
+    void __cdecl Set_Original_Stars_();
+
+    void __cdecl Set_Original_Ships_();
 }

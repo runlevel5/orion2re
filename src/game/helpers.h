@@ -100,3 +100,7 @@ inline void* memset(void* dst, int value, size_t size)
 
     return dst;
 }
+
+inline int abs(int n) {
+    return (n < 0) ? -n : n;
+}

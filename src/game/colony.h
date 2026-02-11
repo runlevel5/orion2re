@@ -15,4 +15,6 @@ namespace COLONY {
 
     inline int16_t& _orbit_temp =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B22});
+
+    inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
 }

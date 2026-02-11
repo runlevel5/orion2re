@@ -1,15 +1,50 @@
 #pragma once
 
 namespace MOX {
+    inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
+    inline int16_t& _n_fltscrn_big_icons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597018});
+    inline int16_t& _n_fltscrn_big_icons = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973E2});
+    inline uint8_t& _n_fltscrn_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597A92});
+    inline int16_t& _old_small_ship_stack_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAA8});
+    inline int16_t& _old_first_fltscrn_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183C});
+    inline int16_t& _n_big_icons_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1838});
+    inline uint8_t& _galaxy_star_anim_count = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597AEA});
+    inline int16_t& _fltscrn_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5E});
+    inline uint8_t& _big_icon_display_columns = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD14});
+    inline uint8_t& _big_icon_display_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005974E4});
+    inline uint8_t& _big_icon_display_max_icons = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597828});
+    inline int16_t& _big_icon_x_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BEA});
+    inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
+    inline int16_t& _offpop_big_icon_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C456});
+    inline uint8_t& _drawing_officer_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D50});
+    inline s_big_icon*& _fltscrn_big_icon = *reinterpret_cast<s_big_icon**>(std::uintptr_t{0x00597460});
     inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});
     inline uint8_t& _first_time = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059749C});
     inline int16_t& _fleet_movement_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597820});
     inline uint8_t& _draw_expanding_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BF32});
     inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
+    inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
 
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
     inline s_current_design*& _design =
         *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
+
+    inline int16_t& _scanned_big_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2A});
+    inline int16_t& _small_ship_stack_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977B4});
+    inline int16_t& _scanned_small_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49B2});
+    inline int16_t& _n_fltscrn_officers = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183A});
+    inline int16_t*& _officer_id_list = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596E94});
+    inline void*& _officer_dismiss_button_seg_active = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5E4});
+    inline void*& _officer_dismiss_button_seg_inactive = *reinterpret_cast<void**>(std::uintptr_t{0x005979AC});
+    inline void*& _officer_pool_button_seg_active = *reinterpret_cast<void**>(std::uintptr_t{0x00597ACC});
+    inline void*& _officer_pool_button_seg_inactive = *reinterpret_cast<void**>(std::uintptr_t{0x0059B468});
+    inline void*& _dull_officer_pool_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1BC4});
+    inline void*& _dull_officer_hire_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B48});
+    inline int8_t& _officer_scanned = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596E70});
+    inline int8_t& _officer_scrn_type = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00597414 });
+    inline void*& _officer_colony_ldrs_button_seg_fleet = *reinterpret_cast<void**>(std::uintptr_t{0x00596C98});
+    inline void*& _officer_colony_ldrs_button_seg_system = *reinterpret_cast<void**>(std::uintptr_t{0x00596FAC});
+    inline int8_t& _officer_selected = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059D6D0 });
 
     inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
@@ -96,7 +131,6 @@ namespace MOX {
     inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
     inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});
     inline uint16_t& _global_exit_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D7A});
-    inline int8_t& _officer_scrn_type = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00597414});
     inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
     inline uint16_t& _eta_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BAAE});
     inline int16_t& _stencil_box_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2C});
@@ -293,6 +327,9 @@ namespace MOX {
 
     inline int16_t*& _officers_original_star_id =
         *reinterpret_cast<int16_t**>(std::uintptr_t{0x0059BF38});
+
+    inline int16_t*& _officers_original_ship_id =
+        *reinterpret_cast<int16_t**>(std::uintptr_t{0x005A1CBC});
 
     inline s_leader_data*& _leaders =
         *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });

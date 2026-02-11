@@ -309,4 +309,17 @@ namespace MAINSCR {
     void __cdecl Highlight_Star_(short star_idx);
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
+
+    inline int __cdecl Scan_Galaxy_Map_Fields_(int16_t scanned, int16_t input, int16_t* out_scanned, int16_t* out_idx) {
+        using Fn = int(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004CBE00})(scanned, input, out_scanned, out_idx);
+    }
+    inline void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int dir) {
+        using Fn = void(__cdecl*)(int16_t*, int16_t*, int);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C4B60})(ptr, out_val, dir);
+    }
+    inline void __cdecl Cycle_Star_Icons_(int16_t* ptr, int16_t player_num, int dir) {
+        using Fn = void(__cdecl*)(int16_t*, int16_t, int);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004C4DB0})(ptr, player_num, dir);
+    }
 }
