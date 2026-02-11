@@ -311,6 +311,24 @@ inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* s
     return fn(filename, index, segment);
 }
 
+inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {
+    using Fn = void(__cdecl*)(const char*, const char*, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471090});
+    fn(title, message, duration);
+}
+
+inline void __cdecl Build_Captain_Id_List_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043D470});
+    fn();
+}
+
+inline void __cdecl Get_Officer_Pictures_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441A40});
+    fn();
+}
+
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);

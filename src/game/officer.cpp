@@ -245,6 +245,9 @@ namespace OFFICER {
         }
     }
 
+    /**
+     * @address 0043D5B0
+     */
     void __cdecl Deassign_Officer_(int16_t leader_idx) {
         s_leader_data& leader = MOX::_leaders[leader_idx];
         int16_t player_idx = (int16_t)leader.player_index;
@@ -389,6 +392,33 @@ namespace OFFICER {
         return 0;
     }
 
+    /**
+     * Attempts to initiate the hiring process for an officer/leader.
+     * Checks if the leader is available (status 4) and if the player has sufficient funds.
+     */
+    int16_t __cdecl Do_Hire_Officer_(int16_t leader_idx) {
+        int16_t result = 0;
+        int32_t cost = Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
+
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+
+        // Leader status 4 (0x4) generally represents being available for hire.
+        s_leader_data* leader = &MOX::_leaders[leader_idx];
+
+        if (leader->status == 4) {
+            s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+            if (player->bc < cost) {
+                Not_Enough_BCs_Message_(leader_idx, cost);
+            } else {
+                result = (int16_t)Ask_For_Hire_(leader_idx);
+            }
+        } else {
+            Already_Hired_Message_(leader_idx);
+        }
+
+        return result;
+    }
+
     bool Is_Fleet_Officer_Screen_() {
         return MOX::_officer_scrn_type == 0;
     }
@@ -456,6 +486,88 @@ namespace OFFICER {
         }
 
         return max_bonus;
+    }
+
+    void __cdecl Draw_Officer_Screen_To_Back_() {
+        bool is_fleet_screen = OFFICER::Is_Fleet_Officer_Screen_();
+        video::Set_Page_Back_();
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+        graphics::Fill_(0, 0, 639, 479, 0);
+
+        if (MOX::_n_fltscrn_officers > 0) {
+            int16_t y_screen_offset = 0;
+            for (int16_t i = 0; i < MOX::_n_fltscrn_officers; ++i) {
+                int16_t leader_id = MOX::_officer_id_list[i];
+                if (leader_id != -1) {
+                    uint8_t* ldrpict_base = reinterpret_cast<uint8_t*>(OFFICER::_ldrpict);
+                    s_animation_header* portrait_anim = *reinterpret_cast<s_animation_header**>(ldrpict_base + i * 6);
+                    
+                    int16_t anim_w = animate::Get_Width_(portrait_anim);
+                    int16_t anim_h = animate::Get_Height_(portrait_anim);
+
+                    s_leader_data& leader = MOX::_leaders[leader_id];
+                    s_animation_header* draw_anim;
+                    
+                    if (leader.eta <= 0 && leader.status != 4) {
+                        draw_anim = portrait_anim;
+                    } else {
+                        draw_anim = *reinterpret_cast<s_animation_header**>(ldrpict_base + i * 6 + 24);
+                    }
+
+                    int16_t x = (75 - anim_w) / 2 + 12;
+                    int16_t y = y_screen_offset + 37 + (90 - anim_h) / 2;
+                    animate::Draw_(x, y, draw_anim);
+                }
+                y_screen_offset += 109;
+            }
+        }
+
+        animate::Draw_(0, 0, MOX::_officer_main_seg);
+
+        if (is_fleet_screen) {
+            OFFICER::Draw_Fleet_Box_();
+        } else {
+            OFFICER::Draw_Colony_Box_();
+        }
+
+        video::Copy_Back_To_Off_();
+        MOX::_draw_officer_to_back = 0;
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+        video::Set_Page_Off_();
+    }
+
+    void __cdecl Fade_Into_Leaders_Screen_() {
+        fields::Disable_Draw_All_Fields_();
+
+        MOX::_refresh_mode = 2;
+        video::Set_Refresh_Stencil_();
+        MOX::_draw_officer_to_back = 1;
+
+        mouse::Set_Mouse_List_(mouse::_mouse_list_none, 1);
+        ERIC::Fast_Fade_Out_();
+
+        fonts::Load_Palette_(8, 0, 0xFF);
+        palette::Set_Palette_Changes_(0, 0xFF);
+
+        if (Is_Fleet_Officer_Screen_() && MOX::_small_ship_stack_ptr > -1) {
+            int16_t ship_id = MOX::_ship_stack_start[MOX::_small_ship_stack_ptr];
+            int16_t owner_id = HACCESS::Ship_Stack_Owner_(ship_id);
+            KEN::Load_Player_Ship_Palette_(owner_id);
+        }
+
+        palstore::Darken_Palette_(100);
+        video::Set_Page_Off_();
+        Draw_Officer_Screen_();
+        palette::Clear_Palette_Changes_(0, 0xFF);
+        RUSS::Mox_Sync_Update_();
+
+        mouse::Set_Mouse_List_(mouse::_mouse_list_arrow, 1);
+        JIM::Fast_Fade_In_();
+
+        fields::Enable_Draw_All_Fields_();
     }
 
     void Draw_Officer_Screen_() {
@@ -713,7 +825,7 @@ namespace OFFICER {
                 }
             }
 
-            Check_Officer_Fields_(input, scanned_id, big_icons_scanned, big_icons_ids);
+            Check_Officer_Fields_(input, scanned_id, (int16_t*)big_icons_scanned, (int16_t*)big_icons_ids);
 
             if (_officer_button_mode == -1) {
                 int16_t scanned_ship_id, scanned_ship_idx;
@@ -755,7 +867,7 @@ namespace OFFICER {
                                     _sprintf(buffer, fmt, Leader_Name_((int16_t)MOX::_officer_selected, 0));
                                     Officer_Screen_User_Box_(buffer, 0);
                                 } else {
-                                    Officer_Screen_User_Box_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
+                                    Assign_Officer_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
                                     MOX::_draw_officer_to_back = 1;
                                     Reset_Officer_Selection_();
                                 }
@@ -921,5 +1033,169 @@ namespace OFFICER {
         MOX::_reloaded_ship_palette = 0;
         _prev_leaders = 0;
         MOX::_scroll_bar = nullptr;
+    }
+
+    void __cdecl Draw_Colony_Box_() {
+        animate::Draw_(300, 12, MOX::_officer_colony_box_seg);
+    }
+
+    void __cdecl Draw_Fleet_Box_() {
+        animate::Draw_(300, 12, MOX::_officer_fleet_box_seg);
+    }
+
+    void __cdecl Check_Officer_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
+        bool is_fleet_screen = Is_Fleet_Officer_Screen_();
+        int16_t field1, field2;
+        int16_t scan_result = Scan_Officer_Fields_(param_3, param_4, param_2, param_1, &MOX::_officer_scanned, &field2, &field1);
+
+        if (scan_result == 0) {
+            if (static_cast<int16_t>(MOX::_officer_selected) == field2) {
+                MOX::_officer_selected = -1;
+                return;
+            }
+
+            if (field2 >= 0) {
+                MOX::_officer_selected = static_cast<int8_t>(field2);
+                int8_t mode = _officer_button_mode;
+
+                if (mode == 0 || (mode == -1 && MOX::_leaders[field2].status == 4 /* Limbo */)) {
+                    Do_Hire_Officer_(field2);
+                    MOX::_draw_officer_to_back = 1;
+                    if (mode != 0) {
+                        MOX::_officer_selected = -1;
+                    }
+                } else if (mode == 2 /* Dismiss */) {
+                    char format_str[200];
+                    char final_msg[200];
+                    strcpy(format_str, HAROLD::H_Message_(HESTR_126_DISMISS_S));
+                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 1));
+
+                    if (Officer_Screen_User_Box_(final_msg, 1) != 0) {
+                        Dismiss_Officer_(MOX::_officer_selected);
+                        MOX::_officer_selected = -1;
+                    } else {
+                        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                    }
+                    MOX::_draw_officer_to_back = 1;
+                } else if (mode == 1 /* Relocate */) {
+                    if (MOX::_leaders[field2].status == 0 || MOX::_leaders[field2].status == 2) {
+                        MOX::_officer_selected = -1;
+                        _officer_button_mode = -1;
+                        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    } else {
+                        Move_Officer_To_Limbo_(field2);
+                    }
+                    MOX::_draw_officer_to_back = 1;
+                } else if (is_fleet_screen) {
+                    if (MOX::_offpop_big_icon_selected >= 0) {
+                        int16_t ship_idx = MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].ship_idx;
+                        if (Leader_Can_Be_Assigned_(field2) != 0) {
+                            Assign_Officer_(MOX::_officer_selected, ship_idx);
+                            MOX::_draw_officer_to_back = 1;
+                            Reset_Officer_Selection_();
+                        } else {
+                            char format_str[200];
+                            char final_msg[200];
+                            strcpy(format_str, HAROLD::H_Message_(HESTR_127_S_MUST_BE_HIRED_BEFORE));
+                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
+                            Officer_Screen_User_Box_(final_msg, 0);
+                        }
+                        MOX::_officer_selected = -1;
+                    }
+                } else if (_officer_star_chosen != -1 && HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, _officer_star_chosen)) {
+                    if (Leader_Can_Be_Assigned_(MOX::_officer_selected) != 0) {
+                        if (MOX::_leaders[static_cast<uint8_t>(MOX::_officer_selected)].location != _officer_star_chosen) {
+                            Assign_Officer_(MOX::_officer_selected, _officer_star_chosen);
+                            MOX::_draw_officer_to_back = 1;
+                        }
+                    } else {
+                        char format_str[200];
+                        char final_msg[200];
+                        if (MOX::_leaders[static_cast<uint8_t>(MOX::_officer_selected)].status == 4) {
+                            strcpy(format_str, HAROLD::H_Message_(HESTR_127_S_MUST_BE_HIRED_BEFORE));
+                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
+                        } else {
+                            strcpy(format_str, HAROLD::H_Message_(HESTR_128_YOU_CANNOT_ASSIGN_S_TO));
+                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0), MOX::_star[_officer_star_chosen].name);
+                        }
+                        Officer_Screen_User_Box_(final_msg, 0);
+                    }
+                    MOX::_officer_selected = -1;
+                }
+            }
+        } else if (scan_result == 1) {
+            if (field1 != -1) {
+                int32_t bonus = Officer_Skill_Bonus_(MOX::_PLAYER_NUM, field2, field1);
+                Print_Officer_Skill_Help_(field2, field1, static_cast<int16_t>(bonus));
+            } else {
+                Find_Selected_Leader_(field2);
+            }
+        }
+    }
+
+    /**
+     * @address 00443fe0
+     */
+    void __cdecl Dismiss_Officer_(int16_t officer_idx) {
+        s_leader_data& leader = MOX::_leaders[officer_idx];
+        int16_t location = leader.location;
+
+        if (leader.type == 0 /* SHIP_OFFICER */) {
+            if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_SHIPS)) {
+                // Remove leader reference from the ship
+                MOX::_ship[location].officer_index = -1;
+            }
+        } else {
+            if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_STARS)) {
+                // Remove leader reference from the star system
+                MOX::_star[location].officer_index[(uint8_t)leader.player_index] = -1;
+            }
+        }
+
+        Deassign_Officer_(officer_idx);
+        Build_Captain_Id_List_();
+        Get_Officer_Pictures_();
+        EVANHELP::Set_Officer_Screen_Help_();
+
+        OFFICER::_officer_button_mode = -1;
+    }
+
+    bool __cdecl Leader_Can_Be_Assigned_(int16_t leader_idx) {
+        int8_t status = MOX::_leaders[leader_idx].status;
+
+        if (status == 0 || status == 1 || status == 2) {
+            return true;
+        }
+
+        return false;
+    }
+
+    int16_t __cdecl Officer_Screen_User_Box_(const char* message, int16_t type) {
+        int16_t result = -1;
+
+        if (type == 1) {
+            result = GENDRAW::Warning_Box_00479700(const_cast<char*>(message));
+        } else if (type == 3) {
+            GENDRAW::Draw_Warning_Box_(message);
+        } else if (type == 5) {
+            int8_t duration = static_cast<int8_t>(MOX::_global_var & 0xFF);
+            if (duration < 0) {
+                duration = 0x7E;
+            }
+
+            *reinterpret_cast<int8_t*>(&MOX::_global_var) = duration;
+            Timed_Text_Box_(nullptr, message, static_cast<int16_t>(duration));
+            *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
+        } else {
+            GENDRAW::Message_Box_(const_cast<char*>(message));
+        }
+
+        video::Set_Page_Off_();
+        MOX::_draw_officer_to_back = 1;
+        OFFICER::Draw_Officer_Screen_();
+        RUSS::Mox_Sync_Update_();
+
+        return result;
     }
 }

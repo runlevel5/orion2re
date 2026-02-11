@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -748,6 +748,16 @@ namespace hooks {
         { 0x00441D70, &OFFICER::Set_Original_Stars_ },
         { 0x00441db0, &OFFICER::Set_Original_Ships_ },
         { 0x0043e9a0, &OFFICER::Officers_Screen_ },
+        { 0x0043DE10, &OFFICER::Draw_Colony_Box_ },
+        { 0x0043de30, &OFFICER::Draw_Fleet_Box_ },
+        { 0x0043dca0, &OFFICER::Draw_Officer_Screen_To_Back_ },
+        { 0x0043fe00, &OFFICER::Fade_Into_Leaders_Screen_ },
+        { 0x00443380, &OFFICER::Do_Hire_Officer_ },
+        { 0x0043f8f0, &OFFICER::Check_Officer_Fields_ },
+        { 0x004401a0, &OFFICER::Officer_Screen_User_Box_ },
+        { 0x0043D5B0, &OFFICER::Deassign_Officer_ },
+        { 0x00443fe0, &OFFICER::Dismiss_Officer_ },
+        { 0x0043fed0, &OFFICER::Leader_Can_Be_Assigned_ },
     };
 
     void Install_Hooks()
