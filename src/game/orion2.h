@@ -592,8 +592,7 @@ struct s_big_icon {
     undefined field6_0x6;
     undefined field7_0x7;
     undefined field8_0x8;
-    undefined field9_0x9;
-    undefined field10_0xa;
+    short field9_0x9;
     short ship_idx;
 };
 
@@ -2450,9 +2449,9 @@ struct s_scroll_bar {
     short last_thumb_center_y;
     short thumb_center_y_copy;
     short thumb_height_px;
-    short total_items;
-    short page_items;
-    short first_visible_idx;
+    short total_rows;
+    short visible_rows;
+    short first_visible_row;
     short track_len_px;
     short field8_0x10;
     short field9_0x12;
@@ -2462,7 +2461,7 @@ struct s_scroll_bar {
     undefined field13_0x17;
     int8_t field14_0x18;
     undefined field15_0x19;
-    int8_t line_step;
+    int8_t row_step;
     short thumb_y_snapshot;
 };
 

@@ -44,6 +44,7 @@
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
     <ClCompile Include="src\game\fleetpop.cpp" />
+    <ClCompile Include="src\game\flt1.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />

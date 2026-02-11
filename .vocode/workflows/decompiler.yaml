@@ -226,7 +226,7 @@ workflows:
                   LEA        ECX,[EAX + EAX*0x8]
                   ADD        ECX,EDX
  
-          * NEVER output structure definitions. You are allowed to output structure name as a reference without the body:
+          * You NEVER output structure definitions. You are allowed to output structure name as a reference without the body:
             
             struct s_player;
             string s_settings;
@@ -250,6 +250,11 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 60
+        preprocessors:
+          - name: file_read
+            options:
+              paths:
+                - src/game/orion2.h
         tools:
           - read_files
           - list_files
@@ -451,7 +456,8 @@ workflows:
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
           * `MSG` is a reserved name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * If you see values resembling enums or constants and there's a provided comment - always check against 
-            `src/game/orion2.h` and use an enum or a constant.
+            `src/game/orion2.h` and use an enum or a constant. The `src/game/orion2.h` is already provided to you in the system
+            prompt, do not read it again.
             - Always prefer enum value name over raw value. 
           * Never put function or variable stubs to .cpp files - they should go to headers.
           * Never add any comments, unless it is one of the following exceptions:
@@ -466,6 +472,7 @@ workflows:
 
           # Checklist
           * You did not read files that were not mentioned in the decomplation input
+          * You did not read `src/game/orion2.h` as it was provided to you in the system prompt
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * All external variables and functions stubs were added to correct files with correct namespaces

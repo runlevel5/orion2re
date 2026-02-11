@@ -241,6 +241,11 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
+inline uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
+    using Fn = uint8_t(__cdecl*)(int16_t, int16_t, char*);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x0045A680})(player_num, officer_id, message);
+}
+
 inline int __cdecl _clock() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540F20 });

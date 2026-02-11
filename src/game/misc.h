@@ -66,6 +66,8 @@ namespace MISC {
         reinterpret_cast<Fn>(0x00520000)(color);
     }
 
+    void __cdecl Replace_Char_(char* str, char target, char replacement);
+
     void __cdecl _Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     int16_t __cdecl Bit_Value_To_Num_(int32_t value, int16_t bit_limit);

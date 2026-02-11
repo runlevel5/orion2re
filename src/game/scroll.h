@@ -14,4 +14,10 @@ namespace SCROLL {
         using Fn = void(__cdecl*)(s_scroll_bar*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0048DBD0})(bar);
     }
+
+    inline int16_t __cdecl Get_Vertical_Scroll_Bar_Height_(s_scroll_bar* sb) {
+        using Fn = int16_t(__cdecl*)(s_scroll_bar*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048dad0});
+        return fn(sb);
+    }
 }

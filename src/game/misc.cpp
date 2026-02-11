@@ -235,4 +235,18 @@ namespace MISC {
 
         return first_bit_index;
     }
+
+    void __cdecl Replace_Char_(char* str, char target, char replacement) {
+        int16_t length = static_cast<int16_t>(strlen(str));
+
+        if (length <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < length; ++i) {
+            if (str[i] == target) {
+                str[i] = replacement;
+            }
+        }
+    }
 }
