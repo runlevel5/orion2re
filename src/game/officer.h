@@ -15,8 +15,10 @@ namespace OFFICER {
     inline int16_t& _officer_star_displayed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77A6});
     inline uint8_t& _offscrn_flash_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A77A8});
     inline int16_t& _officer_star_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77AA});
-    inline uint32_t& _prev_leaders = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565740});
+    inline s_prev_leader_data*& _prev_leaders =
+        *reinterpret_cast<s_prev_leader_data**>(std::uintptr_t{0x00565740});
     inline void*& _ldrpict = *reinterpret_cast<void**>(std::uintptr_t{0x005657B4});
+    inline const char*& PTR_s_OFFICER_LBX = *reinterpret_cast<const char**>(std::uintptr_t{0x00556990});
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
@@ -58,10 +60,28 @@ namespace OFFICER {
 
     void __cdecl Draw_Officer_Screen_To_Back_();
 
-    inline void __cdecl Reload_Officer_Screen_Pictures_() {
+    void __cdecl Reload_Officer_Screen_Pictures_();
+
+    inline void __cdecl Build_Captain_Id_List_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004415E0})();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0043d470})();
     }
+
+    inline void __cdecl Get_Officer_Pictures_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00441a40})();
+    }
+
+    inline void __cdecl Load_Officer_Skill_Name_Descriptions_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00441b60})();
+    }
+
+    inline void __cdecl Reload_Offscrn_Small_Ship_Icons_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00441c90})();
+    }
+
     inline void __cdecl Add_Officer_Screen_Fields_(int16_t* p1, int16_t* p2, int16_t* p3, int16_t* p4, int16_t* p5, int p6, int p7, int16_t* p8, int16_t* p9, int16_t* p10, int16_t* p11, int16_t* p12) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int, int, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0043F440})(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
@@ -91,20 +111,11 @@ namespace OFFICER {
 
     void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx);
 
-    inline int8_t __cdecl Get_Star_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t ship_idx) {
-        using Fn = int8_t(__cdecl*)(int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004448e0})(player_num, leader_idx, ship_idx);
-    }
+    int8_t __cdecl Get_Ship_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t ship_idx);
 
-    inline int8_t __cdecl Get_Leader_To_Colony_ETA_(int16_t player_num, int16_t leader_idx, int16_t star_idx) {
-        using Fn = int8_t(__cdecl*)(int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00444a00})(player_num, leader_idx, star_idx);
-    }
+    short __cdecl Get_Star_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t star_idx);
 
-    inline void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta) {
-        using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_ship_data*, int8_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00444800})(player, leader, ship, eta);
-    }
+    void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta);
 
     bool __cdecl Leader_Can_Be_Assigned_(int16_t leader_idx);
 
@@ -133,10 +144,7 @@ namespace OFFICER {
 
     void __cdecl Wrapper_For_Offscrn_System_Popup_(int16_t system_id);
 
-    inline void __cdecl Print_Galmap_Scanned_Ship_(int16_t ship_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00440340})(ship_idx);
-    }
+    void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx);
 
     void __cdecl Print_Scanned_Ship_Name_();
 
@@ -153,11 +161,7 @@ namespace OFFICER {
 
     void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t is_instant);
 
-    inline void __cdecl Give_Leader_Specials_To_Player_(int16_t officer_idx, int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444AF0});
-        fn(officer_idx, player_idx);
-    }
+    void __cdecl Give_Leader_Specials_To_Player_(int16_t officer_idx, int16_t player_idx);
 
     void __cdecl Hire_Officer_(int16_t player_idx, int16_t leader_idx);
 
@@ -174,4 +178,10 @@ namespace OFFICER {
     void __cdecl Draw_Fleet_Box_();
 
     void __cdecl Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star, int8_t eta);
+
+    bool __cdecl Ships_In_Same_Place_(int16_t ship_index_1, int16_t ship_index_2);
+
+    void __cdecl Load_Fleet_Galaxy_Stars_();
+
+    void __cdecl Load_Officer_Skill_Icons_(void* param_1);
 }

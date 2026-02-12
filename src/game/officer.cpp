@@ -1173,6 +1173,26 @@ namespace OFFICER {
     /**
      * @address 00444730
      */
+    /**
+     * @brief Checks if two ships are at the same coordinates.
+     * 
+     * @param ship_index_1 The index of the first ship in the global ship array.
+     * @param ship_index_2 The index of the second ship in the global ship array.
+     * @return True if both ships have the same x and y coordinates, false otherwise.
+     */
+    bool __cdecl Ships_In_Same_Place_(int16_t ship_index_1, int16_t ship_index_2) {
+        // ship structure size: 0x81 (129) bytes
+        const auto& ship1 = MOX::_ship[ship_index_1];
+        const auto& ship2 = MOX::_ship[ship_index_2];
+
+        // Coordinates x and y are shorts at offsets 0x67 and 0x69 respectively
+        if (ship1.x == ship2.x && ship1.y == ship2.y) {
+            return true;
+        }
+
+        return false;
+    }
+
     void __cdecl Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star, int8_t eta) {
         // Calculate indices based on base pointers
         int32_t player_index = static_cast<int32_t>(player - MOX::_player);
@@ -1200,6 +1220,31 @@ namespace OFFICER {
 
         // Record the leader's index at the star system for the player
         star->officer_index[player_index] = static_cast<int8_t>(leader_index);
+    }
+
+    void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta) {
+        int leader_idx = leader - MOX::_leaders;
+        int ship_idx = ship - MOX::_ship;
+
+        // If the ship already has an officer, clear that officer's assignment data.
+        short current_officer_idx = ship->officer_index;
+        if (current_officer_idx > -1 && current_officer_idx < 67 /* 0x43 */) {
+            s_leader_data* old_officer = &MOX::_leaders[current_officer_idx];
+            old_officer->status = 0;
+            old_officer->location = -1;
+            old_officer->eta = 0;
+        }
+
+        // If this leader was already assigned to another ship, clear that ship's officer index.
+        if (leader->location > -1) {
+            MOX::_ship[leader->location].officer_index = -1;
+        }
+
+        // Apply new assignment
+        leader->location = (short)ship_idx;
+        leader->eta = eta;
+        leader->status = 1;
+        ship->officer_index = (short)leader_idx;
     }
 
     uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
@@ -1409,6 +1454,67 @@ namespace OFFICER {
         }
     }
 
+    int8_t __cdecl Get_Ship_Leader_ETA_(int16_t player_idx, int16_t leader_idx, int16_t ship_idx) {
+        int16_t leader_loc;
+
+        if (_prev_leaders == nullptr) {
+            leader_loc = HAROLD::Absolute_Location_(MOX::_leaders[leader_idx].location);
+        } else {
+            leader_loc = _prev_leaders[leader_idx].location;
+        }
+
+        int16_t home_star_id = MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index;
+        bool at_same_place = false;
+
+        if (leader_loc != -1) {
+            at_same_place = Ships_In_Same_Place_(leader_loc, ship_idx);
+        }
+
+        if (_prev_leaders == nullptr) {
+            return at_same_place ? 0 : 5;
+        }
+
+        int8_t status = _prev_leaders[leader_idx].status;
+        if (status != 0 && status != 4) {
+            if (at_same_place) {
+                return static_cast<int8_t>(_prev_leaders[leader_idx].eta);
+            }
+            return 5;
+        }
+
+        const auto& ship = MOX::_ship[ship_idx];
+        if (ship.location == home_star_id) {
+            return 0;
+        }
+
+        if (HAROLD::XY_To_Star_Id_(ship.x, ship.y) == home_star_id) {
+            return 0;
+        }
+
+        return 5;
+    }
+
+    short __cdecl Get_Star_Leader_ETA_(int16_t player_index, int16_t leader_index, int16_t target_star_index) {
+        short home_star_index = MOX::_planet[MOX::_player[player_index].home_planet_id].star_index;
+
+        if (OFFICER::_prev_leaders == nullptr) {
+            if (target_star_index == home_star_index && MOX::_leaders[leader_index].status == 0) {
+                return 0;
+            }
+        } else {
+            auto& prev = OFFICER::_prev_leaders[leader_index];
+            if (prev.status == 0 || prev.status == 4) {
+                if (target_star_index == home_star_index) {
+                    return 0;
+                }
+            } else if (target_star_index == prev.location) {
+                return prev.eta;
+            }
+        }
+
+        return 5;
+    }
+
     void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx) {
         char format_buf[200];
         char display_buf[200];
@@ -1422,7 +1528,7 @@ namespace OFFICER {
                 return;
             }
 
-            eta = Get_Star_Leader_ETA_(MOX::_PLAYER_NUM, leader_idx, ship_idx);
+            eta = Get_Ship_Leader_ETA_(MOX::_PLAYER_NUM, leader_idx, ship_idx);
             s_ship_data* target_ship = &MOX::_ship[ship_idx];
 
             if (eta == 0) {
@@ -1456,7 +1562,7 @@ namespace OFFICER {
             }
         } else {
             // Colony Officer Screen logic
-            eta = Get_Leader_To_Colony_ETA_(MOX::_PLAYER_NUM, leader_idx, ship_idx);
+            eta = Get_Star_Leader_ETA_(MOX::_PLAYER_NUM, leader_idx, ship_idx);
             s_star_data* target_star = &MOX::_star[ship_idx];
 
             if (eta == 0) {
@@ -1743,6 +1849,37 @@ namespace OFFICER {
         }
     }
 
+    void __cdecl Give_Leader_Specials_To_Player_(int16_t leader_idx, int16_t player_idx) {
+        if (leader_idx == 47) {
+            int16_t gov_type = static_cast<int16_t>(Get_Advanced_Government_Type_(player_idx));
+            int16_t tech_app = COLCALC::Get_Govt_Type_Tech_App_(gov_type);
+
+            if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_app)) {
+                COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], tech_app);
+            }
+        } else {
+            for (int i = 0; i < 3; ++i) {
+                uint8_t tech_app = MOX::_leaders[leader_idx].tech_application[i];
+                if (tech_app != 0) {
+                    if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], (int32_t)tech_app)) {
+                        COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], (int16_t)tech_app);
+                    }
+                }
+            }
+        }
+
+        if (MOX::_leaders[leader_idx].type == 0) {
+            bool has_skill = Officer_Has_Special_Skill_(player_idx, leader_idx, 18);
+            if (!has_skill) {
+                has_skill = Officer_Has_Special_Skill_(player_idx, leader_idx, 19);
+            }
+
+            if (has_skill) {
+                MOX::_player[player_idx].has_galactic_lore = 1;
+            }
+        }
+    }
+
     void __cdecl Set_Officer_To_Player_(int16_t officer_idx, int16_t player_idx, uint8_t is_instant) {
         int16_t count = 0;
         int16_t replace_idx = -1;
@@ -1784,5 +1921,230 @@ namespace OFFICER {
         if (target.type == 1) {
             COLCALC::Do_Player_Colony_Calculations_(player_idx);
         }
+    }
+
+    void __cdecl Print_Galmap_Scanned_Ship_(int16_t icon_idx) {
+        int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+        s_ship_data* ship = &MOX::_ship[ship_idx];
+
+        int16_t ship_x = ship->x;
+        int16_t ship_y = ship->y;
+        int16_t owner = (int16_t)(uint8_t)ship->owner;
+
+        fonts::Set_Outline_Color_(0, 0);
+
+        int16_t print_x, print_y, print_width;
+        if (MOX::_current_screen == SCREEN_OFFICERS) {
+            print_x = 0x16C;
+            print_y = 0x19C;
+            print_width = 0xCB;
+        } else {
+            print_x = 0x43;
+            print_y = 0xF8;
+            print_width = 0xC7;
+        }
+
+        char race_name[256];
+        race_name[0] = '\0';
+
+        int16_t adjusted_owner_idx = node_idx;
+        if (node_idx >= 5000) {
+            adjusted_owner_idx -= 0x137F;
+            adjusted_owner_idx = HACCESS::Ship_Stack_Owner_(adjusted_owner_idx);
+            HACCESS::Race_Name_(adjusted_owner_idx, race_name);
+        } else if (owner > 8) {
+            adjusted_owner_idx = HACCESS::Ship_Stack_Owner_(adjusted_owner_idx);
+            HACCESS::Race_Name_(adjusted_owner_idx, race_name);
+        }
+
+        if (race_name[0] == '\0') {
+            int16_t total, n_colony, n_outpost, n_transport;
+            int32_t hull_counts[6];
+
+            SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &total, &n_colony, &n_outpost, &n_transport, hull_counts);
+
+            uint8_t player_color_idx = 0x49; // 'I'
+            if (owner < 8) {
+                uint8_t player_color = MOX::_player[owner].color;
+                player_color_idx = MOX::_main_palette_player_colors[player_color];
+            }
+
+            s_colors local_260, local_230;
+            MISC::Get_Mox_Font_Colors_(1, player_color_idx, player_color_idx + 5, &local_260);
+
+            for (int i = 1; i < 8; ++i) {
+                uint8_t base = local_260.colors[i];
+                local_260.colors[i] = base + 2;
+                local_230.colors[i] = base + 4;
+            }
+
+            fonts::Set_Font_Special_Colors_(&local_230);
+            fonts::Set_Font_Style_Outline_(1, &local_260);
+            fonts::Set_Font_Spacing_(1);
+
+            HACCESS::Race_Name_(owner, race_name);
+
+            char text_buffer[512];
+            const char* fleet_msg = HAROLD::H_Message_(HESTR_131_S_FLEET);
+            _sprintf(text_buffer, fleet_msg, race_name);
+            strings::String_To_Upper_(text_buffer);
+
+            char temp_fmt[256];
+            if (n_outpost > 0) {
+                HESTRNGS str_id = (n_outpost == 1) ? HESTR_102_D_OUTPOST : HESTR_103_D_OUTPOSTS;
+                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_outpost);
+                strcat(text_buffer, temp_fmt);
+            }
+
+            if (n_transport > 0) {
+                HESTRNGS str_id = (n_transport == 1) ? HESTR_104_D_TRANSPORT : HESTR_105_D_TRANSPORTS;
+                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_transport);
+                strcat(text_buffer, temp_fmt);
+            }
+
+            if (n_colony > 0) {
+                HESTRNGS str_id = (n_colony == 1) ? HESTR_106_D_COLONY_SHIP : HESTR_107_D_COLONY_SHIPS;
+                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_colony);
+                strcat(text_buffer, temp_fmt);
+            }
+
+            for (int i = 0; i < 6; ++i) {
+                int16_t count = (int16_t)hull_counts[i];
+                if (count > 0) {
+                    char* h_name = (count == 1) ? TECHDATA::_hull_data[i].name : TECHDATA::_hull_data[i].size_name;
+                    _sprintf(temp_fmt, "%d %s, ", (int)count, h_name);
+                    strcat(text_buffer, temp_fmt);
+                }
+            }
+
+            size_t len = strlen(text_buffer);
+            if (len > 2) {
+                text_buffer[len - 2] = '\0';
+            }
+
+            int16_t text_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_();
+            if (text_height > 21) {
+                fonts::Set_Font_Special_Colors_(&local_230);
+                fonts::Set_Font_Style_Outline_(0, &local_260);
+            }
+
+            ERIC::Print_Paragraph_Centered_(print_x, print_y, print_width, 22, text_buffer);
+        } else {
+            strings::String_To_Upper_(race_name);
+
+            s_colors* p_colors = MISC::Font_Colors2_(4, 'L', 'O');
+            s_colors local_260;
+            memcpy(local_260.colors, p_colors->colors, 8);
+
+            fonts::Set_Font_Style_Outline_(4, &local_260);
+            fonts::Print_Centered_(print_x + 102, print_y + 5, race_name);
+        }
+    }
+
+    void __cdecl Load_Fleet_Galaxy_Stars_() {
+        for (int i = 0; i < 11; ++i) {
+            MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(
+                PTR_s_OFFICER_LBX,
+                0x82 + i,
+                MOX::_screen_seg
+            );
+        }
+    }
+
+    /**
+     * Loads 27 skill icons from the OFFICER.LBX starting at entry 0x58 (88).
+     * These icons are stored in the global _officer_skill_icon_seg array.
+     */
+    void __cdecl Load_Officer_Skill_Icons_(void* param_1) {
+        for (int i = 0; i < 27; ++i) {
+            MOX::_officer_skill_icon_seg[i] = reinterpret_cast<s_animation_header*>(
+                MOX::farload::Far_Reload_Next_(
+                    reinterpret_cast<const char*>(PTR_s_OFFICER_LBX),
+                    0x58 + i,
+                    param_1
+                )
+            );
+        }
+    }
+
+    void __cdecl Reload_Officer_Screen_Pictures_() {
+        bitmap::Get_Bitmap_Size_(100, 100);
+
+        auto& player = MOX::_player[MOX::_PLAYER_NUM];
+        int8_t home_star_idx = MOX::_planet[player.home_planet_id].star_index;
+
+        MOX::Mox_Update_();
+        MAINSCR::Allocate_First_Screen_Seg_(5);
+        FLT1::Allocate_Fltscrn_Next_Screen_Seg_();
+
+        MOX::_officer_pictures_screen_seg = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
+        
+        _ldrpict = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+        std::memset(_ldrpict, 0, 0x30);
+
+        _prev_leaders = static_cast<s_prev_leader_data*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
+
+        for (int16_t i = 0; i < 0x43; ++i) {
+            _prev_leaders[i].status = MOX::_leaders[i].status;
+            _prev_leaders[i].location = MOX::_leaders[i].location;
+            _prev_leaders[i].eta = static_cast<short>(MOX::_leaders[i].eta);
+
+            if (MOX::_leaders[i].type == 1 /* Ship Captain */) {
+                if (_prev_leaders[i].status == 0 || _prev_leaders[i].status == 4) {
+                    _prev_leaders[i].location = home_star_idx;
+                }
+            }
+        }
+
+        MOX::_officers_original_ship_id = static_cast<int16_t*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
+        MOX::_officers_original_star_id = static_cast<int16_t*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
+
+        Build_Captain_Id_List_();
+        MOX::Mox_Update_();
+
+        const char* lbx = PTR_s_OFFICER_LBX;
+        MOX::_officer_main_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 0, MOX::_screen_seg));
+        MOX::_officer_fleet_box_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 1, MOX::_screen_seg));
+        MOX::_officer_colony_box_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 2, MOX::_screen_seg));
+        MOX::_officer_colony_ldrs_button_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 3, MOX::_screen_seg));
+        MOX::_officer_ship_ldrs_button_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 4, MOX::_screen_seg));
+        MOX::_officer_up_button_seg = MOX::farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg);
+        
+        MOX::Mox_Update_();
+
+        MOX::_officer_dn_button_seg = MOX::farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg);
+        MOX::_officer_prev_button_seg = MOX::farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
+        MOX::_officer_next_button_seg = MOX::farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg);
+        MOX::_officer_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg);
+        MOX::_officer_pool_button_seg_inactive = MOX::farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
+        MOX::_officer_dismiss_button_seg_active = MOX::farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
+        MOX::_officer_return_button_seg = MOX::farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
+        MOX::_officer_cancel_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        MOX::_selected_box_seg = MOX::farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
+        MOX::_scanned_box_seg = MOX::farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
+        MOX::_fleet_scroll_anim_seg = MOX::farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
+        MOX::_dull_officer_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
+        MOX::_dull_officer_pool_button_seg = MOX::farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
+        MOX::_officer_pool_button_seg_active = MOX::farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
+        MOX::_officer_dismiss_button_seg_inactive = MOX::farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        MOX::_officer_normal_window_seg = MOX::farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
+        MOX::_officer_bright_window_seg = MOX::farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
+
+        MOX::Mox_Update_();
+
+        MOX::_temp_officers_pict = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+
+        Get_Officer_Pictures_();
+        Load_Officer_Skill_Name_Descriptions_();
+        Load_Officer_Skill_Icons_(MOX::_screen_seg);
+        Reload_Offscrn_Small_Ship_Icons_();
+        Load_Fleet_Galaxy_Stars_();
     }
 }

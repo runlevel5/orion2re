@@ -717,6 +717,33 @@ namespace HAROLD {
     /**
      * @address 004f1ab0
      */
+    int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y) {
+        int32_t count = (int32_t)MOX::_NUM_STARS + 1;
+
+        for (int32_t i = 0; i < count; ++i) {
+            if (MOX::_star[i].x == x && MOX::_star[i].y == y) {
+                return (int16_t)i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * @address 004f05c0
+     */
+    int16_t __cdecl Absolute_Location_(int16_t location) {
+        if (location >= 500 && location < 1000) {
+            return location - 500;
+        }
+
+        if (location >= 1000 && location < 1072 /* 0x430 */) {
+            return location - 1000;
+        }
+
+        return location;
+    }
+
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx) {
         int16_t player_counts[MAX_PLAYERS];
         int16_t unk_val;

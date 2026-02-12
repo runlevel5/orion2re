@@ -279,6 +279,12 @@ inline void __cdecl Wrapper_For_Normal_System_Fields_() {
     fn();
 }
 
+inline int32_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
+    using Fn = int32_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043dea0});
+    return fn(player_idx);
+}
+
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
     using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
@@ -444,4 +450,6 @@ inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // 
 inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
 inline char*& PTR_s_GAME_LBX_0055ac4c =
     *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
+inline void*& PTR_s_OFFICER_LBX_00556990 =
+    *reinterpret_cast<void**>(std::uintptr_t{0x00556990});
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"

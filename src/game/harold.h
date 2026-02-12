@@ -108,6 +108,10 @@ namespace HAROLD {
 
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
+    int16_t __cdecl Absolute_Location_(int16_t location);
+
+    int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y);
+
     bool __cdecl Player_Is_Omniscient_(int16_t player_idx);
 
     inline uint8_t& _set_fade_for_first_fltpop = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595394});

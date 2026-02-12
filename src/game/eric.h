@@ -17,4 +17,10 @@ namespace ERIC {
     void Fast_Fade_Out_();
 
     void __cdecl Set_Fade_Percent_(int16_t percent);
+
+    inline void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t line_height, char* text) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba9f0});
+        fn(x, y, width, line_height, text);
+    }
 }

@@ -107,6 +107,7 @@
 #include "techdata.h"
 #include "techinit.h"
 #include "desbox.h"
+#include "fmtpara.h"
 #include "haccess.h"
 #include "diplomac.h"
 #include "diplodef.h"

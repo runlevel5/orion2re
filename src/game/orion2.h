@@ -2411,6 +2411,14 @@ struct s_player_info {
     char warlord;
 };
 
+typedef struct s_prev_leader_data s_prev_leader_data, *Ps_prev_leader_data;
+
+struct s_prev_leader_data {
+    int8_t status;
+    short location;
+    short eta;
+};
+
 typedef struct s_save_game_description s_save_game_description, *Ps_save_game_description;
 
 struct s_save_game_description {

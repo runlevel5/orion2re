@@ -98,6 +98,17 @@ namespace GEO {
         return (int16_t)parsecs;
     }
 
+    /**
+     * Checks if a specific star is located within a nebula.
+     * @param star_index The index into the global star array.
+     */
+    uint8_t __cdecl Star_Is_In_Some_Nebula_(int32_t star_index) {
+        // Star data structures are 113 (0x71) bytes in size.
+        // x is at offset 0xF (15), y is at offset 0x11 (17).
+        const auto& star = MOX::_star[star_index];
+        return Point_Is_In_Some_Nebula_(star.x, star.y);
+    }
+
     bool __cdecl Point_Is_In_Some_Nebula_(int16_t x, int16_t y) {
         bool in_any_nebula = false;
         int16_t i = 0;
@@ -121,6 +132,26 @@ namespace GEO {
         }
 
         return in_any_nebula;
+    }
+
+    /**
+     * Scans all stars in the galaxy and collects the indices of those that are classified
+     * as black holes into the provided buffer.
+     * 
+     * @param black_hole_indices Output buffer to store indices of black hole stars.
+     */
+    int16_t __cdecl Collect_Black_Holes_(int16_t* black_hole_indices) {
+        int16_t black_hole_count = 0;
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            // STAR_CLASS_BLACK_HOLE is represented by value 6
+            if (MOX::_star[i].spectral_class == STAR_CLASS_BLACK_HOLE) {
+                black_hole_indices[black_hole_count] = i;
+                black_hole_count++;
+            }
+        }
+
+        return black_hole_count;
     }
 
 } // namespace GEO

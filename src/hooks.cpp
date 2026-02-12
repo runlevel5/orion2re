@@ -778,6 +778,19 @@ namespace hooks {
         { 0x0043df20, &OFFICER::Get_Officer_Costs_ },
         { 0x00442110, &OFFICER::Set_Officer_To_Player_ },
         { 0x004420d0, &FLT1::Initialize_Scroll_Bar_ },
+        { 0x00440340, &OFFICER::Print_Galmap_Scanned_Ship_ },
+        { 0x00444af0, &OFFICER::Give_Leader_Specials_To_Player_ },
+        { 0x00442240, &OFFICER::Ships_In_Same_Place_ },
+        { 0x004f1dc0, &HAROLD::XY_To_Star_Id_ },
+        { 0x004448e0, &OFFICER::Get_Ship_Leader_ETA_ },
+        { 0x00444a00, &OFFICER::Get_Star_Leader_ETA_ },
+        { 0x00444800, &OFFICER::Assign_Leader_To_Ship_ },
+        { 0x004f05c0, &HAROLD::Absolute_Location_ },
+        { 0x00441bf0, &OFFICER::Load_Officer_Skill_Icons_ },
+        { 0x00441C40, &OFFICER::Load_Fleet_Galaxy_Stars_ },
+        { 0x004415e0, &OFFICER::Reload_Officer_Screen_Pictures_ },
+        { 0x00412B70, &GEO::Star_Is_In_Some_Nebula_ },
+        { 0x004127f0, &GEO::Collect_Black_Holes_ },
     };
 
     void Install_Hooks()

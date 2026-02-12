@@ -45,4 +45,9 @@ namespace FLT1 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004898E0});
         fn(val);
     }
+
+    inline void __cdecl Allocate_Fltscrn_Next_Screen_Seg_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004afc80})();
+    }
 }

@@ -259,4 +259,10 @@ namespace COLCALC {
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
 
     int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx);
+
+    inline int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043de50});
+        return fn(govt_type);
+    }
 }

@@ -23,6 +23,12 @@ namespace SYS {
 
     bool __cdecl Ok_To_View_System_(int16_t star_idx, int16_t player_idx);
 
+    inline void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t owner, int16_t* total, int16_t* colony, int16_t* outpost, int16_t* transport, int32_t* hull_counts) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int32_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00496620});
+        fn(x, y, owner, total, colony, outpost, transport, hull_counts);
+    }
+
     inline void __cdecl Draw_System_Display_Popup_(int16_t system_id, uint8_t flag, const char* label, int32_t x, int32_t y, int32_t w, int32_t h, int32_t p8, int32_t p9) {
         using Fn = void(__cdecl*)(int16_t, uint8_t, const char*, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494050});
