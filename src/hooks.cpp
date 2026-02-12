@@ -802,6 +802,11 @@ namespace hooks {
         { 0x00496700, &SYS::Need_To_Reload_System_Display_ },
         { 0x00497460, &SYS::Set_System_Display_Loaded_Flag_ },
         { 0x004962d0, &SYS::Load_New_System_Display_ },
+        { 0x004f1860, &HAROLD::Randomize_List_ },
+        { 0x004ac270, &ADVCIV::Not_Star_Owner_ },
+        { 0x004ecf80, &ADVCIV::Uncolonized_Planet_Worth_To_Player_ },
+        { 0x004ac2a0, &ADVCIV::Assign_Advanced_Civilization_Starting_Ships_ },
+        { 0x004089b0, &ADVCIV::Init_Advanced_Civilization_Fleet_ },
     };
 
     void Install_Hooks()

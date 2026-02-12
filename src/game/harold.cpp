@@ -541,6 +541,47 @@ namespace HAROLD {
     }
 
     /**
+     * @brief Randomizes the elements of a list using either a PRNG or the system clock.
+     *
+     * @param list Pointer to the array of shorts to be shuffled.
+     * @param size The number of elements in the list.
+     * @param use_clock If non-zero, uses clock() % size for indices; otherwise uses Random_(size) - 1.
+     * @address 004f1860
+     */
+    void __cdecl Randomize_List_(int16_t* list, int16_t size, int8_t use_clock) {
+        // The number of shuffle iterations is 1.5 * size
+        int32_t iterations = (static_cast<int32_t>(size) * 3) / 2;
+
+        if (iterations <= 0) {
+            return;
+        }
+
+        int16_t count = 0;
+        do {
+            int16_t idx1, idx2;
+
+            if (use_clock == 0) {
+                // random::Random_ likely returns a value in range [1, size]
+                idx1 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
+                idx2 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
+            } else {
+                idx1 = static_cast<int16_t>(_clock() % static_cast<uint32_t>(size));
+                idx2 = static_cast<int16_t>(_clock() % static_cast<uint32_t>(size));
+            }
+
+            if (idx1 != idx2) {
+                int16_t temp = list[idx1];
+                list[idx1] = list[idx2];
+                list[idx2] = temp;
+            }
+
+            count++;
+            // Note: If iterations > 32767, this comparison will exhibit
+            // unexpected behavior due to the 16-bit sign extension of count.
+        } while (static_cast<int32_t>(count) < iterations);
+    }
+
+    /**
      * @address 004f18f0
      */
     void __cdecl Set_All_Visited_Flags_() {

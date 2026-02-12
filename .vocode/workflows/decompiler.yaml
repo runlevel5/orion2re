@@ -226,7 +226,8 @@ workflows:
                   LEA        ECX,[EAX + EAX*0x8]
                   ADD        ECX,EDX
  
-          * You NEVER output structure definitions. You are allowed to output structure name as a reference without the body:
+          * You NEVER output structure definitions. You are allowed to output structure name as a reference without the body. Correct 
+            examples:
             
             struct s_player;
             string s_settings;

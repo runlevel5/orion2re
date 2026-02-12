@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\game\advciv.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />

@@ -44,6 +44,8 @@ namespace HAROLD {
 
     void __cdecl Get_Monetary_Unit_String_(char* buffer);
 
+    void __cdecl Randomize_List_(int16_t* list, int16_t size, int8_t use_clock);
+
     void __cdecl Save_Mouse_List_();
 
     inline uint8_t (&_saved_mouse_list)[120] =
