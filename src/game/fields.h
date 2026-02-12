@@ -99,6 +99,12 @@ namespace fields {
     int16_t __cdecl Scan_Field_();
 
     void __cdecl Clear_Mouse_Buffer_();
+
+    inline void __cdecl Draw_Visible_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00522C80});
+        fn();
+    }
     void __cdecl Set_Input_Delay_(uint16_t delay);
     void __cdecl Set_Field_Outline_Color_(uint16_t color);
 }

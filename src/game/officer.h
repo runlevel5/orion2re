@@ -113,7 +113,7 @@ namespace OFFICER {
 
     int8_t __cdecl Get_Ship_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t ship_idx);
 
-    short __cdecl Get_Star_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t star_idx);
+    int8_t __cdecl Get_Star_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t star_idx);
 
     void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta);
 

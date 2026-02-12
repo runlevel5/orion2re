@@ -73,22 +73,6 @@ namespace TECHDATA {
     inline s_tech_computer_data* _computers = reinterpret_cast<s_tech_computer_data*>(std::uintptr_t{ 0x00555558 });
     inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
     inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
-
-#pragma pack(push, 1)
-    struct s_tech_weapon_mod_data {
-        uint8_t field_0;
-        uint8_t field_1;
-        uint8_t field_2;
-        uint8_t field_3;
-        char* name;
-        uint8_t field_8;
-        uint8_t field_9;
-        int16_t bonus1;
-        int16_t bonus2;
-        uint8_t field_e;
-    };
-#pragma pack(pop)
-
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 

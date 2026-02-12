@@ -17,6 +17,7 @@ namespace MOX {
     inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
     inline int16_t& _offpop_big_icon_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C456});
     inline uint8_t& _drawing_officer_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D50});
+    inline uint8_t& _look_at_colonies = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A185F});
     inline s_big_icon*& _fltscrn_big_icon = *reinterpret_cast<s_big_icon**>(std::uintptr_t{0x00597460});
     inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});
     inline uint8_t& _first_time = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059749C});
@@ -84,6 +85,8 @@ namespace MOX {
     inline short& _return_screen = *reinterpret_cast<short*>(std::uintptr_t{0x005977F0});
     inline char*& _save_game_dates = *reinterpret_cast<char**>(std::uintptr_t{0x005A1CA8});
     inline char*& _save_game_stardates = *reinterpret_cast<char**>(std::uintptr_t{0x005974e8});
+    inline char*& _star_name_loaded_string =
+        *reinterpret_cast<char**>(std::uintptr_t{0x005A2C20});
     inline int16_t& _scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a9a});
     inline short& _previous_screen = *reinterpret_cast<short*>(std::uintptr_t{ 0x00597AD0 });
     inline int16_t& _max_debug_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059C458 });
@@ -147,6 +150,7 @@ namespace MOX {
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
     inline uint16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597AC8});
+    inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
     inline int8_t& _draw_fleet_screen_to_back = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059770C});
     inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005960E9});
@@ -300,6 +304,7 @@ namespace MOX {
 
     // Suggested name: MOX::_star_seg
     inline s_animation_header** _star_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B4C0});
+    inline s_animation_header** _sun_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF50});
 
     inline uint16_t& _n_stats_to_generate = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A182E});
 

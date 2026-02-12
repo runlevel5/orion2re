@@ -40,4 +40,10 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045ADC0});
         fn();
     }
+
+    inline void __cdecl Clear_System_Special_Slots_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A320});
+        fn();
+    }
 }

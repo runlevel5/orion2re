@@ -379,8 +379,10 @@ namespace hooks {
         { 0x0049e0e0, &MISC::Decrease_Font_Color_Range_ },
         { 0x0049e920, &MISC::Get_Font_Spacing_ },
         { 0x004cbc60, &MAINSCR::Draw_Mini_Main_Offscreen_ },
+#ifndef SKIP_MAIN
         { 0x004c4fe0, &MAINSCR::Do_System_Popup_ },
         { 0x004c4430, &MAINSCR::Add_Map_Fields_ },
+#endif
         { 0x00513680, &MOVEBOX::Move_Box_To_Top_ },
         { 0x0049edc0, &MISC::Save_Window_Status_ },
         { 0x0049eda0, &MISC::Restore_Window_Status_ },
@@ -499,7 +501,9 @@ namespace hooks {
         { 0x00481380, &INITSHIP::Best_Armor_ },
         { 0x004822c0, &INITSHIP::Get_FTL_Speed_ },
         { 0x004831a0, &INITSHIP::Get_Structure_ },
+#ifndef SKIP_MAIN
         { 0x005127b0, &MAINSCR::Add_Moveable_Box_Fields_ },
+#endif
         { 0x0051edf0, &fields::Get_Input_ },
         { 0x00526F20, &mouse::Pointer_X_ },
         { 0x00526F70, &mouse::Pointer_Y_ },
@@ -791,6 +795,13 @@ namespace hooks {
         { 0x004415e0, &OFFICER::Reload_Officer_Screen_Pictures_ },
         { 0x00412B70, &GEO::Star_Is_In_Some_Nebula_ },
         { 0x004127f0, &GEO::Collect_Black_Holes_ },
+        { 0x00484040, &TECH::Tech_Change_ },
+        { 0x00493f30, &SYS::Clear_System_Display_Loaded_Flag_ },
+        { 0x00496250, &SYS::Init_System_Display_ },
+        { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
+        { 0x00496700, &SYS::Need_To_Reload_System_Display_ },
+        { 0x00497460, &SYS::Set_System_Display_Loaded_Flag_ },
+        { 0x004962d0, &SYS::Load_New_System_Display_ },
     };
 
     void Install_Hooks()

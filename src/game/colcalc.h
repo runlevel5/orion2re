@@ -265,4 +265,18 @@ namespace COLCALC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043de50});
         return fn(govt_type);
     }
+
+    // Suggested name: Compute_Potential_Colony_Info
+    inline void __cdecl Compute_Potential_Colony_Info_(s_player* player, s_planet_data* planet, void* result_struct) {
+        using Fn = void(__cdecl*)(s_player*, s_planet_data*, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004FBF50 });
+        fn(player, planet, result_struct);
+    }
+
+    // Suggested name: Planet_Max_Population_For_Player
+    inline int16_t __cdecl Planet_Max_Population_For_Player_(s_planet_data* planet, int16_t player_num) {
+        using Fn = int16_t(__cdecl*)(s_planet_data*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F5A90 });
+        return fn(planet, player_num);
+    }
 }

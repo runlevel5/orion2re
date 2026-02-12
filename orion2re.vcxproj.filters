@@ -213,6 +213,9 @@
     <ClCompile Include="src\game\flt1.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\tech.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -591,6 +594,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\flt2.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\fmtpara.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\reduce.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

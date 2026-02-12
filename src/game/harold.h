@@ -90,6 +90,12 @@ namespace HAROLD {
 
     void __cdecl Restore_Mouse_List_();
 
+    inline bool __cdecl Player_Sighted_Monster_(int16_t player_num, int16_t star_id) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1780});
+        return fn(player_num, star_id);
+    }
+
     void __cdecl Load_Leader_Titles();
 
     inline void Load_H_Strings_() {

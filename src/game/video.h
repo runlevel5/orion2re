@@ -45,7 +45,7 @@ namespace video {
 	// Functions
 	void Set_Refresh_Stencil_();
 	void Set_Refresh_Full_();
-	void Set_Page_Off_();
+	void __cdecl Set_Page_Off_();
 	void __cdecl Clip_Off_();
 
 	// TODO: These were re-implemented in platform

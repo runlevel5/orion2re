@@ -80,6 +80,7 @@
     <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
+    <ClCompile Include="src\game\tech.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
     <ClCompile Include="src\game\video.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="src\game\flt.h" />
     <ClInclude Include="src\game\flt1.h" />
     <ClInclude Include="src\game\flt2.h" />
+    <ClInclude Include="src\game\fmtpara.h" />
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\gendraw.h" />
     <ClInclude Include="src\game\geo.h" />
@@ -183,6 +185,7 @@
     <ClInclude Include="src\game\racescrn.h" />
     <ClInclude Include="src\game\racesel.h" />
     <ClInclude Include="src\game\random.h" />
+    <ClInclude Include="src\game\reduce.h" />
     <ClInclude Include="src\game\regions.h" />
     <ClInclude Include="src\game\remap.h" />
     <ClInclude Include="src\game\report.h" />

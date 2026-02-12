@@ -252,6 +252,12 @@ inline int __cdecl _clock() {
     return fn();
 }
 
+inline int __cdecl _strncmp(const char* s1, const char* s2, size_t n) {
+    using Fn = int(__cdecl*)(const char*, const char*, size_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541C30});
+    return fn(s1, s2, n);
+}
+
 inline char* __cdecl __itoa(int value, char* str, int radix) {
     using Fn = char*(__cdecl*)(int, char*, int);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542d10});
@@ -298,6 +304,7 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
 }
 
 inline char& DAT_00556dac = *reinterpret_cast<char*>(std::uintptr_t{ 0x00556DAC });
+inline char& DAT_00566440 = *reinterpret_cast<char*>(std::uintptr_t{0x00566440});
 
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
@@ -393,6 +400,9 @@ inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541770 });
     return fn(stream, offset, origin);
 }
+
+inline const char* const s_fmt_00557F18 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
 inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
 inline const char* s__GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4); // ".GAM"

@@ -26,6 +26,7 @@
 #include "init.h"
 #include "mouse.h"
 #include "palette.h"
+#include "reduce.h"
 #include "filedef.h"
 #include "video.h"
 #include "exitm.h"

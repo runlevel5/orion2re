@@ -3050,18 +3050,12 @@ typedef struct s_sys_disp s_sys_disp, *Ps_sys_disp;
 
 struct s_sys_disp {
     short orbit;
-    undefined field1_0x2;
-    undefined field2_0x3;
-    undefined field3_0x4;
-    undefined field4_0x5;
-    undefined field5_0x6;
-    undefined field6_0x7;
-    undefined field7_0x8;
-    undefined field8_0x9;
-    undefined field9_0xa;
-    undefined field10_0xb;
-    undefined field11_0xc;
-    undefined field12_0xd;
+    short x;
+    short y;
+    int8_t oribit_pos;
+    int8_t orbit_idx;
+    short current_frame;
+    struct s_animation_header *pic;
 };
 
 typedef struct s_system_display_ships s_system_display_ships, *Ps_system_display_ships;

@@ -1494,7 +1494,7 @@ namespace OFFICER {
         return 5;
     }
 
-    short __cdecl Get_Star_Leader_ETA_(int16_t player_index, int16_t leader_index, int16_t target_star_index) {
+    int8_t __cdecl Get_Star_Leader_ETA_(int16_t player_index, int16_t leader_index, int16_t target_star_index) {
         short home_star_index = MOX::_planet[MOX::_player[player_index].home_planet_id].star_index;
 
         if (OFFICER::_prev_leaders == nullptr) {
