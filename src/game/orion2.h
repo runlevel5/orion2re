@@ -136,6 +136,23 @@ struct s_adv_planet_worth {
     undefined field73_0x78;
 };
 
+typedef struct s_aidesign_ship_design s_aidesign_ship_design, *Ps_aidesign_ship_design;
+
+struct s_aidesign_ship_design {
+    short theme_special;
+    short beam_special;
+    short missile_special;
+    short defense_special;
+    short special_weapon;
+    short special_device;
+    short fighters;
+    short missile_weapon;
+    short heavy_beams;
+    short beams;
+    short point_defense_beams;
+    short bombs;
+};
+
 typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
 typedef uint uint32_t;
@@ -338,29 +355,7 @@ struct s_colony {
 typedef struct s_colony_bldg s_colony_bldg, *Ps_colony_bldg;
 
 struct s_colony_bldg {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    undefined field4_0x4;
-    undefined field5_0x5;
-    undefined field6_0x6;
-    undefined field7_0x7;
-    undefined field8_0x8;
-    undefined field9_0x9;
-    undefined field10_0xa;
-    undefined field11_0xb;
-    undefined field12_0xc;
-    undefined field13_0xd;
-    undefined field14_0xe;
-    undefined field15_0xf;
-    undefined field16_0x10;
-    undefined field17_0x11;
-    undefined field18_0x12;
-    undefined field19_0x13;
-    undefined field20_0x14;
-    undefined field21_0x15;
-    undefined field22_0x16;
+    int32_t buildings[6];
 };
 
 typedef struct s_colors s_colors, *Ps_colors;
@@ -2180,7 +2175,7 @@ struct s_player {
     short player_defeated[8];
     short captured_population;
     char last_attacker;
-    char ship_design_theme;
+    int8_t ship_design_theme;
     char ship_special_theme;
     char tech_apps_learned[4];
     char tech_modifiers[17];
@@ -2929,10 +2924,10 @@ struct s_skill_data {
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
-    uint8_t id;
-    undefined field1_0x1;
-    uint8_t type;
-    undefined field3_0x3;
+    int8_t id;
+    int8_t field1_0x1;
+    int8_t type;
+    int8_t field3_0x3;
 };
 
 typedef struct s_star_data s_star_data, *Ps_star_data;
@@ -3035,7 +3030,7 @@ struct s_tech_building_data {
     undefined field4_0x7;
     int cost;
     short maintenance;
-    undefined field7_0xe;
+    int8_t field7_0xe;
     undefined field8_0xf;
     undefined field9_0x10;
     undefined field10_0x11;

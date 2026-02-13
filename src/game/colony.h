@@ -1,7 +1,16 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+
 namespace COLONY {
+    inline int16_t (&_colony_satellites)[10] =
+        *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x0056EBF8});
+
+    inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
+
+    inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
+
     inline void __cdecl Init_Colonies_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbfd0});
@@ -15,6 +24,12 @@ namespace COLONY {
 
     inline int16_t& _orbit_temp =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B22});
+
+    inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
+    inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
+    inline const char* _COLPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C98}); // "COLPUPS.LBX"
+
+    inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
 
     inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
 
@@ -34,10 +49,8 @@ namespace COLONY {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004DCA30})();
     }
-    inline void __cdecl Update_Colony_Palette_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004DF780})();
-    }
+    s_animation_header* __cdecl C_Anims_(int16_t index);
+    void __cdecl Update_Colony_Palette_();
     inline void __cdecl Make_Bldg_Array_For_Colony_(int32_t colony_handle, uint8_t flag) {
         using Fn = void(__cdecl*)(int32_t, uint8_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004DCEF0})(colony_handle, flag);
@@ -48,4 +61,7 @@ namespace COLONY {
     }
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
+    s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num);
+    bool __cdecl Sat_Should_Be_Replaced_(int16_t building_id);
+    void __cdecl Insert_Satellite_Into_Array_(int16_t satellite_id, int16_t* count);
 }

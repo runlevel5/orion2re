@@ -127,23 +127,106 @@ namespace COLBLDG {
         }
     }
 
-    void __cdecl Add_Build_Queue_Fields_() {
-        int16_t y_end = 350;
+    /**
+     * @address 0050a0b0
+     */
+    void __cdecl Add_Militarys_Fields_() {
+        COLDRAW::Calculate_Squish_Step_(13, 308, _n_military_indexes, 19);
 
-        for (int32_t i = 0; i < 7; ++i) {
+        for (int16_t i = 0; i < _n_military_indexes; ++i) {
+            int16_t step = 19 - COLONY::_step_squish;
             char* hotkey = ESTRINGS::E_Strings_(12);
 
-            _queue_fields[i] = fields::Add_Hidden_Field_(
-                207,
-                y_end - 21,
-                458,
-                y_end,
+            int16_t field_id = fields::Add_Hidden_Field_(
+                485,
+                i * step + 20,
+                623,
+                (i + 1) * step + 19,
                 hotkey,
                 41
             );
 
-            y_end += 20;
+            _military_fields[i] = field_id;
         }
+    }
+
+    /**
+     * @address 0050a020
+     */
+    void __cdecl Add_Buildings_Fields_() {
+        COLDRAW::Calculate_Squish_Step_(13 /* 0x0D */, 469 /* 0x1D5 */, _n_building_indexes, 19 /* 0x13 */);
+
+        if (_n_building_indexes > 0) {
+            for (int16_t i = 0; i < _n_building_indexes; ++i) {
+                int16_t step_size = 19 /* 0x13 */ - COLONY::_step_squish;
+                char* hotkey = ESTRINGS::E_Strings_(12 /* 0x0C */);
+
+                // Coordinates calculation
+                int16_t y1 = i * step_size + 20 /* 0x14 */;
+                int16_t y2 = (i + 1) * step_size + 19 /* 0x13 */;
+
+                _building_fields[i] = fields::Add_Hidden_Field_(
+                    13 /* 0x0D */,
+                    y1,
+                    184 /* 0xB8 */,
+                    y2,
+                    hotkey,
+                    41 /* 0x29 */
+                );
+            }
+        }
+    }
+
+    /**
+     * @address 0050e440
+     */
+    void __cdecl Add_Build_Queue_Fields_() {
+        int16_t y_end = 350 /* 0x15e */;
+
+        for (int i = 0; i < 7; ++i) {
+            char* hotkey = ESTRINGS::E_Strings_(12 /* 0xc */);
+
+            // Adds a hidden field for each item in the build queue
+            _queue_fields[i] = fields::Add_Hidden_Field_(
+                207 /* 0xcf */,
+                y_end - 21 /* 0x15 */,
+                458 /* 0x1ca */,
+                y_end,
+                hotkey,
+                41 /* 0x29 */
+            );
+
+            y_end += 20 /* 0x14 */;
+        }
+    }
+
+    void __cdecl Update_Fields_() {
+        fields::Clear_Fields_();
+
+        _fields[0] = fields::Add_Button_Field_(493, 447, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(12), 40);
+        _fields[3] = fields::Add_Button_Field_(560, 447, ESTRINGS::E_Strings_(12), _anims[3], ESTRINGS::E_Strings_(12), 40);
+
+        _fields[1] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(135));
+        _fields[8] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(139));
+        _fields[9] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(140));
+        _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
+
+        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], &_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+
+        if (MOX::_settings.strategic_combat_flag != 0) {
+            _fields[4] = -1000;
+            _fields[5] = -1000;
+        } else {
+            _fields[4] = fields::Add_Button_Field_(492, 379, ESTRINGS::E_Strings_(12), _anims[4], ESTRINGS::E_Strings_(436 /* ESTR_R */), 40);
+            _fields[5] = fields::Add_Button_Field_(561, 379, ESTRINGS::E_Strings_(12), _anims[5], ESTRINGS::E_Strings_(251 /* ESTR_D3 */), 40);
+        }
+
+        _fields[6] = fields::Add_Button_Field_(503, 411, ESTRINGS::E_Strings_(12), _anims[6], const_cast<char*>(s_e_0055ac48), 40);
+        _fields[7] = -1000;
+
+        Add_Build_Queue_Fields_();
+        Add_Buildings_Fields_();
+        Add_Militarys_Fields_();
     }
 
     void __cdecl Build_Arrays_() {

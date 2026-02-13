@@ -56,6 +56,7 @@
 #include "netmox.h"
 #include "timer.h"
 #include "contact.h"
+#include "coldraw.h"
 #include "colbldg.h"
 #include "key.h"
 #include "file_ani.h"

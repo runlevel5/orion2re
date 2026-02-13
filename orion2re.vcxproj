@@ -109,6 +109,7 @@
     <ClInclude Include="src\game\cmbtmis.h" />
     <ClInclude Include="src\game\colbldg.h" />
     <ClInclude Include="src\game\colcalc.h" />
+    <ClInclude Include="src\game\coldraw.h" />
     <ClInclude Include="src\game\colland.h" />
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\colony.h" />

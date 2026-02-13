@@ -3,41 +3,41 @@
 
 namespace INITSHIP {
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {
-        s_player* player = &MOX::_player[player_idx];
-        int16_t skip_offset;
+        s_player* plr = &MOX::_player[player_idx];
+        int16_t design_flag = 0;
 
-        if (MOX::_settings.starting_civilization_level == 2 || player->objectives != 100 /* 'd' */) {
-            skip_offset = 0;
-        } else {
-            skip_offset = 1;
+        if (MOX::_settings.starting_civilization_level != 2 && plr->objectives == 0x64 /* 'd' */) {
+            design_flag = 1;
         }
 
         if (MOX::_settings.strategic_combat_flag == 1) {
             for (int16_t i = 0; i < 6; ++i) {
-                struct_::Clear_Structure_(&player->ship_designs[i], 99);
-                Auto_Strategic_Design_Ship_(player_idx, i, &player->ship_designs[i]);
+                struct_::Clear_Structure_(&plr->ship_designs[i], 99);
+                Auto_Strategic_Design_Ship_(player_idx, i, &plr->ship_designs[i]);
             }
             return;
         }
 
         MOX::_cur_combat_x = -1000;
-        aidesign::Auto_Design_Ship_(player_idx, player->ship_designs[0].name, 0);
+        aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[0], 0);
         MOX::_cur_combat_x = 0;
 
         for (int16_t i = 1; i < 5; ++i) {
-            aidesign::Auto_Design_Ship_(player_idx, player->ship_designs[i].name, i - skip_offset);
+            aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[i], i - design_flag);
         }
 
-        if (player->objectives == 100 /* 'd' */) {
-            struct_::Clear_Structure_(&player->ship_designs[5], 99);
+        if (plr->objectives == 0x64 /* 'd' */) {
+            struct_::Clear_Structure_(&plr->ship_designs[5], 99);
         } else {
-            aidesign::Auto_Design_Ship_(player_idx, player->ship_designs[5].name, 5);
+            aidesign::Auto_Design_Ship_(player_idx, &plr->ship_designs[5], 5);
 
-            int16_t picture_mod = (int16_t)(player->ship_designs[5].picture_num % 8);
-            DESIGN::Get_Ship_Design_Name_((int16_t)(uint8_t)player->race,
-                         (int16_t)player->ship_designs[5].size,
-                         picture_mod,
-                         player->ship_designs[5].name);
+            int16_t pic_mod_8 = (int16_t)(plr->ship_designs[5].picture_num % 8);
+            DESIGN::Get_Ship_Design_Name_(
+                (int16_t)plr->race,
+                (int16_t)plr->ship_designs[5].size,
+                pic_mod_8,
+                plr->ship_designs[5].name
+            );
         }
     }
 
@@ -216,16 +216,6 @@ namespace INITSHIP {
 
             design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
         }
-    }
-
-    int16_t __cdecl Best_Computer_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00481310)(player_idx);
-    }
-
-    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00481280)(player_idx);
     }
 
     int16_t __cdecl Best_Armor_(int16_t player_idx) {

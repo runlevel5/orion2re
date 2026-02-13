@@ -4,6 +4,8 @@
 namespace COLBLDG {
     inline int16_t* _building_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AB30});
     inline int16_t& _n_building_indexes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AB9C});
+    // Size: short[54]
+    inline int16_t* _building_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F08});
 
     int __cdecl qsort_building_by_name_(const void* a, const void* b);
 
@@ -17,6 +19,7 @@ namespace COLBLDG {
 
     inline int16_t& _n_military_indexes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC0C});
     inline int16_t* _military_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055ABA0});
+    inline int16_t (&_military_fields)[54] = *reinterpret_cast<int16_t(*)[54]>(std::uintptr_t{0x00571E70});
 
     void __cdecl Build_Arrays_();
 
@@ -42,11 +45,13 @@ namespace COLBLDG {
 
     void __cdecl Add_Build_Queue_Fields_();
 
+    void __cdecl Add_Buildings_Fields_();
+
+    void __cdecl Add_Militarys_Fields_();
+
     void __cdecl Clear_Last_App_Desc_();
-    inline void __cdecl Update_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050E240})();
-    }
+
+    void __cdecl Update_Fields_();
     inline void __cdecl Draw_Build_Queue_Popup_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0050DEB0})();

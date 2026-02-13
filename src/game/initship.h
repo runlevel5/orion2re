@@ -26,9 +26,15 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Armor_(int16_t player_idx);
 
-    int16_t __cdecl Best_Computer_(int16_t player_idx);
+    inline int16_t __cdecl Best_Computer_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00481310})(player_idx);
+    }
 
-    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
+    inline int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00481280})(player_idx);
+    }
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 

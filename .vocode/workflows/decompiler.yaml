@@ -69,9 +69,7 @@ workflows:
           - Keep in mind that code might reference symbols from other namespaces. When generating
             stubs, you must correctly put symbols into correct namespace blocks deriving namespace
             name from a symbol name.
-          - Namespaces might have similar names (MOX vs MOX2) - these should be treated
-            as different namespaces.
-          - Even if referenced symbol is in the same namespaces, you MUST include its namespace ex\plicitly.
+          - Even if referenced symbol is in the same namespaces, you MUST include its namespace explicitly.
           - Combine all external symbols (variables and functions) that have same namespace name
             into a single namespace block. Example to follow:
 
@@ -98,9 +96,12 @@ workflows:
              behavior, and memory accesses.
           * You must decompile and output whole function. You are NOT allowed to remove portions of the function from
             the output.
+          * Avoid large refactors and global optimizations. Keep code as close to the original as possible outside of
+            subtle cleanups and tactical optimizations.
           * Cleanup:
             - You are allowed to rename internal variables.
             - You are allowed to remove superfluous variables, control logic, loops, etc.
+            - You are NOT allowed to change or reorder switch/case statements or important if branches.
             - Generated code should resemble code written by a developer and not look like it was decompiled,
                but the execution flow should be as close to original code as possible.
           * Always prefer stdlib functions over hand-rolled loops. Never prefix stdlib functions with `std::` namespace.
@@ -136,7 +137,7 @@ workflows:
 
                call [MOX2::SomeFunc]
 
-               should produce:
+               should produce similar inline function stub:
 
                namespace MOX2 {
                  inline void __cdecl FUN_5287A0() {
@@ -163,6 +164,22 @@ workflows:
             - For CALL/JMP targets, infer the correct function signature from usage and the human-readable comment.
             - We use naming convention from the project - mixed Snake_Case for functions and lowercase snake_case for variables.
           * Use explicit binary-faithful types (uint8_t/uint16_t/uint32_t/int32_t, pointers, structs) and casts where needed.
+          * Always try to resolve references to known structures and variables via human-readable indirection instead of casting
+            variables to flat memory addresses and accessing data via pointer arithmetic. For example:
+
+            mov esi, [n]
+            mov eax, [MOX::_player + esi]
+            mov eax, [eax + 0x25]
+            mov [race], eax
+
+            should be decompiled as:
+
+            race = MOX::_player[n].race;
+
+            end never as:
+
+            race = *(char *)((charptr_t)MOX::_player + 0x25);
+
           * Also output the following code that ties decompiled function to its base address, where 0x123456 is the raw function
             start address and decompiled_func is the address of the decompiled function:
 

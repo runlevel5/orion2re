@@ -830,8 +830,8 @@ namespace hooks {
         { 0x004d3c10, &CMBTDRW1::Detailed_View_Ship_ },
 #ifndef SKIP_MAIN
         { 0x0050e7d0, &COLBLDG::Build_Arrays_ },
-#endif
         { 0x0050e490, &COLBLDG::Build_Queue_Popup_ },
+#endif
         { 0x00509a80, &COLBLDG::Calculate_Building_Array_ },
         { 0x0050d170, &COLBLDG::Selection_Name_ },
         { 0x004dc3a0, &COLONY::Real_Building_Name_ },
@@ -843,6 +843,16 @@ namespace hooks {
         { 0x005097f0, &COLBLDG::Clear_Last_App_Description_String_ },
         { 0x0050e440, &COLBLDG::Add_Build_Queue_Fields_ },
         { 0x005094a0, &COLBLDG::Create_Ship_ },
+        { 0x0050e240, &COLBLDG::Update_Fields_ },
+        { 0x0050a020, &COLBLDG::Add_Buildings_Fields_ },
+        { 0x0050a0b0, &COLBLDG::Add_Militarys_Fields_ },
+        { 0x004e1be0, &COLONY::Buffer_Reload_Planets_ },
+        { 0x004df780, &COLONY::Update_Colony_Palette_ },
+        { 0x004dd6e0, &COLONY::Sat_Should_Be_Replaced_ },
+        { 0x004dd6b0, &COLONY::Insert_Satellite_Into_Array_ },
+        { 0x004dca50, &COLONY::C_Anims_ },
+        { 0x0046e0e0, &aidesign::Auto_Design_Ship_ },
+        { 0x0047f0f0, &INITSHIP::Init_Ship_Designs_ },
     };
 
     void Install_Hooks()
