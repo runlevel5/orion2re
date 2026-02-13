@@ -34,6 +34,7 @@ namespace MAPGEN {
     inline const char* s_Colony_Planets_d_Max_d = 
         reinterpret_cast<const char*>(std::uintptr_t{0x005589CC}); // "Colony Planets: %d Max: %d Plane..."
     inline const char* s_Star_d_orbit_d_has_a_0_sat_t_00558a1c = reinterpret_cast<const char*>(std::uintptr_t{0x00558A1C}); // "Star %d, orbit %d, has a 0 sat t"
+    inline uint8_t& _MAPGEN_TRACE = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005589A8});
 
     void __cdecl Clear_Planets_In_Star_Structure_();
 

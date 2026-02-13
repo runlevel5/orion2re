@@ -1508,7 +1508,7 @@ namespace OFFICER {
                     return 0;
                 }
             } else if (target_star_index == prev.location) {
-                return prev.eta;
+                return (int8_t)prev.eta;
             }
         }
 

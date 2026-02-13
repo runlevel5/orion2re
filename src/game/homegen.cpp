@@ -1,4 +1,5 @@
 #include "deps.h"
+#include <cstring>
 
 namespace HOMEGEN {
     bool __cdecl Star_Has_Planet_(int16_t star_index) {
@@ -260,25 +261,18 @@ namespace HOMEGEN {
      * @param arr Pointer to an array of world identifiers (shorts).
      */
     /**
-     * Checks if a given world ID is already present in the nearest food worlds list.
-     * The list size is bounded by the number of players.
+     * @brief Checks if a given food world index is already in the list of nearest food worlds.
+     * @param food_world_idx The world index to search for.
+     * @return true if the world is already added, false otherwise.
      */
-    bool __cdecl Is_Added_Food_World_(int16_t world_id) {
-        int16_t num_players = static_cast<int16_t>(MOX::_NUM_PLAYERS);
-
-        // Initial check matches 0051b19e CMP SI,AX ; 0051b1a1 JLE ...
-        if (num_players <= 0) {
-            return false;
-        }
-
-        for (int16_t i = 0; i < num_players; ++i) {
-            // Disassembly uses a short-circuit check at the start of loop iterations (0051b1a8 TEST AL, AL)
-            // which is equivalent to returning true immediately upon finding the world.
-            if (_nearest_food_worlds[i] == world_id) {
+    bool __cdecl Is_Added_Food_World_(int16_t food_world_idx) {
+        // The function iterates through the nearest food worlds and returns true if a match is found.
+        // It uses _NUM_PLAYERS as the loop limit.
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            if (_nearest_food_worlds[i] == food_world_idx) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -1177,137 +1171,69 @@ namespace HOMEGEN {
     }
 
     int16_t __cdecl Get_Orion_Star_Id_() {
-        int16_t center_x = (MOX::_cur_map_scale * 253) / 10 + 21;
-        int16_t center_y = (MOX::_cur_map_scale * 200) / 10 + 21;
-        int16_t map_x, map_y;
+        int16_t scale = MOX::_cur_map_scale;
+        int16_t x_center = (scale * 253) / 10 + 21;
+        int16_t y_center = (scale * 200) / 10 + 21;
+        int16_t dist_limit = 4;
 
-        MAINSCR::Get_PointXY_Draw_Coords_(center_x, center_y, &map_x, &map_y);
+        int16_t out_x, out_y;
+        MAINSCR::Get_PointXY_Draw_Coords_(x_center, y_center, &out_x, &out_y);
 
         uint8_t visited[72];
-        memset(&visited, 0, sizeof(visited));
+        memset(visited, 0, sizeof(visited));
 
-        StarCandidate candidates[72];
-        for (int i = 0; i < 72; ++i) {
-            candidates[i].distance = -1;
-            candidates[i].star_id = -1;
-        }
+        s_orion_candidate candidates[72];
+        memset(candidates, 0xFF, sizeof(candidates));
 
         int candidate_count = 0;
-        int16_t search_radius = 4;
+        do {
+            if (dist_limit >= 8) break;
 
-        while (candidate_count < 4 && search_radius <= 7) {
-            for (int16_t star_id = 0; star_id < MOX::_NUM_STARS; ++star_id) {
-                if (visited[star_id] == 0) {
-                    if (!HAROLD::Is_Home_Star_(star_id) && Is_Added_Food_World_(star_id) == 0) {
-                        int16_t dist = GEO::Parsecs_Between_Points_(MOX::_star[star_id].x, MOX::_star[star_id].y, center_x, center_y);
-                        if (dist < search_radius) {
-                            visited[star_id] = 1;
-                            candidates[star_id].distance = (int32_t)dist;
-                            candidates[star_id].star_id = star_id;
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
+                // Potential buffer overflow if _NUM_STARS > 72
+                if (visited[i] == 0) {
+                    if (HAROLD::Is_Home_Star_(i) == 0 && Is_Added_Food_World_(i) == 0) {
+                        int16_t d = GEO::Parsecs_Between_Points_(MOX::_star[i].x, MOX::_star[i].y, x_center, y_center);
+                        if (d < dist_limit) {
+                            visited[i] = 1;
+                            candidates[candidate_count].dist = (int32_t)d;
+                            candidates[candidate_count].star_idx = i;
                             candidate_count++;
                         }
                     }
                 }
             }
-            if (candidate_count >= 4) break;
-            search_radius++;
-        }
+            dist_limit++;
+        } while (candidate_count < 4);
+
+        // Potential buffer overflow if _NUM_STARS > 72
+        _qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), qsort_1_);
 
         int valid_count = 0;
-        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
-            if (candidates[i].distance > 0) {
-                candidates[valid_count].star_id = candidates[i].star_id;
-                candidates[valid_count].distance = candidates[i].distance;
+        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            if (candidates[i].dist > 0) {
+                candidates[valid_count].star_idx = candidates[i].star_idx;
+                candidates[valid_count].dist = candidates[i].dist;
                 valid_count++;
             }
         }
 
-        if (valid_count >= 2) {
-            _qsort(candidates, (size_t)valid_count, sizeof(StarCandidate), qsort_1_);
-            int random_idx = random::Random_(valid_count) - 1;
-            return candidates[random_idx].star_id;
+        int16_t selected_star;
+        if (valid_count < 2) {
+            bool found = false;
+            do {
+                int r = random::Random_((int)MOX::_NUM_STARS);
+                selected_star = (int16_t)(r - 1);
+                if (HAROLD::Is_Home_Star_(selected_star) == 0 && Is_Added_Food_World_(selected_star) == 0) {
+                    found = true;
+                }
+            } while (!found);
         } else {
-            while (true) {
-                int random_star = random::Random_(MOX::_NUM_STARS) - 1;
-                int16_t selected_star_id = (int16_t)random_star;
-                if (!HAROLD::Is_Home_Star_(selected_star_id) && Is_Added_Food_World_(selected_star_id) == 0) {
-                    return selected_star_id;
-                }
-            }
-        }
-    }
-
-    int16_t __cdecl Generate_Orion_() {
-        int16_t orion_star_id = Get_Orion_Star_Id_();
-        int16_t orion_orbit = -1;
-        int16_t temp_planet_indices[5];
-
-        for (int16_t i = 0; i < 5; ++i) {
-            int16_t planet_idx = MOX::_star[0].planet_index[i];
-            temp_planet_indices[i] = planet_idx;
-            if (planet_idx != -1 && i > 2) {
-                if (random::Random_(i - 1) == 1) {
-                    orion_orbit = i;
-                }
-            }
+            int r = random::Random_(valid_count);
+            selected_star = candidates[r - 1].star_idx;
         }
 
-        if (orion_orbit < 2) {
-            orion_orbit = (int16_t)random::Random_(3) + 1;
-        }
-
-        int16_t orion_planet_idx = MOX::_star[0].planet_index[orion_orbit];
-        if (orion_planet_idx == -1) {
-            orion_planet_idx = MOX::_planet_count;
-            MOX::_star[0].planet_index[orion_orbit] = orion_planet_idx;
-            MOX::_planet_count++;
-        }
-
-        for (int16_t i = 0; i < 5; ++i) {
-            if (i != orion_orbit && MOX::_star[0].planet_index[i] != -1) {
-                MOX::_planet[MOX::_star[0].planet_index[i]].planet_type = 1;
-            }
-        }
-
-        MOX::_star[0].system_special = SYSTEM_SPECIAL_ORION_STAR;
-
-        for (int i = 0; i < 6; ++i) {
-            MOX::_star[0].name[i] = s_Orion_0055a738[i];
-        }
-
-        if (MOX::_star[0].spectral_class == 6) {
-            MOX::_star[0].spectral_class = (int8_t)random::Random_(6) - 1;
-        }
-
-        s_star_data backed_up_star = MOX::_star[orion_star_id];
-        MOX::_star[orion_star_id] = MOX::_star[0];
-
-        int16_t saved_template_x = MOX::_star[0].x;
-        int16_t saved_template_y = MOX::_star[0].y;
-
-        MOX::_star[orion_star_id].x = saved_template_x;
-        MOX::_star[orion_star_id].y = saved_template_y;
-
-        MOX::_star[0].x = backed_up_star.x;
-        MOX::_star[0].y = backed_up_star.y;
-
-        s_planet_data* p = &MOX::_planet[orion_planet_idx];
-        memset(p, 0, sizeof(s_planet_data));
-
-        p->colony_index = -1;
-        p->orbit = (int8_t)orion_orbit;
-        p->planet_type = PLANET_TYPE_PLANET;
-        p->size = PLANET_SIZE_HUGE;
-        p->gravity_class = PLANET_GRAVITY_NORMAL_G;
-        p->group = 2;
-        p->climate = PLANET_CLIMAGE_GAIA;
-        p->mineral_class = MINERAL_RESOURCE_ULTRA_RICH;
-        p->planet_special = 11;
-
-        p->food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(0, orion_planet_idx);
-        p->max_farms = MAPGEN::Generate_Max_Farms_(0, orion_planet_idx);
-
-        return orion_star_id;
+        return selected_star;
     }
 
     void __cdecl Enforce_Mineral_Richness_(int16_t planet_index, int16_t mineral_class) {
@@ -1345,5 +1271,74 @@ namespace HOMEGEN {
         // _gravity_table is 5 columns wide (planet size categories)
         int32_t gravity_idx = (planet->mineral_class * 5) + planet->size;
         planet->gravity_class = MOX::_gravity_table[gravity_idx];
+    }
+
+    int16_t __cdecl Generate_Orion_() {
+        int16_t orion_star_idx = Get_Orion_Star_Id_();
+        int16_t planet_indices_backup[5];
+        int16_t selected_orbit = -1;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t p_idx = MOX::_star[0].planet_index[i];
+            planet_indices_backup[i] = p_idx;
+            if (p_idx > -1 && i > 2) {
+                if (random::Random_(i - 1) == 1) {
+                    selected_orbit = i;
+                }
+            }
+        }
+
+        if (selected_orbit < 2) {
+            selected_orbit = (int16_t)random::Random_(3) + 1;
+        }
+
+        int16_t target_planet_idx = MOX::_star[0].planet_index[selected_orbit];
+        if (target_planet_idx == -1) {
+            target_planet_idx = MOX::_planet_count;
+            MOX::_star[0].planet_index[selected_orbit] = MOX::_planet_count;
+            MOX::_planet_count++;
+        }
+
+        for (int16_t i = 0; i < 5; ++i) {
+            if (i != selected_orbit && MOX::_star[0].planet_index[i] != -1) {
+                MOX::_planet[MOX::_star[0].planet_index[i]].planet_type = PLANET_TYPE_ASTEROID;
+            }
+        }
+
+        MOX::_star[0].system_special = SYSTEM_SPECIAL_ORION_STAR;
+        std::memcpy(MOX::_star[0].name, s_Orion, 6);
+
+        if (MOX::_star[0].spectral_class == STAR_CLASS_BLACK_HOLE) {
+            MOX::_star[0].spectral_class = (int8_t)random::Random_(6) - 1;
+        }
+
+        s_star_data star_temp;
+        std::memcpy(&star_temp, &MOX::_star[orion_star_idx], sizeof(s_star_data));
+
+        int16_t star0_x = MOX::_star[0].x;
+        int16_t star0_y = MOX::_star[0].y;
+
+        MOX::_star[orion_star_idx].x = star0_x;
+        MOX::_star[orion_star_idx].y = star0_y;
+
+        MOX::_star[0].x = star_temp.x;
+        MOX::_star[0].y = star_temp.y;
+
+        s_planet_data* p = &MOX::_planet[target_planet_idx];
+        std::memset(p, 0, sizeof(s_planet_data));
+
+        p->colony_index = -1;
+        p->orbit = (int8_t)selected_orbit;
+        p->planet_type = PLANET_TYPE_PLANET;
+        p->size = PLANET_SIZE_HUGE;
+        p->gravity_class = PLANET_GRAVITY_NORMAL_G;
+        p->group = 2;
+        p->climate = PLANET_CLIMATE_GAIA;
+        p->mineral_class = MINERAL_RESOURCE_ULTRA_RICH;
+        p->planet_special = SYSTEM_SPECIAL_ORION_STAR;
+        p->food_per_farmer = MAPGEN::Generate_Food_Per_Farmer_(0, target_planet_idx);
+        p->max_farms = MAPGEN::Generate_Max_Farms_(0, target_planet_idx);
+
+        return orion_star_idx;
     }
 }

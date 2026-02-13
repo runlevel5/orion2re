@@ -146,6 +146,18 @@ inline void __cdecl FUN_5287c0() {
     fn();
 }
 
+inline int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac040});
+    return fn(player_idx, planet_idx);
+}
+
+inline bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
+    using Fn = bool(__cdecl*)(int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac120});
+    return fn(player_idx, star_idx);
+}
+
 inline int __cdecl hgetch_() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
@@ -285,6 +297,12 @@ inline void __cdecl Wrapper_For_Normal_System_Fields_() {
     fn();
 }
 
+inline void __cdecl Init_Homeworld_Colony2_(int16_t colony_idx, int16_t player_idx, int8_t flag) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408340});
+    fn(colony_idx, player_idx, flag);
+}
+
 inline int32_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
     using Fn = int32_t(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043dea0});
@@ -412,9 +430,6 @@ inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintp
 inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
 inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"
 inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*>(std::uintptr_t{0x00556950}); // "Settings file (MOX.SET) is missing..."
-
-// "Orion"
-inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A738});
 
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"

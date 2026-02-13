@@ -459,16 +459,16 @@ typedef enum MINERAL_RESOURCE {
 } MINERAL_RESOURCE;
 
 typedef enum PLANET_CLIMATE {
-    PLANET_CLIMAGE_TOXIC=0,
-    PLANET_CLIMAGE_RADIATED=1,
-    PLANET_CLIMAGE_BARREN=2,
-    PLANET_CLIMAGE_DESERT=3,
-    PLANET_CLIMAGE_TUNDRA=4,
-    PLANET_CLIMAGE_OCEAN=5,
-    PLANET_CLIMAGE_SWAMP=6,
-    PLANET_CLIMAGE_ARID=7,
-    PLANET_CLIMAGE_TERRAN=8,
-    PLANET_CLIMAGE_GAIA=9
+    PLANET_CLIMATE_TOXIC=0,
+    PLANET_CLIMATE_RADIATED=1,
+    PLANET_CLIMATE_BARREN=2,
+    PLANET_CLIMATE_DESERT=3,
+    PLANET_CLIMATE_TUNDRA=4,
+    PLANET_CLIMATE_OCEAN=5,
+    PLANET_CLIMATE_SWAMP=6,
+    PLANET_CLIMATE_ARID=7,
+    PLANET_CLIMATE_TERRAN=8,
+    PLANET_CLIMATE_GAIA=9
 } PLANET_CLIMATE;
 
 typedef enum PLANET_GRAVITY {
@@ -497,6 +497,124 @@ typedef enum PLANET_TYPE {
     PLANET_TYPE_NOT_USED8=8,
     PLANET_TYPE_NOT_USED9=9
 } PLANET_TYPE;
+
+typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
+
+
+typedef struct s_adv_civ_player_star s_adv_civ_player_star, *Ps_adv_civ_player_star;
+
+typedef struct s_adv_civ_player_planet s_adv_civ_player_planet, *Ps_adv_civ_player_planet;
+
+typedef int int32_t;
+
+struct s_adv_civ_player_planet {
+    int8_t has_colony;
+    short proximity_bonus;
+    int32_t worth;
+    short planet_idx;
+    int8_t field4_0x9;
+};
+
+struct s_adv_civ_player_star {
+    short star_idx;
+    short min_dist_to_colony;
+};
+
+struct s_adv_civ_player {
+    short candidate_star_count;
+    short planet_count;
+    short assigned_planet_count;
+    short furthest_star_dist_from_home;
+    int8_t has_planet[360];
+    struct s_adv_civ_player_star stars[72];
+    struct s_adv_civ_player_planet planets[360];
+};
+
+typedef struct s_adv_planet_worth s_adv_planet_worth, *Ps_adv_planet_worth;
+
+typedef struct s_adv_planet_worth_s1 s_adv_planet_worth_s1, *Ps_adv_planet_worth_s1;
+
+struct s_adv_planet_worth_s1 {
+    short planet_idx;
+    int worth;
+};
+
+struct s_adv_planet_worth {
+    int8_t planet_idx;
+    struct s_adv_planet_worth_s1 planets[8];
+    undefined field2_0x31;
+    undefined field3_0x32;
+    undefined field4_0x33;
+    undefined field5_0x34;
+    undefined field6_0x35;
+    undefined field7_0x36;
+    undefined field8_0x37;
+    undefined field9_0x38;
+    undefined field10_0x39;
+    undefined field11_0x3a;
+    undefined field12_0x3b;
+    undefined field13_0x3c;
+    undefined field14_0x3d;
+    undefined field15_0x3e;
+    undefined field16_0x3f;
+    undefined field17_0x40;
+    undefined field18_0x41;
+    undefined field19_0x42;
+    undefined field20_0x43;
+    undefined field21_0x44;
+    undefined field22_0x45;
+    undefined field23_0x46;
+    undefined field24_0x47;
+    undefined field25_0x48;
+    undefined field26_0x49;
+    undefined field27_0x4a;
+    undefined field28_0x4b;
+    undefined field29_0x4c;
+    undefined field30_0x4d;
+    undefined field31_0x4e;
+    undefined field32_0x4f;
+    undefined field33_0x50;
+    undefined field34_0x51;
+    undefined field35_0x52;
+    undefined field36_0x53;
+    undefined field37_0x54;
+    undefined field38_0x55;
+    undefined field39_0x56;
+    undefined field40_0x57;
+    undefined field41_0x58;
+    undefined field42_0x59;
+    undefined field43_0x5a;
+    undefined field44_0x5b;
+    undefined field45_0x5c;
+    undefined field46_0x5d;
+    undefined field47_0x5e;
+    undefined field48_0x5f;
+    undefined field49_0x60;
+    undefined field50_0x61;
+    undefined field51_0x62;
+    undefined field52_0x63;
+    undefined field53_0x64;
+    undefined field54_0x65;
+    undefined field55_0x66;
+    undefined field56_0x67;
+    undefined field57_0x68;
+    undefined field58_0x69;
+    undefined field59_0x6a;
+    undefined field60_0x6b;
+    undefined field61_0x6c;
+    undefined field62_0x6d;
+    undefined field63_0x6e;
+    undefined field64_0x6f;
+    undefined field65_0x70;
+    undefined field66_0x71;
+    undefined field67_0x72;
+    undefined field68_0x73;
+    undefined field69_0x74;
+    undefined field70_0x75;
+    undefined field71_0x76;
+    undefined field72_0x77;
+    undefined field73_0x78;
+};
 
 typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
@@ -580,7 +698,6 @@ struct s_antaran {
 };
 
 typedef struct s_big_icon s_big_icon, *Ps_big_icon;
-
 
 struct s_big_icon {
     undefined field0_0x0;
@@ -1425,8 +1542,6 @@ struct s_game_anims {
 
 typedef struct s_game_popup_fields s_game_popup_fields, *Ps_game_popup_fields;
 
-typedef int int32_t;
-
 struct s_game_popup_fields {
     int32_t field0_0x0[10];
     short field_l;
@@ -2120,6 +2235,12 @@ struct s_nebula {
     int8_t type;
 };
 
+typedef struct s_parsec s_parsec, *Ps_parsec;
+
+struct s_parsec {
+    int32_t dist[72];
+};
+
 typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 
 struct s_planet_data {
@@ -2137,7 +2258,7 @@ struct s_planet_data {
     char n_terraforms;
     char max_farms;
     char max_population;
-    char planet_special;
+    int8_t planet_special;
     char environmental_alterations;
 };
 

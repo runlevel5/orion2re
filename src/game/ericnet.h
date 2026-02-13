@@ -13,4 +13,6 @@ namespace ERICNET {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
         fn(sound_id);
     }
+
+    void __cdecl Init_Non_Homeworld_Colony_(int16_t colony_idx, int16_t player_idx);
 }

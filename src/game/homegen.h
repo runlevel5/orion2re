@@ -14,11 +14,11 @@ namespace HOMEGEN {
     inline const char* s_Found_no_satellites_after_3_MIN_e_0055adc8 =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055ADC8}); // "Found no satellites after 3 MIN epochs for star %d"
 
-    inline const char* s_Orion_0055a738 = reinterpret_cast<const char*>(std::uintptr_t{0x0055a738}); // "Orion"
+    inline const char* s_Orion = reinterpret_cast<const char*>(std::uintptr_t{0x0055a738}); // "Orion"
 
     inline int32_t& _HOME_WORLD_GEN_MAX_CTR = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00572390 });
     inline s_good_star*& _good_stars = *reinterpret_cast<s_good_star**>(std::uintptr_t{ 0x00572398 });
-    inline int16_t* _nearest_food_worlds = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005723A0 });
+    inline int16_t (&_nearest_food_worlds)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005723A0});
     inline s_star_dist*& _star_list = *reinterpret_cast<s_star_dist**>(0x005723B0);
 
     bool __cdecl Is_Added_Food_World_(int16_t world_id);
@@ -29,6 +29,11 @@ namespace HOMEGEN {
     struct CandidateList {
         uint16_t stars[20];
         uint16_t count;
+    };
+
+    struct s_orion_candidate {
+        int32_t dist;
+        int16_t star_idx;
     };
 
     struct StarCandidate {

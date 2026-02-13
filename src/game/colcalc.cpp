@@ -4,12 +4,12 @@ namespace COLCALC {
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
         if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
             switch (climate) {
-                case PLANET_CLIMAGE_TUNDRA: // 4
-                case PLANET_CLIMAGE_SWAMP: // 6
-                    return PLANET_CLIMAGE_TERRAN; // 8
-                case PLANET_CLIMAGE_OCEAN: // 5
-                case PLANET_CLIMAGE_TERRAN: // 8
-                    return PLANET_CLIMAGE_GAIA; // 9
+                case PLANET_CLIMATE_TUNDRA: // 4
+                case PLANET_CLIMATE_SWAMP: // 6
+                    return PLANET_CLIMATE_TERRAN; // 8
+                case PLANET_CLIMATE_OCEAN: // 5
+                case PLANET_CLIMATE_TERRAN: // 8
+                    return PLANET_CLIMATE_GAIA; // 9
                 default:
                     break;
             }
@@ -492,12 +492,12 @@ namespace COLCALC {
         int8_t climate = MOX::_planet[colony->planet].climate;
         colony->climate = climate;
 
-        if (climate == PLANET_CLIMAGE_RADIATED) {
+        if (climate == PLANET_CLIMATE_RADIATED) {
             if (colony->buildings[BUILDING_BARRIER_SHIELD] != 0 ||
                 colony->buildings[BUILDING_FLUX_SHIELD] != 0 ||
                 colony->buildings[BUILDING_RADIATION_SHIELD] != 0)
             {
-                colony->climate = PLANET_CLIMAGE_BARREN;
+                colony->climate = PLANET_CLIMATE_BARREN;
             }
         }
 

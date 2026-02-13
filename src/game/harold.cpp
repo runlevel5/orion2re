@@ -66,7 +66,7 @@ namespace HAROLD {
      * Uses assembly REPE CMPSB with ECX=6 comparison.
      */
     bool __cdecl Star_Is_Orion_(int16_t star_idx) {
-        const char* orion_str = s_Orion_0055a738;
+        const char* orion_str = HOMEGEN::s_Orion;
         const char* star_name = MOX::_star[star_idx].name;
 
         for (int i = 0; i < 6; ++i) {

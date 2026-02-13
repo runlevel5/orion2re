@@ -63,6 +63,9 @@ workflows:
           - If symbol does not seem to have namespace, check both disassembly comment and decompiled code to see 
             if namespace is actually set. Decompiler might not emit namespace if decompiled function is in same namespace
             as a referenced symbol.
+          - Decompiled output might not exactly match the disassembly, might be incomplete or misleading. Always do the
+            disassembly analysis to identify decompiled code gaps, extract correct references and variable sizes. Ensure that
+            no code is missed in the final output.
           - Keep in mind that code might reference symbols from other namespaces. When generating
             stubs, you must correctly put symbols into correct namespace blocks deriving namespace
             name from a symbol name.
@@ -189,8 +192,9 @@ workflows:
                    }
                }
 
-          * If you see loops resembling standard functions, such as memset, strcmp and others,
-            prefer standard library functions over custom loop implementation.
+          * If you see hand rolled loops resembling standard functions, such as memset, strcmp and others,
+            prefer standard library functions over custom loops. Do not use C++
+            versions found in `std::` namespace - rely on C standard library functions.
           * If you see string literals as pointers, reference original string address and 
             provide potential text as a comment. Do not put address inline, create external
             variable reference. 
@@ -251,11 +255,6 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 60
-        preprocessors:
-          - name: file_read
-            options:
-              paths:
-                - src/game/orion2.h
         tools:
           - read_files
           - list_files
@@ -457,8 +456,7 @@ workflows:
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
           * `MSG` is a reserved name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * If you see values resembling enums or constants and there's a provided comment - always check against 
-            `src/game/orion2.h` and use an enum or a constant. The `src/game/orion2.h` is already provided to you in the system
-            prompt, do not read it again.
+            `src/game/orion2.h` and use an enum or a constant.
             - Always prefer enum value name over raw value. 
           * Never put function or variable stubs to .cpp files - they should go to headers.
           * Never add any comments, unless it is one of the following exceptions:
@@ -476,7 +474,6 @@ workflows:
 
           # Checklist
           * You did not read files that were not mentioned in the decomplation input
-          * You did not read `src/game/orion2.h` as it was provided to you in the system prompt
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * All external variables and functions stubs were added to correct files with correct namespaces
