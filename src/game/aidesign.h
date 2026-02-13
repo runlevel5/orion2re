@@ -8,9 +8,5 @@ namespace aidesign {
         fn(player_idx, name, design_idx);
     }
 
-    inline void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, char* name) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004825c0 });
-        fn(player_idx, design_idx, name);
-    }
+    int16_t __cdecl Cost_Reduction_For_Govt_Hull_Type(int16_t govt_type, struct s_ship_design* design);
 }

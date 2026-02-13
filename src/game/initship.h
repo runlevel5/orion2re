@@ -3,6 +3,13 @@
 
 namespace INITSHIP {
     void __cdecl Init_Ship_Designs_(int16_t player_idx);
+    
+    inline void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* defense, int16_t* missile_def, int16_t* attack) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0047ef30 });
+        fn(ship_idx, defense, missile_def, attack);
+    }
+
     int16_t __cdecl Best_Ship_Fuel_(int16_t player_idx);
 
     void __cdecl Update_Player_Ship_Designs_(int16_t player_idx);
@@ -26,6 +33,19 @@ namespace INITSHIP {
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 
     int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech);
+
+    void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, s_ship_design* design);
+
+    inline void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner, s_ship_design* design) {
+        using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00480EA0})(owner, design);
+    }
+
+    inline void __cdecl Update_Strategic_Design_Weapons_Specials_(s_ship_design* design, int16_t player_idx, int16_t design_idx) {
+        using Fn = void(__cdecl*)(s_ship_design*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004823D0});
+        fn(design, player_idx, design_idx);
+    }
 
     inline void __cdecl Get_Design_Combat_Bonuses_(s_ship_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
         // ABI is weird when passed by value, so just call in assembly

@@ -7,4 +7,10 @@ namespace ESTRINGS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a0060});
         fn();
     }
+
+    inline char* __cdecl E_Strings_(int id) {
+        using Fn = char*(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A0050});
+        return fn(id);
+    }
 }

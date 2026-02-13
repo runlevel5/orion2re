@@ -137,6 +137,13 @@ namespace allocate {
         return reinterpret_cast<void*>(sub_block_start + 12);
     }
 
+    void* __cdecl Allocate_First_Block_(void* block, uint32_t size) {
+        // Zero out a field 12 bytes before the provided block pointer
+        *reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(block) - 0x0C) = 0;
+
+        return Allocate_Next_Block_(block, size);
+    }
+
     /**
      * @brief Allocates space with a 12-byte header, aligning odd sizes to the next 4-byte boundary.
      * @param size The requested memory size in bytes.

@@ -1,4 +1,5 @@
 #include "deps.h"
+#include <cstring>
 
 namespace INITSHIP {
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {
@@ -14,7 +15,7 @@ namespace INITSHIP {
         if (MOX::_settings.strategic_combat_flag == 1) {
             for (int16_t i = 0; i < 6; ++i) {
                 struct_::Clear_Structure_(&player->ship_designs[i], 99);
-                aidesign::Auto_Strategic_Design_Ship_(player_idx, i, player->ship_designs[i].name);
+                Auto_Strategic_Design_Ship_(player_idx, i, &player->ship_designs[i]);
             }
             return;
         }
@@ -48,7 +49,7 @@ namespace INITSHIP {
             int8_t old_picture_num = design->picture_num;
 
             struct_::Clear_Structure_(design, sizeof(s_ship_design));
-            aidesign::Auto_Strategic_Design_Ship_(player_idx, i, design->name);
+            Auto_Strategic_Design_Ship_(player_idx, i, design);
 
             int8_t new_picture_num;
             if (i == 5) {
@@ -79,7 +80,7 @@ namespace INITSHIP {
         Update_Equipment_On_Ships_Being_Built_(player_idx);
 
         for (int16_t i = 0; i < 5; ++i) {
-            aidesign::Auto_Strategic_Design_Ship_(player_idx, i, MOX::_player[player_idx].ship_designs[i].name);
+            Auto_Strategic_Design_Ship_(player_idx, i, &MOX::_player[player_idx].ship_designs[i]);
         }
     }
 
@@ -269,5 +270,33 @@ namespace INITSHIP {
         }
 
         return total_structure;
+    }
+
+    void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, s_ship_design* design) {
+        // Copy the default name for this hull type (e.g., "Frigate")
+        strcpy(design->name, TECHDATA::_hull_data[design_idx].name);
+
+        design->size = static_cast<int8_t>(design_idx);
+        design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
+        design->shield_type = static_cast<int8_t>(Best_Ship_Shield_(player_idx));
+        design->computer_type = static_cast<int8_t>(Best_Computer_(player_idx));
+        design->armor_type = static_cast<int8_t>(Best_Armor_(player_idx));
+
+        // Calculate the build cost including government bonuses/penalties
+        design->cost = aidesign::Cost_Reduction_For_Govt_Hull_Type(player_idx, &MOX::_player[player_idx].ship_designs[design_idx]);
+
+        // Fill weapons and special systems
+        Update_Strategic_Design_Weapons_Specials_(design, player_idx, design_idx);
+
+        // Assign visual representation
+        if (design_idx == 5 /* STAR_BASE_HULL */) {
+            design->picture_num = 0x2B; /* '+' sign for starbases */
+        } else {
+            design->picture_num = static_cast<int8_t>(design_idx) << 3;
+        }
+
+        design->previous_owner = static_cast<int8_t>(player_idx);
+        design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, static_cast<int16_t>(design->ftl_type)));
+        design->date_of_design = static_cast<uint16_t>(MOX::_stardate);
     }
 }

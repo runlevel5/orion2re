@@ -1984,7 +1984,7 @@ namespace MAINSCR {
         MAINPUPS::_g_temp_tax_rate = static_cast<int16_t>(static_cast<uint8_t>(current_player->tax_rate));
 
         MAINPUPS::_last_scanned_field = -1;
-        fonts::Set_Font_Style_Shadow_Down_(1, font_colors);
+        fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(font_colors));
         MAINPUPS::Load_Tax_Rate_Popup_();
         MAINPUPS::Do_Popup_Setup_(-1, DAT_00565e20);
         ERICHELP::Set_Tax_Rate_Popup_Help_List_();

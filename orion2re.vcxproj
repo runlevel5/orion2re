@@ -22,14 +22,18 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\advciv.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
+    <ClCompile Include="src\game\aidesign.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
+    <ClCompile Include="src\game\cmbtdrw1.cpp" />
+    <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
+    <ClCompile Include="src\game\colony.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
@@ -111,6 +115,7 @@
     <ClInclude Include="src\game\colsum.h" />
     <ClInclude Include="src\game\colxport.h" />
     <ClInclude Include="src\game\combfind.h" />
+    <ClInclude Include="src\game\combinit.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\contact.h" />
     <ClInclude Include="src\game\deps.h" />
@@ -178,6 +183,8 @@
     <ClInclude Include="src\game\npcdiplo.h" />
     <ClInclude Include="src\game\officer.h" />
     <ClInclude Include="src\game\orion2.h" />
+    <ClInclude Include="src\game\orion2_consts.h" />
+    <ClInclude Include="src\game\orion2_str.h" />
     <ClInclude Include="src\game\palette.h" />
     <ClInclude Include="src\game\palstore.h" />
     <ClInclude Include="src\game\platform.h" />

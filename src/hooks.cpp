@@ -824,6 +824,25 @@ namespace hooks {
         { 0x0051b190, &HOMEGEN::Is_Added_Food_World_ },
         { 0x0051af90, &HOMEGEN::Get_Orion_Star_Id_ },
         { 0x0051ad50, &HOMEGEN::Generate_Orion_ },
+        { 0x00482220, &aidesign::Cost_Reduction_For_Govt_Hull_Type },
+        { 0x004825c0, &INITSHIP::Auto_Strategic_Design_Ship_ },
+        { 0x0052e930, &allocate::Allocate_First_Block_ },
+        { 0x004d3c10, &CMBTDRW1::Detailed_View_Ship_ },
+#ifndef SKIP_MAIN
+        { 0x0050e7d0, &COLBLDG::Build_Arrays_ },
+#endif
+        { 0x0050e490, &COLBLDG::Build_Queue_Popup_ },
+        { 0x00509a80, &COLBLDG::Calculate_Building_Array_ },
+        { 0x0050d170, &COLBLDG::Selection_Name_ },
+        { 0x004dc3a0, &COLONY::Real_Building_Name_ },
+        { 0x0050c0e0, &COLBLDG::Calculate_Military_Array_ },
+        { 0x00509b30, &COLBLDG::qsort_building_by_name_ },
+        { 0x0050c050, &COLBLDG::Star_N_Uncolonized_Worlds_ },
+        { 0x0050c020, &COLBLDG::N_Prods_In_Queue_ },
+        { 0x00509480, &COLBLDG::Clear_Last_App_Desc_ },
+        { 0x005097f0, &COLBLDG::Clear_Last_App_Description_String_ },
+        { 0x0050e440, &COLBLDG::Add_Build_Queue_Fields_ },
+        { 0x005094a0, &COLBLDG::Create_Ship_ },
     };
 
     void Install_Hooks()

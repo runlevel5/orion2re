@@ -12,6 +12,8 @@
 
 #pragma pack(push, 1)
 #include "orion2.h"
+#include "orion2_consts.h"
+#include "orion2_str.h"
 #pragma pack(pop)
 
 #include "random.h"
@@ -129,5 +131,6 @@
 #include "erichelp.h"
 #include "flt.h"
 #include "flt2.h"
+#include "combinit.h"
 #include "cmbtdrw1.h"
 #include "dip_scrn.h"

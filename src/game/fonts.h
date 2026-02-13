@@ -104,8 +104,8 @@ namespace fonts {
     void __cdecl Set_Colors_(const s_colors* colors);
     void __cdecl Set_Font_Special_Colors_(s_colors* colors);
 
-    inline void __cdecl Set_Font_Style_Shadow_Down_(int32_t style, uint8_t* colors) {
-        using Fn = void(__cdecl*)(int32_t, uint8_t*);
+    inline void __cdecl Set_Font_Style_Shadow_Down_(int32_t style, s_colors* colors) {
+        using Fn = void(__cdecl*)(int32_t, s_colors*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525670});
         fn(style, colors);
     }

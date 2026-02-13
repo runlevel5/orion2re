@@ -1,6 +1,11 @@
 #pragma once
 
 namespace OFFICER {
+    inline uint32_t __cdecl Load_Officer_Picture_(int32_t p1, int16_t officer_idx, uint32_t seg, char p4, int16_t mode) {
+        using Fn = uint32_t(__cdecl*)(int32_t, int16_t, uint32_t, char, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d350});
+        return fn(p1, officer_idx, seg, p4, mode);
+    }
     inline s_colors& _normal_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569A0});
     inline const char* s_GEGGGGG_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0});
     inline int16_t& _officer_dismiss_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056566C});

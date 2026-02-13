@@ -99,12 +99,14 @@ namespace MOX {
     inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
+    inline uint32_t& _combat_bitmap = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00597A94});
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
+    inline uint32_t& _draw_ship_bitmap = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
@@ -140,6 +142,7 @@ namespace MOX {
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });
     inline uint8_t& _settings_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597157 });
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
+    inline int16_t& _ship_data_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1782});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
     inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
@@ -239,6 +242,7 @@ namespace MOX {
     inline int16_t& _zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BFDC});
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
     inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
+    inline uint32_t& _detail_fleet_icon_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A49D4});
     inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
     inline int16_t (&_weapons_count_plus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597D50});
     inline int16_t (&_weapons_count_minus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005A1810});
@@ -353,6 +357,8 @@ namespace MOX {
     inline s_ship_data*& _ship =
         *reinterpret_cast<s_ship_data**>(std::uintptr_t{ 0x0059BD3C });
 
+    inline s_global_combat_data& _global_combat_data = *reinterpret_cast<s_global_combat_data*>(std::uintptr_t{0x0059BD90});
+
     inline int16_t*& _officers_original_star_id =
         *reinterpret_cast<int16_t**>(std::uintptr_t{0x0059BF38});
 
@@ -368,6 +374,7 @@ namespace MOX {
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
 
     inline s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B30});
+    inline int16_t& _ship_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B1C});
     inline s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});
 

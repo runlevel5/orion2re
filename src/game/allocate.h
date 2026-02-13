@@ -62,8 +62,5 @@ namespace allocate {
 
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size);
 
-    inline void* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
-        using Fn = void* (__cdecl*)(void*, uint32_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E930 })(seg, size);
-    }
+    void* __cdecl Allocate_First_Block_(void* block, uint32_t size);
 }

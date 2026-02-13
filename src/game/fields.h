@@ -96,6 +96,11 @@ namespace fields {
 
     void __cdecl Invoke_Auto_Function_();
 
+    inline void __cdecl Evaluate_Input_(int16_t* input, int16_t* scan) {
+        using Fn = void(__cdecl*)(int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0050B520})(input, scan);
+    }
+
     int16_t __cdecl Scan_Field_();
 
     void __cdecl Clear_Mouse_Buffer_();
@@ -107,4 +112,22 @@ namespace fields {
     }
     void __cdecl Set_Input_Delay_(uint16_t delay);
     void __cdecl Set_Field_Outline_Color_(uint16_t color);
+
+    inline void __cdecl Draw_Visible_Fields_Back_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ef60});
+        fn();
+    }
+
+    inline void __cdecl Mark_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520120});
+        fn();
+    }
+
+    inline void __cdecl Release_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520190});
+        fn();
+    }
 }

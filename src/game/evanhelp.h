@@ -47,4 +47,16 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Main_Game_Screen_Help_List_();
+
+    inline void __cdecl Save_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041e5e0 });
+        fn();
+    }
+
+    inline void __cdecl Restore_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041e610 });
+        fn();
+    }
 }

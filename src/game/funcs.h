@@ -291,6 +291,12 @@ inline void __cdecl Get_File_Date_String_(const char* filename, char* date_out) 
     reinterpret_cast<Fn>(std::uintptr_t{0x0050f650})(filename, date_out);
 }
 
+inline char* __cdecl Option_String_(int16_t id) {
+    using Fn = char*(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00509880});
+    return fn(id);
+}
+
 inline void __cdecl Wrapper_For_Normal_System_Fields_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497540 });
@@ -341,10 +347,22 @@ inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
     fn(dest, size, value);
 }
 
+inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
+    using Fn = void(__cdecl*)(void*, const void*, int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d0fa});
+    fn(dest, src, size);
+}
+
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
     return fn(filename, index, segment);
+}
+
+inline void __cdecl Combat_Draw_View_Ship_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d1f80});
+    fn();
 }
 
 inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {

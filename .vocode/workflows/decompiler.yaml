@@ -468,6 +468,7 @@ workflows:
           * You are not allowed to rename struct fields or modify their shapes
           * Be VERY conservative with file reads.
           * When applying changes, pass all changes to a single apply_patch tool call to save on roundtrips.
+          * Make sure that external variable and function stubs are added to header files
           * Rename certain stdlib functions:
             sprintf -> _sprintf
             qsort -> _qsort

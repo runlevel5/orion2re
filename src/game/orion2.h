@@ -18,486 +18,6 @@ typedef unsigned long long    undefined7;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
 typedef unsigned short    word;
-typedef enum ECON {
-    ECON_FOOD=0,
-    ECON_INDUSTRY=1,
-    ECON_RESEARCH=2,
-    ECON_BC=3
-} ECON;
-
-typedef enum FIELD_TYPE {
-    FIELD_TYPE_BUTTON=0,
-    FIELD_TYPE_RADIO=1,
-    FIELD_TYPE_LOCKED=2,
-    FIELD_TYPE_MULTI_BUTTON=3,
-    FIELD_TYPE_4=4,
-    FIELD_TYPE_5=5,
-    FIELD_TYPE_SCROLL=6,
-    FIELD_TYPE_HIDDEN=7,
-    FIELD_TYPE_MULTI_HOTKEY=8,
-    FIELD_TYPE_9=9,
-    FIELD_TYPE_10=10,
-    FIELD_TYPE_CONTINUOUS_INPUT=11,
-    FIELD_TYPE_GRID=12,
-    FIELD_TYPE_IRREGULAR_INPUT=13
-} FIELD_TYPE;
-
-typedef enum HESTRNGS {
-    HESTR_001_TITAN_CONSTRUCTION_TEC=1,
-    HESTR_002_DOOM_STAR_CONSTRUCTION=2,
-    HESTR_003_YOU_NEED_TO_BUILD_A_ST=3,
-    HESTR_004_YOU_NEED_TO_BUILD_A_ST=4,
-    HESTR_005_YOU_NEED_TO_BUILD_A_ST=5,
-    HESTR_006_YOU_NEED_TO_BUILD_A_ST=6,
-    HESTR_007_YOUR_CURRENT_DESIGN_IS=7,
-    HESTR_008_YOUR_CURRENT_DESIGN_IS=8,
-    HESTR_009_YOUR_CURRENT_DESIGN_IS=9,
-    HESTR_00A_YOUR_CURRENT_DESIGN_IS=10,
-    HESTR_00B_YOUR_CURRENT_DESIGN_IS=11,
-    HESTR_00C_YOUR_CURRENT_DESIGN_IS=12,
-    HESTR_00D_YOU_MAY_NOT_CHANGE_HUL=13,
-    HESTR_00E_SINCE_S_CANNOT_BUILD_S=14,
-    HESTR_00F_THE_BLUEWHITE_STARS_AR=15,
-    HESTR_010_WHITE_STARS_HAVE_A_FAI=16,
-    HESTR_011_YELLOW_STARS_ARE_THE_S=17,
-    HESTR_012_ORANGE_STARS_WILL_FREQ=18,
-    HESTR_013_RED_STARS_ARE_THE_DIMM=19,
-    HESTR_014_BROWN_STARS_ARE_REALLY=20,
-    HESTR_015_BLACK_HOLES_ARE_ANCIEN=21,
-    HESTR_016_THE_HIGH_COUNCIL_HAS_F=22,
-    HESTR_017_ALTHOUGH_YOUR_SCORE_IS=23,
-    HESTR_018_NO_NEW_WEAPONS_CAN_BE_=24,
-    HESTR_019_NO_NEW_SPECIAL_SYSTEMS=25,
-    HESTR_01A_NOT_ENOUGH_SPACE_TO_AD=26,
-    HESTR_01B_NOT_ENOUGH_SPACE_TO_AD=27,
-    HESTR_01C_HAS_YOUR_OPPONENT_PRES=28,
-    HESTR_01D_PLAY_MASTER_OF_ORION_I=29,
-    HESTR_01E_COMBATTING_COMPUTERIZE=30,
-    HESTR_01F_THIS_WILL_GUIDE_YOU_TH=31,
-    HESTR_020_OPTION_DISABLED_DURING=32,
-    HESTR_021_A_BLACK_HOLE_BLOCKS_MO=33,
-    HESTR_022_ONE_OR_MORE_SHIPS_DOES=34,
-    HESTR_023_ONE_OR_MORE_SHIPS_CHOS=35,
-    HESTR_024_SHIP_MOVEMENT_IS_NOT_A=36,
-    HESTR_025_AFTER_DESTROYING_THE_G=37,
-    HESTR_026_AFTER_DESTROYING_THE_G=38,
-    HESTR_027_MAGNIFICIENT_YOU_HAVE_=39,
-    HESTR_028_WELL_DONE_S_IS_TRULY_O=40,
-    HESTR_029_COMPUTER_TYPE=41,
-    HESTR_02A_BONUS_TO_HIT=42,
-    HESTR_02B_COST=43,
-    HESTR_02C_INIT_BONUS=44,
-    HESTR_02D_NO_COMPUTER=45,
-    HESTR_02E_WEAPON_NAME=46,
-    HESTR_02F_DAM=47,
-    HESTR_030_SPACE=48,
-    HESTR_031_NOTES=49,
-    HESTR_032_NO_WEAPON=50,
-    HESTR_033_SHIELD_TYPE=51,
-    HESTR_034_BASE_COST=52,
-    HESTR_035_BASE_SPACE=53,
-    HESTR_036_NO_SHIELD=54,
-    HESTR_037_SYSTEM=55,
-    HESTR_038_DESCRIPTION=56,
-    HESTR_039_NO_SPECIAL=57,
-    HESTR_03A_INSUFFICIENT_SPACE_TO_=58,
-    HESTR_03B_D_MORE_MINIATURIZATION=59,
-    HESTR_03C_D_MORE_MINIATURIZATION=60,
-    HESTR_03D_HEAVY_MOUNT_MODIFICATI=61,
-    HESTR_03E_POINT_DEFENSE_MODIFICA=62,
-    HESTR_03F_EMMISIONS_GUIDANCE_TEC=63,
-    HESTR_040_S_IS_NOT_ALLOWED_ON_S=64,
-    HESTR_041_S_MAY_ONLY_BE_ADDED_ON=65,
-    HESTR_042_YOU_MAY_HAVE_ONLY_ONE_=66,
-    HESTR_043_YOU_CANNOT_PLACE_S_S_A=67,
-    HESTR_044_BEAM_WEAPONS_MUST_HAVE=68,
-    HESTR_045_INSUFFICIENT_SPACE_TO_=69,
-    HESTR_046_FULL=70,
-    HESTR_047_FORWARD_EXTENDED=71,
-    HESTR_048_BACK_EXTENDED=72,
-    HESTR_049_REAR=73,
-    HESTR_04A_S_360=74,
-    HESTR_04B_INSUFFICIENT_SPACE_TO_=75,
-    HESTR_04C_INSUFFICIENT_SPACE_TO_=76,
-    HESTR_04D_NOT_ENOUGH_ROOM_IN_CUR=77,
-    HESTR_04E_YOU_HAVE_NOT_CHOSEN_A_=78,
-    HESTR_04F_SS_HAVE_BUILTIN_360_AR=79,
-    HESTR_050_YOU_MAY_NOT_UPGRADE_TH=80,
-    HESTR_051_YOU_MAY_NOT_PLACE_SHIE=81,
-    HESTR_052_YOU_MAY_NOT_UPGRADE_TH=82,
-    HESTR_053_REMOVE_S_FROM_SHIP_DES=83,
-    HESTR_054_D_COMBAT_SPEED=84,
-    HESTR_055_D_STRUCTURE_POINTS=85,
-    HESTR_056_D_ARMOR_POINTS=86,
-    HESTR_057_NO_STRENGTH=87,
-    HESTR_058_NO_DAMAGE_POINTS_BLOCK=88,
-    HESTR_059_D_STRENGTH=89,
-    HESTR_05A_D_DAMAGE_POINTS_BLOCKE=90,
-    HESTR_05B_D_BEAM_ATTACK=91,
-    HESTR_05C_BEAM_DEFENSE=92,
-    HESTR_05D_MISSILE_EVASION=93,
-    HESTR_05E_WEAPON_TYPE=94,
-    HESTR_05F_DAMAGE=95,
-    HESTR_060_ARC=96,
-    HESTR_061_MODIFICATIONS=97,
-    HESTR_062_SPECIAL_SYSTEM=98,
-    HESTR_063_SPACE_AVAILABLE=99,
-    HESTR_064_NO_MODIFICATIONS=100,
-    HESTR_065_SPECIAL=101,
-    HESTR_066_S_FLEET=102,
-    HESTR_067_ORBITING_S=103,
-    HESTR_068_DESTINATION_ANTARES=104,
-    HESTR_069_D_TURN_TO_S=105,
-    HESTR_06A_D_TURNS_TO_S=106,
-    HESTR_06B_ETA_D_TURN=107,
-    HESTR_06C_ETA_D_TURNS=108,
-    HESTR_06D_BLACK_HOLE_INBETWEEN=109,
-    HESTR_06E_IMMOBILE_FLEET=110,
-    HESTR_06F_D_PARSEC_TO_S=111,
-    HESTR_070_D_PARSECS_TO_S=112,
-    HESTR_071_BLACK_HOLE_BLOCKS_RANG=113,
-    HESTR_072_D_PARSECS=114,
-    HESTR_073_HYPERSPACE_FLUX=115,
-    HESTR_074_AFTER_SCRAPPING_S_YOU_=116,
-    HESTR_075_S_CANNOT_RECEIVE_ORDER=117,
-    HESTR_076_ALL_STAR_RELOCATIONS_H=118,
-    HESTR_077_ALL_SHIPS_WILL_BE_RELO=119,
-    HESTR_078_YOU_MAY_NOT_SEND_A_FLE=120,
-    HESTR_079_YOU_HAVE_NO_OFFICERS_T=121,
-    HESTR_07A_THIS_SHIP_IS_NOT_AT_A_=122,
-    HESTR_07B_THIS_SHIP_IS_NOT_AT_AN=123,
-    HESTR_07C_THESE_SHIPS_ARE_NOT_AT=124,
-    HESTR_07D_THESE_SHIPS_ARE_NOT_AT=125,
-    HESTR_07E_IF_YOU_SCRAP_S_S_WILL_=126,
-    HESTR_07F_SCRAPPING_SHIPS_ABORTE=127,
-    HESTR_080_SCRAPPING_THIS_SHIP_WI=128,
-    HESTR_081_SCRAPPING_THESE_SHIPS_=129,
-    HESTR_082_A_BLACK_HOLE_BLOCKS_NO=130,
-    HESTR_083_YOU_MAY_NOT_RELOCATE_S=131,
-    HESTR_084_YOU_MAY_NOT_RELOCATE_S=132,
-    HESTR_085_YOU_MAY_NOT_RELOCATE_S=133,
-    HESTR_086_YOU_MAY_NOT_RELOCATE_S=134,
-    HESTR_087_S_IS_GUARDED_BY_A_SPAC=135,
-    HESTR_088_YOU_DO_NOT_HAVE_A_COLO=136,
-    HESTR_089_SHIP_RELOCATION_FROM_S=137,
-    HESTR_08A_GREEN_CREW=138,
-    HESTR_08B_REGULAR_CREW=139,
-    HESTR_08C_VETERAN_CREW=140,
-    HESTR_08D_ELITE_CREW=141,
-    HESTR_08E_ULTRA_ELITE_CREW=142,
-    HESTR_08F_TOO_MANY_SHIPS_IN_LIST=143,
-    HESTR_090_S_IS_OUT_OF_RANGE=144,
-    HESTR_091_THAT_SYSTEM_IS_OUT_OF_=145,
-    HESTR_092_S_S_D_TURN=146,
-    HESTR_093_S_S_D_TURNS=147,
-    HESTR_094_UNEXPLORED=148,
-    HESTR_095_FRONT=149,
-    HESTR_096_RIGHT=150,
-    HESTR_097_BACK=151,
-    HESTR_098_LEFT=152,
-    HESTR_099_BEAM_OCV=153,
-    HESTR_09A_BEAM_DCV=154,
-    HESTR_09B_DESTINATION_S=155,
-    HESTR_09C_DESTINATION_UNEXPLORED=156,
-    HESTR_09D_WEAPONS=157,
-    HESTR_09E_SPECIALS=158,
-    HESTR_09F_NONE=159,
-    HESTR_0A0_PRIME=160,
-    HESTR_0A1_PLACING_HOME_WORLDS=161,
-    HESTR_0A2_START_THE_GAME_WITH_ON=162,
-    HESTR_0A3_START_THE_GAME_WITH_D_=163,
-    HESTR_0A4_PLAYER=164,
-    HESTR_0A5_PLAYERS=165,
-    HESTR_0A6_END_OF_TURN_SUMMARY=166,
-    HESTR_0A7_END_OF_TURN_WAIT=167,
-    HESTR_0A8_ENEMY_MOVES=168,
-    HESTR_0A9_EXPANDING_HELP=169,
-    HESTR_0AA_AUTO_SELECT_SHIPS=170,
-    HESTR_0AB_ANIMATIONS=171,
-    HESTR_0AC_AUTO_SELECT_COLONY=172,
-    HESTR_0AD_SHOW_RELOCATION_LINES=173,
-    HESTR_0AE_SHOW_GNN_REPORT=174,
-    HESTR_0AF_AUTO_DELETE_TRADE_GOOD=175,
-    HESTR_0B0_AUTO_SAVE_GAME=176,
-    HESTR_0B1_SHOW_ONLY_SERIOUS_TURN=177,
-    HESTR_0B2_SAVEDGAM_DOES_NOT_EXIS=178,
-    HESTR_0B3_SAVEDGAM_IS_INVALID=179,
-    HESTR_0B4_SAVEDGAM_IS_A_MULTIPLA=180,
-    HESTR_0B5_YOU_MAY_NOT_LOAD_MULTI=181,
-    HESTR_0B6_LOADED_SAVEDGAM=182,
-    HESTR_0B7_SAVEDGAM_WAS_NOT_LOADE=183,
-    HESTR_0B8_GAME_D_WAS_NOT_LOADED=184,
-    HESTR_0B9_SAVE_GAME_FUNCTION_DIS=185,
-    HESTR_0BA_DO_YOU_WISH_TO_ABANDON=186,
-    HESTR_0BB_DO_YOU_WISH_TO_LEAVE_M=187,
-    HESTR_0BC_COLONY=188,
-    HESTR_0BD_COLONIES=189,
-    HESTR_0BE_JAN=190,
-    HESTR_0BF_FEB=191,
-    HESTR_0C0_MAR=192,
-    HESTR_0C1_APR=193,
-    HESTR_0C2_MAY=194,
-    HESTR_0C3_JUN=195,
-    HESTR_0C4_JUL=196,
-    HESTR_0C5_AUG=197,
-    HESTR_0C6_SEP=198,
-    HESTR_0C7_OCT=199,
-    HESTR_0C8_NOV=200,
-    HESTR_0C9_DEC=201,
-    HESTR_0CA_STARDATE=202,
-    HESTR_0CB_SAVE_D=203,
-    HESTR_0CC_SAVE_GAME_D_S=204,
-    HESTR_0CD_LOAD_GAME_D_S=205,
-    HESTR_0CE_FILE_ANIMATION_NOT_OPE=206,
-    HESTR_0CF_YOU_HAVE_TRIED_TO_CONT=207,
-    HESTR_0D0_YOU_HAVE_TRIED_TO_LOAD=208,
-    HESTR_0D1_YOU_HAVE_SET_ONLY_ONE_=209,
-    HESTR_0D2_YOU_HAVE_NOT_SET_ANY_S=210,
-    HESTR_0D3_GAME_SAVED=211,
-    HESTR_0D4_SAVE_GAME_FUNCTION_DIS=212,
-    HESTR_0D5_USE_THE_FORCE_LUKE_OMN=213,
-    HESTR_0D6_YOU_HAVE_CHOSEN_POORLY=214,
-    HESTR_0D7_S_HAS_BEEN_GIVEN_A_GIF=215,
-    HESTR_0D8_S_WILL_BE_KNOWN=216,
-    HESTR_0D9_S_IS_AN_OUTPOST_PLANET=217,
-    HESTR_0DA_STARDATE_DD=218,
-    HESTR_0DB_S_S_RULER_SEEKS_AN_AUD=219,
-    HESTR_0DC_D_NEW_TECHNOLOGY_APPLI=220,
-    HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI=221,
-    HESTR_0DE_MASTER_OF_ORION_BIDS_Y=222,
-    HESTR_0DF_YOU_DO_NOT_HAVE_ANY_FR=223,
-    HESTR_0E0_SPACE_FLUX=224,
-    HESTR_0E1_D_TURN=225,
-    HESTR_0E2_D_TURNS=226,
-    HESTR_0E3_NO_TRANSPORT_SHIPS_SEL=227,
-    HESTR_0E4_SEND_D_SHIP_TO_ATTACK_=228,
-    HESTR_0E5_SEND_D_SHIPS_TO_ATTACK=229,
-    HESTR_0E6_NO_SHIPS_SELECTED=230,
-    HESTR_0E7_ON=231,
-    HESTR_0E8_OFF=232,
-    HESTR_0E9_S_STARDATE_DD=233,
-    HESTR_0EA_BLOCKED_BY_BLACK_HOLE=234,
-    HESTR_0EB_D_PARSECS=235,
-    HESTR_0EC_ALL_FREIGHTERS_ARE_CUR=236,
-    HESTR_0ED_CHOOSE_THE_NUMBER_OF_F=237,
-    HESTR_0EE_YOU_HAVE_D_SURPLUS_S_S=238,
-    HESTR_0EF_SCRAPPING_D_S=239,
-    HESTR_0F0_FREIGHTER=240,
-    HESTR_0F1_FREIGHTERS=241,
-    HESTR_0F2_GENERATING_UNIVERSE=242,
-    HESTR_0F3_GALAXY_MAP=243,
-    HESTR_0F4_NO_MULTIPLAYER_SAVED_G=244,
-    HESTR_0F5_READY_TO_START_A_NETWO=245,
-    HESTR_0F6_AUTO_DETECT=246,
-    HESTR_0F7_TONE=247,
-    HESTR_0F8_PULSE=248,
-    HESTR_0F9_D_HUMAN_HAS_JOINED_THE=249,
-    HESTR_0FA_D_HUMANS_HAVE_JOINED_T=250,
-    HESTR_0FB_D_OF_D_HUMANS_COMPLETE=251,
-    HESTR_0FC_S_S_SCORE_S=252,
-    HESTR_0FD_SAVE_D_IS_NOT_A_VALID_=253,
-    HESTR_0FE_ENTER_NET_GAME_NAME=254,
-    HESTR_0FF_S_IS_ALREADY_A_GAME_NA=255,
-    HESTR_100_ENTER_STAR_NAME=256,
-    HESTR_101_ENTER_HOME_STAR_NAME=257,
-    HESTR_102_D_OUTPOST=258,
-    HESTR_103_D_OUTPOSTS=259,
-    HESTR_104_D_TRANSPORT=260,
-    HESTR_105_D_TRANSPORTS=261,
-    HESTR_106_D_COLONY_SHIP=262,
-    HESTR_107_D_COLONY_SHIPS=263,
-    HESTR_108_TO_HIRE=264,
-    HESTR_109_MAINT=265,
-    HESTR_10A_NO=266,
-    HESTR_10B_OFFICER_POOL=267,
-    HESTR_10C_UNASSIGNED=268,
-    HESTR_10D_FOR_HIRE_D=269,
-    HESTR_10E_FOR_HIRE=270,
-    HESTR_10F_OFFICER_QUEUE_FULL_FOR=271,
-    HESTR_110_THE=272,
-    HESTR_111_S_IS_IN_THE_OFFICER_PO=273,
-    HESTR_112_S_DOES_NOT_HAVE_A_LOCA=274,
-    HESTR_113_S_IS_LOCATED_ON_S_WHIC=275,
-    HESTR_114_S_CANNOT_BE_LOCATED=276,
-    HESTR_115_TRANSFERING_DISPLAY_TO=277,
-    HESTR_116_TRANSFERING_DISPLAY_TO=278,
-    HESTR_117_YOU_MAY_NOT_ASSIGN_S_T=279,
-    HESTR_118_IT_WILL_TAKE_D_TURNS_F=280,
-    HESTR_119_ASSIGN_S_TO_S=281,
-    HESTR_11A_S_IN_ROUTE_TO_S_WILL_B=282,
-    HESTR_11B_S_CURRENTLY_ON_S_WILL_=283,
-    HESTR_11C_CHOOSE_HERO_TO_ASSIGN_=284,
-    HESTR_11D_S_IS_ALREADY_IN_USE=285,
-    HESTR_11E_YOU_CANNOT_HAVE_S_AS_Y=286,
-    HESTR_11F_YOU_CANNOT_HAVE_S_AS_Y=287,
-    HESTR_120_S_IS_IN_SS_HIRING_QUEU=288,
-    HESTR_121_D_BCS_AND_D_BC_TURN=289,
-    HESTR_122_S_IS_ALREADY_IN_YOUR_S=290,
-    HESTR_123_YOU_HAVE_D_BC_IN_YOUR_=291,
-    HESTR_124_S_WILL_COST_D_BCS_INIT=292,
-    HESTR_125_S_WILL_COST_D_BCS_INIT=293,
-    HESTR_126_DISMISS_S=294,
-    HESTR_127_S_MUST_BE_HIRED_BEFORE=295,
-    HESTR_128_YOU_CANNOT_ASSIGN_S_TO=296,
-    HESTR_129_D_BCS_NO_MAINTENANCE=297,
-    HESTR_12A_SKILL=298,
-    HESTR_12B_YOU_MAY_NOT_PLACE_S_IN=299,
-    HESTR_12C_YOU_MAY_NOT_PLACE_LEAD=300,
-    HESTR_12D_S_CANNOT_BE_PUT_INTO_S=301,
-    HESTR_12E_COLONIES_ARE_NOT_ACCES=302,
-    HESTR_12F_ETA_D=303,
-    HESTR_130_SPACE_S=304,
-    HESTR_131_S_FLEET=305,
-    HESTR_132_MAKE_S_AVAILABLE_TO_S=306,
-    HESTR_133_ETA_D=307,
-    HESTR_134_YOU_ALREADY_HAVE_ONE_C=308,
-    HESTR_135_YOU_ALREADY_HAVE_ONE_O=309,
-    HESTR_136_COLONY=310,
-    HESTR_137_OUTPOST=311,
-    HESTR_138_S_ALREADY_HAS_A_COURSE=312,
-    HESTR_139_S_HAS_SET_A_COURSE_FOR=313,
-    HESTR_13A_S_HAS_SET_A_COURSE_SHO=314,
-    HESTR_13B_S_IS_GUARDED_BY_A_S_DO=315,
-    HESTR_13C_S_IS_GUARDED_BY_A_S_DO=316,
-    HESTR_13D_S_HAS_A_COURSE_LAID_FO=317,
-    HESTR_13E_S_HAS_A_COURSE_LAID_FO=318,
-    HESTR_13F_SHIP_MOVEMENT_IS_NOT_A=319,
-    HESTR_140_ARTIFACTS=320,
-    HESTR_141_D_FOOD=321,
-    HESTR_142_D_PROD=322,
-    HESTR_143_D_MAX_POP=323,
-    HESTR_144_BLACK_HOLE_BLOCKS_TRAV=324,
-    HESTR_145_BLACK_HOLE=325,
-    HESTR_146_CANNOT_REACH=326,
-    HESTR_147_STAR_SYSTEM_UNREACHABL=327,
-    HESTR_148_OUT_OF_RANGE=328,
-    HESTR_149_YOU_ARE_UNABLE_TO_UNDO=329,
-    HESTR_14A_YOU_ARE_UNABLE_TO_UNDO=330,
-    HESTR_14B_ETA_D_TURN=331,
-    HESTR_14C_ETA_D_TURNS=332,
-    HESTR_14D_COLONY_SHIP_HEADING_TO=333,
-    HESTR_14E_OUTPOST_SHIP_HEADING_T=334,
-    HESTR_14F_NO_PLANETS_IN_THE_S_ST=335,
-    HESTR_150_D_TURN_TO=336,
-    HESTR_151_D_TURNS_TO=337,
-    HESTR_152_D_PROD_WORKER=338,
-    HESTR_153_DEFEATING_ANTARAN_HOME=339,
-    HESTR_154_D_CAPTURED_COLONIST=340,
-    HESTR_155_D_CAPTURED_COLONISTS=341,
-    HESTR_156_WON_COUNCIL_VOTE=342,
-    HESTR_157_TOTAL_SCORE=343,
-    HESTR_158_PLAYERS_ELIMINATED=344,
-    HESTR_159_D_PLAYER_ELIMINATED=345,
-    HESTR_15A_D_PLAYERS_ELIMINATED=346,
-    HESTR_15B_CAPTURED_ORION=347,
-    HESTR_15C_D_POPULATION=348,
-    HESTR_15D_TECHNOLOGY=349,
-    HESTR_15E_TIME_D_TURNS=350,
-    HESTR_15F_GAS_GIANT_UNINHABITABL=351,
-    HESTR_160_ASTEROID_UNINHABITABLE=352,
-    HESTR_161_OUTPOST=353,
-    HESTR_162_D_MAX_POP=354,
-    HESTR_163_S_FLEET=355,
-    HESTR_164_S_2D_COLONY_SHIP=356,
-    HESTR_165_S_2D_COLONY_SHIPS=357,
-    HESTR_166_S_2D_OUTPOST_SHIP=358,
-    HESTR_167_S_2D_OUTPOST_SHIPS=359,
-    HESTR_168_S_2D_TRANSPORT_SHIP=360,
-    HESTR_169_S_2D_TRANSPORT_SHIPS=361,
-    HESTR_16A_STAR_SYSTEM_S=362,
-    HESTR_16B_STAR_SYSTEM_UNEXPLORED=363,
-    HESTR_16C_WORMHOLE_LINKS_S=364,
-    HESTR_16D_STABLE_WORMHOLE=365,
-    HESTR_16E_BONUS=366,
-    HESTR_16F_PENALTY=367,
-    HESTR_170_MAX_POPULATION=368,
-    HESTR_171_FOOD_PER_FARMER=369,
-    HESTR_172_INDUSTRY_PER_WORKER=370,
-    HESTR_173_RESEARCH_PER_SCIENTIST=371,
-    HESTR_174_NO_MAINTENANCE_BONUS=372,
-    HESTR_175_MAINTENANCE=373,
-    HESTR_176_NO_WORKER_BONUS=374,
-    HESTR_177_WORKER=375,
-    HESTR_178_COLONY_INFO_FOR_S=376,
-    HESTR_179_STAR_GATE=377,
-    HESTR_17A_JUMP_GATE=378,
-    HESTR_17B_ARTEMIS_NET=379,
-    HESTR_17C_DIMENSIONAL_PORTAL=380,
-    HESTR_17D_D_S_SHIPS_D_NONCOMBAT=381,
-    HESTR_17E_D_PARSECS_TURN=382,
-    HESTR_17F_ADD_NEW_WEAPON=383,
-    HESTR_180_ADD_NEW_SPECIAL_SYSTEM=384,
-    HESTR_181_D_D_POP=385,
-    HESTR_182_THE=386,
-    HESTR_183_BREAKTHROUGH=387,
-    HESTR_184_EMPTY_SLOT=388,
-    HESTR_185_COST=389,
-    HESTR_186_S=390,
-    HESTR_187_SHIP_INITIATIVE=391,
-    HESTR_188_NONE=392,
-    HESTR_189_MAINTENANCE_BONUS=393,
-    HESTR_18A_MAINTENANCE_PENALTY=394,
-    HESTR_18B_WORKER_BONUS=395,
-    HESTR_18C_WORKER_PENALTY=396
-} HESTRNGS;
-
-typedef enum MAIN_MENU_BTN {
-    MAIN_MENU_BTN_CONTINUE=0,
-    MAIN_MENU_BTN_LOAD=1,
-    MAIN_MENU_BTN_NEW=2,
-    MAIN_MENU_BTN_MULTIPLAY=3,
-    MAIN_MENU_BTN_HELP=4,
-    MAIN_MENU_BTN_QUIT=5
-} MAIN_MENU_BTN;
-
-typedef enum MINERAL_RESOURCE {
-    MINERAL_RESOURCE_ULTRA_POOR=0,
-    MINERAL_RESOURCE_POOR=1,
-    MINERAL_RESOURCE_ABUNDANT=2,
-    MINERAL_RESOURCE_RICH=3,
-    MINERAL_RESOURCE_ULTRA_RICH=4
-} MINERAL_RESOURCE;
-
-typedef enum PLANET_CLIMATE {
-    PLANET_CLIMATE_TOXIC=0,
-    PLANET_CLIMATE_RADIATED=1,
-    PLANET_CLIMATE_BARREN=2,
-    PLANET_CLIMATE_DESERT=3,
-    PLANET_CLIMATE_TUNDRA=4,
-    PLANET_CLIMATE_OCEAN=5,
-    PLANET_CLIMATE_SWAMP=6,
-    PLANET_CLIMATE_ARID=7,
-    PLANET_CLIMATE_TERRAN=8,
-    PLANET_CLIMATE_GAIA=9
-} PLANET_CLIMATE;
-
-typedef enum PLANET_GRAVITY {
-    PLANET_GRAVITY_LOW_G=0,
-    PLANET_GRAVITY_NORMAL_G=1,
-    PLANET_GRAVITY_HEAVY_G=2
-} PLANET_GRAVITY;
-
-typedef enum PLANET_SIZE {
-    PLANET_SIZE_TINY=0,
-    PLANET_SIZE_SMALL=1,
-    PLANET_SIZE_MEDIUM=2,
-    PLANET_SIZE_LARGE=3,
-    PLANET_SIZE_HUGE=4
-} PLANET_SIZE;
-
-typedef enum PLANET_TYPE {
-    PLANET_TYPE_NOT_USED0=0,
-    PLANET_TYPE_ASTEROID=1,
-    PLANET_TYPE_GAS_GIANT=2,
-    PLANET_TYPE_PLANET=3,
-    PLANET_TYPE_NOT_USED4=4,
-    PLANET_TYPE_NOT_USED5=5,
-    PLANET_TYPE_NOT_USED6=6,
-    PLANET_TYPE_NOT_USED7=7,
-    PLANET_TYPE_NOT_USED8=8,
-    PLANET_TYPE_NOT_USED9=9
-} PLANET_TYPE;
-
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
 
 
@@ -1975,6 +1495,289 @@ struct s_game_popup_fields {
     undefined field429_0x277;
 };
 
+typedef struct s_global_combat_data s_global_combat_data, *Ps_global_combat_data;
+
+struct s_global_combat_data {
+    char name[32];
+    int8_t player_idx;
+    undefined field2_0x21;
+    undefined field3_0x22;
+    undefined field4_0x23;
+    undefined field5_0x24;
+    undefined field6_0x25;
+    undefined field7_0x26;
+    undefined field8_0x27;
+    undefined field9_0x28;
+    undefined field10_0x29;
+    undefined field11_0x2a;
+    undefined field12_0x2b;
+    undefined field13_0x2c;
+    undefined field14_0x2d;
+    undefined field15_0x2e;
+    undefined field16_0x2f;
+    undefined field17_0x30;
+    undefined field18_0x31;
+    undefined field19_0x32;
+    undefined field20_0x33;
+    short ship_attack;
+    short ship_defense;
+    short ship_missle_defense;
+    undefined field24_0x3a;
+    undefined field25_0x3b;
+    undefined field26_0x3c;
+    undefined field27_0x3d;
+    undefined field28_0x3e;
+    undefined field29_0x3f;
+    undefined field30_0x40;
+    undefined field31_0x41;
+    undefined field32_0x42;
+    undefined field33_0x43;
+    undefined field34_0x44;
+    undefined field35_0x45;
+    undefined field36_0x46;
+    undefined field37_0x47;
+    undefined field38_0x48;
+    undefined field39_0x49;
+    undefined field40_0x4a;
+    undefined field41_0x4b;
+    undefined field42_0x4c;
+    undefined field43_0x4d;
+    undefined field44_0x4e;
+    undefined field45_0x4f;
+    undefined field46_0x50;
+    undefined field47_0x51;
+    undefined field48_0x52;
+    undefined field49_0x53;
+    undefined field50_0x54;
+    undefined field51_0x55;
+    undefined field52_0x56;
+    undefined field53_0x57;
+    undefined field54_0x58;
+    undefined field55_0x59;
+    undefined field56_0x5a;
+    undefined field57_0x5b;
+    undefined field58_0x5c;
+    undefined field59_0x5d;
+    undefined field60_0x5e;
+    undefined field61_0x5f;
+    undefined field62_0x60;
+    undefined field63_0x61;
+    undefined field64_0x62;
+    undefined field65_0x63;
+    undefined field66_0x64;
+    undefined field67_0x65;
+    undefined field68_0x66;
+    undefined field69_0x67;
+    undefined field70_0x68;
+    undefined field71_0x69;
+    undefined field72_0x6a;
+    undefined field73_0x6b;
+    undefined field74_0x6c;
+    undefined field75_0x6d;
+    undefined field76_0x6e;
+    undefined field77_0x6f;
+    undefined field78_0x70;
+    undefined field79_0x71;
+    undefined field80_0x72;
+    undefined field81_0x73;
+    undefined field82_0x74;
+    undefined field83_0x75;
+    undefined field84_0x76;
+    undefined field85_0x77;
+    undefined field86_0x78;
+    undefined field87_0x79;
+    undefined field88_0x7a;
+    undefined field89_0x7b;
+    undefined field90_0x7c;
+    undefined field91_0x7d;
+    undefined field92_0x7e;
+    undefined field93_0x7f;
+    undefined field94_0x80;
+    undefined field95_0x81;
+    undefined field96_0x82;
+    undefined field97_0x83;
+    undefined field98_0x84;
+    undefined field99_0x85;
+    undefined field100_0x86;
+    undefined field101_0x87;
+    undefined field102_0x88;
+    undefined field103_0x89;
+    undefined field104_0x8a;
+    undefined field105_0x8b;
+    undefined field106_0x8c;
+    undefined field107_0x8d;
+    undefined field108_0x8e;
+    undefined field109_0x8f;
+    undefined field110_0x90;
+    undefined field111_0x91;
+    undefined field112_0x92;
+    undefined field113_0x93;
+    undefined field114_0x94;
+    undefined field115_0x95;
+    undefined field116_0x96;
+    undefined field117_0x97;
+    undefined field118_0x98;
+    undefined field119_0x99;
+    undefined field120_0x9a;
+    undefined field121_0x9b;
+    undefined field122_0x9c;
+    undefined field123_0x9d;
+    undefined field124_0x9e;
+    undefined field125_0x9f;
+    undefined field126_0xa0;
+    undefined field127_0xa1;
+    undefined field128_0xa2;
+    undefined field129_0xa3;
+    undefined field130_0xa4;
+    undefined field131_0xa5;
+    undefined field132_0xa6;
+    undefined field133_0xa7;
+    undefined field134_0xa8;
+    undefined field135_0xa9;
+    undefined field136_0xaa;
+    undefined field137_0xab;
+    undefined field138_0xac;
+    short officer_idx;
+    undefined field140_0xaf;
+    undefined field141_0xb0;
+    undefined field142_0xb1;
+    undefined field143_0xb2;
+    undefined field144_0xb3;
+    undefined field145_0xb4;
+    undefined field146_0xb5;
+    undefined field147_0xb6;
+    undefined field148_0xb7;
+    undefined field149_0xb8;
+    undefined field150_0xb9;
+    undefined field151_0xba;
+    undefined field152_0xbb;
+    undefined field153_0xbc;
+    undefined field154_0xbd;
+    undefined field155_0xbe;
+    undefined field156_0xbf;
+    undefined field157_0xc0;
+    undefined field158_0xc1;
+    undefined field159_0xc2;
+    undefined field160_0xc3;
+    undefined field161_0xc4;
+    undefined field162_0xc5;
+    undefined field163_0xc6;
+    undefined field164_0xc7;
+    undefined field165_0xc8;
+    undefined field166_0xc9;
+    undefined field167_0xca;
+    undefined field168_0xcb;
+    undefined field169_0xcc;
+    undefined field170_0xcd;
+    undefined field171_0xce;
+    undefined field172_0xcf;
+    undefined field173_0xd0;
+    undefined field174_0xd1;
+    undefined field175_0xd2;
+    undefined field176_0xd3;
+    undefined field177_0xd4;
+    undefined field178_0xd5;
+    undefined field179_0xd6;
+    undefined field180_0xd7;
+    undefined field181_0xd8;
+    undefined field182_0xd9;
+    undefined field183_0xda;
+    undefined field184_0xdb;
+    undefined field185_0xdc;
+    undefined field186_0xdd;
+    undefined field187_0xde;
+    undefined field188_0xdf;
+    undefined field189_0xe0;
+    undefined field190_0xe1;
+    undefined field191_0xe2;
+    undefined field192_0xe3;
+    undefined field193_0xe4;
+    undefined field194_0xe5;
+    undefined field195_0xe6;
+    undefined field196_0xe7;
+    undefined field197_0xe8;
+    undefined field198_0xe9;
+    undefined field199_0xea;
+    undefined field200_0xeb;
+    undefined field201_0xec;
+    undefined field202_0xed;
+    undefined field203_0xee;
+    undefined field204_0xef;
+    undefined field205_0xf0;
+    undefined field206_0xf1;
+    undefined field207_0xf2;
+    undefined field208_0xf3;
+    undefined field209_0xf4;
+    undefined field210_0xf5;
+    undefined field211_0xf6;
+    undefined field212_0xf7;
+    undefined field213_0xf8;
+    undefined field214_0xf9;
+    undefined field215_0xfa;
+    undefined field216_0xfb;
+    undefined field217_0xfc;
+    undefined field218_0xfd;
+    undefined field219_0xfe;
+    undefined field220_0xff;
+    undefined field221_0x100;
+    undefined field222_0x101;
+    undefined field223_0x102;
+    undefined field224_0x103;
+    undefined field225_0x104;
+    undefined field226_0x105;
+    undefined field227_0x106;
+    undefined field228_0x107;
+    undefined field229_0x108;
+    undefined field230_0x109;
+    undefined field231_0x10a;
+    undefined field232_0x10b;
+    undefined field233_0x10c;
+    undefined field234_0x10d;
+    undefined field235_0x10e;
+    undefined field236_0x10f;
+    undefined field237_0x110;
+    undefined field238_0x111;
+    undefined field239_0x112;
+    undefined field240_0x113;
+    undefined field241_0x114;
+    undefined field242_0x115;
+    undefined field243_0x116;
+    undefined field244_0x117;
+    undefined field245_0x118;
+    undefined field246_0x119;
+    undefined field247_0x11a;
+    undefined field248_0x11b;
+    undefined field249_0x11c;
+    undefined field250_0x11d;
+    undefined field251_0x11e;
+    undefined field252_0x11f;
+    undefined field253_0x120;
+    undefined field254_0x121;
+    undefined field255_0x122;
+    undefined field256_0x123;
+    undefined field257_0x124;
+    undefined field258_0x125;
+    undefined field259_0x126;
+    undefined field260_0x127;
+    undefined field261_0x128;
+    undefined field262_0x129;
+    undefined field263_0x12a;
+    undefined field264_0x12b;
+    undefined field265_0x12c;
+    undefined field266_0x12d;
+    undefined field267_0x12e;
+    undefined field268_0x12f;
+    undefined field269_0x130;
+    undefined field270_0x131;
+    undefined field271_0x132;
+    undefined field272_0x133;
+    undefined field273_0x134;
+    undefined field274_0x135;
+    undefined field275_0x136;
+    undefined field276_0x137;
+    undefined field277_0x138;
+};
+
 typedef struct s_good_star s_good_star, *Ps_good_star;
 
 struct s_good_star {
@@ -2233,6 +2036,13 @@ struct s_nebula {
     short x;
     short y; /* Created by Rename Structure Field action */
     int8_t type;
+};
+
+typedef struct s_orion_candidate s_orion_candidate, *Ps_orion_candidate;
+
+struct s_orion_candidate {
+    int dist;
+    short star_idx;
 };
 
 typedef struct s_parsec s_parsec, *Ps_parsec;
@@ -3415,103 +3225,4 @@ struct s_unit_data {
     undefined field7_0xa;
     undefined field8_0xb;
 };
-
-typedef enum SCREEN {
-    SCREEN_UNKNOWN=-1,
-    SCREEN_MAIN=0,
-    SCREEN_COLONY=1,
-    SCREEN_DESIGN=3,
-    SCREEN_FLEET=4,
-    SCREEN_RACE=6,
-    SCREEN_EXIT=7,
-    SCREEN_GAME=8,
-    SCREEN_INFO=9,
-    SCREEN_MAIN_MENU=10,
-    SCREEN_UNK2=11,
-    SCREEN_MAIN_NEXT_TURN=12,
-    SCREEN_NEW_GAME=13,
-    SCREEN_HALL_OF_FAME=14,
-    SCREEN_MULTI_PLAYER=15,
-    SCREEN_HOTSEAT=16,
-    SCREEN_HOTSEAT_SELECT_PLAYER=17,
-    SCREEN_PLANET_DATA=18,
-    SCREEN_COLONY_SUMMARY=20,
-    SCREEN_START_NET=21,
-    SCREEN_JOIN_NET=22,
-    SCREEN_QUEUE_POPUP=25,
-    SCREEN_DISTANCE_BETWEEN_STARS=28,
-    SCREEN_OFFICERS=29,
-    SCREEN_COLONIZATION_IN_MAIN=30,
-    SCREEN_BUILDING_OUTPOSTS_IN_MAIN=31,
-    SCREEN_PLANET_SUMMARY=32,
-    SCREEN_COLONY_LANDING=33,
-    SCREEN_UNLOADING_TRANSPORTS_IN_MAIN=34,
-    SCREEN_SCRAP_FREIGHTERS=35,
-    SCREEN_TECH_CHANGE=36,
-    SCREEN_NET_NEXT_TURN=37,
-    SCREEN_REPORTS=39,
-    SCREEN_TURN_SUMMARY=40,
-    SCREEN_LOAD_NET=41,
-    SCREEN_SHOW_COMMAND_POINTS=43
-} SCREEN;
-
-typedef enum SHIP_SIZE {
-    SHIP_SIZE_SMALL=0,
-    SHIP_SIZE_MEDIUM=1,
-    SHIP_SIZE_LARGE=2,
-    SHIP_SIZE_HUGE=3,
-    SHIP_SIZE_TITAN=4,
-    SHIP_SIZE_DOOM_STAR=5
-} SHIP_SIZE;
-
-typedef enum SHIP_TYPE {
-    SHIP_TYPE_COMBAT=0,
-    SHIP_TYPE_COLONY=1,
-    SHIP_TYPE_TRANSPORT=2,
-    SHIP_TYPE_UNUSED=3,
-    SHIP_TYPE_OUTPOST=4
-} SHIP_TYPE;
-
-typedef enum STAR_CLASS {
-    STAR_CLASS_B=0,
-    STAR_CLASS_F=1,
-    STAR_CLASS_G=2,
-    STAR_CLASS_K=3,
-    STAR_CLASS_M=4,
-    STAR_CLASS_DWARF=5,
-    STAR_CLASS_BLACK_HOLE=6
-} STAR_CLASS;
-
-typedef enum SYSTEM_SPECIAL {
-    SYSTEM_SPECIAL_NO_SPECIAL=0,
-    SYSTEM_SPECIAL_STABLE_WORMHOLE=1,
-    SYSTEM_SPECIAL_SPACE_DEBRIS=2,
-    SYSTEM_SPECIAL_PIRATE_CACHE=3,
-    SYSTEM_SPECIAL_GOLD_DEPOSITS=4,
-    SYSTEM_SPECIAL_GEM_DEPOSITS=5,
-    SYSTEM_SPECIAL_NATIVES=6,
-    SYSTEM_SPECIAL_SPLINTER_COLONY=7,
-    SYSTEM_SPECIAL_MAROONED_HERO=8,
-    SYSTEM_SPECIAL_SPACE_MONSTER=9,
-    SYSTEM_SPECIAL_ANCIENT_ARTIFACTS=10,
-    SYSTEM_SPECIAL_ORION_STAR=11
-} SYSTEM_SPECIAL;
-
-typedef enum WEAPON_MOD_FLAG {
-    WEAPON_MOD_FLAG_NO_MODS=1,
-    WEAPON_MOD_FLAG_HEAVY_MOUNT=2,
-    WEAPON_MOD_FLAG_POINT_DEFENCE=4,
-    WEAPON_MOD_FLAG_ARMOR_PIERCING=8,
-    WEAPON_MOD_FLAG_CONTINUOUS=16,
-    WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION=32,
-    WEAPON_MOD_FLAG_SHIELD_PIERCING=64,
-    WEAPON_MOD_FLAG_AUTO_FIRE=128,
-    WEAPON_MOD_FLAG_ENVELOPING=256,
-    WEAPON_MOD_FLAG_MIRV=512,
-    WEAPON_MOD_FLAG_ECCM=1024,
-    WEAPON_MOD_FLAG_HEAVILY_ARMORED=2048,
-    WEAPON_MOD_FLAG_FAST=4096,
-    WEAPON_MOD_FLAG_EMISSION_GUIDANCE=8192,
-    WEAPON_MOD_FLAG_OVERLOADED=16384
-} WEAPON_MOD_FLAG;
 

@@ -74,6 +74,12 @@ namespace COLCALC {
     inline const char* s_fmt_val_name = reinterpret_cast<const char*>(std::uintptr_t{0x0055A94C});
     inline const char* s_fmt_val_msg = reinterpret_cast<const char*>(std::uintptr_t{0x0055A958});
 
+    inline bool __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t building_id) {
+        using Fn = bool(__cdecl*)(s_colony*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F6410});
+        return fn(colony, building_id);
+    }
+
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
     int __cdecl Colony_Officer_(s_colony* colony);
