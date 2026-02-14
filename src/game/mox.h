@@ -37,6 +37,8 @@ namespace MOX {
     inline int16_t*& _officer_id_list = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596E94});
     inline s_animation_header* (&_fleet_galaxy_star_seg)[11] =
         *reinterpret_cast<s_animation_header*(*)[11]>(std::uintptr_t{0x00596F50});
+    inline s_animation_header* (&_colony_galaxy_star_seg)[10] =
+        *reinterpret_cast<s_animation_header* (*)[10]>(std::uintptr_t{0x00597AA0});
     inline s_animation_header* (&_officer_skill_icon_seg)[27] =
         *reinterpret_cast<s_animation_header*(*)[27]>(std::uintptr_t{0x005A1BD0});
     inline void*& _officer_pictures_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597778});

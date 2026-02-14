@@ -307,7 +307,7 @@ struct s_colony {
     byte outpost_flag;
     char morale;
     short pollution;
-    char n_pops;
+    int8_t n_pops;
     char specialty;
     struct s_pop_info pop[42];
     short pop_roundoff[10];
@@ -3026,15 +3026,14 @@ struct s_tech_building_data {
     char *name;
     undefined field1_0x4;
     undefined field2_0x5;
-    undefined field3_0x6;
-    undefined field4_0x7;
+    short field3_0x6;
     int cost;
     short maintenance;
-    int8_t field7_0xe;
-    undefined field8_0xf;
-    undefined field9_0x10;
-    undefined field10_0x11;
-    undefined field11_0x12;
+    int8_t type;
+    undefined field7_0xf;
+    undefined field8_0x10;
+    undefined field9_0x11;
+    undefined field10_0x12;
 };
 
 typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data;

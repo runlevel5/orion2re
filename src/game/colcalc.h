@@ -85,6 +85,12 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004f5ee0})(colony, product_idx);
     }
 
+    inline int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony) {
+        using Fn = int16_t(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6120});
+        return fn(colony);
+    }
+
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
     int __cdecl Colony_Officer_(s_colony* colony);

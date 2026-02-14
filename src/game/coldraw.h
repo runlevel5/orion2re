@@ -14,4 +14,33 @@ namespace COLDRAW {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004598a0});
         fn();
     }
+
+    inline void __cdecl Load_Road_List_Anims_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004DC880})();
+    }
+
+    inline void __cdecl Build_Road_List_Based_On_Bldg_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004594e0});
+        fn();
+    }
+
+    inline void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459e50});
+        fn();
+    }
+
+    inline void __cdecl Clear_Veggie_Draw_Flags_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459df0});
+        fn();
+    }
+
+    inline void __cdecl Draw_Veggie_CR_(uint16_t col, uint16_t row, bool not_scanning_valid) {
+        using Fn = void(__cdecl*)(uint16_t, uint16_t, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045a100});
+        fn(col, row, not_scanning_valid);
+    }
 }

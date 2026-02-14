@@ -10,4 +10,9 @@ namespace COLXPORT {
         *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00564DE0});
 
     short __cdecl N_Colonies_(short player_idx);
+
+    inline void __cdecl Load_Xport_Anims_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0042ACB0})();
+    }
 }

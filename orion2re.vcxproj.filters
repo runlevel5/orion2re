@@ -632,6 +632,12 @@
     <ClInclude Include="src\game\coldraw.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\colbcach.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\replace.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

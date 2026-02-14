@@ -57,6 +57,7 @@
 #include "timer.h"
 #include "contact.h"
 #include "coldraw.h"
+#include "colbcach.h"
 #include "colbldg.h"
 #include "key.h"
 #include "file_ani.h"

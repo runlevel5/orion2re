@@ -1094,7 +1094,7 @@ namespace COLBLDG {
 
     void __cdecl Draw_Building_Info_(int16_t building_idx) {
         // BUG: building_idx might be -1 when accessing _buildings
-        if (TECHDATA::_buildings[building_idx].field7_0xe == 7) {
+        if (TECHDATA::_buildings[building_idx].type == 7) {
             s_animation_header* anim = COLONY::Satellite_Anim_(building_idx);
             ERIC::Draw_Centered_(anim);
         } else {

@@ -107,6 +107,7 @@
     <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\cmbtdrw1.h" />
     <ClInclude Include="src\game\cmbtmis.h" />
+    <ClInclude Include="src\game\colbcach.h" />
     <ClInclude Include="src\game\colbldg.h" />
     <ClInclude Include="src\game\colcalc.h" />
     <ClInclude Include="src\game\coldraw.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="src\game\reduce.h" />
     <ClInclude Include="src\game\regions.h" />
     <ClInclude Include="src\game\remap.h" />
+    <ClInclude Include="src\game\replace.h" />
     <ClInclude Include="src\game\report.h" />
     <ClInclude Include="src\game\russ.h" />
     <ClInclude Include="src\game\score.h" />
