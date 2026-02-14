@@ -3,6 +3,15 @@
 
 namespace COLBLDG {
 
+    int16_t __cdecl Calc_Font_Off_() {
+        if (COLONY::_step_squish == 0) {
+            return 0;
+        }
+
+        // Returns 3 if _step_squish >= 5, otherwise 2.
+        return (COLONY::_step_squish >= 5 ? 1 : 0) + 2;
+    }
+
     int16_t __cdecl N_Prods_In_Queue_(int16_t product_id) {
         int16_t match_count = 0;
         for (int32_t i = 0; i < 7; ++i) {
@@ -315,7 +324,7 @@ namespace COLBLDG {
 
         COLONY::_sys_disp_star_handle = COLONY::_star_handle;
         COLBLDG::Clear_Last_App_Desc_();
-        fonts::Set_Font_Style_Shadow_Down_(4, reinterpret_cast<s_colors*>(COLBLDG::_l_font_color_array));
+        fonts::Set_Font_Style_Shadow_Down_(4, &COLBLDG::_l_font_color_array);
         fonts::Set_Font_Spacing_(1);
         COLONY::Load_Colony_Screen_Seg_();
         COLONY::Load_Planet_Screen_();
@@ -440,6 +449,153 @@ namespace COLBLDG {
         _buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xAF6);
     }
 
+    void __cdecl Draw_Militarys_List_() {
+        int16_t font_offset;
+
+        COLDRAW::Calculate_Squish_Step_(13, 308, _n_military_indexes, 19);
+        font_offset = Calc_Font_Off_();
+        Get_Font_Off_For_Military_(&font_offset);
+
+        int16_t style_y_offset = 4 - font_offset;
+        fonts::Set_Font_Style_Shadow_Down_(style_y_offset, &_l_font_color_array);
+
+        for (int16_t i = 0; i < _n_military_indexes; ++i) {
+            int16_t mil_idx = _military_indexes[i];
+            bool use_dimmed_font = false;
+
+            if (mil_idx > -100 && mil_idx <= -50) {
+                s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+
+                if (colony->buildings[40] == 0 && colony->buildings[41] == 0 && colony->buildings[8] == 0) {
+                    int design_idx = -(mil_idx + 50);
+                    // TODO: This does not seem to be correct check
+                    if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size < 2) {
+                        if (_field_mode != 1) {
+                            use_dimmed_font = true;
+                        }
+                    }
+                }
+            }
+
+            if (!use_dimmed_font) {
+                if (_field_mode == 1 && mil_idx == _scanned_prod && mil_idx > -100 && mil_idx <= -50) {
+                    if (ERIC::Global_Cycler_(30, 2) != 0) {
+                        use_dimmed_font = true;
+                    }
+                }
+            }
+
+            if (!use_dimmed_font && mil_idx > -100 && mil_idx <= -50) {
+                if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], mil_idx)) {
+                    if (_field_mode != 1) {
+                        use_dimmed_font = true;
+                    }
+                }
+            }
+
+            if (!use_dimmed_font) {
+                if (mil_idx == -11 || mil_idx == -12 || mil_idx == -13 || mil_idx == -17 || mil_idx == -16) {
+                    if (Auto_Design_Type_(mil_idx) == 0) {
+                        if (mil_idx == -16) {
+                            if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
+                                use_dimmed_font = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            s_colors* current_palette = use_dimmed_font ? &_l_font_dim_color_array : &_l_font_color_array;
+            fonts::Set_Font_Style_Shadow_Down_(style_y_offset, current_palette);
+
+            char* selection_name = Selection_Name_(mil_idx);
+            int16_t draw_y = (19 - COLONY::_step_squish) * i + 20;
+
+            BILL::Squeeze_Print_(485, draw_y, selection_name, 138);
+        }
+    }
+
+    void __cdecl Draw_Buildings_List_() {
+        COLDRAW::Calculate_Squish_Step_(13, 469, _n_building_indexes, 19);
+
+        int16_t font_offset = Calc_Font_Off_();
+        Get_Font_Off_For_Buildings_(&font_offset);
+
+        fonts::Set_Font_Style_Shadow_Down_(4 - font_offset, &_l_font_color_array);
+
+        if (_n_building_indexes > 0) {
+            for (int16_t i = 0; i < _n_building_indexes; ++i) {
+                int16_t building_id = _building_indexes[i];
+
+                s_colors* colors;
+                if (Has_Prod_In_Queue_(building_id)) {
+                    colors = &_l_font_color_array;
+                } else {
+                    colors = &_l_font_dim_color_array;
+                }
+
+                fonts::Set_Font_Style_Shadow_Down_(4 - font_offset, colors);
+
+                char* building_name = Selection_Name_(building_id);
+                int16_t y_pos = (19 - COLONY::_step_squish) * i + 20;
+
+                BILL::Squeeze_Print_(13, y_pos, building_name, 171);
+            }
+        }
+    }
+
+    /**
+     * @address 0050e060
+     */
+    void __cdecl Draw_Build_Queue_() {
+        char buffer[500];
+        int16_t y_pos = 335;
+        int16_t scanned_id = _scanned_prod;
+
+        for (int16_t i = 0; i < 7; ++i) {
+            int16_t active_idx = (_active_prod < 49) ? -1 : (_active_prod - 49);
+
+            bool show_delete = false;
+
+            if (i == active_idx) {
+                if (_current_item[i] == scanned_id) {
+                    show_delete = true;
+                } else if (i < 6 && _current_item[i + 1] == scanned_id && _current_item[i + 1] == -10) {
+                    show_delete = true;
+                } else if (i != 0 && _current_item[i - 1] == scanned_id && _current_item[i] == -10) {
+                    show_delete = true;
+                }
+            }
+
+            if (!show_delete) {
+                if (i != 0 && _current_item[i] == -10 && (_current_item[i] == scanned_id || _current_item[i - 1] == scanned_id)) {
+                    if (i == active_idx || i == active_idx + 1) {
+                        show_delete = true;
+                    }
+                }
+                if (!show_delete && i < 6 && _current_item[i + 1] == -10 && (_current_item[i] == scanned_id || _current_item[i + 1] == scanned_id)) {
+                    if (i == active_idx || i == active_idx - 1) {
+                        show_delete = true;
+                    }
+                }
+            }
+
+            const char* text_to_print;
+            if (show_delete && _scanned_field >= _queue_fields[0] && _scanned_field <= _queue_fields[6] && _current_item[i] != -1) {
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                char* item_name = Selection_Name_(_current_item[i]);
+                _sprintf(buffer, ESTRINGS::E_Strings_(ESTR_DELETE_S), item_name);
+                text_to_print = buffer;
+            } else {
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                text_to_print = Selection_Name_(_current_item[i]);
+            }
+
+            BILL::Squeeze_Print_Centered_(332, y_pos, text_to_print, 251);
+            y_pos += 20;
+        }
+    }
+
     char* __cdecl Selection_Name_(int16_t id) {
         if (id > 0 && id < BUILDING_COUNT) {
             return COLONY::Real_Building_Name_(id);
@@ -466,4 +622,221 @@ namespace COLBLDG {
         return _g_msg;
     }
 
+    void __cdecl Draw_Current_Selection_() {
+        int16_t y_line_count = 0;
+        char buffer[480];
+        int16_t item_id = (_scanned_prod != -1) ? _scanned_prod : _current_item[0];
+
+        switch (item_id) {
+            case -17: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Print_App_Description_(209, 119, 248, 109 /* 0x6D */);
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(244, 56, 46 /* 0x2E */);
+                break;
+            }
+            case -16: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Ship_Design_Info_(-55 /* 0x37 */);
+                break;
+            }
+            case -15: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Print_App_Description_(209, 119, 248, 69 /* 0x45 */);
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(244, 56, 48 /* 0x30 */);
+                break;
+            }
+            case -13: {
+                y_line_count = 1;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Ship_Design_Info_(-54 /* 0x36 */);
+                break;
+            }
+            case -12: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Print_App_Description_(209, 119, 248, 41 /* 0x29 */);
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(244, 56, 45 /* 0x2D */);
+                break;
+            }
+            case -11: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(244, 56, 47 /* 0x2F */);
+                Print_App_Description_(209, 119, 248, 189 /* 0xBD */);
+                break;
+            }
+            case -10: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                _sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
+                fonts::Print_(306, (y_line_count * 13 + 21), buffer);
+                y_line_count++;
+                Print_Selection_Centered_(Selection_Name_(item_id));
+                break;
+            }
+            case -8: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                fonts::Print_(306, (y_line_count * 13 + 21), ESTRINGS::E_Strings_(0x1BD));
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
+                _sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
+                y_line_count++;
+                fonts::Print_(306, (y_line_count * 13 + 21), buffer);
+                y_line_count++;
+                fonts::Set_Font_Style_Shadow_Down_(5, &_l_font_color_array);
+                Print_Selection_Centered_(ESTRINGS::E_Strings_(0x7D));
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                break;
+            }
+            case -7: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
+                y_line_count += 2;
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Print_App_Description_(209, 119, 248, 166 /* 0xA6 */);
+                ERIC::Draw_Centered_(COLONY::Spy_Anim_(MOX::_player[MOX::_PLAYER_NUM].race));
+                break;
+            }
+            case -6: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Print_App_Description_(209, 119, 248, 7);
+                break;
+            }
+            case -5: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Print_App_Description_(209, 119, 248, 8);
+                break;
+            }
+            case -4: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Print_App_Description_(209, 119, 248, 6);
+                break;
+            }
+            case -3: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Draw_Building_Centered_In_Window_(14 /* 0xE */);
+                Print_Setting_Description_(209, 119, 248, 13 /* 0xD */);
+                break;
+            }
+            case -2: {
+                fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+                BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+                y_line_count += 2;
+                animate::Draw_(235 /* 0xEB */, 54 /* 0x36 */, COLONY::Prod_Anims_(3, 1, 0));
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+                Print_Setting_Description_(209, 119, 248, 12 /* 0xC */);
+                break;
+            }
+            default: {
+                if (item_id > 0 && item_id < 49 /* 0x31 */) {
+                    Draw_Building_Info_(item_id);
+                    return;
+                }
+                if (item_id <= -100) {
+                    Draw_Ship_Info_(item_id);
+                    return;
+                }
+                if (item_id <= -50) {
+                    Draw_Ship_Design_Info_(item_id);
+                    return;
+                }
+                RUSS::PFMT_(0, 0, ESTRINGS::E_Strings_(248 /* 0xF8 */));
+                assert::hgetch_();
+                break;
+            }
+        }
+    }
+
+    /**
+     * @address 0050deb0
+     */
+    void __cdecl Draw_Build_Queue_Popup_() {
+        char buffer[200];
+
+        if (COLONY::_full_draw != 0) {
+            graphics::Fill_(0, 0, 640, 479, 0);
+
+            s_animation_header* anim = COLONY::C_Anims_(0);
+            animate::Draw_(0, 0, anim);
+
+            COLDRAW::Draw_Road_List_();
+            COLONY::Draw_Colony_Bldgs_();
+
+            replace::Interlaced_Gray_Scale_Off_Page_(246, 9, 244, 10, 0);
+
+            animate::Draw_Palette_(COLBLDG::_anims[0]);
+            palette::Set_Palette_Changes_(0, 255);
+            remap::Update_Glass_Remap_Colors_();
+
+            graphics::Darken_Fill_(202, 304, 463, 470);
+            animate::Draw_(0, 0, COLBLDG::_anims[0]);
+
+            char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[COLONY::_colony_handle].planet);
+            char* format = ESTRINGS::E_Strings_(ESTR_BUILD_LIST_FOR_S);
+            _sprintf(buffer, format, planet_name);
+
+            fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
+            BILL::Squeeze_Paragraph_Centered_(235, 309, 194, 17, buffer, 2);
+
+            if (MOX::_previous_screen == SCREEN_COLONY_SUMMARY ||
+                COLBLDG::_colony_bldg_saved_screen == SCREEN_COLONY_SUMMARY)
+            {
+                animate::Draw_Palette_(COLBLDG::_anims[0]);
+                remap::Update_Glass_Remap_Colors_();
+                animate::Draw_Palette_(COLBLDG::_colsum_pal_anim);
+            } else {
+                remap::Update_Glass_Remap_Colors_();
+            }
+
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(4, &COLBLDG::_l_font_color_array);
+        fonts::Set_Font_Spacing_(1);
+
+        COLBLDG::Draw_Buildings_List_();
+        COLBLDG::Draw_Militarys_List_();
+        COLBLDG::Draw_Build_Queue_();
+        COLBLDG::Draw_Current_Selection_();
+        COLBLDG::Draw_Active_Prod_();
+    }
 } // namespace COLBLDG

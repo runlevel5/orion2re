@@ -120,4 +120,8 @@ namespace graphics {
         video::_screen_window_x2 = _old_screen_window_x2;
         video::_screen_window_y2 = _old_screen_window_y2;
     }
+
+    void __cdecl Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        Tint_Fill_(x1, y1, x2, y2, 0);
+    }
 }

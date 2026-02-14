@@ -853,6 +853,13 @@ namespace hooks {
         { 0x004dca50, &COLONY::C_Anims_ },
         { 0x0046e0e0, &aidesign::Auto_Design_Ship_ },
         { 0x0047f0f0, &INITSHIP::Init_Ship_Designs_ },
+        { 0x00529640, &graphics::Darken_Fill_ },
+        { 0x0050deb0, &COLBLDG::Draw_Build_Queue_Popup_ },
+        { 0x00509C80, &COLBLDG::Calc_Font_Off_ },
+        { 0x00509b80, &COLBLDG::Draw_Buildings_List_ },
+        { 0x00509d60, &COLBLDG::Draw_Militarys_List_ },
+        { 0x0050e060, &COLBLDG::Draw_Build_Queue_ },
+        { 0x0050d240, &COLBLDG::Draw_Current_Selection_ },
     };
 
     void Install_Hooks()

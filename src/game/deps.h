@@ -66,6 +66,7 @@
 #include "combfind.h"
 #include "colcalc.h"
 #include "remap.h"
+#include "replace.h"
 #include "movebox.h"
 #include "fleetpop.h"
 #include "trade.h"

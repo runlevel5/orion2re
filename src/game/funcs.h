@@ -413,7 +413,6 @@ inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   //
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
 
-inline s_animation_header** _anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00571EE0});
 inline const char* const s_e_0055ac48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC48}); // "e"
 
 inline const char* const s_Null_Pointer_0055b658 =

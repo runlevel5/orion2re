@@ -28,4 +28,15 @@ namespace ERIC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba9f0});
         fn(x, y, width, line_height, text);
     }
+
+    inline int16_t __cdecl Global_Cycler_(int16_t range, int16_t step) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004BA930})(range, step);
+    }
+
+    inline void __cdecl Draw_Centered_(s_animation_header* anim) {
+        using Fn = void(__cdecl*)(s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050d220});
+        fn(anim);
+    }
 }

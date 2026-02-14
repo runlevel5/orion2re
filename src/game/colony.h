@@ -61,7 +61,38 @@ namespace COLONY {
     }
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
+
+    inline void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int x, int y, int seg_id) {
+        using Fn = void(__cdecl*)(int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dba50});
+        fn(x, y, seg_id);
+    }
+
+    inline s_animation_header* __cdecl Spy_Anim_(uint16_t race) {
+        using Fn = s_animation_header*(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dc2d0});
+        return fn(race);
+    }
+
+    inline s_animation_header* __cdecl People_Anim_(int unk1, int unk2, uint16_t race) {
+        using Fn = s_animation_header*(__cdecl*)(int, int, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dc4a0});
+        return fn(unk1, unk2, race);
+    }
+
+    inline s_animation_header* __cdecl Prod_Anims_(int unk1, int unk2, char unk3) {
+        using Fn = s_animation_header*(__cdecl*)(int, int, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dcd70});
+        return fn(unk1, unk2, unk3);
+    }
+
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num);
     bool __cdecl Sat_Should_Be_Replaced_(int16_t building_id);
     void __cdecl Insert_Satellite_Into_Array_(int16_t satellite_id, int16_t* count);
+
+    inline void __cdecl Draw_Colony_Bldgs_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddf20});
+        fn();
+    }
 }
