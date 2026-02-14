@@ -36,10 +36,27 @@ namespace BILL {
         fn(x1, x2, y, height, text, unknown);
     }
 
+    inline void __cdecl Squeeze_Print_Formatted_Paragraph_(int x, int y, int x2, int y2, char* buffer, int unknown) {
+        using Fn = void(__cdecl*)(int, int, int, int, char*, int);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00407680})(x, y, x2, y2, buffer, unknown);
+    }
+
     inline void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* text, int16_t width) {
         using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407410});
         fn(x, y, text, width);
+    }
+
+    inline void __cdecl _Print_Paragraph_(uint16_t x, int16_t y, uint16_t width, const char* text, int shadow_style) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, const char*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408090});
+        fn(x, y, width, text, shadow_style);
+    }
+
+    inline int16_t __cdecl _Get_Paragraph_Max_Width_(int32_t max_width, char* text, int32_t param_3) {
+        using Fn = int16_t(__cdecl*)(int32_t, char*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408120});
+        return fn(max_width, text, param_3);
     }
 
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});

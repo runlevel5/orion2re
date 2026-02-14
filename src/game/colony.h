@@ -86,6 +86,12 @@ namespace COLONY {
         return fn(unk1, unk2, unk3);
     }
 
+    inline s_animation_header* __cdecl Satellite_Anim_(int16_t building_idx) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DDD80});
+        return fn(building_idx);
+    }
+
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num);
     bool __cdecl Sat_Should_Be_Replaced_(int16_t building_id);
     void __cdecl Insert_Satellite_Into_Array_(int16_t satellite_id, int16_t* count);
@@ -94,5 +100,33 @@ namespace COLONY {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddf20});
         fn();
+    }
+
+    inline void __cdecl Remap_Draw_Ship_D_Centered_(int32_t x, int32_t y, int16_t index) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbbd0});
+        fn(x, y, index);
+    }
+
+    inline void __cdecl Draw_Building_With_Bottom_Centered_(int32_t x, int32_t y, int16_t building_id, int32_t param_4, int32_t param_5) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddab0});
+        fn(x, y, building_id, param_4, param_5);
+    }
+
+    inline void __cdecl Remap_Draw_Ship_Centered_(int x, int y, int index) {
+        using Fn = void(__cdecl*)(int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004db8c0});
+        fn(x, y, index);
+    }
+
+    inline int16_t __cdecl Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(int16_t colony_idx, int16_t product_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004ddcd0})(colony_idx, product_idx);
+    }
+
+    inline int16_t __cdecl Calculate_Current_Production_Turn_Count_(int16_t colony_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004ddd30})(colony_idx);
     }
 }

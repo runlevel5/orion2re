@@ -234,6 +234,9 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
+    inline char**& _planet_gravity_string =
+        *reinterpret_cast<char***>(std::uintptr_t{0x005A49E0});
+
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
     inline void*& _global_bitmap_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC4});
     inline uint8_t& _first_time_drawn = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D1A});

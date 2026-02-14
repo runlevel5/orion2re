@@ -860,6 +860,21 @@ namespace hooks {
         { 0x00509d60, &COLBLDG::Draw_Militarys_List_ },
         { 0x0050e060, &COLBLDG::Draw_Build_Queue_ },
         { 0x0050d240, &COLBLDG::Draw_Current_Selection_ },
+        { 0x00509ca0, &COLBLDG::Get_Font_Off_For_Buildings_ },
+        { 0x00509fa0, &COLBLDG::Get_Font_Off_For_Military_ },
+        { 0x00509750, &COLBLDG::Has_Prod_In_Queue_ },
+        { 0x0050b090, &COLBLDG::Auto_Design_Type_ },
+        { 0x0050a290, &COLBLDG::Print_App_Description_ },
+        { 0x0050abe0, &COLBLDG::Draw_Ship_Design_Info_ },
+        { 0x0050a370, &COLBLDG::Draw_Building_Centered_In_Window_ },
+        { 0x0050dc10, &COLBLDG::Print_Setting_Description_ },
+        { 0x0050a1b0, &COLBLDG::Draw_Building_Info_ },
+        { 0x0050ad80, &COLBLDG::Draw_Ship_Info_ },
+        { 0x0050dca0, &COLBLDG::Draw_Cost_And_Time_Info_ },
+        { 0x0050ad10, &COLBLDG::Draw_Ship_Design_Info2_ },
+        { 0x00509780, &COLBLDG::Get_Setting_Description_String_ },
+        { 0x0050ae50, &COLBLDG::Draw_Active_Prod_ },
+        { 0x0050dc80, &COLBLDG::Print_Selection_Centered_ },
     };
 
     void Install_Hooks()

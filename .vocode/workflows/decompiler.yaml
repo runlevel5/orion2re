@@ -130,8 +130,8 @@ workflows:
              }
 
             - For external functions, emit inline wrapper function with namespace (if available) using the following patterns.
-              Make sure to include explicit calling convention. Do not change calling convention
-              in generated stubs.
+              Make sure to include explicit calling convention. Do not change calling convention in generated stubs. If header
+              file already contains a function definition with our without a body - do NOT overwrite it with a stub.
 
                Function with namespace, namespace block MUST be generated: 
 
@@ -252,6 +252,12 @@ workflows:
             
             struct s_player;
             string s_settings;
+
+            Incorrect:
+
+            struct s_player {
+              // ... struct fields go here
+            };
 
           * You are not allowed to rename struct fields or modify their shapes
           * You should NOT emit a new address for any structure variables, if one of the inner fields it being accessed by direct address.

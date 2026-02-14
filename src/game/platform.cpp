@@ -894,3 +894,31 @@ namespace platform {
         return 0;
     }
 }
+
+extern "C" {
+
+    __declspec(naked) void __chkstk() {
+        __asm {
+            ret
+        }
+    }
+
+    __declspec(naked) void __chkstk_ms() {
+        __asm {
+            ret
+        }
+    }
+
+    __declspec(naked) void _chkstk() {
+        __asm {
+            ret
+        }
+    }
+
+    __declspec(naked) void _chkstk_ms() {
+        __asm {
+            ret
+        }
+    }
+
+}

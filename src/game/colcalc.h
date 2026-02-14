@@ -80,6 +80,11 @@ namespace COLCALC {
         return fn(colony, building_id);
     }
 
+    inline int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_idx) {
+        using Fn = int16_t(__cdecl*)(s_colony*, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f5ee0})(colony, product_idx);
+    }
+
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
     int __cdecl Colony_Officer_(s_colony* colony);

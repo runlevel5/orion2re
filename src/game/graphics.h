@@ -21,4 +21,10 @@ namespace graphics {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00529660});
         fn(x1, y1, x2, y2, color);
     }
+
+    inline void __cdecl Box_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t color, int16_t fill) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00529580});
+        fn(x, y, w, h, color, fill);
+    }
 }

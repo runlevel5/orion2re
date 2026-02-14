@@ -12,6 +12,72 @@ namespace COLBLDG {
         return (COLONY::_step_squish >= 5 ? 1 : 0) + 2;
     }
 
+    /**
+     * @address 00509fa0
+     */
+    void __cdecl Get_Font_Off_For_Military_(int16_t* font_offset) {
+        if (_n_military_indexes <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < _n_military_indexes; ++i) {
+            int16_t text_width;
+            do {
+                fonts::Set_Font_Style_Shadow_Down_(4 - *font_offset, &_l_font_color_array);
+
+                char* selection_name = Selection_Name_(_military_indexes[i]);
+
+                text_width = BILL::_Get_Paragraph_Max_Width_(0x280, selection_name, 0);
+
+                if (text_width > 138) {
+                    *font_offset += 1;
+                }
+
+                if (*font_offset > 2) {
+                    text_width = 0;
+                }
+            } while (text_width > 138);
+        }
+    }
+
+    void __cdecl Get_Font_Off_For_Buildings_(int16_t* font_offset) {
+        for (int16_t i = 0; i < _n_building_indexes; ++i) {
+            int16_t width;
+            do {
+                int16_t building_idx = _building_indexes[i];
+                s_colors* colors;
+
+                if (Has_Prod_In_Queue_(building_idx)) {
+                    colors = &_l_font_color_array;
+                } else {
+                    colors = &_l_font_dim_color_array;
+                }
+
+                fonts::Set_Font_Style_Shadow_Down_(4 - *font_offset, colors);
+
+                char* name = Selection_Name_(building_idx);
+                width = BILL::_Get_Paragraph_Max_Width_(0x280, name, 0);
+
+                if (width > 171) {
+                    *font_offset += 1;
+                }
+
+                if (*font_offset > 2) {
+                    width = 0;
+                }
+            } while (width > 171);
+        }
+    }
+
+    bool __cdecl Has_Prod_In_Queue_(int16_t prod_id) {
+        for (int32_t i = 0; i < 7; ++i) {
+            if (_current_item[i] == prod_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     int16_t __cdecl N_Prods_In_Queue_(int16_t product_id) {
         int16_t match_count = 0;
         for (int32_t i = 0; i < 7; ++i) {
@@ -547,6 +613,20 @@ namespace COLBLDG {
     /**
      * @address 0050e060
      */
+    int16_t __cdecl Auto_Design_Type_(int16_t design_code) {
+        if (design_code == -12 /* 0xfff4 */) {
+            return 1;
+        }
+        if (design_code == -17 /* 0xffef */) {
+            return 4;
+        }
+        if (design_code == -11 /* 0xfff5 */) {
+            return 2;
+        }
+
+        return 0;
+    }
+
     void __cdecl Draw_Build_Queue_() {
         char buffer[500];
         int16_t y_pos = 335;
@@ -593,6 +673,27 @@ namespace COLBLDG {
 
             BILL::Squeeze_Print_Centered_(332, y_pos, text_to_print, 251);
             y_pos += 20;
+        }
+    }
+
+    void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
+        if (setting_id != _last_setting) {
+            _last_setting = setting_id;
+            _last_app = -1;
+
+            char* file_path = ESTRINGS::E_Strings_(HESTR_170_MAX_POPULATION);
+            char* loaded_data = (char*)farload::Far_Reload_Data_(
+                file_path,
+                static_cast<int32_t>(setting_id),
+                _buffer,
+                0,
+                1,
+                0x258 /* 600 */
+            );
+
+            if (loaded_data != nullptr) {
+                strcpy(_g_msg, loaded_data);
+            }
         }
     }
 
@@ -786,6 +887,13 @@ namespace COLBLDG {
     }
 
     /**
+     * @address 0050dc80
+     */
+    void __cdecl Print_Selection_Centered_(const char* text) {
+        fonts::Print_Centered_(244, 56, text);
+    }
+
+    /**
      * @address 0050deb0
      */
     void __cdecl Draw_Build_Queue_Popup_() {
@@ -839,4 +947,282 @@ namespace COLBLDG {
         COLBLDG::Draw_Current_Selection_();
         COLBLDG::Draw_Active_Prod_();
     }
+
+    /**
+     * @address 0050dc10
+     */
+    void __cdecl Print_Setting_Description_(uint16_t x, int16_t y, uint16_t width, int16_t setting_id) {
+        fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+        fonts::Set_Font_Spacing_(1);
+        fonts::Set_Font_Spacing_Width_(2);
+
+        Get_Setting_Description_String_(_g_msg, setting_id);
+
+        BILL::_Print_Paragraph_(x, y, width, _g_msg, 3);
+
+        fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+    }
+
+    /**
+     * @address 0050a290
+     */
+    void __cdecl Print_App_Description_(uint16_t x, int16_t y, uint16_t width, int16_t app_id) {
+        char help_lbx_name[20];
+        char description_buffer[1332];
+
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+        fonts::Set_Font_Spacing_(1);
+        fonts::Set_Font_Spacing_Width_(2);
+
+        if (app_id != _last_app) {
+            _last_app = app_id;
+            _desc_record_ptr = farload::Far_Reload_Data_(help_lbx_name, 0, _buffer, app_id, 1, 0x57b);
+        }
+
+        const char* record_text = reinterpret_cast<const char*>(_desc_record_ptr) + 0x67;
+        strcpy(description_buffer, record_text);
+
+        BILL::_Print_Paragraph_(x, y, width, description_buffer, 3);
+
+        fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+    }
+
+    /**
+     * @address 0050abe0
+     */
+    void __cdecl Draw_Ship_Design_Info_(int16_t id) {
+        int16_t index = -50 - id;
+
+        if (id > -100 && id <= -50) {
+            int16_t local_2 = 0;
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+
+            if (id != 4) {
+                s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+                s_ship_design* design = &player->ship_designs[index];
+
+                int16_t y_pos = local_2 * 13 + 21;
+                local_2++;
+
+                fonts::Print_(306, y_pos, design->name);
+
+                local_2++;
+
+                fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+                fonts::Set_Font_Spacing_(1);
+                fonts::Set_Font_Spacing_Width_(2);
+
+                Draw_Cost_And_Time_Info_(COLONY::_colony_handle, id, &local_2);
+                Draw_Ship_Design_Info2_(design);
+            }
+        }
+
+        COLONY::Remap_Draw_Ship_D_Centered_(244, 56, index);
+    }
+
+    /**
+     * @address 0050a370
+     */
+    void __cdecl Draw_Building_Centered_In_Window_(int16_t building_id) {
+        graphics::Set_Window_(203, 9, 285, 103);
+        video::Clip_On_();
+        COLONY::Draw_Building_With_Bottom_Centered_(244, 93, building_id, 5, 5);
+        video::Clip_Off_();
+    }
+
+    void __cdecl Draw_Cost_And_Time_Info_(int16_t colony_idx, int16_t product_idx, int16_t* line_count) {
+        char buffer[500];
+        int32_t y_pos;
+        char* format_str;
+
+        // 1. Draw Production Cost
+        int16_t cost = COLCALC::Colony_Product_Cost_(&MOX::_colony[colony_idx], product_idx);
+        format_str = ESTRINGS::E_Strings_(ESTR_COST_HERE_D);
+        _sprintf(buffer, format_str, (int32_t)cost);
+
+        y_pos = (*line_count) * 13 + 21;
+        fonts::Print_(306, (int16_t)y_pos, buffer);
+        (*line_count)++;
+
+        // 2. Draw Maintenance if applicable
+        if (product_idx > 0 && product_idx < 49) {
+            int32_t maint = (int32_t)TECHDATA::_buildings[product_idx].maintenance;
+            format_str = ESTRINGS::E_Strings_(HESTR_16F_PENALTY);
+            _sprintf(buffer, format_str, maint);
+
+            y_pos = (*line_count) * 13 + 21;
+            fonts::Print_(306, (int16_t)y_pos, buffer);
+            (*line_count)++;
+        }
+
+        // 3. Draw Build Time
+        int16_t build_time = COLONY::Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(colony_idx, product_idx);
+        format_str = ESTRINGS::E_Strings_(ESTR_BUILD_TIME_D);
+        _sprintf(buffer, format_str, (int32_t)build_time);
+
+        y_pos = (*line_count) * 13 + 21;
+        BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
+        (*line_count)++;
+
+        // 4. Draw Turns Left if currently producing
+        if (MOX::_colony[colony_idx].producing[0] == product_idx) {
+            int16_t turns_left = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx);
+            format_str = ESTRINGS::E_Strings_(ESTR_TURNS_LEFT_D);
+            _sprintf(buffer, format_str, (int32_t)turns_left);
+
+            y_pos = (*line_count) * 13 + 21;
+            BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
+            (*line_count)++;
+            return;
+        }
+
+        // 5. Special case for Gravity Generator (ID 25)
+        if (product_idx > 0 && product_idx < 49 && product_idx == 25) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+            int8_t gravity_class = MOX::_planet[planet_idx].gravity_class;
+            char* gravity_str = MOX::_planet_gravity_string[gravity_class];
+
+            format_str = ESTRINGS::E_Strings_(ESTR_GRAVITY_HERE_S);
+            _sprintf(buffer, format_str, gravity_str);
+
+            y_pos = (*line_count) * 13 + 21;
+            BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
+            (*line_count)++;
+        }
+    }
+
+    void __cdecl Draw_Building_Info_(int16_t building_idx) {
+        // BUG: building_idx might be -1 when accessing _buildings
+        if (TECHDATA::_buildings[building_idx].field7_0xe == 7) {
+            s_animation_header* anim = COLONY::Satellite_Anim_(building_idx);
+            ERIC::Draw_Centered_(anim);
+        } else {
+            Draw_Building_Centered_In_Window_(building_idx);
+        }
+
+        if (building_idx != -1) {
+            int16_t y_offset = 0;
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+
+            int y_pos = (y_offset * 13) + 21;
+            y_offset++;
+
+            char* building_name = COLONY::Real_Building_Name_(building_idx);
+            BILL::Squeeze_Print_(0x132, y_pos, building_name, 0x9c);
+
+            y_offset++;
+            fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+
+            Draw_Cost_And_Time_Info_(COLONY::_colony_handle, building_idx, &y_offset);
+
+            y_offset = 0;
+            Print_App_Description_(0xd1, 0x77, 0xf8, *(int16_t*)&TECHDATA::_buildings[building_idx].field3_0x6);
+        }
+    }
+
+    void __cdecl Draw_Ship_Design_Info2_(s_ship_design* design) {
+        char buffer[20000];
+
+        fonts::Set_Font_Style_Shadow_Down_(1, &_l_font_color_array);
+        fonts::Set_Font_Spacing_(1);
+        fonts::Set_Font_Spacing_Width_(2);
+
+        Build_Ship_Design_Info_Formatted_Paragraph_(design, buffer, 0);
+        BILL::Squeeze_Print_Formatted_Paragraph_(212, 114, 248, 186, buffer, 0);
+    }
+
+    /**
+     * @address 0050ae50
+     */
+    void __cdecl Draw_Active_Prod_() {
+        int16_t active_idx = _active_prod;
+        if (active_idx == -1) {
+            return;
+        }
+
+        if (active_idx >= 49 /* 0x31 */) {
+            int16_t rel_idx = active_idx - 49;
+            int16_t* active_prod_ptr = &_active_prod;
+            int16_t current = active_prod_ptr[4 + rel_idx];
+            int16_t scanned_prod = _scanned_prod;
+            int16_t scanned_field = _scanned_field;
+
+            bool is_match = false;
+            if (current == scanned_prod) {
+                is_match = true;
+            } else if (rel_idx != 0 && current == -10 && active_prod_ptr[3 + rel_idx] == scanned_prod) {
+                is_match = true;
+            } else if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10 && active_prod_ptr[5 + rel_idx] == scanned_prod) {
+                is_match = true;
+            }
+
+            if (is_match && scanned_field >= _queue_fields[0] && scanned_field <= _queue_fields[6] && current != -1) {
+                int16_t base_y = rel_idx * 20;
+                graphics::Box_(207, base_y + 332, 252, 16, 1, 239);
+
+                if (rel_idx != 0 && current == -10) {
+                    graphics::Box_(207, base_y + 312, 252, 16, 1, 239);
+                }
+
+                if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10) {
+                    graphics::Box_(207, base_y + 352, 252, 16, 1, 239);
+                }
+
+                COLONY::Reset_Mouse_Picture_();
+            } else {
+                int16_t base_y = rel_idx * 20;
+                graphics::Box_(207, base_y + 332, 252, 16, 1, 100);
+
+                if (rel_idx != 0 && current == -10) {
+                    graphics::Box_(207, base_y + 312, 252, 16, 1, 100);
+                }
+
+                if (rel_idx < 6 && active_prod_ptr[5 + rel_idx] == -10) {
+                    graphics::Box_(207, base_y + 352, 252, 16, 1, 100);
+                }
+
+                mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&_mouse_list_to), 4);
+            }
+        } else {
+            for (int16_t i = 0; i < _n_building_indexes; ++i) {
+                if (_building_indexes[i] == active_idx) {
+                    int16_t step = COLONY::_step_squish;
+                    int16_t height = 18 - step;
+                    int16_t row_spacing = 19 - step;
+                    int16_t y = row_spacing * i + 18;
+                    graphics::Box_(8, y, 171, height, 1, 100);
+                }
+            }
+        }
+    }
+
+    /**
+     * @address 0050ad80
+     */
+    void __cdecl Draw_Ship_Info_(int16_t item) {
+        int16_t index = -100 - item;
+
+        if (item <= -100) {
+            int16_t y_offset_counter = 0;
+            fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+
+            int16_t current_y = y_offset_counter * 13 + 21;
+            y_offset_counter++;
+
+            s_ship_data* ship = &MOX::_ship[index];
+            fonts::Print_(306, current_y, ship->d.name);
+
+            y_offset_counter++;
+            fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+            fonts::Set_Font_Spacing_(1);
+            fonts::Set_Font_Spacing_Width_(2);
+
+            COLBLDG::Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item, &y_offset_counter);
+            COLBLDG::Draw_Ship_Design_Info2_(&ship->d);
+        }
+
+        COLONY::Remap_Draw_Ship_Centered_(244, 56, index);
+    }
+
 } // namespace COLBLDG
