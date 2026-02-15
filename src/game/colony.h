@@ -3,8 +3,25 @@
 
 struct s_animation_header;
 struct s_colors;
+struct s_planet_data;
+struct s_colony;
 
 namespace COLONY {
+    inline int16_t (&_colony_fields)[21] =
+        *reinterpret_cast<int16_t(*)[21]>(std::uintptr_t{0x00559E28});
+
+    inline int16_t (&_military_fields)[2] =
+        *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x00559E54});
+
+    inline int16_t (&_job_fields)[3] =
+        *reinterpret_cast<int16_t(*)[3]>(std::uintptr_t{0x00595E28});
+
+    inline int16_t (&_sys_disp_summ_fields)[5] =
+        *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00595E40});
+
+    inline int16_t (&_pop_fields)[42] =
+        *reinterpret_cast<int16_t(*)[42]>(std::uintptr_t{0x00595F80});
+
     inline s_colony_bldg (&_colony_bldgs)[6] =
         *reinterpret_cast<s_colony_bldg(*)[6]>(std::uintptr_t{0x00559E58});
 
@@ -21,10 +38,12 @@ namespace COLONY {
 
     void __cdecl Init_Colonies_();
 
-    inline void __cdecl Colony_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004dfc10})();
-    }
+    void __cdecl Colony_Screen_();
+
+    inline int16_t& _colony_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EA68});
+    inline int16_t& _g_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EBC8});
+    inline int16_t& _g_scanned_planet = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E6C});
+    inline uint16_t& _planet_display_handle = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00559E20});
 
     inline int16_t& _orbit_temp =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B22});
@@ -148,15 +167,63 @@ namespace COLONY {
         fn();
     }
 
+    inline void __cdecl Set_Colony_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00412320)();
+    }
+
+    inline uint8_t __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
+        using Fn = uint8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(0x004BA7A0)();
+    }
+
+    inline void __cdecl Fast_Fade_Out_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004BA690)();
+    }
+
+    inline void __cdecl Fast_Fade_In_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004BA740)();
+    }
+
+    inline void __cdecl Update_Fields_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004DFF60)();
+    }
+
+    inline void __cdecl Do_Informational_And_Decision_Popups_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004E1990)();
+    }
+
+    inline uint8_t __cdecl Evaluate_Input_(int16_t* input, int16_t* scanned) {
+        using Fn = uint8_t(__cdecl*)(int16_t*, int16_t*);
+        return reinterpret_cast<Fn>(0x004E0870)(input, scanned);
+    }
+
+    inline void __cdecl Clear_Fake_Buttons_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004B53F0)();
+    }
+
+    inline void __cdecl Fix_Colony_Queue_(int32_t handle) {
+        using Fn = void(__cdecl*)(int32_t);
+        reinterpret_cast<Fn>(0x004DFBD0)(handle);
+    }
+
     inline void __cdecl Col_Calc_Wrapper_(int16_t colony_idx) {
         using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dc110});
         fn(colony_idx);
     }
 
-    inline void __cdecl Reset_Field_Arrays_() {
+    void __cdecl Reset_Field_Arrays_();
+
+    inline void __cdecl Clear_Sys_Disp_Fields_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004dbd00)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df710});
+        fn();
     }
 
     inline uint16_t __cdecl Sum_Colonists_(int32_t colony_idx, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6) {

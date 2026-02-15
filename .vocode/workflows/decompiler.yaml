@@ -407,7 +407,7 @@ workflows:
              
             - For all external functions:
               1. If a function is in a namespace, you must add it to the `src/game/<namespace>.h` file unless it is already
-                defined there. Always lowercase the namespace name.
+                defined there either as a stub or as a function definition. Always lowercase the namespace name.
               
                 Example:
 
@@ -453,14 +453,13 @@ workflows:
             - You shall not read any source files except of the decompiled function namespace file.
             - If you create a new header files for namespaces that were not added before, make sure to include them in `src/game/deps.h`.
             - If the decompiled function already exists in the header as a stub reference, remove the old external reference.
-            - If the decompiled function exists as a definition without inline implementation - this function already exists.
             - If the decompiled function is already implemented, update the implementation with the newly decompiled version.
             - If old stub has a different address, you must apply one of the following rules:
               - If it is function reference, you are allowed to update the old address
               - If it is structure reference, do not update as you might have an address of one of the inner fields.
               - If it is reference to a primitive, non-composite type, such as int variable - you are allowed to update.
               - Otherwise do not update.
-            - If function for a stub already exists (as a stub or as an re-implemented function) - do not add the stub again.
+            - If function for a stub already defined in a header, either stub or just a definition - do not add the stub again.
             - Avoid changing signatures of stubs that already exist. If you see an incompatible signature and you sure
               about it - add a type cast and a comment.
             - Find a `// Patch: ` comment and add address to patch to `src/hooks.cpp` at the bottom of the list. Read last 20
@@ -501,7 +500,7 @@ workflows:
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * All external variables and functions stubs were added to correct files with correct namespaces
-          * External function stubs did not overwrite existing function definitions
+          * External function stubs did not overwrite existing functions in header files
           * All mentioned namespaces were processed
           * No existing function signatures were changed
           * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address

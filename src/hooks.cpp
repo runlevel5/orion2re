@@ -990,6 +990,10 @@ namespace hooks {
         { 0x00412020, &namestar::Star_Name_Popup_Screen_Center_X_ },
         { 0x00429a90, &COLLAND::Colony_Landing_Screen_ },
         { 0x004dd880, &COLONY::Bldg_Coords_To_Effective_Frame_ },
+        { 0x00429da0, &COLLAND::Draw_Colony_Landing_Screen_ },
+        { 0x00429f50, &COLLAND::Print_Planet_Data_ },
+        { 0x004dbd00, &COLONY::Reset_Field_Arrays_ },
+        { 0x004dfc10, &COLONY::Colony_Screen_ },
     };
 
     void Install_Hooks()

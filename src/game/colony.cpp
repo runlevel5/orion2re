@@ -1,4 +1,5 @@
 #include "deps.h"
+#include "harold.h"
 
 namespace COLONY {
     void __cdecl Init_Colonies_() {
@@ -821,6 +822,30 @@ namespace COLONY {
         COLSUM::Set_Colony_Font_To_(3);
     }
 
+    void __cdecl Reset_Field_Arrays_() {
+        COLONY::Clear_Sys_Disp_Fields_();
+
+        for (int i = 0; i < 5; ++i) {
+            COLONY::_sys_disp_summ_fields[i] = -1000;
+        }
+
+        for (int i = 0; i < 21; ++i) {
+            COLONY::_colony_fields[i] = -1000;
+        }
+
+        for (int i = 0; i < 2; ++i) {
+            COLONY::_military_fields[i] = -1000;
+        }
+
+        for (int i = 0; i < 42; ++i) {
+            COLONY::_pop_fields[i] = -1000;
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            COLONY::_job_fields[i] = -1000;
+        }
+    }
+
     void __cdecl Show_Colony_Screen_() {
         MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         fields::Deactivate_Auto_Function_();
@@ -876,6 +901,141 @@ namespace COLONY {
         } else {
             return ((int16_t)y * 6 - x) + 5;
         }
+    }
+
+    void __cdecl Colony_Screen_() {
+        int16_t input_val;
+        int16_t scanned_val;
+        bool input_received = false;
+        bool quit_flag = false;
+
+        uint32_t saved_seed = random::Get_Random_Seed_();
+        random::Set_Random_Seed_(static_cast<uint32_t>(_colony_handle));
+        video::Clip_Off_();
+        _using_colony_screen_palette = 1;
+
+        _star_handle = (int32_t)MOX::_screen_data;
+        _orbit_n = (int32_t)_orbit_temp;
+        int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, _orbit_temp);
+        _planet_handle = (int32_t)planet_idx;
+
+        _colony_handle = MOX::_planet[_planet_handle].colony_index;
+        _g_scanned_star = -1;
+        _g_scanned_planet = -1;
+        _sys_disp_star_handle = _star_handle;
+
+        if (_colony_handle == -1) {
+            _valid_colony = 0;
+            _drawing_display = 2;
+            _planet_display_handle = static_cast<uint16_t>(planet_idx);
+        } else {
+            _valid_colony = 1;
+            _drawing_display = 0;
+            _g_scanned_planet = -1;
+        }
+
+        fields::Clear_Mouse_Buffer_();
+        fields::Set_Input_Delay_(3);
+        Set_Colony_Screen_Help_List_();
+
+        int16_t saved_player_num = MOX::_PLAYER_NUM;
+        MOX::_PLAYER_NUM = static_cast<int16_t>(MOX::_colony[_colony_handle].owner);
+
+        Load_Colony_Screen_Seg_();
+        Load_Planet_Screen_();
+
+        if (!_valid_colony) {
+            MOX::_current_screen = MOX::_return_screen;
+            return;
+        }
+
+        Make_Bldg_Array_For_Colony_(_colony_handle, 0);
+
+        if (MOX::_return_screen != MOX::_current_screen) {
+            _colony_saved_screen = MOX::_return_screen;
+        }
+
+        fields::Clear_Fields_();
+        Set_Colony_Font_();
+        mouse::Set_Mouse_List(COLGCBT::_mouse_list_blank, 1);
+        video::Set_Page_Off_();
+        video::Set_Refresh_Stencil_();
+
+        if (Fast_Fade_Out_Needed_For_Colony_Palette_()) {
+            Fast_Fade_Out_();
+        }
+
+        Update_Colony_Palette_();
+
+        if (Fast_Fade_Out_Needed_For_Colony_Palette_()) {
+            palstore::Darken_Palette_(100);
+            palette::Clear_Palette_Changes_(0, 255);
+        }
+
+        palette::Refresh_Palette_();
+        Reset_Field_Arrays_();
+        Update_Fields_();
+        _full_draw = 1;
+
+        fields::Assign_Auto_Function_(Draw_Colony_Screen_, 1);
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+        Draw_Colony_Screen_();
+        Fast_Fade_In_();
+        video::Set_Refresh_Stencil_();
+        mouse::Set_Mouse_List(MOX::_mouse_list_arrow, 1);
+        Do_Informational_And_Decision_Popups_();
+
+        while (true) {
+            timer::Mark_Time_();
+            _g_count++;
+
+            if (input_received) {
+                Update_Fields_();
+                input_val = 0;
+            }
+
+            Draw_Colony_Screen_();
+            MOX::Mox_Sync_Update_();
+
+            input_val = fields::Get_Input_();
+            scanned_val = fields::Scan_Input_();
+            input_received = (input_val != 0);
+
+            if (!Evaluate_Input_(&input_val, &scanned_val)) {
+                quit_flag = true;
+            }
+
+            timer::Release_Time_(1);
+
+            if (quit_flag) break;
+
+            if (_valid_colony) {
+                if (input_val == _colony_fields[1]) break;
+            } else {
+                if (input_val == _colony_fields[0] && input_val == _colony_fields[1]) break;
+            }
+        }
+
+        Reset_Field_Mode_();
+        fields::Clear_Fields_();
+        Clear_Fake_Buttons_();
+        fields::Deactivate_Auto_Function_();
+        
+        MOX::_PLAYER_NUM = saved_player_num;
+        _using_colony_screen_palette = 0;
+
+        if (!quit_flag) {
+            Fix_Colony_Queue_(_colony_handle);
+            if (MOX::_return_screen == MOX::_current_screen) {
+                MOX::_current_screen = _colony_saved_screen;
+                MOX::_return_screen = _colony_saved_screen;
+            } else {
+                MOX::_current_screen = MOX::_return_screen;
+            }
+        }
+
+        fields::Deactivate_Help_List_();
+        random::Set_Random_Seed_(saved_seed);
     }
 
     void __cdecl Tested_Colony_Buys_Outright_(int16_t colony_idx) {

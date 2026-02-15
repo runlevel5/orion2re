@@ -1,11 +1,79 @@
 #include "deps.h"
+#include <cstdio>
 
 namespace COLLAND {
+    /**
+     * @address 00429f50
+     */
+    void __cdecl Print_Planet_Data_(int16_t planet_idx) {
+        char buffer[500];
+        s_planet_data* planet = &MOX::_planet[planet_idx];
+
+        COLSUM::Set_Colony_Font_To_(4);
+
+        if (planet->colony_index == -1) {
+            char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
+            char* fmt = ESTRINGS::E_Strings_(0x46 /* ESTR_S1 */);
+            _sprintf(buffer, fmt, planet_name);
+        } else {
+            s_colony* colony = &MOX::_colony[planet->colony_index];
+            char* race_name = MOX::_player[colony->owner].race_name;
+            char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
+            char* fmt = ESTRINGS::E_Strings_(0x28 /* ESTR_S__S_COLONY */);
+            _sprintf(buffer, fmt, planet_name, race_name);
+        }
+        fonts::Print_(0x14, 0x28, buffer);
+
+        char* climate_str;
+        char* size_str = MOX::_planet_size_string[planet->size];
+
+        if (planet->colony_index == -1) {
+            if (planet->planet_type != 3 /* PLANET_TYPE_PLANET */) {
+                char* gas_giant_msg = ESTRINGS::E_Strings_(0x132 /* ESTR_GAS_GIANT__UNINHABITABLE */);
+                _sprintf(buffer, gas_giant_msg);
+                fonts::Print_(0x14, 0x3c, buffer);
+                return;
+            }
+            climate_str = MOX::_planet_climate_string[planet->climate];
+        } else {
+            climate_str = MOX::_planet_climate_string[(uint8_t)MOX::_colony[planet->colony_index].climate];
+        }
+
+        const char* fmt_size_climate;
+        if (MOX::_settings.language == 4) {
+            fmt_size_climate = s_format_comma_space;
+        } else {
+            fmt_size_climate = ESTRINGS::E_Strings_(0x2d /* ESTR_S_S */);
+        }
+
+        _sprintf(buffer, fmt_size_climate, size_str, climate_str);
+        BILL::_Print_Paragraph_(0x14, 0x3c, 0x26b, buffer, 0);
+
+        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
+        char* fmt_pop = ESTRINGS::E_Strings_(0x1f);
+        _sprintf(buffer, fmt_pop, (int)max_pop);
+        fonts::Print_(0x14, 0x50, buffer);
+
+        char* mineral_str = MOX::_mineral_class_string[planet->mineral_class];
+        char* fmt_minerals = ESTRINGS::E_Strings_(0x176);
+        _sprintf(buffer, fmt_minerals, mineral_str);
+        fonts::Print_(0x14, 100, buffer);
+
+        fonts::Print_(0x14, 0x78, MOX::_planet_gravity_string[planet->gravity_class]);
+
+        if (planet->planet_special != 0) {
+            char* special_str = MOX::_planet_special_string[planet->planet_special];
+            char* fmt_special = ESTRINGS::E_Strings_(0x46 /* ESTR_S1 */);
+            _sprintf(buffer, fmt_special, special_str);
+            BILL::_Print_Paragraph_(0x14, 0x8c, 0x26b, buffer, 0);
+        }
+    }
+
     /**
      * @address 00429d40
      */
     void __cdecl Load_Anims_() {
-        COLLAND::_l_anims = (uint32_t)(uintptr_t)farload::Far_Reload_Next_(COLONY::_COLONY_LBX, 6, MOX::_screen_seg);
+        COLLAND::_l_anims = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY_LBX, 6, MOX::_screen_seg);
     }
 
     void Add_Fields_() {
@@ -22,6 +90,68 @@ namespace COLLAND {
             hotkey,
             sound
         );
+    }
+
+    /**
+     * @address 00429da0
+     */
+    void __cdecl Draw_Colony_Landing_Screen_() {
+        char buffer[500];
+
+        video::Set_Page_Off_();
+
+        if (COLONY::_full_draw != 0) {
+            graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+
+            s_animation_header* anim1 = COLONY::C_Anims_(1);
+            animate::Draw_(0, 0, anim1);
+
+            s_animation_header* anim0 = COLONY::C_Anims_(0);
+            animate::Draw_(0, 0, anim0);
+
+            COLSUM::Set_Colony_Font_To_(4);
+
+            char* planet_name = HACCESS::Get_Planet_Name_((int16_t)COLONY::_planet_handle);
+            char* format = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
+            _sprintf(buffer, format, planet_name);
+            fonts::Print_Centered_(0x13F, 10, buffer);
+
+            if (COLONY::_full_draw != 0) {
+                video::Copy_Off_To_Back_();
+                video::Set_Refresh_Stencil_();
+                COLONY::_full_draw = 0;
+            }
+        }
+
+        animate::Draw_(0, 0, COLLAND::_l_anims);
+
+        int16_t current_frame = animate::Get_Current_Frame_(COLLAND::_l_anims);
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(COLLAND::_l_anims);
+
+        if (((int32_t)frame_count - 2) <= (int32_t)current_frame) {
+            COLLAND::Print_Planet_Data_((int16_t)COLONY::_planet_handle);
+        }
+
+        if (current_frame == 1) {
+            COLLAND::_pod1d_sfx = ERICNET::Mox_Play_Sound_(0x3A);
+            return;
+        }
+
+        if (current_frame == 2) {
+            COLLAND::_pod2d_sfx = ERICNET::Mox_Play_Sound_(0x3A);
+            return;
+        }
+
+        if (current_frame == 0x39) {
+            sound::Fadeout_Sound_(COLLAND::_pod1d_sfx, 2);
+            COLLAND::_pod1l_sfx = ERICNET::Mox_Play_Sound_(0x39);
+            return;
+        }
+
+        if (current_frame == 0x3E) {
+            sound::Fadeout_Sound_(COLLAND::_pod2d_sfx, 2);
+            COLLAND::_pod2l_sfx = ERICNET::Mox_Play_Sound_(0x39);
+        }
     }
 
     /**
@@ -81,8 +211,8 @@ namespace COLLAND {
             timer::Mark_Time_();
             Add_Fields_();
             Draw_Colony_Landing_Screen_();
-            animate::Get_Animation_Frame_Count_((s_animation_header*)(uintptr_t)_l_anims);
-            animate::Get_Current_Frame_((s_animation_header*)(uintptr_t)_l_anims);
+            animate::Get_Animation_Frame_Count_(COLLAND::_l_anims);
+            animate::Get_Current_Frame_(COLLAND::_l_anims);
             RUSS::Mox_Sync_Update_();
             input_result = fields::Get_Input_();
             fields::Scan_Input_();

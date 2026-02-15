@@ -8,10 +8,10 @@ namespace ERICNET {
         fn(planet_idx, owner_idx);
     }
 
-    inline void __cdecl Mox_Play_Sound_(int32_t sound_id) {
-        using Fn = void(__cdecl*)(int32_t);
+    inline int32_t __cdecl Mox_Play_Sound_(int32_t sound_id) {
+        using Fn = int32_t(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
-        fn(sound_id);
+        return fn(sound_id);
     }
 
     void __cdecl Init_Non_Homeworld_Colony_(int16_t colony_idx, int16_t player_idx);

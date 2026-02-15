@@ -242,6 +242,11 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
+    inline char** _planet_special_string = reinterpret_cast<char**>(std::uintptr_t{0x00597780});
+    inline char** _planet_climate_string = reinterpret_cast<char**>(std::uintptr_t{0x0059BA80});
+    inline char** _mineral_class_string = reinterpret_cast<char**>(std::uintptr_t{0x005A2C30});
+    inline char** _planet_size_string = reinterpret_cast<char**>(std::uintptr_t{0x005A47C0});
+
     inline char* (&_planet_gravity_string)[3] =
         *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x005A49E0});
 
@@ -545,6 +550,11 @@ namespace MOX {
         *reinterpret_cast<int16_t(*)[72]>(std::uintptr_t{0x0059B280});
 
     // Funcs
+    inline void __cdecl Mox_Sync_Update_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00483C80)();
+    }
+
     inline void Mox_Update_() {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
