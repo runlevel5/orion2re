@@ -206,6 +206,29 @@ namespace COLONY {
         memset(_colony_satellites, 0xff, sizeof(_colony_satellites));
     }
 
+    void __cdecl Draw_Building_With_Bottom_Centered_(int16_t x, int16_t y, int16_t type, int16_t col, int16_t row) {
+        s_animation_header* bldg_anim = COLBCACH::Cache_Load_Bldg_(col, row, type);
+
+        int32_t cr_x = CR_To_XY_(col, row, 0);
+        int32_t cr_y = CR_To_XY_(col, row, 1);
+
+        bitmap::Create_Blank_Bitmap_(120, 120, COLBLDG::_bldg_bitm);
+
+        int16_t offset_x = -(static_cast<int16_t>(cr_x) - 60);
+        int16_t offset_y = -(static_cast<int16_t>(cr_y) - 120);
+
+        bitmap::Add_Picture_To_Bitmap_(offset_x, offset_y, bldg_anim, (s_animation_header*)COLBLDG::_bldg_bitm);
+        bitmap::Mask_Out_Colors_(COLBLDG::_bldg_bitm, 240, 255);
+
+        int16_t min_x, min_y, actual_w, actual_h;
+        bitmap::Get_Bitmap_Actual_Size_((s_animation_header*)COLBLDG::_bldg_bitm, &min_x, &min_y, &actual_w, &actual_h);
+
+        int16_t draw_x = x - (actual_w / 2) - min_x;
+        int16_t draw_y = y - actual_h - min_y;
+
+        animate::Draw_(draw_x, draw_y, (s_animation_header*)COLBLDG::_bldg_bitm);
+    }
+
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_idx, uint8_t is_ui_view) {
         uint32_t previous_seed = random::Get_Random_Seed_();
         random::Set_Random_Seed_(static_cast<uint32_t>(colony_idx));
@@ -297,6 +320,38 @@ namespace COLONY {
         }
 
         random::Set_Random_Seed_(previous_seed);
+    }
+
+    void __cdecl Find_Replacement_Slot_For_Building_(int16_t bldg_id, int16_t* out_row, int16_t* out_col) {
+        int16_t min_cost = 1000;
+
+        if (bldg_id >= 0) {
+            *out_row = 0;
+            *out_col = 0;
+
+            for (int16_t i = 0; i < 6; ++i) {
+                for (int16_t j = 0; j < 6; ++j) {
+                    int16_t current_bldg_id = static_cast<int16_t>(COLONY::_colony_bldgs[i].buildings[j]);
+
+                    if (current_bldg_id == BUILDING_ARTEMIS_SYSTEM_NET || 
+                        current_bldg_id == BUILDING_DIMENSIONAL_PORTAL || 
+                        current_bldg_id == BUILDING_STAR_BASE || 
+                        current_bldg_id == BUILDING_STAR_FORTRESS) {
+                        min_cost = 0;
+                        *out_row = i;
+                        *out_col = j;
+                    } else {
+                        int32_t current_cost = TECHDATA::_buildings[current_bldg_id].cost;
+                        
+                        if (current_cost < static_cast<int32_t>(min_cost)) {
+                            *out_row = i;
+                            *out_col = j;
+                            min_cost = static_cast<int16_t>(current_cost);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -493,6 +548,220 @@ namespace COLONY {
         return turns;
     }
 
+    /**
+     * @address 004db8c0
+     */
+    void __cdecl Remap_Draw_Ship_Centered_(int16_t x, int16_t y, int16_t ship_index) {
+        uint8_t palette_buffer[31];
+
+        for (int i = 0; i < 31; ++i) {
+            palette_buffer[i] = 0x51 + i;
+        }
+
+        s_ship_data* ship = &MOX::_ship[ship_index];
+        int16_t picture_num = (int16_t)ship->d.picture_num;
+        int16_t previous_owner = (int16_t)ship->d.previous_owner;
+
+        if (picture_num != _ship_bitm_n || (int32_t)previous_owner != _g_ship_pic_n) {
+            _ship_bitm_n = picture_num;
+            _g_ship_pic_n = (int32_t)previous_owner;
+
+            void* picture_seg = KEN::Get_Ship_Picture_Seg_(previous_owner, picture_num);
+            bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_ship_bitm, picture_seg);
+
+            replace::Replace_Color_Range_(_ship_bitm, palette_buffer, 1, 31);
+
+            for (int16_t i = 0; i < 16; ++i) {
+                uint8_t replacement_color = palette_buffer[i * 2];
+                replace::Replace_Color_(_ship_bitm, i + 0xC0, (int32_t)replacement_color);
+                replace::Replace_Color_(_ship_bitm, i + 0xD0, (int32_t)replacement_color);
+            }
+        }
+
+        ERIC::Draw_Centered_(x, y, _ship_bitm);
+    }
+
+    /**
+     * @address 004dd5b0
+     */
+    int16_t __cdecl N_Houses_In_Bldg_Array_() {
+        int16_t house_count = 0;
+
+        for (int i = 0; i < 6; ++i) {
+            for (int j = 0; j < 6; ++j) {
+                int32_t building_id = _colony_bldgs[i].buildings[j];
+
+                if (building_id == BUILDING_ARTEMIS_SYSTEM_NET || 
+                    building_id == BUILDING_DIMENSIONAL_PORTAL || 
+                    building_id == BUILDING_STAR_BASE || 
+                    building_id == BUILDING_STAR_FORTRESS) {
+                    house_count++;
+                }
+            }
+        }
+
+        return house_count;
+    }
+
+    /**
+     * @address 004dd340
+     */
+    void __cdecl Insert_Bldg_Into_Array_(int16_t num_houses_delta, int16_t bldg_id, int16_t bldg_type, int8_t use_back_to_front) {
+        int16_t row = -1;
+        int16_t col = -1;
+        int16_t n_houses = COLONY::N_Houses_In_Bldg_Array_();
+
+        int total = (int)n_houses + (int)num_houses_delta;
+        int16_t house_mod = (int16_t)(total % 4);
+
+        if (bldg_type < 36 /* 0x24 */) {
+            if (use_back_to_front == 1) {
+                // TYPE MISMATCH: existing Bldg_Back_To_Front_ uses uint16_t*
+                COLONY::Bldg_Back_To_Front_(bldg_type, (uint16_t*)&row, (uint16_t*)&col);
+            } else {
+                int16_t empty_count = 0;
+                for (int16_t i = 0; i < 6; ++i) {
+                    for (int16_t j = 0; j < 6; ++j) {
+                        if (COLONY::_colony_bldgs[i].buildings[j] == 0) {
+                            empty_count++;
+                            if (random::Random_((int)empty_count) == 1) {
+                                row = i;
+                                col = j;
+                            }
+                        }
+                    }
+                }
+
+                if (row == -1 || (col == -1 && bldg_id != -3)) {
+                    COLONY::Find_Replacement_Slot_For_Building_(bldg_id, &row, &col);
+                }
+            }
+        } else {
+            COLONY::Find_Replacement_Slot_For_Building_(bldg_id, &row, &col);
+        }
+
+        if (row == -1 || col == -1) {
+            return;
+        }
+
+        if (bldg_id >= 0) {
+            COLONY::_colony_bldgs[row].buildings[col] = (int32_t)bldg_id;
+        } else if (bldg_id == -3) {
+            house_mod++;
+            int switch_idx = (int)house_mod % 4;
+
+            if (static_cast<uint32_t>(switch_idx) > 3) {
+                COLONY::_colony_bldgs[row].buildings[col] = BUILDING_DIMENSIONAL_PORTAL /* 0x0E */;
+            } else {
+                switch (switch_idx) {
+                case 0: COLONY::_colony_bldgs[row].buildings[col] = BUILDING_ARTEMIS_SYSTEM_NET /* 3 */; break;
+                case 1: COLONY::_colony_bldgs[row].buildings[col] = BUILDING_DIMENSIONAL_PORTAL /* 0x0E */; break;
+                case 2: COLONY::_colony_bldgs[row].buildings[col] = BUILDING_STAR_BASE /* 0x28 */; break;
+                case 3: COLONY::_colony_bldgs[row].buildings[col] = BUILDING_STAR_FORTRESS /* 0x29 */; break;
+                }
+            }
+        } else if (bldg_id == -1) {
+            COLONY::_colony_bldgs[row].buildings[col] = BUILDING_BATTLESTATION /* 8 */;
+        }
+    }
+
+    /**
+     * @address 004dd1f0
+     */
+    void Sort_Bldg_Array_Columns_() {
+        int16_t iteration = 0;
+        int16_t swapped_flag;
+
+        do {
+            swapped_flag = 0;
+
+            for (int16_t row = 0; row < 5; ++row) {
+                for (int16_t col = 0; col < 5; ++col) {
+                    int32_t& b1 = _colony_bldgs[row].buildings[col];
+
+                    int32_t& b_diag = _colony_bldgs[row + 1].buildings[col + 1];
+                    if (b1 != 0 && b_diag != 0 &&
+                        static_cast<uint8_t>(TECHDATA::_buildings[b_diag].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
+                        swapped_flag = static_cast<int16_t>(b1);
+                        int32_t temp = b1;
+                        b1 = b_diag;
+                        b_diag = temp;
+                    }
+
+                    int32_t& b_below = _colony_bldgs[row + 1].buildings[col];
+                    if (b1 != 0 && b_below != 0 &&
+                        static_cast<uint8_t>(TECHDATA::_buildings[b_below].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
+                        swapped_flag = static_cast<int16_t>(b1);
+                        int32_t temp = b1;
+                        b1 = b_below;
+                        b_below = temp;
+                    }
+
+                    int32_t& b_right = _colony_bldgs[row].buildings[col + 1];
+                    if (b1 != 0 && b_right != 0 &&
+                        static_cast<uint8_t>(TECHDATA::_buildings[b_right].type) < static_cast<uint8_t>(TECHDATA::_buildings[b1].type)) {
+                        swapped_flag = static_cast<int16_t>(b1);
+                        int32_t temp = b1;
+                        b1 = b_right;
+                        b_right = temp;
+                    }
+                }
+            }
+        } while (swapped_flag != 0 && ++iteration < 6);
+    }
+
+    /**
+     * @address 004ddda0
+     */
+    void __cdecl Bldg_Back_To_Front_(int16_t building_type, uint16_t* out_val1, uint16_t* out_val2) {
+        const uint8_t lookup_table[72] = {
+            5, 5, 5, 4, 4, 5, 5, 3, 3, 5, 4, 4, 5, 2, 2, 5, 4, 3,
+            3, 4, 5, 1, 1, 5, 4, 2, 2, 4, 3, 3, 5, 0, 0, 5, 4, 1,
+            1, 4, 2, 3, 3, 2, 4, 0, 0, 4, 3, 1, 1, 3, 2, 2, 3, 0,
+            0, 3, 2, 1, 1, 2, 2, 0, 0, 2, 1, 1, 1, 0, 0, 1, 0, 0
+        };
+
+        if (out_val1) {
+            *out_val1 = static_cast<uint16_t>(lookup_table[building_type * 2]);
+        }
+
+        if (out_val2) {
+            *out_val2 = static_cast<uint16_t>(lookup_table[building_type * 2 + 1]);
+        }
+    }
+
+    void __cdecl Draw_Colony_Bldg_(int16_t col, int16_t row) {
+        if (col >= 0 && col < 6 && row >= 0 && row < 6) {
+            int32_t building_id = _colony_bldgs[col].buildings[row];
+            if (building_id != 0) {
+                s_animation_header* seg = COLBCACH::Cache_Load_Bldg_(col, row, building_id);
+
+                if (_full_draw) {
+                    int16_t prev_frame = animate::Get_Current_Frame_(seg);
+                    animate::Reset_Animation_Frame_(seg);
+
+                    while (animate::Get_Current_Frame_(seg) < prev_frame) {
+                        animate::Draw_(0, 0, seg);
+                    }
+
+                    if (_full_draw) {
+                        animate::Draw_(0, 0, seg);
+                        return;
+                    }
+                }
+
+                if (_scanned_bldg_C == col && _scanned_bldg_R == row) {
+                    if (ERIC::Global_Cycler_(30, 2)) {
+                        Draw_Bldg_CR_Dark_(col, row);
+                        return;
+                    }
+                }
+
+                animate::Draw_No_Glass_(0, 0, seg);
+            }
+        }
+    }
+
     void __cdecl Draw_Colony_Bldgs_() {
         bool is_scanning_valid = (_scanned_bldg_C != -1 && _scanned_bldg_R != -1);
 
@@ -513,6 +782,22 @@ namespace COLONY {
                     }
                 }
             }
+        }
+    }
+
+    void __cdecl Allocate_Mini_Planet_Cache_() {
+        return;
+    }
+
+    /**
+     * @address 004df750
+     */
+    void __cdecl Clear_Galaxy_Map_Fields_() {
+        _galaxy_map_name_field = -1000;
+        MOX::_galaxy_map_grid_field = -1000;
+
+        for (int i = 0; i < 72; ++i) {
+            MOX::_galaxy_map_star_field[i] = -1000;
         }
     }
 }

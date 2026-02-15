@@ -34,6 +34,7 @@
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\colony.cpp" />
+    <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
@@ -111,7 +112,9 @@
     <ClInclude Include="src\game\colbldg.h" />
     <ClInclude Include="src\game\colcalc.h" />
     <ClInclude Include="src\game\coldraw.h" />
+    <ClInclude Include="src\game\colgcbt.h" />
     <ClInclude Include="src\game\colland.h" />
+    <ClInclude Include="src\game\colmove.h" />
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\colony.h" />
     <ClInclude Include="src\game\colsum.h" />
@@ -135,6 +138,7 @@
     <ClInclude Include="src\game\evanhelp.h" />
     <ClInclude Include="src\game\events.h" />
     <ClInclude Include="src\game\exitm.h" />
+    <ClInclude Include="src\game\fakebuts.h" />
     <ClInclude Include="src\game\farload.h" />
     <ClInclude Include="src\game\fields.h" />
     <ClInclude Include="src\game\filedef.h" />

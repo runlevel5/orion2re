@@ -2,6 +2,7 @@
 #include <cstdint>
 
 struct s_animation_header;
+struct s_colors;
 
 namespace COLONY {
     inline s_colony_bldg (&_colony_bldgs)[6] =
@@ -12,6 +13,7 @@ namespace COLONY {
 
     inline const char* _RACEICON_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C88}); // "RACEICON.LBX"
     inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
+    inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
 
@@ -45,6 +47,12 @@ namespace COLONY {
     inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
 
     inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
+
+    inline void __cdecl Draw_Bldg_CR_Dark_(int16_t c, int16_t r) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004de110 });
+        fn(c, r);
+    }
 
     inline int16_t& _scanned_bldg_C = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E04});
     inline int16_t& _scanned_bldg_R = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E08});
@@ -96,17 +104,9 @@ namespace COLONY {
 
     void __cdecl Remap_Draw_Ship_D_Centered_(int16_t x, int16_t y, int16_t design_index);
 
-    inline void __cdecl Draw_Building_With_Bottom_Centered_(int32_t x, int32_t y, int16_t building_id, int32_t param_4, int32_t param_5) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddab0});
-        fn(x, y, building_id, param_4, param_5);
-    }
+    void __cdecl Draw_Building_With_Bottom_Centered_(int16_t x, int16_t y, int16_t type, int16_t col, int16_t row);
 
-    inline void __cdecl Remap_Draw_Ship_Centered_(int x, int y, int index) {
-        using Fn = void(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004db8c0});
-        fn(x, y, index);
-    }
+    void __cdecl Remap_Draw_Ship_Centered_(int16_t x, int16_t y, int16_t ship_index);
 
     int16_t __cdecl Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(int16_t colony_idx, int16_t product_id);
 
@@ -115,31 +115,41 @@ namespace COLONY {
     void __cdecl Clear_Colony_Buidlings_();
     void __cdecl Clear_Colony_Sattelites_();
 
-    inline void __cdecl Insert_Bldg_Into_Array_(int16_t colony_idx, int16_t bldg_id, int16_t count, uint8_t is_ui_view) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd340});
-        fn(colony_idx, bldg_id, count, is_ui_view);
+    int16_t __cdecl N_Houses_In_Bldg_Array_();
+
+    void __cdecl Find_Replacement_Slot_For_Building_(int16_t bldg_id, int16_t* out_row, int16_t* out_col);
+
+    inline int32_t __cdecl CR_To_XY_(int16_t col, int16_t row, int32_t axis) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd760});
+        return fn(col, row, axis);
     }
 
-    inline void __cdecl Sort_Bldg_Array_Columns_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd1f0});
-        fn();
-    }
+    void __cdecl Insert_Bldg_Into_Array_(int16_t num_houses_delta, int16_t bldg_id, int16_t bldg_type, int8_t use_back_to_front);
+
+    void __cdecl Sort_Bldg_Array_Columns_();
 
     bool __cdecl Get_Bldg_CR_(int16_t building_id, int16_t* row_out, int16_t* col_out);
 
-    inline void __cdecl Bldg_Back_To_Front_(int16_t i, uint16_t* col, uint16_t* row) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t*, uint16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddda0});
-        fn(i, col, row);
-    }
+    void __cdecl Bldg_Back_To_Front_(int16_t building_type, uint16_t* out_val1, uint16_t* out_val2);
 
-    inline void __cdecl Draw_Colony_Bldg_(uint16_t col, uint16_t row) {
-        using Fn = void(__cdecl*)(uint16_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de000});
-        fn(col, row);
-    }
+    void __cdecl Draw_Colony_Bldg_(int16_t col, int16_t row);
 
     void __cdecl Draw_Colony_Bldgs_();
+    void __cdecl Allocate_Mini_Planet_Cache_();
+
+    inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
+    inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
+
+    inline int16_t& _galaxy_map_name_field =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});
+
+    void __cdecl Clear_Galaxy_Map_Fields_();
+
+    inline uint16_t& _g_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00595E4C});
+
+    inline void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004E2030})(x, y, planet_index);
+    }
 }

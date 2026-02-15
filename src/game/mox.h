@@ -150,7 +150,7 @@ namespace MOX {
     inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
     inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
     inline int16_t& _fleet_movement_all_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597466});
-    inline uint16_t& _galaxy_map_scanned_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597762});
+    inline int16_t& _galaxy_map_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
@@ -531,6 +531,12 @@ namespace MOX {
     // Suggested name: MOX::box_visibility_flags
     inline int16_t (&_box_off_flag)[5] =
         *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x0059C420});
+
+    inline int16_t& _galaxy_map_grid_field =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAC});
+
+    inline int16_t (&_galaxy_map_star_field)[72] =
+        *reinterpret_cast<int16_t(*)[72]>(std::uintptr_t{0x0059B280});
 
     // Funcs
     inline void Mox_Update_() {

@@ -11,4 +11,10 @@ namespace ERICHELP {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00412350})();
     }
+
+    inline void __cdecl Set_Colony_Summary_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412330});
+        fn();
+    }
 }

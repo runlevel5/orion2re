@@ -22,6 +22,12 @@ namespace animate {
 
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* resource);
 
+    inline void __cdecl Draw_No_Glass_(int16_t x, int16_t y, s_animation_header* seg) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00523fb0 });
+        fn(x, y, seg);
+    }
+
     inline void __cdecl Set_Animation_Palette_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(0x00524930)();

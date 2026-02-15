@@ -39,4 +39,10 @@ namespace ERIC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050d220});
         fn(anim);
     }
+
+    inline void __cdecl Draw_Centered_(int16_t x, int16_t y, void* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba840});
+        fn(x, y, bitmap);
+    }
 }

@@ -255,6 +255,18 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
+inline void __cdecl Draw_Colony_Scan_Info_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401A40});
+    fn();
+}
+
+inline void __cdecl Set_Colony_Font_To_(int font_id) {
+    using Fn = void(__cdecl*)(int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DBF40});
+    fn(font_id);
+}
+
 inline uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
     using Fn = uint8_t(__cdecl*)(int16_t, int16_t, char*);
     return reinterpret_cast<Fn>(std::uintptr_t{0x0045A680})(player_num, officer_id, message);

@@ -25,4 +25,10 @@ namespace bitmap {
         using Fn = void(__cdecl*)(int, int, int, int, void*);
         reinterpret_cast<Fn>(0x0052F0C0)(x, y, w, h, bmp);
     }
+
+    inline void __cdecl Mask_Out_Colors_(void* handle, uint8_t color_low, uint8_t color_high) {
+        using Fn = void(__cdecl*)(void*, uint8_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f8a0});
+        fn(handle, color_low, color_high);
+    }
 }

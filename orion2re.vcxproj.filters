@@ -234,6 +234,9 @@
     <ClCompile Include="src\game\colony.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\colsum.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -636,6 +639,15 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\replace.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\colgcbt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\fakebuts.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\colmove.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>
