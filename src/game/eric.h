@@ -45,4 +45,15 @@ namespace ERIC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba840});
         fn(x, y, bitmap);
     }
+
+    template <typename... Args>
+    inline void __cdecl String_Builder2_(char* buffer, int index, char* format, Args... args) {
+        using Fn = void(__cdecl*)(char*, int, char*, ...);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004ba550})(buffer, index, format, args...);
+    }
+
+    inline const char* __cdecl Red_If_Negative_Fmt_String_(int16_t value) {
+        using Fn = const char*(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004bab20})(value);
+    }
 }

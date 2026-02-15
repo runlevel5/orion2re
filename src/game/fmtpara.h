@@ -7,4 +7,10 @@ namespace FMTPARA {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432e70});
         return fn();
     }
+
+    inline void __cdecl Print_Formatted_Paragraph_(short x, short y, short width, char* buffer, short unknown) {
+        using Fn = void(__cdecl*)(short, short, short, char*, short);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432dd0});
+        fn(x, y, width, buffer, unknown);
+    }
 }

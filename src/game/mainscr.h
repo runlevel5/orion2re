@@ -63,8 +63,8 @@ namespace MAINSCR {
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
-    inline uint8_t (&_ship_direction_line_red_colors)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00559830});
-    inline uint8_t (&_ship_direction_line_green_colors)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00559838});
+    inline s_colors &_ship_direction_line_red_colors = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00559830});
+    inline s_colors &_ship_direction_line_green_colors = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00559838});
     inline uint8_t& _fltpop_field_selection_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CECC});
     inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
     inline s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});

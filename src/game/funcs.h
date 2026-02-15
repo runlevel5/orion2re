@@ -425,6 +425,10 @@ inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   //
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
 
+inline const char* s_0_00551104 = reinterpret_cast<const char*>(0x00551104); // " 0"
+inline const char* s_2_00551108 = reinterpret_cast<const char*>(0x00551108); // " 2"
+inline const char* s_1_00551114 = reinterpret_cast<const char*>(0x00551114); // " 1"
+
 inline const char* const s_e_0055ac48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC48}); // "e"
 
 inline const char* const s_Null_Pointer_0055b658 =

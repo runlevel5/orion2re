@@ -41,6 +41,11 @@ namespace BILL {
         reinterpret_cast<Fn>(std::uintptr_t{0x00407680})(x, y, x2, y2, buffer, unknown);
     }
 
+    inline void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t a1, int16_t y, uint16_t type, int16_t a4, void* buffer, int32_t a6) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, int16_t, void*, int32_t);
+        reinterpret_cast<Fn>(0x004076f0)(a1, y, type, a4, buffer, a6);
+    }
+
     inline void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* text, int16_t width) {
         using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407410});

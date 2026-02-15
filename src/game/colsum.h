@@ -36,10 +36,15 @@ namespace COLSUM {
     inline uint8_t& _colsum_strings_been_loaded =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005510ec});
 
+    inline int8_t (&_event_good_lookup)[36] =
+        *reinterpret_cast<int8_t(*)[36]>(std::uintptr_t{0x005510C8});
+
     inline char* (&_wee_event_strings)[36] =
         *reinterpret_cast<char* (*)[36]>(std::uintptr_t{0x00564668});
 
     void __cdecl Load_Colsum_Strings_();
+
+    bool __cdecl Event_Good_(int16_t event_id);
 
     void __cdecl Sort_Col_List_();
 
@@ -51,17 +56,12 @@ namespace COLSUM {
 
     void __cdecl Draw_Colony_Summary_Screen_();
 
-    inline void __cdecl Update_First_(int16_t n, int16_t* first, int16_t* slider_pos) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401320});
-        fn(n, first, slider_pos);
-    }
+    void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3);
 
-    inline void __cdecl Draw_Empire_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401FD0});
-        fn();
-    }
+    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
+    inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
+
+    void __cdecl Draw_Empire_Info_();
 
     inline void __cdecl Draw_Galaxy_Map_() {
         using Fn = void(__cdecl*)();
@@ -69,17 +69,14 @@ namespace COLSUM {
         fn();
     }
 
-    inline void __cdecl Draw_Colony_Summary_For_Colony_(int16_t index) {
+    void __cdecl Draw_Colony_Summary_For_Colony_(int16_t index);
+
+    inline void __cdecl Draw_Info_Pop_For_(int16_t list_idx) {
         using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004021D0});
-        fn(index);
+        reinterpret_cast<Fn>(0x00402590)(list_idx);
     }
 
-    inline void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star1, int16_t star2, uint8_t* colors) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00402670});
-        fn(star1, star2, colors);
-    }
+    void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star_idx1, int16_t star_idx2, s_colors* pattern);
 
     inline void __cdecl Draw_Bar_Indicator_() {
         using Fn = void(__cdecl*)();

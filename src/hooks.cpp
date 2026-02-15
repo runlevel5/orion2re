@@ -917,6 +917,12 @@ namespace hooks {
         { 0x00401000, &COLSUM::Load_Colsum_Strings_ },
         { 0x00401c20, &COLSUM::Draw_Scan_Info_ },
         { 0x00401c70, &COLSUM::Draw_Colony_Summary_Screen_ },
+        { 0x00401320, &COLSUM::Update_First_ },
+        { 0x00401fd0, &COLSUM::Draw_Empire_Info_ },
+        { 0x004013b0, &COLSUM::Event_Good_ },
+        { 0x004021d0, &COLSUM::Draw_Colony_Summary_For_Colony_ },
+        { 0x00402670, &COLSUM::Colsum_Connect_Galaxy_Map_Stars_ },
+        { 0x004a0050, &ESTRINGS::E_Strings_ },
     };
 
     void Install_Hooks()

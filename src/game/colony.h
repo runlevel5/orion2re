@@ -16,6 +16,7 @@ namespace COLONY {
     inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
+    inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});
 
     void __cdecl Init_Colonies_();
 
@@ -140,6 +141,23 @@ namespace COLONY {
 
     inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
     inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
+
+    inline void __cdecl Set_Colony_Font_To_(int font_id) {
+        using Fn = void(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbf40});
+        fn(font_id);
+    }
+
+    inline void __cdecl Set_Colony_Font_To_Blue_(int16_t color_idx, uint32_t is_selected) {
+        using Fn = void(__cdecl*)(int16_t, uint32_t);
+        reinterpret_cast<Fn>(0x004dbe20)(color_idx, is_selected);
+    }
+
+    inline void __cdecl Set_Colony_Font_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbd90});
+        fn();
+    }
 
     inline int16_t& _galaxy_map_name_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});

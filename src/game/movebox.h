@@ -44,4 +44,10 @@ namespace MOVEBOX {
         using Fn = void(__cdecl*)(void*, int, int, int, int, int, int, int, int, int, int, int);
         reinterpret_cast<Fn>(std::uintptr_t{0x00512ab0})(header, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
     }
+
+    inline void __cdecl Get_Galaxy_Map_Star_XY_(int16_t star_idx, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t u1, int16_t u2, int16_t u3, int16_t* out_x, int16_t* out_y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005135B0});
+        fn(star_idx, x1, y1, x2, y2, u1, u2, u3, out_x, out_y);
+    }
 }

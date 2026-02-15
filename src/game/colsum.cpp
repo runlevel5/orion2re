@@ -114,6 +114,20 @@ namespace COLSUM {
         COLONY::_using_colony_screen_palette = 0;
     }
 
+    void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3) {
+        if (COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) < param_1) {
+            *param_3 = -1;
+            *param_2 = 0;
+            return;
+        }
+
+        if ((int32_t)COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *param_3 - *param_2 != param_1) {
+            COLONY::_full_draw = 1;
+            *param_2 = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM) - *param_3 - param_1;
+            COLONY::_scanned_pop = -1;
+        }
+    }
+
     void __cdecl Clear_List_Col_Array_() {
         memset(COLSUM::_list_col, 0xff, sizeof(COLSUM::_list_col));
     }
@@ -172,6 +186,38 @@ namespace COLSUM {
         COLONY::Load_Galaxy_Map_Anims_();
     }
 
+    void __cdecl Draw_Empire_Info_() {
+        char buffer[200];
+
+        COLONY::Set_Colony_Font_To_(2);
+
+        auto& player = MOX::_player[MOX::_PLAYER_NUM];
+
+        // Part 0: BC
+        ERIC::String_Builder2_(buffer, 0, ESTRINGS::E_Strings_(0x76 /* 118 */), s_0_0055110c, s_1_00551110, player.bc);
+
+        // Part 1: Surplus BC (with color formatting)
+        const char* red_fmt = ERIC::Red_If_Negative_Fmt_String_(player.surplus_bc);
+        ERIC::String_Builder2_(buffer, 1, ESTRINGS::E_Strings_(0x6a /* 106 */), s_0_0055110c, s_1_00551110, red_fmt, (int)player.surplus_bc);
+
+        // Part 2: Total Population
+        ERIC::String_Builder2_(buffer, 2, ESTRINGS::E_Strings_(0x72 /* 114 */), s_0_0055110c, s_1_00551110, (int)player.total_pop);
+
+        // Part 3: Surplus Freighters
+        ERIC::String_Builder2_(buffer, 3, ESTRINGS::E_Strings_(0x67 /* 103 */), s_0_0055110c, s_1_00551110, (int)player.surplus_freighters);
+
+        // Part 4: Surplus Food
+        ERIC::String_Builder2_(buffer, 4, ESTRINGS::E_Strings_(0x66 /* 102 ESTR_SFOOD_SD */), s_0_0055110c, s_1_00551110, (int)player.surplus_food);
+
+        // Part 5: Research Produced
+        ERIC::String_Builder2_(buffer, 5, ESTRINGS::E_Strings_(0x75 /* 117 */), s_0_0055110c, s_1_00551110, (int)player.research_produced);
+
+        // Render the built strings
+        FMTPARA::Print_Formatted_Paragraph_(520 /* 0x208 */, 354 /* 0x162 */, 104 /* 0x68 */, buffer, 3);
+
+        COLONY::Set_Colony_Font_();
+    }
+
     void __cdecl Draw_Colony_Summary_Screen_() {
         COLONY::_g_count++;
         video::Set_Page_Off_();
@@ -209,10 +255,10 @@ namespace COLSUM {
         Draw_Scan_Info_();
 
         if (COLMOVE::_cluster_colony_n != -1 && COLONY::_g_colony_n != -1) {
-            uint8_t colors[6] = { 0xE8, 0xE9, 0xEA, 0xEB, 0xEA, 0xE9 };
+            s_colors colors = { 0xE8, 0xE9, 0xEA, 0xEB, 0xEA, 0xE9, 0, 0 };
             int16_t star1 = MOX::_planet[MOX::_colony[COLMOVE::_cluster_colony_n].planet].star_index;
             int16_t star2 = MOX::_planet[MOX::_colony[COLONY::_g_colony_n].planet].star_index;
-            Colsum_Connect_Galaxy_Map_Stars_(star1, star2, colors);
+            Colsum_Connect_Galaxy_Map_Stars_(star1, star2, &colors);
         }
 
         if (_draw_planet_sum == 1) {
@@ -229,6 +275,90 @@ namespace COLSUM {
         COLMOVE::Draw_Cluster_(pointer_x, pointer_y);
 
         video::Clip_Off_();
+    }
+
+    bool __cdecl Event_Good_(int16_t event_id) {
+        return static_cast<bool>(_event_good_lookup[event_id]);
+    }
+
+    void __cdecl Draw_Colony_Summary_For_Colony_(int16_t list_idx) {
+        char buffer[500];
+        char sub_buffer1[500];
+        char sub_buffer2[500];
+
+        int16_t colony_idx = _list_col[list_idx];
+        s_colony* colony = &MOX::_colony[colony_idx];
+        int16_t planet_idx = colony->planet;
+
+        fonts::Set_Outline_Color_(0x50, 0x50);
+
+        if (colony_idx == COLONY::_g_colony_n) {
+            Draw_Info_Pop_For_(list_idx);
+        }
+
+        int16_t event_id = EVENTS::Colony_Has_Event_(colony_idx);
+        COLONY::Set_Colony_Font_To_Blue_(2, colony_idx == COLONY::_g_colony_n);
+
+        uint16_t paragraph_type;
+        if (event_id == -1) {
+            s_planet_data* planet = &MOX::_planet[planet_idx];
+            s_star_data* star = &MOX::_star[planet->star_index];
+
+            if ((star->blockaded >> (MOX::_PLAYER_NUM & 0x1F) & 1) == 0) {
+                _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x0C));
+                _sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x0C));
+            } else {
+                _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), s_2_00551108);
+                _sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x86));
+            }
+
+            _sprintf(buffer, ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
+            paragraph_type = 0x59;
+        } else {
+            const char* event_prefix = Event_Good_(event_id) ? s_1_00551114 : s_2_00551108;
+            _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), event_prefix);
+            _sprintf(buffer, ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
+            paragraph_type = 0x57;
+        }
+
+        int16_t y_pos = list_idx * 0x1F + 0x26;
+        BILL::Squeeze_Formatted_Paragraph_Centered_(0x0C, y_pos, paragraph_type, 0x17, buffer, 0);
+
+        if (COLONY::_full_draw != 0) {
+            fonts::Set_Font_Style_Shadow_Down_(0, &COLONY::_font_color_array);
+            Draw_Info_Pop_For_(list_idx);
+
+            int16_t turn_count = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx);
+            COLONY::Set_Colony_Font_To_(1);
+
+            int16_t item_producing = colony->producing[0];
+            if (item_producing != -1) {
+                if (turn_count < 1 || turn_count > 9999) {
+                    if (colony->auto_building == 0) {
+                        _sprintf(buffer, ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
+                    } else {
+                        _sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing));
+                    }
+                } else {
+                    if (colony->auto_building == 0) {
+                        _sprintf(buffer, ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                    } else {
+                        _sprintf(buffer, ESTRINGS::E_Strings_(0x5C), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                    }
+                }
+
+                COLONY::Set_Colony_Font_To_Blue_(2, 0);
+                BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
+                fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
+                return;
+            }
+
+            if (colony->auto_building != 0) {
+                _sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(-1));
+                BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
+                fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
+            }
+        }
     }
 
     void __cdecl Load_Colsum_Strings_() {
@@ -274,5 +404,21 @@ namespace COLSUM {
         _wee_event_strings[33] = ESTRINGS::E_Strings_(0xff);
         _wee_event_strings[34] = ESTRINGS::E_Strings_(0x1f4);
         _wee_event_strings[35] = ESTRINGS::E_Strings_(0x186);
+    }
+
+    void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star_idx1, int16_t star_idx2, s_colors* pattern) {
+        int16_t x1, y1, x2, y2;
+
+        MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx1, 380, 349, 128, 91, 0, 0, 0, &x1, &y1);
+        MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx2, 380, 349, 128, 91, 0, 0, 0, &x2, &y2);
+
+        SHIPS::Draw_Directional_Multi_Colored_Line_(
+            x1 + 2,
+            y1 + 2,
+            x2 + 2,
+            y2 + 2,
+            pattern,
+            static_cast<int16_t>(COLONY::_g_count % 6)
+        );
     }
 }

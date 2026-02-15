@@ -17,4 +17,8 @@ namespace EVENTS {
     int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx);
 
     int16_t __cdecl Event_Check_Hyperspace_Flux_();
+    inline int16_t __cdecl Colony_Has_Event_(int16_t colony_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x00478190)(colony_idx);
+    }
 }

@@ -212,7 +212,7 @@ namespace MAINSCR {
     void __cdecl Draw_ETA_Destination_Line_() {
         int16_t x, y;
         int16_t dest_x, dest_y;
-        uint8_t color_buffer[8];
+        s_colors color_buffer;
 
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
         int32_t zoom_scale = 3 - (int32_t)zoom_level;
@@ -233,16 +233,14 @@ namespace MAINSCR {
         Get_Star_Draw_Coords_(MOX::_eta_star_id, &dest_x, &dest_y);
 
         if (MOX::_g_ship_move_info.field5_0x5 != 0 && MOX::_g_ship_move_info.field4_0x4 != 0) {
-            *reinterpret_cast<uint32_t*>(&color_buffer[0]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_red_colors[0]);
-            *reinterpret_cast<uint32_t*>(&color_buffer[4]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_red_colors[4]);
+            color_buffer = _ship_direction_line_red_colors;
 
-            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, color_buffer, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, &color_buffer, MOX::_multi_colored_line_start);
         } else if ((MOX::_g_ship_move_info.field0_0x0 != 0 || MOX::_g_ship_move_info.field13_0xd != 0) ||
                  (MOX::_g_ship_move_info.field6_0x6 != 0 && MOX::_g_ship_move_info.field2_0x2 == 0)) {
-            *reinterpret_cast<uint32_t*>(&color_buffer[0]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_green_colors[0]);
-            *reinterpret_cast<uint32_t*>(&color_buffer[4]) = *reinterpret_cast<uint32_t*>(&_ship_direction_line_green_colors[4]);
+            color_buffer = _ship_direction_line_green_colors;
 
-            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, color_buffer, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, &color_buffer, MOX::_multi_colored_line_start);
         }
     }
 
@@ -363,7 +361,7 @@ namespace MAINSCR {
 
     void __cdecl Draw_Relocation_Links_() {
         int16_t window_status;
-        uint8_t colors[8] = { 0x6e, 0x6f, 0x70, 0x70, 0x6e, 0x6f, 0x70, 0x70 };
+        s_colors colors = { 0x6e, 0x6f, 0x70, 0x70, 0x6e, 0x6f, 0x70, 0x70 };
 
         MISC::Save_Window_Status_(&window_status);
         graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
@@ -376,7 +374,7 @@ namespace MAINSCR {
                     MAINSCR::Get_Star_Draw_Coords_(star_idx, &x1, &y1);
                     int16_t dest_idx = HACCESS::Relocation_(star_idx, MOX::_PLAYER_NUM);
                     MAINSCR::Get_Star_Draw_Coords_(dest_idx, &x2, &y2);
-                    SHIPS::Draw_Directional_Multi_Colored_Line_(x1, y1, x2, y2, colors, MOX::_multi_colored_line_start);
+                    SHIPS::Draw_Directional_Multi_Colored_Line_(x1, y1, x2, y2, &colors, MOX::_multi_colored_line_start);
                 }
             }
         }
