@@ -1,6 +1,42 @@
 #include "deps.h"
 
 namespace COLSUM {
+    void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            int16_t best_planet = Pick_Best_Planet_To_Goto_At_Star_(star_idx);
+
+            if (*param_1 == MOX::_galaxy_map_star_field[star_idx] && best_planet != -1) {
+                for (int16_t colony_list_idx = 0; colony_list_idx < MOX::_NUM_COLONIES; ++colony_list_idx) {
+                    int16_t col_idx = COLXPORT::_g_colony_list_ptr[colony_list_idx];
+
+                    if (col_idx != -1 && MOX::_colony[col_idx].planet == best_planet) {
+                        _first = colony_list_idx;
+
+                        while (COLXPORT::_g_colony_list_ptr[_first + 9] == -1) {
+                            Increment_First_(10);
+                        }
+
+                        int16_t n_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+                        _slider_bar_position = n_colonies - _first - 10;
+
+                        Update_First_(10, &_first, &_slider_bar_position);
+                        Update_Col_List_();
+                        COLONY::_full_draw = 1;
+                    }
+                }
+            }
+
+            if (*param_2 == MOX::_galaxy_map_star_field[star_idx]) {
+                best_planet = Pick_Best_Planet_To_Goto_At_Star_(star_idx);
+                MOX::_galaxy_map_scanned_star = star_idx;
+
+                if (best_planet != -1) {
+                    COLONY::_g_colony_n = MOX::_planet[best_planet].colony_index;
+                }
+            }
+        }
+    }
+
     void __cdecl Draw_Scan_Info_() {
         Draw_Colony_Scan_Info_();
         Set_Colony_Font_To_(1);
@@ -128,7 +164,7 @@ namespace COLSUM {
         }
     }
 
-    void __cdecl Decrement_First_(int16_t num_items) {
+    void __cdecl Increment_First_(int16_t num_items) {
         int16_t colonies_count = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
 
         if (colonies_count >= num_items) {
@@ -144,11 +180,7 @@ namespace COLSUM {
         }
     }
 
-    /**
-     * Increments the first visible colony index and updates the scrollbar position
-     * if there are enough colonies to shift the view.
-     */
-    void __cdecl Increment_First_(int16_t count) {
+    void __cdecl Decrement_First_(int16_t count) {
         int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
 
         if (num_colonies >= count) {
@@ -230,6 +262,42 @@ namespace COLSUM {
         _x_fields[0] = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
     }
 
+    void __cdecl Add_Fields_Pop_For_(int16_t colony_idx) {
+        int16_t col_id = _list_col[colony_idx];
+        for (int16_t i = 0; i < 3; ++i) {
+            int32_t idx = colony_idx * 3 + i;
+            if (col_id == -1) {
+                _list_col_job_fields[idx] = -1000;
+            } else {
+                int16_t val1, val2;
+                if (i == 0) {
+                    val2 = 101;
+                    val1 = 236;
+                } else if (i == 1) {
+                    val2 = 236;
+                    val1 = 378;
+                } else {
+                    val2 = 378;
+                    val1 = 512;
+                }
+
+                COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+                    col_id,
+                    i,
+                    1,
+                    val2,
+                    (int16_t)(colony_idx * 31 + 34),
+                    (int16_t)(val1 - 10),
+                    0,
+                    _list_col_pop_ref[idx].refs,
+                    &_list_col_pop_count[idx],
+                    &_list_col_coord_vars[idx],
+                    &_list_col_job_fields[idx]
+                );
+            }
+        }
+    }
+
     void __cdecl Update_Col_List_() {
         for (int i = 0; i < 10; ++i) {
             int16_t colony_idx = COLXPORT::_g_colony_list_ptr[COLSUM::_first + i];
@@ -274,7 +342,7 @@ namespace COLSUM {
     void __cdecl Draw_Empire_Info_() {
         char buffer[200];
 
-        COLONY::Set_Colony_Font_To_(2);
+        Set_Colony_Font_To_(2);
 
         auto& player = MOX::_player[MOX::_PLAYER_NUM];
 
@@ -432,7 +500,7 @@ namespace COLSUM {
             Draw_Info_Pop_For_(list_idx);
 
             int16_t turn_count = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx);
-            COLONY::Set_Colony_Font_To_(1);
+            Set_Colony_Font_To_(1);
 
             int16_t item_producing = colony->producing[0];
             if (item_producing != -1) {
@@ -599,13 +667,13 @@ namespace COLSUM {
         int16_t field = *field_ptr;
 
         if (field == _x_fields[1]) {
-            Decrement_First_(10);
+            Increment_First_(10);
             return true;
         }
 
         if (field == _x_fields[2]) {
             if (COLXPORT::_g_colony_list_ptr[_first + 10] != -1) {
-                Increment_First_(10);
+                Decrement_First_(10);
                 return true;
             }
         }
@@ -658,5 +726,209 @@ namespace COLSUM {
         Check_Galaxy_Map_Fields_(field_ptr, param_2);
 
         return result;
+    }
+
+    /**
+     * Evaluates UI input for the population management section of the colony summary screen.
+     * Updates colony scanning and cluster selection based on the active UI fields.
+     */
+    void __cdecl Evaluate_Colony_Pop_Input_(int16_t* input_field_1, int16_t* input_field_2, int16_t colony_idx_in_list) {
+        if (colony_idx_in_list == 0) {
+            COLONY::_scanned_pop = -1;
+        }
+
+        for (int16_t job_idx = 0; job_idx < 3; ++job_idx) {
+            int field_idx = colony_idx_in_list * 3 + job_idx;
+            int16_t job_field_id = _list_col_job_fields[field_idx];
+
+            if (*input_field_1 == job_field_id) {
+                if (COLMOVE::_cluster_colony_n == -1) {
+                    int16_t selected_pop = Get_Selected_Pop_(colony_idx_in_list, job_idx);
+                    if (selected_pop != -1) {
+                        COLMOVE::Get_Cluster_(_list_col[colony_idx_in_list], selected_pop);
+                    }
+                    COLONY::_full_draw = 1;
+                } else {
+                    COLMOVE::Send_Cluster_(_list_col[colony_idx_in_list], job_idx);
+                    Draw_Colony_Summary_();
+                }
+            }
+
+            if (*input_field_2 == job_field_id) {
+                COLONY::_scanned_pop = Get_Scanned_Pop_(colony_idx_in_list, job_idx);
+            }
+        }
+
+        int16_t active_field_2 = *input_field_2;
+        if (_list_fields[colony_idx_in_list] == active_field_2 ||
+            _list_col_prod_fields[colony_idx_in_list] == active_field_2 ||
+            _list_buy_fields[colony_idx_in_list] == active_field_2) 
+        {
+            int16_t colony_id = _list_col[colony_idx_in_list];
+            COLONY::_g_colony_n = colony_id;
+            
+            // Accessing planet index from colony structure (size 361) and star index from planet structure (size 17)
+            int16_t planet_idx = MOX::_colony[colony_id].planet;
+            MOX::_galaxy_map_scanned_star = static_cast<int16_t>(MOX::_planet[planet_idx].star_index);
+        }
+    }
+
+    bool __cdecl Evaluate_Col_List_Input_(int16_t* p_input_field, int16_t* p_input_field_2) {
+        if (COLSUM::_draw_planet_sum == 1) {
+            if (*p_input_field == 0) {
+                return true;
+            }
+            COLSUM::_draw_planet_sum = 0;
+            if (*p_input_field > 0) {
+                *p_input_field = 0;
+            }
+        }
+
+        for (int i = 0; i < 10; ++i) {
+            int16_t current_input = *p_input_field;
+
+            if (COLSUM::_list_fields[i] == current_input) {
+                if (COLMOVE::_cluster_colony_n != -1) {
+                    COLMOVE::Send_Cluster_(COLSUM::_list_col[i], -1);
+                    COLSUM::Draw_Colony_Summary_();
+                } else {
+                    int16_t colony_idx = COLSUM::_list_col[i];
+                    int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+                    MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                    COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
+
+                    MOX::_return_screen = MOX::_current_screen;
+                    MOX::_current_screen = 1;
+                    *p_input_field = _x_fields[3];
+                }
+            } else if (_list_col_prod_fields[i] == current_input) {
+                fields::Deactivate_Auto_Function_();
+                FAKEBUTS::Clear_Fake_Buttons_();
+                COLONY::Clear_Galaxy_Map_Fields_();
+                fields::Clear_Fields_();
+
+                int16_t colony_idx = COLSUM::_list_col[i];
+                int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+                MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
+
+                int16_t target_planet = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+                MOX::_planet[target_planet].colony_index = colony_idx;
+
+                if (COLMOVE::_cluster_colony_n != -1) {
+                    COLMOVE::Clear_Cluster_();
+                    COLONY::Reset_Mouse_Picture_();
+                }
+
+                MOX::_return_screen = MOX::_current_screen;
+                MOX::_current_screen = 25 /* 0x19 */;
+                return false;
+            } else if (COLSUM::_list_fields[i] + current_input == 0) {
+                int16_t colony_idx = COLSUM::_list_col[i];
+                int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+                MOX::_screen_data = (int16_t)MOX::_planet[planet_idx].star_index;
+                COLONY::_orbit_temp = (int16_t)MOX::_planet[planet_idx].orbit;
+                COLSUM::_draw_planet_sum = 1;
+            } else if (_list_buy_fields[i] == current_input) {
+                COLONY::Tested_Colony_Buys_Outright_(COLSUM::_list_col[i]);
+                COLSUM::Draw_Colony_Summary_();
+            }
+
+            COLSUM::Evaluate_Colony_Pop_Input_(p_input_field, p_input_field_2, i);
+        }
+
+        return true;
+    }
+
+    /**
+     * @address 00403590
+     */
+    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1, int16_t param_2) {
+        int16_t colony_idx = _list_col[param_1];
+        int16_t val_ebx;
+        int16_t val_ebp;
+
+        if (param_2 == -1) {
+            val_ebx = 101 /* 0x65 */;
+        } else if (param_2 == 0) {
+            val_ebx = 236 /* 0xec */;
+        } else {
+            val_ebx = (param_2 == 1) ? 378 /* 0x17a */ : 512 /* 0x200 */;
+        }
+
+        if (param_2 == 0) {
+            val_ebp = 101 /* 0x65 */;
+        } else if (param_2 == 1) {
+            val_ebp = 236 /* 0xec */;
+        } else {
+            val_ebp = (param_2 == 2) ? 378 /* 0x17a */ : 512 /* 0x200 */;
+        }
+
+        int32_t list_idx = (int32_t)param_1 * 3 + (int32_t)param_2;
+
+        int16_t result = COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+            colony_idx,
+            param_2,
+            4,
+            val_ebp,
+            (int16_t)(param_1 * 31 + 38),
+            (int16_t)(val_ebx - 10),
+            0,
+            _list_col_pop_ref[list_idx].refs,
+            &_list_col_pop_count[list_idx],
+            &_list_col_coord_vars[list_idx],
+            &_list_col_job_fields[list_idx]
+        );
+
+        COLONY::_g_colony_n = colony_idx;
+        MOX::_galaxy_map_scanned_star = (int16_t)MOX::_planet[MOX::_colony[colony_idx].planet].star_index;
+
+        return result;
+    }
+
+    int16_t __cdecl Get_Selected_Pop_(int16_t colony_idx, int16_t job_idx) {
+        int32_t ebx_val;
+        if (job_idx == -1) {
+            ebx_val = 101;
+        } else if (job_idx == 0) {
+            ebx_val = 236;
+        } else {
+            ebx_val = (job_idx == 1) ? 378 : 512;
+        }
+
+        int32_t ebp_val;
+        if (job_idx == 0) {
+            ebp_val = 101;
+        } else if (job_idx == 1) {
+            ebp_val = 236;
+        } else {
+            ebp_val = (job_idx == 2) ? 378 : 512;
+        }
+
+        int32_t index = (int32_t)colony_idx * 3 + (int32_t)job_idx;
+
+        return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+            _list_col[colony_idx],
+            job_idx,
+            3,
+            (int16_t)ebp_val,
+            (int16_t)(colony_idx * 31 + 38),
+            (int16_t)(ebx_val - 10),
+            0,
+            _list_col_pop_ref[index].refs,
+            &_list_col_pop_count[index],
+            &_list_col_coord_vars[index],
+            &_list_col_job_fields[index]
+        );
+    }
+
+    void __cdecl Set_Colony_Font_To_(int16_t style) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+        fonts::Set_Font_Style_Shadow_Down_(static_cast<int32_t>(style & 0xFF), &COLONY::_font_color_array);
+        fonts::Set_Font_Highlight_Colors_(&COLONY::_bright_blue_font_color_array);
+        fonts::Set_Font_Special_Colors_(&COLONY::_red_font_color_array[0]);
     }
 }

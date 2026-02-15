@@ -255,6 +255,12 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
+inline int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004038D0});
+    return fn(star_idx);
+}
+
 inline void __cdecl Draw_Colony_Scan_Info_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401A40});

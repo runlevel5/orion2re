@@ -800,4 +800,133 @@ namespace COLONY {
             MOX::_galaxy_map_star_field[i] = -1000;
         }
     }
+
+    /**
+     * @address 004dbe20
+     */
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint32_t is_bright) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+
+        s_colors* primary_colors;
+        if (is_bright == 0) {
+            primary_colors = &_font_color_array;
+        } else {
+            primary_colors = &_font_bright_color_array;
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(static_cast<int32_t>(is_bright), primary_colors);
+        fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
+        fonts::Set_Font_Special_Colors_(&_red_font_color_array[is_bright & 1]);
+    }
+
+    void __cdecl Set_Colony_Font_() {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+        COLSUM::Set_Colony_Font_To_(3);
+    }
+
+    void __cdecl Show_Colony_Screen_() {
+        MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        fields::Deactivate_Auto_Function_();
+        _full_draw = 1;
+        fields::Assign_Auto_Function_(Draw_Colony_Screen_, 1);
+        ERICHELP::Set_Colony_Screen_Help_List_();
+    }
+
+    bool __cdecl Colony_Can_Buy_Product_0_(int16_t colony_idx) {
+        if (COLCALC::Colony_Can_Afford_To_Buy_Product_(colony_idx)) {
+            s_colony& colony = MOX::_colony[colony_idx];
+
+            if (colony.bought_outright == 0) {
+                int16_t planet_idx = colony.planet;
+                int8_t star_idx = MOX::_planet[planet_idx].star_index;
+                s_star_data& star = MOX::_star[star_idx];
+
+                if (!struct_::Test_Bit_Field_(&star.blockaded, MOX::_PLAYER_NUM)) {
+                    int32_t cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(&colony);
+                    if (cost > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_idx) {
+        char buffer[2000];
+
+        fonts::Set_Font_Style_Shadow_Down_(1, &_font_color_array);
+
+        graphics::Fill_(x + 5, y + 2, x + 0xb0, y + 0xc3, 0xe9);
+
+        s_animation_header* planet_anim = Get_Planet_Anim_Header(planet_idx);
+        remap::Calculate_Picture_Remap_Colors_(planet_anim);
+
+        s_animation_header* ui_anim = C_Anims_(0xe);
+        animate::Draw_(x, y, ui_anim);
+
+        MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(planet_idx, buffer);
+
+        BILL::Squeeze_Print_Formatted_Paragraph_(x + 14, y + 45, 154, 140, buffer, 0);
+    }
+
+    void __cdecl Tested_Colony_Buys_Outright_(int16_t colony_idx) {
+        s_colony* col = &MOX::_colony[colony_idx];
+        char buf[500];
+
+        if (col->bought_outright != 0) {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_HAVE_ALREADY_BOUGHT_THIS_PRODUCT));
+            COLONY::Show_Colony_Screen_();
+            return;
+        }
+
+        int star_idx = MOX::_planet[col->planet].star_index;
+        if ((MOX::_star[star_idx].blockaded >> (MOX::_PLAYER_NUM & 0x1f)) & 1) {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_BUY_WHILE_THIS_STAR_IS_BLOCKADED));
+            COLONY::Show_Colony_Screen_();
+            return;
+        }
+
+        // -3 = ECON_HOUSING, -2 = ECON_TRADE_GOODS
+        if (col->producing[0] == -3 || col->producing[0] == -2) {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_BUY_HOUSING_OR_TRADE_GOODS_AS_THEY_ARE_SETTINGS_NOT_SPECIFIC_ITEMS));
+            COLONY::Show_Colony_Screen_();
+            return;
+        }
+
+        int buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
+        if (buy_cost <= 0) {
+            if (col->producing[0] != -1 /* ECON_NONE */) {
+                GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_SPEND_BCS_TO_GET_THIS_FASTER_THAN_IN_A_SINGLE_TURN));
+            } else {
+                GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_YOU_HAVE_NO_PRODUCT_SELECTED_TO_BUY));
+            }
+            COLONY::Show_Colony_Screen_();
+            return;
+        }
+
+        if (COLCALC::Colony_Can_Afford_To_Buy_Product_(colony_idx)) {
+            if (COLONY::Colony_Can_Buy_Product_0_(colony_idx)) {
+                int prod_remaining = (int)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - (int)col->production_spent;
+                int actual_buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
+
+                _sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
+                        actual_buy_cost, prod_remaining);
+
+                if (GENDRAW::Warning_Box_(buf) != 0) {
+                    COLCALC::Colony_Buy_Outright_(colony_idx);
+                }
+                COLONY::Col_Calc_Wrapper_(colony_idx);
+            } else {
+                GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_PURCHASING_FAILED_UNEXPECTEDLY_PLEASE_TELL_ERIC));
+                COLONY::Show_Colony_Screen_();
+            }
+        } else {
+            int short_by = (int)(short)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - MOX::_player[col->owner].bc;
+            _sprintf(buf, ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
+                    short_by);
+            GENDRAW::Help_(buf);
+            COLONY::Show_Colony_Screen_();
+        }
+    }
 }

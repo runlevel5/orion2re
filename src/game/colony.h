@@ -139,25 +139,31 @@ namespace COLONY {
     void __cdecl Draw_Colony_Bldgs_();
     void __cdecl Allocate_Mini_Planet_Cache_();
 
-    inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
-    inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
-
-    inline void __cdecl Set_Colony_Font_To_(int font_id) {
-        using Fn = void(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbf40});
-        fn(font_id);
-    }
-
-    inline void __cdecl Set_Colony_Font_To_Blue_(int16_t color_idx, uint32_t is_selected) {
-        using Fn = void(__cdecl*)(int16_t, uint32_t);
-        reinterpret_cast<Fn>(0x004dbe20)(color_idx, is_selected);
-    }
-
-    inline void __cdecl Set_Colony_Font_() {
+    inline void __cdecl Draw_Colony_Screen_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbd90});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DE1F0});
         fn();
     }
+
+    inline void __cdecl Col_Calc_Wrapper_(int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dc110});
+        fn(colony_idx);
+    }
+
+    void __cdecl Show_Colony_Screen_();
+
+    inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
+    inline s_colors& _bright_blue_font_color_array =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F88});
+    inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
+    inline s_colors& _font_bright_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559FA0});
+    inline s_colors (&_red_font_color_array)[2] =
+        *reinterpret_cast<s_colors(*)[2]>(std::uintptr_t{0x00559FA8});
+
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint32_t is_bright);
+
+    void __cdecl Set_Colony_Font_();
 
     inline int16_t& _galaxy_map_name_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});
@@ -166,14 +172,14 @@ namespace COLONY {
 
     inline uint16_t& _g_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00595E4C});
 
-    inline void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004E2030})(x, y, planet_index);
-    }
+    void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 
-    inline uint8_t __cdecl Colony_Can_Buy_Product_0_(int16_t colony_id) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df680});
-        return fn(colony_id);
+    bool __cdecl Colony_Can_Buy_Product_0_(int16_t colony_idx);
+
+    void __cdecl Tested_Colony_Buys_Outright_(int16_t colony_idx);
+
+    inline s_animation_header* __cdecl Get_Planet_Anim_Header(int16_t id) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x004e20f0)(id);
     }
 }

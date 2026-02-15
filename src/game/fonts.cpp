@@ -317,6 +317,12 @@ namespace fonts {
         }
     }
 
+    void __cdecl Set_Font_Highlight_Colors_(s_colors* colors) {
+        for (int i = 0; i < 8; ++i) {
+            _font_header.highlight_colors[i] = colors->colors[i];
+        }
+    }
+
     void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int32_t value) {
         char buffer[12];
         __itoa(value, buffer, 10);

@@ -46,4 +46,10 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A320});
         fn();
     }
+
+    inline void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t id, char* buffer) {
+        using Fn = void(__cdecl*)(int16_t, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045d420});
+        fn(id, buffer);
+    }
 }

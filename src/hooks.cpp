@@ -932,6 +932,22 @@ namespace hooks {
         { 0x004031b0, &COLSUM::Draw_Colony_Summary_ },
         { 0x00403000, &COLSUM::Evaluate_Input_ },
         { 0x00401450, &COLSUM::Add_Fields_ },
+        { 0x004031f0, &COLSUM::Evaluate_Col_List_Input_ },
+        { 0x00403460, &COLSUM::Evaluate_Colony_Pop_Input_ },
+        { 0x00403760, &COLSUM::Check_Galaxy_Map_Fields_ },
+        { 0x00525750, &fonts::Set_Font_Highlight_Colors_ },
+        { 0x004dbf40, &COLSUM::Set_Colony_Font_To_ },
+        { 0x004dbe20, &COLONY::Set_Colony_Font_To_Blue_ },
+        { 0x004dbd90, &COLONY::Set_Colony_Font_ },
+        { 0x004dc240, &COLONY::Show_Colony_Screen_ },
+        { 0x004df820, &COLONY::Tested_Colony_Buys_Outright_ },
+        { 0x004f6100, &COLCALC::Colony_Producing_Product_Cost_ },
+        { 0x004df680, &COLONY::Colony_Can_Buy_Product_0_ },
+        { 0x004e2030, &COLONY::Draw_Planet_Summary_ },
+        { 0x004f6260, &COLCALC::Colony_Cost_To_Buy_Producing_Product_ },
+        { 0x00403590, &COLSUM::Get_Scanned_Pop_ },
+        { 0x00403690, &COLSUM::Get_Selected_Pop_ },
+        { 0x00401950, &COLSUM::Add_Fields_Pop_For_ },
     };
 
     void Install_Hooks()

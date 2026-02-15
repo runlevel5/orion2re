@@ -44,15 +44,16 @@ namespace COLDRAW {
         fn(col, row, not_scanning_valid);
     }
 
-    inline void __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
+    // TYPE MISMATCH: Originally return void
+    inline int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
         int16_t colony_id, int16_t pop_idx, int32_t arg3, int32_t y, int32_t x,
         int32_t y2, int32_t arg7, int16_t* refs, int16_t* pop_count,
         int16_t* coord_vars, int16_t* job_fields)
     {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t, int32_t, int32_t,
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int32_t, int32_t, int32_t,
                                  int32_t, int32_t, int16_t*, int16_t*,
                                  int16_t*, int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458470});
-        fn(colony_id, pop_idx, arg3, y, x, y2, arg7, refs, pop_count, coord_vars, job_fields);
+        return fn(colony_id, pop_idx, arg3, y, x, y2, arg7, refs, pop_count, coord_vars, job_fields);
     }
 }

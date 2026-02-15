@@ -77,14 +77,6 @@ namespace LOADSAVE {
         RUSS::Mox_Sync_Update_();
     }
 
-    /**
-     * @address 0050f530
-     * @brief Displays a popup message box based on the specified type.
-     * 
-     * @param message The message content.
-     * @param type The type of popup: 0 = Message, 1 = Warning with result (Yes/No), 3 = Warning Notification.
-     * @return For type 1, returns the user selection; otherwise returns 0.
-     */
     int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type) {
         int16_t result = 0;
 
@@ -97,7 +89,7 @@ namespace LOADSAVE {
         } else if (type == 1) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            result = GENDRAW::Warning_Box_00479700(message);
+            result = GENDRAW::Warning_Box_(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
         } else if (type == 3) {

@@ -80,9 +80,31 @@ namespace COLCALC {
         return fn(colony, building_id);
     }
 
-    inline int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_idx) {
-        using Fn = int16_t(__cdecl*)(s_colony*, int16_t);
+    inline int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
+        using Fn = int32_t(__cdecl*)(s_colony*, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6190});
+        return fn(colony, product, production_spent);
+    }
+
+    int32_t __cdecl Colony_Cost_To_Buy_Producing_Product_(s_colony* colony);
+
+    inline bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f62f0});
+        return fn(colony_idx);
+    }
+
+    inline int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_idx) {
+        using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004f5ee0})(colony, product_idx);
+    }
+
+    int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony);
+
+    inline void __cdecl Colony_Buy_Outright_(int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6280});
+        fn(colony_idx);
     }
 
     inline int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony) {

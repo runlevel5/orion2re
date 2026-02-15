@@ -9,9 +9,15 @@ namespace GENDRAW {
         fn(message);
     }
 
+    inline void __cdecl Help_(const char* msg) {
+        using Fn = void(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba610});
+        fn(msg);
+    }
+
     // Suggested name: GENDRAW::Warning_Box_Prompt
-    inline int16_t __cdecl Warning_Box_00479700(char* message) {
-        using Fn = int16_t(__cdecl*)(char*);
+    inline int16_t __cdecl Warning_Box_(const char* message) {
+        using Fn = int16_t(__cdecl*)(const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479700});
         return fn(message);
     }
@@ -21,10 +27,6 @@ namespace GENDRAW {
         using Fn = void(__cdecl*)(const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796e0});
         fn(message);
-    }
-
-    inline void __cdecl Warning_Box_(const char* msg) {
-        Draw_Warning_Box_(msg);
     }
 
     // Suggested name: GENDRAW::Warning_Box_Notify

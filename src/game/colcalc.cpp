@@ -2602,4 +2602,19 @@ namespace COLCALC {
             plr->total_maintenance += plr->maintenance[i];
         }
     }
+
+    /**
+     * @address 004f6100
+     */
+    int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony) {
+        return Colony_Product_Cost_(colony, colony->producing[0]);
+    }
+
+    int32_t __cdecl Colony_Cost_To_Buy_Producing_Product_(s_colony* colony) {
+        return COLCALC::Colony_Cost_To_Buy_Given_Product_(
+            colony,
+            static_cast<int32_t>(colony->producing[0]),
+            static_cast<int32_t>(colony->production_spent)
+        );
+    }
 }

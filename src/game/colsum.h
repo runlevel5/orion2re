@@ -42,11 +42,7 @@ namespace COLSUM {
 
     void __cdecl Add_Fields_();
 
-    inline void __cdecl Add_Fields_Pop_For_(int16_t index) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401950});
-        fn(index);
-    }
+    void __cdecl Add_Fields_Pop_For_(int16_t colony_idx);
 
     void __cdecl Update_Col_List_();
 
@@ -81,9 +77,9 @@ namespace COLSUM {
 
     void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3);
 
-    void __cdecl Decrement_First_(int16_t num_items);
+    void __cdecl Increment_First_(int16_t num_items);
 
-    void __cdecl Increment_First_(int16_t count);
+    void __cdecl Decrement_First_(int16_t count);
 
     inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
     inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
@@ -111,19 +107,19 @@ namespace COLSUM {
 
     bool __cdecl Evaluate_Input_(int16_t* input_val, int16_t* scan_val);
 
-    inline bool __cdecl Evaluate_Col_List_Input_(int16_t* field_ptr, int16_t* param_2) {
-        using Fn = bool(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004031F0});
-        return fn(field_ptr, param_2);
-    }
+    bool __cdecl Evaluate_Col_List_Input_(int16_t* field_ptr, int16_t* param_2);
 
-    inline void __cdecl Check_Galaxy_Map_Fields_(int16_t* field_ptr, int16_t* param_2) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403760});
-        fn(field_ptr, param_2);
-    }
+    void __cdecl Evaluate_Colony_Pop_Input_(int16_t* input_field_1, int16_t* input_field_2, int16_t colony_idx_in_list);
+
+    int16_t __cdecl Get_Selected_Pop_(int16_t colony_idx, int16_t job_idx);
+
+    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1, int16_t param_2);
+
+    void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2);
 
     void __cdecl Draw_Scan_Info_();
 
     void __cdecl Colony_Summary_Screen_();
+
+    void __cdecl Set_Colony_Font_To_(int16_t style);
 }

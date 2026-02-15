@@ -1601,7 +1601,7 @@ namespace OFFICER {
         int16_t result = -1;
 
         if (type == 1) {
-            result = GENDRAW::Warning_Box_00479700(const_cast<char*>(message));
+            result = GENDRAW::Warning_Box_(const_cast<char*>(message));
         } else if (type == 3) {
             GENDRAW::Draw_Warning_Box_(message);
         } else if (type == 5) {
