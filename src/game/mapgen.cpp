@@ -1273,7 +1273,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         Randomize_Star_Names_(_name_index);
 
         if (_num_maps_to_generate == 1) {
-            if (ERIC::Get_Fade_Percent_() != 0) JIM::Fast_Fade_In_();
+            if (ERIC::Get_Fade_Percent_() != 0) ERIC::Fast_Fade_In_();
             video::Set_Page_Back_();
             MOX::Mox_Update_();
             s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));

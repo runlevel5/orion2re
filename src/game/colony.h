@@ -67,9 +67,11 @@ namespace COLONY {
 
     inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
 
+    inline uint8_t& _debug_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559C40});
     inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
     inline uint8_t& _drawing_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E10});
     inline uint8_t& _valid_colony = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E14});
+    inline uint8_t& _field_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559DF4});
 
     inline void __cdecl Draw_Bldg_CR_Dark_(int16_t c, int16_t r) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
@@ -159,33 +161,90 @@ namespace COLONY {
     void __cdecl Draw_Colony_Bldg_(int16_t col, int16_t row);
 
     void __cdecl Draw_Colony_Bldgs_();
-    void __cdecl Allocate_Mini_Planet_Cache_();
 
-    inline void __cdecl Draw_Colony_Screen_() {
+    inline void __cdecl Draw_Colony_Satellites_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DE1F0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df450});
         fn();
     }
 
-    inline void __cdecl Set_Colony_Screen_Help_List_() {
+    inline void __cdecl Draw_Colony_Info_Background_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x00412320)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de3f0});
+        fn();
     }
 
-    inline uint8_t __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
-        using Fn = uint8_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004BA7A0)();
+    inline void __cdecl Box_Galaxy_Map_Star_(int32_t handle, int32_t mode) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df620});
+        fn(handle, mode);
     }
 
-    inline void __cdecl Fast_Fade_Out_() {
+    void __cdecl Draw_Colony_Info_();
+
+    inline void __cdecl Draw_Colony_Info_Military_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004BA690)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de750});
+        fn();
     }
 
-    inline void __cdecl Fast_Fade_In_() {
+    inline void __cdecl Draw_Colony_Info_Officer_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004BA740)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004deb20});
+        fn();
     }
+
+    inline void __cdecl Draw_Colony_Info_Production_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de6d0});
+        fn();
+    }
+
+    inline void __cdecl Draw_Colony_Info_Pop_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de490});
+        fn();
+    }
+
+    inline void __cdecl Draw_Colony_Info_Morale_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004decb0});
+        fn();
+    }
+
+    inline void __cdecl Draw_Info_Name_And_Pop_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004decd0});
+        fn();
+    }
+
+    inline void __cdecl Draw_Info_Build_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004deb10});
+        fn();
+    }
+
+    inline void __cdecl Draw_Sys_Disp_Scanned_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df7b0});
+        fn();
+    }
+
+    inline void __cdecl Draw_Colony_Info_Scanned_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004defd0});
+        fn();
+    }
+
+    inline void __cdecl No_Op1_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df600});
+        fn();
+    }
+
+    void __cdecl Allocate_Mini_Planet_Cache_();
+
+    void __cdecl Draw_Colony_Screen_();
 
     inline void __cdecl Update_Fields_() {
         using Fn = void(__cdecl*)();

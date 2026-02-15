@@ -14,6 +14,8 @@ namespace ERIC {
 
     uint16_t __cdecl Get_Fade_Percent_();
 
+    void __cdecl Fast_Fade_In_();
+
     void __cdecl Fast_Fade_Out_();
 
     inline bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {

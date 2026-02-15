@@ -435,7 +435,7 @@ namespace COLBLDG {
         ERICHELP::Set_Building_Queue_Screen_Help_List_();
         palette::Clear_Palette_Changes_(0, 0xFF);
         COLBLDG::Draw_Build_Queue_Popup_();
-        JIM::Fast_Fade_In_();
+        ERIC::Fast_Fade_In_();
         video::Set_Refresh_Stencil_();
 
         int16_t field_id;

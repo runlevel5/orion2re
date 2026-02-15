@@ -925,7 +925,7 @@ namespace MAINSCR {
         }
 
         if (!skip_fade_in) {
-            JIM::Fast_Fade_In_();
+            ERIC::Fast_Fade_In_();
             MOX::Mox_Update_();
         }
 
@@ -2054,7 +2054,7 @@ namespace MAINSCR {
             video::Set_Refresh_Full_();
             video::Set_Page_Off_();
             Draw_Main_Screen_Filled_(1);
-            JIM::Fast_Fade_In_();
+            ERIC::Fast_Fade_In_();
             video::Set_Refresh_Stencil_();
 
             if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {

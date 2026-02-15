@@ -172,7 +172,7 @@ namespace MISC {
         palette::Clear_Palette_Changes_(0, 0xff);
 
         if (MOX::_reloaded_ship_palette == 0) {
-            JIM::Fast_Fade_In_();
+            ERIC::Fast_Fade_In_();
         } else {
             ERIC::Set_Fade_Percent_(0);
             palstore::Darken_Palette_(0);

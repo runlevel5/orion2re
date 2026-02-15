@@ -317,7 +317,7 @@ namespace DESIGN {
             Draw_Design_Screen_();
             palette::Clear_Palette_Changes_(0, 0xFF);
             RUSS::Mox_Sync_Update_();
-            JIM::Fast_Fade_In_();
+            ERIC::Fast_Fade_In_();
             fields::Enable_Draw_All_Fields_();
             MOX::_first_design_screen_call = 0;
             graphics::Reset_Window_();

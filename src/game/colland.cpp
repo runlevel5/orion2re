@@ -197,7 +197,7 @@ namespace COLLAND {
         MOX2::Get_Auto_Function_(&saved_auto_fn);
         fields::Assign_Auto_Function_(Draw_Colony_Landing_Screen_, 1);
         Draw_Colony_Landing_Screen_();
-        JIM::Fast_Fade_In_();
+        ERIC::Fast_Fade_In_();
         video::Set_Refresh_Stencil_();
 
         if (MOX::_colony[COLONY::_colony_handle].occupation_policy == 4 /* OCC_POLICY_OCCUPATION */) {

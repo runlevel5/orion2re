@@ -652,7 +652,7 @@ namespace OFFICER {
         RUSS::Mox_Sync_Update_();
 
         mouse::Set_Mouse_List_(mouse::_mouse_list_arrow, 1);
-        JIM::Fast_Fade_In_();
+        ERIC::Fast_Fade_In_();
 
         fields::Enable_Draw_All_Fields_();
     }

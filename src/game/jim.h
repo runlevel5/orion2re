@@ -24,8 +24,6 @@ namespace JIM {
 
     void __cdecl Logo_Fadeout_();
 
-    void __cdecl Fast_Fade_In_();
-
     void __cdecl Draw_Logos_(void);
     void Play_Background_Music_();
 

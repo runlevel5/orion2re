@@ -35,6 +35,23 @@ namespace ERIC {
         return -1;
     }
 
+    void __cdecl Fast_Fade_In_() {
+        if (_fade_percent != 0) {
+            video::Set_Refresh_Full_();
+
+            int16_t fade_level = static_cast<int16_t>(_fade_percent);
+
+            while (fade_level >= 0) {
+                palstore::Darken_Palette_(static_cast<int32_t>(fade_level));
+                _fade_percent = static_cast<uint8_t>(fade_level);
+                MOX::Mox_Update_();
+                fade_level -= 10;
+            }
+        }
+
+        video::Set_Refresh_Stencil_();
+    }
+
     void Fast_Fade_Out_() {
         bool faded = false;
         capture::Check_Release_Version_();

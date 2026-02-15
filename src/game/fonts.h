@@ -59,6 +59,12 @@ namespace fonts {
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
 
+    inline void __cdecl PSTRS_(int16_t x, int16_t y, const char* str) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533670});
+        fn(x, y, str);
+    }
+
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
     inline uint16_t& _outline_color =

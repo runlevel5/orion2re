@@ -109,7 +109,7 @@ namespace COLSUM {
         fields::Draw_Visible_Fields_();
         RUSS::Mox_Sync_Update_();
         COLONY::_full_draw = 0;
-        JIM::Fast_Fade_In_();
+        ERIC::Fast_Fade_In_();
         mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
 
         while (true) {

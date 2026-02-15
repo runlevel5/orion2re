@@ -1,5 +1,6 @@
 #include "deps.h"
 #include "harold.h"
+#include "colsysdi.h"
 
 namespace COLONY {
     void __cdecl Init_Colonies_() {
@@ -783,6 +784,90 @@ namespace COLONY {
         }
     }
 
+    void __cdecl Draw_Colony_Screen_() {
+        video::Set_Page_Off_();
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+            _full_draw = 1;
+        }
+
+        if (_full_draw != 0) {
+            graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
+
+            s_animation_header* background_anim = C_Anims_(1);
+            animate::Draw_(0, 0, background_anim);
+
+            s_animation_header* base_anim = C_Anims_(0);
+            animate::Draw_(0, 0, base_anim);
+
+            COLDRAW::Draw_Road_List_();
+
+            if (_valid_colony != 0) {
+                Draw_Colony_Info_Background_();
+            }
+
+            if (_drawing_display == 0 || _drawing_display == 2) {
+                if (_DEBUG != 0) {
+                    char* msg = ESTRINGS::E_Strings_(274 /* ESTR_DRAW_SYSTEM */);
+                    fonts::PSTRS_(0, 0, msg);
+                }
+                Set_Colony_Font_();
+                COLSYSDI::Draw_Col_Sys_Disp_(7, 24 /* 0x18 */);
+            } else if (_drawing_display == 1) {
+                if (_DEBUG != 0) {
+                    char* msg = ESTRINGS::E_Strings_(273 /* ESTR_DRAW_GALAXY */);
+                    fonts::PSTRS_(0, 0, msg);
+                }
+
+                int16_t height = MOX::_galaxy_map_height;
+                int16_t grid_y = MOX::_galaxy_map_grid_y;
+                s_animation_header* anim_c = C_Anims_(12 /* 0xc */);
+                s_animation_header* anim_b = C_Anims_(11 /* 0xb */);
+
+                MOVEBOX::Draw_Galaxy_Map_Box_(anim_b, anim_c, 7, 24 /* 0x18 */, height, grid_y, 11 /* 0xb */, 31 /* 0x1f */, 0, 0, 3, 0);
+            }
+
+            if (_valid_colony != 0) {
+                Draw_Colony_Bldgs_();
+                Draw_Colony_Satellites_();
+            }
+
+            video::Copy_Off_To_Back_();
+            video::Set_Refresh_Stencil_();
+            _full_draw = 0;
+        } else {
+            if (_valid_colony != 0) {
+                Draw_Colony_Bldgs_();
+                Draw_Colony_Satellites_();
+            }
+        }
+
+        if (_drawing_display == 1) {
+            Box_Galaxy_Map_Star_(_star_handle, 0);
+            if (_star_handle != _sys_disp_star_handle) {
+                Box_Galaxy_Map_Star_(_sys_disp_star_handle, 1);
+            }
+        }
+
+        if (_valid_colony != 0) {
+            Draw_Colony_Info_();
+        } else {
+            No_Op1_();
+        }
+
+        FAKEBUTS::Draw_Fake_Buttons_();
+        fields::Draw_Visible_Fields_();
+
+        if (_field_mode == 1) {
+            int16_t mouse_y = mouse::Pointer_Y_();
+            int16_t mouse_x = mouse::Pointer_X_();
+            COLMOVE::Draw_Cluster_(mouse_x, mouse_y);
+        }
+
+        palette::Cycle_Palette_Color_(255 /* 0xff */, 19 /* 0x13 */, 16 /* 0x10 */, 9, 32 /* 0x20 */, 40 /* 0x28 */, 21 /* 0x15 */, 2);
+    }
+
     void __cdecl Allocate_Mini_Planet_Cache_() {
         return;
     }
@@ -874,6 +959,18 @@ namespace COLONY {
         return false;
     }
 
+    void __cdecl Draw_Colony_Info_() {
+        Draw_Colony_Info_Military_();
+        Draw_Colony_Info_Officer_();
+        Draw_Colony_Info_Production_();
+        Draw_Colony_Info_Pop_();
+        Draw_Colony_Info_Morale_();
+        Draw_Info_Name_And_Pop_();
+        Draw_Info_Build_();
+        Draw_Sys_Disp_Scanned_();
+        Draw_Colony_Info_Scanned_();
+    }
+
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_idx) {
         char buffer[2000];
 
@@ -936,7 +1033,7 @@ namespace COLONY {
 
         fields::Clear_Mouse_Buffer_();
         fields::Set_Input_Delay_(3);
-        Set_Colony_Screen_Help_List_();
+        ERICHELP::Set_Colony_Screen_Help_List_();
 
         int16_t saved_player_num = MOX::_PLAYER_NUM;
         MOX::_PLAYER_NUM = static_cast<int16_t>(MOX::_colony[_colony_handle].owner);
@@ -961,13 +1058,13 @@ namespace COLONY {
         video::Set_Page_Off_();
         video::Set_Refresh_Stencil_();
 
-        if (Fast_Fade_Out_Needed_For_Colony_Palette_()) {
-            Fast_Fade_Out_();
+        if (ERIC::Fast_Fade_Out_Needed_For_Colony_Palette_()) {
+            ERIC::Fast_Fade_Out_();
         }
 
         Update_Colony_Palette_();
 
-        if (Fast_Fade_Out_Needed_For_Colony_Palette_()) {
+        if (ERIC::Fast_Fade_Out_Needed_For_Colony_Palette_()) {
             palstore::Darken_Palette_(100);
             palette::Clear_Palette_Changes_(0, 255);
         }
@@ -980,7 +1077,7 @@ namespace COLONY {
         fields::Assign_Auto_Function_(Draw_Colony_Screen_, 1);
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
         Draw_Colony_Screen_();
-        Fast_Fade_In_();
+        ERIC::Fast_Fade_In_();
         video::Set_Refresh_Stencil_();
         mouse::Set_Mouse_List(MOX::_mouse_list_arrow, 1);
         Do_Informational_And_Decision_Popups_();

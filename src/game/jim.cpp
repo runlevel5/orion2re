@@ -1,22 +1,6 @@
 #include "deps.h"
 
 namespace JIM {
-    void __cdecl Fast_Fade_In_() {
-        if (ERIC::_fade_percent != 0) {
-            video::Set_Refresh_Full_();
-
-            int16_t fade_level = static_cast<int16_t>(ERIC::_fade_percent);
-
-            while (fade_level >= 0) {
-                palstore::Darken_Palette_(static_cast<int32_t>(fade_level));
-                ERIC::_fade_percent = static_cast<uint8_t>(fade_level);
-                MOX::Mox_Update_();
-                fade_level -= 10;
-            }
-        }
-
-        video::Set_Refresh_Stencil_();
-    }
 
     bool __cdecl Check_For_Simtex_Logo_() {
         char find_buffer[80];
@@ -126,7 +110,7 @@ namespace JIM {
             platform::Toggle_Pages_Stub_();
 
             user_interrupted = false;
-            Fast_Fade_In_();
+            ERIC::Fast_Fade_In_();
             mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
 
             while (!user_interrupted) {

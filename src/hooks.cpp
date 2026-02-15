@@ -199,7 +199,7 @@ namespace hooks {
         { 0x00526610, &fonts::Print_To_Bitmap_ },
         { 0x00425e30, &JIM::Check_For_Simtex_Logo_ },
         { 0x00425dc0, &palstore::Slow_Fade_In_ },
-        { 0x004ba740, &JIM::Fast_Fade_In_ },
+        { 0x004ba740, &ERIC::Fast_Fade_In_ },
         { 0x004c7440, &MAINSCR::Get_PointXY_Draw_Coords_ },
         { 0x004cd560, &MAINSCR::Update_Star_Owners_ },
         { 0x004c6780, &MAINSCR::Draw_Mini_Main_Screen_ },
@@ -994,6 +994,8 @@ namespace hooks {
         { 0x00429f50, &COLLAND::Print_Planet_Data_ },
         { 0x004dbd00, &COLONY::Reset_Field_Arrays_ },
         { 0x004dfc10, &COLONY::Colony_Screen_ },
+        { 0x004de1f0, &COLONY::Draw_Colony_Screen_ },
+        { 0x004de460, &COLONY::Draw_Colony_Info_ },
     };
 
     void Install_Hooks()
