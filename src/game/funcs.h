@@ -517,3 +517,5 @@ inline char*& PTR_s_GAME_LBX_0055ac4c =
 inline void*& PTR_s_OFFICER_LBX_00556990 =
     *reinterpret_cast<void**>(std::uintptr_t{0x00556990});
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
+
+inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});

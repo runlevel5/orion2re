@@ -364,6 +364,12 @@ struct s_colors {
     uint8_t colors[8];
 };
 
+typedef struct s_colsum_col_pop_ref s_colsum_col_pop_ref, *Ps_colsum_col_pop_ref;
+
+struct s_colsum_col_pop_ref {
+    short refs[42];
+};
+
 typedef struct s_combat_data s_combat_data, *Ps_combat_data;
 
 struct s_combat_data {

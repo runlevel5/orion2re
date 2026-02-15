@@ -170,4 +170,10 @@ namespace COLONY {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004E2030})(x, y, planet_index);
     }
+
+    inline uint8_t __cdecl Colony_Can_Buy_Product_0_(int16_t colony_id) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df680});
+        return fn(colony_id);
+    }
 }

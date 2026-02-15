@@ -2,9 +2,12 @@
 #include <cstdint>
 
 struct s_animation_header;
+struct s_colsum_col_pop_ref;
 
 namespace COLSUM {
+    inline int16_t (&_x_fields)[14] = *reinterpret_cast<int16_t(*)[14]>(std::uintptr_t{0x00551040});
     inline int16_t& _x_fields_3 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00551046});
+    inline int16_t& _g_sort_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055105C});
     inline s_animation_header* (&_anims)[21] = *reinterpret_cast<s_animation_header* (*)[21]>(std::uintptr_t{0x00551060});
     inline uint8_t& _draw_planet_sum = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005510C0});
 
@@ -13,18 +16,36 @@ namespace COLSUM {
 
     inline int16_t& _slider_bar_position = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005510B8});
 
+    inline int16_t (&_list_col_prod_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00563B98});
     inline int16_t (&_list_col)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00563BB0});
+
+    inline s_colsum_col_pop_ref (&_list_col_pop_ref)[30] =
+        *reinterpret_cast<s_colsum_col_pop_ref(*)[30]>(std::uintptr_t{0x00563BC8});
+
+    inline int16_t (&_list_col_coord_vars)[32] =
+        *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x005645D0});
+
+    inline int16_t (&_list_col_pop_count)[32] =
+        *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x00564628});
+
+    inline int16_t (&_list_buy_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x005645A0});
+    inline int16_t (&_list_fields)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x005645B8});
     inline int16_t (&_list_buy_data)[10] = *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x00564610});
+
+    inline int16_t (&_list_col_job_fields)[30] =
+        *reinterpret_cast<int16_t(*)[30]>(std::uintptr_t{0x005646F8});
     inline int16_t& _colony_summary_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564624});
 
     void __cdecl Clear_List_Col_Array_();
 
     void __cdecl Init_Fields_();
 
-    inline void __cdecl Add_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401450});
-        fn();
+    void __cdecl Add_Fields_();
+
+    inline void __cdecl Add_Fields_Pop_For_(int16_t index) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401950});
+        fn(index);
     }
 
     void __cdecl Update_Col_List_();
@@ -56,10 +77,21 @@ namespace COLSUM {
 
     void __cdecl Draw_Colony_Summary_Screen_();
 
+    void __cdecl Draw_Colony_Summary_();
+
     void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3);
+
+    void __cdecl Decrement_First_(int16_t num_items);
+
+    void __cdecl Increment_First_(int16_t count);
 
     inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
     inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
+
+    inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F0});
+    inline const char* s_s_005510f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F4});
+    inline const char* s_f_005510f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F8});
+    inline const char* s_p_005510fc = reinterpret_cast<const char*>(std::uintptr_t{0x005510FC});
 
     void __cdecl Draw_Empire_Info_();
 
@@ -71,23 +103,24 @@ namespace COLSUM {
 
     void __cdecl Draw_Colony_Summary_For_Colony_(int16_t index);
 
-    inline void __cdecl Draw_Info_Pop_For_(int16_t list_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x00402590)(list_idx);
-    }
+    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx);
 
     void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star_idx1, int16_t star_idx2, s_colors* pattern);
 
-    inline void __cdecl Draw_Bar_Indicator_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401E70});
-        fn();
+    void __cdecl Draw_Bar_Indicator_();
+
+    bool __cdecl Evaluate_Input_(int16_t* input_val, int16_t* scan_val);
+
+    inline bool __cdecl Evaluate_Col_List_Input_(int16_t* field_ptr, int16_t* param_2) {
+        using Fn = bool(__cdecl*)(int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004031F0});
+        return fn(field_ptr, param_2);
     }
 
-    inline bool __cdecl Evaluate_Input_(int16_t* input_val, int16_t* scan_val) {
-        using Fn = bool(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403000});
-        return fn(input_val, scan_val);
+    inline void __cdecl Check_Galaxy_Map_Fields_(int16_t* field_ptr, int16_t* param_2) {
+        using Fn = void(__cdecl*)(int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403760});
+        fn(field_ptr, param_2);
     }
 
     void __cdecl Draw_Scan_Info_();

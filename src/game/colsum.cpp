@@ -128,6 +128,37 @@ namespace COLSUM {
         }
     }
 
+    void __cdecl Decrement_First_(int16_t num_items) {
+        int16_t colonies_count = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+
+        if (colonies_count >= num_items) {
+            int32_t first_val = static_cast<int32_t>(_first) - 1;
+            if (first_val < 1) {
+                first_val = 0;
+            }
+            _first = static_cast<int16_t>(first_val);
+
+            int16_t updated_colonies_count = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+            _slider_bar_position = (updated_colonies_count - _first) - num_items;
+            COLONY::_full_draw = 1;
+        }
+    }
+
+    /**
+     * Increments the first visible colony index and updates the scrollbar position
+     * if there are enough colonies to shift the view.
+     */
+    void __cdecl Increment_First_(int16_t count) {
+        int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+
+        if (num_colonies >= count) {
+            _first++;
+            num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+            _slider_bar_position = num_colonies - _first - count;
+            COLONY::_full_draw = 1;
+        }
+    }
+
     void __cdecl Clear_List_Col_Array_() {
         memset(COLSUM::_list_col, 0xff, sizeof(COLSUM::_list_col));
     }
@@ -143,6 +174,60 @@ namespace COLSUM {
         FAKEBUTS::Clear_Fake_Buttons_();
         COLONY::Clear_Galaxy_Map_Fields_();
         Add_Fields_();
+    }
+
+    void __cdecl Add_Fields_() {
+        int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+
+        static const int16_t buy_btn_y_coords[] = {35, 65, 96, 128, 159, 190, 221, 251, 283, 314};
+
+        _x_fields[1] = fields::Add_Button_Field_(619, 15, ESTRINGS::E_Strings_(12), _anims[2], ESTRINGS::E_Strings_(137), 40);
+        _x_fields[2] = fields::Add_Button_Field_(619, 316, ESTRINGS::E_Strings_(11), _anims[3], ESTRINGS::E_Strings_(12), 40);
+        _x_fields[3] = fields::Add_Button_Field_(531, 445, ESTRINGS::E_Strings_(12), _anims[1], ESTRINGS::E_Strings_(12), 40);
+        _x_fields[4] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(135));
+        _x_fields[5] = fields::Add_Multi_Button_Field_(89, 446, ESTRINGS::E_Strings_(12), _anims[4], &_g_sort_index, 0, ESTRINGS::E_Strings_(384), 41);
+        _x_fields[6] = fields::Add_Multi_Button_Field_(140, 446, s_p_005510fc, _anims[5], &_g_sort_index, 1, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[7] = fields::Add_Multi_Button_Field_(219, 446, s_f_005510f8, _anims[6], &_g_sort_index, 2, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[8] = fields::Add_Multi_Button_Field_(262, 446, ESTRINGS::E_Strings_(327), _anims[7], &_g_sort_index, 3, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[9] = fields::Add_Multi_Button_Field_(326, 446, s_s_005510f4, _anims[8], &_g_sort_index, 4, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[10] = fields::Add_Multi_Button_Field_(393, 446, ESTRINGS::E_Strings_(436), _anims[9], &_g_sort_index, 5, ESTRINGS::E_Strings_(12), 41);
+        _x_fields[11] = fields::Add_Multi_Button_Field_(480, 446, ESTRINGS::E_Strings_(193), _anims[10], &_g_sort_index, 6, ESTRINGS::E_Strings_(12), 41);
+
+        if (num_colonies < 10) {
+            _x_fields[12] = -1000;
+        } else {
+            _x_fields[12] = fields::Add_Scroll_Field_(621, 40, 0, num_colonies, 0, num_colonies - 10, 5, 271, &_slider_bar_position, ESTRINGS::E_Strings_(12), 0);
+        }
+
+        _x_fields[13] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(596));
+
+        int16_t y_row_end = 65;
+        for (int16_t i = 0; i < 10; ++i) {
+            if (_list_col[i] == -1) {
+                _list_fields[i] = -1000;
+                _list_col_prod_fields[i] = -1000;
+                _list_buy_fields[i] = -1000;
+            } else {
+                int16_t y1 = y_row_end - 30;
+                _list_fields[i] = fields::Add_Hidden_Field_(12, y1, 101, y_row_end, ESTRINGS::E_Strings_(12), 0);
+                _list_col_prod_fields[i] = fields::Add_Hidden_Field_(512, y1, 597, y_row_end, ESTRINGS::E_Strings_(12), 0);
+
+                int16_t col_idx = _list_col[i];
+                if (COLONY::Colony_Can_Buy_Product_0_(col_idx) == 0 && MOX::_colony[col_idx].bought_outright == 0) {
+                    short bx1 = 599;
+                    short by1 = buy_btn_y_coords[i];
+                    short w = animate::Get_Width_(_anims[i + 11]);
+                    short h = animate::Get_Height_(_anims[i + 11]);
+                    _list_buy_fields[i] = fields::Add_Hidden_Field_(bx1, by1, bx1 + w, by1 + h, ESTRINGS::E_Strings_(12), 0);
+                } else {
+                    _list_buy_fields[i] = fields::Add_Locked_Button_Field_(599, buy_btn_y_coords[i], ESTRINGS::E_Strings_(12), _anims[i + 11], &_list_buy_data[i], ESTRINGS::E_Strings_(12), 41);
+                }
+            }
+            y_row_end += 31;
+            Add_Fields_Pop_For_(i);
+        }
+
+        _x_fields[0] = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
     }
 
     void __cdecl Update_Col_List_() {
@@ -277,6 +362,24 @@ namespace COLSUM {
         video::Clip_Off_();
     }
 
+    void __cdecl Draw_Colony_Summary_() {
+        fields::Deactivate_Auto_Function_();
+
+        // Sets up the auto-redraw function for the colony summary screen
+        fields::Assign_Auto_Function_(Draw_Colony_Summary_Screen_, 1);
+
+        COLONY::_full_draw = 1;
+        video::Set_Page_Off_();
+
+        Draw_Colony_Summary_Screen_();
+
+        video::Copy_Off_To_Back_();
+        video::Set_Refresh_Stencil_();
+
+        // Updates context-sensitive help for the current screen
+        ERICHELP::Set_Colony_Summary_Screen_Help_List_();
+    }
+
     bool __cdecl Event_Good_(int16_t event_id) {
         return static_cast<bool>(_event_good_lookup[event_id]);
     }
@@ -406,6 +509,43 @@ namespace COLSUM {
         _wee_event_strings[35] = ESTRINGS::E_Strings_(0x186);
     }
 
+    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
+        int16_t colony_id = _list_col[colony_idx];
+        int16_t y_pos = colony_idx * 31 + 38;
+
+        for (int16_t i = 0; i < 3; ++i) {
+            int32_t x1;
+            int32_t x2_base;
+
+            if (i == 0) {
+                x1 = 101;
+                x2_base = 236;
+            } else if (i == 1) {
+                x1 = 236;
+                x2_base = 378;
+            } else {
+                x1 = 378;
+                x2_base = 512;
+            }
+
+            int32_t index = i + (colony_idx * 3);
+
+            COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+                colony_id,
+                i,
+                0,
+                x1,
+                y_pos,
+                x2_base - 10,
+                0,
+                _list_col_pop_ref[index].refs,
+                &_list_col_pop_count[index],
+                &_list_col_coord_vars[index],
+                &_list_col_job_fields[index]
+            );
+        }
+    }
+
     void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star_idx1, int16_t star_idx2, s_colors* pattern) {
         int16_t x1, y1, x2, y2;
 
@@ -420,5 +560,103 @@ namespace COLSUM {
             pattern,
             static_cast<int16_t>(COLONY::_g_count % 6)
         );
+    }
+
+    /**
+     * Draws the scroll bar indicator (thumb) for the colony summary list.
+     */
+    void __cdecl Draw_Bar_Indicator_() {
+        int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
+        COLSUM::Update_First_(10, &COLSUM::_first, &COLSUM::_slider_bar_position);
+
+        if (num_colonies > 10) {
+            int32_t y1 = (271 * (int32_t)COLSUM::_first) / (int32_t)num_colonies + 40;
+            int32_t y2 = (271 * ((int32_t)COLSUM::_first + 10)) / (int32_t)num_colonies + 40;
+
+            graphics::Set_Window_(0, 0, 639, 479);
+            video::Clip_On_();
+
+            // Draw the indicator bar body
+            graphics::Fill_(621, (int16_t)y1, 626, (int16_t)y2, 229);
+
+            // Draw the indicator bar borders (shaded edges)
+            line::Line_(621, (int16_t)y1, 626, (int16_t)y1, 230);
+            line::Line_(621, (int16_t)y1, 621, (int16_t)y2, 230);
+            line::Line_(626, (int16_t)y1, 626, (int16_t)y2, 228);
+            line::Line_(621, (int16_t)y2, 626, (int16_t)y2, 228);
+
+            // Draw corner markers for the scroll track area
+            graphics::Dot_(621, 40, 80);
+            graphics::Dot_(626, 40, 80);
+            graphics::Dot_(621, 311, 80);
+            graphics::Dot_(626, 311, 80);
+        }
+
+        video::Clip_Off_();
+    }
+
+    bool __cdecl Evaluate_Input_(int16_t* field_ptr, int16_t* param_2) {
+        int16_t field = *field_ptr;
+
+        if (field == _x_fields[1]) {
+            Decrement_First_(10);
+            return true;
+        }
+
+        if (field == _x_fields[2]) {
+            if (COLXPORT::_g_colony_list_ptr[_first + 10] != -1) {
+                Increment_First_(10);
+                return true;
+            }
+        }
+
+        if (field == _x_fields[3] || field == _x_fields[4]) {
+            if (COLMOVE::_cluster_colony_n != -1) {
+                COLMOVE::Clear_Cluster_();
+                COLONY::Reset_Mouse_Picture_();
+            }
+
+            if (MOX::_return_screen == MOX::_current_screen && COLBLDG::_return_to_build_popup_from_custom_design != 0) {
+                MOX::_current_screen = SCREEN_QUEUE_POPUP;
+            } else {
+                MOX::_current_screen = _colony_summary_saved_screen;
+                MOX::_return_screen = _colony_summary_saved_screen;
+            }
+
+            if (*field_ptr == _x_fields[4]) {
+                *field_ptr = _x_fields[3];
+            }
+            return true;
+        }
+
+        if (field == _x_fields[13]) {
+            COLONY::_full_draw = 1;
+            return true;
+        }
+
+        // Check if field is one of the sorting headers (indices 5-11)
+        if (field == _x_fields[5] || field == _x_fields[6] || field == _x_fields[7] ||
+            field == _x_fields[8] || field == _x_fields[9] || field == _x_fields[10] ||
+            field == _x_fields[11]) {
+            Sort_Col_List_();
+            Clear_List_Col_Array_();
+            _first = 0;
+            Decrement_First_(10);
+            Update_First_(10, &_first, &_slider_bar_position);
+            Update_Col_List_();
+            COLONY::_full_draw = 1;
+            return true;
+        }
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            Draw_Colony_Summary_();
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+            return true;
+        }
+
+        bool result = Evaluate_Col_List_Input_(field_ptr, param_2);
+        Check_Galaxy_Map_Fields_(field_ptr, param_2);
+
+        return result;
     }
 }

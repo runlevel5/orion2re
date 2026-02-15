@@ -9,4 +9,10 @@ namespace COLMOVE {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049F2E0});
         fn(x, y);
     }
+
+    inline void __cdecl Clear_Cluster_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049F1B0});
+        fn();
+    }
 }

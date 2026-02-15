@@ -124,6 +124,12 @@ namespace fields {
         fn();
     }
 
+    inline int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, const char* hotkey, int16_t sound) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, const char*, s_animation_header*, int16_t*, const char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051dce0});
+        return fn(x, y, help, pic, value, hotkey, sound);
+    }
+
     inline void __cdecl Mark_Fields_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520120});

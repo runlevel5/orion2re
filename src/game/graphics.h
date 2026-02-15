@@ -27,4 +27,10 @@ namespace graphics {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00529580});
         fn(x, y, w, h, color, fill);
     }
+
+    inline void __cdecl Dot_(int16_t x, int16_t y, uint8_t color) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005294F0});
+        fn(x, y, color);
+    }
 }

@@ -905,7 +905,9 @@ namespace hooks {
         { 0x004de000, &COLONY::Draw_Colony_Bldg_ },
         { 0x004e1bd0, &COLONY::Allocate_Mini_Planet_Cache_ },
         { 0x004012a0, &COLSUM::Reset_List_Col_Array_ },
+#ifndef SKIP_MAIN
         { 0x00402800, &COLSUM::Colony_Summary_Screen_ },
+#endif
         { 0x004dd5b0, &COLONY::N_Houses_In_Bldg_Array_ },
         { 0x004dd600, &COLONY::Find_Replacement_Slot_For_Building_ },
         { 0x004df750, &COLONY::Clear_Galaxy_Map_Fields_ },
@@ -921,8 +923,15 @@ namespace hooks {
         { 0x00401fd0, &COLSUM::Draw_Empire_Info_ },
         { 0x004013b0, &COLSUM::Event_Good_ },
         { 0x004021d0, &COLSUM::Draw_Colony_Summary_For_Colony_ },
+        { 0x00402590, &COLSUM::Draw_Info_Pop_For_ },
         { 0x00402670, &COLSUM::Colsum_Connect_Galaxy_Map_Stars_ },
         { 0x004a0050, &ESTRINGS::E_Strings_ },
+        { 0x00401e70, &COLSUM::Draw_Bar_Indicator_ },
+        { 0x00402750, &COLSUM::Decrement_First_ },
+        { 0x004027B0, &COLSUM::Increment_First_ },
+        { 0x004031b0, &COLSUM::Draw_Colony_Summary_ },
+        { 0x00403000, &COLSUM::Evaluate_Input_ },
+        { 0x00401450, &COLSUM::Add_Fields_ },
     };
 
     void Install_Hooks()
