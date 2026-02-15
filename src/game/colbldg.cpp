@@ -225,6 +225,19 @@ namespace COLBLDG {
         }
     }
 
+    void __cdecl Load_Build_Anims_() {
+        for (int16_t i = 0; i < 7; ++i) {
+            if (i == 0) {
+                _anims[i] = (s_animation_header*)farload::Far_Reload_(COLONY::_COLBLDG_LBX, 0, MOX::_screen_seg);
+            } else {
+                _anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLBLDG_LBX, i, MOX::_screen_seg);
+            }
+        }
+
+        _bldg_bitm = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FA4);
+        _colsum_pal_anim = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLSUM_LBX, 0x15, MOX::_screen_seg);
+    }
+
     /**
      * @address 0050a020
      */

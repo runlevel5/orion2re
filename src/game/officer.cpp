@@ -53,18 +53,23 @@ namespace OFFICER {
         return (intermediate * bonus_base) / 10;
     }
 
+    /**
+     * Calculates the display level (0-5) of an officer based on their experience 
+     * and the player's Warlord trait.
+     */
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
-        int8_t warlord_trait = 0;
+        int8_t warlord = 0;
 
-        // leader_idx 0x42 (66) likely refers to a special entity or unassigned leader
-        if (leader_idx != 0x42) {
+        // Leader index 0x42 (66) appears to be a special case (e.g., Orion) where traits don't apply
+        if (leader_idx != 0x42 /* 66 */) {
             int8_t player_idx = MOX::_leaders[leader_idx].player_index;
-            warlord_trait = MOX::_player[player_idx].traits[TRAIT_WARLORD];
+            // Accessing the first trait (index 0), typically TRAIT_WARLORD
+            warlord = MOX::_player[static_cast<int>(player_idx)].traits[TRAIT_WARLORD];
         }
 
-        int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord_trait);
+        int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord);
 
-        // Cap the maximum level at 5
+        // Caps the reported level at 5
         if (level > 5) {
             level = 5;
         }
@@ -375,21 +380,21 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx) {
-        int32_t cost = OFFICER::Officer_Cost_(player_num, leader_idx);
+        int32_t cost = Officer_Cost_(player_num, leader_idx);
+        int16_t maintenance = (int16_t)((cost + 99) / 100);
 
-        int16_t maintenance_cost = (int16_t)((cost + 99) / 100);
+        bool has_maintenance_reduction_skill = Officer_Has_General_Skill_(player_num, leader_idx, 28 /* 0x1c */) ||
+                                               Officer_Has_General_Skill_(player_num, leader_idx, 29 /* 0x1d */);
 
-        bool has_cost_reduction_skill = OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 28) ||
-                                         OFFICER::Officer_Has_General_Skill_(player_num, leader_idx, 29);
-
-        if (leader_idx != 65 && !has_cost_reduction_skill) {
-            if (maintenance_cost < 1) {
-                maintenance_cost = 1;
-            }
-            return maintenance_cost;
+        if (leader_idx == 65 /* 0x41 */ || has_maintenance_reduction_skill) {
+            return 0;
         }
 
-        return 0;
+        if (maintenance < 1) {
+            maintenance = 1;
+        }
+
+        return maintenance;
     }
 
     /**
@@ -1170,16 +1175,6 @@ namespace OFFICER {
         }
     }
 
-    /**
-     * @address 00444730
-     */
-    /**
-     * @brief Checks if two ships are at the same coordinates.
-     * 
-     * @param ship_index_1 The index of the first ship in the global ship array.
-     * @param ship_index_2 The index of the second ship in the global ship array.
-     * @return True if both ships have the same x and y coordinates, false otherwise.
-     */
     bool __cdecl Ships_In_Same_Place_(int16_t ship_index_1, int16_t ship_index_2) {
         // ship structure size: 0x81 (129) bytes
         const auto& ship1 = MOX::_ship[ship_index_1];

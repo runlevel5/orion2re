@@ -72,10 +72,7 @@ namespace MAPGEN {
 
     void __cdecl Generate_Nebulas_();
 
-    inline void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, void* out_points, int16_t* count, int max_count) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int32_t, void*, int16_t*, int);
-        reinterpret_cast<Fn>(0x004B8270)(x, y, min_x, min_y, max_x, max_y, dist_sq, out_points, count, max_count);
-    }
+    void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, void* out_points, int16_t* count, int32_t max_count);
 
     bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names);
 

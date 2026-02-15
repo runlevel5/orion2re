@@ -34,4 +34,13 @@ namespace BILL {
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx) {
         return static_cast<int16_t>(MOX::_player[player_idx].spies[target_idx] & 0x3F);
     }
+
+    int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height) {
+        _Print_Paragraph_Bill_(0, 0, width, text, height, 0, nullptr);
+        return __pp_max_width;
+    }
+
+    void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width) {
+        _Squeeze_Print_(x - (width / 2), y, str, width, nullptr, 2, 1);
+    }
 }

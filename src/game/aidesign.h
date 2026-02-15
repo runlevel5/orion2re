@@ -2,13 +2,13 @@
 #include <cstdint>
 
 namespace aidesign {
-    inline struct s_spcl* _bio_weapon_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556DC0});
-    inline struct s_spcl* _capture_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556DD8});
-    inline struct s_spcl* _cloaking_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556DF0});
-    inline struct s_spcl* _beam_defense_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556E00});
-    inline struct s_spcl* _missile_defense_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556E10});
-    inline struct s_spcl* _armor_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556E30});
-    inline struct s_spcl* _shield_spcl = reinterpret_cast<struct s_spcl*>(std::uintptr_t{0x00556E40});
+    inline s_spcl (&_bio_weapon_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DC0});
+    inline s_spcl (&_capture_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DD8});
+    inline s_spcl (&_cloaking_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556DF0});
+    inline s_spcl (&_beam_defense_spcl)[4] = *reinterpret_cast<s_spcl(*)[4]>(std::uintptr_t{0x00556E00});
+    inline s_spcl (&_missile_defense_spcl)[8] = *reinterpret_cast<s_spcl(*)[8]>(std::uintptr_t{0x00556E10});
+    inline s_spcl (&_armor_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556E30});
+    inline s_spcl (&_shield_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556E40});
 
     inline s_aidesign_ship_design (&_ship_design_tables)[7][6] = *reinterpret_cast<s_aidesign_ship_design(*)[7][6]>(std::uintptr_t{0x00556F70});
     inline s_spcl (&_beam_offense_spcl)[7] = *reinterpret_cast<s_spcl(*)[7]>(std::uintptr_t{0x00556E50});
@@ -24,41 +24,41 @@ namespace aidesign {
         return fn(list, count, player_idx, design, space, weapon_index_ptr);
     }
 
-    inline int16_t __cdecl Add_Theme_Special_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr) {
-        using Fn = int16_t(__cdecl*)(int16_t, struct s_ship_design*, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0046c7f0 });
-        return fn(player_idx, design, space, weapon_index_ptr);
+    int16_t __cdecl Add_Theme_Special_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
+
+    int16_t __cdecl Get_Ship_Class_(int16_t player_idx);
+
+    int16_t __cdecl Fighters_Available_(int16_t player_idx);
+
+    int16_t __cdecl Special_Weapons_Available_(int16_t player_idx);
+
+    int16_t __cdecl Special_Devices_Available_(int16_t player_idx);
+
+    uint16_t __cdecl Get_Competition_Player_Tech_Values_(uint32_t player_idx, uint32_t tech_type);
+
+    bool __cdecl Human_Player_Best_Weapons_Are_Beams_();
+
+    int16_t __cdecl Add_Fighters_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space);
+
+    int16_t __cdecl Add_Beam_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t weapon_class);
+
+    inline void __cdecl Determine_Beam_Weapon_Modifications_(int16_t player_idx, int16_t hull_size, int16_t* type0, int16_t* spec0, int16_t* arc0, int16_t* type1, int16_t* spec1, int16_t* arc1, int16_t* type2, int16_t* spec2, int16_t* arc2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046d500});
+        fn(player_idx, hull_size, type0, spec0, arc0, type1, spec1, arc1, type2, spec2, arc2);
     }
 
-    inline int16_t __cdecl Get_Ship_Class_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046BE70})(player_idx);
+    inline void __cdecl Determine_Missile_Weapon_Modifications_(int16_t player_idx, uint16_t* type, uint16_t* specials, int16_t size, int16_t space_limit, int16_t* ammo) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t*, uint16_t*, int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046cb80});
+        fn(player_idx, type, specials, size, space_limit, ammo);
     }
 
-    inline bool __cdecl Human_Player_Best_Weapons_Are_Beams_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046BC90})();
-    }
+    int16_t __cdecl Add_Missile_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t ammo);
 
-    inline int16_t __cdecl Add_Fighters_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space) {
-        using Fn = int16_t(__cdecl*)(int16_t, struct s_ship_design*, int16_t*, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046C9E0})(player_idx, design, weapon_index_ptr, space);
-    }
+    void __cdecl Determine_Bomb_Weapon_(int16_t player_idx, int16_t* bomb_type);
 
-    inline int16_t __cdecl Add_Beam_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t weapon_class) {
-        using Fn = int16_t(__cdecl*)(int16_t, struct s_ship_design*, int16_t*, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046DF10})(player_idx, design, weapon_index_ptr, space, weapon_class);
-    }
-
-    inline int16_t __cdecl Add_Missile_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t ammo) {
-        using Fn = int16_t(__cdecl*)(int16_t, struct s_ship_design*, int16_t*, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046D010})(player_idx, design, weapon_index_ptr, space, ammo);
-    }
-
-    inline int16_t __cdecl Add_Bomb_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space) {
-        using Fn = int16_t(__cdecl*)(int16_t, struct s_ship_design*, int16_t*, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0046D3B0})(player_idx, design, weapon_index_ptr, space);
-    }
+    int16_t __cdecl Add_Bomb_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_slot_idx, int16_t space_available);
 
     void __cdecl Auto_Design_Ship_(int16_t player_idx, s_ship_design* design, int16_t hull_idx);
 

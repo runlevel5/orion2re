@@ -80,19 +80,11 @@ namespace COLCALC {
         return fn(colony, building_id);
     }
 
-    inline int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
-        using Fn = int32_t(__cdecl*)(s_colony*, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6190});
-        return fn(colony, product, production_spent);
-    }
+    int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent);
 
     int32_t __cdecl Colony_Cost_To_Buy_Producing_Product_(s_colony* colony);
 
-    inline bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f62f0});
-        return fn(colony_idx);
-    }
+    bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx);
 
     inline int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_idx) {
         using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
@@ -101,17 +93,11 @@ namespace COLCALC {
 
     int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony);
 
-    inline void __cdecl Colony_Buy_Outright_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6280});
-        fn(colony_idx);
-    }
+    int32_t __cdecl Ship_Type_Cost_For_Player_(int32_t ship_type, int16_t player_idx);
 
-    inline int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony) {
-        using Fn = int16_t(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f6120});
-        return fn(colony);
-    }
+    void __cdecl Colony_Buy_Outright_(int16_t colony_idx);
+
+    int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony);
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
@@ -299,11 +285,7 @@ namespace COLCALC {
 
     int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx);
 
-    inline int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043de50});
-        return fn(govt_type);
-    }
+    int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type);
 
     // Suggested name: Compute_Potential_Colony_Info
     inline void __cdecl Compute_Potential_Colony_Info_(s_player* player, s_planet_data* planet, void* result_struct) {
@@ -318,4 +300,8 @@ namespace COLCALC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F5A90 });
         return fn(planet, player_num);
     }
+
+    bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony);
+
+    int16_t __cdecl N_Colonies_And_Outposts_At_Star_(int16_t star_index);
 }

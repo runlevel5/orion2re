@@ -43,7 +43,7 @@ namespace video {
 	inline int16_t& _screen_window_x2 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578E00 });
 
 	// Functions
-	void Set_Refresh_Stencil_();
+	void __cdecl Set_Refresh_Stencil_();
 	void Set_Refresh_Full_();
 	void __cdecl Set_Page_Off_();
 	void __cdecl Clip_Off_();

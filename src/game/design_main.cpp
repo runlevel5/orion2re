@@ -542,9 +542,9 @@ namespace DESIGN {
         MOX::_system_repl_box_btm_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_system_repl_box_cancel_btn = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
 
-        MOX::allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
-        MOX::_design = MOX::allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125);
-        MOX::_weapon_filter = MOX::allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
+        allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+        MOX::_design = (s_current_design*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125);
+        MOX::_weapon_filter = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
 
         char tech_lbx[20];
         Get_Tech_Description_Lbx_Name_(tech_lbx);

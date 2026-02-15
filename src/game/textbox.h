@@ -8,9 +8,11 @@ namespace TEXTBOX {
         fn(buffer);
     }
 
-    inline void __cdecl Text_Box_(const char* title, const char* content) {
-        using Fn = void(__cdecl*)(const char*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471070});
-        fn(title, content);
+    inline void __cdecl Do_Text_Box_(const char* param_1, const char* param_2, uint32_t param_3) {
+        using Fn = void(__cdecl*)(const char*, const char*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004710b0});
+        fn(param_1, param_2, param_3);
     }
+
+    void __cdecl Text_Box_(const char* param_1, const char* param_2);
 }

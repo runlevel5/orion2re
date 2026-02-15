@@ -122,4 +122,9 @@ namespace sound {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052de10});
         fn(sound_id);
     }
+
+    inline void __cdecl Fadeout_Sound_(int32_t handle, int32_t duration) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        reinterpret_cast<Fn>(0x0052e850)(handle, duration);
+    }
 }

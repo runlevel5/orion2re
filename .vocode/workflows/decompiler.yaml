@@ -501,6 +501,7 @@ workflows:
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
           * All external variables and functions stubs were added to correct files with correct namespaces
+          * External function stubs did not overwrite existing function definitions
           * All mentioned namespaces were processed
           * No existing function signatures were changed
           * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address

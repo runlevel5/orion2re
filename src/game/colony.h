@@ -13,6 +13,7 @@ namespace COLONY {
 
     inline const char* _RACEICON_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C88}); // "RACEICON.LBX"
     inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
+    inline const char* _COLBLDG_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CE8}); // "COLBLDG.LBX"
     inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
@@ -48,6 +49,8 @@ namespace COLONY {
     inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
 
     inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
+    inline uint8_t& _drawing_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E10});
+    inline uint8_t& _valid_colony = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E14});
 
     inline void __cdecl Draw_Bldg_CR_Dark_(int16_t c, int16_t r) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
@@ -151,6 +154,21 @@ namespace COLONY {
         fn(colony_idx);
     }
 
+    inline void __cdecl Reset_Field_Arrays_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004dbd00)();
+    }
+
+    inline uint16_t __cdecl Sum_Colonists_(int32_t colony_idx, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6) {
+        using Fn = uint16_t(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
+        return reinterpret_cast<Fn>(0x004dd920)(colony_idx, arg2, arg3, arg4, arg5, arg6);
+    }
+
+    inline void __cdecl Reset_Field_Mode_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004dc190)();
+    }
+
     void __cdecl Show_Colony_Screen_();
 
     inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
@@ -178,8 +196,10 @@ namespace COLONY {
 
     void __cdecl Tested_Colony_Buys_Outright_(int16_t colony_idx);
 
-    inline s_animation_header* __cdecl Get_Planet_Anim_Header(int16_t id) {
+    inline s_animation_header* __cdecl Mini_Planet_Anim_(int16_t id) {
         using Fn = s_animation_header*(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(0x004e20f0)(id);
     }
+
+    int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y);
 }

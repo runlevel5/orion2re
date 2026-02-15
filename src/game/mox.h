@@ -35,6 +35,9 @@ namespace MOX {
     inline int16_t& _scanned_small_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49B2});
     inline int16_t& _n_fltscrn_officers = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183A});
     inline int16_t*& _officer_id_list = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596E94});
+    // Suggested name: MOX::_star_colors_seg
+    inline s_animation_header** _star_colors_seg =
+        reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597430});
     inline s_animation_header* (&_fleet_galaxy_star_seg)[11] =
         *reinterpret_cast<s_animation_header*(*)[11]>(std::uintptr_t{0x00596F50});
     inline s_animation_header* (&_colony_galaxy_star_seg)[10] =
@@ -138,6 +141,9 @@ namespace MOX {
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
+    // Suggested name: MOX::_planet_summary_galaxy_star_seg
+    inline s_animation_header** _planet_summary_galaxy_star_seg =
+        reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B470});
     inline uint8_t& _first_weapon_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6C8});
     inline int16_t& _fleet_box_colonize_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6BA});
     inline uint8_t& _reloaded_ship_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6BC});
@@ -236,8 +242,8 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
-    inline char**& _planet_gravity_string =
-        *reinterpret_cast<char***>(std::uintptr_t{0x005A49E0});
+    inline char* (&_planet_gravity_string)[3] =
+        *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x005A49E0});
 
     inline uint16_t& _NUM_SHIPS = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059B4BC });
     inline void*& _global_bitmap_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596DC4});
@@ -563,11 +569,6 @@ namespace MOX {
     }
 
     namespace allocate {
-        inline uint32_t __cdecl Get_Remaining_Block_Space_(void* seg) {
-            using Fn = uint32_t(__cdecl*)(void*);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0052EBB0})(seg);
-        }
-
         inline s_current_design* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
             using Fn = s_current_design*(__cdecl*)(void*, uint32_t);
             return reinterpret_cast<Fn>(std::uintptr_t{0x0052E930})(seg, size);

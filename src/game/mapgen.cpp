@@ -1169,6 +1169,52 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
     }
 
+    void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, void* out_points, int16_t* count, int32_t max_count) {
+        int16_t x_coords[640];
+        int16_t y_coords[480];
+        bool finished = false;
+
+        memset(x_coords, 0xFF, sizeof(x_coords));
+        memset(y_coords, 0xFF, sizeof(y_coords));
+
+        for (int16_t i = min_x; i < max_x; ++i) {
+            x_coords[i] = i;
+        }
+        for (int16_t i = min_y; i < max_y; ++i) {
+            y_coords[i] = i;
+        }
+
+        HAROLD::Randomize_List_(x_coords, 640, 0);
+        HAROLD::Randomize_List_(y_coords, 480, 0);
+
+        for (int i = 0; i < 640; ++i) {
+            if (finished) break;
+
+            int16_t rx = x_coords[i];
+            if (rx > -1) {
+                for (int j = 0; j < 480; ++j) {
+                    int16_t ry = y_coords[j];
+                    if (ry > -1) {
+                        int32_t dist = HOMEGEN::Dist_Between_Points_(x, y, rx, ry);
+                        if (dist >= dist_sq) {
+                            int16_t current_count = *count;
+                            int16_t* out = (int16_t*)out_points;
+                            out[current_count * 2] = rx;
+                            out[current_count * 2 + 1] = ry;
+
+                            *count = current_count + 1;
+
+                            if (*count >= max_count) {
+                                finished = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void __cdecl Copy_Name_To_Star_(int16_t star_idx) {
         int32_t name_id = static_cast<int16_t>(_name_index[star_idx]);
         const char* src_name = reinterpret_cast<const char*>(reinterpret_cast<std::uintptr_t>(_name_seg) + (name_id * 15));

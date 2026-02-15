@@ -255,6 +255,12 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
+inline void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t width, int16_t* unknown_ptr, int16_t unknown_val1, int8_t unknown_val2) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t*, int16_t, int8_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407210});
+    fn(x, y, str, width, unknown_ptr, unknown_val1, unknown_val2);
+}
+
 inline int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
     using Fn = int16_t(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004038D0});

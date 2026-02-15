@@ -406,9 +406,6 @@ namespace COLONY {
         }
     }
 
-    /**
-     * @address 004dca40
-     */
     void __cdecl Load_Planet_Screen_() {
         return;
     }
@@ -859,7 +856,7 @@ namespace COLONY {
 
         graphics::Fill_(x + 5, y + 2, x + 0xb0, y + 0xc3, 0xe9);
 
-        s_animation_header* planet_anim = Get_Planet_Anim_Header(planet_idx);
+        s_animation_header* planet_anim = Mini_Planet_Anim_(planet_idx);
         remap::Calculate_Picture_Remap_Colors_(planet_anim);
 
         s_animation_header* ui_anim = C_Anims_(0xe);
@@ -868,6 +865,17 @@ namespace COLONY {
         MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(planet_idx, buffer);
 
         BILL::Squeeze_Print_Formatted_Paragraph_(x + 14, y + 45, 154, 140, buffer, 0);
+    }
+
+    /**
+     * @address 004dd880
+     */
+    int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y) {
+        if ((y % 2) == 0) {
+            return (int16_t)y * 6 + x;
+        } else {
+            return ((int16_t)y * 6 - x) + 5;
+        }
     }
 
     void __cdecl Tested_Colony_Buys_Outright_(int16_t colony_idx) {

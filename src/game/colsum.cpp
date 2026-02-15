@@ -339,6 +339,10 @@ namespace COLSUM {
         COLONY::Load_Galaxy_Map_Anims_();
     }
 
+    void __cdecl Draw_Galaxy_Map_() {
+        MOVEBOX::Draw_Galaxy_Map_Box_(nullptr, 0, 0x17c, 0x15d, 0x80, 0x5b, 0, 0, 0, 0, 3, 0);
+    }
+
     void __cdecl Draw_Empire_Info_() {
         char buffer[200];
 

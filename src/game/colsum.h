@@ -91,11 +91,7 @@ namespace COLSUM {
 
     void __cdecl Draw_Empire_Info_();
 
-    inline void __cdecl Draw_Galaxy_Map_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00402720});
-        fn();
-    }
+    void __cdecl Draw_Galaxy_Map_();
 
     void __cdecl Draw_Colony_Summary_For_Colony_(int16_t index);
 

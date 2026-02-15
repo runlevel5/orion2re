@@ -40,10 +40,34 @@ namespace MOVEBOX {
         fn(box_id);
     }
 
-    inline void __cdecl Draw_Galaxy_Map_Box_(void* header, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12) {
-        using Fn = void(__cdecl*)(void*, int, int, int, int, int, int, int, int, int, int, int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00512ab0})(header, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12);
+    void __cdecl Box_Fleet_Screen_Scanned_Star_();
+
+    inline void __cdecl Box_Officer_Screen_Scanned_Star_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005133A0});
+        fn();
     }
+
+    inline void __cdecl Box_Officer_Screen_Chosen_Star_(int16_t p1, int16_t p2, int16_t p3, int16_t p4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005132B0});
+        fn(p1, p2, p3, p4);
+    }
+
+    void __cdecl Box_Fleet_Screen_Scanned_Ship_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
+
+    inline const char* s_geggggg_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
+
+    void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
+
+    void __cdecl Do_Officer_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int scale_x, int scale_y);
+
+    void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,
+                                    int16_t x_base, int16_t y_base,
+                                    int16_t width, int16_t height,
+                                    int16_t map_x_off, int16_t map_y_off,
+                                    int16_t x_adj, int16_t y_adj,
+                                    int16_t view_mode, int16_t exit_flag);
 
     inline void __cdecl Get_Galaxy_Map_Star_XY_(int16_t star_idx, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t u1, int16_t u2, int16_t u3, int16_t* out_x, int16_t* out_y) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*);

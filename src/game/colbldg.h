@@ -62,13 +62,11 @@ namespace COLBLDG {
 
     inline void*& _desc_record_ptr = *reinterpret_cast<void**>(std::uintptr_t{0x00571F74});
 
-    inline s_animation_header** _anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00571EE0});
+    inline s_animation_header* (&_anims)[7] =
+        *reinterpret_cast<s_animation_header* (*)[7]>(std::uintptr_t{0x00571EE0});
     inline s_animation_header*& _colsum_pal_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595380});
 
-    inline void __cdecl Load_Build_Anims_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050A140})();
-    }
+    void __cdecl Load_Build_Anims_();
 
     void __cdecl Clear_Last_App_Description_String_();
 

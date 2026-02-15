@@ -1,6 +1,14 @@
 #include "deps.h"
 
 namespace namestar {
+    int16_t Star_Name_Popup_Screen_Center_X_() {
+        return 0xb1;
+    }
+
+    int16_t Star_Name_Popup_Screen_Center_Y_() {
+        return 125;
+    }
+
     int16_t Star_Name_Popup_Map_Center_X_() {
         return 131;
     }

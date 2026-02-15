@@ -46,11 +46,7 @@ namespace BILL {
         reinterpret_cast<Fn>(0x004076f0)(a1, y, type, a4, buffer, a6);
     }
 
-    inline void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* text, int16_t width) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407410});
-        fn(x, y, text, width);
-    }
+    void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
 
     inline void __cdecl _Print_Paragraph_(uint16_t x, int16_t y, uint16_t width, const char* text, int shadow_style) {
         using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, const char*, int);
@@ -58,11 +54,15 @@ namespace BILL {
         fn(x, y, width, text, shadow_style);
     }
 
-    inline int16_t __cdecl _Get_Paragraph_Max_Width_(int32_t max_width, char* text, int32_t param_3) {
-        using Fn = int16_t(__cdecl*)(int32_t, char*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408120});
-        return fn(max_width, text, param_3);
+    inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
+
+    inline void __cdecl _Print_Paragraph_Bill_(int32_t x, int32_t y, int16_t width, char* text, int16_t height, int32_t alignment, int16_t* out_val) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t, char*, int16_t, int32_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407DD0});
+        fn(x, y, width, text, height, alignment, out_val);
     }
+
+    int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height);
 
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"

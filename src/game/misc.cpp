@@ -213,6 +213,11 @@ namespace MISC {
         fonts::_font_header.font_style = saved_style;
     }
 
+    void __cdecl Set_Font_Default_Spacing_() {
+        fonts::_font_header.font_style_spacing =
+            fonts::_font_header.font_spacing[fonts::_current_font_style];
+    }
+
     int16_t __cdecl Bit_Value_To_Num_(int32_t value, int16_t bit_limit) {
         int16_t first_bit_index = 0;
         bool bit_found = false;
@@ -236,6 +241,37 @@ namespace MISC {
         return first_bit_index;
     }
 
+    void __cdecl Set_Fitted_Font_Style_(char* text, s_colors* colors, int16_t initial_style, int16_t initial_spacing, int16_t variant, int16_t max_width, int16_t min_style) {
+        int16_t current_style = initial_style;
+        int16_t current_spacing = initial_spacing;
+        bool is_finished = false;
+
+        if (variant == -1) {
+            variant = 0;
+        }
+
+        do {
+            fonts::Set_Font_Style_(current_style, colors);
+            fonts::Set_Font_Spacing_(current_spacing);
+            fonts::_font_header.font_style = variant;
+
+            if (fonts::Get_String_Width_(text) < max_width) {
+                is_finished = true;
+            } else {
+                current_spacing--;
+
+                if (current_spacing < 1) {
+                    current_spacing = initial_spacing;
+                    current_style--;
+
+                    if (current_style < min_style) {
+                        is_finished = true;
+                    }
+                }
+            }
+        } while (!is_finished);
+    }
+
     void __cdecl Replace_Char_(char* str, char target, char replacement) {
         int16_t length = static_cast<int16_t>(strlen(str));
 
@@ -248,5 +284,23 @@ namespace MISC {
                 str[i] = replacement;
             }
         }
+    }
+
+    bool __cdecl Occluded_(int16_t x1_min, int16_t y1_min, int16_t x1_max, int16_t y1_max,
+                           int16_t x2_min, int16_t y2_min, int16_t x2_max, int16_t y2_max) {
+        if (((x2_min <= x1_min && x1_min <= x2_max) ||
+             (x2_min <= x1_max && x1_max <= x2_max) ||
+             (x1_min <= x2_min && x2_min <= x1_max) ||
+             (x1_min <= x2_max && x2_max <= x1_max))) {
+
+            if (((y2_min <= y1_min && y1_min <= y2_max) ||
+                 (y2_min <= y1_max && y1_max <= y2_max) ||
+                 (y1_min <= y2_min && y2_min <= y1_max) ||
+                 (y1_min <= y2_max && y2_max <= y1_max))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

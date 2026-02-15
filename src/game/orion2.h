@@ -3190,14 +3190,13 @@ struct s_tech_weapon_data {
     undefined field6_0xd;
     short base_size;
     short cost;
-    undefined field9_0x12;
-    undefined field10_0x13;
-    short field11_0x14;
-    short field12_0x16;
-    undefined field13_0x18;
-    undefined field14_0x19;
-    undefined field15_0x1a;
-    undefined field16_0x1b;
+    short flags;
+    short field10_0x14;
+    short field11_0x16;
+    undefined field12_0x18;
+    undefined field13_0x19;
+    undefined field14_0x1a;
+    undefined field15_0x1b;
 };
 
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;

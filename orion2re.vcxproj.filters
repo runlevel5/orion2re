@@ -240,6 +240,15 @@
     <ClCompile Include="src\game\estrings.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\textbox.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\colbcach.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\colland.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -651,6 +660,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\colmove.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\ocpolpup.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

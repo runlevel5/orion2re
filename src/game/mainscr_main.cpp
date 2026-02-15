@@ -265,7 +265,7 @@ namespace MAINSCR {
         MAINSCR::Clear_Twinkling_Star_Data_();
         MOX::_fleet_ship_scanned = -1;
         MOX::_galaxy_map_scanned_star = -1;
-        MISC::Set_Field_Outline_Color_(20);
+        fields::Set_Field_Outline_Color_(20);
         fields::Disable_Cancel_();
         _zoom_box_increment_value = 1;
         _officer_screen_return_screen = -1;

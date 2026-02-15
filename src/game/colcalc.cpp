@@ -2181,29 +2181,23 @@ namespace COLCALC {
     }
 
     /**
-     * @address 004f75a0
-     */
-    /**
-     * Calculates the gravity-based production factor for a colony and player.
-     * 
-     * @param colony Pointer to the colony data.
-     * @param player_idx Index of the player (0-7).
-     * @return A production factor (e.g., 4 for 100%, 3 for 75%, 2 for 50%).
+     * Executes per-turn colony calculations for a specific player, 
+     * including pre-import processing and final production resolution.
      */
     void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx) {
         MOX::Mox_Update_();
 
-        s_colony* colony = MOX::_colony;
+        for (int32_t i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
 
-        while (colony < MOX::_colony + MOX::_NUM_COLONIES) {
+            // Only process colonies owned by the player that are not outposts
             if (colony->owner == (int8_t)player_idx && colony->outpost_flag == 0) {
-                Pre_Import_Computing_(colony);
+                COLCALC::Pre_Import_Computing_(colony);
                 MOX::Mox_Update_();
             }
-            colony++;
         }
 
-        Do_Player_Colony_Post_Production_(player_idx);
+        COLCALC::Do_Player_Colony_Post_Production_(player_idx);
         MOX::Mox_Update_();
     }
 
@@ -2610,11 +2604,168 @@ namespace COLCALC {
         return Colony_Product_Cost_(colony, colony->producing[0]);
     }
 
+    /**
+     * Calculates the gold cost to complete a colony's current production project.
+     * The cost increases exponentially as less progress is accumulated:
+     * - Remainder above 50% cost: 2x gold per production point.
+     * - Remainder between 10% and 50% cost: 5x gold per production point.
+     * - Remainder below 10% cost: 10x gold per production point.
+     */
+    int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
+        int32_t buy_cost = 0;
+
+        switch (product) {
+            case -38:
+            case -37:
+            case -3:
+            case -2:
+            case -1:
+                // Certain special production projects (e.g., Trade, Housing) cannot be bought.
+                break;
+
+            default: {
+                int32_t total_cost = Colony_Product_Cost_(colony, (int16_t)product);
+                int32_t half_cost = total_cost / 2;
+                int32_t tenth_cost = total_cost / 10;
+
+                if (production_spent < total_cost) {
+                    if (production_spent >= half_cost) {
+                        return (total_cost - production_spent) * 2;
+                    }
+
+                    // Accumulate cost for the portion from 50% to 100%
+                    buy_cost = (total_cost - half_cost) * 2;
+
+                    if (production_spent >= tenth_cost) {
+                        // Progress is between 10% and 50%
+                        return buy_cost + (half_cost - production_spent) * 5;
+                    }
+
+                    // Progress is below 10%, accumulate cost for 10%-50% and then 0%-10%
+                    buy_cost += (half_cost - tenth_cost) * 5;
+                    buy_cost += (tenth_cost - production_spent) * 10;
+                }
+                break;
+            }
+        }
+
+        return buy_cost;
+    }
+
+    int32_t __cdecl Ship_Type_Cost_For_Player_(int32_t ship_type, int16_t player_idx) {
+        int32_t cost = 0;
+
+        if (ship_type == 1) {
+            cost = 500;
+        } else if (ship_type == 2 || ship_type == 4) {
+            cost = 100;
+        }
+
+        DESIGN::Cost_Reduction_For_Govt_Type_(player_idx, &cost);
+
+        return cost;
+    }
+
+    bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        int32_t current_bc = MOX::_player[(int)colony->owner].bc;
+
+        int32_t cost = Colony_Cost_To_Buy_Producing_Product_(colony);
+
+        return current_bc >= cost;
+    }
+
+    /**
+     * @address 004f6260
+     */
     int32_t __cdecl Colony_Cost_To_Buy_Producing_Product_(s_colony* colony) {
         return COLCALC::Colony_Cost_To_Buy_Given_Product_(
             colony,
             static_cast<int32_t>(colony->producing[0]),
             static_cast<int32_t>(colony->production_spent)
         );
+    }
+
+    /**
+     * @address 004f6280
+     */
+    void __cdecl Colony_Buy_Outright_(int16_t colony_idx) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+        s_player* player = &MOX::_player[(uint8_t)colony->owner];
+
+        int32_t buy_cost = Colony_Cost_To_Buy_Producing_Product_(colony);
+        player->bc -= buy_cost;
+
+        int32_t product_total_cost = Colony_Producing_Product_Cost_(colony);
+        colony->bought_outright = (int16_t)product_total_cost - colony->production_spent;
+    }
+
+    /**
+     * Calculates the number of turns required for a colony to finish its current production task.
+     * Returns -1 if net production is zero or negative, preventing completion.
+     */
+    int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
+        switch (govt_type) {
+            case 1:
+                return TECH_APP_CONFEDERATION;
+            case 3:
+                return TECH_APP_IMPERIUM;
+            case 5:
+                return TECH_APP_FEDERATION;
+            case 7:
+                return TECH_APP_GALACTIC_UNIFICATION;
+            default:
+                return 0;
+        }
+    }
+
+    int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony) {
+        int32_t cost = Colony_Product_Cost_(colony, colony->producing[0]);
+        int32_t spent = (int32_t)colony->production_spent;
+
+        if (spent >= cost) {
+            return 1;
+        }
+
+        int32_t net_production = (int32_t)colony->production[ECON_INDUSTRY] - static_cast<int32_t>(static_cast<uint8_t>(colony->maintenance[ECON_INDUSTRY]));
+
+        if (net_production <= 0) {
+            return -1;
+        }
+
+        int32_t remaining_cost = cost - spent;
+
+        int32_t turns = (remaining_cost + net_production - 1) / net_production;
+
+        if (turns <= 0) {
+            return 1;
+        }
+
+        return (int16_t)turns;
+    }
+
+    /**
+     * @address 004fa4f0
+     */
+    bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony) {
+        int16_t max_pop = Planet_Max_Population_For_Player_(&MOX::_planet[colony->planet], (int16_t)colony->owner);
+
+        return (uint32_t)(uint16_t)max_pop == (uint32_t)(uint8_t)colony->n_pops;
+    }
+
+    int16_t __cdecl N_Colonies_And_Outposts_At_Star_(int16_t star_index) {
+        int16_t count = 0;
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_index].planet_index[i];
+
+            // Check if planet exists in this orbit and if it has a colony/outpost
+            if (planet_idx > -1) {
+                if (MOX::_planet[planet_idx].colony_index > -1) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

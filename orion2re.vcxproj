@@ -30,8 +30,10 @@
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\cmbtdrw1.cpp" />
+    <ClCompile Include="src\game\colbcach.cpp" />
     <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
+    <ClCompile Include="src\game\colland.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\colony.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
@@ -89,6 +91,7 @@
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
     <ClCompile Include="src\game\tech.cpp" />
+    <ClCompile Include="src\game\textbox.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
     <ClCompile Include="src\game\video.cpp" />
@@ -188,6 +191,7 @@
     <ClInclude Include="src\game\newgame.h" />
     <ClInclude Include="src\game\nextturn.h" />
     <ClInclude Include="src\game\npcdiplo.h" />
+    <ClInclude Include="src\game\ocpolpup.h" />
     <ClInclude Include="src\game\officer.h" />
     <ClInclude Include="src\game\orion2.h" />
     <ClInclude Include="src\game\orion2_consts.h" />

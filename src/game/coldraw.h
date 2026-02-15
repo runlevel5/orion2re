@@ -44,7 +44,6 @@ namespace COLDRAW {
         fn(col, row, not_scanning_valid);
     }
 
-    // TYPE MISMATCH: Originally return void
     inline int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
         int16_t colony_id, int16_t pop_idx, int32_t arg3, int32_t y, int32_t x,
         int32_t y2, int32_t arg7, int16_t* refs, int16_t* pop_count,

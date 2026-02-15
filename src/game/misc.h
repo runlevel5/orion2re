@@ -18,14 +18,13 @@ namespace MISC {
 
     s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3);
 
-    inline void __cdecl Set_Fitted_Font_Style_(const char* text, s_colors* colors, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
-        using Fn = void(__cdecl*)(const char*, s_colors*, int16_t, int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049ede0})(text, colors, p3, p4, p5, p6, p7);
-    }
+    void __cdecl Set_Fitted_Font_Style_(char* text, s_colors* colors, int16_t initial_style, int16_t initial_spacing, int16_t variant, int16_t max_width, int16_t min_style);
 
     int16_t __cdecl Get_Font_Style_();
 
     void __cdecl Get_Mox_Font_Colors_(int16_t font_idx, uint8_t color_idx_1, uint8_t color_idx_2, s_colors* out_colors);
+
+    void __cdecl Set_Font_Default_Spacing_();
 
     void __cdecl Increase_Font_Color_Range_(int16_t increment);
     void __cdecl Decrease_Font_Color_Range_(int16_t amount);
@@ -61,19 +60,12 @@ namespace MISC {
         fn(x1, y1, x2, y2, colors1, colors2, count, bitmap);
     }
 
-    inline void __cdecl Set_Field_Outline_Color_(int color) {
-        using Fn = void(__cdecl*)(int);
-        reinterpret_cast<Fn>(0x00520000)(color);
-    }
-
     void __cdecl Replace_Char_(char* str, char target, char replacement);
 
     void __cdecl _Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     int16_t __cdecl Bit_Value_To_Num_(int32_t value, int16_t bit_limit);
 
-    inline bool __cdecl Occluded_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ox1, int16_t oy1, int16_t ox2, int16_t oy2) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0049ebd0})(x1, y1, x2, y2, ox1, oy1, ox2, oy2);
-    }
+    bool __cdecl Occluded_(int16_t x1_min, int16_t y1_min, int16_t x1_max, int16_t y1_max,
+                           int16_t x2_min, int16_t y2_min, int16_t x2_max, int16_t y2_max);
 }
