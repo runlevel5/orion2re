@@ -141,3 +141,4 @@
 #include "combinit.h"
 #include "cmbtdrw1.h"
 #include "dip_scrn.h"
+#include "colsysdi.h"
