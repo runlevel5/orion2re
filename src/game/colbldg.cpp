@@ -12,9 +12,6 @@ namespace COLBLDG {
         return (COLONY::_step_squish >= 5 ? 1 : 0) + 2;
     }
 
-    /**
-     * @address 00509fa0
-     */
     void __cdecl Get_Font_Off_For_Military_(int16_t* font_offset) {
         if (_n_military_indexes <= 0) {
             return;

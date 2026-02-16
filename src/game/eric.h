@@ -42,4 +42,10 @@ namespace ERIC {
     inline char* const s_2_00551108 = reinterpret_cast<char*>(std::uintptr_t{0x00551108});
 
     char* __cdecl Red_If_Negative_Fmt_String_(int16_t value);
+
+    inline void __cdecl Pulsing_Box_(int16_t y, int16_t x, int32_t width, int32_t height, int32_t arg5, int32_t arg6, int32_t arg7) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t, int32_t, int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA950});
+        fn(y, x, width, height, arg5, arg6, arg7);
+    }
 }

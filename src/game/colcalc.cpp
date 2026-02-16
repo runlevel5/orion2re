@@ -1113,7 +1113,7 @@ namespace COLCALC {
         if (colony->food2_per_farmer == 0) {
             memset(&breakdown, 0, sizeof(breakdown));
         } else {
-            job_food = Colony_Job_Production_(colony, 0, debug_out ? &breakdown : nullptr);
+            job_food = Colony_Job_Production_(colony, 0, debug_out ? (char*)&breakdown : nullptr);
         }
 
         int16_t hydro_bonus = (colony->buildings[BUILDING_HYDROPONIC_FARM] != 0) ? 2 : 0;
@@ -1454,6 +1454,13 @@ namespace COLCALC {
         return false;
     }
 
+    void __cdecl Show_Industry_Production_(short colony_idx) {
+        char buffer[3000];
+        Colony_Industry_Production_(&MOX::_colony[colony_idx], buffer);
+        TEXTBOX::Text_Box_(_industry_summary_msg, buffer);
+    }
+
+    // TODO: Fix debug_out - crash
     void __cdecl Colony_Industry_Production_(struct s_colony* colony, char* debug_out) {
         int worker_prod;
         uint32_t android_recycler_bonus = 0;
@@ -1581,7 +1588,7 @@ namespace COLCALC {
             
             for (int i = 0; i < 8; ++i) {
                 if (dbg.racial_bonuses[i] != 0) {
-                    ptr += _sprintf(ptr, s_fmt_plus_d_s_s, (int)dbg.racial_bonuses[i], MOX::_player[0].race_name + (i * 0xea9), _bonus_msg);
+                    ptr += _sprintf(ptr, s_fmt_plus_d_s_s, (int)dbg.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
             
@@ -1847,7 +1854,7 @@ namespace COLCALC {
         memset(&debug_data, 0, sizeof(debug_data));
 
         void* debug_ptr = debug_out ? &debug_data : nullptr;
-        int base_research = Colony_Job_Production_(colony, ECON_RESEARCH, debug_ptr);
+        int base_research = Colony_Job_Production_(colony, ECON_RESEARCH, (char*)debug_ptr);
 
         int res_lab_bonus = (colony->buildings[BUILDING_RESEARCH_LAB] != 0) ? 5 : 0;
         int supercomp_bonus = (colony->buildings[BUILDING_SUPERCOMPUTER] != 0) ? 10 : 0;
@@ -2366,7 +2373,7 @@ namespace COLCALC {
         return true;
     }
 
-    int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx) {
+    int16_t __cdecl Gravity_Player_Production_Factor_(s_colony* colony, int16_t player_idx) {
         s_colony* c = static_cast<s_colony*>(colony);
         if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
             return 4;
@@ -2412,7 +2419,8 @@ namespace COLCALC {
         return base_produced;
     }
 
-    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown) {
+    // TODO: Fix me - last parameter is a structure
+    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int16_t job_type, char* breakdown) {
         char* debug_out = (char*)breakdown;
         bool is_blockaded = Colony_Is_Blockaded(colony);
         int officer_idx = Colony_Officer_(colony);

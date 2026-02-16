@@ -35,6 +35,7 @@ namespace COLONY {
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
     inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});
+    inline int16_t& _scanned_satellite = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E00});
 
     void __cdecl Init_Colonies_();
 
@@ -99,11 +100,7 @@ namespace COLONY {
     void __cdecl Update_Colony_Palette_();
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
     void __cdecl Reset_Mouse_Picture_();
-    inline void __cdecl Clear_Mouse_Picture_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e1c90});
-        fn();
-    }
+    void __cdecl Clear_Mouse_Picture_();
 
     void __cdecl Load_Ship_Bitm_();
 
@@ -112,6 +109,8 @@ namespace COLONY {
     void __cdecl Load_Officer_Anim_();
 
     void __cdecl Load_Galaxy_Map_Anims_();
+
+    char* __cdecl CR_Building_Name_(int16_t building_id);
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
 
@@ -130,6 +129,12 @@ namespace COLONY {
     int16_t __cdecl Satellite_Anim_Pic_(int16_t id);
 
     s_animation_header* __cdecl Satellite_Anim_(int16_t colony_id);
+
+    inline void __cdecl Draw_Satellite_Dark_(int16_t x, int16_t y, int16_t satellite_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df520});
+        fn(x, y, satellite_id);
+    }
 
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num);
     s_animation_header* __cdecl Buffer_Reload_Colony_(int16_t index);
@@ -171,49 +176,59 @@ namespace COLONY {
 
     void __cdecl Draw_Colony_Bldgs_();
 
-    inline void __cdecl Draw_Colony_Satellites_() {
+    void __cdecl Draw_Colony_Satellites_();
+
+    void __cdecl Draw_Colony_Info_Background_();
+
+    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t param_2);
+
+    inline void __cdecl Print_Sys_Disp_Scanned_String_(char* name) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbc20});
+        fn(name);
+    }
+
+    void __cdecl Print_Scanned_String_(char* text);
+
+    void __cdecl Print_Building_Name_(int16_t param_1, int16_t param_2);
+
+    inline void __cdecl Print_Scanned_Military_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df450});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DF020});
         fn();
     }
 
-    inline void __cdecl Draw_Colony_Info_Background_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de3f0});
-        fn();
-    }
-
-    inline void __cdecl Box_Galaxy_Map_Star_(int32_t handle, int32_t mode) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df620});
-        fn(handle, mode);
-    }
+    void __cdecl Print_Scanned_Satellite_();
 
     void __cdecl Draw_Colony_Info_();
 
-    inline void __cdecl Draw_Colony_Info_Military_() {
+    void __cdecl Draw_Colony_Info_Military_();
+
+    void __cdecl Draw_Colony_Info_Production_For_(int32_t selection);
+
+    inline int32_t __cdecl Do_Colony_Info_Military_Stuff_For_(int32_t index, int32_t last_result, int32_t counter) {
+        using Fn = int32_t(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de780});
+        return fn(index, last_result, counter);
+    }
+
+    void __cdecl Draw_Colony_Info_Officer_();
+
+    void __cdecl Draw_Colony_Info_Production_();
+
+    inline void __cdecl Draw_Colony_Info_Pop_For_(int32_t type) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de4c0});
+        fn(type);
+    }
+
+    inline void __cdecl Draw_Colony_Info_Pop_Scanned_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de750});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de520});
         fn();
     }
 
-    inline void __cdecl Draw_Colony_Info_Officer_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004deb20});
-        fn();
-    }
-
-    inline void __cdecl Draw_Colony_Info_Production_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de6d0});
-        fn();
-    }
-
-    inline void __cdecl Draw_Colony_Info_Pop_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de490});
-        fn();
-    }
+    void __cdecl Draw_Colony_Info_Pop_();
 
     inline void __cdecl Draw_Colony_Info_Morale_() {
         using Fn = void(__cdecl*)();
@@ -221,29 +236,25 @@ namespace COLONY {
         fn();
     }
 
-    inline void __cdecl Draw_Info_Name_And_Pop_() {
+    void __cdecl Draw_Info_Name_And_Pop_();
+
+    void __cdecl Draw_Info_Build_();
+
+    inline void __cdecl Draw_Current_Production_Graph_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004decd0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddba0});
         fn();
     }
 
-    inline void __cdecl Draw_Info_Build_() {
+    inline void __cdecl Draw_Turn_Count_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004deb10});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df3f0});
         fn();
     }
 
-    inline void __cdecl Draw_Sys_Disp_Scanned_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df7b0});
-        fn();
-    }
+    void __cdecl Draw_Sys_Disp_Scanned_();
 
-    inline void __cdecl Draw_Colony_Info_Scanned_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004defd0});
-        fn();
-    }
+    void __cdecl Draw_Colony_Info_Scanned_();
 
     inline void __cdecl No_Op1_() {
         using Fn = void(__cdecl*)();
@@ -305,6 +316,10 @@ namespace COLONY {
     }
 
     void __cdecl Show_Colony_Screen_();
+
+    void __cdecl Draw_Current_Building2_(int16_t x, int16_t y, int16_t building_id);
+    void __cdecl Draw_Current_Building_(int16_t building_id);
+    void __cdecl Draw_Current_Ship_(int16_t ship_id);
 
     inline int16_t& _g_colony_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DEC});
     inline s_colors& _bright_blue_font_color_array =

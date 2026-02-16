@@ -181,9 +181,6 @@ namespace COLONY {
         BILL::Squeeze_Print_Formatted_Paragraph_(x + 14, y + 45, 154, 140, buffer, 0);
     }
 
-    /**
-     * @address 004dd880
-     */
     int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y) {
         if ((y % 2) == 0) {
             return (int16_t)y * 6 + x;

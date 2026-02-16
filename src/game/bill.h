@@ -30,6 +30,12 @@ namespace BILL {
         fn(x, y, text, limit);
     }
 
+    inline void __cdecl Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t w, int16_t h, char* str, int16_t align) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407650});
+        fn(x, y, w, h, str, align);
+    }
+
     inline void __cdecl Squeeze_Paragraph_Centered_(int16_t x1, int16_t x2, int16_t y, int16_t height, char* text, int16_t unknown) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004076b0});

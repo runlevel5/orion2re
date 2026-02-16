@@ -33,6 +33,7 @@
     <ClCompile Include="src\game\colbcach.cpp" />
     <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
+    <ClCompile Include="src\game\coldraw.cpp" />
     <ClCompile Include="src\game\colland.cpp" />
     <ClCompile Include="src\game\colmove.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />

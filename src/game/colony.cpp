@@ -6,6 +6,19 @@ namespace COLONY {
         return;
     }
 
+    char* __cdecl CR_Building_Name_(int16_t building_id) {
+        if (building_id == BUILDING_ARTEMIS_SYSTEM_NET || building_id == BUILDING_DIMENSIONAL_PORTAL ||
+            building_id == BUILDING_STAR_BASE || building_id == BUILDING_STAR_FORTRESS) {
+            return ESTRINGS::E_Strings_(ESTR_HOUSING);
+        }
+
+        if (building_id == BUILDING_BATTLESTATION) {
+            return ESTRINGS::E_Strings_(ESTR_RUBBLE);
+        }
+
+        return Real_Building_Name_(building_id);
+    }
+
     char* __cdecl Real_Building_Name_(int16_t building_id) {
         return TECHDATA::_buildings[building_id].name;
     }
@@ -266,6 +279,18 @@ namespace COLONY {
         fields::Enable_Draw_All_Fields_();
     }
 
+    void __cdecl Clear_Mouse_Picture_() {
+        bitmap::Clear_Mouse_Image_(0x13);
+        mouse::Set_Mouse_List(MOX::_mouse_list_variable, 1);
+
+        if (COLMOVE::_cluster_colony_n != -1) {
+            int16_t first_unemployed = COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n);
+            if (first_unemployed != -1) {
+                fields::Disable_Draw_All_Fields_();
+            }
+        }
+    }
+
     void __cdecl Remap_Draw_Ship_D_Centered_(int16_t x, int16_t y, int16_t design_index) {
         int16_t picture_num = static_cast<int16_t>(MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_index].picture_num);
 
@@ -300,9 +325,6 @@ namespace COLONY {
         return building_id == -1;
     }
 
-    /**
-     * @address 004ddcd0
-     */
     int16_t __cdecl Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(int16_t colony_idx, int16_t product_id) {
         s_colony* colony = &MOX::_colony[colony_idx];
         int16_t remaining_cost = COLCALC::Colony_Product_Cost_(colony, product_id);
@@ -340,9 +362,6 @@ namespace COLONY {
         return turns;
     }
 
-    /**
-     * @address 004db8c0
-     */
     void __cdecl Remap_Draw_Ship_Centered_(int16_t x, int16_t y, int16_t ship_index) {
         uint8_t palette_buffer[31];
 
@@ -373,9 +392,6 @@ namespace COLONY {
         ERIC::Draw_Centered_(x, y, _ship_bitm);
     }
 
-    /**
-     * @address 004dd5b0
-     */
     int16_t __cdecl N_Houses_In_Bldg_Array_() {
         int16_t house_count = 0;
 
@@ -395,9 +411,6 @@ namespace COLONY {
         return house_count;
     }
 
-    /**
-     * @address 004dd340
-     */
     void __cdecl Insert_Bldg_Into_Array_(int16_t num_houses_delta, int16_t bldg_id, int16_t bldg_type, int8_t use_back_to_front) {
         int16_t row = -1;
         int16_t col = -1;
@@ -457,9 +470,6 @@ namespace COLONY {
         }
     }
 
-    /**
-     * @address 004dd1f0
-     */
     void Sort_Bldg_Array_Columns_() {
         int16_t iteration = 0;
         int16_t swapped_flag;
@@ -502,9 +512,6 @@ namespace COLONY {
         } while (swapped_flag != 0 && ++iteration < 6);
     }
 
-    /**
-     * @address 004ddda0
-     */
     void __cdecl Bldg_Back_To_Front_(int16_t building_type, uint16_t* out_val1, uint16_t* out_val2) {
         const uint8_t lookup_table[72] = {
             5, 5, 5, 4, 4, 5, 5, 3, 3, 5, 4, 4, 5, 2, 2, 5, 4, 3,
@@ -526,9 +533,6 @@ namespace COLONY {
         return;
     }
 
-    /**
-     * @address 004df750
-     */
     void __cdecl Clear_Galaxy_Map_Fields_() {
         _galaxy_map_name_field = -1000;
         MOX::_galaxy_map_grid_field = -1000;
@@ -538,9 +542,6 @@ namespace COLONY {
         }
     }
 
-    /**
-     * @address 004dbe20
-     */
     void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint32_t is_bright) {
         fonts::Set_Outline_Color_(0x50, 0x50);
 
@@ -664,5 +665,368 @@ namespace COLONY {
             GENDRAW::Help_(buf);
             COLONY::Show_Colony_Screen_();
         }
+    }
+
+    void __cdecl Draw_Colony_Info_Background_() {
+        if (_full_draw != 0) {
+            graphics::Darken_Fill_(0, 0, 640, 150);
+
+            int16_t unemployed_idx = COLMOVE::Get_First_Unemployed_(static_cast<int16_t>(_colony_handle));
+
+            if (unemployed_idx == -1) {
+                s_animation_header* anim = C_Anims_(3);
+                animate::Draw_(0, 0, anim);
+            } else {
+                s_animation_header* anim = C_Anims_(4);
+                animate::Draw_(0, 0, anim);
+            }
+        }
+    }
+
+    void __cdecl Draw_Colony_Satellites_() {
+        if (HAROLD::Was_Mouse_List_Saved_()) {
+            return;
+        }
+
+        for (int16_t i = 0; i < 10; ++i) {
+            int16_t satellite_id = _colony_satellites[i];
+            if (satellite_id == -1) {
+                continue;
+            }
+
+            // The X coordinate oscillates around center (295) based on index parity
+            // i=0: 295, i=1: 245, i=2: 395, i=3: 145, i=4: 495, etc.
+            int16_t multiplier = (i % 2 == 0) ? 1 : -1;
+            int16_t x = (multiplier * i * 50) + 295;
+            int16_t y = 162; /* 0xA2 */
+
+            if (satellite_id == _scanned_satellite && ERIC::Global_Cycler_(30 /* 0x1E */, 2) != 0) {
+                Draw_Satellite_Dark_(x, y, satellite_id);
+            } else {
+                s_animation_header* anim = Satellite_Anim_(satellite_id);
+                animate::Draw_(x, y, anim);
+            }
+        }
+    }
+
+    void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t param_2) {
+        int16_t x;
+        int16_t y;
+
+        MOVEBOX::Get_Galaxy_Map_Star_XY_(
+            star_idx,
+            7,
+            24,
+            MOX::_galaxy_map_height,
+            MOX::_galaxy_map_grid_y,
+            11,
+            31,
+            0,
+            &y,
+            &x
+        );
+
+        ERIC::Pulsing_Box_(y, x, 5, 5, 1, 1, 2);
+        timer::Release_Time_(2);
+    }
+
+    void __cdecl Draw_Colony_Info_Military_() {
+        int32_t last_result = 0;
+        int32_t counter = 0;
+        int32_t max_val = 0;
+        int32_t i = 0;
+
+        do {
+            last_result = Do_Colony_Info_Military_Stuff_For_(i, last_result, counter);
+            if (max_val < last_result) {
+                max_val = last_result;
+                counter++;
+            }
+            i++;
+        } while (i < 2);
+    }
+
+    void Draw_Colony_Info_Officer_() {
+        int8_t officer_idx = MOX::_star[COLONY::_star_handle].officer_index[MOX::_PLAYER_NUM];
+
+        if (officer_idx != -1) {
+            MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+            remap::Calculate_Picture_Remap_Colors_(MOX::_main_screen_seg);
+
+            s_animation_header* anim1 = C_Anims_(33);
+            animate::Draw_(544, 351, anim1);
+
+            s_animation_header* anim2 = C_Anims_(30);
+            animate::Draw_(550, 357, anim2);
+
+            COLSUM::Set_Colony_Font_To_(2);
+
+            s_leader_data& leader = MOX::_leaders[officer_idx];
+
+            if (leader.eta > 0) {
+                char local_buffer[500];
+                char* format = ESTRINGS::E_Strings_(285);
+                _sprintf(local_buffer, format, (int)leader.eta);
+                fonts::Print_Centered_(586, 433, local_buffer);
+                return;
+            } else {
+                graphics::Darken_Fill_(550, 433, 623, 442);
+                fonts::Print_Centered_(586, 433, leader.name);
+            }
+        }
+    }
+
+    void __cdecl Draw_Colony_Info_Production_() {
+        Draw_Colony_Info_Production_For_(3);
+        Draw_Colony_Info_Production_For_(0);
+        Draw_Colony_Info_Production_For_(1);
+        Draw_Colony_Info_Production_For_(2);
+    }
+
+    void __cdecl Draw_Colony_Info_Production_For_(int32_t selection) {
+        int16_t v1;
+        int16_t v2;
+
+        if (selection == 3) {
+            v1 = -1;
+            v2 = -3;
+        } else {
+            v1 = (int16_t)selection;
+            v2 = -1;
+        }
+
+        // Calculate y-coordinate: (v1 * 30) + v2 + 65
+        int16_t y_offset = (v1 * 0x1e) + v2 + 0x41;
+
+        COLDRAW::Draw_Colony_Prod_(
+            (int16_t)_colony_handle,
+            selection,
+            128,
+            y_offset,
+            301,
+            20
+        );
+    }
+
+    void __cdecl Draw_Colony_Info_Pop_() {
+        Draw_Colony_Info_Pop_For_(0);
+        Draw_Colony_Info_Pop_For_(1);
+        Draw_Colony_Info_Pop_For_(2);
+        Draw_Colony_Info_Pop_Scanned_();
+    }
+
+    void Draw_Info_Name_And_Pop_() {
+        char buffer[104];
+        int32_t handle = _colony_handle;
+
+        if (MOX::_colony[handle].occupation_policy == 0) {
+            char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
+            char* fmt = ESTRINGS::E_Strings_(ESTR_ANNIHILATING_S);
+            _sprintf(buffer, fmt, planet_name);
+            int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
+            Set_Colony_Font_To_Red_(4, cycle_val);
+        } else {
+            char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
+            char* colony_type = Colony_Type_(handle);
+            char* fmt = ESTRINGS::E_Strings_(ESTR_SCOLONY_OF_S);
+            _sprintf(buffer, fmt, colony_type, planet_name);
+            COLSUM::Set_Colony_Font_To_(4);
+        }
+
+        fonts::Set_Font_Spacing_(2);
+        fonts::Print_Centered_(320, 0, buffer);
+
+        int16_t colony_planet = MOX::_colony[handle].planet;
+        int8_t star_idx = MOX::_planet[colony_planet].star_index;
+
+        int16_t status_msg_id = -1;
+        if ((MOX::_star[star_idx].blockaded >> (MOX::_PLAYER_NUM & 0x1F)) & 1) {
+            int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
+            Set_Colony_Font_To_Red_(4, cycle_val);
+            fonts::Set_Font_Spacing_(2);
+            status_msg_id = ESTR_BLOCKADED1;
+        } else if (EVENTS::Event_Check_Plague_(static_cast<int16_t>(handle))) {
+            int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
+            Set_Colony_Font_To_Red_(4, cycle_val);
+            fonts::Set_Font_Spacing_(2);
+            status_msg_id = ESTR_PLAGUE;
+        } else if (EVENTS::Event_Check_Population_Boom_(static_cast<int16_t>(handle))) {
+            COLSUM::Set_Colony_Font_To_(4);
+            fonts::Set_Font_Spacing_(2);
+            status_msg_id = ESTR_POP_BOOM;
+        }
+
+        if (status_msg_id != -1) {
+            char* status_text = ESTRINGS::E_Strings_(status_msg_id);
+            fonts::Print_(0, 0, status_text);
+        }
+
+        COLSUM::Set_Colony_Font_To_(4);
+        fonts::Set_Font_Spacing_(3);
+
+        int sum_roundoff = 0;
+        int sum_growth = 0;
+        for (int i = 0; i < 10; ++i) {
+            sum_roundoff += MOX::_colony[handle].pop_roundoff[i];
+            sum_growth += MOX::_colony[handle].pop_growth[i];
+        }
+
+        int16_t n_base_pop = static_cast<int16_t>(Sum_Colonists_(handle, -1, -1, -1, -1, -1));
+        int total_pop = n_base_pop + (sum_roundoff / 1000);
+        int roundoff_rem = sum_roundoff % 1000;
+
+        char* pop_fmt = ESTRINGS::E_Strings_(ESTR_POP_D03D_K_DK);
+        _sprintf(buffer, pop_fmt, total_pop, roundoff_rem, sum_growth);
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &_font_color_array);
+        fonts::Print_Right_(638, 3, buffer);
+        Set_Colony_Font_();
+    }
+
+    void __cdecl Draw_Current_Building2_(int16_t x, int16_t y, int16_t building_id) {
+        if (building_id == -3) {
+            graphics::Set_Window_(517, 17, 639, 158);
+            video::Clip_On_();
+            COLONY::Draw_Building_With_Bottom_Centered_(579, 106, 14, 5, 5);
+            video::Clip_Off_();
+            return;
+        }
+
+        if (TECHDATA::_buildings[building_id].type != 7) {
+            graphics::Set_Window_(517, 17, 639, 158);
+            video::Clip_On_();
+            COLONY::Draw_Building_With_Bottom_Centered_(579, 106, building_id, 5, 5);
+            video::Clip_Off_();
+            return;
+        }
+
+        s_animation_header* animation = COLONY::Satellite_Anim_(building_id);
+        ERIC::Draw_Centered_(x, (int16_t)(y - 70), animation);
+    }
+
+    void __cdecl Draw_Current_Building_(int16_t building_id) {
+        Draw_Current_Building2_(0x242, 0x94, building_id);
+    }
+
+    void __cdecl Draw_Current_Ship_(int16_t ship_id) {
+        graphics::Set_Window_(517, 17, 639, 158);
+        video::Clip_On_();
+        Remap_Draw_Ship_Centered_(578, 77, ship_id);
+        video::Clip_Off_();
+    }
+
+    void __cdecl Draw_Info_Build_() {
+        char name_buffer[100];
+        s_colony& colony = MOX::_colony[COLONY::_colony_handle];
+        int16_t producing_id = colony.producing[0];
+
+        switch (producing_id) {
+            case -15:
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x4d /* 77 */, 0x30 /* 48 */);
+                break;
+            case -12:
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x39 /* 57 */, 0x2d /* 45 */);
+                break;
+            case -11:
+                COLONY::Remap_Draw_Ship_Seg_N_Centered_(0x242 /* 578 */, 0x39 /* 57 */, 0x2f /* 47 */);
+                break;
+            case -8:
+            case -2:
+            case -1:
+            case 0:
+                // Do nothing
+                break;
+            case -7: {
+                uint16_t race = (uint16_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
+                s_animation_header* anim = COLONY::Spy_Anim_(race);
+                ERIC::Draw_Centered_(0x242 /* 578 */, 0x4d /* 77 */, anim);
+                break;
+            }
+            case -6:
+            case -5:
+            case -4: {
+                uint16_t race = (uint16_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
+                s_animation_header* anim = COLONY::People_Anim_(0, 4, race);
+                ERIC::Draw_Centered_(0x242 /* 578 */, 0x4d /* 77 */, anim);
+                break;
+            }
+            case -3:
+                COLONY::Draw_Current_Building_(-3);
+                break;
+            default:
+                COLONY::Set_Colony_Font_();
+                if (producing_id >= 1 && producing_id < 49) {
+                    COLONY::Draw_Current_Building_(producing_id);
+                } else if (producing_id <= -100) {
+                    COLONY::Draw_Current_Ship_(-100 - producing_id);
+                } else {
+                    char* err_msg = ESTRINGS::E_Strings_(0xf7);
+                    RUSS::PFMT_(0, 0, err_msg);
+                    assert::hgetch_();
+                }
+                break;
+        }
+
+        COLONY::Draw_Current_Production_Graph_();
+
+        char* name_str = COLBLDG::Selection_Name_(producing_id);
+        strcpy(name_buffer, name_str);
+
+        fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
+        BILL::Squeeze_Print_Paragraph_(0x20a /* 522 */, 0x26 /* 38 */, 0x70 /* 112 */, 0x8d /* 141 */, name_buffer, 2);
+
+        if (colony.auto_building != 0) {
+            fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_bright_blue_font_color_array);
+            char* auto_msg = ESTRINGS::E_Strings_(0xbd);
+            fonts::Print_Centered_(0x242 /* 578 */, 0x1c /* 28 */, auto_msg);
+        }
+
+        COLONY::Draw_Turn_Count_();
+    }
+
+    void __cdecl Draw_Sys_Disp_Scanned_() {
+        if (_drawing_display == 0) {
+            COLSYSDI::Draw_Col_Sys_Disp_Last_Scanned_(7, 24);
+        } else if (_drawing_display == 1) {
+            if (_g_scanned_star != -1) {
+                s_star_data* star = &MOX::_star[_g_scanned_star];
+                Print_Sys_Disp_Scanned_String_(reinterpret_cast<char*>(star));
+
+                Box_Galaxy_Map_Star_(_g_scanned_star, 1);
+            }
+        }
+    }
+
+    void __cdecl Print_Building_Name_(int16_t param_1, int16_t param_2) {
+        if (param_1 != -1 && param_2 != -1) {
+            int32_t building_id = _colony_bldgs[param_1].buildings[param_2];
+
+            char* name = CR_Building_Name_(static_cast<int16_t>(building_id));
+            Print_Scanned_String_(name);
+        }
+    }
+
+    void __cdecl Print_Scanned_String_(char* text) {
+        Set_Colony_Font_();
+
+        int16_t width = BILL::_Get_Paragraph_Max_Width_(0x280, text, 0);
+        int16_t half_width = width / 2;
+
+        graphics::Darken_Fill_(0x135 - half_width, 0x1cf, half_width + 0x149, 0x1de);
+
+        fonts::Print_Centered_(0x13f, 0x1d3, text);
+    }
+
+    void __cdecl Print_Scanned_Satellite_() {
+        if (_scanned_satellite != -1) {
+            char* building_name = Real_Building_Name_(_scanned_satellite);
+            Print_Scanned_String_(building_name);
+        }
+    }
+
+    void __cdecl Draw_Colony_Info_Scanned_() {
+        Print_Scanned_Military_();
+        Print_Scanned_Satellite_();
+        Print_Building_Name_(_scanned_bldg_C, _scanned_bldg_R);
     }
 }

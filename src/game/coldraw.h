@@ -55,4 +55,13 @@ namespace COLDRAW {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458470});
         return fn(colony_id, pop_idx, arg3, y, x, y2, arg7, refs, pop_count, coord_vars, job_fields);
     }
+
+    inline void __cdecl Draw_Colony_Prod_Both_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6, uint8_t param_7) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458c40});
+        fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7);
+    }
+
+    // TYPE MISMATCH: existing stub had int32_t for some parameters, decompiled has int16_t
+    void __cdecl Draw_Colony_Prod_(int16_t colony_handle, int32_t selection, int32_t p3, int16_t y_offset, int32_t p5, int32_t p6);
 }

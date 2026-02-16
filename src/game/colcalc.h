@@ -9,6 +9,12 @@ struct s_planet_data;
 
 namespace COLCALC {
     #pragma pack(push, 1)
+    struct s_production_breakdown {
+        int32_t totals[6];
+        int16_t items1[212];
+        int16_t items2[49];
+    };
+
     struct s_food_production_breakdown {
         int32_t workers;             // Offset 0x00
         int16_t race_bonus[8];       // Offset 0x04
@@ -45,8 +51,8 @@ namespace COLCALC {
     inline int8_t* _non_capital_morale_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F180});
     inline int8_t* _barracks_morale_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F188});
 
-    inline int8_t* _colony_job_production_difficulty_lookup =
-        reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F190});
+    inline int8_t (&_colony_job_production_difficulty_lookup)[8] =
+        *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F190});
 
     inline const char*& _government_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE0});
     inline const char*& _mixed_races_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE4});
@@ -150,6 +156,7 @@ namespace COLCALC {
     inline char*& _trade_goods_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BD4});
     inline char*& _total_industry_produced_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B70});
     inline char*& _total_income_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571BDC});
+    inline const char*& _industry_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B24});
 
     inline int8_t* _planet_robotic_factory_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F198});
     inline int8_t* _industry_planet_size_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A0});
@@ -232,9 +239,11 @@ namespace COLCALC {
 
     void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out);
 
-    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown);
+    void __cdecl Show_Industry_Production_(short colony_idx);
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_struct);
+    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int16_t job_type, char* debug_out);
+
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_ptr);
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
         using Fn = char*(__cdecl*)(int, int);
@@ -285,7 +294,7 @@ namespace COLCALC {
 
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
 
-    int __cdecl Gravity_Player_Production_Factor_(void* colony, int16_t player_idx);
+    int16_t __cdecl Gravity_Player_Production_Factor_(s_colony* colony, int16_t player_idx);
 
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type);
 
