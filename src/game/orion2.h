@@ -309,7 +309,7 @@ struct s_colony {
     short pollution;
     int8_t n_pops;
     char specialty;
-    struct s_pop_info pop[42];
+    uint32_t pop[42];
     short pop_roundoff[10];
     short pop_growth[10];
     char n_turns_existed;

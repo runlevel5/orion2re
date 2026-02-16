@@ -213,6 +213,11 @@ namespace COLCALC {
     uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader);
 
     void __cdecl All_Colony_Calculations_();
+    inline void __cdecl Colony_Calculation_(int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f8230});
+        fn(colony_idx);
+    }
 
     void __cdecl Colony_Pop_Grows_(s_colony* colony);
 
@@ -232,7 +237,7 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown);
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, s_pop_info* pop, int16_t job_type, void* debug_struct);
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_struct);
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
         using Fn = char*(__cdecl*)(int, int);

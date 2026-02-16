@@ -180,32 +180,34 @@ namespace TRADE {
     }
 
     void __cdecl Compute_N_Trade_And_Research_Pops_() {
-        for (int i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
             MOX::_player[i].n_trade_pops = 0;
             MOX::_player[i].n_research_pops = 0;
         }
 
-        for (int i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
-            s_colony* colony = &MOX::_colony[i];
+        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+            s_colony& colony = MOX::_colony[i];
 
-            if (colony->owner != (int8_t)-1) {
-                int16_t trade_pops = 0;
-                int16_t research_pops = 0;
+            if (colony.owner != -1) {
+                int16_t colony_trade_pops = 0;
+                int16_t colony_research_pops = 0;
+                uint8_t n_pops = (uint8_t)colony.n_pops;
 
-                for (int p = 0; p < (uint8_t)colony->n_pops; ++p) {
-                    s_pop_info* pop = &colony->pop[p];
+                for (int j = 0; j < (int)n_pops; ++j) {
+                    uint32_t pop_unit = colony.pop[j];
+                    uint32_t type = pop_unit & 0x0F;
 
-                    if (pop->race < 8) {
-                        trade_pops++;
-                        research_pops++;
-                    } else if (pop->race == 8 && pop->job == 2) {
-                        research_pops++;
+                    if (type < 8) {
+                        colony_trade_pops++;
+                        colony_research_pops++;
+                    } else if (type == 8 && (pop_unit & 0x180) == 0x100) {
+                        // Case specifically for certain research-contributing population types (e.g., androids or natives)
+                        colony_research_pops++;
                     }
                 }
 
-                uint8_t owner_idx = (uint8_t)colony->owner;
-                MOX::_player[owner_idx].n_trade_pops += trade_pops;
-                MOX::_player[owner_idx].n_research_pops += research_pops;
+                MOX::_player[(uint8_t)colony.owner].n_trade_pops += colony_trade_pops;
+                MOX::_player[(uint8_t)colony.owner].n_research_pops += colony_research_pops;
             }
         }
     }

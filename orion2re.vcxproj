@@ -34,6 +34,7 @@
     <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colland.cpp" />
+    <ClCompile Include="src\game\colmove.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\colony.cpp" />
     <ClCompile Include="src\game\colony_main.cpp" />
@@ -123,6 +124,7 @@
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\colony.h" />
     <ClInclude Include="src\game\colsum.h" />
+    <ClInclude Include="src\game\colsysdi.h" />
     <ClInclude Include="src\game\colxport.h" />
     <ClInclude Include="src\game\combfind.h" />
     <ClInclude Include="src\game\combinit.h" />

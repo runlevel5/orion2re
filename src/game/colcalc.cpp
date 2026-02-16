@@ -510,22 +510,20 @@ namespace COLCALC {
     }
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony) {
-        int n_pops = colony->n_pops;
+        uint8_t n_pops = static_cast<uint8_t>(colony->n_pops);
 
-        if (n_pops < 2 || colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] != 0) {
-            return 0;
-        }
+        if (n_pops > 1 && colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] == 0) {
+            uint32_t first_biological_race = 0xFFFFFFFF;
 
-        uint32_t first_standard_race = 0xFFFFFFFF;
+            for (uint32_t i = 0; i < static_cast<uint32_t>(n_pops); ++i) {
+                uint32_t race_id = colony->pop[i] & 0x0F;
 
-        for (int i = 0; i < n_pops; ++i) {
-            uint32_t current_race = colony->pop[i].race;
-
-            if (current_race < 8) {
-                if (first_standard_race == 0xFFFFFFFF) {
-                    first_standard_race = current_race;
-                } else if (current_race != first_standard_race) {
-                    return -4;
+                if (race_id < 8) {
+                    if (first_biological_race == 0xFFFFFFFF) {
+                        first_biological_race = race_id;
+                    } else if (race_id != first_biological_race) {
+                        return -4;
+                    }
                 }
             }
         }
@@ -944,10 +942,10 @@ namespace COLCALC {
         uint8_t race_pop_count[10] = { 0 };
         uint8_t race_conquered_count[10] = { 0 };
         for (int i = 0; i < total_pops; ++i) {
-            uint8_t r = colony->pop[i].race;
+            int8_t r = colony->pop[i] & 0x0F;
             if (r < 10) {
                 race_pop_count[r]++;
-                if (colony->pop[i].conquered || (reinterpret_cast<uint32_t*>(&colony->pop[i])[0] & 0x00000400)) {
+                if (colony->pop[i] & 0x0200 || colony->pop[i] & 0x0400) {
                     race_conquered_count[r]++;
                 }
             }
@@ -1045,7 +1043,7 @@ namespace COLCALC {
                 memset(races_present, 0, sizeof(races_present));
 
                 for (int i = 0; i < (int)colony->n_pops; ++i) {
-                    races_present[colony->pop[i].race] = 1;
+                    races_present[colony->pop[i] & 0x0F] = 1;
                 }
 
                 int16_t max_limit = 0;
@@ -1555,7 +1553,7 @@ namespace COLCALC {
             } else {
                 int immune_pops = 0;
                 for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
-                    uint32_t race_idx = colony->pop[i].race;
+                    int32_t race_idx = colony->pop[i] & 0x0F;
                     if (race_idx == 8 /* Android */ || MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE]) {
                         immune_pops++;
                     }
@@ -1694,8 +1692,7 @@ namespace COLCALC {
         int base_tax_per_pop = owner_ptr->traits[TRAIT_TAX_BONUS] * 2 + 4;
 
         for (int i = 0; i < (uint8_t)colony->n_pops; ++i) {
-            s_pop_info* p = &colony->pop[i];
-            uint32_t race_idx = (uint32_t)p->race;
+            int32_t race_idx = colony->pop[i] & 0x0F;
             if (race_idx < 8) {
                 if (MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
                     total_normal_pops++;
@@ -2395,11 +2392,11 @@ namespace COLCALC {
         return 4; 
     }
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, s_pop_info* pop, int16_t job_type, void* debug_struct) {
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_struct) {
         using ColonyEmpireBaseFn = int16_t(__cdecl*)(s_colony*, int16_t, int32_t, void*);
         auto fn_table = reinterpret_cast<ColonyEmpireBaseFn*>(_colony_empire_base_functions);
 
-        int16_t base_produced = fn_table[job_type](colony, (int16_t)colony->owner, *reinterpret_cast<int32_t*>(pop) & 0xFFFF000F, debug_struct);
+        int16_t base_produced = fn_table[job_type](colony, colony->owner, pop & 0xFFFF000F, debug_struct);
         int16_t min_required = 0;
 
         if (base_produced < 1) {
@@ -2458,8 +2455,7 @@ namespace COLCALC {
         int n_pops = (uint8_t)colony->n_pops;
 
         for (int i = 0; i < n_pops; ++i) {
-            s_pop_info* p = &colony->pop[i];
-            uint32_t pop_data = *reinterpret_cast<uint32_t*>(p);
+            uint32_t pop_data = colony->pop[i];
             
             // Check if population is assigned to this job
             if ((pop_data & 0x200) && ((pop_data & 0x180) >> 7) == (uint32_t)job_type) {
@@ -2470,7 +2466,7 @@ namespace COLCALC {
                     memset(&current_pop_debug, 0, sizeof(current_pop_debug));
                 }
 
-                int16_t base_prod = Colony_Pop_Base_Prod_Produced_(colony, p, (int16_t)job_type, debug_out ? &current_pop_debug : nullptr);
+                int16_t base_prod = Colony_Pop_Base_Prod_Produced_(colony, pop_data, (int16_t)job_type, debug_out ? &current_pop_debug : nullptr);
                 
                 int32_t pop_total = 0;
                 int32_t base_scaled = (int32_t)base_prod * 20;

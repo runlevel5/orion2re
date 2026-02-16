@@ -1005,6 +1005,11 @@ namespace hooks {
         { 0x004faa00, &COLCALC::Advance_Player_Field_ },
         { 0x004fa730, &COLCALC::Field_Is_Gray_Box_ },
         { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
+        { 0x0049f2e0, &COLMOVE::Draw_Cluster_ },
+        { 0x0049f1b0, &COLMOVE::Clear_Cluster_ },
+        { 0x0049f430, &COLMOVE::Get_Cluster_ },
+        { 0x0049f280, &COLMOVE::Get_Num_Unemployed_ },
+        { 0x0049f220, &COLMOVE::Get_First_Unemployed_ },
     };
 
     void Install_Hooks()

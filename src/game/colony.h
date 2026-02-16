@@ -92,9 +92,18 @@ namespace COLONY {
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl C_Anims_(int16_t index);
+    inline s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004DC3C0})(colony_idx, pop_idx);
+    }
     void __cdecl Update_Colony_Palette_();
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
     void __cdecl Reset_Mouse_Picture_();
+    inline void __cdecl Clear_Mouse_Picture_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e1c90});
+        fn();
+    }
 
     void __cdecl Load_Ship_Bitm_();
 
