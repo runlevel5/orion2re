@@ -64,6 +64,12 @@ namespace BILL {
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height);
 
+    inline int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text) {
+        using Fn = int16_t(__cdecl*)(int16_t, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004080F0});
+        return fn(width, text);
+    }
+
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
     inline const char* s_SR_R_wildcard_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512E0}); // "SR_R?_SC.LBX"

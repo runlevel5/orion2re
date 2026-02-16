@@ -28,11 +28,7 @@ namespace COLBLDG {
 
     bool __cdecl Has_Prod_In_Queue_(int16_t building_id);
 
-    inline void __cdecl Draw_Icon_(s_animation_header* anim) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0050d220 });
-        fn(anim);
-    }
+    void __cdecl Draw_Icon_(s_animation_header* anim);
 
     inline int16_t& _n_military_indexes = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AC0C});
     inline int16_t* _military_indexes = reinterpret_cast<int16_t*>(std::uintptr_t{0x0055ABA0});

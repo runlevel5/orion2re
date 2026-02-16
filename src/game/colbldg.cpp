@@ -1211,6 +1211,13 @@ namespace COLBLDG {
     }
 
     /**
+     * @address 0050d220
+     */
+    void __cdecl Draw_Icon_(s_animation_header* anim) {
+        ERIC::Draw_Centered_(244, 56, anim);
+    }
+
+    /**
      * @address 0050ad80
      */
     void __cdecl Draw_Ship_Info_(int16_t item) {

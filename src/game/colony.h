@@ -56,10 +56,10 @@ namespace COLONY {
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x00559FF8});
     inline int16_t& _g_ship_player_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559FFC});
-    inline void*& _ship_pic_bitm =
-        *reinterpret_cast<void**>(std::uintptr_t{0x00595E68});
-    inline void*& _ship_bitm =
-        *reinterpret_cast<void**>(std::uintptr_t{0x00595F7C});
+    inline s_animation_header*& _ship_pic_bitm =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E68});
+    inline s_animation_header*& _ship_bitm =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595F7C});
 
     inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
     inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"

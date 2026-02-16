@@ -377,7 +377,7 @@ namespace DESIGN {
         }
 
         // Calculate Shield space
-        design->shield_space = (int16_t)Shield_Space_Per_Tech_(design->shield, design->ship_size, MOX::_PLAYER_NUM);
+        design->shield_space = (int16_t)Shield_Space_Given_M_Level_(design->shield, design->ship_size, MOX::_PLAYER_NUM);
 
         // Calculate Special Device space for all 8 slots
         for (int i = 0; i < 8; ++i) {
@@ -490,11 +490,15 @@ namespace DESIGN {
         return space;
     }
 
-    int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num) {
-        int16_t base_space = Shield_Space_(shield_type, ship_size);
-        int16_t tech_level = Tech_Level_(player_num, TECHDATA::_shields[shield_type].tech_app_id);
+    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t m_level) {
+        // Calculate the base space requirement for this shield and ship type
+        int16_t base_space = DESIGN::Shield_Space_(shield_id, ship_type);
 
-        return Space_Given_M_Level_(base_space, tech_level, 0);
+        // Determine the effective technology level based on mastery level and shield's tech app
+        int16_t tech_level = DESIGN::Tech_Level_(m_level, TECHDATA::_shields[shield_id].tech_app_id);
+
+        // Adjust the base space requirement according to the technology level
+        return DESIGN::Space_Given_M_Level_(base_space, tech_level, 0);
     }
 
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {

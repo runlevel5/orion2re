@@ -121,4 +121,32 @@ namespace ERIC {
                 return true;
         }
     }
+
+    void __cdecl Draw_Centered_(int16_t x, int16_t y, s_animation_header* animation) {
+        int16_t width = animate::Get_Width_(animation);
+        int16_t height = animate::Get_Height_(animation);
+
+        int16_t x_centered = x - (width / 2);
+        int16_t y_centered = y - (height / 2);
+
+        animate::Draw_(x_centered, y_centered, animation);
+    }
+
+    void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text) {
+        int16_t text_height = BILL::_Get_Paragraph_Max_Height_(width, text);
+
+        int16_t y_centered = static_cast<int16_t>(
+            static_cast<int32_t>(y) +
+            (static_cast<uint16_t>(height) >> 1) -
+            (static_cast<int32_t>(text_height) / 2));
+
+        BILL::_Print_Paragraph_(x, y_centered, width, text, 2);
+    }
+
+    char* __cdecl Red_If_Negative_Fmt_String_(int16_t value) {
+        if (value >= 0) {
+            return ESTRINGS::E_Strings_(12);
+        }
+        return s_2_00551108;
+    }
 }

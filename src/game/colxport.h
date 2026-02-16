@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "types.h"
 
+struct s_animation_header;
+
 namespace COLXPORT {
     inline uint8_t& _cheezy_hack_col_count_state =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005560C8});
@@ -13,14 +15,10 @@ namespace COLXPORT {
 
     inline int16_t*& _g_colony_list_ptr = *reinterpret_cast<int16_t**>(std::uintptr_t{0x005A7B74});
 
-    inline void __cdecl Build_Global_Colony_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042AD70});
-        fn();
-    }
+    void __cdecl Build_Global_Colony_List_();
 
-    inline void __cdecl Load_Xport_Anims_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0042ACB0})();
-    }
+    inline s_animation_header* (&_anims)[4] =
+        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x005560B8});
+
+    void __cdecl Load_Xport_Anims_();
 }

@@ -18,8 +18,5 @@ namespace DESBOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048f4d0});
         fn();
     }
-    inline uint32_t __cdecl Application_Type_(int16_t app_idx) {
-        using Fn = uint32_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0048DCF0})(app_idx);
-    }
+    uint32_t __cdecl Application_Type_(int16_t app_id);
 }

@@ -40,6 +40,7 @@
     <ClCompile Include="src\game\colony_main.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
+    <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />

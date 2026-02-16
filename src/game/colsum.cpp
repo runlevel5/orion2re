@@ -1,4 +1,5 @@
 #include "deps.h"
+#include <cstring>
 
 namespace COLSUM {
     void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2) {
@@ -329,6 +330,31 @@ namespace COLSUM {
         } while (outer_count != 0);
     }
 
+    int16_t __cdecl Switched_cmp_(int16_t param_1, int16_t param_2) {
+        if (param_1 == -1 || param_2 == -1) {
+            return 0;
+        }
+
+        switch (_g_sort_index) {
+            case 0:
+                return cmp_Alpha_(param_1, param_2);
+            case 1:
+                return -cmp_Pops_(param_1, param_2);
+            case 2:
+                return -cmp_Food_(param_1, param_2);
+            case 3:
+                return -cmp_Industry_(param_1, param_2);
+            case 4:
+                return -cmp_Research_(param_1, param_2);
+            case 5:
+                return cmp_Prod_(param_1, param_2);
+            case 6:
+                return -cmp_BC_(param_1, param_2);
+            default:
+                return 0;
+        }
+    }
+
     void __cdecl Load_Col_Sum_Anims_() {
         COLBLDG::Load_Build_Anims_();
 
@@ -634,9 +660,6 @@ namespace COLSUM {
         );
     }
 
-    /**
-     * Draws the scroll bar indicator (thumb) for the colony summary list.
-     */
     void __cdecl Draw_Bar_Indicator_() {
         int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
         COLSUM::Update_First_(10, &COLSUM::_first, &COLSUM::_slider_bar_position);
@@ -732,10 +755,6 @@ namespace COLSUM {
         return result;
     }
 
-    /**
-     * Evaluates UI input for the population management section of the colony summary screen.
-     * Updates colony scanning and cluster selection based on the active UI fields.
-     */
     void __cdecl Evaluate_Colony_Pop_Input_(int16_t* input_field_1, int16_t* input_field_2, int16_t colony_idx_in_list) {
         if (colony_idx_in_list == 0) {
             COLONY::_scanned_pop = -1;
@@ -847,9 +866,6 @@ namespace COLSUM {
         return true;
     }
 
-    /**
-     * @address 00403590
-     */
     int16_t __cdecl Get_Scanned_Pop_(int16_t param_1, int16_t param_2) {
         int16_t colony_idx = _list_col[param_1];
         int16_t val_ebx;
@@ -934,5 +950,81 @@ namespace COLSUM {
         fonts::Set_Font_Style_Shadow_Down_(static_cast<int32_t>(style & 0xFF), &COLONY::_font_color_array);
         fonts::Set_Font_Highlight_Colors_(&COLONY::_bright_blue_font_color_array);
         fonts::Set_Font_Special_Colors_(&COLONY::_red_font_color_array[0]);
+    }
+
+    int16_t __cdecl cmp_Alpha_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        char name1[52];
+        char name2[52];
+        char* planet_name_ptr;
+
+        planet_name_ptr = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx_1].planet);
+        strcpy(name1, planet_name_ptr);
+
+        planet_name_ptr = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx_2].planet);
+        strcpy(name2, planet_name_ptr);
+
+        return (int16_t)__strcmpi(name1, name2);
+    }
+
+    int16_t __cdecl cmp_(int16_t param_1, int16_t param_2) {
+        if (param_1 < param_2) {
+            return -1;
+        }
+
+        return (int16_t)(param_2 < param_1);
+    }
+
+    int16_t __cdecl cmp_Pops_(int16_t colony_idx1, int16_t colony_idx2) {
+        uint16_t pops1 = static_cast<uint8_t>(MOX::_colony[colony_idx1].n_pops);
+        uint16_t pops2 = static_cast<uint8_t>(MOX::_colony[colony_idx2].n_pops);
+
+        return cmp_(pops1, pops2);
+    }
+
+    int16_t __cdecl cmp_Food_(int16_t colony_idx1, int16_t colony_idx2) {
+        return cmp_(static_cast<uint16_t>(MOX::_colony[colony_idx1].production[0]),
+                    static_cast<uint16_t>(MOX::_colony[colony_idx2].production[0]));
+    }
+
+    int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2) {
+        return cmp_(static_cast<uint16_t>(MOX::_colony[param_1].production[ECON_INDUSTRY]),
+                    static_cast<uint16_t>(MOX::_colony[param_2].production[ECON_INDUSTRY]));
+    }
+
+    int16_t __cdecl cmp_Research_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        return cmp_(static_cast<uint16_t>(MOX::_colony[colony_idx_1].production[ECON_RESEARCH]),
+                    static_cast<uint16_t>(MOX::_colony[colony_idx_2].production[ECON_RESEARCH]));
+    }
+
+    int16_t __cdecl cmp_BC_(int16_t param_1, int16_t param_2) {
+        return cmp_(static_cast<uint16_t>(MOX::_colony[param_1].production[ECON_BC]),
+                    static_cast<uint16_t>(MOX::_colony[param_2].production[ECON_BC]));
+    }
+
+    int16_t __cdecl cmp_Prod_(int16_t colony_idx_1, int16_t colony_idx_2) {
+        int16_t prod1 = MOX::_colony[colony_idx_1].producing[0];
+        int16_t prod2 = MOX::_colony[colony_idx_2].producing[0];
+
+        int16_t sort_type1 = Prod_To_Sort_Type_(prod1);
+        int16_t sort_type2 = Prod_To_Sort_Type_(prod2);
+
+        int16_t sort_res = cmp_(sort_type1, sort_type2);
+        if (sort_res != 0) {
+            return -sort_res;
+        }
+
+        const char* name1 = COLBLDG::Selection_Name_(prod1);
+        const char* name2 = COLBLDG::Selection_Name_(prod2);
+
+        int name_diff = strcmp(name1, name2);
+        if (name_diff != 0) {
+            int16_t normalized_diff = (name_diff > 0) ? 1 : -1;
+            return -normalized_diff;
+        }
+
+        int16_t turns1 = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx_1);
+        int16_t turns2 = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx_2);
+
+        return cmp_(turns1, turns2);
     }
 }

@@ -227,8 +227,8 @@ namespace COLONY {
     }
 
     void __cdecl Load_Ship_Bitm_() {
-        _ship_bitm = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE30);
-        _ship_pic_bitm = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE30);
+        _ship_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE30);
+        _ship_pic_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xE30);
 
         _ship_bitm_n = -1;
         _g_ship_pic_n = -1;

@@ -65,11 +65,23 @@ namespace COLSUM {
 
     void __cdecl Sort_Col_List_();
 
-    inline int16_t __cdecl Switched_cmp_(int16_t a1, int16_t a2) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00402AF0});
-        return fn(a1, a2);
-    }
+    int16_t __cdecl cmp_(int16_t param_1, int16_t param_2);
+
+    int16_t __cdecl cmp_Alpha_(int16_t colony_idx_1, int16_t colony_idx_2);
+
+    int16_t __cdecl cmp_Pops_(int16_t colony_idx1, int16_t colony_idx2);
+
+    int16_t __cdecl cmp_Food_(int16_t colony_idx1, int16_t colony_idx2);
+
+    int16_t __cdecl cmp_Industry_(int16_t param_1, int16_t param_2);
+
+    int16_t __cdecl cmp_Research_(int16_t colony_idx_1, int16_t colony_idx_2);
+
+    int16_t __cdecl cmp_Prod_(int16_t colony_idx_1, int16_t colony_idx_2);
+
+    int16_t __cdecl cmp_BC_(int16_t param_1, int16_t param_2);
+
+    int16_t __cdecl Switched_cmp_(int16_t a1, int16_t a2);
 
     void __cdecl Draw_Colony_Summary_Screen_();
 

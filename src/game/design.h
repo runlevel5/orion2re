@@ -170,10 +170,7 @@ namespace DESIGN {
 
     int16_t __cdecl Tech_Level_(int16_t player_idx, int16_t tech_idx);
 
-    inline int16_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_type, int16_t size, int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00431B90})(shield_type, size, player_idx);
-    }
+    int32_t __cdecl Shield_Space_Given_M_Level_(int16_t shield_id, int16_t ship_type, int16_t m_level);
 
     int16_t __cdecl Shield_Space_(int16_t shield_idx, int16_t ship_size);
 
@@ -188,8 +185,6 @@ namespace DESIGN {
     int8_t __cdecl Miniaturization_Category_(int16_t tech_app);
 
     int32_t __cdecl Space_Given_M_Level_(int16_t amount, int16_t miniaturization_level, int8_t mode);
-
-    int32_t __cdecl Shield_Space_Per_Tech_(int16_t shield_type, int16_t ship_size, int16_t player_num);
 
     int16_t __cdecl Weapon_Rack_Size_(int16_t count);
 
