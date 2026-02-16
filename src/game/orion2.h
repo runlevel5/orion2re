@@ -2343,6 +2343,18 @@ struct s_player_info {
     char warlord;
 };
 
+typedef struct s_potential_colony_info s_potential_colony_info, *Ps_potential_colony_info;
+
+struct s_potential_colony_info {
+    short pop_growth_bonus;
+    short maintenance;
+    short field2_0x4;
+    short worker_bonus;
+    short food;
+    short industry;
+    short research;
+};
+
 typedef struct s_prev_leader_data s_prev_leader_data, *Ps_prev_leader_data;
 
 struct s_prev_leader_data {
@@ -3046,7 +3058,7 @@ typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data
 
 struct s_tech_computer_data {
     char *name;
-    short copmuter_id;
+    short computer_id;
     short tech_app;
     short cost_by_ship_type[6];
     short bonus;

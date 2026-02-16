@@ -79,7 +79,10 @@ namespace MOX {
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
 
     // References
-    inline uint8_t* _food_per_farmer_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559690});
+    inline int8_t (&_food_per_farmer_table)[10] =
+        *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00559690});
+    inline int8_t& food_bonus_base_4_6 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559698});
+    inline int8_t& food_bonus_base_5_8 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559699});
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });

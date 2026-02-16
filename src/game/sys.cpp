@@ -178,76 +178,86 @@ namespace SYS {
         }
     }
 
-    void __cdecl Potential_Colony_Info_Popup_(int16_t planet_idx) {
-        char line_buffer[100];
-        char temp_fmt[200];
-        char header_text[80];
-        char main_description[1000];
+    void __cdecl Potential_Colony_Info_Popup_(int16_t planet_id) {
+        char bonus_msg_buf[32];
+        char penalty_msg_buf[32];
+        char fmt_text[200];
+        char line_text[100];
+        char val_text[32];
+        char title_text[80];
+        char main_text[1000];
         s_potential_colony_info info;
 
-        char bonus_str_unused[32];
-        char penalty_str_unused[32];
-        strcpy(bonus_str_unused, HAROLD::H_Message_(HESTR_16E_BONUS));
-        strcpy(penalty_str_unused, HAROLD::H_Message_(HESTR_16F_PENALTY));
+        strcpy(bonus_msg_buf, HAROLD::H_Message_(HESTR_16E_BONUS));
+        strcpy(penalty_msg_buf, HAROLD::H_Message_(HESTR_16F_PENALTY));
 
-        COLCALC::Compute_Potential_Colony_Info_(&MOX::_player[MOX::_PLAYER_NUM], &MOX::_planet[planet_idx], &info);
+        COLCALC::Compute_Potential_Colony_Info_(
+            &MOX::_player[MOX::_PLAYER_NUM],
+            &MOX::_planet[planet_id],
+            &info
+        );
 
-        _sprintf(temp_fmt, " M25,30. 0%s", HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
-        strcat(temp_fmt, " 1");
-        strcat(temp_fmt, "%d\n");
+        _sprintf(fmt_text, s_m25_30_0s, HAROLD::H_Message_(HESTR_170_MAX_POPULATION));
+        strcat(fmt_text, s_1);
+        strcat(fmt_text, s_d_nl);
 
-        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
-        _sprintf(main_description, temp_fmt, (int)max_pop);
+        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_id], MOX::_PLAYER_NUM);
+        _sprintf(main_text, fmt_text, (int)max_pop);
 
         if (info.food == 0) {
-            _sprintf(line_buffer, " 0%s 10\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
+            _sprintf(line_text, s_0s_10_nl, HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER));
         } else {
-            _sprintf(line_buffer, " 0%s 1%d\n", HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), (int)(info.food / 2));
+            int food_val = (int)info.food / 2;
+            _sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_171_FOOD_PER_FARMER), food_val);
         }
-        strcat(main_description, line_buffer);
+        strcat(main_text, line_text);
 
-        _sprintf(line_buffer, " 0%s 1%d\n", HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
-        strcat(main_description, line_buffer);
+        _sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_172_INDUSTRY_PER_WORKER), (int)info.industry);
+        strcat(main_text, line_text);
 
-        _sprintf(line_buffer, " 0%s 1%d\n", HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
-        strcat(main_description, line_buffer);
+        _sprintf(line_text, s_0s_1d_nl, HAROLD::H_Message_(HESTR_173_RESEARCH_PER_SCIENTIST), (int)info.research);
+        strcat(main_text, line_text);
 
         if (info.maintenance == 0) {
-            strcat(main_description, " M25,27.");
-            _sprintf(line_buffer, " 0%s 1--\n", HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
+            strcat(main_text, s_m25_27);
+            _sprintf(line_text, s_0s_1_dash, HAROLD::H_Message_(HESTR_174_NO_MAINTENANCE_BONUS));
+            strcat(main_text, line_text);
         } else {
-            strcat(main_description, " M25,17.");
-            _sprintf(line_buffer, " 0%s", HAROLD::H_Message_(HESTR_175_MAINTENANCE));
+            strcat(main_text, s_m25_17);
+            _sprintf(line_text, s_0s, HAROLD::H_Message_(HESTR_175_MAINTENANCE));
 
-            int16_t msg_id = (info.maintenance < 1) ? HESTR_189_MAINTENANCE_BONUS : HESTR_18A_MAINTENANCE_PENALTY;
-            _sprintf(line_buffer, " 0%s 1", HAROLD::H_Message_(msg_id));
+            int16_t msg_id = (info.maintenance <= 0) ? HESTR_189_MAINTENANCE_BONUS : HESTR_18A_MAINTENANCE_PENALTY;
+            _sprintf(line_text, s_0s_1, HAROLD::H_Message_(msg_id));
 
-            char val_buf[12];
-            _sprintf(val_buf, "%d%%\n", abs((int)info.maintenance));
-            strcat(line_buffer, val_buf);
+            int abs_maint = abs((int)info.maintenance);
+            _sprintf(val_text, s_percent_d_nl, abs_maint);
+
+            strcat(line_text, val_text);
+            strcat(main_text, line_text);
         }
-        strcat(main_description, line_buffer);
 
         if (info.worker_bonus == 0) {
-            strcat(main_description, " M25,27.");
-            _sprintf(line_buffer, " 0%s 1--\n", HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
+            strcat(main_text, s_m25_27);
+            _sprintf(line_text, s_0s_1_dash, HAROLD::H_Message_(HESTR_176_NO_WORKER_BONUS));
+            strcat(main_text, line_text);
         } else {
-            strcat(main_description, " M25,17.");
-            _sprintf(line_buffer, " 0%s", HAROLD::H_Message_(HESTR_177_WORKER));
+            strcat(main_text, s_m25_17);
+            _sprintf(line_text, s_0s, HAROLD::H_Message_(HESTR_177_WORKER));
 
-            int16_t msg_id = (info.worker_bonus < 1) ? HESTR_18C_WORKER_PENALTY : HESTR_18B_WORKER_BONUS;
-            _sprintf(line_buffer, " 0%s 1", HAROLD::H_Message_(msg_id));
+            int16_t msg_id = (info.worker_bonus > 0) ? HESTR_18B_WORKER_BONUS : HESTR_18C_WORKER_PENALTY;
+            _sprintf(line_text, s_0s_1, HAROLD::H_Message_(msg_id));
 
-            char val_buf[12];
-            _sprintf(val_buf, "%d%%\n", abs((int)info.worker_bonus));
-            strcat(line_buffer, val_buf);
+            int abs_bonus = abs((int)info.worker_bonus);
+            _sprintf(val_text, s_percent_d_nl, abs_bonus);
+
+            strcat(line_text, val_text);
+            strcat(main_text, line_text);
         }
-        strcat(main_description, line_buffer);
 
-        char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
-        _sprintf(temp_fmt, "%s", HAROLD::H_Message_(HESTR_178_COLONY_INFO_FOR_S));
-        _sprintf(header_text, temp_fmt, planet_name);
+        strcpy(fmt_text, HAROLD::H_Message_(HESTR_178_COLONY_INFO_FOR_S));
+        char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_id);
+        _sprintf(title_text, fmt_text, planet_name);
 
-        TEXTBOX::Text_Box_(header_text, main_description);
+        TEXTBOX::Text_Box_(title_text, main_text);
     }
 }

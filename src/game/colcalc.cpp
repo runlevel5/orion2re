@@ -726,14 +726,6 @@ namespace COLCALC {
         }
     }
 
-    /**
-     * @brief Checks if a colony is currently blockaded for its owner.
-     * 
-     * The blockade status for each star is stored as a bitmask where each bit 
-     * represents a player. This function retrieves the star index associated 
-     * with the colony's planet and checks the blockade bit corresponding 
-     * to the colony's owner.
-     */
     bool __cdecl Colony_Is_Blockaded(s_colony* colony) {
         int16_t planet_idx = colony->planet;
 
@@ -1038,6 +1030,44 @@ namespace COLCALC {
     void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony) {
         COLCALC::Colony_Pop_Grows_(colony);
         COLCALC::Colony_Specialty_(colony);
+    }
+
+    int16_t __cdecl Planet_Max_Population_For_Player_(s_planet_data* planet, int16_t player_idx) {
+        if (planet->colony_index != -1) {
+            s_colony* colony = &MOX::_colony[planet->colony_index];
+
+            if (colony->outpost_flag == 0) {
+                if (colony->n_pops == 0) {
+                    return Colony_Race_Pop_Limit_(colony, player_idx);
+                }
+
+                uint8_t races_present[10];
+                memset(races_present, 0, sizeof(races_present));
+
+                for (int i = 0; i < (int)colony->n_pops; ++i) {
+                    races_present[colony->pop[i].race] = 1;
+                }
+
+                int16_t max_limit = 0;
+                for (int race = 0; race < 10; ++race) {
+                    if (races_present[race]) {
+                        int16_t race_limit = Colony_Race_Pop_Limit_(colony, (int16_t)race);
+                        if (max_limit < race_limit) {
+                            max_limit = race_limit;
+                        }
+                    }
+                }
+                return max_limit;
+            }
+        }
+
+        int16_t pop_limit = Size_And_Climate_Race_Pop_Limit_(planet->size, planet->climate, player_idx);
+
+        if (MOX::_player[player_idx].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
+            pop_limit += 5;
+        }
+
+        return pop_limit;
     }
 
     int16_t __cdecl Size_And_Climate_Race_Pop_Limit_(int8_t size, int climate, int16_t player_idx) {
@@ -2180,10 +2210,74 @@ namespace COLCALC {
         return result;
     }
 
-    /**
-     * Executes per-turn colony calculations for a specific player, 
-     * including pre-import processing and final production resolution.
-     */
+    void __cdecl Player_Gets_Tech_App_(s_player* plr, int16_t tech_app_id) {
+        plr->tech_applications[tech_app_id] = 3;
+        plr->got_new_app = 1;
+
+        switch (tech_app_id) {
+            case TECH_APP_BATTLEOIDS:
+                if (Player_May_Get_Tech_App_(plr, TECH_APP_ARMOR_BARRACKS)) {
+                    Player_Gets_Tech_App_(plr, TECH_APP_ARMOR_BARRACKS);
+                }
+                break;
+            case TECH_APP_CONFEDERATION:
+                plr->traits[TRAIT_CURRENT_GOVERNMENT] = 1;
+                break;
+            case TECH_APP_FEDERATION:
+                plr->traits[TRAIT_CURRENT_GOVERNMENT] = 5;
+                break;
+            case TECH_APP_GALACTIC_UNIFICATION:
+                plr->traits[TRAIT_CURRENT_GOVERNMENT] = 7;
+                break;
+            case TECH_APP_IMPERIUM:
+                plr->traits[TRAIT_CURRENT_GOVERNMENT] = 3;
+                break;
+            case TECH_APP_SUB_SPACE_COMMUNICATIONS:
+            case TECH_APP_TACHYON_COMMUNICATIONS:
+            case TECH_APP_JUMP_GATE:
+            case TECH_APP_STAR_GATE:
+                Compute_All_Star_Colony_Stuff_();
+                break;
+            default:
+                INITSHIP::Update_Player_Ship_Designs_((int16_t)(plr - MOX::_player));
+                SHIPMOVE::Update_All_Ship_Ranges_();
+                break;
+        }
+
+        Do_Player_Colony_Calculations_((int16_t)(plr - MOX::_player));
+
+        if (static_cast<uint8_t>(plr->current_research_application) == static_cast<uint16_t>(tech_app_id) && 
+            plr->tech_fields[static_cast<uint8_t>(plr->current_research_field)] == 2) {
+            
+            bool advance_field = true;
+            if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
+                auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
+                uint16_t field_techs[4] = { field_data.tech1, field_data.tech2, field_data.tech3, field_data.tech4 };
+
+                for (int i = 0; i < 4; ++i) {
+                    if (field_techs[i] != static_cast<uint16_t>(tech_app_id) && plr->tech_applications[field_techs[i]] == 1) {
+                        advance_field = false;
+                        plr->current_research_application = static_cast<char>(field_techs[i]);
+                    }
+                }
+            }
+
+            if (advance_field) {
+                Advance_Player_Field_(plr, static_cast<uint8_t>(plr->current_research_field), 1);
+                plr->current_research_field = 0;
+                plr->research_accumulated = 0;
+            }
+        } else {
+            int field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
+            if (plr->traits[TRAIT_UNCREATIVE] != 0) {
+                Ensure_Uncreative_Field_OK_(plr, field_id);
+            }
+            if (plr->tech_fields[field_id] == 2) {
+                Advance_Player_Field_(plr, field_id, 1);
+            }
+        }
+    }
+
     void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx) {
         MOX::Mox_Update_();
 
@@ -2201,11 +2295,23 @@ namespace COLCALC {
         MOX::Mox_Update_();
     }
 
-    /**
-     * Determines if a player is eligible to acquire a specific technology application.
-     * Checks requirements based on player traits, game settings (Xenons, Strategic Combat),
-     * and technology metadata.
-     */
+    void __cdecl Do_Player_Colony_Post_Production_(int16_t player_idx) {
+        Pass_Out_Imports_(player_idx, nullptr);
+
+        s_colony* colonies = MOX::_colony;
+        int num_colonies = MOX::_NUM_COLONIES;
+
+        for (int i = 0; i < num_colonies; ++i) {
+            s_colony* colony = &colonies[i];
+            if (colony->owner == player_idx && colony->outpost_flag == 0) {
+                Update_Colony_Pop_Specialty_(colony);
+                MOX::Mox_Update_();
+            }
+        }
+
+        Update_Player_Stats_(&MOX::_player[player_idx]);
+    }
+
     bool __cdecl Player_May_Get_Tech_App_(s_player* plr, int tech_app) {
         if (plr->tech_applications[tech_app] == 3) {
             return false;
@@ -2287,6 +2393,26 @@ namespace COLCALC {
         }
 
         return 4; 
+    }
+
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, s_pop_info* pop, int16_t job_type, void* debug_struct) {
+        using ColonyEmpireBaseFn = int16_t(__cdecl*)(s_colony*, int16_t, int32_t, void*);
+        auto fn_table = reinterpret_cast<ColonyEmpireBaseFn*>(_colony_empire_base_functions);
+
+        int16_t base_produced = fn_table[job_type](colony, (int16_t)colony->owner, *reinterpret_cast<int32_t*>(pop) & 0xFFFF000F, debug_struct);
+        int16_t min_required = 0;
+
+        if (base_produced < 1) {
+            if (job_type != 0 || colony->food2_per_farmer != 0) {
+                min_required = 1;
+            }
+        }
+
+        if (base_produced < min_required) {
+            base_produced = min_required;
+        }
+
+        return base_produced;
     }
 
     int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown) {
@@ -2597,20 +2723,10 @@ namespace COLCALC {
         }
     }
 
-    /**
-     * @address 004f6100
-     */
     int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony) {
         return Colony_Product_Cost_(colony, colony->producing[0]);
     }
 
-    /**
-     * Calculates the gold cost to complete a colony's current production project.
-     * The cost increases exponentially as less progress is accumulated:
-     * - Remainder above 50% cost: 2x gold per production point.
-     * - Remainder between 10% and 50% cost: 5x gold per production point.
-     * - Remainder below 10% cost: 10x gold per production point.
-     */
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent) {
         int32_t buy_cost = 0;
 
@@ -2676,9 +2792,6 @@ namespace COLCALC {
         return current_bc >= cost;
     }
 
-    /**
-     * @address 004f6260
-     */
     int32_t __cdecl Colony_Cost_To_Buy_Producing_Product_(s_colony* colony) {
         return COLCALC::Colony_Cost_To_Buy_Given_Product_(
             colony,
@@ -2745,9 +2858,6 @@ namespace COLCALC {
         return (int16_t)turns;
     }
 
-    /**
-     * @address 004fa4f0
-     */
     bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony) {
         int16_t max_pop = Planet_Max_Population_For_Player_(&MOX::_planet[colony->planet], (int16_t)colony->owner);
 
@@ -2767,5 +2877,190 @@ namespace COLCALC {
             }
         }
         return count;
+    }
+
+    void __cdecl Ensure_Uncreative_Field_OK_(s_player* player, int field_idx) {
+        int selected_tech_id = -1;
+        int candidates_count = 0;
+        int owned_count = 0;
+
+        s_tech_field_data* field = &TECHDATA::_technology_fields[field_idx];
+        uint16_t* techs = &field->tech1;
+
+        for (int i = 0; i < 4; ++i) {
+            int tech_id = (int)(int16_t)techs[i];
+
+            if (tech_id > 0) {
+                if (player->tech_applications[tech_id] == 1) {
+                    // Player already owns a tech in this field
+                    owned_count++;
+                }
+                else if (player->tech_applications[tech_id] == 0) {
+                    // Candidate selection logic
+                    bool is_valid = true;
+
+                    // Tech 0x34 (52) is restricted if xenons (Antarans) do not exist
+                    if (MOX::_settings.xenons_exist == 0 && tech_id == TECH_APP_DIMENSIONAL_PORTAL) {
+                        is_valid = false;
+                    }
+
+                    // Special field index 6 (Advanced Science) is excluded
+                    if (field_idx == 6) {
+                        is_valid = false;
+                    }
+
+                    // If strategic combat is enabled, restricted to strategic techs
+                    if (is_valid && MOX::_settings.strategic_combat_flag != 0) {
+                        if (TECHDATA::_technology_applications[tech_id].in_strategic == 0) {
+                            is_valid = false;
+                        }
+                    }
+
+                    if (is_valid) {
+                        candidates_count++;
+                        // Reservoir sampling: pick new candidate with 1/N probability
+                        if (random::Random_(candidates_count) == 1) {
+                            selected_tech_id = tech_id;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no tech is owned in this field and we found valid candidates, unlock the picked one
+        if (owned_count == 0 && candidates_count > 0) {
+            player->tech_applications[selected_tech_id] = 1;
+        }
+    }
+
+    void __cdecl Advance_Player_Field_(s_player* player, int field_idx, bool skip_first_advance) {
+        int loop_count = 0;
+        int techs_known = 0;
+
+        uint8_t* player_tech_fields = player->tech_fields;
+        uint8_t* player_tech_applications = player->tech_applications;
+
+        do {
+            if (!skip_first_advance || loop_count != 0) {
+                player_tech_fields[field_idx] = 3;
+                field_idx = (int)TECHDATA::_technology_fields[field_idx].next_field_id;
+                player_tech_fields[field_idx] = 2;
+            }
+
+            techs_known = 0;
+            uint16_t* techs_in_field = &TECHDATA::_technology_fields[field_idx].tech1;
+            for (int i = 0; i < 4; ++i) {
+                uint16_t tech_id = techs_in_field[i];
+                if (tech_id > 0 && player_tech_applications[tech_id] == 1) {
+                    techs_known++;
+                }
+            }
+
+            loop_count++;
+        } while (techs_known == 0 && field_idx < 75);
+    }
+
+    bool __cdecl Field_Is_Gray_Box_(int32_t field_id) {
+        switch (field_id) {
+            case 0x16:
+            case 0x17:
+            case 0x1c:
+            case 0x1d:
+            case 0x37:
+            case 0x39:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    void __cdecl Compute_Potential_Colony_Info_(s_player* plr, s_planet_data* planet, s_potential_colony_info* results) {
+        results->pop_growth_bonus = 0;
+        results->maintenance = 0;
+        results->field2_0x4 = 0;
+        results->worker_bonus = 0;
+        results->food = 0;
+        results->industry = 0;
+        results->research = 0;
+
+        results->pop_growth_bonus = static_cast<int16_t>(plr->traits[TRAIT_POP_GROWTH_BONUS]);
+
+        if (plr->traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
+            results->maintenance += static_cast<int16_t>(_climate_maintenance_modifier[planet->climate]);
+        }
+
+        if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
+            if (plr->traits[TRAIT_LOW_G_WORLD] == 0) {
+                results->worker_bonus = -25;
+            }
+        } else if (planet->gravity_class == PLANET_GRAVITY_NORMAL_G) {
+            if (plr->traits[TRAIT_LOW_G_WORLD] != 0) {
+                results->worker_bonus = -25;
+            }
+        } else if (planet->gravity_class == PLANET_GRAVITY_HEAVY_G) {
+            if (plr->traits[TRAIT_HEAVY_G_WORLD] == 0) {
+                results->worker_bonus = -50;
+            }
+        }
+
+        int16_t food_val = static_cast<int16_t>(planet->food_per_farmer) * 2;
+
+        if (food_val == 0 && plr->tech_applications[TECH_APP_BIOMORPHIC_FUNGI] == 3) {
+            food_val = 2;
+        }
+
+        results->food = food_val;
+
+        if (food_val > 0) {
+            results->food += static_cast<int16_t>(plr->traits[TRAIT_FOOD_BONUS]);
+
+            if (plr->traits[TRAIT_AQUATIC] != 0) {
+                int8_t bonus_base = 0;
+                bool has_bonus = true;
+                switch (planet->climate) {
+                    case PLANET_CLIMATE_TUNDRA:
+                    case PLANET_CLIMATE_SWAMP:
+                        bonus_base = MOX::food_bonus_base_4_6;
+                        break;
+                    case PLANET_CLIMATE_OCEAN:
+                    case PLANET_CLIMATE_TERRAN:
+                        bonus_base = MOX::food_bonus_base_5_8;
+                        break;
+                    default:
+                        has_bonus = false;
+                        break;
+                }
+                if (has_bonus) {
+                    results->food += (static_cast<int16_t>(bonus_base) - static_cast<int16_t>(MOX::_food_per_farmer_table[planet->climate])) * 2;
+                }
+            }
+
+            if (results->food < 1) {
+                results->food = 1;
+            }
+        }
+
+        results->industry = static_cast<int16_t>(_minerals_per_mine[planet->mineral_class]);
+
+        if (plr->tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == 3) {
+            results->industry += 1;
+        }
+
+        results->industry += static_cast<int16_t>(plr->traits[TRAIT_PRODUCTION_BONUS]);
+
+        if (results->industry < 1) {
+            results->industry = 1;
+        }
+
+        results->research = 3 + static_cast<int16_t>(plr->traits[TRAIT_RESEARCH_BONUS]);
+        if (plr->tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {
+            results->research += 1;
+        }
+
+        if (planet->planet_special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
+            results->research += 2;
+        } else if (planet->planet_special == SYSTEM_SPECIAL_ORION_STAR) {
+            results->research += 5;
+        }
     }
 }

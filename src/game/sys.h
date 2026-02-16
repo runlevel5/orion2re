@@ -4,6 +4,17 @@
 namespace SYS {
     inline uint32_t& _sys_data_buffer = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A57D0});
     inline const char* s_fmt_star_display = reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
+    inline const char* s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
+    inline const char* s_percent_d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f20}); // "%d%%\n"
+    inline const char* s_0s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f28}); // " 0%s 1"
+    inline const char* s_0s = reinterpret_cast<const char*>(std::uintptr_t{0x00557f30}); // " 0%s"
+    inline const char* s_m25_17 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f38}); // " M25,17."
+    inline const char* s_0s_1_dash = reinterpret_cast<const char*>(std::uintptr_t{0x00557f44}); // " 0%s 1--\n"
+    inline const char* s_m25_27 = reinterpret_cast<const char*>(std::uintptr_t{0x00557f50}); // " M25,27."
+    inline const char* s_0s_1d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f5c}); // " 0%s 1%d\n"
+    inline const char* s_0s_10_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f68}); // " 0%s 10\n"
+    inline const char* s_d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f74}); // "%d\n"
+    inline const char* s_m25_30_0s = reinterpret_cast<const char*>(std::uintptr_t{0x00557f78}); // " M25,30. 0%s"
 
     inline uint8_t& _draw_sun_before_planet = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566438});
     inline int8_t& _skip_draw_system_planets = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A57CC});
@@ -19,16 +30,6 @@ namespace SYS {
     void __cdecl Load_New_System_Display_(int16_t star_idx);
 
     void __cdecl Init_System_Display_(int16_t star_id);
-
-    struct s_potential_colony_info {
-        int16_t unknown_0;
-        int16_t maintenance;    // local_5be
-        int16_t unknown_4;
-        int16_t worker_bonus;   // local_5ba
-        int16_t food;           // local_5b8
-        int16_t industry;       // local_5b6
-        int16_t research;       // local_5b4
-    };
 
     void __cdecl Potential_Colony_Info_Popup_(int16_t planet_idx);
 

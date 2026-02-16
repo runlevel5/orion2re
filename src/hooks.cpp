@@ -31,8 +31,8 @@ namespace hooks {
         ASSERT(sizeof(s_tech_field_data) == 0x17, "s_tech_field_data");
         ASSERT(sizeof(s_tech_drive_data) == 0x2e, "s_tech_drive_data");
         ASSERT(sizeof(s_tech_armor_data) == 15, "s_armor_data");
-        ASSERT(sizeof(TECHDATA::s_tech_hull_data) == 36, "s_tech_hull_data");
-        ASSERT(sizeof(TECHDATA::s_tech_computer_data) == 22, "s_tech_computer_data");
+        ASSERT(sizeof(s_tech_hull_data) == 36, "s_tech_hull_data");
+        ASSERT(sizeof(s_tech_computer_data) == 22, "s_tech_computer_data");
         ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
         ASSERT(sizeof(s_font) == 0x235c, "s_font");
         ASSERT(sizeof(s_MSG) == 18, "s_MSG");
@@ -996,6 +996,15 @@ namespace hooks {
         { 0x004dfc10, &COLONY::Colony_Screen_ },
         { 0x004de1f0, &COLONY::Draw_Colony_Screen_ },
         { 0x004de460, &COLONY::Draw_Colony_Info_ },
+        { 0x004fbf50, &COLCALC::Compute_Potential_Colony_Info_ },
+        { 0x004f5a90, &COLCALC::Planet_Max_Population_For_Player_ },
+        { 0x004f90a0, &COLCALC::Do_Player_Colony_Post_Production_ },
+        { 0x004fa790, &COLCALC::Player_Gets_Tech_App_ },
+        { 0x004f42b0, &COLCALC::Colony_Pop_Base_Prod_Produced_ },
+        { 0x004faa80, &COLCALC::Ensure_Uncreative_Field_OK_ },
+        { 0x004faa00, &COLCALC::Advance_Player_Field_ },
+        { 0x004fa730, &COLCALC::Field_Is_Gray_Box_ },
+        { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
     };
 
     void Install_Hooks()

@@ -5,6 +5,7 @@ struct s_player;
 struct s_colony;
 struct s_star_data;
 struct s_leader_data;
+struct s_planet_data;
 
 namespace COLCALC {
     #pragma pack(push, 1)
@@ -31,11 +32,14 @@ namespace COLCALC {
     };
     #pragma pack(pop)
 
+    inline void** _colony_empire_base_functions =
+        reinterpret_cast<void**>(std::uintptr_t{0x0055A858});
+
     inline int8_t (&_minerals_per_mine)[8] =
         *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F160});
 
-    inline uint8_t (&_climate_maintenance_modifier)[10] =
-        *reinterpret_cast<uint8_t(*)[10]>(std::uintptr_t{0x0054F168});
+    inline int8_t (&_climate_maintenance_modifier)[10] =
+        *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x0054F168});
 
     inline int8_t* _morale_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F178});
     inline int8_t* _non_capital_morale_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F180});
@@ -228,10 +232,7 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int job_type, void* breakdown);
 
-    inline int16_t __cdecl Colony_Pop_Base_Prod_Produced_(void* colony, void* pop_ptr, int16_t job, void* debug_struct) {
-        using Fn = int16_t(__cdecl*)(void*, void*, int16_t, void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f42b0})(colony, pop_ptr, job, debug_struct);
-    }
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, s_pop_info* pop, int16_t job_type, void* debug_struct);
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
         using Fn = char*(__cdecl*)(int, int);
@@ -266,18 +267,17 @@ namespace COLCALC {
 
     bool __cdecl Player_May_Get_Tech_App_(s_player* plr, int tech_app);
 
-    inline void __cdecl Player_Gets_Tech_App_(s_player* player, int16_t tech_app_idx) {
-        using Fn = void(__cdecl*)(s_player*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FA790});
-        fn(player, tech_app_idx);
-    }
+    void __cdecl Player_Gets_Tech_App_(s_player* plr, int16_t tech_app_id);
+
+    bool __cdecl Field_Is_Gray_Box_(int32_t field_id);
+
+    void __cdecl Advance_Player_Field_(s_player* plr, int32_t field_id, bool skip_first_advance);
+
+    void __cdecl Ensure_Uncreative_Field_OK_(s_player* player, int field_idx);
 
     void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx);
 
-    inline void __cdecl Do_Player_Colony_Post_Production_(int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x004f90a0)(player_idx);
-    }
+    void __cdecl Do_Player_Colony_Post_Production_(int16_t player_idx);
 
     bool __cdecl Player_Owns_Officer_(s_player* plr, s_leader_data* leader);
 
@@ -287,19 +287,9 @@ namespace COLCALC {
 
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type);
 
-    // Suggested name: Compute_Potential_Colony_Info
-    inline void __cdecl Compute_Potential_Colony_Info_(s_player* player, s_planet_data* planet, void* result_struct) {
-        using Fn = void(__cdecl*)(s_player*, s_planet_data*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004FBF50 });
-        fn(player, planet, result_struct);
-    }
+    void __cdecl Compute_Potential_Colony_Info_(s_player* plr, s_planet_data* planet, s_potential_colony_info* results);
 
-    // Suggested name: Planet_Max_Population_For_Player
-    inline int16_t __cdecl Planet_Max_Population_For_Player_(s_planet_data* planet, int16_t player_num) {
-        using Fn = int16_t(__cdecl*)(s_planet_data*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004F5A90 });
-        return fn(planet, player_num);
-    }
+    int16_t __cdecl Planet_Max_Population_For_Player_(s_planet_data* planet, int16_t player_idx);
 
     bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony);
 

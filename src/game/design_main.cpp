@@ -83,7 +83,7 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_05B_D_BEAM_ATTACK), (int)TECHDATA::_computers[MOX::_design->computer_type].field5_0x14);
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_05B_D_BEAM_ATTACK), (int)TECHDATA::_computers[MOX::_design->computer_type].bonus);
         fonts::Print_(0x1C5, 0x70, buffer);
 
         fonts::Set_Font_Style_(3, &style3_colors);
