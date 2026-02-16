@@ -126,4 +126,45 @@ namespace EVENTS {
 
         return 0;
     }
+
+    /**
+     * @address 00478190
+     */
+    int16_t __cdecl Colony_Has_Event_(int16_t colony_idx) {
+        if (Event_Check_Comet_(colony_idx) == 1) {
+            return 2;
+        }
+
+        if (Event_Check_Plague_(colony_idx) == 1) {
+            return 16; /* 0x10 */
+        }
+
+        if (Event_Check_Population_Boom_(colony_idx) == 1) {
+            return 17; /* 0x11 */
+        }
+
+        if (Event_Check_Space_Anomaly_(colony_idx) == 1) {
+            return 25; /* 0x19 */
+        }
+
+        // Global Event 14 (Index 0xE)
+        int8_t status14 = _event_data[14].field1_0x1;
+        if (status14 == 2 || status14 == 4 || status14 == 6) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+            if (MOX::_planet[planet_idx].star_index == _event_data[14].event_type) {
+                return 14; /* 0xE */
+            }
+        }
+
+        // Global Event 24 (Index 0x18)
+        int8_t status24 = _event_data[24].field1_0x1;
+        if (status24 == 2 || status24 == 4 || status24 == 6) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+            if (MOX::_planet[planet_idx].star_index == _event_data[24].event_type) {
+                return 24; /* 0x18 */
+            }
+        }
+
+        return -1;
+    }
 }

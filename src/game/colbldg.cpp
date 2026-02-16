@@ -828,7 +828,7 @@ namespace COLBLDG {
                 y_line_count += 2;
                 Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
                 Print_App_Description_(209, 119, 248, 166 /* 0xA6 */);
-                ERIC::Draw_Centered_(COLONY::Spy_Anim_(MOX::_player[MOX::_PLAYER_NUM].race));
+                Draw_Icon_(COLONY::Spy_Anim_(MOX::_player[MOX::_PLAYER_NUM].race));
                 break;
             }
             case -6: {
@@ -837,7 +837,7 @@ namespace COLBLDG {
                 y_line_count += 2;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
-                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Draw_Icon_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
                 Print_App_Description_(209, 119, 248, 7);
                 break;
             }
@@ -847,7 +847,7 @@ namespace COLBLDG {
                 y_line_count += 2;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
-                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Draw_Icon_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
                 Print_App_Description_(209, 119, 248, 8);
                 break;
             }
@@ -857,7 +857,7 @@ namespace COLBLDG {
                 y_line_count += 2;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
-                ERIC::Draw_Centered_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+                Draw_Icon_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
                 Print_App_Description_(209, 119, 248, 6);
                 break;
             }
@@ -1109,7 +1109,7 @@ namespace COLBLDG {
         // BUG: building_idx might be -1 when accessing _buildings
         if (TECHDATA::_buildings[building_idx].type == 7) {
             s_animation_header* anim = COLONY::Satellite_Anim_(building_idx);
-            ERIC::Draw_Centered_(anim);
+            Draw_Icon_(anim);
         } else {
             Draw_Building_Centered_In_Window_(building_idx);
         }

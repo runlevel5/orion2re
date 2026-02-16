@@ -48,10 +48,10 @@ namespace MAINMENU {
             uint16_t current_frame = (uint16_t)file_ani::Get_File_Animation_Frame_();
 
             if (current_frame == 5) {
-                current_sound_handle = sound::Mox_Play_Sound_(0x35); // 53
+                current_sound_handle = ERICNET::Mox_Play_Sound_(0x35); // 53
             } else if (current_frame == 46) {
                 sound::Stop_Sound_(current_sound_handle);
-                current_sound_handle = sound::Mox_Play_Sound_(0x36); // 54
+                current_sound_handle = ERICNET::Mox_Play_Sound_(0x36); // 54
             }
 
             if (input == fullscreen_field || input == hotkey_field) {
@@ -82,7 +82,7 @@ namespace MAINMENU {
 
         if (input_detected) {
             sound::Stop_Sound_(current_sound_handle);
-            sound::Mox_Play_Sound_(0x36);
+            ERICNET::Mox_Play_Sound_(0x36);
         }
 
         return result_code;

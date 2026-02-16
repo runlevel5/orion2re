@@ -213,11 +213,8 @@ namespace COLCALC {
     uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader);
 
     void __cdecl All_Colony_Calculations_();
-    inline void __cdecl Colony_Calculation_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f8230});
-        fn(colony_idx);
-    }
+
+    void __cdecl Colony_Calculation_(int16_t colony_idx);
 
     void __cdecl Colony_Pop_Grows_(s_colony* colony);
 

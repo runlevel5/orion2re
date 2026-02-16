@@ -81,4 +81,44 @@ namespace ERIC {
             video::Set_Refresh_Stencil_();
         }
     }
+
+    int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus) {
+        int32_t current_time = _clock();
+        int32_t cycle_index = current_time / static_cast<int32_t>(divisor);
+        return static_cast<int16_t>(cycle_index % static_cast<int32_t>(modulus));
+    }
+
+    bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
+        if (_hacky_need_to_fade_to_colony_palette_flag != 0) {
+            return true;
+        }
+
+        uint8_t previous_screen = static_cast<uint8_t>(MOX::_previous_screen);
+
+        switch (MOX::_current_screen) {
+            case SCREEN_COLONY:
+                if (previous_screen == SCREEN_QUEUE_POPUP ||
+                    previous_screen == SCREEN_COLONY_LANDING) {
+                    return false;
+                }
+                return true;
+
+            case SCREEN_COLONY_SUMMARY:
+                return previous_screen != SCREEN_QUEUE_POPUP;
+
+            case SCREEN_QUEUE_POPUP:
+                if (previous_screen == SCREEN_COLONY ||
+                    previous_screen == SCREEN_COLONY_LANDING ||
+                    previous_screen == SCREEN_COLONY_SUMMARY) {
+                    return false;
+                }
+                return true;
+
+            case SCREEN_COLONY_LANDING:
+                return true;
+
+            default:
+                return true;
+        }
+    }
 }

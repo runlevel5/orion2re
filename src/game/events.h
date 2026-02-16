@@ -7,6 +7,12 @@ namespace EVENTS {
     inline uint16_t& _event_delay_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A65AE});
 
     void Init_Events_();
+
+    inline int16_t __cdecl Event_Check_Comet_(int16_t colony_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(0x00477750)(colony_idx);
+    }
+
     int16_t __cdecl Event_Check_Space_Anomaly_(int16_t colony_idx);
     int16_t __cdecl Event_Check_Space_Anomaly_At_Star_(int16_t star_idx);
 
@@ -17,8 +23,5 @@ namespace EVENTS {
     int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx);
 
     int16_t __cdecl Event_Check_Hyperspace_Flux_();
-    inline int16_t __cdecl Colony_Has_Event_(int16_t colony_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00478190)(colony_idx);
-    }
+    int16_t __cdecl Colony_Has_Event_(int16_t colony_idx);
 }

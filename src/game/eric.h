@@ -6,6 +6,9 @@ namespace ERIC {
 
     inline uint8_t& fade_step = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B44});
 
+    inline uint8_t& _hacky_need_to_fade_to_colony_palette_flag =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B48});
+
     void __cdecl Eric_Init_();
 
     void __cdecl Eric_Defaults_();
@@ -18,10 +21,7 @@ namespace ERIC {
 
     void __cdecl Fast_Fade_Out_();
 
-    inline bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004BA7A0})();
-    }
+    bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_();
 
     void __cdecl Set_Fade_Percent_(int16_t percent);
 
@@ -31,16 +31,7 @@ namespace ERIC {
         fn(x, y, width, line_height, text);
     }
 
-    inline int16_t __cdecl Global_Cycler_(int16_t range, int16_t step) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004BA930})(range, step);
-    }
-
-    inline void __cdecl Draw_Centered_(s_animation_header* anim) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050d220});
-        fn(anim);
-    }
+    int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus);
 
     inline void __cdecl Draw_Centered_(int16_t x, int16_t y, void* bitmap) {
         using Fn = void(__cdecl*)(int16_t, int16_t, void*);

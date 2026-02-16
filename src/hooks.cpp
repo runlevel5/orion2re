@@ -1010,6 +1010,15 @@ namespace hooks {
         { 0x0049f430, &COLMOVE::Get_Cluster_ },
         { 0x0049f280, &COLMOVE::Get_Num_Unemployed_ },
         { 0x0049f220, &COLMOVE::Get_First_Unemployed_ },
+        { 0x004f8230, &COLCALC::Colony_Calculation_ },
+        { 0x00495a40, &SYS::Get_Rotating_Planet_Segment_ },
+        { 0x00496620, &SYS::N_Ships_By_Type_At_Location_ },
+        { 0x00478190, &EVENTS::Colony_Has_Event_ },
+        { 0x00409230, &ERICNET::Mox_Play_Sound_ },
+        { 0x00408970, &ERICNET::Init_Homeworld_Colony_ },
+        { 0x00480f50, &INITSHIP::Load_Colony_Ship_Design_ },
+        { 0x004ba7a0, &ERIC::Fast_Fade_Out_Needed_For_Colony_Palette_ },
+        { 0x004ba930, &ERIC::Global_Cycler_ },
     };
 
     void Install_Hooks()

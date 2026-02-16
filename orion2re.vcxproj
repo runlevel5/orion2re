@@ -222,7 +222,6 @@
     <ClInclude Include="src\game\smack.h" />
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\special.h" />
-    <ClInclude Include="src\game\sprite.h" />
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\sys.h" />

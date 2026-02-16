@@ -117,7 +117,7 @@ namespace SYS {
                 MOX::_sys_disp[orbit_idx].oribit_pos = (int8_t)orbit_pos_out;
 
                 allocate::Get_Remaining_Block_Space_((void*)_sys_data_buffer);
-                Get_Rotating_Planet_Segment_(&MOX::_sys_disp[orbit_idx].pic, planet_idx, star_idx, 0);
+                Get_Rotating_Planet_Segment_(&MOX::_sys_disp[orbit_idx].pic, planet_idx);
 
                 int16_t frame_count = animate::Get_Animation_Frame_Count_(MOX::_sys_disp[orbit_idx].pic);
                 MOX::_sys_disp[orbit_idx].current_frame = (int16_t)((orbit_idx * 5) % frame_count);
@@ -176,6 +176,32 @@ namespace SYS {
                 MAINPUPS::Clear_System_Special_Slots_();
             }
         }
+    }
+
+    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx) {
+        s_planet_data* planet = &MOX::_planet[planet_idx];
+        int16_t colony_idx = planet->colony_index;
+        uint16_t climate = (uint16_t)(uint8_t)planet->climate;
+        int8_t size = planet->size;
+
+        if (size > 3) {
+            size = 4;
+        }
+
+        if (colony_idx > -1 && colony_idx < (int16_t)MOX::_NUM_COLONIES && planet->planet_type != PLANET_TYPE_GAS_GIANT) {
+            if (MOX::_colony[colony_idx].outpost_flag == 0) {
+                climate = (uint16_t)(uint8_t)MOX::_colony[colony_idx].climate;
+            }
+        }
+
+        int16_t entry_idx;
+        if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
+            entry_idx = 50;
+        } else {
+            entry_idx = (int16_t)climate * 5 + (int16_t)size;
+        }
+
+        *out_ptr = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int)entry_idx + 0x5c, MOX::_global_cache_seg);
     }
 
     void __cdecl Potential_Colony_Info_Popup_(int16_t planet_id) {
@@ -259,5 +285,57 @@ namespace SYS {
         _sprintf(title_text, fmt_text, planet_name);
 
         TEXTBOX::Text_Box_(title_text, main_text);
+    }
+
+    void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes) {
+        *total_count = 0;
+        *bases_count = 0;
+        *colony_ships_count = 0;
+        *transports_count = 0;
+        memset(ship_sizes, 0, 6 * sizeof(int16_t));
+
+        if (MOX::_NUM_SHIPS <= 0) {
+            return;
+        }
+
+        for (int16_t ship_idx = 0; ship_idx < (int16_t)MOX::_NUM_SHIPS; ++ship_idx) {
+            if (HACCESS::Ship_Owner_(ship_idx) != target_owner) {
+                continue;
+            }
+
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (ship->status >= 3) {
+                continue;
+            }
+
+            if (ship->x != x || ship->y != y) {
+                continue;
+            }
+
+            int16_t size = (int16_t)ship->d.size;
+            if (size > 5) {
+                size = 5;
+            }
+
+            switch (ship->d.ship_type) {
+                case 0:
+                    ship_sizes[size]++;
+                    break;
+                case 1:
+                    (*bases_count)++;
+                    break;
+                case 2:
+                    (*transports_count)++;
+                    break;
+                case 4:
+                    (*colony_ships_count)++;
+                    break;
+                default:
+                    break;
+            }
+
+            (*total_count)++;
+        }
     }
 }

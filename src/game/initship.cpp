@@ -289,4 +289,32 @@ namespace INITSHIP {
         design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, static_cast<int16_t>(design->ftl_type)));
         design->date_of_design = static_cast<uint16_t>(MOX::_stardate);
     }
+
+    void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+        struct_::Clear_Structure_(design, 99);
+
+        const char* localized_name = &s_Colony_Ship_Localized[MOX::_settings.language * 16];
+        strcpy(design->name, localized_name);
+
+        design->size = 0;
+        design->ship_type = SHIP_TYPE_COLONY;
+        design->shield_type = 0;
+
+        design->ftl_type = (int8_t)Best_Warp_Drive_(player_idx);
+        design->computer_type = 0;
+
+        int16_t armor = Best_Armor_(player_idx);
+        if (armor > 1) {
+            armor--;
+        }
+        design->armor_type = (int8_t)armor;
+
+        struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+        design->picture_num = 45;
+
+        design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].speed;
+        design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, player_idx);
+
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+    }
 }

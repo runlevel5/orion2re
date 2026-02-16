@@ -105,22 +105,16 @@ namespace sound {
         fn(handle);
     }
 
-    inline int32_t __cdecl Mox_Play_Sound_(int32_t sound_id) {
-        using Fn = int32_t(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409230});
-        return fn(sound_id);
-    }
-
     inline void __cdecl Sound_Update_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E630});
         fn();
     }
 
-    inline void __cdecl Play_Sound_(int16_t sound_id) {
-        using Fn = void(__cdecl*)(int16_t);
+    inline int __cdecl Play_Sound_(int16_t sound_id) {
+        using Fn = int(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052de10});
-        fn(sound_id);
+        return fn(sound_id);
     }
 
     inline void __cdecl Fadeout_Sound_(int32_t handle, int32_t duration) {

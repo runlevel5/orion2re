@@ -329,12 +329,6 @@ inline void __cdecl Wrapper_For_Normal_System_Fields_() {
     fn();
 }
 
-inline void __cdecl Init_Homeworld_Colony2_(int16_t colony_idx, int16_t player_idx, int8_t flag) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408340});
-    fn(colony_idx, player_idx, flag);
-}
-
 inline int32_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
     using Fn = int32_t(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043dea0});

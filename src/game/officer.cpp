@@ -1955,7 +1955,7 @@ namespace OFFICER {
 
         if (race_name[0] == '\0') {
             int16_t total, n_colony, n_outpost, n_transport;
-            int32_t hull_counts[6];
+            int16_t hull_counts[6];
 
             SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &total, &n_colony, &n_outpost, &n_transport, hull_counts);
 

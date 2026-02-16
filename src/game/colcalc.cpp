@@ -2860,6 +2860,16 @@ namespace COLCALC {
         return (uint32_t)(uint16_t)max_pop == (uint32_t)(uint8_t)colony->n_pops;
     }
 
+    void __cdecl Colony_Calculation_(int16_t colony_idx) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        if (colony->outpost_flag == 0) {
+            Recalculate_Colony_(colony);
+        }
+
+        Update_Player_Stats_(&MOX::_player[colony->owner]);
+    }
+
     int16_t __cdecl N_Colonies_And_Outposts_At_Star_(int16_t star_index) {
         int16_t count = 0;
         for (int i = 0; i < 5; ++i) {
