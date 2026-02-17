@@ -996,7 +996,6 @@ namespace hooks {
         { 0x004f5a90, &COLCALC::Planet_Max_Population_For_Player_ },
         { 0x004f90a0, &COLCALC::Do_Player_Colony_Post_Production_ },
         { 0x004fa790, &COLCALC::Player_Gets_Tech_App_ },
-        { 0x004f42b0, &COLCALC::Colony_Pop_Base_Prod_Produced_ },
         { 0x004faa80, &COLCALC::Ensure_Uncreative_Field_OK_ },
         { 0x004faa00, &COLCALC::Advance_Player_Field_ },
         { 0x004fa730, &COLCALC::Field_Is_Gray_Box_ },
@@ -1057,6 +1056,11 @@ namespace hooks {
         { 0x004f37f0, &COLCALC::Colony_Food_Production_ },
         { 0x004f4520, &COLCALC::Colony_Industry_Production_ },
         { 0x004f4fb0, &COLCALC::Colony_Research_Production_ },
+        { 0x004f42b0, &COLCALC::Colony_Pop_Base_Prod_Produced_ },
+        { 0x004f3630, &COLCALC::Colony_Empire_Base_Food2_Produced_ },
+        { 0x004f43f0, &COLCALC::Colony_Empire_Base_Industry_Produced_ },
+        { 0x004f4e60, &COLCALC::Colony_Empire_Base_Research_Produced_ },
+        { 0x004867a0, &NEWGAME::Newgame_Screen_ },
     };
 
     void Install_Hooks()

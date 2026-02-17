@@ -1,4 +1,5 @@
 #include "deps.h"
+#include <cstring>
 
 namespace COLCALC {
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
@@ -132,113 +133,6 @@ namespace COLCALC {
                 Compute_Star_Colony_Stuff_(star_ptr);
                 star_ptr++;
             } while (star_ptr < end_ptr);
-        }
-    }
-
-    void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out) {
-        s_colony_job_production breakdown;
-        int32_t res_lab_bonus, supercomp_bonus, cybernet_bonus, autolab_bonus;
-
-        if (colony->n_pops == 0) {
-            colony->production[ECON_RESEARCH] = 0;
-            return;
-        }
-
-        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
-        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
-            colony->production[ECON_RESEARCH] = 0;
-            if (debug_out != nullptr) {
-                strcpy(debug_out, _anomaly_msg);
-            }
-            return;
-        }
-
-        s_colony_job_production* breakdown_ptr = (debug_out != nullptr) ? &breakdown : nullptr;
-        int32_t job_production = Colony_Job_Production_(colony, ECON_RESEARCH, breakdown_ptr);
-
-        res_lab_bonus = colony->buildings[BUILDING_RESEARCH_LAB] ? 5 : 0;
-        supercomp_bonus = colony->buildings[BUILDING_SUPERCOMPUTER] ? 10 : 0;
-        cybernet_bonus = colony->buildings[BUILDING_GALACTIC_CYBERNET] ? 15 : 0;
-        autolab_bonus = colony->buildings[BUILDING_AUTOLAB] ? 30 : 0;
-
-        int16_t total_research = (int16_t)(autolab_bonus + supercomp_bonus + cybernet_bonus + res_lab_bonus + job_production);
-        colony->production[ECON_RESEARCH] = total_research;
-
-        if (debug_out != nullptr) {
-            char* ptr = debug_out;
-            ptr += _sprintf(ptr, s_str, s_T_15_65);
-            ptr += _sprintf(ptr, s_str, s_0);
-
-            if (breakdown.base_prod != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.base_prod, _produced_by_scientists_msg);
-            }
-            if (breakdown.artifacts_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.artifacts_bonus, _artifacts_bonus_msg);
-            }
-            if (breakdown.intelligence_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.intelligence_bonus, _intelligence_bonus_msg);
-            }
-
-            for (int i = 0; i < 8; ++i) {
-                if (breakdown.racial_bonuses[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_s_r, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
-                }
-            }
-
-            if (breakdown.android_bonuses[0] != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.android_bonuses[0], _android_bonus_msg);
-            }
-
-            for (int i = 0; i < 204; ++i) {
-                if (breakdown.tech_apps[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
-                }
-            }
-
-            for (int i = 0; i < 49; ++i) {
-                if (breakdown.buildings_prod[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
-                }
-            }
-
-            if (breakdown.gravity_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
-            }
-            if (breakdown.conquered_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
-            }
-            if (breakdown.blockaded_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
-            }
-            if (breakdown.morale_bonus > 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
-            } else if (breakdown.morale_bonus < 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
-            }
-            if (breakdown.govt_bonus > 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
-            } else if (breakdown.govt_bonus < 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
-            }
-            if (breakdown.officer_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
-            }
-
-            if (res_lab_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
-            }
-            if (supercomp_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
-            }
-            if (cybernet_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
-            }
-            if (autolab_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
-            }
-
-            ptr += _sprintf(ptr, s_newline);
-            _sprintf(ptr, s_tab_d_s_r, (int)total_research, _total_research_produced_msg);
         }
     }
 
@@ -492,41 +386,41 @@ namespace COLCALC {
     }
 
     // Suggested name: Colony_Industry_Per_Worker
-    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out) {
+    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, uint16_t player_idx, s_colony_job_production* out) {
         int16_t industry;
 
         int8_t mineral_class = MOX::_planet[colony->planet].mineral_class;
         industry = _minerals_per_mine[mineral_class];
 
         if (out != nullptr) {
-            *reinterpret_cast<int32_t*>(out) = industry;
+            out->base_prod = industry;
         }
 
         if (colony->buildings[BUILDING_ASTRO_UNIVERSITY]) {
             industry += 1;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1c8) = 1;
+                out->buildings_prod[BUILDING_ASTRO_UNIVERSITY] = 1;
             }
         }
 
         if (colony->buildings[BUILDING_AUTOMATED_FACTORY]) {
             industry += 1;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1ce) = 1;
+                out->buildings_prod[BUILDING_AUTOMATED_FACTORY] = 1;
             }
         }
 
         if (colony->buildings[BUILDING_ROBO_MINER_PLANT]) {
             industry += 2;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x208) = 2;
+                out->buildings_prod[BUILDING_ROBO_MINER_PLANT] = 2;
             }
         }
 
         if (colony->buildings[BUILDING_DEEP_CORE_MINE]) {
             industry += 3;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1d8) = 3;
+                out->buildings_prod[BUILDING_DEEP_CORE_MINE] = 3;
             }
         }
 
@@ -543,38 +437,38 @@ namespace COLCALC {
     }
 
     // Suggested name: Colony_Research_Per_Scientist
-    int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, void* out) {
+    int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t research_per_scientist = 3;
 
         if (out != nullptr) {
-            *reinterpret_cast<int32_t*>(out) = 3;
+            out->base_prod = 3;
         }
 
         if (colony->buildings[BUILDING_ASTRO_UNIVERSITY] != 0) {
             research_per_scientist = 4;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1c8) = 1;
+                out->buildings_prod[BUILDING_ASTRO_UNIVERSITY] = 1;
             }
         }
 
         if (colony->buildings[BUILDING_SUPERCOMPUTER] != 0) {
             research_per_scientist += 2;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1fc) = 2;
+                out->buildings_prod[BUILDING_SUPERCOMPUTER] = 2;
             }
         }
 
         if (colony->buildings[BUILDING_GALACTIC_CYBERNET] != 0) {
             research_per_scientist += 3;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x1e6) = 3;
+                out->buildings_prod[BUILDING_GALACTIC_CYBERNET] = 3;
             }
         }
 
         if (colony->buildings[BUILDING_RESEARCH_LAB] != 0) {
             research_per_scientist += 1;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x206) = 1;
+                out->buildings_prod[BUILDING_RESEARCH_LAB] = 1;
             }
         }
 
@@ -583,12 +477,12 @@ namespace COLCALC {
         if (special == SYSTEM_SPECIAL_ANCIENT_ARTIFACTS) {
             research_per_scientist += 2;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x226) += 2;
+                out->artifacts_bonus += 2;
             }
         } else if (special == SYSTEM_SPECIAL_ORION_STAR) {
             research_per_scientist += 5;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x226) += 5;
+                out->artifacts_bonus += 5;
             }
         }
 
@@ -739,122 +633,6 @@ namespace COLCALC {
         return static_cast<short>(max_pop);
     }
 
-    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out) {
-        if (colony->n_pops == 0) {
-            colony->production[ECON_FOOD] = 0;
-            return;
-        }
-
-        int16_t colony_idx = (int16_t)(((uintptr_t)colony - (uintptr_t)MOX::_colony) / 361);
-        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
-            colony->production[ECON_FOOD] = 0;
-            if (debug_out) {
-                strcpy(debug_out, _anomaly_msg);
-            }
-            return;
-        }
-
-        int16_t hydro_bonus = 0;
-        int16_t subterranean_bonus = 0;
-        s_colony_job_production breakdown;
-        int32_t base_job_prod = 0;
-
-        if (colony->food2_per_farmer == 0) {
-            memset(&breakdown, 0, sizeof(breakdown));
-        } else {
-            base_job_prod = Colony_Job_Production_(colony, 0, debug_out ? &breakdown : nullptr);
-        }
-
-        if (colony->buildings[BUILDING_HYDROPONIC_FARM]) {
-            hydro_bonus = 2;
-        }
-        if (colony->buildings[BUILDING_SUBTERRANEAN_FARMS]) {
-            subterranean_bonus = 4;
-        }
-
-        colony->production[ECON_FOOD] = static_cast<int16_t>(hydro_bonus + subterranean_bonus + base_job_prod);
-
-        if (debug_out) {
-            int len = _sprintf(debug_out, s_fmt_s_00551130, s_T_15_65);
-            len += _sprintf(debug_out + len, s_fmt_s_00551130, s_0);
-
-            if (breakdown.base_prod != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_workers_msg);
-            }
-            if (breakdown.food_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, DAT_00571bc0);
-            }
-
-            for (int i = 0; i < 8; ++i) {
-                int16_t val = breakdown.racial_bonuses[i];
-                if (val > 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s_s, val / 2, MOX::_player[i].race_name, _bonus_msg);
-                } else if (val < 0) {
-                    char* formatted = Format_Quotient_(val, 2);
-                    len += _sprintf(debug_out + len, s_fmt_s_s_s, formatted, MOX::_player[i].race_name, _bonus_msg);
-                }
-            }
-
-            if (breakdown.android_bonuses[1] != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.android_bonuses[1] / 2, DAT_00571afc);
-            }
-            if (breakdown.android_bonuses[0] != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.android_bonuses[0] / 2, _android_bonus_msg);
-            }
-
-            for (int i = 0; i < 212; ++i) {
-                if (breakdown.tech_apps[i] != 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
-                }
-            }
-
-            for (int i = 0; i < 49; ++i) {
-                if (breakdown.buildings_prod[i] != 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
-                }
-            }
-
-            if (breakdown.gravity_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
-            }
-            if (breakdown.conquered_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
-            }
-            if (breakdown.blockaded_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
-            }
-            if (breakdown.morale_bonus > 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
-            } else if (breakdown.morale_bonus < 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
-            }
-            if (breakdown.govt_bonus > 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
-            } else if (breakdown.govt_bonus < 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
-            }
-            if (breakdown.officer_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
-            }
-
-            if (hydro_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(hydro_bonus), TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
-            }
-            if (subterranean_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(subterranean_bonus), TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
-            }
-
-            if (colony->n_food_replicated != 0) {
-                int replication_amount = static_cast<int>(static_cast<uint8_t>(colony->n_food_replicated));
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
-                colony->production[ECON_FOOD] += static_cast<int16_t>(replication_amount);
-            }
-
-            len += _sprintf(debug_out + len, s_fmt_s_00551130, s_newline_0055136c);
-            _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), DAT_00571b80);
-        }
-    }
-
     void __cdecl All_Colony_Calculations_() {
         RUSS::Assert_Settings_();
 
@@ -934,213 +712,6 @@ namespace COLCALC {
             index++;
         }
         return index;
-    }
-
-    void __cdecl Colony_Industry_Production_(s_colony* colony, char* debug_out) {
-        s_colony_job_production breakdown;
-        uint32_t base_worker_prod;
-        uint32_t bonus_recycling = 0;
-        uint32_t bonus_automated_factory = 0;
-        uint32_t bonus_robo_miner = 0;
-        uint32_t bonus_deep_core = 0;
-        uint32_t bonus_robotic_factory = 0;
-
-        colony->n_industry_recyclers = 0;
-        uint8_t n_pops = colony->n_pops;
-
-        if (n_pops == 0) {
-            colony->production[ECON_INDUSTRY] = 0;
-            return;
-        }
-
-        int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
-        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx)) {
-            colony->production[ECON_INDUSTRY] = 0;
-            if (debug_out) {
-                strcpy(debug_out, _anomaly_msg);
-            }
-            return;
-        }
-
-        s_colony_job_production* p_breakdown = debug_out ? &breakdown : nullptr;
-        base_worker_prod = Colony_Job_Production_(colony, ECON_INDUSTRY, p_breakdown);
-
-        bonus_automated_factory = colony->buildings[BUILDING_AUTOMATED_FACTORY] ? 5 : 0;
-        bonus_robo_miner = colony->buildings[BUILDING_ROBO_MINER_PLANT] ? 10 : 0;
-        bonus_deep_core = colony->buildings[BUILDING_DEEP_CORE_MINE] ? 15 : 0;
-
-        if (colony->buildings[BUILDING_ROBOTIC_FACTORY]) {
-            bonus_robotic_factory = _planet_robotic_factory_lookup[MOX::_planet[colony->planet].mineral_class];
-        }
-
-        if (colony->buildings[BUILDING_RECYCLOTRON]) {
-            colony->n_industry_recyclers = n_pops;
-            bonus_recycling = n_pops;
-        }
-
-        if (MOX::_player[colony->owner].objectives != 100) {
-            int32_t difficulty_bonus = (MOX::_settings.game_difficulty * n_pops + 4) >> 3;
-            colony->n_industry_recyclers += static_cast<char>(difficulty_bonus);
-        }
-
-        int16_t total_prod = static_cast<int16_t>(bonus_automated_factory + bonus_robotic_factory + bonus_robo_miner + 
-                                                bonus_deep_core + bonus_recycling + base_worker_prod);
-
-        int32_t pollution = 0;
-        if (colony->buildings[BUILDING_CORE_WASTE_DUMP]) {
-            colony->pollution = 0;
-        } else {
-            int16_t officer_idx = Colony_Officer_(colony);
-            int32_t base_pollution = static_cast<int32_t>(static_cast<int16_t>(base_worker_prod)) + bonus_robotic_factory;
-            int32_t reduction_size = _industry_planet_size_lookup[MOX::_planet[colony->planet].size];
-
-            if (MOX::_player[colony->owner].tech_applications[TECH_APP_NANO_DISASSEMBLERS] == 3) {
-                reduction_size *= 2;
-            }
-
-            if (colony->buildings[BUILDING_POLLUTION_PROCESSOR]) {
-                base_pollution = (base_pollution + 1) / 2;
-            }
-            if (colony->buildings[BUILDING_ATMOSPHERE_RENEWER]) {
-                base_pollution = (base_pollution + 3) / 4;
-            }
-
-            if (officer_idx != -1) {
-                int32_t officer_reduction = 0;
-                if (MOX::_leaders[officer_idx].special_skills & 2) {
-                    officer_reduction = (Owned_Officer_Level_(officer_idx) * 3 + 3) * 5;
-                } else if (MOX::_leaders[officer_idx].special_skills & 1) {
-                    officer_reduction = (Owned_Officer_Level_(officer_idx) * 5 + 5) * 2;
-                }
-                base_pollution += (officer_reduction * base_pollution) / -100;
-            }
-
-            base_pollution -= reduction_size;
-            pollution = (base_pollution + 1) / 2;
-
-            if (pollution > 0) {
-                int immune_pops = 0;
-                for (int i = 0; i < n_pops; ++i) {
-                    uint32_t race = colony->pop[i] & 0xF;
-                    if ((race < 8 && MOX::_player[race].traits[TRAIT_ENVIRONMENT_IMMUNE]) || race == 8 /* ANDROID */) {
-                        immune_pops++;
-                    }
-                }
-
-                if (immune_pops != 0) {
-                    pollution = (n_pops / 2 + (n_pops - immune_pops) * pollution) / n_pops;
-                }
-
-                if (pollution > 0) {
-                    total_prod -= static_cast<int16_t>(pollution);
-                    if (debug_out) {
-                        breakdown.unk = pollution * -20;
-                    }
-                } else {
-                    pollution = 0;
-                }
-            } else {
-                pollution = 0;
-            }
-            colony->pollution = static_cast<short>(pollution);
-        }
-
-        colony->production[ECON_INDUSTRY] = total_prod;
-
-        if (debug_out) {
-            char* p = debug_out;
-            p += _sprintf(p, s_fmt_s_00551130, s_T_15_65);
-            p += _sprintf(p, s_fmt_s_00551130, s_0);
-
-            if (breakdown.base_prod != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_industry_msg);
-            }
-
-            for (int i = 0; i < 8; ++i) {
-                if (breakdown.racial_bonuses[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s_s, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
-                }
-            }
-
-            if (breakdown.android_bonuses[0] != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.android_bonuses[0], _android_bonus_msg);
-            }
-
-            for (int i = 0; i < 212; ++i) {
-                if (breakdown.tech_apps[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
-                }
-            }
-
-            for (int i = 0; i < 49; ++i) {
-                if (breakdown.buildings_prod[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
-                }
-            }
-
-            if (breakdown.gravity_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
-            }
-
-            if (breakdown.conquered_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
-            }
-
-            if (breakdown.blockaded_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
-            }
-
-            if (breakdown.morale_bonus > 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
-            } else if (breakdown.morale_bonus < 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
-            }
-
-            if (breakdown.govt_bonus > 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
-            } else if (breakdown.govt_bonus < 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
-            }
-
-            if (breakdown.officer_bonus != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
-            }
-
-            if (bonus_recycling != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
-            }
-            if (bonus_automated_factory != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
-            }
-            if (bonus_robo_miner != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
-            }
-            if (bonus_deep_core != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
-            }
-            if (bonus_robotic_factory != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s_s, (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
-            }
-
-            if (breakdown.unk != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.unk, 20), _pollution_penalty_msg);
-            }
-
-            if (colony->n_food_replicated != 0) {
-                char temp[256];
-                _sprintf(temp, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                p += _sprintf(p, s_fmt_d_s, (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
-                colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
-            }
-
-            if (colony->n_industry_taxed != 0) {
-                p += _sprintf(p, s_fmt_minus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
-                colony->production[ECON_INDUSTRY] -= colony->n_industry_taxed;
-            }
-
-            p += _sprintf(p, s_fmt_s_00551130, s_newline_0055136c);
-            _sprintf(p, s_fmt_plus_d_s, (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
-        }
     }
 
     void __cdecl Colony_Industry_Maintenance_(s_colony* colony) {
@@ -1497,21 +1068,25 @@ namespace COLCALC {
         return 4; 
     }
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_struct) {
-        using ColonyEmpireBaseFn = int16_t(__cdecl*)(s_colony*, int16_t, int32_t, void*);
-        auto fn_table = reinterpret_cast<ColonyEmpireBaseFn*>(_colony_empire_base_functions);
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out) {
+        int16_t base_produced;
+        int16_t min_limit = 0;
 
-        int16_t base_produced = fn_table[job_type](colony, colony->owner, pop & 0xFFFF000F, debug_struct);
-        int16_t min_required = 0;
+        base_produced = _colony_empire_base_functions[job_type](
+            colony, 
+            static_cast<int16_t>(colony->owner), 
+            pop & 0xffff000f, 
+            out
+        );
 
         if (base_produced < 1) {
             if (job_type != 0 || colony->food2_per_farmer != 0) {
-                min_required = 1;
+                min_limit = 1;
             }
         }
 
-        if (base_produced < min_required) {
-            base_produced = min_required;
+        if (base_produced < min_limit) {
+            base_produced = min_limit;
         }
 
         return base_produced;

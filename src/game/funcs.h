@@ -121,7 +121,7 @@ inline void __cdecl FUN_533630() {
 }
 
 // Suggested name: setup_screen_workspace
-inline void __cdecl FUN_528680() {
+inline void __cdecl Set_Page_Off_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528680 });
     fn();

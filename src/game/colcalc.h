@@ -6,10 +6,13 @@ struct s_colony;
 struct s_star_data;
 struct s_leader_data;
 struct s_planet_data;
+struct s_colony_job_production;
 
 namespace COLCALC {
-    inline void** _colony_empire_base_functions =
-        reinterpret_cast<void**>(std::uintptr_t{0x0055A858});
+    typedef int16_t (__cdecl *ColonyBaseFunc)(s_colony* colony, int16_t owner, int32_t masked_param2, s_colony_job_production* out);
+
+    inline ColonyBaseFunc (&_colony_empire_base_functions)[3] =
+        *reinterpret_cast<ColonyBaseFunc (*)[3]>(std::uintptr_t{0x0055A858});
 
     inline int8_t (&_minerals_per_mine)[8] =
         *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F160});
@@ -30,6 +33,8 @@ namespace COLCALC {
     inline const char*& _no_capital_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B10});
     inline const char*& _no_barracks_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B38});
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
+    inline int8_t (&_colony_calc_food_cache)[10] =
+        *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00571BA0});
     inline const char*& _ship_maintenance_costs_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571ADC});
     inline const char*& _d_from_1_s_ship_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AEC});
     inline const char*& _d_from_d_battlestations_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AF0});
@@ -47,6 +52,21 @@ namespace COLCALC {
     inline const char*& _from_imperium_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B84});
     inline const char*& _d_from_1_battlestation_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B94});
     inline const char*& _d_from_1_fortress_msg_alt = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC4});
+
+    inline s_colony*& _colony_calc_food_colony =
+        *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A864});
+
+    inline uint8_t& _colony_calc_food_type =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055A868});
+
+    inline s_colony*& _colony_calc_industry_colony =
+        *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A86C});
+
+    inline uint8_t& _colony_calc_industry_type =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055A870});
+
+    inline int8_t (&_colony_calc_industry_cache)[10] =
+        *reinterpret_cast<int8_t (*)[10]>(std::uintptr_t{0x00571B88});
 
     inline const char* s_msg_bc_calc = reinterpret_cast<const char*>(std::uintptr_t{0x0055A908});
     inline const char* s_msg_bc_zero = reinterpret_cast<const char*>(std::uintptr_t{0x0055A928});
@@ -151,9 +171,18 @@ namespace COLCALC {
         return fn(data);
     }
 
-    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, void* out);
+    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, uint16_t player_idx, s_colony_job_production* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
-    int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, void* out);
+    inline s_colony*& _colony_calc_research_colony =
+        *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A874});
+
+    inline uint8_t& _colony_calc_research_type =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055A878});
+
+    inline int8_t (&_colony_calc_research_cache)[10] =
+        *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00571BB0});
+
+    int16_t __cdecl Colony_Research_Per_Scientist_(s_colony* colony, int16_t player_idx, s_colony_job_production* out);
 
     void __cdecl Twiddle_Initial_Homeworlds_();
     void __cdecl Twiddle_Initial_Homeworld_(s_colony* colony);
@@ -214,7 +243,7 @@ namespace COLCALC {
 
     int __cdecl Colony_Job_Production_(s_colony* colony, short econ_type, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_ptr);
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out);
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
         using Fn = char*(__cdecl*)(int, int);
@@ -222,6 +251,12 @@ namespace COLCALC {
     }
 
     void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out);
+
+    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
+
+    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, int16_t player_idx, s_colony_job_production* out);
+
+    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out);
 
     void __cdecl Colony_Food_Maintenance_(s_colony* colony);
 

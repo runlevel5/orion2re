@@ -423,7 +423,7 @@ namespace platform {
 #endif
 
         DAT_00578e68 = 0;
-        FUN_528680();
+        Set_Page_Off_();
         graphics::Fill_(0, 0, 639, 479, 0);
         FUN_5286a0();
         graphics::Fill_(0, 0, 639, 479, 0);

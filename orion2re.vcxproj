@@ -83,6 +83,7 @@
     <ClCompile Include="src\game\mox2.cpp" />
     <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\namestar.cpp" />
+    <ClCompile Include="src\game\newgame.cpp" />
     <ClCompile Include="src\game\officer.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
