@@ -278,6 +278,11 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 60
+        preprocessors:
+          - name: file_read
+            options:
+              paths:
+                - src/game/orion2.h
         tools:
           - read_files
           - list_files
@@ -492,6 +497,7 @@ workflows:
           * Rename certain stdlib functions:
             sprintf -> _sprintf
             qsort -> _qsort
+          * Never read `src/game/orion2.h` - it is already provided to you.
 
           # Checklist
           * You did not read files that were not mentioned in the decomplation input

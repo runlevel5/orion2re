@@ -286,19 +286,6 @@ typedef struct s_colony s_colony, *Ps_colony;
 
 /* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
 
-typedef struct s_pop_info s_pop_info, *Ps_pop_info;
-
-struct s_pop_info {
-    uint race:4;
-    uint loyalty:3;
-    uint job:2;
-    uint conquered:1;
-    uint unknown1:4;
-    uint starve_priority:2;
-    uint unknown2:15;
-    uint employed:1;
-};
-
 struct s_colony {
     char owner;
     char allocated_to;
@@ -356,6 +343,29 @@ typedef struct s_colony_bldg s_colony_bldg, *Ps_colony_bldg;
 
 struct s_colony_bldg {
     int32_t buildings[6];
+};
+
+typedef struct s_colony_job_production s_colony_job_production, *Ps_colony_job_production;
+
+struct s_colony_job_production {
+    int base_prod;
+    short racial_bonuses[8];
+    short android_bonuses[2];
+    short tech_apps[212];
+    short buildings_prod[49];
+    int food_bonus;
+    int artifacts_bonus;
+    int intelligence_bonus;
+    int base_prod_scaled;
+    int gravity_penalty;
+    int conquered_penalty;
+    int unk;
+    int morale_bonus;
+    int govt_bonus;
+    int blockaded_penalty;
+    int officer_bonus;
+    int difficulty_bonus;
+    int final_prod;
 };
 
 typedef struct s_colors s_colors, *Ps_colors;
@@ -2341,6 +2351,19 @@ struct s_player_info {
     char stealthy_ships;
     sbyte trans_dimensional;
     char warlord;
+};
+
+typedef struct s_pop_info s_pop_info, *Ps_pop_info;
+
+struct s_pop_info {
+    uint race:4;
+    uint loyalty:3;
+    uint job:2;
+    uint conquered:1;
+    uint unknown1:4;
+    uint starve_priority:2;
+    uint unknown2:15;
+    uint employed:1;
 };
 
 typedef struct s_potential_colony_info s_potential_colony_info, *Ps_potential_colony_info;

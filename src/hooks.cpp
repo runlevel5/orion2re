@@ -428,9 +428,6 @@ namespace hooks {
         { 0x004f7560, &COLCALC::Leader_At_Anomaly_ },
         { 0x004f7ce0, &COLCALC::Tribute_Received_From_ },
         { 0x004f7e20, &COLCALC::Player_Owns_Officer_ },
-        { 0x004f4520, &COLCALC::Colony_Industry_Production_ },
-        { 0x004f37f0, &COLCALC::Colony_Food_Production_ },
-        { 0x004f4fb0, &COLCALC::Colony_Research_Production_ },
         { 0x004f7310, &COLCALC::Colony_BC_Maintenance_ },
         { 0x004f5b90, &COLCALC::Size_And_Climate_Race_Pop_Limit_ },
         { 0x004f5c70, &COLCALC::Calc_Player_Climate_ },
@@ -438,7 +435,6 @@ namespace hooks {
         { 0x004f5a80, &COLCALC::Double_Add_Two_ },
         { 0x004f75a0, &COLCALC::Compute_Player_Maintenance_ },
         { 0x004f3410, &COLCALC::Gravity_Player_Production_Factor_ },
-        { 0x004f3d50, &COLCALC::Colony_Job_Production_ },
         { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
         { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
         { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
@@ -1058,6 +1054,9 @@ namespace hooks {
         { 0x004defd0, &COLONY::Draw_Colony_Info_Scanned_ },
         { 0x004f44d0, &COLCALC::Show_Industry_Production_ },
         { 0x004f3d50, &COLCALC::Colony_Job_Production_ },
+        { 0x004f37f0, &COLCALC::Colony_Food_Production_ },
+        { 0x004f4520, &COLCALC::Colony_Industry_Production_ },
+        { 0x004f4fb0, &COLCALC::Colony_Research_Production_ },
     };
 
     void Install_Hooks()

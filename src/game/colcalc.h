@@ -8,36 +8,6 @@ struct s_leader_data;
 struct s_planet_data;
 
 namespace COLCALC {
-    #pragma pack(push, 1)
-    struct s_production_breakdown {
-        int32_t totals[6];
-        int16_t items1[212];
-        int16_t items2[49];
-    };
-
-    struct s_food_production_breakdown {
-        int32_t workers;             // Offset 0x00
-        int16_t race_bonus[8];       // Offset 0x04
-        int16_t android_bonus;       // Offset 0x14
-        int16_t other_bonus;         // Offset 0x16
-        int16_t tech_bonus[204];     // Offset 0x18
-        int16_t building_bonus[49];  // Offset 0x1B0
-        int32_t unknown_36[4];       // Offset 0x212
-        int32_t field_222;           // Offset 0x222
-        int32_t field_226;           // Offset 0x226
-        int32_t field_22A;           // Offset 0x22A
-        int32_t field_22E;           // Offset 0x22E
-        int32_t gravity_penalty;     // Offset 0x232
-        int32_t conquered_penalty;   // Offset 0x236
-        int32_t unk_23A;             // Offset 0x23A
-        int32_t morale_modifier;     // Offset 0x23E
-        int32_t government_modifier; // Offset 0x242
-        int32_t blockade_penalty;    // Offset 0x246
-        int32_t leader_bonus;        // Offset 0x24A
-        int32_t field_24E[2];        // Offset 0x24E
-    };
-    #pragma pack(pop)
-
     inline void** _colony_empire_base_functions =
         reinterpret_cast<void**>(std::uintptr_t{0x0055A858});
 
@@ -129,6 +99,7 @@ namespace COLCALC {
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});
     inline char*& _produced_by_workers_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD8});
+    inline char*& _produced_by_workers_industry_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AE8});
     inline char*& _government_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AF4});
     inline char*& DAT_00571afc = *reinterpret_cast<char**>(std::uintptr_t{0x00571AFC});
     inline char*& _conquered_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B0C});
@@ -241,7 +212,7 @@ namespace COLCALC {
 
     void __cdecl Show_Industry_Production_(short colony_idx);
 
-    int16_t __cdecl Colony_Job_Production_(struct s_colony* colony, int16_t job_type, char* debug_out);
+    int __cdecl Colony_Job_Production_(s_colony* colony, short econ_type, s_colony_job_production* out);
 
     int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, void* debug_ptr);
 
@@ -257,6 +228,13 @@ namespace COLCALC {
     void __cdecl Colony_Replicators_(s_colony* colony);
 
     void __cdecl Colony_Research_Production_(s_colony* colony, char* debug_out);
+
+    inline const char* s_str = reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
+    inline const char* s_newline = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // "\r"
+    inline const char* s_tab_s_s_r = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B0}); // "\t%s\t%s\r"
+    inline const char* s_tab_d_s_s_r = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8D0}); // "\t%+d\t%s %s\r"
+    inline const char* s_tab_d_s_r = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "\t%+d\t%s\r"
+    inline const char* s_tab_plus_d_s_r = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8FC}); // "\t+%d\t%s\r"
 
     void __cdecl Colony_Industry_To_Tax_(s_colony* colony);
 
