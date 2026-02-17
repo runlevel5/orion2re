@@ -32,6 +32,7 @@ namespace COLONY {
     inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
     inline const char* _COLBLDG_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CE8}); // "COLBLDG.LBX"
     inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
+    inline const char* _NEWGAME_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D90}); // "NEWGAME.LBX"
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
     inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});

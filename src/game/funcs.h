@@ -478,6 +478,7 @@ inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
 inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
+inline const char* s_RACEOPT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DB0}); // "RACEOPT.LBX"
 inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
 inline const char* s__GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4); // ".GAM"
 inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); // "rb"

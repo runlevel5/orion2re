@@ -23,4 +23,14 @@ namespace FAKEBUTS {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(0x004b55b0)();
     }
+
+    inline void __cdecl Draw_Click_Thru_Fields_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004b5410)();
+    }
+
+    inline int16_t __cdecl Add_Click_Thru_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, void* data, int count, void* var, int unk, const char* str, int16_t unk2, uint16_t hidden_id) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*, int, void*, int, const char*, int16_t, uint16_t);
+        return reinterpret_cast<Fn>(0x004b55d0)(x1, y1, x2, y2, data, count, var, unk, str, unk2, hidden_id);
+    }
 }

@@ -1061,6 +1061,13 @@ namespace hooks {
         { 0x004f43f0, &COLCALC::Colony_Empire_Base_Industry_Produced_ },
         { 0x004f4e60, &COLCALC::Colony_Empire_Base_Research_Produced_ },
         { 0x004867a0, &NEWGAME::Newgame_Screen_ },
+        { 0x00486f60, &NEWGAME::Temps_To_Globals_ },
+        { 0x00486390, &NEWGAME::Reload_Newgame_Screen_ },
+        { 0x00486fd0, &NEWGAME::Globals_To_Temps_ },
+        { 0x00486ac0, &NEWGAME::Update_Fields_ },
+        { 0x004865a0, &NEWGAME::Draw_Newgame_Screen_ },
+        { 0x00486690, &NEWGAME::Draw_Pictures_ },
+        { 0x00486160, &NEWGAME::Load_New_Game_Strings_ },
     };
 
     void Install_Hooks()

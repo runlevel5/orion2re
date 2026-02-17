@@ -122,4 +122,9 @@ namespace fonts {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525670});
         fn(style, colors);
     }
+
+    inline void __cdecl Set_Alias_Color_(int32_t color) {
+        using Fn = void(__cdecl*)(int32_t);
+        reinterpret_cast<Fn>(0x00525790)(color);
+    }
 }
