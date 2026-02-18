@@ -88,6 +88,7 @@
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
+    <ClCompile Include="src\game\racesel.cpp" />
     <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\russ.cpp" />

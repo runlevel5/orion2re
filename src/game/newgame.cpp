@@ -69,7 +69,7 @@ int16_t __cdecl Newgame_Screen_(void) {
             } else if (MOX::_game_type == 2 || MOX::_game_type == 3) {
                 MOX::_current_screen = 21 /* SCREEN_NETWORK_GAME */;
             } else {
-                int16_t selection_result = Race_Selection_Screen_(MOX::_player);
+                int16_t selection_result = RACESEL::Race_Selection_Screen_(MOX::_player);
                 if (selection_result == 1) {
                     exit_loop = true;
                     MOX::_player[0].objectives = 100 /* 'd' */;

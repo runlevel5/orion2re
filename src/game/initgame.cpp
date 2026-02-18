@@ -298,11 +298,11 @@ namespace INITGAME {
 
     void __cdecl Init_Players_() {
         // Load race trait template data from RACESTUF.LBX
-        RACESEL::_race_specials = (void**)farload::Far_Reload_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, 0, 1, 31);
+        RACESEL::_race_specials[0] = (uint8_t*)farload::Far_Reload_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, 0, 1, 31);
         MOX::Mox_Update_();
 
         for (int i = 1; i < 13; ++i) {
-            RACESEL::_race_specials[i] = farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, i, 1, 31);
+            RACESEL::_race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, i, 1, 31);
             MOX::Mox_Update_();
         }
 

@@ -48,10 +48,5 @@ namespace NEWGAME {
 
     void __cdecl Temps_To_Globals_();
 
-    inline int16_t __cdecl Race_Selection_Screen_(s_player* player) {
-        using Fn = int16_t(__cdecl*)(s_player*);
-        return reinterpret_cast<Fn>(0x00498B40)(player);
-    }
-
     int16_t __cdecl Newgame_Screen_();
 }

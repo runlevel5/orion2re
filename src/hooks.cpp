@@ -1068,6 +1068,8 @@ namespace hooks {
         { 0x004865a0, &NEWGAME::Draw_Newgame_Screen_ },
         { 0x00486690, &NEWGAME::Draw_Pictures_ },
         { 0x00486160, &NEWGAME::Load_New_Game_Strings_ },
+        { 0x004981B0, &RACESEL::Reload_Race_Selection_Screen_ },
+        { 0x00498B40, &RACESEL::Race_Selection_Screen_ },
     };
 
     void Install_Hooks()

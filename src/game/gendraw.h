@@ -3,8 +3,8 @@
 
 namespace GENDRAW {
     // Suggested name: GENDRAW::Message_Box
-    inline void __cdecl Message_Box_(char* message) {
-        using Fn = void(__cdecl*)(char*);
+    inline void __cdecl Message_Box_(const char* message) {
+        using Fn = void(__cdecl*)(const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796b0});
         fn(message);
     }

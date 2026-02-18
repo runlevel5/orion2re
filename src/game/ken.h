@@ -13,8 +13,8 @@ namespace KEN {
     s_animation_header* __cdecl Get_Ship_Picture_Seg_(int16_t ship_id, int16_t frame_index);
 
     // Suggested name: Ken_Get_Text_Message
-    inline void __cdecl Ken_Get_Text_Message_(int32_t msg_idx, char* buffer, int32_t max_len) {
-        using Fn = void(__cdecl*)(int32_t, char*, int32_t);
+    inline void __cdecl Ken_Get_Text_Message_(int16_t msg_idx, char* buffer, int16_t max_len) {
+        using Fn = void(__cdecl*)(int16_t, char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c2630});
         fn(msg_idx, buffer, max_len);
     }

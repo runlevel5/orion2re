@@ -28,4 +28,8 @@ namespace ERICHELP {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(0x00412380)(civ_var);
     }
+    inline void __cdecl Set_Race_Select_Help_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004988B0)();
+    }
 }
