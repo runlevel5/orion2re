@@ -13,4 +13,10 @@ namespace ERICNET {
     int __cdecl Mox_Play_Sound_(int16_t sound_id);
 
     void __cdecl Init_Non_Homeworld_Colony_(int16_t colony_idx, int16_t player_idx);
+    
+    inline void __cdecl Do_All_Ships_XP_Check_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00409460 });
+        fn();
+    }
 }

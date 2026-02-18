@@ -112,6 +112,7 @@ namespace MOX {
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
+    inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
     inline uint32_t& _draw_ship_bitmap = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B328});
@@ -135,10 +136,10 @@ namespace MOX {
     inline int16_t& _design_clear_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B4C});
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
+    inline int16_t& _old_system_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5F8});
     inline int8_t& _selected_star_color_mod =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596C50});
     inline int8_t& _selected_star_color_offset = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059C454});
-    inline uint8_t (&_antarans)[66] = *reinterpret_cast<uint8_t(*)[66]>(std::uintptr_t{ 0x0059BA20 });
     inline int16_t* _antarans_ship_counts = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA38 });
     inline int16_t* _antarans_ship_counts_end = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA4A });
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });

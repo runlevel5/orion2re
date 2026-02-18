@@ -1442,4 +1442,31 @@ namespace COLCALC {
             results->research += 5;
         }
     }
+
+    int16_t N_Living_Human_Players_() {
+        int16_t human_count = 0;
+
+        for (int32_t i = 0; i < static_cast<int32_t>(MOX::_NUM_PLAYERS); ++i) {
+            s_player& player = MOX::_player[i];
+
+            if (player.eliminated == 0 && player.objectives == 100) {
+                human_count++;
+            }
+        }
+
+        return human_count;
+    }
+
+    int16_t N_Living_Players_() {
+        int16_t living_count = 0;
+        int32_t num_players = (int32_t)MOX::_NUM_PLAYERS;
+
+        for (int32_t i = 0; i < num_players; ++i) {
+            if (MOX::_player[i].eliminated == 0) {
+                living_count++;
+            }
+        }
+
+        return living_count;
+    }
 }

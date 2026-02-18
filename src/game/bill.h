@@ -8,6 +8,7 @@ namespace BILL {
     }
 
     void __cdecl Cache_Player_Scientist_Anim_();
+    void __cdecl Record_History_();
 
     inline void __cdecl Copy_File_To_File_(const char* src, const char* dest) {
         using Fn = void(__cdecl*)(const char*, const char*);
@@ -74,6 +75,18 @@ namespace BILL {
         using Fn = int16_t(__cdecl*)(int16_t, const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004080F0});
         return fn(width, text);
+    }
+
+    inline void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t width, int16_t* unknown_ptr, int16_t unknown_val1, int8_t unknown_val2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t*, int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00407210 });
+        fn(x, y, str, width, unknown_ptr, unknown_val1, unknown_val2);
+    }
+
+    inline void __cdecl Record_History_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004067d0 });
+        fn();
     }
 
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});

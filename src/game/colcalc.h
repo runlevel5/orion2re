@@ -99,6 +99,12 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony);
 
+    void __cdecl Apply_All_Colony_Changes_();
+    void __cdecl Do_Surrenders_();
+    void __cdecl All_Colony_Calculations_();
+    void __cdecl Apply_All_Player_Changes_();
+    void __cdecl Compute_Blockades_();
+
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
     int __cdecl Colony_Officer_(s_colony* colony);
@@ -318,4 +324,32 @@ namespace COLCALC {
     bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony);
 
     int16_t __cdecl N_Colonies_And_Outposts_At_Star_(int16_t star_index);
+
+    int16_t N_Living_Human_Players_();
+
+    int16_t N_Living_Players_();
+
+    inline void __cdecl Apply_All_Colony_Changes_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91e0 });
+        fn();
+    }
+
+    inline void __cdecl Do_Surrenders_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fb090 });
+        fn();
+    }
+
+    inline void __cdecl Apply_All_Player_Changes_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fb920 });
+        fn();
+    }
+
+    inline void __cdecl Compute_Blockades_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbac0 });
+        fn();
+    }
 }

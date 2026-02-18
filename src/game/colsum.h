@@ -130,4 +130,22 @@ namespace COLSUM {
     void __cdecl Colony_Summary_Screen_();
 
     void __cdecl Set_Colony_Font_To_(int16_t style);
+
+    inline int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004038D0 });
+        return fn(star_idx);
+    }
+
+    inline int16_t __cdecl Prod_To_Sort_Type_(int16_t production_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00402D80 });
+        return fn(production_id);
+    }
+
+    inline void __cdecl Draw_Colony_Scan_Info_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00401A40 });
+        fn();
+    }
 }

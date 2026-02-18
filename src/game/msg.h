@@ -14,4 +14,10 @@ namespace MSG_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00472040});
         return fn(data);
     }
+
+    inline void __cdecl Add_Ongoing_Event_Msgs_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00473b50 });
+        fn();
+    }
 }

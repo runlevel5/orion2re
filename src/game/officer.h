@@ -101,6 +101,11 @@ namespace OFFICER {
 
     int16_t __cdecl Do_Hire_Officer_(int16_t leader_idx);
 
+    void __cdecl Check_For_Officer_Level_();
+    void __cdecl Decrement_Officer_ETA_();
+    void __cdecl Random_Officer_Check_(int16_t player_idx);
+    void __cdecl Assert_Marooned_Leaders_();
+
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
     inline int16_t __cdecl Scan_Officer_Fields_(int16_t* out_p1, int16_t* out_p2, int16_t p2, int16_t p1, int8_t* scanned_flag, int16_t* out_field2, int16_t* out_field1) {
@@ -189,4 +194,33 @@ namespace OFFICER {
     void __cdecl Load_Fleet_Galaxy_Stars_();
 
     void __cdecl Load_Officer_Skill_Icons_(void* param_1);
+
+    inline uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
+        using Fn = uint8_t(__cdecl*)(int16_t, int16_t, char*);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0045A680 })(player_num, officer_id, message);
+    }
+
+    inline void __cdecl Check_For_Officer_Level_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043d560 });
+        fn();
+    }
+
+    inline void __cdecl Decrement_Officer_ETA_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043d6c0 });
+        fn();
+    }
+
+    inline void __cdecl Random_Officer_Check_(int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00442c80 });
+        fn(player_idx);
+    }
+
+    inline void __cdecl Assert_Marooned_Leaders_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043d3e0 });
+        fn();
+    }
 }

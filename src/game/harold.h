@@ -171,4 +171,5 @@ namespace HAROLD {
 
     inline const char* s_MC_0055823c = reinterpret_cast<const char*>(std::uintptr_t{0x0055823c}); // "MC"
     inline const char* s_BC_00558244 = reinterpret_cast<const char*>(std::uintptr_t{0x00558244}); // "BC"
+    inline const char* s_in_next_turn = reinterpret_cast<const char*>(std::uintptr_t{0x00558004}); // "in next-turn"
 }

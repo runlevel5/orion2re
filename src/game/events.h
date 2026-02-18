@@ -24,4 +24,16 @@ namespace EVENTS {
 
     int16_t __cdecl Event_Check_Hyperspace_Flux_();
     int16_t __cdecl Colony_Has_Event_(int16_t colony_idx);
+
+    inline void __cdecl Determine_Event_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004761c0 });
+        fn();
+    }
+
+    inline void __cdecl Event_Twiddle_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004742a0 });
+        fn();
+    }
 }

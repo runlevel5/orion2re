@@ -106,6 +106,7 @@ namespace MAINSCR {
     void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5);
 
     inline uint8_t& _already_faded_into_main_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596180});
+    inline uint8_t& _in_auto_next_turn_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005961F8});
 
     void __cdecl Add_Map_Fields_();
 

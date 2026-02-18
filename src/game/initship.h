@@ -2,6 +2,12 @@
 #include <cstdint>
 
 namespace INITSHIP {
+    inline void __cdecl Repair_Ships_At_Colonies_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00482f10 });
+        fn();
+    }
+
     void __cdecl Init_Ship_Designs_(int16_t player_idx);
     
     inline void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* defense, int16_t* missile_def, int16_t* attack) {

@@ -1070,6 +1070,15 @@ namespace hooks {
         { 0x00486160, &NEWGAME::Load_New_Game_Strings_ },
         { 0x004981B0, &RACESEL::Reload_Race_Selection_Screen_ },
         { 0x00498B40, &RACESEL::Race_Selection_Screen_ },
+        { 0x0049a040, &NEXTTURN::Next_Turn_ },
+        { 0x00499fd0, &NEXTTURN::Do_Autosave_ },
+        { 0x004fba70, &COLCALC::N_Living_Human_Players_ },
+        { 0x004fba20, &COLCALC::N_Living_Players_ },
+        { 0x0049a240, &NEXTTURN::Get_Winner_ },
+        { 0x00499e50, &NEXTTURN::Next_Turn_Calc_ },
+        { 0x004b3cb0, &antarans::Delta_Stardate_ },
+        { 0x004b3c80, &antarans::Delay_ },
+        { 0x004b4100, &antarans::Antarans_Defensive_Resource_Bonus_ },
     };
 
     void Install_Hooks()

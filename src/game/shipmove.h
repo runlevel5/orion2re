@@ -4,6 +4,8 @@
 
 namespace SHIPMOVE {
     void __cdecl Allocate_New_Ship_Slots_();
+    void __cdecl Move_All_Ships_Toward_Stars_();
+    void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_();
 
     void __cdecl Update_All_Ship_Ranges_();
 
@@ -23,6 +25,18 @@ namespace SHIPMOVE {
     inline void __cdecl Make_Ships_Move_To_(int16_t* ids, int16_t target, s_ship_move_info* info) {
         using Fn = void(__cdecl*)(int16_t*, int16_t, s_ship_move_info*);
         reinterpret_cast<Fn>(0x00436A50)(ids, target, info);
+    }
+
+    inline void __cdecl Move_All_Ships_Toward_Stars_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00436b60 });
+        fn();
+    }
+
+    inline void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004377d0 });
+        fn();
     }
 
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});

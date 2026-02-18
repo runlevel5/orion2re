@@ -48,4 +48,19 @@ namespace ERIC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA950});
         fn(y, x, width, height, arg5, arg6, arg7);
     }
+
+    inline void __cdecl Play_Loose_Flic_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004bb260})();
+    }
+
+    inline void __cdecl Play_Normal_Win_Flic_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004bb1b0})();
+    }
+
+    inline void __cdecl Play_All_Flics_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004bb1f0})();
+    }
 }

@@ -278,11 +278,11 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 60
-        preprocessors:
-          - name: file_read
-            options:
-              paths:
-                - src/game/orion2.h
+        #preprocessors:
+        #  - name: file_read
+        #    options:
+        #      paths:
+        #        - src/game/orion2.h
         tools:
           - read_files
           - list_files
@@ -491,15 +491,19 @@ workflows:
           * If you see reference to any of the `_settings` fields, use symbol found in `src/game/mox.h`: `MOX::_settings.field`.
             Do not create a new settings header file.
           * You are not allowed to rename struct fields or modify their shapes
-          * Be VERY conservative with file reads.
+          * Be EXTREMELY conservative with file reads - always read relevant chunks first
+            - You don't need to read whole .cpp file to append a new function. If function was not declared before - there's nothing
+              to overwrite.
+            - Most of the time you don't need a lot of headers either.
           * When applying changes, pass all changes to a single apply_patch tool call to save on roundtrips.
           * Make sure that external variable and function stubs are added to header files
           * Rename certain stdlib functions:
             sprintf -> _sprintf
             qsort -> _qsort
-          * Never read `src/game/orion2.h` - it is already provided to you.
 
           # Checklist
+          * You were conservative with file reads and only read relevant chunks.
+          * You minimized a number of round-trips when patching code.
           * You did not read files that were not mentioned in the decomplation input
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user

@@ -164,9 +164,7 @@ namespace INITGAME {
         MOX::Mox_Update_();
 
         // Clear antaran invasion data (66 bytes)
-        for (int i = 0; i < 66; ++i) {
-            MOX::_antarans[i] = 0;
-        }
+        memset(&MOX::_antarans, 0, sizeof(MOX::_antarans));
         MOX::Mox_Update_();
 
         if (MOX::_game_type != 2) {

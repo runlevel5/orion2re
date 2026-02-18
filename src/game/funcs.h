@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stdio.h>
+#include <cstdint>
+
+void __cdecl nullsub_004d7840();
 
 struct s_animation_header;
 
@@ -255,47 +258,6 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
-inline void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t width, int16_t* unknown_ptr, int16_t unknown_val1, int8_t unknown_val2) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t*, int16_t, int8_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407210});
-    fn(x, y, str, width, unknown_ptr, unknown_val1, unknown_val2);
-}
-
-inline int16_t __cdecl cmp_(uint16_t val1, uint16_t val2) {
-    using Fn = int16_t(__cdecl*)(uint16_t, uint16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00402D60});
-    return fn(val1, val2);
-}
-
-inline int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004038D0});
-    return fn(star_idx);
-}
-
-inline int16_t __cdecl Prod_To_Sort_Type_(int16_t production_id) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00402D80});
-    return fn(production_id);
-}
-
-inline void __cdecl Draw_Colony_Scan_Info_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00401A40});
-    fn();
-}
-
-inline void __cdecl Set_Colony_Font_To_(int font_id) {
-    using Fn = void(__cdecl*)(int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DBF40});
-    fn(font_id);
-}
-
-inline uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
-    using Fn = uint8_t(__cdecl*)(int16_t, int16_t, char*);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x0045A680})(player_num, officer_id, message);
-}
-
 inline int __cdecl _clock() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540F20 });
@@ -442,6 +404,9 @@ inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x0055
 inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   // ""
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
+
+inline const char* const s_Auto_Save_00556938 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"
 
 inline const char* s_0_00551104 = reinterpret_cast<const char*>(0x00551104); // " 0"
 inline const char* s_2_00551108 = reinterpret_cast<const char*>(0x00551108); // " 2"
