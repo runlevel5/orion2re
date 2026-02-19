@@ -50,4 +50,9 @@ namespace SHIPS {
         using Fn = int16_t(__cdecl*)(int16_t*, int16_t, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x0041f370})(ship_icon_id, x_offset, y_offset);
     }
+
+    inline int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t star_idx, int16_t owner, s_ship_design* design, uint8_t just_built) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, s_ship_design*, uint8_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0041FA50})(star_idx, owner, design, just_built);
+    }
 }

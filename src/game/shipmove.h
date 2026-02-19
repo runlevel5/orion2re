@@ -39,5 +39,10 @@ namespace SHIPMOVE {
         fn();
     }
 
+    inline int16_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y) {
+        using Fn = int16_t(__cdecl*)(int16_t, s_ship_design*, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00436E30})(owner, design, x, y);
+    }
+
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});
 }

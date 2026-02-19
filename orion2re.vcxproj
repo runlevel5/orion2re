@@ -23,6 +23,7 @@
     <ClCompile Include="src\game\advciv.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
     <ClCompile Include="src\game\aidesign.cpp" />
+    <ClCompile Include="src\game\aitech.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\antarans.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
+    <ClCompile Include="src\game\dip_scrn.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\draw.cpp" />
     <ClCompile Include="src\game\eric.cpp" />
@@ -86,6 +88,7 @@
     <ClCompile Include="src\game\namestar.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
+    <ClCompile Include="src\game\npcdiplo.cpp" />
     <ClCompile Include="src\game\officer.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
@@ -172,6 +175,7 @@
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\gendraw.h" />
     <ClInclude Include="src\game\geo.h" />
+    <ClInclude Include="src\game\global.h" />
     <ClInclude Include="src\game\graphics.h" />
     <ClInclude Include="src\game\haccess.h" />
     <ClInclude Include="src\game\harold.h" />

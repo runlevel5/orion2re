@@ -185,54 +185,14 @@ typedef struct s_antaran s_antaran, *Ps_antaran;
 
 struct s_antaran {
     short field0_0x0;
-    short field1_0x2;
-    short field2_0x4;
-    undefined2 field3_0x6;
-    undefined2 field4_0x8;
-    undefined field5_0xa;
-    undefined field6_0xb;
-    undefined field7_0xc;
-    undefined field8_0xd;
-    undefined2 field9_0xe;
-    undefined field10_0x10;
-    undefined field11_0x11;
-    undefined field12_0x12;
-    undefined field13_0x13;
-    undefined field14_0x14;
-    undefined field15_0x15;
-    undefined field16_0x16;
-    undefined field17_0x17;
-    undefined2 field18_0x18;
-    undefined2 field19_0x1a;
-    undefined field20_0x1c;
-    undefined field21_0x1d;
-    undefined field22_0x1e;
-    undefined field23_0x1f;
-    undefined field24_0x20;
-    undefined field25_0x21;
-    undefined field26_0x22;
-    undefined field27_0x23;
-    undefined field28_0x24;
-    undefined field29_0x25;
-    undefined2 field30_0x26;
-    undefined2 field31_0x28;
-    undefined2 field32_0x2a;
-    undefined2 field33_0x2c;
-    undefined field34_0x2e;
-    undefined field35_0x2f;
-    undefined field36_0x30;
-    undefined field37_0x31;
-    undefined field38_0x32;
-    undefined field39_0x33;
-    undefined field40_0x34;
-    undefined field41_0x35;
-    undefined field42_0x36;
-    undefined field43_0x37;
-    undefined2 field44_0x38;
-    undefined2 field45_0x3a;
-    undefined1 field46_0x3c;
+    short resource_offensive;
+    short resource_defensive;
+    short defensive_ships[9];
+    short offensive_ships[9];
+    short offensive_deployed[9];
+    undefined1 field6_0x3c;
     int invasion_stardate;
-    undefined1 field48_0x41;
+    undefined1 field8_0x41;
 };
 
 typedef struct s_big_icon s_big_icon, *Ps_big_icon;
@@ -2050,7 +2010,7 @@ struct s_nebula {
     int8_t type;
 };
 
-typedef struct s_network s_network, *Ps_net;
+typedef struct s_network s_network, *Ps_network;
 
 struct s_network {
     undefined field0_0x0;
@@ -3431,23 +3391,20 @@ struct s_ship_icon {
 typedef struct s_ship_move_info s_ship_move_info, *Ps_ship_move_info;
 
 struct s_ship_move_info {
-    int8_t field0_0x0;
-    int8_t field1_0x1;
-    int8_t field2_0x2;
+    int8_t blackhole_blocks;
+    int8_t insufficient_fuel;
+    int8_t immobile;
     undefined field3_0x3;
-    int8_t field4_0x4;
-    int8_t field5_0x5;
+    int8_t turns_left;
+    int8_t moving;
     undefined field6_0x6;
-    undefined field7_0x7;
-    undefined field8_0x8;
-    undefined field9_0x9;
+    int8_t has_navigator;
+    int8_t traveling_speed;
+    int8_t parsecs;
     undefined field10_0xa;
     undefined field11_0xb;
     undefined field12_0xc;
-    int8_t field13_0xd;
-    undefined field14_0xe;
-    undefined field15_0xf;
-    struct s_animation_header *field16_0x10;
+    int8_t hyperspace_flux;
 };
 
 typedef struct s_ship_node s_ship_node, *Ps_ship_node;

@@ -154,3 +154,4 @@
 #include "settler.h"
 #include "invasion.h"
 #include "council.h"
+#include "global.h"

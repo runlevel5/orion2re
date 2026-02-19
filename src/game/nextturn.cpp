@@ -100,7 +100,7 @@ void __cdecl Next_Turn_Calc_() {
 
     MSG_::Allocate_Msg_Slots_();
 
-    if (MOX::_settings.xenons_exist != 0 && MOX::_antarans.field46_0x3c == 0) {
+    if (MOX::_settings.xenons_exist != 0 && MOX::_antarans.field6_0x3c == 0) {
         antarans::Antaran_Invasion_Check_();
     }
 

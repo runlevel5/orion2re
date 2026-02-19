@@ -124,6 +124,12 @@ namespace HACCESS {
 
     bool __cdecl Player_Has_Colony_In_System_(int16_t player_idx, int16_t system_idx);
 
+    inline uint8_t __cdecl N_Colonies_At_Star_(int16_t star_idx, int16_t player_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049AA80});
+        return fn(star_idx, player_idx);
+    }
+
     bool __cdecl Is_Combat_Ship_(int16_t ship_index);
 
     inline char* __cdecl Get_Planet_Name_No_Prime_(int16_t planet_idx) {

@@ -6,6 +6,10 @@ namespace EVENTS {
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
     inline uint16_t& _event_delay_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A65AE});
 
+    inline int16_t __cdecl Get_Antaran_Victim_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00477070})();
+    }
     void Init_Events_();
 
     inline int16_t __cdecl Event_Check_Comet_(int16_t colony_idx) {

@@ -276,6 +276,15 @@
     <ClCompile Include="src\game\nextturn.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\aitech.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\dip_scrn.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\npcdiplo.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -726,6 +735,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\spy.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\global.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

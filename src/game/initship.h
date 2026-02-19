@@ -48,6 +48,18 @@ namespace INITSHIP {
 
     void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, s_ship_design* design);
 
+    void __cdecl Load_Small_Antaran_Design_(s_ship_design* design);
+
+    void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design);
+
+    void __cdecl Load_Large_Antaran_Design_(s_ship_design* design);
+
+    void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design);
+
+    void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design);
+
+    void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size);
+
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
     inline char* s_Colony_Ship_Localized = reinterpret_cast<char*>(std::uintptr_t{0x00558E28});

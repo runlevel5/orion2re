@@ -501,12 +501,12 @@ namespace MAINSCR {
                         HACCESS::Get_Fleet_Box_Selected_Ship_Ids_((int16_t*)ship_ids, 500, 0xff);
                         SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, mouse_field_2, &SHIPMOVE::_g_ship_move_info);
 
-                        if (SHIPMOVE::_g_ship_move_info.field5_0x5 == 0) {
+                        if (SHIPMOVE::_g_ship_move_info.moving == 0) {
                             int msg_id = 0;
-                            if (SHIPMOVE::_g_ship_move_info.field0_0x0 != 0) msg_id = HESTR_021_A_BLACK_HOLE_BLOCKS_MO;
-                            else if (SHIPMOVE::_g_ship_move_info.field1_0x1 != 0) msg_id = HESTR_022_ONE_OR_MORE_SHIPS_DOES;
-                            else if (SHIPMOVE::_g_ship_move_info.field2_0x2 != 0) msg_id = HESTR_023_ONE_OR_MORE_SHIPS_CHOS;
-                            else if (SHIPMOVE::_g_ship_move_info.field13_0xd != 0) msg_id = HESTR_024_SHIP_MOVEMENT_IS_NOT_A;
+                            if (SHIPMOVE::_g_ship_move_info.blackhole_blocks != 0) msg_id = HESTR_021_A_BLACK_HOLE_BLOCKS_MO;
+                            else if (SHIPMOVE::_g_ship_move_info.insufficient_fuel != 0) msg_id = HESTR_022_ONE_OR_MORE_SHIPS_DOES;
+                            else if (SHIPMOVE::_g_ship_move_info.immobile != 0) msg_id = HESTR_023_ONE_OR_MORE_SHIPS_CHOS;
+                            else if (SHIPMOVE::_g_ship_move_info.hyperspace_flux != 0) msg_id = HESTR_024_SHIP_MOVEMENT_IS_NOT_A;
 
                             if (msg_id != 0) {
                                 const char* msg = HAROLD::H_Message_(msg_id);

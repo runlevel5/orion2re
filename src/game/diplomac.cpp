@@ -87,4 +87,57 @@ namespace diplomac {
         diplodef::_council_winner = -1;
         diplodef::_next_council_meeting_turn = 25;
     }
+
+    void Clear_Diplomacy_Messages_() {
+        NoOp2();
+        Update_Diplomatic_Status_();
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
+                s_player* p = &MOX::_player[i];
+                p->last_turn_diplomacy_severity[j] = p->diplomacy_severity[j];
+                p->diplomacy_severity[j] = 0;
+                p->diplomacy_incident[j] = 0;
+                p->diplomacy_proposal_request[j] = 0;
+                p->diplomacy_proposal_tribute_bribe[j] = 0;
+                p->diplomacy_proposal_tech_bribe1[j] = 0;
+                p->diplomacy_proposal_tech_bribe2[j] = 0;
+                p->diplomacy_proposal_gold_bribe[j] = 0;
+                p->diplomacy_message[j] = 0;
+            }
+        }
+
+        // Handle peace duration expiration and treaty revocation
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = i + 1; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
+                if (MOX::_player[i].peace_duration[j] > 0) {
+                    MOX::_player[i].peace_duration[j]--;
+                }
+                if (MOX::_player[j].peace_duration[i] > 0) {
+                    MOX::_player[j].peace_duration[i]--;
+                }
+
+                // If peace duration hits 0 and the treaty was a Peace Treaty (0x03), break it
+                if (MOX::_player[i].peace_duration[j] == 0 && MOX::_player[i].treaty[j] == 3 /* TREATY_PEACE */) {
+                    MOX::_player[i].treaty[j] = 0;
+                    MOX::_player[j].treaty[i] = 0;
+                }
+            }
+        }
+
+        // Increment time since last attack for players at war
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = i + 1; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
+                // Treaty >= 4 usually represents a state of war
+                if (MOX::_player[i].treaty[j] >= 4 /* TREATY_WAR */) {
+                    if (static_cast<uint8_t>(MOX::_player[i].time_since_last_attack[j]) < 250) {
+                        MOX::_player[i].time_since_last_attack[j]++;
+                    }
+                    if (static_cast<uint8_t>(MOX::_player[j].time_since_last_attack[i]) < 250) {
+                        MOX::_player[j].time_since_last_attack[i]++;
+                    }
+                }
+            }
+        }
+    }
 }

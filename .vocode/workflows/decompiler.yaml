@@ -20,6 +20,7 @@ workflows:
         #reasoning_effort: medium
         #reset_policy: keep
         confirmation: auto
+        start_timeout: 120
         system: |
           You are given Ghidra disassembly + Ghidra decompiler output. Produce cleaned-up C/C++ that is
           semantically equivalent to the assembly.
@@ -277,7 +278,7 @@ workflows:
         temperature: 1
         reasoning_effort: high
         confirmation: auto
-        start_timeout: 60
+        start_timeout: 120
         #preprocessors:
         #  - name: file_read
         #    options:
