@@ -1467,4 +1467,28 @@ namespace COLCALC {
 
         return living_count;
     }
+
+    void __cdecl Do_Surrenders_() {
+        if (MOX::_NUM_STARS > 0) {
+            for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+                if (MOX::_NUM_PLAYERS > 0) {
+                    for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+                        int8_t target = MOX::_star[star_idx].surrender_to[player_idx];
+                        if (target != -1) {
+                            Do_Surrender_Star_(star_idx, player_idx, (int16_t)target);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+                int8_t target = MOX::_player[player_idx].surrender_to;
+                if (target != -1) {
+                    Do_Surrender_Empire_(player_idx, (int16_t)target);
+                }
+            }
+        }
+    }
 }

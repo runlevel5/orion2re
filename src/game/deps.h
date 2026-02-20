@@ -65,6 +65,7 @@
 #include "palstore.h"
 #include "smack.h"
 #include "report.h"
+#include "raceopt.h"
 #include "combfind.h"
 #include "colcalc.h"
 #include "colgcbt.h"

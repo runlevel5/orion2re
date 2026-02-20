@@ -1104,6 +1104,10 @@ namespace hooks {
         { 0x004ba480, &COLONIZE::All_AI_Colonize_ },
         { 0x0042b480, &invasion::Compute_Player_Ground_Combat_Bonuses_ },
         { 0x00500e90, &aitech::Compute_AI_Tech_Info_ },
+        { 0x005014c0, &aitech::All_AI_Tech_Select_ },
+        { 0x0041f8b0, &SHIPS::Kill_Ship_ },
+        { 0x004b4360, &maintain::Make_Scrap_Ships_Dead_ },
+        { 0x004fb090, &COLCALC::Do_Surrenders_ },
     };
 
     void Install_Hooks()

@@ -294,6 +294,12 @@
     <ClCompile Include="src\game\invasion.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\maintain.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\ships.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -747,6 +753,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\global.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\raceopt.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

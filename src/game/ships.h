@@ -55,4 +55,6 @@ namespace SHIPS {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, s_ship_design*, uint8_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x0041FA50})(star_idx, owner, design, just_built);
     }
+
+    void __cdecl Kill_Ship_(int16_t ship_idx);
 }

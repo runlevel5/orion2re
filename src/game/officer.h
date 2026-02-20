@@ -51,6 +51,12 @@ namespace OFFICER {
 
     void __cdecl Deassign_Officer_(int16_t leader_idx);
 
+    inline void __cdecl Move_Officer_To_Pool_(int16_t leader_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043E2C0});
+        fn(leader_idx);
+    }
+
     void __cdecl Allocate_Adv_Civ_Game_Officers_();
 
     bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx);

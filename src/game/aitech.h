@@ -3,6 +3,13 @@
 namespace aitech {
     void __cdecl Apply_Evolutionary_Upgrades_();
     void __cdecl Compute_AI_Tech_Info_(s_ai_tech_info* info);
+    void __cdecl All_AI_Tech_Select_();
+
+    inline void __cdecl AI_Tech_Select_(s_player* plr) {
+        using Fn = void(__cdecl*)(s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00500C80});
+        fn(plr);
+    }
 
     inline int __cdecl Player_Best_Ship_Shield_(s_player* player) {
         using Fn = int(__cdecl*)(s_player*);
@@ -45,11 +52,5 @@ namespace aitech {
     inline int __cdecl Player_Best_Drive_(s_player* player) {
         using Fn = int(__cdecl*)(s_player*);
         return reinterpret_cast<Fn>(std::uintptr_t{0x00500E00})(player);
-    }
-
-    inline void __cdecl All_AI_Tech_Select_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005014c0 });
-        fn();
     }
 }

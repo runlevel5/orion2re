@@ -206,6 +206,18 @@ namespace COLCALC {
 
     void __cdecl Init_Surrenders_();
 
+    inline void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t target_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb130});
+        fn(star_idx, player_idx, target_idx);
+    }
+
+    inline void __cdecl Do_Surrender_Empire_(int16_t player_idx, int16_t target_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb320});
+        fn(player_idx, target_idx);
+    }
+
     inline void __cdecl No_Op1_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004FBEF0})();
@@ -332,12 +344,6 @@ namespace COLCALC {
     inline void __cdecl Apply_All_Colony_Changes_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91e0 });
-        fn();
-    }
-
-    inline void __cdecl Do_Surrenders_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fb090 });
         fn();
     }
 

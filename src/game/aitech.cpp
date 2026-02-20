@@ -153,4 +153,30 @@ namespace aitech {
             plr_info->colonization_idle = can_colonize ? 0 : 1;
         }
     }
+
+    /**
+     * Iterates through all players, computes AI tech requirements, selects research
+     * for active AI players, and handles evolutionary mutation upgrades.
+     */
+    void __cdecl All_AI_Tech_Select_() {
+        s_ai_tech_info local_aitech_info;
+
+        aidata::_aitech = &local_aitech_info;
+        aitech::Compute_AI_Tech_Info_(&local_aitech_info);
+
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            s_player* plr = &MOX::_player[i];
+
+            if (plr->eliminated == 0 && plr->objectives != 100) {
+                aitech::AI_Tech_Select_(plr);
+
+                // Index 211 is TECH_APP_EVOLUTIONARY_MUTATION (last element of tech_applications[212])
+                if (plr->tech_applications[211] == 3 && plr->picked_evolutionary_upgrade == 0) {
+                    raceopt::Setup_Evolutionary_Upgrade_((short)i);
+                }
+            }
+        }
+
+        aidata::_aitech = nullptr;
+    }
 }

@@ -82,6 +82,7 @@
     <ClCompile Include="src\game\mainmenu.cpp" />
     <ClCompile Include="src\game\mainscr.cpp" />
     <ClCompile Include="src\game\mainscr_main.cpp" />
+    <ClCompile Include="src\game\maintain.cpp" />
     <ClCompile Include="src\game\mapgen.cpp" />
     <ClCompile Include="src\game\misc.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\russ.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
+    <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
@@ -229,6 +231,7 @@
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\plntsum.h" />
     <ClInclude Include="src\game\racecust.h" />
+    <ClInclude Include="src\game\raceopt.h" />
     <ClInclude Include="src\game\racescrn.h" />
     <ClInclude Include="src\game\racesel.h" />
     <ClInclude Include="src\game\random.h" />
