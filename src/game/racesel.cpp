@@ -144,7 +144,7 @@ short Race_Selection_Screen_(s_player *plr)
                         timer::Mark_Time_();
                         timer::Release_Time_(5);
                         fields::Clear_Fields_();
-                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        struct_::Copy_Structure_(&plr->traits, _race_specials[i], 31);
                         plr->race = i;
                         strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Help_List_();
@@ -166,9 +166,10 @@ short Race_Selection_Screen_(s_player *plr)
                         }
 
                         if (naming_res == 2) {
+                            int8_t* traits = (int8_t*)&plr->traits;
                             for (int k = 1; k < 10; ++k) {
-                                if (plr->traits[k] != 0) {
-                                    plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
+                                if (traits[k] != 0) {
+                                    traits[k] = MOX::_special_bonus[k][traits[k]];
                                 }
                             }
                             exit_flag = true;
@@ -223,7 +224,7 @@ short Race_Selection_Screen_(s_player *plr)
                         animate::Draw_(0, 0, (s_animation_header*)bg5);
                         video::Copy_Back_To_Off_();
                     } else {
-                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        struct_::Copy_Structure_(&plr->traits, _race_specials[i], 31);
                         plr->race = i;
                         strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Auto_Function_();
@@ -290,7 +291,7 @@ short Race_Selection_Screen_(s_player *plr)
                 }
             } else if (f) {
                 _fread(traits_tmp, 31, 1, f);
-                struct_::Copy_Structure_(plr->traits, _race_specials[13], 31);
+                struct_::Copy_Structure_(&plr->traits, _race_specials[13], 31);
                 _fread(&plr->race, 1, 1, f);
                 int16_t ok = (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(plr->race);
                 if (ok == 0) {

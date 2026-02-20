@@ -8,7 +8,7 @@ namespace aimove {
             if (plr.objectives != 100 && plr.ship_speed != 0) {
                 MOX::Mox_Update_();
 
-                if (plr.traits[TRAIT_TRANS_DIMENSIONAL] != 0 || EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
+                if (plr.traits.transdimensional != 0 || EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
                     Move_AI_(i);
                 }
             }

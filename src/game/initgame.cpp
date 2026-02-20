@@ -311,7 +311,7 @@ namespace INITGAME {
 
             if (plr->objectives == 100) {
                 // Predefined or special player setup: copy traits to evolutionary upgrades
-                struct_::Copy_Structure_(&plr->traits[31], &plr->traits[0], 31);
+                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &plr->traits, sizeof(s_player_traits));
             } else {
                 int16_t race_idx;
                 bool unique_race;
@@ -336,20 +336,23 @@ namespace INITGAME {
                 }
 
                 // Copy default traits from template
-                struct_::Copy_Structure_(&plr->traits[0], &RACESEL::_race_specials[race_idx], 31);
-                struct_::Copy_Structure_(&plr->traits[31], &RACESEL::_race_specials[race_idx], 31);
+                struct_::Copy_Structure_(&plr->traits, &RACESEL::_race_specials[race_idx], sizeof(s_player_traits));
+                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &RACESEL::_race_specials[race_idx], sizeof(s_player_traits));
 
                 MOX::Mox_Update_();
                 RACECUST::Race_Customization_(i);
                 MOX::Mox_Update_();
 
                 // Apply special trait bonuses (lookup table)
-                for (int k = TRAIT_POP_GROWTH_BONUS; k < TRAIT_LOW_G_WORLD; ++k) {
-                    if (plr->traits[k] != 0) {
-                        plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
+                int8_t* ptrait = (int8_t*)&plr->traits;
+                int8_t* etrait = (int8_t*)&plr->applied_evolutionary_upgrade;
+
+                for (int k = 1; k < sizeof(s_player_traits); ++k) {
+                    if (ptrait[k] != 0) {
+                        ptrait[k] = MOX::_special_bonus[k][ptrait[k]];
                     }
-                    if (plr->traits[31 + k] != 0) {
-                        plr->traits[31 + k] = MOX::_special_bonus[k][plr->traits[31 + k]];
+                    if (etrait[k] != 0) {
+                        etrait[k] = MOX::_special_bonus[k][etrait[k]];
                     }
                 }
                 MOX::Mox_Update_();

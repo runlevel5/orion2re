@@ -4,9 +4,9 @@ namespace COLCALC {
     void __cdecl Colony_Morale_(s_colony* colony, char* debug) {
         int8_t owner = colony->owner;
         s_player* player = &MOX::_player[owner];
-        int8_t* traits = player->traits;
-        int8_t trait0 = traits[TRAIT_CURRENT_GOVERNMENT];
-        int8_t gov_type = trait0 / 2;
+        s_player_traits* traits = &player->traits;
+        int8_t govt = traits->current_govt;
+        int8_t gov_type = govt / 2;
 
         int leader_bonus = 0;
         int no_capital_penalty = 0;
@@ -19,7 +19,7 @@ namespace COLCALC {
         const char* msg_barracks = s__00551100;
 
         int mixed_race_penalty = Mixed_Race_Morale_Penalty_(colony);
-        colony->morale = _morale_lookup_table[trait0];
+        colony->morale = _morale_lookup_table[govt];
 
         if (gov_type != 3) { // 3 = Unification
             int officer_idx = Colony_Officer_(colony);
@@ -37,7 +37,7 @@ namespace COLCALC {
             if (player->tech_applications[TECH_APP_VIRTUAL_REALITY_NETWORK] == 3) vr_network_bonus = 4;
             if (colony->buildings[BUILDING_PLEASURE_DOME]) pleasure_dome_bonus = 6;
 
-            int8_t owner_trait0 = MOX::_player[owner].traits[TRAIT_CURRENT_GOVERNMENT];
+            int8_t owner_trait0 = MOX::_player[owner].traits.current_govt;
             int8_t owner_gov = owner_trait0 / 2;
             if (owner_gov != 3) {
                 short home_id = player->home_planet_id;
@@ -52,10 +52,10 @@ namespace COLCALC {
             if (gov_type < 2 && player->tech_applications[TECH_APP_PSIONICS] == 3) psychophysics_bonus = 2;
 
             if (colony->buildings[BUILDING_MARINE_BARRACKS]) {
-                marine_barracks_bonus = _barracks_morale_lookup[trait0];
+                marine_barracks_bonus = _barracks_morale_lookup[govt];
             }
             else if (colony->buildings[BUILDING_ARMOR_BARRACKS]) {
-                barracks_bonus = _barracks_morale_lookup[trait0];
+                barracks_bonus = _barracks_morale_lookup[govt];
             }
             else if (gov_type < 2) {
                 msg_barracks = _no_barracks_msg;
@@ -77,7 +77,7 @@ namespace COLCALC {
             debug += _sprintf(debug, (const char*)0x00551130, (const char*)0x0055110C);
 
             debug += _sprintf(debug, (const char*)0x0055A894,
-                _morale_lookup_table[trait0] * 5, _government_morale_msg, msg_barracks);
+                _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
 
             if (no_capital_penalty != 0)
                 debug += _sprintf(debug, (const char*)0x0055A888,
@@ -429,7 +429,7 @@ namespace COLCALC {
             int limit = static_cast<int>(Colony_Race_Pop_Limit_(colony, i));
             if (total_pops < limit) {
                 int leader_idx = Colony_Officer_(colony);
-                int growth_modifier = MOX::_player[i].traits[TRAIT_POP_GROWTH_BONUS] + 100;
+                int growth_modifier = MOX::_player[i].traits.pop_growth_bonus + 100;
                 s_player* owner_ptr = &MOX::_player[static_cast<uint8_t>(colony->owner)];
 
                 if (owner_ptr->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == 3) {
@@ -668,7 +668,7 @@ namespace COLCALC {
         plr->surplus_food = static_cast<int16_t>(surplus_food);
 
         if (surplus_food > 0) {
-            if (plr->traits[TRAIT_FANTASTIC_TRADERS] == 0) {
+            if (plr->traits.fantastic_traders == 0) {
                 surplus_food /= 2;
             }
             total_bc += surplus_food;
@@ -694,16 +694,16 @@ namespace COLCALC {
             }
             break;
         case TECH_APP_CONFEDERATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 1;
+            plr->traits.current_govt = 1;
             break;
         case TECH_APP_FEDERATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 5;
+            plr->traits.current_govt = 5;
             break;
         case TECH_APP_GALACTIC_UNIFICATION:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 7;
+            plr->traits.current_govt = 7;
             break;
         case TECH_APP_IMPERIUM:
-            plr->traits[TRAIT_CURRENT_GOVERNMENT] = 3;
+            plr->traits.current_govt = 3;
             break;
         case TECH_APP_SUB_SPACE_COMMUNICATIONS:
         case TECH_APP_TACHYON_COMMUNICATIONS:
@@ -723,7 +723,7 @@ namespace COLCALC {
             plr->tech_fields[static_cast<uint8_t>(plr->current_research_field)] == 2) {
 
             bool advance_field = true;
-            if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
+            if (plr->traits.creative != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
                 auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
                 uint16_t field_techs[4] = { field_data.tech1, field_data.tech2, field_data.tech3, field_data.tech4 };
 
@@ -743,7 +743,7 @@ namespace COLCALC {
         }
         else {
             int field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
-            if (plr->traits[TRAIT_UNCREATIVE] != 0) {
+            if (plr->traits.uncreative != 0) {
                 Ensure_Uncreative_Field_OK_(plr, field_id);
             }
             if (plr->tech_fields[field_id] == 2) {
@@ -759,7 +759,7 @@ namespace COLCALC {
         bool is_blockaded = Colony_Is_Blockaded(colony);
         int leader_idx = Colony_Officer_(colony);
         int owner = colony->owner;
-        int govt_type = MOX::_player[owner].traits[0];
+        int govt_type = MOX::_player[owner].traits.current_govt;
 
         memset(&final, 0, sizeof(s_colony_job_production));
 
@@ -933,7 +933,7 @@ namespace COLCALC {
             if (col->owner == player_idx && col->outpost_flag == 0) {
                 plr->maintenance[0] += (uint16_t)(uint8_t)col->maintenance[ECON_BC];
 
-                if (plr->traits[TRAIT_WARLORD] != 0) {
+                if (plr->traits.warlord != 0) {
                     warlord_bonus += 2;
                 }
 
@@ -969,7 +969,7 @@ namespace COLCALC {
         plr->command_points = base_cp;
 
         int32_t imperium_bonus = 0;
-        if (plr->traits[TRAIT_CURRENT_GOVERNMENT] == 3) { // FEAT_GOVERNMENT_IMPERIUM
+        if (plr->traits.current_govt == 3) { // FEAT_GOVERNMENT_IMPERIUM
             imperium_bonus = base_cp / 2;
             plr->command_points = base_cp + (int16_t)imperium_bonus;
         }
@@ -1119,12 +1119,12 @@ namespace COLCALC {
         int total_normal_pops = 0;
         int total_immune_pops = 0;
 
-        int base_tax_per_pop = owner_ptr->traits[TRAIT_TAX_BONUS] * 2 + 4;
+        int base_tax_per_pop = owner_ptr->traits.tax_bonus * 2 + 4;
 
         for (int i = 0; i < (uint8_t)colony->n_pops; ++i) {
             int32_t race_idx = colony->pop[i] & 0x0F;
             if (race_idx < 8) {
-                if (MOX::_player[race_idx].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
+                if (MOX::_player[race_idx].traits.environment_immune == 0) {
                     total_normal_pops++;
                 }
                 else {
@@ -1141,7 +1141,7 @@ namespace COLCALC {
         int total_pops = total_normal_pops + total_immune_pops;
         int taxes_collected = (base_tax_per_pop * total_pops + 2) / 4;
 
-        if (total_pops > 0 && MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] != 3) {
+        if (total_pops > 0 && MOX::_player[owner_idx].traits.current_govt != 3) {
             morale_bonus = colony->morale * taxes_collected;
             morale_bonus = (morale_bonus + (morale_bonus < 0 ? -10 : 10)) / 20;
         }
@@ -1160,7 +1160,7 @@ namespace COLCALC {
             int surplus_ind = (int)colony->production[ECON_INDUSTRY] - (int)colony->maintenance[ECON_INDUSTRY];
             if (surplus_ind > 0) {
                 trade_goods_bc = surplus_ind;
-                if (owner_ptr->traits[TRAIT_FANTASTIC_TRADERS] == 0) {
+                if (owner_ptr->traits.fantastic_traders == 0) {
                     trade_goods_bc = (surplus_ind + 1) / 2;
                 }
             }
@@ -1180,10 +1180,10 @@ namespace COLCALC {
             spaceport_bc = income_base / 2;
         }
 
-        if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 4) {
+        if (MOX::_player[owner_idx].traits.current_govt == 4) {
             gov_bonus_bc = income_base / 2;
         }
-        else if (MOX::_player[owner_idx].traits[TRAIT_CURRENT_GOVERNMENT] == 5) {
+        else if (MOX::_player[owner_idx].traits.current_govt == 5) {
             gov_bonus_bc = (income_base * 3 + (income_base * 3 < 0 ? 3 : 0)) / 4;
         }
 
@@ -1565,7 +1565,7 @@ namespace COLCALC {
                 int immune_pops = 0;
                 for (int i = 0; i < n_pops; ++i) {
                     uint32_t race = colony->pop[i] & 0xF;
-                    if ((race < 8 && MOX::_player[race].traits[TRAIT_ENVIRONMENT_IMMUNE]) || race == 8 /* ANDROID */) {
+                    if ((race < 8 && MOX::_player[race].traits.environment_immune) || race == 8 /* ANDROID */) {
                         immune_pops++;
                     }
                 }
@@ -1719,9 +1719,9 @@ namespace COLCALC {
             if (player_idx < 8) {
                 s_player* player = &MOX::_player[player_idx];
 
-                trait_bonus = (int16_t)player->traits[TRAIT_FOOD_BONUS];
+                trait_bonus = (int16_t)player->traits.food_bonus;
 
-                if (player->traits[TRAIT_AQUATIC] != 0) {
+                if (player->traits.aquatic != 0) {
                     int climate = (int)colony->climate;
                     switch (climate) {
                     case PLANET_CLIMATE_TUNDRA:
@@ -1782,7 +1782,7 @@ namespace COLCALC {
         if (_colony_calc_industry_cache[idx] == 0x63) {
             int16_t bonus = 0;
             if (player_idx < 8) {
-                bonus = (int16_t)reinterpret_cast<int8_t*>(MOX::_player[idx].traits)[46];
+                bonus = MOX::_player[idx].traits.production_bonus;
             }
             else if (player_idx == 8) {
                 bonus = 3;
@@ -1829,7 +1829,7 @@ namespace COLCALC {
             int32_t intelligence_bonus = 0;
 
             if (player_idx < 8) {
-                trait_bonus = (int16_t)MOX::_player[idx].traits[TRAIT_RESEARCH_BONUS];
+                trait_bonus = (int16_t)MOX::_player[idx].traits.research_bonus;
 
                 if (colony->owner == (int8_t)player_idx && MOX::_player[idx].tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {
                     intelligence_bonus = 1;

@@ -3,7 +3,7 @@
 
 namespace COLCALC {
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
-        if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
+        if (player_idx < 8 && MOX::_player[player_idx].traits.aquatic != 0) {
             switch (climate) {
                 case PLANET_CLIMATE_TUNDRA: // 4
                 case PLANET_CLIMATE_SWAMP: // 6
@@ -65,7 +65,7 @@ namespace COLCALC {
                 int star_idx = MOX::_planet[player->home_planet_id].star_index;
                 MOX::_star[star_idx].colonize_player = (uint8_t)i;
 
-                player->bc = (player->traits[0] * 100 + 200);
+                player->bc = (player->traits.current_govt * 100 + 200);
 
                 for (int s = 0; s < MOX::_NUM_STARS; ++s) {
                     s_star_data* star = &MOX::_star[s];
@@ -613,8 +613,7 @@ namespace COLCALC {
         bool is_immune = false;
 
         if (player_idx < 8) {
-            // TRAIT_ENVIRONMENT_IMMUNE is at index 16
-            if (MOX::_player[player_idx].traits[16] != 0) {
+            if (MOX::_player[player_idx].traits.environment_immune != 0) {
                 is_immune = true;
             }
         } else if (player_idx == 8) {
@@ -622,12 +621,11 @@ namespace COLCALC {
             is_immune = true;
         }
 
-        int adjusted_climate = COLCALC::Calc_Player_Climate_(static_cast<int>(player_idx), climate);
+        int adjusted_climate = COLCALC::Calc_Player_Climate_(player_idx, climate);
         int max_pop = COLCALC::Size_And_Climate_Max_Population_(size, adjusted_climate, is_immune);
 
-        // TRAIT_SUBTERRANEAN is at index 6
-        if (player_idx < 8 && MOX::_player[player_idx].traits[6] != 0) {
-            max_pop += static_cast<int>(COLCALC::Double_Add_Two_(static_cast<short>(size)));
+        if (player_idx < 8 && MOX::_player[player_idx].traits.subterranean != 0) {
+            max_pop += COLCALC::Double_Add_Two_(size);
         }
 
         return static_cast<short>(max_pop);
@@ -742,7 +740,7 @@ namespace COLCALC {
 
                 if (race < 8) {
                     // If trait is set, the population adds 1 to its industry maintenance requirement
-                    int8_t cost = (MOX::_player[race].traits[TRAIT_PRODUCTION_BONUS] != 0) ? 1 : 0;
+                    int8_t cost = (MOX::_player[race].traits.production_bonus != 0) ? 1 : 0;
 
                     if (race == owner_race_idx) {
                         colony->industry2_needed_for_our_empire += cost;
@@ -834,9 +832,9 @@ namespace COLCALC {
                 s_player* player_ptr = &MOX::_player[race];
                 uint8_t food_rate_half;
 
-                if (player_ptr->traits[TRAIT_CYBERNETIC] != 0) {
+                if (player_ptr->traits.cybernetic != 0) {
                     food_rate_half = 1;
-                } else if (player_ptr->traits[TRAIT_EATS_MINERALS] != 0) {
+                } else if (player_ptr->traits.eats_minerals != 0) {
                     food_rate_half = 0;
                 } else {
                     food_rate_half = 2;
@@ -996,7 +994,7 @@ namespace COLCALC {
                 return false;
 
             case TECH_APP_CONFEDERATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 0) {
+                if (plr->traits.current_govt != 0) {
                     return false;
                 }
                 break;
@@ -1005,19 +1003,19 @@ namespace COLCALC {
                 return (bool)MOX::_settings.xenons_exist;
 
             case TECH_APP_FEDERATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 4) {
+                if (plr->traits.current_govt != 4) {
                     return false;
                 }
                 break;
 
             case TECH_APP_GALACTIC_UNIFICATION:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 6) {
+                if (plr->traits.current_govt != 6) {
                     return false;
                 }
                 break;
 
             case TECH_APP_IMPERIUM:
-                if (plr->traits[TRAIT_CURRENT_GOVERNMENT] != 2) {
+                if (plr->traits.current_govt != 2) {
                     return false;
                 }
                 break;
@@ -1054,15 +1052,15 @@ namespace COLCALC {
         auto& player = MOX::_player[player_idx];
 
         if (gravity_class == PLANET_GRAVITY_LOW_G) { // Low Gravity
-            return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 3 : 4;
+            return (player.traits.low_g_world == 0) ? 3 : 4;
         }
 
         if (gravity_class == PLANET_GRAVITY_NORMAL_G) { // Normal Gravity
-            return (player.traits[TRAIT_LOW_G_WORLD] == 0) ? 4 : 3;
+            return (player.traits.low_g_world == 0) ? 4 : 3;
         }
 
         if (gravity_class == PLANET_GRAVITY_HEAVY_G) { // Heavy Gravity
-            return (player.traits[TRAIT_HEAVY_G_WORLD] == 0) ? 2 : 4;
+            return (player.traits.heavy_g_world == 0) ? 2 : 4;
         }
 
         return 4; 
@@ -1362,22 +1360,22 @@ namespace COLCALC {
         results->industry = 0;
         results->research = 0;
 
-        results->pop_growth_bonus = static_cast<int16_t>(plr->traits[TRAIT_POP_GROWTH_BONUS]);
+        results->pop_growth_bonus = static_cast<int16_t>(plr->traits.pop_growth_bonus);
 
-        if (plr->traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
+        if (plr->traits.environment_immune == 0) {
             results->maintenance += static_cast<int16_t>(_climate_maintenance_modifier[planet->climate]);
         }
 
         if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
-            if (plr->traits[TRAIT_LOW_G_WORLD] == 0) {
+            if (plr->traits.low_g_world == 0) {
                 results->worker_bonus = -25;
             }
         } else if (planet->gravity_class == PLANET_GRAVITY_NORMAL_G) {
-            if (plr->traits[TRAIT_LOW_G_WORLD] != 0) {
+            if (plr->traits.low_g_world != 0) {
                 results->worker_bonus = -25;
             }
         } else if (planet->gravity_class == PLANET_GRAVITY_HEAVY_G) {
-            if (plr->traits[TRAIT_HEAVY_G_WORLD] == 0) {
+            if (plr->traits.heavy_g_world == 0) {
                 results->worker_bonus = -50;
             }
         }
@@ -1391,9 +1389,9 @@ namespace COLCALC {
         results->food = food_val;
 
         if (food_val > 0) {
-            results->food += static_cast<int16_t>(plr->traits[TRAIT_FOOD_BONUS]);
+            results->food += static_cast<int16_t>(plr->traits.food_bonus);
 
-            if (plr->traits[TRAIT_AQUATIC] != 0) {
+            if (plr->traits.aquatic != 0) {
                 int8_t bonus_base = 0;
                 bool has_bonus = true;
                 switch (planet->climate) {
@@ -1425,13 +1423,13 @@ namespace COLCALC {
             results->industry += 1;
         }
 
-        results->industry += static_cast<int16_t>(plr->traits[TRAIT_PRODUCTION_BONUS]);
+        results->industry += static_cast<int16_t>(plr->traits.production_bonus);
 
         if (results->industry < 1) {
             results->industry = 1;
         }
 
-        results->research = 3 + static_cast<int16_t>(plr->traits[TRAIT_RESEARCH_BONUS]);
+        results->research = 3 + static_cast<int16_t>(plr->traits.research_bonus);
         if (plr->tech_applications[TECH_APP_HEIGHTENED_INTELLIGENCE] == 3) {
             results->research += 1;
         }

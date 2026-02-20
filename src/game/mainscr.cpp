@@ -1142,10 +1142,10 @@ namespace MAINSCR {
             if (capture::Check_Release_Version_() == 0) {
 
                 s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-                player->traits[TRAIT_OMNISCIENCE] = (player->traits[TRAIT_OMNISCIENCE] == 0);
+                player->traits.omniscience = (player->traits.omniscience == 0);
 
                 const char* msg_src;
-                if (player->traits[25] == 0) {
+                if (player->traits.omniscience == 0) {
                     msg_src = HAROLD::H_Message_(214); // HESTR_0D6_YOU_HAVE_CHOSEN_POORLY
                 }
                 else {

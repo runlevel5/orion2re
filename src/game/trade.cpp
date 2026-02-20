@@ -122,13 +122,13 @@ namespace TRADE {
         int16_t base_goal = Base_Trade_Agreement_Goal_(player, player_idx);
 
         // traits[0] refers to a specific charisma/personality trait
-        if (player->traits[0] == 4) {
+        if (player->traits.current_govt == 4) {
             trait_multiplier = 150; // 0x96
-        } else if (player->traits[0] == 5) {
+        } else if (player->traits.current_govt == 5) {
             trait_multiplier = 175; // 0xaf
         }
 
-        if (player->traits[TRAIT_FANTASTIC_TRADERS] != 0) {
+        if (player->traits.fantastic_traders != 0) {
             trait_multiplier += 50; // 0x32
         }
 
@@ -164,7 +164,7 @@ namespace TRADE {
         // The original logic truncates the combined points to 16 bits before applying modifiers.
         int16_t base_value = static_cast<int16_t>(combined_points);
 
-        switch (plr->traits[0]) {
+        switch (plr->traits.current_govt) {
             case 0:
                 return static_cast<int16_t>(static_cast<int>(base_value) / 2);
             case 1:
