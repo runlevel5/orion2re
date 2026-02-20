@@ -1098,6 +1098,12 @@ namespace hooks {
         { 0x0041d6f0, &DIP_SCRN::Set_Opportunity_Attacks_ },
         { 0x00453750, &diplomac::Clear_Diplomacy_Messages_ },
         { 0x004e9f80, &npcdiplo::NPC_Diplomacy_ },
+        { 0x0047A070, &AIBUILD::Compute_Empire_Building_Needs_ },
+        { 0x00446b20, &aidudes::All_Colony_AI_ },
+        { 0x004658a0, &aimove::Move_All_AI_ },
+        { 0x004ba480, &COLONIZE::All_AI_Colonize_ },
+        { 0x0042b480, &invasion::Compute_Player_Ground_Combat_Bonuses_ },
+        { 0x00500e90, &aitech::Compute_AI_Tech_Info_ },
     };
 
     void Install_Hooks()

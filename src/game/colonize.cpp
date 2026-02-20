@@ -239,4 +239,12 @@ namespace COLONIZE {
             }
         }
     }
+
+    void __cdecl All_AI_Colonize_() {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (MOX::_player[i].objectives != 100) {
+                AI_Colonize_(i);
+            }
+        }
+    }
 }

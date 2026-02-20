@@ -23,6 +23,8 @@
     <ClCompile Include="src\game\advciv.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
     <ClCompile Include="src\game\aidesign.cpp" />
+    <ClCompile Include="src\game\aidudes.cpp" />
+    <ClCompile Include="src\game\aimove.cpp" />
     <ClCompile Include="src\game\aitech.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
@@ -71,6 +73,7 @@
     <ClCompile Include="src\game\homegen.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\initship.cpp" />
+    <ClCompile Include="src\game\invasion.cpp" />
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\ken.cpp" />
     <ClCompile Include="src\game\key.cpp" />

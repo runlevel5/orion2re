@@ -13,9 +13,9 @@ namespace COLONIZE {
 
 	int16_t Star_N_Uncolonized_Planets_(s_star_data* star);
 
-	inline void __cdecl All_AI_Colonize_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ba480 });
-		fn();
-	}
+    inline void __cdecl AI_Colonize_(int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ba1e0 });
+        fn(player_idx);
+    }
 }

@@ -136,6 +136,37 @@ struct s_adv_planet_worth {
     undefined field73_0x78;
 };
 
+typedef struct s_ai_tech_info s_ai_tech_info, *Ps_ai_tech_info;
+
+typedef struct s_ai_tech_info_player s_ai_tech_info_player, *Ps_ai_tech_info_player;
+
+struct s_ai_tech_info_player {
+    int8_t best_shield;
+    int8_t best_shield_delta; /* Created by Rename Structure Field action */
+    int8_t best_armor;
+    int8_t armor_delta; /* Created by Rename Structure Field action */
+    int8_t best_computer;
+    int8_t best_computer_delta; /* Created by Rename Structure Field action */
+    int8_t best_fuel; /* Created by Rename Structure Field action */
+    int8_t best_planet_shield; /* Created by Rename Structure Field action */
+    int8_t planet_shield_delta; /* Created by Rename Structure Field action */
+    int8_t field9_0x9;
+    int8_t contact_count; /* Created by Rename Structure Field action */
+    int8_t best_drive;
+    int8_t best_weapon1; /* Created by Rename Structure Field action */
+    int8_t best_weapon1_delta; /* Created by Rename Structure Field action */
+    int8_t best_weapon2; /* Created by Rename Structure Field action */
+    int8_t best_weapon2_delta; /* Created by Rename Structure Field action */
+    int8_t groun_tech_bonus; /* Created by Rename Structure Field action */
+    short ground_bonus;
+    int8_t ground_bonus_delta; /* Created by Rename Structure Field action */
+    int8_t colonization_idle; /* Created by Rename Structure Field action */
+};
+
+struct s_ai_tech_info {
+    struct s_ai_tech_info_player players[8];
+};
+
 typedef struct s_aidesign_ship_design s_aidesign_ship_design, *Ps_aidesign_ship_design;
 
 struct s_aidesign_ship_design {
@@ -1766,6 +1797,29 @@ struct s_good_star {
     uint16_t star_count;
 };
 
+typedef struct s_invasion_player_bonuses s_invasion_player_bonuses, *Ps_invasion_player_bonuses;
+
+struct s_invasion_player_bonuses {
+    int8_t antigrav_bonus;
+    int8_t battleoids_bonus;
+    int8_t has_battleoids;
+    int8_t powered_armor_bonus;
+    int8_t has_powered_armor;
+    int8_t best_armor_tech_app_id;
+    int8_t troop_bonus;
+    int8_t personal_shield_tech_app_id;
+    undefined1 personal_shield_bonus;
+    int8_t rifle_tech_app_id;
+    int8_t rifle_bonus;
+    int8_t ground_combat_bonus;
+    undefined1 heavy_g_bonus;
+    int8_t low_g_penalty;
+    undefined1 subterranean_bonus;
+    int8_t difficulty_bonus;
+    short field16_0x10;
+    int8_t field17_0x12;
+};
+
 typedef struct s_lbx_header s_lbx_header, *Ps_lbx_header;
 
 struct s_lbx_header {
@@ -2976,7 +3030,7 @@ struct s_settings {
     undefined field61_0xd1;
     int8_t language;
     byte xenons_exist;
-    byte game_difficulty;
+    int8_t game_difficulty;
     byte number_of_players;
     byte galaxy_size;
     byte galaxy_age;
@@ -3397,7 +3451,7 @@ struct s_ship_move_info {
     undefined field3_0x3;
     int8_t turns_left;
     int8_t moving;
-    undefined field6_0x6;
+    int8_t field6_0x6;
     int8_t has_navigator;
     int8_t traveling_speed;
     int8_t parsecs;
@@ -3551,6 +3605,20 @@ struct s_tech_computer_data {
     short tech_app;
     short cost_by_ship_type[6];
     short bonus;
+};
+
+typedef struct s_tech_data_personal_shield s_tech_data_personal_shield, *Ps_tech_data_personal_shield;
+
+struct s_tech_data_personal_shield {
+    int16_t tech_app_id;
+    int8_t bonus;
+};
+
+typedef struct s_tech_data_rifle s_tech_data_rifle, *Ps_tech_data_rifle;
+
+struct s_tech_data_rifle {
+    int16_t tech_app_id;
+    int8_t bonus;
 };
 
 typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;

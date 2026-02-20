@@ -18,6 +18,12 @@ namespace TECHDATA {
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 
+    inline s_tech_data_rifle* _rifles =
+        reinterpret_cast<s_tech_data_rifle*>(std::uintptr_t{0x0054F028});
+
+    inline s_tech_data_personal_shield* _personal_shields =
+        reinterpret_cast<s_tech_data_personal_shield*>(std::uintptr_t{0x0054F040});
+
     inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432940});
