@@ -47,15 +47,15 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
     bonuses->personal_shield_tech_app_id = (int8_t)TECHDATA::_personal_shields[shield_idx].tech_app_id;
     bonuses->personal_shield_bonus = TECHDATA::_personal_shields[shield_idx].bonus;
 
-    bonuses->ground_combat_bonus = player->traits.ground_combat_bonus;
+    bonuses->ground_combat_bonus = player->traits[TRAIT_GROUND_COMBAT_BONUS];
 
-    if (player->traits.heavy_g_world != 0) {
+    if (player->traits[TRAIT_HEAVY_G_WORLD] != 0) {
         bonuses->heavy_g_bonus = 1;
-    } else if (player->traits.low_g_world != 0) {
+    } else if (player->traits[TRAIT_LOW_G_WORLD] != 0) {
         bonuses->low_g_penalty = (int8_t)0xF6; /* -10 */
     }
 
-    if (player->traits.subterranean != 0 && is_defender != 0) {
+    if (player->traits[TRAIT_SUBTERRANEAN] != 0 && is_defender != 0) {
         bonuses->subterranean_bonus = 10;
     }
 

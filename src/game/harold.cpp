@@ -748,7 +748,7 @@ namespace HAROLD {
             return true;
         }
 
-        if (MOX::_player[player_idx].traits.omniscience != 0) {
+        if (MOX::_player[player_idx].traits[TRAIT_OMNISCIENCE] != 0) {
             return true;
         }
 

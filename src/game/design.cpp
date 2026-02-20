@@ -429,7 +429,7 @@ namespace DESIGN {
      */
     void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t *cost) {
         s_player *player = &MOX::_player[player_idx];
-        int8_t govt_trait = player->traits.current_govt;
+        int8_t govt_trait = player->traits[TRAIT_CURRENT_GOVERNMENT];
 
         if (govt_trait == 0) {
             // Reduction for government trait value 0

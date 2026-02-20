@@ -64,7 +64,7 @@ namespace OFFICER {
         if (leader_idx != 0x42 /* 66 */) {
             int8_t player_idx = MOX::_leaders[leader_idx].player_index;
             // Accessing the first trait (index 0), typically TRAIT_WARLORD
-            warlord = MOX::_player[static_cast<int>(player_idx)].traits.warlord;
+            warlord = MOX::_player[static_cast<int>(player_idx)].traits[TRAIT_WARLORD];
         }
 
         int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord);
@@ -236,7 +236,7 @@ namespace OFFICER {
 
         // Check if the officer's owner has the Warlord trait
         if (leader.player_index != -1) {
-            if (MOX::_player[(uint8_t)leader.player_index].traits.warlord != 0) {
+            if (MOX::_player[(uint8_t)leader.player_index].traits[TRAIT_WARLORD] != 0) {
                 warlord = 1;
             }
         }
@@ -310,7 +310,7 @@ namespace OFFICER {
 
         int16_t repulsive_pool_idx = 0;
         for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
-            if (MOX::_player[player_idx].traits.repulsive != 0) {
+            if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE] != 0) {
                 int16_t leader_idx = leader_indices[repulsive_pool_idx++];
                 if (leader_idx >= 0) {
                     MOX::_leaders[leader_idx].status = 4;
@@ -336,7 +336,7 @@ namespace OFFICER {
         }
 
         for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
-            if (MOX::_player[player_idx].traits.repulsive == 0) {
+            if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE] == 0) {
                 for (int count = 0; count < 2; ++count) {
                     int16_t pool_idx = 0;
                     int16_t leader_idx;

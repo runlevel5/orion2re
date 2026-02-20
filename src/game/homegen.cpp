@@ -860,7 +860,7 @@ namespace HOMEGEN {
                 Enforce_3_Planet_Minimum_(i);
 
                 int16_t climate_threshold = 8;
-                if (player->traits.aquatic != 0) { // Aquatic
+                if (player->traits[TRAIT_AQUATIC] != 0) { // Aquatic
                     climate_threshold = 5;
                 }
 
@@ -869,7 +869,7 @@ namespace HOMEGEN {
 
                 player->home_planet_id = home_planet_id;
 
-                if (player->traits.large_home_world == 0) { // Not Large Home World
+                if (player->traits[TRAIT_LARGE_HOME_WORLD] == 0) { // Not Large Home World
                     Enforce_Medium_Planet_Size_(home_planet_id);
                 } else {
                     Set_Planet_Size(home_planet_id, 3); // PLANET_SIZE_LARGE
@@ -878,21 +878,21 @@ namespace HOMEGEN {
                 Enforce_Planet_Type_(i, home_planet_id);
                 Enforce_Planet_Abundant_Mineral_Class(home_planet_id);
 
-                if (player->traits.rich_home_world > 0) { // Rich Home World
+                if (player->traits[TRAIT_RICH_HOME_WORLD] > 0) { // Rich Home World
                     Enforce_Mineral_Richness_(home_planet_id, 3);
-                } else if (player->traits.rich_home_world < 0) { // Poor Home World
+                } else if (player->traits[TRAIT_RICH_HOME_WORLD] < 0) { // Poor Home World
                     Enforce_Mineral_Richness_(home_planet_id, 1);
                 }
 
-                if (player->traits.ancient_home_world != 0) { // Ancient Home World (Artifacts)
+                if (player->traits[TRAIT_ANCIENT_HOME_WORLD] != 0) { // Ancient Home World (Artifacts)
                     Set_System_Planet_Artifact_Special(home_planet_id, i);
                 }
 
                 int8_t gravity_type;
-                if (player->traits.low_g_world != 0) {
+                if (player->traits[TRAIT_LOW_G_WORLD] != 0) {
                     gravity_type = 0;
                 } else {
-                    gravity_type = (player->traits.heavy_g_world == 0) ? 1 : 2; // Normal-G or Heavy-G
+                    gravity_type = (player->traits[TRAIT_HEAVY_G_WORLD] == 0) ? 1 : 2; // Normal-G or Heavy-G
                 }
                 Enforce_Gravity_(home_planet_id, gravity_type, owner_idx);
 
@@ -1055,7 +1055,7 @@ namespace HOMEGEN {
         // Mineral Class 4 = Ultra Rich
         if (MOX::_planet[planet_idx].mineral_class == MINERAL_RESOURCE_ULTRA_RICH) {
             // Trait index 0 corresponds to Heavy-G World
-            if (MOX::_player[player_idx].traits.heavy_g_world == 0) {
+            if (MOX::_player[player_idx].traits[TRAIT_HEAVY_G_WORLD] == 0) {
                 uint8_t new_minerals = MAPGEN::Generate_Mineral_Class_(MOX::_planet[planet_idx].star_index, planet_idx);
                 
                 // Logic quirk: The reassignment target is the planet at the player's slot index.
@@ -1078,7 +1078,7 @@ namespace HOMEGEN {
             int8_t owner = colony.owner;
             int16_t planet_idx = colony.planet;
 
-            if (planet_idx != -1 && MOX::_player[owner].traits.eats_minerals == 0) {
+            if (planet_idx != -1 && MOX::_player[owner].traits[TRAIT_EATS_MINERALS] == 0) {
                 int16_t food_star = -1;
                 int16_t nearest_empty_star = -1;
                 int16_t nearest_star_in_range = -1;
@@ -1148,7 +1148,7 @@ namespace HOMEGEN {
 
                 reinterpret_cast<int16_t*>(_nearest_food_worlds)[owner] = food_star;
 
-                if (food_star == -1 && MOX::_player[owner].traits.eats_minerals == 0) {
+                if (food_star == -1 && MOX::_player[owner].traits[TRAIT_EATS_MINERALS] == 0) {
                     overall_success = 0;
                 }
             }

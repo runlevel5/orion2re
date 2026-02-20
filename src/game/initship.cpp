@@ -149,7 +149,7 @@ namespace INITSHIP {
         if (player_idx < 8) {
             speed = TECHDATA::_drives[drive_idx].speed;
 
-            if (MOX::_player[player_idx].traits.transdimensional != 0) { // 32: TRAIT_TRANS_DIMENSIONAL
+            if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 return speed + 2;
             }
         } else if (drive_idx > 0) {

@@ -2633,8 +2633,6 @@ typedef struct s_settler_info s_settler_info, *Ps_settler_info;
 
 typedef struct s_ship_design s_ship_design, *Ps_ship_design;
 
-typedef struct s_player_traits s_player_traits, *Ps_player_traits;
-
 
 /* WARNING! conflicting data type names: /types.h/ushort - /ushort */
 
@@ -2673,40 +2671,6 @@ struct s_settler_info {
     byte eta:4;
     byte player:4;
     byte job:2;
-};
-
-struct s_player_traits {
-    int8_t current_govt;
-    int8_t pop_growth_bonus;
-    int8_t food_bonus;
-    int8_t production_bonus;
-    int8_t research_bonus;
-    int8_t tax_bonus;
-    int8_t ship_defense;
-    int8_t ship_attack;
-    int8_t ground_combat_bonus;
-    int8_t spying_bonus;
-    int8_t low_g_world;
-    int8_t heavy_g_world;
-    int8_t aquatic;
-    int8_t subterranean;
-    int8_t large_home_world;
-    int8_t rich_home_world;
-    int8_t ancient_home_world;
-    int8_t cybernetic;
-    int8_t eats_minerals;
-    int8_t repulsive;
-    int8_t charismatic;
-    int8_t uncreative;
-    int8_t creative;
-    int8_t environment_immune;
-    int8_t fantastic_traders;
-    int8_t telepathic;
-    int8_t lucky;
-    int8_t omniscience;
-    int8_t stealthy_ships;
-    int8_t transdimensional;
-    int8_t warlord;
 };
 
 struct s_player {
@@ -2849,8 +2813,8 @@ struct s_player {
     char diplomacy_demand_rejection_message[8];
     sbyte last_diplomacy_threat_turn[8];
     char delayed_diplomacy_orders[8];
-    struct s_player_traits traits;
-    struct s_player_traits evolutionary_upgrade_traits;
+    int8_t traits[31];
+    int8_t evolutionary_upgrade_traits[31];
     char picked_evolutionary_upgrade;
     char applied_evolutionary_upgrade;
     char fleet_history[350];

@@ -14,11 +14,11 @@ namespace aitech {
             s_player* plr = &MOX::_player[i];
 
             if (plr->picked_evolutionary_upgrade != 0 && plr->applied_evolutionary_upgrade == 0) {
-                int8_t govt = plr->traits.current_govt;
+                int8_t govt = plr->traits[TRAIT_CURRENT_GOVERNMENT];
                 
-                memcpy(&plr->traits, &plr->evolutionary_upgrade_traits, sizeof(plr->traits));
+                memcpy(plr->traits, plr->evolutionary_upgrade_traits, sizeof(plr->traits));
                 
-                plr->traits.current_govt = govt;
+                plr->traits[TRAIT_CURRENT_GOVERNMENT] = govt;
                 
                 plr->applied_evolutionary_upgrade = 1;
             }

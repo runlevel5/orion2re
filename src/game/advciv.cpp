@@ -31,7 +31,7 @@ namespace ADVCIV {
 
         if (planet->planet_type == PLANET_TYPE_PLANET) {
             int16_t subterranean_bonus = 0;
-            if (plr->evolutionary_upgrade_traits.subterranean != 0) {
+            if (plr->evolutionary_upgrade_traits[TRAIT_SUBTERRANEAN] != 0) {
                 subterranean_bonus = COLCALC::Double_Add_Two_(planet->size);
             }
 
@@ -46,7 +46,7 @@ namespace ADVCIV {
             int8_t mineral_bonus = COLCALC::_minerals_per_mine[planet->mineral_class];
             int32_t scaled_pop = (mineral_bonus + 1) * total_pop_sum / 3;
 
-            int8_t pop_growth_bonus = plr->traits.pop_growth_bonus;
+            int8_t pop_growth_bonus = plr->traits[TRAIT_POP_GROWTH_BONUS];
             if (pop_growth_bonus == -50) {
                 worth = 80 * mineral_bonus + scaled_pop;
             } else if (pop_growth_bonus == 0) {
@@ -63,8 +63,8 @@ namespace ADVCIV {
                 food_per_farmer = 1;
             }
 
-            if (plr->evolutionary_upgrade_traits.eats_minerals == 0) {
-                if (plr->evolutionary_upgrade_traits.cybernetic == 0) {
+            if (plr->evolutionary_upgrade_traits[TRAIT_EATS_MINERALS] == 0) {
+                if (plr->evolutionary_upgrade_traits[TRAIT_CYBERNETIC] == 0) {
                     worth += food_per_farmer * 150;
                 } else {
                     worth += food_per_farmer * 75;
@@ -82,7 +82,7 @@ namespace ADVCIV {
             worth = (mineral_bonus + 7) * total_pop_sum * worth / 10;
 
             bool is_swamp_ocean = (planet->climate == PLANET_CLIMATE_OCEAN || planet->climate == PLANET_CLIMATE_SWAMP);
-            bool is_aquatic = (plr->evolutionary_upgrade_traits.aquatic != 0);
+            bool is_aquatic = (plr->evolutionary_upgrade_traits[TRAIT_AQUATIC] != 0);
 
             if (!is_swamp_ocean || !is_aquatic) {
                 int32_t maintenance_reduction = COLCALC::_climate_maintenance_modifier[planet->climate] >> 2;
@@ -97,19 +97,19 @@ namespace ADVCIV {
             bool apply_penalty = false;
 
             if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
-                if (plr->evolutionary_upgrade_traits.low_g_world == 0) {
+                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] == 0) {
                     divisor = 20;
                     penalty_factor += 18;
                     apply_penalty = true;
                 }
             } else if (planet->gravity_class == PLANET_GRAVITY_NORMAL_G) {
-                if (plr->evolutionary_upgrade_traits.low_g_world != 0) {
+                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] != 0) {
                     divisor = 20;
                     penalty_factor += 18;
                     apply_penalty = true;
                 }
             } else if (planet->gravity_class == PLANET_GRAVITY_HEAVY_G) {
-                if (plr->evolutionary_upgrade_traits.low_g_world == 0) {
+                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] == 0) {
                     divisor = 6;
                     penalty_factor += 4;
                     apply_penalty = true;
@@ -546,7 +546,7 @@ namespace ADVCIV {
                     {
                         int8_t generated_special = 0;
                         // Skip special generation for home planets of "Fantastic Traders" trait (trait 16)
-                        if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits.ancient_home_world != 0)) {
+                        if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits[TRAIT_ANCIENT_HOME_WORLD] != 0)) {
                             int attempts = 0;
                             do {
                                 int16_t dummy_buf;
