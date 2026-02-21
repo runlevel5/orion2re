@@ -383,6 +383,12 @@ inline void __cdecl Build_Captain_Id_List_() {
     fn();
 }
 
+inline void __cdecl Give_Officer_XP_(int16_t player_index, int16_t leader_index, int16_t amount) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442ec0});
+    fn(player_index, leader_index, amount);
+}
+
 inline void __cdecl Get_Officer_Pictures_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441A40});

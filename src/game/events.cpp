@@ -2,9 +2,6 @@
 #include "events.h"
 
 namespace EVENTS {
-    /**
-     * @address 00473df0
-     */
     void Init_Events_() {
         _event_delay_count = 0;
         _last_event_year = MOX::_stardate;
@@ -19,9 +16,6 @@ namespace EVENTS {
         }
     }
 
-    /**
-     * @address 00477630
-     */
     int16_t __cdecl Event_Check_Space_Anomaly_(int16_t colony_idx) {
         auto& event = _event_data[25];
 
@@ -35,9 +29,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 004784b0
-     */
     int16_t __cdecl Event_Check_Space_Anomaly_At_Star_(int16_t star_idx) {
         auto& event = _event_data[25];
 
@@ -49,9 +40,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 00477690
-     */
     int16_t __cdecl Event_Check_Pirate_Activity_(uint8_t player_idx) {
         uint8_t event_status = _event_data[14].field1_0x1;
 
@@ -67,9 +55,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 00478110
-     */
     int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx) {
         if ((_event_data[16].field1_0x1 == 2 || _event_data[16].field1_0x1 == 6) &&
             (_event_data[16].event_type == colony_idx)) {
@@ -86,9 +71,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 00477720
-     */
     int16_t __cdecl Event_Check_Population_Boom_(int16_t colony_idx) {
         int8_t status = _event_data[17].field1_0x1;
 
@@ -99,9 +81,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 004776d0
-     */
     int16_t __cdecl Event_Check_Plague_(int16_t colony_idx) {
         // _event_data[16] is specifically checked for plague-related flags
         const auto& event = _event_data[16];
@@ -114,9 +93,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 00477610
-     */
     int16_t __cdecl Event_Check_Hyperspace_Flux_() {
         int8_t state = _event_data[9].field1_0x1;
 
@@ -127,9 +103,6 @@ namespace EVENTS {
         return 0;
     }
 
-    /**
-     * @address 00478190
-     */
     int16_t __cdecl Colony_Has_Event_(int16_t colony_idx) {
         if (Event_Check_Comet_(colony_idx) == 1) {
             return 2;

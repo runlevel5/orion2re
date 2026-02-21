@@ -108,6 +108,22 @@ namespace diplomac {
 
     int16_t __cdecl Get_Player_Diplomacy_Personality_(int16_t player_idx, int16_t target_idx);
 
+    void __cdecl Start_Tribute_Treaty_(int16_t player_idx, int16_t target_idx, int16_t amount);
+
+    int __cdecl Fleet_Strength_Comparison_(int16_t player_idx_1, int16_t player_idx_2);
+
+    inline void __cdecl Start_Treaty_(int16_t player_i, int16_t player_j, int16_t type) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00455250});
+        fn(player_i, player_j, type);
+    }
+
+    inline void __cdecl Adjust_Diplomat_Modifiers_(int16_t player_i, int16_t player_j) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004553B0});
+        fn(player_i, player_j);
+    }
+
     inline void __cdecl Diplomacy_Broken_Contacts_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00455590 });

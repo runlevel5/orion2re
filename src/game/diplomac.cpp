@@ -382,4 +382,43 @@ namespace diplomac {
             }
         }
     }
+
+    void __cdecl Start_Tribute_Treaty_(int16_t player_idx, int16_t target_idx, int16_t amount) {
+        MOX::_player[player_idx].tribute_treaty[target_idx] = amount;
+
+        // Clear existing threats between both players
+        MOX::_player[player_idx].threats[target_idx] = 0;
+        MOX::_player[target_idx].threats[player_idx] = 0;
+
+        // Update peace duration for player_idx based on personality
+        int16_t personality1 = Get_Player_Diplomacy_Personality_(player_idx, target_idx);
+        MOX::_player[player_idx].peace_duration[target_idx] += (int8_t)(_personality_peace_duration[personality1] * 2);
+
+        // Update peace duration for target_idx based on personality
+        int16_t personality2 = Get_Player_Diplomacy_Personality_(target_idx, player_idx);
+        MOX::_player[target_idx].peace_duration[player_idx] += (int8_t)(_personality_peace_duration[personality2] * 2);
+    }
+
+    int __cdecl Fleet_Strength_Comparison_(int16_t player_idx_1, int16_t player_idx_2) {
+        uint32_t strength1_v_2 = MOX::_player[player_idx_1].total_ship_strength[player_idx_2];
+        uint32_t strength2_v_1 = MOX::_player[player_idx_2].total_ship_strength[player_idx_1];
+
+        // Result calculation: ((Strength(p1->p2) * 4 + 4) * 25) / (Strength(p2->p1) + 1)
+        uint32_t result = ((strength1_v_2 * 4 + 4) * 25) / (strength2_v_1 + 1);
+
+        if (result > 800) {
+            result = 800;
+        }
+
+        // Halve the result for each third-party player that player_idx_1 is allied with.
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            if (i != player_idx_1 && i != player_idx_2) {
+                if (MOX::_player[player_idx_1].treaty[i] >= 4 /* TREATY_ALLIANCE */) {
+                    result >>= 1;
+                }
+            }
+        }
+
+        return (int)result;
+    }
 }

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -97,10 +97,10 @@ namespace hooks {
         { 0x00478fb0, &INITGAME::Write_Game_Settings_ },
         { 0x00478b30, &INITGAME::Init_Ships_Array_ },
         { 0x00478d80, &INITGAME::Init_Colonies_Array_ },
-        //{ 0x00478820, &INITGAME::Init_New_Game_ },
+        { 0x00478820, &INITGAME::Init_New_Game_ },
         { 0x00479580, &INITGAME::Init_Leaders_ },
         { 0x004f2610, &HAROLD::Get_Officer_Data_LBX_Name_ },
-        //{ 0x00479000, &INITGAME::Init_Players_ },
+        { 0x00479000, &INITGAME::Init_Players_ },
         { 0x00478bc0, &INITGAME::Make_System_Monsters_Into_Ships_ },
         { 0x00478d10, &INITGAME::Set_Initial_Colony_Auto_Selects_ },
         { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },
@@ -1130,6 +1130,27 @@ namespace hooks {
         { 0x00442c80, &OFFICER::Random_Officer_Check_ },
         { 0x0043d3e0, &OFFICER::Assert_Marooned_Leaders_ },
         { 0x00498B40, &RACESEL::Race_Selection_Screen_ },
+        { 0x004ec4c0, &npcdiplo::Clear_Last_Proposal_Turn_ },
+        { 0x004ea9a0, &npcdiplo::NPC_Diplomacy_Buildup_Penalties_ },
+        { 0x004e9fb0, &npcdiplo::NPC_Threats_ },
+        { 0x00455040, &diplomac::Start_Tribute_Treaty_ },
+        { 0x00452fa0, &diplomac::Fleet_Strength_Comparison_ },
+        { 0x004eab20, &npcdiplo::NPC_Declarations_Of_War_ },
+        { 0x004eb500, &npcdiplo::NPC_Peace_Negotiations_ },
+        { 0x004eb7d0, &npcdiplo::NPC_Tech_Exchange_ },
+        { 0x004ec7b0, &npcdiplo::NPC_Treaty_Hatred_ },
+        { 0x004ea1f0, &npcdiplo::NPC_To_NPC_Treaty_Negotiations_ },
+        { 0x004ea890, &npcdiplo::Eliminate_NPC_Treaty_Conflicts_ },
+        { 0x004eb7c0, &npcdiplo::NoOp3 },
+        { 0x004eca10, &npcdiplo::NPC_Surrender_Check_ },
+        { 0x004ea780, &npcdiplo::Honor_Alliances_ },
+        { 0x00442910, &OFFICER::Officer_Status_Ok_ },
+        { 0x00442950, &OFFICER::N_Fleet_Officers_Owned_By_Player_ },
+        { 0x004429b0, &OFFICER::N_Star_Officers_Owned_By_Player_ },
+        { 0x00442a50, &OFFICER::Chance_To_Hire_Hero_ },
+        { 0x0043d560, &OFFICER::Check_For_Officer_Level_ },
+        { 0x0043d6c0, &OFFICER::Decrement_Officer_ETA_ },
+        { 0x00442d50, &OFFICER::Select_Leader_For_Hire_ },
     };
 
     void Install_Hooks()

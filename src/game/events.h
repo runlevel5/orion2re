@@ -27,6 +27,13 @@ namespace EVENTS {
     int16_t __cdecl Event_Check_Colony_Researching_(int16_t colony_idx);
 
     int16_t __cdecl Event_Check_Hyperspace_Flux_();
+
+    inline void __cdecl Event_Surrender_(int8_t actor_player, int16_t target_player) {
+        using Fn = void(__cdecl*)(int8_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775f0});
+        fn(actor_player, target_player);
+    }
+
     int16_t __cdecl Colony_Has_Event_(int16_t colony_idx);
 
     inline void __cdecl Determine_Event_() {

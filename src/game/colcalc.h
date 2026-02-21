@@ -206,6 +206,12 @@ namespace COLCALC {
 
     void __cdecl Init_Surrenders_();
 
+    inline void __cdecl Surrender_Empire_(int16_t actor_player, int16_t target_player) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fafb0});
+        fn(actor_player, target_player);
+    }
+
     inline void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t target_idx) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb130});
@@ -216,6 +222,12 @@ namespace COLCALC {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb320});
         fn(player_idx, target_idx);
+    }
+
+    inline bool __cdecl May_Surrender_Empire_(int16_t player_idx, int16_t other_idx) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FAF60});
+        return fn(player_idx, other_idx);
     }
 
     inline void __cdecl No_Op1_() {

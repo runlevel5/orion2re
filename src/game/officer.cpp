@@ -1621,6 +1621,33 @@ namespace OFFICER {
     }
 
     /**
+     * Updates the status and estimated time of arrival (ETA) for all officers.
+     * Decrements ETA for traveling officers and increments it for those in a pending/cooldown state.
+     */
+    void __cdecl Decrement_Officer_ETA_() {
+        for (int16_t leader_idx = 0; leader_idx < 67 /* 0x43 */; ++leader_idx) {
+            s_leader_data& leader = MOX::_leaders[leader_idx];
+
+            if (leader.status == 4) {
+                // Officer is likely in a cooldown or "killed" state
+                leader.eta++;
+                if (leader.eta >= 30 /* 0x1e */) {
+                    Deassign_Officer_(leader_idx);
+                }
+            } else if (leader.status == 1) {
+                // Officer is traveling or active
+                if (leader.eta > 0) {
+                    leader.eta--;
+                    if (leader.eta == 0 && leader.type == 1 /* Colony Leader */) {
+                        // Recalculate colony effects once the leader arrives
+                        COLCALC::Star_Colony_Calculation_(leader.location, (int16_t)leader.player_index);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @address 0043d750
      */
     void __cdecl Reset_Officer_Selection_() {
@@ -2184,6 +2211,23 @@ namespace OFFICER {
     }
 
     /**
+     * Checks if the officer's status is valid/active.
+     *
+     * @param officer_index The index into the _leaders array.
+     * @return True if the officer status is 0, 1, 3, or 4; false otherwise.
+     */
+    bool __cdecl Officer_Status_Ok_(int16_t officer_index) {
+        int8_t status = MOX::_leaders[officer_index].status;
+
+        // Valid statuses are 0, 1, 3, or 4 based on disassembly branching logic
+        if (status == 0 || status == 1 || status == 4 || status == 3) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @brief Asserts or validates that leaders who are marooned at special systems 
      * (Orion or Antares-type systems) are correctly associated with their location.
      */
@@ -2208,5 +2252,165 @@ namespace OFFICER {
                 }
             }
         }
+    }
+
+    /**
+     * Counts the number of fleet officers owned by a specific player whose status is OK.
+     * @param player_index The index of the player to check for.
+     * @return The count of matching fleet officers.
+     */
+    int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_index) {
+        int16_t count = 0;
+
+        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+            // Check if leader belongs to the player and is of type fleet (0)
+            if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 0) {
+                if (Officer_Status_Ok_(i)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Counts the number of star officers owned by a specific player that have a valid status.
+     * @param player_index The index of the player to check for.
+     * @return The count of valid star officers owned by the player.
+     */
+    int16_t __cdecl N_Star_Officers_Owned_By_Player_(int16_t player_index) {
+        int16_t count = 0;
+
+        for (int16_t i = 0; i < 0x43; ++i) {
+            // Check if the leader belongs to the specified player and is of type 1 (Star Officer)
+            if (MOX::_leaders[i].player_index == (int8_t)player_index && MOX::_leaders[i].type == 1) {
+                if (Officer_Status_Ok_(i)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Iterates through all officers and grants a level/XP increment if they are hired.
+     */
+    void __cdecl Check_For_Officer_Level_() {
+        for (int16_t i = 0; i < MAX_LEADERS; ++i) {
+            s_leader_data& leader = MOX::_leaders[i];
+
+            // A status of 0 or 1 indicates the leader is in active service (hired or standby)
+            if ((leader.status == 1 || leader.status == 0) && (int8_t)leader.player_index != -1) {
+                Give_Officer_XP_(static_cast<int16_t>(leader.player_index), i, 1);
+            }
+        }
+    }
+
+    int16_t __cdecl Select_Leader_For_Hire_(int16_t player_idx) {
+        int16_t selected_leader_idx = -1;
+        int16_t attempts = 0;
+        bool found = false;
+
+        int16_t n_fleet_officers = N_Fleet_Officers_Owned_By_Player_(player_idx);
+        int16_t n_star_officers = N_Star_Officers_Owned_By_Player_(player_idx);
+        int32_t delta_stardate = antarans::Delta_Stardate_();
+
+        // Initial candidate pool limit calculation
+        int16_t limit = (int16_t)MOX::_NUM_PLAYERS + 10 + (int16_t)(delta_stardate / 5);
+
+        s_player* player = &MOX::_player[player_idx];
+
+        // Trait modifiers: Charismatic adds to the pool, Repulsive halves it.
+        if (player->traits[TRAIT_CHARISMATIC] != 0) {
+            limit += 10;
+        } else if (player->traits[TRAIT_REPULSIVE] != 0) {
+            limit /= 2;
+        }
+
+        // Limit is capped at 67 (typically the total number of hireable leaders)
+        if (limit > 67) {
+            limit = 67;
+        }
+
+        do {
+            int32_t roll = random::Random_((int32_t)limit);
+            int16_t leader_idx = (int16_t)roll - 1;
+
+            bool type_match = false;
+            char leader_type = MOX::_leaders[leader_idx].type;
+
+            // Check if leader type (Fleet=0 or Star=1) fits current player slots (max 4 of each)
+            if ((leader_type == 0 && n_fleet_officers < 4) || 
+                (leader_type == 1 && n_star_officers < 4)) {
+                type_match = true;
+            }
+
+            if (type_match) {
+                if (Leader_Available_For_Hire_(leader_idx)) {
+                    found = true;
+                    selected_leader_idx = leader_idx;
+                }
+            }
+
+            attempts++;
+            if (attempts > 100) {
+                found = true;
+            }
+        } while (!found);
+
+        return selected_leader_idx;
+    }
+
+    int16_t __cdecl Chance_To_Hire_Hero_(int16_t player_idx) {
+        int16_t n_fleet_officers = N_Fleet_Officers_Owned_By_Player_(player_idx);
+        int16_t n_star_officers = N_Star_Officers_Owned_By_Player_(player_idx);
+
+        if (antarans::Delta_Stardate_() < 5) {
+            return 0;
+        }
+
+        int16_t chance;
+        uint16_t last_offered = MOX::_player[player_idx].stardate_last_offered_hero;
+        if (last_offered == 0) {
+            chance = (int16_t)antarans::Delta_Stardate_() + 1;
+        } else {
+            chance = (int16_t)MOX::_stardate - (int16_t)last_offered + 1;
+        }
+
+        if (MOX::_player[player_idx].traits[TRAIT_CHARISMATIC]) {
+            chance += 5;
+        }
+        if (MOX::_player[player_idx].traits[TRAIT_REPULSIVE]) {
+            chance -= 10;
+        }
+
+        for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
+            int16_t level_plus_1;
+            if (MOX::_leaders[leader_idx].player_index == -1) {
+                level_plus_1 = Get_Officer_Level_(leader_idx) + 1;
+            } else {
+                level_plus_1 = Owned_Officer_Level_((int32_t)leader_idx) + 1;
+            }
+
+            if (MOX::_leaders[leader_idx].player_index == player_idx) {
+                int8_t status = MOX::_leaders[leader_idx].status;
+                if (status == 0 || status == 1) {
+                    if (Officer_Has_General_Skill_(player_idx, leader_idx, 10 /* Famous */)) {
+                        chance += level_plus_1;
+                    } else if (Officer_Has_General_Skill_(player_idx, leader_idx, 11 /* Reputation */)) {
+                        chance += (level_plus_1 * 15) / 10;
+                    }
+                }
+            }
+        }
+
+        int32_t n_officers = (int32_t)n_star_officers + (int32_t)n_fleet_officers + 1;
+        if (n_officers < 1) {
+            n_officers = 1;
+        }
+
+        return (int16_t)((int32_t)chance / n_officers);
     }
 }
