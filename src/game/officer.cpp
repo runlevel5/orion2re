@@ -2142,4 +2142,71 @@ namespace OFFICER {
         Reload_Offscrn_Small_Ship_Icons_();
         Load_Fleet_Galaxy_Stars_();
     }
+
+    bool __cdecl Player_Can_Hire_More_Officers_(int16_t player_idx) {
+        int16_t fleet_officers = N_Fleet_Officers_Owned_By_Player_(player_idx);
+        int16_t star_officers = N_Star_Officers_Owned_By_Player_(player_idx);
+
+        return (static_cast<int32_t>(fleet_officers) + static_cast<int32_t>(star_officers)) < 8;
+    }
+
+    /**
+     * @address 00442cd0
+     */
+    void __cdecl Generate_Random_Officer_(int16_t player_index) {
+        int16_t leader_index = Select_Leader_For_Hire_(player_index);
+
+        MOX::_player[player_index].officer_for_hire = static_cast<int8_t>(leader_index);
+
+        if (MOX::_player[player_index].officer_for_hire > -1) {
+            MOX::_player[player_index].stardate_last_offered_hero = static_cast<uint16_t>(MOX::_stardate);
+
+            MOX::_leaders[leader_index].player_index = static_cast<int8_t>(player_index);
+        }
+    }
+
+    void __cdecl Random_Officer_Check_(int16_t player_idx) {
+        bool should_generate = false;
+        int16_t chance = Chance_To_Hire_Hero_(player_idx);
+
+        if (Player_Can_Hire_More_Officers_(player_idx)) {
+            if (chance > 0) {
+                // random::Random_(100) returns 1..100
+                if ((static_cast<int16_t>(random::Random_(100)) - 1) < chance) {
+                    should_generate = true;
+                }
+            }
+
+            if (should_generate) {
+                Generate_Random_Officer_(player_idx);
+            }
+        }
+    }
+
+    /**
+     * @brief Asserts or validates that leaders who are marooned at special systems 
+     * (Orion or Antares-type systems) are correctly associated with their location.
+     */
+    void __cdecl Assert_Marooned_Leaders_() {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            int8_t special = MOX::_star[star_idx].system_special;
+
+            // Checks for Orion (8) or specific player-range systems (80 to 80 + _NUM_PLAYERS)
+            if (special == 8 || (special >= 80 && (special - 80) < MOX::_NUM_PLAYERS)) {
+                bool found = false;
+                // Iterate through all possible leaders (67 slots)
+                for (int leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
+                    if (found) {
+                        break;
+                    }
+
+                    // Check if leader status is 5 (marooned) and location matches current star
+                    if (MOX::_leaders[leader_idx].status == 5 &&
+                        MOX::_leaders[leader_idx].location == star_idx) {
+                        found = true;
+                    }
+                }
+            }
+        }
+    }
 }

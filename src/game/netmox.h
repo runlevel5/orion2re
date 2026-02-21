@@ -49,4 +49,6 @@ namespace NETMOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00515560});
         fn(target, type, data, len);
     }
+
+    inline char* net_field_1be = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
 }

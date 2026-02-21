@@ -347,6 +347,18 @@ inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
     fn(dest, src, size);
 }
 
+inline void __cdecl Best_Instructor_Bonus_(int16_t* bonuses) {
+    using Fn = void(__cdecl*)(int16_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409370});
+    fn(bonuses);
+}
+
+inline void __cdecl Do_XP_For_Ship_(int16_t ship_idx, int16_t bonus) {
+    using Fn = void(__cdecl*)(int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409410});
+    fn(ship_idx, bonus);
+}
+
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
@@ -508,12 +520,8 @@ inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055
 
 inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
 
-inline char* __cdecl Colony_Type_(int32_t colony_handle) {
-    using Fn = char*(__cdecl*)(int32_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x004def50})(colony_handle);
-}
-
-inline void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx) {
-    using Fn = void(__cdecl*)(int16_t, int16_t);
-    reinterpret_cast<Fn>(std::uintptr_t{0x004dbef0})(style, color_idx);
+inline void __cdecl Main_Council_Screen_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7f50});
+    fn();
 }

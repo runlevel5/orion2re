@@ -353,15 +353,17 @@ namespace COLCALC {
         fn();
     }
 
-    inline void __cdecl Apply_All_Player_Changes_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fb920 });
-        fn();
+    void __cdecl Apply_All_Player_Changes_();
+
+    inline void __cdecl Check_For_Research_Breakthrough_(s_player* plr) {
+        using Fn = void(__cdecl*)(s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fac60 });
+        fn(plr);
     }
 
-    inline void __cdecl Compute_Blockades_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbac0 });
-        fn();
+    inline void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* plr) {
+        using Fn = void(__cdecl*)(s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004facd0 });
+        fn(plr);
     }
 }

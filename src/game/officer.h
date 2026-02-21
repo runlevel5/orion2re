@@ -110,6 +110,7 @@ namespace OFFICER {
     void __cdecl Check_For_Officer_Level_();
     void __cdecl Decrement_Officer_ETA_();
     void __cdecl Random_Officer_Check_(int16_t player_idx);
+    void __cdecl Generate_Random_Officer_(int16_t player_index);
     void __cdecl Assert_Marooned_Leaders_();
 
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
@@ -154,6 +155,26 @@ namespace OFFICER {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00442f90})(leader_idx);
     }
+    inline int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00442950 });
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl N_Star_Officers_Owned_By_Player_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004429b0 });
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Chance_To_Hire_Hero_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442a50});
+        return fn(player_idx);
+    }
+
+    bool __cdecl Player_Can_Hire_More_Officers_(int16_t player_idx);
+
     void __cdecl Reset_Officer_Selection_();
     void __cdecl Move_Officer_To_Limbo_(int16_t officer_idx);
     void __cdecl Change_Screen_Type_(int8_t* out_flag);
@@ -218,15 +239,10 @@ namespace OFFICER {
         fn();
     }
 
-    inline void __cdecl Random_Officer_Check_(int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00442c80 });
-        fn(player_idx);
+    inline int16_t __cdecl Select_Leader_For_Hire_(int16_t player_index) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442D50});
+        return fn(player_index);
     }
 
-    inline void __cdecl Assert_Marooned_Leaders_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043d3e0 });
-        fn();
-    }
 }

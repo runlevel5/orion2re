@@ -105,6 +105,7 @@ void __cdecl Next_Turn_Calc_() {
     }
 
     aitech::Apply_Evolutionary_Upgrades_();
+    // TODO: FIx crash
     aidata::Compute_AI_Data_();
     DIP_SCRN::Resolve_Delayed_Diplomacy_Orders_();
     DIP_SCRN::Set_Opportunity_Attacks_();

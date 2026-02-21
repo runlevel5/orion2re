@@ -45,4 +45,10 @@ namespace SHIPMOVE {
     }
 
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});
+
+    inline void __cdecl Unmark_Just_Built_AI_Ships_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00437750 });
+        fn();
+    }
 }

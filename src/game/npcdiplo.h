@@ -52,4 +52,10 @@ namespace npcdiplo {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004eb7d0});
         fn();
     }
+
+    inline void __cdecl NPC_Treaty_Hatred_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004EC7B0});
+        fn();
+    }
 }

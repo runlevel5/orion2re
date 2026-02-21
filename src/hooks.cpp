@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -1060,7 +1060,9 @@ namespace hooks {
         { 0x004f3630, &COLCALC::Colony_Empire_Base_Food2_Produced_ },
         { 0x004f43f0, &COLCALC::Colony_Empire_Base_Industry_Produced_ },
         { 0x004f4e60, &COLCALC::Colony_Empire_Base_Research_Produced_ },
+#ifndef SKIP_MAIN
         { 0x004867a0, &NEWGAME::Newgame_Screen_ },
+#endif
         { 0x00486f60, &NEWGAME::Temps_To_Globals_ },
         { 0x00486390, &NEWGAME::Reload_Newgame_Screen_ },
         { 0x00486fd0, &NEWGAME::Globals_To_Temps_ },
@@ -1110,6 +1112,22 @@ namespace hooks {
         { 0x004fb090, &COLCALC::Do_Surrenders_ },
         { 0x004bc2b0, &COLONY::Get_Colony_Planet_Id_ },
         { 0x004bcf70, &COMBFIND::Search_For_Battles_ },
+        { 0x00409460, &ERICNET::Do_All_Ships_XP_Check_ },
+        { 0x00409410, &ERICNET::Do_XP_For_Ship_ },
+        { 0x00470a00, &lostship::Player_Lose_Out_Of_Range_Ships_ },
+        { 0x00470900, &lostship::Lose_Out_Of_Range_Ships_ },
+        { 0x004fb920, &COLCALC::Apply_All_Player_Changes_ },
+        { 0x004fbac0, &COLCALC::Compute_Blockades_ },
+        { 0x00457380, &diplomac::Get_Player_Diplomacy_Personality_ },
+        { 0x00453a80, &diplomac::Determine_First_Contacts_ },
+        { 0x00451a90, &diplomac::Determine_Diplomacy_Messages_ },
+        { 0x00450910, &diplomac::End_Of_Turn_Diplomacy_Adjustments_ },
+        { 0x004d9700, &council::Check_For_Council_Meeting_ },
+        { 0x00442a10, &OFFICER::Player_Can_Hire_More_Officers_ },
+        { 0x00442cd0, &OFFICER::Generate_Random_Officer_ },
+        { 0x00442c80, &OFFICER::Random_Officer_Check_ },
+        { 0x0043d3e0, &OFFICER::Assert_Marooned_Leaders_ },
+        { 0x00498B40, &RACESEL::Race_Selection_Screen_ },
     };
 
     void Install_Hooks()

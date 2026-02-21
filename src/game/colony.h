@@ -355,4 +355,15 @@ namespace COLONY {
     int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y);
 
     int16_t __cdecl Get_Colony_Planet_Id_(int32_t colony_idx);
+
+
+    inline char* __cdecl Colony_Type_(int32_t colony_handle) {
+        using Fn = char* (__cdecl*)(int32_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004def50 })(colony_handle);
+    }
+
+    inline void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x004dbef0 })(style, color_idx);
+    }
 }

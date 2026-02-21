@@ -1468,6 +1468,37 @@ namespace COLCALC {
         return living_count;
     }
 
+    void __cdecl Apply_All_Player_Changes_() {
+        for (int i = 0; i < static_cast<int>(MOX::_NUM_PLAYERS); ++i) {
+            s_player* plr = &MOX::_player[i];
+
+            if (plr->eliminated == 0) {
+                maintain::Player_Maintenance_(plr);
+
+                // Add surplus BC to player treasury
+                plr->bc += static_cast<int>(plr->surplus_bc);
+
+                Update_Player_Stats_(plr);
+                Check_For_Research_Breakthrough_(plr);
+                Compute_Player_Total_Known_Tech_Cost_(plr);
+
+                // Notify if the player is running out of money
+                if (plr->surplus_bc < 0 && plr->bc < 50) {
+                    uint32_t msg_info = 4 | (static_cast<uint32_t>(plr->bc) << 16);
+                    uint32_t val = static_cast<uint32_t>(static_cast<uint16_t>(plr->surplus_bc));
+                    MSG_::Add_Message(msg_info, val, 0, 0, 0, static_cast<int16_t>(i));
+                }
+
+                // Flag interesting events like food or freighter shortages
+                if (plr->surplus_food < 0 || plr->surplus_freighters < 0) {
+                    reinterpret_cast<int8_t*>(REPORT::_something_interesting_happened)[i] = 1;
+                }
+            }
+        }
+
+        SHIPMOVE::Unmark_Just_Built_AI_Ships_();
+    }
+
     void __cdecl Do_Surrenders_() {
         if (MOX::_NUM_STARS > 0) {
             for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
@@ -1487,6 +1518,63 @@ namespace COLCALC {
                 int8_t target = MOX::_player[player_idx].surrender_to;
                 if (target != -1) {
                     Do_Surrender_Empire_(player_idx, target);
+                }
+            }
+        }
+    }
+
+    void __cdecl Compute_Blockades_() {
+        // Step 1: Initialize blockade statuses for all systems
+        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            MOX::_star[i].blockaded = 0;
+            memset(MOX::_star[i].blockaded_by, 0, 8);
+        }
+
+        // Step 2: Calculate blockades based on ship positions
+        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+
+            // Only active combat ships inside known star systems can blockade
+            if (ship->status == 0 && ship->location < 0x48 && ship->d.ship_type == 0) {
+                int16_t star_id = (int16_t)ship->location;
+                int8_t ship_owner = ship->owner;
+                s_star_data* star = &MOX::_star[star_id];
+
+                if (ship_owner < 8) {
+                    for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                        // A blockade occurs if the ship owner is at war with the colony owner
+                        if (p != ship_owner && (star->has_colony & (1 << p))) {
+                            int8_t treaty = MOX::_player[ship_owner].treaty[p];
+                            if (treaty >= 4 && treaty <= 6) { // Hostile/War state
+                                star->blockaded |= (1 << p);
+                                star->blockaded_by[p] |= (1 << ship_owner);
+                            }
+                        }
+                    }
+                } else {
+                    // Special entities (monsters/Antarans) blockade all colonies in the system
+                    star->blockaded = star->has_colony;
+                }
+            }
+        }
+
+        // Step 3: Apply diplomatic penalties for ongoing blockades
+        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            s_star_data* star = &MOX::_star[i];
+            if (star->blockaded != 0) {
+                for (int p_target = 0; p_target < MOX::_NUM_PLAYERS; ++p_target) {
+                    if ((star->blockaded >> p_target) & 1) {
+                        for (int p_attacker = 0; p_attacker < MOX::_NUM_PLAYERS; ++p_attacker) {
+                            // Penalty occurs if p_attacker is blockading p_target,
+                            // and p_attacker doesn't own a colony here themselves
+                            if (((star->blockaded_by[p_target] >> p_attacker) & 1) &&
+                                !((star->has_colony >> p_attacker) & 1)) {
+
+                                int16_t penalty = -static_cast<int16_t>(random::Random_(5));
+                                diplomac::Change_Relations_(penalty, p_attacker, p_target, 7 /* RELATION_BLOCKADE */, i, 0);
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -1,98 +1,103 @@
 #include "deps.h"
 
 namespace SHIPMOVE {
-    /**
-     * Allocates new ship slots for Antarans and players based on quotas.
-     */
     void __cdecl Allocate_New_Ship_Slots_() {
-        int antaran_limit = 0;
-        int16_t* ant_ptr = MOX::_antarans_ship_counts;
-        while (ant_ptr < MOX::_antarans_ship_counts_end) {
-            antaran_limit += *ant_ptr;
-            ant_ptr++;
+        int antaran_ship_sum = 0;
+        for (int i = 0; i < 9; ++i) {
+            antaran_ship_sum += MOX::_antarans.offensive_ships[i];
         }
 
-        if (antaran_limit < 21) {
-            antaran_limit += 2;
+        int num_antaran_slots;
+        if (antaran_ship_sum > 20) {
+            num_antaran_slots = 20;
         } else {
-            antaran_limit = 20;
+            num_antaran_slots = antaran_ship_sum + 2;
         }
 
-        int player_colony_ship_quotas[8] = { 0 };
+        int production_needs[8];
+        memset(production_needs, 0, sizeof(production_needs));
+
         if (MOX::_NUM_COLONIES > 0) {
             for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
                 s_colony& colony = MOX::_colony[i];
                 if (colony.owner != -1 && colony.outpost_flag == 0) {
-                    for (int j = 0; j < 7; ++j) {
-                        if (colony.producing[j] > -100) {
-                            player_colony_ship_quotas[(uint8_t)colony.owner]++;
+                    for (int p = 0; p < 7; ++p) {
+                        if (colony.producing[p] > -100) {
+                            production_needs[(uint8_t)colony.owner]++;
                         }
                     }
                 }
             }
         }
 
-        int local_player_quota = player_colony_ship_quotas[MOX::_PLAYER_NUM];
-        if (MOX::_game_type == 0) {
-            if (local_player_quota > 20) {
-                local_player_quota = 20;
+        int player_production_limit = 0;
+        if (MOX::_game_type == 0 /* Single Player */) {
+            player_production_limit = production_needs[MOX::_PLAYER_NUM];
+            if (player_production_limit > 20) {
+                player_production_limit = 20;
             }
         }
 
-        int available_indices[500];
-        int num_available_slots = 0;
-        int antaran_count = 0;
-        int local_player_count = 0;
+        int free_slot_indices[500];
+        int num_free_slots = 0;
+        int antaran_slots_filled = 0;
+        int player_slots_filled = 0;
 
         for (int i = 0; i < 500; ++i) {
-            s_ship_data& ship = MOX::_ship[i];
-            if (i >= (int)MOX::_NUM_SHIPS || ship.status == 5) {
-                if (antaran_count < antaran_limit) {
-                    ship.owner = 8;
-                    antaran_count++;
-                } else if (local_player_count < local_player_quota) {
-                    ship.owner = (int8_t)MOX::_PLAYER_NUM;
-                    local_player_count++;
+            if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status != 5 /* Status Active */) {
+                if (antaran_slots_filled < num_antaran_slots) {
+                    MOX::_ship[i].owner = 8 /* Antaran Owner ID */;
+                    antaran_slots_filled++;
+                } else if (player_slots_filled < player_production_limit) {
+                    MOX::_ship[i].owner = (char)MOX::_PLAYER_NUM;
+                    player_slots_filled++;
                 } else {
-                    available_indices[num_available_slots++] = i;
+                    free_slot_indices[num_free_slots] = i;
+                    num_free_slots++;
                 }
             }
         }
 
-        int player_allocated_counts[8] = { 0 };
-        player_allocated_counts[MOX::_PLAYER_NUM] = local_player_count;
+        int assigned_slots[8];
+        memset(assigned_slots, 0, sizeof(assigned_slots));
+        assigned_slots[MOX::_PLAYER_NUM] = player_slots_filled;
 
         int current_player = (int)MOX::_stardate % (int)MOX::_NUM_PLAYERS;
-        int ships_distributed = 0;
+        int assigned_count = 0;
 
-        if (num_available_slots > 0) {
-            int players_skipped = 0;
-            while (ships_distributed < num_available_slots && players_skipped < (int)MOX::_NUM_PLAYERS) {
-                if (player_allocated_counts[current_player] < player_colony_ship_quotas[current_player]) {
-                    int ship_idx = available_indices[ships_distributed++];
-                    MOX::_ship[ship_idx].owner = (int8_t)current_player;
-                    player_allocated_counts[current_player]++;
-                    players_skipped = 0;
+        if (num_free_slots > 0) {
+            int consecutive_skips = 0;
+            while (assigned_count < num_free_slots) {
+                if (consecutive_skips >= (int)MOX::_NUM_PLAYERS) break;
+
+                if (assigned_slots[current_player] < production_needs[current_player]) {
+                    int ship_idx = free_slot_indices[assigned_count];
+                    MOX::_ship[ship_idx].owner = (char)current_player;
+                    assigned_slots[current_player]++;
+                    assigned_count++;
+                    consecutive_skips = 0;
                 } else {
-                    players_skipped++;
+                    consecutive_skips++;
                 }
 
                 current_player++;
-                if (current_player >= (int)MOX::_NUM_PLAYERS) {
+                if (current_player == (int)MOX::_NUM_PLAYERS) {
                     current_player = 0;
                 }
             }
         }
 
-        while (ships_distributed < num_available_slots) {
+        // Remaining slots assigned to any active player round-robin
+        while (assigned_count < num_free_slots) {
             if (MOX::_player[current_player].eliminated == 0) {
-                int ship_idx = available_indices[ships_distributed++];
-                MOX::_ship[ship_idx].owner = (int8_t)current_player;
-                player_allocated_counts[current_player]++;
+                int ship_idx = free_slot_indices[assigned_count];
+                MOX::_ship[ship_idx].owner = (char)current_player;
+                assigned_slots[current_player]++;
+                assigned_count++;
             }
-
+            
             current_player++;
-            if (current_player >= (int)MOX::_NUM_PLAYERS) {
+            if (current_player == (int)MOX::_NUM_PLAYERS) {
                 current_player = 0;
             }
         }

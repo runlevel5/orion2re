@@ -47,6 +47,7 @@
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\combfind.cpp" />
+    <ClCompile Include="src\game\council.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
@@ -80,6 +81,7 @@
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\line.cpp" />
     <ClCompile Include="src\game\loadsave.cpp" />
+    <ClCompile Include="src\game\lostship.cpp" />
     <ClCompile Include="src\game\mainmenu.cpp" />
     <ClCompile Include="src\game\mainscr.cpp" />
     <ClCompile Include="src\game\mainscr_main.cpp" />

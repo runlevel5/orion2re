@@ -25,6 +25,9 @@ namespace RACESEL {
     inline const char* s_lastrace_rac = reinterpret_cast<const char*>(0x00556340);
     inline const char* s_RACESEL_LBX = reinterpret_cast<const char*>(0x00557FE4);
     inline const char* s_RACEOPT_LBX_00556320 = reinterpret_cast<const char*>(0x00556320);
+    inline const char* s_rb_0055117C = reinterpret_cast<const char*>(0x0055117C);
+    inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
+    inline const char* s_space_00551120 = reinterpret_cast<const char*>(0x00551120);
 
     inline void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_specials_ptr) {
         using Fn = void(__cdecl*)(uint8_t*);

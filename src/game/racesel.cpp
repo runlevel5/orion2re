@@ -47,8 +47,8 @@ uint8_t __cdecl Naming_Popup_(char* name, int16_t race_idx) {
     return reinterpret_cast<Fn>(0x00499900)(name, race_idx);
 }
 
-int16_t __cdecl Flag_Screen_(uint8_t* color_ptr) {
-    using Fn = int16_t(__cdecl*)(uint8_t*);
+int16_t __cdecl Flag_Screen_(char* color_ptr) {
+    using Fn = int16_t(__cdecl*)(char*);
     return reinterpret_cast<Fn>(0x004996C0)(color_ptr);
 }
 
@@ -57,54 +57,47 @@ int16_t __cdecl Racial_Option_Screen_(s_player* plr) {
     return reinterpret_cast<Fn>(0x00438EF0)(plr);
 }
 
-short Race_Selection_Screen_(s_player *plr)
-{
-    int16_t button_ids[14];
-    int16_t hotkey_id;
-    int16_t input_id;
-    int16_t scan_id;
-    int16_t naming_res;
-    bool exit_flag = false;
-    char text_buffer[100];
-    uint8_t traits_tmp[31];
-
+short Race_Selection_Screen_(s_player* plr) {
+    int16_t field_ids[14];
+    int16_t hotkey_field;
+    char msg_buffer[100];
+    int16_t done_flag = 0;
+    
     fields::Disable_Cancel_();
     fields::Deactivate_Help_List_();
     fields::Clear_Fields_();
     ERIC::Fast_Fade_Out_();
     fonts::Load_Palette_(9, 0, 0xFF);
+    
     _custom_flag = 0;
     _displayed_race = 3;
-
     for (int i = 0; i < 14; ++i) {
         _race_button_status[i] = 0;
     }
     _race_button_status[3] = 1;
-
+    
     Reload_Race_Selection_Screen_();
     ERICHELP::Set_Race_Select_Help_();
     video::Set_Page_Back_();
-    void* raceopt_bg = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+    auto raceopt_anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
     MOX::Mox_Update_();
-    animate::Draw_(0, 0, (s_animation_header*)raceopt_bg);
+    animate::Draw_(0, 0, raceopt_anim);
     video::Copy_Back_To_Off_();
-
+    
     if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-        hotkey_id = fields::Add_Hot_Key_(s__00551120);
+        hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
     } else {
-        hotkey_id = -1000;
+        hotkey_field = -1000;
     }
-
+    
     MOX::Mox_Update_();
-
     for (int i = 0; i < 14; ++i) {
-        button_ids[i] = fields::Add_Radio_Button_Field_(
-            (i / 7) * 0x7E + 0x15F, (i % 7) * 0x30 + 0x5A,
-            s__00551100, _race_button[i], &_race_button_status[i],
-            s__00551100, 0x28
+        field_ids[i] = fields::Add_Radio_Button_Field_(
+            (i / 7) * 126 + 351, (i % 7) * 48 + 90, s_empty_00551100,
+            _race_button[i], &_race_button_status[i], s_empty_00551100, 40
         );
     }
-
+    
     fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
     _old_race = 0;
     video::Set_Page_Off_();
@@ -113,149 +106,103 @@ short Race_Selection_Screen_(s_player *plr)
     palette::Clear_Palette_Changes_(0, 0xFF);
     RUSS::Mox_Sync_Update_();
     ERIC::Fast_Fade_In_();
-
+    
     while (true) {
-        input_id = fields::Get_Input_();
-        scan_id = fields::Scan_Input_();
-
-        _displayed_race = scan_id - button_ids[0];
+        int16_t input_field = fields::Get_Input_();
+        int16_t scan_idx = fields::Scan_Input_();
+        _displayed_race = scan_idx - field_ids[0];
         if (_displayed_race < 0 || _displayed_race > 13) {
             _displayed_race = _old_race;
         }
-
-        for (int i = 0; i < 14; ++i) {
-            if (button_ids[i] == input_id && _race_flag[i] == 0) {
-                int16_t ok = 0;
-                if (_custom_flag == 0) {
-                    if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                        ok = 1;
-                    } else {
-                        ok = NETSTART::Request_Race_(i);
-                    }
-
-                    if (ok == 0) {
-                        KEN::Ken_Get_Text_Message_(0x48, text_buffer, 100);
-                        GENDRAW::Message_Box_(text_buffer);
-                        video::Set_Page_Back_();
-                        void* raceopt_bg2 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                        animate::Draw_(0, 0, (s_animation_header*)raceopt_bg2);
-                        video::Copy_Back_To_Off_();
-                    } else {
+        
+        for (int i = 0; i < 13; ++i) {
+            if (input_field == field_ids[i] && _race_flag[i] == 0) {
+                bool can_request = (MOX::_game_type == 0 || MOX::_game_type == 1) ? true : NETSTART::Request_Race_(i);
+                
+                if (!can_request) {
+                    KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, 100);
+                    GENDRAW::Message_Box_(msg_buffer);
+                    video::Set_Page_Back_();
+                    auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                    animate::Draw_(0, 0, anim);
+                    video::Copy_Back_To_Off_();
+                } else {
+                    struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                    plr->race = i;
+                    strcpy(plr->race_name, MOX::_race_names[i]);
+                    
+                    if (_custom_flag == 0) {
                         timer::Mark_Time_();
                         timer::Release_Time_(5);
                         fields::Clear_Fields_();
-                        struct_::Copy_Structure_(&plr->traits, _race_specials[i], 31);
-                        plr->race = i;
-                        strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Help_List_();
-
-                        while (true) {
-                            naming_res = Naming_Popup_(plr->name, i);
+                        
+                        int screen_state;
+                        do {
+                            screen_state = Naming_Popup_(plr->name, i);
                             video::Set_Page_Back_();
-                            void* bg3 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                            animate::Draw_(0, 0, (s_animation_header*)bg3);
+                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
                             RUSS::Mox_Sync_Update_();
                             _old_race = i;
-
-                            if (naming_res != 1) break;
-                            naming_res += Flag_Screen_((uint8_t*)&plr->color);
-                            if (naming_res != 2) {
-                                Reload_Race_Selection_Screen_();
-                            }
-                        }
-
-                        if (naming_res == 2) {
-                            for (int k = 1; k < 10; ++k) {
-                                if (plr->traits[k] != 0) {
-                                    plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
+                            
+                            if (screen_state == 1) {
+                                screen_state += Flag_Screen_(&plr->color);
+                                if (screen_state != 2) {
+                                    Reload_Race_Selection_Screen_();
                                 }
                             }
-                            exit_flag = true;
+                        } while (screen_state == 1);
+                        
+                        if (screen_state == 2) {
+                            for (int trait_idx = 1; trait_idx < 10; ++trait_idx) {
+                                if (plr->traits[trait_idx] != 0) {
+                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx]];
+                                }
+                            }
+                            done_flag = 1;
                             _race_flag[i] = 1;
                         } else {
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                                _race_flag[i] = 0;
-                            } else {
+                            if (MOX::_game_type != 0 && MOX::_game_type != 1) {
                                 NETSTART::Unrequest_Race_(i);
                             }
                             ERICHELP::Set_Race_Select_Help_();
                             video::Set_Page_Back_();
-                            void* bg4 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                            animate::Draw_(0, 0, (s_animation_header*)bg4);
+                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
-
-                            for (int k = 0; k < 14; ++k) _race_button_status[k] = 0;
                             _old_race = 0;
+                            for (int j = 0; j < 14; ++j) _race_button_status[j] = 0;
                             _race_button_status[_displayed_race] = 1;
-
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                                hotkey_id = fields::Add_Hot_Key_(s__00551120);
-                            } else {
-                                hotkey_id = -1000;
-                            }
-
-                            for (int k = 0; k < 14; ++k) {
-                                button_ids[k] = fields::Add_Radio_Button_Field_(
-                                    (k / 7) * 0x7E + 0x15F, (k % 7) * 0x30 + 0x5A,
-                                    s__00551100, _race_button[k], &_race_button_status[k],
-                                    s__00551100, 0x28
-                                );
+                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                            for (int j = 0; j < 14; ++j) {
+                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
                             }
                             video::Set_Page_Off_();
                             Draw_Race_Selection_Screen_();
                             RUSS::Mox_Sync_Update_();
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                         }
-                    }
-                } else {
-                    if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                        ok = 1;
                     } else {
-                        ok = NETSTART::Request_Race_(i);
-                    }
-
-                    if (ok == 0) {
-                        KEN::Ken_Get_Text_Message_(0x48, text_buffer, 100);
-                        GENDRAW::Message_Box_(text_buffer);
-                        video::Set_Page_Back_();
-                        void* bg5 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                        animate::Draw_(0, 0, (s_animation_header*)bg5);
-                        video::Copy_Back_To_Off_();
-                    } else {
-                        struct_::Copy_Structure_(&plr->traits, _race_specials[i], 31);
-                        plr->race = i;
-                        strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Auto_Function_();
                         fields::Clear_Fields_();
                         if (Racial_Option_Screen_(plr) == 1) {
-                            exit_flag = true;
+                            done_flag = 1;
                             _race_flag[i] = 1;
                         } else {
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                                _race_flag[i] = 0;
-                            } else {
-                                NETSTART::Unrequest_Race_(i);
-                            }
+                            if (MOX::_game_type != 0 && MOX::_game_type != 1) NETSTART::Unrequest_Race_(i);
                             allocate::Pop_Block_(MOX::_screen_seg);
                             Reload_Race_Selection_Screen_();
                             video::Set_Page_Back_();
-                            void* bg6 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                            animate::Draw_(0, 0, (s_animation_header*)bg6);
+                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
-                            if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                                hotkey_id = fields::Add_Hot_Key_(s__00551120);
-                            } else {
-                                hotkey_id = -1000;
+                            if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                            for (int j = 0; j < 13; ++j) {
+                                field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
                             }
-                            for (int k = 0; k < 13; ++k) {
-                                button_ids[k] = fields::Add_Radio_Button_Field_(
-                                    (k / 7) * 0x7E + 0x15F, (k % 7) * 0x30 + 0x5A,
-                                    s__00551100, _race_button[k], &_race_button_status[k],
-                                    s__00551100, 0x28
-                                );
-                            }
-                            button_ids[13] = fields::Add_Radio_Button_Field_(0x1DD, 0x17A, s__00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s__00551100, 0x28);
+                            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                             ERICHELP::Set_Race_Select_Help_();
                             _custom_flag = 0;
@@ -264,8 +211,8 @@ short Race_Selection_Screen_(s_player *plr)
                 }
             }
         }
-
-        if (hotkey_id == input_id) {
+        
+        if (input_field == hotkey_field) {
             if (_custom_flag != 1) {
                 fields::Clear_Fields_();
                 fields::Deactivate_Auto_Function_();
@@ -273,68 +220,60 @@ short Race_Selection_Screen_(s_player *plr)
                 return 0;
             }
             _custom_flag = 0;
-            fields::Clear_Fields_Above_(button_ids[12]);
-            button_ids[13] = fields::Add_Radio_Button_Field_(0x1DD, 0x17A, s__00551100, _race_button[13], &_race_button_status[13], s__00551100, 0x28);
+            fields::Clear_Fields_Above_(field_ids[12]);
+            field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, _race_button[13], &_race_button_status[13], s_empty_00551100, 40);
         }
-
-        if (input_id == button_ids[13]) {
-            FILE* f = _wfopen(s_lastrace_rac, s_rb_0055117c);
+        
+        if (input_field == field_ids[13]) {
+            FILE* f = _wfopen(s_lastrace_rac, s_rb_0055117C);
             if (_custom_flag == 0) {
                 _custom_flag = 1;
-                fields::Clear_Fields_Above_(button_ids[12]);
+                fields::Clear_Fields_Above_(field_ids[12]);
                 if (!f) {
-                    button_ids[13] = -1000;
+                    field_ids[13] = -1000;
                 } else {
-                    button_ids[13] = fields::Add_Radio_Button_Field_(0x1DD, 0x17A, s__00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s__00551100, 0x28);
+                    field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
                     _fclose(f);
                 }
             } else if (f) {
-                _fread(traits_tmp, 31, 1, f);
-                struct_::Copy_Structure_(&plr->traits, _race_specials[13], 31);
-                _fread(&plr->race, 1, 1, f);
-                int16_t ok = (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(plr->race);
-                if (ok == 0) {
+                uint8_t loaded_race;
+                uint8_t temp_traits[31];
+                _fread(temp_traits, 31, 1, f);
+                struct_::Copy_Structure_(plr->traits, _race_specials[13], 31);
+                _fread(&loaded_race, 1, 1, f);
+                plr->race = loaded_race;
+                bool can_request = (MOX::_game_type == 0 || MOX::_game_type == 1) ? true : NETSTART::Request_Race_(loaded_race);
+                
+                if (!can_request) {
                     _fclose(f);
-                    KEN::Ken_Get_Text_Message_(0x48, text_buffer, 100);
-                    GENDRAW::Message_Box_(text_buffer);
+                    KEN::Ken_Get_Text_Message_(72, msg_buffer, 100);
+                    GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
-                    void* bg7 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                    animate::Draw_(0, 0, (s_animation_header*)bg7);
+                    auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                    animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
                     _fread(plr->race_name, 15, 1, f);
                     fields::Deactivate_Auto_Function_();
                     fields::Clear_Fields_();
-                    _old_race = plr->race;
+                    _old_race = loaded_race;
                     _fclose(f);
                     if (Racial_Option_Screen_(plr) == 1) {
-                        exit_flag = true;
-                        _race_flag[plr->race] = 1;
+                        done_flag = 1;
+                        _race_flag[loaded_race] = 1;
                     } else {
-                        if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                            _race_flag[plr->race] = 0;
-                        } else {
-                            NETSTART::Unrequest_Race_(plr->race);
-                        }
+                        if (MOX::_game_type != 0 && MOX::_game_type != 1) NETSTART::Unrequest_Race_(loaded_race);
                         allocate::Pop_Block_(MOX::_screen_seg);
                         Reload_Race_Selection_Screen_();
                         video::Set_Page_Back_();
-                        void* bg8 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-                        animate::Draw_(0, 0, (s_animation_header*)bg8);
+                        auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                        animate::Draw_(0, 0, anim);
                         video::Copy_Back_To_Off_();
-                        if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                            hotkey_id = fields::Add_Hot_Key_(s__00551120);
-                        } else {
-                            hotkey_id = -1000;
+                        if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
+                        for (int j = 0; j < 13; ++j) {
+                            field_ids[j] = fields::Add_Radio_Button_Field_((j / 7) * 126 + 351, (j % 7) * 48 + 90, s_empty_00551100, _race_button[j], &_race_button_status[j], s_empty_00551100, 40);
                         }
-                        for (int k = 0; k < 13; ++k) {
-                            button_ids[k] = fields::Add_Radio_Button_Field_(
-                                (k / 7) * 0x7E + 0x15F, (k % 7) * 0x30 + 0x5A,
-                                s__00551100, _race_button[k], &_race_button_status[k],
-                                s__00551100, 0x28
-                            );
-                        }
-                        button_ids[13] = fields::Add_Radio_Button_Field_(0x1DD, 0x17A, s__00551100, _race_button[13], &_race_button_status[13], s__00551100, 0x28);
+                        field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, _race_button[13], &_race_button_status[13], s_empty_00551100, 40);
                         fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                         ERICHELP::Set_Race_Select_Help_();
                         _custom_flag = 0;
@@ -342,23 +281,23 @@ short Race_Selection_Screen_(s_player *plr)
                 }
             }
         }
-
-        if (exit_flag) break;
-
+        
+        if (done_flag) break;
+        
         if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
             video::Set_Page_Back_();
-            graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
-            void* bg9 = Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-            animate::Draw_(0, 0, (s_animation_header*)bg9);
+            graphics::Fill_(0, 0, 639, 479, 0);
+            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+            animate::Draw_(0, 0, anim);
             video::Copy_Back_To_Off_();
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         }
-
+        
         video::Set_Page_Off_();
         Draw_Race_Selection_Screen_();
         RUSS::Mox_Sync_Update_();
     }
-
+    
     fields::Clear_Fields_();
     fields::Deactivate_Auto_Function_();
     allocate::Pop_Block_(MOX::_screen_seg);

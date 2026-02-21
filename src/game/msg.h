@@ -20,4 +20,10 @@ namespace MSG_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00473b50 });
         fn();
     }
+
+    inline void __cdecl Add_Peace_Ended_Msg_(int player_i, int player_j) {
+        using Fn = void(__cdecl*)(int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473B30});
+        fn(player_i, player_j);
+    }
 }
