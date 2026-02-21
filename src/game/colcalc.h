@@ -341,6 +341,12 @@ namespace COLCALC {
 
     int16_t N_Living_Players_();
 
+    inline void __cdecl Check_For_Eliminated_Players_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb870});
+        fn();
+    }
+
     inline void __cdecl Apply_All_Colony_Changes_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91e0 });

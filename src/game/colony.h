@@ -353,4 +353,6 @@ namespace COLONY {
     }
 
     int16_t __cdecl Bldg_Coords_To_Effective_Frame_(int16_t x, int32_t y);
+
+    int16_t __cdecl Get_Colony_Planet_Id_(int32_t colony_idx);
 }

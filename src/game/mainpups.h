@@ -52,4 +52,10 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045d420});
         fn(id, buffer);
     }
+
+    inline int16_t __cdecl Dragon_New_Star_Popup_(int32_t defender_idx, int32_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045f8a0});
+        return fn(defender_idx, star_idx);
+    }
 }

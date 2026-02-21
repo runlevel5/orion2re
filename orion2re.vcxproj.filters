@@ -300,6 +300,9 @@
     <ClCompile Include="src\game\ships.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\combfind.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -318,9 +321,6 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\platform.h">
-      <Filter>src\game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\helpers.h">
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\video.h">
@@ -756,6 +756,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\raceopt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\net.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

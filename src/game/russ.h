@@ -26,6 +26,12 @@ namespace RUSS {
         fn();
     }
 
+    inline void __cdecl Shuffle_Char_(int8_t* array, int16_t count) {
+        using Fn = void(__cdecl*)(int8_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d79b0});
+        fn(array, count);
+    }
+
     void __cdecl Release_All_Blocks_(void* seg);
 
     void __cdecl Make_All_AI_Game_();

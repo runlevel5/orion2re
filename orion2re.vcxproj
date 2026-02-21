@@ -46,6 +46,7 @@
     <ClCompile Include="src\game\colony_main.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
+    <ClCompile Include="src\game\combfind.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
     <ClCompile Include="src\game\design_main.cpp" />
@@ -184,7 +185,6 @@
     <ClInclude Include="src\game\graphics.h" />
     <ClInclude Include="src\game\haccess.h" />
     <ClInclude Include="src\game\harold.h" />
-    <ClInclude Include="src\game\helpers.h" />
     <ClInclude Include="src\game\homegen.h" />
     <ClInclude Include="src\game\hotpop.h" />
     <ClInclude Include="src\game\info.h" />
@@ -213,6 +213,7 @@
     <ClInclude Include="src\game\msg.h" />
     <ClInclude Include="src\game\multplay.h" />
     <ClInclude Include="src\game\namestar.h" />
+    <ClInclude Include="src\game\net.h" />
     <ClInclude Include="src\game\netcode.h" />
     <ClInclude Include="src\game\netmox.h" />
     <ClInclude Include="src\game\netstart.h" />
@@ -344,6 +345,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -351,8 +353,6 @@
       <EnableUAC>false</EnableUAC>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
-      <AdditionalOptions>/NODEFAULTLIB %(AdditionalOptions)</AdditionalOptions>
-      <EntryPointSymbol>DllMain</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

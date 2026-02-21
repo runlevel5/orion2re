@@ -690,6 +690,17 @@ struct s_combat_data {
     undefined field312_0x138;
 };
 
+typedef struct s_combfind_star_has_player s_combfind_star_has_player, *Ps_combfind_star_has_player;
+
+struct s_combfind_star_has_player {
+    int8_t ship_sizes[5];
+    int8_t has_transport; /* Created by Rename Structure Field action */
+    int8_t has_player;
+    int8_t colony_count; /* Created by Rename Structure Field action */
+    short transport_count;
+    int8_t transport_unk; /* Created by Rename Structure Field action */
+};
+
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {
@@ -2713,7 +2724,7 @@ struct s_player {
     char won_council_vote;
     short player_defeated[8];
     short captured_population;
-    char last_attacker;
+    int8_t last_attacker;
     int8_t ship_design_theme;
     char ship_special_theme;
     char tech_apps_learned[4];

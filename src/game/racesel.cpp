@@ -166,10 +166,9 @@ short Race_Selection_Screen_(s_player *plr)
                         }
 
                         if (naming_res == 2) {
-                            int8_t* traits = (int8_t*)&plr->traits;
                             for (int k = 1; k < 10; ++k) {
-                                if (traits[k] != 0) {
-                                    traits[k] = MOX::_special_bonus[k][traits[k]];
+                                if (plr->traits[k] != 0) {
+                                    plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
                                 }
                             }
                             exit_flag = true;

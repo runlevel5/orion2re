@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <Windows.h>
 #include <ddraw.h>
-#include "helpers.h"
 
 #include "funcs.h"
 #include "accss.h"
@@ -53,6 +52,7 @@
 #include "loader.h"
 #include "sys.h"
 #include "multplay.h"
+#include "net.h"
 #include "netmox.h"
 #include "timer.h"
 #include "contact.h"
