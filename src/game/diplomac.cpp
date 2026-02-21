@@ -1844,16 +1844,17 @@ namespace diplomac {
         for (int p1 = 0; p1 < (int)MOX::_NUM_PLAYERS; ++p1) {
             for (int p2 = 0; p2 < (int)MOX::_NUM_PLAYERS; ++p2) {
                 if (MOX::_player[p1].objectives == 100 && MOX::_player[p2].objectives != 100 && MOX::_player[p1].treaty[p2] != 2) {
-                    int planet_id, threat_val;
-                    int extra_param = -1;
-                    aimove::Player_Threatens_Player_(p1, p2, &planet_id, &threat_val, &extra_param);
+                    int star_id, threat_val;
+                    int planet_id = -1;
+                    // TODO: Fix me!
+                    aimove::Player_Threatens_Player_(p1, p2, &star_id, &threat_val, &planet_id);
 
                     if (planet_id != -1) {
                         int16_t col_idx = MOX::_planet[planet_id].colony_index;
                         if (col_idx != -1) {
-                            if (extra_param != -1 && MOX::_colony[col_idx].n_pops > 4 && threat_val > 100) {
+                            if (star_id != -1 && MOX::_colony[col_idx].n_pops > 4 && threat_val > 100) {
                                 int amount = -((MOX::_colony[col_idx].n_pops - 4) + (threat_val / 50));
-                                Change_Relations_(amount, p1, p2, 5, extra_param, 0);
+                                Change_Relations_(amount, p1, p2, 5, planet_id, 0);
                             }
                         }
                     }

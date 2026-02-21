@@ -99,6 +99,7 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony);
 
+    void __cdecl Apply_Colony_Changes_(s_colony* colony);
     void __cdecl Apply_All_Colony_Changes_();
     void __cdecl Do_Surrenders_();
     void __cdecl All_Colony_Calculations_();
@@ -121,14 +122,8 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0043E8C0})(player_idx, leader_idx);
     }
 
-    inline int __cdecl Get_Player_Max_Population_(int16_t player_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0043e780 })(player_id);
-    }
-    inline int __cdecl Best_Leader_Diplomat_Bonus_(int16_t player_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0043e780})(player_id);
-    }
+    int16_t __cdecl Get_Player_Max_Population_(int16_t player_idx);
+    int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx);
 
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
@@ -221,28 +216,25 @@ namespace COLCALC {
         fn(actor_player, target_player);
     }
 
-    inline void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb130});
-        fn(star_idx, player_idx, target_idx);
+    inline void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner) {
+        using Fn = void(__cdecl*)(s_colony*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FB230});
+        fn(colony, new_owner);
     }
 
-    inline void __cdecl Do_Surrender_Empire_(int16_t player_idx, int16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb320});
-        fn(player_idx, target_idx);
+    void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner);
+
+    void __cdecl Do_Surrender_Empire_(int16_t player_idx, int16_t target_idx);
+
+    inline void __cdecl Eliminate_Player_(s_player* player) {
+        using Fn = void(__cdecl*)(s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FB520});
+        fn(player);
     }
 
-    inline bool __cdecl May_Surrender_Empire_(int16_t player_idx, int16_t other_idx) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FAF60});
-        return fn(player_idx, other_idx);
-    }
+    bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx);
 
-    inline void __cdecl No_Op1_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004FBEF0})();
-    }
+    void __cdecl No_Op1_();
 
     int __cdecl Player_Research_Cost_(s_player* plr, int16_t tech_field);
 
@@ -368,18 +360,14 @@ namespace COLCALC {
         fn();
     }
 
-    inline void __cdecl Apply_All_Colony_Changes_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f91e0 });
-        fn();
-    }
-
     void __cdecl Apply_All_Player_Changes_();
 
-    inline void __cdecl Check_For_Research_Breakthrough_(s_player* plr) {
-        using Fn = void(__cdecl*)(s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fac60 });
-        fn(plr);
+    void __cdecl Check_For_Research_Breakthrough_(s_player* player);
+
+    inline void __cdecl Give_Player_Field_(s_player* player, uint8_t field_id, uint8_t param_3) {
+        using Fn = void(__cdecl*)(s_player*, uint8_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fab40});
+        fn(player, field_id, param_3);
     }
 
     inline void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* plr) {

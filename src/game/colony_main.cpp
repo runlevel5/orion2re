@@ -80,7 +80,7 @@ namespace COLONY {
             }
 
             if (_drawing_display == 0 || _drawing_display == 2) {
-                if (_DEBUG != 0) {
+                if (MAINSCR::_debug_enabled != 0) {
                     char* msg = ESTRINGS::E_Strings_(274 /* ESTR_DRAW_SYSTEM */);
                     fonts::PSTRS_(0, 0, msg);
                 }
@@ -88,7 +88,7 @@ namespace COLONY {
                 COLSYSDI::Draw_Col_Sys_Disp_(7, 24 /* 0x18 */);
             }
             else if (_drawing_display == 1) {
-                if (_DEBUG != 0) {
+                if (MAINSCR::_debug_enabled != 0) {
                     char* msg = ESTRINGS::E_Strings_(273 /* ESTR_DRAW_GALAXY */);
                     fonts::PSTRS_(0, 0, msg);
                 }

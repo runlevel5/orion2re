@@ -231,6 +231,17 @@ namespace COLCALC {
         }
     }
 
+    bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx) {
+        if (MOX::_player[player_idx].surrender_to != target_idx && MOX::_player[target_idx].surrender_to == -1) {
+            return true;
+        }
+        return false;
+    }
+
+    void __cdecl No_Op1_() {
+        return;
+    }
+
     int16_t __cdecl Player_N_Turns_Until_Research_Complete_(s_player* plr) {
         uint8_t field_idx = static_cast<uint8_t>(plr->current_research_field);
 
@@ -1578,5 +1589,189 @@ namespace COLCALC {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the highest diplomatic or charisma bonus provided by any leader currently owned by the player.
+     * Bit 0x20 in general_skills corresponds to the Diplomat skill, while 0x10 is Charisma.
+     */
+    int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx) {
+        int max_bonus = 0;
+        s_player* plr = &MOX::_player[player_idx];
+
+        for (int i = 0; i < 67; ++i) {
+            s_leader_data* leader = &MOX::_leaders[i];
+
+            if (Player_Owns_Officer_(plr, leader)) {
+                int bonus = 0;
+
+                if (leader->general_skills & 0x20 /* DIPLOMAT */) {
+                    int16_t level = Owned_Officer_Level_(i);
+                    bonus = (level * 3 + 3) * 5;
+                }
+                else if (leader->general_skills & 0x10 /* CHARISMA */) {
+                    int16_t level = Owned_Officer_Level_(i);
+                    bonus = (level * 5 + 5) * 2;
+                }
+
+                if (bonus > max_bonus) {
+                    max_bonus = bonus;
+                }
+            }
+        }
+
+        return max_bonus;
+    }
+
+    int16_t __cdecl Get_Player_Max_Population_(int16_t player_idx) {
+        int16_t total_max_pop = 0;
+        s_colony* colony = MOX::_colony;
+
+        s_colony* end = &MOX::_colony[MOX::_NUM_COLONIES];
+
+        while (colony < end) {
+            if (colony->owner == player_idx && colony->outpost_flag == 0) {
+                total_max_pop += Colony_Race_Pop_Limit_(colony, player_idx);
+            }
+            colony++;
+
+            end = &MOX::_colony[MOX::_NUM_COLONIES];
+        }
+
+        return total_max_pop;
+    }
+
+    void __cdecl Do_Surrender_Empire_(int16_t surrender_id, int16_t receiver_id) {
+        s_player* surrender_plr = &MOX::_player[surrender_id];
+        s_player* receiver_plr = &MOX::_player[receiver_id];
+
+        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->owner == (int8_t)surrender_id) {
+                ship->owner = (int8_t)receiver_id;
+                if (ship->officer_index != -1) {
+                    OFFICER::Deassign_Officer_(ship->officer_index);
+                    ship->officer_index = -1;
+                }
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+        for (int i = 0; i < 83; ++i) {
+            if (surrender_plr->tech_applications[i] == 3 /* TECH_OWNED */) {
+                if (Player_May_Get_Tech_App_(receiver_plr, (int16_t)i)) {
+                    Player_Gets_Tech_App_(receiver_plr, (int16_t)i);
+                }
+            }
+        }
+
+        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner == (int8_t)surrender_id) {
+                Do_Surrender_Colony_(colony, receiver_id);
+                int8_t star_idx = MOX::_planet[colony->planet].star_index;
+                Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
+            }
+        }
+
+        int total_spies = BILL::Get_Their_Spy_Number_(receiver_id, receiver_id);
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            total_spies += BILL::Get_Their_Spy_Number_(surrender_id, (int16_t)i);
+        }
+
+        if (total_spies > 63) {
+            total_spies = 63;
+        }
+
+        BILL::Set_Their_Spy_Number_(receiver_id, receiver_id, (uint8_t)total_spies);
+
+        receiver_plr->n_freighters += surrender_plr->n_freighters;
+        receiver_plr->bc += surrender_plr->bc;
+        surrender_plr->surrender_to = -1;
+
+        Eliminate_Player_(surrender_plr);
+    }
+
+    inline void __cdecl Apply_Colony_Changes_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f9240});
+        fn(colony);
+    }
+
+    void __cdecl Apply_All_Colony_Changes_() {
+        int16_t num_colonies = MOX::_NUM_COLONIES;
+        s_colony* colonies = MOX::_colony;
+
+        if (num_colonies <= 0) {
+            return;
+        }
+
+        s_colony* current = colonies;
+        s_colony* end = &colonies[num_colonies];
+
+        do {
+            if (current->owner != -1 && current->outpost_flag == 0) {
+                Apply_Colony_Changes_(current);
+            }
+
+            current++;
+
+            num_colonies = MOX::_NUM_COLONIES;
+            colonies = MOX::_colony;
+            end = &colonies[num_colonies];
+
+        } while (current < end);
+    }
+
+    void __cdecl Check_For_Research_Breakthrough_(s_player* player) {
+        uint8_t field = (uint8_t)player->current_research_field;
+
+        if (field == 0) {
+            return;
+        }
+
+        int32_t breakthrough_chance = Chance_For_Research_Breakthrough_(player);
+        player->research_breakthrough = 0;
+        player->research_accumulated += (int32_t)player->research_produced;
+
+        if (random::Random_(100) <= breakthrough_chance) {
+            player->research_breakthrough = 1;
+            player->research_accumulated = 0;
+            Give_Player_Field_(player, field, 0);
+        }
+    }
+
+    void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner) {
+        s_star_data& star = MOX::_star[star_idx];
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star.planet_index[i];
+            if (planet_idx != -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                if (colony_idx != -1) {
+                    s_colony& colony = MOX::_colony[colony_idx];
+                    if (colony.owner == (int8_t)old_owner) {
+                        COLCALC::Do_Surrender_Colony_(&colony, new_owner);
+                    }
+                }
+            }
+        }
+
+        // Update ownership bitmasks
+        star.has_colony &= ~(1 << (uint8_t)old_owner);
+        star.has_colony |= (1 << (uint8_t)new_owner);
+        star.visited |= (1 << (uint8_t)new_owner);
+
+        COLCALC::Compute_Star_Colony_Stuff_(&star);
+
+        star.colonize_player = -1;
+
+        if (star.officer_index[old_owner] != -1) {
+            OFFICER::Move_Officer_To_Pool_((int16_t)star.officer_index[old_owner]);
+            star.officer_index[old_owner] = -1;
+        }
+
+        star.surrender_to[old_owner] = -1;
     }
 }

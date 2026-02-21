@@ -25,6 +25,12 @@ namespace BILL {
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
 
+    inline void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407080});
+        fn(player_idx, target_idx, n_spies);
+    }
+
     inline void __cdecl Squeeze_Print_(int16_t x, int16_t y, char* text, int16_t limit) {
         using Fn = void(__cdecl*)(int16_t, int16_t, char*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004073E0});

@@ -1225,6 +1225,15 @@ namespace hooks {
         { 0x00457940, &diplomac::Sneak_Attack_Evaluations_ },
         { 0x00508ab0, &aipower::Ship_Strength_Vs_Ships_ },
         { 0x005093f0, &aipower::Get_Best_Ship_Shield_Value_ },
+        { 0x0043E780, &OFFICER::Owned_Officer_Level_ },
+        { 0x004fc780, &COLCALC::Get_Player_Max_Population_ },
+        { 0x004fcb70, &COLCALC::Best_Leader_Diplomat_Bonus_ },
+        { 0x004fb130, &COLCALC::Do_Surrender_Star_ },
+        { 0x004fb320, &COLCALC::Do_Surrender_Empire_ },
+        { 0x004faf60, &COLCALC::May_Surrender_Empire_ },
+        { 0x004fbef0, &COLCALC::No_Op1_ },
+        { 0x004f91e0, &COLCALC::Apply_All_Colony_Changes_ },
+        { 0x004fac60, &COLCALC::Check_For_Research_Breakthrough_ },
     };
 
     void Install_Hooks()

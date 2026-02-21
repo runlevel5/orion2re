@@ -5,4 +5,9 @@
     <LocalDebuggerWorkingDirectory>C:\Projects\moo2\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommand>C:\Projects\moo2\ORION95p.EXE</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>C:\Projects\moo2\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>
