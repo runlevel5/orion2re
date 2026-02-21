@@ -383,6 +383,101 @@ def _render_datatypes_as_c(datatypes):
         return "/* DataTypeWriter failed: %s */\n" % (e,)
 
 
+def _render_composite_layouts(datatypes):
+    """
+    Emit a separate block with byte offsets for Composite types (struct/union).
+    """
+    comps = []
+    for dt in datatypes:
+        try:
+            if isinstance(dt, TypeDef):
+                dt = dt.getDataType()
+            if isinstance(dt, Composite):
+                comps.append(dt)
+        except Exception:
+            pass
+
+    if not comps:
+        return ""
+
+    def _dt_name(dt):
+        try:
+            return dt.getPathName()
+        except Exception:
+            try:
+                return dt.getName()
+            except Exception:
+                return str(dt)
+
+    lines = []
+    lines.append("=== STRUCT LAYOUT (OFFSETS) ===")
+
+    for comp in sorted(comps, key=_dt_name):
+        try:
+            comp_name = _dt_name(comp)
+            comp_size = comp.getLength()
+            is_union = False
+            try:
+                is_union = comp.isUnion()
+            except Exception:
+                # some versions expose union-ness via category/name; ignore if unavailable
+                pass
+
+            lines.append("")
+            lines.append(";; %s  (size=%d / 0x%X)%s" % (
+                comp_name, comp_size, comp_size, " [union]" if is_union else ""
+            ))
+
+            try:
+                components = comp.getComponents()
+            except Exception:
+                # fallback: build list by index
+                components = [comp.getComponent(i) for i in range(comp.getNumComponents())]
+
+            for c in components:
+                try:
+                    off = c.getOffset()
+                except Exception:
+                    off = 0
+                try:
+                    ln = c.getLength()
+                except Exception:
+                    ln = -1
+                try:
+                    fdt = c.getDataType()
+                    fdt_name = fdt.getDisplayName()
+                except Exception:
+                    fdt_name = "<unknown>"
+                try:
+                    fname = c.getFieldName() or c.getName()
+                except Exception:
+                    fname = None
+                if not fname:
+                    fname = "<unnamed>"
+
+                bit_suffix = ""
+                try:
+                    if hasattr(c, "isBitField") and c.isBitField():
+                        bit_suffix = "  (bit %d..%d)" % (
+                            c.getBitOffset(),
+                            c.getBitOffset() + c.getBitSize() - 1
+                        )
+                except Exception:
+                    pass
+
+                # format: 0x0010 (+4) field : type
+                if ln >= 0:
+                    lines.append("  - 0x%04X (+%d)  %s : %s%s" % (off, ln, fname, fdt_name, bit_suffix))
+                else:
+                    lines.append("  - 0x%04X         %s : %s%s" % (off, fname, fdt_name, bit_suffix))
+
+        except Exception as e:
+            lines.append("")
+            lines.append(";; <error rendering composite>: %s" % (e,))
+
+    return "\n".join(lines) + "\n"
+
+
 def _format_externals_for_input(func):
     refs = _collect_referenced_global_data_symbols(func)
     if not refs:
@@ -432,6 +527,9 @@ def _format_externals_for_input(func):
             c_defs = c_defs[:MAX_CHARS] + "\n/* ... truncated ... */\n"
 
         lines.append(c_defs.strip() if c_defs else "<none>")
+
+        lines.append("")
+        lines.append(_render_composite_layouts(list(complex_set)).strip())
 
     return "\n".join(lines) + "\n"
 

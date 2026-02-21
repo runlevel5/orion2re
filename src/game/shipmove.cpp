@@ -2,82 +2,71 @@
 
 namespace SHIPMOVE {
     void __cdecl Allocate_New_Ship_Slots_() {
-        int antaran_ship_sum = 0;
+        int antaran_max_slots = 0;
         for (int i = 0; i < 9; ++i) {
-            antaran_ship_sum += MOX::_antarans.offensive_ships[i];
+            antaran_max_slots += MOX::_antarans.offensive_ships[i];
         }
 
-        int num_antaran_slots;
-        if (antaran_ship_sum > 20) {
-            num_antaran_slots = 20;
+        if (antaran_max_slots > 20) {
+            antaran_max_slots = 20;
         } else {
-            num_antaran_slots = antaran_ship_sum + 2;
+            antaran_max_slots += 2;
         }
 
-        int production_needs[8];
-        memset(production_needs, 0, sizeof(production_needs));
-
-        if (MOX::_NUM_COLONIES > 0) {
-            for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
-                s_colony& colony = MOX::_colony[i];
-                if (colony.owner != -1 && colony.outpost_flag == 0) {
-                    for (int p = 0; p < 7; ++p) {
-                        if (colony.producing[p] > -100) {
-                            production_needs[(uint8_t)colony.owner]++;
-                        }
+        int colony_production_slots[8] = {0};
+        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+            s_colony* col = &MOX::_colony[i];
+            if (col->owner != -1 && col->outpost_flag == 0) {
+                for (int j = 0; j < 7; ++j) {
+                    if (col->producing[j] > -100) {
+                        colony_production_slots[(uint8_t)col->owner]++;
                     }
                 }
             }
         }
 
-        int player_production_limit = 0;
-        if (MOX::_game_type == 0 /* Single Player */) {
-            player_production_limit = production_needs[MOX::_PLAYER_NUM];
-            if (player_production_limit > 20) {
-                player_production_limit = 20;
-            }
+        int player_max_slots = colony_production_slots[MOX::_PLAYER_NUM];
+        if (MOX::_game_type == 0 && player_max_slots > 20) {
+            player_max_slots = 20;
         }
 
-        int free_slot_indices[500];
-        int num_free_slots = 0;
-        int antaran_slots_filled = 0;
-        int player_slots_filled = 0;
+        int unassigned_indices[500];
+        int unassigned_count = 0;
+        int antaran_assigned = 0;
+        int player_assigned = 0;
 
         for (int i = 0; i < 500; ++i) {
-            if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status != 5 /* Status Active */) {
-                if (antaran_slots_filled < num_antaran_slots) {
-                    MOX::_ship[i].owner = 8 /* Antaran Owner ID */;
-                    antaran_slots_filled++;
-                } else if (player_slots_filled < player_production_limit) {
+            if (i >= (int)MOX::_NUM_SHIPS || MOX::_ship[i].status == 5) {
+                if (antaran_assigned < antaran_max_slots) {
+                    MOX::_ship[i].owner = 8;
+                    antaran_assigned++;
+                } else if (player_assigned < player_max_slots) {
                     MOX::_ship[i].owner = (char)MOX::_PLAYER_NUM;
-                    player_slots_filled++;
+                    player_assigned++;
                 } else {
-                    free_slot_indices[num_free_slots] = i;
-                    num_free_slots++;
+                    unassigned_indices[unassigned_count++] = i;
                 }
             }
         }
 
-        int assigned_slots[8];
-        memset(assigned_slots, 0, sizeof(assigned_slots));
-        assigned_slots[MOX::_PLAYER_NUM] = player_slots_filled;
+        int ships_assigned_per_player[8] = {0};
+        ships_assigned_per_player[MOX::_PLAYER_NUM] = player_assigned;
 
         int current_player = (int)MOX::_stardate % (int)MOX::_NUM_PLAYERS;
-        int assigned_count = 0;
+        int assigned_from_unassigned = 0;
+        int players_tried = 0;
 
-        if (num_free_slots > 0) {
-            int consecutive_skips = 0;
-            while (assigned_count < num_free_slots) {
-                if (consecutive_skips >= (int)MOX::_NUM_PLAYERS) break;
+        if (unassigned_count > 0) {
+            while (assigned_from_unassigned < unassigned_count) {
+                if (players_tried >= (int)MOX::_NUM_PLAYERS) break;
 
-                if (assigned_slots[current_player] < production_needs[current_player]) {
-                    int ship_idx = free_slot_indices[assigned_count];
+                if (ships_assigned_per_player[current_player] < colony_production_slots[current_player]) {
+                    int ship_idx = unassigned_indices[assigned_from_unassigned++];
                     MOX::_ship[ship_idx].owner = (char)current_player;
-                    assigned_slots[current_player]++;
-                    assigned_count++;
-                    consecutive_skips = 0;
+                    ships_assigned_per_player[current_player]++;
+                    players_tried = 0;
                 } else {
-                    consecutive_skips++;
+                    players_tried++;
                 }
 
                 current_player++;
@@ -87,15 +76,13 @@ namespace SHIPMOVE {
             }
         }
 
-        // Remaining slots assigned to any active player round-robin
-        while (assigned_count < num_free_slots) {
+        while (assigned_from_unassigned < unassigned_count) {
             if (MOX::_player[current_player].eliminated == 0) {
-                int ship_idx = free_slot_indices[assigned_count];
+                int ship_idx = unassigned_indices[assigned_from_unassigned++];
                 MOX::_ship[ship_idx].owner = (char)current_player;
-                assigned_slots[current_player]++;
-                assigned_count++;
+                ships_assigned_per_player[current_player]++;
             }
-            
+
             current_player++;
             if (current_player == (int)MOX::_NUM_PLAYERS) {
                 current_player = 0;

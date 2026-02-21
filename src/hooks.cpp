@@ -42,7 +42,9 @@ namespace hooks {
     }
 
     static hook all_hooks[] = {
+#ifndef SKIP_MAIN
         { 0x005422e0, &platform::entry },
+#endif
         { 0x005276f0, &platform::Parse_Ten_Cmd_Parameter },
         { 0x00527960, &platform::Create_Direct_Draw },
         { 0x00527e60, &platform::Flip_Surface },
@@ -95,10 +97,10 @@ namespace hooks {
         { 0x00478fb0, &INITGAME::Write_Game_Settings_ },
         { 0x00478b30, &INITGAME::Init_Ships_Array_ },
         { 0x00478d80, &INITGAME::Init_Colonies_Array_ },
-        { 0x00478820, &INITGAME::Init_New_Game_ },
+        //{ 0x00478820, &INITGAME::Init_New_Game_ },
         { 0x00479580, &INITGAME::Init_Leaders_ },
         { 0x004f2610, &HAROLD::Get_Officer_Data_LBX_Name_ },
-        { 0x00479000, &INITGAME::Init_Players_ },
+        //{ 0x00479000, &INITGAME::Init_Players_ },
         { 0x00478bc0, &INITGAME::Make_System_Monsters_Into_Ships_ },
         { 0x00478d10, &INITGAME::Set_Initial_Colony_Auto_Selects_ },
         { 0x0051a620, &HOMEGEN::Generate_Home_Worlds_ },

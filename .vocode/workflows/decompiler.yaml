@@ -181,6 +181,22 @@ workflows:
 
             race = *(char *)((charptr_t)MOX::_player + 0x25);
 
+          * There could be inefficiencies and problems with structure offsets in the provided decompiler output. Always use assembly as a source
+            of truth. For example, following decompiled code incorrectly assumes negative array offset because of iteration of structures and
+            not a local offset within a structure:
+
+            MOX::_ship->special_device_damage_flags[iVar2 + -19] = 8;
+
+            but corresponding assembly is:
+                             
+            MOV        byte ptr [ECX + EAX*0x1 + 0x63],8
+
+            ECX points to MOX::_ship, EAX points to ship offset and 0x63 is the field. The field at offset 0x63 of structure s_ship_data is called
+            `owner`. While a negative memory offset from `special_device_damage_flags` would point to the same memory location, it is semantically
+            incorrect. You MUST resolve these references and derive intent from assembly code.
+            
+            You have access to struct layouts - use them to find a correct name if disassembly does not match decompiled output.
+
           * Also output the following code that ties decompiled function to its base address, where 0x123456 is the raw function
             start address and decompiled_func is the address of the decompiled function:
 
@@ -237,16 +253,6 @@ workflows:
              You also might see a variation of this pattern where offset is calculated via
              bit shifting operations. It is exactly same behavior as a previous example
              with more operations.
-
-                  MOVSX      ECX,word ptr [MOX::_PLAYER_NUM]
-                  MOV        EAX,ECX
-                  LEA        EDX,[ECX + ECX*0x2]
-                  LEA        ECX,[EAX + EDX*0x4]
-                  MOV        EDX,dword ptr [MOX::_player]                     = 00000000
-                  SHL        ECX,0x2
-                  LEA        EAX,[EAX + ECX*0x8]
-                  LEA        ECX,[EAX + EAX*0x8]
-                  ADD        ECX,EDX
  
           * You NEVER output structure definitions. You are allowed to output structure name as a reference without the body. Correct 
             examples:
