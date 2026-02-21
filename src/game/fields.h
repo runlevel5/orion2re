@@ -18,7 +18,14 @@ namespace fields {
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
+    inline s_field*& _sfields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD4});
     inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
+    inline uint16_t& _old_input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572BE4});
+    inline int16_t& _old_active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF4});
+    inline int16_t& _old_down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005762E0});
+    inline int16_t& _old_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576304});
+    inline uint16_t& _old_input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00576308});
+    inline int16_t& _old_auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576320});
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
     inline s_colors (&_list_normal_color) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572C08});
     inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
@@ -124,11 +131,7 @@ namespace fields {
         fn();
     }
 
-    inline int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, const char* hotkey, int16_t sound) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, const char*, s_animation_header*, int16_t*, const char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051dce0});
-        return fn(x, y, help, pic, value, hotkey, sound);
-    }
+    int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound);
 
     inline void __cdecl Mark_Fields_() {
         using Fn = void(__cdecl*)();
@@ -136,9 +139,5 @@ namespace fields {
         fn();
     }
 
-    inline void __cdecl Release_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520190});
-        fn();
-    }
+    void __cdecl Release_Fields_();
 }

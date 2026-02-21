@@ -309,6 +309,12 @@
     <ClCompile Include="src\game\lostship.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\gendraw.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\aipower.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -765,6 +771,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\net.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\aipower.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

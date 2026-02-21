@@ -1014,7 +1014,7 @@ struct s_fleet_box {
     struct s_animation_header *name_sm_seg;
     struct s_animation_header *name_sm_seg2;
     int8_t field12_0x1a;
-    int8_t field13_0x1b;
+    int8_t mouse_pressed;
     int8_t field14_0x1c;
     int8_t field15_0x1d;
     int8_t field16_0x1e;
@@ -2473,7 +2473,7 @@ struct s_network {
     undefined field392_0x18d;
     undefined field393_0x18e;
     undefined field394_0x18f;
-    undefined field395_0x190;
+    int8_t field395_0x190;
     undefined field396_0x191;
     undefined field397_0x192;
     undefined field398_0x193;
@@ -2494,7 +2494,7 @@ struct s_network {
     undefined field413_0x1a2;
     undefined field414_0x1a3;
     undefined field415_0x1a4;
-    undefined field416_0x1a5;
+    int8_t field416_0x1a5;
     undefined field417_0x1a6;
     undefined field418_0x1a7;
     undefined field419_0x1a8;
@@ -3476,7 +3476,7 @@ typedef struct s_ship_node s_ship_node, *Ps_ship_node;
 
 struct s_ship_node {
     short ship_idx;
-    short field1_0x2;
+    short next_node;
     char selected;
 };
 
@@ -3690,8 +3690,7 @@ struct s_tech_hull_data {
     short bomb_weapon_count;
     undefined field16_0x18;
     undefined field17_0x19;
-    undefined field18_0x1a;
-    undefined field19_0x1b;
+    short field18_0x1a;
     char *name;
     char *size_name;
 };

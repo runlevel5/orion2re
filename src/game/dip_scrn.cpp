@@ -17,7 +17,7 @@ namespace DIP_SCRN {
                     int8_t order = MOX::_player[i].delayed_diplomacy_orders[j];
 
                     if (order == 0) {
-                        diplomac::Declare_War(i, j);
+                        diplomac::Declare_War_(i, j);
                     } else if (order == 1) {
                         diplomac::Declare_Peace_(i, j);
                     } else if (order == 2) {

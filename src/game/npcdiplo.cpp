@@ -319,7 +319,7 @@ namespace npcdiplo {
                     if (MOX::_player[j].objectives == 100 /* HUMAN */) {
                         diplomac::Change_Relations_(-10000, j, i, reason[j], 0, 0);
                     }
-                    diplomac::Declare_War(i, j);
+                    diplomac::Declare_War_(i, j);
                 }
             }
 
@@ -345,7 +345,7 @@ namespace npcdiplo {
                             if (MOX::_player[j].objectives == 100 /* HUMAN */) {
                                 diplomac::Change_Relations_(-10000, j, i, reason[j], 0, 0);
                             }
-                            diplomac::Declare_War(i, j);
+                            diplomac::Declare_War_(i, j);
                             break;
                         }
                         target_idx--;
@@ -750,7 +750,7 @@ namespace npcdiplo {
                     }
 
                     MOX::_player[player_idx].diplomacy_proposal_war_player[ally_idx] = (int8_t)i;
-                    diplomac::Declare_War(player_idx, i);
+                    diplomac::Declare_War_(player_idx, i);
                 }
             }
         }

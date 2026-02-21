@@ -2,18 +2,9 @@
 #include <cstdint>
 
 namespace GENDRAW {
-    // Suggested name: GENDRAW::Message_Box
-    inline void __cdecl Message_Box_(const char* message) {
-        using Fn = void(__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796b0});
-        fn(message);
-    }
+    void __cdecl Message_Box_(char* text);
 
-    inline void __cdecl Help_(const char* msg) {
-        using Fn = void(__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba610});
-        fn(msg);
-    }
+    void __cdecl Help_(char* message);
 
     // Suggested name: GENDRAW::Warning_Box_Prompt
     inline int16_t __cdecl Warning_Box_(const char* message) {

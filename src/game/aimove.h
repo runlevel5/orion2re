@@ -17,6 +17,11 @@ namespace aimove {
 
     void __cdecl Move_All_AI_();
 
+    inline void __cdecl Player_Threatens_Player_(int16_t p1, int16_t p2, int* out_planet_id, int* out_threat_val, int* out_extra) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int*, int*, int*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00465f70})(p1, p2, out_planet_id, out_threat_val, out_extra);
+    }
+
     inline int16_t __cdecl Best_Uncolonized_Undestined_Planet_(int16_t player_idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00461000});

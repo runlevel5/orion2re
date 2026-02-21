@@ -32,15 +32,9 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Armor_(int16_t player_idx);
 
-    inline int16_t __cdecl Best_Computer_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00481310})(player_idx);
-    }
+    int16_t __cdecl Best_Computer_(int16_t player_idx);
 
-    inline int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00481280})(player_idx);
-    }
+    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 
@@ -64,10 +58,7 @@ namespace INITSHIP {
 
     inline char* s_Colony_Ship_Localized = reinterpret_cast<char*>(std::uintptr_t{0x00558E28});
 
-    inline void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner, s_ship_design* design) {
-        using Fn = void(__cdecl*)(int16_t, s_ship_design*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00480EA0})(owner, design);
-    }
+    void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design);
 
     inline void __cdecl Update_Strategic_Design_Weapons_Specials_(s_ship_design* design, int16_t player_idx, int16_t design_idx) {
         using Fn = void(__cdecl*)(s_ship_design*, int16_t, int16_t);

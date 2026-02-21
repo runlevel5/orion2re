@@ -245,6 +245,45 @@ namespace INITSHIP {
         return best_armor_idx;
     }
 
+    int16_t __cdecl Best_Computer_(int16_t player_idx) {
+        if (player_idx >= 8) {
+            return 5;
+        }
+
+        int16_t best_computer_idx = 0;
+
+        for (int16_t i = 1; i < 6; ++i) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app] == 3) {
+                best_computer_idx = i;
+            }
+        }
+
+        return best_computer_idx;
+    }
+
+    int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
+        int16_t best_shield_idx = 0;
+
+        if (player_idx < 8) {
+            for (int16_t i = 1; i < 6; ++i) {
+                if (MOX::_player[player_idx].tech_applications[TECHDATA::_shields[i].tech_app_id] == 3) {
+                    best_shield_idx = i;
+                }
+            }
+            return best_shield_idx;
+        }
+
+        if (player_idx == 8) {
+            return 7;
+        }
+
+        if (player_idx == 9) {
+            return 3;
+        }
+
+        return 0;
+    }
+
     int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech) {
         int16_t armor_idx = Best_Armor_(armor_tech);
 
@@ -666,5 +705,10 @@ namespace INITSHIP {
         design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, player_idx);
 
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+    }
+
+    void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
+        aidesign::Auto_Design_Ship_(owner_idx, design, 5);
+        strcpy(design->name, TECHDATA::_hull_data[5].name);
     }
 }

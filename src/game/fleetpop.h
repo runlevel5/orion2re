@@ -6,17 +6,9 @@ namespace FLEETPOP {
 
     void __cdecl Reload_Fleet_Box_Data_(void);
 
-    inline uint8_t __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406590});
-        return fn(ship_idx);
-    }
+    bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx);
 
-    inline int16_t __cdecl N_Fleet_Icons_(int16_t node_ptr) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004051E0});
-        return fn(node_ptr);
-    }
+    int16_t __cdecl N_Fleet_Icons_(int16_t node_idx);
 
     inline void __cdecl Fleet_Box_Data_(int16_t icon_count) {
         using Fn = void(__cdecl*)(int16_t);

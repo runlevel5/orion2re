@@ -311,6 +311,11 @@ namespace fonts {
         _font_header.font_style = 4;
     }
 
+    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors) {
+        Set_Font_Style_(style, colors);
+        _font_header.font_style = 1;
+    }
+
     void __cdecl Set_Font_Special_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
             _font_header.special_colors[i] = colors->colors[i];
@@ -327,5 +332,17 @@ namespace fonts {
         char buffer[12];
         __itoa(value, buffer, 10);
         Print_Right_(x, y, buffer);
+    }
+
+    void __cdecl Set_Font_Spacing_Width_(int spacing_width) {
+        // Sets the width of the space character (ASCII 32)
+        _font_header.font_style_widths[32] = (char)spacing_width;
+    }
+
+    void __cdecl Set_Alias_Color_(int32_t color) { // TYPE MISMATCH: decompiled as uint8_t
+        _font_header.normal_colors[0] = static_cast<uint8_t>(color);
+        _font_header.highlight_colors[0] = static_cast<uint8_t>(color);
+        _font_header.special_colors[0] = static_cast<uint8_t>(color);
+        _font_header.selected_colors[0] = static_cast<uint8_t>(color);
     }
 }

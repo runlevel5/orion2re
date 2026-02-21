@@ -121,6 +121,15 @@ namespace COLCALC {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0043E8C0})(player_idx, leader_idx);
     }
 
+    inline int __cdecl Get_Player_Max_Population_(int16_t player_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0043e780 })(player_id);
+    }
+    inline int __cdecl Best_Leader_Diplomat_Bonus_(int16_t player_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0043e780})(player_id);
+    }
+
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});

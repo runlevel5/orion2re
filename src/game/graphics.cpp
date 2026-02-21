@@ -124,4 +124,45 @@ namespace graphics {
     void __cdecl Darken_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
         Tint_Fill_(x1, y1, x2, y2, 0);
     }
+
+    void __cdecl Box_(int16_t x, int16_t y, int16_t width, int16_t height, int16_t thickness, uint8_t color) {
+        if (thickness <= 0) {
+            return;
+        }
+
+        for (int i = 0; i < (int)thickness; ++i) {
+            int16_t offset = (int16_t)i;
+            int16_t x1 = x + offset;
+            int16_t y1 = y + offset;
+            int16_t x2 = x + width - offset - 1;
+            int16_t y2 = y + height - offset - 1;
+
+            // Draw the four sides of the rectangle for the current thickness layer
+            line::Line_(x1, y1, x2, y1, color); // Top edge
+            line::Line_(x1, y1, x1, y2, color); // Left edge
+            line::Line_(x2, y1, x2, y2, color); // Right edge
+            line::Line_(x1, y2, x2, y2, color); // Bottom edge
+        }
+    }
+
+    void __cdecl Dot_(int16_t x, int16_t y, uint8_t color) {
+        if (animate::_clipping_flag == 1) {
+            if (x < video::_screen_window_x1 || y < video::_screen_window_y1 ||
+                x > video::_screen_window_x2 || y > video::_screen_window_y2) {
+                return;
+            }
+        }
+
+        platform::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
+
+        if (video::screen_refresh_flag >= 2) {
+            video::Add_Dot_To_Scan_List_(static_cast<int32_t>(x), static_cast<int32_t>(y));
+        }
+
+        uint8_t* framebuffer = video::_current_video_page;
+        int32_t offset = static_cast<int32_t>(y) * platform::g_screen_res_x + static_cast<int32_t>(x);
+        framebuffer[offset] = color;
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
 }

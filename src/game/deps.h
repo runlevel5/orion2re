@@ -150,6 +150,7 @@
 #include "aidudes.h"
 #include "aimove.h"
 #include "maintain.h"
+#include "aipower.h"
 #include "spy.h"
 #include "lostship.h"
 #include "settler.h"

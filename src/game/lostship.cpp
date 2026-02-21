@@ -1,6 +1,19 @@
 #include "deps.h"
 
 namespace lostship {
+    void __cdecl Compute_Stars_In_Range_Of_Player_(int8_t* in_range_basic, int8_t* in_range_extended, int16_t player_idx) {
+        int16_t range = MOX::_player[player_idx].ship_range;
+        // Extended range is 1.5x basic range, rounded up.
+        int16_t extended_range = (int16_t)((range * 3 + 1) / 2);
+
+        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            s_star_data* star = &MOX::_star[i];
+
+            in_range_basic[i] = SHIPMOVE::Star_In_Range_Of_Player_(star, player_idx, range);
+            in_range_extended[i] = SHIPMOVE::Star_In_Range_Of_Player_(star, player_idx, extended_range);
+        }
+    }
+
     void __cdecl Lose_Out_Of_Range_Ships_() {
         int8_t reserve_range_array[72];
         int8_t fuel_range_array[72];

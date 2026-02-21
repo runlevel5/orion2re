@@ -267,4 +267,30 @@ void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t is_not_playe
     MOX::_mainscr_palette = 2;
 }
 
+/**
+ * @address 00406590
+ */
+bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
+    if (MAINSCR::Ship_Can_Be_Selected_(ship_idx) && MOX::_just_moved_stack == 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @address 004051e0
+ */
+int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
+    int16_t count = 1;
+
+    // Traverse the ship node chain starting from node_idx
+    while (MOX::_ship_node[node_idx].next_node != -1 && count < 500) {
+        count++;
+        HACCESS::Ship_Owner_(MOX::_ship_node[node_idx].ship_idx);
+        node_idx = MOX::_ship_node[node_idx].next_node;
+    }
+
+    return count;
+}
+
 }

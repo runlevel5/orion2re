@@ -106,25 +106,14 @@ namespace fonts {
 
     void __cdecl Set_Font_Spacing_(int16_t spacing);
 
-    inline void __cdecl Set_Font_Spacing_Width_(int width) {
-        using Fn = void(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525730});
-        fn(width);
-    }
+    void __cdecl Set_Font_Spacing_Width_(int spacing_width);
 
     void __cdecl Get_Colors_(s_colors* colors);
     void __cdecl Set_Colors_(const s_colors* colors);
     void __cdecl Set_Font_Special_Colors_(s_colors* colors);
     void __cdecl Set_Font_Highlight_Colors_(s_colors* colors);
 
-    inline void __cdecl Set_Font_Style_Shadow_Down_(int32_t style, s_colors* colors) {
-        using Fn = void(__cdecl*)(int32_t, s_colors*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525670});
-        fn(style, colors);
-    }
+    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors);
 
-    inline void __cdecl Set_Alias_Color_(int32_t color) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(0x00525790)(color);
-    }
+    void __cdecl Set_Alias_Color_(int32_t color);
 }

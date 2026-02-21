@@ -25,6 +25,7 @@
     <ClCompile Include="src\game\aidesign.cpp" />
     <ClCompile Include="src\game\aidudes.cpp" />
     <ClCompile Include="src\game\aimove.cpp" />
+    <ClCompile Include="src\game\aipower.cpp" />
     <ClCompile Include="src\game\aitech.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
@@ -68,6 +69,7 @@
     <ClCompile Include="src\game\fleetpop.cpp" />
     <ClCompile Include="src\game\flt1.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
+    <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />
     <ClCompile Include="src\game\haccess.cpp" />
@@ -127,6 +129,7 @@
     <ClInclude Include="src\game\aidudes.h" />
     <ClInclude Include="src\game\aileader.h" />
     <ClInclude Include="src\game\aimove.h" />
+    <ClInclude Include="src\game\aipower.h" />
     <ClInclude Include="src\game\aitech.h" />
     <ClInclude Include="src\game\allocate.h" />
     <ClInclude Include="src\game\animate.h" />

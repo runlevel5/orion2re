@@ -66,4 +66,16 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
     }
 }
 
+void __cdecl Check_All_Rebellions_() {
+    s_colony* colony = MOX::_colony;
+    s_colony* end = &colony[MOX::_NUM_COLONIES];
+
+    while (colony < end) {
+        if (colony->owner != -1 && colony->outpost_flag == 0) {
+            Check_Rebellion_(colony);
+        }
+        colony++;
+    }
+}
+
 }

@@ -246,6 +246,8 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
+    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559428});
+
     inline char** _planet_special_string = reinterpret_cast<char**>(std::uintptr_t{0x00597780});
     inline char** _planet_climate_string = reinterpret_cast<char**>(std::uintptr_t{0x0059BA80});
     inline char** _mineral_class_string = reinterpret_cast<char**>(std::uintptr_t{0x005A2C30});

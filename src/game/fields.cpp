@@ -540,4 +540,35 @@ namespace fields {
 
         return 0;
     }
+
+    int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound) {
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
+        }
+
+        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+
+        s_field& current_field = _fields[_fields_count];
+        current_field.field_type = FIELD_TYPE_LOCKED;
+        current_field.detail.radio.selection = (char*)selection;
+
+        int16_t current_index = _fields_count;
+        _fields_count++;
+
+        return current_index;
+    }
+
+    void __cdecl Release_Fields_() {
+        _fields_count = _old_fields_count;
+        _input_delay = _old_input_delay;
+        _down_mouse_button = _old_down_mouse_button;
+
+        // Disassembly uses a 32-bit move here, despite the symbol being a short.
+        *reinterpret_cast<int32_t*>(&_max_fields_count) = 0xfa;
+
+        _auto_input_variable = _old_auto_input_variable;
+        _input_field_active = _old_input_field_active;
+        _fields = _sfields;
+        _active_input_field_number = _old_active_input_field_number;
+    }
 }

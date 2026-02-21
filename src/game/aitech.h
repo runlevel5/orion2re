@@ -53,4 +53,9 @@ namespace aitech {
         using Fn = int(__cdecl*)(s_player*);
         return reinterpret_cast<Fn>(std::uintptr_t{0x00500E00})(player);
     }
+
+    inline int16_t __cdecl System_Proximity_Count_(int16_t player1, uint8_t player2) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x005015f0 })(player1, player2);
+    }
 }
