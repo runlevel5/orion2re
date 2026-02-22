@@ -216,6 +216,18 @@ namespace COLCALC {
         fn(actor_player, target_player);
     }
 
+    inline int8_t __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
+        using Fn = int8_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fadc0});
+        return fn(star_idx, player_idx, to_player_idx);
+    }
+
+    inline void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004faeb0});
+        fn(star_idx, player_idx, to_player_idx);
+    }
+
     inline void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner) {
         using Fn = void(__cdecl*)(s_colony*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FB230});

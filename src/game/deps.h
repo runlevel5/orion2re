@@ -151,6 +151,8 @@
 #include "aimove.h"
 #include "maintain.h"
 #include "aipower.h"
+#include "shipstak.h"
+#include "aistage.h"
 #include "spy.h"
 #include "lostship.h"
 #include "settler.h"

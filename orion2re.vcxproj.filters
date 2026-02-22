@@ -315,6 +315,9 @@
     <ClCompile Include="src\game\aipower.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\aidata.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -774,6 +777,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\aipower.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\aistage.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\shipstak.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

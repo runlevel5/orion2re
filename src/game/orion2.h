@@ -136,6 +136,97 @@ struct s_adv_planet_worth {
     undefined field73_0x78;
 };
 
+typedef struct s_ai_colony_info s_ai_colony_info, *Ps_ai_colony_info;
+
+struct s_ai_colony_info {
+    int8_t race;
+    int8_t pop_limit;
+    int8_t trait_eats_minerals;
+    undefined field3_0x3;
+    int8_t trait_environment_immune;
+    int8_t threatened;
+    int8_t n_flagged_pops;
+};
+
+typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
+
+struct s_ai_player_info {
+    short colony_count;
+    short colony_deficit;
+    short colony_blockaded_count;
+    short n_stars_with_colony;
+    short n_blockaded_stars;
+    short n_contacts;
+    short n_missing_contacts;
+    int8_t reachable_players[8];
+    undefined field8_0x16;
+    undefined field9_0x17;
+    undefined field10_0x18;
+    undefined field11_0x19;
+    int total_ship_strength;
+    undefined field13_0x1e;
+    undefined field14_0x1f;
+    undefined field15_0x20;
+    undefined field16_0x21;
+    undefined field17_0x22;
+    undefined field18_0x23;
+    undefined field19_0x24;
+    undefined field20_0x25;
+    undefined field21_0x26;
+    undefined field22_0x27;
+    undefined field23_0x28;
+    undefined field24_0x29;
+    undefined field25_0x2a;
+    undefined field26_0x2b;
+    undefined field27_0x2c;
+    undefined field28_0x2d;
+    undefined field29_0x2e;
+    undefined field30_0x2f;
+    undefined field31_0x30;
+    undefined field32_0x31;
+    undefined field33_0x32;
+    undefined field34_0x33;
+    undefined field35_0x34;
+    undefined field36_0x35;
+    undefined field37_0x36;
+    undefined field38_0x37;
+    undefined field39_0x38;
+    undefined field40_0x39;
+};
+
+typedef struct s_ai_refit_entry s_ai_refit_entry, *Ps_ai_refit_entry;
+
+struct s_ai_refit_entry {
+    short field0_0x0;
+    short ship_idx;
+    short desirability;
+};
+
+typedef struct s_ai_refit_player s_ai_refit_player, *Ps_ai_refit_player;
+
+struct s_ai_refit_player {
+    short n_entries;
+    struct s_ai_refit_entry entry[500];
+};
+
+typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
+
+typedef struct s_ai_star_player_block s_ai_star_player_block, *Ps_ai_star_player_block;
+
+struct s_ai_star_player_block {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    undefined field4_0x4;
+    int8_t enemy_enroute_or_threat;
+};
+
+struct s_ai_star_info {
+    int8_t n_planets_present;
+    struct s_ai_star_player_block per_player[8];
+};
+
 typedef struct s_ai_tech_info s_ai_tech_info, *Ps_ai_tech_info;
 
 typedef struct s_ai_tech_info_player s_ai_tech_info_player, *Ps_ai_tech_info_player;

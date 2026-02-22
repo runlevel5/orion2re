@@ -1234,6 +1234,7 @@ namespace hooks {
         { 0x004fbef0, &COLCALC::No_Op1_ },
         { 0x004f91e0, &COLCALC::Apply_All_Colony_Changes_ },
         { 0x004fac60, &COLCALC::Check_For_Research_Breakthrough_ },
+        { 0x004edf80, &AIDATA::Compute_AI_Data_ },
     };
 
     void Install_Hooks()

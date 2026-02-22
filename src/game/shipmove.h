@@ -51,4 +51,22 @@ namespace SHIPMOVE {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00437750 });
         fn();
     }
+
+    inline uint32_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star, int16_t dest_star) {
+        using Fn = uint32_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004368e0});
+        return fn(player_idx, start_star, dest_star);
+    }
+
+    inline int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship) {
+        using Fn = int16_t(__cdecl*)(s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00437260});
+        return fn(ship);
+    }
+
+    inline bool __cdecl Can_Order_Ship_(s_ship_data* ship) {
+        using Fn = bool(__cdecl*)(s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004362c0});
+        return fn(ship);
+    }
 }

@@ -22,6 +22,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\advciv.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
+    <ClCompile Include="src\game\aidata.cpp" />
     <ClCompile Include="src\game\aidesign.cpp" />
     <ClCompile Include="src\game\aidudes.cpp" />
     <ClCompile Include="src\game\aimove.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="src\game\aileader.h" />
     <ClInclude Include="src\game\aimove.h" />
     <ClInclude Include="src\game\aipower.h" />
+    <ClInclude Include="src\game\aistage.h" />
     <ClInclude Include="src\game\aitech.h" />
     <ClInclude Include="src\game\allocate.h" />
     <ClInclude Include="src\game\animate.h" />
@@ -253,6 +255,7 @@
     <ClInclude Include="src\game\setvesa.h" />
     <ClInclude Include="src\game\shipmove.h" />
     <ClInclude Include="src\game\ships.h" />
+    <ClInclude Include="src\game\shipstak.h" />
     <ClInclude Include="src\game\smack.h" />
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\special.h" />

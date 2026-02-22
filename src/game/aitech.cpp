@@ -161,7 +161,7 @@ namespace aitech {
     void __cdecl All_AI_Tech_Select_() {
         s_ai_tech_info local_aitech_info;
 
-        aidata::_aitech = &local_aitech_info;
+        AIDATA::_aitech = &local_aitech_info;
         aitech::Compute_AI_Tech_Info_(&local_aitech_info);
 
         for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
@@ -177,6 +177,6 @@ namespace aitech {
             }
         }
 
-        aidata::_aitech = nullptr;
+        AIDATA::_aitech = nullptr;
     }
 }

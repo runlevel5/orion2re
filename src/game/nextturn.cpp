@@ -105,7 +105,7 @@ void __cdecl Next_Turn_Calc_() {
     }
 
     aitech::Apply_Evolutionary_Upgrades_();
-    aidata::Compute_AI_Data_();
+    AIDATA::Compute_AI_Data_();
     DIP_SCRN::Resolve_Delayed_Diplomacy_Orders_();
     DIP_SCRN::Set_Opportunity_Attacks_();
     diplomac::Clear_Diplomacy_Messages_();
@@ -124,7 +124,7 @@ void __cdecl Next_Turn_Calc_() {
     spy::Resolve_Spies_();
     COLCALC::Apply_All_Colony_Changes_();
     COLCALC::Do_Surrenders_();
-    aidata::Deallocate_AI_Data_();
+    AIDATA::Deallocate_AI_Data_();
     COMBFIND::Search_For_Battles_();
     EVENTS::Determine_Event_();
     ERICNET::Do_All_Ships_XP_Check_();
