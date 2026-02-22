@@ -38,11 +38,7 @@ namespace AIDATA {
 
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player);
 
-    inline int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* player) {
-        using Fn = int16_t(__cdecl*)(s_colony*, s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ed7c0});
-        return fn(colony, player);
-    }
+    int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* player);
 
     void __cdecl Compute_Base_Planet_Values_();
 

@@ -31,6 +31,12 @@ namespace GEO {
         return fn(x, y, nebula_index);
     }
 
+    inline void __cdecl Move_Player_1_Turn_To_Star_(int8_t owner, int16_t x, int16_t y, int16_t star_idx, uint16_t speed, int16_t* out_x, int16_t* out_y, uint8_t* nav_buf, uint8_t* out_unk) {
+        using Fn = void(__cdecl*)(int8_t, int16_t, int16_t, int16_t, uint16_t, int16_t*, int16_t*, uint8_t*, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412c30});
+        fn(owner, x, y, star_idx, speed, out_x, out_y, nav_buf, out_unk);
+    }
+
     inline int32_t __cdecl Get_Orbit_From_X_Y_(int32_t x, int32_t y) {
         using Fn = int32_t(__cdecl*)(int32_t, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00413220 });

@@ -10,10 +10,7 @@ namespace BILL {
     void __cdecl Cache_Player_Scientist_Anim_();
     void __cdecl Record_History_();
 
-    inline void __cdecl Copy_File_To_File_(const char* src, const char* dest) {
-        using Fn = void(__cdecl*)(const char*, const char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004077E0})(src, dest);
-    }
+    void __cdecl Copy_File_To_File_(const char* src_path, const char* dst_path);
 
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index);
 
@@ -24,12 +21,7 @@ namespace BILL {
     }
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
-
-    inline void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407080});
-        fn(player_idx, target_idx, n_spies);
-    }
+    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies);
 
     inline void __cdecl Squeeze_Print_(int16_t x, int16_t y, char* text, int16_t limit) {
         using Fn = void(__cdecl*)(int16_t, int16_t, char*, int16_t);
@@ -98,4 +90,9 @@ namespace BILL {
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
     inline const char* s_SR_R_wildcard_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512E0}); // "SR_R?_SC.LBX"
+
+    inline const char* const s_Could_not_open_s = reinterpret_cast<const char*>(std::uintptr_t{0x00551140}); // "Could not open %s"
+    inline const char* const s_Error_copying_s_to_s_bytes_i = reinterpret_cast<const char*>(std::uintptr_t{0x00551154}); // "Error copying %s to %s (bytes: %i)"
+    inline const char* const s_wb = reinterpret_cast<const char*>(std::uintptr_t{0x00551178}); // "wb"
+    inline const char* const s_rb = reinterpret_cast<const char*>(std::uintptr_t{0x0055117c}); // "rb"
 }

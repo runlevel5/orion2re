@@ -25,4 +25,5 @@ namespace AIBUILD {
     }
 
     void __cdecl Compute_Empire_Building_Needs_();
+    int16_t __cdecl Player_War_Level_(int16_t player_idx);
 }

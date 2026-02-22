@@ -39,9 +39,11 @@ namespace antarans {
 
     bool __cdecl Deploy_Antaran_Ships_();
 
-    inline bool __cdecl Antarans_Should_Attack_() {
-        using Fn = bool(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b36e0 });
-        return fn();
-    }
+    int16_t __cdecl Total_Defensive_Force_();
+
+    int16_t __cdecl Antaran_Offensive_Force_();
+
+    int16_t __cdecl Antarans_Defensive_Force_();
+
+    bool __cdecl Antarans_Should_Attack_();
 }

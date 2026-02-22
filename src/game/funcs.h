@@ -531,3 +531,9 @@ inline void __cdecl Main_Council_Screen_() {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7f50});
     fn();
 }
+
+inline void __cdecl Find_Opportunity_Attack_Aux_(int16_t plr1, int16_t plr2, int16_t val, int16_t star_idx, int16_t* planet_idx, int16_t* unknown, int32_t* aux_info) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465e80});
+    fn(plr1, plr2, val, star_idx, planet_idx, unknown, aux_info);
+}

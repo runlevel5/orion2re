@@ -127,7 +127,7 @@ namespace antarans {
                 MOX::_antarans.resource_defensive += off_inc;
             } else {
                 // Otherwise, defensive resource gains its corresponding bonus
-                MOX::_antarans.field0_0x0 += off_inc;
+                MOX::_antarans.attack_pressure += off_inc;
             }
         }
     }
@@ -314,12 +314,31 @@ namespace antarans {
         Build_Antaran_Defensive_Ships_();
 
         if (Antarans_Should_Attack_()) {
-            MOX::_antarans.field0_0x0 = 0;
+            MOX::_antarans.attack_pressure = 0;
 
             if (Deploy_Antaran_Ships_()) {
                 MOX::_antarans.invasion_stardate = (int)MOX::_stardate;
             }
         }
+    }
+
+    int16_t __cdecl Antarans_Defensive_Force_() {
+        int16_t total_force = 0;
+        for (int32_t i = 0; i < 9; ++i) {
+            total_force += (int16_t)(MOX::_antarans.defensive_ships[i] * (uint16_t)(uint8_t)_antaran_ship_cost[i]);
+        }
+        return total_force;
+    }
+
+    int16_t __cdecl Total_Defensive_Force_() {
+        int16_t total_force;
+
+        total_force = Antarans_Defensive_Force_();
+        total_force += Antaran_Offensive_Force_();
+        total_force += MOX::_antarans.resource_offensive;
+        total_force += MOX::_antarans.resource_defensive;
+
+        return total_force;
     }
 
     bool __cdecl Deploy_Antaran_Ships_() {
@@ -393,5 +412,56 @@ namespace antarans {
         }
 
         return true;
+    }
+
+    int16_t __cdecl Antaran_Offensive_Force_() {
+        int16_t total_force = 0;
+
+        for (int i = 0; i < 9; ++i) {
+            // Ship cost is treated as an unsigned byte value (0-255) in the calculation.
+            uint8_t ship_cost = static_cast<uint8_t>(_antaran_ship_cost[i]);
+            int16_t ship_count = MOX::_antarans.offensive_ships[i];
+
+            total_force += (int16_t)(ship_count * ship_cost);
+        }
+
+        return total_force;
+    }
+
+    bool __cdecl Antarans_Should_Attack_() {
+        Delta_Stardate_();
+
+        bool should_attack = false;
+
+        int16_t defensive_force = Total_Defensive_Force_();
+        int16_t offensive_force = Antaran_Offensive_Force_();
+
+        // Offensive force must be at least 1/4 of defensive force to consider an attack
+        if ((int32_t)offensive_force * 4 < (int32_t)defensive_force) {
+            return false;
+        }
+
+        bool has_undeployed_ships = false;
+        for (int i = 0; i < 9; ++i) {
+            if (MOX::_antarans.offensive_ships[i] > MOX::_antarans.offensive_deployed[i]) {
+                has_undeployed_ships = true;
+                break;
+            }
+        }
+
+        // If Antarans have ships that aren't already deployed elsewhere, build up pressure
+        if (has_undeployed_ships) {
+            MOX::_antarans.attack_pressure++;
+        }
+
+        // If there's built-up pressure, perform a random check to decide on the attack
+        if (MOX::_antarans.attack_pressure > 0) {
+            int16_t random_val = (int16_t)random::Random_(200) - 1;
+            if ((int32_t)MOX::_antarans.attack_pressure + 1 > (int32_t)random_val) {
+                should_attack = true;
+            }
+        }
+
+        return should_attack;
     }
 }

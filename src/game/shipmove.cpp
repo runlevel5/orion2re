@@ -227,4 +227,208 @@ namespace SHIPMOVE {
 
         return false;
     }
+
+    /**
+     * Determines if a ship can receive orders, based on its status and player's communications technology.
+     * @param ship The ship to check.
+     * @return True if the ship can be ordered.
+     */
+    /**
+     * @address 00436b40
+     */
+    bool __cdecl Ship_Is_Moving_(s_ship_data* ship) {
+        if (ship->status >= 1 && ship->status <= 2) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Determines if a ship can receive orders, based on its status and player's communications technology.
+     * @param ship The ship to check.
+     * @return True if the ship can be ordered.
+     */
+    bool __cdecl Can_Order_Ship_(s_ship_data* ship) {
+        if (ship->owner < 0 || ship->owner >= (int32_t)MOX::_NUM_PLAYERS) {
+            return false;
+        }
+
+        if (ship->status == 0 || ship->status == 2) {
+            return true;
+        }
+
+        if (ship->status != 1) {
+            return false;
+        }
+
+        s_player* player = &MOX::_player[(uint8_t)ship->owner];
+
+        // Check for Hyperspace Communications
+        if (player->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
+            return true;
+        }
+
+        // Check if player has simpler comms tech and is near a relay
+        if (player->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3 ||
+            player->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
+            
+            uint8_t player_mask = 1 << (ship->owner & 0x1F);
+            
+            for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+                s_star_data* star = &MOX::_star[i];
+                int dist = GEO::Parsecs_Between_Points_(star->x, star->y, ship->x, ship->y);
+
+                if (dist <= 5) {
+                    if (star->has_subspace & player_mask) {
+                        return true;
+                    }
+                    if (dist <= 2) {
+                        if (star->has_tachyon & player_mask) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @address 00437260
+     */
+    int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship) {
+        int16_t location = ship->location;
+
+        if (ship->status == 1) {
+            return location - 500;
+        }
+
+        if (ship->status == 2) {
+            return location - 1000;
+        }
+
+        return location;
+    }
+
+    /**
+     * @address 00436e30
+     */
+    int32_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y) {
+        int16_t i;
+
+        // Search for an available ship slot
+        for (i = 0; i < 500; ++i) {
+            if (MOX::_ship[i].owner == 8) {
+                // Slot is free if status is 5 or it's beyond the current total count
+                if (MOX::_ship[i].status == 5 || i >= (int16_t)MOX::_NUM_SHIPS) {
+                    break;
+                }
+            }
+        }
+
+        if (i == 500) {
+            return -1;
+        }
+
+        if (i >= (int16_t)MOX::_NUM_SHIPS) {
+            MOX::_NUM_SHIPS = i + 1;
+        }
+
+        // Initialize ship slot
+        memset(&MOX::_ship[i], 0, sizeof(s_ship_data));
+
+        if (design != nullptr) {
+            memcpy(&MOX::_ship[i].d, design, sizeof(s_ship_design));
+        }
+
+        MOX::_ship[i].owner = (char)owner;
+        MOX::_ship[i].d.previous_owner = (char)owner;
+        MOX::_ship[i].status = 0;
+
+        // Set orbital position and coordinates
+        MOX::_ship[i].location = HAROLD::XY_To_Star_Id_(x, y);
+        MOX::_ship[i].x = x;
+        MOX::_ship[i].y = y;
+
+        MOX::_ship[i].officer_index = -1;
+        MOX::_ship[i].d.date_of_design = (uint16_t)MOX::_stardate;
+
+        return (int32_t)i;
+    }
+
+    /**
+     * @address 00436b60
+     */
+    void __cdecl Move_All_Ships_Toward_Stars_() {
+        uint8_t local_8;
+        uint8_t local_7;
+
+        if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
+            for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+                MOX::_star[i].just_visited = 0;
+            }
+        }
+
+        for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+
+            if (Ship_Is_Moving_(ship)) {
+                if (ship->location >= 1000) {
+                    ship->location -= 500;
+                }
+
+                int16_t star_idx = ship->location - 500;
+                int16_t star_x = MOX::_star[star_idx].x;
+                int16_t star_y = MOX::_star[star_idx].y;
+
+                if (ship->travelling_speed == (int8_t)0xFF) {
+                    ship->x = star_x;
+                    ship->y = star_y;
+                } else {
+                    GEO::Move_Player_1_Turn_To_Star_(
+                        ship->owner,
+                        ship->x,
+                        ship->y,
+                        star_idx,
+                        (uint16_t)(uint8_t)ship->travelling_speed,
+                        &ship->x,
+                        &ship->y,
+                        (ship->group_has_navigator == 0) ? &local_8 : nullptr,
+                        &local_7
+                    );
+                }
+
+                ship->turns_left--;
+
+                if (ship->x == star_x && ship->y == star_y) {
+                    Make_Ship_Arrive_At_Star_(ship, star_idx);
+                } else {
+                    ship->status = 1;
+                }
+            } else {
+                ship->mission = 0;
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+    }
+
+    /**
+     * @address 00437750
+     */
+    void __cdecl Unmark_Just_Built_AI_Ships_() {
+        int32_t num_ships = static_cast<int32_t>(MOX::_NUM_SHIPS);
+        s_ship_data* ship_array = MOX::_ship;
+
+        for (int32_t i = 0; i < num_ships; ++i) {
+            s_ship_data& ship = ship_array[i];
+
+            // AI players (owner 0-7) who aren't the primary human player (objectives != 100)
+            // have their just_built flag cleared.
+            if (ship.owner < 8 && MOX::_player[static_cast<int32_t>(ship.owner)].objectives != 100) {
+                ship.just_built = 0;
+            }
+        }
+    }
 }

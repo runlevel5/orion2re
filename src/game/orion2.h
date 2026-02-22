@@ -136,6 +136,13 @@ struct s_adv_planet_worth {
     undefined field73_0x78;
 };
 
+typedef struct s_ai_colonizable_planet s_ai_colonizable_planet, *Ps_ai_colonizable_planet;
+
+struct s_ai_colonizable_planet {
+    short planet_idx;
+    int contextual_value;
+};
+
 typedef struct s_ai_colony_info s_ai_colony_info, *Ps_ai_colony_info;
 
 struct s_ai_colony_info {
@@ -218,7 +225,7 @@ struct s_ai_star_player_block {
     int8_t neutral_count;
     int8_t alliance_count;
     int8_t out_of_range_count;
-    undefined field4_0x4;
+    undefined1 nearest_eta; /* Created by Rename Structure Field action */
     int8_t enemy_enroute_or_threat;
 };
 
@@ -306,7 +313,7 @@ struct s_animation_header {
 typedef struct s_antaran s_antaran, *Ps_antaran;
 
 struct s_antaran {
-    short field0_0x0;
+    short attack_pressure;
     short resource_offensive;
     short resource_defensive;
     short defensive_ships[9];

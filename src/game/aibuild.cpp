@@ -21,6 +21,39 @@ namespace AIBUILD {
         return (int16_t)refit_cost;
     }
 
+    /**
+     * Calculates the highest aggressive treaty status level for a given player 
+     * based on their diplomatic relationships with all other players they have contact with.
+     */
+    int16_t __cdecl Player_War_Level_(int16_t player_idx) {
+        int16_t max_war_level = 0;
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            // Skip self and ensure contact has been established
+            if (player_idx != i && MOX::_player[player_idx].contact[i] != 0) {
+                int8_t treaty_type = MOX::_player[player_idx].treaty[i];
+
+                if (treaty_type == 4 /* War */) {
+                    if (max_war_level < 1) {
+                        max_war_level = 1;
+                    }
+                }
+                else if (treaty_type == 5 /* Aggression */) {
+                    if (max_war_level < 2) {
+                        max_war_level = 2;
+                    }
+                }
+                else if (treaty_type == 6 /* Truce */) {
+                    if (max_war_level < 3) {
+                        max_war_level = 3;
+                    }
+                }
+            }
+        }
+
+        return max_war_level;
+    }
+
     void __cdecl Compute_Empire_Building_Needs_() {
         MOX::Mox_Update_();
 

@@ -947,6 +947,72 @@ namespace AIDATA {
         }
     }
 
+    /**
+     * Calculates the "proximity worth" value of a colony for a specific player.
+     * This logic accounts for difficulty settings, alien management centers,
+     * and strategic range to existing colonies.
+     */
+    int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* target_player) {
+        if (MOX::_settings.game_difficulty == 0) {
+            return 0;
+        }
+
+        int8_t owner_idx = colony->owner;
+        s_player* owner_ptr = &MOX::_player[owner_idx];
+
+        // Check for Alien Management Center tech
+        if (owner_ptr->tech_applications[TECH_APP_ALIEN_MANAGEMENT_CENTER] == 3) {
+            return 0;
+        }
+
+        int16_t ship_range = owner_ptr->ship_range;
+        int16_t colony_star_idx = MOX::_planet[colony->planet].star_index;
+        int target_player_idx = (target_player - MOX::_player);
+
+        int16_t total_worth = 0;
+
+        if (target_player_idx == owner_idx) {
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                if (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                    if (Star_In_Range_Of_Given_Star_(i, colony_star_idx, ship_range)) {
+                        uint8_t has_colony_mask = MOX::_star[i].has_colony;
+                        bool other_players_present = (has_colony_mask & ~(1 << owner_idx)) != 0;
+
+                        // Score is 120 if others are present, 80 otherwise
+                        int score = other_players_present ? 120 : 80;
+                        int eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
+
+                        if (eta != 0) {
+                            total_worth += (short)(score / eta);
+                        }
+                    }
+                }
+            }
+        } else {
+            uint32_t min_eta = 10000;
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                if (Star_In_Range_Of_Given_Star_(i, colony_star_idx, ship_range)) {
+                    // Check if target player has a colony at star i
+                    if (MOX::_star[i].has_colony & (1 << target_player_idx)) {
+                        int eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
+                        if (eta != 0) {
+                            total_worth += (short)(100 / eta);
+                            if ((uint32_t)eta < min_eta) {
+                                min_eta = eta;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (total_worth != 0 && min_eta != 0) {
+                total_worth += (short)(400 / min_eta);
+            }
+        }
+
+        return total_worth;
+    }
+
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player) {
         int target_player_idx = (target_player - MOX::_player);
         s_planet_data* planet = &MOX::_planet[colony->planet];
