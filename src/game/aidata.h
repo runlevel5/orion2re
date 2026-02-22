@@ -1,7 +1,7 @@
 #pragma once
 
 namespace AIDATA {
-    inline int16_t(&_g_base_planet_values)[8][360] = *reinterpret_cast<int16_t(*)[8][360]>(std::uintptr_t{ 0x0056ed28 });
+    inline uint16_t(&_g_base_planet_values)[8][360] = *reinterpret_cast<uint16_t(*)[8][360]>(std::uintptr_t{ 0x0056ed28 });
     inline int16_t(*&_ship_strengths)[500][8] = *reinterpret_cast<int16_t(**)[500][8]>(std::uintptr_t{ 0x005953D4 });
     inline int16_t(*&_ship_strengths_in_nebula)[500][8] = *reinterpret_cast<int16_t(**)[500][8]>(std::uintptr_t{ 0x005953AC });
     inline int32_t(*&_ship_bomb_strengths)[500][2] = *reinterpret_cast<int32_t(**)[500][2]>(std::uintptr_t{ 0x005953D8 });
@@ -27,38 +27,28 @@ namespace AIDATA {
     inline s_ai_tech_info*& _aitech = *reinterpret_cast<s_ai_tech_info**>(std::uintptr_t{ 0x005953CC });
     inline s_ai_refit_player(*&_airefit)[8] = *reinterpret_cast<s_ai_refit_player(**)[8]>(std::uintptr_t{ 0x005953A4 });
     inline int32_t(*&_ship_refit_desirabilities)[500] = *reinterpret_cast<int32_t(**)[500]>(std::uintptr_t{ 0x005953C4 });
-    inline int16_t(*&_base_planet_values)[8][360] = *reinterpret_cast<int16_t(**)[8][360]>(std::uintptr_t{ 0x0055A6B4 });
+    inline uint16_t(*&_base_planet_values)[8][360] = *reinterpret_cast<uint16_t(**)[8][360]>(std::uintptr_t{ 0x0055A6B4 });
+    inline int16_t (*&_g_contextual_planet_values)[2880] =
+        *reinterpret_cast<int16_t (**)[2880]>(std::uintptr_t{0x0055A6B8});
     inline uint16_t& _n_all_ships = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005953E0 });
 
-    inline int16_t __cdecl Colony_Dominant_Player_(char* owner) {
-        using Fn = int16_t(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004efb70});
-        return fn(owner);
+    int16_t __cdecl Colony_Dominant_Player_(s_colony* colony);
+
+    void __cdecl Compute_Star_Player_Range_Info_();
+
+    int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player);
+
+    inline int16_t __cdecl Proximity_Worth_To_Player_(s_colony* colony, s_player* player) {
+        using Fn = int16_t(__cdecl*)(s_colony*, s_player*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ed7c0});
+        return fn(colony, player);
     }
 
-    inline void __cdecl Compute_Star_Player_Range_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0230});
-        fn();
-    }
+    void __cdecl Compute_Base_Planet_Values_();
 
-    inline void __cdecl Compute_Base_Planet_Values_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004efc30});
-        fn();
-    }
+    void __cdecl Compute_Contextual_Planet_Values_();
 
-    inline void __cdecl Compute_Contextual_Planet_Values_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004efd60});
-        fn();
-    }
-
-    inline int32_t __cdecl Refit_Desirability_(s_ship_data* ship) {
-        using Fn = int32_t(__cdecl*)(s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0070});
-        return fn(ship);
-    }
+    int32_t __cdecl Refit_Desirability_(s_ship_data* ship);
 
     inline short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player_idx, int16_t star1, int16_t star2, int16_t* inter_ptr, bool fast) {
         using Fn = short(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, bool);
@@ -66,21 +56,13 @@ namespace AIDATA {
         return fn(player_idx, star1, star2, inter_ptr, fast);
     }
 
-    inline int __cdecl airefit_cmp_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004eda10 })(a, b);
-    }
+    int __cdecl airefit_cmp_(const void* a, const void* b);
 
-    inline int __cdecl sort_ships_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004effa0 })(a, b);
-    }
+    int __cdecl sort_ships_(const void* a, const void* b);
 
-    inline void __cdecl Deallocate_AI_Data_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004f05a0 });
-        fn();
-    }
+    void __cdecl Deallocate_AI_Data_();
 
+    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range);
     void __cdecl Compute_AI_Data_();
+    void __cdecl Find_Players_In_Range_(int16_t star_idx, int8_t* in_range_900, int8_t* in_range_2025);
 }

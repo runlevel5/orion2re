@@ -97,11 +97,16 @@ workflows:
              behavior, and memory accesses.
           * You must decompile and output whole function. You are NOT allowed to remove portions of the function from
             the output.
-          * Avoid large refactors and global optimizations. Keep code as close to the original as possible outside of
-            subtle cleanups and tactical optimizations.
+          * You are not allowed to refactor or optimize the code. Keep code as close to the original as possible outside of
+            subtle cleanups.
           * Cleanup:
             - You are allowed to rename internal variables.
-            - You are allowed to remove superfluous variables, control logic, loops, etc.
+            - You are allowed to remove superfluous variables.
+            - You are allowed to convert explicit loops into equivalent C constructs, such as for loops.
+            - You are NOT allowed to remove code that apparently does nothing. If it exists, there must be a reason. You
+              are allowed to provide a comment explaining that the code seems to be no-op, but you still have to emit the
+              code.
+            - You are not allowed to emit `goto` statements.
             - You are NOT allowed to change or reorder switch/case statements or important if branches.
             - Generated code should resemble code written by a developer and not look like it was decompiled,
                but the execution flow should be as close to original code as possible.
@@ -275,6 +280,11 @@ workflows:
             - A symbolic name for the value was provided in the input
             - A potential bug was identified
             - A complicated piece of logic was detected - add at most single line comment
+
+          # Check list
+          * You provided all the stubs into correct namespaces
+          * You provided main decompiled function
+          * All provided types match the input exactly
         outcomes:
           - name: done
       - name: apply

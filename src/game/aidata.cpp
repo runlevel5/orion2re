@@ -2,6 +2,135 @@
 
 namespace AIDATA {
 
+    int16_t __cdecl Colony_Dominant_Player_(s_colony* colony) {
+        uint8_t player_counts[8] = { 0 };
+        int total_pops = 0;
+
+        if (colony->n_pops != 0) {
+            for (int i = 0; i < (int)colony->n_pops; ++i) {
+                uint32_t player_id = colony->pop[i] & 0x0F;
+                if (player_id < 8) {
+                    total_pops++;
+                    player_counts[player_id]++;
+                }
+            }
+        }
+
+        int max_player = (int)MOX::_NUM_PLAYERS - 1;
+        int i = 0;
+        if (max_player > 0) {
+            do {
+                if (player_counts[i] > player_counts[max_player]) {
+                    max_player = i;
+                }
+                i++;
+            } while (i < max_player);
+        }
+
+        uint8_t max_count = player_counts[max_player];
+
+        if (max_count * 2 > total_pops) {
+            return (int16_t)max_player;
+        }
+
+        int16_t current_owner = (int16_t)colony->owner;
+        uint8_t owner_count = player_counts[current_owner];
+
+        if (owner_count * 3 <= total_pops && max_count != 0 && owner_count != max_count) {
+            return (int16_t)max_player;
+        }
+
+        return current_owner;
+    }
+
+    bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range) {
+        bool in_range = false;
+
+        // Check direct distance
+        int distance = GEO::Parsecs_Between_Stars_(source_star_idx, target_star_idx);
+        if (distance <= max_range) {
+            return true;
+        }
+
+        // Check distance via wormhole if available
+        int8_t wormhole_id = MOX::_star[source_star_idx].wormhole_star_id;
+        if (wormhole_id != -1) {
+            distance = GEO::Parsecs_Between_Stars_(static_cast<int16_t>(wormhole_id), target_star_idx);
+            if (distance <= max_range) {
+                in_range = true;
+            }
+        }
+
+        return in_range;
+    }
+
+    int32_t __cdecl Refit_Desirability_(s_ship_data* ship) {
+        int32_t desirability = 0;
+        int owner = (int)ship->owner;
+
+        if ((int)ship->d.previous_owner != owner) {
+            return 0;
+        }
+
+        s_ai_tech_info_player* ai_tech = &AIDATA::_aitech->players[owner];
+
+        // Evaluate core defensive and utility systems
+        if (ai_tech->best_shield > ship->d.shield_type) {
+            desirability += (ai_tech->best_shield - ship->d.shield_type) * 10;
+        }
+
+        if (ai_tech->best_computer > ship->d.computer_type) {
+            desirability += (ai_tech->best_computer - ship->d.computer_type) * 7;
+        }
+
+        if (ai_tech->best_armor > ship->d.armor_type) {
+            desirability += (ai_tech->best_armor - ship->d.armor_type) * 5;
+        }
+
+        uint8_t best_beam_cost = 0;
+        uint8_t best_missile_cost = 0;
+
+        for (int i = 0; i < 8; ++i) {
+            int weapon_type = (int)ship->d.ship_weapon[i].type;
+            if (weapon_type != 0) {
+                uint16_t app_id = TECHDATA::_weapons[weapon_type].tech_application_id;
+                uint16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
+                uint8_t normalized_cost = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
+
+                int8_t rack = TECHDATA::_weapons[weapon_type].rack;
+                if (rack == 0 /* RACK_BEAM */) {
+                    if (normalized_cost > best_beam_cost) {
+                        best_beam_cost = normalized_cost;
+                    }
+                } else if (rack == 1 /* RACK_MISSILE */ || rack == 2 /* RACK_TORPEDO */) {
+                    if (normalized_cost > best_missile_cost) {
+                        best_missile_cost = normalized_cost;
+                    }
+                }
+            }
+        }
+
+        // Evaluate weapon upgrades
+        if (best_beam_cost != 0 && ai_tech->best_weapon1 > best_beam_cost) {
+            desirability += (ai_tech->best_weapon1 - best_beam_cost) * 8;
+        }
+
+        if (best_missile_cost != 0 && ai_tech->best_weapon2 > best_missile_cost) {
+            desirability += (ai_tech->best_weapon2 - best_missile_cost) * 6;
+        }
+
+        // Small hulls check against standard designs
+        if (desirability != 0 && ship->d.size < 5) {
+            s_ship_design* standard_design = &MOX::_player[owner].ship_designs[(int)ship->d.size];
+            // Compare the design contents excluding the owner field at offset 0x63
+            if (memcmp(&ship->d, standard_design, 99 /* sizeof(s_ship_design) */) == 0) {
+                return 0;
+            }
+        }
+
+        return desirability;
+    }
+
     void Compute_AI_Data_() {
         RUSS::Assert_Settings_();
         allocate::Push_Block_(MOX::_screen_seg);
@@ -209,7 +338,7 @@ namespace AIDATA {
                         ai_col.n_flagged_pops++;
                     }
                 }
-                ai_col.race = (int8_t)Colony_Dominant_Player_(&col.owner);
+                ai_col.race = (int8_t)Colony_Dominant_Player_(&col);
                 ai_col.pop_limit = (int8_t)COLCALC::Colony_Race_Pop_Limit_(&col, (int16_t)ai_col.race);
                 if (MOX::_player[ai_col.race].traits[TRAIT_EATS_MINERALS] == 0 || MOX::_player[col.owner].traits[TRAIT_EATS_MINERALS] == 0) {
                     ai_col.trait_eats_minerals = 1;
@@ -526,5 +655,410 @@ namespace AIDATA {
         for (int s = 0; s < MOX::_NUM_STARS; ++s) {
             MOX::_star[s].just_visited = 0;
         }
+    }
+
+    void __cdecl Compute_Star_Player_Range_Info_() {
+        if (MOX::_NUM_STARS <= 0) {
+            return;
+        }
+
+        for (int star_idx = 0; star_idx < (int)MOX::_NUM_STARS; ++star_idx) {
+            s_ai_star_info& ai_info = (*_ai_star_info)[star_idx];
+
+            // Evaluate colony owner ship range threats to this star
+            for (int colony_idx = 0; colony_idx < (int)MOX::_NUM_COLONIES; ++colony_idx) {
+                s_colony& col = MOX::_colony[colony_idx];
+                int8_t owner = col.owner;
+
+                if (owner != -1) {
+                    short col_star_idx = MOX::_planet[col.planet].star_index;
+                    int ship_range = (int)MOX::_player[owner].ship_range;
+
+                    if (Star_In_Range_Of_Given_Star_((short)star_idx, col_star_idx, ship_range)) {
+                        ai_info.per_player[owner].enemy_enroute_or_threat++;
+                    }
+                }
+            }
+
+            int8_t in_range[8];
+            int8_t out_of_range[8];
+            Find_Players_In_Range_((short)star_idx, in_range, out_of_range);
+
+            for (int player_idx = 0; player_idx < (int)MOX::_NUM_PLAYERS; ++player_idx) {
+                // If this player has a colony in the current star system
+                if ((MOX::_star[star_idx].has_colony >> player_idx) & 1) {
+                    s_player& plr = MOX::_player[player_idx];
+                    s_ai_star_player_block& block = ai_info.per_player[player_idx];
+
+                    for (int other_idx = 0; other_idx < (int)MOX::_NUM_PLAYERS; ++other_idx) {
+                        if (player_idx == other_idx) {
+                            continue;
+                        }
+                        if (MOX::_player[other_idx].eliminated) {
+                            continue;
+                        }
+
+                        if (in_range[other_idx]) {
+                            int8_t treaty = plr.treaty[other_idx];
+                            switch (treaty) {
+                                case 0: /* Neutral/None */
+                                    block.neutral_count++;
+                                    break;
+                                case 1: /* War */
+                                case 2: /* Armistice */
+                                case 3:
+                                    block.war_count++;
+                                    break;
+                                case 4: /* Alliance */
+                                case 5:
+                                case 6:
+                                    block.alliance_count++;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else if (out_of_range[other_idx]) {
+                            block.out_of_range_count++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Find_Players_In_Range_(int16_t star_idx, int8_t* in_range_900, int8_t* in_range_2025) {
+        auto& target_star = MOX::_star[star_idx];
+        int32_t target_x = target_star.x;
+        int32_t target_y = target_star.y;
+
+        // Initialize flag arrays (8 players)
+        memset(in_range_900, 0, 8);
+        memset(in_range_2025, 0, 8);
+
+        int32_t max_range_sq_900[8];
+        int32_t max_range_sq_2025[8];
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            int32_t range = MOX::_player[i].ship_range;
+            int32_t range_sq = range * range;
+
+            // Primary range: 30 cells (30^2 = 900)
+            max_range_sq_900[i] = range_sq * 900;
+            // Extended range: 45 cells (45^2 = 2025)
+            max_range_sq_2025[i] = range_sq * 2025;
+        }
+
+        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            auto& colony = MOX::_colony[i];
+            int8_t owner = colony.owner;
+
+            // If player has no colony here or is already marked as 'in range', skip
+            if (owner != -1 && in_range_900[owner] == 0) {
+                auto& planet = MOX::_planet[colony.planet];
+                auto& colony_star = MOX::_star[planet.star_index];
+
+                int32_t dx = (int32_t)colony_star.x - target_x;
+                int32_t dy = (int32_t)colony_star.y - target_y;
+                int32_t dist_sq = dx * dx + dy * dy;
+
+                if (dist_sq <= max_range_sq_2025[owner]) {
+                    in_range_2025[owner] = 1;
+                    if (dist_sq <= max_range_sq_900[owner]) {
+                        in_range_900[owner] = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    int __cdecl airefit_cmp_(const void* a, const void* b) {
+        int32_t val_1 = *reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(a) + 2);
+        int32_t val_2 = *reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(b) + 2);
+
+        return val_1 - val_2;
+    }
+
+    int __cdecl sort_ships_(const void* a, const void* b) {
+        int16_t idx1 = *static_cast<const int16_t*>(a);
+        int16_t idx2 = *static_cast<const int16_t*>(b);
+
+        s_ship_data& ship1 = MOX::_ship[idx1];
+        s_ship_data& ship2 = MOX::_ship[idx2];
+
+        // Sort by owner
+        if (ship1.owner < ship2.owner) {
+            return -1;
+        }
+        if (ship1.owner > ship2.owner) {
+            return 1;
+        }
+
+        // Sort by location
+        int16_t loc1 = ship1.location;
+        int16_t loc2 = ship2.location;
+
+        if (loc2 > loc1) {
+            if (loc1 < 0x48 /* 72 - Threshold for star systems vs deep space */) {
+                return -1;
+            }
+        } else if (loc2 < loc1) {
+            if (loc2 < 0x48) {
+                return 1;
+            }
+        }
+
+        // If both ships are in the same system index (below 72), they are considered equal in location
+        if (loc1 < 0x48 && loc2 < 0x48) {
+            return 0;
+        }
+
+        // Sort by coordinates (ascending)
+        if (ship1.x < ship2.x) {
+            return -1;
+        }
+        if (ship1.x > ship2.x) {
+            return 1;
+        }
+
+        if (ship1.y < ship2.y) {
+            return -1;
+        }
+        if (ship1.y > ship2.y) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Compute_Base_Planet_Values_() {
+        memset(*_base_planet_values, 0, sizeof(int16_t) * 8 * 360);
+
+        if (MOX::_NUM_PLAYERS <= 0) {
+            return;
+        }
+
+        for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
+            for (int16_t planet_idx = 0; planet_idx < (int16_t)MOX::_planet_count; ++planet_idx) {
+                s_planet_data* planet = &MOX::_planet[planet_idx];
+
+                uint8_t system_visibility_bits = (*_star_in_extended_range_of_player)[planet->star_index];
+
+                if ((system_visibility_bits >> (player_idx & 0x1F)) & 1) {
+                    int16_t col_idx = planet->colony_index;
+
+                    MOX::Mox_Update_();
+
+                    uint16_t value;
+                    if (col_idx == -1) {
+                        value = ADVCIV::Uncolonized_Planet_Worth_To_Player_(planet, &MOX::_player[player_idx]);
+                    } else {
+                        value = Colony_Worth_To_Player_(&MOX::_colony[col_idx], &MOX::_player[player_idx]);
+                    }
+
+                    (*_base_planet_values)[player_idx][planet_idx] = value;
+                }
+            }
+        }
+    }
+
+    void __cdecl Deallocate_AI_Data_() {
+        RUSS::Assert_Settings_();
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    /**
+     * Computes the "contextual" value of planets for each player, adjusting the base
+     * values based on ownership of other planets in the same star system.
+     */
+    void __cdecl Compute_Contextual_Planet_Values_() {
+        // Clear all contextual values for all players (8 players * 360 planets)
+        memset(*AIDATA::_g_contextual_planet_values, 0, 8 * 360 * sizeof(int16_t));
+
+        if (MOX::_NUM_PLAYERS <= 0) {
+            return;
+        }
+
+        for (int p = 0; p < (int)MOX::_NUM_PLAYERS; ++p) {
+            for (int i = 0; i < (int)MOX::_planet_count; ++i) {
+                int16_t base_val = (*AIDATA::_base_planet_values)[p][i];
+                if (base_val <= 0) {
+                    continue;
+                }
+
+                s_planet_data* planet = &MOX::_planet[i];
+                s_star_data* star = &MOX::_star[(uint8_t)planet->star_index];
+
+                // Refresh UI/input during processing
+                MOX::Mox_Update_();
+
+                int16_t& contextual_val = (*AIDATA::_g_contextual_planet_values)[p * 360 + i];
+                contextual_val = base_val;
+
+                int uncolonized_system_base_sum = 0;
+                int owned_system_base_sum = 0;
+                int owned_colonies_in_system = 0;
+                int enemy_colonies_in_system = 0;
+
+                // Examine all potential planets in the system (up to 5)
+                for (int k = 0; k < 5; ++k) {
+                    int16_t sys_planet_idx = star->planet_index[k];
+
+                    if (sys_planet_idx == -1 || sys_planet_idx == i) {
+                        continue;
+                    }
+
+                    int16_t colony_idx = MOX::_planet[sys_planet_idx].colony_index;
+
+                    if (colony_idx == -1) {
+                        // Uncolonized planet in system
+                        uncolonized_system_base_sum += (*AIDATA::_base_planet_values)[p][sys_planet_idx];
+                    } else {
+                        if (MOX::_colony[colony_idx].owner == p) {
+                            // Colony owned by the current player
+                            owned_colonies_in_system++;
+                            owned_system_base_sum += (*AIDATA::_base_planet_values)[p][sys_planet_idx];
+                        } else {
+                            // Colony owned by an enemy
+                            enemy_colonies_in_system++;
+                        }
+                    }
+                }
+
+                if (planet->colony_index == -1) {
+                    // Current planet is not yet colonized
+                    if (owned_colonies_in_system > 0) {
+                        // Bonus if we already have a presence in the system
+                        contextual_val = (int16_t)((contextual_val * (planet->size + 1)) / 10);
+                    } else {
+                        // Small bonus for general system potential
+                        contextual_val += (int16_t)(uncolonized_system_base_sum / 8);
+                    }
+
+                    // Penalize value if enemies are present
+                    if (enemy_colonies_in_system > 0) {
+                        contextual_val = (int16_t)(contextual_val / (enemy_colonies_in_system + 2));
+                    }
+                } else {
+                    // Current planet is already colonized; add value of neighboring potential
+                    contextual_val += (int16_t)(uncolonized_system_base_sum / 8);
+                    contextual_val += (int16_t)(owned_system_base_sum / 4);
+                }
+            }
+        }
+    }
+
+    int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player) {
+        int target_player_idx = (target_player - MOX::_player);
+        s_planet_data* planet = &MOX::_planet[colony->planet];
+        int colony_idx = (colony - MOX::_colony);
+        int colony_race = (*AIDATA::_ai_colony_info)[colony_idx].race;
+        s_player* race_player = &MOX::_player[colony_race];
+
+        int max_pop_race = COLCALC::Planet_Max_Population_For_Player_(planet, (int16_t)colony_race);
+        int max_pop_target = COLCALC::Planet_Max_Population_For_Player_(planet, (int16_t)target_player_idx);
+        int avg_max_pop = (max_pop_target + max_pop_race + 1) / 2;
+
+        bool is_hostile = (planet->climate == PLANET_CLIMATE_TOXIC || planet->climate == PLANET_CLIMATE_RADIATED);
+
+        if (colony->outpost_flag != 0) {
+            return AIDATA::Proximity_Worth_To_Player_(colony, target_player);
+        }
+
+        int food_base = COLCALC::Colony_Empire_Base_Food2_Produced_(colony, (int16_t)target_player_idx, (int16_t)colony_race, nullptr);
+        int food = food_base / 2;
+        int industry = COLCALC::Colony_Empire_Base_Industry_Produced_(colony, (uint16_t)target_player_idx, (int16_t)colony_race, nullptr);
+        int research = COLCALC::Colony_Empire_Base_Research_Produced_(colony, (int16_t)target_player_idx, (int16_t)colony_race, nullptr);
+
+        int prod_mult;
+        if (race_player->traits[TRAIT_EATS_MINERALS] != 0) {
+            prod_mult = (industry + research) * 6;
+        } else if (race_player->traits[TRAIT_CYBERNETIC] != 0) {
+            prod_mult = (industry + research + food_base / 2) * 4;
+        } else {
+            prod_mult = (research + food * 2 + industry) * 3;
+        }
+
+        int growth_trait = target_player->traits[TRAIT_POP_GROWTH_BONUS];
+        int growth_mult;
+        switch (growth_trait) {
+            case 50:
+                growth_mult = (colony->n_pops * 19 + avg_max_pop) * 5;
+                break;
+            case 100:
+                growth_mult = (colony->n_pops * 9 + avg_max_pop) * 10;
+                break;
+            case 0:
+                growth_mult = colony->n_pops * 85 + avg_max_pop * 15;
+                break;
+            case -50:
+                growth_mult = (avg_max_pop + colony->n_pops * 4) * 20;
+                break;
+            default:
+                growth_mult = max_pop_target;
+                break;
+        }
+
+        int worth = (avg_max_pop - colony->n_pops + 100) * growth_mult * prod_mult / 100;
+
+        if (!is_hostile || race_player->traits[12 /* TRAIT_ENVIRONMENT_IMMUNE */] != 0) {
+            int climate_modifier = COLCALC::_climate_maintenance_modifiers[(int)planet->climate] >> 2;
+            worth = worth * (100 - climate_modifier) / 100;
+        }
+
+        if (is_hostile) {
+            worth = (worth * 3) / 4;
+        }
+
+        if (target_player_idx != colony->owner || colony->buildings[BUILDING_GRAVITY_GENERATOR] == 0) {
+            int grav_gen_bonus = (target_player->tech_applications[TECH_APP_PLANETARY_GRAVITY_GENERATOR] == 3) ? 1 : 0;
+            int gravity = planet->gravity_class;
+
+            if (gravity == PLANET_GRAVITY_LOW_G) {
+                if (race_player->traits[TRAIT_LOW_G_WORLD] == 0) {
+                    worth = (grav_gen_bonus + 12) * worth / 16;
+                }
+            } else if (gravity == PLANET_GRAVITY_NORMAL_G) {
+                if (race_player->traits[TRAIT_LOW_G_WORLD] != 0) {
+                    worth = (grav_gen_bonus + 12) * worth / 16;
+                }
+            } else if (gravity == PLANET_GRAVITY_HEAVY_G) {
+                if (race_player->traits[TRAIT_HEAVY_G_WORLD] == 0) {
+                    worth = (grav_gen_bonus + 6) * worth / 12;
+                }
+            }
+        }
+
+        if (colony->buildings[BUILDING_CAPITOL] != 0) {
+            int government_tier = MOX::_player[(int)colony->owner].traits[TRAIT_CURRENT_GOVERNMENT] / 2;
+            if (government_tier == 0) {
+                worth = worth * 3 / 2;
+            } else if (government_tier == 1) {
+                worth = worth * 4 / 3;
+            } else if (government_tier == 2) {
+                worth = worth * 6 / 5;
+            }
+        }
+
+        if (planet->planet_special == SYSTEM_SPECIAL_GOLD_DEPOSITS) {
+            worth += 1000;
+        } else if (planet->planet_special == SYSTEM_SPECIAL_GEM_DEPOSITS) {
+            worth += 2000;
+        }
+
+        int final_worth = worth / 64;
+
+        if (MOX::_settings.game_difficulty >= 2 /* DIFFICULTY_NORMAL */) {
+            short proximity_worth = AIDATA::Proximity_Worth_To_Player_(colony, target_player);
+            final_worth += (proximity_worth / 8);
+            if (final_worth < proximity_worth) {
+                final_worth = proximity_worth;
+            }
+        }
+
+        if (final_worth > 65535) {
+            final_worth = 65535;
+        }
+
+        return (int16_t)final_worth;
     }
 }

@@ -85,7 +85,7 @@ namespace ADVCIV {
             bool is_aquatic = (plr->evolutionary_upgrade_traits[TRAIT_AQUATIC] != 0);
 
             if (!is_swamp_ocean || !is_aquatic) {
-                int32_t maintenance_reduction = COLCALC::_climate_maintenance_modifier[planet->climate] >> 2;
+                int32_t maintenance_reduction = COLCALC::_climate_maintenance_modifiers[planet->climate] >> 2;
                 worth = worth * (100 - maintenance_reduction) / 100;
                 if (is_swamp_ocean) {
                     worth = (worth * 3) / 4;

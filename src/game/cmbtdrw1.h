@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 namespace CMBTDRW1 {
     inline void*& _k_save = *reinterpret_cast<void**>(std::uintptr_t{0x005960FC});

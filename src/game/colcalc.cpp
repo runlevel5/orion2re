@@ -928,7 +928,7 @@ namespace COLCALC {
                     }
                 }
 
-                int32_t climate_modifier = static_cast<int32_t>(_climate_maintenance_modifier[static_cast<uint8_t>(colony->climate)]) + 100;
+                int32_t climate_modifier = static_cast<int32_t>(_climate_maintenance_modifiers[static_cast<uint8_t>(colony->climate)]) + 100;
                 int32_t base_cost = static_cast<uint8_t>(colony->n_food_replicated) + total_building_maintenance;
 
                 int32_t calculated_bc = (((climate_modifier * base_cost) * 4 + 200) * 25) / 10000;
@@ -1178,9 +1178,6 @@ namespace COLCALC {
         );
     }
 
-    /**
-     * @address 004f6280
-     */
     void __cdecl Colony_Buy_Outright_(int16_t colony_idx) {
         s_colony* colony = &MOX::_colony[colony_idx];
         s_player* player = &MOX::_player[(uint8_t)colony->owner];
@@ -1192,10 +1189,6 @@ namespace COLCALC {
         colony->bought_outright = (int16_t)product_total_cost - colony->production_spent;
     }
 
-    /**
-     * Calculates the number of turns required for a colony to finish its current production task.
-     * Returns -1 if net production is zero or negative, preventing completion.
-     */
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type) {
         switch (govt_type) {
             case 1:
@@ -1374,7 +1367,7 @@ namespace COLCALC {
         results->pop_growth_bonus = static_cast<int16_t>(plr->traits[TRAIT_POP_GROWTH_BONUS]);
 
         if (plr->traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
-            results->maintenance += static_cast<int16_t>(_climate_maintenance_modifier[planet->climate]);
+            results->maintenance += static_cast<int16_t>(_climate_maintenance_modifiers[planet->climate]);
         }
 
         if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
@@ -1773,5 +1766,94 @@ namespace COLCALC {
         }
 
         star.surrender_to[old_owner] = -1;
+    }
+
+    void __cdecl Give_Player_Field_(s_player* player, int field_id, char get_all_flag) {
+        if (field_id < 75 /* HYPER_ADVANCED_THRESHOLD */) {
+            Advance_Player_Field_(player, field_id, false);
+
+            bool get_all = (player->traits[TRAIT_CREATIVE] != 0) || (get_all_flag != 0);
+            bool update_ship_designs = false;
+
+            // Certain fields automatically grant all technologies or require ship design recalculation
+            if (field_id >= 22 && field_id <= 57) {
+                switch (field_id) {
+                    case 22: /* CONSTRUCTION_22 - e.g., Battleship hulls */
+                    case 55: /* CONSTRUCTION_55 - e.g., Doom Star hulls */
+                    case 57: /* CONSTRUCTION_57 - e.g., Core Waste Dump? */
+                        update_ship_designs = true;
+                        get_all = true;
+                        break;
+                    case 23:
+                    case 28:
+                    case 29:
+                        get_all = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (get_all) {
+                // Creative players or forced breakthrough: get all available technologies in the field
+                uint16_t* techs = &TECHDATA::_technology_fields[field_id].tech1;
+                for (int i = 0; i < 4; ++i) {
+                    uint16_t tech_id = techs[i];
+                    // tech_applications[id] == 1 usually means it was just researched but not yet applied
+                    if (tech_id > 0 && player->tech_applications[tech_id] == 1) {
+                        Player_Gets_Tech_App_(player, (int16_t)tech_id);
+                    }
+                }
+
+                if (update_ship_designs) {
+                    short player_idx = static_cast<short>(player - MOX::_player);
+                    INITSHIP::Init_Ship_Designs_(player_idx);
+                    return;
+                }
+            } else {
+                // Non-Creative: only get the specific technology they were researching
+                uint16_t tech_id = static_cast<uint16_t>(static_cast<uint8_t>(player->current_research_application));
+                Player_Gets_Tech_App_(player, (int16_t)tech_id);
+            }
+        } else {
+            // Hyper-advanced technology increment
+            player->hyper_advanced_tech[field_id - 75]++;
+        }
+    }
+
+    void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player) {
+        player->total_known_tech_cost = 0;
+
+        // Process standard technology fields (0 to 74)
+        for (int i = 0; i < 75; ++i) {
+            const s_tech_field_data& field = TECHDATA::_technology_fields[i];
+
+            int divisor = 1;
+            int numerator = (player->tech_fields[i] == 3) ? 1 : 0;
+
+            uint16_t techs[4] = { field.tech1, field.tech2, field.tech3, field.tech4 };
+
+            for (int j = 0; j < 4; ++j) {
+                uint16_t tech_id = techs[j];
+                if (tech_id > 0) {
+                    divisor++;
+                    if (player->tech_applications[tech_id] == 3) {
+                        numerator++;
+                    }
+                }
+            }
+
+            player->total_known_tech_cost += (int32_t)((uint32_t)field.cost * (uint32_t)numerator) / divisor;
+        }
+
+        // Process hyper-advanced technology fields (75 to 82)
+        for (int i = 75; i < 83; ++i) {
+            uint8_t level = static_cast<uint8_t>(player->hyper_advanced_tech[i - 75]);
+            if (level > 0) {
+                const s_tech_field_data& field = TECHDATA::_technology_fields[i];
+                // Cost calculation: Base Cost + (Level - 1) * 10000
+                player->total_known_tech_cost += field.cost + (level - 1) * 10000;
+            }
+        }
     }
 }

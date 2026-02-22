@@ -116,6 +116,7 @@
 #include "racecust.h"
 #include "racesel.h"
 #include "techdata.h"
+#include "newtech.h"
 #include "techinit.h"
 #include "desbox.h"
 #include "fmtpara.h"

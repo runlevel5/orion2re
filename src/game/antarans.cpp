@@ -33,6 +33,44 @@ namespace antarans {
         return 100;
     }
 
+    int16_t __cdecl Antarans_Offensive_Resource_Bonus_() {
+        if (MOX::_settings.game_difficulty == 3) {
+            return 150;
+        }
+
+        if (MOX::_settings.game_difficulty == 4) {
+            return 200;
+        }
+
+        return 100;
+    }
+
+    int16_t __cdecl No_Small_Ships_After_N_Turns_() {
+        int16_t bonus = Antarans_Defensive_Resource_Bonus_();
+
+        if (MOX::_settings.game_difficulty < 3 /* HARD */) {
+            return 100;
+        }
+
+        // The turn threshold is 12500 divided by the Antaran resource bonus.
+        // Higher bonus = earlier appearance of large ships.
+        return (int16_t)(12500 / (int32_t)bonus);
+    }
+
+    int16_t __cdecl No_Medium_Ships_After_N_Turns_() {
+        int16_t bonus = Antarans_Defensive_Resource_Bonus_();
+
+        if (MOX::_settings.game_difficulty < 3) {
+            return 199;
+        }
+
+        if (bonus == 0) {
+            return 0;
+        }
+
+        return (int16_t)(20000 / bonus);
+    }
+
     int16_t __cdecl Next_Antaran_Ship_Size_() {
         int16_t result = -1;
 
@@ -52,7 +90,20 @@ namespace antarans {
         return result;
     }
 
-    // Suggested name: Increment_Antaran_Resource_Level
+    bool __cdecl Antaran_Defensive_Force_At_Maximum_() {
+        for (int i = 0; i < 9; ++i) {
+            uint8_t max_val = static_cast<uint8_t>(_n_max_antaran_def_ships[i]);
+
+            // If a ship type has a maximum threshold specified, check if current count meets it
+            if (max_val != 0) {
+                if (MOX::_antarans.defensive_ships[i] < static_cast<int16_t>(max_val)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     void __cdecl Increment_Antaran_Resource_Level_() {
         int32_t delta_stardate = Delta_Stardate_();
         int16_t antaran_delay = Delay_();
@@ -251,6 +302,24 @@ namespace antarans {
         }
 
         return target_star_idx;
+    }
+
+    void __cdecl Antaran_Invasion_Check_() {
+        if (Delta_Stardate_() == 0) {
+            _offensive_titan_ship_built = 0;
+        }
+
+        Increment_Antaran_Resource_Level_();
+        Build_Antaran_Offensive_Ships_();
+        Build_Antaran_Defensive_Ships_();
+
+        if (Antarans_Should_Attack_()) {
+            MOX::_antarans.field0_0x0 = 0;
+
+            if (Deploy_Antaran_Ships_()) {
+                MOX::_antarans.invasion_stardate = (int)MOX::_stardate;
+            }
+        }
     }
 
     bool __cdecl Deploy_Antaran_Ships_() {

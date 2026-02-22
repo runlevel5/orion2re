@@ -17,7 +17,7 @@ namespace COLCALC {
     inline int8_t (&_minerals_per_mine)[8] =
         *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F160});
 
-    inline int8_t (&_climate_maintenance_modifier)[10] =
+    inline int8_t (&_climate_maintenance_modifiers)[10] =
         *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x0054F168});
 
     inline int8_t* _morale_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F178});
@@ -376,15 +376,7 @@ namespace COLCALC {
 
     void __cdecl Check_For_Research_Breakthrough_(s_player* player);
 
-    inline void __cdecl Give_Player_Field_(s_player* player, uint8_t field_id, uint8_t param_3) {
-        using Fn = void(__cdecl*)(s_player*, uint8_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fab40});
-        fn(player, field_id, param_3);
-    }
+    void __cdecl Give_Player_Field_(s_player* player, int field_id, char get_all_flag);
 
-    inline void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* plr) {
-        using Fn = void(__cdecl*)(s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004facd0 });
-        fn(plr);
-    }
+    void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player);
 }

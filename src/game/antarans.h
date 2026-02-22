@@ -1,42 +1,21 @@
 #pragma once
 
 namespace antarans {
-    inline void __cdecl Antaran_Invasion_Check_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b3690 });
-        fn();
-    }
+    void __cdecl Antaran_Invasion_Check_();
 
     int32_t __cdecl Delta_Stardate_();
     int16_t __cdecl Delay_();
     int16_t __cdecl Antarans_Defensive_Resource_Bonus_();
+    int16_t __cdecl Antarans_Offensive_Resource_Bonus_();
     int16_t __cdecl Next_Antaran_Ship_Size_();
 
-    inline int16_t __cdecl Antarans_Offensive_Resource_Bonus_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b40d0});
-        return fn();
-    }
-
-    inline bool __cdecl Antaran_Defensive_Force_At_Maximum_() {
-        using Fn = bool(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4130});
-        return fn();
-    }
+    bool __cdecl Antaran_Defensive_Force_At_Maximum_();
 
     void __cdecl Increment_Antaran_Resource_Level_();
 
-    inline int16_t __cdecl No_Small_Ships_After_N_Turns_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4230});
-        return fn();
-    }
+    int16_t __cdecl No_Small_Ships_After_N_Turns_();
 
-    inline int16_t __cdecl No_Medium_Ships_After_N_Turns_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4260});
-        return fn();
-    }
+    int16_t __cdecl No_Medium_Ships_After_N_Turns_();
 
     inline int8_t (&_antaran_ship_cost)[9] = *reinterpret_cast<int8_t (*)[9]>(std::uintptr_t{0x00558560});
     inline int8_t (&_n_max_antaran_off_ships)[9] = *reinterpret_cast<int8_t (*)[9]>(std::uintptr_t{0x00558570});
@@ -59,4 +38,10 @@ namespace antarans {
     inline const char* s_ships_deployed_by_size = reinterpret_cast<const char*>(std::uintptr_t{0x005586FC});
 
     bool __cdecl Deploy_Antaran_Ships_();
+
+    inline bool __cdecl Antarans_Should_Attack_() {
+        using Fn = bool(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b36e0 });
+        return fn();
+    }
 }

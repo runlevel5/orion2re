@@ -214,10 +214,10 @@ typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 typedef struct s_ai_star_player_block s_ai_star_player_block, *Ps_ai_star_player_block;
 
 struct s_ai_star_player_block {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
+    int8_t war_count;
+    int8_t neutral_count;
+    int8_t alliance_count;
+    int8_t out_of_range_count;
     undefined field4_0x4;
     int8_t enemy_enroute_or_threat;
 };

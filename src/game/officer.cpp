@@ -54,21 +54,28 @@ namespace OFFICER {
     }
 
     /**
-     * Calculates the current level of an officer based on their accumulated XP and player's Warlord trait.
-     * The level is clamped to a maximum of 5.
+     * Calculates the current effective level of an officer owned by a player, 
+     * factoring in their experience and the player's "Warlord" trait.
+     * 
+     * @param leader_idx Index into the global leaders array.
+     * @return The level of the officer, capped at a maximum of 5.
      */
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
-        int8_t warlord = 0;
-        int16_t xp = MOX::_leaders[leader_idx].xp;
+        auto& leader = MOX::_leaders[leader_idx];
+        int8_t warlord_trait = 0;
 
-        if (leader_idx != 66 /* 0x42 */) {
-            int8_t player_index = MOX::_leaders[leader_idx].player_index;
-            // Access Warlord trait (index 30) for the leader's owner
-            warlord = MOX::_player[player_index].traits[TRAIT_WARLORD];
+        // Leader index 0x42 (66) appears to be a special case or sentinel.
+        if (leader_idx != 0x42 /* 66 */) {
+            // Retrieve the Warlord trait value for the player owning this leader.
+            // TRAIT_WARLORD is at index 30 in the traits array.
+            int16_t player_idx = static_cast<int16_t>(leader.player_index);
+            warlord_trait = MOX::_player[player_idx].traits[TRAIT_WARLORD];
         }
 
-        int16_t level = OFFICER::Get_Officer_Base_Level_(xp, warlord);
+        // Calculate base level from XP and potential Warlord bonus.
+        int16_t level = OFFICER::Get_Officer_Base_Level_(leader.xp, warlord_trait);
 
+        // Levels are effectively capped at 5 in game mechanics.
         if (level > 5) {
             level = 5;
         }
@@ -379,26 +386,32 @@ namespace OFFICER {
     }
 
     /**
+     * Calculates the maintenance cost for an officer.
+     * Maintenance is calculated as (cost + 99) / 100, with a minimum of 1,
+     * unless the officer has specific general skills (0x1c or 0x1d) or
+     * matches a specific ID (0x41), in which case maintenance is 0.
      * @address 0043e8c0
      */
     int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx) {
-        int16_t cost = static_cast<int16_t>(Officer_Cost_(player_num, leader_idx));
+        int16_t base_cost = static_cast<int16_t>(Officer_Cost_(player_num, leader_idx));
 
-        // Calculate maintenance as ceiling(cost / 100)
-        int16_t maintenance = static_cast<int16_t>((static_cast<int32_t>(cost) + 99) / 100);
+        // Calculate maintenance rounding up to the nearest 100
+        int16_t maintenance = (int16_t)(((int32_t)base_cost + 99) / 100);
 
-        // Check for specific general skills (28 = 0x1c, 29 = 0x1d) that negate maintenance
-        bool has_maintenance_skill = Officer_Has_General_Skill_(player_num, leader_idx, 28 /* 0x1c */) ||
-                                     Officer_Has_General_Skill_(player_num, leader_idx, 29 /* 0x1d */);
+        // Check if officer has skill 28 (0x1C) or 29 (0x1D)
+        bool has_cost_reduction_skill = Officer_Has_General_Skill_(player_num, leader_idx, 28 /* Famous */);
+        if (!has_cost_reduction_skill) {
+            has_cost_reduction_skill = Officer_Has_General_Skill_(player_num, leader_idx, 29 /* Legendary */);
+        }
 
-        // If specific condition (leader_idx == 65) or maintenance skill is present, maintenance is zero
-        if (leader_idx == 65 /* 0x41 */ || has_maintenance_skill) {
+        // Return 0 if special conditions are met
+        if (leader_idx == 65 /* 0x41 */ || has_cost_reduction_skill) {
             return 0;
         }
 
-        // Maintenance is at least 1 credit if not negated
-        if (maintenance <= 1) {
-            return 1;
+        // Clamp maintenance to a minimum of 1
+        if (maintenance < 1) {
+            maintenance = 1;
         }
 
         return maintenance;
