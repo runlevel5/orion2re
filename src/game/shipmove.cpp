@@ -295,6 +295,23 @@ namespace SHIPMOVE {
     }
 
     /**
+     * @address 00435fc0
+     */
+    int16_t __cdecl Ship_Range_(s_ship_data* ship) {
+        if (ship->owner >= 8) {
+            return 0xFF;
+        }
+
+        int16_t range = MOX::_player[(uint8_t)ship->owner].ship_range;
+
+        if (struct_::Test_Bit_Field_(ship->d.special_device_flags, 11)) {
+            range = (range * 3 + 1) / 2;
+        }
+
+        return range;
+    }
+
+    /**
      * @address 00437260
      */
     int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship) {
@@ -415,6 +432,53 @@ namespace SHIPMOVE {
     }
 
     /**
+     * @address 00436a50
+     */
+    void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_id, s_ship_move_info* move_info) {
+        int8_t status;
+        bool colony_flag_needed = false;
+        int i = 0;
+
+        if (move_info->turns_left == 0) {
+            status = 0;
+        } else {
+            int16_t first_ship_idx = ship_list[0];
+            int16_t first_loc = MOX::_ship[first_ship_idx].location;
+
+            if (first_loc < 72 || first_loc >= 1000) {
+                status = 2;
+                destination_id += 1000;
+            } else {
+                status = 1;
+                destination_id += 500;
+            }
+        }
+
+        int16_t ship_idx;
+        while ((ship_idx = ship_list[i]) != -1) {
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (!colony_flag_needed) {
+                if (ship->d.ship_type == 1 || ship->d.ship_type == 4) {
+                    colony_flag_needed = true;
+                }
+            }
+
+            ship->location = destination_id;
+            ship->turns_left = move_info->turns_left;
+            ship->group_has_navigator = move_info->has_navigator;
+            ship->travelling_speed = move_info->traveling_speed;
+            ship->status = status;
+
+            i++;
+        }
+
+        if (colony_flag_needed) {
+            SHIPS::Clear_All_Ships_Auto_Colonization_Flag_(ship_list);
+        }
+    }
+
+    /**
      * @address 00437750
      */
     void __cdecl Unmark_Just_Built_AI_Ships_() {
@@ -428,6 +492,50 @@ namespace SHIPMOVE {
             // have their just_built flag cleared.
             if (ship.owner < 8 && MOX::_player[static_cast<int32_t>(ship.owner)].objectives != 100) {
                 ship.just_built = 0;
+            }
+        }
+    }
+
+    /**
+     * @address 00436cd0
+     */
+    void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
+        ship->location = (short)star_idx;
+        ship->status = 0;
+        ship->x = MOX::_star[star_idx].x;
+        ship->y = MOX::_star[star_idx].y;
+        ship->mission = 0;
+
+        MOX::_star[star_idx].ignore_combat_ships = 0;
+
+        int8_t owner = ship->owner;
+
+        if (owner < 8) {
+            // Check for Orion discovery
+            if (MOX::_star[star_idx].system_special == 11 /* Orion */ && MOX::_star[star_idx].visited == 0) {
+                EVENTS::Event_Orion_Discovered_((int16_t)owner);
+            }
+
+            // Update colony ship arrival flags
+            if (ship->d.ship_type == 1 /* Colony Ship */ || ship->d.ship_type == 4 /* Colony Base */) {
+                MOX::_star[ship->location].ignore_colony_ships &= ~(1 << owner);
+            }
+
+            // Mark system as visited by player
+            if (!((MOX::_star[ship->location].visited >> owner) & 1)) {
+                MOX::_star[ship->location].visited |= (1 << owner);
+                MOX::_star[ship->location].just_visited |= (1 << owner);
+            }
+        } else if (owner == 13 /* Monster/Antaran */) {
+            ship->d.date_of_design = 0;
+        }
+
+        if (owner < 8) {
+            reinterpret_cast<int8_t*>(REPORT::_something_interesting_happened)[owner] = 1;
+
+            // Check if player's objective is to defend Orion
+            if (MOX::_player[owner].objectives == 100 /* 'd' */) {
+                MOX::_star[star_idx].not_used3 = 0;
             }
         }
     }

@@ -1287,6 +1287,14 @@ namespace hooks {
         { 0x00436e30, &SHIPMOVE::Create_Nonplayer_Ship_ },
         { 0x00436b40, &SHIPMOVE::Ship_Is_Moving_ },
         { 0x00436b60, &SHIPMOVE::Move_All_Ships_Toward_Stars_ },
+        { 0x00462760, &aimove::Get_Enemy_Strength_On_Turn_ },
+        { 0x00436a50, &SHIPMOVE::Make_Ships_Move_To_ },
+        { 0x00435fc0, &SHIPMOVE::Ship_Range_ },
+        { 0x00436cd0, &SHIPMOVE::Make_Ship_Arrive_At_Star_ },
+        { 0x00479ea0, &AIBUILD::Mean_Ship_Strength_ },
+        { 0x0047a9c0, &AIBUILD::Compute_Colony_Ship_Need_ },
+        { 0x0047a9e0, &AIBUILD::Compute_Freighter_Need_ },
+        { 0x0047a2e0, &AIBUILD::Compute_Needs_ },
     };
 
     void Install_Hooks()

@@ -323,4 +323,36 @@ namespace aimove {
             }
         }
     }
+
+    void __cdecl Get_Enemy_Strength_On_Turn_(int16_t star_id, int* turn_strengths, int* cumulative_strengths) {
+        uint8_t in_nebula = MOX::_star[star_id].in_nebula;
+
+        memset(turn_strengths, 0, 10 * sizeof(int));
+
+        s_ship_data* ships = MOX::_ship;
+        int num_ships = MOX::_NUM_SHIPS;
+
+        for (int i = 0; i < num_ships; ++i) {
+            s_ship_data* ship = &ships[i];
+
+            if (ship->owner != _i_ai && ship->status < 3) {
+                if (ship->location == star_id) {
+                    int16_t (*strength_table)[500][8] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                    turn_strengths[0] += (*strength_table)[i][_i_ai];
+                } else {
+                    int32_t location_diff = (int32_t)ship->location - (int32_t)star_id;
+                    // Location diffs of 500 and 1000 relate to travel/wormhole logic
+                    if ((location_diff == 500 || location_diff == 1000) && ship->turns_left < 10) {
+                        int16_t (*strength_table)[500][8] = in_nebula ? AIDATA::_ship_strengths_in_nebula : AIDATA::_ship_strengths;
+                        turn_strengths[ship->turns_left] += (*strength_table)[i][_i_ai];
+                    }
+                }
+            }
+        }
+
+        cumulative_strengths[0] = turn_strengths[0];
+        for (int t = 1; t < 10; ++t) {
+            cumulative_strengths[t] = turn_strengths[t] + cumulative_strengths[t - 1];
+        }
+    }
 }

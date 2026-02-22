@@ -22,10 +22,7 @@ namespace SHIPMOVE {
         reinterpret_cast<Fn>(0x004363E0)(ids, target, out_info);
     }
 
-    inline void __cdecl Make_Ships_Move_To_(int16_t* ids, int16_t target, s_ship_move_info* info) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t, s_ship_move_info*);
-        reinterpret_cast<Fn>(0x00436A50)(ids, target, info);
-    }
+    void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_id, s_ship_move_info* move_info);
 
     inline void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
         using Fn = void(__cdecl*)();
@@ -50,13 +47,11 @@ namespace SHIPMOVE {
 
     int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship);
 
+    int16_t __cdecl Ship_Range_(s_ship_data* ship);
+
     bool __cdecl Can_Order_Ship_(s_ship_data* ship);
 
     bool __cdecl Ship_Is_Moving_(s_ship_data* ship);
 
-    inline void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx) {
-        using Fn = void(__cdecl*)(s_ship_data*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00436cd0});
-        fn(ship, star_idx);
-    }
+    void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx);
 }

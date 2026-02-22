@@ -57,4 +57,10 @@ namespace SHIPS {
     }
 
     void __cdecl Kill_Ship_(int16_t ship_idx);
+
+    inline void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
+        using Fn = void(__cdecl*)(int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041FF60});
+        fn(ship_list);
+    }
 }

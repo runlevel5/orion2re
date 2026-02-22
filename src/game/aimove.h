@@ -70,6 +70,8 @@ namespace aimove {
 
     int16_t __cdecl Best_Uncolonized_Undestined_Planet_(int16_t player_idx);
 
+    void __cdecl Get_Enemy_Strength_On_Turn_(int16_t star_id, int* turn_strengths, int* cumulative_strengths);
+
     inline void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00465E00 });
