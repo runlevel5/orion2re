@@ -24,4 +24,10 @@ namespace AIBUILD {
     int16_t __cdecl Player_War_Level_(int16_t player_idx);
     void __cdecl Compute_Colony_Ship_Need_(int16_t player_num);
     void __cdecl Compute_Freighter_Need_(int16_t player_idx);
+
+    inline void __cdecl Empire_Buy_Outright_(int16_t i_ai) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047BA30});
+        fn(i_ai);
+    }
 }

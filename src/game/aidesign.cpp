@@ -1,6 +1,97 @@
 #include "deps.h"
 
 namespace aidesign {
+#pragma pack(push, 1)
+    struct s_spcl_item {
+        int16_t id;
+        int16_t type; // 0 = Special Device, non-zero = Weapon
+    };
+#pragma pack(pop)
+
+    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
+        int16_t total_space_used = 0;
+        int16_t already_has_fighter_bay = 0;
+        s_spcl_item* spcl = reinterpret_cast<s_spcl_item*>(list);
+
+        for (int i = 0; i < count; ++i) {
+            int16_t item_id = spcl[i].id;
+
+            if (spcl[i].type == 0) {
+                // Processing Special Device
+                int16_t tech_app_id = TECHDATA::_specials[item_id].tech_application_id;
+
+                if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
+                    if (Special_Legal_For_Design_(design, item_id)) {
+                        // Check if player has Stealth trait, if so skip Stealth Field device
+                        if (MOX::_player[player_idx].traits[TRAIT_STEALTHY_SHIPS] == 0 || item_id != 31 /* SPCL_STEALTH_FIELD */) {
+                            int8_t mini_cat = DESIGN::Miniaturization_Category_(tech_app_id);
+                            int16_t tech_lvl = DESIGN::Tech_Level_(player_idx, tech_app_id);
+                            int16_t base_space = TECHDATA::_specials[item_id].space_per_ship_type[design->size];
+                            int16_t actual_space = (int16_t)DESIGN::Space_Given_M_Level_(base_space, tech_lvl, mini_cat);
+
+                            if (actual_space < space_available) {
+                                struct_::Set_Bit_Field_(design->special_device_flags, item_id);
+                                total_space_used += actual_space;
+                                space_available -= actual_space;
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Processing Weapon
+                if (*weapon_slot_idx_ptr < 8) {
+                    if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
+                        already_has_fighter_bay = 0;
+                        for (int16_t slot = 0; slot < *weapon_slot_idx_ptr; ++slot) {
+                            if (design->ship_weapon[slot].type == 0x21 /* WPN_FIGHTER_BAY */) {
+                                already_has_fighter_bay = 1;
+                                break;
+                            }
+                        }
+                    }
+
+                    int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_application_id;
+                    if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == 3 /* LEARNED */ && !already_has_fighter_bay) {
+                        int16_t weapon_unit_space = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
+                        int16_t max_count = space_available / weapon_unit_space;
+
+                        if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
+                            if (max_count > (int16_t)design->size * 10) {
+                                max_count = (int16_t)design->size * 10;
+                            }
+                        }
+
+                        if (max_count > 0) {
+                            int16_t items_this_type = 0;
+
+                            // Split weapons into multiple slots if count > 99
+                            while (max_count > 0 && *weapon_slot_idx_ptr < 8) {
+                                int16_t count_in_slot = (max_count > 99) ? 99 : max_count;
+
+                                design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
+                                design->ship_weapon[*weapon_slot_idx_ptr].count = (int8_t)count_in_slot;
+                                design->ship_weapon[*weapon_slot_idx_ptr].current_count = (int8_t)count_in_slot;
+                                design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
+                                design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
+                                design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
+
+                                items_this_type += count_in_slot;
+                                max_count -= count_in_slot;
+                                (*weapon_slot_idx_ptr)++;
+                            }
+
+                            int16_t space_calc = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
+                            total_space_used += space_calc * items_this_type;
+                            space_available -= space_calc * items_this_type;
+                        }
+                    }
+                }
+            }
+        }
+
+        return total_space_used;
+    }
+
     int16_t __cdecl Add_Beam_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t weapon_class) {
         int16_t types[4] = {0};
         int16_t specials[4] = {0};
@@ -786,6 +877,31 @@ namespace aidesign {
         DESIGN::Cost_Reduction_For_Govt_Type_(govt_type, &reduced_cost);
 
         return (int16_t)reduced_cost;
+    }
+
+    int16_t __cdecl Special_Legal_For_Design_(s_ship_design* design, int16_t tech_id) {
+        int16_t result = 1;
+        int16_t bit = 0;
+
+        while (bit < 40 && result == 1) {
+            if (struct_::Test_Bit_Field_(design->special_device_flags, bit)) {
+                for (int i = 0; i < 6; ++i) {
+                    if (TECHDATA::_specials[bit].field6_0x20[i] == tech_id) {
+                        result = 0;
+                        break;
+                    }
+                }
+            }
+            bit++;
+        }
+
+        if (design->shield_type == 0) {
+            if (tech_id == 13 || tech_id == 20 || tech_id == 30) {
+                result = 0;
+            }
+        }
+
+        return result;
     }
 
 }

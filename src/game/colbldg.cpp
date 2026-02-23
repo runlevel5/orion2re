@@ -1214,6 +1214,14 @@ namespace COLBLDG {
         ERIC::Draw_Centered_(244, 56, anim);
     }
 
+    void __cdecl Clear_Colony_Queue_(int16_t colony_idx) {
+        int16_t count = 7;
+        do {
+            Delete_From_Colony_Queue_(colony_idx, 0);
+            count--;
+        } while (count != 0);
+    }
+
     /**
      * @address 0050ad80
      */

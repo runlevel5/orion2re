@@ -46,11 +46,7 @@ namespace AIDATA {
 
     int32_t __cdecl Refit_Desirability_(s_ship_data* ship);
 
-    inline short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player_idx, int16_t star1, int16_t star2, int16_t* inter_ptr, bool fast) {
-        using Fn = short(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004eda30});
-        return fn(player_idx, star1, star2, inter_ptr, fast);
-    }
+    short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player, int16_t star_a, int16_t star_b, int16_t* inter_star_out, bool use_extended);
 
     int __cdecl airefit_cmp_(const void* a, const void* b);
 

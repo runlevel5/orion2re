@@ -18,11 +18,7 @@ namespace aidesign {
     inline s_spcl (&_defense_specials_f_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556EC0});
     inline s_spcl (&_defense_specials_t_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556F10});
 
-    inline int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr) {
-        using Fn = int16_t(__cdecl*)(struct s_spcl*, int, int16_t, struct s_ship_design*, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046C4F0});
-        return fn(list, count, player_idx, design, space, weapon_index_ptr);
-    }
+    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
 
     int16_t __cdecl Add_Theme_Special_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
 
@@ -63,4 +59,6 @@ namespace aidesign {
     void __cdecl Auto_Design_Ship_(int16_t player_idx, s_ship_design* design, int16_t hull_idx);
 
     int16_t __cdecl Cost_Reduction_For_Govt_Hull_Type(int16_t govt_type, struct s_ship_design* design);
+
+    int16_t __cdecl Special_Legal_For_Design_(s_ship_design* design, int16_t tech_id);
 }

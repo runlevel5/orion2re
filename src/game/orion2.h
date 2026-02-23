@@ -3594,9 +3594,9 @@ typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
     int8_t id;
-    int8_t field1_0x1;
+    int8_t special_or_weapon_id;
     int8_t type;
-    int8_t field3_0x3;
+    int8_t category;
 };
 
 typedef struct s_star_data s_star_data, *Ps_star_data;
@@ -3837,21 +3837,10 @@ struct s_tech_specials_data {
     short tech_application_id;
     short space_per_ship_type[6];
     short cost_per_ship_type[6];
-    undefined field6_0x20;
-    undefined field7_0x21;
-    undefined field8_0x22;
-    undefined field9_0x23;
-    undefined field10_0x24;
-    undefined field11_0x25;
-    undefined field12_0x26;
-    undefined field13_0x27;
-    undefined field14_0x28;
-    undefined field15_0x29;
-    undefined field16_0x2a;
-    undefined field17_0x2b;
-    undefined field18_0x2c;
-    undefined field19_0x2d;
-    undefined field20_0x2e;
+    short field6_0x20[6];
+    undefined field7_0x2c;
+    undefined field8_0x2d;
+    undefined field9_0x2e;
 };
 
 typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;

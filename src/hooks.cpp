@@ -1295,6 +1295,16 @@ namespace hooks {
         { 0x0047a9c0, &AIBUILD::Compute_Colony_Ship_Need_ },
         { 0x0047a9e0, &AIBUILD::Compute_Freighter_Need_ },
         { 0x0047a2e0, &AIBUILD::Compute_Needs_ },
+        { 0x004eda30, &AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_ },
+        { 0x0046c470, &aidesign::Special_Legal_For_Design_ },
+        { 0x0046c4f0, &aidesign::Add_Specials_To_Design_ },
+        { 0x004460b0, &aidudes::Colony_AI_ },
+        { 0x00446170, &aidudes::Collect_AI_Colonies_ },
+        { 0x0050b340, &COLBLDG::Clear_Colony_Queue_ },
+        { 0x00446330, &aidudes::Clear_Build_Queues_If_New_Tech_ },
+        { 0x004462c0, &aidudes::Sort_Colonies_Blockaded_ },
+        { 0x004467e0, &aidudes::Keep_Ship_Designs_Up_To_Date_ },
+        { 0x004468d0, &aidudes::Freighter_Cheat_ },
     };
 
     void Install_Hooks()

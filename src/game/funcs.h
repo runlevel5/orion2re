@@ -6,6 +6,7 @@
 void __cdecl nullsub_004d7840();
 
 struct s_animation_header;
+struct s_ship_design;
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
@@ -536,4 +537,10 @@ inline void __cdecl Find_Opportunity_Attack_Aux_(int16_t plr1, int16_t plr2, int
     using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465e80});
     fn(plr1, plr2, val, star_idx, planet_idx, unknown, aux_info);
+}
+
+inline void __cdecl Load_Doom_Star_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480ea0});
+    fn(player_idx, design);
 }

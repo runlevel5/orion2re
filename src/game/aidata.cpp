@@ -1013,6 +1013,87 @@ namespace AIDATA {
         return total_worth;
     }
 
+    short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(short player, short star_a, short star_b, short* inter_star_out, bool use_extended) {
+        uint8_t* info = (uint8_t*)&(*_n_turns_from_to_intermediate)[star_a][star_b][player];
+
+        if (info[1] == 0xFF) {
+            s_player* plr = &MOX::_player[player];
+
+            // Check if player can reach the star directly
+            if (plr->ship_speed != 0 &&
+                plr->tech_applications[TECH_APP_JUMP_GATE] != 3 &&
+                plr->tech_applications[TECH_APP_STAR_GATE] != 3 &&
+                MOX::_star[star_a].wormhole_star_id == -1 &&
+                MOX::_star[star_b].wormhole_star_id == -1 &&
+                (*_n_turns_from_to)[star_a][star_b][player] != -1) {
+
+                int dist = GEO::Parsecs_Between_Stars_(star_a, star_b);
+                int turns = (dist + (uint8_t)plr->ship_speed - 1) / (uint8_t)plr->ship_speed;
+
+                if ((uint8_t)(*_n_turns_from_to)[star_a][star_b][player] <= turns) {
+                    if (((*_star_in_range_of_player)[star_b] >> player) & 1) {
+                        info[0] = (uint8_t)turns;
+                        info[1] = (uint8_t)star_b;
+                    } else {
+                        info[1] = MAX_STARS;
+                    }
+                    info[2] = (uint8_t)turns;
+                    info[3] = (uint8_t)star_b;
+                }
+            }
+
+            if (info[1] == 0xFF) {
+                for (int i = MOX::_NUM_STARS - 1; i >= 0; --i) {
+                    // Check if Star i is in range and not blocked
+                    if (((*_star_in_extended_range_of_player)[i] >> player) & 1) {
+                        s_star_data* s = &MOX::_star[i];
+
+                        if (i == star_b || (s->spectral_class != STAR_CLASS_BLACK_HOLE &&
+                            s->system_special != 9 /* Orion */ &&
+                            (((s->has_colony >> player) & 1) || s->has_colony == 0))) {
+
+                            uint8_t dist_a_i = (uint8_t)(*_n_turns_from_to)[star_a][i][player];
+                            uint8_t dist_i_b = (uint8_t)(*_n_turns_from_to)[i][star_b][player];
+                            uint8_t total_turns = dist_a_i + dist_i_b;
+
+                            if ((((*_star_in_range_of_player)[i] >> player) & 1) && total_turns < info[0]) {
+                                info[0] = total_turns;
+                                info[1] = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
+                            }
+
+                            if (total_turns < info[2]) {
+                                info[2] = total_turns;
+                                info[3] = (i == star_a) ? (uint8_t)star_b : (uint8_t)i;
+                            }
+                        }
+                    }
+                    if (info[0] <= 1) break;
+                }
+
+                if (info[1] == 0xFF) {
+                    info[1] = 0x48 /* NUM_STARS (72) */;
+                }
+                if (info[3] == 0xFF) {
+                    info[3] = 0x48 /* NUM_STARS (72) */;
+                }
+            }
+        }
+
+        if (inter_star_out) {
+            uint8_t inter_star = use_extended ? info[3] : info[1];
+            if (inter_star < 0x48 /* NUM_STARS (72) */) {
+                *inter_star_out = (short)inter_star;
+            } else {
+                *inter_star_out = -1;
+            }
+        }
+
+        if (use_extended) {
+            return (short)info[2];
+        }
+        return (short)info[0];
+    }
+
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player) {
         int target_player_idx = (target_player - MOX::_player);
         s_planet_data* planet = &MOX::_planet[colony->planet];
