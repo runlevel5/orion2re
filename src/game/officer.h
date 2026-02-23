@@ -227,4 +227,15 @@ namespace OFFICER {
 
     bool __cdecl Officer_Status_Ok_(int16_t officer_index);
 
+    inline int16_t __cdecl Calculate_Officer_Cost_(int16_t player_idx, int16_t leader_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442c60});
+        return fn(player_idx, leader_idx);
+    }
+
+    inline void __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* result_ptr, int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443260});
+        fn(star_idx, result_ptr, player_idx);
+    }
 }

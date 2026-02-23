@@ -122,8 +122,9 @@ void __cdecl Search_For_Battles_() {
                         bribe_planet_idx = MAINPUPS::Dragon_New_Star_Popup_(final_defender_idx, star_idx);
                     }
                     if (bribe_planet_idx != -1) {
-                        final_defender_idx = -1;
+                        // BUG: final_defender_idx was set to -1 before being passed to Do_Dragon_Bribe_
                         Do_Dragon_Bribe_(final_defender_idx, star_idx, bribe_planet_idx);
+                        final_defender_idx = -1;
                     }
                 }
 
@@ -164,6 +165,28 @@ void __cdecl Search_For_Battles_() {
     _battle_stars = nullptr;
 
     COLCALC::Check_For_Eliminated_Players_();
+}
+
+void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
+    int16_t ship_indices[2];
+    s_ship_move_info move_info;
+
+    ship_indices[0] = -1;
+    ship_indices[1] = -1;
+
+    for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+        // Owner 12 is the Dragon/Guardian
+        if (MOX::_ship[i].owner == 12 && MOX::_ship[i].location == (int16_t)star_idx) {
+            ship_indices[0] = (int16_t)i;
+        }
+    }
+
+    SHIPMOVE::Ships_Try_To_Move_To_(ship_indices, dest_idx, &move_info);
+    SHIPMOVE::Make_Ships_Move_To_(ship_indices, dest_idx, &move_info);
+
+    MOX::_player[player_idx].bc -= 500;
+
+    (*_star_has_nonplayer)[star_idx] &= 0xEF;
 }
 
 } // namespace COMBFIND

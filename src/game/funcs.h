@@ -514,6 +514,12 @@ inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  //
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
+
+inline void __cdecl Save_Hotseat_Map_Info_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBD70});
+    fn();
+}
 inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
 inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"

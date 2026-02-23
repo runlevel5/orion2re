@@ -34,9 +34,6 @@ namespace SHIPMOVE {
 
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});
 
-    /**
-     * @address 00437750
-     */
     void __cdecl Unmark_Just_Built_AI_Ships_();
 
     inline uint32_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star, int16_t dest_star) {

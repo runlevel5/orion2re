@@ -86,10 +86,7 @@ namespace COLCALC {
 
     bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx);
 
-    inline int32_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_idx) {
-        using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f5ee0})(colony, product_idx);
-    }
+    int __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id);
 
     int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony);
 
@@ -216,11 +213,7 @@ namespace COLCALC {
         fn(actor_player, target_player);
     }
 
-    inline int8_t __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
-        using Fn = int8_t(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fadc0});
-        return fn(star_idx, player_idx, to_player_idx);
-    }
+    bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx);
 
     inline void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
@@ -366,11 +359,7 @@ namespace COLCALC {
 
     int16_t N_Living_Players_();
 
-    inline void __cdecl Check_For_Eliminated_Players_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fb870});
-        fn();
-    }
+    void __cdecl Check_For_Eliminated_Players_();
 
     void __cdecl Apply_All_Player_Changes_();
 

@@ -2164,4 +2164,68 @@ namespace MAINSCR {
 
         return MOX::_global_bitmap_seg;
     }
+
+    /**
+     * @address 004c4e90
+     */
+    void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode) {
+        MOX::_at_least_one_report = 0;
+        MOX::_previous_report = 0;
+        MOX::_just_moved_stack = 0;
+        MOX::_animated_star = 0xFFFF;
+
+        _warn_about_cheaters = (int8_t)(1 << (MOX::_PLAYER_NUM & 0x1F));
+
+        if (MOX::_game_type == 1 /* Hotseat */) {
+            Save_Hotseat_Map_Info_();
+            if (MOX::_game_type == 1) {
+                MOX::_player[MOX::_PLAYER_NUM].player_done_flags = 1;
+                MOX::_current_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
+            } else {
+                if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+                    MOX::_current_screen = SCREEN_NET_NEXT_TURN;
+                } else {
+                    MOX::_current_screen = SCREEN_MAIN_NEXT_TURN;
+                }
+                MOX::_return_screen = SCREEN_REPORTS;
+            }
+        } else {
+            if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+                MOX::_current_screen = SCREEN_NET_NEXT_TURN;
+            } else {
+                MOX::_current_screen = SCREEN_MAIN_NEXT_TURN;
+            }
+            MOX::_return_screen = SCREEN_REPORTS;
+        }
+
+        Set_Reload_Fleet_Box_Palette_Flag_();
+        SYS::Clear_System_Display_Loaded_Flag_();
+
+        if (auto_mode == 0) {
+            _in_auto_next_turn_mode = 0;
+            fields::Clear_Fields_();
+            Clear_Main_Screen_Fields_();
+
+            if (MOX::_settings.end_of_turn_wait == 0) {
+                MOX::_global_exit_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+                *exit_flag = 1;
+                return;
+            }
+        } else {
+            _in_auto_next_turn_mode = 1;
+            MISC::Increment_Mouse_Clock_Image_();
+            int16_t input = fields::Get_Input_();
+            MOX::_auto_turn_exit = (uint8_t)input;
+
+            if (MOX::_auto_turn_exit != 0) {
+                _check_next_turn_exit_field = 0;
+                mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                _next_turn_hit = 0;
+                fields::Clear_Fields_();
+                MOX::_current_screen = SCREEN_MAIN;
+            }
+        }
+
+        *exit_flag = 1;
+    }
 }

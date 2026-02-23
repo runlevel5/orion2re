@@ -318,6 +318,18 @@
     <ClCompile Include="src\game\aidata.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\aileader.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\report.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\scroll.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\special.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -783,6 +795,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\shipstak.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\newtech.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

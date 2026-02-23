@@ -286,10 +286,7 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(0x004C8D00)(key, flag);
     }
 
-    inline void __cdecl Do_Next_Turn_(int16_t* ptr, int8_t unk) {
-        using Fn = void(__cdecl*)(int16_t*, int8_t);
-        reinterpret_cast<Fn>(0x004C4E90)(ptr, unk);
-    }
+    void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode);
 
     int16_t __cdecl Get_Ship_Stack_For_Officers_Screen_();
 

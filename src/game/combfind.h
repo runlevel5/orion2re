@@ -68,11 +68,7 @@ namespace COMBFIND {
         fn(star_idx, attacker_idx, defender_idx, planet_idx, unk_ptr, unk_flag);
     }
 
-    inline void __cdecl Do_Dragon_Bribe_(int defender_idx, int star_idx, int planet_idx) {
-        using Fn = void(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c0320});
-        fn(defender_idx, star_idx, planet_idx);
-    }
+    void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx);
 
     inline void __cdecl Client_Combat_Loop_() {
         using Fn = void(__cdecl*)();

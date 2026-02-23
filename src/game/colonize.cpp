@@ -240,6 +240,70 @@ namespace COLONIZE {
         }
     }
 
+    void __cdecl AI_Colonize_(int16_t player_idx) {
+        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            s_star_data* star = &MOX::_star[i];
+            bool done_with_star = false;
+
+            while (!done_with_star) {
+                if (star->colonize_player == player_idx) {
+                    s_colony* colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, (int16_t)i);
+                    s_ship_data* colony_ship_ptr = REPORT::Player_Ship_Type_At_Star_(player_idx, SHIP_TYPE_COLONY, (int16_t)i, 1);
+
+                    if (colony_base_ptr == nullptr && colony_ship_ptr == nullptr) {
+                        done_with_star = true;
+                    } else {
+                        uint32_t best_worth = 0;
+                        int16_t best_planet_idx = -1;
+
+                        for (int p = 0; p < 5; ++p) {
+                            int16_t planet_idx = star->planet_index[p];
+                            if (planet_idx != -1 && MOX::_planet[planet_idx].colony_index == -1) {
+                                uint32_t worth = ADVCIV::Uncolonized_Planet_Worth_To_Player_(&MOX::_planet[planet_idx], &MOX::_player[player_idx]);
+                                if (best_worth < (worth & 0xFFFF)) {
+                                    best_planet_idx = planet_idx;
+                                    best_worth = worth & 0xFFFF;
+                                }
+                            }
+                        }
+
+                        if (best_planet_idx == -1) {
+                            done_with_star = true;
+                            if (colony_base_ptr != nullptr) {
+                                // Sell colony base buildings if no worthwhile planets found
+                                do {
+                                    MOX::_player[player_idx].bc += TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
+                                    colony_base_ptr->buildings[BUILDING_COLONY_BASE] = 0;
+                                    colony_base_ptr = REPORT::Player_Colony_Base_At_Star_(player_idx, (int16_t)i);
+                                } while (colony_base_ptr != nullptr);
+                            }
+                        } else {
+                            COLONIZE::Make_New_Colony_Or_Outpost_(best_planet_idx, player_idx);
+
+                            if (colony_base_ptr == nullptr) {
+                                // Consumed a colony ship
+                                for (int s = 0; s < (int)MOX::_NUM_SHIPS; ++s) {
+                                    s_ship_data* ship = &MOX::_ship[s];
+                                    if (ship->mission == 4 && ship->owner == (char)player_idx && (int)ship->location == i) {
+                                        ship->mission = 0;
+                                    }
+                                }
+                                SHIPS::Kill_Ship_((int16_t)(colony_ship_ptr - MOX::_ship));
+                                MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+                            } else {
+                                // Consumed an existing colony base building
+                                ERICNET::Remove_Building_((int16_t)(colony_base_ptr - MOX::_colony), BUILDING_COLONY_BASE);
+                            }
+                            // Continue checking system (logic loops to see if more ships/bases exist)
+                        }
+                    }
+                } else {
+                    done_with_star = true;
+                }
+            }
+        }
+    }
+
     void __cdecl All_AI_Colonize_() {
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].objectives != 100) {

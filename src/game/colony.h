@@ -98,6 +98,12 @@ namespace COLONY {
         using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004DC3C0})(colony_idx, pop_idx);
     }
+
+    inline int16_t __cdecl Pop_To_Pop_State_(int16_t colony_idx, int16_t pop_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dda60});
+        return fn(colony_idx, pop_idx);
+    }
     void __cdecl Update_Colony_Palette_();
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
     void __cdecl Reset_Mouse_Picture_();

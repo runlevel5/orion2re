@@ -164,6 +164,7 @@ namespace MOX {
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
+    inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});
     inline uint16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597AC8});
     inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});

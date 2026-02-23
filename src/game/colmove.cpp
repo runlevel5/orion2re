@@ -106,4 +106,29 @@ namespace COLMOVE {
 
         return unemployed_count;
     }
+
+    bool __cdecl Pops_Identical_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4) {
+        uint32_t pop1 = MOX::_colony[param_1].pop[param_2];
+        uint32_t pop2 = MOX::_colony[param_3].pop[param_4];
+
+        // Check first set of flags (bits 7 and 8)
+        if (((pop1 ^ pop2) & 0x180) != 0) {
+            return false;
+        }
+
+        int16_t state2 = COLONY::Pop_To_Pop_State_(param_3, param_4);
+        int16_t state1 = COLONY::Pop_To_Pop_State_(param_1, param_2);
+
+        // Compare derived population states
+        if (state2 != state1) {
+            return false;
+        }
+
+        // Check second set of flags (bits 0, 1, 2, 3, and 10)
+        if (((pop2 ^ pop1) & 0x40f) != 0) {
+            return false;
+        }
+
+        return true;
+    }
 }

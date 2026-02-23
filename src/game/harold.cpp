@@ -454,6 +454,28 @@ namespace HAROLD {
     }
 
     /**
+     * @brief Checks if a player has sighted a monster at a specific star system.
+     *
+     * A monster is sighted if the star system has a special type of 9 (monster)
+     * and the player has visited the star system.
+     *
+     * @param player_id The ID of the player.
+     * @param star_id The ID of the star system.
+     * @return true if the monster is sighted, false otherwise.
+     * @address 004f1780
+     */
+    bool __cdecl Player_Sighted_Monster_(int16_t player_id, int16_t star_id) {
+        int8_t system_special = MOX::_star[star_id].system_special;
+        bool has_visited = HAROLD::Player_Has_Visited_(player_id, star_id);
+
+        if (system_special == SYSTEM_SPECIAL_SPACE_MONSTER && has_visited) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Finds the index of the player who has their home planet in the specified star system.
      * Returns -1 if no home planet in the system belongs to any player.
      * @address 004f17d0

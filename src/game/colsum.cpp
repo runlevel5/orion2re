@@ -1027,4 +1027,85 @@ namespace COLSUM {
 
         return cmp_(turns1, turns2);
     }
+
+    int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx) {
+        int16_t planet_idx = static_cast<int16_t>(MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM]);
+
+        bool needs_search = false;
+        if (planet_idx == -1) {
+            needs_search = true;
+        } else {
+            int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+            if (colony_idx == -1) {
+                needs_search = true;
+            } else {
+                if (MOX::_colony[colony_idx].owner != 0) {
+                    needs_search = true;
+                }
+            }
+        }
+
+        if (needs_search) {
+            for (int16_t i = 0; i < 5; ++i) {
+                int16_t p_idx = MOX::_star[star_idx].planet_index[i];
+                if (p_idx != -1) {
+                    int16_t c_idx = MOX::_planet[p_idx].colony_index;
+                    if (c_idx != -1) {
+                        if (MOX::_colony[c_idx].owner == MOX::_PLAYER_NUM) {
+                            planet_idx = p_idx;
+                        }
+                    }
+                }
+            }
+        }
+
+        return planet_idx;
+    }
+
+    /**
+     * @address 00402d80
+     */
+    int16_t __cdecl Prod_To_Sort_Type_(int16_t param_1) {
+        if (param_1 <= -100) {
+            // Index logic: -100 maps to ship 0, -101 to ship 1, etc.
+            return static_cast<int16_t>(MOX::_ship[-100 - param_1].d.size) + 10000;
+        }
+
+        if (param_1 == -15) {
+            return 9999;
+        }
+
+        // Handle specific building indices (1-48)
+        if (param_1 > 0 && param_1 < 49) {
+            return static_cast<int16_t>(TECHDATA::_buildings[param_1].cost) + 10;
+        }
+
+        // Special categories of items/projects
+        if (param_1 == -6 || param_1 == -4 || param_1 == -5 || param_1 == -7) {
+            return -1;
+        }
+
+        if (param_1 == -3 || param_1 == -2 || param_1 == -10) {
+            return -2;
+        }
+
+        // Broad range return
+        if (param_1 > -100 && param_1 <= -50) {
+            return 0;
+        }
+
+        // Specific indices returning 0
+        if (param_1 == -11 || param_1 == -12 || param_1 == -13 || 
+            param_1 == -17 || param_1 == -16 || param_1 == -8 || 
+            param_1 == -9 || param_1 >= 49) {
+            return 0;
+        }
+
+        // Optimized fallback for param_1 == -1
+        if (param_1 == -1) {
+            return -1;
+        }
+
+        return 0;
+    }
 }

@@ -1735,6 +1735,42 @@ namespace COLCALC {
         }
     }
 
+    bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx) {
+        if (MOX::_player[player_idx].home_planet_id != -1) {
+            if (MOX::_planet[MOX::_player[player_idx].home_planet_id].star_index == (char)star_idx) {
+                return false;
+            }
+        }
+
+        // Check if the system is already set to surrender to this recipient
+        if (MOX::_star[star_idx].surrender_to[recipient_idx] == (int8_t)player_idx) {
+            return false;
+        }
+
+        // Check if the player already has a surrender order for this system
+        if (MOX::_star[star_idx].surrender_to[player_idx] != -1) {
+            return false;
+        }
+
+        // Recipient must be able to reach the star
+        if (!SHIPMOVE::Star_In_Normal_Range_Of_Player_(&MOX::_star[star_idx], (int16_t)recipient_idx)) {
+            return false;
+        }
+
+        bool has_other_colony = false;
+        // Verify player has colonies in other star systems
+        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            // has_colony is a bitmask of players present in the system
+            if ((MOX::_star[i].has_colony >> (uint8_t)player_idx) & 1) {
+                if (&MOX::_star[i] != &MOX::_star[star_idx]) {
+                    has_other_colony = true;
+                }
+            }
+        }
+
+        return has_other_colony;
+    }
+
     void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner) {
         s_star_data& star = MOX::_star[star_idx];
 
@@ -1821,6 +1857,89 @@ namespace COLCALC {
         }
     }
 
+    int __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
+        if (product_id >= 1 && product_id < BUILDING_COUNT) {
+            int base_cost = TECHDATA::_buildings[product_id].cost;
+
+            switch (product_id) {
+                case BUILDING_BARRIER_SHIELD:
+                    if (colony->buildings[BUILDING_FLUX_SHIELD]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_FLUX_SHIELD].cost;
+                    }
+                    if (colony->buildings[BUILDING_RADIATION_SHIELD]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_RADIATION_SHIELD].cost;
+                    }
+                    return base_cost;
+
+                case BUILDING_FLUX_SHIELD:
+                    if (colony->buildings[BUILDING_RADIATION_SHIELD]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_RADIATION_SHIELD].cost;
+                    }
+                    return base_cost;
+
+                case BUILDING_STAR_FORTRESS:
+                    if (colony->buildings[BUILDING_BATTLESTATION]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_BATTLESTATION].cost;
+                    }
+                    if (colony->buildings[BUILDING_STAR_BASE]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_STAR_BASE].cost;
+                    }
+                    return base_cost;
+
+                case BUILDING_BATTLESTATION:
+                    if (colony->buildings[BUILDING_STAR_BASE]) {
+                        return base_cost - TECHDATA::_buildings[BUILDING_STAR_BASE].cost;
+                    }
+                    return base_cost;
+
+                case BUILDING_TERRAFORMING:
+                {
+                    int n_terraforms = MOX::_planet[colony->planet].n_terraforms;
+                    return base_cost + (n_terraforms * 250);
+                }
+
+                default:
+                    return base_cost;
+            }
+        }
+
+        if (product_id <= -100) {
+            int ship_index = -100 - product_id;
+            return MOX::_ship[ship_index].d.cost;
+        }
+
+        if (product_id <= -50) {
+            int design_index = -50 - product_id;
+            return MOX::_player[colony->owner].ship_designs[design_index].cost;
+        }
+
+        switch (product_id) {
+            case -17: // Transport
+                return Ship_Type_Cost_For_Player_(4, colony->owner);
+
+            case -12: // Colony Ship
+                return Ship_Type_Cost_For_Player_(1, colony->owner);
+
+            case -11: // Freighter
+                return Ship_Type_Cost_For_Player_(2, colony->owner);
+
+            case -7: // Spy
+                return 100;
+
+            case -16: // Housing / Trade Goods
+            case -15: // Outpost?
+            case -14:
+            case -13:
+            case -6:
+            case -5:
+            case -4:
+                return 50;
+
+            default:
+                return 0;
+        }
+    }
+
     void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player) {
         player->total_known_tech_cost = 0;
 
@@ -1853,6 +1972,38 @@ namespace COLCALC {
                 const s_tech_field_data& field = TECHDATA::_technology_fields[i];
                 // Cost calculation: Base Cost + (Level - 1) * 10000
                 player->total_known_tech_cost += field.cost + (level - 1) * 10000;
+            }
+        }
+    }
+
+    /**
+     * @address 004fb870
+     */
+    void __cdecl Check_For_Eliminated_Players_() {
+        uint8_t has_colonies[8];
+        memset(has_colonies, 0, sizeof(has_colonies));
+
+        // Mark players that currently own at least one colony (excluding outposts)
+        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if ((uint8_t)colony->owner < 8 && colony->outpost_flag == 0) {
+                has_colonies[(uint8_t)colony->owner] = 1;
+            }
+        }
+
+        // Check each player to see if they should be eliminated
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            s_player* player = &MOX::_player[i];
+
+            if (player->eliminated == 0) {
+                // If the player has no colonies left, eliminate them from the game
+                if (has_colonies[i] == 0) {
+                    Eliminate_Player_(player);
+                    EVENTS::Event_Race_Eliminated_((int8_t)i);
+                }
+
+                // Reset the last attacker info for this turn
+                player->last_attacker = -1;
             }
         }
     }

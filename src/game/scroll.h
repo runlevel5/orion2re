@@ -6,18 +6,8 @@ namespace SCROLL {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0048dc40})(bar, fill_fn);
     }
 
-    inline void __cdecl Scroll_Down_One_Item_(s_scroll_bar* bar) {
-        using Fn = void(__cdecl*)(s_scroll_bar*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0048DB60})(bar);
-    }
-    inline void __cdecl Scroll_Up_One_Item_(s_scroll_bar* bar) {
-        using Fn = void(__cdecl*)(s_scroll_bar*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0048DBD0})(bar);
-    }
+    void __cdecl Scroll_Down_One_Item_(s_scroll_bar* sb);
+    void __cdecl Scroll_Up_One_Item_(s_scroll_bar* bar);
 
-    inline int16_t __cdecl Get_Vertical_Scroll_Bar_Height_(s_scroll_bar* sb) {
-        using Fn = int16_t(__cdecl*)(s_scroll_bar*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048dad0});
-        return fn(sb);
-    }
+    int16_t __cdecl Get_Vertical_Scroll_Bar_Height_(s_scroll_bar* sb);
 }

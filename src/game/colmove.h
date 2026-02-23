@@ -15,11 +15,7 @@ namespace COLMOVE {
 
     void __cdecl Get_Cluster_(int16_t colony_idx, int16_t start_pop_idx);
 
-    inline bool __cdecl Pops_Identical_(int16_t col1, int16_t pop1, int16_t col2, int16_t pop2) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f4f0});
-        return fn(col1, pop1, col2, pop2);
-    }
+    bool __cdecl Pops_Identical_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
     inline void __cdecl Send_Cluster_(int16_t colony_idx, int16_t param_2) {
         using Fn = void(__cdecl*)(int16_t, int16_t);

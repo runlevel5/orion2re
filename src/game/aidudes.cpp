@@ -23,6 +23,56 @@ namespace aidudes {
         }
     }
 
+    void __cdecl Industry_Sanity_Check_() {
+        int n_colonies = (int)aidudes::_n_our_unblockaded;
+        s_aidudes_colony_info* colony_infos = aidudes::_our_unblockaded;
+
+        for (int i = 0; i < n_colonies; ++i) {
+            s_aidudes_colony_info* info = &colony_infos[i];
+            uint8_t colony_idx = (uint8_t)info->colony_idx;
+            s_colony* col = &MOX::_colony[colony_idx];
+
+            bool is_colony_researching = (col->producing[0] == -2);
+
+            if ((is_colony_researching && aidudes::_p_ai->do_not_research == 0) ||
+                EVENTS::Event_Check_Colony_Researching_((int16_t)colony_idx) != 0) {
+
+                for (int j = (int)info->pop_tail_idx - 1; j >= (int)info->first_assignable_pop_idx; --j) {
+                    uint32_t* pop_entry = &col->pop[j];
+
+                    if ((*pop_entry & 0x180) != 0x80) {
+                        break;
+                    }
+
+                    *pop_entry = (*pop_entry & ~0x80) | 0x100;
+                }
+
+                COLCALC::Colony_Calculation_((int16_t)colony_idx);
+            }
+        }
+    }
+
+    void __cdecl Colony_AI_Given_Tax_() {
+        for (int i = 0; i < aidudes::_n_our_blockaded; ++i) {
+            aidudes::Do_Blockaded_Colony_(&aidudes::_our_blockaded[i]);
+        }
+
+        for (int i = 0; i < aidudes::_n_our_unblockaded; ++i) {
+            aidudes::Do_Unblockaded_Colony_(&aidudes::_our_unblockaded[i]);
+        }
+
+        aidudes::Assign_Additional_Research_Industry_();
+        aidudes::Assign_Empire_Building_(aidudes::_i_ai);
+        aidudes::Assign_Buildings_();
+        aidudes::Industry_Sanity_Check_();
+
+        if (aidudes::_n_our_unblockaded > 0) {
+            aidudes::Assign_Additional_Unblockaded_Farmers_();
+        } else {
+            COLCALC::Do_Player_Colony_Post_Production_(aidudes::_i_ai);
+        }
+    }
+
     void __cdecl Colony_AI_(int16_t i_ai) {
         s_aidudes_colony_info our_colonies_local[250];
 
@@ -164,7 +214,7 @@ namespace aidudes {
                     weights[15] = 30;
                 }
 
-                if (colony->pollution >= 5 && current_info->field12_0xc == 0) {
+                if (colony->pollution >= 5 && current_info->eats_minerals == 0) {
                     // TECH_APP_CORE_WASTE_DUMPS (50), BUILDING_CORE_WASTE_DUMP (13)
                     if (_p_ai->tech_applications[50] == 3 && colony->buildings[13] == 0) {
                         weights[13] = static_cast<int8_t>(isqrt_(colony->pollution)) + 8;
@@ -277,6 +327,17 @@ namespace aidudes {
         _our_unblockaded = &((*_our_colonies)[_n_our_blockaded]);
     }
 
+    void __cdecl Assign_Buildings_() {
+        int count = (int)_n_our_colonies;
+
+        if (count > 0) {
+            for (int i = 0; i < count; ++i) {
+                uint8_t colony_idx = (uint8_t)(*_our_colonies)[i].colony_idx;
+                AIBUILD::Assign_Colony_Building_(&MOX::_colony[colony_idx]);
+            }
+        }
+    }
+
     void __cdecl Freighter_Cheat_(int32_t player_idx) {
         s_player* plr = &MOX::_player[player_idx];
 
@@ -289,5 +350,264 @@ namespace aidudes {
                 plr->n_freighters = 5;
             }
         }
+    }
+
+    void __cdecl Do_Ship_Upgrade_Cheats_() {
+        s_ai_refit_player* refit_player = &(*AIDATA::_airefit)[aidudes::_i_ai];
+        int16_t num_entries = refit_player->n_entries;
+
+        if (MOX::_stardate <= 35035 /* 0x88db */) {
+            return;
+        }
+
+        if (num_entries == 0) {
+            return;
+        }
+
+        // Determine if AI is eligible for an upgrade cheat based on difficulty and last refit entry desirability
+        int ship_design_idx = refit_player->entry[num_entries - 1].ship_idx;
+        int difficulty_bonus = AIBUILD::_difficulty_ship_design[MOX::_settings.game_difficulty];
+        int upgrade_count = 0;
+
+        if (random::Random_(900) <= (difficulty_bonus + ship_design_idx) * 2) {
+            upgrade_count = 1;
+        }
+
+        // AI must have a stable empire (at least 2 colonies and sufficient population) to cheat
+        if ((*AIDATA::_ai_player_info)[aidudes::_i_ai].colony_count < 2) {
+            upgrade_count = 0;
+        } else {
+            int total_pop = MOX::_player[aidudes::_i_ai].total_pop;
+            if (random::Random_(total_pop) <= 8) {
+                upgrade_count = 0;
+            }
+        }
+
+        // Iterate backwards through refit entries and perform the upgrade if conditions met
+        for (int i = num_entries; i > 0; i--) {
+            if (upgrade_count == 0) {
+                break;
+            }
+
+            s_ai_refit_entry* entry = &refit_player->entry[i - 1];
+            s_ship_data* ship = &MOX::_ship[entry->field0_0x0];
+            int location = ship->location;
+
+            // Skip ships in systems with incoming human activity
+            if ((*AIDATA::_enroute_human_ships)[location][3] != 0) {
+                continue;
+            }
+
+            // Only upgrade if the system is either uncolonized or owned strictly by this AI
+            uint8_t has_colony_mask = MOX::_star[location].has_colony;
+            uint32_t other_players_mask = ~(1 << aidudes::_i_ai);
+            if ((has_colony_mask & other_players_mask) != 0) {
+                continue;
+            }
+
+            // Apply design upgrade
+            if (ship->d.size < 5 /* SIZE_DOOMSTAR */) {
+                ship->d = aidudes::_p_ai->ship_designs[(int)ship->d.size];
+            } else {
+                INITSHIP::Load_Doom_Star_Ship_Design_(aidudes::_i_ai, &ship->d);
+            }
+
+            upgrade_count--;
+
+            // Remove the entry from the refit list
+            refit_player->n_entries--;
+            int entries_to_move = refit_player->n_entries - (i - 1);
+            if (entries_to_move > 0) {
+                memcpy(&refit_player->entry[i - 1], &refit_player->entry[i], entries_to_move * sizeof(s_ai_refit_entry));
+            }
+        }
+    }
+
+    void __cdecl Assign_Additional_Research_Industry_() {
+        int industry_mult = 10;
+        int research_mult = 18;
+
+        if (aidudes::_p_ai->surplus_bc < 0) {
+            research_mult = 18 + (int)isqrt_((uint32_t)-aidudes::_p_ai->surplus_bc);
+        }
+
+        if (aidudes::_p_ai->do_not_research == 0) {
+            if (aidudes::_p_ai->objectives == 3) {
+                industry_mult = 12;
+            } else if (aidudes::_p_ai->objectives == 4) {
+                research_mult += 2;
+            }
+        } else {
+            industry_mult = 0;
+        }
+
+        COLCALC::Do_Player_Colony_Calculations_(aidudes::_i_ai);
+
+        while (true) {
+            s_aidudes_colony_info* best_colony = nullptr;
+
+            if ((uint32_t)aidudes::_p_ai->research_produced * (uint32_t)research_mult < (uint32_t)aidudes::_p_ai->industry_produced * (uint32_t)industry_mult) {
+                short max_score = (short)0x8001;
+                for (int i = 0; i < (int)aidudes::_n_our_unblockaded; ++i) {
+                    if (aidudes::_our_unblockaded[i].worker_to_farmer_score > max_score) {
+                        max_score = aidudes::_our_unblockaded[i].worker_to_farmer_score;
+                        best_colony = &aidudes::_our_unblockaded[i];
+                    }
+                }
+
+                if (best_colony == nullptr) {
+                    return;
+                }
+                aidudes::Grab_Scientist_(best_colony);
+            } else {
+                short min_score = 0x7fff;
+                for (int i = 0; i < (int)aidudes::_n_our_unblockaded; ++i) {
+                    if (aidudes::_our_unblockaded[i].field9_0xa < min_score) {
+                        min_score = aidudes::_our_unblockaded[i].field9_0xa;
+                        best_colony = &aidudes::_our_unblockaded[i];
+                    }
+                }
+
+                if (best_colony == nullptr) {
+                    return;
+                }
+                aidudes::Grab_Worker_(best_colony);
+            }
+
+            COLCALC::Colony_Calculation_((int16_t)best_colony->colony_idx);
+        }
+    }
+
+    void __cdecl Grab_Scientist_(s_aidudes_colony_info* colony_info) {
+        uint8_t colony_idx = (uint8_t)colony_info->colony_idx;
+        uint8_t cur_pop_idx = (uint8_t)colony_info->cur_pop_idx;
+
+        s_colony& colony = MOX::_colony[colony_idx];
+
+        uint32_t& pop_flags = colony.pop[cur_pop_idx];
+
+        pop_flags = (pop_flags & 0xffffff7f) | 0x100;
+
+        pop_flags |= 0x200;
+
+        colony_info->cur_pop_idx = (int8_t)(cur_pop_idx + 1);
+
+        Compute_Max_Min_R_I_Worthiness_(colony_info);
+    }
+
+    void __cdecl Grab_Worker_(s_aidudes_colony_info* info) {
+        s_colony* colony = &MOX::_colony[(uint8_t)info->colony_idx];
+
+        info->pop_end_idx--;
+
+        uint32_t& pop_record = colony->pop[(uint8_t)info->pop_end_idx];
+
+        pop_record = (pop_record & 0xFFFFFEFF) | 0x80;
+
+        pop_record |= 0x200;
+
+        Compute_Max_Min_R_I_Worthiness_(info);
+    }
+
+    void __cdecl Do_Unblockaded_Colony_(s_aidudes_colony_info* info) {
+        s_colony* colony = &MOX::_colony[info->colony_idx];
+
+        // Calculate minimum required workers (ceiling of n_pops / 5)
+        int32_t n_required_workers = ((uint8_t)colony->n_pops + 4) / 5;
+
+        Assign_Required_Colonists_(info);
+
+        _Sort_Pops_colony = colony;
+        _qsort(&colony->pop[info->first_assignable_pop_idx],
+              (uint8_t)colony->n_pops - info->first_assignable_pop_idx,
+              sizeof(uint32_t),
+              Sort_Pops_Compare_1);
+
+        if (EVENTS::Event_Check_Colony_Researching_((int16_t)info->colony_idx)) {
+            n_required_workers = 0;
+        }
+
+        COLCALC::Pre_Import_Computing_(colony);
+
+        // Main loop to shift population to workers based on industry needs
+        while (info->cur_pop_idx < info->pop_tail_idx) {
+            int32_t needed_industry = (uint8_t)colony->industry2_needed_for_conquered +
+                                      (uint8_t)colony->industry2_needed_for_our_empire +
+                                      (uint8_t)colony->industry2_needed_for_androids +
+                                      (uint8_t)colony->industry2_needed_for_assimilated;
+
+            if (info->n_workers >= n_required_workers && needed_industry <= colony->production[1] * 2) {
+                break;
+            }
+
+            info->pop_tail_idx--;
+            uint8_t idx = info->pop_tail_idx;
+            // Mark pop as worker and set AI worker flags
+            colony->pop[idx] = (colony->pop[idx] & 0xFFFFFEFF) | 0x80 | 0x200;
+            info->n_workers++;
+
+            COLCALC::Pre_Import_Computing_(colony);
+        }
+
+        info->pop_end_idx = info->pop_tail_idx;
+        info->pollution_at_start = (int8_t)colony->pollution;
+
+        _Sort_Pops_colony = colony;
+        _qsort(&colony->pop[info->first_assignable_pop_idx],
+              info->pop_end_idx - info->cur_pop_idx,
+              sizeof(uint32_t),
+              Sort_Pops_Compare_2);
+
+        Compute_Max_Min_R_I_Worthiness_(info);
+    }
+
+    void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info) {
+        s_colony* colony = &MOX::_colony[colony_info->colony_idx];
+
+        Assign_Required_Colonists_(colony_info);
+
+        aidudes::_Sort_Pops_colony = colony;
+        _qsort(&colony->pop[colony_info->first_assignable_pop_idx],
+              (size_t)colony->n_pops - colony_info->first_assignable_pop_idx,
+              sizeof(uint32_t),
+              Sort_Pops_FI_);
+
+        if (colony->food2_per_farmer != 0) {
+            COLCALC::Pre_Import_Computing_(colony);
+
+            while (colony_info->cur_pop_idx < colony_info->pop_end_idx) {
+                int food_needed = (uint8_t)colony->food2_needed_for_our_empire +
+                                  (uint8_t)colony->food2_needed_for_assimilated +
+                                  (uint8_t)colony->food2_needed_for_conquered +
+                                  (uint8_t)colony->food2_needed_for_natives;
+
+                if (food_needed > (colony->production[0] * 2)) {
+                    if (colony_info->n_farmers < (int8_t)colony->max_farms) {
+                        colony->pop[colony_info->cur_pop_idx] &= ~0x180;
+                        colony->pop[colony_info->cur_pop_idx] |= 0x200;
+                        colony_info->cur_pop_idx++;
+                        colony_info->n_farmers++;
+                    }
+                } else {
+                    colony_info->pop_end_idx--;
+                    uint8_t idx = colony_info->pop_end_idx;
+                    colony->pop[idx] = (colony->pop[idx] & ~0x100) | 0x80;
+                    colony->pop[idx] |= 0x200;
+                }
+                COLCALC::Pre_Import_Computing_(colony);
+            }
+        } else {
+            int16_t research_status = EVENTS::Event_Check_Colony_Researching_((int16_t)colony_info->colony_idx);
+            uint32_t target_bits = (research_status == 0) ? 0x80 : 0x100;
+
+            while (colony_info->cur_pop_idx < colony_info->pop_end_idx) {
+                uint32_t current_pop = colony->pop[colony_info->cur_pop_idx];
+                colony->pop[colony_info->cur_pop_idx] = (current_pop & ~0x180) | target_bits;
+                colony->pop[colony_info->cur_pop_idx] |= 0x200;
+                colony_info->cur_pop_idx++;
+            }
+        }
+
+        COLCALC::Pre_Import_Computing_(colony);
     }
 }

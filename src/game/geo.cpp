@@ -154,4 +154,27 @@ namespace GEO {
         return black_hole_count;
     }
 
+    /**
+     * Checks if a point (x, y) is within the radius of a warp field interdictor
+     * belonging to any player other than the one specified by player_idx.
+     */
+    bool __cdecl Point_Is_In_Warp_Field_Interdictor_Of_Star_(int16_t x, int16_t y, uint8_t player_idx, s_star_data* star) {
+        bool result = false;
+
+        // Mask out the bit corresponding to player_idx to check for interdictors from other players
+        uint8_t other_players_mask = ~(1 << player_idx);
+
+        if ((star->has_warp_field_interdictor & other_players_mask) != 0) {
+            int32_t dx = (int32_t)x - (int32_t)star->x;
+            int32_t dy = (int32_t)y - (int32_t)star->y;
+
+            // Check if squared distance is within the threshold (8100 = 90^2)
+            if (dx * dx + dy * dy <= 8100 /* 0x1fa4 */) {
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
 } // namespace GEO

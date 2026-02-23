@@ -1,22 +1,9 @@
 #pragma once
 
-namespace aidudes {
-    struct s_aidudes_colony_info {
-        int8_t colony_idx;
-        uint8_t field1_0x1;
-        uint8_t field2_0x2;
-        uint8_t field3_0x3;
-        uint8_t field4_0x4;
-        uint8_t field5_0x5;
-        uint8_t field6_0x6;
-        uint8_t field7_0x7;
-        uint8_t field8_0x8;
-        uint8_t field9_0x9;
-        uint8_t field10_0xa;
-        uint8_t field11_0xb;
-        uint8_t field12_0xc;
-    };
+struct s_colony;
+struct s_aidudes_colony_info;
 
+namespace aidudes {
     inline uint16_t& _n_our_blockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C0});
     inline uint16_t& _n_our_unblockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C4});
     inline s_aidudes_colony_info*& _our_blockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657C8});
@@ -26,6 +13,8 @@ namespace aidudes {
 
     inline s_aidudes_colony_info*& _our_unblockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657D0});
     inline uint16_t& _n_our_colonies = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657D4});
+    inline s_colony*& _Sort_Pops_colony =
+        *reinterpret_cast<s_colony**>(std::uintptr_t{0x005657D8});
 
     inline int16_t& _i_ai =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657DC});
@@ -43,18 +32,66 @@ namespace aidudes {
 
     void __cdecl Freighter_Cheat_(int32_t player_idx);
 
-    inline void __cdecl Do_Ship_Upgrade_Cheats_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00446950});
-        fn();
+    void __cdecl Do_Ship_Upgrade_Cheats_();
+
+    void __cdecl Colony_AI_Given_Tax_();
+
+    inline int __cdecl Sort_Pops_FI_(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445320});
+        return fn(a, b);
     }
 
-    inline void __cdecl Colony_AI_Given_Tax_() {
+    void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info);
+
+    void __cdecl Do_Unblockaded_Colony_(s_aidudes_colony_info* info);
+
+    inline void __cdecl Assign_Required_Colonists_(s_aidudes_colony_info* info) {
+        using Fn = void(__cdecl*)(s_aidudes_colony_info*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445130});
+        fn(info);
+    }
+
+    inline void __cdecl Compute_Max_Min_R_I_Worthiness_(s_aidudes_colony_info* info) {
+        using Fn = void(__cdecl*)(s_aidudes_colony_info*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445710});
+        fn(info);
+    }
+
+    inline int __cdecl Sort_Pops_Compare_2(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445520});
+        return fn(a, b);
+    }
+
+    inline int __cdecl Sort_Pops_Compare_1(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004455D0});
+        return fn(a, b);
+    }
+
+    void __cdecl Assign_Additional_Research_Industry_();
+
+    void __cdecl Grab_Scientist_(s_aidudes_colony_info* colony);
+
+    void __cdecl Grab_Worker_(s_aidudes_colony_info* info);
+
+    inline void __cdecl Assign_Empire_Building_(int16_t i_ai) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047be10});
+        fn(i_ai);
+    }
+
+    void __cdecl Industry_Sanity_Check_();
+
+    inline void __cdecl Assign_Additional_Unblockaded_Farmers_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444E80});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004459d0});
         fn();
     }
 
     void __cdecl Colony_AI_(int16_t i_ai);
     void All_Colony_AI_();
+
+    void __cdecl Assign_Buildings_();
 }

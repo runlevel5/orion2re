@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace AIBUILD {
+    inline int8_t (&_difficulty_ship_design)[12] =
+        *reinterpret_cast<int8_t (*)[12]>(std::uintptr_t{0x0054F054});
     inline int8_t (&_difficulty_intel_bias)[8] =
         *reinterpret_cast<int8_t (*)[8]>(std::uintptr_t{0x0054F060});
     inline int8_t* _player_ship_size_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F068});
@@ -25,9 +27,13 @@ namespace AIBUILD {
     void __cdecl Compute_Colony_Ship_Need_(int16_t player_num);
     void __cdecl Compute_Freighter_Need_(int16_t player_idx);
 
-    inline void __cdecl Empire_Buy_Outright_(int16_t i_ai) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047BA30});
-        fn(i_ai);
+    void __cdecl Empire_Buy_Outright_(int16_t player_idx);
+
+    void __cdecl Assign_Colony_Building_(struct s_colony* colony);
+
+    inline void __cdecl Assign_Colony_New_Building_(struct s_colony* colony) {
+        using Fn = void(__cdecl*)(struct s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047aab0});
+        fn(colony);
     }
 }

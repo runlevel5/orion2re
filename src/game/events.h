@@ -53,4 +53,10 @@ namespace EVENTS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775D0});
         fn(owner);
     }
+
+    inline void __cdecl Event_Race_Eliminated_(int8_t player_idx) {
+        using Fn = void(__cdecl*)(int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775b0});
+        fn(player_idx);
+    }
 }

@@ -21,4 +21,10 @@ namespace ERICNET {
     void __cdecl Calc_Ship_Level_(int16_t ship_idx);
 
     void __cdecl Do_XP_For_Ship_(int16_t ship_index, int16_t xp_gain);
+
+    inline void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409020});
+        fn(colony_idx, building_idx);
+    }
 }

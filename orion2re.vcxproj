@@ -25,6 +25,7 @@
     <ClCompile Include="src\game\aidata.cpp" />
     <ClCompile Include="src\game\aidesign.cpp" />
     <ClCompile Include="src\game\aidudes.cpp" />
+    <ClCompile Include="src\game\aileader.cpp" />
     <ClCompile Include="src\game\aimove.cpp" />
     <ClCompile Include="src\game\aipower.cpp" />
     <ClCompile Include="src\game\aitech.cpp" />
@@ -106,10 +107,13 @@
     <ClCompile Include="src\game\racesel.cpp" />
     <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
+    <ClCompile Include="src\game\report.cpp" />
     <ClCompile Include="src\game\russ.cpp" />
+    <ClCompile Include="src\game\scroll.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
+    <ClCompile Include="src\game\special.cpp" />
     <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
@@ -226,6 +230,7 @@
     <ClInclude Include="src\game\netstart.h" />
     <ClInclude Include="src\game\netturn.h" />
     <ClInclude Include="src\game\newgame.h" />
+    <ClInclude Include="src\game\newtech.h" />
     <ClInclude Include="src\game\nextturn.h" />
     <ClInclude Include="src\game\npcdiplo.h" />
     <ClInclude Include="src\game\ocpolpup.h" />

@@ -1,6 +1,11 @@
 #pragma once
 #include <cstdint>
 
+struct s_colony;
+struct s_planet_data;
+struct s_star_data;
+struct s_ship_data;
+
 namespace REPORT {
     inline uint16_t& _n_reports = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A4EAA});
     inline uint8_t (&_reports)[950] = *reinterpret_cast<uint8_t(*)[950]>(std::uintptr_t{0x005A4EC0});
@@ -20,4 +25,7 @@ namespace REPORT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A9D80});
         fn(data);
     }
+
+    s_colony* __cdecl Player_Colony_Base_At_Star_(short player_idx, short star_idx);
+    s_ship_data* __cdecl Player_Ship_Type_At_Star_(short owner, short ship_type, short location, char include_just_built);
 }

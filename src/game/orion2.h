@@ -281,6 +281,22 @@ struct s_aidesign_ship_design {
     short bombs;
 };
 
+typedef struct s_aidudes_colony_info s_aidudes_colony_info, *Ps_aidudes_colony_info;
+
+struct s_aidudes_colony_info {
+    int8_t colony_idx;
+    int8_t n_farmers;
+    int8_t n_workers;
+    int8_t first_assignable_pop_idx;
+    int8_t cur_pop_idx;
+    int8_t pop_end_idx;
+    int8_t pop_tail_idx;
+    int8_t pollution_at_start;
+    short worker_to_farmer_score;
+    short field9_0xa;
+    int8_t eats_minerals;
+};
+
 typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
 typedef uint uint32_t;

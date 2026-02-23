@@ -25,6 +25,8 @@ namespace GEO {
     }
     int16_t __cdecl Get_Orbit_From_X_Y_(int16_t rel_x, int16_t rel_y);
 
+    bool __cdecl Point_Is_In_Warp_Field_Interdictor_Of_Star_(int16_t x, int16_t y, uint8_t player_idx, s_star_data* star);
+
     inline bool __cdecl Point_Is_In_Nebula_N_(int16_t x, int16_t y, int16_t nebula_index) {
         using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412A90});

@@ -416,4 +416,107 @@ namespace AIBUILD {
         Compute_Colony_Ship_Need_(player_idx);
         Compute_Freighter_Need_(player_idx);
     }
+
+    void __cdecl Empire_Buy_Outright_(int16_t player_idx) {
+        s_player* player = &MOX::_player[player_idx];
+        int16_t total_maintenance = *reinterpret_cast<int16_t*>(&player->total_maintenance);
+        
+        int32_t limit = (player->bc * 3) / 4;
+        if (limit > 1500) {
+            limit = 1500;
+        } else if (limit < 50) {
+            limit = 50;
+        }
+
+        int16_t chosen_colony;
+        do {
+            bool has_threatened = false;
+            uint16_t max_weight_threatened = 0;
+            uint16_t max_weight_safe = 0;
+            uint16_t weights[250];
+            memset(weights, 0, sizeof(weights));
+
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+                s_colony* colony = &MOX::_colony[i];
+                
+                if (colony->owner != (int8_t)player_idx) continue;
+                if (colony->bought_outright != 0) continue;
+
+                int16_t planet_idx = colony->planet;
+                int8_t star_idx = MOX::_planet[planet_idx].star_index;
+                if ((MOX::_star[star_idx].blockaded >> (player_idx & 0x1F)) & 1) continue;
+
+                int16_t producing = colony->producing[0];
+                if (producing >= -3 && producing <= -1) continue;
+
+                int32_t cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(colony);
+                if (cost <= 0) continue;
+
+                if ((int32_t)total_maintenance + cost >= player->bc) continue;
+
+                s_ai_colony_info* ai_info = &(*AIDATA::_ai_colony_info)[i];
+                if (ai_info->threatened == 0) {
+                    if (player->bc - (int32_t)total_maintenance - cost < limit) continue;
+                }
+
+                int32_t turns = (int32_t)COLCALC::Colony_N_Turns_To_Produce_(colony);
+                if (turns < 0 || turns > 50) {
+                    turns = 50;
+                }
+
+                uint32_t weight = ((turns * turns * 1000) / (cost * cost)) + 1;
+                if (weight > 0xFFFF) {
+                    weight = 0xFFFF;
+                }
+                weights[i] = (uint16_t)weight;
+
+                if (ai_info->threatened != 0) {
+                    has_threatened = true;
+                    if (weights[i] > max_weight_threatened) {
+                        max_weight_threatened = weights[i];
+                    }
+                } else {
+                    if (weights[i] > max_weight_safe) {
+                        max_weight_safe = weights[i];
+                    }
+                }
+            }
+
+            if (max_weight_safe != 0 || max_weight_threatened != 0) {
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+                    if (weights[i] == 0) continue;
+
+                    if (has_threatened) {
+                        s_ai_colony_info* ai_info = &(*AIDATA::_ai_colony_info)[i];
+                        if (ai_info->threatened == 0 || (uint32_t)weights[i] * 4 < (uint32_t)max_weight_threatened * 3) {
+                            weights[i] = 0;
+                        }
+                    } else {
+                        if ((uint32_t)weights[i] * 4 < (uint32_t)max_weight_safe * 3) {
+                            weights[i] = 0;
+                        }
+                    }
+                }
+            }
+
+            chosen_colony = RUSS::Get_Weighted_Choice_Short_((const int16_t*)weights, (int16_t)MOX::_NUM_COLONIES);
+            if (chosen_colony != -1) {
+                COLCALC::Colony_Buy_Outright_(chosen_colony);
+            }
+
+            MOX::Mox_Update_();
+
+        } while (chosen_colony != -1);
+    }
+
+    void __cdecl Assign_Colony_Building_(s_colony* colony) {
+        if (colony->outpost_flag == 0 && colony->n_pops != 0) {
+            int16_t current_production = colony->producing[0];
+
+            // Check if producing specific special projects (values -38, or -3 to -1)
+            if (current_production == -38 || (current_production >= -3 && current_production <= -1)) {
+                Assign_Colony_New_Building_(colony);
+            }
+        }
+    }
 }
