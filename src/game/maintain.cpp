@@ -99,6 +99,96 @@ namespace maintain {
         _ship_worths = nullptr;
     }
 
+    /**
+     * @brief Checks if a building has a maintenance cost greater than zero.
+     * @param p Pointer to the player.
+     * @param a Colony index.
+     * @param b Building index.
+     * @return True if maintenance > 0, false otherwise.
+     */
+    bool __cdecl Phase2_Building_(s_player* p, int16_t a, int16_t b) {
+        // TYPE MISMATCH: decompiler showed bool __cdecl Phase2_Building_(short building_idx)
+        return TECHDATA::_buildings[b].maintenance > 0;
+    }
+
+    bool __cdecl All_But_Capitol_(s_player* p, int16_t a, int16_t b) {
+        // TYPE MISMATCH: decompiler showed bool __cdecl All_But_Capitol_(uint16_t building_id)
+        return b != BUILDING_CAPITOL;
+    }
+
+    /**
+     * @brief Removes research-specific buildings from all colonies of a specific player and provides BC compensation.
+     *
+     * This function iterates through all colonies belonging to the provided player. It checks for specific
+     * research buildings (IDs 6, 30, 19, 35) and removes them if present. The player is compensated with
+     * half of the building's cost, and a difficulty-based bonus is applied unless they have reached objective 100.
+     * If the colony was currently producing the removed building, its production is reset.
+     */
+    void __cdecl Kill_Research_Buildings_(s_player* player) {
+        int player_idx = (int)(player - MOX::_player);
+        bool any_removed = false;
+
+        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+
+            if (colony->owner == player_idx) {
+                for (int j = 0; j < 4; ++j) {
+                    uint8_t building_id = maintain::_research_building_table[j];
+
+                    if (colony->buildings[building_id] != 0) {
+                        int cost = TECHDATA::_buildings[building_id].cost;
+
+                        ERICNET::Remove_Building_((int16_t)i, (int16_t)building_id);
+                        any_removed = true;
+
+                        int compensation = cost / 2;
+                        player->bc += compensation;
+
+                        if (player->objectives != 100) {
+                            player->bc += MOX::_settings.game_difficulty;
+                        }
+                    }
+
+                    if (colony->producing[0] == building_id) {
+                        colony->producing[0] = -2; /* Set to default housing/trade */
+                    }
+                }
+            }
+        }
+
+        if (any_removed) {
+            COLCALC::Do_Player_Colony_Calculations_((int16_t)player_idx);
+        }
+    }
+
+    /**
+     * @brief Checks if the ship is currently located at a star system where its owner has a colony.
+     *
+     * @param ship Pointer to the ship data.
+     * @return true if the ship is at a colony belonging to its owner, false otherwise.
+     */
+    bool __cdecl Ship_Is_At_Colony_(s_ship_data* ship) {
+        int16_t star_id;
+        int8_t status = ship->status;
+        int8_t owner = ship->owner;
+
+        if (status == 0 || status == 4) {
+            star_id = ship->location;
+        } else if (status == 2) {
+            int16_t x = ship->x;
+            int16_t y = ship->y;
+            star_id = HAROLD::XY_To_Star_Id_(x, y);
+        } else {
+            return false;
+        }
+
+        if (((MOX::_star[star_id].has_colony >> owner) & 1) != 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     // Suggested name: MAINTAIN::Make_Scrap_Ships_Dead_
     void __cdecl Make_Scrap_Ships_Dead_() {
         int num_ships = (int)MOX::_NUM_SHIPS;
@@ -107,6 +197,152 @@ namespace maintain {
         for (int i = 0; i < num_ships; ++i) {
             if (ships[i].status == 7 || ships[i].status == 8) {
                 SHIPS::Kill_Ship_(static_cast<int16_t>(i));
+            }
+        }
+    }
+
+    /**
+     * Iteratively scraps the cheapest ships matching criteria until player maintenance deficit is resolved.
+     */
+    void __cdecl Kill_Ships_(s_player* player, bool at_colony_only, bool restricted_mission, int16_t ship_type) {
+        int16_t player_idx = (int16_t)(player - MOX::_player);
+        bool no_more_ships_found = false;
+
+        while ((player->bc + player->surplus_bc < 0) && !no_more_ships_found) {
+            s_ship_data* cheapest_ship = nullptr;
+            int16_t min_worth = 0x7FFF;
+
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+
+                if (ship->owner == player_idx &&
+                    (int16_t)ship->d.ship_type == ship_type &&
+                    ship->status < 3 /* Active */)
+                {
+                    if (at_colony_only && !Ship_Is_At_Colony_(ship)) {
+                        continue;
+                    }
+
+                    if (restricted_mission) {
+                        // Restricted missions: None (0), Orbiting (3), or Scrapped? (7)
+                        if (!(ship->mission == 0 || ship->mission == 3 || ship->mission == 7)) {
+                            continue;
+                        }
+                    }
+
+                    int16_t worth = (int16_t)(*maintain::_ship_worths)[i];
+                    if (worth < min_worth) {
+                        min_worth = worth;
+                        cheapest_ship = ship;
+                    }
+                }
+            }
+
+            if (cheapest_ship == nullptr) {
+                no_more_ships_found = true;
+            } else {
+                int scrap_cost = INITSHIP::Get_Ship_Scrap_Cost_(cheapest_ship);
+                player->bc += scrap_cost;
+
+                if (player->objectives != 100) {
+                    player->bc += MOX::_settings.game_difficulty;
+                }
+
+                COLCALC::Do_Player_Colony_Post_Production_(player_idx);
+
+                // Construct 20-byte message packet on stack as separate dwords
+                uint16_t ship_index = (uint16_t)(cheapest_ship - MOX::_ship);
+
+                uint32_t arg1 = (uint32_t)6 /* MSG_SHIP_SCRAPPED */ | ((uint32_t)cheapest_ship->location << 16);
+                uint32_t arg2 = (uint32_t)(uint16_t)scrap_cost | ((uint32_t)ship_index << 16);
+                uint32_t arg3 = 0;
+                uint32_t arg4 = 0;
+                uint32_t arg5 = 0;
+
+                MSG_::Add_Msg_(arg1, arg2, arg3, arg4, arg5, player_idx);
+
+                cheapest_ship->status = 7; /* Scrapped */
+
+                if (cheapest_ship->officer_index != -1) {
+                    OFFICER::Move_Officer_To_Pool_(cheapest_ship->officer_index);
+                    cheapest_ship->officer_index = -1;
+                }
+
+                MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+            }
+        }
+    }
+
+    /**
+     * Reduces the number of spies for a player if they have a negative BC balance (deficit).
+     * The spies are removed until the deficit is cleared or all spies are gone.
+     */
+    void __cdecl Kill_Spy_(s_player* player) {
+        int deficit = (int)player->bc + (int)player->surplus_bc;
+
+        if (deficit < 0) {
+            deficit = -deficit;
+            int16_t player_idx = (int16_t)(player - MOX::_player);
+
+            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+                if (deficit == 0) {
+                    break;
+                }
+
+                if (MOX::_player[i].eliminated == 0) {
+                    int16_t num_spies = BILL::Get_Their_Spy_Number_(player_idx, (int16_t)i);
+
+                    if (num_spies != 0) {
+                        if (deficit < (int)num_spies) {
+                            int16_t new_spy_count = num_spies - (int16_t)deficit;
+                            BILL::Set_Their_Spy_Number_(player_idx, (int16_t)i, (uint8_t)new_spy_count);
+                            deficit = 0;
+                        } else {
+                            deficit -= (int)num_spies;
+                            BILL::Set_Their_Spy_Number_(player_idx, (int16_t)i, 0);
+                        }
+                    }
+                }
+            }
+
+            COLCALC::Do_Player_Colony_Post_Production_(player_idx);
+        }
+    }
+
+    /**
+     * @brief Removes leaders/officers from a player's service if they are in financial deficit.
+     *
+     * Iterates through the player's hired leaders and deassigns them until the player is no
+     * longer in debt or no more leaders with maintenance costs remain.
+     *
+     * @param p Pointer to the player structure to process.
+     */
+    void __cdecl Kill_Leaders_(s_player* p) {
+        int16_t player_idx = (int16_t)(p - MOX::_player);
+        bool no_more_candidates = false;
+
+        while ((p->bc + (int)p->surplus_bc) < 0) {
+            if (no_more_candidates) {
+                break;
+            }
+
+            no_more_candidates = true;
+            for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
+                if (MOX::_leaders[leader_idx].player_index == (int8_t)player_idx) {
+                    if (OFFICER::Officer_Maintenance_(player_idx, leader_idx) > 0) {
+                        OFFICER::Deassign_Officer_(leader_idx);
+                        COLCALC::Do_Player_Colony_Calculations_(player_idx);
+
+                        uint32_t msg_args[5];
+                        memset(msg_args, 0, 18);
+                        msg_args[0] = 0x16 /* MSG_LEADER_FIRED */ | (uint32_t)(leader_idx << 16);
+
+                        MSG_::Add_Msg_(msg_args[0], msg_args[1], msg_args[2], msg_args[3], msg_args[4], player_idx);
+
+                        no_more_candidates = false;
+                        break;
+                    }
+                }
             }
         }
     }

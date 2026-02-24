@@ -1127,7 +1127,7 @@ namespace COLBLDG {
             Draw_Cost_And_Time_Info_(COLONY::_colony_handle, building_idx, &y_offset);
 
             y_offset = 0;
-            Print_App_Description_(0xd1, 0x77, 0xf8, *(int16_t*)&TECHDATA::_buildings[building_idx].field3_0x6);
+            Print_App_Description_(0xd1, 0x77, 0xf8, *(int16_t*)&TECHDATA::_buildings[building_idx].tech_app);
         }
     }
 
@@ -1223,6 +1223,16 @@ namespace COLBLDG {
     }
 
     /**
+     * @address 0050b2d0
+     */
+    void __cdecl Delete_Ship_(short ship_index) {
+        // status 5 likely indicates a deleted or inactive state
+        MOX::_ship[ship_index].status = 5;
+        // -1 (0xFFFF) location indicates the ship is no longer on the map
+        MOX::_ship[ship_index].location = -1;
+    }
+
+    /**
      * @address 0050ad80
      */
     void __cdecl Draw_Ship_Info_(int16_t item) {
@@ -1248,6 +1258,26 @@ namespace COLBLDG {
         }
 
         COLONY::Remap_Draw_Ship_Centered_(244, 56, index);
+    }
+
+    /**
+     * @brief Removes an item from a colony's production queue and cleans up associated ship data if necessary.
+     *
+     * @param colony_idx Index of the colony in the global colony array.
+     * @param queue_idx Index of the production queue slot to delete.
+     */
+    void __cdecl Delete_From_Colony_Queue_(short colony_idx, short queue_idx) {
+        if (queue_idx != -1) {
+            short producing_id = MOX::_colony[colony_idx].producing[queue_idx];
+
+            // Ship-related production items have IDs <= -100
+            if (producing_id <= -100) {
+                // Calculate original ship design ID or instance ID from the queue value
+                COLBLDG::Delete_Ship_(-100 - (int)producing_id);
+            }
+
+            COLBLDG::Squish_Out_Colony_Queue_Slot_(colony_idx, queue_idx);
+        }
     }
 
 } // namespace COLBLDG

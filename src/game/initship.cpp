@@ -725,4 +725,150 @@ namespace INITSHIP {
         aidesign::Auto_Design_Ship_(owner_idx, design, 5);
         strcpy(design->name, TECHDATA::_hull_data[5].name);
     }
+
+    void __cdecl Repair_Ships_At_Colonies_() {
+        int16_t best_warp_drives[8];
+
+        for (int16_t i = 0; i < 8; ++i) {
+            best_warp_drives[i] = Best_Warp_Drive_(i);
+        }
+
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+                s_ship_data& ship = MOX::_ship[i];
+
+                if (ship.owner < 8 && ship.status == 0) {
+                    int16_t best_ftl = best_warp_drives[(uint8_t)ship.owner];
+                    if (best_ftl != (int16_t)ship.d.ftl_type) {
+                        int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+                        ship.d.ftl_type = (int8_t)best_ftl;
+                        int8_t new_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+
+                        ship.d.combat_speed = (ship.d.combat_speed - old_modifier) + new_modifier;
+                    }
+                }
+
+                if (ship.owner > 8) {
+                    Repair_Ship_Full_(i);
+                } else {
+                    if (ship.location >= 0 && ship.location < 72 && 
+                        ship.status == 0 && ship.d.ship_type == 0) {
+                        
+                        if (Test_Bit_Field_(&MOX::_star[ship.location].has_colony, (int16_t)ship.owner)) {
+                            Repair_Ship_Full_(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    int16_t __cdecl Get_Ship_Armor_Hits_(int16_t ship_idx) {
+        s_ship_data* ship = &MOX::_ship[ship_idx];
+
+        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].armor_absorption_percent;
+        int16_t hull_absorption = TECHDATA::_hull_data[(uint8_t)ship->d.size].armor_absorption;
+
+        bool has_special_armor = struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
+
+        int32_t calc = ((int32_t)armor_absorption_pct * (int32_t)hull_absorption) / 100;
+        int16_t total_hits = (int16_t)calc + hull_absorption;
+
+        if (has_special_armor) {
+            total_hits *= 3;
+        }
+
+        return total_hits;
+    }
+
+    int16_t __cdecl Get_Ship_Structure_(int16_t ship_idx) {
+        s_ship_data* ship = &MOX::_ship[ship_idx];
+
+        if (ship->owner <= 9) {
+            return Get_Design_Structure_(ship->d);
+        }
+
+        switch (ship->owner) {
+            case 10:
+                if (ship->d.ftl_type > 0) {
+                    return 750;
+                }
+                return 400;
+
+            case 11:
+                if (ship->d.ftl_type > 0) {
+                    return 2500;
+                }
+                return 500;
+
+            case 12:
+                if (ship->d.ftl_type > 0) {
+                    return 2500;
+                }
+                return 500;
+
+            case 13:
+                if (ship->d.ftl_type > 0) {
+                    return 1000;
+                }
+                return 300;
+
+            case 14:
+                if (ship->d.ftl_type > 0) {
+                    return 1500;
+                }
+                return 500;
+
+            default:
+            {
+                int16_t uninitialized_result;
+                // BUG: Returns uninitialized stack memory
+                return uninitialized_result;
+            }
+        }
+    }
+
+    // Suggested name: Get_Ship_Combat_Bonuses
+    void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* ship_defense, int16_t* ship_missile_defense, int16_t* ship_attack) {
+        int16_t local_defense = 0;
+        int16_t local_missile_defense = 0;
+        int16_t local_attack = 0;
+
+        s_ship_data* ship = &MOX::_ship[ship_idx];
+        s_ship_design design_copy;
+        _memcpy(&design_copy, &ship->d, sizeof(s_ship_design));
+
+        Get_Design_Combat_Bonuses_(&design_copy, &local_attack, &local_defense, &local_missile_defense);
+
+        if (ship->officer_index > -1) {
+            int16_t helmsman_bonus = CMBTFIR2::Helmsman_Bonus_(ship->officer_index);
+            local_defense += helmsman_bonus;
+            local_missile_defense += (int16_t)(helmsman_bonus / 2);
+
+            local_attack += CMBTFIR2::Weaponry_Bonus_(ship->officer_index);
+        }
+
+        int16_t crew_def_bonus = _crew_data[(int)ship->crew_quality].defense;
+        local_defense += crew_def_bonus;
+        local_missile_defense += (int16_t)(crew_def_bonus / 2);
+        local_attack += _crew_data[(int)ship->crew_quality].attack;
+
+        if (ship->owner < 8) {
+            s_player* owner_player = &MOX::_player[(int)ship->owner];
+
+            int16_t trait_def_bonus = (int16_t)owner_player->traits[TRAIT_SHIP_DEFENSE];
+            local_defense += trait_def_bonus;
+            local_missile_defense += (int16_t)(trait_def_bonus / 2);
+
+            local_attack += (int16_t)owner_player->traits[TRAIT_SHIP_ATTACK];
+
+            if (owner_player->traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+                local_defense += 20;
+            }
+        }
+
+        *ship_defense = local_defense;
+        *ship_missile_defense = local_missile_defense;
+        *ship_attack = local_attack;
+    }
 }

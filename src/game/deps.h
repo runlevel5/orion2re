@@ -105,6 +105,7 @@
 #include "events.h"
 #include "bill.h"
 #include "geo.h"
+#include "cmbtfir2.h"
 #include "cmbtmis.h"
 #include "mapgen.h"
 #include "homegen.h"

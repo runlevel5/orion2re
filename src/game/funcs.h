@@ -7,6 +7,9 @@ void __cdecl nullsub_004d7840();
 
 struct s_animation_header;
 struct s_ship_design;
+struct s_crew_data;
+
+inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
@@ -360,6 +363,21 @@ inline void __cdecl Do_XP_For_Ship_(int16_t ship_idx, int16_t bonus) {
     fn(ship_idx, bonus);
 }
 
+inline int16_t __cdecl Base_Generic_Dcv_(int16_t target_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00508670})(target_idx);
+}
+
+inline uint32_t __cdecl Modified_Weapon_Strength_(uint32_t strength, uint16_t specials) {
+    using Fn = uint32_t(__cdecl*)(uint32_t, uint16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00508990})(strength, specials);
+}
+
+inline int16_t __cdecl Strength_Hits_Modifier_(int16_t hits) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    return reinterpret_cast<Fn>(std::uintptr_t{0x00508A50})(hits);
+}
+
 inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
     using Fn = void*(__cdecl*)(const char*, int32_t, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
@@ -572,4 +590,16 @@ inline void __cdecl Move_Officer_To_Pool_(int16_t officer_idx) {
     using Fn = void(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e2c0});
     fn(officer_idx);
+}
+
+inline bool __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
+    using Fn = bool(__cdecl*)(void*, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFB5});
+    return fn(field, bit_index);
+}
+
+inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412E20});
+    fn(root1, root2, mode);
 }

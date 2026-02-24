@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -795,11 +795,11 @@ namespace hooks {
         { 0x004127f0, &GEO::Collect_Black_Holes_ },
         { 0x00484040, &TECH::Tech_Change_ },
         { 0x00493f30, &SYS::Clear_System_Display_Loaded_Flag_ },
-        { 0x00496250, &SYS::Init_System_Display_ },
+        //{ 0x00496250, &SYS::Init_System_Display_ },
         { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
         { 0x00496700, &SYS::Need_To_Reload_System_Display_ },
         { 0x00497460, &SYS::Set_System_Display_Loaded_Flag_ },
-        { 0x004962d0, &SYS::Load_New_System_Display_ },
+        //{ 0x004962d0, &SYS::Load_New_System_Display_ },
         { 0x004f1860, &HAROLD::Randomize_List_ },
         { 0x004ac270, &ADVCIV::Enemy_Has_Colony_At_Star_ },
         { 0x004ecf80, &ADVCIV::Uncolonized_Planet_Worth_To_Player_ },
@@ -1357,6 +1357,28 @@ namespace hooks {
         { 0x0047d450, &aidudes::colony_less_industry_cmp_ },
         { 0x005086e0, &INITSHIP::Best_Computer_Attack_Bonus_ },
         { 0x00508e10, &aipower::Current_Ship_Hits_ },
+        { 0x00508a90, &aipower::Ship_Strength_Vs_Ships_In_Nebula_ },
+        { 0x00508f00, &aipower::Ship_Strength_Vs_Planetary_Shield_ },
+        { 0x00482f10, &INITSHIP::Repair_Ships_At_Colonies_ },
+        { 0x0047ef30, &INITSHIP::Get_Ship_Combat_Bonuses_ },
+        { 0x00412f40, &GEO::Map_Is_Connected_ },
+        { 0x00413140, &GEO::Get_Orbit_Display_X_Y_ },
+        //{ 0x00413220, &GEO::Get_Orbit_From_X_Y_ },
+        { 0x00412c30, &GEO::Move_Player_1_Turn_To_Star_ },
+        { 0x00412a90, &GEO::Point_Is_In_Nebula_N_ },
+        { 0x00508ad0, &aipower::Ship_Strength_Vs_Shield_ },
+        { 0x004b4950, &maintain::Phase2_Building_ },
+        { 0x004b4970, &maintain::All_But_Capitol_ },
+        { 0x004b47e0, &maintain::Kill_Research_Buildings_ },
+        { 0x004b42e0, &maintain::Ship_Is_At_Colony_ },
+        { 0x004b4de0, &maintain::Kill_Ships_ },
+        { 0x004b4d20, &maintain::Kill_Spy_ },
+        { 0x004b4fd0, &maintain::Kill_Leaders_ },
+        { 0x004831f0, &INITSHIP::Get_Ship_Structure_ },
+        { 0x004832d0, &INITSHIP::Get_Ship_Armor_Hits_ },
+        { 0x00508e50, &aipower::Max_Ship_Hits_ },
+        { 0x0050b2d0, &COLBLDG::Delete_Ship_ },
+        { 0x0050b270, &COLBLDG::Delete_From_Colony_Queue_ },
     };
 
     void Install_Hooks()

@@ -3711,7 +3711,7 @@ struct s_tech_building_data {
     char *name;
     undefined field1_0x4;
     undefined field2_0x5;
-    short field3_0x6;
+    short tech_app;
     int cost;
     short maintenance;
     int8_t type;

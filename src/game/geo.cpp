@@ -109,6 +109,43 @@ namespace GEO {
         return Point_Is_In_Some_Nebula_(star.x, star.y);
     }
 
+    /**
+     * Checks if a point (x, y) is within the opaque portion of a nebula's graphical representation.
+     * The nebula is selected by index, and the coordinates are transformed relative to the nebula's
+     * world position before being scaled down and checked against the animation frame data.
+     */
+    bool __cdecl Point_Is_In_Nebula_N_(int16_t x, int16_t y, int16_t nebula_idx) {
+        s_nebula* nebula = &MOX::_nebula[nebula_idx];
+
+        // Calculate relative coordinates and scale down by 3
+        int32_t rel_x = (static_cast<int32_t>(x) - nebula->x) / 3;
+        if (rel_x < 0) {
+            return false;
+        }
+
+        int32_t rel_y = (static_cast<int32_t>(y) - nebula->y) / 3;
+        if (rel_y < 0) {
+            return false;
+        }
+
+        // Access the 4th variant of the nebula animation
+        s_animation_header* anim = MOX::_nebula_pict_seg[nebula_idx][3];
+
+        // Check if the relative coordinates are within the animation frame dimensions
+        if (rel_x < static_cast<int32_t>(anim->width) && rel_y < static_cast<int32_t>(anim->height)) {
+            // Frame pixel data is stored immediately after the 16-byte animation header
+            uint8_t* pixel_data = reinterpret_cast<uint8_t*>(anim) + 16;
+            uint8_t pixel_value = pixel_data[rel_y * anim->width + rel_x];
+
+            // The nebula is considered present if the pixel value exceeds a transparency threshold
+            if (pixel_value > 5) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     bool __cdecl Point_Is_In_Some_Nebula_(int16_t x, int16_t y) {
         bool in_any_nebula = false;
         int16_t i = 0;
@@ -134,12 +171,42 @@ namespace GEO {
         return in_any_nebula;
     }
 
-    /**
-     * Scans all stars in the galaxy and collects the indices of those that are classified
-     * as black holes into the provided buffer.
-     * 
-     * @param black_hole_indices Output buffer to store indices of black hole stars.
-     */
+    bool __cdecl Map_Is_Connected_() {
+        int16_t local_dads_buffer[72]; // Stack space allocated for union-find dads
+        GEO::_dads = local_dads_buffer;
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            GEO::_dads[i] = -1;
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                for (int16_t j = i + 1; j < MOX::_NUM_STARS; ++j) {
+                    if (MOX::_star[j].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                        // Check if star 'i' is blocked from star 'j' by a black hole
+                        if (!struct_::Test_Bit_Field_(MOX::_star[i].black_hole_blocks, (uint16_t)j)) {
+                            if (Parsecs_Between_Stars_(i, j) <= 8) {
+                                Union_Find_(i, j, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int32_t disconnected_components = 0;
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                if (GEO::_dads[i] == -1) {
+                    disconnected_components++;
+                }
+            }
+        }
+
+        GEO::_dads = nullptr;
+        return disconnected_components == 1;
+    }
+
     int16_t __cdecl Collect_Black_Holes_(int16_t* black_hole_indices) {
         int16_t black_hole_count = 0;
 
@@ -152,6 +219,47 @@ namespace GEO {
         }
 
         return black_hole_count;
+    }
+
+    void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
+        int base_time = (star_idx * 7) + (int)MOX::_stardate;
+        
+        // Complex multiplier calculation for 5311 * base_time
+        int scaled_time = base_time;
+        int t5 = scaled_time * 5;
+        int t41 = scaled_time + (t5 * 8);
+        int t83 = scaled_time + (t41 * 2);
+        int dividend = (t83 << 6) - scaled_time; // (83 * 64 - 1) * base_time = 5311 * base_time
+
+        int denominator = (orbit_idx * 100) + star_idx + 150;
+        int angle = (dividend / denominator) % 360;
+
+        // X coordinate calculation with rounding
+        int cos_res = angle::Cos_(angle, GEO::_orbit_radiuses[orbit_idx+1][0]);
+        int x_val = cos_res + 5;
+        if (x_val >= 0) {
+            x_val += 5; // Result: (cos + 10) / 10
+        } else {
+            x_val -= 5; // Result: cos / 10
+        }
+        *out_x = x_val / 10;
+
+        // Y coordinate calculation with rounding and inversion
+        int sin_res = angle::Sin_(angle, GEO::_orbit_radiuses[orbit_idx+1][1]);
+        int y_val = sin_res - 5;
+        if (y_val >= 0) {
+            y_val += 5; // Result: sin / 10
+        } else {
+            y_val -= 5; // Result: (sin - 10) / 10
+        }
+        *out_y = -(y_val / 10);
+
+        // Calculate rotation frame (32 frames total)
+        int rotation_frame = ((angle + 6) * 32) / 360;
+        if (rotation_frame == 32) {
+            rotation_frame = 0;
+        }
+        *orbit_pos = rotation_frame;
     }
 
     /**
@@ -175,6 +283,137 @@ namespace GEO {
         }
 
         return result;
+    }
+
+    int32_t __cdecl Get_Orbit_From_X_Y_(int32_t x, int32_t y) {
+        int32_t result_orbit = -1;
+
+        if (x != 0 || y != 0) {
+            uint32_t min_dist_sq = 0xFFFFFFFF;
+            int32_t best_index = -1;
+
+            for (int i = 0; i < 7; ++i) {
+                // Get_Angle_ arguments: (short[1]*x, short[0]*-y)
+                int16_t angle_val = angle::Get_Angle_(GEO::_orbit_radiuses[i][1] * x, GEO::_orbit_radiuses[i][0] * -y);
+
+                // Rounding for Cosine result
+                int cos_raw = angle::Cos_(angle_val, GEO::_orbit_radiuses[i][0]);
+                int scaled_cos;
+                if (cos_raw + 5 >= 0) {
+                    scaled_cos = (cos_raw + 10) / 10;
+                } else {
+                    scaled_cos = cos_raw / 10;
+                }
+
+                // Rounding for Sine result
+                int sin_raw = angle::Sin_(angle_val, GEO::_orbit_radiuses[i][1]);
+                int scaled_sin;
+                if (sin_raw - 5 >= 0) {
+                    scaled_sin = sin_raw / 10;
+                } else {
+                    scaled_sin = (sin_raw - 10) / 10;
+                }
+
+                // Distance squared calculation: (cos_res - x)^2 + (sin_res + y)^2
+                int dx = scaled_cos - x;
+                int dy = scaled_sin + y;
+                uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
+
+                if (dist_sq < min_dist_sq) {
+                    min_dist_sq = dist_sq;
+                    best_index = i;
+                }
+            }
+
+            // Return adjusted index if within valid middle-range [1, 5]
+            if (best_index > 0 && best_index < 6) {
+                result_orbit = best_index - 1;
+            }
+        }
+
+        return result_orbit;
+    }
+
+    /**
+     * Calculates the movement of a player's fleet towards a target star for one turn or multiple turns, 
+     * accounting for movement speed (30 units/turn), nebula entry, and warp interdictors.
+     */
+    void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag) {
+        s_star_data* target_star = &MOX::_star[star_idx];
+        int16_t target_x = target_star->x;
+        int16_t target_y = target_star->y;
+
+        int32_t dx = (int32_t)target_x - (int32_t)start_x;
+        int32_t dy = (int32_t)target_y - (int32_t)start_y;
+        uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
+        uint32_t dist = isqrt_(dist_sq);
+
+        int16_t turns_limit = max_turns;
+        if (turns_limit == 0) {
+            turns_limit = 1;
+        }
+
+        bool in_nebula = false;
+        bool reached_target = false;
+        *interdictor_flag = 0;
+
+        int16_t turn = 1;
+        while (true) {
+            // If fleet enters a nebula and caller requested a nebula flag, stop movement immediately
+            if (nebula_flag != nullptr && in_nebula) {
+                break;
+            }
+
+            // Check termination conditions: interdicted, destination reached, or turn limit reached
+            if (*interdictor_flag != 0 || reached_target || turn > turns_limit) {
+                break;
+            }
+
+            // Check if movement in this turn exceeds remaining distance
+            // Movement speed is 30 units per turn (30^2 = 900)
+            if ((int32_t)(turn * turn * 900) >= (int32_t)dist_sq) {
+                reached_target = true;
+                *out_x = target_x;
+                *out_y = target_y;
+            } else {
+                // Linear interpolation to find current coordinates based on distance traveled (turn * 30)
+                int32_t move_x;
+                if (dx < 0) {
+                    move_x = (dx * (int32_t)turn * 30 - (int32_t)dist + 1) / (int32_t)dist;
+                } else {
+                    move_x = (dx * (int32_t)turn * 30 + (int32_t)dist - 1) / (int32_t)dist;
+                }
+                *out_x = start_x + (int16_t)move_x;
+
+                int32_t move_y;
+                if (dy < 0) {
+                    move_y = (dy * (int32_t)turn * 30 - (int32_t)dist + 1) / (int32_t)dist;
+                } else {
+                    move_y = (dy * (int32_t)turn * 30 + (int32_t)dist - 1) / (int32_t)dist;
+                }
+                *out_y = start_y + (int16_t)move_y;
+            }
+
+            // Check if current position is inside a nebula
+            if (nebula_flag != nullptr) {
+                if (Point_Is_In_Some_Nebula_(*out_x, *out_y)) {
+                    in_nebula = true;
+                    turn++;
+                    continue;
+                }
+            }
+
+            // Check for enemy warp interdictors blocking the path
+            if (Point_Is_In_Warp_Field_Interdictor_Of_Star_(*out_x, *out_y, player_num, target_star)) {
+                *interdictor_flag = 1;
+            }
+
+            turn++;
+        }
+
+        if (in_nebula && nebula_flag != nullptr) {
+            *nebula_flag = 1;
+        }
     }
 
 } // namespace GEO

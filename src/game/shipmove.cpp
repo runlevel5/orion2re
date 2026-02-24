@@ -378,8 +378,8 @@ namespace SHIPMOVE {
      * @address 00436b60
      */
     void __cdecl Move_All_Ships_Toward_Stars_() {
-        uint8_t local_8;
-        uint8_t local_7;
+        int8_t local_8;
+        int8_t local_7;
 
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
             for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {

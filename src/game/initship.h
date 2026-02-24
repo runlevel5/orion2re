@@ -1,20 +1,26 @@
 #pragma once
 #include <cstdint>
 
+struct s_ship_data;
+
 namespace INITSHIP {
-    inline void __cdecl Repair_Ships_At_Colonies_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00482f10 });
-        fn();
+    void __cdecl Repair_Ships_At_Colonies_();
+
+    inline int __cdecl Get_Ship_Scrap_Cost_(s_ship_data* ship) {
+        using Fn = int(__cdecl*)(s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b42b0});
+        return fn(ship);
+    }
+
+    inline void __cdecl Repair_Ship_Full_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483050});
+        fn(ship_idx);
     }
 
     void __cdecl Init_Ship_Designs_(int16_t player_idx);
     
-    inline void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* defense, int16_t* missile_def, int16_t* attack) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0047ef30 });
-        fn(ship_idx, defense, missile_def, attack);
-    }
+    void __cdecl Get_Ship_Combat_Bonuses_(int16_t ship_idx, int16_t* ship_defense, int16_t* ship_missile_defense, int16_t* ship_attack);
 
     int16_t __cdecl Best_Ship_Fuel_(int16_t player_idx);
 
@@ -40,7 +46,17 @@ namespace INITSHIP {
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 
+    inline int16_t __cdecl Get_Design_Structure_(s_ship_design design) {
+        using Fn = int16_t(__cdecl*)(s_ship_design);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483120});
+        return fn(design);
+    }
+
     int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech);
+
+    int16_t __cdecl Get_Ship_Structure_(int16_t ship_idx);
+
+    int16_t __cdecl Get_Ship_Armor_Hits_(int16_t ship_idx);
 
     void __cdecl Auto_Strategic_Design_Ship_(int16_t player_idx, int16_t design_idx, s_ship_design* design);
 
@@ -66,6 +82,21 @@ namespace INITSHIP {
         using Fn = void(__cdecl*)(s_ship_design*, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004823D0});
         fn(design, player_idx, design_idx);
+    }
+
+    inline void __cdecl Update_Strategic_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004826D0})(ship_idx);
+    }
+
+    inline int16_t __cdecl Best_Point_Defense_Weapon_(int16_t owner_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00481510})(owner_idx);
+    }
+
+    inline int16_t __cdecl Best_Bomb_Weapon_(int16_t owner_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004818F0})(owner_idx);
     }
 
     inline void __cdecl Get_Design_Combat_Bonuses_(s_ship_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
