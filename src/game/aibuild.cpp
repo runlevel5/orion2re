@@ -519,4 +519,471 @@ namespace AIBUILD {
             }
         }
     }
+
+    void __cdecl Find_Buildable_Buildings_(s_colony* colony, int16_t* buildable_flags) {
+        for (int16_t product_id = 1; product_id < 0x31; ++product_id) {
+            // Check if the specific colony can build the product identified by product_id
+            if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
+                buildable_flags[product_id] = 1;
+            }
+        }
+    }
+
+    short __cdecl Colony_Building_Score_(s_colony* colony, short building_id) {
+        int owner = (uint8_t)colony->owner;
+        s_player* player = &MOX::_player[owner];
+        int colony_idx = (int)(colony - MOX::_colony);
+        s_ai_colony_info* ai_colony = &(*AIDATA::_ai_colony_info)[colony_idx];
+
+        int obj_5 = (player->objectives == 5);
+        int obj_4 = (player->objectives == 4);
+        int obj_1 = (player->objectives == 1);
+        int obj_3 = (player->objectives == 3);
+
+        int bc_score = 0;
+        if (player->bc >= 1500) {
+            bc_score = (int)isqrt_((uint32_t)((player->surplus_bc + (player->surplus_bc < 0 ? 63 : 0)) >> 6));
+        }
+        if (bc_score > 10) bc_score = 10;
+
+        s_planet_data* planet = &MOX::_planet[colony->planet];
+        int star_idx = (uint8_t)planet->star_index;
+        s_ai_star_info* ai_star = &(*AIDATA::_ai_star_info)[star_idx];
+        s_ai_star_player_block* ps_star_player = &ai_star->per_player[owner];
+
+        int trait_score = (uint8_t)ai_colony->field3_0x3 + (uint8_t)ai_colony->trait_environment_immune;
+        
+        bool is_industrial_focus = false;
+        if (colony->auto_building == 0 && player->tech_applications[22 /* TECH_APP_AUTOMATED_FACTORIES */] == 3 && planet->mineral_class <= 2) {
+            is_industrial_focus = true;
+        }
+
+        bool is_military_focus = false;
+        int ground_trait = player->traits[0 /* TRAIT_GROUND_COMBAT */] / 2;
+        if (ground_trait >= 0 && ground_trait <= 1) {
+            if ((colony->buildings[22 /* BUILDING_MARINE_BARRACKS */] == 0 && player->tech_applications[103 /* TECH_APP_MARINE_BARRACKS */] == 3) ||
+                (colony->buildings[2 /* BUILDING_ARMOR_BARRACKS */] == 0 && player->tech_applications[14 /* TECH_APP_ARMOR_BARRACKS */] == 3)) {
+                is_military_focus = true;
+            }
+        }
+
+        bool building_focus = is_industrial_focus || is_military_focus;
+        int score = 0;
+
+        switch (building_id) {
+        case 2: {
+            int threatened_score = ps_star_player->alliance_count * 3 + ai_colony->threatened * 2 + 
+                                   ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->war_count;
+            if (colony->n_pops > 2 || bc_score != 0) {
+                if (threatened_score != 0) score = threatened_score + obj_1;
+            }
+            if (ground_trait >= 0 && ground_trait <= 1 && colony->buildings[22 /* BUILDING_MARINE_BARRACKS */] == 0) {
+                score += 6;
+            }
+            if (Colony_Is_Conquered_(colony)) score += 1;
+            bc_score /= 2;
+            score += bc_score;
+        } break;
+
+        case 3:
+            if (building_focus && ai_colony->threatened == 0) break;
+            if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner & 0x1F)) & 1) == 0) {
+                int threatened_score = ps_star_player->alliance_count * 3 + ai_colony->threatened * 10 + 
+                                       ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->war_count;
+                if (threatened_score != 0) score = threatened_score + obj_1;
+            }
+            bc_score /= 2;
+            score += bc_score;
+            break;
+
+        case 4:
+            score = 5;
+            break;
+
+        case 5:
+            if (trait_score != 0 && colony->pollution > 5) {
+                score = obj_5;
+                if (colony->pollution >= 11) {
+                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                }
+            }
+            break;
+
+        case 6:
+            if (!building_focus && player->do_not_research == 0) {
+                score = obj_3 * 4 + 11;
+            }
+            break;
+
+        case 7:
+            score = (uint8_t)colony->n_pops + 13 + obj_4 * 2;
+            break;
+
+        case 8: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int base_threat = (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 3 + ai_colony->threatened * 10;
+            if (player->command_points <= player->command_points_used) {
+                base_threat += (player->command_points_used - player->command_points) + 1;
+            }
+            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+        } break;
+
+        case 9:
+            if (ground_trait != 3 && player->home_planet_id == colony->planet) {
+                score = 100;
+            }
+            break;
+
+        case 10:
+            if (!building_focus) {
+                if (player->traits[5 /* TRAIT_POP_GROWTH_BONUS */] < 0) score = obj_5;
+                bc_score /= 2;
+                score += bc_score;
+            }
+            break;
+
+        case 12:
+            score = (uint8_t)colony->n_pops + 12 + obj_4 * 4;
+            break;
+
+        case 13:
+            if (!building_focus && trait_score != 0 && colony->pollution > 5) {
+                score = obj_5;
+                if (colony->pollution >= 11) {
+                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                }
+            }
+            break;
+
+        case 15:
+            if (!building_focus) score = obj_5 + 18;
+            break;
+
+        case 16:
+            if (ai_colony->trait_eats_minerals != 0) {
+                score = (player->surplus_food < 0) ? 8 : 4;
+                score += obj_5 + bc_score;
+            }
+            break;
+
+        case 17:
+            score = bc_score + obj_5;
+            break;
+
+        case 19:
+            if (!building_focus && player->do_not_research == 0) score = 11;
+            break;
+
+        case 20:
+            if (ground_trait != 3 && (colony->n_pops > 2 || (bc_score != 0 && colony->n_pops > 1))) {
+                score = 10;
+            }
+            break;
+
+        case 21:
+            if (ai_colony->trait_eats_minerals != 0) {
+                int base_val = 6;
+                if (colony->food2_per_farmer == 0) base_val = 12;
+                else if (colony->food2_per_farmer == 1) base_val = 11;
+                else if (colony->food2_per_farmer == 2) base_val = 10;
+
+                if (player->surplus_food < 0) base_val -= (int)player->surplus_food;
+                score = base_val + obj_5 * 4;
+            }
+            break;
+
+        case 22: {
+            int threatened_score = ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->out_of_range_count) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->war_count;
+            if (colony->n_pops > 1 || bc_score != 0) {
+                if (threatened_score != 0) score = threatened_score + obj_1;
+            }
+            if (colony->buildings[2 /* BUILDING_ARMOR_BARRACKS */] == 0 && ground_trait >= 0 && ground_trait <= 1) {
+                score += 12;
+            }
+            if (Colony_Is_Conquered_(colony)) score += 3;
+            score += bc_score;
+        } break;
+
+        case 23:
+        case 24: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int threatened_score = ps_star_player->war_count + (ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count) * 2 + ps_star_player->out_of_range_count) * 2;
+            if (threatened_score != 0) score = threatened_score + obj_1;
+            if (planet->climate == 1) score += obj_5 * 2;
+            score += bc_score;
+        } break;
+
+        case 25: {
+            int grav = planet->gravity_class;
+            if (player->traits[10 /* TRAIT_HEAVY_G_WORLD */] != 0) {
+                if (grav == 0) score = obj_5 + 3;
+            } else if (player->traits[9 /* TRAIT_LOW_G_WORLD */] != 0) {
+                if (grav == 1) score = obj_5 + 3;
+                else if (grav == 2) score = obj_5 + 6;
+            } else {
+                if (grav == 0) score = obj_5 + 3;
+                else if (grav == 2) score = obj_5 + 6;
+            }
+        } break;
+
+        case 26:
+        case 27: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int base_threat = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+        } break;
+
+        case 28: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count * 2 + ps_star_player->out_of_range_count + ps_star_player->war_count) * 4;
+            if (threatened_score != 0) score = threatened_score + obj_1;
+            if (planet->climate == 1) score += obj_5 * 2;
+            score += bc_score;
+        } break;
+
+        case 29:
+            if (!building_focus && colony->n_pops > 4) {
+                score = (ai_colony->pop_limit + (uint8_t)colony->n_pops + obj_4) / 3;
+            }
+            break;
+
+        case 30:
+            if (!building_focus && player->do_not_research == 0) {
+                score = obj_3 * 3 + 8;
+            }
+            break;
+
+        case 31:
+            if (ground_trait != 3 && (colony->n_pops > 2 || (bc_score != 0 && colony->n_pops > 1))) {
+                score = 16;
+            }
+            break;
+
+        case 32:
+            if (trait_score != 0 && colony->pollution > 5) {
+                score = obj_5;
+                if (colony->pollution >= 11) {
+                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                }
+            }
+            break;
+
+        case 33:
+            score = (ai_colony->pop_limit + (uint8_t)colony->n_pops * 2) / 3 + (trait_score + obj_4 + obj_5) * 2;
+            break;
+
+        case 34:
+            score = obj_4 * 2 + 12;
+            break;
+
+        case 35:
+            if (!building_focus && player->do_not_research == 0) {
+                score = obj_3 * 2 + 5;
+            }
+            break;
+
+        case 36:
+            score = (uint8_t)colony->n_pops + 5 + obj_4 * 2;
+            break;
+
+        case 37:
+            if (!building_focus && ai_colony->trait_eats_minerals != 0 && colony->food2_per_farmer != 0) {
+                int base_val = (player->surplus_food >= 0) ? 3 : 5;
+                score = base_val + obj_5 * 2;
+            }
+            break;
+
+        case 38:
+            if (!building_focus && (colony->production[1] > 16 || colony->n_pops > 4 || bc_score != 0)) {
+                score = (int)isqrt_((uint32_t)((int)colony->production[1] - 15));
+            }
+            break;
+
+        case 39:
+            if (!building_focus && colony->n_pops > 2) {
+                score = (ai_colony->pop_limit + (uint8_t)colony->n_pops + obj_4) / 3;
+            }
+            break;
+
+        case 40:
+        case 41: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int base_threat = (building_id == 40) ?
+                ps_star_player->out_of_range_count * 3 + (ps_star_player->war_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2) * 4 + ai_colony->threatened * 10 :
+                (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 3 + ai_colony->threatened * 10;
+            
+            if (player->command_points <= player->command_points_used) {
+                base_threat += (player->command_points_used - player->command_points) + 1;
+            }
+            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+        } break;
+
+        case 42: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
+        } break;
+
+        case 43:
+            if (!building_focus && ai_colony->trait_eats_minerals != 0) {
+                int base_val = 7;
+                if (colony->food2_per_farmer == 0) base_val = 13;
+                else if (colony->food2_per_farmer == 1) base_val = 12;
+                else if (colony->food2_per_farmer == 2) base_val = 10;
+
+                if (player->surplus_food < 0) base_val -= (int)player->surplus_food;
+                score = base_val + obj_5 * 3 + bc_score;
+            }
+            break;
+
+        case 44:
+            if (!building_focus) {
+                int base_climate_score = 0;
+                bool valid_climate = true;
+                bool is_aquatic = (player->traits[11 /* TRAIT_AQUATIC */] != 0);
+                switch (planet->climate) {
+                case 2: base_climate_score = 2; break;
+                case 3: base_climate_score = 1; break;
+                case 4: if (is_aquatic) base_climate_score = 1; else valid_climate = false; break;
+                case 5: if (!is_aquatic) base_climate_score = 4; else valid_climate = false; break;
+                case 6: if (!is_aquatic) base_climate_score = 6; else valid_climate = false; break;
+                case 7: base_climate_score = 1; break;
+                default: valid_climate = false; break;
+                }
+                if (valid_climate) score = base_climate_score + obj_5 * 3 + bc_score;
+            }
+            break;
+
+        case 45: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner & 0x1F)) & 1) == 0) {
+                int threatened_score = ai_colony->threatened * 5 + (ps_star_player->war_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->out_of_range_count;
+                if (threatened_score != 0) score = threatened_score + obj_1;
+            }
+            bc_score /= 2;
+            score += bc_score;
+        } break;
+
+        case 46:
+            if (!building_focus && ai_colony->trait_eats_minerals != 0 && colony->food2_per_farmer != 0) {
+                int base_val = (player->surplus_food >= 0) ? 5 : 10;
+                score = base_val + obj_5 * 2;
+            }
+            break;
+
+        case 47: {
+            if (building_focus && ai_colony->threatened == 0) break;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
+        } break;
+        }
+
+        if (score > 1000) score = 1000;
+        if (score <= 0) return 0;
+        return (short)score;
+    }
+
+    /**
+     * Checks if a colony contains population units belonging to a non-eliminated player
+     * who has an active high-level treaty (Research, Non-Aggression, or Alliance)
+     * with the current colony owner.
+     */
+    bool __cdecl Colony_Is_Conquered_(s_colony* colony) {
+        for (uint8_t i = 0; i < (uint8_t)colony->n_pops; ++i) {
+            uint32_t pop_data = colony->pop[i];
+            uint32_t pop_owner = pop_data & 0x0F;
+
+            // Only check valid players (0-7) excluding the current colony owner
+            if (pop_owner < 8 && (int8_t)pop_owner != colony->owner) {
+                // Ensure the population owner is still in the game
+                if (MOX::_player[pop_owner].eliminated == 0) {
+                    int8_t treaty_status = MOX::_player[pop_owner].treaty[(int)colony->owner];
+
+                    // Treaty range 4 to 6 likely corresponds to Research, Non-Aggression, and Alliance
+                    if (treaty_status >= 4 && treaty_status <= 6) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    void __cdecl Assign_Colony_New_Building_(s_colony* colony) {
+        short weights[52];
+        short max_score = 0;
+
+        memset(weights, 0, 102);
+
+        Find_Buildable_Buildings_(colony, weights);
+
+        for (int i = 4; i <= 48; ++i) {
+            if (weights[i] > 0) {
+                short score = Colony_Building_Score_(colony, i);
+                weights[i] = score;
+                if (score > max_score) {
+                    max_score = score;
+                }
+            }
+        }
+
+        weights[50] = 1;
+
+        if (max_score < 1) {
+            max_score = 1;
+        }
+
+        int difficulty = MOX::_settings.game_difficulty;
+        if (MOX::_player[static_cast<int>(colony->owner)].objectives == 100 /* ECON_INDUSTRY */) {
+            difficulty = 4;
+        }
+
+        int threshold_multiplier = 6 - difficulty;
+
+        for (int i = 0; i <= 50; ++i) {
+            if (threshold_multiplier * weights[i] < max_score) {
+                weights[i] = 0;
+            }
+        }
+
+        int colony_idx = (int)(colony - MOX::_colony);
+        int pop_limit = (*AIDATA::_ai_colony_info)[colony_idx].pop_limit;
+
+        if (colony->n_pops * 3 <= pop_limit) {
+            int housing_weight_base = (pop_limit - colony->n_pops) * 3;
+            weights[49] = (short)isqrt_(housing_weight_base);
+        }
+
+        short choice = MOX::Get_Weighted_Choice_Short_(reinterpret_cast<uint16_t*>(weights), 51);
+
+        if (choice < 49) {
+            Delete_Prod_From_Colony_Queue_(colony_idx, choice);
+            colony->producing[0] = choice;
+        } else if (choice == 49) {
+            colony->producing[0] = -3; // Housing
+        } else if (choice == 50) {
+            colony->producing[0] = -2; // Trade Goods
+        }
+    }
+
+    void __cdecl Force_Produce_(uint8_t* id_list, int16_t index, int32_t* list_count, int16_t production_id) {
+        // Retrieve the colony index from the provided list at the specified index
+        uint8_t colony_idx = id_list[index];
+
+        // Set the primary production item for the colony
+        MOX::_colony[colony_idx].producing[0] = production_id;
+
+        // Decrement the list counter
+        *list_count -= 1;
+
+        // Calculate the number of items to move to fill the gap in the list
+        int32_t items_to_move = *list_count - index;
+
+        // Shift the list left to remove the entry at the specified index
+        memcpy(&id_list[index], &id_list[index + 1], items_to_move);
+    }
+
+    int16_t __cdecl Industry_Worth(s_colony* colony) {
+        return (int16_t)(((uint16_t)colony->n_pops >> 3) - (uint16_t)colony->maintenance[1] + colony->production[1]);
+    }
 }

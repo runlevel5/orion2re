@@ -1,15 +1,7 @@
 #pragma once
-#include <cstdint>
-
-struct s_player;
-struct s_colony;
-struct s_star_data;
-struct s_leader_data;
-struct s_planet_data;
-struct s_colony_job_production;
 
 namespace COLCALC {
-    typedef int16_t (__cdecl *ColonyBaseFunc)(s_colony* colony, int16_t owner, int32_t masked_param2, s_colony_job_production* out);
+    typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int32_t masked_param2, s_colony_job_production* out);
 
     inline ColonyBaseFunc (&_colony_empire_base_functions)[3] =
         *reinterpret_cast<ColonyBaseFunc (*)[3]>(std::uintptr_t{0x0055A858});
@@ -200,6 +192,8 @@ namespace COLCALC {
 
     void __cdecl Recalculate_Colony_(s_colony* colony);
 
+    bool __cdecl Colony_Can_Build_Large_Ships_(s_colony* colony);
+
     void __cdecl Compute_All_Star_Colony_Stuff_();
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
 
@@ -279,7 +273,9 @@ namespace COLCALC {
 
     int __cdecl Colony_Job_Production_(s_colony* colony, short econ_type, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out);
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out);
+
+    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const s_colony* pop_unit, int16_t mode);
 
     inline char* __cdecl Format_Quotient_(int value, int divisor) {
         using Fn = char*(__cdecl*)(int, int);
@@ -343,7 +339,7 @@ namespace COLCALC {
 
     void __cdecl Compute_Player_Maintenance_(s_player* plr, char* debug_out);
 
-    int16_t __cdecl Gravity_Player_Production_Factor_(s_colony* colony, int16_t player_idx);
+    int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx);
 
     int16_t __cdecl Get_Govt_Type_Tech_App_(int16_t govt_type);
 

@@ -378,6 +378,11 @@ inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int1
     fn(title, message, duration);
 }
 
+inline void __cdecl Delete_Prod_From_Colony_Queue_(int32_t colony_idx, int32_t choice) {
+    using Fn = void(__cdecl*)(int32_t, int32_t);
+    reinterpret_cast<Fn>(std::uintptr_t{0x0050b300})(colony_idx, choice);
+}
+
 inline void __cdecl Build_Captain_Id_List_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043D470});
@@ -549,4 +554,22 @@ inline void __cdecl Load_Doom_Star_Ship_Design_(int16_t player_idx, s_ship_desig
     using Fn = void(__cdecl*)(int16_t, s_ship_design*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480ea0});
     fn(player_idx, design);
+}
+
+inline void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480f50});
+    fn(player_idx, design);
+}
+
+inline void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004810f0});
+    fn(player_idx, design);
+}
+
+inline void __cdecl Move_Officer_To_Pool_(int16_t officer_idx) {
+    using Fn = void(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e2c0});
+    fn(officer_idx);
 }

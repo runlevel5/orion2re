@@ -327,6 +327,25 @@ namespace aidudes {
         _our_unblockaded = &((*_our_colonies)[_n_our_blockaded]);
     }
 
+    void __cdecl Compute_Max_Min_R_I_Worthiness_(s_aidudes_colony_info* info) {
+        if (info->cur_pop_idx < info->pop_end_idx) {
+            s_colony* colony = &MOX::_colony[info->colony_idx];
+
+            uint32_t* cur_pop_ptr = &colony->pop[info->cur_pop_idx];
+            int16_t cur_prod_2 = COLCALC::Colony_Pop_Prod_Produced_(colony, (s_colony*)cur_pop_ptr, 2);
+            int16_t cur_prod_1 = COLCALC::Colony_Pop_Prod_Produced_(colony, (s_colony*)cur_pop_ptr, 1);
+            info->best_worker_to_farmer_score = cur_prod_2 - cur_prod_1;
+
+            uint32_t* end_pop_ptr = &colony->pop[info->pop_end_idx - 1];
+            int16_t end_prod_2 = COLCALC::Colony_Pop_Prod_Produced_(colony, (s_colony*)end_pop_ptr, 2);
+            int16_t end_prod_1 = COLCALC::Colony_Pop_Prod_Produced_(colony, (s_colony*)end_pop_ptr, 1);
+            info->worst_worker_to_farmer_score = end_prod_2 - end_prod_1;
+        } else {
+            info->best_worker_to_farmer_score = (int16_t)0x8001;
+            info->worst_worker_to_farmer_score = 0x7FFF;
+        }
+    }
+
     void __cdecl Assign_Buildings_() {
         int count = (int)_n_our_colonies;
 
@@ -449,8 +468,8 @@ namespace aidudes {
             if ((uint32_t)aidudes::_p_ai->research_produced * (uint32_t)research_mult < (uint32_t)aidudes::_p_ai->industry_produced * (uint32_t)industry_mult) {
                 short max_score = (short)0x8001;
                 for (int i = 0; i < (int)aidudes::_n_our_unblockaded; ++i) {
-                    if (aidudes::_our_unblockaded[i].worker_to_farmer_score > max_score) {
-                        max_score = aidudes::_our_unblockaded[i].worker_to_farmer_score;
+                    if (aidudes::_our_unblockaded[i].best_worker_to_farmer_score > max_score) {
+                        max_score = aidudes::_our_unblockaded[i].best_worker_to_farmer_score;
                         best_colony = &aidudes::_our_unblockaded[i];
                     }
                 }
@@ -462,8 +481,8 @@ namespace aidudes {
             } else {
                 short min_score = 0x7fff;
                 for (int i = 0; i < (int)aidudes::_n_our_unblockaded; ++i) {
-                    if (aidudes::_our_unblockaded[i].field9_0xa < min_score) {
-                        min_score = aidudes::_our_unblockaded[i].field9_0xa;
+                    if (aidudes::_our_unblockaded[i].worst_worker_to_farmer_score < min_score) {
+                        min_score = aidudes::_our_unblockaded[i].worst_worker_to_farmer_score;
                         best_colony = &aidudes::_our_unblockaded[i];
                     }
                 }
@@ -517,11 +536,11 @@ namespace aidudes {
 
         Assign_Required_Colonists_(info);
 
-        _Sort_Pops_colony = colony;
+        _Sort_Pops_colony_data = colony;
         _qsort(&colony->pop[info->first_assignable_pop_idx],
               (uint8_t)colony->n_pops - info->first_assignable_pop_idx,
               sizeof(uint32_t),
-              Sort_Pops_Compare_1);
+              _Sort_Pops_colony);
 
         if (EVENTS::Event_Check_Colony_Researching_((int16_t)info->colony_idx)) {
             n_required_workers = 0;
@@ -552,11 +571,11 @@ namespace aidudes {
         info->pop_end_idx = info->pop_tail_idx;
         info->pollution_at_start = (int8_t)colony->pollution;
 
-        _Sort_Pops_colony = colony;
+        _Sort_Pops_colony_data = colony;
         _qsort(&colony->pop[info->first_assignable_pop_idx],
               info->pop_end_idx - info->cur_pop_idx,
               sizeof(uint32_t),
-              Sort_Pops_Compare_2);
+              _Sort_Pops_colony);
 
         Compute_Max_Min_R_I_Worthiness_(info);
     }
@@ -566,11 +585,11 @@ namespace aidudes {
 
         Assign_Required_Colonists_(colony_info);
 
-        aidudes::_Sort_Pops_colony = colony;
+        aidudes::_Sort_Pops_colony_data = colony;
         _qsort(&colony->pop[colony_info->first_assignable_pop_idx],
-              (size_t)colony->n_pops - colony_info->first_assignable_pop_idx,
+              (uint32_t)(colony->n_pops - colony_info->first_assignable_pop_idx),
               sizeof(uint32_t),
-              Sort_Pops_FI_);
+              &Sort_Pops_FI_);
 
         if (colony->food2_per_farmer != 0) {
             COLCALC::Pre_Import_Computing_(colony);
@@ -609,5 +628,895 @@ namespace aidudes {
         }
 
         COLCALC::Pre_Import_Computing_(colony);
+    }
+
+    int16_t __cdecl FI_Worthiness_(const s_colony* colony, const s_colony* pop) {
+        int16_t worthiness_0;
+        int16_t worthiness_1;
+
+        worthiness_0 = COLCALC::Colony_Pop_Prod_Produced_(colony, pop, 0);
+        worthiness_1 = COLCALC::Colony_Pop_Prod_Produced_(colony, pop, 1);
+
+        return worthiness_0 - worthiness_1;
+    }
+
+    int __cdecl Sort_Pops_FI_(const void* a, const void* b) {
+        const s_colony* pop1 = reinterpret_cast<const s_colony*>(a);
+        const s_colony* pop2 = reinterpret_cast<const s_colony*>(b);
+        int16_t worth1 = FI_Worthiness_(_Sort_Pops_colony_data, pop1);
+        int16_t worth2 = FI_Worthiness_(_Sort_Pops_colony_data, pop2);
+
+        if (worth2 == worth1) {
+            int16_t prod1 = COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop1, 0);
+            int16_t prod2 = COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, pop2, 0);
+
+            // If worthiness is equal, sort by production ascending
+            return (int)prod1 - (int)prod2;
+        }
+
+        // Sort by worthiness descending
+        return (int)worth2 - (int)worth1;
+    }
+
+    void __cdecl Assign_Required_Colonists_(s_aidudes_colony_info* colony_info) {
+        s_colony* colony = &MOX::_colony[colony_info->colony_idx];
+        uint32_t* pop_ptr = colony->pop;
+        char do_not_research = MOX::_player[(int)colony->owner].do_not_research;
+        int16_t non_immune_pops = 0;
+
+        colony_info->first_assignable_pop_idx = 0;
+        colony_info->n_farmers = 0;
+        colony_info->n_workers = 0;
+
+        for (int i = 0; i < (int)colony->n_pops; ++i) {
+            uint32_t pop_entry = pop_ptr[i];
+            uint32_t race_idx = pop_entry & 0xF;
+
+            if (race_idx == 8 /* Android */ || race_idx == 9 /* Native */) {
+                colony_info->first_assignable_pop_idx++;
+                uint32_t job = (pop_entry >> 7) & 0x3;
+
+                if (job == 0 /* Farmer */) {
+                    colony_info->n_farmers++;
+                } else if (job == 1 /* Worker */) {
+                    colony_info->n_workers++;
+                } else if (job == 2 /* Scientist */) {
+                    if (do_not_research != 0) {
+                        // Clear bit 9 (manual/locked assignment bit) if research is disabled
+                        pop_ptr[i] &= ~0x200;
+                    }
+                }
+            } else {
+                // For other biological races, clear manual assignment bit 9
+                pop_ptr[i] &= ~0x200;
+            }
+
+            // Re-evaluate current pop entry state after potential modifications
+            uint32_t current_pop = pop_ptr[i];
+            uint32_t current_race = current_pop & 0xF;
+
+            // Check if population is affected by pollution (not Android/Native and not Tolerant)
+            if (current_race < 8) {
+                if (MOX::_player[current_race].traits[TRAIT_ENVIRONMENT_IMMUNE] == 0) {
+                    // If not rioting (bit 10) or colony is being assimilated/conquered
+                    if (!(current_pop & 0x400) || (colony->occupation_policy >= 2 && colony->occupation_policy <= 3)) {
+                        non_immune_pops++;
+                    }
+                }
+            }
+        }
+
+        // Determine if Lithovore trait (eats minerals) applies to this colony
+        if ((non_immune_pops * 2 < (int)colony->n_pops) &&
+            (MOX::_player[(int)colony->owner].traits[TRAIT_EATS_MINERALS] != 0) &&
+            (MOX::_player[(int)colony->owner].surplus_food >= 0)) {
+            colony_info->eats_minerals = 1;
+        }
+
+        // Sort population for AI processing
+        aidudes::_Sort_Pops_colony_data = colony;
+        _qsort(colony->pop, (size_t)colony->n_pops, 4, aidudes::Sort_Pops_Fixed_);
+
+        colony_info->cur_pop_idx = colony_info->first_assignable_pop_idx;
+        colony_info->pop_end_idx = colony->n_pops;
+        colony_info->pop_tail_idx = colony->n_pops;
+    }
+
+    int __cdecl Sort_Pops_Fixed_(const void* a, const void* b) {
+        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
+        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+        uint8_t flag1 = 0;
+        uint32_t val1 = *param_1 & 0xF;
+
+        if (val1 == 8 || val1 == 9) {
+            flag1 = 1;
+        }
+
+        uint8_t flag2 = 0;
+        uint32_t val2 = *param_2 & 0xF;
+
+        if (val2 == 8 || val2 == 9) {
+            flag2 = 1;
+        }
+
+        return (int)flag2 - (int)flag1;
+    }
+
+    /**
+     * @brief Comparison function used for sorting colony population assignments.
+     *
+     * Compares two population units based on their production contribution and mask value.
+     */
+    int __cdecl _Sort_Pops_colony(const void* a, const void* b) {
+        s_colony* colony = aidudes::_Sort_Pops_colony_data;
+
+        // Get production values for both pops across two different production types
+        int16_t p1_prod_1 = COLCALC::Colony_Pop_Prod_Produced_(colony, (const s_colony*)a, 1);
+        int16_t p2_prod_1 = COLCALC::Colony_Pop_Prod_Produced_(colony, (const s_colony*)b, 1);
+        int16_t p1_prod_2 = COLCALC::Colony_Pop_Prod_Produced_(colony, (const s_colony*)a, 2);
+        int16_t p2_prod_2 = COLCALC::Colony_Pop_Prod_Produced_(colony, (const s_colony*)b, 2);
+
+        // Calculate differences in production contributions
+        int16_t diff1 = p1_prod_2 - p1_prod_1;
+        int16_t diff2 = p2_prod_2 - p2_prod_1;
+
+        // Primary sort: difference between production types
+        if (diff2 != diff1) {
+            return (int)diff2 - (int)diff1;
+        }
+
+        // Secondary sort: specific production type 1 contribution
+        if (p1_prod_1 != p2_prod_1) {
+            return (int)p1_prod_1 - (int)p2_prod_1;
+        }
+
+        // Tertiary sort: masked raw value comparison
+        uint32_t val1 = *reinterpret_cast<const uint32_t*>(a);
+        uint32_t val2 = *reinterpret_cast<const uint32_t*>(b);
+
+        return (int)(val1 & 0x0F) - (int)(val2 & 0x0F);
+    }
+
+    void __cdecl Assign_Empire_Building_(int16_t player_idx) {
+        s_player* p = &MOX::_player[player_idx];
+        s_ai_refit_player* p_refit = &(*AIDATA::_airefit)[player_idx];
+
+        int war_level = AIBUILD::Player_War_Level_(player_idx);
+        int colony_queue_count = 0;
+
+        bool is_objective_1 = (p->objectives == 1);
+        bool low_money = (p->bc + p->surplus_bc < p->total_maintenance);
+
+        int isqrt_val = 0;
+        if (low_money || p->bc < 1500) {
+            isqrt_val = 0;
+        } else {
+            isqrt_val = isqrt_((p->surplus_bc + ((p->surplus_bc >> 31) & 0x3f)) >> 6);
+        }
+
+        if (isqrt_val > 10) {
+            isqrt_val = 10;
+        }
+
+        MOX::Mox_Update_();
+
+        if (p->war_buildup_duration != 0 && war_level == 0) {
+            war_level = is_objective_1 + 1;
+        }
+
+        bool recalculate_colony = false;
+        uint8_t colony_queue[256];
+
+        if (MOX::_NUM_COLONIES > 0) {
+            for (int current_colony_idx = 0; current_colony_idx < MOX::_NUM_COLONIES; ++current_colony_idx) {
+                s_colony* temp_colony = &MOX::_colony[current_colony_idx];
+
+                if (temp_colony->owner == (char)player_idx &&
+                    temp_colony->outpost_flag == 0 &&
+                    temp_colony->n_pops != 0) {
+
+                    if (EVENTS::Event_Check_Space_Anomaly_(current_colony_idx) == 0) {
+                        MOX::Mox_Update_();
+
+                        if (COLCALC::Colony_Is_Blockaded(temp_colony) ||
+                            (*AIDATA::_ai_colony_info)[current_colony_idx].threatened != 0 ||
+                            low_money) {
+
+                            bool delete_from_queue = false;
+                            int16_t prod = temp_colony->producing[0];
+                            if (prod < -100) {
+                                if (MOX::_ship[-prod - 100].d.ship_type != 0) {
+                                    delete_from_queue = true;
+                                }
+                            } else if (prod > -8) {
+                                if (prod > -4) {
+                                    if (prod == -2) {
+                                        recalculate_colony = true;
+                                    }
+                                } else {
+                                    delete_from_queue = true;
+                                }
+                            }
+
+                            if (delete_from_queue) {
+                                COLBLDG::Delete_From_Colony_Queue_(current_colony_idx, 0);
+                            }
+                        }
+
+                        int16_t prod = temp_colony->producing[0];
+                        if (prod == -3) {
+                            // pass
+                        } else if (prod == -2) {
+                            recalculate_colony = true;
+                        } else if (prod == -1) {
+                            // pass
+                        } else {
+                            continue;
+                        }
+
+                        temp_colony->producing[0] = -38;
+                        colony_queue[colony_queue_count] = current_colony_idx;
+                        colony_queue_count++;
+                    }
+                }
+            }
+        }
+
+        if (recalculate_colony) {
+            COLCALC::Do_Player_Colony_Calculations_(player_idx);
+        }
+
+        if (colony_queue_count <= 0) {
+            return;
+        }
+
+        bool no_range_or_speed;
+        if (p->ship_range == 0 || p->ship_speed == 0) {
+            no_range_or_speed = true;
+        } else {
+            no_range_or_speed = false;
+        }
+
+        int flag_74 = 0;
+        int16_t best_planet = aimove::Best_Uncolonized_Undestined_Planet_(player_idx);
+        bool is_objective_2 = (p->objectives == 2);
+
+        s_ship_design ship_design;
+        ship_design.cost = 0;
+
+        for (int i = 0; i < colony_queue_count; ++i) {
+            s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
+            MOX::Mox_Update_();
+
+            if ((war_level != 0 && (*AIDATA::_enroute_human_ships)[MOX::_planet[temp_colony->planet].star_index][9] != 0) ||
+                AIBUILD::Colony_Is_Conquered_(temp_colony)) {
+
+                if (COLCALC::Colony_Can_Build_Product_(temp_colony, 26)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 26);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 27)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 27);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 40)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 8)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 41)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 28)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 28);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 24)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 24);
+                } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 23)) {
+                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 23);
+                }
+            }
+        }
+
+        bool want_colony_base = false;
+        if (best_planet != -1) {
+            if ((*AIDATA::_ai_player_info)[player_idx].n_contacts == 0 ||
+                (war_level == 0 && AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0) ||
+                AIBUILD::_player_total_strength_vs_ships[player_idx][2] < 10 ||
+                isqrt_val > 1) {
+
+                if (p->tech_applications[41] == 3 && !no_range_or_speed) {
+                    int val = (*AIDATA::_g_contextual_planet_values)[player_idx * 360 + best_planet];
+                    if (war_level > 0) {
+                        val >>= 2;
+                    }
+
+                    int deficit = (*AIDATA::_ai_player_info)[player_idx].colony_deficit * 10;
+                    if (val / 2 < deficit) {
+                        val += val / 2;
+                    } else {
+                        val += deficit;
+                    }
+
+                    int rand_val = random::Random_(700);
+                    int adjusted_rand = rand_val + 100 + (is_objective_2 ? 0 : 100);
+
+                    if (adjusted_rand < (isqrt_val + 64) * val) {
+                        want_colony_base = true;
+                    }
+                }
+            }
+        }
+
+        MOX::Mox_Update_();
+        _qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
+
+        if (p->tech_applications[40] == 3) {
+            int i = colony_queue_count;
+            while (want_colony_base && i > 0) {
+                i--;
+                s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
+                if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 13) {
+                    if (MOX::_planet[temp_colony->planet].star_index == MOX::_planet[best_planet].star_index) {
+                        if (temp_colony->buildings[11] != 1) {
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 11);
+                        }
+                        want_colony_base = false;
+                    }
+                }
+            }
+        }
+
+        MOX::Mox_Update_();
+        if (want_colony_base && p->tech_applications[41] == 3) {
+            int r = 0;
+            if (is_objective_2 == 0) {
+                if (random::Random_(5) == 1) {
+                    r = 1;
+                }
+            } else {
+                r = 1;
+            }
+
+            if (AIBUILD::_player_n_colony_ships[player_idx][0] <= r) {
+                int i = colony_queue_count;
+                while (want_colony_base && i > 0) {
+                    i--;
+                    s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
+                    if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
+                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 > random::Random_(100)) {
+                            Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
+                            int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
+                            if (ship_idx == -1) {
+                                no_range_or_speed = true;
+                            } else {
+                                MOX::_ship[ship_idx].status = 6;
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ship_idx);
+                            }
+                            want_colony_base = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        while (colony_queue_count > 0) {
+            int prev_count = colony_queue_count;
+            int i = colony_queue_count - 1;
+            s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
+
+            MOX::Mox_Update_();
+
+            if (colony_queue_count > 0 &&
+                p->bc + p->surplus_bc < p->total_maintenance &&
+                p->surplus_bc < 0 &&
+                temp_colony->maintenance[1] < temp_colony->production[1]) {
+
+                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -37);
+                COLCALC::Colony_Calculation_(colony_queue[i]);
+                continue;
+            }
+
+            int vs_ships_2 = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
+            int current_colony_idx = colony_queue[i];
+
+            int temp_44 = 0;
+            if (vs_ships_2 > 0 && p->ship_range != 0 && p->ship_speed != 0 && !no_range_or_speed) {
+                int strength_0 = AIBUILD::_player_total_strength_vs_ships[player_idx][0];
+                temp_44 = (vs_ships_2 * 1000) / (strength_0 + vs_ships_2);
+                if (war_level > 0) {
+                    temp_44 *= 2;
+                }
+            }
+
+            int local_48 = 0;
+            int local_50 = 0;
+            int local_54 = 0;
+            int local_58 = 0;
+
+            uint8_t threatened = (*AIDATA::_ai_colony_info)[current_colony_idx].threatened;
+            if (threatened == 0) {
+                if (AIBUILD::_player_n_freighter_groups_wanted[player_idx] != 0 &&
+                    flag_74 <= 1 &&
+                    p->tech_applications[69] == 3) {
+
+                    local_48 = (AIBUILD::_player_n_freighter_groups_wanted[player_idx] - flag_74 * 2) * 20 + 100;
+                    if (war_level > 0) {
+                        local_48 /= (war_level * war_level);
+                    }
+                } else if (AIBUILD::_player_n_spies[player_idx][1] != 0) {
+                    local_50 = (AIBUILD::_player_n_spies[player_idx][1] * 4 + 40) * 25;
+                    if (war_level > 0) {
+                        local_50 /= (war_level * war_level);
+                    }
+                } else if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
+                           p->tech_applications[52] == 3 &&
+                           !no_range_or_speed) {
+                    local_54 = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
+                    if (war_level > 0) {
+                        local_54 /= 2;
+                    }
+                }
+            } else {
+                if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
+                    p->tech_applications[52] == 3 &&
+                    !no_range_or_speed) {
+                    local_54 = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
+                    if (war_level > 0) {
+                        local_54 = (local_54 * 3) / 2;
+                    }
+                }
+            }
+
+            if (war_level == 0) {
+                local_58 = 333;
+            } else {
+                local_58 = 350 - war_level * 100;
+            }
+
+            int32_t choice_weights[6] = {0, 0, 0, 0, 0, 0};
+            choice_weights[0] = temp_44;
+            choice_weights[1] = local_48;
+            choice_weights[3] = local_50;
+            choice_weights[4] = local_54;
+            choice_weights[5] = local_58;
+
+            while (true) {
+                MOX::Mox_Update_();
+                int random_choice = MOX::Get_Weighted_Choice_Int_(choice_weights, 6);
+
+                if (random_choice == -1 || random_choice == 5) {
+                    colony_queue_count--;
+                    break;
+                }
+
+                switch (random_choice) {
+                    case 0:
+                    {
+                        bool flag_34 = false;
+                        bool flag_38 = false;
+                        bool flag_2c = false;
+
+                        int ind_worth = AIBUILD::Industry_Worth(temp_colony);
+                        if (p->surplus_bc > 5 && p->bc > 50) {
+                            ind_worth += isqrt_(p->bc) + isqrt_(p->surplus_bc);
+                        }
+
+                        uint16_t ship_weights[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+                        if (p->ship_designs[0].cost <= (war_level + 15) * ind_worth * 2) {
+                            ship_weights[0] = 2;
+                            int cost_threshold_1 = (war_level * 2 + 33) * ind_worth;
+                            if (p->ship_designs[1].cost <= cost_threshold_1) {
+                                ship_weights[1] = 16;
+
+                                if (temp_colony->buildings[41] == 0) {
+                                    if (p->tech_applications[169] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 41) <= (war_level * 2 + 31) * ind_worth) {
+                                        flag_38 = true;
+                                        ship_weights[8] = (uint16_t)(((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2 +
+                                                           ((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2) * 2 +
+                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count) * 2;
+                                        if (p->command_points < p->command_points_used) {
+                                            ship_weights[8] += (p->command_points_used - p->command_points) * 2;
+                                        }
+                                    }
+                                }
+
+                                if (temp_colony->buildings[8] == 0) {
+                                    if (p->tech_applications[27] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 8) <= cost_threshold_1) {
+                                        flag_34 = true;
+                                        ship_weights[7] = (uint16_t)(((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2 +
+                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2) * 5 +
+                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count * 3;
+                                        if (p->command_points < p->command_points_used) {
+                                            ship_weights[7] += (p->command_points_used - p->command_points) * 2;
+                                        }
+                                    }
+                                }
+
+                                if (temp_colony->buildings[40] == 0) {
+                                    if (p->tech_applications[168] == 3 &&
+                                        COLCALC::Colony_Product_Cost_(MOX::_colony, 40) <= (war_level * 2 + 35) * ind_worth) {
+                                        flag_2c = true;
+                                        ship_weights[6] = (uint16_t)((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 10 +
+                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count * 4 + 12 +
+                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 6;
+                                        if (p->command_points < p->command_points_used) {
+                                            ship_weights[6] += (p->command_points_used - p->command_points) * 2;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (COLCALC::Colony_Can_Build_Large_Ships_(temp_colony)) {
+                            int size_9 = AIBUILD::_player_ship_sizes[player_idx][9];
+                            if (size_9 >= 2 && p->ship_designs[2].cost <= (war_level * 2 + 45) * ind_worth) {
+                                ship_weights[2] = 32;
+                                ship_weights[1] /= 5;
+                                if (size_9 >= 3 && p->ship_designs[3].cost <= (war_level * 2 + 55) * ind_worth) {
+                                    ship_weights[3] = 64;
+                                    if (p->tech_applications[186] == 3 && size_9 >= 4 && p->ship_designs[4].cost <= (war_level * 2 + 48) * ind_worth) {
+                                        ship_weights[4] = 100;
+                                    }
+                                    if (p->tech_applications[55] == 3 && size_9 >= 5) {
+                                        if (ship_design.cost == 0) {
+                                            Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
+                                        }
+                                        if (ship_design.cost <= (war_level * 2 + 48) * ind_worth) {
+                                            ship_weights[5] = 150;
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            if (flag_2c) {
+                                ship_weights[6] += (*AIDATA::_ai_colony_info)[current_colony_idx].threatened * 7 + 2;
+                            }
+                            if (flag_34) {
+                                ship_weights[7] += (*AIDATA::_ai_colony_info)[current_colony_idx].threatened * 6 + 2;
+                            }
+                            if (flag_38) {
+                                ship_weights[8] += (*AIDATA::_ai_colony_info)[current_colony_idx].threatened * 5 + 2;
+                            }
+                        }
+
+                        if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] > 0 && random::Random_(5) == 1) {
+                            ship_weights[0] = 0;
+                        }
+
+                        int ship_choice = MOX::Get_Weighted_Choice_Short_(ship_weights, 9);
+                        switch (ship_choice + 1) {
+                            case 0:
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                            {
+                                int16_t created_idx = COLBLDG::Create_Ship_(player_idx, (int16_t)ship_choice, (int16_t)current_colony_idx);
+                                if (created_idx == -1) {
+                                    no_range_or_speed = true;
+                                } else {
+                                    MOX::_ship[created_idx].status = 6;
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - created_idx);
+                                    AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= AIBUILD::Mean_Ship_Strength_(&MOX::_ship[created_idx]);
+                                }
+                                break;
+                            }
+                            case 6:
+                            {
+                                memcpy(&p->ship_designs[5], &ship_design, sizeof(s_ship_design));
+                                int16_t ds_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)current_colony_idx);
+                                if (ds_idx == -1) {
+                                    no_range_or_speed = true;
+                                } else {
+                                    MOX::_ship[ds_idx].status = 6;
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ds_idx);
+                                    AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= AIBUILD::Mean_Ship_Strength_(&MOX::_ship[ds_idx]);
+                                }
+                                break;
+                            }
+                            case 7:
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                break;
+                            case 8:
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 3 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                break;
+                            case 9:
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 6 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 4 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                break;
+                        }
+                        choice_weights[0] = 0;
+                        break;
+                    }
+                    case 1:
+                        if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 12) {
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -15);
+                            flag_74++;
+                            AIBUILD::_player_n_freighter_groups_wanted[player_idx]--;
+                        }
+                        choice_weights[1] = 0;
+                        break;
+                    case 2:
+                    {
+                        int refit_planet_idx = MOX::_planet[temp_colony->planet].star_index;
+                        int n_entries = p_refit->n_entries - 1;
+                        bool refitted = false;
+                        for (int j = n_entries; j >= 0; j--) {
+                            int16_t ship_idx = p_refit->entry[j].ship_idx;
+                            s_ship_data* s = &MOX::_ship[ship_idx];
+                            if (s->location == refit_planet_idx &&
+                                (s->d.size < 2 || COLCALC::Colony_Can_Build_Large_Ships_(temp_colony))) {
+
+                                s_ship_design* refit_design;
+                                if (s->d.size == 5) {
+                                    if (ship_design.cost == 0) {
+                                        Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
+                                    }
+                                    refit_design = &ship_design;
+                                } else {
+                                    refit_design = &p->ship_designs[s->d.size];
+                                }
+
+                                int16_t cost = AIBUILD::Refit_Cost_(player_idx, &s->d, refit_design);
+                                if (cost <= refit_design->cost &&
+                                    cost <= AIBUILD::Industry_Worth(temp_colony) * (war_level + 10)) {
+
+                                    if (s->officer_index != -1) {
+                                        Move_Officer_To_Pool_(s->officer_index);
+                                        s->officer_index = -1;
+                                    }
+
+                                    memcpy(&s->d, refit_design, sizeof(s_ship_design));
+                                    s->d.cost = cost;
+                                    s->status = 4;
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ship_idx);
+
+                                    p_refit->n_entries--;
+                                    memcpy(&p_refit->entry[j], &p_refit->entry[j + 1], (p_refit->n_entries - j) * sizeof(s_ai_refit_entry));
+                                    refitted = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!refitted) {
+                            choice_weights[2] = 0;
+                        }
+                        break;
+                    }
+                    case 3:
+                        if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 15) {
+                            AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -7);
+                            AIBUILD::_player_n_spies[player_idx][1]--;
+                        }
+                        choice_weights[3] = 0;
+                        break;
+                    case 4:
+                        if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 14) {
+                            if (temp_colony->buildings[22] == 0) {
+                                AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 22);
+                                AIBUILD::_player_n_transports[player_idx][1]--;
+                            } else {
+                                Load_Transport_Ship_Design_(player_idx, &p->ship_designs[5]);
+                                int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)current_colony_idx);
+                                if (tr_idx == -1) {
+                                    no_range_or_speed = true;
+                                } else {
+                                    MOX::_ship[tr_idx].status = 6;
+                                    AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - tr_idx);
+                                    AIBUILD::_player_n_transports[player_idx][1]--;
+                                }
+                            }
+                        }
+                        choice_weights[4] = 0;
+                        break;
+                }
+
+                if (colony_queue_count != prev_count) {
+                    break;
+                }
+            }
+        }
+    }
+
+    int __cdecl Sort_Pops_F_IR_(const void* a, const void* b) {
+        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
+        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+
+        int prod1 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 0);
+        int prod2 = (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 0);
+
+        int score1;
+        if ((*param_1 & 0x180) == 0x80 /* Farmer */) {
+            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 1);
+            if ((int)_Sort_Pops_colony_info->pollution_at_start < (int)_Sort_Pops_colony_data->pollution) {
+                score1 += 1000;
+            }
+        } else {
+            score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 2);
+        }
+
+        int score2;
+        if ((*param_2 & 0x180) == 0x80 /* Farmer */) {
+            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 1);
+            if ((int)_Sort_Pops_colony_info->pollution_at_start < (int)_Sort_Pops_colony_data->pollution) {
+                score2 += 1000;
+            }
+        } else {
+            score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 2);
+        }
+
+        if (score2 != score1) {
+            return score2 - score1;
+        }
+
+        if (prod1 != prod2) {
+            return prod1 - prod2;
+        }
+
+        uint32_t val1 = *param_1;
+        uint32_t val2 = *param_2;
+
+        if (((val1 ^ val2) & 0x180) == 0) {
+            return (int)(val1 & 0xF) - (int)(val2 & 0xF);
+        }
+
+        return (int)((val1 & 0x180) >> 7) - (int)((val2 & 0x180) >> 7);
+    }
+
+    void __cdecl Make_First_Unassigned_Into_Farmer_(s_aidudes_colony_info* info) {
+        s_colony* colony = &MOX::_colony[(uint8_t)info->colony_idx];
+        int16_t old_pollution = colony->pollution;
+
+        colony->pop[(uint8_t)info->cur_pop_idx] &= 0xFFFFFE7F;
+        colony->pop[(uint8_t)info->cur_pop_idx] |= 0x0200;
+
+        info->cur_pop_idx++;
+        info->n_farmers++;
+
+        COLCALC::Pre_Import_Computing_(colony);
+
+        if (colony->pollution < old_pollution) {
+            aidudes::_Sort_Pops_colony_info = info;
+            aidudes::_Sort_Pops_colony_data = colony;
+
+            size_t n_to_sort = (size_t)(info->pop_end_idx - info->cur_pop_idx);
+            _qsort(&colony->pop[(uint8_t)info->cur_pop_idx], n_to_sort, sizeof(uint32_t), aidudes::Sort_Pops_F_IR_);
+        }
+
+        if (info->n_farmers < (uint8_t)colony->max_farms && info->cur_pop_idx < (uint8_t)colony->n_pops) {
+            info->best_worker_to_farmer_score = aidudes::F_IR_Worthiness_(info, &colony->pop[(uint8_t)info->cur_pop_idx]);
+        } else {
+            info->best_worker_to_farmer_score = (int16_t)0x8001;
+        }
+    }
+
+    void __cdecl Assign_Additional_Unblockaded_Farmers_() {
+        s_aidudes_colony_info* candidates[250];
+        int num_candidates = 0;
+        bool freighter_shortage_flag = false;
+        bool allocation_failed = false;
+
+        if (aidudes::_n_our_unblockaded > 0) {
+            s_aidudes_colony_info* info = aidudes::_our_unblockaded;
+            s_aidudes_colony_info* end = aidudes::_our_unblockaded + aidudes::_n_our_unblockaded;
+
+            while (info < end) {
+                s_colony* col = &MOX::_colony[(uint8_t)info->colony_idx];
+                info->cur_pop_idx = info->first_assignable_pop_idx;
+                info->pop_end_idx = info->pop_tail_idx;
+
+                if ((uint8_t)info->cur_pop_idx < (uint8_t)info->pop_tail_idx && 
+                    (uint8_t)info->n_farmers < (uint8_t)col->max_farms && 
+                    col->food2_per_farmer != 0) 
+                {
+                    aidudes::_Sort_Pops_colony_data = col;
+                    aidudes::_Sort_Pops_colony_info = info;
+
+                    _qsort(&col->pop[(uint8_t)info->cur_pop_idx], 
+                          (uint8_t)info->pop_end_idx - (uint8_t)info->cur_pop_idx, 
+                          4, 
+                          aidudes::Sort_Pops_F_IR_);
+
+                    info->best_worker_to_farmer_score = aidudes::F_IR_Worthiness_(info, &col->pop[(uint8_t)info->cur_pop_idx]);
+                    candidates[num_candidates++] = info;
+                }
+                info++;
+            }
+
+            COLCALC::Do_Player_Colony_Post_Production_(aidudes::_i_ai);
+
+            while ((aidudes::_p_ai->surplus_food < 0 || aidudes::_p_ai->surplus_freighters < 0) && 
+                   (num_candidates > 0 && !allocation_failed)) 
+            {
+                int best_candidate_idx;
+
+                if (aidudes::_p_ai->surplus_freighters < 1) {
+                    best_candidate_idx = -1;
+                    freighter_shortage_flag = true;
+
+                    for (int i = 0; i < num_candidates; ++i) {
+                        s_aidudes_colony_info* candidate = candidates[i];
+                        s_colony* col = &MOX::_colony[(uint8_t)candidate->colony_idx];
+
+                        int food_needed = (uint8_t)col->food2_needed_for_our_empire + 
+                                          (uint8_t)col->food2_needed_for_assimilated + 
+                                          (uint8_t)col->food2_needed_for_conquered + 
+                                          (uint8_t)col->food2_needed_for_natives;
+
+                        if (food_needed > (col->production[0] * 2)) {
+                            if (best_candidate_idx == -1 || candidate->best_worker_to_farmer_score > candidates[best_candidate_idx]->best_worker_to_farmer_score) {
+                                best_candidate_idx = i;
+                            }
+                        }
+                    }
+                } else {
+                    best_candidate_idx = 0;
+                    for (int i = num_candidates - 1; i > 0; --i) {
+                        if (candidates[i]->best_worker_to_farmer_score > candidates[best_candidate_idx]->best_worker_to_farmer_score) {
+                            best_candidate_idx = i;
+                        }
+                    }
+                }
+
+                if (best_candidate_idx == -1) {
+                    allocation_failed = true;
+                } else {
+                    s_aidudes_colony_info* target_info = candidates[best_candidate_idx];
+                    aidudes::Make_First_Unassigned_Into_Farmer_(target_info);
+                    COLCALC::Colony_Calculation_(target_info->colony_idx);
+
+                    s_colony* target_col = &MOX::_colony[(uint8_t)target_info->colony_idx];
+                    if ((uint8_t)target_info->cur_pop_idx >= (uint8_t)target_info->pop_end_idx || 
+                        (uint8_t)target_info->n_farmers >= (uint8_t)target_col->max_farms) 
+                    {
+                        num_candidates--;
+                        if (best_candidate_idx < num_candidates) {
+                            _memcpy(&candidates[best_candidate_idx], &candidates[best_candidate_idx + 1], (num_candidates - best_candidate_idx) * sizeof(s_aidudes_colony_info*));
+                        }
+                    }
+                }
+            }
+        }
+
+        if (freighter_shortage_flag) {
+            if (random::Random_(10) <= (int)MOX::_settings.game_difficulty) {
+                aidudes::_p_ai->n_freighters += 5;
+            }
+        }
+    }
+
+    int __cdecl F_IR_Worthiness_(s_aidudes_colony_info* info, uint32_t* flags) {
+        s_colony* colony = &MOX::_colony[info->colony_idx];
+        int16_t base_production = COLCALC::Colony_Pop_Prod_Produced_(colony, reinterpret_cast<const s_colony*>(flags), 0);
+        int worthiness;
+
+        if ((*flags & 0x180) == 0x80) {
+            int16_t mode1_production = COLCALC::Colony_Pop_Prod_Produced_(colony, reinterpret_cast<const s_colony*>(flags), 1);
+            worthiness = (int)base_production - (int)mode1_production;
+
+            // If pollution has increased since the start of evaluation
+            if (colony->pollution > (int16_t)info->pollution_at_start) {
+                return worthiness + 1000;
+            }
+        } else {
+            int16_t mode2_production = COLCALC::Colony_Pop_Prod_Produced_(colony, reinterpret_cast<const s_colony*>(flags), 2);
+            worthiness = (int)base_production - (int)mode2_production;
+        }
+
+        return worthiness;
+    }
+
+    /**
+     * @brief Comparison function for sorting colonies by their industry worth.
+     *
+     * Takes pointers to colony indices, calculates their industry worth, and returns the difference.
+     * Used typically as a callback for qsort or similar sorting algorithms.
+     */
+    int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2) {
+        int16_t worth1 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p1)]);
+        int16_t worth2 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p2)]);
+
+        return (int)worth1 - (int)worth2;
     }
 }

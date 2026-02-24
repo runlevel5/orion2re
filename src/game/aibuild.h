@@ -29,11 +29,16 @@ namespace AIBUILD {
 
     void __cdecl Empire_Buy_Outright_(int16_t player_idx);
 
+    void __cdecl Find_Buildable_Buildings_(struct s_colony* colony, int16_t* buildable_flags);
+
+    short __cdecl Colony_Building_Score_(struct s_colony* colony, short building_id);
+
     void __cdecl Assign_Colony_Building_(struct s_colony* colony);
 
-    inline void __cdecl Assign_Colony_New_Building_(struct s_colony* colony) {
-        using Fn = void(__cdecl*)(struct s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047aab0});
-        fn(colony);
-    }
+    void __cdecl Assign_Colony_New_Building_(struct s_colony* colony);
+
+    bool __cdecl Colony_Is_Conquered_(struct s_colony* colony);
+
+    void __cdecl Force_Produce_(uint8_t* id_list, int16_t index, int32_t* list_count, int16_t production_id);
+    int16_t __cdecl Industry_Worth(struct s_colony* colony);
 }

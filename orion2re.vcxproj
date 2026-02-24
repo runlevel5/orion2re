@@ -138,6 +138,7 @@
     <ClInclude Include="src\game\aistage.h" />
     <ClInclude Include="src\game\aitech.h" />
     <ClInclude Include="src\game\allocate.h" />
+    <ClInclude Include="src\game\angle.h" />
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\antarans.h" />
     <ClInclude Include="src\game\assert.h" />

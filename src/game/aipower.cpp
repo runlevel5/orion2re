@@ -34,4 +34,20 @@ namespace aipower {
         int16_t shield_value = Get_Best_Ship_Shield_Value_(target_idx);
         return Ship_Strength_Vs_Shield_(attacker_idx, target_idx, shield_value);
     }
+
+    int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx) {
+        int16_t hits;
+
+        hits = aipower::Max_Ship_Hits_(ship_idx);
+
+        // Substract structural damage
+        hits -= MOX::_ship[ship_idx].structural_damage;
+
+        // In strategic combat armor damage is not counted
+        if (MOX::_settings.strategic_combat_flag == 0) {
+            hits -= MOX::_ship[ship_idx].armor_damage;
+        }
+
+        return hits;
+    }
 }

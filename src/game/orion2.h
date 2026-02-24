@@ -292,8 +292,8 @@ struct s_aidudes_colony_info {
     int8_t pop_end_idx;
     int8_t pop_tail_idx;
     int8_t pollution_at_start;
-    short worker_to_farmer_score;
-    short field9_0xa;
+    short best_worker_to_farmer_score;
+    short worst_worker_to_farmer_score;
     int8_t eats_minerals;
 };
 
@@ -3873,7 +3873,7 @@ struct s_tech_weapon_data {
     short cost;
     short flags;
     short field10_0x14;
-    short field11_0x16;
+    short damage;
     undefined field12_0x18;
     undefined field13_0x19;
     undefined field14_0x1a;

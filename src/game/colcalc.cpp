@@ -1051,8 +1051,8 @@ namespace COLCALC {
         return true;
     }
 
-    int16_t __cdecl Gravity_Player_Production_Factor_(s_colony* colony, int16_t player_idx) {
-        s_colony* c = static_cast<s_colony*>(colony);
+    int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx) {
+        const s_colony* c = colony;
         if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
             return 4;
         }
@@ -1077,7 +1077,39 @@ namespace COLCALC {
         return 4; 
     }
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const s_colony* pop_unit, int16_t mode) {
+        uint32_t pop_mask = reinterpret_cast<const uint32_t&>(*pop_unit);
+
+        // Call the empire-specific base production function
+        int16_t base_prod = _colony_empire_base_functions[mode](
+            colony,
+            static_cast<int16_t>(colony->owner),
+            pop_mask & 0xFFFF000F,
+            nullptr
+        );
+
+        // Apply multipliers if base production is positive
+        if (base_prod > 0) {
+            if ((pop_mask & 0x400) != 0) {
+                base_prod *= 3;
+            } else {
+                base_prod *= 4;
+            }
+
+            // Apply the production factor (e.g., gravity modifier)
+            int16_t gravity_factor = Gravity_Player_Production_Factor_(colony, static_cast<int16_t>(pop_mask & 0xFFFF000F));
+            base_prod = (int16_t)(gravity_factor * base_prod);
+        }
+
+        // If mode is 0, the result is halved
+        if (mode == 0) {
+            base_prod /= 2;
+        }
+
+        return base_prod;
+    }
+
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out) {
         int16_t base_produced;
         int16_t min_limit = 0;
 
@@ -1974,6 +2006,15 @@ namespace COLCALC {
                 player->total_known_tech_cost += field.cost + (level - 1) * 10000;
             }
         }
+    }
+
+    bool __cdecl Colony_Can_Build_Large_Ships_(s_colony *colony) {
+        if (colony->buildings[BUILDING_STAR_BASE] != 0 ||
+            colony->buildings[BUILDING_BATTLESTATION] != 0 ||
+            colony->buildings[BUILDING_STAR_FORTRESS] != 0) {
+            return true;
+        }
+        return false;
     }
 
     /**

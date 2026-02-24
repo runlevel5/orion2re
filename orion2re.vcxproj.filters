@@ -800,6 +800,9 @@
     <ClInclude Include="src\game\newtech.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\angle.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

@@ -13,7 +13,10 @@ namespace aidudes {
 
     inline s_aidudes_colony_info*& _our_unblockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657D0});
     inline uint16_t& _n_our_colonies = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657D4});
-    inline s_colony*& _Sort_Pops_colony =
+    inline s_aidudes_colony_info*& _Sort_Pops_colony_info =
+        *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657BC});
+
+    inline s_colony*& _Sort_Pops_colony_data =
         *reinterpret_cast<s_colony**>(std::uintptr_t{0x005657D8});
 
     inline int16_t& _i_ai =
@@ -36,39 +39,27 @@ namespace aidudes {
 
     void __cdecl Colony_AI_Given_Tax_();
 
-    inline int __cdecl Sort_Pops_FI_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445320});
-        return fn(a, b);
-    }
+    int __cdecl Sort_Pops_FI_(const void* a, const void* b);
+
+    int __cdecl Sort_Pops_F_IR_(const void* a, const void* b);
+
+    int16_t __cdecl FI_Worthiness_(const s_colony* colony, const s_colony* pop);
+
+    int __cdecl F_IR_Worthiness_(s_aidudes_colony_info* info, uint32_t* flags);
 
     void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info);
 
     void __cdecl Do_Unblockaded_Colony_(s_aidudes_colony_info* info);
 
-    inline void __cdecl Assign_Required_Colonists_(s_aidudes_colony_info* info) {
-        using Fn = void(__cdecl*)(s_aidudes_colony_info*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445130});
-        fn(info);
-    }
+    void __cdecl Assign_Required_Colonists_(s_aidudes_colony_info* colony_info);
 
-    inline void __cdecl Compute_Max_Min_R_I_Worthiness_(s_aidudes_colony_info* info) {
-        using Fn = void(__cdecl*)(s_aidudes_colony_info*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445710});
-        fn(info);
-    }
+    void __cdecl Make_First_Unassigned_Into_Farmer_(s_aidudes_colony_info* info);
 
-    inline int __cdecl Sort_Pops_Compare_2(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00445520});
-        return fn(a, b);
-    }
+    int __cdecl Sort_Pops_Fixed_(const void* a, const void* b);
 
-    inline int __cdecl Sort_Pops_Compare_1(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004455D0});
-        return fn(a, b);
-    }
+    void __cdecl Compute_Max_Min_R_I_Worthiness_(s_aidudes_colony_info* info);
+
+    int __cdecl _Sort_Pops_colony(const void* a, const void* b);
 
     void __cdecl Assign_Additional_Research_Industry_();
 
@@ -76,22 +67,15 @@ namespace aidudes {
 
     void __cdecl Grab_Worker_(s_aidudes_colony_info* info);
 
-    inline void __cdecl Assign_Empire_Building_(int16_t i_ai) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047be10});
-        fn(i_ai);
-    }
+    void __cdecl Assign_Empire_Building_(int16_t player_idx);
 
     void __cdecl Industry_Sanity_Check_();
 
-    inline void __cdecl Assign_Additional_Unblockaded_Farmers_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004459d0});
-        fn();
-    }
+    void __cdecl Assign_Additional_Unblockaded_Farmers_();
 
     void __cdecl Colony_AI_(int16_t i_ai);
     void All_Colony_AI_();
 
     void __cdecl Assign_Buildings_();
+    int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2);
 }

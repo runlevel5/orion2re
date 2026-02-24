@@ -261,6 +261,20 @@ namespace INITSHIP {
         return best_computer_idx;
     }
 
+    int16_t __cdecl Best_Computer_Attack_Bonus_(int16_t player_idx) {
+        int16_t computer_idx;
+        int16_t bonus;
+
+        computer_idx = INITSHIP::Best_Computer_(player_idx);
+        bonus = TECHDATA::_computers[computer_idx].bonus;
+
+        if (player_idx < 8) {
+            bonus += MOX::_player[player_idx].traits[7 /* TRAIT_SHIP_ATTACK */];
+        }
+
+        return bonus;
+    }
+
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
         int16_t best_shield_idx = 0;
 

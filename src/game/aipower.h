@@ -24,4 +24,12 @@ namespace aipower {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508f00});
         fn(ship_idx, result_ptr);
     }
+
+    inline int16_t __cdecl Max_Ship_Hits_(int16_t ship_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508e50});
+        return fn(ship_idx);
+    }
+
+    int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx);
 }
