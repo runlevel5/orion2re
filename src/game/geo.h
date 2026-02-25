@@ -28,9 +28,7 @@ namespace GEO {
 
     void __cdecl Move_Player_1_Turn_To_Star_(uint8_t player_num, int16_t start_x, int16_t start_y, int32_t star_idx, int16_t max_turns, int16_t *out_x, int16_t *out_y, int8_t *nebula_flag, int8_t *interdictor_flag);
 
-    inline bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004124B0 });
-        return fn(px, py, d, x1, y1, x2, y2);
-    }
+    bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+
+    int32_t __cdecl Points_On_Same_Side_Of_Line_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t lx1, int32_t ly1, int32_t lx2, int32_t ly2);
 }

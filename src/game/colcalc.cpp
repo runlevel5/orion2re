@@ -1520,9 +1520,11 @@ namespace COLCALC {
 
                 // Notify if the player is running out of money
                 if (plr->surplus_bc < 0 && plr->bc < 50) {
-                    uint32_t msg_info = 4 | (static_cast<uint32_t>(plr->bc) << 16);
-                    uint32_t val = static_cast<uint32_t>(static_cast<uint16_t>(plr->surplus_bc));
-                    MSG_::Add_Message(msg_info, val, 0, 0, 0, static_cast<int16_t>(i));
+                    s_MSG msg;
+                    msg.msg_type = MSG_TYPE_FINANCIAL;
+                    msg.u.financial.a = plr->bc;
+                    msg.u.financial.b = plr->surplus_bc;
+                    MSG_::Add_Msg_(msg, i);
                 }
 
                 // Flag interesting events like food or freighter shortages

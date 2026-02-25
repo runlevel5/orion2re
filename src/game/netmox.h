@@ -38,6 +38,11 @@ namespace NETMOX {
         fn(player_num);
     }
 
+    inline void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t p2, int16_t p3) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(0x005187C0)(owner, p2, p3);
+    }
+
     inline char* __cdecl Load_Netmox_Strings_(char* data) {
         using Fn = char*(__cdecl*)(char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513E80});

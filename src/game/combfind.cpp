@@ -167,6 +167,160 @@ void __cdecl Search_For_Battles_() {
     COLCALC::Check_For_Eliminated_Players_();
 }
 
+void __cdecl Process_Retreating_Ships_(void) {
+    struct s_msg {
+        char type;
+        char pad1;
+        char star_idx;
+        char reason;
+        short count;
+        char killed_officer_count;
+        char pad2[13];
+    };
+
+    s_retreat_report report[8][73];
+    int8_t player_retreat_target[8];
+    int16_t ship_indices[500];
+    s_ship_move_info move_info;
+    
+    memset(report, 0, sizeof(report));
+    memset(player_retreat_target, 0xFF, sizeof(player_retreat_target));
+
+    for (int i = MOX::_NUM_SHIPS - 1; i >= 0; --i) {
+        s_ship_data* ship = &MOX::_ship[i];
+
+        if (ship->location == MOX::_NUM_STARS) {
+            int8_t owner = ship->owner;
+            if (player_retreat_target[owner] == -1) {
+                player_retreat_target[owner] = 0x48; /* 'H' */
+                uint32_t valid_star_count = 0;
+                for (int j = 0; j < MOX::_NUM_STARS; ++j) {
+                    if ((MOX::_star[j].has_dimensional_portal >> owner) & 1) {
+                        valid_star_count++;
+                        if (random::Random_(valid_star_count) == 1) {
+                            player_retreat_target[owner] = (int8_t)j;
+                        }
+                    }
+                }
+            }
+
+            if (player_retreat_target[owner] == 0x48) {
+                int16_t leader_idx = ship->officer_index;
+                if (leader_idx != -1) {
+                    if (MOX::_leaders[leader_idx].eta < 1) {
+                        MOX::_leaders[leader_idx].location = -1;
+                        ship->officer_index = -1;
+                        OFFICER::Kill_Officer_(leader_idx);
+                        report[owner][MOX::_NUM_STARS].killed_officers++;
+                    } else {
+                        OFFICER::Move_Officer_To_Pool_(leader_idx);
+                    }
+                }
+                report[owner][MOX::_NUM_STARS].count++;
+                report[owner][MOX::_NUM_STARS].reason = 0;
+                SHIPS::Kill_Ship_((int16_t)i);
+            } else {
+                int target_loc = (int)player_retreat_target[owner];
+                ship->location = (int16_t)target_loc;
+                ship->x = MOX::_star[target_loc].x;
+                ship->y = MOX::_star[target_loc].y;
+                ship->status = 0;
+            }
+        } else if (ship->status == 9) {
+            int group_count = 1;
+            int16_t loc = ship->location;
+            int8_t owner = ship->owner;
+            ship_indices[0] = (int16_t)i;
+            ship->mission = 0;
+
+            for (int j = i - 1; j >= 0; --j) {
+                s_ship_data* other = &MOX::_ship[j];
+                if (other->status == 9 && other->location == loc && other->owner == owner) {
+                    ship_indices[group_count++] = (int16_t)j;
+                    other->mission = 0;
+                }
+            }
+
+            int16_t retreat_star = Closest_Other_Colony_Star_((int16_t)owner, loc);
+            bool retreat_failed = false;
+            int8_t fail_reason = -1;
+
+            if (retreat_star == -1) {
+                retreat_failed = true;
+                fail_reason = 2;
+            } else {
+                ship_indices[group_count] = (int16_t)0xFFFF;
+                SHIPMOVE::Ships_Try_To_Move_To_(ship_indices, retreat_star, &move_info);
+                if (move_info.moving == 0) {
+                    retreat_failed = true;
+                    fail_reason = (move_info.hyperspace_flux == 0) ? 2 : 1;
+                }
+            }
+
+            if (retreat_failed) {
+                for (int k = 0; k < group_count; ++k) {
+                    int16_t idx = ship_indices[k];
+                    int16_t leader_idx = MOX::_ship[idx].officer_index;
+                    if (leader_idx != -1) {
+                        if (MOX::_leaders[leader_idx].eta < 1) {
+                            OFFICER::Kill_Officer_(leader_idx);
+                            report[owner][loc].killed_officers++;
+                        } else {
+                            OFFICER::Move_Officer_To_Pool_(leader_idx);
+                        }
+                    }
+                    report[owner][loc].count++;
+                    report[owner][loc].reason = fail_reason;
+                    SHIPS::Kill_Ship_(idx);
+                }
+            } else {
+                ship_indices[group_count] = (int16_t)0xFFFF;
+                SHIPMOVE::Make_Ships_Move_To_(ship_indices, retreat_star, &move_info);
+                for (int k = 0; k < group_count; ++k) {
+                    int16_t idx = ship_indices[k];
+                    MOX::_ship[idx].location -= 500;
+                    MOX::_ship[idx].status = 1;
+                }
+            }
+        } else if (ship->owner >= 8) {
+            if (ship->owner == 8 && ship->status == 0) {
+                antarans::Restock_Antaran_Ship_((int16_t)ship->d.size);
+                SHIPS::Kill_Ship_((int16_t)i);
+            } else if (ship->owner > 7 && ship->status == 0 && ship->d.speed != 0) {
+                bool destroy_monster = false;
+                if (ship->owner == 10) {
+                    destroy_monster = true;
+                } else if (ship->owner == 11 || ship->owner == 12 || ship->owner == 14) {
+                    if (random::Random_(2) == 1) {
+                        destroy_monster = true;
+                    }
+                }
+
+                if (destroy_monster) {
+                    SHIPS::Kill_Ship_((int16_t)i);
+                    NETMOX::Russ_Event_Monster_Update_((int16_t)ship->owner, -1, -1);
+                }
+            }
+        }
+    }
+
+    for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+        for (int s = 0; s < MOX::_NUM_STARS + 1; ++s) {
+            if (report[p][s].count != 0) {
+                s_MSG msg;
+                msg.msg_type = MSG_TYPE_FAILED_RETREAT;
+                msg.u.retreat.star_idx = (char)s;
+                msg.u.retreat.reason = report[p][s].reason;
+                msg.u.retreat.ships_lost = report[p][s].count;
+                msg.u.retreat.leader_count = report[p][s].killed_officers;
+                MSG_::Add_Msg_(msg, p);
+            }
+        }
+    }
+
+    MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+}
+
 void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
     int16_t ship_indices[2];
     s_ship_move_info move_info;

@@ -113,6 +113,11 @@ namespace OFFICER {
     void __cdecl Generate_Random_Officer_(int16_t player_index);
     void __cdecl Assert_Marooned_Leaders_();
 
+    inline void __cdecl Kill_Officer_(int16_t leader_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(0x0043E110)(leader_idx);
+    }
+
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
     inline int16_t __cdecl Scan_Officer_Fields_(int16_t* out_p1, int16_t* out_p2, int16_t p2, int16_t p1, int8_t* scanned_flag, int16_t* out_field2, int16_t* out_field1) {

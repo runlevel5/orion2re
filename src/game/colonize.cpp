@@ -179,9 +179,12 @@ namespace COLONIZE {
                     colony->buildings[BUILDING_COLONY_BASE] = 0;
                     MOX::_player[colony->owner].bc += refund;
 
-                    uint32_t header = (uint32_t)((uint8_t)colony->planet << 16);
-                    uint32_t p2 = (uint32_t)BUILDING_COLONY_BASE | ((uint32_t)(uint16_t)refund << 16);
-                    MSG_::Add_Message(header, p2, 0, 0, 0, (int16_t)colony->owner);
+                    s_MSG msg;
+                    msg.msg_type = MSG_TYPE_COLONY;
+                    msg.u.colony.planet_idx = (uint8_t)colony->planet;
+                    msg.u.colony.c.scrap.bc = refund;
+                    msg.u.colony.c.scrap.building_id = BUILDING_COLONY_BASE;
+                    MSG_::Add_Msg_(msg, colony->owner);
                 }
             }
         }

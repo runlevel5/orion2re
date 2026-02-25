@@ -20,10 +20,17 @@ namespace COMBFIND {
 
     void __cdecl Search_For_Battles_();
 
-    inline void __cdecl Process_Retreating_Ships_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bc420});
-        fn();
+    struct s_retreat_report {
+        int8_t reason;
+        int16_t count;
+        int8_t killed_officers;
+    };
+
+    void __cdecl Process_Retreating_Ships_();
+
+    inline int16_t __cdecl Closest_Other_Colony_Star_(int16_t owner, int16_t loc) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(0x004BC300)(owner, loc);
     }
 
     inline void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx, int16_t* attacker_idx) {

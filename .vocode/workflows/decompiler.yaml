@@ -1,3 +1,10 @@
+variables:
+  LLM_DECOMPILER_MODEL: 
+    value: gemini/gemini-3-flash-preview
+    type: llm_models
+  LLM_DECOMPILER_CODER: 
+    value: gemini/gemini-3-flash-preview
+    type: llm_models
 workflows:
   decompiler:
     description: "A LLM enabled decompiler agentic loop."
@@ -13,14 +20,11 @@ workflows:
           - name: done
       - name: decompile
         type: llm
-        model: gemini/gemini-3-flash-preview
-        #model: gemini/gemini-3.1-pro-preview
+        model: ${LLM_DECOMPILER_MODEL}
         temperature: 1
         reasoning_effort: high
-        #reasoning_effort: medium
-        #reset_policy: keep
         confirmation: auto
-        start_timeout: 120
+        start_timeout: 600
         system: |
           You are professional reverse engineer. Your core expertise is code restoration of old C and C++
           projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game
@@ -295,8 +299,7 @@ workflows:
           - name: done
       - name: apply
         type: llm
-        model: gemini/gemini-3-flash-preview
-        #model: gemini/gemini-3-pro-preview
+        model: ${LLM_DECOMPILER_CODER}
         temperature: 1
         reasoning_effort: high
         confirmation: auto
@@ -452,7 +455,8 @@ workflows:
 
                 The `thunk_main2_` should be added to `src/game/mox2.h`
             
-              2. For external function stubs without namespace, put them to `src/game/funcs.h`.
+              2. For external function stubs without namespace, put them to to the same namespace. If the external function
+                 is already defined in `src/game/funcs.h` - do not add it, it a global function.
               3. If function is a standard Win32 API function (SendMessageA, MessageBoxA and so on) - do not generate
                  a stub.
 

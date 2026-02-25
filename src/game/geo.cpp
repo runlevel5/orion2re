@@ -1,12 +1,6 @@
 #include "deps.h"
 
 namespace GEO {
-
-    /**
-     * Initializes the black_hole_blocks bit fields for all stars.
-     * This field tracks which other stars are blocked from view by a black hole
-     * relative to a given star, based on a proximity radius 'distance'.
-     */
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance) {
         int16_t black_hole_indices[72];
         int16_t num_black_holes = Collect_Black_Holes_(black_hole_indices);
@@ -221,6 +215,9 @@ namespace GEO {
         return black_hole_count;
     }
 
+#include <stdlib.h>
+#include <time.h>
+
     void __cdecl Get_Orbit_Display_X_Y_(int32_t star_idx, int32_t orbit_idx, int32_t* out_x, int32_t* out_y, int32_t* orbit_pos) {
         int base_time = (star_idx * 7) + (int)MOX::_stardate;
         
@@ -416,4 +413,127 @@ namespace GEO {
         }
     }
 
+    bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        bool bVar1 = false;
+        int32_t iVar15 = (int32_t)y1 - (int32_t)y2;
+        int32_t iVar17 = (int32_t)x2 - (int32_t)x1;
+
+        int32_t dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
+        uint32_t abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
+
+        uint32_t uVar8 = (uint32_t)iVar17 * (uint32_t)iVar17 + (uint32_t)iVar15 * (uint32_t)iVar15;
+        uint32_t uVar13 = (uint32_t)d * (uint32_t)d;
+
+        if (0xFFFFFFFFu / uVar13 < uVar8) {
+            do {
+                if (abs_dot <= 0xFFFF) {
+                    bVar1 = true;
+                    break;
+                }
+
+                uint32_t sqrt_uVar8 = isqrt_(uVar8);
+                if (abs_dot <= sqrt_uVar8 * (uint32_t)d) {
+                    bVar1 = true;
+                    break;
+                }
+
+                if ((sqrt_uVar8 + 1) * (uint32_t)d < abs_dot) {
+                    return false;
+                }
+
+                y2 /= 2;
+                x2 /= 2;
+                y1 /= 2;
+                x1 /= 2;
+                d /= 2;
+                py /= 2;
+                px /= 2;
+
+                iVar15 = (int32_t)y1 - (int32_t)y2;
+                iVar17 = (int32_t)x2 - (int32_t)x1;
+                dot_product = (px - x2) * iVar15 + (py - y2) * iVar17;
+                abs_dot = (dot_product ^ (dot_product >> 31)) - (dot_product >> 31);
+
+                uVar8 = (uint32_t)iVar17 * (uint32_t)iVar17 + (uint32_t)iVar15 * (uint32_t)iVar15;
+                uVar13 = (uint32_t)d * (uint32_t)d;
+
+            } while (0xFFFFFFFFu / uVar13 < uVar8);
+        }
+
+        if (!bVar1) {
+            if (abs_dot > 0xFFFF || uVar13 * uVar8 < abs_dot * abs_dot) {
+                return false;
+            }
+        }
+
+        if (dot_product == 0) {
+            if (x2 > x1) {
+                if (x1 > px || x2 < px) {
+                    return false;
+                }
+            } else if (x2 < x1) {
+                if (x2 > px || x1 < px) {
+                    return false;
+                }
+            } else {
+                if (y2 >= y1) {
+                    if (y1 > py || y2 < py) {
+                        return false;
+                    }
+                } else {
+                    if (y2 > py || y1 < py) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else {
+            uint32_t sum_sq = (uint32_t)iVar15 * (uint32_t)iVar15 + (uint32_t)iVar17 * (uint32_t)iVar17;
+            int32_t iVar12 = iVar15;
+            int32_t local_10 = iVar17;
+
+            if (sum_sq <= uVar13) {
+                do {
+                    iVar12 += iVar15;
+                    local_10 += iVar17;
+                    sum_sq = (uint32_t)iVar12 * (uint32_t)iVar12 + (uint32_t)local_10 * (uint32_t)local_10;
+                } while (sum_sq <= uVar13);
+            }
+
+            int32_t ppx1 = iVar12 + px;
+            int32_t ppy1 = local_10 + py;
+
+            if (Points_On_Same_Side_Of_Line_(ppx1, ppy1, px, py, x1, y1, x2, y2) > 0) {
+                ppx1 = px - iVar12;
+                ppy1 = py - local_10;
+                Points_On_Same_Side_Of_Line_(ppx1, ppy1, px, py, x1, y1, x2, y2);
+            }
+
+            if (Points_On_Same_Side_Of_Line_(x1, y1, x2, y2, ppx1, ppy1, px, py) > 0) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    int32_t __cdecl Points_On_Same_Side_Of_Line_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t lx1, int32_t ly1, int32_t lx2, int32_t ly2) {
+        int32_t dx_line = lx2 - lx1;
+        int32_t dy_line = ly2 - ly1;
+
+        int32_t cross1 = (y1 - ly1) * dx_line + (lx1 - x1) * dy_line;
+
+        if (cross1 == 0) {
+            return 0;
+        }
+
+        int32_t dx2 = x2 - lx1;
+        int32_t dy2 = y2 - ly1;
+
+        if (cross1 > 0) {
+            return dx_line * dy2 - dy_line * dx2;
+        } else {
+            return dy_line * dx2 - dx_line * dy2;
+        }
+    }
 } // namespace GEO

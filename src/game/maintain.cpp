@@ -250,16 +250,16 @@ namespace maintain {
 
                 COLCALC::Do_Player_Colony_Post_Production_(player_idx);
 
-                // Construct 20-byte message packet on stack as separate dwords
+                // TODO: Fix me
                 uint16_t ship_index = (uint16_t)(cheapest_ship - MOX::_ship);
 
-                uint32_t arg1 = (uint32_t)6 /* MSG_SHIP_SCRAPPED */ | ((uint32_t)cheapest_ship->location << 16);
-                uint32_t arg2 = (uint32_t)(uint16_t)scrap_cost | ((uint32_t)ship_index << 16);
-                uint32_t arg3 = 0;
-                uint32_t arg4 = 0;
-                uint32_t arg5 = 0;
+                s_MSG msg;
+                msg.msg_type = MSG_TYPE_SCRAP_SHIP;
+                msg.u.scrap_ship.where = cheapest_ship->location;
+                msg.u.scrap_ship.ship_idx = ship_index;
+                msg.u.scrap_ship.bc = scrap_cost;
 
-                MSG_::Add_Msg_(arg1, arg2, arg3, arg4, arg5, player_idx);
+                MSG_::Add_Msg_(msg, player_idx);
 
                 cheapest_ship->status = 7; /* Scrapped */
 
@@ -309,14 +309,6 @@ namespace maintain {
         }
     }
 
-    /**
-     * @brief Removes leaders/officers from a player's service if they are in financial deficit.
-     *
-     * Iterates through the player's hired leaders and deassigns them until the player is no
-     * longer in debt or no more leaders with maintenance costs remain.
-     *
-     * @param p Pointer to the player structure to process.
-     */
     void __cdecl Kill_Leaders_(s_player* p) {
         int16_t player_idx = (int16_t)(p - MOX::_player);
         bool no_more_candidates = false;
@@ -333,11 +325,11 @@ namespace maintain {
                         OFFICER::Deassign_Officer_(leader_idx);
                         COLCALC::Do_Player_Colony_Calculations_(player_idx);
 
-                        uint32_t msg_args[5];
-                        memset(msg_args, 0, 18);
-                        msg_args[0] = 0x16 /* MSG_LEADER_FIRED */ | (uint32_t)(leader_idx << 16);
+                        s_MSG msg;
+                        msg.msg_type = MSG_TYPE_SCRAP_LEADER;
+                        msg.u.scrap_leader.leader_idx = (int8_t)leader_idx;
 
-                        MSG_::Add_Msg_(msg_args[0], msg_args[1], msg_args[2], msg_args[3], msg_args[4], player_idx);
+                        MSG_::Add_Msg_(msg, player_idx);
 
                         no_more_candidates = false;
                         break;

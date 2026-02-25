@@ -351,6 +351,23 @@ inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
     fn(dest, src, size);
 }
 
+inline size_t __cdecl _strlen(const char* str) {
+    using Fn = size_t(__cdecl*)(const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005419B0 });
+    return fn(str);
+}
+
+inline char* __cdecl _strcpy(char* dest, const char* src) {
+    using Fn = char*(__cdecl*)(char*, const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005418E0 });
+    return fn(dest, src);
+}
+
+namespace GLOBALS {
+    inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
+    inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
+}
+
 inline void __cdecl Best_Instructor_Bonus_(int16_t* bonuses) {
     using Fn = void(__cdecl*)(int16_t*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409370});

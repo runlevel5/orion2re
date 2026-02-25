@@ -3,6 +3,11 @@
 namespace antarans {
     void __cdecl Antaran_Invasion_Check_();
 
+    inline void __cdecl Restock_Antaran_Ship_(int16_t size) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(0x004B4290)(size);
+    }
+
     int32_t __cdecl Delta_Stardate_();
     int16_t __cdecl Delay_();
     int16_t __cdecl Antarans_Defensive_Resource_Bonus_();

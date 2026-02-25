@@ -2172,12 +2172,234 @@ struct s_movable_box {
 
 typedef struct s_MSG s_MSG, *Ps_MSG;
 
+typedef union s_MSG_union s_MSG_union, *Ps_MSG_union;
+
+typedef struct s_MSG_colony s_MSG_colony, *Ps_MSG_colony;
+
+typedef struct s_MSG_players s_MSG_players, *Ps_MSG_players;
+
+typedef struct s_MSG_financial s_MSG_financial, *Ps_MSG_financial;
+
+typedef struct s_MSG_lost_ship s_MSG_lost_ship, *Ps_MSG_lost_ship;
+
+typedef struct s_MSG_scrap_ship s_MSG_scrap_ship, *Ps_MSG_scrap_ship;
+
+typedef struct s_MSG_lost_colony s_MSG_lost_colony, *Ps_MSG_lost_colony;
+
+typedef struct s_MSG_hyperspace_beast s_MSG_hyperspace_beast, *Ps_MSG_hyperspace_beast;
+
+typedef struct s_MSG_lost_attacking_spy s_MSG_lost_attacking_spy, *Ps_MSG_lost_attacking_spy;
+
+typedef struct s_MSG_lost_defending_spy s_MSG_lost_defending_spy, *Ps_MSG_lost_defending_spy;
+
+typedef struct s_MSG_artemis s_MSG_artemis, *Ps_MSG_artemis;
+
+typedef struct s_MSG_artemis_leader s_MSG_artemis_leader, *Ps_MSG_artemis_leader;
+
+typedef struct s_MSG_failed_retreat s_MSG_failed_retreat, *Ps_MSG_failed_retreat;
+
+typedef struct s_MSG_spy_assasination s_MSG_spy_assasination, *Ps_MSG_spy_assasination;
+
+typedef struct s_MSG_anomaly s_MSG_anomaly, *Ps_MSG_anomaly;
+
+typedef struct s_MSG_diplomacy s_MSG_diplomacy, *Ps_MSG_diplomacy;
+
+typedef struct s_MSG_eel s_MSG_eel, *Ps_MSG_eel;
+
+typedef struct s_MSG_artifacts s_MSG_artifacts, *Ps_MSG_artifacts;
+
+typedef struct s_MSG_scrap_leader s_MSG_scrap_leader, *Ps_MSG_scrap_leader;
+
+typedef union s_MSG_colony_union s_MSG_colony_union, *Ps_MSG_colony_union;
+
+typedef struct s_MSG_colony_scrap_building s_MSG_colony_scrap_building, *Ps_MSG_colony_scrap_building;
+
+typedef struct s_MSG_colony_build_info s_MSG_colony_build_info, *Ps_MSG_colony_build_info;
+
+typedef struct s_MSG_colony_assimilation s_MSG_colony_assimilation, *Ps_MSG_colony_assimilation;
+
+typedef struct s_MSG_colony_starvation s_MSG_colony_starvation, *Ps_MSG_colony_starvation;
+
+typedef struct s_MSG_colony_settlers s_MSG_colony_settlers, *Ps_MSG_colony_settlers;
+
+typedef struct s_MSG_colony_rebellion s_MSG_colony_rebellion, *Ps_MSG_colony_rebellion;
+
+typedef struct s_MSG_colony_android_killed s_MSG_colony_android_killed, *Ps_MSG_colony_android_killed;
+
+struct s_MSG_financial {
+    int16_t a;
+    int16_t b;
+};
+
+struct s_MSG_colony_scrap_building {
+    int16_t building_id;
+    int16_t bc;
+};
+
+struct s_MSG_lost_attacking_spy {
+    int16_t player_idx;
+};
+
+struct s_MSG_colony_settlers {
+    int8_t settlers;
+    int8_t over_limit;
+    bool blockaded;
+};
+
+struct s_MSG_players {
+    int16_t player_a_idx;
+    int16_t player_b_idx;
+};
+
+struct s_MSG_artemis {
+    int16_t star_idx;
+};
+
+struct s_MSG_artifacts {
+    uint8_t star_idx;
+    int8_t tech1;
+    int8_t tech2;
+};
+
+struct s_MSG_scrap_leader {
+    int8_t leader_idx;
+};
+
+struct s_MSG_failed_retreat {
+    int8_t star_idx;
+    int8_t reason;
+    int16_t ships_lost;
+    int8_t leader_count;
+};
+
+struct s_MSG_artemis_leader {
+    int8_t star_idx;
+    int8_t leader_idx;
+    int8_t fate;
+};
+
+struct s_MSG_eel {
+    uint8_t star_idx;
+};
+
+struct s_MSG_scrap_ship {
+    int16_t where;
+    int16_t bc;
+    int16_t ship_idx;
+};
+
+struct s_MSG_hyperspace_beast {
+    int16_t ship_idx;
+    int8_t star_idx;
+    int8_t field2_0x3;
+    int8_t leader_idx;
+    int8_t fate;
+    int8_t your_ship;
+};
+
+struct s_MSG_lost_ship {
+    int16_t star_idx;
+    int16_t ship_idx;
+    int8_t leader_idx;
+    int8_t fate;
+};
+
+struct s_MSG_colony_android_killed {
+    int8_t race_idx;
+};
+
+struct s_MSG_colony_starvation {
+    int8_t a;
+    int8_t b;
+};
+
+struct s_MSG_colony_assimilation {
+    uint8_t val;
+};
+
+struct s_MSG_colony_rebellion {
+    int8_t owner_player;
+    int8_t rebels;
+    int8_t lost;
+};
+
+struct s_MSG_colony_build_info {
+    int16_t build_id;
+    int16_t product_id;
+    bool is_refit;
+    int8_t append_fmt;
+};
+
+union s_MSG_colony_union {
+    struct s_MSG_colony_scrap_building scrap;
+    struct s_MSG_colony_build_info build;
+    struct s_MSG_colony_assimilation assimilation;
+    struct s_MSG_colony_starvation starvation;
+    struct s_MSG_colony_settlers settlers;
+    struct s_MSG_colony_rebellion rebels;
+    struct s_MSG_colony_android_killed android_killed;
+};
+
+struct s_MSG_colony {
+    uint8_t planet_idx;
+    int8_t subtype;
+    union s_MSG_colony_union c;
+};
+
+struct s_MSG_lost_colony {
+    int16_t planet_idx;
+    int16_t reason;
+    int16_t leader_idx;
+    int8_t colony_or_outpost;
+};
+
+struct s_MSG_diplomacy {
+    int8_t diplomacy_idx;
+    int8_t plr_a;
+    int8_t plr_b;
+};
+
+struct s_MSG_lost_defending_spy {
+    int16_t count;
+};
+
+struct s_MSG_spy_assasination {
+    int8_t plr_a;
+    int8_t plr_b;
+    int8_t leader_id;
+    int8_t victim_id;
+};
+
+struct s_MSG_anomaly {
+    uint8_t star_idx;
+};
+
+union s_MSG_union {
+    struct s_MSG_colony colony;
+    struct s_MSG_players players;
+    struct s_MSG_financial financial;
+    struct s_MSG_lost_ship lost_ship;
+    struct s_MSG_scrap_ship scrap_ship;
+    struct s_MSG_lost_colony lost_colony;
+    struct s_MSG_hyperspace_beast hyperspace_beast;
+    struct s_MSG_lost_attacking_spy lost_attacking_spy;
+    struct s_MSG_lost_defending_spy lost_defending_spy;
+    struct s_MSG_artemis artemis;
+    struct s_MSG_artemis_leader artemis_leader;
+    struct s_MSG_failed_retreat retreat;
+    struct s_MSG_spy_assasination spy_assasination;
+    struct s_MSG_anomaly anomaly;
+    struct s_MSG_diplomacy diplomacy;
+    struct s_MSG_eel eel;
+    struct s_MSG_artifacts artifacts;
+    struct s_MSG_scrap_leader scrap_leader;
+};
+
 struct s_MSG {
-    undefined4 field0_0x0;
-    undefined4 field1_0x4;
-    dword field2_0x8;
-    dword field3_0xc;
-    word field4_0x10;
+    int8_t msg_type;
+    uint8_t priority;
+    union s_MSG_union u;
+    undefined field3_0xa[8];
 };
 
 typedef struct s_nebula s_nebula, *Ps_nebula;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -35,7 +35,7 @@ namespace hooks {
         ASSERT(sizeof(s_tech_computer_data) == 22, "s_tech_computer_data");
         ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
         ASSERT(sizeof(s_font) == 0x235c, "s_font");
-        ASSERT(sizeof(s_MSG) == 18, "s_MSG");
+        ASSERT(sizeof(s_MSG) == 0x12, "s_MSG");
         ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
         ASSERT(sizeof(s_skill_data) == 0x12, "MOX::s_skill_data");
         ASSERT(sizeof(s_field) == 0x37, "s_field");
@@ -229,7 +229,6 @@ namespace hooks {
         { 0x004b5cf0, &MAPGEN::Generate_Mineral_Class_ },
         { 0x00527630, &mouse::Mouse_Buffer_ },
         { 0x00520200, &capture::Release_Version_ },
-        { 0x00473810, &MSG_::Add_Message },
         { 0x004B7120, &MAPGEN::Universe_Generation_ },
         { 0x004b6d40, &MAPGEN::Randomize_Star_Names_ },
         { 0x004b61d0, &MAPGEN::Generate_Number_Of_Nebulas_ },
@@ -799,7 +798,7 @@ namespace hooks {
         { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
         { 0x00496700, &SYS::Need_To_Reload_System_Display_ },
         { 0x00497460, &SYS::Set_System_Display_Loaded_Flag_ },
-        //{ 0x004962d0, &SYS::Load_New_System_Display_ },
+        { 0x004962d0, &SYS::Load_New_System_Display_ },
         { 0x004f1860, &HAROLD::Randomize_List_ },
         { 0x004ac270, &ADVCIV::Enemy_Has_Colony_At_Star_ },
         { 0x004ecf80, &ADVCIV::Uncolonized_Planet_Worth_To_Player_ },
@@ -1363,7 +1362,7 @@ namespace hooks {
         { 0x0047ef30, &INITSHIP::Get_Ship_Combat_Bonuses_ },
         { 0x00412f40, &GEO::Map_Is_Connected_ },
         { 0x00413140, &GEO::Get_Orbit_Display_X_Y_ },
-        //{ 0x00413220, &GEO::Get_Orbit_From_X_Y_ },
+        { 0x00413220, &GEO::Get_Orbit_From_X_Y_ },
         { 0x00412c30, &GEO::Move_Player_1_Turn_To_Star_ },
         { 0x00412a90, &GEO::Point_Is_In_Nebula_N_ },
         { 0x00508ad0, &aipower::Ship_Strength_Vs_Shield_ },
@@ -1379,6 +1378,13 @@ namespace hooks {
         { 0x00508e50, &aipower::Max_Ship_Hits_ },
         { 0x0050b2d0, &COLBLDG::Delete_Ship_ },
         { 0x0050b270, &COLBLDG::Delete_From_Colony_Queue_ },
+        { 0x004bc420, &COMBFIND::Process_Retreating_Ships_ },
+        { 0x004124b0, &GEO::Point_Within_D_Of_Seg_ },
+        { 0x00412440, &GEO::Points_On_Same_Side_Of_Line_ },
+        { 0x004727c0, &MSG_::N_Msgs_For_Player_ },
+        { 0x004727E0, &MSG_::sprintf_msg_ },
+        { 0x00473810, &MSG_::Add_Msg_ },
+        { 0x004aac60, &REPORT::Has_Msg_ },
     };
 
     void Install_Hooks()
