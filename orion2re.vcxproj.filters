@@ -330,6 +330,12 @@
     <ClCompile Include="src\game\special.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\fakebuts.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\gui.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -801,6 +807,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\angle.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\cmbtfir2.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\gui.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

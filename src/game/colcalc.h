@@ -22,8 +22,10 @@ namespace COLCALC {
     inline const char*& _government_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE0});
     inline const char*& _mixed_races_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571AE4});
     inline const char*& _unification_has_no_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B00});
+    inline const char*& _research_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B04});
     inline const char*& _no_capital_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B10});
     inline const char*& _no_barracks_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B38});
+    inline const char*& _morale_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BBC});
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
     inline int8_t (&_colony_calc_food_cache)[10] =
         *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00571BA0});
@@ -40,6 +42,7 @@ namespace COLCALC {
     inline const char*& _d_from_d_s_ships_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B60});
     inline const char*& _d_from_d_noncombat_ships_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B64});
     inline const char*& _total_command_points_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B68});
+    inline const char*& _bc_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B6C});
     inline const char*& _total_command_points_used_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B74});
     inline const char*& _from_imperium_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B84});
     inline const char*& _d_from_1_battlestation_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B94});

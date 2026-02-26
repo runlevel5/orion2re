@@ -630,4 +630,16 @@ namespace MOX {
         using Fn = void(__cdecl*)(s_settings*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0043D290})(settings);
     }
+
+    inline void __cdecl Check_Free(void* ptr) {
+        using Fn = void(__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494090});
+        fn(ptr);
+    }
+
+    inline void* __cdecl Check_Allocate(size_t size) {
+        using Fn = void*(__cdecl*)(size_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494050});
+        return fn(size);
+    }
 }

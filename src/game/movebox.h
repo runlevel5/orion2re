@@ -74,4 +74,12 @@ namespace MOVEBOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005135B0});
         fn(star_idx, x1, y1, x2, y2, u1, u2, u3, out_x, out_y);
     }
+
+    inline void __cdecl Add_Galaxy_Map_Fields_2_(int16_t arg1, int16_t arg2, int16_t height, int16_t grid_y,
+                                                 int16_t arg5, int16_t arg6, int16_t arg7, int16_t arg8, int16_t arg9,
+                                                 int16_t* name_field, int16_t* star_field, int16_t* grid_field) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512640});
+        fn(arg1, arg2, height, grid_y, arg5, arg6, arg7, arg8, arg9, name_field, star_field, grid_field);
+    }
 }

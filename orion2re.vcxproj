@@ -64,6 +64,7 @@
     <ClCompile Include="src\game\evanhelp.cpp" />
     <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exitm.cpp" />
+    <ClCompile Include="src\game\fakebuts.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
@@ -74,6 +75,7 @@
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />
+    <ClCompile Include="src\game\gui.cpp" />
     <ClCompile Include="src\game\haccess.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
@@ -147,6 +149,7 @@
     <ClInclude Include="src\game\capture.h" />
     <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\cmbtdrw1.h" />
+    <ClInclude Include="src\game\cmbtfir2.h" />
     <ClInclude Include="src\game\cmbtmis.h" />
     <ClInclude Include="src\game\colbcach.h" />
     <ClInclude Include="src\game\colbldg.h" />
@@ -195,6 +198,7 @@
     <ClInclude Include="src\game\geo.h" />
     <ClInclude Include="src\game\global.h" />
     <ClInclude Include="src\game\graphics.h" />
+    <ClInclude Include="src\game\gui.h" />
     <ClInclude Include="src\game\haccess.h" />
     <ClInclude Include="src\game\harold.h" />
     <ClInclude Include="src\game\homegen.h" />

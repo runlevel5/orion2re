@@ -2,11 +2,13 @@
 #include <cstdint>
 
 namespace FAKEBUTS {
-    inline void __cdecl Clear_Fake_Buttons_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B53F0});
-        fn();
-    }
+    inline uint8_t& _n_fake_buttons =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558994 });
+
+    inline int16_t(&_fake_buttons)[125] =
+        *reinterpret_cast<int16_t(*)[125]>(std::uintptr_t{ 0x005A4B60 });
+
+    void Clear_Fake_Buttons_();
 
     inline void __cdecl Draw_Fake_Buttons_() {
         using Fn = void(__cdecl*)();

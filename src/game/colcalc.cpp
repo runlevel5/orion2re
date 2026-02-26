@@ -812,7 +812,11 @@ namespace COLCALC {
 
     void __cdecl Show_Industry_Production_(short colony_idx) {
         char buffer[3000];
-        Colony_Industry_Production_(&MOX::_colony[colony_idx], buffer);
+
+        // MOX::_colony is a pointer to an array of s_colony structures (size 0x169 / 361)
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        Colony_Industry_Production_(colony, buffer);
         TEXTBOX::Text_Box_(_industry_summary_msg, buffer);
     }
 

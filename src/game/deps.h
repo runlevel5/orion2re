@@ -162,3 +162,4 @@
 #include "invasion.h"
 #include "council.h"
 #include "global.h"
+#include "gui.h"

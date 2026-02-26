@@ -363,6 +363,12 @@ inline char* __cdecl _strcpy(char* dest, const char* src) {
     return fn(dest, src);
 }
 
+inline char* __cdecl _strncpy(char* dest, const char* src, size_t count) {
+    using Fn = char*(__cdecl*)(char*, const char*, size_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bf070});
+    return fn(dest, src, count);
+}
+
 namespace GLOBALS {
     inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
@@ -619,4 +625,9 @@ inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
     using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412E20});
     fn(root1, root2, mode);
+}
+
+inline void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_num) {
+    using Fn = void(__cdecl*)(int16_t, int16_t);
+    reinterpret_cast<Fn>(0x0049aff0)(colony_idx, player_num);
 }

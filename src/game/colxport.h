@@ -21,4 +21,10 @@ namespace COLXPORT {
         *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x005560B8});
 
     void __cdecl Load_Xport_Anims_();
+
+    inline int16_t __cdecl Xport_Popup_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042adf0});
+        return fn();
+    }
 }

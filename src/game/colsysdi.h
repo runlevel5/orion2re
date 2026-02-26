@@ -13,4 +13,10 @@ namespace COLSYSDI {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047e530});
         fn(x, y);
     }
+
+    inline void __cdecl Add_Col_Sys_Disp_Fields_(int16_t arg1, int16_t arg2, int16_t arg3) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047e3c0});
+        fn(arg1, arg2, arg3);
+    }
 }

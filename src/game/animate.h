@@ -20,6 +20,12 @@ namespace animate {
     int16_t __cdecl Get_Width_(s_animation_header* anim);
     int16_t __cdecl Get_Height_(s_animation_header* anim);
 
+    inline s_animation_header* __cdecl C_Anims_(int index) {
+        using Fn = s_animation_header*(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dca50});
+        return fn(index);
+    }
+
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* resource);
 
     inline void __cdecl Draw_No_Glass_(int16_t x, int16_t y, s_animation_header* seg) {
