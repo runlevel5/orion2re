@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_unit_data;
+
 namespace TECHDATA {
     // Correct addresses for various TECHDATA structures. If address does not match, then it points inside of structure.
     inline s_tech_armor_data* _armor = reinterpret_cast<s_tech_armor_data*>(std::uintptr_t{ 0x00554d90 });
@@ -17,6 +19,8 @@ namespace TECHDATA {
     inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
+
+    inline s_unit_data* _units = reinterpret_cast<s_unit_data*>(std::uintptr_t{0x00555728});
 
     inline s_tech_data_rifle (&_rifles)[6] =
         *reinterpret_cast<s_tech_data_rifle(*)[6]>(std::uintptr_t{0x0054F028});

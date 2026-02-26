@@ -16,6 +16,9 @@ namespace COLONY {
     inline int16_t (&_job_fields)[3] =
         *reinterpret_cast<int16_t(*)[3]>(std::uintptr_t{0x00595E28});
 
+    inline int16_t (&_pop_fields_count)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E30});
+
     inline int16_t (&_sys_disp_summ_fields)[5] =
         *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00595E40});
 
@@ -36,6 +39,7 @@ namespace COLONY {
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
     inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});
+    inline int16_t& _scanned_military = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DFC});
     inline int16_t& _scanned_satellite = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E00});
 
     void __cdecl Init_Colonies_();
@@ -54,10 +58,10 @@ namespace COLONY {
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559F78});
     inline int16_t& _bldg_bitm_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559F7C});
-    inline int32_t& _g_ship_pic_n =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00559FF8});
-    inline int16_t& _g_ship_player_n =
+    inline int16_t& _g_ship_pic_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559FFC});
+    inline int32_t& _g_ship_player_n =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00559FF8});
     inline s_animation_header*& _ship_pic_bitm =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E68});
     inline s_animation_header*& _ship_bitm =
@@ -74,6 +78,8 @@ namespace COLONY {
     inline uint8_t& _drawing_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E10});
     inline uint8_t& _valid_colony = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E14});
     inline uint8_t& _field_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559DF4});
+    inline int16_t& _move_colonist =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E0C});
 
     inline void __cdecl Draw_Bldg_CR_Dark_(int16_t c, int16_t r) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
@@ -85,6 +91,13 @@ namespace COLONY {
     inline int16_t& _scanned_bldg_R = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E08});
     inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E18});
     inline int32_t& _colony_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E50});
+
+    inline int16_t (&_pop_fields_coord_var)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E70});
+
+    inline int16_t (&_pop_fields_ref)[3][42] =
+        *reinterpret_cast<int16_t(*)[3][42]>(std::uintptr_t{0x00595E80});
+
     inline int32_t& _planet_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD8});
     inline int32_t& _star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E58});
     inline int32_t& _orbit_n = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E78});
@@ -94,16 +107,25 @@ namespace COLONY {
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl C_Anims_(int16_t index);
-    inline s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004DC3C0})(colony_idx, pop_idx);
-    }
+    s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx);
 
-    inline int16_t __cdecl Pop_To_Pop_State_(int16_t colony_idx, int16_t pop_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dda60});
-        return fn(colony_idx, pop_idx);
-    }
+    int16_t __cdecl Get_Effective_Pop_Player_(int16_t colony_idx, int16_t pop_idx);
+
+    s_animation_header* __cdecl Colony_Pop_Icon_(int16_t race_index);
+
+    s_animation_header* __cdecl Military_Anims_(int16_t param_1, int16_t param_2);
+    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t param_2);
+
+    short __cdecl Pop_To_Pop_State_(short colony_idx, short pop_idx);
+
+    char* __cdecl Pop_State_String_(int16_t state);
+
+    char* __cdecl Conquered_String_(bool is_conquered);
+
+    char* __cdecl Pop_Race_String_(int16_t colony_idx, int16_t pop_idx);
+
+    char* __cdecl Job_String_(int16_t job_id);
+
     void __cdecl Update_Colony_Palette_();
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
     void __cdecl Reset_Mouse_Picture_();
@@ -121,11 +143,7 @@ namespace COLONY {
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
 
-    inline void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int x, int y, int seg_id) {
-        using Fn = void(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dba50});
-        fn(x, y, seg_id);
-    }
+    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3);
 
     s_animation_header* __cdecl Spy_Anim_(int16_t race_index);
 
@@ -137,11 +155,7 @@ namespace COLONY {
 
     s_animation_header* __cdecl Satellite_Anim_(int16_t colony_id);
 
-    inline void __cdecl Draw_Satellite_Dark_(int16_t x, int16_t y, int16_t satellite_id) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df520});
-        fn(x, y, satellite_id);
-    }
+    void __cdecl Draw_Satellite_Dark_(int16_t x, int16_t y, int16_t satellite_id);
 
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num);
     s_animation_header* __cdecl Buffer_Reload_Colony_(int16_t index);
@@ -189,21 +203,13 @@ namespace COLONY {
 
     void __cdecl Box_Galaxy_Map_Star_(int16_t star_idx, int16_t param_2);
 
-    inline void __cdecl Print_Sys_Disp_Scanned_String_(char* name) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbc20});
-        fn(name);
-    }
+    void __cdecl Print_Sys_Disp_Scanned_String_(char* text);
 
     void __cdecl Print_Scanned_String_(char* text);
 
     void __cdecl Print_Building_Name_(int16_t param_1, int16_t param_2);
 
-    inline void __cdecl Print_Scanned_Military_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DF020});
-        fn();
-    }
+    void __cdecl Print_Scanned_Military_();
 
     void __cdecl Print_Scanned_Satellite_();
 
@@ -211,63 +217,43 @@ namespace COLONY {
 
     void __cdecl Draw_Colony_Info_Military_();
 
+    int __cdecl Draw_Colony_Info_Military_For_(int param_1, int param_2, int param_3);
+
     void __cdecl Draw_Colony_Info_Production_For_(int32_t selection);
 
-    inline int32_t __cdecl Do_Colony_Info_Military_Stuff_For_(int32_t index, int32_t last_result, int32_t counter) {
-        using Fn = int32_t(__cdecl*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de780});
-        return fn(index, last_result, counter);
+    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode);
+
+    inline void __cdecl Set_Colony_Font_To_(int font_id) {
+        using Fn = void(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbf40});
+        fn(font_id);
     }
 
     void __cdecl Draw_Colony_Info_Officer_();
 
     void __cdecl Draw_Colony_Info_Production_();
 
-    inline void __cdecl Draw_Colony_Info_Pop_For_(int32_t type) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de4c0});
-        fn(type);
-    }
+    void __cdecl Draw_Colony_Info_Pop_For_(int32_t type);
 
-    inline void __cdecl Draw_Colony_Info_Pop_Scanned_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004de520});
-        fn();
-    }
+    void __cdecl Draw_Colony_Info_Pop_Scanned_();
 
     void __cdecl Draw_Colony_Info_Pop_();
 
-    inline void __cdecl Draw_Colony_Info_Morale_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004decb0});
-        fn();
-    }
+    void __cdecl Draw_Colony_Info_Morale_();
 
     void __cdecl Draw_Info_Name_And_Pop_();
 
     void __cdecl Draw_Info_Build_();
 
-    inline void __cdecl Draw_Current_Production_Graph_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ddba0});
-        fn();
-    }
+    void __cdecl Draw_Current_Production_Graph_();
 
-    inline void __cdecl Draw_Turn_Count_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df3f0});
-        fn();
-    }
+    void __cdecl Draw_Turn_Count_();
 
     void __cdecl Draw_Sys_Disp_Scanned_();
 
     void __cdecl Draw_Colony_Info_Scanned_();
 
-    inline void __cdecl No_Op1_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df600});
-        fn();
-    }
+    void __cdecl No_Op1_();
 
     void __cdecl Allocate_Mini_Planet_Cache_();
 
@@ -278,9 +264,12 @@ namespace COLONY {
         reinterpret_cast<Fn>(0x004DFF60)();
     }
 
-    inline void __cdecl Do_Informational_And_Decision_Popups_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004E1990)();
+    void __cdecl Do_Informational_And_Decision_Popups_();
+
+    inline bool __cdecl Colony_Has_Natives_(int16_t colony_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DD8D0});
+        return fn(colony_idx);
     }
 
     inline uint8_t __cdecl Evaluate_Input_(int16_t* input, int16_t* scanned) {
@@ -293,16 +282,15 @@ namespace COLONY {
         reinterpret_cast<Fn>(0x004B53F0)();
     }
 
-    inline void __cdecl Fix_Colony_Queue_(int32_t handle) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(0x004DFBD0)(handle);
-    }
+    void __cdecl Fix_Colony_Queue_(int16_t colony_idx);
 
-    inline void __cdecl Col_Calc_Wrapper_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dc110});
-        fn(colony_idx);
-    }
+    void __cdecl Squish_Out_Colony_Queue_Slot_(int16_t colony_idx, int16_t slot_idx);
+
+    void __cdecl Defragment_Colony_Queue_(int16_t colony_idx);
+
+    void __cdecl Cleanup_Colony_Queue_(int16_t colony_idx);
+
+    void __cdecl Col_Calc_Wrapper_(int16_t colony_idx);
 
     void __cdecl Reset_Field_Arrays_();
 
@@ -317,9 +305,12 @@ namespace COLONY {
         return reinterpret_cast<Fn>(0x004dd920)(colony_idx, arg2, arg3, arg4, arg5, arg6);
     }
 
-    inline void __cdecl Reset_Field_Mode_() {
+    void __cdecl Reset_Field_Mode_();
+
+    inline void __cdecl Drop_Military_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004dc190)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC1E0});
+        fn();
     }
 
     void __cdecl Show_Colony_Screen_();
@@ -363,13 +354,7 @@ namespace COLONY {
     int16_t __cdecl Get_Colony_Planet_Id_(int32_t colony_idx);
 
 
-    inline char* __cdecl Colony_Type_(int32_t colony_handle) {
-        using Fn = char* (__cdecl*)(int32_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004def50 })(colony_handle);
-    }
+    char* __cdecl Colony_Type_(int32_t colony_idx);
 
-    inline void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004dbef0 })(style, color_idx);
-    }
+    void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx);
 }

@@ -32,6 +32,12 @@ namespace bitmap {
         fn(handle, color_low, color_high);
     }
 
+    inline void __cdecl Tint_Bitmap_(void* dst_bitmap, void* src_bitmap, int32_t tint_type) {
+        using Fn = void(__cdecl*)(void*, void*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f560});
+        fn(dst_bitmap, src_bitmap, tint_type);
+    }
+
     inline void __cdecl Clear_Mouse_Image_(int32_t image_idx) {
         using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F240});

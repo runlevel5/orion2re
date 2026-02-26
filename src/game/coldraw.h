@@ -64,4 +64,18 @@ namespace COLDRAW {
 
     // TYPE MISMATCH: existing stub had int32_t for some parameters, decompiled has int16_t
     void __cdecl Draw_Colony_Prod_(int16_t colony_handle, int32_t selection, int32_t p3, int16_t y_offset, int32_t p5, int32_t p6);
+
+    inline void __cdecl Draw_Info_Morale_Both_(int16_t param_1, int16_t param_2, int16_t param_3, int32_t param_4, int8_t param_5) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int32_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458a60});
+        fn(param_1, param_2, param_3, param_4, param_5);
+    }
+
+    void __cdecl Draw_Info_Morale_(int16_t param_1, int16_t param_2, int16_t param_3, int32_t param_4);
+
+    inline void __cdecl Draw_Colony_PC_Bar_(int x, int y, int cost, int spent) {
+        using Fn = void(__cdecl*)(int, int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459300});
+        fn(x, y, cost, spent);
+    }
 }

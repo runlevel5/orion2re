@@ -6,6 +6,10 @@ namespace COLONY {
         return;
     }
 
+    void __cdecl No_Op1_() {
+        return;
+    }
+
     char* __cdecl CR_Building_Name_(int16_t building_id) {
         if (building_id == BUILDING_ARTEMIS_SYSTEM_NET || building_id == BUILDING_DIMENSIONAL_PORTAL ||
             building_id == BUILDING_STAR_BASE || building_id == BUILDING_STAR_FORTRESS) {
@@ -730,14 +734,18 @@ namespace COLONY {
         timer::Release_Time_(2);
     }
 
+    int __cdecl Draw_Colony_Info_Military_For_(int param_1, int param_2, int param_3) {
+        return COLONY::Do_Colony_Info_Military_Stuff_For_(param_1, param_2, param_3, 0);
+    }
+
     void __cdecl Draw_Colony_Info_Military_() {
-        int32_t last_result = 0;
-        int32_t counter = 0;
-        int32_t max_val = 0;
-        int32_t i = 0;
+        int last_result = 0;
+        int counter = 0;
+        int max_val = 0;
+        int i = 0;
 
         do {
-            last_result = Do_Colony_Info_Military_Stuff_For_(i, last_result, counter);
+            last_result = Draw_Colony_Info_Military_For_(i, last_result, counter);
             if (max_val < last_result) {
                 max_val = last_result;
                 counter++;
@@ -1036,5 +1044,601 @@ namespace COLONY {
         }
 
         return MOX::_colony[colony_idx].planet;
+    }
+
+    void __cdecl Draw_Satellite_Dark_(int16_t x, int16_t y, int16_t satellite_id) {
+        s_animation_header* satellite_anim = Satellite_Anim_(satellite_id);
+
+        bitmap::Create_Blank_Bitmap_(120, 120, COLBLDG::_bldg_bitm);
+        bitmap::Add_Picture_To_Bitmap_(0, 0, satellite_anim, (s_animation_header*)COLBLDG::_bldg_bitm);
+        bitmap::Mask_Out_Colors_(COLBLDG::_bldg_bitm, 240, 255);
+        bitmap::Tint_Bitmap_(COLBLDG::_bldg_bitm, COLBLDG::_bldg_bitm, 2);
+
+        graphics::Set_Window_(0, 0, 639, 479);
+        video::Clip_On_();
+        animate::Draw_(x, y, (s_animation_header*)COLBLDG::_bldg_bitm);
+        video::Clip_Off_();
+    }
+
+    /**
+     * @address 004df020
+     */
+    void __cdecl Print_Scanned_Military_() {
+        char buffer[500];
+
+        if (COLONY::_scanned_military != (int16_t)-1) {
+            // Units are indexed with +1 for scanned military data
+            char* unit_name = TECHDATA::_units[COLONY::_scanned_military + 1].name;
+            int unit_count = (int)MOX::_colony[COLONY::_colony_handle].military[COLONY::_scanned_military];
+
+            char* format = ESTRINGS::E_Strings_(14 /* ESTR_MILITARY_COUNT_FORMAT */);
+            _sprintf(buffer, format, unit_count, unit_name);
+
+            COLONY::Print_Scanned_String_(buffer);
+        }
+    }
+
+    /**
+     * @address 004dbfe0
+     */
+    char* __cdecl Job_String_(int16_t job_id) {
+        if (job_id == 0) {
+            return ESTRINGS::E_Strings_(ESTR_FARMER);
+        }
+
+        if (job_id == 1) {
+            return ESTRINGS::E_Strings_(ESTR_WORKER);
+        }
+
+        return ESTRINGS::E_Strings_(ESTR_SCIENTIST);
+    }
+
+    /**
+     * @address 004dc030
+     */
+    char* __cdecl Conquered_String_(bool is_conquered) {
+        if (is_conquered) {
+            return ESTRINGS::E_Strings_(ESTR_CONQUERED);
+        }
+        return ESTRINGS::E_Strings_(12);
+    }
+
+    /**
+     * @address 004dc060
+     */
+    char* __cdecl Pop_State_String_(int16_t state) {
+        switch (state) {
+        case 0:
+            return ESTRINGS::E_Strings_(ESTR_EXPERT);
+        case 2:
+        case 3:
+        case 4:
+            return ESTRINGS::E_Strings_(12);
+        default:
+            // Case 1 and any value not explicitly handled above return the default string
+            return ESTRINGS::E_Strings_(12);
+        }
+    }
+
+    /**
+     * @address 004de520
+     */
+    void __cdecl Draw_Colony_Info_Pop_Scanned_() {
+        char buffer[500];
+
+        if (COLONY::_scanned_pop != -1) {
+            int16_t handle_s = (int16_t)COLONY::_colony_handle;
+            uint32_t pop_data = MOX::_colony[COLONY::_colony_handle].pop[COLONY::_scanned_pop];
+
+            char* str_state;
+            char* str_conquered;
+            char* str_race;
+            char* str_job;
+            char* format_str;
+
+            // Branching logic based on language affects the order of components in the final string
+            if (MOX::_settings.language == 4 /* Localized variant */) {
+                str_state = Pop_State_String_(Pop_To_Pop_State_(handle_s, COLONY::_scanned_pop));
+                str_conquered = Conquered_String_((bool)((pop_data >> 10) & 1));
+                str_race = Pop_Race_String_(handle_s, COLONY::_scanned_pop);
+                str_job = Job_String_((int16_t)((pop_data >> 7) & 3));
+
+                format_str = ESTRINGS::E_Strings_(76);
+                _sprintf(buffer, format_str, str_job, str_race, str_conquered, str_state);
+            } else {
+                str_job = Job_String_((int16_t)((pop_data >> 7) & 3));
+                str_state = Pop_State_String_(Pop_To_Pop_State_(handle_s, COLONY::_scanned_pop));
+                str_race = Pop_Race_String_(handle_s, COLONY::_scanned_pop);
+                str_conquered = Conquered_String_((bool)((pop_data >> 10) & 1));
+
+                format_str = ESTRINGS::E_Strings_(76);
+                _sprintf(buffer, format_str, str_conquered, str_race, str_state, str_job);
+            }
+
+            Set_Colony_Font_();
+            Print_Scanned_String_(buffer);
+        }
+    }
+
+    /**
+     * @address 004dbc90
+     */
+    char* __cdecl Pop_Race_String_(int16_t colony_idx, int16_t pop_idx) {
+        // Each population unit's race index is stored in the lower 4 bits of its data
+        uint32_t race_index = MOX::_colony[colony_idx].pop[pop_idx] & 0x0F;
+
+        if (race_index == 8) {
+            return ESTRINGS::E_Strings_(static_cast<int16_t>(0xB3));
+        }
+
+        if (race_index == 9) {
+            return ESTRINGS::E_Strings_(static_cast<int16_t>(0x255));
+        }
+
+        return MOX::_player[race_index].race_name;
+    }
+
+    void __cdecl Draw_Colony_Info_Morale_() {
+        COLDRAW::Draw_Info_Morale_(COLONY::_colony_handle, 310, 33, 510);
+    }
+
+    /**
+     * @address 004ddba0
+     */
+    void __cdecl Draw_Current_Production_Graph_() {
+        s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+
+        int cost = COLCALC::Colony_Producing_Product_Cost_(colony);
+        int spent = (int)colony->production_spent;
+
+        if (colony->bought_outright != 0) {
+            spent = cost;
+        }
+
+        COLDRAW::Draw_Colony_PC_Bar_(606, 43, cost, spent);
+    }
+
+    /**
+     * @address 004df3f0
+     */
+    void __cdecl Draw_Turn_Count_() {
+        char buffer[500];
+        int16_t turns;
+        char* format;
+
+        turns = Calculate_Current_Production_Turn_Count_(static_cast<int16_t>(_colony_handle));
+
+        fonts::Set_Font_Style_Shadow_Down_(0, &_font_color_array);
+
+        format = ESTRINGS::E_Strings_(ESTR_D_TURNS);
+
+        _sprintf(buffer, format, static_cast<int32_t>(turns));
+
+        fonts::Print_Right_(624, 103, buffer);
+    }
+
+    /**
+     * @address 004e1990
+     */
+    void __cdecl Do_Informational_And_Decision_Popups_() {
+        char buffer[500];
+        s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
+
+        if (colony->occupation_policy == 4) {
+            int16_t population_count = Sum_Colonists_(static_cast<int16_t>(COLONY::_colony_handle), -1, -1, -1, -1, 1);
+            if (population_count < 1) {
+                if (!Colony_Has_Natives_(static_cast<int16_t>(COLONY::_colony_handle))) {
+                    goto check_production;
+                }
+            }
+            OCPOLPUP::Occupation_Policy_Popup_();
+            Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+            Show_Colony_Screen_();
+        }
+
+    check_production:
+        int16_t production_id = colony->just_produced;
+        if (production_id == -1) {
+            return;
+        }
+
+        if (production_id == -39) {
+            char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
+            char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_COLONIZED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
+            _sprintf(buffer, format, planet_name);
+            GENDRAW::Help_(buffer);
+            Show_Colony_Screen_();
+            colony->just_produced = -1;
+            return;
+        }
+
+        if (production_id == -40) {
+            char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
+            char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_CONQUERED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
+            _sprintf(buffer, format, planet_name);
+            GENDRAW::Help_(buffer);
+            Show_Colony_Screen_();
+            colony->just_produced = -1;
+            return;
+        }
+
+        if (production_id == -41) {
+            char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
+            char* format = ESTRINGS::E_Strings_(ESTR_S_JUST_LIBERATED_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
+            _sprintf(buffer, format, planet_name);
+            GENDRAW::Help_(buffer);
+            Show_Colony_Screen_();
+            colony->just_produced = -1;
+            return;
+        }
+
+        char* selection_name = COLBLDG::Selection_Name_(production_id);
+        char* planet_name = HACCESS::Get_Planet_Name_(colony->planet);
+        char* format = ESTRINGS::E_Strings_(ESTR_S_FINISHED_BUILDING_S_PLACE_YOUR_ORDERS_FOR_FUTURE_PRODUCTION);
+        _sprintf(buffer, format, planet_name, selection_name);
+        GENDRAW::Help_(buffer);
+        Show_Colony_Screen_();
+        colony->just_produced = -1;
+    }
+
+    /**
+     * Ensures that if the first item in the production queue is -10 (invalid/empty slot),
+     * it is removed and the queue is shifted.
+     */
+    void __cdecl Fix_Colony_Queue_(int16_t colony_idx) {
+        Defragment_Colony_Queue_(colony_idx);
+
+        while (MOX::_colony[colony_idx].producing[0] == -10) {
+            Squish_Out_Colony_Queue_Slot_(colony_idx, 0);
+        }
+    }
+
+    /**
+     * @address 004db800
+     */
+    void __cdecl Defragment_Colony_Queue_(int16_t colony_idx) {
+        for (int16_t i = 0; i < 7; ++i) {
+            // BUG: if multiple slots are -1, some might be skipped due to shifting
+            if (MOX::_colony[colony_idx].producing[i] == -1) {
+                COLONY::Squish_Out_Colony_Queue_Slot_(colony_idx, i);
+            }
+        }
+    }
+
+    void __cdecl Cleanup_Colony_Queue_(int16_t colony_idx) {
+        COLONY::Fix_Colony_Queue_(colony_idx);
+
+        if (MOX::_colony[colony_idx].producing[0] == -1) {
+            MOX::_colony[colony_idx].producing[0] = -2;
+        }
+    }
+
+    void __cdecl Squish_Out_Colony_Queue_Slot_(int16_t colony_idx, int16_t slot_idx) {
+        if (slot_idx < 6) {
+            for (int i = (int)slot_idx; i < 6; i++) {
+                MOX::_colony[colony_idx].producing[i] = MOX::_colony[colony_idx].producing[i + 1];
+            }
+        }
+        MOX::_colony[colony_idx].producing[6] = -1;
+    }
+
+    void __cdecl Col_Calc_Wrapper_(int16_t colony_idx) {
+        COLCALC::Colony_Calculation_(colony_idx);
+
+        if (COLONY::_move_colonist != -1 && COLONY::_field_mode == 1) {
+            s_colony* colony = &MOX::_colony[colony_idx];
+
+            if (colony->n_pops != 0) {
+                // Iterates through colony pops to find the last one without flag 0x200
+                for (int16_t i = 0; i < (int16_t)(uint8_t)colony->n_pops; ++i) {
+                    if ((colony->pop[i] & 0x200 /* FLAG_COLONIST_MOVING */) == 0) {
+                        COLONY::_move_colonist = i;
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Reset_Field_Mode_() {
+        int16_t unemployed_index = COLMOVE::Get_First_Unemployed_(static_cast<int16_t>(COLONY::_colony_handle));
+
+        if (unemployed_index != -1) {
+            if (COLONY::_field_mode == 1) {
+                COLMOVE::Clear_Cluster_();
+            }
+            else if (COLONY::_field_mode == 2) {
+                COLONY::Drop_Military_();
+            }
+
+            COLONY::Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+        }
+
+        COLONY::_field_mode = 0;
+    }
+
+    /**
+     * @address 004def50
+     */
+    char* __cdecl Colony_Type_(int32_t colony_idx) {
+        int8_t specialty = MOX::_colony[colony_idx].specialty;
+
+        switch (specialty) {
+            case -1:
+                return ESTRINGS::E_Strings_(12);
+
+            case 0:
+                return ESTRINGS::E_Strings_(ESTR_AGRICULTURAL);
+
+            case 1:
+                return ESTRINGS::E_Strings_(ESTR_INDUSTRIAL);
+
+            case 2:
+                return ESTRINGS::E_Strings_(ESTR_RESEARCH);
+
+            default:
+                return ESTRINGS::E_Strings_(ESTR_RESEARCH);
+        }
+    }
+
+    /**
+     * @address 004dbef0
+     */
+    void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+
+        s_colors* colors_ptr = &_red_font_color_array[color_idx];
+
+        fonts::Set_Font_Style_Shadow_Down_(style, colors_ptr);
+        fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
+        fonts::Set_Font_Special_Colors_(colors_ptr);
+    }
+
+    void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        uint8_t local_20[32];
+
+        // Manual assembly initialization of local buffer
+        memcpy(local_20, "QRSTUVWXYZ[\\]^_`abcdefghijklmno", 31);
+
+        if (COLONY::_ship_bitm_n != param_3) {
+            COLONY::_ship_bitm_n = param_3;
+            COLONY::_g_ship_player_n = (int32_t)MOX::_PLAYER_NUM;
+
+            s_animation_header* ship_seg = KEN::Get_Ship_Picture_Seg_(MOX::_PLAYER_NUM, param_3);
+            bitmap::Draw_Picture_To_Bitmap_(COLONY::_ship_bitm, ship_seg);
+
+            // remap starting from local_20[8] which is 'Y'
+            replace::Replace_Color_Range_(COLONY::_ship_bitm, &local_20[8], 1, 31 /* 0x1f */);
+
+            for (int16_t i = 0; i < 16; ++i) {
+                uint8_t remap_color = local_20[i * 2];
+                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xc0, remap_color);
+                replace::Replace_Color_(COLONY::_ship_bitm, i + 0xd0, remap_color);
+            }
+        }
+
+        ERIC::Draw_Centered_(param_1, param_2, COLONY::_ship_bitm);
+    }
+
+    short __cdecl Pop_To_Pop_State_(short colony_idx, short pop_idx) {
+        // Extract the lower nibble of the population data to determine status
+        uint32_t pop_status = MOX::_colony[colony_idx].pop[pop_idx] & 0xf;
+
+        if (pop_status == 9) {
+            return 3;
+        }
+
+        // Logic based on assembly: if status is 8, return 4, otherwise return 2
+        // Assembly uses SUB EAX, 8; CMP EAX, 1; SBB EAX, EAX; which evaluates to CF=1 only if EAX=0 (status=8)
+        if (pop_status == 8) {
+            return 4;
+        }
+
+        return 2;
+    }
+
+    int16_t __cdecl Get_Effective_Pop_Player_(int16_t colony_idx, int16_t pop_idx) {
+        uint32_t pop_val = MOX::_colony[colony_idx].pop[pop_idx];
+        uint32_t pop_type = pop_val & 0x0F;
+
+        if (pop_type == 8 || pop_type == 9) {
+            return static_cast<int16_t>(MOX::_colony[colony_idx].owner);
+        }
+
+        return static_cast<int16_t>(pop_type);
+    }
+
+    s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx) {
+        uint32_t pop_data = MOX::_colony[colony_idx].pop[pop_idx];
+        int16_t pop_state = static_cast<int16_t>(Pop_To_Pop_State_(colony_idx, pop_idx));
+
+        uint32_t type = (pop_data >> 7) & 0x3;
+
+        int16_t player_idx = Get_Effective_Pop_Player_(colony_idx, pop_idx);
+        uint32_t race = static_cast<uint32_t>(static_cast<uint8_t>(MOX::_player[player_idx].race));
+
+        // Check for specific flag in pop data (bit 10 / 0x400)
+        if ((pop_data & 0x400) != 0) {
+            return Colony_Pop_Icon_(race);
+        }
+
+        return People_Anim_(static_cast<int16_t>(type), pop_state, static_cast<int16_t>(race));
+    }
+
+    /**
+     * @address 004dc470
+     */
+    s_animation_header* __cdecl Colony_Pop_Icon_(int16_t race_index) {
+        // Entry calculation based on race index: each race has a set of icons starting at offset 12 with stride 13
+        int16_t entry_index = (int16_t)(race_index * 13 + 12);
+
+        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(COLONY::_RACEICON_LBX, (int)entry_index, MOX::_global_cache_seg));
+    }
+
+    void __cdecl Print_Sys_Disp_Scanned_String_(char* text) {
+        Set_Colony_Font_();
+        fonts::Print_Centered_(61, 135, text);
+    }
+
+    /**
+     * Retrieves military animation headers from RACEICON.LBX based on race and animation indices.
+     *
+     * @param param_1 Animation index offset
+     * @param param_2 Race index
+     * @return Pointer to the animation header in the global cache
+     */
+    s_animation_header* __cdecl Military_Anims_(int16_t param_1, int16_t param_2) {
+        // Calculation is done in 16-bit registers in disassembly
+        int16_t entry_index = (int16_t)(param_2 * 13 + param_1 + 6);
+
+        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+            COLONY::_RACEICON_LBX,
+            (int)entry_index,
+            MOX::_global_cache_seg
+        ));
+    }
+
+    /**
+     * Retrieves a military animation header based on the requested type and context.
+     * Maps generic military animation requests to specific variants based on player technology.
+     */
+    s_animation_header* __cdecl Military_Anim_(int16_t animation_type, int16_t param_2) {
+        if (animation_type == -1) {
+            return COLONY::Military_Anims_(0, param_2);
+        }
+
+        if (animation_type == 0) {
+            // Check technology application at index 0x90 (144)
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[0x90] == 3) {
+                return COLONY::Military_Anims_(2, param_2);
+            }
+            return COLONY::Military_Anims_(1, param_2);
+        }
+
+        if (animation_type == 1) {
+            // Check technology application at index 0x18 (24)
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[0x18] == 3) {
+                return COLONY::Military_Anims_(4, param_2);
+            }
+            return COLONY::Military_Anims_(3, param_2);
+        }
+
+        // Fallthrough for other animation types
+        return COLONY::Military_Anims_(animation_type, param_2);
+    }
+
+    /**
+     * @address 004de7a0
+     */
+    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode) {
+        int military_count;
+        int owner;
+        int local_n;
+        char buffer[256];
+        s_animation_header* anim;
+        int16_t height;
+
+        military_count = MOX::_colony[_colony_handle].military[military_index];
+        owner = MOX::_colony[_colony_handle].owner;
+        _step_squish = 0;
+
+        if (mode != 2) {
+            Do_Colony_Info_Military_Stuff_For_(military_index, start_n, param_3, 2);
+        }
+
+        Set_Colony_Font_();
+
+        if (_step_squish == 0) {
+            local_n = 0;
+            if (military_count > 0) {
+                do {
+                    if (mode == 0) {
+                        int race = MOX::_player[owner].race;
+                        anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                        height = animate::Get_Height_(anim);
+                        animate::Draw_(static_cast<int16_t>((local_n + start_n) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), anim);
+                    }
+                    local_n++;
+                } while (local_n < military_count);
+            }
+        } else {
+            _step_squish = 0;
+            local_n = 0;
+            if (military_count > 0) {
+                int race = MOX::_player[owner].race;
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                animate::Draw_(static_cast<int16_t>(start_n * 30), static_cast<int16_t>(0x1df - height), anim);
+
+                _sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
+                Set_Colony_Font_To_(3);
+
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                fonts::Print_(static_cast<int16_t>((start_n + 1) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), buffer);
+                local_n = 3;
+            }
+        }
+
+        if (mode == 1) {
+            if (local_n > 0) {
+                int step = 30 - _step_squish;
+                int race = MOX::_player[owner].race;
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                int x1 = start_n * step;
+                int y1 = 0x1df - height;
+                int x2 = (local_n + start_n) * step - 1;
+                int y2 = 0x1df;
+
+                _military_fields[military_index] = fields::Add_Hidden_Field_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), ESTRINGS::E_Strings_(0xc), 0);
+            } else {
+                _military_fields[military_index] = -1000;
+            }
+        } else if (mode == 2) {
+            int other_index = (military_index + 1) % 2;
+            int total_military = military_count + MOX::_colony[_colony_handle].military[other_index];
+
+            if (total_military < 2) {
+                total_military = 1;
+            }
+
+            int step = 260 / total_military;
+            if (step < 1) {
+                step = 1;
+            }
+
+            if (step < 30) {
+                _step_squish = static_cast<short>(30 - step);
+            } else {
+                _step_squish = 0;
+            }
+        }
+
+        return start_n + local_n;
+    }
+
+    /**
+     * @address 004de4c0
+     */
+    void __cdecl Draw_Colony_Info_Pop_For_(int32_t type) {
+        // Vertical offset calculation: 0x3E (62) is base Y, 0x1E (30) is row height.
+        int16_t y_coord = static_cast<int16_t>(type * 30 + 62);
+
+        COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+            static_cast<int16_t>(COLONY::_colony_handle),
+            static_cast<int16_t>(type),
+            0,
+            0x136 /* 310 */,
+            y_coord,
+            0x1FE /* 510 */,
+            1,
+            COLONY::_pop_fields_ref[type],
+            &COLONY::_pop_fields_count[type],
+            &COLONY::_pop_fields_coord_var[type],
+            &COLONY::_job_fields[type]
+        );
     }
 }

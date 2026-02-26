@@ -6,4 +6,8 @@ void __cdecl Draw_Colony_Prod_(int16_t colony_handle, int32_t selection, int32_t
     Draw_Colony_Prod_Both_(colony_handle, (int16_t)selection, (int16_t)p3, y_offset, (int16_t)p5, (int16_t)p6, 0);
 }
 
+void __cdecl Draw_Info_Morale_(int16_t param_1, int16_t param_2, int16_t param_3, int32_t param_4) {
+    COLDRAW::Draw_Info_Morale_Both_(param_1, param_2, param_3, param_4, 0);
+}
+
 }
