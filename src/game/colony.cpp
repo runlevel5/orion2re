@@ -236,6 +236,22 @@ namespace COLONY {
         return building_id == -1;
     }
 
+    /**
+     * @address 004dc300
+     * @brief Marks a specific colony building as rubble.
+     * @param param_1 The identifier of the building to destroy.
+     */
+    void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t param_1) {
+        int16_t row;
+        int16_t col;
+
+        if (Get_Bldg_CR_(param_1, &row, &col)) {
+            _full_draw = 1;
+            // Value 8 represents the 'Rubble' state for a building
+            _colony_bldgs[row].buildings[col] = 8;
+        }
+    }
+
     int16_t __cdecl Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(int16_t colony_idx, int16_t product_id) {
         s_colony* colony = &MOX::_colony[colony_idx];
         int16_t remaining_cost = COLCALC::Colony_Product_Cost_(colony, product_id);
@@ -369,7 +385,7 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_() {
         fonts::Set_Outline_Color_(0x50, 0x50);
-        COLSUM::Set_Colony_Font_To_(3);
+        Set_Colony_Font_To_(3);
     }
 
     void __cdecl Clear_Sys_Disp_Fields_() {
@@ -406,6 +422,19 @@ namespace COLONY {
         }
     }
 
+
+    bool __cdecl Colonize_Planet_(int16_t planet_idx) {
+        if (MOX::_planet[planet_idx].colony_index == -1) {
+            int16_t colony_idx = static_cast<int16_t>(MOX::_NUM_COLONIES);
+            MOX::_NUM_COLONIES++;
+
+            INITGAME::Init_Colony_(colony_idx, planet_idx, MOX::_PLAYER_NUM);
+
+            return true;
+        }
+
+        return false;
+    }
 
     bool __cdecl Colony_Can_Buy_Product_0_(int16_t colony_idx) {
         if (COLCALC::Colony_Can_Afford_To_Buy_Product_(colony_idx)) {
@@ -523,7 +552,7 @@ namespace COLONY {
             s_animation_header* anim2 = C_Anims_(30);
             animate::Draw_(550, 357, anim2);
 
-            COLSUM::Set_Colony_Font_To_(2);
+            Set_Colony_Font_To_(2);
 
             s_leader_data& leader = MOX::_leaders[officer_idx];
 
@@ -658,6 +687,24 @@ namespace COLONY {
         video::Clip_Off_();
     }
 
+    void __cdecl Draw_Bldg_CR_Dark_(int16_t col, int16_t row) {
+        int32_t bldg_id = _colony_bldgs[col].buildings[row];
+        s_animation_header* bldg_anim = (s_animation_header*)COLBCACH::Cache_Load_Bldg_(col, row, (int16_t)bldg_id);
+
+        int16_t x = (int16_t)CR_To_XY_(col, row, 0) - 60;
+        int16_t y = (int16_t)CR_To_XY_(col, row, 1) - 120;
+
+        bitmap::Create_Blank_Bitmap_(120, 120, COLBLDG::_bldg_bitm);
+        bitmap::Add_Picture_To_Bitmap_(-x, -y, bldg_anim, (s_animation_header*)COLBLDG::_bldg_bitm);
+        bitmap::Mask_Out_Colors_(COLBLDG::_bldg_bitm, 240, 255);
+        bitmap::Tint_Bitmap_(COLBLDG::_bldg_bitm, COLBLDG::_bldg_bitm, 2);
+
+        graphics::Set_Window_(0, 0, 639, 479);
+        video::Clip_On_();
+        animate::Draw_(x, y, (s_animation_header*)COLBLDG::_bldg_bitm);
+        video::Clip_Off_();
+    }
+
     void __cdecl Print_Scanned_Military_() {
         char buffer[500];
 
@@ -685,9 +732,6 @@ namespace COLONY {
         return ESTRINGS::E_Strings_(ESTR_SCIENTIST);
     }
 
-    /**
-     * @address 004dc030
-     */
     char* __cdecl Conquered_String_(bool is_conquered) {
         if (is_conquered) {
             return ESTRINGS::E_Strings_(ESTR_CONQUERED);
@@ -938,6 +982,13 @@ namespace COLONY {
         Reset_Field_Mode_();
     }
 
+    void __cdecl Show_Food_Production_(int16_t colony_idx) {
+        char buffer[3000];
+
+        COLCALC::Colony_Food_Production_(&MOX::_colony[colony_idx], buffer);
+        TEXTBOX::Text_Box_(COLCALC::_food_summary_msg, buffer);
+    }
+
     char* __cdecl Colony_Type_(int32_t colony_idx) {
         int8_t specialty = MOX::_colony[colony_idx].specialty;
 
@@ -970,8 +1021,20 @@ namespace COLONY {
     }
 
     /**
-     * @address 004f54d0
+     * @address 004dbf40
      */
+    void __cdecl Set_Colony_Font_To_(int16_t style) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+
+        // style & 0xff extracts the lower byte as seen in the disassembly (MOV AL, byte ptr [ESP + 0xc])
+        fonts::Set_Font_Style_Shadow_Down_(style & 0xFF, &COLONY::_font_color_array);
+
+        fonts::Set_Font_Highlight_Colors_(&COLONY::_bright_blue_font_color_array);
+
+        // _red_font_color_array is s_colors[2], passed as a pointer
+        fonts::Set_Font_Special_Colors_(COLONY::_red_font_color_array);
+    }
+
     void __cdecl Show_BC_Production_(int16_t colony_idx) {
         char local_buffer[3000];
 
@@ -1117,96 +1180,6 @@ namespace COLONY {
         return COLONY::Military_Anims_(animation_type, param_2);
     }
 
-    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode) {
-        int military_count;
-        int owner;
-        int local_n;
-        char buffer[256];
-        s_animation_header* anim;
-        int16_t height;
-
-        military_count = MOX::_colony[_colony_handle].military[military_index];
-        owner = MOX::_colony[_colony_handle].owner;
-        _step_squish = 0;
-
-        if (mode != 2) {
-            Do_Colony_Info_Military_Stuff_For_(military_index, start_n, param_3, 2);
-        }
-
-        Set_Colony_Font_();
-
-        if (_step_squish == 0) {
-            local_n = 0;
-            if (military_count > 0) {
-                do {
-                    if (mode == 0) {
-                        int race = MOX::_player[owner].race;
-                        anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                        height = animate::Get_Height_(anim);
-                        animate::Draw_(static_cast<int16_t>((local_n + start_n) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), anim);
-                    }
-                    local_n++;
-                } while (local_n < military_count);
-            }
-        } else {
-            _step_squish = 0;
-            local_n = 0;
-            if (military_count > 0) {
-                int race = MOX::_player[owner].race;
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                height = animate::Get_Height_(anim);
-
-                animate::Draw_(static_cast<int16_t>(start_n * 30), static_cast<int16_t>(0x1df - height), anim);
-
-                _sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
-                Set_Colony_Font_To_(3);
-
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                height = animate::Get_Height_(anim);
-
-                fonts::Print_(static_cast<int16_t>((start_n + 1) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), buffer);
-                local_n = 3;
-            }
-        }
-
-        if (mode == 1) {
-            if (local_n > 0) {
-                int step = 30 - _step_squish;
-                int race = MOX::_player[owner].race;
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                height = animate::Get_Height_(anim);
-
-                int x1 = start_n * step;
-                int y1 = 0x1df - height;
-                int x2 = (local_n + start_n) * step - 1;
-                int y2 = 0x1df;
-
-                _military_fields[military_index] = fields::Add_Hidden_Field_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), ESTRINGS::E_Strings_(0xc), 0);
-            } else {
-                _military_fields[military_index] = -1000;
-            }
-        } else if (mode == 2) {
-            int other_index = (military_index + 1) % 2;
-            int total_military = military_count + MOX::_colony[_colony_handle].military[other_index];
-
-            if (total_military < 2) {
-                total_military = 1;
-            }
-
-            int step = 260 / total_military;
-            if (step < 1) {
-                step = 1;
-            }
-
-            if (step < 30) {
-                _step_squish = static_cast<short>(30 - step);
-            } else {
-                _step_squish = 0;
-            }
-        }
-
-        return start_n + local_n;
-    }
 
     void __cdecl Draw_Colony_Info_Pop_For_(int32_t type) {
         // Vertical offset calculation: 0x3E (62) is base Y, 0x1E (30) is row height.
@@ -1314,6 +1287,24 @@ namespace COLONY {
         COLONY::Add_Screen_Fields_();
     }
 
+    int16_t __cdecl Get_Scanned_Pop_(int16_t param_1) {
+        _g_colony_n = static_cast<int16_t>(_colony_handle);
+
+        return COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+            static_cast<int16_t>(_colony_handle),
+            param_1,
+            4,
+            310,
+            param_1 * 30 + 62,
+            510,
+            1,
+            _pop_fields_ref[param_1],
+            &_pop_fields_count[param_1],
+            &_pop_fields_coord_var[param_1],
+            &_job_fields[param_1]
+        );
+    }
+
     int16_t __cdecl Get_Selected_Pop_(int16_t param_1) {
         int32_t index = (int32_t)param_1;
 
@@ -1324,6 +1315,24 @@ namespace COLONY {
             3,
             310,
             static_cast<int16_t>(param_1 * 30 + 62),
+            510,
+            1,
+            _pop_fields_ref[index],
+            &_pop_fields_count[index],
+            &_pop_fields_coord_var[index],
+            &_job_fields[index]
+        );
+    }
+
+    void __cdecl Add_Job_Field_For_(int16_t index) {
+        int32_t arg5_calc = (int32_t)((int16_t)(index * 30 + 62));
+
+        COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+            static_cast<int16_t>(_colony_handle),
+            index,
+            1,
+            310,
+            arg5_calc,
             510,
             1,
             _pop_fields_ref[index],
@@ -1381,7 +1390,7 @@ namespace COLONY {
         int max_val = 0;
 
         for (int i = 0; i < 2; i++) {
-            int current_ret = COLONY::Add_Military_Field_For_(i, prev_ret, count);
+            int current_ret = COLONY::Do_Colony_Info_Military_Stuff_For_Aux_(i, prev_ret, count);
 
             if (current_ret > max_val) {
                 max_val = current_ret;
@@ -1467,12 +1476,6 @@ namespace COLONY {
         Col_Calc_Wrapper_(static_cast<int16_t>(_colony_handle));
     }
 
-    /**
-     * @brief Finds the next or previous colony belonging to the same owner that is not an outpost.
-     * @param current_idx The starting colony index.
-     * @param direction If 0, searches forward (next); otherwise, searches backward (previous).
-     * @return The index of the next/previous matching colony, or the original index if no others exist.
-     */
     short __cdecl Get_Next_Colony_(short current_idx, short direction) {
         int8_t target_owner = MOX::_colony[current_idx].owner;
         short search_idx = current_idx;
@@ -1501,6 +1504,415 @@ namespace COLONY {
         } while (search_idx != current_idx);
 
         return current_idx;
+    }
+
+    void __cdecl Remove_Satellite_From_Array_(int16_t satellite_id) {
+        for (int16_t i = 0; i < 10; ++i) {
+            if (_colony_satellites[i] == satellite_id) {
+                _colony_satellites[i] = 0;
+
+                // Note: The following check may perform an out-of-bounds access 
+                // on _colony_satellites[10] if i is 9. This behavior is 
+                // preserved from the binary.
+                if (_colony_satellites[i + 1] != 0) {
+                    // This loop effectively performs the same assignment 9 times.
+                    for (int count = 9; count != 0; --count) {
+                        _colony_satellites[i] = _colony_satellites[i + 1];
+                    }
+                    _colony_satellites[9] = -1;
+                }
+            }
+        }
+
+        _full_draw = 1;
+        Make_Bldg_Array_For_Colony_(_colony_handle, 0);
+    }
+
+    void __cdecl Add_Move_Colonist_Job_Field_For_(int16_t index) {
+        char* hotkey = ESTRINGS::E_Strings_(12);
+
+        // The assembly uses 16-bit math for coordinate and offset calculations.
+        // x1: 0x136 (310)
+        // y1: (index + 2) * 30
+        // x2: 0x1fe (510)
+        // y2: index * 30 + 88 (0x58)
+        int16_t field_id = fields::Add_Hidden_Field_(
+            310,
+            (index + 2) * 30,
+            510,
+            index * 30 + 88,
+            hotkey,
+            0
+        );
+
+        _job_fields[index] = field_id;
+    }
+
+    int __cdecl Do_Colony_Info_Military_Stuff_For_Aux_(int index, int prev_ret, int count) {
+        return COLONY::Do_Colony_Info_Military_Stuff_For_(index, prev_ret, count, 1);
+    }
+
+    void Add_Satellite_Fields_() {
+        for (int16_t i = 0; i < 10; ++i) {
+            int16_t satellite_id = COLONY::_colony_satellites[i];
+
+            if (satellite_id == -1) {
+                COLONY::_colony_satellite_fields[i] = -1000;
+            } else {
+                s_animation_header* anim = COLONY::Satellite_Anim_(satellite_id);
+                int16_t width = animate::Get_Width_(anim);
+                int16_t height = animate::Get_Height_(anim);
+
+                // Alternating horizontal offset calculation:
+                // side is 1 if even, -1 if odd
+                int16_t side = (i % 2 == 0) ? 1 : -1;
+                int16_t x_offset = side * i * 50;
+
+                int16_t x1 = x_offset + 295 /* 0x127 */;
+                int16_t y1 = 162 /* 0xa2 */;
+                int16_t x2 = width + x1;
+                int16_t y2 = height + y1;
+
+                char* hotkey = ESTRINGS::E_Strings_(12 /* 0xc */);
+                int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, hotkey, 0);
+
+                COLONY::_colony_satellite_fields[i] = field_id;
+            }
+        }
+    }
+
+    void __cdecl Add_Stacking_Fields_() {
+        s_colony* colony = &MOX::_colony[_colony_handle];
+
+        if (colony->occupation_policy == 0) {
+            char* str = ESTRINGS::E_Strings_(12);
+            _colony_fields[8] = fields::Add_Hidden_Field_(0, 0, 639, 19, str, 40);
+        } else {
+            _colony_fields[8] = -1000;
+        }
+
+        int16_t first_unemployed = COLMOVE::Get_First_Unemployed_((int16_t)_colony_handle);
+
+        if (first_unemployed != -1 && _valid_colony != 0) {
+            char* str = ESTRINGS::E_Strings_(12);
+            s_animation_header* pic = C_Anims_(24);
+            char* help = ESTRINGS::E_Strings_(12);
+
+            _colony_fields[11] = fields::Add_Button_Field_(307, 159, help, pic, str, 40);
+        } else {
+            _colony_fields[11] = -1000;
+        }
+    }
+
+    uint32_t __cdecl Check_System_Display_Fields_(int16_t* param_1, int16_t* param_2) {
+        int16_t scanned_star_out;
+        int16_t scanned_val_out;
+        char description[2000];
+
+        if (COLONY::_drawing_display == 0) {
+            if (*param_1 == COLONY::_sys_disp_fields[0]) {
+                COLONY::_drawing_display = 1;
+                COLONY::_full_draw = 1;
+            } else {
+                for (int16_t i = 0; i < 5; ++i) {
+                    if (COLONY::_sys_disp_planet_fields[i] == *param_1) {
+                        if (COLONY::_field_mode == 1) {
+                            int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
+                            COLMOVE::Send_Cluster_(MOX::_planet[planet_idx].colony_index, -1);
+                            COLONY::Show_Colony_Screen_();
+                        } else {
+                            int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
+                            int16_t col_idx = MOX::_planet[planet_idx].colony_index;
+
+                            if (col_idx != -1 &&
+                                MOX::_colony[col_idx].outpost_flag != 1 &&
+                                col_idx != COLONY::_colony_handle &&
+                                MOX::_colony[col_idx].owner == MOX::_PLAYER_NUM) 
+                            {
+                                (&MOX::_screen_data)[0] = (int16_t)COLONY::_sys_disp_star_handle;
+                                (&MOX::_screen_data)[1] = i;
+                                (&MOX::_screen_data)[2] = col_idx;
+
+                                COLONY::Cleanup_Colony_Queue_(COLONY::_colony_handle);
+                                COLONY::Reset_Field_Mode_();
+                                fields::Clear_Fields_();
+                                FAKEBUTS::Clear_Fake_Buttons_();
+                                fields::Deactivate_Auto_Function_();
+                                COLONY::_full_draw = 1;
+
+                                COLONY::Set_Last_Colony_Selected_(col_idx, MOX::_PLAYER_NUM);
+                                return 0;
+                            }
+                            return 1;
+                        }
+                    } else if (COLONY::_sys_disp_summ_fields[i] == *param_1) {
+                        int16_t planet_idx = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
+                        if (MOX::_planet[planet_idx].planet_type == 3 /* Gas Giant */) {
+                            COLONY::_planet_display_handle = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
+                            COLONY::_drawing_display = 2;
+                            return 1;
+                        }
+                    } else if (*param_2 == COLONY::_sys_disp_planet_fields[i]) {
+                        COLONY::_g_scanned_planet = HAROLD::Planet_Index_(COLONY::_sys_disp_star_handle, i);
+                    }
+                }
+            }
+        } else if (COLONY::_drawing_display == 1) {
+            int16_t scan_res = (int16_t)MAINSCR::Scan_Galaxy_Map_Fields_(*param_2, *param_1, &scanned_star_out, &scanned_val_out);
+            COLONY::_sys_disp_scanned_star_handle = -1;
+
+            if (*param_1 == COLONY::_galaxy_map_name_field) {
+                COLONY::_drawing_display = 0;
+                COLONY::_full_draw = 1;
+                COLONY::_g_scanned_planet = -1;
+            } else if (scan_res == 4) {
+                COLONY::_g_scanned_star = scanned_star_out;
+            } else if (scan_res == 2) {
+                int16_t center_x = (int16_t)((((int)MOX::_galaxy_map_grid_y * (int)MOX::_max_map_scale) / 10 * (5060 / (int)MOX::_galaxy_map_height)) / 10);
+                int16_t center_y = (int16_t)((((int)MOX::_galaxy_map_grid_x * (int)MOX::_max_map_scale) / 10 * (4000 / (int)MOX::_galaxy_map_width)) / 10);
+                MAINSCR::Center_Map_(center_x, center_y);
+                COLONY::_full_draw = 1;
+            } else if (scan_res == 0) {
+                if (COLONY::_debug_flag != 0) {
+                    fonts::PSTRS_(0, 0, ESTRINGS::E_Strings_(0x138));
+                }
+                COLONY::_drawing_display = 0;
+                COLONY::_full_draw = 1;
+                COLONY::_sys_disp_star_handle = (int32_t)scanned_val_out;
+                COLONY::_g_scanned_planet = -1;
+            }
+        } else if (COLONY::_drawing_display == 2) {
+            MAINPUPS::Build_Generic_Planet_Or_Colony_Description_String_Formatted_(COLONY::_planet_display_handle, description);
+            COLONY::_drawing_display = 0;
+            COLONY::_planet_display_handle = (uint16_t)-1;
+            GENDRAW::Help_(description);
+            COLONY::Show_Colony_Screen_();
+        }
+
+        return 1;
+    }
+
+    void __cdecl Do_Cheats_() {
+        char input_buf[20];
+
+        // Copy menu title into buffer
+        strcpy(input_buf, ESTRINGS::E_Strings_(12));
+
+        RUSS::PFMT_(0, ESTR_ELSE__COL_CALC_WRAPPER, ESTRINGS::E_Strings_(ESTR_ELSE__COL_CALC_WRAPPER));
+        RUSS::PFMT_(0, ESTR_Q__PRODUCTION__10000, ESTRINGS::E_Strings_(ESTR_Q__PRODUCTION__10000));
+        RUSS::PFMT_(0, ESTR_P__PRODUCTION__100, ESTRINGS::E_Strings_(ESTR_P__PRODUCTION__100));
+        RUSS::PFMT_(0, ESTR_C__COLONIZE_PLANET_SUMMARY_HANDLE, ESTRINGS::E_Strings_(ESTR_C__COLONIZE_PLANET_SUMMARY_HANDLE));
+        RUSS::PFMT_(0, ESTR_F__ADD_FREIGHTERS_TO_POOL, ESTRINGS::E_Strings_(ESTR_F__ADD_FREIGHTERS_TO_POOL));
+        RUSS::PFMT_(0, ESTR_B__ADD_BCS_TO_TREASURY, ESTRINGS::E_Strings_(ESTR_B__ADD_BCS_TO_TREASURY));
+
+        int key = hgetch_();
+        input_buf[0] = (char)key;
+        input_buf[1] = '\0';
+
+        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_P)) == 0) {
+            MOX::_colony[COLONY::_colony_handle].production_spent += 100;
+            COLONY::_full_draw = 1;
+        }
+
+        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_Q)) == 0) {
+            MOX::_colony[COLONY::_colony_handle].production_spent += 10000;
+            COLONY::_full_draw = 1;
+            return;
+        }
+
+        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_C1)) == 0) {
+            if (COLONY::_drawing_display == 2) {
+                if (!COLONY::Colonize_Planet_(static_cast<int16_t>(COLONY::_planet_display_handle))) {
+                    GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_PLANET_ALREADY_COLONIZED));
+                    COLONY::Show_Colony_Screen_();
+                    return;
+                }
+            }
+        } else if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_F)) == 0) {
+            MOX::_player[MOX::_PLAYER_NUM].n_freighters += 5;
+            return;
+        } else if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_B)) == 0) {
+            MOX::_player[MOX::_PLAYER_NUM].bc += 100;
+            return;
+        } else {
+            COLONY::Col_Calc_Wrapper_(static_cast<int16_t>(COLONY::_colony_handle));
+        }
+    }
+
+    void __cdecl Check_Bldg_Fields_(int16_t* param_1, int16_t* param_2) {
+        _scanned_bldg_C = -1;
+        _scanned_bldg_R = -1;
+
+        int16_t mouse_x = mouse::Pointer_X_();
+        int16_t mouse_y = mouse::Pointer_Y_();
+
+        char buffer[1000];
+
+        for (int row = 0; row < 6; ++row) {
+            for (int col = 0; col < 6; ++col) {
+                int16_t field_val = _colony_bldg_fields[row * 6 + col];
+                int32_t bldg_id = _colony_bldgs[row].buildings[col];
+
+                // Case: Potential Demolish
+                bool demolish_match = false;
+                if (field_val == *param_1) {
+                    demolish_match = true;
+                } else if (_colony_fields[0] == *param_1) {
+                    if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
+                        demolish_match = true;
+                    }
+                }
+
+                if (demolish_match) {
+                    if (bldg_id == 3 /* Star Base */ || bldg_id == 14 /* Battlestation */ || 
+                        bldg_id == 40 /* Star Fortress */ || bldg_id == 41 /* Orbital Missile Base */ || 
+                        bldg_id == 8 /* Marine Barracks */ || bldg_id == 9 /* Armor Barracks */) {
+                        return;
+                    }
+
+                    s_colony& col_ref = MOX::_colony[_colony_handle];
+                    if (col_ref.last_turn_building_destroyed == (int16_t)MOX::_stardate) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x243));
+                        Show_Colony_Screen_();
+                        return;
+                    }
+
+                    int32_t refund_val = TECHDATA::_buildings[bldg_id].cost / 2;
+                    _sprintf(buffer, ESTRINGS::E_Strings_(0x107), CR_Building_Name_((int16_t)bldg_id), refund_val);
+                    
+                    if (GENDRAW::Warning_Box_(buffer)) {
+                        col_ref.last_turn_building_destroyed = (int16_t)MOX::_stardate;
+                        Turn_To_Rubble_CR_Bldg_((int16_t)bldg_id);
+                        ERICNET::Remove_Building_((int16_t)_colony_handle, (int16_t)bldg_id);
+                        COLCALC::Colony_Calculation_((int16_t)_colony_handle);
+                        MOX::_player[MOX::_PLAYER_NUM].bc += refund_val;
+                    }
+
+                    Show_Colony_Screen_();
+                    return;
+                }
+
+                // Case: Potential Info Description
+                bool info_match = false;
+                if (field_val + *param_1 == 0) {
+                    info_match = true;
+                } else if (_colony_fields[0] + *param_1 == 0) {
+                    if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
+                        info_match = true;
+                    }
+                }
+
+                if (info_match) {
+                    if (bldg_id == 3 /* Star Base */ || bldg_id == 14 /* Battlestation */ || 
+                        bldg_id == 40 /* Star Fortress */ || bldg_id == 41 /* Orbital Missile Base */ || 
+                        bldg_id == 8 /* Marine Barracks */) {
+                        return;
+                    }
+
+                    COLBLDG::Get_App_Description_String_(buffer, TECHDATA::_buildings[bldg_id].tech_app);
+                    TEXTBOX::Text_Box_(CR_Building_Name_((int16_t)bldg_id), buffer);
+                    Show_Colony_Screen_();
+                    return;
+                }
+
+                // Case: Potential Selection Scan
+                bool scan_match = false;
+                if (field_val == *param_2) {
+                    scan_match = true;
+                } else if (XY_In_Bldg_Poly_(mouse_x, mouse_y, (int16_t)row, (int16_t)col) && bldg_id != 0) {
+                    scan_match = true;
+                }
+
+                if (scan_match) {
+                    _scanned_bldg_C = (int16_t)row;
+                    _scanned_bldg_R = (int16_t)col;
+                    return;
+                }
+            }
+        }
+    }
+
+    void __cdecl Check_Military_Fields_(int16_t* param_1, int16_t* param_2) {
+        COLONY::_scanned_military = -1;
+
+        if (COLONY::_field_mode == 2 && *param_1 != 0) {
+            COLONY::Drop_Military_();
+            *param_1 = 0;
+        }
+
+        for (int16_t i = 0; i < 2; ++i) {
+            // Note: *param_1 is re-evaluated in each iteration as per assembly MOV CX, [ESI]
+            if (COLONY::_military_fields[i] == *param_1) {
+                NEWPUP::Troop_Popup_();
+                COLONY::Show_Colony_Screen_();
+                *param_1 = 0;
+            }
+
+            if (COLONY::_military_fields[i] == *param_2) {
+                COLONY::_scanned_military = i;
+            }
+        }
+    }
+
+    /**
+     * @address 004dd920
+     */
+    /**
+     * @address 0049aff0
+     * @brief Updates the last planet selected in a star system for a specific player based on a colony.
+     *
+     * @param colony_idx The index of the colony.
+     * @param player_idx The index of the player.
+     */
+    void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_idx) {
+        if (MOX::_colony[colony_idx].outpost_flag == 0) {
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+            // Note: star_index and orbit are extracted from the planet associated with the colony
+            int8_t star_idx = MOX::_planet[planet_idx].star_index;
+            char orbit = MOX::_planet[planet_idx].orbit;
+
+            // Update the player's last selected planet in the system's star data
+            MOX::_star[star_idx].last_planet_selected[player_idx] = orbit;
+        }
+    }
+
+    int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t param_5, int16_t param_6) {
+        _colonists_count = 0;
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        if (colony->n_pops != 0) {
+            for (int16_t i = 0; i < (int16_t)(uint8_t)colony->n_pops; ++i) {
+                int16_t effective_player = Get_Effective_Pop_Player_(colony_idx, i);
+                uint32_t pop_data = colony->pop[i];
+                uint32_t pop_race_val = pop_data & 0xF;
+
+                bool race_match = false;
+                if ((int)MOX::_player[effective_player].race == (int)race && pop_race_val == (uint32_t)effective_player) {
+                    race_match = true;
+                } else if (race == -1) {
+                    race_match = true;
+                } else if (pop_race_val >= 14 && pop_race_val == (uint32_t)race) {
+                    race_match = true;
+                }
+
+                if (race_match) {
+                    int16_t pop_state = Pop_To_Pop_State_(colony_idx, i);
+                    if (pop_state == state || state == -1) {
+                        if ((int)((pop_data & 0x180) >> 7) == (int)job || job == -1) {
+                            if ((int)((pop_data & 0x400) >> 10) == (int)param_6 || param_6 == -1) {
+                                // Bit 9: 0x200
+                                if (pop_data & 0x200) {
+                                    _colonists_count++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return (int16_t)_colonists_count;
     }
 
 }

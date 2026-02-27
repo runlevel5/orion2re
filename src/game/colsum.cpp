@@ -40,7 +40,7 @@ namespace COLSUM {
 
     void __cdecl Draw_Scan_Info_() {
         Draw_Colony_Scan_Info_();
-        Set_Colony_Font_To_(1);
+        COLONY::Set_Colony_Font_To_(1);
 
         if (MOX::_galaxy_map_scanned_star != -1) {
             const char* star_name = reinterpret_cast<const char*>(&MOX::_star[MOX::_galaxy_map_scanned_star]);
@@ -372,7 +372,7 @@ namespace COLSUM {
     void __cdecl Draw_Empire_Info_() {
         char buffer[200];
 
-        Set_Colony_Font_To_(2);
+        COLONY::Set_Colony_Font_To_(2);
 
         auto& player = MOX::_player[MOX::_PLAYER_NUM];
 
@@ -530,7 +530,7 @@ namespace COLSUM {
             Draw_Info_Pop_For_(list_idx);
 
             int16_t turn_count = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx);
-            Set_Colony_Font_To_(1);
+            COLONY::Set_Colony_Font_To_(1);
 
             int16_t item_producing = colony->producing[0];
             if (item_producing != -1) {
@@ -943,13 +943,6 @@ namespace COLSUM {
             &_list_col_coord_vars[index],
             &_list_col_job_fields[index]
         );
-    }
-
-    void __cdecl Set_Colony_Font_To_(int16_t style) {
-        fonts::Set_Outline_Color_(0x50, 0x50);
-        fonts::Set_Font_Style_Shadow_Down_(static_cast<int32_t>(style & 0xFF), &COLONY::_font_color_array);
-        fonts::Set_Font_Highlight_Colors_(&COLONY::_bright_blue_font_color_array);
-        fonts::Set_Font_Special_Colors_(&COLONY::_red_font_color_array[0]);
     }
 
     int16_t __cdecl cmp_Alpha_(int16_t colony_idx_1, int16_t colony_idx_2) {

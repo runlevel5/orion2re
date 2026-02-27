@@ -88,6 +88,7 @@
 #include "mainmenu.h"
 #include "nextturn.h"
 #include "newgame.h"
+#include "newpup.h"
 #include "score.h"
 #include "hotpop.h"
 #include "colsum.h"

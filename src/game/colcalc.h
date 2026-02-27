@@ -117,6 +117,8 @@ namespace COLCALC {
     int16_t __cdecl Get_Player_Max_Population_(int16_t player_idx);
     int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx);
 
+    bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index);
+
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});
@@ -129,6 +131,8 @@ namespace COLCALC {
     inline char*& _colony_debug_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
     inline char*& _anomaly_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B40});
     inline char*& _bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B48});
+    inline char*& _food_summary_msg =
+        *reinterpret_cast<char**>(std::uintptr_t{0x00571B4C});
     inline char*& _blockaded_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B50});
     inline char*& _morale_penalty_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B54});
     inline char*& _total_research_produced_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571B5C});
@@ -280,12 +284,10 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const s_colony* pop_unit, int16_t mode);
 
-    inline char* __cdecl Format_Quotient_(int value, int divisor) {
-        using Fn = char*(__cdecl*)(int, int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f2e40})(value, divisor);
-    }
+    inline char (&_tmp_quotient)[20] = *reinterpret_cast<char (*)[20]>(std::uintptr_t{0x00571AC0});
+    char* __cdecl Format_Quotient_(int value, int divisor);
 
-    void __cdecl Colony_Food_Production_(s_colony* colony, char* debug_out);
+    void __cdecl Colony_Food_Production_(s_colony* colony, char* buffer);
 
     int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
 
@@ -367,4 +369,6 @@ namespace COLCALC {
     void __cdecl Give_Player_Field_(s_player* player, int field_id, char get_all_flag);
 
     void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player);
+
+    short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id);
 }

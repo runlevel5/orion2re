@@ -815,6 +815,9 @@
     <ClInclude Include="src\game\gui.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\newpup.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

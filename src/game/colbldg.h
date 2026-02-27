@@ -125,6 +125,8 @@ namespace COLBLDG {
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id);
 
+    void __cdecl Get_App_Description_String_(char* dest, int16_t app_id);
+
     void __cdecl Draw_Building_Info_(int16_t building_idx);
 
     void __cdecl Draw_Ship_Info_(int16_t item);

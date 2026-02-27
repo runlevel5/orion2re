@@ -129,8 +129,6 @@ namespace COLSUM {
 
     void __cdecl Colony_Summary_Screen_();
 
-    void __cdecl Set_Colony_Font_To_(int16_t style);
-
     int16_t __cdecl Pick_Best_Planet_To_Goto_At_Star_(int16_t star_idx);
 
     int16_t __cdecl Prod_To_Sort_Type_(int16_t production_id);

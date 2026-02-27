@@ -320,4 +320,9 @@ namespace MAINSCR {
         using Fn = void(__cdecl*)(int16_t*, int16_t, int);
         reinterpret_cast<Fn>(std::uintptr_t{0x004C4DB0})(ptr, player_num, dir);
     }
+
+    inline void __cdecl Center_Map_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004c49d0})(x, y);
+    }
 }

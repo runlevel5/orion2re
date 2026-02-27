@@ -779,7 +779,7 @@ namespace COLONY {
             char* colony_type = Colony_Type_(handle);
             char* fmt = ESTRINGS::E_Strings_(ESTR_SCOLONY_OF_S);
             _sprintf(buffer, fmt, colony_type, planet_name);
-            COLSUM::Set_Colony_Font_To_(4);
+            Set_Colony_Font_To_(4);
         }
 
         fonts::Set_Font_Spacing_(2);
@@ -802,7 +802,7 @@ namespace COLONY {
             status_msg_id = ESTR_PLAGUE;
         }
         else if (EVENTS::Event_Check_Population_Boom_(static_cast<int16_t>(handle))) {
-            COLSUM::Set_Colony_Font_To_(4);
+            Set_Colony_Font_To_(4);
             fonts::Set_Font_Spacing_(2);
             status_msg_id = ESTR_POP_BOOM;
         }
@@ -812,7 +812,7 @@ namespace COLONY {
             fonts::Print_(0, 0, status_text);
         }
 
-        COLSUM::Set_Colony_Font_To_(4);
+        Set_Colony_Font_To_(4);
         fonts::Set_Font_Spacing_(3);
 
         int sum_roundoff = 0;
@@ -1129,4 +1129,100 @@ namespace COLONY {
 
         return 1;
     }
+
+    int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode) {
+        int military_count;
+        int owner;
+        int local_n;
+        char buffer[256];
+        s_animation_header* anim;
+        int16_t height;
+
+        military_count = MOX::_colony[_colony_handle].military[military_index];
+        owner = MOX::_colony[_colony_handle].owner;
+        _step_squish = 0;
+
+        if (mode != 2) {
+            Do_Colony_Info_Military_Stuff_For_(military_index, start_n, param_3, 2);
+        }
+
+        Set_Colony_Font_();
+
+        if (_step_squish == 0) {
+            local_n = 0;
+            if (military_count > 0) {
+                do {
+                    if (mode == 0) {
+                        int race = MOX::_player[owner].race;
+                        anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                        height = animate::Get_Height_(anim);
+                        animate::Draw_(static_cast<int16_t>((local_n + start_n) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), anim);
+                    }
+                    local_n++;
+                } while (local_n < military_count);
+            }
+        }
+        else {
+            _step_squish = 0;
+            local_n = 0;
+            if (military_count > 0) {
+                int race = MOX::_player[owner].race;
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                animate::Draw_(static_cast<int16_t>(start_n * 30), static_cast<int16_t>(0x1df - height), anim);
+
+                _sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
+                Set_Colony_Font_To_(3);
+
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                fonts::Print_(static_cast<int16_t>((start_n + 1) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), buffer);
+                local_n = 3;
+            }
+        }
+
+        if (mode == 1) {
+            if (local_n > 0) {
+                int step = 30 - _step_squish;
+                int race = MOX::_player[owner].race;
+                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                height = animate::Get_Height_(anim);
+
+                int x1 = start_n * step;
+                int y1 = 0x1df - height;
+                int x2 = (local_n + start_n) * step - 1;
+                int y2 = 0x1df;
+
+                _military_fields[military_index] = fields::Add_Hidden_Field_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), ESTRINGS::E_Strings_(0xc), 0);
+            }
+            else {
+                _military_fields[military_index] = -1000;
+            }
+        }
+        else if (mode == 2) {
+            int other_index = (military_index + 1) % 2;
+            int total_military = military_count + MOX::_colony[_colony_handle].military[other_index];
+
+            if (total_military < 2) {
+                total_military = 1;
+            }
+
+            int step = 260 / total_military;
+            if (step < 1) {
+                step = 1;
+            }
+
+            if (step < 30) {
+                _step_squish = static_cast<short>(30 - step);
+            }
+            else {
+                _step_squish = 0;
+            }
+        }
+
+        return start_n + local_n;
+    }
+
 }

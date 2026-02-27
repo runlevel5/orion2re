@@ -686,6 +686,29 @@ namespace COLBLDG {
         }
     }
 
+    /**
+     * @address 00509800
+     */
+    void __cdecl Get_App_Description_String_(char* dest, int16_t app_id) {
+        char lbx_name[20];
+        void* record_ptr;
+
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+
+        if (_last_app != app_id) {
+            _last_app = app_id;
+            record_ptr = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 0x57B /* 1403 */);
+        } else {
+            record_ptr = _desc_record_ptr;
+        }
+
+        _desc_record_ptr = record_ptr;
+
+        char* description_src = (char*)record_ptr + 0x67;
+
+        strcpy(dest, description_src);
+    }
+
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
         if (setting_id != _last_setting) {
             _last_setting = setting_id;

@@ -558,7 +558,10 @@ namespace MOX {
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596cb0});
 
     inline int16_t& _galaxy_map_grid_y =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059b428});
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a1b4e});
+
+    inline int16_t& _galaxy_map_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059b428});
+    inline int16_t& _galaxy_map_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B52});
 
     inline int16_t (&_galaxy_map_star_field)[72] =
         *reinterpret_cast<int16_t(*)[72]>(std::uintptr_t{0x0059B280});

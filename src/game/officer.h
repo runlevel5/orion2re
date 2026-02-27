@@ -61,7 +61,7 @@ namespace OFFICER {
 
     bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx);
 
-    int16_t __cdecl Officer_Maintenance_(int16_t player_num, int16_t leader_idx);
+    int16_t __cdecl Officer_Maintenance_(int16_t param_1, int16_t param_2);
 
     int32_t __cdecl Officer_Cost_(int16_t player_idx, int16_t leader_idx);
 

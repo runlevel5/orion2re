@@ -571,6 +571,7 @@ inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // 
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
 inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // "N"
 inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
+inline const char* s_dot_d_0055a528 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A528}); // ".%d"
 inline char*& PTR_s_GAME_LBX_0055ac4c =
     *reinterpret_cast<char**>(std::uintptr_t{0x0055AC4C});
 inline void*& PTR_s_OFFICER_LBX_00556990 =

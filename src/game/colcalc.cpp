@@ -2054,4 +2054,71 @@ namespace COLCALC {
             }
         }
     }
+
+    char* __cdecl Format_Quotient_(int numerator, int denominator) {
+        int val = numerator;
+
+        if (val < 0) {
+            val = -val;
+            _tmp_quotient[0] = '-';
+        } else {
+            _tmp_quotient[0] = '+';
+        }
+
+        int n_chars = _sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
+        char* fraction_ptr = &_tmp_quotient[1] + n_chars;
+
+        int remainder = val % denominator;
+        if (remainder != 0) {
+            int multiplier = 10;
+            int count = 1;
+
+            if ((remainder * 10) % denominator != 0) {
+                while (count < 5) {
+                    multiplier *= 10;
+                    count++;
+                    if ((remainder * multiplier) % denominator == 0) {
+                        break;
+                    }
+                }
+            }
+
+            if (multiplier != 0) {
+                _sprintf(fraction_ptr, s_dot_d_0055a528, (remainder * multiplier) / denominator);
+            }
+        }
+
+        return _tmp_quotient;
+    }
+
+    short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id) {
+        short count = 0;
+        for (short i = 0; i < 7; i++) {
+            if (MOX::_colony[colony_idx].producing[i] == item_id) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index) {
+        bool found = false;
+        
+        // s_star_data size is 113 (0x71). planet_index is at offset 0x4a.
+        for (int i = 0; i < 5; ++i) {
+            short planet_index = MOX::_star[star_index].planet_index[i];
+            
+            if (planet_index != -1) {
+                // s_planet_data size is 17 (0x11). planet_type is at offset 0x4.
+                int8_t planet_type = MOX::_planet[planet_index].planet_type;
+                
+                // Checks for specific planet types (likely 1 = Asteroids, 2 = Gas Giant)
+                if (planet_type == PLANET_TYPE_ASTEROID || planet_type == PLANET_TYPE_GAS_GIANT) {
+                    found = true;
+                }
+            }
+        }
+        
+        return found;
+    }
 }

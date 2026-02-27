@@ -235,6 +235,7 @@
     <ClInclude Include="src\game\netstart.h" />
     <ClInclude Include="src\game\netturn.h" />
     <ClInclude Include="src\game\newgame.h" />
+    <ClInclude Include="src\game\newpup.h" />
     <ClInclude Include="src\game\newtech.h" />
     <ClInclude Include="src\game\nextturn.h" />
     <ClInclude Include="src\game\npcdiplo.h" />

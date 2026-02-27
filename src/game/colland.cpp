@@ -9,7 +9,7 @@ namespace COLLAND {
         char buffer[500];
         s_planet_data* planet = &MOX::_planet[planet_idx];
 
-        COLSUM::Set_Colony_Font_To_(4);
+        COLONY::Set_Colony_Font_To_(4);
 
         if (planet->colony_index == -1) {
             char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
@@ -109,7 +109,7 @@ namespace COLLAND {
             s_animation_header* anim0 = COLONY::C_Anims_(0);
             animate::Draw_(0, 0, anim0);
 
-            COLSUM::Set_Colony_Font_To_(4);
+            COLONY::Set_Colony_Font_To_(4);
 
             char* planet_name = HACCESS::Get_Planet_Name_((int16_t)COLONY::_planet_handle);
             char* format = ESTRINGS::E_Strings_(0xE5 /* ESTR_COLONY_BUILT_ON_S */);
