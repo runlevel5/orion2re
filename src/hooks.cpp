@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -794,7 +794,7 @@ namespace hooks {
         { 0x004127f0, &GEO::Collect_Black_Holes_ },
         { 0x00484040, &TECH::Tech_Change_ },
         { 0x00493f30, &SYS::Clear_System_Display_Loaded_Flag_ },
-        //{ 0x00496250, &SYS::Init_System_Display_ },
+        { 0x00496250, &SYS::Init_System_Display_ },
         { 0x004967f0, &SYS::Potential_Colony_Info_Popup_ },
         { 0x00496700, &SYS::Need_To_Reload_System_Display_ },
         { 0x00497460, &SYS::Set_System_Display_Loaded_Flag_ },
@@ -1460,9 +1460,19 @@ namespace hooks {
         { 0x004e1120, &COLONY::Check_Military_Fields_ },
         { 0x004dc300, &COLONY::Turn_To_Rubble_CR_Bldg_ },
         { 0x004e0b40, &COLONY::Check_Bldg_Fields_ },
-        { 0x004b53f0, &FAKEBUTS::Clear_Fake_Buttons_ },
         { 0x004dd920, &COLONY::Sum_Colonists_ },
         { 0x0049aff0, &COLONY::Set_Last_Colony_Selected_ },
+        { 0x004e0e80, &COLONY::XY_In_Bldg_Poly_ },
+        { 0x004e05b0, &COLONY::Add_Bldg_Fields_ },
+        { 0x004b53f0, &FAKEBUTS::Clear_Fake_Buttons_ },
+        { 0x00471850, &TEXTBOX::Get_Help_Lbx_Name_ },
+        { 0x004710b0, &TEXTBOX::Do_Text_Box_ },
+        { 0x0043e8c0, &OFFICER::Officer_Maintenance_ },
+        { 0x004fafb0, &COLCALC::Surrender_Empire_ },
+        { 0x004faeb0, &COLCALC::Surrender_Star_ },
+        { 0x004fb230, &COLCALC::Do_Surrender_Colony_ },
+        { 0x004fb520, &COLCALC::Eliminate_Player_ },
+        { 0x004727a0, &MSG_::First_Msg_For_Player_ },
     };
 
     void Install_Hooks()

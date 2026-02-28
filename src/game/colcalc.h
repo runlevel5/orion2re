@@ -208,35 +208,25 @@ namespace COLCALC {
 
     void __cdecl Init_Surrenders_();
 
-    inline void __cdecl Surrender_Empire_(int16_t actor_player, int16_t target_player) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fafb0});
-        fn(actor_player, target_player);
-    }
+    void __cdecl Surrender_Empire_(int16_t player_id, int16_t target_id);
 
     bool __cdecl May_Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t recipient_idx);
 
-    inline void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004faeb0});
-        fn(star_idx, player_idx, to_player_idx);
-    }
+    void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx);
 
-    inline void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner) {
-        using Fn = void(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FB230});
-        fn(colony, new_owner);
+    void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner);
+
+    inline void __cdecl Do_Colony_Owner_Change_Star_Colony_Stuff_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fbea0});
+        fn(colony);
     }
 
     void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner);
 
     void __cdecl Do_Surrender_Empire_(int16_t player_idx, int16_t target_idx);
 
-    inline void __cdecl Eliminate_Player_(s_player* player) {
-        using Fn = void(__cdecl*)(s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004FB520});
-        fn(player);
-    }
+    void __cdecl Eliminate_Player_(s_player* player);
 
     bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx);
 

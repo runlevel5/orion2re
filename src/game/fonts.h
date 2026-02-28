@@ -39,6 +39,12 @@ namespace fonts {
     void __cdecl Set_PSTR_Style_(uint16_t style);
     void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors);
 
+    inline void __cdecl Set_Remap_Font_Style_(int style, s_colors* colors) {
+        using Fn = void(__cdecl*)(int, s_colors*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005254c0});
+        fn(style, colors);
+    }
+
     int16_t __cdecl Get_String_Width_(const char* str);
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);

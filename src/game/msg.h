@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 namespace MSG_ {
     inline uint8_t (&_first_msg)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A66F0});
@@ -12,11 +11,7 @@ namespace MSG_ {
 
     void __cdecl Add_Msg_(s_MSG msg, int16_t plr_idx);
 
-    inline int16_t __cdecl First_Msg_For_Player_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004727a0});
-        return fn(player_idx);
-    }
+    int16_t __cdecl First_Msg_For_Player_(int16_t player_idx);
 
     inline char* __cdecl Load_Msg_Strings_(char* data) {
         using Fn = char*(__cdecl*)(char*);
@@ -55,7 +50,7 @@ namespace MSG_ {
     inline char*& _s_and_s_declare_alliance_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F3C});
     inline char*& _msg_colony_d_rebels_won_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F40});
     inline char*& _msg_hyperspace_flux_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F44});
-    inline char*& _msg_colony_starvation_ind_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F48});
+    inline char*& _msg_financial_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F48});
     inline char*& _msg_lost_colony_leader_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F4C});
     inline char*& _msg_colony_built_android_farmer_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F50});
     inline char*& _native_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00565F54});
@@ -95,6 +90,7 @@ namespace MSG_ {
     inline char*& _msg_colony_plague_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FF8});
     inline char*& _msg_anomaly_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FFC});
     inline char** _msg_diplomacy_strings = reinterpret_cast<char**>(std::uintptr_t{0x00566000});
+    inline char*& _msg_colony_starvation_ind_fmt = *reinterpret_cast<char**>(std::uintptr_t{ 0x00565fa0 });
     inline char*& _msg_colony_starvation_both_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00566014});
     inline char*& _msg_colony_built_spy_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00566018});
     inline char*& _msg_colony_built_building_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056601C});

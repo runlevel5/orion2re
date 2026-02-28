@@ -6,4 +6,10 @@ namespace spy {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b8be0 });
         fn();
     }
+
+    inline void __cdecl Bring_Home_Spies_Vs_(int16_t target_player_idx, int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b97c0});
+        fn(target_player_idx, player_idx);
+    }
 }

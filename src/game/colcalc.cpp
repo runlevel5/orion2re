@@ -219,6 +219,49 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
+        s_star_data* star = &MOX::_star[star_idx];
+
+        star->surrender_to[player_idx] = (int8_t)to_player_idx;
+
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            if (star->surrender_to[i] == (int8_t)player_idx) {
+                star->surrender_to[i] = (int8_t)to_player_idx;
+            }
+        }
+
+        if (star->surrender_to[to_player_idx] != (int8_t)-1) {
+            int8_t indirect_target = star->surrender_to[to_player_idx];
+            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+                if (star->surrender_to[i] == (int8_t)to_player_idx) {
+                    star->surrender_to[i] = indirect_target;
+                }
+            }
+        }
+    }
+
+    void __cdecl Surrender_Empire_(int16_t player_id, int16_t target_id) {
+        MOX::_player[player_id].surrender_to = (char)target_id;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+                if (MOX::_player[i].surrender_to == (char)player_id) {
+                    MOX::_player[i].surrender_to = (char)target_id;
+                }
+            }
+        }
+
+        if (MOX::_player[target_id].surrender_to != -1) {
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+                    if (MOX::_player[i].surrender_to == (char)target_id) {
+                        MOX::_player[i].surrender_to = MOX::_player[target_id].surrender_to;
+                    }
+                }
+            }
+        }
+    }
+
     void __cdecl Init_Surrenders_() {
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
             for (int j = 0; j < (int)MOX::_NUM_PLAYERS; ++j) {
@@ -1809,6 +1852,41 @@ namespace COLCALC {
         return has_other_colony;
     }
 
+    void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner) {
+        int8_t old_owner = colony->owner;
+
+        // Check for Capitol building and remove it upon surrender
+        if (colony->buildings[BUILDING_CAPITOL] != 0) {
+            colony->buildings[BUILDING_CAPITOL] = 0;
+        }
+
+        colony->owner = (char)new_owner;
+        colony->auto_building = 0;
+
+        // Update ownership of individual population units
+        for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
+            uint32_t pop_val = colony->pop[i];
+            // Race/Owner bits are 4-6
+            if (((pop_val & 0x70) >> 4) == (uint32_t)old_owner) {
+                colony->pop[i] = (pop_val & ~0x70) | (((uint32_t)new_owner << 4) & 0x70);
+            }
+        }
+
+        Do_Colony_Owner_Change_Star_Colony_Stuff_(colony);
+        Colony_Environmental_Stuff_(colony);
+        invasion::Enforce_Population_Limits_At_Colony_(colony);
+
+        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+        COLBLDG::Clear_Colony_Queue_(colony_idx);
+        COLCALC::Colony_Calculation_(colony_idx);
+
+        colony->n_turns_existed = 0;
+
+        // Update the 'visited' bitmask for the star system to reflect the new owner
+        int star_idx = MOX::_planet[colony->planet].star_index;
+        MOX::_star[star_idx].visited |= (1 << (uint8_t)new_owner);
+    }
+
     void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner) {
         s_star_data& star = MOX::_star[star_idx];
 
@@ -2120,5 +2198,76 @@ namespace COLCALC {
         }
         
         return found;
+    }
+
+    void __cdecl Eliminate_Player_(s_player* player) {
+        int16_t player_idx = static_cast<int16_t>(player - MOX::_player);
+
+        player->eliminated = 1;
+
+        // Destroy all outposts owned by the eliminated player
+        for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+            if (colony->owner == player_idx && colony->outpost_flag != 0) {
+                BOMB::Destroy_Colony_(colony, -1);
+            }
+        }
+
+        // Release all leaders hired by the eliminated player
+        for (int i = 0; i < 65; ++i) {
+            s_leader_data* leader = &MOX::_leaders[i];
+            if (leader->player_index == player_idx) {
+                leader->status = -2 /* STATUS_RELEASED? */;
+                leader->eta = 0;
+                if (leader->location != -1) {
+                    if (leader->type == 0 /* LEADER_TYPE_SHIP */) {
+                        MOX::_ship[leader->location].officer_index = -1;
+                    } else {
+                        MOX::_star[leader->location].officer_index[player_idx] = -1;
+                    }
+                    leader->location = -1;
+                }
+                leader->player_index = -1;
+            }
+        }
+
+        // Destroy all ships owned by the eliminated player
+        for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+            if (MOX::_ship[i].owner == player_idx) {
+                SHIPS::Kill_Ship_(static_cast<int16_t>(i));
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+        // Clean up diplomatic relations and spies for/against this player
+        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+            BILL::Set_Their_Spy_Number_(player_idx, static_cast<int16_t>(i), 0);
+            if (player_idx != i) {
+                spy::Bring_Home_Spies_Vs_(static_cast<int16_t>(i), (int16_t)player_idx);
+            }
+
+            // Clear treaties from others towards the eliminated player
+            MOX::_player[i].treaty[player_idx] = 0;
+            MOX::_player[i].trade_treaty[player_idx] = 0;
+            MOX::_player[i].research_treaty[player_idx] = 0;
+            MOX::_player[i].tribute_treaty[player_idx] = 0;
+
+            // Clear treaties from the eliminated player towards others
+            MOX::_player[player_idx].treaty[i] = 0;
+            MOX::_player[player_idx].trade_treaty[i] = 0;
+            MOX::_player[player_idx].research_treaty[i] = 0;
+            MOX::_player[player_idx].tribute_treaty[i] = 0;
+        }
+
+        // Reset economic/logistic stats
+        player->n_freighters = 0;
+        player->bc = 0;
+        player->settlers_freighted = 0;
+
+        // Record the date of defeat for the attacker
+        if (player->last_attacker >= 0 && player->last_attacker < 8) {
+            MOX::_player[player->last_attacker].player_defeated[player_idx] = static_cast<int16_t>(MOX::_stardate);
+        }
     }
 }

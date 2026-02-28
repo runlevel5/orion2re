@@ -100,7 +100,8 @@ namespace COLONY {
     inline int16_t& _scanned_bldg_R = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E08});
     inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E18});
     inline int32_t& _colony_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E50});
-    inline int16_t* _colony_bldg_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x0056EA18});
+    inline int16_t (&_colony_bldg_fields)[36] =
+        *reinterpret_cast<int16_t(*)[36]>(std::uintptr_t{0x0056EA18});
 
     inline int16_t (&_pop_fields_coord_var)[8] =
         *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E70});
@@ -137,11 +138,13 @@ namespace COLONY {
 
     char* __cdecl Job_String_(int16_t job_id);
 
-    inline bool __cdecl XY_In_Bldg_Poly_(int16_t x, int16_t y, int16_t row, int16_t col) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e0e80});
-        return fn(x, y, row, col);
+    inline void __cdecl Get_Bldg_Box_(int16_t bldg_type, int32_t bldg_id, int16_t* x_coords, int16_t* y_coords) {
+        using Fn = void(__cdecl*)(int16_t, int32_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd790});
+        fn(bldg_type, bldg_id, x_coords, y_coords);
     }
+
+    bool __cdecl XY_In_Bldg_Poly_(int16_t x, int16_t y, int16_t bldg_type, int32_t bldg_id);
 
     void __cdecl Update_Colony_Palette_();
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
@@ -298,9 +301,12 @@ namespace COLONY {
 
     void __cdecl Add_Satellite_Fields_();
 
-    inline void __cdecl Add_Bldg_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004e05b0)();
+    void __cdecl Add_Bldg_Fields_();
+
+    inline int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int row, int col, int axis) {
+        using Fn = int(__cdecl*)(int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd840});
+        return fn(row, col, axis);
     }
 
     void __cdecl Update_Fields_();

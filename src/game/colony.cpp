@@ -1552,6 +1552,41 @@ namespace COLONY {
         return COLONY::Do_Colony_Info_Military_Stuff_For_(index, prev_ret, count, 1);
     }
 
+    void __cdecl Add_Bldg_Fields_() {
+        // Table of building coordinates (row, col) in a specific processing order (diagonal/diamond scan)
+        static const uint8_t building_coords[36][2] = {
+            {0, 0}, {0, 1}, {1, 0}, {1, 1}, {0, 2}, {2, 0}, {1, 2}, {2, 1},
+            {0, 3}, {3, 0}, {2, 2}, {1, 3}, {3, 1}, {0, 4}, {4, 0}, {3, 2},
+            {2, 3}, {1, 4}, {4, 1}, {0, 5}, {5, 0}, {3, 3}, {2, 4}, {4, 2},
+            {1, 5}, {5, 1}, {4, 4}, {3, 4}, {4, 3}, {2, 5}, {5, 2},
+            {3, 5}, {5, 3}, {4, 5}, {5, 4}, {5, 5}
+        };
+
+        for (int i = 0; i < 36; ++i) {
+            uint8_t row = building_coords[i][0];
+            uint8_t col = building_coords[i][1];
+            int index = row * 6 + col;
+
+            if (COLONY::_colony_bldgs[row].buildings[col] != 0) {
+                int center_x = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 0);
+                int center_y = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 1);
+                char* hotkey_label = ESTRINGS::E_Strings_(12);
+
+                COLONY::_colony_bldg_fields[index] = fields::Add_Hidden_Field_(
+                    (int16_t)(center_x - 20),
+                    (int16_t)(center_y - 30),
+                    (int16_t)(center_x + 20),
+                    (int16_t)(center_y + 10),
+                    hotkey_label,
+                    0
+                );
+            } else {
+                // -1000 indicates no field/empty slot
+                COLONY::_colony_bldg_fields[index] = (int16_t)0xfc18;
+            }
+        }
+    }
+
     void Add_Satellite_Fields_() {
         for (int16_t i = 0; i < 10; ++i) {
             int16_t satellite_id = COLONY::_colony_satellites[i];
@@ -1875,6 +1910,39 @@ namespace COLONY {
             // Update the player's last selected planet in the system's star data
             MOX::_star[star_idx].last_planet_selected[player_idx] = orbit;
         }
+    }
+
+    bool __cdecl XY_In_Bldg_Poly_(int16_t x, int16_t y, int16_t bldg_type, int32_t bldg_id) {
+        int16_t x_coords[4];
+        int16_t y_coords[4];
+        int32_t hit_count = 0;
+
+        COLONY::Get_Bldg_Box_(bldg_type, bldg_id, x_coords, y_coords);
+
+        // Store y in a local because the original code spills/overwrites a stack parameter
+        int32_t y_val = static_cast<int32_t>(y);
+
+        for (int32_t i = 0; i < 4; ++i) {
+            // Calculate indices for the polygon segments (mod 4 wrapping)
+            int32_t next = (i + 1) % 4;
+            int32_t next_next = (i + 2) % 4;
+
+            // Check if the target point (x, y) lies on the same side of edge (i -> next) 
+            // as the vertex (next_next)
+            if (GEO::Points_On_Same_Side_Of_Line_(
+                static_cast<int32_t>(x),
+                y_val,
+                static_cast<int32_t>(x_coords[i]),
+                static_cast<int32_t>(y_coords[i]),
+                static_cast<int32_t>(x_coords[next]),
+                static_cast<int32_t>(y_coords[next]),
+                static_cast<int32_t>(x_coords[next_next]),
+                static_cast<int32_t>(y_coords[next_next])) > 0) {
+                hit_count++;
+            }
+        }
+
+        return hit_count == 4;
     }
 
     int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t param_5, int16_t param_6) {

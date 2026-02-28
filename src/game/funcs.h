@@ -351,24 +351,6 @@ inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
     fn(dest, src, size);
 }
 
-inline size_t __cdecl _strlen(const char* str) {
-    using Fn = size_t(__cdecl*)(const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005419B0 });
-    return fn(str);
-}
-
-inline char* __cdecl _strcpy(char* dest, const char* src) {
-    using Fn = char*(__cdecl*)(char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005418E0 });
-    return fn(dest, src);
-}
-
-inline char* __cdecl _strncpy(char* dest, const char* src, size_t count) {
-    using Fn = char*(__cdecl*)(char*, const char*, size_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bf070});
-    return fn(dest, src, count);
-}
-
 namespace GLOBALS {
     inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
@@ -527,6 +509,11 @@ inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
 inline const char* s_ships_lbx_005597b4 = reinterpret_cast<const char*>(std::uintptr_t{0x005597B4}); // "ships.lbx"
 inline const char* const s_gstar_lbx_00558544 = reinterpret_cast<const char*>(std::uintptr_t{0x00558544}); // "gstar.lbx"
+inline char* const s_SPA_HELP_LBX_00557450 = reinterpret_cast<char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
+inline char* const s_ITA_HELP_LBX_00557460 = reinterpret_cast<char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"
+inline char* const s_FRE_HELP_LBX_00557470 = reinterpret_cast<char*>(std::uintptr_t{0x00557470}); // "FRE_HELP.LBX"
+inline char* const s_GER_HELP_LBX_00557480 = reinterpret_cast<char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
+inline char* const s_HELP_LBX_00557490 = reinterpret_cast<char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"

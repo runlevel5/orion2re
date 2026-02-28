@@ -691,22 +691,22 @@ namespace COLBLDG {
      */
     void __cdecl Get_App_Description_String_(char* dest, int16_t app_id) {
         char lbx_name[20];
-        void* record_ptr;
+        void* record;
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
 
         if (_last_app != app_id) {
             _last_app = app_id;
-            record_ptr = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 0x57B /* 1403 */);
+            // Reload record from LBX if the app index changed
+            record = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 1403 /* 0x57B */);
         } else {
-            record_ptr = _desc_record_ptr;
+            record = _desc_record_ptr;
         }
 
-        _desc_record_ptr = record_ptr;
+        _desc_record_ptr = record;
 
-        char* description_src = (char*)record_ptr + 0x67;
-
-        strcpy(dest, description_src);
+        // Copy the description string located at offset 0x67 of the record
+        strcpy(dest, (char*)record + 0x67);
     }
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
@@ -996,9 +996,6 @@ namespace COLBLDG {
         fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
     }
 
-    /**
-     * @address 0050a290
-     */
     void __cdecl Print_App_Description_(uint16_t x, int16_t y, uint16_t width, int16_t app_id) {
         char help_lbx_name[20];
         char description_buffer[1332];

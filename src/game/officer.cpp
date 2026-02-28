@@ -54,17 +54,20 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
-        int8_t warlord_trait;
+        s_leader_data* leader = &MOX::_leaders[leader_idx];
+        int16_t xp = leader->xp;
+        int8_t warlord = 0;
 
-        if (leader_idx == 0x42 /* 66 */) {
-            warlord_trait = 0;
-        } else {
-            int8_t player_idx = MOX::_leaders[leader_idx].player_index;
-            warlord_trait = MOX::_player[player_idx].traits[30 /* TRAIT_WARLORD */];
+        // Leader index 0x42 (66) appears to be a special case (e.g., Guardian or Orion-related) 
+        // where player traits do not apply.
+        if (leader_idx != 0x42) {
+            int player_idx = (int)leader->player_index;
+            warlord = MOX::_player[player_idx].traits[30 /* TRAIT_WARLORD */];
         }
 
-        int16_t level = OFFICER::Get_Officer_Base_Level_(MOX::_leaders[leader_idx].xp, warlord_trait);
+        int16_t level = Get_Officer_Base_Level_(xp, warlord);
 
+        // The game caps the effective level displayed or used for certain mechanics at 5.
         if (level > 5) {
             level = 5;
         }
@@ -376,30 +379,22 @@ namespace OFFICER {
 
     /**
      * Calculates the maintenance cost for an officer.
-     * Maintenance is calculated as (cost + 99) / 100, with a minimum of 1,
-     * unless the officer has specific general skills (0x1c or 0x1d) or
-     * matches a specific ID (0x41), in which case maintenance is 0.
+     * Maintenance is 0 if the officer has specific general skills (28 or 29) or is rank 0x41.
+     * Otherwise, maintenance is (Officer_Cost + 99) / 100, with a minimum of 1.
      * @address 0043e8c0
      */
-    int16_t __cdecl Officer_Maintenance_(int16_t param_1, int16_t param_2) {
-        int16_t cost = (int16_t)Officer_Cost_(param_1, param_2);
+    int16_t __cdecl Officer_Maintenance_(int16_t officer_idx, int16_t rank_idx) {
+        int32_t raw_cost = Officer_Cost_(officer_idx, rank_idx);
+        int16_t maintenance = static_cast<int16_t>((raw_cost + 99) / 100);
 
-        // Maintenance is cost divided by 100, rounded up
-        int16_t maintenance = (int16_t)((cost + 99 /* 0x63 */) / 100 /* 0x64 */);
+        bool has_skill = Officer_Has_General_Skill_(officer_idx, rank_idx, 28 /* 0x1c */) ||
+                         Officer_Has_General_Skill_(officer_idx, rank_idx, 29 /* 0x1d */);
 
-        // Check for specific general skills (IDs 28 and 29)
-        bool has_special_skill = Officer_Has_General_Skill_(param_1, param_2, 28 /* 0x1c */) != 0;
-        if (!has_special_skill) {
-            has_special_skill = Officer_Has_General_Skill_(param_1, param_2, 29 /* 0x1d */) != 0;
-        }
-
-        // Return 0 maintenance if param_2 is 65 or if the officer has special skills
-        if (param_2 == 65 /* 0x41 */ || has_special_skill) {
+        if (rank_idx == 65 /* 0x41 */ || has_skill) {
             return 0;
         }
 
-        // Minimum maintenance is 1
-        if (maintenance < 1) {
+        if (maintenance <= 1) {
             maintenance = 1;
         }
 
@@ -1958,7 +1953,6 @@ namespace OFFICER {
         int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
         int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
         s_ship_data* ship = &MOX::_ship[ship_idx];
-
         int16_t ship_x = ship->x;
         int16_t ship_y = ship->y;
         int16_t owner = (int16_t)(uint8_t)ship->owner;
@@ -1979,97 +1973,95 @@ namespace OFFICER {
         char race_name[256];
         race_name[0] = '\0';
 
-        int16_t adjusted_owner_idx = node_idx;
         if (node_idx >= 5000) {
-            adjusted_owner_idx -= 0x137F;
-            adjusted_owner_idx = HACCESS::Ship_Stack_Owner_(adjusted_owner_idx);
-            HACCESS::Race_Name_(adjusted_owner_idx, race_name);
+            int16_t adjusted_node_idx = node_idx - 0x137F;
+            adjusted_node_idx = HACCESS::Ship_Stack_Owner_(adjusted_node_idx);
+            HACCESS::Race_Name_(adjusted_node_idx, race_name);
         } else if (owner > 8) {
-            adjusted_owner_idx = HACCESS::Ship_Stack_Owner_(adjusted_owner_idx);
-            HACCESS::Race_Name_(adjusted_owner_idx, race_name);
+            int16_t adjusted_node_idx = HACCESS::Ship_Stack_Owner_(node_idx);
+            HACCESS::Race_Name_(adjusted_node_idx, race_name);
         }
 
-        if (race_name[0] == '\0') {
-            int16_t total, n_colony, n_outpost, n_transport;
+        if (race_name[0] != '\0') {
+            strings::String_To_Upper_(race_name);
+
+            s_colors* p_colors = MISC::Font_Colors2_(4, 'L', 'O');
+            s_colors local_colors;
+            memcpy(local_colors.colors, p_colors->colors, 8);
+
+            fonts::Set_Font_Style_Outline_(4, &local_colors);
+            fonts::Print_Centered_(print_x + 102, print_y + 5, race_name);
+        } else {
+            int16_t n_unknown, n_colony_ships, n_outposts, n_transports;
             int16_t hull_counts[6];
 
-            SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &total, &n_colony, &n_outpost, &n_transport, hull_counts);
+            SYS::N_Ships_By_Type_At_Location_(ship_x, ship_y, owner, &n_unknown, &n_colony_ships, &n_outposts, &n_transports, hull_counts);
 
-            uint8_t player_color_idx = 0x49; // 'I'
+            uint8_t player_palette_color = 0x49; // 'I'
             if (owner < 8) {
                 uint8_t player_color = MOX::_player[owner].color;
-                player_color_idx = MOX::_main_palette_player_colors[player_color];
+                player_palette_color = MOX::_main_palette_player_colors[player_color];
             }
 
-            s_colors local_260, local_230;
-            MISC::Get_Mox_Font_Colors_(1, player_color_idx, player_color_idx + 5, &local_260);
+            s_colors mox_colors;
+            MISC::Get_Mox_Font_Colors_(1, player_palette_color, player_palette_color + 5, &mox_colors);
 
+            s_colors special_colors;
             for (int i = 1; i < 8; ++i) {
-                uint8_t base = local_260.colors[i];
-                local_260.colors[i] = base + 2;
-                local_230.colors[i] = base + 4;
+                mox_colors.colors[i] += 2;
+                special_colors.colors[i] = mox_colors.colors[i] + 2;
             }
 
-            fonts::Set_Font_Special_Colors_(&local_230);
-            fonts::Set_Font_Style_Outline_(1, &local_260);
+            fonts::Set_Font_Special_Colors_(&special_colors);
+            fonts::Set_Font_Style_Outline_(1, &mox_colors);
             fonts::Set_Font_Spacing_(1);
 
             HACCESS::Race_Name_(owner, race_name);
 
-            char text_buffer[512];
-            const char* fleet_msg = HAROLD::H_Message_(HESTR_131_S_FLEET);
-            _sprintf(text_buffer, fleet_msg, race_name);
-            strings::String_To_Upper_(text_buffer);
+            char construction_buffer[512];
+            char temp_sprintf_buf[256];
 
-            char temp_fmt[256];
-            if (n_outpost > 0) {
-                HESTRNGS str_id = (n_outpost == 1) ? HESTR_102_D_OUTPOST : HESTR_103_D_OUTPOSTS;
-                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_outpost);
-                strcat(text_buffer, temp_fmt);
+            _sprintf(construction_buffer, HAROLD::H_Message_(HESTR_131_S_FLEET), race_name);
+            strings::String_To_Upper_(construction_buffer);
+
+            if (n_outposts > 0) {
+                int16_t msg_id = (n_outposts == 1) ? HESTR_102_D_OUTPOST : HESTR_103_D_OUTPOSTS;
+                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_outposts);
+                strcat(construction_buffer, temp_sprintf_buf);
             }
 
-            if (n_transport > 0) {
-                HESTRNGS str_id = (n_transport == 1) ? HESTR_104_D_TRANSPORT : HESTR_105_D_TRANSPORTS;
-                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_transport);
-                strcat(text_buffer, temp_fmt);
+            if (n_transports > 0) {
+                int16_t msg_id = (n_transports == 1) ? HESTR_104_D_TRANSPORT : HESTR_105_D_TRANSPORTS;
+                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_transports);
+                strcat(construction_buffer, temp_sprintf_buf);
             }
 
-            if (n_colony > 0) {
-                HESTRNGS str_id = (n_colony == 1) ? HESTR_106_D_COLONY_SHIP : HESTR_107_D_COLONY_SHIPS;
-                _sprintf(temp_fmt, HAROLD::H_Message_(str_id), (int)n_colony);
-                strcat(text_buffer, temp_fmt);
+            if (n_colony_ships > 0) {
+                int16_t msg_id = (n_colony_ships == 1) ? HESTR_106_D_COLONY_SHIP : HESTR_107_D_COLONY_SHIPS;
+                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_colony_ships);
+                strcat(construction_buffer, temp_sprintf_buf);
             }
 
             for (int i = 0; i < 6; ++i) {
-                int16_t count = (int16_t)hull_counts[i];
-                if (count > 0) {
-                    char* h_name = (count == 1) ? TECHDATA::_hull_data[i].name : TECHDATA::_hull_data[i].size_name;
-                    _sprintf(temp_fmt, "%d %s, ", (int)count, h_name);
-                    strcat(text_buffer, temp_fmt);
+                if (hull_counts[i] > 0) {
+                    const char* hull_name = (hull_counts[i] == 1) ? TECHDATA::_hull_data[i].name : TECHDATA::_hull_data[i].size_name;
+                    _sprintf(temp_sprintf_buf, "%d %s, ", (int)hull_counts[i], hull_name);
+                    strcat(construction_buffer, temp_sprintf_buf);
                 }
             }
 
-            size_t len = strlen(text_buffer);
+            size_t len = strlen(construction_buffer);
             if (len > 2) {
-                text_buffer[len - 2] = '\0';
+                construction_buffer[len - 2] = '\0';
             }
 
-            int16_t text_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_();
+            int16_t text_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(print_width, construction_buffer);
             if (text_height > 21) {
-                fonts::Set_Font_Special_Colors_(&local_230);
-                fonts::Set_Font_Style_Outline_(0, &local_260);
+                fonts::Set_Font_Special_Colors_(&special_colors);
+                fonts::Set_Font_Style_Outline_(0, &mox_colors);
             }
 
-            ERIC::Print_Paragraph_Centered_(print_x, print_y, print_width, 22, text_buffer);
-        } else {
-            strings::String_To_Upper_(race_name);
-
-            s_colors* p_colors = MISC::Font_Colors2_(4, 'L', 'O');
-            s_colors local_260;
-            memcpy(local_260.colors, p_colors->colors, 8);
-
-            fonts::Set_Font_Style_Outline_(4, &local_260);
-            fonts::Print_Centered_(print_x + 102, print_y + 5, race_name);
+            ERIC::Print_Paragraph_Centered_(print_x, print_y, print_width, 22, construction_buffer);
         }
     }
 

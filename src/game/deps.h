@@ -105,6 +105,7 @@
 #include "colony.h"
 #include "events.h"
 #include "bill.h"
+#include "bomb.h"
 #include "geo.h"
 #include "cmbtfir2.h"
 #include "cmbtmis.h"

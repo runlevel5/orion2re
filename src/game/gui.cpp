@@ -25,7 +25,7 @@ char** __cdecl GUI_Prepare_Text(const char* text, int font_id, int width, int* o
         int offset = GUI_Get_Line_Offset(text, width, i);
         int length = GUI_Get_Line_Length(text, width, i);
         lines[i] = (char*)MOX::Check_Allocate(length + 1);
-        _strncpy(lines[i], text + offset, length);
+        strncpy(lines[i], text + offset, length);
         lines[i][length] = '\0';
     }
 
