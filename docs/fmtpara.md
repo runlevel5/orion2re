@@ -96,6 +96,27 @@ Injects variables, ordinals, and handles conditional capitalization. Depending o
 * **`\x18I<arg>`**: Inserts a string conditionally (plural).
   * *Effect*: Prints the string variable only if the plural flag is active.
   * *Example*: `"\x18I0"`
+* **`\x18J<arg>`**: Inserts next argument string conditionally based on argument not being 1.
+  * *Effect*: Prints the next argument string only if the specified variable is anything other than exactly 1.
+  * *Example*: `"\x18J0"`
+* **`\x18K<arg>`**: Inserts a string conditionally (singular).
+  * *Effect*: Prints the string variable only if the plural flag is inactive.
+  * *Example*: `"\x18K0"`
+* **`\x18L<arg>`**: Inserts next argument string conditionally based on argument being 1.
+  * *Effect*: Prints the next argument string only if the specified variable is exactly 1.
+  * *Example*: `"\x18L0"`
+* **`\x18M<arg>`**: Inserts a string conditionally (cond_flag true).
+  * *Effect*: Prints the string variable only if the conditional flag is true.
+  * *Example*: `"\x18M0"`
+* **`\x18N<arg>`**: Inserts next argument string conditionally based on argument not being 0.
+  * *Effect*: Prints the next argument string only if the specified variable is non-zero.
+  * *Example*: `"\x18N0"`
+* **`\x18O<arg>`**: Inserts a string conditionally (cond_flag false).
+  * *Effect*: Prints the string variable only if the conditional flag is false.
+  * *Example*: `"\x18O0"`
+* **`\x18P<arg>`**: Inserts next argument string conditionally based on argument being 0.
+  * *Effect*: Prints the next argument string only if the specified variable is exactly 0.
+  * *Example*: `"\x18P0"`
 * **`\x18Q`**: Switches the text mode to UPPERCASE.
   * *Effect*: Forces all subsequent text to render in capital letters, regardless of how it was typed.
   * *Example*: `"\x18Qshouting\x18T"`
@@ -115,9 +136,36 @@ Evaluates variables and sets a global `cond_flag`. The command is followed by a 
 * **`\x190<arg>`**: `cond_flag = (val1 != 0)`
   * *Effect*: Checks if a variable is non-zero, saving the result (true/false) to be used by later commands (like `\x1FL` to exit text).
   * *Example*: `"\x1900"`
+* **`\x191`**: `cond_flag = use_plural`
+  * *Effect*: Sets the conditional flag to the state of the global plural flag.
+  * *Example*: `"\x191"`
 * **`\x192`**: `cond_flag = !cond_flag`
   * *Effect*: Flips the current true/false state of the conditional flag.
   * *Example*: `"\x192"`
+* **`\x193<arg>`**: `var[arg] = cond_flag`
+  * *Effect*: Saves the current conditional flag state into the specified variable.
+  * *Example*: `"\x1930"`
+* **`\x194<arg1><arg2>`**: `var[arg2] = var[arg1]`
+  * *Effect*: Copies the value of variable `arg1` into variable `arg2`.
+  * *Example*: `"\x19401"`
+* **`\x195<arg1><arg2>`**: `cond_flag = (var[arg2] == var[arg1])`
+  * *Effect*: Checks if two variables are equal.
+  * *Example*: `"\x19501"`
+* **`\x196<arg1><arg2>`**: `cond_flag = (var[arg2] != var[arg1])`
+  * *Effect*: Checks if two variables are not equal.
+  * *Example*: `"\x19601"`
+* **`\x197<arg1><arg2>`**: `cond_flag = (var[arg2] > var[arg1])`
+  * *Effect*: Checks if `var[arg2]` is greater than `var[arg1]`.
+  * *Example*: `"\x19701"`
+* **`\x198<arg1><arg2>`**: `cond_flag = (var[arg2] < var[arg1])`
+  * *Effect*: Checks if `var[arg2]` is less than `var[arg1]`.
+  * *Example*: `"\x19801"`
+* **`\x199<arg1><arg2>`**: `cond_flag = (var[arg2] >= var[arg1])`
+  * *Effect*: Checks if `var[arg2]` is greater than or equal to `var[arg1]`.
+  * *Example*: `"\x19901"`
+* **`\x19A<arg1><arg2>`**: `cond_flag = (var[arg2] <= var[arg1])`
+  * *Effect*: Checks if `var[arg2]` is less than or equal to `var[arg1]`.
+  * *Example*: `"\x19A01"`
 
 ### Text Justification (`\x1A`)
 Changes inline paragraph justification mode. Followed by a numeric character `0-3`.
@@ -150,6 +198,13 @@ Sets the text foreground and background color based on an index `0-5`.
 * **`\x1C6<0-7>`**: Sets the background color to the specific index.
   * *Effect*: Draws a colored highlight box behind the text.
   * *Example*: `"\x1C61Blue Background"`
+
+### Reset Parameters (`\x1D`)
+Resets paragraph parameters based on a bitmask character.
+
+* **`\x1D<char>`**: Reads the lower 4 bits of the character as an index to lookup reset flags.
+  * *Effect*: Resets font spacing, space width, line feeds, or specific paragraph variables depending on the flags.
+  * *Example*: `"\x1D\x01"`
 
 ### Quit Context (`\x1F`)
 Allows early exit from paragraphs or nesting based on conditional logic.
