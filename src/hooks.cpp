@@ -1497,6 +1497,20 @@ namespace hooks {
         { 0x00434e70, &FMTPARA::FN_Set_Y_Pos_ },
         { 0x00435d80, &FMTPARA::Skip_Spaces_ },
         { 0x00435a70, &FMTPARA::Sort_Tabs_ },
+        { 0x004334a0, &FMTPARA::Return_To_Last_Break_ },
+        { 0x00433ad0, &FMTPARA::Complete_Line_Data_ },
+        { 0x00435290, &FMTPARA::Justify_Line_ },
+        { 0x00435440, &FMTPARA::Print_Line_ },
+        { 0x004342e0, &FMTPARA::Insert_Item_ },
+        { 0x00434190, &FMTPARA::Get_Next_Item_Value_ },
+        { 0x004341c0, &FMTPARA::Get_Item_Value_ },
+        { 0x004346e0, &FMTPARA::Get_Insert_Argument_Next_ },
+        { 0x00434240, &FMTPARA::Set_Item_Value_ },
+        { 0x00433d30, &FMTPARA::Reset_Parameters_ },
+        { 0x00435210, &FMTPARA::FN_User_Call_ },
+        { 0x00434ca0, &FMTPARA::FN_Superscript_ },
+        { 0x00435aa0, &FMTPARA::_Comp_Tabs_ },
+        { 0x00526ae0, &fonts::Print_Character_To_Bitmap_ },
     };
 
     void Install_Hooks()

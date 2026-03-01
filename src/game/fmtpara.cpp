@@ -1,5 +1,6 @@
 #include "deps.h"
 #include <cstdlib>
+#include <cstring>
 
 namespace FMTPARA {
     void __cdecl Initialize_Line_Start_() {
@@ -179,6 +180,44 @@ namespace FMTPARA {
         } while (_para_p->para_y <= _para_p->y2_limit);
 
         return false;
+    }
+
+    /**
+     * @address 00433d30
+     */
+    void __cdecl Reset_Parameters_() {
+        uint8_t reset_flags;
+        uint16_t argument;
+
+        _para_p->str++;
+
+        reset_flags = (uint8_t)_reset_parameters_lookup[(uint8_t)*_para_p->str & 0x0F];
+
+        if (reset_flags & 0x01) {
+            Reset_Font_Spacing_();
+        }
+
+        if (reset_flags & 0x02) {
+            Reset_Font_Spacing_Width_();
+        }
+
+        if (reset_flags & 0x04) {
+            Reset_Font_LF_();
+        }
+
+        if (reset_flags & 0x08) {
+            _para_p->para_advance_y = _para_p->line_advance_y;
+        }
+
+        if (reset_flags & 0x10) {
+            Initialize_Formatted_Paragraph_System_();
+        }
+
+        if (reset_flags & 0x20) {
+            if (Get_Insert_Argument_Next_(&argument)) {
+                Reset_A_Paragraph_Variable_(argument);
+            }
+        }
     }
 
     bool __cdecl Process_Command_(char param_1) {
@@ -670,6 +709,31 @@ namespace FMTPARA {
         return false;
     }
 
+    bool __cdecl Get_Insert_Argument_Next_(uint16_t* value) {
+        _para_p->str++;
+        _para_p->str = Skip_Spaces_(_para_p->str);
+
+        int c = _toupper(*_para_p->str);
+        uint16_t digit;
+
+        if (c >= '0' && c <= '9') {
+            digit = (uint16_t)((uint8_t)c - 0x30);
+        }
+        else if (c >= 'A' && c <= 'Z') {
+            digit = (uint16_t)((uint8_t)c - 0x37);
+        }
+        else {
+            return false;
+        }
+
+        if (digit < 0x10) {
+            *value = digit;
+            return true;
+        }
+
+        return false;
+    }
+
     void __cdecl Set_Value_() {
         int16_t rel_x = _line_p->x - _para_p->x1;
         char cmd = _para_p->str[1];
@@ -719,6 +783,133 @@ namespace FMTPARA {
         }
     }
 
+    void __cdecl Insert_Item_() {
+        _para_p->str++;
+        uint8_t c = static_cast<uint8_t>(*_para_p->str);
+        uint16_t arg_idx;
+        bool has_arg = true;
+
+        if (_tabs_3_plus_1[c] != '0') {
+            has_arg = Get_Insert_Argument_Next_(&arg_idx);
+        }
+
+        if (!has_arg) {
+            return;
+        }
+
+        switch (c) {
+        case 'A':
+            Skip_Arg_Insert_A_String_(arg_idx, true);
+            break;
+
+        case 'B': {
+            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            __itoa(val, _tmp_str, 10);
+            Insert_String_(_tmp_str);
+            break;
+        }
+
+        case 'C': {
+            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            __itoa(val, _tmp_str, 10);
+            int len = (int)strlen(_tmp_str);
+            int digit = _tmp_str[len - 1] - '0';
+            sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);
+            Insert_String_(_tmp_str2);
+            break;
+        }
+
+        case 'D': {
+            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            if (val >= 0 && val <= 10) {
+                Insert_String_(_ordinal_word[val]);
+            } else {
+                __itoa(val, _tmp_str, 10);
+                int len = (int)strlen(_tmp_str);
+                int digit = _tmp_str[len - 1] - '0';
+                sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);
+                Insert_String_(_tmp_str2);
+            }
+            break;
+        }
+
+        case 'E':
+            if (_para_global.use_plural) {
+                Insert_String_(s_s_00556218);
+            }
+            break;
+
+        case 'F':
+            if (Get_Item_Value_(arg_idx) != 1) {
+                Insert_String_(s_s_00556218);
+            }
+            break;
+
+        case 'G':
+            if (_para_global.use_plural) {
+                Insert_String_(s_es_0055621c);
+            }
+            break;
+
+        case 'H':
+            if (Get_Item_Value_(arg_idx) != 1) {
+                Insert_String_(s_es_0055621c);
+            }
+            break;
+
+        case 'I':
+            Skip_Arg_Insert_A_String_(arg_idx, _para_global.use_plural);
+            break;
+
+        case 'J':
+            Insert_Next_Argument_String_(Get_Item_Value_(arg_idx) != 1);
+            break;
+
+        case 'K':
+            Skip_Arg_Insert_A_String_(arg_idx, !_para_global.use_plural);
+            break;
+
+        case 'L':
+            Insert_Next_Argument_String_(Get_Item_Value_(arg_idx) == 1);
+            break;
+
+        case 'M':
+            Skip_Arg_Insert_A_String_(arg_idx, _para_global.cond_flag);
+            break;
+
+        case 'N':
+            Insert_Next_Argument_String_(Get_Item_Value_(arg_idx) != 0);
+            break;
+
+        case 'O':
+            Skip_Arg_Insert_A_String_(arg_idx, !_para_global.cond_flag);
+            break;
+
+        case 'P':
+            Insert_Next_Argument_String_(Get_Item_Value_(arg_idx) == 0);
+            break;
+
+        case 'Q':
+            _insert_case = 1;
+            break;
+
+        case 'R':
+            _insert_case = 2;
+            break;
+
+        case 'S':
+            _insert_case = 3;
+            break;
+
+        case 'T':
+            _insert_case = 0;
+            break;
+
+        default:
+            break;
+        }
+    }
+
     bool __cdecl Quit_Context_() {
         char current_char = *_para_p->str;
         _para_p->str++;
@@ -756,6 +947,34 @@ namespace FMTPARA {
         }
 
         _para_p->justify_mode = new_mode;
+    }
+
+    void __cdecl Complete_Line_Data_() {
+        _line_p->line_done = true;
+
+        if (_line_p->char_count > 0) {
+            if (_line_p->line_y_offset != 0) {
+                _char_p = _first_char_p;
+                _end_char_p = &_first_char_p[_line_p->char_count];
+
+                do {
+                    _char_p->y += _line_p->line_y_offset;
+
+                    if (_char_p->y < 0) {
+                        _char_p->y = 0;
+                    }
+
+                    _char_p++;
+                } while (_char_p != _end_char_p);
+
+                _para_p->para_y += _line_p->line_y_offset;
+            }
+
+            int diff = (int)_line_p->x_candidate - (int)_line_p->left_limit_x;
+            _line_p->left_offset_abs = (int16_t)abs(diff);
+        } else {
+            _line_p->left_offset_abs = 0;
+        }
     }
 
     void __cdecl Complete_Line_() {
@@ -809,7 +1028,7 @@ namespace FMTPARA {
                 uint32_t cond_val = (uint32_t)_para_global.cond_flag;
                 uint16_t arg;
                 if (Get_Insert_Argument_Next_(&arg)) {
-                    _para_global.cond_flag = (bool)Set_Item_Value_(cond_val, arg);
+                    _para_global.cond_flag = Set_Item_Value_(arg, cond_val);
                 }
                 break;
             }
@@ -817,7 +1036,7 @@ namespace FMTPARA {
             case '4': {
                 uint16_t arg;
                 if (Get_Insert_Argument_Next_(&arg)) {
-                    _para_global.cond_flag = (bool)Set_Item_Value_(val1, arg);
+                    _para_global.cond_flag = Set_Item_Value_(arg, val1);
                 }
                 break;
             }
@@ -866,6 +1085,82 @@ namespace FMTPARA {
     void __cdecl Set_Current_Colors_() {
         _para_p->str++;
         _style_p->color_attr = (uint8_t)(*_para_p->str << 5);
+    }
+
+    uint32_t __cdecl Get_Item_Value_(uint16_t index) {
+        if (index < 16) {
+            int8_t type = FMTPARA::_para_global.item_type[index];
+            void* ptr = FMTPARA::_para_global.item_ptr[index];
+
+            switch (type) {
+            case 2:
+                // Return as 32-bit dword
+                return *reinterpret_cast<uint32_t*>(ptr);
+
+            case 3:
+                // Return as unsigned 16-bit word
+                return static_cast<uint32_t>(*reinterpret_cast<uint16_t*>(ptr));
+
+            case 4:
+                // Return as signed 16-bit short (sign-extended)
+                return static_cast<int32_t>(*reinterpret_cast<int16_t*>(ptr));
+
+            case 6:
+                // Return as signed 8-bit char (sign-extended)
+                return static_cast<int32_t>(*reinterpret_cast<int8_t*>(ptr));
+
+            case 5:
+            default:
+                // Default case handles type 5 and any undefined types as unsigned 8-bit byte
+                return static_cast<uint32_t>(*reinterpret_cast<uint8_t*>(ptr));
+            }
+        }
+
+        return 0;
+    }
+
+    uint32_t __cdecl Get_Next_Item_Value_() {
+        uint16_t item_id;
+
+        if (FMTPARA::Get_Insert_Argument_Next_(&item_id)) {
+            return (uint32_t)FMTPARA::Get_Item_Value_(item_id);
+        }
+
+        return 0;
+    }
+
+    bool __cdecl Set_Item_Value_(uint16_t index, uint32_t value) {
+        if (index >= 16) {
+            return false;
+        }
+
+        int8_t type = _para_global.item_type[index];
+        void* ptr = _para_global.item_ptr[index];
+
+        switch (type) {
+            case 2:
+                *reinterpret_cast<uint32_t*>(ptr) = value;
+                return true;
+
+            case 3:
+                *reinterpret_cast<uint16_t*>(ptr) = (uint16_t)value;
+                return true;
+
+            case 4:
+                *reinterpret_cast<int16_t*>(ptr) = (int16_t)value;
+                return true;
+
+            case 5:
+                *reinterpret_cast<uint8_t*>(ptr) = (uint8_t)value;
+                return true;
+
+            case 6:
+                *reinterpret_cast<int8_t*>(ptr) = (int8_t)value;
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     void __cdecl Set_Current_Style_() {
@@ -924,7 +1219,7 @@ namespace FMTPARA {
                 if (flag) {
                     value += Get_Item_Value_(_var_index);
                 }
-                Set_Item_Value_(value, _var_index);
+                Set_Item_Value_(_var_index, value);
             }
         }
 
@@ -1248,12 +1543,236 @@ namespace FMTPARA {
         }
     }
 
-    /**
-     * @address 00435a70
-     */
     void __cdecl Sort_Tabs_() {
         if (_tabs[0] > 1) {
             _qsort(&_tabs[1], (size_t)_tabs[0], sizeof(int16_t), _Comp_Tabs_);
         }
+    }
+
+    void __cdecl Justify_Line_(int8_t mode) {
+        s_fmtpara_line* line = _line_p;
+        int16_t remaining_width = (line->right_limit_x - line->left_limit_x - line->left_offset_abs) + 1;
+
+        if (mode != 0 && line->char_count > 0 && remaining_width > 0) {
+            if (mode == 1) {
+                _first_char_p->x_advance += remaining_width;
+            } else if (mode == 2) {
+                _first_char_p->x_advance += (remaining_width / 2);
+            } else if (mode == 3) {
+                _Justify_Line_Fully_(remaining_width);
+            }
+        }
+    }
+
+    bool __cdecl Return_To_Last_Break_() {
+        if (!_break_p->break_valid) {
+            return false;
+        }
+
+        _para_p->str = _break_p->break_str_next;
+        _line_p->x = _break_p->break_x;
+        _line_p->x_candidate = _break_p->break_x_candidate;
+        _insert_case = _break_p->insert_case;
+        _para_p->nest_depth = _break_p->nest_depth;
+        _line_p->line_y_offset = _break_p->line_y_offset;
+        _line_p->font_spacing = _break_p->font_spacing;
+        _line_p->char_count = _break_p->char_count;
+        _line_p->space_count = _break_p->space_count;
+
+        _line_p[1].x = _break_p->x;
+        _line_p[1].left_limit_x = _break_p->left_limit_x;
+        _line_p[1].right_limit_x = _break_p->right_limit_x;
+        _line_p[1].exclusion_left_x = _break_p->exclusion_left_x;
+        _line_p[1].exclusion_right_x = _break_p->exclusion_right_x;
+        _line_p[1].x_candidate = _break_p->x_candidate;
+        *reinterpret_cast<int8_t*>(&_line_p[1].char_count) = _break_p->line_char_count;
+
+        if (_break_p->break_is_backspace && &_first_char_p[_line_p->char_count - 1] == _char_p) {
+            Add_Character_To_Line_('-');
+            _char_p--;
+            _line_p->char_count--;
+            return true;
+        }
+
+        _char_p = &_first_char_p[_line_p->char_count - 1];
+        return true;
+    }
+
+    void __cdecl Print_Line_() {
+        int16_t x = 0;
+
+        if (_line_p->char_count > 0) {
+            _char_p = _first_char_p;
+            _end_char_p = _first_char_p + _line_p->char_count;
+
+            if (_para_p->paragraph_break != 0) {
+                fonts::_font_header.font_style = _first_char_p->fg_and_attr & 0xF;
+                Pick_Font_Color_(_first_char_p->fg_and_attr);
+                _last_fg_and_attr = _char_p->fg_and_attr;
+                Pick_Font_Number_(_char_p->font_id);
+                _last_font_id = _char_p->font_id;
+                _para_p->paragraph_break = 0;
+            }
+
+            do {
+                if (_char_p->fg_and_attr != _last_fg_and_attr) {
+                    fonts::_font_header.font_style = _char_p->fg_and_attr & 0xF;
+                    if (((_char_p->fg_and_attr ^ _last_fg_and_attr) & 0xE0) != 0) {
+                        Pick_Font_Color_(_char_p->fg_and_attr);
+                    }
+                    _last_fg_and_attr = _char_p->fg_and_attr;
+                }
+
+                if (_last_font_id != _char_p->font_id) {
+                    Pick_Font_Number_(_char_p->font_id);
+                    _last_font_id = _char_p->font_id;
+                }
+
+                x += _char_p->x_advance;
+                Set_Max_Min_X_(x, _char_p);
+                Set_Max_Min_Y_(_char_p);
+
+                if (_para_p->do_render) {
+                    if (fonts::_font_header.font_style != 0) {
+                        uint8_t outline_byte = static_cast<uint8_t>(fonts::_outline_color);
+                        uint32_t color_val = (outline_byte << 24) | (outline_byte << 16) | (outline_byte << 8) | outline_byte;
+
+                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[0]) = color_val;
+                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[4]) = color_val;
+
+                        if (_para_p->seg == nullptr) {
+                            if (fonts::_font_header.font_style != 2) {
+                                fonts::Print_Character_(x + 1, _char_p->y + 1, _char_p->ch);
+                                fonts::Print_Character_(x, _char_p->y + 1, _char_p->ch);
+                                fonts::Print_Character_(x + 1, _char_p->y, _char_p->ch);
+                            }
+                            if (fonts::_font_header.font_style != 1 && fonts::_font_header.font_style != 3) {
+                                fonts::Print_Character_(x - 1, _char_p->y, _char_p->ch);
+                                fonts::Print_Character_(x - 1, _char_p->y - 1, _char_p->ch);
+                                fonts::Print_Character_(x, _char_p->y - 1, _char_p->ch);
+                            }
+                            if (fonts::_font_header.font_style == 3 || fonts::_font_header.font_style == 5) {
+                                fonts::Print_Character_(x + 2, _char_p->y + 2, _char_p->ch);
+                                fonts::Print_Character_(x + 1, _char_p->y + 2, _char_p->ch);
+                                fonts::Print_Character_(x + 2, _char_p->y + 1, _char_p->ch);
+                            }
+                            if (fonts::_font_header.font_style > 3) {
+                                fonts::Print_Character_(x + 1, _char_p->y - 1, _char_p->ch);
+                                fonts::Print_Character_(x - 1, _char_p->y + 1, _char_p->ch);
+                            }
+                            if (fonts::_font_header.font_style == 5) {
+                                fonts::Print_Character_(x + 2, _char_p->y, _char_p->ch);
+                                fonts::Print_Character_(x, _char_p->y + 2, _char_p->ch);
+                            }
+                        } else {
+                            if (fonts::_font_header.font_style != 2) {
+                                fonts::Print_Character_To_Bitmap_(x + 1, _char_p->y + 1, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x, _char_p->y + 1, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x + 1, _char_p->y, _char_p->ch, _para_p->seg);
+                            }
+                            if (fonts::_font_header.font_style != 1 && fonts::_font_header.font_style != 3) {
+                                fonts::Print_Character_To_Bitmap_(x - 1, _char_p->y, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x - 1, _char_p->y - 1, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x, _char_p->y - 1, _char_p->ch, _para_p->seg);
+                            }
+                            if (fonts::_font_header.font_style == 3 || fonts::_font_header.font_style == 5) {
+                                fonts::Print_Character_To_Bitmap_(x + 2, _char_p->y + 2, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x + 1, _char_p->y + 2, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x + 2, _char_p->y + 1, _char_p->ch, _para_p->seg);
+                            }
+                            if (fonts::_font_header.font_style > 3) {
+                                fonts::Print_Character_To_Bitmap_(x + 1, _char_p->y - 1, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x - 1, _char_p->y + 1, _char_p->ch, _para_p->seg);
+                            }
+                            if (fonts::_font_header.font_style == 5) {
+                                fonts::Print_Character_To_Bitmap_(x + 2, _char_p->y, _char_p->ch, _para_p->seg);
+                                fonts::Print_Character_To_Bitmap_(x, _char_p->y + 2, _char_p->ch, _para_p->seg);
+                            }
+                        }
+
+                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[0]) =
+                            *reinterpret_cast<uint32_t*>(&fonts::_font_header.normal_colors[0]);
+                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[4]) =
+                            *reinterpret_cast<uint32_t*>(&fonts::_font_header.normal_colors[4]);
+                    }
+
+                    if (_para_p->seg == nullptr) {
+                        fonts::Print_Character_(x, _char_p->y, _char_p->ch);
+                    } else {
+                        fonts::Print_Character_To_Bitmap_(x, _char_p->y, _char_p->ch, _para_p->seg);
+                    }
+                }
+                _char_p++;
+            } while (_char_p != _end_char_p);
+        }
+    }
+
+    /**
+     * @brief Manages superscript font styling.
+     * If val is 0, restores the previously saved font style.
+     * Otherwise, saves the current style and shifts the font ID based on val.
+     */
+    char __cdecl FN_Superscript_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
+        if (val == 0) {
+            // Restore style from saved buffer
+            memcpy(_style_p, _saved_superscript, 13 /* sizeof(s_fmtpara_style) */);
+            return 0;
+        }
+
+        // Backup current style to saved buffer
+        memcpy(_saved_superscript, _style_p, 13 /* sizeof(s_fmtpara_style) */);
+
+        // Calculate new font ID based on superscript depth (val)
+        // font_id is at offset 0 of s_fmtpara_style
+        int32_t new_font_id = (int32_t)_style_p->font_id - val;
+
+        if (new_font_id < 0) {
+            _style_p->font_id = 0;
+        } else if (new_font_id < 6) {
+            _style_p->font_id = (int8_t)new_font_id;
+        } else {
+            _style_p->font_id = 5;
+        }
+
+        Reset_Font_Spacing_();
+        return 0;
+    }
+
+    /**
+     * @address 00435210
+     */
+    int8_t __cdecl FN_User_Call_(int8_t func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
+        // user_fn is at offset 0x58 within s_fmtpara_global
+        void* user_fn_ptr = *reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(&_para_global) + 0x58);
+
+        if (user_fn_ptr == nullptr) {
+            return 0;
+        }
+
+        if (arg_index == 1) {
+            if (arg_ret) {
+                _user_fn_arg = 0;
+            } else {
+                _user_fn_arg = static_cast<uint32_t>(val);
+            }
+            return func_char;
+        }
+
+        // Logical path for either arg_index == 2 or arg_ret being true
+        if (arg_index == 2 || arg_ret) {
+            Update_Max_Min_Values_();
+
+            using UserFn = void(__cdecl*)(s_fmtpara_para*, uint32_t, int32_t);
+            auto fn = reinterpret_cast<UserFn>(user_fn_ptr);
+            fn(_para_p, _user_fn_arg, val);
+
+            return 0;
+        }
+
+        return func_char;
+    }
+
+    int __cdecl _Comp_Tabs_(const void* a, const void* b) {
+        return (int)*(short*)a - (int)*(short*)b;
     }
 }

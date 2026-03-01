@@ -6,17 +6,32 @@ namespace FMTPARA {
     inline char* const _legal_functions = reinterpret_cast<char*>(0x00556288);
     inline char* const _legal_fn_arg_chars = reinterpret_cast<char*>(0x00556298);
     inline uint8_t* _font_base_offsets = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562C8});
+    inline int8_t (&_reset_parameters_lookup)[16] = *reinterpret_cast<int8_t(*)[16]>(std::uintptr_t{0x005562D0});
     inline short (&_tabs)[11] = *reinterpret_cast<short(*)[11]>(std::uintptr_t{0x005562B0});
+    inline uint8_t (&_saved_superscript)[13] = *reinterpret_cast<uint8_t (*)[13]>(std::uintptr_t{0x005650D8});
     inline s_fmtpara_style*& _style_p = *reinterpret_cast<s_fmtpara_style**>(std::uintptr_t{0x005650C4});
     inline s_fmtpara_char*& _char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x005650C8});
     inline s_fmtpara_char*& _end_char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x005650CC});
+    inline uint8_t& _last_fg_and_attr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005650D0});
     inline s_fmtpara_para*& _para_p = *reinterpret_cast<s_fmtpara_para**>(std::uintptr_t{0x005650D4});
     inline int16_t& _insert_case = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005650E8});
     inline s_fmtpara_line*& _line_p = *reinterpret_cast<s_fmtpara_line**>(std::uintptr_t{0x005650F0});
     inline s_fmtpara_break*& _break_p = *reinterpret_cast<s_fmtpara_break**>(std::uintptr_t{0x005650EC});
     inline s_fmtpara_char*& _first_char_p = *reinterpret_cast<s_fmtpara_char**>(std::uintptr_t{0x00565118});
     inline uint16_t& _var_index = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056511C});
+    inline uint8_t& _last_font_id = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565120});
     inline s_fmtpara_global& _para_global = *reinterpret_cast<s_fmtpara_global*>(std::uintptr_t{0x005A7B10});
+    inline char* _tmp_str = reinterpret_cast<char*>(std::uintptr_t{0x005650b0});
+    inline char* _tmp_str2 = reinterpret_cast<char*>(std::uintptr_t{0x005650f8});
+    inline char** _ordinal_ending = reinterpret_cast<char**>(std::uintptr_t{0x00556220});
+    inline char** _ordinal_word = reinterpret_cast<char**>(std::uintptr_t{0x00556248});
+    inline const char* _ordinal_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00556278});
+    inline uint8_t* _tabs_3_plus_1 = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562B7});
+    inline const char* s_s_00556218 = reinterpret_cast<const char*>(std::uintptr_t{0x00556218});
+    inline const char* s_es_0055621c = reinterpret_cast<const char*>(std::uintptr_t{0x0055621C});
+    inline uint32_t& _user_fn_arg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005650C0 });
+
 
     void __cdecl Set_Para_Y2_();
     void __cdecl Reset_Max_Min_Values_();
@@ -26,6 +41,48 @@ namespace FMTPARA {
     uint8_t __cdecl Get_Current_Color_Set_();
 
     void __cdecl Reset_Font_Spacing_();
+
+    inline void __cdecl Initialize_Formatted_Paragraph_System_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433dc0});
+        fn();
+    }
+
+    inline void __cdecl Reset_A_Paragraph_Variable_(uint16_t value) {
+        using Fn = void(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433de0});
+        fn(value);
+    }
+
+    inline void __cdecl Pick_Font_Color_(uint8_t fg_and_attr) {
+        using Fn = void(__cdecl*)(uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435B60});
+        fn(fg_and_attr);
+    }
+
+    inline void __cdecl Pick_Font_Number_(uint8_t font_id) {
+        using Fn = void(__cdecl*)(uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435B90});
+        fn(font_id);
+    }
+
+    inline void __cdecl Update_Max_Min_Values_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435C10});
+        fn();
+    }
+
+    inline void __cdecl Set_Max_Min_X_(short x, s_fmtpara_char* char_p) {
+        using Fn = void(__cdecl*)(short, s_fmtpara_char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435CA0});
+        fn(x, char_p);
+    }
+
+    inline void __cdecl Set_Max_Min_Y_(s_fmtpara_char* char_p) {
+        using Fn = void(__cdecl*)(s_fmtpara_char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435CF0});
+        fn(char_p);
+    }
 
     int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text);
 
@@ -43,31 +100,21 @@ namespace FMTPARA {
 
     void __cdecl Add_Character_To_Line_(char ch);
 
-    inline bool __cdecl Return_To_Last_Break_() {
-        using Fn = bool(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004334A0});
-        return fn();
-    }
+    bool __cdecl Return_To_Last_Break_();
 
     bool __cdecl Previous_Nesting_Level_();
 
-    inline void __cdecl Complete_Line_Data_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433ad0});
-        fn();
+    void __cdecl Complete_Line_Data_();
+
+    void __cdecl Justify_Line_(int8_t mode);
+
+    inline void __cdecl _Justify_Line_Fully_(int16_t remaining_width) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004352F0});
+        fn(remaining_width);
     }
 
-    inline void __cdecl Justify_Line_(int8_t mode) {
-        using Fn = void(__cdecl*)(int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435290});
-        fn(mode);
-    }
-
-    inline void __cdecl Print_Line_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00435440});
-        fn();
-    }
+    void __cdecl Print_Line_();
 
     void __cdecl Complete_Line_();
 
@@ -87,37 +134,41 @@ namespace FMTPARA {
 
     bool __cdecl Quit_Context_();
 
-    inline void __cdecl Insert_Item_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004342E0});
-        fn();
+    void __cdecl Insert_Item_();
+
+    inline void __cdecl Skip_Arg_Insert_A_String_(uint16_t arg, bool flag) {
+        using Fn = void(__cdecl*)(uint16_t, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004346A0});
+        fn(arg, flag);
+    }
+
+    inline int32_t __cdecl Set_Plural_Flag_From_Item_(uint16_t item_idx) {
+        using Fn = int32_t(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00434640});
+        return fn(item_idx);
+    }
+
+    inline void __cdecl Insert_String_(const char* str) {
+        using Fn = void(__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00434760});
+        fn(str);
+    }
+
+    inline void __cdecl Insert_Next_Argument_String_(bool flag) {
+        using Fn = void(__cdecl*)(bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00434670});
+        fn(flag);
     }
 
     void __cdecl Test_Item_();
 
-    inline uint32_t __cdecl Get_Next_Item_Value_() {
-        using Fn = uint32_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00434190});
-        return fn();
-    }
+    uint32_t __cdecl Get_Next_Item_Value_();
 
-    inline int32_t __cdecl Get_Item_Value_(uint16_t index) {
-        using Fn = int32_t(__cdecl*)(uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004341C0});
-        return fn(index);
-    }
+    uint32_t __cdecl Get_Item_Value_(uint16_t index);
 
-    inline bool __cdecl Get_Insert_Argument_Next_(uint16_t* arg) {
-        using Fn = bool(__cdecl*)(uint16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004346E0});
-        return fn(arg);
-    }
+    bool __cdecl Get_Insert_Argument_Next_(uint16_t* value);
 
-    inline uint32_t __cdecl Set_Item_Value_(uint32_t value, uint16_t index) {
-        using Fn = uint32_t(__cdecl*)(uint32_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00434240});
-        return fn(value, index);
-    }
+    bool __cdecl Set_Item_Value_(uint16_t index, uint32_t value);
 
     void __cdecl Set_Justification_();
 
@@ -125,21 +176,13 @@ namespace FMTPARA {
 
     void __cdecl Set_Current_Style_();
 
-    inline void __cdecl Reset_Parameters_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433D30});
-        fn();
-    }
+    void __cdecl Reset_Parameters_();
 
     bool __cdecl Get_Function_Argument_(int32_t* val, bool* flag);
 
     char __cdecl FN_Set_Variable_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
-    inline char __cdecl FN_User_Call_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
-        using Fn = char(__cdecl*)(char, int32_t, int16_t, int16_t, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00435210 });
-        return fn(func_char, val, arg_index, arg_ret, flag);
-    }
+    int8_t __cdecl FN_User_Call_(int8_t func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
     char __cdecl FN_Set_Font_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
@@ -163,19 +206,11 @@ namespace FMTPARA {
 
     char __cdecl FN_Set_Y_Pos_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
-    inline char __cdecl FN_Superscript_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
-        using Fn = char(__cdecl*)(char, int32_t, int16_t, int16_t, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00434ca0 });
-        return fn(func_char, val, arg_index, arg_ret, flag);
-    }
+    char __cdecl FN_Superscript_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag);
 
     char* __cdecl Skip_Spaces_(char* str);
 
-    inline int __cdecl _Comp_Tabs_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00435AA0 });
-        return fn(a, b);
-    }
+    int __cdecl _Comp_Tabs_(const void* a, const void* b);
 
     void __cdecl Sort_Tabs_();
 

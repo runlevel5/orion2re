@@ -1,3 +1,5 @@
+Mapping between MSG.msg_type and used structure type.
+
  0 = MSG_TYPE_COLONY
      base: s_MSG_colony        (u.colony)
      subtype (u.colony.subtype):

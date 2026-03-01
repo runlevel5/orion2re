@@ -1190,10 +1190,7 @@ struct s_fmtpara_global {
     short max_y;
     void *item_ptr[16];
     int8_t item_type[16];
-    undefined field6_0x58;
-    undefined field7_0x59;
-    undefined field8_0x5a;
-    undefined field9_0x5b;
+    void *user_fn;
     bool cond_flag;
     bool use_plural;
 };

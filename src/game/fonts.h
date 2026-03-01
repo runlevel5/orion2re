@@ -48,6 +48,13 @@ namespace fonts {
     int16_t __cdecl Get_String_Width_(const char* str);
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);
+    void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg);
+
+    inline void __cdecl Print_Clipped_Letter_To_Bitmap_(short draw_x, short draw_y, char char_idx, short src_x, short clipped_width, short src_y, short clipped_height, s_animation_header* header) {
+        using Fn = void(__cdecl*)(short, short, char, short, short, short, short, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526bd0});
+        fn(draw_x, draw_y, char_idx, src_x, clipped_width, src_y, clipped_height, header);
+    }
 
     int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character);
 

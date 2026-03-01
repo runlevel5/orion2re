@@ -261,6 +261,56 @@ namespace fonts {
         return updated_x;
     }
 
+    void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg) {
+        if ((uint8_t)ch > 128) {
+            return;
+        }
+
+        short font_h = _font_header.font_style_height;
+        short glyph_w = (short)_font_header.font_style_widths[(uint8_t)ch];
+
+        short anim_w = animate::Get_Width_(seg);
+        short anim_h = animate::Get_Height_(seg);
+
+        short max_x_idx = anim_w - 1;
+        short max_y_idx = anim_h - 1;
+
+        short src_x = 0;
+        short draw_x = x;
+        short clipped_w = glyph_w;
+
+        if (draw_x < 0) {
+            src_x = -draw_x;
+            if (src_x >= glyph_w) {
+                return;
+            }
+            draw_x = 0;
+            clipped_w = glyph_w - src_x;
+        }
+
+        if ((int)draw_x + (int)clipped_w > (int)max_x_idx) {
+            clipped_w = max_x_idx - draw_x + 1;
+            if (clipped_w < 1) {
+                return;
+            }
+        }
+
+        short src_y = 0;
+        short draw_y = y;
+
+        if (draw_y < 0) {
+            src_y = -draw_y;
+            draw_y = 0;
+        }
+
+        short clipped_h = font_h;
+        if ((int)draw_y + (int)clipped_h > (int)max_y_idx) {
+            clipped_h = max_y_idx - draw_y + 1;
+        }
+
+        Print_Clipped_Letter_To_Bitmap_(draw_x, draw_y, ch, src_x, clipped_w, src_y, clipped_h, seg);
+    }
+
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap) {
         Print_Display_To_Bitmap_(x, y, text, 0, bitmap);
     }
