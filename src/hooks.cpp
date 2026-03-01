@@ -1473,6 +1473,17 @@ namespace hooks {
         { 0x004fb230, &COLCALC::Do_Surrender_Colony_ },
         { 0x004fb520, &COLCALC::Eliminate_Player_ },
         { 0x004727a0, &MSG_::First_Msg_For_Player_ },
+        { 0x00433cf0, &FMTPARA::Reset_Font_LF_ },
+        { 0x00433cd0, &FMTPARA::Reset_Font_Spacing_Width_ },
+        { 0x00435d60, &FMTPARA::Set_Para_Y2_ },
+        { 0x00435db0, &FMTPARA::Legalize_Paragraph_Y_ },
+        { 0x00435de0, &FMTPARA::Set_Line_Limits_ },
+        { 0x00435b20, &FMTPARA::Initialize_Line_Start_ },
+        { 0x00435d30, &FMTPARA::Reset_Max_Min_Values_ },
+        { 0x00433120, &FMTPARA::Process_Paragraph_Text_ },
+        { 0x00432F20, &FMTPARA::_Print_Formatted_Paragraph_ },
+        { 0x004337B0, &FMTPARA::Process_Command_ },
+        { 0x00434800, &FMTPARA::Process_Function_ },
     };
 
     void Install_Hooks()

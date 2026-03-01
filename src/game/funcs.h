@@ -13,6 +13,9 @@ inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
+inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
+inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
+
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {
     using Fn = int(__cdecl*)();

@@ -71,6 +71,7 @@
     <ClCompile Include="src\game\file_ani.cpp" />
     <ClCompile Include="src\game\fleetpop.cpp" />
     <ClCompile Include="src\game\flt1.cpp" />
+    <ClCompile Include="src\game\fmtpara.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="src\game\assert.h" />
     <ClInclude Include="src\game\bill.h" />
     <ClInclude Include="src\game\bitmap.h" />
+    <ClInclude Include="src\game\bomb.h" />
     <ClInclude Include="src\game\capture.h" />
     <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\cmbtdrw1.h" />
@@ -246,6 +248,7 @@
     <ClInclude Include="src\game\orion2_str.h" />
     <ClInclude Include="src\game\palette.h" />
     <ClInclude Include="src\game\palstore.h" />
+    <ClInclude Include="src\game\paragrph.h" />
     <ClInclude Include="src\game\platform.h" />
     <ClInclude Include="src\game\funcs.h" />
     <ClInclude Include="src\game\plntsum.h" />

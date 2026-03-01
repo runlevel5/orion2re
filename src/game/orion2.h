@@ -1147,6 +1147,117 @@ struct s_fleet_movement_icon {
     short ship_node_idx;
 };
 
+typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
+
+struct s_fmtpara_break {
+    char *break_str_next;
+    short break_x;
+    short break_x_candidate;
+    short insert_case;
+    short line_y_offset;
+    short font_spacing;
+    short nest_depth;
+    short char_count;
+    short space_count;
+    bool break_is_backspace;
+    bool break_valid;
+    short x;
+    short left_limit_x;
+    short right_limit_x;
+    short exclusion_left_x;
+    short exclusion_right_x;
+    short x_candidate;
+    int8_t line_char_count;
+};
+
+typedef struct s_fmtpara_char s_fmtpara_char, *Ps_fmtpara_char;
+
+struct s_fmtpara_char {
+    short x_advance;
+    short y;
+    uint8_t font_id;
+    uint8_t fg_and_attr;
+    uint8_t bg_color;
+    char ch;
+};
+
+typedef struct s_fmtpara_global s_fmtpara_global, *Ps_fmtpara_global;
+
+struct s_fmtpara_global {
+    short min_x;
+    short min_y;
+    short max_x;
+    short max_y;
+    void *item_ptr[16];
+    int8_t item_type[16];
+    undefined field6_0x58;
+    undefined field7_0x59;
+    undefined field8_0x5a;
+    undefined field9_0x5b;
+    bool cond_flag;
+    bool use_plural;
+};
+
+typedef struct s_fmtpara_line s_fmtpara_line, *Ps_fmtpara_line;
+
+struct s_fmtpara_line {
+    short x;
+    short left_limit_x;
+    short right_limit_x;
+    short exclusion_left_x;
+    short exclusion_right_x;
+    short x_candidate;
+    short char_count;
+    short space_count;
+    short line_y_offset;
+    short prev_x;
+    short left_offset_abs;
+    short font_spacing;
+    bool line_done;
+    int8_t line_started;
+};
+
+typedef struct s_fmtpara_para s_fmtpara_para, *Ps_fmtpara_para;
+
+struct s_fmtpara_para {
+    short para_y;
+    char *str;
+    short x1;
+    short x2;
+    short y;
+    short y_origin;
+    short width;
+    struct s_animation_header *seg;
+    bool do_render;
+    short line_start_x;
+    short line_right_limit_x;
+    short y2_limit;
+    undefined field12_0x1b;
+    undefined field13_0x1c;
+    short line_advance_y;
+    short para_advance_y;
+    short first_line_indent;
+    short right_indent;
+    short left_indent;
+    int8_t justify_mode;
+    int8_t paragraph_break;
+    int16_t nest_depth;
+    struct s_fmtpara_line *nest_stack[10];
+};
+
+typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;
+
+struct s_fmtpara_style {
+    int8_t font_id;
+    undefined1 highlight;
+    uint8_t fg_color;
+    uint8_t bg_color;
+    uint8_t color_attr;
+    short font_height_px;
+    int8_t *char_widths;
+    short space_width;
+};
+
 typedef struct s_font s_font, *Ps_font;
 
 typedef ushort uint16_t;
@@ -1160,13 +1271,13 @@ struct s_font {
     byte special_colors[8];
     uint16_t current_height;
     uint16_t line_height;
-    uint16_t field24_0x28;
+    uint16_t leading_offset;
     short font_style_spacing;
     char font_style_widths[256];
     uint32_t font_style_offsets[256];
     short font_heights[8];
     short font_spacing[8];
-    short field31_0x54c[8];
+    short leading_extra[8];
     byte font_glyph_widths[6][256];
     uint32_t font_glyph_offsets[6][256];
 };
@@ -2399,7 +2510,14 @@ struct s_MSG {
     int8_t msg_type;
     uint8_t priority;
     union s_MSG_union u;
-    undefined field3_0xa[8];
+    undefined field3_0xa;
+    undefined field4_0xb;
+    undefined field5_0xc;
+    undefined field6_0xd;
+    undefined field7_0xe;
+    undefined field8_0xf;
+    undefined field9_0x10;
+    undefined field10_0x11;
 };
 
 typedef struct s_nebula s_nebula, *Ps_nebula;

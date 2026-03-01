@@ -96,9 +96,9 @@ namespace fonts {
         _font_header.current_height = _font_header.font_heights[font_style];
         _font_header.font_style_height = _font_header.font_heights[font_style];
         _font_header.font_style = 0;
-        _font_header.field24_0x28 = _font_header.field31_0x54c[font_style];
+        _font_header.leading_offset = _font_header.leading_extra[font_style];
         _font_header.font_style_spacing = _font_header.font_spacing[font_style];
-        _font_header.line_height = _font_header.font_style_height + _font_header.field24_0x28;
+        _font_header.line_height = _font_header.font_style_height + _font_header.leading_offset;
 
         for (int i = 0; i < 255; ++i) {
             _font_header.font_style_widths[i] = _font_header.font_glyph_widths[font_style][i];

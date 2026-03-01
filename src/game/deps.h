@@ -124,6 +124,7 @@
 #include "techinit.h"
 #include "desbox.h"
 #include "fmtpara.h"
+#include "paragrph.h"
 #include "haccess.h"
 #include "diplomac.h"
 #include "diplodef.h"
