@@ -1242,7 +1242,8 @@ struct s_fmtpara_para {
     int8_t justify_mode;
     int8_t paragraph_break;
     int16_t nest_depth;
-    struct s_fmtpara_line *nest_stack[10];
+    char *nest_stack[9];
+    struct s_fmtpara_line *line;
 };
 
 typedef struct s_fmtpara_style s_fmtpara_style, *Ps_fmtpara_style;

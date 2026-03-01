@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -66,9 +66,7 @@ namespace hooks {
         { 0x0043d300, &FILEDEF::Update_Game_Settings_Version_Number_ },
         { 0x00478e80, &INITGAME::Set_Default_Game_Settings_ },
         { 0x004f24d0, &HAROLD::Get_Font_File_ },
-#ifndef SKIP_MAIN
         { 0x00483470, &MOX2::main2_ },
-#endif
         { 0x005274d0, &mouse::Set_Mouse_List_ },
         { 0x00527680, &mouse::Mouse_Button_ },
         { 0x0052d580, &sound::Set_Audio_Buffer_ },
@@ -316,10 +314,8 @@ namespace hooks {
         { 0x00525820, &fonts::Print_Centered_ },
         { 0x00525740, &fonts::Set_Font_Spacing_ },
         { 0x005257f0, &fonts::Print_Right_ },
-#ifndef SKIP_MAIN
         { 0x004c5700, &MAINSCR::Draw_Main_Main_Screen_ },
         { 0x004c6550, &MAINSCR::Draw_Main_Screen_Filled_ },
-#endif
         { 0x004c6880, &MAINSCR::Draw_Nebulae_ },
         { 0x004c5830, &MAINSCR::Draw_Diplomacy_Request_Lights_ },
         { 0x005365b0, &draw::Draw_Bitmap_Sprite_ },
@@ -380,10 +376,8 @@ namespace hooks {
         { 0x0049e0e0, &MISC::Decrease_Font_Color_Range_ },
         { 0x0049e920, &MISC::Get_Font_Spacing_ },
         { 0x004cbc60, &MAINSCR::Draw_Mini_Main_Offscreen_ },
-#ifndef SKIP_MAIN
         { 0x004c4fe0, &MAINSCR::Do_System_Popup_ },
         { 0x004c4430, &MAINSCR::Add_Map_Fields_ },
-#endif
         { 0x00513680, &MOVEBOX::Move_Box_To_Top_ },
         { 0x0049edc0, &MISC::Save_Window_Status_ },
         { 0x0049eda0, &MISC::Restore_Window_Status_ },
@@ -440,14 +434,10 @@ namespace hooks {
         { 0x00406f70, &BILL::Get_Their_Spy_Number_ },
         { 0x004b56a0, &MAPGEN::Update_Planet_Group_Cache },
         { 0x00432100, &INITGAME::Get_Design_Hull_Size_ },
-#ifndef SKIP_MAIN
         { 0x00483830, &MOX2::Screen_Control_ },
-#endif
         { 0x004e9560, &MAINMENU::Main_Menu_Fade_Function_ },
         { 0x004e90b0, &MAINMENU::Add_Main_Menu_Fields_ },
-#ifndef SKIP_MAIN
         { 0x004e8c90, &MAINMENU::Main_Menu_Screen_ },
-#endif
         { 0x004e9d50, &MAINMENU::Reload_Main_Menu_Screen_ },
         { 0x004e9580, &MAINMENU::Main_Menu_Fade_Function2_ },
         { 0x004e9250, &MAINMENU::Do_Main_Menu_File_Animation_ },
@@ -498,9 +488,7 @@ namespace hooks {
         { 0x00481380, &INITSHIP::Best_Armor_ },
         { 0x004822c0, &INITSHIP::Get_FTL_Speed_ },
         { 0x004831a0, &INITSHIP::Get_Structure_ },
-#ifndef SKIP_MAIN
         { 0x005127b0, &MAINSCR::Add_Moveable_Box_Fields_ },
-#endif
         { 0x0051edf0, &fields::Get_Input_ },
         { 0x00526F20, &mouse::Pointer_X_ },
         { 0x00526F70, &mouse::Pointer_Y_ },
@@ -587,9 +575,7 @@ namespace hooks {
         { 0x0042e620, &DESIGN::Get_Base_Combat_Speed_ },
         { 0x0042e650, &DESIGN::Get_Ship_Speed_Modifier_ },
         { 0x0042e5b0, &DESIGN::Current_Design_Base_Combat_Speed_ },
-#ifndef SKIP_MAIN
         { 0x0042e6b0, &DESIGN::Design_Screen_ },
-#endif
         { 0x00432830, &DESIGN::Weapon_Space_ },
         { 0x0049a490, &DESIGN::Current_Design_Size_ },
         { 0x0042d5d0, &DESIGN::Build_Initial_Design_Template_ },
@@ -646,9 +632,7 @@ namespace hooks {
         { 0x004c8b80, &MAINSCR::Add_Cheats_ },
         { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
         { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
-#ifndef SKIP_MAIN
         { 0x004c7720, &MAINSCR::Main_Screen_ },
-#endif
         { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
         { 0x00431fb0, &DESIGN::Tech_Level_ },
         { 0x00431b10, &DESIGN::Shield_Cost_ },
@@ -825,10 +809,8 @@ namespace hooks {
         { 0x004825c0, &INITSHIP::Auto_Strategic_Design_Ship_ },
         { 0x0052e930, &allocate::Allocate_First_Block_ },
         { 0x004d3c10, &CMBTDRW1::Detailed_View_Ship_ },
-#ifndef SKIP_MAIN
         { 0x0050e7d0, &COLBLDG::Build_Arrays_ },
         { 0x0050e490, &COLBLDG::Build_Queue_Popup_ },
-#endif
         { 0x00509a80, &COLBLDG::Calculate_Building_Array_ },
         { 0x0050d170, &COLBLDG::Selection_Name_ },
         { 0x004dc3a0, &COLONY::Real_Building_Name_ },
@@ -902,9 +884,7 @@ namespace hooks {
         { 0x004de000, &COLONY::Draw_Colony_Bldg_ },
         { 0x004e1bd0, &COLONY::Allocate_Mini_Planet_Cache_ },
         { 0x004012a0, &COLSUM::Reset_List_Col_Array_ },
-#ifndef SKIP_MAIN
         { 0x00402800, &COLSUM::Colony_Summary_Screen_ },
-#endif
         { 0x004dd5b0, &COLONY::N_Houses_In_Bldg_Array_ },
         { 0x004dd600, &COLONY::Find_Replacement_Slot_For_Building_ },
         { 0x004df750, &COLONY::Clear_Galaxy_Map_Fields_ },
@@ -1061,9 +1041,7 @@ namespace hooks {
         { 0x004f3630, &COLCALC::Colony_Empire_Base_Food2_Produced_ },
         { 0x004f43f0, &COLCALC::Colony_Empire_Base_Industry_Produced_ },
         { 0x004f4e60, &COLCALC::Colony_Empire_Base_Research_Produced_ },
-#ifndef SKIP_MAIN
         { 0x004867a0, &NEWGAME::Newgame_Screen_ },
-#endif
         { 0x00486f60, &NEWGAME::Temps_To_Globals_ },
         { 0x00486390, &NEWGAME::Reload_Newgame_Screen_ },
         { 0x00486fd0, &NEWGAME::Globals_To_Temps_ },
@@ -1484,6 +1462,41 @@ namespace hooks {
         { 0x00432F20, &FMTPARA::_Print_Formatted_Paragraph_ },
         { 0x004337B0, &FMTPARA::Process_Command_ },
         { 0x00434800, &FMTPARA::Process_Function_ },
+        { 0x00433c90, &FMTPARA::Reset_Font_Spacing_ },
+        { 0x00433990, &FMTPARA::Quit_Paragraph_ },
+        { 0x00433C10, &FMTPARA::Vertical_Move_Line_Advance_ },
+        { 0x00433bf0, &FMTPARA::Vertical_Move_Paragraph_Advance_ },
+        { 0x00435ac0, &FMTPARA::Get_Current_Color_Set_ },
+        { 0x00432e70, &FMTPARA::Get_Formatted_Paragraph_Max_Height_ },
+        { 0x00432ee0, &FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_ },
+        { 0x00432dd0, &FMTPARA::Print_Formatted_Paragraph_ },
+        { 0x00433600, &FMTPARA::Record_Break_Position_ },
+        { 0x004333e0, &FMTPARA::Add_Character_To_Line_ },
+        { 0x004347c0, &FMTPARA::Previous_Nesting_Level_ },
+        { 0x00433a70, &FMTPARA::Complete_Line_ },
+        { 0x00433ba0, &FMTPARA::Paragraph_HT_ },
+        { 0x00433c30, &FMTPARA::Vertical_Move_ },
+        { 0x00434060, &FMTPARA::Set_Value_ },
+        { 0x00433950, &FMTPARA::Quit_Context_ },
+        { 0x00433ec0, &FMTPARA::Test_Item_ },
+        { 0x004339f0, &FMTPARA::Set_Justification_ },
+        { 0x00433e40, &FMTPARA::Set_Current_Colors_ },
+        { 0x00433e60, &FMTPARA::Set_Current_Style_ },
+        { 0x00434b20, &FMTPARA::Get_Function_Argument_ },
+        { 0x00434d40, &FMTPARA::FN_Set_Variable_ },
+        { 0x00434bd0, &FMTPARA::FN_Set_Font_ },
+        { 0x00434ee0, &FMTPARA::FN_Set_H_Spacing_ },
+        { 0x004350e0, &FMTPARA::FN_Set_Indent_ },
+        { 0x00435010, &FMTPARA::FN_Set_Margins_ },
+        { 0x00435140, &FMTPARA::FN_Set_Origin_ },
+        { 0x00434fb0, &FMTPARA::FN_Set_FF_Size_ },
+        { 0x00434f20, &FMTPARA::FN_Set_Space_Size_ },
+        { 0x00434db0, &FMTPARA::FN_Set_Tabs_ },
+        { 0x00434f70, &FMTPARA::FN_Set_V_Spacing_ },
+        { 0x00434e20, &FMTPARA::FN_Set_X_Pos_ },
+        { 0x00434e70, &FMTPARA::FN_Set_Y_Pos_ },
+        { 0x00435d80, &FMTPARA::Skip_Spaces_ },
+        { 0x00435a70, &FMTPARA::Sort_Tabs_ },
     };
 
     void Install_Hooks()
