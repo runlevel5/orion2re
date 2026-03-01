@@ -1,14 +1,4 @@
-#include "deps.h"
-#include "haccess.h"
-#include "evanhelp.h"
-#include "colony.h"
-#include "officer.h"
-#include "misc.h"
-#include "fonts.h"
-#include "harold.h"
-#include "mox.h"
-#include <cstdio>
-#include <cstring>
+#include "pch.h"
 
 namespace MOVEBOX {
     void __cdecl Draw_Galaxy_Map_Box_(s_animation_header* anim1, s_animation_header* anim2,

@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "regions.h"
+#include "pch.h"
 
 namespace regions {
     void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {

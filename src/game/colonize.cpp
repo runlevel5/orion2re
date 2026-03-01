@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace COLONIZE {
     int16_t Star_N_Uncolonized_Planets_(s_star_data* star) {

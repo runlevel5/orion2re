@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace COLSUM {
     void __cdecl Check_Galaxy_Map_Fields_(int16_t* param_1, int16_t* param_2) {

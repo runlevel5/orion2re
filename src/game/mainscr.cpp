@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace MAINSCR {
     bool __cdecl Is_Main_Screen_Palette_() {

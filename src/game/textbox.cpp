@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "textbox.h"
+#include "pch.h"
 
 namespace TEXTBOX {
     void __cdecl Get_Help_Lbx_Name_(char* lbx_name) {

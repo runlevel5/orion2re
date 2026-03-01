@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace INITSHIP {
     void __cdecl Init_Ship_Designs_(int16_t player_idx) {

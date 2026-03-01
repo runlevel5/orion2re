@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace random {
     uint32_t __cdecl Get_Random_Seed_() {

@@ -1,8 +1,4 @@
-#include "deps.h"
-#include <cstdlib>
-#include <cstring>
-#include <algorithm>
-#include "advciv.h"
+#include "pch.h"
 
 namespace ADVCIV {
     bool __cdecl Enemy_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {

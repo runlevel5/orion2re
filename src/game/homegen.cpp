@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace HOMEGEN {
     bool __cdecl Star_Has_Planet_(int16_t star_index) {
@@ -1306,14 +1305,14 @@ namespace HOMEGEN {
         }
 
         MOX::_star[0].system_special = SYSTEM_SPECIAL_ORION_STAR;
-        std::memcpy(MOX::_star[0].name, s_Orion, 6);
+        memcpy(MOX::_star[0].name, s_Orion, 6);
 
         if (MOX::_star[0].spectral_class == STAR_CLASS_BLACK_HOLE) {
             MOX::_star[0].spectral_class = (int8_t)random::Random_(6) - 1;
         }
 
         s_star_data star_temp;
-        std::memcpy(&star_temp, &MOX::_star[orion_star_idx], sizeof(s_star_data));
+        memcpy(&star_temp, &MOX::_star[orion_star_idx], sizeof(s_star_data));
 
         int16_t star0_x = MOX::_star[0].x;
         int16_t star0_y = MOX::_star[0].y;
@@ -1325,7 +1324,7 @@ namespace HOMEGEN {
         MOX::_star[0].y = star_temp.y;
 
         s_planet_data* p = &MOX::_planet[target_planet_idx];
-        std::memset(p, 0, sizeof(s_planet_data));
+        memset(p, 0, sizeof(s_planet_data));
 
         p->colony_index = -1;
         p->orbit = (int8_t)selected_orbit;

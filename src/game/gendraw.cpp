@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace GENDRAW {
     void __cdecl Message_Box_(char* text) {

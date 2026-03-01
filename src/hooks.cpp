@@ -1511,6 +1511,19 @@ namespace hooks {
         { 0x00434ca0, &FMTPARA::FN_Superscript_ },
         { 0x00435aa0, &FMTPARA::_Comp_Tabs_ },
         { 0x00526ae0, &fonts::Print_Character_To_Bitmap_ },
+        { 0x00433dc0, &FMTPARA::Initialize_Formatted_Paragraph_System_ },
+        { 0x00433de0, &FMTPARA::Reset_A_Paragraph_Variable_ },
+        { 0x00435b60, &FMTPARA::Pick_Font_Color_ },
+        { 0x00435b90, &FMTPARA::Pick_Font_Number_ },
+        { 0x00435c10, &FMTPARA::Update_Max_Min_Values_ },
+        { 0x00435ca0, &FMTPARA::Set_Max_Min_X_ },
+        { 0x00435cf0, &FMTPARA::Set_Max_Min_Y_ },
+        { 0x004346a0, &FMTPARA::Skip_Arg_Insert_A_String_ },
+        { 0x00434640, &FMTPARA::Set_Plural_Flag_From_Item_ },
+        { 0x00434760, &FMTPARA::Insert_String_ },
+        { 0x00434670, &FMTPARA::Insert_Next_Argument_String_ },
+        { 0x00434780, &FMTPARA::Insert_A_String_ },
+        { 0x004352f0, &FMTPARA::_Justify_Line_Fully_ },
     };
 
     void Install_Hooks()

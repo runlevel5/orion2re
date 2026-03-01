@@ -1,10 +1,4 @@
-#include <string.h>
-#include "deps.h"
-#include "haccess.h"
-#include "techdata.h"
-#include "mox.h"
-#include "exitm.h"
-#include "funcs.h"
+#include "pch.h"
 
 namespace HACCESS {
     int16_t __cdecl Ship_Owner_(int16_t ship_idx) {

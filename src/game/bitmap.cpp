@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace bitmap {
     void __cdecl Get_Bitmap_Actual_Size_(s_animation_header* header, int16_t* out_min_x, int16_t* out_min_y, int16_t* out_actual_width, int16_t* out_actual_height) {

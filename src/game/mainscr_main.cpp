@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace MAINSCR {
     void __cdecl Print_Main_Screen_Data_() {

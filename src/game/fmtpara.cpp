@@ -1,8 +1,27 @@
-#include "deps.h"
-#include <cstdlib>
-#include <cstring>
+#include "pch.h"
 
 namespace FMTPARA {
+    /**
+     * @address 00433de0
+     */
+    void __cdecl Reset_A_Paragraph_Variable_(uint16_t index) {
+        if (index < 16) {
+            uint32_t* var_ptr = &FMTPARA::_variable[index];
+            _para_global.item_ptr[index] = var_ptr;
+            _para_global.item_type[index] = 2;
+            *var_ptr = 0;
+        }
+    }
+
+    /**
+     * @address 00433dc0
+     */
+    void __cdecl Initialize_Formatted_Paragraph_System_() {
+        for (uint16_t i = 0; i < 0x10; ++i) {
+            Reset_A_Paragraph_Variable_(i);
+        }
+    }
+
     void __cdecl Initialize_Line_Start_() {
         _line_p->line_y_offset = 0;
         _line_p->space_count = 0;
@@ -1549,6 +1568,84 @@ namespace FMTPARA {
         }
     }
 
+    /**
+     * @address 004352f0
+     */
+    void __cdecl _Justify_Line_Fully_(int16_t extra_space) {
+        short space_count = _line_p->space_count;
+        short char_count = _line_p->char_count;
+        uint32_t spread_index;
+
+        if (space_count == 0 || (char_count / 4) < space_count) {
+            spread_index = 0;
+        } else {
+            // Check if space_count <= char_count / 8
+            if (space_count <= (char_count / 8)) {
+                spread_index = 2;
+            } else {
+                spread_index = 1;
+            }
+        }
+
+        uint16_t non_space_justify_count = 0;
+        _end_char_p = &_first_char_p[char_count];
+
+        s_fmtpara_char* first_non_space = _first_char_p;
+        while (first_non_space < _end_char_p && first_non_space->ch == ' ') {
+            first_non_space++;
+        }
+
+        if (first_non_space != _end_char_p) {
+            // Start distributing extra space from the character following the first non-space
+            s_fmtpara_char* distribution_start = first_non_space + 1;
+            uint16_t flag_offset = 0;
+
+            while (extra_space > 0) {
+                uint8_t flags = justify_spread_flags[spread_index * 8 + flag_offset];
+
+                if (flags & 2) {
+                    non_space_justify_count++;
+                    if (non_space_justify_count > 3) {
+                        // Cap non-space justification to 3 passes
+                        flags = 1; /* Force space-only justification */
+                        if (_line_p->space_count == 0) {
+                            return;
+                        }
+                    }
+                }
+
+                s_fmtpara_char* current = distribution_start;
+                while (current < _end_char_p) {
+                    bool applied = false;
+                    if (current->ch == ' ') {
+                        if (flags & 1) {
+                            current->x_advance++;
+                            extra_space--;
+                            applied = true;
+                        }
+                    } else {
+                        if (flags & 2) {
+                            current->x_advance++;
+                            extra_space--;
+                            applied = true;
+                        }
+                    }
+
+                    if (applied && extra_space <= 0) {
+                        return;
+                    }
+                    current++;
+                }
+
+                flag_offset++;
+                // Check for null terminator in flag pattern and reset
+                if (justify_spread_flags[spread_index * 8 + flag_offset] == 0) {
+                    flag_offset = 0;
+                }
+            }
+        }
+    }
+
     void __cdecl Justify_Line_(int8_t mode) {
         s_fmtpara_line* line = _line_p;
         int16_t remaining_width = (line->right_limit_x - line->left_limit_x - line->left_offset_abs) + 1;
@@ -1774,5 +1871,138 @@ namespace FMTPARA {
 
     int __cdecl _Comp_Tabs_(const void* a, const void* b) {
         return (int)*(short*)a - (int)*(short*)b;
+    }
+
+    void __cdecl Pick_Font_Color_(uint8_t fg_and_attr) {
+        uint32_t masked_val = static_cast<uint32_t>(fg_and_attr) & 0xE0;
+
+        if (masked_val == 0x00) {
+            fonts::Set_Normal_Colors_On_();
+        } else if (masked_val == 0x20) {
+            fonts::Set_Highlight_Colors_On_();
+        } else if (masked_val == 0x40) {
+            fonts::Set_Special_Colors_On_();
+        }
+    }
+
+    void __cdecl Pick_Font_Number_(uint8_t font_id) {
+        uint8_t saved_selected_colors[8];
+        s_colors saved_current_colors;
+
+        // Backup original font color states
+        memcpy(saved_selected_colors, fonts::_font_header.selected_colors, 8);
+        saved_current_colors = fonts::_current_font_color_array;
+
+        if (font_id & 0x80) {
+            // Apply new font style using the normal_colors array as a reference
+            // TYPE MISMATCH: existing stub uses s_colors* for colors instead of uint8_t*
+            fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), reinterpret_cast<s_colors*>(fonts::_font_header.normal_colors));
+        }
+
+        // Restore the original font color states that might have been modified by Set_Remap_Font_Style_
+        memcpy(fonts::_font_header.selected_colors, saved_selected_colors, 8);
+        fonts::_current_font_color_array = saved_current_colors;
+    }
+
+    void __cdecl Update_Max_Min_Values_() {
+        short current_x = 0;
+
+        if (FMTPARA::_line_p->char_count > 0) {
+            FMTPARA::_char_p = FMTPARA::_first_char_p;
+            FMTPARA::_end_char_p = &FMTPARA::_first_char_p[FMTPARA::_line_p->char_count];
+
+            if (FMTPARA::_char_p != FMTPARA::_end_char_p) {
+                do {
+                    current_x += FMTPARA::_char_p->x_advance;
+                    FMTPARA::Set_Max_Min_X_(current_x, FMTPARA::_char_p);
+                    FMTPARA::Set_Max_Min_Y_(FMTPARA::_char_p);
+                    FMTPARA::_char_p++;
+                } while (FMTPARA::_char_p != FMTPARA::_end_char_p);
+            }
+
+            int diff = (int)FMTPARA::_line_p->x_candidate - (int)FMTPARA::_first_char_p->x_advance;
+            FMTPARA::_line_p->left_offset_abs = (short)abs(diff);
+        }
+    }
+
+    void __cdecl Set_Max_Min_X_(short current_x, s_fmtpara_char* char_info) {
+        if (FMTPARA::_first_char_p->x_advance < current_x) {
+            uint8_t font_index = char_info->font_id & 0x7F;
+            current_x += fonts::_font_header.font_glyph_widths[font_index][(uint8_t)char_info->ch];
+        }
+
+        if (current_x < FMTPARA::_para_global.min_x) {
+            FMTPARA::_para_global.min_x = current_x;
+            return;
+        }
+
+        if (current_x > FMTPARA::_para_global.max_x) {
+            FMTPARA::_para_global.max_x = current_x;
+        }
+    }
+
+    void __cdecl Set_Max_Min_Y_(s_fmtpara_char* char_p) {
+        int16_t y = char_p->y;
+
+        if (y < _para_global.min_y) {
+            _para_global.min_y = y;
+        }
+
+        int16_t font_height = fonts::_font_header.font_heights[char_p->font_id & 0x7f];
+        int16_t total_y = y + font_height;
+
+        if (total_y > _para_global.max_y) {
+            _para_global.max_y = total_y;
+        }
+    }
+
+    uint32_t __cdecl Set_Plural_Flag_From_Item_(short item_idx) {
+        uint32_t value = FMTPARA::Get_Item_Value_(item_idx);
+
+        if (value != 1) {
+            FMTPARA::_para_global.use_plural = true;
+        } else {
+            FMTPARA::_para_global.use_plural = false;
+        }
+
+        return value;
+    }
+
+    void __cdecl Insert_Next_Argument_String_(bool flag) {
+        uint16_t arg_index;
+
+        if (FMTPARA::Get_Insert_Argument_Next_(&arg_index)) {
+            FMTPARA::Skip_Arg_Insert_A_String_(arg_index, flag);
+        }
+    }
+
+    void __cdecl Skip_Arg_Insert_A_String_(uint16_t arg, bool flag) {
+        if (!flag) {
+            _para_p->str++;
+        } else {
+            char* string_to_insert;
+            if (arg < 16) {
+                string_to_insert = (char*)_para_global.item_ptr[arg];
+            } else {
+                // If arg >= 16, string_to_insert is used uninitialized from the local stack slot
+            }
+            Insert_String_(string_to_insert);
+        }
+    }
+
+    /**
+     * @address 00434780
+     */
+    void __cdecl Insert_A_String_(char* new_str) {
+        if (_para_p->nest_depth < 10) {
+            _para_p->nest_stack[_para_p->nest_depth] = _para_p->str;
+            _para_p->nest_depth++;
+            _para_p->str = new_str;
+        }
+    }
+
+    void __cdecl Insert_String_(const char* param_1) {
+        FMTPARA::_para_p->str++;
+        FMTPARA::Insert_A_String_(const_cast<char*>(param_1));
     }
 }

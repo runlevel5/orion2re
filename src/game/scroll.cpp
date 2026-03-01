@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace SCROLL {
     int16_t __cdecl Get_Vertical_Scroll_Bar_Height_(s_scroll_bar* sb) {

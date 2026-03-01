@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace COLCALC {
     void __cdecl Colony_Morale_(s_colony* colony, char* debug) {

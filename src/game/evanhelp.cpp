@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace EVANHELP {
     void __cdecl Set_Main_Game_Screen_Help_List_() {

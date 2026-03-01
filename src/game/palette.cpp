@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace palette {
     void __cdecl Set_Palette_Changes_(int32_t start_index, int32_t end_index) {

@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace aitech {
     int __cdecl Player_Best_Armor_(s_player* player) {

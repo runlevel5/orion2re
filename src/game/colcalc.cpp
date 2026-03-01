@@ -1,5 +1,4 @@
-#include "deps.h"
-#include <cstring>
+#include "pch.h"
 
 namespace COLCALC {
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {

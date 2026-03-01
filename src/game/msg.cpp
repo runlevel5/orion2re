@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace MSG_ {
     int16_t __cdecl N_Msgs_For_Player_(int16_t player_idx) {

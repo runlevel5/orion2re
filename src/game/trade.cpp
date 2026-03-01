@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace TRADE {
     void __cdecl Process_Research_Agreement_(s_player* plr, int16_t target_plr_idx) {

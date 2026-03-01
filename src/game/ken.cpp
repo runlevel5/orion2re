@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "ken.h"
+#include "pch.h"
 
 namespace KEN {
     s_animation_header* __cdecl Do_Get_Ship_Picture_Seg(int16_t player_idx, int16_t ship_type) {

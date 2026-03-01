@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace FILEDEF {
     void __cdecl Load_Game_Settings_() {

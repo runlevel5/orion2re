@@ -1,7 +1,4 @@
-#include "deps.h"
-#include <cmath>
-#include <cstdio>
-#include <cstring>
+#include "pch.h"
 
 namespace OFFICER {
     int16_t __cdecl Get_Officer_Level_(int16_t leader_idx) {
@@ -816,7 +813,7 @@ namespace OFFICER {
             OFFICER::_offscrn_flash_value += OFFICER::_offscrn_flash_dir;
         }
 
-        MOX::_multi_colored_line_start = (std::abs(MOX::_multi_colored_line_start + 1)) % 8;
+        MOX::_multi_colored_line_start = (abs(MOX::_multi_colored_line_start + 1)) % 8;
     }
 
     void Officers_Screen_() {
@@ -2104,7 +2101,7 @@ namespace OFFICER {
         MOX::_officer_pictures_screen_seg = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
         
         _ldrpict = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
-        std::memset(_ldrpict, 0, 0x30);
+        memset(_ldrpict, 0, 0x30);
 
         _prev_leaders = static_cast<s_prev_leader_data*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
 

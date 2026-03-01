@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "aipower.h"
+#include "pch.h"
 
 namespace aipower {
     int16_t __cdecl Get_Best_Ship_Shield_Value_(int16_t player_idx) {

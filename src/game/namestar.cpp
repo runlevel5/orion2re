@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace namestar {
     int16_t Star_Name_Popup_Screen_Center_X_() {

@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace ERIC {
     uint16_t __cdecl Get_Fade_Percent_() {

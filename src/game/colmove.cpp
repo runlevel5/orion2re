@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "colmove.h"
+#include "pch.h"
 
 namespace COLMOVE {
     void __cdecl Draw_Cluster_(int16_t x, int16_t y) {

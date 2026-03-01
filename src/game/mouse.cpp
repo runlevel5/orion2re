@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace mouse {
     int16_t __cdecl Mouse_Buffer_() {

@@ -1,9 +1,4 @@
-#include "deps.h"
-#include <cstdlib>
-#include <cstring>
-#include "random.h"
-#include "diplodef.h"
-#include "npcdiplo.h"
+#include "pch.h"
 
 namespace diplomac {
     // Suggested name: Sneak_Attack_Evaluations

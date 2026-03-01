@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace lostship {
     void __cdecl Compute_Stars_In_Range_Of_Player_(int8_t* in_range_basic, int8_t* in_range_extended, int16_t player_idx) {

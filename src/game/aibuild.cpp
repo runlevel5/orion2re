@@ -1,6 +1,4 @@
-#include <cstring>
-#include "deps.h"
-#include "aibuild.h"
+#include "pch.h"
 
 namespace AIBUILD {
     int16_t __cdecl Mean_Ship_Strength_(s_ship_data* ship) {

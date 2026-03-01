@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace npcdiplo {
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_id_1, int16_t player_id_2) {

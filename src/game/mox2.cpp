@@ -1,5 +1,4 @@
-#include "deps.h"
-#include "diplodef.h"
+#include "pch.h"
 
 namespace MOX2 {
     void __cdecl Init_Map_Pictures_Default__() {

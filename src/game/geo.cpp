@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace GEO {
     void __cdecl Initialize_Black_Hole_Blocks_(int16_t distance) {

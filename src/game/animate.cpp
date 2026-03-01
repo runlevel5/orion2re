@@ -1,4 +1,4 @@
-#include "deps.h"
+#include "pch.h"
 
 namespace animate {
     short __cdecl Get_Full_Store_Flag_(s_animation_header* header) {
