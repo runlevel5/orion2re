@@ -61,7 +61,7 @@ namespace OFFICER {
 
     bool __cdecl One_Leader_With_Galactic_Lore_(int16_t player_idx);
 
-    int16_t __cdecl Officer_Maintenance_(int16_t officer_idx, int16_t rank_idx);
+    int16_t __cdecl Officer_Maintenance_(int16_t player_idx, int16_t leader_idx);
 
     int32_t __cdecl Officer_Cost_(int16_t player_idx, int16_t leader_idx);
 
@@ -138,6 +138,12 @@ namespace OFFICER {
     int8_t __cdecl Get_Star_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t star_idx);
 
     void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta);
+
+    inline void __cdecl Ai_Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship) {
+        using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444650});
+        fn(player, leader, ship);
+    }
 
     bool __cdecl Leader_Can_Be_Assigned_(int16_t leader_idx);
 

@@ -107,11 +107,7 @@ namespace COLBLDG {
 
     void __cdecl Delete_Ship_(short ship_index);
 
-    inline void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx) {
-        using Fn = void(__cdecl*)(short, short);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050B360});
-        fn(colony_idx, queue_idx);
-    }
+    void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx);
 
     void __cdecl Clear_Colony_Queue_(int16_t colony_idx);
 

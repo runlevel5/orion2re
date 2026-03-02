@@ -218,6 +218,17 @@ namespace COLCALC {
         }
     }
 
+    void __cdecl Do_Colony_Owner_Change_Star_Colony_Stuff_(s_colony* colony) {
+        s_planet_data* planet = &MOX::_planet[colony->planet];
+        s_star_data* star = &MOX::_star[planet->star_index];
+
+        COLCALC::Compute_Star_Colony_Stuff_(star);
+
+        if (colony->buildings[BUILDING_WARP_INTERDICTOR] != 0) {
+            SHIPMOVE::Update_Ship_ETAs_(-1);
+        }
+    }
+
     void __cdecl Surrender_Star_(int16_t star_idx, int16_t player_idx, int16_t to_player_idx) {
         s_star_data* star = &MOX::_star[star_idx];
 

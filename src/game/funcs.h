@@ -8,6 +8,9 @@ void __cdecl nullsub_004d7840();
 struct s_animation_header;
 struct s_ship_design;
 struct s_crew_data;
+struct s_player;
+struct s_leader_data;
+struct s_star_data;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
@@ -556,6 +559,12 @@ inline void __cdecl Save_Hotseat_Map_Info_() {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBD70});
     fn();
 }
+
+inline void __cdecl _Squeeze_Print_Paragraph_(uint16_t p1, int16_t p2, int16_t p3, int16_t p4, char* p5, uint16_t p6, int16_t* p7, int8_t p8, int8_t p9) {
+    using Fn = void(__cdecl*)(uint16_t, int16_t, int16_t, int16_t, char*, uint16_t, int16_t*, int8_t, int8_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407480});
+    fn(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+}
 inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
 inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
@@ -606,6 +615,12 @@ inline void __cdecl Move_Officer_To_Pool_(int16_t officer_idx) {
     fn(officer_idx);
 }
 
+inline void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star) {
+    using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_star_data*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004446C0});
+    fn(player, leader, star);
+}
+
 inline bool __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
     using Fn = bool(__cdecl*)(void*, int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFB5});
@@ -621,4 +636,10 @@ inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
 inline void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_num) {
     using Fn = void(__cdecl*)(int16_t, int16_t);
     reinterpret_cast<Fn>(0x0049aff0)(colony_idx, player_num);
+}
+
+inline void __cdecl Set_Plyr_Info_Btns_(int32_t button_id) {
+    using Fn = void(__cdecl*)(int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004299E0});
+    fn(button_id);
 }

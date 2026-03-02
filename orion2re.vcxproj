@@ -28,6 +28,7 @@
     <ClCompile Include="src\game\aileader.cpp" />
     <ClCompile Include="src\game\aimove.cpp" />
     <ClCompile Include="src\game\aipower.cpp" />
+    <ClCompile Include="src\game\aistage.cpp" />
     <ClCompile Include="src\game\aitech.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
@@ -37,6 +38,8 @@
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\cmbtdrw1.cpp" />
+    <ClCompile Include="src\game\cmbtfir2.cpp" />
+    <ClCompile Include="src\game\cmbtmis.cpp" />
     <ClCompile Include="src\game\colbcach.cpp" />
     <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
@@ -129,6 +132,7 @@
     <ClCompile Include="src\patch.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -392,7 +396,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;ORION2RE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

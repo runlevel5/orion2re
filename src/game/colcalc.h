@@ -216,11 +216,7 @@ namespace COLCALC {
 
     void __cdecl Do_Surrender_Colony_(s_colony* colony, int16_t new_owner);
 
-    inline void __cdecl Do_Colony_Owner_Change_Star_Colony_Stuff_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fbea0});
-        fn(colony);
-    }
+    void __cdecl Do_Colony_Owner_Change_Star_Colony_Stuff_(s_colony* colony);
 
     void __cdecl Do_Surrender_Star_(int16_t star_idx, int16_t old_owner, int16_t new_owner);
 

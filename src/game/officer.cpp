@@ -51,20 +51,21 @@ namespace OFFICER {
     }
 
     int16_t __cdecl Owned_Officer_Level_(int leader_idx) {
+        int8_t warlord;
         s_leader_data* leader = &MOX::_leaders[leader_idx];
         int16_t xp = leader->xp;
-        int8_t warlord = 0;
 
-        // Leader index 0x42 (66) appears to be a special case (e.g., Guardian or Orion-related) 
-        // where player traits do not apply.
-        if (leader_idx != 0x42) {
-            int player_idx = (int)leader->player_index;
-            warlord = MOX::_player[player_idx].traits[30 /* TRAIT_WARLORD */];
+        // Leader index 66 (0x42) is handled as having no warlord bonus
+        if (leader_idx == 0x42) {
+            warlord = 0;
+        } else {
+            int player_idx = (int)(int8_t)leader->player_index;
+            // trait[30] corresponds to TRAIT_WARLORD
+            warlord = MOX::_player[player_idx].traits[30];
         }
 
         int16_t level = Get_Officer_Base_Level_(xp, warlord);
 
-        // The game caps the effective level displayed or used for certain mechanics at 5.
         if (level > 5) {
             level = 5;
         }
@@ -375,22 +376,28 @@ namespace OFFICER {
     }
 
     /**
-     * Calculates the maintenance cost for an officer.
-     * Maintenance is 0 if the officer has specific general skills (28 or 29) or is rank 0x41.
-     * Otherwise, maintenance is (Officer_Cost + 99) / 100, with a minimum of 1.
+     * Calculates the maintenance cost for an officer in a specific slot.
+     * Logic: (cost + 99) / 100, clamped to minimum 1, unless the officer has
+     * specific skills or is in a specific slot (0x41).
      * @address 0043e8c0
      */
-    int16_t __cdecl Officer_Maintenance_(int16_t officer_idx, int16_t rank_idx) {
-        int32_t raw_cost = Officer_Cost_(officer_idx, rank_idx);
-        int16_t maintenance = static_cast<int16_t>((raw_cost + 99) / 100);
+    int16_t __cdecl Officer_Maintenance_(int16_t player_idx, int16_t leader_idx) {
+        int32_t cost = (int32_t)OFFICER::Officer_Cost_(player_idx, leader_idx);
+        int16_t maintenance = (int16_t)((cost + 99) / 100);
 
-        bool has_skill = Officer_Has_General_Skill_(officer_idx, rank_idx, 28 /* 0x1c */) ||
-                         Officer_Has_General_Skill_(officer_idx, rank_idx, 29 /* 0x1d */);
+        bool has_free_maintenance_skill = false;
+        if (OFFICER::Officer_Has_General_Skill_(player_idx, leader_idx, 28 /* 0x1c */)) {
+            has_free_maintenance_skill = true;
+        } else if (OFFICER::Officer_Has_General_Skill_(player_idx, leader_idx, 29 /* 0x1d */)) {
+            has_free_maintenance_skill = true;
+        }
 
-        if (rank_idx == 65 /* 0x41 */ || has_skill) {
+        // Slot 0x41 or maintenance skills result in 0 maintenance
+        if (leader_idx == 65 /* 0x41 */ || has_free_maintenance_skill) {
             return 0;
         }
 
+        // Clamp maintenance to a minimum of 1
         if (maintenance <= 1) {
             maintenance = 1;
         }

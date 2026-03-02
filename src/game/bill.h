@@ -2,6 +2,8 @@
 #include <cstdint>
 
 namespace BILL {
+    struct s_animation_header;
+
     inline void __cdecl Bill_Init_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00406780})();
@@ -14,37 +16,18 @@ namespace BILL {
 
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index);
 
-    inline void __cdecl Bill_Default_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004067b0});
-        fn();
-    }
+    void __cdecl Bill_Default_(void);
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
     void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies);
 
-    inline void __cdecl Squeeze_Print_(int16_t x, int16_t y, char* text, int16_t limit) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004073E0});
-        fn(x, y, text, limit);
-    }
+    void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width);
 
-    inline void __cdecl Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t w, int16_t h, char* str, int16_t align) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407650});
-        fn(x, y, w, h, str, align);
-    }
+    void __cdecl Squeeze_Print_Paragraph_(uint16_t x, int16_t y, int16_t w, int16_t h, char* str, uint16_t align);
 
-    inline void __cdecl Squeeze_Paragraph_Centered_(int16_t x1, int16_t x2, int16_t y, int16_t height, char* text, int16_t unknown) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004076b0});
-        fn(x1, x2, y, height, text, unknown);
-    }
+    void __cdecl Squeeze_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color);
 
-    inline void __cdecl Squeeze_Print_Formatted_Paragraph_(int x, int y, int x2, int y2, char* buffer, int unknown) {
-        using Fn = void(__cdecl*)(int, int, int, int, char*, int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00407680})(x, y, x2, y2, buffer, unknown);
-    }
+    void __cdecl Squeeze_Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t flags);
 
     inline void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t a1, int16_t y, uint16_t type, int16_t a4, void* buffer, int32_t a6) {
         using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, int16_t, void*, int32_t);
@@ -75,11 +58,16 @@ namespace BILL {
         return fn(width, text);
     }
 
-    inline void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t width, int16_t* unknown_ptr, int16_t unknown_val1, int8_t unknown_val2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t*, int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00407210 });
-        fn(x, y, str, width, unknown_ptr, unknown_val1, unknown_val2);
+    inline uint8_t (&_space_limits)[8] =
+        *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00551138});
+
+    inline void __cdecl _Print_String_Bill_(int16_t x, int16_t y, int16_t limit_w, const char* str, int16_t p6, int32_t p7, void* p5) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407C20});
+        fn(x, y, limit_w, str, p6, p7, p5);
     }
+
+    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, void* p5, int16_t p6, bool adjust_y);
 
     inline void __cdecl Record_History_() {
         using Fn = void(__cdecl*)();

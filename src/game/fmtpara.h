@@ -36,6 +36,12 @@ namespace FMTPARA {
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005650C0 });
 
 
+    inline void __cdecl Init_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432EF0});
+        fn();
+    }
+
     void __cdecl Set_Para_Y2_();
     void __cdecl Reset_Max_Min_Values_();
     void __cdecl Reset_Font_LF_();

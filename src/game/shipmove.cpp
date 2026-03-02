@@ -539,4 +539,56 @@ namespace SHIPMOVE {
             }
         }
     }
+
+    /**
+     * @address 00437290
+     */
+    void __cdecl Update_Ship_ETAs_(int32_t player_id) {
+        int num_ships = (int)MOX::_NUM_SHIPS;
+        s_ship_data* ships = MOX::_ship;
+
+        for (int i = 0; i < num_ships; ++i) {
+            s_ship_data* ship = &ships[i];
+
+            // Only process ships that are active/moving and do not belong to player_id
+            if ((ship->status == 1 || ship->status == 2) && (int16_t)ship->owner != (int16_t)player_id) {
+                int16_t dest_star_idx = SHIPMOVE::Ship_Destination_Star_(ship);
+                s_star_data* star = &MOX::_star[dest_star_idx];
+
+                int32_t target_x = (int32_t)star->x;
+                int32_t target_y = (int32_t)star->y;
+
+                int16_t current_x = ship->x;
+                int16_t current_y = ship->y;
+                uint8_t turn_count = 0;
+
+                int8_t local_a;
+                int8_t local_9;
+
+                // Simulate movement turn by turn until destination is reached
+                while ((int32_t)current_x != target_x || (int32_t)current_y != target_y) {
+                    turn_count++;
+
+                    int8_t* navigator_ptr = nullptr;
+                    if (ship->group_has_navigator != 1) {
+                        navigator_ptr = &local_a;
+                    }
+
+                    GEO::Move_Player_1_Turn_To_Star_(
+                        (uint8_t)ship->owner,
+                        current_x,
+                        current_y,
+                        dest_star_idx,
+                        (int16_t)(uint8_t)ship->travelling_speed,
+                        &current_x,
+                        &current_y,
+                        navigator_ptr,
+                        &local_9
+                    );
+                }
+
+                ship->turns_left = (char)turn_count;
+            }
+        }
+    }
 }

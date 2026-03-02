@@ -102,6 +102,126 @@ namespace BILL {
     }
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width) {
-        _Squeeze_Print_(x - (width / 2), y, str, width, nullptr, 2, 1);
+        _Squeeze_Print_(x - (width / 2), y, str, width, nullptr, 2, true);
+    }
+
+    /**
+     * @address 004073e0
+     */
+    void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width) {
+        _Squeeze_Print_(x, y, text, max_width, nullptr, 0, true);
+    }
+
+    /**
+     * @address 00407210
+     */
+    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, void* p5, int16_t p6, bool adjust_y) {
+        bool resized = false;
+        int16_t current_width = fonts::Get_String_Width_(str);
+
+        if (current_width <= limit_w) {
+            _Print_String_Bill_(x, y, limit_w, str, p6, 1, p5);
+            return;
+        }
+
+        uint8_t orig_space_width = (uint8_t)fonts::_font_header.font_style_widths[32];
+        int16_t orig_spacing = fonts::_font_header.font_style_spacing;
+        uint16_t orig_current_font_style = fonts::_current_font_style;
+        int16_t orig_font_style = fonts::_font_header.font_style;
+        int16_t y_offset = 0;
+        int16_t initial_height = fonts::Get_Font_Height_();
+
+        while (true) {
+            while ((uint8_t)fonts::_font_header.font_style_widths[32] > BILL::_space_limits[fonts::_current_font_style]) {
+                if (fonts::Get_String_Width_(str) <= limit_w) {
+                    break;
+                }
+                fonts::_font_header.font_style_widths[32]--;
+            }
+
+            current_width = fonts::Get_String_Width_(str);
+            while (current_width > limit_w && fonts::_font_header.font_style_spacing > 1) {
+                fonts::_font_header.font_style_spacing--;
+                current_width = fonts::Get_String_Width_(str);
+            }
+
+            current_width = fonts::Get_String_Width_(str);
+            if (current_width <= limit_w || fonts::_current_font_style <= 0) {
+                fonts::_font_header.font_style = orig_font_style;
+                _Print_String_Bill_(x, y + y_offset, limit_w, str, p6, 1, p5);
+
+                fonts::_font_header.font_style_spacing = orig_spacing;
+                fonts::_font_header.font_style_widths[32] = (char)orig_space_width;
+
+                if (resized) {
+                    fonts::Set_Font_Style_(orig_current_font_style, (s_colors*)fonts::_font_header.selected_colors);
+                    fonts::_font_header.font_style = orig_font_style;
+                }
+                return;
+            }
+
+            fonts::Set_Font_Style_(fonts::_current_font_style - 1, (s_colors*)fonts::_font_header.normal_colors);
+
+            if (adjust_y) {
+                int16_t new_height = fonts::Get_Font_Height_();
+                y_offset = (initial_height - new_height) / 2;
+            }
+            resized = true;
+        }
+    }
+
+    /**
+     * @address 00407650
+     */
+    void __cdecl Squeeze_Print_Paragraph_(uint16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, char* param_5, uint16_t param_6) {
+        // Calls the internal version with default terminal parameters
+        _Squeeze_Print_Paragraph_(param_1, param_2, param_3, param_4, param_5, param_6, nullptr, 0, 0);
+    }
+
+    /**
+     * @address 004067b0
+     */
+    void __cdecl Bill_Default_(void) {
+        if (MOX::_settings.game_difficulty < 2) {
+            Set_Plyr_Info_Btns_(4);
+        }
+        FMTPARA::Init_();
+    }
+
+    /**
+     * @address 004076b0
+     */
+    void __cdecl Squeeze_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color) {
+        // Centering logic: y_offset = height / 2
+        int16_t centered_y = (int16_t)(height / 2) + y;
+
+        _Squeeze_Print_Paragraph_(
+            x,
+            centered_y,
+            width,
+            height,
+            text,
+            color,
+            nullptr,
+            0,
+            1
+        );
+    }
+
+    /**
+     * @address 00407680
+     */
+    void __cdecl Squeeze_Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t flags) {
+        _Squeeze_Print_Paragraph_(
+            x,
+            y,
+            width,
+            height,
+            text,
+            flags,
+            nullptr,
+            1,
+            0
+        );
     }
 }

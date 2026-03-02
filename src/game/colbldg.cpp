@@ -1279,6 +1279,17 @@ namespace COLBLDG {
         COLONY::Remap_Draw_Ship_Centered_(244, 56, index);
     }
 
+    void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx) {
+        s_colony* col = &MOX::_colony[colony_idx];
+
+        do {
+            for (short i = queue_idx; i < 6; i++) {
+                col->producing[i] = col->producing[i + 1];
+            }
+            col->producing[6] = -1;
+        } while (col->producing[queue_idx] == -10);
+    }
+
     /**
      * @brief Removes an item from a colony's production queue and cleans up associated ship data if necessary.
      *
