@@ -357,6 +357,12 @@ inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
     fn(dest, src, size);
 }
 
+inline void __cdecl Swap_Structure_(void* ptr1, void* ptr2, int size) {
+    using Fn = void(__cdecl*)(void*, void*, int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D169});
+    fn(ptr1, ptr2, size);
+}
+
 namespace GLOBALS {
     inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
@@ -461,6 +467,9 @@ inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x0055
 inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   // ""
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
+
+inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00552CD8}); // "Monster (ship id: %d) cannot move to %s (%d)!"
 
 inline const char* const s_Auto_Save_00556938 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"

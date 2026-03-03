@@ -233,12 +233,12 @@ namespace MAINSCR {
         Get_Star_Draw_Coords_(MOX::_eta_star_id, &dest_x, &dest_y);
 
         if (MOX::_g_ship_move_info.moving != 0 && MOX::_g_ship_move_info.turns_left != 0) {
-            color_buffer = _ship_direction_line_red_colors;
+            color_buffer = _ship_direction_line_green_colors;
 
             SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, &color_buffer, MOX::_multi_colored_line_start);
         } else if ((MOX::_g_ship_move_info.blackhole_blocks != 0 || MOX::_g_ship_move_info.hyperspace_flux != 0) ||
-                 (MOX::_g_ship_move_info.field6_0x6 != 0 && MOX::_g_ship_move_info.immobile == 0)) {
-            color_buffer = _ship_direction_line_green_colors;
+                 (MOX::_g_ship_move_info.out_of_range != 0 && MOX::_g_ship_move_info.immobile == 0)) {
+            color_buffer = _ship_direction_line_red_colors;
 
             SHIPS::Draw_Directional_Multi_Colored_Line_(x, y, dest_x, dest_y, &color_buffer, MOX::_multi_colored_line_start);
         }

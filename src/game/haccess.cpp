@@ -1,6 +1,19 @@
 #include "pch.h"
 
 namespace HACCESS {
+    /**
+     * @address 0049b240
+     */
+    int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx) {
+        int16_t node_idx = MOX::_ship_icon[ship_icon_idx].node_idx;
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+
+        return MOX::_ship[ship_idx].location;
+    }
+
+    /**
+     * @address 0049b270
+     */
     int16_t __cdecl Ship_Owner_(int16_t ship_idx) {
         int16_t error_code = 0;
 
@@ -302,8 +315,11 @@ namespace HACCESS {
         return MOX::_ship_node[MOX::_fleet_movement_icon[icon_idx].ship_node_idx].ship_idx;
     }
 
+    /**
+     * @address 0049b530
+     */
     int16_t __cdecl Ship_Stack_Owner_(int16_t stack_idx) {
-        return Ship_Owner_(MOX::_ship_node[stack_idx].ship_idx);
+        return HACCESS::Ship_Owner_(MOX::_ship_node[stack_idx].ship_idx);
     }
 
     /**
@@ -480,6 +496,33 @@ namespace HACCESS {
      * @param filter The ship type to filter for (0xFF for no filter).
      * @return The number of selected ships found.
      */
+    /**
+     * @brief Retrieves the X coordinate of a ship at a specific index in the ship node stack.
+     *
+     * @param stack_idx Index in the ship node list.
+     * @return The X coordinate of the ship referenced by the node.
+     */
+    int16_t __cdecl Ship_Stack_X_(int16_t stack_idx) {
+        // Fetch the ship index from the node list at the given stack index
+        int16_t ship_idx = MOX::_ship_node[stack_idx].ship_idx;
+
+        // Access the ship data array and return the x coordinate
+        // ship_idx is used as an index into the s_ship_data array (size 0x81)
+        return MOX::_ship[ship_idx].x;
+    }
+
+    /**
+     * @brief Returns the Y coordinate of a ship in a stack node.
+     * @param node_idx The index into the ship node array.
+     * @return The Y coordinate of the ship.
+     */
+    int16_t __cdecl Ship_Stack_Y_(int16_t node_idx) {
+        // Fetch ship_idx from _ship_node[node_idx]
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+        // Fetch _ship[ship_idx].y
+        return MOX::_ship[ship_idx].y;
+    }
+
     int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int max, int filter) {
         // Initialize output buffer with 0xFFFF (-1)
         memset(selected_ids_out, 0xff, max * sizeof(int16_t));

@@ -874,6 +874,37 @@ namespace HAROLD {
     }
 
     /**
+     * @brief Checks if a player has an outpost in a specific star system.
+     * 
+     * @param param_1 Unused in original binary.
+     * @param star_idx Index of the star system to check.
+     * @return true if an outpost is found on any planet in the system, false otherwise.
+     */
+    bool __cdecl Player_Has_Outpost_(int16_t param_1, int16_t star_idx) {
+        bool has_outpost = false;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            // The binary checks result flag at the start of the loop block
+            if (has_outpost) {
+                break;
+            }
+
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+            if (planet_idx > -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                if (colony_idx > -1) {
+                    // Offset 0x6 in s_colony is outpost_flag
+                    if (MOX::_colony[colony_idx].outpost_flag != 0) {
+                        has_outpost = true;
+                    }
+                }
+            }
+        }
+
+        return has_outpost;
+    }
+
+    /**
      * @address 004f1050
      */
     int16_t __cdecl Galaxy_Size_From_N_Stars_() {
@@ -962,7 +993,7 @@ namespace HAROLD {
         MOX::_zoom_count = static_cast<int16_t>(next_zoom);
 
         // Fetch a dynamic limit based on the current map scale
-        int16_t scaled_limit = static_cast<int16_t>(static_cast<int8_t>(HAROLD::Map_Scale_To_Zoom_Level_()));
+        int16_t scaled_limit = HAROLD::Map_Scale_To_Zoom_Level_();
 
         if (scaled_limit <= MOX::_zoom_count) {
             MOX::_zoom_count = scaled_limit;

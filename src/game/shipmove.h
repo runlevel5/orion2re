@@ -17,18 +17,9 @@ namespace SHIPMOVE {
 
     void __cdecl Update_Player_Ship_Range_(s_player* player);
 
-    inline void __cdecl Ships_Try_To_Move_To_(int16_t* ids, int16_t target, s_ship_move_info* out_info) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t, s_ship_move_info*);
-        reinterpret_cast<Fn>(0x004363E0)(ids, target, out_info);
-    }
+    void __cdecl Ships_Try_To_Move_To_(int16_t* ship_list, int16_t target_star_idx, s_ship_move_info* move_info);
 
     void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_id, s_ship_move_info* move_info);
-
-    inline void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004377d0 });
-        fn();
-    }
 
     int32_t __cdecl Create_Nonplayer_Ship_(int16_t owner, s_ship_design* design, int16_t x, int16_t y);
 
@@ -36,11 +27,7 @@ namespace SHIPMOVE {
 
     void __cdecl Unmark_Just_Built_AI_Ships_();
 
-    inline uint32_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star, int16_t dest_star) {
-        using Fn = uint32_t(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004368e0});
-        return fn(player_idx, start_star, dest_star);
-    }
+    int16_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star_idx, int16_t end_star_idx);
 
     int16_t __cdecl Ship_Destination_Star_(s_ship_data* ship);
 

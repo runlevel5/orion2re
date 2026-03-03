@@ -3910,16 +3910,15 @@ struct s_ship_move_info {
     int8_t blackhole_blocks;
     int8_t insufficient_fuel;
     int8_t immobile;
-    undefined field3_0x3;
+    int8_t pad;
     int8_t turns_left;
     int8_t moving;
-    int8_t field6_0x6;
+    int8_t out_of_range;
     int8_t has_navigator;
     int8_t traveling_speed;
     int8_t parsecs;
-    undefined field10_0xa;
-    undefined field11_0xb;
-    int8_t field12_0xc;
+    short uses_wormhole;
+    int8_t has_stargate_route;
     int8_t hyperspace_flux;
 };
 

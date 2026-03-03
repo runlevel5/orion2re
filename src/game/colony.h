@@ -119,6 +119,12 @@ namespace COLONY {
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl C_Anims_(int16_t index);
+
+    inline s_animation_header* __cdecl Govt_Anim_(int16_t trait) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DCCB0});
+        return fn(trait);
+    }
     s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx);
 
     int16_t __cdecl Get_Effective_Pop_Player_(int16_t colony_idx, int16_t pop_idx);
@@ -170,6 +176,16 @@ namespace COLONY {
     s_animation_header* __cdecl People_Anim_(int16_t param_1, int16_t param_2, int16_t param_3);
 
     s_animation_header* __cdecl Prod_Anims_(int16_t param_1, int16_t param_2, int8_t param_3);
+
+    inline s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int8_t);
+        return reinterpret_cast<Fn>(0x004dcdb0)(type, is_tens, frame);
+    }
+
+    inline s_animation_header* __cdecl Short_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int8_t);
+        return reinterpret_cast<Fn>(0x004dcdf0)(type, is_tens, frame);
+    }
 
     int16_t __cdecl Satellite_Anim_Pic_(int16_t id);
 
@@ -419,4 +435,24 @@ namespace COLONY {
     short __cdecl Get_Next_Colony_(short current_idx, short direction);
 
     void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_idx);
+
+    inline void __cdecl Reset_Step_Squish_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004dd8c0})();
+    }
+
+    inline void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004db6f0})(x, y, colony_idx, pop_idx);
+    }
+
+    inline void __cdecl Create_Shadow_Farmer_(int16_t player_num) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004e1cf0})(player_num);
+    }
+
+    inline s_animation_header* __cdecl Shadow_Farmer_Bitm_() {
+        using Fn = s_animation_header*(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004e1d90})();
+    }
 }

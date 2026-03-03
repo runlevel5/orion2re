@@ -139,6 +139,8 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Colony_(short player_num, short star_idx);
 
+    bool __cdecl Player_Has_Outpost_(int16_t param_1, int16_t star_idx);
+
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 
     bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star);

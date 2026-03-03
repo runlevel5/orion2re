@@ -82,4 +82,15 @@ namespace HACCESS {
     bool __cdecl Is_Combat_Ship_(int16_t ship_index);
 
     char* __cdecl Get_Planet_Name_No_Prime_(int16_t planet_idx);
+
+    int16_t __cdecl Ship_Stack_X_(int16_t stack_idx);
+    int16_t __cdecl Ship_Stack_Y_(int16_t node_idx);
+
+    int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx);
+
+    inline int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B210});
+        return fn(icon_id);
+    }
 }

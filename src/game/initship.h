@@ -2,6 +2,7 @@
 #include <cstdint>
 
 struct s_ship_data;
+struct s_ship_design;
 
 namespace INITSHIP {
     void __cdecl Repair_Ships_At_Colonies_();
@@ -71,6 +72,36 @@ namespace INITSHIP {
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design);
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size);
+
+    inline void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
+        using Fn = void(__cdecl*)(s_ship_design*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00482da0})(design);
+    }
+
+    inline void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, uint8_t owner) {
+        using Fn = void(__cdecl*)(s_ship_design*, uint8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004829f0})(design, owner);
+    }
+
+    inline void __cdecl Load_Crystal_Ship_Design_(s_ship_design* design, uint8_t owner) {
+        using Fn = void(__cdecl*)(s_ship_design*, uint8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00482c60})(design, owner);
+    }
+
+    inline void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, uint8_t owner) {
+        using Fn = void(__cdecl*)(s_ship_design*, uint8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00482780})(design, owner);
+    }
+
+    inline void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, uint8_t owner) {
+        using Fn = void(__cdecl*)(s_ship_design*, uint8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00482b30})(design, owner);
+    }
+
+    inline void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, uint8_t owner) {
+        using Fn = void(__cdecl*)(s_ship_design*, uint8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004828d0})(design, owner);
+    }
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 

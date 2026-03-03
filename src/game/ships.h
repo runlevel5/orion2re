@@ -1,66 +1,57 @@
 #pragma once
 #include <cstdint>
 
+struct s_ship_design;
+struct s_ship_data;
+struct s_animation_header;
+
 namespace SHIPS {
-    inline void __cdecl Build_Nonplayer_Ship_(int32_t ship_type, int32_t star_idx, int32_t p3) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0041F940})(ship_type, star_idx, p3);
-    }
+    int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, int16_t owner);
 
     inline void __cdecl Build_Ship_Icons_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e670})();
     }
 
-    inline void __cdecl Set_Ship_Icon_XYs_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0041ec00})();
+    void __cdecl Set_Ship_Icon_XYs_();
+
+    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t color_offset);
+
+    void __cdecl Get_Ship_Icon_Coords_(int16_t ship_idx, int16_t* x, int16_t* y);
+
+    void __cdecl Get_Ship_Icon_Coords_In_Space_(int16_t icon_id, int16_t* x, int16_t* y);
+
+    void __cdecl Get_XYs_For_Orbiting_Ships_(int16_t star_idx, int16_t ship_icon_idx, int16_t* out_x1, int16_t* out_y1, int16_t* out_x2, int16_t* out_y2, int16_t* out_arr_x, int16_t* out_arr_y);
+
+    void __cdecl Get_Ship_Icon_Dimensions_(int16_t zoom_level, int8_t* width, int8_t* height);
+
+    s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t ship_type_idx, uint8_t is_highlighted);
+
+    inline void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, s_colors*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f680});
+        fn(x1, y1, x2, y2, colors);
     }
 
-    inline void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t line_type) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, s_colors*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f560});
-        fn(x1, y1, x2, y2, colors, line_type);
-    }
+    void __cdecl Print_Eta_On_Ship_Icon_(int16_t node_idx, int16_t style_toggle, int16_t x_offset, int16_t y_offset);
 
-    inline void __cdecl Get_Ship_Icon_Coords_(int16_t icon_id, int16_t* x, int16_t* y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041ee70});
-        fn(icon_id, x, y);
-    }
+    void __cdecl Do_Ship_Destination_Lines_();
 
-    inline void __cdecl Get_Ship_Icon_Dimensions_(int32_t scale, int8_t* width, int8_t* height) {
-        using Fn = void(__cdecl*)(int32_t, int8_t*, int8_t*);
-        reinterpret_cast<Fn>(0x0041fef0)(scale, width, height);
-    }
+    int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* ship_icon_id, int16_t threshold_x, int16_t threshold_y);
 
-    inline s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t owner, uint8_t flag) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f200});
-        return fn(owner, flag);
-    }
+    int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t system_idx, int16_t type, s_ship_design* design, uint8_t owner);
 
-    inline void __cdecl Do_Ship_Destination_Lines_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041EC60});
-        fn();
-    }
-
-    inline int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* ship_icon_id, int16_t x_offset, int16_t y_offset) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0041f370})(ship_icon_id, x_offset, y_offset);
-    }
-
-    inline int16_t __cdecl Set_Nonplayer_Ship_XY_(int16_t star_idx, int16_t owner, s_ship_design* design, uint8_t just_built) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, s_ship_design*, uint8_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0041FA50})(star_idx, owner, design, just_built);
-    }
+    int16_t __cdecl Set_Nonplayer_Ship_Destination_(int16_t star_idx, int16_t ship_idx, uint8_t is_moving);
 
     void __cdecl Kill_Ship_(int16_t ship_idx);
 
-    inline void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
-        using Fn = void(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041FF60});
-        fn(ship_list);
+    inline void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
+        using Fn = void(__cdecl*)(s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041FF40});
+        fn(ship);
     }
+
+    void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list);
+
+    bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(short node_idx);
 }

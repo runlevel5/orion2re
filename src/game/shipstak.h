@@ -7,4 +7,6 @@ namespace SHIPSTAK {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460660});
         return fn(ship_idx);
     }
+
+    short __cdecl Ship_Stack_Star_Id_(short node_idx);
 }

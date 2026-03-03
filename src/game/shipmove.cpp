@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cstring>
 
 namespace SHIPMOVE {
     void __cdecl Allocate_New_Ship_Slots_() {
@@ -431,9 +432,6 @@ namespace SHIPMOVE {
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
     }
 
-    /**
-     * @address 00436a50
-     */
     void __cdecl Make_Ships_Move_To_(int16_t* ship_list, int16_t destination_id, s_ship_move_info* move_info) {
         int8_t status;
         bool colony_flag_needed = false;
@@ -543,6 +541,185 @@ namespace SHIPMOVE {
     /**
      * @address 00437290
      */
+    void __cdecl Ships_Try_To_Move_To_(int16_t* ship_list, int16_t target_star_idx, s_ship_move_info* move_info) {
+        int16_t start_x = 0;
+        int16_t start_y = 0;
+        int32_t navigator_bonus = 0;
+        int32_t min_range = 30000;
+        int8_t first_ship_flag = 0;
+        int32_t player_idx;
+        int32_t ship_speed;
+
+        s_star_data* target_star = &MOX::_star[target_star_idx];
+        player_idx = MOX::_ship[*ship_list].owner;
+
+        if (player_idx < 8) {
+            ship_speed = MOX::_player[player_idx].ship_speed;
+        } else {
+            ship_speed = 1;
+        }
+
+        move_info->blackhole_blocks = 0;
+        move_info->immobile = 0;
+        move_info->turns_left = 0;
+        move_info->moving = 0;
+        move_info->out_of_range = 0;
+        move_info->has_navigator = 0;
+        move_info->traveling_speed = 0;
+        move_info->parsecs = 0;
+        move_info->uses_wormhole = 0;
+        move_info->has_stargate_route = 0;
+        move_info->hyperspace_flux = 0;
+
+        int8_t has_jumpgate_route = 0;
+
+        if (MOX::_NUM_STARS != target_star_idx && player_idx < 8) {
+            if (MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
+                if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
+                    move_info->hyperspace_flux = 1;
+                    return;
+                }
+            }
+        }
+
+        for (int i = 0; ship_list[i] != -1; ++i) {
+            s_ship_data* ship = &MOX::_ship[ship_list[i]];
+            int16_t range = SHIPMOVE::Ship_Range_(ship);
+
+            if (ship->officer_index != -1) {
+                s_leader_data* leader = &MOX::_leaders[ship->officer_index];
+                if (leader->eta == 0) {
+                    int32_t bonus = 0;
+                    if ((leader->special_skills & 0x200 /* NAVIGATOR */) != 0) {
+                        bonus = (OFFICER::Owned_Officer_Level_(ship->officer_index) / 3) + 1;
+                    } else if ((leader->special_skills & 0x100 /* HELMSMAN */) != 0) {
+                        bonus = (OFFICER::Owned_Officer_Level_(ship->officer_index) / 4) + 1;
+                    }
+                    if (navigator_bonus < bonus) {
+                        navigator_bonus = bonus;
+                    }
+                }
+            }
+
+            if (first_ship_flag == 0) {
+                first_ship_flag = 1;
+                start_x = ship->x;
+                start_y = ship->y;
+            }
+
+            if (range < min_range) {
+                min_range = range;
+            }
+        }
+
+        int16_t start_star_id = HAROLD::XY_To_Star_Id_(start_x, start_y);
+
+        // Dimensional Portal logic for Antares
+        if (MOX::_NUM_STARS == target_star_idx && start_star_id != -1) {
+            if ((MOX::_star[start_star_id].has_dimensional_portal >> (player_idx & 0x1F)) & 1) {
+                move_info->turns_left = 1;
+                move_info->moving = 1;
+                move_info->traveling_speed = -1;
+                return;
+            }
+        }
+
+        if (player_idx < 8) {
+            if (!SHIPMOVE::Star_In_Range_Of_Player_(target_star, (int16_t)player_idx, (int16_t)min_range)) {
+                int16_t closest_star = COMBFIND::Closest_Other_Colony_Star_((int16_t)player_idx, target_star_idx);
+                if (closest_star != -1) {
+                    move_info->parsecs = (int8_t)GEO::Parsecs_Between_Stars_(closest_star, target_star_idx);
+                }
+                move_info->out_of_range = 1;
+            }
+
+            if (start_star_id >= 0) {
+                if (MOX::_star[start_star_id].wormhole_star_id == target_star_idx) {
+                    move_info->uses_wormhole = 1;
+                }
+
+                if (((MOX::_star[start_star_id].has_stargate >> (player_idx & 0x1F)) & 1) &&
+                    ((target_star->has_stargate >> (player_idx & 0x1F)) & 1)) {
+                    move_info->has_stargate_route = 1;
+                }
+
+                if (((MOX::_star[start_star_id].has_jumpgate >> (player_idx & 0x1F)) & 1) &&
+                    ((target_star->has_jumpgate >> (player_idx & 0x1F)) & 1)) {
+                    has_jumpgate_route = 1;
+                }
+
+                if (Test_Bit_Field_(MOX::_star[start_star_id].black_hole_blocks, target_star_idx)) {
+                    if (navigator_bonus == 0 && move_info->uses_wormhole == 0) {
+                        if (move_info->has_stargate_route == 0 && has_jumpgate_route == 0) {
+                            move_info->blackhole_blocks = 1;
+                        }
+                    }
+                }
+            } else {
+                if (GEO::Black_Hole_Blocks_Points_(start_x, start_y, target_star->x, target_star->y)) {
+                    move_info->blackhole_blocks = 1;
+                }
+            }
+        }
+
+        int32_t base_speed = ship_speed + navigator_bonus;
+        if (move_info->has_stargate_route == 0 && move_info->uses_wormhole == 0) {
+            if (ship_speed <= 0) {
+                move_info->immobile = 1;
+            } else {
+                int16_t cur_x = start_x;
+                int16_t cur_y = start_y;
+                int8_t turn_count = 0;
+                if (has_jumpgate_route != 0) {
+                    base_speed += 3;
+                }
+
+                while (cur_x != target_star->x || cur_y != target_star->y) {
+                    int8_t dummy_dir;
+                    int8_t dummy_nav_flag;
+                    turn_count++;
+                    GEO::Move_Player_1_Turn_To_Star_(
+                        (uint8_t)player_idx, 
+                        cur_x, 
+                        cur_y, 
+                        target_star_idx, 
+                        (int16_t)base_speed, 
+                        &cur_x, 
+                        &cur_y, 
+                        (int8_t*)(navigator_bonus == 0 ? nullptr : &dummy_nav_flag), 
+                        &dummy_dir
+                    );
+                }
+                move_info->turns_left = turn_count;
+            }
+        } else {
+            move_info->turns_left = 0;
+            if (start_star_id != target_star_idx) {
+                move_info->turns_left = 1;
+            }
+        }
+
+        move_info->has_navigator = (navigator_bonus > 0);
+        
+        // Final validation
+        if ((move_info->blackhole_blocks != 0 && has_jumpgate_route == 0 && 
+            move_info->has_stargate_route == 0 && navigator_bonus <= 0) || 
+            (move_info->out_of_range != 0) ||
+            (ship_speed == 0 && (target_star->x != start_x || target_star->y != start_y))) {
+            move_info->turns_left = -1;
+            move_info->moving = 0;
+            return;
+        }
+
+        if (move_info->has_stargate_route == 0 && move_info->uses_wormhole == 0) {
+            move_info->moving = 1;
+            move_info->traveling_speed = (int8_t)base_speed;
+        } else {
+            move_info->traveling_speed = -1;
+            move_info->moving = 1;
+        }
+    }
+
     void __cdecl Update_Ship_ETAs_(int32_t player_id) {
         int num_ships = (int)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
@@ -590,5 +767,124 @@ namespace SHIPMOVE {
                 ship->turns_left = (char)turn_count;
             }
         }
+    }
+
+    /**
+     * @address 004377d0
+     */
+    void __cdecl Reset_Needless_Ignore_Combat_Ships_Flags_() {
+        uint16_t presence_mask[72]; // Tracks which players have assets at each star
+        memset(presence_mask, 0, sizeof(presence_mask));
+
+        // Mark player presence via ships
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+                // Only active ships with a valid owner count
+                if (ship->owner != (char)0xFF && ship->status == 0) {
+                    presence_mask[ship->location] |= (1 << ship->owner);
+                }
+            }
+        }
+
+        // Mark player presence via colonies
+        if (MOX::_NUM_COLONIES > 0) {
+            for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+                s_colony* colony = &MOX::_colony[i];
+                if (colony->owner != (char)0xFF) {
+                    int star_index = MOX::_planet[colony->planet].star_index;
+                    presence_mask[star_index] |= (1 << colony->owner);
+                }
+            }
+        }
+
+        // Review stars and clear ignore_combat_ships flags where no longer applicable
+        if (MOX::_NUM_STARS > 0) {
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                s_star_data* star = &MOX::_star[i];
+
+                if (star->ignore_combat_ships != 0) {
+                    for (int player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                        // If the flag is set for this player at this star
+                        if ((star->ignore_combat_ships >> player_idx) & 1) {
+                            // Clear the flag if no other player has presence at this star
+                            if ((presence_mask[i] & ~(1 << player_idx)) == 0) {
+                                star->ignore_combat_ships &= ~(1 << player_idx);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @address 004368e0
+     */
+    int16_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star_idx, int16_t end_star_idx) {
+        if (start_star_idx == end_star_idx) {
+            return 0;
+        }
+
+        s_star_data* start_star = &MOX::_star[start_star_idx];
+        s_star_data* target_star = &MOX::_star[end_star_idx];
+
+        // Check stargate connectivity (player bitmask)
+        if (((start_star->has_stargate >> player_idx) & 1) &&
+            ((target_star->has_stargate >> player_idx) & 1)) {
+            return 1;
+        }
+
+        // Check wormhole link
+        if (start_star->wormhole_star_id == end_star_idx) {
+            return 1;
+        }
+
+        short speed = MOX::_player[player_idx].ship_speed;
+        bool is_jumpgate_used = false;
+
+        // Check jumpgate connectivity (player bitmask)
+        if (((start_star->has_jumpgate >> player_idx) & 1) &&
+            ((target_star->has_jumpgate >> player_idx) & 1)) {
+            speed += 3;
+            is_jumpgate_used = true;
+        }
+
+        if (!is_jumpgate_used) {
+            // Black holes block travel unless jumpgates are used
+            if (struct_::Test_Bit_Field_(start_star->black_hole_blocks, (uint16_t)end_star_idx)) {
+                return -1;
+            }
+        }
+
+        if (speed == 0) {
+            return -1;
+        }
+
+        int16_t current_x = start_star->x;
+        int16_t current_y = start_star->y;
+        int16_t target_x = target_star->x;
+        int16_t target_y = target_star->y;
+        int16_t n_turns = 0;
+
+        int8_t status1;
+        int8_t status2;
+
+        while (current_x != target_x || current_y != target_y) {
+            n_turns++;
+            GEO::Move_Player_1_Turn_To_Star_(
+                (uint8_t)player_idx,
+                current_x,
+                current_y,
+                end_star_idx,
+                (int16_t)speed,
+                &current_x,
+                &current_y,
+                &status1,
+                &status2
+            );
+        }
+
+        return n_turns;
     }
 }

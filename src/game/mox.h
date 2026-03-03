@@ -1,5 +1,8 @@
 #pragma once
 
+struct s_animation_header;
+struct s_player;
+
 namespace MOX {
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
     inline int16_t& _n_fltscrn_big_icons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597018});
@@ -44,6 +47,18 @@ namespace MOX {
         *reinterpret_cast<s_animation_header* (*)[10]>(std::uintptr_t{0x00597AA0});
     inline s_animation_header* (&_officer_skill_icon_seg)[27] =
         *reinterpret_cast<s_animation_header*(*)[27]>(std::uintptr_t{0x005A1BD0});
+    inline s_animation_header* (&_hl_antaran_ship_icon_seg)[24] =
+        *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597380});
+    inline s_animation_header* (&_antaran_ship_icons)[24] =
+        *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597670});
+    inline s_animation_header* (&_monster_ship_seg)[4] =
+        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x0059BF10});
+    inline s_animation_header* (&_hl_monster_ship_icon_seg)[4] =
+        *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x005A17A0});
+    inline s_animation_header* (&_ship_icon_seg)[32] =
+        *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A1870});
+    inline s_animation_header* (&_hl_ship_icon_seg)[32] =
+        *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A4A00});
     inline void*& _officer_pictures_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597778});
     inline s_animation_header*& _officer_main_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597830});
     inline s_animation_header*& _officer_colony_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B44C});
@@ -411,6 +426,7 @@ namespace MOX {
     // Suggested name: MOX::orbit_to_satellite_type
     inline uint8_t* _orbit_to_satellite_type = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559508});
 
+    // Suggested name: MOX::_ship_node
     inline s_ship_node (&_ship_node)[500] =
         *reinterpret_cast<s_ship_node(*)[500]>(std::uintptr_t{0x00597DA0});
 
@@ -427,8 +443,12 @@ namespace MOX {
 
     inline void*& _fleet_box_grid_sm_seg4 = *reinterpret_cast<void**>(std::uintptr_t{0x005A47E0});
 
+    inline int16_t& _icon_overlay_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005974EC});
+
     inline int16_t& _ship_icon_count =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597664});
+
+    inline int16_t& _icon_overlay_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597666});
 
     inline int16_t& _fleet_box_ship_stack =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183E});
