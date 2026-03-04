@@ -45,7 +45,7 @@ namespace LOADSAVE {
 
     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y);
 
-    int8_t __cdecl Get_Save_Slot_();
+    int8_t __cdecl Active_Save_Slot_Invalid_();
 
     void __cdecl Set_Up_Load_Save_Popup_();
 

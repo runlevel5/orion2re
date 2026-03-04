@@ -500,7 +500,7 @@ namespace COLONY {
 
         int16_t satellite_count = 0;
         Clear_Colony_Buidlings_();
-        Clear_Colony_Sattelites_();
+        Clear_Satellite_Array_();
 
         int bldg_count = 0;
         for (int16_t bldg_id = 0; bldg_id < 49; ++bldg_id) {

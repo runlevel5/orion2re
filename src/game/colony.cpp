@@ -108,7 +108,7 @@ namespace COLONY {
         memset(_colony_bldgs, 0, sizeof(_colony_bldgs));
     }
 
-    void __cdecl Clear_Colony_Sattelites_() {
+    void __cdecl Clear_Satellite_Array_() {
         memset(_colony_satellites, 0xff, sizeof(_colony_satellites));
     }
 

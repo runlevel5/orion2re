@@ -335,13 +335,13 @@ namespace COLCALC {
             bool colony_was_updated = false;
             for (int16_t i = 0; i < num_needy; ++i) {
                 s_colony* c = &MOX::_colony[needy_colony_indices[i]];
-                Update_Colony_Pop_Specialty_(c);
+                Post_Import_Computing_(c);
                 if (c == colony) {
                     colony_was_updated = true;
                 }
             }
             if (!colony_was_updated) {
-                Update_Colony_Pop_Specialty_(colony);
+                Post_Import_Computing_(colony);
             }
         }
     }

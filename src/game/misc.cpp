@@ -18,6 +18,14 @@ namespace MISC {
         return fonts::_current_font_style;
     }
 
+    void __cdecl Set_Font_Colors_(const s_colors* colors) {
+        for (int i = 0; i < 8; ++i) {
+            uint8_t color = colors->colors[i];
+            fonts::_font_header.selected_colors[i] = color;
+            fonts::_font_header.normal_colors[i] = color;
+        }
+    }
+
     s_colors* __cdecl Font_Colors2_(int16_t mode, uint8_t param_2, uint8_t param_3) {
         for (int i = 0; i < 8; ++i) {
             _mox_font_colors.colors[i] = 0;
@@ -105,7 +113,7 @@ namespace MISC {
             colors.colors[i] = static_cast<uint8_t>(val);
         }
 
-        fonts::Set_Colors_(&colors);
+        MISC::Set_Font_Colors_(&colors);
     }
 
     void __cdecl Decrease_Font_Color_Range_(int16_t amount) {
@@ -122,7 +130,7 @@ namespace MISC {
             colors.colors[i] = static_cast<uint8_t>(new_val);
         }
 
-        fonts::Set_Colors_(&colors);
+        MISC::Set_Font_Colors_(&colors);
     }
 
     void __cdecl Save_Window_Status_(int16_t* status) {

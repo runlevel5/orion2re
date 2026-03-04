@@ -5,7 +5,7 @@ namespace HAROLD {
 
     int16_t __cdecl Get_Scaled_Value_(int16_t value);
 
-    int32_t __cdecl Get_Upscaled_Value_(int16_t value);
+    int32_t __cdecl Get_Up_Scaled_Value_(int16_t value);
 
     bool __cdecl Empty_System_(int16_t star_idx);
 
@@ -15,7 +15,7 @@ namespace HAROLD {
 
     int16_t __cdecl N_Colony_Owners_(int16_t star_idx);
 
-    uint8_t __cdecl N_Sattelites_(int16_t star_index);
+    uint8_t __cdecl N_Satellites(int16_t star_index);
 
     void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap);
 

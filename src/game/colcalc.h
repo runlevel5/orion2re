@@ -250,7 +250,7 @@ namespace COLCALC {
 
     void __cdecl Colony_Specialty_(s_colony* colony);
 
-    void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony);
+    void __cdecl Post_Import_Computing_(s_colony* colony);
 
     void __cdecl Update_Player_Stats_(s_player* player);
 
@@ -338,7 +338,7 @@ namespace COLCALC {
 
     int16_t __cdecl Planet_Max_Population_For_Player_(s_planet_data* planet, int16_t player_idx);
 
-    bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony);
+    bool __cdecl Housing_Is_Useless_(s_colony* colony);
 
     int16_t __cdecl N_Colonies_And_Outposts_At_Star_(int16_t star_index);
 

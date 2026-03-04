@@ -568,7 +568,7 @@ namespace fields {
 
         _auto_input_variable = _old_auto_input_variable;
         _input_field_active = _old_input_field_active;
-        _fields = _sfields;
+        _fields = _old_fields;
         _active_input_field_number = _old_active_input_field_number;
     }
 }

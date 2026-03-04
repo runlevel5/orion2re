@@ -92,7 +92,7 @@ namespace RUSS {
 
     void __cdecl Make_All_AI_Game_() {
         if (MOX::_game_type == 0) {
-            MOX::_all_ai_game = 1;
+            RUSS::_all_ai_game = 1;
 
             if (MOX::_player[MOX::_PLAYER_NUM].objectives == 0x64 /* 'd' */) {
                 Make_Player_Into_AI_(static_cast<int32_t>(MOX::_PLAYER_NUM));

@@ -78,8 +78,6 @@ namespace diplomac {
 
     void __cdecl Sneak_Attack_Or_Declare_War_(int16_t attacker_idx, int16_t target_idx, int8_t message_idx);
 
-    int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_idx);
-
     int16_t __cdecl Total_War_Loss_Comparison_(int16_t attacker_idx, int16_t target_idx);
 
     inline int16_t __cdecl Get_Demands_(int16_t current_player, int16_t target_player, int demand_count, int p1, int p2, int p3, int p4) {

@@ -102,10 +102,7 @@ namespace LOADSAVE {
         return result;
     }
 
-    /**
-     * @address 00512200
-     */
-    int8_t __cdecl Get_Save_Slot_() {
+    int8_t __cdecl Active_Save_Slot_Invalid_() {
         using Fn = int8_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512200});
         return fn();
@@ -146,7 +143,7 @@ namespace LOADSAVE {
             }
         }
 
-        if (LOADSAVE::Get_Save_Slot_() != 0) {
+        if (LOADSAVE::Active_Save_Slot_Invalid_() != 0) {
             MOX::_settings.active_save_slot = -1;
         }
     }

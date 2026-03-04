@@ -174,7 +174,7 @@ namespace OFFICER {
 
     bool __cdecl Player_Can_Hire_More_Officers_(int16_t player_idx);
 
-    void __cdecl Reset_Officer_Selection_();
+    void __cdecl Deselect_Offpop_Icons_();
     void __cdecl Move_Officer_To_Limbo_(int16_t officer_idx);
     void __cdecl Change_Screen_Type_(int8_t* out_flag);
 
@@ -205,9 +205,9 @@ namespace OFFICER {
 
     void __cdecl Move_From_Limbo_To_Pool_();
 
-    void __cdecl Set_Original_Stars_();
+    void __cdecl Save_Officers_Original_Colony_Id_();
 
-    void __cdecl Set_Original_Ships_();
+    void __cdecl Save_Officers_Original_Ship_Id_();
 
     void __cdecl Draw_Colony_Box_();
 

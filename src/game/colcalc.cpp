@@ -630,7 +630,7 @@ namespace COLCALC {
         }
     }
 
-    void __cdecl Update_Colony_Pop_Specialty_(s_colony* colony) {
+    void __cdecl Post_Import_Computing_(s_colony* colony) {
         COLCALC::Colony_Pop_Grows_(colony);
         COLCALC::Colony_Specialty_(colony);
     }
@@ -712,7 +712,7 @@ namespace COLCALC {
         for (int32_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
             if (colony->owner != -1 && colony->outpost_flag == 0) {
-                Update_Colony_Pop_Specialty_(colony);
+                Post_Import_Computing_(colony);
             }
         }
 
@@ -1043,7 +1043,7 @@ namespace COLCALC {
         for (int i = 0; i < num_colonies; ++i) {
             s_colony* colony = &colonies[i];
             if (colony->owner == player_idx && colony->outpost_flag == 0) {
-                Update_Colony_Pop_Specialty_(colony);
+                Post_Import_Computing_(colony);
                 MOX::Mox_Update_();
             }
         }
@@ -1318,7 +1318,7 @@ namespace COLCALC {
         return (int16_t)turns;
     }
 
-    bool __cdecl Colony_Is_At_Max_Population_(s_colony* colony) {
+    bool __cdecl Housing_Is_Useless_(s_colony* colony) {
         int16_t max_pop = Planet_Max_Population_For_Player_(&MOX::_planet[colony->planet], (int16_t)colony->owner);
 
         return (uint32_t)(uint16_t)max_pop == (uint32_t)(uint8_t)colony->n_pops;

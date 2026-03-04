@@ -44,7 +44,7 @@ void Next_Turn_() {
 
     MOX::_current_screen = MOX::_return_screen;
 
-    if (MOX::_game_type != 2 && MOX::_game_type != 3 && MOX::_all_ai_game == 0) {
+    if (MOX::_game_type != 2 && MOX::_game_type != 3 && RUSS::_all_ai_game == 0) {
         if (COLCALC::N_Living_Human_Players_() < 1) {
             ERIC::Fast_Fade_Out_();
             video::Set_Page_Off_();
@@ -146,7 +146,7 @@ void __cdecl Next_Turn_Calc_() {
     diplomac::Determine_Diplomacy_Messages_();
     diplomac::End_Of_Turn_Diplomacy_Adjustments_();
 
-    if (MOX::_game_type == 0 && MOX::_all_ai_game == 0) {
+    if (MOX::_game_type == 0 && RUSS::_all_ai_game == 0) {
         council::Check_For_Council_Meeting_();
     }
 

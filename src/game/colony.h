@@ -209,7 +209,7 @@ namespace COLONY {
     int16_t __cdecl Calculate_Current_Production_Turn_Count_(int16_t colony_idx);
 
     void __cdecl Clear_Colony_Buidlings_();
-    void __cdecl Clear_Colony_Sattelites_();
+    void __cdecl Clear_Satellite_Array_();
 
     void __cdecl Remove_Satellite_From_Array_(int16_t building_id);
 

@@ -7,12 +7,6 @@ struct s_ship_design;
 namespace INITSHIP {
     void __cdecl Repair_Ships_At_Colonies_();
 
-    inline int __cdecl Get_Ship_Scrap_Cost_(s_ship_data* ship) {
-        using Fn = int(__cdecl*)(s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b42b0});
-        return fn(ship);
-    }
-
     inline void __cdecl Repair_Ship_Full_(int16_t ship_idx) {
         using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483050});
@@ -40,8 +34,6 @@ namespace INITSHIP {
     int16_t __cdecl Best_Armor_(int16_t player_idx);
 
     int16_t __cdecl Best_Computer_(int16_t player_idx);
-
-    int16_t __cdecl Best_Computer_Attack_Bonus_(int16_t player_idx);
 
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
 
@@ -129,6 +121,8 @@ namespace INITSHIP {
         using Fn = int16_t(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004818F0})(owner_idx);
     }
+
+    int16_t __cdecl Cost_Of_Strategic_Design_(int16_t govt_type, struct s_ship_design* design);
 
     inline void __cdecl Get_Design_Combat_Bonuses_(s_ship_design *design, int16_t* bonus1, int16_t* bonus2, int16_t* bonus3) {
         // ABI is weird when passed by value, so just call in assembly

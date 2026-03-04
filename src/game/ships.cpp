@@ -196,8 +196,8 @@ namespace SHIPS {
                 }
             }
 
-            final_x_upscaled = (int16_t)HAROLD::Get_Upscaled_Value_(final_x_scaled);
-            final_y_upscaled = (int16_t)HAROLD::Get_Upscaled_Value_(final_y_scaled);
+            final_x_upscaled = (int16_t)HAROLD::Get_Up_Scaled_Value_(final_x_scaled);
+            final_y_upscaled = (int16_t)HAROLD::Get_Up_Scaled_Value_(final_y_scaled);
         }
 
         return (int16_t)SHIPMOVE::Create_Nonplayer_Ship_(type, design, final_x_upscaled, final_y_upscaled);

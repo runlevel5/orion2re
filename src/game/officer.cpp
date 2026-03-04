@@ -541,13 +541,13 @@ namespace OFFICER {
         }
     }
 
-    void __cdecl Set_Original_Stars_() {
+    void __cdecl Save_Officers_Original_Colony_Id_() {
         for (int32_t i = 0; i < MAX_LEADERS; ++i) {
             MOX::_officers_original_star_id[i] = MOX::_leaders[i].location;
         }
     }
 
-    void __cdecl Set_Original_Ships_() {
+    void __cdecl Save_Officers_Original_Ship_Id_() {
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             MOX::_officers_original_ship_id[i] = MOX::_leaders[i].location;
         }
@@ -911,8 +911,8 @@ namespace OFFICER {
         MOX::_officer_scanned = -1;
 
         SYS::Clear_System_Display_Loaded_Flag_();
-        Set_Original_Stars_();
-        Set_Original_Ships_();
+        Save_Officers_Original_Colony_Id_();
+        Save_Officers_Original_Ship_Id_();
         MOX::_draw_officer_to_back = 1;
         MOX::_global_var = 1;
         MOX::_return_screen = (int16_t)MOX::_previous_screen;
@@ -998,7 +998,7 @@ namespace OFFICER {
                                 } else {
                                     Assign_Officer_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
                                     MOX::_draw_officer_to_back = 1;
-                                    Reset_Officer_Selection_();
+                                    Deselect_Offpop_Icons_();
                                 }
                                 if (MOX::_offpop_big_icon_selected > -1) {
                                     MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].selected = 0;
@@ -1353,7 +1353,7 @@ namespace OFFICER {
                         if (Leader_Can_Be_Assigned_(field2) != 0) {
                             Assign_Officer_(MOX::_officer_selected, ship_idx);
                             MOX::_draw_officer_to_back = 1;
-                            Reset_Officer_Selection_();
+                            Deselect_Offpop_Icons_();
                         } else {
                             char format_str[200];
                             char final_msg[200];
@@ -1655,10 +1655,7 @@ namespace OFFICER {
         }
     }
 
-    /**
-     * @address 0043d750
-     */
-    void __cdecl Reset_Officer_Selection_() {
+    void __cdecl Deselect_Offpop_Icons_() {
         // Reset the currently selected officer index
         MOX::_officer_selected = -1;
 

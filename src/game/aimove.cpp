@@ -265,7 +265,7 @@ namespace aimove {
                     // Lookup contextual value for the planet relative to the current AI player.
                     // The table contains 360 entries per player (2880 total).
                     int contextual_idx = i + (static_cast<int>(aimove::_i_ai) * 360);
-                    uint16_t val = static_cast<uint16_t>((*AIDATA::_g_contextual_planet_values)[contextual_idx]);
+                    uint16_t val = static_cast<uint16_t>((*AIDATA::_contextual_planet_values)[contextual_idx]);
                     colonizable_planets[current_count].contextual_value = static_cast<int32_t>(val);
 
                     *count = current_count + 1;
@@ -354,4 +354,53 @@ namespace aimove {
             cumulative_strengths[t] = turn_strengths[t] + cumulative_strengths[t - 1];
         }
     }
+
+    int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_player_idx) {
+        // attacked_stars tracks which stars have an active threat from the player.
+        // Array size 72 is based on the game's maximum number of stars.
+        uint8_t attacked_stars[72];
+        memset(attacked_stars, 0, sizeof(attacked_stars));
+
+        int num_ships = (int)MOX::_NUM_SHIPS;
+        s_ship_data* ships = MOX::_ship;
+
+        for (int i = 0; i < num_ships; ++i) {
+            s_ship_data* ship = &ships[i];
+
+            // Only consider ships owned by the player that are combat ships (type 0)
+            if (ship->owner == (int8_t)player_idx && ship->d.ship_type == 0) {
+                int star_idx = -1;
+
+                // Determine the current or destination star index based on ship status.
+                // Status 0: At star
+                // Status 1: Traveling (location offset by 500)
+                // Status 2: Orbiting/Wormhole (location offset by 1000)
+                if (ship->status == 0) {
+                    star_idx = (int)ship->location;
+                }
+                else if (ship->status == 1) {
+                    star_idx = (int)ship->location - 500;
+                }
+                else if (ship->status == 2) {
+                    star_idx = (int)ship->location - 1000;
+                }
+
+                if (star_idx >= 0 && star_idx < 72) {
+                    // Check if the target player has a colony at this star via bitmask.
+                    if ((MOX::_star[star_idx].has_colony >> (uint8_t)target_player_idx) & 1) {
+                        attacked_stars[star_idx] = 1;
+                    }
+                }
+            }
+        }
+
+        int total_attacks = 0;
+        int num_stars = (int)MOX::_NUM_STARS;
+        for (int i = 0; i < num_stars; ++i) {
+            total_attacks += attacked_stars[i];
+        }
+
+        return total_attacks;
+    }
+
 }

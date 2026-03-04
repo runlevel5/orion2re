@@ -78,7 +78,7 @@ namespace MAPGEN {
 
     bool __cdecl Star_XY_Invalid_(int16_t star_idx, int16_t width, int16_t height, int16_t x_scaled);
 
-    void __cdecl Copy_Name_To_Star_(int16_t star_idx);
+    void __cdecl Get_Star_Name_(int16_t star_idx);
     int16_t __cdecl Generate_Number_Of_Satellites_(int16_t star_idx);
     void __cdecl Planet_Generation_(int16_t star_idx);
     void __cdecl Generate_Star_Special_(int16_t star_idx, void* param_2, uint8_t* special_counts);

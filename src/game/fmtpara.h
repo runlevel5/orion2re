@@ -117,7 +117,7 @@ namespace FMTPARA {
 
     void __cdecl Insert_A_String_(char* new_str);
 
-    uint32_t __cdecl Set_Plural_Flag_From_Item_(short item_idx);
+    uint32_t __cdecl Get_Item_Value_Set_Plural_(short item_idx);
 
     void __cdecl Insert_String_(const char* str);
 

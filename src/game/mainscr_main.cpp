@@ -390,7 +390,7 @@ namespace MAINSCR {
                 }
             }
 
-            if (MOX::_all_ai_game != 0) {
+            if (RUSS::_all_ai_game != 0) {
                 video::Set_Page_Off_();
                 MAINSCR::Draw_Main_Screen_();
                 RUSS::Mox_Sync_Update_();
@@ -829,12 +829,12 @@ namespace MAINSCR {
                             MOX::_cur_map_y = 0;
                         }
 
-                        int limit_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
+                        int limit_x = HAROLD::Get_Up_Scaled_Value_(MOX::_MAP_MAX_X - 0x280);
                         if (limit_x < MOX::_cur_map_x) {
-                            MOX::_cur_map_x = HAROLD::Get_Upscaled_Value_(MOX::_MAP_MAX_X - 0x280);
+                            MOX::_cur_map_x = HAROLD::Get_Up_Scaled_Value_(MOX::_MAP_MAX_X - 0x280);
                         }
 
-                        int limit_y = MOX::_MAP_MAX_Y - HAROLD::Get_Upscaled_Value_(400);
+                        int limit_y = MOX::_MAP_MAX_Y - HAROLD::Get_Up_Scaled_Value_(400);
                         if (limit_y < MOX::_cur_map_y) {
                             MOX::_cur_map_y = limit_y;
                         }
@@ -851,8 +851,8 @@ namespace MAINSCR {
                             mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
                             fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
 
-                            MOX::_cur_map_x += HAROLD::Get_Upscaled_Value_(_zoom_box_x - 0x15);
-                            MOX::_cur_map_y += HAROLD::Get_Upscaled_Value_(_zoom_box_y - 0x15);
+                            MOX::_cur_map_x += HAROLD::Get_Up_Scaled_Value_(_zoom_box_x - 0x15);
+                            MOX::_cur_map_y += HAROLD::Get_Up_Scaled_Value_(_zoom_box_y - 0x15);
                             MOX::_cur_map_scale = HAROLD::Get_Map_Scale_(MOX::_zoom_count);
 
                             MOX::_far_star_x = 0x16; MOX::_mid_star_x = 0x16; MOX::_near_star_x = 0x16;
@@ -863,8 +863,8 @@ namespace MAINSCR {
             // Scroll map logic
             // TODO: Why this is -main_screen_grid_field?
             if (-MOX::_main_screen_grid_field == input && MOX::_skip_fields == 0 && MOX::_max_map_scale != MOX::_cur_map_scale) {
-                int target_y = HAROLD::Get_Upscaled_Value_(MOX::_main_screen_grid_y) + MOX::_cur_map_y;
-                int target_x = HAROLD::Get_Upscaled_Value_(MOX::_main_screen_grid_x) + MOX::_cur_map_x;
+                int target_y = HAROLD::Get_Up_Scaled_Value_(MOX::_main_screen_grid_y) + MOX::_cur_map_y;
+                int target_x = HAROLD::Get_Up_Scaled_Value_(MOX::_main_screen_grid_x) + MOX::_cur_map_x;
                 MAINSCR::Scroll_Map_(target_x, target_y);
             }
 

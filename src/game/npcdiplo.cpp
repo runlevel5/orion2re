@@ -125,9 +125,9 @@ namespace npcdiplo {
                         // Negative severity (diplomatic insult/attack) increases threats
                         short threat_threshold;
                         if (p1.personality == 4 /* Aggressive/Ruthless */ && p1.dishonored_flag[p2_idx] == 1) {
-                            threat_threshold = diplodef::_const_50;
+                            threat_threshold = diplodef::_personality_threat_modifiers[6];
                         } else {
-                            threat_threshold = diplodef::_personality_threat_modifiers[(uint8_t)p1.personality];
+                            threat_threshold = diplodef::_personality_threat_modifiers[p1.personality];
                         }
 
                         // Severity is negative, so subtracting it increases the random threshold

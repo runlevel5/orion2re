@@ -336,14 +336,6 @@ namespace fonts {
         }
     }
 
-    void __cdecl Set_Colors_(const s_colors* colors) {
-        for (int i = 0; i < 8; ++i) {
-            uint8_t color = colors->colors[i];
-            _font_header.selected_colors[i] = color;
-            _font_header.normal_colors[i] = color;
-        }
-    }
-
     int16_t __cdecl Get_Current_Font_Style_() {
         return _current_font_style;
     }

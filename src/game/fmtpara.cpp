@@ -822,14 +822,14 @@ namespace FMTPARA {
             break;
 
         case 'B': {
-            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            int val = Get_Item_Value_Set_Plural_(arg_idx);
             __itoa(val, _tmp_str, 10);
             Insert_String_(_tmp_str);
             break;
         }
 
         case 'C': {
-            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            int val = Get_Item_Value_Set_Plural_(arg_idx);
             __itoa(val, _tmp_str, 10);
             int len = (int)strlen(_tmp_str);
             int digit = _tmp_str[len - 1] - '0';
@@ -839,7 +839,7 @@ namespace FMTPARA {
         }
 
         case 'D': {
-            int val = Set_Plural_Flag_From_Item_(arg_idx);
+            int val = Get_Item_Value_Set_Plural_(arg_idx);
             if (val >= 0 && val <= 10) {
                 Insert_String_(_ordinal_word[val]);
             } else {
@@ -1956,7 +1956,7 @@ namespace FMTPARA {
         }
     }
 
-    uint32_t __cdecl Set_Plural_Flag_From_Item_(short item_idx) {
+    uint32_t __cdecl Get_Item_Value_Set_Plural_(short item_idx) {
         uint32_t value = FMTPARA::Get_Item_Value_(item_idx);
 
         if (value != 1) {

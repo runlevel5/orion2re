@@ -77,7 +77,7 @@ short Race_Selection_Screen_(s_player* plr) {
     _race_button_status[3] = 1;
     
     Reload_Race_Selection_Screen_();
-    ERICHELP::Set_Race_Select_Help_();
+    RACESEL::Set_Race_Select_Help_();
     video::Set_Page_Back_();
     auto raceopt_anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
     MOX::Mox_Update_();
@@ -167,7 +167,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             if (MOX::_game_type != 0 && MOX::_game_type != 1) {
                                 NETSTART::Unrequest_Race_(i);
                             }
-                            ERICHELP::Set_Race_Select_Help_();
+                            RACESEL::Set_Race_Select_Help_();
                             video::Set_Page_Back_();
                             auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
@@ -204,7 +204,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             }
                             field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
-                            ERICHELP::Set_Race_Select_Help_();
+                            RACESEL::Set_Race_Select_Help_();
                             _custom_flag = 0;
                         }
                     }
@@ -275,7 +275,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         }
                         field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, _race_button[13], &_race_button_status[13], s_empty_00551100, 40);
                         fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
-                        ERICHELP::Set_Race_Select_Help_();
+                        RACESEL::Set_Race_Select_Help_();
                         _custom_flag = 0;
                     }
                 }

@@ -122,7 +122,6 @@ namespace fonts {
     void __cdecl Set_Font_Spacing_Width_(int spacing_width);
 
     void __cdecl Get_Colors_(s_colors* colors);
-    void __cdecl Set_Colors_(const s_colors* colors);
     void __cdecl Set_Font_Special_Colors_(s_colors* colors);
     void __cdecl Set_Font_Highlight_Colors_(s_colors* colors);
 

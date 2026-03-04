@@ -3,6 +3,7 @@
 
 namespace RUSS {
     inline auto PFMT_ = reinterpret_cast<void(__cdecl*)(int32_t, int32_t, const char*, ...)>(std::uintptr_t{0x004D7850});
+    inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x005960E9 });
 
     int16_t __cdecl Get_Weighted_Choice_Char_(int8_t* weights, int16_t count);
 
@@ -48,9 +49,6 @@ namespace RUSS {
 
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
     inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"
-
-    inline uint8_t& _all_ai_game =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059533F});
 
     inline const char* s_This_isnt_a_single_player_game =
         reinterpret_cast<const char*>(std::uintptr_t{0x00559A08}); // "This isn't a single player game, cheeky monkey!"

@@ -49,11 +49,13 @@ namespace DESIGN {
 
     int8_t __cdecl Count_Weapons_Loaded_();
 
-    int8_t __cdecl Get_Modified_Combat_Speed_(s_current_design* design);
+    int16_t __cdecl Get_Colony_Handle_();
 
-    int8_t __cdecl Get_Base_Combat_Speed_(s_current_design* design);
+    int8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design);
 
-    int8_t __cdecl Get_Ship_Speed_Modifier_(s_current_design* design);
+    int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design);
+
+    int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design);
 
     int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design);
 
@@ -77,7 +79,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Space_Used_();
 
-    int32_t __cdecl Get_Design_Hull_Size_();
+    int32_t __cdecl Total_Design_Space_();
 
     int8_t __cdecl Count_Special_Devices_();
 
@@ -90,8 +92,6 @@ namespace DESIGN {
     void __cdecl Print_Ship_Size_Error_Message_(int16_t ship_size_index);
 
     void __cdecl Design_Screen_();
-
-    int32_t __cdecl Get_Design_Hull_Size_();
 
     void __cdecl Draw_Design_Screen_();
 
@@ -131,7 +131,7 @@ namespace DESIGN {
 
     void __cdecl Set_Flashing_Colors_(int16_t font_style, int16_t spacing);
 
-    int16_t __cdecl Current_Design_Ship_Structure_();
+    int16_t __cdecl Current_Design_Structural_Points_();
 
     void __cdecl Cost_Reduction_For_Govt_Type_(int16_t player_idx, int32_t* cost);
 

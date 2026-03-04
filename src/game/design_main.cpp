@@ -33,7 +33,7 @@ namespace DESIGN {
         _sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].speed);
         fonts::Print_(0xFB, 0x47, buffer);
 
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), (int)Get_Base_Combat_Speed_(MOX::_design));
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), Current_Design_Combat_Speed_(MOX::_design));
         fonts::Print_(0xFB, 0x56, buffer);
 
         fonts::Set_Font_Style_(3, &style3_colors);
@@ -42,7 +42,7 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_055_D_STRUCTURE_POINTS), (int)Current_Design_Ship_Structure_());
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_055_D_STRUCTURE_POINTS), (int)Current_Design_Structural_Points_());
         fonts::Print_(0xFB, 0x7A, buffer);
 
         _sprintf(buffer, HAROLD::H_Message_(HESTR_056_D_ARMOR_POINTS), (int)Current_Design_Armor_Absorption_());

@@ -1270,12 +1270,6 @@ namespace MAINSCR {
         _last_field = fields::_fields_count - 1;
     }
 
-    int16_t __cdecl Current_Colony_() {
-        int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
-
-        return MOX::_planet[planet_idx].colony_index;
-    }
-
     void __cdecl Highlight_Star_(short star_idx) {
         if (MOX::_star[star_idx].spectral_class != STAR_CLASS_BLACK_HOLE) {
             Print_Highlighted_Star_Name_(star_idx);
@@ -2090,14 +2084,14 @@ namespace MAINSCR {
     }
 
     void __cdecl Scroll_Map_(int16_t x, int16_t y) {
-        int16_t target_x = x - HAROLD::Get_Upscaled_Value_(253 /* 0xFD */);
-        int16_t target_y = y - HAROLD::Get_Upscaled_Value_(200 /* 0xC8 */);
+        int16_t target_x = x - HAROLD::Get_Up_Scaled_Value_(253 /* 0xFD */);
+        int16_t target_y = y - HAROLD::Get_Up_Scaled_Value_(200 /* 0xC8 */);
 
         if (target_x < 0) {
             target_x = 0;
         }
 
-        int16_t max_x_offset = HAROLD::Get_Upscaled_Value_(506 /* 0x1FA */);
+        int16_t max_x_offset = HAROLD::Get_Up_Scaled_Value_(506 /* 0x1FA */);
         if (MOX::_MAP_MAX_X - max_x_offset < target_x) {
             target_x = MOX::_MAP_MAX_X - max_x_offset;
         }
@@ -2106,7 +2100,7 @@ namespace MAINSCR {
             target_y = 0;
         }
 
-        int16_t max_y_offset = HAROLD::Get_Upscaled_Value_(400 /* 0x190 */);
+        int16_t max_y_offset = HAROLD::Get_Up_Scaled_Value_(400 /* 0x190 */);
         if (MOX::_MAP_MAX_Y - max_y_offset < target_y) {
             target_y = MOX::_MAP_MAX_Y - max_y_offset;
         }

@@ -175,11 +175,11 @@ namespace HAROLD {
         return static_cast<int16_t>(static_cast<int32_t>(value * 10) / static_cast<int32_t>(MOX::_cur_map_scale));
     }
 
-    int32_t __cdecl Get_Upscaled_Value_(int16_t value) {
+    int32_t __cdecl Get_Up_Scaled_Value_(int16_t value) {
         return (static_cast<int32_t>(value) * static_cast<int32_t>(MOX::_cur_map_scale)) / 10;
     }
 
-    uint8_t __cdecl N_Sattelites_(int16_t star_index) {
+    uint8_t __cdecl N_Satellites(int16_t star_index) {
         uint8_t count = 0;
 
         for (int i = 0; i < 5; ++i) {
@@ -254,7 +254,7 @@ namespace HAROLD {
             int16_t invalidated_count = 0;
             for (int i = 0; i < count; ++i) {
                 int16_t star_id = candidates[i];
-                if (MOX::_star[star_id].wormhole_star_id > 0 || N_Sattelites_(star_id) == 0) {
+                if (MOX::_star[star_id].wormhole_star_id > 0 || N_Satellites(star_id) == 0) {
                     candidates[i] = -1;
                     invalidated_count++;
                 }
@@ -298,7 +298,7 @@ namespace HAROLD {
      * @address 004f0860
      */
     bool __cdecl Empty_System_(int16_t star_idx) {
-        return N_Sattelites_(star_idx) == 0;
+        return N_Satellites(star_idx) == 0;
     }
 
     bool __cdecl Is_Home_Star_(int16_t star_idx) {

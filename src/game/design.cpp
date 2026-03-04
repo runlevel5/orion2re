@@ -18,7 +18,7 @@ namespace DESIGN {
         d->ftl_type = INITSHIP::Best_Warp_Drive_(player_idx);
         d->drive_speed = TECHDATA::_drives[d->ftl_type].speed;
         d->ship_size = static_cast<int16_t>(static_cast<int8_t>(Current_Design_Size_(player_idx, design_idx)));
-        d->hull_space = INITGAME::Get_Design_Hull_Size_();
+        d->hull_space = DESIGN::Total_Design_Space_();
         d->computer_type = INITSHIP::Best_Computer_(player_idx);
         d->picture_type = static_cast<int16_t>(static_cast<int8_t>(HACCESS::Design_Picture_Num_(player_idx, design_idx)));
         d->armor_type = INITSHIP::Best_Armor_(player_idx);
@@ -70,7 +70,7 @@ namespace DESIGN {
         }
         d->help2 = special_idx;
 
-        d->base_combat_speed = static_cast<int16_t>(Get_Base_Combat_Speed_(d));
+        d->base_combat_speed = Current_Design_Combat_Speed_(d);
         d->field83_0x123 = 140;
 
         Update_Calculated_Design_Data_(player_idx);
@@ -95,7 +95,7 @@ namespace DESIGN {
         local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].speed;
         local_design.ship_size = static_cast<int16_t>(ship_design->size);
 
-        local_design.hull_space = INITGAME::Get_Design_Hull_Size_();
+        local_design.hull_space = DESIGN::Total_Design_Space_();
         local_design.computer_type = static_cast<int16_t>(ship_design->computer_type);
         local_design.picture_type = static_cast<int16_t>(ship_design->picture_num);
         local_design.armor_type = static_cast<int16_t>(ship_design->armor_type);
@@ -128,7 +128,7 @@ namespace DESIGN {
             }
         }
 
-        local_design.base_combat_speed = Get_Modified_Combat_Speed_(_design);
+        local_design.base_combat_speed = Current_Design_Combat_Speed_(_design);
         Update_Calculated_Design_Data_(player_idx);
 
         return static_cast<int16_t>(local_design.total_cost);
@@ -150,7 +150,7 @@ namespace DESIGN {
         return count;
     }
 
-    int8_t __cdecl Get_Modified_Combat_Speed_(s_current_design* design) {
+    int8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design) {
         int8_t speed = Current_Design_Base_Combat_Speed_(design);
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_AUGMENTED_ENGINES) != 0) {
@@ -162,17 +162,17 @@ namespace DESIGN {
         return speed;
     }
 
-    int8_t __cdecl Get_Base_Combat_Speed_(s_current_design* design) {
+    int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design) {
         return TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->ship_size];
     }
 
-    int8_t __cdecl Get_Ship_Speed_Modifier_(s_current_design* design) {
+    int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
         return TECHDATA::_drives[design->ftl_type].speed_modifier[design->ship_size];
     }
 
     int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
-        uint8_t base_speed = (uint8_t)Get_Base_Combat_Speed_(design);
-        uint8_t speed_mod = (uint8_t)Get_Ship_Speed_Modifier_(design);
+        uint8_t base_speed = (uint8_t)Current_Design_Min_Combat_Speed_(design);
+        uint8_t speed_mod = (uint8_t)Current_Design_Max_Combat_Speed_(design);
 
         int32_t space_utilization = (-100 * design->space_used) / design->hull_space;
 
@@ -239,6 +239,18 @@ namespace DESIGN {
         return MOX::_design->shield_space;
     }
 
+    int32_t __cdecl Total_Design_Space_() {
+        // Access hull_size from TECHDATA::_hull_data array based on current design's ship size
+        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].hull_size);
+
+        if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
+            // Apply 25% hull space bonus: (hull_size * 125) / 100
+            hull_size = (hull_size * 125) / 100;
+        }
+
+        return hull_size;
+    }
+
     void __cdecl Update_Calculated_Design_Data_(int16_t player_idx) {
         Has_Damper_Field_();
         Current_Design_Shield_();
@@ -247,7 +259,7 @@ namespace DESIGN {
 
         _design->total_cost = Total_Design_Cost_();
         _design->space_used = Total_Space_Used_();
-        _design->hull_space = Get_Design_Hull_Size_();
+        _design->hull_space = Total_Design_Space_();
 
         MOX::_n_weapons_loaded = Count_Weapons_Loaded_();
         MOX::_n_special_systems = Count_Special_Devices_();
@@ -440,7 +452,7 @@ namespace DESIGN {
         }
     }
 
-    int16_t __cdecl Current_Design_Ship_Structure_() {
+    int16_t __cdecl Current_Design_Structural_Points_() {
         int16_t player_num = MOX::_PLAYER_NUM;
         uint8_t has_reinforced_hull = Current_Design_Has_Special_System_(_design, SPECIAL_REINFORCED_HULL);
         return INITSHIP::Get_Structure_(_design->ship_size, has_reinforced_hull != 0, player_num);
@@ -543,10 +555,6 @@ namespace DESIGN {
         total_space += special_space_sum;
 
         return total_space;
-    }
-
-    int32_t __cdecl Get_Design_Hull_Size_() {
-        return INITGAME::Get_Design_Hull_Size_();
     }
 
     int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx) {
@@ -750,7 +758,7 @@ namespace DESIGN {
         target_design->date_of_design = (uint16_t)MOX::_stardate;
 
         _use_augmented_engines = 0;
-        target_design->combat_speed = (int8_t)Get_Modified_Combat_Speed_(MOX::_design);
+        target_design->combat_speed = Current_Design_Combat_Speed_(MOX::_design);
         target_design->speed = (int8_t)INITSHIP::Get_FTL_Speed_(player_idx, MOX::_design->ftl_type);
     }
 
@@ -1022,7 +1030,7 @@ namespace DESIGN {
         template_out->picture_num = (int8_t)d->picture_type;
         template_out->cost = (int16_t)d->total_cost;
         template_out->date_of_design = (uint16_t)MOX::_stardate;
-        template_out->combat_speed = Get_Modified_Combat_Speed_(d);
+        template_out->combat_speed = Current_Design_Combat_Speed_(d);
     }
 
     void __cdecl Get_Ship_Size_Button_Field_XY_(int16_t size_idx, int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2) {
@@ -1228,7 +1236,7 @@ namespace DESIGN {
             case 0xF5:
                 message_id = HESTR_00E_SINCE_S_CANNOT_BUILD_S;
                 if (MOX::_return_screen == 0x19) {
-                    int16_t colony_idx = MAINSCR::Current_Colony_();
+                    int16_t colony_idx = DESIGN::Get_Colony_Handle_();
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
                     is_formatted = true;
                     _sprintf(planet_name_buf, "%s", planet_name);
@@ -1704,5 +1712,11 @@ namespace DESIGN {
         }
 
         return level;
+    }
+
+    int16_t __cdecl Get_Colony_Handle_() {
+        int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+
+        return MOX::_planet[planet_idx].colony_index;
     }
 }

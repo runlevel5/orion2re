@@ -13,8 +13,6 @@ namespace ADVCIV {
 
     void __cdecl Assign_Advanced_Civilization_Starting_Ships_();
 
-    int32_t __cdecl Uncolonized_Planet_Worth_To_Player_(s_planet_data* planet, s_player* plr);
-
     inline int8_t*& _planet_selected_flag = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CD54});
     inline s_adv_civ_player*& _adv_civ_player = *reinterpret_cast<s_adv_civ_player**>(std::uintptr_t{0x0056CD58});
 
@@ -28,7 +26,7 @@ namespace ADVCIV {
 
     void __cdecl Choose_Adv_Civ_Planets_();
 
-    int16_t Get_AdvCiv_Planet_Picks_Cutoff();
+    int16_t Num_Adv_Civ_Planets_();
 
     void __cdecl Build_Adv_Civ_Star_List_();
 

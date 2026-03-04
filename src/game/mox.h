@@ -184,7 +184,6 @@ namespace MOX {
     inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
     inline int8_t& _draw_fleet_screen_to_back = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059770C});
-    inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005960E9});
     inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
     inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
     inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});

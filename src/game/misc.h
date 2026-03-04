@@ -68,4 +68,6 @@ namespace MISC {
 
     bool __cdecl Occluded_(int16_t x1_min, int16_t y1_min, int16_t x1_max, int16_t y1_max,
                            int16_t x2_min, int16_t y2_min, int16_t x2_max, int16_t y2_max);
+
+    void __cdecl Set_Font_Colors_(const s_colors* colors);
 }

@@ -58,7 +58,5 @@ namespace aidesign {
 
     void __cdecl Auto_Design_Ship_(int16_t player_idx, s_ship_design* design, int16_t hull_idx);
 
-    int16_t __cdecl Cost_Reduction_For_Govt_Hull_Type(int16_t govt_type, struct s_ship_design* design);
-
     int16_t __cdecl Special_Legal_For_Design_(s_ship_design* design, int16_t tech_id);
 }

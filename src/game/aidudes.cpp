@@ -918,7 +918,7 @@ namespace aidudes {
                 isqrt_val > 1) {
 
                 if (p->tech_applications[41] == 3 && !no_range_or_speed) {
-                    int val = (*AIDATA::_g_contextual_planet_values)[player_idx * 360 + best_planet];
+                    int val = (*AIDATA::_contextual_planet_values)[player_idx * 360 + best_planet];
                     if (war_level > 0) {
                         val >>= 2;
                     }

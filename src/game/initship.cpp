@@ -260,20 +260,6 @@ namespace INITSHIP {
         return best_computer_idx;
     }
 
-    int16_t __cdecl Best_Computer_Attack_Bonus_(int16_t player_idx) {
-        int16_t computer_idx;
-        int16_t bonus;
-
-        computer_idx = INITSHIP::Best_Computer_(player_idx);
-        bonus = TECHDATA::_computers[computer_idx].bonus;
-
-        if (player_idx < 8) {
-            bonus += MOX::_player[player_idx].traits[7 /* TRAIT_SHIP_ATTACK */];
-        }
-
-        return bonus;
-    }
-
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx) {
         int16_t best_shield_idx = 0;
 
@@ -325,7 +311,7 @@ namespace INITSHIP {
         design->armor_type = static_cast<int8_t>(Best_Armor_(player_idx));
 
         // Calculate the build cost including government bonuses/penalties
-        design->cost = aidesign::Cost_Reduction_For_Govt_Hull_Type(player_idx, &MOX::_player[player_idx].ship_designs[design_idx]);
+        design->cost = Cost_Of_Strategic_Design_(player_idx, &MOX::_player[player_idx].ship_designs[design_idx]);
 
         // Fill weapons and special systems
         Update_Strategic_Design_Weapons_Specials_(design, player_idx, design_idx);
@@ -869,5 +855,13 @@ namespace INITSHIP {
         *ship_defense = local_defense;
         *ship_missile_defense = local_missile_defense;
         *ship_attack = local_attack;
+    }
+
+    int16_t __cdecl Cost_Of_Strategic_Design_(int16_t govt_type, s_ship_design* design) {
+        int32_t reduced_cost = (TECHDATA::_hull_data[design->size].hull_space * 3) / 2;
+
+        DESIGN::Cost_Reduction_For_Govt_Type_(govt_type, &reduced_cost);
+
+        return (int16_t)reduced_cost;
     }
 }

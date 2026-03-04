@@ -58,7 +58,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         int16_t collision_w;
         if (use_names) {
-            MAPGEN::Copy_Name_To_Star_(i);
+            MAPGEN::Get_Star_Name_(i);
             HAROLD::Set_Player_Font_Style_(0, 0);
             char formatted_name[32];
             _sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
@@ -117,8 +117,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     MOX::Mox_Update_();
                     int16_t fx = (int16_t)random::Random_(0x189) + 0x14;
                     int16_t fy = (int16_t)random::Random_(0x155) + 0x14;
-                    MOX::_star[i].x = HAROLD::Get_Upscaled_Value_(fx);
-                    MOX::_star[i].y = HAROLD::Get_Upscaled_Value_(fy);
+                    MOX::_star[i].x = HAROLD::Get_Up_Scaled_Value_(fx);
+                    MOX::_star[i].y = HAROLD::Get_Up_Scaled_Value_(fy);
 
                     if (!MAPGEN::Star_XY_Invalid_(i, collision_w, collision_h, fx)) {
                         fallback_found = true;
@@ -836,8 +836,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             int16_t start_y = (int16_t)random::Random_(400 - heights[0]);
 
             MOX::_nebula[0].type = (int8_t)nebula_types[0];
-            MOX::_nebula[0].x = HAROLD::Get_Upscaled_Value_(start_x);
-            MOX::_nebula[0].y = HAROLD::Get_Upscaled_Value_(start_y);
+            MOX::_nebula[0].x = HAROLD::Get_Up_Scaled_Value_(start_x);
+            MOX::_nebula[0].y = HAROLD::Get_Up_Scaled_Value_(start_y);
 
             if (MOX::_NUM_NEBULAS < 2) break;
 
@@ -887,8 +887,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
                     int16_t choice = MOX::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
                     MOX::_nebula[i].type = (int8_t)nebula_types[i];
-                    MOX::_nebula[i].x = HAROLD::Get_Upscaled_Value_(coord_buffer[choice * 2]);
-                    MOX::_nebula[i].y = HAROLD::Get_Upscaled_Value_(coord_buffer[choice * 2 + 1]);
+                    MOX::_nebula[i].x = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2]);
+                    MOX::_nebula[i].y = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2 + 1]);
                     weight_buffer[choice] = 0;
                 }
                 break;
@@ -1215,7 +1215,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
     }
 
-    void __cdecl Copy_Name_To_Star_(int16_t star_idx) {
+    void __cdecl Get_Star_Name_(int16_t star_idx) {
         int32_t name_id = static_cast<int16_t>(_name_index[star_idx]);
         const char* src_name = reinterpret_cast<const char*>(reinterpret_cast<std::uintptr_t>(_name_seg) + (name_id * 15));
         char* dest_name = MOX::_star[star_idx].name;

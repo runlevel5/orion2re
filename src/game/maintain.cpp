@@ -238,7 +238,7 @@ namespace maintain {
             if (cheapest_ship == nullptr) {
                 no_more_ships_found = true;
             } else {
-                int scrap_cost = INITSHIP::Get_Ship_Scrap_Cost_(cheapest_ship);
+                int scrap_cost = maintain::Ship_Scrap_Value_(cheapest_ship);
                 player->bc += scrap_cost;
 
                 if (player->objectives != 100) {

@@ -871,14 +871,6 @@ namespace aidesign {
         design->date_of_design = (uint16_t)MOX::_stardate;
     }
 
-    int16_t __cdecl Cost_Reduction_For_Govt_Hull_Type(int16_t govt_type, s_ship_design* design) {
-        int32_t reduced_cost = (TECHDATA::_hull_data[design->size].hull_space * 3) / 2;
-
-        DESIGN::Cost_Reduction_For_Govt_Type_(govt_type, &reduced_cost);
-
-        return (int16_t)reduced_cost;
-    }
-
     int16_t __cdecl Special_Legal_For_Design_(s_ship_design* design, int16_t tech_id) {
         int16_t result = 1;
         int16_t bit = 0;

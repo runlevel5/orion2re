@@ -41,4 +41,9 @@ namespace RACESEL {
     int16_t __cdecl Flag_Screen_(uint8_t* color_ptr);
     int16_t __cdecl Racial_Option_Screen_(s_player* plr);
     short Race_Selection_Screen_(s_player *plr);
+
+    inline void __cdecl Set_Race_Select_Help_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004988B0)();
+    }
 }

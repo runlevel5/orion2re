@@ -18,7 +18,7 @@ namespace fields {
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
-    inline s_field*& _sfields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD4});
+    inline s_field*& _old_fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD4});
     inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
     inline uint16_t& _old_input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572BE4});
     inline int16_t& _old_active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF4});

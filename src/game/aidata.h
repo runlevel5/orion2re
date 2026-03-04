@@ -28,7 +28,9 @@ namespace AIDATA {
     inline s_ai_refit_player(*&_airefit)[8] = *reinterpret_cast<s_ai_refit_player(**)[8]>(std::uintptr_t{ 0x005953A4 });
     inline int32_t(*&_ship_refit_desirabilities)[500] = *reinterpret_cast<int32_t(**)[500]>(std::uintptr_t{ 0x005953C4 });
     inline uint16_t(*&_base_planet_values)[8][360] = *reinterpret_cast<uint16_t(**)[8][360]>(std::uintptr_t{ 0x0055A6B4 });
-    inline int16_t (*&_g_contextual_planet_values)[2880] =
+    inline int16_t(&_g_contextual_planet_values)[2880] =
+        *reinterpret_cast<int16_t(*)[2880]>(std::uintptr_t{ 0x0056ed28 });
+    inline int16_t (*&_contextual_planet_values)[2880] =
         *reinterpret_cast<int16_t (**)[2880]>(std::uintptr_t{0x0055A6B8});
     inline uint16_t& _n_all_ships = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005953E0 });
 
@@ -57,4 +59,6 @@ namespace AIDATA {
     bool __cdecl Star_In_Range_Of_Given_Star_(int16_t target_star_idx, int16_t source_star_idx, int max_range);
     void __cdecl Compute_AI_Data_();
     void __cdecl Find_Players_In_Range_(int16_t star_idx, int8_t* in_range_900, int8_t* in_range_2025);
+
+    int32_t __cdecl Uncolonized_Planet_Worth_To_Player_(s_planet_data* planet, s_player* plr);
 }

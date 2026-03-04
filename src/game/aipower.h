@@ -16,4 +16,6 @@ namespace aipower {
     int16_t __cdecl Max_Ship_Hits_(int16_t ship_idx);
 
     int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx);
+
+    int16_t __cdecl Base_Generic_Ocv_(int16_t player_idx);
 }

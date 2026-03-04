@@ -321,7 +321,7 @@ namespace antarans {
         }
     }
 
-    int16_t __cdecl Antarans_Defensive_Force_() {
+    int16_t __cdecl Antaran_Defensive_Force_() {
         int16_t total_force = 0;
         for (int32_t i = 0; i < 9; ++i) {
             total_force += (int16_t)(MOX::_antarans.defensive_ships[i] * (uint16_t)(uint8_t)_antaran_ship_cost[i]);
@@ -329,10 +329,10 @@ namespace antarans {
         return total_force;
     }
 
-    int16_t __cdecl Total_Defensive_Force_() {
+    int16_t __cdecl Antaran_Total_Resources_() {
         int16_t total_force;
 
-        total_force = Antarans_Defensive_Force_();
+        total_force = Antaran_Defensive_Force_();
         total_force += Antaran_Offensive_Force_();
         total_force += MOX::_antarans.resource_offensive;
         total_force += MOX::_antarans.resource_defensive;
@@ -432,7 +432,7 @@ namespace antarans {
 
         bool should_attack = false;
 
-        int16_t defensive_force = Total_Defensive_Force_();
+        int16_t defensive_force = Antaran_Total_Resources_();
         int16_t offensive_force = Antaran_Offensive_Force_();
 
         // Offensive force must be at least 1/4 of defensive force to consider an attack

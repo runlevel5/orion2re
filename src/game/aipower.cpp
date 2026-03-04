@@ -38,7 +38,7 @@ namespace aipower {
         int16_t temp_defense;
 
         if (MOX::_settings.strategic_combat_flag != 0) {
-            attack_bonus = INITSHIP::Best_Computer_Attack_Bonus_(ship->owner);
+            attack_bonus = aipower::Base_Generic_Ocv_(ship->owner);
             INITSHIP::Update_Strategic_Ship_(ship_idx);
         } else {
             INITSHIP::Get_Ship_Combat_Bonuses_(ship_idx, &temp_attack, &temp_defense, &attack_bonus);
@@ -273,4 +273,19 @@ namespace aipower {
             }
         }
     }
+
+    int16_t __cdecl Base_Generic_Ocv_(int16_t player_idx) {
+        int16_t computer_idx;
+        int16_t bonus;
+
+        computer_idx = INITSHIP::Best_Computer_(player_idx);
+        bonus = TECHDATA::_computers[computer_idx].bonus;
+
+        if (player_idx < 8) {
+            bonus += MOX::_player[player_idx].traits[7 /* TRAIT_SHIP_ATTACK */];
+        }
+
+        return bonus;
+    }
+
 }

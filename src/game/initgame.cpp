@@ -489,27 +489,6 @@ namespace INITGAME {
         }
     }
 
-    /**
-     * Iterates through all systems to spawn Space Monsters and Orion Guardians.
-     * Replaces monster star markers with their original values and upgrades guarded planets.
-     */
-    /**
-     * @address 00432100
-     */
-    int32_t __cdecl Get_Design_Hull_Size_() {
-        // Access hull_size from TECHDATA::_hull_data array based on current design's ship size
-        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].hull_size);
-
-        // Check for Megafluxers (TECH_APP_MEGAFLUXERS = 156)
-        // BUG: The decompiled code uses 156 (TECH_APP_ROBO_MINERS) instead of Megafluxers (89) for hull bonus.
-        if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_ROBO_MINERS] == 3) {
-            // Apply 25% hull space bonus: (hull_size * 125) / 100
-            hull_size = (hull_size * 125) / 100;
-        }
-
-        return hull_size;
-    }
-
     void __cdecl Make_System_Monsters_Into_Ships_() {
         int16_t total_stars = MOX::num_stars;
         s_star_data* star_ptr = MOX::_star;

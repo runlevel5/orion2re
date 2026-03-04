@@ -1482,8 +1482,8 @@ namespace diplomac {
 
         int16_t base_chance = (int16_t)time_since_attack - 9;
 
-        int32_t p1_attacks = Number_Of_Attacks_Underway_(player_idx, target_idx);
-        int32_t p2_attacks = Number_Of_Attacks_Underway_(target_idx, player_idx);
+        int32_t p1_attacks = aimove::Number_Of_Attacks_Underway_(player_idx, target_idx);
+        int32_t p2_attacks = aimove::Number_Of_Attacks_Underway_(target_idx, player_idx);
 
         int16_t war_count_p2_p1 = Get_War_Count_(target_idx, player_idx);
         int16_t war_count_p1_p2 = Get_War_Count_(player_idx, target_idx);
@@ -1501,7 +1501,7 @@ namespace diplomac {
 
         for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
             if (p != player_idx && p != target_idx) {
-                score += (int16_t)(Number_Of_Attacks_Underway_(p, target_idx) * 20);
+                score += (int16_t)(aimove::Number_Of_Attacks_Underway_(p, target_idx) * 20);
             }
         }
 
@@ -1993,60 +1993,6 @@ namespace diplomac {
         }
 
         return (int16_t)result;
-    }
-
-    /**
-     * Calculates the number of unique stars where a player has ships that could attack a target player's colony.
-     * Only ships of type 0 (combat ships) are considered.
-     * 
-     * @param player_idx The player index whose ships are being checked.
-     * @param target_player_idx The player index whose colonies might be under attack.
-     * @return The count of unique stars being attacked.
-     */
-    int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_player_idx) {
-        // attacked_stars tracks which stars have an active threat from the player.
-        // Array size 72 is based on the game's maximum number of stars.
-        uint8_t attacked_stars[72];
-        memset(attacked_stars, 0, sizeof(attacked_stars));
-
-        int num_ships = (int)MOX::_NUM_SHIPS;
-        s_ship_data* ships = MOX::_ship;
-
-        for (int i = 0; i < num_ships; ++i) {
-            s_ship_data* ship = &ships[i];
-
-            // Only consider ships owned by the player that are combat ships (type 0)
-            if (ship->owner == (int8_t)player_idx && ship->d.ship_type == 0) {
-                int star_idx = -1;
-
-                // Determine the current or destination star index based on ship status.
-                // Status 0: At star
-                // Status 1: Traveling (location offset by 500)
-                // Status 2: Orbiting/Wormhole (location offset by 1000)
-                if (ship->status == 0) {
-                    star_idx = (int)ship->location;
-                } else if (ship->status == 1) {
-                    star_idx = (int)ship->location - 500;
-                } else if (ship->status == 2) {
-                    star_idx = (int)ship->location - 1000;
-                }
-
-                if (star_idx >= 0 && star_idx < 72) {
-                    // Check if the target player has a colony at this star via bitmask.
-                    if ((MOX::_star[star_idx].has_colony >> (uint8_t)target_player_idx) & 1) {
-                        attacked_stars[star_idx] = 1;
-                    }
-                }
-            }
-        }
-
-        int total_attacks = 0;
-        int num_stars = (int)MOX::_NUM_STARS;
-        for (int i = 0; i < num_stars; ++i) {
-            total_attacks += attacked_stars[i];
-        }
-
-        return total_attacks;
     }
 
     void __cdecl Break_Research_(int16_t player1_idx, int16_t player2_idx) {

@@ -44,11 +44,11 @@ namespace antarans {
 
     bool __cdecl Deploy_Antaran_Ships_();
 
-    int16_t __cdecl Total_Defensive_Force_();
+    int16_t __cdecl Antaran_Total_Resources_();
 
     int16_t __cdecl Antaran_Offensive_Force_();
 
-    int16_t __cdecl Antarans_Defensive_Force_();
+    int16_t __cdecl Antaran_Defensive_Force_();
 
     bool __cdecl Antarans_Should_Attack_();
 }
