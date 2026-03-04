@@ -102,12 +102,6 @@ namespace LOADSAVE {
         return result;
     }
 
-    int8_t __cdecl Active_Save_Slot_Invalid_() {
-        using Fn = int8_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512200});
-        return fn();
-    }
-
     /**
      * @address 005120e0
      */

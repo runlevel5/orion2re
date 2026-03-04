@@ -1572,7 +1572,6 @@ namespace hooks {
         { 0x0041ff60, &SHIPS::Clear_All_Ships_Auto_Colonization_Flag_ },
         { 0x0041f7b0, &SHIPS::Print_Eta_On_Ship_Icon_ },
         { 0x004f1640, &HAROLD::Player_Has_Outpost_ },
-        { 0x00512200, &LOADSAVE::Active_Save_Slot_Invalid_ },
     };
 
     void Install_Hooks()
