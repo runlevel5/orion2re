@@ -27,11 +27,7 @@ namespace SHIPS {
 
     s_animation_header* __cdecl Get_Ship_Icon_Pict_Seg_(int16_t ship_type_idx, uint8_t is_highlighted);
 
-    inline void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, s_colors*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f680});
-        fn(x1, y1, x2, y2, colors);
-    }
+    void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors);
 
     void __cdecl Print_Eta_On_Ship_Icon_(int16_t node_idx, int16_t style_toggle, int16_t x_offset, int16_t y_offset);
 
@@ -45,11 +41,7 @@ namespace SHIPS {
 
     void __cdecl Kill_Ship_(int16_t ship_idx);
 
-    inline void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
-        using Fn = void(__cdecl*)(s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041FF40});
-        fn(ship);
-    }
+    void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship);
 
     void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list);
 

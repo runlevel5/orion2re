@@ -203,6 +203,8 @@ namespace MOX {
     inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
     inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
 
+    inline int16_t* _help_entry_list = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1900});
+
     // Suggested name: MOX::_class_to_mineral
     inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
 

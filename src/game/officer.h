@@ -113,10 +113,7 @@ namespace OFFICER {
     void __cdecl Generate_Random_Officer_(int16_t player_index);
     void __cdecl Assert_Marooned_Leaders_();
 
-    inline void __cdecl Kill_Officer_(int16_t leader_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x0043E110)(leader_idx);
-    }
+    void __cdecl Kill_Officer_(int16_t leader_idx);
 
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
@@ -139,11 +136,7 @@ namespace OFFICER {
 
     void __cdecl Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship, int8_t eta);
 
-    inline void __cdecl Ai_Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship) {
-        using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444650});
-        fn(player, leader, ship);
-    }
+    void __cdecl Ai_Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship);
 
     bool __cdecl Leader_Can_Be_Assigned_(int16_t leader_idx);
 

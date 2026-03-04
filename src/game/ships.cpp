@@ -3,6 +3,18 @@
 namespace SHIPS {
 
     /**
+     * @address 0041ff40
+     */
+    void __cdecl Clear_Auto_Colonization_Flag_(s_ship_data* ship) {
+        uint8_t ship_type = ship->d.ship_type;
+
+        if (ship_type == 1 || ship_type == 4) {
+            ship->d.ship_weapon[0].type = -1;
+            ship->d.ship_weapon[1].type = 0;
+        }
+    }
+
+    /**
      * @address 0041ff60
      */
     void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list) {
@@ -565,6 +577,42 @@ namespace SHIPS {
     /**
      * @address 0041f370
      */
+    /**
+     * @address 0041f680
+     */
+    void __cdecl Draw_Ship_Destination_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors) {
+        int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+        int zoom_index = 3 - (int)zoom_level;
+        if (zoom_index <= 0) {
+            zoom_index = 0;
+        }
+
+        int16_t target_x;
+        int16_t target_y;
+
+        // Check if current screen is Galaxy (0), System (12/0x0C), or Special (39/0x27)
+        if (MOX::_current_screen == 0 || MOX::_current_screen == 0x27 || MOX::_current_screen == 0x0C) {
+            SHIPS::Get_Ship_Icon_Dimensions_((int16_t)zoom_index, &MOX::_ship_icon_width[zoom_index], &MOX::_ship_icon_height[zoom_index]);
+
+            // Adjust destination to the center of the ship icon
+            target_x = x2 + (int16_t)((uint8_t)MOX::_ship_icon_width[zoom_index] >> 1);
+            target_y = y2 + (int16_t)((uint8_t)MOX::_ship_icon_height[zoom_index] >> 1);
+        } else {
+            // Default fixed offset for other screens
+            target_x = x2 + 4;
+            target_y = y2 + 4;
+        }
+
+        SHIPS::Draw_Directional_Multi_Colored_Line_(
+            target_x,
+            target_y,
+            x1,
+            y1,
+            colors,
+            MOX::_multi_colored_line_start
+        );
+    }
+
     int16_t __cdecl Overlapped_Ship_Icon_Button_(int16_t* p_icon_idx, int16_t threshold_x, int16_t threshold_y) {
         int16_t current_idx = *p_icon_idx;
         int16_t result = 0;

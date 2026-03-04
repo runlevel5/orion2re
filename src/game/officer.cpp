@@ -2365,6 +2365,21 @@ namespace OFFICER {
         return selected_leader_idx;
     }
 
+    /**
+     * Calculates the indices of the player, leader, and ship pointers,
+     * determines the ETA for assigning the leader to the ship,
+     * and performs the assignment.
+     */
+    void __cdecl Ai_Assign_Leader_To_Ship_(s_player* player, s_leader_data* leader, s_ship_data* ship) {
+        int16_t ship_idx = static_cast<int16_t>(ship - MOX::_ship);
+        int16_t leader_idx = static_cast<int16_t>(leader - MOX::_leaders);
+        int16_t player_idx = static_cast<int16_t>(player - MOX::_player);
+
+        int8_t eta = Get_Ship_Leader_ETA_(player_idx, leader_idx, ship_idx);
+
+        Assign_Leader_To_Ship_(player, leader, ship, eta);
+    }
+
     int16_t __cdecl Chance_To_Hire_Hero_(int16_t player_idx) {
         int16_t n_fleet_officers = N_Fleet_Officers_Owned_By_Player_(player_idx);
         int16_t n_star_officers = N_Star_Officers_Owned_By_Player_(player_idx);
@@ -2414,5 +2429,29 @@ namespace OFFICER {
         }
 
         return (int16_t)((int32_t)chance / n_officers);
+    }
+
+    void __cdecl Kill_Officer_(int16_t leader_idx) {
+        s_leader_data* leader = &MOX::_leaders[leader_idx];
+        int16_t loc = leader->location;
+
+        if (loc > -1) {
+            if (leader->type == 1) {
+                int16_t player_idx = (int16_t)leader->player_index;
+                if (player_idx > -1 && player_idx < 8) {
+                    MOX::_star[loc].officer_index[player_idx] = -1;
+                }
+            } else {
+                MOX::_ship[loc].officer_index = -1;
+            }
+        }
+
+        leader->status = -2;
+        leader->eta = 0;
+        leader->location = -1;
+
+        if (leader->type == 1) {
+            COLCALC::Do_Player_Colony_Calculations_((int16_t)leader->player_index);
+        }
     }
 }

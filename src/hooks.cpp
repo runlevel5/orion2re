@@ -1572,6 +1572,12 @@ namespace hooks {
         { 0x0041ff60, &SHIPS::Clear_All_Ships_Auto_Colonization_Flag_ },
         { 0x0041f7b0, &SHIPS::Print_Eta_On_Ship_Icon_ },
         { 0x004f1640, &HAROLD::Player_Has_Outpost_ },
+        { 0x0041f680, &SHIPS::Draw_Ship_Destination_Line_ },
+        { 0x0041ff40, &SHIPS::Clear_Auto_Colonization_Flag_ },
+        { 0x004988B0, &RACESEL::Set_Race_Select_Help_ },
+        { 0x00439ca0, &raceopt::Setup_Evolutionary_Upgrade_ },
+        { 0x00444650, &OFFICER::Ai_Assign_Leader_To_Ship_ },
+        { 0x0043e110, &OFFICER::Kill_Officer_ },
     };
 
     void Install_Hooks()
