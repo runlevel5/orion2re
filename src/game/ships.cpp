@@ -235,7 +235,7 @@ namespace SHIPS {
         Get_XYs_For_Orbiting_Ships_(star_id, (int16_t)ship->owner, &ox1, &oy1, &ox2, &oy2, ox_arr, oy_arr);
 
         // stack_slot is at offset 6 in s_ship_icon
-        int16_t slot = *reinterpret_cast<int16_t*>(&MOX::_ship_icon[ship_idx].field3_0x6);
+        int16_t slot = *reinterpret_cast<int16_t*>(&MOX::_ship_icon[ship_idx].stack_slot);
 
         switch (slot) {
         case 0:

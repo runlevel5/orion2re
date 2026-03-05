@@ -4,6 +4,7 @@ typedef unsigned char   undefined;
 typedef unsigned char    byte;
 typedef unsigned int    dword;
 
+typedef long long    int16;
 typedef long long    longlong;
 typedef unsigned char    uchar;
 typedef unsigned int    uint;
@@ -319,10 +320,9 @@ struct s_animation_header {
     int16_t current_frame;
     int16_t frame_count;
     uint8_t loop_frame;
-    uint8_t field5_0x9;
-    uint8_t field6_0xa;
-    uint8_t flags;
-    uint32_t frame_offsets[1];
+    short field5_0x9;
+    undefined1 flags;
+    uint32_t frame_offsets[0]; /* Dynamic length, varies by file */
 };
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
@@ -374,6 +374,14 @@ struct s_bomb {
     short field11_0xb;
     undefined field12_0xd;
     undefined field13_0xe;
+};
+
+typedef struct s_build_ship_icon_item s_build_ship_icon_item, *Ps_build_ship_icon_item;
+
+struct s_build_ship_icon_item {
+    int8_t player_idx;
+    short ship_idx;
+    short icon_idx;
 };
 
 typedef struct s_class_group s_class_group, *Ps_class_group;
@@ -3338,6 +3346,53 @@ struct s_player_info {
     char warlord;
 };
 
+typedef struct s_plntsum_planet s_plntsum_planet, *Ps_plntsum_planet;
+
+struct s_plntsum_planet {
+    short max_pop;
+    short food_per_farmer;
+    short minerals;
+    short mineral_class;
+    short climate;
+    short explored;
+    short best_colony_eta;
+    short best_outpost_eta;
+    short best_colony_ship_idx;
+    short best_outpost_ship_idx;
+    bool field10_0x14;
+    short field11_0x15;
+    short field12_0x17;
+    undefined field13_0x19;
+    int8_t colony_eta;
+    int8_t outpost_eta;
+};
+
+typedef struct s_plntsum_screen s_plntsum_screen, *Ps_plntsum_screen;
+
+struct s_plntsum_screen {
+    struct s_animation_header *pics[14];
+    short buttons[10];
+    short fields[8];
+    short colony_icons[8];
+    short output_icons[8];
+    short up_button;
+    short dn_button;
+    short esc_button;
+    short planet_icons[72];
+    bool refresh_fields;
+    short scanned_input;
+};
+
+typedef struct s_plntsum_ship s_plntsum_ship, *Ps_plntsum_ship;
+
+struct s_plntsum_ship {
+    short colony_ship_idx;
+    short outpost_ship_idx;
+    short ship_icon_id;
+    bool colony_available; /* Created by Rename Structure Field action */
+    bool output_available; /* Created by Rename Structure Field action */
+};
+
 typedef struct s_pop_info s_pop_info, *Ps_pop_info;
 
 struct s_pop_info {
@@ -3413,8 +3468,8 @@ struct s_scroll_bar {
     short visible_rows;
     short first_visible_row;
     short track_len_px;
-    short field8_0x10;
-    short field9_0x12;
+    short up_btn;
+    short dn_btn;
     undefined field10_0x14;
     undefined field11_0x15;
     undefined field12_0x16;
@@ -3897,9 +3952,8 @@ typedef struct s_ship_icon s_ship_icon, *Ps_ship_icon;
 struct s_ship_icon {
     short field0_0x0;
     short node_idx;
-    short field2_0x4;
-    undefined field3_0x6;
-    undefined field4_0x7;
+    short star_idx;
+    short stack_slot;
     short x;
     short y;
 };

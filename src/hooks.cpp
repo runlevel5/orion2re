@@ -1578,6 +1578,22 @@ namespace hooks {
         { 0x00439ca0, &raceopt::Setup_Evolutionary_Upgrade_ },
         { 0x00444650, &OFFICER::Ai_Assign_Leader_To_Ship_ },
         { 0x0043e110, &OFFICER::Kill_Officer_ },
+        { 0x0049ac20, &HACCESS::Player_Can_Order_Ship_ },
+        { 0x0044b0a0, &PLNTSUM::Set_Planet_Explored_Flags_ },
+        { 0x0044b100, &PLNTSUM::Reset_Explored_Planets_ },
+        { 0x00448f20, &PLNTSUM::Add_Plntsum_Fields_ },
+        { 0x00449d00, &PLNTSUM::Load_Planet_Summary_Pictures_ },
+        { 0x00449500, &PLNTSUM::Allocate_Space_For_Summary_Screen_ },
+        { 0x00449930, &PLNTSUM::Determine_Button_Status_ },
+        { 0x004495a0, &PLNTSUM::Build_Ship_Summary_ },
+        { 0x0044b180, &PLNTSUM::Sort_Planet_Summary_ },
+        { 0x004499e0, &PLNTSUM::Filter_Explored_Planets_ },
+        { 0x0044a5b0, &PLNTSUM::Planet_Summary_Id_ },
+        { 0x0044a320, &PLNTSUM::Scan_Summary_Box_Fields_ },
+        { 0x00449350, &PLNTSUM::Add_Colony_Ship_Icon_Field_ },
+        { 0x004493c0, &PLNTSUM::Add_Outpost_Ship_Icon_Field_ },
+        { 0x00449460, &PLNTSUM::Add_PlntSum_Galaxy_Map_Fields_ },
+        { 0x00447340, &PLNTSUM::Summary_Planet_Index_ },
     };
 
     void Install_Hooks()

@@ -636,6 +636,12 @@ inline bool __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
     return fn(field, bit_index);
 }
 
+inline void __cdecl Set_Bit_Field_(void* field, int16_t bit_index) {
+    using Fn = void(__cdecl*)(void*, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFED});
+    fn(field, bit_index);
+}
+
 inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
     using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412E20});

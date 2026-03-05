@@ -110,6 +110,7 @@
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />
     <ClCompile Include="src\game\platform.cpp" />
+    <ClCompile Include="src\game\plntsum.cpp" />
     <ClCompile Include="src\game\raceopt.cpp" />
     <ClCompile Include="src\game\racesel.cpp" />
     <ClCompile Include="src\game\random.cpp" />

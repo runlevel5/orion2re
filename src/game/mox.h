@@ -599,6 +599,16 @@ namespace MOX {
         fn();
     }
 
+    inline void __cdecl Push_Block_(void* screen_seg) {
+        using Fn = void(__cdecl*)(void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB30})(screen_seg);
+    }
+
+    inline void __cdecl Pop_Block_(void* screen_seg) {
+        using Fn = void(__cdecl*)(void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB70})(screen_seg);
+    }
+
     namespace farload {
         inline void* __cdecl Far_Reload_(const char* filename, int entry, void* seg) {
             using Fn = void*(__cdecl*)(const char*, int, void*);

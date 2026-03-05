@@ -93,4 +93,6 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B210});
         return fn(icon_id);
     }
+
+    bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship);
 }

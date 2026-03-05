@@ -793,6 +793,28 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f13d0
+     */
+    int16_t __cdecl N_Turns_To_Star_(int16_t ship_id, int16_t star_id) {
+        int16_t ship_ids[2];
+        s_ship_move_info move_info;
+        int16_t result = -1;
+
+        // Initialize ship IDs list with a terminator
+        ship_ids[0] = ship_id;
+        ship_ids[1] = -1;
+
+        SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, star_id, &move_info);
+
+        // If the ships are able to move, return the number of turns required
+        if (move_info.moving != 0) {
+            result = (int16_t)move_info.turns_left;
+        }
+
+        return result;
+    }
+
+    /**
      * @address 004f05c0
      */
     int16_t __cdecl Absolute_Location_(int16_t location) {

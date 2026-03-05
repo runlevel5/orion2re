@@ -57,7 +57,6 @@ namespace bitmap {
         h->frame_count = 1;
         h->loop_frame = 0;
         h->field5_0x9 = 0;
-        h->field6_0xa = 0;
         h->flags = 1;
         h->frame_offsets[0] = 0x00000010;
     }

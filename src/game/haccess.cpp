@@ -523,6 +523,17 @@ namespace HACCESS {
         return MOX::_ship[ship_idx].y;
     }
 
+    /**
+     * @address 0049ac20
+     */
+    bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship) {
+        if (static_cast<int16_t>(ship->owner) == player_idx) {
+            return SHIPMOVE::Can_Order_Ship_(ship);
+        }
+
+        return false;
+    }
+
     int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int max, int filter) {
         // Initialize output buffer with 0xFFFF (-1)
         memset(selected_ids_out, 0xff, max * sizeof(int16_t));
