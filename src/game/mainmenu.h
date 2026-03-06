@@ -93,4 +93,7 @@ namespace MAINMENU {
     int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list);
 
     void __cdecl Main_Menu_Screen_();
+
+
+    int32_t __cdecl Get_File_Animation_Block_Space_();
 }

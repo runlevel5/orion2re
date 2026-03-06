@@ -2,6 +2,19 @@
 
 namespace HACCESS {
     /**
+     * @address 0049b210
+     */
+    int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx) {
+        int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
+
+        if (node_idx >= 0 && node_idx < 500) {
+            return MOX::_ship_node[node_idx].ship_idx;
+        }
+
+        return 0;
+    }
+
+    /**
      * @address 0049b240
      */
     int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx) {
@@ -532,6 +545,33 @@ namespace HACCESS {
         }
 
         return false;
+    }
+
+    int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords) {
+        int16_t best_star_idx = -1;
+        uint16_t min_turns = 255; /* 0xff */
+        s_ship_move_info move_info;
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            // Check if player has a colony or presence in the system
+            if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, i)) {
+                // Check if the system is blockaded for the current player
+                if (!((MOX::_star[i].blockaded >> (static_cast<uint8_t>(MOX::_PLAYER_NUM) & 0x1F)) & 1)) {
+                    SHIPMOVE::Ships_Try_To_Move_To_(coords, i, &move_info);
+
+                    // If ships can actually move to this star
+                    if (move_info.moving != 0) {
+                        // Update best candidate if this star is closer in terms of turns
+                        if (static_cast<uint8_t>(move_info.turns_left) < min_turns) {
+                            min_turns = static_cast<uint16_t>(static_cast<uint8_t>(move_info.turns_left));
+                            best_star_idx = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return best_star_idx;
     }
 
     int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int max, int filter) {

@@ -217,13 +217,4 @@ namespace file_ani {
 
         return init::_io_buffer->frame_count - 1;
     }
-
-    int32_t __cdecl Get_File_Animation_Block_Space_() {
-        s_animation_header* header = init::_io_buffer;
-        int16_t index = header->current_frame;
-        int32_t current_val = header->frame_offsets[index];
-        int32_t next_val = header->frame_offsets[index + 1];
-        return (next_val - current_val) + 1;
-    }
-
 }

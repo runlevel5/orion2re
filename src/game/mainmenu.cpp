@@ -16,7 +16,7 @@ namespace MAINMENU {
         int32_t current_sound_handle = 0;
 
         file_ani::Open_File_Animation_(s_MAINMENU_LBX_0055a630, 0);
-        uint32_t buffer_size = file_ani::Get_File_Animation_Block_Space_();
+        uint32_t buffer_size = MAINMENU::Get_File_Animation_Block_Space_();
         uint16_t total_frames = (uint16_t)file_ani::Get_File_Animation_Total_Frames_();
 
         void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, buffer_size);
@@ -521,5 +521,13 @@ namespace MAINMENU {
                 return;
             }
         } while (true);
+    }
+
+    int32_t __cdecl Get_File_Animation_Block_Space_() {
+        s_animation_header* header = init::_io_buffer;
+        int16_t index = header->current_frame;
+        int32_t current_val = header->frame_offsets[index];
+        int32_t next_val = header->frame_offsets[index + 1];
+        return (next_val - current_val) + 1;
     }
 }

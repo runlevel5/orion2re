@@ -60,6 +60,7 @@ namespace MAINSCR {
     }
 
     inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
+    inline uint8_t* _twinkling_stars = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565460});
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});

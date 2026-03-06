@@ -3359,10 +3359,10 @@ struct s_plntsum_planet {
     short best_outpost_eta;
     short best_colony_ship_idx;
     short best_outpost_ship_idx;
-    bool field10_0x14;
-    short field11_0x15;
-    short field12_0x17;
-    undefined field13_0x19;
+    int8_t blocked;
+    short ship_summary_idx;
+    short scan_highlight_pulse;
+    int8_t scan_highlight_pulse_step;
     int8_t colony_eta;
     int8_t outpost_eta;
 };

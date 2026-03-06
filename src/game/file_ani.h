@@ -50,6 +50,4 @@ namespace file_ani {
     int16_t __cdecl Get_File_Animation_Frame_();
 
     int16_t __cdecl Get_File_Animation_Total_Frames_();
-
-    int32_t __cdecl Get_File_Animation_Block_Space_();
 }

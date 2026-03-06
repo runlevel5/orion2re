@@ -9,6 +9,12 @@ namespace MISC {
 
     void __cdecl Increment_Mouse_Clock_Image_();
 
+    inline void __cdecl Fade_To_Black_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049E6F0});
+        fn();
+    }
+
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id);
 
     void __cdecl Change_Font_Style_(int16_t font_id);

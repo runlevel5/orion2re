@@ -172,4 +172,15 @@ namespace HAROLD {
     inline const char* s_MC_0055823c = reinterpret_cast<const char*>(std::uintptr_t{0x0055823c}); // "MC"
     inline const char* s_BC_00558244 = reinterpret_cast<const char*>(std::uintptr_t{0x00558244}); // "BC"
     inline const char* s_in_next_turn = reinterpret_cast<const char*>(std::uintptr_t{0x00558004}); // "in next-turn"
+
+    inline bool __cdecl Star_Guarded_By_Monster_(int16_t star_idx, int16_t* summary_id_ptr) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t*);
+        return reinterpret_cast<Fn>(0x004f1e80)(star_idx, summary_id_ptr);
+    }
+
+    inline int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star) {
+        using Fn = int16_t(__cdecl*)(s_star_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1D00});
+        return fn(star);
+    }
 }

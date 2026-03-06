@@ -45,6 +45,13 @@ namespace video {
 	// Functions
 	void __cdecl Set_Refresh_Stencil_();
 	void Set_Refresh_Full_();
+
+	inline void __cdecl Load_Palette_(uint32_t p1, uint32_t p2, uint32_t p3) {
+		using Fn = void(__cdecl*)(uint32_t, uint32_t, uint32_t);
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525400});
+		fn(p1, p2, p3);
+	}
+
 	void __cdecl Set_Page_Off_();
 	void __cdecl Clip_Off_();
 

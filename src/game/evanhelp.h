@@ -23,6 +23,12 @@ namespace EVANHELP {
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e140})();
     }
 
+    inline void __cdecl Set_PlntSum_Screen_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041DDF0});
+        fn();
+    }
+
     inline void __cdecl Set_Officer_Screen_Help_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00443E70 });

@@ -16,4 +16,10 @@ namespace line {
 
     void __cdecl Draw_Vertical_Run_(uint8_t** buf, int16_t param_2, int16_t count, uint8_t color);
     void __cdecl Draw_Horizontal_Run_(uint8_t** buf, int16_t step_x, int16_t count, uint8_t color);
+
+    inline void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t y1, int16_t x1, int16_t y2, int16_t x2, uint8_t* colors, int16_t start_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041F560});
+        fn(y1, x1, y2, x2, colors, start_idx);
+    }
 }

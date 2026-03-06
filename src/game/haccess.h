@@ -88,11 +88,15 @@ namespace HACCESS {
 
     int16_t __cdecl Ship_Icon_Star_Id_(int16_t ship_icon_idx);
 
-    inline int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B210});
-        return fn(icon_id);
-    }
+    int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx);
 
     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship);
+
+    int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords);
+
+    inline bool __cdecl Special_Is_Planet_Special_(int16_t special_id) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B5B0});
+        return fn(special_id);
+    }
 }

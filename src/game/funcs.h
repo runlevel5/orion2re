@@ -345,6 +345,12 @@ inline uint32_t __cdecl isqrt_(uint32_t val) {
     return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
 }
 
+inline int16_t __cdecl Range_(int16_t y1, int16_t x1, int16_t y2, int16_t x2) {
+    using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531A50});
+    return fn(y1, x1, y2, x2);
+}
+
 inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
     using Fn = void(__cdecl*)(void*, uint32_t, uint8_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052ced8});
@@ -467,6 +473,9 @@ inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x0055
 inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   // ""
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
+inline const char* s_c_00556350 = reinterpret_cast<const char*>(std::uintptr_t{0x00556350}); // "c"
+inline const char* s_o_00556af4 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF4}); // "o"
+inline const char* s_oc_00556af8 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF8}); // "oc"
 
 inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00552CD8}); // "Monster (ship id: %d) cannot move to %s (%d)!"
@@ -562,6 +571,36 @@ inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  //
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
+
+inline void __cdecl Set_Font_Style_(int32_t a1, const void* colors) {
+    using Fn = void(__cdecl*)(int32_t, const void*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005255A0});
+    fn(a1, colors);
+}
+
+inline int16_t __cdecl Get_Font_Height_(int32_t a1) {
+    using Fn = int16_t(__cdecl*)(int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526060});
+    return fn(a1);
+}
+
+inline int16_t __cdecl Get_String_Width_(const char* str) {
+    using Fn = int16_t(__cdecl*)(const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525470});
+    return fn(str);
+}
+
+inline void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528CC0});
+    fn(x1, y1, x2, y2, color);
+}
+
+inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
+    using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525910});
+    fn(x, y, str);
+}
 
 inline void __cdecl Save_Hotseat_Map_Info_() {
     using Fn = void(__cdecl*)();
