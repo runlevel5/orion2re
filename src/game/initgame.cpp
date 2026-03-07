@@ -82,8 +82,8 @@ namespace INITGAME {
         MOX::_settings.auto_saves = 1;
         MOX::_settings.only_show_serious_turn_summary_reports = 0;
         MOX::_settings.ship_initiative = 0;
-        MOX::_settings.field14_0xe = 0;
-        MOX::_settings.field15_0xf = 0;
+        MOX::_settings.tactical_combat_speed = 0;
+        MOX::_settings.message_delay = 0;
 
         // Sound and Music
         MOX::_settings.sound_fx_on = 1;
@@ -111,11 +111,8 @@ namespace INITGAME {
         MOX::_settings.active_save_slot = -1; // 0xFF
         MOX::_settings.version = 0x82;
 
-        // Specific field writes (using absolute offsets as per disassembly)
-        // field71_0xde (0xDE) and field72_0xdf (0xDF) as a word (value 2)
-        *reinterpret_cast<uint16_t*>(&MOX::_settings.field71_0xde) = 2;
-        // field73_0xe0 (0xE0) and field74_0xe1 (0xE1) as a word (value 1)
-        *reinterpret_cast<uint16_t*>(&MOX::_settings.field73_0xe0) = 1;
+        MOX::_settings.sound_driver_id = 2;
+        MOX::_settings.music_driver_id = 1;
 
         // Clear the first byte of 10 consecutive records starting at 0x5974F0 (stride 0x25)
         // TODO: Unknown

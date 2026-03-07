@@ -1624,6 +1624,7 @@ namespace hooks {
         { 0x00449c80, &PLNTSUM::Load_Planet_Pictures_ },
         { 0x004497f0, &PLNTSUM::Check_For_Colony_And_Outpost_Ships_ },
         { 0x004f1e80, &HAROLD::Star_Guarded_By_Monster_ },
+        { 0x00411ee0, &namestar::Do_Change_Star_Name_ },
     };
 
     void Install_Hooks()

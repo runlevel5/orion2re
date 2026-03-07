@@ -450,6 +450,7 @@ inline const char* const s_Interdictor_005576ac = reinterpret_cast<const char*>(
 inline const char* const s_Harbinger_005576b8 = reinterpret_cast<const char*>(0x005576B8); // "Harbinger"
 inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
 inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
+inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
 
 inline void __cdecl FUN_00443C60() {
