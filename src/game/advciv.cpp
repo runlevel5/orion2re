@@ -64,7 +64,7 @@ namespace ADVCIV {
         for (int16_t player_idx = 0; player_idx < (int16_t)MOX::_NUM_PLAYERS; ++player_idx) {
             s_adv_civ_player& player = _adv_civ_player[player_idx];
 
-            for (int16_t i = 0; i < player.planet_count; ++i) {
+            for (int16_t i = 0; i < player.candidate_planet_count; ++i) {
                 s_adv_civ_player_planet& planet = player.planets[i];
 
                 int32_t worth = 0;
@@ -76,7 +76,7 @@ namespace ADVCIV {
                 }
 
                 planet.worth = worth;
-                planet.has_colony = has_colony;
+                planet.is_homeworld = has_colony;
                 planet.proximity_bonus = proximity_bonus;
             }
 
@@ -149,13 +149,13 @@ namespace ADVCIV {
                                 player->has_planet[planet_idx] == 0 &&
                                 planet->colony_index == -1)
                             {
-                                int16_t count = player->planet_count;
+                                int16_t count = player->candidate_planet_count;
                                 s_adv_civ_player_planet* adv_planet = &player->planets[count];
 
                                 memset(adv_planet, 0, sizeof(s_adv_civ_player_planet));
                                 adv_planet->planet_idx = planet_idx;
 
-                                player->planet_count++;
+                                player->candidate_planet_count++;
                                 player->has_planet[planet_idx] = 1;
                             }
                         }
@@ -176,8 +176,8 @@ namespace ADVCIV {
 
         int16_t expansion_cutoff = Num_Adv_Civ_Planets_();
 
-        if (adv_player.assigned_planet_count < expansion_cutoff) {
-            int16_t total_planet_count = adv_player.planet_count;
+        if (adv_player.settled_planet_count < expansion_cutoff) {
+            int16_t total_planet_count = adv_player.candidate_planet_count;
 
             // Calculate maximum allowed expansion distance based on furthest current reach
             int32_t dist_calc = (static_cast<int32_t>(adv_player.furthest_star_dist_from_home) * 4) / 10;
@@ -284,30 +284,30 @@ namespace ADVCIV {
                     short global_p_idx = cand_planet.planet_idx;
 
                     s_adv_planet_worth& worth_rec = _planet_worth_to_player[p];
-                    if (worth_rec.planet_idx < 0) {
-                        worth_rec.planet_idx = 0;
+                    if (worth_rec.num_planets < 0) {
+                        worth_rec.num_planets = 0;
                     }
 
-                    int8_t w_idx = worth_rec.planet_idx;
+                    int8_t w_idx = worth_rec.num_planets;
                     s_adv_planet_worth_s1* planets_ptr = (s_adv_planet_worth_s1*)worth_rec.planets;
                     planets_ptr[w_idx].planet_idx = global_p_idx;
                     planets_ptr[w_idx].worth = cand_planet.worth;
 
-                    worth_rec.planet_idx++;
-                    if (worth_rec.planet_idx >= 20) {
-                        worth_rec.planet_idx = 19;
+                    worth_rec.num_planets++;
+                    if (worth_rec.num_planets >= 20) {
+                        worth_rec.num_planets = 19;
                     }
 
-                    plr.assigned_planet_count++;
-                    cand_planet.field4_0x9 = 1;
+                    plr.settled_planet_count++;
+                    cand_planet.is_settled = 1;
                     cand_planet.worth = -32766;
 
-                    if (plr.planet_count > 1) {
-                        plr.planets[cand_idx] = plr.planets[plr.planet_count - 1];
+                    if (plr.candidate_planet_count > 1) {
+                        plr.planets[cand_idx] = plr.planets[plr.candidate_planet_count - 1];
                     }
-                    plr.planet_count--;
+                    plr.candidate_planet_count--;
 
-                    if (plr.assigned_planet_count >= cutoff) {
+                    if (plr.settled_planet_count >= cutoff) {
                         player_status[p] = -1;
                         active_players_count--;
                     }
@@ -369,9 +369,9 @@ namespace ADVCIV {
             _star_colony_owner[star_idx] = (int8_t)p_idx;
 
             s_adv_civ_player_planet& hw_planet = _adv_civ_player[p_idx].planets[hw_idx];
-            hw_planet.has_colony = 1;
+            hw_planet.is_homeworld = 1;
             hw_planet.planet_idx = hw_idx;
-            hw_planet.field4_0x9 = 1;
+            hw_planet.is_settled = 1;
             hw_planet.worth = -32766;
         }
 

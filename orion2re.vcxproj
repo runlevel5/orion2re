@@ -308,6 +308,7 @@
     <None Include=".vocode\workflows\agent.yaml" />
     <None Include=".vocode\workflows\chat.yaml" />
     <None Include=".vocode\workflows\decompiler.yaml" />
+    <None Include=".vocode\workflows\struct.yaml" />
     <None Include="notes.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

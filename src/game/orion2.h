@@ -29,11 +29,11 @@ typedef struct s_adv_civ_player_planet s_adv_civ_player_planet, *Ps_adv_civ_play
 typedef int int32_t;
 
 struct s_adv_civ_player_planet {
-    int8_t has_colony;
+    int8_t is_homeworld;
     short proximity_bonus;
     int32_t worth;
     short planet_idx;
-    int8_t field4_0x9;
+    int8_t is_settled;
 };
 
 struct s_adv_civ_player_star {
@@ -43,8 +43,8 @@ struct s_adv_civ_player_star {
 
 struct s_adv_civ_player {
     short candidate_star_count;
-    short planet_count;
-    short assigned_planet_count;
+    short candidate_planet_count;
+    short settled_planet_count;
     short furthest_star_dist_from_home;
     int8_t has_planet[360];
     struct s_adv_civ_player_star stars[72];
@@ -61,80 +61,8 @@ struct s_adv_planet_worth_s1 {
 };
 
 struct s_adv_planet_worth {
-    int8_t planet_idx;
-    struct s_adv_planet_worth_s1 planets[8];
-    undefined field2_0x31;
-    undefined field3_0x32;
-    undefined field4_0x33;
-    undefined field5_0x34;
-    undefined field6_0x35;
-    undefined field7_0x36;
-    undefined field8_0x37;
-    undefined field9_0x38;
-    undefined field10_0x39;
-    undefined field11_0x3a;
-    undefined field12_0x3b;
-    undefined field13_0x3c;
-    undefined field14_0x3d;
-    undefined field15_0x3e;
-    undefined field16_0x3f;
-    undefined field17_0x40;
-    undefined field18_0x41;
-    undefined field19_0x42;
-    undefined field20_0x43;
-    undefined field21_0x44;
-    undefined field22_0x45;
-    undefined field23_0x46;
-    undefined field24_0x47;
-    undefined field25_0x48;
-    undefined field26_0x49;
-    undefined field27_0x4a;
-    undefined field28_0x4b;
-    undefined field29_0x4c;
-    undefined field30_0x4d;
-    undefined field31_0x4e;
-    undefined field32_0x4f;
-    undefined field33_0x50;
-    undefined field34_0x51;
-    undefined field35_0x52;
-    undefined field36_0x53;
-    undefined field37_0x54;
-    undefined field38_0x55;
-    undefined field39_0x56;
-    undefined field40_0x57;
-    undefined field41_0x58;
-    undefined field42_0x59;
-    undefined field43_0x5a;
-    undefined field44_0x5b;
-    undefined field45_0x5c;
-    undefined field46_0x5d;
-    undefined field47_0x5e;
-    undefined field48_0x5f;
-    undefined field49_0x60;
-    undefined field50_0x61;
-    undefined field51_0x62;
-    undefined field52_0x63;
-    undefined field53_0x64;
-    undefined field54_0x65;
-    undefined field55_0x66;
-    undefined field56_0x67;
-    undefined field57_0x68;
-    undefined field58_0x69;
-    undefined field59_0x6a;
-    undefined field60_0x6b;
-    undefined field61_0x6c;
-    undefined field62_0x6d;
-    undefined field63_0x6e;
-    undefined field64_0x6f;
-    undefined field65_0x70;
-    undefined field66_0x71;
-    undefined field67_0x72;
-    undefined field68_0x73;
-    undefined field69_0x74;
-    undefined field70_0x75;
-    undefined field71_0x76;
-    undefined field72_0x77;
-    undefined field73_0x78;
+    int8_t num_planets;
+    struct s_adv_planet_worth_s1 planets[20];
 };
 
 typedef struct s_ai_colonizable_planet s_ai_colonizable_planet, *Ps_ai_colonizable_planet;
@@ -342,16 +270,12 @@ struct s_antaran {
 typedef struct s_big_icon s_big_icon, *Ps_big_icon;
 
 struct s_big_icon {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    int8_t selected; /* Created by Rename Structure Field action */
-    undefined field5_0x5;
-    undefined field6_0x6;
-    undefined field7_0x7;
-    undefined field8_0x8;
-    short field9_0x9;
+    short grid_x;
+    short grid_y;
+    int8_t selected;
+    short screen_x;
+    short screen_y;
+    short button_id;
     short ship_idx;
 };
 
@@ -387,11 +311,7 @@ struct s_build_ship_icon_item {
 typedef struct s_class_group s_class_group, *Ps_class_group;
 
 struct s_class_group {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
-    undefined field4_0x4;
+    int8_t planet_group_by_orbit[5];
 };
 
 typedef struct s_colony s_colony, *Ps_colony;
@@ -472,7 +392,7 @@ struct s_colony_job_production {
     int base_prod_scaled;
     int gravity_penalty;
     int conquered_penalty;
-    int unk;
+    int pollution_penalty;
     int morale_bonus;
     int govt_bonus;
     int blockaded_penalty;

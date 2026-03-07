@@ -864,5 +864,8 @@
     </None>
     <None Include=".gitignore" />
     <None Include="notes.md" />
+    <None Include=".vocode\workflows\struct.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
   </ItemGroup>
 </Project>

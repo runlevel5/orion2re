@@ -829,6 +829,38 @@ namespace HAROLD {
         return location;
     }
 
+    /**
+     * @address 004f1e80
+     */
+    bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner) {
+        *monster_owner = 0;
+        bool found = false;
+
+        for (int16_t i = 0; i < (int16_t)MOX::_ship_stack_count; ++i) {
+            if (found) {
+                break;
+            }
+
+            int16_t node_idx = MOX::_ship_stack_start[i];
+            while (node_idx != -1) {
+                int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+                s_ship_data* ship = &MOX::_ship[ship_idx];
+
+                // Status 0 indicates the ship is active/available.
+                // Owners >= 8 (specifically owner 8) are typically neutral monsters (Orion Guardians, etc).
+                if (ship->status == 0 && ship->owner >= 8 && ship->location == location_idx) {
+                    found = true;
+                    *monster_owner = (int16_t)ship->owner;
+                    break;
+                }
+
+                node_idx = MOX::_ship_node[node_idx].next_node;
+            }
+        }
+
+        return found;
+    }
+
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx) {
         int16_t player_counts[MAX_PLAYERS];
         int16_t unk_val;

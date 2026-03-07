@@ -1273,12 +1273,12 @@ namespace OFFICER {
 
                 auto& icon = MOX::_fltscrn_big_icon[i];
                 if (icon.ship_idx > -1) {
-                    if (icon.field9_0x9 == param_2) {
+                    if (icon.button_id == param_2) {
                         result = 0;
                         found = true;
                         *param_4 = i;
                     }
-                    else if (icon.field9_0x9 + param_2 == 0) {
+                    else if (icon.button_id == -param_2) {
                         result = 1;
                         found = true;
                         *param_4 = i;
@@ -1291,7 +1291,7 @@ namespace OFFICER {
             if (start_idx < end_idx && !found) {
                 for (int16_t i = start_idx; i < end_idx; ++i) {
                     auto& icon = MOX::_fltscrn_big_icon[i];
-                    if (icon.field9_0x9 == param_1 && icon.ship_idx > -1) {
+                    if (icon.button_id == param_1 && icon.ship_idx > -1) {
                         result = 4;
                         *param_3 = i;
                         break;

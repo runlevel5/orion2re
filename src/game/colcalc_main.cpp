@@ -868,7 +868,7 @@ namespace COLCALC {
                     final.difficulty_bonus += diff_bonus;
                 }
 
-                cur_stat.final_prod = cur_stat.artifacts_bonus + cur_stat.officer_bonus + cur_stat.unk +
+                cur_stat.final_prod = cur_stat.artifacts_bonus + cur_stat.officer_bonus + cur_stat.pollution_penalty +
                     cur_stat.difficulty_bonus + cur_stat.morale_bonus + cur_stat.govt_bonus +
                     cur_stat.gravity_penalty + cur_stat.blockaded_penalty +
                     cur_stat.conquered_penalty + scaled_base;
@@ -1577,7 +1577,7 @@ namespace COLCALC {
                 if (pollution > 0) {
                     total_prod -= static_cast<int16_t>(pollution);
                     if (debug_out) {
-                        breakdown.unk = pollution * -20;
+                        breakdown.pollution_penalty = pollution * -20;
                     }
                 }
                 else {
@@ -1669,8 +1669,8 @@ namespace COLCALC {
                 p += _sprintf(p, s_fmt_plus_d_s_s, (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
             }
 
-            if (breakdown.unk != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.unk, 20), _pollution_penalty_msg);
+            if (breakdown.pollution_penalty != 0) {
+                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
             }
 
             if (colony->n_food_replicated != 0) {
