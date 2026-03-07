@@ -157,17 +157,17 @@ namespace LOADSAVE {
             *out_y = animate::Get_Height_(_game_anims->pictures[0]);
 
             if (MOX::_game_type == 0 || MOX::_game_type == 1) {
-                _game_popup_fields->field_l = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[2], s_L_005560e8, '(');
-                _game_popup_fields->field_n = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[3], s_N_0055765c, '(');
+                _game_popup_fields->btn_main_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[2], s_L_005560e8, '(');
+                _game_popup_fields->btn_main_new_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[3], s_N_0055765c, '(');
             } else {
-                _game_popup_fields->field_l = -1000;
-                _game_popup_fields->field_n = -1000;
+                _game_popup_fields->btn_main_load_id = -1000;
+                _game_popup_fields->btn_main_new_id = -1000;
             }
 
-            _game_popup_fields->field_s = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], s_S_005569cc, '(');
-            _game_popup_fields->field_q = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], s_Q_005598f0, '(');
-            _game_popup_fields->field_o = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], s_O_00556afc, '(');
-            _game_popup_fields->field_esc = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
+            _game_popup_fields->btn_main_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x2b, s__00551100, _game_anims->pictures[1], s_S_005569cc, '(');
+            _game_popup_fields->btn_main_quit_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x93, MOX::_popup_base_y + 0x58, s__00551100, _game_anims->pictures[4], s_Q_005598f0, '(');
+            _game_popup_fields->btn_main_options_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x28, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[5], s_O_00556afc, '(');
+            _game_popup_fields->btn_main_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x97, MOX::_popup_base_y + 0x133, s__00551100, _game_anims->pictures[6], s__00551120, '(');
 
             _music_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xc2, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->music_level, s__00551100, '\0');
             _sfx_level_field = fields::Add_Scroll_Field_(MOX::_popup_base_x + 0x3e, MOX::_popup_base_y + 0xd8, 0, 0x9c, 0, 0x9c, 0x9b, 0xc, &_game_popup_fields->sound_fx_level, s__00551100, '\0');
@@ -189,7 +189,7 @@ namespace LOADSAVE {
                 _game_popup_fields->option_toggles[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x31, by, MOX::_popup_base_x + 0xf3, animate::Get_Height_(pic) + by, s__00551100, ')');
                 offset_y += 0x11;
             }
-            _game_popup_fields->field_A = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], s_A_00557ed4, '(');
+            _game_popup_fields->btn_settings_accept_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x61, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[10], s_A_00557ed4, '(');
             break;
         }
         case 2:
@@ -213,7 +213,7 @@ namespace LOADSAVE {
             *out_x = animate::Get_Width_(main_pic);
             *out_y = animate::Get_Height_(main_pic);
 
-            Check_For_Saved_Games_(_game_popup_fields->saved_games);
+            Check_For_Saved_Games_(_game_popup_fields->slot_status);
             s_colors colors_style, colors_special;
             Get_Game_Popup_Colors_(2, &colors_style, &colors_special);
             fonts::Set_Font_Special_Colors_(&colors_special);
@@ -228,7 +228,7 @@ namespace LOADSAVE {
 
             if (MOX::_screen_data == 2) {
                 for (int16_t i = 0; i < 10; ++i) {
-                    if (_game_popup_fields->saved_games[i] == 2) {
+                    if (_game_popup_fields->slot_status[i] == 2) {
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 4) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 4);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 8) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 8);
@@ -236,12 +236,12 @@ namespace LOADSAVE {
                     _game_popup_fields->saved_game_types[i] = FILEDEF::Get_Game_Type_From_Saved_Game_(i);
                     _game_popup_fields->saved_game_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, MOX::_popup_base_y + 0x18 + i * 0x1f, MOX::_popup_base_x + 0xe2, MOX::_popup_base_y + 0x18 + i * 0x1f + 0x18, s__00551100, ')');
                 }
-                _game_popup_fields->field_d = fields::Add_Hidden_Field_(0x275, 0x1d5, 0x27f, 0x1df, s_D_005569dc, '3');
-                _game_popup_fields->field_l2 = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], s_L_005560e8, '(');
+                _game_popup_fields->debug_hotspot_id = fields::Add_Hidden_Field_(0x275, 0x1d5, 0x27f, 0x1df, s_D_005569dc, '3');
+                _game_popup_fields->btn_popup_load_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x151, s__00551100, _game_anims->pictures[0xc], s_L_005560e8, '(');
             } else {
                 for (int16_t i = 0; i < 10; ++i) {
                     fonts::Set_Font_Style_(2, &colors_style);
-                    if (_game_popup_fields->saved_games[i] == 2) {
+                    if (_game_popup_fields->slot_status[i] == 2) {
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 4) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 4);
                         *reinterpret_cast<uint32_t*>(MOX::_save_game_description[i].description + 8) = *reinterpret_cast<const uint32_t*>(s___INVALID___0055ac58 + 8);
@@ -254,10 +254,10 @@ namespace LOADSAVE {
                     int16_t font_h = fonts::Get_Font_Height_();
                     _game_popup_fields->save_slot_fields[i] = fields::Add_Hidden_Field_(MOX::_popup_base_x + 0x1d, y_start + font_h + 1, MOX::_popup_base_x + 0xf4, y_start + font_h * 2, s__00551100, ')');
                 }
-                _game_popup_fields->field_d = -1000;
-                _game_popup_fields->field_s2 = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], s_S_005569cc, '(');
+                _game_popup_fields->debug_hotspot_id = -1000;
+                _game_popup_fields->btn_popup_save_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0x25, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xf], s_S_005569cc, '(');
             }
-            _game_popup_fields->field19_0x6e = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], s_C_00552420, '(');
+            _game_popup_fields->btn_popup_close_id = fields::Add_Button_Field_(MOX::_popup_base_x + 0xab, MOX::_popup_base_y + 0x152, s__00551100, _game_anims->pictures[0xd], s_C_00552420, '(');
             break;
         }
         default:
@@ -265,7 +265,7 @@ namespace LOADSAVE {
         }
 
         _game_popup_fields->field_space = fields::Add_Hidden_Field_(MOX::_popup_base_x, MOX::_popup_base_y, *out_x + MOX::_popup_base_x, *out_y + MOX::_popup_base_y, s__00551100, '\0');
-        _game_popup_fields->field_esc_2 = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, ')');
+        _game_popup_fields->screen_cancel_field_id = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, ')');
     }
 
     /**
@@ -311,7 +311,7 @@ namespace LOADSAVE {
                 }
             }
 
-            if (_game_popup_fields->field_esc_2 + 256 == input_id || _game_popup_fields->field_l2 == input_id) {
+            if (_game_popup_fields->screen_cancel_field_id + 256 == input_id || _game_popup_fields->btn_popup_load_id == input_id) {
                 if (selected_slot == -1) {
                     if (MOX::_settings.active_save_slot < 10) {
                         _draw_down = 1;
@@ -321,7 +321,7 @@ namespace LOADSAVE {
             }
 
             if (selected_slot >= 0 && selected_slot < 10) {
-                if (_game_popup_fields->saved_games[selected_slot] == 0) {
+                if (_game_popup_fields->slot_status[selected_slot] == 0) {
                     if (MOX::_settings.animations_on != 0 && MOX::_previous_screen == SCREEN_MAIN) {
                         fields::Clear_Fields_();
                         _game_anims->field1_0x64 = 1;
@@ -349,18 +349,18 @@ namespace LOADSAVE {
                     exit_loop = 1;
                     *exit_flag = 1;
                 } else {
-                    Bad_Game_File_Message_(static_cast<uint16_t>(static_cast<uint8_t>(_game_popup_fields->saved_games[selected_slot])), selected_slot);
+                    Bad_Game_File_Message_(static_cast<uint16_t>(static_cast<uint8_t>(_game_popup_fields->slot_status[selected_slot])), selected_slot);
                     exit_loop = 2;
                 }
             }
 
-            if (_game_popup_fields->field19_0x6e == input_id) {
+            if (_game_popup_fields->btn_popup_close_id == input_id) {
                 MOX::_screen_data = 0;
                 exit_loop = 1;
                 if (from_menu) {
                     *exit_flag = 1;
                 }
-            } else if (_game_popup_fields->field_esc_2 == input_id) {
+            } else if (_game_popup_fields->screen_cancel_field_id == input_id) {
                 load_success = 0;
                 exit_loop = 1;
                 *exit_flag = 1;
@@ -410,10 +410,10 @@ namespace LOADSAVE {
                 }
             }
 
-            if (_game_popup_fields->field_esc_2 == input) {
+            if (_game_popup_fields->screen_cancel_field_id == input) {
                 exit_loop = true;
                 *exit_code = 1;
-            } else if (_game_popup_fields->field_A == input) {
+            } else if (_game_popup_fields->btn_settings_accept_id == input) {
                 exit_loop = true;
                 MOX::_screen_data = 0;
             }
@@ -503,7 +503,7 @@ namespace LOADSAVE {
                 }
             }
 
-            if (input_id == _game_popup_fields->field_s) { // Save button / Space
+            if (input_id == _game_popup_fields->btn_main_save_id) { // Save button / Space
                 if (active_slot_idx < 0 || active_slot_idx >= 10) {
                     if (MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10) {
                         active_slot_idx = (int16_t)MOX::_settings.active_save_slot;
@@ -574,11 +574,11 @@ namespace LOADSAVE {
                 *out_should_close = 1;
             }
 
-            if (input_id == _game_popup_fields->field_o || (input_id < 0 && (active_slot_idx = -input_id) >= 0)) {
+            if (input_id == _game_popup_fields->btn_main_options_id || (input_id < 0 && (active_slot_idx = -input_id) >= 0)) {
                 // Potential check against popup field range omitted for clarity as per decompiler
                 MOX::_screen_data = 0;
                 exit_popup = true;
-            } else if (input_id == _game_popup_fields->field_esc) {
+            } else if (input_id == _game_popup_fields->btn_main_close_id) {
                 exit_popup = true;
                 *out_should_close = 1;
             }
@@ -655,7 +655,7 @@ namespace LOADSAVE {
             char local_str_buf[25];
             memset(local_str_buf, 0, 25);
 
-            int32_t star_date_value = fields->field0_0x0[i];
+            int32_t star_date_value = fields->slot_occupied_flags[i];
 
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
@@ -828,7 +828,7 @@ namespace LOADSAVE {
 
             _memcpy(stardate_buf, MOX::_save_game_stardates + (i * 25), 25);
 
-            bool is_valid_slot = (_game_popup_fields->saved_games[i] != 2);
+            bool is_valid_slot = (_game_popup_fields->slot_status[i] != 2);
             int16_t x_icon, y_icon;
             if (_print_data_to_bitmap == 0) {
                 x_icon = MOX::_popup_base_x + 0xE4;
@@ -859,8 +859,8 @@ namespace LOADSAVE {
                 text_x = MOX::_popup_base_x + 0x20;
                 text_y = MOX::_popup_base_y + 0x18 + (i * 31);
                 if (MOX::_screen_data == 2) {
-                    Get_Game_Popup_Colors_(2, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
-                    s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+                    Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
+                    s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
                     fonts::Set_Font_Style_(2, color);
                     const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
                     fonts::Print_(text_x, text_y, desc);
@@ -868,8 +868,8 @@ namespace LOADSAVE {
             } else {
                 text_x = 0x20;
                 text_y = (i * 31) + 0x18;
-                Get_Game_Popup_Colors_(2, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
-                s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+                Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
+                s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
                 fonts::Set_Font_Style_(2, color);
 
                 int16_t print_x = (MOX::_screen_data == 3) ? 0x24 : 0x20;
@@ -883,8 +883,8 @@ namespace LOADSAVE {
             }
 
             // Print stardate and real-world date
-            Get_Game_Popup_Colors_(1, &_game_popup_fields->popup_color1, &_game_popup_fields->popup_color2);
-            s_colors* color_1 = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->popup_color1 : &_game_popup_fields->popup_color2;
+            Get_Game_Popup_Colors_(1, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
+            s_colors* color_1 = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
             fonts::Set_Font_Style_(1, color_1);
 
             if (MOX::_screen_data == 3) text_x += 2;
@@ -1238,13 +1238,13 @@ namespace LOADSAVE {
         while (true) {
             int16_t input = fields::Get_Input_();
 
-            if (input == _game_popup_fields->field_esc) {
+            if (input == _game_popup_fields->btn_main_close_id) {
                 _draw_game_popup_to_back = 1;
                 event_processed = true;
                 if (MOX::_screen_data == 0) {
                     *out_finished = 1;
                 }
-            } else if (input == _game_popup_fields->field_n) {
+            } else if (input == _game_popup_fields->btn_main_new_id) {
                 const char* msg = HAROLD::H_Message_(0xBA); // "QUIT TO MAIN MENU?"
                 strcpy(text_buffer, msg);
 
@@ -1261,7 +1261,7 @@ namespace LOADSAVE {
                     MAINSCR::Draw_Main_Main_Screen_();
                     video::Copy_Back_To_Off_();
                 }
-            } else if (input == _game_popup_fields->field_q) {
+            } else if (input == _game_popup_fields->btn_main_quit_id) {
                 const char* msg = HAROLD::H_Message_(0xBB); // "QUIT TO WINDOWS?"
                 strcpy(text_buffer, msg);
 
@@ -1286,16 +1286,16 @@ namespace LOADSAVE {
                     MAINSCR::Draw_Main_Main_Screen_();
                     video::Copy_Back_To_Off_();
                 }
-            } else if (input == _game_popup_fields->field_o) {
+            } else if (input == _game_popup_fields->btn_main_options_id) {
                 _draw_game_popup_to_back = 1;
                 MOX::_screen_data = 1;
                 event_processed = true;
-            } else if (input == _game_popup_fields->field_l) {
+            } else if (input == _game_popup_fields->btn_main_load_id) {
                 event_processed = true;
                 fields::Assign_Auto_Function_(LOADSAVE::_Draw_Load_Save_Game_Popup_, 1);
                 _draw_game_popup_to_back = 1;
                 MOX::_screen_data = 2;
-            } else if (input == _game_popup_fields->field_s) {
+            } else if (input == _game_popup_fields->btn_main_save_id) {
                 if (MOX::_disallow_saves_code == 0) {
                     _draw_game_popup_to_back = 1;
                     MOX::_screen_data = 3;
@@ -1313,7 +1313,7 @@ namespace LOADSAVE {
                 Set_Sound_For_Game_Popup_(1);
             }
 
-            if (input == _game_popup_fields->field_esc_2) {
+            if (input == _game_popup_fields->screen_cancel_field_id) {
                 closed_with_exit = true;
                 event_processed = true;
                 *out_finished = 1;

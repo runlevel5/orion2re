@@ -4,12 +4,6 @@ workflows:
     need_input: False
     nodes:
       - name: input
-        type: input
-        message: "What are we restoring today?"
-        confirmation: auto
-        outcomes:
-          - name: done
-      - name: ghidra-input
         type: http-input
         message: "Waiting for Ghidra input..."
         message_mode: concatenate_final
@@ -87,6 +81,5 @@ workflows:
         outcomes:
           - name: done
     edges:
-      - input.done -> ghidra-input
-      - ghidra-input.done -> decompile
-      - decompile.done -> ghidra-input
+      - input.done -> decompile
+      - decompile.done -> input
