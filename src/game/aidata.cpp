@@ -413,7 +413,7 @@ namespace AIDATA {
                         }
                     }
                     if (reachable) {
-                        (*_ai_player_info)[p1].n_missing_contacts++;
+                        (*_ai_player_info)[p1].n_reachable_players++;
                         (*_ai_player_info)[p1].reachable_players[p2] = 1;
                     }
                 }
@@ -463,9 +463,8 @@ namespace AIDATA {
                     int32_t d = Refit_Desirability_(ship);
                     (*_ship_refit_desirabilities)[i] = d;
                     s_ai_refit_player& refit_p = (*_airefit)[ship->owner];
-                    refit_p.entry[refit_p.n_entries].ship_idx = (int16_t)i;
                     refit_p.entry[refit_p.n_entries].desirability = (int16_t)d;
-                    refit_p.entry[refit_p.n_entries].field0_0x0 = (int16_t)i;
+                    refit_p.entry[refit_p.n_entries].ship_idx = (int16_t)i;
                     refit_p.n_entries++;
                 }
             }
@@ -707,7 +706,7 @@ namespace AIDATA {
                                 case 1: /* War */
                                 case 2: /* Armistice */
                                 case 3:
-                                    block.war_count++;
+                                    block.enemy_count++;
                                     break;
                                 case 4: /* Alliance */
                                 case 5:

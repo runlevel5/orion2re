@@ -6,7 +6,7 @@ namespace AIBUILD {
         int owner = (int)ship->owner;
         int16_t result_strength = 0;
 
-        if ((*AIDATA::_ai_player_info)[owner].n_missing_contacts == 0) {
+        if ((*AIDATA::_ai_player_info)[owner].n_reachable_players == 0) {
             uint32_t total_str = 0;
             uint32_t count = 0;
 
@@ -236,7 +236,7 @@ namespace AIBUILD {
             if (player_idx != i) {
                 bool aware = ((*AIDATA::_ai_player_info)[player_idx].reachable_players[i] != 0);
                 if (!aware) {
-                    if ((*AIDATA::_ai_player_info)[player_idx].n_missing_contacts == 0 && MOX::_player[i].objectives == 100 /* 'd' */) {
+                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0 && MOX::_player[i].objectives == 100 /* 'd' */) {
                         aware = true;
                     }
                 }
@@ -279,7 +279,7 @@ namespace AIBUILD {
 
         AIBUILD::_player_ship_sizes[player_idx][9] = highest_ship_size_idx + 1;
         if (max_strength_vs_ships < AIBUILD::_player_total_strength_vs_ships[player_idx][0] || 
-            (*AIDATA::_ai_player_info)[player_idx].n_missing_contacts == 0) {
+            (*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0) {
             int rand_val = random::Random_(2);
             AIBUILD::_player_ship_sizes[player_idx][9] = highest_ship_size_idx + 1 + rand_val + (is_objective_1 ? 1 : 0) - 1;
         }
@@ -298,8 +298,8 @@ namespace AIBUILD {
                 AIBUILD::_player_n_transports[player_idx][1] = (int8_t)(transport_avg - AIBUILD::_player_n_transports[player_idx][0]);
             }
 
-            if ((*AIDATA::_ai_player_info)[player_idx].n_missing_contacts > 0) {
-                int missing_need = (is_objective_1 ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_missing_contacts + (int)isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
+            if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
+                int missing_need = (is_objective_1 ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_reachable_players + (int)isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
                 if (AIBUILD::_player_n_transports[player_idx][0] < missing_need) {
                     int diff = missing_need - AIBUILD::_player_n_transports[player_idx][0];
                     if (AIBUILD::_player_n_transports[player_idx][1] < diff) {
@@ -311,7 +311,7 @@ namespace AIBUILD {
             if (AIBUILD::_player_n_transports[player_idx][0] < 20) {
                 if (colony_limit < AIBUILD::_player_n_transports[player_idx][1]) {
                     AIBUILD::_player_n_transports[player_idx][1] = (int8_t)colony_limit;
-                    if ((*AIDATA::_ai_player_info)[player_idx].n_missing_contacts == 0) {
+                    if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0) {
                         AIBUILD::_player_n_transports[player_idx][1] >>= 2;
                     }
                 }
@@ -334,14 +334,14 @@ namespace AIBUILD {
         if (AIBUILD::_player_total_strength_vs_ships[player_idx][0] < strength_target) {
             int diff = strength_target - AIBUILD::_player_total_strength_vs_ships[player_idx][0];
             AIBUILD::_player_total_strength_vs_ships[player_idx][2] = diff;
-            if ((*AIDATA::_ai_player_info)[player_idx].n_missing_contacts == 0) {
+            if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players == 0) {
                 AIBUILD::_player_total_strength_vs_ships[player_idx][2] = diff / 2;
             }
         }
 
         int current_need = AIBUILD::_player_total_strength_vs_ships[player_idx][2];
         if (current_need == 0 || MOX::_player[player_idx].command_points_used < MOX::_player[player_idx].command_points) {
-            if ((*AIDATA::_ai_player_info)[player_idx].n_missing_contacts > 0) {
+            if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
                 if (random::Random_(10 - (is_objective_1 ? 1 : 0)) == 1) {
                     AIBUILD::_player_total_strength_vs_ships[player_idx][2] += (is_objective_1 ? 4 : 0) + 1;
                 }
@@ -549,7 +549,7 @@ namespace AIBUILD {
         s_ai_star_info* ai_star = &(*AIDATA::_ai_star_info)[star_idx];
         s_ai_star_player_block* ps_star_player = &ai_star->per_player[owner];
 
-        int trait_score = (uint8_t)ai_colony->field3_0x3 + (uint8_t)ai_colony->trait_environment_immune;
+        int trait_score = (uint8_t)ai_colony->trait_tolerant + (uint8_t)ai_colony->trait_environment_immune;
         
         bool is_industrial_focus = false;
         if (colony->auto_building == 0 && player->tech_applications[22 /* TECH_APP_AUTOMATED_FACTORIES */] == 3 && planet->mineral_class <= 2) {
@@ -571,7 +571,7 @@ namespace AIBUILD {
         switch (building_id) {
         case 2: {
             int threatened_score = ps_star_player->alliance_count * 3 + ai_colony->threatened * 2 + 
-                                   ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->war_count;
+                                   ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->enemy_count;
             if (colony->n_pops > 2 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + obj_1;
             }
@@ -587,7 +587,7 @@ namespace AIBUILD {
             if (building_focus && ai_colony->threatened == 0) break;
             if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner & 0x1F)) & 1) == 0) {
                 int threatened_score = ps_star_player->alliance_count * 3 + ai_colony->threatened * 10 + 
-                                       ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->war_count;
+                                       ps_star_player->out_of_range_count + ps_star_player->neutral_count + ps_star_player->enemy_count;
                 if (threatened_score != 0) score = threatened_score + obj_1;
             }
             bc_score /= 2;
@@ -619,7 +619,7 @@ namespace AIBUILD {
 
         case 8: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int base_threat = (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 3 + ai_colony->threatened * 10;
+            int base_threat = (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 3 + ai_colony->threatened * 10;
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
@@ -691,7 +691,7 @@ namespace AIBUILD {
             break;
 
         case 22: {
-            int threatened_score = ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->out_of_range_count) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->war_count;
+            int threatened_score = ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->out_of_range_count) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->enemy_count;
             if (colony->n_pops > 1 || bc_score != 0) {
                 if (threatened_score != 0) score = threatened_score + obj_1;
             }
@@ -705,7 +705,7 @@ namespace AIBUILD {
         case 23:
         case 24: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int threatened_score = ps_star_player->war_count + (ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count) * 2 + ps_star_player->out_of_range_count) * 2;
+            int threatened_score = ps_star_player->enemy_count + (ai_colony->threatened * 5 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count) * 2 + ps_star_player->out_of_range_count) * 2;
             if (threatened_score != 0) score = threatened_score + obj_1;
             if (planet->climate == 1) score += obj_5 * 2;
             score += bc_score;
@@ -727,13 +727,13 @@ namespace AIBUILD {
         case 26:
         case 27: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int base_threat = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            int base_threat = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
             if (base_threat != 0) score = base_threat + obj_5 + bc_score;
         } break;
 
         case 28: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count * 2 + ps_star_player->out_of_range_count + ps_star_player->war_count) * 4;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->alliance_count * 3 + ps_star_player->neutral_count * 2 + ps_star_player->out_of_range_count + ps_star_player->enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + obj_1;
             if (planet->climate == 1) score += obj_5 * 2;
             score += bc_score;
@@ -807,8 +807,8 @@ namespace AIBUILD {
         case 41: {
             if (building_focus && ai_colony->threatened == 0) break;
             int base_threat = (building_id == 40) ?
-                ps_star_player->out_of_range_count * 3 + (ps_star_player->war_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2) * 4 + ai_colony->threatened * 10 :
-                (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 3 + ai_colony->threatened * 10;
+                ps_star_player->out_of_range_count * 3 + (ps_star_player->enemy_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2) * 4 + ai_colony->threatened * 10 :
+                (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 3 + ai_colony->threatened * 10;
             
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
@@ -818,7 +818,7 @@ namespace AIBUILD {
 
         case 42: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
         } break;
 
@@ -855,7 +855,7 @@ namespace AIBUILD {
         case 45: {
             if (building_focus && ai_colony->threatened == 0) break;
             if (((MOX::_star[star_idx].has_warp_field_interdictor >> (owner & 0x1F)) & 1) == 0) {
-                int threatened_score = ai_colony->threatened * 5 + (ps_star_player->war_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->out_of_range_count;
+                int threatened_score = ai_colony->threatened * 5 + (ps_star_player->enemy_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->neutral_count * 3 + ps_star_player->out_of_range_count;
                 if (threatened_score != 0) score = threatened_score + obj_1;
             }
             bc_score /= 2;
@@ -871,7 +871,7 @@ namespace AIBUILD {
 
         case 47: {
             if (building_focus && ai_colony->threatened == 0) break;
-            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->war_count) * 4;
+            int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
             if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
         } break;
         }

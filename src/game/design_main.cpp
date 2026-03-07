@@ -326,7 +326,7 @@ namespace DESIGN {
 
         bool update_buttons = true;
         mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(MOX::_mouse_list_arrow), 1);
-        EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->help1, MOX::_design->help2);
+        EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->num_weapon_slots, MOX::_design->num_special_slots);
 
         int16_t screen_exit_flag = 0;
         do {
@@ -359,7 +359,7 @@ namespace DESIGN {
 
             if (MOX::_design_clear_button == input_field) {
                 Clear_Design_();
-                EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->help1, MOX::_design->help2);
+                EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->num_weapon_slots, MOX::_design->num_special_slots);
             }
 
             if (MOX::_design_build_button == input_field) {

@@ -383,11 +383,11 @@ namespace aidudes {
         }
 
         // Determine if AI is eligible for an upgrade cheat based on difficulty and last refit entry desirability
-        int ship_design_idx = refit_player->entry[num_entries - 1].ship_idx;
+        int desirability = refit_player->entry[num_entries - 1].desirability;
         int difficulty_bonus = AIBUILD::_difficulty_ship_design[MOX::_settings.game_difficulty];
         int upgrade_count = 0;
 
-        if (random::Random_(900) <= (difficulty_bonus + ship_design_idx) * 2) {
+        if (random::Random_(900) <= (difficulty_bonus + desirability) * 2) {
             upgrade_count = 1;
         }
 
@@ -408,7 +408,7 @@ namespace aidudes {
             }
 
             s_ai_refit_entry* entry = &refit_player->entry[i - 1];
-            s_ship_data* ship = &MOX::_ship[entry->field0_0x0];
+            s_ship_data* ship = &MOX::_ship[entry->ship_idx];
             int location = ship->location;
 
             // Skip ships in systems with incoming human activity
@@ -1108,7 +1108,7 @@ namespace aidudes {
                                         flag_38 = true;
                                         ship_weights[8] = (uint16_t)(((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2 +
                                                            ((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2) * 2 +
-                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count) * 2;
+                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count) * 2;
                                         if (p->command_points < p->command_points_used) {
                                             ship_weights[8] += (p->command_points_used - p->command_points) * 2;
                                         }
@@ -1121,7 +1121,7 @@ namespace aidudes {
                                         flag_34 = true;
                                         ship_weights[7] = (uint16_t)(((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 2 +
                                                            (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + 2) * 5 +
-                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count * 3;
+                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 3;
                                         if (p->command_points < p->command_points_used) {
                                             ship_weights[7] += (p->command_points_used - p->command_points) * 2;
                                         }
@@ -1133,7 +1133,7 @@ namespace aidudes {
                                         COLCALC::Colony_Product_Cost_(MOX::_colony, 40) <= (war_level * 2 + 35) * ind_worth) {
                                         flag_2c = true;
                                         ship_weights[6] = (uint16_t)((*AIDATA::_ai_colony_info)[current_colony_idx].threatened + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count) * 10 +
-                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count * 4 + 12 +
+                                                          (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count * 4 + 12 +
                                                           (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 6;
                                         if (p->command_points < p->command_points_used) {
                                             ship_weights[6] += (p->command_points_used - p->command_points) * 2;
@@ -1214,15 +1214,15 @@ namespace aidudes {
                             }
                             case 7:
                                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                             case 8:
                                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 3 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 3 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 2 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                             case 9:
                                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
-                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 6 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 4 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].war_count);
+                                AIBUILD::_player_total_strength_vs_ships[player_idx][2] -= ((*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].alliance_count * 6 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].neutral_count * 4 + (*AIDATA::_ai_star_info)[MOX::_planet[temp_colony->planet].star_index].per_player[player_idx].enemy_count);
                                 break;
                         }
                         choice_weights[0] = 0;

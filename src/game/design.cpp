@@ -30,7 +30,7 @@ namespace DESIGN {
             d->weapon_cost[i] = 0;
         }
 
-        d->help1 = 0;
+        d->num_weapon_slots = 0;
         for (int i = 0; i < 8; ++i) {
             d->weapon_type[i] = HACCESS::Design_Weapon_(player_idx, design_idx, i);
             d->weapon_count[i] = static_cast<int16_t>(static_cast<int8_t>(HACCESS::Design_Weapon_Count_(player_idx, design_idx, i)));
@@ -50,7 +50,7 @@ namespace DESIGN {
             }
 
             if (d->weapon_type[i] > 0) {
-                d->help1++;
+                d->num_weapon_slots++;
             }
         }
 
@@ -68,10 +68,10 @@ namespace DESIGN {
                 special_idx++;
             }
         }
-        d->help2 = special_idx;
+        d->num_special_slots = special_idx;
 
         d->base_combat_speed = Current_Design_Combat_Speed_(d);
-        d->field83_0x123 = 140;
+        d->date_of_design = 140;
 
         Update_Calculated_Design_Data_(player_idx);
     }
@@ -271,7 +271,7 @@ namespace DESIGN {
         Update_Weapon_Count_();
 
         if (_design->show_help != 0) {
-            EVANHELP::Set_Design_Screen_Help_List_(_design->help1, _design->help2);
+            EVANHELP::Set_Design_Screen_Help_List_(_design->num_weapon_slots, _design->num_special_slots);
             _design->show_help = 0;
         }
     }
@@ -411,22 +411,22 @@ namespace DESIGN {
     }
 
     void __cdecl Update_Weapon_Count_() {
-        MOX::_design->help1 = 0;
+        MOX::_design->num_weapon_slots = 0;
         for (int i = 0; i < 8; ++i) {
             if (MOX::_design->weapon_type[i] > 0) {
-                MOX::_design->help1++;
+                MOX::_design->num_weapon_slots++;
             }
         }
     }
 
     void __cdecl Update_N_Spec_Systems_In_Design_() {
-        MOX::_design->help2 = 0;
+        MOX::_design->num_special_slots = 0;
 
         for (int16_t i = 0; i < 8; ++i) {
             if (MOX::_design->special_devices[i] > 0) {
-                MOX::_design->help2++;
+                MOX::_design->num_special_slots++;
 
-                if (MOX::_design->help2 >= 8) {
+                if (MOX::_design->num_special_slots >= 8) {
                     break;
                 }
             }
