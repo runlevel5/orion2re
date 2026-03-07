@@ -1550,8 +1550,8 @@ namespace MAINSCR {
         fonts::Set_Font_Style_(2, &text_colors);
 
         s_movable_box box = MOX::_moveable_box[1];
-        int16_t final_x = box.x + (int16_t)box.field12_0x18 + 15;
-        int16_t final_y = (int16_t)box.height + (box.y + (int16_t)box.field13_0x1a) - 25;
+        int16_t final_x = box.x + (int16_t)box.content_offset_x + 15;
+        int16_t final_y = (int16_t)box.height + (box.y + (int16_t)box.content_offset_y) - 25;
 
         fonts::Print_(final_x, final_y, print_buffer);
     }

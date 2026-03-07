@@ -7,7 +7,7 @@ int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count) {
     int16_t name_height;
     int16_t bottom_height;
 
-    if (MOX::_fleet_box.field12_0x1a == 0) {
+    if (MOX::_fleet_box.is_small_frame == 0) {
         MOX::_fleet_box_name_sm_seg_0059736C = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
         MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059736C;
         name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);

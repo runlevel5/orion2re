@@ -324,7 +324,7 @@ namespace LOADSAVE {
                 if (_game_popup_fields->slot_status[selected_slot] == 0) {
                     if (MOX::_settings.animations_on != 0 && MOX::_previous_screen == SCREEN_MAIN) {
                         fields::Clear_Fields_();
-                        _game_anims->field1_0x64 = 1;
+                        _game_anims->animating = 1;
                         video::Set_Page_Off_();
                         Animate_Game_Popup_Pic_Height_(_game_anims->pictures[11], 1);
                     }
@@ -597,7 +597,7 @@ namespace LOADSAVE {
         if (saved_successfully && MOX::_settings.animations_on != '\0') {
             fields::Clear_Fields_();
             Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0xe], 1);
-            _game_anims->field1_0x64 = 1;
+            _game_anims->animating = 1;
         }
     }
 
@@ -1323,7 +1323,7 @@ namespace LOADSAVE {
                 if (closed_with_exit && MOX::_settings.animations_on != 0) {
                     fields::Clear_Fields_();
                     Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
-                    _game_anims->field1_0x64 = 1;
+                    _game_anims->animating = 1;
                 }
                 return;
             }
@@ -1606,7 +1606,7 @@ namespace LOADSAVE {
         fields::Deactivate_Auto_Function_();
         fields::Clear_Fields_();
 
-        if (MOX::_settings.animations_on != 0 && _game_anims->field1_0x64 == 0 && _loaded_debug_save == 0) {
+        if (MOX::_settings.animations_on != 0 && _game_anims->animating == 0 && _loaded_debug_save == 0) {
             _dont_draw_darkened_buttons = 1;
             video::Set_Page_Off_();
             _Draw_Main_Game_Popup_();
