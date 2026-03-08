@@ -541,7 +541,7 @@ namespace SHIPMOVE {
         }
 
         if (owner < 8) {
-            reinterpret_cast<int8_t*>(REPORT::_something_interesting_happened)[owner] = 1;
+            REPORT::_something_interesting_happened[owner] = 1;
 
             // Check if player's objective is to defend Orion
             if (MOX::_player[owner].objectives == 100 /* 'd' */) {

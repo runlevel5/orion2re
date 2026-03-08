@@ -1586,7 +1586,7 @@ namespace COLCALC {
 
                 // Flag interesting events like food or freighter shortages
                 if (plr->surplus_food < 0 || plr->surplus_freighters < 0) {
-                    reinterpret_cast<int8_t*>(REPORT::_something_interesting_happened)[i] = 1;
+                    REPORT::_something_interesting_happened[i] = 1;
                 }
             }
         }
