@@ -4,11 +4,11 @@ namespace aimove {
     inline s_player*& _p_ai = *reinterpret_cast<s_player**>(std::uintptr_t{0x00565E80});
     inline s_ai_colonizable_planet*& _colonizable = *reinterpret_cast<s_ai_colonizable_planet**>(std::uintptr_t{0x00565E84});
     inline int8_t (*&_nonplayer_here)[72] = *reinterpret_cast<int8_t (**)[72]>(std::uintptr_t{0x00565E88});
-    inline int8_t (*&_flee_stars)[720] = *reinterpret_cast<int8_t (**)[720]>(std::uintptr_t{0x00565E8C});
+    inline int8_t*& _flee_stars = *reinterpret_cast<int8_t**>(std::uintptr_t{0x00565E8C});
     inline int16_t& _i_ai = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E90});
     inline int16_t& _n_colonizable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E94});
 
-    void __cdecl Move_AI_(int32_t player_idx);
+    void __cdecl Move_AI_(int16_t player_idx);
 
     int __cdecl Sort_colonizable_(const void* a, const void* b);
 
@@ -16,10 +16,12 @@ namespace aimove {
 
     void __cdecl Launch_Sneak_Attack_();
 
-    inline void __cdecl Launch_Attacks_(int param_1, int param_2) {
-        using Fn = void(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00462CB0});
-        fn(param_1, param_2);
+    void __cdecl Launch_Attacks_(int param_1, int param_2);
+
+    inline void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* param_2, int param_3, int param_4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00462D10});
+        fn(star_idx, param_2, param_3, param_4);
     }
 
     inline void __cdecl Intercept_Invaders_() {
@@ -34,23 +36,11 @@ namespace aimove {
         fn(planets, count);
     }
 
-    inline void __cdecl Move_Transports_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00464C40});
-        fn();
-    }
+    void __cdecl Move_Transports_();
 
-    inline void __cdecl Move_To_Stage_Points_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00464620});
-        fn();
-    }
+    void __cdecl Move_To_Stage_Points_();
 
-    inline void __cdecl Move_To_Unexplored_Stars_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465390});
-        fn();
-    }
+    void __cdecl Move_To_Unexplored_Stars_();
 
     inline void __cdecl Move_NPCs_() {
         using Fn = void(__cdecl*)();
@@ -70,13 +60,13 @@ namespace aimove {
 
     int16_t __cdecl Best_Uncolonized_Undestined_Planet_(int16_t player_idx);
 
+    uint32_t __cdecl Ship_Rough_Strength_At_Star_(int16_t ship_idx, int16_t star_idx);
+
     void __cdecl Get_Enemy_Strength_On_Turn_(int16_t star_id, int* turn_strengths, int* cumulative_strengths);
 
     int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_idx);
 
-    inline void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00465E00 });
-        fn(player_idx, target_idx, threshold, out_planet, out_value, out_ratio);
-    }
+    void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio);
+
+    void __cdecl Move_Ships_With_Possible_Intermediate_(int16_t* ship_array, int16_t dest_star, int16_t* out_star, int16_t* out_turns);
 }

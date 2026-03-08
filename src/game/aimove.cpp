@@ -63,64 +63,79 @@ namespace aimove {
         }
     }
 
-    void __cdecl Move_AI_(int32_t player_idx) {
-        int8_t local_nonplayer_here[72];
-        int8_t local_flee_stars[720];
-        s_ai_colonizable_planet local_colonizable[360];
+    void __cdecl Move_AI_(int16_t player_idx) {
+        int8_t local_b88[72];
+        int8_t local_b40[720];
+        s_ai_colonizable_planet local_870[360];
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
-        _i_ai = (int16_t)player_idx;
-        _colonizable = local_colonizable;
+        _i_ai = player_idx;
+        _colonizable = local_870;
         _p_ai = &MOX::_player[player_idx];
 
-        Get_Colonizable_Planets_(local_colonizable, &_n_colonizable);
-        _qsort(_colonizable, _n_colonizable, sizeof(s_ai_colonizable_planet), Sort_colonizable_);
+        Get_Colonizable_Planets_(local_870, &_n_colonizable);
 
-        _flee_stars = (int8_t(*)[720])local_flee_stars;
+        ::_qsort(_colonizable, _n_colonizable, 6, Sort_colonizable_);
+
+        _flee_stars = local_b40;
         memset(_flee_stars, 0, 720);
-        Mark_Flee_Stars_(static_cast<int16_t>(player_idx));
 
-        _nonplayer_here = (int8_t(*)[72])local_nonplayer_here;
+        Mark_Flee_Stars_(player_idx);
+
+        _nonplayer_here = reinterpret_cast<int8_t(*)[72]>(local_b88);
         memset(_nonplayer_here, 0, 72);
 
-        for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
-            s_ship_data* ship = &MOX::_ship[i];
-            // Check for aliens, monsters, or other non-player factions (owner >= 8) and currently not on a mission
-            if (ship->owner >= 8 && ship->status == 0) {
-                (*_nonplayer_here)[ship->location] = ship->owner;
-            }
+        s_ship_data* ship = MOX::_ship;
+        if (ship < MOX::_ship + MOX::_NUM_SHIPS) {
+            do {
+                if (ship->owner >= 8 && ship->status == 0) {
+                    (*_nonplayer_here)[ship->location] = ship->owner;
+                }
+                ship++;
+            } while (ship < MOX::_ship + MOX::_NUM_SHIPS);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Delete_Already_Assigned_Planets_(_colonizable, &_n_colonizable);
-        MOX::Mox_Update_();
-        Launch_Sneak_Attack_();
-        MOX::Mox_Update_();
-        Launch_Attacks_(6, 2);
-        MOX::Mox_Update_();
-        Launch_Attacks_(1, 2);
-        MOX::Mox_Update_();
-        Intercept_Invaders_();
-        MOX::Mox_Update_();
-        Assign_New_Colony_Ship_Destinations_(_colonizable, &_n_colonizable);
-        MOX::Mox_Update_();
-        Launch_Attacks_(2, 2);
-        MOX::Mox_Update_();
-        Launch_Attacks_(6, 0);
-        MOX::Mox_Update_();
-        Launch_Attacks_(1, 0);
-        MOX::Mox_Update_();
-        Launch_Attacks_(2, 0);
-        MOX::Mox_Update_();
-        Move_Transports_();
-        MOX::Mox_Update_();
-        Move_To_Stage_Points_();
-        MOX::Mox_Update_();
 
-        s_ai_player_info* ai_info = &(*AIDATA::_ai_player_info)[_i_ai];
-        // BUG: prev_n_contacts not found in s_ai_player_info, using n_contacts as placeholder
-        if (ai_info->n_contacts == ai_info->n_contacts || MOX::_settings.game_difficulty == 0) {
+        RUSS::Mox_Update_();
+        Launch_Sneak_Attack_();
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(6, 2);
+
+        RUSS::Mox_Update_();
+        Intercept_Invaders_();
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(1, 2);
+
+        RUSS::Mox_Update_();
+        Assign_New_Colony_Ship_Destinations_(_colonizable, &_n_colonizable);
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(2, 2);
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(6, 0);
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(1, 0);
+
+        RUSS::Mox_Update_();
+        Launch_Attacks_(2, 0);
+
+        RUSS::Mox_Update_();
+        Move_Transports_();
+
+        RUSS::Mox_Update_();
+        Move_To_Stage_Points_();
+
+        RUSS::Mox_Update_();
+        if ((*AIDATA::_ai_player_info)[_i_ai].prev_n_contacts ==
+            (*AIDATA::_ai_player_info)[_i_ai].n_contacts ||
+            MOX::_settings.game_difficulty == 0) {
             Move_To_Unexplored_Stars_();
         }
 
@@ -189,6 +204,94 @@ namespace aimove {
         return best_planet_idx;
     }
 
+    void __cdecl Move_To_Unexplored_Stars_() {
+        int8_t star_flags_0[72];
+        int32_t enemy_strength_1[10];
+        int32_t enemy_strength_2[10];
+        int16_t ship_indices[500];
+        s_ship_move_info move_info;
+        int16_t local_4a0[2];
+
+        memset(star_flags_0, 0, sizeof(star_flags_0));
+
+        int32_t num_ships_selected = 0;
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+                if (MOX::_ship[i].owner == _i_ai) {
+                    int8_t status = MOX::_ship[i].status;
+                    int16_t loc = MOX::_ship[i].location;
+                    
+                    if (status == 0) {
+                        if ((MOX::_ship[i].mission == 0 || MOX::_ship[i].mission == 3) &&
+                            MOX::_ship[i].d.ship_type == 0) {
+                            ship_indices[num_ships_selected] = (int16_t)i;
+                            num_ships_selected++;
+                        }
+                        star_flags_0[loc] = 1;
+                    }
+                }
+            }
+        }
+
+        if (MOX::_NUM_STARS > 0) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_STARS; ++i) {
+                if ((((*AIDATA::_star_in_extended_range_of_player)[i] >> (uint8_t)_i_ai) & 1) != 0 &&
+                    ((MOX::_star[i].visited >> (uint8_t)_i_ai) & 1) == 0 &&
+                    star_flags_0[i] == 0 &&
+                    (MOX::_settings.game_difficulty != 0 || MOX::_star[i].has_colony == 0)) {
+                    
+                    int32_t best_ship_idx = -1;
+                    int32_t best_star = -1;
+                    int32_t min_turns = 255;
+                    
+                    Get_Enemy_Strength_On_Turn_((int16_t)i, enemy_strength_1, enemy_strength_2);
+                    
+                    if (num_ships_selected == 0) {
+                        return;
+                    }
+                    
+                    for (int32_t j = 0; j < num_ships_selected; ++j) {
+                        int16_t ship_idx = ship_indices[j];
+                        bool has_device = struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 11);
+                        
+                        if (has_device || (((*AIDATA::_star_in_range_of_player)[i] >> (uint8_t)_i_ai) & 1) != 0) {
+                            int16_t loc = MOX::_ship[ship_idx].location;
+                            int8_t turns = (*AIDATA::_n_turns_from_to)[loc][i][_i_ai];
+                            
+                            if (turns < min_turns && turns < 10 && enemy_strength_2[turns] == 0) {
+                                min_turns = turns;
+                                best_ship_idx = j;
+                                best_star = (int32_t)i;
+                            }
+                        }
+                    }
+                    
+                    if (best_ship_idx != -1) {
+                        local_4a0[0] = ship_indices[best_ship_idx];
+                        local_4a0[1] = -1;
+                        num_ships_selected--;
+                        ship_indices[best_ship_idx] = ship_indices[num_ships_selected];
+                        
+                        SHIPMOVE::Ships_Try_To_Move_To_(local_4a0, (int16_t)best_star, &move_info);
+                        MOX::_ship[local_4a0[0]].mission = 7;
+                        SHIPMOVE::Make_Ships_Move_To_(local_4a0, (int16_t)best_star, &move_info);
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Launch_Attacks_(int param_1, int param_2) {
+        if (MOX::_NUM_STARS > 0) {
+            for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                // Accessing ship registry for current AI player and star
+                if ((*AIDATA::_i_all_combat_ships)[aimove::_i_ai][star_idx] != -1) {
+                    aimove::Find_Best_Attack_From_Star_(star_idx, nullptr, param_1, param_2);
+                }
+            }
+        }
+    }
+
     void __cdecl Mark_Flee_Stars_(int16_t player_idx) {
         // Iterate through all players to check for active blockading durations.
         for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
@@ -197,7 +300,7 @@ namespace aimove {
                 // If so, iterate through stars to identify retreat/flee targets.
                 for (int star_idx = 0; star_idx < (int)MOX::_NUM_STARS; ++star_idx) {
                     // Each star entry in flee_stars is 10 bytes wide.
-                    int8_t* star_flee_ptr = &(*_flee_stars)[star_idx * 10];
+                    int8_t* star_flee_ptr = &_flee_stars[star_idx * 10];
 
                     // Only mark the star if it hasn't been processed yet.
                     if (star_flee_ptr[0] == 0) {
@@ -355,6 +458,182 @@ namespace aimove {
         }
     }
 
+    uint32_t __cdecl Ship_Rough_Strength_At_Star_(int16_t ship_idx, int16_t star_idx) {
+        uint8_t in_nebula = MOX::_star[star_idx].in_nebula;
+        uint32_t min_val1 = 0xffffffff;
+        uint32_t min_val2 = 0xffffffff;
+        uint32_t sum1 = 0;
+        uint32_t sum2 = 0;
+        int32_t count1 = 0;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                if (_i_ai != i) {
+                    if (((*AIDATA::_star_in_extended_range_of_player)[star_idx] >> i) & 1) {
+                        if ((((*AIDATA::_star_in_range_of_player)[star_idx] >> i) & 1) ||
+                            MOX::_player[i].objectives == 'd') {
+
+                            uint16_t strength;
+                            if (in_nebula) {
+                                strength = (uint16_t)(*AIDATA::_ship_strengths_in_nebula)[ship_idx][i];
+                            } else {
+                                strength = (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
+                            }
+
+                            count1++;
+                            sum1 += strength;
+                            if (strength < min_val1) {
+                                min_val1 = strength;
+                            }
+                        }
+                    }
+
+                    if ((*AIDATA::_ai_player_info)[_i_ai].reachable_players[i] != 0) {
+                        uint16_t strength;
+                        if (in_nebula) {
+                            strength = (uint16_t)(*AIDATA::_ship_strengths_in_nebula)[ship_idx][i];
+                        } else {
+                            strength = (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
+                        }
+
+                        sum2 += strength;
+                        if (strength < min_val2) {
+                            min_val2 = strength;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ((*_nonplayer_here)[star_idx] != 0) {
+            uint32_t strength;
+            if (in_nebula) {
+                strength = aipower::Ship_Strength_Vs_Ships_In_Nebula_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
+            } else {
+                strength = aipower::Ship_Strength_Vs_Ships_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
+            }
+
+            strength &= 0xffff;
+            if (strength < min_val1) {
+                min_val1 = strength;
+            }
+            return min_val1;
+        }
+
+        if (count1 > 0) {
+            return (((min_val1 + 2) * (uint32_t)count1) + sum1 - 1) / ((uint32_t)count1 * 2);
+        }
+
+        int16_t n_reachable = (*AIDATA::_ai_player_info)[_i_ai].n_reachable_players;
+        if (n_reachable > 0) {
+            return (((min_val2 + 2) * (uint32_t)n_reachable) + sum2 - 1) / ((uint32_t)n_reachable * 2);
+        }
+
+        return (uint32_t)((int32_t)MOX::_ship[ship_idx].d.size + 1);
+    }
+
+    void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio) {
+        *out_planet = -1;
+        if (AIDATA::_i_all_combat_ships != nullptr) {
+            if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] == 0) {
+                if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
+                    return;
+                }
+            }
+            Find_Opportunity_Attack_Aux_(
+                player_idx,
+                target_idx,
+                threshold,
+                static_cast<int16_t>(MOX::_player[player_idx].offensive_stagepoint),
+                out_planet,
+                out_value,
+                out_ratio
+            );
+        }
+    }
+
+    void __cdecl Move_Ships_With_Possible_Intermediate_(int16_t* ship_array, int16_t dest_star, int16_t* out_star, int16_t* out_turns) {
+        int16_t ship = *ship_array;
+        int16_t location = MOX::_ship[ship].location;
+        int16_t x = MOX::_ship[ship].x;
+        int16_t y = MOX::_ship[ship].y;
+
+        *out_star = -1;
+        *out_turns = 0x7fff;
+
+        s_ship_move_info move_info;
+        SHIPMOVE::Ships_Try_To_Move_To_(ship_array, dest_star, &move_info);
+
+        if (move_info.moving != 0) {
+            *out_turns = move_info.turns_left;
+            *out_star = dest_star;
+            return;
+        }
+
+        int16_t best_eta = 0x7fff;
+        int16_t best_star_idx = -1;
+
+        s_colony* colony_ptr = MOX::_colony;
+        if (colony_ptr < MOX::_colony + MOX::_NUM_COLONIES) {
+            do {
+                if (colony_ptr->owner == _i_ai) {
+                    int16_t current_star_idx = MOX::_planet[colony_ptr->planet].star_index;
+
+                    if (location != current_star_idx && current_star_idx != dest_star) {
+                        SHIPMOVE::Ships_Try_To_Move_To_(ship_array, current_star_idx, &move_info);
+
+                        if (move_info.moving != 0) {
+                            // Bug in original game: compares 'moving' flag with 'best_eta' instead of using 'turns_left'
+                            if (move_info.moving < best_eta) {
+                                int i = 0;
+                                int16_t leg1_turns_left = move_info.turns_left;
+
+                                if (ship_array[0] != -1) {
+                                    do {
+                                        int16_t ship_idx = ship_array[i];
+                                        i++;
+                                        MOX::_ship[ship_idx].location = current_star_idx;
+                                        MOX::_ship[ship_idx].x = MOX::_star[current_star_idx].x;
+                                        MOX::_ship[ship_idx].y = MOX::_star[current_star_idx].y;
+                                    } while (ship_array[i] != -1);
+                                }
+
+                                SHIPMOVE::Ships_Try_To_Move_To_(ship_array, dest_star, &move_info);
+
+                                if (i > 0) {
+                                    do {
+                                        i--;
+                                        int16_t ship_idx = ship_array[i];
+                                        MOX::_ship[ship_idx].location = location;
+                                        MOX::_ship[ship_idx].x = x;
+                                        MOX::_ship[ship_idx].y = y;
+                                    } while (i != 0);
+                                }
+
+                                if (move_info.moving != 0) {
+                                    leg1_turns_left += move_info.turns_left;
+
+                                    if (leg1_turns_left < best_eta) {
+                                        best_eta = leg1_turns_left;
+                                        best_star_idx = current_star_idx;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                colony_ptr++;
+            } while (colony_ptr < MOX::_colony + MOX::_NUM_COLONIES);
+        }
+
+        if (best_star_idx != -1) {
+            if (best_eta < *out_turns) {
+                *out_turns = best_eta;
+                *out_star = best_star_idx;
+            }
+        }
+    }
+
     int __cdecl Number_Of_Attacks_Underway_(int16_t player_idx, int16_t target_player_idx) {
         // attacked_stars tracks which stars have an active threat from the player.
         // Array size 72 is based on the game's maximum number of stars.
@@ -401,6 +680,432 @@ namespace aimove {
         }
 
         return total_attacks;
+    }
+
+#pragma pack(push, 1)
+    struct StagePoint {
+        uint8_t star_idx;
+        union {
+            uint32_t strength;
+            struct {
+                uint8_t pad[3];
+                uint8_t turns_left;
+            };
+        };
+    };
+#pragma pack(pop)
+
+    void __cdecl Move_To_Stage_Points_() {
+        uint8_t local_5d7;
+        if (EVENTS::Event_Check_Warp_Beast_() != 0 && _p_ai->traits[26] == 0) {
+            local_5d7 = 1;
+        } else {
+            local_5d7 = 0;
+        }
+
+        int32_t total_stage_weight = 0;
+        int16_t num_stage_points = 0;
+        int16_t num_ships = 0;
+        int8_t stage_point_map[72];
+        StagePoint stage_points[72];
+        int16_t ship_indices[500];
+
+        for (int i = 0; i < 72; ++i) {
+            stage_point_map[i] = -1;
+        }
+
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (_flee_stars[star_idx * 10 + 9] == 0) {
+                if ((MOX::_star[star_idx].is_stagepoint >> _i_ai) & 1) {
+                    stage_point_map[star_idx] = static_cast<int8_t>(num_stage_points);
+                    stage_points[num_stage_points].star_idx = static_cast<uint8_t>(star_idx);
+                    stage_points[num_stage_points].strength = 0;
+                    total_stage_weight += (*AIDATA::_star_stage_weights)[star_idx][_i_ai];
+                    num_stage_points++;
+                }
+            }
+        }
+
+        int8_t offensive_stagepoint = _p_ai->offensive_stagepoint;
+        int16_t war_level = AIBUILD::Player_War_Level_(_i_ai);
+        (*AIDATA::_star_stage_weights)[offensive_stagepoint][_i_ai] += (war_level + 1) * total_stage_weight;
+
+        for (int16_t ship_idx = 0; ship_idx < (int16_t)MOX::_NUM_SHIPS; ++ship_idx) {
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+            if (ship->owner == _i_ai &&
+                ship->status <= 2 &&
+                ship->d.ship_type == 0) {
+
+                if (ship->mission != 1 && ship->mission != 2 &&
+                    ship->mission != 4 && ship->mission != 5 &&
+                    ship->mission != 6 && ship->mission != 7) {
+
+                    if (SHIPMOVE::Can_Order_Ship_(ship)) {
+                        ship_indices[num_ships] = ship_idx;
+                        num_ships++;
+                    } else {
+                        int16_t dest_star = SHIPMOVE::Ship_Destination_Star_(ship);
+                        if (dest_star != -1) {
+                            int8_t sp_idx = stage_point_map[dest_star];
+                            if (sp_idx != -1) {
+                                stage_points[sp_idx].strength += Ship_Rough_Strength_At_Star_(ship_idx, dest_star);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (num_stage_points == 0) {
+            return;
+        }
+
+        if (num_stage_points == 1) {
+            int16_t ship_list[2];
+            ship_list[1] = -1;
+            uint8_t target_star = stage_points[0].star_idx;
+
+            for (int16_t i = 0; i < num_ships; ++i) {
+                int16_t ship_idx = ship_indices[i];
+                bool has_navigator = RUSS::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                ship_list[0] = ship_idx;
+
+                int16_t location = MOX::_ship[ship_idx].location;
+                int16_t intermediate_star;
+
+                if (location < 72) {
+                    AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                        _i_ai, location, target_star, &intermediate_star, has_navigator);
+                } else {
+                    int16_t turns;
+                    Move_Ships_With_Possible_Intermediate_(
+                        ship_list, target_star, &intermediate_star, &turns);
+                }
+
+                if (intermediate_star != -1) {
+                    MOX::_ship[ship_idx].mission = 3;
+                    SHIPMOVE::Ships_Try_To_Move_To_(ship_list, intermediate_star, reinterpret_cast<s_ship_move_info*>(&stage_points[0]));
+                    uint8_t turns_left = stage_points[0].turns_left;
+                    if (turns_left <= 1 || local_5d7 == 0) {
+                        SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate_star, reinterpret_cast<s_ship_move_info*>(&stage_points[0]));
+                    }
+                }
+            }
+            return;
+        }
+
+        RUSS::Shuffle_Sint_(ship_indices, num_ships);
+
+        while (num_ships > 0 && num_stage_points > 0) {
+            int32_t best_sp_idx = -1;
+            uint32_t best_strength = 0xFFFFFFFF;
+            uint32_t best_weight = 1;
+            int32_t best_ship_i = -1;
+            uint32_t best_ship_star = 0xFFFFFFFF;
+
+            int32_t best_turns = (local_5d7 == 1) ? 2 : 255;
+
+            MOX::Mox_Update_();
+
+            for (int16_t i = 0; i < num_stage_points; ++i) {
+                uint32_t strength = stage_points[i].strength;
+                uint8_t star_idx = stage_points[i].star_idx;
+                uint32_t weight = (*AIDATA::_star_stage_weights)[star_idx][_i_ai];
+
+                bool better = false;
+                if (best_sp_idx == -1) {
+                    better = true;
+                } else {
+                    int32_t cmp = RUSS::Compare_Ratios_(strength, weight, best_strength, best_weight);
+                    if (cmp == -1) {
+                        better = true;
+                    } else if (cmp == 0 && best_weight < weight) {
+                        better = true;
+                    }
+                }
+                if (better) {
+                    best_strength = strength;
+                    best_sp_idx = i;
+                    best_weight = weight;
+                }
+            }
+
+            uint8_t target_star = stage_points[best_sp_idx].star_idx;
+            int32_t best_ship_turns = best_turns;
+
+            for (int16_t i = 0; i < num_ships; ++i) {
+                int16_t ship_idx = ship_indices[i];
+                bool has_navigator = RUSS::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                int16_t location = MOX::_ship[ship_idx].location;
+
+                if (location == target_star) {
+                    best_ship_i = i;
+                    best_ship_star = target_star;
+                    best_ship_turns = 0;
+                } else if (location < 72) {
+                    int16_t intermediate_star;
+                    int16_t turns = AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                        _i_ai, location, target_star, &intermediate_star, has_navigator);
+                    if (best_ship_turns > turns) {
+                        best_ship_i = i;
+                        best_ship_star = intermediate_star;
+                        best_ship_turns = turns;
+                    }
+                } else {
+                    int16_t ship_list[2];
+                    ship_list[0] = ship_idx;
+                    ship_list[1] = -1;
+                    int16_t intermediate_star;
+                    int16_t turns;
+                    Move_Ships_With_Possible_Intermediate_(
+                        ship_list, target_star, &intermediate_star, &turns);
+                    if (best_ship_turns > turns) {
+                        best_ship_i = i;
+                        best_ship_star = intermediate_star;
+                        best_ship_turns = turns;
+                    }
+                }
+            }
+
+            if (best_ship_i == -1) {
+                num_stage_points--;
+                stage_point_map[best_sp_idx] = stage_point_map[num_stage_points];
+            } else {
+                int16_t ship_idx = ship_indices[best_ship_i];
+                int16_t ship_list[2];
+                ship_list[0] = ship_idx;
+                ship_list[1] = -1;
+                MOX::_ship[ship_idx].mission = 3;
+                s_ship_move_info temp_move_info;
+                
+                SHIPMOVE::Ships_Try_To_Move_To_(ship_list, best_ship_star, &temp_move_info);
+                SHIPMOVE::Make_Ships_Move_To_(ship_list, best_ship_star, &temp_move_info);
+
+                uint32_t rough_strength = Ship_Rough_Strength_At_Star_(ship_idx, target_star);
+                num_ships--;
+                stage_points[best_sp_idx].strength += rough_strength;
+                ship_indices[best_ship_i] = ship_indices[num_ships];
+            }
+        }
+    }
+
+    void __cdecl Move_Transports_() {
+        uint8_t dest_turns_colony[72];
+        uint8_t dest_turns_outpost[72];
+        int8_t dest_star_arr[72];
+
+        for (int i = 0; i < 72; i++) {
+            dest_turns_colony[i] = 0;
+            dest_turns_outpost[i] = 0;
+            dest_star_arr[i] = -1;
+        }
+
+        int16_t transport_ships[500];
+        int16_t num_transports = 0;
+
+        for (int16_t i = 0; i < MOX::_NUM_SHIPS; i++) {
+            s_ship_data *ship = &MOX::_ship[i];
+
+            if (ship->owner == _i_ai && ship->status < 3) {
+                uint8_t ship_type = ship->d.ship_type;
+
+                if (ship_type == 0) {
+                    if (ship->mission == 1) {
+                        if (ship->location < 72) {
+                            dest_turns_colony[ship->location] = 1;
+                            dest_star_arr[ship->location] = (int8_t)ship->location;
+                        } else {
+                            int16_t dest = SHIPMOVE::Ship_Destination_Star_(ship);
+                            uint8_t turns = ship->turns_left;
+                            if (dest_turns_colony[dest] == 0) {
+                                dest_turns_colony[dest] = turns + 1;
+                            } else if (turns + 1 < dest_turns_colony[dest]) {
+                                dest_turns_colony[dest] = turns + 1;
+                            }
+                        }
+                    } else if (ship->mission == 6) {
+                        if (ship->location < 72) {
+                            dest_turns_outpost[ship->location] = 1;
+                            dest_star_arr[ship->location] = (int8_t)ship->location;
+                        } else {
+                            int16_t dest = SHIPMOVE::Ship_Destination_Star_(ship);
+                            uint8_t turns = ship->turns_left;
+                            if (dest_turns_outpost[dest] == 0) {
+                                dest_turns_outpost[dest] = turns + 1;
+                            } else if (turns + 1 < dest_turns_outpost[dest]) {
+                                dest_turns_outpost[dest] = turns + 1;
+                            }
+                        }
+                    }
+                } else if (ship_type == 2) {
+                    int16_t loc = ship->location;
+                    if (loc < 72) {
+                        MOX::Mox_Update_();
+                        if (MOX::_settings.game_difficulty > 0) {
+                            if (((MOX::_star[loc].has_colony >> _i_ai) & 1) != 0) {
+                                if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == 1) {
+                                    int16_t ship_idx = i;
+                                    for (int j = 4; j >= 0; j--) {
+                                        int16_t planet_idx = MOX::_star[loc].planet_index[j];
+                                        if (planet_idx != -1) {
+                                            int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                                            if (colony_idx != -1) {
+                                                s_colony *colony = &MOX::_colony[colony_idx];
+                                                if (colony->owner == _i_ai && colony->outpost_flag == 0) {
+                                                    if ((*AIDATA::_ai_colony_info)[colony_idx].threatened != 0 ||
+                                                        colony->military[0] < (*AIDATA::_ai_colony_info)[colony_idx].n_flagged_pops * 2) {
+                                                        if (invasion::Unload_Transports_(colony, &ship_idx, 1) == 1) {
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (ship->status != 5) {
+                        transport_ships[num_transports] = i;
+                        num_transports++;
+                    }
+                }
+            }
+        }
+
+        while (num_transports > 0) {
+            num_transports--;
+            int16_t ship_idx = transport_ships[num_transports];
+            int16_t ship_arr[2];
+            ship_arr[0] = ship_idx;
+            ship_arr[1] = -1;
+
+            s_ship_data *ship = &MOX::_ship[ship_idx];
+            int16_t loc = ship->location;
+            MOX::Mox_Update_();
+
+            if (loc < 72) {
+                uint8_t need_to_move = 1;
+                int16_t dest_star = dest_star_arr[loc];
+
+                if (dest_star != -1) {
+                    int16_t out_dest;
+                    int16_t out_eta;
+                    Move_Ships_With_Possible_Intermediate_(ship_arr, dest_star, &out_dest, &out_eta);
+
+                    if (out_dest != -1) {
+                        if (out_eta >= dest_turns_outpost[dest_star] - 1) {
+                            s_ship_move_info move_info;
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, out_dest, &move_info);
+                            SHIPMOVE::Make_Ships_Move_To_(ship_arr, out_dest, &move_info);
+                        } else if (dest_turns_colony[dest_star] - out_eta == 1) {
+                            s_ship_move_info move_info;
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, out_dest, &move_info);
+                            SHIPMOVE::Make_Ships_Move_To_(ship_arr, out_dest, &move_info);
+                        }
+                        need_to_move = 0;
+                    }
+                }
+
+                if (need_to_move) {
+                    bool found_better = false;
+                    int16_t best_dest = -1;
+                    int16_t best_eta = 0x7FFF;
+
+                    for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
+                        uint8_t t_colony = dest_turns_colony[i];
+                        uint8_t t_outpost = dest_turns_outpost[i];
+
+                        if (t_colony == 0 && t_outpost == 0) continue;
+
+                        if (t_colony < 11 && dest_turns_colony[loc] >= 2) {
+                            if (_flee_stars[i * 10 + t_colony - 1] != 0) continue;
+                        }
+                        if (t_outpost < 11 && dest_turns_outpost[loc] >= 2) {
+                            if (_flee_stars[i * 10 + t_outpost - 1] != 0) continue;
+                        }
+
+                        int16_t out_dest;
+                        int16_t out_eta;
+                        Move_Ships_With_Possible_Intermediate_(ship_arr, i, &out_dest, &out_eta);
+                        if (out_dest == -1) continue;
+
+                        bool better = false;
+                        bool worse = false;
+
+                        if (out_eta < (int16_t)t_outpost - 1) {
+                            better = true;
+                            out_eta = (int16_t)t_colony - 1;
+                        } else {
+                            int16_t t_colony_minus_1 = (int16_t)t_colony - 1;
+                            if (out_eta < t_colony_minus_1) {
+                                better = true;
+                                out_eta = (int16_t)t_colony - 1;
+                            } else {
+                                if ((t_colony_minus_1 < out_eta && t_outpost == 0) || out_eta >= 10 || _flee_stars[i * 10 + out_eta] != 0) {
+                                    worse = true;
+                                }
+                            }
+                        }
+
+                        if (!worse && out_eta < best_eta) {
+                            best_dest = out_dest;
+                            best_eta = out_eta;
+                            found_better = better;
+                        }
+                    }
+
+                    if (best_dest != -1) {
+                        if (!found_better) {
+                            s_ship_move_info move_info;
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, best_dest, &move_info);
+                            SHIPMOVE::Make_Ships_Move_To_(ship_arr, best_dest, &move_info);
+                        }
+                    } else {
+                        int16_t stagepoint = _p_ai->offensive_stagepoint;
+                        need_to_move = 0;
+                        if (_flee_stars[stagepoint * 10 + 9] == 0 &&
+                            ((MOX::_star[stagepoint].blockaded >> _i_ai) & 1) == 0 &&
+                            loc != stagepoint) {
+                            s_ship_move_info move_info;
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, stagepoint, &move_info);
+                            if (move_info.moving != 0) {
+                                SHIPMOVE::Make_Ships_Move_To_(ship_arr, stagepoint, &move_info);
+                                need_to_move = 1;
+                            }
+                        }
+
+                        if (!need_to_move && _flee_stars[loc * 10 + 1] != 0) {
+                            int32_t best_eta_32 = 0x7FFF;
+                            int32_t best_dest_32 = -1;
+                            for (int16_t i = 0; i < MOX::_NUM_STARS; i++) {
+                                if (_flee_stars[i * 10 + 9] == 0 &&
+                                    ((MOX::_star[i].has_colony >> _i_ai) & 1) != 0) {
+                                    s_ship_move_info move_info;
+                                    SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, i, &move_info);
+                                    if (move_info.moving != 0) {
+                                        if ((*AIDATA::_ai_star_info)[i].per_player[_i_ai].enemy_enroute_or_threat != 0) {
+                                            move_info.turns_left -= 24;
+                                        }
+                                        if ((int32_t)move_info.turns_left < best_eta_32) {
+                                            best_eta_32 = move_info.turns_left;
+                                            best_dest_32 = i;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (best_dest_32 != -1) {
+                                s_ship_move_info move_info;
+                                SHIPMOVE::Ships_Try_To_Move_To_(ship_arr, (int16_t)best_dest_32, &move_info);
+                                SHIPMOVE::Make_Ships_Move_To_(ship_arr, (int16_t)best_dest_32, &move_info);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

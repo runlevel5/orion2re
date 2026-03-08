@@ -59,4 +59,10 @@ namespace EVENTS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775b0});
         fn(player_idx);
     }
+
+    inline int16_t __cdecl Event_Check_Warp_Beast_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00477700});
+        return fn();
+    }
 }

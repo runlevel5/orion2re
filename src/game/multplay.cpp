@@ -749,39 +749,61 @@ void __cdecl Draw_Modem_Setup_Screen_(void) {
     }
 
     void __cdecl Add_Modem_Setup_Fields2_(void) {
-        int16_t screen_x = MOX::_mp_screen->screen_x;
-        int16_t screen_y = MOX::_mp_screen->screen_y;
+        short screen_x = MOX::_mp_screen->screen_x;
+        short screen_y = MOX::_mp_screen->screen_y;
 
         MOX::_mp_screen->field_id_cancel = -1000;
 
         if (MOX::_mp_screen->flag_modem_disabled == 1) {
-            int16_t x1 = screen_x + 0x94;
-            int16_t y1 = screen_y + 0x56;
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(x1, y1, x1 + 0x55, y1 + 0xF, s__00551100, 0x28 /* 40 */);
-                y1 += 0xF;
-            }
-        } else if (MOX::_mp_screen->flag_modem_disabled == 2) {
-            int16_t x1 = screen_x + 0x12F;
-            int16_t y1 = screen_y + 0x60;
-            for (int i = 0; i < 8; ++i) {
-                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(x1, y1, x1 + 0x50, y1 + 0xF, s__00551100, 0x28 /* 40 */);
-                y1 += 0xF;
-            }
-        } else {
-            int16_t btn_y = screen_y + 0xC7; // 199
-            MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(screen_x + 0x3D, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_2, s__00551120, 0x28 /* 40 */);
-            MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(screen_x + 0xFF, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 0x28 /* 40 */);
+            short start_x = screen_x + 0x94;
+            short current_y = screen_y + 0x56;
+            short end_x = start_x + 0x55;
 
-            int16_t row_y1 = screen_y + 0x3E;
-            int16_t row_y2 = screen_y + 0x4D;
-            MOX::_mp_screen->game_list_field_ids[0] = fields::Add_Hidden_Field_(screen_x + 0x7A, row_y1, screen_x + 0xCA, row_y2, s__00551100, 0x28 /* 40 */);
-            MOX::_mp_screen->game_list_field_ids[1] = fields::Add_Hidden_Field_(screen_x + 0x124, row_y1, screen_x + 0x174, row_y2, s__00551100, 0x28 /* 40 */);
-            MOX::_mp_screen->game_list_field_ids[5] = fields::Add_Hidden_Field_(screen_x + 0x126, screen_y + 0x9D, screen_x + 0x176, screen_y + 0xAC, s__00551100, 0x28 /* 40 */);
+            for (int i = 0; i < 8; ++i) {
+                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
+                current_y += 0xF;
+            }
+        }
+        else if (MOX::_mp_screen->flag_modem_disabled == 2) {
+            short start_x = screen_x + 0x12F;
+            short current_y = screen_y + 0x60;
+            short end_x = start_x + 0x50;
+
+            for (int i = 0; i < 8; ++i) {
+                MOX::_mp_screen->game_list_field_ids[i] = fields::Add_Hidden_Field_(start_x, current_y, end_x, current_y + 0xF, s__00551100, 0x28);
+                current_y += 0xF;
+            }
+        }
+        else {
+            short btn_y = screen_y + 0xC7;
+
+            MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(
+                screen_x + 0x3D, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_2, s__00551120, 0x28
+            );
+
+            MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(
+                screen_x + 0xFF, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 0x28
+            );
+
+            short hidden_y1 = screen_y + 0x3E;
+            short hidden_y2 = screen_y + 0x4D;
+
+            MOX::_mp_screen->game_list_field_ids[0] = fields::Add_Hidden_Field_(
+                screen_x + 0x7A, hidden_y1, screen_x + 0xCA, hidden_y2, s__00551100, 0x28
+            );
+
+            MOX::_mp_screen->game_list_field_ids[1] = fields::Add_Hidden_Field_(
+                screen_x + 0x124, hidden_y1, screen_x + 0x174, hidden_y2, s__00551100, 0x28
+            );
+
+            MOX::_mp_screen->game_list_field_ids[5] = fields::Add_Hidden_Field_(
+                screen_x + 0x126, screen_y + 0x9D, screen_x + 0x176, screen_y + 0xAC, s__00551100, 0x28
+            );
         }
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20 /* 32 */, MOX::_global_cache_seg);
-        MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0x29 /* 41 */);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
+
+        MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0x29);
     }
 
 void __cdecl Load_Modem_Setup_Screen_(void) {
@@ -1186,68 +1208,36 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     }
 
     void __cdecl Add_Modem_Setup_Fields_() {
-        int16_t screen_x;
-        int16_t screen_y;
-        s_colors colors;
-        s_colors* p_colors;
-        int16_t field_x;
-
-        screen_x = MOX::_mp_screen->screen_x;
-        screen_y = MOX::_mp_screen->screen_y;
-
-        p_colors = MISC::Font_Colors2_(1, 0x92, 0x98);
-        colors = *p_colors;
-
-        field_x = screen_x + 0x7C;
-        fonts::Set_Font_Style_((uint8_t)MOX::_mp_screen->subscreen_mode, &colors);
-
-        // Command: Reset
+        int16_t sx = MOX::_mp_screen->screen_x;
+        int16_t sy = MOX::_mp_screen->screen_y;
+        
+        s_colors* p_colors = MISC::Font_Colors2_(1, 0x92, 0x98);
+        s_colors local_colors = *p_colors;
+        
+        int16_t x_offset = sx + 0x7C;
+        fonts::Set_Font_Style_(static_cast<uint8_t>(MOX::_mp_screen->subscreen_mode), &local_colors);
+        
         MOX::_mp_screen->game_list_field_ids[3] = fields::Add_Continuous_String_Input_Field_(
-            field_x,
-            screen_y + 0x81,
-            0x9A,
-            0x10,
-            NETMOX::_net.modem_settings.cmd_reset,
-            0x1E,
-            0, 0, 0x29, 0
+            x_offset, sy + 0x81, 0x9A, 0x10, net::modem_settings_cmd_reset, 0x1E, 0, 0, 0x29, 0
         );
-
-        // Command: Init
+        
         MOX::_mp_screen->game_list_field_ids[4] = fields::Add_Continuous_String_Input_Field_(
-            field_x,
-            screen_y + 0x99,
-            0x9A,
-            0x10,
-            NETMOX::_net.modem_settings.cmd_init,
-            0x1E,
-            0, 0, 0x29, 0
+            x_offset, sy + 0x99, 0x9A, 0x10, net::modem_settings_cmd_init, 0x1E, 0, 0, 0x29, 0
         );
-
-        // Command: Hangup
+        
         MOX::_mp_screen->game_list_field_ids[6] = fields::Add_Continuous_String_Input_Field_(
-            field_x,
-            screen_y + 0xB1,
-            0x9A,
-            0x10,
-            NETMOX::_net.modem_settings.cmd_hangup,
-            0x1E,
-            0, 0, 0x29, 0
+            x_offset, sy + 0xB1, 0x9A, 0x10, net::modem_settings_cmd_hangup, 0x1E, 0, 0, 0x29, 0
         );
-
+        
         MOX::_mox_font_colors_offset = 0x96;
+        
         p_colors = MISC::Font_Colors2_(4, 0x92, 0x98);
-        colors = *p_colors;
-        fonts::Set_Font_Style_(4, &colors);
-
-        // Dial Number
+        local_colors = *p_colors;
+        
+        fonts::Set_Font_Style_(4, &local_colors);
+        
         MOX::_mp_screen->game_list_field_ids[2] = fields::Add_Continuous_String_Input_Field_(
-            screen_x + 0x91,
-            screen_y + 0x5B,
-            0x96,
-            0x10,
-            NETMOX::_net.modem_settings.dial_number,
-            0x20,
-            0, 0, 0x29, 0
+            sx + 0x91, sy + 0x5B, 0x96, 0x10, net::modem_settings_dial_number, 0x20, 0, 0, 0x29, 0
         );
     }
 

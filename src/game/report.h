@@ -29,9 +29,17 @@ namespace REPORT {
     s_colony* __cdecl Player_Colony_Base_At_Star_(short player_idx, short star_idx);
     s_ship_data* __cdecl Player_Ship_Type_At_Star_(short owner, short ship_type, short location, char include_just_built);
     bool __cdecl Has_Msg_(int16_t player_idx, int8_t show_summary);
-    inline uint8_t __cdecl Must_Display_Reports_(int16_t player_num) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ab280 });
-        return fn(player_num);
+    inline int8_t __cdecl Display_Report_Aux_(short player_num, int8_t type) {
+        using Fn = int8_t(__cdecl*)(short, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AA270});
+        return fn(player_num, type);
     }
+
+    inline void __cdecl Redirect_Newly_Built_Ships_(short player_num) {
+        using Fn = void(__cdecl*)(short);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB2F0});
+        fn(player_num);
+    }
+
+    int8_t __cdecl Must_Display_Reports_(short player_num);
 }

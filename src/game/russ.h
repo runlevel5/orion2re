@@ -33,6 +33,12 @@ namespace RUSS {
         fn(array, count);
     }
 
+    inline void __cdecl Shuffle_Sint_(int16_t* array, int32_t count) {
+        using Fn = void(__cdecl*)(int16_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7A10});
+        fn(array, count);
+    }
+
     void __cdecl Release_All_Blocks_(void* seg);
 
     void __cdecl Make_All_AI_Game_();
@@ -41,6 +47,18 @@ namespace RUSS {
         using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7DC0});
         fn(player_idx);
+    }
+
+    inline bool __cdecl Test_Bit_Field_(uint8_t* bit_field, int32_t bit_idx) {
+        using Fn = bool(__cdecl*)(uint8_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFB5});
+        return fn(bit_field, bit_idx);
+    }
+
+    inline int32_t __cdecl Compare_Ratios_(uint32_t a1, uint32_t a2, uint32_t b1, uint32_t b2) {
+        using Fn = int32_t(__cdecl*)(uint32_t, uint32_t, uint32_t, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7C60});
+        return fn(a1, a2, b1, b2);
     }
 
     void __cdecl Load_Russ_Strings_();

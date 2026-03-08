@@ -149,4 +149,27 @@ namespace REPORT {
         return (bool)result;
     }
 
+    int8_t __cdecl Must_Display_Reports_(short player_num) {
+        int8_t displayed = 0;
+
+        // Check if player objectives are complete (flag 100)
+        if (MOX::_player[player_num].objectives == 100) {
+            displayed = REPORT::Display_Report_Aux_(player_num, 0);
+        }
+
+        if (displayed == 0) {
+            REPORT::Redirect_Newly_Built_Ships_(player_num);
+
+            // Re-checking displayed (BL) as per disassembly 0x004ab2c6
+            if (displayed == 0) {
+                // If game type is 2 (Hotseat) or 3 (Network), perform autosave
+                if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
+                    NEXTTURN::Do_Autosave_();
+                }
+            }
+        }
+
+        return displayed;
+    }
+
 }

@@ -25,6 +25,8 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 600
+        tools:
+          - read_files
         system: |
           You are professional reverse engineer. Your core expertise is code restoration of old C and C++
           projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game
@@ -83,13 +85,13 @@ workflows:
 
           RULES:
           * Correctness first: match control flow, calling convention, side effects, flags-dependent
-             behavior, and memory accesses.
+            behavior, and memory accesses.
           * You must decompile and output whole function. You are NOT allowed to remove portions of the function from
             the output.
           * You are not allowed to refactor or optimize the code. Keep code as close to the original as possible outside of
-            subtle cleanups.
+            subtle cleanups or local variable renames.
           * Cleanup:
-            - You are allowed to rename internal variables.
+            - You are allowed to rename local variables to better represent their semantic meaning.
             - You are allowed to remove superfluous variables.
             - You are allowed to convert explicit loops into equivalent C constructs, such as for loops.
             - You are NOT allowed to remove code that apparently does nothing. If it exists, there must be a reason. You
@@ -290,6 +292,8 @@ workflows:
             - A symbolic name for the value was provided in the input
             - A potential bug was identified
             - A complicated piece of logic was detected - add at most single line comment
+          * If you see usage of s_MSG structure, you MUST read the ./docs/msg.md for additional instructions, as s_MSG is a union type
+            and structure fields are dependent on message type.
 
           # Check list
           * You provided all the stubs into correct namespaces
@@ -507,6 +511,8 @@ workflows:
           * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
           * Received input might be inaccurate and won't match existing codebase conventions or data types. In this case, follow
             existing codebase conventions.
+          * If structure field does not seem to exist - you MUST emit it as provided in the input. You are NOT allowed to
+            change the name or use a different field.
           * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
           * `MSG` is a reserved name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * Always prefer enum value name over raw value. 

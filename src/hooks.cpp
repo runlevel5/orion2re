@@ -1652,6 +1652,15 @@ namespace hooks {
         { 0x00508300, &MULTPLAY::Change_MP_Game_Name_ },
         { 0x00505560, &MULTPLAY::Load_Load_MP_Game_Screen_ },
         { 0x005050d0, &MULTPLAY::Draw_Load_MP_Game_Screen_ },
+        { 0x004ab280, &REPORT::Must_Display_Reports_ },
+        { 0x00462cb0, &aimove::Launch_Attacks_ },
+        { 0x00464C40, &aimove::Move_Transports_ },
+        { 0x00464620, &aimove::Move_To_Stage_Points_ },
+        { 0x00465390, &aimove::Move_To_Unexplored_Stars_ },
+        { 0x00461be0, &aimove::Move_Ships_With_Possible_Intermediate_ },
+        { 0x004628D0, &aimove::Ship_Rough_Strength_At_Star_ },
+        { 0x00465E00, &aimove::Find_Opportunity_Attack_ },
+        { 0x00461540, &aimove::Move_AI_ },
     };
 
     void Install_Hooks()

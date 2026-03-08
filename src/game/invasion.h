@@ -3,6 +3,12 @@
 struct s_colony;
 
 namespace invasion {
+    inline int __cdecl Unload_Transports_(s_colony* col, int16_t* ship_array, int count) {
+        using Fn = int(__cdecl*)(s_colony*, int16_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0042cdc0 });
+        return fn(col, ship_array, count);
+    }
+
     void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_player_bonuses* bonuses, char is_defender);
 
     inline void __cdecl Check_Rebellion_(s_colony* colony) {
