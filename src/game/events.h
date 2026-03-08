@@ -65,4 +65,10 @@ namespace EVENTS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00477700});
         return fn();
     }
+
+    inline void __cdecl Kill_All_Events_At_Colony_(int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00478290});
+        fn(colony_idx);
+    }
 }

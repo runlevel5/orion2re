@@ -35,6 +35,7 @@
     <ClCompile Include="src\game\antarans.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
+    <ClCompile Include="src\game\bomb.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\cmbtdrw1.cpp" />

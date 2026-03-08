@@ -2,6 +2,7 @@
 #include <cstdint>
 
 struct s_combfind_star_has_player;
+struct s_planet_data;
 
 namespace MOX {
     struct s_star_data;
@@ -28,21 +29,18 @@ namespace COMBFIND {
 
     void __cdecl Process_Retreating_Ships_();
 
-    inline int16_t __cdecl Closest_Other_Colony_Star_(int16_t owner, int16_t loc) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(0x004BC300)(owner, loc);
-    }
+    int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx);
 
-    inline void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx, int16_t* attacker_idx) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bc960});
-        fn(star_idx, attacker_idx);
-    }
+    void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx, int16_t* attacker_idx);
 
-    inline void __cdecl Do_System_Discoveries_At_Star_(s_star_data* star) {
-        using Fn = void(__cdecl*)(s_star_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfea0});
-        fn(star);
+    void __cdecl Reset_One_Shot_System_Special_(s_star_data* star);
+
+    void __cdecl Do_System_Discoveries_At_Star_(s_star_data* star);
+
+    inline int16_t __cdecl Find_Planet_At_Star_Satisfying(s_star_data* star, int32_t (__cdecl* predicate)(s_planet_data*)) {
+        using Fn = int16_t(__cdecl*)(s_star_data*, int32_t (__cdecl*)(s_planet_data*));
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bce80});
+        return fn(star, predicate);
     }
 
     inline void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int attacker_idx, int defender_idx) {
@@ -88,4 +86,8 @@ namespace COMBFIND {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BC0D0});
         return fn(data);
     }
+
+    s_colony* __cdecl Free_Colony_Slot_();
+
+    bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet);
 }

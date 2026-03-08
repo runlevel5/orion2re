@@ -584,6 +584,15 @@ struct s_combfind_star_has_player {
     int8_t transport_unk; /* Created by Rename Structure Field action */
 };
 
+typedef struct s_combfind_target s_combfind_target, *Ps_combfind_target;
+
+struct s_combfind_target {
+    int16_t colony_targets[5];
+    int16_t num_colony_targets;
+    int16_t player_targets[15];
+    int16_t num_player_targets;
+};
+
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {

@@ -24,4 +24,10 @@ namespace invasion {
     }
 
     void __cdecl Check_All_Rebellions_();
+
+    inline void __cdecl Assign_New_Home_Planet_(int8_t player_idx, int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int8_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042bf20});
+        fn(player_idx, colony_idx);
+    }
 }

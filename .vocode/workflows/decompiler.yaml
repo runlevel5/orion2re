@@ -25,8 +25,11 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 600
-        tools:
-          - read_files
+        preprocessors:
+          - name: file_read
+            options:
+              paths:
+                - docs/msg.md
         system: |
           You are professional reverse engineer. Your core expertise is code restoration of old C and C++
           projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game
@@ -292,8 +295,8 @@ workflows:
             - A symbolic name for the value was provided in the input
             - A potential bug was identified
             - A complicated piece of logic was detected - add at most single line comment
-          * If you see usage of s_MSG structure, you MUST read the ./docs/msg.md for additional instructions, as s_MSG is a union type
-            and structure fields are dependent on message type.
+          * If you see usage of `s_MSG` structure or its derivatives (`s_MSG_xyz`) you MUST select correct `s_MSG` variant using rules
+            from provided msg.md file.
 
           # Check list
           * You provided all the stubs into correct namespaces

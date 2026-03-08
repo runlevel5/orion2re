@@ -4,9 +4,7 @@
 struct s_colony;
 
 namespace BOMB {
-    inline void __cdecl Destroy_Colony_(s_colony* colony, int16_t attacker_player_idx) {
-        using Fn = void(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047e780});
-        fn(colony, attacker_player_idx);
-    }
+    int16_t __cdecl Handle_Leader_At_Lost_Colony_(s_colony* colony);
+
+    void __cdecl Destroy_Colony_(s_colony* colony, int32_t capturing_player);
 }

@@ -343,4 +343,264 @@ void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
     (*_star_has_nonplayer)[star_idx] &= 0xEF;
 }
 
+int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx) {
+    uint32_t min_dist_sq = 0xFFFFFFFF;
+    int16_t closest_star_idx = -1;
+
+    s_star_data* src_star = &MOX::_star[star_idx];
+    int32_t src_x = src_star->x;
+    int32_t src_y = src_star->y;
+
+    int num_colonies = (int32_t)MOX::_NUM_COLONIES;
+    for (int i = 0; i < num_colonies; ++i) {
+        s_colony* colony = &MOX::_colony[i];
+
+        if (colony->owner == (int8_t)player_idx) {
+            int16_t target_star_idx = (int16_t)MOX::_planet[colony->planet].star_index;
+
+            if (target_star_idx != star_idx && target_star_idx != closest_star_idx) {
+                if (!struct_::Test_Bit_Field_((uint8_t*)src_star->black_hole_blocks, (int)target_star_idx)) {
+                    s_star_data* target_star = &MOX::_star[target_star_idx];
+
+                    int32_t dx = (int32_t)target_star->x - src_x;
+                    int32_t dy = (int32_t)target_star->y - src_y;
+                    int32_t dist_sq = dx * dx + dy * dy;
+
+                    if (dist_sq < min_dist_sq) {
+                        min_dist_sq = dist_sq;
+                        closest_star_idx = target_star_idx;
+                    }
+                }
+            }
+        }
+    }
+
+    return closest_star_idx;
+}
+
+void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx_ptr, int16_t* attacker_idx_ptr) {
+    int16_t star_list_idx = _n_battle_stars - 1;
+    *star_idx_ptr = -1;
+
+    while (star_list_idx >= 0) {
+        RUSS::Mox_Update_();
+
+        // Get star index from the pending battle stars list
+        uint8_t star_idx = (uint8_t)_battle_stars[star_list_idx];
+        *star_idx_ptr = (int16_t)star_idx;
+
+        if ((MOX::_game_type == 2 || MOX::_game_type == 3) && Some_Star_Player_Is_Busy_(*star_idx_ptr)) {
+            // Skip star if player logic is currently busy (e.g. multiplayer/hotseat)
+            star_list_idx--;
+            *star_idx_ptr = -1;
+        } else {
+            do {
+                *attacker_idx_ptr = Pick_Attacker_At_Star_(*star_idx_ptr);
+
+                if (*attacker_idx_ptr == -1) {
+                    // No valid attacker found at this star, remove the star from the list by swapping with last
+                    int16_t current_list_idx = star_list_idx;
+                    *star_idx_ptr = -1;
+                    _n_battle_stars--;
+                    star_list_idx--;
+                    _battle_stars[current_list_idx] = _battle_stars[_n_battle_stars];
+                } else {
+                    // Mark this player as processed for this star in the current pick
+                    (*_player_needs_to_attack)[*star_idx_ptr] &= ~(1 << *attacker_idx_ptr);
+
+                    Collect_Targets_For_Combat_(*star_idx_ptr, *attacker_idx_ptr);
+
+                    // If no valid targets (player or colony) were found, try to find another attacker at the same star
+                    if (_target.num_player_targets == 0 && _target.num_colony_targets == 0) {
+                        *attacker_idx_ptr = -1;
+                    }
+                }
+            } while (*attacker_idx_ptr == -1 && *star_idx_ptr != -1);
+        }
+
+        // If a valid star and attacker pair was found, exit
+        if (*star_idx_ptr != -1) {
+            break;
+        }
+    }
+}
+
+bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet) {
+    return planet->planet_special == 7 /* PLANET_SPECIAL_SPLINTER_COLONY */;
+}
+
+s_colony* __cdecl Free_Colony_Slot_() {
+    uint16_t i = 0;
+    s_colony* col = MOX::_colony;
+
+    if (i < MOX::_NUM_COLONIES) {
+        do {
+            // Check if the colony slot is empty
+            if (col->planet == -1) {
+                break;
+            }
+            i++;
+            col++;
+        } while (i < MOX::_NUM_COLONIES);
+
+        // Found a free slot within the existing array bounds
+        if (i < MOX::_NUM_COLONIES) {
+            return col;
+        }
+    }
+
+    // No free slot found; expand the colony count and return the next slot
+    MOX::_NUM_COLONIES = i + 1;
+    return col;
+}
+
+void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
+{
+    int star_idx;
+    int eligible_player_count;
+    int8_t player_present[8];
+    int8_t player_idx;
+    s_colony *colony;
+    int16_t planet_idx;
+    int16_t limit;
+    int n_techs;
+    int total_valid_techs;
+    int picked_tech_id;
+    s_MSG msg;
+
+    star_idx = (int)(star - MOX::_star);
+    Reset_One_Shot_System_Special_(star);
+
+    if (star->system_special != 0 && (*_star_has_nonplayer)[star_idx] == 0) {
+        eligible_player_count = 0;
+        memset(player_present, 0, 8);
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if ((*_star_has_player)[star_idx][i].has_player != 0) {
+                player_present[i] = 1;
+                eligible_player_count++;
+            }
+        }
+
+        if (eligible_player_count > 0) {
+            player_idx = (int8_t)RUSS::Get_Weighted_Choice_Char_(player_present, MOX::_NUM_PLAYERS);
+
+            switch (star->system_special) {
+            case 2:
+                MOX::_player[player_idx].bc += 50;
+                star->system_special = player_idx + 50;
+                break;
+
+            case 3:
+                MOX::_player[player_idx].bc += 100;
+                star->system_special = player_idx + 60;
+                break;
+
+            case 7:
+                star->system_special = player_idx + 70;
+                (*_star_has_player)[star_idx][player_idx].colony_count = 1;
+                colony = Free_Colony_Slot_();
+                planet_idx = Find_Planet_At_Star_Satisfying(star, (int32_t (__cdecl*)(s_planet_data*))Planet_Has_Splinter_Colony_);
+                INITGAME::Init_Colony_((int)(colony - MOX::_colony), planet_idx, player_idx);
+                
+                limit = COLCALC::Colony_Race_Pop_Limit_(colony, player_idx);
+                colony->n_pops = (int8_t)limit;
+                if (colony->n_pops > 3) {
+                    colony->n_pops = 3;
+                }
+
+                memset(colony->buildings, 0, 49);
+                memset(colony->pop, 0, 168 /* 42 * 4 */);
+
+                for (int i = 0; i < colony->n_pops; ++i) {
+                    uint32_t pop_val = colony->pop[i];
+                    
+                    // Set owner bits (0-3) and source planet bits (4-6)
+                    pop_val = (pop_val & ~0xF) | (player_idx & 0xF);
+                    pop_val = (pop_val & ~0x70) | ((planet_idx << 4) & 0x70);
+
+                    if (MOX::_planet[planet_idx].food_per_farmer == 0 || MOX::_player[player_idx].traits[18] != 0) {
+                        int r = random::Random_(2);
+                        pop_val = (pop_val & ~0x180) | ((r << 7) & 0x180);
+                    } else if (MOX::_player[player_idx].traits[17] == 0) {
+                        pop_val &= ~0x180;
+                    } else if (i == 0) {
+                        pop_val = (pop_val & ~0x100) | 0x80;
+                    } else {
+                        pop_val &= ~0x180;
+                    }
+
+                    pop_val |= 0x200; // Population unit exists flag
+                    colony->pop[i] = pop_val;
+                }
+
+                COLCALC::Compute_Star_Colony_Stuff_(star);
+                COLCALC::Colony_Calculation_((int16_t)(colony - MOX::_colony));
+                colony->just_produced = -39 /* 0xFFD9 */;
+                break;
+
+            case 8:
+                star->system_special = player_idx + 80;
+                break;
+
+            case 10:
+                if (star->artifacts_gave_app == 0) {
+                    star->system_special = player_idx + 90;
+                    star->artifacts_gave_app = 1;
+                    
+                    // n_techs = (Random(4) / 4) + 1; Result is always 1
+                    n_techs = (random::Random_(4) >> 2) + 1;
+                    picked_tech_id = 0;
+
+                    for (int i = n_techs; i != 0; --i) {
+                        total_valid_techs = 0;
+                        for (int tech_id = 1; tech_id < 204; ++tech_id) {
+                            if (MOX::_player[player_idx].tech_fields[TECHDATA::_technology_applications[tech_id].tech_field_id] == 2 &&
+                                COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_id)) {
+                                
+                                total_valid_techs++;
+                                if (random::Random_(total_valid_techs) == 1) {
+                                    picked_tech_id = tech_id;
+                                }
+                            }
+                        }
+                        if (total_valid_techs != 0) {
+                            COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], picked_tech_id);
+                        }
+                    }
+
+                    if (picked_tech_id != 0) {
+                        memset(&msg, 0, sizeof(s_MSG));
+                        msg.msg_type = 20 /* MSG_TYPE_ARTIFACTS */;
+                        msg.priority = 1; // Default priority
+                        msg.u.artifacts.star_idx = (uint8_t)star_idx;
+                        msg.u.artifacts.tech1 = (int8_t)picked_tech_id;
+                        msg.u.artifacts.tech2 = 0;
+                        MSG_::Add_Msg_(msg, player_idx);
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+}
+
+void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
+    // System specials with value >= 50 (ASCII '2') are treated as one-shot/temporary events.
+    if (star->system_special >= 50) {
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = star->planet_index[i];
+            if (planet_idx != -1) {
+                // Reset the special status on each planet belonging to this system
+                MOX::_planet[planet_idx].planet_special = 0;
+            }
+        }
+        // Clear the system special flag
+        star->system_special = 0;
+    }
+}
+
 } // namespace COMBFIND

@@ -206,6 +206,18 @@ namespace SHIPMOVE {
     }
 
     /**
+     * Checks if a star system is within the extended ship range of a player.
+     * The extended range is calculated as 150% of the player's standard ship range.
+     */
+    bool __cdecl Star_In_Extended_Range_Of_Player_(s_star_data* star, int16_t player_idx) {
+        // The standard ship range is multiplied by 3 and divided by 2.
+        // The assembly uses a standard signed division sequence (CDQ, SUB, SAR) to truncate towards zero.
+        int16_t extended_range = static_cast<int16_t>((MOX::_player[player_idx].ship_range * 3) / 2);
+
+        return Star_In_Range_Of_Player_(star, player_idx, extended_range);
+    }
+
+    /**
      * Checks if a star is within the extended range of a player, considering alliances.
      * @param star The target star.
      * @param player_idx Index of the player.

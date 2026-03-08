@@ -11,11 +11,7 @@ namespace SHIPMOVE {
 
     bool __cdecl Star_In_Normal_Range_Of_Player_(s_star_data* star, int16_t player_idx);
 
-    inline bool __cdecl Star_In_Extended_Range_Of_Player_(s_star_data* star, int16_t player_num) {
-        using Fn = bool(__cdecl*)(s_star_data*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00436270});
-        return fn(star, player_num);
-    }
+    bool __cdecl Star_In_Extended_Range_Of_Player_(s_star_data* star, int16_t player_idx);
 
     bool __cdecl Star_In_Range_Of_Player_Aux1_(s_star_data* star, int16_t player_idx, int16_t dist);
     bool __cdecl Star_In_Range_Of_Player_Aux2_(s_star_data* star, int16_t player_idx, int16_t dist);

@@ -11,8 +11,11 @@ struct s_crew_data;
 struct s_player;
 struct s_leader_data;
 struct s_star_data;
+struct s_combfind_target;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
+
+inline s_combfind_target& _target = *reinterpret_cast<s_combfind_target*>(std::uintptr_t{0x0056CE38});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
@@ -767,4 +770,22 @@ inline void __cdecl Set_Plyr_Info_Btns_(int32_t button_id) {
     using Fn = void(__cdecl*)(int32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004299E0});
     fn(button_id);
+}
+
+inline bool __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
+    using Fn = bool(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCD50});
+    return fn(star_idx);
+}
+
+inline int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCA70});
+    return fn(star_idx);
+}
+
+inline void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t attacker_idx) {
+    using Fn = void(__cdecl*)(int16_t, int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCB20});
+    fn(star_idx, attacker_idx);
 }

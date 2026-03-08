@@ -1661,6 +1661,15 @@ namespace hooks {
         { 0x004628D0, &aimove::Ship_Rough_Strength_At_Star_ },
         { 0x00465E00, &aimove::Find_Opportunity_Attack_ },
         { 0x00461540, &aimove::Move_AI_ },
+        { 0x00436270, &SHIPMOVE::Star_In_Extended_Range_Of_Player_ },
+        { 0x0047e780, &BOMB::Destroy_Colony_ },
+        { 0x0047e670, &BOMB::Handle_Leader_At_Lost_Colony_ },
+        { 0x004bc300, &COMBFIND::Closest_Other_Colony_Star_ },
+        { 0x004bc960, &COMBFIND::Pick_Star_And_Attacker_ },
+        { 0x004bcf20, &COMBFIND::Reset_One_Shot_System_Special_ },
+        { 0x004bcee0, &COMBFIND::Free_Colony_Slot_ },
+        { 0x004c0310, &COMBFIND::Planet_Has_Splinter_Colony_ },
+        { 0x004bfea0, &COMBFIND::Do_System_Discoveries_At_Star_ },
     };
 
     void Install_Hooks()
