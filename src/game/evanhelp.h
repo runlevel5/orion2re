@@ -8,6 +8,9 @@ namespace EVANHELP {
     inline uint8_t& _main_menu_screen_help_list = 
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552B48});
 
+    inline uint8_t& _multi_player_setup_screen_help_list =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552B88});
+
     inline void __cdecl Set_Load_Game_Screen_Help_List_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e130})();
@@ -53,6 +56,13 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Main_Game_Screen_Help_List_();
+
+    void __cdecl Set_Multi_Player_Setup_Screen_Help_List_();
+    inline void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041e3c0 });
+        fn(x, y);
+    }
 
     inline void __cdecl Save_Help_List_() {
         using Fn = void(__cdecl*)();

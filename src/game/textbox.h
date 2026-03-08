@@ -42,4 +42,10 @@ namespace TEXTBOX {
     void __cdecl Do_Text_Box_(char* title, char* text, int16_t input_type);
 
     void __cdecl Text_Box_(const char* param_1, const char* param_2);
+
+    inline void __cdecl Draw_Help_Entry_(int16_t help_id) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00470A90});
+        fn(help_id);
+    }
 }

@@ -357,6 +357,18 @@ inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
     fn(dest, size, value);
 }
 
+inline void* __cdecl Allocate_First_Block_(uint32_t segment, uint32_t size) {
+    using Fn = void*(__cdecl*)(uint32_t, uint32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E930});
+    return fn(segment, size);
+}
+
+inline void* __cdecl Allocate_Next_Block_(uint32_t segment, uint32_t size) {
+    using Fn = void*(__cdecl*)(uint32_t, uint32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E950});
+    return fn(segment, size);
+}
+
 inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
     using Fn = void(__cdecl*)(void*, const void*, int32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d0fa});
@@ -407,6 +419,24 @@ inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* s
     return fn(filename, index, segment);
 }
 
+inline s_animation_header* __cdecl Far_Reload_(const char* filename, int16_t entry, uint32_t segment) {
+    using Fn = s_animation_header*(__cdecl*)(const char*, int16_t, uint32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051C710});
+    return fn(filename, entry, segment);
+}
+
+inline int16_t __cdecl Get_Width_(s_animation_header* anim) {
+    using Fn = int16_t(__cdecl*)(s_animation_header*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D20});
+    return fn(anim);
+}
+
+inline int16_t __cdecl Get_Height_(s_animation_header* anim) {
+    using Fn = int16_t(__cdecl*)(s_animation_header*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D30});
+    return fn(anim);
+}
+
 inline void __cdecl Combat_Draw_View_Ship_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d1f80});
@@ -427,6 +457,12 @@ inline void __cdecl Delete_Prod_From_Colony_Queue_(int32_t colony_idx, int32_t c
 inline void __cdecl Build_Captain_Id_List_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043D470});
+    fn();
+}
+
+inline void __cdecl Set_Multi_Player_Game_Type_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005081D0});
     fn();
 }
 
@@ -477,6 +513,10 @@ inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);
 inline const char* s_c_00556350 = reinterpret_cast<const char*>(std::uintptr_t{0x00556350}); // "c"
 inline const char* s_o_00556af4 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF4}); // "o"
 inline const char* s_oc_00556af8 = reinterpret_cast<const char*>(std::uintptr_t{0x00556AF8}); // "oc"
+inline const char* s_H_005569d4 = reinterpret_cast<const char*>(0x005569D4); // "H"
+inline const char* s_M_00557ed8 = reinterpret_cast<const char*>(0x00557ED8); // "M"
+inline const char* DAT_00558540 = reinterpret_cast<const char*>(0x00558540);
+inline const char* DAT_0055aa90 = reinterpret_cast<const char*>(0x0055AA90);
 
 inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00552CD8}); // "Monster (ship id: %d) cannot move to %s (%d)!"
@@ -606,6 +646,36 @@ inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
 inline void __cdecl Save_Hotseat_Map_Info_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBD70});
+    fn();
+}
+
+inline void __cdecl Restore_Hotseat_Map_Info_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBC80});
+    fn();
+}
+
+inline void __cdecl Fade_In_Function_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504500});
+    fn();
+}
+
+inline void __cdecl Hotseat_Draw_Next_Player_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503E30});
+    fn();
+}
+
+inline void __cdecl Hotseat_Load_Next_Player_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504190});
+    fn();
+}
+
+inline void __cdecl Hotseat_Add_Next_Player_Fields_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503D30});
     fn();
 }
 

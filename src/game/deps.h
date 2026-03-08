@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <Windows.h>
 #include <ddraw.h>
+#include <time.h>
 
 #include "funcs.h"
 #include "accss.h"

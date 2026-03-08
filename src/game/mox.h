@@ -2,6 +2,7 @@
 
 struct s_animation_header;
 struct s_player;
+struct s_mp_screen;
 
 namespace MOX {
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
@@ -28,6 +29,7 @@ namespace MOX {
     inline uint8_t& _draw_expanding_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BF32});
     inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
     inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
+    inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
 
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
     inline s_current_design*& _design =
@@ -230,6 +232,18 @@ namespace MOX {
     inline int16_t& _near_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA6});
     inline int16_t& _near_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596EA8});
     inline s_animation_header*& _near_star_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597424});
+
+    inline const char* s_ATZ_0055AA7C =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA7C}); // "ATZ"
+
+    inline const char* s_AT_K0_M1_D2_0055AA6C =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA6C}); // "AT &K0 M1 &D2"
+
+    inline const char* s_AT_H0_S0_0_0055AA60 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA60}); // "AT H0 S0=0"
+
+    inline const char* s_5551212_0055AA58 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055AA58}); // "5551212"
 
     inline const char* s_fmt_s =
         reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"

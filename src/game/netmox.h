@@ -1,7 +1,11 @@
 #pragma once
 #include <cstdint>
 
+struct s_network;
+
 namespace NETMOX {
+    inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
+
     inline int16_t __cdecl Human_Requesting_Diplomacy_() {
         using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519a00});

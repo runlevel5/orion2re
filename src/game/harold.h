@@ -66,6 +66,12 @@ namespace HAROLD {
         reinterpret_cast<Fn>(std::uintptr_t{0x004f1420})();
     }
 
+    inline void __cdecl Load_Language_Fonts_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F24A0});
+        fn();
+    }
+
     uint8_t* __cdecl Harold_Init_();
 
     inline void __cdecl Harold_Defaults_() {
