@@ -1,12 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_combfind_star_has_player;
-struct s_planet_data;
-
-namespace MOX {
-    struct s_star_data;
-}
 
 namespace COMBFIND {
     inline uint8_t& _messed_up_fleet_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD0});
@@ -14,7 +6,7 @@ namespace COMBFIND {
     inline int8_t (*&_battle_stars) = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CE14});
     inline int8_t (*&_star_has_nonplayer)[73] = *reinterpret_cast<int8_t (**)[73]>(std::uintptr_t{0x0056CE20});
     inline int16_t& _n_battle_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CE2C});
-    inline uint32_t*& _attack_confirmed = *reinterpret_cast<uint32_t**>(std::uintptr_t{0x0056CE64});
+    inline int8_t(*&_attack_confirmed)[8][8] = *reinterpret_cast<int8_t(**)[8][8]>(std::uintptr_t{ 0x0056CE64 });
     inline s_combfind_star_has_player (*&_star_has_player)[73][8] = *reinterpret_cast<s_combfind_star_has_player (**)[73][8]>(std::uintptr_t{0x0056CE68});
     inline uint32_t& _current_star_has_nonplayer = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A4AAC});
     inline uint32_t& _current_star_has_player = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A4AB0});

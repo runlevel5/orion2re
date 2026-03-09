@@ -16,7 +16,7 @@ void __cdecl Search_For_Battles_() {
     int8_t star_has_nonplayer_stack[73];
     int16_t player_needs_to_attack_stack[73];
     int8_t battle_stars_stack[76];
-    uint32_t attack_confirmed_buf[16];
+    int8_t attack_confirmed_buf[8][8];
 
     _star_has_player = &star_has_player_stack;
     memset(&star_has_player_stack, 0, sizeof(star_has_player_stack));
@@ -83,7 +83,7 @@ void __cdecl Search_For_Battles_() {
 
     if (MOX::_game_type < 2) { /* Case 0 (Single), Case 1 (Host) */
         memset(attack_confirmed_buf, 0, sizeof(attack_confirmed_buf));
-        _attack_confirmed = attack_confirmed_buf;
+        _attack_confirmed = &attack_confirmed_buf;
 
         while (_n_battle_stars > 0) {
             int16_t star_idx, attacker_idx;
