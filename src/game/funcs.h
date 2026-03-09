@@ -15,8 +15,6 @@ struct s_combfind_target;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
-inline s_combfind_target& _target = *reinterpret_cast<s_combfind_target*>(std::uintptr_t{0x0056CE38});
-
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
@@ -561,6 +559,8 @@ inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
 
 inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
+
+inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintptr_t{0x00558BD8});
 
 inline const char* s_RACEOPT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DB0}); // "RACEOPT.LBX"
 inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"

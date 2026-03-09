@@ -58,4 +58,10 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045f8a0});
         return fn(defender_idx, star_idx);
     }
+
+    inline int16_t __cdecl Defense_Colony_Selection_Popup_(int16_t star_idx, int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045c4a0});
+        return fn(star_idx, player_idx);
+    }
 }

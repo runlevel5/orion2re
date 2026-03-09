@@ -153,6 +153,7 @@ namespace MOX {
     inline int16_t& _design_clear_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B4C});
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
+    inline char** _treaty_labels = reinterpret_cast<char**>(std::uintptr_t{0x005A1B00});
     inline int16_t& _old_system_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5F8});
     inline int8_t& _selected_star_color_mod =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596C50});

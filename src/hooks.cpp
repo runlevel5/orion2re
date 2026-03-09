@@ -1670,6 +1670,14 @@ namespace hooks {
         { 0x004bcee0, &COMBFIND::Free_Colony_Slot_ },
         { 0x004c0310, &COMBFIND::Planet_Has_Splinter_Colony_ },
         { 0x004bfea0, &COMBFIND::Do_System_Discoveries_At_Star_ },
+        { 0x004bce80, &COMBFIND::Find_Planet_At_Star_Satisfying_ },
+        { 0x004bd580, &COMBFIND::Update_Player_Needs_To_Attack_ },
+        { 0x004bd640, &COMBFIND::Get_Local_Human_Target_ },
+        { 0x004bd8d0, &COMBFIND::Get_AI_Target_ },
+        { 0x004be1e0, &COMBFIND::Get_NPC_Target_ },
+        { 0x004bc0d0, &COMBFIND::Load_Combfind_Strings_ },
+        { 0x004bd750, &COMBFIND::Human_Confirms_Attack_ },
+        { 0x004bc2e0, &COMBFIND::Target_Planet_To_Colony_ },
     };
 
     void Install_Hooks()

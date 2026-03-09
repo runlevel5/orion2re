@@ -425,8 +425,39 @@ void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx_ptr, int16_t* attacker_id
     }
 }
 
+int16_t __cdecl Find_Planet_At_Star_Satisfying_(s_star_data* star, bool (__cdecl* predicate)(s_planet_data*)) {
+    for (int16_t i = 0; i < 5; ++i) {
+        int16_t planet_idx = star->planet_index[i];
+
+        if (planet_idx != -1) {
+            // Accessing the planet data via the global planet array
+            if (predicate(&MOX::_planet[planet_idx])) {
+                return planet_idx;
+            }
+        }
+    }
+
+    return -1;
+}
+
 bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet) {
     return planet->planet_special == 7 /* PLANET_SPECIAL_SPLINTER_COLONY */;
+}
+
+/**
+ * @brief Translates a planet index to its corresponding colony index.
+ * 
+ * @param planet_idx The index of the planet in the global planet array.
+ * @return The colony index associated with the planet, or -1 if the planet index is invalid or no colony exists.
+ */
+int16_t __cdecl Target_Planet_To_Colony_(int32_t planet_idx) {
+    if (planet_idx == -1) {
+        return -1;
+    }
+
+    // Each s_planet_data structure is 17 (0x11) bytes.
+    // The assembly calculates the offset as (planet_idx * 16) + planet_idx.
+    return MOX::_planet[planet_idx].colony_index;
 }
 
 s_colony* __cdecl Free_Colony_Slot_() {
@@ -500,7 +531,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
                 star->system_special = player_idx + 70;
                 (*_star_has_player)[star_idx][player_idx].colony_count = 1;
                 colony = Free_Colony_Slot_();
-                planet_idx = Find_Planet_At_Star_Satisfying(star, (int32_t (__cdecl*)(s_planet_data*))Planet_Has_Splinter_Colony_);
+                planet_idx = Find_Planet_At_Star_Satisfying_(star, Planet_Has_Splinter_Colony_);
                 INITGAME::Init_Colony_((int)(colony - MOX::_colony), planet_idx, player_idx);
                 
                 limit = COLCALC::Colony_Race_Pop_Limit_(colony, player_idx);
@@ -601,6 +632,380 @@ void __cdecl Reset_One_Shot_System_Special_(s_star_data* star) {
         // Clear the system special flag
         star->system_special = 0;
     }
+}
+
+/**
+ * @address 004bd640
+ */
+void __cdecl Get_Local_Human_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player_idx_out, int16_t* target_colony_idx_out) {
+    *target_colony_idx_out = -1;
+    *target_player_idx_out = -1;
+
+    if (star_idx == MOX::_NUM_STARS) {
+        *target_player_idx_out = 8;
+        return;
+    }
+
+    if (COMBFIND::_target.num_colony_targets > 0 || COMBFIND::_target.num_player_targets > 0) {
+        video::Set_Page_Off_();
+        MAINSCR::Draw_Mini_Main_Screen_();
+        video::Copy_Off_To_Back_();
+        RUSS::Mox_Sync_Update_();
+        MAINSCR::Draw_Mini_Main_Screen_();
+
+        REPORT::_something_interesting_happened[player_idx] = 1;
+        MOX::_star[star_idx].visited |= (1 << player_idx);
+        MOX::_PLAYER_NUM = player_idx;
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+        int16_t target_id;
+        while (true) {
+            target_id = -1;
+            *target_colony_idx_out = -1;
+            *target_player_idx_out = -1;
+
+            int16_t selection = MAINPUPS::Defense_Colony_Selection_Popup_(star_idx, player_idx);
+
+            if (selection != -1) {
+                COMBFIND::_messed_up_fleet_palette = 1;
+                if (selection < 15) {
+                    target_id = selection;
+                    *target_player_idx_out = selection;
+                } else {
+                    int16_t colony_idx = selection - 15;
+                    *target_colony_idx_out = colony_idx;
+                    target_id = (int16_t)MOX::_colony[colony_idx].owner;
+                }
+            }
+
+            if (target_id == -1) {
+                return;
+            }
+
+            if (COMBFIND::Human_Confirms_Attack_(player_idx, target_id)) {
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * @address 004bd580
+ */
+void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player, int16_t* target_colony, int8_t* is_sneak_attack) {
+    *is_sneak_attack = 0;
+    *target_player = -1;
+    *target_colony = -1;
+
+    if (MOX::_NUM_STARS == star_idx) {
+        *target_player = 8 /* STAR_ORION */;
+        return;
+    }
+
+    if (COMBFIND::_target.num_colony_targets > 0 || COMBFIND::_target.num_player_targets > 0) {
+        s_player* player = &MOX::_player[player_idx];
+        int16_t sneak_attack_target = -1;
+
+        if (player->sneak_attack_planet != -1) {
+            if (MOX::_planet[player->sneak_attack_planet].star_index == (int8_t)star_idx) {
+                sneak_attack_target = (int16_t)player->sneak_attack_player;
+                player->sneak_attack_planet = -1;
+                player->sneak_attack_player = -1;
+                player->war_buildup_duration = 0;
+            }
+        }
+
+        uint32_t bonus_info[4];
+        uint32_t our_strength[15];
+        uint32_t enemy_strength[15];
+
+        COMBFIND::Get_Ship_Strength_Info_(bonus_info, our_strength, enemy_strength, star_idx, player_idx);
+
+        uint32_t best_colony_score = 0;
+        int16_t best_colony_idx = -1;
+
+        COMBFIND::Get_Best_Colony_Target_(enemy_strength, our_strength, bonus_info, star_idx, player_idx, &best_colony_score, &best_colony_idx, sneak_attack_target);
+
+        uint32_t best_player_score = 0;
+        int16_t best_player_idx = -1;
+
+        // Only consider player targets if there is no sneak attack target at this star or no valid colony target found
+        if (sneak_attack_target == -1 || best_colony_idx == -1) {
+            for (int16_t i = 0; i < COMBFIND::_target.num_player_targets; ++i) {
+                int16_t enemy_idx = COMBFIND::_target.player_targets[i];
+                uint32_t enemy_str = enemy_strength[enemy_idx];
+                uint32_t our_str = our_strength[enemy_idx];
+
+                if (enemy_str <= our_str) {
+                    bool is_valid = false;
+                    if (enemy_str < our_str) {
+                        is_valid = true;
+                    } else {
+                        s_star_data* star = &MOX::_star[star_idx];
+                        // Check if player has a colony here and if it is currently blockaded by the enemy
+                        if (((star->has_colony >> player_idx) & 1) && ((star->blockaded_by[player_idx] >> enemy_idx) & 1)) {
+                            is_valid = true;
+                        } else if (enemy_idx == sneak_attack_target) {
+                            is_valid = true;
+                        } else {
+                            switch (player->personality) {
+                                case 0 /* PERSONALITY_AGGRESSIVE */:
+                                case 1 /* PERSONALITY_EXPANSIONIST */:
+                                    is_valid = true;
+                                    break;
+                                case 2 /* PERSONALITY_XENOPHOBIC */:
+                                case 3 /* PERSONALITY_PACIFIST */:
+                                    // Xenophobes and Pacifists have a 50% chance to engage in a tie-strength situation
+                                    is_valid = (random::Random_(2) - 1) != 0;
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (is_valid) {
+                        // Normalize strengths for scoring if the ratio is overwhelming
+                        if (our_str > enemy_str * 3) {
+                            our_str = 3;
+                            enemy_str = 1;
+                        } else if (our_str == 0) {
+                            enemy_str = 1;
+                        }
+
+                        uint32_t score;
+                        if (enemy_idx == sneak_attack_target) {
+                            score = 0xFFFFFFFF;
+                        } else {
+                            score = (our_str << 4) / enemy_str;
+                        }
+
+                        if (best_player_score < score) {
+                            best_player_score = score;
+                            best_player_idx = enemy_idx;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (best_colony_score < best_player_score) {
+            *target_player = best_player_idx;
+            if (best_player_idx == sneak_attack_target) {
+                *is_sneak_attack = 1;
+            }
+        } else if (best_colony_score != 0) {
+            *target_colony = best_colony_idx;
+            if (MOX::_colony[best_colony_idx].owner == sneak_attack_target) {
+                *is_sneak_attack = 1;
+            }
+        }
+    }
+}
+
+void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_idx1, int player_idx2) {
+    // Process first player index
+    if (player_idx1 < 8) {
+        // Check if player has a presence (colony/outpost/ship) at this star
+        if ((*_star_has_player)[star_idx][player_idx1].has_player == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx1 & 0x1f));
+        }
+    } else {
+        // For indices >= 8, check against the non-player bitmask.
+        // Note: Since _star_has_nonplayer is 8-bit, indices >= 8 will effectively always result in 0.
+        uint8_t nonplayer_mask = static_cast<uint8_t>((*_star_has_nonplayer)[star_idx]);
+        if (((nonplayer_mask >> (player_idx1 & 0x1f)) & 1) == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx1 & 0x1f));
+        }
+    }
+
+    // Process second player index
+    if (player_idx2 < 8) {
+        if ((*_star_has_player)[star_idx][player_idx2].has_player == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx2 & 0x1f));
+        }
+    } else {
+        uint8_t nonplayer_mask = static_cast<uint8_t>((*_star_has_nonplayer)[star_idx]);
+        if (((nonplayer_mask >> (player_idx2 & 0x1f)) & 1) == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx2 & 0x1f));
+        }
+    }
+}
+
+void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *player_target_ptr, int16_t *colony_target_ptr) {
+    int lucky_count;
+    int non_lucky_count;
+    int lucky_target;
+    int non_lucky_target;
+    int i;
+
+    *colony_target_ptr = -1;
+    *player_target_ptr = -1;
+
+    if (event_type == 13 /* EVENT_TYPE_13 */) {
+        return;
+    }
+
+    if (MOX::_NUM_STARS == star_idx) {
+        *player_target_ptr = 8;
+        return;
+    }
+
+    if (COMBFIND::_target.num_colony_targets > 0) {
+        lucky_count = 0;
+        non_lucky_count = 0;
+        lucky_target = -1;
+        non_lucky_target = -1;
+
+        for (i = 0; i < (int)COMBFIND::_target.num_colony_targets; ++i) {
+            int16_t colony_idx = COMBFIND::_target.colony_targets[i];
+            int8_t owner = MOX::_colony[colony_idx].owner;
+
+            if (MOX::_player[owner].traits[26 /* TRAIT_LUCKY */] != 0) {
+                lucky_count++;
+                if (random::Random_(lucky_count) == 1) {
+                    lucky_target = colony_idx;
+                }
+            }
+            else {
+                non_lucky_count++;
+                if (random::Random_(non_lucky_count) == 1) {
+                    non_lucky_target = colony_idx;
+                }
+            }
+        }
+
+        if (non_lucky_target != -1) {
+            *colony_target_ptr = (int16_t)non_lucky_target;
+        }
+        else {
+            *colony_target_ptr = (int16_t)lucky_target;
+        }
+        return;
+    }
+
+    if (COMBFIND::_target.num_player_targets > 0) {
+        lucky_count = 0;
+        non_lucky_count = 0;
+        lucky_target = -1;
+        non_lucky_target = -1;
+
+        for (i = 0; i < (int)COMBFIND::_target.num_player_targets; ++i) {
+            int16_t player_idx = COMBFIND::_target.player_targets[i];
+
+            // If player is valid index and not lucky, prioritize them
+            if (player_idx < 8 && MOX::_player[player_idx].traits[26 /* TRAIT_LUCKY */] == 0) {
+                non_lucky_count++;
+                if (random::Random_(non_lucky_count) == 1) {
+                    non_lucky_target = player_idx;
+                }
+            }
+            else {
+                lucky_count++;
+                if (random::Random_(lucky_count) == 1) {
+                    lucky_target = player_idx;
+                }
+            }
+        }
+
+        if (non_lucky_target != -1) {
+            *player_target_ptr = (int16_t)non_lucky_target;
+        }
+        else {
+            *player_target_ptr = (int16_t)lucky_target;
+        }
+    }
+}
+
+/**
+ * @address 004bc0d0
+ */
+char* __cdecl Load_Combfind_Strings_(char* strings_block) {
+    char* current = strings_block;
+
+    _combfind_strings_base = current;
+    current += strlen(current) + 1;
+
+    _you_have_following_treaties_msg = current;
+    current += strlen(current) + 1;
+
+    _trade_treaty_msg = current;
+    current += strlen(current) + 1;
+
+    _research_treaty_msg = current;
+    current += strlen(current) + 1;
+
+    _receiving_tribute_msg = current;
+    current += strlen(current) + 1;
+
+    _really_risk_war_msg = current;
+    current += strlen(current) + 1;
+
+    _outpost_destroyed_msg = current;
+    current += strlen(current) + 1;
+
+    _colony_seized_by_mind_control_msg = current;
+    current += strlen(current) + 1;
+
+    _s_attacks_you_at_s_msg = current;
+    current += strlen(current) + 1;
+
+    _combat_is_reported_between_s_and_s_msg = current;
+    current += strlen(current) + 1;
+
+    return current;
+}
+
+/**
+ * @address 004bd750
+ */
+int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
+    char message_buffer[400];
+    int8_t confirmed = 1;
+
+    if (target_idx < 8 && (*_attack_confirmed)[player_idx][target_idx] == 0) {
+        int treaty_count = 0;
+        int offset = _sprintf(message_buffer, s_format_string, _you_have_following_treaties_msg);
+        char* dest_ptr = message_buffer + offset;
+
+        // Check standard treaties (e.g., Non-Aggression, Alliance)
+        int8_t treaty_type = MOX::_player[player_idx].treaty[target_idx];
+        if (treaty_type > 0 && treaty_type < 4) {
+            treaty_count = 1;
+            offset = _sprintf(dest_ptr, s_format_string, MOX::_treaty_labels[treaty_type]);
+            dest_ptr += offset;
+        }
+
+        // Check trade treaty
+        if (MOX::_player[player_idx].trade_treaty[target_idx] != 0) {
+            treaty_count++;
+            offset = _sprintf(dest_ptr, s_format_string, _trade_treaty_msg);
+            dest_ptr += offset;
+        }
+
+        // Check research treaty
+        if (MOX::_player[player_idx].research_treaty[target_idx] != 0) {
+            treaty_count++;
+            offset = _sprintf(dest_ptr, s_format_string, _research_treaty_msg);
+            dest_ptr += offset;
+        }
+
+        // Check if player is receiving tribute from the target
+        if (MOX::_player[target_idx].tribute_treaty[player_idx] != 0) {
+            treaty_count++;
+            offset = _sprintf(dest_ptr, s_format_string, _receiving_tribute_msg);
+            dest_ptr += offset;
+        }
+
+        if (treaty_count != 0) {
+            _sprintf(dest_ptr, _really_risk_war_msg);
+            confirmed = (int8_t)GENDRAW::Warning_Box_(message_buffer);
+
+            if (confirmed != 0) {
+                (*_attack_confirmed)[player_idx][target_idx] = 1;
+            }
+        }
+    }
+
+    return confirmed;
 }
 
 } // namespace COMBFIND
