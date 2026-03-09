@@ -664,14 +664,6 @@ namespace COLONY {
         Print_Building_Name_(_scanned_bldg_C, _scanned_bldg_R);
     }
 
-    int16_t __cdecl Get_Colony_Planet_Id_(int32_t colony_idx) {
-        if (colony_idx == -1) {
-            return -1;
-        }
-
-        return MOX::_colony[colony_idx].planet;
-    }
-
     void __cdecl Draw_Satellite_Dark_(int16_t x, int16_t y, int16_t satellite_id) {
         s_animation_header* satellite_anim = Satellite_Anim_(satellite_id);
 

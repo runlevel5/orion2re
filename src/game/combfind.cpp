@@ -129,7 +129,7 @@ void __cdecl Search_For_Battles_() {
                 }
 
                 if (final_defender_idx != -1) {
-                    int16_t planet_idx = COLONY::Get_Colony_Planet_Id_(colony_idx);
+                    int16_t planet_idx = COMBFIND::Target_Colony_To_Planet_(colony_idx);
                     MOX::_star[star_idx].ignore_combat_ships = 0;
                     Do_1_Combat_(star_idx, attacker_idx, defender_idx, planet_idx, nullptr, unk_flag);
                     _current_star_has_player = 0;
@@ -1006,6 +1006,14 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
     }
 
     return confirmed;
+}
+
+int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
+    if (colony_idx == -1) {
+        return -1;
+    }
+
+    return MOX::_colony[colony_idx].planet;
 }
 
 } // namespace COMBFIND

@@ -1089,7 +1089,7 @@ namespace hooks {
         { 0x0041f8b0, &SHIPS::Kill_Ship_ },
         { 0x004b4360, &maintain::Make_Scrap_Ships_Dead_ },
         { 0x004fb090, &COLCALC::Do_Surrenders_ },
-        { 0x004bc2b0, &COLONY::Get_Colony_Planet_Id_ },
+        { 0x004bc2b0, &COMBFIND::Target_Colony_To_Planet_ },
         { 0x004bcf70, &COMBFIND::Search_For_Battles_ },
         { 0x00409460, &ERICNET::Do_All_Ships_XP_Check_ },
         { 0x00409410, &ERICNET::Do_XP_For_Ship_ },

@@ -85,4 +85,6 @@ namespace COMBFIND {
     bool __cdecl Planet_Has_Splinter_Colony_(s_planet_data* planet);
 
     int16_t __cdecl Target_Planet_To_Colony_(int32_t planet_idx);
+
+    int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx);
 }
