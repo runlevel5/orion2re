@@ -37,7 +37,8 @@ workflows:
           # RULES:
           * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory accesses.
           * Your goal is to provide human-readable names for variables that look like `fieldX_0xY`, where X and Y are numeric and
-            byte offsets within a structure.
+            byte offsets within a structure. You might also see a different variation, like `_X_Y_`, where X is structure offset and Y is the
+            size. For example `_0_2_` means offset 0, size 2.
           * You shall also provide hint for a total structure length based on use and access patterns. For example, you might see
             an initialization code that zeroes out structure with explicit number of bytes, this might provide a hint about its size.
             You must must be careful - a lot of code might initialize array of structures too.
@@ -63,10 +64,11 @@ workflows:
             Number represents hex offset of the variable from structure start. 
             <short description> is very short sentence explaining what this field represents or how it is being used.
 
-          * You must also provide a list of all renamed fields. If field was not renamed, do NOT include it in this list. If there are
-            no renamed or corrected fields, output nothing.
+          * You must also provide a list of all renamed fields as a Markdown table. If field was not renamed, do NOT include it in this 
+            list. If there are no renamed or corrected fields, output nothing. If there are multiple displayed structures, show a table 
+            per structre, do not mix fields from different structures into one table.
 
-            Example for a renamed field:
+            Example for a renamed field, as a table:
            
             <hex offset> <data type> <name> // <short description>
 
