@@ -787,7 +787,7 @@ namespace MAINSCR {
                 MOX::_zoom_in = 1;
                 fields::Clear_Fields_Above_(_last_field);
                 MAINSCR::Add_Map_Fields_();
-                mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_zoom_mode, 5);
+                mouse::Set_Mouse_List_(MOX::_mouse_list_zoom_mode, 5);
 
                 HAROLD::Decrement_Zoom_Count_();
 

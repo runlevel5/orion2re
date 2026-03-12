@@ -4,8 +4,8 @@ namespace MISC {
     inline uint8_t& _mouse_clock_image_num =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566578});
 
-    inline uint8_t* _mouse_list_clock =
-        reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558250});
+    inline int16_t* _mouse_list_clock =
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00558250});
 
     void __cdecl Increment_Mouse_Clock_Image_();
 

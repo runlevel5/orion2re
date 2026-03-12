@@ -1,11 +1,11 @@
 #pragma once
 
 namespace mouse {
-    inline uint16_t& _current_mouse_list_count =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578A90 });
+    inline int16_t& _current_mouse_list_count =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });
 
-    inline uint8_t*& _current_mouse_list =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00578A98 });
+    inline int16_t*& _current_mouse_list =
+        *reinterpret_cast<int16_t**>(std::uintptr_t{ 0x00578A98 });
 
     // Suggested name: mouse::Check_Mouse_Shape_
     inline void __cdecl Check_Mouse_Shape_() {
@@ -26,9 +26,6 @@ namespace mouse {
     inline int16_t& _mouse_buffer_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DD8 });
 
-    inline uint8_t* _mouse_list_none = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D70 });
-    inline uint8_t* _mouse_list_arrow = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00558D10 });
-
     int16_t __cdecl Mouse_Buffer_();
 
     inline void __cdecl Mouse_Buffer2_() {
@@ -44,11 +41,10 @@ namespace mouse {
      */
     uint16_t __cdecl Mouse_Button_();
 
-    void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count);
+    void __cdecl Set_Mouse_List_(int16_t* list, int16_t count);
 
     inline void __cdecl Set_Mouse_List(void* mouse_data, int16_t count) {
-        using Fn = void(__cdecl*)(void*, int16_t);
-        reinterpret_cast<Fn>(0x005274D0)(mouse_data, count);
+        Set_Mouse_List_(static_cast<int16_t*>(mouse_data), count);
     }
 
     int16_t Pointer_X_();

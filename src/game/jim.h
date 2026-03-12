@@ -11,7 +11,7 @@ namespace JIM {
     inline const char* s_STREAM_LBX =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x005558FC });
 
-    inline void* _logo_mouse_list = reinterpret_cast<void*>(std::uintptr_t{ 0x005558F0 });
+    inline int16_t* _logo_mouse_list = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558F0 });
     inline int16_t& _darken_palette_value = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A7D96 });
 
     inline const char* s_intro_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555960 });   // "intro.lbx"

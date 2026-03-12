@@ -344,7 +344,7 @@ void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
 }
 
 int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx) {
-    uint32_t min_dist_sq = 0xFFFFFFFF;
+    int32_t min_dist_sq = -1;
     int16_t closest_star_idx = -1;
 
     s_star_data* src_star = &MOX::_star[star_idx];

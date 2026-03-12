@@ -358,14 +358,14 @@ inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
     fn(dest, size, value);
 }
 
-inline void* __cdecl Allocate_First_Block_(uint32_t segment, uint32_t size) {
-    using Fn = void*(__cdecl*)(uint32_t, uint32_t);
+inline void* __cdecl Allocate_First_Block_(void* segment, uint32_t size) {
+    using Fn = void*(__cdecl*)(void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E930});
     return fn(segment, size);
 }
 
-inline void* __cdecl Allocate_Next_Block_(uint32_t segment, uint32_t size) {
-    using Fn = void*(__cdecl*)(uint32_t, uint32_t);
+inline void* __cdecl Allocate_Next_Block_(void* segment, uint32_t size) {
+    using Fn = void*(__cdecl*)(void*, uint32_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E950});
     return fn(segment, size);
 }

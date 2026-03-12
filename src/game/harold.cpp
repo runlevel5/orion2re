@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <cstring>
 
 namespace HAROLD {
     uint32_t __cdecl Is_Colony_Star_(int16_t star_idx) {
@@ -629,33 +630,21 @@ namespace HAROLD {
         return &MOX::_h_strings[buffer_offset];
     }
 
-    /**
-     * @address 004f2190
-     */
     void __cdecl Save_Mouse_List_() {
-        uint16_t count = mouse::_current_mouse_list_count;
+        int16_t count = mouse::_current_mouse_list_count;
 
-        if (count > 10) {
+        // The list is capped at 10 entries
+        if (count >= 10) {
             count = 10;
         }
 
-        _saved_mouse_list_count = count;
+        HAROLD::_saved_mouse_list_count = count;
 
-        uint32_t dword_count = static_cast<uint32_t>(count) * 3;
-        uint32_t* src = reinterpret_cast<uint32_t*>(mouse::_current_mouse_list);
-        uint32_t* dest = reinterpret_cast<uint32_t*>(_saved_mouse_list);
-
-        for (uint32_t i = 0; i < dword_count; ++i) {
-            dest[i] = src[i];
-        }
+        // Each entry in the mouse list is 12 bytes (6 shorts)
+        // Total bytes to copy = count * 12
+        memcpy(HAROLD::_saved_mouse_list, mouse::_current_mouse_list, (size_t)count * 12);
     }
 
-    /**
-     * @address 004f0640
-     */
-    /**
-     * @address 004f21d0
-     */
     void __cdecl Restore_Mouse_List_() {
         mouse::Set_Mouse_List_(_saved_mouse_list, _saved_mouse_list_count);
         _saved_mouse_list_count = 0;

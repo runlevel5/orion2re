@@ -55,6 +55,7 @@
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\combat.cpp" />
     <ClCompile Include="src\game\combfind.cpp" />
+    <ClCompile Include="src\game\combinit.cpp" />
     <ClCompile Include="src\game\council.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />

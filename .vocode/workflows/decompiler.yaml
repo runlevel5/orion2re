@@ -87,8 +87,8 @@ workflows:
             name from a symbol name.
 
           RULES:
-          * Correctness first: match control flow, calling convention, side effects, flags-dependent
-            behavior, and memory accesses.
+          * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory 
+            access patterns.
           * You must decompile and output whole function. You are NOT allowed to remove portions of the function from
             the output.
           * You are not allowed to refactor or optimize the code. Keep code as close to the original as possible outside of
@@ -101,9 +101,8 @@ workflows:
               are allowed to provide a comment explaining that the code seems to be no-op, but you still have to emit the
               code.
             - You are not allowed to emit `goto` statements.
-            - You are NOT allowed to change or reorder switch/case statements or important if branches.
-            - Generated code should resemble code written by a developer and not look like it was decompiled,
-               but the execution flow should be as close to original code as possible.
+            - You are not allowed to change or reorder switch/case statements or important if branches.
+            - Generated code should resemble code written by a developer and not look like it was decompiled.
           * Always prefer stdlib functions over hand-rolled loops. Never prefix stdlib functions with `std::` namespace.
           * Do not generate code that uses `goto`, implement code in a way where `goto` is not necessary.
           * Even if referenced symbol is in the same namespaces, you MUST include its namespace explicitly.
@@ -186,7 +185,10 @@ workflows:
             - We use naming convention from the project - mixed Snake_Case for functions and lowercase snake_case for variables.
           * Use explicit binary-faithful types (uint8_t/uint16_t/uint32_t/int32_t, pointers, structs) and casts where needed.
           * Always try to resolve references to known structures and variables via human-readable indirection instead of casting
-            variables to flat memory addresses and accessing data via pointer arithmetic. For example:
+            variables to flat memory addresses and accessing data via pointer arithmetic. Never emit raw pointer arithmetic operations
+            when working with structures.
+            
+            For example:
 
             mov esi, [n]
             mov eax, [MOX::_player + esi]

@@ -439,7 +439,7 @@ namespace OFFICER {
             _officer_button_mode = -1;
         } else {
             if (_officer_button_mode == 0) {
-                mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
                 MOX::_officer_selected = -1;
             }
         }
@@ -641,7 +641,7 @@ namespace OFFICER {
         video::Set_Refresh_Stencil_();
         MOX::_draw_officer_to_back = 1;
 
-        mouse::Set_Mouse_List_(mouse::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_none, 1);
         ERIC::Fast_Fade_Out_();
 
         fonts::Load_Palette_(8, 0, 0xFF);
@@ -659,7 +659,7 @@ namespace OFFICER {
         palette::Clear_Palette_Changes_(0, 0xFF);
         RUSS::Mox_Sync_Update_();
 
-        mouse::Set_Mouse_List_(mouse::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
         ERIC::Fast_Fade_In_();
 
         fields::Enable_Draw_All_Fields_();
@@ -944,7 +944,7 @@ namespace OFFICER {
                         MOX::_draw_officer_to_back = 1;
                         _officer_button_mode = -1;
                     } else {
-                        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
                         MOX::_offpop_big_icon_selected = -1;
                         _officer_button_mode = 0;
                         MOX::_officer_selected = -1;
@@ -1081,7 +1081,7 @@ namespace OFFICER {
                     mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
                 } else {
                     _officer_button_mode = 2;
-                    mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                    mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
                 }
             }
 
@@ -1094,7 +1094,7 @@ namespace OFFICER {
                         Move_Officer_To_Limbo_((int16_t)MOX::_officer_selected);
                     } else {
                         _officer_button_mode = 1;
-                        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
                     }
                 }
             }
@@ -1335,7 +1335,7 @@ namespace OFFICER {
                         Dismiss_Officer_(MOX::_officer_selected);
                         MOX::_officer_selected = -1;
                     } else {
-                        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&DIP_SCRN::_diplomacy_hand_mouse), 1);
+                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
                     }
                     MOX::_draw_officer_to_back = 1;
                 } else if (mode == 1 /* Relocate */) {

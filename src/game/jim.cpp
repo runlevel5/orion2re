@@ -21,7 +21,7 @@ namespace JIM {
 
     void __cdecl Draw_Logos_(void) {
         fields::Deactivate_Auto_Function_();
-        mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+        mouse::Set_Mouse_List_(_logo_mouse_list, 1);
         _darken_palette_value = 0;
         fields::Clear_Fields_();
         video::Set_Refresh_Stencil_();
@@ -40,7 +40,7 @@ namespace JIM {
             file_ani::Open_File_Animation_(s_logo_lbx, 0);
             video::Set_Page_Off_();
             palstore::Darken_Palette_(100);
-            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+            mouse::Set_Mouse_List_(_logo_mouse_list, 1);
             palette::Clear_Palette_Changes_(0, 0xFF);
             platform::Toggle_Pages_Stub_();
 
@@ -55,7 +55,7 @@ namespace JIM {
             palstore::Slow_Fade_In_();
 
             int16_t end_delay_counter = 15; // 0xF
-            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+            mouse::Set_Mouse_List_(_logo_mouse_list, 1);
 
             while (!user_interrupted) {
                 if (skip_flag != 0) break;
@@ -111,7 +111,7 @@ namespace JIM {
 
             user_interrupted = false;
             ERIC::Fast_Fade_In_();
-            mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(_logo_mouse_list), 1);
+            mouse::Set_Mouse_List_(_logo_mouse_list, 1);
 
             while (!user_interrupted) {
                 timer::Mark_Time_();

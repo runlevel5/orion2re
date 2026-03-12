@@ -1211,7 +1211,7 @@ namespace COLBLDG {
                     graphics::Box_(207, base_y + 352, 252, 16, 1, 100);
                 }
 
-                mouse::Set_Mouse_List_(reinterpret_cast<uint8_t*>(&_mouse_list_to), 4);
+                mouse::Set_Mouse_List_(_mouse_list_to, 4);
             }
         } else {
             for (int16_t i = 0; i < _n_building_indexes; ++i) {

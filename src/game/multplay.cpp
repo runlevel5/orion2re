@@ -1291,8 +1291,8 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
 
     _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
 
-    MOX::_save_game_dates = (char*)Allocate_First_Block_((uint32_t)MOX::_global_data_seg, 1000);
-    MOX::_save_game_stardates = (char*)Allocate_Next_Block_((uint32_t)MOX::_global_data_seg, 1000);
+    MOX::_save_game_dates = (char*)Allocate_First_Block_(MOX::_global_data_seg, 1000);
+    MOX::_save_game_stardates = (char*)Allocate_Next_Block_(MOX::_global_data_seg, 1000);
 
     MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
 

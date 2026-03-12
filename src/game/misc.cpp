@@ -7,7 +7,7 @@ namespace MISC {
         }
 
         uint32_t clock_index = _mouse_clock_image_num >> 2;
-        uint8_t* cursor_entry = &_mouse_list_clock[clock_index * 12];
+        int16_t* cursor_entry = &_mouse_list_clock[clock_index * 12];
 
         mouse::Set_Mouse_List_(cursor_entry, 1);
 
@@ -161,7 +161,7 @@ namespace MISC {
 
         *status_flag = 1;
         palette::Clear_Palette_Changes_(0, 0xff);
-        mouse::Set_Mouse_List_(mouse::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_none, 1);
 
         ERIC::Fast_Fade_Out_();
         fonts::Load_Palette_(palette_id, 0, 0xff);
@@ -170,7 +170,7 @@ namespace MISC {
         FUN_0052b660();
         palstore::Darken_Palette_(100);
 
-        mouse::Set_Mouse_List_(mouse::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
         video::Set_Page_Off_();
 
         if (draw_callback) {

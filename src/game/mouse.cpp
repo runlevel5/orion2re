@@ -15,9 +15,9 @@ namespace mouse {
         return _mouse_overide_right_button + _mouse_overide_left_button;
     }
 
-    void __cdecl Set_Mouse_List_(uint8_t* mouse_data, uint16_t count) {
+    void __cdecl Set_Mouse_List_(int16_t* list, int16_t count) {
         _current_mouse_list_count = count;
-        _current_mouse_list = mouse_data;
+        _current_mouse_list = list;
 
         Check_Mouse_Shape_();
 

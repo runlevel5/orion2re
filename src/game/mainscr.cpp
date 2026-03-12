@@ -884,7 +884,7 @@ namespace MAINSCR {
 
         fields::Disable_Draw_All_Fields_();
         video::Set_Refresh_Stencil_();
-        mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_none, 1);
         ERIC::Fast_Fade_Out_();
         MOX::Mox_Update_();
 
@@ -914,7 +914,7 @@ namespace MAINSCR {
         palette::Clear_Palette_Changes_(0, 255);
         RUSS::Mox_Sync_Update_();
 
-        mouse::Set_Mouse_List_((uint8_t*)MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
 
         bool skip_fade_in = false;
         if (MOX::_reloaded_ship_palette != 0) {
