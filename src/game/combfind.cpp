@@ -1,4 +1,16 @@
 #include "pch.h"
+#include "combfind.h"
+#include "mox.h"
+#include "russ.h"
+#include "haccess.h"
+#include "colcalc.h"
+#include "gendraw.h"
+#include "netmox.h"
+#include "multplay.h"
+#include "officer.h"
+#include "eric.h"
+#include "funcs.h"
+#include <string.h>
 
 namespace COMBFIND {
 
@@ -13,7 +25,7 @@ void __cdecl Search_For_Battles_() {
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
     s_combfind_star_has_player star_has_player_stack[73][8];
-    int8_t star_has_nonplayer_stack[73];
+    uint8_t star_has_nonplayer_stack[73];
     int16_t player_needs_to_attack_stack[73];
     int8_t battle_stars_stack[76];
     int8_t attack_confirmed_buf[8][8];
@@ -801,31 +813,30 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
     }
 }
 
-void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_idx1, int player_idx2) {
-    // Process first player index
-    if (player_idx1 < 8) {
-        // Check if player has a presence (colony/outpost/ship) at this star
-        if ((*_star_has_player)[star_idx][player_idx1].has_player == 0) {
-            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx1 & 0x1f));
+void __cdecl Update_Player_Needs_To_Attack_(int star_idx, int player_a_idx, int player_b_idx) {
+    // Handle first player
+    if (player_a_idx < 8) {
+        // Regular player: check presence via star-player status struct
+        if ((*_star_has_player)[star_idx][player_a_idx].has_player == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_a_idx & 0x1f));
         }
     } else {
-        // For indices >= 8, check against the non-player bitmask.
-        // Note: Since _star_has_nonplayer is 8-bit, indices >= 8 will effectively always result in 0.
-        uint8_t nonplayer_mask = static_cast<uint8_t>((*_star_has_nonplayer)[star_idx]);
-        if (((nonplayer_mask >> (player_idx1 & 0x1f)) & 1) == 0) {
-            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx1 & 0x1f));
+        // Non-player/Monster: check presence via bitmask
+        if ((((*_star_has_nonplayer)[star_idx] >> (player_a_idx & 0x1f)) & 1) == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_a_idx & 0x1f));
         }
     }
 
-    // Process second player index
-    if (player_idx2 < 8) {
-        if ((*_star_has_player)[star_idx][player_idx2].has_player == 0) {
-            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx2 & 0x1f));
+    // Handle second player
+    if (player_b_idx < 8) {
+        // Regular player: check presence via star-player status struct
+        if ((*_star_has_player)[star_idx][player_b_idx].has_player == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_b_idx & 0x1f));
         }
     } else {
-        uint8_t nonplayer_mask = static_cast<uint8_t>((*_star_has_nonplayer)[star_idx]);
-        if (((nonplayer_mask >> (player_idx2 & 0x1f)) & 1) == 0) {
-            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_idx2 & 0x1f));
+        // Non-player/Monster: check presence via bitmask
+        if ((((*_star_has_nonplayer)[star_idx] >> (player_b_idx & 0x1f)) & 1) == 0) {
+            (*_player_needs_to_attack)[star_idx] &= ~(1 << (player_b_idx & 0x1f));
         }
     }
 }
@@ -1014,6 +1025,163 @@ int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
     }
 
     return MOX::_colony[colony_idx].planet;
+}
+
+void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count) {
+    *plr1_offset = 0;
+    *plr1_count = 0;
+    *plr2_offset = 500;
+    *plr2_count = 0;
+
+    for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+        s_ship_data* ship = &MOX::_ship[i];
+
+        if (ship->location == star_idx && ship->status == 0) {
+            if (ship->owner == (int8_t)plr1_idx) {
+                ships[*plr1_count] = (int16_t)i;
+                *plr1_count = *plr1_count + 1;
+            } else if (ship->owner == (int8_t)plr2_idx) {
+                *plr2_offset = *plr2_offset - 1;
+                ships[*plr2_offset] = (int16_t)i;
+                *plr2_count = *plr2_count + 1;
+            }
+        }
+    }
+}
+
+short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short planet_idx, s_battle_results *result, int8_t is_sneak_attack) {
+    short colony_idx;
+    int16_t plr1_ship_offset;
+    int16_t plr2_ship_offset;
+    int16_t plr1_ship_count;
+    int16_t plr2_ship_count;
+    char msg_buf[200];
+    int16_t ships[500];
+    s_battle_results local_results;
+
+    colony_idx = Target_Planet_To_Colony_(planet_idx);
+
+    if (plr1_idx == -1) {
+        colony_idx = Target_Planet_To_Colony_(planet_idx);
+        plr1_idx = (short)MOX::_colony[colony_idx].owner;
+    }
+
+    if (plr2_idx < 8 && plr1_idx < 8) {
+        MOX::_player[plr2_idx].time_since_last_attack[plr1_idx] = 0;
+    }
+
+    if (result == nullptr) {
+        result = &local_results;
+        memset(result, 0, 1742);
+    }
+
+    if (MOX::_game_type < 2 || MOX::_game_type > 3) {
+        _current_star_has_player = &(*_star_has_player)[star_idx][0];
+        _current_star_has_nonplayer = &(*_star_has_nonplayer)[star_idx];
+    } else {
+        if (NETMOX::_net.local_net_id == NETMOX::_net.net_host_id) {
+            _current_star_has_player = &(*_star_has_player)[star_idx][0];
+            _current_star_has_nonplayer = &(*_star_has_nonplayer)[star_idx];
+        }
+        if (MOX::_PLAYER_NUM == plr1_idx && MOX::_settings.strategic_combat_flag == 0) {
+            char* star_or_planet_name;
+            if (planet_idx == -1) {
+                star_or_planet_name = RUSS::Star_Name_(star_idx);
+            } else {
+                star_or_planet_name = HACCESS::Get_Planet_Name_(planet_idx);
+            }
+            char* attacker_name = COLCALC::Player_Name_(plr2_idx);
+            _sprintf(msg_buf, _s_attacks_you_at_s_msg, attacker_name, star_or_planet_name);
+            GENDRAW::Message_Box_(msg_buf);
+        }
+    }
+
+    Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
+
+    short combat_status = Russ_Combat_(plr2_idx, &ships[plr2_ship_offset], plr2_ship_count, plr1_idx, &ships[plr1_ship_offset], plr1_ship_count, star_idx, colony_idx, is_sneak_attack, result);
+    result->combat_result = (int8_t)combat_status;
+
+    colony_idx = Target_Planet_To_Colony_(planet_idx);
+
+    if (MOX::_game_type > 1 && MOX::_game_type < 4) {
+        if (MOX::_PLAYER_NUM == plr2_idx || MOX::_PLAYER_NUM == plr1_idx) {
+            MULTPLAY::Load_Net_Next_Turn_Screen_(1);
+            MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+            MULTPLAY::Chat_Box_Input_Loop_();
+        }
+    }
+
+    if (result->combat_result >= 0) {
+        if (plr1_idx < 8) {
+            if (_current_star_has_player[plr1_idx].ship_sizes[0] == 0 && colony_idx == -1) {
+                Kill_Noncombat_Ships_(&ships[plr1_ship_offset], plr1_ship_count);
+            } else {
+                Determine_Retreat_Ships_(star_idx, plr1_idx, colony_idx);
+            }
+        } else {
+            *_current_star_has_nonplayer &= ~(1 << (plr1_idx - 8));
+        }
+    }
+
+    if (result->combat_result <= 0) {
+        if (plr2_idx < 8) {
+            Determine_Retreat_Ships_(star_idx, plr2_idx, -1);
+        } else {
+            *_current_star_has_nonplayer &= ~(1 << (plr2_idx - 8));
+        }
+
+        if (plr2_idx == 9) { // Guardian defeated
+            MOX::_player[plr1_idx].captured_orion = 1;
+            OFFICER::Give_Player_Loknar_Special_(plr1_idx, (uint8_t*)result->orion_techs, &result->rescued_hero_id);
+            if (MOX::_player[plr1_idx].objectives == 100) {
+                if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
+                    ERIC::Play_Take_Orion_Flic_();
+                    OFFICER::Rescued_Loknar_Popup_(plr1_idx, *reinterpret_cast<int32_t*>(result->orion_techs), result->rescued_hero_id);
+                }
+            }
+        }
+
+        if (result->combat_result < 0) {
+            Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
+            if (plr1_ship_count == 0) {
+                if (plr1_idx < 8) {
+                    Reset_Combat_Ships_At_Current_Star_Has_Player_(plr1_idx);
+                } else {
+                    *_current_star_has_nonplayer &= ~(1 << (plr1_idx - 8));
+                }
+            }
+        }
+    } else {
+        if (plr1_idx == 9) { // Guardian defeated by attacker
+            MOX::_player[plr2_idx].captured_orion = 1;
+            OFFICER::Give_Player_Loknar_Special_(plr2_idx, (uint8_t*)result->orion_techs, &result->rescued_hero_id);
+            if (MOX::_player[plr2_idx].objectives == 100) {
+                if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
+                    ERIC::Play_Take_Orion_Flic_();
+                    OFFICER::Rescued_Loknar_Popup_(plr2_idx, *reinterpret_cast<int32_t*>(result->orion_techs), result->rescued_hero_id);
+                }
+            }
+        }
+
+        if (star_idx == MOX::_NUM_STARS) { // Antares victory
+            MOX::_player[plr2_idx].captured_antares = 1;
+            memset(_player_needs_to_attack, 0, 146);
+        } else {
+            Get_Combat_Ships_(ships, star_idx, plr2_idx, &plr2_ship_offset, &plr2_ship_count, plr1_idx, &plr1_ship_offset, &plr1_ship_count);
+            if (plr2_ship_count == 0) {
+                if (plr2_idx < 8) {
+                    Reset_Combat_Ships_At_Current_Star_Has_Player_(plr2_idx);
+                } else {
+                    *_current_star_has_nonplayer &= ~(1 << (plr2_idx - 8));
+                }
+            }
+            if (colony_idx != -1 && MOX::_colony[colony_idx].owner != -1) {
+                Do_Attacker_Beat_Colony_Stuff_(&ships[plr2_ship_offset], (int16_t)plr2_ship_count, colony_idx, result);
+            }
+        }
+    }
+
+    return (short)result->combat_result;
 }
 
 } // namespace COMBFIND

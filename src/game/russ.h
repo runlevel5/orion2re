@@ -9,6 +9,11 @@ namespace RUSS {
 
     int16_t __cdecl Get_Weighted_Choice_Short_(const int16_t* weights, int16_t count);
 
+    inline char* __cdecl Star_Name_(int32_t star_idx) {
+        using Fn = char*(__cdecl*)(int32_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004d7c30})(star_idx);
+    }
+
     inline void Mox_Sync_Update_() {
         using Fn = void(*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483C80 });

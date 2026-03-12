@@ -159,6 +159,17 @@ namespace OFFICER {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00442f90})(leader_idx);
     }
+
+    inline void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id) {
+        using Fn = void(__cdecl*)(int16_t, uint8_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00443760})(player_idx, techs, hero_id);
+    }
+
+    inline void __cdecl Rescued_Loknar_Popup_(int16_t player_idx, int32_t techs_val, int16_t hero_id) {
+        using Fn = void(__cdecl*)(int16_t, int32_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00443890})(player_idx, techs_val, hero_id);
+    }
+
     int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_idx);
 
     int16_t __cdecl N_Star_Officers_Owned_By_Player_(int16_t player_idx);

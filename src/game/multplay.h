@@ -81,4 +81,14 @@ namespace MULTPLAY {
         reinterpret_cast<const char*>(std::uintptr_t{0x00558280}); // "%ld"
 
     int8_t __cdecl Do_Get_Valid_MP_Save_Games_(int8_t* valid_types_out);
+
+    inline void __cdecl Load_Net_Next_Turn_Screen_(int8_t param) {
+        using Fn = void(__cdecl*)(int8_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00504640})(param);
+    }
+
+    inline void __cdecl Chat_Box_Input_Loop_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x005080f0})();
+    }
 }

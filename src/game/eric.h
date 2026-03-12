@@ -63,4 +63,9 @@ namespace ERIC {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004bb1f0})();
     }
+
+    inline void __cdecl Play_Take_Orion_Flic_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004bb110})();
+    }
 }

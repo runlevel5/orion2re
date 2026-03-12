@@ -1678,6 +1678,8 @@ namespace hooks {
         { 0x004bc0d0, &COMBFIND::Load_Combfind_Strings_ },
         { 0x004bd750, &COMBFIND::Human_Confirms_Attack_ },
         { 0x004bc2e0, &COMBFIND::Target_Planet_To_Colony_ },
+        { 0x004be8f0, &COMBFIND::Get_Combat_Ships_ },
+        { 0x004be3b0, &COMBFIND::Do_1_Combat_ },
     };
 
     void Install_Hooks()

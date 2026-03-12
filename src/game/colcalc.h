@@ -100,6 +100,11 @@ namespace COLCALC {
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
+    inline char* __cdecl Player_Name_(int32_t player_idx) {
+        using Fn = char*(__cdecl*)(int32_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004fcb40})(player_idx);
+    }
+
     int __cdecl Colony_Officer_(s_colony* colony);
 
     short __cdecl Colony_Race_Pop_Limit_(s_colony* colony, int16_t player_idx);
