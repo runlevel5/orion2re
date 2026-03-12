@@ -36,6 +36,12 @@ namespace NETMOX {
         return reinterpret_cast<Fn>(std::uintptr_t{0x00519c40})();
     }
 
+    inline void __cdecl Russ_Change_Relations_(int32_t change, int16_t attacker, int16_t defender, int32_t reason, int16_t star_idx, int32_t param6) {
+        using Fn = void(__cdecl*)(int32_t, int16_t, int16_t, int32_t, int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00518820});
+        fn(change, attacker, defender, reason, star_idx, param6);
+    }
+
     inline void __cdecl Human_Abdicates_(int32_t player_num) {
         using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519D50});

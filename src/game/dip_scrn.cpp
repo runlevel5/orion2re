@@ -84,4 +84,11 @@ namespace DIP_SCRN {
             }
         }
     }
+
+    /**
+     * @address 00418160
+     */
+    void __cdecl Show_Sneak_Attack_Message_(int16_t player_idx, int16_t defender_idx) {
+        Npc_Diplomacy_Screen_(player_idx, 1);
+    }
 }

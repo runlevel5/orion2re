@@ -53,6 +53,7 @@
     <ClCompile Include="src\game\colony_main.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
+    <ClCompile Include="src\game\combat.cpp" />
     <ClCompile Include="src\game\combfind.cpp" />
     <ClCompile Include="src\game\council.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="src\game\colsum.h" />
     <ClInclude Include="src\game\colsysdi.h" />
     <ClInclude Include="src\game\colxport.h" />
+    <ClInclude Include="src\game\combat.h" />
     <ClInclude Include="src\game\combfind.h" />
     <ClInclude Include="src\game\combinit.h" />
     <ClInclude Include="src\game\consts.h" />

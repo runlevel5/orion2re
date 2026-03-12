@@ -3,6 +3,7 @@
 struct s_animation_header;
 struct s_player;
 struct s_mp_screen;
+struct s_qship;
 
 namespace MOX {
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
@@ -410,6 +411,16 @@ namespace MOX {
 
     inline s_ship_data*& _ship =
         *reinterpret_cast<s_ship_data**>(std::uintptr_t{ 0x0059BD3C });
+
+    inline int16_t& _combat_defender_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059700C});
+    inline int16_t& _combat_attacker_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059701C});
+    inline s_qship*& _qcombat_data = *reinterpret_cast<s_qship**>(std::uintptr_t{0x00597498});
+    inline int16_t& _combat_total_ship_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784A});
+    inline int16_t& _combat_attacker_player = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B32C});
+    inline int16_t& _combat_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B49C});
+    inline uint8_t& _colony_defense_flags = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BA});
+    inline int16_t& _cmbt_colony_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A47BC});
+    inline int16_t& _combat_defender_player = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49CC});
 
     inline s_global_combat_data& _global_combat_data = *reinterpret_cast<s_global_combat_data*>(std::uintptr_t{0x0059BD90});
 

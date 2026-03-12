@@ -13,4 +13,12 @@ namespace DIP_SCRN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041D890});
         fn();
     }
+
+    inline void __cdecl Npc_Diplomacy_Screen_(int16_t player_idx, int32_t mode) {
+        using Fn = void(__cdecl*)(int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00417260});
+        fn(player_idx, mode);
+    }
+
+    void __cdecl Show_Sneak_Attack_Message_(int16_t player_idx, int16_t defender_idx);
 }

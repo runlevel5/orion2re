@@ -8,6 +8,18 @@ namespace antarans {
         reinterpret_cast<Fn>(0x004B4290)(size);
     }
 
+    inline void __cdecl Kill_Antaran_Defensive_Ship_(int32_t size) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4170});
+        fn(size);
+    }
+
+    inline void __cdecl Kill_Antaran_Offensive_Ship_(int32_t size) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b41c0});
+        fn(size);
+    }
+
     int32_t __cdecl Delta_Stardate_();
     int16_t __cdecl Delay_();
     int16_t __cdecl Antarans_Defensive_Resource_Bonus_();

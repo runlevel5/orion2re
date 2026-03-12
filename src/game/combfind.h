@@ -17,6 +17,7 @@ namespace COMBFIND {
     inline char*& _combat_is_reported_between_s_and_s_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE10});
     inline char*& _you_have_following_treaties_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE18});
     inline char*& _receiving_tribute_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE1C});
+    inline char*& _noncombat_ships_destroyed_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE24});
     inline char*& _combfind_strings_base = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE24});
     inline char*& _colony_seized_by_mind_control_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE28});
     inline char*& _really_risk_war_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CE30});
@@ -74,25 +75,13 @@ namespace COMBFIND {
 
     void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count);
 
-    inline int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* result) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t, int16_t, int16_t*, int16_t, int16_t, int16_t, int8_t, s_battle_results*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004bec80})(attacker_idx, attacker_ships, attacker_count, defender_idx, defender_ships, defender_count, star_idx, colony_idx, is_sneak_attack, result);
-    }
+    int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results);
 
-    inline void __cdecl Kill_Noncombat_Ships_(int16_t* ships, int16_t count) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004be9a0})(ships, count);
-    }
+    void __cdecl Kill_Noncombat_Ships_(int16_t* ship_indices, int16_t count);
 
-    inline void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bea60})(star_idx, player_idx, colony_idx);
-    }
+    void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t retreat_type);
 
-    inline void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bfe60})(player_idx);
-    }
+    void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx);
 
     inline void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ships, int16_t ship_count, int16_t colony_idx, s_battle_results* result) {
         using Fn = void(__cdecl*)(int16_t*, int16_t, int16_t, s_battle_results*);
@@ -110,4 +99,6 @@ namespace COMBFIND {
     int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx);
 
     short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short planet_idx, s_battle_results *result, int8_t is_sneak_attack);
+
+    bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx);
 }

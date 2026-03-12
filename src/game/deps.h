@@ -146,6 +146,7 @@
 #include "erichelp.h"
 #include "flt.h"
 #include "flt2.h"
+#include "combat.h"
 #include "combinit.h"
 #include "cmbtdrw1.h"
 #include "dip_scrn.h"

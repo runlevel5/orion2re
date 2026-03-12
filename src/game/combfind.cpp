@@ -1,16 +1,4 @@
 #include "pch.h"
-#include "combfind.h"
-#include "mox.h"
-#include "russ.h"
-#include "haccess.h"
-#include "colcalc.h"
-#include "gendraw.h"
-#include "netmox.h"
-#include "multplay.h"
-#include "officer.h"
-#include "eric.h"
-#include "funcs.h"
-#include <string.h>
 
 namespace COMBFIND {
 
@@ -1182,6 +1170,234 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
     }
 
     return (short)result->combat_result;
+}
+
+int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int16_t attacker_count, int16_t defender_idx, int16_t* defender_ships, int16_t defender_count, int16_t star_idx, int16_t colony_idx, int8_t is_sneak_attack, s_battle_results* results)
+{
+    bool not_multiplayer;
+    bool plr1_is_human;
+    bool plr2_is_human;
+    uint8_t strategic_combat_flag;
+    int16_t combat_result_code;
+
+    if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+        not_multiplayer = false;
+    } else {
+        not_multiplayer = true;
+    }
+
+    strategic_combat_flag = MOX::_settings.strategic_combat_flag;
+
+    if (attacker_idx < 8 && MOX::_player[attacker_idx].objectives == 100 /* HUMAN */) {
+        plr1_is_human = true;
+    } else {
+        plr1_is_human = false;
+    }
+
+    if (defender_idx < 8 && MOX::_player[defender_idx].objectives == 100 /* HUMAN */) {
+        plr2_is_human = true;
+    } else {
+        plr2_is_human = false;
+    }
+
+    // Early return if no actual combat possible and not at special star location
+    if (((attacker_count == 0) || (defender_count == 0 && colony_idx == -1)) && (star_idx != MOX::_NUM_STARS)) {
+        return 0;
+    }
+
+    if (attacker_idx < 8) {
+        REPORT::_something_interesting_happened[attacker_idx] = 1;
+    }
+    if (defender_idx < 8) {
+        REPORT::_something_interesting_happened[defender_idx] = 1;
+    }
+
+    // Display attacker alerts in single player mode
+    if (not_multiplayer && plr2_is_human) {
+        if (is_sneak_attack != 0) {
+            DIP_SCRN::Show_Sneak_Attack_Message_(attacker_idx, defender_idx);
+        }
+        MAINPUPS::Player_Attacked_Popup_(attacker_idx, defender_idx, star_idx, colony_idx);
+        COMBFIND::_messed_up_fleet_palette = 1;
+    }
+
+    // Force strategic combat if no human players are involved
+    if (strategic_combat_flag == 0) {
+        if (!plr1_is_human && !plr2_is_human) {
+            strategic_combat_flag = 1;
+        }
+    }
+
+    if (strategic_combat_flag != 0) {
+        combat_result_code = COMBAT::Strategic_Combat_(attacker_ships, attacker_count, defender_ships, defender_count,
+                                                       star_idx, colony_idx, results->summary, results->details);
+
+        // Show result dialog if human is involved or it is a local single player game
+        if (not_multiplayer || MOX::_PLAYER_NUM == attacker_idx) {
+            if (plr2_is_human || plr1_is_human) {
+                MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+                COMBAT::Message_Box_Titled_(results->summary, results->details);
+                MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+                COMBFIND::_messed_up_fleet_palette = 1;
+            }
+        }
+    } else {
+        int32_t retreat_flag = 1;
+
+        if (attacker_idx < 8 && defender_idx < 8) {
+            if (plr1_is_human) {
+                if (!plr2_is_human) {
+                    retreat_flag = AI_Can_Retreat_(defender_idx, colony_idx);
+                }
+            } else {
+                retreat_flag = AI_Can_Retreat_(attacker_idx, -1);
+            }
+        } else {
+            retreat_flag = 0;
+        }
+
+        // Multiplayer synchronization for tactical combat
+        if (plr1_is_human && plr2_is_human && (MOX::_game_type == 2 || MOX::_game_type == 3)) {
+            int16_t remote_plr_idx = (MOX::_PLAYER_NUM == attacker_idx) ? defender_idx : attacker_idx;
+            int16_t net_id = MOX::_player[remote_plr_idx].network_player_id;
+
+            NETMOX::Mox_Send_Message_(net_id, 0x40 /* COMBAT_START */, nullptr, 0);
+
+            while (NETMOX::_net.network_sync_complete_flag == 0) {
+                RUSS::Mox_Update_();
+            }
+
+            combat_result_code = COMBINIT::Tactical_Combat_(attacker_ships, attacker_count, defender_ships, defender_count,
+                                                            star_idx, colony_idx, retreat_flag);
+
+            NETMOX::Mox_Send_Message_(net_id, 0x41 /* COMBAT_END */, nullptr, 0);
+
+            while (NETMOX::_net.network_sync_complete_flag == 1) {
+                RUSS::Mox_Update_();
+            }
+
+            NETMOX::_net.network_sync_complete_flag = 0;
+        } else {
+            combat_result_code = COMBINIT::Tactical_Combat_(attacker_ships, attacker_count, defender_ships, defender_count,
+                                                            star_idx, colony_idx, retreat_flag);
+        }
+    }
+
+    MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+    if (combat_result_code < 0) {
+        return -1;
+    }
+
+    return (combat_result_code > 0);
+}
+
+void __cdecl Kill_Noncombat_Ships_(int16_t* ship_indices, int16_t count) {
+    if (count <= 0) {
+        return;
+    }
+
+    int8_t owner_idx = MOX::_ship[ship_indices[0]].owner;
+
+    if (MOX::_player[owner_idx].objectives == 100 /* 'd' */ &&
+        MOX::_game_type >= 0 && MOX::_game_type <= 1) {
+        GENDRAW::Message_Box_(_noncombat_ships_destroyed_msg);
+    }
+
+    for (int16_t i = 0; i < count; ++i) {
+        SHIPS::Kill_Ship_(ship_indices[i]);
+    }
+
+    _current_star_has_player[owner_idx].has_player = 0;
+    MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+}
+
+void __cdecl Determine_Retreat_Ships_(int16_t star_idx, int16_t player_idx, int16_t retreat_type) {
+    int32_t p_idx = (int32_t)player_idx;
+    bool should_retreat_or_die = false;
+
+    if (retreat_type != -1 || COMBFIND::_current_star_has_player[p_idx].colony_count == 0) {
+        if (COMBFIND::_current_star_has_player[p_idx].colony_count < 2) {
+            should_retreat_or_die = true;
+        }
+    }
+
+    if (should_retreat_or_die) {
+        bool flux_blocks = false;
+        if (player_idx < 8 && MOX::_player[p_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */] == 0) {
+            if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
+                flux_blocks = true;
+            }
+        }
+
+        if (flux_blocks) {
+            // Destruction logic due to Hyperspace Flux
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+                if (ship->owner == player_idx && ship->location == star_idx && ship->status == 0) {
+                    if (ship->officer_index != -1) {
+                        if (MOX::_leaders[ship->officer_index].eta <= 0) {
+                            OFFICER::Kill_Officer_(ship->officer_index);
+                        } else {
+                            OFFICER::Move_Officer_To_Pool_(ship->officer_index);
+                        }
+                    }
+                    SHIPS::Kill_Ship_(i);
+                }
+            }
+            COMBFIND::_current_star_has_player[p_idx].has_player = 0;
+            return;
+        } else {
+            // Normal retreat logic
+            for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+                if (ship->owner == player_idx && ship->location == star_idx && ship->status == 0) {
+                    ship->status = 9; // Status 9: retreating/travelling
+                }
+            }
+            COMBFIND::_current_star_has_player[p_idx].has_player = 0;
+            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+            return;
+        }
+    }
+
+    // Default case: verify if any active ships remain at the star
+    bool ships_remaining = false;
+    for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+        s_ship_data* ship = &MOX::_ship[i];
+        if (ship->owner == player_idx && ship->location == star_idx && ship->status == 0) {
+            ships_remaining = true;
+            break;
+        }
+    }
+
+    if (!ships_remaining) {
+        COMBFIND::_current_star_has_player[p_idx].has_player = 0;
+    }
+}
+
+void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx) {
+    _current_star_has_player[player_idx].ship_sizes[0] = 0;
+    _current_star_has_player[player_idx].has_player = 0;
+
+    for (int i = 0; i < 5; ++i) {
+        if (_current_star_has_player[player_idx].ship_sizes[i] != 0) {
+            _current_star_has_player[player_idx].has_player = 1;
+        }
+    }
+}
+
+/**
+ * Checks if the specified player owns any colony other than the one at excluded_colony_idx.
+ * This is typically used to determine if an AI player can retreat (needs at least one other colony to retreat to).
+ */
+bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx) {
+    for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+        if (MOX::_colony[i].owner == (int8_t)player_idx && i != excluded_colony_idx) {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace COMBFIND

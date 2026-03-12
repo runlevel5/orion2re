@@ -1680,6 +1680,13 @@ namespace hooks {
         { 0x004bc2e0, &COMBFIND::Target_Planet_To_Colony_ },
         { 0x004be8f0, &COMBFIND::Get_Combat_Ships_ },
         { 0x004be3b0, &COMBFIND::Do_1_Combat_ },
+        { 0x004bec80, &COMBFIND::Russ_Combat_ },
+        { 0x004be9a0, &COMBFIND::Kill_Noncombat_Ships_ },
+        { 0x004bea60, &COMBFIND::Determine_Retreat_Ships_ },
+        { 0x004bfe60, &COMBFIND::Reset_Combat_Ships_At_Current_Star_Has_Player_ },
+        { 0x004bf060, &COMBFIND::AI_Can_Retreat_ },
+        { 0x00418160, &DIP_SCRN::Show_Sneak_Attack_Message_ },
+        { 0x00489FE0, &COMBAT::Strategic_Combat_ },
     };
 
     void Install_Hooks()

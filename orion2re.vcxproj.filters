@@ -366,6 +366,9 @@
     <ClCompile Include="src\game\bomb.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\combat.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -852,6 +855,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\paragrph.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\combat.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>
