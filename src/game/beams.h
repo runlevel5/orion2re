@@ -32,7 +32,7 @@ namespace BEAMS {
     }
 
     s_animation_header* __cdecl Reflection_Field_Anims_(int32_t p1, int32_t p2);
-    void __cdecl Load_Reflection_Field_Hit_(uint8_t should_load);
+    void __cdecl Load_Reflection_Field_Hit_(int8_t should_load);
 
-    void __cdecl Load_Combat_Beam_Stuff_(uint8_t flag);
+    void __cdecl Load_Combat_Beam_Stuff_(int8_t reflection_hit_param);
 }

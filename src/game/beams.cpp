@@ -19,7 +19,7 @@ namespace BEAMS {
         );
     }
 
-    void __cdecl Load_Reflection_Field_Hit_(uint8_t should_load) {
+    void __cdecl Load_Reflection_Field_Hit_(int8_t should_load) {
         if (should_load != 0) {
             s_animation_header* anim = BEAMS::Reflection_Field_Anims_(0, 0);
             animate::Draw_Palette_(anim);
@@ -27,15 +27,15 @@ namespace BEAMS {
         }
     }
 
-    void __cdecl Load_Combat_Beam_Stuff_(uint8_t flag) {
-        BEAMS::Init_Beams_();
+    void __cdecl Load_Combat_Beam_Stuff_(int8_t reflection_hit_param) {
+        Init_Beams_();
         FIREPTS::Load_FP_Data_From_LBX_();
-        BEAMS::Load_Ship_Burst_();
-        BEAMS::Load_Ship_Explosion_();
-        BEAMS::Load_Shield_Hit_();
-        BEAMS::Load_Reflection_Field_Hit_(flag);
+        Load_Ship_Burst_();
+        Load_Ship_Explosion_();
+        Load_Shield_Hit_();
+        Load_Reflection_Field_Hit_(reflection_hit_param);
 
-        BEAMS::_mauler_ball_seg = static_cast<s_animation_header*>(
+        _mauler_ball_seg = reinterpret_cast<s_animation_header*>(
             farload::Far_Reload_Next_(COLONY::_BEAMS_LBX, 0x58, MOX::_screen_seg)
         );
     }

@@ -45,20 +45,12 @@ namespace COMBINIT {
 
     void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture);
 
-    inline int16_t __cdecl Type_Of_Space_Station_(int16_t colony_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040C960});
-        return fn(colony_id);
-    }
+    int16_t __cdecl Type_Of_Space_Station_(int16_t colony_idx);
 
     void __cdecl Load_Combat_Satelite_(int16_t station_type);
 
     void __cdecl Load_Combat_Ship_Palette_(int16_t plr);
-    inline void __cdecl Create_Ship_Darken_Map_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d6380});
-        fn();
-    }
+
     inline void __cdecl Load_Combat_Beam_Stuff_(int16_t flag) {
         using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420b70});
@@ -69,16 +61,9 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5ba0});
         fn();
     }
-    inline void __cdecl Load_Individual_Ship_Pictures_(int16_t plr) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c230});
-        fn(plr);
-    }
-    inline void __cdecl Init_Special_Devices_(int16_t count) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040f500});
-        fn(count);
-    }
+    void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx);
+
+    void __cdecl Init_Special_Devices_(int16_t combat_ship_idx);
 
     void __cdecl Deploy_Ships_();
 
@@ -92,21 +77,6 @@ namespace COMBINIT {
 
     void __cdecl Scroll_Combat_Screen_();
 
-    inline int16_t __cdecl Check_For_Winner_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004695d0});
-        return fn();
-    }
-    inline int16_t __cdecl Calc_Current_Speed_(int16_t count) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004693d0});
-        return fn(count);
-    }
-    inline int16_t __cdecl Offensive_Combat_Bonus_(int16_t count) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6410});
-        return fn(count);
-    }
     inline int16_t __cdecl Defensive_Combat_Bonus_(int16_t count, int16_t flag) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5920});

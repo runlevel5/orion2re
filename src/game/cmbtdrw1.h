@@ -35,4 +35,10 @@ namespace CMBTDRW1 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d5370});
         fn();
     }
+
+    inline void __cdecl Create_Ship_Darken_Map_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d6380 });
+        fn();
+    }
 }

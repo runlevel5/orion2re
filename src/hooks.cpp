@@ -1728,6 +1728,10 @@ namespace hooks {
         { 0x0040fd60, &COMBINIT::Load_Antaran_Star_Fortress_ },
         { 0x0040CBA0, &COMBINIT::Load_Tactical_Colony_ },
         { 0x0040df10, &COMBINIT::Load_Combat_Satelite_ },
+        { 0x0040C960, &COMBINIT::Type_Of_Space_Station_ },
+        { 0x0040c230, &COMBINIT::Load_Individual_Ship_Pictures_ },
+        { 0x0040f500, &COMBINIT::Init_Special_Devices_ },
+        { 0x004695d0, &COMBAT1::Check_For_Winner_ },
     };
 
     void Install_Hooks()

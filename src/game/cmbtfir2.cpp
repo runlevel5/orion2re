@@ -36,11 +36,13 @@ namespace CMBTFIR2 {
 
     void __cdecl Set_Combat_Ordnance_Values_() {
         int16_t attacker_idx = MOX::_combat_attacker_player;
-        int16_t bonus_attacker = Get_Fleet_Ordnance_Bonus_(attacker_idx);
-        int16_t defender_idx = MOX::_combat_defender_player;
+        int16_t attacker_bonus = CMBTFIR2::Get_Fleet_Ordnance_Bonus_(attacker_idx) + 100;
 
-        MOX::_ordnance_bonus[attacker_idx] = bonus_attacker + 100;
-        MOX::_ordnance_bonus[defender_idx] = Get_Fleet_Ordnance_Bonus_(defender_idx) + 100;
+        int16_t defender_idx = MOX::_combat_defender_player;
+        MOX::_ordnance_bonus[attacker_idx] = attacker_bonus;
+
+        int16_t defender_bonus = CMBTFIR2::Get_Fleet_Ordnance_Bonus_(defender_idx) + 100;
+        MOX::_ordnance_bonus[defender_idx] = defender_bonus;
     }
 
     int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx) {

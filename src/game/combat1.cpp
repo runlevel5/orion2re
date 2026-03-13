@@ -833,7 +833,7 @@ namespace COMBAT1 {
     int16_t __cdecl Check_For_Winner_() {
         int16_t attacker_count = 0;
         int16_t defender_count = 0;
-        int16_t winner_status = 0;
+        int16_t winner = 0;
 
         if (MOX::_combat_data[0].unit_status != 5) {
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_()) {
@@ -852,22 +852,22 @@ namespace COMBAT1 {
         }
 
         if (MOX::_combat_turn > 50) {
-            winner_status = -1;
+            winner = -1;
             if (defender_count <= 0) {
-                winner_status = 666;
+                winner = 666;
             }
         }
 
         if (attacker_count <= 0) {
-            winner_status = -1;
+            winner = -1;
             if (defender_count <= 0) {
-                return 666;
+                winner = 666;
             }
         } else if (defender_count <= 0) {
-            winner_status = 1;
+            winner = 1;
         }
 
-        return winner_status;
+        return winner;
     }
 
 }
