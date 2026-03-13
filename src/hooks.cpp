@@ -1724,6 +1724,10 @@ namespace hooks {
         { 0x004e6410, &CMBTFIR2::Offensive_Combat_Bonus_ },
         { 0x0040c570, &COMBINIT::Increment_Bhg_ },
         { 0x0040c620, &COMBINIT::End_Of_Turn_Bookeeping_ },
+        { 0x0040F660, &COMBINIT::Load_Display_Combat_Ship_ },
+        { 0x0040fd60, &COMBINIT::Load_Antaran_Star_Fortress_ },
+        { 0x0040CBA0, &COMBINIT::Load_Tactical_Colony_ },
+        { 0x0040df10, &COMBINIT::Load_Combat_Satelite_ },
     };
 
     void Install_Hooks()

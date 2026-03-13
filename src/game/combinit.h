@@ -1,6 +1,16 @@
 #pragma once
 
 namespace COMBINIT {
+    inline uint8_t& radiation_shield_hits = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F04D});
+    inline uint8_t& flux_shield_hits = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F050});
+    inline uint8_t& barrier_shield_hits = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F053});
+
+    inline void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040d2e0});
+        fn(colony_idx);
+    }
+
     inline int8_t* s__00579491 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579491});
     inline int8_t* s__00579492 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579492});
     inline int8_t* s__00579493 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579493});
@@ -18,11 +28,7 @@ namespace COMBINIT {
     inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
     inline char* s_sphersfx_lbx_00551218 = reinterpret_cast<char*>(std::uintptr_t{0x00551218});
 
-    inline void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040f660});
-        fn(ship_idx);
-    }
+    void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx);
 
     void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx);
     int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx);
@@ -33,19 +39,11 @@ namespace COMBINIT {
 
     void __cdecl Load_Combat_Antaran_Ship_(int16_t ship_idx, int16_t ship_size);
 
-    inline void __cdecl Load_Antaran_Star_Fortress_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040FD60});
-        fn();
-    }
+    void __cdecl Load_Antaran_Star_Fortress_();
     void __cdecl Load_Antaran_Planet_();
     void __cdecl Load_Colony_Defense_(int16_t colony_idx);
 
-    inline void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040CBA0});
-        fn(colony_idx, flag);
-    }
+    void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture);
 
     inline int16_t __cdecl Type_Of_Space_Station_(int16_t colony_id) {
         using Fn = int16_t(__cdecl*)(int16_t);
@@ -53,17 +51,7 @@ namespace COMBINIT {
         return fn(colony_id);
     }
 
-    inline void __cdecl Load_Combat_Satelite_(int16_t station_type) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040DF10});
-        fn(station_type);
-    }
-
-    inline uint8_t __cdecl Does_Combat_Planet_Have_Defenses_() {
-        using Fn = uint8_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ae1e0});
-        return fn();
-    }
+    void __cdecl Load_Combat_Satelite_(int16_t station_type);
 
     void __cdecl Load_Combat_Ship_Palette_(int16_t plr);
     inline void __cdecl Create_Ship_Darken_Map_() {

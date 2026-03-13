@@ -37,6 +37,24 @@ namespace INITSHIP {
 
     int16_t __cdecl Best_Ship_Shield_(int16_t player_idx);
 
+    inline int16_t __cdecl Best_Beam_Weapon_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481420});
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Best_Secondary_Weapon_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481630});
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Best_Missile_Weapon_NT_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481800});
+        return fn(player_idx);
+    }
+
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t ftl_type);
 
     inline int16_t __cdecl Get_Design_Structure_(s_ship_design design) {
