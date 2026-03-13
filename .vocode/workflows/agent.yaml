@@ -6,6 +6,8 @@ workflows:
     nodes:
       - $include:
           template: nodes/agent.yaml
+        system_append:
+          If you need to search through the codebase, run `rg` via `exec` tool.
         confirmation: loop
         max_rounds: 0
         preprocessors:
@@ -17,10 +19,8 @@ workflows:
               paths:
                 - AGENTS.md
         tools:
-          - summarize_files
           - read_files
           - list_files
-          - search_project
           - run_agent
           - name: exec
             auto_approve_rules:
