@@ -1,14 +1,21 @@
 #include "pch.h"
-#include "combinit.h"
-#include "mox.h"
-#include "funcs.h"
-#include "ken.h"
 
 namespace COMBINIT {
 
-int __cdecl qsort_ship_array_by_size_(const void* a, const void* b) { return 0; }
-void __cdecl Draw_Main_Combat_Screen_() {}
-void __cdecl Draw_Mini_Main_Screen_() {}
+int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2) {
+    char size_2 = MOX::_ship[*param_2].d.size;
+    char size_1 = MOX::_ship[*param_1].d.size;
+
+    if (size_2 == size_1) {
+        return 0;
+    }
+
+    if (size_2 > size_1) {
+        return 1;
+    }
+
+    return -1;
+}
 
 int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag) {
     bool skip_combat = false;
@@ -494,7 +501,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::Mox_Update_();
 
         combat_winner = Check_For_Winner_();
-        Assign_Auto_Function_(reinterpret_cast<void*>(Draw_Main_Combat_Screen_), 1);
+        Assign_Auto_Function_(reinterpret_cast<void*>(CMBTDRW1::Draw_Main_Combat_Screen_), 1);
         Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
 
         int16_t turn_plr1 = MOX::_combat_attacker_player;
@@ -617,7 +624,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         Play_Background_Music_();
         Update_Ship_Icons_In_Between_Turns_();
         Restore_Glass_Remap_Block_(glass_remap_block);
-        Fade_Into_Screen_(reinterpret_cast<void*>(Draw_Mini_Main_Screen_), &MOX::_draw_main_screen_to_back, 0);
+        Fade_Into_Screen_(reinterpret_cast<void*>(MAINSCR::Draw_Mini_Main_Screen_), &MOX::_draw_main_screen_to_back, 0);
     }
 
     Allocate_First_Screen_Seg_(5);

@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 namespace COMBINIT {
     inline int8_t* s__00579491 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579491});
@@ -22,8 +21,6 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040f660});
         fn(ship_idx);
     }
-
-    int __cdecl qsort_ship_array_by_size_(const void* a, const void* b);
 
     inline void __cdecl Play_Dimensional_Portal_Flic_() {
         using Fn = void(__cdecl*)();
@@ -250,7 +247,6 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fe90});
         fn(func, a);
     }
-    void __cdecl Draw_Main_Combat_Screen_();
 
     inline void __cdecl Mox_Send_Message_(int16_t a, int16_t b, void* data, int16_t c) {
         using Fn = void(__cdecl*)(int16_t, int16_t, void*, int16_t);
@@ -337,7 +333,6 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cd550});
         fn();
     }
-    void __cdecl Draw_Mini_Main_Screen_();
 
     inline void __cdecl Fade_Into_Screen_(void* func, uint8_t* flag, int16_t a) {
         using Fn = void(__cdecl*)(void*, uint8_t*, int16_t);
@@ -351,4 +346,5 @@ namespace COMBINIT {
     }
 
     int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag);
+    int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2);
 }
