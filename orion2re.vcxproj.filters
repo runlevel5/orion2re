@@ -372,6 +372,9 @@
     <ClCompile Include="src\game\combinit.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\combat1.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -861,6 +864,21 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\combat.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\cmbtai.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\cmbtfire.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\cmbtmov1.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\cmbtspec.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\combat1.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

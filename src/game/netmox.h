@@ -59,8 +59,8 @@ namespace NETMOX {
         return fn(data);
     }
 
-    inline void __cdecl Mox_Send_Message_(uint16_t target, uint8_t type, uint8_t* data, uint32_t len) {
-        using Fn = void(__cdecl*)(uint16_t, uint8_t, uint8_t*, uint32_t);
+    inline void __cdecl Mox_Send_Message_(int16_t target, int16_t type, void* data, int32_t len) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, void*, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00515560});
         fn(target, type, data, len);
     }

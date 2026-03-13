@@ -1,5 +1,5 @@
 workflows:
-  structs:
+  verifier:
     description: "A LLM enabled verifier loop."
     need_input: False
     nodes:
@@ -43,20 +43,27 @@ workflows:
 
           # RULES:
           * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory accesses.
+          * You must read existing function implementation in the project to analyze it against provided disassembly and decompiler
+            output.
+          * Decompiler output could be partially incorrect, always validate it against the provided disassembled code.
           * You must detect if all mentioned stub functions are defined.
           * You must analyze provided disassembly and deduce variables used. Keep in mind that original disassembly might re-use
-            variables for different purposes
+            variables for different purposes.
           * You shall ignore subtle changes, such as possible refactors, potentially imperfect variable names, etc.
           * You shall never rename any functions, global variables and so on. You are allowed to suggest a better name for
             local variables.
+          * If you have to search current project, always use `rg` instead of `grep`.
+          * Prefer built-in tools over shell tools. For example, use built-in `read_files` instead of `cat` through shell.
           
           # OUTPUT:
-          * Your must output places where project code is different from provided disassembly with very short and concise explanation why
-          * You must use provided tools to tactically correct discrepancies, if you absolutely sure that you found a discrepancy or a bug
+          * Your must output places where project code is different from provided disassembly with very short and concise explanation why.
+            You are allowed to include several lines of original disassembly or decompiler output if they're equivalent.
+          * For each found inconsistency you must provide a short diff snippet showing how to fix it
+          * You should not make any changes unless user explicitly requested them to be applied.
 
           # CHECKLIST
+          * You found and read existing function in the codebase
           * You provided a list of differences with explanations
-          * You corrected obvious discrepancies
         outcomes:
           - name: done
     edges:

@@ -1690,6 +1690,7 @@ namespace hooks {
         { 0x00409540, &COMBINIT::Tactical_Combat_ },
         { 0x0040ade0, &COMBINIT::qsort_ship_array_by_size_ },
         { 0x005274d0, &mouse::Set_Mouse_List_ },
+        { 0x00466d10, &COMBAT1::Do_Combat_Turn_ },
     };
 
     void Install_Hooks()

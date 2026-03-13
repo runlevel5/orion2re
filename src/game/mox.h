@@ -4,6 +4,9 @@ struct s_animation_header;
 struct s_player;
 struct s_mp_screen;
 struct s_qship;
+struct s_missile;
+struct s_combat_data;
+struct s_net_combat_message;
 
 namespace MOX {
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
@@ -31,6 +34,22 @@ namespace MOX {
     inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
     inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
+    inline int8_t* _player_mode = reinterpret_cast<int8_t*>(std::uintptr_t{0x0059D650});
+    inline int16_t& _start_of_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a6e10});
+    inline int16_t& _cur_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6c0});
+    inline int16_t& _net_destination = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b8});
+    inline int16_t& _done_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b4});
+    inline int16_t& _msl_impact_warning_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4a98});
+    inline int16_t& _draw_legal_boxes_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059bfb4});
+    inline int16_t& _msl_warning_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059c028});
+    inline int16_t& _wait_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6be});
+    inline int16_t& _scan_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059bf30});
+    inline int16_t* _missile_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AF0});
+    inline int16_t* _combat_grid = reinterpret_cast<int16_t*>(std::uintptr_t{0x00598770});
+    inline int16_t* _weapon_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E80});
+    inline int16_t* _ship_turn_order = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BB20});
+    inline int16_t* _side_end_of_turn = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596DA0});
+    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
     inline s_current_design*& _design =
@@ -196,6 +215,29 @@ namespace MOX {
     inline uint8_t& _g_galaxy_age = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1780});
     inline int16_t& _ship_data_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1782});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
+    inline int16_t& _cur_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B42A});
+    inline int16_t& _board_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B340});
+    inline int16_t& _tactical_net_choice = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973F0});
+    inline int16_t& _auto_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B3FC});
+    inline int16_t& _auto_combat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5CA});
+    inline int16_t& _speedx2_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CB4});
+    inline int16_t& _grid_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAAA});
+    inline int16_t& _shields_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005979A4});
+    inline int16_t& _super_fast_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597420});
+    inline int16_t& _self_destruct_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD38});
+    inline int16_t& _weapons_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059742A});
+    inline int16_t& _specials_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D48});
+    inline int16_t& _cmbt_info_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAB0});
+    inline int16_t& _flee_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597836});
+    inline int16_t& _board_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AD2});
+    inline int16_t& _map_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C52});
+    inline int16_t& _map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B43C});
+    inline int16_t& _map_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B43A});
+    inline int16_t& _center_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597852});
+    inline int16_t& _space_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FD0});
+    inline int16_t& _ypos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005976D4});
+    inline int16_t& _xpos = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059745C});
+    inline int16_t& _saved_msl_warn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059791A});
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
     inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
     inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
@@ -463,7 +505,7 @@ namespace MOX {
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
     inline s_combat_data*& _combat_data = *reinterpret_cast<s_combat_data**>(std::uintptr_t{0x005A2BE0});
     inline s_missile*& _missile = *reinterpret_cast<s_missile**>(std::uintptr_t{0x00597858});
-    inline uint8_t* _new_message = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B5D0});
+    inline s_net_combat_message& _new_message = *reinterpret_cast<s_net_combat_message*>(std::uintptr_t{0x0059B5D0});
     inline int16_t* _gate_icon_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D68});
     inline int16_t& _system_display_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A6});
     inline int16_t& _system_display_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A8});

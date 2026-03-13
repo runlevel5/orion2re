@@ -60,4 +60,9 @@ namespace mouse {
         using Fn = int16_t(__cdecl*)();
         return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F30 })();
     }
+
+    inline int16_t __cdecl Get_Pointer_Image_Number_() {
+        using Fn = int16_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00526f50})();
+    }
 }

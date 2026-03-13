@@ -232,6 +232,16 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040af90});
         fn();
     }
+
+    inline void __cdecl Snap_Center_Combat_Screen_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0040bcc0})(x, y);
+    }
+
+    inline void __cdecl Scroll_Combat_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0040b9e0})();
+    }
     inline void __cdecl Add_Tactical_Combat_Fields_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046a8a0});

@@ -54,6 +54,7 @@
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\combat.cpp" />
+    <ClCompile Include="src\game\combat1.cpp" />
     <ClCompile Include="src\game\combfind.cpp" />
     <ClCompile Include="src\game\combinit.cpp" />
     <ClCompile Include="src\game\council.cpp" />
@@ -164,9 +165,13 @@
     <ClInclude Include="src\game\bomb.h" />
     <ClInclude Include="src\game\capture.h" />
     <ClInclude Include="src\game\clipped.h" />
+    <ClInclude Include="src\game\cmbtai.h" />
     <ClInclude Include="src\game\cmbtdrw1.h" />
     <ClInclude Include="src\game\cmbtfir2.h" />
+    <ClInclude Include="src\game\cmbtfire.h" />
     <ClInclude Include="src\game\cmbtmis.h" />
+    <ClInclude Include="src\game\cmbtmov1.h" />
+    <ClInclude Include="src\game\cmbtspec.h" />
     <ClInclude Include="src\game\colbcach.h" />
     <ClInclude Include="src\game\colbldg.h" />
     <ClInclude Include="src\game\colcalc.h" />
@@ -180,6 +185,7 @@
     <ClInclude Include="src\game\colsysdi.h" />
     <ClInclude Include="src\game\colxport.h" />
     <ClInclude Include="src\game\combat.h" />
+    <ClInclude Include="src\game\combat1.h" />
     <ClInclude Include="src\game\combfind.h" />
     <ClInclude Include="src\game\combinit.h" />
     <ClInclude Include="src\game\consts.h" />

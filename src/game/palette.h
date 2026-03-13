@@ -1,6 +1,11 @@
 #pragma once
 
 namespace palette {
+    inline void __cdecl Set_Palette_Gradient_(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, int32_t h) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052b330})(a, b, c, d, e, f, g, h);
+    }
+
     void __cdecl Set_Palette_Changes_(int32_t start, int32_t end);
 
     void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end);

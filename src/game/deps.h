@@ -168,3 +168,8 @@
 #include "council.h"
 #include "global.h"
 #include "gui.h"
+#include "combat1.h"
+#include "cmbtmov1.h"
+#include "cmbtfire.h"
+#include "cmbtspec.h"
+#include "cmbtai.h"

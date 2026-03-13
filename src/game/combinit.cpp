@@ -512,7 +512,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
 
         if (MOX::_net_flag != 0) {
-            Clear_Structure_(MOX::_new_message, 16);
+            Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
             int16_t net_plr = MOX::_combat_attacker_player;
             if (MOX::_PLAYER_NUM == MOX::_combat_attacker_player) {
                 net_plr = MOX::_combat_defender_player;
