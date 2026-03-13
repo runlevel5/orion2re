@@ -309,7 +309,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         if (star_idx == MOX::_NUM_STARS) {
             has_bhg = 1;
-            has_stellar_converter = 1;
+            has_special_26 = 1;
             Load_Antaran_Defense_Fleet_();
             Load_Antaran_Planet_();
         } else {
