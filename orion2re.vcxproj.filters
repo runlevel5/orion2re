@@ -882,5 +882,8 @@
     <None Include=".vocode\workflows\struct.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
+    <None Include=".vocode\workflows\verifier.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
   </ItemGroup>
 </Project>
