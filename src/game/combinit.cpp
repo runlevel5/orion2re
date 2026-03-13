@@ -17,6 +17,144 @@ int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* par
     return -1;
 }
 
+void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
+    s_ship_data* ship = &MOX::_ship[ship_idx];
+    s_combat_data* combat = &MOX::_combat_data[combat_idx];
+
+    strcpy(combat->name, ship->d.name);
+    combat->owner = ship->owner;
+    combat->previous_owner = ship->d.previous_owner;
+    combat->ship_idx = ship_idx;
+    combat->shield_type = ship->d.shield_type;
+    combat->computer_type = ship->d.computer_type;
+
+    if (combat->owner < 8) {
+        combat->drive_destroyed = ship->d.ftl_type;
+    } else {
+        combat->drive_destroyed = (int8_t)INITSHIP::Best_Warp_Drive_(combat->owner);
+    }
+
+    combat->combat_speed_base = ship->d.combat_speed;
+    combat->size_class = ship->d.size;
+    combat->unit_status = 0;
+
+    for (int i = 0; i < 5; ++i) {
+        combat->special_device_flags[i] = ship->d.special_device_flags[i];
+        combat->special_device_damage_flags[i] = ship->special_device_damage_flags[i];
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        combat->weapons[i].weapon_id = ship->d.ship_weapon[i].type;
+        combat->weapons[i].count = ship->d.ship_weapon[i].current_count;
+        combat->weapons[i].arc = ship->d.ship_weapon[i].firing_arc;
+        combat->weapons[i].specials = ship->d.ship_weapon[i].specials;
+        combat->weapons[i].ammo = ship->d.ship_weapon[i].ammo;
+
+        if (combat->weapons[i].arc == 16) {
+            combat->weapons[i].arc = 15;
+        }
+
+        combat->weapons[i].active = 1;
+        combat->weapons[i].shots_left = combat->weapons[i].count;
+
+        uint16_t weapon_id = combat->weapons[i].weapon_id;
+        if (TECHDATA::_weapons[weapon_id].rack == 2) {
+            combat->weapons[i].ammo = 0;
+        } else if (TECHDATA::_weapons[weapon_id].rack != 1) {
+            combat->weapons[i].ammo = TECHDATA::_weapons[weapon_id].base_ammo;
+        }
+
+        if (combat->weapons[i].weapon_id == 0x21 /* 33 */) {
+            combat->weapons[i].ammo *= combat->weapons[i].count;
+        }
+
+        combat->weapons[i].status = 0;
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        combat->weapon_ready_flags[i] = 1;
+    }
+
+    combat->crew_quality = ship->crew_quality;
+
+    int16_t officer_idx = ship->officer_index;
+    if (officer_idx < 0 || MOX::_leaders[officer_idx].eta != 0) {
+        combat->officer_idx = -1;
+    } else {
+        combat->officer_idx = officer_idx;
+    }
+
+    if (ship->d.ship_type == 0 && ship->owner < 9) {
+        combat->marine_count = TECHDATA::_hull_data[combat->size_class].marine_count;
+        if (struct_::Test_Bit_Field_(combat->special_device_flags, 0x24 /* 36 */) == 1 &&
+            struct_::Test_Bit_Field_(combat->special_device_damage_flags, 0x24 /* 36 */) == 0) {
+            combat->marine_count *= 2;
+        }
+    } else {
+        combat->marine_count = -1;
+    }
+
+    combat->structure_max = INITSHIP::Get_Ship_Structure_(ship_idx);
+    combat->armor_remaining = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - ship->armor_damage;
+    combat->armor_type = ship->d.armor_type;
+    combat->structure_damage = ship->structural_damage;
+
+    if (combat->structure_damage > combat->structure_max) {
+        combat->structure_damage = combat->structure_max - 1;
+    }
+
+    if (combat->size_class == 5 && combat->owner < 8) {
+        combat->picture_num = 43 /* 0x2b */;
+    } else {
+        combat->picture_num = ship->d.picture_num;
+    }
+
+    combat->is_retreating = 0;
+    CMBTFIR2::Init_Internal_Space_(combat);
+
+    combat->shield_current_hits = (int16_t)((100 - ship->shield_damage_percent) * combat->shield_max_hits / 100);
+    combat->drive_current_hits = (int16_t)((100 - ship->drive_damage_percent) * combat->drive_max_hits / 100);
+    combat->computer_current_hits = combat->computer_max_hits - ship->computer_damage;
+
+    combat->shield_arc_max = Calc_Combat_Shield_Max_(combat_idx);
+    for (int i = 0; i < 4; ++i) {
+        combat->shield_arc_current[i] = combat->shield_arc_max;
+    }
+
+    if (combat->owner > 8 && combat->drive_destroyed == 0) {
+        switch (combat->owner) {
+            case 9:
+            case 11:
+                combat->drive_destroyed = 4;
+                break;
+            case 10:
+            case 14:
+                combat->drive_destroyed = 2;
+                break;
+            case 12:
+            case 13:
+                combat->drive_destroyed = 6;
+                break;
+            default:
+                break;
+        }
+    }
+
+    Init_Special_Devices_(combat_idx);
+}
+
+int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id) {
+    int16_t result = 0;
+
+    if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, special_id) == 1) {
+        if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, special_id) == 0) {
+            result = 1;
+        }
+    }
+
+    return result;
+}
+
 int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag) {
     bool skip_combat = false;
     int16_t has_tractor_beam = 0;
@@ -34,7 +172,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     int16_t combat_winner = 0;
 
     if (star_idx == MOX::_NUM_STARS) {
-        Play_Dimensional_Portal_Flic_();
+        ERIC::Play_Dimensional_Portal_Flic_();
     }
 
     MOX::_ai_retreat_flag = (int16_t)retreat_flag;
@@ -74,7 +212,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_cmbt_colony_id = colony_idx;
 
     MOX::_combat_data = reinterpret_cast<s_combat_data*>(Allocate_First_Block_(MOX::_screen_seg, 0x100C2));
-    Clear_Structure_(MOX::_combat_data, 0x100C2);
+    struct_::Clear_Structure_(MOX::_combat_data, 0x100C2);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
 
@@ -92,7 +230,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     if (star_idx == MOX::_NUM_STARS) {
         MOX::_in_nebula_flag = 0;
     } else {
-        MOX::_in_nebula_flag = Point_Is_In_Some_Nebula_(MOX::_star[star_idx].x, MOX::_star[star_idx].y) ? 1 : 0;
+        MOX::_in_nebula_flag = GEO::Point_Is_In_Some_Nebula_(MOX::_star[star_idx].x, MOX::_star[star_idx].y) ? 1 : 0;
     }
 
     _qsort(plr1_ships, plr1_ship_count, 2, (int(__cdecl*)(const void*, const void*))qsort_ship_array_by_size_);
@@ -141,7 +279,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     }
 
     if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
-        if (Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
+        if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
             skip_combat = Apply_Combat_Artemis_Net_(0);
             if (skip_combat == 0) {
                 KEN::Ken_Get_Text_Message_(0x53, msg_buf, 80);
@@ -190,7 +328,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         Set_Fade_Percent_(0);
 
         MOX::_missile = reinterpret_cast<s_missile*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 7800));
-        Clear_Structure_(MOX::_missile, 7800);
+        struct_::Clear_Structure_(MOX::_missile, 7800);
         MOX::Mox_Update_();
 
         MOX::_level_symbol_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x2A, MOX::_screen_seg);
@@ -512,7 +650,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
 
         if (MOX::_net_flag != 0) {
-            Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
+            struct_::Clear_Structure_(&MOX::_new_message, sizeof(MOX::_new_message));
             int16_t net_plr = MOX::_combat_attacker_player;
             if (MOX::_PLAYER_NUM == MOX::_combat_attacker_player) {
                 net_plr = MOX::_combat_defender_player;

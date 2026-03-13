@@ -4525,7 +4525,7 @@ typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
 struct s_tech_hull_data {
     short hull_space;
     short hull_size;
-    undefined field2_0x4;
+    undefined1 marine_count; /* Created by Rename Structure Field action */
     undefined field3_0x5;
     short armor_absorption;
     short structure;

@@ -47,4 +47,10 @@ namespace CMBTFIR2 {
         using Fn = int32_t(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004e6f40})(ship);
     }
+
+    inline void __cdecl Init_Internal_Space_(s_combat_data* combat_ship) {
+        using Fn = void(__cdecl*)(s_combat_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6180});
+        fn(combat_ship);
+    }
 }

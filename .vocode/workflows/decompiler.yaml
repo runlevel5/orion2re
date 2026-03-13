@@ -545,8 +545,9 @@ workflows:
           * You did not read files that were not mentioned in the decomplation input
           * You *USED* the patch_tool to apply changes and not just printed them
           * All patches were successfully applied by apply_patch tool and were not printed to the user
-          * All external variables and functions stubs were added to correct files with correct namespaces
-          * External function stubs did not overwrite existing functions in header files
+          * All variables that don't exist in the project were added to correct headers with correct namespaces
+          * All functions that don't exist in the project were added as stubs to header files with correct namespaces
+          * If external function did not exist, you wrote a stub
           * All mentioned namespaces were processed
           * No existing function signatures were changed
           * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address

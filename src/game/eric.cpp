@@ -149,4 +149,10 @@ namespace ERIC {
         }
         return s_2_00551108;
     }
+
+    void __cdecl Play_Dimensional_Portal_Flic_() {
+        Do_Cinematic_Popup_Setup_();
+        SMACK::Play_Cinematic_(COLONY::_DIMTVFIN_LBX, 0, 0);
+        Do_Cinematic_Popup_Cleanup_();
+    }
 }

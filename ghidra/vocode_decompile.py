@@ -29,7 +29,8 @@ from ghidra.program.model.listing import CodeUnitFormat, CodeUnitFormatOptions
 from ghidra.program.model.data import DataTypeWriter, Pointer, Array, TypeDef, Composite, Enum
 from java.io import StringWriter
 from java.util import ArrayList
-
+from ghidra.app.decompiler import DecompInterface, DecompileOptions
+from ghidra import GhidraOptions
 
 POST_URL = "http://127.0.0.1:5050/input"
 
@@ -126,7 +127,11 @@ _CODE_UNIT_FMT = None
 def _get_code_unit_format():
     global _CODE_UNIT_FMT
     if _CODE_UNIT_FMT is None:
-        _CODE_UNIT_FMT = CodeUnitFormat(CodeUnitFormatOptions())
+        opts = CodeUnitFormatOptions(
+            CodeUnitFormatOptions.ShowBlockName.NEVER,
+            CodeUnitFormatOptions.ShowNamespace.ALWAYS
+        )
+        _CODE_UNIT_FMT = CodeUnitFormat(opts)
     return _CODE_UNIT_FMT
 
 
@@ -536,6 +541,17 @@ def _format_externals_for_input(func):
 
 def _get_decompiler_output(func, timeout_seconds=60):
     decomp = DecompInterface()
+
+    opts = DecompileOptions()
+    tool = state.getTool()
+    if tool is not None:
+        field_opts = tool.getOptions(GhidraOptions.CATEGORY_BROWSER_FIELDS)
+        decomp_opts = tool.getOptions(GhidraOptions.CATEGORY_DECOMPILER_POPUPS)
+        opts.grabFromToolAndProgram(field_opts, decomp_opts, currentProgram)
+    else:
+        opts.grabFromProgram(currentProgram)
+
+    decomp.setOptions(opts)
     decomp.openProgram(currentProgram)
 
     res = decomp.decompileFunction(func, timeout_seconds, monitor)

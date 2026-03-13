@@ -68,4 +68,18 @@ namespace ERIC {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004bb110})();
     }
+
+    inline void __cdecl Do_Cinematic_Popup_Setup_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAEE0});
+        fn();
+    }
+
+    inline void __cdecl Do_Cinematic_Popup_Cleanup_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BB040});
+        fn();
+    }
+
+    void __cdecl Play_Dimensional_Portal_Flic_();
 }

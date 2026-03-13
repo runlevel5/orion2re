@@ -22,36 +22,13 @@ namespace COMBINIT {
         fn(ship_idx);
     }
 
-    inline void __cdecl Play_Dimensional_Portal_Flic_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bb0c0});
-        fn();
+    void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx);
+    inline int16_t __cdecl Calc_Combat_Shield_Max_(int16_t combat_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040b3c0});
+        return fn(combat_idx);
     }
-    inline void __cdecl Clear_Structure_(void* ptr, uint32_t size) {
-        using Fn = void(__cdecl*)(void*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d0b7});
-        fn(ptr, size);
-    }
-    inline bool __cdecl Point_Is_In_Some_Nebula_(int16_t x, int16_t y) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412b10});
-        return fn(x, y);
-    }
-    inline void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t count) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040b460});
-        fn(ship_idx, count);
-    }
-    inline int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t count, int16_t special_id) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040d3c0});
-        return fn(count, special_id);
-    }
-    inline bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star) {
-        using Fn = bool(__cdecl*)(void*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1560});
-        return fn(player, star);
-    }
+    int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id);
     inline bool __cdecl Apply_Combat_Artemis_Net_(int16_t unk) {
         using Fn = bool(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e88b0});
@@ -227,6 +204,7 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040f500});
         fn(count);
     }
+
     inline void __cdecl Deploy_Ships_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040af90});

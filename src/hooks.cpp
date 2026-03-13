@@ -1691,6 +1691,9 @@ namespace hooks {
         { 0x0040ade0, &COMBINIT::qsort_ship_array_by_size_ },
         { 0x005274d0, &mouse::Set_Mouse_List_ },
         { 0x00466d10, &COMBAT1::Do_Combat_Turn_ },
+        { 0x004bb0c0, &ERIC::Play_Dimensional_Portal_Flic_ },
+        { 0x0040B460, &COMBINIT::Load_Combat_Ship_ },
+        { 0x0040d3c0, &COMBINIT::Does_Combat_Ship_Have_Special_ },
     };
 
     void Install_Hooks()
