@@ -23,32 +23,14 @@ namespace COMBINIT {
     }
 
     void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx);
-    inline int16_t __cdecl Calc_Combat_Shield_Max_(int16_t combat_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040b3c0});
-        return fn(combat_idx);
-    }
+    int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx);
     int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id);
     inline bool __cdecl Apply_Combat_Artemis_Net_(int16_t unk) {
         using Fn = bool(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e88b0});
         return fn(unk);
     }
-    inline void __cdecl Refresh_Palette_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b660});
-        fn();
-    }
-    inline void __cdecl Message_Box_(char* buf) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796b0});
-        fn(buf);
-    }
-    inline int8_t __cdecl Colony_Has_Defenses_(int16_t idx) {
-        using Fn = int8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004094d0});
-        return fn(idx);
-    }
+    int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx);
     inline void __cdecl Get_Auto_Function_(void** func) {
         using Fn = void(__cdecl*)(void**);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483c90});

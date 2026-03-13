@@ -1694,6 +1694,8 @@ namespace hooks {
         { 0x004bb0c0, &ERIC::Play_Dimensional_Portal_Flic_ },
         { 0x0040B460, &COMBINIT::Load_Combat_Ship_ },
         { 0x0040d3c0, &COMBINIT::Does_Combat_Ship_Have_Special_ },
+        { 0x0040b3c0, &COMBINIT::Calc_Combat_Shield_Max_ },
+        { 0x004094d0, &COMBINIT::Colony_Has_Defenses_ },
     };
 
     void Install_Hooks()

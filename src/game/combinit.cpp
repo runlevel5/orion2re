@@ -2,6 +2,22 @@
 
 namespace COMBINIT {
 
+int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx) {
+    s_colony* col = &MOX::_colony[colony_idx];
+
+    if (col->buildings[BUILDING_STAR_BASE] != 0 ||
+        col->buildings[BUILDING_FIGHTER_GARRISON] != 0 ||
+        col->buildings[BUILDING_MISSILE_BASE] != 0 ||
+        col->buildings[BUILDING_BATTLESTATION] != 0 ||
+        col->buildings[BUILDING_GROUND_BATTERIES] != 0 ||
+        col->buildings[BUILDING_STELLAR_CONVERTER] != 0 ||
+        col->buildings[BUILDING_STAR_FORTRESS] != 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
 int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2) {
     char size_2 = MOX::_ship[*param_2].d.size;
     char size_1 = MOX::_ship[*param_1].d.size;
@@ -141,6 +157,40 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
     }
 
     Init_Special_Devices_(combat_idx);
+}
+
+int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx) {
+    int16_t max_shield = 0;
+    s_combat_data* ship = &MOX::_combat_data[ship_idx];
+    int8_t shield_type = ship->shield_type;
+
+    if (shield_type > 0) {
+        int16_t multiplier;
+        int8_t size_class = ship->size_class;
+
+        if (size_class < 5) {
+            multiplier = (int16_t)size_class + 1;
+        } else {
+            multiplier = (int16_t)size_class + 2;
+        }
+
+        // Calculation uses base shield blocking points multiplied by ship size factor and global multiplier 5
+        max_shield = TECHDATA::_shields[shield_type].points_blocked * multiplier * 5;
+
+        // Shields are suppressed in a nebula unless the ship has specific warp/shield stabilization (Special 13)
+        if (MOX::_in_nebula_flag != 0) {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 13 /* 0x0d */) == 0) {
+                max_shield = 0;
+            }
+        }
+
+        // Shield multipliers or hardening (Special 20) increase capacity by 50%
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 20 /* 0x14 */) != 0) {
+            max_shield = (max_shield * 3) / 2;
+        }
+    }
+
+    return max_shield;
 }
 
 int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id) {
@@ -286,8 +336,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             } else {
                 KEN::Ken_Get_Text_Message_(0x52, msg_buf, 80);
             }
-            Refresh_Palette_();
-            Message_Box_(msg_buf);
+            palette::Refresh_Palette_();
+            GENDRAW::Message_Box_(msg_buf);
             combat_winner = (int16_t)0xFFFF;
         }
     }
