@@ -8,6 +8,12 @@ namespace replace {
         fn(bitmap, color_table, start_color, count);
     }
 
+    inline void __cdecl Shift_Palette_Range_(void* bitmap, int32_t range) {
+        using Fn = void(__cdecl*)(void*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530af0});
+        fn(bitmap, range);
+    }
+
     inline void __cdecl Replace_Color_(void* bitmap, int32_t target_color, int32_t replacement_color) {
         using Fn = void(__cdecl*)(void*, int32_t, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530570});

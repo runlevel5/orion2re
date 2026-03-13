@@ -65,6 +65,36 @@ namespace INITSHIP {
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size);
 
+    inline void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047f300});
+        fn(ship_idx);
+    }
+
+    inline void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047f6e0});
+        fn(ship_idx);
+    }
+
+    inline void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047fb50});
+        fn(ship_idx);
+    }
+
+    inline void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004800d0});
+        fn(ship_idx);
+    }
+
+    inline void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480720});
+        fn(ship_idx);
+    }
+
     inline void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
         using Fn = void(__cdecl*)(s_ship_design*);
         reinterpret_cast<Fn>(std::uintptr_t{0x00482da0})(design);

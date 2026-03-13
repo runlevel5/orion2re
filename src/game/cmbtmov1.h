@@ -37,4 +37,10 @@ namespace CMBTMOV1 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00470560});
         fn(ship_idx, target_x, target_y);
     }
+
+    inline bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046EE10});
+        return fn(ship_idx);
+    }
 }

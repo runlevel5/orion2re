@@ -29,4 +29,10 @@ namespace CMBTDRW1 {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004d5b60})(ship_idx);
     }
+
+    inline void __cdecl Scroll_Draw_Combat_Screen_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d5370});
+        fn();
+    }
 }

@@ -69,7 +69,7 @@ namespace COMBAT1 {
 
                 if (MOX::_combat_total_ship_count > 0) {
                     for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-                        if (MOX::_combat_data[i].drive_destroyed == 0 && MOX::_combat_data[i].unit_status == 0) {
+                        if (MOX::_combat_data[i].ftl_type == 0 && MOX::_combat_data[i].unit_status == 0) {
                             if (CMBTMOV1::Ship_Is_In_Stasis_(i) == 0) {
                                 CMBTMOV1::Rotate_Ship_(i, (MOX::_combat_data[i].facing_dir + 2) & 0xf, (MOX::_combat_data[i].x - MOX::_cur_combat_x) * 20, (MOX::_combat_data[i].y - MOX::_cur_combat_y) * 20);
                             }
@@ -196,10 +196,10 @@ namespace COMBAT1 {
                                                     Send_Tactical_Combat_Message_(MOX::_net_destination, 10000, 0, 0, 0);
                                                 }
                                                 MOX::_combat_data[MOX::_cur_ship].drive_current_hits = 0;
-                                                int8_t saved_destr = MOX::_combat_data[MOX::_cur_ship].drive_destroyed;
-                                                MOX::_combat_data[MOX::_cur_ship].drive_destroyed = 1;
+                                                int8_t saved_ftl_type = MOX::_combat_data[MOX::_cur_ship].ftl_type;
+                                                MOX::_combat_data[MOX::_cur_ship].ftl_type = 1;
                                                 CMBTFIRE::Destroy_Ship_(MOX::_cur_ship, MOX::_combat_data[MOX::_cur_ship].x * 20, MOX::_combat_data[MOX::_cur_ship].y * 20, CMBTFIRE::Is_Combat_Ship_Dead_(MOX::_cur_ship));
-                                                MOX::_combat_data[MOX::_cur_ship].drive_destroyed = saved_destr;
+                                                MOX::_combat_data[MOX::_cur_ship].ftl_type = saved_ftl_type;
                                                 MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
                                                 next_ship_flag = Next_Ship_(param_1);
                                                 if (MOX::_net_flag != 0) {
@@ -306,7 +306,7 @@ namespace COMBAT1 {
                                         if (MOX::_combat_data[MOX::_cur_ship].is_retreating == 0) {
                                             int16_t msg_id = 0;
                                             if (Enemy_Dissipator_Exists_(MOX::_combat_data[MOX::_cur_ship].owner) == 0) {
-                                                if (MOX::_combat_data[MOX::_cur_ship].drive_destroyed != 0) {
+                                                if (MOX::_combat_data[MOX::_cur_ship].ftl_type == 0) {
                                                     msg_id = 59;
                                                 } else if (MOX::_combat_data[MOX::_cur_ship].current_speed < 1) {
                                                     msg_id = 79;
@@ -538,10 +538,10 @@ namespace COMBAT1 {
                                                 case 10000:
                                                     MOX::_combat_data[MOX::_cur_ship].drive_current_hits = 0;
                                                     {
-                                                        int8_t saved_destr = MOX::_combat_data[MOX::_cur_ship].drive_destroyed;
-                                                        MOX::_combat_data[MOX::_cur_ship].drive_destroyed = 1;
+                                                        int8_t saved_ftl_type = MOX::_combat_data[MOX::_cur_ship].ftl_type;
+                                                        MOX::_combat_data[MOX::_cur_ship].ftl_type = 1;
                                                         CMBTFIRE::Destroy_Ship_(MOX::_cur_ship, MOX::_combat_data[MOX::_cur_ship].x * 20, MOX::_combat_data[MOX::_cur_ship].y * 20, CMBTFIRE::Is_Combat_Ship_Dead_(MOX::_cur_ship));
-                                                        MOX::_combat_data[MOX::_cur_ship].drive_destroyed = saved_destr;
+                                                        MOX::_combat_data[MOX::_cur_ship].ftl_type = saved_ftl_type;
                                                     }
                                                     MOX::_tactical_net_choice = 10000;
                                                     MOX::_ship_turn_order[MOX::_cur_ptr] = -1;
@@ -763,6 +763,111 @@ namespace COMBAT1 {
                 CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
             }
         }
+    }
+
+    int16_t __cdecl Calc_Current_Speed_(int16_t ship_idx)
+    {
+        int16_t speed = 0;
+
+        if (MOX::_combat_data[ship_idx].ftl_type == 0 || CMBTMOV1::Ship_In_Black_Hole_(ship_idx)) {
+            speed = 0;
+        } else {
+            int combat_speed = static_cast<uint8_t>(MOX::_combat_data[ship_idx].combat_speed_base);
+            
+            if (struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_flags, 2) == 1 &&
+                struct_::Test_Bit_Field_(MOX::_combat_data[ship_idx].special_device_damage_flags, 2) == 0) {
+                combat_speed += 5;
+            }
+            
+            int owner = MOX::_combat_data[ship_idx].owner;
+            int current_hits = MOX::_combat_data[ship_idx].drive_current_hits;
+            int max_hits = MOX::_combat_data[ship_idx].drive_max_hits;
+            
+            if (owner <= 9) {
+                int half_max = max_hits / 2;
+                int range = max_hits - half_max;
+                speed = static_cast<int16_t>(((current_hits - half_max) * combat_speed) / range);
+            } else {
+                speed = static_cast<int16_t>((current_hits * combat_speed) / max_hits);
+            }
+            
+            if (speed < 0) {
+                speed = 0;
+            }
+            
+            if (owner < 8 && MOX::_player[owner].traits[29] != 0) {
+                speed += 4;
+            }
+            
+            if (speed > 0) {
+                int16_t tractor_beams = 0;
+                for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                    if (static_cast<uint8_t>(MOX::_combat_data[i].special_cooldown) == ship_idx && 
+                        Combat_Ship_Is_Functional_(i)) {
+                        for (int j = 0; j < 8; ++j) {
+                            if (MOX::_combat_data[i].weapons[j].weapon_id == 39 /* Tractor Beam */) {
+                                tractor_beams += MOX::_combat_data[i].weapons[j].count;
+                            }
+                        }
+                    }
+                }
+                
+                if (MOX::_combat_data[ship_idx].size_class + 1 <= tractor_beams) {
+                    speed = 0;
+                } else {
+                    speed += static_cast<int16_t>((speed * tractor_beams) / (-1 - MOX::_combat_data[ship_idx].size_class));
+                    if (speed < 1) {
+                        speed = 1;
+                    }
+                }
+            }
+        }
+        
+        if (speed <= 0) {
+            MOX::_combat_data[ship_idx].is_retreating = 0;
+        }
+        
+        return speed;
+    }
+
+    int16_t __cdecl Check_For_Winner_() {
+        int16_t attacker_count = 0;
+        int16_t defender_count = 0;
+        int16_t winner_status = 0;
+
+        if (MOX::_combat_data[0].unit_status != 5) {
+            if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_()) {
+                defender_count = 1;
+            }
+        }
+
+        for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+            if (MOX::_combat_data[i].unit_status != 5 && MOX::_combat_data[i].is_captured == 0) {
+                if (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) {
+                    attacker_count++;
+                } else {
+                    defender_count++;
+                }
+            }
+        }
+
+        if (MOX::_combat_turn > 50) {
+            winner_status = -1;
+            if (defender_count <= 0) {
+                winner_status = 666;
+            }
+        }
+
+        if (attacker_count <= 0) {
+            winner_status = -1;
+            if (defender_count <= 0) {
+                return 666;
+            }
+        } else if (defender_count <= 0) {
+            winner_status = 1;
+        }
+
+        return winner_status;
     }
 
 }

@@ -22,4 +22,28 @@ namespace palette {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b3d0});
         fn(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
     }
+
+    inline void __cdecl Save_Glass_Remap_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b710 });
+        fn(block);
+    }
+
+    inline void* __cdecl Allocate_Glass_Remap_Next_Block_(void* seg) {
+        using Fn = void* (__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b6f0 });
+        return fn(seg);
+    }
+
+    inline void __cdecl Set_Glass_Remap_Color_(int16_t idx, int16_t r, int16_t g, int16_t b, int16_t c) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b8f0 });
+        fn(idx, r, g, b, c);
+    }
+
+    inline void __cdecl Restore_Glass_Remap_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b740 });
+        fn(block);
+    }
 }

@@ -7,6 +7,20 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Weaponry_Bonus_(int16_t leader_idx);
 
+    inline int16_t __cdecl Galactic_Lore_Bonus_(int16_t officer_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E6570});
+        return fn(officer_idx);
+    }
+
+    void __cdecl Set_Combat_Ordnance_Values_();
+
+    inline int16_t __cdecl Get_Fleet_Ordnance_Bonus_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E5C50});
+        return fn(player_idx);
+    }
+
     inline int8_t __cdecl Apply_Combat_Artemis_Net_(int8_t flag) {
         using Fn = int8_t(__cdecl*)(int8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e88b0});
@@ -53,4 +67,26 @@ namespace CMBTFIR2 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6180});
         fn(combat_ship);
     }
+
+    int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx);
+
+    short __cdecl Fleet_Defensive_Bonus_(short player_idx, short mode, short* bonus_val_ptr);
+
+    short __cdecl Fleet_Offensive_Bonus_(short player_idx);
+
+    inline int16_t __cdecl Ship_Specials_Defensive_Bonus_(int16_t ship_idx, int16_t target_type, int16_t* base_bonus) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6810});
+        return fn(ship_idx, target_type, base_bonus);
+    }
+
+    int16_t __cdecl Ship_Specials_Offensive_Bonus_(int16_t ship_idx);
+
+    int16_t __cdecl Defensive_Combat_Bonus_(int16_t combat_unit_idx, int16_t target_type);
+
+    int16_t __cdecl Offensive_Combat_Bonus_(int16_t ship_idx);
+
+    int16_t __cdecl Computer_Bonus_(int16_t ship_idx);
+
+    int16_t __cdecl Crew_Attack_Bonus_(int16_t ship_idx);
 }

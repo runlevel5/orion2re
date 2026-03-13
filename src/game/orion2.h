@@ -1506,7 +1506,7 @@ struct s_combat_data {
     int8_t shield_type;
     int16_t shield_arc_max;
     int16_t shield_arc_current[4];
-    int8_t drive_destroyed;
+    int8_t ftl_type;
     int8_t computer_type;
     int8_t armor_type;
     int16_t tac_val_attack;
@@ -2143,7 +2143,7 @@ struct s_global_combat_data {
     undefined field3_0x21;
     undefined field4_0x22;
     undefined field5_0x23;
-    undefined field6_0x24;
+    int8_t field6_0x24;
     int8_t hull_size;
     int8_t shield_type;
     int16_t shield_points_base;
@@ -2177,7 +2177,7 @@ struct s_global_combat_data {
     int16_t structure_max;
     int8_t crew_quality;
     int16_t officer_idx;
-    undefined field40_0xaf;
+    int8_t marine_count;
     undefined field41_0xb0;
     undefined field42_0xb1;
     int8_t special_device_damage[5];

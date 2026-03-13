@@ -572,6 +572,8 @@ inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const ch
 inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"
 inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*>(std::uintptr_t{0x00556950}); // "Settings file (MOX.SET) is missing..."
 
+inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintptr_t{0x00551288});
+inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"

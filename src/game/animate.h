@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+
 namespace animate {
     inline s_animation_header*& _animation_header =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0057632C });

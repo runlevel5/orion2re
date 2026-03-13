@@ -33,6 +33,7 @@
     <ClCompile Include="src\game\allocate.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\antarans.cpp" />
+    <ClCompile Include="src\game\beams.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
     <ClCompile Include="src\game\bomb.cpp" />
@@ -40,6 +41,7 @@
     <ClCompile Include="src\game\clipped.cpp" />
     <ClCompile Include="src\game\cmbtdrw1.cpp" />
     <ClCompile Include="src\game\cmbtfir2.cpp" />
+    <ClCompile Include="src\game\cmbtfire.cpp" />
     <ClCompile Include="src\game\cmbtmis.cpp" />
     <ClCompile Include="src\game\colbcach.cpp" />
     <ClCompile Include="src\game\colbldg.cpp" />
@@ -160,6 +162,7 @@
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\antarans.h" />
     <ClInclude Include="src\game\assert.h" />
+    <ClInclude Include="src\game\beams.h" />
     <ClInclude Include="src\game\bill.h" />
     <ClInclude Include="src\game\bitmap.h" />
     <ClInclude Include="src\game\bomb.h" />

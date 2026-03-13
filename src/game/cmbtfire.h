@@ -25,4 +25,6 @@ namespace CMBTFIRE {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AF2A0});
         fn(ship_idx);
     }
+
+    int16_t __cdecl Does_Combat_Planet_Have_Defenses_();
 }

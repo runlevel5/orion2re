@@ -6,10 +6,13 @@ struct s_mp_screen;
 struct s_qship;
 struct s_missile;
 struct s_combat_data;
+struct s_crew_data;
 struct s_net_combat_message;
+struct s_antaran;
 
 namespace MOX {
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
+    inline int16_t* _ordnance_bonus = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597050});
     inline int16_t& _n_fltscrn_big_icons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597018});
     inline int16_t& _n_fltscrn_big_icons = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973E2});
     inline uint8_t& _n_fltscrn_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597A92});
@@ -144,7 +147,13 @@ namespace MOX {
     inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
     inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
-    inline uint32_t& _combat_bitmap = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00597A94});
+    inline s_animation_header*& _combat_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A94});
+    inline s_animation_header*& _combat_map_planet_seg =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596448});
+    inline s_animation_header*& _combat_planet_seg =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B4});
+    inline s_animation_header*& _combat_planet_seg2 =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5E8});
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
@@ -152,7 +161,7 @@ namespace MOX {
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
-    inline uint32_t& _draw_ship_bitmap = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B328});
+    inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
@@ -488,7 +497,7 @@ namespace MOX {
     inline void*& _specials_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD34});
     inline void*& _msl_warning_on_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A49F4});
     inline void*& _warning_fighter_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597764});
-    inline void*& _ship_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00597A8C});
+    inline s_animation_header*& _ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A8C});
     inline void*& _darken_plasma_map = *reinterpret_cast<void**>(std::uintptr_t{0x005A49D0});
     inline void*& _shield_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x0059BECC});
     inline void*& _pulsar_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A2BE4});

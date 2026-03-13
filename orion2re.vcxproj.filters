@@ -375,6 +375,12 @@
     <ClCompile Include="src\game\combat1.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\beams.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\cmbtfire.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -879,6 +885,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\combat1.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\beams.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

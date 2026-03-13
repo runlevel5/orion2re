@@ -12,6 +12,8 @@ namespace COMBINIT {
     inline int8_t* s__00579613 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579613});
 
     inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
+    inline const char* s_monster_lbx_00551250 = reinterpret_cast<const char*>(std::uintptr_t{0x00551250});
+    inline const char* s_cmbtshp_lbx_0055125c = reinterpret_cast<const char*>(std::uintptr_t{0x0055125C});
     inline char* s_cmbtmisl_lbx_00551234 = reinterpret_cast<char*>(std::uintptr_t{0x00551234});
     inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
     inline char* s_sphersfx_lbx_00551218 = reinterpret_cast<char*>(std::uintptr_t{0x00551218});
@@ -26,41 +28,44 @@ namespace COMBINIT {
     int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx);
     int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special_id);
     int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx);
-    inline void* __cdecl Allocate_Glass_Remap_Next_Block_(void* seg) {
-        using Fn = void*(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b6f0});
-        return fn(seg);
-    }
-    inline void __cdecl Save_Glass_Remap_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b710});
-        fn(block);
-    }
-    inline void __cdecl Load_Antaran_Defense_Fleet_() {
+
+    void __cdecl Load_Antaran_Defense_Fleet_();
+
+    void __cdecl Load_Combat_Antaran_Ship_(int16_t ship_idx, int16_t ship_size);
+
+    inline void __cdecl Load_Antaran_Star_Fortress_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040fcf0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040FD60});
         fn();
     }
-    inline void __cdecl Load_Antaran_Planet_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c9b0});
-        fn();
+    void __cdecl Load_Antaran_Planet_();
+    void __cdecl Load_Colony_Defense_(int16_t colony_idx);
+
+    inline void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040CBA0});
+        fn(colony_idx, flag);
     }
-    inline void __cdecl Load_Colony_Defense_(int16_t col) {
+
+    inline int16_t __cdecl Type_Of_Space_Station_(int16_t colony_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040C960});
+        return fn(colony_id);
+    }
+
+    inline void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040cb30});
-        fn(col);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040DF10});
+        fn(station_type);
     }
+
     inline uint8_t __cdecl Does_Combat_Planet_Have_Defenses_() {
         using Fn = uint8_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ae1e0});
         return fn();
     }
-    inline void __cdecl Load_Combat_Ship_Palette_(int16_t plr) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c030});
-        fn(plr);
-    }
+
+    void __cdecl Load_Combat_Ship_Palette_(int16_t plr);
     inline void __cdecl Create_Ship_Darken_Map_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d6380});
@@ -70,11 +75,6 @@ namespace COMBINIT {
         using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420b70});
         fn(flag);
-    }
-    inline void __cdecl Set_Glass_Remap_Color_(int16_t idx, int16_t r, int16_t g, int16_t b, int16_t c) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b8f0});
-        fn(idx, r, g, b, c);
     }
     inline void __cdecl Set_Combat_Ordnance_Values_() {
         using Fn = void(__cdecl*)();
@@ -86,32 +86,24 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c230});
         fn(plr);
     }
-    inline void __cdecl Restore_Glass_Remap_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b740});
-        fn(block);
-    }
     inline void __cdecl Init_Special_Devices_(int16_t count) {
         using Fn = void(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040f500});
         fn(count);
     }
 
-    inline void __cdecl Deploy_Ships_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040af90});
-        fn();
-    }
+    void __cdecl Deploy_Ships_();
 
-    inline void __cdecl Snap_Center_Combat_Screen_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0040bcc0})(x, y);
-    }
+    int16_t __cdecl Ship_Size_Offset_(int16_t size);
 
-    inline void __cdecl Scroll_Combat_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0040b9e0})();
-    }
+    int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx);
+
+    int __cdecl qsort_combat_data_by_size_(const void* a, const void* b);
+
+    void __cdecl Snap_Center_Combat_Screen_(int16_t target_x, int16_t target_y);
+
+    void __cdecl Scroll_Combat_Screen_();
+
     inline int16_t __cdecl Check_For_Winner_() {
         using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004695d0});
@@ -137,16 +129,18 @@ namespace COMBINIT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c690});
         fn(plr);
     }
-    inline void __cdecl Increment_Bhg_(int16_t plr) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c570});
-        fn(plr);
-    }
-    inline void __cdecl End_Of_Turn_Bookeeping_() {
+    void __cdecl Increment_Bhg_(int16_t player_idx);
+    inline void __cdecl Recharge_Shields_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c620});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c840});
         fn();
     }
+    inline void __cdecl Repair_All_Combat_Ships_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040fb30});
+        fn();
+    }
+    void __cdecl End_Of_Turn_Bookeeping_();
     inline void __cdecl End_Of_Combat_(int16_t colony_idx, int16_t pop, int16_t winner) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040d4a0});

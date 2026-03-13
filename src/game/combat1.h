@@ -90,4 +90,6 @@ namespace COMBAT1 {
     }
 
     void __cdecl Do_Combat_Turn_(int16_t param_1, int16_t param_2);
+    int16_t __cdecl Check_For_Winner_();
+    int16_t __cdecl Calc_Current_Speed_(int16_t ship_idx);
 }

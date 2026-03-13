@@ -32,8 +32,8 @@ namespace CMBTDRW1 {
             );
 
             uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(98, 98);
-            MOX::_draw_ship_bitmap = (uint32_t)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
-            MOX::_combat_bitmap = (uint32_t)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+            MOX::_draw_ship_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+            MOX::_combat_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
 
             s_animation_header* anim = (s_animation_header*)Buffer_Reload_("Combat.lbx", 0xB, MOX::_global_cache_seg);
             remap::Calculate_Picture_Remap_Colors_(anim);
