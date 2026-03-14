@@ -72,6 +72,12 @@ namespace fields {
 
     int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound);
 
+    inline int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, const char* label, int16_t unknown) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d4d0});
+        return fn(x1, y1, x2, y2, label, unknown);
+    }
+
     int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t help_start, int16_t help_end, const char* hotkey_ptr, int16_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);

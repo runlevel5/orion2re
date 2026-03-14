@@ -2,6 +2,180 @@
 
 namespace COMBAT1 {
 
+    void __cdecl Add_Tactical_Combat_Fields_(void) {
+        short auto_combat_idx = 0;
+        const char* info_hotkey;
+        int info_y_coord;
+
+        if (MOX::_cur_ship > -1) {
+            if (MOX::_combat_data[MOX::_cur_ship].owner != MOX::_combat_attacker_player) {
+                auto_combat_idx = 1;
+            }
+        }
+
+        Set_Combat_Help_Fields_();
+
+        if (MOX::_auto_combat_flag[auto_combat_idx] == 1 || 
+            (MOX::_game_type != 1 && MOX::_cur_ship > -1 && 
+             MOX::_combat_data[MOX::_cur_ship].owner != MOX::_PLAYER_NUM && 
+             MOX::_take_control_flag == 0)) {
+            
+            for (int i = 0; i < 300; ++i) {
+                MOX::_missile_field[i] = -1000;
+            }
+            MOX::_take_control_button = -1000;
+            MOX::_space_field = -1000;
+            MOX::_map_field = -1000;
+            MOX::_msl_warning_button = -1000;
+            MOX::_speedx2_button = -100;
+            MOX::_draw_legal_boxes_button = -100;
+            MOX::_msl_impact_warning_button = -100;
+            MOX::_self_destruct_button = -100;
+            MOX::_shields_button = -100;
+            MOX::_grid_button = -100;
+            MOX::_scan_button = -100;
+            COMBAT1::_end_of_turn_button = -100;
+            MOX::_board_button = -100;
+            MOX::_flee_button = -100;
+            MOX::_wait_button = -100;
+            MOX::_done_button = -100;
+            for (int i = 0; i < 8; ++i) {
+                MOX::_weapon_button[i] = -1000;
+            }
+            MOX::_center_button = -1000;
+            MOX::_weapons_button = -1000;
+            MOX::_specials_button = -1000;
+            MOX::_cmbt_info_button = -1000;
+            MOX::_super_fast_button = -1000;
+            return;
+        }
+
+        fields::Clear_Fields_();
+
+        if (MOX::_order_info_flag == 1) {
+            Add_Missile_Fields_();
+            MOX::_take_control_button = fields::Add_Hot_Key_("[");
+            MOX::_space_field = fields::Add_Grid_Field_(0, 0, 10, 10, 64, 36, &MOX::_xpos, &MOX::_ypos, 0);
+            
+            if (MOX::_missile_warning == 1) {
+                MOX::_msl_warning_button = fields::Add_Hidden_Field_(505, 370, 622, 464, "", 0);
+                MOX::_map_field = -1000;
+            } else {
+                MOX::_map_field = fields::Add_Grid_Field_(500, 364, 1, 1, 121, 102, &MOX::_map_x, &MOX::_map_y, 0);
+                MOX::_msl_warning_button = -1000;
+            }
+
+            MOX::_weapons_button = fields::Add_Multi_Button_Field_(114, 361, "", (s_animation_header*)MOX::_weapons_button_seg, &MOX::_ship_status_display, 0, "", 41);
+            MOX::_specials_button = fields::Add_Multi_Button_Field_(187, 361, "", (s_animation_header*)MOX::_specials_button_seg, &MOX::_ship_status_display, 1, "", 41);
+            MOX::_auto_button = fields::Add_Radio_Button_Field_(273, 364, "", (s_animation_header*)MOX::_auto_button_seg, &MOX::_auto_cmbt_button_value, "a", 40);
+            MOX::_scan_button = fields::Add_Radio_Button_Field_(337, 364, "", (s_animation_header*)MOX::_scan_button_seg, &MOX::_skan_flag, "s", 40);
+            MOX::_board_button = fields::Add_Radio_Button_Field_(273, 392, "", (s_animation_header*)MOX::_board_button_seg, &MOX::_board_flag, "b", 40);
+            MOX::_flee_button = fields::Add_Button_Field_(337, 392, "", (s_animation_header*)MOX::_flee_button_seg, "r", 40);
+            MOX::_wait_button = fields::Add_Button_Field_(273, 420, "", (s_animation_header*)MOX::_wait_button_seg, "w", 40);
+            MOX::_done_button = fields::Add_Button_Field_(337, 420, "", (s_animation_header*)MOX::_cmbt_done_button_seg, "d", 40);
+            COMBAT1::_end_of_turn_button = (int)fields::Add_Hot_Key_("t");
+
+            MOX::_draw_legal_boxes_button = -100;
+            MOX::_msl_impact_warning_button = -100;
+            MOX::_speedx2_button = -100;
+            MOX::_shields_button = -100;
+            MOX::_grid_button = -100;
+            MOX::_self_destruct_button = -100;
+
+            if (MOX::_combat_attacker_player < 8 && MOX::_player[MOX::_combat_attacker_player].objectives == 100 /* 'd' */ &&
+                MOX::_combat_defender_player < 8 && MOX::_player[MOX::_combat_defender_player].objectives == 100 /* 'd' */) {
+                MOX::_super_fast_button = -1000;
+            } else if (MOX::_combat_attacker_player < 8 && MOX::_player[MOX::_combat_attacker_player].objectives == 100 /* 'd' */ &&
+                       MOX::_combat_defender_player < 8 && MOX::_player[MOX::_combat_defender_player].objectives == 100 /* 'd' */) {
+                // Redundant check in disassembly
+                MOX::_super_fast_button = -1000;
+            } else {
+                MOX::_super_fast_button = fields::Add_Hot_Key_("z");
+            }
+
+            info_hotkey = "O";
+            info_y_coord = 448;
+        } else {
+            for (int i = 0; i < 300; ++i) {
+                MOX::_missile_field[i] = -1000;
+            }
+            MOX::_take_control_button = -100;
+            MOX::_space_field = -100;
+            MOX::_map_field = fields::Add_Grid_Field_(500, 364, 1, 1, 121, 102, &MOX::_map_x, &MOX::_map_y, 0);
+            MOX::_msl_warning_button = -100;
+            MOX::_weapons_button = -100;
+            MOX::_specials_button = -100;
+            MOX::_msl_impact_warning_button = fields::Add_Hidden_Field_(264, 383, 407, 396, "", 41);
+            MOX::_speedx2_button = fields::Add_Hidden_Field_(264, 399, 407, 412, "", 41);
+            MOX::_draw_legal_boxes_button = fields::Add_Hidden_Field_(264, 415, 407, 428, "", 41);
+            MOX::_shields_button = fields::Add_Hidden_Field_(264, 431, 407, 444, "", 41);
+            MOX::_grid_button = fields::Add_Hidden_Field_(264, 447, 407, 460, "", 41);
+            MOX::_self_destruct_button = fields::Add_Button_Field_(283, 348, "", (s_animation_header*)MOX::_self_destruct_seg, "", 40);
+            MOX::_auto_button = -100;
+            MOX::_scan_button = -100;
+            COMBAT1::_end_of_turn_button = -100;
+            MOX::_super_fast_button = -1000;
+            MOX::_board_button = -100;
+            MOX::_flee_button = -100;
+            MOX::_wait_button = -100;
+            MOX::_done_button = -100;
+            info_hotkey = " ";
+            info_y_coord = 301;
+        }
+
+        MOX::_cmbt_info_button = fields::Add_Button_Field_(298, info_y_coord, "", (s_animation_header*)MOX::_cmbt_info_button_seg, info_hotkey, 40);
+
+        short weapon_y = 389;
+        for (int i = 0; i < 8; ++i) {
+            MOX::_weapon_button[i] = fields::Add_Hidden_Field_(120, weapon_y - 10, 255, weapon_y, "", 41);
+            weapon_y += 11;
+        }
+
+        MOX::_center_button = fields::Add_Hidden_Field_(15, 379, 100, 460, "c", 41);
+    }
+
+    int32_t __cdecl Send_Tactical_Combat_Message_(int16_t player_idx, int16_t p2, int16_t p3, int16_t p4, int16_t p5) {
+        s_net_combat_message combat_msg;
+
+        combat_msg.x = MOX::_cur_combat_x;
+        combat_msg.y = MOX::_cur_combat_y;
+        combat_msg.f4 = random::Get_Random_Seed_();
+        combat_msg.f8 = p2;
+        combat_msg.f10 = p3;
+        combat_msg.f12 = p4;
+        combat_msg.f14 = p5;
+
+        int16_t net_id = MOX::_player[player_idx].network_player_id;
+
+        return NETMOX::Mox_Send_Message_(net_id, 1000 /* MSG_TACTICAL_COMBAT */, &combat_msg, sizeof(combat_msg));
+    }
+
+    int16_t __cdecl Ship_Controlled_By_Computer_(int16_t ship_idx) {
+        int16_t is_computer = 0;
+        int8_t owner = MOX::_combat_data[ship_idx].owner;
+
+        if (((owner >= 8) || (MOX::_player[owner].objectives != 100) || (MOX::_auto_combat == 1)) &&
+            (MOX::_take_control_flag == 0)) {
+            is_computer = 1;
+        }
+
+        return is_computer;
+    }
+
+    int16_t __cdecl Combat_Ship_Is_Functional_(int16_t ship_idx) {
+        int16_t is_functional = 0;
+
+        if (MOX::_combat_data[ship_idx].unit_status == 0 &&
+            MOX::_combat_data[ship_idx].is_captured == 0) {
+
+            if (!CMBTMOV1::Ship_Is_In_Stasis_(ship_idx)) {
+                is_functional = 1;
+            }
+        }
+
+        return is_functional;
+    }
+
     void __cdecl Do_Combat_Turn_(int16_t param_1, int16_t param_2) {
         MOX::_player_mode[MOX::_combat_attacker_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_attacker_player);
         MOX::_player_mode[MOX::_combat_defender_player] = CMBTAI::Get_Player_Mode_(MOX::_combat_defender_player);
@@ -383,7 +557,7 @@ namespace COMBAT1 {
                                             }
                                         }
                                         
-                                        int16_t tgt_idx = MOX::_combat_grid[tx * 68 + ty];
+                                        int16_t tgt_idx = MOX::_combat_grid[tx][ty];
                                         if (MOX::_board_flag + MOX::_skan_flag <= 0) {
                                             if (tgt_idx == 2000) {
                                                 int8_t orig_owner = MOX::_combat_data[MOX::_cur_ship].owner;
@@ -526,7 +700,7 @@ namespace COMBAT1 {
                                             timer::Release_Time_(1);
                                         } else {
                                             net_processed = 1;
-                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.f0 + 16, MOX::_new_message.f2 + 9);
+                                            COMBINIT::Snap_Center_Combat_Screen_(MOX::_new_message.x + 16, MOX::_new_message.y + 9);
                                             int16_t f10 = MOX::_new_message.f10;
                                             int16_t f12 = MOX::_new_message.f12;
                                             int16_t f14 = MOX::_new_message.f14;
@@ -830,6 +1004,108 @@ namespace COMBAT1 {
         return speed;
     }
 
+    void __cdecl Init_Ship_For_Start_Of_Turn_(int16_t ship_idx) {
+        int16_t is_captured_now = CMBTFIR2::Being_Captured_(ship_idx);
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+
+        ship->combat_status_flags = 0;
+        if (is_captured_now != 0) {
+            CMBTFIR2::Set_Capturing_Flag_(ship_idx);
+        }
+        ship->field42_0x49 = 0;
+
+        if (ship->is_retreating == 1) {
+            if (MOX::_net_flag != 0 && MOX::_combat_init != 0) {
+                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+            }
+            Retreat_Ship_(ship_idx);
+            return;
+        }
+
+        if (ship->is_captured == 1) {
+            ship->movement_left = 0;
+            ship->special_status_flag = 2;
+            for (int i = 0; i < 8; ++i) {
+                ship->weapons[i].shots_left = 0;
+                ship->weapons[i].status = 0;
+            }
+            return;
+        }
+
+        int16_t stasis_count = Get_Number_Of_Ships_In_Stasis_(ship_idx);
+        int16_t speed = Calc_Current_Speed_(ship_idx);
+        ship->current_speed = speed;
+        ship->movement_left = speed;
+
+        if (ship->special_status_flag == 2) {
+            ship->special_status_flag = 3;
+        }
+        if (ship->special_status_flag == 6) {
+            ship->special_status_flag = 7;
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            s_combat_weapon_slot* slot = &ship->weapons[i];
+            uint8_t count = slot->count;
+
+            if (slot->weapon_id == 0x20 /* Stasis Field */) {
+                if ((int16_t)count < stasis_count) {
+                    slot->shots_left = 0;
+                    stasis_count -= (int16_t)count;
+                } else {
+                    slot->shots_left = count - (uint8_t)is_captured_now;
+                }
+            } else {
+                slot->shots_left = count;
+            }
+
+            if (slot->active != -1) {
+                slot->active = 1;
+            }
+
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 16 /* 0x10 */) != 0) {
+                if (TECHDATA::_weapons[slot->weapon_id].rack == 0 && slot->status != 1) {
+                    slot->status = 2;
+                }
+            }
+
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 12 /* 0x0C */) != 0) {
+                if (TECHDATA::_weapons[slot->weapon_id].rack == 1 && slot->status != 1) {
+                    slot->status = 2;
+                }
+            }
+
+            if (slot->weapon_id > 0 && TECHDATA::_weapons[slot->weapon_id].rack == 2) {
+                if (slot->ammo > 0) {
+                    slot->ammo--;
+                }
+            }
+        }
+    }
+
+    int __cdecl qsort_ship_initiative_(const void* p1, const void* p2) {
+        const int16_t* ship1_ptr = reinterpret_cast<const int16_t*>(p1);
+        const int16_t* ship2_ptr = reinterpret_cast<const int16_t*>(p2);
+
+        // First pass: check for equality
+        int16_t init1 = Ship_Initiative_Value_(*ship1_ptr);
+        int16_t init2 = Ship_Initiative_Value_(*ship2_ptr);
+
+        if (init1 == init2) {
+            return 0;
+        }
+
+        // Second pass: identify order (re-calculating values as per assembly)
+        init1 = Ship_Initiative_Value_(*ship1_ptr);
+        init2 = Ship_Initiative_Value_(*ship2_ptr);
+
+        if (init1 < init2) {
+            return -1;
+        }
+
+        return 1;
+    }
+
     int16_t __cdecl Check_For_Winner_() {
         int16_t attacker_count = 0;
         int16_t defender_count = 0;
@@ -870,4 +1146,1021 @@ namespace COMBAT1 {
         return winner;
     }
 
+    int16_t __cdecl Next_Ship_(int16_t param_1) {
+        (void)param_1;
+        int16_t saved_cur_ship = MOX::_cur_ship;
+        int16_t saved_cur_ptr = MOX::_cur_ptr;
+        int16_t planet_has_defenses = 0;
+
+        if (COMBAT1::Check_For_Winner_() != 0) {
+            return 1;
+        }
+
+        do {
+            MOX::_cur_ptr++;
+            int32_t current_ptr = MOX::_cur_ptr;
+
+            if (MOX::_ship_turn_order[current_ptr] == -10) {
+                if (MOX::_cur_ptr != 0 && MOX::_cur_ptr != 1) {
+                    MOX::_cur_ptr = 0;
+                } else {
+                    MOX::_cur_ptr = saved_cur_ptr;
+                }
+            }
+
+            current_ptr = MOX::_cur_ptr;
+            if (MOX::_ship_turn_order[current_ptr] == 0) {
+                if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0) {
+                    planet_has_defenses = 1;
+                }
+            }
+
+            if (saved_cur_ptr == MOX::_cur_ptr) {
+                break;
+            }
+
+            current_ptr = MOX::_cur_ptr;
+            int16_t ship_idx = MOX::_ship_turn_order[current_ptr];
+
+            if (ship_idx == 0) {
+                if (planet_has_defenses != 0) break;
+            } else if (ship_idx != -1) {
+                int8_t owner = MOX::_combat_data[ship_idx].owner;
+                if (MOX::_side_end_of_turn[owner] == 0) {
+                    if (COMBAT1::Combat_Ship_Is_Functional_(ship_idx) != 0) {
+                        break;
+                    }
+                }
+            }
+        } while (true);
+
+        if (MOX::_cur_ptr < 0) {
+            MOX::_cur_ship = -1;
+        } else {
+            MOX::_cur_ship = MOX::_ship_turn_order[MOX::_cur_ptr];
+        }
+
+        int16_t result;
+        if (MOX::_cur_ship < 0) {
+            result = 1;
+            MOX::_cur_ship = saved_cur_ship;
+            MOX::_cur_ptr = saved_cur_ptr;
+        } else {
+            if (MOX::_combat_init != 0 || (CMBTDRW1::Ship_Completely_On_Screen_(MOX::_cur_ship) == 0 && COMBAT1::_start_of_turn != 0)) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[MOX::_cur_ship].x, MOX::_combat_data[MOX::_cur_ship].y);
+            }
+
+            COMBAT1::Add_Tactical_Combat_Fields_();
+            COMBAT1::Assign_Combat_Grids_(MOX::_cur_ship);
+            CMBTDRW1::Refresh_Combat_Screen_Full_();
+
+            int8_t owner = MOX::_combat_data[MOX::_cur_ship].owner;
+            if (owner == MOX::_combat_attacker_player) {
+                MOX::_auto_combat = MOX::_auto_combat_flag[0];
+            } else {
+                MOX::_auto_combat = MOX::_auto_combat_flag[1];
+            }
+
+            if (MOX::_net_flag != 0) {
+                if (owner == MOX::_combat_attacker_player) {
+                    MOX::_net_destination = MOX::_combat_defender_player;
+                } else {
+                    MOX::_net_destination = MOX::_combat_attacker_player;
+                }
+
+                if (owner == MOX::_PLAYER_NUM) {
+                    MOX::_msl_impact_warning_flag = MOX::_saved_msl_warning;
+                    NETMOX::Mox_Send_Message_(MOX::_player[MOX::_net_destination].network_player_id, 1003 /* MSG_TYPE_MISSLE_WARNING */, &MOX::_msl_impact_warning_flag, 2);
+                }
+                CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+            }
+            result = 0;
+        }
+
+        MOX::_missile_warning = 0;
+        if (MOX::_super_fast_flag != 0) {
+            CMBTDRW1::Draw_Super_Fast_Screen_();
+        }
+
+        return result;
+    }
+
+    int16_t __cdecl Ship_Done_Check_(void) {
+        int16_t done = 1;
+        s_combat_data* ship = &MOX::_combat_data[MOX::_cur_ship];
+
+        if (ship->movement_left > 0) {
+            done = 0;
+        }
+
+        for (int i = 0; i < 8; ++i) {
+            if (ship->weapons[i].shots_left > 0) {
+                done = 0;
+            }
+        }
+
+        return done;
+    }
+
+    void __cdecl Retreat_Ship_(uint16_t ship_idx) {
+        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+            if (CMBTDRW1::Ship_On_Screen_(ship_idx) == 0) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[ship_idx].x, MOX::_combat_data[ship_idx].y);
+            }
+            CMBTDRW1::Draw_Retreating_Ship_(ship_idx);
+        }
+
+        if (CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx) == 0) {
+            MOX::_combat_data[ship_idx].unit_status = 5;
+            MOX::_combat_data[ship_idx].is_retreating = 2;
+            CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+            COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
+        }
+    }
+
+    int16_t __cdecl Get_Number_Of_Ships_In_Stasis_(int16_t source_ship_idx) {
+        int16_t count = 0;
+
+        for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+            if (MOX::_combat_data[i].stasis_source_idx == (uint8_t)source_ship_idx) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    void __cdecl Add_Missile_Fields_(void) {
+        MOX::_cur_missile_count = 0;
+        graphics::Set_Window_(0, 0, 639 /* 0x27f */, 350 /* 0x15e */);
+        video::Clip_On_();
+
+        for (int16_t i = 0; i < 300; ++i) {
+            s_missile* missile = &MOX::_missile[i]; // s_missile size 0x1A
+
+            if (missile->type > 0 && CMBTMIS::On_Combat_Screen_((missile->x - 8) / 20, (missile->y - 8) / 20)) {
+                int16_t screen_x = missile->x - (MOX::_cur_combat_x * 20);
+                int16_t screen_y = missile->y - (MOX::_cur_combat_y * 20);
+
+                int16_t field_id = fields::Add_Clipped_Hidden_Field_(
+                    screen_x - 16,
+                    screen_y - 16,
+                    screen_x - 8,
+                    screen_y - 8,
+                    MOX::s__00551100,
+                    0
+                );
+
+                MOX::_missile_field[i] = field_id;
+
+                int grid_idx = i * 6;
+                MOX::_combat_mouse_grid[grid_idx + 0xD88] = screen_x - 16;
+                MOX::_combat_mouse_grid[grid_idx + 0xD8A] = screen_x - 8;
+                MOX::_combat_mouse_grid[grid_idx + 0xD89] = screen_y - 16;
+                MOX::_combat_mouse_grid[grid_idx + 0xD8B] = screen_y - 8;
+                MOX::_combat_mouse_grid[grid_idx + 0xD87] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD86] = 12; // 0x0c
+
+                MOX::_cur_missile_count++;
+            } else {
+                MOX::_missile_field[i] = -1000; // 0xfc18
+
+                int grid_idx = i * 6;
+                MOX::_combat_mouse_grid[grid_idx + 0xD88] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD8A] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD89] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD8B] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD87] = 0;
+                MOX::_combat_mouse_grid[grid_idx + 0xD86] = 0;
+            }
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+    }
+
+    void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            // Check if this ship is being held in stasis by the source ship
+            if (MOX::_combat_data[i].stasis_source_idx == (uint8_t)source_idx) {
+                CMBTFIRE::Remove_Stasis_Beam_(i);
+            }
+
+            // Check if this ship is affected by a black hole created by the source ship
+            if (MOX::_combat_data[i].black_hole_source_idx == (int8_t)source_idx) {
+                MOX::_combat_data[i].black_hole_flag = 0;
+                MOX::_combat_data[i].black_hole_source_idx = -1;
+            }
+
+            // Check if special cooldown (or effect tracking) matches the source ship
+            if (MOX::_combat_data[i].special_cooldown == (int8_t)source_idx) {
+                MOX::_combat_data[i].special_cooldown = -1;
+            }
+        }
+    }
+
+    void __cdecl Assign_Mouse_Images_() {
+        auto _combat_mouse_grid = reinterpret_cast<s_mouse_grid_entry*>(MOX::_combat_mouse_grid);
+
+        if (MOX::_game_type != 1 && MOX::_combat_data[MOX::_cur_ship].owner != MOX::_PLAYER_NUM) {
+            MOX::_cmbt_mouse_list_clock[0] = MOX::_combat_clock_frame;
+            mouse::Set_Mouse_List_(MOX::_cmbt_mouse_list_clock, 1);
+            return;
+        }
+
+        if (MOX::_order_info_flag != 1) {
+            mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+            return;
+        }
+
+        int16_t grid_idx = 1;
+        int16_t x_offset = 0;
+        for (int i = 32; i > 0; --i) {
+            int16_t y_offset = 0;
+            for (int j = 0; j < 18; ++j) {
+                _combat_mouse_grid[grid_idx].x1 = x_offset;
+                _combat_mouse_grid[grid_idx].y1 = y_offset;
+                _combat_mouse_grid[grid_idx].x2 = x_offset + 19;
+                if (j == 17) {
+                    _combat_mouse_grid[grid_idx].y2 = y_offset + 22;
+                } else {
+                    _combat_mouse_grid[grid_idx].y2 = y_offset + 19;
+                }
+                grid_idx++;
+                y_offset += 20;
+            }
+            x_offset += 20;
+        }
+
+        int16_t local_c;
+        int8_t ship_size = MOX::_combat_data[MOX::_cur_ship].size_class;
+        if (ship_size <= 0) {
+            local_c = 0;
+        } else {
+            if (ship_size > 2) {
+                local_c = 20;
+            } else {
+                local_c = 10;
+            }
+        }
+
+        for (int16_t x = 31; x >= 0; --x) {
+            for (int16_t y = 17; y >= 0; --y) {
+                int16_t ship_at_grid = MOX::_combat_grid[MOX::_cur_combat_x + x][MOX::_cur_combat_y + y];
+                int current_idx = x * 18 + y;
+
+                if (MOX::_skan_flag == 1) {
+                    if (ship_at_grid < 0 || ship_at_grid >= MOX::_combat_total_ship_count) {
+                        _combat_mouse_grid[current_idx + 1].icon = 14;
+                    } else {
+                        _combat_mouse_grid[current_idx + 1].icon = 13;
+                    }
+                    _combat_mouse_grid[current_idx + 1].field_A = 12;
+                } else if (MOX::_board_flag == 1) {
+                    if (ship_at_grid < 0 || 
+                        MOX::_combat_data[ship_at_grid].owner == MOX::_combat_data[MOX::_cur_ship].owner ||
+                        ship_at_grid >= MOX::_combat_total_ship_count) {
+                        _combat_mouse_grid[current_idx + 1].icon = 2;
+                    } else {
+                        _combat_mouse_grid[current_idx + 1].icon = 3;
+                    }
+                    _combat_mouse_grid[current_idx + 1].field_A = 12;
+                } else {
+                    if (ship_at_grid < 0) {
+                        _combat_mouse_grid[current_idx + 1].icon = 2;
+                        _combat_mouse_grid[current_idx + 1].field_A = 12;
+                    } else if (ship_at_grid < MOX::_combat_total_ship_count) {
+                        if (MOX::_combat_data[ship_at_grid].owner == MOX::_combat_data[MOX::_cur_ship].owner) {
+                            if (ship_at_grid == MOX::_cur_ship) {
+                                _combat_mouse_grid[current_idx + 1].icon = 2;
+                                _combat_mouse_grid[current_idx + 1].field_A = 12;
+                            } else {
+                                _combat_mouse_grid[current_idx + 1].icon = 1;
+                                _combat_mouse_grid[current_idx + 1].field_A = 0;
+                            }
+                        } else {
+                            if (CMBTMOV1::Ship_Is_In_Stasis_(ship_at_grid)) {
+                                _combat_mouse_grid[current_idx + 1].icon = 1;
+                                _combat_mouse_grid[current_idx + 1].field_A = 0;
+                            } else {
+                                _combat_mouse_grid[current_idx + 1].icon = 12;
+                                _combat_mouse_grid[current_idx + 1].field_A = 12;
+                            }
+                        }
+                    } else if (ship_at_grid == 2000) {
+                        int facing = CMBTMOV1::Get_Facing_(
+                            MOX::_combat_data[MOX::_cur_ship].x,
+                            MOX::_combat_data[MOX::_cur_ship].y,
+                            MOX::_cur_combat_x + x,
+                            MOX::_cur_combat_y + y
+                        );
+                        _combat_mouse_grid[current_idx + 1].icon = (int16_t)(facing / 2) + 4;
+                        _combat_mouse_grid[current_idx + 1].field_A = 12;
+                    }
+                }
+            }
+        }
+
+        if (local_c != 0) {
+            for (int16_t x = 31; x >= 0; --x) {
+                int16_t x_idx = x * 18;
+                for (int16_t y = 17; y >= 0; --y) {
+                    int i = x_idx + y + 1;
+                    int16_t icon = _combat_mouse_grid[i].icon;
+                    if (icon > 3 && icon < 12) {
+                        if (local_c == 20) {
+                            if (x < 31 && y < 17) {
+                                _combat_mouse_grid[i + 19].icon = icon;
+                            }
+                        } else if (local_c == 10) {
+                            if (_combat_mouse_grid[i + 19].icon < 4 || _combat_mouse_grid[i + 19].icon > 11) {
+                                _combat_mouse_grid[i + 19].x1 = 0;
+                                _combat_mouse_grid[i + 19].x2 = 0;
+                                _combat_mouse_grid[i + 19].y1 = 0;
+                                _combat_mouse_grid[i + 19].y2 = 0;
+                            }
+                            if (_combat_mouse_grid[i + 1].icon < 4 || _combat_mouse_grid[i + 1].icon > 11) {
+                                _combat_mouse_grid[i + 1].x1 = 0;
+                                _combat_mouse_grid[i + 1].x2 = 0;
+                                _combat_mouse_grid[i + 1].y1 = 0;
+                                _combat_mouse_grid[i + 1].y2 = 0;
+                            }
+                            if (_combat_mouse_grid[i + 18].icon < 4 || _combat_mouse_grid[i + 18].icon > 11) {
+                                _combat_mouse_grid[i + 18].x1 = 0;
+                                _combat_mouse_grid[i + 18].x2 = 0;
+                                _combat_mouse_grid[i + 18].y1 = 0;
+                                _combat_mouse_grid[i + 18].y2 = 0;
+                            }
+                        }
+                        int16_t x_rect = local_c + 620;
+                        int16_t y_rect = local_c + 340;
+                        _combat_mouse_grid[i].x1 = x_rect - (int16_t)(31 - x) * 20;
+                        _combat_mouse_grid[i].x2 = x_rect - (int16_t)(31 - x) * 20 + 19;
+                        _combat_mouse_grid[i].y1 = y_rect - (int16_t)(17 - y) * 20;
+                        _combat_mouse_grid[i].y2 = y_rect - (int16_t)(17 - y) * 20 + 19;
+                    }
+                }
+            }
+        }
+
+        mouse::Set_Mouse_List_(reinterpret_cast<int16_t*>(_combat_mouse_grid), 0x36E);
+    }
+
+    void __cdecl Set_Cur_Ship_To_(int16_t ship_idx) {
+        if (ship_idx == 0) {
+            if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() <= 0) {
+                return;
+            }
+        }
+
+        int16_t cur_ptr_idx = -1;
+        int16_t total_ships = MOX::_combat_total_ship_count;
+
+        for (int16_t i = 0; i < total_ships; ++i) {
+            int16_t order_val = MOX::_ship_turn_order[i];
+            if (order_val == -10) {
+                break;
+            }
+            if (ship_idx == order_val) {
+                cur_ptr_idx = i;
+            }
+        }
+
+        if (cur_ptr_idx == -1) {
+            for (int16_t i = 0; i < total_ships; ++i) {
+                if (MOX::_ship_turn_order[i] == -1) {
+                    cur_ptr_idx = i;
+                    MOX::_ship_turn_order[i] = ship_idx;
+                    break;
+                }
+            }
+        }
+
+        MOX::_cur_ptr = cur_ptr_idx;
+        MOX::_cur_ship = ship_idx;
+
+        CMBTDRW1::Refresh_Combat_Screen_Full_();
+    }
+
+    int16_t __cdecl Enemy_Dissipator_Exists_(int16_t player_idx) {
+        int16_t exists = 0;
+        int16_t total_ships = MOX::_combat_total_ship_count;
+
+        for (int16_t i = 0; i < total_ships; ++i) {
+            // 0x25 = Shield Dissipator
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 0x25) != 0) {
+                s_combat_data* ship = &MOX::_combat_data[i];
+
+                if (ship->is_captured == 0 && ship->unit_status == 0 && ship->owner != player_idx) {
+                    exists = 1;
+                }
+            }
+        }
+
+        return exists;
+    }
+
+    void __cdecl Assign_Combat_Grids_(int16_t param_1) {
+        s_combat_data* ship;
+        int16_t dim;
+        int16_t i;
+        int16_t j;
+
+        for (i = 0; i < 81; ++i) {
+            for (j = 0; j < 68; ++j) {
+                MOX::_combat_grid[i][j] = -1;
+            }
+        }
+
+        if (MOX::_order_info_flag == 1) {
+            for (int16_t ship_idx = 0; ship_idx < MOX::_combat_total_ship_count; ++ship_idx) {
+                ship = &MOX::_combat_data[ship_idx];
+
+                if (ship->unit_status == 0) {
+                    MOX::_combat_grid[ship->x][ship->y] = ship_idx;
+
+                    if (ship_idx != param_1 || MOX::_skan_flag == 1 || MOX::_board_flag == 1) {
+                        if (ship_idx == 0) {
+                            if (MOX::_cmbt_colony_id == -1) {
+                                dim = 6;
+                            } else {
+                                int8_t planet_size = MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
+                                switch (planet_size) {
+                                    case 0: dim = 3; break;
+                                    case 1: dim = 4; break;
+                                    case 2: dim = 6; break;
+                                    case 3: dim = 7; break;
+                                    case 4: dim = 8; break;
+                                    default: dim = 6; break;
+                                }
+                            }
+
+                            for (i = 0; i < dim; ++i) {
+                                for (j = 0; j < dim; ++j) {
+                                    MOX::_combat_grid[ship->x + i][ship->y + j] = 0;
+                                }
+                            }
+                        } else {
+                            dim = (ship->size_class + 1) / 2;
+                            if (dim == 1) {
+                                for (i = 0; i < 2; ++i) {
+                                    for (j = 0; j < 2; ++j) {
+                                        MOX::_combat_grid[ship->x + i][ship->y + j] = ship_idx;
+                                    }
+                                }
+                            } else if (dim > 1 && dim < 4) {
+                                for (i = 0; i < 3; ++i) {
+                                    for (j = 0; j < 3; ++j) {
+                                        MOX::_combat_grid[ship->x + i][ship->y + j] = ship_idx;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (MOX::_cur_ship == param_1) {
+            COMBAT1::Set_Legal_Moves_(param_1, MOX::_combat_data[param_1].movement_left, 1);
+            COMBAT1::Assign_Mouse_Images_();
+        }
+    }
+
+    void __cdecl Initiate_Boarding_Action_(int16_t attacker_idx, uint16_t defender_idx) {
+        bool can_board = true;
+        int16_t range = static_cast<int16_t>(CMBTAI::Range_To_Ship_(attacker_idx, static_cast<int16_t>(defender_idx)));
+        int16_t has_transporters = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* SPEC_TRANSPORTERS */);
+        int16_t max_range = (has_transporters == 1) ? 4 : 1;
+        s_combat_data* target = &MOX::_combat_data[defender_idx];
+        char msg_buffer[80];
+        int msg_idx = 0;
+
+        if (target->owner > 8) {
+            can_board = false;
+            msg_idx = 0x3E; // Monsters cannot be boarded
+        } else if (defender_idx == 0) {
+            can_board = false;
+            msg_idx = 0x3F; // Planets cannot be boarded
+        } else if (MOX::_combat_data[MOX::_cur_ship].owner == target->owner) {
+            can_board = false;
+            msg_idx = (target->is_captured == 0) ? 0x40 : 0x41; // Cannot board own ship
+        } else if (range > max_range) {
+            can_board = false;
+            msg_idx = 0x42; // Out of range
+        } else if (max_range != 4 && COMBAT1::Calc_Current_Speed_(static_cast<int16_t>(defender_idx)) > 0) {
+            can_board = false;
+            msg_idx = 0x43; // Ship moving too fast
+        } else if (MOX::_combat_data[MOX::_cur_ship].marine_count == 0) {
+            can_board = false;
+            msg_idx = 0x44; // No marines
+        } else {
+            if (max_range == 4) {
+                if (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0) {
+                    uint32_t bearing = CMBTDRW1::Relative_Bearing_(static_cast<int16_t>(defender_idx), attacker_idx);
+                    int16_t shield_idx = CMBTFIRE::Facing_Shield_(static_cast<int16_t>(bearing));
+                    if (target->shield_arc_current[shield_idx] > 0) {
+                        can_board = false;
+                        KEN::Ken_Get_Text_Message_(0x45, msg_buffer, 0x50);
+                        palette::Refresh_Palette_();
+                        GENDRAW::Draw_Warning_Box_(msg_buffer);
+                        CMBTDRW1::Refresh_Combat_Screen_Full_();
+                    }
+                    if (COMBINIT::Does_Combat_Ship_Have_Special_(static_cast<int16_t>(defender_idx), 0xD /* SPEC_WARP_DISSIPATOR */) != 0) {
+                        can_board = false;
+                        msg_idx = 0x46; // Warp dissipator blocks
+                    }
+                }
+            }
+        }
+
+        if (!can_board) {
+            if (msg_idx != 0) {
+                KEN::Ken_Get_Text_Message_(static_cast<int16_t>(msg_idx), msg_buffer, 0x50);
+                palette::Refresh_Palette_();
+                GENDRAW::Draw_Warning_Box_(msg_buffer);
+                CMBTDRW1::Refresh_Combat_Screen_Full_();
+            }
+        } else {
+            int16_t marines_sent;
+            int16_t result = CMBTFIR2::Init_Boarding_Action_(MOX::_cur_ship, &marines_sent);
+            if (result != 0) {
+                MOX::_combat_data[MOX::_cur_ship].marine_count -= static_cast<int8_t>(marines_sent);
+
+                if (max_range == 4 && (range > 1 || MOX::_combat_data[defender_idx].current_speed > 0)) {
+                    if (COMBINIT::Does_Combat_Ship_Have_Special_(static_cast<int16_t>(defender_idx), 7 /* SPEC_DISPLACEMENT_DEVICE */) != 0) {
+                        marines_sent = marines_sent / 3;
+                    }
+                    if (marines_sent <= 0) {
+                        result = 0;
+                    }
+                }
+
+                if (MOX::_net_flag != 0 && (result == 1 || result == 2)) {
+                    int16_t msg_player = MOX::_combat_attacker_player;
+                    if (MOX::_combat_data[attacker_idx].owner == MOX::_combat_attacker_player) {
+                        msg_player = MOX::_combat_defender_player;
+                    }
+                    if (MOX::_PLAYER_NUM != msg_player) {
+                        COMBAT1::Send_Tactical_Combat_Message_(msg_player, 0x271F, static_cast<int16_t>(defender_idx), marines_sent, result);
+                    }
+                }
+
+                if (result == 1) { // Raid
+                    if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 1) {
+                        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+                            CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
+                        }
+                        MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                    } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
+                        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+                            CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
+                        }
+                        MOX::_combat_data[MOX::_cur_ship].special_status_flag = 6;
+                    }
+                    CMBTFIR2::Set_Boarded_Flag_(MOX::_cur_ship);
+                    CMBTFIR2::Resolve_Raid_(MOX::_cur_ship, static_cast<int16_t>(defender_idx), &marines_sent);
+                    MOX::_combat_data[MOX::_cur_ship].marine_count += static_cast<int8_t>(marines_sent);
+                } else if (result == 2) { // Capture
+                    if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 1) {
+                        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+                            CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 2);
+                        }
+                        MOX::_combat_data[MOX::_cur_ship].special_status_flag = 2;
+                    } else if (MOX::_combat_data[MOX::_cur_ship].special_status_flag == 4) {
+                        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+                            CMBTSPEC::Draw_Cloak_(MOX::_cur_ship, 5);
+                        }
+                        MOX::_combat_data[MOX::_cur_ship].special_status_flag = 6;
+                    }
+                    CMBTFIR2::Set_Boarded_Flag_(MOX::_cur_ship);
+                    CMBTFIR2::Resolve_Capture_(MOX::_cur_ship, static_cast<int16_t>(defender_idx), marines_sent, target->x * 20, target->y * 20);
+                }
+
+                MOX::_board_flag = 0;
+                if (MOX::_net_flag != 0) {
+                    CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+                }
+            }
+        }
+    }
+
+    void __cdecl Seeking_Missiles_(int16_t player_idx) {
+        int16_t resolved_missile_idx[300];
+        int16_t resolved_target_idx[300];
+        int16_t is_finished;
+        int16_t resolve_count;
+        int16_t target_x, target_y;
+
+        do {
+            is_finished = 1;
+            resolve_count = 0;
+            int16_t screen_updated = 0;
+
+            for (int16_t i = 0; i < 300; ++i) {
+                s_missile* missile = &MOX::_missile[i];
+                int16_t target_idx = missile->target_unit_idx;
+
+                if (missile->type <= 0 || missile->travel_dist <= 0 || missile->is_anti_missile_rocket != 0) {
+                    continue;
+                }
+
+                if (MOX::_combat_init != 0) {
+                    if (missile->fighter_count == -1) {
+                        if (MOX::_combat_init != 0) continue;
+                    }
+                } else {
+                    if (MOX::_combat_data[target_idx].owner != player_idx) {
+                        if (player_idx != MOX::_combat_defender_player || missile->source_unit_idx != target_idx || 
+                            MOX::_combat_data[missile->source_unit_idx].owner == player_idx) {
+                            continue;
+                        }
+                    }
+                }
+
+                if (missile->is_anti_missile_rocket == 0) {
+                    COMBINIT::Ship_Center_Offsets_(target_idx, &target_x, &target_y);
+                    target_x += MOX::_combat_data[target_idx].x * 20;
+                    target_y += MOX::_combat_data[target_idx].y * 20;
+                } else {
+                    target_x = MOX::_missile[target_idx].x;
+                    target_y = MOX::_missile[target_idx].y;
+                }
+
+                uint8_t resolve_flag = CMBTMIS::Move_Missile_(i, target_x, target_y, missile->speed);
+
+                if (CMBTMIS::Missile_On_Combat_Screen_(i)) {
+                    screen_updated = 1;
+                }
+
+                if (missile->x != target_x || missile->y != target_y) {
+                    is_finished = 0;
+                }
+
+                if (resolve_flag == 1) {
+                    if (TECHDATA::_weapons[missile->type].rack != 4 /* FIGHTER */ || missile->is_active == 1) {
+                        resolved_missile_idx[resolve_count] = i;
+                        resolved_target_idx[resolve_count] = target_idx;
+                        resolve_count++;
+                    }
+                }
+            }
+
+            if (screen_updated != 0) {
+                video::Set_Page_Off_();
+                CMBTDRW1::Draw_Main_Combat_Screen_();
+                RUSS::Mox_Sync_Update_();
+            }
+
+            for (int16_t j = 0; j < resolve_count; ++j) {
+                int16_t m_idx = resolved_missile_idx[j];
+                int16_t t_idx = resolved_target_idx[j];
+                s_missile* missile = &MOX::_missile[m_idx];
+                s_combat_data* target_ship = &MOX::_combat_data[t_idx];
+
+                if (MOX::_missile[m_idx].target_unit_idx == t_idx) {
+                    if (target_ship->unit_status == 0) {
+                        int16_t owner = CMBTMIS::Missile_Owner_(m_idx);
+                        if (owner != target_ship->owner || missile->source_unit_idx == t_idx) {
+                            if (missile->is_anti_missile_rocket == 0) {
+                                COMBINIT::Ship_Center_Offsets_(t_idx, &target_x, &target_y);
+                                target_x += target_ship->x * 20;
+                                target_y += target_ship->y * 20;
+                            } else {
+                                target_x = MOX::_missile[t_idx].x;
+                                target_y = MOX::_missile[t_idx].y;
+                            }
+                            CMBTMIS::Resolve_Missile_(m_idx, target_x, target_y);
+                        } else {
+                            CMBTMIS::Kill_Missile_(m_idx);
+                        }
+                    } else {
+                        CMBTMIS::Kill_Missile_(m_idx);
+                    }
+                }
+            }
+        } while (is_finished == 0);
+
+        for (int16_t k = 0; k < 300; ++k) {
+            s_missile* missile = &MOX::_missile[k];
+            int16_t target_idx = missile->target_unit_idx;
+
+            if (missile->type < 1 || TECHDATA::_weapons[missile->type].rack == 4 /* FIGHTER */ || 
+                missile->fighter_count == -1 || missile->is_anti_missile_rocket != 0) {
+                if (missile->fighter_count == -1) {
+                    missile->fighter_count = 0;
+                }
+            } else {
+                bool should_increment = false;
+                if (MOX::_combat_init == 0) {
+                    if (MOX::_combat_data[target_idx].owner != player_idx) {
+                        if (player_idx == MOX::_combat_defender_player && missile->source_unit_idx == target_idx && 
+                            MOX::_combat_data[missile->source_unit_idx].owner != player_idx) {
+                            should_increment = true;
+                        }
+                    } else {
+                        should_increment = true;
+                    }
+                } else {
+                    should_increment = true;
+                }
+
+                if (should_increment) {
+                    missile->fighter_count++;
+                }
+            }
+        }
+    }
+
+    int16_t __cdecl Ship_Initiative_Value_(int16_t ship_idx) {
+        int16_t initiative = -5;
+
+        if (ship_idx != -1) {
+            s_combat_data* ship = &MOX::_combat_data[ship_idx];
+            initiative = (ship->tac_val_attack / 10) + ship->current_speed;
+        }
+
+        return initiative;
+    }
+
+    void __cdecl Set_Legal_Moves_(int16_t ship_idx, int16_t range, int16_t check_cost) {
+        int16_t footprint;
+        int16_t ship_x;
+        int16_t ship_y;
+        int16_t x_pixel;
+        int16_t y_pixel;
+
+        if (((COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */) ||
+              COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x16 /* TRANSPORTER */)) &&
+             CMBTFIR2::Used_Teleporter_(ship_idx) == 0) &&
+            (range < 20)) {
+            range = 20;
+        }
+
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        footprint = (ship->size_class + 1) / 2;
+        if (footprint > 2) {
+            footprint = 2;
+        }
+
+        ship_x = ship->x;
+        ship_y = ship->y;
+        x_pixel = 0;
+
+        for (int16_t x = 0; x < 81; ++x) {
+            y_pixel = 0;
+            for (int16_t y = 0; y < 68; ++y) {
+                int16_t* grid_cell = &MOX::_combat_grid[x][y];
+
+                if (*grid_cell == -1) {
+                    int16_t dx = ship_x - x;
+                    if (dx < 0) dx = -dx;
+
+                    int16_t dy = ship_y - y;
+                    if (dy < 0) dy = -dy;
+
+                    if (dx <= range && dy <= range) {
+                        *grid_cell = 2000;
+
+                        if (footprint == 1) {
+                            for (int16_t f_dx = 0; f_dx < 2; ++f_dx) {
+                                for (int16_t f_dy = 0; f_dy < 2; ++f_dy) {
+                                    if ((x + f_dx > 80) || (y + f_dy > 67)) {
+                                        *grid_cell = -1;
+                                    } else {
+                                        int16_t cell_val = MOX::_combat_grid[x + f_dx][y + f_dy];
+                                        if (cell_val != -1 && cell_val != 2000 && cell_val != ship_idx) {
+                                            *grid_cell = -1;
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (footprint == 2) {
+                            for (int16_t f_dx = 0; f_dx <= 2; ++f_dx) {
+                                for (int16_t f_dy = 0; f_dy <= 2; ++f_dy) {
+                                    if ((x + f_dx > 80) || (y + f_dy > 67)) {
+                                        *grid_cell = -1;
+                                    } else {
+                                        int16_t cell_val = MOX::_combat_grid[x + f_dx][y + f_dy];
+                                        if (cell_val != -1 && cell_val != 2000 && cell_val != ship_idx) {
+                                            *grid_cell = -1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((81 - footprint < x) || (68 - footprint < y)) {
+                            *grid_cell = -1;
+                        }
+
+                        if (*grid_cell == 2000 && check_cost == 1) {
+                            int16_t cost = CMBTMOV1::Move_Cost_(ship_idx, x, y);
+                            if (ship->movement_left < cost) {
+                                *grid_cell = -1;
+                            }
+
+                            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */)) {
+                                if (*grid_cell == -1 && CMBTFIR2::Used_Teleporter_(ship_idx) == 0) {
+                                    if (CMBTFIRE::Special_Is_Turned_On_(ship_idx, 0x21 /* SUBSPACE_TELEPORTER */) == 1) {
+                                        if (CMBTAI::Range_To_XY_(ship_idx, x_pixel, y_pixel) <= 20) {
+                                            *grid_cell = 2000;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                y_pixel += 20;
+            }
+            x_pixel += 20;
+        }
+    }
+
+    void __cdecl Set_Combat_Help_Fields_(void) {
+        int16_t start_index;
+
+        if (MOX::_order_info_flag == 1) {
+            MOX::_help_entry_list[0] = 617;
+            MOX::_help_entry_list[1] = 292;
+            MOX::_help_entry_list[2] = 446;
+            MOX::_help_entry_list[3] = 374;
+            MOX::_help_entry_list[4] = 472;
+
+            MOX::_help_entry_list[5] = 623;
+            MOX::_help_entry_list[6] = 271;
+            MOX::_help_entry_list[7] = 362;
+            MOX::_help_entry_list[8] = 330;
+            MOX::_help_entry_list[9] = 386;
+
+            MOX::_help_entry_list[10] = 624;
+            MOX::_help_entry_list[11] = 332;
+            MOX::_help_entry_list[12] = 362;
+            MOX::_help_entry_list[13] = 394;
+            MOX::_help_entry_list[14] = 386;
+
+            MOX::_help_entry_list[15] = 625;
+            MOX::_help_entry_list[16] = 271;
+            MOX::_help_entry_list[17] = 389;
+            MOX::_help_entry_list[18] = 330;
+            MOX::_help_entry_list[19] = 414;
+
+            MOX::_help_entry_list[20] = 626;
+            MOX::_help_entry_list[21] = 333;
+            MOX::_help_entry_list[22] = 389;
+            MOX::_help_entry_list[23] = 394;
+            MOX::_help_entry_list[24] = 414;
+
+            MOX::_help_entry_list[25] = 627;
+            MOX::_help_entry_list[26] = 271;
+            MOX::_help_entry_list[27] = 418;
+            MOX::_help_entry_list[28] = 330;
+            MOX::_help_entry_list[29] = 441;
+
+            MOX::_help_entry_list[30] = 628;
+            MOX::_help_entry_list[31] = 333;
+            MOX::_help_entry_list[32] = 418;
+            MOX::_help_entry_list[33] = 394;
+            MOX::_help_entry_list[34] = 441;
+
+            start_index = 7;
+        }
+        else {
+            MOX::_help_entry_list[0] = 695;
+            MOX::_help_entry_list[1] = 282;
+            MOX::_help_entry_list[2] = 350;
+            MOX::_help_entry_list[3] = 384;
+            MOX::_help_entry_list[4] = 371;
+
+            MOX::_help_entry_list[5] = 696;
+            MOX::_help_entry_list[6] = 264;
+            MOX::_help_entry_list[7] = 383;
+            MOX::_help_entry_list[8] = 407;
+            MOX::_help_entry_list[9] = 396;
+
+            MOX::_help_entry_list[10] = 697;
+            MOX::_help_entry_list[11] = 264;
+            MOX::_help_entry_list[12] = 399;
+            MOX::_help_entry_list[13] = 407;
+            MOX::_help_entry_list[14] = 412;
+
+            MOX::_help_entry_list[15] = 698;
+            MOX::_help_entry_list[16] = 264;
+            MOX::_help_entry_list[17] = 415;
+            MOX::_help_entry_list[18] = 407;
+            MOX::_help_entry_list[19] = 428;
+
+            MOX::_help_entry_list[20] = 699;
+            MOX::_help_entry_list[21] = 264;
+            MOX::_help_entry_list[22] = 431;
+            MOX::_help_entry_list[23] = 407;
+            MOX::_help_entry_list[24] = 444;
+
+            MOX::_help_entry_list[25] = 700;
+            MOX::_help_entry_list[26] = 264;
+            MOX::_help_entry_list[27] = 447;
+            MOX::_help_entry_list[28] = 407;
+            MOX::_help_entry_list[29] = 460;
+
+            start_index = 6;
+        }
+
+        MOX::_help_entry_list[start_index * 5 + 0] = 618;
+        MOX::_help_entry_list[start_index * 5 + 1] = 10;
+        MOX::_help_entry_list[start_index * 5 + 2] = 360;
+        MOX::_help_entry_list[start_index * 5 + 3] = 106;
+        MOX::_help_entry_list[start_index * 5 + 4] = 471;
+
+        MOX::_help_entry_list[(start_index + 1) * 5 + 1] = 502;
+        MOX::_help_entry_list[(start_index + 1) * 5 + 2] = 360;
+        MOX::_help_entry_list[(start_index + 1) * 5 + 3] = 626;
+        MOX::_help_entry_list[(start_index + 1) * 5 + 4] = 471;
+        if (MOX::_missile_warning == 1) {
+            MOX::_help_entry_list[(start_index + 1) * 5 + 0] = 621;
+        }
+        else {
+            MOX::_help_entry_list[(start_index + 1) * 5 + 0] = 620;
+        }
+
+        MOX::_help_entry_list[(start_index + 2) * 5 + 0] = 622;
+        MOX::_help_entry_list[(start_index + 2) * 5 + 1] = 399;
+        MOX::_help_entry_list[(start_index + 2) * 5 + 2] = 360;
+        MOX::_help_entry_list[(start_index + 2) * 5 + 3] = 495;
+        MOX::_help_entry_list[(start_index + 2) * 5 + 4] = 471;
+
+        int16_t ship_info_base_idx = start_index + 3;
+
+        if (MOX::_ship_status_display == 0) {
+            for (int i = 0; i < 8; ++i) {
+                int16_t weapon_id = MOX::_combat_data[MOX::_cur_ship].weapons[i].weapon_id;
+                int16_t tech_app_id = TECHDATA::_weapons[weapon_id].tech_application_id;
+                if (tech_app_id == 0) {
+                    tech_app_id = -1;
+                }
+                MOX::_help_entry_list[(ship_info_base_idx + i) * 5 + 0] = tech_app_id;
+            }
+        }
+        else {
+            int16_t specials_found = 0;
+            for (int i = 0; i < 39; ++i) {
+                if (struct_::Test_Bit_Field_(MOX::_combat_data[MOX::_cur_ship].special_device_flags, i) == 1) {
+                    int16_t tech_app_id = TECHDATA::_specials[i].tech_application_id;
+                    MOX::_help_entry_list[(ship_info_base_idx + specials_found) * 5 + 0] = tech_app_id;
+                    specials_found++;
+                }
+            }
+            for (int i = specials_found; i < specials_found + 8; ++i) {
+                MOX::_help_entry_list[(ship_info_base_idx + i) * 5 + 0] = -1;
+            }
+        }
+
+        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 2] = 379;
+        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 4] = 389;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 2] = 390;
+        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 4] = 400;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 2] = 401;
+        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 4] = 411;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 2] = 412;
+        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 4] = 422;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 2] = 423;
+        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 4] = 433;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 2] = 434;
+        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 4] = 444;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 2] = 445;
+        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 4] = 455;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 1] = 114;
+        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 2] = 456;
+        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 3] = 264;
+        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 4] = 467;
+
+        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 0] = 629;
+        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 1] = 113;
+        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 2] = 360;
+        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 3] = 265;
+        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 4] = 471;
+
+        fields::Set_Help_List_(MOX::_help_entry_list, start_index + 12);
+    }
 }

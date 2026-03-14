@@ -107,4 +107,14 @@ namespace CMBTFIR2 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5830});
         fn(ship);
     }
+
+    int16_t __cdecl Being_Captured_(int16_t ship_idx);
+
+    void __cdecl Set_Capturing_Flag_(int16_t unit_idx);
+
+    inline int16_t __cdecl Init_Boarding_Action_(int16_t ship_idx, int16_t* marines_sent) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E70C0});
+        return fn(ship_idx, marines_sent);
+    }
 }

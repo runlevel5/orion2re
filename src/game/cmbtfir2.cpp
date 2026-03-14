@@ -224,4 +224,12 @@ namespace CMBTFIR2 {
 
         return computer_bonus + crew_bonus + trait_bonus + fleet_bonus + specials_bonus;
     }
+
+    int16_t __cdecl Being_Captured_(int16_t ship_idx) {
+        return (int16_t)struct_::Test_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 4);
+    }
+
+    void __cdecl Set_Capturing_Flag_(int16_t unit_idx) {
+        struct_::Set_Bit_Field_(&MOX::_combat_data[unit_idx].combat_status_flags, 4);
+    }
 }

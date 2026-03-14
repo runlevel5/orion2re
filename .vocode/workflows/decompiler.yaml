@@ -471,7 +471,7 @@ workflows:
 
              - For the actual function body, you must put it under `src/game/<namespace>.cpp` and create a definition in
                `src/game/<namespace>.h`. If you need to create a new file, make sure you include "pch.h" precompiled header at the top
-               of the new file.
+               of the new file. You shall never add any additional includes to .cpp files as pch.h includes all headers.
 
                Example:
 

@@ -43,4 +43,10 @@ namespace CMBTMOV1 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046EE10});
         return fn(ship_idx);
     }
+
+    inline int __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        using Fn = int(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00470070});
+        return fn(x1, y1, x2, y2);
+    }
 }

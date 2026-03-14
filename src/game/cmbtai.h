@@ -21,4 +21,16 @@ namespace CMBTAI {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044D610});
         fn();
     }
+
+    inline int __cdecl Range_To_Ship_(int16_t attacker_idx, int16_t defender_idx) {
+        using Fn = int(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044C390});
+        return fn(attacker_idx, defender_idx);
+    }
+
+    inline int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t x, int16_t y) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044C260});
+        return fn(ship_idx, x, y);
+    }
 }

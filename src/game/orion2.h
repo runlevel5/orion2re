@@ -3155,8 +3155,8 @@ struct s_nebula {
 typedef struct s_net_combat_message s_net_combat_message, *Ps_net_combat_message;
 
 struct s_net_combat_message {
-    short f0;
-    short f2;
+    short x;
+    short y;
     int f4;
     short f8;
     short f10;

@@ -3,6 +3,14 @@
 struct s_animation_header;
 struct s_player;
 struct s_mp_screen;
+struct s_mouse_grid_entry {
+    int16_t icon;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t field_A;
+};
 struct s_qship;
 struct s_missile;
 struct s_combat_data;
@@ -50,8 +58,10 @@ namespace MOX {
     inline int16_t& _msl_warning_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059c028});
     inline int16_t& _wait_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6be});
     inline int16_t& _scan_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059bf30});
-    inline int16_t* _missile_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AF0});
-    inline int16_t* _combat_grid = reinterpret_cast<int16_t*>(std::uintptr_t{0x00598770});
+    inline int16_t (&_missile_field)[300] =
+        *reinterpret_cast<int16_t(*)[300]>(std::uintptr_t{0x00597AF0});
+    inline int16_t (&_combat_grid)[81][68] =
+        *reinterpret_cast<int16_t (*)[81][68]>(std::uintptr_t{0x00598770});
     inline int16_t* _weapon_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E80});
     inline int16_t* _ship_turn_order = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BB20});
     inline int16_t* _side_end_of_turn = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596DA0});
@@ -127,6 +137,8 @@ namespace MOX {
     inline int8_t& food_bonus_base_4_6 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559698});
     inline int8_t& food_bonus_base_5_8 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559699});
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
+    inline int16_t& _cur_missile_count =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597408});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
@@ -176,6 +188,8 @@ namespace MOX {
     inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
     inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});
     inline char (&_temp_string)[512] = *reinterpret_cast<char(*)[512]>(std::uintptr_t{0x00596230});
+    inline int16_t& _take_control_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D62});
+    inline int16_t& _auto_cmbt_button_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C60});
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
     inline int16_t& _ai_retreat_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B436});
     inline int16_t& _bio_weapon_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B446});
@@ -297,6 +311,7 @@ namespace MOX {
     // Suggested name: MOX::_gravity_table
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
+    inline int16_t* _cmbt_mouse_list_clock = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558DB8});
     inline int16_t* _mouse_list_arrow = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00558D10 });
     inline int16_t* _mouse_list_variable = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D20});
     inline int16_t* _mouse_list_none = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D70});
