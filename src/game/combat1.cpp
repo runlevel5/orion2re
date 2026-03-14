@@ -1356,13 +1356,13 @@ namespace COMBAT1 {
 
     void __cdecl Assign_Mouse_Images_() {
         if (MOX::_game_type != 1 && MOX::_combat_data[MOX::_cur_ship].owner != MOX::_PLAYER_NUM) {
-            MOX::_cmbt_mouse_list_clock[0] = MOX::_combat_clock_frame;
-            mouse::Set_Mouse_List_(MOX::_cmbt_mouse_list_clock, 1);
+            MOX::_cmbt_mouse_list_clock.icon = MOX::_combat_clock_frame;
+            mouse::Set_Mouse_List_(&MOX::_cmbt_mouse_list_clock, 1);
             return;
         }
 
         if (MOX::_order_info_flag != 1) {
-            mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
             return;
         }
 
@@ -1513,7 +1513,7 @@ namespace COMBAT1 {
             }
         }
 
-        mouse::Set_Mouse_List_(reinterpret_cast<int16_t*>(MOX::_combat_mouse_grid), 878);
+        mouse::Set_Mouse_List_(MOX::_combat_mouse_grid, 878);
     }
 
     void __cdecl Set_Cur_Ship_To_(int16_t ship_idx) {

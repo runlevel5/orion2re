@@ -205,9 +205,9 @@ void __cdecl Draw_Modem_Setup_Screen_(void) {
 
         MOX::_temp_string[0] = '\0';
 
-        mouse::Set_Mouse_List(MOX::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
         MOX2::Get_Auto_Function_(&saved_auto_func);
-        mouse::Set_Mouse_List(MOX::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
 
         fields::Clear_Fields_();
         Load_MP_Setup_Pictures_();
@@ -218,7 +218,7 @@ void __cdecl Draw_Modem_Setup_Screen_(void) {
         palette::Refresh_Palette_();
         palstore::Darken_Palette_(100);
 
-        mouse::Set_Mouse_List(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         EVANHELP::Set_Multi_Player_Setup_Screen_Help_List_();
 
         video::Set_Page_Off_();
@@ -234,7 +234,7 @@ void __cdecl Draw_Modem_Setup_Screen_(void) {
         video::Copy_Back_To_Off_();
 
         fields::Assign_Auto_Function_(Draw_MP_Setup_Screen_, 1);
-        mouse::Set_Mouse_List(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         Add_MP_Setup_Screen_Fields_();
 
         while (true) {

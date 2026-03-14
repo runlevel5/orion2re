@@ -439,7 +439,7 @@ namespace OFFICER {
             _officer_button_mode = -1;
         } else {
             if (_officer_button_mode == 0) {
-                mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
+                mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_hand_mouse, 1);
                 MOX::_officer_selected = -1;
             }
         }
@@ -456,7 +456,7 @@ namespace OFFICER {
         int16_t result = 0;
         int32_t cost = Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
         // Leader status 4 (0x4) generally represents being available for hire.
         s_leader_data* leader = &MOX::_leaders[leader_idx];
@@ -641,7 +641,7 @@ namespace OFFICER {
         video::Set_Refresh_Stencil_();
         MOX::_draw_officer_to_back = 1;
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
         ERIC::Fast_Fade_Out_();
 
         fonts::Load_Palette_(8, 0, 0xFF);
@@ -659,7 +659,7 @@ namespace OFFICER {
         palette::Clear_Palette_Changes_(0, 0xFF);
         RUSS::Mox_Sync_Update_();
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         ERIC::Fast_Fade_In_();
 
         fields::Enable_Draw_All_Fields_();
@@ -929,7 +929,7 @@ namespace OFFICER {
             int16_t scanned_id = fields::Scan_Input_();
 
             if (cancel_btn == input) {
-                mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 MOX::_offpop_big_icon_selected = -1;
                 _officer_button_mode = -1;
                 MOX::_officer_selected = -1;
@@ -939,12 +939,12 @@ namespace OFFICER {
             if (hire_btn == input) {
                 if (MOX::_officer_selected < 0) {
                     if (_officer_button_mode == 0) {
-                        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                         MOX::_offpop_big_icon_selected = -1;
                         MOX::_draw_officer_to_back = 1;
                         _officer_button_mode = -1;
                     } else {
-                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
+                        mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_hand_mouse, 1);
                         MOX::_offpop_big_icon_selected = -1;
                         _officer_button_mode = 0;
                         MOX::_officer_selected = -1;
@@ -1078,23 +1078,23 @@ namespace OFFICER {
             if (_officer_dismiss_btn == input) {
                 if (_officer_button_mode == 2) {
                     _officer_button_mode = -1;
-                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 } else {
                     _officer_button_mode = 2;
-                    mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
+                    mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_hand_mouse, 1);
                 }
             }
 
             if (_officer_pool_btn == input) {
                 if (_officer_button_mode == 1) {
                     _officer_button_mode = -1;
-                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 } else {
                     if (MOX::_officer_selected > -1) {
                         Move_Officer_To_Limbo_((int16_t)MOX::_officer_selected);
                     } else {
                         _officer_button_mode = 1;
-                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
+                        mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_hand_mouse, 1);
                     }
                 }
             }
@@ -1153,7 +1153,7 @@ namespace OFFICER {
 
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         Move_From_Limbo_To_Pool_();
         Check_For_Colony_Calculation_Update_();
         COLCALC::Do_Player_Colony_Calculations_(MOX::_PLAYER_NUM);
@@ -1328,21 +1328,21 @@ namespace OFFICER {
                     char format_str[200];
                     char final_msg[200];
                     strcpy(format_str, HAROLD::H_Message_(HESTR_126_DISMISS_S));
-                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                     _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 1));
 
                     if (Officer_Screen_User_Box_(final_msg, 1) != 0) {
                         Dismiss_Officer_(MOX::_officer_selected);
                         MOX::_officer_selected = -1;
                     } else {
-                        mouse::Set_Mouse_List_(DIP_SCRN::_diplomacy_hand_mouse, 1);
+                        mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_hand_mouse, 1);
                     }
                     MOX::_draw_officer_to_back = 1;
                 } else if (mode == 1 /* Relocate */) {
                     if (MOX::_leaders[field2].status == 0 || MOX::_leaders[field2].status == 2) {
                         MOX::_officer_selected = -1;
                         _officer_button_mode = -1;
-                        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                     } else {
                         Move_Officer_To_Limbo_(field2);
                     }
@@ -1723,7 +1723,7 @@ namespace OFFICER {
         int16_t location = leader.location;
         int8_t player_idx = leader.player_index;
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
         if (Is_Fleet_Officer_Screen_()) {
             if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_SHIPS)) {

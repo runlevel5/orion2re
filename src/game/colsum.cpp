@@ -77,7 +77,7 @@ namespace COLSUM {
 
         fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
         MOX2::Get_Auto_Function_(&saved_auto_fn);
-        mouse::Set_Mouse_List_(COLGCBT::_mouse_list_blank, 1);
+        mouse::Set_Mouse_List_(&COLGCBT::_mouse_list_blank, 1);
         fields::Deactivate_Auto_Function_();
 
         if (ERIC::Fast_Fade_Out_Needed_For_Colony_Palette_()) {
@@ -110,7 +110,7 @@ namespace COLSUM {
         RUSS::Mox_Sync_Update_();
         COLONY::_full_draw = 0;
         ERIC::Fast_Fade_In_();
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
         while (true) {
             video::Set_Refresh_Stencil_();

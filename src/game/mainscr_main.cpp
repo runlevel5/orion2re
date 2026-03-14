@@ -445,7 +445,7 @@ namespace MAINSCR {
 
                 if (mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE && _merging_relocations != 0) {
                     _merging_relocations = 0;
-                    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                     HACCESS::Set_All_Star_Relocations_(mouse_field_2, MOX::_PLAYER_NUM);
 
                     const char* msg = HAROLD::H_Message_(HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI);
@@ -848,7 +848,7 @@ namespace MAINSCR {
                             boxes_saved_flag = 0;
                             MOX::_zoom_in = 0;
                             EVANHELP::Set_Main_Game_Screen_Help_List_();
-                            mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                             fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
 
                             MOX::_cur_map_x += HAROLD::Get_Up_Scaled_Value_(_zoom_box_x - 0x15);

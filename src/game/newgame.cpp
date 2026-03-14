@@ -15,7 +15,7 @@ short __cdecl Newgame_Screen_(void) {
     int16_t result = 0;
     int16_t current_civ_btn = NEWGAME::_civ_button_variable;
 
-    mouse::Set_Mouse_List_(COLGCBT::_mouse_list_blank, 1);
+    mouse::Set_Mouse_List_(&COLGCBT::_mouse_list_blank, 1);
     ERIC::Fast_Fade_Out_();
     fonts::Load_Palette_(9, 0, 0xff);
 
@@ -39,7 +39,7 @@ short __cdecl Newgame_Screen_(void) {
 
     bool exit_screen = false;
     ERIC::Fast_Fade_In_();
-    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
     while (!exit_screen) {
         int16_t input = fields::Get_Input_();

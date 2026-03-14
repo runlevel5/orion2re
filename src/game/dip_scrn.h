@@ -2,7 +2,7 @@
 #include <cstdint>
 
 namespace DIP_SCRN {
-    inline int16_t* _diplomacy_hand_mouse = *reinterpret_cast<int16_t**>(std::uintptr_t{0x005569A8});
+    inline s_mouse_list& _diplomacy_hand_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005569A8});
 
     void Resolve_Delayed_Diplomacy_Orders_();
 

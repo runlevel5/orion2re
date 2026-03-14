@@ -269,7 +269,7 @@ namespace MOX {
     inline int16_t& _stencil_box_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2C});
     inline int16_t& _draw_main_screen_stencilled = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1864});
     inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
-    inline int16_t* _mouse_list_zoom_mode = reinterpret_cast<int16_t*>(std::uintptr_t{0x00559898});
+    inline s_mouse_list (&_mouse_list_zoom_mode)[5] = *reinterpret_cast<s_mouse_list(*)[5]>(std::uintptr_t{0x00559898});
     inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
     inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
     inline uint16_t& _first_fleet_movement_icon = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D4A});
@@ -294,10 +294,10 @@ namespace MOX {
     // Suggested name: MOX::_gravity_table
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
-    inline int16_t (&_mouse_list_arrow)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00558D10});
-    inline int16_t (&_cmbt_mouse_list_clock)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00558DB8});
-    inline int16_t* _mouse_list_variable = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D20});
-    inline int16_t* _mouse_list_none = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D70});
+    inline s_mouse_list &_mouse_list_arrow = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D10});
+    inline s_mouse_list (&_cmbt_mouse_list_clock) = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558DB8});
+    inline s_mouse_list &_mouse_list_variable = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D20});
+    inline s_mouse_list& _mouse_list_none = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D70});
 
     inline int16_t& _mid_star_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059643C});
     inline int16_t& _mid_star_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596444});

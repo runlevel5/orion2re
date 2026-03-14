@@ -185,13 +185,13 @@ namespace COLONY {
     }
 
     void __cdecl Reset_Mouse_Picture_() {
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         fields::Enable_Draw_All_Fields_();
     }
 
     void __cdecl Clear_Mouse_Picture_() {
         bitmap::Clear_Mouse_Image_(0x13);
-        mouse::Set_Mouse_List(MOX::_mouse_list_variable, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_variable, 1);
 
         if (COLMOVE::_cluster_colony_n != -1) {
             int16_t first_unemployed = COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n);

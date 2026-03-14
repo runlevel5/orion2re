@@ -245,7 +245,7 @@ namespace COLONY {
 
         fields::Clear_Fields_();
         Set_Colony_Font_();
-        mouse::Set_Mouse_List(COLGCBT::_mouse_list_blank, 1);
+        mouse::Set_Mouse_List_(&COLGCBT::_mouse_list_blank, 1);
         video::Set_Page_Off_();
         video::Set_Refresh_Stencil_();
 
@@ -270,7 +270,7 @@ namespace COLONY {
         Draw_Colony_Screen_();
         ERIC::Fast_Fade_In_();
         video::Set_Refresh_Stencil_();
-        mouse::Set_Mouse_List(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         Do_Informational_And_Decision_Popups_();
 
         while (true) {

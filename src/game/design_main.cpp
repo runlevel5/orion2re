@@ -273,7 +273,7 @@ namespace DESIGN {
         fields::Assign_Auto_Function_(Draw_Design_Screen_, 2);
         fields::Clear_Fields_();
         _design_size_field = -1000;
-        mouse::Set_Mouse_List_(MOX::_mouse_list_variable, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_variable, 1);
 
         if (MOX::_first_design_screen_call == 0) {
             _changed_design_name = 0;
@@ -325,7 +325,7 @@ namespace DESIGN {
         }
 
         bool update_buttons = true;
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         EVANHELP::Set_Design_Screen_Help_List_(MOX::_design->num_weapon_slots, MOX::_design->num_special_slots);
 
         int16_t screen_exit_flag = 0;

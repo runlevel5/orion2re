@@ -884,7 +884,7 @@ namespace MAINSCR {
 
         fields::Disable_Draw_All_Fields_();
         video::Set_Refresh_Stencil_();
-        mouse::Set_Mouse_List_(MOX::_mouse_list_none, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
         ERIC::Fast_Fade_Out_();
         MOX::Mox_Update_();
 
@@ -914,7 +914,7 @@ namespace MAINSCR {
         palette::Clear_Palette_Changes_(0, 255);
         RUSS::Mox_Sync_Update_();
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
         bool skip_fade_in = false;
         if (MOX::_reloaded_ship_palette != 0) {
@@ -1365,7 +1365,7 @@ namespace MAINSCR {
     void __cdecl Exit_Zooming_Mode_(int16_t* zooming_state) {
         *zooming_state = 0;
         MOX::_zoom_in = 0;
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
         EVANHELP::Set_Main_Screen_Help_List_();
     }
@@ -2213,7 +2213,7 @@ namespace MAINSCR {
 
             if (MOX::_auto_turn_exit != 0) {
                 _check_next_turn_exit_field = 0;
-                mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 _next_turn_hit = 0;
                 fields::Clear_Fields_();
                 MOX::_current_screen = SCREEN_MAIN;

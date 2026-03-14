@@ -180,7 +180,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         ((ship_type == 4 /* OUTPOST_SHIP */) && (PLNTSUM::_planet_summary[summary_idx].outpost_eta > 0))) {
         
         _sprintf(msg_buffer, HAROLD::H_Message_(0x134 /* HESTR_134_YOU_ALREADY_HAVE_ONE_C */), &MOX::_star[target_star_idx]);
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         should_continue = (GENDRAW::Warning_Box_(msg_buffer) != 0);
         PLNTSUM::_screen->refresh_fields = true;
         if (!should_continue) {
@@ -213,7 +213,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             _sprintf(msg_buffer, HAROLD::H_Message_(0x13A /* HESTR_13A_S_HAS_SET_A_COURSE_SHO */), &MOX::_ship[nearest_ship_idx]);
         }
 
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         should_continue = (GENDRAW::Warning_Box_(msg_buffer) != 0);
         PLNTSUM::_screen->refresh_fields = true;
     }
@@ -241,7 +241,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             int16_t monster_race_summary_id;
             if (HAROLD::Star_Guarded_By_Monster_(target_star_idx, &monster_race_summary_id)) {
                 HACCESS::Race_Name_(monster_race_summary_id, race_name_buffer);
-                mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+                mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 
                 int16_t msg_id = (PLNTSUM::_send_choice == 0) ? 0x13C /* HESTR_13C_S_IS_GUARDED_BY_A_S_DO */ : 0x13B /* HESTR_13B_S_IS_GUARDED_BY_A_S_DO */;
                 _sprintf(msg_buffer, HAROLD::H_Message_(msg_id), &MOX::_star[target_star_idx], race_name_buffer);
@@ -2039,7 +2039,7 @@ void Planet_Summary_Screen_() {
     fields::Clear_Fields_();
     fields::Disable_Draw_All_Fields_();
     video::Set_Refresh_Stencil_();
-    mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
     MISC::Fade_To_Black_();
     fields::Enable_Draw_All_Fields_();
     MOX::_scroll_bar = nullptr;

@@ -4,8 +4,8 @@ namespace mouse {
     inline int16_t& _current_mouse_list_count =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });
 
-    inline int16_t*& _current_mouse_list =
-        *reinterpret_cast<int16_t**>(std::uintptr_t{ 0x00578A98 });
+    inline s_mouse_list*& _current_mouse_list =
+        *reinterpret_cast<s_mouse_list**>(std::uintptr_t{ 0x00578A98 });
 
     // Suggested name: mouse::Check_Mouse_Shape_
     inline void __cdecl Check_Mouse_Shape_() {
@@ -41,11 +41,7 @@ namespace mouse {
      */
     uint16_t __cdecl Mouse_Button_();
 
-    void __cdecl Set_Mouse_List_(int16_t* list, int16_t count);
-
-    inline void __cdecl Set_Mouse_List(void* mouse_data, int16_t count) {
-        Set_Mouse_List_(static_cast<int16_t*>(mouse_data), count);
-    }
+    void __cdecl Set_Mouse_List_(s_mouse_list* list, int16_t count);
 
     int16_t Pointer_X_();
 

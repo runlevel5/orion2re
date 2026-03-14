@@ -17,7 +17,7 @@ namespace ERIC {
         _fade_percent = static_cast<uint8_t>(percent);
 
         if (percent == 0) {
-            mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         }
     }
 

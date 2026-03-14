@@ -131,7 +131,7 @@ namespace COLBLDG {
 
     char* __cdecl Selection_Name_(int16_t id);
 
-    inline short*& _mouse_list_to = *reinterpret_cast<short**>(std::uintptr_t{0x0055AAB0});
+    inline s_mouse_list (&_mouse_list_to)[4] = *reinterpret_cast<s_mouse_list(*)[4]>(std::uintptr_t{0x0055AAB0});
 
     void __cdecl Print_Selection_Centered_(const char* text);
 }

@@ -597,7 +597,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::Mox_Update_();
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         MAINSCR::Set_Reload_Fleet_Box_Palette_Flag_();
         ERIC::Fast_Fade_Out_();
         fonts::Load_Palette_(3, 0, 0xFF);
@@ -916,7 +916,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         combat_winner = COMBAT1::Check_For_Winner_();
         fields::Assign_Auto_Function_(CMBTDRW1::Draw_Main_Combat_Screen_, 1);
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
         int16_t turn_plr1 = MOX::_combat_attacker_player;
         int16_t turn_plr2 = MOX::_combat_defender_player;
@@ -1030,7 +1030,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         fields::Deactivate_Help_List_();
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         ERIC::Fast_Fade_Out_();
         palette::Set_Palette_Gradient_(160, 95, 0, 0, 0, 0, 0, 0);
         MOX2::Put_Auto_Function_(&auto_func);

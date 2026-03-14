@@ -164,7 +164,7 @@ void __cdecl Next_Turn_Calc_() {
     MOX::_stardate++;
 
     if (MAINSCR::_in_auto_next_turn_mode == 0) {
-        mouse::Set_Mouse_List_(MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
     }
 }
 

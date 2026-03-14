@@ -48,8 +48,8 @@ namespace HAROLD {
 
     void __cdecl Save_Mouse_List_();
 
-    inline int16_t (&_saved_mouse_list)[60] =
-        *reinterpret_cast<int16_t(*)[60]>(std::uintptr_t{0x00571A40});
+    inline s_mouse_list (&_saved_mouse_list)[10] =
+        *reinterpret_cast<s_mouse_list(*)[10]>(std::uintptr_t{0x00571A40});
 
     inline uint32_t& _saved_mouse_list_offset_4 =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00571A44});
