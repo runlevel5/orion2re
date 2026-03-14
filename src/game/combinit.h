@@ -51,16 +51,6 @@ namespace COMBINIT {
 
     void __cdecl Load_Combat_Ship_Palette_(int16_t plr);
 
-    inline void __cdecl Load_Combat_Beam_Stuff_(int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420b70});
-        fn(flag);
-    }
-    inline void __cdecl Set_Combat_Ordnance_Values_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5ba0});
-        fn();
-    }
     void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx);
 
     void __cdecl Init_Special_Devices_(int16_t combat_ship_idx);
@@ -77,34 +67,19 @@ namespace COMBINIT {
 
     void __cdecl Scroll_Combat_Screen_();
 
-    inline int16_t __cdecl Defensive_Combat_Bonus_(int16_t count, int16_t flag) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5920});
-        return fn(count, flag);
-    }
-    inline void __cdecl Plasma_Web_Damage_(int16_t plr) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c690});
-        fn(plr);
-    }
+    void __cdecl Plasma_Web_Damage_(int16_t owner_idx);
     void __cdecl Increment_Bhg_(int16_t player_idx);
-    inline void __cdecl Recharge_Shields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040c840});
-        fn();
-    }
-    inline void __cdecl Repair_All_Combat_Ships_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040fb30});
-        fn();
-    }
+    void __cdecl Recharge_Shields_();
+    void __cdecl Repair_All_Combat_Ships_();
     void __cdecl End_Of_Turn_Bookeeping_();
-    inline void __cdecl End_Of_Combat_(int16_t colony_idx, int16_t pop, int16_t winner) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040d4a0});
-        fn(colony_idx, pop, winner);
-    }
+    void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3);
 
     int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag);
+
+    void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx);
+
+    void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3);
+
+    inline uint8_t& _real_attack_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8BBC});
     int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2);
 }

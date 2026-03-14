@@ -787,7 +787,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             CMBTDRW1::Create_Ship_Darken_Map_();
         }
 
-        Load_Combat_Beam_Stuff_(has_special_26);
+        BEAMS::Load_Combat_Beam_Stuff_(has_special_26);
 
         MOX::_shield_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
         MOX::Mox_Update_();
@@ -892,7 +892,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             palette::Set_Palette_Gradient_(144, 32, 0, 0, 0, 0, 0, 0);
         }
 
-        Set_Combat_Ordnance_Values_();
+        CMBTFIR2::Set_Combat_Ordnance_Values_();
         MOX::Mox_Update_();
         Load_Individual_Ship_Pictures_(MOX::_combat_attacker_player);
         MOX::Mox_Update_();
@@ -2135,6 +2135,44 @@ void __cdecl Snap_Center_Combat_Screen_(int16_t target_x, int16_t target_y) {
     CMBTDRW1::Refresh_Combat_Screen_Full_();
 }
 
+void __cdecl Recharge_Shields_() {
+    if (MOX::_combat_total_ship_count <= 1) {
+        return;
+    }
+
+    for (int16_t ship_idx = 1; ship_idx < MOX::_combat_total_ship_count; ++ship_idx) {
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+
+        if (ship->shield_type > 0 &&
+            CMBTMOV1::Ship_Is_In_Stasis_(ship_idx) == 0 &&
+            ship->shield_current_hits > 0) {
+
+            int32_t recharge_rate = 3;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 30 /* High Energy Focus? */) != 0) {
+                recharge_rate = 10;
+            }
+
+            int32_t recharge_pool = (ship->shield_arc_max * recharge_rate) / 10;
+
+            if (recharge_pool > 0) {
+                bool changed = true;
+                while (recharge_pool > 0 && changed) {
+                    changed = false;
+                    for (int16_t arc = 0; arc < 4; ++arc) {
+                        if (ship->shield_arc_current[arc] < ship->shield_arc_max) {
+                            if (recharge_pool > 0) {
+                                recharge_pool--;
+                                changed = true;
+                                ship->shield_arc_current[arc]++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void __cdecl Increment_Bhg_(int16_t player_idx) {
     if (MOX::_combat_total_ship_count > 1) {
         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
@@ -2371,4 +2409,384 @@ void __cdecl Load_Individual_Ship_Pictures_(int16_t player_idx) {
         }
     }
 }
+
+void __cdecl Repair_All_Combat_Ships_() {
+    int16_t attacker_bonus;
+    int16_t defender_bonus;
+    int16_t repair_amount;
+
+    attacker_bonus = CMBTFIR2::Get_Fleet_Engineer_Bonus_(MOX::_combat_attacker_player);
+    defender_bonus = CMBTFIR2::Get_Fleet_Engineer_Bonus_(MOX::_combat_defender_player);
+
+    if (MOX::_combat_attacker_player < 8) {
+        if (MOX::_player[MOX::_combat_attacker_player].traits[TRAIT_CYBERNETIC] != 0) {
+            attacker_bonus += 10;
+        }
+    }
+
+    if (MOX::_combat_defender_player < 8) {
+        if (MOX::_player[MOX::_combat_defender_player].traits[TRAIT_CYBERNETIC] != 0) {
+            defender_bonus += 10;
+        }
+    }
+
+    for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+        repair_amount = 0;
+
+        if (MOX::_combat_data[i].unit_status == 0 &&
+            MOX::_combat_data[i].is_captured == 0 &&
+            !CMBTMOV1::Ship_Is_In_Stasis_(i))
+        {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) != 0) {
+                repair_amount = 20;
+            }
+
+            if (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) {
+                repair_amount += attacker_bonus;
+            } else {
+                repair_amount += defender_bonus;
+            }
+
+            if (repair_amount > 0) {
+                CMBTFIR2::Repair_Combat_Ship_(i, repair_amount);
+            }
+        }
+    }
+}
+
+void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3) {
+    int16_t leader_count = 0;
+    int16_t defender_losses = 0;
+    int16_t attacker_losses = 0;
+    int32_t defender_power_lost = 0;
+    int32_t attacker_power_lost = 0;
+    int16_t leaders[8];
+
+    int16_t victor_player;
+    if (param_3 < 0) {
+        victor_player = MOX::_combat_defender_player;
+    } else if (param_3 == 666) {
+        victor_player = -1;
+    } else {
+        victor_player = MOX::_combat_attacker_player;
+    }
+
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+        COMBINIT::Init_Special_Devices_(i);
+        s_combat_data* ship = &MOX::_combat_data[i];
+
+        if (ship->ftl_type == 0 && (ship->unit_status == 5 || ship->owner != MOX::_combat_defender_player)) {
+            if (param_1 != MOX::_NUM_STARS) {
+                s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
+                if (col->buildings[BUILDING_STAR_BASE] != 0) {
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_BASE);
+                } else if (col->buildings[BUILDING_BATTLESTATION] != 0) {
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_BATTLESTATION);
+                } else if (col->buildings[BUILDING_STAR_FORTRESS] != 0) {
+                    ERICNET::Remove_Building_(MOX::_cmbt_colony_id, BUILDING_STAR_FORTRESS);
+                }
+            }
+            continue;
+        }
+
+        if ((ship->unit_status == 5 && ship->is_retreating != 2) ||
+            (ship->is_captured != 0 && ship->owner != victor_player) ||
+            (ship->owner >= 8 && ship->previous_owner != ship->owner)) {
+            
+            ship->unit_status = 5;
+
+            if (MOX::_combat_attacker_player == ship->owner) {
+                attacker_losses += (ship->size_class + 1);
+                attacker_power_lost += (1 << (ship->size_class + 1));
+            } else {
+                defender_losses += (ship->size_class + 1);
+                defender_power_lost += (1 << (ship->size_class + 1));
+            }
+
+            if (ship->ship_idx != -1 && ship->officer_idx > -1) {
+                int16_t officer_idx = ship->officer_idx;
+                if (MOX::_leaders[officer_idx].eta > 0) {
+                    OFFICER::Move_Officer_To_Pool_(officer_idx);
+                } else {
+                    if (MOX::_player[ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
+                        leaders[leader_count] = officer_idx;
+                        leader_count++;
+                        MOX::_ship[ship->ship_idx].officer_index = -1;
+                    } else {
+                        OFFICER::Kill_Officer_(officer_idx);
+                    }
+                }
+            }
+        } else {
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(i, SPECIAL_AUTOMATED_REPAIR_UNIT) == 1 ||
+                CMBTFIR2::Get_Fleet_Engineer_Bonus_(ship->owner) > 0 ||
+                (ship->owner < 8 && (MOX::_player[ship->owner].tech_applications[TECH_APP_ADVANCED_DAMAGE_CONTROL] == 3 ||
+                                     MOX::_player[ship->owner].traits[TRAIT_CYBERNETIC] != 0))) {
+                
+                CMBTFIR2::Clear_Internal_Space_(ship);
+                for (int16_t j = 0; j < 5; ++j) {
+                    ship->special_device_damage_flags[j] = 0;
+                }
+                ship->structure_damage = 0;
+                if (ship->ship_idx != -1) {
+                    ship->armor_remaining = INITSHIP::Get_Ship_Armor_Hits_(ship->ship_idx);
+                }
+            }
+            COMBINIT::Unload_Combat_Ship_(i);
+        }
+    }
+
+    if (MOX::_combat_attacker_player < 8) {
+        if (MOX::_bio_weapon_flag != 0) {
+            COMBINIT::Apply_Bio_Weapon_Penalty_(MOX::_combat_attacker_player, param_1, param_2);
+        }
+        if (MOX::_combat_defender_player < 8) {
+            MOX::_player[MOX::_combat_attacker_player].ship_war_losses[MOX::_combat_defender_player] += static_cast<int16_t>(attacker_power_lost);
+            MOX::_player[MOX::_combat_defender_player].ship_war_losses[MOX::_combat_attacker_player] += static_cast<int16_t>(defender_power_lost);
+            
+            if (defender_losses <= 0) {
+                defender_losses = 1;
+            }
+            
+            if (COMBINIT::_real_attack_flag != 0) {
+                if (param_2 > 0) {
+                    NETMOX::Russ_Change_Relations_(-10000, MOX::_combat_attacker_player, MOX::_combat_defender_player, 10, param_1, param_2);
+                }
+                NETMOX::Russ_Change_Relations_(-15 * defender_losses, MOX::_combat_attacker_player, MOX::_combat_defender_player, 11, param_1, 0);
+            }
+        }
+    }
+
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+        s_combat_data* ship = &MOX::_combat_data[i];
+        if ((ship->unit_status == 0 || ship->is_retreating == 2) &&
+            ship->officer_idx != -1 &&
+            ship->owner == victor_player &&
+            ship->ship_idx != -1) {
+            
+            int16_t xp = (victor_player == MOX::_combat_attacker_player) ? defender_losses : attacker_losses;
+            xp /= 2;
+            if (xp < 1) {
+                xp = 1;
+            }
+            OFFICER::Give_Officer_XP_(victor_player, ship->officer_idx, xp);
+        }
+    }
+
+    if (leader_count > 0) {
+        for (int16_t j = 0; j < leader_count; ++j) {
+            int16_t ship_idx_found = 0;
+            int16_t ship_assigned = 0;
+            int16_t leader_id = leaders[j];
+
+            for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+                if (ship_idx_found != 0) {
+                    break;
+                }
+                s_combat_data* ship = &MOX::_combat_data[i];
+                if ((ship->unit_status != 5 || ship->is_retreating == 2) && ship->ship_idx != -1) {
+                    if (MOX::_leaders[leader_id].player_index == ship->owner) {
+                        if (MOX::_ship[ship->ship_idx].officer_index == -1) {
+                            ship_idx_found = 1;
+                            MOX::_ship[ship->ship_idx].officer_index = leader_id;
+                            ship->officer_idx = leader_id;
+                            MOX::_ship[MOX::_leaders[leader_id].location].officer_index = -1;
+                            MOX::_leaders[leader_id].location = ship->ship_idx;
+                        }
+                        ship_assigned = 1;
+                    }
+                }
+            }
+
+            if (ship_idx_found != 0 || ship_assigned != 0) {
+                if (MOX::_leaders[leader_id].player_index == victor_player) {
+                    int16_t xp = (victor_player == MOX::_combat_attacker_player) ? defender_losses : attacker_losses;
+                    xp /= 2;
+                    if (xp < 1) {
+                        xp = 1;
+                    }
+                    OFFICER::Give_Officer_XP_(victor_player, leader_id, xp);
+                }
+            }
+
+            if (ship_idx_found == 0) {
+                if (ship_assigned == 1) {
+                    OFFICER::Move_Officer_To_Pool_(leader_id);
+                } else {
+                    OFFICER::Kill_Officer_(leader_id);
+                }
+            }
+        }
+    }
+
+    for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+        s_combat_data* ship = &MOX::_combat_data[i];
+        
+        if (param_1 == MOX::_NUM_STARS && ship->owner == 8 &&
+            ship->unit_status == 5 && ship->ftl_type != 0) {
+            antarans::Kill_Antaran_Defensive_Ship_(ship->size_class);
+        } 
+        else if (ship->unit_status == 5 && ship->ship_idx != -1 && ship->is_retreating != 2) {
+            if (ship->owner == 8) {
+                antarans::Kill_Antaran_Offensive_Ship_(ship->size_class);
+            }
+            if (MOX::_ship[ship->ship_idx].officer_index > -1) {
+                OFFICER::Move_Officer_To_Pool_(MOX::_ship[ship->ship_idx].officer_index);
+            }
+            SHIPS::Kill_Ship_(ship->ship_idx);
+        } 
+        else if (ship->owner == victor_player && ship->ship_idx != -1) {
+            int16_t xp = (victor_player == MOX::_combat_attacker_player) ? defender_losses : attacker_losses;
+            xp /= 2;
+            if (xp < 1) {
+                xp = 1;
+            }
+            MOX::_ship[ship->ship_idx].crew_experience += xp;
+        }
+    }
+
+    if (MOX::_cmbt_colony_id != -1) {
+        s_colony* col = &MOX::_colony[MOX::_cmbt_colony_id];
+        if (col->outpost_flag == 0 && col->n_pops == 0) {
+            int16_t has_buildings = 0;
+            for (int16_t i = 0; i < BUILDING_COUNT; ++i) {
+                if (has_buildings != 0) {
+                    break;
+                }
+                has_buildings += col->buildings[i];
+            }
+            if (has_buildings == 0) {
+                BOMB::Destroy_Colony_(col, 1);
+            }
+        }
+    }
+}
+
+void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx) {
+    int16_t ship_idx = MOX::_combat_data[combat_ship_idx].ship_idx;
+
+    if (ship_idx != -1) {
+        while (MOX::_combat_data[combat_ship_idx].current_speed < 1) {
+            MOX::_combat_data[combat_ship_idx].drive_current_hits++;
+            MOX::_combat_data[combat_ship_idx].current_speed = COMBAT1::Calc_Current_Speed_(combat_ship_idx);
+        }
+
+        if (MOX::_combat_data[combat_ship_idx].drive_max_hits < MOX::_combat_data[combat_ship_idx].drive_current_hits) {
+            MOX::_combat_data[combat_ship_idx].drive_current_hits = MOX::_combat_data[combat_ship_idx].drive_max_hits;
+        }
+
+        MOX::_ship[ship_idx].owner = MOX::_combat_data[combat_ship_idx].owner;
+
+        for (int16_t i = 0; i < 8; i++) {
+            MOX::_ship[ship_idx].d.ship_weapon[i].current_count = MOX::_combat_data[combat_ship_idx].weapons[i].count;
+        }
+
+        for (int16_t i = 0; i < 5; i++) {
+            MOX::_ship[ship_idx].special_device_damage_flags[i] = MOX::_combat_data[combat_ship_idx].special_device_damage_flags[i];
+        }
+
+        MOX::_ship[ship_idx].structural_damage = MOX::_combat_data[combat_ship_idx].structure_damage;
+        MOX::_ship[ship_idx].armor_damage = INITSHIP::Get_Ship_Armor_Hits_(ship_idx) - MOX::_combat_data[combat_ship_idx].armor_remaining;
+        MOX::_ship[ship_idx].computer_damage = 0;
+
+        if (MOX::_combat_data[combat_ship_idx].shield_max_hits > 0) {
+            MOX::_ship[ship_idx].shield_damage_percent =
+                100 - (MOX::_combat_data[combat_ship_idx].shield_current_hits * 100) / MOX::_combat_data[combat_ship_idx].shield_max_hits;
+        }
+
+        if (MOX::_combat_data[combat_ship_idx].drive_max_hits > 0) {
+            MOX::_ship[ship_idx].drive_damage_percent =
+                100 - (MOX::_combat_data[combat_ship_idx].drive_current_hits * 100) / MOX::_combat_data[combat_ship_idx].drive_max_hits;
+        }
+    }
+}
+
+void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
+    if (MOX::_combat_total_ship_count <= 0) {
+        return;
+    }
+
+    for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+        s_combat_data* ship = &MOX::_combat_data[i];
+
+        if (ship->unit_status != 0) {
+            continue;
+        }
+
+        if (ship->plasma_web_damage <= 0) {
+            continue;
+        }
+
+        if (ship->owner != owner_idx) {
+            continue;
+        }
+
+        if (CMBTMOV1::Ship_Is_In_Stasis_(i) != 0) {
+            continue;
+        }
+
+        int16_t total_damage = 0;
+        int16_t struct_damage_total = 0;
+
+        for (int16_t arc = 0; arc < 4; ++arc) {
+            int16_t arc_damage = ship->plasma_web_damage;
+            int16_t arc_struct_damage = 0;
+
+            CMBTFIRE::Apply_Ship_Damage_(
+                i,
+                &arc_damage,
+                &arc_struct_damage,
+                arc,
+                0,
+                nullptr,
+                0,
+                0,
+                0
+            );
+
+            total_damage += arc_damage;
+            struct_damage_total += arc_struct_damage;
+        }
+
+        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
+            if (CMBTDRW1::Ship_Completely_On_Screen_(i) == 0) {
+                COMBINIT::Snap_Center_Combat_Screen_(ship->x, ship->y);
+            }
+
+            BEAMS::Add_Damage_Indicator_For_Ship_(
+                (ship->x - MOX::_cur_combat_x) * 20,
+                (ship->y - MOX::_cur_combat_y) * 20,
+                i,
+                1,
+                total_damage,
+                struct_damage_total
+            );
+
+            BEAMS::Draw_Damage_Message_Queue_Until_Done_();
+        }
+
+        int16_t cause = CMBTFIRE::Is_Combat_Ship_Dead_(i);
+        if (cause != 0) {
+            CMBTFIRE::Destroy_Ship_(i, ship->x * 20, ship->y * 20, cause);
+        } else {
+            int16_t new_plasma_damage = ship->plasma_web_damage - 5;
+            if (new_plasma_damage < 0) {
+                new_plasma_damage = 0;
+            }
+            ship->plasma_web_damage = new_plasma_damage;
+        }
+    }
+}
+
+void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3) {
+    if (player_idx < 8) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (MOX::_player[i].objectives != 100 /* 'd' */ && i != player_idx) {
+                int16_t change = -static_cast<int16_t>(random::Random_(10));
+                NETMOX::Russ_Change_Relations_(change, player_idx, i, 6, param_2, param_3);
+            }
+        }
+    }
+}
+
 }

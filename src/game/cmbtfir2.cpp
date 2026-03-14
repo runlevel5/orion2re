@@ -38,6 +38,7 @@ namespace CMBTFIR2 {
         int16_t attacker_idx = MOX::_combat_attacker_player;
         int16_t attacker_bonus = CMBTFIR2::Get_Fleet_Ordnance_Bonus_(attacker_idx) + 100;
 
+        // Load defender index before storing attacker result to match register usage (SI)
         int16_t defender_idx = MOX::_combat_defender_player;
         MOX::_ordnance_bonus[attacker_idx] = attacker_bonus;
 

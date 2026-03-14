@@ -89,4 +89,22 @@ namespace CMBTFIR2 {
     int16_t __cdecl Computer_Bonus_(int16_t ship_idx);
 
     int16_t __cdecl Crew_Attack_Bonus_(int16_t ship_idx);
+
+    inline int16_t __cdecl Get_Fleet_Engineer_Bonus_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5a40});
+        return fn(player_idx);
+    }
+
+    inline void __cdecl Repair_Combat_Ship_(int16_t ship_idx, int16_t amount) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5450});
+        fn(ship_idx, amount);
+    }
+
+    inline void __cdecl Clear_Internal_Space_(s_combat_data* ship) {
+        using Fn = void(__cdecl*)(s_combat_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5830});
+        fn(ship);
+    }
 }

@@ -1732,6 +1732,12 @@ namespace hooks {
         { 0x0040c230, &COMBINIT::Load_Individual_Ship_Pictures_ },
         { 0x0040f500, &COMBINIT::Init_Special_Devices_ },
         { 0x004695d0, &COMBAT1::Check_For_Winner_ },
+        { 0x0040c840, &COMBINIT::Recharge_Shields_ },
+        { 0x0040fb30, &COMBINIT::Repair_All_Combat_Ships_ },
+        { 0x0040d4a0, &COMBINIT::End_Of_Combat_ },
+        { 0x0040C690, &COMBINIT::Plasma_Web_Damage_ },
+        { 0x0040dd50, &COMBINIT::Unload_Combat_Ship_ },
+        { 0x0040D420, &COMBINIT::Apply_Bio_Weapon_Penalty_ },
     };
 
     void Install_Hooks()

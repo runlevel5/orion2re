@@ -115,6 +115,12 @@ namespace OFFICER {
 
     void __cdecl Kill_Officer_(int16_t leader_idx);
 
+    inline void __cdecl Give_Officer_XP_(int16_t player_idx, int16_t officer_idx, int16_t xp) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442ec0});
+        fn(player_idx, officer_idx, xp);
+    }
+
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
     inline int16_t __cdecl Scan_Officer_Fields_(int16_t* out_p1, int16_t* out_p2, int16_t p2, int16_t p1, int8_t* scanned_flag, int16_t* out_field2, int16_t* out_field1) {

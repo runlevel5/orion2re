@@ -14,7 +14,8 @@ namespace MOX {
     inline s_animation_header* (&_fighter_seg)[15][64] =
         *reinterpret_cast<s_animation_header* (*)[15][64]>(std::uintptr_t{0x005A1CC0});
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
-    inline int16_t* _ordnance_bonus = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597050});
+    inline int16_t (&_ordnance_bonus)[15] =
+        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00597050});
     inline int16_t& _n_fltscrn_big_icons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597018});
     inline int16_t& _n_fltscrn_big_icons = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973E2});
     inline uint8_t& _n_fltscrn_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597A92});

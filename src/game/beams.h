@@ -35,4 +35,16 @@ namespace BEAMS {
     void __cdecl Load_Reflection_Field_Hit_(int8_t should_load);
 
     void __cdecl Load_Combat_Beam_Stuff_(int8_t reflection_hit_param);
+
+    inline void __cdecl Add_Damage_Indicator_For_Ship_(int32_t dx, int32_t dy, int16_t ship_idx, int32_t flag, int16_t total_damage, int16_t struct_damage) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t, int32_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422D20});
+        fn(dx, dy, ship_idx, flag, total_damage, struct_damage);
+    }
+
+    inline void __cdecl Draw_Damage_Message_Queue_Until_Done_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422E70});
+        fn();
+    }
 }

@@ -41,4 +41,10 @@ namespace CMBTDRW1 {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d6380 });
         fn();
     }
+
+    inline int16_t __cdecl Ship_Completely_On_Screen_(int16_t ship_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D5820});
+        return fn(ship_idx);
+    }
 }
