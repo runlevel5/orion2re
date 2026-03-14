@@ -1769,6 +1769,13 @@ namespace hooks {
         { 0x004e8b20, &CMBTFIR2::Set_Teleporter_Used_ },
         { 0x0046f810, &CMBTMOV1::Move_Ship_ },
         { 0x00470560, &CMBTMOV1::Turn_To_Face_ },
+        { 0x0046ee10, &CMBTMOV1::Ship_In_Black_Hole_ },
+        { 0x00470070, &CMBTMOV1::Get_Facing_ },
+        { 0x0046ee40, &CMBTMOV1::Draw_Teleporting_Ship_ },
+        { 0x00470440, &CMBTMOV1::Turn_Cost_ },
+        { 0x0046f3f0, &CMBTMOV1::Test_Move_Until_Impact_ },
+        { 0x0046f350, &CMBTMOV1::Ship_In_Legal_Square_ },
+        { 0x0046f0b0, &CMBTMOV1::Rotate_Ship_Until_Impact_ },
     };
 
     void Install_Hooks()

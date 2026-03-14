@@ -43,4 +43,9 @@ namespace bitmap {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F240});
         fn(image_idx);
     }
+
+    inline void __cdecl Vanish_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t intensity) {
+        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052F400})(dest, src, intensity);
+    }
 }

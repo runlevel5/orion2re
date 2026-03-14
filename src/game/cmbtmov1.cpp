@@ -1,7 +1,21 @@
 #include "pch.h"
-#include <cstdlib>
 
 namespace CMBTMOV1 {
+    int16_t __cdecl Turn_Cost_(int16_t ship_idx) {
+        int16_t cost = 2;
+
+        // Check for specific ship special systems that affect turning cost
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 18)) {
+            return 1;
+        }
+
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 17)) {
+            cost = 0;
+        }
+
+        return cost;
+    }
+
     bool __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
         return MOX::_combat_data[ship_idx].stasis_source_idx != 0xFF;
     }
@@ -467,6 +481,356 @@ void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     CMBTMOV1::Rotate_Ship_(ship_idx, target_facing, static_cast<int16_t>(dx), static_cast<int16_t>(dy));
     COMBAT1::Assign_Combat_Grids_(ship_idx);
     CMBTDRW1::Refresh_Combat_Screen_Full_();
+}
+
+bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
+    return MOX::_combat_data[ship_idx].black_hole_source_idx != -1;
+}
+
+int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+    // Calculate the relative angle between the two points
+    int16_t angle = angle::Get_Angle_(x2 - x1, y2 - y1);
+
+    // Invert the angle and normalize to the range [0, 359]
+    angle = -angle;
+    if (angle < 0) {
+        angle += 360;
+    }
+
+    // Convert the angle (0-360) to 16 discrete facing segments (0-15).
+    // The formula used is roughly (angle / 22.5) with rounding logic:
+    // (angle * 4 + 45) / 90
+    int32_t val = (int32_t)(int16_t)(angle << 2);
+    val = (val + 45) / 90;
+
+    // Perform a sign-aware modulo 16 operation.
+    // Even though val is non-negative in this context, the compiled code
+    // uses a generic absolute value and sign restoration pattern.
+    int32_t truncated_val = (int32_t)(int16_t)val;
+    int32_t sign = (truncated_val < 0) ? -1 : 0;
+
+    // Compute abs(truncated_val)
+    int32_t result = (truncated_val ^ sign) - sign;
+
+    // Apply the 16-direction mask
+    result &= 0x0F;
+
+    // Restore the sign
+    result = (result ^ sign) - sign;
+
+    return (int16_t)result;
+}
+
+    int16_t __cdecl Rotate_Ship_Until_Impact_(int16_t ship_idx, int16_t* target_facing) {
+        int16_t impact_detected = 0;
+        uint8_t missile_tracked[300];
+        int16_t saved_missile_x[300];
+        int16_t saved_missile_y[300];
+        int16_t saved_missile_travel[300];
+        int16_t sx, sy;
+        int16_t rotation_step;
+        int8_t current_facing;
+
+        memset(missile_tracked, 0, sizeof(missile_tracked));
+
+        s_combat_data* ship = &MOX::_combat_data[ship_idx];
+        current_facing = ship->facing_dir;
+
+        COMBINIT::Ship_Center_Offsets_(ship_idx, &sx, &sy);
+        sx += (int16_t)ship->x * 20;
+        sy += (int16_t)ship->y * 20;
+
+        int16_t diff = (int16_t)current_facing - *target_facing;
+        if (diff < 0) {
+            rotation_step = ((-diff) > 8) ? -1 : 1;
+        } else {
+            rotation_step = (diff > 8) ? 1 : -1;
+        }
+
+        if ((int16_t)current_facing != *target_facing) {
+            while (impact_detected == 0) {
+                current_facing = (int8_t)((current_facing + rotation_step + 16) % 16);
+
+                for (int i = 0; i < 300; ++i) {
+                    s_missile* missile = &MOX::_missile[i];
+                    if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                        int16_t move_speed = 5;
+                        if (ship->current_speed != 0) {
+                            move_speed = (int16_t)(((int32_t)missile->speed * 5) / (int32_t)ship->current_speed);
+                        }
+                        if (move_speed < 2) {
+                            move_speed = 2;
+                        }
+
+                        if (missile_tracked[i] == 0) {
+                            saved_missile_x[i] = missile->x;
+                            saved_missile_y[i] = missile->y;
+                            saved_missile_travel[i] = missile->travel_dist;
+                            missile_tracked[i] = 1;
+                        }
+
+                        if (CMBTMIS::Move_Missile_(i, sx, sy, move_speed)) {
+                            if (CMBTAI::Will_Missile_Do_Damage_(ship_idx, i) != 0 && missile->is_active == 1) {
+                                impact_detected = 1;
+                            }
+                        }
+                    }
+                }
+
+                if ((int16_t)current_facing == *target_facing) {
+                    break;
+                }
+            }
+        }
+
+        if (impact_detected != 0) {
+            current_facing = (int8_t)((current_facing - rotation_step + 16) % 16);
+            *target_facing = (int16_t)current_facing;
+        }
+
+        for (int i = 0; i < 300; ++i) {
+            if (missile_tracked[i] == 1) {
+                MOX::_missile[i].x = saved_missile_x[i];
+                MOX::_missile[i].y = saved_missile_y[i];
+                MOX::_missile[i].travel_dist = saved_missile_travel[i];
+            }
+        }
+
+        return impact_detected;
+    }
+
+int16_t __cdecl Test_Move_Until_Impact_(int16_t ship_idx, int16_t *dest_x, int16_t *dest_y, int16_t *dest_facing) {
+    int16_t impact_flag = 0;
+    int16_t time_spent = 0;
+    
+    int8_t missile_checked[300];
+    int16_t missile_x_saved[300];
+    int16_t missile_y_saved[300];
+    int16_t missile_travel_dist_saved[300];
+
+    struct_::Clear_Structure_(missile_checked, 300);
+
+    int16_t target_x_val = *dest_x;
+    int16_t target_y_val = *dest_y;
+    
+    int16_t center_x, center_y;
+    COMBINIT::Ship_Center_Offsets_(ship_idx, &center_x, &center_y);
+
+    s_combat_data *ship = &MOX::_combat_data[ship_idx];
+    
+    int16_t start_x = ship->x * 20;
+    int16_t start_y = ship->y * 20;
+    
+    int16_t speed;
+    if (MOX::_speedx2_flag == 1 || MOX::_net_flag != 0) {
+        speed = 12;
+    } else {
+        speed = 2;
+    }
+
+    int16_t current_x = start_x;
+    int16_t current_y = start_y;
+    
+    int16_t facing = Get_Facing_(start_x, start_y, target_x_val, target_y_val);
+    
+    if (ship->facing_dir != facing) {
+        time_spent = Rotate_Ship_Until_Impact_(ship_idx, &facing);
+        impact_flag = time_spent;
+    }
+    
+    *dest_facing = facing;
+    
+    int16_t legal_x = current_x;
+    int16_t legal_y = current_y;
+
+    if (impact_flag == 0) {
+        while (true) {
+            if (current_x == target_x_val && current_y == target_y_val) {
+                break;
+            }
+
+            if (Ship_In_Legal_Square_(MOX::_cur_ship, current_x, current_y, target_x_val, target_y_val)) {
+                legal_x = current_x;
+                legal_y = current_y;
+            }
+
+            special::Absolute_Interpolate_Line_(&current_x, &current_y, start_x, start_y, target_x_val, target_y_val, speed);
+
+            for (int16_t i = 0; i < 300; ++i) {
+                s_missile *missile = &MOX::_missile[i];
+                if (missile->type > 0 && missile->target_unit_idx == ship_idx && missile->source_unit_idx != ship_idx) {
+                    
+                    int16_t missile_speed = 5;
+                    if (ship->current_speed != 0) {
+                        uint8_t m_speed = missile->speed;
+                        missile_speed = (m_speed * speed) / ship->current_speed;
+                    }
+                    if (missile_speed < 2) {
+                        missile_speed = 2;
+                    }
+
+                    if (missile_checked[i] == 0) {
+                        missile_x_saved[i] = missile->x;
+                        missile_y_saved[i] = missile->y;
+                        missile_travel_dist_saved[i] = missile->travel_dist;
+                        missile_checked[i] = 1;
+                    }
+
+                    if (CMBTMIS::Move_Missile_(i, current_x + center_x, current_y + center_y, missile_speed)) {
+                        if (CMBTAI::Will_Missile_Do_Damage_(ship_idx, i)) {
+                            if (missile->is_active == 1) {
+                                impact_flag = 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (impact_flag != 0) {
+                break;
+            }
+        }
+    }
+
+    if (impact_flag != 0) {
+        if (legal_x == start_x && legal_y == start_y) {
+            current_x = legal_x;
+            current_y = legal_y;
+        } else {
+            if (legal_x > target_x_val) {
+                current_x = legal_x - (legal_x % 20) + 20;
+            } else {
+                current_x = legal_x - (legal_x % 20);
+            }
+
+            if (legal_y > target_y_val) {
+                current_y = legal_y - (legal_y % 20) + 20;
+            } else {
+                current_y = legal_y - (legal_y % 20);
+            }
+        }
+    }
+
+    *dest_x = current_x;
+    *dest_y = current_y;
+
+    for (int16_t i = 0; i < 300; ++i) {
+        if (missile_checked[i] == 1) {
+            s_missile *missile = &MOX::_missile[i];
+            missile->x = missile_x_saved[i];
+            missile->y = missile_y_saved[i];
+            missile->travel_dist = missile_travel_dist_saved[i];
+        }
+    }
+
+    return time_spent;
+}
+
+void __cdecl Draw_Teleporting_Ship_(int16_t ship_idx, int16_t target_x, int16_t target_y) {
+    int16_t off_x, off_y;
+    int16_t ship_screen_x, ship_screen_y;
+    int16_t target_screen_x, target_screen_y;
+    s_animation_header* anim;
+    int32_t sound_handle;
+    int16_t step;
+    int16_t step_10;
+    int16_t counter;
+    int16_t vanish_out, vanish_in;
+    int32_t pitch;
+
+    if (MOX::_super_fast_flag != 0) {
+        return;
+    }
+
+    if (!CMBTMIS::On_Combat_Screen_(target_x, target_y)) {
+        COMBINIT::Snap_Center_Combat_Screen_(target_x, target_y);
+    }
+
+    MOX::_dont_draw_ship = ship_idx;
+    CMBTDRW1::Get_Draw_Ship_Offsets_(ship_idx, &off_x, &off_y);
+
+    ship_screen_x = (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20 + off_x;
+    ship_screen_y = (MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y) * 20 + off_y;
+
+    target_screen_x = (target_x - MOX::_cur_combat_x) * 20 + off_x;
+    target_screen_y = (target_y - MOX::_cur_combat_y) * 20 + off_y;
+
+    allocate::Push_Block_(MOX::_screen_seg);
+    anim = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2584);
+    video::Set_Page_Off_();
+    CMBTDRW1::Full_Draw_Combat_Screen_();
+
+    if (MOX::_speedx2_flag == 1 || MOX::_net_flag != 0) {
+        step = 2;
+    } else {
+        step = 1;
+    }
+
+    sound_handle = ERICNET::Mox_Play_Sound_(0x37);
+    pitch = (2 - (int32_t)MOX::_combat_data[ship_idx].size_class) * 2500;
+    sound::Pitch_Bend_Sound_(sound_handle, pitch);
+
+    counter = 0;
+    step_10 = step * 10;
+    vanish_out = 0;
+    vanish_in = 100;
+
+    do {
+        CMBTDRW1::Draw_Main_Combat_Screen_();
+        graphics::Set_Window_(0, 0, 639, 350);
+        video::Clip_On_();
+
+        // Ship vanishing at current location
+        CMBTDRW1::Draw_Ship_To_Bitmap_(ship_idx, 0, 0, 0);
+        bitmap::Vanish_Bitmap_(anim, MOX::_draw_ship_bitmap, vanish_out);
+        animate::Draw_(ship_screen_x, ship_screen_y, anim);
+
+        // Ship appearing at target location
+        CMBTDRW1::Draw_Ship_To_Bitmap_(ship_idx, 0, 0, 0);
+        bitmap::Vanish_Bitmap_(anim, MOX::_draw_ship_bitmap, vanish_in);
+        animate::Draw_(target_screen_x, target_screen_y, anim);
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+        RUSS::Mox_Sync_Update_();
+
+        counter += step;
+        vanish_out += step_10;
+        vanish_in -= step_10;
+    } while (counter < 10);
+
+    video::Clip_Off_();
+    allocate::Pop_Block_(MOX::_screen_seg);
+    sound::Fadeout_Sound_(sound_handle, 10);
+}
+
+int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_id, int16_t x, int16_t y, int16_t target_x, int16_t target_y) {
+    int16_t grid_x;
+    int16_t grid_y;
+
+    if (target_x < x) {
+        grid_x = (x - (x % 20)) + 20;
+    } else {
+        grid_x = x - (x % 20);
+    }
+
+    if (target_y < y) {
+        grid_y = (y - (y % 20)) + 20;
+    } else {
+        grid_y = y - (y % 20);
+    }
+
+    int16_t cell_x = grid_x / 20;
+    int16_t cell_y = grid_y / 20;
+
+    int16_t cell_val = MOX::_combat_grid[cell_x][cell_y];
+
+    // 2000 likely represents an empty or traversable square
+    if (cell_val == 2000 /* 0x7d0 */ || cell_val == ship_id) {
+        return 1;
+    }
+
+    return 0;
 }
 
 }

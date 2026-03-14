@@ -20,8 +20,8 @@ namespace CMBTMIS {
         reinterpret_cast<Fn>(std::uintptr_t{0x00500070})(m);
     }
 
-    inline uint8_t __cdecl Move_Missile_(int16_t missile_idx, int16_t x, int16_t y, int8_t speed) {
-        using Fn = uint8_t(__cdecl*)(int16_t, int16_t, int16_t, int8_t);
+    inline int8_t __cdecl Move_Missile_(int16_t missile_idx, int16_t x, int16_t y, int16_t speed) {
+        using Fn = int8_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004FEF70})(missile_idx, x, y, speed);
     }
 

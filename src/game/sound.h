@@ -121,4 +121,9 @@ namespace sound {
         using Fn = void(__cdecl*)(int32_t, int32_t);
         reinterpret_cast<Fn>(0x0052e850)(handle, duration);
     }
+
+    inline void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052D520})(handle, pitch);
+    }
 }
