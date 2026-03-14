@@ -22,6 +22,11 @@ namespace graphics {
         fn(x1, y1, x2, y2, color);
     }
 
+    inline void __cdecl Interlaced_Fill_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(0x00528f30)(param_1, param_2, param_3, param_4, param_5, param_6);
+    }
+
     void __cdecl Box_(int16_t x, int16_t y, int16_t width, int16_t height, int16_t thickness, uint8_t color);
 
     void __cdecl Dot_(int16_t x, int16_t y, uint8_t color);

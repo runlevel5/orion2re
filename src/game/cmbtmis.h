@@ -39,4 +39,9 @@ namespace CMBTMIS {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004FDA60})(missile_idx);
     }
+
+    inline void __cdecl Draw_Missile_(int16_t missile_idx, int16_t x, int16_t y, int16_t param_4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004FDB50})(missile_idx, x, y, param_4);
+    }
 }

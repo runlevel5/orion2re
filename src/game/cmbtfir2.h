@@ -32,6 +32,8 @@ namespace CMBTFIR2 {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004e8af0})(ship);
     }
 
+    void __cdecl Set_Teleporter_Used_(int16_t ship_idx);
+
     inline void __cdecl Set_Boarded_Flag_(int16_t ship) {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004e8b80})(ship);
@@ -116,5 +118,10 @@ namespace CMBTFIR2 {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E70C0});
         return fn(ship_idx, marines_sent);
+    }
+
+    inline void __cdecl Defensive_Fire_Check_(int16_t ship_idx, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004E6C70})(ship_idx, x1, y1, x2, y2);
     }
 }

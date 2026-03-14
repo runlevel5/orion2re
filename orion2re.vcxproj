@@ -43,6 +43,8 @@
     <ClCompile Include="src\game\cmbtfir2.cpp" />
     <ClCompile Include="src\game\cmbtfire.cpp" />
     <ClCompile Include="src\game\cmbtmis.cpp" />
+    <ClCompile Include="src\game\cmbtmov1.cpp" />
+    <ClCompile Include="src\game\cmbtspec.cpp" />
     <ClCompile Include="src\game\colbcach.cpp" />
     <ClCompile Include="src\game\colbldg.cpp" />
     <ClCompile Include="src\game\colcalc.cpp" />
@@ -214,6 +216,7 @@
     <ClInclude Include="src\game\fields.h" />
     <ClInclude Include="src\game\filedef.h" />
     <ClInclude Include="src\game\file_ani.h" />
+    <ClInclude Include="src\game\firepts.h" />
     <ClInclude Include="src\game\fleetpop.h" />
     <ClInclude Include="src\game\flt.h" />
     <ClInclude Include="src\game\flt1.h" />

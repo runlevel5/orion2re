@@ -564,12 +564,11 @@ namespace COMBAT1 {
                                                 if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
                                                     Send_Tactical_Combat_Message_(MOX::_net_destination, 10005, tx, ty, 0);
                                                 }
-                                                int16_t cost = CMBTMOV1::Move_Cost_(MOX::_cur_ship, tx, ty);
                                                 if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
                                                 }
                                                 int16_t used_tp1 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
-                                                int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, tx, ty, cost);
+                                                int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, tx, ty);
                                                 int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                 if (used_tp1 == used_tp2) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
@@ -732,12 +731,11 @@ namespace COMBAT1 {
                                                     break;
                                                 case 10005: {
                                                     int8_t orig_owner = MOX::_combat_data[MOX::_cur_ship].owner;
-                                                    int16_t cost = CMBTMOV1::Move_Cost_(MOX::_cur_ship, f10, f12);
                                                     if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
                                                     }
                                                     int16_t used_tp1 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
-                                                    int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, f10, f12, cost);
+                                                    int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, f10, f12);
                                                     int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                     if (used_tp1 == used_tp2) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;

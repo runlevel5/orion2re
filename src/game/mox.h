@@ -176,6 +176,7 @@ namespace MOX {
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
+    inline int16_t& _auto_msl_warning_off = *reinterpret_cast<int16_t*>(0x0059790E);
     inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
@@ -553,6 +554,8 @@ namespace MOX {
     inline int16_t& _combat_attacker_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059701C});
     inline s_qship*& _qcombat_data = *reinterpret_cast<s_qship**>(std::uintptr_t{0x00597498});
     inline int16_t& _combat_total_ship_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784A});
+    inline uint8_t& _combat_done_waiting = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1B50});
+    inline s_colors& _combat_green = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559710});
     inline int16_t& _combat_attacker_player = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B32C});
     inline int16_t& _combat_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B49C});
     inline uint8_t& _colony_defense_flags = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BA});

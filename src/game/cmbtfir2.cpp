@@ -232,4 +232,9 @@ namespace CMBTFIR2 {
     void __cdecl Set_Capturing_Flag_(int16_t unit_idx) {
         struct_::Set_Bit_Field_(&MOX::_combat_data[unit_idx].combat_status_flags, 4);
     }
+
+    void __cdecl Set_Teleporter_Used_(int16_t ship_idx) {
+        // Bit 0 of combat_status_flags indicates if teleporter was used
+        struct_::Set_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 0);
+    }
 }

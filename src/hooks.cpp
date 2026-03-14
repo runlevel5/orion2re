@@ -1761,6 +1761,14 @@ namespace hooks {
         { 0x0046a8a0, &COMBAT1::Add_Tactical_Combat_Fields_ },
         { 0x0046a0f0, &COMBAT1::Add_Missile_Fields_ },
         { 0x0046a2c0, &COMBAT1::Set_Combat_Help_Fields_ },
+        { 0x004a6960, &CMBTSPEC::Draw_Cloak_ },
+        { 0x0046ede0, &CMBTMOV1::Ship_Is_In_Stasis_ },
+        { 0x004700d0, &CMBTMOV1::Rotate_Ship_ },
+        { 0x004706e0, &CMBTMOV1::Wait_Until_Net_Opponent_Finished_ },
+        { 0x00470480, &CMBTMOV1::Move_Cost_ },
+        { 0x004e8b20, &CMBTFIR2::Set_Teleporter_Used_ },
+        { 0x0046f810, &CMBTMOV1::Move_Ship_ },
+        { 0x00470560, &CMBTMOV1::Turn_To_Face_ },
     };
 
     void Install_Hooks()
