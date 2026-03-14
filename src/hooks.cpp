@@ -1797,6 +1797,7 @@ namespace hooks {
         { 0x004fdeb0, &CMBTMIS::Get_Multiple_Torpedo_Coords_ },
         { 0x004fdb50, &CMBTMIS::Draw_Missile_ },
         { 0x004fde10, &CMBTMIS::Picture_Count_ },
+        { 0x004ac800, &CMBTFIRE::Is_Combat_Ship_Dead_ },
     };
 
     void Install_Hooks()

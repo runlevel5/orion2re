@@ -17,7 +17,7 @@ namespace CMBTMOV1 {
     }
 
     bool __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
-        return MOX::_combat_data[ship_idx].stasis_source_idx != 0xFF;
+        return MOX::_combat_data[ship_idx].stasis_source_idx != -1;
     }
 
 void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t screen_x, int16_t screen_y)

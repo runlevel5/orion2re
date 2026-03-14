@@ -2,11 +2,7 @@
 #include <cstdint>
 
 namespace CMBTFIRE {
-    inline int16_t __cdecl Is_Combat_Ship_Dead_(int16_t ship_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AC800});
-        return fn(ship_idx);
-    }
+    int16_t __cdecl Is_Combat_Ship_Dead_(int16_t ship_idx);
 
     inline void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t x, int16_t y, int16_t is_dead) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);

@@ -16,4 +16,27 @@ namespace CMBTFIRE {
         }
         return 0;
     }
+
+    int16_t __cdecl Is_Combat_Ship_Dead_(int16_t ship_idx) {
+        int16_t result = 0;
+
+        if (ship_idx != 0) {
+            s_combat_data* ship = &MOX::_combat_data[ship_idx];
+
+            if (ship->structure_damage >= ship->structure_max) {
+                result = 1;
+            }
+            else if (ship->drive_current_hits == 0 && ship->owner <= 9 && ship->ftl_type > 0) {
+                result = 3;
+            }
+
+            if (result != 0) {
+                if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* SPECIAL_STASIS_FIELD */)) {
+                    result = 4;
+                }
+            }
+        }
+
+        return result;
+    }
 }

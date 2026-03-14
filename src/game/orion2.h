@@ -1524,7 +1524,7 @@ struct s_combat_data {
     int8_t field40_0x47;
     uint8_t combat_status_flags; /* bit 0: teleporter used; bit 1: being boarded; bit 2: turn finished */
     undefined field42_0x49;
-    uint8_t stasis_source_idx;
+    int8_t stasis_source_idx;
     int8_t is_retreating;
     uint8_t special_device_flags[5];
     undefined field46_0x51;

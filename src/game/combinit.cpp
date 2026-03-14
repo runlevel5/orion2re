@@ -336,7 +336,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
 void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     s_combat_data* ship = &MOX::_combat_data[combat_ship_idx];
 
-    ship->stasis_source_idx = 0xFF;
+    ship->stasis_source_idx = -1;
     ship->black_hole_source_idx = -1;
     ship->field39_0x45 = 0;
     ship->black_hole_flag = 0;

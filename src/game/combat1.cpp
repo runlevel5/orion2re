@@ -1280,7 +1280,7 @@ namespace COMBAT1 {
         int16_t count = 0;
 
         for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-            if (MOX::_combat_data[i].stasis_source_idx == (uint8_t)source_ship_idx) {
+            if (MOX::_combat_data[i].stasis_source_idx == source_ship_idx) {
                 count++;
             }
         }
@@ -1337,7 +1337,7 @@ namespace COMBAT1 {
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx) {
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
             // Check if this ship is being held in stasis by the source ship
-            if (MOX::_combat_data[i].stasis_source_idx == (uint8_t)source_idx) {
+            if (MOX::_combat_data[i].stasis_source_idx == source_idx) {
                 CMBTFIRE::Remove_Stasis_Beam_(i);
             }
 
