@@ -1784,6 +1784,19 @@ namespace hooks {
         { 0x004ff3c0, &CMBTMIS::Resolve_Missile_ },
         { 0x46b260, &COMBAT1::Assign_Mouse_Images_ },
         { 0x0046a0f0, &COMBAT1::Add_Missile_Fields_ },
+        { 0x004fdad0, &CMBTMIS::Did_Missile_Hit_ },
+        { 0x004fec90, &CMBTMIS::Get_Facing_ },
+        { 0x004fed80, &CMBTMIS::Missile_Speed_ },
+        { 0x004ff340, &CMBTMIS::Is_Missile_Target_Alive_ },
+        { 0x004ffe00, &CMBTMIS::Find_Weakest_Shield_ },
+        { 0x00500580, &CMBTMIS::Fighter_Combat_SFX_ },
+        { 0x004fe040, &CMBTMIS::Get_Multiple_Missile_Coords_ },
+        { 0x004fd8f0, &CMBTMIS::Missile_Type_ },
+        { 0x004ffe50, &CMBTMIS::Draw_Fighter_ },
+        { 0x004fda60, &CMBTMIS::Kill_Missile_ },
+        { 0x004fdeb0, &CMBTMIS::Get_Multiple_Torpedo_Coords_ },
+        { 0x004fdb50, &CMBTMIS::Draw_Missile_ },
+        { 0x004fde10, &CMBTMIS::Picture_Count_ },
     };
 
     void Install_Hooks()

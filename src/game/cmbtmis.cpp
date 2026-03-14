@@ -1,6 +1,22 @@
 #include "pch.h"
 
 namespace CMBTMIS {
+    int8_t __cdecl Did_Missile_Hit_(int16_t missile_idx, int16_t x, int16_t y) {
+        int32_t dx = (int32_t)x - (int32_t)MOX::_missile[missile_idx].x;
+        int32_t dy = (int32_t)y - (int32_t)MOX::_missile[missile_idx].y;
+        int32_t dist_sq = dx * dx + dy * dy;
+
+        if (MOX::_missile[missile_idx].is_anti_missile_rocket == 1) {
+            return dist_sq < 64 /* 0x40 */;
+        }
+
+        int16_t target_idx = MOX::_missile[missile_idx].target_unit_idx;
+        int32_t radius = (int32_t)MOX::_missile_hit_radius[MOX::_combat_data[target_idx].size_class];
+        int32_t radius_sq = radius * radius;
+
+        return dist_sq < radius_sq;
+    }
+
     int16_t __cdecl Missile_Owner_(int16_t missile_idx) {
         return MOX::_missile[missile_idx].owner;
     }
@@ -195,6 +211,15 @@ namespace CMBTMIS {
                 *out_y = 0;
             }
         }
+    }
+
+    int16_t __cdecl Get_Facing_(int16_t missile_idx, int16_t target_x, int16_t target_y) {
+        return CMBTMOV1::Get_Facing_(
+            MOX::_missile[missile_idx].x,
+            MOX::_missile[missile_idx].y,
+            target_x,
+            target_y
+        );
     }
 
     int16_t __cdecl Resolve_Missile_(int16_t missile_idx, int16_t x, int16_t y) {
@@ -505,5 +530,543 @@ namespace CMBTMIS {
         }
 
         return 0;
+    }
+
+    int16_t __cdecl Missile_Speed_(int16_t type, uint16_t flags, int16_t player_idx) {
+        bool is_warp_affected = true;
+        int16_t missile_speed = 0;
+
+        switch (type) {
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+                missile_speed = 12;
+                break;
+
+            case 18:
+            case 19:
+                is_warp_affected = false;
+                missile_speed = 20;
+                break;
+
+            case 20:
+            case 40: /* 0x28 */
+                is_warp_affected = false;
+                missile_speed = 24;
+                break;
+
+            case 28: /* 0x1C */
+                missile_speed = 6;
+                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                    missile_speed = 10;
+                }
+                break;
+
+            case 29: /* 0x1D */
+                missile_speed = 8;
+                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                    missile_speed = 12;
+                }
+                break;
+
+            case 30: /* 0x1E */
+                missile_speed = 8;
+                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                    missile_speed = 12;
+                }
+                break;
+
+            case 31: /* 0x1F */
+                missile_speed = 10;
+                if (player_idx < 8 && MOX::_player[player_idx].traits[29 /* TRAIT_TRANS_DIMENSIONAL */]) {
+                    missile_speed = 14;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        if (is_warp_affected) {
+            int16_t drive_level = INITSHIP::Best_Warp_Drive_(player_idx);
+            missile_speed += (drive_level * 2) - 2;
+        }
+
+        if (flags & 0x1000 /* WAF_FAST */) {
+            missile_speed += 4;
+        }
+
+        return missile_speed;
+    }
+
+    int16_t __cdecl Is_Missile_Target_Alive_(int16_t missile_idx) {
+        int16_t result = 0;
+        s_missile* missile = &MOX::_missile[missile_idx];
+
+        if (missile->is_anti_missile_rocket != 0) {
+            // Anti-missile rocket logic: target is another missile
+            if (MOX::_missile[missile->target_unit_idx].quantity > 0) {
+                return 1;
+            }
+        } else {
+            // Standard missile logic: target is a ship
+            if (missile->target_unit_idx == 0) {
+                return 1;
+            }
+
+            if (CMBTFIRE::Is_Combat_Ship_Dead_(missile->target_unit_idx) == 0) {
+                result = 1;
+            }
+        }
+
+        return result;
+    }
+
+    int16_t __cdecl Find_Weakest_Shield_(int16_t ship_idx) {
+        int16_t weakest_idx = 0;
+        int16_t min_shield = 200;
+
+        for (int16_t i = 0; i < 4; ++i) {
+            if (MOX::_combat_data[ship_idx].shield_arc_current[i] < min_shield) {
+                min_shield = MOX::_combat_data[ship_idx].shield_arc_current[i];
+                weakest_idx = i;
+            }
+        }
+
+        return weakest_idx;
+    }
+
+    void __cdecl Get_Multiple_Torpedo_Coords_(int16_t missile_idx, int16_t group_size, int16_t* out_x, int16_t* out_y) {
+        // The assembly treats facing_dir as an unsigned index via mask and MOVSX
+        uint8_t facing_dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
+
+        // Initialize output arrays (4 shorts each = 8 bytes total)
+        memset(out_x, 0, 8);
+        memset(out_y, 0, 8);
+
+        // This complex logic matches (int32_t)stardate % 2 == 1 in assembly
+        int32_t stardate_mod = (int32_t)MOX::_stardate % 2;
+
+        if (group_size == 2) {
+            if (stardate_mod == 1) {
+                out_x[0] = _torpedo_group_offset[facing_dir][0];
+                out_y[0] = _torpedo_group_offset[facing_dir][1];
+                out_x[1] = _torpedo_group_offset[facing_dir][4];
+                out_y[1] = _torpedo_group_offset[facing_dir][5];
+            } else {
+                out_x[0] = _torpedo_group_offset[facing_dir][2];
+                out_y[0] = _torpedo_group_offset[facing_dir][3];
+                out_x[1] = _torpedo_group_offset[facing_dir][6];
+                out_y[1] = _torpedo_group_offset[facing_dir][7];
+            }
+        } else if (group_size == 3) {
+            if (stardate_mod == 1) {
+                out_x[1] = _torpedo_group_offset[facing_dir][0];
+                out_y[1] = _torpedo_group_offset[facing_dir][1];
+                out_x[2] = _torpedo_group_offset[facing_dir][4];
+                out_y[2] = _torpedo_group_offset[facing_dir][5];
+            } else {
+                out_x[1] = _torpedo_group_offset[facing_dir][2];
+                out_y[1] = _torpedo_group_offset[facing_dir][3];
+                out_x[2] = _torpedo_group_offset[facing_dir][6];
+                out_y[2] = _torpedo_group_offset[facing_dir][7];
+            }
+        } else if (group_size == 4) {
+            for (int16_t i = 0; i < 4; ++i) {
+                out_x[i] = _torpedo_group_offset[facing_dir][i * 2];
+                out_y[i] = _torpedo_group_offset[facing_dir][i * 2 + 1];
+            }
+        }
+    }
+
+    void __cdecl Get_Multiple_Missile_Coords_(int16_t missile_idx, int16_t quantity, int16_t* out_x, int16_t* out_y) {
+        int dir = MOX::_missile[missile_idx].facing_dir;
+
+        // Initialize output arrays with zeros (9 elements each)
+        memset(out_x, 0, 18);
+        memset(out_y, 0, 18);
+
+        if (static_cast<uint16_t>(quantity - 2) > 7) {
+            return;
+        }
+
+        switch (quantity) {
+            case 2:
+                out_x[0] = CMBTMIS::_missile_group_offset[dir][2] / 2;
+                out_y[0] = CMBTMIS::_missile_group_offset[dir][3] / 2;
+                out_x[1] = CMBTMIS::_missile_group_offset[dir][10] / 2;
+                out_y[1] = CMBTMIS::_missile_group_offset[dir][11] / 2;
+                break;
+
+            case 3:
+                if ((MOX::_stardate % 2) == 1) {
+                    out_x[1] = CMBTMIS::_missile_group_offset[dir][6];
+                    out_y[1] = CMBTMIS::_missile_group_offset[dir][7];
+                    out_x[2] = CMBTMIS::_missile_group_offset[dir][14];
+                    out_y[2] = CMBTMIS::_missile_group_offset[dir][15];
+                } else {
+                    out_x[1] = CMBTMIS::_missile_group_offset[dir][2];
+                    out_y[1] = CMBTMIS::_missile_group_offset[dir][3];
+                    out_x[2] = CMBTMIS::_missile_group_offset[dir][10];
+                    out_y[2] = CMBTMIS::_missile_group_offset[dir][11];
+                }
+                break;
+
+            case 4:
+                out_x[0] = CMBTMIS::_missile_group_offset[dir][2];
+                out_y[0] = CMBTMIS::_missile_group_offset[dir][3];
+                out_x[1] = CMBTMIS::_missile_group_offset[dir][6];
+                out_y[1] = CMBTMIS::_missile_group_offset[dir][7];
+                out_x[2] = CMBTMIS::_missile_group_offset[dir][10];
+                out_y[2] = CMBTMIS::_missile_group_offset[dir][11];
+                out_x[3] = CMBTMIS::_missile_group_offset[dir][14];
+                out_y[3] = CMBTMIS::_missile_group_offset[dir][15];
+                break;
+
+            case 5:
+                out_x[1] = CMBTMIS::_missile_group_offset[dir][2];
+                out_y[1] = CMBTMIS::_missile_group_offset[dir][3];
+                out_x[2] = CMBTMIS::_missile_group_offset[dir][6];
+                out_y[2] = CMBTMIS::_missile_group_offset[dir][7];
+                out_x[3] = CMBTMIS::_missile_group_offset[dir][10];
+                out_y[3] = CMBTMIS::_missile_group_offset[dir][11];
+                out_x[4] = CMBTMIS::_missile_group_offset[dir][14];
+                out_y[4] = CMBTMIS::_missile_group_offset[dir][15];
+                break;
+
+            case 6:
+                out_x[0] = CMBTMIS::_missile_group_offset[dir][2];
+                out_y[0] = CMBTMIS::_missile_group_offset[dir][3];
+                out_x[1] = CMBTMIS::_missile_group_offset[dir][4];
+                out_y[1] = CMBTMIS::_missile_group_offset[dir][5];
+                out_x[2] = CMBTMIS::_missile_group_offset[dir][6];
+                out_y[2] = CMBTMIS::_missile_group_offset[dir][7];
+                out_x[3] = CMBTMIS::_missile_group_offset[dir][10];
+                out_y[3] = CMBTMIS::_missile_group_offset[dir][11];
+                out_x[4] = CMBTMIS::_missile_group_offset[dir][12];
+                out_y[4] = CMBTMIS::_missile_group_offset[dir][13];
+                out_x[5] = CMBTMIS::_missile_group_offset[dir][14];
+                out_y[5] = CMBTMIS::_missile_group_offset[dir][15];
+                break;
+
+            case 7:
+                out_x[1] = CMBTMIS::_missile_group_offset[dir][2];
+                out_y[1] = CMBTMIS::_missile_group_offset[dir][3];
+                out_x[2] = CMBTMIS::_missile_group_offset[dir][4];
+                out_y[2] = CMBTMIS::_missile_group_offset[dir][5];
+                out_x[3] = CMBTMIS::_missile_group_offset[dir][6];
+                out_y[3] = CMBTMIS::_missile_group_offset[dir][7];
+                out_x[4] = CMBTMIS::_missile_group_offset[dir][10];
+                out_y[4] = CMBTMIS::_missile_group_offset[dir][11];
+                out_x[5] = CMBTMIS::_missile_group_offset[dir][12];
+                out_y[5] = CMBTMIS::_missile_group_offset[dir][13];
+                out_x[6] = CMBTMIS::_missile_group_offset[dir][14];
+                out_y[6] = CMBTMIS::_missile_group_offset[dir][15];
+                break;
+
+            case 8:
+                for (int i = 0; i < 8; ++i) {
+                    out_x[i] = CMBTMIS::_missile_group_offset[dir][i * 2];
+                    out_y[i] = CMBTMIS::_missile_group_offset[dir][i * 2 + 1];
+                }
+                break;
+
+            case 9:
+                for (int i = 0; i < 8; ++i) {
+                    out_x[i + 1] = CMBTMIS::_missile_group_offset[dir][i * 2];
+                    out_y[i + 1] = CMBTMIS::_missile_group_offset[dir][i * 2 + 1];
+                }
+                break;
+        }
+    }
+
+    void __cdecl Fighter_Combat_SFX_(int16_t missile_idx, int16_t x, int16_t y, int16_t dmg, int16_t sys_dmg) {
+        int16_t missile_type;
+        int16_t target_unit_idx;
+        int16_t target_x_scr, target_y_scr;
+        int16_t source_x_scr, source_y_scr;
+        int16_t beam_count;
+        int16_t missile_x_offsets[10];
+        int16_t missile_y_offsets[10];
+        int16_t beams[18];
+        int16_t shot_idx;
+        int16_t off_x, off_y;
+        uint8_t drawing;
+
+        s_missile *missile = &MOX::_missile[missile_idx];
+        missile_type = missile->type;
+        target_unit_idx = missile->target_unit_idx;
+
+        if (missile->is_anti_missile_rocket) {
+            if (!Missile_On_Combat_Screen_(target_unit_idx)) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_missile[target_unit_idx].x / 20, MOX::_missile[target_unit_idx].y / 20);
+            }
+            target_x_scr = MOX::_missile[target_unit_idx].x - MOX::_cur_combat_x * 20;
+            target_y_scr = MOX::_missile[target_unit_idx].y - MOX::_cur_combat_y * 20;
+        } else {
+            if (!CMBTDRW1::Ship_Completely_On_Screen_(target_unit_idx)) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[target_unit_idx].x, MOX::_combat_data[target_unit_idx].y);
+            }
+            target_x_scr = x - MOX::_cur_combat_x * 20;
+            target_y_scr = y - MOX::_cur_combat_y * 20;
+        }
+
+        source_x_scr = missile->x - MOX::_cur_combat_x * 20;
+        source_y_scr = missile->y - MOX::_cur_combat_y * 20;
+
+        beam_count = (missile->quantity + (missile->quantity < 0 ? 3 : 0)) / 4;
+        if (beam_count > 9) beam_count = 9;
+        if (beam_count < 1) beam_count = 1;
+
+        CMBTMIS::Get_Multiple_Missile_Coords_(missile_idx, beam_count, missile_x_offsets, missile_y_offsets);
+        shot_idx = 0;
+
+        do {
+            timer::Mark_Time_();
+            video::Set_Page_Off_();
+            missile->type = 0;
+            CMBTDRW1::Draw_Main_Combat_Screen_();
+            missile->type = missile_type;
+
+            if (!missile->is_anti_missile_rocket && missile->target_unit_idx == MOX::_dont_draw_ship) {
+                COMBINIT::Ship_Center_Offsets_(missile->target_unit_idx, &off_x, &off_y);
+                graphics::Set_Window_(0, 0, 639, 350);
+                video::Clip_On_();
+                CMBTDRW1::Draw_Ship_(missile->target_unit_idx, target_x_scr - off_x, target_y_scr - off_y);
+                video::Clip_Off_();
+                graphics::Reset_Window_();
+            }
+
+            for (int16_t i = 0; i < beam_count; ++i) {
+                beams[i * 2] = missile_x_offsets[i] + source_x_scr - 2;
+                beams[i * 2 + 1] = missile_y_offsets[i] + source_y_scr - 2;
+            }
+
+            CMBTMIS::Draw_Fighter_(missile_idx, source_x_scr, source_y_scr, 1);
+            int16_t owner = CMBTMIS::Missile_Owner_(missile_idx);
+            drawing = BEAMS::Draw_Fighter_Beam_(beams, beam_count, target_x_scr, target_y_scr, MOX::_fighter_beam_type[owner], shot_idx);
+            
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
+            shot_idx++;
+        } while (drawing);
+
+        if (missile->is_anti_missile_rocket) {
+            BEAMS::Add_Damage_Indicator_For_Missile_(target_x_scr, target_y_scr, 1, dmg);
+            BEAMS::Draw_Damage_Message_Queue_Until_Done_();
+        } else {
+            COMBINIT::Ship_Center_Offsets_(target_unit_idx, &off_x, &off_y);
+            BEAMS::Add_Damage_Indicator_For_Ship_(target_x_scr - off_x, target_y_scr - off_y, target_unit_idx, 1, dmg, sys_dmg);
+            
+            while (!BEAMS::Done_Drawing_Damage_Message_Queue_()) {
+                timer::Mark_Time_();
+                video::Set_Page_Off_();
+                CMBTDRW1::Draw_Main_Combat_Screen_();
+                graphics::Set_Window_(0, 0, 639, 350);
+                video::Clip_On_();
+                if (target_unit_idx == MOX::_dont_draw_ship) {
+                    COMBINIT::Ship_Center_Offsets_(target_unit_idx, &off_x, &off_y);
+                    CMBTDRW1::Draw_Ship_(target_unit_idx, target_x_scr - off_x, target_y_scr - off_y);
+                }
+                BEAMS::Draw_Damage_Message_Queue_();
+                RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(1);
+                video::Clip_Off_();
+                graphics::Reset_Window_();
+            }
+        }
+    }
+
+    int16_t __cdecl Missile_Type_(int16_t missile_idx) {
+        switch (MOX::_missile[missile_idx].type) {
+            case 14 /* 0x0e */:
+                return 0;
+            case 15 /* 0x0f */:
+                return 1;
+            case 16 /* 0x10 */:
+                return 2;
+            case 17 /* 0x11 */:
+                return 3;
+            case 18 /* 0x12 */:
+                return 4;
+            case 19 /* 0x13 */:
+                return 5;
+            case 20 /* 0x14 */:
+            case 40 /* 0x28 */:
+                return 6;
+            case 28 /* 0x1c */:
+                return 3;
+            case 29 /* 0x1d */:
+                return 1;
+            case 30 /* 0x1e */:
+                return 2;
+            case 31 /* 0x1f */:
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
+    int16_t __cdecl Picture_Count_(int16_t missile_idx) {
+        s_missile* missile = &MOX::_missile[missile_idx];
+        int8_t rack = TECHDATA::_weapons[missile->type].rack;
+        int16_t count;
+
+        if (rack == 1) {
+            count = (missile->quantity / 5) + 1;
+            if (count <= 0) {
+                return 1;
+            }
+            if (count > 9) {
+                return 9;
+            }
+            return count;
+        }
+
+        if (rack == 2) {
+            count = (missile->quantity / 5) + 1;
+            if (count <= 0) {
+                return 1;
+            }
+            if (count > 4) {
+                return 4;
+            }
+            return count;
+        }
+
+        if (rack == 4) {
+            count = missile->quantity;
+            if (count <= 9) {
+                count = 9;
+            }
+            return count;
+        }
+
+        return 1;
+    }
+
+    void __cdecl Kill_Missile_(int16_t missile_idx) {
+        // Clear the missile data structure
+        memset(&MOX::_missile[missile_idx], 0, sizeof(s_missile));
+
+        // Scan for all active anti-missile rockets that were targeting this missile
+        for (int16_t i = 0; i < 300; ++i) {
+            if (MOX::_missile[i].target_unit_idx == missile_idx &&
+                MOX::_missile[i].is_anti_missile_rocket == 1) {
+                Retarget_Missile_(i);
+            }
+        }
+    }
+
+    void __cdecl Draw_Fighter_(int16_t m_idx, int16_t base_x, int16_t base_y, int16_t combat_view_type) {
+        int16_t rand_x = 0;
+        int16_t rand_y = 0;
+        int16_t num_missiles;
+        int16_t x_coords[10];
+        int16_t y_coords[10];
+        int16_t type;
+        int16_t owner;
+        int16_t window_height;
+        int16_t facing_dir;
+        s_animation_header* fighter_anim;
+
+        num_missiles = MOX::_missile[m_idx].quantity / 4;
+        if (num_missiles > 9) {
+            num_missiles = 9;
+        }
+        if (num_missiles < 1) {
+            num_missiles = 1;
+        }
+
+        Get_Multiple_Missile_Coords_(m_idx, num_missiles, x_coords, y_coords);
+
+        if (combat_view_type == 1) {
+            window_height = 479;
+        } else {
+            window_height = 350;
+        }
+
+        graphics::Set_Window_(0, 0, 639, window_height);
+        video::Clip_On_();
+
+        for (int16_t i = 0; i < num_missiles; ++i) {
+            type = Missile_Type_(m_idx);
+
+            if (combat_view_type == 0 && (MOX::_ship_frame % 3 == 0)) {
+                uint32_t old_seed = random::Get_Random_Seed_();
+                random::Set_Random_Seed_(static_cast<uint32_t>(_clock()) + i + m_idx);
+                rand_x = static_cast<int16_t>(random::Random_(3)) - 2;
+                rand_y = static_cast<int16_t>(random::Random_(3)) - 2;
+                random::Set_Random_Seed_(old_seed);
+            }
+
+            owner = Missile_Owner_(m_idx);
+            facing_dir = static_cast<uint8_t>(MOX::_missile[m_idx].facing_dir);
+            fighter_anim = MOX::_fighter_seg[owner][type * 16 + facing_dir];
+
+            if (MOX::_missile[m_idx].target_unit_idx == MOX::_cur_ship) {
+                animate::Set_Animation_Frame_(fighter_anim, (MOX::_ship_frame + m_idx) % 3);
+            } else {
+                animate::Reset_Animation_Frame_(fighter_anim);
+            }
+
+            animate::Draw_(x_coords[i] + base_x + rand_x - 12,
+                          y_coords[i] + base_y + rand_y - 12,
+                          fighter_anim);
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+    }
+
+    void __cdecl Draw_Missile_(int16_t missile_idx, int16_t screen_x, int16_t screen_y, int16_t flag) {
+        if (MOX::_missile[missile_idx].type > 0) {
+            if (Missile_On_Combat_Screen_(missile_idx) != 0 || flag != 0) {
+                Missile_Owner_(missile_idx);
+                int16_t type_idx = Missile_Type_(missile_idx);
+                int16_t facing_idx = (int16_t)(uint8_t)MOX::_missile[missile_idx].facing_dir;
+
+                if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].rack != 4 /* RACK_FIGHTER */) {
+                    if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship || MOX::_missile[missile_idx].type == 0x13 /* MSL_TYPE_PLASMA */) {
+                        animate::Set_Animation_Frame_(MOX::_msl_seg[type_idx * 16 + facing_idx], (MOX::_ship_frame + missile_idx) % 3);
+                    } else {
+                        animate::Reset_Animation_Frame_(MOX::_msl_seg[type_idx * 16 + facing_idx]);
+                    }
+                }
+
+                if (MOX::_missile[missile_idx].target_unit_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
+                    int16_t weapon_type = MOX::_missile[missile_idx].type;
+                    if (TECHDATA::_weapons[weapon_type].rack == 4 /* RACK_FIGHTER */) {
+                        Draw_Fighter_(missile_idx, screen_x, screen_y, flag);
+                        return;
+                    }
+
+                    int16_t count = Picture_Count_(missile_idx);
+                    int16_t coords_x[10];
+                    int16_t coords_y[10];
+
+                    if (TECHDATA::_weapons[weapon_type].rack != 1 /* RACK_MISSILE */ && weapon_type != 0x12 /* MSL_TYPE_MIRV */) {
+                        Get_Multiple_Torpedo_Coords_(missile_idx, count, coords_y, coords_x);
+                        graphics::Set_Window_(0, 0, 0x27f, (flag == 1) ? 0x1df : 0x15e);
+                        video::Clip_On_();
+                        for (int i = 0; i < count; ++i) {
+                            animate::Draw_(coords_x[i] + screen_x - 0x17, coords_y[i] + screen_y - 0x17, MOX::_msl_seg[type_idx * 16 + facing_idx]);
+                        }
+                        video::Clip_Off_();
+                        graphics::Reset_Window_();
+                    } else {
+                        Get_Multiple_Missile_Coords_(missile_idx, count, coords_y, coords_x);
+                        graphics::Set_Window_(0, 0, 0x27f, (flag == 1) ? 0x1df : 0x15e);
+                        video::Clip_On_();
+                        for (int i = 0; i < count; ++i) {
+                            animate::Draw_(coords_x[i] + screen_x - 0xc, coords_y[i] + screen_y - 0xc, MOX::_msl_seg[type_idx * 16 + facing_idx]);
+                        }
+                        video::Clip_Off_();
+                        graphics::Reset_Window_();
+                    }
+                }
+            }
+        }
     }
 }

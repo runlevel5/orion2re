@@ -631,7 +631,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::Mox_Update_();
 
         for (int16_t i = 0; i < 0x70; ++i) {
-            MOX::_msl_seg[i] = MOX::farload::Far_Reload_Next_(s_cmbtmisl_lbx_00551234, i, MOX::_screen_seg);
+            MOX::_msl_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_cmbtmisl_lbx_00551234, i, MOX::_screen_seg);
             MOX::Mox_Update_();
         }
 

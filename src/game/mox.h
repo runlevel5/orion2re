@@ -507,7 +507,8 @@ namespace MOX {
     inline void*& _bhg_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A1860});
     inline void*& _plasma_web_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A1CB4});
     inline void*& _stellar_converter_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x0059C418});
-    inline void** _msl_seg = reinterpret_cast<void**>(std::uintptr_t{0x005A47F0});
+    inline s_animation_header* (&_msl_seg)[112] =
+        *reinterpret_cast<s_animation_header* (*)[112]>(std::uintptr_t{0x005A47F0});
     inline void** _ship_cursor = reinterpret_cast<void**>(std::uintptr_t{0x0059BF00});
     inline void** _shield_div_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BFA0});
     inline void** _shield_mask_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BAE0});
@@ -515,8 +516,8 @@ namespace MOX {
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
     inline s_combat_data*& _combat_data = *reinterpret_cast<s_combat_data**>(std::uintptr_t{0x005A2BE0});
     inline s_missile*& _missile = *reinterpret_cast<s_missile**>(std::uintptr_t{0x00597858});
-    inline int16_t* _missile_hit_radius =
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00559718});
+    inline int16_t (&_missile_hit_radius)[6] =
+        *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00559718});
     inline s_net_combat_message& _new_message = *reinterpret_cast<s_net_combat_message*>(std::uintptr_t{0x0059B5D0});
     inline int16_t* _gate_icon_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D68});
     inline int16_t& _system_display_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A6});

@@ -62,4 +62,14 @@ namespace BEAMS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422E70});
         fn();
     }
+
+    inline uint8_t __cdecl Draw_Fighter_Beam_(int16_t* beams, int16_t count, int16_t target_x, int16_t target_y, int16_t beam_type, int16_t frame) {
+        using Fn = uint8_t(__cdecl*)(int16_t*, int16_t, int16_t, int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00422770})(beams, count, target_x, target_y, beam_type, frame);
+    }
+
+    inline void __cdecl Add_Damage_Indicator_For_Missile_(int16_t x, int16_t y, int16_t flag, int16_t damage) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00422DC0})(x, y, flag, damage);
+    }
 }
