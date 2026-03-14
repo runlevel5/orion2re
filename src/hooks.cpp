@@ -1798,6 +1798,19 @@ namespace hooks {
         { 0x004fdb50, &CMBTMIS::Draw_Missile_ },
         { 0x004fde10, &CMBTMIS::Picture_Count_ },
         { 0x004ac800, &CMBTFIRE::Is_Combat_Ship_Dead_ },
+        { 0x004e6570, &CMBTFIR2::Galactic_Lore_Bonus_ },
+        { 0x004addd0, &CMBTFIRE::Facing_Shield_ },
+        { 0x004af320, &CMBTFIRE::Special_Is_Turned_On_ },
+        { 0x004af2f0, &CMBTFIRE::Special_Is_On_ },
+        { 0x004e5c50, &CMBTFIR2::Get_Fleet_Ordnance_Bonus_ },
+        { 0x004e5bf0, &CMBTFIR2::Leader_Ordnance_Bonus_ },
+        { 0x004e88b0, &CMBTFIR2::Apply_Combat_Artemis_Net_ },
+        { 0x004e8b80, &CMBTFIR2::Set_Boarded_Flag_ },
+        { 0x004e8b50, &CMBTFIR2::Already_Boarded_ },
+        { 0x004e8ac0, &CMBTFIR2::Set_Combat_Ship_Done_ },
+        { 0x004e6f40, &CMBTFIR2::Max_Defensive_Fire_Range_ },
+        { 0x004ADE00, &CMBTFIRE::Destroy_Ship_ },
+        { 0x004af2a0, &CMBTFIRE::Remove_Stasis_Beam_ },
     };
 
     void Install_Hooks()

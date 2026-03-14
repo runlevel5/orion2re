@@ -28,4 +28,9 @@ namespace CMBTSPEC {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004a6190})(target, missile_idx, x, y);
     }
+
+    inline void __cdecl Destroy_Ship_FX_(int16_t ship_idx, int16_t p2, int16_t p3, int16_t p4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004A9400})(ship_idx, p2, p3, p4);
+    }
 }

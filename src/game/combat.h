@@ -87,4 +87,10 @@ namespace COMBAT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00489A70});
         fn(summary, details);
     }
+
+    inline void __cdecl Apply_Damage_To_Qship_(int16_t ship_idx, int16_t damage) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048AB60});
+        fn(ship_idx, damage);
+    }
 }

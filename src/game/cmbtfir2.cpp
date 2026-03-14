@@ -34,6 +34,31 @@ namespace CMBTFIR2 {
         return bonus;
     }
 
+    /**
+     * @brief Calculates the Galactic Lore bonus for a leader.
+     * @param leader_idx Index of the leader in the global leaders array.
+     * @return The calculated bonus value.
+     */
+    int16_t __cdecl Galactic_Lore_Bonus_(int16_t leader_idx) {
+        int16_t bonus = 0;
+        uint32_t special_skills = MOX::_leaders[leader_idx].special_skills;
+
+        // Check for bit 0x10 (likely Galactic Lore skill)
+        if (special_skills & 0x10) {
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
+            return (int16_t)((level + 1) * 5);
+        }
+
+        // Check for bit 0x20 (likely Advanced Galactic Lore skill)
+        if (special_skills & 0x20) {
+            int32_t level = OFFICER::Owned_Officer_Level_(leader_idx);
+            // Calculation: ((level * 3 + 3) * 5) / 2
+            bonus = (int16_t)(((level * 3 + 3) * 5) / 2);
+        }
+
+        return bonus;
+    }
+
     void __cdecl Set_Combat_Ordnance_Values_() {
         int16_t attacker_idx = MOX::_combat_attacker_player;
         int16_t attacker_bonus = CMBTFIR2::Get_Fleet_Ordnance_Bonus_(attacker_idx) + 100;
@@ -233,8 +258,146 @@ namespace CMBTFIR2 {
         struct_::Set_Bit_Field_(&MOX::_combat_data[unit_idx].combat_status_flags, 4);
     }
 
+    void __cdecl Set_Boarded_Flag_(int16_t ship_idx) {
+        struct_::Set_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 1);
+    }
+
+    int16_t __cdecl Already_Boarded_(int16_t ship_idx) {
+        return (int16_t)struct_::Test_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 1);
+    }
+
     void __cdecl Set_Teleporter_Used_(int16_t ship_idx) {
         // Bit 0 of combat_status_flags indicates if teleporter was used
         struct_::Set_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 0);
+    }
+
+    int16_t __cdecl Get_Fleet_Ordnance_Bonus_(int16_t owner) {
+        int16_t max_bonus = 0;
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            if (MOX::_combat_data[i].owner == (int8_t)owner &&
+                MOX::_combat_data[i].is_captured == 0 &&
+                MOX::_combat_data[i].unit_status == 0 &&
+                MOX::_combat_data[i].officer_idx != -1) {
+
+                int16_t bonus = Leader_Ordnance_Bonus_(MOX::_combat_data[i].officer_idx);
+
+                if (bonus > max_bonus) {
+                    max_bonus = bonus;
+                }
+            }
+        }
+
+        return max_bonus;
+    }
+
+    int16_t Leader_Ordnance_Bonus_(int16_t leader_idx) {
+        int16_t bonus = 0;
+        
+        if ((MOX::_leaders[leader_idx].special_skills & 0x400) != 0) {
+            bonus = (Owned_Officer_Level_(leader_idx) + 1) * 5;
+        } else if ((MOX::_leaders[leader_idx].special_skills & 0x800) != 0) {
+            int16_t level = Owned_Officer_Level_(leader_idx);
+            bonus = (int16_t)(((level * 3 + 3) * 5) / 2);
+        }
+        
+        return bonus;
+    }
+
+    int16_t __cdecl Max_Defensive_Fire_Range_(int16_t ship_idx) {
+        int16_t min_range = -1;
+
+        for (int i = 0; i < 8; ++i) {
+            uint16_t weapon_id = MOX::_combat_data[ship_idx].weapons[i].weapon_id;
+            if ((int16_t)weapon_id > 0 &&
+                TECHDATA::_weapons[(int16_t)weapon_id].rack == 0 &&
+                (MOX::_combat_data[ship_idx].weapons[i].specials & 6) == 0 &&
+                MOX::_combat_data[ship_idx].weapons[i].shots_left > 0) {
+                min_range = 24;
+            }
+        }
+
+        if (min_range > 0 && MOX::_combat_total_ship_count > 1) {
+            for (int i = 1; i < MOX::_combat_total_ship_count; ++i) {
+                if (MOX::_combat_data[ship_idx].owner != MOX::_combat_data[i].owner &&
+                    MOX::_combat_data[i].is_captured == 0 &&
+                    MOX::_combat_data[i].unit_status == 0) {
+                    int16_t move_cost = CMBTMOV1::Move_Cost_(i, (int16_t)MOX::_combat_data[ship_idx].x, (int16_t)MOX::_combat_data[ship_idx].y);
+                    int16_t current_speed = COMBAT1::Calc_Current_Speed_(i);
+                    int16_t range = 1;
+                    if (move_cost - current_speed > 1) {
+                        range = move_cost - current_speed;
+                    }
+                    if (range < min_range) {
+                        min_range = range;
+                    }
+                }
+            }
+        }
+        return min_range;
+    }
+
+    bool __cdecl Apply_Combat_Artemis_Net_(char strategic) {
+        int16_t ship_idx = 1;
+        bool is_active = true;
+
+        if (ship_idx < MOX::_combat_total_ship_count) {
+            do {
+                int16_t size_class;
+                if (strategic == 0) {
+                    size_class = MOX::_combat_data[ship_idx].size_class;
+                } else {
+                    size_class = MOX::_qcombat_data[ship_idx].size;
+                }
+
+                int16_t chance = _artemis_net_chance[size_class];
+                int32_t roll = random::Random_(100);
+
+                if (chance < roll) {
+                    is_active = false;
+                } else if (strategic == 0) {
+                    // Tactical combat
+                    for (int i = 0; i < 4; ++i) {
+                        MOX::_combat_data[ship_idx].shield_arc_current[i] = 0;
+                    }
+
+                    int32_t total_damage = random::Random_(0x191) + 0x95; // Random(401) + 149
+                    
+                    while (total_damage > 0 && !CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx)) {
+                        int16_t damage = 0x14; // 20
+                        int16_t unk = 0;
+                        CMBTFIRE::Apply_Ship_Damage_(ship_idx, &damage, &unk, 0, 0, nullptr, 0, 0, 0);
+                        total_damage -= 0x14;
+                    }
+
+                    if (!CMBTFIRE::Is_Combat_Ship_Dead_(ship_idx)) {
+                        is_active = false;
+                        int16_t shield_max = COMBINIT::Calc_Combat_Shield_Max_(ship_idx);
+                        for (int i = 0; i < 4; ++i) {
+                            MOX::_combat_data[ship_idx].shield_arc_current[i] = shield_max;
+                        }
+                    } else {
+                        MOX::_combat_data[ship_idx].unit_status = 5; // Destroyed
+                    }
+                } else {
+                    // Strategic combat
+                    int16_t shield_id = MOX::_qcombat_data[ship_idx].shield_id;
+                    int16_t damage = (int16_t)(random::Random_(0xC9) + 0x4A); // Random(201) + 74
+                    
+                    MOX::_qcombat_data[ship_idx].shield_id = 0;
+                    COMBAT::Apply_Damage_To_Qship_(ship_idx, damage);
+                    MOX::_qcombat_data[ship_idx].shield_id = shield_id;
+
+                    if (MOX::_qcombat_data[ship_idx].status != 1) { // 1 = Destroyed?
+                        is_active = false;
+                    } else {
+                        MOX::_qcombat_data[ship_idx].status = 2; // Inactive?
+                        MOX::_combat_attacker_count--;
+                    }
+                }
+                ship_idx++;
+            } while (ship_idx < MOX::_combat_total_ship_count);
+        }
+        return is_active;
     }
 }

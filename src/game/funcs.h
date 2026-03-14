@@ -12,6 +12,8 @@ struct s_player;
 struct s_leader_data;
 struct s_star_data;
 struct s_combfind_target;
+struct s_combat_data;
+struct s_qship;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
@@ -166,6 +168,12 @@ inline int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx) 
     using Fn = int16_t(__cdecl*)(int16_t, int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac040});
     return fn(player_idx, planet_idx);
+}
+
+inline int16_t __cdecl Owned_Officer_Level_(int32_t leader_idx) {
+    using Fn = int16_t(__cdecl*)(int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e780});
+    return fn(leader_idx);
 }
 
 inline bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
