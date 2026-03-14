@@ -635,7 +635,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             MOX::Mox_Update_();
         }
 
-        MOX::_combat_mouse_grid = reinterpret_cast<int16_t*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2928));
+        MOX::_combat_mouse_grid = reinterpret_cast<s_mouse_list*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2928));
         MOX::_specials_button_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 8, MOX::_screen_seg);
         MOX::_msl_warning_on_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 4, MOX::_screen_seg);
         MOX::Mox_Update_();
@@ -667,36 +667,36 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             MOX::Mox_Update_();
         }
 
-        MOX::_combat_mouse_grid[2] = 0;
-        MOX::_combat_mouse_grid[4] = 0x27F;
-        MOX::_combat_mouse_grid[3] = 0;
-        MOX::_combat_mouse_grid[5] = 0x15E;
-        MOX::_combat_mouse_grid[1] = 12;
-        MOX::_combat_mouse_grid[0] = 2;
+        MOX::_combat_mouse_grid->x1 = 0;
+        MOX::_combat_mouse_grid->x2 = 0x27F;
+        MOX::_combat_mouse_grid->y1 = 0;
+        MOX::_combat_mouse_grid->y2 = 0x15E;
+        MOX::_combat_mouse_grid->frame = 12;
+        MOX::_combat_mouse_grid->icon = 2;
 
-        int16_t grid_y = 0;
+        int16_t grid_x = 0;
         int16_t grid_idx = 1;
-        for (int16_t row = 0; row < 32; ++row) {
-            int16_t grid_x = 0;
-            for (int16_t col = 0; col < 18; ++col) {
-                MOX::_combat_mouse_grid[grid_idx * 6 + 2] = grid_y;
-                MOX::_combat_mouse_grid[grid_idx * 6 + 4] = grid_y + 19;
-                MOX::_combat_mouse_grid[grid_idx * 6 + 3] = grid_x;
-                MOX::_combat_mouse_grid[grid_idx * 6 + 5] = grid_x + 19;
-                MOX::_combat_mouse_grid[grid_idx * 6 + 1] = 0;
-                MOX::_combat_mouse_grid[grid_idx * 6 + 0] = 0;
-                grid_x += 20;
+        for (int16_t col = 0; col < 32; ++col) {
+            int16_t grid_y = 0;
+            for (int16_t row = 0; row < 18; ++row) {
+                MOX::_combat_mouse_grid[grid_idx].x1 = grid_x;
+                MOX::_combat_mouse_grid[grid_idx].x2 = grid_x + 19;
+                MOX::_combat_mouse_grid[grid_idx].y1 = grid_y;
+                MOX::_combat_mouse_grid[grid_idx].y2 = grid_y + 19;
+                MOX::_combat_mouse_grid[grid_idx].frame = 0;
+                MOX::_combat_mouse_grid[grid_idx].icon = 0;
+                grid_y += 20;
                 grid_idx++;
             }
             grid_y += 20;
         }
 
-        MOX::_combat_mouse_grid[0x1490] = 0;
-        MOX::_combat_mouse_grid[0x1492] = 0x27F;
-        MOX::_combat_mouse_grid[0x1491] = 0x15F;
-        MOX::_combat_mouse_grid[0x1493] = 0x1DF;
-        MOX::_combat_mouse_grid[0x148F] = 0;
-        MOX::_combat_mouse_grid[0x148E] = 1;
+        MOX::_combat_mouse_grid[0x36d].x1 = 0;
+        MOX::_combat_mouse_grid[0x36d].x2 = 0x27F;
+        MOX::_combat_mouse_grid[0x36d].y1 = 0x15F;
+        MOX::_combat_mouse_grid[0x36d].y2 = 0x1DF;
+        MOX::_combat_mouse_grid[0x36d].frame = 0;
+        MOX::_combat_mouse_grid[0x36d].icon = 1;
 
         if (MOX::_game_type != 0 && MOX::_game_type != 1) {
             if (MOX::_combat_attacker_player < MOX::_NUM_PLAYERS && MOX::_player[MOX::_combat_attacker_player].objectives == 100) {

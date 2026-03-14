@@ -63,7 +63,8 @@ workflows:
 
           # CHECKLIST
           * You found and read existing function in the codebase
-          * You provided a list of differences with explanations
+          * You analyzed and confirmed hypothesis
+          * You provided a list of identified discrepancies with explanations
         outcomes:
           - name: done
     edges:

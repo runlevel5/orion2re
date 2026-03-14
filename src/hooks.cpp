@@ -1776,6 +1776,14 @@ namespace hooks {
         { 0x0046f3f0, &CMBTMOV1::Test_Move_Until_Impact_ },
         { 0x0046f350, &CMBTMOV1::Ship_In_Legal_Square_ },
         { 0x0046f0b0, &CMBTMOV1::Rotate_Ship_Until_Impact_ },
+        { 0x004ff300, &CMBTMIS::On_Combat_Screen_ },
+        { 0x004fd8d0, &CMBTMIS::Missile_Owner_ },
+        { 0x00500070, &CMBTMIS::Retarget_Missile_ },
+        { 0x004fef70, &CMBTMIS::Move_Missile_ },
+        { 0x004fef30, &CMBTMIS::Missile_On_Combat_Screen_ },
+        { 0x004ff3c0, &CMBTMIS::Resolve_Missile_ },
+        { 0x46b260, &COMBAT1::Assign_Mouse_Images_ },
+        { 0x0046a0f0, &COMBAT1::Add_Missile_Fields_ },
     };
 
     void Install_Hooks()

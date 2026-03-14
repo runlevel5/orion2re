@@ -2519,6 +2519,17 @@ struct s_modem_settings {
     char dial_number[24];
 };
 
+typedef struct s_mouse_list s_mouse_list, *Ps_mouse_list;
+
+struct s_mouse_list {
+    int16_t icon;
+    int16_t frame;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+};
+
 typedef struct s_mouse_xy s_mouse_xy, *Ps_mouse_xy;
 
 struct s_mouse_xy {

@@ -34,6 +34,12 @@ namespace CMBTAI {
         return fn(ship_idx, x, y);
     }
 
+    inline int16_t __cdecl Range_To_XY_(int16_t ship_idx, int16_t missile_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044c360});
+        return fn(ship_idx, missile_idx);
+    }
+
     inline int16_t __cdecl Will_Missile_Do_Damage_(int16_t ship_idx, int16_t missile_idx) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044ed00});

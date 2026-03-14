@@ -1,23 +1,5 @@
 #pragma once
 
-struct s_animation_header;
-struct s_player;
-struct s_mp_screen;
-struct s_mouse_grid_entry {
-    int16_t icon;
-    int16_t x1;
-    int16_t y1;
-    int16_t x2;
-    int16_t y2;
-    int16_t field_A;
-};
-struct s_qship;
-struct s_missile;
-struct s_combat_data;
-struct s_crew_data;
-struct s_net_combat_message;
-struct s_antaran;
-
 namespace MOX {
     inline s_animation_header* (&_fighter_seg)[15][64] =
         *reinterpret_cast<s_animation_header* (*)[15][64]>(std::uintptr_t{0x005A1CC0});
@@ -312,8 +294,8 @@ namespace MOX {
     // Suggested name: MOX::_gravity_table
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
-    inline int16_t* _cmbt_mouse_list_clock = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558DB8});
-    inline int16_t* _mouse_list_arrow = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00558D10 });
+    inline int16_t (&_mouse_list_arrow)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00558D10});
+    inline int16_t (&_cmbt_mouse_list_clock)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00558DB8});
     inline int16_t* _mouse_list_variable = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D20});
     inline int16_t* _mouse_list_none = reinterpret_cast<int16_t*>(std::uintptr_t{0x00558D70});
 
@@ -489,7 +471,7 @@ namespace MOX {
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
     inline uint16_t& _combat_init = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005596D8});
     inline void*& _warp_core_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596430});
-    inline int16_t*& _combat_mouse_grid = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596CB8});
+    inline s_mouse_list*& _combat_mouse_grid = *reinterpret_cast<s_mouse_list**>(std::uintptr_t{0x00596CB8});
     inline void*& _stasis_bubble_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596CBC});
     inline uint16_t& _apply_damage_to_planet = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596CDC});
     inline uint16_t& _missile_warning = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D1C});
@@ -533,6 +515,8 @@ namespace MOX {
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
     inline s_combat_data*& _combat_data = *reinterpret_cast<s_combat_data**>(std::uintptr_t{0x005A2BE0});
     inline s_missile*& _missile = *reinterpret_cast<s_missile**>(std::uintptr_t{0x00597858});
+    inline int16_t* _missile_hit_radius =
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x00559718});
     inline s_net_combat_message& _new_message = *reinterpret_cast<s_net_combat_message*>(std::uintptr_t{0x0059B5D0});
     inline int16_t* _gate_icon_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D68});
     inline int16_t& _system_display_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A6});

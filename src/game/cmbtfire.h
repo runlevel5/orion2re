@@ -34,6 +34,12 @@ namespace CMBTFIRE {
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_();
 
+    inline int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t weapon_type, int16_t source_unit_idx, int16_t target_unit_idx, int16_t unknown) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac880});
+        return fn(weapon_type, source_unit_idx, target_unit_idx, unknown);
+    }
+
     inline int16_t __cdecl Facing_Shield_(int16_t bearing) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ADDD0});
@@ -44,6 +50,16 @@ namespace CMBTFIRE {
         using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t, int8_t, int16_t*, int8_t, int8_t, int8_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AD980});
         fn(ship_idx, damage_in_out, struct_damage_out, shield_arc_idx, armor_piercing, special_damage_out, enveloping, shield_piercing, continuous);
+    }
+
+    inline void __cdecl Fire_Fighter_Beam_(int16_t missile_idx, int16_t shield_idx, int16_t is_anti_missile_rocket, int16_t* p_dmg, int16_t* p_sys_dmg) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004aefd0})(missile_idx, shield_idx, is_anti_missile_rocket, p_dmg, p_sys_dmg);
+    }
+
+    inline void __cdecl Fire_Fighter_Bomb_(int16_t missile_idx, int16_t shield_idx, int16_t* p_dmg, int16_t* p_sys_dmg) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004aee50})(missile_idx, shield_idx, p_dmg, p_sys_dmg);
     }
 
     inline int8_t __cdecl Special_Is_Turned_On_(int16_t ship_idx, int16_t special_id) {

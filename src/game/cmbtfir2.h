@@ -124,4 +124,9 @@ namespace CMBTFIR2 {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004E6C70})(ship_idx, x1, y1, x2, y2);
     }
+
+    inline void __cdecl Final_Fire_(int16_t target, int16_t x, int16_t y, int16_t missile_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004e6a30})(target, x, y, missile_idx);
+    }
 }

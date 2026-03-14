@@ -42,6 +42,21 @@ namespace BEAMS {
         fn(dx, dy, ship_idx, flag, total_damage, struct_damage);
     }
 
+    inline void __cdecl Draw_Shield_Hit_Once_Through_(int16_t target, int16_t facing, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00423210})(target, facing, x, y);
+    }
+
+    inline int8_t __cdecl Done_Drawing_Damage_Message_Queue_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00422a60})();
+    }
+
+    inline void __cdecl Draw_Damage_Message_Queue_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004229d0})();
+    }
+
     inline void __cdecl Draw_Damage_Message_Queue_Until_Done_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422E70});

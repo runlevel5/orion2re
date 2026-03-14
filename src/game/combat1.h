@@ -3,7 +3,6 @@
 
 namespace COMBAT1 {
     inline int32_t& _end_of_turn_button = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565E98});
-    inline char* s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
 
     int16_t __cdecl Combat_Ship_Is_Functional_(int16_t ship_idx);
 
