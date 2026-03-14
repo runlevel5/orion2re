@@ -118,4 +118,68 @@ namespace CMBTFIRE {
             }
         }
     }
+
+    int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t weapon_id, int16_t source_unit_idx, int16_t target_idx, int16_t is_missile_target) {
+        bool is_legal = true;
+
+        if (is_missile_target) {
+            is_legal = Weapon_Can_Fire_At_Missiles_(weapon_id, source_unit_idx);
+            int16_t missile_type = MOX::_missile[target_idx].type;
+            if (TECHDATA::_weapons[missile_type].rack == 4 && weapon_id == 0x21) {
+                is_legal = false;
+            }
+            if (TECHDATA::_weapons[missile_type].rack == 2) {
+                return false;
+            }
+            return is_legal;
+        }
+
+        if (CMBTMOV1::Ship_Is_In_Stasis_(target_idx)) {
+            is_legal = false;
+        }
+        else {
+            bool check_weapons_flag = true;
+            if ((TECHDATA::_weapons[weapon_id].flags & 8) != 0 &&
+                (MOX::_combat_data[target_idx].previous_owner >= 8 && MOX::_combat_data[target_idx].previous_owner != 9)) {
+                check_weapons_flag = false;
+            }
+
+            if (check_weapons_flag && (TECHDATA::_weapons[weapon_id].rack != 3 || target_idx == 0) && weapon_id != 0x21) {
+                if (target_idx == 0) {
+                    is_legal = (weapon_id != 0x1c);
+                    if (TECHDATA::_weapons[weapon_id].rack == 5) {
+                        switch (weapon_id) {
+                        case 0xd:
+                        case 0x20:
+                        case 0x22:
+                        case 0x23:
+                        case 0x24:
+                        case 0x25:
+                        case 0x27:
+                        case 0x2c:
+                        case 0x2d:
+                            is_legal = false;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+                else {
+                    if (weapon_id == 0x1c && MOX::_combat_data[target_idx].owner >= 9) {
+                        is_legal = true;
+                    }
+                    else {
+                        is_legal = false;
+                    }
+                }
+            }
+        }
+
+        if (is_legal && MOX::_combat_data[target_idx].black_hole_flag != 0 && weapon_id == 0x25) {
+            is_legal = false;
+        }
+
+        return is_legal;
+    }
 }

@@ -1811,6 +1811,7 @@ namespace hooks {
         { 0x004e6f40, &CMBTFIR2::Max_Defensive_Fire_Range_ },
         { 0x004ADE00, &CMBTFIRE::Destroy_Ship_ },
         { 0x004af2a0, &CMBTFIRE::Remove_Stasis_Beam_ },
+        { 0x004ac880, &CMBTFIRE::Target_Is_Legal_For_Weapon_ },
     };
 
     void Install_Hooks()

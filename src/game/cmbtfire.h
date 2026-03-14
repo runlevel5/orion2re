@@ -22,11 +22,7 @@ namespace CMBTFIRE {
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_();
 
-    inline int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t weapon_type, int16_t source_unit_idx, int16_t target_unit_idx, int16_t unknown) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac880});
-        return fn(weapon_type, source_unit_idx, target_unit_idx, unknown);
-    }
+    int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t weapon_type, int16_t source_unit_idx, int16_t target_idx, int16_t is_missile_target);
 
     int16_t __cdecl Facing_Shield_(int16_t angle);
 
@@ -49,4 +45,10 @@ namespace CMBTFIRE {
     bool __cdecl Special_Is_On_(int16_t ship_idx, int16_t weapon_idx);
 
     int8_t __cdecl Special_Is_Turned_On_(int16_t ship_idx, int16_t special_idx);
+
+    inline bool __cdecl Weapon_Can_Fire_At_Missiles_(int16_t weapon_id, int param_2) {
+        using Fn = bool(__cdecl*)(int16_t, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004AE9C0 });
+        return fn(weapon_id, param_2);
+    }
 }
