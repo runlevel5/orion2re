@@ -637,14 +637,14 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         MOX::_combat_mouse_grid = reinterpret_cast<s_mouse_list*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2928));
         MOX::_specials_button_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 8, MOX::_screen_seg);
-        MOX::_msl_warning_on_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 4, MOX::_screen_seg);
+        MOX::_msl_warning_on_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 4, MOX::_screen_seg);
         MOX::Mox_Update_();
-        MOX::_warning_missile_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x25, MOX::_screen_seg);
+        MOX::_warning_missile_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x25, MOX::_screen_seg);
         MOX::_warning_fighter_seg = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x26, MOX::_screen_seg);
         MOX::Mox_Update_();
 
         for (int16_t i = 0; i < 3; ++i) {
-            MOX::_ship_cursor[i] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, i + 0x20, MOX::_screen_seg);
+            MOX::_ship_cursor[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, i + 0x20, MOX::_screen_seg);
             MOX::Mox_Update_();
         }
 

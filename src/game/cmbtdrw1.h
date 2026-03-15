@@ -1,18 +1,40 @@
 #pragma once
 
 namespace CMBTDRW1 {
+    inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline void*& _k_save = *reinterpret_cast<void**>(std::uintptr_t{0x005960FC});
 
     void __cdecl Detailed_View_Ship_(int16_t ship_idx);
 
-    inline void __cdecl Draw_Internals_Display_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004d66d0)(x, y);
+    void __cdecl Draw_Internals_Display_(int16_t x_off, int16_t y_off);
+    void __cdecl Full_Draw_Combat_Screen_();
+    void __cdecl Draw_Legal_Boxes_();
+    inline void __cdecl Draw_Ship_Status_(int16_t y, int16_t x, int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ce740});
+        fn(y, x, ship_idx);
     }
+    void __cdecl Draw_Grey_Damage_Bars_(int16_t x, int16_t y, int16_t ship_idx);
+    void __cdecl Draw_Crew_Level_Stars_(int16_t ship_idx, int16_t x, int16_t y);
+    void __cdecl Draw_Reduced_Combat_Map_();
 
-    inline void __cdecl Full_Draw_Combat_Screen_() {
+    void __cdecl Draw_Reduced_Map_Box_();
+
+    void __cdecl Draw_Fake_Combat_Buttons_();
+
+    void __cdecl Draw_Option_Panel_Lights_();
+
+    void __cdecl Draw_Blip2_(int16_t x, int16_t y, int16_t intensity_a, int16_t intensity_b);
+
+    void __cdecl Draw_Blip3_(int16_t x, int16_t y, int16_t p3, int16_t p4);
+
+    void __cdecl Draw_Blip4_(int16_t x, int16_t y, int16_t base_color, int16_t color_offset);
+
+    void __cdecl Draw_Blip5_(int16_t x, int16_t y, int16_t color_base_a, int16_t color_base_b);
+
+    inline void __cdecl Draw_Shield_Arcs_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004cdb50)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004d3f50})();
     }
 
     inline void __cdecl Draw_Weapon_Status_Display_(int16_t param_1, int16_t param_2) {
@@ -20,41 +42,19 @@ namespace CMBTDRW1 {
         reinterpret_cast<Fn>(0x004cf810)(param_1, param_2);
     }
 
-    inline void __cdecl Draw_Special_Status_Display_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004d0070)();
-    }
+    void __cdecl Draw_Special_Status_Display_();
 
-    inline void __cdecl Draw_Main_Combat_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004d0ca0 })();
-    }
+    void __cdecl Draw_Main_Combat_Screen_();
 
-    inline void __cdecl Refresh_Combat_Screen_Full_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004cda90})();
-    }
+    void __cdecl Refresh_Combat_Screen_Full_();
 
-    inline void __cdecl Draw_Super_Fast_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004cd9e0})();
-    }
+    void __cdecl Draw_Super_Fast_Screen_();
 
-    inline void __cdecl Move_Options_Background_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004d6e60})();
-    }
+    void __cdecl Move_Options_Background_();
 
-    inline void __cdecl Display_Combat_View_Ship_(int16_t ship_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004d5b60})(ship_idx);
-    }
+    void __cdecl Display_Combat_View_Ship_(int16_t ship_idx);
 
-    inline void __cdecl Scroll_Draw_Combat_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d5370});
-        fn();
-    }
+    void __cdecl Scroll_Draw_Combat_Screen_();
 
     inline void __cdecl Create_Ship_Darken_Map_() {
         using Fn = void(__cdecl*)();
@@ -62,24 +62,13 @@ namespace CMBTDRW1 {
         fn();
     }
 
-    inline int16_t __cdecl Ship_Completely_On_Screen_(int16_t ship_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D5820});
-        return fn(ship_idx);
-    }
+    int16_t __cdecl Ship_Completely_On_Screen_(int16_t ship_idx);
 
-    inline int16_t __cdecl Relative_Bearing_XY_(int16_t target_unit_idx, int16_t x, int16_t y) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004d4580})(target_unit_idx, x, y);
-    }
+    int16_t __cdecl Relative_Bearing_XY_(int16_t ship_idx, int16_t target_x, int16_t target_y);
 
     int16_t __cdecl Relative_Bearing_(int16_t ship_a_idx, int16_t ship_b_idx);
 
-    inline int16_t __cdecl Ship_On_Screen_(uint16_t ship_idx) {
-        using Fn = int16_t(__cdecl*)(uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D59A0});
-        return fn(ship_idx);
-    }
+    int16_t __cdecl Ship_On_Screen_(int16_t ship_idx);
 
     inline void __cdecl Draw_Ship_(int16_t ship_idx, int16_t x, int16_t y) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
@@ -104,8 +93,11 @@ namespace CMBTDRW1 {
         fn(ship_idx);
     }
 
-    inline uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004D4730})(bearing);
+    uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing);
+
+    inline int16_t __cdecl Board_Popup_(int16_t unknown_0, int16_t boarding_strength, char* message, int16_t* param_4) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, char*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7120});
+        return fn(unknown_0, boarding_strength, message, param_4);
     }
 }

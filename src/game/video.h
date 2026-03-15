@@ -94,4 +94,9 @@ namespace video {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527D00});
         fn();
     }
+
+    inline uint8_t __cdecl Get_Current_Video_Page_Flag_() {
+        using Fn = uint8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00527950})();
+    }
 }

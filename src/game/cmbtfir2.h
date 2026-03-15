@@ -11,6 +11,8 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Engineer_Bonus_(int16_t leader_idx);
 
+    int16_t __cdecl Fighter_Pilot_Bonus_(int16_t leader_idx);
+
     int16_t __cdecl Galactic_Lore_Bonus_(int16_t leader_idx);
 
     void __cdecl Set_Combat_Ordnance_Values_();
@@ -48,17 +50,18 @@ namespace CMBTFIR2 {
 
     short __cdecl Max_Total_Internal_Space_(short ship_idx);
 
+    inline short __cdecl Total_Internal_Space_(short ship_idx) {
+        using Fn = short(__cdecl*)(short);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004e6930})(ship_idx);
+    }
+
     int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx);
 
     short __cdecl Fleet_Defensive_Bonus_(short player_idx, short mode, short* bonus_val_ptr);
 
     short __cdecl Fleet_Offensive_Bonus_(short player_idx);
 
-    inline int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5b20});
-        return fn(player_idx);
-    }
+    int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t owner_idx);
 
     int16_t __cdecl Ship_Specials_Defensive_Bonus_(int16_t ship_idx, int16_t target_type, int16_t* field_bonus_out);
 
@@ -82,11 +85,7 @@ namespace CMBTFIR2 {
 
     void __cdecl Set_Capturing_Flag_(int16_t unit_idx);
 
-    inline int16_t __cdecl Init_Boarding_Action_(int16_t ship_idx, int16_t* marines_sent) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E70C0});
-        return fn(ship_idx, marines_sent);
-    }
+    int16_t __cdecl Init_Boarding_Action_(int16_t unit_idx, int16_t* param_2);
 
     void __cdecl Defensive_Fire_Check_(int16_t target_idx, int16_t target_x, int16_t target_y, int16_t dest_x, int16_t dest_y);
 

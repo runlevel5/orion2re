@@ -1,6 +1,7 @@
 #pragma once
 
 namespace MOX {
+    inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline s_animation_header* (&_fighter_seg)[15][64] =
         *reinterpret_cast<s_animation_header* (*)[15][64]>(std::uintptr_t{0x005A1CC0});
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
@@ -473,13 +474,18 @@ namespace MOX {
     inline void*& _warp_core_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596430});
     inline s_mouse_list*& _combat_mouse_grid = *reinterpret_cast<s_mouse_list**>(std::uintptr_t{0x00596CB8});
     inline void*& _stasis_bubble_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x00596CBC});
+    inline s_animation_header*& _combat_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596F80});
+    inline s_animation_header*& _combat_far_star = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1CB0});
+    inline s_animation_header*& _combat_mid_star = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D14});
+    inline s_animation_header*& _combat_near_star = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597D7C});
     inline uint16_t& _apply_damage_to_planet = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596CDC});
     inline uint16_t& _missile_warning = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D1C});
     inline void*& _cmbt_option_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596D44});
-    inline void*& _warning_missile_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596E90});
+    inline s_animation_header*& _warning_missile_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596E90});
     inline void*& _self_destruct_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596EA0});
     inline uint16_t& _saved_msl_warning = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596EA4});
     inline void*& _auto_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596FA8});
+    inline s_animation_header*& _combat_options_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059741C});
     inline int16_t& _cur_combat_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059706E});
     inline uint16_t& _grid_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597300});
     inline uint16_t& _speedx2_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597400});
@@ -496,7 +502,7 @@ namespace MOX {
     inline void*& _cmbt_info_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059C430});
     inline void*& _weapons_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597A84});
     inline void*& _specials_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD34});
-    inline void*& _msl_warning_on_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A49F4});
+    inline s_animation_header*& _msl_warning_on_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49F4});
     inline void*& _warning_fighter_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597764});
     inline s_animation_header*& _ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A8C});
     inline void*& _darken_plasma_map = *reinterpret_cast<void**>(std::uintptr_t{0x005A49D0});
@@ -509,7 +515,7 @@ namespace MOX {
     inline void*& _stellar_converter_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x0059C418});
     inline s_animation_header* (&_msl_seg)[112] =
         *reinterpret_cast<s_animation_header* (*)[112]>(std::uintptr_t{0x005A47F0});
-    inline void** _ship_cursor = reinterpret_cast<void**>(std::uintptr_t{0x0059BF00});
+    inline s_animation_header* (&_ship_cursor)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BF00});
     inline void** _shield_div_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BFA0});
     inline void** _shield_mask_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BAE0});
     inline int16_t* _fighter_beam_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B450});

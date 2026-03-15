@@ -17,6 +17,8 @@ struct s_qship;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
+inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
+
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
@@ -388,6 +390,16 @@ inline void __cdecl Swap_Structure_(void* ptr1, void* ptr2, int size) {
     using Fn = void(__cdecl*)(void*, void*, int);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D169});
     fn(ptr1, ptr2, size);
+}
+
+namespace switchD_004d0ea1 {
+    inline uint32_t* switchdataD_004d1930 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1930});
+}
+namespace switchD_004d1457 {
+    inline uint32_t* switchdataD_004d1948 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1948});
+}
+namespace switchD_004d174c {
+    inline uint32_t* switchdataD_004d1960 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1960});
 }
 
 namespace GLOBALS {

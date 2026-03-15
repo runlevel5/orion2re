@@ -53,6 +53,24 @@ namespace CMBTFIR2 {
         return bonus;
     }
 
+    int16_t __cdecl Fighter_Pilot_Bonus_(int16_t leader_idx) {
+        int16_t bonus = 0;
+        uint32_t special_skills = MOX::_leaders[leader_idx].special_skills;
+
+        if (special_skills & 0x4 /* FIGHTER_PILOT */) {
+            int16_t level = Owned_Officer_Level_(leader_idx);
+            return (level + 1) * 5;
+        }
+
+        if (special_skills & 0x8 /* ACE_PILOT */) {
+            int16_t level = Owned_Officer_Level_(leader_idx);
+            // Calculation: ((level * 3 + 3) * 5) / 2
+            bonus = (int16_t)(((level * 3 + 3) * 5) / 2);
+        }
+
+        return bonus;
+    }
+
     /**
      * @brief Calculates the Galactic Lore bonus for a leader.
      * @param leader_idx Index of the leader in the global leaders array.
@@ -331,6 +349,30 @@ namespace CMBTFIR2 {
                     int16_t current_bonus = CMBTFIR2::Engineer_Bonus_(ship->officer_idx);
                     if (current_bonus > max_bonus) {
                         max_bonus = current_bonus;
+                    }
+                }
+            }
+        }
+
+        return max_bonus;
+    }
+
+    int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t owner_idx) {
+        int16_t max_bonus = 0;
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            // MOX::_combat_data is pointer to array of s_combat_data (size 313 / 0x139)
+            s_combat_data& ship = MOX::_combat_data[i];
+
+            if (ship.owner == (int8_t)owner_idx) {
+                if (ship.is_captured == 0) {
+                    if (ship.unit_status == 0 /* ACTIVE */) {
+                        if (ship.officer_idx != -1) {
+                            int16_t bonus = Fighter_Pilot_Bonus_(ship.officer_idx);
+                            if (bonus > max_bonus) {
+                                max_bonus = bonus;
+                            }
+                        }
                     }
                 }
             }
@@ -841,5 +883,16 @@ namespace CMBTFIR2 {
         } else {
             ship.marine_count -= (int8_t)kill_count;
         }
+    }
+
+    int16_t __cdecl Init_Boarding_Action_(int16_t unit_idx, int16_t* param_2) {
+        char message_buffer[80];
+        int16_t boarding_strength;
+
+        KEN::Ken_Get_Text_Message_(41 /* 0x29 */, message_buffer, 80 /* 0x50 */);
+
+        boarding_strength = (MOX::_combat_data[unit_idx].marine_count + 1) / 2;
+
+        return CMBTDRW1::Board_Popup_(0, boarding_strength, message_buffer, param_2);
     }
 }
