@@ -112,6 +112,12 @@ namespace fonts {
     void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors);
 
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str);
+
+    inline void __cdecl Print_Integer_Centered_(int x, int y, int value) {
+        using Fn = void(__cdecl*)(int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005258a0});
+        fn(x, y, value);
+    }
      
     void __cdecl Print_Right_(int16_t x, int16_t y, const char* text);
 

@@ -507,7 +507,7 @@ namespace MOX {
     inline s_animation_header*& _msl_warning_on_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49F4});
     inline void*& _warning_fighter_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597764});
     inline s_animation_header*& _ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A8C});
-    inline void*& _darken_plasma_map = *reinterpret_cast<void**>(std::uintptr_t{0x005A49D0});
+    inline s_animation_header*& _darken_plasma_map = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49D0});
     inline void*& _shield_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x0059BECC});
     inline void*& _pulsar_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A2BE4});
     inline void*& _small_tractor_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5B0});
@@ -518,8 +518,8 @@ namespace MOX {
     inline s_animation_header* (&_msl_seg)[112] =
         *reinterpret_cast<s_animation_header* (*)[112]>(std::uintptr_t{0x005A47F0});
     inline s_animation_header* (&_ship_cursor)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BF00});
-    inline void** _shield_div_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BFA0});
-    inline void** _shield_mask_bitmap = reinterpret_cast<void**>(std::uintptr_t{0x0059BAE0});
+    inline s_animation_header** _shield_div_bitmap = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BFA0});
+    inline s_animation_header** _shield_mask_bitmap = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BAE0});
     inline int16_t* _fighter_beam_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B450});
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
     inline s_combat_data*& _combat_data = *reinterpret_cast<s_combat_data**>(std::uintptr_t{0x005A2BE0});

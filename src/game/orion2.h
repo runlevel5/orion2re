@@ -1317,6 +1317,21 @@ struct s_battle_results {
     undefined field1018_0x6cd;
 };
 
+typedef struct s_beam_fx_entry s_beam_fx_entry, *Ps_beam_fx_entry;
+
+typedef ushort uint16_t;
+
+struct s_beam_fx_entry {
+    int16_t weapon_id;
+    int16_t shot_count;
+    uint16_t result_flags;
+    uint16_t special_flag;
+    int16_t accum_hit_x;
+    int16_t accum_hit_y;
+    uint16_t specials;
+    int8_t is_damage_entry;
+};
+
 typedef struct s_big_icon s_big_icon, *Ps_big_icon;
 
 struct s_big_icon {
@@ -1463,11 +1478,29 @@ struct s_colsum_col_pop_ref {
     short refs[42];
 };
 
+typedef struct s_combat_bomb_result s_combat_bomb_result, *Ps_combat_bomb_result;
+
+struct s_combat_bomb_result {
+    int8_t attacker_idx;
+    uint8_t colony_idx;
+    int8_t is_planetary_hit;
+    int16_t bomb_hits_remaining;
+    int8_t is_bio_weapon;
+    int16_t bio_hits_remaining;
+    int16_t infantry_killed;
+    int16_t tanks_killed;
+    int16_t population_killed;
+    int8_t buildings_destroyed[49];
+    int16_t bio_pop_killed;
+    int8_t damage_occurred;
+    int8_t colony_wiped_out;
+    int16_t production_lost;
+    int32_t total_hits_processed;
+};
+
 typedef struct s_combat_data s_combat_data, *Ps_combat_data;
 
 typedef struct s_combat_weapon_slot s_combat_weapon_slot, *Ps_combat_weapon_slot;
-
-typedef ushort uint16_t;
 
 struct s_combat_weapon_slot {
     int16_t weapon_id;
@@ -4565,7 +4598,7 @@ struct s_tech_weapon_data {
     int8_t base_ammo;
     short base_size;
     short cost;
-    short flags;
+    ushort flags;
     short min_damage;
     short damage;
     undefined field12_0x18;
@@ -4584,6 +4617,14 @@ struct s_tech_weapon_mod_data {
     short bonus1;
     short bonus2;
     undefined field6_0xe;
+};
+
+typedef struct s_techdata_planetary_shield s_techdata_planetary_shield, *Ps_techdata_planetary_shield;
+
+struct s_techdata_planetary_shield {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    int8_t absorption;
 };
 
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;

@@ -72,4 +72,9 @@ namespace BEAMS {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00422DC0})(x, y, flag, damage);
     }
+
+    inline void __cdecl Beam_SFX_(int16_t source, int16_t sx, int16_t sy, int16_t target, int16_t tx, int16_t ty, s_beam_fx_entry* fx_entries, int16_t flag) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, s_beam_fx_entry*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00420D60})(source, sx, sy, target, tx, ty, fx_entries, flag);
+    }
 }

@@ -1871,6 +1871,21 @@ namespace hooks {
         { 0x004d6650, &CMBTDRW1::Get_Ship_Center_Draw_XY_ },
         { 0x004d4e40, &CMBTDRW1::Get_Ship_Actual_Size_ },
         { 0x004e8a90, &CMBTFIR2::Combat_Ship_Done_ },
+        { 0x004cf810, &CMBTDRW1::Draw_Weapon_Status_Display_ },
+        { 0x004ce740, &CMBTDRW1::Draw_Ship_Status_ },
+        { 0x004d7120, &CMBTDRW1::Board_Popup_ },
+        { 0x004d73f0, &CMBTDRW1::Draw_Board_Popup_ },
+        { 0x004d5da0, &CMBTDRW1::Plasma_Darken_ },
+        { 0x004af740, &CMBTFIRE::Draw_Energy_Absorber_ },
+        { 0x004af850, &CMBTFIRE::Draw_BHG_ },
+        { 0x004ae4d0, &CMBTFIRE::Apply_Damage_To_Planet_ },
+        { 0x0047edc0, &BOMB::Apply_Bomb_Hits_ },
+        { 0x004aca30, &CMBTFIRE::Fire_Ship_ },
+        { 0x004ae250, &CMBTFIRE::Destroy_Colony_Defense_ },
+        { 0x004af670, &CMBTFIRE::Pre_Weapon_Specials_ },
+        { 0x004ad490, &CMBTFIRE::Fire_Beam_Weapon_ },
+        { 0x004ae8b0, &CMBTFIRE::Fire_Bomb_ },
+        { 0x004aea70, &CMBTFIRE::Fire_Special_Weapon_ },
     };
 
     void Install_Hooks()

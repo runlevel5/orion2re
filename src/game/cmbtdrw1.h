@@ -4,6 +4,16 @@ namespace CMBTDRW1 {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline void*& _k_save = *reinterpret_cast<void**>(std::uintptr_t{0x005960FC});
 
+    inline int16_t& _g_max = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE0});
+    inline int16_t& _g_min = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE4});
+    inline char*& _g_msg = *reinterpret_cast<char**>(std::uintptr_t{0x0056CEE8});
+    inline int16_t& _g_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CF00});
+
+    inline s_animation_header*& _board_capture_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005960F4});
+    inline s_animation_header*& _board_raid_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005960F8});
+    inline s_animation_header*& _board_left_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596100});
+    inline s_animation_header*& _board_right_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596104});
+
     inline const char* s_B_005560e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005560E4}); // "B"
     inline const char* s_L_005560e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005560E8}); // "L"
     inline const char* s_S_005569cc = reinterpret_cast<const char*>(std::uintptr_t{0x005569CC}); // "S"
@@ -15,14 +25,12 @@ namespace CMBTDRW1 {
 
     void __cdecl Detailed_View_Ship_(int16_t ship_idx);
 
+    void __cdecl Draw_Board_Popup_();
+
     void __cdecl Draw_Internals_Display_(int16_t x_off, int16_t y_off);
     void __cdecl Full_Draw_Combat_Screen_();
     void __cdecl Draw_Legal_Boxes_();
-    inline void __cdecl Draw_Ship_Status_(int16_t y, int16_t x, int16_t ship_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ce740});
-        fn(y, x, ship_idx);
-    }
+    void __cdecl Draw_Ship_Status_(int16_t param_1, int16_t param_2, int16_t param_3);
     void __cdecl Draw_Grey_Damage_Bars_(int16_t x, int16_t y, int16_t ship_idx);
     void __cdecl Draw_Crew_Level_Stars_(int16_t ship_idx, int16_t x, int16_t y);
     void __cdecl Draw_Reduced_Combat_Map_();
@@ -43,10 +51,7 @@ namespace CMBTDRW1 {
 
     void __cdecl Draw_Shield_Arcs_();
 
-    inline void __cdecl Draw_Weapon_Status_Display_(int16_t param_1, int16_t param_2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004cf810)(param_1, param_2);
-    }
+    void __cdecl Draw_Weapon_Status_Display_(int16_t param_1, int16_t param_2);
 
     void __cdecl Draw_Special_Status_Display_();
 
@@ -76,7 +81,7 @@ namespace CMBTDRW1 {
 
     void __cdecl Get_Draw_Ship_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);
 
-    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t param_2, int16_t param_3, uint16_t param_4);
+    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t x, int16_t y);
 
     void __cdecl Draw_Retreating_Ship_(int16_t ship_idx);
 
@@ -86,15 +91,12 @@ namespace CMBTDRW1 {
 
     uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing);
 
-    inline int16_t __cdecl Board_Popup_(int16_t unknown_0, int16_t boarding_strength, char* message, int16_t* param_4) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, char*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7120});
-        return fn(unknown_0, boarding_strength, message, param_4);
-    }
+    int16_t __cdecl Board_Popup_(int16_t min_val, int16_t max_val, char* msg, int16_t* out_val);
 
-    inline void __cdecl Plasma_Darken_(s_animation_header* anim, int16_t val, int16_t color) {
-        using Fn = void(__cdecl*)(s_animation_header*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d5da0 });
-        fn(anim, val, color);
+    void __cdecl Plasma_Darken_(s_animation_header* param_1, int16_t param_2, int16_t param_3);
+
+    inline void __cdecl Draw_Bombs_(int16_t source, int16_t target, int16_t weapon_id, int16_t hits) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004D5FC0})(source, target, weapon_id, hits);
     }
 }

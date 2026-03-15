@@ -86,4 +86,28 @@ namespace BOMB {
         COLCALC::Compute_Star_Colony_Stuff_(star);
     }
 
+    /**
+     * @address 0047edc0
+     */
+    void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result* result) {
+        int32_t bio_hits = result->bio_hits_remaining;
+        int32_t bomb_hits = result->bomb_hits_remaining;
+        s_colony* colony = &MOX::_colony[result->colony_idx];
+
+        while (bio_hits + bomb_hits > 0) {
+            if (bio_hits != 0) {
+                bio_hits--;
+                BOMB::Resolve_Biological_Hit_(colony, result);
+            } else {
+                int hits_dealt = BOMB::Resolve_Bomb_Hit_(colony, result, (int16_t)bomb_hits);
+                if (hits_dealt == 0) {
+                    bomb_hits = 0;
+                } else {
+                    bomb_hits -= hits_dealt;
+                    result->total_hits_processed += hits_dealt;
+                }
+            }
+        }
+    }
+
 } // namespace BOMB

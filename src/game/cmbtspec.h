@@ -45,4 +45,39 @@ namespace CMBTSPEC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a75e0});
         fn(param_1, x, y);
     }
+
+    inline void __cdecl Do_Spherical_SFX_(int16_t ship_idx, int16_t x, int16_t y, int16_t subtype, int16_t shots_left) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a7f70})(ship_idx, x, y, subtype, shots_left);
+    }
+
+    inline void __cdecl Draw_Stasis_Beam_(int16_t ship_idx, uint16_t target_idx) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a6610})(ship_idx, target_idx);
+    }
+
+    inline void __cdecl Anti_Missile_Rockets_(int16_t ship_idx, int16_t x, int16_t y, uint16_t target_idx, int16_t weapon_slot_idx, int16_t range) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a5590})(ship_idx, x, y, target_idx, weapon_slot_idx, range);
+    }
+
+    inline void __cdecl Gyro_Destablizer_(int16_t ship_idx, uint16_t target_idx, int16_t shots_left) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a5a20})(ship_idx, target_idx, shots_left);
+    }
+
+    inline void __cdecl Plasma_Web_(int16_t ship_idx, uint16_t target_idx, int16_t weapon_slot_idx) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a6eb0})(ship_idx, target_idx, weapon_slot_idx);
+    }
+
+    inline void __cdecl Stellar_Converter_(int16_t ship_idx, uint16_t target_idx, int16_t shots_left) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a7a20})(ship_idx, target_idx, shots_left);
+    }
+
+    inline void __cdecl Tractor_Beam_(int16_t ship_idx, uint16_t target_idx) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a73c0})(ship_idx, target_idx);
+    }
 }

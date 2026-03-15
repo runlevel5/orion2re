@@ -49,6 +49,12 @@ namespace bitmap {
         reinterpret_cast<Fn>(std::uintptr_t{0x0052F400})(dest, src, intensity);
     }
 
+    inline void __cdecl Set_Picture_Glassed_(s_animation_header* anim) {
+        using Fn = void(__cdecl*)(s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EFA0});
+        fn(anim);
+    }
+
     inline void __cdecl Flip_Bitmap_(s_animation_header* dst, s_animation_header* src, int32_t flag) {
         using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EFB0});
@@ -65,5 +71,11 @@ namespace bitmap {
         using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F690});
         fn(unk1, unk2, dest, src, unk3);
+    }
+
+    inline void __cdecl Copy_Bitmap_To_Bitmap_(s_animation_header* src, s_animation_header* dst) {
+        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f070});
+        fn(src, dst);
     }
 }

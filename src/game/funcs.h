@@ -17,8 +17,11 @@ struct s_qship;
 
 inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
 
+inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
+inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
 inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
+inline char* s__00559998 = reinterpret_cast<char*>(std::uintptr_t{0x00559998});
 inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
 
@@ -504,8 +507,12 @@ inline void __cdecl Get_Officer_Pictures_() {
 
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
+inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
 inline const char* const s_Raider_0055768c = reinterpret_cast<const char*>(0x0055768C); // "Raider"
+inline char* s_rparen_00557f08 = reinterpret_cast<char*>(std::uintptr_t{0x00557F08}); // ")"
 inline const char* const s_Marauder_00557694 = reinterpret_cast<const char*>(0x00557694); // "Marauder"
+inline char* s_space_lparen_0055999c = reinterpret_cast<char*>(std::uintptr_t{0x0055999C}); // " ("
+inline char* s_space_x_005599a0 = reinterpret_cast<char*>(std::uintptr_t{0x005599A0}); // " x"
 inline const char* const s_Interdictor_005576ac = reinterpret_cast<const char*>(0x005576AC); // "Interdictor"
 inline const char* const s_Harbinger_005576b8 = reinterpret_cast<const char*>(0x005576B8); // "Harbinger"
 inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
@@ -640,6 +647,7 @@ inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  //
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
+inline const char* s_combat_lbx_005599c8 = reinterpret_cast<const char*>(0x005599C8); // "combat.LBX"
 
 inline void __cdecl Set_Font_Style_(int32_t a1, const void* colors) {
     using Fn = void(__cdecl*)(int32_t, const void*);

@@ -653,16 +653,16 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::_combat_bitmap = (s_animation_header*)MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(0x62, 0x62));
         MOX::Mox_Update_();
 
-        MOX::_shield_div_bitmap[0] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xE, MOX::_screen_seg);
-        MOX::_shield_div_bitmap[1] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xF, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[0] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xE, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[1] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xF, MOX::_screen_seg);
         MOX::Mox_Update_();
-        MOX::_shield_div_bitmap[2] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xC, MOX::_screen_seg);
-        MOX::_shield_div_bitmap[3] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xD, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[2] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xC, MOX::_screen_seg);
+        MOX::_shield_div_bitmap[3] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0xD, MOX::_screen_seg);
         MOX::Mox_Update_();
 
         for (int16_t i = 0; i < 4; ++i) {
             for (int16_t j = 0; j < 4; ++j) {
-                MOX::_shield_mask_bitmap[j + i * 4] = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, j + i * 4 + 0x10, MOX::_screen_seg);
+                MOX::_shield_mask_bitmap[j + i * 4] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, j + i * 4 + 0x10, MOX::_screen_seg);
             }
             MOX::Mox_Update_();
         }
@@ -782,7 +782,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::Mox_Update_();
 
         if (has_cloaking != 0) {
-            MOX::_darken_plasma_map = MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x31, MOX::_screen_seg);
+            MOX::_darken_plasma_map = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_00551244, 0x31, MOX::_screen_seg);
             MOX::Mox_Update_();
             CMBTDRW1::Create_Ship_Darken_Map_();
         }

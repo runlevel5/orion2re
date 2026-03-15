@@ -5,6 +5,8 @@ struct s_unit_data;
 
 namespace TECHDATA {
     // Correct addresses for various TECHDATA structures. If address does not match, then it points inside of structure.
+    inline s_techdata_planetary_shield* _planetary_shields =
+        reinterpret_cast<s_techdata_planetary_shield*>(std::uintptr_t{ 0x0054F048 });
     inline s_tech_armor_data* _armor = reinterpret_cast<s_tech_armor_data*>(std::uintptr_t{ 0x00554d90 });
     inline s_tech_building_data* _buildings = reinterpret_cast<s_tech_building_data*>(std::uintptr_t{ 0x00554290 });
     inline s_tech_hull_data* _hull_data = reinterpret_cast<s_tech_hull_data*>(std::uintptr_t{ 0x00555798 });
@@ -16,7 +18,8 @@ namespace TECHDATA {
     inline s_tech_shield_data* _shields = reinterpret_cast<s_tech_shield_data*>(std::uintptr_t{ 0x00554e00 });
     inline s_tech_computer_data* _computers = reinterpret_cast<s_tech_computer_data*>(std::uintptr_t{ 0x00555558 });
     inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
-    inline s_tech_weapon_data* _weapons = reinterpret_cast<s_tech_weapon_data*>(std::uintptr_t{ 0x00554f68 });
+    inline s_tech_weapon_data (&_weapons)[46] =
+        *reinterpret_cast<s_tech_weapon_data(*)[46]>(std::uintptr_t{0x00554F68});
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 
