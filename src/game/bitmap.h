@@ -48,4 +48,22 @@ namespace bitmap {
         using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0052F400})(dest, src, intensity);
     }
+
+    inline void __cdecl Flip_Bitmap_(s_animation_header* dst, s_animation_header* src, int32_t flag) {
+        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EFB0});
+        fn(dst, src, flag);
+    }
+
+    inline void __cdecl Outline_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t color, int16_t unk) {
+        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F4C0});
+        fn(dest, src, color, unk);
+    }
+
+    inline void __cdecl Mask_Out_Bitmap_With_Bitmap_(int16_t unk1, int16_t unk2, s_animation_header* dest, s_animation_header* src, int16_t unk3) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F690});
+        fn(unk1, unk2, dest, src, unk3);
+    }
 }

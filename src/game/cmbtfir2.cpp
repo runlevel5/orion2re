@@ -895,4 +895,8 @@ namespace CMBTFIR2 {
 
         return CMBTDRW1::Board_Popup_(0, boarding_strength, message_buffer, param_2);
     }
+
+    int16_t __cdecl Combat_Ship_Done_(int16_t ship_idx) {
+        return struct_::Test_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 2);
+    }
 }

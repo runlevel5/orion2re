@@ -83,6 +83,8 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Being_Captured_(int16_t ship_idx);
 
+    int16_t __cdecl Combat_Ship_Done_(int16_t ship_idx);
+
     void __cdecl Set_Capturing_Flag_(int16_t unit_idx);
 
     int16_t __cdecl Init_Boarding_Action_(int16_t unit_idx, int16_t* param_2);

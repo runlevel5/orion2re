@@ -1862,6 +1862,15 @@ namespace hooks {
         { 0x004d4580, &CMBTDRW1::Relative_Bearing_XY_ },
         { 0x004d59a0, &CMBTDRW1::Ship_On_Screen_ },
         { 0x004d4730, &CMBTDRW1::Get_Weapon_Arc_ },
+        { 0x004d6520, &CMBTDRW1::Get_Draw_Ship_Offsets_ },
+        { 0x004d4780, &CMBTDRW1::Draw_Ship_To_Bitmap_ },
+        { 0x004d1980, &CMBTDRW1::Draw_Ship_ },
+        { 0x004d4a20, &CMBTDRW1::Draw_Retreating_Ship_ },
+        { 0x004d3f50, &CMBTDRW1::Draw_Shield_Arcs_ },
+        { 0x004d6380, &CMBTDRW1::Create_Ship_Darken_Map_ },
+        { 0x004d6650, &CMBTDRW1::Get_Ship_Center_Draw_XY_ },
+        { 0x004d4e40, &CMBTDRW1::Get_Ship_Actual_Size_ },
+        { 0x004e8a90, &CMBTFIR2::Combat_Ship_Done_ },
     };
 
     void Install_Hooks()

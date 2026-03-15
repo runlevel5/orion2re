@@ -152,6 +152,8 @@ namespace MOX {
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A17B4});
     inline s_animation_header*& _combat_planet_seg2 =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5E8});
+    inline uint8_t (&_ship_darken_map)[128][16] =
+        *reinterpret_cast<uint8_t(*)[128][16]>(std::uintptr_t{0x00596450});
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});

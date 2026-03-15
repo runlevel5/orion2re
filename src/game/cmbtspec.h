@@ -33,4 +33,16 @@ namespace CMBTSPEC {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004A9400})(ship_idx, p2, p3, p4);
     }
+
+    inline void __cdecl Draw_Stasis_Ball_(int16_t param_1, int16_t size, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a6390});
+        fn(param_1, size, x, y);
+    }
+
+    inline void __cdecl Draw_Plasma_Web_(int16_t param_1, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a75e0});
+        fn(param_1, x, y);
+    }
 }

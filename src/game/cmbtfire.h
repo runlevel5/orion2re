@@ -53,4 +53,16 @@ namespace CMBTFIRE {
     int16_t __cdecl Weapon_In_Range_(int16_t weapon_slot_idx, int16_t ship_idx, int16_t target_idx, int16_t target_type, int16_t range);
 
     void __cdecl Apply_Damage_To_Missile_(int16_t missile_idx, int16_t* damage_io, uint16_t specials, uint16_t weapon_flags);
+
+    inline void __cdecl Draw_Energy_Absorber_(int16_t param_1, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004af740});
+        fn(param_1, x, y);
+    }
+
+    inline void __cdecl Draw_BHG_(int16_t param_1, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004af850});
+        fn(param_1, x, y);
+    }
 }
