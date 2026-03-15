@@ -39,6 +39,7 @@
     <ClCompile Include="src\game\bomb.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
+    <ClCompile Include="src\game\cmbtai.cpp" />
     <ClCompile Include="src\game\cmbtdrw1.cpp" />
     <ClCompile Include="src\game\cmbtfir2.cpp" />
     <ClCompile Include="src\game\cmbtfire.cpp" />

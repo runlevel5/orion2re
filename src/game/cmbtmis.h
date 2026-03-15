@@ -25,6 +25,8 @@ namespace CMBTMIS {
 
     int16_t __cdecl Missile_Speed_(int16_t type, uint16_t specials, int16_t owner);
 
+    int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags);
+
     int8_t __cdecl Missile_On_Combat_Screen_(int16_t missile_idx);
 
     int16_t __cdecl Resolve_Missile_(int16_t missile_idx, int16_t x, int16_t y);
@@ -46,4 +48,11 @@ namespace CMBTMIS {
     int16_t __cdecl Picture_Count_(int16_t missile_idx);
 
     void __cdecl Draw_Missile_(int16_t missile_idx, int16_t screen_x, int16_t screen_y, int16_t flag);
+
+    int16_t __cdecl Fighter_Ocv_(int16_t player_idx);
+
+    inline int16_t __cdecl Missile_Dcv_(int16_t type, int16_t owner) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005002f0})(type, owner);
+    }
 }

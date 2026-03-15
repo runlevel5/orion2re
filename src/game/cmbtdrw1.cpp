@@ -91,4 +91,42 @@ namespace CMBTDRW1 {
         MOX2::Put_Auto_Function_(&_k_save);
         allocate::Pop_Block_(MOX::_screen_seg);
     }
+
+    /**
+     * Calculates the relative bearing from ship_a to ship_b, adjusted for ship_a's current facing direction.
+     * The result is in degrees [0, 359].
+     */
+    int16_t __cdecl Relative_Bearing_(int16_t ship_a_idx, int16_t ship_b_idx) {
+        int16_t x1, y1;
+        int16_t x2, y2;
+        int16_t bearing;
+        int8_t facing;
+
+        // Get coordinates for ship A
+        COMBINIT::Ship_Center_Offsets_(ship_a_idx, &x1, &y1);
+        x1 += MOX::_combat_data[ship_a_idx].x * 20;
+        y1 += MOX::_combat_data[ship_a_idx].y * 20;
+
+        // Get coordinates for ship B
+        COMBINIT::Ship_Center_Offsets_(ship_b_idx, &x2, &y2);
+        x2 += MOX::_combat_data[ship_b_idx].x * 20;
+        y2 += MOX::_combat_data[ship_b_idx].y * 20;
+
+        // Calculate angle between ships. Y-axis is inverted in screen space calculation here.
+        bearing = angle::Get_Angle_(x2 - x1, y1 - y2);
+
+        facing = MOX::_combat_data[ship_a_idx].facing_dir;
+
+        // Subtract ship A's heading from the absolute bearing. 
+        // Heading is in 16 discrete directions (0-15), where each unit is 22.5 degrees.
+        // 22.5 * facing = 22 * facing + facing / 2
+        bearing = bearing - (facing / 2) - (facing * 22);
+
+        // Normalize angle to [0, 359]
+        if (bearing < 0) {
+            bearing += 360;
+        }
+
+        return bearing;
+    }
 }

@@ -268,7 +268,7 @@ namespace CMBTMIS {
 
         int16_t shield_idx = 0;
         int16_t evade = 0;
-        int16_t applied_hits = 0;
+        uint16_t weapon_flags = 0;
         int16_t shield_hit_dir = 0;
 
         if (is_anti_missile_rocket == 0) {
@@ -342,10 +342,7 @@ namespace CMBTMIS {
         if (TECHDATA::_weapons[type].rack == 4) {
             missile->is_active = 0;
             if (type == 28) { // 0x1C (Assault Shuttle)
-                // TYPE MISMATCH: Resolve_Capture_ signature differs in header.
-                using ResolveCaptureFn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-                auto resolve_capture = reinterpret_cast<ResolveCaptureFn>(std::uintptr_t{0x004e7ea0});
-                resolve_capture(missile->source_unit_idx, target_unit_idx, missile->quantity, x, y);
+                CMBTFIR2::Resolve_Capture_(missile->source_unit_idx, target_unit_idx, missile->quantity, x, y);
                 missile->fighter_count--;
             } else {
                 if (type != 30) { // 0x1E (Heavy Bomber)
@@ -425,21 +422,15 @@ namespace CMBTMIS {
                         if (!(specials & 0x0100)) {
                             int16_t dmg_out = damage;
                             int16_t sys_dmg = 0;
-                            // TYPE MISMATCH: Apply_Ship_Damage_ signature differs in header.
-                            using ApplyShipDamageFn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-                            auto apply_ship_damage = reinterpret_cast<ApplyShipDamageFn>(std::uintptr_t{0x004ad980});
-                            int16_t applied = apply_ship_damage(target_unit_idx, &dmg_out, &sys_dmg, shield_idx, specials, applied_hits, 0, 0, specials & 0x2000);
+                            int16_t applied = CMBTFIRE::Apply_Ship_Damage_(target_unit_idx, &dmg_out, &sys_dmg, shield_idx, specials, weapon_flags, 0, 0, specials & 0x2000);
                             dmg_accum += dmg_out;
                             sys_dmg_accum += sys_dmg;
-                            applied_hits |= applied;
+                            weapon_flags |= applied;
                         } else {
                             for (int16_t i = 0; i < 4; ++i) {
                                 int16_t dmg_out = damage;
                                 int16_t sys_dmg = 0;
-                                // TYPE MISMATCH: Apply_Ship_Damage_ signature differs in header.
-                                using ApplyShipDamageFn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-                                auto apply_ship_damage = reinterpret_cast<ApplyShipDamageFn>(std::uintptr_t{0x004ad980});
-                                apply_ship_damage(target_unit_idx, &dmg_out, &sys_dmg, i, specials, applied_hits, 0, 0, specials & 0x2000);
+                                CMBTFIRE::Apply_Ship_Damage_(target_unit_idx, &dmg_out, &sys_dmg, i, specials, weapon_flags, 0, 0, specials & 0x2000);
                                 dmg_accum += dmg_out;
                                 sys_dmg_accum += sys_dmg;
                             }
@@ -1068,5 +1059,91 @@ namespace CMBTMIS {
                 }
             }
         }
+    }
+
+    int16_t __cdecl Fighter_Ocv_(int16_t player_idx) {
+        int16_t ocv;
+        int16_t best_computer_idx;
+        int16_t pilot_bonus;
+
+        ocv = CMBTFIR2::Fleet_Offensive_Bonus_(player_idx);
+        best_computer_idx = INITSHIP::Best_Computer_(player_idx);
+
+        // Add computer offensive bonus
+        ocv += TECHDATA::_computers[best_computer_idx].bonus;
+
+        // Players 0-7 get their racial/trained ship attack trait bonus
+        if (player_idx < 8) {
+            ocv += MOX::_player[player_idx].traits[TRAIT_SHIP_ATTACK];
+        }
+
+        pilot_bonus = CMBTFIR2::Get_Fleet_Pilot_Bonus_(player_idx);
+
+        // Base fighter OCV is 50
+        return ocv + pilot_bonus + 50;
+    }
+
+    int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags) {
+        int16_t hits = 0;
+        int16_t armor_idx;
+        int16_t absorption;
+
+        switch (missile_id) {
+            case 0x0E: // 14
+                hits = 4;
+                break;
+
+            case 0x0F: // 15
+                hits = 8;
+                break;
+
+            case 0x10: // 16
+                hits = 12;
+                break;
+
+            case 0x11: // 17
+                hits = 16;
+                break;
+
+            case 0x12: // 18
+            case 0x13: // 19
+            case 0x14: // 20
+            case 0x28: // 40
+                hits = 5;
+                break;
+
+            case 0x1C: // 28
+                armor_idx = INITSHIP::Best_Armor_(ship_idx);
+                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                hits = (int16_t)(((absorption * 3 + 300) * 2) / 200);
+                break;
+
+            case 0x1D: // 29
+                armor_idx = INITSHIP::Best_Armor_(ship_idx);
+                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                hits = (int16_t)(((absorption * 5 + 500) * 2) / 200);
+                break;
+
+            case 0x1E: // 30
+                armor_idx = INITSHIP::Best_Armor_(ship_idx);
+                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                hits = (int16_t)((absorption * 8 + 800) / 200);
+                break;
+
+            case 0x1F: // 31
+                armor_idx = INITSHIP::Best_Armor_(ship_idx);
+                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                hits = (int16_t)((absorption * 4 + 400) / 200);
+                break;
+
+            default:
+                break;
+        }
+
+        if (flags & 0x0800 /* WEAPON_MOD_FLAG_HEAVILY_ARMORED? */) {
+            hits *= 2;
+        }
+
+        return hits;
     }
 }

@@ -2738,7 +2738,7 @@ void __cdecl Plasma_Web_Damage_(int16_t owner_idx) {
                 &arc_struct_damage,
                 arc,
                 0,
-                nullptr,
+                0,
                 0,
                 0,
                 0

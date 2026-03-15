@@ -154,6 +154,12 @@ namespace DESIGN {
 
     bool __cdecl Space_For_Weapon_Replacement_();
 
+    inline int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_id, int8_t arc, int16_t specials, int16_t ammo) {
+        using Fn = int16_t(__cdecl*)(int16_t, int8_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00430400});
+        return fn(weapon_id, arc, specials, ammo);
+    }
+
     int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category);
 
     int16_t __cdecl One_Weapon_Space_(int16_t weapon_id);

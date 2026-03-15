@@ -45,4 +45,22 @@ namespace CMBTAI {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044ed00});
         return fn(ship_idx, missile_idx);
     }
+
+    inline bool __cdecl Safe_To_Fire_Sphere_Weapon_(int16_t ship_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0044BA50});
+        return fn(ship_idx);
+    }
+
+    inline int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t slot_idx, int16_t target_idx, int16_t shots, int16_t range_tactic, int16_t is_missile) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0044CD80})(ship_idx, slot_idx, target_idx, shots, range_tactic, is_missile);
+    }
+
+    inline int16_t __cdecl Expected_Missile_Damage_(int16_t target_idx, uint16_t weapon_id, int16_t shots, uint16_t specials, int16_t owner) {
+        using Fn = int16_t(__cdecl*)(int16_t, uint16_t, int16_t, uint16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0044CB10})(target_idx, weapon_id, shots, specials, owner);
+    }
+
+    int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot, int16_t target_idx, int16_t target_type, int16_t range);
 }

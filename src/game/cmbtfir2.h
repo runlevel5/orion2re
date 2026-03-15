@@ -9,6 +9,8 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Weaponry_Bonus_(int16_t leader_idx);
 
+    int16_t __cdecl Engineer_Bonus_(int16_t leader_idx);
+
     int16_t __cdecl Galactic_Lore_Bonus_(int16_t leader_idx);
 
     void __cdecl Set_Combat_Ordnance_Values_();
@@ -20,10 +22,7 @@ namespace CMBTFIR2 {
     extern int16_t* _artemis_net_chance;
     bool __cdecl Apply_Combat_Artemis_Net_(char strategic);
 
-    inline int16_t __cdecl Used_Teleporter_(int16_t ship) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004e8af0})(ship);
-    }
+    int16_t __cdecl Used_Teleporter_(int16_t ship_idx);
 
     void __cdecl Set_Teleporter_Used_(int16_t ship_idx);
 
@@ -34,25 +33,20 @@ namespace CMBTFIR2 {
         reinterpret_cast<Fn>(std::uintptr_t{0x004e7120})(ship, a, b);
     }
 
-    inline void __cdecl Resolve_Capture_(int16_t ship, int16_t a, int16_t b, int32_t x, int32_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int32_t, int32_t);
+    inline void __cdecl Resolve_Capture_(int16_t ship, int16_t a, int16_t b, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004e7ea0})(ship, a, b, x, y);
     }
 
     int16_t __cdecl Already_Boarded_(int16_t param_1);
 
-    inline void __cdecl Set_Combat_Ship_Done_(int16_t ship) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e8ac0})(ship);
-    }
+    void __cdecl Set_Combat_Ship_Done_(int16_t ship_idx);
 
     int16_t __cdecl Max_Defensive_Fire_Range_(int16_t ship_idx);
 
-    inline void __cdecl Init_Internal_Space_(s_combat_data* combat_ship) {
-        using Fn = void(__cdecl*)(s_combat_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6180});
-        fn(combat_ship);
-    }
+    void __cdecl Init_Internal_Space_(s_combat_data* ship);
+
+    short __cdecl Max_Total_Internal_Space_(short ship_idx);
 
     int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx);
 
@@ -60,11 +54,13 @@ namespace CMBTFIR2 {
 
     short __cdecl Fleet_Offensive_Bonus_(short player_idx);
 
-    inline int16_t __cdecl Ship_Specials_Defensive_Bonus_(int16_t ship_idx, int16_t target_type, int16_t* base_bonus) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e6810});
-        return fn(ship_idx, target_type, base_bonus);
+    inline int16_t __cdecl Get_Fleet_Pilot_Bonus_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5b20});
+        return fn(player_idx);
     }
+
+    int16_t __cdecl Ship_Specials_Defensive_Bonus_(int16_t ship_idx, int16_t target_type, int16_t* field_bonus_out);
 
     int16_t __cdecl Ship_Specials_Offensive_Bonus_(int16_t ship_idx);
 
@@ -76,23 +72,11 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Crew_Attack_Bonus_(int16_t ship_idx);
 
-    inline int16_t __cdecl Get_Fleet_Engineer_Bonus_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5a40});
-        return fn(player_idx);
-    }
+    int16_t __cdecl Get_Fleet_Engineer_Bonus_(int16_t player_idx);
 
-    inline void __cdecl Repair_Combat_Ship_(int16_t ship_idx, int16_t amount) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5450});
-        fn(ship_idx, amount);
-    }
+    void __cdecl Repair_Combat_Ship_(int16_t ship_idx, int16_t amount);
 
-    inline void __cdecl Clear_Internal_Space_(s_combat_data* ship) {
-        using Fn = void(__cdecl*)(s_combat_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e5830});
-        fn(ship);
-    }
+    void __cdecl Clear_Internal_Space_(s_combat_data* combat_data);
 
     int16_t __cdecl Being_Captured_(int16_t ship_idx);
 
@@ -104,13 +88,9 @@ namespace CMBTFIR2 {
         return fn(ship_idx, marines_sent);
     }
 
-    inline void __cdecl Defensive_Fire_Check_(int16_t ship_idx, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004E6C70})(ship_idx, x1, y1, x2, y2);
-    }
+    void __cdecl Defensive_Fire_Check_(int16_t target_idx, int16_t target_x, int16_t target_y, int16_t dest_x, int16_t dest_y);
 
-    inline void __cdecl Final_Fire_(int16_t target, int16_t x, int16_t y, int16_t missile_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e6a30})(target, x, y, missile_idx);
-    }
+    void __cdecl Final_Fire_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx);
+
+    void __cdecl Kill_Crew_(int16_t combat_data_idx, int16_t kill_count);
 }

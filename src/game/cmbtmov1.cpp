@@ -16,7 +16,7 @@ namespace CMBTMOV1 {
         return cost;
     }
 
-    bool __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
+    int8_t __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
         return MOX::_combat_data[ship_idx].stasis_source_idx != -1;
     }
 

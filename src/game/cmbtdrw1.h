@@ -73,11 +73,7 @@ namespace CMBTDRW1 {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004d4580})(target_unit_idx, x, y);
     }
 
-    inline uint32_t __cdecl Relative_Bearing_(int16_t attacker_idx, int16_t defender_idx) {
-        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D4630});
-        return fn(attacker_idx, defender_idx);
-    }
+    int16_t __cdecl Relative_Bearing_(int16_t ship_a_idx, int16_t ship_b_idx);
 
     inline int16_t __cdecl Ship_On_Screen_(uint16_t ship_idx) {
         using Fn = int16_t(__cdecl*)(uint16_t);
@@ -106,5 +102,10 @@ namespace CMBTDRW1 {
         using Fn = void(__cdecl*)(uint16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D4A20});
         fn(ship_idx);
+    }
+
+    inline uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004D4730})(bearing);
     }
 }

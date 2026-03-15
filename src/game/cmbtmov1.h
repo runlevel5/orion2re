@@ -2,7 +2,7 @@
 #include <cstdint>
 
 namespace CMBTMOV1 {
-    bool __cdecl Ship_Is_In_Stasis_(int16_t ship_idx);
+    int8_t __cdecl Ship_Is_In_Stasis_(int16_t ship_idx);
 
     void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t screen_x, int16_t screen_y);
 
