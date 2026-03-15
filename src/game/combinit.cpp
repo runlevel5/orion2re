@@ -338,7 +338,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
     ship->stasis_source_idx = -1;
     ship->black_hole_source_idx = -1;
-    ship->field39_0x45 = 0;
+    ship->reflected_damage_pool = 0;
     ship->black_hole_flag = 0;
     ship->combat_status_flags = 0;
     ship->field42_0x49 = 0;

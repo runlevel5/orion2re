@@ -93,4 +93,30 @@ namespace CMBTFIR2 {
     void __cdecl Final_Fire_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx);
 
     void __cdecl Kill_Crew_(int16_t combat_data_idx, int16_t kill_count);
+
+    inline void __cdecl Select_Internal_(
+        int16_t target_ship_idx,
+        int16_t* out_sys_index,
+        int16_t* out_count,
+        int16_t param_8,
+        int16_t armor_piercing_flag,
+        int16_t ignore_armor_flag,
+        int16_t param_9
+    ) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e65d0});
+        fn(target_ship_idx, out_sys_index, out_count, param_8, armor_piercing_flag, ignore_armor_flag, param_9);
+    }
+
+    inline void __cdecl Apply_Internal_Damage_(
+        int16_t target_ship_idx,
+        int16_t* remaining_damage,
+        int16_t sys_index,
+        int16_t count,
+        int16_t flag
+    ) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e4e60});
+        fn(target_ship_idx, remaining_damage, sys_index, count, flag);
+    }
 }

@@ -1832,6 +1832,9 @@ namespace hooks {
         { 0x004e63d0, &CMBTFIR2::Kill_Crew_ },
         { 0x004aefd0, &CMBTFIRE::Fire_Fighter_Beam_ },
         { 0x004ae9c0, &CMBTFIRE::Weapon_Can_Fire_At_Missiles_ },
+        { 0x004aee50, &CMBTFIRE::Fire_Fighter_Bomb_ },
+        { 0x004ae140, &CMBTFIRE::Apply_Damage_To_Missile_ },
+        { 0x004ad980, &CMBTFIRE::Apply_Ship_Damage_ },
     };
 
     void Install_Hooks()

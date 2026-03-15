@@ -1470,7 +1470,7 @@ typedef struct s_combat_weapon_slot s_combat_weapon_slot, *Ps_combat_weapon_slot
 typedef ushort uint16_t;
 
 struct s_combat_weapon_slot {
-    uint16_t weapon_id;
+    int16_t weapon_id;
     uint8_t count;
     int8_t arc;
     uint16_t specials;
@@ -1520,7 +1520,7 @@ struct s_combat_data {
     int8_t special_status_timer;
     int8_t special_cooldown;
     int16_t plasma_web_damage;
-    short field39_0x45;
+    short reflected_damage_pool;
     int8_t field40_0x47;
     uint8_t combat_status_flags; /* bit 0: teleporter used; bit 1: being boarded; bit 2: turn finished */
     undefined field42_0x49;
@@ -2448,15 +2448,14 @@ struct s_missile {
     sbyte is_anti_missile_rocket;
     short x;
     short y;
-    undefined field7_0xd;
-    undefined field8_0xe;
+    short hits_taken;
     int16_t quantity;
     uint16_t specials;
     int16_t travel_dist;
     int8_t facing_dir;
     int8_t speed;
     int8_t fighter_count;
-    undefined field15_0x18;
+    undefined field14_0x18;
     int8_t is_active;
 };
 

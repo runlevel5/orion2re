@@ -881,7 +881,7 @@ namespace COMBAT1 {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (Combat_Ship_Is_Functional_(i) != 0) {
                     if (MOX::_combat_init == 0 || MOX::_combat_data[i].owner == param_1) {
-                        MOX::_combat_data[i].field39_0x45 = 0;
+                        MOX::_combat_data[i].reflected_damage_pool = 0;
                     }
                 }
             }
