@@ -120,6 +120,10 @@ namespace MOX {
     inline int8_t& food_bonus_base_4_6 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559698});
     inline int8_t& food_bonus_base_5_8 = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559699});
     inline uint8_t* _star_class_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005596C0});
+    inline int16_t (&_ranged_to_hit_penalty)[9] =
+        *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x005596E0});
+    inline int16_t (&_ranged_damage_penalty)[9] = 
+        *reinterpret_cast<int16_t(*)[9]>(std::uintptr_t{0x005596F8});
     inline int16_t& _cur_missile_count =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597408});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });

@@ -17,41 +17,31 @@ namespace CMBTFIRE {
 
     void __cdecl Pre_Weapon_Specials_(int16_t unit_idx, int16_t target_idx, int16_t is_coord);
 
-    inline void __cdecl Energy_Absorber_Attack_(int16_t unit_idx, int16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004af3b0})(unit_idx, target_idx);
-    }
+    void __cdecl Energy_Absorber_Attack_(int16_t unit_idx, int16_t target_idx);
 
     int16_t __cdecl Fire_Beam_Weapon_(int16_t source, int16_t target, int16_t weapon_id, uint16_t specials, uint16_t weapon_flags, int16_t* hit_x, int16_t* hit_y, int16_t* damage);
 
-    inline void __cdecl Get_Beam_Weapon_Modifiers_(int16_t source, int16_t range, uint16_t specials, int16_t weapon_id, int16_t* hit_modifier, int16_t* weapon_dmg_bonus) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, int16_t, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004ad3b0})(source, range, specials, weapon_id, hit_modifier, weapon_dmg_bonus);
-    }
+    void __cdecl Get_Beam_Weapon_Modifiers_(int16_t ship_idx, int16_t range, uint16_t wpn_modifier_flags, int16_t wpn_idx, int16_t *hit_bonus_out, int16_t *dmg_mod_out);
 
     int16_t __cdecl Fire_Bomb_(int16_t ship_idx, int16_t param_2, int16_t weapon_slot_idx);
 
     void __cdecl Fire_Special_Weapon_(int16_t ship_idx, int16_t x, int16_t y, uint16_t target_idx, int16_t weapon_slot_idx, int16_t target_type);
 
-    inline void __cdecl BHG_(int16_t ship_idx, uint16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004afa10})(ship_idx, target_idx);
-    }
+    void __cdecl BHG_(int16_t source_idx, int16_t target_idx);
 
     void __cdecl Remove_Stasis_Beam_(int16_t ship_idx);
 
     void __cdecl Retarget_Missiles_Aimed_At_(int16_t unit_idx);
 
-    inline void __cdecl Place_Ship_In_Stasis_(uint16_t target_idx, int8_t ship_idx) {
-        using Fn = void(__cdecl*)(uint16_t, int8_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004aea40})(target_idx, ship_idx);
-    }
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int8_t source_idx);
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_();
 
     int16_t __cdecl Target_Is_Legal_For_Weapon_(int16_t weapon_id, uint16_t specials, int16_t target_idx, int16_t target_type);
 
     int16_t __cdecl Facing_Shield_(int16_t angle);
+
+    int16_t __cdecl Get_Beam_Range_To_Hit_Bonus_(int16_t ship_idx, int16_t range);
 
     uint16_t __cdecl Apply_Ship_Damage_(
         int16_t target_ship_idx,

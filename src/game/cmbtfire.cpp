@@ -790,6 +790,14 @@ namespace CMBTFIRE {
         animate::Draw_(x + off_x - (width / 2), y + off_y - (height / 2), seg);
     }
 
+    int16_t __cdecl Get_Beam_Range_To_Hit_Bonus_(int16_t ship_idx, int16_t range) {
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 25) == 1) {
+            return MOX::_ranged_to_hit_penalty[range / 3];
+        }
+
+        return MOX::_ranged_to_hit_penalty[range];
+    }
+
     void __cdecl Draw_BHG_(int16_t ship_idx, int16_t x_adj, int16_t y_adj) {
         int16_t off_x;
         int16_t off_y;
@@ -1576,5 +1584,185 @@ namespace CMBTFIRE {
         }
 
         return (int16_t)return_flags;
+    }
+
+    void __cdecl Energy_Absorber_Attack_(int16_t param_1, int16_t param_2) {
+        s_beam_fx_entry local_f0[15];
+        struct_::Clear_Structure_(local_f0, sizeof(local_f0));
+
+        int16_t local_f8 = 0;
+        int16_t local_fc = Facing_Shield_(CMBTDRW1::Relative_Bearing_(param_2, param_1));
+
+        int16_t range = (int16_t)CMBTAI::Range_To_Ship_(param_1, param_2);
+        int16_t local_fe;
+        Get_Beam_Weapon_Modifiers_(param_1, range, 0, 3, &local_fe, &local_f8);
+
+        int32_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] + local_f8;
+        int16_t damage = (int16_t)(((bonus - 100) * MOX::_combat_data[param_1].reflected_damage_pool + 50) / 100);
+
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(param_2, 8) != 0) {
+            if (random::Random_(100) > 30) {
+                damage = 0;
+            }
+        }
+
+        if (param_2 == 0) {
+            damage /= 2;
+        }
+
+        uint16_t uVar4 = 0;
+        int16_t shield_hit_result = 0;
+
+        if (damage > 0) {
+            int16_t sVar3 = COMBINIT::Does_Combat_Ship_Have_Special_(param_1, 1);
+            int16_t sVar2 = COMBINIT::Does_Combat_Ship_Have_Special_(param_1, 0x20);
+            uVar4 = Apply_Ship_Damage_(param_2, &damage, &shield_hit_result, local_fc, 0, 0, sVar2, sVar3, 0);
+        }
+
+        int16_t is_dead = Is_Combat_Ship_Dead_(param_2);
+
+        if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
+            if (CMBTDRW1::Ship_Completely_On_Screen_(param_2) == 0) {
+                COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[param_2].x, MOX::_combat_data[param_2].y);
+            }
+
+            local_f0[0].weapon_id = 0x2e;
+            local_f0[0].shot_count = 1;
+            local_f0[0].special_flag = uVar4 & 1;
+            local_f0[0].result_flags = (uVar4 & 2) != 0;
+            local_f0[0].accum_hit_x = damage;
+            local_f0[0].accum_hit_y = shield_hit_result;
+            local_f0[0].is_damage_entry = 0;
+            local_f0[0].specials = 0;
+
+            BEAMS::Beam_SFX_(
+                param_1,
+                (MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20,
+                (MOX::_combat_data[param_1].y - MOX::_cur_combat_y) * 20,
+                param_2,
+                (MOX::_combat_data[param_2].x - MOX::_cur_combat_x) * 20,
+                (MOX::_combat_data[param_2].y - MOX::_cur_combat_y) * 20,
+                local_f0,
+                0
+            );
+        }
+
+        if (is_dead != 0) {
+            Destroy_Ship_(param_2, MOX::_combat_data[param_2].x * 20, MOX::_combat_data[param_2].y * 20, is_dead);
+        }
+
+        MOX::_combat_data[param_1].reflected_damage_pool = 0;
+    }
+
+    void __cdecl Get_Beam_Weapon_Modifiers_(int16_t ship_idx, int16_t range, uint16_t wpn_modifier_flags, int16_t wpn_idx, int16_t *hit_bonus_out, int16_t *dmg_mod_out) {
+        int16_t effective_range;
+
+        *dmg_mod_out = 100;
+        *hit_bonus_out = 0;
+
+        if (wpn_modifier_flags & 0x2 /* PD */) {
+            effective_range = range / 2;
+        } else if (wpn_modifier_flags & 0x4 /* HV */) {
+            effective_range = range * 2;
+            if (effective_range > 8) {
+                effective_range = 8;
+            }
+        } else {
+            effective_range = range;
+        }
+
+        *hit_bonus_out = CMBTFIRE::Get_Beam_Range_To_Hit_Bonus_(ship_idx, effective_range);
+
+        if (TECHDATA::_weapons[wpn_idx].flags & 0x2 /* Continuous */) {
+            *hit_bonus_out *= 2;
+        }
+
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 15 /* HIGH_ENERGY_FOCUS */)) {
+            *dmg_mod_out += 50;
+        }
+
+        if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].flags & 0x4)) {
+            *dmg_mod_out += MOX::_ranged_damage_penalty[effective_range];
+        }
+
+        if (wpn_modifier_flags & 0x4 /* HV */) {
+            *hit_bonus_out += 25;
+            *dmg_mod_out -= 50;
+        } else if (wpn_modifier_flags & 0x2 /* PD */) {
+            *dmg_mod_out += 50;
+        }
+    }
+
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int8_t source_idx) {
+        MOX::_combat_data[ship_idx].stasis_source_idx = source_idx;
+        CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+    }
+
+    void __cdecl BHG_(int16_t source_idx, int16_t target_idx) {
+        int16_t x1, y1, x2, y2;
+        int16_t frame_count;
+        s_animation_header* anim_seg;
+        void* temp_bitmap;
+        int32_t sound_handle;
+        int16_t speed_step;
+        int16_t loop_counter;
+        const char* s_cmbtsfx_lbx_local = reinterpret_cast<const char*>(std::uintptr_t{0x00551228}); // "cmbtsfx.lbx"
+
+        if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
+            anim_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F /* 47 */, MOX::_global_cache_seg);
+            animate::Draw_Palette_(anim_seg);
+            frame_count = animate::Get_Animation_Frame_Count_(anim_seg);
+
+            COMBINIT::Ship_Center_Offsets_(source_idx, &x1, &y1);
+            x1 += (MOX::_combat_data[source_idx].x - MOX::_cur_combat_x) * 20;
+            y1 += (MOX::_combat_data[source_idx].y - MOX::_cur_combat_y) * 20;
+
+            COMBINIT::Ship_Center_Offsets_(target_idx, &x2, &y2);
+            x2 += (MOX::_combat_data[target_idx].x - MOX::_cur_combat_x) * 20;
+            y2 += (MOX::_combat_data[target_idx].y - MOX::_cur_combat_y) * 20;
+
+            y2 -= animate::Get_Height_(anim_seg) / 2;
+
+            if (MOX::_speedx2_flag == 1 || MOX::_net_flag != 0) {
+                speed_step = 2;
+            } else {
+                speed_step = 1;
+            }
+
+            allocate::Push_Block_(MOX::_screen_seg);
+            temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
+
+            sound_handle = ERICNET::Mox_Play_Sound_(10);
+            loop_counter = 0;
+
+            do {
+                timer::Mark_Time_();
+                video::Set_Page_Off_();
+
+                int16_t current_frame = loop_counter % frame_count;
+                loop_counter += speed_step;
+
+                animate::Set_Animation_Frame_(anim_seg, (int32_t)current_frame);
+                anim_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F, MOX::_global_cache_seg);
+                bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, anim_seg);
+
+                graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);
+                video::Clip_On_();
+                bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bitmap);
+                graphics::Reset_Window_();
+                video::Clip_Off_();
+
+                CMBTDRW1::Draw_Main_Combat_Screen_();
+                RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(1);
+            } while (loop_counter < 12);
+
+            MOX::_dont_draw_ship = -1;
+            sound::Fadeout_Sound_(sound_handle, 10);
+            allocate::Pop_Block_(MOX::_screen_seg);
+        }
+
+        MOX::_combat_data[target_idx].black_hole_flag = 1;
+        MOX::_combat_data[target_idx].black_hole_source_idx = (int8_t)source_idx;
     }
 }

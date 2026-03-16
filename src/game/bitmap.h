@@ -78,4 +78,10 @@ namespace bitmap {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f070});
         fn(src, dst);
     }
+
+    inline void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, void* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052fe10});
+        fn(x1, y1, x2, y2, bitmap);
+    }
 }

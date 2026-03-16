@@ -1886,6 +1886,11 @@ namespace hooks {
         { 0x004ad490, &CMBTFIRE::Fire_Beam_Weapon_ },
         { 0x004ae8b0, &CMBTFIRE::Fire_Bomb_ },
         { 0x004aea70, &CMBTFIRE::Fire_Special_Weapon_ },
+        { 0x004af3b0, &CMBTFIRE::Energy_Absorber_Attack_ },
+        { 0x004ad370, &CMBTFIRE::Get_Beam_Range_To_Hit_Bonus_ },
+        { 0x004ad3b0, &CMBTFIRE::Get_Beam_Weapon_Modifiers_ },
+        { 0x004aea40, &CMBTFIRE::Place_Ship_In_Stasis_ },
+        { 0x004afa10, &CMBTFIRE::BHG_ },
     };
 
     void Install_Hooks()
