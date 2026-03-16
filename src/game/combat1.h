@@ -52,8 +52,5 @@ namespace COMBAT1 {
 
     int16_t __cdecl Get_Number_Of_Ships_In_Stasis_(int16_t source_ship_idx);
 
-    inline bool __cdecl Weapon_Is_On_(int16_t ship_idx, int16_t slot_idx) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00469A00})(ship_idx, slot_idx);
-    }
+    bool __cdecl Weapon_Is_On_(int16_t ship_idx, int16_t weapon_idx);
 }

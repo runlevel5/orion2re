@@ -311,7 +311,7 @@ namespace CMBTFIRE {
 
         if (range == 0) {
             if (target_type == 1) {
-                range = CMBTAI::Range_To_XY_(ship_idx, target_idx);
+                range = CMBTAI::Range_To_Missile_(ship_idx, target_idx);
             }
             else {
                 range = CMBTAI::Range_To_Ship_(ship_idx, target_idx);
@@ -1303,7 +1303,7 @@ namespace CMBTFIRE {
         if (is_coord != 0) {
             CMBTMIS::Missile_Type_(target_idx);
             if (is_coord != 0) {
-                range = CMBTAI::Range_To_XY_(unit_idx, target_idx);
+                range = CMBTAI::Range_To_Missile_(unit_idx, target_idx);
             }
             else {
                 range = CMBTAI::Range_To_Ship_(unit_idx, target_idx);
@@ -1456,7 +1456,7 @@ namespace CMBTFIRE {
             shield_arc = CMBTFIRE::Facing_Shield_(CMBTDRW1::Relative_Bearing_(target, source));
             range = (int16_t)CMBTAI::Range_To_Ship_(source, target);
         } else {
-            range = CMBTAI::Range_To_XY_(source, target);
+            range = CMBTAI::Range_To_Missile_(source, target);
         }
 
         int16_t hit_modifier = 0;

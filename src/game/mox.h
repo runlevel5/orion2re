@@ -32,7 +32,8 @@ namespace MOX {
     inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
     inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
-    inline int8_t* _player_mode = reinterpret_cast<int8_t*>(std::uintptr_t{0x0059D650});
+    inline int8_t (&_player_mode)[15] =
+        *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
     inline int16_t& _start_of_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a6e10});
     inline int16_t& _cur_ship = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6c0});
     inline int16_t& _net_destination = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059d6b8});
@@ -162,7 +163,7 @@ namespace MOX {
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
-    inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
+    inline int8_t& _game_type = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x005974DD });
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
@@ -233,6 +234,7 @@ namespace MOX {
     inline int16_t& _ship_data_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1782});
     inline int16_t& _cur_combat_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597070});
     inline int16_t& _cur_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B42A});
+    inline int16_t& _wait_ptr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059b5bc});
     inline int16_t& _board_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B340});
     inline int16_t& _tactical_net_choice = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005973F0});
     inline int16_t& _auto_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B3FC});
@@ -496,7 +498,8 @@ namespace MOX {
     inline int16_t& _cur_combat_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059706E});
     inline uint16_t& _grid_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597300});
     inline uint16_t& _speedx2_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597400});
-    inline int16_t* _auto_combat_flag = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059740C});
+    inline int16_t (&_auto_combat_flag)[2] =
+        *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x0059740C});
     inline int16_t& _combat_clock_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059745E});
     inline int16_t& _combat_near_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597468});
     inline int16_t& _combat_near_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059747A});

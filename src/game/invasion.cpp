@@ -66,6 +66,33 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
     }
 }
 
+void __cdecl Get_Boarding_Info_(int16_t attacker_player_id, int16_t attacker_unit_count, int16_t attacker_additional_modifier, int16_t defender_player_id, int16_t defender_unit_count, int16_t defender_additional_modifier, s_invasion_side_info* side_a, s_invasion_side_info* side_b) {
+    memset(side_a, 0, sizeof(s_invasion_side_info));
+    side_a->colony_id = -1;
+    side_a->ship_list = nullptr;
+    side_a->player_id = attacker_player_id;
+    side_a->opponent_player_id = defender_player_id;
+    side_a->n_ships = 0;
+    side_a->unit_counts[1] = attacker_unit_count;
+
+    memset(side_b, 0, sizeof(s_invasion_side_info));
+    side_b->colony_id = -1;
+    side_b->ship_list = nullptr;
+    side_b->player_id = defender_player_id;
+    side_b->opponent_player_id = attacker_player_id;
+    side_b->n_ships = 0;
+    side_b->unit_counts[1] = defender_unit_count;
+
+    invasion::Compute_Player_Ground_Combat_Bonuses_(side_a->player_id, &side_a->combat_modifiers, 0);
+    side_a->combat_modifiers.additional_modifier = attacker_additional_modifier;
+
+    invasion::Compute_Player_Ground_Combat_Bonuses_(side_b->player_id, &side_b->combat_modifiers, 0);
+    side_b->combat_modifiers.additional_modifier = defender_additional_modifier;
+
+    invasion::Compute_Ground_Combat_Info_(side_a, &side_a->combat_modifiers, &side_b->combat_modifiers);
+    invasion::Compute_Ground_Combat_Info_(side_b, &side_b->combat_modifiers, &side_a->combat_modifiers);
+}
+
 void __cdecl Check_All_Rebellions_() {
     s_colony* colony = MOX::_colony;
     s_colony* end = &colony[MOX::_NUM_COLONIES];
@@ -132,6 +159,40 @@ void __cdecl Find_Troops_(s_invasion_side_info* side_info) {
         side_info->current_troop_type_idx++;
     }
     side_info->current_unit_damage = 0;
+}
+
+/**
+ * @brief Assigns a new home planet to a player by selecting their colony with the largest population.
+ * 
+ * @param player_idx The index of the player.
+ * @param excluded_colony_idx An index of a colony to exclude from the search (usually the one being lost).
+ */
+void __cdecl Assign_New_Home_Planet_(int8_t player_idx, int16_t excluded_colony_idx) {
+    int max_pops = 0;
+    int best_colony_idx = -1;
+
+    for (int i = 0; i < (int)MOX::_NUM_COLONIES; ++i) {
+        // Check if the current colony is not the excluded one and belongs to the player
+        if (i != (int)excluded_colony_idx && MOX::_colony[i].owner == (int8_t)player_idx) {
+            // Population is handled as unsigned byte in comparison logic
+            int current_pops = (uint8_t)MOX::_colony[i].n_pops;
+
+            // Select the colony with the largest population. 
+            // Ties result in selecting the colony with the higher index.
+            if (current_pops >= max_pops) {
+                max_pops = current_pops;
+                best_colony_idx = i;
+            }
+        }
+    }
+
+    if (best_colony_idx == -1) {
+        // No suitable colony found for a new home
+        MOX::_player[player_idx].home_planet_id = -1;
+    } else {
+        // Assign the planet index of the best colony found
+        MOX::_player[player_idx].home_planet_id = MOX::_colony[best_colony_idx].planet;
+    }
 }
 
 }

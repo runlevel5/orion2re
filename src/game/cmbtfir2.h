@@ -58,11 +58,7 @@ namespace CMBTFIR2 {
 
     void __cdecl Resolve_Capture_(int16_t attacker_idx, int16_t defender_idx, int16_t attacker_marines, int16_t param_4, int16_t param_5);
 
-    inline void __cdecl Capture_Ship_(int16_t param_1, int16_t param_2, int16_t param_3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e8530});
-        fn(param_1, param_2, param_3);
-    }
+    void __cdecl Capture_Ship_(int16_t ship_idx, int16_t attacker_ship_idx, int16_t weapon_idx);
 
     int16_t __cdecl Already_Boarded_(int16_t param_1);
 
@@ -119,4 +115,6 @@ namespace CMBTFIR2 {
     void __cdecl Select_Internal_(int16_t ship_idx, int16_t* hit_type, int16_t* target_idx, int16_t heavy_hit, int16_t direct_hit, int16_t armor_piercing, int16_t internal_only);
 
     void __cdecl Apply_Internal_Damage_(int16_t target_ship_idx, int16_t* remaining_damage, int16_t sys_index, int16_t count, int16_t flag);
+
+    void __cdecl Clear_Capturing_Flag_(int16_t ship_idx);
 }

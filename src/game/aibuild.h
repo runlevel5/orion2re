@@ -42,9 +42,5 @@ namespace AIBUILD {
     void __cdecl Force_Produce_(uint8_t* id_list, int16_t index, int32_t* list_count, int16_t production_id);
     int16_t __cdecl Industry_Worth(struct s_colony* colony);
 
-    inline char* __cdecl Product_Name_(int16_t ship_idx) {
-        using Fn = char*(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479E80});
-        return fn(ship_idx);
-    }
+    char* __cdecl Product_Name_(int16_t product_id);
 }

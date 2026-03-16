@@ -984,4 +984,18 @@ namespace AIBUILD {
     int16_t __cdecl Industry_Worth(s_colony* colony) {
         return (int16_t)(((uint16_t)colony->n_pops >> 3) - (uint16_t)colony->maintenance[1] + colony->production[1]);
     }
+
+    /**
+     * @brief Returns the name of the product being built.
+     * @param product_id The ID of the building or project.
+     * @return A pointer to the product name string.
+     */
+    char* __cdecl Product_Name_(int16_t product_id) {
+        // 0xffdb is -37, which represents "Trade Goods" in AI contexts
+        if (product_id == -37 /* 0xffdb */) {
+            return s_AI_trade_goods_00557670;
+        }
+
+        return COLBLDG::Selection_Name_(product_id);
+    }
 }

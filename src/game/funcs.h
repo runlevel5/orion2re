@@ -24,6 +24,7 @@ inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00
 inline char* s__00559998 = reinterpret_cast<char*>(std::uintptr_t{0x00559998});
 inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
+inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -1908,6 +1908,40 @@ namespace hooks {
         { 0x004e5e90, &CMBTFIR2::Security_Bonus_ },
         { 0x004e7050, &CMBTFIR2::Get_Combat_Ship_Special_Id_ },
         { 0x004e86c0, &CMBTFIR2::Select_Raid_Internal_ },
+        { 0x004e8c10, &CMBTFIR2::Clear_Capturing_Flag_ },
+        { 0x004e8530, &CMBTFIR2::Capture_Ship_ },
+        { 0x0042b760, &invasion::Get_Boarding_Info_ },
+        { 0x0042bf20, &invasion::Assign_New_Home_Planet_ },
+        { 0x00469a00, &COMBAT1::Weapon_Is_On_ },
+        { 0x0040bf20, &COMBINIT::Ship_Center_Offsets_ },
+        { 0x00450360, &CMBTAI::Get_Player_Mode_ },
+        { 0x0044d360, &CMBTAI::Toggle_Auto_Combat_Flags_ },
+        { 0x0044C390, &CMBTAI::Range_To_Ship_ },
+        { 0x0044c360, &CMBTAI::Range_To_Missile_ },
+        { 0x0044ed00, &CMBTAI::Will_Missile_Do_Damage_ },
+        { 0x0044ba50, &CMBTAI::Safe_To_Fire_Sphere_Weapon_ },
+        { 0x0044d610, &CMBTAI::Do_Auto_Ship_Turn_ },
+        { 0x0044FA40, &CMBTAI::Retreat_Check_ },
+        { 0x0044fd10, &CMBTAI::Get_Long_Range_Beam_Strength_ },
+        { 0x0044f8d0, &CMBTAI::Get_Effective_Beam_Strength_ },
+        { 0x0044d1e0, &CMBTAI::Is_Ship_Out_Of_Ammo_ },
+        { 0x0044c1a0, &CMBTAI::Ai_Stasis_Check_ },
+        { 0x0044e380, &CMBTAI::Choose_Target_ },
+        { 0x0044e2d0, &CMBTAI::Select_Ship_To_Target_ },
+        { 0x0044e070, &CMBTAI::Target_Ship_Value_ },
+        { 0x0044e3e0, &CMBTAI::Combat_Ship_Class_ },
+        { 0x0044e740, &CMBTAI::Auto_Move_Ship_ },
+        { 0x0044b9c0, &CMBTAI::Does_Ship_Have_Missiles_Incoming_ },
+        { 0x00450020, &CMBTAI::Boarding_Action_Type_ },
+        { 0x0044fe50, &CMBTAI::Resolve_Ai_Boarding_ },
+        { 0x0044d310, &CMBTAI::Is_Ship_Targeted_By_Missile_ },
+        { 0x0044c260, &CMBTAI::Range_To_XY_ },
+        { 0x0044d180, &CMBTAI::Check_For_Launched_Fighters_ },
+        { 0x0044c110, &CMBTAI::Release_Smallest_Ship_From_Stasis_ },
+        { 0x0044e680, &CMBTAI::Evaluate_Possible_Move_ },
+        { 0x0044d530, &CMBTAI::Crystal_Control_ },
+        { 0x0044f980, &CMBTAI::Get_Total_Hits_ },
+        { 0x00479e80, &AIBUILD::Product_Name_ },
     };
 
     void Install_Hooks()

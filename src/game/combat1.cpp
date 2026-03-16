@@ -2173,4 +2173,8 @@ namespace COMBAT1 {
 
         fields::Set_Help_List_(MOX::_help_entry_list, start_index + 12);
     }
+
+    bool __cdecl Weapon_Is_On_(int16_t ship_idx, int16_t weapon_idx) {
+        return MOX::_combat_data[ship_idx].weapons[weapon_idx].active == 1;
+    }
 }

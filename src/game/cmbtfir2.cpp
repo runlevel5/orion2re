@@ -1087,6 +1087,10 @@ namespace CMBTFIR2 {
         }
     }
 
+    void __cdecl Clear_Capturing_Flag_(int16_t ship_idx) {
+        struct_::Clear_Bit_Field_(&MOX::_combat_data[ship_idx].combat_status_flags, 4);
+    }
+
     void __cdecl Apply_Internal_Damage_(int16_t target_ship_idx, int16_t* remaining_damage, int16_t sys_index, int16_t count, int16_t flag) {
         s_combat_data* ship = &MOX::_combat_data[target_ship_idx];
 
@@ -1698,5 +1702,58 @@ namespace CMBTFIR2 {
         }
 
         return found_special_id;
+    }
+
+    void __cdecl Capture_Ship_(int16_t ship_idx, int16_t attacker_ship_idx, int16_t weapon_idx) {
+        int16_t new_owner;
+        s_combat_data* combat_ship = &MOX::_combat_data[ship_idx];
+
+        if (combat_ship->officer_idx > -1) {
+            OFFICER::Kill_Officer_(combat_ship->officer_idx);
+            combat_ship->officer_idx = -1;
+            if (combat_ship->ship_idx != -1) {
+                MOX::_ship[combat_ship->ship_idx].officer_index = -1;
+            }
+        }
+
+        CMBTFIR2::Clear_Capturing_Flag_(ship_idx);
+
+        if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* SPEC_HIGH_ENERGY_FOCUS */)) {
+            if (random::Random_(10) < 6) {
+                CMBTFIRE::Destroy_Ship_(ship_idx, attacker_ship_idx, weapon_idx, 4);
+                return;
+            }
+        }
+
+        if (combat_ship->owner == MOX::_combat_attacker_player) {
+            new_owner = MOX::_combat_defender_player;
+        } else {
+            new_owner = MOX::_combat_attacker_player;
+        }
+
+        combat_ship->owner = (int8_t)new_owner;
+
+        CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
+        COMBAT1::Remove_Continuing_Effect_Specials_(ship_idx);
+
+        if (new_owner >= 8 || !MOX::_player[new_owner].traits[25 /* TRAIT_TELEPATHIC */]) {
+            combat_ship->is_captured = 1;
+        }
+
+        combat_ship->is_retreating = 0;
+        combat_ship->special_cooldown = -1;
+
+        int16_t i = 0;
+        while (MOX::_ship_turn_order[i] != -10) {
+            i++;
+        }
+
+        for (int16_t j = i; j >= 0; j--) {
+            MOX::_ship_turn_order[j + 1] = MOX::_ship_turn_order[j];
+        }
+
+        MOX::_ship_turn_order[0] = -1;
+        MOX::_cur_ptr++;
+        MOX::_wait_ptr++;
     }
 }

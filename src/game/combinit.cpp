@@ -2789,4 +2789,61 @@ void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int1
     }
 }
 
+void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y) {
+    int16_t result_offset = 0;
+
+    if (ship_idx == 0) {
+        if (MOX::_cmbt_colony_id == -1) {
+            result_offset = 60;
+        } else {
+            int16_t planet_idx = MOX::_colony[MOX::_cmbt_colony_id].planet;
+            int8_t planet_size = MOX::_planet[planet_idx].size;
+
+            switch (planet_size) {
+                case 0:
+                    result_offset = 30;
+                    break;
+                case 1:
+                    result_offset = 40;
+                    break;
+                case 2:
+                    result_offset = 60;
+                    break;
+                case 3:
+                    result_offset = 70;
+                    break;
+                case 4:
+                    result_offset = 80;
+                    break;
+                default:
+                    result_offset = 0;
+                    break;
+            }
+        }
+    } else {
+        int8_t size_class = MOX::_combat_data[ship_idx].size_class;
+
+        switch (size_class) {
+            case 0:
+                result_offset = 10;
+                break;
+            case 1:
+            case 2:
+                result_offset = 20;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                result_offset = 30;
+                break;
+            default:
+                result_offset = 0;
+                break;
+        }
+    }
+
+    *out_x = result_offset;
+    *out_y = result_offset;
+}
+
 }

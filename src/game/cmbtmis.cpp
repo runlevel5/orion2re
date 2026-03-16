@@ -64,7 +64,7 @@ namespace CMBTMIS {
                             ship.unit_status == 0 &&
                             missile.target_unit_idx != ship_idx) {
 
-                            int16_t range = CMBTAI::Range_To_XY_(ship_idx, missile_idx);
+                            int16_t range = CMBTAI::Range_To_Missile_(ship_idx, missile_idx);
                             if (range < min_range) {
                                 min_range = range;
                                 best_target = ship_idx;

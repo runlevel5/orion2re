@@ -83,8 +83,5 @@ namespace COMBINIT {
     inline uint8_t& _real_attack_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8BBC});
     int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2);
 
-    inline void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* x, int16_t* y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0040BF20})(ship_idx, x, y);
-    }
+    void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);
 }
