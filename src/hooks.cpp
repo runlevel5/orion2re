@@ -1891,6 +1891,23 @@ namespace hooks {
         { 0x004ad3b0, &CMBTFIRE::Get_Beam_Weapon_Modifiers_ },
         { 0x004aea40, &CMBTFIRE::Place_Ship_In_Stasis_ },
         { 0x004afa10, &CMBTFIRE::BHG_ },
+        { 0x0047e8e0, &BOMB::Resolve_Bomb_Hit_ },
+        { 0x0047ebd0, &BOMB::Resolve_Biological_Hit_ },
+        { 0x004e6930, &CMBTFIR2::Total_Internal_Space_ },
+        { 0x004e65d0, &CMBTFIR2::Select_Internal_ },
+        { 0x004d5fc0, &CMBTDRW1::Draw_Bombs_ },
+        { 0x004e4e60, &CMBTFIR2::Apply_Internal_Damage_ },
+        { 0x004e7120, &CMBTFIR2::Resolve_Raid_ },
+        { 0x004e7ea0, &CMBTFIR2::Resolve_Capture_ },
+        { 0x0042b610, &invasion::Ground_Combat_Round_ },
+        { 0x0042b6f0, &invasion::Find_Troops_ },
+        { 0x004e5cd0, &CMBTFIR2::Get_Fleet_Commando_Bonus_ },
+        { 0x004e5d50, &CMBTFIR2::Commando_Bonus_ },
+        { 0x004e5890, &CMBTFIR2::Crew_Boarding_Combat_Bonus_ },
+        { 0x004e5e10, &CMBTFIR2::Get_Fleet_Security_Bonus_ },
+        { 0x004e5e90, &CMBTFIR2::Security_Bonus_ },
+        { 0x004e7050, &CMBTFIR2::Get_Combat_Ship_Special_Id_ },
+        { 0x004e86c0, &CMBTFIR2::Select_Raid_Internal_ },
     };
 
     void Install_Hooks()

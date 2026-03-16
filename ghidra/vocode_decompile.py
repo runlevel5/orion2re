@@ -482,11 +482,86 @@ def _render_composite_layouts(datatypes):
 
     return "\n".join(lines) + "\n"
 
+def _collect_function_local_and_signature_datatypes(func, complex_set, seen):
+    """
+    Collect complex datatypes used directly by the function signature and local variables.
+    This covers cases like:
+        s_invasion_side_info side1;
+    which are not referenced through global data symbols.
+    """
+    try:
+        ret_dt = func.getReturnType()
+        _collect_complex_datatypes_recursive(ret_dt, complex_set, seen)
+    except Exception:
+        pass
+
+    try:
+        for p in func.getParameters():
+            try:
+                _collect_complex_datatypes_recursive(p.getDataType(), complex_set, seen)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    try:
+        for v in func.getLocalVariables():
+            try:
+                _collect_complex_datatypes_recursive(v.getDataType(), complex_set, seen)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+def _collect_called_function_signature_datatypes(func, complex_set, seen):
+    listing = currentProgram.getListing()
+    rm = currentProgram.getReferenceManager()
+    fm = currentProgram.getFunctionManager()
+
+    instr_iter = listing.getInstructions(func.getBody(), True)
+    for ins in instr_iter:
+        from_addr = ins.getAddress()
+
+        try:
+            refs = rm.getReferencesFrom(from_addr)
+        except Exception:
+            continue
+
+        for ref in refs:
+            try:
+                to = ref.getToAddress()
+            except Exception:
+                continue
+
+            if to is None or (not to.isMemoryAddress()):
+                continue
+
+            try:
+                callee = fm.getFunctionAt(to)
+            except Exception:
+                callee = None
+
+            if callee is None:
+                continue
+
+            try:
+                _collect_complex_datatypes_recursive(callee.getReturnType(), complex_set, seen)
+            except Exception:
+                pass
+
+            try:
+                for p in callee.getParameters():
+                    try:
+                        _collect_complex_datatypes_recursive(p.getDataType(), complex_set, seen)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
 
 def _format_externals_for_input(func):
     refs = _collect_referenced_global_data_symbols(func)
-    if not refs:
-        return "=== EXTERNALS / GLOBALS ===\n<none>\n"
 
     lines = []
     lines.append("=== EXTERNALS / GLOBALS ===")
@@ -495,7 +570,13 @@ def _format_externals_for_input(func):
     complex_set = set()
     seen = set()
 
-    MAX_ITEMS = 64
+    _collect_function_local_and_signature_datatypes(func, complex_set, seen)
+    _collect_called_function_signature_datatypes(func, complex_set, seen)
+
+    if not refs:
+        lines.append("<none>")
+
+    MAX_ITEMS = 128
     for (to, sym, dt, s_val) in refs[:MAX_ITEMS]:
         try:
             addr_hex = "0x%08X" % int(to.getOffset())

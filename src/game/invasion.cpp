@@ -78,4 +78,60 @@ void __cdecl Check_All_Rebellions_() {
     }
 }
 
+void __cdecl Ground_Combat_Round_(s_invasion_side_info* side1, s_invasion_side_info* side2) {
+    int16_t roll1 = side1->unit_strengths[(uint8_t)side1->current_troop_type_idx] + (int16_t)random::Random_(100);
+    int16_t roll2 = side2->unit_strengths[(uint8_t)side2->current_troop_type_idx] + (int16_t)random::Random_(100);
+
+    side1->round_hit_unit_type = -1;
+    side1->round_killed_unit_type = -1;
+
+    if (roll2 >= roll1) {
+        uint8_t idx = (uint8_t)side1->current_troop_type_idx;
+        side1->current_unit_damage++;
+
+        if (side1->unit_hps[idx] == side1->current_unit_damage) {
+            side1->round_killed_unit_type = idx;
+            side1->unit_counts[idx]--;
+            side1->current_unit_damage = 0;
+
+            if (side1->unit_counts[idx] == 0) {
+                Find_Troops_(side1);
+            }
+        } else {
+            side1->round_hit_unit_type = idx;
+        }
+    }
+
+    side2->round_hit_unit_type = -1;
+    side2->round_killed_unit_type = -1;
+
+    if (roll2 <= roll1) {
+        uint8_t idx = (uint8_t)side2->current_troop_type_idx;
+        side2->current_unit_damage++;
+
+        if (side2->unit_hps[idx] == side2->current_unit_damage) {
+            side2->round_killed_unit_type = idx;
+            side2->unit_counts[idx]--;
+            side2->current_unit_damage = 0;
+
+            if (side2->unit_counts[idx] == 0) {
+                Find_Troops_(side2);
+            }
+        } else {
+            side2->round_hit_unit_type = idx;
+        }
+    }
+}
+
+void __cdecl Find_Troops_(s_invasion_side_info* side_info) {
+    while (side_info->unit_counts[side_info->current_troop_type_idx] == 0) {
+        // Potential bug: out-of-bounds access to unit_counts[4] if current_troop_type_idx reaches 4
+        if (side_info->current_troop_type_idx >= 4) {
+            break;
+        }
+        side_info->current_troop_type_idx++;
+    }
+    side_info->current_unit_damage = 0;
+}
+
 }

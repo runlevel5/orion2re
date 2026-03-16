@@ -87,6 +87,225 @@ namespace BOMB {
     }
 
     /**
+     * @address 0047e8e0
+     */
+    int __cdecl Resolve_Bomb_Hit_(s_colony* colony, s_combat_bomb_result* result, int bomb_power) {
+        int target_building_count = 0;
+        int8_t target_building_indices[BUILDING_COUNT];
+        s_player* owner_player = &MOX::_player[(uint8_t)colony->owner];
+
+        for (int i = 0; i < BUILDING_COUNT; ++i) {
+            if (colony->buildings[i] != 0 &&
+                i != BUILDING_CAPITOL &&
+                i != BUILDING_MISSILE_BASE &&
+                i != BUILDING_GROUND_BATTERIES &&
+                i != BUILDING_STELLAR_CONVERTER &&
+                i != BUILDING_FIGHTER_GARRISON &&
+                i != BUILDING_BATTLESTATION &&
+                i != BUILDING_STAR_BASE &&
+                i != BUILDING_STAR_FORTRESS) {
+                target_building_indices[target_building_count] = (int8_t)i;
+                target_building_count++;
+            }
+        }
+
+        int total_targets = (int)colony->military[0] + (int)colony->military[1] + target_building_count;
+        if (colony->production_spent != 0) {
+            total_targets++;
+        }
+
+        int result_code = 0;
+        if (colony->n_pops == 1) {
+            if (total_targets == 0) {
+                int pop_idx = colony->pop[0] & 0xF;
+                if (colony->pop_roundoff[pop_idx] <= 100) {
+                    result->population_killed++;
+                    colony->pop_roundoff[pop_idx] = 0;
+                    colony->n_pops = 0;
+
+                    if (colony->buildings[BUILDING_CAPITOL] != 0) {
+                        int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+                        ERICNET::Remove_Building_(colony_idx, BUILDING_CAPITOL);
+                    }
+
+                    result->colony_wiped_out = 1;
+                    owner_player->colony_war_losses[(uint8_t)result->attacker_idx] += 10;
+                } else {
+                    colony->pop_roundoff[pop_idx] -= 100;
+                }
+                result_code = 1;
+                result->damage_occurred = 1;
+            }
+        } else {
+            total_targets += (uint8_t)colony->n_pops;
+        }
+
+        if (result_code == 0) {
+            if (total_targets == 0) {
+                return 0;
+            }
+
+            int hit_val = random::Random_(total_targets);
+            int hit_idx = hit_val - 1;
+
+            if (hit_idx < target_building_count) {
+                int8_t building_id = target_building_indices[hit_idx];
+                int16_t colony_idx = (int16_t)(colony - MOX::_colony);
+                ERICNET::Remove_Building_(colony_idx, (int16_t)building_id);
+                result->buildings_destroyed[building_id] = 1;
+                result->damage_occurred = 1;
+                return 1;
+            }
+
+            hit_idx -= target_building_count;
+            if (hit_idx < (int)colony->military[0]) {
+                int needed_strength = 1;
+                if (owner_player->tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
+                    needed_strength = 2;
+                }
+                if (owner_player->traits[TRAIT_HEAVY_G_WORLD] != 0) {
+                    needed_strength++;
+                }
+
+                if (bomb_power < needed_strength) {
+                    return 0;
+                }
+
+                colony->military[0]--;
+                result->damage_occurred = 1;
+                result->infantry_killed++;
+                return needed_strength;
+            }
+
+            hit_idx -= (int)colony->military[0];
+            if (hit_idx < (int)colony->military[1]) {
+                int needed_strength = 2;
+                if (owner_player->tech_applications[TECH_APP_BATTLEOIDS] == 3) {
+                    needed_strength = 3;
+                }
+                if (owner_player->traits[TRAIT_HEAVY_G_WORLD] != 0) {
+                    needed_strength++;
+                }
+
+                if (bomb_power < needed_strength) {
+                    return 0;
+                }
+
+                colony->military[1]--;
+                result->damage_occurred = 1;
+                result->tanks_killed++;
+                return needed_strength;
+            }
+
+            hit_idx -= (int)colony->military[1];
+            if (hit_idx < (int)colony->production_spent) {
+                result->production_lost = colony->production_spent;
+                colony->production_spent = 0;
+            } else {
+                result->population_killed++;
+                colony->n_pops--;
+                colony->pop[hit_idx] = colony->pop[colony->n_pops];
+                owner_player->colony_war_losses[(uint8_t)result->attacker_idx]++;
+            }
+            result_code = 1;
+            result->damage_occurred = 1;
+        }
+
+        return result_code;
+    }
+
+    /**
+     * @address 0047ebd0
+     */
+    void __cdecl Resolve_Biological_Hit_(s_colony* colony, s_combat_bomb_result* result) {
+        int target_pop_idx = -1;
+        int non_android_count = 0;
+
+        for (int i = 0; i < (int)(uint8_t)colony->n_pops; ++i) {
+            // Check race index; 8 is RACE_ANDROID
+            if ((colony->pop[i] & 0xf) != 8) {
+                non_android_count++;
+                if (random::Random_(non_android_count) == 1) {
+                    target_pop_idx = i;
+                }
+            }
+        }
+
+        if (target_pop_idx < 0) {
+            return;
+        }
+
+        result->damage_occurred = 1;
+
+        if ((uint8_t)colony->n_pops >= 2) {
+            int chance_sum = (int)colony->military[0] + (int)colony->military[1] + (int)(uint8_t)colony->n_pops;
+            if (random::Random_(chance_sum) <= (int)(uint8_t)colony->n_pops) {
+                result->population_killed++;
+                result->bio_pop_killed++;
+
+                colony->n_pops--;
+                colony->pop[target_pop_idx] = colony->pop[(uint8_t)colony->n_pops];
+
+                MOX::_player[(uint8_t)colony->owner].colony_war_losses[(uint8_t)result->attacker_idx]++;
+                return;
+            }
+
+            if (colony->military[0] != 0) {
+                if (random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
+                    colony->military[0]--;
+                    result->infantry_killed++;
+                    return;
+                }
+            }
+
+            colony->military[1]--;
+            result->tanks_killed++;
+            return;
+        }
+
+        // Single population colony logic
+        if (colony->military[0] != 0) {
+            if (random::Random_((int)colony->military[1] + (int)colony->military[0]) <= (int)colony->military[0]) {
+                colony->military[0]--;
+                result->infantry_killed++;
+                return;
+            }
+        }
+
+        if (colony->military[1] != 0) {
+            colony->military[1]--;
+            result->tanks_killed++;
+            return;
+        }
+
+        int race_idx = (int)(colony->pop[0] & 0xf);
+        // BUG: colony->pop_roundoff has 10 elements in orion2.h but 16 are possible here
+        if (colony->pop_roundoff[race_idx] <= 100) {
+            result->population_killed++;
+            result->bio_pop_killed++;
+
+            colony->pop_roundoff[race_idx] = 0;
+            colony->n_pops = 0;
+
+            bool has_buildings = false;
+            for (int i = 0; i < 49; ++i) {
+                if (colony->buildings[i] != 0) {
+                    has_buildings = true;
+                    break;
+                }
+            }
+
+            if (!has_buildings) {
+                result->colony_wiped_out = 1;
+                MOX::_player[(uint8_t)colony->owner].colony_war_losses[(uint8_t)result->attacker_idx] += 10;
+            }
+        } else {
+            race_idx = (int)(colony->pop[target_pop_idx] & 0xf);
+            colony->pop_roundoff[race_idx] -= 100;
+        }
+    }
+
+    /**
      * @address 0047edc0
      */
     void __cdecl Apply_Bomb_Hits_(s_combat_bomb_result* result) {

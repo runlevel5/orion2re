@@ -80,4 +80,9 @@ namespace CMBTSPEC {
         using Fn = void(__cdecl*)(int16_t, uint16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004a73c0})(ship_idx, target_idx);
     }
+
+    inline void __cdecl Draw_Transporter_Bomb_Beam_(int16_t ship_idx, int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(0x004a7830)(ship_idx, x, y);
+    }
 }

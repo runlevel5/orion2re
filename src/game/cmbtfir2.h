@@ -30,14 +30,38 @@ namespace CMBTFIR2 {
 
     void __cdecl Set_Boarded_Flag_(int16_t ship_idx);
 
-    inline void __cdecl Resolve_Raid_(int16_t ship, int16_t a, int16_t* b) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e7120})(ship, a, b);
-    }
+    inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005510F0 }); /* " " */
+    inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005569F8 }); /* "\n" */
+    inline const char* s__00557e5c = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E5C });
+    inline const char* s__00557e60 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00557E60 });
+    inline const char* s__0055a588 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A588 });
+    inline const char* s__0055a5a0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A5A0 });
+    inline const char* s__0055a5d0 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A5D0 });
+    inline const char* s__0055a550 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A550 });
+    inline const char* s__0055a544 = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055A544 });
 
-    inline void __cdecl Resolve_Capture_(int16_t ship, int16_t a, int16_t b, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e7ea0})(ship, a, b, x, y);
+    int16_t __cdecl Commando_Bonus_(int16_t leader_idx);
+
+    int16_t __cdecl Get_Fleet_Commando_Bonus_(int16_t player_idx);
+
+    int16_t __cdecl Crew_Boarding_Combat_Bonus_(int16_t ship_idx);
+
+    int16_t __cdecl Security_Bonus_(int16_t leader_idx);
+
+    int16_t __cdecl Get_Fleet_Security_Bonus_(int16_t player_idx);
+
+    void __cdecl Select_Raid_Internal_(int16_t ship_idx, int16_t* raid_type, int16_t* component_idx);
+
+    int16_t __cdecl Get_Combat_Ship_Special_Id_(int16_t ship_idx, int16_t occurrence);
+
+    void __cdecl Resolve_Raid_(int16_t attacker_idx, int16_t target_idx, int16_t* raiders);
+
+    void __cdecl Resolve_Capture_(int16_t attacker_idx, int16_t defender_idx, int16_t attacker_marines, int16_t param_4, int16_t param_5);
+
+    inline void __cdecl Capture_Ship_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e8530});
+        fn(param_1, param_2, param_3);
     }
 
     int16_t __cdecl Already_Boarded_(int16_t param_1);
@@ -50,10 +74,7 @@ namespace CMBTFIR2 {
 
     short __cdecl Max_Total_Internal_Space_(short ship_idx);
 
-    inline short __cdecl Total_Internal_Space_(short ship_idx) {
-        using Fn = short(__cdecl*)(short);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004e6930})(ship_idx);
-    }
+    int16_t __cdecl Total_Internal_Space_(int16_t ship_idx);
 
     int16_t __cdecl Crew_Defense_Bonus_(int16_t combat_idx);
 
@@ -95,29 +116,7 @@ namespace CMBTFIR2 {
 
     void __cdecl Kill_Crew_(int16_t combat_data_idx, int16_t kill_count);
 
-    inline void __cdecl Select_Internal_(
-        int16_t target_ship_idx,
-        int16_t* out_sys_index,
-        int16_t* out_count,
-        int16_t param_8,
-        int16_t armor_piercing_flag,
-        int16_t ignore_armor_flag,
-        int16_t param_9
-    ) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e65d0});
-        fn(target_ship_idx, out_sys_index, out_count, param_8, armor_piercing_flag, ignore_armor_flag, param_9);
-    }
+    void __cdecl Select_Internal_(int16_t ship_idx, int16_t* hit_type, int16_t* target_idx, int16_t heavy_hit, int16_t direct_hit, int16_t armor_piercing, int16_t internal_only);
 
-    inline void __cdecl Apply_Internal_Damage_(
-        int16_t target_ship_idx,
-        int16_t* remaining_damage,
-        int16_t sys_index,
-        int16_t count,
-        int16_t flag
-    ) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e4e60});
-        fn(target_ship_idx, remaining_damage, sys_index, count, flag);
-    }
+    void __cdecl Apply_Internal_Damage_(int16_t target_ship_idx, int16_t* remaining_damage, int16_t sys_index, int16_t count, int16_t flag);
 }

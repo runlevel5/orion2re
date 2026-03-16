@@ -2953,4 +2953,90 @@ namespace CMBTDRW1 {
         }
     }
 
+    void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage) {
+        bool is_bio = (TECHDATA::_weapons[weapon_id].flags & 0x80) != 0;
+        bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* Transporter */) != 0;
+        int16_t speed = (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) ? 12 : 6;
+
+        if (Ship_Completely_On_Screen_(attacker_idx) == 0) {
+            COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[attacker_idx].x, MOX::_combat_data[attacker_idx].y);
+        }
+
+        int16_t target_x, target_y;
+        Get_Ship_Center_Draw_XY_(target_idx, &target_x, &target_y);
+
+        int16_t start_x, start_y;
+        if (has_transporter) {
+            int16_t mid_x = animate::Get_Width_(MOX::_combat_planet_seg) / 2;
+            int16_t mid_y = animate::Get_Height_(MOX::_combat_planet_seg) / 2;
+            Get_Ship_Center_Draw_XY_(attacker_idx, &start_x, &start_y);
+            
+            int16_t range = special::Range_(start_x, start_y, target_x, target_y);
+            int32_t limit_sq = (int32_t)mid_x * mid_x + (int32_t)mid_y * mid_y + 3600;
+            
+            if ((int32_t)range * range > limit_sq) {
+                do {
+                    special::Absolute_Interpolate_Line_(&start_x, &start_y, start_x, start_y, target_x, target_y, 20);
+                    range = special::Range_(start_x, start_y, target_x, target_y);
+                } while ((int32_t)range * range > limit_sq);
+            }
+            CMBTSPEC::Draw_Transporter_Bomb_Beam_(attacker_idx, start_x, start_y);
+        } else {
+            Get_Ship_Center_Draw_XY_(attacker_idx, &start_x, &start_y);
+        }
+
+        int16_t facing = CMBTMOV1::Get_Facing_(start_x, start_y, target_x, target_y);
+        int32_t projectile_entry = facing + (is_bio ? 160 /* 0xA0 */ : 144 /* 0x90 */);
+
+        video::Set_Page_Back_();
+        Full_Draw_Combat_Screen_();
+
+        int16_t curr_x = start_x;
+        int16_t curr_y = start_y;
+        while (curr_x != target_x || curr_y != target_y) {
+            timer::Mark_Time_();
+            video::Set_Page_Off_();
+            Draw_Main_Combat_Screen_();
+            graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);
+            video::Clip_On_();
+
+            special::Absolute_Interpolate_Line_(&curr_x, &curr_y, start_x, start_y, target_x, target_y, speed);
+            
+            s_animation_header* projectile_anim = (s_animation_header*)Buffer_Reload_("cmbtmisl.lbx", projectile_entry, MOX::_global_cache_seg);
+            animate::Draw_(curr_x - 17, curr_y - 17, projectile_anim);
+            
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
+        }
+
+        if (is_bio) {
+            BEAMS::Add_Damage_Indicator_For_Biological_(target_x, target_y, 1, damage);
+        } else {
+            BEAMS::Add_Damage_Indicator_For_Missile_(target_x, target_y, 1, damage);
+        }
+
+        int16_t sound_handle = (int16_t)ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
+        s_animation_header* explosion_anim = (s_animation_header*)Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(explosion_anim);
+
+        for (int16_t i = 0; i < frame_count; ++i) {
+            timer::Mark_Time_();
+            video::Set_Page_Off_();
+            Draw_Main_Combat_Screen_();
+            graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);
+            video::Clip_On_();
+
+            explosion_anim = (s_animation_header*)Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
+            animate::Set_Animation_Frame_(explosion_anim, i);
+            animate::Draw_(target_x - 12, target_y - 12, explosion_anim);
+            
+            BEAMS::Draw_Damage_Message_Queue_();
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
+        }
+
+        BEAMS::Draw_Damage_Message_Queue_Until_Done_();
+        sound::Fadeout_Sound_(sound_handle, 10);
+    }
+
 }

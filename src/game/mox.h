@@ -17,6 +17,7 @@ namespace MOX {
     inline int16_t& _fltscrn_bar_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5E});
     inline uint8_t& _big_icon_display_columns = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD14});
     inline uint8_t& _big_icon_display_rows = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005974E4});
+    inline uint16_t& _ken_trace = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005974EE});
     inline uint8_t& _big_icon_display_max_icons = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597828});
     inline int16_t& _big_icon_x_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2BEA});
     inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
