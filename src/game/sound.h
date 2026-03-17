@@ -126,4 +126,10 @@ namespace sound {
         using Fn = void(__cdecl*)(int32_t, int32_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0052D520})(handle, pitch);
     }
+
+    inline void __cdecl Loop_Sound_(int handle, int loop_count) {
+        using Fn = void(__cdecl*)(int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d560});
+        fn(handle, loop_count);
+    }
 }

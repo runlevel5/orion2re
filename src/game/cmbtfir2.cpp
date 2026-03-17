@@ -1756,4 +1756,21 @@ namespace CMBTFIR2 {
         MOX::_cur_ptr++;
         MOX::_wait_ptr++;
     }
+
+    int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx) {
+        int16_t damage;
+        int16_t has_special;
+        int8_t size_class;
+
+        has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* 24 */);
+
+        size_class = MOX::_combat_data[ship_idx].size_class;
+        damage = TECHDATA::_hull_data[size_class].drive_hits * 5;
+
+        if (has_special) {
+            damage *= 3;
+        }
+
+        return damage;
+    }
 }

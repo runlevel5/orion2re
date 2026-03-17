@@ -49,25 +49,20 @@ namespace CMBTMIS {
 
     void __cdecl Draw_Missile_(int16_t missile_idx, int16_t screen_x, int16_t screen_y, int16_t flag);
 
-    inline void __cdecl Fire_Missile_(int16_t source, int16_t target, int16_t slot, int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004FE7B0})(source, target, slot, flag);
-    }
+    void __cdecl Fire_Missile_(int16_t source_idx, int16_t target_idx, int16_t weapon_slot, int16_t is_anti_rocket);
 
-    inline void __cdecl Draw_Missile_Status_(int16_t x, int16_t y, int16_t missile_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004fe3e0})(x, y, missile_idx);
-    }
+    inline char* s__005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
+    inline const char* s_combat_lbx_00551244 = reinterpret_cast<const char*>(std::uintptr_t{0x00551244}); // "combat.lbx"
 
-    inline void __cdecl Draw_Missiles_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004fe760})();
-    }
+    void __cdecl Draw_Missile_Status_(int16_t x_off, int16_t y_off, int16_t missile_idx);
+
+    void __cdecl Draw_Missiles_();
 
     int16_t __cdecl Fighter_Ocv_(int16_t player_idx);
 
-    inline int16_t __cdecl Missile_Dcv_(int16_t type, int16_t owner) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x005002f0})(type, owner);
-    }
+    int16_t __cdecl Missile_Dcv_(int16_t weapon_idx, int16_t player_idx);
+
+    void __cdecl Next_Missile_Id_(int16_t* missile_id);
+
+    int16_t __cdecl Missile_Facing_(int16_t missile_idx, int16_t target_idx, int16_t target_is_missile);
 }

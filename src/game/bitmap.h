@@ -79,6 +79,12 @@ namespace bitmap {
         fn(src, dst);
     }
 
+    inline void __cdecl Scale_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t scale_x, int16_t scale_y) {
+        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F270});
+        fn(dst, src, scale_x, scale_y);
+    }
+
     inline void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, void* bitmap) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052fe10});

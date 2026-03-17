@@ -117,4 +117,6 @@ namespace CMBTFIR2 {
     void __cdecl Apply_Internal_Damage_(int16_t target_ship_idx, int16_t* remaining_damage, int16_t sys_index, int16_t count, int16_t flag);
 
     void __cdecl Clear_Capturing_Flag_(int16_t ship_idx);
+
+    int16_t __cdecl Damage_From_Ship_Exploding_(int16_t ship_idx);
 }

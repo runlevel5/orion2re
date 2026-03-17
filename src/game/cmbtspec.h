@@ -2,87 +2,60 @@
 #include <cstdint>
 
 namespace CMBTSPEC {
+    inline int& _g_engine_sfx_handle =
+        *reinterpret_cast<int*>(std::uintptr_t{0x00558484});
+
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type);
 
-    inline void __cdecl Draw_Continuing_Tractor_(int16_t ship_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004A6B20})(ship_idx);
-    }
+    void __cdecl Draw_Continuing_Tractor_(int16_t ship_idx);
 
-    inline void __cdecl Start_Ship_Engine_SFX_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004a7e20)();
-    }
+    void __cdecl Start_Ship_Engine_SFX_();
 
-    inline void __cdecl End_Ship_Engine_SFX_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004a7e50)();
-    }
+    void __cdecl End_Ship_Engine_SFX_();
 
-    inline void __cdecl Draw_Moving_Tractor_(int16_t tractor_idx, int16_t cur_pixel_x, int16_t cur_pixel_y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004a6cb0)(tractor_idx, cur_pixel_x, cur_pixel_y);
-    }
+    void __cdecl Draw_Moving_Tractor_(int16_t ship_idx, int16_t center_x, int16_t center_y);
 
-    inline void __cdecl Lightning_Field_(int16_t target, int16_t missile_idx, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a6190})(target, missile_idx, x, y);
-    }
+    void __cdecl Lightning_Field_(int16_t ship_idx, int16_t missile_idx, int16_t target_x, int16_t target_y);
 
-    inline void __cdecl Destroy_Ship_FX_(int16_t ship_idx, int16_t p2, int16_t p3, int16_t p4) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004A9400})(ship_idx, p2, p3, p4);
-    }
+    void __cdecl Destroy_Ship_FX_(int16_t ship_idx, int16_t x, int16_t y, int16_t explosion_type);
 
-    inline void __cdecl Draw_Stasis_Ball_(int16_t param_1, int16_t size, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a6390});
-        fn(param_1, size, x, y);
-    }
+    void __cdecl Draw_Stasis_Ball_(int16_t ship_idx, int16_t scale_percent, int16_t off_x, int16_t off_y);
 
-    inline void __cdecl Draw_Plasma_Web_(int16_t param_1, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a75e0});
-        fn(param_1, x, y);
-    }
+    void __cdecl Draw_Plasma_Web_(int16_t ship_idx, int16_t x_off, int16_t y_off);
 
     inline void __cdecl Do_Spherical_SFX_(int16_t ship_idx, int16_t x, int16_t y, int16_t subtype, int16_t shots_left) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x004a7f70})(ship_idx, x, y, subtype, shots_left);
     }
 
-    inline void __cdecl Draw_Stasis_Beam_(int16_t ship_idx, uint16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a6610})(ship_idx, target_idx);
+    void __cdecl Draw_Stasis_Beam_(int16_t source_ship_idx, int16_t target_ship_idx);
+
+    void __cdecl Draw_Anti_Missile_Rockets_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx);
+
+    void __cdecl Draw_Anti_Missile_Rocket_Picture_(int16_t x, int16_t y);
+
+    void __cdecl Anti_Missile_Rockets_(int16_t ship_idx, int16_t ship_x, int16_t ship_y, int16_t missile_idx, int16_t weapon_slot_idx, int16_t tech_level);
+
+    void __cdecl Gyro_Destablizer_(int16_t source_idx, int16_t target_idx, int16_t attack_count);
+
+    inline void __cdecl Draw_Gyro_Special_Effect_(int16_t source_idx, int16_t target_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004a5d90})(source_idx, target_idx);
     }
 
-    inline void __cdecl Anti_Missile_Rockets_(int16_t ship_idx, int16_t x, int16_t y, uint16_t target_idx, int16_t weapon_slot_idx, int16_t range) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a5590})(ship_idx, x, y, target_idx, weapon_slot_idx, range);
-    }
+    void __cdecl Plasma_Web_(int16_t param_1, int16_t param_2, int16_t param_3);
 
-    inline void __cdecl Gyro_Destablizer_(int16_t ship_idx, uint16_t target_idx, int16_t shots_left) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a5a20})(ship_idx, target_idx, shots_left);
-    }
+    void __cdecl Stellar_Converter_(int16_t attacker_idx, int16_t target_idx, int16_t num_shots);
 
-    inline void __cdecl Plasma_Web_(int16_t ship_idx, uint16_t target_idx, int16_t weapon_slot_idx) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a6eb0})(ship_idx, target_idx, weapon_slot_idx);
-    }
+    void __cdecl Tractor_Beam_(int16_t ship_idx, int16_t target_idx);
 
-    inline void __cdecl Stellar_Converter_(int16_t ship_idx, uint16_t target_idx, int16_t shots_left) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a7a20})(ship_idx, target_idx, shots_left);
-    }
+    void __cdecl Draw_Transporter_Bomb_Beam_(int16_t ship_idx, int16_t target_x, int16_t target_y);
 
-    inline void __cdecl Tractor_Beam_(int16_t ship_idx, uint16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a73c0})(ship_idx, target_idx);
-    }
+    void __cdecl Missile_Launch_FX_(int16_t missile_idx, int16_t tx, int16_t ty, int16_t is_targeting_missile);
 
-    inline void __cdecl Draw_Transporter_Bomb_Beam_(int16_t ship_idx, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004a7830)(ship_idx, x, y);
+    inline void __cdecl Play_Ship_Explosion_SFX_(int16_t size_class) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A9360});
+        fn(size_class);
     }
 }
