@@ -37,4 +37,10 @@ namespace GEO {
     bool __cdecl Point_Within_D_Of_Seg_(int16_t px, int16_t py, int16_t d, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
     int32_t __cdecl Points_On_Same_Side_Of_Line_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t lx1, int32_t ly1, int32_t lx2, int32_t ly2);
+
+    inline int32_t __cdecl Actual_Expected_Damage_(int32_t min_dmg, int32_t max_dmg, int32_t hit_chance, int32_t attack_def_diff, int32_t points_blocked) {
+        using Fn = int32_t(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00413330});
+        return fn(min_dmg, max_dmg, hit_chance, attack_def_diff, points_blocked);
+    }
 }

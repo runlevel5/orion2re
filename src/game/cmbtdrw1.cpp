@@ -1841,8 +1841,8 @@ namespace CMBTDRW1 {
         }
     }
 
-    uint8_t __cdecl Get_Weapon_Arc_(int16_t bearing) {
-        uint8_t arc_flags = 0;
+    int8_t __cdecl Get_Weapon_Arc_(int16_t bearing) {
+        int8_t arc_flags = 0;
 
         // Front arc bit (approx. +/- 60 degrees)
         if (bearing <= 60 || bearing >= 300) {

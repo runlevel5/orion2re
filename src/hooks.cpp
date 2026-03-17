@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -1942,6 +1942,18 @@ namespace hooks {
         { 0x0044d530, &CMBTAI::Crystal_Control_ },
         { 0x0044f980, &CMBTAI::Get_Total_Hits_ },
         { 0x00479e80, &AIBUILD::Product_Name_ },
+        { 0x0044ef10, &CMBTAI::Get_Current_Target_ },
+        { 0x0044f860, &CMBTAI::Get_Effective_Weapon_Damage_ },
+        { 0x0044d0b0, &CMBTAI::Missile_Overkill_Check_ },
+        { 0x0044ee10, &CMBTAI::Get_Current_Missile_Target_ },
+        { 0x0044eaf0, &CMBTAI::Get_Current_Ship_Target_ },
+        { 0x0044cd80, &CMBTAI::Expected_Beam_Bomb_Damage_ },
+        { 0x0044cb10, &CMBTAI::Expected_Missile_Damage_ },
+        { 0x0044de30, &CMBTAI::Target_Missile_Value_ },
+        { 0x0044f5a0, &CMBTAI::Convert_Ordinal_To_Msl_Type_ },
+        { 0x0044f010, &CMBTAI::Get_Effective_Missile_Strength_ },
+        { 0x0044f640, &CMBTAI::Average_Missile_Kills_ },
+        { 0x0044bc60, &CMBTAI::Ai_Self_Destruct_Check_ },
     };
 
     void Install_Hooks()
