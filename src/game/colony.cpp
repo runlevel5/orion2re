@@ -1936,6 +1936,10 @@ namespace COLONY {
         return hit_count == 4;
     }
 
+    void __cdecl Reset_Step_Squish_() {
+        _step_squish = 0;
+    }
+
     int16_t __cdecl Sum_Colonists_(int16_t colony_idx, int16_t job, int16_t state, int16_t race, int16_t param_5, int16_t param_6) {
         _colonists_count = 0;
         s_colony* colony = &MOX::_colony[colony_idx];

@@ -155,4 +155,22 @@ namespace ERIC {
         SMACK::Play_Cinematic_(COLONY::_DIMTVFIN_LBX, 0, 0);
         Do_Cinematic_Popup_Cleanup_();
     }
+
+    void __cdecl Play_Planetary_Destruction_Flic_() {
+        Do_Cinematic_Popup_Setup_();
+        SMACK::Play_Cinematic_(COLONY::_PLNTDFIN_LBX, 0, 0);
+        Do_Cinematic_Popup_Cleanup_();
+    }
+
+    void __cdecl Do_Cinematic_Popup_Cleanup_() {
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        fields::Deactivate_Auto_Function_();
+        MOX2::Put_Auto_Function_(&ERIC::_cinematic_saved_autofunction);
+        allocate::Pop_Block_(MOX::_screen_seg);
+
+        if (ERIC::_saved_sfx_l != 0 || ERIC::_saved_music_l != 0) {
+            MOX::_settings.sound_fx_level = (int8_t)ERIC::_saved_sfx_l;
+            MOX::_settings.music_level = (int8_t)ERIC::_saved_music_l;
+        }
+    }
 }

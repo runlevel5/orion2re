@@ -1,5 +1,7 @@
 #pragma once
 
+struct s_combat_bomb_result;
+
 namespace MOX {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline s_animation_header* (&_fighter_seg)[15][64] =
@@ -564,6 +566,7 @@ namespace MOX {
     inline uint8_t& _colony_defense_flags = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BA});
     inline int16_t& _cmbt_colony_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A47BC});
     inline int16_t& _combat_defender_player = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49CC});
+    inline s_combat_bomb_result& _combat_bomb_result = *reinterpret_cast<s_combat_bomb_result*>(std::uintptr_t{0x005972B2});
 
     inline s_global_combat_data& _global_combat_data = *reinterpret_cast<s_global_combat_data*>(std::uintptr_t{0x0059BD90});
 

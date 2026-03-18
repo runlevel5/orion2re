@@ -8,7 +8,7 @@ namespace FAKEBUTS {
     inline int16_t(&_fake_buttons)[125] =
         *reinterpret_cast<int16_t(*)[125]>(std::uintptr_t{0x005A4B60});
 
-    void Clear_Fake_Buttons_();
+    void __cdecl Clear_Fake_Buttons_();
 
     inline void __cdecl Draw_Fake_Buttons_() {
         using Fn = void(__cdecl*)();

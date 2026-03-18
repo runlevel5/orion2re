@@ -2035,6 +2035,14 @@ namespace hooks {
         { 0x00482780, &INITSHIP::Load_Dragon_Ship_Design_ },
         { 0x00482b30, &INITSHIP::Load_Eel_Ship_Design_ },
         { 0x004828d0, &INITSHIP::Load_Hydra_Ship_Design_ },
+        { 0x0048d450, &COMBAT::Strategic_Bombardment_ },
+        { 0x0048d670, &COMBAT::Tactical_Bombardment_ },
+        { 0x0048d570, &COMBAT::Bombardment_ },
+        { 0x004bb0a0, &ERIC::Play_Planetary_Destruction_Flic_ },
+        { 0x004B53F0, &FAKEBUTS::Clear_Fake_Buttons_ },
+        { 0x004dd8c0, &COLONY::Reset_Step_Squish_ },
+        { 0x0048d990, &COMBAT::qsort_ship_array_by_size_ },
+        { 0x004bb040, &ERIC::Do_Cinematic_Popup_Cleanup_ },
     };
 
     void Install_Hooks()

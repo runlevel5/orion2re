@@ -1264,4 +1264,173 @@ namespace COMBAT {
         }
         strcat(stats_msg, msg_buffer);
     }
+
+    /**
+     * @brief Comparison function for qsort to sort ship indices by ship size (descending).
+     * 
+     * This function compares the design size of two ships indexed by p1 and p2.
+     * Logic: (size_of_ship2 - size_of_ship1).
+     * 
+     * @param a Pointer to the first ship index.
+     * @param b Pointer to the second ship index.
+     * @return 1 if ship2 is larger, -1 if ship1 is larger, 0 if equal.
+     */
+    int __cdecl qsort_ship_array_by_size_(const void* a, const void* b) {
+        const int16_t* p1 = static_cast<const int16_t*>(a);
+        const int16_t* p2 = static_cast<const int16_t*>(b);
+        int8_t size2 = MOX::_ship[*p2].d.size;
+        int8_t size1 = MOX::_ship[*p1].d.size;
+
+        if (size2 == size1) {
+            return 0;
+        }
+
+        if (size2 > size1) {
+            return 1;
+        }
+
+        return -1;
+    }
+
+    int16_t __cdecl Strategic_Bombardment_(int16_t* attacker_ship_indices, int16_t attacker_count, int16_t colony_id) {
+        MOX::_cmbt_colony_id = colony_id;
+        MOX::_qcombat_data = (s_qship*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x4075);
+        MOX::_combat_attacker_count = attacker_count;
+        MOX::_combat_defender_count = 0;
+
+        MOX::_combat_attacker_player = (int16_t)MOX::_ship[*attacker_ship_indices].owner;
+        MOX::_combat_defender_player = (int16_t)MOX::_colony[colony_id].owner;
+
+        MOX::_combat_total_ship_count = 1;
+        MOX::_colony_defense_flags = 0;
+
+        COMBAT::Qload_Ships_(attacker_ship_indices, attacker_count, 0, 0, 0, 0);
+        COMBAT::Qload_Ships_(attacker_ship_indices, 0, 0, 0, 0, 0);
+
+        int16_t rounds = 0;
+        do {
+            int16_t ship_idx = 1;
+            if (MOX::_combat_total_ship_count > 1) {
+                do {
+                    COMBAT::Missile_Attack_(ship_idx, 0);
+                    COMBAT::Beam_Attack_(ship_idx, 0);
+                    COMBAT::Strat_Bomb_Attack_(ship_idx);
+
+                    if (MOX::_qcombat_data->structural_damage > 30000) {
+                        rounds = 6;
+                        break;
+                    }
+                    ship_idx++;
+                } while (ship_idx < MOX::_combat_total_ship_count);
+            }
+            rounds++;
+        } while (rounds < 3);
+
+        return MOX::_qcombat_data->structural_damage / 40 /* 0x28 */;
+    }
+
+    void __cdecl Bombardment_(s_combat_bomb_result* bomb_result) {
+        int16_t ship_indices[500];
+        int16_t ship_count = 0;
+        uint16_t colony_idx;
+
+        struct_::Clear_Structure_(&MOX::_combat_bomb_result, sizeof(s_combat_bomb_result));
+
+        colony_idx = (uint16_t)bomb_result->colony_idx;
+        int16_t planet_idx = MOX::_colony[colony_idx].planet;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
+
+        for (int16_t i = 0; i < 500; ++i) {
+            if (MOX::_ship[i].location == star_idx &&
+                MOX::_ship[i].d.ship_type == 0 &&
+                MOX::_ship[i].status == 0 &&
+                MOX::_ship[i].owner == bomb_result->attacker_idx) {
+                ship_indices[ship_count++] = i;
+            }
+        }
+
+        if (MOX::_settings.strategic_combat_flag == 1) {
+            bomb_result->bomb_hits_remaining = Strategic_Bombardment_(ship_indices, ship_count, colony_idx);
+            bomb_result->is_planetary_hit = 1;
+            bomb_result->bio_hits_remaining = 0;
+            bomb_result->is_bio_weapon = 0;
+        } else {
+            Tactical_Bombardment_(ship_indices, ship_count, bomb_result);
+        }
+    }
+
+    void __cdecl Tactical_Bombardment_(int16_t* ship_array, int16_t ship_count, s_combat_bomb_result* bomb_result) {
+        MOX::_cmbt_colony_id = (int16_t)bomb_result->colony_idx;
+        MOX::_apply_damage_to_planet = 0;
+        MOX::_combat_total_ship_count = 1;
+
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        MOX::_combat_data = (s_combat_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x100c2 /* 210 * sizeof(s_combat_data) */);
+        struct_::Clear_Structure_(MOX::_combat_data, 0x100c2);
+
+        MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1e78 /* 300 * sizeof(s_missile) */);
+        struct_::Clear_Structure_(MOX::_missile, 0x1e78);
+
+        MOX::_combat_attacker_player = (int16_t)MOX::_ship[ship_array[0]].owner;
+        MOX::_combat_defender_player = (int16_t)MOX::_colony[MOX::_cmbt_colony_id].owner;
+
+        _qsort(ship_array, (size_t)ship_count, 2, (int(__cdecl*)(const void*, const void*))qsort_ship_array_by_size_);
+
+        for (int16_t i = 0; i < ship_count; ++i) {
+            // d.ship_type == 0 indicates a ship that is not a fighter or similar
+            if (MOX::_ship[ship_array[i]].d.ship_type == 0) {
+                COMBINIT::Load_Combat_Ship_(ship_array[i], MOX::_combat_total_ship_count);
+                MOX::_combat_data[MOX::_combat_total_ship_count].x = 0;
+                MOX::_combat_data[MOX::_combat_total_ship_count].y = 0;
+                MOX::_combat_total_ship_count++;
+            }
+        }
+
+        COMBINIT::Load_Tactical_Colony_(MOX::_cmbt_colony_id, 0);
+        CMBTFIR2::Set_Combat_Ordnance_Values_();
+
+        // Index 0 of combat data is assigned to the colony
+        MOX::_combat_data[0].x = 0;
+        MOX::_combat_data[0].y = 0;
+
+        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            // TYPE MISMATCH: Offensive_Combat_Bonus_ has 2 arguments in this context
+            MOX::_combat_data[i].tac_val_attack = reinterpret_cast<int16_t(__cdecl*)(int16_t, int16_t)>(CMBTFIR2::Offensive_Combat_Bonus_)(i, 0);
+            MOX::_combat_data[i].tac_val_defense = CMBTFIR2::Defensive_Combat_Bonus_(i, 0);
+            MOX::_combat_data[i].tac_val_evade = CMBTFIR2::Defensive_Combat_Bonus_(i, 1);
+            COMBINIT::Init_Special_Devices_(i);
+        }
+
+        for (int16_t turns = 10; turns > 0; --turns) {
+            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                for (int16_t j = 0; j < 8; ++j) {
+                    MOX::_combat_data[i].weapons[j].shots_left = MOX::_combat_data[i].weapons[j].count;
+                    MOX::_combat_data[i].weapons[j].active = 1;
+
+                    int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
+                    if (weapon_id > 0) {
+                        // Check if weapon is not a rack type before decrementing ammo
+                        if (TECHDATA::_weapons[weapon_id].rack != 1) {
+                            if (MOX::_combat_data[i].weapons[j].ammo > 0) {
+                                MOX::_combat_data[i].weapons[j].ammo--;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Bombardment begins from the first ship (index 1), colony is index 0
+            for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+                CMBTFIRE::Fire_Ship_(i, 0, 0, 0, 0, 0, 0);
+            }
+        }
+
+        bomb_result->bomb_hits_remaining = MOX::_combat_data[0].structure_max / 100;
+        bomb_result->is_planetary_hit = MOX::_combat_bomb_result.is_planetary_hit;
+        bomb_result->is_bio_weapon = MOX::_combat_bomb_result.is_bio_weapon;
+        bomb_result->bio_hits_remaining = MOX::_combat_bomb_result.bio_hits_remaining;
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
 }

@@ -11,6 +11,12 @@ namespace ERIC {
     inline uint8_t& _hacky_need_to_fade_to_colony_palette_flag =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B48});
 
+    inline uint16_t& _saved_sfx_l = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00558B4C});
+
+    inline uint16_t& _saved_music_l = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00558B50});
+
+    inline void*& _cinematic_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A4AD8});
+
     void __cdecl Eric_Init_();
 
     void __cdecl Eric_Defaults_();
@@ -75,11 +81,9 @@ namespace ERIC {
         fn();
     }
 
-    inline void __cdecl Do_Cinematic_Popup_Cleanup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BB040});
-        fn();
-    }
+    void __cdecl Do_Cinematic_Popup_Cleanup_();
 
     void __cdecl Play_Dimensional_Portal_Flic_();
+
+    void __cdecl Play_Planetary_Destruction_Flic_();
 }

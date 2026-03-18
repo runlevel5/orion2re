@@ -49,4 +49,12 @@ namespace COMBAT {
     inline const char* s_Antaran_00557e54 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E54});  // "Antaran"
 
     void __cdecl Get_Non_Player_Name_(int16_t param_1, char* param_2);
+
+    int16_t __cdecl Strategic_Bombardment_(int16_t* attacker_ship_indices, int16_t attacker_count, int16_t colony_id);
+
+    int __cdecl qsort_ship_array_by_size_(const void* a, const void* b);
+
+    void __cdecl Tactical_Bombardment_(int16_t* ship_array, int16_t ship_count, s_combat_bomb_result* bomb_result);
+
+    void __cdecl Bombardment_(s_combat_bomb_result* bomb_result);
 }

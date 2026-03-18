@@ -43,6 +43,7 @@ namespace COLONY {
     inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
     inline const char* _DIMTVFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D38}); // "DIMTVFIN.LBX"
     inline const char* _NEWGAME_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D90}); // "NEWGAME.LBX"
+    inline const char* _PLNTDFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DA0}); // "PLNTDFIN.LBX"
     inline const char* _BEAMS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CC8}); // "BEAMS.LBX"
     inline const char* _CMBTSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CD8}); // "CMBTSFX.LBX"
     inline const char* _SPHERSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x00559DD0 }); // "SPHERSFX.LBX"
@@ -437,10 +438,7 @@ namespace COLONY {
 
     void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_idx);
 
-    inline void __cdecl Reset_Step_Squish_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004dd8c0})();
-    }
+    void __cdecl Reset_Step_Squish_();
 
     inline void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
