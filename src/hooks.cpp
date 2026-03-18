@@ -1979,6 +1979,10 @@ namespace hooks {
         { 0x004a6eb0, &CMBTSPEC::Plasma_Web_ },
         { 0x004a59c0, &CMBTSPEC::Draw_Anti_Missile_Rocket_Picture_ },
         { 0x004A9400, &CMBTSPEC::Destroy_Ship_FX_ },
+        { 0x004a9360, &CMBTSPEC::Play_Ship_Explosion_SFX_ },
+        { 0x004a5d90, &CMBTSPEC::Draw_Gyro_Special_Effect_ },
+        { 0x004a7e70, &CMBTSPEC::Draw_Ship_Collapsing_ },
+        { 0x004a7f70, &CMBTSPEC::Do_Spherical_SFX_ },
     };
 
     void Install_Hooks()

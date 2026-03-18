@@ -23,10 +23,7 @@ namespace CMBTSPEC {
 
     void __cdecl Draw_Plasma_Web_(int16_t ship_idx, int16_t x_off, int16_t y_off);
 
-    inline void __cdecl Do_Spherical_SFX_(int16_t ship_idx, int16_t x, int16_t y, int16_t subtype, int16_t shots_left) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a7f70})(ship_idx, x, y, subtype, shots_left);
-    }
+    void __cdecl Do_Spherical_SFX_(int16_t ship_idx, int16_t x, int16_t y, int16_t subtype, int16_t shots_left);
 
     void __cdecl Draw_Stasis_Beam_(int16_t source_ship_idx, int16_t target_ship_idx);
 
@@ -38,10 +35,7 @@ namespace CMBTSPEC {
 
     void __cdecl Gyro_Destablizer_(int16_t source_idx, int16_t target_idx, int16_t attack_count);
 
-    inline void __cdecl Draw_Gyro_Special_Effect_(int16_t source_idx, int16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a5d90})(source_idx, target_idx);
-    }
+    void __cdecl Draw_Gyro_Special_Effect_(int16_t source_idx, int16_t target_idx);
 
     void __cdecl Plasma_Web_(int16_t param_1, int16_t param_2, int16_t param_3);
 
@@ -53,9 +47,7 @@ namespace CMBTSPEC {
 
     void __cdecl Missile_Launch_FX_(int16_t missile_idx, int16_t tx, int16_t ty, int16_t is_targeting_missile);
 
-    inline void __cdecl Play_Ship_Explosion_SFX_(int16_t size_class) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A9360});
-        fn(size_class);
-    }
+    void __cdecl Play_Ship_Explosion_SFX_(int16_t param_1);
+
+    void __cdecl Draw_Ship_Collapsing_(int16_t ship_idx, int16_t x, int16_t y, int16_t scale, int8_t rotation_offset);
 }
