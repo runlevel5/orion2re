@@ -1501,7 +1501,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         MOX::_combat_data->weapons[0].shots_left = (uint8_t)count_1;
         MOX::_combat_data->weapons[0].status = 0;
 
-        int16_t weapon_id_2 = INITSHIP::Best_Secondary_Weapon_(MOX::_colony[colony_idx].owner);
+        int16_t weapon_id_2 = INITSHIP::Best_Point_Defense_Weapon_By_Size_(MOX::_colony[colony_idx].owner);
         int16_t mini_level_2 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_2].tech_application_id);
         int16_t specials_2 = 4;
 
@@ -1819,7 +1819,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].shots_left = (uint8_t)count2;
     beam_idx++;
 
-    int16_t pd_id = INITSHIP::Best_Secondary_Weapon_(defender);
+    int16_t pd_id = INITSHIP::Best_Point_Defense_Weapon_By_Size_(defender);
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = pd_id;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
@@ -1838,7 +1838,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].shots_left = 99;
             beam_idx++;
             // Bug in original binary: potential buffer overflow into structure_max since beam_idx is not checked against 8 here
-            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = INITSHIP::Best_Secondary_Weapon_(defender);
+            MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = INITSHIP::Best_Point_Defense_Weapon_By_Size_(defender);
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = -1;
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].arc = 15;

@@ -53,6 +53,7 @@ namespace MOX {
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     inline uint16_t& _fleet_box_map_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D70});
+    inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
     inline s_current_design*& _design =
         *reinterpret_cast<s_current_design**>(std::uintptr_t{0x0059B330});
 
@@ -221,6 +222,7 @@ namespace MOX {
     inline int16_t* _antarans_ship_counts_end = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA4A });
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
+    inline const char* s_Harbinger = reinterpret_cast<const char*>(std::uintptr_t{0x005576B8}); // "Harbinger"
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
     // Suggested name: MOX::_planet_summary_galaxy_star_seg
     inline s_animation_header** _planet_summary_galaxy_star_seg =

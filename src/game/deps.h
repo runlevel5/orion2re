@@ -51,6 +51,7 @@
 #include "angle.h"
 #include "special.h"
 #include "misc.h"
+#include "string.h"
 #include "strings.h"
 #include "loader.h"
 #include "sys.h"

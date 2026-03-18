@@ -369,6 +369,12 @@ inline int16_t __cdecl Range_(int16_t y1, int16_t x1, int16_t y2, int16_t x2) {
     return fn(y1, x1, y2, x2);
 }
 
+inline int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481cf0});
+    return fn(player_idx);
+}
+
 inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
     using Fn = void(__cdecl*)(void*, uint32_t, uint8_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052ced8});

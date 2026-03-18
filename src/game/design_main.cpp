@@ -10,7 +10,7 @@ namespace DESIGN {
         char arc_str[128];
 
         Build_Design_Template_(&local_design);
-        INITSHIP::Get_Design_Combat_Bonuses_(&local_design, &bonus_beam_atk, &bonus_beam_def, &bonus_mis_evade);
+        INITSHIP::Get_Design_Combat_Bonuses_(local_design, &bonus_beam_atk, &bonus_beam_def, &bonus_mis_evade);
 
         graphics::Reset_Window_();
         video::Clip_Off_();

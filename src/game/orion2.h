@@ -1365,6 +1365,21 @@ struct s_class_group {
     int8_t planet_group_by_orbit[5];
 };
 
+typedef struct s_click_through_field s_click_through_field, *Ps_click_through_field;
+
+struct s_click_through_field {
+    short f0;
+    short f2;
+    short f4;
+    short f6;
+    short f8;
+    short fa;
+    int fc;
+    short f10;
+    int f12;
+    byte f16;
+};
+
 typedef struct s_colony s_colony, *Ps_colony;
 
 
@@ -3784,6 +3799,26 @@ struct s_qship { /* Strategic (quick) combat ships, used in strategic combat. Th
     int16_t structural_damage;
 };
 
+typedef struct s_report s_report, *Ps_report;
+
+typedef char __int8_t;
+
+struct s_report {
+    int field0_0x0;
+    int field1_0x4;
+    int field2_0x8;
+    int field3_0xc;
+    short field4_0x10;
+    __int8_t field5_0x12;
+};
+
+typedef struct s_saved_box s_saved_box, *Ps_saved_box;
+
+struct s_saved_box {
+    short f0;
+    __int8_t f2;
+};
+
 typedef struct s_scroll_bar s_scroll_bar, *Ps_scroll_bar;
 
 struct s_scroll_bar {
@@ -4324,6 +4359,33 @@ struct s_skill_data {
     char *format_str;
 };
 
+typedef struct s_sound_index s_sound_index, *Ps_sound_index;
+
+struct s_sound_index {
+    int field_0;
+    int field_4;
+    int field_8;
+    byte field_c;
+    undefined field4_0xd;
+    undefined field5_0xe;
+    undefined field6_0xf;
+    undefined field7_0x10;
+    undefined field8_0x11;
+    undefined field9_0x12;
+    undefined field10_0x13;
+    undefined field11_0x14;
+    undefined field12_0x15;
+    undefined field13_0x16;
+    undefined field14_0x17;
+    undefined field15_0x18;
+    undefined field16_0x19;
+    undefined field17_0x1a;
+    undefined field18_0x1b;
+    int field_1c;
+    int field_20;
+    int field_24;
+};
+
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
@@ -4588,9 +4650,8 @@ struct s_tech_weapon_data {
     short min_damage;
     short damage;
     undefined field12_0x18;
-    undefined field13_0x19;
-    undefined field14_0x1a;
-    undefined field15_0x1b;
+    undefined1 ai_priority; /* Created by Rename Structure Field action */
+    uint16_t specials;
 };
 
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
