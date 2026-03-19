@@ -1591,15 +1591,15 @@ namespace DESIGN {
 
         if ((flags & 0x2) != 0) {
             int16_t index = MISC::Bit_Value_To_Num_(2, 15);
-            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
-            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+            *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].space;
             return;
         }
 
         if ((flags & 0x4) != 0) {
             int16_t index = MISC::Bit_Value_To_Num_(4, 15);
-            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
-            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+            *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].space;
         }
     }
 
@@ -1621,74 +1621,74 @@ namespace DESIGN {
 
         if (mods & 0x4000 /* WEAPON_MOD_FLAG_OVERLOADED */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x4000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0008 /* WEAPON_MOD_FLAG_ARMOR_PIERCING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0008, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0010 /* WEAPON_MOD_FLAG_CONTINUOUS */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0010, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0020 /* WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0020, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0040 /* WEAPON_MOD_FLAG_SHIELD_PIERCING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0040, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0080 /* WEAPON_MOD_FLAG_AUTO_FIRE */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0080, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0100 /* WEAPON_MOD_FLAG_ENVELOPING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0100, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0200 /* WEAPON_MOD_FLAG_MIRV */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0200, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0400 /* WEAPON_MOD_FLAG_ECCM */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0400, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0800 /* WEAPON_MOD_FLAG_HEAVILY_ARMORED */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0800, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x1000 /* WEAPON_MOD_FLAG_FAST */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x1000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x2000 /* WEAPON_MOD_FLAG_EMISSION_GUIDANCE */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x2000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
     }
 

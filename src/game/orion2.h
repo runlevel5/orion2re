@@ -4161,13 +4161,13 @@ struct s_tech_weapon_data {
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
 
 struct s_tech_weapon_mod_data {
-    char *name0;
     char *name;
+    char *name_plural;
     uint8_t mod_id;
     uint8_t level;
-    short bonus1;
-    short bonus2;
-    undefined field6_0xe;
+    int16_t cost;
+    int16_t space;
+    uint8_t col5;
 };
 
 typedef struct s_techdata_planetary_shield s_techdata_planetary_shield, *Ps_techdata_planetary_shield;
