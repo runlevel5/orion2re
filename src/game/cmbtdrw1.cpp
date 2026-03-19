@@ -2767,7 +2767,7 @@ namespace CMBTDRW1 {
                     display_color_mode = 0;
                 }
 
-                int8_t rack = TECHDATA::_weapons[w_id].rack;
+                int8_t rack = TECHDATA::_weapons[w_id].type;
                 int16_t ammo = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].ammo;
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
@@ -2954,7 +2954,7 @@ namespace CMBTDRW1 {
     }
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage) {
-        bool is_bio = (TECHDATA::_weapons[weapon_id].flags & 0x80) != 0;
+        bool is_bio = (TECHDATA::_weapons[weapon_id].natural_mods & 0x80) != 0;
         bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* Transporter */) != 0;
         int16_t speed = (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) ? 12 : 6;
 

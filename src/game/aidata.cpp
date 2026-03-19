@@ -93,16 +93,16 @@ namespace AIDATA {
         for (int i = 0; i < 8; ++i) {
             int weapon_type = (int)ship->d.ship_weapon[i].type;
             if (weapon_type != 0) {
-                uint16_t app_id = TECHDATA::_weapons[weapon_type].tech_application_id;
+                uint16_t app_id = TECHDATA::_weapons[weapon_type].tech_app_id;
                 uint16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                 uint8_t normalized_cost = (uint8_t)(TECHDATA::_technology_fields[field_id].cost / 100);
 
-                int8_t rack = TECHDATA::_weapons[weapon_type].rack;
-                if (rack == 0 /* RACK_BEAM */) {
+                int8_t type= TECHDATA::_weapons[weapon_type].type;
+                if (type == 0 /* RACK_BEAM */) {
                     if (normalized_cost > best_beam_cost) {
                         best_beam_cost = normalized_cost;
                     }
-                } else if (rack == 1 /* RACK_MISSILE */ || rack == 2 /* RACK_TORPEDO */) {
+                } else if (type == 1 /* RACK_MISSILE */ || type == 2 /* RACK_TORPEDO */) {
                     if (normalized_cost > best_missile_cost) {
                         best_missile_cost = normalized_cost;
                     }

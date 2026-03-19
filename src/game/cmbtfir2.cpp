@@ -400,7 +400,7 @@ namespace CMBTFIR2 {
         for (int i = 0; i < 8; ++i) {
             uint16_t weapon_id = MOX::_combat_data[ship_idx].weapons[i].weapon_id;
             if ((int16_t)weapon_id > 0 &&
-                TECHDATA::_weapons[(int16_t)weapon_id].rack == 0 &&
+                TECHDATA::_weapons[(int16_t)weapon_id].type == 0 &&
                 (MOX::_combat_data[ship_idx].weapons[i].specials & 6) == 0 &&
                 MOX::_combat_data[ship_idx].weapons[i].shots_left > 0) {
                 min_range = 24;
@@ -748,7 +748,7 @@ namespace CMBTFIR2 {
 
         if (CMBTAI::Will_Missile_Do_Damage_(ship_idx, missile_idx) != 0) {
             int16_t m_type = MOX::_missile[missile_idx].type;
-            if (TECHDATA::_weapons[m_type].rack != 2 && MOX::_missile[missile_idx].quantity > 0) {
+            if (TECHDATA::_weapons[m_type].type != 2 && MOX::_missile[missile_idx].quantity > 0) {
                 for (int16_t i = 0; i < 8; ++i) {
                     saved_active[i] = (int16_t)MOX::_combat_data[ship_idx].weapons[i].active;
                     MOX::_combat_data[ship_idx].weapons[i].active = -1;
@@ -771,7 +771,7 @@ namespace CMBTFIR2 {
                     MOX::_combat_data[ship_idx].weapons[i].active = 1;
 
                     bool should_fire = false;
-                    if (TECHDATA::_weapons[weapon_id].rack == 0) {
+                    if (TECHDATA::_weapons[weapon_id].type == 0) {
                         if (MOX::_combat_data[ship_idx].weapons[i].specials & 4) {
                             should_fire = true;
                         }
@@ -841,7 +841,7 @@ namespace CMBTFIR2 {
                                         active_backup[i] = MOX::_combat_data[attacker_idx].weapons[i].active;
                                         int16_t weapon_id = MOX::_combat_data[attacker_idx].weapons[i].weapon_id;
 
-                                        if (TECHDATA::_weapons[weapon_id].rack == 0 &&
+                                        if (TECHDATA::_weapons[weapon_id].type == 0 &&
                                             active_backup[i] != -1 &&
                                             (MOX::_combat_data[attacker_idx].weapons[i].specials & 6) == 0) {
 

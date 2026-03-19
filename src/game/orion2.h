@@ -4144,19 +4144,18 @@ typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;
 struct s_tech_weapon_data {
     char *name;
     char *name_plural;
-    undefined field2_0x8;
-    undefined field3_0x9;
-    short tech_application_id;
-    sbyte rack;
-    int8_t base_ammo;
-    short base_size;
-    short cost;
-    ushort flags;
-    short min_damage;
-    short damage;
-    undefined field12_0x18;
-    undefined1 ai_priority; /* Created by Rename Structure Field action */
-    uint16_t specials;
+    uint16_t weapon_id;
+    uint16_t tech_app_id;
+    uint8_t type;
+    int8_t ammo;
+    uint16_t size;
+    uint16_t cost;
+    uint16_t natural_mods; // mods that are inherent to the weapon, e.g. neutron blaster always kills marines
+    uint16_t min_damage;
+    uint16_t max_damage;
+    uint8_t strat_min_damage;
+    uint8_t strat_max_damage;
+    uint16_t available_mods;
 };
 
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;

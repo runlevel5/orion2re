@@ -580,7 +580,7 @@ namespace DESIGN {
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
                                   uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size) {
-        int16_t base_size = TECHDATA::_weapons[weapon_idx].base_size;
+        int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
         int32_t rack_size = 0;
 
         if (Weapon_Needs_Racks_(weapon_idx) != 0) {
@@ -599,7 +599,7 @@ namespace DESIGN {
         int16_t regular_mod_add;
         Bonus_For_Regular_Mods_(mod_flags, &dummy_out, &regular_mod_add);
 
-        int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_application_id;
+        int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
         uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
         int16_t tech_level = Tech_Level_(player_idx, tech_app_id);
 
@@ -642,7 +642,7 @@ namespace DESIGN {
 
         int32_t total_modified_cost = (static_cast<int32_t>(space_bonus) + regular_bonus_pct + 100) * base_scaled_cost / 100;
 
-        int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_application_id);
+        int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_app_id);
 
         return (int32_t)Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
     }
@@ -842,7 +842,7 @@ namespace DESIGN {
             } else if (clicked_field + weapon_field_id == 0) {
                 int16_t weapon_type = MOX::_design->weapon_type[i];
                 if (weapon_type > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_application_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_app_id);
                     TEXTBOX::Text_Box_(TECHDATA::_weapons[weapon_type].name, description_buffer);
                 }
             }
@@ -1154,11 +1154,11 @@ namespace DESIGN {
     int16_t __cdecl One_Weapon_Space_(int16_t weapon_id) {
         int16_t needs_racks = Weapon_Needs_Racks_(weapon_id);
 
-        int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_application_id;
+        int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_app_id;
         uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));
         int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
-        int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].base_size;
+        int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].size;
         int16_t space_req = static_cast<int16_t>(Space_Given_M_Level_(base_weapon_size, tech_lvl, category));
 
         if (needs_racks != 0) {
@@ -1322,7 +1322,7 @@ namespace DESIGN {
 
         if (category == 3) { // Weapon Category
             for (int16_t i = 0; i < 40; ++i) {
-                if (TECHDATA::_weapons[i].tech_application_id == app_id) {
+                if (TECHDATA::_weapons[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
                 }
@@ -1558,15 +1558,15 @@ namespace DESIGN {
         auto& app = TECHDATA::_technology_applications[tech_app];
 
         if (app.type == 3) {
-            if (tech_app == TECHDATA::_weapons[31].tech_application_id ||
-                tech_app == TECHDATA::_weapons[30].tech_application_id ||
-                tech_app == TECHDATA::_weapons[28].tech_application_id ||
-                tech_app == TECHDATA::_weapons[29].tech_application_id) {
+            if (tech_app == TECHDATA::_weapons[31].tech_app_id ||
+                tech_app == TECHDATA::_weapons[30].tech_app_id ||
+                tech_app == TECHDATA::_weapons[28].tech_app_id ||
+                tech_app == TECHDATA::_weapons[29].tech_app_id) {
                 return 2;
             }
 
             int16_t weapon_idx = HACCESS::Weapons_Index_From_Tech_App_(tech_app);
-            int8_t rack = TECHDATA::_weapons[weapon_idx].rack;
+            int8_t rack = TECHDATA::_weapons[weapon_idx].type;
 
             if (rack == 3 || rack == 1 || rack == 0) {
                 return 0;

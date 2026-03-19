@@ -50,7 +50,7 @@ namespace aidesign {
                         }
                     }
 
-                    int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_application_id;
+                    int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_app_id;
                     if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == 3 /* LEARNED */ && !already_has_fighter_bay) {
                         int16_t weapon_unit_space = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
                         int16_t max_count = space_available / weapon_unit_space;
@@ -327,7 +327,7 @@ namespace aidesign {
             if (type_lookup == 0) {
                 tech_app_id = TECHDATA::_specials[id_lookup].tech_application_id;
             } else {
-                tech_app_id = TECHDATA::_weapons[id_lookup].tech_application_id;
+                tech_app_id = TECHDATA::_weapons[id_lookup].tech_app_id;
             }
 
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
@@ -429,8 +429,8 @@ namespace aidesign {
         int num_candidates = 0;
 
         for (int i = 1; i < 40; ++i) {
-            if (TECHDATA::_weapons[i].rack == 3 && (TECHDATA::_weapons[i].flags & 0x80) == 0) {
-                int16_t tech_app_id = TECHDATA::_weapons[i].tech_application_id;
+            if (TECHDATA::_weapons[i].type == 3 && (TECHDATA::_weapons[i].natural_mods & 0x80) == 0) {
+                int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                     candidates[num_candidates] = i;
                     int16_t field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
@@ -473,7 +473,7 @@ namespace aidesign {
 
         int i = 0;
         for (; i < num_candidates; ++i) {
-            int16_t tech_app_id = TECHDATA::_weapons[candidates[i]].tech_application_id;
+            int16_t tech_app_id = TECHDATA::_weapons[candidates[i]].tech_app_id;
             int16_t min_lvl = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
             if (min_lvl > 5) min_lvl = 5;
 

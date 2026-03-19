@@ -167,7 +167,7 @@ namespace aitech {
 
             // Calculate Best Weapon scores based on technology costs
             for (int w_idx = 1; w_idx <= 13; ++w_idx) {
-                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_application_id;
+                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);
@@ -178,7 +178,7 @@ namespace aitech {
             }
 
             for (int w_idx = 14; w_idx <= 20; ++w_idx) {
-                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_application_id;
+                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);

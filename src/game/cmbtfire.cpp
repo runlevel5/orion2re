@@ -46,7 +46,7 @@ namespace CMBTFIRE {
                 switch (building_id) {
                     case 26 /* BUILDING_MISSILE_BASE */:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].rack;
+                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 1 || rack == 2) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
@@ -56,7 +56,7 @@ namespace CMBTFIRE {
 
                     case 27 /* BUILDING_GROUND_BATTERIES */:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].rack;
+                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 0) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
@@ -66,7 +66,7 @@ namespace CMBTFIRE {
 
                     case 42 /* BUILDING_STELLAR_CONVERTER */:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].rack;
+                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 5) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
@@ -76,7 +76,7 @@ namespace CMBTFIRE {
 
                     case 47 /* BUILDING_FIGHTER_GARRISON */:
                         for (int i = 0; i < 8; ++i) {
-                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].rack;
+                            int8_t rack = TECHDATA::_weapons[MOX::_combat_data->weapons[i].weapon_id].type;
                             if (rack == 4) {
                                 MOX::_combat_data->weapons[i].weapon_id = 0;
                                 MOX::_combat_data->weapons[i].count = 0;
@@ -217,7 +217,7 @@ namespace CMBTFIRE {
             is_legal = CMBTFIRE::Weapon_Can_Fire_At_Missiles_(weapon_id, specials);
 
             int16_t missile_type = MOX::_missile[target_idx].type;
-            int8_t rack = TECHDATA::_weapons[missile_type].rack;
+            int8_t rack = TECHDATA::_weapons[missile_type].type;
 
             if (rack == 4 /* Torpedo */) {
                 if (weapon_id == 33 /* Transporter */) {
@@ -235,7 +235,7 @@ namespace CMBTFIRE {
         if (CMBTMOV1::Ship_Is_In_Stasis_(target_idx)) {
             is_legal = 0;
         } else {
-            if ((TECHDATA::_weapons[weapon_id].flags & 0x8) != 0) {
+            if ((TECHDATA::_weapons[weapon_id].natural_mods & 0x8) != 0) {
                 int8_t prev_owner = MOX::_combat_data[target_idx].previous_owner;
                 if (prev_owner >= 8 && prev_owner != 9) {
                     is_legal = 0;
@@ -243,7 +243,7 @@ namespace CMBTFIRE {
             }
 
             if (is_legal != 0) {
-                int8_t rack = TECHDATA::_weapons[weapon_id].rack;
+                int8_t rack = TECHDATA::_weapons[weapon_id].type;
                 if (rack == 3 /* Fighter */ && target_idx != 0) {
                     is_legal = 0;
                 } else if (weapon_id == 33 /* Transporter */) {
@@ -329,7 +329,7 @@ namespace CMBTFIRE {
         }
 
         in_range = 0;
-        switch (TECHDATA::_weapons[weapon_id].rack) {
+        switch (TECHDATA::_weapons[weapon_id].type) {
         case 0: // Standard Beam / Direct fire
             if (range <= 8) {
                 return 1;
@@ -391,7 +391,7 @@ namespace CMBTFIRE {
             return 0;
         }
 
-        int8_t rack = TECHDATA::_weapons[weapon_idx].rack;
+        int8_t rack = TECHDATA::_weapons[weapon_idx].type;
 
         // The assembly performs an unsigned bounds check on the sign-extended rack value
         // before using the jump table.
@@ -440,13 +440,13 @@ namespace CMBTFIRE {
 
         int16_t weapon_id = MOX::_fighter_beam_type[source_owner];
         uint16_t specials = 0;
-        uint16_t weapon_flags = TECHDATA::_weapons[weapon_id].flags;
+        uint16_t weapon_flags = TECHDATA::_weapons[weapon_id].natural_mods;
 
         if (weapon_flags & 0x100) {
             specials = 0x40;
         }
 
-        int16_t weapon_damage = TECHDATA::_weapons[weapon_id].damage;
+        int16_t weapon_damage = TECHDATA::_weapons[weapon_id].max_damage;
         int16_t weapon_min_damage = TECHDATA::_weapons[weapon_id].min_damage;
 
         int16_t chance_to_hit;
@@ -571,7 +571,7 @@ namespace CMBTFIRE {
         *total_internal_damage = 0;
 
         weapon_id = MOX::_fighter_bomb_type[owner];
-        weapon_flags = TECHDATA::_weapons[weapon_id].flags;
+        weapon_flags = TECHDATA::_weapons[weapon_id].natural_mods;
         damage_special_flags = 0;
 
         if ((weapon_flags & 0x100) != 0) {
@@ -579,7 +579,7 @@ namespace CMBTFIRE {
         }
 
         min_damage = TECHDATA::_weapons[weapon_id].min_damage;
-        damage_range = TECHDATA::_weapons[weapon_id].damage - min_damage;
+        damage_range = TECHDATA::_weapons[weapon_id].max_damage - min_damage;
 
         for (int16_t i = 0; i < MOX::_missile[missile_idx].quantity; ++i) {
             roll = (int16_t)random::Random_(100);
@@ -845,14 +845,14 @@ namespace CMBTFIRE {
         int16_t weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
 
         int16_t min_damage = (int16_t)((TECHDATA::_weapons[weapon_id].min_damage * ordnance_bonus) / 100);
-        int16_t max_damage = (int16_t)((TECHDATA::_weapons[weapon_id].damage * ordnance_bonus) / 100);
+        int16_t max_damage = (int16_t)((TECHDATA::_weapons[weapon_id].max_damage * ordnance_bonus) / 100);
 
         if (MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
             int32_t damage_range = max_damage - min_damage;
 
             for (int16_t i = 0; i < MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left; ++i) {
                 int16_t current_damage = (int16_t)(((random::Random_(100) * damage_range) / 100) + min_damage);
-                Apply_Damage_To_Planet_(&current_damage, 0, TECHDATA::_weapons[weapon_id].flags);
+                Apply_Damage_To_Planet_(&current_damage, 0, TECHDATA::_weapons[weapon_id].natural_mods);
                 total_damage += current_damage;
             }
         }
@@ -1064,7 +1064,7 @@ namespace CMBTFIRE {
                     s_combat_weapon_slot* weapon = &MOX::_combat_data[source_ship_idx].weapons[weapon_slot_idx];
                     if (weapon->weapon_id != 0) {
                         fire_result_flags = 0;
-                        weapon_rack_type = TECHDATA::_weapons[weapon->weapon_id].rack;
+                        weapon_rack_type = TECHDATA::_weapons[weapon->weapon_id].type;
 
                         if (COMBAT1::Weapon_Is_On_(source_ship_idx, weapon_slot_idx) != 0 &&
                             (target_arc_mask & weapon->arc) != 0) {
@@ -1155,7 +1155,7 @@ namespace CMBTFIRE {
                                                 secondary_damage = 0;
                                                 Apply_Ship_Damage_(
                                                     source_ship_idx, &primary_damage, &secondary_damage, shield_facing, 0,
-                                                    TECHDATA::_weapons[weapon->weapon_id].flags, 0, 0, 0
+                                                    TECHDATA::_weapons[weapon->weapon_id].natural_mods, 0, 0, 0
                                                 );
                                                 primary_damage_total += primary_damage;
                                                 secondary_damage_total += secondary_damage;
@@ -1173,7 +1173,7 @@ namespace CMBTFIRE {
                                             uint16_t base_specials = weapon->specials;
                                             beam_fx_entries[beam_fx_count].specials = base_specials;
 
-                                            if ((TECHDATA::_weapons[weapon->weapon_id].flags & 0x0200) != 0) {
+                                            if ((TECHDATA::_weapons[weapon->weapon_id].natural_mods & 0x0200) != 0) {
                                                 beam_fx_entries[beam_fx_count].specials = base_specials | 0x100;
                                             }
 
@@ -1187,7 +1187,7 @@ namespace CMBTFIRE {
                                         case 4: {
                                             CMBTMIS::Fire_Missile_(source_ship_idx, target_ship_idx, weapon_slot_idx, flag);
                                             if (weapon_rack_type == 2) {
-                                                weapon->ammo = TECHDATA::_weapons[weapon->weapon_id].base_ammo;
+                                                weapon->ammo = TECHDATA::_weapons[weapon->weapon_id].ammo;
                                             } else {
                                                 weapon->ammo--;
                                             }
@@ -1361,7 +1361,7 @@ namespace CMBTFIRE {
             case 33:
                 if (target_type != 0) {
                     int16_t type = MOX::_missile[target_idx].type;
-                    if (TECHDATA::_weapons[type].rack == 1 || TECHDATA::_weapons[type].rack == 4) {
+                    if (TECHDATA::_weapons[type].type == 1 || TECHDATA::_weapons[type].type == 4) {
                         if (CMBTMIS::Missile_Owner_(target_idx) != MOX::_combat_data[ship_idx].owner) {
                             CMBTSPEC::Anti_Missile_Rockets_(ship_idx, x, y, target_idx, weapon_slot_idx, range);
                         }
@@ -1437,7 +1437,7 @@ namespace CMBTFIRE {
         int16_t weapon_dmg_bonus = 0;
         uint16_t return_flags = 0;
 
-        uint16_t weapon_flags_00 = TECHDATA::_weapons[weapon_id].flags;
+        uint16_t weapon_flags_00 = TECHDATA::_weapons[weapon_id].natural_mods;
         if (weapon_flags_00 & 0x100) {
             specials |= 0x40;
         }
@@ -1448,7 +1448,7 @@ namespace CMBTFIRE {
             specials |= 0x10;
         }
 
-        int16_t max_damage = TECHDATA::_weapons[weapon_id].damage;
+        int16_t max_damage = TECHDATA::_weapons[weapon_id].max_damage;
         int16_t min_damage = TECHDATA::_weapons[weapon_id].min_damage;
 
         int16_t range;
@@ -1673,7 +1673,7 @@ namespace CMBTFIRE {
 
         *hit_bonus_out = CMBTFIRE::Get_Beam_Range_To_Hit_Bonus_(ship_idx, effective_range);
 
-        if (TECHDATA::_weapons[wpn_idx].flags & 0x2 /* Continuous */) {
+        if (TECHDATA::_weapons[wpn_idx].natural_mods & 0x2 /* Continuous */) {
             *hit_bonus_out *= 2;
         }
 
@@ -1681,7 +1681,7 @@ namespace CMBTFIRE {
             *dmg_mod_out += 50;
         }
 
-        if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].flags & 0x4)) {
+        if (!(wpn_modifier_flags & 0x20) && !(TECHDATA::_weapons[wpn_idx].natural_mods & 0x4)) {
             *dmg_mod_out += MOX::_ranged_damage_penalty[effective_range];
         }
 

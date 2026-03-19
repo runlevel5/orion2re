@@ -68,7 +68,7 @@ namespace aipower {
                     count *= 3;
                 }
 
-                int16_t damage = TECHDATA::_weapons[weapon_type].damage;
+                int16_t damage = TECHDATA::_weapons[weapon_type].max_damage;
                 if (slot_specials & 0x02) {
                     damage += (int16_t)(((damage * 5 + 5) * 10) / 100);
                 } else if (slot_specials & 0x04) {
@@ -79,11 +79,11 @@ namespace aipower {
                 if (adjusted_damage < 1) adjusted_damage = 0;
                 slot_strength = adjusted_damage * count;
             } else {
-                slot_strength = (int32_t)TECHDATA::_weapons[weapon_type].damage * (int32_t)count;
+                slot_strength = (int32_t)TECHDATA::_weapons[weapon_type].max_damage * (int32_t)count;
             }
 
             if (slot_strength != 0) {
-                int8_t rack_type = TECHDATA::_weapons[weapon_type].rack;
+                int8_t rack_type = TECHDATA::_weapons[weapon_type].type;
                 switch (rack_type) {
                     case 0: {
                         int16_t hit_chance = (attack_bonus - defense_bonus) + 50;
@@ -238,12 +238,12 @@ namespace aipower {
                 int16_t weapon_type = MOX::_ship[ship_idx].d.ship_weapon[i].type;
                 if (weapon_type > 0) {
                     int16_t weapon_damage;
-                    uint8_t rack_type = TECHDATA::_weapons[weapon_type].rack;
+                    uint8_t rack_type = TECHDATA::_weapons[weapon_type].type;
 
                     if (rack_type == 0 || rack_type == 2) {
-                        weapon_damage = TECHDATA::_weapons[weapon_type].damage / 2;
+                        weapon_damage = TECHDATA::_weapons[weapon_type].max_damage / 2;
                     } else {
-                        weapon_damage = TECHDATA::_weapons[weapon_type].damage;
+                        weapon_damage = TECHDATA::_weapons[weapon_type].max_damage;
                     }
 
                     int32_t count = MOX::_ship[ship_idx].d.ship_weapon[i].current_count;

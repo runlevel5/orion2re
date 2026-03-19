@@ -42,7 +42,7 @@ namespace CMBTMIS {
         int16_t owner_player = MOX::_combat_data[missile.source_unit_idx].owner;
 
         // Retargeting requires rack type 4 (Fighters) or Emissions Guidance tech (tech app 46)
-        if (TECHDATA::_weapons[missile.type].rack == 4 || 
+        if (TECHDATA::_weapons[missile.type].type == 4 || 
             (owner_player < 8 && MOX::_player[owner_player].tech_applications[46] == 3)) {
             
             int16_t min_range = 30000;
@@ -77,7 +77,7 @@ namespace CMBTMIS {
 
         if (best_target == -1) {
             // If no new target found, rack type 4 (Fighters) returns to source ship if it's still active
-            if (TECHDATA::_weapons[missile.type].rack == 4 && 
+            if (TECHDATA::_weapons[missile.type].type == 4 && 
                 MOX::_combat_data[missile.source_unit_idx].unit_status == 0) {
                 missile.target_unit_idx = missile.source_unit_idx;
                 missile.is_anti_missile_rocket = 0;
@@ -96,7 +96,7 @@ namespace CMBTMIS {
         char hit_flag = 0;
         int16_t dx, dy;
 
-        if (TECHDATA::_weapons[type].rack == 4 /* MIRV */ && missile->is_anti_missile_rocket == 0) {
+        if (TECHDATA::_weapons[type].type == 4 /* MIRV */ && missile->is_anti_missile_rocket == 0) {
             target_x += MOX::_missile_hit_radius[MOX::_combat_data[missile->target_unit_idx].size_class] / 2;
         }
 
@@ -162,7 +162,7 @@ namespace CMBTMIS {
                 bonus += 50;
             }
 
-            int16_t base_damage = (int16_t)((TECHDATA::_weapons[type].damage * bonus) / 100);
+            int16_t base_damage = (int16_t)((TECHDATA::_weapons[type].max_damage * bonus) / 100);
             int16_t damage_adjustment;
             if (type == 20) {
                 damage_adjustment = (adj_val / -20) * 5;
@@ -295,7 +295,7 @@ namespace CMBTMIS {
             int32_t sign = idx >> 31;
             shield_hit_dir = ((((idx ^ sign) - sign) & 0xF) ^ sign) - sign;
 
-            if (TECHDATA::_weapons[type].rack == 4) {
+            if (TECHDATA::_weapons[type].type == 4) {
                 shield_idx = Find_Weakest_Shield_(target_unit_idx);
                 evade = 0;
             } else {
@@ -339,7 +339,7 @@ namespace CMBTMIS {
         int16_t dmg_accum = 0;
         int16_t sys_dmg_accum = 0;
 
-        if (TECHDATA::_weapons[type].rack == 4) {
+        if (TECHDATA::_weapons[type].type == 4) {
             missile->is_active = 0;
             if (type == 28) { // 0x1C (Assault Shuttle)
                 CMBTFIR2::Resolve_Capture_(missile->source_unit_idx, target_unit_idx, missile->quantity, x, y);
@@ -377,7 +377,7 @@ namespace CMBTMIS {
             if (specials & 0x4000) {
                 bonus += 50;
             }
-            int16_t damage = (TECHDATA::_weapons[type].damage * bonus) / 100;
+            int16_t damage = (TECHDATA::_weapons[type].max_damage * bonus) / 100;
 
             if ((type == 20 || type == 40) && !(specials & 0x0020)) {
                 int16_t degrad = 0;
@@ -397,7 +397,7 @@ namespace CMBTMIS {
                 }
             }
 
-            if (target_unit_idx == 0 && TECHDATA::_weapons[type].rack == 2) {
+            if (target_unit_idx == 0 && TECHDATA::_weapons[type].type == 2) {
                 damage /= 2;
             }
 
@@ -497,7 +497,7 @@ namespace CMBTMIS {
             }
         }
 
-        if (TECHDATA::_weapons[type].rack == 4) {
+        if (TECHDATA::_weapons[type].type == 4) {
             if (missile->fighter_count == 0) {
                 int16_t source = missile->source_unit_idx;
                 if (MOX::_combat_data[source].owner == Missile_Owner_(missile_idx) &&
@@ -925,7 +925,7 @@ namespace CMBTMIS {
 
     int16_t __cdecl Picture_Count_(int16_t missile_idx) {
         s_missile* missile = &MOX::_missile[missile_idx];
-        int8_t rack = TECHDATA::_weapons[missile->type].rack;
+        int8_t rack = TECHDATA::_weapons[missile->type].type;
         int16_t count;
 
         if (rack == 1) {
@@ -1042,7 +1042,7 @@ namespace CMBTMIS {
                 int16_t type_idx = Missile_Type_(missile_idx);
                 int16_t facing_idx = (int16_t)(uint8_t)MOX::_missile[missile_idx].facing_dir;
 
-                if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].rack != 4 /* RACK_FIGHTER */) {
+                if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].type != 4 /* RACK_FIGHTER */) {
                     if (MOX::_missile[missile_idx].target_unit_idx == MOX::_cur_ship || MOX::_missile[missile_idx].type == 0x13 /* MSL_TYPE_PLASMA */) {
                         animate::Set_Animation_Frame_(MOX::_msl_seg[type_idx * 16 + facing_idx], (MOX::_ship_frame + missile_idx) % 3);
                     } else {
@@ -1052,7 +1052,7 @@ namespace CMBTMIS {
 
                 if (MOX::_missile[missile_idx].target_unit_idx != MOX::_cur_ship || MOX::_draw_active_missiles == 1) {
                     int16_t weapon_type = MOX::_missile[missile_idx].type;
-                    if (TECHDATA::_weapons[weapon_type].rack == 4 /* RACK_FIGHTER */) {
+                    if (TECHDATA::_weapons[weapon_type].type == 4 /* RACK_FIGHTER */) {
                         Draw_Fighter_(missile_idx, screen_x, screen_y, flag);
                         return;
                     }
@@ -1061,7 +1061,7 @@ namespace CMBTMIS {
                     int16_t coords_x[10];
                     int16_t coords_y[10];
 
-                    if (TECHDATA::_weapons[weapon_type].rack != 1 /* RACK_MISSILE */ && weapon_type != 0x12 /* MSL_TYPE_MIRV */) {
+                    if (TECHDATA::_weapons[weapon_type].type != 1 /* RACK_MISSILE */ && weapon_type != 0x12 /* MSL_TYPE_MIRV */) {
                         Get_Multiple_Torpedo_Coords_(missile_idx, count, coords_y, coords_x);
                         graphics::Set_Window_(0, 0, 0x27f, (flag == 1) ? 0x1df : 0x15e);
                         video::Clip_On_();
@@ -1161,7 +1161,7 @@ namespace CMBTMIS {
             MOX::_missile[missile_idx].is_active = 1;
             MOX::_missile[missile_idx].is_anti_missile_rocket = (int8_t)is_anti_rocket;
 
-            if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].rack == 4) {
+            if (TECHDATA::_weapons[MOX::_missile[missile_idx].type].type == 4) {
                 MOX::_missile[missile_idx].quantity = (int16_t)MOX::_combat_data[source_idx].weapons[weapon_slot].count << 2;
 
                 switch (MOX::_missile[missile_idx].type) {
@@ -1323,11 +1323,11 @@ namespace CMBTMIS {
         __itoa(MOX::_missile[missile_idx].quantity, status_str, 10);
 
         int16_t weapon_type = MOX::_missile[missile_idx].type;
-        if (TECHDATA::_weapons[weapon_type].rack == 1) {
+        if (TECHDATA::_weapons[weapon_type].type == 1) {
             int16_t msg_id = (MOX::_missile[missile_idx].quantity == 1) ? 53 : 107;
             KEN::Ken_Get_Text_Message_(msg_id, msg_buf, 80);
             strcat(status_str, msg_buf);
-        } else if (TECHDATA::_weapons[weapon_type].rack == 4) {
+        } else if (TECHDATA::_weapons[weapon_type].type == 4) {
             strcat(status_str, s__005510f0);
             const char* weapon_name;
             if (weapon_type == 30) {
@@ -1355,7 +1355,7 @@ namespace CMBTMIS {
         int16_t base_dcv = speed * 5;
 
         // Check if the weapon is a Torpedo (rack type 4)
-        if (TECHDATA::_weapons[weapon_idx].rack == 4) {
+        if (TECHDATA::_weapons[weapon_idx].type == 4) {
             bonus = CMBTFIR2::Get_Fleet_Pilot_Bonus_(player_idx);
 
             // Add defense trait bonus if player is valid

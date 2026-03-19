@@ -40,10 +40,10 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
 
             int16_t weapon_id = MOX::_global_combat_data.weapons[i].weapon_id;
 
-            if (TECHDATA::_weapons[weapon_id].rack == 2) {
+            if (TECHDATA::_weapons[weapon_id].type == 2) {
                 MOX::_global_combat_data.weapons[i].ammo = 0;
-            } else if (TECHDATA::_weapons[weapon_id].rack != 1) {
-                MOX::_global_combat_data.weapons[i].ammo = TECHDATA::_weapons[weapon_id].base_ammo;
+            } else if (TECHDATA::_weapons[weapon_id].type != 1) {
+                MOX::_global_combat_data.weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
             }
 
             if (weapon_id == 33) {
@@ -248,10 +248,10 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
         combat->weapons[i].shots_left = combat->weapons[i].count;
 
         uint16_t weapon_id = combat->weapons[i].weapon_id;
-        if (TECHDATA::_weapons[weapon_id].rack == 2) {
+        if (TECHDATA::_weapons[weapon_id].type == 2) {
             combat->weapons[i].ammo = 0;
-        } else if (TECHDATA::_weapons[weapon_id].rack != 1) {
-            combat->weapons[i].ammo = TECHDATA::_weapons[weapon_id].base_ammo;
+        } else if (TECHDATA::_weapons[weapon_id].type != 1) {
+            combat->weapons[i].ammo = TECHDATA::_weapons[weapon_id].ammo;
         }
 
         if (combat->weapons[i].weapon_id == 0x21 /* 33 */) {
@@ -357,7 +357,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 16 /* 0x10 */)) {
         for (int i = 0; i < 8; ++i) {
-            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].rack == 0) {
+            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 0) {
                 ship->weapons[i].status = 1;
             }
         }
@@ -365,7 +365,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 12 /* 0x0C */)) {
         for (int i = 0; i < 8; ++i) {
-            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].rack == 1) {
+            if (TECHDATA::_weapons[ship->weapons[i].weapon_id].type == 1) {
                 ship->weapons[i].status = 1;
             }
         }
@@ -1472,7 +1472,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_STAR_BASE] != 0) {
         int16_t weapon_id_1 = INITSHIP::Best_Beam_Weapon_(MOX::_colony[colony_idx].owner);
-        int16_t mini_level_1 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_1].tech_application_id);
+        int16_t mini_level_1 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_1].tech_app_id);
         int16_t specials_1 = 2;
 
         if (TECHDATA::_weapon_modifications[3].level <= mini_level_1) {
@@ -1502,7 +1502,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         MOX::_combat_data->weapons[0].status = 0;
 
         int16_t weapon_id_2 = INITSHIP::Best_Point_Defense_Weapon_By_Size_(MOX::_colony[colony_idx].owner);
-        int16_t mini_level_2 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_2].tech_application_id);
+        int16_t mini_level_2 = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_2].tech_app_id);
         int16_t specials_2 = 4;
 
         if (TECHDATA::_weapon_modifications[4].level <= mini_level_2) {
@@ -1567,7 +1567,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
 
     if (MOX::_colony[colony_idx].buildings[BUILDING_MISSILE_BASE] != 0) {
         int16_t weapon_id_m = INITSHIP::Best_Missile_Weapon_NT_(MOX::_colony[colony_idx].owner);
-        int16_t mini_level_m = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_m].tech_application_id);
+        int16_t mini_level_m = DESIGN::Miniaturization_Level_(MOX::_combat_defender_player, TECHDATA::_weapons[weapon_id_m].tech_app_id);
         int16_t specials_m = 0;
 
         if (TECHDATA::_weapon_modifications[12].level <= mini_level_m) {
@@ -1596,7 +1596,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
             MOX::_combat_data->weapons[weapon_index].specials = specials_m;
             MOX::_combat_data->weapons[weapon_index].status = 0;
 
-            if (TECHDATA::_weapons[weapon_id_m].rack == 1) {
+            if (TECHDATA::_weapons[weapon_id_m].type == 1) {
                 MOX::_combat_data->weapons[weapon_index].ammo = 125;
             } else {
                 MOX::_combat_data->weapons[weapon_index].ammo = 0;
@@ -1850,7 +1850,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     beam_idx++;
 
     int16_t missile_id = INITSHIP::Best_Missile_Weapon_NT_(defender);
-    int16_t miniaturization = DESIGN::Miniaturization_Level_(defender, TECHDATA::_weapons[missile_id].tech_application_id);
+    int16_t miniaturization = DESIGN::Miniaturization_Level_(defender, TECHDATA::_weapons[missile_id].tech_app_id);
     uint16_t missile_specials = 0;
     if (TECHDATA::_weapon_modifications[12].level <= miniaturization) {
         missile_specials = 0x1000;
@@ -1862,7 +1862,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = missile_id;
     MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
-    if (TECHDATA::_weapons[missile_id].rack == 1) {
+    if (TECHDATA::_weapons[missile_id].type == 1) {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 20;
     } else {
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
@@ -1883,7 +1883,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         // Bug in original binary: potential buffer overflow into structure_max
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].weapon_id = missile_id;
         MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].active = 1;
-        if (TECHDATA::_weapons[missile_id].rack == 1) {
+        if (TECHDATA::_weapons[missile_id].type == 1) {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 20;
         } else {
             MOX::_combat_data[MOX::_combat_total_ship_count].weapons[beam_idx].ammo = 0;
@@ -2201,7 +2201,7 @@ void __cdecl End_Of_Turn_Bookeeping_() {
         for (int i = 0; i < 8; ++i) {
             uint16_t weapon_id = MOX::_combat_data->weapons[i].weapon_id;
 
-            if (TECHDATA::_weapons[weapon_id].rack == 4) {
+            if (TECHDATA::_weapons[weapon_id].type == 4) {
                 MOX::_combat_data->weapons[i].ammo = 1;
             }
         }

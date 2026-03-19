@@ -931,12 +931,12 @@ namespace INITSHIP {
         for (int16_t i = 0; i < 40; ++i) {
             // Check if player has researched/learned this weapon (level 3)
             // and ensure it is a beam weapon (rack == 0)
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_application_id] == 3 &&
-                TECHDATA::_weapons[i].rack == 0) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3 &&
+                TECHDATA::_weapons[i].type == 0) {
 
                 // Track weapon with highest damage
-                if (TECHDATA::_weapons[i].damage > max_damage) {
-                    max_damage = TECHDATA::_weapons[i].damage;
+                if (TECHDATA::_weapons[i].max_damage > max_damage) {
+                    max_damage = TECHDATA::_weapons[i].max_damage;
                     best_weapon_idx = i;
                 }
             }
@@ -953,12 +953,12 @@ namespace INITSHIP {
         if (player_idx < 8) {
             for (int16_t i = 0; i < 40; ++i) {
                 // check if player has researched the weapon (value 3 usually means fully researched/available)
-                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_application_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
                     // check if weapon is a missile (rack 1 or 2)
-                    if (TECHDATA::_weapons[i].rack == 1 || TECHDATA::_weapons[i].rack == 2) {
-                        if (max_damage < TECHDATA::_weapons[i].damage) {
+                    if (TECHDATA::_weapons[i].type == 1 || TECHDATA::_weapons[i].type == 2) {
+                        if (max_damage < TECHDATA::_weapons[i].max_damage) {
                             best_idx = i;
-                            max_damage = TECHDATA::_weapons[i].damage;
+                            max_damage = TECHDATA::_weapons[i].max_damage;
                         }
                     }
                 }
@@ -996,11 +996,11 @@ namespace INITSHIP {
             for (int16_t i = 0; i < 40; ++i) {
                 const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 /* TECH_STATE_RESEARCHED */ &&
-                    (weapon.specials & 0x4 /* WPN_SPECIAL_POINT_DEFENSE */) != 0 &&
-                    weapon.rack == 0 /* WPN_RACK_NORMAL */)
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 /* TECH_STATE_RESEARCHED */ &&
+                    (weapon.available_mods & 0x4 /* WPN_SPECIAL_POINT_DEFENSE */) != 0 &&
+                    weapon.type == 0 /* WPN_RACK_NORMAL */)
                 {
-                    int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, weapon.tech_application_id);
+                    int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, weapon.tech_app_id);
 
                     if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
                         int16_t current_dmg = Point_Defense_Damage_Per_Space_(i, player_idx);
@@ -1019,7 +1019,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Point_Defense_Damage_Per_Space_(int16_t weapon_idx, int16_t player_idx) {
-        int16_t damage = TECHDATA::_weapons[weapon_idx].damage;
+        int16_t damage = TECHDATA::_weapons[weapon_idx].max_damage;
         int32_t space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 1, 1, 4);
         int32_t scaled_damage = (int32_t)damage * 100;
         return (int16_t)(scaled_damage / space) + damage;
@@ -1053,11 +1053,11 @@ namespace INITSHIP {
         if (player_idx < 8) {
             for (int i = 0; i < 40; ++i) {
                 const auto& weapon = TECHDATA::_weapons[i];
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 &&
-                    weapon.rack == 1 &&
-                    weapon.damage > max_damage) {
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+                    weapon.type == 1 &&
+                    weapon.max_damage > max_damage) {
                     best_weapon_idx = (int16_t)i;
-                    max_damage = weapon.damage;
+                    max_damage = weapon.max_damage;
                 }
             }
             return best_weapon_idx;
@@ -1106,12 +1106,12 @@ namespace INITSHIP {
             s_player& player = MOX::_player[player_idx];
 
             // Check if player knows the weapon technology (3 = TECH_STATE_KNOWN)
-            if (player.tech_applications[weapon.tech_application_id] == 3) {
+            if (player.tech_applications[weapon.tech_app_id] == 3) {
                 // Check if weapon is compatible with rack types 4 or 5
-                if (weapon.rack == 5 || weapon.rack == 4) {
-                    if ((uint8_t)weapon.ai_priority > max_priority) {
+                if (weapon.type == 5 || weapon.type == 4) {
+                    if ((uint8_t)weapon.strat_max_damage > max_priority) {
                         best_weapon = i;
-                        max_priority = (uint8_t)weapon.ai_priority;
+                        max_priority = (uint8_t)weapon.strat_max_damage;
                     }
                 }
             }
@@ -1261,12 +1261,12 @@ int16_t __cdecl Best_Bomb_Weapon_(int16_t player_idx) {
         const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
         // Check if player has the tech, if it is a bomb (rack == 3), and if it deals more damage
-        if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 &&
-            weapon.rack == 3 &&
-            weapon.damage > max_damage)
+        if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+            weapon.type == 3 &&
+            weapon.max_damage > max_damage)
         {
             best_weapon_idx = i;
-            max_damage = weapon.damage;
+            max_damage = weapon.max_damage;
         }
     }
 
@@ -1279,19 +1279,19 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
 
     if (player_idx < 8) {
         for (int16_t i = 0; i < 40; ++i) {
-            int16_t tech_app_id = TECHDATA::_weapons[i].tech_application_id;
+            int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
             // Check if the player has researched the weapon to full application (level 3)
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                 // Check if weapon has PD special (bit 2) and rack count is 0
-                if ((TECHDATA::_weapons[i].specials & 0x4) && (TECHDATA::_weapons[i].rack == 0)) {
+                if ((TECHDATA::_weapons[i].available_mods & 0x4) && (TECHDATA::_weapons[i].type == 0)) {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
                     
                     // Check if miniaturization level meets requirements for point defense mod
                     // modification index 2 corresponds to Point Defense modification.
                     if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
-                        if (TECHDATA::_weapons[i].damage > max_damage) {
-                            max_damage = TECHDATA::_weapons[i].damage;
+                        if (TECHDATA::_weapons[i].max_damage > max_damage) {
+                            max_damage = TECHDATA::_weapons[i].max_damage;
                             best_weapon_idx = i;
                         }
                     }

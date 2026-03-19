@@ -712,7 +712,7 @@ namespace COMBAT {
      */
     void __cdecl Stellar_Converter_Attack_(int16_t target_idx) {
         for (int i = 0; i < 4; ++i) {
-            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].damage);
+            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].max_damage);
         }
     }
 
@@ -757,7 +757,7 @@ namespace COMBAT {
 
         if (beam_weapon_id > 0 && beam_weapon_count > 0) {
             int min_damage = (int)TECHDATA::_weapons[beam_weapon_id].min_damage;
-            int max_damage = (int)TECHDATA::_weapons[beam_weapon_id].damage;
+            int max_damage = (int)TECHDATA::_weapons[beam_weapon_id].max_damage;
 
             if (qships[attacker_idx].beam_damage_modifier > 0) {
                 int modifier = qships[attacker_idx].beam_damage_modifier + 100;
@@ -797,7 +797,7 @@ namespace COMBAT {
         int16_t missile_count = INITSHIP::Strat_Missile_Weapon_Count_(attacker->size);
 
         if (missile_weapon_id > 0 && missile_count > 0) {
-            int16_t weapon_damage = TECHDATA::_weapons[missile_weapon_id].damage;
+            int16_t weapon_damage = TECHDATA::_weapons[missile_weapon_id].max_damage;
             int16_t damage_modifier = attacker->missile_damage_modifier;
 
             if (damage_modifier > 0) {
@@ -854,7 +854,7 @@ namespace COMBAT {
         if (weapon_id > 0 && count > 0) {
             while (count > 0 && target_idx != -1) {
                 int16_t min_dmg = TECHDATA::_weapons[weapon_id].min_damage;
-                int16_t max_dmg = TECHDATA::_weapons[weapon_id].damage;
+                int16_t max_dmg = TECHDATA::_weapons[weapon_id].max_damage;
 
                 int damage_roll = min_dmg + random::Random_(max_dmg - min_dmg + 1) - 1;
                 
@@ -877,7 +877,7 @@ namespace COMBAT {
 
         if (weapon_id > 0 && weapon_count > 0) {
             int16_t min_dmg = TECHDATA::_weapons[weapon_id].min_damage;
-            int16_t max_dmg = TECHDATA::_weapons[weapon_id].damage;
+            int16_t max_dmg = TECHDATA::_weapons[weapon_id].max_damage;
 
             // The loop processes damage for each bomb weapon on the ship
             for (int16_t i = weapon_count; i > 0; --i) {
@@ -1411,7 +1411,7 @@ namespace COMBAT {
                     int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
                     if (weapon_id > 0) {
                         // Check if weapon is not a rack type before decrementing ammo
-                        if (TECHDATA::_weapons[weapon_id].rack != 1) {
+                        if (TECHDATA::_weapons[weapon_id].type != 1) {
                             if (MOX::_combat_data[i].weapons[j].ammo > 0) {
                                 MOX::_combat_data[i].weapons[j].ammo--;
                             }
