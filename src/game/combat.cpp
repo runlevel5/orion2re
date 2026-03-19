@@ -423,8 +423,8 @@ namespace COMBAT {
                     for (int16_t device_idx = 0; device_idx < 39; ++device_idx) {
                         if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, device_idx) != 0 &&
                             struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, device_idx) == 0) {
-                            
-                            int16_t bonus = TECHDATA::_specials[device_idx].bonus_value;
+
+                            int16_t bonus = TECHDATA::_specials[device_idx].strategic;
                             switch (TECHDATA::_specials[device_idx].category) {
                                 case 1:
                                     if (special_ocv < bonus) special_ocv = bonus;

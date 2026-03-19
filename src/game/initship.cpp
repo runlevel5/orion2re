@@ -1325,11 +1325,11 @@ int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech associated with this special device
             // 3 usually corresponds to the application being learned/available
-            if (MOX::_player[player_idx].tech_applications[spec.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[spec.tech_app_id] == 3) {
                 // Check if special belongs to the correct category (1 = beam accuracy)
                 if (spec.category == 1) {
-                    if (spec.bonus_value > max_bonus) {
-                        max_bonus = spec.bonus_value;
+                    if (spec.strategic > max_bonus) {
+                        max_bonus = spec.strategic;
                         best_special_idx = special_idx;
                     }
                 }
@@ -1349,12 +1349,12 @@ int16_t __cdecl Best_Beam_Damage_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if player has fully researched the tech for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Check if the device is categorized as a beam damage special (2 or 7)
                 if (special.category == 2 || special.category == 7) {
-                    if (max_bonus < special.bonus_value) {
+                    if (max_bonus < special.strategic) {
                         best_idx = i;
-                        max_bonus = special.bonus_value;
+                        max_bonus = special.strategic;
                     }
                 }
             }
@@ -1373,12 +1373,12 @@ int16_t __cdecl Best_Beam_Defense_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if the player has researched the technology for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Category 3 and 6 represent beam defense enhancements
                 if (special.category == 3 || special.category == 6) {
-                    if (special.bonus_value > max_bonus) {
+                    if (special.strategic > max_bonus) {
                         best_special_idx = i;
-                        max_bonus = special.bonus_value;
+                        max_bonus = special.strategic;
                     }
                 }
             }
@@ -1404,11 +1404,11 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech application associated with this special
             // Value 3 typically indicates the tech application is known/learned.
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Category 4 and 6 represent missile defense systems (e.g., Jammer, Lightning Field)
                 if (special.category == 4 || special.category == 6) {
-                    if (special.bonus_value > best_bonus) {
-                        best_bonus = special.bonus_value;
+                    if (special.strategic > best_bonus) {
+                        best_bonus = special.strategic;
                         best_special_idx = special_idx;
                     }
                 }

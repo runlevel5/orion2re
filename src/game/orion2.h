@@ -4129,14 +4129,13 @@ typedef struct s_tech_specials_data s_tech_specials_data, *Ps_tech_specials_data
 
 struct s_tech_specials_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
-    short tech_application_id;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    short field6_0x20[6];
+    uint16_t special_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint16_t exclude[6];
     int8_t category;
-    int16_t bonus_value;
+    int16_t strategic;
 };
 
 typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;

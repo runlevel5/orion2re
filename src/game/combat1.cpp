@@ -2115,7 +2115,7 @@ namespace COMBAT1 {
             int16_t specials_found = 0;
             for (int i = 0; i < 39; ++i) {
                 if (struct_::Test_Bit_Field_(MOX::_combat_data[MOX::_cur_ship].special_device_flags, i) == 1) {
-                    int16_t tech_app_id = TECHDATA::_specials[i].tech_application_id;
+                    int16_t tech_app_id = TECHDATA::_specials[i].tech_app_id;
                     MOX::_help_entry_list[(ship_info_base_idx + specials_found) * 5 + 0] = tech_app_id;
                     specials_found++;
                 }

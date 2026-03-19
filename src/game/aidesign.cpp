@@ -18,7 +18,7 @@ namespace aidesign {
 
             if (spcl[i].type == 0) {
                 // Processing Special Device
-                int16_t tech_app_id = TECHDATA::_specials[item_id].tech_application_id;
+                int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
                     if (Special_Legal_For_Design_(design, item_id)) {
@@ -325,7 +325,7 @@ namespace aidesign {
             int16_t type_lookup = *reinterpret_cast<const int16_t*>(&_special_device_spcl[i].type);
 
             if (type_lookup == 0) {
-                tech_app_id = TECHDATA::_specials[id_lookup].tech_application_id;
+                tech_app_id = TECHDATA::_specials[id_lookup].tech_app_id;
             } else {
                 tech_app_id = TECHDATA::_weapons[id_lookup].tech_app_id;
             }
@@ -878,7 +878,7 @@ namespace aidesign {
         while (bit < 40 && result == 1) {
             if (struct_::Test_Bit_Field_(design->special_device_flags, bit)) {
                 for (int i = 0; i < 6; ++i) {
-                    if (TECHDATA::_specials[bit].field6_0x20[i] == tech_id) {
+                    if (TECHDATA::_specials[bit].exclude[i] == tech_id) {
                         result = 0;
                         break;
                     }

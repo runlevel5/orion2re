@@ -317,7 +317,7 @@ namespace DESIGN {
                 if (special_idx == 4) { // Special logic for specific device ID 4 (Reinforced Hull?)
                     design->special_device_cost[i] = base_cost;
                 } else {
-                    int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_application_id);
+                    int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_app_id);
                     design->special_device_cost[i] = Cost_Given_M_Level_(base_cost, special_tech_level);
                 }
             }
@@ -399,7 +399,7 @@ namespace DESIGN {
                     // Device 4 has fixed space requirements (not miniaturized)
                     design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[design->ship_size];
                 } else {
-                    int16_t tech_app = TECHDATA::_specials[device_id].tech_application_id;
+                    int16_t tech_app = TECHDATA::_specials[device_id].tech_app_id;
                     uint8_t min_cat = static_cast<uint8_t>(Miniaturization_Category_(tech_app));
                     int16_t tech_level = Tech_Level_(player_num, tech_app);
 
@@ -884,7 +884,7 @@ namespace DESIGN {
             } else if ((field_id + clicked_field_id == 0)) {
                 int16_t special_id = MOX::_design->special_devices[i];
                 if (special_id > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_application_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_app_id);
 
                     const char* title = *reinterpret_cast<const char**>(&TECHDATA::_specials[special_id]);
                     TEXTBOX::Text_Box_(title, description_buffer);
@@ -1271,7 +1271,7 @@ namespace DESIGN {
                     for (int16_t special_idx = 1; special_idx < 39; ++special_idx) {
                         if (device_fits) break;
 
-                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_application_id) {
+                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_app_id) {
                             bool already_on_ship = false;
                             for (int i = 0; i < 8; ++i) {
                                 if (MOX::_design->special_devices[i] == special_idx) {
@@ -1281,7 +1281,7 @@ namespace DESIGN {
                             }
 
                             if (!already_on_ship) {
-                                uint16_t tech_id = TECHDATA::_specials[special_idx].tech_application_id;
+                                uint16_t tech_id = TECHDATA::_specials[special_idx].tech_app_id;
                                 uint8_t category = (uint8_t)Miniaturization_Category_(tech_id);
                                 int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
@@ -1329,7 +1329,7 @@ namespace DESIGN {
             }
         } else if (category == 9) { // Special Equipment Category
             for (int16_t i = 0; i < 39; ++i) {
-                if (TECHDATA::_specials[i].tech_application_id == app_id) {
+                if (TECHDATA::_specials[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
                 }
@@ -1572,11 +1572,11 @@ namespace DESIGN {
                 return 0;
             }
         } else if (app.type == 9) {
-            if (tech_app == TECHDATA::_specials[2].tech_application_id ||
-                tech_app == TECHDATA::_specials[27].tech_application_id ||
-                tech_app == TECHDATA::_specials[11].tech_application_id ||
-                tech_app == TECHDATA::_specials[14].tech_application_id ||
-                tech_app == TECHDATA::_specials[36].tech_application_id) {
+            if (tech_app == TECHDATA::_specials[2].tech_app_id ||
+                tech_app == TECHDATA::_specials[27].tech_app_id ||
+                tech_app == TECHDATA::_specials[11].tech_app_id ||
+                tech_app == TECHDATA::_specials[14].tech_app_id ||
+                tech_app == TECHDATA::_specials[36].tech_app_id) {
                 return 2;
             }
             return 1;
