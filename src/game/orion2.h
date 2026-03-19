@@ -1122,10 +1122,10 @@ struct s_combfind_target {
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {
-    ushort experience;
-    short attack;
-    short defense;
-    short ground;
+    uint16_t experience;
+    int16_t attack;
+    int16_t defense;
+    int16_t ground;
 };
 
 typedef struct s_current_design s_current_design, *Ps_current_design;
