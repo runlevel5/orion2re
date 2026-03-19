@@ -869,7 +869,7 @@ namespace CMBTFIRE {
         struct_::Clear_Structure_(&bomb_stats, 0x49);
 
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
-        int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].armor_absorption_percent * 4 + 400) * 25) /
+        int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
             100);
 
         if (flags & 0x80 /* BIO_WEAPON */) {

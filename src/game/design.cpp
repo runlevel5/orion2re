@@ -293,7 +293,7 @@ namespace DESIGN {
 
         // Calculate Armor Cost (Scaled by hull space and divided by 100)
         int32_t hull_space = TECHDATA::_hull_data[design->ship_size].hull_space;
-        int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost;
+        int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost_percent;
         design->armor_cost = static_cast<int16_t>((hull_space * armor_unit_cost) / 100);
 
         // Calculate Weapon Costs
@@ -463,7 +463,7 @@ namespace DESIGN {
 
         int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_absorption;
 
-        int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].armor_absorption_percent;
+        int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].ships_bonus;
         int16_t total_absorption = base_absorption + (int16_t)((int32_t)base_absorption * bonus_percent / 100);
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_HEAVY_ARMOR)) {

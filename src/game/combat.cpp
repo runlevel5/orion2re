@@ -380,7 +380,7 @@ namespace COMBAT {
         }
 
         best_armor_id = INITSHIP::Best_Armor_(player_idx);
-        armor_absorption = TECHDATA::_armor[best_armor_id].armor_absorption_percent;
+        armor_absorption = TECHDATA::_armor[best_armor_id].ships_bonus;
 
         if (num_ships > 0) {
             for (int16_t i = 0; i < num_ships; ++i) {
@@ -635,7 +635,7 @@ namespace COMBAT {
         armor_idx = INITSHIP::Best_Armor_(8);
         
         // Explicit lookup based on struct layout and assembly
-        absorption_percent = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+        absorption_percent = TECHDATA::_armor[armor_idx].ships_bonus;
         
         special_weapon_id = INITSHIP::Best_Strat_Special_Weapon_(8, size_idx);
 

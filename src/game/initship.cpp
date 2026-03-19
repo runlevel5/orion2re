@@ -316,7 +316,7 @@ namespace INITSHIP {
         int16_t armor_idx = Best_Armor_(armor_tech);
 
         int16_t base_structure = TECHDATA::_hull_data[hull_index].structure;
-        int16_t absorption_pct = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+        int16_t absorption_pct = TECHDATA::_armor[armor_idx].ships_bonus;
 
         // Formula: base_structure + (absorption_pct * base_structure) / 100
         int32_t bonus = (static_cast<int32_t>(absorption_pct) * static_cast<int32_t>(base_structure)) / 100;
@@ -780,7 +780,7 @@ namespace INITSHIP {
     int16_t __cdecl Get_Ship_Armor_Hits_(int16_t ship_idx) {
         s_ship_data* ship = &MOX::_ship[ship_idx];
 
-        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].armor_absorption_percent;
+        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].ships_bonus;
         int16_t hull_absorption = TECHDATA::_hull_data[(uint8_t)ship->d.size].armor_absorption;
 
         bool has_special_armor = struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
@@ -1033,7 +1033,7 @@ namespace INITSHIP {
         }
 
         int16_t base_structure = TECHDATA::_hull_data[(int16_t)d.size].structure;
-        int16_t absorption = TECHDATA::_armor[(uint8_t)d.armor_type].armor_absorption_percent;
+        int16_t absorption = TECHDATA::_armor[(uint8_t)d.armor_type].ships_bonus;
 
         // Calculate structure bonus from armor
         int32_t total_structure = base_structure + (absorption * base_structure) / 100;
@@ -1471,7 +1471,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
     ship->armor_type = 6;
 
-    int16_t absorption_percent = TECHDATA::_armor[ship->armor_type].armor_absorption_percent;
+    int16_t absorption_percent = TECHDATA::_armor[ship->armor_type].ships_bonus;
     ship->structure_max = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].structure) / 100);
     ship->armor_remaining = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
@@ -1550,7 +1550,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
     ship->armor_type = 6;
 
-    int32_t armor_factor = TECHDATA::_armor[ship->armor_type].armor_absorption_percent + 100;
+    int32_t armor_factor = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     
     ship->structure_max = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].structure) / 100);
     ship->armor_remaining = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
@@ -1688,7 +1688,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
     ship->armor_type = 6 /* ARMOR_NEUTRONTUIM */;
 
-    int32_t armor_boost = TECHDATA::_armor[ship->armor_type].armor_absorption_percent + 100;
+    int32_t armor_boost = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     ship->structure_max = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].structure) / 100);
     ship->armor_remaining = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
@@ -1803,7 +1803,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
     ship->armor_type = 6;
 
-    int32_t armor_factor = TECHDATA::_armor[6].armor_absorption_percent + 100;
+    int32_t armor_factor = TECHDATA::_armor[6].ships_bonus + 100;
     ship->structure_max = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].structure) / 100);
     ship->armor_remaining = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
@@ -1945,7 +1945,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     ship->marine_count = TECHDATA::_hull_data[ship->size_class].marine_count;
     ship->armor_type = 6;
 
-    int16_t abs_pct = TECHDATA::_armor[ship->armor_type].armor_absorption_percent;
+    int16_t abs_pct = TECHDATA::_armor[ship->armor_type].ships_bonus;
     ship->structure_max = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].structure / 100);
     ship->armor_remaining = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].armor_absorption / 100);
     ship->structure_damage = 0;

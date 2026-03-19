@@ -3986,8 +3986,8 @@ struct s_tech_armor_data {
     short tech_app_id; /* Type 'TECH_APP' was deleted */
     undefined field3_0x8;
     uint8_t troops_bonus;
-    short armor_absorption_percent;
-    short cost;
+    uint16_t ships_bonus;
+    uint16_t cost_percent;
     uint8_t strategic_hp;
 };
 

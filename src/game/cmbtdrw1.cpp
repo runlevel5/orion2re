@@ -928,7 +928,7 @@ namespace CMBTDRW1 {
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 int16_t armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
-                int32_t absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                int32_t absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 int32_t denom = ((absorption * 4 + 400) * 25) / 100;
                 int16_t bar_len = ((struct_dmg * 88) / denom) / 2;
 
@@ -977,7 +977,7 @@ namespace CMBTDRW1 {
             }
 
             int16_t hull_armor = TECHDATA::_hull_data[hull_size].armor_absorption;
-            int16_t armor_percent = TECHDATA::_armor[MOX::_combat_data[ship_idx].armor_type].armor_absorption_percent;
+            int16_t armor_percent = TECHDATA::_armor[MOX::_combat_data[ship_idx].armor_type].ships_bonus;
             
             int32_t armor_total = hull_armor + (armor_percent * hull_armor) / 100;
             

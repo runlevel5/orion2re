@@ -169,7 +169,7 @@ namespace aipower {
                 // The original code performs a second call to Best_Armor_ if result is positive
                 best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
 
-                int absorption_pct = (int)TECHDATA::_armor[best_armor_idx].armor_absorption_percent;
+                int absorption_pct = (int)TECHDATA::_armor[best_armor_idx].ships_bonus;
 
                 // bonus = (absorption_percent * base_hits) / 100
                 int16_t bonus_hits = (int16_t)((absorption_pct * (int)base_hits) / 100);

@@ -1106,10 +1106,10 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     strcpy(ship->name, TECHDATA::_hull_data[8].name);
 
     ship->structure_max = (TECHDATA::_hull_data[8].structure +
-        (TECHDATA::_armor[ship->armor_type].armor_absorption_percent * TECHDATA::_hull_data[8].structure) / 100) * 3;
+        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure) / 100) * 3;
 
     ship->armor_remaining = (TECHDATA::_hull_data[8].armor_absorption +
-        (TECHDATA::_armor[ship->armor_type].armor_absorption_percent * TECHDATA::_hull_data[8].armor_absorption) / 100) * 3;
+        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_absorption) / 100) * 3;
 
     int16_t sVar2 = (TECHDATA::_hull_data[8].hull_size * 5 / 4) / 2;
 
@@ -1634,7 +1634,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     MOX::_combat_data[MOX::_combat_total_ship_count].computer_type = (int8_t)INITSHIP::Best_Computer_(defender);
     MOX::_combat_data[MOX::_combat_total_ship_count].armor_type = (int8_t)INITSHIP::Best_Armor_(defender);
 
-    int16_t armor_absorption = TECHDATA::_armor[MOX::_combat_data[MOX::_combat_total_ship_count].armor_type].armor_absorption_percent;
+    int16_t armor_absorption = TECHDATA::_armor[MOX::_combat_data[MOX::_combat_total_ship_count].armor_type].ships_bonus;
     int16_t space = 0;
 
     if (station_type == 6) {

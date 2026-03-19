@@ -1245,25 +1245,25 @@ namespace CMBTMIS {
 
             case 0x1C: // 28
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
-                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 hits = (int16_t)(((absorption * 3 + 300) * 2) / 200);
                 break;
 
             case 0x1D: // 29
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
-                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 hits = (int16_t)(((absorption * 5 + 500) * 2) / 200);
                 break;
 
             case 0x1E: // 30
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
-                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 hits = (int16_t)((absorption * 8 + 800) / 200);
                 break;
 
             case 0x1F: // 31
                 armor_idx = INITSHIP::Best_Armor_(ship_idx);
-                absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 hits = (int16_t)((absorption * 4 + 400) / 200);
                 break;
 
