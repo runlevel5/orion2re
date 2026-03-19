@@ -162,7 +162,7 @@ namespace aipower {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
             int hull_type = (int)ship->d.size;
-            int16_t base_hits = TECHDATA::_hull_data[hull_type].base_structure;
+            int16_t base_hits = TECHDATA::_hull_data[hull_type].strat_hits;
 
             int16_t best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
             if (best_armor_idx > 0) {

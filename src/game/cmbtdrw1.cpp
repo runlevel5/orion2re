@@ -976,7 +976,7 @@ namespace CMBTDRW1 {
                 hull_size = MOX::_combat_data[ship_idx].size_class;
             }
 
-            int16_t hull_armor = TECHDATA::_hull_data[hull_size].armor_absorption;
+            int16_t hull_armor = TECHDATA::_hull_data[hull_size].armor_hp;
             int16_t armor_percent = TECHDATA::_armor[MOX::_combat_data[ship_idx].armor_type].ships_bonus;
             
             int32_t armor_total = hull_armor + (armor_percent * hull_armor) / 100;

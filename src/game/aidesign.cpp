@@ -656,7 +656,7 @@ namespace aidesign {
         design->computer_type = (int8_t)INITSHIP::Best_Computer_(player_idx);
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(player_idx);
 
-        remaining_space = TECHDATA::_hull_data[hull_idx].hull_size;
+        remaining_space = TECHDATA::_hull_data[hull_idx].size;
 
         // Check for Battle Pods
         if (player->tech_applications[TECH_APP_BATTLE_PODS] == 3) {

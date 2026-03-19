@@ -381,7 +381,7 @@ namespace DESIGN {
 
             if (MOX::_design->ship_size != MOX::_design_size) {
                 MOX::_design->ship_size = MOX::_design_size;
-                MOX::_design->hull_space = TECHDATA::_hull_data[MOX::_design->ship_size].hull_size;
+                MOX::_design->hull_space = TECHDATA::_hull_data[MOX::_design->ship_size].size;
                 needs_refresh = 1;
                 if (MOX::_design->ship_size == 5) {
                     MOX::_design->picture_type = 43;

@@ -62,7 +62,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
     MOX::_global_combat_data.officer_idx = MOX::_ship[ship_idx].officer_index;
 
     if (MOX::_ship[ship_idx].d.ship_type == 0 && MOX::_ship[ship_idx].owner <= 8) {
-        MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marine_count;
+        MOX::_global_combat_data.marine_count = (int8_t)TECHDATA::_hull_data[MOX::_global_combat_data.hull_size].marines;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 36)) {
             if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, 36)) {
@@ -275,7 +275,7 @@ void __cdecl Load_Combat_Ship_(int16_t ship_idx, int16_t combat_idx) {
     }
 
     if (ship->d.ship_type == 0 && ship->owner < 9) {
-        combat->marine_count = TECHDATA::_hull_data[combat->size_class].marine_count;
+        combat->marine_count = TECHDATA::_hull_data[combat->size_class].marines;
         if (struct_::Test_Bit_Field_(combat->special_device_flags, 0x24 /* 36 */) == 1 &&
             struct_::Test_Bit_Field_(combat->special_device_damage_flags, 0x24 /* 36 */) == 0) {
             combat->marine_count *= 2;
@@ -1105,13 +1105,13 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     strcpy(ship->name, TECHDATA::_hull_data[8].name);
 
-    ship->structure_max = (TECHDATA::_hull_data[8].structure +
-        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure) / 100) * 3;
+    ship->structure_max = (TECHDATA::_hull_data[8].structure_hp +
+        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].structure_hp) / 100) * 3;
 
-    ship->armor_remaining = (TECHDATA::_hull_data[8].armor_absorption +
-        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_absorption) / 100) * 3;
+    ship->armor_remaining = (TECHDATA::_hull_data[8].armor_hp +
+        (TECHDATA::_armor[ship->armor_type].ships_bonus * TECHDATA::_hull_data[8].armor_hp) / 100) * 3;
 
-    int16_t sVar2 = (TECHDATA::_hull_data[8].hull_size * 5 / 4) / 2;
+    int16_t sVar2 = (TECHDATA::_hull_data[8].size * 5 / 4) / 2;
 
     ship->size_class = 4;
     ship->picture_num = 5;
@@ -1236,7 +1236,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
 
     ship->crew_quality = 3;
     ship->officer_idx = 0x42;
-    ship->marine_count = static_cast<int8_t>(TECHDATA::_hull_data[8].marine_count);
+    ship->marine_count = static_cast<int8_t>(TECHDATA::_hull_data[8].marines);
     ship->current_speed = 0;
     ship->structure_damage = 0;
     ship->is_retreating = 0;
@@ -1639,11 +1639,11 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
     if (station_type == 6) {
         strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[6].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[6].structure;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[6].armor_absorption +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[6].armor_absorption) / 100);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[6].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[6].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[6].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[6].hull_size;
+        int16_t size = TECHDATA::_hull_data[6].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1653,11 +1653,11 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 40;
     } else if (station_type == 7) {
         strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[7].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[7].structure;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[7].armor_absorption +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[7].armor_absorption) / 100);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[7].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[7].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[7].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[7].hull_size;
+        int16_t size = TECHDATA::_hull_data[7].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1667,11 +1667,11 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
         MOX::_combat_data[MOX::_combat_total_ship_count].picture_num = 41;
     } else if (station_type == 8) {
         strcpy(MOX::_combat_data[MOX::_combat_total_ship_count].name, TECHDATA::_hull_data[8].name);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[8].structure;
-        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[8].armor_absorption +
-            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[8].armor_absorption) / 100);
+        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max = TECHDATA::_hull_data[8].structure_hp;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining = TECHDATA::_hull_data[8].armor_hp +
+            (int16_t)(((int32_t)armor_absorption * TECHDATA::_hull_data[8].armor_hp) / 100);
 
-        int16_t size = TECHDATA::_hull_data[8].hull_size;
+        int16_t size = TECHDATA::_hull_data[8].size;
         if (MOX::_player[defender].tech_applications[89] == 3) {
             size = (size * 5) / 4;
         }
@@ -1901,7 +1901,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
 
     MOX::_combat_data[MOX::_combat_total_ship_count].crew_quality = 1;
     MOX::_combat_data[MOX::_combat_total_ship_count].officer_idx = -1;
-    MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = TECHDATA::_hull_data[station_type].marine_count;
+    MOX::_combat_data[MOX::_combat_total_ship_count].marine_count = TECHDATA::_hull_data[station_type].marines;
     MOX::_combat_data[MOX::_combat_total_ship_count].current_speed = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].structure_damage = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].is_retreating = 0;

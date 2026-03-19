@@ -4071,21 +4071,20 @@ struct s_tech_fuel_data {
 typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
 
 struct s_tech_hull_data {
-    short hull_space;
-    short hull_size;
-    undefined1 marine_count; /* Created by Rename Structure Field action */
-    undefined field3_0x5;
-    short armor_absorption;
-    short structure;
-    short computer_hits;
-    short drive_hits;
-    short shield_hits;
-    short beam_weapon_count;
-    short missle_weapon_count;
-    short special_weapon_count;
-    short bomb_weapon_count;
-    short base_beam_defense;
-    short base_structure;
+    uint16_t cost;
+    uint16_t size;
+    uint16_t marines;
+    uint16_t armor_hp;
+    uint16_t structure_hp;
+    uint16_t computer_hp;
+    uint16_t drive_hp;
+    uint16_t shield_hp;
+    uint16_t strat_beam;
+    uint16_t strat_missile;
+    uint16_t strat_special;
+    uint16_t strat_bomb;
+    int16_t strat_def_bonus;
+    uint16_t strat_hits;
     char *name;
     char *size_name;
 };

@@ -241,7 +241,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Space_() {
         // Access hull_size from TECHDATA::_hull_data array based on current design's ship size
-        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].hull_size);
+        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].size);
 
         if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
             // Apply 25% hull space bonus: (hull_size * 125) / 100
@@ -292,7 +292,7 @@ namespace DESIGN {
         design->drive_cost = Cost_Given_M_Level_(drive_base, drive_tech_level);
 
         // Calculate Armor Cost (Scaled by hull space and divided by 100)
-        int32_t hull_space = TECHDATA::_hull_data[design->ship_size].hull_space;
+        int32_t hull_space = TECHDATA::_hull_data[design->ship_size].cost;
         int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost_percent;
         design->armor_cost = static_cast<int16_t>((hull_space * armor_unit_cost) / 100);
 
@@ -347,7 +347,7 @@ namespace DESIGN {
             }
         }
 
-        int total_cost = (int)TECHDATA::_hull_data[_design->ship_size].hull_space +
+        int total_cost = (int)TECHDATA::_hull_data[_design->ship_size].cost +
                          (int)_design->computer_cost +
                          (int)_design->drive_cost +
                          (int)_design->armor_cost +
@@ -461,7 +461,7 @@ namespace DESIGN {
     int16_t __cdecl Current_Design_Armor_Absorption_() {
         s_current_design* design = MOX::_design;
 
-        int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_absorption;
+        int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_hp;
 
         int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].ships_bonus;
         int16_t total_absorption = base_absorption + (int16_t)((int32_t)base_absorption * bonus_percent / 100);

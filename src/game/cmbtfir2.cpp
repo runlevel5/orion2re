@@ -515,7 +515,7 @@ namespace CMBTFIR2 {
         if (ship->ftl_type <= 0) {
             ship->drive_max_hits = 0;
         } else {
-            ship->drive_max_hits = TECHDATA::_hull_data[ship->size_class].drive_hits;
+            ship->drive_max_hits = TECHDATA::_hull_data[ship->size_class].drive_hp;
         }
 
         if (struct_::Test_Bit_Field_(ship->special_device_flags, 27 /* SPEC_STRUCTURAL_ANALYZER */) &&
@@ -523,7 +523,7 @@ namespace CMBTFIR2 {
             ship->drive_max_hits *= 3;
         }
 
-        ship->computer_max_hits = TECHDATA::_hull_data[ship->size_class].computer_hits;
+        ship->computer_max_hits = TECHDATA::_hull_data[ship->size_class].computer_hp;
 
         for (int i = 0; i < 8; ++i) {
             if (ship->weapons[i].weapon_id < 1) {
@@ -575,7 +575,7 @@ namespace CMBTFIR2 {
         if (ship->shield_type <= 0) {
             ship->shield_max_hits = 0;
         } else {
-            ship->shield_max_hits = TECHDATA::_hull_data[ship->size_class].shield_hits;
+            ship->shield_max_hits = TECHDATA::_hull_data[ship->size_class].shield_hp;
         }
 
         CMBTFIR2::Clear_Internal_Space_(ship);
@@ -607,22 +607,22 @@ namespace CMBTFIR2 {
             int8_t size = ship->size_class;
             if (ship->ftl_type == 0) {
                 if (size == 2) {
-                    armor_hits = TECHDATA::_hull_data[6].armor_absorption + 
+                    armor_hits = TECHDATA::_hull_data[6].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_absorption / 100);
+                                           TECHDATA::_hull_data[6].armor_hp / 100);
                 } else if (size == 3) {
-                    armor_hits = TECHDATA::_hull_data[7].armor_absorption + 
+                    armor_hits = TECHDATA::_hull_data[7].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_absorption / 100);
+                                           TECHDATA::_hull_data[6].armor_hp / 100);
                 } else if (size == 4) {
-                    armor_hits = TECHDATA::_hull_data[8].armor_absorption + 
+                    armor_hits = TECHDATA::_hull_data[8].armor_hp + 
                                  (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                           TECHDATA::_hull_data[6].armor_absorption / 100);
+                                           TECHDATA::_hull_data[6].armor_hp / 100);
                 }
             } else {
-                armor_hits = TECHDATA::_hull_data[size].armor_absorption + 
+                armor_hits = TECHDATA::_hull_data[size].armor_hp + 
                              (int16_t)((int32_t)TECHDATA::_armor[ship->armor_type].ships_bonus * 
-                                       TECHDATA::_hull_data[size].armor_absorption / 100);
+                                       TECHDATA::_hull_data[size].armor_hp / 100);
             }
             
             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 14 /* SPECIAL_REINFORCED_HULL */)) {
@@ -1765,7 +1765,7 @@ namespace CMBTFIR2 {
         has_special = COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0x18 /* 24 */);
 
         size_class = MOX::_combat_data[ship_idx].size_class;
-        damage = TECHDATA::_hull_data[size_class].drive_hits * 5;
+        damage = TECHDATA::_hull_data[size_class].drive_hp * 5;
 
         if (has_special) {
             damage *= 3;
