@@ -38,4 +38,16 @@ namespace invasion {
     void __cdecl Get_Boarding_Info_(int16_t attacker_player_id, int16_t attacker_unit_count, int16_t attacker_additional_modifier, int16_t defender_player_id, int16_t defender_unit_count, int16_t defender_additional_modifier, s_invasion_side_info* side_a, s_invasion_side_info* side_b);
 
     void __cdecl Ground_Combat_Round_(s_invasion_side_info* side1, s_invasion_side_info* side2);
+
+    inline int16_t __cdecl Colony_Tank_Barracks_Limit_(s_colony* colony) {
+        using Fn = int16_t(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042cd70});
+        return fn(colony);
+    }
+
+    inline int16_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony) {
+        using Fn = int16_t(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042ccd0});
+        return fn(colony);
+    }
 }

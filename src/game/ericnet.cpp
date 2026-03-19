@@ -234,6 +234,208 @@ namespace ERICNET {
         }
     }
 
+    void __cdecl Add_Building_(int16_t colony_idx, int16_t building_idx) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+        s_player* player = &MOX::_player[(uint8_t)colony->owner];
+        s_planet_data* planet = &MOX::_planet[colony->planet];
+        s_star_data* star = &MOX::_star[planet->star_index];
+
+        uint8_t add_to_list = 1;
+        uint8_t recompute_star = 0;
+        uint8_t clear_combat_ignore = 0;
+
+        switch (building_idx) {
+            case 2: /* Armor Barracks / Tanks */
+                colony->tank_roundoff = 0;
+                {
+                    int16_t limit = invasion::Colony_Tank_Barracks_Limit_(colony);
+                    if (limit > 2) limit = 2;
+                    if (colony->military[1] < limit) {
+                        colony->military[1] = limit;
+                    }
+                }
+                break;
+
+            case 3:
+            case 14:
+            case 45: /* Artemis System */
+                recompute_star = 1;
+                break;
+
+            case 9: /* Galactic Headquarters */
+                player->home_planet_id = colony->planet;
+                for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+                    if (i != colony_idx && MOX::_colony[i].owner == colony->owner) {
+                        COLBLDG::Delete_Prod_From_Colony_Queue_(i, 9);
+                    }
+                }
+                break;
+
+            case 11: /* Colony Ship stuff */
+                star->ignore_colony_ships &= ~(1 << (colony->owner & 0x1F));
+                break;
+
+            case 13: /* Recycler Upgrade logic */
+                if (colony->buildings[32]) {
+                    colony->buildings[32] = 0;
+                    player->bc += TECHDATA::_buildings[32].cost;
+                }
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 32);
+                if (colony->buildings[5]) {
+                    colony->buildings[5] = 0;
+                    player->bc += TECHDATA::_buildings[5].cost;
+                }
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 5);
+                break;
+
+            case 17: /* Atmosphere Renewer / Weather Controller */
+                if (colony->climate == 8 /* Tundra */) {
+                    planet->climate = 9;
+                    planet->food_per_farmer += (MOX::_food_per_farmer_table[9] - MOX::_food_per_farmer_table[8]);
+                }
+                add_to_list = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 44);
+                break;
+
+            case 22: /* Marine Barracks / Infantry */
+                colony->infantry_roundoff = 0;
+                {
+                    int16_t limit = invasion::Colony_Infantry_Barracks_Limit_(colony);
+                    if (limit > 4) limit = 4;
+                    if (colony->military[0] < limit) {
+                        colony->military[0] = limit;
+                    }
+                }
+                break;
+
+            case 23:
+                colony->buildings[24] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 24);
+                /* fallthrough */
+            case 24:
+                colony->buildings[28] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 28);
+                /* fallthrough */
+            case 28:
+            case 26:
+            case 27:
+            case 42:
+                clear_combat_ignore = 1;
+                break;
+
+            case 37: /* Soil Enrichment */
+                planet->food_per_farmer += 1;
+                add_to_list = 0;
+                planet->environmental_alterations |= 0x2;
+                break;
+
+            case 41:
+                colony->buildings[8] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 8);
+                /* fallthrough */
+            case 8:
+                colony->buildings[40] = 0;
+                COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 40);
+                /* fallthrough */
+            case 40:
+                recompute_star = 1;
+                clear_combat_ignore = 1;
+                break;
+
+            case 44: /* Terraforming */
+            {
+                int16_t p_idx = colony->planet;
+                int8_t old_climate = colony->climate;
+                switch (old_climate) {
+                    case 2: /* Barren */
+                        if (star->planet_index[0] == p_idx || star->planet_index[1] == p_idx) {
+                            MOX::_planet[p_idx].climate = 3; /* Desert */
+                        } else if (star->planet_index[3] == p_idx || star->planet_index[4] == p_idx) {
+                            MOX::_planet[p_idx].climate = 4; /* Tundra */
+                        } else {
+                            MOX::_planet[p_idx].climate = (random::Random_(2) != 1) ? 4 : 3;
+                        }
+                        break;
+                    case 3: /* Desert */
+                        MOX::_planet[p_idx].climate = 7; /* Arid */
+                        break;
+                    case 4: /* Tundra */
+                        MOX::_planet[p_idx].climate = 6; /* Swamp */
+                        break;
+                    case 5: /* Ocean */
+                    case 6: /* Swamp */
+                    case 7: /* Arid */
+                        MOX::_planet[p_idx].climate = 8; /* Terran */
+                        break;
+                }
+                add_to_list = 0;
+                MOX::_planet[p_idx].food_per_farmer += (MOX::_food_per_farmer_table[MOX::_planet[p_idx].climate] - MOX::_food_per_farmer_table[old_climate]);
+                MOX::_planet[p_idx].n_terraforms += 1;
+            }
+            break;
+
+            case 48: /* Stellar Converter Transform / Artificial Planet */
+            {
+                int16_t target_planet = -1;
+                int8_t size = 0;
+                
+                // Look for Asteroid Belt
+                for (int i = 0; i < 5; ++i) {
+                    int16_t p_idx = star->planet_index[i];
+                    if (p_idx != -1 && MOX::_planet[p_idx].planet_type == 2 /* Asteroid */) {
+                        target_planet = p_idx;
+                        size = 4; // Large
+                        break;
+                    }
+                }
+                // Look for Gas Giant
+                if (target_planet == -1) {
+                    for (int i = 0; i < 5; ++i) {
+                        int16_t p_idx = star->planet_index[i];
+                        if (p_idx != -1 && MOX::_planet[p_idx].planet_type == 1 /* Gas Giant */) {
+                            target_planet = p_idx;
+                            size = 3; // Medium
+                            break;
+                        }
+                    }
+                }
+
+                if (target_planet != -1) {
+                    s_planet_data* tp = &MOX::_planet[target_planet];
+                    tp->planet_type = 3; /* Normal */
+                    tp->size = size;
+                    tp->gravity_class = 1; /* Normal Gravity */
+                    tp->group = 0;
+                    tp->climate = 2; /* Barren */
+                    tp->climate_bg_type = (int8_t)random::Random_(3) - 1;
+                    tp->mineral_class = 2; /* Abundant */
+                    tp->food_per_farmer = 0;
+                    tp->n_terraforms = 0;
+                    tp->max_farms = global::_max_farms_by_size[size];
+                    tp->max_population = global::_max_pop_by_size[size];
+                    tp->environmental_alterations = 0;
+                }
+                add_to_list = 0;
+            }
+            break;
+        }
+
+        if (add_to_list) {
+            colony->buildings[building_idx] = 1;
+        }
+
+        if (recompute_star) {
+            COLCALC::Compute_Star_Colony_Stuff_(star);
+            if (building_idx == 45 /* Artemis System */) {
+                SHIPMOVE::Update_Ship_ETAs_((int32_t)colony->owner);
+            }
+        }
+
+        if (clear_combat_ignore) {
+            star->ignore_combat_ships = 0;
+        }
+    }
+
     void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_id) {
         MOX::_colony[colony_idx].buildings[building_id] = 0;
 

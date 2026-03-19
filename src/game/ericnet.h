@@ -5,11 +5,7 @@ namespace ERICNET {
     inline int8_t* _start_civ_level = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F000});
     inline int16_t* _buildlist = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551198});
 
-    inline void __cdecl Add_Building_(int16_t colony_idx, int16_t building_id) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004089C0});
-        fn(colony_idx, building_id);
-    }
+    void __cdecl Add_Building_(int16_t colony_idx, int16_t building_idx);
 
     void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t flag);
 

@@ -1,7 +1,5 @@
 #pragma once
 
-struct s_combat_bomb_result;
-
 namespace MOX {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline s_animation_header* (&_fighter_seg)[15][64] =

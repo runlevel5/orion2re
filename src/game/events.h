@@ -2,20 +2,24 @@
 #include <cstdint>
 
 namespace EVENTS {
+#pragma pack(push, 1)
+    struct s_wormhole_data {
+        uint8_t success;
+        int32_t target_id;
+        int32_t amount;
+    };
+#pragma pack(pop)
+
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
-    inline uint16_t& _event_delay_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A65AE});
+    inline int16_t& _event_delay_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A65AE});
+    inline int8_t (&_event_good_array)[36] =
+        *reinterpret_cast<int8_t(*)[36]>(std::uintptr_t{0x00557508});
 
-    inline int16_t __cdecl Get_Antaran_Victim_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00477070})();
-    }
+    int16_t __cdecl Get_Antaran_Victim_();
     void Init_Events_();
 
-    inline int16_t __cdecl Event_Check_Comet_(int16_t colony_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00477750)(colony_idx);
-    }
+    int16_t __cdecl Event_Check_Comet_(int16_t target_id);
 
     int16_t __cdecl Event_Check_Space_Anomaly_(int16_t colony_idx);
     int16_t __cdecl Event_Check_Space_Anomaly_At_Star_(int16_t star_idx);
@@ -28,47 +32,65 @@ namespace EVENTS {
 
     int16_t __cdecl Event_Check_Hyperspace_Flux_();
 
-    inline void __cdecl Event_Surrender_(int8_t actor_player, int16_t target_player) {
-        using Fn = void(__cdecl*)(int8_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775f0});
-        fn(actor_player, target_player);
-    }
+    void __cdecl Event_Surrender_(int8_t player_idx, int16_t target_id);
 
     int16_t __cdecl Colony_Has_Event_(int16_t colony_idx);
 
-    inline void __cdecl Determine_Event_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004761c0 });
-        fn();
-    }
+    bool __cdecl Player_Has_Bad_Event_(int16_t player_idx);
 
-    inline void __cdecl Event_Twiddle_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004742a0 });
-        fn();
-    }
+    void __cdecl Determine_Event_();
 
-    inline void __cdecl Event_Orion_Discovered_(int16_t owner) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775D0});
-        fn(owner);
-    }
+    void __cdecl Event_Twiddle_();
 
-    inline void __cdecl Event_Race_Eliminated_(int8_t player_idx) {
-        using Fn = void(__cdecl*)(int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004775b0});
-        fn(player_idx);
-    }
+    void __cdecl Update_Lucky_Players_Events_();
 
-    inline int16_t __cdecl Event_Check_Warp_Beast_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00477700});
-        return fn();
-    }
+    int16_t __cdecl Determine_Lucky_Players_Events_();
 
-    inline void __cdecl Kill_All_Events_At_Colony_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00478290});
-        fn(colony_idx);
-    }
+    int16_t __cdecl Get_Event_Climate_Change_Colony_(int16_t player_idx);
+
+    int16_t __cdecl Pick_Random_Player_In_Contact_(int16_t player_idx);
+
+    int16_t __cdecl Pick_Random_Ship_(int16_t player_idx);
+
+    int16_t __cdecl Get_Event_Industrial_Accident_Colony_(int16_t player_idx);
+
+    int16_t __cdecl Get_Event_Mineral_Depletion_Colony_(int16_t player_idx);
+    int16_t __cdecl Get_Event_Mineral_Deposit_Colony_(int16_t player_idx);
+
+    int16_t __cdecl Pick_Random_Colony_No_Capitol_(int16_t player_idx);
+
+    int16_t __cdecl Pick_Random_Colony_No_Outpost_(int16_t player_idx);
+
+    int16_t __cdecl Pick_Random_Star_(int16_t player_idx);
+
+    int16_t __cdecl Star_Has_Event_(int16_t star_idx);
+
+    int16_t __cdecl Event_Pirate_Activity_Strength_(int16_t star_idx);
+
+    int16_t __cdecl Pick_Completely_Random_Star_();
+
+    void __cdecl Event_Check_Planet_Warning_();
+
+    void __cdecl Event_Check_General_Status_();
+
+    inline int8_t* s__00557509 =
+        reinterpret_cast<int8_t*>(std::uintptr_t{0x00557509});
+
+    int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx);
+
+    void __cdecl Allocate_Comet_Hit_(int16_t colony_idx);
+
+    void __cdecl Allocate_Earthquake_Hit_(int16_t colony_idx, int16_t* pop_killed, int16_t* buildings_destroyed_count);
+
+    int16_t __cdecl Colony_Research_Points_(int16_t colony_idx);
+
+    void __cdecl Allocate_Industrial_Accident_Hit_(int16_t colony_idx);
+
+    int16_t __cdecl Get_Event_Victim_(int8_t type);
+
+    void __cdecl Event_Orion_Discovered_(int8_t player_idx);
+    void __cdecl Event_Race_Eliminated_(int8_t player_idx);
+    int16_t __cdecl Event_Check_Warp_Beast_();
+
+    void __cdecl Kill_All_Events_At_Colony_(int16_t colony_idx);
 }

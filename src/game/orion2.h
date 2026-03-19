@@ -1180,12 +1180,12 @@ struct s_current_design {
 typedef struct s_event_data s_event_data, *Ps_event_data;
 
 struct s_event_data {
-    sbyte field0_0x0;
-    sbyte field1_0x1;
-    sbyte field2_0x2;
-    short event_type;
-    short field4_0x5;
-    short field5_0x7;
+    int8_t player_idx;
+    int8_t status; /* 0:Inactive, 1:Triggered, 2:Active, 3:Expired, 5:Finishing, 6:Just Started */
+    int8_t turn_count;
+    short target_id;
+    short amount;
+    short max_amount;
 };
 
 typedef struct s_field s_field, *Ps_field;
@@ -3371,7 +3371,7 @@ struct s_settings {
     sbyte sound_fx_on;
     sbyte sound_fx_level;
     sbyte music_on;
-    int8_t music_level;
+    sbyte music_level;
     char active_save_slot;
     byte multi_player_game_type;
     char net_game_name[9];

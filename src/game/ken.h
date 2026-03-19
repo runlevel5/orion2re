@@ -35,4 +35,16 @@ namespace KEN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004C1B30 });
         fn(player);
     }
+
+    inline int16_t __cdecl Get_Weighted_Choice_(int16_t* weights, int16_t count) {
+        using Fn = int16_t(__cdecl*)(int16_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1d60});
+        return fn(weights, count);
+    }
+
+    inline void __cdecl Get_Derelict_Applications_(int16_t player_idx, int16_t* app1, int16_t* count) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C1DF0});
+        fn(player_idx, app1, count);
+    }
 }
