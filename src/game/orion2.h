@@ -4011,10 +4011,10 @@ typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data
 
 struct s_tech_computer_data {
     char *name;
-    short computer_id;
-    short tech_app;
-    short cost_by_ship_type[6];
-    short bonus;
+    uint16_t computer_id;
+    uint16_t tech_app_id;
+    uint16_t cost_by_ship_type[6];
+    uint16_t bonus;
 };
 
 typedef struct s_tech_data_personal_shield s_tech_data_personal_shield, *Ps_tech_data_personal_shield;

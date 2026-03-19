@@ -82,7 +82,7 @@ namespace aitech {
         int computer_idx = 5;
 
         while (computer_idx > 0) {
-            int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app;
+            int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app_id;
 
             // Check if the player has researched the technology application associated with this computer.
             if (player->tech_applications[tech_app_idx] == 3 /* TECH_RESEARCHED */) {

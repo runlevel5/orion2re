@@ -325,7 +325,7 @@ namespace DESIGN {
 
         // Calculate Computer Cost
         int16_t computer_idx = design->computer_type;
-        int16_t comp_tech_level = Tech_Level_(player_idx, TECHDATA::_computers[computer_idx].tech_app);
+        int16_t comp_tech_level = Tech_Level_(player_idx, TECHDATA::_computers[computer_idx].tech_app_id);
         int16_t comp_base = Computer_Cost_(computer_idx);
         design->computer_cost = Cost_Given_M_Level_(comp_base, comp_tech_level);
     }

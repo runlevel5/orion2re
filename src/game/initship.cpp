@@ -270,7 +270,7 @@ namespace INITSHIP {
         int16_t best_computer_idx = 0;
 
         for (int16_t i = 1; i < 6; ++i) {
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app_id] == 3) {
                 best_computer_idx = i;
             }
         }
