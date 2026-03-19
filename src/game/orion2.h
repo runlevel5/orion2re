@@ -3895,9 +3895,9 @@ struct s_sound_index {
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
-    int8_t id;
+    uint8_t id;
     int8_t special_or_weapon_id;
-    int8_t type;
+    uint8_t type;
     int8_t category;
 };
 
