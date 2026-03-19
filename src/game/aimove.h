@@ -69,4 +69,9 @@ namespace aimove {
     void __cdecl Find_Opportunity_Attack_(int16_t player_idx, int16_t target_idx, int16_t threshold, int16_t* out_planet, int16_t* out_value, int32_t* out_ratio);
 
     void __cdecl Move_Ships_With_Possible_Intermediate_(int16_t* ship_array, int16_t dest_star, int16_t* out_star, int16_t* out_turns);
+
+    inline int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00461320})(colony_idx, player_idx);
+    }
 }

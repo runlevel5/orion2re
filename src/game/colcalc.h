@@ -364,4 +364,9 @@ namespace COLCALC {
     void __cdecl Compute_Player_Total_Known_Tech_Cost_(s_player* player);
 
     short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id);
+
+    inline int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony) {
+        using Fn = int16_t(__cdecl*)(s_colony*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004fc750})(colony);
+    }
 }

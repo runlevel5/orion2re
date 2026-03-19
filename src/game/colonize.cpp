@@ -280,7 +280,7 @@ namespace COLONIZE {
                                 } while (colony_base_ptr != nullptr);
                             }
                         } else {
-                            COLONIZE::Make_New_Colony_Or_Outpost_(best_planet_idx, player_idx);
+                            COLONIZE::Make_New_Colony_(best_planet_idx, player_idx);
 
                             if (colony_base_ptr == nullptr) {
                                 // Consumed a colony ship
@@ -312,5 +312,86 @@ namespace COLONIZE {
                 AI_Colonize_(i);
             }
         }
+    }
+
+    void __cdecl Make_New_Colony_Or_Outpost_(short planet_idx, short player_idx, short is_outpost) {
+        bool is_reused = false;
+        s_planet_data* planet = &MOX::_planet[planet_idx];
+        s_colony* colony;
+
+        if (is_outpost == 0 && planet->colony_index != -1) {
+            is_reused = true;
+            colony = &MOX::_colony[planet->colony_index];
+        } else {
+            colony = MOX::_colony;
+            while (colony->allocated_to != (int8_t)player_idx) {
+                colony++;
+            }
+        }
+
+        if (colony >= (MOX::_colony + MOX::_NUM_COLONIES)) {
+            MOX::_NUM_COLONIES = (short)(colony - MOX::_colony) + 1;
+        }
+
+        short colony_idx = (short)(colony - MOX::_colony);
+        INITGAME::Init_Colony_(colony_idx, planet_idx, (uint8_t)player_idx);
+
+        colony->allocated_to = -1;
+
+        if (is_outpost == 0) {
+            colony->n_pops = 1;
+
+            if (planet->food_per_farmer < 1 || MOX::_player[player_idx].traits[18] != 0 || MOX::_player[player_idx].traits[17] != 0) {
+                colony->pop[0] = (colony->pop[0] & 0xFFFFFEFF) | 0x80;
+            } else {
+                colony->pop[0] = colony->pop[0] & 0xFFFFFE7F;
+            }
+
+            colony->pop[0] = (colony->pop[0] & ~0x0F) | (player_idx & 0x0F);
+            colony->pop[0] = (colony->pop[0] & ~0x70) | ((player_idx << 4) & 0x70);
+            colony->pop[0] |= 0x200;
+
+            if (planet->planet_special == 6 /* ORION */) {
+                for (int i = 1; i < 4; ++i) {
+                    uint32_t p = colony->pop[i];
+                    p = p & 0xFFFFFE7F;
+                    p = (p & 0xFFFFFFF9) | 9;
+                    p = (p & ~0x70) | ((player_idx << 4) & 0x70);
+                    p |= 0x200;
+                    colony->pop[i] = p;
+                }
+                colony->n_pops = 4;
+                planet->planet_special = 0;
+                MOX::_star[planet->star_index].system_special = 0;
+            }
+
+            if (is_reused) {
+                colony->buildings[22 /* Marine Barracks? */] = 1;
+            }
+
+            COLCALC::Colony_Calculation_(colony_idx);
+            colony->just_produced = -39; /* ECON_TRADE_GOODS? */
+        } else {
+            colony->outpost_flag = 1;
+            colony->n_pops = 0;
+            colony->climate = planet->climate;
+        }
+
+        colony->producing[0] = -1;
+        COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[planet->star_index]);
+    }
+
+    /**
+     * @address 004b9820
+     */
+    void __cdecl Make_New_Colony_(int16_t planet_idx, int16_t player_idx) {
+        COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 0);
+    }
+
+    /**
+     * @address 004b9a80
+     */
+    void __cdecl Make_New_Outpost_(int16_t planet_idx, int16_t player_idx) {
+        COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 1);
     }
 }

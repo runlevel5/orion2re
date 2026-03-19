@@ -51,17 +51,17 @@ namespace COMBFIND {
 
     void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* target_player, int16_t* target_colony, int8_t* is_sneak_attack);
 
-    inline void __cdecl Get_Ship_Strength_Info_(uint32_t* bonus_info, uint32_t* our_strength, uint32_t* enemy_strength, int16_t star_idx, int16_t player_idx) {
-        using Fn = void(__cdecl*)(uint32_t*, uint32_t*, uint32_t*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bdc10});
-        fn(bonus_info, our_strength, enemy_strength, star_idx, player_idx);
-    }
+    void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_strength, uint32_t* shield_strength, int16_t star_idx, int16_t player_idx);
 
-    inline void __cdecl Get_Best_Colony_Target_(uint32_t* enemy_strength, uint32_t* our_strength, uint32_t* bonus_info, int16_t star_idx, int16_t player_idx, uint32_t* best_score, int16_t* best_colony_idx, int16_t sneak_attack_target) {
-        using Fn = void(__cdecl*)(uint32_t*, uint32_t*, uint32_t*, int16_t, int16_t, uint32_t*, int16_t*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bde70});
-        fn(enemy_strength, our_strength, bonus_info, star_idx, player_idx, best_score, best_colony_idx, sneak_attack_target);
-    }
+    void __cdecl Get_Best_Colony_Target_(
+        uint32_t* enemy_fleet_space_str_arr,
+        uint32_t* our_space_str_arr,
+        uint32_t* our_ground_str_arr,
+        int16_t star_idx,
+        int16_t player_idx,
+        uint32_t* best_score,
+        int16_t* best_colony_idx,
+        int32_t preferred_owner);
 
     void __cdecl Get_NPC_Target_(int16_t star_idx, int16_t event_type, int16_t *player_target_ptr, int16_t *colony_target_ptr);
 

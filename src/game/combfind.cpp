@@ -719,7 +719,7 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
         uint32_t our_strength[15];
         uint32_t enemy_strength[15];
 
-        COMBFIND::Get_Ship_Strength_Info_(bonus_info, our_strength, enemy_strength, star_idx, player_idx);
+        COMBFIND::Get_Ship_Strength_Info_(enemy_strength, our_strength, bonus_info, star_idx, player_idx);
 
         uint32_t best_colony_score = 0;
         int16_t best_colony_idx = -1;
@@ -1398,6 +1398,176 @@ bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx) {
         }
     }
     return false;
+}
+
+void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_strength, uint32_t* shield_strength, int16_t star_idx, int16_t player_idx) {
+    uint32_t ship_size_sum = 0;
+
+    memset(enemy_strength, 0, 15 * sizeof(uint32_t));
+    memset(player_strength, 0, 15 * sizeof(uint32_t));
+    memset(shield_strength, 0, 4 * sizeof(uint32_t));
+
+    int16_t num_ships = (int16_t)MOX::_NUM_SHIPS;
+    s_ship_data* ship = MOX::_ship;
+
+    for (int16_t i = 0; i < num_ships; ++i, ++ship) {
+        if (ship->location == star_idx && ship->status == 0) {
+            int16_t owner = (int16_t)ship->owner;
+            
+            if (player_idx == owner) {
+                ship_size_sum += (1U << ship->d.size);
+
+                for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                    if (player_idx != p) {
+                        if ((*_star_has_player)[star_idx][p].has_player != 0 ||
+                            (*_star_has_player)[star_idx][p].colony_count != 0) {
+                            player_strength[p] += aipower::Ship_Strength_Vs_Ships_(i, p);
+                        }
+                    }
+                }
+
+                for (int16_t np = 8; np < 15; ++np) {
+                    if ((((*_star_has_nonplayer)[star_idx] >> (np - 8)) & 1) != 0 &&
+                        (((*_player_needs_to_attack)[star_idx] >> np) & 1) == 0) {
+                        player_strength[np] += aipower::Ship_Strength_Vs_Ships_(i, np);
+                    }
+                }
+
+                int16_t shield[4];
+                aipower::Ship_Strength_Vs_Planetary_Shield_(i, shield);
+                
+                for (int j = 0; j < 4; ++j) {
+                    shield_strength[j] += (uint32_t)shield[j];
+                }
+            } else {
+                enemy_strength[owner] += aipower::Ship_Strength_Vs_Ships_(i, player_idx);
+            }
+        }
+    }
+
+    if (ship_size_sum > 150) {
+        for (int i = 0; i < 15; ++i) {
+            uint32_t val = player_strength[i];
+            uint32_t new_val = (val / 150) * ship_size_sum;
+            if (new_val > val) {
+                player_strength[i] = new_val;
+            }
+        }
+    }
+}
+
+void __cdecl Get_Best_Colony_Target_(
+    uint32_t* enemy_fleet_space_str_arr,
+    uint32_t* our_space_str_arr,
+    uint32_t* our_ground_str_arr,
+    int16_t star_idx,
+    int16_t player_idx,
+    uint32_t* best_score,
+    int16_t* best_colony_idx,
+    int32_t preferred_owner)
+{
+    *best_score = 0;
+    *best_colony_idx = -1;
+
+    uint32_t best_pref_score = 0;
+    int32_t best_pref_colony = -1;
+
+    if (_target.num_colony_targets > 0) {
+        for (int16_t i = 0; i < _target.num_colony_targets; ++i) {
+            int16_t colony_idx = _target.colony_targets[i];
+            s_colony* colony = &MOX::_colony[colony_idx];
+
+            int16_t shield_val = COLCALC::Colony_Planetary_Shield_(colony);
+            int32_t owner = colony->owner;
+
+            uint32_t our_space_str = our_space_str_arr[owner];
+            uint32_t our_ground_str = our_ground_str_arr[shield_val];
+
+            uint32_t enemy_space_str_vs = aipower::Colony_Space_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
+            uint32_t enemy_space_str = enemy_fleet_space_str_arr[owner] + enemy_space_str_vs;
+
+            uint32_t enemy_ground_str_vs = aipower::Colony_Ground_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
+            uint32_t enemy_ground_str = enemy_ground_str_vs;
+
+            bool player_is_omni = false;
+            if (MOX::_player[player_idx].traits[25] != 0 && MOX::_player[owner].traits[25] == 0) {
+                player_is_omni = true;
+            }
+
+            bool is_valid = false;
+            if (our_space_str != 0 || our_ground_str != 0 ||
+                (*_star_has_player)[star_idx][player_idx].has_transport != 0 ||
+                player_is_omni ||
+                colony->outpost_flag != 0)
+            {
+                if (our_space_str > enemy_space_str && our_ground_str > enemy_ground_str) {
+                    bool condition2 = ((*_star_has_player)[star_idx][owner].colony_count < 2 ||
+                                       our_ground_str != 0 ||
+                                       (*_star_has_player)[star_idx][player_idx].has_transport != 0 ||
+                                       player_is_omni);
+
+                    if (condition2 || enemy_space_str_vs != 0) {
+                        if (colony->n_pops != 1 ||
+                            (colony->pop[0] & 0xF) != player_idx ||
+                            (*_star_has_player)[star_idx][player_idx].ship_sizes[2] != 0 ||
+                            MOX::_player[player_idx].personality == 1)
+                        {
+                            is_valid = true;
+                        }
+                    }
+                }
+            }
+
+            if (is_valid) {
+                uint32_t worth = static_cast<uint32_t>(aimove::Enemy_Colony_Worth_To_Player_(colony_idx, player_idx));
+
+                if (enemy_space_str * 3 < our_space_str) {
+                    our_space_str = 3;
+                    enemy_space_str = 1;
+                } else if (our_space_str == 0) {
+                    our_space_str = 1;
+                    enemy_space_str = 1;
+                }
+
+                if (enemy_ground_str * 3 < our_ground_str) {
+                    our_ground_str = 3;
+                    enemy_ground_str = 1;
+                } else if (our_ground_str == 0) {
+                    our_ground_str = 1;
+                    enemy_ground_str = 1;
+                }
+
+                uint32_t enemy_space_str_scaled = enemy_space_str;
+                if (enemy_space_str_scaled > 0xFFFF) {
+                    enemy_space_str_scaled >>= 8;
+                    our_space_str >>= 8;
+                }
+
+                uint32_t enemy_ground_str_scaled = enemy_ground_str;
+                if (enemy_ground_str_scaled > 0xFFFF) {
+                    enemy_ground_str_scaled >>= 8;
+                    our_ground_str >>= 8;
+                }
+
+                uint32_t score = ((worth * our_space_str) / enemy_space_str_scaled * our_ground_str) / enemy_ground_str_scaled;
+
+                if (score > *best_score) {
+                    *best_score = score;
+                    *best_colony_idx = colony_idx;
+                }
+
+                if (owner == preferred_owner && score > best_pref_score) {
+                    best_pref_score = score;
+                    best_pref_colony = colony_idx;
+                }
+            }
+        }
+    }
+
+    if (preferred_owner != -1 && best_pref_colony != -1) {
+        *best_score = best_pref_score;
+        *best_colony_idx = static_cast<int16_t>(best_pref_colony);
+    }
 }
 
 } // namespace COMBFIND

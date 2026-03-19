@@ -15,9 +15,7 @@ namespace COLONIZE {
 
     void __cdecl AI_Colonize_(int16_t player_idx);
 
-    inline void __cdecl Make_New_Colony_Or_Outpost_(int16_t planet_idx, int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b9820});
-        fn(planet_idx, player_idx);
-    }
+    void __cdecl Make_New_Colony_(int16_t planet_idx, int16_t player_idx);
+    void __cdecl Make_New_Colony_Or_Outpost_(short planet_idx, short player_idx, short is_outpost);
+    void __cdecl Make_New_Outpost_(int16_t planet_idx, int16_t player_idx);
 }

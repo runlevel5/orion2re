@@ -2080,6 +2080,17 @@ namespace hooks {
         { 0x00477b20, &EVENTS::Allocate_Industrial_Accident_Hit_ },
         { 0x00477240, &EVENTS::Player_Has_Bad_Event_ },
         { 0x004761C0, &EVENTS::Determine_Event_ },
+        { 0x004b9a80, &COLONIZE::Make_New_Outpost_ },
+        { 0x004b9820, &COLONIZE::Make_New_Colony_ },
+        { 0x004B9840, &COLONIZE::Make_New_Colony_Or_Outpost_ },
+        { 0x0042ADF0, &COLXPORT::Xport_Popup_ },
+        { 0x0042b1e0, &COLXPORT::Clear_List_Col_Array_ },
+        { 0x0042b110, &COLXPORT::Draw_Xport_Popup_ },
+        { 0x0042af90, &COLXPORT::Add_Fields_ },
+        { 0x0042b200, &COLXPORT::Draw_Colony_Summary_For_Colony_ },
+        { 0x0042b330, &COLXPORT::Draw_Bar_Indicator_ },
+        { 0x004bdc10, &COMBFIND::Get_Ship_Strength_Info_ },
+        { 0x004bde70, &COMBFIND::Get_Best_Colony_Target_ },
     };
 
     void Install_Hooks()

@@ -18,4 +18,14 @@ namespace aipower {
     int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx);
 
     int16_t __cdecl Base_Generic_Ocv_(int16_t player_idx);
+
+    inline uint32_t __cdecl Colony_Space_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
+        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00509390})(colony_idx, player_idx);
+    }
+
+    inline uint32_t __cdecl Colony_Ground_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
+        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005092d0})(colony_idx, player_idx);
+    }
 }
