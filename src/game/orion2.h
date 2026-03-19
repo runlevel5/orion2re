@@ -3860,7 +3860,7 @@ struct s_skill_data {
     uint8_t skill_type;
     uint16_t strength;
     uint8_t level_up;
-    uint8_t unknown3;
+    uint8_t cost;
     char *name;
     char *format_str;
 };

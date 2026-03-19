@@ -90,7 +90,7 @@ namespace OFFICER {
                             val *= 2;
                         }
                     } else {
-                        val = (int8_t)skill.unknown3;
+                        val = (int8_t)skill.cost;
                     }
                     total_value += val;
                 }
@@ -99,13 +99,13 @@ namespace OFFICER {
             if (leader.type == 0) { // Ship Officer
                 if (skill.skill_type == 1) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
-                        total_value += (int8_t)skill.unknown3;
+                        total_value += (int8_t)skill.cost;
                     }
                 }
             } else if (leader.type == 1) { // Colony Leader
                 if (skill.skill_type == 2) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
-                        total_value += (int8_t)skill.unknown3;
+                        total_value += (int8_t)skill.cost;
                     }
                 }
             }
