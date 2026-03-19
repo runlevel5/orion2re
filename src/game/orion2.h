@@ -3855,7 +3855,7 @@ struct s_ship_node {
 typedef struct s_skill_data s_skill_data, *Ps_skill_data;
 
 struct s_skill_data {
-    uint8_t id;
+    uint8_t skill_id;
     uint skill_mask;
     uint8_t skill_type;
     uint16_t strength;
@@ -3969,7 +3969,7 @@ typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;
 
 struct s_tech_app_data {
     char *name;
-    uint16_t id;
+    uint16_t tech_app_id;
     int16_t tech_field_id;
     uint8_t unk_class;
     uint8_t ai_group;
@@ -4048,7 +4048,7 @@ typedef struct s_tech_field_data s_tech_field_data, *Ps_tech_field_data;
 
 struct s_tech_field_data {
     char *name;
-    short id;
+    short tech_field_id;
     short prev_field_id;
     short next_field_id;
     ushort tech1;

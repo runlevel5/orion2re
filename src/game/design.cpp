@@ -1271,7 +1271,7 @@ namespace DESIGN {
                     for (int16_t special_idx = 1; special_idx < 39; ++special_idx) {
                         if (device_fits) break;
 
-                        if (TECHDATA::_technology_applications[app_idx].id == TECHDATA::_specials[special_idx].tech_application_id) {
+                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_application_id) {
                             bool already_on_ship = false;
                             for (int i = 0; i < 8; ++i) {
                                 if (MOX::_design->special_devices[i] == special_idx) {
