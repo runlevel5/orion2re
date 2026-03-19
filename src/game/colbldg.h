@@ -105,6 +105,12 @@ namespace COLBLDG {
 
     void __cdecl Delete_From_Colony_Queue_(short colony_idx, short queue_idx);
 
+    inline void __cdecl Delete_Prod_From_Colony_Queue_(short colony_idx, short prod_type) {
+        using Fn = void(__cdecl*)(short, short);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050B300});
+        fn(colony_idx, prod_type);
+    }
+
     void __cdecl Delete_Ship_(short ship_index);
 
     void __cdecl Squish_Out_Colony_Queue_Slot_(short colony_idx, short queue_idx);

@@ -366,7 +366,7 @@ namespace clipped {
                         uint8_t pixel = *current_sprite_row;
                         if (pixel != 0) {
                             if (pixel >= 0xF0) {
-                                pixel = draw::_glass_lookup_table[pixel][*current_screen_row];
+                                pixel = video::_glass_remap_colors[pixel - 0xF0][*current_screen_row];
                             }
                             *current_screen_row = pixel;
                         }
@@ -499,7 +499,7 @@ namespace clipped {
                         }
                         else {
                             uint8_t background_pixel = *screen_ptr;
-                            *screen_ptr++ = draw::_glass_lookup_table[pixel][background_pixel];
+                            *screen_ptr++ = video::_glass_remap_colors[pixel - 0xF0][background_pixel];
                         }
                         run_start_abs++;
                         cursor_abs++;

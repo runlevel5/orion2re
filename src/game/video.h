@@ -18,6 +18,8 @@ namespace video {
 	inline uint32_t& _screen_pixel_size =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b0 });
 
+	inline auto& _glass_remap_colors = *reinterpret_cast<uint8_t(*)[16][256]>(std::uintptr_t{ 0x00579998 });
+
 #pragma pack(push, 1)
 	struct s_palette_entry {
 		uint8_t changed;

@@ -2043,6 +2043,8 @@ namespace hooks {
         { 0x004dd8c0, &COLONY::Reset_Step_Squish_ },
         { 0x0048d990, &COMBAT::qsort_ship_array_by_size_ },
         { 0x004bb040, &ERIC::Do_Cinematic_Popup_Cleanup_ },
+        { 0x00409020, &ERICNET::Remove_Building_ },
+        { 0x00408340, &ERICNET::Init_Homeworld_Colony2_ },
     };
 
     void Install_Hooks()

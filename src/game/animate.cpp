@@ -275,7 +275,7 @@ namespace animate {
                     }
                     else {
                         uint8_t background_pixel = video_ptr[dest_idx];
-                        video_ptr[dest_idx] = draw::_glass_lookup_table[pixel][background_pixel];
+                        video_ptr[dest_idx] = video::_glass_remap_colors[pixel - 0xF0][background_pixel];
                     }
                     dest_idx++;
                 }
@@ -312,7 +312,7 @@ namespace animate {
                             }
                             else {
                                 uint8_t existing_pixel = v_page[screen_offset];
-                                v_page[screen_offset] = draw::_glass_lookup_table[pixel][existing_pixel];
+                                v_page[screen_offset] = video::_glass_remap_colors[pixel - 0xF0][existing_pixel];
                             }
                         }
                         sprite_idx++;
@@ -389,7 +389,7 @@ namespace animate {
                         *dst = color;
                     }
                     else {
-                        *dst = draw::_glass_lookup_table[color][*dst];
+                        *dst = video::_glass_remap_colors[color - 0xF0][*dst];
                     }
 
                     current_pixel++;

@@ -2,17 +2,22 @@
 #include <cstdint>
 
 namespace ERICNET {
-    inline void __cdecl Init_Homeworld_Colony2_(int16_t colony_idx, int16_t player_idx, uint8_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408340});
-        fn(colony_idx, player_idx, flag);
+    inline int8_t* _start_civ_level = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F000});
+    inline int16_t* _buildlist = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551198});
+
+    inline void __cdecl Add_Building_(int16_t colony_idx, int16_t building_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004089C0});
+        fn(colony_idx, building_id);
     }
 
-    void __cdecl Init_Homeworld_Colony_(int16_t colony_idx, int16_t player_idx);
+    void __cdecl Init_Homeworld_Colony2_(int16_t planet_idx, int16_t player_idx, uint8_t flag);
+
+    void __cdecl Init_Homeworld_Colony_(int16_t planet_idx, int16_t player_idx);
 
     int __cdecl Mox_Play_Sound_(int16_t sound_id);
 
-    void __cdecl Init_Non_Homeworld_Colony_(int16_t colony_idx, int16_t player_idx);
+    void __cdecl Init_Non_Homeworld_Colony_(int16_t planet_idx, int16_t player_idx);
     
     void __cdecl Do_All_Ships_XP_Check_();
 
@@ -22,9 +27,5 @@ namespace ERICNET {
 
     void __cdecl Do_XP_For_Ship_(int16_t ship_index, int16_t xp_gain);
 
-    inline void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409020});
-        fn(colony_idx, building_idx);
-    }
+    void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_idx);
 }
