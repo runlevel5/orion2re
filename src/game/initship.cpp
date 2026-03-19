@@ -145,7 +145,7 @@ namespace INITSHIP {
         int16_t best_warp_index = 0;
         // Search through warp drive techs 1-6 (Nuclear to Interdimensional)
         for (int16_t i = 1; i < 7; ++i) {
-            int16_t app_idx = TECHDATA::_drives[i].tech_app;
+            int16_t app_idx = TECHDATA::_drives[i].tech_app_id;
             // Status 3 indicates that the technology has been researched
             if (MOX::_player[player_idx].tech_applications[app_idx] == 3) {
                 best_warp_index = i;
@@ -164,7 +164,7 @@ namespace INITSHIP {
         int16_t speed = 0;
 
         if (player_idx < 8) {
-            speed = TECHDATA::_drives[drive_idx].speed;
+            speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 return speed + 2;
@@ -192,12 +192,12 @@ namespace INITSHIP {
                     int16_t old_ftl = static_cast<int16_t>(ship->d.ftl_type);
                     int8_t ship_size = ship->d.size;
 
-                    int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+                    int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_min[ship_size];
 
                     ship->d.ftl_type = static_cast<int8_t>(best_ftl);
                     ship->d.speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl));
 
-                    int8_t new_bonus = TECHDATA::_drives[best_ftl].combat_speed_modifier[ship_size];
+                    int8_t new_bonus = TECHDATA::_drives[best_ftl].combat_speed_min[ship_size];
                     ship->d.combat_speed = (ship->d.combat_speed - old_bonus) + new_bonus;
                 }
 
@@ -222,12 +222,12 @@ namespace INITSHIP {
                 int8_t ship_size = design->size;
 
                 // Adjust combat speed based on the bonus difference between old and new drives
-                int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+                int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_min[ship_size];
 
                 design->ftl_type = static_cast<int8_t>(best_ftl_type);
                 design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl_type));
 
-                int8_t new_bonus = TECHDATA::_drives[best_ftl_type].combat_speed_modifier[ship_size];
+                int8_t new_bonus = TECHDATA::_drives[best_ftl_type].combat_speed_min[ship_size];
                 design->combat_speed = (design->combat_speed - old_bonus) + new_bonus;
             }
 
@@ -396,7 +396,7 @@ namespace INITSHIP {
         design->previous_owner = 8;
         design->cost = 500;
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
@@ -449,7 +449,7 @@ namespace INITSHIP {
         design->previous_owner = 8;
         design->cost = 500;
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
@@ -530,7 +530,7 @@ namespace INITSHIP {
         design->picture_num = 3;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
@@ -596,7 +596,7 @@ namespace INITSHIP {
         design->picture_num = 2;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
@@ -682,7 +682,7 @@ namespace INITSHIP {
         design->picture_num = 4;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size) {
@@ -729,10 +729,10 @@ namespace INITSHIP {
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
         design->picture_num = 45;
 
-        design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].speed;
+        design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].warp_speed;
         design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, player_idx);
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
@@ -754,9 +754,9 @@ namespace INITSHIP {
                 if (ship.owner < 8 && ship.status == 0) {
                     int16_t best_ftl = best_warp_drives[(uint8_t)ship.owner];
                     if (best_ftl != (int16_t)ship.d.ftl_type) {
-                        int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+                        int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_min[(uint8_t)ship.d.size];
                         ship.d.ftl_type = (int8_t)best_ftl;
-                        int8_t new_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+                        int8_t new_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_min[(uint8_t)ship.d.size];
 
                         ship.d.combat_speed = (ship.d.combat_speed - old_modifier) + new_modifier;
                     }
@@ -1476,7 +1476,7 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->armor_remaining = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 0;
     ship->is_retreating = 0;
 
@@ -1556,7 +1556,7 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->armor_remaining = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 1;
     ship->is_retreating = 0;
 
@@ -1693,7 +1693,7 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
     ship->armor_remaining = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 2;
     ship->is_retreating = 0;
 
@@ -1808,7 +1808,7 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
     ship->armor_remaining = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 3;
     ship->is_retreating = 0;
 
@@ -1949,7 +1949,7 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
     ship->structure_max = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].structure / 100);
     ship->armor_remaining = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].armor_absorption / 100);
     ship->structure_damage = 0;
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 4;
     ship->is_retreating = 0;
 
@@ -2015,7 +2015,7 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     struct_::Set_Bit_Field_(design->special_device_flags, 18);
 
     int16_t drive_idx = Best_Warp_Drive_(9);
-    design->combat_speed = TECHDATA::_drives[drive_idx].combat_speed_modifier[(uint8_t)design->size];
+    design->combat_speed = TECHDATA::_drives[drive_idx].combat_speed_min[(uint8_t)design->size];
     design->cost = 0;
     design->picture_num = 7;
     design->previous_owner = 9;
@@ -2046,7 +2046,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
         design->picture_num = 8;
         design->ship_weapon[0].type = 45;
         design->ship_weapon[1].type = 23;
-        design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_min[design->size];
     } else {
         design->size = 2;
         design->ship_type = 0;
@@ -2063,7 +2063,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
         design->picture_num = 20;
         design->ship_weapon[0].type = 45;
         int16_t best_drive = Best_Warp_Drive_(10);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
     }
 
     struct_::Set_Bit_Field_(design->special_device_flags, 39 /* 0x27 */);
@@ -2102,7 +2102,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
         design->ship_weapon[1].type = 26;
         design->ship_weapon[0].specials = 2;
         design->picture_num = 9;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
         // Guardian variant
         design->armor_type = 0;
@@ -2123,7 +2123,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
         design->ship_weapon[1].current_count = 5;
         int16_t best_drive = Best_Warp_Drive_(11);
         design->picture_num = 21;
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[2];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[2];
     }
 
     design->previous_owner = 11;
@@ -2159,7 +2159,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster)
         design->ship_weapon[1].count = 1;
         design->ship_weapon[1].current_count = 1;
 
-        int8_t modifier = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        int8_t modifier = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
         design->picture_num = 10;
         design->combat_speed = modifier + 4;
     } else {
@@ -2182,7 +2182,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster)
         design->ship_weapon[1].current_count = 1;
 
         int16_t best_drive = Best_Warp_Drive_(12);
-        int8_t modifier = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        int8_t modifier = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
         design->picture_num = 22;
         design->combat_speed = modifier + 4;
     }
@@ -2222,7 +2222,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel
         design->ship_weapon[0].firing_arc = 15 /* ARC_360 */;
 
         design->picture_num = 11;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size] + 8;
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 8;
     } else {
         design->armor_type = 0;
         int16_t best_warp = INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
@@ -2242,7 +2242,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel
 
         design->picture_num = 23;
         // Lookup uses Best_Warp_Drive directly regardless of ftl_type field
-        design->combat_speed = TECHDATA::_drives[best_warp].combat_speed_modifier[design->size] + 8;
+        design->combat_speed = TECHDATA::_drives[best_warp].combat_speed_min[design->size] + 8;
     }
 
     design->previous_owner = 13 /* PLAYER_MONSTER */;
@@ -2270,7 +2270,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) 
         design->ship_weapon[0].count = 5;
         design->ship_weapon[0].current_count = 5;
         design->picture_num = 12;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
         design->size = 2;
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(14);
@@ -2284,7 +2284,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) 
         design->picture_num = 24;
 
         int16_t best_drive = INITSHIP::Best_Warp_Drive_(14);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
     }
 
     struct_::Set_Bit_Field_(design->special_device_flags, 10);

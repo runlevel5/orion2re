@@ -121,7 +121,7 @@ namespace aitech {
         // Index 0 (Nuclear Engine) is the fallback value and is not explicitly checked.
         while (drive_idx > 0) {
             // tech_app maps the drive to its corresponding entry in the tech_applications array.
-            int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app;
+            int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app_id;
 
             if (player->tech_applications[tech_app_idx] == 3) {
                 return drive_idx;

@@ -865,7 +865,7 @@ namespace aidesign {
             Add_Bomb_Weapon_To_Design_(player_idx, design, &weapon_slot_idx, current_budget + (int16_t)((remaining_space * table->bombs) / 100));
         }
 
-        design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_modifier[hull_idx];
+        design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[hull_idx];
         design->previous_owner = (int8_t)player_idx;
         design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
         design->date_of_design = (uint16_t)MOX::_stardate;

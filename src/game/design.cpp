@@ -16,7 +16,7 @@ namespace DESIGN {
         }
 
         d->ftl_type = INITSHIP::Best_Warp_Drive_(player_idx);
-        d->drive_speed = TECHDATA::_drives[d->ftl_type].speed;
+        d->drive_speed = TECHDATA::_drives[d->ftl_type].warp_speed;
         d->ship_size = static_cast<int16_t>(static_cast<int8_t>(Current_Design_Size_(player_idx, design_idx)));
         d->hull_space = DESIGN::Total_Design_Space_();
         d->computer_type = INITSHIP::Best_Computer_(player_idx);
@@ -92,7 +92,7 @@ namespace DESIGN {
         *dst = '\0';
 
         local_design.ftl_type = static_cast<int16_t>(ship_design->ftl_type);
-        local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].speed;
+        local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].warp_speed;
         local_design.ship_size = static_cast<int16_t>(ship_design->size);
 
         local_design.hull_space = DESIGN::Total_Design_Space_();
@@ -163,11 +163,11 @@ namespace DESIGN {
     }
 
     int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design) {
-        return TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->ship_size];
+        return TECHDATA::_drives[design->ftl_type].combat_speed_min[design->ship_size];
     }
 
     int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
-        return TECHDATA::_drives[design->ftl_type].speed_modifier[design->ship_size];
+        return TECHDATA::_drives[design->ftl_type].combat_speed_max[design->ship_size];
     }
 
     int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
@@ -287,7 +287,7 @@ namespace DESIGN {
 
         // Calculate Drive Cost
         int16_t drive_idx = design->ftl_type;
-        int16_t drive_tech_level = Tech_Level_(player_idx, TECHDATA::_drives[drive_idx].tech_app);
+        int16_t drive_tech_level = Tech_Level_(player_idx, TECHDATA::_drives[drive_idx].tech_app_id);
         int16_t drive_base = TECHDATA::_drives[drive_idx].cost_per_ship_type[design->ship_size];
         design->drive_cost = Cost_Given_M_Level_(drive_base, drive_tech_level);
 
@@ -365,7 +365,7 @@ namespace DESIGN {
 
         // Calculate FTL drive space
         int16_t ftl_type = design->ftl_type;
-        int16_t drive_tech_app = TECHDATA::_drives[ftl_type].tech_app;
+        int16_t drive_tech_app = TECHDATA::_drives[ftl_type].tech_app_id;
         uint8_t drive_min_cat = static_cast<uint8_t>(Miniaturization_Category_(drive_tech_app));
         int16_t drive_tech_level = Tech_Level_(player_num, drive_tech_app);
 
@@ -931,7 +931,7 @@ namespace DESIGN {
         s_current_design* design = _design;
 
         design->ftl_type = INITSHIP::Best_Warp_Drive_(player_num);
-        design->drive_speed = TECHDATA::_drives[design->ftl_type].speed;
+        design->drive_speed = TECHDATA::_drives[design->ftl_type].warp_speed;
 
         design->computer_type = INITSHIP::Best_Computer_(player_num);
         design->armor_type = INITSHIP::Best_Armor_(player_num);

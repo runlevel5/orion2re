@@ -4035,13 +4035,13 @@ typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;
 
 struct s_tech_drive_data {
     char *name;
-    short drive_id;
-    short tech_app;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    int8_t combat_speed_modifier[6];
-    int8_t speed_modifier[6];
-    short speed;
+    uint16_t drive_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint8_t combat_speed_min[6];
+    uint8_t combat_speed_max[6];
+    uint16_t warp_speed;
 };
 
 typedef struct s_tech_field_data s_tech_field_data, *Ps_tech_field_data;

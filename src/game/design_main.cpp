@@ -30,7 +30,7 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].speed);
+        _sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].warp_speed);
         fonts::Print_(0xFB, 0x47, buffer);
 
         _sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), Current_Design_Combat_Speed_(MOX::_design));
