@@ -42,8 +42,8 @@ namespace OFFICER {
         }
 
         int32_t current_level_val = static_cast<int32_t>(level) + 1;
-        int32_t skill_div = static_cast<int32_t>(MOX::_skill_data[skill_idx].unknown2);
-        int32_t bonus_base = static_cast<int32_t>(MOX::_skill_data[skill_idx].skill_bonus);
+        int32_t skill_div = static_cast<int32_t>(MOX::_skill_data[skill_idx].level_up);
+        int32_t bonus_base = static_cast<int32_t>(MOX::_skill_data[skill_idx].strength);
 
         int32_t intermediate = (current_level_val + skill_div - 1) / skill_div;
 
@@ -80,7 +80,7 @@ namespace OFFICER {
         for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
             s_skill_data& skill = MOX::_skill_data[skill_idx];
 
-            if (skill.unknown1 == 0) {
+            if (skill.skill_type == 0) {
                 if (OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                     int16_t val;
                     if (skill_idx == 2 || skill_idx == 3) {
@@ -97,13 +97,13 @@ namespace OFFICER {
             }
 
             if (leader.type == 0) { // Ship Officer
-                if (skill.unknown1 == 1) {
+                if (skill.skill_type == 1) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                         total_value += (int8_t)skill.unknown3;
                     }
                 }
             } else if (leader.type == 1) { // Colony Leader
-                if (skill.unknown1 == 2) {
+                if (skill.skill_type == 2) {
                     if (OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, leader_index, skill_idx)) {
                         total_value += (int8_t)skill.unknown3;
                     }
@@ -150,7 +150,7 @@ namespace OFFICER {
             for (int j = 0; j < 54; j += 2) {
                 if (current_class == 0) {
                     // Search for secondary skills
-                    if (MOX::_skill_data[j].unknown1 == 0 &&
+                    if (MOX::_skill_data[j].skill_type == 0 &&
                         ((*secondary_mask & MOX::_skill_data[j].skill_mask) == 0) &&
                         ((*secondary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {
@@ -165,7 +165,7 @@ namespace OFFICER {
                     }
                 } else {
                     // Search for primary skills of specific class
-                    if ((int16_t)MOX::_skill_data[j].unknown1 == skill_class &&
+                    if ((int16_t)MOX::_skill_data[j].skill_type == skill_class &&
                         ((*primary_mask & MOX::_skill_data[j].skill_mask) == 0) &&
                         ((*primary_mask & MOX::_skill_data[j + 1].skill_mask) == 0)) 
                     {

@@ -3855,12 +3855,12 @@ struct s_ship_node {
 typedef struct s_skill_data s_skill_data, *Ps_skill_data;
 
 struct s_skill_data {
-    byte num;
+    uint8_t id;
     uint skill_mask;
-    byte unknown1;
-    int16_t skill_bonus;
-    byte unknown2;
-    byte unknown3;
+    uint8_t skill_type;
+    uint16_t strength;
+    uint8_t level_up;
+    uint8_t unknown3;
     char *name;
     char *format_str;
 };
