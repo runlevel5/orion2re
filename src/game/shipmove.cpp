@@ -112,7 +112,7 @@ namespace SHIPMOVE {
      */
     void __cdecl Update_Player_Ship_Range_(s_player* player) {
         for (int i = 5; i >= 1; --i) {
-            int16_t tech_idx = TECHDATA::_fuel[i].tech_app;
+            int16_t tech_idx = TECHDATA::_fuel[i].tech_app_id;
 
             // Check if the tech application for this fuel tier is fully researched (level 3)
             if (player->tech_applications[tech_idx] == 3) {

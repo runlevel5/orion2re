@@ -112,7 +112,7 @@ namespace INITSHIP {
         for (int16_t i = 0; i < 6; ++i) {
             // Check if player has researched this fuel technology (application value 3)
             // and if it provides a better range than the current best.
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app_id] == 3) {
                 if (TECHDATA::_fuel[i].ship_range > best_range) {
                     best_range = TECHDATA::_fuel[i].ship_range;
                     best_fuel_idx = i;

@@ -68,7 +68,7 @@ namespace aitech {
         int fuel_idx = 5;
 
         while (fuel_idx > 0) {
-            int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app;
+            int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app_id;
             if (player->tech_applications[tech_idx] == 3) {
                 return fuel_idx;
             }

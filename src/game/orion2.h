@@ -4063,9 +4063,9 @@ typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
 
 struct s_tech_fuel_data {
     char *name;
-    short fuel_id;
-    short tech_app;
-    short ship_range;
+    uint16_t fuel_id;
+    uint16_t tech_app_id;
+    uint16_t ship_range;
 };
 
 typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
