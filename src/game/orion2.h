@@ -3969,13 +3969,13 @@ typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;
 
 struct s_tech_app_data {
     char *name;
-    ushort id;
-    short tech_field_id;
-    byte unk_class;
-    byte ai_group;
+    uint16_t id;
+    int16_t tech_field_id;
+    uint8_t unk_class;
+    uint8_t ai_group;
     byte unknown1;
-    byte in_strategic;
-    byte type;
+    uint8_t in_strategic;
+    uint8_t type;
 };
 
 typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
