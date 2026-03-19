@@ -106,7 +106,7 @@ void __cdecl Load_Display_Combat_Ship_(int16_t ship_idx) {
             : MOX::_global_combat_data.hull_size + 2;
 
         MOX::_global_combat_data.shield_points_base =
-            TECHDATA::_shields[MOX::_global_combat_data.shield_type].points_blocked * shield_hull_mult * 5;
+            TECHDATA::_shields[MOX::_global_combat_data.shield_type].shield_class * shield_hull_mult * 5;
 
         if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 20)) {
             if (!struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, 20)) {
@@ -401,7 +401,7 @@ int16_t __cdecl Calc_Combat_Shield_Max_(int16_t ship_idx) {
         }
 
         // Calculation uses base shield blocking points multiplied by ship size factor and global multiplier 5
-        max_shield = TECHDATA::_shields[shield_type].points_blocked * multiplier * 5;
+        max_shield = TECHDATA::_shields[shield_type].shield_class * multiplier * 5;
 
         // Shields are suppressed in a nebula unless the ship has specific warp/shield stabilization (Special 13)
         if (MOX::_in_nebula_flag != 0) {
@@ -1451,7 +1451,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
     }
 
     int16_t shield_id = INITSHIP::Best_Ship_Shield_(MOX::_combat_defender_player);
-    MOX::_combat_data->shield_arc_current[0] += TECHDATA::_shields[shield_id].points_blocked;
+    MOX::_combat_data->shield_arc_current[0] += TECHDATA::_shields[shield_id].shield_class;
 
     MOX::_combat_data->computer_type = INITSHIP::Best_Computer_(MOX::_colony[colony_idx].owner);
     MOX::_combat_data->armor_type = INITSHIP::Best_Armor_(MOX::_colony[colony_idx].owner);

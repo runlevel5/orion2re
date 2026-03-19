@@ -4093,11 +4093,11 @@ typedef struct s_tech_shield_data s_tech_shield_data, *Ps_tech_shield_data;
 
 struct s_tech_shield_data {
     char *name;
-    ushort shield_id;
-    short tech_app_id;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    short points_blocked;
+    uint16_t shield_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint16_t shield_class;
     undefined field6_0x22;
     undefined field7_0x23;
     undefined field8_0x24;
@@ -4122,7 +4122,7 @@ struct s_tech_shield_data {
     undefined field27_0x37;
     undefined field28_0x38;
     undefined field29_0x39;
-    byte unk_strat_value;
+    uint8_t unk_strat_value;
 };
 
 typedef struct s_tech_specials_data s_tech_specials_data, *Ps_tech_specials_data;

@@ -483,7 +483,7 @@ namespace DESIGN {
             multiplier = design->ship_size + 2;
         }
 
-        int16_t strength = TECHDATA::_shields[design->shield].points_blocked * multiplier * 5;
+        int16_t strength = TECHDATA::_shields[design->shield].shield_class * multiplier * 5;
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_MULTI_PHASED_SHIELDS)) {
             strength = (int16_t)((strength * 3) / 2);
@@ -516,7 +516,7 @@ namespace DESIGN {
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {
         int16_t shield_idx = MOX::_design->shield;
 
-        int16_t blocked_points = TECHDATA::_shields[shield_idx].points_blocked;
+        int16_t blocked_points = TECHDATA::_shields[shield_idx].shield_class;
 
         if (Current_Design_Has_Special_System_(MOX::_design, SPECIAL_HARD_SHIELDS)) {
             blocked_points += 3;

@@ -63,7 +63,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
                 int16_t blocked = 0;
                 if (MOX::_combat_data[target_idx].shield_current_hits > 0) {
                     int8_t shield_type = MOX::_combat_data[target_idx].shield_type;
-                    blocked = TECHDATA::_shields[shield_type].points_blocked;
+                    blocked = TECHDATA::_shields[shield_type].shield_class;
                 }
                 if (COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) != 0) {
                     blocked += 3;
@@ -72,7 +72,7 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
                     ((specials & 0x40) != 0 && COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, SPECIAL_HARD_SHIELDS) == 0)) {
                     blocked = 0;
                 }
-                points_blocked = (int32_t)blocked;
+               points_blocked = (int32_t)blocked;
             }
         } else {
             points_blocked = 0;
@@ -123,8 +123,8 @@ int32_t __cdecl Expected_Beam_Bomb_Damage_(int16_t ship_idx, int16_t weapon_slot
             min_damage /= 4;
             max_damage /= 4;
         } else {
-            min_damage -= TECHDATA::_shields[shield_id].points_blocked;
-            max_damage -= TECHDATA::_shields[shield_id].points_blocked;
+            min_damage -= TECHDATA::_shields[shield_id].shield_class;
+            max_damage -= TECHDATA::_shields[shield_id].shield_class;
         }
         if (min_damage < 0) {
             min_damage = 0;
@@ -191,7 +191,7 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
                 int min_dam = TECHDATA::_weapons[weapon_id].min_damage;
                 int max_dam = TECHDATA::_weapons[weapon_id].damage;
                 int avg_dam = (min_dam + max_dam) / 2;
-                int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].points_blocked;
+                int blocked = TECHDATA::_shields[MOX::_combat_data[target_idx].shield_type].shield_class;
                 int size_mult = MOX::_combat_data[target_idx].size_class + 1;
 
                 switch (weapon_id) {
@@ -459,7 +459,7 @@ int16_t __cdecl Will_Missile_Do_Damage_(int16_t target_idx, int16_t missile_idx)
     int16_t points_blocked = 0;
     s_combat_data* target = &MOX::_combat_data[target_idx];
     if (target->shield_current_hits > 0) {
-        points_blocked = TECHDATA::_shields[target->shield_type].points_blocked;
+       points_blocked = TECHDATA::_shields[target->shield_type].shield_class;
     }
 
     return damage > points_blocked;
@@ -1900,7 +1900,7 @@ int16_t __cdecl Expected_Missile_Damage_(int16_t target_ship_idx, int16_t weapon
     } else {
         s_combat_data* target_ship = &MOX::_combat_data[target_ship_idx];
         if (target_ship->shield_current_hits > 0) {
-            shield_reduction = TECHDATA::_shields[target_ship->shield_type].points_blocked;
+            shield_reduction = TECHDATA::_shields[target_ship->shield_type].shield_class;
         }
 
         if (COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, SPECIAL_HARD_SHIELDS) != 0) {
@@ -2037,7 +2037,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     if (unit_idx == 0) {
         shield_blocked = MOX::_combat_data[0].shield_arc_current[0];
     } else {
-        shield_blocked = TECHDATA::_shields[MOX::_combat_data[unit_idx].shield_type].points_blocked;
+        shield_blocked = TECHDATA::_shields[MOX::_combat_data[unit_idx].shield_type].shield_class;
     }
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(unit_idx, 7)) {
@@ -2107,7 +2107,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
     if (best_shield == 7) {
         shield_points = 100;
     } else {
-        shield_points = TECHDATA::_shields[best_shield].points_blocked;
+        shield_points = TECHDATA::_shields[best_shield].shield_class;
     }
 
     *beam_strength = 0;

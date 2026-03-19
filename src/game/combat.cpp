@@ -965,7 +965,7 @@ namespace COMBAT {
             applied_damage = damage / 4;
         } else {
             // Normal shields block a flat amount of damage.
-            applied_damage = damage - TECHDATA::_shields[ship->shield_id].points_blocked;
+            applied_damage = damage - TECHDATA::_shields[ship->shield_id].shield_class;
         }
 
         if (applied_damage < 0) {

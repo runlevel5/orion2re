@@ -22,7 +22,7 @@ namespace aipower {
         }
 
         int16_t shield_idx = INITSHIP::Best_Ship_Shield_(player_idx);
-        return TECHDATA::_shields[shield_idx].points_blocked;
+        return TECHDATA::_shields[shield_idx].shield_class;
     }
 
     /**
