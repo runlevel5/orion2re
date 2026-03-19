@@ -22,7 +22,7 @@ namespace aipower {
         }
 
         int16_t shield_idx = INITSHIP::Best_Ship_Shield_(player_idx);
-        return TECHDATA::_shields[shield_idx].points_blocked;
+        return TECHDATA::_shields[shield_idx].shield_class;
     }
 
     /**
@@ -68,7 +68,7 @@ namespace aipower {
                     count *= 3;
                 }
 
-                int16_t damage = TECHDATA::_weapons[weapon_type].damage;
+                int16_t damage = TECHDATA::_weapons[weapon_type].max_damage;
                 if (slot_specials & 0x02) {
                     damage += (int16_t)(((damage * 5 + 5) * 10) / 100);
                 } else if (slot_specials & 0x04) {
@@ -79,11 +79,11 @@ namespace aipower {
                 if (adjusted_damage < 1) adjusted_damage = 0;
                 slot_strength = adjusted_damage * count;
             } else {
-                slot_strength = (int32_t)TECHDATA::_weapons[weapon_type].damage * (int32_t)count;
+                slot_strength = (int32_t)TECHDATA::_weapons[weapon_type].max_damage * (int32_t)count;
             }
 
             if (slot_strength != 0) {
-                int8_t rack_type = TECHDATA::_weapons[weapon_type].rack;
+                int8_t rack_type = TECHDATA::_weapons[weapon_type].type;
                 switch (rack_type) {
                     case 0: {
                         int16_t hit_chance = (attack_bonus - defense_bonus) + 50;
@@ -162,14 +162,14 @@ namespace aipower {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
             int hull_type = (int)ship->d.size;
-            int16_t base_hits = TECHDATA::_hull_data[hull_type].base_structure;
+            int16_t base_hits = TECHDATA::_hull_data[hull_type].strat_hits;
 
             int16_t best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
             if (best_armor_idx > 0) {
                 // The original code performs a second call to Best_Armor_ if result is positive
                 best_armor_idx = INITSHIP::Best_Armor_((int16_t)ship->owner);
 
-                int absorption_pct = (int)TECHDATA::_armor[best_armor_idx].armor_absorption_percent;
+                int absorption_pct = (int)TECHDATA::_armor[best_armor_idx].ships_bonus;
 
                 // bonus = (absorption_percent * base_hits) / 100
                 int16_t bonus_hits = (int16_t)((absorption_pct * (int)base_hits) / 100);
@@ -238,12 +238,12 @@ namespace aipower {
                 int16_t weapon_type = MOX::_ship[ship_idx].d.ship_weapon[i].type;
                 if (weapon_type > 0) {
                     int16_t weapon_damage;
-                    uint8_t rack_type = TECHDATA::_weapons[weapon_type].rack;
+                    uint8_t rack_type = TECHDATA::_weapons[weapon_type].type;
 
                     if (rack_type == 0 || rack_type == 2) {
-                        weapon_damage = TECHDATA::_weapons[weapon_type].damage / 2;
+                        weapon_damage = TECHDATA::_weapons[weapon_type].max_damage / 2;
                     } else {
-                        weapon_damage = TECHDATA::_weapons[weapon_type].damage;
+                        weapon_damage = TECHDATA::_weapons[weapon_type].max_damage;
                     }
 
                     int32_t count = MOX::_ship[ship_idx].d.ship_weapon[i].current_count;

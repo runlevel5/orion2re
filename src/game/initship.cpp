@@ -112,7 +112,7 @@ namespace INITSHIP {
         for (int16_t i = 0; i < 6; ++i) {
             // Check if player has researched this fuel technology (application value 3)
             // and if it provides a better range than the current best.
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_fuel[i].tech_app_id] == 3) {
                 if (TECHDATA::_fuel[i].ship_range > best_range) {
                     best_range = TECHDATA::_fuel[i].ship_range;
                     best_fuel_idx = i;
@@ -145,7 +145,7 @@ namespace INITSHIP {
         int16_t best_warp_index = 0;
         // Search through warp drive techs 1-6 (Nuclear to Interdimensional)
         for (int16_t i = 1; i < 7; ++i) {
-            int16_t app_idx = TECHDATA::_drives[i].tech_app;
+            int16_t app_idx = TECHDATA::_drives[i].tech_app_id;
             // Status 3 indicates that the technology has been researched
             if (MOX::_player[player_idx].tech_applications[app_idx] == 3) {
                 best_warp_index = i;
@@ -164,7 +164,7 @@ namespace INITSHIP {
         int16_t speed = 0;
 
         if (player_idx < 8) {
-            speed = TECHDATA::_drives[drive_idx].speed;
+            speed = TECHDATA::_drives[drive_idx].warp_speed;
 
             if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
                 return speed + 2;
@@ -192,12 +192,12 @@ namespace INITSHIP {
                     int16_t old_ftl = static_cast<int16_t>(ship->d.ftl_type);
                     int8_t ship_size = ship->d.size;
 
-                    int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+                    int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_min[ship_size];
 
                     ship->d.ftl_type = static_cast<int8_t>(best_ftl);
                     ship->d.speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl));
 
-                    int8_t new_bonus = TECHDATA::_drives[best_ftl].combat_speed_modifier[ship_size];
+                    int8_t new_bonus = TECHDATA::_drives[best_ftl].combat_speed_min[ship_size];
                     ship->d.combat_speed = (ship->d.combat_speed - old_bonus) + new_bonus;
                 }
 
@@ -222,12 +222,12 @@ namespace INITSHIP {
                 int8_t ship_size = design->size;
 
                 // Adjust combat speed based on the bonus difference between old and new drives
-                int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_modifier[ship_size];
+                int8_t old_bonus = TECHDATA::_drives[old_ftl].combat_speed_min[ship_size];
 
                 design->ftl_type = static_cast<int8_t>(best_ftl_type);
                 design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, best_ftl_type));
 
-                int8_t new_bonus = TECHDATA::_drives[best_ftl_type].combat_speed_modifier[ship_size];
+                int8_t new_bonus = TECHDATA::_drives[best_ftl_type].combat_speed_min[ship_size];
                 design->combat_speed = (design->combat_speed - old_bonus) + new_bonus;
             }
 
@@ -270,7 +270,7 @@ namespace INITSHIP {
         int16_t best_computer_idx = 0;
 
         for (int16_t i = 1; i < 6; ++i) {
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app] == 3) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_computers[i].tech_app_id] == 3) {
                 best_computer_idx = i;
             }
         }
@@ -315,8 +315,8 @@ namespace INITSHIP {
     int16_t __cdecl Get_Structure_(int16_t hull_index, bool is_fort, int16_t armor_tech) {
         int16_t armor_idx = Best_Armor_(armor_tech);
 
-        int16_t base_structure = TECHDATA::_hull_data[hull_index].structure;
-        int16_t absorption_pct = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+        int16_t base_structure = TECHDATA::_hull_data[hull_index].structure_hp;
+        int16_t absorption_pct = TECHDATA::_armor[armor_idx].ships_bonus;
 
         // Formula: base_structure + (absorption_pct * base_structure) / 100
         int32_t bonus = (static_cast<int32_t>(absorption_pct) * static_cast<int32_t>(base_structure)) / 100;
@@ -396,7 +396,7 @@ namespace INITSHIP {
         design->previous_owner = 8;
         design->cost = 500;
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Medium_Antaran_Design_(s_ship_design* design) {
@@ -449,7 +449,7 @@ namespace INITSHIP {
         design->previous_owner = 8;
         design->cost = 500;
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Huge_Antaran_Design_(s_ship_design* design) {
@@ -530,7 +530,7 @@ namespace INITSHIP {
         design->picture_num = 3;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
@@ -596,7 +596,7 @@ namespace INITSHIP {
         design->picture_num = 2;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
@@ -682,7 +682,7 @@ namespace INITSHIP {
         design->picture_num = 4;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size) {
@@ -729,10 +729,10 @@ namespace INITSHIP {
         struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
         design->picture_num = 45;
 
-        design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].speed;
+        design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].warp_speed;
         design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(SHIP_TYPE_COLONY, player_idx);
 
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
@@ -754,9 +754,9 @@ namespace INITSHIP {
                 if (ship.owner < 8 && ship.status == 0) {
                     int16_t best_ftl = best_warp_drives[(uint8_t)ship.owner];
                     if (best_ftl != (int16_t)ship.d.ftl_type) {
-                        int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+                        int8_t old_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_min[(uint8_t)ship.d.size];
                         ship.d.ftl_type = (int8_t)best_ftl;
-                        int8_t new_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_modifier[(uint8_t)ship.d.size];
+                        int8_t new_modifier = TECHDATA::_drives[ship.d.ftl_type].combat_speed_min[(uint8_t)ship.d.size];
 
                         ship.d.combat_speed = (ship.d.combat_speed - old_modifier) + new_modifier;
                     }
@@ -780,8 +780,8 @@ namespace INITSHIP {
     int16_t __cdecl Get_Ship_Armor_Hits_(int16_t ship_idx) {
         s_ship_data* ship = &MOX::_ship[ship_idx];
 
-        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].armor_absorption_percent;
-        int16_t hull_absorption = TECHDATA::_hull_data[(uint8_t)ship->d.size].armor_absorption;
+        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].ships_bonus;
+        int16_t hull_absorption = TECHDATA::_hull_data[(uint8_t)ship->d.size].armor_hp;
 
         bool has_special_armor = struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
 
@@ -891,7 +891,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Cost_Of_Strategic_Design_(int16_t govt_type, s_ship_design* design) {
-        int32_t reduced_cost = (TECHDATA::_hull_data[design->size].hull_space * 3) / 2;
+        int32_t reduced_cost = (TECHDATA::_hull_data[design->size].cost * 3) / 2;
 
         DESIGN::Cost_Reduction_For_Govt_Type_(govt_type, &reduced_cost);
 
@@ -931,12 +931,12 @@ namespace INITSHIP {
         for (int16_t i = 0; i < 40; ++i) {
             // Check if player has researched/learned this weapon (level 3)
             // and ensure it is a beam weapon (rack == 0)
-            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_application_id] == 3 &&
-                TECHDATA::_weapons[i].rack == 0) {
+            if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3 &&
+                TECHDATA::_weapons[i].type == 0) {
 
                 // Track weapon with highest damage
-                if (TECHDATA::_weapons[i].damage > max_damage) {
-                    max_damage = TECHDATA::_weapons[i].damage;
+                if (TECHDATA::_weapons[i].max_damage > max_damage) {
+                    max_damage = TECHDATA::_weapons[i].max_damage;
                     best_weapon_idx = i;
                 }
             }
@@ -953,12 +953,12 @@ namespace INITSHIP {
         if (player_idx < 8) {
             for (int16_t i = 0; i < 40; ++i) {
                 // check if player has researched the weapon (value 3 usually means fully researched/available)
-                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_application_id] == 3) {
+                if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
                     // check if weapon is a missile (rack 1 or 2)
-                    if (TECHDATA::_weapons[i].rack == 1 || TECHDATA::_weapons[i].rack == 2) {
-                        if (max_damage < TECHDATA::_weapons[i].damage) {
+                    if (TECHDATA::_weapons[i].type == 1 || TECHDATA::_weapons[i].type == 2) {
+                        if (max_damage < TECHDATA::_weapons[i].max_damage) {
                             best_idx = i;
-                            max_damage = TECHDATA::_weapons[i].damage;
+                            max_damage = TECHDATA::_weapons[i].max_damage;
                         }
                     }
                 }
@@ -996,11 +996,11 @@ namespace INITSHIP {
             for (int16_t i = 0; i < 40; ++i) {
                 const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 /* TECH_STATE_RESEARCHED */ &&
-                    (weapon.specials & 0x4 /* WPN_SPECIAL_POINT_DEFENSE */) != 0 &&
-                    weapon.rack == 0 /* WPN_RACK_NORMAL */)
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 /* TECH_STATE_RESEARCHED */ &&
+                    (weapon.available_mods & 0x4 /* WPN_SPECIAL_POINT_DEFENSE */) != 0 &&
+                    weapon.type == 0 /* WPN_RACK_NORMAL */)
                 {
-                    int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, weapon.tech_application_id);
+                    int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, weapon.tech_app_id);
 
                     if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
                         int16_t current_dmg = Point_Defense_Damage_Per_Space_(i, player_idx);
@@ -1019,7 +1019,7 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Point_Defense_Damage_Per_Space_(int16_t weapon_idx, int16_t player_idx) {
-        int16_t damage = TECHDATA::_weapons[weapon_idx].damage;
+        int16_t damage = TECHDATA::_weapons[weapon_idx].max_damage;
         int32_t space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 1, 1, 4);
         int32_t scaled_damage = (int32_t)damage * 100;
         return (int16_t)(scaled_damage / space) + damage;
@@ -1029,11 +1029,11 @@ namespace INITSHIP {
         int16_t has_special = (int16_t)struct_::Test_Bit_Field_(d.special_device_flags, 27 /* 0x1b */);
 
         if (MOX::_settings.strategic_combat_flag != 0) {
-            return TECHDATA::_hull_data[(int16_t)d.size].base_structure;
+            return TECHDATA::_hull_data[(int16_t)d.size].strat_hits;
         }
 
-        int16_t base_structure = TECHDATA::_hull_data[(int16_t)d.size].structure;
-        int16_t absorption = TECHDATA::_armor[(uint8_t)d.armor_type].armor_absorption_percent;
+        int16_t base_structure = TECHDATA::_hull_data[(int16_t)d.size].structure_hp;
+        int16_t absorption = TECHDATA::_armor[(uint8_t)d.armor_type].ships_bonus;
 
         // Calculate structure bonus from armor
         int32_t total_structure = base_structure + (absorption * base_structure) / 100;
@@ -1053,11 +1053,11 @@ namespace INITSHIP {
         if (player_idx < 8) {
             for (int i = 0; i < 40; ++i) {
                 const auto& weapon = TECHDATA::_weapons[i];
-                if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 &&
-                    weapon.rack == 1 &&
-                    weapon.damage > max_damage) {
+                if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+                    weapon.type == 1 &&
+                    weapon.max_damage > max_damage) {
                     best_weapon_idx = (int16_t)i;
-                    max_damage = weapon.damage;
+                    max_damage = weapon.max_damage;
                 }
             }
             return best_weapon_idx;
@@ -1106,12 +1106,12 @@ namespace INITSHIP {
             s_player& player = MOX::_player[player_idx];
 
             // Check if player knows the weapon technology (3 = TECH_STATE_KNOWN)
-            if (player.tech_applications[weapon.tech_application_id] == 3) {
+            if (player.tech_applications[weapon.tech_app_id] == 3) {
                 // Check if weapon is compatible with rack types 4 or 5
-                if (weapon.rack == 5 || weapon.rack == 4) {
-                    if ((uint8_t)weapon.ai_priority > max_priority) {
+                if (weapon.type == 5 || weapon.type == 4) {
+                    if ((uint8_t)weapon.strat_max_damage > max_priority) {
                         best_weapon = i;
-                        max_priority = (uint8_t)weapon.ai_priority;
+                        max_priority = (uint8_t)weapon.strat_max_damage;
                     }
                 }
             }
@@ -1221,15 +1221,15 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Strat_Missile_Weapon_Count_(int16_t hull_idx) {
-        return TECHDATA::_hull_data[hull_idx].missle_weapon_count;
+        return TECHDATA::_hull_data[hull_idx].strat_missile;
     }
 
     int16_t __cdecl Strat_Special_Weapon_Count_(int16_t hull_idx) {
-        return TECHDATA::_hull_data[hull_idx].special_weapon_count;
+        return TECHDATA::_hull_data[hull_idx].strat_special;
     }
 
     int16_t __cdecl Strat_Beam_Weapon_Count_(int16_t player_idx, int16_t hull_idx) {
-        int16_t weapon_count = TECHDATA::_hull_data[hull_idx].beam_weapon_count;
+        int16_t weapon_count = TECHDATA::_hull_data[hull_idx].strat_beam;
 
         if (player_idx < 8) {
             // Check for Megafluxers tech application
@@ -1261,12 +1261,12 @@ int16_t __cdecl Best_Bomb_Weapon_(int16_t player_idx) {
         const s_tech_weapon_data& weapon = TECHDATA::_weapons[i];
 
         // Check if player has the tech, if it is a bomb (rack == 3), and if it deals more damage
-        if (MOX::_player[player_idx].tech_applications[weapon.tech_application_id] == 3 &&
-            weapon.rack == 3 &&
-            weapon.damage > max_damage)
+        if (MOX::_player[player_idx].tech_applications[weapon.tech_app_id] == 3 &&
+            weapon.type == 3 &&
+            weapon.max_damage > max_damage)
         {
             best_weapon_idx = i;
-            max_damage = weapon.damage;
+            max_damage = weapon.max_damage;
         }
     }
 
@@ -1279,19 +1279,19 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
 
     if (player_idx < 8) {
         for (int16_t i = 0; i < 40; ++i) {
-            int16_t tech_app_id = TECHDATA::_weapons[i].tech_application_id;
+            int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
 
             // Check if the player has researched the weapon to full application (level 3)
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                 // Check if weapon has PD special (bit 2) and rack count is 0
-                if ((TECHDATA::_weapons[i].specials & 0x4) && (TECHDATA::_weapons[i].rack == 0)) {
+                if ((TECHDATA::_weapons[i].available_mods & 0x4) && (TECHDATA::_weapons[i].type == 0)) {
                     int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
                     
                     // Check if miniaturization level meets requirements for point defense mod
                     // modification index 2 corresponds to Point Defense modification.
                     if (mini_level >= (int16_t)TECHDATA::_weapon_modifications[2].level) {
-                        if (TECHDATA::_weapons[i].damage > max_damage) {
-                            max_damage = TECHDATA::_weapons[i].damage;
+                        if (TECHDATA::_weapons[i].max_damage > max_damage) {
+                            max_damage = TECHDATA::_weapons[i].max_damage;
                             best_weapon_idx = i;
                         }
                     }
@@ -1311,7 +1311,7 @@ int16_t __cdecl Best_Point_Defense_Weapon_(int16_t player_idx) {
  * @return The number of bomb weapon slots.
  */
 int16_t __cdecl Strat_Bomb_Weapon_Count_(int16_t hull_idx) {
-    return TECHDATA::_hull_data[hull_idx].bomb_weapon_count;
+    return TECHDATA::_hull_data[hull_idx].strat_bomb;
 }
 
 int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
@@ -1325,11 +1325,11 @@ int16_t __cdecl Best_Beam_To_Hit_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech associated with this special device
             // 3 usually corresponds to the application being learned/available
-            if (MOX::_player[player_idx].tech_applications[spec.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[spec.tech_app_id] == 3) {
                 // Check if special belongs to the correct category (1 = beam accuracy)
                 if (spec.category == 1) {
-                    if (spec.bonus_value > max_bonus) {
-                        max_bonus = spec.bonus_value;
+                    if (spec.strategic > max_bonus) {
+                        max_bonus = spec.strategic;
                         best_special_idx = special_idx;
                     }
                 }
@@ -1349,12 +1349,12 @@ int16_t __cdecl Best_Beam_Damage_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if player has fully researched the tech for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Check if the device is categorized as a beam damage special (2 or 7)
                 if (special.category == 2 || special.category == 7) {
-                    if (max_bonus < special.bonus_value) {
+                    if (max_bonus < special.strategic) {
                         best_idx = i;
-                        max_bonus = special.bonus_value;
+                        max_bonus = special.strategic;
                     }
                 }
             }
@@ -1373,12 +1373,12 @@ int16_t __cdecl Best_Beam_Defense_Special_(int16_t player_idx) {
             const s_tech_specials_data& special = TECHDATA::_specials[i];
 
             // Check if the player has researched the technology for this special device
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Category 3 and 6 represent beam defense enhancements
                 if (special.category == 3 || special.category == 6) {
-                    if (special.bonus_value > max_bonus) {
+                    if (special.strategic > max_bonus) {
                         best_special_idx = i;
-                        max_bonus = special.bonus_value;
+                        max_bonus = special.strategic;
                     }
                 }
             }
@@ -1404,11 +1404,11 @@ int16_t __cdecl Best_Missile_Defense_Special_(int16_t player_idx) {
 
             // Check if the player has researched the tech application associated with this special
             // Value 3 typically indicates the tech application is known/learned.
-            if (MOX::_player[player_idx].tech_applications[special.tech_application_id] == 3) {
+            if (MOX::_player[player_idx].tech_applications[special.tech_app_id] == 3) {
                 // Category 4 and 6 represent missile defense systems (e.g., Jammer, Lightning Field)
                 if (special.category == 4 || special.category == 6) {
-                    if (special.bonus_value > best_bonus) {
-                        best_bonus = special.bonus_value;
+                    if (special.strategic > best_bonus) {
+                        best_bonus = special.strategic;
                         best_special_idx = special_idx;
                     }
                 }
@@ -1468,15 +1468,15 @@ void __cdecl Load_Small_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
+    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6;
 
-    int16_t absorption_percent = TECHDATA::_armor[ship->armor_type].armor_absorption_percent;
-    ship->structure_max = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].structure) / 100);
-    ship->armor_remaining = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
+    int16_t absorption_percent = TECHDATA::_armor[ship->armor_type].ships_bonus;
+    ship->structure_max = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
+    ship->armor_remaining = (int16_t)(((absorption_percent + 100) * (int)TECHDATA::_hull_data[ship->size_class].armor_hp) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 0;
     ship->is_retreating = 0;
 
@@ -1547,16 +1547,16 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
+    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6;
 
-    int32_t armor_factor = TECHDATA::_armor[ship->armor_type].armor_absorption_percent + 100;
+    int32_t armor_factor = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
     
-    ship->structure_max = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].structure) / 100);
-    ship->armor_remaining = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
+    ship->structure_max = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
+    ship->armor_remaining = (int16_t)((armor_factor * TECHDATA::_hull_data[ship->size_class].armor_hp) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 1;
     ship->is_retreating = 0;
 
@@ -1685,15 +1685,15 @@ void __cdecl Load_Large_Antaran_Combat_Ship_(int16_t combat_idx) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
+    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6 /* ARMOR_NEUTRONTUIM */;
 
-    int32_t armor_boost = TECHDATA::_armor[ship->armor_type].armor_absorption_percent + 100;
-    ship->structure_max = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].structure) / 100);
-    ship->armor_remaining = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
+    int32_t armor_boost = TECHDATA::_armor[ship->armor_type].ships_bonus + 100;
+    ship->structure_max = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
+    ship->armor_remaining = (int16_t)((armor_boost * TECHDATA::_hull_data[ship->size_class].armor_hp) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 2;
     ship->is_retreating = 0;
 
@@ -1800,15 +1800,15 @@ void __cdecl Load_Huge_Antaran_Combat_Ship_(int16_t ship_idx) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marine_count;
+    ship->marine_count = (int8_t)TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6;
 
-    int32_t armor_factor = TECHDATA::_armor[6].armor_absorption_percent + 100;
-    ship->structure_max = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].structure) / 100);
-    ship->armor_remaining = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].armor_absorption) / 100);
+    int32_t armor_factor = TECHDATA::_armor[6].ships_bonus + 100;
+    ship->structure_max = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].structure_hp) / 100);
+    ship->armor_remaining = (int16_t)((armor_factor * (int)TECHDATA::_hull_data[ship->size_class].armor_hp) / 100);
     ship->structure_damage = 0;
 
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 3;
     ship->is_retreating = 0;
 
@@ -1942,14 +1942,14 @@ void __cdecl Load_Titan_Antaran_Combat_Ship_(int16_t ship_index) {
 
     ship->crew_quality = 3;
     ship->officer_idx = -1;
-    ship->marine_count = TECHDATA::_hull_data[ship->size_class].marine_count;
+    ship->marine_count = TECHDATA::_hull_data[ship->size_class].marines;
     ship->armor_type = 6;
 
-    int16_t abs_pct = TECHDATA::_armor[ship->armor_type].armor_absorption_percent;
-    ship->structure_max = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].structure / 100);
-    ship->armor_remaining = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].armor_absorption / 100);
+    int16_t abs_pct = TECHDATA::_armor[ship->armor_type].ships_bonus;
+    ship->structure_max = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].structure_hp / 100);
+    ship->armor_remaining = (int16_t)((abs_pct + 100) * TECHDATA::_hull_data[ship->size_class].armor_hp / 100);
     ship->structure_damage = 0;
-    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_modifier[ship->size_class];
+    ship->combat_speed_base = TECHDATA::_drives[ship->ftl_type].combat_speed_min[ship->size_class];
     ship->picture_num = 4;
     ship->is_retreating = 0;
 
@@ -2015,7 +2015,7 @@ void __cdecl Load_Guardian_Ship_Design_(s_ship_design* design) {
     struct_::Set_Bit_Field_(design->special_device_flags, 18);
 
     int16_t drive_idx = Best_Warp_Drive_(9);
-    design->combat_speed = TECHDATA::_drives[drive_idx].combat_speed_modifier[(uint8_t)design->size];
+    design->combat_speed = TECHDATA::_drives[drive_idx].combat_speed_min[(uint8_t)design->size];
     design->cost = 0;
     design->picture_num = 7;
     design->previous_owner = 9;
@@ -2046,7 +2046,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
         design->picture_num = 8;
         design->ship_weapon[0].type = 45;
         design->ship_weapon[1].type = 23;
-        design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[(uint8_t)design->ftl_type].combat_speed_min[design->size];
     } else {
         design->size = 2;
         design->ship_type = 0;
@@ -2063,7 +2063,7 @@ void __cdecl Load_Amoeba_Ship_Design_(s_ship_design* design, int16_t is_large) {
         design->picture_num = 20;
         design->ship_weapon[0].type = 45;
         int16_t best_drive = Best_Warp_Drive_(10);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
     }
 
     struct_::Set_Bit_Field_(design->special_device_flags, 39 /* 0x27 */);
@@ -2102,7 +2102,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
         design->ship_weapon[1].type = 26;
         design->ship_weapon[0].specials = 2;
         design->picture_num = 9;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
         // Guardian variant
         design->armor_type = 0;
@@ -2123,7 +2123,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
         design->ship_weapon[1].current_count = 5;
         int16_t best_drive = Best_Warp_Drive_(11);
         design->picture_num = 21;
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[2];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[2];
     }
 
     design->previous_owner = 11;
@@ -2159,7 +2159,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster)
         design->ship_weapon[1].count = 1;
         design->ship_weapon[1].current_count = 1;
 
-        int8_t modifier = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        int8_t modifier = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
         design->picture_num = 10;
         design->combat_speed = modifier + 4;
     } else {
@@ -2182,7 +2182,7 @@ void __cdecl Load_Dragon_Ship_Design_(s_ship_design* design, int16_t is_monster)
         design->ship_weapon[1].current_count = 1;
 
         int16_t best_drive = Best_Warp_Drive_(12);
-        int8_t modifier = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        int8_t modifier = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
         design->picture_num = 22;
         design->combat_speed = modifier + 4;
     }
@@ -2222,7 +2222,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel
         design->ship_weapon[0].firing_arc = 15 /* ARC_360 */;
 
         design->picture_num = 11;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size] + 8;
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 8;
     } else {
         design->armor_type = 0;
         int16_t best_warp = INITSHIP::Best_Warp_Drive_(13 /* TECH_WARP_DRIVE */);
@@ -2242,7 +2242,7 @@ void __cdecl Load_Eel_Ship_Design_(s_ship_design* design, int16_t is_greater_eel
 
         design->picture_num = 23;
         // Lookup uses Best_Warp_Drive directly regardless of ftl_type field
-        design->combat_speed = TECHDATA::_drives[best_warp].combat_speed_modifier[design->size] + 8;
+        design->combat_speed = TECHDATA::_drives[best_warp].combat_speed_min[design->size] + 8;
     }
 
     design->previous_owner = 13 /* PLAYER_MONSTER */;
@@ -2270,7 +2270,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) 
         design->ship_weapon[0].count = 5;
         design->ship_weapon[0].current_count = 5;
         design->picture_num = 12;
-        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     } else {
         design->size = 2;
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(14);
@@ -2284,7 +2284,7 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) 
         design->picture_num = 24;
 
         int16_t best_drive = INITSHIP::Best_Warp_Drive_(14);
-        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_modifier[design->size];
+        design->combat_speed = TECHDATA::_drives[best_drive].combat_speed_min[design->size];
     }
 
     struct_::Set_Bit_Field_(design->special_device_flags, 10);

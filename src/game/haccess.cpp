@@ -387,7 +387,7 @@ namespace HACCESS {
                 break;
             }
 
-            if (TECHDATA::_weapons[i].tech_application_id == tech_app_id) {
+            if (TECHDATA::_weapons[i].tech_app_id == tech_app_id) {
                 result_index = i;
                 found = true;
             }

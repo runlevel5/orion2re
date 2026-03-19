@@ -540,7 +540,7 @@ namespace CMBTSPEC {
 
         int32_t total_damage_accum = 0;
         if (attack_count > 0) {
-            int16_t range = TECHDATA::_weapons[34].damage - TECHDATA::_weapons[34].min_damage + 1;
+            int16_t range = TECHDATA::_weapons[34].max_damage - TECHDATA::_weapons[34].min_damage + 1;
             for (int i = 0; i < attack_count; ++i) {
                 int32_t roll = random::Random_(range);
                 int16_t base_dmg = TECHDATA::_weapons[34].min_damage + (int16_t)roll - 1;
@@ -953,7 +953,7 @@ namespace CMBTSPEC {
         int16_t total_damage = 0;
         int16_t total_struct_damage = 0;
         int16_t bonus = MOX::_ordnance_bonus[MOX::_combat_data[attacker_idx].owner];
-        int16_t base_damage = TECHDATA::_weapons[38].damage;
+        int16_t base_damage = TECHDATA::_weapons[38].max_damage;
         int16_t damage_per_hit = (bonus * num_shots * base_damage) / 100;
 
         for (int16_t i = 0; i < 4; ++i) {
@@ -1085,7 +1085,7 @@ namespace CMBTSPEC {
 
         int16_t ord_bonus = MOX::_ordnance_bonus[source_ship->owner];
         int16_t min_dmg = (TECHDATA::_weapons[weapon_id].min_damage * ord_bonus) / 100;
-        int16_t max_dmg = (TECHDATA::_weapons[weapon_id].damage * ord_bonus) / 100;
+        int16_t max_dmg = (TECHDATA::_weapons[weapon_id].max_damage * ord_bonus) / 100;
         int16_t diff = max_dmg - min_dmg;
 
         if (shots_left > 0) {
@@ -1758,8 +1758,8 @@ namespace CMBTSPEC {
 
         for (int32_t i = 0; i < 300; ++i) {
             if (MOX::_missile[i].type > 0 &&
-                TECHDATA::_weapons[MOX::_missile[i].type].rack != 2 &&
-                (TECHDATA::_weapons[MOX::_missile[i].type].rack != 4 || random::Random_(2) != 1))
+                TECHDATA::_weapons[MOX::_missile[i].type].type != 2 &&
+                (TECHDATA::_weapons[MOX::_missile[i].type].type != 4 || random::Random_(2) != 1))
             {
                 int32_t mx = (int32_t)MOX::_missile[i].x + (int32_t)MOX::_cur_combat_x * -20;
                 int32_t my = (int32_t)MOX::_missile[i].y + (int32_t)MOX::_cur_combat_y * -20;
@@ -1776,21 +1776,21 @@ namespace CMBTSPEC {
 
                     if (sfx_type == 0) {
                         for (int16_t k = 0; k < param_5; ++k) {
-                            damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].damage -
+                            damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
                                 TECHDATA::_weapons[44].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
                     }
                     else if (sfx_type == 1) {
                         for (int16_t k = 0; k < param_5; ++k) {
-                            damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].damage -
+                            damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
                                 TECHDATA::_weapons[36].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
                     }
                     else if (sfx_type == 2) {
                         for (int16_t k = 0; k < param_5; ++k) {
-                            damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].damage -
+                            damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
                                 TECHDATA::_weapons[13].min_damage + 1) - 1;
                         }
                         damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
@@ -1825,21 +1825,21 @@ namespace CMBTSPEC {
 
             if (sfx_type == 0) {
                 for (int16_t k = 0; k < param_5; ++k) {
-                    damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].damage -
+                    damage += TECHDATA::_weapons[44].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[44].max_damage -
                         TECHDATA::_weapons[44].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
             }
             else if (sfx_type == 1) {
                 for (int16_t k = 0; k < param_5; ++k) {
-                    damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].damage -
+                    damage += TECHDATA::_weapons[36].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[36].max_damage -
                         TECHDATA::_weapons[36].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);
             }
             else if (sfx_type == 2) {
                 for (int16_t k = 0; k < param_5; ++k) {
-                    damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].damage -
+                    damage += TECHDATA::_weapons[13].min_damage + (int16_t)random::Random_(TECHDATA::_weapons[13].max_damage -
                         TECHDATA::_weapons[13].min_damage + 1) - 1;
                 }
                 damage = (int16_t)((MOX::_ordnance_bonus[MOX::_combat_data[param_1].owner] * damage) / 100);

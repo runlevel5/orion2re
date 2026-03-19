@@ -18,7 +18,7 @@ namespace aidesign {
 
             if (spcl[i].type == 0) {
                 // Processing Special Device
-                int16_t tech_app_id = TECHDATA::_specials[item_id].tech_application_id;
+                int16_t tech_app_id = TECHDATA::_specials[item_id].tech_app_id;
 
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3 /* LEARNED */) {
                     if (Special_Legal_For_Design_(design, item_id)) {
@@ -50,7 +50,7 @@ namespace aidesign {
                         }
                     }
 
-                    int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_application_id;
+                    int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_app_id;
                     if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == 3 /* LEARNED */ && !already_has_fighter_bay) {
                         int16_t weapon_unit_space = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
                         int16_t max_count = space_available / weapon_unit_space;
@@ -325,9 +325,9 @@ namespace aidesign {
             int16_t type_lookup = *reinterpret_cast<const int16_t*>(&_special_device_spcl[i].type);
 
             if (type_lookup == 0) {
-                tech_app_id = TECHDATA::_specials[id_lookup].tech_application_id;
+                tech_app_id = TECHDATA::_specials[id_lookup].tech_app_id;
             } else {
-                tech_app_id = TECHDATA::_weapons[id_lookup].tech_application_id;
+                tech_app_id = TECHDATA::_weapons[id_lookup].tech_app_id;
             }
 
             if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
@@ -429,8 +429,8 @@ namespace aidesign {
         int num_candidates = 0;
 
         for (int i = 1; i < 40; ++i) {
-            if (TECHDATA::_weapons[i].rack == 3 && (TECHDATA::_weapons[i].flags & 0x80) == 0) {
-                int16_t tech_app_id = TECHDATA::_weapons[i].tech_application_id;
+            if (TECHDATA::_weapons[i].type == 3 && (TECHDATA::_weapons[i].natural_mods & 0x80) == 0) {
+                int16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
                 if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
                     candidates[num_candidates] = i;
                     int16_t field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
@@ -473,7 +473,7 @@ namespace aidesign {
 
         int i = 0;
         for (; i < num_candidates; ++i) {
-            int16_t tech_app_id = TECHDATA::_weapons[candidates[i]].tech_application_id;
+            int16_t tech_app_id = TECHDATA::_weapons[candidates[i]].tech_app_id;
             int16_t min_lvl = DESIGN::Miniaturization_Level_(player_idx, tech_app_id);
             if (min_lvl > 5) min_lvl = 5;
 
@@ -656,7 +656,7 @@ namespace aidesign {
         design->computer_type = (int8_t)INITSHIP::Best_Computer_(player_idx);
         design->armor_type = (int8_t)INITSHIP::Best_Armor_(player_idx);
 
-        remaining_space = TECHDATA::_hull_data[hull_idx].hull_size;
+        remaining_space = TECHDATA::_hull_data[hull_idx].size;
 
         // Check for Battle Pods
         if (player->tech_applications[TECH_APP_BATTLE_PODS] == 3) {
@@ -865,7 +865,7 @@ namespace aidesign {
             Add_Bomb_Weapon_To_Design_(player_idx, design, &weapon_slot_idx, current_budget + (int16_t)((remaining_space * table->bombs) / 100));
         }
 
-        design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_modifier[hull_idx];
+        design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[hull_idx];
         design->previous_owner = (int8_t)player_idx;
         design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
         design->date_of_design = (uint16_t)MOX::_stardate;
@@ -878,7 +878,7 @@ namespace aidesign {
         while (bit < 40 && result == 1) {
             if (struct_::Test_Bit_Field_(design->special_device_flags, bit)) {
                 for (int i = 0; i < 6; ++i) {
-                    if (TECHDATA::_specials[bit].field6_0x20[i] == tech_id) {
+                    if (TECHDATA::_specials[bit].exclude[i] == tech_id) {
                         result = 0;
                         break;
                     }

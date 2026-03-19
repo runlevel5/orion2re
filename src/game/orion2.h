@@ -1122,10 +1122,10 @@ struct s_combfind_target {
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {
-    ushort experience;
-    short attack;
-    short defense;
-    short ground;
+    uint16_t experience;
+    int16_t attack;
+    int16_t defense;
+    int16_t ground;
 };
 
 typedef struct s_current_design s_current_design, *Ps_current_design;
@@ -3855,12 +3855,12 @@ struct s_ship_node {
 typedef struct s_skill_data s_skill_data, *Ps_skill_data;
 
 struct s_skill_data {
-    byte num;
+    uint8_t skill_id;
     uint skill_mask;
-    byte unknown1;
-    int16_t skill_bonus;
-    byte unknown2;
-    byte unknown3;
+    uint8_t skill_type;
+    uint16_t strength;
+    uint8_t level_up;
+    uint8_t cost;
     char *name;
     char *format_str;
 };
@@ -3895,9 +3895,9 @@ struct s_sound_index {
 typedef struct s_spcl s_spcl, *Ps_spcl;
 
 struct s_spcl {
-    int8_t id;
+    uint8_t id;
     int8_t special_or_weapon_id;
-    int8_t type;
+    uint8_t type;
     int8_t category;
 };
 
@@ -3969,13 +3969,13 @@ typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;
 
 struct s_tech_app_data {
     char *name;
-    ushort id;
-    short tech_field_id;
-    byte unk_class;
-    byte ai_group;
+    uint16_t tech_app_id;
+    int16_t tech_field_id;
+    uint8_t unk_class;
+    uint8_t ai_group;
     byte unknown1;
-    byte in_strategic;
-    byte type;
+    uint8_t in_strategic;
+    uint8_t type;
 };
 
 typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
@@ -3986,8 +3986,8 @@ struct s_tech_armor_data {
     short tech_app_id; /* Type 'TECH_APP' was deleted */
     undefined field3_0x8;
     uint8_t troops_bonus;
-    short armor_absorption_percent;
-    short cost;
+    uint16_t ships_bonus;
+    uint16_t cost_percent;
     uint8_t strategic_hp;
 };
 
@@ -4011,10 +4011,10 @@ typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data
 
 struct s_tech_computer_data {
     char *name;
-    short computer_id;
-    short tech_app;
-    short cost_by_ship_type[6];
-    short bonus;
+    uint16_t computer_id;
+    uint16_t tech_app_id;
+    uint16_t cost_by_ship_type[6];
+    uint16_t bonus;
 };
 
 typedef struct s_tech_data_personal_shield s_tech_data_personal_shield, *Ps_tech_data_personal_shield;
@@ -4035,20 +4035,20 @@ typedef struct s_tech_drive_data s_tech_drive_data, *Ps_tech_drive_data;
 
 struct s_tech_drive_data {
     char *name;
-    short drive_id;
-    short tech_app;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    int8_t combat_speed_modifier[6];
-    int8_t speed_modifier[6];
-    short speed;
+    uint16_t drive_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint8_t combat_speed_min[6];
+    uint8_t combat_speed_max[6];
+    uint16_t warp_speed;
 };
 
 typedef struct s_tech_field_data s_tech_field_data, *Ps_tech_field_data;
 
 struct s_tech_field_data {
     char *name;
-    short id;
+    short tech_field_id;
     short prev_field_id;
     short next_field_id;
     ushort tech1;
@@ -4063,29 +4063,28 @@ typedef struct s_tech_fuel_data s_tech_fuel_data, *Ps_tech_fuel_data;
 
 struct s_tech_fuel_data {
     char *name;
-    short fuel_id;
-    short tech_app;
-    short ship_range;
+    uint16_t fuel_id;
+    uint16_t tech_app_id;
+    uint16_t ship_range;
 };
 
 typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
 
 struct s_tech_hull_data {
-    short hull_space;
-    short hull_size;
-    undefined1 marine_count; /* Created by Rename Structure Field action */
-    undefined field3_0x5;
-    short armor_absorption;
-    short structure;
-    short computer_hits;
-    short drive_hits;
-    short shield_hits;
-    short beam_weapon_count;
-    short missle_weapon_count;
-    short special_weapon_count;
-    short bomb_weapon_count;
-    short base_beam_defense;
-    short base_structure;
+    uint16_t cost;
+    uint16_t size;
+    uint16_t marines;
+    uint16_t armor_hp;
+    uint16_t structure_hp;
+    uint16_t computer_hp;
+    uint16_t drive_hp;
+    uint16_t shield_hp;
+    uint16_t strat_beam;
+    uint16_t strat_missile;
+    uint16_t strat_special;
+    uint16_t strat_bomb;
+    int16_t strat_def_bonus;
+    uint16_t strat_hits;
     char *name;
     char *size_name;
 };
@@ -4094,11 +4093,11 @@ typedef struct s_tech_shield_data s_tech_shield_data, *Ps_tech_shield_data;
 
 struct s_tech_shield_data {
     char *name;
-    ushort shield_id;
-    short tech_app_id;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    short points_blocked;
+    uint16_t shield_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint16_t shield_class;
     undefined field6_0x22;
     undefined field7_0x23;
     undefined field8_0x24;
@@ -4123,21 +4122,20 @@ struct s_tech_shield_data {
     undefined field27_0x37;
     undefined field28_0x38;
     undefined field29_0x39;
-    byte unk_strat_value;
+    uint8_t unk_strat_value;
 };
 
 typedef struct s_tech_specials_data s_tech_specials_data, *Ps_tech_specials_data;
 
 struct s_tech_specials_data {
     char *name;
-    undefined field1_0x4;
-    undefined field2_0x5;
-    short tech_application_id;
-    short space_per_ship_type[6];
-    short cost_per_ship_type[6];
-    short field6_0x20[6];
+    uint16_t special_id;
+    uint16_t tech_app_id;
+    uint16_t space_per_ship_type[6];
+    uint16_t cost_per_ship_type[6];
+    uint16_t exclude[6];
     int8_t category;
-    int16_t bonus_value;
+    int16_t strategic;
 };
 
 typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;
@@ -4145,31 +4143,30 @@ typedef struct s_tech_weapon_data s_tech_weapon_data, *Ps_tech_weapon_data;
 struct s_tech_weapon_data {
     char *name;
     char *name_plural;
-    undefined field2_0x8;
-    undefined field3_0x9;
-    short tech_application_id;
-    sbyte rack;
-    int8_t base_ammo;
-    short base_size;
-    short cost;
-    ushort flags;
-    short min_damage;
-    short damage;
-    undefined field12_0x18;
-    undefined1 ai_priority; /* Created by Rename Structure Field action */
-    uint16_t specials;
+    uint16_t weapon_id;
+    uint16_t tech_app_id;
+    uint8_t type;
+    int8_t ammo;
+    uint16_t size;
+    uint16_t cost;
+    uint16_t natural_mods; // mods that are inherent to the weapon, e.g. neutron blaster always kills marines
+    uint16_t min_damage;
+    uint16_t max_damage;
+    uint8_t strat_min_damage;
+    uint8_t strat_max_damage;
+    uint16_t available_mods;
 };
 
 typedef struct s_tech_weapon_mod_data s_tech_weapon_mod_data, *Ps_tech_weapon_mod_data;
 
 struct s_tech_weapon_mod_data {
-    char *name0;
     char *name;
+    char *name_plural;
     uint8_t mod_id;
     uint8_t level;
-    short bonus1;
-    short bonus2;
-    undefined field6_0xe;
+    int16_t cost;
+    int16_t space;
+    uint8_t col5;
 };
 
 typedef struct s_techdata_planetary_shield s_techdata_planetary_shield, *Ps_techdata_planetary_shield;

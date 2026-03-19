@@ -1062,18 +1062,18 @@ namespace COMBAT1 {
             }
 
             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 16 /* 0x10 */) != 0) {
-                if (TECHDATA::_weapons[slot->weapon_id].rack == 0 && slot->status != 1) {
+                if (TECHDATA::_weapons[slot->weapon_id].type == 0 && slot->status != 1) {
                     slot->status = 2;
                 }
             }
 
             if (COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 12 /* 0x0C */) != 0) {
-                if (TECHDATA::_weapons[slot->weapon_id].rack == 1 && slot->status != 1) {
+                if (TECHDATA::_weapons[slot->weapon_id].type == 1 && slot->status != 1) {
                     slot->status = 2;
                 }
             }
 
-            if (slot->weapon_id > 0 && TECHDATA::_weapons[slot->weapon_id].rack == 2) {
+            if (slot->weapon_id > 0 && TECHDATA::_weapons[slot->weapon_id].type == 2) {
                 if (slot->ammo > 0) {
                     slot->ammo--;
                 }
@@ -1808,7 +1808,7 @@ namespace COMBAT1 {
                 }
 
                 if (resolve_flag == 1) {
-                    if (TECHDATA::_weapons[missile->type].rack != 4 /* FIGHTER */ || missile->is_active == 1) {
+                    if (TECHDATA::_weapons[missile->type].type != 4 /* FIGHTER */ || missile->is_active == 1) {
                         resolved_missile_idx[resolve_count] = i;
                         resolved_target_idx[resolve_count] = target_idx;
                         resolve_count++;
@@ -1855,7 +1855,7 @@ namespace COMBAT1 {
             s_missile* missile = &MOX::_missile[k];
             int16_t target_idx = missile->target_unit_idx;
 
-            if (missile->type < 1 || TECHDATA::_weapons[missile->type].rack == 4 /* FIGHTER */ || 
+            if (missile->type < 1 || TECHDATA::_weapons[missile->type].type == 4 /* FIGHTER */ || 
                 missile->fighter_count == -1 || missile->is_anti_missile_rocket != 0) {
                 if (missile->fighter_count == -1) {
                     missile->fighter_count = 0;
@@ -2104,7 +2104,7 @@ namespace COMBAT1 {
         if (MOX::_ship_status_display == 0) {
             for (int i = 0; i < 8; ++i) {
                 int16_t weapon_id = MOX::_combat_data[MOX::_cur_ship].weapons[i].weapon_id;
-                int16_t tech_app_id = TECHDATA::_weapons[weapon_id].tech_application_id;
+                int16_t tech_app_id = TECHDATA::_weapons[weapon_id].tech_app_id;
                 if (tech_app_id == 0) {
                     tech_app_id = -1;
                 }
@@ -2115,7 +2115,7 @@ namespace COMBAT1 {
             int16_t specials_found = 0;
             for (int i = 0; i < 39; ++i) {
                 if (struct_::Test_Bit_Field_(MOX::_combat_data[MOX::_cur_ship].special_device_flags, i) == 1) {
-                    int16_t tech_app_id = TECHDATA::_specials[i].tech_application_id;
+                    int16_t tech_app_id = TECHDATA::_specials[i].tech_app_id;
                     MOX::_help_entry_list[(ship_info_base_idx + specials_found) * 5 + 0] = tech_app_id;
                     specials_found++;
                 }

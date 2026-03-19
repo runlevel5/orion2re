@@ -16,7 +16,7 @@ namespace DESIGN {
         }
 
         d->ftl_type = INITSHIP::Best_Warp_Drive_(player_idx);
-        d->drive_speed = TECHDATA::_drives[d->ftl_type].speed;
+        d->drive_speed = TECHDATA::_drives[d->ftl_type].warp_speed;
         d->ship_size = static_cast<int16_t>(static_cast<int8_t>(Current_Design_Size_(player_idx, design_idx)));
         d->hull_space = DESIGN::Total_Design_Space_();
         d->computer_type = INITSHIP::Best_Computer_(player_idx);
@@ -92,7 +92,7 @@ namespace DESIGN {
         *dst = '\0';
 
         local_design.ftl_type = static_cast<int16_t>(ship_design->ftl_type);
-        local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].speed;
+        local_design.drive_speed = TECHDATA::_drives[local_design.ftl_type].warp_speed;
         local_design.ship_size = static_cast<int16_t>(ship_design->size);
 
         local_design.hull_space = DESIGN::Total_Design_Space_();
@@ -163,11 +163,11 @@ namespace DESIGN {
     }
 
     int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design) {
-        return TECHDATA::_drives[design->ftl_type].combat_speed_modifier[design->ship_size];
+        return TECHDATA::_drives[design->ftl_type].combat_speed_min[design->ship_size];
     }
 
     int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
-        return TECHDATA::_drives[design->ftl_type].speed_modifier[design->ship_size];
+        return TECHDATA::_drives[design->ftl_type].combat_speed_max[design->ship_size];
     }
 
     int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
@@ -241,7 +241,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Space_() {
         // Access hull_size from TECHDATA::_hull_data array based on current design's ship size
-        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].hull_size);
+        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].size);
 
         if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
             // Apply 25% hull space bonus: (hull_size * 125) / 100
@@ -287,13 +287,13 @@ namespace DESIGN {
 
         // Calculate Drive Cost
         int16_t drive_idx = design->ftl_type;
-        int16_t drive_tech_level = Tech_Level_(player_idx, TECHDATA::_drives[drive_idx].tech_app);
+        int16_t drive_tech_level = Tech_Level_(player_idx, TECHDATA::_drives[drive_idx].tech_app_id);
         int16_t drive_base = TECHDATA::_drives[drive_idx].cost_per_ship_type[design->ship_size];
         design->drive_cost = Cost_Given_M_Level_(drive_base, drive_tech_level);
 
         // Calculate Armor Cost (Scaled by hull space and divided by 100)
-        int32_t hull_space = TECHDATA::_hull_data[design->ship_size].hull_space;
-        int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost;
+        int32_t hull_space = TECHDATA::_hull_data[design->ship_size].cost;
+        int32_t armor_unit_cost = TECHDATA::_armor[design->armor_type].cost_percent;
         design->armor_cost = static_cast<int16_t>((hull_space * armor_unit_cost) / 100);
 
         // Calculate Weapon Costs
@@ -317,7 +317,7 @@ namespace DESIGN {
                 if (special_idx == 4) { // Special logic for specific device ID 4 (Reinforced Hull?)
                     design->special_device_cost[i] = base_cost;
                 } else {
-                    int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_application_id);
+                    int16_t special_tech_level = Tech_Level_(player_idx, TECHDATA::_specials[special_idx].tech_app_id);
                     design->special_device_cost[i] = Cost_Given_M_Level_(base_cost, special_tech_level);
                 }
             }
@@ -325,7 +325,7 @@ namespace DESIGN {
 
         // Calculate Computer Cost
         int16_t computer_idx = design->computer_type;
-        int16_t comp_tech_level = Tech_Level_(player_idx, TECHDATA::_computers[computer_idx].tech_app);
+        int16_t comp_tech_level = Tech_Level_(player_idx, TECHDATA::_computers[computer_idx].tech_app_id);
         int16_t comp_base = Computer_Cost_(computer_idx);
         design->computer_cost = Cost_Given_M_Level_(comp_base, comp_tech_level);
     }
@@ -347,7 +347,7 @@ namespace DESIGN {
             }
         }
 
-        int total_cost = (int)TECHDATA::_hull_data[_design->ship_size].hull_space +
+        int total_cost = (int)TECHDATA::_hull_data[_design->ship_size].cost +
                          (int)_design->computer_cost +
                          (int)_design->drive_cost +
                          (int)_design->armor_cost +
@@ -365,7 +365,7 @@ namespace DESIGN {
 
         // Calculate FTL drive space
         int16_t ftl_type = design->ftl_type;
-        int16_t drive_tech_app = TECHDATA::_drives[ftl_type].tech_app;
+        int16_t drive_tech_app = TECHDATA::_drives[ftl_type].tech_app_id;
         uint8_t drive_min_cat = static_cast<uint8_t>(Miniaturization_Category_(drive_tech_app));
         int16_t drive_tech_level = Tech_Level_(player_num, drive_tech_app);
 
@@ -399,7 +399,7 @@ namespace DESIGN {
                     // Device 4 has fixed space requirements (not miniaturized)
                     design->special_device_space[i] = TECHDATA::_specials[4].space_per_ship_type[design->ship_size];
                 } else {
-                    int16_t tech_app = TECHDATA::_specials[device_id].tech_application_id;
+                    int16_t tech_app = TECHDATA::_specials[device_id].tech_app_id;
                     uint8_t min_cat = static_cast<uint8_t>(Miniaturization_Category_(tech_app));
                     int16_t tech_level = Tech_Level_(player_num, tech_app);
 
@@ -461,9 +461,9 @@ namespace DESIGN {
     int16_t __cdecl Current_Design_Armor_Absorption_() {
         s_current_design* design = MOX::_design;
 
-        int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_absorption;
+        int16_t base_absorption = TECHDATA::_hull_data[design->ship_size].armor_hp;
 
-        int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].armor_absorption_percent;
+        int32_t bonus_percent = (int32_t)TECHDATA::_armor[design->armor_type].ships_bonus;
         int16_t total_absorption = base_absorption + (int16_t)((int32_t)base_absorption * bonus_percent / 100);
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_HEAVY_ARMOR)) {
@@ -483,7 +483,7 @@ namespace DESIGN {
             multiplier = design->ship_size + 2;
         }
 
-        int16_t strength = TECHDATA::_shields[design->shield].points_blocked * multiplier * 5;
+        int16_t strength = TECHDATA::_shields[design->shield].shield_class * multiplier * 5;
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_MULTI_PHASED_SHIELDS)) {
             strength = (int16_t)((strength * 3) / 2);
@@ -516,7 +516,7 @@ namespace DESIGN {
     int16_t __cdecl Current_Shield_Damage_Points_Blocked_() {
         int16_t shield_idx = MOX::_design->shield;
 
-        int16_t blocked_points = TECHDATA::_shields[shield_idx].points_blocked;
+        int16_t blocked_points = TECHDATA::_shields[shield_idx].shield_class;
 
         if (Current_Design_Has_Special_System_(MOX::_design, SPECIAL_HARD_SHIELDS)) {
             blocked_points += 3;
@@ -580,7 +580,7 @@ namespace DESIGN {
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
                                   uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size) {
-        int16_t base_size = TECHDATA::_weapons[weapon_idx].base_size;
+        int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
         int32_t rack_size = 0;
 
         if (Weapon_Needs_Racks_(weapon_idx) != 0) {
@@ -599,7 +599,7 @@ namespace DESIGN {
         int16_t regular_mod_add;
         Bonus_For_Regular_Mods_(mod_flags, &dummy_out, &regular_mod_add);
 
-        int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_application_id;
+        int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
         uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
         int16_t tech_level = Tech_Level_(player_idx, tech_app_id);
 
@@ -642,7 +642,7 @@ namespace DESIGN {
 
         int32_t total_modified_cost = (static_cast<int32_t>(space_bonus) + regular_bonus_pct + 100) * base_scaled_cost / 100;
 
-        int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_application_id);
+        int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_app_id);
 
         return (int32_t)Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
     }
@@ -842,7 +842,7 @@ namespace DESIGN {
             } else if (clicked_field + weapon_field_id == 0) {
                 int16_t weapon_type = MOX::_design->weapon_type[i];
                 if (weapon_type > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_application_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_weapons[weapon_type].tech_app_id);
                     TEXTBOX::Text_Box_(TECHDATA::_weapons[weapon_type].name, description_buffer);
                 }
             }
@@ -884,7 +884,7 @@ namespace DESIGN {
             } else if ((field_id + clicked_field_id == 0)) {
                 int16_t special_id = MOX::_design->special_devices[i];
                 if (special_id > 0) {
-                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_application_id);
+                    EVANHELP::Get_Application_Description_(description_buffer, TECHDATA::_specials[special_id].tech_app_id);
 
                     const char* title = *reinterpret_cast<const char**>(&TECHDATA::_specials[special_id]);
                     TEXTBOX::Text_Box_(title, description_buffer);
@@ -931,7 +931,7 @@ namespace DESIGN {
         s_current_design* design = _design;
 
         design->ftl_type = INITSHIP::Best_Warp_Drive_(player_num);
-        design->drive_speed = TECHDATA::_drives[design->ftl_type].speed;
+        design->drive_speed = TECHDATA::_drives[design->ftl_type].warp_speed;
 
         design->computer_type = INITSHIP::Best_Computer_(player_num);
         design->armor_type = INITSHIP::Best_Armor_(player_num);
@@ -1154,11 +1154,11 @@ namespace DESIGN {
     int16_t __cdecl One_Weapon_Space_(int16_t weapon_id) {
         int16_t needs_racks = Weapon_Needs_Racks_(weapon_id);
 
-        int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_application_id;
+        int16_t tech_id = TECHDATA::_weapons[weapon_id].tech_app_id;
         uint8_t category = static_cast<uint8_t>(Miniaturization_Category_(tech_id));
         int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
-        int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].base_size;
+        int16_t base_weapon_size = TECHDATA::_weapons[weapon_id].size;
         int16_t space_req = static_cast<int16_t>(Space_Given_M_Level_(base_weapon_size, tech_lvl, category));
 
         if (needs_racks != 0) {
@@ -1271,7 +1271,7 @@ namespace DESIGN {
                     for (int16_t special_idx = 1; special_idx < 39; ++special_idx) {
                         if (device_fits) break;
 
-                        if (TECHDATA::_technology_applications[app_idx].id == TECHDATA::_specials[special_idx].tech_application_id) {
+                        if (TECHDATA::_technology_applications[app_idx].tech_app_id == TECHDATA::_specials[special_idx].tech_app_id) {
                             bool already_on_ship = false;
                             for (int i = 0; i < 8; ++i) {
                                 if (MOX::_design->special_devices[i] == special_idx) {
@@ -1281,7 +1281,7 @@ namespace DESIGN {
                             }
 
                             if (!already_on_ship) {
-                                uint16_t tech_id = TECHDATA::_specials[special_idx].tech_application_id;
+                                uint16_t tech_id = TECHDATA::_specials[special_idx].tech_app_id;
                                 uint8_t category = (uint8_t)Miniaturization_Category_(tech_id);
                                 int16_t tech_lvl = Tech_Level_(MOX::_PLAYER_NUM, tech_id);
 
@@ -1322,14 +1322,14 @@ namespace DESIGN {
 
         if (category == 3) { // Weapon Category
             for (int16_t i = 0; i < 40; ++i) {
-                if (TECHDATA::_weapons[i].tech_application_id == app_id) {
+                if (TECHDATA::_weapons[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
                 }
             }
         } else if (category == 9) { // Special Equipment Category
             for (int16_t i = 0; i < 39; ++i) {
-                if (TECHDATA::_specials[i].tech_application_id == app_id) {
+                if (TECHDATA::_specials[i].tech_app_id == app_id) {
                     result_id = i;
                     break;
                 }
@@ -1558,25 +1558,25 @@ namespace DESIGN {
         auto& app = TECHDATA::_technology_applications[tech_app];
 
         if (app.type == 3) {
-            if (tech_app == TECHDATA::_weapons[31].tech_application_id ||
-                tech_app == TECHDATA::_weapons[30].tech_application_id ||
-                tech_app == TECHDATA::_weapons[28].tech_application_id ||
-                tech_app == TECHDATA::_weapons[29].tech_application_id) {
+            if (tech_app == TECHDATA::_weapons[31].tech_app_id ||
+                tech_app == TECHDATA::_weapons[30].tech_app_id ||
+                tech_app == TECHDATA::_weapons[28].tech_app_id ||
+                tech_app == TECHDATA::_weapons[29].tech_app_id) {
                 return 2;
             }
 
             int16_t weapon_idx = HACCESS::Weapons_Index_From_Tech_App_(tech_app);
-            int8_t rack = TECHDATA::_weapons[weapon_idx].rack;
+            int8_t rack = TECHDATA::_weapons[weapon_idx].type;
 
             if (rack == 3 || rack == 1 || rack == 0) {
                 return 0;
             }
         } else if (app.type == 9) {
-            if (tech_app == TECHDATA::_specials[2].tech_application_id ||
-                tech_app == TECHDATA::_specials[27].tech_application_id ||
-                tech_app == TECHDATA::_specials[11].tech_application_id ||
-                tech_app == TECHDATA::_specials[14].tech_application_id ||
-                tech_app == TECHDATA::_specials[36].tech_application_id) {
+            if (tech_app == TECHDATA::_specials[2].tech_app_id ||
+                tech_app == TECHDATA::_specials[27].tech_app_id ||
+                tech_app == TECHDATA::_specials[11].tech_app_id ||
+                tech_app == TECHDATA::_specials[14].tech_app_id ||
+                tech_app == TECHDATA::_specials[36].tech_app_id) {
                 return 2;
             }
             return 1;
@@ -1591,15 +1591,15 @@ namespace DESIGN {
 
         if ((flags & 0x2) != 0) {
             int16_t index = MISC::Bit_Value_To_Num_(2, 15);
-            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
-            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+            *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].space;
             return;
         }
 
         if ((flags & 0x4) != 0) {
             int16_t index = MISC::Bit_Value_To_Num_(4, 15);
-            *bonus1_out += TECHDATA::_weapon_modifications[index].bonus1;
-            *bonus2_out += TECHDATA::_weapon_modifications[index].bonus2;
+            *bonus1_out += TECHDATA::_weapon_modifications[index].cost;
+            *bonus2_out += TECHDATA::_weapon_modifications[index].space;
         }
     }
 
@@ -1621,74 +1621,74 @@ namespace DESIGN {
 
         if (mods & 0x4000 /* WEAPON_MOD_FLAG_OVERLOADED */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x4000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0008 /* WEAPON_MOD_FLAG_ARMOR_PIERCING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0008, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0010 /* WEAPON_MOD_FLAG_CONTINUOUS */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0010, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0020 /* WEAPON_MOD_FLAG_NO_RANGE_DISSIPATION */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0020, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0040 /* WEAPON_MOD_FLAG_SHIELD_PIERCING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0040, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0080 /* WEAPON_MOD_FLAG_AUTO_FIRE */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0080, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0100 /* WEAPON_MOD_FLAG_ENVELOPING */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0100, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0200 /* WEAPON_MOD_FLAG_MIRV */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0200, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0400 /* WEAPON_MOD_FLAG_ECCM */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0400, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x0800 /* WEAPON_MOD_FLAG_HEAVILY_ARMORED */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x0800, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x1000 /* WEAPON_MOD_FLAG_FAST */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x1000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
 
         if (mods & 0x2000 /* WEAPON_MOD_FLAG_EMISSION_GUIDANCE */) {
             int16_t idx = MISC::Bit_Value_To_Num_(0x2000, 15);
-            *bonus1 += TECHDATA::_weapon_modifications[idx].bonus1;
-            *bonus2 += TECHDATA::_weapon_modifications[idx].bonus2;
+            *bonus1 += TECHDATA::_weapon_modifications[idx].cost;
+            *bonus2 += TECHDATA::_weapon_modifications[idx].space;
         }
     }
 

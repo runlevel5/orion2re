@@ -928,7 +928,7 @@ namespace CMBTDRW1 {
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 int16_t armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
-                int32_t absorption = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+                int32_t absorption = TECHDATA::_armor[armor_idx].ships_bonus;
                 int32_t denom = ((absorption * 4 + 400) * 25) / 100;
                 int16_t bar_len = ((struct_dmg * 88) / denom) / 2;
 
@@ -976,8 +976,8 @@ namespace CMBTDRW1 {
                 hull_size = MOX::_combat_data[ship_idx].size_class;
             }
 
-            int16_t hull_armor = TECHDATA::_hull_data[hull_size].armor_absorption;
-            int16_t armor_percent = TECHDATA::_armor[MOX::_combat_data[ship_idx].armor_type].armor_absorption_percent;
+            int16_t hull_armor = TECHDATA::_hull_data[hull_size].armor_hp;
+            int16_t armor_percent = TECHDATA::_armor[MOX::_combat_data[ship_idx].armor_type].ships_bonus;
             
             int32_t armor_total = hull_armor + (armor_percent * hull_armor) / 100;
             
@@ -2767,7 +2767,7 @@ namespace CMBTDRW1 {
                     display_color_mode = 0;
                 }
 
-                int8_t rack = TECHDATA::_weapons[w_id].rack;
+                int8_t rack = TECHDATA::_weapons[w_id].type;
                 int16_t ammo = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].ammo;
                 int8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
                 uint8_t status = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].status;
@@ -2954,7 +2954,7 @@ namespace CMBTDRW1 {
     }
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage) {
-        bool is_bio = (TECHDATA::_weapons[weapon_id].flags & 0x80) != 0;
+        bool is_bio = (TECHDATA::_weapons[weapon_id].natural_mods & 0x80) != 0;
         bool has_transporter = COMBINIT::Does_Combat_Ship_Have_Special_(attacker_idx, 0x23 /* Transporter */) != 0;
         int16_t speed = (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) ? 12 : 6;
 

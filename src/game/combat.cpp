@@ -380,7 +380,7 @@ namespace COMBAT {
         }
 
         best_armor_id = INITSHIP::Best_Armor_(player_idx);
-        armor_absorption = TECHDATA::_armor[best_armor_id].armor_absorption_percent;
+        armor_absorption = TECHDATA::_armor[best_armor_id].ships_bonus;
 
         if (num_ships > 0) {
             for (int16_t i = 0; i < num_ships; ++i) {
@@ -403,13 +403,13 @@ namespace COMBAT {
                     q->shield_id = best_shield;
 
                     if (static_cast<uint8_t>(q->player) < 10) {
-                        q->max_hits = static_cast<int16_t>((static_cast<int32_t>(TECHDATA::_hull_data[ship_size].hull_size) * (armor_absorption + 100)) / 100);
+                        q->max_hits = static_cast<int16_t>((static_cast<int32_t>(TECHDATA::_hull_data[ship_size].size) * (armor_absorption + 100)) / 100);
                     } else {
-                        q->max_hits = TECHDATA::_hull_data[ship_size].hull_size;
+                        q->max_hits = TECHDATA::_hull_data[ship_size].size;
                     }
 
                     q->missile_defense_bonus = 0;
-                    q->beam_defense_bonus = TECHDATA::_hull_data[ship_size].hull_space + warp_bonus;
+                    q->beam_defense_bonus = TECHDATA::_hull_data[ship_size].cost + warp_bonus;
                     q->base_ocv = base_ocv;
                     q->missile_damage_modifier = 0;
                     q->beam_damage_modifier = 0;
@@ -423,8 +423,8 @@ namespace COMBAT {
                     for (int16_t device_idx = 0; device_idx < 39; ++device_idx) {
                         if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, device_idx) != 0 &&
                             struct_::Test_Bit_Field_(MOX::_ship[ship_idx].special_device_damage_flags, device_idx) == 0) {
-                            
-                            int16_t bonus = TECHDATA::_specials[device_idx].bonus_value;
+
+                            int16_t bonus = TECHDATA::_specials[device_idx].strategic;
                             switch (TECHDATA::_specials[device_idx].category) {
                                 case 1:
                                     if (special_ocv < bonus) special_ocv = bonus;
@@ -536,9 +536,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[6].hull_size)) / 100);
+                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[6].size)) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[6].hull_space;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[6].cost;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -556,9 +556,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[7].hull_size)) / 100);
+                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[7].size)) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[7].hull_space;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[7].cost;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -576,9 +576,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[8].hull_size)) / 100);
+                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[8].size)) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[8].hull_space;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[8].cost;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -635,7 +635,7 @@ namespace COMBAT {
         armor_idx = INITSHIP::Best_Armor_(8);
         
         // Explicit lookup based on struct layout and assembly
-        absorption_percent = TECHDATA::_armor[armor_idx].armor_absorption_percent;
+        absorption_percent = TECHDATA::_armor[armor_idx].ships_bonus;
         
         special_weapon_id = INITSHIP::Best_Strat_Special_Weapon_(8, size_idx);
 
@@ -653,13 +653,13 @@ namespace COMBAT {
         ship.shield_id = shield_id;
 
         if (ship.player <= 9) {
-            ship.max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[size_idx].base_structure * (absorption_percent + 100)) / 100);
+            ship.max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[size_idx].strat_hits * (absorption_percent + 100)) / 100);
         } else {
-            ship.max_hits = TECHDATA::_hull_data[size_idx].base_structure;
+            ship.max_hits = TECHDATA::_hull_data[size_idx].strat_hits;
         }
 
         ship.missile_defense_bonus = 0;
-        ship.beam_defense_bonus = TECHDATA::_hull_data[size_idx].base_beam_defense + 95 /* 0x5f */;
+        ship.beam_defense_bonus = TECHDATA::_hull_data[size_idx].strat_def_bonus + 95 /* 0x5f */;
         ship.base_ocv = ocv + 45 /* 0x2d */;
         ship.missile_damage_modifier = 0;
         ship.beam_damage_modifier = 105 /* 0x69 */;
@@ -695,9 +695,9 @@ namespace COMBAT {
         qship->bomb_weapon_id = 0;
         qship->special_weapon_id = 0;
         qship->shield_id = 7;
-        qship->max_hits = (int16_t)((TECHDATA::_hull_data[8].base_structure * 1000) / 100);
+        qship->max_hits = (int16_t)((TECHDATA::_hull_data[8].strat_hits * 1000) / 100);
         qship->missile_defense_bonus = 0;
-        qship->beam_defense_bonus = TECHDATA::_hull_data[8].base_beam_defense + 45 /* 0x2d */;
+        qship->beam_defense_bonus = TECHDATA::_hull_data[8].strat_def_bonus + 45 /* 0x2d */;
         qship->base_ocv = aipower::Base_Generic_Ocv_(8) + 45 /* 0x2d */;
         qship->missile_damage_modifier = 0;
         qship->beam_damage_modifier = 105 /* 0x69 */;
@@ -712,7 +712,7 @@ namespace COMBAT {
      */
     void __cdecl Stellar_Converter_Attack_(int16_t target_idx) {
         for (int i = 0; i < 4; ++i) {
-            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].damage);
+            Apply_Damage_To_Qship_(target_idx, TECHDATA::_weapons[38].max_damage);
         }
     }
 
@@ -746,7 +746,7 @@ namespace COMBAT {
     void __cdecl Beam_Attack_(int16_t attacker_idx, int16_t target_idx) {
         s_qship* qships = MOX::_qcombat_data;
         int16_t beam_weapon_id = qships[attacker_idx].beam_weapon_id;
-        int16_t beam_weapon_count = TECHDATA::_hull_data[qships[attacker_idx].size].beam_weapon_count;
+        int16_t beam_weapon_count = TECHDATA::_hull_data[qships[attacker_idx].size].strat_beam;
 
         // Base miss threshold (hit chance = 100 - miss_threshold)
         int16_t miss_threshold = (qships[target_idx].beam_defense_bonus - qships[attacker_idx].base_ocv) + 40;
@@ -757,7 +757,7 @@ namespace COMBAT {
 
         if (beam_weapon_id > 0 && beam_weapon_count > 0) {
             int min_damage = (int)TECHDATA::_weapons[beam_weapon_id].min_damage;
-            int max_damage = (int)TECHDATA::_weapons[beam_weapon_id].damage;
+            int max_damage = (int)TECHDATA::_weapons[beam_weapon_id].max_damage;
 
             if (qships[attacker_idx].beam_damage_modifier > 0) {
                 int modifier = qships[attacker_idx].beam_damage_modifier + 100;
@@ -797,7 +797,7 @@ namespace COMBAT {
         int16_t missile_count = INITSHIP::Strat_Missile_Weapon_Count_(attacker->size);
 
         if (missile_weapon_id > 0 && missile_count > 0) {
-            int16_t weapon_damage = TECHDATA::_weapons[missile_weapon_id].damage;
+            int16_t weapon_damage = TECHDATA::_weapons[missile_weapon_id].max_damage;
             int16_t damage_modifier = attacker->missile_damage_modifier;
 
             if (damage_modifier > 0) {
@@ -854,7 +854,7 @@ namespace COMBAT {
         if (weapon_id > 0 && count > 0) {
             while (count > 0 && target_idx != -1) {
                 int16_t min_dmg = TECHDATA::_weapons[weapon_id].min_damage;
-                int16_t max_dmg = TECHDATA::_weapons[weapon_id].damage;
+                int16_t max_dmg = TECHDATA::_weapons[weapon_id].max_damage;
 
                 int damage_roll = min_dmg + random::Random_(max_dmg - min_dmg + 1) - 1;
                 
@@ -873,11 +873,11 @@ namespace COMBAT {
     void __cdecl Strat_Bomb_Attack_(int16_t attacker_idx) {
         s_qship* attacker = &MOX::_qcombat_data[attacker_idx];
         int16_t weapon_id = attacker->bomb_weapon_id;
-        int16_t weapon_count = TECHDATA::_hull_data[attacker->size].bomb_weapon_count;
+        int16_t weapon_count = TECHDATA::_hull_data[attacker->size].strat_bomb;
 
         if (weapon_id > 0 && weapon_count > 0) {
             int16_t min_dmg = TECHDATA::_weapons[weapon_id].min_damage;
-            int16_t max_dmg = TECHDATA::_weapons[weapon_id].damage;
+            int16_t max_dmg = TECHDATA::_weapons[weapon_id].max_damage;
 
             // The loop processes damage for each bomb weapon on the ship
             for (int16_t i = weapon_count; i > 0; --i) {
@@ -965,7 +965,7 @@ namespace COMBAT {
             applied_damage = damage / 4;
         } else {
             // Normal shields block a flat amount of damage.
-            applied_damage = damage - TECHDATA::_shields[ship->shield_id].points_blocked;
+            applied_damage = damage - TECHDATA::_shields[ship->shield_id].shield_class;
         }
 
         if (applied_damage < 0) {
@@ -1411,7 +1411,7 @@ namespace COMBAT {
                     int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
                     if (weapon_id > 0) {
                         // Check if weapon is not a rack type before decrementing ammo
-                        if (TECHDATA::_weapons[weapon_id].rack != 1) {
+                        if (TECHDATA::_weapons[weapon_id].type != 1) {
                             if (MOX::_combat_data[i].weapons[j].ammo > 0) {
                                 MOX::_combat_data[i].weapons[j].ammo--;
                             }

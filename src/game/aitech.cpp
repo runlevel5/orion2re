@@ -68,7 +68,7 @@ namespace aitech {
         int fuel_idx = 5;
 
         while (fuel_idx > 0) {
-            int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app;
+            int16_t tech_idx = TECHDATA::_fuel[fuel_idx].tech_app_id;
             if (player->tech_applications[tech_idx] == 3) {
                 return fuel_idx;
             }
@@ -82,7 +82,7 @@ namespace aitech {
         int computer_idx = 5;
 
         while (computer_idx > 0) {
-            int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app;
+            int16_t tech_app_idx = TECHDATA::_computers[computer_idx].tech_app_id;
 
             // Check if the player has researched the technology application associated with this computer.
             if (player->tech_applications[tech_app_idx] == 3 /* TECH_RESEARCHED */) {
@@ -121,7 +121,7 @@ namespace aitech {
         // Index 0 (Nuclear Engine) is the fallback value and is not explicitly checked.
         while (drive_idx > 0) {
             // tech_app maps the drive to its corresponding entry in the tech_applications array.
-            int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app;
+            int16_t tech_app_idx = TECHDATA::_drives[drive_idx].tech_app_id;
 
             if (player->tech_applications[tech_app_idx] == 3) {
                 return drive_idx;
@@ -167,7 +167,7 @@ namespace aitech {
 
             // Calculate Best Weapon scores based on technology costs
             for (int w_idx = 1; w_idx <= 13; ++w_idx) {
-                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_application_id;
+                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);
@@ -178,7 +178,7 @@ namespace aitech {
             }
 
             for (int w_idx = 14; w_idx <= 20; ++w_idx) {
-                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_application_id;
+                uint16_t app_id = TECHDATA::_weapons[w_idx].tech_app_id;
                 if (plr->tech_applications[app_id] == 3 /* LEARNED */) {
                     int16_t field_id = TECHDATA::_technology_applications[app_id].tech_field_id;
                     uint8_t cost_score = static_cast<uint8_t>(TECHDATA::_technology_fields[field_id].cost / 100);
