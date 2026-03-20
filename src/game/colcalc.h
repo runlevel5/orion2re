@@ -98,6 +98,10 @@ namespace COLCALC {
     void __cdecl Apply_All_Player_Changes_();
     void __cdecl Compute_Blockades_();
 
+    void __cdecl Do_Colony_Owner_Change_Star_Colony_Stuff_(s_colony* colony);
+
+    void __cdecl Colony_Environmental_Stuff_(s_colony* colony);
+
     void __cdecl Compute_Star_Colony_Stuff_(s_star_data* star);
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);

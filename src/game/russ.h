@@ -38,11 +38,11 @@ namespace RUSS {
         fn(array, count);
     }
 
-    inline void __cdecl Shuffle_Sint_(int16_t* array, int32_t count) {
-        using Fn = void(__cdecl*)(int16_t*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7A10});
-        fn(array, count);
-    }
+    void __cdecl Shuffle_Sint_(int16_t* data, int16_t count);
+
+    void __cdecl Shuffle_Int_(int32_t* array, int16_t count);
+
+    void __cdecl Shuffle_(void* buffer, int16_t element_size, int16_t num_elements);
 
     void __cdecl Release_All_Blocks_(void* seg);
 

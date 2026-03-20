@@ -103,4 +103,76 @@ namespace RUSS {
             GENDRAW::Message_Box_(const_cast<char*>(s_This_isnt_a_single_player_game));
         }
     }
+
+    void __cdecl Shuffle_Int_(int32_t* array, int16_t count) {
+        if (count <= 0) {
+            return;
+        }
+
+        // Standard Fisher-Yates shuffle implementation.
+        // Note: random::Random_(n) in this context is assumed to return a value in the range [1, n].
+        for (int16_t i = 0; i < count; ++i) {
+            int32_t r = random::Random_(static_cast<int32_t>(count) - i);
+            int16_t target_idx = static_cast<int16_t>(i + r - 1);
+
+            int32_t temp = array[i];
+            array[i] = array[target_idx];
+            array[target_idx] = temp;
+        }
+    }
+
+    void __cdecl Shuffle_Sint_(int16_t* data, int16_t count) {
+        if (count <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < count; ++i) {
+            // Note: The logic suggests random::Random_(n) returns a value in range [1, n].
+            int r = random::Random_(static_cast<int>(count) - i);
+
+            int16_t temp = data[i];
+
+            // target_idx = i + r - 1
+            // If Random_(n) is 1-based, this maps [1, count-i] to [i, count-1].
+            int16_t target_idx = static_cast<int16_t>(i + r - 1);
+
+            data[i] = data[target_idx];
+            data[target_idx] = temp;
+        }
+    }
+
+    void __cdecl Shuffle_(void* buffer, int16_t element_size, int16_t num_elements) {
+        if (element_size == 1) {
+            RUSS::Shuffle_Char_(static_cast<int8_t*>(buffer), num_elements);
+            return;
+        }
+
+        if (element_size == 2) {
+            RUSS::Shuffle_Sint_(static_cast<int16_t*>(buffer), num_elements);
+            return;
+        }
+
+        if (element_size == 4) {
+            RUSS::Shuffle_Int_(static_cast<int32_t*>(buffer), num_elements);
+            return;
+        }
+
+        if (num_elements > 0) {
+            uint8_t temp[128]; // Scratch buffer for element swapping
+            for (int16_t i = 0; i < num_elements; ++i) {
+                // Random_ returns a value in range [1, range]
+                int r = random::Random_(static_cast<int>(num_elements) - static_cast<int>(i));
+                int16_t j = i + static_cast<int16_t>(r) - 1;
+
+                if (j != i) {
+                    uint8_t* p_i = static_cast<uint8_t*>(buffer) + static_cast<int>(i) * static_cast<int>(element_size);
+                    uint8_t* p_j = static_cast<uint8_t*>(buffer) + static_cast<int>(j) * static_cast<int>(element_size);
+
+                    memcpy(temp, p_i, element_size);
+                    memcpy(p_i, p_j, element_size);
+                    memcpy(p_j, temp, element_size);
+                }
+            }
+        }
+    }
 }

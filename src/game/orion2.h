@@ -19,6 +19,15 @@ typedef unsigned long long    undefined7;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
 typedef unsigned short    word;
+
+/* WARNING! conflicting data type names: /orion2.h/dword - /dword */
+
+
+/* WARNING! conflicting data type names: /orion2.h/int16 - /int16 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/longlong - /longlong */
+
 typedef struct s_adv_civ_player s_adv_civ_player, *Ps_adv_civ_player;
 
 
@@ -86,6 +95,9 @@ struct s_ai_colony_info {
 
 typedef struct s_ai_player_info s_ai_player_info, *Ps_ai_player_info;
 
+
+/* WARNING! conflicting data type names: /orion2.h/undefined - /undefined */
+
 struct s_ai_player_info {
     short colony_count;
     short colony_deficit;
@@ -118,6 +130,9 @@ struct s_ai_refit_player {
 typedef struct s_ai_star_info s_ai_star_info, *Ps_ai_star_info;
 
 typedef struct s_ai_star_player_block s_ai_star_player_block, *Ps_ai_star_player_block;
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined1 - /undefined1 */
 
 struct s_ai_star_player_block {
     int8_t enemy_count;
@@ -199,6 +214,9 @@ struct s_aidudes_colony_info {
 
 typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
+
+/* WARNING! conflicting data type names: /types.h/uint - /uint */
+
 typedef uint uint32_t;
 
 struct s_alloc_header {
@@ -211,6 +229,9 @@ typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
 typedef short int16_t;
 
+
+/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
+
 typedef uchar uint8_t;
 
 struct s_animation_header {
@@ -221,7 +242,7 @@ struct s_animation_header {
     uint8_t loop_frame;
     short field5_0x9;
     undefined1 flags;
-    uint32_t frame_offsets[0]; /* Dynamic length, varies by file */
+    uint32_t frame_offsets[0];
 };
 
 typedef struct s_antaran s_antaran, *Ps_antaran;
@@ -241,6 +262,8 @@ struct s_antaran {
 typedef struct s_battle_results s_battle_results, *Ps_battle_results;
 
 typedef struct s_combat_bomb_result s_combat_bomb_result, *Ps_combat_bomb_result;
+
+typedef struct s_battle_results_info s_battle_results_info, *Ps_battle_results_info;
 
 typedef struct s_invasion_side_info s_invasion_side_info, *Ps_invasion_side_info;
 
@@ -283,38 +306,7 @@ struct s_invasion_side_info {
     struct s_invasion_player_bonuses combat_modifiers;
 };
 
-struct s_combat_bomb_result {
-    int8_t attacker_idx;
-    uint8_t colony_idx;
-    int8_t is_planetary_hit;
-    int16_t bomb_hits_remaining;
-    int8_t is_bio_weapon;
-    int16_t bio_hits_remaining;
-    int16_t infantry_killed;
-    int16_t tanks_killed;
-    int16_t population_killed;
-    int8_t buildings_destroyed[49];
-    int16_t bio_pop_killed;
-    int8_t damage_occurred;
-    int8_t colony_wiped_out;
-    int16_t production_lost;
-    int32_t total_hits_processed;
-};
-
-struct s_battle_results {
-    int8_t packet_type;
-    uint8_t combat_star_id;
-    int16_t combat_defender_id;
-    int16_t combat_planet_id;
-    int16_t combat_target_player_id;
-    undefined field5_0x8;
-    int8_t combat_attacker_id;
-    int8_t combat_result;
-    undefined field8_0xb;
-    int8_t outpost_destroyed_flag;
-    undefined field10_0xd;
-    undefined field11_0xe;
-    struct s_combat_bomb_result bomb_results;
+struct s_battle_results_info {
     struct s_invasion_side_info attacker_invasion;
     struct s_invasion_side_info defender_invasion;
     int32_t ground_defense_strength;
@@ -829,7 +821,45 @@ struct s_battle_results {
     undefined field524_0x6cd;
 };
 
+struct s_combat_bomb_result {
+    int8_t attacker_idx;
+    uint8_t colony_idx;
+    int8_t is_planetary_hit;
+    int16_t bomb_hits_remaining;
+    int8_t is_bio_weapon;
+    int16_t bio_hits_remaining;
+    int16_t infantry_killed;
+    int16_t tanks_killed;
+    int16_t population_killed;
+    int8_t buildings_destroyed[49];
+    int16_t bio_pop_killed;
+    int8_t damage_occurred;
+    int8_t colony_wiped_out;
+    int16_t production_lost;
+    int32_t total_hits_processed;
+};
+
+struct s_battle_results {
+    int8_t packet_type;
+    uint8_t combat_star_id;
+    int16_t combat_defender_id;
+    int16_t combat_planet_id;
+    int16_t combat_target_player_id;
+    undefined field5_0x8;
+    int8_t combat_attacker_id;
+    int8_t combat_result;
+    undefined field8_0xb;
+    int8_t outpost_destroyed_flag;
+    undefined field10_0xd;
+    undefined field11_0xe;
+    struct s_combat_bomb_result bomb;
+    struct s_battle_results_info info;
+};
+
 typedef struct s_beam_fx_entry s_beam_fx_entry, *Ps_beam_fx_entry;
+
+
+/* WARNING! conflicting data type names: /types.h/ushort - /ushort */
 
 typedef ushort uint16_t;
 
@@ -893,6 +923,9 @@ struct s_class_group {
 
 typedef struct s_click_through_field s_click_through_field, *Ps_click_through_field;
 
+
+/* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
+
 struct s_click_through_field {
     short f0;
     short f2;
@@ -907,9 +940,6 @@ struct s_click_through_field {
 };
 
 typedef struct s_colony s_colony, *Ps_colony;
-
-
-/* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
 
 struct s_colony {
     char owner;
@@ -1055,14 +1085,14 @@ struct s_combat_data {
     int8_t combat_speed_base;
     int16_t current_speed;
     int16_t movement_left;
-    int8_t target_type_flag; /* 0 = ship, 1 = missle */
+    int8_t target_type_flag;
     int8_t special_status_flag;
     int8_t special_status_timer;
     int8_t special_cooldown;
     int16_t plasma_web_damage;
     short reflected_damage_pool;
     int8_t field40_0x47;
-    uint8_t combat_status_flags; /* bit 0: teleporter used; bit 1: being boarded; bit 2: turn finished */
+    uint8_t combat_status_flags;
     undefined field42_0x49;
     int8_t stasis_source_idx;
     int8_t is_retreating;
@@ -1180,8 +1210,8 @@ struct s_current_design {
 typedef struct s_event_data s_event_data, *Ps_event_data;
 
 struct s_event_data {
-    int8_t player_idx;
-    int8_t status; /* 0:Inactive, 1:Triggered, 2:Active, 3:Expired, 5:Finishing, 6:Just Started */
+    uint8_t player_idx;
+    int8_t status;
     int8_t turn_count;
     short target_id;
     short amount;
@@ -2694,7 +2724,7 @@ struct s_network {
     undefined field5_0x91;
     undefined field6_0x92;
     int8_t modem_initialized;
-    uint8_t mode; /* 3=ten 1/2=modem/ip? 0=offline */
+    uint8_t mode;
     int field9_0x95;
     int8_t num_connected_players;
     short net_host_id;
@@ -2959,9 +2989,6 @@ typedef struct s_settler_info s_settler_info, *Ps_settler_info;
 
 typedef struct s_ship_design s_ship_design, *Ps_ship_design;
 
-
-/* WARNING! conflicting data type names: /types.h/ushort - /ushort */
-
 typedef struct s_ship_weapons s_ship_weapons, *Ps_ship_weapons;
 
 struct s_ship_weapons {
@@ -3074,7 +3101,7 @@ struct s_player {
     char fighter_bomb_type;
     short total_research;
     short total_ships;
-    int32_t total_ship_strength[8]; /* Type 'dword.conflict[8]' was deleted */
+    int32_t total_ship_strength[8];
     short total_colonies;
     sbyte failed_to_expand;
     char first_contact[8];
@@ -3284,12 +3311,12 @@ struct s_prev_leader_data {
 
 typedef struct s_qship s_qship, *Ps_qship;
 
-struct s_qship { /* Strategic (quick) combat ships, used in strategic combat. The structure is smaller than for tactical ships. Named after global MOX::_qcombat_data. */
+struct s_qship {
     int8_t player;
     byte size;
     short ship_design_idx;
     short field3_0x4;
-    int8_t status; /* 0: Active, 1: Destroyed, 2: Inactive */
+    int8_t status;
     int16_t officer_idx;
     int16_t shield_id;
     int16_t missile_weapon_id;
@@ -3371,7 +3398,7 @@ struct s_settings {
     sbyte sound_fx_on;
     sbyte sound_fx_level;
     sbyte music_on;
-    sbyte music_level;
+    int8_t music_level;
     char active_save_slot;
     byte multi_player_game_type;
     char net_game_name[9];
@@ -3983,7 +4010,7 @@ typedef struct s_tech_armor_data s_tech_armor_data, *Ps_tech_armor_data;
 struct s_tech_armor_data {
     char *name;
     short armor_id;
-    short tech_app_id; /* Type 'TECH_APP' was deleted */
+    short tech_app_id;
     undefined field3_0x8;
     uint8_t troops_bonus;
     uint16_t ships_bonus;
@@ -4149,7 +4176,7 @@ struct s_tech_weapon_data {
     int8_t ammo;
     uint16_t size;
     uint16_t cost;
-    uint16_t natural_mods; // mods that are inherent to the weapon, e.g. neutron blaster always kills marines
+    uint16_t natural_mods;
     uint16_t min_damage;
     uint16_t max_damage;
     uint8_t strat_min_damage;
@@ -4190,4 +4217,28 @@ struct s_unit_data {
     undefined field7_0xa;
     undefined field8_0xb;
 };
+
+
+/* WARNING! conflicting data type names: /orion2.h/ulonglong - /ulonglong */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined2 - /undefined2 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined4 - /undefined4 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined5 - /undefined5 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined6 - /undefined6 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined7 - /undefined7 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/undefined8 - /undefined8 */
+
+
+/* WARNING! conflicting data type names: /orion2.h/word - /word */
 

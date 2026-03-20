@@ -1120,11 +1120,11 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
 
         if (plr2_idx == 9) { // Guardian defeated
             MOX::_player[plr1_idx].captured_orion = 1;
-            OFFICER::Give_Player_Loknar_Special_(plr1_idx, (uint8_t*)result->orion_techs, &result->rescued_hero_id);
+            OFFICER::Give_Player_Loknar_Special_(plr1_idx, (uint8_t*)result->info.orion_techs, &result->info.rescued_hero_id);
             if (MOX::_player[plr1_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
-                    OFFICER::Rescued_Loknar_Popup_(plr1_idx, *reinterpret_cast<int32_t*>(result->orion_techs), result->rescued_hero_id);
+                    OFFICER::Rescued_Loknar_Popup_(plr1_idx, *reinterpret_cast<int32_t*>(result->info.orion_techs), result->info.rescued_hero_id);
                 }
             }
         }
@@ -1142,11 +1142,11 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
     } else {
         if (plr1_idx == 9) { // Guardian defeated by attacker
             MOX::_player[plr2_idx].captured_orion = 1;
-            OFFICER::Give_Player_Loknar_Special_(plr2_idx, (uint8_t*)result->orion_techs, &result->rescued_hero_id);
+            OFFICER::Give_Player_Loknar_Special_(plr2_idx, (uint8_t*)result->info.orion_techs, &result->info.rescued_hero_id);
             if (MOX::_player[plr2_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
-                    OFFICER::Rescued_Loknar_Popup_(plr2_idx, *reinterpret_cast<int32_t*>(result->orion_techs), result->rescued_hero_id);
+                    OFFICER::Rescued_Loknar_Popup_(plr2_idx, *reinterpret_cast<int32_t*>(result->info.orion_techs), result->info.rescued_hero_id);
                 }
             }
         }
@@ -1230,13 +1230,13 @@ int16_t __cdecl Russ_Combat_(int16_t attacker_idx, int16_t* attacker_ships, int1
 
     if (strategic_combat_flag != 0) {
         combat_result_code = COMBAT::Strategic_Combat_(attacker_ships, attacker_count, defender_ships, defender_count,
-                                                       star_idx, colony_idx, results->summary, results->details);
+                                                       star_idx, colony_idx, results->info.summary, results->info.details);
 
         // Show result dialog if human is involved or it is a local single player game
         if (not_multiplayer || MOX::_PLAYER_NUM == attacker_idx) {
             if (plr2_is_human || plr1_is_human) {
                 MAINSCR::Update_Ship_Icons_In_Between_Turns_();
-                COMBAT::Message_Box_Titled_(results->summary, results->details);
+                COMBAT::Message_Box_Titled_(results->info.summary, results->info.details);
                 MAINSCR::Update_Ship_Icons_In_Between_Turns_();
                 COMBFIND::_messed_up_fleet_palette = 1;
             }

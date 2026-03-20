@@ -2091,6 +2091,23 @@ namespace hooks {
         { 0x0042b330, &COLXPORT::Draw_Bar_Indicator_ },
         { 0x004bdc10, &COMBFIND::Get_Ship_Strength_Info_ },
         { 0x004bde70, &COMBFIND::Get_Best_Colony_Target_ },
+        { 0x0042cdc0, &invasion::Unload_Transports_ },
+        { 0x0042CC70, &invasion::Colony_Infantry_Limit_ },
+        { 0x0042b730, &invasion::Resolve_Ground_Combat_ },
+        { 0x0042c650, &invasion::Check_Rebellion_ },
+        { 0x0042c890, &invasion::Get_Rebellion_Info_ },
+        { 0x0042bfd0, &invasion::Change_Colony_Ownership_ },
+        { 0x0042bc70, &invasion::Colony_N_Militia_ },
+        { 0x0042bb30, &invasion::Compute_Colony_Officer_Bonus_ },
+        { 0x0042c350, &invasion::Change_Pop_Ownership_ },
+        { 0x0042c9b0, &invasion::Resolve_Rebellion_Troops_ },
+        { 0x004d7a10, &RUSS::Shuffle_Sint_ },
+        { 0x004d7a70, &RUSS::Shuffle_Int_ },
+        { 0x004d7ad0, &RUSS::Shuffle_ },
+        { 0x0042bcb0, &invasion::Enforce_Population_Limits_At_Colony_ },
+        { 0x0042b820, &invasion::Compute_Ground_Combat_Info_ },
+        { 0x0042cd70, &invasion::Colony_Tank_Barracks_Limit_ },
+        { 0x0042ccd0, &invasion::Colony_Infantry_Barracks_Limit_ },
     };
 
     void Install_Hooks()
