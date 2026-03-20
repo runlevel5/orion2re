@@ -297,9 +297,8 @@ int32_t __cdecl Colony_Infantry_Limit_(s_colony* param_1) {
 int __cdecl Unload_Transports_(s_colony* colony, int16_t* transport_ship_ids, int num_transports) {
     int count = 0;
     int limit = Colony_Infantry_Limit_(colony);
-    int16_t* occupation = reinterpret_cast<int16_t*>(&colony->occupation_points);
 
-    if (*occupation < limit) {
+    if (colony->military[0] < limit) {
         while (count < num_transports) {
             int16_t ship_idx = *transport_ship_ids;
             transport_ship_ids++;
@@ -307,8 +306,8 @@ int __cdecl Unload_Transports_(s_colony* colony, int16_t* transport_ship_ids, in
             
             SHIPS::Kill_Ship_(ship_idx);
             
-            *occupation += 4;
-            if (*occupation >= limit) {
+            colony->military[0] += 4;
+            if (colony->military[0] >= limit) {
                 break;
             }
         }
@@ -466,7 +465,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
     MOX::_player[new_owner_idx].captured_population += (uint8_t)colony->n_pops;
 
     if (results != nullptr) {
-        int16_t captured_techs[4];
+        int16_t captured_techs[4] = { 0 };
         int16_t weights[212];
         int32_t captured_count = 0;
         int32_t chance_base;
