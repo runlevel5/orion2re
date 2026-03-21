@@ -1,7 +1,31 @@
---- src/game/flt1.cpp
-+++ src/game/flt1.cpp
-@@ -1,6 +1,6 @@
-         MAINSCR::Allocate_First_Screen_Seg_(5);
+--- src/game/flt2.cpp
++++ src/game/flt2.cpp
+@@ -258,11 +258,11 @@
+     int16_t icon_idx;
  
--        MOX::_fleet_background_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 0, MOX::_screen_seg);
-+        MOX::_fleet_background_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX_005584a8, 0, MOX::_screen_seg);
+     if (MOX::_current_screen == 4 /* SCREEN_GALAXY */) {
+-        height_offset = 0x3a;
+-        width_offset = 0x39;
++        width_offset = 0x3a;
++        height_offset = 0x39;
+     } else {
+-        height_offset = 0x39;
+-        width_offset = 0x39;
++        width_offset = 0x39;
++        height_offset = 0x39;
+     }
+ 
+     search_idx = 0;
+@@ -293,10 +293,10 @@
+ 
+             if (MOX::_PLAYER_NUM == owner) {
+                 MOX::_fltscrn_big_icon[icon_idx].button_id = fields::Add_Hidden_Field_(
+-                    y,
+                     x,
+-                    y + height_offset,
++                    y,
+                     x + width_offset,
++                    y + height_offset,
+                     FLT2::s__00551100,
+                     0x29
+                 );

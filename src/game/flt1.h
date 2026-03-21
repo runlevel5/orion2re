@@ -5,6 +5,8 @@ namespace FLT1 {
 
     void __cdecl Draw_Fltscrn_Big_Ship_Icons_(int16_t param_1);
 
+    void __cdecl Draw_Fltscrn_Relocation_Lines_(int16_t param_1);
+
     int16_t __cdecl First_Selected_Ship_();
 
     int16_t __cdecl F_Ship_Icon_From_Node_Ptr_(int16_t node_idx);
@@ -35,7 +37,7 @@ namespace FLT1 {
 
     void __cdecl Reload_Fleet_Screen_();
 
-    void Draw_Fleet_Screen_();
+    void __cdecl Draw_Fleet_Screen_();
 
     void __cdecl Add_Fleet_Screen_Fields_(int16_t* relocate_fleet_field_id, int16_t* scrap_button_field_id,
                                           int16_t* fleet_return_button_field_id, int16_t* up_scroll_button_field_id,
@@ -43,11 +45,7 @@ namespace FLT1 {
                                           int16_t* prev_fleet_button_field_id, int16_t* officers_button_field_id,
                                           int16_t* all_button_field_id, int16_t* big_icon_field_ids);
 
-    inline bool At_Least_One_Officer_(int16_t player_num) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B2AE0});
-        return fn(player_num);
-    }
+    bool __cdecl At_Least_One_Officer_(int16_t player_num);
 
     inline const char* const s_empty = reinterpret_cast<const char*>(0x00551100);
     inline const char* const s_plus = reinterpret_cast<const char*>(0x00551118);
@@ -66,31 +64,29 @@ namespace FLT1 {
 
     void __cdecl Star_Relocation_(int16_t* star_from_ptr, int16_t* star_to_ptr, int16_t star_idx);
 
-    inline bool __cdecl Okay_To_Set_Relocate_Star2_(int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b2c20});
-        return fn(star_idx);
-    }
+    bool __cdecl Okay_To_Set_Relocate_Star_(int16_t star_idx, uint8_t prompt_flag);
 
-    inline bool __cdecl Okay_To_Set_Relocate_To_Star_(int16_t star_from, int16_t star_to) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b2c50});
-        return fn(star_from, star_to);
-    }
+    uint8_t __cdecl Okay_To_Set_Relocate_Star2_(int16_t star_idx);
+
+    uint8_t __cdecl Okay_To_Set_Relocate_To_Star_(int16_t src_star_idx, int16_t dst_star_idx);
 
     void __cdecl Cant_Order_Ship_Message_(const s_ship_data* ship);
 
-    inline void __cdecl Set_Fltscrn_Big_Icons_(int16_t val) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004b2980 })(val);
-    }
+    void __cdecl Set_Fltscrn_Big_Icons_(int16_t select_flag);
 
     void __cdecl Build_Scrap_List_(int16_t* scrap_list, int16_t* list_count);
 
-    inline uint8_t __cdecl Scrap_Ships_(int16_t player_num, int16_t* list, int16_t count, int16_t flag) {
-        using Fn = uint8_t(__cdecl*)(int16_t, int16_t*, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004b2440 })(player_num, list, count, flag);
+    int8_t __cdecl Scrap_Ships_(int16_t player_idx, int16_t* ship_indices, int16_t num_ships, int8_t interactive);
+
+    int16_t __cdecl Get_Scrap_Ship_Value_();
+
+    inline void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_num, int8_t flag) {
+        using Fn = void(__cdecl*)(s_ship_data*, int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AFD80});
+        fn(ship, player_num, flag);
     }
+
+    void __cdecl Plunder_Ships_For_Tech_(int16_t* ship_indices, int16_t count, int8_t flag);
 
     int16_t __cdecl N_Fltscrn_Ships_Selected_();
 

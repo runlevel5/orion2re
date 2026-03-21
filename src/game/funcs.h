@@ -273,6 +273,8 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
 
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
+inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E00});
+
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
@@ -497,6 +499,7 @@ inline const char* const s_Harbinger_005576b8 = reinterpret_cast<const char*>(0x
 inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
 inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
 inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"
+inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
 
 inline void __cdecl FUN_00443C60() {
@@ -714,4 +717,7 @@ inline void*& PTR_s_OFFICER_LBX_00556990 =
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
 
 inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
+
+inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
+inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
 

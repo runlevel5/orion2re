@@ -23,7 +23,7 @@ namespace MOX {
     inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
     inline int16_t& _offpop_big_icon_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C456});
     inline uint8_t& _drawing_officer_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D50});
-    inline int8_t*& _fltscrn_ship_icon_selection_list = *reinterpret_cast<int8_t**>(std::uintptr_t{ 0x0059b4a0 });
+    inline int16_t*& _fltscrn_ship_icon_selection_list = *reinterpret_cast<int16_t**>(std::uintptr_t{ 0x0059b4a0 });
     inline uint8_t& _look_at_colonies = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A185F});
     inline s_big_icon*& _fltscrn_big_icon = *reinterpret_cast<s_big_icon**>(std::uintptr_t{0x00597460});
     inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});

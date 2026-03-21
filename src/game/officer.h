@@ -156,6 +156,11 @@ namespace OFFICER {
         return reinterpret_cast<Fn>(std::uintptr_t{0x00442710})(leader_idx, flag, star_ptr);
     }
 
+    inline void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00440230})(leader_idx, x, y, w);
+    }
+
     inline char** _officer_skill_description_string =
         reinterpret_cast<char**>(std::uintptr_t{0x005656D0});
 

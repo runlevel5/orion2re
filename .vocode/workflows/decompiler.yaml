@@ -94,9 +94,9 @@ workflows:
           * You are not allowed to refactor or optimize the code. Keep code as close to the original as possible outside of
             subtle cleanups or local variable renames.
           * Cleanup:
-            - You are allowed to rename local variables to better represent their semantic meaning.
+            - You shall rename generic local variable names to better represent their semantic meaning.
             - You are allowed to remove superfluous variables.
-            - You are allowed to convert explicit loops into equivalent C constructs, such as for loops.
+            - You are allowed to convert explicit loops into equivalent C constructs, such as for or while loops.
             - You are NOT allowed to remove code that apparently does nothing. If it exists, there must be a reason. You
               are allowed to provide a comment explaining that the code seems to be no-op, but you still have to emit the
               code.
@@ -276,7 +276,7 @@ workflows:
              bit shifting operations. It is exactly same behavior as a previous example
              with more operations.
  
-          * You NEVER output structure definitions. You are allowed to output structure name as a reference without the body. Correct 
+          * You NEVER output complete structure definitions. You are allowed to output structure name as a reference without the body. Correct 
             examples:
             
             struct s_player;
@@ -304,6 +304,7 @@ workflows:
           * You provided all the stubs into correct namespaces
           * You provided main decompiled function
           * All provided types match the input exactly
+          * You did not provide complete structures, only structure type references.
         outcomes:
           - name: done
       - name: apply

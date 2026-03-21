@@ -173,4 +173,18 @@ namespace ERIC {
             MOX::_settings.music_level = (int8_t)ERIC::_saved_music_l;
         }
     }
+
+    bool __cdecl Sint_Is_In_List_(int16_t value, int16_t* list, uint16_t count) {
+        if (count == 0) {
+            return false;
+        }
+
+        for (uint16_t i = 0; i < count; ++i) {
+            if (list[i] == value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

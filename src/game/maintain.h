@@ -10,9 +10,9 @@ namespace maintain {
     inline int (*&_ship_worths)[500] =
         *reinterpret_cast<int (**)[500]>(std::uintptr_t{0x0056CD8C});
 
-    inline int __cdecl Ship_Scrap_Value_(s_ship_data* ship) {
-        using Fn = int(__cdecl*)(s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b42b0 });
+    inline int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship) {
+        using Fn = int16_t(__cdecl*)(s_ship_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B42B0});
         return fn(ship);
     }
 

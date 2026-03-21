@@ -35,6 +35,11 @@ namespace ERIC {
 
     void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text);
 
+    inline void __cdecl Print_Paragraph_Centered_Vertically_(int16_t x, int16_t y, int16_t w, int16_t h, void* text, int16_t unk) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004BA9A0})(x, y, w, h, text, unk);
+    }
+
     int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus);
 
     void __cdecl Draw_Centered_(int16_t x, int16_t y, s_animation_header* anim);
@@ -86,4 +91,6 @@ namespace ERIC {
     void __cdecl Play_Dimensional_Portal_Flic_();
 
     void __cdecl Play_Planetary_Destruction_Flic_();
+
+    bool __cdecl Sint_Is_In_List_(int16_t value, int16_t* list, uint16_t count);
 }

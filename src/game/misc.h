@@ -76,4 +76,15 @@ namespace MISC {
                            int16_t x2_min, int16_t y2_min, int16_t x2_max, int16_t y2_max);
 
     void __cdecl Set_Font_Colors_(const s_colors* colors);
+
+    inline int8_t __cdecl Is_Vowel_(char c) {
+        using Fn = int8_t(__cdecl*)(char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049EAA0});
+        return fn(c);
+    }
+
+    inline void __cdecl Draw_Highlight_Box_(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t* colors) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049e510})(x, y, w, h, colors);
+    }
 }

@@ -1780,7 +1780,7 @@ namespace OFFICER {
             }
         }
 
-        FLT2::Build_Fltscrn_Big_Icon_Fields_(MOX::_small_ship_stack_ptr, MOX::_scroll_bar->visible_rows);
+        FLT2::Build_Fltscrn_Big_Icon_Fields_(MOX::_small_ship_stack_ptr);
         OFFICER::Reload_Officer_Screen_Pictures_();
 
         MOX::_draw_officer_to_back = 1;
