@@ -58,11 +58,11 @@ namespace COLBLDG {
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x0055AB08});
     inline int16_t (&_queue_fields)[7] = *reinterpret_cast<int16_t(*)[7]>(std::uintptr_t{0x0055AB20});
 
-    inline void*& _buffer = *reinterpret_cast<void**>(std::uintptr_t{0x00595388});
+    inline uint8_t*& _buffer = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00595388});
 
     inline void*& _bldg_bitm = *reinterpret_cast<void**>(std::uintptr_t{0x00595384});
 
-    inline void*& _desc_record_ptr = *reinterpret_cast<void**>(std::uintptr_t{0x00571F74});
+    inline uint8_t*& _desc_record_ptr = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00571F74});
 
     inline s_animation_header* (&_anims)[7] =
         *reinterpret_cast<s_animation_header* (*)[7]>(std::uintptr_t{0x00571EE0});

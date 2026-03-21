@@ -2280,4 +2280,240 @@ namespace COLCALC {
             MOX::_player[player->last_attacker].player_defeated[player_idx] = static_cast<int16_t>(MOX::_stardate);
         }
     }
+
+    char* __cdecl Player_Name_(int32_t player_idx) {
+        if (player_idx < 8) {
+            return MOX::_player[player_idx].race_name;
+        }
+
+        return MOX::_race_names[player_idx + 5];
+    }
+
+    int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony) {
+        if (colony->buildings[BUILDING_BARRIER_SHIELD] != 0) {
+            return 3;
+        }
+
+        if (colony->buildings[BUILDING_FLUX_SHIELD] != 0) {
+            return 2;
+        }
+
+        if (colony->buildings[BUILDING_RADIATION_SHIELD] != 0) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product) {
+        uint8_t owner = colony->owner;
+
+        if (product > 0 && product < 49) {
+            if (MOX::_player[owner].tech_applications[TECHDATA::_buildings[product].tech_app] == 3 &&
+                colony->buildings[product] == 0) {
+                
+                switch (product) {
+                    case 1: {
+                        if (colony->n_pops > 0) {
+                            int32_t first_race = -1;
+                            for (int i = 0; i < colony->n_pops; ++i) {
+                                if (colony->pop[i] & 0x400) {
+                                    return 1;
+                                }
+                                uint32_t race = colony->pop[i] & 0xF;
+                                if (race < 8) {
+                                    if (first_race == -1) {
+                                        first_race = race;
+                                    } else if (first_race != race) {
+                                        if (MOX::_player[owner].traits[0] / 2 != 3) {
+                                            return 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return 2;
+                    }
+                    case 3: {
+                        uint8_t retval = 1;
+                        int16_t star_index = MOX::_planet[colony->planet].star_index;
+                        for (int i = 0; i < 5; ++i) {
+                            int16_t p = MOX::_star[star_index].planet_index[i];
+                            if (p != -1) {
+                                int16_t c = MOX::_planet[p].colony_index;
+                                if (c != -1 && MOX::_colony[c].owner == owner) {
+                                    if (MOX::_colony[c].buildings[3] != 0 || 
+                                        COLCALC::N_Prods_In_Colony_Queue_(c, 3) >= 1) {
+                                        retval = 2;
+                                    }
+                                }
+                            }
+                        }
+                        return retval;
+                    }
+                    case 5:
+                    case 32: {
+                        if (colony->buildings[13] != 0) return 0;
+                        return 1;
+                    }
+                    case 9: {
+                        if (MOX::_player[owner].traits[0] / 2 == 3) return 0;
+                        int16_t c = MOX::_planet[MOX::_player[owner].home_planet_id].colony_index;
+                        if (MOX::_colony[c].buildings[9] != 0) return 0;
+                        return 1;
+                    }
+                    case 11: {
+                        bool has_planet_type_3 = false;
+                        int16_t star_index = MOX::_planet[colony->planet].star_index;
+                        for (int i = 0; i < 5; ++i) {
+                            int16_t p = MOX::_star[star_index].planet_index[i];
+                            if (p != -1) {
+                                if (MOX::_planet[p].planet_type == 3) {
+                                    has_planet_type_3 = true;
+                                    if (MOX::_planet[p].colony_index == -1) {
+                                        return 1;
+                                    }
+                                }
+                            }
+                        }
+                        if (has_planet_type_3) return 2;
+                        return 0;
+                    }
+                    case 14: {
+                        return 1;
+                    }
+                    case 17: {
+                        if (colony->climate == 8) return 1;
+                        return 0;
+                    }
+                    case 18: {
+                        return 0;
+                    }
+                    case 20:
+                    case 31: {
+                        if (MOX::_player[owner].traits[0] / 2 == 3) return 0;
+                        return 1;
+                    }
+                    case 25: {
+                        if (colony->n_pops > 0) {
+                            int8_t gravity = MOX::_planet[colony->planet].gravity_class;
+                            for (int i = 0; i < colony->n_pops; ++i) {
+                                uint32_t race = colony->pop[i] & 0xF;
+                                if (race < 8) {
+                                    if (gravity == 0) {
+                                        if (MOX::_player[race].traits[10] == 0) return 1;
+                                    } else if (gravity == 1) {
+                                        if (MOX::_player[race].traits[10] != 0) return 1;
+                                    } else if (gravity == 2) {
+                                        if (MOX::_player[race].traits[11] == 0) return 1;
+                                    }
+                                }
+                            }
+                        }
+                        return 2;
+                    }
+                    case 28:
+                        if (colony->buildings[24] != 0) return 0;
+                        // fallthrough
+                    case 24:
+                        if (colony->buildings[23] != 0) return 0;
+                        return 1;
+                    case 37: {
+                        if ((MOX::_planet[colony->planet].environmental_alterations & 2) != 0) return 0;
+                        if (colony->climate >= 3 && colony->climate <= 9) return 1;
+                        return 0;
+                    }
+                    case 40:
+                        if (colony->buildings[8] != 0) return 0;
+                        // fallthrough
+                    case 8:
+                        if (colony->buildings[41] != 0) return 0;
+                        return 1;
+                    case 44: {
+                        if (colony->climate >= 2 && colony->climate <= 7) return 1;
+                        return 0;
+                    }
+                    case 46: {
+                        return (colony->food2_per_farmer == 0) ? 2 : 1;
+                    }
+                    case 48: {
+                        return COLCALC::Star_Has_Asteroid_Or_Gas_Giant_(MOX::_planet[colony->planet].star_index);
+                    }
+                    default:
+                        return 1;
+                }
+            }
+        } else {
+            if (product <= -50) {
+                if (MOX::_player[owner].ship_range == 0 || MOX::_player[owner].ship_speed == 0) return 0;
+                
+                s_ship_design* ship_design;
+                if (product <= -100) {
+                    ship_design = &MOX::_ship[-product - 100].d;
+                } else {
+                    ship_design = &MOX::_player[owner].ship_designs[-product - 50];
+                }
+                
+                switch (ship_design->ship_type) {
+                    case 0:
+                        if (ship_design->size < 2) return 1;
+                        if (COLCALC::Colony_Can_Build_Large_Ships_(colony)) {
+                            if (ship_design->size == 4) {
+                                if (MOX::_player[owner].tech_applications[186] == 3) return 1;
+                                return 0;
+                            }
+                            if (ship_design->size == 5) {
+                                if (MOX::_player[owner].tech_applications[55] == 3) return 1;
+                                return 0;
+                            }
+                            return 1;
+                        }
+                        return 0;
+                    case 1:
+                        if (MOX::_player[owner].tech_applications[41] == 3) return 1;
+                        return 0;
+                    case 2:
+                        if (colony->buildings[22] != 0 && MOX::_player[owner].tech_applications[189] == 3) return 1;
+                        return 0;
+                    case 4:
+                        if (MOX::_player[owner].tech_applications[109] == 3) return 1;
+                        return 0;
+                    default:
+                        return 0;
+                }
+            } else {
+                switch (product) {
+                    case -38:
+                    case -37:
+                    case -7:
+                    case -2:
+                    case -1:
+                        return 1;
+                    case -15:
+                        if (MOX::_player[owner].tech_applications[69] == 3) return 1;
+                        return 0;
+                    case -6:
+                        if (MOX::_player[owner].tech_applications[7] == 3) {
+                            return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
+                        }
+                        return 0;
+                    case -5:
+                        if (MOX::_player[owner].tech_applications[8] == 3) {
+                            return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
+                        }
+                        return 0;
+                    case -4:
+                        if (MOX::_player[owner].tech_applications[6] == 3) {
+                            return (COLCALC::Room_For_Another_Dude_(colony, 8) == 1) ? 1 : 2;
+                        }
+                        return 0;
+                    case -3:
+                        return 1;
+                    default:
+                        return 0;
+                }
+            }
+        }
+        return 0;
+    }
 }

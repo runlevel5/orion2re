@@ -42,6 +42,11 @@ namespace HAROLD {
 
     const char* __cdecl H_Message_(int16_t id);
 
+    inline int16_t __cdecl N_Player_Ships_(int16_t player_num) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004f1330})(player_num);
+    }
+
     void __cdecl Get_Monetary_Unit_String_(char* buffer);
 
     void __cdecl Randomize_List_(int16_t* list, int16_t size, int8_t use_clock);
@@ -124,6 +129,8 @@ namespace HAROLD {
     int16_t __cdecl Star_Owner_(int16_t star_idx, int16_t player_idx);
 
     int16_t __cdecl Absolute_Location_(int16_t location);
+
+    int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id);
 
     int16_t __cdecl XY_To_Star_Id_(int16_t x, int16_t y);
 

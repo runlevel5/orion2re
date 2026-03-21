@@ -43,4 +43,10 @@ namespace GEO {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00413330});
         return fn(min_dmg, max_dmg, hit_chance, attack_def_diff, points_blocked);
     }
+
+    inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00412E20 });
+        fn(root1, root2, mode);
+    }
 }

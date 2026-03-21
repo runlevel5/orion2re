@@ -84,6 +84,8 @@ namespace COLONY {
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E68});
     inline s_animation_header*& _ship_bitm =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595F7C});
+    inline s_animation_header*& _swap_bitm =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595FF0});
 
     inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
     inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
@@ -91,11 +93,7 @@ namespace COLONY {
 
     inline s_animation_header** _c_anims = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00559EE8});
 
-    inline void __cdecl Set_Colony_Globals_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC0C0});
-        fn(colony_idx);
-    }
+    void __cdecl Set_Colony_Globals_(int16_t param_1);
 
     inline uint8_t& _debug_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559C40});
     inline uint8_t& _using_colony_screen_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E24});
@@ -122,7 +120,8 @@ namespace COLONY {
 
     inline int32_t& _planet_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD8});
     inline int32_t& _star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E58});
-    inline int32_t& _orbit_n = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E78});
+    inline int16_t (&_orbit_n)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E78});
     inline uint8_t& _cheats = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E1C});
     inline int32_t& _sys_disp_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD4});
     inline int32_t& _sys_disp_scanned_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FEC});
@@ -131,11 +130,10 @@ namespace COLONY {
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl C_Anims_(int16_t index);
 
-    inline s_animation_header* __cdecl Govt_Anim_(int16_t trait) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DCCB0});
-        return fn(trait);
-    }
+    s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1);
+
+    s_animation_header* __cdecl Govt_Anim_(int16_t param_1);
+
     s_animation_header* __cdecl Colony_Pop_Anim_(int16_t colony_idx, int16_t pop_idx);
 
     int16_t __cdecl Get_Effective_Pop_Player_(int16_t colony_idx, int16_t pop_idx);
@@ -155,11 +153,7 @@ namespace COLONY {
 
     char* __cdecl Job_String_(int16_t job_id);
 
-    inline void __cdecl Get_Bldg_Box_(int16_t bldg_type, int32_t bldg_id, int16_t* x_coords, int16_t* y_coords) {
-        using Fn = void(__cdecl*)(int16_t, int32_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd790});
-        fn(bldg_type, bldg_id, x_coords, y_coords);
-    }
+    void __cdecl Get_Bldg_Box_(int16_t c, int16_t r, int16_t* x_arr, int16_t* y_arr);
 
     bool __cdecl XY_In_Bldg_Poly_(int16_t x, int16_t y, int16_t bldg_type, int32_t bldg_id);
 
@@ -188,15 +182,9 @@ namespace COLONY {
 
     s_animation_header* __cdecl Prod_Anims_(int16_t param_1, int16_t param_2, int8_t param_3);
 
-    inline s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int8_t);
-        return reinterpret_cast<Fn>(0x004dcdb0)(type, is_tens, frame);
-    }
+    s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame);
 
-    inline s_animation_header* __cdecl Short_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int8_t);
-        return reinterpret_cast<Fn>(0x004dcdf0)(type, is_tens, frame);
-    }
+    s_animation_header* __cdecl Short_Anims_(int16_t type, int16_t is_tens, uint8_t frame);
 
     int16_t __cdecl Satellite_Anim_Pic_(int16_t id);
 

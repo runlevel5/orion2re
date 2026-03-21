@@ -170,7 +170,7 @@ namespace aimove {
                 int16_t dummy_short;
                 int32_t found_aux;
 
-                Find_Opportunity_Attack_Aux_((int16_t)plr1, (int16_t)plr2, 150 /* 0x96 */, (int16_t)i, &found_planet, &dummy_short, &found_aux);
+                aimove::Find_Opportunity_Attack_Aux_((int16_t)plr1, (int16_t)plr2, 150 /* 0x96 */, (int16_t)i, &found_planet, &dummy_short, &found_aux);
 
                 if (found_planet != -1) {
                     *star_idx = i;

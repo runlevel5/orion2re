@@ -1,5 +1,7 @@
 #pragma once
 
+struct s_scroll_bar;
+
 namespace OFFICER {
     inline uint32_t __cdecl Load_Officer_Picture_(int32_t p1, int16_t officer_idx, uint32_t seg, char p4, int16_t mode) {
         using Fn = uint32_t(__cdecl*)(int32_t, int16_t, uint32_t, char, int16_t);
@@ -97,6 +99,9 @@ namespace OFFICER {
         using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int, int, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0043F440})(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
     }
+
+    void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* sb);
+
     void __cdecl Fade_Into_Leaders_Screen_();
 
     void __cdecl Already_Hired_Message_(int16_t officer_id);
@@ -258,5 +263,11 @@ namespace OFFICER {
         using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443260});
         fn(star_idx, result_ptr, player_idx);
+    }
+
+    inline void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star) {
+        using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_star_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004446C0 });
+        fn(player, leader, star);
     }
 }

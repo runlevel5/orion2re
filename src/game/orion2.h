@@ -3845,7 +3845,7 @@ struct s_ship_drive_data {
 typedef struct s_ship_icon s_ship_icon, *Ps_ship_icon;
 
 struct s_ship_icon {
-    short field0_0x0;
+    short stack_id;
     short node_idx;
     short star_idx;
     short stack_slot;

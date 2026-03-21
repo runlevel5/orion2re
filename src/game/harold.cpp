@@ -819,6 +819,29 @@ namespace HAROLD {
     }
 
     /**
+     * @address 004f05f0
+     */
+    int16_t __cdecl Actual_Star_Id_(int16_t star_id, int16_t* out_actual_id) {
+        int16_t type = 0;
+
+        // Range [500, 999]
+        if (star_id >= 500 && star_id < 1000) {
+            *out_actual_id = star_id - 500;
+            return 1;
+        }
+
+        // Range [1000, 1499]
+        if (star_id >= 1000 && star_id < 1500) {
+            star_id -= 1000;
+            type = 2;
+        }
+
+        // Default or Range >= 1500
+        *out_actual_id = star_id;
+        return type;
+    }
+
+    /**
      * @address 004f1e80
      */
     bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner) {

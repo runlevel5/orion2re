@@ -768,7 +768,7 @@ namespace INITSHIP {
                     if (ship.location >= 0 && ship.location < 72 && 
                         ship.status == 0 && ship.d.ship_type == 0) {
                         
-                        if (Test_Bit_Field_(&MOX::_star[ship.location].has_colony, (int16_t)ship.owner)) {
+                        if (struct_::Test_Bit_Field_(&MOX::_star[ship.location].has_colony, (int16_t)ship.owner)) {
                             Repair_Ship_Full_(i);
                         }
                     }
@@ -866,10 +866,10 @@ namespace INITSHIP {
             local_attack += CMBTFIR2::Weaponry_Bonus_(ship->officer_index);
         }
 
-        int16_t crew_def_bonus = _crew_data[(int)ship->crew_quality].defense;
+        int16_t crew_def_bonus = MOX::_crew_data[(int)ship->crew_quality].defense;
         local_defense += crew_def_bonus;
         local_missile_defense += (int16_t)(crew_def_bonus / 2);
-        local_attack += _crew_data[(int)ship->crew_quality].attack;
+        local_attack += MOX::_crew_data[(int)ship->crew_quality].attack;
 
         if (ship->owner < 8) {
             s_player* owner_player = &MOX::_player[(int)ship->owner];

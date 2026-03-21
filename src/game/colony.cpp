@@ -1978,4 +1978,63 @@ namespace COLONY {
         return (int16_t)_colonists_count;
     }
 
+    /**
+     * @address 004dc0c0
+     */
+    void __cdecl Set_Colony_Globals_(int16_t param_1) {
+        _colony_handle = param_1;
+        _planet_handle = MOX::_colony[param_1].planet;
+        _star_handle = MOX::_planet[_planet_handle].star_index;
+        *reinterpret_cast<int32_t*>(_orbit_n) = MOX::_planet[_planet_handle].orbit;
+    }
+
+    /**
+     * @address 004dcc90
+     */
+    s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1) {
+        return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, param_1 + 0x13, MOX::_global_cache_seg);
+    }
+
+    /**
+     * @address 004dccb0
+     */
+    s_animation_header* __cdecl Govt_Anim_(int16_t param_1) {
+        return Load_Govt_Anim_(param_1);
+    }
+
+    /**
+     * @address 004dd790
+     */
+    void __cdecl Get_Bldg_Box_(int16_t c, int16_t r, int16_t* x_arr, int16_t* y_arr) {
+        x_arr[0] = (int16_t)CR_To_XY_(c, r, 0);
+        x_arr[1] = (int16_t)CR_To_XY_(c + 1, r, 0);
+        x_arr[2] = (int16_t)CR_To_XY_(c + 1, r + 1, 0);
+        x_arr[3] = (int16_t)CR_To_XY_(c, r + 1, 0);
+
+        y_arr[0] = (int16_t)CR_To_XY_(c, r, 1);
+        y_arr[1] = (int16_t)CR_To_XY_(c + 1, r, 1);
+        y_arr[2] = (int16_t)CR_To_XY_(c + 1, r + 1, 1);
+        y_arr[3] = (int16_t)CR_To_XY_(c, r + 1, 1);
+    }
+
+    /**
+     * @address 004dcdb0
+     */
+    s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
+        if (frame == 0) {
+            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 8, MOX::_global_cache_seg));
+        }
+        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 0x23, MOX::_global_cache_seg));
+    }
+
+    s_animation_header* __cdecl Short_Anims_(int16_t type, int16_t is_tens, uint8_t frame) {
+        s_animation_header* anim = Import_Anims_(type, is_tens, frame);
+
+        bitmap::Create_Blank_Bitmap_(30, 30, _swap_bitm);
+        bitmap::Add_Picture_To_Bitmap_(1, 1, anim, _swap_bitm);
+        bitmap::Outline_Bitmap_(_swap_bitm, _swap_bitm, 0xED, 0);
+
+        return _swap_bitm;
+    }
+
 }

@@ -606,39 +606,46 @@ namespace COLSUM {
         _wee_event_strings[35] = ESTRINGS::E_Strings_(0x186);
     }
 
-    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
-        int16_t colony_id = _list_col[colony_idx];
-        int16_t y_pos = colony_idx * 31 + 38;
+    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx)
+    {
+        int32_t list_val = _list_col[colony_idx];
 
-        for (int16_t i = 0; i < 3; ++i) {
-            int32_t x1;
-            int32_t x2_base;
+        for (int16_t i = 0; i < 3; i++) {
+            int32_t ecx_val;
 
-            if (i == 0) {
-                x1 = 101;
-                x2_base = 236;
-            } else if (i == 1) {
-                x1 = 236;
-                x2_base = 378;
+            // The i == -1 block is present in the binary despite 'i' initializing to 0.
+            if (i == -1) {
+                ecx_val = 0x65;
+            } else if (i == 0) {
+                ecx_val = 0xec;
             } else {
-                x1 = 378;
-                x2_base = 512;
+                ecx_val = ((i == 1 ? -1 : 0) & (int32_t)0xffffff7a) + 0x200;
             }
 
-            int32_t index = i + (colony_idx * 3);
+            int32_t edx_val;
+            if (i == 0) {
+                edx_val = 0x65;
+            } else if (i == 1) {
+                edx_val = 0xec;
+            } else {
+                edx_val = ((i == 2 ? -1 : 0) & (int32_t)0xffffff7a) + 0x200;
+            }
+
+            int32_t offset = i + colony_idx * 3;
+            ecx_val -= 10;
 
             COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-                colony_id,
+                list_val,
                 i,
                 0,
-                x1,
-                y_pos,
-                x2_base - 10,
+                edx_val,
+                (colony_idx * 31) + 38,
+                ecx_val,
                 0,
-                _list_col_pop_ref[index].refs,
-                &_list_col_pop_count[index],
-                &_list_col_coord_vars[index],
-                &_list_col_job_fields[index]
+                _list_col_pop_ref[offset].refs,
+                &_list_col_pop_count[offset],
+                &_list_col_coord_vars[offset],
+                &_list_col_job_fields[offset]
             );
         }
     }

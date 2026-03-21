@@ -47,4 +47,10 @@ namespace KEN {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C1DF0});
         fn(player_idx, app1, count);
     }
+
+    inline s_animation_header* __cdecl Get_Ship_Id_Picture_Seg_(int16_t ship_idx) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1c90});
+        return fn(ship_idx);
+    }
 }

@@ -41,4 +41,10 @@ namespace FLEETPOP {
     void __cdecl Clear_Ship_Node_Selection_Flags_();
 
     void __cdecl Reload_Fleet_Box_Palette_(int16_t player_idx, uint32_t is_not_player);
+
+    inline void __cdecl Draw_Damage_Bars_(int16_t x, int16_t y, int16_t arg3, int16_t arg4, int16_t arg5, int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403ef0});
+        fn(x, y, arg3, arg4, arg5, ship_idx);
+    }
 }

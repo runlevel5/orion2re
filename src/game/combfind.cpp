@@ -389,13 +389,13 @@ void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx_ptr, int16_t* attacker_id
         uint8_t star_idx = (uint8_t)_battle_stars[star_list_idx];
         *star_idx_ptr = (int16_t)star_idx;
 
-        if ((MOX::_game_type == 2 || MOX::_game_type == 3) && Some_Star_Player_Is_Busy_(*star_idx_ptr)) {
+        if ((MOX::_game_type == 2 || MOX::_game_type == 3) && COMBFIND::Some_Star_Player_Is_Busy_(*star_idx_ptr)) {
             // Skip star if player logic is currently busy (e.g. multiplayer/hotseat)
             star_list_idx--;
             *star_idx_ptr = -1;
         } else {
             do {
-                *attacker_idx_ptr = Pick_Attacker_At_Star_(*star_idx_ptr);
+                *attacker_idx_ptr = COMBFIND::Pick_Attacker_At_Star_(*star_idx_ptr);
 
                 if (*attacker_idx_ptr == -1) {
                     // No valid attacker found at this star, remove the star from the list by swapping with last
@@ -408,7 +408,7 @@ void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx_ptr, int16_t* attacker_id
                     // Mark this player as processed for this star in the current pick
                     (*_player_needs_to_attack)[*star_idx_ptr] &= ~(1 << *attacker_idx_ptr);
 
-                    Collect_Targets_For_Combat_(*star_idx_ptr, *attacker_idx_ptr);
+                    COMBFIND::Collect_Targets_For_Combat_(*star_idx_ptr, *attacker_idx_ptr);
 
                     // If no valid targets (player or colony) were found, try to find another attacker at the same star
                     if (_target.num_player_targets == 0 && _target.num_colony_targets == 0) {

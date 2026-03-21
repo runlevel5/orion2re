@@ -64,8 +64,8 @@ namespace MAINSCR {
     inline int16_t& _n_twinkling_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEA8});
     inline int16_t& _main_screen_ship_icon_scanned =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596188});
-    inline s_colors &_ship_direction_line_green_colors = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00559830});
-    inline s_colors &_ship_direction_line_red_colors = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00559838});
+    inline s_colors& _ship_direction_line_green_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559830});
+    inline s_colors& _ship_direction_line_red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559838});
     inline uint8_t& _fltpop_field_selection_status = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CECC});
     inline int8_t (&_diplo_lights_anim_frame)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0056CEB8});
     inline s_animation_header* (&_player_lights_seg)[8] = *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x00596110});
@@ -307,9 +307,9 @@ namespace MAINSCR {
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
-    inline int __cdecl Scan_Galaxy_Map_Fields_(int16_t scanned, int16_t input, int16_t* out_scanned, int16_t* out_idx) {
-        using Fn = int(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004CBE00})(scanned, input, out_scanned, out_idx);
+    inline int16_t __cdecl Scan_Galaxy_Map_Fields_(uint32_t scan_input, int16_t input, int16_t* scanned_star_id, int16_t* clicked_star_id) {
+        using Fn = int16_t(__cdecl*)(uint32_t, int16_t, int16_t*, int16_t*);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x004CBE00})(scan_input, input, scanned_star_id, clicked_star_id);
     }
     inline void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int dir) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*, int);

@@ -378,7 +378,7 @@ namespace COLBLDG {
         random::Set_Random_Seed_(static_cast<uint32_t>(COLONY::_colony_handle));
 
         COLONY::_star_handle = static_cast<int32_t>(MOX::_screen_data);
-        COLONY::_orbit_n = static_cast<int32_t>(COLONY::_orbit_temp);
+        *reinterpret_cast<int32_t*>(COLONY::_orbit_n) = static_cast<int32_t>(COLONY::_orbit_temp);
 
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
         COLONY::_planet_handle = static_cast<int32_t>(planet_idx);
@@ -521,7 +521,7 @@ namespace COLBLDG {
 
     void __cdecl Clear_Last_App_Desc_() {
         Clear_Last_App_Description_String_();
-        _buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xAF6);
+        _buffer = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xAF6);
     }
 
     void __cdecl Draw_Militarys_List_() {
@@ -690,22 +690,15 @@ namespace COLBLDG {
      */
     void __cdecl Get_App_Description_String_(char* dest, int16_t app_id) {
         char lbx_name[20];
-        void* record;
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
 
         if (_last_app != app_id) {
             _last_app = app_id;
-            // Reload record from LBX if the app index changed
-            record = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 1403 /* 0x57B */);
-        } else {
-            record = _desc_record_ptr;
+            _desc_record_ptr = (uint8_t*)farload::Far_Reload_Data_(lbx_name, 0, _buffer, app_id, 1, 0x57B);
         }
 
-        _desc_record_ptr = record;
-
-        // Copy the description string located at offset 0x67 of the record
-        strcpy(dest, (char*)record + 0x67);
+        strcpy(dest, reinterpret_cast<char*>(_desc_record_ptr + 0x67));
     }
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {
@@ -1006,7 +999,7 @@ namespace COLBLDG {
 
         if (app_id != _last_app) {
             _last_app = app_id;
-            _desc_record_ptr = farload::Far_Reload_Data_(help_lbx_name, 0, _buffer, app_id, 1, 0x57b);
+            _desc_record_ptr = (uint8_t*)farload::Far_Reload_Data_(help_lbx_name, 0, _buffer, app_id, 1, 0x57b);
         }
 
         const char* record_text = reinterpret_cast<const char*>(_desc_record_ptr) + 0x67;

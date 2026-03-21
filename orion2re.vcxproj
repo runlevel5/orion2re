@@ -302,6 +302,7 @@
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\special.h" />
     <ClInclude Include="src\game\spy.h" />
+    <ClInclude Include="src\game\string.h" />
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\sys.h" />

@@ -5,18 +5,6 @@
 
 void __cdecl nullsub_004d7840();
 
-struct s_animation_header;
-struct s_ship_design;
-struct s_crew_data;
-struct s_player;
-struct s_leader_data;
-struct s_star_data;
-struct s_combfind_target;
-struct s_combat_data;
-struct s_qship;
-
-inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
-
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
 inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
@@ -283,6 +271,8 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
     return fn(filename, mode);
 }
 
+inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
+
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
@@ -453,24 +443,6 @@ inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* s
     return fn(filename, index, segment);
 }
 
-inline s_animation_header* __cdecl Far_Reload_(const char* filename, int16_t entry, uint32_t segment) {
-    using Fn = s_animation_header*(__cdecl*)(const char*, int16_t, uint32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051C710});
-    return fn(filename, entry, segment);
-}
-
-inline int16_t __cdecl Get_Width_(s_animation_header* anim) {
-    using Fn = int16_t(__cdecl*)(s_animation_header*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D20});
-    return fn(anim);
-}
-
-inline int16_t __cdecl Get_Height_(s_animation_header* anim) {
-    using Fn = int16_t(__cdecl*)(s_animation_header*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D30});
-    return fn(anim);
-}
-
 inline void __cdecl Combat_Draw_View_Ship_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d1f80});
@@ -598,6 +570,8 @@ inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
 inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintptr_t{0x00558BD8});
+
+inline const char*& PTR_s_FLEET_LBX_005584a8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005584A8});
 
 inline const char* s_RACEOPT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DB0}); // "RACEOPT.LBX"
 inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); // "SAVE"
@@ -741,91 +715,3 @@ inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055
 
 inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
 
-inline void __cdecl Main_Council_Screen_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7f50});
-    fn();
-}
-
-inline void __cdecl Find_Opportunity_Attack_Aux_(int16_t plr1, int16_t plr2, int16_t val, int16_t star_idx, int16_t* planet_idx, int16_t* unknown, int32_t* aux_info) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465e80});
-    fn(plr1, plr2, val, star_idx, planet_idx, unknown, aux_info);
-}
-
-inline void __cdecl Load_Doom_Star_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480ea0});
-    fn(player_idx, design);
-}
-
-inline void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00480f50});
-    fn(player_idx, design);
-}
-
-inline void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
-    using Fn = void(__cdecl*)(int16_t, s_ship_design*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004810f0});
-    fn(player_idx, design);
-}
-
-inline void __cdecl Move_Officer_To_Pool_(int16_t officer_idx) {
-    using Fn = void(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e2c0});
-    fn(officer_idx);
-}
-
-inline void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star) {
-    using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_star_data*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004446C0});
-    fn(player, leader, star);
-}
-
-inline bool __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
-    using Fn = bool(__cdecl*)(void*, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFB5});
-    return fn(field, bit_index);
-}
-
-inline void __cdecl Set_Bit_Field_(void* field, int16_t bit_index) {
-    using Fn = void(__cdecl*)(void*, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CFED});
-    fn(field, bit_index);
-}
-
-inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412E20});
-    fn(root1, root2, mode);
-}
-
-inline void __cdecl Set_Last_Colony_Selected_(int16_t colony_idx, int16_t player_num) {
-    using Fn = void(__cdecl*)(int16_t, int16_t);
-    reinterpret_cast<Fn>(0x0049aff0)(colony_idx, player_num);
-}
-
-inline void __cdecl Set_Plyr_Info_Btns_(int32_t button_id) {
-    using Fn = void(__cdecl*)(int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004299E0});
-    fn(button_id);
-}
-
-inline bool __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
-    using Fn = bool(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCD50});
-    return fn(star_idx);
-}
-
-inline int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCA70});
-    return fn(star_idx);
-}
-
-inline void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t attacker_idx) {
-    using Fn = void(__cdecl*)(int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCB20});
-    fn(star_idx, attacker_idx);
-}

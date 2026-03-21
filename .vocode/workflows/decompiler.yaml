@@ -518,7 +518,9 @@ workflows:
             existing codebase conventions.
           * If structure field does not seem to exist - you MUST emit it as provided in the input. You are NOT allowed to
             change the name or use a different field.
-          * If you need to search for things, always use `rg` (ripgrep) instead of old `grep`.
+          * If you need to search for things, always use `rg` (ripgrep) instead of 'grep'. Do NOT use 'grep'.
+          * Always read whole files via provided tool. Do not use shell `grep`, `cat` and similar commands to read full or
+            partial file contents. You are allowed to use `tail` to read "hooks.cpp".
           * `MSG` is a reserved name and you should put members of `MSG` under `MSG_` namespace found in `src/game/msg.h`.
           * Always prefer enum value name over raw value. 
           * Never put function or variable stubs to .cpp files - they should go to headers.

@@ -166,7 +166,7 @@ namespace COLLAND {
         COLONY::_using_colony_screen_palette = 1;
 
         COLONY::_star_handle = (int32_t)MOX::_screen_data;
-        COLONY::_orbit_n = (int32_t)COLONY::_orbit_temp;
+        *reinterpret_cast<int32_t*>(COLONY::_orbit_n) = (int32_t)COLONY::_orbit_temp;
 
         COLONY::_planet_handle = (int32_t)HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
         COLONY::_colony_handle = (int32_t)MOX::_planet[COLONY::_planet_handle].colony_index;

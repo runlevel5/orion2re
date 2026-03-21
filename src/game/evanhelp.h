@@ -75,4 +75,9 @@ namespace EVANHELP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041e610 });
         fn();
     }
+
+    inline void __cdecl Set_Fleet_Screen_Help_List_(int16_t val) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0041e160})(val);
+    }
 }

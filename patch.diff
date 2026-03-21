@@ -1,0 +1,7 @@
+--- src/game/flt1.cpp
++++ src/game/flt1.cpp
+@@ -1,6 +1,6 @@
+         MAINSCR::Allocate_First_Screen_Seg_(5);
+ 
+-        MOX::_fleet_background_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX, 0, MOX::_screen_seg);
++        MOX::_fleet_background_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_FLEET_LBX_005584a8, 0, MOX::_screen_seg);

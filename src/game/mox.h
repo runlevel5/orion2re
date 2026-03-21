@@ -23,6 +23,7 @@ namespace MOX {
     inline int16_t& _big_icon_y_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059784E});
     inline int16_t& _offpop_big_icon_selected = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C456});
     inline uint8_t& _drawing_officer_popup = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D50});
+    inline int8_t*& _fltscrn_ship_icon_selection_list = *reinterpret_cast<int8_t**>(std::uintptr_t{ 0x0059b4a0 });
     inline uint8_t& _look_at_colonies = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A185F});
     inline s_big_icon*& _fltscrn_big_icon = *reinterpret_cast<s_big_icon**>(std::uintptr_t{0x00597460});
     inline uint8_t& _add_help_fields = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597024});
@@ -31,6 +32,25 @@ namespace MOX {
     inline uint8_t& _draw_expanding_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BF32});
     inline uint8_t& _mainscr_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A1AF4});
     inline s_scroll_bar*& _scroll_bar = *reinterpret_cast<s_scroll_bar**>(std::uintptr_t{0x00597370});
+    inline int16_t& _fltscrn_stack_owner = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6B6});
+    inline uint8_t& _add_scrap_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E1});
+    inline uint8_t& _skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059bef0 });
+    inline uint8_t& _fix_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059baac });
+    inline s_animation_header*& _scrap_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597824});
+    inline uint8_t& _add_all_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B438});
+    inline s_animation_header*& _fleet_all_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D4C});
+    inline s_animation_header*& _fleet_return_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597920});
+    inline int16_t& _old_fltscrn_stack_owner =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597918});
+    inline s_animation_header*& _up_scroll_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597914});
+    inline s_animation_header*& _down_scroll_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C45C});
+    inline s_animation_header*& _prev_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD10});
+    inline s_animation_header*& _next_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D20});
+    inline s_animation_header*& _relocate_fleet_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C450});
+    inline s_animation_header*& _officers_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1820});
+    inline uint8_t& _add_officers_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B4BB});
+    inline short& _fltscrn_support_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x0059776C});
+    inline short& _fltscrn_combat_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x00597464});
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
     inline int8_t (&_player_mode)[15] =
         *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
@@ -75,6 +95,8 @@ namespace MOX {
         *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597380});
     inline s_animation_header* (&_antaran_ship_icons)[24] =
         *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597670});
+    inline s_animation_header* (& _fltscrn_small_ship_icon_seg)[8] =
+        *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x005A1760});
     inline s_animation_header* (&_monster_ship_seg)[4] =
         *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x0059BF10});
     inline s_animation_header* (&_hl_monster_ship_icon_seg)[4] =
@@ -83,6 +105,7 @@ namespace MOX {
         *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A1870});
     inline s_animation_header* (&_hl_ship_icon_seg)[32] =
         *reinterpret_cast<s_animation_header* (*)[32]>(std::uintptr_t{0x005A4A00});
+    inline s_animation_header*& _fleet_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005a47d8 });
     inline void*& _officer_pictures_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597778});
     inline s_animation_header*& _officer_main_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597830});
     inline s_animation_header*& _officer_colony_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B44C});
@@ -96,11 +119,11 @@ namespace MOX {
     inline void*& _officer_return_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B440});
     inline void*& _officer_cancel_hire_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5FC});
     inline void*& _selected_box_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005977E8});
-    inline void*& _scanned_box_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005977E4});
-    inline void*& _fleet_scroll_anim_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B40});
+    inline s_animation_header*& _scanned_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005977E4});
+    inline s_animation_header*& _fleet_scroll_anim_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B40});
     inline void*& _officer_normal_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD2C});
     inline void*& _officer_bright_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597020});
-    inline s_animation_header** _temp_officers_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B338});
+    inline s_animation_header**& _temp_officers_pict = *reinterpret_cast<s_animation_header***>(std::uintptr_t{0x0059B338});
     inline void*& _officer_dismiss_button_seg_active = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5E4});
     inline s_animation_header*& _officer_fleet_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979A8});
     inline void*& _officer_dismiss_button_seg_inactive = *reinterpret_cast<void**>(std::uintptr_t{0x005979AC});
@@ -116,6 +139,9 @@ namespace MOX {
 
     inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
+
+    inline int8_t*& _fltscrn_icon_selection_status =
+        *reinterpret_cast<int8_t**>(std::uintptr_t{0x00596438});
 
     // References
     inline int8_t (&_food_per_farmer_table)[10] =
@@ -271,7 +297,7 @@ namespace MOX {
     inline uint16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597AC8});
     inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
-    inline int8_t& _draw_fleet_screen_to_back = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059770C});
+    inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
     inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
     inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
     inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});
@@ -528,7 +554,9 @@ namespace MOX {
     inline s_animation_header* (&_msl_seg)[112] =
         *reinterpret_cast<s_animation_header* (*)[112]>(std::uintptr_t{0x005A47F0});
     inline s_animation_header* (&_ship_cursor)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BF00});
-    inline s_animation_header** _shield_div_bitmap = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BFA0});
+    inline s_animation_header* (&_shield_div_bitmap)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BFA0});
+    inline s_animation_header* (&_fltscrn_monster_ship_icon)[8] =
+        *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x0059BFC0});
     inline s_animation_header** _shield_mask_bitmap = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BAE0});
     inline int16_t* _fighter_beam_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B450});
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
@@ -573,6 +601,11 @@ namespace MOX {
 
     inline int16_t*& _officers_original_ship_id =
         *reinterpret_cast<int16_t**>(std::uintptr_t{0x005A1CBC});
+
+    inline void*& _dimmed_all_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1788});
+    inline void*& _dimmed_relocate_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059C434});
+    inline void*& _dimmed_scrap_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A47DC});
+    inline void*& _dimmed_officers_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A4AA0});
 
     inline s_leader_data*& _leaders =
         *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });
@@ -756,6 +789,12 @@ namespace MOX {
 
     inline int16_t (&_galaxy_map_star_field)[72] =
         *reinterpret_cast<int16_t(*)[72]>(std::uintptr_t{0x0059B280});
+
+    inline s_animation_header* (&_fltscrn_flashing_ship_pict_seg)[8] =
+        *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x005976E0});
+
+    inline s_animation_header* (&_fltscrn_flashing_monster_ship_icon)[8] =
+        *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x005A2C00});
 
     // Funcs
     inline void __cdecl Mox_Sync_Update_() {

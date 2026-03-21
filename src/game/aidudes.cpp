@@ -286,7 +286,7 @@ namespace aidudes {
                         source_design = &aidudes::_p_ai->ship_designs[(int)ship.d.size];
                     } else {
                         if (doom_star_design.cost == 0) {
-                            Load_Doom_Star_Ship_Design_(aidudes::_i_ai, &doom_star_design);
+                            INITSHIP::Load_Doom_Star_Ship_Design_(aidudes::_i_ai, &doom_star_design);
                         }
                         source_design = &doom_star_design;
                     }
@@ -977,7 +977,7 @@ namespace aidudes {
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
                         if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 > random::Random_(100)) {
-                            Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
+                            INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
                             int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
                                 no_range_or_speed = true;
@@ -1155,7 +1155,7 @@ namespace aidudes {
                                     }
                                     if (p->tech_applications[55] == 3 && size_9 >= 5) {
                                         if (ship_design.cost == 0) {
-                                            Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
+                                            INITSHIP::Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
                                         }
                                         if (ship_design.cost <= (war_level * 2 + 48) * ind_worth) {
                                             ship_weights[5] = 150;
@@ -1250,7 +1250,7 @@ namespace aidudes {
                                 s_ship_design* refit_design;
                                 if (s->d.size == 5) {
                                     if (ship_design.cost == 0) {
-                                        Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
+                                        INITSHIP::Load_Doom_Star_Ship_Design_(player_idx, &ship_design);
                                     }
                                     refit_design = &ship_design;
                                 } else {
@@ -1262,7 +1262,7 @@ namespace aidudes {
                                     cost <= AIBUILD::Industry_Worth(temp_colony) * (war_level + 10)) {
 
                                     if (s->officer_index != -1) {
-                                        Move_Officer_To_Pool_(s->officer_index);
+                                        OFFICER::Move_Officer_To_Pool_(s->officer_index);
                                         s->officer_index = -1;
                                     }
 
@@ -1296,7 +1296,7 @@ namespace aidudes {
                                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 22);
                                 AIBUILD::_player_n_transports[player_idx][1]--;
                             } else {
-                                Load_Transport_Ship_Design_(player_idx, &p->ship_designs[5]);
+                                INITSHIP::Load_Transport_Ship_Design_(player_idx, &p->ship_designs[5]);
                                 int16_t tr_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)current_colony_idx);
                                 if (tr_idx == -1) {
                                     no_range_or_speed = true;

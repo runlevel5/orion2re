@@ -902,7 +902,7 @@ namespace OFFICER {
         MOX::_big_icon_y_offset = 0x13;
 
         Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, &star_view_btn, &fleet_view_btn, &ok_btn, (int)big_icons_scanned, (int)big_icons_ids, &scroll_up_btn, &scroll_down_btn, &prev_btn, &next_btn, &dummy_field);
-        FLT1::Initialize_Scroll_Bar_(MOX::_scroll_bar);
+        OFFICER::Initialize_Scroll_Bar_(MOX::_scroll_bar);
 
         MOX::_offpop_big_icon_selected = -1;
         MOX::_system_star_id = -1;
@@ -1137,7 +1137,7 @@ namespace OFFICER {
                 needs_help_reset = 0;
                 EVANHELP::Set_Officer_Screen_Help_();
                 if (MOX::_officer_scrn_type == 0) {
-                    FLT1::Initialize_Scroll_Bar_(MOX::_scroll_bar);
+                    OFFICER::Initialize_Scroll_Bar_(MOX::_scroll_bar);
                 }
             }
 
@@ -2149,8 +2149,8 @@ namespace OFFICER {
         MOX::Mox_Update_();
 
         MOX::_selected_box_seg = MOX::farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
-        MOX::_scanned_box_seg = MOX::farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
-        MOX::_fleet_scroll_anim_seg = MOX::farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
+        MOX::_scanned_box_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
+        MOX::_fleet_scroll_anim_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
         MOX::_dull_officer_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
         MOX::_dull_officer_pool_button_seg = MOX::farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
         MOX::_officer_pool_button_seg_active = MOX::farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
@@ -2158,12 +2158,12 @@ namespace OFFICER {
 
         MOX::Mox_Update_();
 
-        MOX::_officer_normal_window_seg = MOX::farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
-        MOX::_officer_bright_window_seg = MOX::farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
+        MOX::_officer_normal_window_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
+        MOX::_officer_bright_window_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        MOX::_temp_officers_pict = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+        MOX::_temp_officers_pict = (s_animation_header**)MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
 
         Get_Officer_Pictures_();
         Load_Officer_Skill_Name_Descriptions_();
@@ -2453,5 +2453,20 @@ namespace OFFICER {
         if (leader->type == 1) {
             COLCALC::Do_Player_Colony_Calculations_((int16_t)leader->player_index);
         }
+    }
+
+    void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* sb) {
+        sb->visible_rows = 3;
+        sb->track_len_px = 0x79;
+
+        int16_t height = SCROLL::Get_Vertical_Scroll_Bar_Height_(sb);
+
+        sb->thumb_height_px = height;
+        sb->last_thumb_center_y = -1;
+        sb->field14_0x18 = 2;
+        sb->row_step = 1;
+
+        // Division logic (CDQ; SUB EAX, EDX; SAR EAX, 1) implements signed height / 2
+        sb->thumb_center_y = sb->track_len_px - (height / 2);
     }
 }

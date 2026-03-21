@@ -1312,12 +1312,12 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
         MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_index, MOX::_global_cache_seg);
     }
 
-    MOX::_mp_screen->anim_btn_unk_2 = Far_Reload_(s_MULTIGM_LBX_00558d04, 0x101, (uint32_t)MOX::_screen_seg);
+    MOX::_mp_screen->anim_btn_unk_2 = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX_00558d04, 0x101, MOX::_screen_seg);
 
-    width = Get_Width_(MOX::_mp_screen->anim_btn_unk_4);
+    width = animate::Get_Width_(MOX::_mp_screen->anim_btn_unk_4);
     MOX::_mp_screen->screen_x = (640 - width) / 2;
 
-    height = Get_Height_(MOX::_mp_screen->anim_btn_unk_4);
+    height = animate::Get_Height_(MOX::_mp_screen->anim_btn_unk_4);
     MOX::_mp_screen->screen_y = (399 - height) / 2 + 37 /* 0x25 */;
 
     MOX::_mp_screen->sel_anim_active = 1;

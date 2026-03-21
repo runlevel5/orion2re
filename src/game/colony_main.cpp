@@ -202,7 +202,7 @@ namespace COLONY {
         _using_colony_screen_palette = 1;
 
         _star_handle = (int32_t)MOX::_screen_data;
-        _orbit_n = (int32_t)_orbit_temp;
+        *reinterpret_cast<int32_t*>(_orbit_n) = (int32_t)_orbit_temp;
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, _orbit_temp);
         _planet_handle = (int32_t)planet_idx;
 

@@ -54,6 +54,7 @@ workflows:
             local variables.
           * If you have to search current project, always use `rg` instead of `grep`.
           * Prefer built-in tools over shell tools. For example, use built-in `read_files` instead of `cat` through shell.
+          * Ensure that external function stubs and external variables have correct types and addresses.
           
           # OUTPUT:
           * Your must output places where project code is different from provided disassembly with very short and concise explanation why.
@@ -65,6 +66,7 @@ workflows:
           * You found and read existing function in the codebase
           * You analyzed and confirmed hypothesis
           * You provided a list of identified discrepancies with explanations
+          * You did not make any file changes without prior approval
         outcomes:
           - name: done
     edges:

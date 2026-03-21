@@ -22,7 +22,7 @@ namespace council {
                                      (diplodef::_COUNCIL_FLAG == 0);
 
             if (time_for_meeting && active_players > 2 && owned_stars >= (MOX::_NUM_STARS / 2)) {
-                Main_Council_Screen_();
+                council::Main_Council_Screen_();
                 diplodef::_next_council_meeting_turn = (int16_t)MOX::_stardate + 30561;
             }
         }

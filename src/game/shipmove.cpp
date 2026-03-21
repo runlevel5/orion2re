@@ -660,7 +660,7 @@ namespace SHIPMOVE {
                     has_jumpgate_route = 1;
                 }
 
-                if (Test_Bit_Field_(MOX::_star[start_star_id].black_hole_blocks, target_star_idx)) {
+                if (struct_::Test_Bit_Field_(MOX::_star[start_star_id].black_hole_blocks, target_star_idx)) {
                     if (navigator_bonus == 0 && move_info->uses_wormhole == 0) {
                         if (move_info->has_stargate_route == 0 && has_jumpgate_route == 0) {
                             move_info->blackhole_blocks = 1;

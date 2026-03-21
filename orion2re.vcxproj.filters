@@ -902,6 +902,9 @@
     <ClInclude Include="src\game\firepts.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\string.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

@@ -75,6 +75,12 @@ namespace BILL {
         fn();
     }
 
+    inline void __cdecl Set_Plyr_Info_Btns_(int32_t button_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004299E0 });
+        fn(button_id);
+    }
+
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
     inline const char* s_SR_R_wildcard_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512E0}); // "SR_R?_SC.LBX"

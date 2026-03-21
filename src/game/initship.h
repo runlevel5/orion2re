@@ -126,4 +126,10 @@ namespace INITSHIP {
     int16_t __cdecl Cost_Of_Strategic_Design_(int16_t govt_type, struct s_ship_design* design);
 
     void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bonus_out, int16_t* defense_rating_out, int16_t* missile_defense_out);
+
+    inline void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+        using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004810f0 });
+        fn(player_idx, design);
+    }
 }

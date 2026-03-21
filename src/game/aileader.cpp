@@ -140,7 +140,7 @@ namespace aileader {
         }
 
         if (star_scores[best_star_idx] != 0) {
-            Ai_Assign_Leader_To_Star_(&MOX::_player[player_index], &MOX::_leaders[leader_index], &MOX::_star[best_star_idx]);
+            OFFICER::Ai_Assign_Leader_To_Star_(&MOX::_player[player_index], &MOX::_leaders[leader_index], &MOX::_star[best_star_idx]);
         }
     }
 

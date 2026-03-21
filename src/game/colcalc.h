@@ -69,10 +69,12 @@ namespace COLCALC {
     inline const char* s_fmt_val_name = reinterpret_cast<const char*>(std::uintptr_t{0x0055A94C});
     inline const char* s_fmt_val_msg = reinterpret_cast<const char*>(std::uintptr_t{0x0055A958});
 
-    inline bool __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t building_id) {
-        using Fn = bool(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F6410});
-        return fn(colony, building_id);
+    uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product);
+
+    inline uint8_t __cdecl Room_For_Another_Dude_(s_colony* colony, int16_t pop_type) {
+        using Fn = uint8_t(__cdecl*)(s_colony*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F5D70});
+        return fn(colony, pop_type);
     }
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent);
@@ -106,24 +108,11 @@ namespace COLCALC {
 
     int32_t __cdecl Mixed_Race_Morale_Penalty_(s_colony* colony);
 
-    inline char* __cdecl Player_Name_(int32_t player_idx) {
-        using Fn = char*(__cdecl*)(int32_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004fcb40})(player_idx);
-    }
+    char* __cdecl Player_Name_(int32_t player_idx);
 
     int __cdecl Colony_Officer_(s_colony* colony);
 
     short __cdecl Colony_Race_Pop_Limit_(s_colony* colony, int16_t player_idx);
-
-    inline int16_t __cdecl Owned_Officer_Level_(int officer_idx) {
-        using Fn = int16_t(__cdecl*)(int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0043e780})(officer_idx);
-    }
-
-    inline int16_t __cdecl Officer_Maintenance_(int16_t player_idx, int16_t leader_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0043E8C0})(player_idx, leader_idx);
-    }
 
     int16_t __cdecl Get_Player_Max_Population_(int16_t player_idx);
     int __cdecl Best_Leader_Diplomat_Bonus_(int player_idx);
@@ -369,8 +358,5 @@ namespace COLCALC {
 
     short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id);
 
-    inline int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony) {
-        using Fn = int16_t(__cdecl*)(s_colony*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004fc750})(colony);
-    }
+    int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony);
 }

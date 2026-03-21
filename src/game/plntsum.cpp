@@ -590,7 +590,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
             // Check if the current player can view the star system containing this planet
             if (SYS::Ok_To_View_System_(MOX::_planet[i].star_index, MOX::_PLAYER_NUM)) {
-                Set_Bit_Field_(PLNTSUM::_explored_bitmap, i);
+                struct_::Set_Bit_Field_(PLNTSUM::_explored_bitmap, i);
             }
         }
     }
@@ -929,7 +929,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             if (passes_filter) {
                 if (!Planet_Has_Been_Visited_(i)) {
                     passes_filter = false;
-                } else if (!Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
+                } else if (!struct_::Test_Bit_Field_(PLNTSUM::_explored_bitmap, i)) {
                     passes_filter = false;
                 }
             }
