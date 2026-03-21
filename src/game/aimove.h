@@ -26,7 +26,7 @@ namespace AIMOVE {
         return fn(ai_player, target_player);
     }
 
-    inline int16_t __cdecl Evaluate_Colony_Attack_Score_(int16_t colony_idx, int16_t* ship_list, int16_t turns_left, int8_t* mission, int8_t* visited_star, int16_t* target_info, int param_4) {
+    inline int16_t __cdecl Compute_Attack_Worthiness_(int16_t colony_idx, int16_t* ship_list, int16_t turns_left, int8_t* mission, int8_t* visited_star, int16_t* target_info, int param_4) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t, int8_t*, int8_t*, int16_t*, int);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00463090});
         return fn(colony_idx, ship_list, turns_left, mission, visited_star, target_info, param_4);

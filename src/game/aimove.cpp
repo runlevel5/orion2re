@@ -1665,8 +1665,7 @@ namespace AIMOVE {
                             SHIPMOVE::Ships_Try_To_Move_To_(ship_list, target_star, &move_info);
                             
                             if (move_info.moving != 0 && move_info.turns_left < 10) {
-                                // Note: 0x00463090 is Evaluate_Colony_Attack_Score_
-                                int16_t score = Evaluate_Colony_Attack_Score_(i, ship_list, move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
+                                int16_t score = Compute_Attack_Worthiness_(i, ship_list, move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
                                 scores[i] = score;
 
                                 if (score != 0) {
