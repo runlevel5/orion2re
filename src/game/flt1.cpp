@@ -408,11 +408,11 @@ namespace FLT1 {
         fields::Clear_Fields_();
 
         int16_t btn_relocate, btn_scrap, btn_close, btn_scroll_up, btn_scroll_down;
-        int16_t btn_next_ship, btn_prev_ship, btn_add_officers, btn_big_icons, btn_unknown;
+        int16_t btn_next_ship, btn_prev_ship, btn_add_officers, btn_all_ships, btn_scroll_field;
 
         Add_Fleet_Screen_Fields_(&btn_relocate, &btn_scrap, &btn_close, &btn_scroll_up,
                                  &btn_scroll_down, &btn_next_ship, &btn_prev_ship,
-                                 &btn_add_officers, &btn_big_icons, &btn_unknown);
+                                 &btn_add_officers, &btn_all_ships, &btn_scroll_field);
 
         Initialize_Scroll_Bar_(MOX::_scroll_bar);
         EVANHELP::Set_Fleet_Screen_Help_List_(MOX::_n_fltscrn_big_icons_added);
@@ -451,7 +451,7 @@ namespace FLT1 {
             fields::Clear_Fields_();
             Add_Fleet_Screen_Fields_(&btn_relocate, &btn_scrap, &btn_close, &btn_scroll_up,
                                      &btn_scroll_down, &btn_next_ship, &btn_prev_ship,
-                                     &btn_add_officers, &btn_big_icons, &btn_unknown);
+                                     &btn_add_officers, &btn_all_ships, &btn_scroll_field);
             timer::Mark_Time_();
             MOX::_fix_palette = 0;
 
@@ -550,7 +550,7 @@ namespace FLT1 {
                 MOX::_galaxy_map_scanned_star = -1;
             }
 
-            if (input == btn_big_icons && MOX::_n_fltscrn_big_icons > 0 &&
+            if (input == btn_all_ships && MOX::_n_fltscrn_big_icons > 0 &&
                 HACCESS::Ship_Owner_(MOX::_fltscrn_big_icon[0].ship_idx) == MOX::_PLAYER_NUM) {
                 Set_Fltscrn_Big_Icons_(MOX::_n_big_icons_selected != MOX::_n_fltscrn_big_icons);
             }
@@ -1028,7 +1028,7 @@ namespace FLT1 {
                                           int16_t* fleet_return_button_field_id, int16_t* up_scroll_button_field_id, 
                                           int16_t* down_scroll_button_field_id, int16_t* next_fleet_button_field_id, 
                                           int16_t* prev_fleet_button_field_id, int16_t* officers_button_field_id, 
-                                          int16_t* all_button_field_id, int16_t* big_icon_field_ids)
+                                          int16_t* all_button_field_id, int16_t* scroll_field_id)
     {
         int16_t temp_field_id;
 
@@ -1090,7 +1090,7 @@ namespace FLT1 {
         FLT2::Add_Fltscrn_Small_Icon_Fields_();
 
         if (MOX::_small_ship_stack_ptr > -1) {
-            FLT2::Fleet_Screen_Big_Icon_Fields_(big_icon_field_ids, 605, 86, 14, 234);
+            FLT2::Fleet_Screen_Big_Icon_Fields_(scroll_field_id, 605, 86, 14, 234);
             MOX::_scroll_bar->total_rows = (int16_t)MOX::_n_fltscrn_rows;
         }
 
