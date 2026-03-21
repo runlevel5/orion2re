@@ -18,10 +18,18 @@ namespace AIMOVE {
 
     void __cdecl Launch_Attacks_(int param_1, int param_2);
 
-    inline void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* param_2, int param_3, int param_4) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00462D10});
-        fn(star_idx, param_2, param_3, param_4);
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* target_info, int mission_type, int param_4);
+
+    inline int8_t __cdecl AI_May_Attack_Player_(int16_t ai_player, int16_t target_player) {
+        using Fn = int8_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460eb0});
+        return fn(ai_player, target_player);
+    }
+
+    inline int16_t __cdecl Evaluate_Colony_Attack_Score_(int16_t colony_idx, int16_t* ship_list, int16_t turns_left, int8_t* mission, int8_t* visited_star, int16_t* target_info, int param_4) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t, int8_t*, int8_t*, int16_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00463090});
+        return fn(colony_idx, ship_list, turns_left, mission, visited_star, target_info, param_4);
     }
 
     void __cdecl Intercept_Invaders_();

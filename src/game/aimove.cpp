@@ -1608,4 +1608,138 @@ namespace AIMOVE {
             AIMOVE::Interceptions_(intercepts, &i, star_to_intercept_idx, is_desperate);
         }
     }
+
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* target_info, int mission_type, int param_4)
+    {
+        int16_t target_info_copy[5];
+        int16_t* puVar8 = nullptr;
+        int16_t max_score = 0;
+        bool valid_target_found = false;
+        
+        s_ship_move_info move_info;
+        int8_t visited_stars[72];
+        int8_t mission_array[250];
+        int16_t scores[250];
+        int16_t ship_list[500];
+
+        // Initialize copy of target_info
+        if (target_info != nullptr) {
+            target_info_copy[0] = target_info[0];
+            target_info_copy[1] = target_info[1];
+            target_info_copy[2] = target_info[2];
+            target_info_copy[3] = target_info[3];
+            target_info_copy[4] = target_info[4];
+            puVar8 = target_info_copy;
+        }
+
+        for (int i = 0; i < 72; i++) {
+            visited_stars[i] = 0;
+        }
+
+        for (int i = 0; i < 250; i++) {
+            scores[i] = 0;
+        }
+
+        int16_t ship_count = Gather_Player_Ships_At_Star_(_i_ai, star_idx, ship_list);
+
+        if (MOX::_NUM_COLONIES > 0) {
+            for (int i = 0; i < MOX::_NUM_COLONIES; i++) {
+                int8_t owner = MOX::_colony[i].owner;
+                
+                if (owner != -1) {
+                    if (target_info == nullptr) {
+                        if (!AI_May_Attack_Player_(_i_ai, owner)) {
+                            continue;
+                        }
+                    } else {
+                        if (target_info[0] != owner) {
+                            continue;
+                        }
+                    }
+
+                    int16_t planet_idx = MOX::_colony[i].planet;
+                    int8_t target_star = MOX::_planet[planet_idx].star_index;
+
+                    if (visited_stars[target_star] == 0) {
+                        if ((((*AIDATA::_star_in_range_of_player)[target_star] >> _i_ai) & 1) != 0) {
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_list, target_star, &move_info);
+                            
+                            if (move_info.moving != 0 && move_info.turns_left < 10) {
+                                // Note: 0x00463090 is Evaluate_Colony_Attack_Score_
+                                int16_t score = Evaluate_Colony_Attack_Score_(i, ship_list, move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
+                                scores[i] = score;
+
+                                if (score != 0) {
+                                    int8_t mission = mission_array[i];
+                                    
+                                    if (mission == 1) {
+                                        if (mission_type != 1) {
+                                            scores[i] = 0;
+                                            continue;
+                                        }
+                                        if (max_score < score) {
+                                            max_score = score;
+                                            if (puVar8 != nullptr && puVar8[2] != -1) {
+                                                target_info[2] = puVar8[2];
+                                                target_info[3] = puVar8[3];
+                                                target_info[4] = puVar8[4];
+                                            }
+                                        }
+                                    } else if (mission == 2) {
+                                        if (mission_type != 2) {
+                                            scores[i] = 0;
+                                            continue;
+                                        }
+                                        if (max_score < score) {
+                                            max_score = score;
+                                        }
+                                    } else if (mission == 6) {
+                                        if (mission_type != 6) {
+                                            scores[i] = 0;
+                                            continue;
+                                        }
+                                        if (max_score < score) {
+                                            max_score = score;
+                                        }
+                                    } else {
+                                        // Bypasses validation setup entirely, leaves initial calculated score intact
+                                        continue;
+                                    }
+
+                                    valid_target_found = true;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+                scores[i] = 0;
+            }
+        }
+
+        if (valid_target_found && target_info == nullptr) {
+            for (int i = 0; i < 250; i++) {
+                // Drop scores below 2/3 of maximum
+                if ((uint32_t)scores[i] * 3 < (uint32_t)max_score * 2) {
+                    scores[i] = 0;
+                }
+            }
+
+            int16_t best_colony_idx = RUSS::Get_Weighted_Choice_Short_(scores, 250);
+            int8_t best_mission = mission_array[best_colony_idx];
+            int16_t best_planet_idx = MOX::_colony[best_colony_idx].planet;
+            int8_t best_star_idx = MOX::_planet[best_planet_idx].star_index;
+
+            (*AIDATA::_i_all_combat_ships)[_i_ai][star_idx] = -1;
+
+            SHIPMOVE::Ships_Try_To_Move_To_(ship_list, best_star_idx, &move_info);
+            SHIPMOVE::Make_Ships_Move_To_(ship_list, best_star_idx, &move_info);
+
+            while (ship_count > 0) {
+                ship_count--;
+                int16_t ship_idx = ship_list[ship_count];
+                MOX::_ship[ship_idx].mission = best_mission;
+            }
+        }
+    }
 }

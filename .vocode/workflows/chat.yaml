@@ -51,6 +51,7 @@ workflows:
             changes to the codebase.
           * Always prefer built-in tools to shell-based tools.
           * If you need to search the project, always use `ripgrep` and never use `grep`.
+          * You shall not make any changes unless explicitly requested and treat all inputs as clarifying
           
           # Patterns
           * CONCAT is an indication that variables are incorrectly sized
