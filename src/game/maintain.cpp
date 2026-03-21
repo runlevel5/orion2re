@@ -52,7 +52,7 @@ namespace maintain {
                 if (ship.owner == player_idx && ship.status < 5 && ship.d.ship_type == 0) {
                     for (int k = 0; k < (int)MOX::_NUM_PLAYERS; ++k) {
                         if (eligible_players[k]) {
-                            worths[j] += aipower::Ship_Strength_Vs_Ships_(j, (int16_t)k) & 0xFFFF;
+                            worths[j] += AIPOWER::Ship_Strength_Vs_Ships_(j, (int16_t)k) & 0xFFFF;
                         }
                     }
                     worths[j] /= (ship.d.size + 1) * eligible_count;

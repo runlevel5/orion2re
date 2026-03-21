@@ -307,7 +307,7 @@ namespace COLONY {
 
         Reset_Field_Mode_();
         fields::Clear_Fields_();
-        Clear_Fake_Buttons_();
+        FAKEBUTS::Clear_Fake_Buttons_();
         fields::Deactivate_Auto_Function_();
 
         MOX::_PLAYER_NUM = saved_player_num;

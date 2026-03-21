@@ -1421,7 +1421,7 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
                     if (player_idx != p) {
                         if ((*_star_has_player)[star_idx][p].has_player != 0 ||
                             (*_star_has_player)[star_idx][p].colony_count != 0) {
-                            player_strength[p] += aipower::Ship_Strength_Vs_Ships_(i, p);
+                            player_strength[p] += AIPOWER::Ship_Strength_Vs_Ships_(i, p);
                         }
                     }
                 }
@@ -1429,18 +1429,18 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
                 for (int16_t np = 8; np < 15; ++np) {
                     if ((((*_star_has_nonplayer)[star_idx] >> (np - 8)) & 1) != 0 &&
                         (((*_player_needs_to_attack)[star_idx] >> np) & 1) == 0) {
-                        player_strength[np] += aipower::Ship_Strength_Vs_Ships_(i, np);
+                        player_strength[np] += AIPOWER::Ship_Strength_Vs_Ships_(i, np);
                     }
                 }
 
                 int16_t shield[4];
-                aipower::Ship_Strength_Vs_Planetary_Shield_(i, shield);
+                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, shield);
                 
                 for (int j = 0; j < 4; ++j) {
                     shield_strength[j] += (uint32_t)shield[j];
                 }
             } else {
-                enemy_strength[owner] += aipower::Ship_Strength_Vs_Ships_(i, player_idx);
+                enemy_strength[owner] += AIPOWER::Ship_Strength_Vs_Ships_(i, player_idx);
             }
         }
     }
@@ -1483,10 +1483,10 @@ void __cdecl Get_Best_Colony_Target_(
             uint32_t our_space_str = our_space_str_arr[owner];
             uint32_t our_ground_str = our_ground_str_arr[shield_val];
 
-            uint32_t enemy_space_str_vs = aipower::Colony_Space_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
+            uint32_t enemy_space_str_vs = AIPOWER::Colony_Space_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
             uint32_t enemy_space_str = enemy_fleet_space_str_arr[owner] + enemy_space_str_vs;
 
-            uint32_t enemy_ground_str_vs = aipower::Colony_Ground_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
+            uint32_t enemy_ground_str_vs = AIPOWER::Colony_Ground_Strength_Vs_Player_(colony_idx, player_idx) & 0xFFFF;
             uint32_t enemy_ground_str = enemy_ground_str_vs;
 
             bool player_is_omni = false;
@@ -1519,7 +1519,7 @@ void __cdecl Get_Best_Colony_Target_(
             }
 
             if (is_valid) {
-                uint32_t worth = static_cast<uint32_t>(aimove::Enemy_Colony_Worth_To_Player_(colony_idx, player_idx));
+                uint32_t worth = static_cast<uint32_t>(AIMOVE::Enemy_Colony_Worth_To_Player_(colony_idx, player_idx));
 
                 if (enemy_space_str * 3 < our_space_str) {
                     our_space_str = 3;

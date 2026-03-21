@@ -1482,8 +1482,8 @@ namespace diplomac {
 
         int16_t base_chance = (int16_t)time_since_attack - 9;
 
-        int32_t p1_attacks = aimove::Number_Of_Attacks_Underway_(player_idx, target_idx);
-        int32_t p2_attacks = aimove::Number_Of_Attacks_Underway_(target_idx, player_idx);
+        int32_t p1_attacks = AIMOVE::Number_Of_Attacks_Underway_(player_idx, target_idx);
+        int32_t p2_attacks = AIMOVE::Number_Of_Attacks_Underway_(target_idx, player_idx);
 
         int16_t war_count_p2_p1 = Get_War_Count_(target_idx, player_idx);
         int16_t war_count_p1_p2 = Get_War_Count_(player_idx, target_idx);
@@ -1501,7 +1501,7 @@ namespace diplomac {
 
         for (int16_t p = 0; p < (int16_t)MOX::_NUM_PLAYERS; ++p) {
             if (p != player_idx && p != target_idx) {
-                score += (int16_t)(aimove::Number_Of_Attacks_Underway_(p, target_idx) * 20);
+                score += (int16_t)(AIMOVE::Number_Of_Attacks_Underway_(p, target_idx) * 20);
             }
         }
 
@@ -1842,7 +1842,7 @@ namespace diplomac {
                     int star_id, threat_val;
                     int planet_id = -1;
                     // TODO: Fix me!
-                    aimove::Player_Threatens_Player_(p1, p2, &star_id, &threat_val, &planet_id);
+                    AIMOVE::Player_Threatens_Player_(p1, p2, &star_id, &threat_val, &planet_id);
 
                     if (planet_id != -1) {
                         int16_t col_idx = MOX::_planet[planet_id].colony_index;

@@ -113,7 +113,7 @@ void __cdecl Next_Turn_Calc_() {
     aileader::Do_AI_Leaders_();
     AIBUILD::Compute_Empire_Building_Needs_();
     aidudes::All_Colony_AI_();
-    aimove::Move_All_AI_();
+    AIMOVE::Move_All_AI_();
     COLONIZE::All_AI_Colonize_();
     aitech::All_AI_Tech_Select_();
     maintain::Make_Scrap_Ships_Dead_();

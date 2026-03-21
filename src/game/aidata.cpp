@@ -196,11 +196,11 @@ namespace AIDATA {
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                         if (owner != p && MOX::_player[p].eliminated == 0) {
                             if (ship.d.ship_type == 0) {
-                                int16_t str = aipower::Ship_Strength_Vs_Ships_(i, p);
+                                int16_t str = AIPOWER::Ship_Strength_Vs_Ships_(i, p);
                                 (*_ship_strengths)[i][p] = str;
                                 (*_ai_player_info)[p].total_ship_strength += str;
-                                (*_ship_strengths_in_nebula)[i][p] = aipower::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
-                                aipower::Ship_Strength_Vs_Planetary_Shield_(i, (int16_t*)&(*_ship_bomb_strengths)[i][0]);
+                                (*_ship_strengths_in_nebula)[i][p] = AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
+                                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (int16_t*)&(*_ship_bomb_strengths)[i][0]);
                                 MOX::Mox_Update_();
                                 if (owner < 8 && turn_idx < 10) {
                                     int16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];

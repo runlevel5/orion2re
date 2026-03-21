@@ -688,17 +688,23 @@ namespace COLBLDG {
     /**
      * @address 00509800
      */
-    void __cdecl Get_App_Description_String_(char* dest, int16_t app_id) {
+    void __cdecl Get_App_Description_String_(char* dest_str, int16_t app_id) {
         char lbx_name[20];
+        void* record_ptr;
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
 
         if (_last_app != app_id) {
             _last_app = app_id;
-            _desc_record_ptr = (uint8_t*)farload::Far_Reload_Data_(lbx_name, 0, _buffer, app_id, 1, 0x57B);
+            record_ptr = farload::Far_Reload_Data_(lbx_name, 0, _buffer, (int)app_id, 1, 0x57B /* 1403 */);
+        } else {
+            record_ptr = _desc_record_ptr;
         }
 
-        strcpy(dest, reinterpret_cast<char*>(_desc_record_ptr + 0x67));
+        _desc_record_ptr = (uint8_t*)record_ptr;
+
+        // Copy description string starting at offset 0x67 of the record
+        strcpy(dest_str, (char*)record_ptr + 0x67);
     }
 
     void __cdecl Get_Setting_Description_String_(char* buffer, int16_t setting_id) {

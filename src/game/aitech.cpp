@@ -272,7 +272,7 @@ namespace aitech {
 
             // Check for Colonization status
             bool can_colonize = (plr->tech_applications[129 /* THORIUM_FUEL_CELLS */] == 3) || 
-                                (aimove::Best_Uncolonized_Undestined_Planet_(static_cast<int16_t>(p_idx)) != -1);
+                                (AIMOVE::Best_Uncolonized_Undestined_Planet_(static_cast<int16_t>(p_idx)) != -1);
             
             plr_info->colonization_idle = can_colonize ? 0 : 1;
         }

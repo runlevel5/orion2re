@@ -2,6 +2,9 @@
 #include <cstdint>
 
 namespace aidesign {
+    inline int16_t (&_min_weapon_count_table)[8] =
+        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00556F60});
+
     inline s_spcl (&_bio_weapon_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DC0});
     inline s_spcl (&_capture_spcl)[5] = *reinterpret_cast<s_spcl(*)[5]>(std::uintptr_t{0x00556DD8});
     inline s_spcl (&_cloaking_spcl)[3] = *reinterpret_cast<s_spcl(*)[3]>(std::uintptr_t{0x00556DF0});
@@ -38,17 +41,16 @@ namespace aidesign {
 
     int16_t __cdecl Add_Beam_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t weapon_class);
 
-    inline void __cdecl Determine_Beam_Weapon_Modifications_(int16_t player_idx, int16_t hull_size, int16_t* type0, int16_t* spec0, int16_t* arc0, int16_t* type1, int16_t* spec1, int16_t* arc1, int16_t* type2, int16_t* spec2, int16_t* arc2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046d500});
-        fn(player_idx, hull_size, type0, spec0, arc0, type1, spec1, arc1, type2, spec2, arc2);
-    }
+    void __cdecl Determine_Beam_Weapon_Modifications_(int16_t player_idx, int16_t hull_size, int16_t* type0, int16_t* spec0, int16_t* arc0, int16_t* type1, int16_t* spec1, int16_t* arc1, int16_t* type2, int16_t* spec2, int16_t* arc2);
 
-    inline void __cdecl Determine_Missile_Weapon_Modifications_(int16_t player_idx, uint16_t* type, uint16_t* specials, int16_t size, int16_t space_limit, int16_t* ammo) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t*, uint16_t*, int16_t, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0046cb80});
-        fn(player_idx, type, specials, size, space_limit, ammo);
-    }
+    void __cdecl Determine_Missile_Weapon_Modifications_(
+        int16_t player_idx,
+        uint16_t* out_weapon_id,
+        uint16_t* out_weapon_mods,
+        int16_t weapon_count_table_idx,
+        int16_t available_space,
+        int16_t* out_weapon_count
+    );
 
     int16_t __cdecl Add_Missile_Weapon_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t* weapon_index_ptr, int16_t space, int16_t ammo);
 

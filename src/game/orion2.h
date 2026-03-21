@@ -212,6 +212,40 @@ struct s_aidudes_colony_info {
     int8_t eats_minerals;
 };
 
+typedef struct s_aimove_alien_strength s_aimove_alien_strength, *Ps_aimove_alien_strength;
+
+
+/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
+
+typedef uchar uint8_t;
+
+struct s_aimove_alien_strength {
+    uint8_t eta;
+    int32_t strength;
+};
+
+typedef struct s_aimove_intercept_entry s_aimove_intercept_entry, *Ps_aimove_intercept_entry;
+
+
+/* WARNING! conflicting data type names: /types.h/ushort - /ushort */
+
+typedef ushort uint16_t;
+
+typedef struct s_aimove_intercept_player s_aimove_intercept_player, *Ps_aimove_intercept_player;
+
+struct s_aimove_intercept_player {
+    uint8_t present;
+    uint8_t eta;
+};
+
+struct s_aimove_intercept_entry {
+    int32_t star_idx;
+    uint16_t player_mask;
+    uint8_t min_eta;
+    int32_t strength[10];
+    struct s_aimove_intercept_player players[8];
+};
+
 typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
 
@@ -228,11 +262,6 @@ struct s_alloc_header {
 typedef struct s_animation_header s_animation_header, *Ps_animation_header;
 
 typedef short int16_t;
-
-
-/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
-
-typedef uchar uint8_t;
 
 struct s_animation_header {
     int16_t width;
@@ -857,11 +886,6 @@ struct s_battle_results {
 };
 
 typedef struct s_beam_fx_entry s_beam_fx_entry, *Ps_beam_fx_entry;
-
-
-/* WARNING! conflicting data type names: /types.h/ushort - /ushort */
-
-typedef ushort uint16_t;
 
 struct s_beam_fx_entry {
     int16_t weapon_id;

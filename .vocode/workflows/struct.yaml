@@ -1,5 +1,5 @@
 workflows:
-  structs:
+  struct:
     description: "A LLM enabled decompiler agentic loop."
     need_input: False
     nodes:
@@ -20,6 +20,9 @@ workflows:
         confirmation: auto
         start_timeout: 600
         reset_policy: keep
+        tools:
+          - read_files
+          - list_files
         system: |
           You are professional reverse engineer. Your core expertise is code restoration of old C and C++
           projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game

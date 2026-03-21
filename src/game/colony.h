@@ -7,6 +7,9 @@ struct s_planet_data;
 struct s_colony;
 
 namespace COLONY {
+    inline int32_t (&_building_cr)[170] =
+        *reinterpret_cast<int32_t(*)[170]>(std::uintptr_t{0x0055A188});
+
     inline int16_t (&_colony_fields)[21] =
         *reinterpret_cast<int16_t(*)[21]>(std::uintptr_t{0x00559E28});
 
@@ -87,6 +90,9 @@ namespace COLONY {
     inline s_animation_header*& _swap_bitm =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595FF0});
 
+    inline s_animation_header*& _mouse_bitm =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E54});
+
     inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
     inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
     inline const char* _COLPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C98}); // "COLPUPS.LBX"
@@ -109,6 +115,9 @@ namespace COLONY {
     inline int16_t& _scanned_bldg_R = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559E08});
     inline uint8_t& _full_draw = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E18});
     inline int32_t& _colony_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E50});
+    inline int16_t (&_building_cr_xy)[7][7][4] =
+        *reinterpret_cast<int16_t(*)[7][7][4]>(std::uintptr_t{0x0055A000});
+
     inline int16_t (&_colony_bldg_fields)[36] =
         *reinterpret_cast<int16_t(*)[36]>(std::uintptr_t{0x0056EA18});
 
@@ -212,21 +221,11 @@ namespace COLONY {
 
     void __cdecl Remove_Satellite_From_Array_(int16_t building_id);
 
-    inline void __cdecl Get_App_Description_String_(char* buffer, int16_t tech_app) {
-        using Fn = void(__cdecl*)(char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00509800});
-        fn(buffer, tech_app);
-    }
-
     int16_t __cdecl N_Houses_In_Bldg_Array_();
 
     void __cdecl Find_Replacement_Slot_For_Building_(int16_t bldg_id, int16_t* out_row, int16_t* out_col);
 
-    inline int32_t __cdecl CR_To_XY_(int16_t col, int16_t row, int32_t axis) {
-        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd760});
-        return fn(col, row, axis);
-    }
+    int16_t __cdecl CR_To_XY_(int16_t col, int16_t row, int16_t axis);
 
     void __cdecl Insert_Bldg_Into_Array_(int16_t num_houses_delta, int16_t bldg_id, int16_t bldg_type, int8_t use_back_to_front);
 
@@ -318,11 +317,7 @@ namespace COLONY {
 
     void __cdecl Add_Bldg_Fields_();
 
-    inline int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int row, int col, int axis) {
-        using Fn = int(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dd840});
-        return fn(row, col, axis);
-    }
+    int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int grid_y, int grid_x, int axis);
 
     void __cdecl Update_Fields_();
 
@@ -361,11 +356,6 @@ namespace COLONY {
     void __cdecl Check_Satellite_Fields_(int16_t* param_1, int16_t* param_2);
 
     void __cdecl Check_Bldg_Fields_(int16_t* param_1, int16_t* param_2);
-
-    inline void __cdecl Clear_Fake_Buttons_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004B53F0)();
-    }
 
     void __cdecl Fix_Colony_Queue_(int16_t colony_idx);
 
@@ -434,18 +424,9 @@ namespace COLONY {
 
     void __cdecl Reset_Step_Squish_();
 
-    inline void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004db6f0})(x, y, colony_idx, pop_idx);
-    }
+    void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx);
 
-    inline void __cdecl Create_Shadow_Farmer_(int16_t player_num) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e1cf0})(player_num);
-    }
+    void __cdecl Create_Shadow_Farmer_(int16_t unused);
 
-    inline s_animation_header* __cdecl Shadow_Farmer_Bitm_() {
-        using Fn = s_animation_header*(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004e1d90})();
-    }
+    s_animation_header* __cdecl Shadow_Farmer_Bitm_();
 }

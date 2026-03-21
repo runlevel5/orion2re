@@ -1449,7 +1449,7 @@ namespace COLONY {
                 }
             } else if (_colony_satellite_fields[i] + *param_1 == 0) {
                 int16_t building_idx = _colony_satellites[i];
-                Get_App_Description_String_(local_buffer, TECHDATA::_buildings[building_idx].tech_app);
+                COLBLDG::Get_App_Description_String_(local_buffer, TECHDATA::_buildings[building_idx].tech_app);
                 char* bld_name = Real_Building_Name_(building_idx);
                 TEXTBOX::Text_Box_(bld_name, local_buffer);
             }
@@ -2035,6 +2035,74 @@ namespace COLONY {
         bitmap::Outline_Bitmap_(_swap_bitm, _swap_bitm, 0xED, 0);
 
         return _swap_bitm;
+    }
+
+    /**
+     * @brief Draws a darkened version of a population animation at the specified coordinates.
+     * 
+     * @param x The screen X-coordinate.
+     * @param y The screen Y-coordinate.
+     * @param colony_idx The index of the colony.
+     * @param pop_idx The index of the population unit.
+     */
+    void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx) {
+        s_animation_header* anim;
+
+        anim = Colony_Pop_Anim_(colony_idx, pop_idx);
+
+        // Prepare a scratch buffer (30x30) with the darkened population frame
+        bitmap::Create_Blank_Bitmap_(30, 30, _swap_bitm);
+        bitmap::Add_Picture_To_Bitmap_(0, 0, anim, _swap_bitm);
+        bitmap::Tint_Bitmap_(_swap_bitm, _swap_bitm, 2);
+
+        animate::Draw_(x, y, _swap_bitm);
+    }
+
+    /**
+     * @brief Creates a "ghosted" or shadowed mouse bitmap for the farmer icon.
+     * This version is used when dragging a farmer in the colony screen.
+     */
+    void __cdecl Create_Shadow_Farmer_(int16_t unused) {
+        s_animation_header* anim;
+        int32_t race_idx;
+
+        // Create a 30x30 workspace for the mouse cursor
+        bitmap::Create_Blank_Bitmap_(30, 30, (void*)COLONY::_mouse_bitm);
+
+        // Fetch current player's race index
+        race_idx = (int32_t)(uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
+
+        // Get the first frame of the farmer animation for this race
+        anim = COLONY::People_Anim_(0, 2 /* ANIM_FARMER */, (int16_t)race_idx);
+
+        // Draw the frame, replace color 240 with transparency/background,
+        // apply the "glassed" (translucent) effect and outline it in white.
+        bitmap::Draw_Picture_To_Bitmap_(COLONY::_mouse_bitm, (void*)anim);
+        replace::Replace_Color_All_(COLONY::_mouse_bitm, 240);
+        bitmap::Set_Picture_Glassed_(COLONY::_mouse_bitm);
+        bitmap::Outline_Bitmap_(COLONY::_mouse_bitm, COLONY::_mouse_bitm, 229 /* WHITE_OUTLINE */, 0);
+    }
+
+    s_animation_header* __cdecl Shadow_Farmer_Bitm_() {
+        return COLONY::_mouse_bitm;
+    }
+
+    int16_t __cdecl CR_To_XY_(int16_t col, int16_t row, int16_t axis) {
+        return _building_cr_xy[col][row][axis * 2];
+    }
+
+    /**
+     * @address 004dd840
+     */
+    int __cdecl Bldg_Coords_To_Centered_Screen_Coord_(int grid_y, int grid_x, int axis) {
+        // Calculate index based on 7-column stride and 2 components per cell
+        int index = axis + (grid_y * 7 + grid_x) * 2;
+
+        // Calculate the center point between the two boundary coordinates
+        int coord_min = COLONY::_building_cr[index];
+        int coord_max = COLONY::_building_cr[index + 16];
+
+        return (coord_min + coord_max) / 2;
     }
 
 }

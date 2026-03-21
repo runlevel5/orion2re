@@ -101,4 +101,10 @@ namespace MSG_ {
     inline char*& _msg_colony_d_settlers_arrived_over_limit_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00566030});
 
     void __cdecl sprintf_msg_(char* param_1, s_MSG* param_2);
+
+    inline void __cdecl Add_Msg_All_(s_MSG msg) {
+        using Fn = void(__cdecl*)(s_MSG);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473900});
+        fn(msg);
+    }
 }

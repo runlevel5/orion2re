@@ -1,6 +1,6 @@
 #include "pch.h"
 
-namespace aimove {
+namespace AIMOVE {
     int __cdecl Sort_colonizable_(const void* a, const void* b) {
         auto p1 = static_cast<const s_ai_colonizable_planet*>(a);
         auto p2 = static_cast<const s_ai_colonizable_planet*>(b);
@@ -170,7 +170,7 @@ namespace aimove {
                 int16_t dummy_short;
                 int32_t found_aux;
 
-                aimove::Find_Opportunity_Attack_Aux_((int16_t)plr1, (int16_t)plr2, 150 /* 0x96 */, (int16_t)i, &found_planet, &dummy_short, &found_aux);
+                AIMOVE::Find_Opportunity_Attack_Aux_((int16_t)plr1, (int16_t)plr2, 150 /* 0x96 */, (int16_t)i, &found_planet, &dummy_short, &found_aux);
 
                 if (found_planet != -1) {
                     *star_idx = i;
@@ -285,8 +285,8 @@ namespace aimove {
         if (MOX::_NUM_STARS > 0) {
             for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
                 // Accessing ship registry for current AI player and star
-                if ((*AIDATA::_i_all_combat_ships)[aimove::_i_ai][star_idx] != -1) {
-                    aimove::Find_Best_Attack_From_Star_(star_idx, nullptr, param_1, param_2);
+                if ((*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][star_idx] != -1) {
+                    AIMOVE::Find_Best_Attack_From_Star_(star_idx, nullptr, param_1, param_2);
                 }
             }
         }
@@ -360,14 +360,14 @@ namespace aimove {
                 // who have that star within their extended travel range.
                 uint8_t star_range_mask = (*AIDATA::_star_in_extended_range_of_player)[(uint8_t)planet->star_index];
 
-                if ((1 << (aimove::_i_ai & 0x1F)) & (uint32_t)star_range_mask) {
+                if ((1 << (AIMOVE::_i_ai & 0x1F)) & (uint32_t)star_range_mask) {
                     int16_t current_count = *count;
 
                     colonizable_planets[current_count].planet_idx = (int16_t)i;
 
                     // Lookup contextual value for the planet relative to the current AI player.
                     // The table contains 360 entries per player (2880 total).
-                    int contextual_idx = i + (static_cast<int>(aimove::_i_ai) * 360);
+                    int contextual_idx = i + (static_cast<int>(AIMOVE::_i_ai) * 360);
                     uint16_t val = static_cast<uint16_t>((*AIDATA::_contextual_planet_values)[contextual_idx]);
                     colonizable_planets[current_count].contextual_value = static_cast<int32_t>(val);
 
@@ -508,9 +508,9 @@ namespace aimove {
         if ((*_nonplayer_here)[star_idx] != 0) {
             uint32_t strength;
             if (in_nebula) {
-                strength = aipower::Ship_Strength_Vs_Ships_In_Nebula_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
+                strength = AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
             } else {
-                strength = aipower::Ship_Strength_Vs_Ships_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
+                strength = AIPOWER::Ship_Strength_Vs_Ships_(ship_idx, (int16_t)(*_nonplayer_here)[star_idx]);
             }
 
             strength &= 0xffff;
@@ -889,6 +889,220 @@ namespace aimove {
         }
     }
 
+    void __cdecl Move_NPCs_() {
+        uint8_t dummy_out_of_bounds[1100] = { 0 }; // Increased from 500 to handle traveling/orbiting location offsets safely
+        uint8_t star_flag1[72] = { 0 };
+        uint8_t star_flag2[72] = { 0 };
+
+        int32_t monster_count = -1;
+
+        for (int16_t ship_idx = 0; ship_idx < MOX::_NUM_SHIPS; ++ship_idx) {
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (ship->owner < 8) {
+                continue;
+            }
+
+            if (ship->d.speed == 0) {
+                continue;
+            }
+
+            if (ship->status == 1) {
+                // Original code has an out-of-bounds stack write here due to a compiler/code bug.
+                // We emulate the side effect cleanly with a dedicated dummy array.
+                dummy_out_of_bounds[ship->location] = 1;
+                continue;
+            }
+
+            if (ship->status != 0) {
+                continue;
+            }
+
+            bool try_move = false;
+
+            if (ship->owner != 13) {
+                try_move = true;
+            } else {
+                if (star_flag1[ship->location] != 0) {
+                    try_move = true;
+                }
+
+                star_flag1[ship->location] = 1;
+                star_flag2[ship->location] = 1;
+
+                ship->d.date_of_design++;
+
+                if (ship->d.date_of_design == 30) {
+                    int32_t dest = AIMOVE::Npc_Dest_(ship_idx, star_flag2);
+                    ship->d.date_of_design = 0;
+
+                    // Note: Original buggy logic preserved. If dest == -1, the monster count 
+                    // array scan is bypassed, enabling monster duplication beyond the cap.
+                    if (dest != -1) {
+                        if (monster_count == -1) {
+                            monster_count = 0;
+                            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                                s_ship_data* s = &MOX::_ship[i];
+                                if (s->owner == 13 && s->d.speed > 0 && s->status < 5) {
+                                    monster_count++;
+                                }
+                            }
+                        }
+                    }
+
+                    if (monster_count < 4) {
+                        s_ship_design eel_design = {};
+                        INITSHIP::Load_Eel_Ship_Design_(&eel_design, 1);
+
+                        s_star_data* star = &MOX::_star[ship->location];
+                        int32_t new_ship_idx = SHIPMOVE::Create_Nonplayer_Ship_(13, &eel_design, star->x, star->y);
+
+                        if (new_ship_idx != -1) {
+                            s_MSG msg = {};
+                            msg.msg_type = 18; // MSG_TYPE_EEL_SPAWNED
+                            msg.u.eel.star_idx = (uint8_t)ship->location;
+                            MSG_::Add_Msg_All_(msg);
+
+                            MOX::_ship[new_ship_idx].d.date_of_design = 0;
+                        }
+                        monster_count++;
+                    }
+                }
+            }
+
+            if (try_move) {
+                int32_t dest = AIMOVE::Npc_Dest_(ship_idx, star_flag2);
+
+                if (dest == -1) {
+                    s_MSG msg = {};
+                    msg.msg_type = 19; // MSG_TYPE_EEL_VANISHED
+                    msg.u.eel.star_idx = (uint8_t)ship->location;
+                    MSG_::Add_Msg_All_(msg);
+
+                    SHIPS::Kill_Ship_(ship_idx);
+                } else {
+                    int16_t ships_arr[2];
+                    ships_arr[0] = ship_idx;
+                    ships_arr[1] = -1;
+
+                    s_ship_move_info move_info = {};
+                    SHIPMOVE::Ships_Try_To_Move_To_(ships_arr, (int16_t)dest, &move_info);
+                    SHIPMOVE::Make_Ships_Move_To_(ships_arr, (int16_t)dest, &move_info);
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Finds the colony ship that can reach the destination in the minimum number of turns 
+     * and moves it, potentially via intermediate stars.
+     * 
+     * @param ship_indices Pointer to an array of ship indices to evaluate.
+     * @param ship_count Pointer to the number of ship indices in the array.
+     * @param destination The target destination star index.
+     */
+    void __cdecl Get_Best_Unescorted_Colony_Ship_(int16_t* ship_indices, int16_t* ship_count, int16_t destination) {
+        int16_t best_ship_array_idx = -1;
+        int16_t min_turns = 0x7fff;
+        int16_t best_dest = -1;
+        int16_t ship_list[2];
+        s_ship_move_info move_info;
+
+        ship_list[1] = -1;
+
+        for (int16_t i = 0; i < *ship_count; ++i) {
+            ship_list[0] = ship_indices[i];
+            int16_t found_dest;
+            int16_t turns;
+
+            Move_Ships_With_Possible_Intermediate_(ship_list, destination, &found_dest, &turns);
+
+            if (found_dest != -1 && turns < min_turns) {
+                min_turns = turns;
+                best_ship_array_idx = i;
+                best_dest = found_dest;
+            }
+        }
+
+        if (best_ship_array_idx != -1) {
+            ship_list[0] = ship_indices[best_ship_array_idx];
+
+            SHIPMOVE::Ships_Try_To_Move_To_(ship_list, best_dest, &move_info);
+            SHIPMOVE::Make_Ships_Move_To_(ship_list, best_dest, &move_info);
+
+            // Remove the ship from the array by replacing it with the last element
+            int16_t last_idx = *ship_count - 1;
+            *ship_count = last_idx;
+            ship_indices[best_ship_array_idx] = ship_indices[last_idx];
+        }
+    }
+
+    bool __cdecl Star_Has_Monster_(int star_idx) {
+        for (int i = 0; i < (int)MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+
+            if (ship->owner >= 8 && (int)ship->location == star_idx && ship->status == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int16_t __cdecl I_Soonest_Enemy_Colony_Ship_(int16_t* ship_indices, int16_t count, int16_t target_location) {
+        int16_t best_idx = -1;
+        uint16_t min_turns = 0x7fff;
+
+        for (int16_t i = 0; i < count; ++i) {
+            int16_t ship_idx = ship_indices[i];
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (ship->location == target_location) {
+                return i;
+            }
+
+            int32_t diff = (int32_t)ship->location - (int32_t)target_location;
+            if (diff == 500 || diff == 1000) {
+                uint16_t turns = (uint8_t)ship->turns_left;
+                if (turns < min_turns) {
+                    min_turns = turns;
+                    best_idx = i;
+                }
+            }
+        }
+
+        return best_idx;
+    }
+
+    int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx) {
+        int8_t owner = MOX::_colony[colony_idx].owner;
+        int32_t weight_player;
+        int32_t weight_owner;
+
+        if (MOX::_player[player_idx].treaty[owner] == 4) {
+            weight_player = 2;
+            weight_owner = 4;
+        } else if (MOX::_player[player_idx].treaty[owner] == 6) {
+            weight_player = 0;
+            weight_owner = 6;
+        } else {
+            weight_player = 1;
+            weight_owner = 5;
+        }
+
+        if (MOX::_player[player_idx].traits[TRAIT_TELEPATHIC] != 0 && MOX::_player[owner].traits[TRAIT_TELEPATHIC] == 0) {
+            weight_player++;
+            weight_owner--;
+        }
+
+        int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+        return (
+            (*AIDATA::_base_planet_values)[player_idx][planet_idx] * weight_player +
+            (*AIDATA::_base_planet_values)[owner][planet_idx] * weight_owner
+        ) / 6;
+    }
+
     void __cdecl Move_Transports_() {
         uint8_t dest_turns_colony[72];
         uint8_t dest_turns_outpost[72];
@@ -1108,4 +1322,290 @@ namespace aimove {
         }
     }
 
+    void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count) {
+        int16_t num_my_colony_ships = 0;
+        int16_t my_colony_ships[500];
+
+        int16_t enemy_colony_ships_buf[500];
+        int16_t* enemy_colony_ships_ptr = &enemy_colony_ships_buf[500];
+
+        for (int i = 0; i < MOX::_NUM_SHIPS; i++) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->d.ship_type == 1 /* SHIP_TYPE_COLONY */) {
+                if (ship->owner == AIMOVE::_i_ai) {
+                    if (SHIPMOVE::Can_Order_Ship_(ship)) {
+                        my_colony_ships[num_my_colony_ships++] = i;
+                    }
+                } else {
+                    if (ship->status < 3) {
+                        *(--enemy_colony_ships_ptr) = i;
+                    }
+                }
+            }
+        }
+
+        int16_t num_enemy_colony_ships = (int16_t)(&enemy_colony_ships_buf[500] - enemy_colony_ships_ptr);
+
+        while (*count > 0) {
+            if (num_my_colony_ships <= 0) return;
+
+            int16_t target_idx = *count;
+            int16_t star_idx = MOX::_planet[planets[target_idx - 1].planet_idx].star_index;
+
+            if ((~((1 << AIMOVE::_i_ai)) & (*AIDATA::_star_in_extended_range_of_player)[star_idx]) == 0 &&
+                (*AIDATA::_ai_star_info)[star_idx].per_player[AIMOVE::_i_ai].enemy_enroute_or_threat == 0 &&
+                AIMOVE::Star_Has_Monster_(star_idx) == 0)
+            {
+                if (MOX::_settings.game_difficulty >= 2 ||
+                    (MOX::_settings.game_difficulty >= 1 && AIMOVE::_p_ai->objectives == 2) ||
+                    (((*AIDATA::_star_in_range_of_player)[star_idx] >> AIMOVE::_i_ai) & 1) != 0)
+                {
+                    AIMOVE::Get_Best_Unescorted_Colony_Ship_(my_colony_ships, &num_my_colony_ships, star_idx);
+                }
+            } else {
+                int16_t enemy_ship_idx = AIMOVE::I_Soonest_Enemy_Colony_Ship_(enemy_colony_ships_ptr, num_enemy_colony_ships, star_idx);
+                int16_t max_eta = 0x7FFF;
+
+                if (enemy_ship_idx != -1) {
+                    max_eta = MOX::_ship[enemy_colony_ships_ptr[enemy_ship_idx]].turns_left;
+                }
+
+                if (AIMOVE::Get_Best_Escorted_Colony_Ship_(my_colony_ships, &num_my_colony_ships, star_idx, max_eta) == 0) {
+                    if (enemy_ship_idx != -1) {
+                        enemy_colony_ships_ptr[enemy_ship_idx] = enemy_colony_ships_ptr[0];
+                        enemy_colony_ships_ptr++;
+                        num_enemy_colony_ships--;
+                    }
+                }
+            }
+
+            (*count)--;
+        }
+
+        if (num_my_colony_ships > 0) {
+            uint8_t star_added[72];
+            memset(star_added, 0, sizeof(star_added));
+
+            int16_t num_candidates = 0;
+            uint8_t candidate_stars[72];
+
+            for (int i = 0; i < MOX::_NUM_STARS; i++) {
+                s_star_data* star = &MOX::_star[i];
+                if (((star->is_stagepoint >> AIMOVE::_i_ai) & 1) != 0 &&
+                    ((star->blockaded >> AIMOVE::_i_ai) & 1) == 0)
+                {
+                    if (star_added[i] == 0) {
+                        candidate_stars[num_candidates++] = (uint8_t)i;
+                        star_added[i] = 1;
+                    }
+                }
+            }
+
+            for (int i = 0; i < num_my_colony_ships; i++) {
+                RUSS::Shuffle_Char_(reinterpret_cast<int8_t*>(candidate_stars), num_candidates);
+
+                using QsortFn = int(__cdecl*)(const void*, const void*);
+                auto sort_fn = reinterpret_cast<QsortFn>(std::uintptr_t{ 0x00462BA0 });
+                ::_qsort(candidate_stars, num_candidates, 1, sort_fn);
+
+                if (num_candidates > 0) {
+                    for (int j = 0; j < num_candidates; j++) {
+                        uint8_t star_idx = candidate_stars[j];
+                        int16_t ship_idx_list[2] = { my_colony_ships[i], -1 };
+                        s_ship_move_info move_info{};
+
+                        SHIPMOVE::Ships_Try_To_Move_To_(ship_idx_list, star_idx, &move_info);
+
+                        if (move_info.moving != 0) {
+                            num_candidates--;
+                            SHIPMOVE::Make_Ships_Move_To_(ship_idx_list, star_idx, &move_info);
+                            candidate_stars[j] = candidate_stars[num_candidates];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void AIMOVE::Intercept_Invaders_()
+    {
+        int i = 0;
+        s_aimove_intercept_entry intercepts[72];
+
+        // Compiler artifact: initialization immediately overwritten by memset
+        intercepts[0].star_idx = -1;
+        memset(intercepts, 0, sizeof(intercepts));
+
+        int8_t star_to_intercept_idx[72];
+        memset(star_to_intercept_idx, -1, sizeof(star_to_intercept_idx));
+
+        if (MOX::_NUM_STARS > 0)
+        {
+            for (int star_idx = 0; star_idx < MOX::_NUM_STARS; star_idx++)
+            {
+                if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
+                {
+                    for (int p = 0; p < MOX::_NUM_PLAYERS; p++)
+                    {
+                        if (p != _i_ai)
+                        {
+                            // [9] acts as an indicator/total for enroute ships
+                            if ((*AIDATA::_enroute_ships)[star_idx][p][9] != 0 &&
+                                ((*AIDATA::_enroute_ships)[star_idx][p][0] != 0 ||
+                                    (*AIDATA::_enroute_nonstealthy_ships)[star_idx][p] != 0))
+                            {
+                                int eta = 0;
+                                while ((*AIDATA::_enroute_ships)[star_idx][p][eta] == 0)
+                                {
+                                    eta++;
+                                    if (eta >= 10) break;
+                                }
+
+                                if (eta < 10)
+                                {
+                                    // Keep UI responsive during heavy AI computation
+                                    RUSS::Mox_Update_();
+
+                                    int idx = star_to_intercept_idx[star_idx];
+                                    if (idx == -1)
+                                    {
+                                        intercepts[i].star_idx = star_idx;
+                                        intercepts[i].min_eta = 0xFF;
+                                        star_to_intercept_idx[star_idx] = i;
+                                        idx = i;
+                                        i++;
+                                    }
+
+                                    intercepts[idx].player_mask |= (1 << p);
+                                    if (eta < intercepts[idx].min_eta)
+                                    {
+                                        intercepts[idx].min_eta = eta;
+                                    }
+
+                                    if (eta < 10)
+                                    {
+                                        for (int j = 0; j < 10 - eta; j++)
+                                        {
+                                            intercepts[idx].strength[eta + j] +=
+                                                (*AIDATA::_enroute_ship_strengths)[star_idx][p][_i_ai][eta + j];
+                                        }
+                                    }
+
+                                    intercepts[idx].players[p].present = 1;
+                                    intercepts[idx].players[p].eta = eta;
+                                }
+                            }
+                        }
+                    }
+
+                    int idx = star_to_intercept_idx[star_idx];
+                    if (idx != -1)
+                    {
+                        if (intercepts[idx].min_eta < 10)
+                        {
+                            for (int j = 0; j < 10 - intercepts[idx].min_eta; j++)
+                            {
+                                if (intercepts[idx].strength[intercepts[idx].min_eta + j] == 0)
+                                {
+                                    intercepts[idx].strength[intercepts[idx].min_eta + j] = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        s_aimove_alien_strength alien_str[72][7];
+        memset(alien_str, 0, sizeof(alien_str));
+
+        bool aliens_present = false;
+
+        for (int s = 0; s < MOX::_NUM_SHIPS; s++)
+        {
+            s_ship_data* ship = &MOX::_ship[s];
+            if (ship->owner > 7 && ship->d.speed != 0)
+            {
+                if (ship->status == 0) // In orbit
+                {
+                    int star_idx = ship->location;
+                    if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
+                    {
+                        int strength = AIPOWER::Ship_Strength_Vs_Ships_(s, _i_ai);
+                        alien_str[star_idx][ship->owner - 8].strength += strength;
+                        if (alien_str[star_idx][ship->owner - 8].strength == 0)
+                        {
+                            alien_str[star_idx][ship->owner - 8].strength = 1;
+                        }
+                        alien_str[star_idx][ship->owner - 8].eta = 0;
+                        aliens_present = true;
+                    }
+                }
+                else if (ship->status > 0 && ship->status <= 2) // En-route
+                {
+                    int star_idx = ship->location - (ship->status == 1 ? 500 : 1000);
+                    if ((MOX::_star[star_idx].has_colony >> _i_ai) & 1)
+                    {
+                        int strength = AIPOWER::Ship_Strength_Vs_Ships_(s, _i_ai);
+                        alien_str[star_idx][ship->owner - 8].strength += strength;
+                        if (alien_str[star_idx][ship->owner - 8].strength == 0)
+                        {
+                            alien_str[star_idx][ship->owner - 8].strength = 1;
+                        }
+
+                        // Original bug: alien_str.eta is initialized to 0, so turns_left is never < eta
+                        if (ship->turns_left < alien_str[star_idx][ship->owner - 8].eta)
+                        {
+                            alien_str[star_idx][ship->owner - 8].eta = ship->turns_left;
+                        }
+                        aliens_present = true;
+                    }
+                }
+            }
+        }
+
+        if (aliens_present)
+        {
+            for (int o = 0; o < 7; o++)
+            {
+                for (int star_idx = 0; star_idx < MOX::_NUM_STARS; star_idx++)
+                {
+                    if (alien_str[star_idx][o].strength != 0)
+                    {
+                        int idx = star_to_intercept_idx[star_idx];
+                        if (idx == -1)
+                        {
+                            intercepts[i].star_idx = star_idx;
+                            intercepts[i].min_eta = 0xFF;
+                            star_to_intercept_idx[star_idx] = i;
+                            idx = i;
+                            i++;
+                        }
+
+                        intercepts[idx].player_mask |= (1 << (o + 8));
+
+                        if (alien_str[star_idx][o].eta < intercepts[idx].min_eta)
+                        {
+                            intercepts[idx].min_eta = alien_str[star_idx][o].eta;
+                        }
+
+                        if (intercepts[idx].min_eta < 10)
+                        {
+                            for (int j = 0; j < 10 - intercepts[idx].min_eta; j++)
+                            {
+                                intercepts[idx].strength[intercepts[idx].min_eta + j] += alien_str[star_idx][o].strength;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (i > 0)
+        {
+            bool is_desperate = ((*AIDATA::_ai_player_info)[_i_ai].n_stars_with_colony <= 3);
+            AIMOVE::Interceptions_(intercepts, &i, star_to_intercept_idx, is_desperate);
+        }
+    }
 }

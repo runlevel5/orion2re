@@ -71,7 +71,7 @@ namespace DIP_SCRN {
                     int16_t value = 0;
                     int32_t ratio = 0;
 
-                    aimove::Find_Opportunity_Attack_(p_idx, target_idx, 100, &planet_num, &value, &ratio);
+                    AIMOVE::Find_Opportunity_Attack_(p_idx, target_idx, 100, &planet_num, &value, &ratio);
 
                     player.opportunity_planet_num[target_idx] = planet_num;
                     player.opportunity_planet_value[target_idx] = value;

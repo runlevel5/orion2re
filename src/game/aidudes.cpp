@@ -877,7 +877,7 @@ namespace aidudes {
         }
 
         int flag_74 = 0;
-        int16_t best_planet = aimove::Best_Uncolonized_Undestined_Planet_(player_idx);
+        int16_t best_planet = AIMOVE::Best_Uncolonized_Undestined_Planet_(player_idx);
         bool is_objective_2 = (p->objectives == 2);
 
         s_ship_design ship_design;

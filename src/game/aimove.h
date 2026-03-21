@@ -1,6 +1,6 @@
 #pragma once
 
-namespace aimove {
+namespace AIMOVE {
     inline s_player*& _p_ai = *reinterpret_cast<s_player**>(std::uintptr_t{0x00565E80});
     inline s_ai_colonizable_planet*& _colonizable = *reinterpret_cast<s_ai_colonizable_planet**>(std::uintptr_t{0x00565E84});
     inline int8_t (*&_nonplayer_here)[72] = *reinterpret_cast<int8_t (**)[72]>(std::uintptr_t{0x00565E88});
@@ -24,16 +24,26 @@ namespace aimove {
         fn(star_idx, param_2, param_3, param_4);
     }
 
-    inline void __cdecl Intercept_Invaders_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00463760});
-        fn();
+    void __cdecl Intercept_Invaders_();
+
+    inline void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
+        using Fn = void(__cdecl*)(s_aimove_intercept_entry*, int*, int8_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00463ce0 });
+        fn(intercepts, count, star_to_intercept_idx, is_desperate);
     }
 
-    inline void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count) {
-        using Fn = void(__cdecl*)(s_ai_colonizable_planet*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00461760});
-        fn(planets, count);
+    void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count);
+
+    bool __cdecl Star_Has_Monster_(int star_idx);
+
+    void __cdecl Get_Best_Unescorted_Colony_Ship_(int16_t* ship_indices, int16_t* ship_count, int16_t destination);
+
+    int16_t __cdecl I_Soonest_Enemy_Colony_Ship_(int16_t* ship_indices, int16_t count, int16_t target_location);
+
+    inline bool __cdecl Get_Best_Escorted_Colony_Ship_(int16_t* ship_list, int16_t* count, int32_t star_idx, int32_t max_eta) {
+        using Fn = bool(__cdecl*)(int16_t*, int16_t*, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00461eb0 });
+        return fn(ship_list, count, star_idx, max_eta);
     }
 
     void __cdecl Move_Transports_();
@@ -42,10 +52,12 @@ namespace aimove {
 
     void __cdecl Move_To_Unexplored_Stars_();
 
-    inline void __cdecl Move_NPCs_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00465910 });
-        fn();
+    void __cdecl Move_NPCs_();
+
+    inline int32_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags) {
+        using Fn = int32_t(__cdecl*)(int16_t, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465BA0});
+        return fn(ship_idx, star_flags);
     }
 
     void __cdecl Move_All_AI_();
@@ -70,11 +82,7 @@ namespace aimove {
 
     void __cdecl Move_Ships_With_Possible_Intermediate_(int16_t* ship_array, int16_t dest_star, int16_t* out_star, int16_t* out_turns);
 
-    inline int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00461320})(colony_idx, player_idx);
-    }
-
+    int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx);
 
     inline void __cdecl Find_Opportunity_Attack_Aux_(int16_t plr1, int16_t plr2, int16_t val, int16_t star_idx, int16_t* planet_idx, int16_t* unknown, int32_t* aux_info) {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t*);

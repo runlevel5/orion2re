@@ -8,6 +8,357 @@ namespace aidesign {
     };
 #pragma pack(pop)
 
+    void __cdecl Determine_Beam_Weapon_Modifications_(
+        int16_t player_idx,
+        int16_t hull_size,
+        int16_t* type0,
+        int16_t* spec0,
+        int16_t* arc0,
+        int16_t* type1,
+        int16_t* spec1,
+        int16_t* arc1,
+        int16_t* type2,
+        int16_t* spec2,
+        int16_t* arc2
+    ) {
+        int16_t weapon_count = 0;
+        int16_t weapon_id[40];
+        int16_t weapon_mods[40];
+        int16_t ai_group[40];
+        int16_t spec2_mods[40];
+        int16_t spec1_mods[40];
+
+        for (int16_t i = 1; i < 40; ++i) {
+            if (TECHDATA::_weapons[i].type == 0 && MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] == 3) {
+                weapon_id[weapon_count] = i;
+                spec1_mods[weapon_count] = 0;
+                spec2_mods[weapon_count] = 0;
+                weapon_mods[weapon_count] = 0;
+                ai_group[weapon_count] = TECHDATA::_technology_fields[TECHDATA::_technology_applications[TECHDATA::_weapons[i].tech_app_id].tech_field_id].ai_group;
+                weapon_count++;
+            }
+        }
+
+        if (weapon_count == 0) {
+            *type2 = 0;
+            *type1 = 0;
+            *type0 = 0;
+            return;
+        }
+
+        int16_t max_idx = weapon_count - 1;
+        bool swapped;
+        if (max_idx > 0) {
+            do {
+                swapped = false;
+                for (int16_t i = 0; i < max_idx; ++i) {
+                    if (ai_group[i + 1] < ai_group[i]) {
+                        int16_t temp_ai = ai_group[i];
+                        ai_group[i] = ai_group[i + 1];
+                        ai_group[i + 1] = temp_ai;
+
+                        int16_t temp_id = weapon_id[i];
+                        weapon_id[i] = weapon_id[i + 1];
+                        weapon_id[i + 1] = temp_id;
+
+                        swapped = true;
+                    }
+                }
+            } while (swapped);
+        }
+
+        int16_t first_living_player = 0;
+        while (MOX::_player[first_living_player].eliminated != 0) {
+            first_living_player++;
+        }
+
+        int16_t best_comp = INITSHIP::Best_Computer_(player_idx);
+        int16_t comp_bonus = TECHDATA::_computers[best_comp].bonus;
+        comp_bonus += MOX::_player[player_idx].traits[7];
+
+        int16_t target_defense;
+        int16_t local_d4;
+
+        if (MOX::_player[player_idx].objectives == 100) {
+            local_d4 = 1;
+            target_defense = TECHDATA::_drives[2].combat_speed_min[2] + 20;
+        } else {
+            local_d4 = AIPOWER::Get_Best_Ship_Shield_Value_(first_living_player);
+            int16_t best_drive = INITSHIP::Best_Warp_Drive_(first_living_player);
+            target_defense = MOX::_player[first_living_player].traits[6] + TECHDATA::_drives[best_drive].combat_speed_min[2] * 5;
+        }
+
+        int16_t net_bonus = comp_bonus - target_defense;
+
+        for (int16_t i = 0; i < weapon_count; ++i) {
+            int16_t w_id = weapon_id[i];
+            int16_t min_lvl = DESIGN::Miniaturization_Level_(player_idx, TECHDATA::_weapons[w_id].tech_app_id);
+            if (min_lvl > 5) min_lvl = 5;
+
+            int16_t cur_bonus = net_bonus;
+
+            if (TECHDATA::_weapon_modifications[4].level <= min_lvl) {
+                weapon_mods[i] += 0x10;
+                if (net_bonus < 50) {
+                    spec1_mods[i] += 0x10;
+                    spec2_mods[i] += 0x10;
+                    cur_bonus = net_bonus + 25;
+                }
+            }
+
+            if (cur_bonus > 0 && TECHDATA::_weapon_modifications[5].level <= min_lvl) {
+                spec1_mods[i] += 0x20;
+                spec2_mods[i] += 0x20;
+            }
+
+            if (cur_bonus >= 0 && TECHDATA::_weapon_modifications[7].level <= min_lvl) {
+                if (cur_bonus > 30) {
+                    weapon_mods[i] += 0x80;
+                }
+                spec1_mods[i] += 0x80;
+                spec2_mods[i] += 0x80;
+            }
+
+            uint16_t avail = TECHDATA::_weapons[w_id].available_mods;
+
+            weapon_mods[i] = (weapon_mods[i] + 4) & avail;
+            if ((weapon_mods[i] & 4) == 0) {
+                weapon_mods[i] = 0;
+            }
+
+            if (TECHDATA::_weapon_modifications[3].level <= min_lvl) {
+                spec1_mods[i] += 8;
+                spec2_mods[i] += 8;
+            }
+
+            if (TECHDATA::_weapon_modifications[6].level <= min_lvl) {
+                spec1_mods[i] += 0x40;
+                spec2_mods[i] += 0x40;
+            }
+
+            if (TECHDATA::_weapon_modifications[8].level <= min_lvl) {
+                spec1_mods[i] += 0x100;
+                spec2_mods[i] += 0x100;
+            }
+
+            spec1_mods[i] &= avail;
+
+            spec2_mods[i] = (spec2_mods[i] + 2) & avail;
+            if ((spec2_mods[i] & 2) == 0) {
+                spec2_mods[i] = 0;
+            }
+        }
+
+        if (MOX::_settings.game_difficulty < 2) {
+            int16_t idx1 = weapon_count - 1;
+            while (idx1 >= 0) {
+                if ((TECHDATA::_weapons[weapon_id[idx1]].available_mods & 4) != 0) {
+                    break;
+                }
+                idx1--;
+            }
+
+            if (idx1 < 0) {
+                *type0 = 0;
+                *spec0 = 0;
+            } else {
+                *type0 = weapon_id[idx1];
+                *spec0 = 4;
+            }
+
+            *type1 = weapon_id[weapon_count - 1];
+            *spec1 = 0;
+
+            int16_t idx2 = weapon_count - 1;
+            while (idx2 >= 0) {
+                if ((TECHDATA::_weapons[weapon_id[idx2]].available_mods & 2) != 0) {
+                    break;
+                }
+                idx2--;
+            }
+
+            if (idx2 < 0) {
+                *type2 = 0;
+                *spec2 = 0;
+            } else {
+                *type2 = weapon_id[idx2];
+                *spec2 = 2;
+            }
+        } else {
+            if (weapon_count == 1) {
+                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & 4) == 0) {
+                    *type0 = 0;
+                } else {
+                    *type0 = weapon_id[0];
+                    *spec0 = weapon_mods[0] & 0x7ffd;
+                }
+
+                *type1 = weapon_id[0];
+                *spec1 = spec1_mods[0] & 0x7ff9;
+
+                if ((TECHDATA::_weapons[weapon_id[0]].available_mods & 2) == 0) {
+                    *type2 = 0;
+                    *spec2 = 0;
+                } else {
+                    *type2 = weapon_id[0];
+                    *spec2 = spec2_mods[0] & 0x7ffb;
+                }
+            } else {
+                int16_t pd_weapon = INITSHIP::Best_Point_Defense_Weapon_By_Size_(player_idx);
+                int16_t pd_idx = 0;
+                for (pd_idx = 0; pd_idx < weapon_count; pd_idx++) {
+                    if (weapon_id[pd_idx] == pd_weapon) {
+                        break;
+                    }
+                }
+
+                if (pd_idx >= weapon_count) {
+                    *type0 = 0;
+                } else {
+                    *type0 = weapon_id[pd_idx];
+                    *spec0 = weapon_mods[pd_idx] & 0x7ffd;
+                }
+
+                int16_t max_damage_idx = weapon_count - 1;
+                if (max_damage_idx < 0) {
+                    *type1 = 0;
+                } else {
+                    int16_t best_idx = 0;
+                    if (max_damage_idx != 0) {
+                        int32_t best_val = 0;
+                        for (int16_t i = 0; i < weapon_count; i++) {
+                            int16_t w_id = weapon_id[i];
+                            if (w_id != 0) {
+                                int16_t space = static_cast<int16_t>(DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 0));
+                                uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
+                                int32_t damage = TECHDATA::_weapons[w_id].max_damage;
+
+                                if ((natural_mods & 0x100) == 0) {
+                                    damage -= local_d4;
+                                }
+
+                                int32_t val = (damage * 10) / space;
+
+                                if ((natural_mods & 0x20) != 0) {
+                                    val = (val * 3) / 2;
+                                }
+                                if ((natural_mods & 0x4) != 0) {
+                                    val = (val * 5) / 4;
+                                }
+                                if ((natural_mods & 0x400) != 0) {
+                                    val = (val * 5) / 4;
+                                }
+                                if ((natural_mods & 0x200) != 0) {
+                                    val *= 2;
+                                }
+                                if ((natural_mods & 0x10) != 0 && MOX::_player[player_idx].ship_special_theme == 1) {
+                                    val *= 2;
+                                }
+
+                                if (val > best_val) {
+                                    best_val = val;
+                                    best_idx = i;
+                                }
+                            }
+                        }
+                    }
+                    *type1 = weapon_id[best_idx];
+                    *spec1 = spec1_mods[best_idx] & 0x7ff9;
+                }
+
+                if (max_damage_idx < 0) {
+                    *type2 = 0;
+                    *spec2 = 0;
+                } else {
+                    int16_t best_idx = 0;
+                    if (max_damage_idx != 0) {
+                        int32_t best_val = 0;
+                        for (int16_t i = 0; i < weapon_count; i++) {
+                            int16_t w_id = weapon_id[i];
+                            if (w_id != 0) {
+                                int16_t space = static_cast<int16_t>(DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 2));
+                                uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
+                                int32_t damage = TECHDATA::_weapons[w_id].max_damage * 3;
+
+                                if ((natural_mods & 0x100) == 0) {
+                                    damage = damage / 2 - local_d4;
+                                } else {
+                                    damage = damage / 2;
+                                }
+
+                                int32_t val = (damage * 10) / space;
+
+                                if ((natural_mods & 0x20) != 0) {
+                                    val = (val * 3) / 2;
+                                }
+                                if ((natural_mods & 0x4) != 0) {
+                                    val = (val * 5) / 4;
+                                }
+                                if ((natural_mods & 0x400) != 0) {
+                                    val = (val * 5) / 4;
+                                }
+                                if ((natural_mods & 0x200) != 0) {
+                                    val *= 2;
+                                }
+
+                                if (val > best_val) {
+                                    best_val = val;
+                                    best_idx = i;
+                                }
+                            }
+                        }
+                    }
+                    *type2 = weapon_id[best_idx];
+                    *spec2 = spec2_mods[best_idx] & 0x7ffb;
+                }
+            }
+        }
+
+        *arc1 = 1;
+        *arc2 = 1;
+        *arc0 = 1;
+
+        int16_t comp_tech = Get_Competition_Player_Tech_Values_(player_idx, 0x12);
+        int16_t r_base = (0x14 - comp_tech) * hull_size;
+
+        int16_t cnt_4 = 0;
+        for (uint16_t m = 8; m < 0x200; m *= 2) {
+            if ((m & *spec0) != 0) {
+                cnt_4++;
+            }
+        }
+
+        int16_t cnt_7 = 0;
+        for (uint16_t m = 8; m < 0x200; m *= 2) {
+            if ((m & *spec1) != 0) {
+                cnt_7++;
+            }
+        }
+
+        int16_t cnt_10 = 0;
+        for (uint16_t m = 8; m < 0x200; m *= 2) {
+            if ((m & *spec2) != 0) {
+                cnt_10++;
+            }
+        }
+
+        if (random::Random_(100) < r_base + cnt_4 * 20) {
+            if (random::Random_(100) < (r_base / 2) + cnt_4 * 20) {
+                *arc0 = 16;
+            } else {
+                *arc0 = 2;
+            }
+        }
+
+        if (random::Random_(100) < cnt_7 * 20 + (r_base / 2)) {
+            *arc1 = 2;
+        }
+
+        if (random::Random_(100) < cnt_10 * 20 + (r_base / 4)) {
+            *arc2 = 2;
+        }
+    }
+
     int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
         int16_t total_space_used = 0;
         int16_t already_has_fighter_bay = 0;
@@ -541,6 +892,166 @@ namespace aidesign {
         int32_t final_space_per_bomb = DESIGN::Weapon_Space_(player_idx, bomb_type, 1, 1, 0, 0);
 
         return (int16_t)(final_space_per_bomb * total_bombs_added);
+    }
+
+    void __cdecl Determine_Missile_Weapon_Modifications_(
+        int16_t player_idx,
+        uint16_t* out_weapon_id,
+        uint16_t* out_weapon_mods,
+        int16_t weapon_count_table_idx,
+        int16_t available_space,
+        int16_t* out_weapon_count
+    ) {
+        uint16_t sort_keys[20];
+        uint16_t weapon_indices[20];
+        uint16_t weapon_mods[20];
+        int16_t count = 0;
+
+        for (int16_t i = 1; i < 40; ++i) {
+            uint8_t type = TECHDATA::_weapons[i].type;
+            if (type == 1 || type == 2) {
+                uint16_t tech_app_id = TECHDATA::_weapons[i].tech_app_id;
+                if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+                    weapon_indices[count] = i;
+                    weapon_mods[count] = 0;
+                    int16_t tech_field_id = TECHDATA::_technology_applications[tech_app_id].tech_field_id;
+                    sort_keys[count] = (uint16_t)TECHDATA::_technology_fields[tech_field_id].ai_group;
+                    count++;
+                }
+            }
+        }
+
+        if (count == 0) {
+            *out_weapon_id = 0;
+            return;
+        }
+
+        int16_t swapped;
+        do {
+            swapped = 0;
+            if (count - 1 > 0) {
+                for (int16_t i = 0; i < count - 1; ++i) {
+                    if (sort_keys[i + 1] < sort_keys[i]) {
+                        uint16_t temp_idx = weapon_indices[i + 1];
+                        uint16_t temp_key = sort_keys[i];
+                        uint16_t temp_idx2 = weapon_indices[i];
+
+                        sort_keys[i] = sort_keys[i + 1];
+                        sort_keys[i + 1] = temp_key;
+
+                        weapon_indices[i] = temp_idx;
+                        weapon_indices[i + 1] = temp_idx2;
+
+                        swapped = 1;
+                    }
+                }
+            }
+        } while (swapped == 1);
+
+        int16_t competitor_idx = 0;
+        while (MOX::_player[competitor_idx].eliminated != 0) {
+            competitor_idx++;
+        }
+
+        int16_t max_shield = AIPOWER::Get_Best_Ship_Shield_Value_(competitor_idx);
+        int16_t comp_tech = (int16_t)Get_Competition_Player_Tech_Values_(competitor_idx, 0x1C);
+
+        if (count > 0) {
+            for (int16_t i = 0; i < count; ++i) {
+                uint16_t w_idx = weapon_indices[i];
+                if ((int16_t)TECHDATA::_weapons[w_idx].max_damage < max_shield + 4) {
+                    weapon_indices[i] = 0;
+                    sort_keys[i] = 0;
+                    // Note: Potentially a memory corruption bug in original game where parameter pointer 
+                    // is used as an array. Translated faithfully from original assembly.
+                    out_weapon_mods[i] = 0;
+                } else {
+                    int16_t mini_level = DESIGN::Miniaturization_Level_(player_idx, TECHDATA::_weapons[w_idx].tech_app_id);
+                    if (mini_level > 5) {
+                        mini_level = 5;
+                    }
+
+                    if (mini_level >= 1) {
+                        if (comp_tech > 0) {
+                            weapon_mods[i] += 0x0400;
+                        }
+                        weapon_mods[i] += 0x5820;
+                    }
+
+                    if (mini_level >= 2) {
+                        weapon_mods[i] += 0x0300;
+                    }
+
+                    if (MOX::_player[player_idx].tech_applications[59] == 3) {
+                        if (mini_level >= 2) {
+                            weapon_mods[i] += 0x2000;
+                        }
+                    }
+
+                    weapon_mods[i] &= TECHDATA::_weapons[w_idx].available_mods;
+                }
+            }
+        }
+
+        if (MOX::_settings.game_difficulty < 2) {
+            *out_weapon_id = weapon_indices[count - 1];
+            *out_weapon_mods = 0;
+            return;
+        }
+
+        if (count == 1) {
+            *out_weapon_id = weapon_indices[0];
+            *out_weapon_mods = weapon_mods[0];
+        } else {
+            int32_t best_score = 0;
+            int16_t best_index = 0;
+
+            if (count > 0) {
+                for (int16_t i = 0; i < count; ++i) {
+                    uint16_t w_idx = weapon_indices[i];
+                    if (w_idx != 0) {
+                        int32_t space = DESIGN::Weapon_Space_(player_idx, w_idx, 1, 1, 5, 0);
+                        int32_t score = (((int32_t)(int16_t)TECHDATA::_weapons[w_idx].max_damage - max_shield) * 10) / space;
+                        if (best_score < score) {
+                            best_index = i;
+                            best_score = score;
+                        }
+                    }
+                }
+            }
+
+            *out_weapon_id = weapon_indices[best_index];
+            *out_weapon_mods = weapon_mods[best_index] & 0x7FF9;
+        }
+
+        uint16_t mods = *out_weapon_mods;
+        int32_t space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+
+        if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
+            if (*out_weapon_count > 5) {
+                *out_weapon_count = 5;
+            }
+
+            space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+
+            if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
+                if (mods & 0x0800) {
+                    mods ^= 0x0800;
+                    *out_weapon_mods = mods;
+                }
+
+                space = DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+
+                if ((available_space / space) < _min_weapon_count_table[weapon_count_table_idx]) {
+                    if (mods & 0x1000) {
+                        mods ^= 0x1000;
+                        *out_weapon_mods = mods;
+                    }
+
+                    DESIGN::Weapon_Space_(player_idx, *out_weapon_id, 1, 1, *out_weapon_count, mods);
+                }
+            }
+        }
     }
 
     int16_t __cdecl Add_Missile_Weapon_To_Design_(int16_t player_idx, s_ship_design* design, int16_t* weapon_index_ptr, int16_t space_limit, int16_t ammo) {

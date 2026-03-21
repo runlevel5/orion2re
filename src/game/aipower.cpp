@@ -1,6 +1,6 @@
 #include "pch.h"
 
-namespace aipower {
+namespace AIPOWER {
     int16_t __cdecl Get_Best_Ship_Shield_Value_(int16_t player_idx) {
         if (player_idx >= 8) {
             switch (player_idx) {
@@ -38,7 +38,7 @@ namespace aipower {
         int16_t temp_defense;
 
         if (MOX::_settings.strategic_combat_flag != 0) {
-            attack_bonus = aipower::Base_Generic_Ocv_(ship->owner);
+            attack_bonus = AIPOWER::Base_Generic_Ocv_(ship->owner);
             INITSHIP::Update_Strategic_Ship_(ship_idx);
         } else {
             INITSHIP::Get_Ship_Combat_Bonuses_(ship_idx, &temp_attack, &temp_defense, &attack_bonus);
@@ -194,13 +194,13 @@ namespace aipower {
      * In a nebula, shields are disabled, so the shield value is set to 0.
      */
     int16_t __cdecl Ship_Strength_Vs_Ships_In_Nebula_(int16_t attacker_idx, int16_t target_idx) {
-        return aipower::Ship_Strength_Vs_Shield_(attacker_idx, target_idx, 0);
+        return AIPOWER::Ship_Strength_Vs_Shield_(attacker_idx, target_idx, 0);
     }
 
     int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx) {
         int16_t hits;
 
-        hits = aipower::Max_Ship_Hits_(ship_idx);
+        hits = AIPOWER::Max_Ship_Hits_(ship_idx);
 
         // Substract structural damage
         hits -= MOX::_ship[ship_idx].structural_damage;
