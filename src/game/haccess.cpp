@@ -613,4 +613,11 @@ namespace HACCESS {
 
         return selected_count;
     }
+
+    /**
+     * @address 0049AC40
+     */
+    bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx) {
+        return MOX::_player[player_idx].tech_applications[tech_idx] == 3;
+    }
 }

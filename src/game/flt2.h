@@ -4,11 +4,7 @@
 namespace FLT2 {
     void __cdecl Add_Fltscrn_Small_Icon_Fields_();
 
-    inline void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width, int16_t* height) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004899d0});
-        fn(icon_idx, width, height);
-    }
+    void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out, int16_t* height_out);
 
     void __cdecl Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y, int16_t w, int16_t h);
 
@@ -36,11 +32,7 @@ namespace FLT2 {
 
     void __cdecl Print_Fltscrn_Scanned_Star_Name_();
 
-    inline int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* list) {
-        using Fn = int16_t(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00487DE0});
-        return fn(list);
-    }
+    int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list);
 
     inline s_colors& _normal_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DD0});
     inline s_colors& _neutral_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557DE0});

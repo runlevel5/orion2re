@@ -546,8 +546,9 @@ workflows:
           * You were conservative with file reads and only read relevant chunks.
           * You minimized a number of round-trips when patching code.
           * You did not read files that were not mentioned in the decomplation input
-          * You *USED* the patch_tool to apply changes and not just printed them
-          * All patches were successfully applied by apply_patch tool and were not printed to the user
+          * You USED the patch_tool to successfully apply all changes
+          * You did NOT print final changes to the user
+          * You confirmed to the user that all changes were applied
           * All variables that don't exist in the project were added to correct headers with correct namespaces
           * All functions that don't exist in the project were added as stubs to header files with correct namespaces
           * If external function did not exist, you wrote a stub

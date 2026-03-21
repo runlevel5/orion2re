@@ -80,11 +80,7 @@ namespace FLT1 {
 
     int16_t __cdecl Get_Scrap_Ship_Value_();
 
-    inline void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_num, int8_t flag) {
-        using Fn = void(__cdecl*)(s_ship_data*, int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AFD80});
-        fn(ship, player_num, flag);
-    }
+    void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_id, char show_msg);
 
     void __cdecl Plunder_Ships_For_Tech_(int16_t* ship_indices, int16_t count, int8_t flag);
 

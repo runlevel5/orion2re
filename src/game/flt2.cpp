@@ -1,6 +1,24 @@
 #include "pch.h"
 
 namespace FLT2 {
+void __cdecl Get_Small_Icon_Animation_Size_(int16_t icon_idx, int16_t* width_out, int16_t* height_out)
+{
+    int16_t node_idx = MOX::_ship_icon[icon_idx].node_idx;
+    int16_t owner = HACCESS::Ship_Stack_Owner_(node_idx);
+    int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+
+    s_animation_header* anim;
+    if (owner < 8) {
+        anim = MOX::_fltscrn_small_ship_icon_seg[static_cast<uint8_t>(MOX::_player[owner].color)];
+    }
+    else {
+        anim = MOX::_shield_div_bitmap[MOX::_ship[ship_idx].owner];
+    }
+
+    *width_out = animate::Get_Width_(anim);
+    *height_out = animate::Get_Height_(anim);
+}
+
     void __cdecl Add_Fltscrn_Small_Icon_Fields_() {
         int16_t width;
         int16_t height;
@@ -851,6 +869,35 @@ uint8_t __cdecl Draw_Captains_Picture_(int16_t param_1) {
     }
 
     return found;
+}
+
+int16_t __cdecl Build_Fltscrn_Ship_List_(int16_t* ship_list) {
+    int16_t retval = 1;
+    int16_t error_flag = 0;
+    int16_t count = 0;
+
+    if (MOX::_n_fltscrn_big_icons > 0) {
+        for (int16_t i = 0; i < MOX::_n_fltscrn_big_icons; i++) {
+            if (error_flag != 0) {
+                break;
+            }
+            if (MOX::_fltscrn_big_icon[i].selected != 0) {
+                ship_list[count] = MOX::_fltscrn_big_icon[i].ship_idx;
+                count++;
+                if (count >= 250) {
+                    HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, s_Too_many_ships_in_list_00557de8, 0);
+                    error_flag = 1;
+                    retval = 0;
+                }
+            }
+        }
+    }
+
+    if (count == 0) {
+        retval = 0;
+    }
+
+    return retval;
 }
 
 int16_t __cdecl Scan_Fltscrn_Big_Icons_(int16_t btn_id1, int16_t btn_id2, int16_t* out_idx1, int16_t* out_idx2) {

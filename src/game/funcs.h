@@ -588,6 +588,9 @@ inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*
 
 inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintptr_t{0x00551288});
 inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
+inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
+inline const char* s___00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
+inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F8}); /* "\n" */
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
 inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
@@ -720,4 +723,7 @@ inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040
 
 inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
 inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
+
+inline const char* s_Too_many_ships_in_list_00557de8 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
 

@@ -2180,6 +2180,10 @@ namespace hooks {
         { 0x00488600, &FLT2::Ok_To_Add_Ship_ },
         { 0x00487b10, &FLT2::Add_Fltscrn_Small_Icon_Fields_ },
         { 0x004B2920, &FLT1::Plunder_Ships_For_Tech_ },
+        { 0x0049AC40, &HACCESS::Player_Has_Tech_ },
+        { 0x004899D0, &FLT2::Get_Small_Icon_Animation_Size_ },
+        { 0x00487DE0, &FLT2::Build_Fltscrn_Ship_List_ },
+        { 0x004afd80, &FLT1::Get_Technology_From_Scrapped_Ship_ },
     };
 
     void Install_Hooks()

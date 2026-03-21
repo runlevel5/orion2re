@@ -1296,6 +1296,98 @@ namespace FLT1 {
         return false;
     }
 
+    void __cdecl Get_Technology_From_Scrapped_Ship_(s_ship_data* ship, int16_t player_id, char show_msg) {
+        uint16_t tech_apps[25];
+        uint16_t got_tech_apps[25];
+
+        for (int i = 0; i < 25; i++) {
+            tech_apps[i] = 0xFFFF;
+            got_tech_apps[i] = 0;
+        }
+
+        int16_t num_new_techs = 0;
+
+        int16_t fuel_id = INITSHIP::Best_Ship_Fuel_(ship->owner);
+        if (fuel_id > -1 && fuel_id < 6) {
+            uint16_t tech_id = TECHDATA::_fuel[fuel_id].tech_app_id;
+            if (!HACCESS::Player_Has_Tech_(tech_id, player_id)) {
+                tech_apps[num_new_techs++] = tech_id;
+            }
+        }
+
+        uint16_t drive_tech_id = TECHDATA::_drives[ship->d.ftl_type].tech_app_id;
+        if (!HACCESS::Player_Has_Tech_(drive_tech_id, player_id)) {
+            tech_apps[num_new_techs++] = drive_tech_id;
+        }
+
+        uint16_t comp_tech_id = TECHDATA::_computers[ship->d.computer_type].tech_app_id;
+        if (!HACCESS::Player_Has_Tech_(comp_tech_id, player_id)) {
+            tech_apps[num_new_techs++] = comp_tech_id;
+        }
+
+        uint16_t armor_tech_id = TECHDATA::_armor[ship->d.armor_type].tech_app_id;
+        if (!HACCESS::Player_Has_Tech_(armor_tech_id, player_id)) {
+            tech_apps[num_new_techs++] = armor_tech_id;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            int16_t weapon_type = ship->d.ship_weapon[i].type;
+            if (weapon_type > 0) {
+                uint16_t weapon_tech_id = TECHDATA::_weapons[weapon_type].tech_app_id;
+                if (!HACCESS::Player_Has_Tech_(weapon_tech_id, player_id)) {
+                    tech_apps[num_new_techs++] = weapon_tech_id;
+                }
+            }
+        }
+
+        for (int i = 1; i < 39; i++) {
+            if (struct_::Test_Bit_Field_(ship->d.special_device_flags, i)) {
+                uint16_t special_tech_id = TECHDATA::_specials[i].tech_app_id;
+                if (!HACCESS::Player_Has_Tech_(special_tech_id, player_id)) {
+                    tech_apps[num_new_techs++] = special_tech_id;
+                }
+            }
+        }
+
+        if (num_new_techs > 0) {
+            char lbx_message[200];
+            char message[500];
+
+            MISC::Get_LBX_Message_(116, lbx_message);
+            _sprintf(message, lbx_message, ship->d.name);
+
+            int32_t first_idx = random::Random_(num_new_techs) - 1;
+            int16_t num_acquired = 1;
+            got_tech_apps[0] = tech_apps[first_idx];
+
+            for (int i = 0; i < num_new_techs; i++) {
+                if (i != first_idx) {
+                    if ((random::Random_(100) - 1) < ((6 - num_acquired) * 5)) {
+                        got_tech_apps[num_acquired++] = tech_apps[i];
+                    }
+                }
+            }
+
+            for (int i = 0; i < num_acquired; i++) {
+                uint16_t tech_id = got_tech_apps[i];
+                if (tech_id != 0) {
+                    COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_id], tech_id);
+
+                    strcat(message, s_0_0055110c);
+                    strcat(message, s___00556070);
+                    strcat(message, TECHDATA::_technology_applications[tech_id].name);
+                    strcat(message, s__005569f8);
+                }
+            }
+
+            strcpy(MOX::_temp_string, ship->d.name);
+
+            if (show_msg != 0) {
+                HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, message, 2);
+            }
+        }
+    }
+
     /**
      * @address 004b2210
      */

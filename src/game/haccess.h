@@ -105,4 +105,6 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B5B0});
         return fn(special_id);
     }
+
+    bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx);
 }
