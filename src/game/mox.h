@@ -100,7 +100,7 @@ namespace MOX {
     inline void*& _fleet_scroll_anim_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005A1B40});
     inline void*& _officer_normal_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059BD2C});
     inline void*& _officer_bright_window_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00597020});
-    inline void*& _temp_officers_pict = *reinterpret_cast<void**>(std::uintptr_t{0x0059B338});
+    inline s_animation_header** _temp_officers_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B338});
     inline void*& _officer_dismiss_button_seg_active = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5E4});
     inline s_animation_header*& _officer_fleet_box_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979A8});
     inline void*& _officer_dismiss_button_seg_inactive = *reinterpret_cast<void**>(std::uintptr_t{0x005979AC});
