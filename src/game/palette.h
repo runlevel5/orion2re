@@ -6,9 +6,24 @@ namespace palette {
         reinterpret_cast<Fn>(std::uintptr_t{0x0052b330})(a, b, c, d, e, f, g, h);
     }
 
+    inline void __cdecl Save_Palette_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052B2E0})();
+    }
+
     void __cdecl Set_Palette_Changes_(int32_t start, int32_t end);
 
     void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end);
+
+    inline void __cdecl Reset_Cycle_Palette_Color_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052B8E0})();
+    }
+
+    inline void __cdecl Restore_Palette_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052B300})();
+    }
 
     inline void __cdecl Refresh_Palette_() {
         using Fn = void(__cdecl*)();

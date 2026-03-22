@@ -38,4 +38,19 @@ namespace JIM {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00424FB0});
         fn(music_id, p2, p3);
     }
+
+    inline void __cdecl Get_Text_Message_(const char* lbx_name, int16_t index, char* buffer, int16_t max_len) {
+        using Fn = void(__cdecl*)(const char*, int16_t, char*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00425340})(lbx_name, index, buffer, max_len);
+    }
+
+    inline void __cdecl Bill_Picture_To_Mouse_(s_animation_header* sprite) {
+        using Fn = void(__cdecl*)(s_animation_header*);
+        reinterpret_cast<Fn>(0x00425A10)(sprite);
+    }
+
+    inline void __cdecl Decode_Text_Race_(char* buffer, int16_t player_idx, int16_t max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
+        reinterpret_cast<Fn>(0x00425770)(buffer, player_idx, max_len);
+    }
 }

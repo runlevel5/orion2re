@@ -427,6 +427,49 @@ namespace antarans {
         return total_force;
     }
 
+    void __cdecl Kill_Antaran_Defensive_Ship_(int16_t ship_idx) {
+        int32_t defensive_count = (int32_t)MOX::_antarans.defensive_ships[ship_idx] - 1;
+
+        if (defensive_count < 1) {
+            defensive_count = 0;
+        }
+
+        MOX::_antarans.defensive_ships[ship_idx] = (int16_t)defensive_count;
+
+        if (MOX::_antarans.offensive_ships[ship_idx] > 0) {
+            int32_t offensive_count = (int32_t)MOX::_antarans.offensive_ships[ship_idx] - 1;
+
+            if (offensive_count < 1) {
+                offensive_count = 0;
+            }
+
+            MOX::_antarans.offensive_ships[ship_idx] = (int16_t)offensive_count;
+            MOX::_antarans.defensive_ships[ship_idx]++;
+        }
+    }
+
+    void __cdecl Kill_Antaran_Offensive_Ship_(int16_t ship_idx) {
+        int32_t count = (int32_t)MOX::_antarans.offensive_ships[ship_idx] - 1;
+
+        if (count < 1) {
+            count = 0;
+        }
+
+        MOX::_antarans.offensive_ships[ship_idx] = (int16_t)count;
+
+        Restock_Antaran_Ship_(ship_idx);
+    }
+
+    void __cdecl Restock_Antaran_Ship_(int16_t ship_type_idx) {
+        int16_t count = MOX::_antarans.offensive_deployed[ship_type_idx] - 1;
+
+        if (count < 1) {
+            count = 0;
+        }
+
+        MOX::_antarans.offensive_deployed[ship_type_idx] = count;
+    }
+
     bool __cdecl Antarans_Should_Attack_() {
         Delta_Stardate_();
 

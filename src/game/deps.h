@@ -91,6 +91,8 @@
 #include "mainmenu.h"
 #include "nextturn.h"
 #include "newgame.h"
+#include "billhelp.h"
+#include "racerprt.h"
 #include "newpup.h"
 #include "score.h"
 #include "hotpop.h"

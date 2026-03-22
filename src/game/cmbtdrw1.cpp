@@ -1555,10 +1555,10 @@ namespace CMBTDRW1 {
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        _board_left_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_005599c8, 6, MOX::_screen_seg);
-        _board_right_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_005599c8, 40, MOX::_screen_seg);
-        _board_raid_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_005599c8, 39, MOX::_screen_seg);
-        _board_capture_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_combat_lbx_005599c8, 41, MOX::_screen_seg);
+        _board_left_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 6, MOX::_screen_seg);
+        _board_right_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 40, MOX::_screen_seg);
+        _board_raid_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 39, MOX::_screen_seg);
+        _board_capture_button_seg = (s_animation_header*)farload::Far_Reload_Next_(s_combat_lbx_005599c8, 41, MOX::_screen_seg);
 
         video::Set_Page_Back_();
         Full_Draw_Combat_Screen_();

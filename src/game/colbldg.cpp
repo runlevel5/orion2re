@@ -1240,6 +1240,16 @@ namespace COLBLDG {
         } while (count != 0);
     }
 
+    void __cdecl Delete_Prod_From_Colony_Queue_(int16_t colony_idx, int16_t product_id) {
+        int16_t slot_idx;
+
+        slot_idx = COLBLDG::First_Prod_Colony_Queue_Slot_(colony_idx, product_id);
+        while (slot_idx != -1) {
+            COLBLDG::Delete_From_Colony_Queue_(colony_idx, slot_idx);
+            slot_idx = COLBLDG::First_Prod_Colony_Queue_Slot_(colony_idx, product_id);
+        }
+    }
+
     /**
      * @address 0050b2d0
      */

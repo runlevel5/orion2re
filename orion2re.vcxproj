@@ -114,6 +114,7 @@
     <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\multplay.cpp" />
     <ClCompile Include="src\game\namestar.cpp" />
+    <ClCompile Include="src\game\netmox.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
     <ClCompile Include="src\game\npcdiplo.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="src\game\platform.cpp" />
     <ClCompile Include="src\game\plntsum.cpp" />
     <ClCompile Include="src\game\raceopt.cpp" />
+    <ClCompile Include="src\game\racescrn.cpp" />
     <ClCompile Include="src\game\racesel.cpp" />
     <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
@@ -168,6 +170,7 @@
     <ClInclude Include="src\game\assert.h" />
     <ClInclude Include="src\game\beams.h" />
     <ClInclude Include="src\game\bill.h" />
+    <ClInclude Include="src\game\billhelp.h" />
     <ClInclude Include="src\game\bitmap.h" />
     <ClInclude Include="src\game\bomb.h" />
     <ClInclude Include="src\game\capture.h" />
@@ -283,6 +286,7 @@
     <ClInclude Include="src\game\plntsum.h" />
     <ClInclude Include="src\game\racecust.h" />
     <ClInclude Include="src\game\raceopt.h" />
+    <ClInclude Include="src\game\racerprt.h" />
     <ClInclude Include="src\game\racescrn.h" />
     <ClInclude Include="src\game\racesel.h" />
     <ClInclude Include="src\game\random.h" />
@@ -331,6 +335,7 @@
     <None Include=".vocode\workflows\struct.yaml" />
     <None Include=".vocode\workflows\verifier.yaml" />
     <None Include="notes.md" />
+    <None Include="src\game\flt2.cpp.orig" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

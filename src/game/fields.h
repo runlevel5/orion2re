@@ -128,6 +128,11 @@ namespace fields {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00522C80});
         fn();
     }
+
+    inline void __cdecl Draw_All_Fields_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0051EF40})();
+    }
     void __cdecl Set_Input_Delay_(uint16_t delay);
     void __cdecl Set_Field_Outline_Color_(uint16_t color);
 

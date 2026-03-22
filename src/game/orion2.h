@@ -3367,6 +3367,61 @@ struct s_qship {
     int16_t structural_damage;
 };
 
+typedef struct s_racescrn_icon_layout s_racescrn_icon_layout, *Ps_racescrn_icon_layout;
+
+struct s_racescrn_icon_layout {
+    int16_t x;
+    int16_t y;
+    int16_t width;
+    int16_t height;
+    int16_t spacing_x;
+    int16_t spacing_y;
+    int16_t max_icons_per_row;
+};
+
+typedef struct s_racescrn_mouse_group s_racescrn_mouse_group, *Ps_racescrn_mouse_group;
+
+struct s_racescrn_mouse_group {
+    int16_t x;
+    int16_t y;
+    int16_t width;
+    int16_t height;
+    int16_t spacing_x;
+    int16_t field5_0xa;
+    int16_t count;
+    int16_t field7_0xe;
+    int16_t sprite_width;
+    int16_t field9_0x12;
+    struct s_animation_header *sprite1;
+    struct s_animation_header *sprite2;
+    int16_t spacing_y;
+    int16_t max_icons_per_row;
+};
+
+typedef struct s_racescrn_race_display s_racescrn_race_display, *Ps_racescrn_race_display;
+
+struct s_racescrn_race_display {
+    int16_t list_idx;
+    int16_t player_idx;
+    struct s_player *player;
+    int16_t race;
+    int8_t is_empty_slot;
+    int8_t is_eliminated;
+    struct s_racescrn_mouse_group spy_icons_group;
+    int16_t agent_mission_idx;
+    int16_t relationship_slider_y;
+    int16_t relationshiop_field_id;
+    char *relationship_text;
+    int16_t main_interaction_field_id;
+    char *player_name;
+    struct s_animation_header *race_portrait_img;
+    struct s_animation_header *relationship_slider_img;
+    struct s_animation_header *eliminated_overlay_img;
+    struct s_animation_header *spy_icon_img;
+    struct s_animation_header *sabotage_icon_img;
+    struct s_animation_header *assassination_icon_img;
+};
+
 typedef struct s_report s_report, *Ps_report;
 
 typedef char __int8_t;
@@ -4063,10 +4118,10 @@ struct s_tech_building_data {
     int cost;
     short maintenance;
     int8_t type;
-    undefined field7_0xf;
-    undefined field8_0x10;
-    undefined field9_0x11;
-    undefined field10_0x12;
+    undefined1 field7_0xf;
+    undefined1 field8_0x10;
+    undefined1 field9_0x11;
+    undefined1 field10_0x12;
 };
 
 typedef struct s_tech_computer_data s_tech_computer_data, *Ps_tech_computer_data;

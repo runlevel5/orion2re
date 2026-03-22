@@ -2087,6 +2087,20 @@ namespace COLONY {
         return COLONY::_mouse_bitm;
     }
 
+    void __cdecl Picture_To_Mouse_(s_animation_header* anim_header) {
+        if (animate::Get_Width_(anim_header) > 0x18 || animate::Get_Height_(anim_header) > 0x18) {
+            if (_debug_flag != 0) {
+                fonts::PSTRS_(0, 1, ESTRINGS::E_Strings_(0x122));
+            }
+            ::__getch();
+        }
+
+        bitmap::Draw_Picture_To_Bitmap_(_mouse_bitm, anim_header);
+        bitmap::Clear_Mouse_Image_(0x13);
+        bitmap::Draw_Bitmap_To_Mouse_(0, 0, _mouse_bitm, 0x13);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_variable, 1);
+    }
+
     int16_t __cdecl CR_To_XY_(int16_t col, int16_t row, int16_t axis) {
         return _building_cr_xy[col][row][axis * 2];
     }

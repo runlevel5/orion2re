@@ -191,6 +191,12 @@ inline int16_t __cdecl Mouse_Button_() {
     return fn();
 }
 
+inline int __cdecl __getch() {
+    using Fn = int(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0054EAC0});
+    return fn();
+}
+
 inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter) {
     using Fn = HRESULT(__stdcall*)(GUID*, LPDIRECTDRAW*, IUnknown*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0053a8ca });

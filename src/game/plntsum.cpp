@@ -700,37 +700,37 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Load_Planet_Summary_Pictures_(void) {
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
-        _screen->pics[0] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 0, MOX::_screen_seg);
-        _screen->pics[1] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 1, MOX::_screen_seg);
-        _screen->pics[2] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 2, MOX::_screen_seg);
-        _screen->pics[3] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 3, MOX::_screen_seg);
+        _screen->pics[0] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 0, MOX::_screen_seg);
+        _screen->pics[1] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 1, MOX::_screen_seg);
+        _screen->pics[2] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 2, MOX::_screen_seg);
+        _screen->pics[3] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 3, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        _screen->pics[4] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 4, MOX::_screen_seg);
-        _screen->pics[5] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 5, MOX::_screen_seg);
-        _screen->pics[6] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 6, MOX::_screen_seg);
-        _screen->pics[7] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 7, MOX::_screen_seg);
+        _screen->pics[4] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 4, MOX::_screen_seg);
+        _screen->pics[5] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 5, MOX::_screen_seg);
+        _screen->pics[6] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 6, MOX::_screen_seg);
+        _screen->pics[7] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 7, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        _screen->pics[8] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 8, MOX::_screen_seg);
+        _screen->pics[8] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 8, MOX::_screen_seg);
 
-        _send_colony_ship_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 9, MOX::_screen_seg);
-        _send_outpost_ship_button_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 10, MOX::_screen_seg);
+        _send_colony_ship_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 9, MOX::_screen_seg);
+        _send_outpost_ship_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 10, MOX::_screen_seg);
 
-        _screen->pics[9] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 11, MOX::_screen_seg);
-        _screen->pics[10] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 12, MOX::_screen_seg);
-        _screen->pics[12] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 13, MOX::_screen_seg);
+        _screen->pics[9] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 11, MOX::_screen_seg);
+        _screen->pics[10] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 12, MOX::_screen_seg);
+        _screen->pics[12] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 13, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        _screen->pics[11] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 14, MOX::_screen_seg);
+        _screen->pics[11] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 14, MOX::_screen_seg);
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
         for (int i = 0; i < 11; ++i) {
-            MOX::_planet_summary_galaxy_star_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 15 + i, MOX::_screen_seg);
+            MOX::_planet_summary_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 15 + i, MOX::_screen_seg);
             MOX::Mox_Update_();
         }
 
@@ -904,7 +904,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         MOX::Push_Block_(MOX::_screen_seg);
 
         // Allocate buffer for 360 planets (0x2760 / 28 bytes)
-        s_plntsum_planet* temp_buffer = (s_plntsum_planet*)MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2760);
+        s_plntsum_planet* temp_buffer = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2760);
 
         // Initialize temp buffer with 0xFF (sets all shorts to -1)
         memset(temp_buffer, 0xFF, 0x2760);
@@ -1266,7 +1266,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Load_Player_Icon_() {
         int entry_num = (int)(short)((uint8_t)MOX::_player[MOX::_PLAYER_NUM].color + 0x4C);
 
-        s_animation_header* player_icon = (s_animation_header*)MOX::farload::Far_Reload_Next_(
+        s_animation_header* player_icon = (s_animation_header*)farload::Far_Reload_Next_(
             PLNTSUM::PTR_s_PLNTSUM_LBX_00556AC0,
             entry_num,
             MOX::_screen_seg

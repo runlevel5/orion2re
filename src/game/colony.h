@@ -170,6 +170,7 @@ namespace COLONY {
     void __cdecl Make_Bldg_Array_For_Colony_(int16_t colony_handle, uint8_t flag);
     void __cdecl Reset_Mouse_Picture_();
     void __cdecl Clear_Mouse_Picture_();
+    void __cdecl Picture_To_Mouse_(s_animation_header* anim_header);
 
     void __cdecl Load_Ship_Bitm_();
 

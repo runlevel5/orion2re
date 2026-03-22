@@ -1074,6 +1074,25 @@ namespace AIMOVE {
         return best_idx;
     }
 
+    int32_t __cdecl N_Enemy_Stars_Reachable_(int16_t player_idx, int16_t player_bit, int16_t source_star_idx) {
+        int32_t reachable_count = 0;
+
+        for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
+            if ((MOX::_star[i].has_colony >> (player_bit & 0x1f)) & 1) {
+                int16_t ship_range = MOX::_player[player_idx].ship_range;
+                int16_t distance = GEO::Parsecs_Between_Stars_(i, source_star_idx);
+
+                if (distance <= ship_range) {
+                    if (!struct_::Test_Bit_Field_(MOX::_star[i].black_hole_blocks, source_star_idx)) {
+                        reachable_count++;
+                    }
+                }
+            }
+        }
+
+        return reachable_count;
+    }
+
     int32_t __cdecl Enemy_Colony_Worth_To_Player_(int16_t colony_idx, int16_t player_idx) {
         int8_t owner = MOX::_colony[colony_idx].owner;
         int32_t weight_player;
@@ -2039,6 +2058,34 @@ namespace AIMOVE {
         }
     }
 
+    int __cdecl Sort_npc_dests_(const void* a_ptr, const void* b_ptr) {
+        auto a = static_cast<const s_aimove_npc_dest*>(a_ptr);
+        auto b = static_cast<const s_aimove_npc_dest*>(b_ptr);
+        int result;
+
+        result = ((int)a->has_lucky - (int)a->has_unlucky) - ((int)b->has_lucky - (int)b->has_unlucky);
+        if (result != 0) {
+            return result;
+        }
+
+        result = (int)(a->dist >> 3) - (int)(b->dist >> 3);
+        if (result != 0) {
+            return result;
+        }
+
+        result = (int)b->unlucky_strength - (int)a->unlucky_strength;
+        if (result != 0) {
+            return result;
+        }
+
+        result = (int)b->lucky_strength - (int)a->lucky_strength;
+        if (result != 0) {
+            return result;
+        }
+
+        return (int)a->dist - (int)b->dist;
+    }
+
     int16_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags) {
         int32_t dest_star_idx = -1;
         int32_t ship_location = MOX::_ship[ship_idx].location;
@@ -2099,6 +2146,50 @@ namespace AIMOVE {
         }
 
         return (int16_t)dest_star_idx;
+    }
+
+    int8_t __cdecl Player_Is_Hostile_To_Player_(int player_idx_a, int player_idx_b) {
+        int8_t result = 2;
+        s_player* p_a = &MOX::_player[player_idx_a];
+
+        // Check if a specific high-level treaty exists (e.g., Non-Aggression or Alliance)
+        if (p_a->treaty[player_idx_b] >= 4 && p_a->treaty[player_idx_b] <= 6) {
+            result = 1; /* Not Hostile */
+        }
+
+        if (result == 2) {
+            switch (p_a->personality) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    result = 1; /* Not Hostile */
+                    break;
+                case 4:
+                case 5:
+                    result = 0; /* Hostile */
+                    break;
+                default:
+                    // Keep result as 2 to proceed to objective check
+                    break;
+            }
+
+            if (result != 2) {
+                return result;
+            }
+
+            // Fallback to checking objectives if personality was not recognized or is neutral
+            if (p_a->objectives == 1) {
+                result = 1;
+            }
+        }
+
+        // Final safety fallback: default to Not Hostile (1)
+        if (result == 2) {
+            result = 1;
+        }
+
+        return result;
     }
 
     int8_t __cdecl AI_May_Attack_Player_(int16_t player_idx, int16_t target_idx) {

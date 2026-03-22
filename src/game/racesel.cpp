@@ -103,14 +103,14 @@ void __cdecl Reload_Race_Selection_Screen_() {
     allocate::Push_Block_(MOX::_screen_seg);
 
     for (int i = 0; i < 13; ++i) {
-        _race_specials[i] = (uint8_t*)MOX::farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, i, 1, 0x1F);
+        _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, i, 1, 0x1F);
         MOX::Mox_Update_();
     }
 
     FILE* file = _wfopen(s_lastrace_rac, s_rb_0055117c);
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
-        _race_specials[13] = (uint8_t*)MOX::farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);
+        _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);
 
         // Overwrite template with saved race data
         _fread(_race_specials[13], 31, 1, file);
@@ -125,11 +125,11 @@ void __cdecl Reload_Race_Selection_Screen_() {
     }
 
     for (int i = 0; i < 14; ++i) {
-        _race_button[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_RACESEL_LBX, i + 1, MOX::_screen_seg);
+        _race_button[i] = (s_animation_header*)farload::Far_Reload_Next_(s_RACESEL_LBX, i + 1, MOX::_screen_seg);
         MOX::Mox_Update_();
     }
 
-    _last_race_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_patch13_lbx, 1, MOX::_screen_seg);
+    _last_race_seg = (s_animation_header*)farload::Far_Reload_Next_(s_patch13_lbx, 1, MOX::_screen_seg);
 }
 
 void __cdecl Draw_Race_Selection_Screen_() {

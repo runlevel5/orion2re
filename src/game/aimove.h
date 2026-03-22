@@ -32,17 +32,9 @@ namespace AIMOVE {
         int32_t min_pop
     );
 
-    inline bool __cdecl Player_Is_Hostile_To_Player_(int16_t player1, int16_t player2) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00461410 });
-        return fn(player1, player2);
-    }
+    int8_t __cdecl Player_Is_Hostile_To_Player_(int player_idx_a, int player_idx_b);
 
-    inline int32_t __cdecl N_Enemy_Stars_Reachable_(int16_t ai_player, int16_t target_player, int16_t star_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004614A0 });
-        return fn(ai_player, target_player, star_idx);
-    }
+    int32_t __cdecl N_Enemy_Stars_Reachable_(int16_t player_idx, int16_t player_bit, int16_t source_star_idx);
 
     void __cdecl Intercept_Invaders_();
 
@@ -70,11 +62,7 @@ namespace AIMOVE {
 
     void __cdecl Move_NPCs_();
 
-    inline int __cdecl Sort_npc_dests_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00465d90 });
-        return fn(a, b);
-    }
+    int __cdecl Sort_npc_dests_(const void* a, const void* b);
 
     int16_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags);
 

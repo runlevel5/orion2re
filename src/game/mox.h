@@ -210,6 +210,8 @@ namespace MOX {
     inline int16_t& _take_control_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D62});
     inline int16_t& _auto_cmbt_button_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C60});
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
+    inline uint8_t* _active_player = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597360});
+    inline int16_t& _active_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B6});
     inline int16_t& _ai_retreat_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B436});
     inline int16_t& _bio_weapon_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B446});
     inline int16_t& _last_ship_status = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B3A});
@@ -239,6 +241,7 @@ namespace MOX {
     inline int16_t& _design_clear_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B4C});
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
+    inline s_player*& _cur_plyr_ptr = *reinterpret_cast<s_player**>(std::uintptr_t{0x005974E0});
     inline char** _treaty_labels = reinterpret_cast<char**>(std::uintptr_t{0x005A1B00});
     inline int16_t& _old_system_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5F8});
     inline int8_t& _selected_star_color_mod =
@@ -816,35 +819,6 @@ namespace MOX {
     inline void __cdecl Pop_Block_(void* screen_seg) {
         using Fn = void(__cdecl*)(void*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0052EB70})(screen_seg);
-    }
-
-    namespace farload {
-        inline void* __cdecl Far_Reload_(const char* filename, int entry, void* seg) {
-            using Fn = void*(__cdecl*)(const char*, int, void*);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C710})(filename, entry, seg);
-        }
-
-        inline void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* seg) {
-            using Fn = void*(__cdecl*)(const char*, int, void*);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C730})(filename, entry, seg);
-        }
-
-        inline char* __cdecl Far_Reload_Next_Data_(const char* filename, int type, void* seg, int entry, int field, int size) {
-            using Fn = char*(__cdecl*)(const char*, int, void*, int, int, int);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0051C780})(filename, type, seg, entry, field, size);
-        }
-    }
-
-    namespace allocate {
-        inline s_current_design* __cdecl Allocate_First_Block_(void* seg, uint32_t size) {
-            using Fn = s_current_design*(__cdecl*)(void*, uint32_t);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0052E930})(seg, size);
-        }
-
-        inline void* __cdecl Allocate_Next_Block_(void* seg, uint32_t size) {
-            using Fn = void*(__cdecl*)(void*, uint32_t);
-            return reinterpret_cast<Fn>(std::uintptr_t{0x0052E950})(seg, size);
-        }
     }
 
     inline int16_t __cdecl Get_Weighted_Choice_Short_(uint16_t* weights, int16_t count) {

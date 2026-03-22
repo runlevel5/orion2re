@@ -200,9 +200,5 @@ namespace DESIGN {
 
     void __cdecl Bonus_For_Regular_Mods_(int16_t mods, int16_t* bonus1, int16_t* bonus2);
 
-    inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00432940 });
-        return fn(weapon_idx);
-    }
+    int16_t __cdecl Weapon_Type_(int16_t weapon_idx);
 }

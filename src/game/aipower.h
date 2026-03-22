@@ -19,13 +19,31 @@ namespace AIPOWER {
 
     int16_t __cdecl Base_Generic_Ocv_(int16_t player_idx);
 
-    inline uint32_t __cdecl Colony_Space_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
-        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00509390})(colony_idx, player_idx);
+    inline uint16_t __cdecl Satelite_Strength_Vs_Ships_(int16_t building_type, int16_t owner_idx, int16_t target_player_idx) {
+        using Fn = uint16_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508730});
+        return fn(building_type, owner_idx, target_player_idx);
     }
 
-    inline uint32_t __cdecl Colony_Ground_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
-        using Fn = uint32_t(__cdecl*)(int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x005092d0})(colony_idx, player_idx);
+    uint16_t __cdecl Colony_Space_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx);
+
+    uint16_t __cdecl Colony_Ground_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx);
+
+    inline uint16_t __cdecl Missile_Base_Strength_(int16_t owner_idx, int16_t target_player_idx) {
+        using Fn = uint16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00509080});
+        return fn(owner_idx, target_player_idx);
+    }
+
+    inline uint16_t __cdecl Phasor_Base_Strength_(int16_t owner_idx, int16_t target_player_idx) {
+        using Fn = uint16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00509110});
+        return fn(owner_idx, target_player_idx);
+    }
+
+    inline uint16_t __cdecl Fighter_Garrison_Strength_(int16_t owner_idx, int16_t target_player_idx) {
+        using Fn = uint16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005091c0});
+        return fn(owner_idx, target_player_idx);
     }
 }

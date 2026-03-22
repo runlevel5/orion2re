@@ -3,22 +3,11 @@
 namespace antarans {
     void __cdecl Antaran_Invasion_Check_();
 
-    inline void __cdecl Restock_Antaran_Ship_(int16_t size) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x004B4290)(size);
-    }
+    void __cdecl Restock_Antaran_Ship_(int16_t ship_type_idx);
 
-    inline void __cdecl Kill_Antaran_Defensive_Ship_(int32_t size) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4170});
-        fn(size);
-    }
+    void __cdecl Kill_Antaran_Defensive_Ship_(int16_t ship_idx);
 
-    inline void __cdecl Kill_Antaran_Offensive_Ship_(int32_t size) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b41c0});
-        fn(size);
-    }
+    void __cdecl Kill_Antaran_Offensive_Ship_(int16_t ship_idx);
 
     int32_t __cdecl Delta_Stardate_();
     int16_t __cdecl Delay_();

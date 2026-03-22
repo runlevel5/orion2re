@@ -90,4 +90,10 @@ namespace bitmap {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052fe10});
         fn(x1, y1, x2, y2, bitmap);
     }
+
+    inline void __cdecl Draw_Bitmap_To_Mouse_(int16_t x, int16_t y, s_animation_header* anim, int16_t index) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F160});
+        fn(x, y, anim, index);
+    }
 }

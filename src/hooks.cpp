@@ -2203,6 +2203,20 @@ namespace hooks {
         { 0x00464390, &AIMOVE::Knock_Out_Impossible_Interceptions_ },
         { 0x00465ba0, &AIMOVE::Npc_Dest_ },
         { 0x00444FA0, &aidudes::Do_Blockaded_Colony_ },
+        { 0x00432940, &DESIGN::Weapon_Type_ },
+        { 0x00465d90, &AIMOVE::Sort_npc_dests_ },
+        { 0x004614a0, &AIMOVE::N_Enemy_Stars_Reachable_ },
+        { 0x00461410, &AIMOVE::Player_Is_Hostile_To_Player_ },
+        { 0x00509390, &AIPOWER::Colony_Space_Strength_Vs_Player_ },
+        { 0x005092d0, &AIPOWER::Colony_Ground_Strength_Vs_Player_ },
+        { 0x004b4170, &antarans::Kill_Antaran_Defensive_Ship_ },
+        { 0x004b41c0, &antarans::Kill_Antaran_Offensive_Ship_ },
+        { 0x004b4290, &antarans::Restock_Antaran_Ship_ },
+        { 0x0050b300, &COLBLDG::Delete_Prod_From_Colony_Queue_ },
+        { 0x005195A0, &NETMOX::Net_May_Begin_AI_Diplomacy_ },
+        { 0x0049b760, &RACESCRN::Race_Screen_ },
+        { 0x0049c5a0, &RACESCRN::Init_Race_Display_Data_ },
+        { 0x004E1C00, &COLONY::Picture_To_Mouse_ },
     };
 
     void Install_Hooks()

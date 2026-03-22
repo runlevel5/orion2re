@@ -13,6 +13,10 @@ namespace GENDRAW {
         return fn(message);
     }
 
+    inline int16_t __cdecl Warning_Box2_(char* text) {
+        return Warning_Box_(text);
+    }
+
     // Suggested name: GENDRAW::Warning_Box_Alert
     inline void __cdecl Draw_Warning_Box_(const char* message) {
         using Fn = void(__cdecl*)(const char*);

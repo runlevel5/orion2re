@@ -288,4 +288,71 @@ namespace AIPOWER {
         return bonus;
     }
 
+    /**
+     * @brief Calculates the defensive space strength of a colony against a specific player.
+     * 
+     * Determines the building level of the colony's defensive satellites (Star Base, Battlestation, 
+     * or Star Fortress) and calculates the total strength based on that building and the colony's owner.
+     * 
+     * @param colony_idx The index of the colony in the global colony array.
+     * @param player_idx The index of the player attacking the colony.
+     * @return The calculated space strength as a 16-bit unsigned integer.
+     */
+    uint16_t __cdecl Colony_Space_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+        int16_t building_type = -1;
+
+        if (colony->buildings[BUILDING_STAR_BASE] != 0) {
+            building_type = 1;
+        }
+        else if (colony->buildings[BUILDING_BATTLESTATION] != 0) {
+            building_type = 2;
+        }
+        else if (colony->buildings[BUILDING_STAR_FORTRESS] != 0) {
+            building_type = 3;
+        }
+
+        return AIPOWER::Satelite_Strength_Vs_Ships_(building_type, (int16_t)colony->owner, player_idx);
+    }
+
+    /**
+     * Calculates the defensive strength of a colony's ground-based installations 
+     * against a specific player.
+     */
+    uint16_t __cdecl Colony_Ground_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
+        uint16_t strength = 0;
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        // BUILDING_MISSILE_BASE: 26
+        if (colony->buildings[BUILDING_MISSILE_BASE] != 0) {
+            strength = AIPOWER::Missile_Base_Strength_((int16_t)colony->owner, player_idx);
+        }
+
+        // BUILDING_GROUND_BATTERIES: 27
+        if (colony->buildings[BUILDING_GROUND_BATTERIES] != 0) {
+            strength += AIPOWER::Phasor_Base_Strength_((int16_t)colony->owner, player_idx);
+        }
+
+        // BUILDING_STELLAR_CONVERTER: 42
+        if (colony->buildings[BUILDING_STELLAR_CONVERTER] != 0) {
+            if (MOX::_settings.strategic_combat_flag == 1) {
+                strength += 200;
+            } else {
+                strength += 500;
+            }
+        }
+
+        // BUILDING_FIGHTER_GARRISON: 47
+        if (colony->buildings[BUILDING_FIGHTER_GARRISON] != 0) {
+            strength += AIPOWER::Fighter_Garrison_Strength_((int16_t)colony->owner, player_idx);
+        }
+
+        // Cap maximum defensive strength
+        if (strength > 64000) {
+            strength = 64000;
+        }
+
+        return strength;
+    }
+
 }

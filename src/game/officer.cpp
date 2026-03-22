@@ -2068,7 +2068,7 @@ namespace OFFICER {
 
     void __cdecl Load_Fleet_Galaxy_Stars_() {
         for (int i = 0; i < 11; ++i) {
-            MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)MOX::farload::Far_Reload_Next_(
+            MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(
                 PTR_s_OFFICER_LBX,
                 0x82 + i,
                 MOX::_screen_seg
@@ -2083,7 +2083,7 @@ namespace OFFICER {
     void __cdecl Load_Officer_Skill_Icons_(void* param_1) {
         for (int i = 0; i < 27; ++i) {
             MOX::_officer_skill_icon_seg[i] = reinterpret_cast<s_animation_header*>(
-                MOX::farload::Far_Reload_Next_(
+                farload::Far_Reload_Next_(
                     reinterpret_cast<const char*>(PTR_s_OFFICER_LBX),
                     0x58 + i,
                     param_1
@@ -2102,12 +2102,12 @@ namespace OFFICER {
         MAINSCR::Allocate_First_Screen_Seg_(5);
         FLT1::Allocate_Fltscrn_Next_Screen_Seg_();
 
-        MOX::_officer_pictures_screen_seg = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
+        MOX::_officer_pictures_screen_seg = allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
         
-        _ldrpict = MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+        _ldrpict = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
         memset(_ldrpict, 0, 0x30);
 
-        _prev_leaders = static_cast<s_prev_leader_data*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
+        _prev_leaders = static_cast<s_prev_leader_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
 
         for (int16_t i = 0; i < 0x43; ++i) {
             _prev_leaders[i].status = MOX::_leaders[i].status;
@@ -2121,49 +2121,49 @@ namespace OFFICER {
             }
         }
 
-        MOX::_officers_original_ship_id = static_cast<int16_t*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
-        MOX::_officers_original_star_id = static_cast<int16_t*>(MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
+        MOX::_officers_original_ship_id = static_cast<int16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
+        MOX::_officers_original_star_id = static_cast<int16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
 
         Build_Captain_Id_List_();
         MOX::Mox_Update_();
 
         const char* lbx = PTR_s_OFFICER_LBX;
-        MOX::_officer_main_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 0, MOX::_screen_seg));
-        MOX::_officer_fleet_box_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 1, MOX::_screen_seg));
-        MOX::_officer_colony_box_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 2, MOX::_screen_seg));
-        MOX::_officer_colony_ldrs_button_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 3, MOX::_screen_seg));
-        MOX::_officer_ship_ldrs_button_seg = reinterpret_cast<s_animation_header*>(MOX::farload::Far_Reload_Next_(lbx, 4, MOX::_screen_seg));
-        MOX::_officer_up_button_seg = MOX::farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg);
+        MOX::_officer_main_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 0, MOX::_screen_seg));
+        MOX::_officer_fleet_box_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 1, MOX::_screen_seg));
+        MOX::_officer_colony_box_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 2, MOX::_screen_seg));
+        MOX::_officer_colony_ldrs_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 3, MOX::_screen_seg));
+        MOX::_officer_ship_ldrs_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 4, MOX::_screen_seg));
+        MOX::_officer_up_button_seg = farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg);
         
         MOX::Mox_Update_();
 
-        MOX::_officer_dn_button_seg = MOX::farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg);
-        MOX::_officer_prev_button_seg = MOX::farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
-        MOX::_officer_next_button_seg = MOX::farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg);
-        MOX::_officer_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg);
-        MOX::_officer_pool_button_seg_inactive = MOX::farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
-        MOX::_officer_dismiss_button_seg_active = MOX::farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
-        MOX::_officer_return_button_seg = MOX::farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
-        MOX::_officer_cancel_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
+        MOX::_officer_dn_button_seg = farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg);
+        MOX::_officer_prev_button_seg = farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
+        MOX::_officer_next_button_seg = farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg);
+        MOX::_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg);
+        MOX::_officer_pool_button_seg_inactive = farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
+        MOX::_officer_dismiss_button_seg_active = farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
+        MOX::_officer_return_button_seg = farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
+        MOX::_officer_cancel_hire_button_seg = farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        MOX::_selected_box_seg = MOX::farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
-        MOX::_scanned_box_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
-        MOX::_fleet_scroll_anim_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
-        MOX::_dull_officer_hire_button_seg = MOX::farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
-        MOX::_dull_officer_pool_button_seg = MOX::farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
-        MOX::_officer_pool_button_seg_active = MOX::farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
-        MOX::_officer_dismiss_button_seg_inactive = MOX::farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
+        MOX::_selected_box_seg = farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
+        MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
+        MOX::_fleet_scroll_anim_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
+        MOX::_dull_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
+        MOX::_dull_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
+        MOX::_officer_pool_button_seg_active = farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
+        MOX::_officer_dismiss_button_seg_inactive = farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        MOX::_officer_normal_window_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
-        MOX::_officer_bright_window_seg = (s_animation_header*)MOX::farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
+        MOX::_officer_normal_window_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
+        MOX::_officer_bright_window_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 
-        MOX::_temp_officers_pict = (s_animation_header**)MOX::allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+        MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
 
         Get_Officer_Pictures_();
         Load_Officer_Skill_Name_Descriptions_();

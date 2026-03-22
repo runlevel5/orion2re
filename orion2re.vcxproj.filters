@@ -393,6 +393,12 @@
     <ClCompile Include="src\game\flt2.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\netmox.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\racescrn.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -908,6 +914,12 @@
     <ClInclude Include="src\game\string.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\billhelp.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\racerprt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">
@@ -929,6 +941,9 @@
     </None>
     <None Include=".vocode\workflows\verifier.yaml">
       <Filter>.vocode\worklows</Filter>
+    </None>
+    <None Include="src\game\flt2.cpp.orig">
+      <Filter>src\game</Filter>
     </None>
   </ItemGroup>
 </Project>

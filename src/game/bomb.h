@@ -1,8 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_colony;
-struct s_combat_bomb_result;
 
 namespace BOMB {
     int16_t __cdecl Handle_Leader_At_Lost_Colony_(s_colony* colony);

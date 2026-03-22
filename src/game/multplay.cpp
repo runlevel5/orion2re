@@ -879,8 +879,8 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x27, MOX::_global_cache_seg);
 
         // Load button animations (note: indices might be specific to serial/modem setup)
-        MOX::_mp_screen->anim_btn_unk_2 = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x24, MOX::_screen_seg);
-        MOX::_mp_screen->anim_btn_unk_3 = (s_animation_header*)MOX::farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x25, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_unk_2 = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x24, MOX::_screen_seg);
+        MOX::_mp_screen->anim_btn_unk_3 = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x25, MOX::_screen_seg);
 
         // Center the background on the 640x480 screen
         width = animate::Get_Width_(MOX::_mp_screen->bg_seg);

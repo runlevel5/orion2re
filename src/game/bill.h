@@ -34,6 +34,39 @@ namespace BILL {
         reinterpret_cast<Fn>(0x004076f0)(a1, y, type, a4, buffer, a6);
     }
 
+    inline void __cdecl Get_Players_Dead_Or_Alive_Or_Omniscient_(int16_t dummy1, int16_t dummy2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x00406DE0)(dummy1, dummy2);
+    }
+
+    inline void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x004071F0)(start, end);
+    }
+
+    inline void __cdecl Get_Active_Players_(int16_t dummy1, int16_t dummy2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x00406CD0)(dummy1, dummy2);
+    }
+
+    inline int16_t __cdecl Get_My_Spy_Number_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406FE0});
+        return fn(player_idx);
+    }
+
+    inline int8_t __cdecl Get_My_Spy_Mission_(int16_t player_idx) {
+        using Fn = int8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407010});
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Get_My_Agent_Number_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407050});
+        return fn();
+    }
+
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
 
     inline void __cdecl _Print_Paragraph_(uint16_t x, int16_t y, uint16_t width, const char* text, int shadow_style) {

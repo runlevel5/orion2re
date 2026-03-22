@@ -66,4 +66,71 @@ namespace NETMOX {
     }
 
     inline char* net_field_1be = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
+
+    inline void __cdecl Net_Request_AI_Diplomacy_(int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00519560})(player_idx);
+    }
+
+    int8_t __cdecl Net_May_Begin_AI_Diplomacy_();
+
+    inline int8_t __cdecl No_AI_Diplomacy_Allowed_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00519730})();
+    }
+
+    inline void __cdecl Net_Cancel_AI_Diplomacy_Request_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x005196D0})();
+    }
+
+    inline int8_t __cdecl Net_Cancel_AI_Diplomacy_Confirmed_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00519720})();
+    }
+
+    inline void __cdecl Net_End_AI_Diplomacy_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x005195D0})();
+    }
+
+    inline void __cdecl Net_Request_Human_Diplomacy_(int16_t player_idx, int16_t dummy) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00519750})(player_idx, dummy);
+    }
+
+    inline int8_t __cdecl Net_May_Begin_Human_Diplomacy_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005198D0})();
+    }
+
+    inline int8_t __cdecl Human_Hit_Next_Turn_(int16_t player_idx) {
+        using Fn = int8_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005199C0})(player_idx);
+    }
+
+    inline int8_t __cdecl Allowed_To_Cancel_Human_Diplomacy_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00519950})();
+    }
+
+    inline int8_t __cdecl Human_Diplomat_Says_Wait_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005199E0})();
+    }
+
+    inline int8_t __cdecl Net_Human_Rejected_Diplomacy_() {
+        using Fn = int8_t(__cdecl*)();
+        return reinterpret_cast<Fn>(std::uintptr_t{0x00519C50})();
+    }
+
+    inline void __cdecl Net_End_Human_Diplomacy_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x005199D0})();
+    }
+
+    inline void __cdecl Net_Cancel_Human_Diplomacy_Request_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x00519960})();
+    }
 }

@@ -8,6 +8,11 @@ namespace DIP_SCRN {
 
     void __cdecl Set_Opportunity_Attacks_();
 
+    inline void __cdecl Diplomacy_Screen_(int16_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004133B0})(player_idx);
+    }
+
     inline void __cdecl Add_Diplomacy_Turn_Summary_Messages_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041D890});
