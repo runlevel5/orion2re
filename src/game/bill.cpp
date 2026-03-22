@@ -77,23 +77,24 @@ namespace BILL {
     }
 
     /**
-     * Sets the number of spies for a specific player against a target player.
-     * The spy count is packed into the lower 6 bits of the spies byte, 
-     * preserving the upper 2 bits (likely used for flags).
+     * @brief Updates the spy count for a specific target player.
      * 
-     * @param player_idx Index of the player whose spies are being set
-     * @param target_idx Index of the target player the spies are spying on
-     * @param n_spies The number of spies (only the lower 6 bits are used)
+     * This function modifies the lower 6 bits of the spy count byte while 
+     * preserving the upper 2 bits (bits 6-7).
+     * 
+     * @param player_idx The index of the player who owns the spies.
+     * @param target_player_idx The index of the player being spied upon.
+     * @param count The new spy count (masked to 0-63).
      */
-    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies) {
-        // Offset 0xE57 is the 'spies' field within s_player
-        int8_t& spy_data = MOX::_player[player_idx].spies[target_idx];
-
-        // Preserve bits 6-7, clear bits 0-5, then set bits 0-5 from n_spies
-        uint8_t flags = static_cast<uint8_t>(spy_data) & 0xC0;
-        uint8_t packed_count = n_spies & 0x3F;
-
-        spy_data = static_cast<int8_t>(flags | packed_count);
+    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, uint8_t count) {
+        // s_player size: 0xEA9 (3753 bytes)
+        // spies offset: 0xE57
+        
+        // Clear lower 6 bits (intermediate write observed in assembly)
+        MOX::_player[player_idx].spies[target_player_idx] &= 0xC0;
+        
+        // Set new count in lower 6 bits
+        MOX::_player[player_idx].spies[target_player_idx] |= (count & 0x3F);
     }
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height) {
@@ -103,6 +104,13 @@ namespace BILL {
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width) {
         _Squeeze_Print_(x - (width / 2), y, str, width, nullptr, 2, true);
+    }
+
+    /**
+     * @address 00407450
+     */
+    void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit) {
+        _Squeeze_Print_((int16_t)x, y, text, (int16_t)limit, nullptr, 2, true);
     }
 
     /**
@@ -223,5 +231,26 @@ namespace BILL {
             1,
             0
         );
+    }
+
+    /**
+     * @address 00407140
+     */
+    void __cdecl Set_My_Spy_Mission_(int16_t target_player_idx, int8_t mission) {
+        BILL::Set_Their_Spy_Mission_(MOX::_PLAYER_NUM, target_player_idx, mission);
+    }
+
+    /**
+     * @address 00407120
+     */
+    void __cdecl Set_My_Spy_Number_(int16_t target_player_idx, uint8_t n_spies) {
+        BILL::Set_Their_Spy_Number_(MOX::_PLAYER_NUM, target_player_idx, n_spies);
+    }
+
+    /**
+     * @address 00407160
+     */
+    void __cdecl Set_My_Agent_Number_(uint8_t agent_num) {
+        BILL::Set_Their_Spy_Number_(MOX::_PLAYER_NUM, MOX::_PLAYER_NUM, agent_num);
     }
 }

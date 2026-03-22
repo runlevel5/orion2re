@@ -19,7 +19,7 @@ namespace BILL {
     void __cdecl Bill_Default_(void);
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
-    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_idx, uint8_t n_spies);
+    void __cdecl Set_Their_Spy_Number_(int16_t player_idx, int16_t target_player_idx, uint8_t count);
 
     void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width);
 
@@ -61,13 +61,27 @@ namespace BILL {
         return fn(player_idx);
     }
 
+    inline void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004070D0});
+        fn(player_idx, target_player_idx, mission);
+    }
+
     inline int16_t __cdecl Get_My_Agent_Number_() {
         using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407050});
         return fn();
     }
 
+    void __cdecl Set_My_Spy_Mission_(int16_t target_player_idx, int8_t mission);
+
+    void __cdecl Set_My_Spy_Number_(int16_t target_player_idx, uint8_t n_spies);
+
+    void __cdecl Set_My_Agent_Number_(uint8_t agent_num);
+
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
+
+    void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit);
 
     inline void __cdecl _Print_Paragraph_(uint16_t x, int16_t y, uint16_t width, const char* text, int shadow_style) {
         using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, const char*, int);

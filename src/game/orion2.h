@@ -3370,32 +3370,30 @@ struct s_qship {
 typedef struct s_racescrn_icon_layout s_racescrn_icon_layout, *Ps_racescrn_icon_layout;
 
 struct s_racescrn_icon_layout {
-    int16_t x;
-    int16_t y;
-    int16_t width;
-    int16_t height;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
     int16_t spacing_x;
-    int16_t spacing_y;
-    int16_t max_icons_per_row;
+    void *render_fn;
 };
 
 typedef struct s_racescrn_mouse_group s_racescrn_mouse_group, *Ps_racescrn_mouse_group;
 
 struct s_racescrn_mouse_group {
-    int16_t x;
-    int16_t y;
-    int16_t width;
-    int16_t height;
-    int16_t spacing_x;
-    int16_t field5_0xa;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t total_height;
+    int16_t total_width;
     int16_t count;
     int16_t field7_0xe;
-    int16_t sprite_width;
-    int16_t field9_0x12;
+    int16_t icon_width;
+    int16_t spacing_x;
     struct s_animation_header *sprite1;
     struct s_animation_header *sprite2;
-    int16_t spacing_y;
-    int16_t max_icons_per_row;
+    void *render_fn;
 };
 
 typedef struct s_racescrn_race_display s_racescrn_race_display, *Ps_racescrn_race_display;

@@ -133,4 +133,9 @@ namespace NETMOX {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00519960})();
     }
+
+    inline int32_t __cdecl Net_Diplomacy_With_(int16_t limit) {
+        using Fn = int32_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x005199F0})(limit);
+    }
 }

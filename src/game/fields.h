@@ -104,6 +104,12 @@ namespace fields {
 
     void __cdecl Clear_Fields_Above_(int16_t f);
 
+    inline int16_t __cdecl Get_Field_Counter_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d170});
+        return fn();
+    }
+
     void __cdecl Enable_Mouse_Pressed_Field_Update_();
 
     void __cdecl Deactivate_Help_List_();

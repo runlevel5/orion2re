@@ -1531,9 +1531,6 @@ namespace LOADSAVE {
         }
     }
 
-    /**
-     * @address 00510db0
-     */
     void __cdecl _Game_Popup_() {
         int16_t exit_condition = 0;
         bool first_loop_drawn = true;
