@@ -2197,6 +2197,12 @@ namespace hooks {
         { 0x00462c50, &AIMOVE::Star_Has_Monster_ },
         { 0x00461b00, &AIMOVE::Get_Best_Unescorted_Colony_Ship_ },
         { 0x00462b00, &AIMOVE::I_Soonest_Enemy_Colony_Ship_ },
+        { 0x00463ce0, &AIMOVE::Interceptions_ },
+        { 0x00460eb0, &AIMOVE::AI_May_Attack_Player_ },
+        { 0x00464540, &AIMOVE::Gather_Intercepting_Ships_ },
+        { 0x00464390, &AIMOVE::Knock_Out_Impossible_Interceptions_ },
+        { 0x00465ba0, &AIMOVE::Npc_Dest_ },
+        { 0x00444FA0, &aidudes::Do_Blockaded_Colony_ },
     };
 
     void Install_Hooks()

@@ -18,27 +18,35 @@ namespace AIMOVE {
 
     void __cdecl Launch_Attacks_(int param_1, int param_2);
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* target_info, int mission_type, int param_4);
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, uint8_t* target_info, int mission_type, int param_4);
 
-    inline int8_t __cdecl AI_May_Attack_Player_(int16_t ai_player, int16_t target_player) {
-        using Fn = int8_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460eb0});
-        return fn(ai_player, target_player);
+    int8_t __cdecl AI_May_Attack_Player_(int16_t player_idx, int16_t target_idx);
+
+    uint16_t __cdecl Compute_Attack_Worthiness_(
+        int16_t colony_idx,
+        int16_t* ship_list,
+        int16_t eta,
+        int8_t* out_attack_type,
+        int8_t* out_flee,
+        uint8_t* target_info,
+        int32_t min_pop
+    );
+
+    inline bool __cdecl Player_Is_Hostile_To_Player_(int16_t player1, int16_t player2) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00461410 });
+        return fn(player1, player2);
     }
 
-    inline int16_t __cdecl Compute_Attack_Worthiness_(int16_t colony_idx, int16_t* ship_list, int16_t turns_left, int8_t* mission, int8_t* visited_star, int16_t* target_info, int param_4) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t*, int16_t, int8_t*, int8_t*, int16_t*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00463090});
-        return fn(colony_idx, ship_list, turns_left, mission, visited_star, target_info, param_4);
+    inline int32_t __cdecl N_Enemy_Stars_Reachable_(int16_t ai_player, int16_t target_player, int16_t star_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004614A0 });
+        return fn(ai_player, target_player, star_idx);
     }
 
     void __cdecl Intercept_Invaders_();
 
-    inline void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
-        using Fn = void(__cdecl*)(s_aimove_intercept_entry*, int*, int8_t*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00463ce0 });
-        fn(intercepts, count, star_to_intercept_idx, is_desperate);
-    }
+    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate);
 
     void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count);
 
@@ -62,11 +70,13 @@ namespace AIMOVE {
 
     void __cdecl Move_NPCs_();
 
-    inline int32_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags) {
-        using Fn = int32_t(__cdecl*)(int16_t, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00465BA0});
-        return fn(ship_idx, star_flags);
+    inline int __cdecl Sort_npc_dests_(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00465d90 });
+        return fn(a, b);
     }
+
+    int16_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags);
 
     void __cdecl Move_All_AI_();
 
@@ -75,6 +85,15 @@ namespace AIMOVE {
     void __cdecl Get_Colonizable_Planets_(s_ai_colonizable_planet* colonizable_planets, int16_t* count);
 
     int __cdecl Gather_Player_Ships_At_Star_(int16_t player_id, int16_t star_id, int16_t* ships_list);
+
+    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map);
+
+    void __cdecl Knock_Out_Impossible_Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* temp_arr, int* temp_count, int keep_one_entry);
+
+    inline int32_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int star_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t, uint16_t, int);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004642b0 })(ship_idx, player_mask, star_idx);
+    }
 
     void __cdecl Player_Threatens_Player_(int plr1, int plr2, int* star_idx, int* aux_info, int* planet_idx);
 

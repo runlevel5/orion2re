@@ -246,12 +246,23 @@ struct s_aimove_intercept_entry {
     struct s_aimove_intercept_player players[8];
 };
 
-typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
+typedef struct s_aimove_npc_dest s_aimove_npc_dest, *Ps_aimove_npc_dest;
 
 
 /* WARNING! conflicting data type names: /types.h/uint - /uint */
 
 typedef uint uint32_t;
+
+struct s_aimove_npc_dest {
+    uint8_t star_idx;
+    uint8_t dist;
+    uint8_t has_lucky;
+    uint8_t has_unlucky;
+    uint32_t lucky_strength;
+    uint32_t unlucky_strength;
+};
+
+typedef struct s_alloc_header s_alloc_header, *Ps_alloc_header;
 
 struct s_alloc_header {
     uint32_t current;

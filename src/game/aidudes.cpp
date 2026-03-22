@@ -580,49 +580,46 @@ namespace aidudes {
     }
 
     void __cdecl Do_Blockaded_Colony_(s_aidudes_colony_info* colony_info) {
-        s_colony* colony = &MOX::_colony[colony_info->colony_idx];
-
+        s_colony* colony = &MOX::_colony[(uint8_t)colony_info->colony_idx];
         Assign_Required_Colonists_(colony_info);
 
-        aidudes::_Sort_Pops_colony_data = colony;
-        _qsort(&colony->pop[colony_info->first_assignable_pop_idx],
-              (uint32_t)(colony->n_pops - colony_info->first_assignable_pop_idx),
-              sizeof(uint32_t),
-              &Sort_Pops_FI_);
+        _Sort_Pops_colony_data = colony;
 
-        if (colony->food2_per_farmer != 0) {
-            COLCALC::Pre_Import_Computing_(colony);
+        _qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
+              (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
+              4,
+              Sort_Pops_FI_);
 
-            while (colony_info->cur_pop_idx < colony_info->pop_end_idx) {
-                int food_needed = (uint8_t)colony->food2_needed_for_our_empire +
-                                  (uint8_t)colony->food2_needed_for_assimilated +
-                                  (uint8_t)colony->food2_needed_for_conquered +
-                                  (uint8_t)colony->food2_needed_for_natives;
+        if (colony->food2_per_farmer == 0) {
+            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
+            uint32_t job_mask = (is_researching == 0) ? 0x80 : 0x100;
 
-                if (food_needed > (colony->production[0] * 2)) {
-                    if (colony_info->n_farmers < (int8_t)colony->max_farms) {
-                        colony->pop[colony_info->cur_pop_idx] &= ~0x180;
-                        colony->pop[colony_info->cur_pop_idx] |= 0x200;
-                        colony_info->cur_pop_idx++;
-                        colony_info->n_farmers++;
-                    }
-                } else {
-                    colony_info->pop_end_idx--;
-                    uint8_t idx = colony_info->pop_end_idx;
-                    colony->pop[idx] = (colony->pop[idx] & ~0x100) | 0x80;
-                    colony->pop[idx] |= 0x200;
-                }
-                COLCALC::Pre_Import_Computing_(colony);
+            while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
+                colony->pop[(uint8_t)colony_info->cur_pop_idx] = (colony->pop[(uint8_t)colony_info->cur_pop_idx] & 0xFFFFFE7F) | job_mask;
+                colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
+                colony_info->cur_pop_idx++;
             }
         } else {
-            int16_t research_status = EVENTS::Event_Check_Colony_Researching_((int16_t)colony_info->colony_idx);
-            uint32_t target_bits = (research_status == 0) ? 0x80 : 0x100;
+            COLCALC::Pre_Import_Computing_(colony);
 
-            while (colony_info->cur_pop_idx < colony_info->pop_end_idx) {
-                uint32_t current_pop = colony->pop[colony_info->cur_pop_idx];
-                colony->pop[colony_info->cur_pop_idx] = (current_pop & ~0x180) | target_bits;
-                colony->pop[colony_info->cur_pop_idx] |= 0x200;
-                colony_info->cur_pop_idx++;
+            while ((uint8_t)colony_info->cur_pop_idx < (uint8_t)colony_info->pop_end_idx) {
+                int32_t total_food_needed = (uint8_t)colony->food2_needed_for_our_empire +
+                                            (uint8_t)colony->food2_needed_for_assimilated +
+                                            (uint8_t)colony->food2_needed_for_conquered +
+                                            (uint8_t)colony->food2_needed_for_natives;
+
+                if (total_food_needed > colony->production[0] * 2 &&
+                    (uint8_t)colony_info->n_farmers < (uint8_t)colony->max_farms) {
+                    colony->pop[(uint8_t)colony_info->cur_pop_idx] &= 0xFFFFFE7F;
+                    colony->pop[(uint8_t)colony_info->cur_pop_idx] |= 0x200;
+                    colony_info->cur_pop_idx++;
+                    colony_info->n_farmers++;
+                } else {
+                    colony_info->pop_end_idx--;
+                    colony->pop[(uint8_t)colony_info->pop_end_idx] = (colony->pop[(uint8_t)colony_info->pop_end_idx] & 0xFFFFFEFF) | 0x80;
+                    colony->pop[(uint8_t)colony_info->pop_end_idx] |= 0x200;
+                }
+                COLCALC::Pre_Import_Computing_(colony);
             }
         }
 

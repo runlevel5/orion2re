@@ -8,7 +8,7 @@ namespace TECHDATA {
     inline s_techdata_planetary_shield* _planetary_shields =
         reinterpret_cast<s_techdata_planetary_shield*>(std::uintptr_t{ 0x0054F048 });
     inline s_tech_armor_data* _armor = reinterpret_cast<s_tech_armor_data*>(std::uintptr_t{ 0x00554d90 });
-    inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554280});
+    inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
     inline s_tech_hull_data* _hull_data = reinterpret_cast<s_tech_hull_data*>(std::uintptr_t{ 0x00555798 });
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
     inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
@@ -30,10 +30,4 @@ namespace TECHDATA {
 
     inline s_tech_data_personal_shield (&_personal_shields)[6] =
         *reinterpret_cast<s_tech_data_personal_shield(*)[6]>(std::uintptr_t{0x0054F040});
-
-    inline int16_t __cdecl Weapon_Rack_(int16_t weapon_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432940});
-        return fn(weapon_idx);
-    }
 }

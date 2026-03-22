@@ -38,7 +38,7 @@ namespace DESIGN {
             d->weapon_firing_arc[i] = static_cast<int8_t>(HACCESS::Design_Weapon_Firing_Arc_(player_idx, design_idx, i));
             d->weapon_ammo[i] = static_cast<int8_t>(HACCESS::Design_Weapon_Ammo_(player_idx, design_idx, i));
 
-            int16_t rack_type = TECHDATA::Weapon_Rack_(d->weapon_type[i]);
+            int16_t rack_type = DESIGN::Weapon_Rack_(d->weapon_type[i]);
             if (rack_type == 2) {
                 if (d->weapon_firing_arc[i] != 16) {
                     d->weapon_firing_arc[i] = 16;
@@ -558,7 +558,7 @@ namespace DESIGN {
     }
 
     int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx) {
-        return TECHDATA::Weapon_Rack_(weapon_idx) == 1;
+        return DESIGN::Weapon_Rack_(weapon_idx) == 1;
     }
 
     int16_t __cdecl Weapon_Rack_Size_(int16_t count) {
@@ -592,7 +592,7 @@ namespace DESIGN {
         Bonus_For_Special_Mods_(mod_flags, &dummy_out, &special_mod_mult);
 
         int16_t mod_rack_offset = 0;
-        if (TECHDATA::Weapon_Rack_(weapon_idx) == 0) {
+        if (DESIGN::Weapon_Rack_(weapon_idx) == 0) {
             mod_rack_offset = Get_Weapon_Mod_Space_Bonus_(mod_flags);
         }
 
@@ -629,7 +629,7 @@ namespace DESIGN {
         Bonus_For_Special_Mods_(specials, &special_bonus_pct, &local_4);
 
         int16_t space_bonus = 0;
-        if (TECHDATA::Weapon_Rack_(weapon_idx) == 0) {
+        if (DESIGN::Weapon_Rack_(weapon_idx) == 0) {
             space_bonus = Get_Weapon_Mod_Space_Bonus_(arc);
         }
 

@@ -50,6 +50,11 @@ namespace AIDATA {
 
     short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(int16_t player, int16_t star_a, int16_t star_b, int16_t* inter_star_out, bool use_extended);
 
+    inline short __cdecl Ship_N_Turns_To_Star_With_Intermediate_(int16_t ship_idx, int16_t star_idx, int16_t* inter_star_out) {
+        using Fn = short(__cdecl*)(int16_t, int16_t, int16_t*);
+        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004edd30 })(ship_idx, star_idx, inter_star_out);
+    }
+
     int __cdecl airefit_cmp_(const void* a, const void* b);
 
     int __cdecl sort_ships_(const void* a, const void* b);

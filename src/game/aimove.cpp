@@ -1322,6 +1322,45 @@ namespace AIMOVE {
         }
     }
 
+    void __cdecl Gather_Intercepting_Ships_(int16_t* ships_list, int32_t* ship_count, int8_t* intercept_map) {
+        *ship_count = 0;
+
+        for (int32_t i = 0; i < static_cast<int32_t>(AIDATA::_n_all_ships); ++i) {
+            int16_t ship_idx = (*AIDATA::_all_ships)[i];
+            s_ship_data* ship = &MOX::_ship[ship_idx];
+
+            if (static_cast<int16_t>(ship->owner) == AIMOVE::_i_ai) {
+                bool should_gather = false;
+
+                if (SHIPMOVE::Can_Order_Ship_(ship)) {
+                    // Check if mission is one of the interceptable/idle types
+                    switch (ship->mission) {
+                        case 0:
+                        case 2:
+                        case 3:
+                        case 5:
+                        case 7:
+                            should_gather = true;
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    // Ship is already moving, check if it's arriving at a target star
+                    int16_t dest_star = SHIPMOVE::Ship_Destination_Star_(ship);
+                    if (dest_star != -1 && intercept_map[dest_star] != -1 /* 0xff */) {
+                        should_gather = true;
+                    }
+                }
+
+                if (should_gather) {
+                    ships_list[*ship_count] = ship_idx;
+                    *ship_count = *ship_count + 1;
+                }
+            }
+        }
+    }
+
     void __cdecl Assign_New_Colony_Ship_Destinations_(s_ai_colonizable_planet* planets, int16_t* count) {
         int16_t num_my_colony_ships = 0;
         int16_t my_colony_ships[500];
@@ -1424,6 +1463,211 @@ namespace AIMOVE {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    void __cdecl Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* star_to_intercept_idx, int is_desperate) {
+        int num_intercepting_ships;
+        int16_t intercepting_ships[500];
+        int8_t star_valid_target[72];
+        int local_1670;
+
+        Gather_Intercepting_Ships_(intercepting_ships, &num_intercepting_ships, star_to_intercept_idx);
+        Knock_Out_Impossible_Interceptions_(intercepts, count, star_valid_target, &local_1670, is_desperate);
+
+        while (true) {
+            if (*count <= 0) {
+                return;
+            }
+
+            RUSS::Mox_Update_();
+
+            char ship_target_star[500];
+            for (int i = 0; i < 500; ++i) {
+                ship_target_star[i] = -1;
+            }
+
+            char ship_intermediate_star[500];
+            for (int i = 0; i < 500; ++i) {
+                ship_intermediate_star[i] = -1;
+            }
+
+            uint32_t strength_totals[720];
+            for (int i = 0; i < 720; ++i) {
+                strength_totals[i] = 0;
+            }
+
+            char target_min_eta[72];
+            char target_best_eta[72];
+
+            if (num_intercepting_ships > 0) {
+                uint8_t ship_min_eta[500];
+                int16_t star_min_strength[72];
+
+                for (int ship_list_index = 0; ship_list_index < num_intercepting_ships; ++ship_list_index) {
+                    int16_t ship_id = intercepting_ships[ship_list_index];
+                    bool has_special_bit_11 = struct_::Test_Bit_Field_(MOX::_ship[ship_id].d.special_device_flags, 11);
+                    int best_target = -1;
+                    ship_min_eta[ship_id] = 10;
+
+                    if (*count > 0) {
+                        for (int target_index = 0; target_index < *count; ++target_index) {
+                            s_aimove_intercept_entry* target = &intercepts[target_index];
+                            int star_idx = target->star_idx;
+
+                            star_min_strength[star_idx] = (int16_t)Ship_Min_Strength_Versus_Players_At_Star_(ship_id, target->player_mask, star_idx);
+
+                            int16_t ship_intermediate_star_tmp;
+                            int eta;
+
+                            if (MOX::_ship[ship_id].location < 72) {
+                                eta = AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                                    _i_ai,
+                                    MOX::_ship[ship_id].location,
+                                    star_idx,
+                                    &ship_intermediate_star_tmp,
+                                    has_special_bit_11
+                                );
+                            } else {
+                                eta = AIDATA::Ship_N_Turns_To_Star_With_Intermediate_(
+                                    ship_id,
+                                    star_idx,
+                                    &ship_intermediate_star_tmp
+                                );
+                            }
+
+                            if (eta < 10) {
+                                bool update_target = false;
+
+                                if (eta < ship_min_eta[ship_id]) {
+                                    update_target = true;
+                                } else if (eta == ship_min_eta[ship_id]) {
+                                    if (best_target != -1) {
+                                        int e = eta;
+                                        while (e < 10 && target->strength[e] == 0 && intercepts[best_target].strength[e] == 0) {
+                                            e++;
+                                        }
+
+                                        if (target->strength[e] == 0) {
+                                            // Condition implicitly fails, update_target remains false
+                                        } else if (intercepts[best_target].strength[e] == 0) {
+                                            update_target = true;
+                                        } else {
+                                            int cmp = RUSS::Compare_Ratios_(
+                                                strength_totals[e + target->star_idx * 10],
+                                                target->strength[e],
+                                                strength_totals[e + intercepts[best_target].star_idx * 10],
+                                                intercepts[best_target].strength[e]
+                                            );
+                                            if (cmp < 0) {
+                                                update_target = true;
+                                            }
+                                        }
+                                    } else {
+                                        update_target = true;
+                                    }
+                                }
+
+                                if (update_target) {
+                                    best_target = target_index;
+                                    ship_min_eta[ship_id] = (uint8_t)eta;
+                                    ship_target_star[ship_id] = (char)target->star_idx;
+                                    ship_intermediate_star[ship_id] = static_cast<char>(ship_intermediate_star_tmp);
+                                }
+                            }
+                        }
+                    }
+
+                    if (best_target != -1) {
+                        uint8_t min_eta = ship_min_eta[ship_id];
+                        if (min_eta < 10) {
+                            int rem = 10 - min_eta;
+                            uint32_t* ptr = &strength_totals[min_eta + intercepts[best_target].star_idx * 10];
+                            int16_t min_str = star_min_strength[intercepts[best_target].star_idx];
+
+                            do {
+                                *ptr += min_str;
+                                ptr++;
+                                rem--;
+                            } while (rem != 0);
+                        }
+                    }
+                }
+            }
+
+            bool loop_again = false;
+            if (*count > 0) {
+                for (int target_index = 0; target_index < *count; ++target_index) {
+                    s_aimove_intercept_entry* target = &intercepts[target_index];
+                    int star_idx = target->star_idx;
+                    bool target_met = false;
+                    
+                    target_min_eta[star_idx] = 10;
+
+                    for (int e = 0; e < 10; ++e) {
+                        uint32_t strength_needed = (uint32_t)target->strength[e];
+                        
+                        if (strength_needed != 0 || target->strength[9] == 0) {
+                            if (strength_totals[e + star_idx * 10] >= strength_needed) {
+                                if (!target_met) {
+                                    target_best_eta[star_idx] = (char)e;
+                                }
+                                target_met = true;
+                                if (strength_totals[e + star_idx * 10] > strength_needed * 4 + 8) {
+                                    target_min_eta[star_idx] = (char)e;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!target_met && is_desperate == 0) {
+                        target_best_eta[star_idx] = -1;
+                        loop_again = true;
+                    }
+                }
+            }
+
+            if (loop_again) {
+                (*count)--;
+            } else {
+                if (num_intercepting_ships > 0) {
+                    for (int ship_list_index = 0; ship_list_index < num_intercepting_ships; ++ship_list_index) {
+                        int16_t ship_id = intercepting_ships[ship_list_index];
+
+                        if (ship_intermediate_star[ship_id] != -1 && SHIPMOVE::Can_Order_Ship_(&MOX::_ship[ship_id])) {
+                            s_ship_move_info move_info;
+                            int16_t ship_list[2] = { ship_id, -1 };
+                            int16_t target_star = (int16_t)(uint8_t)ship_intermediate_star[ship_id];
+                            SHIPMOVE::Ships_Try_To_Move_To_(ship_list, target_star, &move_info);
+
+                            if (move_info.turns_left <= target_min_eta[(int)(uint8_t)ship_target_star[ship_id]]) {
+                                int16_t ship_loc = HAROLD::XY_To_Star_Id_(MOX::_ship[ship_id].x, MOX::_ship[ship_id].y);
+                                MOX::_ship[ship_id].mission = 5;
+
+                                int16_t move_star = -1;
+                                if (move_info.turns_left < target_best_eta[(int)(uint8_t)ship_target_star[ship_id]]) {
+                                    if (MOX::_ship[ship_id].status == 1) {
+                                        move_star = (int16_t)(uint8_t)ship_intermediate_star[ship_id];
+                                    } else if (MOX::_ship[ship_id].status == 2) {
+                                        MOX::_ship[ship_id].location = ship_loc;
+                                        MOX::_ship[ship_id].status = 0;
+                                    }
+                                } else {
+                                    move_star = (int16_t)(uint8_t)ship_target_star[ship_id];
+                                }
+
+                                if (move_star != -1) {
+                                    int16_t intermediate = (int16_t)(uint8_t)ship_intermediate_star[ship_id];
+                                    SHIPMOVE::Make_Ships_Move_To_(ship_list, intermediate, &move_info);
+                                    (*AIDATA::_i_all_combat_ships)[_i_ai][ship_loc] = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return;
             }
         }
     }
@@ -1609,10 +1853,10 @@ namespace AIMOVE {
         }
     }
 
-    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, int16_t* target_info, int mission_type, int param_4)
+    void __cdecl Find_Best_Attack_From_Star_(int16_t star_idx, uint8_t* target_info, int mission_type, int param_4)
     {
-        int16_t target_info_copy[5];
-        int16_t* puVar8 = nullptr;
+        uint8_t target_info_copy[10];
+        uint8_t* puVar8 = nullptr;
         int16_t max_score = 0;
         bool valid_target_found = false;
         
@@ -1624,11 +1868,8 @@ namespace AIMOVE {
 
         // Initialize copy of target_info
         if (target_info != nullptr) {
-            target_info_copy[0] = target_info[0];
-            target_info_copy[1] = target_info[1];
-            target_info_copy[2] = target_info[2];
-            target_info_copy[3] = target_info[3];
-            target_info_copy[4] = target_info[4];
+            memcpy(target_info_copy, target_info, sizeof(target_info_copy));
+
             puVar8 = target_info_copy;
         }
 
@@ -1665,7 +1906,7 @@ namespace AIMOVE {
                             SHIPMOVE::Ships_Try_To_Move_To_(ship_list, target_star, &move_info);
                             
                             if (move_info.moving != 0 && move_info.turns_left < 10) {
-                                int16_t score = Compute_Attack_Worthiness_(i, ship_list, move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
+                                uint16_t score = Compute_Attack_Worthiness_(i, ship_list, move_info.turns_left, &mission_array[i], &visited_stars[target_star], puVar8, param_4);
                                 scores[i] = score;
 
                                 if (score != 0) {
@@ -1740,5 +1981,346 @@ namespace AIMOVE {
                 MOX::_ship[ship_idx].mission = best_mission;
             }
         }
+    }
+
+    void __cdecl Knock_Out_Impossible_Interceptions_(
+        s_aimove_intercept_entry* intercept_entries,
+        int* num_entries,
+        int8_t* knocked_out_stars,
+        int* num_knocked_out,
+        int keep_one_entry
+    ) {
+        *num_knocked_out = 0;
+
+        for (int entry_idx = *num_entries - 1; entry_idx >= 0; --entry_idx) {
+            s_aimove_intercept_entry* current_entry = &intercept_entries[entry_idx];
+            bool can_intercept = false;
+            int32_t star_idx = current_entry->star_idx;
+
+            for (int class_idx = 0; class_idx < 10; ++class_idx) {
+                uint32_t min_possible = 0xFFFFFFFF;
+                uint32_t total_enroute = 0;
+
+                if (MOX::_NUM_PLAYERS > 0) {
+                    for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                        if (current_entry->players[p].present) {
+                            uint32_t possible = static_cast<uint32_t>(
+                                (*AIDATA::_possible_ship_strengths)[star_idx][_i_ai][p][class_idx]
+                            );
+
+                            if (possible < min_possible) {
+                                min_possible = possible;
+                            }
+
+                            total_enroute += static_cast<uint32_t>(
+                                (*AIDATA::_enroute_ship_strengths)[star_idx][p][_i_ai][class_idx]
+                            );
+                        }
+                    }
+                }
+
+                if (total_enroute < min_possible) {
+                    can_intercept = true;
+                    break;
+                }
+            }
+
+            if (!can_intercept && (keep_one_entry == 0 || *num_entries > 1)) {
+                (*num_entries)--;
+                int num_to_move = *num_entries - entry_idx;
+
+                memmove(current_entry, current_entry + 1, num_to_move * sizeof(s_aimove_intercept_entry));
+
+                knocked_out_stars[*num_knocked_out] = static_cast<int8_t>(star_idx);
+                (*num_knocked_out)++;
+
+                memset(&_flee_stars[star_idx * 10], 1, 10);
+            }
+        }
+    }
+
+    int16_t __cdecl Npc_Dest_(int16_t ship_idx, uint8_t* star_flags) {
+        int32_t dest_star_idx = -1;
+        int32_t ship_location = MOX::_ship[ship_idx].location;
+        uint32_t player_str[8] = { 0 };
+        s_aimove_npc_dest npc_dest[72];
+
+        memset(npc_dest, 0, sizeof(npc_dest));
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+            if (MOX::_player[i].eliminated == 0) {
+                uint32_t str_val = isqrt_(MOX::_player[i].bc);
+                str_val = isqrt_(str_val);
+                player_str[i] = str_val +
+                    MOX::_player[i].total_colonies * 4 +
+                    (int16_t)(MOX::_player[i].total_research / 4) +
+                    MOX::_player[i].total_ships;
+            }
+        }
+
+        for (int i = 0; i < MOX::_NUM_COLONIES; i++) {
+            int8_t owner = MOX::_colony[i].owner;
+            if (owner != -1) {
+                int16_t planet_idx = MOX::_colony[i].planet;
+                int16_t star_idx = MOX::_planet[planet_idx].star_index;
+
+                if (ship_location != star_idx && star_flags[star_idx] == 0) {
+                    if (MOX::_player[owner].traits[TRAIT_LUCKY] == 0) {
+                        npc_dest[star_idx].has_unlucky = 1;
+                        if (npc_dest[star_idx].unlucky_strength < player_str[owner]) {
+                            npc_dest[star_idx].unlucky_strength = player_str[owner];
+                        }
+                    }
+                    else {
+                        npc_dest[star_idx].has_lucky = 1;
+                        if (npc_dest[star_idx].lucky_strength < player_str[owner]) {
+                            npc_dest[star_idx].lucky_strength = player_str[owner];
+                        }
+                    }
+                    npc_dest[star_idx].star_idx = (uint8_t)star_idx;
+                    npc_dest[star_idx].dist = (uint8_t)GEO::Parsecs_Between_Stars_(ship_location, star_idx);
+                }
+            }
+        }
+
+        ::_qsort(npc_dest, MOX::_NUM_STARS, sizeof(s_aimove_npc_dest), Sort_npc_dests_);
+
+        int32_t valid_count = 0;
+        for (int i = 0; i < MOX::_NUM_STARS; i++) {
+            if (valid_count >= 7) {
+                break;
+            }
+            if (npc_dest[i].dist != 0 && npc_dest[i].dist < 15) {
+                valid_count++;
+                if (random::Random_(valid_count) == 1) {
+                    dest_star_idx = npc_dest[i].star_idx;
+                }
+            }
+        }
+
+        return (int16_t)dest_star_idx;
+    }
+
+    int8_t __cdecl AI_May_Attack_Player_(int16_t player_idx, int16_t target_idx) {
+        int8_t may_attack = 0;
+
+        if (target_idx != player_idx) {
+            s_player* plr = &MOX::_player[player_idx];
+
+            if (plr->stop_blockading_duration[target_idx] == 0 &&
+                plr->trade_treaty[target_idx] == 0 &&
+                plr->research_treaty[target_idx] == 0 &&
+                plr->treaty[target_idx] >= 4 &&
+                plr->treaty[target_idx] <= 6) {
+                may_attack = 1;
+            }
+        }
+
+        return may_attack;
+    }
+
+    uint16_t __cdecl Compute_Attack_Worthiness_(
+        int16_t colony_idx,
+        int16_t* ship_list,
+        int16_t eta,
+        int8_t* out_attack_type,
+        int8_t* out_flee,
+        uint8_t* target_info,
+        int32_t min_pop
+    ) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+        int8_t owner = colony->owner;
+        int16_t planet_idx = colony->planet;
+        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+
+        uint32_t attack_worthiness = 0;
+        uint32_t total_space_strength = 0;
+        uint32_t total_bomb_strength = 0;
+        bool in_nebula = MOX::_star[star_idx].in_nebula != 0;
+        bool is_hostile = Player_Is_Hostile_To_Player_(_i_ai, owner);
+        uint32_t total_ship_size = 0;
+
+        bool can_attack = true;
+        if (colony->n_pops < min_pop && colony->outpost_flag == 0 && _p_ai->personality != 1 && colony->n_pops != 0) {
+            for (int i = 0; i < colony->n_pops; ++i) {
+                if ((colony->pop[i] & 0xF) == _i_ai) {
+                    can_attack = false;
+                }
+            }
+        }
+
+        if (!can_attack) {
+            return 0;
+        }
+
+        int16_t shield = COLCALC::Colony_Planetary_Shield_(colony);
+
+        int ship_idx_idx = 0;
+        int16_t ship_idx = ship_list[0];
+        if (ship_idx != -1) {
+            do {
+                uint16_t space_str = in_nebula ?
+                    (*AIDATA::_ship_strengths_in_nebula)[ship_idx][owner] :
+                    (*AIDATA::_ship_strengths)[ship_idx][owner];
+                total_space_strength += space_str;
+
+                uint16_t bomb_str = reinterpret_cast<int16_t*>((*AIDATA::_ship_bomb_strengths)[ship_idx])[shield];
+                total_bomb_strength += bomb_str;
+
+                total_ship_size += (1 << (MOX::_ship[ship_idx].d.size & 0x1F));
+
+                ship_idx_idx++;
+                ship_idx = ship_list[ship_idx_idx];
+            } while (ship_idx != -1);
+        }
+
+        if (target_info == nullptr && total_ship_size > 0x96) {
+            uint32_t scaled = (total_space_strength / 0x96) * total_ship_size;
+            if (total_space_strength < scaled) {
+                total_space_strength = scaled;
+            }
+        }
+
+        uint32_t possible_space_strength = (*AIDATA::_possible_ship_strengths)[star_idx][owner][_i_ai][eta];
+        uint32_t added_strength = 0;
+        int producing_idx = 0;
+        int32_t current_bc = MOX::_player[owner].bc;
+        int32_t spent = colony->production_spent;
+
+        for (int i = 0; i < 7; ++i) {
+            if (current_bc + spent < 1 || eta <= producing_idx) break;
+
+            int16_t prod_id = colony->producing[i];
+            if (prod_id < -99) {
+                int16_t ship_design_idx = -100 - prod_id;
+                if (MOX::_ship[ship_design_idx].d.ship_type == 0) {
+                    int32_t cost = MOX::_ship[ship_design_idx].d.cost;
+                    if (cost > spent) {
+                        int32_t buy_cost = COLCALC::Colony_Cost_To_Buy_Given_Product_(colony, prod_id, spent);
+                        if (buy_cost <= current_bc) {
+                            spent = 0;
+                            added_strength += AIPOWER::Ship_Strength_Vs_Ships_(ship_design_idx, _i_ai);
+                            producing_idx++;
+                            current_bc -= buy_cost;
+                        }
+                    }
+                    else {
+                        added_strength += AIPOWER::Ship_Strength_Vs_Ships_(ship_design_idx, _i_ai);
+                        spent -= cost;
+                        producing_idx++;
+                    }
+                }
+            }
+        }
+
+        possible_space_strength += added_strength;
+
+        if (total_bomb_strength + total_space_strength == 0 || (total_space_strength * 3 < possible_space_strength * 4)) {
+            *out_flee = 1;
+            if (eta < 10) {
+                for (int i = eta; i < 10; ++i) {
+                    _flee_stars[star_idx * 10 + i] = 1;
+                }
+            }
+        }
+        else {
+            uint32_t colony_worth = Enemy_Colony_Worth_To_Player_(colony_idx, _i_ai);
+            uint32_t defending_space = possible_space_strength + (AIPOWER::Colony_Space_Strength_Vs_Player_(colony_idx, _i_ai) & 0xFFFF);
+            uint32_t defending_ground = AIPOWER::Colony_Ground_Strength_Vs_Player_(colony_idx, _i_ai) & 0xFFFF;
+
+            uint32_t attack_space = total_space_strength + is_hostile;
+            uint32_t attack_ground = total_bomb_strength + is_hostile;
+
+            bool success = true;
+            if (attack_space <= defending_space || attack_ground <= defending_ground) {
+                success = false;
+            }
+
+            if (success) {
+                *out_attack_type = 1;
+                if (defending_space * 3 < total_space_strength) {
+                    total_space_strength = 3;
+                    defending_space = 1;
+                }
+                else if (total_space_strength == 0) {
+                    total_space_strength = 1;
+                    defending_space = 1;
+                }
+
+                if (defending_ground * 3 < total_bomb_strength) {
+                    total_bomb_strength = 3;
+                    defending_ground = 1;
+                }
+                else if (total_bomb_strength == 0) {
+                    total_bomb_strength = 1;
+                    defending_ground = 1;
+                }
+
+                if (target_info == nullptr && total_space_strength == 3 && defending_space == 1) {
+                    *out_attack_type = 6;
+                }
+
+                if (defending_space >= 0x10000) {
+                    defending_space >>= 8;
+                    total_space_strength >>= 8;
+                }
+                if (defending_ground >= 0x10000) {
+                    defending_ground >>= 8;
+                    total_bomb_strength >>= 8;
+                }
+
+                int32_t reachable = N_Enemy_Stars_Reachable_(_i_ai, owner, star_idx);
+                uint32_t reachable_sq = isqrt_(reachable * 100);
+
+                uint32_t temp = (colony_worth * total_space_strength) / defending_space;
+                temp = (temp * total_bomb_strength) / defending_ground;
+
+                attack_worthiness = (reachable_sq * temp) / 10;
+
+                if (target_info != nullptr) {
+                    uint32_t target_val = (total_space_strength * 100 / defending_space * total_bomb_strength) / defending_ground;
+
+                    *reinterpret_cast<int16_t*>(target_info + 8) = static_cast<int16_t>(target_val);
+
+                    if (*reinterpret_cast<int16_t*>(target_info + 2) < static_cast<int16_t>(target_val)) {
+                        *reinterpret_cast<int16_t*>(target_info + 4) = planet_idx;
+                        *reinterpret_cast<int16_t*>(target_info + 6) = static_cast<int16_t>(colony_worth);
+                    }
+                    else {
+                        attack_worthiness = 0;
+                    }
+                }
+            }
+            else {
+                *out_attack_type = 2;
+                if (defending_space * 3 < total_space_strength) {
+                    total_space_strength = 3;
+                    defending_space = 1;
+                }
+                else if (total_space_strength == 0) {
+                    total_space_strength = 1;
+                    defending_space = 1;
+                }
+
+                attack_worthiness = (colony_worth * total_space_strength) / (defending_space * 2);
+
+                if ((MOX::_star[star_idx].blockaded >> owner) & 1) {
+                    uint8_t blocked_by = MOX::_star[star_idx].blockaded_by[owner];
+                    if ((blocked_by & ~(1 << _i_ai)) != 0 || ((blocked_by >> _i_ai) & 1) == 0) {
+                        attack_worthiness = 0;
+                    }
+                }
+            }
+        }
+
+        if (eta < 2) {
+            attack_worthiness += attack_worthiness / 6;
+        }
+
+        if (attack_worthiness > 0xFFFF) {
+            attack_worthiness = 0xFFFF;
+        }
+
+        return static_cast<uint16_t>(attack_worthiness);
     }
 }
