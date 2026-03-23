@@ -28,8 +28,6 @@ namespace MOX2 {
 
     void __cdecl Screen_Control_();
 
-    s_animation_header* __cdecl Buffer_Reload_(const char* filename, int entry, uint32_t cache_seg);
-
     inline const char* s_MOX_SET = reinterpret_cast<const char*>(0x00556918); // "MOX.SET"
     inline const char* s_language_ini = reinterpret_cast<const char*>(0x005576D8); // "language.ini"
     inline const char* s_rt = reinterpret_cast<const char*>(0x00557BE8);           // "rt"

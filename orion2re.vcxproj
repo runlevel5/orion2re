@@ -93,6 +93,7 @@
     <ClCompile Include="src\game\haccess.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
+    <ClCompile Include="src\game\info.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
     <ClCompile Include="src\game\initship.cpp" />
     <ClCompile Include="src\game\invasion.cpp" />

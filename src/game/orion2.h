@@ -1242,6 +1242,18 @@ struct s_current_design {
     short date_of_design;
 };
 
+typedef struct s_drop_area s_drop_area, *Ps_drop_area;
+
+struct s_drop_area {
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    uint8_t colors_main[3];
+    uint8_t colors_left[3];
+    uint8_t colors_right[3];
+};
+
 typedef struct s_event_data s_event_data, *Ps_event_data;
 
 struct s_event_data {

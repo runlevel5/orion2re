@@ -16,6 +16,12 @@ namespace BILL {
 
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index);
 
+    inline int16_t __cdecl Get_History_Params_(int16_t* n_points) {
+        using Fn = int16_t(__cdecl*)(int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004071C0});
+        return fn(n_points);
+    }
+
     void __cdecl Bill_Default_(void);
 
     int16_t __cdecl Get_Their_Spy_Number_(int16_t player_idx, int16_t target_idx);
@@ -47,6 +53,12 @@ namespace BILL {
     inline void __cdecl Get_Active_Players_(int16_t dummy1, int16_t dummy2) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         reinterpret_cast<Fn>(0x00406CD0)(dummy1, dummy2);
+    }
+
+    inline void __cdecl Get_Players_Alive_Or_Omniscient_(int16_t param_1, int8_t param_2) {
+        using Fn = void(__cdecl*)(int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406eb0});
+        fn(param_1, param_2);
     }
 
     inline int16_t __cdecl Get_My_Spy_Number_(int16_t player_idx) {

@@ -103,6 +103,12 @@ namespace fonts {
 
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap);
 
+    inline void __cdecl Print_Centered_To_Bitmap_(int16_t x, int16_t y, const char* text, s_animation_header* dest) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005265A0});
+        fn(x, y, text, dest);
+    }
+
     // Suggested name: fonts::Update_Palette_Internal
     inline void __cdecl FUN_00526f80() {
         using Fn = void(__cdecl*)();

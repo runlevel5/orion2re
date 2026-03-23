@@ -666,6 +666,17 @@ namespace MOX {
     inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
 
     inline uint32_t (&_bill_savegame)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x00559478});
+    inline int16_t& _bill_savegame_2 =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055947C});
+
+    inline int16_t& _bill_savegame_3 =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055947E});
+
+    inline int16_t& _bill_savegame_4 =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559480});
+
+    inline int16_t& _bill_savegame_5 =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559482});
     inline uint16_t& _antaran_resource_level = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059790C});
     inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
     inline uint16_t& _chance_for_antaran_invasion = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D24});

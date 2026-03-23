@@ -49,7 +49,7 @@ workflows:
           * Function that is provided to you might not exist in the project yet and user needs your help identifying
             issues before implementing it in the project.
           * You might receive different functions or multiple version of a single function as it is being cleaned up - use
-            latest version for difference analysis
+            latest version for difference analysis.
           * If user requests you to apply changes, read .vocode/workflows/decompiler.yaml to understand how to apply
             changes to the codebase.
           * Always prefer built-in tools over shell commands (read_files and similar)
@@ -63,6 +63,14 @@ workflows:
           * Code will use STOSD/STOSW/STOSB to clear data and this might throw the decompiler type off. Do usage-based analysis
             instead of relying on function types and report to the user. User can adjust type and provide updated version of the
             function.
+          * You might detect type casting when calling functions from and to generic types. This usually means that the target
+            function prototype is incorrect and needs updating. Mention this to the user.
+
+          # Checklist
+          * You analyzed provided disassembly, decompiler output and any user instructions
+          * You provided correct analysis results to the user
+          * You provided various recommendations to the user how to adjust types in Ghidra to make decompiler output cleaner
+          * You did not make any changes unless explicitly requested
         outcomes:
           - name: done
     edges:
