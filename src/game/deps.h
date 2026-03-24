@@ -104,6 +104,7 @@
 #include "tech.h"
 #include "netturn.h"
 #include "turnsum.h"
+#include "list.h"
 #include "fade.h"
 #include "eric.h"
 #include "ericnet.h"

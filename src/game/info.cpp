@@ -343,6 +343,181 @@ namespace INFO {
         fonts::Print_Centered_(105, 196, msg_stat);
     }
 
+    int16_t __cdecl _Tech_Review_Subscreen_(s_animation_header** param_1, int16_t param_2, int16_t param_3) {
+        s_list_state list_headers[4];
+        char billtext[40];
+        char help_lbx_name[20];
+        void* text_buffer;
+        int16_t field_down;
+        int16_t field_up;
+        bool is_tech_image_loaded;
+
+        for (int i = 0; i < 4; ++i) {
+            _g_header_p = &list_headers[i];
+            // TODO: This is just memset
+            for (int j = 0; j < 16; ++j) {
+                reinterpret_cast<uint32_t*>(_g_header_p)[j] = reinterpret_cast<uint32_t*>(&_tech_review_list_header)[j];
+            }
+            _g_header_p->items = reinterpret_cast<s_list_item*>(
+                allocate::Allocate_Next_Block_(MOX::_screen_seg, _list_sizes[i])
+            );
+            Init_Tech_Review_List_(_g_header_p, i);
+            _g_header_p->items[0].is_selectable = 1;
+            _g_header_p->items[0].current_app_index = 0;
+        }
+
+        text_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
+        _g_bitmap1_p = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 150));
+        _g_bitmap2_p = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 48));
+
+        s_animation_header* app_pics = reinterpret_cast<s_animation_header*>(
+            farload::Far_Reload_Next_(s_app_pics_lbx_00556028, 0, MOX::_screen_seg)
+        );
+
+        is_tech_image_loaded = false;
+        fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(Draw_Tech_Review_Subscreen_), 2);
+
+        int16_t field_multi_last;
+        for (int i = 0; i < 4; ++i) {
+            field_multi_last = fields::Add_Multi_Button_Field_(
+                _tech_rev_field[i * 2],
+                _tech_rev_field[i * 2 + 1],
+                s__00551100,
+                param_1[i + 4],
+                &_tech_review_tab_index,
+                i,
+                s__00551100,
+                40
+            );
+        }
+
+        field_up = fields::Add_Button_Field_(410, 65, s__00551100, param_1[2], s__00551120, 40);
+        field_down = fields::Add_Button_Field_(410, 395, s__00551100, param_1[3], s__00551120, 40);
+
+        JIM::Get_Text_Message_(s_billtext_lbx, 6, billtext, 40);
+        fonts::Print_Centered_(416, 31, billtext);
+
+        Draw_Multiple_Drop_Areas_(_tech_review_drops, 4);
+        graphics::Fill_(433, 115, 612, 253, 0);
+        animate::Draw_(433, 115, app_pics);
+
+        bool list_changed = false;
+        bool refresh_list_content = true;
+
+        while (true) {
+            if (refresh_list_content) {
+                _g_header_p = &list_headers[_tech_review_tab_index];
+            }
+
+            RUSS::Mox_Update_();
+            Draw_Drop_Area_(_tech_review_drops);
+            animate::Draw_(410, 65, param_1[0]);
+            animate::Draw_(410, 395, param_1[1]);
+            LIST::Display_List_Page_(_g_header_p);
+            video::Copy_Off_To_Back_();
+
+            fields::Clear_Fields_Above_(field_down);
+            _g_first_list_field = fields::Get_Field_Counter_();
+            _g_last_list_field = LIST::Add_Fields_To_List_Page_(_g_header_p);
+
+            if (list_changed) {
+                LIST::Set_Selected_List_Entry_(_g_header_p, _g_first_list_field);
+            }
+
+            LIST::Set_List_Up_Down_Field_Drawing_(_g_header_p, field_up, field_down);
+            _g_selected_list_p = LIST::Get_Selected_List_Entry_(_g_header_p);
+            _g_list_update_needed = 1;
+            _g_prior_choice = 0;
+
+            Introduce_Subscreen_();
+
+            bool inner_break = false;
+            while (!inner_break) {
+                timer::Mark_Time_();
+
+                if (_g_list_update_needed != 0 && _g_header_p->num_items != 0) {
+                    bitmap::Create_Blank_Bitmap_(180, 150, _g_bitmap1_p);
+                    bitmap::Create_Blank_Bitmap_(180, 48, _g_bitmap2_p);
+
+                    uint8_t tech_app_id = _g_selected_list_p->tech_app_ids[_g_selected_list_p->current_app_index];
+
+                    TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+                    farload::Far_Reload_Data_(help_lbx_name, 0, text_buffer, tech_app_id, 1, 1403 /*0x57b*/);
+
+                    fonts::Set_Font_Style_(2, &_info_normal_color);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(2, 4, 173, static_cast<char*>(text_buffer) + 103, 0, _g_bitmap1_p);
+
+                    _g_selected_app_id = tech_app_id;
+                    fonts::Set_Font_Style_(4, &_info_normal_color);
+
+                    char* name_str = TECH::Technology_Applications_Name_(_g_selected_app_id, param_3);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 12, 176 /*0xb0*/, name_str, 2, _g_bitmap2_p);
+
+                    RUSS::Mox_Update_();
+
+                    if (is_tech_image_loaded) {
+                        allocate::Pop_Block_(MOX::_screen_seg);
+                    }
+
+                    allocate::Push_Block_(MOX::_screen_seg);
+                    _g_tech_image_seg = farload::Far_Reload_Next_(s_APP_PICS_LBX_00556018, tech_app_id, MOX::_screen_seg);
+                    is_tech_image_loaded = true;
+
+                    animate::Draw_Palette_(reinterpret_cast<s_animation_header*>(_g_tech_image_seg));
+                    palette::Refresh_Palette_();
+                }
+
+                int16_t input = fields::Get_Input_();
+
+                if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                    RUSS::Mox_Update_();
+                    return input;
+                }
+
+                if (input <= field_multi_last) {
+                    if (input == 0) {
+                        Draw_Tech_Review_Subscreen_();
+                        RUSS::Mox_Sync_Update_();
+                        timer::Release_Time_(2);
+                    }
+                } else {
+                    if (input == field_down) {
+                        if (LIST::Next_List_Page_(_g_header_p) != 0) {
+                            list_changed = true;
+                            refresh_list_content = false;
+                            inner_break = true;
+                            continue;
+                        }
+                    } else if (input == field_up) {
+                        if (LIST::Previous_List_Page_(_g_header_p) != 0) {
+                            list_changed = true;
+                            refresh_list_content = false;
+                            inner_break = true;
+                            continue;
+                        }
+                    }
+                }
+
+                if (input == 0 || input > field_multi_last) {
+                    continue;
+                }
+
+                if (input >= param_2) {
+                    list_changed = false;
+                    refresh_list_content = true;
+                    inner_break = true;
+                    continue;
+                } else {
+                    animate::Draw_(434, 264, reinterpret_cast<s_animation_header*>(_g_bitmap1_p));
+                    animate::Draw_(434, 60, reinterpret_cast<s_animation_header*>(_g_bitmap2_p));
+                    platform::Toggle_Pages_Stub_();
+                    RUSS::Mox_Update_();
+                    return input;
+                }
+            }
+        }
+    }
+
     void __cdecl Set_Up_Player_Colors_(s_animation_header** anim_ptrs) {
         palette::Set_Palette_Changes_(0xC0, 0xFF);
         animate::Draw_Palette_(anim_ptrs[1]);
@@ -703,6 +878,84 @@ namespace INFO {
         } else {
             fade::Blinds_Fade_(0, 0, 639, 479, 3);
         }
+    }
+
+    int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t param_2) {
+        RACERPRT::_race_report_jim_hack = 1;
+        return _Tech_Review_Subscreen_(&headers[12], param_2, MOX::_PLAYER_NUM);
+    }
+
+    /**
+     * @brief Initializes a technical review list for the given player based on discovered technology.
+     * 
+     * @param state The list state structure to populate.
+     * @param review_idx Index into the achievement list pointers.
+     */
+    void __cdecl Init_Tech_Review_List_(s_list_state* state, int16_t review_idx) {
+        s_tech_review_achievement* ach = INFO::_review_list[review_idx];
+        s_list_item* item = state->items;
+        int16_t app_idx;
+
+        item->app_count = 0;
+        state->num_items = 1;
+
+        // Loop until "End of Array" flag (0x08) is encountered
+        while (!(ach->flags & 0x08 /* End of Array */)) {
+            if (ach->flags & 0x04 /* Group Header */) {
+                // If the previous item had any technology applications, start a new list item
+                if (item->app_count != 0) {
+                    item++;
+                    state->num_items++;
+                }
+                
+                // Fetch group name from LBX and initialize item header fields
+                JIM::Get_Text_Message_(INFO::s_billtex2_lbx, static_cast<int16_t>(ach->id), item->group_name, 0x40);
+                item->group_id = ach->id;
+                item->group_color_index = 0;
+                item->app_count = 0;
+                app_idx = 0;
+            } else {
+                // If the player has researched the technology application, add it to the item's application list
+                if (MOX::_cur_plyr_ptr->tech_applications[ach->id] == 3 /* Researched */) {
+                    item->tech_app_ids[app_idx] = ach->id;
+                    item->tech_app_status[app_idx] = MOX::_cur_plyr_ptr->tech_applications[ach->id];
+                    app_idx++;
+                    item->app_count++;
+                }
+            }
+            ach++;
+        }
+
+        // Clean up: if the last initialized item remained empty, exclude it from the list
+        if (item->app_count == 0) {
+            state->num_items--;
+        }
+
+        LIST::Init_List_Data_(state);
+    }
+
+    void __cdecl Draw_Tech_Review_Subscreen_() {
+        int16_t input_field = fields::Scan_Input_();
+        int16_t mouse_btn = Mouse_Button_();
+
+        if (mouse_btn == 0 && INFO::_g_list_update_needed == 0 &&
+            input_field >= INFO::_g_first_list_field && input_field <= INFO::_g_last_list_field &&
+            input_field != INFO::_g_prior_choice) {
+
+            LIST::Set_Selected_List_Entry_(INFO::_g_header_p, input_field);
+            INFO::_g_selected_list_p = LIST::Get_Selected_List_Entry_(INFO::_g_header_p);
+            INFO::_g_prior_choice = input_field;
+            INFO::_g_list_update_needed = 1;
+        }
+        else if (INFO::_g_header_p->num_items != 0) {
+            animate::Draw_(0x1B1, 0x73, reinterpret_cast<s_animation_header*>(INFO::_g_tech_image_seg));
+            INFO::_g_list_update_needed = 0;
+            animate::Draw_(0x1B2, 0x108, reinterpret_cast<s_animation_header*>(INFO::_g_bitmap1_p));
+            animate::Draw_(0x1B2, 0x3C, reinterpret_cast<s_animation_header*>(INFO::_g_bitmap2_p));
+        }
+
+        LIST::Display_Selected_List_Text_(INFO::_g_header_p, INFO::_g_selected_list_p);
+        palette::Cycle_Palette_Color_(0xBF, 8, 0x20, 0, 0x28, 0x3F, 8, 8);
     }
 
     int16_t __cdecl Draw_The_History_Graph_() {

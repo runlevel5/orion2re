@@ -2260,6 +2260,21 @@ namespace hooks {
         { 0x00429690, &INFO::Introduce_Subscreen_ },
         { 0x00427390, &INFO::Draw_History_Subscreen_ },
         { 0x004296e0, &INFO::Draw_Drop_Area_ },
+        { 0x00427410, &INFO::_Tech_Review_Subscreen_ },
+        { 0x004273E0, &INFO::Tech_Review_Subscreen_ },
+        { 0x004602f0, &LIST::Display_List_Page_ },
+        { 0x004601a0, &LIST::Display_List_Text_ },
+        { 0x0045ff40, &LIST::Add_Fields_To_List_Page_ },
+        { 0x004605b0, &LIST::Set_List_Up_Down_Field_Drawing_ },
+        { 0x004603a0, &LIST::Next_List_Page_ },
+        { 0x004603d0, &LIST::Previous_List_Page_ },
+        { 0x004604d0, &LIST::Set_Selected_List_Entry_ },
+        { 0x00460570, &LIST::Get_Selected_List_Entry_ },
+        { 0x00460340, &LIST::Set_List_Page_Pointer_ },
+        { 0x00427a60, &INFO::Init_Tech_Review_List_ },
+        { 0x0045fe20, &LIST::Init_List_Data_ },
+        { 0x00427970, &INFO::Draw_Tech_Review_Subscreen_ },
+        { 0x0045fff0, &LIST::Display_Selected_List_Text_ },
     };
 
     void Install_Hooks()

@@ -17,6 +17,8 @@ inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{
 inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
 inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
 inline const char* s_INFO_LBX_00556000 = reinterpret_cast<const char*>(std::uintptr_t{0x00556000}); // "INFO.LBX"
+inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
+inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018);
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 

@@ -402,6 +402,9 @@
     <ClCompile Include="src\game\info.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\list.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -921,6 +924,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\racerprt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\fade.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\list.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

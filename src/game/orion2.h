@@ -1914,6 +1914,52 @@ struct s_leader_data {
     char player_index;
 };
 
+typedef struct s_list_item s_list_item, *Ps_list_item;
+
+struct s_list_item {
+    int16_t x;
+    int16_t y;
+    int8_t stop_flag;
+    uint8_t is_selectable;
+    uint8_t current_app_index;
+    char group_name[64];
+    uint8_t group_id;
+    uint8_t group_color_index;
+    uint8_t app_count;
+    int16_t app_base_x;
+    int16_t app_x_max;
+    int16_t app_y_offsets[16];
+    uint8_t app_ids[16];
+    uint8_t tech_app_ids[16];
+    uint8_t tech_app_status[16];
+};
+
+typedef struct s_list_state s_list_state, *Ps_list_state;
+
+struct s_list_state {
+    int16_t x;
+    int16_t y;
+    int16_t item_width;
+    int16_t y_max;
+    int16_t *app_y_table;
+    int16_t *app_ymin_offsets;
+    int16_t *app_ymax_offsets;
+    uint8_t item_spacing;
+    int8_t num_items;
+    struct s_list_item *items;
+    struct s_list_item *selected_item;
+    uint8_t max_page;
+    uint8_t cur_page;
+    uint8_t group_font;
+    uint8_t item_font;
+    void *draw_app_cb;
+    uint8_t app_x_offset;
+    uint8_t marker_color;
+    struct s_colors *active_color;
+    struct s_colors *group_colors[4];
+    struct s_colors *disabled_color;
+};
+
 typedef struct s_main_menu s_main_menu, *Ps_main_menu;
 
 typedef struct s_main_menu_button s_main_menu_button, *Ps_main_menu_button;
@@ -4214,6 +4260,13 @@ struct s_tech_hull_data {
     uint16_t strat_hits;
     char *name;
     char *size_name;
+};
+
+typedef struct s_tech_review_achievement s_tech_review_achievement, *Ps_tech_review_achievement;
+
+struct s_tech_review_achievement {
+    uint8_t id;
+    uint8_t flags; /* Bit 2 (0x04) = Group Header, Bit 3 (0x08) = End of Array */
 };
 
 typedef struct s_tech_shield_data s_tech_shield_data, *Ps_tech_shield_data;

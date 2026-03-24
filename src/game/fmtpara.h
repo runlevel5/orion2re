@@ -188,4 +188,10 @@ namespace FMTPARA {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432e50});
         fn(idx, ptr);
     }
+
+    inline void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int param_1, int param_2, int param_3, char* text, int param_5, void* bitmap) {
+        using Fn = void(__cdecl*)(int, int, int, char*, int, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432E00});
+        fn(param_1, param_2, param_3, text, param_5, bitmap);
+    }
 }

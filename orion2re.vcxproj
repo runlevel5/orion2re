@@ -101,6 +101,7 @@
     <ClCompile Include="src\game\ken.cpp" />
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\line.cpp" />
+    <ClCompile Include="src\game\list.cpp" />
     <ClCompile Include="src\game\loadsave.cpp" />
     <ClCompile Include="src\game\lostship.cpp" />
     <ClCompile Include="src\game\mainmenu.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="src\game\evanhelp.h" />
     <ClInclude Include="src\game\events.h" />
     <ClInclude Include="src\game\exitm.h" />
+    <ClInclude Include="src\game\fade.h" />
     <ClInclude Include="src\game\fakebuts.h" />
     <ClInclude Include="src\game\farload.h" />
     <ClInclude Include="src\game\fields.h" />
@@ -247,6 +249,7 @@
     <ClInclude Include="src\game\ken.h" />
     <ClInclude Include="src\game\key.h" />
     <ClInclude Include="src\game\line.h" />
+    <ClInclude Include="src\game\list.h" />
     <ClInclude Include="src\game\loader.h" />
     <ClInclude Include="src\game\loadsave.h" />
     <ClInclude Include="src\game\lostship.h" />

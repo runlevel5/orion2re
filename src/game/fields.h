@@ -97,6 +97,18 @@ namespace fields {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0051DC20})(x, y, help, pic, variable, hotkey, sound);
     }
 
+    inline void __cdecl Disable_Draw_Field_(int16_t field_id) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051eea0});
+        fn(field_id);
+    }
+
+    inline void __cdecl Enable_Draw_Field_(int16_t field_id) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051eef0});
+        fn(field_id);
+    }
+
     void __cdecl Disable_Draw_All_Fields_();
     void __cdecl Enable_Draw_All_Fields_();
 
