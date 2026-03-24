@@ -18,6 +18,9 @@ namespace INFO {
     inline s_colors& _info_normal_color =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x00555B88});
 
+    inline s_colors& _info_high_color =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00555B90});
+
     inline int16_t (&_tech_rev_field)[8] =
         *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00555CB0});
 
@@ -78,8 +81,24 @@ namespace INFO {
     inline uint8_t& _race_statistics_page =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B9D});
 
+    inline s_drop_area& _turn_summary_drop =
+        *reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D78});
+
+    inline s_list_state& _g_turn_header =
+        *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555F68});
+
     inline uint16_t& _g_exit_field =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7B9E});
+
+    inline s_list_item*& _g_selected_msg_p =
+        *reinterpret_cast<s_list_item**>(std::uintptr_t{0x00564DA0});
+
+    inline s_drop_area* _race_stats_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D30});
+    inline int16_t* _race_bitmap_x = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F18});
+    inline int16_t* _race_bitmap_y = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F20});
+    inline int16_t& _race_statistics_specials_help_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B96});
+    inline int16_t (&_race_statistics_specials_help)[50][5] =
+        *reinterpret_cast<int16_t (*)[50][5]>(std::uintptr_t{0x005A7BA0});
 
     int16_t __cdecl Get_Plyr_Info_Btns_();
 
@@ -151,23 +170,57 @@ namespace INFO {
 
     int16_t __cdecl Tech_Review_Subscreen_(s_animation_header** headers, int16_t param_2);
 
-    inline int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** info_lbx, int16_t counter) {
-        using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00427C60 });
-        return fn(info_lbx, counter);
+    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2);
+
+    inline const char* s_plus_00551118 = reinterpret_cast<const char*>(std::uintptr_t{0x00551118}); // "+"
+    inline const char* s_minus_0055111C = reinterpret_cast<const char*>(std::uintptr_t{0x0055111C}); // "-"
+    inline const char* s_fmt_00556048 = reinterpret_cast<const char*>(std::uintptr_t{0x00556048}); // "%s%+i"
+    inline const char* s_plus_2_00556050 = reinterpret_cast<const char*>(std::uintptr_t{0x00556050}); // "+2"
+    inline const char* s_plus_1_00556054 = reinterpret_cast<const char*>(std::uintptr_t{0x00556054}); // "+1"
+    inline const char* s_minus_0_5_00556058 = reinterpret_cast<const char*>(std::uintptr_t{0x00556058}); // "-0.5"
+    inline const char* s_0_5_BC_00556060 = reinterpret_cast<const char*>(std::uintptr_t{0x00556060}); // "0.5 BC"
+    inline const char* s_1_BC_00556068 = reinterpret_cast<const char*>(std::uintptr_t{0x00556068}); // "1 BC"
+    inline const char* s_caret_space_00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); // "^ "
+
+    void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap);
+
+    void __cdecl Race_Statistics_Specials_Help_(int16_t x, int16_t y, uint8_t player_idx);
+
+    void __cdecl Draw_Race_Stats_Subscreen_();
+
+    void __cdecl Draw_Dummy_Turn_Summary_Subscreen_();
+
+    void __cdecl Draw_Turn_Summary_Subscreen_();
+
+    inline void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t val, int32_t item_count, int32_t page_size) {
+        using Fn = void(__cdecl*)(s_list_state*, int16_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004284d0});
+        fn(state, val, item_count, page_size);
     }
 
-    inline int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** info_lbx, int16_t counter) {
+    void __cdecl Init_Turn_Summary_List_(s_list_state* state, int16_t val);
+
+    int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** anim_data, int16_t min_field);
+
+    inline int16_t __cdecl Reference_Main_Subscreen_(s_animation_header** param_1, int16_t param_2) {
         using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00428600 });
-        return fn(info_lbx, counter);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00428ae0});
+        return fn(param_1, param_2);
     }
 
-    inline int16_t __cdecl Reference_Subscreen_(s_animation_header** info_lbx, int16_t counter) {
+    inline int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** param_1, int16_t param_2) {
         using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00428A30 });
-        return fn(info_lbx, counter);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00429020});
+        return fn(param_1, param_2);
     }
+
+    inline int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** param_1, int16_t param_2) {
+        using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00428ec0});
+        return fn(param_1, param_2);
+    }
+
+    int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2);
 
     void __cdecl Info_Screen_();
 }

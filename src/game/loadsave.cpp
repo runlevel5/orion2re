@@ -1477,26 +1477,26 @@ namespace LOADSAVE {
             int16_t text_x1 = draw_x + 4 + btn_width;
             int16_t text_x2 = text_x1 + 0x96;
 
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x02, s__ALT_F1__0055ad24, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x13, s__ALT_F2__0055ad18, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x24, s__ALT_F3__0055ad0c, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x46, s__ALT_F5__0055ad00, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x57, s__ALT_F6__0055acf4, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, s__ALT_F7__0055ace8, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055addc, &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xBD, HAROLD::H_Message_(0xB1), &_bitmap->width);
-            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xCE, HAROLD::H_Message_(0x187), &_bitmap->width);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x02, HAROLD::H_Message_(0xA6), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x02, s__ALT_F1__0055ad24, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x13, HAROLD::H_Message_(0xA7), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x13, s__ALT_F2__0055ad18, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x24, HAROLD::H_Message_(0xA8), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x24, s__ALT_F3__0055ad0c, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x35, HAROLD::H_Message_(0xA9), _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x46, HAROLD::H_Message_(0xAA), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x46, s__ALT_F5__0055ad00, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x57, HAROLD::H_Message_(0xAB), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x57, s__ALT_F6__0055acf4, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x68, HAROLD::H_Message_(0xAC), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x68, s__ALT_F7__0055ace8, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x79, HAROLD::H_Message_(0xAD), _bitmap);
+            fonts::Print_To_Bitmap_(text_x2, draw_y + 0x79, s__ALT_F8__0055addc, _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x8A, HAROLD::H_Message_(0xAE), _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0x9B, HAROLD::H_Message_(0xAF), _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xAC, HAROLD::H_Message_(0xB0), _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xBD, HAROLD::H_Message_(0xB1), _bitmap);
+            fonts::Print_To_Bitmap_(text_x1, draw_y + 0xCE, HAROLD::H_Message_(0x187), _bitmap);
 
             for (int i = 0; i < 13; ++i) {
                 animate::Set_Animation_Frame_(_game_anims->pictures[9], _game_popup_fields->options[i]);

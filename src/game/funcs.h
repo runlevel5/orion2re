@@ -112,6 +112,12 @@ inline char* __cdecl __strlwr(char* str) {
     return fn(str);
 }
 
+inline char* __cdecl __strupr(char* str) {
+    using Fn = char* (__cdecl*)(char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0054e910 });
+    return fn(str);
+}
+
 inline int __cdecl _atoi(const char* str) {
     using Fn = int(__cdecl*)(const char*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005415a0 });
@@ -607,6 +613,7 @@ inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); //
 inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
 inline const char* s_ships_lbx_005597b4 = reinterpret_cast<const char*>(std::uintptr_t{0x005597B4}); // "ships.lbx"
+inline const char* s_billtext_lbx_0055135c = reinterpret_cast<const char*>(std::uintptr_t{0x0055135C}); // "billtext.lbx"
 inline const char* const s_gstar_lbx_00558544 = reinterpret_cast<const char*>(std::uintptr_t{0x00558544}); // "gstar.lbx"
 inline char* const s_SPA_HELP_LBX_00557450 = reinterpret_cast<char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
 inline char* const s_ITA_HELP_LBX_00557460 = reinterpret_cast<char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"

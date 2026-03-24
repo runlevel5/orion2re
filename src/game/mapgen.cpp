@@ -1285,7 +1285,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             strncpy(_fill_msg, msg, sizeof(_fill_msg));
 
             uint32_t bsize = bitmap::Get_Bitmap_Size_(325, 30);
-            _fill_msg_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
+            _fill_msg_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
             bitmap::Create_Blank_Bitmap_(325, 30, _fill_msg_bitmap);
             _fill_msg_ctr = 0;
             MOX::Mox_Update_();

@@ -407,7 +407,7 @@ namespace HOMEGEN {
 
         // Initialize background bitmap for the progress message
         uint32_t bmp_size = bitmap::Get_Bitmap_Size_(325, 30);
-        MAPGEN::_fill_msg_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
+        MAPGEN::_fill_msg_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
         bitmap::Create_Blank_Bitmap_(325, 30, MAPGEN::_fill_msg_bitmap);
         MAPGEN::_fill_msg_ctr = 0;
 

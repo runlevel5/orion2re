@@ -2275,6 +2275,15 @@ namespace hooks {
         { 0x0045fe20, &LIST::Init_List_Data_ },
         { 0x00427970, &INFO::Draw_Tech_Review_Subscreen_ },
         { 0x0045fff0, &LIST::Display_Selected_List_Text_ },
+        { 0x00427c60, &INFO::Race_Stats_Subscreen_ },
+        { 0x00428600, &INFO::Turn_Summary_Subscreen_ },
+        { 0x00428A30, &INFO::Reference_Subscreen_ },
+        { 0x00428150, &INFO::Print_Player_Specials_To_Bitmap_ },
+        { 0x00427b50, &INFO::Race_Statistics_Specials_Help_ },
+        { 0x00428440, &INFO::Draw_Race_Stats_Subscreen_ },
+        { 0x004289a0, &INFO::Draw_Dummy_Turn_Summary_Subscreen_ },
+        { 0x004289b0, &INFO::Draw_Turn_Summary_Subscreen_ },
+        { 0x004285e0, &INFO::Init_Turn_Summary_List_ },
     };
 
     void Install_Hooks()

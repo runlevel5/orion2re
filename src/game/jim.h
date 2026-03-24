@@ -64,4 +64,10 @@ namespace JIM {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425920});
         fn(out_str, stat_num, padding);
     }
+
+    inline void __cdecl Decode_Text_Year_(char* buffer, int length) {
+        using Fn = void(__cdecl*)(char*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004259B0});
+        fn(buffer, length);
+    }
 }

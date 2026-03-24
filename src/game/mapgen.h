@@ -14,7 +14,7 @@ namespace MAPGEN {
     inline uint32_t& _num_maps_to_generate = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDD0});
     inline void*& _name_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0056CDB8});
     inline uint16_t*& _name_index = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x0056CDA0});
-    inline void*& _fill_msg_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x005A4B20});
+    inline s_animation_header*& _fill_msg_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4B20});
     inline char (&_fill_msg)[36] = *reinterpret_cast<char (*)[36]>(std::uintptr_t{0x005A4B30});
     inline int16_t& _fill_msg_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A4B54});
     inline int8_t& _first_time_map_is_generated = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005589A4});

@@ -107,4 +107,10 @@ namespace MSG_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473900});
         fn(msg);
     }
+
+    inline uint8_t __cdecl Goto_Msg_Colony_(s_MSG* msg) {
+        using Fn = uint8_t(__cdecl*)(s_MSG*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473940});
+        return fn(msg);
+    }
 }

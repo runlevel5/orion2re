@@ -1,6 +1,110 @@
 #include "pch.h"
 
 namespace INFO {
+    void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap) {
+        if (player_idx >= MOX::_NUM_PLAYERS) {
+            return;
+        }
+
+        int8_t* traits = MOX::_player[player_idx].traits;
+
+        for (int trait_idx = 0; trait_idx < 31; ++trait_idx) {
+            int8_t trait_val = traits[trait_idx];
+
+            if (trait_val != 0 || trait_idx == 0) {
+                char local_40[64];
+                char local_80[64];
+
+                strcpy(local_40, s_caret_space_00556070);
+
+                if (trait_idx == 0) {
+                    strcat(local_40, MOX::_government_labels[trait_val]);
+                } else if (trait_idx == 15) {
+                    if (trait_val < 0) {
+                        strcat(local_40, MOX::_special_ability_names[31]);
+                    } else {
+                        strcat(local_40, MOX::_special_ability_names[15]);
+                    }
+                } else {
+                    strcat(local_40, MOX::_special_ability_names[trait_idx]);
+                }
+
+                char* print_str = local_40;
+
+                if (trait_idx > 0 && trait_idx < 10) {
+                    if (trait_idx == 2) {
+                        strcpy(local_80, local_40);
+                        if (trait_val < 0) {
+                            strcat(local_80, s_minus_0_5_00556058);
+                        } else if (trait_val == 2) {
+                            strcat(local_80, s_plus_1_00556054);
+                        } else {
+                            strcat(local_80, s_plus_2_00556050);
+                        }
+                        print_str = local_80;
+                    } else if (trait_idx == 5) {
+                        strcpy(local_80, local_40);
+                        if (trait_val < 0) {
+                            strcat(local_80, s_minus_0055111C);
+                        } else {
+                            strcat(local_80, s_plus_00551118);
+                        }
+
+                        if (trait_val == 2) {
+                            strcat(local_80, s_1_BC_00556068);
+                        } else {
+                            strcat(local_80, s_0_5_BC_00556060);
+                        }
+                        print_str = local_80;
+                    } else {
+                        _sprintf(local_80, s_fmt_00556048, local_40, (int)trait_val);
+                        print_str = local_80;
+                    }
+                }
+
+                fonts::Print_To_Bitmap_(x, y, print_str, bitmap);
+                y += fonts::_font_header.line_height;
+            }
+        }
+    }
+
+    void __cdecl Race_Statistics_Specials_Help_(int16_t x, int16_t y, uint8_t player_idx) {
+        s_player* player = &MOX::_player[player_idx];
+
+        for (int i = 0; i < 31; ++i) {
+            int8_t trait_val = player->traits[i];
+
+            if (trait_val != 0 || i == 0) {
+                int16_t help_id;
+
+                if (i == 0) {
+                    help_id = (int16_t)(trait_val / 2) + 474;
+                } else if (i == 15) {
+                    if (trait_val < 0) {
+                        help_id = 458;
+                    } else {
+                        help_id = 457;
+                    }
+                } else if (i < 15) {
+                    help_id = (int16_t)i + 442;
+                } else {
+                    help_id = (int16_t)i + 443;
+                }
+
+                int count = INFO::_race_statistics_specials_help_count;
+
+                INFO::_race_statistics_specials_help[count][0] = help_id;
+                INFO::_race_statistics_specials_help[count][1] = x;
+                INFO::_race_statistics_specials_help[count][2] = y;
+                INFO::_race_statistics_specials_help[count][3] = x + 175;
+                INFO::_race_statistics_specials_help[count][4] = y + 9;
+
+                y += 13;
+                INFO::_race_statistics_specials_help_count++;
+            }
+        }
+    }
+
     void __cdecl Colorize_Bitmap_(s_animation_header* anim, s_colors* color_table, uint8_t range_start, uint8_t range_end) {
         int32_t total_pixels = (int32_t)anim->height * (int32_t)anim->width;
 
@@ -532,6 +636,32 @@ namespace INFO {
         // This function is a no-op in the original binary
     }
 
+    void __cdecl Draw_Race_Stats_Subscreen_() {
+        // This function is a no-op in the original binary.
+        return;
+    }
+
+    void __cdecl Draw_Dummy_Turn_Summary_Subscreen_() {
+        return;
+    }
+
+    void __cdecl Draw_Turn_Summary_Subscreen_() {
+        _g_turn_header.group_colors[0] = &_info_high_color;
+
+        int16_t field_idx = fields::Scan_Input_();
+
+        if (field_idx >= _g_first_list_field && field_idx <= _g_last_list_field) {
+            LIST::Set_Selected_List_Entry_(&_g_turn_header, field_idx);
+        }
+
+        _g_selected_msg_p = LIST::Get_Selected_List_Entry_(&_g_turn_header);
+        LIST::Display_List_Text_(&_g_turn_header, _g_selected_msg_p);
+
+        _g_turn_header.group_colors[0] = &_info_normal_color;
+
+        palette::Cycle_Palette_Color_(0xbf, 8, 0x20, 0, 0x28, 0x3f, 8, 8);
+    }
+
     int16_t __cdecl History_Subscreen_(s_animation_header** lbx_images, int16_t exit_threshold) {
         char msg_buffer[40];
         int16_t player_hist_buttons[4];
@@ -1038,6 +1168,284 @@ namespace INFO {
         }
 
         return return_val;
+    }
+
+    int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2) {
+        char str_race_statistics[40];
+        char str_unknown[40];
+        char str_unknown2[40];
+        char str_title[40];
+
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 14, str_race_statistics, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 15, str_unknown, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 16, str_unknown2, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 7, str_title, 40);
+
+        fonts::Print_Centered_(416, 31, str_title);
+
+        INFO::Set_Up_Player_Colors_(param_1);
+
+        MOX::_active_player[0] = static_cast<uint8_t>(MOX::_PLAYER_NUM);
+
+        BILL::Get_Players_Dead_Or_Alive_Or_Omniscient_(1, 1);
+
+        uint32_t bmp_size = bitmap::Get_Bitmap_Size_(183, 20);
+        s_animation_header* eliminated_sprite = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
+        bitmap::Create_Blank_Bitmap_(183, 20, eliminated_sprite);
+
+        fonts::Set_Font_Style_Outline_(2, &INFO::_info_red_color);
+        fonts::Print_Centered_To_Bitmap_(91, 2, str_race_statistics, eliminated_sprite);
+
+        s_animation_header* player_sprites[8];
+        for (int16_t i = 0; i < 8; ++i) {
+            bmp_size = bitmap::Get_Bitmap_Size_(183, 164);
+            player_sprites[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
+            bitmap::Create_Blank_Bitmap_(183, 164, player_sprites[i]);
+
+            if (i < MOX::_active_count) {
+                uint8_t player_id = MOX::_active_player[i];
+                fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_id]);
+
+                char local_c0[40];
+                strcpy(local_c0, MOX::_player[player_id].race_name);
+                __strupr(local_c0);
+
+                fonts::Print_Centered_To_Bitmap_(91, 0, local_c0, player_sprites[i]);
+
+                fonts::Set_Font_Style_(2, INFO::_hist_graph_palettes[player_id]);
+                INFO::Print_Player_Specials_To_Bitmap_(0, 22, player_id, player_sprites[i]);
+            } else {
+                fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
+                fonts::Print_Centered_To_Bitmap_(91, 0, str_unknown, player_sprites[i]);
+            }
+        }
+
+        if (MOX::_active_count > 4) {
+            fields::Add_Button_Field_(385, 427, INFO::empty_string, param_1[20], INFO::empty_string, 40);
+        }
+
+        fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(INFO::Draw_Race_Stats_Subscreen_), 2);
+
+        int16_t input;
+        while (true) {
+            INFO::_race_statistics_specials_help_count = 0;
+            INFO::Draw_Multiple_Drop_Areas_(INFO::_race_stats_drops, 4);
+
+            int16_t offset_idx = (INFO::_race_statistics_page == 1) ? 0 : 4;
+
+            for (int16_t i = 0; i < 4; ++i, ++offset_idx) {
+                int16_t x = INFO::_race_bitmap_x[i];
+                int16_t y = INFO::_race_bitmap_y[i];
+
+                line::Line_(x + 10, y + 17, x + 173, y + 17, INFO::_info_normal_color.colors[6]);
+
+                animate::Draw_(x, y, player_sprites[offset_idx]);
+
+                uint8_t player_id = MOX::_active_player[offset_idx];
+                if (MOX::_player[player_id].eliminated != 0) {
+                    animate::Draw_(x, y + 11, eliminated_sprite);
+                } else {
+                    if (offset_idx < MOX::_active_count) {
+                        INFO::Race_Statistics_Specials_Help_(x, y + 22, player_id);
+                    }
+                }
+            }
+
+            int16_t idx = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[idx][0] = 242;
+            INFO::_race_statistics_specials_help[idx][1] = 0;
+            INFO::_race_statistics_specials_help[idx][2] = 40;
+            INFO::_race_statistics_specials_help[idx][3] = 205;
+            INFO::_race_statistics_specials_help[idx][4] = 197;
+
+            idx = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[idx][0] = 243;
+            INFO::_race_statistics_specials_help[idx][1] = 0;
+            INFO::_race_statistics_specials_help[idx][2] = 198;
+            INFO::_race_statistics_specials_help[idx][3] = 205;
+            INFO::_race_statistics_specials_help[idx][4] = 479;
+
+            idx = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[idx][0] = 248;
+            INFO::_race_statistics_specials_help[idx][1] = 206;
+            INFO::_race_statistics_specials_help[idx][2] = 0;
+            INFO::_race_statistics_specials_help[idx][3] = 639;
+            INFO::_race_statistics_specials_help[idx][4] = 479;
+
+            fields::Deactivate_Help_List_();
+            fields::Set_Help_List_(INFO::_race_statistics_specials_help, INFO::_race_statistics_specials_help_count);
+
+            video::Copy_Off_To_Back_();
+            INFO::Introduce_Subscreen_();
+
+            while (true) {
+                input = fields::Get_Input_();
+
+                if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                    return 0;
+                }
+
+                if (input >= param_2) {
+                    INFO::_race_statistics_page = (INFO::_race_statistics_page == 0) ? 1 : 0;
+                    break;
+                }
+
+                if (input != 0) {
+                    return input;
+                }
+
+                timer::Mark_Time_();
+                RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(2);
+            }
+        }
+    }
+
+    int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2) {
+        char text_buffer[40];
+
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 9, text_buffer, 40);
+        fonts::Print_Centered_(416, 31, text_buffer);
+        fonts::Set_Font_Style_(4, &_info_normal_color);
+
+        if (_g_reference_screen_type == 0) {
+            BILLHELP::Reference_Help_();
+            return Reference_Main_Subscreen_(param_1, param_2);
+        }
+
+        if (_g_reference_screen_type == 1) {
+            BILLHELP::Ref_How_To_Help_();
+            return Reference_How_To_Subscreen_(param_1, param_2);
+        }
+
+        if (_g_reference_screen_type == 2) {
+            BILLHELP::Ref_Category_Help_();
+            return Reference_Category_Subscreen_(param_1, param_2);
+        }
+
+        return 0;
+    }
+
+    void __cdecl Init_Turn_Summary_List_(s_list_state* state, int16_t val) {
+        INFO::_Init_Turn_Summary_List_(state, val, 4, 10);
+    }
+
+    int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** anim_data, int16_t min_field) {
+        char str_turn_summary[40];
+        char str_year[40];
+        char str_date[64];
+        s_list_item list_items[100];
+
+        JIM::Get_Text_Message_(s_billtext_lbx, 0x10, str_turn_summary, 40);
+        JIM::Get_Text_Message_(s_billtext_lbx, 8, str_year, 40);
+        fonts::Print_Centered_(0x1a0, 0x1f, str_year);
+        JIM::Get_Text_Message_(s_billtext_lbx, 0x1a, str_date, 60);
+        JIM::Decode_Text_Year_(str_date, 60);
+
+        int16_t msg_count = MSG_::N_Msgs_For_Player_(MOX::_PLAYER_NUM);
+        int16_t up_button;
+        int16_t down_button;
+
+        if (msg_count > 0) {
+            up_button = fields::Add_Button_Field_(0x250, 0x54, s__00551100, anim_data[0xe], s__00551120, '(');
+            down_button = fields::Add_Button_Field_(0x250, 0x18b, s__00551100, anim_data[0xf], s__00551120, '(');
+
+            _g_turn_header.items = list_items;
+            Init_Turn_Summary_List_(&_g_turn_header, msg_count);
+            _g_selected_msg_p = LIST::Select_And_Page_By_Head_ID_(&_g_turn_header, _g_turn_message_ix);
+        } else {
+            down_button = list_items[0].x;
+        }
+
+        while (true) {
+            Draw_Drop_Area_(&_turn_summary_drop);
+            fonts::Set_Font_Style_(4, &_info_normal_color);
+            fonts::Print_Centered_(0x19e, 0x42, str_date);
+            line::Line_(0xee, 0x51, 0x244, 0x51, 0xb8);
+            animate::Draw_(0x250, 0x54, anim_data[0xc]);
+            animate::Draw_(0x250, 0x18b, anim_data[0xd]);
+
+            int16_t input_field;
+
+            if (msg_count == 0) {
+                fonts::Set_Font_Style_(4, &_info_normal_color);
+                fonts::Print_Centered_(0x19e, 0xd8, str_turn_summary);
+                fields::Assign_Auto_Function_(Draw_Dummy_Turn_Summary_Subscreen_, 2);
+                video::Copy_Off_To_Back_();
+                Introduce_Subscreen_();
+
+                while (true) {
+                    input_field = fields::Get_Input_();
+                    if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                        return 0;
+                    }
+                    timer::Mark_Time_();
+                    RUSS::Mox_Sync_Update_();
+                    timer::Release_Time_(2);
+                    if (input_field != 0) {
+                        return input_field;
+                    }
+                }
+            }
+
+            fields::Clear_Fields_Above_(down_button);
+            _g_first_list_field = fields::Get_Field_Counter_();
+            _g_last_list_field = LIST::Add_Fields_To_List_Page_(&_g_turn_header);
+            LIST::Display_List_Page_(&_g_turn_header);
+            LIST::Set_List_Up_Down_Field_Drawing_(&_g_turn_header, up_button, down_button);
+            fields::Assign_Auto_Function_(Draw_Turn_Summary_Subscreen_, 2);
+            video::Copy_Off_To_Back_();
+            Introduce_Subscreen_();
+
+            bool refresh_outer = false;
+
+            while (true) {
+                input_field = fields::Get_Input_();
+                if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                    return 0;
+                }
+
+                if (input_field >= _g_first_list_field && input_field <= _g_last_list_field) {
+                    if (MSG_::Goto_Msg_Colony_(&MSG_::_msgs[_g_selected_msg_p->group_id])) {
+                        _g_turn_message_ix = _g_selected_msg_p->group_id;
+                        MOX::_current_screen = 1;
+                        MOX::_return_screen = 9;
+                        input_field = _g_exit_field;
+                    }
+                } else {
+                    if (input_field < min_field || msg_count <= 0) {
+                        if (input_field == 0) {
+                            timer::Mark_Time_();
+                            Draw_Turn_Summary_Subscreen_();
+                            RUSS::Mox_Sync_Update_();
+                            timer::Release_Time_(2);
+                        }
+                    } else {
+                        if (input_field == down_button) {
+                            if (LIST::Next_List_Page_(&_g_turn_header)) {
+                                refresh_outer = true;
+                                break;
+                            }
+                        } else if (input_field == up_button) {
+                            if (LIST::Previous_List_Page_(&_g_turn_header)) {
+                                refresh_outer = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (input_field != 0) {
+                    if (input_field < min_field) {
+                        return input_field;
+                    }
+                }
+            }
+
+            if (refresh_outer) {
+                continue;
+            }
+        }
     }
 
 }

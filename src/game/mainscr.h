@@ -102,9 +102,9 @@ namespace MAINSCR {
 
     void __cdecl Print_Star_Name(int16_t star_id, int8_t simple_draw, char* star_name, void* buffer);
 
-    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* out_bitmap_ptr);
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, s_animation_header** out_bitmap_ptr);
 
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5);
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, s_animation_header** param_5);
 
     inline uint8_t& _already_faded_into_main_screen = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596180});
     inline uint8_t& _in_auto_next_turn_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005961F8});

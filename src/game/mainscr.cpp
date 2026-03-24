@@ -186,7 +186,7 @@ namespace MAINSCR {
     void __cdecl Print_Star_Names_() {
         int16_t window_status;
         int8_t star_type;
-        uint32_t star_data;
+        s_animation_header* star_data;
         char star_name[32];
 
         star_type = 0;
@@ -201,7 +201,7 @@ namespace MAINSCR {
                 Get_Star_Name_(i, 0, &star_type, star_name, &star_data);
 
                 if (star_name[0] != '\0') {
-                    Print_Star_Name(i, star_type, star_name, reinterpret_cast<void*>(star_data));
+                    Print_Star_Name(i, star_type, star_name, star_data);
                 }
             }
         }
@@ -933,7 +933,7 @@ namespace MAINSCR {
         fields::Enable_Draw_All_Fields_();
     }
 
-    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, void* param_5) {
+    void __cdecl Get_Star_Name_(int16_t star_idx, int8_t is_selected, int8_t* param_3, char* str, s_animation_header** param_5) {
         bool galactic_lore = HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM);
         *str = '\0';
         *param_3 = 0;
@@ -1007,7 +1007,7 @@ namespace MAINSCR {
         }
     }
 
-    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, void* out_bitmap_ptr) {
+    bool __cdecl Print_Star_Name_To_Bitmap_(int16_t star_idx, char* str, s_animation_header** out_bitmap_ptr) {
         int16_t owner_counts[8];
         int16_t num_owners;
         s_colors standard_colors;
@@ -1030,8 +1030,8 @@ namespace MAINSCR {
         allocate::Push_Block_(MOX::_screen_seg);
 
         uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(200, 20);
-        void* bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
-        *reinterpret_cast<void**>(out_bitmap_ptr) = bitmap;
+        s_animation_header* bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+        *out_bitmap_ptr = bitmap;
 
         bitmap::Create_Blank_Bitmap_(200, 20, bitmap);
         fonts::Print_To_Bitmap_(0, 0, str, bitmap);

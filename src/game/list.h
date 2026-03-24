@@ -27,4 +27,10 @@ namespace LIST {
     void __cdecl Init_List_Data_(s_list_state* state);
 
     void __cdecl Display_Selected_List_Text_(s_list_state* state, s_list_item* item);
+
+    inline s_list_item* __cdecl Select_And_Page_By_Head_ID_(s_list_state* list, uint8_t id) {
+        using Fn = s_list_item*(__cdecl*)(s_list_state*, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460460});
+        return fn(list, id);
+    }
 }

@@ -26,4 +26,22 @@ namespace BILLHELP {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004B5310})();
     }
+
+    inline void __cdecl Reference_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b50e0});
+        fn();
+    }
+
+    inline void __cdecl Ref_How_To_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5120});
+        fn();
+    }
+
+    inline void __cdecl Ref_Category_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5160});
+        fn();
+    }
 }
