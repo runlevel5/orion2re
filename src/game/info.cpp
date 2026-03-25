@@ -471,8 +471,8 @@ namespace INFO {
         }
 
         text_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x57C);
-        _g_bitmap1_p = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 150));
-        _g_bitmap2_p = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 48));
+        _g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 150));
+        _g_bitmap2_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap::Get_Bitmap_Size_(180, 48));
 
         s_animation_header* app_pics = reinterpret_cast<s_animation_header*>(
             farload::Far_Reload_Next_(s_app_pics_lbx_00556028, 0, MOX::_screen_seg)
@@ -660,6 +660,139 @@ namespace INFO {
         _g_turn_header.group_colors[0] = &_info_normal_color;
 
         palette::Cycle_Palette_Color_(0xbf, 8, 0x20, 0, 0x28, 0x3f, 8, 8);
+    }
+
+    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused) {
+        char header_text[80];
+        char lbx_name[20];
+        uint32_t record_offsets[60];
+        s_list_item items[60];
+        void* out_buffer;
+        int i, j;
+
+        Draw_Drop_Area_(INFO::_category_drops);
+        JIM::Get_Text_Message_("billtext.lbx", 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
+        strcat(header_text, MOX::_help_category_labels[INFO::_g_reference_ix]);
+        fonts::Print_Centered_(416, 67, header_text);
+
+        INFO::_g_category_header.items = items;
+        uint32_t bmp_size = bitmap::Get_Bitmap_Size_(190, 314);
+        INFO::_g_bitmap1_p = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
+        out_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 1404 /* 0x57C */);
+
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        int count = farload::Get_Farload_Data_Record_Count_(lbx_name, INFO::_g_reference_ix);
+        INFO::_g_category_header.num_items = (int8_t)count;
+
+        for (i = 0; i < count; i++) {
+            char* data = (char*)farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, out_buffer, i, 1, 84 /* 0x54 */);
+            strcpy(items[i].group_name, data);
+            record_offsets[i] = *reinterpret_cast<uint32_t*>(data + 80 /* 0x50 */);
+            items[i].group_id = (uint8_t)i;
+            items[i].group_color_index = 0;
+            items[i].app_count = 1;
+        }
+
+        // Alphabetical sort of categories
+        for (i = 0; i < count; i++) {
+            for (j = 0; j < (count - 1); j++) {
+                if (strcmp(items[j].group_name, items[j + 1].group_name) > 0) {
+                    char temp_name[64];
+                    strcpy(temp_name, items[j].group_name);
+                    strcpy(items[j].group_name, items[j + 1].group_name);
+                    strcpy(items[j + 1].group_name, temp_name);
+
+                    uint32_t temp_off = record_offsets[j];
+                    record_offsets[j] = record_offsets[j + 1];
+                    record_offsets[j + 1] = temp_off;
+                }
+            }
+        }
+
+        LIST::Init_List_Data_(&INFO::_g_category_header);
+        short close_btn_id = fields::Add_Button_Field_(386, 427, "", anims[21], "", '(');
+        short up_btn_id = fields::Add_Button_Field_(398, 96, "", anims[14], " ", '(');
+        short down_btn_id = fields::Add_Button_Field_(398, 396, "", anims[15], " ", '(');
+
+        fields::Assign_Auto_Function_(reinterpret_cast<void(*)()>(0x004295D0 /* INFO::Draw_Reference_Category_Subscreen_ */), 2);
+        INFO::_g_reference_screen_type = 0;
+
+        while (true) {
+            INFO::Draw_Multiple_Drop_Areas_(&INFO::_category_drops[1], 2);
+            animate::Draw_(398, 96, anims[12]);
+            animate::Draw_(398, 396, anims[13]);
+            LIST::Display_List_Page_(&INFO::_g_category_header);
+            video::Copy_Off_To_Back_();
+
+            fields::Clear_Fields_Above_(down_btn_id);
+            INFO::_g_first_list_field = fields::Get_Field_Counter_();
+            INFO::_g_last_list_field = LIST::Add_Fields_To_List_Page_(&INFO::_g_category_header);
+            LIST::Set_List_Up_Down_Field_Drawing_(&INFO::_g_category_header, up_btn_id, down_btn_id);
+
+            INFO::_g_prior_choice = fields::Scan_Input_();
+            if (INFO::_g_prior_choice < INFO::_g_first_list_field || INFO::_g_prior_choice > INFO::_g_last_list_field) {
+                INFO::_g_prior_choice = INFO::_g_first_list_field;
+            }
+
+            LIST::Set_Selected_List_Entry_(&INFO::_g_category_header, INFO::_g_prior_choice);
+            INFO::_g_selected_list_p = LIST::Get_Selected_List_Entry_(&INFO::_g_category_header);
+            INFO::_g_list_update_needed = 1;
+
+            INFO::Introduce_Subscreen_();
+
+            while (true) {
+                timer::Mark_Time_();
+                if (INFO::_g_list_update_needed != 0) {
+                    bitmap::Create_Blank_Bitmap_(190, 314, INFO::_g_bitmap1_p);
+                    char* data = (char*)farload::Far_Reload_Data_(lbx_name, 0, out_buffer, record_offsets[INFO::_g_selected_list_p->group_id], 1, 1403 /* 0x57B */);
+
+                    fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
+                    BILL::Print_1_Or_More_Lines_Centered_To_Bitmap_(0, 24, 186, data, INFO::_g_bitmap1_p);
+
+                    fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
+                    FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 64, 186, data + 103 /* 0x67 */, 3, INFO::_g_bitmap1_p);
+                    INFO::_g_list_update_needed = 0;
+                }
+
+                short input = fields::Get_Input_();
+                if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                    return 0;
+                }
+
+                if (input == down_btn_id) {
+                    if (LIST::Next_List_Page_(&INFO::_g_category_header) != 0) break;
+                } else if (input == up_btn_id) {
+                    if (LIST::Previous_List_Page_(&INFO::_g_category_header) != 0) break;
+                } else if (input == 0) {
+                    INFO::Draw_Reference_Category_Subscreen_();
+                    RUSS::Mox_Sync_Update_();
+                    timer::Release_Time_(2);
+                } else if (input <= close_btn_id) {
+                    return input;
+                }
+            }
+        }
+    }
+
+    void __cdecl Draw_Reference_Category_Subscreen_() {
+        int16_t field_id = fields::Scan_Input_();
+        int16_t mouse_button = Mouse_Button_();
+
+        if (mouse_button == 0 && INFO::_g_list_update_needed == 0 &&
+            field_id >= INFO::_g_first_list_field && field_id <= INFO::_g_last_list_field &&
+            field_id != INFO::_g_prior_choice) {
+
+            LIST::Set_Selected_List_Entry_(&INFO::_g_category_header, field_id);
+            INFO::_g_selected_list_p = LIST::Get_Selected_List_Entry_(&INFO::_g_category_header);
+            INFO::_g_prior_choice = field_id;
+            INFO::_g_list_update_needed = 1;
+        } else {
+            INFO::_g_list_update_needed = 0;
+            animate::Draw_(422, 96, (s_animation_header*)INFO::_g_bitmap1_p);
+        }
+
+        LIST::Display_Selected_List_Text_(&INFO::_g_category_header, INFO::_g_selected_list_p);
+        palette::Cycle_Palette_Color_(191, 8, 32, 0, 40, 63, 8, 8);
     }
 
     int16_t __cdecl History_Subscreen_(s_animation_header** lbx_images, int16_t exit_threshold) {
@@ -1301,6 +1434,157 @@ namespace INFO {
         }
     }
 
+    // Suggested name: INFO::Reference_Main_Subscreen_
+    int16_t __cdecl Reference_Main_Subscreen_(uint32_t param_1, int16_t exit_code) {
+        char header_text[40];
+        char lbx_name[20];
+        char category_strs[16][48];
+        char how_to_strs[16][48];
+        int16_t category_indices[16];
+        uint32_t topic_ids[16];
+        int16_t y_pos;
+        int16_t input;
+        uint16_t record_count;
+        s_help_topic_record* record;
+        int16_t category_count;
+
+        const char* s_bullet_fmt = "^ %s";
+        const char* s_empty = "";
+
+        INFO::_g_category_str_p = (char*)category_strs;
+        INFO::_g_how_to_str_ = (char*)how_to_strs;
+
+        INFO::Draw_Multiple_Drop_Areas_(INFO::_reference_drops, 4);
+
+        JIM::Get_Text_Message_(s_billtext_lbx, 10, header_text, 0x28);
+        fonts::Print_(0xe0, 0x43, header_text);
+
+        JIM::Get_Text_Message_(s_billtext_lbx, 11, header_text, 0x28);
+        fonts::Print_(0x1a8, 0x43, header_text);
+
+        if (MOX::_settings.language == 1 || MOX::_settings.language == 2) {
+            fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
+        } else {
+            fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
+        }
+
+        y_pos = 100;
+        INFO::_g_first_category_field = fields::Get_Field_Counter_();
+        category_count = 0;
+
+        for (int i = 1; i < 17; ++i) {
+            if ((uint8_t)MOX::_help_category_labels[i][0] > 0x39 /* '9' */) {
+                _sprintf(category_strs[category_count], s_bullet_fmt, MOX::_help_category_labels[i]);
+                fonts::Print_(0xdd, y_pos, category_strs[category_count]);
+                fields::Add_Hidden_Field_(0xdd, y_pos - 2, 0x19b, y_pos + 18, s_empty, 0);
+                category_indices[category_count] = (int16_t)i;
+                category_count++;
+                y_pos += 20;
+            }
+        }
+
+        void* reload_buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x54 /* sizeof(s_help_topic_record) */);
+        INFO::_g_first_how_to_field = fields::Get_Field_Counter_();
+        TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
+        record_count = farload::Get_Farload_Data_Record_Count_(lbx_name, 0xf);
+
+        y_pos = 100;
+        for (int i = 0; i < (int)record_count; ++i) {
+            record = (s_help_topic_record*)farload::Far_Reload_Data_(lbx_name, 0xf, reload_buffer, i, 1, 0x54);
+            topic_ids[i] = record->id;
+            _sprintf(how_to_strs[i], s_bullet_fmt, record->text);
+            fonts::Print_(0x1a5, y_pos, how_to_strs[i]);
+            fields::Add_Hidden_Field_(0x1a5, y_pos - 2, 0x263, y_pos + 18, s_empty, 0);
+            y_pos += 20;
+        }
+
+        video::Copy_Off_To_Back_();
+        fields::Assign_Auto_Function_(INFO::Draw_Reference_Main_Subscreen_, 2);
+        INFO::Introduce_Subscreen_();
+
+        if (MOX::_settings.language == 1 || MOX::_settings.language == 2) {
+            fonts::Set_Font_Style_(3, &INFO::_info_high_color);
+        } else {
+            fonts::Set_Font_Style_(4, &INFO::_info_high_color);
+        }
+
+        while (true) {
+            input = fields::Get_Input_();
+            if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                return 0;
+            }
+            if (input >= exit_code) {
+                break;
+            }
+            if (input == 0) {
+                timer::Mark_Time_();
+                INFO::Draw_Reference_Main_Subscreen_();
+                RUSS::Mox_Sync_Update_();
+                timer::Release_Time_(2);
+                continue;
+            }
+            if (input < exit_code) {
+                return input;
+            }
+        }
+
+        if (input < INFO::_g_first_how_to_field) {
+            INFO::_g_reference_screen_type = 1;
+            INFO::_g_reference_ix = category_indices[input - INFO::_g_first_category_field];
+        } else {
+            INFO::_g_reference_screen_type = 2;
+            INFO::_g_reference_ix = (int16_t)topic_ids[input - INFO::_g_first_how_to_field];
+        }
+
+        return 0;
+    }
+
+    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2) {
+        char help_lbx_name[20];
+        char title_combined[128];
+        char* loaded_help_text;
+        int16_t input_code;
+
+        TEXTBOX::Get_Help_Lbx_Name_(help_lbx_name);
+        INFO::Draw_Multiple_Drop_Areas_(INFO::_how_to_drops, 2);
+
+        loaded_help_text = (char*)farload::Far_Reload_Next_Data_(
+            help_lbx_name, 0, MOX::_screen_seg, (uint32_t)INFO::_g_reference_ix, 1, 0x57B
+        );
+
+        title_combined[0] = '\0';
+        JIM::Get_Text_Message_(s_billtext_lbx, 13, &title_combined[24], 80);
+
+        strcat(title_combined, loaded_help_text);
+
+        fonts::Print_Centered_(414, 67, title_combined);
+
+        if (MOX::_settings.language == 1 || MOX::_settings.language == 2) {
+            fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
+        }
+
+        FMTPARA::Print_Formatted_Paragraph_(224, 99, 381, loaded_help_text + 0x67, 3);
+
+        video::Copy_Off_To_Back_();
+
+        fields::Add_Button_Field_(386, 427, "", turn_summary_data_ptrs[21], "", 40);
+
+        fields::Assign_Auto_Function_(INFO::Draw_Dummy_Turn_Summary_Subscreen_, 2);
+        
+        INFO::_g_reference_screen_type = 0;
+        INFO::Introduce_Subscreen_();
+
+        do {
+            input_code = fields::Get_Input_();
+            if (input_code != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                break;
+            }
+            RUSS::Mox_Sync_Update_();
+        } while (true);
+        
+        return input_code;
+    }
+
     int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2) {
         char text_buffer[40];
 
@@ -1310,24 +1594,79 @@ namespace INFO {
 
         if (_g_reference_screen_type == 0) {
             BILLHELP::Reference_Help_();
-            return Reference_Main_Subscreen_(param_1, param_2);
+            return Reference_Main_Subscreen_(reinterpret_cast<std::uintptr_t>(param_1), param_2);
         }
 
         if (_g_reference_screen_type == 1) {
-            BILLHELP::Ref_How_To_Help_();
-            return Reference_How_To_Subscreen_(param_1, param_2);
+            BILLHELP::Ref_Category_Help_();
+            return Reference_Category_Subscreen_(param_1, param_2);
         }
 
         if (_g_reference_screen_type == 2) {
-            BILLHELP::Ref_Category_Help_();
-            return Reference_Category_Subscreen_(param_1, param_2);
+            BILLHELP::Ref_How_To_Help_();
+            return Reference_How_To_Subscreen_(param_1, param_2);
         }
 
         return 0;
     }
 
+    // Suggested name: INFO::Init_Turn_Summary_List
+    void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t num_items, int16_t font_style, int16_t font_lf) {
+        if (num_items != 0) {
+            state->num_items = (int8_t)num_items;
+
+            int16_t msg_idx = MSG_::First_Msg_For_Player_(MOX::_PLAYER_NUM);
+            int16_t end_msg_idx = msg_idx + num_items;
+
+            fonts::Set_Font_Style_(font_style, &INFO::_info_normal_color);
+            fonts::Set_Font_LF_(font_lf);
+
+            s_list_item* item = state->items;
+            char buffer[256];
+
+            while (msg_idx < end_msg_idx) {
+                item->group_name[0] = '\0';
+                item->group_id = (uint8_t)msg_idx;
+                item->group_color_index = 0;
+                item->tech_app_ids[0] = (uint8_t)msg_idx;
+
+                MSG_::sprintf_msg_(buffer, &MSG_::_msgs[msg_idx]);
+
+                int16_t height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(state->item_width, buffer);
+                item->app_count = (uint8_t)(height / font_lf);
+
+                // Initialize applications for the list item based on paragraph height
+                for (int i = 0; i < (int)item->app_count; ++i) {
+                    item->tech_app_status[i] = 0;
+                    item->tech_app_ids[i + 1] = 0xff;
+                }
+
+                msg_idx++;
+                item++;
+            }
+
+            LIST::Init_List_Data_(state);
+        }
+    }
+
     void __cdecl Init_Turn_Summary_List_(s_list_state* state, int16_t val) {
         INFO::_Init_Turn_Summary_List_(state, val, 4, 10);
+    }
+
+    void __cdecl Draw_Reference_Main_Subscreen_() {
+        int16_t field_idx = fields::Scan_Input_();
+
+        if (field_idx >= INFO::_g_first_how_to_field) {
+            int16_t offset = field_idx - INFO::_g_first_how_to_field;
+            // TYPE MISMATCH: _g_how_to_str_ is char* in header but used as char[][48]
+            fonts::Print_(0x1a5, (offset + 5) * 20, &INFO::_g_how_to_str_[offset * 48]);
+        } else if (field_idx >= INFO::_g_first_category_field) {
+            int16_t offset = field_idx - INFO::_g_first_category_field;
+            // TYPE MISMATCH: _g_category_str_p is char* in header but used as char[][48]
+            fonts::Print_(0xdd, (offset + 5) * 20, &INFO::_g_category_str_p[offset * 48]);
+        }
+
+        palette::Cycle_Palette_Color_(0xbf, 8, 0x20, 0, 0x28, 0x3f, 8, 8);
     }
 
     int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** anim_data, int16_t min_field) {

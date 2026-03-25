@@ -21,16 +21,12 @@ namespace MAINSCR2 {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004da6d0})();
     }
-    inline void __cdecl Scrap_Freighters_() {
+    void __cdecl Scrap_Freighters_();
+    inline void __cdecl Do_Begin_Of_Turn_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004da420})();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004da9f0});
+        fn();
     }
-    inline void __cdecl Reports_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004da870})();
-    }
-    inline void __cdecl Show_Command_Points_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004daf20})();
-    }
+    void __cdecl Reports_Screen_();
+    void Show_Command_Points_Screen_();
 }

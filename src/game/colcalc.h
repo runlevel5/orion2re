@@ -27,6 +27,7 @@ namespace COLCALC {
     inline const char*& _no_barracks_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B38});
     inline const char*& _morale_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BBC});
     inline const char*& _total_morale_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC8});
+    inline const char*& _command_summary_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BCC});
     inline int8_t (&_colony_calc_food_cache)[10] =
         *reinterpret_cast<int8_t(*)[10]>(std::uintptr_t{0x00571BA0});
     inline const char*& _ship_maintenance_costs_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571ADC});
@@ -359,4 +360,6 @@ namespace COLCALC {
     short __cdecl N_Prods_In_Colony_Queue_(short colony_idx, short item_id);
 
     int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony);
+
+    void __cdecl Show_Command_Points_(int player_idx);
 }

@@ -80,4 +80,9 @@ namespace EVANHELP {
         using Fn = void(__cdecl*)(int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x0041e160})(val);
     }
+
+    inline void __cdecl Set_Scrap_Freighters_Help_List_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x0041e120)();
+    }
 }

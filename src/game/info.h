@@ -4,6 +4,7 @@
 struct s_animation_header;
 struct s_colors;
 struct s_drop_area;
+struct s_help_topic_record;
 struct s_list_item;
 struct s_list_state;
 struct s_tech_review_achievement;
@@ -48,8 +49,8 @@ namespace INFO {
     inline s_list_state*& _g_header_p =
         *reinterpret_cast<s_list_state**>(std::uintptr_t{0x005A7B88});
 
-    inline void*& _g_bitmap1_p =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005A7B8C});
+    inline s_animation_header*& _g_bitmap1_p =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A7B8C});
 
     inline void*& _g_bitmap2_p =
         *reinterpret_cast<void**>(std::uintptr_t{0x005A7B90});
@@ -78,14 +79,35 @@ namespace INFO {
     inline uint8_t& _g_turn_message_ix =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00564D7C});
 
+    inline int16_t& _g_reference_ix =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DA4});
+
+    inline char*& _g_how_to_str_ =
+        *reinterpret_cast<char**>(std::uintptr_t{0x00564DA8});
+
+    inline int16_t& _g_first_how_to_field =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DAC});
+
+    inline int16_t& _g_first_category_field =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00564DB0});
+
+    inline char*& _g_category_str_p =
+        *reinterpret_cast<char**>(std::uintptr_t{0x00564DB4});
+
     inline uint8_t& _race_statistics_page =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7B9D});
 
     inline s_drop_area& _turn_summary_drop =
         *reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D78});
 
+    inline s_drop_area (&_reference_drops)[4] =
+        *reinterpret_cast<s_drop_area(*)[4]>(std::uintptr_t{0x00555D90});
+
     inline s_list_state& _g_turn_header =
         *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555F68});
+
+    inline s_list_state& _g_category_header =
+        *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00555FB0});
 
     inline uint16_t& _g_exit_field =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7B9E});
@@ -93,6 +115,8 @@ namespace INFO {
     inline s_list_item*& _g_selected_msg_p =
         *reinterpret_cast<s_list_item**>(std::uintptr_t{0x00564DA0});
 
+    inline s_drop_area* _how_to_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555DD8});
+    inline s_drop_area* _category_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555E00});
     inline s_drop_area* _race_stats_drops = reinterpret_cast<s_drop_area*>(std::uintptr_t{0x00555D30});
     inline int16_t* _race_bitmap_x = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F18});
     inline int16_t* _race_bitmap_y = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F20});
@@ -192,33 +216,21 @@ namespace INFO {
 
     void __cdecl Draw_Turn_Summary_Subscreen_();
 
-    inline void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t val, int32_t item_count, int32_t page_size) {
-        using Fn = void(__cdecl*)(s_list_state*, int16_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004284d0});
-        fn(state, val, item_count, page_size);
-    }
+    void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t num_items, int16_t font_style, int16_t font_lf);
 
     void __cdecl Init_Turn_Summary_List_(s_list_state* state, int16_t val);
 
     int16_t __cdecl Turn_Summary_Subscreen_(s_animation_header** anim_data, int16_t min_field);
 
-    inline int16_t __cdecl Reference_Main_Subscreen_(s_animation_header** param_1, int16_t param_2) {
-        using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00428ae0});
-        return fn(param_1, param_2);
-    }
+    int16_t __cdecl Reference_Main_Subscreen_(uint32_t param_1, int16_t exit_code);
 
-    inline int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** param_1, int16_t param_2) {
-        using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00429020});
-        return fn(param_1, param_2);
-    }
+    void __cdecl Draw_Reference_Main_Subscreen_();
 
-    inline int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** param_1, int16_t param_2) {
-        using Fn = int16_t(__cdecl*)(s_animation_header**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00428ec0});
-        return fn(param_1, param_2);
-    }
+    int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2);
+
+    void __cdecl Draw_Reference_Category_Subscreen_();
+
+    int16_t __cdecl Reference_Category_Subscreen_(s_animation_header** anims, int16_t unused);
 
     int16_t __cdecl Reference_Subscreen_(s_animation_header** param_1, int16_t param_2);
 

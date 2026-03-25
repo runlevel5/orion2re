@@ -1,6 +1,15 @@
 #include "pch.h"
 
 namespace COLCALC {
+    void __cdecl Show_Command_Points_(int player_idx) {
+        char msg_buffer[3000];
+
+        // Assembly calculates offset: player_idx * 3753 (0xEA9)
+        Compute_Player_Maintenance_(&MOX::_player[player_idx], msg_buffer);
+
+        TEXTBOX::Text_Box_(_command_summary_msg, msg_buffer);
+    }
+
     int __cdecl Calc_Player_Climate_(int player_idx, int climate) {
         if (player_idx < 8 && MOX::_player[player_idx].traits[TRAIT_AQUATIC] != 0) {
             switch (climate) {

@@ -52,4 +52,10 @@ namespace farload {
     void* __cdecl Far_Reload_Next_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6);
 
     void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type);
+
+    inline uint16_t __cdecl Get_Farload_Data_Record_Count_(const char* lbx_name, int type) {
+        using Fn = uint16_t(__cdecl*)(const char*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051cd30});
+        return fn(lbx_name, type);
+    }
 }

@@ -2,8 +2,6 @@
 #include <cstdint>
 
 namespace BILL {
-    struct s_animation_header;
-
     inline void __cdecl Bill_Init_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00406780})();
@@ -92,6 +90,11 @@ namespace BILL {
     void __cdecl Set_My_Agent_Number_(uint8_t agent_num);
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
+
+    inline void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp) {
+        using Fn = void(__cdecl*)(int, int, int, char*, s_animation_header*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x004077A0})(x, y, width, str, bmp);
+    }
 
     void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit);
 

@@ -70,4 +70,9 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045C9B0});
         fn(plr1_idx, plr2_idx, star_idx, colony_idx);
     }
+
+    inline int16_t __cdecl Slider_Popup_(int16_t min_val, int16_t max_val, int16_t field2, const char* title, int16_t initial_val) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t);
+        return reinterpret_cast<Fn>(0x0045cc60)(min_val, max_val, field2, title, initial_val);
+    }
 }

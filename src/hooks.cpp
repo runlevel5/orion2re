@@ -2284,6 +2284,19 @@ namespace hooks {
         { 0x004289a0, &INFO::Draw_Dummy_Turn_Summary_Subscreen_ },
         { 0x004289b0, &INFO::Draw_Turn_Summary_Subscreen_ },
         { 0x004285e0, &INFO::Init_Turn_Summary_List_ },
+        { 0x004284d0, &INFO::_Init_Turn_Summary_List_ },
+        { 0x00428ae0, &INFO::Reference_Main_Subscreen_ },
+        { 0x00428e30, &INFO::Draw_Reference_Main_Subscreen_ },
+        { 0x00428ec0, &INFO::Reference_How_To_Subscreen_ },
+        { 0x004295d0, &INFO::Draw_Reference_Category_Subscreen_ },
+        { 0x00429020, &INFO::Reference_Category_Subscreen_ },
+        { 0x004daf20, &MAINSCR2::Show_Command_Points_Screen_ },
+        { 0x004f7d40, &COLCALC::Show_Command_Points_ },
+        { 0x004da870, &MAINSCR2::Reports_Screen_ },
+        { 0x004da420, &MAINSCR2::Scrap_Freighters_ },
+        { 0x00484040, &TECH::Tech_Change_ },
+        { 0x004860a0, &TECH::Save_Hyper_Tech_Values_ },
+        { 0x00486120, &TECH::Promote_Hyper_Field_Values_ },
     };
 
     void Install_Hooks()
