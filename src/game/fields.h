@@ -40,6 +40,11 @@ namespace fields {
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
     void __cdecl Deactivate_Auto_Function_();
+    inline void __cdecl Activate_Auto_Function_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FF10});
+        fn();
+    }
     void __cdecl Clear_Fields_();
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str);

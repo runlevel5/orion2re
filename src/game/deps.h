@@ -41,6 +41,7 @@
 #include "sound.h"
 #include "ten.h"
 #include "fields.h"
+#include "fieldsav.h"
 #include "firepts.h"
 #include "farload.h"
 #include "s_starname.h"

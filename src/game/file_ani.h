@@ -43,6 +43,12 @@ namespace file_ani {
 
     void __cdecl Open_File_Animation_(const char* filename, int16_t entry_index);
 
+    inline void __cdecl Set_File_Animation_Frame_(int frame) {
+        using Fn = void(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005316d0});
+        fn(frame);
+    }
+
     void __cdecl Draw_File_Animation_();
 
     void __cdecl Draw_File_Animation_Stencil_();

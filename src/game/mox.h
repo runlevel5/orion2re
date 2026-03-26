@@ -2,6 +2,7 @@
 
 namespace MOX {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
+    inline uint8_t (&_first_field_in_group)[10] = *reinterpret_cast<uint8_t(*)[10]>(0x00558D30);
     inline s_animation_header* (&_fighter_seg)[15][64] =
         *reinterpret_cast<s_animation_header* (*)[15][64]>(std::uintptr_t{0x005A1CC0});
     inline uint8_t& _draw_officer_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597838});
@@ -207,6 +208,7 @@ namespace MOX {
     inline int16_t& _star_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C5C});
     inline int16_t& _star_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA04});
     inline char (&_temp_string)[512] = *reinterpret_cast<char(*)[512]>(std::uintptr_t{0x00596230});
+    inline char (&_temp_string_buf)[64] = *reinterpret_cast<char (*)[64]>(std::uintptr_t{0x00559487});
     inline int16_t& _take_control_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D62});
     inline int16_t& _auto_cmbt_button_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C60});
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
@@ -252,6 +254,7 @@ namespace MOX {
     inline int16_t* _antarans_ship_counts_end = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA4A });
     inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
+    inline char*& _hyper_field_title = *reinterpret_cast<char**>(std::uintptr_t{0x00598764});
     inline const char* s_Harbinger = reinterpret_cast<const char*>(std::uintptr_t{0x005576B8}); // "Harbinger"
     inline uint8_t& _at_least_one_tactical_combat = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005973E0});
     // Suggested name: MOX::_planet_summary_galaxy_star_seg
@@ -394,7 +397,7 @@ namespace MOX {
     inline s_planet_data*& _planet =
         *reinterpret_cast<s_planet_data**>(std::uintptr_t{ 0x005978F8 });
 
-    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559428});
+    inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559424});
 
     inline char** _planet_special_string = reinterpret_cast<char**>(std::uintptr_t{0x00597780});
     inline char** _planet_climate_string = reinterpret_cast<char**>(std::uintptr_t{0x0059BA80});
@@ -420,6 +423,8 @@ namespace MOX {
 
     inline void*& _techname_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B31C });
+
+    inline void*& _tech_desc_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005977EC});
 
     inline s_animation_header*& _main_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B400});
     inline s_animation_header*& _design_screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059D6CC});

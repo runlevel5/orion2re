@@ -27,6 +27,17 @@ namespace BILLHELP {
         reinterpret_cast<Fn>(std::uintptr_t{0x004B5310})();
     }
 
+    inline void __cdecl Technology_Change_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b52c0});
+        fn();
+    }
+    inline void __cdecl Technology_Select_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b52b0});
+        fn();
+    }
+
     inline void __cdecl Reference_Help_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b50e0});
@@ -42,6 +53,30 @@ namespace BILLHELP {
     inline void __cdecl Ref_Category_Help_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b5160});
+        fn();
+    }
+
+    inline void __cdecl Tech_Change_List_Right_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B52F0});
+        fn();
+    }
+
+    inline void __cdecl Tech_Select_List_Right_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B52D0});
+        fn();
+    }
+
+    inline void __cdecl Tech_Change_List_Left_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B5300});
+        fn();
+    }
+
+    inline void __cdecl Tech_Select_List_Left_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B52E0});
         fn();
     }
 }

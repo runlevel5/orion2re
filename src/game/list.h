@@ -33,4 +33,10 @@ namespace LIST {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460460});
         return fn(list, id);
     }
+
+    inline void __cdecl Display_Selected_List_Text_For_Tech_List_(s_list_state* list, s_list_item* item) {
+        using Fn = void(__cdecl*)(s_list_state*, s_list_item*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460120});
+        fn(list, item);
+    }
 }

@@ -10,6 +10,7 @@ inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x0
 inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
 inline char* s_combat_lbx_00551244 = reinterpret_cast<char*>(std::uintptr_t{0x00551244});
 inline char* s__00559998 = reinterpret_cast<char*>(std::uintptr_t{0x00559998});
+inline char (&s__00559488)[64] = *reinterpret_cast<char(*)[64]>(std::uintptr_t{0x00559488});
 inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
 inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
@@ -17,6 +18,8 @@ inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{
 inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
 inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
 inline const char* s_INFO_LBX_00556000 = reinterpret_cast<const char*>(std::uintptr_t{0x00556000}); // "INFO.LBX"
+inline const char* s_SCIENCE_LBX_00557d68 = reinterpret_cast<const char*>(0x00557D68); // "SCIENCE.LBX"
+inline const char* s_SR_R_x_SC_LBX_00557d74 = reinterpret_cast<const char*>(0x00557D74); // "SR_R%x_SC.LBX"
 inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
 inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018);
 
@@ -745,4 +748,11 @@ inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00
 
 inline const char* s_Too_many_ships_in_list_00557de8 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
+
+inline const char* s_i_PR_00557d84 = reinterpret_cast<const char*>(0x00557D84);
+inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);
+inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
+inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{0x00557D9C});
+inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
+inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
 

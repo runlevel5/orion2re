@@ -223,6 +223,7 @@
     <ClInclude Include="src\game\fakebuts.h" />
     <ClInclude Include="src\game\farload.h" />
     <ClInclude Include="src\game\fields.h" />
+    <ClInclude Include="src\game\fieldsav.h" />
     <ClInclude Include="src\game\filedef.h" />
     <ClInclude Include="src\game\file_ani.h" />
     <ClInclude Include="src\game\firepts.h" />

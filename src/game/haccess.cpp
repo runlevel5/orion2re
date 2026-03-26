@@ -212,27 +212,33 @@ namespace HACCESS {
         return (bool)MOX::_ship_node[node_idx].selected;
     }
 
-    void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* dest_buffer, uint8_t localized_flag) {
-        char temp_buf[200];
+    void __cdecl Do_Get_Planet_Name_(int16_t planet_idx, char* out_str, uint8_t localized_flag) {
+        char buffer[200];
 
-        int8_t star_index = MOX::_planet[planet_idx].star_index;
+        *reinterpret_cast<uint16_t*>(buffer) = *reinterpret_cast<const uint16_t*>(s__005510f0);
 
-        int8_t roman_index = HAROLD::Planet_Number_(planet_idx);
-        const char* roman_str = MOX::_roman_literals[roman_index];
+        int8_t star_idx = MOX::_planet[planet_idx].star_index;
+        int8_t planet_num = HAROLD::Planet_Number_(planet_idx);
 
-        if (localized_flag != 0) {
-            if (strcmp(roman_str, s_I) == 0) {
-                roman_str = HAROLD::H_Message_(0xA0);
+        const char* numeral_str;
+        if (localized_flag == 0) {
+            numeral_str = MOX::_roman_literals[planet_num + 1];
+        } else {
+            numeral_str = MOX::_roman_literals[planet_num + 1];
+            if (strcmp(numeral_str, s_I) == 0) {
+                numeral_str = HAROLD::H_Message_(0xa0);
             }
         }
 
-        _sprintf(temp_buf, s_format_star_roman, &MOX::_star[star_index].name, roman_str);
+        s_star_data* star = &MOX::_star[star_idx];
 
-        if (strlen(temp_buf) > 30) {
-            temp_buf[30] = '\0';
+        _sprintf(buffer, s_format_star_roman, star->name, numeral_str);
+
+        if (strlen(buffer) > 30) {
+            buffer[30] = '\0';
         }
 
-        strcpy(dest_buffer, temp_buf);
+        strcpy(out_str, buffer);
     }
 
     char* __cdecl Get_Planet_Name_(int16_t planet_idx) {
