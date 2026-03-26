@@ -1282,6 +1282,35 @@ namespace MAINSCR {
         }
     }
 
+    void __cdecl Print_Highlighted_Star_Name_(int16_t star_idx) {
+        int16_t window_status_cookie;
+        int8_t is_highlighted;
+        char star_name[32];
+        s_animation_header* bitmap_ptr = nullptr;
+
+        MISC::Save_Window_Status_(&window_status_cookie);
+        graphics::Set_Window_(0x16 /* 22 */, 0x16 /* 22 */, 0x20f /* 527 */, 0x1a5 /* 421 */);
+        video::Clip_On_();
+
+        MAINSCR::Get_Star_Name_(star_idx, 1, &is_highlighted, star_name, &bitmap_ptr);
+
+        if (star_name[0] != '\0') {
+            if (is_highlighted) {
+                MISC::Tint_Bitmap_Colors_(0, 0, 0, 0, 1, MAINSCR::_star_name_highlight_value, bitmap_ptr);
+
+                MAINSCR::_star_name_highlight_value += MAINSCR::_star_name_highlight_direction;
+
+                if (MAINSCR::_star_name_highlight_value == 0 || MAINSCR::_star_name_highlight_value == 3) {
+                    MAINSCR::_star_name_highlight_direction = -MAINSCR::_star_name_highlight_direction;
+                }
+            }
+
+            MAINSCR::Print_Star_Name(star_idx, is_highlighted, star_name, bitmap_ptr);
+        }
+
+        MISC::Restore_Window_Status_(window_status_cookie);
+    }
+
     int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out_field, int16_t* out_index) {
         bool is_box_selected = MOVEBOX::Moveable_Box_Selected_(2);
 
@@ -1297,12 +1326,12 @@ namespace MAINSCR {
                 *out_index = MOX::_mouse_XY.ship_icon_idx;
                 return (int16_t)(MOX::_mouse_XY.selected != 1);
             }
-            if (MOX::_mouse_XY.field3_0x6 > -1 && type == 0) {
-                *out_field = MOX::_mouse_XY.field3_0x6;
+            if (MOX::_mouse_XY.hovering_star_idx > -1 && type == 0) {
+                *out_field = MOX::_mouse_XY.hovering_star_idx;
                 return 4;
             }
-            if (MOX::_mouse_XY.field1_0x2 > -1 && type == 1) {
-                *out_field = MOX::_mouse_XY.field1_0x2;
+            if (MOX::_mouse_XY.hovering_ship_icon_idx > -1 && type == 1) {
+                *out_field = MOX::_mouse_XY.hovering_ship_icon_idx;
                 return 4;
             }
         } else {
@@ -1314,12 +1343,12 @@ namespace MAINSCR {
                 *out_index = MOX::_mouse_XY.star_idx;
                 return (int16_t)(MOX::_mouse_XY.selected != 1);
             }
-            if (MOX::_mouse_XY.field1_0x2 > -1 && type == 1) {
-                *out_field = MOX::_mouse_XY.field1_0x2;
+            if (MOX::_mouse_XY.hovering_ship_icon_idx > -1 && type == 1) {
+                *out_field = MOX::_mouse_XY.hovering_ship_icon_idx;
                 return 4;
             }
-            if (MOX::_mouse_XY.field3_0x6 > -1 && type == 0) {
-                *out_field = MOX::_mouse_XY.field3_0x6;
+            if (MOX::_mouse_XY.hovering_star_idx > -1 && type == 0) {
+                *out_field = MOX::_mouse_XY.hovering_star_idx;
                 return 4;
             }
         }
@@ -1599,8 +1628,8 @@ namespace MAINSCR {
         int16_t mouse_y = mouse::Pointer_Y_();
 
         MOX::_mouse_XY.selected = 0;
-        MOX::_mouse_XY.field3_0x6 = -1;
-        MOX::_mouse_XY.field1_0x2 = -1;
+        MOX::_mouse_XY.hovering_star_idx = -1;
+        MOX::_mouse_XY.hovering_ship_icon_idx = -1;
 
         bool is_in_box = false;
 
@@ -2039,6 +2068,48 @@ namespace MAINSCR {
      *
      * @param redraw_full If true, performs a full screen clear, fade out, and fade in.
      */
+    /**
+     * @brief Centers the map view on a specific point.
+     * 
+     * @param target_x Desired center X coordinate.
+     * @param target_y Desired center Y coordinate.
+     */
+    void __cdecl Center_Map_(int16_t target_x, int16_t target_y) {
+        int16_t old_x = MOX::_cur_map_x;
+        int16_t old_y = MOX::_cur_map_y;
+
+        // Calculate top-left corner based on centered target
+        MOX::_cur_map_x = target_x - (int16_t)HAROLD::Get_Up_Scaled_Value_(253 /* 0xfd */);
+        MOX::_cur_map_y = target_y - (int16_t)HAROLD::Get_Up_Scaled_Value_(200 /* 0xc8 */);
+
+        // Clamp X to bounds [0, MAX_X - view_width]
+        if (MOX::_cur_map_x < 0) {
+            MOX::_cur_map_x = 0;
+        }
+        
+        int maxX_limit = (int)MOX::_MAP_MAX_X - HAROLD::Get_Up_Scaled_Value_(506 /* 0x1fa */);
+        if ((int)MOX::_cur_map_x > maxX_limit) {
+            MOX::_cur_map_x = (int16_t)MOX::_MAP_MAX_X - (int16_t)HAROLD::Get_Up_Scaled_Value_(506 /* 0x1fa */);
+        }
+
+        // Clamp Y to bounds [0, MAX_Y - view_height]
+        if (MOX::_cur_map_y < 0) {
+            MOX::_cur_map_y = 0;
+        }
+
+        int maxY_limit = (int)MOX::_MAP_MAX_Y - HAROLD::Get_Up_Scaled_Value_(400 /* 0x190 */);
+        if ((int)MOX::_cur_map_y > maxY_limit) {
+            MOX::_cur_map_y = (int16_t)MOX::_MAP_MAX_Y - (int16_t)HAROLD::Get_Up_Scaled_Value_(400 /* 0x190 */);
+        }
+
+        // If viewport position changed, update parallax offsets
+        if (old_x != MOX::_cur_map_x || old_y != MOX::_cur_map_y) {
+            MAINSCR::Get_New_Paralax_XYs_((int16_t)old_x, (int16_t)old_y, 1);
+        }
+
+        MOX::_draw_main_screen_to_back = 1;
+    }
+
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full) {
         if (redraw_full != 0) {
             ERIC::Fast_Fade_Out_();
@@ -2162,6 +2233,10 @@ namespace MAINSCR {
     /**
      * @address 004c4e90
      */
+    bool __cdecl Ship_Can_Be_Selected_(int16_t ship_idx) {
+        return HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM, &MOX::_ship[ship_idx]);
+    }
+
     void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode) {
         MOX::_at_least_one_report = 0;
         MOX::_previous_report = 0;
@@ -2221,5 +2296,431 @@ namespace MAINSCR {
         }
 
         *exit_flag = 1;
+    }
+
+    void __cdecl Draw_Player_Done_Lights_(void)
+    {
+        int8_t all_humans_ready_flag = 0;
+        int16_t n_humans = HAROLD::Get_N_Remaining_Humans_();
+        int16_t dropped_count = 0;
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (MOX::_game_type == 1 /* GAME_HOTSEAT */) {
+                if ((int16_t)MULTPLAY::Hotseat_Player_Status_(i) == 1) {
+                    dropped_count++;
+                }
+            }
+            else if ((MOX::_game_type == 2 /* GAME_NETWORK */ || MOX::_game_type == 3 /* GAME_MODEM */)) {
+                if (NETMOX::_net.dropped_players[i] != 0) {
+                    dropped_count++;
+                }
+            }
+        }
+
+        if ((n_humans - 1) <= dropped_count) {
+            all_humans_ready_flag = 1;
+        }
+
+        int16_t draw_idx = 0;
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            bool should_draw = false;
+
+            if (MOX::_game_type == 2 || MOX::_game_type == 3) {
+                if (NETMOX::_net.dropped_players[i] != 0) {
+                    should_draw = true;
+                }
+            }
+            else if (MOX::_game_type == 1) {
+                if ((int16_t)MULTPLAY::Hotseat_Player_Status_(i) == 1) {
+                    should_draw = true;
+                }
+            }
+
+            if (should_draw) {
+                int8_t color = MOX::_player[i].color;
+                int16_t anim_width = animate::Get_Width_(MAINSCR::_player_lights_seg[0]);
+                int16_t x_pos = (anim_width * draw_idx) + 0x49;
+
+                if (all_humans_ready_flag == 0) {
+                    animate::Set_Animation_Frame_(MAINSCR::_player_lights_seg[color], 5);
+                }
+
+                animate::Draw_(x_pos, 5, MAINSCR::_player_lights_seg[color]);
+                draw_idx++;
+            }
+        }
+    }
+
+    void __cdecl Draw_Game_Turn_Buttons_() {
+        animate::Reset_Animation_Frame_(MOX::_main_next_button_seg);
+        animate::Draw_(544, 441, MOX::_main_next_button_seg);
+
+        animate::Reset_Animation_Frame_(MOX::_main_game_button_seg);
+        animate::Draw_(249, 5, MOX::_main_game_button_seg);
+    }
+
+    /**
+     * @address 004c64b0
+     */
+    void __cdecl Draw_Main_Screen_Before_Stencil_() {
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        MAINSCR::Draw_Main_Main_Screen_();
+        video::Copy_Off_To_Back_();
+
+        for (int16_t i = 4; i >= 0; --i) {
+            int16_t box_id = MOX::_moveable_box_order[i];
+            if (MOVEBOX::Moveable_Box_Selected_(box_id) != 0) {
+                if (MOX::_stencil_box_id != box_id) {
+                    int16_t mouse_btn = Mouse_Button_();
+                    MOVEBOX::Move_Moveable_Box_(box_id, mouse_btn);
+                    MOVEBOX::Draw_Moveable_Box_(box_id);
+                }
+            }
+        }
+
+        MAINSCR::Draw_Game_Turn_Buttons_();
+        MOVEBOX::Draw_Moveable_Box_(MOX::_stencil_box_id);
+    }
+
+    void __cdecl Scan_Ships_XY_(int16_t mouse_x, int16_t mouse_y) {
+        bool found = false;
+        char icon_label[80];
+
+        for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
+            if (found) {
+                return;
+            }
+
+            int16_t ship_idx = MOX::_ship_node[MOX::_ship_icon[i].node_idx].ship_idx;
+            int16_t owner = HACCESS::Ship_Owner_(ship_idx);
+            s_animation_header* pict_seg = SHIPS::Get_Ship_Icon_Pict_Seg_(owner, 0);
+
+            if (fields::_field_box_mode == 1) {
+                int16_t h = animate::Get_Height_(pict_seg);
+                int16_t w = animate::Get_Width_(pict_seg);
+                graphics::Box_(MOX::_ship_icon[i].x, MOX::_ship_icon[i].y, w, h, 1, 10 /* 0xA */);
+            }
+
+            int16_t icon_x = MOX::_ship_icon[i].x;
+            int16_t icon_y = MOX::_ship_icon[i].y;
+            int16_t width = animate::Get_Width_(pict_seg);
+            int16_t height = animate::Get_Height_(pict_seg);
+
+            if (mouse_x >= icon_x && mouse_x <= (icon_x + width) &&
+                mouse_y >= icon_y && mouse_y <= (icon_y + height)) {
+
+                if (!MAINSCR::_moving_a_stack || MOX::_mouse_XY.hovering_star_idx == -1) {
+                    MOX::_mouse_XY.hovering_ship_icon_idx = i;
+                    MOX::_mouse_XY.selected = 0;
+                    _sprintf(icon_label, MAINSCR::s_ship_icon_idx_fmt, (int)i);
+                    MOX::_mouse_XY.hovering_star_idx = -1;
+                }
+                found = true;
+            }
+        }
+    }
+
+    /**
+     * Cycles through stars to find the next or previous one where the player has a colony.
+     * 
+     * @param p_star_idx Pointer to the current star index; updated to the new star index if found.
+     * @param player_idx The player whose colonies are being searched.
+     * @param direction  Direction to cycle (0 for next, non-zero for previous).
+     */
+    void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction) {
+        bool found = false;
+        int16_t current_idx = *p_star_idx;
+
+        // Search from current position to the edge of the star list
+        while (true) {
+            if (direction == 0 /* NEXT */) {
+                current_idx++;
+            } else {
+                current_idx--;
+            }
+
+            bool in_bounds;
+            if (direction == 0 /* NEXT */) {
+                in_bounds = (int16_t)MOX::_NUM_STARS > current_idx;
+            } else {
+                in_bounds = current_idx > -1;
+            }
+
+            if (!in_bounds) {
+                break;
+            }
+
+            if (found) {
+                return;
+            }
+
+            if (HAROLD::Player_Has_Colony_(player_idx, current_idx)) {
+                *p_star_idx = current_idx;
+                found = true;
+            }
+        }
+
+        if (found) {
+            return;
+        }
+
+        // Wrap around to the other side of the list if nothing was found yet
+        if (direction == 0 /* NEXT */) {
+            current_idx = 0;
+        } else {
+            current_idx = (int16_t)MOX::_NUM_STARS - 1;
+        }
+
+        while (true) {
+            bool in_bounds;
+            if (direction == 0 /* NEXT */) {
+                in_bounds = (int16_t)MOX::_NUM_STARS > current_idx;
+            } else {
+                // Backward wrap check ensures we don't pass the original star index
+                in_bounds = (*p_star_idx - 1) < current_idx;
+            }
+
+            if (!in_bounds) {
+                break;
+            }
+
+            if (found) {
+                return;
+            }
+
+            if (HAROLD::Player_Has_Colony_(player_idx, current_idx)) {
+                *p_star_idx = current_idx;
+                found = true;
+            }
+
+            if (direction == 0 /* NEXT */) {
+                current_idx++;
+            } else {
+                current_idx--;
+            }
+        }
+
+        if (!found) {
+            *p_star_idx = -1;
+        }
+    }
+
+    void __cdecl Scan_Stars_XY_(int16_t mouse_x, int16_t mouse_y) {
+        int32_t star_range_by_size[3];
+        star_range_by_size[0] = 12;
+        star_range_by_size[1] = 10;
+        star_range_by_size[2] = 8;
+
+        int16_t zoom_box_sizes[4];
+        zoom_box_sizes[0] = 39;
+        zoom_box_sizes[1] = 33;
+        zoom_box_sizes[2] = 33;
+        zoom_box_sizes[3] = 24;
+
+        bool star_processed = false;
+        _moving_a_stack = 0;
+
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (star_processed) {
+                return;
+            }
+
+            int16_t star_draw_x, star_draw_y;
+            Get_Star_Draw_Coords_(star_idx, &star_draw_x, &star_draw_y);
+
+            int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
+            int16_t box_size;
+
+            if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
+                box_size = zoom_box_sizes[zoom_level];
+            } else {
+                box_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
+            }
+
+            int32_t dx = (int32_t)star_draw_x - (int32_t)mouse_x;
+            int32_t dy = (int32_t)star_draw_y - (int32_t)mouse_y;
+            int32_t dist_sq = (dx * dx) + (dy * dy);
+
+            int32_t range = star_range_by_size[(int32_t)MOX::_star[star_idx].size];
+            if (dist_sq <= (range * range) && MOX::_mouse_XY.hovering_ship_icon_idx == -1) {
+                s_colors font_colors;
+                font_colors.colors[0] = 0;
+                font_colors.colors[1] = 10;
+                font_colors.colors[2] = 12;
+                font_colors.colors[3] = 14;
+                font_colors.colors[4] = 16;
+                font_colors.colors[5] = 18;
+                font_colors.colors[6] = 20;
+                font_colors.colors[7] = 22;
+
+                if (FLEETPOP::Some_Icon_Selected_()) {
+                    int16_t selected_ship_ids[500];
+                    HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, 500, 0xFF);
+                    SHIPMOVE::Ships_Try_To_Move_To_(selected_ship_ids, star_idx, &MOX::_g_ship_move_info);
+                    _moving_a_stack = 1;
+                }
+
+                MOX::_mouse_XY.selected = 0;
+                MOX::_mouse_XY.hovering_ship_icon_idx = -1;
+                MOX::_mouse_XY.hovering_star_idx = star_idx;
+
+                fonts::Set_Font_Style_(2, &font_colors);
+                fonts::Set_Font_Spacing_(1);
+
+                s_star_data* star_ptr = &MOX::_star[star_idx];
+                int16_t text_width = fonts::Get_String_Width_(star_ptr->name);
+                
+                char buffer[80];
+                _sprintf(buffer, s_fmt_star_len_00559984, star_ptr->name, (int32_t)text_width);
+                
+                star_processed = true;
+            }
+
+            if (fields::_field_box_mode == 1) {
+                graphics::Box_(star_draw_x - (box_size / 2), star_draw_y - (box_size / 2), box_size, box_size, 1, 10);
+            }
+        }
+    }
+
+    int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2) {
+        int16_t result = -1;
+        *star_idx_ptr_1 = -1;
+        *star_idx_ptr_2 = -1;
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            if (MOX::_galaxy_map_star_field[i] == field_id_2) {
+                result = 0;
+                *star_idx_ptr_2 = i;
+                break;
+            }
+        }
+
+        if (*star_idx_ptr_2 == -1) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                if (MOX::_galaxy_map_star_field[i] == field_id_1 && MOX::_star[i].spectral_class != STAR_CLASS_BLACK_HOLE) {
+                    result = 4;
+                    *star_idx_ptr_1 = i;
+                    break;
+                }
+            }
+        }
+
+        if (result == -1 && MOX::_galaxy_map_grid_field == field_id_2) {
+            result = 2;
+        }
+
+        return result;
+    }
+
+    void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag) {
+        int16_t colony_id = -1;
+        char msg_buffer[200];
+
+        if (key == -1110 /* 0xfbaa */) {
+            return;
+        }
+
+        if (key > -1110 && key < -1100 /* 0xfbb3 */) {
+            MAINSCR::Toggle_Game_Option_(-1101 - key);
+        }
+
+        int32_t switch_idx = (int32_t)key + 1010;
+        if (switch_idx > 9) {
+            return;
+        }
+
+        switch (switch_idx) {
+        case 0: /* DI = -1010 */
+            if (MOX::_disallow_saves_code == 0) {
+                FILEDEF::Save_Game_(9);
+                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(211 /* HESTR_0D3_GAME_SAVED */)));
+                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
+            } else {
+                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(212 /* HESTR_0D4_SAVE_GAME_FUNCTION_DIS */)));
+                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
+            }
+            break;
+
+        case 1: /* DI = -1009 */
+            MOX::_current_screen = SCREEN_DISTANCE_BETWEEN_STARS;
+            MOX::_return_screen = SCREEN_MAIN;
+            if (flag) {
+                *flag = 1;
+            }
+            break;
+
+        case 4: /* DI = -1006 (Next Star) */
+            MAINSCR::Cycle_Star_Icons_(&MOX::_system_star_id_for_auto_select, MOX::_PLAYER_NUM, 0);
+            if (MOX::_system_star_id_for_auto_select > -1 && MOX::_system_star_id_for_auto_select < MOX::_NUM_STARS) {
+                if (MOX::_settings.auto_select_colony != 0) {
+                    colony_id = HACCESS::Last_Colony_Selected_(MOX::_system_star_id_for_auto_select, MOX::_PLAYER_NUM);
+                }
+                if (colony_id > -1) {
+                    MAINSCR::Do_Colony_Screen_(colony_id, flag);
+                } else {
+                    MOX::_moveable_box[0].off_flag = MOX::_system_star_id_for_auto_select;
+                    MAINSCR::Do_System_Popup_(MOX::_system_star_id_for_auto_select);
+                }
+            }
+            break;
+
+        case 5: /* DI = -1005 (Prev Star) */
+            MAINSCR::Cycle_Star_Icons_(&MOX::_system_star_id_for_auto_select, MOX::_PLAYER_NUM, 1);
+            if (MOX::_system_star_id_for_auto_select > -1 && MOX::_system_star_id_for_auto_select < MOX::_NUM_STARS) {
+                if (MOX::_settings.auto_select_colony != 0) {
+                    colony_id = HACCESS::Last_Colony_Selected_(MOX::_system_star_id_for_auto_select, MOX::_PLAYER_NUM);
+                }
+                if (colony_id > -1) {
+                    MAINSCR::Do_Colony_Screen_(colony_id, flag);
+                } else {
+                    MOX::_moveable_box[0].off_flag = MOX::_system_star_id_for_auto_select;
+                    MAINSCR::Do_System_Popup_(MOX::_system_star_id_for_auto_select);
+                }
+            }
+            break;
+
+        case 6: /* DI = -1004 (Relocations) */
+        {
+            int8_t reloc_count = HACCESS::N_Star_Relocations_(MOX::_PLAYER_NUM);
+            if (reloc_count > 1) {
+                if (MAINSCR::_merging_relocations != 0) {
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+                    MAINSCR::_merging_relocations = 0;
+                } else {
+                    mouse::Set_Mouse_List_(&MOX::_mouse_list_relocation, 2);
+                    MAINSCR::_merging_relocations = 1;
+                }
+            } else {
+                int16_t msg_id = (reloc_count == 1) ? 209 /* 0xD1 */ : 210 /* 0xD2 */;
+                strcpy(msg_buffer, const_cast<char*>(HAROLD::H_Message_(msg_id)));
+                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 0);
+            }
+            break;
+        }
+
+        case 8: /* DI = -1002 (Next Ship) */
+        {
+            int16_t ship_idx;
+            MAINSCR::Cycle_Ship_Icons_(&MOX::_fleet_box_ship_stack, &ship_idx, 0);
+            if (ship_idx > -1 && ship_idx < MOX::_ship_icon_count) {
+                MAINSCR::Do_Fleet_Popup_(ship_idx, 0);
+            }
+            break;
+        }
+
+        case 9: /* DI = -1001 (Prev Ship) */
+        {
+            int16_t ship_idx;
+            MAINSCR::Cycle_Ship_Icons_(&MOX::_fleet_box_ship_stack, &ship_idx, 1);
+            if (ship_idx > -1 && ship_idx < MOX::_ship_icon_count) {
+                MAINSCR::Do_Fleet_Popup_(ship_idx, 0);
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
     }
 }

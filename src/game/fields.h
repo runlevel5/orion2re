@@ -37,6 +37,7 @@ namespace fields {
     inline uint16_t& _field_outline_color = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B020});
     inline uint16_t& _mouse_cancel_disabled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B018});
     inline uint16_t& _dynamic_field_refresh = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B074});
+    inline uint16_t& _field_box_mode = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B044});
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
     void __cdecl Deactivate_Auto_Function_();
@@ -49,7 +50,7 @@ namespace fields {
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str);
 
-    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int16_t delay);
+    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int32_t delay);
 
     int16_t __cdecl Get_Input_();
 

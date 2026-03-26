@@ -304,6 +304,7 @@ namespace MOX {
     inline int16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AC8});
     inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
+    inline int16_t& _system_star_id_for_auto_select = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA1A});
     inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
     inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
     inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
@@ -340,6 +341,7 @@ namespace MOX {
     inline uint8_t (&_gravity_table)[30] = *reinterpret_cast<uint8_t(*)[30]>(std::uintptr_t{0x00559580});
 
     inline s_mouse_list &_mouse_list_arrow = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D10});
+    inline s_mouse_list& _mouse_list_relocation = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005598D8});
     inline s_mouse_list (&_cmbt_mouse_list_clock) = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558DB8});
     inline s_mouse_list &_mouse_list_variable = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D20});
     inline s_mouse_list& _mouse_list_none = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00558D70});
@@ -798,6 +800,14 @@ namespace MOX {
     // Suggested name: MOX::box_visibility_flags
     inline int16_t (&_box_off_flag)[5] =
         *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x0059C420});
+
+    struct s_saved_box {
+        int16_t f0;
+        int8_t f2;
+    };
+
+    inline s_saved_box* _saved_boxes =
+        reinterpret_cast<s_saved_box*>(std::uintptr_t{0x005A1850});
 
     inline int16_t& _galaxy_map_grid_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAC});

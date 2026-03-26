@@ -22,6 +22,79 @@ namespace MAINSCR2 {
         MOX::_current_screen = MOX::_return_screen;
     }
 
+    void __cdecl Draw_Main_Screen_For_Star_Distan() {
+        int16_t star_idx = MOX::_screen_mouse_list_type;
+        s_colors local_58 = {{0x70, 0x72, 0x71, 0x72, 0x72, 0x72, 0x72, 0x72}};
+        s_colors local_60 = {{0x4C, 0x50, 0x4E, 0x50, 0x50, 0x50, 0x50, 0x50}};
+
+        MAINSCR::Draw_Mini_Main_Screen_();
+        MAINSCR::Draw_Main_Main_Screen_();
+        graphics::Set_Window_(22, 22, 527, 421);
+        video::Clip_On_();
+
+        *reinterpret_cast<int8_t*>(&MOX::_global_var) = static_cast<int8_t>(MOX::_temp_star_handle);
+
+        if (star_idx > -1) {
+            MAINSCR::Highlight_Star_(star_idx);
+            bool found = false;
+
+            if (MOX::_NUM_STARS > 0) {
+                for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                    if (found) {
+                        break;
+                    }
+
+                    if (MOX::_star_button[i] == MOX::_scanned_field && i != star_idx) {
+                        found = true;
+                        MOX::_temp_star_handle = i;
+                    }
+
+                    if (MOX::_temp_star_handle > -1 && MOX::_temp_star_handle != star_idx) {
+                        if (static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)) == MOX::_temp_star_handle) {
+                            int16_t x1, y1;
+                            int16_t x2, y2;
+
+                            MAINSCR::Get_Star_Draw_Coords_(star_idx, &x1, &y1);
+                            MAINSCR::Get_Star_Draw_Coords_(MOX::_temp_star_handle, &x2, &y2);
+
+                            int32_t distance = GEO::Parsecs_Between_Stars_(star_idx, MOX::_temp_star_handle);
+
+                            char local_50[80];
+                            if (struct_::Test_Bit_Field_(MOX::_star[star_idx].black_hole_blocks, MOX::_temp_star_handle) != 0) {
+                                fonts::Set_Outline_Color_(0, 0);
+                                fonts::Set_Font_Style_Outline_(2, &local_60);
+                                strcpy(local_50, HAROLD::H_Message_(234));
+                                MISC::Change_Font_Style_(1);
+                            } else {
+                                fonts::Set_Outline_Color_(0, 0);
+                                fonts::Set_Font_Style_Outline_(2, &local_58);
+                                _sprintf(local_50, HAROLD::H_Message_(235), distance);
+                            }
+
+                            int16_t width = fonts::Get_String_Width_(local_50);
+                            if (x2 + width + 10 <= 522) {
+                                fonts::Print_(x2 + 10, y2, local_50);
+                            } else {
+                                fonts::Print_Right_(522, y2, local_50);
+                            }
+
+                            SHIPS::Draw_Directional_Multi_Colored_Line_(
+                                x1, y1, x2, y2,
+                                &MAINSCR::_ship_direction_line_green_colors,
+                                MOX::_multi_colored_line_start
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        MOX::_multi_colored_line_start = (MOX::_multi_colored_line_start + 1) % 8;
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+    }
+
     // Suggested name: MAINSCR2::Reports_Screen_
     void __cdecl Reports_Screen_() {
         int8_t report_mode;
@@ -394,6 +467,64 @@ namespace MAINSCR2 {
         SYS::Clear_System_Display_Loaded_Flag_();
     }
 
+    void __cdecl Begin_Of_Turn_(int8_t* p_report_flag) {
+        bool is_main_palette = true;
+
+        *p_report_flag = 0;
+        MAINSCR2::Main_Screen_Report_Handler_(p_report_flag);
+
+        if (MOX::_global_esc == 1) {
+            return;
+        }
+
+        MAINSCR::Allocate_First_Screen_Seg_(5);
+
+        MOX::_ship_icon_player_id = (uint16_t)-1;
+        MOX::_eta_star_id = -1;
+        MOX::_icon_overlay_x = -1;
+        MOX::_icon_overlay_y = -1;
+
+        MAINSCR::Clear_Main_Screen_Fields_();
+        MAINSCR::Update_Star_Owners_();
+        SHIPS::Build_Ship_Icons_();
+
+        if (MOX::_game_type != 1) {
+            if (MOVEBOX::Box_Was_Open_(2) || MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+                MAINSCR2::Check_Fleet_Movement_Box_Status_();
+            }
+        }
+
+        fields::Disable_Draw_All_Fields_();
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 2);
+
+        if (p_report_flag == nullptr) {
+            is_main_palette = MAINSCR::Is_Main_Screen_Palette_();
+        }
+
+        MOVEBOX::Box_Was_Open_(0);
+        bool box_2_was_open = MOVEBOX::Box_Was_Open_(2);
+        MOVEBOX::Restore_Boxes_();
+
+        if (box_2_was_open || MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+            FLEETPOP::Reload_Ship_Selection_Status_();
+        }
+
+        if (p_report_flag != nullptr) {
+            if (box_2_was_open) {
+                MAINSCR2::Restore_Fleet_Box_Palette_();
+                fields::Enable_Draw_All_Fields_();
+                return;
+            }
+        } else {
+            if (box_2_was_open) {
+                MOX::_moveable_box[2].off_flag = 1;
+            }
+            MAINSCR::Redraw_Main_Screen_(!is_main_palette);
+        }
+
+        fields::Enable_Draw_All_Fields_();
+    }
+
     void __cdecl Do_Begin_Of_Turn_() {
         int8_t cancel_turn;
         int16_t next_turn_out;
@@ -524,5 +655,103 @@ namespace MAINSCR2 {
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         SYS::Clear_System_Display_Loaded_Flag_();
+    }
+
+    void __cdecl Redraw_Main_Screen_After_Popups_(uint8_t redraw) {
+        if (redraw) {
+            SYS::_skip_draw_system_planets = (int8_t)MOVEBOX::Moveable_Box_Selected_(0);
+            MAINSCR::Fade_Into_Main_Screen_();
+        }
+    }
+
+    void __cdecl Main_Screen_Report_Handler_(int8_t *reports_available) {
+        uint8_t pending_reports;
+        bool is_popup_report;
+
+        pending_reports = REPORT::Must_Display_Reports_(MOX::_PLAYER_NUM);
+        *reports_available = pending_reports;
+
+        if (MOX::_stardate_at_beg_of_turn != 0 && MOX::_stardate != MOX::_stardate_at_beg_of_turn) {
+            MAINSCR::_already_faded_into_main_screen = 0;
+        }
+
+        if (*reports_available == 0) {
+            if (MOX::_at_least_one_tactical_combat != 0) {
+                if (MOVEBOX::Moveable_Box_Selected_(2) != 0 || MOVEBOX::Moveable_Box_Selected_(0) != 0) {
+                    MAINSCR2::_force_main_screen_fade = 1;
+                }
+                MOX::_at_least_one_tactical_combat = 0;
+            }
+            return;
+        }
+
+        MOX::_at_least_one_report = 1;
+        MOX::_mainscr_palette = 0xff;
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
+
+        if (MOX::_stardate != MOX::_stardate_at_beg_of_turn) {
+            if (MAINSCR::Is_Main_Screen_Palette_() != 0) {
+                video::Set_Page_Off_();
+                MAINSCR::Draw_Mini_Main_Screen_();
+                RUSS::Mox_Sync_Update_();
+            } else {
+                MAINSCR::Fade_Into_Main_Screen_();
+            }
+            MOX::_stardate_at_beg_of_turn = MOX::_stardate;
+        }
+
+        do {
+            MAINSCR::_already_faded_into_main_screen = 0;
+            SYS::Clear_System_Display_Ship_Fields_();
+            SYS::Clear_System_Display_Loaded_Flag_();
+            MAINSCR::Allocate_First_Screen_Seg_(5);
+
+            MOX::_previous_report = REPORT::Display_Report_(MOX::_PLAYER_NUM);
+
+            if (MOX::_previous_report == 2 /* MSG_TYPE_DECLARE_WAR? */ || 
+                MOX::_previous_report == 5 /* MSG_TYPE_LOST_SHIP */ || 
+                MOX::_previous_report == 6 /* MSG_TYPE_SCRAP_SHIP */ || 
+                (MOX::_previous_report == 7 /* MSG_TYPE_LOST_COLONY */ && MOX::_settings.show_gnn_report != 0)) {
+                is_popup_report = true;
+            } else {
+                is_popup_report = false;
+            }
+
+            if (MOX::_global_esc == 1) {
+                return;
+            }
+
+            pending_reports = REPORT::Must_Display_Reports_(MOX::_PLAYER_NUM);
+
+            if (is_popup_report && pending_reports != 3) {
+                MAINSCR2::Redraw_Main_Screen_After_Popups_(1);
+                MAINSCR::_already_faded_into_main_screen = 1;
+            }
+
+        } while (pending_reports != 0);
+
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
+    }
+
+    void __cdecl Check_Fleet_Movement_Box_Status_() {
+        MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
+
+        if (MOX::_fleet_box_ship_stack == -1) {
+            MOVEBOX::Vanish_Fleet_Movement_Box_();
+            MOX::_saved_boxes[2].f2 = 0;
+            MOX::_saved_boxes[2].f0 = MOX::_box_off_flag[2];
+        }
+    }
+
+    void __cdecl Restore_Fleet_Box_Palette_() {
+        MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
+
+        if (MOX::_fleet_box_ship_stack == -1) {
+            MOX::_moveable_box[2].off_flag = MOX::_box_off_flag[2];
+        } else {
+            MOX::_moveable_box[2].off_flag = 1;
+            MAINSCR::Fade_Into_Main_Screen_();
+            _force_main_screen_fade = 0;
+        }
     }
 }

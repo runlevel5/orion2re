@@ -93,4 +93,10 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049E490});
         fn(x, y, w, h, color);
     }
+
+    inline void __cdecl Tint_Bitmap_Colors_(int a1, int a2, int a3, int a4, int a5, int tint_value, void* bitmap) {
+        using Fn = void(__cdecl*)(int, int, int, int, int, int, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049efb0});
+        fn(a1, a2, a3, a4, a5, tint_value, bitmap);
+    }
 }

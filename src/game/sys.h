@@ -23,6 +23,12 @@ namespace SYS {
 
     void __cdecl Clear_System_Display_Loaded_Flag_();
 
+    inline void __cdecl Clear_System_Display_Ship_Fields_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493F50});
+        fn();
+    }
+
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_id);
 
     void __cdecl Set_System_Display_Loaded_Flag_(short star_idx);

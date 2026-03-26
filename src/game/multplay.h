@@ -91,4 +91,10 @@ namespace MULTPLAY {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x005080f0})();
     }
+
+    inline uint32_t __cdecl Hotseat_Player_Status_(int16_t player_idx) {
+        using Fn = uint32_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005045f0});
+        return fn(player_idx);
+    }
 }

@@ -35,11 +35,13 @@ namespace REPORT {
         return fn(player_num, type);
     }
 
+    uint8_t __cdecl Display_Report_(int16_t report_idx);
+
     inline void __cdecl Redirect_Newly_Built_Ships_(short player_num) {
         using Fn = void(__cdecl*)(short);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB2F0});
         fn(player_num);
     }
 
-    int8_t __cdecl Must_Display_Reports_(short player_num);
+    uint8_t __cdecl Must_Display_Reports_(int16_t player_num);
 }

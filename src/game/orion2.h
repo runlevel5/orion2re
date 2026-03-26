@@ -2641,9 +2641,9 @@ typedef struct s_mouse_xy s_mouse_xy, *Ps_mouse_xy;
 
 struct s_mouse_xy {
     short ship_icon_idx;
-    short field1_0x2;
+    short hovering_ship_icon_idx;
     short star_idx;
-    short field3_0x6;
+    short hovering_star_idx;
     int8_t selected;
 };
 

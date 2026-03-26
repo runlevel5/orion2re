@@ -200,7 +200,7 @@ namespace COLONIZE {
 
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
-            if (star->colonize_player != -1) {
+            if (star->colonize_player >= 0 && star->colonize_player < 8) {
                 int16_t count = Star_N_Uncolonized_Planets_(star);
                 uncolonized_counts[star->colonize_player] += count;
             }

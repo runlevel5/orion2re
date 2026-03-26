@@ -10,6 +10,12 @@ namespace MOVEBOX {
 
     bool __cdecl Moveable_Box_Selected_(int16_t index);
 
+    inline bool __cdecl Box_Was_Open_(int16_t box_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513c80});
+        return fn(box_idx);
+    }
+
     void __cdecl Vanish_Fleet_Movement_Box_();
 
     void __cdecl Vanish_System_Display_Box_();

@@ -39,15 +39,17 @@ namespace MAINSCR {
     inline uint16_t& _zoom_box_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596192});
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
 
+    inline int8_t& _star_name_highlight_direction =
+        *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559840});
+
+    inline uint8_t& _star_name_highlight_value =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559844});
+
     void* __cdecl Allocate_First_Screen_Seg_(int32_t p);
 
     bool __cdecl Is_Main_Screen_Palette_();
 
-    inline uint8_t __cdecl Ship_Can_Be_Selected_(int16_t ship_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CD0F0});
-        return fn(ship_idx);
-    }
+    bool __cdecl Ship_Can_Be_Selected_(int16_t ship_idx);
 
     void __cdecl Draw_Main_Screen_();
 
@@ -143,10 +145,9 @@ namespace MAINSCR {
 
     void __cdecl Draw_Diplomacy_Request_Lights_();
 
-    inline void __cdecl Draw_Player_Done_Lights_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C6B40})();
-    }
+    void __cdecl Draw_Player_Done_Lights_();
+
+    void __cdecl Draw_Game_Turn_Buttons_();
 
     void __cdecl Draw_Main_Screen_Filled_(int16_t should_copy_to_back);
 
@@ -164,11 +165,7 @@ namespace MAINSCR {
 
     void __cdecl Print_Main_Screen_Data_();
 
-    inline void __cdecl Draw_Main_Screen_Before_Stencil_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C64B0});
-        fn();
-    }
+    void __cdecl Draw_Main_Screen_Before_Stencil_();
 
     void __cdecl Popup_XY_(int16_t index, int16_t x, int16_t y, int16_t* out_w, int16_t* out_h);
 
@@ -191,6 +188,8 @@ namespace MAINSCR {
     inline const char* const s_ISEEALL_00559808 = reinterpret_cast<const char*>(std::uintptr_t{0x00559808});
     inline const char* const s_SCORE_00559820 = reinterpret_cast<const char*>(std::uintptr_t{0x00559820});
     inline const char* s_Current_score_for_s_is_d = reinterpret_cast<const char*>(std::uintptr_t{0x00559908});
+    inline const char* const s_fmt_star_len_00559984 = reinterpret_cast<const char*>(0x00559984);
+    inline const char* s_ship_icon_idx_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00559974});
 
     void __cdecl Check_Hot_Keys_(int16_t key, int param_2);
 
@@ -202,17 +201,9 @@ namespace MAINSCR {
 
     void __cdecl Check_Ships_XY_(int16_t mouse_x, int16_t mouse_y, int8_t selection_id);
 
-    inline void __cdecl Scan_Stars_XY_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cc700});
-        fn(x, y);
-    }
+    void __cdecl Scan_Stars_XY_(int16_t mouse_x, int16_t mouse_y);
 
-    inline void __cdecl Scan_Ships_XY_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004cc5b0});
-        fn(x, y);
-    }
+    void __cdecl Scan_Ships_XY_(int16_t mouse_x, int16_t mouse_y);
 
     int16_t __cdecl Get_Mouse_Field_(int16_t type, int16_t* out_field, int16_t* out_index);
 
@@ -286,9 +277,11 @@ namespace MAINSCR {
 
     int16_t __cdecl Check_For_Diplomacy_Request_();
 
-    inline void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*);
-        reinterpret_cast<Fn>(0x004C8D00)(key, flag);
+    void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag);
+
+    inline void __cdecl Toggle_Game_Option_(int32_t option_idx) {
+        using Fn = void(__cdecl*)(int32_t);
+        reinterpret_cast<Fn>(0x004CD1B0)(option_idx);
     }
 
     void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode);
@@ -303,31 +296,18 @@ namespace MAINSCR {
 
     void __cdecl Set_Reload_Fleet_Box_Palette_Flag_();
 
-    inline void __cdecl Print_Highlighted_Star_Name_(short star_idx) {
-        using Fn = void(__cdecl*)(short);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ca360});
-        fn(star_idx);
-    }
+    void __cdecl Print_Highlighted_Star_Name_(int16_t star_idx);
 
     void __cdecl Highlight_Star_(short star_idx);
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
-    inline int16_t __cdecl Scan_Galaxy_Map_Fields_(uint32_t scan_input, int16_t input, int16_t* scanned_star_id, int16_t* clicked_star_id) {
-        using Fn = int16_t(__cdecl*)(uint32_t, int16_t, int16_t*, int16_t*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004CBE00})(scan_input, input, scanned_star_id, clicked_star_id);
-    }
+    int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2);
     inline void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int dir) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*, int);
         reinterpret_cast<Fn>(std::uintptr_t{0x004C4B60})(ptr, out_val, dir);
     }
-    inline void __cdecl Cycle_Star_Icons_(int16_t* ptr, int16_t player_num, int dir) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t, int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C4DB0})(ptr, player_num, dir);
-    }
+    void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
 
-    inline void __cdecl Center_Map_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004c49d0})(x, y);
-    }
+    void __cdecl Center_Map_(int16_t x, int16_t y);
 }

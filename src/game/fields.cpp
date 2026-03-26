@@ -5,12 +5,12 @@ namespace fields {
         _update_function = function_ptr;
     }
 
-    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int16_t delay) {
+    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int32_t delay) {
         _auto_active_flag = 1;
         _function = function_ptr;
 
         if (delay > 0 && delay < 10) {
-            _auto_function_delay = delay;
+            _auto_function_delay = (uint16_t)delay;
         } else {
             _auto_function_delay = 2;
         }

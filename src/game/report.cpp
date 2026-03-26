@@ -149,7 +149,11 @@ namespace REPORT {
         return (bool)result;
     }
 
-    int8_t __cdecl Must_Display_Reports_(short player_num) {
+    uint8_t __cdecl Display_Report_(int16_t report_idx) {
+        return (uint8_t)REPORT::Display_Report_Aux_(report_idx, 1);
+    }
+
+    uint8_t __cdecl Must_Display_Reports_(int16_t player_num) {
         int8_t displayed = 0;
 
         // Check if player objectives are complete (flag 100)

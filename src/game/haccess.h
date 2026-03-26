@@ -83,6 +83,11 @@ namespace HACCESS {
 
     char* __cdecl Get_Planet_Name_No_Prime_(int16_t planet_idx);
 
+    inline int8_t __cdecl N_Star_Relocations_(int16_t player_num) {
+        using Fn = int8_t(__cdecl*)(int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049AB10})(player_num);
+    }
+
     int16_t __cdecl Ship_Stack_X_(int16_t stack_idx);
     int16_t __cdecl Ship_Stack_Y_(int16_t node_idx);
 
