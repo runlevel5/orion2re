@@ -129,8 +129,7 @@ namespace COLONY {
 
     inline int32_t& _planet_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD8});
     inline int32_t& _star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E58});
-    inline int16_t (&_orbit_n)[8] =
-        *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00595E78});
+    inline int32_t& _orbit_n = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E78});
     inline uint8_t& _cheats = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559E1C});
     inline int32_t& _sys_disp_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD4});
     inline int32_t& _sys_disp_scanned_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FEC});

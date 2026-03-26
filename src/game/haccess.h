@@ -107,4 +107,16 @@ namespace HACCESS {
     }
 
     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx);
+
+    inline int16_t __cdecl Planet_Orbit_(int16_t planet_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049AC00});
+        return fn(planet_idx);
+    }
+
+    inline bool __cdecl Enemy_Ship_Going_To_My_Colony_() {
+        using Fn = bool(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049A730});
+        return fn();
+    }
 }

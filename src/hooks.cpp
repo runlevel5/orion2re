@@ -2322,6 +2322,11 @@ namespace hooks {
         { 0x00485550, &TECH::Set_Selected_Entry_ },
         { 0x004855d0, &TECH::Get_Selected_Entry_ },
         { 0x00486120, &TECH::Promote_Hyper_Field_Values_ },
+        { 0x004d9d10, &MAINSCR2::Distance_Between_Stars_Screen_ },
+        { 0x004DA200, &MAINSCR2::Planet_Colonization_In_Main_Screen_ },
+        { 0x004d9b40, &MAINSCR2::Building_Outposts_In_Main_Screen_ },
+        { 0x004da6d0, &MAINSCR2::Unloading_Transports_In_Main_Screen_ },
+        { 0x004DA9F0, &MAINSCR2::Do_Begin_Of_Turn_ },
     };
 
     void Install_Hooks()

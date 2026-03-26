@@ -552,6 +552,7 @@ workflows:
           * All variables that don't exist in the project were added to correct headers with correct namespaces
           * All functions that don't exist in the project were added as stubs to header files with correct namespaces
           * If external function did not exist, you wrote a stub
+          * If external function exists in the header as a definition, you did not convert it to a stub
           * All mentioned namespaces were processed
           * No existing function signatures were changed
           * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address

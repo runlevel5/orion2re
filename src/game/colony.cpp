@@ -1985,7 +1985,7 @@ namespace COLONY {
         _colony_handle = param_1;
         _planet_handle = MOX::_colony[param_1].planet;
         _star_handle = MOX::_planet[_planet_handle].star_index;
-        *reinterpret_cast<int32_t*>(_orbit_n) = MOX::_planet[_planet_handle].orbit;
+        _orbit_n = MOX::_planet[_planet_handle].orbit;
     }
 
     /**

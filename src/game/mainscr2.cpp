@@ -97,23 +97,92 @@ namespace MAINSCR2 {
         fields::Deactivate_Auto_Function_();
     }
 
-    void __cdecl Scrap_Freighters_(void) {
-        char buffer[200];
-        bool box_selected;
-        int16_t max_scrapable;
-        int16_t scrap_count;
-        int16_t confirm_scrap = 1;
-        const char* msg;
-        const char* plural_scrap;
-        const char* plural_surplus;
-        s_player* player;
+    void __cdecl Distance_Between_Stars_Screen_() {
+        fields::Clear_Fields_();
+        MAINSCR::Clear_Main_Screen_Fields_();
 
-        box_selected = MOVEBOX::Moveable_Box_Selected_(2);
-        max_scrapable = settler::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
+        graphics::Set_Window_(22, 22, 527, 421);
+        video::Clip_On_();
+        MAINSCR::Add_Star_Fields_();
+        video::Clip_Off_();
+        graphics::Reset_Window_();
 
-        if (max_scrapable <= 0) {
-            strcpy(buffer, HAROLD::H_Message_(0xE6));
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 3);
+        int16_t hotkey = fields::Add_Hot_Key_(s__00551120);
+        int16_t starmap_field = fields::Add_Hidden_Field_(22, 22, 506, 400, s__00551100, 41);
+
+        bool done = false;
+        int16_t full_screen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+
+        fields::Assign_Auto_Function_(Draw_Main_Screen_For_Star_Distan, 2);
+
+        MOX::_screen_mouse_list_type = -1;
+        MOX::_temp_star_handle = -1;
+
+        video::Set_Page_Off_();
+        MAINSCR::Draw_Main_Screen_Filled_(0);
+        palette::Set_Palette_Changes_(0, 255);
+        remap::Update_Glass_Remap_Colors_();
+
+        MISC::_Darken_Fill_(0, 0, 21, 479);
+        MISC::_Darken_Fill_(0, 0, 639, 21);
+        MISC::_Darken_Fill_(527, 0, 639, 479);
+        MISC::_Darken_Fill_(21, 421, 527, 479);
+
+        video::Copy_Off_To_Back_();
+
+        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0xFF;
+
+        do {
+            timer::Mark_Time_();
+
+            int16_t input = fields::Get_Input_();
+            MOX::_scanned_field = fields::Scan_Input_();
+
+            if (MOX::_screen_mouse_list_type == -1) {
+                mouse::Set_Mouse_List_(_mouse_list_from, 5);
+            } else {
+                mouse::Set_Mouse_List_(_mouse_list_to, 5);
+            }
+
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                int16_t btn = MOX::_star_button[i];
+                if (input == btn) {
+                    MOX::_screen_mouse_list_type = i;
+                } else if (input + btn == 0) {
+                    done = true;
+                }
+            }
+
+            if (input == full_screen_field ||
+                input + full_screen_field == 0 ||
+                input + starmap_field == 0 ||
+                input == -1009 /* 0xfc0f */ ||
+                input == hotkey) {
+                done = true;
+            }
+
+            if (!done) {
+                video::Set_Page_Off_();
+                Draw_Main_Screen_For_Star_Distan();
+                RUSS::Mox_Sync_Update_();
+            }
+
+            timer::Release_Time_(1);
+        } while (!done);
+
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        MOX::_current_screen = 0;
+    }
+
+    void __cdecl Scrap_Freighters_() {
+        char local_c8[200];
+
+        int16_t selected_box = MOVEBOX::Moveable_Box_Selected_(2);
+        int16_t scrap_amount = settler::N_Freighters_Player_Can_Scrap_(MOX::_PLAYER_NUM);
+
+        if (scrap_amount <= 0) {
+            strcpy(local_c8, HAROLD::H_Message_(0xe6 /* HESTR_0E6_NO_SHIPS_SELECTED */));
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 3);
         } else {
             fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
             EVANHELP::Set_Scrap_Freighters_Help_List_();
@@ -121,64 +190,339 @@ namespace MAINSCR2 {
             MOX::_moveable_box[2].off_flag = 0;
             fields::Disable_Draw_All_Fields_();
             video::Set_Page_Off_();
-            graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+            graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
             MAINSCR::Draw_Mini_Main_Screen_();
             RUSS::Mox_Sync_Update_();
             fields::Enable_Draw_All_Fields_();
 
-            msg = HAROLD::H_Message_(0xED);
-            scrap_count = MAINPUPS::Slider_Popup_(0, max_scrapable, 0, msg, 0);
+            int16_t count = MAINPUPS::Slider_Popup_(0, scrap_amount, 0, HAROLD::H_Message_(0xed), 0);
+            if (count >= 0) {
+                s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
+                int16_t box_result = 1;
 
-            if (scrap_count >= 0) {
-                player = &MOX::_player[MOX::_PLAYER_NUM];
+                if (plr->n_freighters <= count || plr->surplus_freighters <= count) {
+                    const char* str1 = HAROLD::H_Message_((count == 1) ? 0xf0 /* HESTR_0F0_FREIGHTER */ : 0xf1 /* HESTR_0F1_FREIGHTERS */);
+                    const char* str2 = HAROLD::H_Message_((plr->surplus_freighters == 1) ? 0xf0 : 0xf1);
+                    _sprintf(local_c8, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
+                    box_result = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 1);
+                }
 
-                // If player attempts to scrap more than current surplus, or all freighters, ask for confirmation
-                if (player->n_freighters <= scrap_count || player->surplus_freighters <= scrap_count) {
-                    if (scrap_count == 1) {
-                        plural_scrap = HAROLD::H_Message_(0xF0 /* HESTR_0F0_FREIGHTER */);
-                    } else {
-                        plural_scrap = HAROLD::H_Message_(0xF1 /* HESTR_0F1_FREIGHTERS */);
+                if (box_result != 0 && count > 0) {
+                    const char* str3 = HAROLD::H_Message_((count == 1) ? 0xf0 : 0xf1);
+                    _sprintf(local_c8, HAROLD::H_Message_(0xef), count, str3);
+                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
+
+                    int16_t new_freighters = plr->n_freighters - count;
+                    if (new_freighters <= 0) {
+                        new_freighters = 0;
                     }
+                    plr->n_freighters = new_freighters;
 
-                    if (player->surplus_freighters == 1) {
-                        plural_surplus = HAROLD::H_Message_(0xF0);
-                    } else {
-                        plural_surplus = HAROLD::H_Message_(0xF1);
-                    }
-
-                    const char* format = HAROLD::H_Message_(0xEE);
-                    _sprintf(buffer, format, (int)player->surplus_freighters, plural_surplus, (int)scrap_count, plural_scrap);
-                    confirm_scrap = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 1);
+                    COLCALC::Do_Player_Colony_Calculations_(MOX::_PLAYER_NUM);
                 }
-            }
-
-            if (confirm_scrap != 0 && scrap_count > 0) {
-                if (scrap_count == 1) {
-                    plural_scrap = HAROLD::H_Message_(0xF0);
-                } else {
-                    plural_scrap = HAROLD::H_Message_(0xF1);
-                }
-
-                const char* result_format = HAROLD::H_Message_(0xEF);
-                _sprintf(buffer, result_format, (int)scrap_count, plural_scrap);
-                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
-
-                player = &MOX::_player[MOX::_PLAYER_NUM];
-                int32_t new_count = player->n_freighters - scrap_count;
-                if (new_count < 0) {
-                    new_count = 0;
-                }
-                player->n_freighters = (int16_t)new_count;
-
-                COLCALC::Do_Player_Colony_Calculations_(MOX::_PLAYER_NUM);
             }
         }
 
         MOX::_current_screen = MOX::_return_screen;
-        if (box_selected) {
+        if (selected_box != 0) {
             MOX::_moveable_box[2].off_flag = 1;
         }
+
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
+    }
+
+    void __cdecl Building_Outposts_In_Main_Screen_() {
+        int8_t saved_expanding_help = MOX::_settings.expanding_help;
+        bool skip_draw = false;
+
+        int16_t star_id = SHIPSTAK::Ship_Stack_Star_Id_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+
+        if (MOX::_settings.expanding_help != 0) {
+            MOX::_settings.expanding_help = 0;
+        }
+
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
+        fields::Clear_Fields_();
+        MOVEBOX::Vanish_Fleet_Movement_Box_();
+        fields::Disable_Draw_All_Fields_();
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
+        MAINSCR::Draw_Mini_Main_Screen_();
+        RUSS::Mox_Sync_Update_();
+        fields::Enable_Draw_All_Fields_();
+
+        int16_t new_outpost_star_id = MAINPUPS::New_Outpost_Selection_Popup_(star_id);
+
+        if (new_outpost_star_id > -1) {
+            bool found_outpost_ship = false;
+            int16_t outpost_ship_id = 0;
+
+            if (MOX::_fleet_box.count > 0) {
+                for (int16_t i = 0; i < MOX::_fleet_box.count; ++i) {
+                    int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(i);
+
+                    if (MOX::_ship[ship_id].d.ship_type == 4) {
+                        found_outpost_ship = true;
+                        outpost_ship_id = ship_id;
+                        break;
+                    }
+                }
+            }
+
+            if (found_outpost_ship) {
+                COLONIZE::Make_New_Outpost_(new_outpost_star_id, MOX::_PLAYER_NUM);
+                MOX::_ship[outpost_ship_id].status = 5;
+
+                if (MOX::_fleet_box.count == 1) {
+                    skip_draw = true;
+                }
+
+                MOX::_first_node_ptr_in_stack_ = -1;
+                MOX::_fleet_icon_buttons_added--;
+            }
+        }
+
+        if (!skip_draw) {
+            video::Set_Page_Off_();
+            MAINSCR::Draw_Main_Screen_Filled_(1);
+            MAINSCR::Draw_Main_Screen_();
+            RUSS::Mox_Sync_Update_();
+            KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
+
+            MOX::_moveable_box[2].off_flag = 1;
+
+            SHIPS::Build_Ship_Icons_();
+            MOX::_eta_star_id = -1;
+            MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
+
+            if (MOX::_fleet_box_ship_stack == -1) {
+                MOVEBOX::Vanish_Fleet_Movement_Box_();
+            }
+        }
+
+        MOX::_current_screen = MOX::_return_screen;
+        MOX::_settings.expanding_help = saved_expanding_help;
+
+        fields::Clear_Fields_();
+        fields::Deactivate_Auto_Function_();
+        SYS::Clear_System_Display_Loaded_Flag_();
+    }
+
+    void __cdecl Planet_Colonization_In_Main_Screen_() {
+        int8_t saved_expanding_help = MOX::_settings.expanding_help;
+        bool do_animation = false;
+        bool single_fleet_ship = false;
+
+        int16_t star_idx = SHIPSTAK::Ship_Stack_Star_Id_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+        namestar::Can_Change_Star_Name_(star_idx);
+
+        if (MOX::_settings.expanding_help != 0) {
+            MOX::_settings.expanding_help = 0;
+        }
+
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
+        fields::Clear_Fields_();
+        MOVEBOX::Vanish_Fleet_Movement_Box_();
+        fields::Disable_Draw_All_Fields_();
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 639, 479, 0);
+        MAINSCR::Draw_Mini_Main_Screen_();
+        RUSS::Mox_Sync_Update_();
+        fields::Enable_Draw_All_Fields_();
+
+        int16_t planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, 1);
+
+        if (planet_idx > -1) {
+            bool found_colony_ship = false;
+            int16_t ship_idx = saved_expanding_help;
+
+            if (MOX::_fleet_box.count > 0) {
+                for (int16_t box_idx = 0; box_idx < MOX::_fleet_box.count; ++box_idx) {
+                    int16_t current_ship_idx = HACCESS::Fleet_Movement_Ship_Id_(box_idx);
+                    if (MOX::_ship[current_ship_idx].d.ship_type == 1) {
+                        found_colony_ship = true;
+                        ship_idx = current_ship_idx;
+                        break;
+                    }
+                }
+            }
+
+            if (found_colony_ship) {
+                if (MOX::_settings.animations_on != 0) {
+                    do_animation = true;
+                }
+
+                COLONIZE::Make_New_Colony_(planet_idx, MOX::_PLAYER_NUM);
+                MOX::_ship[ship_idx].status = 5;
+
+                if (MOX::_fleet_box.count == 1) {
+                    single_fleet_ship = true;
+                }
+
+                MOX::_first_node_ptr_in_stack_ = -1;
+                MOX::_fleet_icon_buttons_added--;
+            }
+        }
+
+        if (do_animation) {
+            MOX::_screen_data = star_idx;
+            COLONY::_orbit_temp = HACCESS::Planet_Orbit_(planet_idx);
+            COLLAND::Colony_Landing_Screen_();
+            MISC::Fade_Into_Screen_(MAINSCR::Draw_Mini_Main_Screen_, &MOX::_draw_main_screen_to_back, 0);
+        }
+
+        if (!single_fleet_ship) {
+            video::Set_Page_Off_();
+            MAINSCR::Draw_Main_Screen_Filled_(1);
+            MAINSCR::Draw_Main_Screen_();
+            RUSS::Mox_Sync_Update_();
+            KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
+            MOX::_moveable_box[2].off_flag = 1;
+            SHIPS::Build_Ship_Icons_();
+            MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
+
+            if (MOX::_fleet_box_ship_stack == -1) {
+                MOVEBOX::Vanish_Fleet_Movement_Box_();
+            }
+        }
+
+        MOX::_current_screen = MOX::_return_screen;
+        MOX::_settings.expanding_help = saved_expanding_help;
+        fields::Clear_Fields_();
+        fields::Deactivate_Auto_Function_();
+        SYS::Clear_System_Display_Loaded_Flag_();
+    }
+
+    void __cdecl Do_Begin_Of_Turn_() {
+        int8_t cancel_turn;
+        int16_t next_turn_out;
+        s_colors font_colors;
+        char msg_buffer[80];
+
+        _in_reports_phase = 1;
+        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0;
+
+        Begin_Of_Turn_(&cancel_turn);
+
+        MAINSCR::_officer_screen_return_screen = 0x27; /* '\'' */
+
+        bool enemy_ship_coming = HACCESS::Enemy_Ship_Going_To_My_Colony_();
+
+        if (MOX::_settings.end_of_turn_wait != 0 ||
+            cancel_turn != 0 ||
+            REPORT::_something_interesting_happened[MOX::_PLAYER_NUM] != 0 ||
+            MAINSCR::_next_turn_hit == 0 ||
+            MOX::_game_type != 0 ||
+            enemy_ship_coming) {
+
+            MAINSCR::_check_next_turn_exit_field = 0;
+            mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+            MAINSCR::_next_turn_hit = 0;
+            fields::Clear_Fields_();
+
+        } else {
+            MAINSCR::_check_next_turn_exit_field = 1;
+            MOX::_animated_star = -1;
+
+            fields::Disable_Draw_All_Fields_();
+            fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
+            video::Set_Page_Off_();
+            MAINSCR::Draw_Mini_Main_Screen_();
+
+            HAROLD::Get_Player_Font_Colors_(MOX::_PLAYER_NUM, 3, &font_colors, false);
+            fonts::Set_Font_Style_(3, &font_colors);
+
+            int32_t stardate_mod = MOX::_stardate % 10;
+            int32_t stardate_div = MOX::_stardate / 10;
+            char* race_name = MOX::_player[MOX::_PLAYER_NUM].race_name;
+            char* format = const_cast<char*>(HAROLD::H_Message_(0xE9));
+
+            _sprintf(msg_buffer, format, race_name, stardate_div, stardate_mod);
+
+            int16_t str_width = fonts::Get_String_Width_(msg_buffer);
+            int16_t font_height = fonts::Get_Font_Height_();
+
+            int16_t box_w = str_width + 8;
+            int16_t box_h = font_height + 4;
+
+            int16_t box_x = (506 - box_w) / 2 + 21;
+            int16_t box_y = (400 - box_h) / 2 + 21;
+
+            palette::Set_Palette_Changes_(0, 0xFF);
+            remap::Update_Glass_Remap_Colors_();
+
+            MISC::Draw_Darkened_Box_(box_x, box_y, box_w, box_h, font_colors.colors[1]);
+            fonts::Print_(box_x + 8, box_y + 6, msg_buffer);
+
+            RUSS::Mox_Sync_Update_();
+            fields::Enable_Draw_All_Fields_();
+
+            MAINSCR::Do_Next_Turn_(&next_turn_out, 1);
+        }
+
+        _in_reports_phase = 0;
+    }
+
+    void __cdecl Unloading_Transports_In_Main_Screen_() {
+        int8_t original_expanding_help = MOX::_settings.expanding_help;
+        bool unloaded_all = false;
+
+        int16_t star_id = SHIPSTAK::Ship_Stack_Star_Id_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+
+        if (MOX::_settings.expanding_help != 0) {
+            MOX::_settings.expanding_help = 0;
+        }
+
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
+        fields::Clear_Fields_();
+        MOVEBOX::Vanish_Fleet_Movement_Box_();
+        fields::Disable_Draw_All_Fields_();
+        video::Set_Page_Off_();
+
+        graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
+        MAINSCR::Draw_Mini_Main_Screen_();
+        RUSS::Mox_Sync_Update_();
+        fields::Enable_Draw_All_Fields_();
+
+        star_id = MAINPUPS::Drop_Troops_Selection_Popup_(star_id);
+
+        if (star_id >= 0) {
+            int16_t colony_index = MOX::_planet[star_id].colony_index;
+            if (colony_index >= 0) {
+                if (MOX::_colony[colony_index].owner == MOX::_PLAYER_NUM) {
+                    int16_t ship_ids[500];
+                    int32_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(ship_ids, 500, 2);
+                    int16_t unloaded = invasion::Unload_Transports_(&MOX::_colony[colony_index], ship_ids, count);
+
+                    if (MOX::_fleet_box.count == unloaded) {
+                        unloaded_all = true;
+                    }
+                    MOX::_first_node_ptr_in_stack_ = -1;
+                    MOX::_fleet_icon_buttons_added--;
+                }
+            }
+        }
+
+        if (!unloaded_all) {
+            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+            video::Set_Page_Off_();
+            MAINSCR::Draw_Main_Screen_Filled_(1);
+            MAINSCR::Draw_Main_Screen_();
+            RUSS::Mox_Sync_Update_();
+            KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
+            MOX::_moveable_box[2].off_flag = 1;
+
+            MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
+            if (MOX::_fleet_box_ship_stack == -1) {
+                MOVEBOX::Vanish_Fleet_Movement_Box_();
+            }
+        }
+
+        MOX::_current_screen = MOX::_return_screen;
+        MOX::_settings.expanding_help = original_expanding_help;
+        fields::Clear_Fields_();
+        fields::Deactivate_Auto_Function_();
+        SYS::Clear_System_Display_Loaded_Flag_();
     }
 }

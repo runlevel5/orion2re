@@ -75,4 +75,22 @@ namespace MAINPUPS {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t);
         return reinterpret_cast<Fn>(0x0045cc60)(min_val, max_val, field2, title, initial_val);
     }
+
+    inline int16_t __cdecl New_Colony_Selection_Popup_(int16_t star_idx, int16_t arg2) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045BCA0});
+        return fn(star_idx, arg2);
+    }
+
+    inline int16_t __cdecl New_Outpost_Selection_Popup_(int16_t star_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045BC80});
+        return fn(star_id);
+    }
+
+    inline int16_t __cdecl Drop_Troops_Selection_Popup_(int16_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045bc60});
+        return fn(star_idx);
+    }
 }

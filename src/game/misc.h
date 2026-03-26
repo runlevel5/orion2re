@@ -87,4 +87,10 @@ namespace MISC {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0049e510})(x, y, w, h, colors);
     }
+
+    inline void __cdecl Draw_Darkened_Box_(int16_t x, int16_t y, int16_t w, int16_t h, uint32_t color) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049E490});
+        fn(x, y, w, h, color);
+    }
 }

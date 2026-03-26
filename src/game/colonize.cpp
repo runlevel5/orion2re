@@ -190,13 +190,9 @@ namespace COLONIZE {
     }
 
     void Allocate_New_Colony_Slots_() {
-        uint16_t uncolonized_counts[8];
-        uint16_t allocated_counts[8];
-        uint8_t free_slots_indices[250];
-
-        memset(&uncolonized_counts, 0, sizeof(uncolonized_counts));
-        memset(&allocated_counts, 0, sizeof(allocated_counts));
-        memset(&free_slots_indices, 0, sizeof(free_slots_indices));
+        uint16_t uncolonized_counts[8] = { 0 };
+        uint16_t allocated_counts[8] = { 0 };
+        uint8_t free_slots_indices[250] = { 0 };
 
         int16_t free_slots_count = 0;
 
@@ -204,7 +200,7 @@ namespace COLONIZE {
 
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
-            if (star->colonize_player < 8) {
+            if (star->colonize_player != -1) {
                 int16_t count = Star_N_Uncolonized_Planets_(star);
                 uncolonized_counts[star->colonize_player] += count;
             }

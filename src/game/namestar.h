@@ -27,4 +27,10 @@ namespace namestar {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004116e0});
         return fn(buffer, max_chars, width, title, x, y);
     }
+
+    inline void __cdecl Can_Change_Star_Name_(short star_id) {
+        using Fn = void(__cdecl*)(short);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00411E10});
+        fn(star_id);
+    }
 }

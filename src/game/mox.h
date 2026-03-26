@@ -301,7 +301,7 @@ namespace MOX {
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
     inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});
-    inline uint16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597AC8});
+    inline int16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AC8});
     inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
     inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
@@ -310,7 +310,7 @@ namespace MOX {
     inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});
     inline uint16_t& _global_exit_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D7A});
     inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
-    inline uint16_t& _eta_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BAAE});
+    inline int16_t& _eta_star_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAAE});
     inline int16_t& _stencil_box_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B2C});
     inline int16_t& _draw_main_screen_stencilled = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1864});
     inline uint16_t& _animated_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B5F0});
@@ -507,7 +507,7 @@ namespace MOX {
     inline s_animation_header*& _main_leaders_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A2BF0});
     inline s_animation_header*& _main_races_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B42C});
     inline s_animation_header*& _main_info_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596E74});
-    inline int16_t& _star_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2C50});
+    inline int16_t* _star_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A2C50});
     inline int16_t& _main_screen_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977F2});
     inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
     inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
@@ -736,7 +736,7 @@ namespace MOX {
     inline uint8_t& _fleet_movement_icons_on =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596C9C});
 
-    inline uint16_t& _fleet_icon_buttons_added = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B38});
+    inline int16_t& _fleet_icon_buttons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B38});
 
     inline s_animation_header*& _fleet_box_name_sm_seg_0059736C =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059736C});
@@ -772,6 +772,8 @@ namespace MOX {
     inline int16_t& _popup_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597710});
     inline int16_t& _popup_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059770E});
     inline int16_t& _screen_data = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B20});
+    inline int16_t& _screen_mouse_list_type = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005a1b26 });
+    inline int16_t& _temp_star_handle = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005a1b28 });
     inline uint8_t& _moving_a_stack = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEB4});
     inline uint8_t& _track_time_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEC0});
     inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});

@@ -1094,7 +1094,7 @@ namespace MAINSCR {
         video::Clip_On_();
         MISC::Restore_Window_Status_(window_status);
 
-        _first_field = MOX::_star_button;
+        _first_field = MOX::_star_button[0];
 
         if (_debug_enabled) {
             _debug_field = fields::Add_Hidden_Field_(630, 470, 639, 479, s__00551100, 0);

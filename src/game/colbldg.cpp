@@ -377,8 +377,8 @@ namespace COLBLDG {
         uint32_t original_seed = random::Get_Random_Seed_();
         random::Set_Random_Seed_(static_cast<uint32_t>(COLONY::_colony_handle));
 
-        COLONY::_star_handle = static_cast<int32_t>(MOX::_screen_data);
-        *reinterpret_cast<int32_t*>(COLONY::_orbit_n) = static_cast<int32_t>(COLONY::_orbit_temp);
+        COLONY::_star_handle = MOX::_screen_data;
+        COLONY::_orbit_n = COLONY::_orbit_temp;
 
         int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
         COLONY::_planet_handle = static_cast<int32_t>(planet_idx);
