@@ -318,7 +318,7 @@ namespace MOX {
     inline s_mouse_list (&_mouse_list_zoom_mode)[5] = *reinterpret_cast<s_mouse_list(*)[5]>(std::uintptr_t{0x00559898});
     inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
     inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
-    inline uint16_t& _first_fleet_movement_icon = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D4A});
+    inline int16_t& _first_fleet_movement_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D4A});
 
     inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
 
@@ -568,8 +568,8 @@ namespace MOX {
         *reinterpret_cast<s_animation_header* (*)[112]>(std::uintptr_t{0x005A47F0});
     inline s_animation_header* (&_ship_cursor)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BF00});
     inline s_animation_header* (&_shield_div_bitmap)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x0059BFA0});
-    inline s_animation_header* (&_fltscrn_monster_ship_icon)[8] =
-        *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x0059BFC0});
+    inline s_animation_header* (&_fltscrn_monster_ship_icon)[7] =
+        *reinterpret_cast<s_animation_header*(*)[7]>(std::uintptr_t{0x0059BFC0});
     inline s_animation_header** _shield_mask_bitmap = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BAE0});
     inline int16_t* _fighter_beam_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B450});
     inline int16_t* _fighter_bomb_type = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D80});
@@ -757,6 +757,9 @@ namespace MOX {
 
     inline s_animation_header*& _fleet_box_grid_lg_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BEEC});
+
+    inline int16_t* _fleet_movement_box_ptr =
+            reinterpret_cast<int16_t*>(std::uintptr_t{0x00596210});
 
     inline s_fleet_box& _fleet_box =
         *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});

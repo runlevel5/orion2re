@@ -87,7 +87,7 @@ namespace HAROLD {
 
     void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2);
 
-    int16_t __cdecl Map_Scale_To_Zoom_Level_();
+    int8_t __cdecl Map_Scale_To_Zoom_Level_();
 
     void __cdecl Decrement_Zoom_Count_();
 
@@ -95,7 +95,12 @@ namespace HAROLD {
 
     void __cdecl Increment_Zoom_Count_();
 
-    int16_t __cdecl Get_Map_Scale_(int16_t param_1);
+    int16_t __cdecl Get_Map_Scale_(int16_t layer_type);
+
+    inline void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* colors, uint32_t color_inc) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, uint32_t);
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1FB0 })(x1, y1, x2, y2, colors, color_inc);
+    }
 
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 

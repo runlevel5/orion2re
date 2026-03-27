@@ -124,4 +124,10 @@ namespace HACCESS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049A730});
         return fn();
     }
+
+    inline void __cdecl Set_All_Colony_Auto_Select_Flags_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049add0});
+        fn();
+    }
 }

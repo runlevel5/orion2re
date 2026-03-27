@@ -1470,11 +1470,11 @@ struct s_fleet_box {
     struct s_animation_header *name_sm_seg2;
     int8_t is_small_frame;
     int8_t mouse_pressed;
-    int8_t field14_0x1c;
-    int8_t field15_0x1d;
-    int8_t field16_0x1e;
-    int8_t field17_0x1f;
-    int8_t field18_0x20;
+    int8_t attack_btn_active;
+    int8_t engage_btn_active;
+    int8_t colonize_btn_active;
+    int8_t transport_btn_active;
+    int8_t outpost_btn_active;
 };
 
 typedef struct s_fleet_movement_icon s_fleet_movement_icon, *Ps_fleet_movement_icon;
@@ -2658,7 +2658,7 @@ struct s_movable_box {
     int16_t y;
     int16_t active;
     int16_t field;
-    int16_t field8_0x10;
+    int16_t close_btn;
     int16_t field9_0x12;
     int16_t field10_0x14;
     int16_t field11_0x16;

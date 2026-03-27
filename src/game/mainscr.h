@@ -32,11 +32,13 @@ namespace MAINSCR {
     inline int8_t& _mouse_btn_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC8});
     inline int8_t& _merging_relocations = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED0});
     inline int8_t& _warn_about_cheaters = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED4});
-    inline int8_t& _zoom_box_increment_value = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED8});
-    inline int8_t& _officer_screen_return_screen = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596184});
-    inline int8_t& _next_turn_hit = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059618C});
-    inline uint16_t& _zoom_box_x = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059618E});
-    inline uint16_t& _zoom_box_y = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596192});
+    inline uint8_t& _zoom_box_counter = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEA4 });
+    inline uint8_t& _zoom_box_color_increment = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEAC });
+    inline uint8_t& _zoom_box_increment_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CED8 });
+    inline int8_t& _officer_screen_return_screen = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00596184 });
+    inline int8_t& _next_turn_hit = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059618C });
+    inline int16_t& _zoom_box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059618E });
+    inline int16_t& _zoom_box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00596192 });
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
 
     inline int8_t& _star_name_highlight_direction =
@@ -216,10 +218,7 @@ namespace MAINSCR {
         return reinterpret_cast<Fn>(std::uintptr_t{0x00527680})();
     }
 
-    inline void __cdecl Set_Painted_Fleet_Fields_(int16_t field) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004CD040})(field);
-    }
+    void __cdecl Set_Painted_Fleet_Fields_(int16_t field_to_select);
 
     void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_();
 
@@ -255,15 +254,7 @@ namespace MAINSCR {
         reinterpret_cast<Fn>(0x004F0E20)();
     }
 
-    inline int16_t __cdecl Get_Map_Scale_(int16_t zoom) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x004F0880)(zoom);
-    }
-
-    inline void __cdecl Draw_Main_Screen_For_Zooming_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004C9C30)();
-    }
+    void __cdecl Draw_Main_Screen_For_Zooming_();
 
     int16_t __cdecl Get_New_Paralax_XYs_(int16_t target_map_x, int16_t target_map_y, int16_t scale);
 
@@ -279,10 +270,7 @@ namespace MAINSCR {
 
     void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag);
 
-    inline void __cdecl Toggle_Game_Option_(int32_t option_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(0x004CD1B0)(option_idx);
-    }
+    void __cdecl Toggle_Game_Option_(int32_t option_idx);
 
     void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode);
 
@@ -303,10 +291,9 @@ namespace MAINSCR {
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
     int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2);
-    inline void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int dir) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*, int);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004C4B60})(ptr, out_val, dir);
-    }
+    int __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor);
+    int32_t __cdecl Zoom_Box_Height_(int16_t height, int16_t divisor);
+    void __cdecl Cycle_Ship_Icons_(int16_t* ptr, int16_t* out_val, int16_t dir);
     void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
 
     void __cdecl Center_Map_(int16_t x, int16_t y);

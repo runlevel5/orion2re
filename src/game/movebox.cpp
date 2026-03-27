@@ -133,7 +133,7 @@ namespace MOVEBOX {
         MOX::_fleet_movement_all_button = -1000;
         MOX::_fleet_box_colonize_button = -1000;
         MOX::_moveable_box[2].field = -1000;
-        MOX::_moveable_box[2].field8_0x10 = -1000;
+        MOX::_moveable_box[2].close_btn = -1000;
 
         MOX::_mouse_XY.ship_icon_idx = -1;
         MOX::_eta_star_id = -1;
@@ -157,7 +157,7 @@ namespace MOVEBOX {
         }
 
         MOX::_moveable_box[0].field = -1000;
-        MOX::_moveable_box[0].field8_0x10 = -1000;
+        MOX::_moveable_box[0].close_btn = -1000;
     }
 
     bool __cdecl Mouse_Within_Fleet_Box_() {

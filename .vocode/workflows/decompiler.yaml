@@ -514,7 +514,8 @@ workflows:
               Add `{ 0x005277b0, &WinMain_Proxy },` to `src/hooks.cpp` as the very last item and before the closing brace of 
               the `all_hooks` list.
           * You are not allowed to edit any structures
-          * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed.
+          * Provide a very short summary of changes made. Do not show diffs, just a sentence per action completed. User does not need
+            to see the changes you're making, use the tool to apply them to the codebase.
           * Received input might be inaccurate and won't match existing codebase conventions or data types. In this case, follow
             existing codebase conventions.
           * If structure field does not seem to exist - you MUST emit it as provided in the input. You are NOT allowed to

@@ -553,7 +553,7 @@ namespace MAINSCR {
             }
 
             if (MOVEBOX::Moveable_Box_Selected_(0) && MOX::_skip_fields == 0) {
-                if (MOX::_system_star_id > -1 && MOX::_system_star_id < MOX::_NUM_STARS && input != MOX::_moveable_box[0].field8_0x10) {
+                if (MOX::_system_star_id > -1 && MOX::_system_star_id < MOX::_NUM_STARS && input != MOX::_moveable_box[0].close_btn) {
                     int mx = mouse::Pointer_X_();
                     int my = mouse::Pointer_Y_();
 

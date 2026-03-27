@@ -1056,7 +1056,7 @@ namespace MAINSCR {
             Clear_Main_Screen_Fields_();
             for (int i = 0; i < 5; ++i) {
                 MOX::_moveable_box[i].field = -1000;
-                MOX::_moveable_box[i].field8_0x10 = -1000;
+                MOX::_moveable_box[i].close_btn = -1000;
             }
 
             _zoom_in_button = fields::Add_Button_Field_(244, 428, s__00551100, MOX::_main_zoom_in_button_seg, s_plus_00551118, 0x28);
@@ -2074,6 +2074,29 @@ namespace MAINSCR {
      * @param target_x Desired center X coordinate.
      * @param target_y Desired center Y coordinate.
      */
+    void __cdecl Set_Painted_Fleet_Fields_(int16_t field_to_select) {
+        int16_t box_ptr_idx = 0;
+        int16_t icon_idx = MOX::_first_fleet_movement_icon;
+        int32_t limit = (int32_t)MOX::_fleet_icon_buttons_added + (int32_t)icon_idx;
+
+        if (limit > (int32_t)MOX::_fleet_box.count) {
+            limit = (int32_t)MOX::_fleet_box.count;
+        }
+
+        while (icon_idx < (int16_t)limit) {
+            if (MOX::_fleet_movement_icon[icon_idx].field == field_to_select) {
+                int16_t movement_icon_idx = MOX::_fleet_movement_box_ptr[box_ptr_idx];
+                int16_t node_idx = MOX::_fleet_movement_icon[movement_icon_idx].ship_node_idx;
+
+                if (MAINSCR::Ship_Can_Be_Selected_(MOX::_ship_node[node_idx].ship_idx)) {
+                    MOX::_ship_node[node_idx].selected = (int8_t)MAINSCR::_fltpop_field_selection_status;
+                }
+            }
+            box_ptr_idx++;
+            icon_idx++;
+        }
+    }
+
     void __cdecl Center_Map_(int16_t target_x, int16_t target_y) {
         int16_t old_x = MOX::_cur_map_x;
         int16_t old_y = MOX::_cur_map_y;
@@ -2721,6 +2744,249 @@ namespace MAINSCR {
 
         default:
             break;
+        }
+    }
+
+    int __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor) {
+        return (width * 506 /* 0x1fa */) / zoom_factor;
+    }
+
+    int32_t __cdecl Zoom_Box_Height_(int16_t height, int16_t divisor) {
+        return (height * 400) / divisor;
+    }
+
+    void __cdecl Draw_Main_Screen_For_Zooming_() {
+        uint8_t color_table[8];
+        uint32_t saved_seed;
+        int16_t width;
+        int16_t height;
+
+        saved_seed = random::Get_Random_Seed_();
+
+        for (int16_t i = 0; i < 8; ++i) {
+            if (i < 2 || i > 5) {
+                color_table[i] = 12;
+            }
+            else if (i == 2 || i == 5) {
+                color_table[i] = 16;
+            }
+            else {
+                color_table[i] = 19;
+            }
+        }
+
+        if (mouse::Pointer_X_() <= 22) {
+            _zoom_box_x = 22;
+        }
+        else {
+            _zoom_box_x = mouse::Pointer_X_();
+        }
+
+        if (mouse::Pointer_Y_() <= 22) {
+            _zoom_box_y = 22;
+        }
+        else {
+            _zoom_box_y = mouse::Pointer_Y_();
+        }
+
+        width = (int16_t)Zoom_Box_Width_(HAROLD::Get_Map_Scale_(MOX::_zoom_count), MOX::_cur_map_scale);
+        height = (int16_t)Zoom_Box_Height_(HAROLD::Get_Map_Scale_(MOX::_zoom_count), MOX::_cur_map_scale);
+
+        if (width + _zoom_box_x >= 536) {
+            _zoom_box_x = 526 - width;
+        }
+
+        if (height + _zoom_box_y >= 420) {
+            _zoom_box_y = 420 - height;
+        }
+
+        graphics::Set_Window_(_zoom_box_x, _zoom_box_y, _zoom_box_x + width, _zoom_box_y + height);
+        video::Clip_On_();
+        animate::Draw_(22, 22, (s_animation_header*)_temp_bitmap);
+
+        HAROLD::Draw_Multi_Colored_Box_(
+            _zoom_box_x,
+            _zoom_box_y,
+            _zoom_box_x + width,
+            _zoom_box_y + height,
+            color_table,
+            static_cast<uint32_t>(_zoom_box_color_increment)
+        );
+
+        _zoom_box_counter++;
+        if ((_zoom_box_counter % 3) == 0) {
+            _zoom_box_color_increment += _zoom_box_increment_value;
+        }
+
+        if ((_zoom_box_counter % 12) == 0) {
+            _zoom_box_counter = 0;
+            _zoom_box_increment_value = 0xFF; /* -1 */
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+        random::Set_Random_Seed_(saved_seed);
+    }
+
+    void __cdecl Toggle_Game_Option_(int32_t option_idx) {
+        char option_name_raw[32];
+        char message[100];
+        int8_t status_flag;
+
+        switch (option_idx) {
+            case 0:
+                MOX::_settings.end_of_turn_summary = (MOX::_settings.end_of_turn_summary == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xa6));
+                status_flag = MOX::_settings.end_of_turn_summary;
+                break;
+
+            case 1:
+                MOX::_settings.end_of_turn_wait = (MOX::_settings.end_of_turn_wait == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xa7));
+                status_flag = MOX::_settings.end_of_turn_wait;
+                break;
+
+            case 2:
+                MOX::_settings.enemy_moves = (MOX::_settings.enemy_moves == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xa8));
+                status_flag = MOX::_settings.enemy_moves;
+                break;
+
+            case 4:
+                MOX::_settings.auto_select_ships = (MOX::_settings.auto_select_ships == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xaa));
+                status_flag = MOX::_settings.auto_select_ships;
+                break;
+
+            case 5:
+                MOX::_settings.animations_on = (MOX::_settings.animations_on == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xab));
+                status_flag = MOX::_settings.animations_on;
+                break;
+
+            case 6:
+                MOX::_settings.auto_select_colony = (MOX::_settings.auto_select_colony == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xac));
+                status_flag = MOX::_settings.auto_select_colony;
+                if (status_flag != 0) {
+                    HACCESS::Set_All_Colony_Auto_Select_Flags_();
+                }
+                break;
+
+            case 7:
+                MOX::_settings.show_relocation_lines = (MOX::_settings.show_relocation_lines == 0);
+                strcpy(option_name_raw, HAROLD::H_Message_(0xad));
+                status_flag = MOX::_settings.show_relocation_lines;
+                break;
+
+            case 3:
+            default:
+                status_flag = message[0];
+                break;
+        }
+
+        const char* status_text = HAROLD::H_Message_(status_flag ? 0xe7 /* ON */ : 0xe8 /* OFF */);
+
+        _sprintf(&message[4], "%s %s", &option_name_raw[4], status_text);
+
+        LOADSAVE::Save_Session_Related_Settings_();
+        HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
+    }
+
+    void __cdecl Cycle_Ship_Icons_(int16_t* current_stack_idx_ptr, int16_t* out_icon_idx, int16_t direction) {
+        int16_t target_player_num;
+        int16_t result_stack_idx = -1;
+        int16_t result_icon_idx = -1;
+        int16_t start_node_idx = -1;
+        bool found_stack = false;
+        bool found_icon = false;
+
+        if (MOX::_fleet_box_ship_stack > 0 && MOX::_fleet_box_ship_stack < 500 && MOVEBOX::Moveable_Box_Selected_(2)) {
+            target_player_num = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
+        }
+        else {
+            target_player_num = MOX::_PLAYER_NUM;
+        }
+
+        if (MOX::_ship_icon_count > 0 && *current_stack_idx_ptr != -1) {
+            int16_t stack_idx = *current_stack_idx_ptr;
+
+            // Search from current position
+            if (direction == 0 /* Forward */) {
+                stack_idx++;
+                while (stack_idx < MOX::_ship_stack_count) {
+                    start_node_idx = MOX::_ship_stack_start[stack_idx];
+                    int16_t ship_idx = MOX::_ship_node[start_node_idx].ship_idx;
+                    if (HACCESS::Ship_Owner_(ship_idx) == target_player_num && MOX::_ship[ship_idx].status < 3) {
+                        found_stack = true;
+                        result_stack_idx = stack_idx;
+                        break;
+                    }
+                    stack_idx++;
+                }
+            }
+            else /* Backward */ {
+                stack_idx--;
+                while (stack_idx > -1) {
+                    start_node_idx = MOX::_ship_stack_start[stack_idx];
+                    int16_t ship_idx = MOX::_ship_node[start_node_idx].ship_idx;
+                    if (HACCESS::Ship_Owner_(ship_idx) == target_player_num && MOX::_ship[ship_idx].status < 3) {
+                        found_stack = true;
+                        result_stack_idx = stack_idx;
+                        break;
+                    }
+                    stack_idx--;
+                }
+            }
+
+            // Wrap around if not found
+            if (!found_stack) {
+                if (direction == 0 /* Forward */) {
+                    stack_idx = 0;
+                    while (stack_idx < MOX::_ship_stack_count) {
+                        start_node_idx = MOX::_ship_stack_start[stack_idx];
+                        int16_t ship_idx = MOX::_ship_node[start_node_idx].ship_idx;
+                        if (HACCESS::Ship_Owner_(ship_idx) == target_player_num && MOX::_ship[ship_idx].status < 3) {
+                            found_stack = true;
+                            result_stack_idx = stack_idx;
+                            break;
+                        }
+                        stack_idx++;
+                    }
+                }
+                else /* Backward */ {
+                    stack_idx = MOX::_ship_stack_count - 1;
+                    while (stack_idx > (*current_stack_idx_ptr - 1)) {
+                        start_node_idx = MOX::_ship_stack_start[stack_idx];
+                        int16_t ship_idx = MOX::_ship_node[start_node_idx].ship_idx;
+                        if (HACCESS::Ship_Owner_(ship_idx) == target_player_num && MOX::_ship[ship_idx].status < 3) {
+                            found_stack = true;
+                            result_stack_idx = stack_idx;
+                            break;
+                        }
+                        stack_idx--;
+                    }
+                }
+            }
+        }
+
+        if (start_node_idx != -1 && MOX::_ship_icon_count > 0) {
+            for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
+                if (MOX::_ship_icon[i].node_idx == start_node_idx) {
+                    found_icon = true;
+                    result_icon_idx = i;
+                    break;
+                }
+            }
+        }
+
+        if (found_icon) {
+            *out_icon_idx = result_icon_idx;
+            *current_stack_idx_ptr = result_stack_idx;
+        }
+        else {
+            *out_icon_idx = -1;
+            *current_stack_idx_ptr = -1;
         }
     }
 }

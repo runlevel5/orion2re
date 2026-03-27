@@ -1005,12 +1005,13 @@ namespace HAROLD {
      */
     void __cdecl Decrement_Zoom_Count_() {
         MOX::_zoom_count--;
+
         if (MOX::_zoom_count < 1) {
             MOX::_zoom_count = 0;
         }
     }
 
-    int16_t __cdecl Map_Scale_To_Zoom_Level_() {
+    int8_t __cdecl Map_Scale_To_Zoom_Level_() {
         int16_t max_zoom = MOX::_max_zoom_count;
         int16_t scale = MOX::_cur_map_scale;
 
@@ -1030,15 +1031,9 @@ namespace HAROLD {
             return 3;
         }
 
-        return max_zoom;
+        return (int8_t)max_zoom;
     }
 
-    /**
-     * @brief Increments the zoom count up to the maximum zoom limit,
-     * then caps it further based on the current map scale.
-     *
-     * @return int16_t 0 if zoom was capped by the map scale limit, 1 otherwise.
-     */
     /**
      * @address 004f0e20
      */
@@ -1050,63 +1045,62 @@ namespace HAROLD {
     }
 
     int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
-        int32_t next_zoom = static_cast<int32_t>(MOX::_zoom_count) + 1;
-        int32_t max_allowed = static_cast<int32_t>(MOX::_max_zoom_count);
+        int32_t next_zoom = (int32_t)MOX::_zoom_count + 1;
 
-        if (next_zoom >= max_allowed) {
-            next_zoom = max_allowed;
+        if (next_zoom >= (int32_t)MOX::_max_zoom_count) {
+            next_zoom = (int32_t)MOX::_max_zoom_count;
         }
-        MOX::_zoom_count = static_cast<int16_t>(next_zoom);
 
-        // Fetch a dynamic limit based on the current map scale
-        int16_t scaled_limit = HAROLD::Map_Scale_To_Zoom_Level_();
+        MOX::_zoom_count = (int16_t)next_zoom;
 
-        if (scaled_limit <= MOX::_zoom_count) {
-            MOX::_zoom_count = scaled_limit;
+        int8_t mapped_zoom = Map_Scale_To_Zoom_Level_();
+
+        // Check if the mapped zoom level is lower or equal to the incremented zoom count
+        if ((int16_t)mapped_zoom <= MOX::_zoom_count) {
+            MOX::_zoom_count = (int16_t)mapped_zoom;
             return 0;
         }
 
         return 1;
     }
 
-    int16_t __cdecl Get_Map_Scale_(int16_t param_1) {
-        int16_t result = MOX::_max_map_scale;
+    int16_t __cdecl Get_Map_Scale_(int16_t layer_type) {
+        int16_t scale;
 
-        if (param_1 == 0) {
-            if (result > 10) {
-                result = 10;
+        if (layer_type == 0) {
+            scale = MOX::_max_map_scale;
+            if (scale >= 10) {
+                scale = 10;
             }
-        }
-        else if (param_1 == 1) {
-            if (result > 15) {
-                result = 15;
+        } else if (layer_type == 1) {
+            scale = MOX::_max_map_scale;
+            if (scale >= 15) {
+                scale = 15;
             }
-        }
-        else if (param_1 == 2) {
-            if (result > 20) {
-                result = 20;
+        } else if (layer_type == 2) {
+            scale = MOX::_max_map_scale;
+            if (scale >= 20) {
+                scale = 20;
             }
-        }
-        else {
-            if (result > 30) {
-                result = 30;
+        } else {
+            scale = MOX::_max_map_scale;
+            if (scale >= 30) {
+                scale = 30;
             }
         }
 
-        // If no truncation occurred, reset star coordinates
-        if (result == MOX::_max_map_scale) {
+        // If the resulting scale is unconstrained (equals the max), reset background star shifts
+        if (scale == MOX::_max_map_scale) {
             MOX::_far_star_x = 0;
             MOX::_far_star_y = 0;
             MOX::_mid_star_x = 0;
             MOX::_mid_star_y = 0;
             MOX::_near_star_x = 0;
             MOX::_near_star_y = 0;
-
-            // Re-load result as per original binary's return sequence
-            result = MOX::_max_map_scale;
+            scale = MOX::_max_map_scale;
         }
 
-        return result;
+        return scale;
     }
 
     /**

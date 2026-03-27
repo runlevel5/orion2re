@@ -2343,9 +2343,17 @@ namespace hooks {
         { 0x004cc5b0, &MAINSCR::Scan_Ships_XY_ },
         { 0x004c49d0, &MAINSCR::Center_Map_ },
         { 0x004c4db0, &MAINSCR::Cycle_Star_Icons_ },
+        { 0x004c4b60, &MAINSCR::Cycle_Ship_Icons_ },
         { 0x004cbe00, &MAINSCR::Scan_Galaxy_Map_Fields_ },
         { 0x004ca360, &MAINSCR::Print_Highlighted_Star_Name_ },
         { 0x004c8d00, &MAINSCR::Check_Function_Keys_ },
+        { 0x004cd1b0, &MAINSCR::Toggle_Game_Option_ },
+        { 0x004cd5d0, &MAINSCR::Zoom_Box_Width_ },
+        { 0x004cd5b0, &MAINSCR::Zoom_Box_Height_ },
+        { 0x004c9c30, &MAINSCR::Draw_Main_Screen_For_Zooming_ },
+        { 0x004f0840, &HAROLD::Decrement_Zoom_Count_ },
+        { 0x004cd040, &MAINSCR::Set_Painted_Fleet_Fields_ },
+        { 0x004f0e20, &HAROLD::Increment_Zoom_Count_ },
     };
 
     void Install_Hooks()
