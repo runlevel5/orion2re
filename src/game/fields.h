@@ -98,6 +98,12 @@ namespace fields {
 
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound);
 
+    inline int16_t __cdecl Add_Clipped_Circle_Field_(int16_t x, int16_t y, int16_t radius, char* str, char flags) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, char*, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523b00});
+        return fn(x, y, radius, str, flags);
+    }
+
     inline int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int16_t sound) {
         using Fn = int16_t(__cdecl*)(int16_t, int16_t, const char*, s_animation_header*, int16_t*, const char*, int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x0051DC20})(x, y, help, pic, variable, hotkey, sound);

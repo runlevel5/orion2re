@@ -7,6 +7,7 @@ namespace MAINSCR {
     inline int16_t& _whole_screen_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596134});
     inline int16_t& _game_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059613E});
     inline int16_t& _next_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F2});
+    inline int16_t& _design_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596182});
     inline int16_t& _colonies_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619C});
     inline int16_t& _planets_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961A8});
     inline int16_t& _fleets_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596194});
@@ -40,6 +41,7 @@ namespace MAINSCR {
     inline int16_t& _zoom_box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059618E });
     inline int16_t& _zoom_box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00596192 });
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
+    inline int16_t& _fleet_icon_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F6});
 
     inline int8_t& _star_name_highlight_direction =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559840});
@@ -56,12 +58,6 @@ namespace MAINSCR {
     void __cdecl Draw_Main_Screen_();
 
     void __cdecl Main_Screen_();
-
-    inline void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int32_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004039A0 });
-        fn(node_ptr, flag);
-    }
 
     inline uint8_t& _check_next_turn_exit_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059613A});
     inline uint8_t* _twinkling_stars = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565460});
@@ -115,21 +111,13 @@ namespace MAINSCR {
 
     void __cdecl Add_Map_Fields_();
 
-    inline void __cdecl Add_Star_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c48b0});
-        fn();
-    }
+    void __cdecl Add_Star_Fields_();
 
     void __cdecl Add_Moveable_Box_Fields_();
 
     void __cdecl Do_System_Popup_(int16_t system_id);
 
-    inline void __cdecl Clear_Main_Screen_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c4b00});
-        fn();
-    }
+    void __cdecl Clear_Main_Screen_Fields_();
 
     inline void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, uint16_t x_box, uint16_t y_box, uint16_t width, uint16_t height, int16_t flag) {
         using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, uint16_t, uint16_t, uint16_t, int16_t);
@@ -177,6 +165,7 @@ namespace MAINSCR {
 
     inline uint16_t& _omniscience_cheat_alt = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00559860});
     inline int16_t& _all_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559864});
+    inline int16_t& _leader_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559868});
     inline int16_t& _more_money_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055986C});
     inline int16_t& _get_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559870});
     inline int16_t& _omniscience_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559874});
@@ -213,11 +202,6 @@ namespace MAINSCR {
 
     void __cdecl Do_Fleet_Popup_(int16_t ship_icon_id, int8_t check_overlap);
 
-    inline int16_t __cdecl Mouse_Button_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00527680})();
-    }
-
     void __cdecl Set_Painted_Fleet_Fields_(int16_t field_to_select);
 
     void __cdecl Draw_Fleet_Box_Selected_Ship_Seg_();
@@ -233,26 +217,6 @@ namespace MAINSCR {
     int16_t __cdecl Scan_System_Display_Fields_(int16_t mouse_input, int16_t input, int16_t *colony_btns, 
                                                 int16_t *m_planet_idx, int16_t *planet_idx, 
                                                 int16_t *m_ship_idx, int16_t *ship_idx, int16_t *selection);
-
-    inline void __cdecl Scan_Moveable_Box_Fields(int16_t skip, int16_t key, int16_t scan, uint16_t* flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t*);
-        reinterpret_cast<Fn>(0x004CBED0)(skip, key, scan, flag);
-    }
-
-    inline void __cdecl Decrement_Zoom_Count_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004F0840)();
-    }
-
-    inline int16_t __cdecl Increment_Zoom_Count_With_Limit_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(0x004F0E50)();
-    }
-
-    inline void __cdecl Increment_Zoom_Count_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004F0E20)();
-    }
 
     void __cdecl Draw_Main_Screen_For_Zooming_();
 
@@ -297,4 +261,36 @@ namespace MAINSCR {
     void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
 
     void __cdecl Center_Map_(int16_t x, int16_t y);
+
+    struct s_fleet_box {
+        int16_t x;
+        int16_t y;
+        int16_t height;
+        int16_t width;
+        int16_t map_height;
+        uint8_t field5_0xa;
+        uint8_t field6_0xb;
+        int16_t count;
+        int16_t field8_0xe;
+        int16_t field9_0x10;
+        struct s_animation_header* name_sm_seg;
+        struct s_animation_header* name_sm_seg2;
+        int8_t is_small_frame;
+        int8_t mouse_pressed;
+        int8_t attack_btn_active;
+        int8_t engage_btn_active;
+        int8_t colonize_btn_active;
+        int8_t transport_btn_active;
+        int8_t outpost_btn_active;
+    };
+
+    inline s_fleet_box& _fleet_box = *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+
+    inline int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int32_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
+        using Fn = int16_t(__cdecl*)(int32_t, int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CC480});
+        return fn(param_1, param_2, param_3, param_4);
+    }
+
+    void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4);
 }

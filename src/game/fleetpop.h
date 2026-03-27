@@ -17,6 +17,11 @@ namespace FLEETPOP {
     }
 
     int16_t __cdecl Fleet_Buttons_Chosen_();
+    inline bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403E90});
+        return (bool)fn(ship_type);
+    }
 
     void __cdecl Set_Fleet_Movement_Icon_Selections_(int16_t state, uint8_t auto_select_flag);
 
@@ -29,7 +34,7 @@ namespace FLEETPOP {
     void __cdecl Save_Ship_Selection_Status_();
 
     int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type);
-    int16_t __cdecl Fleet_Box_Width_();
+    int16_t __cdecl Fleet_Box_Width_(int16_t count);
     int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count);
 
     void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count);
@@ -47,4 +52,11 @@ namespace FLEETPOP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00403ef0});
         fn(x, y, arg3, arg4, arg5, ship_idx);
     }
+
+    inline void __cdecl Add_Added_Buttons_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00403cc0})(x, y);
+    }
+
+    void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag);
 }

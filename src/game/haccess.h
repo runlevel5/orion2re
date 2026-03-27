@@ -55,6 +55,11 @@ namespace HACCESS {
     int16_t __cdecl Fleet_Movement_Ship_Id_(int16_t icon_idx);
 
     int16_t __cdecl Ship_Stack_From_Ship_Id_(int16_t ship_id);
+    inline int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_ptr) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B510});
+        return fn(node_ptr);
+    }
 
     uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_();
 
@@ -62,7 +67,7 @@ namespace HACCESS {
 
     inline void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
         using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00403ee0})();
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049A400})();
     }
 
     int16_t __cdecl Ship_Stack_Owner_(int16_t stack_idx);

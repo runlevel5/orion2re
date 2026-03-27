@@ -200,12 +200,6 @@ inline int __cdecl hgetch_() {
     return fn();
 }
 
-inline int16_t __cdecl Mouse_Button_() {
-    using Fn = int16_t(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527680});
-    return fn();
-}
-
 inline int __cdecl __getch() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0054EAC0});
@@ -574,10 +568,6 @@ inline const char* const s_Couldn_t_Allocate_0055B668 =
 inline const char* const s_Unable_to_Allocate_bytes =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%s, %d)\n"
 
-// Suggested name: g_mouse_buttons_state
-inline uint16_t& g_mouse_buttons_state =
-    *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578DE0 });
-
 inline int __cdecl __strcmpi(const char* s1, const char* s2) {
     using Fn = int(__cdecl*)(const char*, const char*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005428d0 });
@@ -755,4 +745,3 @@ inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
 inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{0x00557D9C});
 inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
-

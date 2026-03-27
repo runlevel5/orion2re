@@ -380,7 +380,7 @@ namespace FLT1 {
         MOVEBOX::Draw_Galaxy_Map_Box_(nullptr, nullptr, 15, 52, 305, 182, 0, 0, 0, 0, 1, -1);
 
         if (FLT1::_relocate_button_mode != 1) {
-            if (Mouse_Button_() == 1) {
+            if (mouse::Mouse_Button_() == 1) {
                 int16_t icon_limit = (int16_t)MOX::_big_icon_display_rows * (int16_t)MOX::_big_icon_display_columns;
                 int16_t start_idx = MOX::_scroll_bar->first_visible_row * (int16_t)MOX::_big_icon_display_columns;
 

@@ -158,6 +158,7 @@ namespace MOX {
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597408});
     inline int16_t& num_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
     inline int16_t& _NUM_STARS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059740A });
+    inline s_scroll_bar& _fltpop_scroll_bar = *reinterpret_cast<s_scroll_bar*>(std::uintptr_t{0x005974C0});
     inline int16_t& _cur_map_scale = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D604 });
     inline int16_t& _cur_map_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F0});
     inline int16_t& _cur_map_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A18F8});
@@ -739,6 +740,12 @@ namespace MOX {
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596C9C});
 
     inline int16_t& _fleet_icon_buttons_added = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B38});
+    inline int16_t& _fleet_box_outpost_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596DBE});
+    inline int16_t& _fleet_box_attack_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D78});
+    inline int16_t& _fleet_box_scroll_dn_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA16});
+    inline int16_t& _fleet_box_transport_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BFB6});
+    inline int16_t& _fleet_box_engage_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B5C});
+    inline int16_t& _fleet_box_scroll_up_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49B0});
 
     inline s_animation_header*& _fleet_box_name_sm_seg_0059736C =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059736C});
@@ -763,6 +770,11 @@ namespace MOX {
 
     inline s_fleet_box& _fleet_box =
         *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+
+    inline s_animation_header*& _fleet_box_scroll_dn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596C58});
+    inline int16_t& _fleet_movement_bar_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597A90});
+    inline s_animation_header*& _fleet_box_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BA70});
+    inline s_animation_header*& _fleet_box_all_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C02C});
 
     inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
         *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});

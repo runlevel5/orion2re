@@ -776,7 +776,7 @@ namespace INFO {
 
     void __cdecl Draw_Reference_Category_Subscreen_() {
         int16_t field_id = fields::Scan_Input_();
-        int16_t mouse_button = Mouse_Button_();
+        int16_t mouse_button = mouse::Mouse_Button_();
 
         if (mouse_button == 0 && INFO::_g_list_update_needed == 0 &&
             field_id >= INFO::_g_first_list_field && field_id <= INFO::_g_last_list_field &&
@@ -1199,7 +1199,7 @@ namespace INFO {
 
     void __cdecl Draw_Tech_Review_Subscreen_() {
         int16_t input_field = fields::Scan_Input_();
-        int16_t mouse_btn = Mouse_Button_();
+        int16_t mouse_btn = mouse::Mouse_Button_();
 
         if (mouse_btn == 0 && INFO::_g_list_update_needed == 0 &&
             input_field >= INFO::_g_first_list_field && input_field <= INFO::_g_last_list_field &&

@@ -2,42 +2,147 @@
 
 namespace FLEETPOP {
 
-int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count) {
-    int16_t close_btn_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
-    int16_t name_height;
-    int16_t bottom_height;
+    int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count) {
+        int16_t close_btn_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
+        int16_t name_height;
+        int16_t bottom_height;
 
-    if (MOX::_fleet_box.is_small_frame == 0) {
-        MOX::_fleet_box_name_sm_seg_0059736C = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
-        MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059736C;
-        name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
+        if (MOX::_fleet_box.is_small_frame == 0) {
+            MOX::_fleet_box_name_sm_seg_0059736C = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+            MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059736C;
+            name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
 
-        MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
-        MOX::_fleet_box_bottom_sm_seg2 = MOX::_fleet_box.name_sm_seg2;
-    } else {
-        MOX::_fleet_box_name_sm_seg_0059B430 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
-        MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059B430;
-        name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
-
-        MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
-        MOX::_fleet_box_bottom_sm_seg_0059BA00 = MOX::_fleet_box.name_sm_seg2;
-    }
-
-    bottom_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg2);
-
-    int16_t grid_height;
-    if (fleet_count > 9) {
-        MOX::_fleet_box_grid_lg_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
-        grid_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
-    } else {
-        int32_t rows = (static_cast<int32_t>(fleet_count) - 1) / 3 + 1;
-        if (rows > 3) {
-            rows = 3;
+            MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+            MOX::_fleet_box_bottom_sm_seg2 = MOX::_fleet_box.name_sm_seg2;
         }
-        grid_height = FLEETPOP::Fleet_Box_Grid_Height_(static_cast<int16_t>(rows));
+        else {
+            MOX::_fleet_box_name_sm_seg_0059B430 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+            MOX::_fleet_box.name_sm_seg = MOX::_fleet_box_name_sm_seg_0059B430;
+            name_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg);
+
+            MOX::_fleet_box.name_sm_seg2 = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+            MOX::_fleet_box_bottom_sm_seg_0059BA00 = MOX::_fleet_box.name_sm_seg2;
+        }
+
+        bottom_height = animate::Get_Height_(MOX::_fleet_box.name_sm_seg2);
+
+        int16_t grid_height;
+        if (fleet_count > 9) {
+            MOX::_fleet_box_grid_lg_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
+            grid_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
+        }
+        else {
+            int32_t rows = (static_cast<int32_t>(fleet_count) - 1) / 3 + 1;
+            if (rows > 3) {
+                rows = 3;
+            }
+            grid_height = FLEETPOP::Fleet_Box_Grid_Height_(static_cast<int16_t>(rows));
+        }
+
+        return grid_height + close_btn_height + bottom_height + name_height;
     }
 
-    return grid_height + close_btn_height + bottom_height + name_height;
+void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag) {
+    int16_t local_a = -1;
+    int16_t local_8 = -1;
+
+    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+    if (node_ptr == MOX::_first_node_ptr_in_stack_) {
+        node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+        int16_t num_icons = N_Fleet_Icons_(node_ptr);
+        Fleet_Box_Data_(num_icons);
+
+        int16_t box_x = MOX::_moveable_box[2].x;
+        int16_t box_y = MOX::_moveable_box[2].y;
+        int16_t box_width = Fleet_Box_Width_(MOX::_fleet_box.count);
+
+        MOX::_moveable_box[2].field9_0x12 = -1000;
+        MOX::_moveable_box[2].field = fields::Add_Hidden_Field_(
+            box_x, box_y, box_width + box_x, box_y + 0x23, (char*)s__00551100, 0
+        );
+
+        int16_t end_idx = MOX::_fleet_icon_buttons_added + MOX::_first_fleet_movement_icon;
+        if (MOX::_fleet_box.count < end_idx) {
+            end_idx = MOX::_fleet_box.count;
+        }
+
+        for (int16_t i = MOX::_first_fleet_movement_icon; i < end_idx; i++) {
+            int16_t icon_x = MOX::_fleet_movement_icon[i].x;
+            int16_t icon_y = MOX::_fleet_movement_icon[i].y;
+
+            if (local_a < 0) {
+                local_a = icon_x;
+            }
+            if (local_8 < 0) {
+                local_8 = icon_y;
+            }
+
+            HACCESS::Fleet_Movement_Ship_Id_(i);
+
+            MOX::_fleet_movement_icon[i].field = fields::Add_Hidden_Field_(
+                icon_x, icon_y, icon_x + 0x35, icon_y + 0x35, (char*)s__00551100, 0x29
+            );
+        }
+
+        node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+        int16_t ship_idx = MOX::_ship_node[node_ptr].ship_idx;
+
+        if (MOX::_moveable_box_order[0] == 2 && flag != 0 &&
+            HACCESS::Ship_Owner_(ship_idx) == MOX::_PLAYER_NUM &&
+            HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM, &MOX::_ship[ship_idx])) {
+
+            int16_t btn_x = box_x + 16;
+            if (MOX::_fleet_box.is_small_frame == 1) {
+                btn_x += 1;
+            }
+
+            MOX::_fleet_movement_all_button = fields::Add_Clipped_Button_Field_(
+                btn_x, MOX::_fleet_box.field9_0x10 + box_y, (char*)s__00551100,
+                MOX::_fleet_box_all_button_seg, (char*)s__00551100, 0x28
+            );
+        } else {
+            MOX::_fleet_movement_all_button = -1000;
+        }
+
+        if (MOX::_fleet_box.count > 9) {
+            int16_t up_btn = -1000;
+            int16_t dn_btn = -1000;
+
+            MOX::_fleet_box_scroll_up_button = -1000;
+            MOX::_fleet_box_scroll_dn_button = -1000;
+
+            if (flag != 0) {
+                up_btn = fields::Add_Button_Field_(
+                    box_x + 0xbf, box_y + 0x2a, (char*)s__00551100,
+                    MOX::_fleet_box_scroll_up_button_seg, (char*)s_minus_0055111c, 0x28
+                );
+                MOX::_fleet_box_scroll_up_button = up_btn;
+
+                dn_btn = fields::Add_Button_Field_(
+                    box_x + 0xbf, box_y + 0xae, (char*)s__00551100,
+                    MOX::_fleet_box_scroll_dn_button_seg, (char*)s_plus_00551118, 0x28
+                );
+            }
+
+            MOX::_fleet_box_scroll_dn_button = dn_btn;
+            MOX::_fltpop_scroll_bar.up_btn = up_btn;
+            MOX::_fltpop_scroll_bar.dn_btn = dn_btn;
+
+            MOX::_fleet_movement_bar_field = fields::Add_Scroll_Field_(
+                box_x + 0xc0, box_y + 0x42, 0, 0x66, 0, 0x66, 10, 0x66,
+                &MOX::_fltpop_scroll_bar.thumb_center_y, (char*)s__00551100, 0
+            );
+        }
+
+        MOX::_fleet_box_outpost_button = -1000;
+        MOX::_fleet_box_colonize_button = -1000;
+        MOX::_fleet_box_engage_button = -1000;
+        MOX::_fleet_box_transport_button = -1000;
+        MOX::_fleet_box_attack_button = -1000;
+
+        Add_Added_Buttons_(box_x, box_y);
+        MOVEBOX::Add_Whole_Window_Field_(2);
+    }
 }
 
 int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type) {
@@ -67,7 +172,7 @@ void __cdecl Set_Fleet_Movement_Box_Dimensions_(int16_t count) {
     MOX::_moveable_box[2].height = Fleet_Box_Height_(count);
 }
 
-int16_t __cdecl Fleet_Box_Width_() {
+int16_t __cdecl Fleet_Box_Width_(int16_t count) {
     return animate::Get_Width_(MOX::_fleet_box.name_sm_seg);
 }
 

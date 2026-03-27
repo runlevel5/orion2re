@@ -9,6 +9,11 @@ namespace MOVEBOX {
     }
 
     bool __cdecl Moveable_Box_Selected_(int16_t index);
+    inline bool __cdecl Box_Field_Selected_(int16_t box_idx, int16_t field_id) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005128D0});
+        return (bool)fn(box_idx, field_id);
+    }
 
     inline bool __cdecl Box_Was_Open_(int16_t box_idx) {
         using Fn = bool(__cdecl*)(int16_t);
@@ -93,5 +98,10 @@ namespace MOVEBOX {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512640});
         fn(arg1, arg2, height, grid_y, arg5, arg6, arg7, arg8, arg9, name_field, star_field, grid_field);
+    }
+
+    inline void __cdecl Add_Whole_Window_Field_(int16_t val) {
+        using Fn = void(__cdecl*)(int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00512870})(val);
     }
 }

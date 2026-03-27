@@ -7,9 +7,9 @@ namespace mouse {
         return old_flag;
     }
 
-    uint16_t __cdecl Mouse_Button_() {
+    int16_t __cdecl Mouse_Button_() {
         if (_mouse_overide_flag == 0) {
-            return g_mouse_buttons_state;
+            return _mouse_buttons;
         }
 
         return _mouse_overide_right_button + _mouse_overide_left_button;

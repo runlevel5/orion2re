@@ -15,7 +15,7 @@ namespace palstore {
                 input_occurred = 1;
             }
 
-            if (Mouse_Button_() != 0) {
+            if (mouse::Mouse_Button_() != 0) {
                 exit_loop = 1;
                 input_occurred = 1;
             }

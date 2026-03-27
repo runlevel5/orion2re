@@ -14,14 +14,17 @@ namespace mouse {
         fn();
     }
 
-    inline uint16_t& _mouse_overide_flag =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B180 });
+    inline int16_t& _mouse_overide_flag =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B180 });
 
-    inline uint16_t& _mouse_overide_right_button =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B184 });
+    inline int16_t& _mouse_overide_right_button =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B184 });
 
-    inline uint16_t& _mouse_overide_left_button =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B188 });
+    inline int16_t& _mouse_overide_left_button =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B188 });
+
+    inline int16_t& _mouse_buttons =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578DE0});
 
     inline int16_t& _mouse_buffer_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DD8 });
@@ -39,7 +42,7 @@ namespace mouse {
      * Usually, the return value represents a bitmask or sum of button states:
      * 1 = Left, 2 = Right, 3 = Both.
      */
-    uint16_t __cdecl Mouse_Button_();
+    int16_t __cdecl Mouse_Button_();
 
     void __cdecl Set_Mouse_List_(s_mouse_list* list, int16_t count);
 

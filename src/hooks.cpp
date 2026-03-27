@@ -2354,6 +2354,10 @@ namespace hooks {
         { 0x004f0840, &HAROLD::Decrement_Zoom_Count_ },
         { 0x004cd040, &MAINSCR::Set_Painted_Fleet_Fields_ },
         { 0x004f0e20, &HAROLD::Increment_Zoom_Count_ },
+        { 0x004CBED0, &MAINSCR::Scan_Moveable_Box_Fields },
+        { 0x004ccf30, &MAINSCR::Clear_Main_Screen_Fields_ },
+        { 0x004c48b0, &MAINSCR::Add_Star_Fields_ },
+        { 0x004039a0, &FLEETPOP::Add_Fleet_Movement_Box_Fields_ },
     };
 
     void Install_Hooks()

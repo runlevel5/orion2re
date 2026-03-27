@@ -590,7 +590,7 @@ namespace MAINSCR {
                 }
             }
 
-            MAINSCR::Scan_Moveable_Box_Fields(MOX::_skip_fields, input, mouse_input, (uint16_t*)&exit_flag);
+            MAINSCR::Scan_Moveable_Box_Fields(MOX::_skip_fields, input, mouse_input, &exit_flag);
 
             if (MOX::_skip_fields == 0) {
                 int field_res = MAINSCR::Get_Mouse_Field_(1, &mouse_field_1, &mouse_field_2);
@@ -983,7 +983,7 @@ namespace MAINSCR {
             Draw_Stars_();
             Draw_Ship_Icons_(false);
 
-            if (Mouse_Button_() == 1) {
+            if (mouse::Mouse_Button_() == 1) {
                 if (MOVEBOX::Moveable_Box_Selected_(2)) {
                     if (FLEETPOP::Can_Select_Fleet_Box_Ship_(0) && MOVEBOX::Mouse_Within_Fleet_Box_()) {
                         int16_t scanned_field = fields::Scan_Input_();
@@ -1017,7 +1017,7 @@ namespace MAINSCR {
             for (int16_t i = 4; i >= 0; --i) {
                 int16_t box_id = MOX::_moveable_box_order[i];
                 if (MOVEBOX::Moveable_Box_Selected_(box_id) && box_id != (int16_t)MOX::_stencil_box_id) {
-                    int16_t btn = Mouse_Button_();
+                    int16_t btn = mouse::Mouse_Button_();
                     if (btn != 0) {
                         int16_t target_field = MOX::_moveable_box[box_id].field;
                         if (target_field == fields::Auto_Input_() || MOX::_moveable_box[box_id].active == 1) {
