@@ -22,4 +22,10 @@ namespace line {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041F560});
         fn(y1, x1, y2, x2, colors, start_idx);
     }
+
+    inline void __cdecl Plasma_Box_(int16_t x, int16_t y, int16_t w, int16_t h, int16_t thickness, int16_t color_anim, int16_t unk_color, uint8_t* colors) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052a900});
+        fn(x, y, w, h, thickness, color_anim, unk_color, colors);
+    }
 }

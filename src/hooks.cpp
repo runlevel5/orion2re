@@ -2358,6 +2358,7 @@ namespace hooks {
         { 0x004ccf30, &MAINSCR::Clear_Main_Screen_Fields_ },
         { 0x004c48b0, &MAINSCR::Add_Star_Fields_ },
         { 0x004039a0, &FLEETPOP::Add_Fleet_Movement_Box_Fields_ },
+        { 0x004c5220, &MAINSCR::Draw_Exploding_Plasma_Box_ },
     };
 
     void Install_Hooks()

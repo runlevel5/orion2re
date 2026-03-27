@@ -119,11 +119,7 @@ namespace MAINSCR {
 
     void __cdecl Clear_Main_Screen_Fields_();
 
-    inline void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, uint16_t x_box, uint16_t y_box, uint16_t width, uint16_t height, int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, uint16_t, uint16_t, uint16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c5220});
-        fn(x_start, y_start, x_box, y_box, width, height, flag);
-    }
+    void __cdecl Draw_Exploding_Plasma_Box_(int16_t x_start, int16_t y_start, int16_t x_box, int16_t y_box, int16_t width, int16_t height, int16_t flag);
 
     void __cdecl Set_Popup_Draw_XY_(int16_t popup_type, int16_t ship_icon_idx, int16_t* out_w, int16_t* out_h);
 
@@ -261,28 +257,6 @@ namespace MAINSCR {
     void __cdecl Cycle_Star_Icons_(int16_t* p_star_idx, int16_t player_idx, int16_t direction);
 
     void __cdecl Center_Map_(int16_t x, int16_t y);
-
-    struct s_fleet_box {
-        int16_t x;
-        int16_t y;
-        int16_t height;
-        int16_t width;
-        int16_t map_height;
-        uint8_t field5_0xa;
-        uint8_t field6_0xb;
-        int16_t count;
-        int16_t field8_0xe;
-        int16_t field9_0x10;
-        struct s_animation_header* name_sm_seg;
-        struct s_animation_header* name_sm_seg2;
-        int8_t is_small_frame;
-        int8_t mouse_pressed;
-        int8_t attack_btn_active;
-        int8_t engage_btn_active;
-        int8_t colonize_btn_active;
-        int8_t transport_btn_active;
-        int8_t outpost_btn_active;
-    };
 
     inline s_fleet_box& _fleet_box = *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
 

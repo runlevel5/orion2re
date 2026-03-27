@@ -3211,4 +3211,173 @@ namespace MAINSCR {
             *current_stack_idx_ptr = -1;
         }
     }
+
+    void __cdecl Draw_Exploding_Plasma_Box_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7)
+    {
+        uint32_t random_seed = random::Get_Random_Seed_();
+        MOX::_animated_star = 0xFFFF;
+
+        if (param_7 == 2) {
+            int16_t node = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
+            int16_t n_icons = FLEETPOP::N_Fleet_Icons_(node);
+            FLEETPOP::Fleet_Box_Data_(n_icons);
+            param_5 = MOX::_fleet_box.width;
+            param_6 = MOX::_fleet_box.height;
+        }
+
+        int16_t saved_window;
+        MISC::Save_Window_Status_(&saved_window);
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+
+        if (animate::_clipping_flag == 1) {
+            if (param_3 < video::_screen_window_x1) {
+                param_3 = video::_screen_window_x1;
+            }
+            if (param_4 < video::_screen_window_y1) {
+                param_4 = video::_screen_window_y1;
+            }
+            if (video::_screen_window_x2 < param_5 + param_3) {
+                param_5 = video::_screen_window_x2 - param_3;
+            }
+            if (video::_screen_window_y2 < param_6 + param_4) {
+                param_6 = video::_screen_window_y2 - param_4;
+            }
+        }
+
+        int16_t original_x2 = param_3;
+        int16_t original_y2 = param_4;
+
+        fields::Disable_Draw_All_Fields_();
+        param_5 -= 3;
+        param_6 -= 3;
+        MOVEBOX::N_Moveable_Boxes_Selected_(param_7);
+        video::Set_Page_Off_();
+        Draw_Main_Screen_Filled_(1);
+        graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+        video::Clip_On_();
+        Draw_Main_Main_Screen_();
+        video::Copy_Off_To_Back_();
+
+        uint8_t acStack_8[8];
+        for (int i = 0; i < 8; ++i) {
+            acStack_8[i] = static_cast<uint8_t>((i * 2) + 14);
+        }
+
+        int16_t unk_color = (int16_t)random::Random_(8) - 1;
+        int16_t color_anim = 0;
+
+        int16_t dest_x = original_x2;
+        int16_t dest_y = original_y2;
+
+        if (param_1 < dest_x) {
+            if (param_2 <= dest_y) {
+                dest_x += 3;
+                dest_y += 3;
+            } else {
+                if (dest_y + param_6 <= 0x1a5) {
+                    dest_y += param_6;
+                }
+                dest_y -= 3;
+            }
+        } else {
+            if (param_2 <= dest_y) {
+                if (dest_x + param_5 <= 0x20f) {
+                    dest_x += param_5;
+                }
+                dest_x -= 3;
+            } else {
+                if (dest_x + param_5 <= 0x20f) {
+                    dest_x += param_5;
+                }
+                if (dest_y + param_6 <= 0x1cb) {
+                    dest_y += param_6;
+                }
+                dest_x -= 3;
+                dest_y -= 3;
+            }
+        }
+
+        int16_t step_x = (dest_x - param_1) / 10;
+        int16_t step_y = (dest_y - param_2) / 10;
+        int16_t accum_x = 0;
+        int16_t accum_y = 0;
+
+        for (int i = 0; i < 10; ++i) {
+            int16_t w_offset;
+            int16_t h_offset;
+
+            if (original_x2 <= param_1) {
+                if (param_2 <= original_y2) {
+                    w_offset = (param_5 * i) / -10;
+                    h_offset = (param_6 * i) / 10;
+                } else {
+                    w_offset = (param_5 * i) / -10;
+                    h_offset = (param_6 * i) / -10;
+                }
+            } else {
+                if (param_2 <= original_y2) {
+                    w_offset = (param_5 * i) / 10;
+                    h_offset = (param_6 * i) / 10;
+                } else {
+                    w_offset = (param_5 * i) / 10;
+                    h_offset = (param_6 * i) / -10;
+                }
+            }
+
+            int16_t box_x = param_1 + accum_x + w_offset;
+            int16_t box_y = param_2 + accum_y + h_offset;
+
+            if (box_x < 0x15) {
+                box_x = 0x16;
+            }
+            if (box_x > 0x20f) {
+                box_x = 0x20e;
+            }
+
+            if (box_y < 0x15) {
+                box_y = 0x16;
+            }
+            if (box_y > 0x1a5) {
+                box_y = 0x1a4;
+            }
+
+            int16_t draw_x = box_x - w_offset;
+            int16_t draw_y = box_y - h_offset;
+
+            if (i > 0) {
+                video::Set_Page_Off_();
+            }
+
+            line::Plasma_Box_(draw_x, draw_y, w_offset, h_offset, 3, color_anim, unk_color, acStack_8);
+
+            color_anim = (random::Random_(10) + color_anim) & 0xFF;
+            RUSS::Mox_Sync_Update_();
+
+            accum_y += step_y;
+            accum_x += step_x;
+        }
+
+        if (animate::_clipping_flag == 1) {
+            if (original_x2 < video::_screen_window_x1) {
+                original_x2 = video::_screen_window_x1;
+            }
+            if (original_y2 < video::_screen_window_y1) {
+                original_y2 = video::_screen_window_y1;
+            }
+            if (video::_screen_window_x2 < original_x2 + param_5) {
+                param_5 = video::_screen_window_x2 - original_x2;
+            }
+            if (video::_screen_window_y2 < original_y2 + param_6) {
+                param_6 = video::_screen_window_y2 - original_y2;
+            }
+        }
+
+        line::Plasma_Box_(original_x2, original_y2, param_5, param_6, 3, color_anim, unk_color, acStack_8);
+        RUSS::Mox_Sync_Update_();
+        fields::Enable_Draw_All_Fields_();
+        MOX::_draw_main_screen_to_back = 1;
+        random::Set_Random_Seed_(random_seed);
+        MISC::Restore_Window_Status_(saved_window);
+    }
 }
