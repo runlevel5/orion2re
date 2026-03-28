@@ -193,7 +193,7 @@ namespace DIP_SCRN {
                     strcpy(_diplomacy_list_choice[i], _main_diplomacy_list[i]);
                 }
 
-                fonts::Set_Outline_Color_(0xF8, 0);
+                fonts::Set_Outline_Color_(0, 0xF8);
                 fonts::Set_Font_Style_Outline_(4, &_diplomacy_normal_colors);
                 fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
                 fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
@@ -247,6 +247,8 @@ namespace DIP_SCRN {
                         break;
                     case 7:
                     case -1:
+                        exit_flag = true;
+                        break;
                     default:
                         break;
                 }
