@@ -122,6 +122,8 @@ namespace fonts {
 
     int16_t __cdecl Get_Font_Height_();
 
+    int16_t __cdecl Get_Font_Vertical_Spacing_();
+
     void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors);
 
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str);
@@ -152,5 +154,5 @@ namespace fonts {
 
     void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors);
 
-    void __cdecl Set_Alias_Color_(int32_t color);
+    void __cdecl Set_Alias_Color_(uint8_t color);
 }

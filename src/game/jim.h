@@ -49,6 +49,12 @@ namespace JIM {
         reinterpret_cast<Fn>(0x00425A10)(sprite);
     }
 
+    inline void __cdecl Decode_Text_Name_And_Stat_(char* buffer, uint8_t ambassador, uint8_t id_plus_one, int16_t max_len) {
+        using Fn = void(__cdecl*)(char*, uint8_t, uint8_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004257a0});
+        fn(buffer, ambassador, id_plus_one, max_len);
+    }
+
     inline void __cdecl Decode_Text_Race_(char* buffer, int16_t player_idx, int16_t max_len) {
         using Fn = void(__cdecl*)(char*, int16_t, int16_t);
         reinterpret_cast<Fn>(0x004258F0)(buffer, player_idx, max_len);

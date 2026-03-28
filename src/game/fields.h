@@ -29,6 +29,7 @@ namespace fields {
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
     inline s_colors (&_list_normal_color) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572C08});
     inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
+    inline s_colors (&_list_special_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572BD0});
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
@@ -174,6 +175,8 @@ namespace fields {
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound);
 
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str);
+
     inline void __cdecl Mark_Fields_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520120});
@@ -186,5 +189,17 @@ namespace fields {
         fn(x, y, color);
     }
 
+    inline void __cdecl Exit_List_Field_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523df0});
+        fn();
+    }
+
     void __cdecl Release_Fields_();
+
+    inline int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* font, char* list_ptr, int16_t item_size, char* selection_buffer, char* highlight_buffer, int16_t param_9, int16_t* param_10, int16_t param_11, s_animation_header* param_12, int16_t param_13, int16_t param_14) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, char*, char*, int16_t, char*, char*, int16_t, int16_t*, int16_t, s_animation_header*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00521210});
+        return fn(x, y, width, font, list_ptr, item_size, selection_buffer, highlight_buffer, param_9, param_10, param_11, param_12, param_13, param_14);
+    }
 }

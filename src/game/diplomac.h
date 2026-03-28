@@ -38,6 +38,17 @@ namespace diplomac {
 
     void __cdecl Break_Tribute_(int16_t p1_idx, int16_t p2_idx);
 
+    inline void __cdecl Start_Trade_Treaty_(int16_t a, int16_t b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004551b0});
+        fn(a, b);
+    }
+    inline void __cdecl Start_Research_Treaty_(int16_t a, int16_t b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00455110});
+        fn(a, b);
+    }
+
     void __cdecl Modifier_Diplomacy_Adjustments_();
 
     void NoOp2();
@@ -103,4 +114,12 @@ namespace diplomac {
     void __cdecl Diplomacy_Broken_Contacts_();
 
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_idx_1, int16_t player_idx_2);
+
+    inline int16_t __cdecl Find_Worst_Modifier_(int16_t player_num, int16_t ambassador_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00453e90 });
+        return fn(player_num, ambassador_idx);
+    }
+
+    int8_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
 }

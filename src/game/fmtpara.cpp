@@ -67,11 +67,11 @@ namespace FMTPARA {
         int highlight_match_count = 0;
 
         for (int i = 0; i < 8; ++i) {
-            uint8_t selected_color = fonts::_font_header.selected_colors[i];
+            uint8_t selected_color = fonts::_font_header.selected_colors.colors[i];
 
-            if (fonts::_font_header.normal_colors[i] == selected_color) {
+            if (fonts::_font_header.normal_colors.colors[i] == selected_color) {
                 normal_match_count++;
-            } else if (fonts::_font_header.highlight_colors[i] == selected_color) {
+            } else if (fonts::_font_header.highlight_colors.colors[i] == selected_color) {
                 highlight_match_count++;
             }
         }
@@ -1734,8 +1734,9 @@ namespace FMTPARA {
                         uint8_t outline_byte = static_cast<uint8_t>(fonts::_outline_color);
                         uint32_t color_val = (outline_byte << 24) | (outline_byte << 16) | (outline_byte << 8) | outline_byte;
 
-                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[0]) = color_val;
-                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[4]) = color_val;
+                        for (int i = 0; i < 8; i++) {
+                            fonts::_font_header.selected_colors.colors[i] = outline_byte;
+                        }
 
                         if (_para_p->seg == nullptr) {
                             if (fonts::_font_header.font_style != 2) {
@@ -1787,10 +1788,7 @@ namespace FMTPARA {
                             }
                         }
 
-                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[0]) =
-                            *reinterpret_cast<uint32_t*>(&fonts::_font_header.normal_colors[0]);
-                        *reinterpret_cast<uint32_t*>(&fonts::_font_header.selected_colors[4]) =
-                            *reinterpret_cast<uint32_t*>(&fonts::_font_header.normal_colors[4]);
+                        fonts::_font_header.selected_colors = fonts::_font_header.normal_colors;
                     }
 
                     if (_para_p->seg == nullptr) {
@@ -1890,17 +1888,16 @@ namespace FMTPARA {
         s_colors saved_current_colors;
 
         // Backup original font color states
-        memcpy(saved_selected_colors, fonts::_font_header.selected_colors, 8);
+        memcpy(saved_selected_colors, &fonts::_font_header.selected_colors, 8);
         saved_current_colors = fonts::_current_font_color_array;
 
         if (font_id & 0x80) {
             // Apply new font style using the normal_colors array as a reference
-            // TYPE MISMATCH: existing stub uses s_colors* for colors instead of uint8_t*
-            fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), reinterpret_cast<s_colors*>(fonts::_font_header.normal_colors));
+            fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), &fonts::_font_header.normal_colors);
         }
 
         // Restore the original font color states that might have been modified by Set_Remap_Font_Style_
-        memcpy(fonts::_font_header.selected_colors, saved_selected_colors, 8);
+        memcpy(&fonts::_font_header.selected_colors, saved_selected_colors, 8);
         fonts::_current_font_color_array = saved_current_colors;
     }
 

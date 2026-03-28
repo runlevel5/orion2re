@@ -3,19 +3,19 @@
 namespace fonts {
     void __cdecl Set_Normal_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors[i] = _font_header.normal_colors[i];
+            _font_header.selected_colors.colors[i] = _font_header.normal_colors.colors[i];
         }
     }
 
     void __cdecl Set_Highlight_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors[i] = _font_header.highlight_colors[i];
+            _font_header.selected_colors.colors[i] = _font_header.highlight_colors.colors[i];
         }
     }
 
     void __cdecl Set_Special_Colors_On_(void) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.selected_colors[i] = _font_header.special_colors[i];
+            _font_header.selected_colors.colors[i] = _font_header.special_colors.colors[i];
         }
     }
 
@@ -88,8 +88,8 @@ namespace fonts {
 
         for (int i = 0; i < 8; ++i) {
             uint8_t color = new_colors->colors[i];
-            _font_header.selected_colors[i] = color;
-            _font_header.normal_colors[i] = color;
+            _font_header.selected_colors.colors[i] = color;
+            _font_header.normal_colors.colors[i] = color;
             _current_font_color_array.colors[i] = color;
         }
 
@@ -332,7 +332,7 @@ namespace fonts {
 
     void __cdecl Get_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            colors->colors[i] = _font_header.normal_colors[i];
+            colors->colors[i] = _font_header.normal_colors.colors[i];
         }
     }
 
@@ -348,6 +348,10 @@ namespace fonts {
         return _font_header.font_style_height;
     }
 
+    int16_t __cdecl Get_Font_Vertical_Spacing_() {
+        return _font_header.leading_offset;
+    }
+
     void __cdecl Set_Font_Style_Outline_(int16_t style, s_colors* colors) {
         Set_Font_Style_(style, colors);
         _font_header.font_style = 4;
@@ -360,13 +364,13 @@ namespace fonts {
 
     void __cdecl Set_Font_Special_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.special_colors[i] = colors->colors[i];
+            _font_header.special_colors.colors[i] = colors->colors[i];
         }
     }
 
     void __cdecl Set_Font_Highlight_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            _font_header.highlight_colors[i] = colors->colors[i];
+            _font_header.highlight_colors.colors[i] = colors->colors[i];
         }
     }
 
@@ -381,10 +385,10 @@ namespace fonts {
         _font_header.font_style_widths[32] = (char)spacing_width;
     }
 
-    void __cdecl Set_Alias_Color_(int32_t color) { // TYPE MISMATCH: decompiled as uint8_t
-        _font_header.normal_colors[0] = static_cast<uint8_t>(color);
-        _font_header.highlight_colors[0] = static_cast<uint8_t>(color);
-        _font_header.special_colors[0] = static_cast<uint8_t>(color);
-        _font_header.selected_colors[0] = static_cast<uint8_t>(color);
+    void __cdecl Set_Alias_Color_(uint8_t color) {
+        _font_header.normal_colors.colors[0] = static_cast<uint8_t>(color);
+        _font_header.highlight_colors.colors[0] = static_cast<uint8_t>(color);
+        _font_header.special_colors.colors[0] = static_cast<uint8_t>(color);
+        _font_header.selected_colors.colors[0] = static_cast<uint8_t>(color);
     }
 }

@@ -113,4 +113,28 @@ namespace MSG_ {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473940});
         return fn(msg);
     }
+
+    inline void __cdecl Add_Nonaggression_Msg_(int16_t player_a, int16_t player_b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473B10});
+        fn(player_a, player_b);
+    }
+
+    inline void __cdecl Add_Alliance_Msg_(int16_t player_a, int16_t player_b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473AF0});
+        fn(player_a, player_b);
+    }
+
+    inline void __cdecl Add_Peace_Msg_(int16_t player_a, int16_t player_b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473AD0});
+        fn(player_a, player_b);
+    }
+
+    inline void __cdecl Add_War_Msg_(int16_t player_a, int16_t player_b) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004739F0});
+        fn(player_a, player_b);
+    }
 }

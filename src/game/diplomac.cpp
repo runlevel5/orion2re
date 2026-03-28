@@ -2111,6 +2111,66 @@ namespace diplomac {
         }
     }
 
+    /**
+     * @brief Checks if a proposed treaty between two players is valid given their current relations.
+     * 
+     * @param player_idx Index of the player initiating the proposal.
+     * @param target_idx Index of the target player receiving the proposal.
+     * @param treaty_type The type of treaty being proposed.
+     * @return int8_t 1 if the proposal is valid, 0 otherwise.
+     */
+    int8_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type) {
+        int8_t current_treaty = MOX::_player[player_idx].treaty[target_idx];
+
+        // If the proposed treaty is already in effect, it's not a valid proposal.
+        if (current_treaty == (int8_t)treaty_type) {
+            return 0;
+        }
+
+        switch (treaty_type) {
+            case 1: /* Peace Treaty */
+                // Cannot propose peace if already at peace or better (treaty >= 4) or if currently under a specific status (2).
+                if (current_treaty >= 4 || current_treaty == 2) {
+                    return 0;
+                }
+                break;
+
+            case 2:
+                // Specific transition check: must be in state 1 to propose state 2.
+                if (current_treaty != 1) {
+                    return 0;
+                }
+                break;
+
+            case 3:
+                // Can only propose state 3 if current status is 4 or higher.
+                if (current_treaty < 4) {
+                    return 0;
+                }
+                break;
+
+            case 7: /* Trade Treaty */
+                // Cannot propose trade if treaty status is too high (>= 4) or if a trade treaty is already active.
+                if (current_treaty >= 4 || MOX::_player[player_idx].trade_treaty[target_idx] == 1) {
+                    return 0;
+                }
+                break;
+
+            case 8: /* Research Treaty */
+                // Cannot propose research if treaty status is too high (>= 4) or if a research treaty is already active.
+                if (current_treaty >= 4 || MOX::_player[player_idx].research_treaty[target_idx] == 1) {
+                    return 0;
+                }
+                break;
+
+            default:
+                // For treaty types 4, 5, 6 or any unknown types, the proposal is considered valid.
+                break;
+        }
+
+        return 1;
+    }
+
     void __cdecl Modifier_Diplomacy_Adjustments_() {
         if (MOX::_NUM_PLAYERS == 0) {
             return;

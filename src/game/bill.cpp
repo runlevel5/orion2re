@@ -162,13 +162,13 @@ namespace BILL {
                 fonts::_font_header.font_style_widths[32] = (char)orig_space_width;
 
                 if (resized) {
-                    fonts::Set_Font_Style_(orig_current_font_style, (s_colors*)fonts::_font_header.selected_colors);
+                    fonts::Set_Font_Style_(orig_current_font_style, &fonts::_font_header.selected_colors);
                     fonts::_font_header.font_style = orig_font_style;
                 }
                 return;
             }
 
-            fonts::Set_Font_Style_(fonts::_current_font_style - 1, (s_colors*)fonts::_font_header.normal_colors);
+            fonts::Set_Font_Style_(fonts::_current_font_style - 1, &fonts::_font_header.normal_colors);
 
             if (adjust_y) {
                 int16_t new_height = fonts::Get_Font_Height_();

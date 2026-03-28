@@ -311,6 +311,12 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
     return fn(value, str, radix);
 }
 
+inline void __cdecl Set_Fade_Speed_Perc(int32_t speed) {
+    using Fn = void(__cdecl*)(int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA650});
+    fn(speed);
+}
+
 inline void __cdecl Reload_Language_Strings_() {
     using Fn = void(__cdecl*)();
     reinterpret_cast<Fn>(std::uintptr_t{0x004f2470})();
@@ -613,6 +619,8 @@ inline char* const s_ITA_HELP_LBX_00557460 = reinterpret_cast<char*>(std::uintpt
 inline char* const s_FRE_HELP_LBX_00557470 = reinterpret_cast<char*>(std::uintptr_t{0x00557470}); // "FRE_HELP.LBX"
 inline char* const s_GER_HELP_LBX_00557480 = reinterpret_cast<char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
 inline char* const s_HELP_LBX_00557490 = reinterpret_cast<char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
+inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); // "DIPLOMAT.LBX"
+inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
@@ -742,6 +750,10 @@ inline const char* s_Too_many_ships_in_list_00557de8 =
 inline const char* s_i_PR_00557d84 = reinterpret_cast<const char*>(0x00557D84);
 inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);
 inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
+inline const char* s_jimtext_lbx_00552360 = reinterpret_cast<const char*>(0x00552360);
+inline const char* s_s_sez__s_00552334 = reinterpret_cast<const char*>(std::uintptr_t{0x00552334}); // "%s sez: %s"
+inline const char* s_percent_s_0055236c = reinterpret_cast<const char*>(0x0055236C);
+inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
 inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{0x00557D9C});
 inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});

@@ -1242,6 +1242,26 @@ struct s_current_design {
     short date_of_design;
 };
 
+typedef struct s_dipscrn_help_item s_dipscrn_help_item, *Ps_dipscrn_help_item;
+
+struct s_dipscrn_help_item {
+    int16_t help_id;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+};
+
+typedef struct s_dipscrn_net_message s_dipscrn_net_message, *Ps_dipscrn_net_message;
+
+struct s_dipscrn_net_message {
+    uint8_t field0_0x0;
+    uint8_t field1_0x1;
+    int16_t field2_0x2;
+    int16_t field3_0x4;
+    int16_t field4_0x6;
+};
+
 typedef struct s_drop_area s_drop_area, *Ps_drop_area;
 
 struct s_drop_area {
@@ -1280,6 +1300,8 @@ typedef struct s_field_scroll s_field_scroll, *Ps_field_scroll;
 typedef struct s_field_cont_input s_field_cont_input, *Ps_field_cont_input;
 
 typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button;
+
+typedef struct s_field_string_list s_field_string_list, *Ps_field_string_list;
 
 struct s_field_grid {
     undefined field0_0x0;
@@ -1354,8 +1376,7 @@ struct s_field_multi_button {
 };
 
 struct s_field_button {
-    undefined field0_0x0;
-    undefined field1_0x1;
+    int16_t field0_0x0;
     short field2_0x2;
     struct s_colors *highlight_color;
     char *help;
@@ -1373,6 +1394,40 @@ struct s_field_button {
     short field16_0x20;
     undefined field17_0x22;
     undefined field18_0x23;
+};
+
+struct s_field_string_list {
+    int16_t field0_0x0;
+    int16_t field1_0x2;
+    struct s_colors *highlight_color;
+    char *help;
+    int16_t help_start;
+    undefined2 field5_0xe;
+    char **strings;
+    int16_t *value;
+    undefined4 field8_0x18;
+    struct s_animation_header *pic;
+    struct s_colors *special_color;
+};
+
+struct s_field_radio {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    short field2_0x2;
+    struct s_colors *highlight_color;
+    char *help;
+    short help_start;
+    undefined field6_0xe;
+    undefined field7_0xf;
+    char *selection;
+    short field9_0x14;
+    undefined field10_0x16;
+    undefined field11_0x17;
+    int field12_0x18;
+    struct s_animation_header *pic;
+    short field14_0x20;
+    undefined field15_0x22;
+    undefined field16_0x23;
 };
 
 struct s_field_cont_input {
@@ -1397,26 +1452,6 @@ struct s_field_cont_input {
     undefined field18_0x23;
 };
 
-struct s_field_radio {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    short field2_0x2;
-    struct s_colors *highlight_color;
-    char *help;
-    short help_start;
-    undefined field6_0xe;
-    undefined field7_0xf;
-    char *selection;
-    short field9_0x14;
-    undefined field10_0x16;
-    undefined field11_0x17;
-    int field12_0x18;
-    struct s_animation_header *pic;
-    short field14_0x20;
-    undefined field15_0x22;
-    undefined field16_0x23;
-};
-
 union s_field_detail {
     struct s_field_button button;
     struct s_field_grid grid;
@@ -1424,6 +1459,7 @@ union s_field_detail {
     struct s_field_scroll scroll;
     struct s_field_cont_input cont_input;
     struct s_field_multi_button multibtn;
+    struct s_field_string_list strings;
 };
 
 struct s_field {
@@ -1599,12 +1635,12 @@ struct s_fmtpara_style {
 typedef struct s_font s_font, *Ps_font;
 
 struct s_font {
-    byte selected_colors[8];
+    s_colors selected_colors;
     short font_style_height;
     short font_style;
-    byte normal_colors[8];
-    byte highlight_colors[8];
-    byte special_colors[8];
+    s_colors normal_colors;
+    struct s_colors highlight_colors;
+    struct s_colors special_colors;
     uint16_t current_height;
     uint16_t line_height;
     uint16_t leading_offset;

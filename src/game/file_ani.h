@@ -43,8 +43,8 @@ namespace file_ani {
 
     void __cdecl Open_File_Animation_(const char* filename, int16_t entry_index);
 
-    inline void __cdecl Set_File_Animation_Frame_(int frame) {
-        using Fn = void(__cdecl*)(int);
+    inline void __cdecl Set_File_Animation_Frame_(int32_t frame) {
+        using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005316d0});
         fn(frame);
     }

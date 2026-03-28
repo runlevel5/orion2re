@@ -571,4 +571,36 @@ namespace fields {
         _fields = _old_fields;
         _active_input_field_number = _old_active_input_field_number;
     }
+
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str) {
+        int16_t n = _fields_count;
+
+        _fields[n].x = x;
+        _fields[n].y = y - 1;
+        _fields[n].font_style = fonts::Get_Current_Font_Style_();
+        _fields[n].font_color = &_list_normal_color;
+        _fields[n].detail.strings.highlight_color = &_list_highlight_colors;
+        _fields[n].detail.strings.special_color = &_list_special_colors;
+        _fields[n].x_end = x + width;
+        _fields[n].y_end = y + fonts::Get_Font_Height_() + 1;
+        _fields[n].detail.strings.help_start = help_start;
+        _fields[n].hotkey = *hotkey_str;
+        _fields[n].detail.strings.field1_0x2 = param_5;
+
+        if (_fields[n].hotkey > '`' && _fields[n].hotkey < '{') {
+            _fields[n].hotkey -= 0x20;
+        }
+
+        _fields[n].detail.strings.help = help;
+        _fields[n].detail.strings.strings = strings;
+        _fields[n].detail.strings.field0_0x0 = param_8;
+        _fields[n].detail.strings.value = value;
+        _fields[n].detail.strings.field8_0x18 = param_10;
+        _fields[n].detail.strings.pic = pic;
+        _fields[n].field_type = FIELD_TYPE_10;
+
+        _fields_count++;
+
+        return _fields_count - 1;
+    }
 }

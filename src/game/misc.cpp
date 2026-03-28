@@ -21,8 +21,8 @@ namespace MISC {
     void __cdecl Set_Font_Colors_(const s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
             uint8_t color = colors->colors[i];
-            fonts::_font_header.selected_colors[i] = color;
-            fonts::_font_header.normal_colors[i] = color;
+            fonts::_font_header.selected_colors.colors[i] = color;
+            fonts::_font_header.normal_colors.colors[i] = color;
         }
     }
 
