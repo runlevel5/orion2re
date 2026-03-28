@@ -588,7 +588,7 @@ namespace aidudes {
         _qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
               (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
               4,
-              Sort_Pops_FI_);
+              Sort_Pops_FR_I_);
 
         if (colony->food2_per_farmer == 0) {
             int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
@@ -1514,5 +1514,60 @@ namespace aidudes {
         int16_t worth2 = AIBUILD::Industry_Worth(&MOX::_colony[*((const uint8_t*)p2)]);
 
         return (int)worth1 - (int)worth2;
+    }
+
+    int __cdecl Sort_Pops_FR_I_(const void* a, const void* b) {
+        const uint32_t* param_1 = static_cast<const uint32_t*>(a);
+        const uint32_t* param_2 = static_cast<const uint32_t*>(b);
+
+        if (aidudes::_Sort_Pops_colony_data->food2_per_farmer == 0) {
+            return aidudes::_Sort_Pops_colony(a, b);
+        }
+
+        int16_t prod_0_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 0);
+        int16_t prod_1_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 1);
+        int16_t prod_2_p1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_1), 2);
+
+        int16_t score_p1 = prod_2_p1 - (prod_1_p1 * 2) + prod_0_p1;
+
+        int16_t prod_0_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 0);
+        int16_t prod_1_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 1);
+        int16_t prod_2_p2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, reinterpret_cast<const s_colony*>(param_2), 2);
+
+        int16_t score_p2 = prod_2_p2 - (prod_1_p2 * 2) + prod_0_p2;
+
+        if (score_p2 != score_p1) {
+            return (int32_t)score_p2 - (int32_t)score_p1;
+        }
+
+        if (prod_0_p2 != prod_0_p1) {
+            return (int32_t)prod_0_p2 - (int32_t)prod_0_p1;
+        }
+
+        if (prod_1_p2 != prod_1_p1) {
+            return (int32_t)prod_1_p1 - (int32_t)prod_1_p2;
+        }
+
+        return (int32_t)(*param_1 & 0x0F) - (int32_t)(*param_2 & 0x0F);
+    }
+
+    int __cdecl Sort_Pops_R_I_(const void* p1, const void* p2) {
+        int16_t p1_prod1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, (const s_colony*)p1, 1);
+        int16_t p2_prod1 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, (const s_colony*)p2, 1);
+        int16_t p1_prod2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, (const s_colony*)p1, 2);
+        int16_t p2_prod2 = COLCALC::Colony_Pop_Prod_Produced_(aidudes::_Sort_Pops_colony_data, (const s_colony*)p2, 2);
+
+        int16_t p2_delta = p2_prod2 - p2_prod1;
+        int16_t p1_delta = p1_prod2 - p1_prod1;
+
+        if (p2_delta != p1_delta) {
+            return (int)p2_delta - (int)p1_delta;
+        }
+
+        if (p2_prod1 == p1_prod1) {
+            return (int)(*(const uint32_t*)p1 & 0xF) - (int)(*(const uint32_t*)p2 & 0xF);
+        }
+
+        return (int)p1_prod1 - (int)p2_prod1;
     }
 }

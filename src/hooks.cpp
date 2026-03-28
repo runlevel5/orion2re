@@ -2202,7 +2202,6 @@ namespace hooks {
         { 0x00464540, &AIMOVE::Gather_Intercepting_Ships_ },
         { 0x00464390, &AIMOVE::Knock_Out_Impossible_Interceptions_ },
         { 0x00465ba0, &AIMOVE::Npc_Dest_ },
-        { 0x00444FA0, &aidudes::Do_Blockaded_Colony_ },
         { 0x00432940, &DESIGN::Weapon_Type_ },
         { 0x00465d90, &AIMOVE::Sort_npc_dests_ },
         { 0x004614a0, &AIMOVE::N_Enemy_Stars_Reachable_ },
@@ -2394,6 +2393,15 @@ namespace hooks {
         { 0x00418b90, &DIP_SCRN::Diplomacy_Mouse_Init_ },
         { 0x0041a480, &DIP_SCRN::Start_Diplomacy_Music_ },
         { 0x00416700, &DIP_SCRN::Diplomacy_Need_Better_Offer_ },
+        { 0x00419780, &DIP_SCRN::Check_Surrender_System_ },
+        { 0x004189b0, &DIP_SCRN::Get_Human_Gift_Response_ },
+        { 0x00419e70, &DIP_SCRN::Diplomacy_System_Scan_ },
+        { 0x004fc800, &COLCALC::Get_System_Population_ },
+        { 0x0041a600, &DIP_SCRN::Diplomacy_Offer_Money_ },
+        { 0x00418ac0, &DIP_SCRN::Diplomacy_Load_New_Ambassador_ },
+        { 0x00414f80, &DIP_SCRN::Get_Human_Offer_Gift_Message_ },
+        { 0x004455d0, &aidudes::Sort_Pops_FR_I_ },
+        { 0x00445520, &aidudes::Sort_Pops_R_I_ },
     };
 
     void Install_Hooks()

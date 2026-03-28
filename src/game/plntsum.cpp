@@ -643,7 +643,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             _screen->buttons[8] = -1000;
         }
 
-        if (Send_Colony_Button_Selectable_()) {
+        if (Send_Outpost_Button_Selectable_()) {
             _screen->buttons[9] = fields::Add_Hidden_Field_(413, 437, 610, 442, s_O, 41);
         } else {
             _screen->buttons[9] = -1000;
@@ -754,7 +754,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 _send_choice = 0;
 
                 // Redundant check in original binary
-                if (Send_Colony_Button_Selectable_()) {
+                if (Send_Outpost_Button_Selectable_()) {
                     _draw_outpost_button_status = 1;
                 }
                 return;
@@ -767,7 +767,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     _send_choice = 0;
                     return;
                 }
-            } else if (Send_Colony_Button_Selectable_()) {
+            } else if (Send_Outpost_Button_Selectable_()) {
                 _draw_outpost_button_status = 2;
                 _send_choice = 1;
             }

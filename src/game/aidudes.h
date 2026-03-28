@@ -61,6 +61,8 @@ namespace aidudes {
 
     int __cdecl _Sort_Pops_colony(const void* a, const void* b);
 
+    int __cdecl Sort_Pops_FR_I_(const void* a, const void* b);
+
     void __cdecl Assign_Additional_Research_Industry_();
 
     void __cdecl Grab_Scientist_(s_aidudes_colony_info* colony);
@@ -78,4 +80,6 @@ namespace aidudes {
 
     void __cdecl Assign_Buildings_();
     int __cdecl colony_less_industry_cmp_(const void* p1, const void* p2);
+
+    int __cdecl Sort_Pops_R_I_(const void* p1, const void* p2);
 }

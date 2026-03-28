@@ -31,6 +31,12 @@ namespace ERIC {
 
     bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_();
 
+    inline void __cdecl Set_Fade_Speed_Perc(int32_t percentage) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba650});
+        fn(percentage);
+    }
+
     void __cdecl Set_Fade_Percent_(int16_t percent);
 
     void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text);

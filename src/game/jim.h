@@ -44,6 +44,18 @@ namespace JIM {
         reinterpret_cast<Fn>(std::uintptr_t{0x00425340})(lbx_name, index, buffer, max_len);
     }
 
+    inline void __cdecl Decode_Text_Name_And_Tech_(char* buffer, int16_t player_idx, int16_t tech_idx, int16_t max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425800});
+        fn(buffer, player_idx, tech_idx, max_len);
+    }
+
+    inline void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t player_idx, int16_t star_idx, int16_t max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004257d0});
+        fn(buffer, player_idx, star_idx, max_len);
+    }
+
     inline void __cdecl Bill_Picture_To_Mouse_(s_animation_header* sprite) {
         using Fn = void(__cdecl*)(s_animation_header*);
         reinterpret_cast<Fn>(0x00425A10)(sprite);

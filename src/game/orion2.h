@@ -1255,11 +1255,11 @@ struct s_dipscrn_help_item {
 typedef struct s_dipscrn_net_message s_dipscrn_net_message, *Ps_dipscrn_net_message;
 
 struct s_dipscrn_net_message {
-    uint8_t field0_0x0;
-    uint8_t field1_0x1;
-    int16_t field2_0x2;
-    int16_t field3_0x4;
-    int16_t field4_0x6;
+    uint8_t sender_player_id;
+    uint8_t target_player_id;
+    int16_t arg1;
+    int16_t msg_type;
+    int16_t arg2;
 };
 
 typedef struct s_drop_area s_drop_area, *Ps_drop_area;
@@ -1635,10 +1635,10 @@ struct s_fmtpara_style {
 typedef struct s_font s_font, *Ps_font;
 
 struct s_font {
-    s_colors selected_colors;
+    struct s_colors selected_colors;
     short font_style_height;
     short font_style;
-    s_colors normal_colors;
+    struct s_colors normal_colors;
     struct s_colors highlight_colors;
     struct s_colors special_colors;
     uint16_t current_height;

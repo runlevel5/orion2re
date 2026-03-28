@@ -31,6 +31,10 @@ namespace DIP_SCRN {
     inline const char* s_empty_string = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551100 });
     inline const char* s_empty = reinterpret_cast<const char*>(0x00551100);
     inline const char* s_jimtext_lbx = reinterpret_cast<const char*>(0x00552360);
+    inline const char* s__00551100 = (const char*)std::uintptr_t{0x00551100}; // ""
+    inline const char* s_jimtext2_lbx_00552340 = (const char*)std::uintptr_t{0x00552340}; // "jimtext2.lbx"
+    inline const char* s_jimtext_lbx_00552360 = (const char*)std::uintptr_t{0x00552360}; // "jimtext.lbx"
+    inline const char* s__d_BC_00552384 = (const char*)std::uintptr_t{0x00552384}; // "  %d BC"
 
     inline s_colors& _diplomacy_normal_colors =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x00552268});
@@ -211,26 +215,21 @@ namespace DIP_SCRN {
         fn();
     }
 
-    inline int16_t __cdecl Check_Surrender_System_(int16_t param_1, int16_t param_2) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00419780});
-        return fn(param_1, param_2);
-    }
-    inline void __cdecl Get_Human_Gift_Response_(int16_t param_1, int16_t param_2, int16_t category, int16_t gift_param) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004189B0});
-        fn(param_1, param_2, category, gift_param);
-    }
+    bool __cdecl Check_Surrender_System_(int16_t player_a, int16_t player_b);
+
+    void __cdecl Get_Human_Offer_Gift_Message_(int16_t player_idx, int16_t offer_type, int16_t value);
+
+    void __cdecl Diplomacy_Load_New_Ambassador_(int16_t player_idx);
+
+    void __cdecl Get_Human_Gift_Response_(int16_t sender_player_idx, int16_t target_player_idx, int16_t gift_type, int16_t gift_arg);
     inline int16_t __cdecl Diplomacy_System_Display_(int16_t param_1, uint8_t ambassador, int16_t flag) {
         using Fn = int16_t(__cdecl*)(int16_t, uint8_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00419800});
         return fn(param_1, ambassador, flag);
     }
-    inline void __cdecl Diplomacy_Offer_Money_(int16_t param_1, int16_t param_2, int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041A600});
-        fn(param_1, param_2, flag);
-    }
+    int16_t __cdecl Diplomacy_Offer_Money_(int16_t player_idx, int16_t target_idx, int8_t do_transaction);
 
     void __cdecl Start_Diplomacy_Music_(int16_t music_type);
+
+    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices);
 }

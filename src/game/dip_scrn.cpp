@@ -1240,11 +1240,11 @@ namespace DIP_SCRN {
                     case 4:
                         done = 1;
                         if (param_3 == 1) {
-                            _net_diplomacy_message.field0_0x0 = static_cast<uint8_t>(param_1);
-                            _net_diplomacy_message.field1_0x1 = static_cast<uint8_t>(param_2);
+                            _net_diplomacy_message.sender_player_id = static_cast<uint8_t>(param_1);
+                            _net_diplomacy_message.target_player_id = static_cast<uint8_t>(param_2);
                             _net_diplomacy_esc_pressed = 1;
-                            _net_diplomacy_message.field4_0x6 = -1;
-                            _net_diplomacy_message.field3_0x4 = 0x82;
+                            _net_diplomacy_message.arg2 = -1;
+                            _net_diplomacy_message.arg1 = 0x82;
 
                             NETMOX::Mox_Send_Message_(
                                 MOX::_player[param_1].network_player_id, 2000, 
@@ -1835,6 +1835,35 @@ namespace DIP_SCRN {
         }
     }
 
+    /**
+     * Checks if player_a has at least one system (up to 3) that could potentially
+     * surrender to player_b.
+     */
+    bool __cdecl Check_Surrender_System_(int16_t player_a, int16_t player_b) {
+        int16_t star_idx = 0;
+        int16_t surrender_count = 0;
+
+        if (MOX::_NUM_STARS > 0) {
+            do {
+                // Limit search once we find at least 3 systems
+                if (surrender_count >= 3) {
+                    break;
+                }
+
+                // has_colony is treated as a bitmask where bit N indicates player N has a colony
+                if (((MOX::_star[star_idx].has_colony >> (player_a & 0x1F)) & 1) != 0) {
+                    if (COLCALC::May_Surrender_Star_(star_idx, player_a, player_b)) {
+                        surrender_count++;
+                    }
+                }
+
+                star_idx++;
+            } while (star_idx < MOX::_NUM_STARS);
+        }
+
+        return surrender_count >= 1;
+    }
+
     int16_t __cdecl Diplomacy_Need_Better_Offer_(int16_t type, int16_t tech_app, int16_t bc, int16_t star_idx, int16_t tribute) {
         uint8_t selectable[16] = { 0 };
         char text_buffer[40];
@@ -1889,6 +1918,220 @@ namespace DIP_SCRN {
             return 1;
         default:
             return 1;
+        }
+    }
+
+    void __cdecl Get_Human_Gift_Response_(int16_t sender_player_idx, int16_t target_player_idx, int16_t gift_type, int16_t gift_arg) {
+        if (MOX::_game_type == 1) {
+            _old_response_message = _response_message;
+            Get_Human_Offer_Gift_Message_(sender_player_idx, gift_type, gift_arg);
+            Diplomacy_Load_New_Ambassador_(sender_player_idx);
+            Diplomacy_Display_Response_();
+            Diplomacy_Load_New_Ambassador_(target_player_idx);
+        } else {
+            _net_diplomacy_message.sender_player_id = (uint8_t)sender_player_idx;
+            _net_diplomacy_message.arg1 = gift_type;
+            _net_diplomacy_message.arg2 = gift_arg;
+            _net_diplomacy_message.target_player_id = (uint8_t)target_player_idx;
+            _net_diplomacy_message.msg_type = 0x3ec;
+
+            NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 2000, &_net_diplomacy_message, 8);
+            RUSS::Mox_Update_();
+        }
+
+        switch (gift_type) {
+            case 1:
+                _response_message = 0xA3;
+                break;
+            case 2:
+                _response_message = 0xA2;
+                break;
+            case 3:
+                _response_message = 0xA1;
+                break;
+            case 4:
+                _response_message = 0xA4;
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * @brief Scans a star system for colonies belonging to a specific player.
+     * 
+     * @param star_idx Index of the star system to scan.
+     * @param player_idx Index of the player whose colonies to search for.
+     * @param artemis_planet_idx Output: Index of the planet with an Artemis Net (building index 9), or -1 if none found.
+     * @param owned_count Output: Total number of colonies owned by the player in this system.
+     * @param planet_indices Output: Array of indices for the planets owned by the player.
+     * @return The player index if colonies exist, otherwise the original star owner.
+     */
+    int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices) {
+        *artemis_planet_idx = -1;
+        *owned_count = 0;
+
+        s_star_data* star = &MOX::_star[star_idx];
+
+        // Check if the player has any colonies in this system using a bitmask
+        if ((star->has_colony >> (uint8_t)player_idx) & 1) {
+            for (int16_t i = 0; i < 5; ++i) {
+                int16_t planet_idx = star->planet_index[i];
+                if (planet_idx != -1) {
+                    int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                    if (colony_idx != -1) {
+                        s_colony* colony = &MOX::_colony[colony_idx];
+                        if (colony->owner == (int8_t)player_idx) {
+                            planet_indices[*owned_count] = (int8_t)planet_idx;
+                            
+                            // Check for Artemis Net (building 9)
+                            if (colony->buildings[9] != 0) {
+                                *artemis_planet_idx = planet_idx;
+                            }
+                            
+                            *owned_count = *owned_count + 1;
+                        }
+                    }
+                }
+            }
+            return player_idx;
+        }
+
+        return (int16_t)star->owner;
+    }
+
+    int16_t __cdecl Diplomacy_Offer_Money_(int16_t player_idx, int16_t target_idx, int8_t do_transaction) {
+        int16_t result_bc = -1;
+        Setup_Full_Screen_Diplomacy_Help_(0x267);
+
+        uint8_t selection_flags[15];
+        memset(selection_flags, 1, 15);
+
+        for (int i = 0; i < 15; ++i) {
+            strcpy(_diplomacy_list_choice[i], s__00551100);
+        }
+
+        int current_bc = MOX::_player[player_idx].bc;
+        if (current_bc > 32000) {
+            current_bc = 32000;
+        }
+
+        int16_t rounded_bc = (int16_t)(current_bc / 20) * 20;
+        int16_t bc_options[5];
+        int8_t choice_count;
+
+        if (rounded_bc < 100) {
+            choice_count = rounded_bc / 20;
+            bc_options[0] = 20;
+            bc_options[1] = 40;
+            bc_options[2] = 60;
+            bc_options[3] = 80;
+            bc_options[4] = 100;
+        } else {
+            choice_count = 5;
+            bc_options[0] = (int16_t)((rounded_bc / 5) / 20) * 20;
+            bc_options[1] = (int16_t)((rounded_bc * 2 / 5) / 20) * 20;
+            bc_options[2] = (int16_t)((rounded_bc * 3 / 5) / 20) * 20;
+            bc_options[3] = (int16_t)((rounded_bc * 4 / 5) / 20) * 20;
+            bc_options[4] = (int16_t)(rounded_bc / 20) * 20;
+        }
+
+        for (int i = 0; i < (int)choice_count; ++i) {
+            _sprintf(_diplomacy_list_choice[i], s__d_BC_00552384, (int)bc_options[i]);
+            if (MOX::_player[player_idx].bc < (int)bc_options[i]) {
+                selection_flags[i] = 0;
+            }
+        }
+
+        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x2E, _diplomacy_list_choice[choice_count], 0x28);
+        
+        char title_text[40];
+        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 8, title_text, 0x28);
+
+        int16_t selection = fields::Get_List_Field_(
+            10, 0x76, 0xF5, title_text, _diplomacy_list_choice[0], 0x32,
+            &choice_count, selection_flags, 0x11, 0, 0, 0, 0, 0
+        );
+
+        if (selection >= 0 && selection < choice_count) {
+            result_bc = bc_options[selection];
+            if (do_transaction == 1) {
+                _old_response_message = -1;
+                MOX::_player[player_idx].bc -= (int)result_bc;
+                MOX::_player[target_idx].bc += (int)result_bc;
+                
+                if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+                    Get_Human_Gift_Response_(player_idx, target_idx, 1, result_bc);
+                } else {
+                    diplomac::Get_Gift_Response_(player_idx, target_idx, 1, result_bc, &_response_message);
+                    if ((int)(MOX::_stardate * 5 - 175000) <= (int)result_bc) {
+                        npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
+                    }
+                }
+            }
+        }
+
+        return result_bc;
+    }
+
+    void __cdecl Diplomacy_Load_New_Ambassador_(int16_t player_idx) {
+        mouse::Set_Mouse_List_(&DIP_SCRN::_diplomacy_blank_mouse, 1);
+        fields::Deactivate_Auto_Function_();
+        fields::Clear_Fields_();
+        ERIC::Set_Fade_Percent_(0);
+        ERIC::Set_Fade_Speed_Perc(10);
+        ERIC::Fast_Fade_Out_();
+        DIP_SCRN::Diplomacy_Mouse_Init_(player_idx);
+
+        uint8_t race = (uint8_t)MOX::_player[player_idx].race;
+
+        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, (uint16_t)race * 2 + 13);
+        video::Set_Page_Off_();
+        file_ani::Draw_File_Animation_();
+        video::Copy_Off_To_Back_();
+
+        DIP_SCRN::_current_ambassador = (uint8_t)player_idx;
+
+        file_ani::Open_File_Animation_(s_DIPLOMAT_LBX, (uint16_t)race * 2 + 14);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        file_ani::Draw_File_Animation_Stencil_();
+    }
+
+    /**
+     * @brief Prepares a diplomatic gift offer message based on the gift type.
+     * 
+     * @param player_idx The index of the player offering the gift.
+     * @param offer_type The type of gift (1: BC, 2: Peace/Treaty, 3: Tech, 4: System).
+     * @param value The amount of BC, tech index, or star system index.
+     */
+    void __cdecl Get_Human_Offer_Gift_Message_(int16_t player_idx, int16_t offer_type, int16_t value) {
+        switch (offer_type) {
+            case 1:
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 18 /* 0x12 */, _diplomacy_message, 250);
+                JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, (uint8_t)value, 250);
+                break;
+
+            case 2:
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 15 /* 0x0F */, _diplomacy_message, 250);
+                if (value == 1) {
+                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, 5, 250);
+                } else {
+                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, 10, 250);
+                }
+                break;
+
+            case 3:
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 16 /* 0x10 */, _diplomacy_message, 250);
+                JIM::Decode_Text_Name_And_Tech_(_diplomacy_message, player_idx, value, 250);
+                break;
+
+            case 4:
+                JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 17 /* 0x11 */, _diplomacy_message, 250);
+                JIM::Decode_Text_Name_And_System_(_diplomacy_message, player_idx, value, 250);
+                break;
+
+            default:
+                break;
         }
     }
 }

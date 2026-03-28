@@ -1,6 +1,28 @@
 #include "pch.h"
 
 namespace COLCALC {
+    int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx) {
+        int16_t total_pop = 0;
+
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx != -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx != -1) {
+                    // Check if colony belongs to the specified player
+                    if (MOX::_colony[colony_idx].owner == player_idx) {
+                        // n_pops is accumulated as an unsigned byte value
+                        total_pop += (uint8_t)MOX::_colony[colony_idx].n_pops;
+                    }
+                }
+            }
+        }
+
+        return total_pop;
+    }
+
     void __cdecl Show_Command_Points_(int player_idx) {
         char msg_buffer[3000];
 

@@ -362,4 +362,5 @@ namespace COLCALC {
     int16_t __cdecl Colony_Planetary_Shield_(s_colony* colony);
 
     void __cdecl Show_Command_Points_(int player_idx);
+    int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx);
 }
