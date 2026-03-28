@@ -201,7 +201,7 @@ namespace DIP_SCRN {
 
                 Setup_Diplomacy_Help_(9, &_main_diplomacy_help_entry);
 
-                char search_string[2];
+                int8_t search_string[2];
                 search_string[0] = '\0';
                 search_string[1] = '\0';
 
@@ -209,7 +209,7 @@ namespace DIP_SCRN {
                     10, 0x76, 0xF5,
                     _main_diplomacy_title,
                     (char*)_diplomacy_list_choice, 50,
-                    search_string, (char*)main_options, 0x11,
+                    search_string, main_options, 0x11,
                     nullptr, 0, nullptr, 0, 0
                 );
 
@@ -742,7 +742,7 @@ namespace DIP_SCRN {
             int16_t btn_prev = -1;
             int16_t btn_next = -1;
 
-            char list_highlight[16];
+            uint8_t list_highlight[16];
             memset(list_highlight, 1, 15);
 
             strcpy(_diplomacy_list_choice[0], str_prev);
@@ -792,7 +792,7 @@ namespace DIP_SCRN {
             fonts::Set_Font_LF_(4);
             Setup_Diplomacy_Help_(list_idx + 2, item_values);
 
-            char selection_buffer[2] = {0, 0};
+            int8_t selection_buffer[2] = {0, 0};
 
             int16_t action = fields::Get_List_Field_(
                 10, 118, 245, list_title,
@@ -823,10 +823,10 @@ namespace DIP_SCRN {
     int16_t __cdecl Get_Non_Player_Proposals_() {
         int16_t default_retval = 1;
         int16_t sVar3 = -1000;
-        char hotkey_flags[10];
+        uint8_t hotkey_flags[10];
         memset(hotkey_flags, 1, sizeof(hotkey_flags));
 
-        int16_t list_pos;
+        int8_t list_pos[2];
         char text_buffer[80];
         char abStack_424[212];
         int32_t aiStack_350[212];
@@ -853,7 +853,8 @@ namespace DIP_SCRN {
 
         fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
         fields::Set_Input_Delay_(1);
-        list_pos = default_retval;
+        list_pos[0] = 1;
+        list_pos[1] = 0;
 
         fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
         fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
@@ -911,8 +912,8 @@ namespace DIP_SCRN {
             result = 1;
         } else {
             result = fields::Get_List_Field_(
-                10, 0x76, 0xF5, text_buffer, (char*)_diplomacy_list_choice, 50,
-                (char*)&list_pos, (char*)hotkey_flags, 0x11, nullptr, 0, nullptr, 0, 0
+                10, 0x76, 0xF5, text_buffer, _diplomacy_list_choice[0], 50,
+                list_pos, hotkey_flags, 0x11, nullptr, 0, nullptr, 0, 0
             );
         }
 
@@ -1016,8 +1017,8 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Diplomacy_Propose_Treaty_(int16_t player_idx, int16_t target_idx) {
-        int8_t valid_treaties[7];
-        char hotkeys[2] = { '\0', '\0' };
+        uint8_t valid_treaties[7];
+        int8_t hotkeys[2] = { '\0', '\0' };
 
         valid_treaties[0] = 1;
         valid_treaties[1] = 1;
@@ -1027,11 +1028,11 @@ namespace DIP_SCRN {
         valid_treaties[5] = 1;
         valid_treaties[6] = 1;
 
-        valid_treaties[0] = static_cast<int8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 7));
-        valid_treaties[1] = static_cast<int8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 8));
-        valid_treaties[2] = static_cast<int8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 3));
-        valid_treaties[3] = static_cast<int8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 1));
-        valid_treaties[4] = static_cast<int8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 2));
+        valid_treaties[0] = static_cast<uint8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 7));
+        valid_treaties[1] = static_cast<uint8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 8));
+        valid_treaties[2] = static_cast<uint8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 3));
+        valid_treaties[3] = static_cast<uint8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 1));
+        valid_treaties[4] = static_cast<uint8_t>(diplomac::Valid_Treaty_Proposal_(player_idx, target_idx, 2));
 
         fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
         fields::Set_Input_Delay_(1);
@@ -1055,7 +1056,7 @@ namespace DIP_SCRN {
             reinterpret_cast<char*>(_diplomacy_list_choice),
             50,
             hotkeys,
-            (char*)valid_treaties,
+            valid_treaties,
             0x11,
             nullptr, 0, nullptr, 0, 0
         );
@@ -1128,6 +1129,141 @@ namespace DIP_SCRN {
         }
     }
 
+    void __cdecl Get_Main_Repulsive_Diplomacy_Choices_(int16_t param_1, int16_t param_2, int8_t param_3) {
+        int16_t done = 0;
+
+        while (true) {
+            uint8_t flags[5];
+            flags[0] = 1;
+            flags[1] = 1;
+            flags[2] = 1;
+            flags[3] = 1;
+            flags[4] = 1;
+
+            if (MOX::_player[param_1].treaty[param_2] < 4) {
+                flags[0] = 0;
+            } else {
+                flags[1] = 0;
+            }
+
+            flags[2] = 0;
+            if (COLCALC::May_Surrender_Empire_(param_1, param_2)) {
+                flags[2] = 1;
+            }
+
+            if (param_3 == 0 && diplomac::Find_Worst_Modifier_(param_1, param_2) < -99) {
+                if (_old_response_message != _response_message) {
+                    Diplomacy_Display_Response_();
+                }
+                _response_message = 0x82;
+                Diplomacy_Display_Response_();
+                done = 1;
+            } else {
+                if (_net_diplomacy_esc_pressed == 1) {
+                    done = 1;
+                }
+
+                fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+                fields::Set_Input_Delay_(1);
+                fonts::Set_Outline_Color_(0, 0xF8);
+                fonts::Set_Font_Style_Outline_(4, &_diplomacy_normal_colors);
+                fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+                fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+                fonts::Set_Font_LF_(4);
+
+                int16_t list_size = 0;
+                int16_t* help_entry = nullptr;
+
+                if (param_3 == 1) {
+                    for (int i = 0; i < 6; ++i) {
+                        strcpy(_diplomacy_list_choice[i], _main_net_repulsive_diplomacy_list[i]);
+                    }
+                    help_entry = _main_net_repulsive_diplomacy_help_entry;
+                    list_size = 6;
+                } else {
+                    for (int i = 0; i < 5; ++i) {
+                        strcpy(_diplomacy_list_choice[i], _main_repulsive_diplomacy_list[i]);
+                    }
+                    help_entry = _main_repulsive_diplomacy_help_entry;
+                    list_size = 5;
+                }
+
+                Setup_Diplomacy_Help_(list_size, help_entry);
+
+                int8_t list_pos[2] = { 0 };
+                int16_t choice = fields::Get_List_Field_(
+                    10, 0x76, 0xF5, 
+                    _main_diplomacy_title, 
+                    _diplomacy_list_choice[0], 
+                    0x32, 
+                    list_pos, 
+                    flags, 
+                    0x11, nullptr, 0, nullptr, 0, 0
+                );
+
+                if (param_3 == 1 && choice == 3) {
+                    choice = 5;
+                }
+
+                switch (choice) {
+                    case 0: {
+                        *_diplomacy_message = s_empty_string_00551100[0];
+                        _old_response_message = -1;
+                        int16_t proposal = Diplomacy_Determine_Treaty_Proposal_(param_1, param_2, 3);
+                        diplomac::Adjust_Diplomat_Modifiers_(param_1, param_2);
+                        if (proposal == 1) {
+                            diplomac::Declare_Peace_(param_1, param_2);
+                        }
+                        break;
+                    }
+                    case 1:
+                        if (Diplomacy_Declare_War_Resolution_(param_1, param_2) == 1) {
+                            done = 1;
+                            Diplomacy_Display_Response_();
+                            _net_diplomacy_esc_pressed = 1;
+                        }
+                        break;
+                    case 2:
+                        if (Diplomacy_Surrender_(param_1, param_2) == 1) {
+                            done = 1;
+                            _net_diplomacy_esc_pressed = 1;
+                        }
+                        break;
+                    case 5:
+                        Diplomacy_Main_Net_Chat_(param_2, param_1);
+                        if (_net_diplomacy_esc_pressed == 1) {
+                            done = 1;
+                        }
+                        break;
+                    case -1:
+                    case 3:
+                    case 4:
+                        done = 1;
+                        if (param_3 == 1) {
+                            _net_diplomacy_message.field0_0x0 = static_cast<uint8_t>(param_1);
+                            _net_diplomacy_message.field1_0x1 = static_cast<uint8_t>(param_2);
+                            _net_diplomacy_esc_pressed = 1;
+                            _net_diplomacy_message.field4_0x6 = -1;
+                            _net_diplomacy_message.field3_0x4 = 0x82;
+
+                            NETMOX::Mox_Send_Message_(
+                                MOX::_player[param_1].network_player_id, 2000, 
+                                (uint8_t*)&_net_diplomacy_message, 8
+                            );
+                            RUSS::Mox_Update_();
+                        }
+                        break;
+                }
+            }
+
+            if (done != 0) {
+                fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+                fields::Set_Input_Delay_(1);
+                return;
+            }
+        }
+    }
+
     void __cdecl Npc_Give_Gift_(int16_t player_idx, int16_t target_idx) {
         if (MOX::_player[player_idx].diplomacy_proposal_tribute_bribe[target_idx] != 0) {
             if (MOX::_player[player_idx].diplomacy_proposal_tribute_bribe[target_idx] == 1) {
@@ -1168,6 +1304,591 @@ namespace DIP_SCRN {
                     target_idx
                 );
             }
+        }
+    }
+
+    int16_t __cdecl Diplomacy_Determine_Treaty_Proposal_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type) {
+        int16_t sVar1;
+        int16_t success;
+        int16_t local_c;
+        int16_t local_a;
+        int16_t local_8;
+        int16_t local_6;
+        int16_t local_4;
+
+        uint16_t initial_response = _response_message;
+
+        if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+            sVar1 = Check_Human_Treaty_Proposal_(proposer_idx, target_idx, treaty_type);
+        } else {
+            sVar1 = diplomac::Check_Treaty_Proposal_(target_idx, proposer_idx, treaty_type, &_response_message, &local_4, &local_6, &local_8, &local_a, &local_c);
+        }
+
+        if ((sVar1 == 0) || (sVar1 == 3)) {
+            success = (sVar1 != 0) ? 1 : 0;
+        } else {
+            if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+                sVar1 = Diplomacy_Human_Need_Better_Offer_(proposer_idx, target_idx);
+            } else {
+                sVar1 = Diplomacy_Need_Better_Offer_(local_4, local_6, local_8, local_a, local_c);
+            }
+
+            if (sVar1 == 1) {
+                success = 1;
+                switch (treaty_type) {
+                    case 1:
+                        _response_message = 0x83;
+                        break;
+                    case 2:
+                        _response_message = 0x84;
+                        break;
+                    case 3:
+                        _response_message = 0x87;
+                        break;
+                    case 7:
+                        _response_message = 0x85;
+                        break;
+                    case 8:
+                        _response_message = 0x86;
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                _response_message = 0x8A;
+                success = 0;
+            }
+        }
+
+        if (MOX::_player[target_idx].objectives == 100 /* 'd' */) {
+            if (success == 1) {
+                Get_Human_Form_Treaty_Message_(proposer_idx, target_idx, treaty_type, 3);
+            } else {
+                Get_Human_Form_Treaty_Message_(proposer_idx, target_idx, treaty_type, 0);
+            }
+        } else {
+            npcdiplo::NPC_Message_Rejection_Check_(target_idx, proposer_idx, &_response_message);
+        }
+
+        if (initial_response == _response_message) {
+            _response_message = 0x8A;
+        }
+
+        return success;
+    }
+
+    void __cdecl Diplomacy_Break_Treaty_(int16_t param_1, int16_t param_2) {
+        uint8_t option_flags[7] = {0};
+
+        if (MOX::_player[param_1].trade_treaty[param_2] == 1) {
+            option_flags[0] = 1;
+        }
+        if (MOX::_player[param_1].research_treaty[param_2] == 1) {
+            option_flags[1] = 1;
+        }
+        if (MOX::_player[param_1].tribute_treaty[param_2] > 0) {
+            option_flags[2] = 1;
+        }
+        if (MOX::_player[param_1].treaty[param_2] == 1) {
+            option_flags[3] = 1;
+        }
+        if (MOX::_player[param_1].treaty[param_2] == 2) {
+            option_flags[4] = 1;
+        }
+        option_flags[5] = 1;
+
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+        fields::Set_Input_Delay_(1);
+
+        for (int i = 0; i < 7; ++i) {
+            strcpy(_diplomacy_list_choice[i], _break_treaty_diplomacy_list[i]);
+        }
+
+        fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
+        fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+        fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+        fonts::Set_Font_LF_(4);
+        Setup_Diplomacy_Help_(7, _break_treaty_help_entry);
+
+        int8_t list_pos[2] = {0, 0};
+        int16_t choice = fields::Get_List_Field_(
+            10, 118, 245,
+            _break_treaty_title,
+            (char*)_diplomacy_list_choice,
+            50,
+            list_pos,
+            option_flags,
+            17,
+            nullptr,
+            0,
+            nullptr,
+            0,
+            0
+        );
+
+        if (choice > 4) {
+            return;
+        }
+
+        switch (choice) {
+            case 0:
+                _old_response_message = -1;
+                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 7);
+                break;
+            case 1:
+                _old_response_message = -1;
+                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 8);
+                break;
+            case 2:
+                _old_response_message = -1;
+                if (MOX::_player[param_1].tribute_treaty[param_2] == 1) {
+                    Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 9);
+                } else {
+                    Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 10);
+                }
+                break;
+            case 3:
+                _old_response_message = -1;
+                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 1);
+                break;
+            case 4:
+                _old_response_message = -1;
+                Diplomacy_Break_Treaty_Resolution_(param_1, param_2, 2);
+                break;
+        }
+    }
+
+    void __cdecl Get_Human_Form_Treaty_Message_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type, int16_t msg_type) {
+        switch (treaty_type) {
+            case 1:
+                if (msg_type != 3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x27, _diplomacy_message, 0xFA);
+                } else {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x26, _diplomacy_message, 0xFA);
+                }
+                break;
+            case 2:
+                if (msg_type != 3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x29, _diplomacy_message, 0xFA);
+                } else {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x28, _diplomacy_message, 0xFA);
+                }
+                break;
+            case 7:
+                if (msg_type != 3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x21, _diplomacy_message, 0xFA);
+                } else {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x20, _diplomacy_message, 0xFA);
+                }
+                break;
+            case 8:
+                if (msg_type != 3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x23, _diplomacy_message, 0xFA);
+                } else {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x22, _diplomacy_message, 0xFA);
+                }
+                break;
+            case 9:
+            case 10:
+                if (msg_type != 3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x25, _diplomacy_message, 0xFA);
+                } else {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x24, _diplomacy_message, 0xFA);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    void __cdecl Get_Diplomacy_Demand_Treaty_List_(int16_t player1, int16_t player2, int16_t treaty_type, int16_t* out_count, uint8_t* out_list) {
+        *out_count = 0;
+
+        if (MOX::_NUM_PLAYERS <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (player2 != i && player1 != i) {
+                if (MOX::_player[i].contact[player2] == 1 && MOX::_player[i].contact[player1] == 1) {
+                    bool add_to_list = false;
+
+                    if (treaty_type == 2) {
+                        if (MOX::_player[i].treaty[player2] == 2) {
+                            add_to_list = true;
+                        }
+                    } else if (treaty_type == 3) {
+                        if (MOX::_player[i].treaty[player2] == 4 || MOX::_player[i].treaty[player2] == 5) {
+                            add_to_list = true;
+                        }
+                    } else if (treaty_type == 5) {
+                        if (MOX::_player[i].treaty[player2] < 4) {
+                            add_to_list = true;
+                        }
+                    }
+
+                    if (add_to_list) {
+                        out_list[*out_count] = static_cast<uint8_t>(i);
+                        *out_count += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, uint8_t* list_strings, int8_t add_cancel, uint8_t* background) {
+        if (item_count > 8) {
+            item_count = 8;
+        }
+
+        uint8_t item_states[10];
+        for (int i = 0; i < 10; ++i) {
+            item_states[i] = 1;
+        }
+
+        fields::Clear_Fields_();
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+        Setup_Full_Screen_Diplomacy_Help_(0x2b6);
+        fields::Set_Input_Delay_(1);
+
+        for (int16_t i = 0; i < item_count; ++i) {
+            const char* src = reinterpret_cast<const char*>(list_strings + i * 40);
+            char* dst = _diplomacy_list_choice[i];
+            strcpy(dst, src);
+        }
+
+        int16_t cancel_idx;
+        if (add_cancel == 1) {
+            JIM::Get_Text_Message_(s_jimtext_lbx, 46, _diplomacy_list_choice[item_count], 50);
+            _diplomacy_list_choice[item_count + 1][0] = MOX::s__00551100[0];
+            cancel_idx = item_count;
+        } else {
+            cancel_idx = item_count - 1;
+            _diplomacy_list_choice[item_count][0] = MOX::s__00551100[0];
+        }
+
+        fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
+        fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+        fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+        fonts::Set_Font_LF_(4);
+
+        int8_t selected_idx[2] = { 0 };
+
+        int16_t result = fields::Get_List_Field_(
+            10, 0x76, 0xf5, (char*)background, (char*)_diplomacy_list_choice, 50,
+            selected_idx, item_states, 0x11, nullptr, 0, nullptr, 0, 0
+        );
+
+        if (result == -1 || result == cancel_idx) {
+            result = -1;
+        }
+
+        return result;
+    }
+
+    void __cdecl Diplomacy_Offer_Gift_(int16_t player_idx, int16_t target_idx) {
+        uint8_t options[16] = {0};
+        int8_t title[2];
+        int16_t local_446 = 0;
+        uint8_t local_424[212];
+        int32_t local_350[212];
+
+        options[0] = 1;
+        options[1] = 1;
+
+        if (MOX::_player[target_idx].tribute_treaty[player_idx] > 0) {
+            options[0] = 0;
+            options[1] = 0;
+        } else {
+            int16_t player_tribute = MOX::_player[player_idx].tribute_treaty[target_idx];
+            if (player_tribute > 0) {
+                options[0] = 0;
+                options[1] = 0;
+            } else if (player_tribute == 1) {
+                options[0] = 0;
+            } else if (player_tribute == 2) {
+                options[0] = 0;
+                options[1] = 0;
+            }
+        }
+
+        local_446 = 0;
+        npcdiplo::Get_Differential_Tech_List_(target_idx, player_idx, 0, 0xc343cb00, local_424, local_350, &local_446, 1);
+
+        if (local_446 > 0) {
+            options[2] = 1;
+        }
+
+        if (Check_Surrender_System_(player_idx, target_idx) == 1) {
+            options[3] = 1;
+        }
+
+        if (MOX::_player[player_idx].bc > 100) {
+            options[4] = 1;
+        }
+
+        options[5] = 1;
+
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+        fields::Set_Input_Delay_(1);
+
+        for (int i = 0; i < 7; ++i) {
+            strcpy(_diplomacy_list_choice[i], _offer_diplomacy_list[i]);
+        }
+
+        fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
+        fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+        fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+        fonts::Set_Font_LF_(4);
+
+        Setup_Diplomacy_Help_(7, &_offer_help_entry);
+
+        title[0] = '\0';
+        title[1] = '\0';
+
+        int16_t choice = fields::Get_List_Field_(
+            10, 0x76, 0xf5,
+            _offer_title,
+            (char*)_diplomacy_list_choice,
+            0x32,
+            title,
+            options,
+            0x11,
+            nullptr, 0, nullptr, 0, 0
+        );
+
+        switch (choice) {
+            case 0:
+                _old_response_message = -1;
+                diplomac::Start_Tribute_Treaty_(player_idx, target_idx, 1);
+                if (MOX::_player[target_idx].objectives != 100) {
+                    diplomac::Get_Gift_Response_(player_idx, target_idx, 2, 1, &_response_message);
+                    npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
+                } else {
+                    Get_Human_Gift_Response_(player_idx, target_idx, 2, 1);
+                }
+                break;
+
+            case 1:
+                _old_response_message = -1;
+                diplomac::Start_Tribute_Treaty_(player_idx, target_idx, 2);
+                if (MOX::_player[target_idx].objectives != 100) {
+                    diplomac::Get_Gift_Response_(player_idx, target_idx, 2, 2, &_response_message);
+                    npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
+                } else {
+                    Get_Human_Gift_Response_(player_idx, target_idx, 2, 2);
+                }
+                break;
+
+            case 2:
+            {
+                int16_t tech_idx = Diplomacy_Generic_Exchange_Tech_List_(player_idx, target_idx, _offer_title, (int8_t*)local_424, local_446, 0);
+                if (tech_idx == -1) {
+                    *_diplomacy_message = MOX::s__00551100[0];
+                } else {
+                    uint8_t tech_app = local_424[tech_idx];
+                    _old_response_message = -1;
+                    COLCALC::Player_Gets_Tech_App_(&MOX::_player[target_idx], tech_app);
+                    
+                    if (MOX::_player[target_idx].objectives != 100) {
+                        diplomac::Get_Gift_Response_(player_idx, target_idx, 3, tech_app, &_response_message);
+                        npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
+                        npcdiplo::Get_Exchange_Tech_List_(player_idx, target_idx, &_exchange_tech_count, _target_tech_list, _exchange_tech_list);
+                    } else {
+                        Get_Human_Gift_Response_(player_idx, target_idx, 3, tech_app);
+                    }
+                }
+                break;
+            }
+
+            case 3:
+            {
+                int16_t system_idx = Diplomacy_System_Display_(player_idx, _current_ambassador, 0);
+                if (system_idx == -1) {
+                    *_diplomacy_message = MOX::s__00551100[0];
+                } else {
+                    _old_response_message = -1;
+                    if (MOX::_player[target_idx].objectives != 100) {
+                        diplomac::Get_Gift_Response_(player_idx, target_idx, 4, system_idx, &_response_message);
+                        npcdiplo::NPC_Proposal_Rejection_Accept_(target_idx, player_idx, 1);
+                    } else {
+                        Get_Human_Gift_Response_(player_idx, target_idx, 4, system_idx);
+                    }
+
+                    if (COLCALC::May_Surrender_Star_(system_idx, player_idx, target_idx)) {
+                        COLCALC::Surrender_Star_(system_idx, player_idx, target_idx);
+                    }
+                }
+                break;
+            }
+
+            case 4:
+                Diplomacy_Offer_Money_(player_idx, target_idx, 1);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    void __cdecl Diplomacy_Mouse_Init_(int16_t param_1) {
+        _diplomacy_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x395);
+        s_animation_header* diplomat_anim = (s_animation_header*)
+            farload::Far_Reload_Next_(s_DIPLOMAT_LBX_00552350, (int)MOX::_player[param_1].race, MOX::_screen_seg);
+
+        bitmap::Clear_Mouse_Image_(0);
+        bitmap::Create_Blank_Bitmap_(30, 30, _diplomacy_mouse_bitmap);
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_diplomacy_mouse_bitmap, diplomat_anim);
+
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+
+        animate::Draw_Palette_(diplomat_anim);
+        remap::Update_Glass_Remap_Colors_();
+        palette::Set_Palette_Changes_(0, 0xFF);
+
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+        bitmap::Draw_Bitmap_To_Mouse_(0, 0, (s_animation_header*)_diplomacy_mouse_bitmap, 0);
+
+        _diplomacy_system_star_background_seg = (uint8_t*)farload::Far_Reload_Next_(s_dipstars_lbx_00552374, 0, MOX::_screen_seg);
+        for (int i = 0; i < 11; ++i) {
+            MOX::_fleet_galaxy_star_seg[i] = (s_animation_header*)
+                farload::Far_Reload_Next_(s_dipstars_lbx_00552374, i + 1, MOX::_screen_seg);
+        }
+
+        _main_diplomacy_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        for (int i = 0; i < 9; ++i) {
+            _main_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        }
+
+        for (int i = 0; i < 11; ++i) {
+            _main_net_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            _main_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        }
+
+        for (int i = 0; i < 6; ++i) {
+            _main_net_repulsive_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        }
+
+        _propose_treaty_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        for (int i = 0; i < 7; ++i) {
+            _propose_treaty_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        }
+
+        _break_treaty_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        for (int i = 0; i < 7; ++i) {
+            _break_treaty_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        }
+
+        _demand_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        for (int i = 0; i < 11; ++i) {
+            _demand_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        }
+
+        _offer_title = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        for (int i = 0; i < 7; ++i) {
+            _offer_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            _agree_diplomacy_list[i] = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20);
+        }
+
+        _choose_a_system_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _system_cancel_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20);
+        _system_million_colonists_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        _system_homeworld_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 30);
+        _system_x_star_system_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 35);
+        _player_number_name_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _player_name_ambassador_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _you_were_framed_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _system_unsurrenderable_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _enter_your_message_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _percent_tribute_treaty_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _statement_trade_treaty_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _statement_research_treaty_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40);
+        _net_listen_mode_option_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20);
+        _net_listen_mode_good_bye_buffer = (char*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20);
+
+        file_ani::Set_File_Animation_Buffer_(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x7C830));
+        Load_Diplomacy_Text_Messages_();
+
+        _diplomacy_current_music = -1;
+        _diplomacy_good_music = (int16_t)MOX::_player[param_1].race + 1;
+        _diplomacy_bad_music = (int16_t)random::Random_(3) + 13;
+    }
+
+    void __cdecl Start_Diplomacy_Music_(int16_t music_type) {
+        int16_t new_music;
+
+        if (music_type == 0) {
+            new_music = _diplomacy_bad_music;
+        } else {
+            new_music = _diplomacy_good_music;
+        }
+
+        if (new_music != _diplomacy_current_music) {
+            _diplomacy_current_music = new_music;
+        }
+    }
+
+    int16_t __cdecl Diplomacy_Need_Better_Offer_(int16_t type, int16_t tech_app, int16_t bc, int16_t star_idx, int16_t tribute) {
+        uint8_t selectable[16] = { 0 };
+        char text_buffer[40];
+
+        selectable[0] = 1;
+        selectable[1] = 1;
+        selectable[2] = 1;
+
+        int16_t msg_idx = (random::Random_(2) == 1) ? 0x4A : 0x4B;
+        JIM::Get_Text_Message_(s_jimtext_lbx_00552360, msg_idx, text_buffer, 40);
+
+        fields::Clear_Fields_();
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+        fields::Deactivate_Help_List_();
+        fields::Set_Input_Delay_(1);
+
+        for (int16_t i = 0; i < 3; ++i) {
+            char* src = reinterpret_cast<char**>(_agree_diplomacy_list)[i];
+            strcpy(_diplomacy_list_choice[i], src);
+        }
+
+        fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
+        fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+        fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+        fonts::Set_Font_LF_(4);
+
+        int8_t current_idx[2] = { 0 };
+        int16_t result = fields::Get_List_Field_(
+            10, 118, 245, text_buffer, _diplomacy_list_choice[0], 50,
+            current_idx, selectable, 17, nullptr, 0, nullptr, 0, 0
+        );
+
+        if (result == -1 || result == 1) {
+            return 0;
+        }
+
+        switch (type) {
+        case 1:
+            MOX::_player[MOX::_PLAYER_NUM].bc -= bc;
+            MOX::_player[_current_ambassador].bc += bc;
+            return 1;
+        case 2:
+            if (COLCALC::May_Surrender_Star_(star_idx, MOX::_PLAYER_NUM, _current_ambassador)) {
+                COLCALC::Surrender_Star_(star_idx, MOX::_PLAYER_NUM, _current_ambassador);
+            }
+            return 1;
+        case 3:
+            MOX::_player[MOX::_PLAYER_NUM].tribute_treaty[_current_ambassador] = tribute;
+            return 1;
+        case 4:
+            COLCALC::Player_Gets_Tech_App_(&MOX::_player[_current_ambassador], tech_app);
+            return 1;
+        default:
+            return 1;
         }
     }
 }

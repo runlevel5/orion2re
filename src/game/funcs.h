@@ -621,6 +621,7 @@ inline char* const s_GER_HELP_LBX_00557480 = reinterpret_cast<char*>(std::uintpt
 inline char* const s_HELP_LBX_00557490 = reinterpret_cast<char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
 inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); // "DIPLOMAT.LBX"
 inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
+inline const char* s_dipstars_lbx_00552374 = reinterpret_cast<const char*>(std::uintptr_t{0x00552374}); // "dipstars.lbx"
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
@@ -751,6 +752,7 @@ inline const char* s_i_PR_00557d84 = reinterpret_cast<const char*>(0x00557D84);
 inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);
 inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
 inline const char* s_jimtext_lbx_00552360 = reinterpret_cast<const char*>(0x00552360);
+inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340});
 inline const char* s_s_sez__s_00552334 = reinterpret_cast<const char*>(std::uintptr_t{0x00552334}); // "%s sez: %s"
 inline const char* s_percent_s_0055236c = reinterpret_cast<const char*>(0x0055236C);
 inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);

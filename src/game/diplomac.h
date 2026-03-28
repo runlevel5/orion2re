@@ -122,4 +122,16 @@ namespace diplomac {
     }
 
     int8_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
+
+    inline int16_t __cdecl Check_Treaty_Proposal_(int16_t target_idx, int16_t proposer_idx, int16_t treaty_type, uint16_t* response_message, int16_t* var1, int16_t* var2, int16_t* var3, int16_t* var4, int16_t* var5) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, uint16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004556F0});
+        return fn(target_idx, proposer_idx, treaty_type, response_message, var1, var2, var3, var4, var5);
+    }
+
+    inline void __cdecl Get_Gift_Response_(int16_t param_1, int16_t param_2, int16_t category, int16_t gift_param, uint16_t* response) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456B60});
+        fn(param_1, param_2, category, gift_param, response);
+    }
 }

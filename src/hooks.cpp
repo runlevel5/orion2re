@@ -2384,6 +2384,16 @@ namespace hooks {
         { 0x00414560, &DIP_SCRN::Diplomacy_Fade_In_ },
         { 0x00414690, &DIP_SCRN::Diplomacy_Propose_Treaty_ },
         { 0x005214c0, &fields::Add_String_List_Field_ },
+        { 0x00413A30, &DIP_SCRN::Get_Main_Repulsive_Diplomacy_Choices_ },
+        { 0x00416530, &DIP_SCRN::Diplomacy_Determine_Treaty_Proposal_ },
+        { 0x00415400, &DIP_SCRN::Get_Human_Form_Treaty_Message_ },
+        { 0x00414a30, &DIP_SCRN::Diplomacy_Break_Treaty_ },
+        { 0x00417180, &DIP_SCRN::Get_Diplomacy_Demand_Treaty_List_ },
+        { 0x00416a30, &DIP_SCRN::Diplomacy_Generic_List_ },
+        { 0x00415FF0, &DIP_SCRN::Diplomacy_Offer_Gift_ },
+        { 0x00418b90, &DIP_SCRN::Diplomacy_Mouse_Init_ },
+        { 0x0041a480, &DIP_SCRN::Start_Diplomacy_Music_ },
+        { 0x00416700, &DIP_SCRN::Diplomacy_Need_Better_Offer_ },
     };
 
     void Install_Hooks()

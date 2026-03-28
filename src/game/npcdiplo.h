@@ -58,4 +58,10 @@ namespace npcdiplo {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ebfa0});
         fn(player_a, player_b, mode, max_value, tech_list, tech_cost_list, n_techs, sort_flag);
     }
+
+    inline void __cdecl NPC_Message_Rejection_Check_(int16_t target_idx, int16_t proposer_idx, uint16_t* response_message) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004EC520});
+        fn(target_idx, proposer_idx, response_message);
+    }
 }

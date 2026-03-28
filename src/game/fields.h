@@ -197,9 +197,9 @@ namespace fields {
 
     void __cdecl Release_Fields_();
 
-    inline int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* font, char* list_ptr, int16_t item_size, char* selection_buffer, char* highlight_buffer, int16_t param_9, int16_t* param_10, int16_t param_11, s_animation_header* param_12, int16_t param_13, int16_t param_14) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, char*, char*, int16_t, char*, char*, int16_t, int16_t*, int16_t, s_animation_header*, int16_t, int16_t);
+    inline int16_t __cdecl Get_List_Field_(int16_t num_items, int16_t x, int16_t y, char* font, char* list_ptr, int16_t item_size, int8_t* selected_index, uint8_t* item_flags, int16_t param_9, int16_t* param_10, int16_t param_11, s_animation_header* param_12, int16_t param_13, int16_t param_14) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, char*, char*, int16_t, int8_t*, uint8_t*, int16_t, int16_t*, int16_t, s_animation_header*, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00521210});
-        return fn(x, y, width, font, list_ptr, item_size, selection_buffer, highlight_buffer, param_9, param_10, param_11, param_12, param_13, param_14);
+        return fn(num_items, x, y, font, list_ptr, item_size, selected_index, item_flags, param_9, param_10, param_11, param_12, param_13, param_14);
     }
 }
