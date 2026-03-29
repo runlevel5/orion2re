@@ -68,6 +68,7 @@
     <ClCompile Include="src\game\design_main.cpp" />
     <ClCompile Include="src\game\diplomac.cpp" />
     <ClCompile Include="src\game\dip_scrn.cpp" />
+    <ClCompile Include="src\game\dip_scrn_main.cpp" />
     <ClCompile Include="src\game\dos.cpp" />
     <ClCompile Include="src\game\draw.cpp" />
     <ClCompile Include="src\game\eric.cpp" />

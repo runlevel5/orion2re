@@ -6,7 +6,7 @@ namespace DIP_SCRN {
     inline s_mouse_list& _diplomacy_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00552318});
     inline uint8_t& _ambassador_option = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A81BC});
     inline int16_t& _main_diplomacy_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00552280 });
-    inline uint16_t& _response_message = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A81CC});
+    inline int16_t& _response_message = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A81CC});
     inline uint16_t& _synch_up_established_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A81CE});
     inline int16_t& _old_response_message = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A81D0});
     inline int16_t* _propose_treaty_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522D0});
@@ -14,13 +14,16 @@ namespace DIP_SCRN {
     inline char*& _propose_treaty_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A85DC});
     inline int8_t& _talker_ambassador = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A8378});
     inline int16_t& _diplomacy_current_music = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89EC});
-    inline uint16_t& _net_diplomacy_esc_pressed = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89FC});
+    inline int16_t& _net_diplomacy_esc_pressed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89FC});
     inline uint8_t (&_target_tech_list)[212] = *reinterpret_cast<uint8_t(*)[212]>(std::uintptr_t{ 0x005A85E0 });
     inline uint8_t& _listen_ambassador = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8A06});
     inline int16_t& _exchange_tech_count = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A89D8 });
     inline char* (&_main_diplomacy_list)[9] = *reinterpret_cast<char* (*)[9]>(std::uintptr_t{ 0x005A8A10 });
     inline char* (&_propose_treaty_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A8A50});
     inline int16_t (&_exchange_tech_list)[100] = *reinterpret_cast<int16_t(*)[100]>(std::uintptr_t{ 0x005A8A70 });
+    inline char (&_chat_message)[100] = *reinterpret_cast<char (*)[100]>(std::uintptr_t{0x005A82F0});
+    inline int16_t& _diplomacy_quit_chat_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A00});
+    inline int16_t& _diplomacy_chat_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A40});
     inline char (&_net_diplomacy_chat_message)[100] = *reinterpret_cast<char(*)[100]>(std::uintptr_t{0x005A8B50});
     inline char*& _player_number_name_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A89F0});
     inline char*& _player_name_ambassador_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A81C8});
@@ -33,8 +36,24 @@ namespace DIP_SCRN {
     inline const char* s_jimtext_lbx = reinterpret_cast<const char*>(0x00552360);
     inline const char* s__00551100 = (const char*)std::uintptr_t{0x00551100}; // ""
     inline const char* s_jimtext2_lbx_00552340 = (const char*)std::uintptr_t{0x00552340}; // "jimtext2.lbx"
+    inline const char* s_jimtext2_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552340});
     inline const char* s_jimtext_lbx_00552360 = (const char*)std::uintptr_t{0x00552360}; // "jimtext.lbx"
     inline const char* s__d_BC_00552384 = (const char*)std::uintptr_t{0x00552384}; // "  %d BC"
+
+    inline uint16_t& _chat_width =
+            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A85D8});
+
+    inline uint16_t& _chat_base_y =
+            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89DA});
+
+    inline uint16_t& _chat_base_x =
+            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89DC});
+
+    inline uint16_t& _chat_height =
+            *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A89FE});
+
+    inline uint8_t& _chat_mode_flag =
+            *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8A02});
 
     inline s_colors& _diplomacy_normal_colors =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x00552268});
@@ -62,6 +81,14 @@ namespace DIP_SCRN {
     inline uint8_t& DAT_005a8712 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8712});
     inline uint8_t& DAT_005a8744 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8744});
 
+    inline bool __cdecl Check_Better_Offer_Available_(int16_t player_a, int16_t player_b) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00418490});
+        return fn(player_a, player_b);
+    }
+
+    void __cdecl Get_Human_Propose_Treaty_Message_(int16_t treaty_type);
+
     void Resolve_Delayed_Diplomacy_Orders_();
 
     void __cdecl Set_Opportunity_Attacks_();
@@ -88,11 +115,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Break_Treaty_(int16_t param_1, int16_t param_2);
 
-    inline void __cdecl Diplomacy_Break_Treaty_Resolution_(int16_t param_1, int16_t param_2, int param_3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00414cb0});
-        fn(param_1, param_2, param_3);
-    }
+    void __cdecl Diplomacy_Break_Treaty_Resolution_(int16_t sender_id, int16_t target_id, int16_t treaty_type);
 
     inline void __cdecl Diplomacy_Demand_(int16_t player_num, int16_t ambassador_idx) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
@@ -108,17 +131,11 @@ namespace DIP_SCRN {
         fn(player_num, ambassador_idx);
     }
 
-    inline int16_t __cdecl Diplomacy_Declare_War_Resolution_(int16_t player_num, int16_t ambassador_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00414300 });
-        return fn(player_num, ambassador_idx);
-    }
+    int16_t __cdecl Diplomacy_Declare_War_Resolution_(int16_t sender_id, int16_t target_id);
 
-    inline int16_t __cdecl Diplomacy_Surrender_(int16_t player_num, int16_t ambassador_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041a4b0 });
-        return fn(player_num, ambassador_idx);
-    }
+    int16_t __cdecl Diplomacy_Surrender_(int16_t sender_player_id, int16_t target_player_id);
+
+    void __cdecl Get_Human_Surrender_Message_(int16_t race_idx);
 
     void __cdecl Add_Diplomacy_Turn_Summary_Messages_();
 
@@ -157,17 +174,19 @@ namespace DIP_SCRN {
     inline char* (&_main_net_repulsive_diplomacy_list)[6] = *reinterpret_cast<char* (*)[6]>(std::uintptr_t{0x005A85B0});
     inline s_dipscrn_net_message& _net_diplomacy_message = *reinterpret_cast<s_dipscrn_net_message*>(std::uintptr_t{0x005A8370});
 
-    inline void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041DAC0});
-        fn(param_1, param_2);
-    }
+    void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2);
 
-    inline int16_t __cdecl Check_Human_Treaty_Proposal_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00418170});
-        return fn(proposer_idx, target_idx, treaty_type);
-    }
+    void __cdecl Draw_Diplomacy_Listen_Mode_();
+
+    void __cdecl Diplomacy_Chat_(int16_t player_idx, uint8_t target_player_id);
+
+    int16_t __cdecl Check_Human_Treaty_Proposal_(int16_t player_id, int16_t target_player_id, int16_t treaty_type);
+
+    int16_t __cdecl Get_Human_Treaty_Choice_(int16_t player_a, int16_t player_b, int16_t treaty_type);
+
+    void __cdecl Get_Listen_Mode_Message_(int16_t race_idx);
+
+    void __cdecl Diplomacy_Listen_Mode_(int16_t player_idx, uint8_t target_player_id);
 
     int16_t __cdecl Diplomacy_Need_Better_Offer_(int16_t type, int16_t tech_app, int16_t bc, int16_t star_idx, int16_t tribute);
 
@@ -179,7 +198,11 @@ namespace DIP_SCRN {
 
     void __cdecl Get_Human_Form_Treaty_Message_(int16_t proposer_idx, int16_t target_idx, int16_t treaty_type, int16_t msg_type);
 
+    void __cdecl Get_Human_Declare_War_Message_(int16_t race_idx);
+
     void __cdecl Get_Diplomacy_Demand_Treaty_List_(int16_t player1, int16_t player2, int16_t treaty_type, int16_t* out_count, uint8_t* out_list);
+
+    void __cdecl Get_Diplomacy_Tech_List_(int16_t player_a_idx, int16_t player_b_idx, int16_t* tech_count_ptr, uint8_t* tech_list_buffer);
 
     int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, uint8_t* list_strings, int8_t add_cancel, uint8_t* background);
 
@@ -221,7 +244,10 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Load_New_Ambassador_(int16_t player_idx);
 
-    void __cdecl Get_Human_Gift_Response_(int16_t sender_player_idx, int16_t target_player_idx, int16_t gift_type, int16_t gift_arg);
+    void __cdecl Get_Human_Break_Treaty_Message_(int16_t race_idx, int16_t treaty_type);
+
+    void __cdecl Get_Human_Gift_Response_(int16_t sender_id, int16_t target_id, int16_t gift_type, int16_t gift_arg);
+
     inline int16_t __cdecl Diplomacy_System_Display_(int16_t param_1, uint8_t ambassador, int16_t flag) {
         using Fn = int16_t(__cdecl*)(int16_t, uint8_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00419800});

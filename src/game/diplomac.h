@@ -38,6 +38,30 @@ namespace diplomac {
 
     void __cdecl Break_Tribute_(int16_t p1_idx, int16_t p2_idx);
 
+    inline void __cdecl Get_Break_Treaty_Message_(int16_t sender_id, int16_t target_id, int16_t* out_msg_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456770});
+        fn(sender_id, target_id, out_msg_id);
+    }
+
+    inline void __cdecl Get_Break_Trade_Message_(int16_t sender_id, int16_t target_id, int16_t* out_msg_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456940});
+        fn(sender_id, target_id, out_msg_id);
+    }
+
+    inline void __cdecl Get_Break_Research_Message_(int16_t sender_id, int16_t target_id, int16_t* out_msg_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456870});
+        fn(sender_id, target_id, out_msg_id);
+    }
+
+    inline void __cdecl Get_Break_Tribute_Treaty_Message_(int16_t sender_id, int16_t target_id, int16_t* out_msg_id) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456A10});
+        fn(sender_id, target_id, out_msg_id);
+    }
+
     inline void __cdecl Start_Trade_Treaty_(int16_t a, int16_t b) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004551b0});
@@ -111,6 +135,12 @@ namespace diplomac {
 
     void __cdecl Adjust_Diplomat_Modifiers_(int16_t player_idx, int16_t target_idx);
 
+    inline void __cdecl Get_Declare_War_Message_(int16_t sender_id, int16_t target_id, int16_t* response_message) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456AE0});
+        fn(sender_id, target_id, response_message);
+    }
+
     void __cdecl Diplomacy_Broken_Contacts_();
 
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_idx_1, int16_t player_idx_2);
@@ -123,14 +153,14 @@ namespace diplomac {
 
     int8_t Valid_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t treaty_type);
 
-    inline int16_t __cdecl Check_Treaty_Proposal_(int16_t target_idx, int16_t proposer_idx, int16_t treaty_type, uint16_t* response_message, int16_t* var1, int16_t* var2, int16_t* var3, int16_t* var4, int16_t* var5) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, uint16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+    inline int16_t __cdecl Check_Treaty_Proposal_(int16_t target_idx, int16_t proposer_idx, int16_t treaty_type, int16_t* response_message, int16_t* var1, int16_t* var2, int16_t* var3, int16_t* var4, int16_t* var5) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004556F0});
         return fn(target_idx, proposer_idx, treaty_type, response_message, var1, var2, var3, var4, var5);
     }
 
-    inline void __cdecl Get_Gift_Response_(int16_t param_1, int16_t param_2, int16_t category, int16_t gift_param, uint16_t* response) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint16_t*);
+    inline void __cdecl Get_Gift_Response_(int16_t param_1, int16_t param_2, int16_t category, int16_t gift_param, int16_t* response) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456B60});
         fn(param_1, param_2, category, gift_param, response);
     }

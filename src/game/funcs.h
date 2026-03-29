@@ -753,6 +753,7 @@ inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);
 inline const char* s_i_RP_00557d94 = reinterpret_cast<const char*>(0x00557D94);
 inline const char* s_jimtext_lbx_00552360 = reinterpret_cast<const char*>(0x00552360);
 inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340});
+inline const char* s_jimtext2_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552340}); // "jimtext2.lbx"
 inline const char* s_s_sez__s_00552334 = reinterpret_cast<const char*>(std::uintptr_t{0x00552334}); // "%s sez: %s"
 inline const char* s_percent_s_0055236c = reinterpret_cast<const char*>(0x0055236C);
 inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);

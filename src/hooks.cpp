@@ -2403,6 +2403,21 @@ namespace hooks {
         { 0x004455d0, &aidudes::Sort_Pops_FR_I_ },
         { 0x00445520, &aidudes::Sort_Pops_R_I_ },
         { 0x00493100, &DESBOX::Update_Weapon_Modification_Data_ },
+        { 0x00414cb0, &DIP_SCRN::Diplomacy_Break_Treaty_Resolution_ },
+        { 0x00414300, &DIP_SCRN::Diplomacy_Declare_War_Resolution_ },
+        { 0x0041a4b0, &DIP_SCRN::Diplomacy_Surrender_ },
+        { 0x0041dac0, &DIP_SCRN::Diplomacy_Main_Net_Chat_ },
+        { 0x00418170, &DIP_SCRN::Check_Human_Treaty_Proposal_ },
+        { 0x00416980, &DIP_SCRN::Get_Diplomacy_Tech_List_ },
+        { 0x0041c720, &DIP_SCRN::Diplomacy_Chat_ },
+        { 0x004182e0, &DIP_SCRN::Get_Human_Treaty_Choice_ },
+        { 0x0041cbc0, &DIP_SCRN::Get_Listen_Mode_Message_ },
+        { 0x0041c580, &DIP_SCRN::Diplomacy_Listen_Mode_ },
+        { 0x00414f40, &DIP_SCRN::Get_Human_Declare_War_Message_ },
+        { 0x004152c0, &DIP_SCRN::Get_Human_Break_Treaty_Message_ },
+        { 0x00415540, &DIP_SCRN::Get_Human_Propose_Treaty_Message_ },
+        { 0x00414f00, &DIP_SCRN::Get_Human_Surrender_Message_ },
+        { 0x0041c8b0, &DIP_SCRN::Draw_Diplomacy_Listen_Mode_ },
     };
 
     void Install_Hooks()

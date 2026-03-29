@@ -14,6 +14,8 @@ namespace JIM {
     inline s_mouse_list& _logo_mouse_list = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x005558F0 });
     inline int16_t& _darken_palette_value = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A7D96 });
 
+    inline const char* jimtext_lbx = reinterpret_cast<const char*>(0x00552360);
+
     inline const char* s_intro_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555960 });   // "intro.lbx"
     inline const char* s_simtex_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055596C });  // "simtex.lbx"
     inline const char* s_logo_lbx = reinterpret_cast<const char*>(std::uintptr_t{ 0x00555978 });    // "logo.lbx"
@@ -67,9 +69,10 @@ namespace JIM {
         fn(buffer, ambassador, id_plus_one, max_len);
     }
 
-    inline void __cdecl Decode_Text_Race_(char* buffer, int16_t player_idx, int16_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004258F0)(buffer, player_idx, max_len);
+    inline void __cdecl Decode_Text_Race_(char* buffer, int16_t race_idx, int max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425770});
+        fn(buffer, race_idx, max_len);
     }
 
     inline void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx, int16_t max_len) {
