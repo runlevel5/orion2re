@@ -2,6 +2,9 @@
 #include <cstdint>
 
 namespace DESBOX {
+    inline uint16_t& _weapon_replacement_mods =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00566428});
+
     inline int8_t& _incr_value = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A61E0});
 
     inline void __cdecl Generic_Replacement_Box_() {
@@ -19,4 +22,5 @@ namespace DESBOX {
         fn();
     }
     uint32_t __cdecl Application_Type_(int16_t app_id);
+    void __cdecl Update_Weapon_Modification_Data_();
 }

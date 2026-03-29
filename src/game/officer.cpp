@@ -749,25 +749,25 @@ namespace OFFICER {
         }
 
         if (OFFICER::_officer_button_mode == 2) {
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg_active), 1);
-            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg_active));
+            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg), 1);
+            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg));
         } else if (OFFICER::_officer_dismiss_btn == -1000) {
-            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg_inactive));
+            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_dismiss_button_seg));
         }
 
         if (OFFICER::_officer_button_mode == 1) {
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg_active), 1);
-            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg_active));
+            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg), 1);
+            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg));
         } else if (OFFICER::_officer_pool_btn == -1000) {
-            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg_inactive));
+            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_pool_button_seg));
         }
 
         if (!Leaders_In_Hiring_Pool_()) {
-            animate::Draw_(313, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_pool_button_seg));
+            animate::Draw_(313, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_hire_button_seg));
         }
 
         if (OFFICER::_officer_button_mode == 0) {
-            animate::Draw_(300, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_hire_button_seg));
+            animate::Draw_(300, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_hire_replace_seg));
             if (MOX::_officer_scanned > -1) {
                 Get_Officer_Costs_(MOX::_officer_scanned, &hire_cost, &maint_cost);
                 if (maint_cost == 0) {
@@ -2141,8 +2141,8 @@ namespace OFFICER {
         MOX::_officer_prev_button_seg = farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
         MOX::_officer_next_button_seg = farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg);
         MOX::_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg);
-        MOX::_officer_pool_button_seg_inactive = farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
-        MOX::_officer_dismiss_button_seg_active = farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
+        MOX::_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
+        MOX::_officer_dismiss_button_seg = farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
         MOX::_officer_return_button_seg = farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
         MOX::_officer_cancel_hire_button_seg = farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
 
@@ -2151,10 +2151,10 @@ namespace OFFICER {
         MOX::_selected_box_seg = farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
         MOX::_fleet_scroll_anim_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
-        MOX::_dull_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
-        MOX::_dull_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
-        MOX::_officer_pool_button_seg_active = farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
-        MOX::_officer_dismiss_button_seg_inactive = farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
+        MOX::_officer_hire_replace_seg = farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
+        MOX::_dull_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
+        MOX::_dull_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
+        MOX::_dull_officer_dismiss_button_seg = farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
 
         MOX::Mox_Update_();
 

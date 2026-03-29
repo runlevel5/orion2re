@@ -976,7 +976,7 @@ namespace COLCALC {
 
         if (debug_out) {
             char* ptr = debug_out;
-            ptr += _sprintf(ptr, s_fmt_val_msg, 5, _d_from_1_fortress_msg);
+            ptr += _sprintf(ptr, s_fmt_val_msg, 5, _starting_command_points_msg);
 
             if (n_star_bases > 0) {
                 if (n_star_bases == 1) ptr += _sprintf(ptr, _d_from_1_star_base_msg, 1);
@@ -987,7 +987,7 @@ namespace COLCALC {
                 else ptr += _sprintf(ptr, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
             }
             if (n_fortresses > 0) {
-                if (n_fortresses == 1) ptr += _sprintf(ptr, _d_from_1_fortress_msg_alt, 3);
+                if (n_fortresses == 1) ptr += _sprintf(ptr, _d_from_1_fortress_msg, 3);
                 else ptr += _sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
             }
             if (comm_tech_total != 0) {

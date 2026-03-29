@@ -1502,8 +1502,8 @@ struct s_fleet_box {
     short count;
     short field8_0xe;
     short field9_0x10;
-    struct s_animation_header *name_sm_seg;
-    struct s_animation_header *name_sm_seg2;
+    struct s_animation_header *name_seg;
+    struct s_animation_header *bottom_seg;
     int8_t is_small_frame;
     int8_t mouse_pressed;
     int8_t attack_btn_active;

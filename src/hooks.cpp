@@ -2402,6 +2402,7 @@ namespace hooks {
         { 0x00414f80, &DIP_SCRN::Get_Human_Offer_Gift_Message_ },
         { 0x004455d0, &aidudes::Sort_Pops_FR_I_ },
         { 0x00445520, &aidudes::Sort_Pops_R_I_ },
+        { 0x00493100, &DESBOX::Update_Weapon_Modification_Data_ },
     };
 
     void Install_Hooks()

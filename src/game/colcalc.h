@@ -37,7 +37,7 @@ namespace COLCALC {
     inline const char*& _d_from_1_star_base_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B18});
     inline const char*& _d_from_1_noncombat_ship_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B1C});
     inline const char*& _d_from_d_fortresses_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B34});
-    inline const char*& _d_from_1_fortress_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B3C});
+    inline const char*& _starting_command_points_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B3C});
     inline const char*& _d_from_d_star_bases_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B44});
     inline const char*& _total_command_point_used_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B58});
     inline const char*& _d_from_d_s_ships_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B60});
@@ -47,7 +47,7 @@ namespace COLCALC {
     inline const char*& _total_command_points_used_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B74});
     inline const char*& _from_imperium_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B84});
     inline const char*& _d_from_1_battlestation_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571B94});
-    inline const char*& _d_from_1_fortress_msg_alt = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC4});
+    inline const char*& _d_from_1_fortress_msg = *reinterpret_cast<const char**>(std::uintptr_t{0x00571BC4});
 
     inline s_colony*& _colony_calc_food_colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A864});
