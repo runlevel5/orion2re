@@ -230,7 +230,7 @@ namespace DIP_SCRN {
         }
     }
 
-    int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, uint8_t* list_strings, int8_t add_cancel, uint8_t* background) {
+    int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, char* list_strings, int8_t add_cancel, char* background) {
         if (item_count > 8) {
             item_count = 8;
         }
@@ -696,13 +696,21 @@ namespace DIP_SCRN {
 
     int16_t __cdecl Diplomacy_Offer_Money_(int16_t player_idx, int16_t target_idx, int8_t do_transaction) {
         int16_t result_bc = -1;
+        int16_t choice_count;
+        int16_t bc_options[5];
+        int8_t selection_idx[2];
+        uint8_t selection_flags[15];
+        char title_text[40];
+
         Setup_Full_Screen_Diplomacy_Help_(0x267);
 
-        uint8_t selection_flags[15];
+        selection_idx[0] = 0;
+        selection_idx[1] = 0;
+
         memset(selection_flags, 1, 15);
 
         for (int i = 0; i < 15; ++i) {
-            strcpy(_diplomacy_list_choice[i], s__00551100);
+            _diplomacy_list_choice[i][0] = s__00551100[0];
         }
 
         int current_bc = MOX::_player[player_idx].bc;
@@ -711,8 +719,6 @@ namespace DIP_SCRN {
         }
 
         int16_t rounded_bc = (int16_t)(current_bc / 20) * 20;
-        int16_t bc_options[5];
-        int8_t choice_count;
 
         if (rounded_bc < 100) {
             choice_count = rounded_bc / 20;
@@ -721,7 +727,8 @@ namespace DIP_SCRN {
             bc_options[2] = 60;
             bc_options[3] = 80;
             bc_options[4] = 100;
-        } else {
+        }
+        else {
             choice_count = 5;
             bc_options[0] = (int16_t)((rounded_bc / 5) / 20) * 20;
             bc_options[1] = (int16_t)((rounded_bc * 2 / 5) / 20) * 20;
@@ -730,7 +737,7 @@ namespace DIP_SCRN {
             bc_options[4] = (int16_t)(rounded_bc / 20) * 20;
         }
 
-        for (int i = 0; i < (int)choice_count; ++i) {
+        for (int i = 0; i < choice_count; ++i) {
             _sprintf(_diplomacy_list_choice[i], s__d_BC_00552384, (int)bc_options[i]);
             if (MOX::_player[player_idx].bc < (int)bc_options[i]) {
                 selection_flags[i] = 0;
@@ -738,13 +745,12 @@ namespace DIP_SCRN {
         }
 
         JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x2E, _diplomacy_list_choice[choice_count], 0x28);
-        
-        char title_text[40];
+
         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 8, title_text, 0x28);
 
         int16_t selection = fields::Get_List_Field_(
             10, 0x76, 0xF5, title_text, _diplomacy_list_choice[0], 0x32,
-            &choice_count, selection_flags, 0x11, 0, 0, 0, 0, 0
+            selection_idx, selection_flags, 0x11, 0, 0, 0, 0, 0
         );
 
         if (selection >= 0 && selection < choice_count) {
@@ -894,36 +900,38 @@ namespace DIP_SCRN {
     }
 
     int16_t __cdecl Diplomacy_Declare_War_Resolution_(int16_t sender_id, int16_t target_id) {
-        char buffer1[40];
+        char buffer1[400] = { 0 };
         char buffer2[80];
         int16_t result = 0;
 
         Setup_Full_Screen_Diplomacy_Help_(0x266);
 
-        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 59, buffer1, 40);
-        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 60, buffer2, 80);
+        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3B, buffer1, 0x28);
+        JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3C, buffer2, 0x50);
 
-        if (Diplomacy_Generic_List_(1, (uint8_t*)&buffer1[12], 1, (uint8_t*)buffer2) != -1) {
+        if (Diplomacy_Generic_List_(1, buffer1, 1, buffer2) != -1) {
             result = 1;
 
-            if (MOX::_player[target_id].objectives == 'd' /* 0x64 */) {
+            if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
                 if (MOX::_game_type == 1) {
                     Diplomacy_Load_New_Ambassador_(sender_id);
-                    Get_Human_Declare_War_Message_(sender_id);
+                    Get_Human_Declare_War_Message_(target_id);
                     Diplomacy_Display_Response_();
                     Diplomacy_Load_New_Ambassador_(target_id);
-                } else {
+                }
+                else {
                     _net_diplomacy_message.arg2 = (int16_t)_response_message;
                     _net_diplomacy_message.sender_player_id = (uint8_t)sender_id;
                     _net_diplomacy_message.target_player_id = (uint8_t)target_id;
                     _net_diplomacy_message.arg1 = 0;
-                    _net_diplomacy_message.msg_type = 1002 /* 0x3ea */;
+                    _net_diplomacy_message.msg_type = 0x3EA;
 
                     NETMOX::Mox_Send_Message_(MOX::_player[target_id].network_player_id, 2000, &_net_diplomacy_message, 8);
                     RUSS::Mox_Update_();
                 }
-                _response_message = 160 /* 0xa0 */;
-            } else {
+                _response_message = 0xA0;
+            }
+            else {
                 diplomac::Get_Declare_War_Message_(sender_id, target_id, &_response_message);
             }
 
@@ -944,7 +952,7 @@ namespace DIP_SCRN {
         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 6, msg6_buffer, 40);
         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 7, msg7_buffer, 80);
 
-        if (DIP_SCRN::Diplomacy_Generic_List_(1, (uint8_t*)&msg6_buffer[12], 1, (uint8_t*)msg7_buffer) != -1) {
+        if (DIP_SCRN::Diplomacy_Generic_List_(1, msg6_buffer, 1, msg7_buffer) != -1) {
             if (COLCALC::May_Surrender_Empire_(sender_player_id, target_player_id)) {
                 COLCALC::Surrender_Empire_(sender_player_id, target_player_id);
             }
@@ -1181,7 +1189,7 @@ namespace DIP_SCRN {
 
         JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4A, title_text, 40);
 
-        selected_idx = DIP_SCRN::Diplomacy_Generic_List_(num_choices, (uint8_t*)choice1_text, 0, (uint8_t*)title_text);
+        selected_idx = DIP_SCRN::Diplomacy_Generic_List_(num_choices, choice1_text, 0, title_text);
 
         if (num_choices == 2 && selected_idx == -1) {
             selected_idx = 1;

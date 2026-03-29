@@ -204,7 +204,7 @@ namespace DIP_SCRN {
 
     void __cdecl Get_Diplomacy_Tech_List_(int16_t player_a_idx, int16_t player_b_idx, int16_t* tech_count_ptr, uint8_t* tech_list_buffer);
 
-    int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, uint8_t* list_strings, int8_t add_cancel, uint8_t* background);
+    int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, char* list_strings, int8_t add_cancel, char* title);
 
     inline int16_t& _offer_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552308});
     inline char* (&_offer_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A81E0});
