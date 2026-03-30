@@ -1574,12 +1574,12 @@ namespace DIP_SCRN {
         fields::Clear_Fields_();
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
-            MOVEBOX::Get_Galaxy_Map_Star_XY_(i, 10, 0xAB, 0xB4, 0x6E, 0, 0, 1, &y, &x);
-            int16_t field_id = fields::Add_Hidden_Field_(x, y, x + 5, y + 5, DIP_SCRN::s_empty, 0);
+            MOVEBOX::Get_Galaxy_Map_Star_XY_(i, 10, 0xAB, 0xB4, 0x6E, 0, 0, 1, &x, &y);
+            int16_t field_id = fields::Add_Hidden_Field_(x, y, x + 5, y + 5, s__00551100, 0);
             DIP_SCRN::_diplomacy_system_fields[i + 1] = field_id;
         }
 
-        exit_field_id = fields::Add_Hidden_Field_(0xF, 0x8B, 0x9D, 0xA2, DIP_SCRN::s_empty, 0);
+        exit_field_id = fields::Add_Hidden_Field_(0xF, 0x8B, 0x9D, 0xA2, s__00551100, 0);
 
         while (true) {
             timer::Mark_Time_();
@@ -1617,6 +1617,7 @@ namespace DIP_SCRN {
             if (input != 0 && !done) {
                 DIP_SCRN::_diplomacy_scan_input_flag = -1;
                 for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                    if (done) break;
                     if (DIP_SCRN::_diplomacy_system_fields[i + 1] == input) {
                         if (DIP_SCRN::Diplomacy_System_Scan_(input - 1, giver_idx, &DIP_SCRN::_diplomacy_system_homeworld_flag, &DIP_SCRN::_diplomacy_system_planet_count, (int8_t*)DIP_SCRN::_diplomacy_system_planet_list) == giver_idx) {
                             if (COLCALC::May_Surrender_Star_(input - 1, (int16_t)DIP_SCRN::_diplomacy_system_giver, (int16_t)DIP_SCRN::_diplomacy_system_receiver)) {
@@ -1627,7 +1628,6 @@ namespace DIP_SCRN {
                             }
                         }
                     }
-                    if (done) break;
                 }
             }
 
