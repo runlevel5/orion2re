@@ -589,19 +589,22 @@ namespace DIP_SCRN {
                     replacement = MOX::_player[param_3].name;
                     break;
                 case 0x84:
-                    replacement = An_(MOX::_player[param_3].race_name);
+                    replacement = An_(MOX::_player[param_2].race_name);
                     break;
                 case 0x85:
-                    replacement = MOX::_star[MOX::_player[param_3].diplomacy_system[param_2]].name;
+                    replacement = An_(MOX::_player[param_3].race_name);
                     break;
                 case 0x86:
+                    replacement = MOX::_star[MOX::_player[param_3].diplomacy_system[param_2]].name;
+                    break;
                 case 0x87:
+                case 0x88:
                     replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].race_name;
                     break;
-                case 0x88:
+                case 0x89:
                     replacement = TECH::Technology_Applications_Name_(MOX::_player[param_3].diplomacy_proposal_exchange_tech[param_2], param_3);
                     break;
-                case 0x89: {
+                case 0x8A: {
                     int treaty = MOX::_player[param_3].treaty[param_2];
                     if (treaty == 1 || treaty == 2) {
                         replacement = MOX::_treaty_labels[treaty];
@@ -612,10 +615,10 @@ namespace DIP_SCRN {
                     }
                     break;
                 }
-                case 0x8A:
+                case 0x8B:
                     replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].name;
                     break;
-                case 0x8B: {
+                case 0x8C: {
                     int gift = MOX::_player[param_3].last_gift[param_2];
                     if (gift >= 1 && gift <= 4) {
                         JIM::Get_Text_Message_(s_jimtext2_lbx, 0x4A + gift, temp_buf, 40);
@@ -625,10 +628,10 @@ namespace DIP_SCRN {
                     }
                     break;
                 }
-                case 0x8C:
+                case 0x8D:
                     replacement = TECHDATA::_buildings[MOX::_player[param_3].diplomacy_value[param_2]].name;
                     break;
-                case 0x8D:
+                case 0x8E:
                     if (MOX::_settings.language == 0) {
                         _sprintf(temp_buf, s_fmt_dot, MOX::_stardate / 10, MOX::_stardate % 10);
                     } else {
@@ -636,7 +639,10 @@ namespace DIP_SCRN {
                     }
                     replacement = temp_buf;
                     break;
-                case 0x8E:
+                case 0x8F:
+                    break;
+                case 0x90:
+                case 0x95:
                     if (MOX::_player[param_3].diplomacy_proposal_tribute_bribe[param_2] == 0) {
                         if (MOX::_player[param_3].diplomacy_proposal_tech_bribe1[param_2] != 0) {
                             replacement = TECH::Technology_Applications_Name_(MOX::_player[param_3].diplomacy_proposal_tech_bribe1[param_2], param_3);
@@ -657,12 +663,10 @@ namespace DIP_SCRN {
                         replacement = temp_buf;
                     }
                     break;
-                case 0x8F:
-                    break;
-                case 0x90:
+                case 0x91:
                     replacement = MOX::_player[MOX::_player[param_3].diplomacy_proposal_war_player[param_2]].race_name;
                     break;
-                case 0x91: {
+                case 0x92: {
                     int broken = MOX::_player[param_3].last_broken_treaty[param_2];
                     if (broken == 7) {
                         replacement = _statement_trade_treaty_buffer;
@@ -673,17 +677,11 @@ namespace DIP_SCRN {
                     }
                     break;
                 }
-                case 0x92:
-                    replacement = An_(MOX::_player[param_2].race_name);
-                    break;
                 case 0x93:
                     replacement = MOX::_star[MOX::_player[param_3].diplomacy_system[param_2]].name;
                     break;
                 case 0x94:
                     replacement = MOX::_player[MOX::_player[param_3].trust_breaker_player[param_2]].race_name;
-                    break;
-                case 0x95:
-                    replacement = An_(MOX::_player[param_2].race_name);
                     break;
             }
 
@@ -2284,6 +2282,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 0, treaty_val);
+                    return;
                 }
                 break;
             }
@@ -2308,6 +2307,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 1, treaty_val);
+                    return;
                 }
                 break;
             }
@@ -2332,6 +2332,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 2, treaty_val);
+                    return;
                 }
                 break;
             }
@@ -2346,6 +2347,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 3, 0);
+                    return;
                 }
                 break;
             }
@@ -2360,6 +2362,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 4, 0);
+                    return;
                 }
                 break;
             }
@@ -2372,7 +2375,7 @@ namespace DIP_SCRN {
                     diplomac::Get_Demand_Response_(player_num, ambassador_idx, 5, 0, &response, &_response_message);
                 }
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
-                break;
+                return;
             }
             case 6: {
                 int16_t selection_tech = Diplomacy_Generic_Exchange_Tech_List_(player_num, ambassador_idx, _demand_title, (int8_t*)local_5b4, local_624, 0);
@@ -2389,6 +2392,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 6, tech_val);
+                    return;
                 }
                 break;
             }
@@ -2406,6 +2410,7 @@ namespace DIP_SCRN {
                 diplomac::Adjust_Diplomat_Modifiers_(player_num, ambassador_idx);
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 7, selection_sys);
+                    return;
                 }
                 break;
             }
@@ -2421,7 +2426,7 @@ namespace DIP_SCRN {
                 if (response == 1) {
                     Diplomacy_Give_In_To_Demand_(player_num, ambassador_idx, 8, 0);
                 }
-                break;
+                return;
             }
             default:
                 break;

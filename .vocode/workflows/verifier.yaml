@@ -57,16 +57,16 @@ workflows:
           * Ensure that external function stubs and external variables have correct types and addresses.
           
           # OUTPUT:
-          * Your must output places where project code is different from provided disassembly with very short and concise explanation why.
+          * Your must show places where project code is different from provided disassembly with very short and concise explanation why.
             You are allowed to include several lines of original disassembly or decompiler output if they're equivalent.
-          * For each found inconsistency you must provide a short diff snippet showing how to fix it
-          * You should not make any changes unless user explicitly requested them to be applied.
+          * For each found inconsistency you must provide a short diff snippet showing how to fix it WITHOUT applying it
+          * You should NOT make any changes unless user explicitly requested them to be applied.
 
           # CHECKLIST
           * You found and read existing function in the codebase
           * You analyzed and confirmed hypothesis
           * You provided a list of identified discrepancies with explanations
-          * You did not make any file changes without prior approval
+          * You did NOT make any file changes without prior approval
         outcomes:
           - name: done
     edges:
