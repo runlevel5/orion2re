@@ -13,4 +13,6 @@ namespace diplodef {
     inline int16_t& _council_winner = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596010});
     inline int16_t* _personality_reward_proposal_chance = reinterpret_cast<int16_t*>(std::uintptr_t{0x00559C10});
     inline int16_t* _personality_max_threats = reinterpret_cast<int16_t*>(std::uintptr_t{0x00559B38});
+    inline int16_t (&_personality_break_treaty_war)[10] =
+        *reinterpret_cast<int16_t (*)[10]>(std::uintptr_t{0x00559C28});
 }

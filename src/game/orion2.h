@@ -3547,6 +3547,13 @@ struct s_network {
     undefined field209_0x209;
 };
 
+typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;
+
+struct s_npcdiplo_tech {
+    int32_t value;
+    uint8_t index;
+};
+
 typedef struct s_orion_candidate s_orion_candidate, *Ps_orion_candidate;
 
 struct s_orion_candidate {

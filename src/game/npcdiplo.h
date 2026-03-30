@@ -3,25 +3,29 @@
 #include <cstdint>
 
 namespace npcdiplo {
+    struct s_npcdiplo_tech {
+        uint8_t index;
+        int32_t value;
+    };
+
+    inline s_npcdiplo_tech (&_human_tech)[212] = 
+        *reinterpret_cast<s_npcdiplo_tech(*)[212]>(std::uintptr_t{0x00595830});
+
+    inline int32_t __cdecl Get_Tech_Exchange_Expectation_(int16_t target_player_idx, int16_t player_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ebec0});
+        return fn(target_player_idx, player_idx);
+    }
+
+    int __cdecl reverse_compare_tech_(const void* a, const void* b);
+
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_id_1, int16_t player_id_2);
 
-    inline void __cdecl NPC_Proposal_Rejection_Accept_(int16_t a, int16_t b, int32_t status) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ec6a0});
-        fn(a, b, status);
-    }
+    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int32_t accepted);
 
-    inline int16_t __cdecl NPC_Good_Proposal_Check_(int16_t player_idx, int16_t target_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ec330});
-        return fn(player_idx, target_idx);
-    }
+    bool __cdecl NPC_Good_Proposal_Check_(int16_t npc_idx, int16_t player_idx);
 
-    inline void __cdecl NPC_Tech_Exchange_Check_(int16_t player_idx, int16_t target_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ec180});
-        fn(player_idx, target_idx);
-    }
+    void __cdecl NPC_Tech_Exchange_Check_(int16_t player_idx, int16_t target_player_idx);
 
     void __cdecl NPC_Diplomacy_();
 
@@ -53,15 +57,16 @@ namespace npcdiplo {
 
     void __cdecl NPC_Treaty_Hatred_();
 
-    inline void __cdecl Get_Differential_Tech_List_(int16_t player_a, int16_t player_b, int32_t mode, int32_t max_value, uint8_t* tech_list, int32_t* tech_cost_list, int16_t* n_techs, int32_t sort_flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t, int32_t, uint8_t*, int32_t*, int16_t*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ebfa0});
-        fn(player_a, player_b, mode, max_value, tech_list, tech_cost_list, n_techs, sort_flag);
-    }
+    void __cdecl Get_Differential_Tech_List_(
+        int16_t player_idx,
+        int16_t other_player_idx,
+        uint32_t min_tech_value,
+        uint32_t max_tech_value,
+        uint8_t* tech_list_indices,
+        int32_t* tech_list_values,
+        int16_t* tech_count,
+        int16_t sort_flag
+    );
 
-    inline void __cdecl NPC_Message_Rejection_Check_(int16_t target_idx, int16_t proposer_idx, int16_t* response_message) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004EC520});
-        fn(target_idx, proposer_idx, response_message);
-    }
+    void __cdecl NPC_Message_Rejection_Check_(int16_t player_idx, int16_t target_idx, int16_t* msg_type);
 }

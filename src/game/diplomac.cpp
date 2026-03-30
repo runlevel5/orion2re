@@ -2224,4 +2224,316 @@ namespace diplomac {
             }
         }
     }
+
+    void __cdecl Get_Break_Treaty_Message_(int16_t victim_idx, int16_t actor_idx, int16_t* msg_id) {
+        int16_t war_count = diplomac::Get_War_Count_(actor_idx, victim_idx);
+        int16_t fleet_comp = diplomac::Fleet_Comparison_(actor_idx, victim_idx);
+
+        int16_t random_score = (int16_t)random::Random_(200);
+        int16_t treaty_break_score = random_score + (war_count * -50) - fleet_comp;
+
+        int16_t personality_idx = (uint8_t)MOX::_player[actor_idx].personality;
+        int16_t war_chance = diplodef::_personality_break_treaty_war[personality_idx];
+        int16_t war_roll = (int16_t)random::Random_(100);
+
+        if (war_roll <= war_chance && treaty_break_score > 100) {
+            diplomac::Declare_War_(victim_idx, actor_idx);
+            *msg_id = 155 /* 0x9b */;
+        }
+
+        *msg_id = 154 /* 0x9a */;
+        if (MOX::_player[actor_idx].personality != 4) {
+            *msg_id = 153 /* 0x99 */;
+        }
+
+        MOX::_player[victim_idx].dishonored_flag[actor_idx] = 1;
+        MOX::_player[actor_idx].dishonored_flag[victim_idx] = 1;
+    }
+
+    void __cdecl Get_Break_Trade_Message_(int16_t other_player_idx, int16_t this_player_idx, int16_t* out_message_id) {
+        int16_t war_count;
+        int32_t fleet_strength_diff;
+        int32_t rand_val_200;
+        int16_t personality_threshold;
+        int32_t rand_val_100;
+        int16_t break_score;
+
+        war_count = Get_War_Count_(this_player_idx, other_player_idx);
+        fleet_strength_diff = Fleet_Comparison_(this_player_idx, other_player_idx);
+        rand_val_200 = random::Random_(200);
+
+        // Calculate break score using fleet strength, active wars and randomness
+        break_score = (int16_t)(war_count * -50 - (int16_t)fleet_strength_diff + (int16_t)rand_val_200);
+
+        personality_threshold = diplodef::_personality_break_treaty_war[(uint8_t)MOX::_player[this_player_idx].personality];
+        rand_val_100 = random::Random_(100);
+
+        // If personality and fleet/war conditions are met, break trade/treaty
+        if (rand_val_100 <= personality_threshold && break_score > 100) {
+            int8_t treaty = MOX::_player[this_player_idx].treaty[other_player_idx];
+            if (treaty == 1 || treaty == 2) {
+                Break_Treaties_(other_player_idx, this_player_idx);
+
+                // Note: The binary explicitly overwrites 0x9D with 0x9C immediately after this assignment.
+                // This appears to be a logic bug in the original code where a message choice was intended.
+                *out_message_id = 157 /* 0x9d */;
+            }
+        }
+
+        *out_message_id = 156 /* 0x9c */;
+    }
+
+    void __cdecl Get_Break_Tribute_Treaty_Message_(int16_t other_player_idx, int16_t acting_player_idx, int16_t* out_msg_id) {
+        int16_t war_count;
+        int16_t fleet_comp;
+        int16_t random_200;
+        int16_t score;
+        int16_t personality_threshold;
+        int16_t random_150;
+        uint8_t personality;
+
+        war_count = Get_War_Count_(acting_player_idx, other_player_idx);
+        fleet_comp = Fleet_Comparison_(acting_player_idx, other_player_idx);
+        random_200 = (int16_t)random::Random_(200);
+
+        // Score calculation: (war_count * -50) - fleet_comparison + random(200)
+        score = (war_count * -50) - fleet_comp + random_200;
+
+        personality = (uint8_t)MOX::_player[acting_player_idx].personality;
+        personality_threshold = diplodef::_personality_break_treaty_war[personality];
+        random_150 = (int16_t)random::Random_(150);
+
+        if (personality_threshold >= random_150 && score > 75) {
+            Declare_War_(other_player_idx, acting_player_idx);
+            *out_msg_id = 173 /* 0xAD MSG_WAR_BREAK_TRIBUTE */;
+        }
+
+        // Note: The following logic checks the acting player's personality and sets the message ID, 
+        // effectively overwriting the value 173 (MSG_WAR_BREAK_TRIBUTE) if war was declared.
+        if (MOX::_player[acting_player_idx].personality == 4 /* PERSONALITY_AGGRESSIVE */) {
+            *out_msg_id = 172 /* 0xAC MSG_PERSONALITY_BREAK_TRIBUTE_AGGRESSIVE */;
+        } else {
+            *out_msg_id = 171 /* 0xAB MSG_PERSONALITY_BREAK_TRIBUTE_NORMAL */;
+        }
+    }
+
+    /**
+     * Determines whether an AI player should break research/trade treaties.
+     * Note: This function always sets out_msg_id to 0x9E due to the flow
+     * in the original compiled code, making the 0x9F branch effectively dead code.
+     */
+    void __cdecl Get_Break_Research_Message_(int16_t other_player_idx, int16_t this_player_idx, int16_t* out_msg_id) {
+        int16_t war_count = Get_War_Count_(other_player_idx, this_player_idx);
+        int16_t fleet_diff = Fleet_Comparison_(other_player_idx, this_player_idx);
+        int16_t rand_bonus = (int16_t)random::Random_(200);
+
+        // Calculate diplomatic score based on state and military comparison
+        int16_t break_score = (int16_t)(war_count * -50 - fleet_diff + rand_bonus);
+
+        uint8_t personality = (uint8_t)MOX::_player[this_player_idx].personality;
+        int16_t personality_limit = diplodef::_personality_break_treaty_war[personality];
+        int16_t personality_roll = (int16_t)random::Random_(100);
+
+        if (personality_limit >= personality_roll && break_score > 100) {
+            int8_t treaty_type = MOX::_player[this_player_idx].treaty[other_player_idx];
+
+            // 1 = Trade, 2 = Research
+            if (treaty_type == 1 || treaty_type == 2) {
+                Break_Treaties_(other_player_idx, this_player_idx);
+                // This value is immediately overwritten by 0x9E below
+                *out_msg_id = 159 /* 0x9f */;
+            }
+        }
+
+        *out_msg_id = 158 /* 0x9e */;
+    }
+
+    void __cdecl Start_Trade_Treaty_(int16_t player_idx, int16_t target_player_idx) {
+        int16_t personality;
+        int8_t bonus;
+
+        personality = Get_Player_Diplomacy_Personality_(player_idx, target_player_idx);
+        bonus = (int8_t)_personality_peace_duration[personality];
+        MOX::_player[player_idx].peace_duration[target_player_idx] += bonus;
+
+        personality = Get_Player_Diplomacy_Personality_(target_player_idx, player_idx);
+        bonus = (int8_t)_personality_peace_duration[personality];
+        MOX::_player[target_player_idx].peace_duration[player_idx] += bonus;
+
+        TRADE::Start_Trade_Agreement_(&MOX::_player[player_idx], target_player_idx);
+    }
+
+    void __cdecl Start_Research_Treaty_(int16_t player_idx, int16_t other_idx) {
+        int16_t personality_a;
+        int16_t personality_b;
+
+        personality_a = Get_Player_Diplomacy_Personality_(player_idx, other_idx);
+        MOX::_player[player_idx].peace_duration[other_idx] += (int8_t)_personality_peace_duration[personality_a];
+
+        personality_b = Get_Player_Diplomacy_Personality_(other_idx, player_idx);
+        MOX::_player[other_idx].peace_duration[player_idx] += (int8_t)_personality_peace_duration[personality_b];
+
+        TRADE::Start_Research_Agreement_(&MOX::_player[player_idx], other_idx);
+    }
+
+    int16_t __cdecl Find_Worst_Modifier_(int16_t player_idx, int16_t target_idx) {
+        if (diplodef::_COUNCIL_FLAG == 3) {
+            return 0;
+        }
+
+        s_player* plr = &MOX::_player[player_idx];
+        int16_t worst = plr->treaty_modifier[target_idx];
+
+        if (plr->trade_modifier[target_idx] < worst) {
+            worst = plr->trade_modifier[target_idx];
+        }
+
+        if (plr->tech_exchange_modifier[target_idx] < worst) {
+            worst = plr->tech_exchange_modifier[target_idx];
+        }
+
+        if (plr->peace_modifier[target_idx] < worst) {
+            worst = plr->peace_modifier[target_idx];
+        }
+
+        return worst;
+    }
+
+    void __cdecl Get_Declare_War_Message_(int16_t player_a_idx, int16_t player_b_idx, int16_t* msg_id) {
+        // If the player declaring war (player_b_idx) has an honorable personality (4),
+        // we check if a treaty is being broken dishonorably.
+        if (MOX::_player[player_b_idx].personality == 4) {
+            if (MOX::_player[player_a_idx].dishonored_flag[player_b_idx] == 0 &&
+                (MOX::_player[player_b_idx].treaty[player_a_idx] == 1 ||
+                 MOX::_player[player_b_idx].treaty[player_a_idx] == 2)) {
+                *msg_id = 0x42; // Special message for breaking a treaty
+                return;
+            }
+        }
+
+        *msg_id = 0xa0; // Standard war declaration message
+    }
+
+    // Suggested name: DIPLOMAC::Get_Gift_Response
+    int __cdecl Fleet_Comparison_(int16_t player_idx, int16_t opponent_idx) {
+        int32_t strength_a = MOX::_player[player_idx].total_ship_strength[opponent_idx];
+        int32_t strength_b = MOX::_player[opponent_idx].total_ship_strength[player_idx];
+
+        int32_t ratio = (100 * strength_a + 100) / (strength_b + 1);
+
+        if (ratio < 100) {
+            ratio = -100 / (ratio + 1);
+        }
+        else {
+            ratio++;
+        }
+
+        if (ratio > 300) {
+            ratio = 300;
+        }
+        else if (ratio < -300) {
+            ratio = -300;
+        }
+
+        return ratio;
+    }
+
+    void __cdecl Get_Gift_Response_(int16_t plr_a, int16_t plr_b, int16_t gift_type, int16_t gift_data, int16_t *response_code) {
+        int32_t gift_value = 0;
+        
+        MOX::_player[plr_b].last_gift[plr_a] = (int8_t)gift_type;
+
+        switch (gift_type) {
+            case 1: /* BC gift */
+            {
+                *response_code = 163 /* STR_DIP_GIFT_RESPONSE_BC_163 */;
+                int32_t maintenance = MOX::_player[plr_a].total_maintenance;
+                if (maintenance < 10) {
+                    maintenance = 10;
+                }
+                gift_value = (gift_data / maintenance) / 10;
+                if (gift_value > 8) {
+                    gift_value = 8;
+                }
+            }
+            break;
+
+            case 2:
+                gift_value = 2;
+                *response_code = 162 /* STR_DIP_GIFT_RESPONSE_BC_162 */;
+                break;
+
+            case 3: /* Technology gift */
+            {
+                *response_code = 161 /* STR_DIP_GIFT_RESPONSE_TECH_161 */;
+                uint32_t max_ai_group = 1;
+                
+                // Loop through known technologies to find highest AI group value
+                for (int i = 0; i < 204; ++i) {
+                    // If player A has learned this application
+                    if (MOX::_player[plr_a].tech_applications[i] == 3) {
+                        int16_t field_id = TECHDATA::_technology_applications[i].tech_field_id;
+                        uint8_t ai_group = TECHDATA::_technology_fields[field_id].ai_group;
+                        if (ai_group > max_ai_group) {
+                            max_ai_group = ai_group;
+                        }
+                    }
+                }
+
+                int16_t target_field_id = TECHDATA::_technology_applications[gift_data].tech_field_id;
+                uint8_t target_ai_group = TECHDATA::_technology_fields[target_field_id].ai_group;
+                gift_value = (target_ai_group * 5) / max_ai_group;
+            }
+            break;
+
+            case 4: /* Star system gift */
+            {
+                *response_code = 164 /* STR_DIP_GIFT_RESPONSE_SYSTEM_164 */;
+                int16_t population = COLCALC::Get_System_Population_(plr_a, gift_data);
+                gift_value = (population / 2) + 1;
+            }
+            break;
+
+            default:
+                break;
+        }
+
+        if (gift_value != 0) {
+            // Soften previous rejection severity based on gift value
+            MOX::_player[plr_a].last_diplomacy_proposal_turn[plr_b] /= (int16_t)gift_value;
+            MOX::_player[plr_b].last_diplomacy_proposal_turn[plr_a] /= (int16_t)gift_value;
+        }
+
+        // Update relations
+        int32_t relation_bonus = (random::Random_(4) + 4) * gift_value;
+        int32_t current_relations = MOX::_player[plr_a].relations[plr_b];
+        
+        if (current_relations + relation_bonus > 100) {
+            MOX::_player[plr_a].relations[plr_b] = 100;
+        } else {
+            MOX::_player[plr_a].relations[plr_b] = (int8_t)(current_relations + relation_bonus);
+        }
+
+        // Safety cap for relations
+        if (MOX::_player[plr_a].relations[plr_b] > 100) {
+            MOX::_player[plr_a].relations[plr_b] = 100;
+        }
+
+        // Update base relations
+        int32_t current_base = MOX::_player[plr_a].base_relations[plr_b];
+        if (current_base + gift_value > 100) {
+            MOX::_player[plr_a].base_relations[plr_b] = 100;
+        } else {
+            MOX::_player[plr_a].base_relations[plr_b] = (int8_t)(current_base + gift_value);
+        }
+
+        // Safety cap for base relations
+        if (MOX::_player[plr_a].base_relations[plr_b] > 100) {
+            MOX::_player[plr_a].base_relations[plr_b] = 100;
+        }
+
+        // Sync mirrored relations
+        MOX::_player[plr_b].base_relations[plr_a] = MOX::_player[plr_a].base_relations[plr_b];
+        MOX::_player[plr_b].relations[plr_a] = MOX::_player[plr_a].relations[plr_b];
+    }
 }

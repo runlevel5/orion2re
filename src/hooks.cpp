@@ -2444,6 +2444,22 @@ namespace hooks {
         { 0x0041c520, &DIP_SCRN::Send_Diplomacy_Handshake_ },
         { 0x0041c480, &DIP_SCRN::Diplomacy_Net_Switcheroo_ },
         { 0x00417150, &DIP_SCRN::Diplomacy_Generic_System_List_Draw_ },
+        { 0x004ec6a0, &npcdiplo::NPC_Proposal_Rejection_Accept_ },
+        { 0x004ec330, &npcdiplo::NPC_Good_Proposal_Check_ },
+        { 0x004ebbe0, &npcdiplo::reverse_compare_tech_ },
+        { 0x004ebfa0, &npcdiplo::Get_Differential_Tech_List_ },
+        { 0x004ec520, &npcdiplo::NPC_Message_Rejection_Check_ },
+        { 0x004ec180, &npcdiplo::NPC_Tech_Exchange_Check_ },
+        { 0x00456770, &diplomac::Get_Break_Treaty_Message_ },
+        { 0x00456870, &diplomac::Get_Break_Research_Message_ },
+        { 0x00456940, &diplomac::Get_Break_Trade_Message_ },
+        { 0x00456a10, &diplomac::Get_Break_Tribute_Treaty_Message_ },
+        { 0x004551b0, &diplomac::Start_Trade_Treaty_ },
+        { 0x00455110, &diplomac::Start_Research_Treaty_ },
+        { 0x00456ae0, &diplomac::Get_Declare_War_Message_ },
+        { 0x00453e90, &diplomac::Find_Worst_Modifier_ },
+        { 0x00456b60, &diplomac::Get_Gift_Response_ },
+        { 0x00454d90, &diplomac::Fleet_Comparison_ },
     };
 
     void Install_Hooks()

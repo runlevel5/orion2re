@@ -871,4 +871,259 @@ namespace npcdiplo {
 
         Eliminate_NPC_Treaty_Conflicts_();
     }
+
+    /**
+     * @brief Adjusts the diplomacy proposal rejection value between two players based on personality and acceptance.
+     *
+     * This function is called when a diplomatic proposal is either accepted or rejected.
+     * It modifies the rejection counter which tracks the player's history of rejecting proposals from another player.
+     *
+     * @param player_idx The index of the player whose personality influences the change.
+     * @param other_player_idx The index of the other involved player.
+     * @param accepted Whether the proposal was accepted (1) or rejected (0).
+     */
+    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int32_t accepted) {
+        s_player* player = &MOX::_player[player_idx];
+        int16_t rejection_val = player->diplomacy_proposal_rejection[other_player_idx];
+
+        if (accepted == 1) {
+            if (rejection_val < 0) {
+                switch (player->personality) {
+                    case 0: /* Ruthless */
+                        rejection_val++;
+                        break;
+                    case 1: /* Aggressive */
+                    case 2: /* Erratic */
+                    case 3: /* Honorable */
+                    case 4: /* Pacific */
+                    case 5: /* Xenophobic */
+                        rejection_val = 1;
+                        break;
+                }
+            } else {
+                rejection_val++;
+            }
+        } else {
+            // Case for rejection (accepted != 1)
+            if (rejection_val <= 0) {
+                rejection_val--;
+            } else {
+                switch (player->personality) {
+                    case 0: /* Ruthless */
+                        rejection_val = -1;
+                        break;
+                    case 1: /* Aggressive */
+                    case 2: /* Erratic */
+                    case 3: /* Honorable */
+                        rejection_val /= 2;
+                        break;
+                    case 4: /* Pacific */
+                        if (player->dishonored_flag[other_player_idx] == 1) {
+                            rejection_val = -1;
+                        }
+                        break;
+                    case 5: /* Xenophobic */
+                        rejection_val--;
+                        break;
+                }
+            }
+        }
+
+        player->diplomacy_proposal_rejection[other_player_idx] = rejection_val;
+        MOX::_player[other_player_idx].diplomacy_proposal_rejection[player_idx] = rejection_val;
+    }
+
+    bool __cdecl NPC_Good_Proposal_Check_(int16_t npc_idx, int16_t player_idx) {
+        s_player* npc = &MOX::_player[npc_idx];
+        s_player* other = &MOX::_player[player_idx];
+
+        // Check if player has at least non-aggression or better
+        if (npc->treaty[player_idx] >= 4) {
+            return false;
+        }
+
+        int bonus = COLCALC::Best_Leader_Diplomat_Bonus_(player_idx);
+        int score = bonus / -15;
+
+        score -= diplodef::_personality_relation_modifiers[(uint8_t)npc->personality] / 5;
+        score -= npc->broken_treaties_modifier[player_idx] / 20;
+        score += npc->relations[player_idx] / 20;
+        score += -npc->treaty_modifier[player_idx] / 20;
+        score += npc->diplomacy_proposal_rejection[player_idx] * 3;
+        score += 10 + MOX::_settings.game_difficulty * 4;
+
+        if (other->treaty[npc_idx] == 1 /* TREATY_NON_AGGRESSION */) {
+            score -= 4;
+        } else if (other->treaty[npc_idx] == 2 /* TREATY_TRADE_AGREEMENT */) {
+            score -= 8;
+        }
+
+        // Technology check (offset 200 within tech applications)
+        if (other->tech_applications[200] == 3) {
+            score -= 5;
+        }
+
+        if (score < 0) {
+            score = 0;
+        }
+        if (score > 40) {
+            score = 40;
+        }
+
+        int divisor = (score * score) / 50 + 1;
+        int threshold = (int)npc->last_diplomacy_proposal_turn[player_idx] / divisor;
+
+        int random_val = random::Random_(100);
+
+        return random_val <= threshold;
+    }
+
+    int __cdecl reverse_compare_tech_(const void* a, const void* b) {
+        return static_cast<const s_npcdiplo_tech*>(b)->value - static_cast<const s_npcdiplo_tech*>(a)->value;
+    }
+
+    void __cdecl Get_Differential_Tech_List_(
+        int16_t player_idx,
+        int16_t other_player_idx,
+        uint32_t min_tech_value,
+        uint32_t max_tech_value,
+        uint8_t* tech_list_indices,
+        int32_t* tech_list_values,
+        int16_t* tech_count,
+        int16_t sort_flag
+    ) {
+        *tech_count = 0;
+
+        newtech::Set_Competition_Tech_Values_(player_idx);
+
+        for (int16_t tech_idx = 0; tech_idx < 204; ++tech_idx) {
+            if (MOX::_player[other_player_idx].tech_applications[tech_idx] == 3) {
+                uint32_t tech_value = newtech::Calc_Tech_Value_(player_idx, tech_idx);
+
+                if (tech_idx == 0x2a && MOX::_player[player_idx].traits[0] != 0) {
+                    tech_value = 0;
+                }
+                if (tech_idx == 0x5c && MOX::_player[player_idx].traits[0] != 2) {
+                    tech_value = 0;
+                }
+                if (tech_idx == 0x41 && MOX::_player[player_idx].traits[0] != 4) {
+                    tech_value = 0;
+                }
+                if (tech_idx == 0x4d && MOX::_player[player_idx].traits[0] != 6) {
+                    tech_value = 0;
+                }
+
+                if (!COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_idx)) {
+                    tech_value = 0;
+                }
+
+                if (tech_value != 0 && tech_value >= min_tech_value && tech_value <= max_tech_value) {
+                    _human_tech[*tech_count].index = static_cast<uint8_t>(tech_idx);
+                    _human_tech[*tech_count].value = static_cast<int32_t>(tech_value);
+                    *tech_count += 1;
+                }
+            }
+        }
+
+        if (sort_flag == 1 && *tech_count != 0) {
+            _qsort(_human_tech, *tech_count, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
+        }
+
+        if (*tech_count > 0) {
+            for (int16_t i = 0; i < *tech_count; ++i) {
+                tech_list_indices[i] = _human_tech[i].index;
+                tech_list_values[i] = _human_tech[i].value;
+            }
+        }
+    }
+
+    void __cdecl NPC_Message_Rejection_Check_(int16_t player_idx, int16_t target_idx, int16_t* msg_type) {
+        int16_t rejection_val = MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx];
+        if (rejection_val > -4) {
+            return;
+        }
+
+        if (*msg_type != 0x8a && *msg_type != 0x8b && *msg_type != 0x8c &&
+            *msg_type != 0x8d && *msg_type != 0x8e && *msg_type != 0x8f &&
+            *msg_type != 0x90 && *msg_type != 0x91 && *msg_type != 0x92 &&
+            *msg_type != 0x93 && *msg_type != 0x94 && *msg_type != 0x95 &&
+            *msg_type != 0x96 && *msg_type != 0x97 && *msg_type != 0x98 &&
+            *msg_type != 0xae) {
+            return;
+        }
+
+        *msg_type = 0xaf;
+
+        switch (MOX::_player[player_idx].personality) {
+            case 0:
+                rejection_val = static_cast<int16_t>(random::Random_(4) - 6);
+                break;
+            case 1:
+            case 2:
+                rejection_val = static_cast<int16_t>(-1 - random::Random_(3));
+                break;
+            case 3:
+                rejection_val = static_cast<int16_t>(-random::Random_(4));
+                break;
+            case 4:
+                if (MOX::_player[player_idx].dishonored_flag[target_idx] == 1) {
+                    rejection_val = static_cast<int16_t>(random::Random_(4) - 6);
+                } else {
+                    rejection_val = static_cast<int16_t>(-random::Random_(3));
+                }
+                break;
+            case 5:
+                rejection_val = static_cast<int16_t>(-random::Random_(3));
+                break;
+            default:
+                break;
+        }
+
+        MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx] = rejection_val;
+        MOX::_player[target_idx].diplomacy_proposal_rejection[player_idx] = rejection_val;
+    }
+
+    void __cdecl NPC_Tech_Exchange_Check_(int16_t player_idx, int16_t target_player_idx) {
+        int16_t local_43a = 0;
+        int16_t local_424[106];
+        int32_t local_350[212];
+        
+        if (MOX::_player[player_idx].diplomacy_message[target_player_idx] == '\0' &&
+            MOX::_player[player_idx].treaty[target_player_idx] < 4) 
+        {
+            int32_t expectation = Get_Tech_Exchange_Expectation_(target_player_idx, player_idx);
+            if (expectation < 10) {
+                expectation = 10;
+            }
+            
+            int32_t num_elements = 0;
+            newtech::Set_Competition_Tech_Values_(player_idx);
+            
+            for (int32_t i = 0; i < 204; ++i) {
+                if (MOX::_player[target_player_idx].tech_applications[i] == 3) {
+                    int32_t tech_value = static_cast<int32_t>(newtech::Calc_Tech_Value_(player_idx, static_cast<int16_t>(i)));
+                    if ((tech_value * 2) != 0) {
+                        _human_tech[num_elements].index = static_cast<uint8_t>(i);
+                        _human_tech[num_elements].value = tech_value * 2;
+                        num_elements++;
+                    }
+                }
+            }
+            
+            if (num_elements > 0) {
+                _qsort(_human_tech, num_elements, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
+                int32_t rand_idx = random::Random_((num_elements + 1) / 2) - 1;
+                uint8_t selected_tech_index = _human_tech[rand_idx].index;
+                int32_t exchange_val = (_human_tech[rand_idx].value * expectation) / 100;
+                
+                Get_Differential_Tech_List_(target_player_idx, player_idx, 0, (uint32_t)exchange_val, (uint8_t*)local_424, local_350, &local_43a, 0);
+                
+                if (local_43a > 0) {
+                    MOX::_player[player_idx].diplomacy_message[target_player_idx] = 101; /* 'e' */
+                    MOX::_player[player_idx].diplomacy_proposal_exchange_max_value[target_player_idx] = exchange_val;
+                    MOX::_player[player_idx].diplomacy_proposal_exchange_tech[target_player_idx] = selected_tech_index;
+                }
+            }
+        }
+    }
 }
