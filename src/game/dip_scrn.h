@@ -56,10 +56,7 @@ namespace DIP_SCRN {
     inline const char* s_DIPLOMSG_LBX = reinterpret_cast<const char*>(0x005523F4);
     inline const char* s_DIPLOMSE_LBX = reinterpret_cast<const char*>(0x00552404);
 
-    inline char* __cdecl An_(char* str) {
-        using Fn = char*(__cdecl*)(char*);
-        return reinterpret_cast<Fn>(0x0041B290)(str);
-    }
+    char* __cdecl An_(char* text);
 
     inline uint16_t& _chat_width =
             *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A85D8});
@@ -135,17 +132,9 @@ namespace DIP_SCRN {
 
     inline int16_t* _demand_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522F0});
 
-    inline void __cdecl Get_Human_Demand_Response_(int16_t param_1, int16_t param_2, int16_t demand_type, uint16_t treaty_val, int16_t* response) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004187c0});
-        fn(param_1, param_2, demand_type, treaty_val, response);
-    }
+    void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice);
 
-    inline void __cdecl Diplomacy_Give_In_To_Demand_(int16_t param_1, int16_t param_2, int16_t demand_type, uint16_t treaty_val) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00418600});
-        fn(param_1, param_2, demand_type, treaty_val);
-    }
+    void __cdecl Diplomacy_Give_In_To_Demand_(int16_t asking_player_idx, int16_t giving_player_idx, int16_t demand_type, int16_t demand_data);
 
     void __cdecl Diplomacy_Offer_Gift_(int16_t player_num, int16_t ambassador_idx);
 
@@ -182,30 +171,15 @@ namespace DIP_SCRN {
 
     void __cdecl Setup_Diplomacy_Help_(int16_t count, int16_t* help_ids);
 
-    inline void __cdecl Send_Diplomacy_Handshake_(int16_t p1, int16_t p2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x0041C520)(p1, p2);
-    }
+    void __cdecl Send_Diplomacy_Handshake_(int16_t sender_player_id, int16_t target_player_id);
 
-    inline void __cdecl Diplomacy_Synch_Mode_(int16_t p1, int16_t p2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x0041C920)(p1, p2);
-    }
+    void __cdecl Diplomacy_Synch_Mode_(int16_t p1, int16_t p2);
 
-    inline void __cdecl Diplomacy_Net_Switcheroo_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x0041C480)();
-    }
+    void __cdecl Diplomacy_Net_Switcheroo_();
 
-    inline void __cdecl Get_Human_Demand_Message_(int16_t p1, int16_t p2, int16_t p3, int16_t p4) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004150A0)(p1, p2, p3, p4);
-    }
+    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused, int16_t demand_type, int16_t item_idx);
 
-    inline int16_t __cdecl Get_Human_Demand_Choice_(int16_t p1, int16_t p2, int16_t p3, int16_t p4) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(0x00418520)(p1, p2, p3, p4);
-    }
+    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t some_id);
 
     void __cdecl Setup_Full_Screen_Diplomacy_Help_(int16_t help_id);
 
@@ -245,10 +219,7 @@ namespace DIP_SCRN {
 
     int16_t __cdecl Diplomacy_Generic_List_(int16_t item_count, char* list_strings, int8_t add_cancel, char* title);
 
-    inline int16_t __cdecl Diplomacy_Generic_System_List_(int16_t system_sel, int16_t player_idx, int16_t target_player_idx, int unknown) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int);
-        return reinterpret_cast<Fn>(0x00416F30)(system_sel, player_idx, target_player_idx, unknown);
-    }
+    short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag);
 
     inline int16_t& _offer_help_entry = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552308});
     inline char* (&_offer_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A81E0});
@@ -269,7 +240,7 @@ namespace DIP_SCRN {
     inline char* (&_agree_diplomacy_list)[4] = *reinterpret_cast<char*(*)[4]>(std::uintptr_t{0x005A8360});
     inline char*& _system_cancel_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A837C});
     inline int16_t& _diplomacy_system_homeworld_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8380});
-    inline s_animation_header* _diplomacy_system_star_background_seg = reinterpret_cast<s_animation_header*>(std::uintptr_t{0x005A84FC});
+    inline s_animation_header*& _diplomacy_system_star_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A84FC});
     inline int16_t* _diplomacy_system_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A850E}); // short[72]
     inline uint8_t*& _diplomacy_mouse_bitmap = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A8500});
     inline char*& _system_homeworld_buffer = *reinterpret_cast<char**>(std::uintptr_t{0x005A85A8});
@@ -309,21 +280,15 @@ namespace DIP_SCRN {
 
     void __cdecl Draw_Diplomacy_System_Display_();
 
-    inline void __cdecl Draw_Diplomacy_System_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00419C20});
-        fn();
-    }
+    void __cdecl Draw_Diplomacy_System_();
 
-    inline void __cdecl Draw_Diplomacy_System_Text_(int16_t scan_flag, int16_t homeworld_flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00419C80});
-        fn(scan_flag, homeworld_flag);
-    }
+    void __cdecl Draw_Diplomacy_System_Text_(int16_t star_idx, int16_t selected_planet_idx);
 
     int16_t __cdecl Diplomacy_Offer_Money_(int16_t player_idx, int16_t target_idx, int8_t do_transaction);
 
     void __cdecl Start_Diplomacy_Music_(int16_t music_type);
 
     int16_t __cdecl Diplomacy_System_Scan_(int16_t star_idx, int16_t player_idx, int16_t* artemis_planet_idx, int16_t* owned_count, int8_t* planet_indices);
+
+    void __cdecl Diplomacy_Generic_System_List_Draw_();
 }

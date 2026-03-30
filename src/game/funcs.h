@@ -23,6 +23,9 @@ inline const char* s_SR_R_x_SC_LBX_00557d74 = reinterpret_cast<const char*>(0x00
 inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
 inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018);
 
+inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x00552414});
+inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x00552418});
+
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});

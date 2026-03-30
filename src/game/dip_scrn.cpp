@@ -1667,6 +1667,12 @@ namespace DIP_SCRN {
         return 0;
     }
 
+    void __cdecl Draw_Diplomacy_System_() {
+        graphics::Box_(9, 0xaa, 0xb6, 0x70, 1, 0xfb);
+        graphics::Darken_Fill_(0xa, 0xab, 0xbe, 0x118);
+        MOVEBOX::Draw_Galaxy_Map_Box_(nullptr, nullptr, 0xa, 0xab, 0xb4, 0x6e, 0, 0, 0, 0, 4, 0);
+    }
+
     void __cdecl Draw_Diplomacy_System_Display_() {
         Draw_Diplomacy_Synch_Mode_();
         Draw_Diplomacy_System_();
@@ -2905,5 +2911,424 @@ namespace DIP_SCRN {
 
     void __cdecl Get_Human_Tech_Exchange_Decline_Message_() {
         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x32, _diplomacy_message, 0xFA);
+    }
+
+    /**
+     * Returns the appropriate English indefinite article ("a " or "an ") for the given string.
+     * If the current game language is not English, it returns an empty string.
+     */
+    void __cdecl Get_Human_Demand_Response_(int16_t player_id, int16_t target_player_id, int16_t demand_type, int16_t demand_arg, int16_t* out_choice) {
+        int16_t choice_1_response;
+        int16_t choice_else_response;
+
+        switch (demand_type) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                choice_1_response = 0xA9;
+                choice_else_response = 0xA8;
+                break;
+            default:
+                // Reading uninitialized stack garbage as per disassembly 0x00418835
+                int16_t garbage; 
+                choice_1_response = garbage;
+                choice_else_response = garbage;
+                break;
+        }
+
+        if (MOX::_game_type == 1 /* SINGLE_PLAYER */) {
+            _old_response_message = _response_message;
+            Get_Human_Demand_Message_(player_id, target_player_id, demand_type, demand_arg);
+            Diplomacy_Load_New_Ambassador_(player_id);
+            
+            int16_t choice = Get_Human_Demand_Choice_(target_player_id, player_id, demand_type, demand_arg);
+            *out_choice = choice;
+            
+            _old_response_message = -1;
+            _response_message = choice_1_response;
+            
+            if (*out_choice != 1) {
+                _response_message = choice_else_response;
+            }
+            
+            Diplomacy_Load_New_Ambassador_(target_player_id);
+        } else {
+            _net_diplomacy_message.sender_player_id = (uint8_t)player_id;
+            _net_diplomacy_message.target_player_id = (uint8_t)target_player_id;
+            _net_diplomacy_message.arg1 = demand_type;
+            _net_diplomacy_message.msg_type = 1005 /* 0x3ED */;
+            _net_diplomacy_message.arg2 = demand_arg;
+
+            NETMOX::Mox_Send_Message_(
+                MOX::_player[target_player_id].network_player_id, 
+                2000 /* 0x7D0 */, 
+                &_net_diplomacy_message, 
+                8
+            );
+
+            RUSS::Mox_Update_();
+            Get_Listen_Mode_Message_(target_player_id);
+            _net_diplomacy_message.arg2 = -1;
+
+            do {
+                Diplomacy_Listen_Mode_(target_player_id, (uint8_t)player_id);
+            } while (_net_diplomacy_message.arg2 == -1 && _net_diplomacy_esc_pressed == 0);
+
+            if (_net_diplomacy_esc_pressed == 1) {
+                _net_diplomacy_message.arg2 = 0;
+            }
+
+            *out_choice = _net_diplomacy_message.arg2;
+        }
+    }
+
+    char* __cdecl An_(char* text) {
+        if (MOX::_settings.language != 0) {
+            return const_cast<char*>(s__00551100);
+        }
+
+        char first_char = *text;
+
+        // Check if the first character is a vowel (case-insensitive)
+        if (first_char == 'A' || first_char == 'a' ||
+            first_char == 'E' || first_char == 'e' ||
+            first_char == 'I' || first_char == 'i' ||
+            first_char == 'O' || first_char == 'o' ||
+            first_char == 'U' || first_char == 'u') {
+            return s_an;
+        }
+
+        return s_a;
+    }
+
+    void __cdecl Diplomacy_Give_In_To_Demand_(int16_t asking_player_idx, int16_t giving_player_idx, int16_t demand_type, int16_t demand_data) {
+        switch (demand_type) {
+        case 0:
+            MOX::_player[giving_player_idx].delayed_diplomacy_orders[demand_data] = 0;
+            break;
+
+        case 1:
+            MOX::_player[giving_player_idx].delayed_diplomacy_orders[demand_data] = 1;
+            break;
+
+        case 2:
+            MOX::_player[giving_player_idx].delayed_diplomacy_orders[demand_data] = 2;
+            break;
+
+        case 3:
+            diplomac::Start_Tribute_Treaty_(giving_player_idx, asking_player_idx, 1);
+            break;
+
+        case 4:
+            diplomac::Start_Tribute_Treaty_(giving_player_idx, asking_player_idx, 2);
+            break;
+
+        case 6:
+            COLCALC::Player_Gets_Tech_App_(&MOX::_player[asking_player_idx], demand_data);
+            break;
+
+        case 7:
+            if (COLCALC::May_Surrender_Star_(demand_data, giving_player_idx, asking_player_idx)) {
+                COLCALC::Surrender_Star_(demand_data, giving_player_idx, asking_player_idx);
+            }
+            break;
+
+        case 8:
+            {
+                int32_t r1 = random::Random_(50);
+                int32_t r2 = random::Random_(50);
+                MOX::_player[giving_player_idx].stop_blockading_duration[asking_player_idx] = (int8_t)r1 + (int8_t)r2 + 10;
+            }
+            break;
+
+        case 5:
+        default:
+            break;
+        }
+    }
+
+    void __cdecl Diplomacy_Synch_Mode_(int16_t p1, int16_t p2) {
+        _old_response_message = 0;
+        _response_message = 0;
+
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Listen_Mode_, 2);
+        timer::Mark_Time_();
+        fields::Clear_Fields_();
+
+        Draw_Diplomacy_Synch_Mode_();
+        RUSS::Mox_Sync_Update_();
+
+        timer::Release_Time_(2);
+        fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
+    }
+
+    void __cdecl Get_Human_Demand_Message_(int16_t player_idx, int16_t unused, int16_t demand_type, int16_t item_idx) {
+        switch (demand_type) {
+        case 0:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x13, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Name_(_diplomacy_message, player_idx, item_idx, 0xfa);
+            break;
+        case 1:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x14, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Name_(_diplomacy_message, player_idx, item_idx, 0xfa);
+            break;
+        case 2:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x15, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Name_(_diplomacy_message, player_idx, item_idx, 0xfa);
+            break;
+        case 3:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x16, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, 5, 0xfa);
+            break;
+        case 4:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x16, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, 10, 0xfa);
+            break;
+        case 5:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x17, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Race_(_diplomacy_message, player_idx, 0xfa);
+            break;
+        case 6:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x18, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_Tech_(_diplomacy_message, player_idx, item_idx, 0xfa);
+            break;
+        case 7:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x19, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Name_And_System_(_diplomacy_message, player_idx, item_idx, 0xfa);
+            break;
+        case 8:
+            JIM::Get_Text_Message_(s_jimtext2_lbx, 0x1a, _diplomacy_message, 0xfa);
+            JIM::Decode_Text_Race_(_diplomacy_message, player_idx, 0xfa);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * @brief Displays a list for the human player to select a demand (e.g., star system or tech).
+     * 
+     * @param player_idx The index of the player making the demand.
+     * @param other_player_idx The index of the player being demanded from.
+     * @param demand_type The type of demand being made (e.g., 7 for a Star System).
+     * @param some_id An additional identifier used for system selection.
+     * @return int16_t 1 if a choice was made (or for system demands), 0 if cancelled.
+     */
+    int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t some_id) {
+        char cancel_btn_text[40];
+        char demand_text[40];
+        char unused_text[40];
+        char separator;
+        int16_t result;
+
+        if (demand_type == 7 /* ECON_STAR_SYSTEM */) {
+            // Displays the star system selection list. Returns 1 regardless of specific system result.
+            DIP_SCRN::Diplomacy_Generic_System_List_(some_id, player_idx, other_player_idx, 1);
+            result = 1;
+        } else {
+            // Load demand strings and display the generic demand choice list.
+            JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 79 /* MSG_DEMAND_HEADER */, demand_text, 40);
+            JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 80 /* MSG_DEMAND_SUBHEADER */, unused_text, 40);
+            
+            separator = DIP_SCRN::s_empty_string[0];
+            fields::Deactivate_Help_List_();
+            
+            JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx, 0 /* MSG_CANCEL */, cancel_btn_text, 40);
+
+            // If the list result is 0 (first option or similar), we return 1 (Success/Accept).
+            // Otherwise return 0 (Cancel).
+            if (DIP_SCRN::Diplomacy_Generic_List_(2, demand_text, 0, cancel_btn_text) == 0) {
+                result = 1;
+            } else {
+                result = 0;
+            }
+        }
+
+        return result;
+    }
+
+    short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag)
+    {
+        uint32_t saved_bg_seg;
+        int16_t result;
+        int16_t current_selection;
+        uint8_t enabled_flags[17];
+        char list_title[40];
+
+        COLONY::_using_colony_screen_palette = 1;
+        MOX::_star_bg_index = 0;
+        saved_bg_seg = (uint32_t)MOX::_star_bg_seg;
+        MOX::_current_screen = 6;
+        MOX::_galaxy_map_scanned_star = star_idx;
+        _diplomacy_scan_input_flag = star_idx;
+        MOX::_star_bg_seg = _diplomacy_system_star_background_seg;
+        _diplomacy_system_giver = (uint8_t)giver_player_idx;
+        _diplomacy_system_receiver = (uint8_t)receiver_player_idx;
+
+        Diplomacy_System_Scan_(star_idx, giver_player_idx, &_diplomacy_system_homeworld_flag, &_diplomacy_system_planet_count, (int8_t*)_diplomacy_system_planet_list);
+        
+        _diplomacy_system_population = COLCALC::Get_System_Population_(giver_player_idx, star_idx);
+        
+        JIM::Get_Text_Message_(s_jimtext2_lbx, 0x38 /* 56 */, _system_million_colonists_buffer, 0x1E /* 30 */);
+        JIM::Decode_Text_Stat_(_system_million_colonists_buffer, _diplomacy_system_population, 0x1E);
+        
+        JIM::Get_Text_Message_(s_jimtext2_lbx, 0x3A /* 58 */, _system_x_star_system_buffer, 0x23 /* 35 */);
+        JIM::Decode_Text_System_(_system_x_star_system_buffer, star_idx, 0x23);
+
+        memset(enabled_flags, 0, sizeof(enabled_flags));
+        // Items 10-16 are enabled
+        memset(&enabled_flags[10], 1, 7);
+
+        JIM::Get_Text_Message_(s_jimtext_lbx, 0x4B /* 75 */, list_title, 0x28 /* 40 */);
+
+        if (mode_flag == 1) {
+            Get_Human_Demand_Message_(receiver_player_idx, giver_player_idx, 7, star_idx);
+        } else {
+            JIM::Get_Text_Message_(s_jimtext_lbx, 0x4E /* 78 */, _diplomacy_message, 0xFA /* 250 */);
+        }
+
+        JIM::Get_Text_Message_(s_jimtext_lbx, 0x4F /* 79 */, _diplomacy_list_choice[0], 0x32 /* 50 */);
+        JIM::Get_Text_Message_(s_jimtext_lbx, 0x50 /* 80 */, _diplomacy_list_choice[1], 0x32);
+        _diplomacy_list_choice[2][0] = s_empty[0];
+
+        fields::Clear_Fields_();
+        fields::Assign_Auto_Function_(Diplomacy_Generic_System_List_Draw_, 2);
+        fields::Set_Input_Delay_(1);
+
+        fonts::Set_Font_Style_(4, &_diplomacy_normal_colors);
+        fonts::Set_Font_Highlight_Colors_(&_diplomacy_highlight_colors);
+        fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
+        fonts::Set_Font_LF_(4);
+
+        current_selection = 0;
+        result = fields::Get_List_Field_(10, 102, 245, list_title, _diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
+
+        MOX::_star_bg_seg = (s_animation_header*)saved_bg_seg;
+        COLONY::_using_colony_screen_palette = 0;
+
+        if (result == -1 || result == 1) {
+            result = -1;
+        }
+
+        return result;
+    }
+
+    // Suggested name: DIP_SCRN::Draw_Diplomacy_System_Text_
+    void __cdecl Draw_Diplomacy_System_Text_(int16_t star_idx, int16_t selected_planet_idx) {
+        char text_buffer[80];
+        bool use_special_colors = false;
+
+        if (star_idx == -1) {
+            fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_normal_colors);
+        } else {
+            use_special_colors = true;
+            fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_special_colors);
+        }
+
+        strcpy(text_buffer, DIP_SCRN::_system_x_star_system_buffer);
+
+        if (!COLCALC::May_Surrender_Star_(star_idx, DIP_SCRN::_diplomacy_system_giver, DIP_SCRN::_diplomacy_system_receiver)) {
+            fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_special_colors);
+            strcat(text_buffer, DIP_SCRN::_system_unsurrenderable_buffer);
+            use_special_colors = true;
+        }
+
+        fonts::Print_(10, 287 /* 0x11f */, text_buffer);
+
+        if (selected_planet_idx != (int16_t)0xFFFF || use_special_colors) {
+            fonts::Set_Font_Style_Shadow_Down_(3, &DIP_SCRN::_diplomacy_special_colors);
+        } else {
+            fonts::Set_Font_Style_Shadow_Down_(3, &DIP_SCRN::_diplomacy_normal_colors);
+        }
+
+        fonts::Print_(10, 309 /* 0x135 */, DIP_SCRN::_system_million_colonists_buffer);
+
+        if (DIP_SCRN::_diplomacy_system_planet_count > 0) {
+            int y_offset = 32;
+            for (int16_t i = 0; i < DIP_SCRN::_diplomacy_system_planet_count; ++i) {
+                uint8_t planet_idx = DIP_SCRN::_diplomacy_system_planet_list[i];
+                s_planet_data* planet = &MOX::_planet[planet_idx];
+
+                _sprintf(text_buffer, "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
+
+                if (planet_idx == (uint8_t)selected_planet_idx) {
+                    strcat(text_buffer, DIP_SCRN::_system_homeworld_buffer);
+                }
+
+                fonts::Print_(10, y_offset + 291 /* 0x123 */, text_buffer);
+                y_offset += 14;
+            }
+        }
+    }
+
+    void __cdecl Send_Diplomacy_Handshake_(int16_t sender_player_id, int16_t target_player_id) {
+        DIP_SCRN::_net_diplomacy_message.sender_player_id = (uint8_t)sender_player_id;
+        DIP_SCRN::_net_diplomacy_message.target_player_id = (uint8_t)target_player_id;
+
+        // Note: _net_diplomacy_message.arg1 is left uninitialized by this function.
+
+        DIP_SCRN::_net_diplomacy_message.arg2 = -1;
+        DIP_SCRN::_net_diplomacy_message.msg_type = 1012 /* 0x3F4 */;
+
+        NETMOX::Mox_Send_Message_(
+            MOX::_player[sender_player_id].network_player_id,
+            2000 /* 0x7D0 */,
+            &DIP_SCRN::_net_diplomacy_message,
+            8
+        );
+
+        RUSS::Mox_Update_();
+    }
+
+    /**
+     * @address 00417150
+     */
+    void __cdecl Diplomacy_Generic_System_List_Draw_() {
+        Draw_Diplomacy_Synch_Mode_();
+        Draw_Diplomacy_System_();
+
+        Draw_Diplomacy_System_Text_(
+            _diplomacy_scan_input_flag,
+            _diplomacy_system_homeworld_flag
+        );
+    }
+
+    /**
+     * @address 0041c480
+     */
+    void __cdecl Diplomacy_Net_Switcheroo_() {
+        uint8_t original_talker = (uint8_t)DIP_SCRN::_talker_ambassador;
+        uint8_t original_listen = DIP_SCRN::_listen_ambassador;
+
+        DIP_SCRN::_old_response_message = -1;
+        DIP_SCRN::_net_diplomacy_message.arg2 = -1;
+
+        // Perform Ambassador swap
+        DIP_SCRN::_talker_ambassador = (int8_t)original_listen;
+        DIP_SCRN::_listen_ambassador = original_talker;
+
+        // Populate message with original state before variables were swapped
+        DIP_SCRN::_net_diplomacy_message.sender_player_id = original_listen;
+        DIP_SCRN::_net_diplomacy_message.target_player_id = original_talker;
+        DIP_SCRN::_net_diplomacy_message.msg_type = 1011 /* 0x3F3 */;
+
+        // Send message to the new talker (who was the original listener)
+        NETMOX::Mox_Send_Message_(
+            MOX::_player[DIP_SCRN::_talker_ambassador].network_player_id,
+            2000,
+            &DIP_SCRN::_net_diplomacy_message,
+            sizeof(s_dipscrn_net_message)
+        );
+
+        RUSS::Mox_Update_();
+
+        DIP_SCRN::_response_message = 0;
+        DIP_SCRN::_old_response_message = 0;
     }
 }

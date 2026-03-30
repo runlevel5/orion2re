@@ -2432,6 +2432,18 @@ namespace hooks {
         { 0x004156b0, &DIP_SCRN::Get_Human_Tech_Exchange_Accept_Message_ },
         { 0x004156d0, &DIP_SCRN::Get_Human_Tech_Exchange_Decline_Message_ },
         { 0x00415670, &DIP_SCRN::Get_Human_Tech_Exchange_First_Message_ },
+        { 0x0041b290, &DIP_SCRN::An_ },
+        { 0x004187c0, &DIP_SCRN::Get_Human_Demand_Response_ },
+        { 0x00418600, &DIP_SCRN::Diplomacy_Give_In_To_Demand_ },
+        { 0x0041c920, &DIP_SCRN::Diplomacy_Synch_Mode_ },
+        { 0x004150a0, &DIP_SCRN::Get_Human_Demand_Message_ },
+        { 0x00418520, &DIP_SCRN::Get_Human_Demand_Choice_ },
+        { 0x00416f30, &DIP_SCRN::Diplomacy_Generic_System_List_ },
+        { 0x00419c20, &DIP_SCRN::Draw_Diplomacy_System_ },
+        { 0x00419c80, &DIP_SCRN::Draw_Diplomacy_System_Text_ },
+        { 0x0041c520, &DIP_SCRN::Send_Diplomacy_Handshake_ },
+        { 0x0041c480, &DIP_SCRN::Diplomacy_Net_Switcheroo_ },
+        { 0x00417150, &DIP_SCRN::Diplomacy_Generic_System_List_Draw_ },
     };
 
     void Install_Hooks()
