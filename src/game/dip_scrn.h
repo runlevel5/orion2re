@@ -20,7 +20,7 @@ namespace DIP_SCRN {
     inline int16_t& _exchange_tech_count = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A89D8 });
     inline char* (&_main_diplomacy_list)[9] = *reinterpret_cast<char* (*)[9]>(std::uintptr_t{ 0x005A8A10 });
     inline char* (&_propose_treaty_diplomacy_list)[7] = *reinterpret_cast<char*(*)[7]>(std::uintptr_t{0x005A8A50});
-    inline int16_t (&_exchange_tech_list)[100] = *reinterpret_cast<int16_t(*)[100]>(std::uintptr_t{ 0x005A8A70 });
+    inline uint8_t (&_exchange_tech_list)[212] = *reinterpret_cast<uint8_t(*)[212]>(std::uintptr_t{ 0x005A8A70 });
     inline char (&_chat_message)[100] = *reinterpret_cast<char (*)[100]>(std::uintptr_t{0x005A82F0});
     inline int16_t& _diplomacy_quit_chat_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A00});
     inline int16_t& _net_diplomacy_treaty_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8A04});

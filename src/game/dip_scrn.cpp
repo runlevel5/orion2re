@@ -1868,12 +1868,12 @@ namespace DIP_SCRN {
                         Get_Human_Tech_Exchange_First_Message_(player_1, player_2, tech_1);
                         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 4, text_msg, 40);
 
-                        uint8_t tech_categories[15];
-                        memset(tech_categories, 1, sizeof(tech_categories));
+                        int32_t tech_categories[212];
+                        memset(tech_categories, 1, sizeof(tech_categories)); // original only sets 15 bytes
 
                         npcdiplo::Get_Differential_Tech_List_(
                             player_2, player_1, 0, 0xC343CB00,
-                            _target_tech_list, (int32_t*)tech_categories, // TYPE MISMATCH: passing uint8_t[15] to int32_t*
+                            _target_tech_list, tech_categories,
                             &_exchange_tech_count, 1
                         );
 
@@ -1884,7 +1884,7 @@ namespace DIP_SCRN {
                         Diplomacy_Load_New_Ambassador_(player_2);
 
                         if (ex_selected_tech_idx != -1) {
-                            uint16_t tech_2 = _target_tech_list[ex_selected_tech_idx];
+                            tech_2 = _target_tech_list[ex_selected_tech_idx];
                             Get_Human_Tech_Exchange_Message_(player_2, player_1, tech_1, tech_2);
                             JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 5, text_msg, 40);
 
@@ -1950,7 +1950,7 @@ namespace DIP_SCRN {
                     _response_message = 0xAE;
                     npcdiplo::NPC_Message_Rejection_Check_(player_2, player_1, &_response_message);
                 } else {
-                    uint16_t tech_2 = _exchange_tech_list[selected_tech_idx];
+                    uint8_t tech_2 = _exchange_tech_list[selected_tech_idx];
                     Get_Human_Tech_Exchange_Message_(player_2, player_1, tech_1, tech_2);
                     JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 5, text_msg, 40);
 

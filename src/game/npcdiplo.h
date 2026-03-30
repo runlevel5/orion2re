@@ -43,8 +43,8 @@ namespace npcdiplo {
 
     int16_t __cdecl NPC_Surrender_Check_(int16_t player_idx);
 
-    inline void __cdecl Get_Exchange_Tech_List_(int16_t player_num, int16_t ambassador_idx, int16_t* count, uint8_t* target_list, int16_t* exchange_list) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, uint8_t*, int16_t*);
+    inline void __cdecl Get_Exchange_Tech_List_(int16_t player_num, int16_t ambassador_idx, int16_t* count, uint8_t* target_list, uint8_t* exchange_list) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, uint8_t*, uint8_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ebbf0 });
         fn(player_num, ambassador_idx, count, target_list, exchange_list);
     }
