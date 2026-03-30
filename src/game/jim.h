@@ -41,6 +41,11 @@ namespace JIM {
         fn(music_id, p2, p3);
     }
 
+    inline void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t name1_idx, int16_t name2_idx, int16_t size) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00425890})(buffer, name1_idx, name2_idx, size);
+    }
+
     inline void __cdecl Get_Text_Message_(const char* lbx_name, int16_t index, char* buffer, int16_t max_len) {
         using Fn = void(__cdecl*)(const char*, int16_t, char*, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00425340})(lbx_name, index, buffer, max_len);
@@ -52,10 +57,27 @@ namespace JIM {
         fn(buffer, player_idx, tech_idx, max_len);
     }
 
+    inline void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t param_1, int16_t param_2, int16_t param_3, int32_t max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425830});
+        fn(buffer, param_1, param_2, param_3, max_len);
+    }
+
+    inline void __cdecl Decode_Text_System_(char* buffer, int16_t star_idx, int16_t size) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00425950})(buffer, star_idx, size);
+    }
+
     inline void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t player_idx, int16_t star_idx, int16_t max_len) {
         using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004257d0});
         fn(buffer, player_idx, star_idx, max_len);
+    }
+
+    inline void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* buffer, int16_t param_1, int16_t param_2, int16_t param_4, int16_t param_3, int32_t max_len) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int16_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425860});
+        fn(buffer, param_1, param_2, param_4, param_3, max_len);
     }
 
     inline void __cdecl Bill_Picture_To_Mouse_(s_animation_header* sprite) {

@@ -542,6 +542,7 @@ inline const char* const s___00559948 = reinterpret_cast<const char*>(0x00559948
 inline const char* const s_0__s_00559940 = reinterpret_cast<const char*>(0x00559940); // "0 %s"
 inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x005569F0); // "%d %s"
 inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   // ""
+inline const char* s__d_BC_00552384 = reinterpret_cast<const char*>(0x00552384);
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"
 inline const char* s_c_00556350 = reinterpret_cast<const char*>(std::uintptr_t{0x00556350}); // "c"

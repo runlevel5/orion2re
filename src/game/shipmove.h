@@ -27,6 +27,12 @@ namespace SHIPMOVE {
 
     inline s_ship_move_info& _g_ship_move_info = *reinterpret_cast<s_ship_move_info*>(std::uintptr_t{0x0059C440});
 
+    inline uint8_t __cdecl Player_Has_Ships_Pestering_Other_Player_(int16_t param_1, int16_t param_2) {
+        using Fn = uint8_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00437910});
+        return fn(param_1, param_2);
+    }
+
     void __cdecl Unmark_Just_Built_AI_Ships_();
 
     int16_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star_idx, int16_t end_star_idx);

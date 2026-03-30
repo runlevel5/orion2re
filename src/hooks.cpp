@@ -2418,6 +2418,20 @@ namespace hooks {
         { 0x00415540, &DIP_SCRN::Get_Human_Propose_Treaty_Message_ },
         { 0x00414f00, &DIP_SCRN::Get_Human_Surrender_Message_ },
         { 0x0041c8b0, &DIP_SCRN::Draw_Diplomacy_Listen_Mode_ },
+        { 0x00418490, &DIP_SCRN::Check_Better_Offer_Available_ },
+        { 0x00419800, &DIP_SCRN::Diplomacy_System_Display_ },
+        { 0x00419B90, &DIP_SCRN::Draw_Diplomacy_System_Display_ },
+        { 0x0041CC00, &DIP_SCRN::Load_Diplomacy_Text_Messages_ },
+        { 0x00419020, &DIP_SCRN::Diplomacy_Human_Need_Better_Offer_ },
+        { 0x0041a8e0, &DIP_SCRN::Get_Diplomacy_Statement_ },
+        { 0x00419f70, &DIP_SCRN::Diplomacy_Exchange_Technology_ },
+        { 0x004156f0, &DIP_SCRN::Diplomacy_Demand_ },
+        { 0x0041c980, &DIP_SCRN::Start_Net_Treaty_ },
+        { 0x0041B2E0, &DIP_SCRN::Get_Net_Diplomacy_Choices_ },
+        { 0x00415620, &DIP_SCRN::Get_Human_Tech_Exchange_Message_ },
+        { 0x004156b0, &DIP_SCRN::Get_Human_Tech_Exchange_Accept_Message_ },
+        { 0x004156d0, &DIP_SCRN::Get_Human_Tech_Exchange_Decline_Message_ },
+        { 0x00415670, &DIP_SCRN::Get_Human_Tech_Exchange_First_Message_ },
     };
 
     void Install_Hooks()

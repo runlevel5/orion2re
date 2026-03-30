@@ -164,4 +164,10 @@ namespace diplomac {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456B60});
         fn(param_1, param_2, category, gift_param, response);
     }
+
+    inline void __cdecl Get_Demand_Response_(int16_t param_1, int16_t param_2, int16_t demand_type, uint16_t treaty_val, int16_t* response, int16_t* message) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, uint16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00456e10});
+        fn(param_1, param_2, demand_type, treaty_val, response, message);
+    }
 }
