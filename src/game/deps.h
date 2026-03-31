@@ -173,6 +173,7 @@
 #include "settler.h"
 #include "invasion.h"
 #include "council.h"
+#include "s_council.h"
 #include "global.h"
 #include "gui.h"
 #include "combat1.h"

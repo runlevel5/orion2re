@@ -4928,3 +4928,8 @@ struct s_unit_data {
 
 /* WARNING! conflicting data type names: /orion2.h/word - /word */
 
+namespace orion2 {
+    inline const char* s_empty = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
+    inline const char* s_jimtext_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552360}); // "jimtext.lbx"
+    inline const char* s_format_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055236c}); // "  %s"
+}

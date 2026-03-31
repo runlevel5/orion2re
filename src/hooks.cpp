@@ -2497,6 +2497,22 @@ namespace hooks {
         { 0x004d80a0, &council::Control_Main_Council_Screen_ },
         { 0x004d8bd0, &council::Next_Council_State_ },
         { 0x004d7f50, &council::Main_Council_Screen_ },
+        { 0x004d8130, &council::Draw_Main_Council_Screen_ },
+        { 0x004d9180, &council::Council_Player_Vote_ },
+        { 0x004d8ff0, &council::Council_Vote_Result_ },
+        { 0x004d8940, &council::Get_Num_Votes_ },
+        { 0x004d8ce0, &council::Council_Votes_ },
+        { 0x004d8c30, &council::Council_Finished_Voting_ },
+        { 0x004d8440, &council::Reload_Main_Council_Screen_ },
+        { 0x004d89a0, &council::Get_Council_Message_ },
+        { 0x004d9430, &council::Council_Accept_Ruling_ },
+        { 0x004d97e0, &council::Load_Council_Text_Messages_ },
+        { 0x004d8e60, &council::Vote_Check_ },
+        { 0x0049ab90, &HACCESS::Orion_Owner_ },
+        { 0x004d98e0, &council::Drive_Council_Player_Voted_Winner_ },
+        { 0x004d9840, &council::Council_Player_Voted_Winner_ },
+        { 0x004d9ae0, &council::Get_Player_Voted_Winner_Message_ },
+        { 0x004d9990, &council::Draw_Council_Player_Voted_Winner_ },
     };
 
     void Install_Hooks()

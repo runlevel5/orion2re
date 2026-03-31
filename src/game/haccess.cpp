@@ -626,4 +626,27 @@ namespace HACCESS {
     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx) {
         return MOX::_player[player_idx].tech_applications[tech_idx] == 3;
     }
+
+    /**
+     * @address 0049ab90
+     */
+    int8_t __cdecl Orion_Owner_() {
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star->planet_index[i];
+
+            if (planet_idx != -1) {
+                s_planet_data* planet = &MOX::_planet[planet_idx];
+
+                if (planet->planet_type == 3 /* PLANET_TYPE_ORION */) {
+                    int16_t colony_idx = planet->colony_index;
+
+                    if (colony_idx != -1) {
+                        return MOX::_colony[colony_idx].owner;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
 }

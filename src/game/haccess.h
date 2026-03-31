@@ -93,6 +93,8 @@ namespace HACCESS {
         return reinterpret_cast<Fn>(std::uintptr_t{0x0049AB10})(player_num);
     }
 
+    int8_t __cdecl Orion_Owner_();
+
     int16_t __cdecl Ship_Stack_X_(int16_t stack_idx);
     int16_t __cdecl Ship_Stack_Y_(int16_t node_idx);
 
