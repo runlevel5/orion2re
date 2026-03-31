@@ -113,10 +113,6 @@ namespace COMBFIND {
 
     void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t player_idx);
 
-    inline bool __cdecl Player_May_Attack_Player_(int player_a, int player_b) {
-        using Fn = bool(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCC90});
-        return fn(player_a, player_b);
-    }
+    int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx);
 
 }

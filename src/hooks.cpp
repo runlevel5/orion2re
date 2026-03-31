@@ -2513,6 +2513,8 @@ namespace hooks {
         { 0x004d9840, &council::Council_Player_Voted_Winner_ },
         { 0x004d9ae0, &council::Get_Player_Voted_Winner_Message_ },
         { 0x004d9990, &council::Draw_Council_Player_Voted_Winner_ },
+        { 0x004bcc90, &COMBFIND::Player_May_Attack_Player_ },
+        { 0x00432e50, &FMTPARA::Set_Paragraph_Sint_Pointer_ },
     };
 
     void Install_Hooks()

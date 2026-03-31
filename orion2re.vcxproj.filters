@@ -963,8 +963,5 @@
     <None Include=".vocode\workflows\verifier.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
-    <None Include="src\game\flt2.cpp.orig">
-      <Filter>src\game</Filter>
-    </None>
   </ItemGroup>
 </Project>

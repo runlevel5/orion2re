@@ -183,10 +183,12 @@ namespace FMTPARA {
 
     char* __cdecl _Print_Formatted_Paragraph_(short x, short y, short width, char* str, short justify, s_animation_header* seg, bool do_render);
 
-    inline void __cdecl Set_Paragraph_Sint_Pointer_(int16_t idx, int16_t* ptr) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432e50});
-        fn(idx, ptr);
+    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr);
+
+    inline void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t id, void* ptr, int32_t size) {
+        using Fn = void(__cdecl*)(uint16_t, void*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433e10});
+        fn(id, ptr, size);
     }
 
     inline void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int param_1, int param_2, int param_3, char* text, int param_5, void* bitmap) {

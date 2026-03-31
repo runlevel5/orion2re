@@ -1097,6 +1097,57 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
     return confirmed;
 }
 
+/**
+ * Determines if a specific player is allowed to initiate an attack on another player 
+ * based on their current relationship status, treaties, and personality.
+ */
+int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
+    if (target_idx == attacker_idx) {
+        return 0;
+    }
+
+    // Indices >= 8 usually represent Antarans, Guardians, or space monsters
+    if (attacker_idx > 7) {
+        return 1;
+    }
+
+    s_player* attacker = &MOX::_player[attacker_idx];
+
+    // 0x64 ('d') represents human player
+    if (attacker->objectives == 100) {
+        return 1;
+    }
+
+    int8_t treaty_status = attacker->treaty[target_idx];
+    if (treaty_status != 0) {
+        // Specific treaty values allow combat (e.g., War or specific hostilities)
+        if (treaty_status >= 4 && treaty_status <= 6) {
+            return 1;
+        }
+        return 0;
+    }
+
+    // If no formal treaty exists, check for non-aggression or active trade/research ties
+    if (attacker->stop_blockading_duration[target_idx] == 0 &&
+        attacker->trade_treaty[target_idx] == 0 &&
+        attacker->research_treaty[target_idx] == 0) 
+    {
+        // Personality 0 is likely Ruthless/Aggressive
+        if (attacker->personality == 0) {
+            return 1;
+        }
+
+        // Personality 3 is likely erratic or opportunistic, having a small chance to attack
+        if (attacker->personality == 3) {
+            if (random::Random_(10) == 1) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
     if (colony_idx == -1) {
         return -1;

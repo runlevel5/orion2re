@@ -2002,4 +2002,11 @@ namespace FMTPARA {
         FMTPARA::_para_p->str++;
         FMTPARA::Insert_A_String_(const_cast<char*>(param_1));
     }
+
+    /**
+     * @address 00432e50
+     */
+    void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr) {
+        Set_Paragraph_Variable_Pointer_(id, ptr, 4);
+    }
 }
