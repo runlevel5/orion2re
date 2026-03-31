@@ -78,10 +78,7 @@ namespace AIMOVE {
 
     void __cdecl Knock_Out_Impossible_Interceptions_(s_aimove_intercept_entry* intercepts, int* count, int8_t* temp_arr, int* temp_count, int keep_one_entry);
 
-    inline int32_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int star_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t, uint16_t, int);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004642b0 })(ship_idx, player_mask, star_idx);
-    }
+    uint16_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int star_idx);
 
     void __cdecl Player_Threatens_Player_(int plr1, int plr2, int* star_idx, int* aux_info, int* planet_idx);
 

@@ -103,11 +103,7 @@ namespace COLBLDG {
         reinterpret_cast<Fn>(std::uintptr_t{0x0050a5c0})(design, buffer, unknown);
     }
 
-    inline int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050b0c0});
-        return fn(colony_idx, product_id);
-    }
+    int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id);
 
     void __cdecl Delete_From_Colony_Queue_(short colony_idx, short queue_idx);
 

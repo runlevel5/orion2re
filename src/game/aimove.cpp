@@ -2414,4 +2414,50 @@ namespace AIMOVE {
 
         return static_cast<uint16_t>(attack_worthiness);
     }
+
+    uint16_t __cdecl Ship_Min_Strength_Versus_Players_At_Star_(int16_t ship_idx, uint16_t player_mask, int32_t star_idx) {
+        int16_t min_strength = 32767 /* 0x7fff */;
+        bool in_nebula = MOX::_star[star_idx].in_nebula != 0;
+
+        // Check empire players (indices 0 to 7)
+        if ((uint8_t)player_mask != 0) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+                if ((player_mask >> i) & 1) {
+                    int16_t(*strengths)[500][8];
+                    if (in_nebula) {
+                        strengths = AIDATA::_ship_strengths_in_nebula;
+                    }
+                    else {
+                        strengths = AIDATA::_ship_strengths;
+                    }
+
+                    int16_t strength = (*strengths)[ship_idx][i];
+                    if (strength < min_strength) {
+                        min_strength = strength;
+                    }
+                }
+            }
+        }
+
+        // Check special entities or high-index players (indices 8 to 14)
+        if ((uint8_t)(player_mask >> 8) != 0) {
+            for (int32_t i = 8; i < 15; ++i) {
+                if ((player_mask >> i) & 1) {
+                    int16_t strength;
+                    if (in_nebula) {
+                        strength = AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_((int16_t)ship_idx, (int16_t)i);
+                    }
+                    else {
+                        strength = AIPOWER::Ship_Strength_Vs_Ships_((int16_t)ship_idx, (int16_t)i);
+                    }
+
+                    if (strength < min_strength) {
+                        min_strength = strength;
+                    }
+                }
+            }
+        }
+
+        return min_strength;
+    }
 }

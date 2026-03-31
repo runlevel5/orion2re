@@ -316,9 +316,130 @@ namespace AIPOWER {
     }
 
     /**
+     * @brief Calculates the defensive strength of a stationary defense (Star Base, Battlestation, Fortress) against ships.
+     * @param building_type Index offset for stationary defense (0=Star Base, 1=Battlestation, 2=Fortress).
+     * @param player_idx Index of the player owning the satellite.
+     * @param target_player_idx Index of the attacking player.
+     * @return Strength value clamped to 64000.
+     */
+    uint16_t __cdecl Satelite_Strength_Vs_Ships_(int16_t building_type, int16_t player_idx, int16_t target_player_idx) {
+        uint32_t total_strength = 0;
+
+        if (building_type != -1) {
+            int16_t ocv = AIPOWER::Base_Generic_Ocv_(player_idx);
+            int16_t dcv = (int16_t)Base_Generic_Dcv_(target_player_idx);
+            int32_t accuracy_mod = (ocv - dcv) + 100;
+
+            if (accuracy_mod < 10) {
+                accuracy_mod = 10;
+            }
+            if (accuracy_mod > 100) {
+                accuracy_mod = 100;
+            }
+
+            int16_t best_beam = INITSHIP::Best_Beam_Weapon_(player_idx);
+            int16_t best_missile = INITSHIP::Best_Missile_Weapon_NT_(player_idx);
+
+            int16_t beam_count_normal;
+            int16_t beam_count_heavy;
+            int16_t missile_count;
+            s_tech_hull_data* hull = &TECHDATA::_hull_data[5 + building_type];
+
+            if (MOX::_settings.strategic_combat_flag == 0) {
+                int16_t hull_size = hull->size;
+                int16_t size_div_2 = hull_size / 2;
+                int16_t rem_size = hull_size - size_div_2;
+
+                // Tactical: Calculate weapon counts based on available hull space
+                int32_t space_normal = DESIGN::Weapon_Space_(player_idx, best_beam, 1, 0xF /* STATUS_OK */, 0, 0);
+                beam_count_normal = (int16_t)((size_div_2 / 4) / space_normal);
+
+                int32_t space_heavy = DESIGN::Weapon_Space_(player_idx, best_beam, 1, 0xF /* STATUS_OK */, 0, 2 /* MOD_HEAVY_MOUNT */);
+                beam_count_heavy = (int16_t)((size_div_2 / 2) / space_heavy);
+
+                int32_t space_missile = DESIGN::Weapon_Space_(player_idx, best_missile, 1, 0xF /* STATUS_OK */, 20, 0);
+                missile_count = (int16_t)(rem_size / space_missile);
+            } else {
+                // Strategic: Use predefined counts
+                beam_count_heavy = 0;
+                beam_count_normal = hull->strat_beam;
+                missile_count = hull->strat_missile;
+            }
+
+            int16_t shield_val = AIPOWER::Get_Best_Ship_Shield_Value_(target_player_idx);
+            
+            int32_t adj_beam_dmg_heavy = ((TECHDATA::_weapons[best_beam].max_damage * 3) / 2) - shield_val;
+            if (adj_beam_dmg_heavy < 0) adj_beam_dmg_heavy = 0;
+
+            int32_t adj_missile_dmg = TECHDATA::_weapons[best_missile].max_damage - shield_val;
+            if (adj_missile_dmg < 0) adj_missile_dmg = 0;
+
+            int32_t adj_beam_dmg_normal = TECHDATA::_weapons[best_beam].max_damage - shield_val;
+            if (adj_beam_dmg_normal < 0) adj_beam_dmg_normal = 0;
+
+            total_strength = (adj_beam_dmg_heavy * beam_count_heavy * accuracy_mod) / 100;
+            total_strength += (adj_missile_dmg * missile_count);
+            total_strength += (adj_beam_dmg_normal * beam_count_normal * accuracy_mod) / 100;
+
+            if (MOX::_settings.strategic_combat_flag == 0) {
+                uint32_t structural_mod = Strength_Hits_Modifier_(hull->structure_hp);
+                uint32_t val = (structural_mod * total_strength) / 100;
+                
+                if (val > 1) {
+                    val = (Strength_Hits_Modifier_(hull->structure_hp) * total_strength) / 100;
+                } else {
+                    val = 1;
+                }
+                
+                total_strength = (val * 75) / 100;
+            }
+
+            if (total_strength > 0xFA00 /* 64000 */) {
+                total_strength = 0xFA00;
+            }
+        }
+
+        return (uint16_t)total_strength;
+    }
+
+    /**
      * Calculates the defensive strength of a colony's ground-based installations 
      * against a specific player.
      */
+    /**
+     * Calculates the defensive ground strength of a colony's missile base.
+     */
+    uint32_t __cdecl Missile_Base_Strength_(int16_t player_idx, int16_t target_idx) {
+        if (MOX::_settings.strategic_combat_flag == 1) {
+            return 90 /* 0x5a */;
+        }
+
+        int16_t weapon_idx = INITSHIP::Best_Missile_Weapon_NT_(player_idx);
+
+        // weapon_idx is used here to get space cost
+        int32_t weapon_space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 16 /* 0x10 */, 5, 0);
+
+        // Calculate number of weapon mounts based on base space 300
+        int16_t capacity = 300 / (int16_t)weapon_space;
+
+        int16_t shield_val = AIPOWER::Get_Best_Ship_Shield_Value_(target_idx);
+
+        // Calculate base damage per weapon mount minus shield reduction
+        int32_t net_damage = (int32_t)TECHDATA::_weapons[weapon_idx].max_damage - (int32_t)shield_val;
+
+        if (net_damage < 0) {
+            net_damage = 0;
+        }
+
+        uint32_t strength = (uint32_t)net_damage * (uint32_t)capacity * 2;
+
+        if (strength > 64000 /* 0xfa00 */) {
+            strength = 64000;
+        }
+
+        return strength;
+    }
+
     uint16_t __cdecl Colony_Ground_Strength_Vs_Player_(int16_t colony_idx, int16_t player_idx) {
         uint16_t strength = 0;
         s_colony* colony = &MOX::_colony[colony_idx];
@@ -353,6 +474,86 @@ namespace AIPOWER {
         }
 
         return strength;
+    }
+
+    // Suggested name: AIPOWER::Phasor_Base_Strength_
+    uint32_t __cdecl Phasor_Base_Strength_(int16_t ship_idx, int16_t target_idx) {
+        if (MOX::_settings.strategic_combat_flag == 1) {
+            return 120 /* 0x78 */;
+        }
+
+        int16_t weapon_idx = INITSHIP::Best_Beam_Weapon_(ship_idx);
+        int32_t space = DESIGN::Weapon_Space_(ship_idx, weapon_idx, 1, 1, 1, 2);
+
+        // Number of weapon mounts that can fit in standard phasor space allocation
+        int16_t weapon_count = (int16_t)(225 /* 0xE1 */ / space);
+
+        int16_t shield_value = AIPOWER::Get_Best_Ship_Shield_Value_(target_idx);
+
+        int32_t max_damage = TECHDATA::_weapons[weapon_idx].max_damage;
+        int32_t base_damage = ((max_damage * 3) / 2) - shield_value;
+
+        if (base_damage < 0) {
+            base_damage = 0;
+        }
+
+        uint32_t total_power = (uint32_t)base_damage * (uint32_t)weapon_count;
+
+        if ((TECHDATA::_weapons[weapon_idx].natural_mods & 8) != 0) {
+            total_power *= 3;
+        }
+
+        if (total_power > 64000 /* 0xFA00 */) {
+            total_power = 64000 /* 0xFA00 */;
+        }
+
+        return total_power;
+    }
+
+    uint16_t __cdecl Fighter_Garrison_Strength_(int16_t player_idx, int16_t target_player_idx) {
+        int16_t pd_weapon_idx = INITSHIP::Best_Point_Defense_Weapon_(player_idx);
+        int16_t bomb_weapon_idx = INITSHIP::Best_Bomb_Weapon_(player_idx);
+        int16_t bomber_modifier = 0;
+        int16_t shield_value = Get_Best_Ship_Shield_Value_(target_player_idx);
+        int16_t bomber_count = 0;
+
+        if (MOX::_settings.strategic_combat_flag == 1) {
+            return 120;
+        }
+
+        int16_t pd_count = 10;
+        s_player* player = &MOX::_player[player_idx];
+
+        if (player->tech_applications[TECH_APP_HEAVY_FIGHTER_BAYS] == 3) {
+            pd_count = 0;
+            bomber_modifier = 0;
+            bomber_count = 4;
+        } else if (player->tech_applications[TECH_APP_BOMBER_BAYS] == 3) {
+            pd_count = 0;
+            bomber_modifier = 6;
+        }
+
+        int32_t bomb_dmg = (int32_t)TECHDATA::_weapons[bomb_weapon_idx].max_damage - shield_value;
+        if (bomb_dmg < 0) {
+            bomb_dmg = 0;
+        }
+
+        int32_t pd_dmg = (int32_t)TECHDATA::_weapons[pd_weapon_idx].max_damage - shield_value;
+        if (pd_dmg < 0) {
+            pd_dmg = 0;
+        }
+
+        uint16_t base_strength = (int16_t)bomb_dmg * ((bomber_count * 3 / 2) + bomber_modifier) +
+                                 (int16_t)pd_dmg * (pd_count + bomber_count * 2);
+
+        base_strength &= 0x3fff;
+
+        uint16_t final_strength = base_strength * 2;
+        if (final_strength > 64000 /* 0xFA00 */) {
+            final_strength = 64000;
+        }
+
+        return final_strength;
     }
 
 }

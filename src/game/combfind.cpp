@@ -378,6 +378,96 @@ int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx)
     return closest_star_idx;
 }
 
+/**
+ * @brief Selects a random attacker from the pool of players/entities that need to attack at a specific star.
+ * 
+ * The function checks bits 8-14 of the flags first (special attackers/factions). 
+ * If any of those are set, it picks one randomly and ignores player bits (0-7).
+ * Otherwise, it picks randomly from players 0 to _NUM_PLAYERS-1 whose bits are set.
+ * 
+ * @param star_idx The index of the star system.
+ * @return The index of the selected attacker, or -1 if none found.
+ */
+void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t player_idx) {
+    _target.num_colony_targets = 0;
+
+    if (star_idx < MOX::_NUM_STARS) {
+        for (int i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+            if (planet_idx >= 0) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                if (colony_idx >= 0) {
+                    if (Player_May_Attack_Player_(player_idx, MOX::_colony[colony_idx].owner)) {
+                        _target.colony_targets[_target.num_colony_targets] = colony_idx;
+                        _target.num_colony_targets++;
+                    }
+                }
+            }
+        }
+    }
+
+    _target.num_player_targets = 0;
+    for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+        if (player_idx != i) {
+            s_combfind_star_has_player* status = &(*_star_has_player)[star_idx][i];
+            if (status->has_player && status->colony_count == 0) {
+                if (Player_May_Attack_Player_(player_idx, i)) {
+                    _target.player_targets[_target.num_player_targets] = i;
+                    _target.num_player_targets++;
+                }
+            }
+        }
+    }
+
+    uint8_t mask = (*_star_has_nonplayer)[star_idx];
+    if (mask != 0) {
+        for (int i = 0; i < 7; ++i) {
+            // Indices 8-14 represent non-player factions/monsters
+            if (player_idx != (i + 8)) {
+                if ((mask >> i) & 1) {
+                    _target.player_targets[_target.num_player_targets] = (int16_t)i + 8;
+                    _target.num_player_targets++;
+                }
+            }
+        }
+    }
+}
+
+int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
+    uint16_t needs_attack = (uint16_t)(*_player_needs_to_attack)[star_idx];
+    int32_t attacker_idx = -1;
+    int32_t count = 0;
+
+    if (needs_attack == 0) {
+        return -1;
+    }
+
+    // Check for special entities (bits 8-14)
+    if (needs_attack >= 0x100 /* bit 8 set */) {
+        for (int32_t i = 8; i < 15; ++i) {
+            if ((needs_attack >> i) & 1) {
+                count++;
+                // Reservoir sampling for equal probability distribution
+                if (random::Random_(count) == 1) {
+                    attacker_idx = i;
+                }
+            }
+        }
+        return static_cast<int16_t>(attacker_idx);
+    } else {
+        // Check for players (bits 0-7)
+        for (int32_t i = 0; i < static_cast<int32_t>(MOX::_NUM_PLAYERS); ++i) {
+            if ((needs_attack >> i) & 1) {
+                count++;
+                if (random::Random_(count) == 1) {
+                    attacker_idx = i;
+                }
+            }
+        }
+        return static_cast<int16_t>(attacker_idx);
+    }
+}
+
 void __cdecl Pick_Star_And_Attacker_(int16_t* star_idx_ptr, int16_t* attacker_idx_ptr) {
     int16_t star_list_idx = _n_battle_stars - 1;
     *star_idx_ptr = -1;

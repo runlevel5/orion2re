@@ -1064,6 +1064,62 @@ namespace COLSUM {
     /**
      * @address 00402d80
      */
+    void __cdecl Draw_Colony_Scan_Info_(void) {
+        int16_t total_roundoff;
+        int16_t total_growth;
+        int16_t planet_idx;
+        uint8_t climate_idx;
+        char buffer[1000];
+
+        total_roundoff = 0;
+        total_growth = 0;
+
+        if (COLONY::_g_colony_n != -1) {
+            s_colony* colony = &MOX::_colony[COLONY::_g_colony_n];
+            climate_idx = (uint8_t)colony->climate;
+            planet_idx = colony->planet;
+
+            int16_t y_pos = 349 /* 0x15d */;
+            for (int16_t i = 0; i < 4; ++i) {
+                COLDRAW::Draw_Colony_Wee_Prod_(COLONY::_g_colony_n, i, 106, y_pos, 366, 20);
+                y_pos += 18;
+            }
+
+            COLDRAW::Draw_Info_Wee_Morale_(COLONY::_g_colony_n, 106, 421, 366);
+            COLONY::Set_Colony_Font_To_(1);
+
+            for (int16_t i = 0; i < 10; ++i) {
+                total_roundoff += colony->pop_roundoff[i];
+                total_growth += colony->pop_growth[i];
+            }
+
+            COLONY::Sum_Colonists_(COLONY::_g_colony_n, -1, -1, -1, -1, -1);
+
+            const char* sign_str = s__00551100;
+            if (total_growth < 0) {
+                sign_str = s_2_00551108;
+            }
+
+            s_planet_data* planet = &MOX::_planet[planet_idx];
+            int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
+            char* format = ESTRINGS::E_Strings_(74 /* 0x4a */);
+
+            _sprintf(buffer, format,
+                    sign_str,
+                    MOX::_planet_size_string[planet->size],
+                    MOX::_planet_climate_string[climate_idx],
+                    MOX::_planet_gravity_string[planet->gravity_class],
+                    MOX::_mineral_class_string[planet->mineral_class],
+                    (uint32_t)(uint8_t)colony->n_pops,
+                    (int32_t)max_pop,
+                    sign_str,
+                    (int32_t)total_growth,
+                    s_0_00551104);
+
+            BILL::Squeeze_Print_Formatted_Paragraph_(13, 354, 80, 88, buffer, 0);
+        }
+    }
+
     int16_t __cdecl Prod_To_Sort_Type_(int16_t param_1) {
         if (param_1 <= -100) {
             // Index logic: -100 maps to ship 0, -101 to ship 1, etc.

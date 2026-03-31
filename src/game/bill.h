@@ -27,61 +27,42 @@ namespace BILL {
 
     void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width);
 
+    inline void __cdecl _Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text, int16_t color, s_animation_header* anim, bool flag1, bool flag2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*, int16_t, s_animation_header*, bool, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407480});
+        fn(x, y, width, height, text, color, anim, flag1, flag2);
+    }
+
     void __cdecl Squeeze_Print_Paragraph_(uint16_t x, int16_t y, int16_t w, int16_t h, char* str, uint16_t align);
 
     void __cdecl Squeeze_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color);
 
     void __cdecl Squeeze_Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t flags);
 
-    inline void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t a1, int16_t y, uint16_t type, int16_t a4, void* buffer, int32_t a6) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t, int16_t, void*, int32_t);
-        reinterpret_cast<Fn>(0x004076f0)(a1, y, type, a4, buffer, a6);
-    }
+    void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color);
 
-    inline void __cdecl Get_Players_Dead_Or_Alive_Or_Omniscient_(int16_t dummy1, int16_t dummy2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x00406DE0)(dummy1, dummy2);
-    }
+    void __cdecl Get_Players_Dead_Or_Alive_Or_Omniscient_(int32_t param_1, char param_2);
 
     inline void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end) {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         reinterpret_cast<Fn>(0x004071F0)(start, end);
     }
 
-    inline void __cdecl Get_Active_Players_(int16_t dummy1, int16_t dummy2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x00406CD0)(dummy1, dummy2);
+    inline void __cdecl Get_Active_Players_(int player_id, char is_active) {
+        using Fn = void(__cdecl*)(int, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406CD0});
+        fn(player_id, is_active);
     }
 
-    inline void __cdecl Get_Players_Alive_Or_Omniscient_(int16_t param_1, int8_t param_2) {
-        using Fn = void(__cdecl*)(int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406eb0});
-        fn(param_1, param_2);
-    }
+    void __cdecl Get_Players_Alive_Or_Omniscient_(int32_t param_1, char param_2);
 
-    inline int16_t __cdecl Get_My_Spy_Number_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406FE0});
-        return fn(player_idx);
-    }
+    int16_t __cdecl Get_My_Spy_Number_(int16_t spy_idx);
 
-    inline int8_t __cdecl Get_My_Spy_Mission_(int16_t player_idx) {
-        using Fn = int8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407010});
-        return fn(player_idx);
-    }
+    int8_t __cdecl Get_My_Spy_Mission_(int16_t target_player_idx);
 
-    inline void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004070D0});
-        fn(player_idx, target_player_idx, mission);
-    }
+    void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission);
 
-    inline int16_t __cdecl Get_My_Agent_Number_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407050});
-        return fn();
-    }
+    int16_t __cdecl Get_My_Agent_Number_();
 
     void __cdecl Set_My_Spy_Mission_(int16_t target_player_idx, int8_t mission);
 
@@ -91,34 +72,30 @@ namespace BILL {
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width);
 
-    inline void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp) {
-        using Fn = void(__cdecl*)(int, int, int, char*, s_animation_header*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004077A0})(x, y, width, str, bmp);
+    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp);
+
+    inline void __cdecl _Print_1_Or_More_Lines_Centered_(uint16_t x, int16_t y, uint16_t width, uint8_t* bitmap, int16_t* line_y_offsets) {
+        using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, uint8_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407730});
+        fn(x, y, width, bitmap, line_y_offsets);
     }
 
     void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit);
 
-    inline void __cdecl _Print_Paragraph_(uint16_t x, int16_t y, uint16_t width, const char* text, int shadow_style) {
-        using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, const char*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408090});
-        fn(x, y, width, text, shadow_style);
-    }
+    void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment);
 
     inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
+    inline int16_t& __pp_max_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BC0});
 
-    inline void __cdecl _Print_Paragraph_Bill_(int32_t x, int32_t y, int16_t width, char* text, int16_t height, int32_t alignment, int16_t* out_val) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t, char*, int16_t, int32_t, int16_t*);
+    inline void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment, int32_t flag, void* reserved) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int32_t, void*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407DD0});
-        fn(x, y, width, text, height, alignment, out_val);
+        fn(x, y, width, text, alignment, flag, reserved);
     }
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height);
 
-    inline int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text) {
-        using Fn = int16_t(__cdecl*)(int16_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004080F0});
-        return fn(width, text);
-    }
+    int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text);
 
     inline uint8_t (&_space_limits)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00551138});

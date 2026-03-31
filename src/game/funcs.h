@@ -764,3 +764,6 @@ inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
 inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{0x00557D9C});
 inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
+
+struct s_mouse_list;
+inline s_mouse_list& DAT_00559a48 = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00559A48});

@@ -14,8 +14,8 @@ namespace RUSS {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004d7c30})(star_idx);
     }
 
-    inline void Mox_Sync_Update_() {
-        using Fn = void(*)();
+    inline void __cdecl Mox_Sync_Update_() {
+        using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00483C80 });
         fn();
     }

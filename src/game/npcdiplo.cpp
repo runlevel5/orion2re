@@ -978,6 +978,10 @@ namespace npcdiplo {
         return random_val <= threshold;
     }
 
+    int __cdecl compare_tech_(const void* a, const void* b) {
+        return static_cast<const s_npcdiplo_tech*>(a)->value - static_cast<const s_npcdiplo_tech*>(b)->value;
+    }
+
     int __cdecl reverse_compare_tech_(const void* a, const void* b) {
         return static_cast<const s_npcdiplo_tech*>(b)->value - static_cast<const s_npcdiplo_tech*>(a)->value;
     }
@@ -1037,6 +1041,45 @@ namespace npcdiplo {
         }
     }
 
+    int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        int32_t rand_val = random::Random_(150);
+
+        int32_t reaction = MOX::_player[param_1].diplomacy_proposal_rejection[param_2] * 20
+                         + COLCALC::Best_Leader_Diplomat_Bonus_(param_1)
+                         + (3 - MOX::_settings.game_difficulty) * 50
+                         + MOX::_player[param_1].broken_treaties_modifier[param_2]
+                         + MOX::_player[param_1].relations[param_2];
+
+        if (MOX::_player[param_1].traits[20] != 0) {
+            reaction += 50;
+        }
+
+        if (MOX::_player[param_1].tech_applications[200] == 3) {
+            reaction += 50;
+        }
+
+        int32_t personality_modifier;
+        if (MOX::_player[param_2].personality == 4 && MOX::_player[param_2].dishonored_flag[param_1] == 1) {
+            personality_modifier = diplodef::_personality_relation_modifiers[6];
+        } else {
+            personality_modifier = diplodef::_personality_relation_modifiers[MOX::_player[param_2].personality];
+        }
+
+        reaction += personality_modifier;
+
+        if (param_3 == 1) {
+            reaction += 150;
+        } else {
+            reaction += rand_val + MOX::_player[param_1].tech_exchange_modifier[param_2] - 1;
+        }
+
+        if (reaction < 0) {
+            return static_cast<int16_t>(10000 / (100 - reaction));
+        }
+
+        return static_cast<int16_t>(reaction + 100);
+    }
+
     void __cdecl NPC_Message_Rejection_Check_(int16_t player_idx, int16_t target_idx, int16_t* msg_type) {
         int16_t rejection_val = MOX::_player[player_idx].diplomacy_proposal_rejection[target_idx];
         if (rejection_val > -4) {
@@ -1083,6 +1126,33 @@ namespace npcdiplo {
         MOX::_player[target_idx].diplomacy_proposal_rejection[player_idx] = rejection_val;
     }
 
+    int32_t __cdecl Get_Tech_Exchange_Expectation_(int16_t player_idx, int16_t target_idx) {
+        int32_t expectation = random::Random_(150 /* 0x96 */);
+
+        expectation -= MOX::_settings.game_difficulty * 25;
+        expectation += MOX::_player[player_idx].broken_treaties_modifier[target_idx];
+
+        if (MOX::_player[player_idx].traits[20] != 0) {
+            expectation += 50;
+        }
+
+        if (MOX::_player[player_idx].tech_applications[200] == 3) {
+            expectation += 50;
+        }
+
+        if (MOX::_player[target_idx].personality == 4 && MOX::_player[target_idx].dishonored_flag[player_idx] == 1) {
+            expectation += diplodef::_personality_relation_modifiers[6];
+        } else {
+            expectation += diplodef::_personality_relation_modifiers[static_cast<uint8_t>(MOX::_player[target_idx].personality)];
+        }
+
+        if (expectation < 0) {
+            return 10000 / (100 - expectation);
+        }
+
+        return expectation + 100;
+    }
+
     void __cdecl NPC_Tech_Exchange_Check_(int16_t player_idx, int16_t target_player_idx) {
         int16_t local_43a = 0;
         int16_t local_424[106];
@@ -1124,6 +1194,97 @@ namespace npcdiplo {
                     MOX::_player[player_idx].diplomacy_proposal_exchange_tech[target_player_idx] = selected_tech_index;
                 }
             }
+        }
+    }
+
+    void __cdecl Get_Exchange_Tech_List_(int16_t player_a, int16_t player_b, int16_t* out_count, uint8_t* out_tech_index, uint8_t* out_human_tech_index) {
+        int16_t reaction_modifier = Get_Tech_Exchange_Reaction_(player_a, player_b, 0);
+
+        if (reaction_modifier <= 0) {
+            *out_count = 0;
+            return;
+        }
+
+        newtech::Set_Competition_Tech_Values_(player_b);
+        int human_count = 0;
+
+        for (int i = 0; i < 204; i++) {
+            if (MOX::_player[player_a].tech_applications[i] == 3) {
+                if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_b], i)) {
+                    int32_t val = newtech::Calc_Tech_Value_(player_b, i);
+                    if (val != 0) {
+                        _human_tech[human_count].index = static_cast<uint8_t>(i);
+                        _human_tech[human_count].value = val;
+                        human_count++;
+                    }
+                }
+            }
+        }
+
+        int max_human_tech = 0;
+        if (human_count > 0) {
+            for (int i = 0; i < human_count; i++) {
+                int scaled_val = (_human_tech[i].value * reaction_modifier) / 100;
+                if (max_human_tech < scaled_val) {
+                    max_human_tech = scaled_val;
+                }
+                _human_tech[i].value = scaled_val;
+            }
+        }
+
+        int target_count = 0;
+        newtech::Set_Competition_Tech_Values_(player_a);
+
+        int max_target_val = (reaction_modifier * max_human_tech) / reaction_modifier;
+
+        for (int i = 0; i < 212; i++) {
+            if (MOX::_player[player_b].tech_applications[i] == 3) {
+                if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_a], i)) {
+                    int32_t val = newtech::Calc_Tech_Value_(player_a, i);
+                    if (val != 0 && val <= max_target_val) {
+                        _target_tech[target_count].index = static_cast<uint8_t>(i);
+                        _target_tech[target_count].value = val;
+                        target_count++;
+                    }
+                }
+            }
+        }
+
+        if (human_count == 0 || target_count == 0) {
+            *out_count = 0;
+            return;
+        }
+
+        _qsort(_human_tech, human_count, 5, compare_tech_);
+        _qsort(_target_tech, target_count, 5, reverse_compare_tech_);
+
+        int median_human_tech = _human_tech[human_count / 2].value;
+        *out_count = 0;
+
+        for (int i = 0; i < target_count; i++) {
+            int target_val = _target_tech[i].value;
+
+            if (target_val > max_human_tech) {
+                out_tech_index[*out_count] = _target_tech[i].index;
+                out_human_tech_index[*out_count] = 0;
+            } else {
+                int j = (target_val < median_human_tech) ? 0 : (human_count / 2);
+                while (j < human_count) {
+                    if (_human_tech[j].value >= target_val) {
+                        break;
+                    }
+                    j++;
+                }
+
+                if (j < human_count) {
+                    out_tech_index[*out_count] = _target_tech[i].index;
+                    out_human_tech_index[*out_count] = _human_tech[j].index;
+                } else {
+                    out_tech_index[*out_count] = _target_tech[i].index;
+                    out_human_tech_index[*out_count] = 1;
+                }
+            }
+            (*out_count)++;
         }
     }
 }

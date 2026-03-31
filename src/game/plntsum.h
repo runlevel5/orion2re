@@ -90,10 +90,7 @@ namespace PLNTSUM {
 
     int16_t __cdecl Summary_Planet_Index_(int16_t star_index);
 
-    inline int16_t __cdecl Get_ETA_To_Star_(int star_id) {
-        using Fn = int16_t(__cdecl*)(int);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00448230})(star_id);
-    }
+    int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx);
 
     void __cdecl Set_Planet_Explored_Flags_();
 
@@ -190,30 +187,20 @@ namespace PLNTSUM {
 
     void __cdecl Draw_Rotating_Planets_();
 
-    inline s_animation_header* __cdecl Load_Planet_Segment_(int16_t segment_index) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00449cb0})(segment_index);
-    }
+    s_animation_header* __cdecl Load_Planet_Segment_(int16_t param_1);
 
     void __cdecl Summary_Screen_Print_Data_();
 
-    inline void __cdecl Draw_Colony_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004482C0});
-        fn(planet_sum_idx, scroll_idx);
+    void __cdecl Draw_Colony_ETA_(int16_t planet_sum_idx, int16_t scroll_idx);
+    void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx);
+
+    inline void __cdecl Player_Colors_(int16_t player_idx, s_colors* colors, char param_3, uint8_t* out_val) {
+        using Fn = void(__cdecl*)(int16_t, s_colors*, char, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00447b20});
+        fn(player_idx, colors, param_3, out_val);
     }
 
-    inline void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00448320});
-        fn(planet_sum_idx, scroll_idx);
-    }
-
-    inline void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char choice_index) {
-        using Fn = void(__cdecl*)(int16_t, s_colors*, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00447AB0});
-        fn(colony_idx, colors, choice_index);
-    }
+    void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char param_3);
 
     void __cdecl Summary_Screen_Print_Scanned_();
 

@@ -109,16 +109,14 @@ namespace COMBFIND {
         return fn(star_idx);
     }
 
-    inline int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004BCA70 });
-        return fn(star_idx);
-    }
+    int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx);
 
-    inline void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t attacker_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004BCB20 });
-        fn(star_idx, attacker_idx);
+    void __cdecl Collect_Targets_For_Combat_(int16_t star_idx, int16_t player_idx);
+
+    inline bool __cdecl Player_May_Attack_Player_(int player_a, int player_b) {
+        using Fn = bool(__cdecl*)(int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BCC90});
+        return fn(player_a, player_b);
     }
 
 }

@@ -227,6 +227,19 @@ namespace COLCALC {
 
     bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx);
 
+    struct StarWeight {
+        uint8_t star_idx;
+        uint8_t weight;
+    };
+
+    inline int __cdecl Sort_star_weights_(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc9b0});
+        return fn(a, b);
+    }
+
+    short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode);
+
     void __cdecl No_Op1_();
 
     int __cdecl Player_Research_Cost_(s_player* plr, int16_t tech_field);
@@ -363,4 +376,6 @@ namespace COLCALC {
 
     void __cdecl Show_Command_Points_(int player_idx);
     int16_t __cdecl Get_System_Population_(int16_t player_idx, int16_t star_idx);
+
+    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, uint8_t *star_list);
 }

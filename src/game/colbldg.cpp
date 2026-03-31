@@ -1160,6 +1160,42 @@ namespace COLBLDG {
         BILL::Squeeze_Print_Formatted_Paragraph_(212, 114, 248, 186, buffer, 0);
     }
 
+    int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t item_id) {
+        for (int16_t i = 0; i < 7; ++i) {
+            if (item_id > 0 && item_id < 49) {
+                if (MOX::_colony[colony_idx].producing[i] == item_id) {
+                    return i;
+                }
+            } else {
+                if (item_id > -100 && item_id <= -50) {
+                    return -1;
+                }
+
+                int16_t produced_item = MOX::_colony[colony_idx].producing[i];
+
+                if (produced_item <= -100) {
+                    if (item_id == produced_item) {
+                        return i;
+                    }
+                } else if (item_id >= 49) {
+                    if (item_id - i == 49) {
+                        return i;
+                    }
+                } else {
+                    if (item_id == -6 || item_id == -4 || item_id == -5 ||
+                        item_id == -7 || item_id == -3 || item_id == -2 ||
+                        item_id == -10 || item_id == -15) {
+                        if (item_id == produced_item) {
+                            return i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
     /**
      * @address 0050ae50
      */

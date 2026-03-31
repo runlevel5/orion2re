@@ -2547,4 +2547,106 @@ namespace COLCALC {
         }
         return 0;
     }
+
+    /**
+     * @brief Identifies systems owned by a player that are eligible for surrender.
+     * @param player_idx Index of the player potentially surrendering systems.
+     * @param target_player_idx Index of the player the systems would surrender to.
+     * @param star_list Output array to store indices of eligible stars.
+     * @return Number of eligible systems found.
+     */
+    short __cdecl Get_Possible_Surrender_Systems_(short player_idx, short target_player_idx, uint8_t *star_list) {
+        short result_count = 0;
+        short range = MOX::_player[target_player_idx].ship_range;
+        short colony_system_count = 0;
+        
+        for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+            s_star_data* star = &MOX::_star[i];
+            
+            // Check if player has any colony in this system via bitmask
+            if ((star->has_colony >> (player_idx & 0x1f)) & 1) {
+                colony_system_count++;
+                
+                if (SHIPMOVE::Star_In_Range_Of_Player_(star, target_player_idx, range)) {
+                    bool has_warp_gate = false;
+                    
+                    // Check if any planet in the system has a Warp Gate/Stargate (building index 9)
+                    for (int p = 4; p >= 0; --p) {
+                        short planet_idx = star->planet_index[p];
+                        if (planet_idx != -1) {
+                            short colony_idx = MOX::_planet[planet_idx].colony_index;
+                            if (colony_idx != -1) {
+                                s_colony* colony = &MOX::_colony[colony_idx];
+                                if (colony->owner == (char)player_idx && colony->buildings[9] != 0) {
+                                    has_warp_gate = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Systems with Warp Gates are not eligible for surrender in this context
+                    if (!has_warp_gate) {
+                        if (star_list != nullptr) {
+                            star_list[result_count] = (uint8_t)i;
+                        }
+                        result_count++;
+                    }
+                }
+            }
+        }
+        
+        // A player will not surrender if they only have one system remaining
+        if (colony_system_count == 1) {
+            result_count = 0;
+        }
+        
+        return result_count;
+    }
+
+    short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode) {
+        uint8_t possible_stars[72];
+        StarWeight star_weights[72];
+        short result_star_idx = -1;
+
+        // Populate potential stars to surrender
+        short num_stars = Get_Possible_Surrender_Systems_(player_idx, param_2, possible_stars);
+
+        if (num_stars != 0) {
+            for (int i = 0; i < (int)num_stars; ++i) {
+                uint8_t star_idx = possible_stars[i];
+                star_weights[i].star_idx = star_idx;
+                star_weights[i].weight = 0;
+
+                // Calculate weight based on total population of colonies owned by the player in this system
+                for (int p = 0; p < 5; ++p) {
+                    short planet_idx = MOX::_star[star_idx].planet_index[p];
+                    if (planet_idx != -1) {
+                        short colony_idx = MOX::_planet[planet_idx].colony_index;
+                        if (colony_idx != -1 && MOX::_colony[colony_idx].owner == player_idx) {
+                            star_weights[i].weight += MOX::_colony[colony_idx].n_pops;
+                        }
+                    }
+                }
+            }
+
+            // Sort systems by population weight
+            _qsort(star_weights, (size_t)num_stars, sizeof(StarWeight), Sort_star_weights_);
+
+            int half_count = (num_stars + 1) / 2;
+            int chosen_idx;
+
+            if (selection_mode == 0) {
+                // Pick from the "bottom" (lower weight) half
+                chosen_idx = random::Random_(half_count) - 1;
+            } else {
+                // Pick from the "top" (higher weight) half
+                chosen_idx = num_stars - random::Random_(half_count);
+            }
+
+            result_star_idx = (short)star_weights[chosen_idx].star_idx;
+        }
+
+        return result_star_idx;
+    }
 }

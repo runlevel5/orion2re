@@ -2050,4 +2050,70 @@ void Planet_Summary_Screen_() {
     fields::Set_Field_Outline_Color_(10);
 }
 
+s_animation_header* __cdecl Load_Planet_Segment_(int16_t param_1) {
+    allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+
+    s_animation_header* segment = (s_animation_header*)farload::Far_Reload_Next_(
+        PTR_s_PLNTSUM_LBX_00556AC0,
+        static_cast<int32_t>(static_cast<int16_t>(param_1 + 0x1A)),
+        MOX::_screen_seg
+    );
+
+    allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+
+    return segment;
+}
+
+void __cdecl Draw_Colony_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
+    int16_t width = animate::Get_Width_(_screen->pics[13]);
+    int16_t height = animate::Get_Height_(_screen->pics[13]);
+
+    int16_t x = 0x66 - width;
+    int16_t y = (_plntscrn_delta_y[scroll_idx] - height) + 0x54;
+
+    animate::Draw_(x, y, _screen->pics[13]);
+}
+
+int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
+    int16_t best_ship = -1;
+
+    if (MOX::_scroll_bar->total_rows > 0) {
+        for (int16_t i = 0; i < MOX::_scroll_bar->total_rows; ++i) {
+            if (best_ship != -1) {
+                break;
+            }
+
+            int16_t planet_idx = _planet_summary[i].explored;
+            if (static_cast<int16_t>(MOX::_planet[planet_idx].star_index) == static_cast<int16_t>(star_idx)) {
+                best_ship = _planet_summary[i].best_colony_ship_idx;
+                if (best_ship <= _planet_summary[i].best_outpost_ship_idx) {
+                    best_ship = _planet_summary[i].best_outpost_ship_idx;
+                }
+            }
+        }
+    }
+
+    if (best_ship != -1) {
+        return HAROLD::N_Turns_To_Star_(best_ship, (int16_t)star_idx);
+    }
+
+    return -1;
+}
+
+void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {
+    int16_t height = animate::Get_Height_(_screen->pics[13]);
+    int16_t y = _plntscrn_delta_y[scroll_idx] - height + 0x54;
+    animate::Draw_(0x12, y, _screen->pics[13]);
+}
+
+void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char param_3) {
+    uint8_t local_1;
+
+    if (colony_idx != -1) {
+        Player_Colors_(MOX::_colony[colony_idx].owner, colors, param_3, &local_1);
+    } else {
+        Player_Colors_(-1, colors, param_3, &local_1);
+    }
+}
+
 }

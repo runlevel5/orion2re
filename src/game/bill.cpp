@@ -77,6 +77,15 @@ namespace BILL {
     }
 
     /**
+     * @address 00406fe0
+     */
+    int16_t __cdecl Get_My_Spy_Number_(int16_t spy_idx) {
+        // Size of s_player is 3753 (0xEA9)
+        // spies field is at offset 0xE57
+        return static_cast<int16_t>(MOX::_player[MOX::_PLAYER_NUM].spies[spy_idx] & 0x3F);
+    }
+
+    /**
      * @brief Updates the spy count for a specific target player.
      * 
      * This function modifies the lower 6 bits of the spy count byte while 
@@ -100,6 +109,21 @@ namespace BILL {
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height) {
         _Print_Paragraph_Bill_(0, 0, width, text, height, 0, nullptr);
         return __pp_max_width;
+    }
+
+    /**
+     * @address 004080f0
+     */
+    int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text) {
+        BILL::_Print_Paragraph_Bill_(0, 0, width, text, 0, 0, nullptr);
+        return BILL::__pp_max_height;
+    }
+
+    /**
+     * @address 00408090
+     */
+    void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment) {
+        BILL::_Print_Paragraph_Bill_(x, y, width, text, alignment, 1, nullptr);
     }
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width) {
@@ -217,6 +241,14 @@ namespace BILL {
     }
 
     /**
+     * @address 004076f0
+     */
+    void __cdecl Squeeze_Formatted_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t color) {
+        // The Y coordinate is centered by adding half the height of the paragraph.
+        BILL::_Squeeze_Print_Paragraph_(x, y + (height / 2), width, height, text, color, nullptr, true, true);
+    }
+
+    /**
      * @address 00407680
      */
     void __cdecl Squeeze_Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, char* text, int16_t flags) {
@@ -252,5 +284,110 @@ namespace BILL {
      */
     void __cdecl Set_My_Agent_Number_(uint8_t agent_num) {
         BILL::Set_Their_Spy_Number_(MOX::_PLAYER_NUM, MOX::_PLAYER_NUM, agent_num);
+    }
+
+    // Suggested name: Get_Players_Alive_Or_Omniscient
+    void __cdecl Get_Players_Alive_Or_Omniscient_(int32_t param_1, char param_2) {
+        Get_Active_Players_(param_1, param_2);
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            // Do not add yourself
+            if (i == MOX::_PLAYER_NUM) {
+                continue;
+            }
+
+            // If the current player is omniscient, add all other alive players to the active list
+            if (HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM)) {
+                if (MOX::_player[i].eliminated == 0) {
+                    bool is_found = false;
+                    for (int16_t j = 0; j < MOX::_active_count; ++j) {
+                        // Compare list entry with current index i
+                        if (static_cast<uint8_t>(MOX::_active_player[j]) == static_cast<uint8_t>(i)) {
+                            is_found = true;
+                            break;
+                        }
+                    }
+
+                    if (!is_found) {
+                        int16_t index = MOX::_active_count;
+                        MOX::_active_count++;
+                        MOX::_active_player[index] = static_cast<char>(i);
+                    }
+                }
+            }
+        }
+    }
+
+    // Suggested name: BILL::Update_Active_Players_List
+    void __cdecl Get_Players_Dead_Or_Alive_Or_Omniscient_(int32_t param_1, char param_2) {
+        BILL::Get_Active_Players_(param_1, param_2);
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            // Skip the current player being updated
+            if (i == MOX::_PLAYER_NUM) {
+                continue;
+            }
+
+            // Logic to include players even if they are dead (eliminated) or if the current player sees all
+            if (HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM) || MOX::_player[i].eliminated != 0) {
+                bool already_in_list = false;
+                for (int16_t j = 0; j < MOX::_active_count; ++j) {
+                    if (static_cast<uint8_t>(MOX::_active_player[j]) == static_cast<uint8_t>(i)) {
+                        already_in_list = true;
+                        break;
+                    }
+                }
+
+                if (!already_in_list) {
+                    int16_t index = MOX::_active_count;
+                    MOX::_active_count++;
+                    MOX::_active_player[index] = static_cast<char>(i);
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Retrieves the spy mission type for a specific target player from the perspective of the current player.
+     * 
+     * The mission type is stored in the upper 2 bits (bits 6 and 7) of the spy state byte.
+     * 
+     * @param target_player_idx The index of the player being spied upon.
+     * @return The mission type (0-3).
+     * @address 00407010
+     */
+    int8_t __cdecl Get_My_Spy_Mission_(int16_t target_player_idx) {
+        // s_player size: 0xEA9 (3753 bytes)
+        // spies offset: 0x0E57
+        return (uint8_t)MOX::_player[MOX::_PLAYER_NUM].spies[target_player_idx] >> 6;
+    }
+
+    /**
+     * @address 004070d0
+     */
+    void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission) {
+        // Offset 0xe57 in s_player is the 'spies' array
+        // The mission is stored in the top 2 bits (bits 6 and 7) of the spy byte.
+        MOX::_player[player_idx].spies[target_player_idx] &= 0x3f;
+        MOX::_player[player_idx].spies[target_player_idx] |= (mission << 6);
+    }
+
+    /**
+     * @address 00407050
+     */
+    int16_t __cdecl Get_My_Agent_Number_() {
+        int16_t player_num = MOX::_PLAYER_NUM;
+
+        // The assembly calculates (3753 * player_num) + player_num + offsetof(spies) + player_num.
+        // This resolves to MOX::_player[player_num].spies[player_num].
+        // 3753 is the size of s_player.
+        return static_cast<int16_t>(MOX::_player[player_num].spies[player_num] & 0x3f);
+    }
+
+    /**
+     * @address 004077a0
+     */
+    void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp) {
+        _Print_1_Or_More_Lines_Centered_(static_cast<uint16_t>(x), static_cast<int16_t>(y), static_cast<uint16_t>(width), reinterpret_cast<uint8_t*>(str), reinterpret_cast<int16_t*>(bmp));
     }
 }

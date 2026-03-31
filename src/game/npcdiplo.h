@@ -11,11 +11,14 @@ namespace npcdiplo {
     inline s_npcdiplo_tech (&_human_tech)[212] = 
         *reinterpret_cast<s_npcdiplo_tech(*)[212]>(std::uintptr_t{0x00595830});
 
-    inline int32_t __cdecl Get_Tech_Exchange_Expectation_(int16_t target_player_idx, int16_t player_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ebec0});
-        return fn(target_player_idx, player_idx);
-    }
+    inline s_npcdiplo_tech(&_target_tech)[212] =
+            *reinterpret_cast<s_npcdiplo_tech(*)[212]>(std::uintptr_t{0x00595400});
+
+    int16_t __cdecl Get_Tech_Exchange_Reaction_(int16_t player_a, int16_t player_b, int16_t param_3);
+
+    int __cdecl compare_tech_(const void* a, const void* b);
+
+    int32_t __cdecl Get_Tech_Exchange_Expectation_(int16_t player_idx, int16_t target_idx);
 
     int __cdecl reverse_compare_tech_(const void* a, const void* b);
 
@@ -47,11 +50,7 @@ namespace npcdiplo {
 
     int16_t __cdecl NPC_Surrender_Check_(int16_t player_idx);
 
-    inline void __cdecl Get_Exchange_Tech_List_(int16_t player_num, int16_t ambassador_idx, int16_t* count, uint8_t* target_list, uint8_t* exchange_list) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ebbf0 });
-        fn(player_num, ambassador_idx, count, target_list, exchange_list);
-    }
+    void __cdecl Get_Exchange_Tech_List_(int16_t player_a, int16_t player_b, int16_t* out_count, uint8_t* out_tech_index, uint8_t* out_human_tech_index);
 
     void __cdecl NPC_Tech_Exchange_();
 

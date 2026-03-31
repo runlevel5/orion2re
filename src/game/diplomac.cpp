@@ -1766,14 +1766,14 @@ namespace diplomac {
         s_player* players = MOX::_player;
 
         // Set demands for player 1 against player 2
-        players[p1].diplomacy_proposal_tribute_bribe[p2] = _diplomacy_proposal_tech_bribe1;
-        players[p1].diplomacy_proposal_tech_bribe1[p2] = _diplomacy_proposal_tech_bribe2;
+        players[p1].diplomacy_proposal_tribute_bribe[p2] = _diplomacy_proposal_tribute_bribe;
+        players[p1].diplomacy_proposal_tech_bribe1[p2] = _diplomacy_proposal_tech_bribe1;
         players[p1].diplomacy_proposal_gold_bribe[p2] = _diplomacy_proposal_gold_bribe;
         players[p1].diplomacy_proposal_system_bribe[p2] = _diplomacy_proposal_system_bribe;
 
         // Set demands for player 2 against player 1
-        players[p2].diplomacy_proposal_tribute_bribe[p1] = _diplomacy_proposal_tech_bribe1;
-        players[p2].diplomacy_proposal_tech_bribe1[p1] = _diplomacy_proposal_tech_bribe2;
+        players[p2].diplomacy_proposal_tribute_bribe[p1] = _diplomacy_proposal_tribute_bribe;
+        players[p2].diplomacy_proposal_tech_bribe1[p1] = _diplomacy_proposal_tech_bribe1;
         players[p2].diplomacy_proposal_gold_bribe[p1] = _diplomacy_proposal_gold_bribe;
         players[p2].diplomacy_proposal_system_bribe[p1] = _diplomacy_proposal_system_bribe;
     }
@@ -2535,5 +2535,758 @@ namespace diplomac {
         // Sync mirrored relations
         MOX::_player[plr_b].base_relations[plr_a] = MOX::_player[plr_a].base_relations[plr_b];
         MOX::_player[plr_b].relations[plr_a] = MOX::_player[plr_a].relations[plr_b];
+    }
+
+    void __cdecl Get_Demand_Response_(int16_t player_a, int16_t player_b, int16_t demand_type, int16_t param_4, int16_t *accepted, int16_t *response_code) {
+        int32_t tech_comp = Tech_Comparison_(player_a, player_b);
+        int32_t fleet_comp = Fleet_Comparison_(player_a, player_b);
+        int32_t pop_comp = Population_Comparison_(player_a, player_b);
+        int16_t worst_mod = Find_Worst_Modifier_(player_a, player_b);
+        int32_t rnd = random::Random_(200);
+
+        int16_t pers_mod;
+        if (MOX::_player[player_b].personality != 4 || MOX::_player[player_a].dishonored_flag[player_b] != 1) {
+            pers_mod = diplodef::_personality_relation_modifiers[MOX::_player[player_b].personality];
+        } else {
+            pers_mod = diplodef::_personality_relation_modifiers[6];
+        }
+
+        int16_t modifier = static_cast<int16_t>(((tech_comp + fleet_comp + pop_comp) / 3) + worst_mod + rnd + (pers_mod * 2));
+
+        switch (demand_type) {
+            case 0: {
+                if (MOX::_player[player_b].treaty[param_4] == 1) {
+                    modifier -= 75;
+                } else if (MOX::_player[player_b].treaty[param_4] == 2) {
+                    modifier -= 150;
+                } else {
+                    modifier -= 25;
+                }
+
+                int8_t rel = MOX::_player[player_b].relations[param_4];
+                modifier -= rel / 2;
+
+                int32_t tgt_fleet = Fleet_Comparison_(player_b, param_4);
+                modifier -= tgt_fleet / 4;
+
+                if (MOX::_player[param_4].objectives != 100) {
+                    modifier -= 25;
+                }
+                break;
+            }
+            case 1: {
+                modifier -= (diplodef::_personality_relation_modifiers[MOX::_player[param_4].personality] + 80);
+                if (MOX::_player[param_4].objectives == 100) {
+                    modifier = 0;
+                }
+                break;
+            }
+            case 2: {
+                modifier -= MOX::_player[player_b].relations[param_4] * 2;
+                break;
+            }
+            case 3:
+            case 5:
+            case 8: {
+                modifier -= 50;
+                break;
+            }
+            case 4: {
+                modifier -= 150;
+                break;
+            }
+            case 6: {
+                uint32_t tech_val = newtech::Calc_Tech_Value_(player_a, param_4);
+                int32_t max_tech_val = aitech::Get_Max_Technology_Value_(player_a);
+                modifier -= static_cast<int16_t>((tech_val * 100) / max_tech_val);
+                break;
+            }
+            case 7: {
+                int16_t sys_pop = COLCALC::Get_System_Population_(player_b, param_4);
+                int32_t val = (sys_pop * 1000) / MOX::_player[player_b].total_pop;
+                if (val > 300) {
+                    val = 300;
+                }
+                modifier -= static_cast<int16_t>(val);
+                break;
+            }
+        }
+
+        Adjust_Diplomat_Modifiers_(player_a, player_b);
+        Adjust_Diplomat_Modifiers_(player_a, player_b);
+        Adjust_Diplomat_Modifiers_(player_a, player_b);
+        Adjust_Diplomat_Modifiers_(player_a, player_b);
+        Adjust_Diplomat_Modifiers_(player_a, player_b);
+
+        int8_t treaty = MOX::_player[player_a].treaty[player_b];
+        if (treaty == 1 || treaty == 2) {
+            if (modifier < -100 || Get_Player_Diplomacy_Personality_(player_b, player_a) == 6) {
+                *response_code = 0xA5;
+                Declare_War_(player_a, player_b);
+                *accepted = 0;
+            } else if (modifier < -50) {
+                MOX::_player[player_a].threats[player_b]++;
+                MOX::_player[player_b].threats[player_a]++;
+                *response_code = 0xA6;
+                Break_Treaties_(player_a, player_b);
+                Break_Research_(player_a, player_b);
+                Break_Trade_(player_a, player_b);
+                *accepted = 0;
+            } else if (modifier < -25) {
+                MOX::_player[player_a].threats[player_b]++;
+                MOX::_player[player_b].threats[player_a]++;
+                
+                int32_t base_rel = MOX::_player[player_a].base_relations[player_b] - 10;
+                if (base_rel < -100) {
+                    base_rel = -100;
+                }
+                MOX::_player[player_a].base_relations[player_b] = static_cast<int8_t>(base_rel);
+                MOX::_player[player_b].base_relations[player_a] = static_cast<int8_t>(base_rel);
+                
+                *response_code = 0xA7;
+                *accepted = 0;
+            } else if (modifier < 0) {
+                *response_code = 0xA8;
+                *accepted = 0;
+            } else {
+                *response_code = 0xA9;
+                *accepted = 1;
+            }
+        } else {
+            if (modifier < -150 || Get_Player_Diplomacy_Personality_(player_b, player_a) == 6) {
+                *response_code = 0xA5;
+                Declare_War_(player_a, player_b);
+                *accepted = 0;
+            } else if (modifier < -75) {
+                MOX::_player[player_a].threats[player_b]++;
+                MOX::_player[player_b].threats[player_a]++;
+                
+                int32_t base_rel = MOX::_player[player_a].base_relations[player_b] - 10;
+                if (base_rel < -100) {
+                    base_rel = -100;
+                }
+                MOX::_player[player_a].base_relations[player_b] = static_cast<int8_t>(base_rel);
+                MOX::_player[player_b].base_relations[player_a] = static_cast<int8_t>(base_rel);
+                
+                *response_code = 0xA7;
+                *accepted = 0;
+            } else if (modifier < 0) {
+                *response_code = 0xA8;
+                *accepted = 0;
+            } else if (modifier > 0) {
+                *response_code = 0xA9;
+                *accepted = 1;
+            }
+        }
+
+        if (*accepted == 1 && demand_type == 5) {
+            int32_t rnd1 = random::Random_(50);
+            int32_t rnd2 = random::Random_(50);
+            MOX::_player[player_b].stop_spying_duration[param_4] = static_cast<int8_t>(rnd1 + rnd2 + 10);
+        }
+    }
+
+    int16_t __cdecl Get_Demands_(int16_t player_idx, int16_t target_idx, int16_t severity, int16_t demands_tribute, int16_t demands_tech, int16_t demands_gold, int16_t demands_system) {
+        _diplomacy_proposal_gold_bribe = 0;
+        _diplomacy_proposal_tribute_bribe = 0;
+        _diplomacy_proposal_tech_bribe1 = 0;
+        _diplomacy_proposal_system_bribe = -1;
+
+        if (severity > 10) {
+            severity = 10;
+        }
+
+        uint8_t diff_tech_list[212];
+        int16_t diff_tech_categories[424];
+        int16_t num_techs = 0;
+        int16_t tech_severity_limit = 0;
+
+        if (demands_tech == 1) {
+            npcdiplo::Get_Differential_Tech_List_(player_idx, target_idx, 0, 0xc343cb00, diff_tech_list, reinterpret_cast<int32_t*>(diff_tech_categories), &num_techs, 1);
+
+            uint32_t target_max_ai_group = 1;
+            uint32_t player_max_ai_group = 1;
+
+            for (int i = 0; i < 204; ++i) {
+                if (MOX::_player[player_idx].tech_applications[i] == 3) {
+                    int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
+                    uint8_t ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
+                    if (target_max_ai_group < ai_group) {
+                        target_max_ai_group = ai_group;
+                    }
+                }
+                if (MOX::_player[target_idx].tech_applications[i] == 3) {
+                    int16_t tech_field_id = TECHDATA::_technology_applications[i].tech_field_id;
+                    uint8_t ai_group = TECHDATA::_technology_fields[tech_field_id].ai_group;
+                    if (player_max_ai_group < ai_group) {
+                        player_max_ai_group = ai_group;
+                    }
+                }
+            }
+
+            if (player_max_ai_group < target_max_ai_group) {
+                tech_severity_limit = (int16_t)((player_max_ai_group * 10) / target_max_ai_group);
+            } else {
+                tech_severity_limit = 10;
+            }
+
+            if (tech_severity_limit < 1) {
+                tech_severity_limit = 1;
+            }
+        }
+
+        int16_t max_gold_severity = 0;
+        if (demands_gold == 1) {
+            int32_t total_maint = MOX::_player[player_idx].total_maintenance;
+            if (total_maint < 10) {
+                total_maint = 10;
+            }
+
+            int32_t target_bc = MOX::_player[target_idx].bc;
+            if (target_bc == 0) {
+                max_gold_severity = 0;
+            } else {
+                max_gold_severity = (int16_t)((target_bc / total_maint) / 10);
+            }
+
+            if (max_gold_severity > 10) {
+                max_gold_severity = 10;
+            }
+        } else {
+            max_gold_severity = diff_tech_categories[0];
+        }
+
+        if (severity == 0) {
+            return 0;
+        }
+
+        if (severity > 6) {
+            demands_tribute = 0;
+        }
+
+        if (severity > tech_severity_limit) {
+            demands_tech = 0;
+        }
+
+        if (num_techs == 0) {
+            demands_tech = 0;
+        }
+
+        if (severity > max_gold_severity) {
+            demands_gold = 0;
+        }
+
+        int16_t actual_demand_system = 0;
+        if (severity > 5) {
+            actual_demand_system = demands_system;
+        }
+
+        if (actual_demand_system + demands_tribute + demands_gold + demands_tech == 0) {
+            return 0;
+        }
+
+        int chosen_demand_type = 0;
+
+        if (actual_demand_system == 1 && (random::Random_(3) == 1 || (demands_gold + demands_tribute + demands_tech == 0))) {
+            chosen_demand_type = 3;
+        } else if (demands_tech == 1 && (random::Random_(3) == 1 || (demands_gold + demands_tribute == 0))) {
+            chosen_demand_type = 2;
+        } else if (demands_tribute == 1 && (random::Random_(2) == 1 || demands_gold == 0)) {
+            chosen_demand_type = 4;
+        } else if (demands_gold != 0) {
+            chosen_demand_type = 1;
+        }
+
+        if (chosen_demand_type == 4) {
+            if (severity < 3) {
+                _diplomacy_proposal_tribute_bribe = 1;
+            } else {
+                _diplomacy_proposal_tribute_bribe = 2;
+            }
+            return 1;
+        }
+
+        if (chosen_demand_type == 1) {
+            int32_t total_maint = MOX::_player[player_idx].total_maintenance;
+            if (total_maint < 10) {
+                total_maint = 10;
+            }
+
+            int32_t computed_gold = severity * total_maint * 10;
+            int32_t target_bc = MOX::_player[target_idx].bc;
+
+            int32_t final_gold = computed_gold;
+            if (final_gold > target_bc) {
+                final_gold = target_bc;
+            }
+
+            if (final_gold >= 100) {
+                final_gold = (final_gold / 100) * 100;
+            } else {
+                final_gold = (final_gold / 10) * 10;
+            }
+
+            if (final_gold == 0) {
+                return 0;
+            }
+
+            if (final_gold > 32000) {
+                final_gold = 32000;
+            }
+
+            _diplomacy_proposal_gold_bribe = (uint16_t)final_gold;
+            return 1;
+        }
+
+        if (chosen_demand_type == 3) {
+            int16_t system_idx = COLCALC::Get_Surrender_System_(target_idx, player_idx, severity > 6 ? 1 : 0);
+            if (system_idx != -1) {
+                if (COLCALC::May_Surrender_Star_(system_idx, target_idx, player_idx)) {
+                    _diplomacy_proposal_system_bribe = (int16_t)(int8_t)system_idx;
+                    return 1;
+                }
+            }
+        }
+
+        if (chosen_demand_type == 2) {
+            int tech_idx = num_techs - (severity * num_techs) / tech_severity_limit;
+            tech_idx = tech_idx - random::Random_(3) + 1;
+
+            if (tech_idx < 0) {
+                tech_idx = 0;
+            }
+
+            if (tech_idx >= num_techs) {
+                tech_idx = num_techs - 1;
+            }
+
+            _diplomacy_proposal_tech_bribe1 = diff_tech_list[tech_idx];
+            return 1;
+        }
+
+        return 0;
+    }
+
+    int16_t __cdecl Check_Treaty_Proposal_(int16_t player_idx, int16_t target_idx, int16_t proposal_type, int16_t* response, int16_t* demand_type, int16_t* demand_tech, int16_t* demand_gold, int16_t* demand_system, int16_t* demand_tribute) {
+        int16_t result = 0;
+        int16_t demand_category = 0;
+
+        *demand_type = 0;
+
+        switch (proposal_type) {
+            case 1: {
+                result = Diplomacy_Test_(player_idx, target_idx, 0x4B, 0);
+                demand_category = 4;
+                switch (result) {
+                    case 0:
+                        if (random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
+                            *response = 0x8B;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                            *response = 0x8C;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
+                            *response = 0x8D;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                        } else {
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 2:
+                        demand_category = 8;
+                        // fallthrough
+                    case 1:
+                        if (random::Random_(2) == 1 && Get_Demands_(player_idx, target_idx, demand_category, 0, 1, 1, 0) == 1) {
+                            if (_diplomacy_proposal_tribute_bribe != 0) {
+                                *demand_type = 3;
+                                *demand_tribute = _diplomacy_proposal_tribute_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_gold_bribe != 0) {
+                                *demand_type = 1;
+                                *demand_gold = _diplomacy_proposal_gold_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_system_bribe != -1) {
+                                *demand_type = 2;
+                                *demand_system = _diplomacy_proposal_system_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_tech_bribe1 != 0) {
+                                *demand_type = 4;
+                                *demand_tech = _diplomacy_proposal_tech_bribe1;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                        } else {
+                            result = 0;
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 3:
+                        if (random::Random_(3) == 1 && MOX::_player[player_idx].treaty[target_idx] == 2) {
+                            *response = 0x88;
+                        } else if (random::Random_(4) == 1 && MOX::_player[target_idx].last_gift[player_idx] != '\0') {
+                            *response = 0x89;
+                        } else {
+                            *response = 0x83;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 2: {
+                result = Diplomacy_Test_(player_idx, target_idx, MOX::_player[player_idx].broken_treaties_modifier[target_idx] + 0x7D, 0);
+                if (MOX::_player[player_idx].relations[target_idx] < 50) {
+                    result = 0;
+                }
+                demand_category = 4;
+                switch (result) {
+                    case 0:
+                        if (random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
+                            *response = 0x8B;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                            *response = 0x8C;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
+                            *response = 0x8D;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                        } else {
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 2:
+                        demand_category = 8;
+                        // fallthrough
+                    case 1:
+                        if (random::Random_(4) == 1 && Get_Demands_(player_idx, target_idx, demand_category, 0, 1, 1, 0) == 1) {
+                            if (_diplomacy_proposal_tribute_bribe != 0) {
+                                *demand_type = 3;
+                                *demand_tribute = _diplomacy_proposal_tribute_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_gold_bribe != 0) {
+                                *demand_type = 1;
+                                *demand_gold = _diplomacy_proposal_gold_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_system_bribe != -1) {
+                                *demand_type = 2;
+                                *demand_system = _diplomacy_proposal_system_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_tech_bribe1 != 0) {
+                                *demand_type = 4;
+                                *demand_tech = _diplomacy_proposal_tech_bribe1;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                        } else {
+                            result = 0;
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 3:
+                        if (random::Random_(4) == 1 && MOX::_player[target_idx].last_gift[player_idx] != '\0') {
+                            *response = 0x89;
+                        } else {
+                            *response = 0x84;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 3: {
+                int attacks_out = AIMOVE::Number_Of_Attacks_Underway_(player_idx, target_idx);
+                int attacks_in = AIMOVE::Number_Of_Attacks_Underway_(target_idx, player_idx);
+                int16_t war_count_out = Get_War_Count_(player_idx, target_idx);
+                int16_t war_count_in = Get_War_Count_(target_idx, player_idx);
+                int fleet_cmp = Fleet_Strength_Comparison_(player_idx, target_idx);
+                int16_t war_loss_cmp = Total_War_Loss_Comparison_(player_idx, target_idx);
+
+                int16_t test_val = (9 - MOX::_player[player_idx].time_since_last_attack[target_idx]) +
+                                 ((((attacks_out * 2 + 2 - attacks_in) * 2 - war_count_out) + war_count_in) * 25 +
+                                  ((fleet_cmp - 100) / 2) - war_loss_cmp) -
+                                 MOX::_player[player_idx].broken_treaties_modifier[target_idx] -
+                                 MOX::_player[player_idx].trust_worthiness[target_idx] +
+                                 MOX::_player[player_idx].relations[target_idx];
+
+                result = Diplomacy_Test_(player_idx, target_idx, test_val, 0);
+
+                if (static_cast<uint8_t>(MOX::_player[player_idx].time_since_last_attack[target_idx]) < 10) {
+                    result = 0;
+                }
+
+                demand_category = 4;
+                switch (result) {
+                    case 0:
+                        if (random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
+                            *response = 0x8B;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                            *response = 0x8C;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
+                            *response = 0x8D;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                        } else {
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 2:
+                        demand_category = 8;
+                        // fallthrough
+                    case 1:
+                        if (Get_Demands_(player_idx, target_idx, demand_category, 1, 1, 1, 1) == 1) {
+                            if (_diplomacy_proposal_tribute_bribe != 0) {
+                                *demand_type = 3;
+                                *demand_tribute = _diplomacy_proposal_tribute_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_gold_bribe != 0) {
+                                *demand_type = 1;
+                                *demand_gold = _diplomacy_proposal_gold_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_system_bribe != -1) {
+                                *demand_type = 2;
+                                *demand_system = _diplomacy_proposal_system_bribe;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                            if (_diplomacy_proposal_tech_bribe1 != 0) {
+                                *demand_type = 4;
+                                *demand_tech = _diplomacy_proposal_tech_bribe1;
+                                *response = 0xAA;
+                                Set_Demands_(player_idx, target_idx);
+                            }
+                        } else {
+                            result = 0;
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 3:
+                        if (random::Random_(4) == 1 && MOX::_player[target_idx].last_gift[player_idx] != '\0') {
+                            *response = 0x89;
+                        } else {
+                            *response = 0x87;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 7: {
+                result = Diplomacy_Test_(player_idx, target_idx, 0x3C, 0);
+                switch (result) {
+                    case 0:
+                        if (random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
+                            *response = 0x8B;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                            *response = 0x8C;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
+                            *response = 0x8D;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                        } else {
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        result = 0;
+                        break;
+                    case 3:
+                        if (random::Random_(3) == 1 && MOX::_player[player_idx].treaty[target_idx] == 2) {
+                            *response = 0x88;
+                        } else if (random::Random_(4) == 1 && MOX::_player[target_idx].last_gift[player_idx] != '\0') {
+                            *response = 0x89;
+                        } else {
+                            *response = 0x85;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 8: {
+                result = Diplomacy_Test_(player_idx, target_idx, 0x28, 0);
+                switch (result) {
+                    case 0:
+                        if (random::Random_(4) == 1 && MOX::_player[player_idx].last_broken_treaty[target_idx] != '\0') {
+                            *response = 0x8B;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].personality == 4 && MOX::_player[player_idx].dishonored_flag[target_idx] != '\0') {
+                            *response = 0x8C;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].trust_worthiness[target_idx] != '\0') {
+                            *response = 0x8D;
+                        } else if (random::Random_(4) == 1 && MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx] != 0) {
+                            *response = static_cast<uint8_t>(MOX::_player[player_idx].last_bad_diplomatic_incident[target_idx]) + 0x8D;
+                        } else {
+                            *response = 0x8A;
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        result = 0;
+                        *response = 0x8A;
+                        break;
+                    case 3:
+                        if (random::Random_(3) == 1 && MOX::_player[player_idx].treaty[target_idx] == 2) {
+                            *response = 0x88;
+                        } else if (random::Random_(4) == 1 && MOX::_player[target_idx].last_gift[player_idx] != '\0') {
+                            *response = 0x89;
+                        } else {
+                            *response = 0x86;
+                        }
+                        break;
+                }
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    int32_t __cdecl Tech_Comparison_(int16_t player_1, int16_t player_2) {
+        int16_t initial_tech = (int16_t)aitech::Get_Max_Technology_Value_(player_1);
+        if (initial_tech == 0) {
+            return 300;
+        }
+
+        int32_t tech_2 = aitech::Get_Max_Technology_Value_(player_2);
+        int32_t tech_1 = aitech::Get_Max_Technology_Value_(player_1);
+        int32_t diff = tech_2 - tech_1;
+
+        int32_t tech_1_divisor = aitech::Get_Max_Technology_Value_(player_1);
+        int32_t result = (diff * 100) / tech_1_divisor;
+
+        if (result > 300) {
+            result = 300;
+        }
+
+        if (result < -300) {
+            result = -300;
+        }
+
+        return result;
+    }
+
+    int32_t __cdecl Population_Comparison_(int16_t player_idx1, int16_t player_idx2) {
+        int32_t pop1 = MOX::_player[player_idx1].total_pop;
+        if (pop1 == 0) {
+            return 300;
+        }
+
+        int32_t pop2 = MOX::_player[player_idx2].total_pop;
+        int32_t diff_percent = ((pop1 - pop2) * 100) / pop1;
+
+        if (diff_percent > 300) {
+            diff_percent = 300;
+        }
+
+        if (diff_percent < -300) {
+            diff_percent = -300;
+        }
+
+        if (diff_percent == 0) {
+            return 0;
+        }
+
+        if (diff_percent < 0) {
+            return -random::Random_(-diff_percent);
+        }
+
+        return random::Random_(diff_percent);
+    }
+
+    int16_t __cdecl Diplomacy_Test_(int16_t evaluator_idx, int16_t proposer_idx, int16_t difficulty_mod, int16_t treaty_type) {
+        int16_t score = static_cast<int16_t>(MOX::_player[evaluator_idx].broken_treaties_modifier[proposer_idx]) +
+            static_cast<int16_t>(MOX::_player[evaluator_idx].relations[proposer_idx]) +
+            static_cast<int16_t>(MOX::_player[evaluator_idx].trust_worthiness[proposer_idx]);
+
+        int16_t modifier;
+        if (MOX::_player[evaluator_idx].personality == 4) {
+            score += static_cast<int16_t>(MOX::_player[evaluator_idx].trust_worthiness[proposer_idx]);
+            if (MOX::_player[evaluator_idx].dishonored_flag[proposer_idx] == 1) {
+                modifier = diplodef::_personality_relation_modifiers[6];
+            }
+            else {
+                modifier = diplodef::_personality_relation_modifiers[MOX::_player[evaluator_idx].personality];
+            }
+        }
+        else {
+            modifier = diplodef::_personality_relation_modifiers[MOX::_player[evaluator_idx].personality];
+        }
+
+        score -= (difficulty_mod - modifier);
+        score += static_cast<int16_t>(random::Random_(100));
+
+        switch (treaty_type) {
+        case 0:
+            score += MOX::_player[evaluator_idx].treaty_modifier[proposer_idx];
+            break;
+        case 1:
+            score += MOX::_player[evaluator_idx].trade_modifier[proposer_idx];
+            break;
+        case 2:
+            score += MOX::_player[evaluator_idx].tech_exchange_modifier[proposer_idx];
+            break;
+        case 3:
+            score += MOX::_player[evaluator_idx].peace_modifier[proposer_idx];
+            break;
+        default:
+            break;
+        }
+
+        Adjust_Diplomat_Modifiers_(evaluator_idx, proposer_idx);
+
+        switch (treaty_type) {
+        case 0:
+            MOX::_player[evaluator_idx].treaty_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(30) + 20);
+            break;
+        case 1:
+            MOX::_player[evaluator_idx].trade_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(30) + 20);
+            break;
+        case 2:
+            MOX::_player[evaluator_idx].tech_exchange_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(50) + 20);
+            break;
+        case 3:
+            MOX::_player[evaluator_idx].peace_modifier[proposer_idx] -= static_cast<int16_t>(random::Random_(50) + 50);
+            break;
+        default:
+            break;
+        }
+
+        if (MOX::_player[proposer_idx].traits[20] != 0) {
+            score += 50;
+        }
+        else if (MOX::_player[proposer_idx].traits[19] != 0) {
+            score -= 50;
+        }
+
+        if (MOX::_player[proposer_idx].traits[25] != 0) {
+            score += 25;
+        }
+
+        if (MOX::_player[proposer_idx].tech_applications[200] == 3) {
+            score += 30;
+        }
+
+        score += COLCALC::Best_Leader_Diplomat_Bonus_(proposer_idx);
+
+        if (score < -75) {
+            return 0;
+        }
+        if (score < -50) {
+            return 2;
+        }
+        if (score < 0) {
+            return 1;
+        }
+        return 3;
     }
 }

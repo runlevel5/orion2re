@@ -133,9 +133,5 @@ namespace COLSUM {
 
     int16_t __cdecl Prod_To_Sort_Type_(int16_t production_id);
 
-    inline void __cdecl Draw_Colony_Scan_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00401A40 });
-        fn();
-    }
+    void __cdecl Draw_Colony_Scan_Info_();
 }
