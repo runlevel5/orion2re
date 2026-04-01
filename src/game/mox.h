@@ -680,7 +680,8 @@ namespace MOX {
 
     inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
 
-    inline uint32_t (&_bill_savegame)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x00559478});
+    inline int16_t (&_bill_savegame)[6] =
+        *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00559478});
     inline int16_t& _bill_savegame_2 =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055947C});
 

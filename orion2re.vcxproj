@@ -148,6 +148,7 @@
     <ClCompile Include="src\game\textbox.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
+    <ClCompile Include="src\game\turnsum.cpp" />
     <ClCompile Include="src\game\video.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\patch.cpp" />

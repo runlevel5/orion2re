@@ -41,76 +41,41 @@ namespace JIM {
         fn(music_id, p2, p3);
     }
 
-    inline void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t name1_idx, int16_t name2_idx, int16_t size) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00425890})(buffer, name1_idx, name2_idx, size);
-    }
+    void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3);
 
     inline void __cdecl Get_Text_Message_(const char* lbx_name, int16_t index, char* buffer, int16_t max_len) {
         using Fn = void(__cdecl*)(const char*, int16_t, char*, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00425340})(lbx_name, index, buffer, max_len);
     }
 
-    inline void __cdecl Decode_Text_Name_And_Tech_(char* buffer, int16_t player_idx, int16_t tech_idx, int16_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425800});
-        fn(buffer, player_idx, tech_idx, max_len);
-    }
+    void __cdecl Decode_Text_Name_And_Tech_(char* text, int16_t id1, int16_t id2, int16_t id3);
 
-    inline void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t param_1, int16_t param_2, int16_t param_3, int32_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425830});
-        fn(buffer, param_1, param_2, param_3, max_len);
-    }
+    void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t id1, int16_t id2, int16_t id3, int16_t id4);
 
-    inline void __cdecl Decode_Text_System_(char* buffer, int16_t star_idx, int16_t size) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00425950})(buffer, star_idx, size);
-    }
+    void __cdecl Decode_Text_System_(char* buffer, int16_t message_id, int16_t system_id);
 
-    inline void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t player_idx, int16_t star_idx, int16_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004257d0});
-        fn(buffer, player_idx, star_idx, max_len);
-    }
+    void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t name_idx, int16_t system_idx, int16_t unknown_idx);
 
-    inline void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* buffer, int16_t param_1, int16_t param_2, int16_t param_4, int16_t param_3, int32_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425860});
-        fn(buffer, param_1, param_2, param_4, param_3, max_len);
-    }
+    void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* text, int16_t val1, int16_t val2, int16_t val3, int16_t val4, int16_t val5);
 
     inline void __cdecl Bill_Picture_To_Mouse_(s_animation_header* sprite) {
         using Fn = void(__cdecl*)(s_animation_header*);
         reinterpret_cast<Fn>(0x00425A10)(sprite);
     }
 
-    inline void __cdecl Decode_Text_Name_And_Stat_(char* buffer, uint8_t ambassador, uint8_t id_plus_one, int16_t max_len) {
-        using Fn = void(__cdecl*)(char*, uint8_t, uint8_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004257a0});
-        fn(buffer, ambassador, id_plus_one, max_len);
+    void __cdecl Decode_Text_Name_And_Stat_(char* text, int16_t val1, int16_t val2, int16_t val3);
+
+    void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx1, int16_t race_idx2);
+
+    void __cdecl Decode_Text_Race_(char* out_buffer, int16_t msg_idx, int16_t race_idx);
+
+    void __cdecl Decode_Text_Stat_(char* buffer, int16_t stat_a, int16_t stat_b);
+
+    inline void __cdecl Decode_Text_Message_(char* buffer, int16_t a1, int16_t a2, int16_t a3, int16_t a4, int16_t a5, int16_t a6, int16_t a7, int16_t a8) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425420});
+        fn(buffer, a1, a2, a3, a4, a5, a6, a7, a8);
     }
 
-    inline void __cdecl Decode_Text_Race_(char* buffer, int16_t race_idx, int max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425770});
-        fn(buffer, race_idx, max_len);
-    }
-
-    inline void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx, int16_t max_len) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004258C0})(buffer, race_idx, max_len);
-    }
-
-    inline void __cdecl Decode_Text_Stat_(char* out_str, int stat_num, int padding) {
-        using Fn = void(__cdecl*)(char*, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425920});
-        fn(out_str, stat_num, padding);
-    }
-
-    inline void __cdecl Decode_Text_Year_(char* buffer, int length) {
-        using Fn = void(__cdecl*)(char*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004259B0});
-        fn(buffer, length);
-    }
+    void __cdecl Decode_Text_Year_(char* buffer, int16_t year);
 }

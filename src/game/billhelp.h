@@ -17,6 +17,12 @@ namespace BILLHELP {
         reinterpret_cast<Fn>(std::uintptr_t{0x004B51F0})();
     }
 
+    inline void __cdecl Turn_Summary_Popup_Help_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b51a0});
+        fn();
+    }
+
     inline void __cdecl Turn_Summary_Help_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004B51B0})();

@@ -2,6 +2,7 @@
 #include "misc.h"
 
 namespace fonts {
+    inline uint16_t& _font_header_current_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0057646C});
     inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
 
     inline void*& _palette_block =

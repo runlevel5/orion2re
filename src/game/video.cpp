@@ -19,4 +19,17 @@ namespace video {
 	void Clip_Off_() {
 		animate::_clipping_flag = 0;
 	}
+
+	void __cdecl Clip_On_() {
+		animate::_clipping_flag = 1;
+	}
+
+	uint8_t __cdecl Get_Current_Video_Page_Flag_() {
+		return platform::g_render_buffer;
+	}
+
+	void __cdecl Set_Refresh_Differential_() {
+		screen_refresh_flag = 2;
+		screen_dump_flag = 0;
+	}
 }

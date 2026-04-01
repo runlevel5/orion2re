@@ -56,6 +56,7 @@ namespace video {
 
 	void __cdecl Set_Page_Off_();
 	void __cdecl Clip_Off_();
+	void __cdecl Clip_On_();
 
 	// TODO: These were re-implemented in platform
 	inline void __cdecl Copy_Off_To_Back_() {
@@ -73,12 +74,6 @@ namespace video {
         reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
     }
 
-    inline void __cdecl Clip_On_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524D00});
-        fn();
-    }
-
     inline void __cdecl Add_Line_To_Scan_List_(int32_t start_x, int32_t y, int32_t end_x) {
         using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528A30 });
@@ -91,14 +86,6 @@ namespace video {
         fn(x, y);
     }
 
-    inline void __cdecl Set_Refresh_Differential_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527D00});
-        fn();
-    }
-
-    inline uint8_t __cdecl Get_Current_Video_Page_Flag_() {
-        using Fn = uint8_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00527950})();
-    }
+	void __cdecl Set_Refresh_Differential_();
+	uint8_t __cdecl Get_Current_Video_Page_Flag_();
 }

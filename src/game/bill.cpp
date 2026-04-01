@@ -147,12 +147,12 @@ namespace BILL {
     /**
      * @address 00407210
      */
-    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, void* p5, int16_t p6, bool adjust_y) {
+    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, s_animation_header* pic, int16_t p6, bool adjust_y) {
         bool resized = false;
         int16_t current_width = fonts::Get_String_Width_(str);
 
         if (current_width <= limit_w) {
-            _Print_String_Bill_(x, y, limit_w, str, p6, 1, p5);
+            _Print_String_Bill_(x, y, limit_w, str, p6, 1, pic);
             return;
         }
 
@@ -180,7 +180,7 @@ namespace BILL {
             current_width = fonts::Get_String_Width_(str);
             if (current_width <= limit_w || fonts::_current_font_style <= 0) {
                 fonts::_font_header.font_style = orig_font_style;
-                _Print_String_Bill_(x, y + y_offset, limit_w, str, p6, 1, p5);
+                _Print_String_Bill_(x, y + y_offset, limit_w, str, p6, 1, pic);
 
                 fonts::_font_header.font_style_spacing = orig_spacing;
                 fonts::_font_header.font_style_widths[32] = (char)orig_space_width;
@@ -199,6 +199,90 @@ namespace BILL {
                 y_offset = (initial_height - new_height) / 2;
             }
             resized = true;
+        }
+    }
+
+    /**
+     * @address 00407480
+     */
+    void __cdecl _Squeeze_Print_Paragraph_(
+        int16_t x, int16_t y, int16_t width, int16_t max_height,
+        char* text, int16_t alignment, s_animation_header* bitmap,
+        bool is_formatted, bool center_y)
+    {
+        char orig_space_width = fonts::_font_header.font_style_widths[32];
+        int16_t orig_spacing = fonts::_font_header.font_style_spacing;
+        int16_t orig_leading = fonts::_font_header.leading_offset;
+        int16_t orig_font_style = fonts::_font_header.font_style;
+
+        int16_t orig_current_font_style = fonts::_current_font_style;
+
+        using GetHeightFn = int16_t(__cdecl*)(int16_t, char*);
+        GetHeightFn get_height = is_formatted ? FMTPARA::Get_Formatted_Paragraph_Max_Height_ : (GetHeightFn)BILL::_Get_Paragraph_Max_Height_;
+
+        bool font_changed = false;
+        bool fits;
+        int16_t cur_height;
+
+        do {
+            cur_height = get_height(width, text);
+            if (max_height >= cur_height) {
+                break;
+            }
+
+            fits = true;
+
+            while (true) {
+                if (get_height(width, text) <= max_height) {
+                    break;
+                }
+                if ((int)BILL::_space_limits[fonts::_current_font_style] >= (int)fonts::_font_header.font_style_widths[32]) {
+                    break;
+                }
+
+                fonts::_font_header.font_style_widths[32]--;
+                fits = false;
+            }
+
+            while (true) {
+                if (get_height(width, text) <= max_height) {
+                    break;
+                }
+                if ((int16_t)fonts::_font_header.leading_offset <= 2) {
+                    break;
+                }
+
+                fonts::_font_header.leading_offset--;
+                fits = false;
+            }
+
+            cur_height = get_height(width, text);
+            if (cur_height > max_height) {
+                if (fonts::_current_font_style > 0) {
+                    fonts::Set_Font_Style_(fonts::_current_font_style - 1, &fonts::_font_header.normal_colors);
+                    font_changed = true;
+                    fits = false;
+                }
+            }
+        } while (!fits);
+
+        if (center_y) {
+            y = y - (cur_height / 2);
+        }
+
+        if (is_formatted) {
+            FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(x, y, width, text, alignment, bitmap);
+        } else {
+            BILL::_Print_Paragraph_Bill_(x, y, width, text, alignment, 1, reinterpret_cast<int16_t*>(bitmap));
+        }
+
+        fonts::_font_header.font_style_spacing = orig_spacing;
+        fonts::_font_header.font_style_widths[32] = orig_space_width;
+        fonts::_font_header.leading_offset = orig_leading;
+
+        if (font_changed) {
+            fonts::Set_Font_Style_(orig_current_font_style, &fonts::_font_header.selected_colors);
+            fonts::_font_header.font_style = orig_font_style;
         }
     }
 
@@ -385,9 +469,183 @@ namespace BILL {
     }
 
     /**
+     * @address 00407730
+     */
+    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, int16_t* aux) {
+        int16_t max_height = _Get_Paragraph_Max_Height_(width, text);
+        int16_t current_height = static_cast<int16_t>(fonts::_font_header_current_height);
+
+        int16_t new_y = y + static_cast<int16_t>((current_height - max_height) / 2);
+
+        if (new_y < 0) {
+            new_y = 0;
+        }
+
+        if (aux == nullptr) {
+            _Print_Paragraph_(x, new_y, width, text, 2);
+        } else {
+            _Print_Paragraph_Bill_Aux_(x, new_y, width, text, 2, aux);
+        }
+    }
+
+    /**
      * @address 004077a0
      */
     void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp) {
-        _Print_1_Or_More_Lines_Centered_(static_cast<uint16_t>(x), static_cast<int16_t>(y), static_cast<uint16_t>(width), reinterpret_cast<uint8_t*>(str), reinterpret_cast<int16_t*>(bmp));
+        _Print_1_Or_More_Lines_Centered_(static_cast<int16_t>(x), static_cast<int16_t>(y), static_cast<int16_t>(width), str, reinterpret_cast<int16_t*>(bmp));
+    }
+
+    /**
+     * @address 004299E0
+     */
+    void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val) {
+        MOX::_player[MOX::_PLAYER_NUM].history_btns &= 0x8F;
+        MOX::_player[MOX::_PLAYER_NUM].history_btns |= (btn_val & 0x7) << 4;
+    }
+
+    /**
+     * @address 00407C20
+     */
+    void __cdecl _Print_String_Bill_(int16_t x, int16_t y, int16_t width, const char* str, uint16_t mode, uint8_t draw_flag, s_animation_header* bitmap) {
+        if (width >= 10 && width <= 640 &&
+            x >= 0 && x < 640 &&
+            y >= 0 && y < 480 &&
+            str != nullptr) 
+        {
+            int16_t str_width = fonts::Get_String_Width_(str);
+            
+            if (mode == 1 || mode == 3) {
+                str_width = width;
+            }
+
+            if (draw_flag != 0) {
+                if (bitmap != nullptr) {
+                    mode |= 0x800;
+                }
+
+                switch (mode) {
+                    case 0:
+                        fonts::Print_(x, y, str);
+                        break;
+                    case 1:
+                        fonts::Print_Right_(x + width - 1, y, str);
+                        break;
+                    case 2:
+                        fonts::Print_Centered_(x + width / 2, y, str);
+                        break;
+                    case 3:
+                        Print_Display_Auto_Width_(x, y, str, (int32_t)width);
+                        break;
+                    case 0x800:
+                        fonts::Print_To_Bitmap_(x, y, str, (void*)bitmap);
+                        break;
+                    case 0x801:
+                        Print_Right_Aligned_To_Bitmap_(x + width - 1, y, str, bitmap);
+                        break;
+                    case 0x802:
+                        fonts::Print_Centered_To_Bitmap_(x + width / 2, y, str, bitmap);
+                        break;
+                    case 0x803:
+                        Print_Display_To_Bitmap_Auto_Width_(x, y, str, width, bitmap);
+                        break;
+                }
+            }
+
+            if (static_cast<int32_t>(static_cast<uint16_t>(__pp_max_width)) < static_cast<int32_t>(str_width)) {
+                __pp_max_width = str_width;
+            }
+        }
+    }
+
+    /**
+     * @address 00406CD0
+     */
+    int16_t __cdecl Get_History_Params_(int16_t* out_history_param) {
+        int16_t history_param = static_cast<int16_t>(MOX::_stardate) + 30536;
+
+        if (history_param > 350) {
+            *out_history_param = 350;
+            return MOX::_bill_savegame[1];
+        }
+
+        *out_history_param = history_param;
+        return 0;
+    }
+
+    /**
+     * @address 005258e0
+     */
+    void __cdecl Print_Display_Auto_Width_(int16_t x, int16_t y, const char* text, int32_t width) {
+        if (width < 0) {
+            width = 0;
+        }
+        fonts::Print_Display_(x, y, text, width);
+    }
+
+    void __cdecl Get_Active_Players_(int32_t start_idx, int8_t include_previously_contacted) {
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                if (i != MOX::_PLAYER_NUM) {
+                    if (MOX::_player[i].eliminated == 0) {
+                        if (MOX::_player[MOX::_PLAYER_NUM].contact[i] != 0) {
+                            MOX::_active_player[start_idx] = static_cast<char>(i);
+                            start_idx++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (include_previously_contacted != 0) {
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                    if (i != MOX::_PLAYER_NUM) {
+                        if (MOX::_player[i].eliminated == 0) {
+                            if (MOX::_player[MOX::_PLAYER_NUM].contact[i] == 0) {
+                                if (MOX::_player[MOX::_PLAYER_NUM].n_times_established_contact[i] != 0) {
+                                    MOX::_active_player[start_idx] = static_cast<char>(i);
+                                    start_idx++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        MOX::_active_count = static_cast<int16_t>(start_idx);
+    }
+
+    /**
+     * @address 00526560
+     */
+    void __cdecl Print_Right_Aligned_To_Bitmap_(int16_t x, int16_t y, const char* str, s_animation_header* bitmap) {
+        int16_t width = fonts::Get_String_Width_(str);
+        fonts::Print_To_Bitmap_(x - (width - 1), y, str, (void*)bitmap);
+    }
+
+    /**
+     * @address 005265e0
+     */
+    void __cdecl Print_Display_To_Bitmap_Auto_Width_(int16_t x, int16_t y, const char* text, int16_t width, s_animation_header* bitmap) {
+        if (width < 0) {
+            width = 0;
+        }
+        fonts::Print_Display_To_Bitmap_(x, y, text, (int32_t)width, (void*)bitmap);
+    }
+
+    /**
+     * @address 004071f0
+     */
+    void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end) {
+        palstore::Darken_Palette_(100);
+        palette::Clear_Palette_Changes_(0, 255);
+    }
+
+    /**
+     * @address 004080c0
+     */
+    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4, int16_t param_5, int16_t* param_6) {
+        _Print_Paragraph_Bill_(param_1, param_2, param_3, param_4, param_5, 1, param_6);
     }
 }

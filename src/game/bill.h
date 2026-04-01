@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+
 namespace BILL {
     inline void __cdecl Bill_Init_() {
         using Fn = void(__cdecl*)();
@@ -14,11 +16,7 @@ namespace BILL {
 
     char* __cdecl Cache_Player_Scientist_Anim_Imp_(int16_t player_index);
 
-    inline int16_t __cdecl Get_History_Params_(int16_t* n_points) {
-        using Fn = int16_t(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004071C0});
-        return fn(n_points);
-    }
+    int16_t __cdecl Get_History_Params_(int16_t* out_history_param);
 
     void __cdecl Bill_Default_(void);
 
@@ -27,11 +25,10 @@ namespace BILL {
 
     void __cdecl Squeeze_Print_(int16_t x, int16_t y, const char* text, int16_t max_width);
 
-    inline void __cdecl _Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text, int16_t color, s_animation_header* anim, bool flag1, bool flag2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*, int16_t, s_animation_header*, bool, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407480});
-        fn(x, y, width, height, text, color, anim, flag1, flag2);
-    }
+    void __cdecl _Squeeze_Print_Paragraph_(
+        int16_t x, int16_t y, int16_t width, int16_t max_height,
+        char* text, int16_t alignment, s_animation_header* bitmap,
+        bool is_formatted, bool center_y);
 
     void __cdecl Squeeze_Print_Paragraph_(uint16_t x, int16_t y, int16_t w, int16_t h, char* str, uint16_t align);
 
@@ -43,16 +40,9 @@ namespace BILL {
 
     void __cdecl Get_Players_Dead_Or_Alive_Or_Omniscient_(int32_t param_1, char param_2);
 
-    inline void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(0x004071F0)(start, end);
-    }
+    void __cdecl Turn_Off_Palettes_(int16_t start, int16_t end);
 
-    inline void __cdecl Get_Active_Players_(int player_id, char is_active) {
-        using Fn = void(__cdecl*)(int, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406CD0});
-        fn(player_id, is_active);
-    }
+    void __cdecl Get_Active_Players_(int32_t start_idx, int8_t include_previously_contacted);
 
     void __cdecl Get_Players_Alive_Or_Omniscient_(int32_t param_1, char param_2);
 
@@ -74,23 +64,21 @@ namespace BILL {
 
     void __cdecl Print_1_Or_More_Lines_Centered_To_Bitmap_(int x, int y, int width, char* str, s_animation_header* bmp);
 
-    inline void __cdecl _Print_1_Or_More_Lines_Centered_(uint16_t x, int16_t y, uint16_t width, uint8_t* bitmap, int16_t* line_y_offsets) {
-        using Fn = void(__cdecl*)(uint16_t, int16_t, uint16_t, uint8_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407730});
-        fn(x, y, width, bitmap, line_y_offsets);
-    }
+    void __cdecl _Print_1_Or_More_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, int16_t* aux);
 
     void __cdecl Squeeze_Centered_Print_(uint16_t x, int16_t y, char* text, uint16_t limit);
 
     void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment);
 
+    void __cdecl _Print_Paragraph_Bill_Aux_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4, int16_t param_5, int16_t* param_6);
+
     inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
     inline int16_t& __pp_max_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BC0});
 
-    inline void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment, int32_t flag, void* reserved) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int32_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407DD0});
-        fn(x, y, width, text, alignment, flag, reserved);
+    inline void __cdecl _Print_Paragraph_Bill_(int16_t param_1, int16_t param_2, int16_t param_3, const char* param_4, int16_t param_5, int16_t param_6, int16_t* param_7) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407dd0});
+        fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7);
     }
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height);
@@ -100,13 +88,15 @@ namespace BILL {
     inline uint8_t (&_space_limits)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00551138});
 
-    inline void __cdecl _Print_String_Bill_(int16_t x, int16_t y, int16_t limit_w, const char* str, int16_t p6, int32_t p7, void* p5) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int32_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407C20});
-        fn(x, y, limit_w, str, p6, p7, p5);
-    }
+    void __cdecl Print_Display_Auto_Width_(int16_t x, int16_t y, const char* text, int32_t width);
 
-    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, void* p5, int16_t p6, bool adjust_y);
+    void __cdecl Print_Right_Aligned_To_Bitmap_(int16_t x, int16_t y, const char* str, s_animation_header* bitmap);
+
+    void __cdecl Print_Display_To_Bitmap_Auto_Width_(int16_t x, int16_t y, const char* str, int16_t width, s_animation_header* bitmap);
+
+    void __cdecl _Print_String_Bill_(int16_t x, int16_t y, int16_t width, const char* str, uint16_t mode, uint8_t draw_flag, s_animation_header* bitmap);
+
+    void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, s_animation_header* pic, int16_t p6, bool adjust_y);
 
     inline void __cdecl Record_History_() {
         using Fn = void(__cdecl*)();
@@ -114,11 +104,7 @@ namespace BILL {
         fn();
     }
 
-    inline void __cdecl Set_Plyr_Info_Btns_(int32_t button_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004299E0 });
-        fn(button_id);
-    }
+    void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val);
 
     inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"

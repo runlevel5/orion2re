@@ -208,4 +208,48 @@ namespace JIM {
         sound::Set_Stream_Volume_(0);
         sound::Fade_Stream_Up_(30);
     }
+
+    void __cdecl Decode_Text_Stat_(char* buffer, int16_t stat_a, int16_t stat_b) {
+        Decode_Text_Message_(buffer, -1, -1, -1, stat_a, -1, -1, -1, stat_b);
+    }
+
+    void __cdecl Decode_Text_Year_(char* buffer, int16_t year) {
+        JIM::Decode_Text_Message_(buffer, -1, -1, -1, -1, -1, -1, -1, year);
+    }
+
+    void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx1, int16_t race_idx2) {
+        JIM::Decode_Text_Message_(buffer, race_idx1, -1, -1, -1, -1, -1, -1, race_idx2);
+    }
+
+    void __cdecl Decode_Text_Race_(char* out_buffer, int16_t msg_idx, int16_t race_idx) {
+        JIM::Decode_Text_Message_(out_buffer, msg_idx, -1, -1, -1, -1, -1, -1, race_idx);
+    }
+
+    void __cdecl Decode_Text_Name_And_Stat_(char* text, int16_t val1, int16_t val2, int16_t val3) {
+        JIM::Decode_Text_Message_(text, val1, -1, -1, val2, -1, -1, -1, val3);
+    }
+
+    void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* text, int16_t val1, int16_t val2, int16_t val3, int16_t val4, int16_t val5) {
+        JIM::Decode_Text_Message_(text, val1, -1, val3, -1, val2, val4, -1, val5);
+    }
+
+    void __cdecl Decode_Text_Name_And_System_(char* buffer, int16_t name_idx, int16_t system_idx, int16_t unknown_idx) {
+        JIM::Decode_Text_Message_(buffer, name_idx, system_idx, -1, -1, -1, -1, -1, unknown_idx);
+    }
+
+    void __cdecl Decode_Text_System_(char* buffer, int16_t message_id, int16_t system_id) {
+        JIM::Decode_Text_Message_(buffer, -1, message_id, -1, -1, -1, -1, -1, system_id);
+    }
+
+    void __cdecl Decode_Text_Name_And_Other_Tech_(char* buffer, int16_t id1, int16_t id2, int16_t id3, int16_t id4) {
+        JIM::Decode_Text_Message_(buffer, id1, -1, -1, -1, id2, id3, -1, id4);
+    }
+
+    void __cdecl Decode_Text_Name_And_Tech_(char* text, int16_t id1, int16_t id2, int16_t id3) {
+        JIM::Decode_Text_Message_(text, id1, -1, id2, -1, -1, -1, -1, id3);
+    }
+
+    void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3) {
+        Decode_Text_Message_(buffer, id1, -1, -1, -1, id2, -1, -1, id3);
+    }
 }
