@@ -767,4 +767,3 @@ inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
 
 struct s_mouse_list;
-inline s_mouse_list& DAT_00559a48 = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00559A48});

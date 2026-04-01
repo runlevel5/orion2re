@@ -65,7 +65,7 @@ namespace council {
         fields::Enable_Draw_All_Fields_();
         graphics::Reset_Window_();
         video::Clip_Off_();
-        mouse::Set_Mouse_List_(&DAT_00559a48, 1);
+        mouse::Set_Mouse_List_(&council::_council_blank_mouse, 1);
         JIM::Play_Streaming_Music_(0x77 /* MUSIC_COUNCIL */, -1, 1);
         ERIC::Set_Fade_Percent_(0);
         Set_Fade_Speed_Perc(10);
@@ -175,10 +175,10 @@ namespace council {
     void Council_Player_Vote_() {
         char list_items[4][25];
         char title_msg[48];
-        int16_t result_code;
+        int16_t result_code = 0;
 
-        int16_t* list_metadata = reinterpret_cast<int16_t*>(&list_items[0][6]);
-        uint8_t* active_mask = reinterpret_cast<uint8_t*>(&list_items[0][12]);
+        int16_t list_metadata;
+        uint8_t active_mask[4];
 
         fields::Assign_Auto_Function_(council::Draw_Main_Council_Screen_, 2);
 
@@ -213,11 +213,11 @@ namespace council {
         fonts::Set_Font_LF_(4);
 
         council::_council_message[0] = orion2::s_empty[0];
-        *list_metadata = 0;
+        list_metadata = 0;
 
         int16_t selection = fields::Get_List_Field_(
-            214, 388, 180, &title_msg[32], list_items[0], 25,
-            list_metadata, active_mask, 17, nullptr, 0, nullptr, 0, 0
+            214, 388, 180, title_msg, list_items, 25,
+            &list_metadata, active_mask, 17, nullptr, 0, nullptr, 0, 0
         );
 
         if (selection == 0) {

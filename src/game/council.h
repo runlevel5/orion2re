@@ -31,7 +31,7 @@ namespace council {
     inline uint8_t& _council_vote_for =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005960E8});
 
-    inline const char*& s_format_votes = *reinterpret_cast<const char**>(std::uintptr_t{0x005569F0});
+    inline const char* s_format_votes = reinterpret_cast<const char*>(std::uintptr_t{0x005569F0});
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
@@ -41,6 +41,7 @@ namespace council {
 
     inline const char* s_council_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A74});
     inline const char* s_empty_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    inline s_mouse_list& _council_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x00559A48 });
 
     void Drive_Council_Player_Voted_Winner_(int16_t player_idx);
 
