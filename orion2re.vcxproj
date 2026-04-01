@@ -57,6 +57,7 @@
     <ClCompile Include="src\game\colony.cpp" />
     <ClCompile Include="src\game\colony_main.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
+    <ClCompile Include="src\game\colsysdi.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />
     <ClCompile Include="src\game\combat.cpp" />
     <ClCompile Include="src\game\combat1.cpp" />
@@ -318,6 +319,7 @@
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\sys.h" />
+    <ClInclude Include="src\game\s_council.h" />
     <ClInclude Include="src\game\s_starname.h" />
     <ClInclude Include="src\game\tech.h" />
     <ClInclude Include="src\game\techdata.h" />

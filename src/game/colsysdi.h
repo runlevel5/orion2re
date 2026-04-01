@@ -1,22 +1,13 @@
 #pragma once
-#include <cstdint>
 
 namespace COLSYSDI {
-    inline void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047ddf0});
-        fn(x, y);
-    }
+    void __cdecl Draw_Col_Sys_Disp_(int16_t x, int16_t y);
 
-    inline void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int32_t x, int32_t y) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047e530});
-        fn(x, y);
-    }
+    s_animation_header* __cdecl Planet_Anims_(int16_t planet_type, int16_t planet_size);
 
-    inline void __cdecl Add_Col_Sys_Disp_Fields_(int16_t arg1, int16_t arg2, int16_t arg3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047e3c0});
-        fn(arg1, arg2, arg3);
-    }
+    void __cdecl Planet_Summary_String_(char* param_1, int16_t param_2, int16_t param_3);
+
+    void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int32_t param_1, int32_t param_2);
+
+    void __cdecl Add_Col_Sys_Disp_Fields_(int16_t x, int16_t y, int16_t end_x);
 }

@@ -2536,6 +2536,11 @@ namespace hooks {
         { 0x00422770, &BEAMS::Draw_Fighter_Beam_ },
         { 0x00422a70, &BEAMS::Draw_Damage_Indicator_ },
         { 0x004233f0, &BEAMS::Draw_Shield_Hit_ },
+        { 0x0047ddf0, &COLSYSDI::Draw_Col_Sys_Disp_ },
+        { 0x0047e530, &COLSYSDI::Draw_Col_Sys_Disp_Last_Scanned_ },
+        { 0x0047e3c0, &COLSYSDI::Add_Col_Sys_Disp_Fields_ },
+        { 0x0047ddb0, &COLSYSDI::Planet_Anims_ },
+        { 0x0047dfe0, &COLSYSDI::Planet_Summary_String_ },
     };
 
     void Install_Hooks()

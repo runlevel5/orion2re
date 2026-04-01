@@ -44,6 +44,7 @@ namespace COLONY {
     inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
     inline const char* _COLBLDG_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CE8}); // "COLBLDG.LBX"
     inline const char* _COLSUM_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D18}); // "COLSUM.LBX"
+    inline const char* _COLSYSDI_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D28}); // "COLSYSDI.LBX"
     inline const char* _DIMTVFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D38}); // "DIMTVFIN.LBX"
     inline const char* _NEWGAME_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D90}); // "NEWGAME.LBX"
     inline const char* _PLNTDFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DA0}); // "PLNTDFIN.LBX"
@@ -429,4 +430,10 @@ namespace COLONY {
     void __cdecl Create_Shadow_Farmer_(int16_t unused);
 
     s_animation_header* __cdecl Shadow_Farmer_Bitm_();
+
+    inline void __cdecl Set_Colony_Font_To_Player_(int16_t font_color, int8_t player_idx) {
+        using Fn = void(__cdecl*)(int16_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbdb0});
+        fn(font_color, player_idx);
+    }
 }

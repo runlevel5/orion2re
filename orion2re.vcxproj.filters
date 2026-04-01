@@ -411,6 +411,9 @@
     <ClCompile Include="src\game\dip_scrn_main.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\colsysdi.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -939,6 +942,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\fieldsav.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\s_council.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>
