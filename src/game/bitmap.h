@@ -96,4 +96,15 @@ namespace bitmap {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F160});
         fn(x, y, anim, index);
     }
+
+    inline void __cdecl Create_Brighten_Bitmap_Palettes_(void* screen_seg, uint8_t* colors, int count) {
+        using Fn = void(__cdecl*)(void*, uint8_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EBD0});
+        fn(screen_seg, colors, count);
+    }
+
+    inline void __cdecl Mask_Brighten_Bitmap_(int16_t x_offset, int16_t y_offset, s_animation_header* src, s_animation_header* mask, int16_t amount) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052ED00})(x_offset, y_offset, src, mask, amount);
+    }
 }

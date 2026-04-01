@@ -186,25 +186,25 @@ namespace council {
         council::_council_voter = static_cast<uint8_t>(MOX::_PLAYER_NUM);
 
         for (int i = 0; i < 4; ++i) {
-            list_items[i][0] = orion2::s_empty[0];
+            list_items[i][0] = '\0';
         }
 
-        JIM::Get_Text_Message_(orion2::s_jimtext_lbx, 23 /* COUNCIL_VOTE_CAST_INFO */, title_msg, 45);
+        JIM::Get_Text_Message_("jimtext.lbx", 23 /* COUNCIL_VOTE_CAST_INFO */, title_msg, 45);
         JIM::Decode_Text_Stat_(title_msg, council::_council_vote_cast, 45);
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[0]) {
-            JIM::Get_Text_Message_(orion2::s_jimtext_lbx, 24 /* ME */, list_items[0], 25);
+            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[0], 25);
         } else {
-            _sprintf(list_items[0], orion2::s_format_s, MOX::_player[council::_council_nominee_[0]].name);
+            _sprintf(list_items[0], "  %s", MOX::_player[council::_council_nominee_[0]].name);
         }
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[1]) {
-            JIM::Get_Text_Message_(orion2::s_jimtext_lbx, 24 /* ME */, list_items[1], 25);
+            JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[1], 25);
         } else {
-            _sprintf(list_items[1], orion2::s_format_s, MOX::_player[council::_council_nominee_[1]].name);
+            _sprintf(list_items[1], "  %s", MOX::_player[council::_council_nominee_[1]].name);
         }
 
-        JIM::Get_Text_Message_(orion2::s_jimtext_lbx, 25 /* ABSTAIN */, list_items[2], 25);
+        JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], 25);
 
         *reinterpret_cast<uint32_t*>(active_mask) = 0x01010101;
         fonts::Set_Outline_Color_(0, 0);
@@ -212,7 +212,7 @@ namespace council {
         fonts::Set_Font_Highlight_Colors_(&council::_council_highlight_colors);
         fonts::Set_Font_LF_(4);
 
-        council::_council_message[0] = orion2::s_empty[0];
+        council::_council_message[0] = '\0';
         list_metadata = 0;
 
         int16_t selection = fields::Get_List_Field_(

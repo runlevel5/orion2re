@@ -896,6 +896,18 @@ struct s_battle_results {
     struct s_battle_results_info info;
 };
 
+typedef struct s_beam_dmg_msg s_beam_dmg_msg, *Ps_beam_dmg_msg;
+
+struct s_beam_dmg_msg {
+    int16_t x;
+    int16_t y;
+    uint16_t total_dmg;
+    uint16_t hull_dmg;
+    uint16_t shield_dmg;
+    uint16_t anim_timer;
+    uint8_t side;
+};
+
 typedef struct s_beam_fx_entry s_beam_fx_entry, *Ps_beam_fx_entry;
 
 struct s_beam_fx_entry {
@@ -4928,8 +4940,3 @@ struct s_unit_data {
 
 /* WARNING! conflicting data type names: /orion2.h/word - /word */
 
-namespace orion2 {
-    inline const char* s_empty = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
-    inline const char* s_jimtext_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00552360}); // "jimtext.lbx"
-    inline const char* s_format_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055236c}); // "  %s"
-}
