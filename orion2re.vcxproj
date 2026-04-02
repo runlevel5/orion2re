@@ -173,6 +173,7 @@
     <ClInclude Include="src\game\angle.h" />
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\antarans.h" />
+    <ClInclude Include="src\game\antaroom.h" />
     <ClInclude Include="src\game\assert.h" />
     <ClInclude Include="src\game\beams.h" />
     <ClInclude Include="src\game\bill.h" />
@@ -305,6 +306,7 @@
     <ClInclude Include="src\game\replace.h" />
     <ClInclude Include="src\game\report.h" />
     <ClInclude Include="src\game\russ.h" />
+    <ClInclude Include="src\game\science.h" />
     <ClInclude Include="src\game\score.h" />
     <ClInclude Include="src\game\scroll.h" />
     <ClInclude Include="src\game\settler.h" />
@@ -332,6 +334,7 @@
     <ClInclude Include="src\game\turnsum.h" />
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />
+    <ClInclude Include="src\game\_antarans.h" />
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\patch.h" />
     <ClInclude Include="src\pch.h" />

@@ -98,6 +98,12 @@ namespace ERIC {
 
     void __cdecl Play_Planetary_Destruction_Flic_();
 
+    inline void __cdecl Play_Antarans_Attack_Flic_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BB0E0});
+        fn();
+    }
+
     bool __cdecl Sint_Is_In_List_(int16_t value, int16_t* list, uint16_t count);
 
     inline void __cdecl Play_Diplomatic_Win_Flic_() {

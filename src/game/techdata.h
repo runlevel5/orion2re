@@ -11,7 +11,8 @@ namespace TECHDATA {
     inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
     inline s_tech_hull_data* _hull_data = reinterpret_cast<s_tech_hull_data*>(std::uintptr_t{ 0x00555798 });
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
-    inline s_tech_app_data* _technology_applications = reinterpret_cast<s_tech_app_data*>(std::uintptr_t{ 0x005537c8 });
+    inline s_tech_app_data (&_technology_applications)[212] =
+        *reinterpret_cast<s_tech_app_data(*)[212]>(std::uintptr_t{0x005537C8});
     inline s_tech_field_data (&_technology_fields)[83] =
         *reinterpret_cast<s_tech_field_data (*)[83]>(std::uintptr_t{ 0x00553050 });
     inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });

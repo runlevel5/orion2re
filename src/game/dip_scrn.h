@@ -58,6 +58,12 @@ namespace DIP_SCRN {
 
     char* __cdecl An_(char* text);
 
+    inline bool __cdecl Diplomacy_Message_Is_Interactive_(uint16_t msg) {
+        using Fn = bool(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041DB60});
+        return fn(msg);
+    }
+
     inline uint16_t& _chat_width =
             *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A85D8});
 

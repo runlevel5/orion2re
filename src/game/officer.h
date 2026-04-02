@@ -112,6 +112,7 @@ namespace OFFICER {
 
     int16_t __cdecl Do_Hire_Officer_(int16_t leader_idx);
 
+    int8_t __cdecl Officer_Made_Level_Report_(int16_t player_idx, int8_t process_popups);
     void __cdecl Check_For_Officer_Level_();
     void __cdecl Decrement_Officer_ETA_();
     void __cdecl Random_Officer_Check_(int16_t player_idx);

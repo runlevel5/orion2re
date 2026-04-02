@@ -94,4 +94,16 @@ namespace EVENTS {
     int16_t __cdecl Event_Check_Warp_Beast_();
 
     void __cdecl Kill_All_Events_At_Colony_(int16_t colony_idx);
+
+    inline int16_t __cdecl Check_For_Event_Message_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473EA0});
+        return fn();
+    }
+
+    inline void __cdecl Check_For_Event_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473ED0});
+        fn();
+    }
 }

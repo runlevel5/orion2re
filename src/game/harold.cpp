@@ -425,7 +425,7 @@ namespace HAROLD {
     /**
      * @address 004f1590
      */
-    bool __cdecl Player_Has_Colony_(short player_num, short star_idx) {
+    bool __cdecl Player_Has_Colony_(int16_t player_num, int16_t star_idx) {
         return struct_::Test_Bit_Field_(&MOX::_star[star_idx].has_colony, player_num) != 0;
     }
 
@@ -942,11 +942,11 @@ namespace HAROLD {
     /**
      * @brief Checks if a player has an outpost in a specific star system.
      * 
-     * @param param_1 Unused in original binary.
+     * @param player_num Unused in original binary.
      * @param star_idx Index of the star system to check.
      * @return true if an outpost is found on any planet in the system, false otherwise.
      */
-    bool __cdecl Player_Has_Outpost_(int16_t param_1, int16_t star_idx) {
+    bool __cdecl Player_Has_Outpost_(int16_t player_num, int16_t star_idx) {
         bool has_outpost = false;
 
         for (int16_t i = 0; i < 5; ++i) {

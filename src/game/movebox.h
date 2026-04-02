@@ -110,4 +110,10 @@ namespace MOVEBOX {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513bc0});
         fn(count);
     }
+
+    inline void __cdecl Remove_Box_Check_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513D20});
+        fn();
+    }
 }

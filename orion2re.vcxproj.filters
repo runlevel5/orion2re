@@ -950,6 +950,15 @@
     <ClInclude Include="src\game\s_council.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\_antarans.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\antaroom.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\science.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

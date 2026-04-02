@@ -296,7 +296,7 @@ struct s_antaran {
     short offensive_deployed[9];
     undefined1 field6_0x3c;
     int invasion_stardate;
-    undefined1 field8_0x41;
+    uint8_t attack_notified_mask;
 };
 
 typedef struct s_battle_results s_battle_results, *Ps_battle_results;
@@ -4025,18 +4025,67 @@ struct s_racescrn_race_display {
 
 typedef struct s_report s_report, *Ps_report;
 
-typedef char __int8_t;
+typedef union s_report_data s_report_data, *Ps_report_data;
+
+typedef struct s_report_steal s_report_steal, *Ps_report_steal;
+
+typedef struct s_report_sabotage s_report_sabotage, *Ps_report_sabotage;
+
+typedef struct s_report_enemy_steal s_report_enemy_steal, *Ps_report_enemy_steal;
+
+typedef struct s_report_enemy_sabotage s_report_enemy_sabotage, *Ps_report_enemy_sabotage;
+
+struct s_report_enemy_sabotage {
+    int16_t enemy_player_idx;
+    uint8_t planet_idx;
+    uint8_t building_id;
+};
+
+struct s_report_sabotage {
+    int8_t framed_player_idx;
+    int8_t victim_player_idx;
+    uint8_t planet_idx;
+    uint8_t building_id;
+};
+
+struct s_report_enemy_steal {
+    int16_t enemy_player_idx;
+    int16_t tech_app_id;
+};
+
+struct s_report_steal {
+    int8_t framed_player_idx;
+    int8_t victim_player_idx;
+    int16_t tech_app_id;
+};
+
+union s_report_data {
+    struct s_report_steal steal;
+    struct s_report_sabotage sabotage;
+    struct s_report_enemy_steal enemy_steal;
+    struct s_report_enemy_sabotage enemy_sabotage;
+};
 
 struct s_report {
-    int field0_0x0;
-    int field1_0x4;
-    int field2_0x8;
-    int field3_0xc;
+    uint8_t type;
+    int16_t player_idx;
+    uint8_t action;
+    union s_report_data d;
+    undefined field4_0x8;
+    undefined field5_0x9;
+    undefined field6_0xa;
+    undefined field7_0xb;
+    undefined field8_0xc;
+    undefined field9_0xd;
+    undefined field10_0xe;
+    undefined field11_0xf;
     short field4_0x10;
-    __int8_t field5_0x12;
+    int8_t field5_0x12;
 };
 
 typedef struct s_saved_box s_saved_box, *Ps_saved_box;
+
+typedef char __int8_t;
 
 struct s_saved_box {
     short f0;

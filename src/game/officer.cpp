@@ -2299,6 +2299,50 @@ namespace OFFICER {
     /**
      * Iterates through all officers and grants a level/XP increment if they are hired.
      */
+    int8_t __cdecl Officer_Made_Level_Report_(int16_t player_idx, int8_t process_popups) {
+        int8_t found = 0;
+
+        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+            // Check if a report was found in previous iteration
+            if (found != 0) {
+                return 1;
+            }
+
+            s_leader_data* leader = &MOX::_leaders[i];
+            bool is_active = false;
+
+            // Logic to determine if the officer/leader is active or in a pool
+            if (((leader->status == 1) && (leader->location != -1)) || (leader->status == 0)) {
+                is_active = true;
+            }
+
+            if (is_active && (leader->player_index == (int8_t)player_idx) && (leader->display_level_popup != 0)) {
+                if (process_popups != 0) {
+                    int16_t loc = leader->location;
+
+                    // If leader is an Officer (type 0) and assigned to a ship
+                    if (leader->type == 0 && loc > -1) {
+                        loc = MOX::_ship[loc].location;
+
+                        // Resolve ship location to an absolute map index
+                        if (loc < 500 || loc >= 1000) {
+                            loc = HAROLD::Absolute_Location_(loc);
+                        } else {
+                            // Location is in-transit or invalid for report
+                            loc = -1;
+                        }
+                    }
+
+                    MAINPUPS::Officer_Gains_Level_Popup_(loc, i);
+                    leader->display_level_popup = 0;
+                }
+                found = 1;
+            }
+        }
+
+        return found;
+    }
+
     void __cdecl Check_For_Officer_Level_() {
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             s_leader_data& leader = MOX::_leaders[i];

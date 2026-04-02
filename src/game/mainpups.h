@@ -93,4 +93,22 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045bc60});
         return fn(star_idx);
     }
+
+    inline bool __cdecl Random_New_Officer_Popup_(int16_t player_idx) {
+        using Fn = bool(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A6C0});
+        return fn(player_idx);
+    }
+
+    inline void __cdecl New_System_Discovery_Popup_(short star_idx, int16_t special_type) {
+        using Fn = void(__cdecl*)(short, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045B850});
+        fn(star_idx, special_type);
+    }
+
+    inline void __cdecl Officer_Gains_Level_Popup_(int16_t location, int16_t leader_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045B540});
+        fn(location, leader_idx);
+    }
 }

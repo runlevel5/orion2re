@@ -436,22 +436,19 @@ namespace SHIPS {
     /**
      * @address 0041f730
      */
-    bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(short node_idx) {
-        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+    bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(int16_t node_idx) {
         bool result = false;
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
 
-        // Check if the ship belongs to another player
         if (HACCESS::Ship_Owner_(ship_idx) != MOX::_PLAYER_NUM) {
             s_ship_data* ship = &MOX::_ship[ship_idx];
 
-            // Verify the ship is active/moving (status != 0)
             if (ship->status != 0) {
-                // Get the absolute location of the ship's target/current position
-                int16_t abs_loc = HAROLD::Absolute_Location_(ship->location);
+                int16_t star_idx = HAROLD::Absolute_Location_(ship->location);
 
-                // Check if the player has any infrastructure at that location
-                if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, abs_loc) ||
-                    HAROLD::Player_Has_Outpost_(MOX::_PLAYER_NUM, abs_loc)) {
+                if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, star_idx)) {
+                    result = true;
+                } else if (HAROLD::Player_Has_Outpost_(MOX::_PLAYER_NUM, star_idx)) {
                     result = true;
                 }
             }

@@ -45,7 +45,7 @@ namespace SHIPS {
 
     void __cdecl Clear_All_Ships_Auto_Colonization_Flag_(int16_t* ship_list);
 
-    bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(short node_idx);
+    bool __cdecl Enemy_Ship_Heading_Toward_Our_Colony_(int16_t node_idx);
     inline int16_t __cdecl Deploy_Ships_To_Attack_Antares_() {
         using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041FE40});
