@@ -468,6 +468,10 @@ namespace BILL {
         return static_cast<int16_t>(MOX::_player[player_num].spies[player_num] & 0x3f);
     }
 
+    int16_t __cdecl Get_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx) {
+        return static_cast<int16_t>(MOX::_player[player_idx].spies[target_player_idx] >> 6);
+    }
+
     /**
      * @address 00407730
      */

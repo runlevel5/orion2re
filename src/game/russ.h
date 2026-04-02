@@ -9,6 +9,12 @@ namespace RUSS {
 
     int16_t __cdecl Get_Weighted_Choice_Short_(const int16_t* weights, int16_t count);
 
+    inline int16_t __cdecl Get_Weighted_Choice_Int_(uint32_t* weights, int16_t num_weights) {
+        using Fn = int16_t(__cdecl*)(uint32_t*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d7950});
+        return fn(weights, num_weights);
+    }
+
     inline char* __cdecl Star_Name_(int32_t star_idx) {
         using Fn = char*(__cdecl*)(int32_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x004d7c30})(star_idx);

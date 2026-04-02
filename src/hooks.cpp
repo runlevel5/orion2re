@@ -2588,6 +2588,17 @@ namespace hooks {
         { 0x004aaf40, &REPORT::Has_Report_ },
         { 0x004a9e40, &REPORT::sprintf_report_ },
         { 0x004aa020, &REPORT::Client_Initialize_Reports_ },
+        { 0x004b8600, &spy::Tech_Spy_Bonus_ },
+        { 0x004b8450, &spy::Compute_Spy_Bonuses_ },
+        { 0x004b8be0, &spy::Resolve_Spies_ },
+        { 0x004b97c0, &spy::Bring_Home_Spies_Vs_ },
+        { 0x004b9570, &spy::Resolve_Assassins_ },
+        { 0x004b8d20, &spy::Resolve_Player_Spies_ },
+        { 0x004b8660, &spy::Allocate_AI_Spies_ },
+        { 0x004b9540, &spy::N_Spies_Bonus_ },
+        { 0x004b91d0, &spy::Steal_App_ },
+        { 0x004b9030, &spy::Frame_Another_ },
+        { 0x004b9380, &spy::Destroy_Random_Building_ },
     };
 
     void Install_Hooks()

@@ -50,6 +50,8 @@ namespace BILL {
 
     int8_t __cdecl Get_My_Spy_Mission_(int16_t target_player_idx);
 
+    int16_t __cdecl Get_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx);
+
     void __cdecl Set_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx, int8_t mission);
 
     int16_t __cdecl Get_My_Agent_Number_();

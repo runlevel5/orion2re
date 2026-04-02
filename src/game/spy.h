@@ -1,21 +1,35 @@
 #pragma once
 
+struct s_leader_data;
+
 namespace spy {
-    inline void __cdecl Compute_Spy_Bonuses_(s_player* player, int16_t* spy_bonus, int16_t* agent_bonus) {
-        using Fn = void(__cdecl*)(s_player*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B8450});
-        fn(player, spy_bonus, agent_bonus);
-    }
+    inline int8_t (&_lookup_table)[8] =
+        *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x0054F090});
 
-    inline void __cdecl Resolve_Spies_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004b8be0 });
-        fn();
-    }
+    int16_t __cdecl Tech_Spy_Bonus_(s_player* player);
 
-    inline void __cdecl Bring_Home_Spies_Vs_(int16_t target_player_idx, int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b97c0});
-        fn(target_player_idx, player_idx);
-    }
+    void __cdecl Compute_Spy_Bonuses_(s_player* player, int16_t* defense_bonus_out, int16_t* attack_bonus_out);
+
+    void __cdecl Resolve_Spies_();
+
+    inline int16_t* _spy_bonuses =
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CDD8});
+
+    void __cdecl Resolve_Assassins_();
+
+    void __cdecl Leader_Assassinates_(s_leader_data* leader);
+
+    void __cdecl Allocate_AI_Spies_(s_player* player);
+
+    void __cdecl Resolve_Player_Spies_(s_player* player);
+
+    void __cdecl Bring_Home_Spies_Vs_(int16_t player_idx, int16_t enemy_idx);
+
+    int32_t __cdecl N_Spies_Bonus_(int32_t spy_count);
+
+    void __cdecl Steal_App_(s_player* attacker, s_player* victim, int8_t frame_flag);
+
+    bool __cdecl Frame_Another_(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t victim_idx);
+
+    void __cdecl Destroy_Random_Building_(int16_t framed_player_idx, int16_t victim_player_idx, int acting_player_idx);
 }
