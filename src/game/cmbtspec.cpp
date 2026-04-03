@@ -1118,8 +1118,8 @@ namespace CMBTSPEC {
         if (ship->previous_owner < 10) {
             if (explosion_type != 1) {
                 int16_t damage = CMBTFIR2::Damage_From_Ship_Exploding_(ship_idx);
-                Do_Spherical_SFX_(ship_idx, x, y, explosion_type, damage);
                 ship->unit_status = 5 /* DESTROYED */;
+                Do_Spherical_SFX_(ship_idx, x, y, explosion_type, damage);
                 return;
             }
 
@@ -1749,8 +1749,8 @@ namespace CMBTSPEC {
                 RUSS::Mox_Sync_Update_();
                 timer::Release_Time_(1);
 
-                ship_collapse_3_val -= step * 8;
-                ship_collapse_4_val -= step * 10;
+                ship_collapse_3_val -= step * 10;
+                ship_collapse_4_val -= step * 8;
             }
 
             MOX::_dont_draw_ship = -1;

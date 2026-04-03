@@ -97,6 +97,7 @@
 #include "racerprt.h"
 #include "newpup.h"
 #include "score.h"
+#include "s_score.h"
 #include "hotpop.h"
 #include "colsum.h"
 #include "netstart.h"

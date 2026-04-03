@@ -1,15 +1,13 @@
---- src/game/tech.cpp
-+++ src/game/tech.cpp
-@@ -293,7 +293,11 @@
-                         MOX::_cur_plyr_ptr->current_research_field = static_cast<char>(_g_selected_entry_p->tech_field_id);
-                         MOX::_cur_plyr_ptr->current_research_application =
-                             static_cast<char>(_g_selected_entry_p->app_ids[_g_selected_entry_p->selected_app_index]);
--                        input_val = 0;
-+                        allocate::Pop_Block_(MOX::_screen_seg);
-+                        MOX2::Put_Auto_Function_(&auto_func);
-+                        fields::Clear_Fields_();
-+                        Restore_Hyper_Tech_Values_(MOX::_PLAYER_NUM);
-+                        fields::Deactivate_Help_List_();
-+                        return;
-                     }
-                     else if (input_val <= last_btn_field) {
+--- src/game/cmbtspec.cpp
++++ src/game/cmbtspec.cpp
+@@ -1763,8 +1763,8 @@
+                 RUSS::Mox_Sync_Update_();
+                 timer::Release_Time_(1);
+ 
+-                ship_collapse_3_val -= step * 8;
+-                ship_collapse_4_val -= step * 10;
++                ship_collapse_3_val -= step * 10;
++                ship_collapse_4_val -= step * 8;
+             }
+ 
+             MOX::_dont_draw_ship = -1;

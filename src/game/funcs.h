@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <cstdint>
 
-void __cdecl nullsub_004d7840();
-
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
 inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
@@ -293,6 +291,11 @@ inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintp
 
 inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E00});
 
+inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
+inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
+inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
+inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
+
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
@@ -388,6 +391,12 @@ inline int16_t __cdecl Range_(int16_t y1, int16_t x1, int16_t y2, int16_t x2) {
 inline int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
     using Fn = int16_t(__cdecl*)(int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481cf0});
+    return fn(player_idx);
+}
+
+inline int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
+    using Fn = int16_t(__cdecl*)(int16_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E2630});
     return fn(player_idx);
 }
 
