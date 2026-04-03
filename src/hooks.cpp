@@ -2646,6 +2646,12 @@ namespace hooks {
         { 0x004e3540, &SCORE::Load_Hi_Score_Screen_ },
         { 0x004E2A20, &SCORE::Draw_Cap_Pop_ },
         { 0x004e2d90, &SCORE::Draw_Eliminated_Race_Pictures_ },
+        { 0x004e3110, &SCORE::Draw_Pop_ },
+        { 0x004e49d0, &SCORE::Move_Sorted_HOF_Data_ },
+        { 0x004E4940, &SCORE::Sort_HOF_Scores_ },
+        { 0x004e48d0, &SCORE::qsort_hof_scores_descending_ },
+        { 0x004e4e40, &SCORE::ascending_qsort_uchar_ },
+        { 0x004e4980, &SCORE::qsort_hof_scores_ascending_ },
     };
 
     void Install_Hooks()

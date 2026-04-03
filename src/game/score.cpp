@@ -5,6 +5,43 @@ namespace SCORE {
         return;
     }
 
+    int32_t __cdecl qsort_hof_scores_descending_(int16_t* a, int16_t* b) {
+        if (b[0] < a[0]) {
+            return -1;
+        }
+        if (a[0] < b[0]) {
+            return 1;
+        }
+        if (b[1] < a[1]) {
+            return -1;
+        }
+        if (a[1] < b[1]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * @address 0x004e4980
+     */
+    int32_t __cdecl qsort_hof_scores_ascending_(const int16_t* param_1, const int16_t* param_2) {
+        if (param_2[0] < param_1[0]) {
+            return 1;
+        }
+        if (param_1[0] < param_2[0]) {
+            return -1;
+        }
+        if (param_2[0] == param_1[0]) {
+            if (param_2[1] < param_1[1]) {
+                return 1;
+            }
+            if (param_1[1] < param_2[1]) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
     /**
      * @address 004e3ad0
      */
@@ -481,7 +518,7 @@ namespace SCORE {
             _hi->sort_list[i][1] = (int16_t)i;
         }
 
-        _qsort(_hi->sort_list, 10, 4, qsort_hof_scores_descending_);
+        _qsort(_hi->sort_list, 10, 4, (int(__cdecl*)(const void*, const void*))qsort_hof_scores_descending_);
 
         int16_t y = 131;
         for (int i = 0; i < 10; ++i) {
@@ -524,6 +561,38 @@ namespace SCORE {
         fields::Enable_Draw_All_Fields_();
 
         animate::Draw_Palette_(_hi->background_anim);
+    }
+
+    /**
+     * @address 0x004E4940
+     */
+    void __cdecl Sort_HOF_Scores_(int16_t sort_list[10][2]) {
+        for (int16_t i = 0; i < 10; ++i) {
+            sort_list[i][0] = _hof.scores[i];
+            sort_list[i][1] = i;
+        }
+        _qsort(sort_list, 10, 4, (int(__cdecl*)(const void*, const void*))qsort_hof_scores_ascending_);
+    }
+
+    /**
+     * @address 0x004e49d0
+     */
+    void __cdecl Move_Sorted_HOF_Data_(int16_t sort_list[10][2]) {
+        s_hof local_hof;
+
+        local_hof.version = _hof.version;
+
+        for (int16_t i = 0; i < 10; ++i) {
+            int16_t idx = sort_list[i][1];
+
+            strcpy(local_hof.player_names[i], _hof.player_names[idx]);
+            local_hof.scores[i] = _hof.scores[idx];
+            local_hof.race_ids[i] = _hof.race_ids[idx];
+            local_hof.difficulties[i] = _hof.difficulties[idx];
+            strcpy(local_hof.race_names[i], _hof.race_names[idx]);
+        }
+
+        _hof = local_hof;
     }
 
     /**
@@ -1164,6 +1233,10 @@ namespace SCORE {
         allocate::Pop_Block_(MOX::_screen_seg);
     }
 
+    int __cdecl ascending_qsort_uchar_(const void* a, const void* b) {
+        return static_cast<int>(*static_cast<const uint8_t*>(a)) - static_cast<int>(*static_cast<const uint8_t*>(b));
+    }
+
     void __cdecl Build_Captured_Colonists_Array_(int16_t player_idx) {
         uint32_t original_seed;
         uint16_t weights[8];
@@ -1244,6 +1317,85 @@ namespace SCORE {
         // Change global font color offset before fetching temporary colors
         MOX::_mox_font_colors_offset = 0xF3;
         SCORE::_hi->temp_colors = *MISC::Font_Colors2_(4, 208 /* 0xD0 */, 210 /* 0xD2 */);
+    }
+
+    /**
+     * @address 0x004e3110
+     */
+    void __cdecl Draw_Pop_(uint8_t is_captured, int16_t max_pop, int16_t current_pop) {
+        int16_t space;
+        s_animation_header* anim;
+        int16_t y_start;
+        int16_t y_offset = 0;
+        int16_t x_offset = 0;
+        int16_t row_anim_count = 0;
+        int16_t drawn_count = 0;
+
+        y_start = SCORE::_hi->next_draw_y;
+
+        anim = COLONY::C_Anims_(13);
+        remap::Calculate_Picture_Remap_Colors_(anim);
+
+        if (current_pop < max_pop * 48) {
+            space = 12;
+        } else if (current_pop < max_pop * 58) {
+            space = 10;
+        } else if (current_pop < max_pop * 72) {
+            space = 8;
+        } else if (current_pop < max_pop * 97) {
+            space = 6;
+        } else {
+            space = 4;
+        }
+
+        if (current_pop > 0) {
+            for (int16_t i = 0; i < current_pop; ++i) {
+                if (i < max_pop * 97) {
+                    if (is_captured == 0) {
+                        anim = COLONY::Colony_Pop_Anim_(
+                            SCORE::_hi->pop_units[i].race_id,
+                            SCORE::_hi->pop_units[i].icon_id
+                        );
+                    } else {
+                        anim = COLONY::Colony_Pop_Icon_(
+                            static_cast<uint16_t>(static_cast<uint8_t>(SCORE::_hi->captured_pop_race_ids[i]))
+                        );
+                    }
+
+                    if (current_pop > max_pop * 27) {
+                        if ((row_anim_count & 1) == 0) {
+                            animate::Remap_Draw_(x_offset + 140, y_start, anim);
+                            y_offset = 0;
+                        } else {
+                            animate::Remap_Draw_(x_offset + 140, y_start + space, anim);
+                            y_offset = space;
+                        }
+                        x_offset += space;
+                        drawn_count++;
+
+                        if (x_offset + 24 > 360) {
+                            y_start += 30;
+                            y_offset = 0;
+                            row_anim_count = 0;
+                            x_offset = 0;
+                        }
+                    } else {
+                        x_offset = (drawn_count % 25) * 22;
+                        y_offset = (drawn_count / 25) * 22;
+                        animate::Remap_Draw_(x_offset + 140, y_start + y_offset, anim);
+                        drawn_count++;
+                    }
+                    row_anim_count++;
+                }
+            }
+
+            if (current_pop > 0) {
+                SCORE::_hi->next_draw_y = y_start + y_offset + 28;
+                return;
+            }
+        }
+
+        SCORE::_hi->next_draw_y += 3;
     }
 
     /**

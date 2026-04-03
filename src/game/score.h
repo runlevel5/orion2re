@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_hof;
+
 namespace SCORE {
     inline s_hof& _hof = *reinterpret_cast<s_hof*>(std::uintptr_t{0x00595C60});
     inline char (&_default_names)[10][20] = *reinterpret_cast<char (*)[10][20]>(std::uintptr_t{0x0055A448});
@@ -33,11 +35,9 @@ namespace SCORE {
 
     void __cdecl Init_Hall_Of_Fame_Screen_();
 
-    inline int __cdecl qsort_hof_scores_descending_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e48d0});
-        return fn(a, b);
-    }
+    int32_t __cdecl qsort_hof_scores_descending_(int16_t* a, int16_t* b);
+
+    int32_t __cdecl qsort_hof_scores_ascending_(const int16_t* param_1, const int16_t* param_2);
 
     void __cdecl Get_Hall_Of_Fame_Colors_();
 
@@ -45,16 +45,9 @@ namespace SCORE {
 
     int16_t __cdecl Hi_Score_Screen_(int16_t player_idx);
 
-    inline void __cdecl Sort_HOF_Scores_(int16_t sort_list[10][2]) {
-        using Fn = void(__cdecl*)(int16_t[10][2]);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004e4940})(sort_list);
-    }
+    void __cdecl Sort_HOF_Scores_(int16_t sort_list[10][2]);
 
-    inline void __cdecl Move_Sorted_HOF_Data_(void* sort_buffer) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e49d0});
-        fn(sort_buffer);
-    }
+    void __cdecl Move_Sorted_HOF_Data_(int16_t sort_list[10][2]);
 
     void __cdecl Write_HOF_File_();
 
@@ -84,11 +77,7 @@ namespace SCORE {
 
     void __cdecl Draw_Total_Score_();
 
-    inline void __cdecl Draw_Pop_(int32_t a1, int32_t a2, int16_t a3) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E3110});
-        fn(a1, a2, a3);
-    }
+    void __cdecl Draw_Pop_(uint8_t is_captured, int16_t max_pop, int16_t current_pop);
 
     void __cdecl Draw_Reg_Pop_();
 
@@ -108,11 +97,7 @@ namespace SCORE {
 
     void __cdecl Get_From_Tmp_Pop_(s_hiscore_tmp_pop* tmp_pop_list, uint16_t race_idx, int16_t count, int16_t* out_colony_idx, int16_t* out_pop_idx);
 
-    inline int __cdecl ascending_qsort_uchar_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E4E40});
-        return fn(a, b);
-    }
+    int __cdecl ascending_qsort_uchar_(const void* a, const void* b);
 
     void __cdecl Build_Captured_Colonists_Array_(int16_t player_idx);
 
