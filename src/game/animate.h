@@ -4,6 +4,14 @@
 struct s_animation_header;
 
 namespace animate {
+    struct s_palette_header {
+        int16_t start_index;
+        int16_t count;
+    };
+
+    inline s_palette_header*& _palette_header =
+        *reinterpret_cast<s_palette_header**>(std::uintptr_t{0x00576328});
+
     inline s_animation_header*& _animation_header =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x0057632C });
 

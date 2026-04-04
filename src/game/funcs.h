@@ -633,6 +633,7 @@ inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // 
 inline const char* s_councmsg_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A80}); // "councmsg.lbx"
 inline const char* s_ships_lbx_005597b4 = reinterpret_cast<const char*>(std::uintptr_t{0x005597B4}); // "ships.lbx"
 inline const char* s_billtext_lbx_0055135c = reinterpret_cast<const char*>(std::uintptr_t{0x0055135C}); // "billtext.lbx"
+inline char* s_racerprt_lbx_005574d8 = reinterpret_cast<char*>(std::uintptr_t{0x005574D8});
 inline const char* const s_gstar_lbx_00558544 = reinterpret_cast<const char*>(std::uintptr_t{0x00558544}); // "gstar.lbx"
 inline char* const s_SPA_HELP_LBX_00557450 = reinterpret_cast<char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
 inline char* const s_ITA_HELP_LBX_00557460 = reinterpret_cast<char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"

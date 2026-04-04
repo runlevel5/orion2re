@@ -354,6 +354,9 @@
     <ClCompile Include="src\game\shipstak.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\racecust.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
     <ClCompile Include="src\game\raceopt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
@@ -421,6 +424,9 @@
       <Filter>src\game</Filter>
     </ClCompile>
     <ClCompile Include="src\game\score.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\racerprt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
   </ItemGroup>

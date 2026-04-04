@@ -248,6 +248,8 @@ namespace MOX {
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
     inline s_player*& _cur_plyr_ptr = *reinterpret_cast<s_player**>(std::uintptr_t{0x005974E0});
+    inline char** _personality_labels = reinterpret_cast<char**>(std::uintptr_t{0x00596CC0});
+    inline char** _objective_labels = reinterpret_cast<char**>(std::uintptr_t{0x0059B3E0});
     inline char** _treaty_labels = reinterpret_cast<char**>(std::uintptr_t{0x005A1B00});
     inline char** _help_category_labels = reinterpret_cast<char**>(std::uintptr_t{0x0059BFE0});
     inline int16_t& _old_system_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5F8});

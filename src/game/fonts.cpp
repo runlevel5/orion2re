@@ -49,8 +49,8 @@ namespace fonts {
         void* loaded_palette = farload::Far_Reload_(_font_name, static_cast<int32_t>(palette_id) + 1, _palette_block);
 
         // Calculate the range to copy. Colors are assumed to be 4-byte entries.
-        video::s_palette_entry* src = reinterpret_cast<video::s_palette_entry*>(loaded_palette) + start_index;
-        video::s_palette_entry* dst = &video::_current_palette[start_index];
+        s_palette_entry* src = reinterpret_cast<s_palette_entry*>(loaded_palette) + start_index;
+        s_palette_entry* dst = &video::_current_palette[start_index];
         uint32_t byte_count = static_cast<uint32_t>(end_index - start_index + 1) * sizeof(uint32_t);
 
         struct_::Copy_Structure_(dst, src, byte_count);

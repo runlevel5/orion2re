@@ -36,7 +36,7 @@ namespace hooks {
         ASSERT(sizeof(s_tech_weapon_data) == 28, "s_tech_weapon_data");
         ASSERT(sizeof(s_font) == 0x235c, "s_font");
         ASSERT(sizeof(s_MSG) == 0x12, "s_MSG");
-        ASSERT(sizeof(video::s_palette_entry) == 4, "video::Palette_Entry");
+        ASSERT(sizeof(s_palette_entry) == 4, "video::Palette_Entry");
         ASSERT(sizeof(s_skill_data) == 0x12, "MOX::s_skill_data");
         ASSERT(sizeof(s_field) == 0x37, "s_field");
     }
@@ -2665,6 +2665,17 @@ namespace hooks {
         { 0x00438AE0, &raceopt::Set_Race_Option_Help_List_ },
         { 0x00439d60, &raceopt::Add_Race_Options_Fields_EM_ },
         { 0x00439B20, &raceopt::Real_Ability_Cost_ },
+        { 0x00471930, &RACERPRT::Race_Report_Screen_ },
+        { 0x0043C0C0, &settler::N_Freighters_Player_Can_Scrap_ },
+        { 0x0043BE10, &settler::Move_Settlers_ },
+        { 0x0043bcf0, &settler::Add_Settler_To_Colony_ },
+        { 0x0052bc90, &remap::Update_Glass_Remap_Colors_ },
+        { 0x0052bdb0, &remap::Sort_Palette_List_ },
+        { 0x0052be80, &remap::Find_Closest_Color_ },
+        { 0x0052c070, &remap::Create_Picture_Remap_Palette_ },
+        { 0x0052c020, &remap::Calculate_Picture_Remap_Colors_ },
+        { 0x0052c0e0, &remap::Get_Remap_Palette_Color_ },
+        { 0x0043baa0, &settler::Room_For_Another_ },
     };
 
     void Install_Hooks()

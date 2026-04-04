@@ -1,14 +1,11 @@
 #pragma once
 
 namespace settler {
-    inline int16_t __cdecl N_Freighters_Player_Can_Scrap_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x0043c0c0)(player_idx);
-    }
+    int32_t __cdecl N_Freighters_Player_Can_Scrap_(int16_t player_idx);
 
-    inline void __cdecl Move_Settlers_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043be10 });
-        fn();
-    }
+    bool __cdecl Room_For_Another_(s_colony* colony, int16_t race_idx, int8_t include_freighters);
+
+    int8_t __cdecl Add_Settler_To_Colony_(uint32_t settler_data, s_colony* colony);
+
+    void __cdecl Move_Settlers_();
 }

@@ -1754,6 +1754,15 @@ struct s_game_popup_fields {
     undefined field60_0x277;
 };
 
+typedef struct s_glass_color s_glass_color, *Ps_glass_color;
+
+struct s_glass_color {
+    uint8_t intensity;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
 typedef struct s_global_combat_data s_global_combat_data, *Ps_global_combat_data;
 
 struct s_global_combat_data {
@@ -3191,6 +3200,15 @@ struct s_orion_candidate {
     short star_idx;
 };
 
+typedef struct s_palette_entry s_palette_entry, *Ps_palette_entry;
+
+struct s_palette_entry {
+    uint8_t changed;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
 typedef struct s_parsec s_parsec, *Ps_parsec;
 
 struct s_parsec {
@@ -3586,6 +3604,27 @@ struct s_qship {
     int16_t missile_damage_modifier;
     int16_t max_hits;
     int16_t structural_damage;
+};
+
+typedef struct s_racecust_race_customize s_racecust_race_customize, *Ps_racecust_race_customize;
+
+typedef struct s_racecust_trait_mod s_racecust_trait_mod, *Ps_racecust_trait_mod;
+
+struct s_racecust_trait_mod {
+    uint8_t trait_idx;
+    int8_t trait_val;
+};
+
+struct s_racecust_race_customize {
+    uint8_t count;
+    struct s_racecust_trait_mod items[8];
+};
+
+typedef struct s_racecust_race_evolution s_racecust_race_evolution, *Ps_racecust_race_evolution;
+
+struct s_racecust_race_evolution {
+    uint8_t count;
+    struct s_racecust_trait_mod items[2];
 };
 
 typedef struct s_racescrn_icon_layout s_racescrn_icon_layout, *Ps_racescrn_icon_layout;

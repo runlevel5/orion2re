@@ -48,6 +48,16 @@ namespace allocate {
 
     void __cdecl Pop_Block_(void* block);
 
+    inline void __cdecl Mark_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB10})(block);
+    }
+
+    inline void __cdecl Release_Block_(void* block) {
+        using Fn = void(__cdecl*)(void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB20})(block);
+    }
+
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
 
     void* __cdecl Allocate_Next_Block_(void* block, uint32_t size);

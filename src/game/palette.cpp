@@ -7,7 +7,7 @@ namespace palette {
 
         if (start <= end) {
             // Pointer to the first palette status entry to modify
-            video::s_palette_entry* entry = &video::_current_palette[start];
+            s_palette_entry* entry = &video::_current_palette[start];
             
             // Calculate number of entries to mark (inclusive)
             int32_t count = (end - start) + 1;
@@ -27,7 +27,7 @@ namespace palette {
         if (start <= end) {
             // Calculate how many entries to clear
             int count = (int)end - (int)start + 1;
-            video::s_palette_entry* entry = &video::_current_palette[start];
+            s_palette_entry* entry = &video::_current_palette[start];
 
             do {
                 // Clear only the 'changed' status byte (offset 0 in the 4-byte record)

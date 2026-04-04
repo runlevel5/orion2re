@@ -185,6 +185,11 @@ namespace FMTPARA {
 
     void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr);
 
+    inline void __cdecl Set_Paragraph_Integer_Pointer_(int index, void* ptr) {
+        using Fn = void(__cdecl*)(int, void*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x00432E30})(index, ptr);
+    }
+
     inline void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t id, void* ptr, int32_t size) {
         using Fn = void(__cdecl*)(uint16_t, void*, int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433e10});

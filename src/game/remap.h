@@ -1,20 +1,22 @@
 #pragma once
 
+struct s_animation_header;
+
 namespace remap {
-    inline void __cdecl Update_Glass_Remap_Colors_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x0052BC90)();
-    }
+    inline uint8_t (&_picture_remap_color_list)[256] =
+        *reinterpret_cast<uint8_t(*)[256]>(std::uintptr_t{0x00576330});
 
-    inline void __cdecl Calculate_Picture_Remap_Colors_(s_animation_header* anim) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052c020});
-        fn(anim);
-    }
+    inline const char* s_Remapped_Picture_Must_Have_Palet_0055b2ac =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B2AC}); // "Remapped Picture Must Have Palette"
 
-    inline uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index) {
-        using Fn = uint8_t(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052c0e0});
-        return fn(index);
-    }
+    void __cdecl Update_Glass_Remap_Colors_();
+    void __cdecl Sort_Palette_List_();
+
+    uint8_t __cdecl Find_Closest_Color_(uint8_t r, uint8_t g, uint8_t b);
+
+    void __cdecl Create_Picture_Remap_Palette_(uint8_t* src_palette, uint8_t* remap_table);
+
+    void __cdecl Calculate_Picture_Remap_Colors_(s_animation_header* header);
+
+    uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index);
 }

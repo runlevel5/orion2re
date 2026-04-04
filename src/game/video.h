@@ -20,18 +20,18 @@ namespace video {
 
 	inline auto& _glass_remap_colors = *reinterpret_cast<uint8_t(*)[16][256]>(std::uintptr_t{ 0x00579998 });
 
-#pragma pack(push, 1)
-	struct s_palette_entry {
-		uint8_t changed;
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-	};
-#pragma pack(pop)
+	inline s_glass_color (&_glass_colors)[16] =
+		*reinterpret_cast<s_glass_color(*)[16]>(std::uintptr_t{ 0x00579858 });
 
 	// Address 0x579350 is the base of the current palette status array
 	inline s_palette_entry* _current_palette =
 		reinterpret_cast<s_palette_entry*>(std::uintptr_t{ 0x00579350 });
+
+	inline uint8_t** _palette_list =
+		reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00579750 });
+
+	inline uint8_t* _palette_reds =
+		reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579898 });
 
 	inline uint8_t& DAT_00579354 =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579354 });
