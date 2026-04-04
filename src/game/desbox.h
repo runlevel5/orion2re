@@ -30,7 +30,7 @@ namespace DESBOX {
     inline int16_t& _weapon_replacement_arcs = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566408});
     inline uint16_t& _weapon_replacement_rack = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A61E2});
     inline uint8_t& _wait_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566400});
-    inline uint8_t (&_valid_mods)[15] = *reinterpret_cast<uint8_t(*)[15]>(std::uintptr_t{0x005663E0});
+    inline uint8_t (&_valid_mods)[16] = *reinterpret_cast<uint8_t(*)[16]>(std::uintptr_t{0x005663E0});
     inline uint8_t* _valid_arcs_racks = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005663F8});
 
     int16_t __cdecl Weapon_Choices_(int16_t player_num);
@@ -39,45 +39,52 @@ namespace DESBOX {
 
     void __cdecl Set_Up_Weapon_Scroll_Bar_();
     void __cdecl Space_With_Weapons_();
-    inline int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048f140});
-        return fn(weapon_idx);
-    }
+    int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx);
     void __cdecl Add_Replacement_Weapon_Fields_(int16_t* cancel_btn_field, int16_t* fullscreen_field);
     void __cdecl Draw_Weapons_Replacement_Box_();
     void __cdecl Get_Weapons_Box_Base_Dimensions_();
     void __cdecl Set_Up_Weapon_Display_(int16_t weapon_index);
     void __cdecl Weapon_Replacement_Help_(int16_t weapon_idx);
-    inline int16_t __cdecl Weapon_Index_(int16_t filter_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493990});
-        return fn(filter_idx);
-    }
+    int16_t __cdecl Weapon_Index_(int16_t index);
     void __cdecl Print_Weapon_Mod_Help_Description_(int16_t mod_id);
     int16_t __cdecl Scan_Replacement_Fields_(int16_t field_id, int16_t target_field, int16_t* out_field_index, int16_t* out_visible_row);
     void __cdecl Update_Weapon_Replacement_(int16_t* exit_flag, int16_t weapon_choice, int16_t slot_idx);
-    inline void __cdecl Set_New_Weapon_Modifications_(int16_t* weapon_specials) {
-        using Fn = void(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004933b0});
-        fn(weapon_specials);
-    }
+    void __cdecl Set_New_Weapon_Modifications_(uint16_t* modifications);
     void __cdecl Print_Weapon_Modification_Message_(int16_t mod_idx);
     int16_t __cdecl Update_Field_Item_Chosen_(int16_t weapon_idx);
-    inline int __cdecl qsort_by_research_cost_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00493A00})(a, b);
-    }
+    int __cdecl qsort_by_research_cost_(const void* a, const void* b);
 
     void __cdecl Generic_Replacement_Box_();
 
     void __cdecl Draw_Darkened_Design_Screen_();
 
-    inline void __cdecl Draw_Generic_Replacement_Box_() {
+    int16_t __cdecl Special_System_Choices_();
+
+    void __cdecl Set_Up_Special_System_Scroll_Bar_();
+
+    void __cdecl Special_System_Replacement_Box_Dimensions_(int32_t ignored_param, int16_t row_count);
+
+    void __cdecl Draw_Special_Systems_Replacement_Box();
+
+    inline void __cdecl Print_Special_System_Data_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048fec0});
+        fn(x, y);
+    }
+
+    inline void __cdecl Draw_Special_Systems_Scroll_Bar_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048E580});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048dd10});
         fn();
     }
+
+    void __cdecl Add_Special_System_Fields_(int16_t* btn1, int16_t* btn2);
+
+    int16_t __cdecl Special_System_Exclusion_(int16_t special_idx, int16_t* out_conflict_id);
+
+    int16_t __cdecl Items_Selected_();
+
+    void __cdecl Draw_Generic_Replacement_Box_();
 
     void __cdecl Generic_Replacement_Box_Choices_();
 
@@ -91,11 +98,7 @@ namespace DESBOX {
 
     void __cdecl Weapons_Replacement_Box_();
 
-    inline void __cdecl Special_Systems_Box_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048f4d0});
-        fn();
-    }
+    void __cdecl Special_Systems_Box_();
     int8_t __cdecl Application_Type_(int16_t tech_app_id);
 
     void __cdecl Update_Weapon_Modification_Data_();
@@ -104,42 +107,28 @@ namespace DESBOX {
 
     int16_t __cdecl Valid_Modifications_(int8_t* mod_status_list);
 
-    inline void __cdecl Print_Main_Weapon_Box_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00492170});
-        fn(x, y);
-    }
+    void __cdecl Print_Shield_Data_(int16_t x, int16_t y);
+
+    void __cdecl Print_Computer_Data_(int16_t x, int16_t y);
+
+    void __cdecl Print_Main_Weapon_Box_(int16_t x, int16_t y);
+   
     void __cdecl Draw_Weapons_Scroll_Bar_();
     void __cdecl Draw_Weapons_Rack_Box_(int16_t x, int16_t y);
     void __cdecl Draw_Weapons_Arc_Box_(int16_t x, int16_t y);
     void __cdecl Draw_Weapons_Mod_Box_(int16_t x, int16_t y);
 
-    inline void __cdecl Clear_Weapon_Replacement_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x00491850)();
-    }
+    void __cdecl Clear_Weapon_Replacement_Fields_();
 
     int __cdecl New_Arc_Space_(uint8_t arc_index);
 
-    inline void __cdecl Get_Weapon_Mod_Field_XYs_(int16_t* unused, int16_t* x_coords, int16_t* y_coords) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(0x00491E30)(unused, x_coords, y_coords);
-    }
+    void __cdecl Get_Weapon_Mod_Field_XYs_(int16_t* mod_indices, int16_t* x_coords, int16_t* y_coords);
 
-    inline bool __cdecl Mod_Allowed_On_Weapon_Type_(uint8_t mod_idx) {
-        using Fn = bool(__cdecl*)(uint8_t);
-        return reinterpret_cast<Fn>(0x004920B0)(mod_idx);
-    }
+    int8_t __cdecl Mod_Allowed_On_Weapon_Type_(uint8_t mod_idx);
 
-    inline bool __cdecl Should_Add_Mod_(int16_t mod_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(0x00492FC0)(mod_idx);
-    }
+    int8_t __cdecl Should_Add_Mod_(int16_t mod_idx);
 
-    inline int16_t __cdecl Weapon_Choice_Valid_(char* msg_buf) {
-        using Fn = int16_t(__cdecl*)(char*);
-        return reinterpret_cast<Fn>(0x00493530)(msg_buf);
-    }
+    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out);
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100}); // ""
     inline const char* s_plus = reinterpret_cast<const char*>(std::uintptr_t{0x00551118}); // "+"

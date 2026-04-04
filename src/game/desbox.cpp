@@ -1,6 +1,254 @@
 #include "pch.h"
 
 namespace DESBOX {
+
+    int16_t __cdecl Special_System_Choices_() {
+        memset(MOX::_design->item_unlocked, 0, 41);
+
+        for (int i = 0; i < 40; ++i) {
+            MOX::_design_choice_items[i] = -1;
+            MOX::_design_choice_item_selected[i] = 0;
+        }
+
+        MOX::_design_choice_items[0] = 0;
+        MOX::_scroll_bar->total_rows = 1;
+
+        for (int i = 0; i < 39; ++i) {
+            if (MOX::_scroll_bar->total_rows >= 40) {
+                break;
+            }
+
+            uint16_t tech_app_id = TECHDATA::_specials[i].tech_app_id;
+            if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[tech_app_id] == 3 /* LEARNED */) {
+                MOX::_design_choice_items[MOX::_scroll_bar->total_rows] = (short)i;
+                MOX::_scroll_bar->total_rows++;
+            }
+        }
+
+        for (short slot_idx = 0; slot_idx < 8; ++slot_idx) {
+            short device_id = MOX::_design->special_devices[slot_idx];
+            if (device_id > 0) {
+                for (short choice_idx = 0; choice_idx < MOX::_scroll_bar->total_rows; ++choice_idx) {
+                    if (device_id == MOX::_design_choice_items[choice_idx] &&
+                        MOX::_design_screen_replacement_slot != -1 &&
+                        MOX::_design->special_devices[MOX::_design_screen_replacement_slot] != device_id) {
+                        MOX::_design_choice_item_selected[choice_idx] = 1;
+                    }
+                }
+            }
+        }
+
+        short valid_choice_count = 0;
+        if (MOX::_scroll_bar->total_rows > 1) {
+            for (short i = 1; i < MOX::_scroll_bar->total_rows; ++i) {
+                int choice_special_idx = (int)MOX::_design_choice_items[i];
+                uint16_t tech_app_id = TECHDATA::_specials[choice_special_idx].tech_app_id;
+                
+                int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
+                int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
+                
+                uint16_t base_space = TECHDATA::_specials[choice_special_idx].space_per_ship_type[MOX::_design->ship_size];
+                int space_required = DESIGN::Space_Given_M_Level_(base_space, tech_level, category);
+
+                if (MOX::_design->special_devices[MOX::_design_screen_replacement_slot] > 0) {
+                    space_required -= MOX::_design->special_device_space[MOX::_design_screen_replacement_slot];
+                }
+
+                if ((MOX::_design->space_used + space_required <= MOX::_design->hull_space) &&
+                    (MOX::_design_choice_item_selected[i] == 0)) {
+                    valid_choice_count++;
+                }
+            }
+        }
+
+        return valid_choice_count;
+    }
+
+    void __cdecl Special_Systems_Box_() {
+        char msg42[120];
+        char msg41[200];
+        char msg42_base[200];
+        char msg43_base[200];
+        char desc[1332];
+
+        int16_t btn1;
+        int16_t btn2;
+        int16_t redraw_warning;
+        int16_t input_field;
+        int16_t done;
+        int16_t exclude_special;
+        int16_t scanned_field;
+        int16_t item_count;
+        int16_t exclusion_result;
+        int8_t redraw_bg;
+
+        redraw_bg = 1;
+        allocate::Push_Block_(MOX::_global_data_seg);
+        MOX::_scroll_bar = reinterpret_cast<s_scroll_bar*>(allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x1D));
+        memset(MOX::_scroll_bar, 0, 0x1D);
+        
+        _field_item_chosen = -1;
+        MOX::_scroll_bar->first_visible_row = 0;
+        _incr_value = 1;
+        MOX::_multi_colored_line_start = 0;
+        MOX::_scroll_bar->thumb_center_y = 140;
+        MOX::_scroll_bar->visible_rows = 10;
+        MOX::_scroll_bar->track_len_px = 140;
+        MOX::_scroll_bar->type = 2;
+        MOX::_scroll_bar->row_step = 1;
+
+        Draw_Darkened_Design_Screen_();
+        redraw_warning = 1;
+        Special_System_Choices_();
+        
+        MOX::_scroll_bar->thumb_height_px = SCROLL::Get_Vertical_Scroll_Bar_Height_(MOX::_scroll_bar);
+        Set_Up_Special_System_Scroll_Bar_();
+        Special_System_Replacement_Box_Dimensions_(610, MOX::_scroll_bar->total_rows);
+        
+        fields::Assign_Auto_Function_(Draw_Special_Systems_Replacement_Box, 3);
+        fields::Clear_Fields_();
+        Add_Special_System_Fields_(&btn1, &btn2);
+        
+        _wait_ctr = 0;
+        done = 0;
+
+        while (done == 0) {
+            input_field = fields::Get_Input_();
+            scanned_field = fields::Scan_Input_();
+            _field_item_scanned = -1;
+
+            int16_t num_visible = MOX::_scroll_bar->total_rows;
+            if (num_visible > 10) {
+                num_visible = 10;
+            }
+
+            if (num_visible > 0) {
+                for (int16_t i = 0; i < num_visible; i++) {
+                    if (done != 0) {
+                        break;
+                    }
+
+                    int16_t item_idx = MOX::_scroll_bar->first_visible_row + i;
+                    int16_t field = MOX::_repl_fields[i];
+
+                    if (scanned_field == field) {
+                        _field_item_scanned = i;
+                    }
+
+                    if (input_field == field) {
+                        if (item_idx == 0) {
+                            if (MOX::_design->special_devices[MOX::_design_screen_replacement_slot] > 0) {
+                                DESIGN::Clear_Special_System_Slot_(MOX::_design_screen_replacement_slot);
+                            }
+                            done = 1;
+                        } else {
+                            exclusion_result = Special_System_Exclusion_(MOX::_design_choice_items[item_idx], &exclude_special);
+                            item_count = Items_Selected_();
+
+                            if (MOX::_design_choice_items[item_idx] != 4) {
+                                int16_t m_cat = DESIGN::Miniaturization_Category_(TECHDATA::_specials[MOX::_design_choice_items[item_idx]].tech_app_id);
+                                int16_t t_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].tech_app_id);
+                                DESIGN::Space_Given_M_Level_(TECHDATA::_specials[MOX::_design_choice_items[item_idx]].space_per_ship_type[MOX::_design->ship_size], t_level, (int8_t)m_cat);
+                            }
+
+                            int8_t can_add = (item_idx == 0) || (item_count < 8 && exclusion_result == 0);
+                            int16_t current_slot_item = MOX::_design->special_devices[MOX::_design_screen_replacement_slot];
+
+                            if (MOX::_design_choice_item_selected[item_idx] == 0 ||
+                                MOX::_design_choice_items[item_idx] == current_slot_item) {
+                                
+                                if (can_add) {
+                                    done = 1;
+                                    _field_item_chosen = item_idx;
+                                    MOX::_design->special_devices[MOX::_design_screen_replacement_slot] = MOX::_design_choice_items[item_idx];
+                                } else if (exclusion_result != 0) {
+                                    if (strcmp(TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name, TECHDATA::_specials[exclude_special].name) == 0) {
+                                        MISC::Get_LBX_Message_(0x42, msg42_base);
+                                        _sprintf(msg42, msg42_base, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
+                                    } else {
+                                        MISC::Get_LBX_Message_(0x43, msg43_base);
+                                        char* name_item = TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name;
+                                        char* name_excl = TECHDATA::_specials[exclude_special].name;
+                                        const char* article_item = MISC::Is_Vowel_(name_item[0]) ? s_an : s_a;
+                                        const char* article_excl = MISC::Is_Vowel_(name_excl[0]) ? s_an : s_a;
+                                        _sprintf(msg42, msg43_base, article_excl, name_excl, article_item, name_item);
+                                    }
+                                    GENDRAW::Draw_Warning_Box_(msg42);
+                                    redraw_warning = 1;
+                                }
+                            } else {
+                                MISC::Get_LBX_Message_(0x41, msg41);
+                                _sprintf(msg42, msg41, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
+                                GENDRAW::Draw_Warning_Box_(msg42);
+                                redraw_warning = 1;
+                            }
+                        }
+                    } else if (input_field == -field) {
+                        int16_t item_id = MOX::_design_choice_items[item_idx];
+                        if (item_id <= 0) {
+                            TEXTBOX::Draw_Help_Entry_(691);
+                        } else {
+                            EVANHELP::Get_Application_Description_(desc, TECHDATA::_specials[item_id].tech_app_id);
+                            TEXTBOX::Text_Box_(TECHDATA::_specials[item_id].name, desc);
+                        }
+                    }
+
+                    num_visible = MOX::_scroll_bar->total_rows;
+                    if (num_visible > 10) {
+                        num_visible = 10;
+                    }
+                }
+            }
+
+            if (MOX::_special_scroll_up_button == input_field) {
+                SCROLL::Scroll_Up_One_Item_(MOX::_scroll_bar);
+                _wait_ctr = 0;
+            }
+            if (MOX::_special_scroll_dn_button == input_field) {
+                SCROLL::Scroll_Down_One_Item_(MOX::_scroll_bar);
+                _wait_ctr = 0;
+            }
+
+            if (btn1 == input_field || btn2 == input_field) {
+                done = 1;
+            } else if (input_field == -btn1) {
+                TEXTBOX::Draw_Help_Entry_(689);
+            } else if (input_field == -btn2) {
+                TEXTBOX::Draw_Help_Entry_(687);
+            }
+
+            fields::Clear_Fields_();
+            Add_Special_System_Fields_(&btn1, &btn2);
+
+            if (done == 0) {
+                if (redraw_warning == 0 && redraw_bg != 0) {
+                    Redraw_Main_Design_Screen_To_Background_();
+                    redraw_bg = 0;
+                }
+                
+                if (done == 0) {
+                    video::Set_Page_Off_();
+                    Draw_Special_Systems_Replacement_Box();
+                    
+                    if (redraw_warning != 0) {
+                        redraw_warning = 0;
+                    } else {
+                        RUSS::Mox_Sync_Update_();
+                    }
+                }
+            }
+        }
+
+        MOX::_design->item_unlocked[40] = static_cast<int8_t>(MOX::_scroll_bar->first_visible_row);
+        MOX::_design->date_of_design = MOX::_scroll_bar->thumb_center_y;
+        MOX::_scroll_bar = nullptr;
+
+        allocate::Pop_Block_(MOX::_global_data_seg);
+        MOX::_current_screen = 3;
+        
+        DESIGN::Update_Calculated_Design_Data_(MOX::_PLAYER_NUM);
+        fields::Clear_Fields_();
+    }
     void __cdecl Add_Replacement_Weapon_Fields_(int16_t* param_1, int16_t* param_2) {
         int16_t rack_quantities[5] = {2, 5, 10, 15, 20};
         int16_t mod_fields[15] = {0};
@@ -1557,6 +1805,42 @@ namespace DESBOX {
         }
     }
 
+    int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
+        int16_t extra_space = 0;
+        int16_t weapon_space;
+        int16_t result_extra;
+
+        if (weapon_idx > 0) {
+            uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
+            int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
+            int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
+
+            if (DESIGN::Weapon_Needs_Racks_(weapon_idx)) {
+                weapon_space = (int16_t)DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[weapon_idx].size, tech_level, category);
+
+                int16_t rack_base_size = DESIGN::Weapon_Rack_Size_(2);
+                result_extra = (int16_t)DESIGN::Space_Given_M_Level_(rack_base_size, tech_level, category);
+            } else {
+                weapon_space = (int16_t)DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[weapon_idx].size, tech_level, category);
+                result_extra = 0;
+            }
+        } else {
+            weapon_space = extra_space;
+            result_extra = extra_space;
+        }
+
+        int16_t total_space = (int16_t)MOX::_design->space_used + result_extra + weapon_space;
+
+        if (MOX::_design_screen_replacement_slot > -1) {
+            int slot = MOX::_design_screen_replacement_slot;
+            if (MOX::_design->weapon_type[slot] > 0) {
+                total_space -= (int16_t)MOX::_design->weapon_space[slot];
+            }
+        }
+
+        return total_space;
+    }
+
     void __cdecl Set_Up_Weapon_Display_(int16_t weapon_index) {
         int16_t racks_list[5] = {2, 5, 10, 15, 20};
 
@@ -1658,6 +1942,35 @@ namespace DESBOX {
         );
     }
 
+    void __cdecl Draw_Generic_Replacement_Box_() {
+        int16_t type = MOX::_design_screen_replacement_type;
+        int16_t current_x = DESBOX::_replacement_box_base_x;
+        int16_t current_y = DESBOX::_replacement_box_base_y;
+
+        if (type == 2 || type == 8) {
+            animate::Draw_(current_x, current_y, MOX::_system_repl_box_top_seg);
+        }
+
+        current_y += animate::Get_Height_(MOX::_system_repl_box_top_seg);
+
+        graphics::Set_Window_(current_x, current_y, current_x + DESBOX::_replacement_box_width, current_y + DESBOX::_replacement_box_middle_height);
+        video::Clip_On_();
+        animate::Draw_(current_x, current_y, MOX::_system_repl_box_mid_seg);
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+
+        current_y += DESBOX::_replacement_box_middle_height;
+        animate::Draw_(current_x, current_y, MOX::_system_repl_box_btm_seg);
+
+        if (type == 2) {
+            DESBOX::Print_Shield_Data_(DESBOX::_replacement_box_base_x, DESBOX::_replacement_box_base_y);
+        } else if (type == 8) {
+            DESBOX::Print_Computer_Data_(DESBOX::_replacement_box_base_x, DESBOX::_replacement_box_base_y);
+        }
+
+        JIM::Play_Streaming_Music_(8, -1, 1);
+    }
+
     void __cdecl Draw_Darkened_Design_Screen_() {
         video::Set_Page_Off_();
         Draw_Design_Screen_();
@@ -1680,5 +1993,744 @@ namespace DESBOX {
             }
             _weapon_replacement_mods = mods;
         }
+    }
+
+    int16_t __cdecl Weapon_Index_(int16_t index) {
+        return MOX::_weapon_filter[index].weapon_idx;
+    }
+
+    int __cdecl qsort_by_research_cost_(const void* a, const void* b) {
+        const s_weapon_filter_item* item1 = static_cast<const s_weapon_filter_item*>(a);
+        const s_weapon_filter_item* item2 = static_cast<const s_weapon_filter_item*>(b);
+        return item2->tech_cost - item1->tech_cost;
+    }
+
+    void __cdecl Set_New_Weapon_Modifications_(uint16_t* modifications) {
+        *modifications = 0;
+        if (_field_item_chosen > -1) {
+            Weapon_Index_(_field_item_chosen);
+            *modifications = 0;
+
+            for (int16_t i = 1; i < 15; ++i) {
+                if (MOX::_weapon_mod_field_status[i] == 1) {
+                    *modifications |= (1 << i);
+                }
+            }
+        }
+    }
+
+    void __cdecl Clear_Weapon_Replacement_Fields_() {
+        for (int16_t i = 0; i < 10; ++i) {
+            MOX::_repl_fields[i] = -1000;
+        }
+
+        for (int16_t i = 0; i < 5; ++i) {
+            MOX::_weapon_arc_field[i] = -1000;
+            MOX::_weapon_rack_field[i] = -1000;
+        }
+
+        for (int16_t i = 0; i < 15; ++i) {
+            MOX::_weapon_mod_fields[i] = -1000;
+        }
+    }
+
+    int8_t __cdecl Should_Add_Mod_(int16_t mod_idx) {
+        uint8_t mod_status = DESBOX::_valid_mods[mod_idx];
+
+        if (mod_status == 0x01 || mod_status == 0xF9 || mod_status == 0xFC || mod_status == 0xFB) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    int8_t __cdecl Mod_Allowed_On_Weapon_Type_(uint8_t mod_idx) {
+        int16_t weapon_type = -1;
+
+        if (DESBOX::_field_item_chosen > -1) {
+            int16_t weapon_index = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
+            weapon_type = DESIGN::Weapon_Type_(weapon_index);
+        }
+
+        // Check if the specific weapon modification is allowed based on the weapon type.
+        // Each weapon type (0, 1, 2) has a bitmask defining allowed modifications.
+        if (weapon_type == 0) {
+            return (int8_t)((0x01FE >> mod_idx) & 1);
+        }
+
+        if (weapon_type == 1) {
+            return (int8_t)((0x3E00 >> mod_idx) & 1);
+        }
+
+        if (weapon_type == 2) {
+            return (int8_t)((0x6520 >> mod_idx) & 1);
+        }
+
+        return 0;
+    }
+
+    int16_t __cdecl Weapon_Choice_Valid_(char* error_msg_out) {
+        int16_t is_valid = 1;
+        error_msg_out[0] = '\0';
+
+        if (DESBOX::_field_item_chosen > -1) {
+            int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
+            // If it's a beam weapon (type 0) and no firing arc is selected, it's invalid.
+            if (DESIGN::Weapon_Type_(weapon_idx) == 0 && DESBOX::_weapon_replacement_arcs == -1) {
+                is_valid = 0;
+                const char* msg = HAROLD::H_Message_(0x44 /* MSG_MUST_SELECT_FIRING_ARC */);
+                strcpy(error_msg_out, msg);
+            }
+        }
+
+        // Bound check the selection against scroll bar total rows.
+        if (DESBOX::_field_item_chosen < 0 || DESBOX::_field_item_chosen > MOX::_scroll_bar->total_rows) {
+            DESBOX::_field_item_chosen = 0;
+        }
+
+        return is_valid;
+    }
+
+    void __cdecl Get_Weapon_Mod_Field_XYs_(int16_t* mod_indices, int16_t* x_coords, int16_t* y_coords) {
+        int16_t mod_count = 0;
+        int16_t y_offset = 11;
+
+        if (DESBOX::_field_item_chosen <= -1) {
+            return;
+        }
+
+        for (int16_t i = 1; i < 15; ++i) {
+            int16_t mod_idx = -1;
+
+            if (DESBOX::Should_Add_Mod_(i)) {
+                int16_t weapon_idx = DESBOX::Weapon_Index_(DESBOX::_field_item_chosen);
+                int16_t weapon_type = DESIGN::Weapon_Type_(weapon_idx);
+
+                // Mod indices mapping for Beam (0), Missile (1), and Fighter (2) types
+                if (weapon_type == 0 || weapon_type == 1 || weapon_type == 2) {
+                    switch (i) {
+                        case 1:  mod_idx = 0; break;
+                        case 2:  mod_idx = 1; break;
+                        case 3:  mod_idx = 2; break;
+                        case 4:  mod_idx = 3; break;
+                        case 5:  mod_idx = (weapon_type == 0) ? 4 : 13; break;
+                        case 6:  mod_idx = 5; break;
+                        case 7:  mod_idx = 6; break;
+                        case 8:  mod_idx = (weapon_type == 0) ? 7 : 14; break;
+                        case 9:  mod_idx = 8; break;
+                        case 10: mod_idx = (weapon_type == 1) ? 12 : 16; break;
+                        case 11: mod_idx = 9; break;
+                        case 12: mod_idx = 10; break;
+                        case 13: mod_idx = (weapon_type == 1) ? 11 : 15; break;
+                        case 14: mod_idx = 17; break;
+                    }
+                }
+
+                // Vertical UI alignment based on weapon category
+                switch (weapon_type) {
+                    case 0: /* Beam */
+                    case 2: /* Fighter */
+                    case 3: /* Special */
+                        y_offset = 17;
+                        break;
+                    case 1: /* Missile */
+                        y_offset = 21;
+                        break;
+                }
+
+                // UI list is organized into two columns
+                if (mod_count % 2 == 0) {
+                    x_coords[i] = 233 /* 0xE9 */;
+                } else {
+                    x_coords[i] = 386 /* 0x182 */;
+                }
+
+                y_coords[i] = (mod_count / 2) * 17 + y_offset + 70 /* 0x46 */;
+                mod_indices[i] = mod_idx;
+                mod_count++;
+            }
+        }
+    }
+
+    void __cdecl Print_Main_Weapon_Box_(int16_t x, int16_t y) {
+        int16_t rack_sizes[5] = { 2, 5, 10, 15, 20 };
+
+        s_colors base_colors = *MISC::Font_Colors2_(3, 0x55, 0x5B);
+        fonts::Set_Font_Style_(3, &base_colors);
+
+        int16_t ty = y + 3;
+        fonts::Print_(x + 0x1C, ty, HAROLD::H_Message_(0x2E));
+        fonts::Print_Right_(x + 0xC6, ty, HAROLD::H_Message_(0x2F));
+        fonts::Print_(x + 0xFD, ty, HAROLD::H_Message_(0x30));
+        fonts::Print_(x + 0xD3, ty, HAROLD::H_Message_(0x2B));
+        fonts::Print_(x + 0x183, ty, HAROLD::H_Message_(0x31));
+
+        int16_t row_idx = MOX::_scroll_bar->first_visible_row;
+        int16_t loop_count = 0;
+        int16_t cur_y = y + 0x13;
+
+        while (true) {
+            bool selected = false;
+            int16_t weapon_idx = Weapon_Index_(row_idx);
+            int32_t weapon_cost = 0;
+            int32_t weapon_space = 0;
+
+            if (row_idx > 0) {
+                if (_field_item_chosen <= -1 || (weapon_idx > 0 && _field_item_chosen != row_idx)) {
+                    if (weapon_idx > 0) {
+                        int16_t rack_ammo = (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0) ? 5 : 0;
+                        weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, 1, rack_ammo, 0);
+                        weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, 1, rack_ammo, 0);
+                    }
+                } else if (weapon_idx > 0 && _field_item_chosen == row_idx) {
+                    int16_t rack_ammo = 0;
+                    if (DESIGN::Weapon_Needs_Racks_(weapon_idx) != 0) {
+                        rack_ammo = rack_sizes[_weapon_replacement_rack];
+                    }
+                    weapon_cost = DESIGN::Weapon_Cost_(weapon_idx, 1, _weapon_replacement_arcs, rack_ammo, _weapon_replacement_mods);
+                    weapon_space = DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, _weapon_replacement_arcs, rack_ammo, _weapon_replacement_mods);
+                }
+            }
+
+            if (_field_item_chosen > -1 && _field_item_chosen == row_idx) {
+                selected = true;
+            }
+
+            if (_field_item_scanned == loop_count && row_idx > -1 && MOX::_design->item_unlocked[row_idx] != 0) {
+                s_colors colors = *MISC::Font_Colors2_(2, 0x55, 0x58);
+                fonts::Set_Font_Style_(2, &colors);
+                MISC::Increase_Font_Color_Range_(MOX::_multi_colored_line_start);
+            } else {
+                s_colors* pcolors;
+                if (selected) {
+                    pcolors = MISC::Font_Colors2_(2, 0x55, 0x5C);
+                } else if (row_idx <= -1) {
+                    pcolors = MISC::Font_Colors2_(2, 0x55, 0x59);
+                } else if (MOX::_design->item_unlocked[row_idx] != 0) {
+                    pcolors = MISC::Font_Colors2_(2, 0x55, 0x5A);
+                } else {
+                    pcolors = MISC::Font_Colors2_(2, 0x55, 0x57);
+                }
+                s_colors colors = *pcolors;
+                fonts::Set_Font_Style_(2, &colors);
+            }
+
+            char cost_str[20];
+            char space_str[20];
+            _sprintf(cost_str, "%d", weapon_cost);
+            _sprintf(space_str, "%d", weapon_space);
+
+            if (selected) {
+                animate::Draw_(x, cur_y + 1, MOX::_weapons_selected_seg);
+            }
+
+            int16_t num_weapons = 0;
+            if (weapon_space > 0) {
+                // Keep original game bug: division of 0 by weapon_space instead of remaining space
+                num_weapons = 0 / weapon_space;
+                if (num_weapons >= 99) {
+                    num_weapons = 99;
+                }
+                if (MOX::_design->item_unlocked[row_idx] != 0 && num_weapons <= 1) {
+                    num_weapons = 1;
+                }
+            }
+
+            char name_str[80];
+            if (weapon_idx <= 0) {
+                strcpy(name_str, HAROLD::H_Message_(0x32));
+            } else {
+                _sprintf(name_str, "%s (%d)", TECHDATA::_weapons[weapon_idx].name, num_weapons);
+            }
+
+            fonts::Set_Font_Spacing_(1);
+            fonts::Print_(x + 0x0C, cur_y, name_str);
+            MISC::Set_Font_Default_Spacing_();
+
+            DESIGN::Design_Weapon_Damage_String_(weapon_idx, name_str, _field_item_chosen, row_idx);
+
+            if (strcmp(name_str, HAROLD::H_Message_(0x65)) == 0) {
+                MISC::Change_Font_Style_(1);
+                fonts::Print_Right_(x + 0xC6, cur_y + 2, name_str);
+                MISC::Change_Font_Style_(2);
+            } else {
+                fonts::Print_Right_(x + 0xC6, cur_y, name_str);
+            }
+
+            fonts::Print_Right_(x + 0xE9, cur_y, cost_str);
+            fonts::Print_Right_(x + 0x11F, cur_y, space_str);
+
+            if (weapon_idx > 0) {
+                DESIGN::Tech_Level_(MOX::_PLAYER_NUM, TECHDATA::_weapons[weapon_idx].tech_app_id);
+                if (DESIGN::Weapon_Needs_Racks_(weapon_idx) > 0) {
+                    DESIGN::Weapon_Rack_Size_(2);
+                }
+            }
+
+            if (weapon_idx == 0) {
+                name_str[0] = '\0';
+            } else {
+                strcpy(name_str, MOX::_weapon_notes_string[weapon_idx]);
+                s_colors colors;
+                fonts::Get_Colors_(&colors);
+                fonts::Set_Font_Style_(2, &colors);
+                fonts::Set_Font_Spacing_(1);
+                fonts::Print_(x + 0x131, cur_y, name_str);
+                MISC::Set_Font_Default_Spacing_();
+            }
+
+            cur_y += 14;
+            loop_count++;
+            row_idx = MOX::_scroll_bar->first_visible_row + loop_count;
+
+            if (loop_count >= 10 || MOX::_scroll_bar->total_rows <= row_idx) {
+                _wait_ctr++;
+                if (_wait_ctr >= 2) {
+                    _wait_ctr = 0;
+                    MOX::_multi_colored_line_start += static_cast<int8_t>(_incr_value);
+                    if (MOX::_multi_colored_line_start >= 3) {
+                        _incr_value = -1;
+                        MOX::_multi_colored_line_start = 3;
+                    } else if (MOX::_multi_colored_line_start <= -1) {
+                        _incr_value = 1;
+                        MOX::_multi_colored_line_start = -1;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    void __cdecl Print_Shield_Data_(int16_t x, int16_t y) {
+        s_colors title_colors = *MISC::Font_Colors2_(4, 'U', '[');
+
+        graphics::Set_Window_(x, y, x + DESBOX::_replacement_box_width, y + DESBOX::_replacement_box_height);
+        video::Clip_On_();
+
+        int16_t text_y = y + 0x37;
+        fonts::Set_Font_Style_(4, &title_colors);
+
+        int16_t text_x = x + 0x14;
+
+        char msg_34[80];
+        MISC::Get_LBX_Message_(0x34, msg_34);
+
+        char msg_35[80];
+        MISC::Get_LBX_Message_(0x35, msg_35);
+
+        fonts::Print_(text_x, text_y, HAROLD::H_Message_(0x33));
+        fonts::Print_(text_x + 0xdc, text_y, msg_34);
+        fonts::Print_(text_x + 0x15e, text_y, msg_35);
+
+        int16_t msg_34_width = fonts::Get_String_Width_(msg_34);
+        int16_t msg_35_width = fonts::Get_String_Width_(msg_35);
+
+        s_colors color_selected = *MISC::Font_Colors2_(3, 'U', '[');
+        s_colors color_unlocked = *MISC::Font_Colors2_(3, 'U', 'Y');
+        s_colors color_locked = *MISC::Font_Colors2_(3, 'U', 'W');
+
+        text_y += 0x12;
+
+        for (int16_t i = 0; i < MOX::_scroll_bar->total_rows; ++i) {
+            s_colors color_scanned;
+            s_colors* current_colors;
+
+            if (MOX::_repl_fields[i] == static_cast<int16_t>(DESBOX::_field_item_scanned) && MOX::_design->item_unlocked[i] != 0) {
+                color_scanned.colors[0] = 0;
+                for (int j = 1; j < 8; ++j) {
+                    color_scanned.colors[j] = color_unlocked.colors[j] + static_cast<uint8_t>(MOX::_multi_colored_line_start);
+                }
+                current_colors = &color_scanned;
+            } else if (DESBOX::_field_item_chosen == i) {
+                current_colors = &color_selected;
+            } else if (MOX::_design->item_unlocked[i] != 0) {
+                current_colors = &color_unlocked;
+            } else {
+                current_colors = &color_locked;
+            }
+
+            fonts::Set_Font_Style_(3, current_colors);
+
+            int16_t item = MOX::_design_choice_items[i];
+            if (item == 0) {
+                fonts::Print_(text_x + 3, text_y, HAROLD::H_Message_(0x36));
+
+                // Potential bug: original code swaps msg_34_width and msg_35_width centering calculations here
+                fonts::Print_Integer_Centered_(text_x + 0xdc + msg_35_width / 2, text_y, 0);
+                fonts::Print_Integer_Centered_(text_x + 0x15e + msg_34_width / 2, text_y, 0);
+
+                text_y += 14;
+            } else if (item > 0) {
+                fonts::Print_(text_x + 3, text_y, TECHDATA::_shields[item].name);
+
+                int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, TECHDATA::_shields[item].tech_app_id);
+                int16_t cost = DESIGN::Cost_Given_M_Level_(TECHDATA::_shields[item].cost_per_ship_type[MOX::_design->ship_size], tech_level);
+
+                // Potential bug: original code swaps msg_34_width and msg_35_width centering calculations here
+                fonts::Print_Integer_Centered_(text_x + 0xdc + msg_35_width / 2, text_y, cost);
+
+                tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, TECHDATA::_shields[item].tech_app_id);
+                int16_t space = static_cast<int16_t>(DESIGN::Space_Given_M_Level_(TECHDATA::_shields[item].space_per_ship_type[MOX::_design->ship_size], tech_level, 0));
+
+                fonts::Print_Integer_Centered_(text_x + 0x15e + msg_34_width / 2, text_y, space);
+
+                text_y += 14;
+            }
+        }
+
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+
+        DESBOX::_wait_ctr++;
+        if (DESBOX::_wait_ctr >= 2) {
+            DESBOX::_wait_ctr = 0;
+            MOX::_multi_colored_line_start += static_cast<int16_t>(static_cast<int8_t>(DESBOX::_incr_value));
+
+            if (MOX::_multi_colored_line_start >= 3) {
+                DESBOX::_incr_value = static_cast<uint8_t>(-1);
+                MOX::_multi_colored_line_start = 3;
+            } else if (MOX::_multi_colored_line_start <= -1) {
+                DESBOX::_incr_value = 1;
+                MOX::_multi_colored_line_start = -1;
+            }
+        }
+    }
+
+    void __cdecl Print_Computer_Data_(int16_t x, int16_t y) {
+        s_colors colors_0;
+        s_colors colors_1;
+        s_colors colors_2;
+        s_colors colors_3;
+        char lbx_msg1[80];
+        char lbx_msg2[80];
+        char lbx_msg3[80];
+        char sprint_buf[80];
+
+        colors_0 = *MISC::Font_Colors2_(4, 0x55, 0x5B);
+
+        graphics::Set_Window_(
+            x,
+            y,
+            x + _replacement_box_width,
+            y + _replacement_box_height
+        );
+
+        video::Clip_On_();
+
+        int16_t current_y = y + 0x37;
+
+        fonts::Set_Font_Style_(4, &colors_0);
+
+        int16_t current_x = x + 0x14;
+
+        MISC::Get_LBX_Message_(0x29, lbx_msg1);
+        MISC::Get_LBX_Message_(0x2A, lbx_msg2);
+        MISC::Get_LBX_Message_(0x2B, lbx_msg3);
+
+        int16_t x1 = current_x + 3;
+
+        fonts::Print_(x1, current_y, lbx_msg1);
+        fonts::Print_(current_x + 0xE1, current_y, lbx_msg2);
+        fonts::Print_(current_x + 0x195, current_y, lbx_msg3);
+
+        int16_t w1 = fonts::Get_String_Width_(lbx_msg1);
+        fonts::Get_String_Width_(lbx_msg2);
+
+        current_y += 0x12;
+
+        int16_t w3 = fonts::Get_String_Width_(lbx_msg3);
+
+        colors_0 = *MISC::Font_Colors2_(3, 0x55, 0x5B);
+        colors_1 = *MISC::Font_Colors2_(3, 0x55, 0x59);
+        colors_2 = *MISC::Font_Colors2_(3, 0x55, 0x57);
+
+        for (int16_t idx = 0; idx < MOX::_scroll_bar->total_rows; idx++) {
+            s_colors* current_color;
+
+            if (MOX::_repl_fields[idx] == _field_item_scanned && MOX::_design->item_unlocked[idx] != 0) {
+                colors_3.colors[0] = 0;
+                for (int i = 1; i < 8; i++) {
+                    colors_3.colors[i] = colors_1.colors[i] + static_cast<uint8_t>(MOX::_multi_colored_line_start);
+                }
+                current_color = &colors_3;
+            } else if (idx == _field_item_chosen) {
+                current_color = &colors_0;
+            } else if (MOX::_design->item_unlocked[idx] != 0) {
+                current_color = &colors_1;
+            } else {
+                current_color = &colors_2;
+            }
+
+            fonts::Set_Font_Style_(3, current_color);
+
+            int16_t item = MOX::_design_choice_items[idx];
+            int16_t final_cost = 0;
+
+            if (item == 0) {
+                fonts::Print_(x1, current_y, HAROLD::H_Message_(0x2D));
+                fonts::Print_Integer_Centered_(current_x + 0xE1 + w1 / 2, current_y, 0);
+            } else if (item > 0) {
+                int16_t tech_lvl = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, TECHDATA::_computers[item].tech_app_id);
+                int16_t comp_cost = DESIGN::Computer_Cost_(item);
+                final_cost = DESIGN::Cost_Given_M_Level_(comp_cost, tech_lvl);
+
+                fonts::Print_(x1, current_y, TECHDATA::_computers[item].name);
+
+                _sprintf(sprint_buf, strings::s_fmt_plus_d_00557ed0, TECHDATA::_computers[item].bonus);
+                fonts::Print_Centered_(current_x + 0xE1 + w1 / 2, current_y, sprint_buf);
+            } else {
+                continue;
+            }
+
+            fonts::Print_Integer_Centered_(current_x + 0x195 + w3 / 2, current_y, final_cost);
+            current_y += 0xE;
+        }
+
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+
+        _wait_ctr++;
+        if (_wait_ctr >= 2) {
+            _wait_ctr = 0;
+            MOX::_multi_colored_line_start += static_cast<int16_t>(_incr_value);
+
+            if (MOX::_multi_colored_line_start >= 3) {
+                _incr_value = -1;
+                MOX::_multi_colored_line_start = 3;
+            } else if (MOX::_multi_colored_line_start <= -1) {
+                _incr_value = 1;
+                MOX::_multi_colored_line_start = -1;
+            }
+        }
+    }
+
+    void __cdecl Set_Up_Special_System_Scroll_Bar_() {
+        int temp_calc;
+        int16_t step_size;
+        int16_t center_y;
+
+        // Load initial track length
+        center_y = MOX::_scroll_bar->track_len_px;
+
+        // Calculate step_size:
+        // row_step is treated as unsigned (uint8_t) for this calculation based on XOR EDX,EDX / MOV DL load.
+        // Formula: (((10 * row_step * track_len_px) + 90) / total_rows) / 10
+        temp_calc = 10 * (int)(uint8_t)MOX::_scroll_bar->row_step * (int)MOX::_scroll_bar->track_len_px + 90;
+        step_size = (int16_t)((temp_calc / (int)MOX::_scroll_bar->total_rows) / 10);
+
+        // Subtract half thumb height (standard signed division used in assembly)
+        center_y -= (int16_t)(MOX::_scroll_bar->thumb_height_px / 2);
+
+        // Update first_visible_row from design item_unlocked[40] (offset 0x122)
+        MOX::_scroll_bar->first_visible_row = (int16_t)MOX::_design->item_unlocked[40];
+
+        // Final thumb center y calculation
+        center_y -= (int16_t)(MOX::_scroll_bar->first_visible_row * step_size);
+
+        MOX::_scroll_bar->thumb_center_y = center_y;
+        MOX::_scroll_bar->last_thumb_center_y = center_y;
+        MOX::_scroll_bar->thumb_center_y_copy = center_y;
+    }
+
+    void __cdecl Draw_Special_Systems_Replacement_Box() {
+        int16_t x = _replacement_box_base_x;
+        int16_t y = _replacement_box_base_y;
+
+        animate::Draw_(x, y, MOX::_system_repl_box_top_seg);
+
+        y += animate::Get_Height_(MOX::_system_repl_box_top_seg);
+
+        graphics::Set_Window_(x, y, x + _replacement_box_width, y + _replacement_box_middle_height);
+        video::Clip_On_();
+        animate::Draw_(x, y, MOX::_system_repl_box_mid_seg);
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+
+        animate::Draw_(x, y + _replacement_box_middle_height, MOX::_system_repl_box_btm_seg);
+
+        Print_Special_System_Data_(_replacement_box_base_x, _replacement_box_base_y);
+
+        if (MOX::_scroll_bar->total_rows > 10 && _replacement_scroll_field != -1000) {
+            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, (void*)Draw_Special_Systems_Scroll_Bar_);
+        }
+
+        JIM::Play_Streaming_Music_(8, -1, 1);
+    }
+
+    void __cdecl Special_System_Replacement_Box_Dimensions_(int32_t ignored_param, int16_t row_count) {
+        int16_t cancel_btn_h;
+        int16_t top_seg_h;
+        int16_t btm_seg_h;
+
+        cancel_btn_h = animate::Get_Height_(MOX::_system_repl_box_cancel_btn);
+        top_seg_h = animate::Get_Height_(MOX::_system_repl_box_top_seg);
+        btm_seg_h = animate::Get_Height_(MOX::_system_repl_box_btm_seg);
+
+        if (row_count > 10) {
+            row_count = 10;
+        }
+
+        // Calculation: (row_count * 16) + cancel_btn_height + 20
+        DESBOX::_replacement_box_middle_height = (row_count * 16) + cancel_btn_h + 20;
+
+        // Total height = middle_height + top_segment_height + bottom_segment_height
+        DESBOX::_replacement_box_height = DESBOX::_replacement_box_middle_height + top_seg_h + btm_seg_h;
+
+        DESBOX::_replacement_box_width = animate::Get_Width_(MOX::_system_repl_box_top_seg);
+
+        // Center calculation on 640x440 coordinate space
+        DESBOX::_replacement_box_base_x = (640 - DESBOX::_replacement_box_width) / 2;
+        DESBOX::_replacement_box_base_y = (440 - DESBOX::_replacement_box_height) / 2;
+    }
+
+    int16_t __cdecl Special_System_Exclusion_(int16_t special_idx, int16_t* out_conflict_id) {
+        int16_t found = 0;
+        *out_conflict_id = 0;
+
+        for (int16_t i = 0; i < 6; ++i) {
+            // Check if conflict already found in previous iterations
+            if (found != 0) {
+                break;
+            }
+
+            int16_t exclude_id = (int16_t)TECHDATA::_specials[special_idx].exclude[i];
+            if (exclude_id > 0) {
+                for (int16_t j = 0; j < 8; ++j) {
+                    if (found != 0) {
+                        break;
+                    }
+
+                    int16_t current_special = MOX::_design->special_devices[j];
+                    if (exclude_id == current_special) {
+                        // A conflict is only valid if the conflicting special is not the one 
+                        // currently being replaced/selected in the design screen
+                        if (MOX::_design->special_devices[MOX::_design_screen_replacement_slot] != current_special) {
+                            found = 1;
+                            *out_conflict_id = current_special;
+                        }
+                    }
+                }
+            }
+        }
+
+        return found;
+    }
+
+    int16_t __cdecl Items_Selected_() {
+        int16_t selected_count = 0;
+        int16_t row_limit = MOX::_scroll_bar->total_rows;
+
+        if (row_limit > 10) {
+            row_limit = 10;
+        }
+
+        if (row_limit > 0) {
+            for (int16_t i = 0; i < row_limit; ++i) {
+                if (MOX::_design_choice_item_selected[i] != 0) {
+                    selected_count++;
+                }
+            }
+        }
+
+        return selected_count;
+    }
+
+    void __cdecl Add_Special_System_Fields_(int16_t* cancel_field_id_out, int16_t* screen_field_id_out) {
+        int16_t scroll_x;
+        int16_t scroll_y;
+        int16_t loop_limit;
+
+        loop_limit = MOX::_scroll_bar->total_rows;
+        if (loop_limit > 10) {
+            loop_limit = 10;
+        }
+
+        if (loop_limit > 0) {
+            for (int16_t i = 0; i < loop_limit; ++i) {
+                int16_t field_y1 = _replacement_box_base_y + 89 /* 0x59 */ + (i * 16);
+                MOX::_repl_fields[i] = fields::Add_Hidden_Field_(
+                    _replacement_box_base_x + 25 /* 0x19 */,
+                    field_y1,
+                    _replacement_box_base_x + 25 + 559 /* 0x22F */,
+                    field_y1 + 16,
+                    strings::s__00551100,
+                    41 /* 0x29 */
+                );
+            }
+        }
+
+        _replacement_scroll_field = -1000 /* 0xFC18 */;
+
+        scroll_x = _replacement_box_base_x + 602 /* 0x25A */;
+        scroll_y = _replacement_box_base_y + 93 /* 0x5D */;
+
+        if (MOX::_scroll_bar->total_rows > 10) {
+            _replacement_scroll_field = fields::Add_Scroll_Field_(
+                scroll_x,
+                scroll_y,
+                0,
+                140 /* 0x8C */,
+                0,
+                140 /* 0x8C */,
+                9,
+                140 /* 0x8C */,
+                &MOX::_scroll_bar->thumb_center_y,
+                strings::s__00551100,
+                0
+            );
+        } else {
+            _replacement_scroll_field = -1000 /* 0xFC18 */;
+        }
+
+        if (MOX::_scroll_bar->total_rows > 10 && scroll_x > 0 && scroll_y > 0) {
+            int16_t up_btn_y = scroll_y - animate::Get_Height_(MOX::_d_scroll_up_button_seg) - 3;
+            MOX::_special_scroll_up_button = fields::Add_Button_Field_(
+                scroll_x,
+                up_btn_y,
+                strings::s__00551100,
+                MOX::_d_scroll_up_button_seg,
+                strings::s_minus_0055111c,
+                40 /* 0x28 */
+            );
+
+            int16_t dn_btn_y = scroll_y + animate::Get_Height_(MOX::_system_repl_scroll_bar_seg) + 3;
+            MOX::_special_scroll_dn_button = fields::Add_Button_Field_(
+                scroll_x,
+                dn_btn_y,
+                strings::s__00551100,
+                MOX::_d_scroll_dn_button_seg,
+                strings::s_plus_00551118,
+                40 /* 0x28 */
+            );
+        } else {
+            MOX::_special_scroll_up_button = -1000 /* 0xFC18 */;
+            MOX::_special_scroll_dn_button = -1000 /* 0xFC18 */;
+            _replacement_scroll_field = -1000 /* 0xFC18 */;
+        }
+
+        int16_t cancel_btn_x = _replacement_box_base_x + _replacement_box_width - animate::Get_Width_(MOX::_system_repl_box_cancel_btn) - 35 /* 0x23 */;
+        int16_t cancel_btn_y = _replacement_box_base_y + _replacement_box_height - animate::Get_Height_(MOX::_system_repl_box_cancel_btn) - 16 /* 0x10 */;
+        *cancel_field_id_out = fields::Add_Button_Field_(
+            cancel_btn_x,
+            cancel_btn_y,
+            strings::s__00551100,
+            MOX::_system_repl_box_cancel_btn,
+            strings::s_space_00551120,
+            40 /* 0x28 */
+        );
+
+        fields::Add_Hidden_Field_(
+            _replacement_box_base_x,
+            _replacement_box_base_y,
+            _replacement_box_base_x + _replacement_box_width,
+            _replacement_box_base_y + _replacement_box_height,
+            strings::s__00551100,
+            0
+        );
+
+        *screen_field_id_out = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27F */, 479 /* 0x1DF */, strings::s__00551100, 41 /* 0x29 */);
+
+        MOX::_scroll_bar->up_btn = (int16_t)MOX::_special_scroll_up_button;
+        MOX::_scroll_bar->dn_btn = (int16_t)MOX::_special_scroll_dn_button;
     }
 }

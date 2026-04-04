@@ -18,6 +18,7 @@ namespace strings {
     inline const char* s_O_00556afc = reinterpret_cast<const char*>(std::uintptr_t{0x00556AFC});
     inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED4});
     inline const char* s_M_00557ed8 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED8});
+    inline const char* s_fmt_plus_d_00557ed0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED0});
 
     void Load_Strings();
 

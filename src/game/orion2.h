@@ -1235,7 +1235,7 @@ struct s_current_design {
     short weapon_type[8];
     short weapon_count[8];
     char weapon_firing_arc[8];
-    short weapon_specials[8];
+    uint16_t weapon_specials[8];
     int weapon_cost[8];
     int weapon_space[8];
     char weapon_ammo[8];

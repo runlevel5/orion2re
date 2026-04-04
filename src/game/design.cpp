@@ -1723,4 +1723,18 @@ namespace DESIGN {
 
         return MOX::_planet[planet_idx].colony_index;
     }
+
+    void __cdecl Clear_Special_System_Slot_(int16_t slot_idx) {
+        int n_systems = (int)MOX::_n_special_systems;
+
+        for (int i = (int)slot_idx; i < n_systems - 1; ++i) {
+            MOX::_design->special_devices[i] = MOX::_design->special_devices[i + 1];
+            MOX::_design->special_device_cost[i] = MOX::_design->special_device_cost[i + 1];
+            MOX::_design->special_device_space[i] = MOX::_design->special_device_space[i + 1];
+        }
+
+        MOX::_design->special_devices[n_systems - 1] = 0;
+        MOX::_design->special_device_cost[n_systems - 1] = 0;
+        MOX::_design->special_device_space[n_systems - 1] = 0;
+    }
 }

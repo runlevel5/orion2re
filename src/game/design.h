@@ -83,6 +83,8 @@ namespace DESIGN {
 
     int8_t __cdecl Count_Special_Devices_();
 
+    void __cdecl Clear_Special_System_Slot_(int16_t slot);
+
     void __cdecl Update_N_Spec_Systems_In_Design_();
 
     void __cdecl Update_Weapon_Count_();

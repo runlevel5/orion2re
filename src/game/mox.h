@@ -158,6 +158,7 @@ namespace MOX {
     inline void*& _officer_colony_ldrs_button_seg_system = *reinterpret_cast<void**>(std::uintptr_t{0x00596FAC});
     inline int8_t& _officer_selected = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059D6D0 });
 
+    inline uint16_t& _special_scroll_dn_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596434});
     inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
 
@@ -216,9 +217,11 @@ namespace MOX {
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
+    inline uint16_t& _special_scroll_up_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059775E});
     inline int16_t& _auto_msl_warning_off = *reinterpret_cast<int16_t*>(0x0059790E);
     inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
+    inline int16_t* _design_choice_item_selected = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BD40});
     inline uint8_t& _first_special_system_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4A});
     inline int16_t (&_special_system_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BAD0});
     inline int16_t(&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{ 0x00597470 });
