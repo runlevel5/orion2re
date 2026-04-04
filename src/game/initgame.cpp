@@ -343,10 +343,10 @@ namespace INITGAME {
                 // Apply special trait bonuses (lookup table)
                 for (int k = 1; k < TRAIT_COUNT; ++k) {
                     if (plr->traits[k] != 0) {
-                        plr->traits[k] = MOX::_special_bonus[k][plr->traits[k]];
+                        plr->traits[k] = MOX::_special_bonus[k - 1][plr->traits[k] - 1];
                     }
                     if (plr->evolutionary_upgrade_traits[k] != 0) {
-                        plr->evolutionary_upgrade_traits[k] = MOX::_special_bonus[k][plr->evolutionary_upgrade_traits[k]];
+                        plr->evolutionary_upgrade_traits[k] = MOX::_special_bonus[k - 1][plr->evolutionary_upgrade_traits[k - 1]];
                     }
                 }
                 MOX::Mox_Update_();

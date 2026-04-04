@@ -253,7 +253,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         if (screen_state == 2) {
                             for (int trait_idx = 1; trait_idx < 10; ++trait_idx) {
                                 if (plr->traits[trait_idx] != 0) {
-                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx]];
+                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx] - 1];
                                 }
                             }
                             done_flag = 1;

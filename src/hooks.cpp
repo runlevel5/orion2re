@@ -2652,6 +2652,19 @@ namespace hooks {
         { 0x004e48d0, &SCORE::qsort_hof_scores_descending_ },
         { 0x004e4e40, &SCORE::ascending_qsort_uchar_ },
         { 0x004e4980, &SCORE::qsort_hof_scores_ascending_ },
+        { 0x0043A270, &raceopt::Evolutionary_Mutation_Screen_ },
+        { 0x00437990, &raceopt::Player_Score_Modifier_ },
+        { 0x0043a0e0, &raceopt::Calculate_EM_Picks_ },
+        { 0x00438200, &raceopt::Draw_Racial_Option_Screen_ },
+        { 0x00437ab0, &raceopt::Calculate_Picks_ },
+        { 0x00437b90, &raceopt::Draw_Race_Option_Background_ },
+        { 0x00439a90, &raceopt::Reload_Option_Strings_ },
+        { 0x00437a20, &raceopt::Reload_Racial_Option_Screen_ },
+        { 0x0043a0f0, &raceopt::Convert_Player_To_Flags_EM_ },
+        { 0x0043a1d0, &raceopt::Convert_Flags_To_Player_EM_ },
+        { 0x00438AE0, &raceopt::Set_Race_Option_Help_List_ },
+        { 0x00439d60, &raceopt::Add_Race_Options_Fields_EM_ },
+        { 0x00439B20, &raceopt::Real_Ability_Cost_ },
     };
 
     void Install_Hooks()

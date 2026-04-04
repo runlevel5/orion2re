@@ -329,7 +329,8 @@ namespace MOX {
     inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
     inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
 
-    inline int16_t* _help_entry_list = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1900});
+    inline int16_t (&_help_entry_list)[250] =
+        *reinterpret_cast<int16_t(*)[250]>(std::uintptr_t{0x005A1900});
 
     // Suggested name: MOX::_class_to_mineral
     inline uint8_t (&_class_to_mineral)[60] = *reinterpret_cast<uint8_t(*)[60]>(std::uintptr_t{0x00559540});
@@ -593,7 +594,7 @@ namespace MOX {
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
     inline int8_t (&_class_to_num_satellites)[10][6] =
         *reinterpret_cast<int8_t (*)[10][6]>(std::uintptr_t{0x005594C8});
-    inline uint8_t (&_special_bonus)[10][3] = *reinterpret_cast<uint8_t (*)[10][3]>(std::uintptr_t{ 0x0055903A });
+    inline uint8_t (&_special_bonus)[9][3] = *reinterpret_cast<uint8_t (*)[9][3]>(std::uintptr_t{ 0x0055903B });
     inline uint16_t (&_star_fields_dim)[6] = *reinterpret_cast<uint16_t(*)[6]>(std::uintptr_t{ 0x005A47B0 });
 
     inline s_ship_data*& _ship =

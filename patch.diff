@@ -1,13 +1,11 @@
---- src/game/cmbtspec.cpp
-+++ src/game/cmbtspec.cpp
-@@ -1763,8 +1763,8 @@
-                 RUSS::Mox_Sync_Update_();
-                 timer::Release_Time_(1);
+--- src/game/raceopt.cpp
++++ src/game/raceopt.cpp
+@@ -239,7 +239,7 @@
+         Convert_Player_To_Flags_EM_(MOX::_player[player_idx].traits);
+         Calculate_Picks_();
  
--                ship_collapse_3_val -= step * 8;
--                ship_collapse_4_val -= step * 10;
-+                ship_collapse_3_val -= step * 10;
-+                ship_collapse_4_val -= step * 8;
-             }
+-        if (MOX::_player[player_idx].tech_applications[62] == 3) {
++        if (MOX::_player[player_idx].tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3) {
+             _picks += 4;
+         }
  
-             MOX::_dont_draw_ship = -1;

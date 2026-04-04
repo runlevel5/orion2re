@@ -29,6 +29,8 @@ inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
 
+inline const char* s_percent_0055633c = reinterpret_cast<const char*>(0x0055633C); // "%"
+
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {
     using Fn = int(__cdecl*)();
@@ -294,7 +296,11 @@ inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintpt
 inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
 inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
 inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
+inline char* s_RACEOPT_LBX_00556320 = reinterpret_cast<char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
+inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
+inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x00556330}); // "patch13.lbx"
 inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
+inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::uintptr_t{0x00556310});
 
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
