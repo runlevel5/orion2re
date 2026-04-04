@@ -94,7 +94,7 @@ namespace TEXTBOX {
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
     }
 
-    void __cdecl Text_Box_(const char* param_1, const char* param_2) {
-        Do_Text_Box_(const_cast<char*>(param_1), const_cast<char*>(param_2), 0);
+    void __cdecl Text_Box_(void* data_ptr, const char* text) {
+        Do_Text_Box_(reinterpret_cast<char*>(data_ptr), const_cast<char*>(text), 0);
     }
 }

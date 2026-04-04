@@ -544,6 +544,7 @@ inline char* s_space_lparen_0055999c = reinterpret_cast<char*>(std::uintptr_t{0x
 inline char* s_space_x_005599a0 = reinterpret_cast<char*>(std::uintptr_t{0x005599A0}); // " x"
 inline const char* const s_Interdictor_005576ac = reinterpret_cast<const char*>(0x005576AC); // "Interdictor"
 inline const char* const s_Harbinger_005576b8 = reinterpret_cast<const char*>(0x005576B8); // "Harbinger"
+inline const char* s__00557e60 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E60}); // "\n\n"
 inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x00557614);
 inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
 inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"

@@ -49,7 +49,7 @@ namespace farload {
 
     void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6);
 
-    void* __cdecl Far_Reload_Next_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6);
+    void* __cdecl Far_Reload_Next_Data_(const char* filename, int unused, void* buffer, int entry_num, int type, int size);
 
     void* __cdecl Farload_Library_(const char* lib_name, int idx, void* param_3, int alloc_type);
 

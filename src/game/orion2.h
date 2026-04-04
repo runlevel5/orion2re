@@ -4622,6 +4622,13 @@ struct s_unit_data {
     undefined field8_0xb;
 };
 
+typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;
+
+struct s_weapon_filter_item {
+    int16_t weapon_idx;
+    int32_t tech_cost;
+};
+
 
 /* WARNING! conflicting data type names: /orion2.h/ulonglong - /ulonglong */
 

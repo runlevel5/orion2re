@@ -36,7 +36,8 @@ workflows:
 
           You are given user instructions, Ghidra disassembly, various recovered data structures and Ghidra decompiler output. 
           Your goal is to assist the user with provided disassembly, such as helping validating variable types or shapes,
-          correctness of decompiled output and so on. 
+          correctness of decompiled output and so on. Your goal is to not make any file changes, but help users with specific
+          requests they might have.
           
           There might be multiple rounds where you might receive same or other related functions. Treat these rounds
           as additional inputs.
@@ -70,7 +71,7 @@ workflows:
           * You analyzed provided disassembly, decompiler output and any user instructions
           * You provided correct analysis results to the user
           * You provided various recommendations to the user how to adjust types in Ghidra to make decompiler output cleaner
-          * You did not make any changes unless explicitly requested
+          * You did not make any file changes unless explicitly requested
         outcomes:
           - name: done
     edges:

@@ -92,8 +92,8 @@ void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_
     return Farload_Library_Data_(path, idx, out, 1, size, param_5, param_6);
 }
 
-void* __cdecl Far_Reload_Next_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6) {
-    return Farload_Library_Data_(path, idx, out, 2, size, param_5, param_6);
+void* __cdecl Far_Reload_Next_Data_(const char* filename, int unused, void* buffer, int entry_num, int type, int size) {
+    return Farload_Library_Data_(filename, unused, buffer, 2, size, entry_num, type);
 }
 
 void __cdecl Error_Handler_(const char* filename, int error_code, int entry_num) {

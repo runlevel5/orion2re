@@ -68,13 +68,15 @@ namespace MOX {
         *reinterpret_cast<int16_t(*)[300]>(std::uintptr_t{0x00597AF0});
     inline int16_t (&_combat_grid)[81][68] =
         *reinterpret_cast<int16_t (*)[81][68]>(std::uintptr_t{0x00598770});
-    inline int16_t* _weapon_mod_field_status =
-        reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CE0});
+    inline int16_t (&_weapon_mod_field_status)[15] =
+        *reinterpret_cast<int16_t(*)[15]>(std::uintptr_t{0x00596CE0});
     inline int16_t* _weapon_button = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E80});
     inline int16_t* _ship_turn_order = reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BB20});
     inline int16_t* _repl_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D30});
     inline int16_t* _side_end_of_turn = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596DA0});
-    inline int16_t* _design_choice_items = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597310});
+    inline int16_t& DAT_0059730e = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059730E});
+    inline int16_t (&_design_choice_items)[40] =
+        *reinterpret_cast<int16_t (*)[40]>(std::uintptr_t{0x00597310});
     inline int16_t* _weapon_mod_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE0});
     inline int16_t* _weapon_arc_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x00597900});
     inline int16_t* _weapon_rack_field = reinterpret_cast<int16_t*>(std::uintptr_t{0x005A49C0});
@@ -85,6 +87,7 @@ namespace MOX {
     inline int16_t& _special_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059790A});
     inline int16_t& _replacement_box_accept_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978F4});
     inline int16_t& _bomb_filter_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597662});
+    inline int16_t& ENDOF__save_game_description = _bomb_filter_button;
     inline int16_t& DAT_00596fe2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE2});
     inline int16_t& DAT_00596fe4 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596FE4});
     inline int16_t& DAT_00597902 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597902});
@@ -485,14 +488,16 @@ namespace MOX {
     inline s_animation_header* (&_design_size_button_seg)[6] = *reinterpret_cast<s_animation_header*(*)[6]>(std::uintptr_t{0x00597740});
     inline s_animation_header** _darkened_size_button_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B410});
     inline s_animation_header** _weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
+    inline s_animation_header** weapons_arc_pict_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D60});
     inline s_animation_header** _weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
+    inline s_animation_header** weapons_arc_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597030});
     inline s_animation_header** _weapons_rack_text_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597980});
     inline s_animation_header** _weapons_special_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597930});
-    inline void*& _weapon_filter = *reinterpret_cast<void**>(std::uintptr_t{0x0059BA0C});
+    inline s_weapon_filter_item*& _weapon_filter = *reinterpret_cast<s_weapon_filter_item**>(std::uintptr_t{0x0059BA0C});
     inline char** _special_desc_string = reinterpret_cast<char**>(std::uintptr_t{0x00596EB0});
     inline char** _weapon_notes_string = reinterpret_cast<char**>(std::uintptr_t{0x00596DD0});
-    inline void*& DAT_00597994 = *reinterpret_cast<void**>(std::uintptr_t{0x00597994});
-    inline void*& _weapons_rack_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005979A0});
+    inline s_animation_header*& _d_scroll_bar_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597994});
+    inline s_animation_header*& _weapons_rack_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005979A0});
 
     inline s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B464});
 

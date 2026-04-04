@@ -85,4 +85,10 @@ namespace EVANHELP {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(0x0041e120)();
     }
+
+    inline void __cdecl Set_Weapon_Replacement_Screen_Help_List_(int16_t total_rows, int16_t x, int16_t y, bool needs_racks) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041dea0});
+        fn(total_rows, x, y, needs_racks);
+    }
 }

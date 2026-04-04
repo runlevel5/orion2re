@@ -501,7 +501,7 @@ namespace DESIGN {
         MOX::_dull_d_scroll_up_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_dull_d_scroll_dn_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
 
-        MOX::DAT_00597994 = farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_d_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
 
         MOX::_beam_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_missile_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
@@ -517,7 +517,7 @@ namespace DESIGN {
         MOX::_weapons_selected_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::Mox_Update_();
 
-        MOX::_weapons_rack_seg = farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
+        MOX::_weapons_rack_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
 
         for (int i = 0; i < 5; ++i) {
             MOX::_weapons_arc_pict_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
@@ -544,7 +544,7 @@ namespace DESIGN {
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         MOX::_design = (s_current_design*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 0x125);
-        MOX::_weapon_filter = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
+        MOX::_weapon_filter = (s_weapon_filter_item*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0xF0);
 
         char tech_lbx[20];
         Get_Tech_Description_Lbx_Name_(tech_lbx);

@@ -201,4 +201,10 @@ namespace DESIGN {
     void __cdecl Bonus_For_Regular_Mods_(int16_t mods, int16_t* bonus1, int16_t* bonus2);
 
     int16_t __cdecl Weapon_Type_(int16_t weapon_idx);
+
+    inline void __cdecl Clear_Weapon_Slot_(int16_t slot_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042e120});
+        fn(slot_idx);
+    }
 }
