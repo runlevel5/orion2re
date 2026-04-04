@@ -853,8 +853,8 @@ namespace CMBTDRW1 {
                     Draw_Blip4_(blip_x, blip_y, 0x60, blip_frame);
                 } else if (p_size > 0 && p_size <= 4) {
                     allocate::Push_Block_(MOX::_screen_seg);
-                    uint8_t* p_bmp = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 400);
-                    bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)p_bmp, MOX::_combat_map_planet_seg);
+                    s_animation_header* p_bmp = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 400);
+                    bitmap::Draw_Picture_To_Bitmap_(p_bmp, MOX::_combat_map_planet_seg);
 
                     for (int16_t i = 0x60; i < 0x70; ++i) {
                         int16_t shade = i - blip_frame;
@@ -862,7 +862,7 @@ namespace CMBTDRW1 {
                         replace::Replace_Color_(p_bmp, i, shade);
                     }
 
-                    animate::Draw_(blip_x + p_size - 7, blip_y + p_size - 7, reinterpret_cast<s_animation_header*>(p_bmp));
+                    animate::Draw_(blip_x + p_size - 7, blip_y + p_size - 7, p_bmp);
                     allocate::Pop_Block_(MOX::_screen_seg);
                 }
             } else {

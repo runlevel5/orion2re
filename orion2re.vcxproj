@@ -136,6 +136,7 @@
     <ClCompile Include="src\game\random.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\remap.cpp" />
+    <ClCompile Include="src\game\replace.cpp" />
     <ClCompile Include="src\game\report.cpp" />
     <ClCompile Include="src\game\russ.cpp" />
     <ClCompile Include="src\game\score.cpp" />
@@ -317,6 +318,7 @@
     <ClInclude Include="src\game\scroll.h" />
     <ClInclude Include="src\game\settler.h" />
     <ClInclude Include="src\game\setvesa.h" />
+    <ClInclude Include="src\game\shear.h" />
     <ClInclude Include="src\game\shipmove.h" />
     <ClInclude Include="src\game\ships.h" />
     <ClInclude Include="src\game\shipstak.h" />

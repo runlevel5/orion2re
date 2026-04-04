@@ -25,6 +25,7 @@ inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x00552414});
 inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x00552418});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
+inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
@@ -661,6 +662,9 @@ inline const char* const s_Memory_Corruption_val_00558028 =
 
 inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
+
+inline char* s_Cannot_color_replace_refresh_mas_0055b7a0 =
+    reinterpret_cast<char*>(std::uintptr_t{0x0055B7A0}); // "Cannot color replace refresh mask."
 
 inline const char* s_PR_00558238 = reinterpret_cast<const char*>(std::uintptr_t{0x00558238}); // "PR"
 inline const char* s_FP_00558240 = reinterpret_cast<const char*>(std::uintptr_t{0x00558240}); // "FP"

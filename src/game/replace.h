@@ -1,34 +1,29 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+
 namespace replace {
-    inline void __cdecl Replace_Color_All_(void* bitmap, int32_t color) {
-        using Fn = void(__cdecl*)(void*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530710});
-        fn(bitmap, color);
-    }
+    inline uint8_t& _graphics_buffer =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057A9A8});
 
-    inline void __cdecl Replace_Color_Range_(void* bitmap, uint8_t* color_table, int32_t start_color, int32_t count) {
-        using Fn = void(__cdecl*)(void*, uint8_t*, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530890});
-        fn(bitmap, color_table, start_color, count);
-    }
+    inline uint8_t*& _palette_color_list =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0057E07C});
 
-    inline void __cdecl Shift_Palette_Range_(void* bitmap, int32_t range) {
-        using Fn = void(__cdecl*)(void*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530af0});
-        fn(bitmap, range);
-    }
+    void __cdecl Replace_Color_All_(s_animation_header* anim, uint8_t color);
 
-    inline void __cdecl Replace_Color_(void* bitmap, int32_t target_color, int32_t replacement_color) {
-        using Fn = void(__cdecl*)(void*, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530570});
-        fn(bitmap, target_color, replacement_color);
-    }
+    void __cdecl Exit_With_Message_();
 
-    inline void __cdecl Interlaced_Gray_Scale_Off_Page_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t unknown) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530b40});
-        fn(x1, y1, x2, y2, unknown);
-    }
+    void __cdecl Replace_Color_Range_(s_animation_header* anim, uint8_t* palette_map, int16_t start_color, int16_t num_colors);
+
+    inline const char* s_Shift_Palette_Range_exceeds_25_0055b7c4 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B7C4});
+
+    void __cdecl Shift_Palette_Range_(s_animation_header* anim, int shift);
+
+    void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, int8_t new_color);
+
+    void __cdecl Establish_Color_Gradient_(int16_t scale, int16_t invert);
+
+    void __cdecl Interlaced_Gray_Scale_Off_Page_(int8_t color_offset1, int16_t gradient_start1, int8_t color_offset2, int16_t gradient_start2, int16_t gradient_end);
 }

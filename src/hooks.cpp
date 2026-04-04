@@ -2676,6 +2676,13 @@ namespace hooks {
         { 0x0052c020, &remap::Calculate_Picture_Remap_Colors_ },
         { 0x0052c0e0, &remap::Get_Remap_Palette_Color_ },
         { 0x0043baa0, &settler::Room_For_Another_ },
+        { 0x00530710, &replace::Replace_Color_All_ },
+        { 0x00530af0, &replace::Shift_Palette_Range_ },
+        { 0x00530B40, &replace::Interlaced_Gray_Scale_Off_Page_ },
+        { 0x00530880, &replace::Exit_With_Message_ },
+        { 0x00530890, &replace::Replace_Color_Range_ },
+        { 0x00530570, &replace::Replace_Color_ },
+        { 0x00530a80, &replace::Establish_Color_Gradient_ },
     };
 
     void Install_Hooks()

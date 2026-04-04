@@ -78,6 +78,7 @@
 #include "fakebuts.h"
 #include "remap.h"
 #include "replace.h"
+#include "shear.h"
 #include "movebox.h"
 #include "fleetpop.h"
 #include "trade.h"
