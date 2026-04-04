@@ -1898,7 +1898,7 @@ void Planet_Summary_Screen_() {
     MOX::_scroll_bar->thumb_height_px = SCROLL::Get_Vertical_Scroll_Bar_Height_(MOX::_scroll_bar);
     MOX::_scroll_bar->thumb_center_y = MOX::_scroll_bar->track_len_px - (MOX::_scroll_bar->thumb_height_px / 2);
     MOX::_scroll_bar->last_thumb_center_y = -1;
-    MOX::_scroll_bar->field14_0x18 = 2;
+    MOX::_scroll_bar->type = 2;
     MOX::_scroll_bar->row_step = 1;
 
     _p_rotating_planet = reinterpret_cast<s_animation_header**>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 200 /* 0xc8 */));

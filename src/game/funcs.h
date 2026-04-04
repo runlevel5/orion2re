@@ -529,6 +529,14 @@ inline void __cdecl Get_Officer_Pictures_() {
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
+inline void __cdecl Draw_Design_Screen_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042F470});
+    fn();
+}
+
+inline uint8_t& DAT_00590000 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00590000});
+
 inline const char* const s_Raider_0055768c = reinterpret_cast<const char*>(0x0055768C); // "Raider"
 inline char* s_rparen_00557f08 = reinterpret_cast<char*>(std::uintptr_t{0x00557F08}); // ")"
 inline const char* const s_Marauder_00557694 = reinterpret_cast<const char*>(0x00557694); // "Marauder"

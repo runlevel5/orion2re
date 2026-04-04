@@ -2507,7 +2507,7 @@ namespace OFFICER {
 
         sb->thumb_height_px = height;
         sb->last_thumb_center_y = -1;
-        sb->field14_0x18 = 2;
+        sb->type = 2;
         sb->row_step = 1;
 
         // Division logic (CDQ; SUB EAX, EDX; SAR EAX, 1) implements signed height / 2

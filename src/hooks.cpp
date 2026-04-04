@@ -2683,6 +2683,9 @@ namespace hooks {
         { 0x00530890, &replace::Replace_Color_Range_ },
         { 0x00530570, &replace::Replace_Color_ },
         { 0x00530a80, &replace::Establish_Color_Gradient_ },
+        { 0x0048e320, &DESBOX::Draw_Darkened_Design_Screen_ },
+        { 0x0048DFB0, &DESBOX::Generic_Replacement_Box_ },
+        { 0x00490780, &DESBOX::Weapons_Replacement_Box_ },
     };
 
     void Install_Hooks()

@@ -55,6 +55,8 @@ workflows:
           * If you have to search current project, always use `rg` instead of `grep`.
           * Prefer built-in tools over shell tools. For example, use built-in `read_files` instead of `cat` through shell.
           * Ensure that external function stubs and external variables have correct types and addresses.
+          * Detect incorrect signess for existing variables and structure fields. If disassembly clearly uses unsigned instructions,
+            but decompiled project code has signed variable (and vice-a-versa) - mention it with explanation.
           
           # OUTPUT:
           * Your must show places where project code is different from provided disassembly with very short and concise explanation why.

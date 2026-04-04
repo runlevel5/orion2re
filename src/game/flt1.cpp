@@ -11,7 +11,7 @@ namespace FLT1 {
         sb->thumb_height_px = scroll_height;
 
         sb->last_thumb_center_y = -1;
-        sb->field14_0x18 = 0;
+        sb->type = 0;
         sb->row_step = 1;
 
         // Division by 2 logic (CDQ, SUB, SAR) matches signed integer division behavior
