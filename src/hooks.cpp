@@ -2690,6 +2690,10 @@ namespace hooks {
         { 0x0051CA30, &farload::Farload_Library_Data_ },
         { 0x0051C780, &farload::Far_Reload_Next_Data_ },
         { 0x004cc480, &MAINSCR::Scan_Fleet_Movement_Box_Fields_ },
+        { 0x004e9b70, &MAINMENU::Load_Credits_ },
+        { 0x004e9780, &MAINMENU::Draw_Credits_ },
+        { 0x004e9a40, &MAINMENU::Copy_Credit_String_To_Bitmap_ },
+        { 0x004e9e30, &MAINMENU::Init_Credits_ },
     };
 
     void Install_Hooks()

@@ -11,14 +11,17 @@ namespace MAINMENU {
     inline s_animation_header*& _mainmenu_last_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595C5C});
     inline void*& __gametype = *reinterpret_cast<void**>(std::uintptr_t{0x0056ece8});
     inline int16_t& _max_credits = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECE0});
-    inline int32_t& DAT_0056ece4 = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ECE4});
-    inline uint16_t& DAT_0056ecf4 = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056ECF4});
+    inline int32_t& _credit_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ECE4});
+    inline int16_t& _credits_font_style = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ECF4});
     inline uint8_t& _credit_num = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECF8});
     inline uint8_t& _credits_font_spacing = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECFC});
-    inline void*& _bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x0056ED00});
-    inline int32_t& _credit_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed0c});
+    inline s_animation_header*& _bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056ED00});
+    inline int16_t& _credit_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ED0C});
     inline int32_t& _credit_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed10});
     inline int16_t& _delay_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ed18});
+    inline int16_t& _fade_in_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055A5E4});
+    inline int16_t& _fade_out_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055A5E8});
+    inline char (*&_credits)[2][127] = *reinterpret_cast<char (**)[2][127]>(std::uintptr_t{0x00595C54});
 
     inline const char* const s_MAINMENU_LBX_0055a630 = reinterpret_cast<const char*>(0x0055A630); // "MAINMENU.LBX"
     inline const char* const s_C_00552420 = reinterpret_cast<const char*>(0x00552420); // "C"
@@ -49,11 +52,10 @@ namespace MAINMENU {
 
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
-    inline void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, void* bmp) {
-        using Fn = void(__cdecl*)(int16_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E9A40});
-        fn(index, bmp);
-    }
+    inline uint8_t& _credits_column_one =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECEC});
+
+    void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, s_animation_header* bitmap);
 
     void __cdecl Draw_Credits_();
 
@@ -72,9 +74,7 @@ namespace MAINMENU {
 
     int32_t __cdecl Get_File_Animation_Block_Space_();
 
-    inline void Load_Credits_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004e9b70 });
-        fn();
-    }
+    void __cdecl Init_Credits_(char* filename);
+
+    void __cdecl Load_Credits_();
 }

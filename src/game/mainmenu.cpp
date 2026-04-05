@@ -290,6 +290,33 @@ namespace MAINMENU {
         fonts::Print_Centered_(0x205, 0x1BB - (font_h + 1), s_Version_1_31_0055a658);
     }
 
+    void __cdecl Copy_Credit_String_To_Bitmap_(int16_t index, s_animation_header* bitmap) {
+        char buffer[100];
+        char (*credits)[2][127] = MAINMENU::_credits;
+        
+        if (credits[index][0][0] == '\0' && credits[index][1][0] == '\0') {
+            return;
+        }
+
+        strcpy(buffer, credits[index][0]);
+        fonts::Print_To_Bitmap_(0, 0, buffer, bitmap);
+
+        int16_t x_pos = 0;
+        if (buffer[0] != '\0') {
+            x_pos = fonts::Get_String_Width_(buffer) + 4;
+        }
+
+        if (credits[index][0][0] != '\0' && credits[index][1][0] != '\0') {
+            while (x_pos < (int16_t)MAINMENU::_credits_column_one) {
+                fonts::Print_To_Bitmap_(x_pos, 0, s_dot_0055632c, bitmap);
+                x_pos += fonts::Get_String_Width_(s_dot_0055632c);
+            }
+        }
+
+        strcpy(buffer, credits[index][1]);
+        fonts::Print_To_Bitmap_((int16_t)MAINMENU::_credits_column_one + 4, 0, buffer, bitmap);
+    }
+
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors) {
         for (int16_t i = 1; i < 8; ++i) {
             colors->colors[i] += amount;
@@ -297,76 +324,62 @@ namespace MAINMENU {
     }
 
     void __cdecl Draw_Credits_() {
-        s_colors local_colors;
+        s_colors fade_out_palette = { 0xD3, 0xD5, 0xD4, 0xD5, 0xD5, 0xD5, 0xD5, 0xD5 };
+        s_colors fade_in_palette = { 0xD4, 0xD9, 0xD7, 0xD9, 0xD9, 0xD9, 0xD9, 0xD9 };
+        s_colors default_palette = { 0xD5, 0xDC, 0xDA, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC };
+        s_colors active_palette;
 
-        if (_delay_count <= 0) {
-            _credit_y -= 2;
-            DAT_0056ece4 = 0x1A6 - _credit_y;
+        if (MAINMENU::_delay_count <= 0) {
+            MAINMENU::_credit_y -= 2;
+            MAINMENU::_credit_count = 0x1A6 /* 422 */ - MAINMENU::_credit_y;
 
-            int16_t start_fade_idx = (_credit_y < 0xB3) ? (int16_t)((0xB3 - _credit_y) / 14) : (int16_t)-1;
-            int16_t end_fade_idx = (int16_t)(DAT_0056ece4 / 14);
-            int16_t current_y = (int16_t)_credit_y;
+            int16_t fade_in_line_idx = -1;
+            if (MAINMENU::_credit_y < 0xB3 /* 179 */) {
+                fade_in_line_idx = (int16_t)((0xB3 - MAINMENU::_credit_y) / 14);
+            }
 
-            for (int16_t i = 0; i < _max_credits; ++i) {
-                if (i == start_fade_idx) {
-                    local_colors.colors[0] = 0xD4;
-                    local_colors.colors[1] = 0xD9;
-                    local_colors.colors[2] = 0xD7;
-                    local_colors.colors[3] = 0xD9;
-                    local_colors.colors[4] = 0xD9;
-                    local_colors.colors[5] = 0xD9;
-                    local_colors.colors[6] = 0xD9;
-                    local_colors.colors[7] = 0xD9;
-                    int8_t intensity = (int8_t)((((_credit_y - 0xB3) % 14) / 3) * 2);
-                    Fade_Credit_Colors_(intensity, &local_colors);
-                } else if (i == end_fade_idx) {
-                    int32_t rem = (0x1A6 - _credit_y) % 14;
-                    local_colors.colors[0] = 0xD3;
-                    local_colors.colors[1] = 0xD5;
-                    local_colors.colors[2] = 0xD4;
-                    local_colors.colors[3] = 0xD5;
-                    local_colors.colors[4] = 0xD5;
-                    local_colors.colors[5] = 0xD5;
-                    local_colors.colors[6] = 0xD5;
-                    local_colors.colors[7] = 0xD5;
-                    int8_t intensity = (int8_t)(((rem + (rem < 0 ? 3 : 0)) / 4) * 2);
-                    Fade_Credit_Colors_(intensity, &local_colors);
+            int16_t fade_out_line_idx = (int16_t)(MAINMENU::_credit_count / 14);
+            int16_t current_y = MAINMENU::_credit_y;
+
+            for (int16_t i = 0; i < MAINMENU::_max_credits; ++i) {
+                if (i == fade_in_line_idx) {
+                    active_palette = fade_in_palette;
+                    int16_t remainder = (MAINMENU::_credit_y - 0xB3) % 14;
+                    int8_t step = (int8_t)((remainder / 3) * 2);
+                    MAINMENU::Fade_Credit_Colors_(step, &active_palette);
+                } else if (i == fade_out_line_idx) {
+                    active_palette = fade_out_palette;
+                    int32_t remainder = MAINMENU::_credit_count % 14;
+                    // Standard C signed division adjustment for SAR implementation
+                    int8_t step = (int8_t)(((remainder + (remainder < 0 ? 3 : 0)) >> 2) * 2);
+                    MAINMENU::Fade_Credit_Colors_(step, &active_palette);
                 } else {
-                    local_colors.colors[0] = 0xD5;
-                    local_colors.colors[1] = 0xDC;
-                    local_colors.colors[2] = 0xDA;
-                    local_colors.colors[3] = 0xDC;
-                    local_colors.colors[4] = 0xDC;
-                    local_colors.colors[5] = 0xDC;
-                    local_colors.colors[6] = 0xDC;
-                    local_colors.colors[7] = 0xDC;
+                    active_palette = default_palette;
                 }
 
                 fonts::Set_Outline_Color_(0xFD, 0xFD);
-                fonts::Set_Font_Style_Outline_((int16_t)DAT_0056ecf4, &local_colors);
-                fonts::Set_Font_Spacing_((int16_t)_credits_font_spacing);
+                fonts::Set_Font_Style_Outline_(MAINMENU::_credits_font_style, &active_palette);
+                fonts::Set_Font_Spacing_((int16_t)MAINMENU::_credits_font_spacing);
                 
-                bitmap::Create_Blank_Bitmap_(0x121, 14, _bitmap);
-                Copy_Credit_String_To_Bitmap_(i, _bitmap);
+                bitmap::Create_Blank_Bitmap_(289 /* 0x121 */, 14, MAINMENU::_bitmap);
+                MAINMENU::Copy_Credit_String_To_Bitmap_(i, MAINMENU::_bitmap);
                 
-                graphics::Set_Window_(0x42, 0xB3, 0x162, 0x1A6);
+                graphics::Set_Window_(66 /* 0x42 */, 179 /* 0xB3 */, 354 /* 0x162 */, 422 /* 0x1A6 */);
                 video::Clip_On_();
-                animate::Draw_(0x42, current_y, (s_animation_header*)_bitmap);
+                animate::Draw_(66 /* 0x42 */, current_y, MAINMENU::_bitmap);
                 video::Clip_Off_();
-                
+
                 current_y += 14;
             }
         } else {
-            _delay_count--;
+            MAINMENU::_delay_count--;
         }
 
-        int32_t abs_offset = _credit_y - 0xB3;
-        if (abs_offset < 0) abs_offset = -abs_offset;
-
-        if (abs_offset > (int32_t)(_max_credits * 14)) {
-            _credit_x = 0x42;
-            _credit_y = 0x1A6;
-            _delay_count = 10;
+        // Check if credits have finished scrolling off the top
+        if (abs(MAINMENU::_credit_y - 179) > MAINMENU::_max_credits * 14) {
+            MAINMENU::_credit_x = 0x42 /* 66 */;
+            MAINMENU::_credit_y = 0x1A6 /* 422 */;
+            MAINMENU::_delay_count = 10;
         }
     }
 
@@ -523,11 +536,96 @@ namespace MAINMENU {
         } while (true);
     }
 
+    void __cdecl Load_Credits_() {
+        char path[20];
+        char* data;
+        int16_t credit_idx;
+        int32_t entry_idx;
+
+        Init_Credits_(path);
+        RUSS::Mox_Update_();
+
+        // Load entry 0 to get the total number of credits
+        data = (char*)farload::Far_Reload_Next_Data_(path, 0, MOX::_screen_seg, 0, 1, 127);
+        entry_idx = 1;
+        RUSS::Mox_Update_();
+
+        _max_credits = (int16_t)atoi(data);
+        _credits = (char (*)[2][127])allocate::Allocate_Next_Block_(MOX::_screen_seg, _max_credits * 254);
+
+        for (credit_idx = 0; credit_idx < _max_credits; ++credit_idx) {
+            RUSS::Mox_Update_();
+
+            // Load first line of credit entry
+            allocate::Push_Block_(MOX::_screen_seg);
+            data = (char*)farload::Far_Reload_Next_Data_(path, 0, MOX::_screen_seg, entry_idx++, 1, 127);
+            allocate::Pop_Block_(MOX::_screen_seg);
+            strcpy(_credits[credit_idx][0], data);
+
+            // Load second line of credit entry
+            allocate::Push_Block_(MOX::_screen_seg);
+            data = (char*)farload::Far_Reload_Next_Data_(path, 0, MOX::_screen_seg, entry_idx++, 1, 127);
+            allocate::Pop_Block_(MOX::_screen_seg);
+            strcpy(_credits[credit_idx][1], data);
+        }
+
+        _credit_num = 1;
+        _credit_x = 66;
+        _delay_count = 0;
+        _credit_count = 0;
+        _fade_in_count = 0;
+        _credit_y = 422;
+        _fade_out_count = 0;
+
+        uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(289, 14);
+        _bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+        RUSS::Mox_Update_();
+    }
+
     int32_t __cdecl Get_File_Animation_Block_Space_() {
         s_animation_header* header = init::_io_buffer;
         int16_t index = header->current_frame;
         int32_t current_val = header->frame_offsets[index];
         int32_t next_val = header->frame_offsets[index + 1];
         return (next_val - current_val) + 1;
+    }
+
+    void __cdecl Init_Credits_(char* filename) {
+        switch (MOX::_settings.language) {
+            case 1: /* German */
+                _credits_font_style = 2;
+                _credits_font_spacing = 2;
+                _credits_column_one = 0x9a;
+                memcpy(filename, s_GERCRDTS_LBX, 13);
+                return;
+
+            case 2: /* French */
+                _credits_column_one = 0xa4;
+                _credits_font_spacing = 1;
+                _credits_font_style = 2;
+                memcpy(filename, s_FRECRDTS_LBX, 13);
+                return;
+
+            case 3: /* Spanish */
+                _credits_column_one = 0x92;
+                _credits_font_spacing = 1;
+                _credits_font_style = 2;
+                memcpy(filename, s_SPACRDTS_LBX, 13);
+                return;
+
+            case 4:
+                _credits_column_one = 0x92;
+                _credits_font_spacing = 1;
+                _credits_font_style = 2;
+                memcpy(filename, DAT_0055A668, 13);
+                return;
+
+            default: /* English */
+                _credits_column_one = 0x7c;
+                _credits_font_spacing = 1;
+                _credits_font_style = 3;
+                memcpy(filename, s_CREDITS_LBX, 12);
+                return;
+        }
     }
 }
