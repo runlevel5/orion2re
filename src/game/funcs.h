@@ -815,4 +815,10 @@ struct s_fleet_movement_icon;
 inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
     *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
 
+inline void __cdecl Restore_Mouse_List_() {
+    using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F21D0});
+    fn();
+}
+
 struct s_mouse_list;

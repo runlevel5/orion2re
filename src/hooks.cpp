@@ -1426,7 +1426,6 @@ namespace hooks {
         { 0x004e0e80, &COLONY::XY_In_Bldg_Poly_ },
         { 0x004e05b0, &COLONY::Add_Bldg_Fields_ },
         { 0x00471850, &TEXTBOX::Get_Help_Lbx_Name_ },
-        { 0x004710b0, &TEXTBOX::Do_Text_Box_ },
         { 0x004fafb0, &COLCALC::Surrender_Empire_ },
         { 0x004faeb0, &COLCALC::Surrender_Star_ },
         { 0x004fb230, &COLCALC::Do_Surrender_Colony_ },
@@ -2725,6 +2724,14 @@ namespace hooks {
         { 0x0049a730, &HACCESS::Enemy_Ship_Going_To_My_Colony_ },
         { 0x0049add0, &HACCESS::Set_All_Colony_Auto_Select_Flags_ },
         { 0x0049acd0, &HACCESS::Race_Name_ },
+        { 0x00466710, &TRADE::Start_Trade_Agreement_ },
+        { 0x004667d0, &TRADE::Start_Research_Agreement_ },
+        { 0x00471550, &TEXTBOX::Text_Box_Startup_ },
+        { 0x004713c0, &TEXTBOX::Box_Centered_On_XY_ },
+        { 0x00471710, &TEXTBOX::Text_Box_Get_Input_ },
+        { 0x00471690, &TEXTBOX::Text_Box_Cleanup_ },
+        { 0x004710b0, &TEXTBOX::Do_Text_Box_ },
+        { 0x00471850, &TEXTBOX::Get_Help_Lbx_Name_ },
     };
 
     void Install_Hooks()

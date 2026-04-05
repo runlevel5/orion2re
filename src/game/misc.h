@@ -57,9 +57,9 @@ namespace MISC {
         fn(x1, y1, x2, y2, field_4, colors, target_color, field_7, anim);
     }
 
-    void __cdecl Save_Window_Status_(int16_t* status);
+    void __cdecl Save_Window_Status_(void* status);
 
-    void __cdecl Restore_Window_Status_(int16_t clip_enabled);
+    void __cdecl Restore_Window_Status_(uint32_t status);
 
     void __cdecl Get_LBX_Message_(int16_t message_id, char* buffer);
 

@@ -16,6 +16,10 @@ namespace remap {
 
     void __cdecl Create_Picture_Remap_Palette_(uint8_t* src_palette, uint8_t* remap_table);
 
+    inline uint8_t& color_2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576332});
+    inline uint8_t& color_3 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576333});
+    inline uint8_t& color_4 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576334});
+
     void __cdecl Calculate_Picture_Remap_Colors_(s_animation_header* header);
 
     uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index);

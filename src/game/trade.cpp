@@ -211,4 +211,50 @@ namespace TRADE {
             }
         }
     }
+
+    void __cdecl Start_Trade_Agreement_(s_player* player_a, int16_t player_b_idx) {
+        int16_t base_goal = TRADE::Base_Trade_Agreement_Goal_(player_a, player_b_idx);
+        // Calculate player_a index from pointer subtraction (s_player size is 0xEA9)
+        int16_t player_a_idx = static_cast<int16_t>(player_a - MOX::_player);
+        s_player* player_b = &MOX::_player[player_b_idx];
+
+        player_a->trade_treaty[player_b_idx] = 1;
+        player_a->current_trade_agreement_level[player_b_idx] = -base_goal;
+        player_a->trade_agreement_goal[player_b_idx] = TRADE::Trade_Agreement_Goal_(player_a, player_b_idx);
+
+        player_b->trade_treaty[player_a_idx] = 1;
+        player_b->current_trade_agreement_level[player_a_idx] = -base_goal;
+        player_b->trade_agreement_goal[player_a_idx] = TRADE::Trade_Agreement_Goal_(player_b, player_a_idx);
+
+        COLCALC::Update_Player_Stats_(player_a);
+        COLCALC::Update_Player_Stats_(player_b);
+    }
+
+    void __cdecl Start_Research_Agreement_(s_player* player_a, int16_t player_b_idx) {
+        int16_t combined_pts;
+        int16_t player_a_idx;
+        s_player* player_b;
+        int16_t goal;
+
+        combined_pts = static_cast<int16_t>(TRADE::Get_Combined_Research_Points_(player_a, player_b_idx));
+
+        player_a_idx = static_cast<int16_t>(player_a - MOX::_player);
+
+        player_a->research_treaty[player_b_idx] = 1;
+        player_a->current_research_agreement_level[player_b_idx] = -combined_pts;
+
+        player_b = &MOX::_player[player_b_idx];
+
+        goal = TRADE::Research_Agreement_Goal_(player_a, player_b_idx);
+        player_a->research_agreement_goal[player_b_idx] = goal;
+
+        player_b->research_treaty[player_a_idx] = 1;
+        player_b->current_research_agreement_level[player_a_idx] = -combined_pts;
+
+        goal = TRADE::Research_Agreement_Goal_(player_b, player_a_idx);
+        player_b->research_agreement_goal[player_a_idx] = goal;
+
+        COLCALC::Update_Player_Stats_(player_a);
+        COLCALC::Update_Player_Stats_(player_b);
+    }
 }

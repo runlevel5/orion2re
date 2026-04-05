@@ -1,100 +1,243 @@
 #include "pch.h"
 
 namespace TEXTBOX {
-    void __cdecl Get_Help_Lbx_Name_(char* lbx_name) {
+    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name) {
         switch (MOX::_settings.language) {
-            case 1:
-                strcpy(lbx_name, s_GER_HELP_LBX_00557480);
+            case 1: /* German */
+                strcpy(help_lbx_name, s_GER_HELP_LBX);
                 break;
-            case 2:
-                strcpy(lbx_name, s_FRE_HELP_LBX_00557470);
+            case 2: /* French */
+                strcpy(help_lbx_name, s_FRE_HELP_LBX);
                 break;
-            case 3:
-                strcpy(lbx_name, s_SPA_HELP_LBX_00557450);
+            case 3: /* Spanish */
+                strcpy(help_lbx_name, s_SPA_HELP_LBX);
                 break;
-            case 4:
-                strcpy(lbx_name, s_ITA_HELP_LBX_00557460);
+            case 4: /* Italian */
+                strcpy(help_lbx_name, s_ITA_HELP_LBX);
                 break;
-            default:
-                strcpy(lbx_name, s_HELP_LBX_00557490);
+            default: /* English / Default */
+                strcpy(help_lbx_name, s_HELP_LBX);
                 break;
         }
     }
+    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height, int32_t flag) {
+        int16_t total_height = height + 85;
+        int centered_y;
 
-    void __cdecl Do_Text_Box_(char* title, char* body_text, int16_t input_param) {
-        int16_t x = 0;
-        int16_t y = 0;
-        uint8_t color_1 = 0;
+        if (MOX::_current_screen == 0) {
+            *x_ptr = 84;
+            centered_y = (400 - total_height) / 2 + 21;
+            if (centered_y < 6) {
+                centered_y = 5;
+            }
+        } else {
+            *x_ptr = 130;
+            centered_y = (480 - total_height) / 2;
+        }
+        *y_ptr = (int16_t)centered_y;
+
+        s_animation_header* header_top = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
+        remap::Calculate_Picture_Remap_Colors_(header_top);
+
+        graphics::Tri_Interlaced_Fill_(
+            *x_ptr + 5,
+            *y_ptr + 5,
+            *x_ptr + 375,
+            *y_ptr + total_height - 5,
+            remap::color_2,
+            remap::color_3,
+            remap::color_4
+        );
+
+        int16_t y_mid = *y_ptr + 42;
+        animate::Remap_Draw_(*x_ptr, *y_ptr, header_top);
+
+        s_animation_header* header_mid = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 1, MOX::_global_cache_seg);
+        int16_t y_bot = height + y_mid;
+
+        int16_t window_status[4];
+        MISC::Save_Window_Status_(window_status);
+
+        graphics::Set_Window_(*x_ptr, y_mid, *x_ptr + 380, y_bot);
+        video::Clip_On_();
+        animate::Remap_Draw_(*x_ptr, y_mid, header_mid);
+        MISC::Restore_Window_Status_(*(uint32_t*)window_status);
+
+        s_animation_header* header_bot = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 2, MOX::_global_cache_seg);
+        animate::Remap_Draw_(*x_ptr, y_bot, header_bot);
+
+        _bottom_y = y_bot + 43;
+    }
+    void __cdecl Text_Box_Startup_(int32_t size) {
+        HAROLD::Save_Mouse_List_();
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+
+        TEXTBOX::_old_help_list_active = fields::_help_list_active;
+        fields::_help_list_active = 0;
+
+        MOX2::Get_Auto_Function_(&TEXTBOX::_textbox_af);
+        fields::Deactivate_Auto_Function_();
+        video::Set_Refresh_Stencil_();
+        MOX2::Execute_Auto_Function_(&TEXTBOX::_textbox_af);
+
+        TEXTBOX::_old_draw_fields_flag = fields::_draw_fields_flag;
+        fields::Enable_Draw_All_Fields_();
+        fields::Draw_Visible_Fields_();
+        fields::Disable_Draw_All_Fields_();
+
+        // 18 bytes per record based on assembly: (ix * 2) + (ix * 16)
+        void* save_ptr = (uint8_t*)&TEXTBOX::_textbox_field_save + (TEXTBOX::_field_save_ix * 18);
+        FIELDSAV::Save_Field_Stats_((int16_t*)save_ptr);
+        TEXTBOX::_field_save_ix++;
+
+        int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+        if (remaining - 0x200 < size) {
+            swap::Save_Block_To_Drive_(MOX::_screen_seg, size + 0x200);
+            TEXTBOX::_textbox_seg = (uint32_t)allocate::Allocate_First_Block_(MOX::_screen_seg, size + 0x180);
+            TEXTBOX::_reload_saved_block = 1;
+        } else {
+            allocate::Push_Block_(MOX::_screen_seg);
+            TEXTBOX::_reload_saved_block = 0;
+            TEXTBOX::_textbox_seg = (uint32_t)allocate::Allocate_Next_Block_(MOX::_screen_seg, size + 0x180);
+        }
+
+        s_animation_header* header = (s_animation_header*)Buffer_Reload_(TEXTBOX::s_textbox_lbx, 0, MOX::_global_cache_seg);
+        remap::Calculate_Picture_Remap_Colors_(header);
+    }
+
+    void __cdecl Text_Box_Get_Input_(int16_t ticks) {
+        if (ticks != 0) {
+            fields::Timed_Wait_For_Input_(static_cast<int32_t>(ticks));
+            fields::Clear_Mouse_Buffer_();
+            fields::Set_Input_Delay_(3);
+            return;
+        }
+
+        // Wait for mouse button release
+        while (mouse::Mouse_Button_() != 0) {
+            timer::Mark_Time_();
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
+        }
+
+        fields::Clear_Mouse_Buffer_();
+
+        // Wait for any keyboard or mouse input
+        do {
+            timer::Mark_Time_();
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(1);
+        } while (fields::Get_Input_() == 0);
+    }
+
+    void __cdecl Text_Box_Cleanup_() {
+        RUSS::Mox_Sync_Update_();
+        _field_save_ix--;
+        FIELDSAV::Restore_Field_Stats_(&_textbox_field_save);
+        fields::Enable_Draw_All_Fields_();
+
+        if (_reload_saved_block != 0) {
+            swap::Restore_Block_From_Drive_();
+        } else {
+            allocate::Pop_Block_(MOX::_screen_seg);
+        }
+
+        MOX2::Put_Auto_Function_(&_textbox_af);
+        fields::Activate_Auto_Function_();
+        fields::Clear_Mouse_Buffer_();
+        fields::Set_Input_Delay_(3);
+
+        fields::_help_list_active = _old_help_list_active;
+        fields::_draw_fields_flag = _old_draw_fields_flag;
+
+        Restore_Mouse_List_();
+    }
+
+    void __cdecl Do_Text_Box_(const char* title, const char* text, int16_t input_flag) {
+        s_colors colors_1;
+        s_animation_header *anim;
+        s_colors colors_2;
         uint8_t color_2 = 0;
-        s_colors style_colors;
-        s_colors base_colors;
-        int16_t text_x, text_y;
+        uint8_t color_1 = 0;
+        int16_t font_spacing;
+        int16_t title_x;
         int16_t window_status;
+        int16_t font_style;
+        uint16_t width;
+        int16_t y = 0;
+        int16_t x = 0;
 
         Get_Mox_Text_Box_Base_Colors_(0, &color_1, &color_2);
-        Text_Box_Startup_(60000 /* 0xea60 */);
+        Text_Box_Startup_(60000);
 
-        style_colors = *MISC::Font_Colors2_(5, color_1, color_2);
-        base_colors = *MISC::Font_Colors2_(3, color_1, color_2);
+        colors_1 = *MISC::Font_Colors2_(5, color_1, color_2);
+        colors_2 = *MISC::Font_Colors2_(3, color_1, color_2);
 
-        fonts::Set_Font_Style_(3, &style_colors);
+        fonts::Set_Font_Style_(3, &colors_1);
 
-        int16_t height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(339 /* 0x153 */, body_text);
-        int16_t width = FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_();
-        if (width > 339 /* 0x153 */) {
-            width = 339 /* 0x153 */;
-        }
+        uint16_t max_height = (uint16_t)FMTPARA::Get_Formatted_Paragraph_Max_Height_(339, const_cast<char*>(text));
 
-        Box_Centered_On_XY_(&x, &y, height, title != nullptr);
-
-        s_animation_header* anim = (s_animation_header*)farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, (void*)_textbox_seg);
-
-        if (title != nullptr) {
-            fonts::Set_Remap_Font_Style_(5, &style_colors);
-            fonts::Get_String_Width_(title);
-            MISC::Set_Fitted_Font_Style_(title, &style_colors, 5, 2, -1, 380 /* 0x17c */, 3);
-            
-            int16_t current_style = MISC::Get_Font_Style_();
-            int16_t current_spacing = MISC::Get_Font_Spacing_();
-            
-            style_colors = *MISC::Font_Colors2_(current_style, color_1, color_2);
-            fonts::Set_Remap_Font_Style_(current_style, &style_colors);
-            fonts::Set_Font_Spacing_(current_spacing);
-            
-            fonts::Print_Centered_(x + 190 /* 0xbe */, y + 11 /* 0xb */, title);
-        }
-
-        fonts::Set_Remap_Font_Style_(3, &base_colors);
-
-        if (title != nullptr) {
-            text_x = x + 20 /* 0x14 */;
-            text_y = y + 42 /* 0x2a */;
+        if (FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_() < 339) {
+            width = (uint16_t)FMTPARA::Get_Last_Formatted_Paragraph_Max_Width_();
         } else {
-            text_x = x + 8 + (362 /* 0x16a */ - (int32_t)width) / 2;
-            text_y = y + 12 + ((int32_t)height + 43 /* 0x2b */ - (int32_t)height) / 2;
+            width = 339;
+        }
+
+        Box_Centered_On_XY_(&x, &y, max_height, title != nullptr);
+
+        anim = reinterpret_cast<s_animation_header*>(
+            farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, reinterpret_cast<void*>(_textbox_seg))
+        );
+
+        if (title != nullptr) {
+            fonts::Set_Remap_Font_Style_(5, &colors_1);
+            int16_t title_y_base = y;
+            title_x = x + 190;
+            fonts::Get_String_Width_(title);
+            MISC::Set_Fitted_Font_Style_(const_cast<char*>(title), &colors_1, 5, 2, -1, 380, 3);
+            font_style = MISC::Get_Font_Style_();
+            font_spacing = MISC::Get_Font_Spacing_();
+            colors_1 = *MISC::Font_Colors2_(font_style, color_1, color_2);
+            fonts::Set_Remap_Font_Style_(font_style, &colors_1);
+            fonts::Set_Font_Spacing_(font_spacing);
+            fonts::Print_Centered_(title_x, title_y_base + 11, title);
+        }
+
+        fonts::Set_Remap_Font_Style_(3, &colors_2);
+
+        int16_t print_x = x + 20;
+        int16_t print_y = y + 42;
+
+        if (title == nullptr) {
+            print_x = x + 8 + (362 - width) / 2;
+            print_y = y + 12 + ((max_height + 43) - max_height) / 2;
         }
 
         MISC::Save_Window_Status_(&window_status);
-        graphics::Set_Window_(x + 20 /* 0x14 */, y + 42 /* 0x2a */, x + 359 /* 0x167 */, y + 418 /* 0x1a2 */);
+
+        graphics::Set_Window_(x + 20, y + 42, x + 359, y + 418);
+
         video::Clip_On_();
 
-        FMTPARA::Print_Formatted_Paragraph_(text_x, text_y, width, body_text, 0);
+        FMTPARA::Print_Formatted_Paragraph_(print_x, print_y, width, const_cast<char*>(text), 0);
 
-        MISC::Restore_Window_Status_(window_status);
+        MISC::Restore_Window_Status_((uint32_t)window_status);
+
         video::Copy_Off_To_Back_();
 
-        fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, s__00551120, 41 /* 0x29 */);
+        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
 
-        Text_Box_Get_Input_(input_param);
+        Text_Box_Get_Input_(input_flag);
 
         animate::Set_Animation_Frame_(anim, 1);
-        animate::Remap_Draw_(x + 158 /* 0x9e */, _bottom_y - 27 /* 0x1b */, anim);
+        animate::Remap_Draw_(x + 158, _bottom_y - 27, anim);
 
         Text_Box_Cleanup_();
+
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
     }
 
-    void __cdecl Text_Box_(void* data_ptr, const char* text) {
-        Do_Text_Box_(reinterpret_cast<char*>(data_ptr), const_cast<char*>(text), 0);
+    void __cdecl Text_Box_(const char* title, const char* text) {
+        Do_Text_Box_(title, text, 0);
     }
 }

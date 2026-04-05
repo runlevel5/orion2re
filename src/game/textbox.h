@@ -4,10 +4,27 @@
 namespace TEXTBOX {
     inline int16_t& _bottom_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EC8});
     inline uint32_t& _textbox_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565ED8});
+    inline uint16_t& _field_save_ix = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00557434});
+    inline const char* s_textbox_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
     inline const char* s_textbox_lbx_00557444 = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
+    inline const char* const s_SPA_HELP_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00557450}); // "SPA_HELP.LBX"
+    inline const char* const s_ITA_HELP_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00557460}); // "ITA_HELP.LBX"
+    inline const char* const s_FRE_HELP_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00557470}); // "FRE_HELP.LBX"
+    inline const char* const s_GER_HELP_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
+    inline const char* const s_HELP_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
+    inline int16_t& _textbox_field_save = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EA0});
+    inline uint8_t& _reload_saved_block = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565ECC});
+    inline uint16_t& _old_draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565ED0});
+    inline void*& _textbox_af = *reinterpret_cast<void**>(std::uintptr_t{0x00565ED4});
+    inline uint16_t& _old_help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565EEC});
     inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
 
-    void __cdecl Get_Help_Lbx_Name_(char* lbx_name);
+    void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name);
 
     inline void __cdecl Get_Mox_Text_Box_Base_Colors_(int unknown, uint8_t* color_out_1, uint8_t* color_out_2) {
         using Fn = void(__cdecl*)(int, uint8_t*, uint8_t*);
@@ -15,37 +32,17 @@ namespace TEXTBOX {
         fn(unknown, color_out_1, color_out_2);
     }
 
-    inline void __cdecl Text_Box_Startup_(int size) {
-        using Fn = void(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471550});
-        fn(size);
-    }
+    void __cdecl Text_Box_Startup_(int32_t size);
 
-    inline void __cdecl Box_Centered_On_XY_(int16_t* out_x, int16_t* out_y, int16_t height, bool has_title) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004713c0});
-        fn(out_x, out_y, height, has_title);
-    }
+    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height, int32_t flag);
 
-    inline void __cdecl Text_Box_Get_Input_(int16_t input_type) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471710});
-        fn(input_type);
-    }
+    void __cdecl Text_Box_Get_Input_(int16_t ticks);
 
-    inline void __cdecl Text_Box_Cleanup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471690});
-        fn();
-    }
+    void __cdecl Text_Box_Cleanup_();
 
-    void __cdecl Do_Text_Box_(char* title, char* text, int16_t input_type);
+    void __cdecl Do_Text_Box_(const char* title, const char* text, int16_t input_flag);
 
-    inline void __cdecl Text_Box_(const char* title, const char* body) {
-        using Fn = void(__cdecl*)(const char*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471070});
-        fn(title, body);
-    }
+    void __cdecl Text_Box_(const char* title, const char* text);
 
     inline void __cdecl Draw_Help_Entry_(int16_t help_id) {
         using Fn = void(__cdecl*)(int16_t);

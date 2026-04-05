@@ -133,12 +133,13 @@ namespace MISC {
         MISC::Set_Font_Colors_(&colors);
     }
 
-    void __cdecl Save_Window_Status_(int16_t* status) {
+    void __cdecl Save_Window_Status_(void* status) {
         graphics::Save_Window_();
-        *status = animate::_clipping_flag;
+        *(int16_t*)status = animate::_clipping_flag;
     }
 
-    void __cdecl Restore_Window_Status_(int16_t clip_enabled) {
+    void __cdecl Restore_Window_Status_(uint32_t status) {
+        int16_t clip_enabled = (int16_t)status;
         graphics::Restore_Window_();
         if (clip_enabled != 0) {
             video::Clip_On_();

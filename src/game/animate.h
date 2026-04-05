@@ -38,10 +38,10 @@ namespace animate {
 
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* resource);
 
-    inline void __cdecl Remap_Draw_(int x, int y, void* anim) {
-        using Fn = void(__cdecl*)(int, int, void*);
+    inline void __cdecl Remap_Draw_(int16_t x, int16_t y, s_animation_header* header) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00524dd0});
-        fn(x, y, anim);
+        fn(x, y, header);
     }
 
     inline void __cdecl Draw_No_Glass_(int16_t x, int16_t y, s_animation_header* seg) {
