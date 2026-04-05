@@ -1389,7 +1389,6 @@ namespace hooks {
         { 0x004dff60, &COLONY::Update_Fields_ },
         { 0x004dd8d0, &COLONY::Colony_Has_Natives_ },
         { 0x004e15e0, &COLONY::Evaluate_Screen_Input_ },
-        { 0x004187a0, &gui::GUI_Prepare_Text },
         { 0x004e1050, &COLONY::Get_Selected_Pop_ },
         { 0x004e0f40, &COLONY::Check_Job_Fields_ },
         { 0x004dfff0, &COLONY::Add_Job_Fields_ },

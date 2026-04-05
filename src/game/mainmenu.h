@@ -71,4 +71,10 @@ namespace MAINMENU {
     void __cdecl Main_Menu_Screen_();
 
     int32_t __cdecl Get_File_Animation_Block_Space_();
+
+    inline void Load_Credits_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004e9b70 });
+        fn();
+    }
 }

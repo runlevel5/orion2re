@@ -333,9 +333,6 @@
     <ClCompile Include="src\game\fakebuts.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\gui.cpp">
-      <Filter>src\game</Filter>
-    </ClCompile>
     <ClCompile Include="src\game\fmtpara.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
@@ -429,6 +426,9 @@
     <ClCompile Include="src\game\racerprt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\remap.cpp" />
+    <ClCompile Include="src\game\replace.cpp" />
+    <ClCompile Include="src\game\settler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -905,9 +905,6 @@
     <ClInclude Include="src\game\cmbtfir2.h">
       <Filter>src\game</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\gui.h">
-      <Filter>src\game</Filter>
-    </ClInclude>
     <ClInclude Include="src\game\newpup.h">
       <Filter>src\game</Filter>
     </ClInclude>
@@ -974,6 +971,7 @@
     <ClInclude Include="src\game\s_score.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\shear.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

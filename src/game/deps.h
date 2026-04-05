@@ -180,7 +180,6 @@
 #include "council.h"
 #include "s_council.h"
 #include "global.h"
-#include "gui.h"
 #include "combat1.h"
 #include "cmbtmov1.h"
 #include "cmbtfire.h"

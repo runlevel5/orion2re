@@ -380,7 +380,7 @@ namespace MAINMENU {
 
         _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);
         MOX::Mox_Update_();
-        MOX::Load_Credits_();
+        MAINMENU::Load_Credits_();
         MOX::Mox_Update_();
 
         MOX::_game_type = 0;

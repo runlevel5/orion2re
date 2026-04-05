@@ -314,7 +314,7 @@ namespace MOX2 {
 
         if (MOX2::_quick_start != 0) {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            if (MOX::Read_Moo_Custom_Player_Data_(player)) {
+            if (FILEDEF::Read_Moo_Custom_Player_Data_(player)) {
                 INITGAME::Init_New_Game_(
                     MOX::_settings.game_difficulty,
                     MOX::_settings.galaxy_size,

@@ -888,32 +888,8 @@ namespace MOX {
         fn();
     }
 
-    inline void Load_Credits_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e9b70});
-        fn();
-    }
-
-    inline bool Read_Moo_Custom_Player_Data_(s_player* player) {
-        using Fn = bool(*)(s_player*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043D1C0 });
-        return fn(player);
-    }
-
     inline void __cdecl Apply_Save_Settings(s_settings* settings) {
         using Fn = void(__cdecl*)(s_settings*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0043D290})(settings);
-    }
-
-    inline void __cdecl Check_Free(void* ptr) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494090});
-        fn(ptr);
-    }
-
-    inline void* __cdecl Check_Allocate(size_t size) {
-        using Fn = void*(__cdecl*)(size_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494050});
-        return fn(size);
     }
 }

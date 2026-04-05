@@ -91,7 +91,6 @@
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
     <ClCompile Include="src\game\graphics.cpp" />
-    <ClCompile Include="src\game\gui.cpp" />
     <ClCompile Include="src\game\haccess.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
@@ -248,7 +247,6 @@
     <ClInclude Include="src\game\geo.h" />
     <ClInclude Include="src\game\global.h" />
     <ClInclude Include="src\game\graphics.h" />
-    <ClInclude Include="src\game\gui.h" />
     <ClInclude Include="src\game\haccess.h" />
     <ClInclude Include="src\game\harold.h" />
     <ClInclude Include="src\game\homegen.h" />
