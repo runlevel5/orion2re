@@ -7,12 +7,7 @@ namespace mouse {
     inline s_mouse_list*& _current_mouse_list =
         *reinterpret_cast<s_mouse_list**>(std::uintptr_t{ 0x00578A98 });
 
-    // Suggested name: mouse::Check_Mouse_Shape_
-    inline void __cdecl Check_Mouse_Shape_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527510 });
-        fn();
-    }
+    void __cdecl Check_Mouse_Shape_();
 
     inline int16_t& _mouse_overide_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B180 });
@@ -29,13 +24,12 @@ namespace mouse {
     inline int16_t& _mouse_buffer_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DD8 });
 
+    inline uint16_t& _mouse_buffer_flag2 =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578B50 });
+
     int16_t __cdecl Mouse_Buffer_();
 
-    inline void __cdecl Mouse_Buffer2_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527640 });
-        fn();
-    }
+    uint16_t __cdecl Mouse_Buffer2_();
 
     /**
      * Returns the current mouse button state, allowing for button overrides.
@@ -50,18 +44,9 @@ namespace mouse {
 
     int16_t Pointer_Y_();
 
-    inline void __cdecl Clear_Mouse_XY_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x004C9650)();
-    }
+    void __cdecl Clear_Mouse_XY_();
 
-    inline int16_t __cdecl Get_Pointer_Offset_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F30 })();
-    }
+    int __cdecl Get_Pointer_Offset_();
 
-    inline int16_t __cdecl Get_Pointer_Image_Number_() {
-        using Fn = int16_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00526f50})();
-    }
+    int16_t __cdecl Get_Pointer_Image_Number_();
 }

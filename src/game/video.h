@@ -4,6 +4,12 @@ namespace video {
 	// Variables
 	inline uint32_t*& _video_memory = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x005792F0 });
 
+	inline int16_t& _current_mouse_list_ptr =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A94 });
+
+	inline int16_t& _current_mouse_shape =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578AC4 });
+
 	inline uint8_t*& _current_video_page = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005792F8});
 
 	inline uint32_t& screen_dump_flag =
@@ -88,4 +94,10 @@ namespace video {
 
 	void __cdecl Set_Refresh_Differential_();
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
+
+	inline void __cdecl Init_Video_Drivers_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526d10});
+		fn();
+	}
 }

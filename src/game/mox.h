@@ -888,8 +888,5 @@ namespace MOX {
         fn();
     }
 
-    inline void __cdecl Apply_Save_Settings(s_settings* settings) {
-        using Fn = void(__cdecl*)(s_settings*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043D290})(settings);
-    }
+    void __cdecl Apply_Save_Settings(s_settings* s);
 }

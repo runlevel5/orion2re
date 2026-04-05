@@ -429,6 +429,12 @@
     <ClCompile Include="src\game\remap.cpp" />
     <ClCompile Include="src\game\replace.cpp" />
     <ClCompile Include="src\game\settler.cpp" />
+    <ClCompile Include="src\game\init.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\mox.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -972,6 +978,12 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\shear.h" />
+    <ClInclude Include="src\game\settings.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\sysfont.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

@@ -1,0 +1,15 @@
+#include "pch.h"
+
+namespace MOX {
+    void __cdecl Apply_Save_Settings(s_settings* s) {
+        MOX::_settings.xenons_exist = s->xenons_exist;
+        MOX::_settings.game_difficulty = s->game_difficulty;
+        MOX::_settings.number_of_players = s->number_of_players;
+        MOX::_settings.galaxy_size = s->galaxy_size;
+        MOX::_settings.galaxy_age = s->galaxy_age;
+        MOX::_settings.strategic_combat_flag = s->strategic_combat_flag;
+        MOX::_settings.starting_civilization_level = s->starting_civilization_level;
+        MOX::_settings.start_of_game_seed = s->start_of_game_seed;
+        MOX::_settings.random_events = s->random_events;
+    }
+}

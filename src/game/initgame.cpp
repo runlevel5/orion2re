@@ -429,6 +429,34 @@ namespace INITGAME {
      * Initializes leader data from LBX, sets random skills for specific officers,
      * and calculates initial officer skill values.
      */
+    /**
+     * @address 004794b0
+     */
+    void __cdecl Init_Colony_(int colony_idx, int planet_idx, int player_num) {
+        s_colony* colony = &MOX::_colony[colony_idx];
+
+        // Zero-initialize the entire colony structure
+        memset(colony, 0, sizeof(s_colony));
+
+        s_planet_data* planet = &MOX::_planet[planet_idx];
+        planet->colony_index = (int16_t)colony_idx;
+
+        colony->planet = (int16_t)planet_idx;
+        colony->owner = (int8_t)player_num;
+        colony->officer = -1;
+
+        int8_t star_idx = planet->star_index;
+        // Mark the star system as visited/seen by the player
+        MOX::_star[star_idx].visited |= (1 << player_num);
+
+        for (int i = 0; i < 7; ++i) {
+            colony->producing[i] = -1;
+        }
+
+        colony->occupation_policy = 4;
+        colony->just_produced = -1;
+    }
+
     void __cdecl Init_Leaders_() {
         char lbx_filename[20];
         HAROLD::Get_Officer_Data_LBX_Name_(lbx_filename);

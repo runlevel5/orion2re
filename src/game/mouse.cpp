@@ -7,6 +7,12 @@ namespace mouse {
         return old_flag;
     }
 
+    uint16_t __cdecl Mouse_Buffer2_() {
+        uint16_t original_flag = _mouse_buffer_flag2;
+        _mouse_buffer_flag2 = 0;
+        return original_flag;
+    }
+
     int16_t __cdecl Mouse_Button_() {
         if (_mouse_overide_flag == 0) {
             return _mouse_buttons;
@@ -31,5 +37,57 @@ namespace mouse {
 
     int16_t Pointer_Y_() {
         return platform::g_mouse_y;
+    }
+
+    void __cdecl Check_Mouse_Shape_() {
+        video::_current_mouse_list_ptr = -1;
+
+        for (int i = 0; i < (int)mouse::_current_mouse_list_count; ++i) {
+            s_mouse_list* entry = &mouse::_current_mouse_list[i];
+
+            // Note: frame field is used as a coordinate offset for the mouse position check
+            int adjusted_x = (int)platform::g_mouse_x + (int)entry->frame;
+            int adjusted_y = (int)platform::g_mouse_y + (int)entry->frame;
+
+            if (entry->x1 <= adjusted_x && adjusted_x <= entry->x2 &&
+                entry->y1 <= adjusted_y && adjusted_y <= entry->y2) {
+                video::_current_mouse_list_ptr = (int16_t)i;
+            }
+        }
+
+        if (video::_current_mouse_list_ptr == -1) {
+            video::_current_mouse_shape = 0;
+        } else {
+            video::_current_mouse_shape = mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+        }
+    }
+
+    void __cdecl Clear_Mouse_XY_() {
+        MOX::_mouse_XY.ship_icon_idx = -1;
+        MOX::_mouse_XY.hovering_ship_icon_idx = -1;
+        MOX::_mouse_XY.star_idx = -1;
+        MOX::_mouse_XY.hovering_star_idx = -1;
+        MOX::_mouse_XY.selected = -1;
+    }
+
+    /**
+     * @brief Retrieves the frame offset for the current mouse cursor from the active mouse list.
+     * @return The frame index of the current mouse pointer.
+     */
+    int __cdecl Get_Pointer_Offset_() {
+        // The instruction sequence:
+        // MOVSX EAX, word ptr [video::_current_mouse_list_ptr]
+        // MOV ECX, [mouse::_current_mouse_list]
+        // MOVSX EAX, word ptr [ECX + EAX*12 + 2]
+        // maps to indexing into the array of s_mouse_list (size 0xC) and returning the 'frame' field (offset 0x2).
+        return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].frame;
+    }
+
+    /**
+     * @brief Retrieves the icon index for the currently active mouse pointer from the current mouse list.
+     * @return The icon index of the current mouse pointer.
+     */
+    int16_t __cdecl Get_Pointer_Image_Number_() {
+        return mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
     }
 }

@@ -12,6 +12,7 @@ inline char (&s__00559488)[64] = *reinterpret_cast<char(*)[64]>(std::uintptr_t{0
 inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x00551250});
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
 inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
+inline const char* s_Human_00558020 = reinterpret_cast<const char*>(std::uintptr_t{0x00558020}); // "Human"
 
 inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
 inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
@@ -684,6 +685,8 @@ inline const char* const s_Memory_Corruption_val_00558028 =
 
 inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
+
+inline const char* s_Refresh_Mask_can_t_be_drawn_0055b10c = reinterpret_cast<const char*>(std::uintptr_t{0x0055B10C}); // "Refresh Mask can't be drawn"
 
 inline char* s_Cannot_color_replace_refresh_mas_0055b7a0 =
     reinterpret_cast<char*>(std::uintptr_t{0x0055B7A0}); // "Cannot color replace refresh mask."

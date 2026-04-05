@@ -263,4 +263,6 @@ namespace MAINSCR {
     int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_fleet_icon_idx, int16_t* out_loop_counter);
 
     void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4);
+
+    void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width);
 }

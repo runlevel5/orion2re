@@ -66,10 +66,7 @@ namespace HAROLD {
 
     void __cdecl Init_System_Display_Box_();
 
-    inline void __cdecl Planet_Data_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004f1420})();
-    }
+    void __cdecl Planet_Data_Screen_();
 
     inline void __cdecl Load_Language_Fonts_() {
         using Fn = void(__cdecl*)();

@@ -630,6 +630,33 @@ namespace HACCESS {
     /**
      * @address 0049ab90
      */
+    /**
+     * @address 0049b510
+     */
+    int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx) {
+        int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+        return MOX::_ship[ship_idx].location;
+    }
+
+    /**
+     * @address 0049AB10
+     */
+    int8_t __cdecl N_Star_Relocations_(int16_t player_idx) {
+        int16_t relocation_count = 0;
+
+        for (int16_t star_idx = 0; star_idx < (int16_t)MOX::_NUM_STARS; ++star_idx) {
+            if (Star_Has_Relocation_(star_idx, player_idx)) {
+                relocation_count++;
+            }
+        }
+
+        return (int8_t)relocation_count;
+    }
+
+    void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_idx) {
+        MOX::_star[star_idx].relocate_ship_to[player_idx] = -1;
+    }
+
     int8_t __cdecl Orion_Owner_() {
         for (int i = 0; i < 5; ++i) {
             int16_t planet_idx = MOX::_star->planet_index[i];
@@ -648,5 +675,108 @@ namespace HACCESS {
         }
 
         return -1;
+    }
+
+    /**
+     * @address 0049b5b0
+     */
+    int8_t __cdecl Special_Is_Planet_Special_(int16_t special_type) {
+        if (special_type == 4 || special_type == 5 || special_type == 6 ||
+            special_type == 7 || special_type == 10) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @address 0049ac00
+     */
+    int16_t __cdecl Planet_Orbit_(int16_t planet_idx) {
+        return (int16_t)MOX::_planet[planet_idx].orbit;
+    }
+
+    bool __cdecl Enemy_Ship_Going_To_My_Colony_() {
+        bool enemy_approaching = false;
+        int16_t i = 0;
+
+        if (MOX::_ship_stack_count > 0) {
+            while (!enemy_approaching) {
+                int16_t node_idx = MOX::_ship_stack_start[i];
+                int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+
+                if (HACCESS::Ship_Owner_(ship_idx) != MOX::_PLAYER_NUM) {
+                    int16_t location = MOX::_ship[ship_idx].location;
+                    int16_t abs_location = HAROLD::Absolute_Location_(location);
+
+                    if (HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, abs_location)) {
+                        enemy_approaching = true;
+                    }
+                }
+
+                i++;
+                if (i >= (int16_t)MOX::_ship_stack_count) {
+                    break;
+                }
+            }
+        }
+
+        return enemy_approaching;
+    }
+
+    /**
+     * @address 0049acd0
+     */
+    void __cdecl Race_Name_(int16_t id, char* race_name_out) {
+        // Initial setup with default race name "Human"
+        strcpy(race_name_out, s_Human_00558020);
+
+        if (id < 8) {
+            // For valid player indices, use their customized race name
+            strcpy(race_name_out, MOX::_player[id].race_name);
+        } else if (id == 8) {
+            // Special index 8 maps to a specific internal race string
+            strcpy(race_name_out, MOX::_race_names[13]);
+        } else {
+            // For other indices, use a fixed offset into the race names list
+            strcpy(race_name_out, MOX::_race_names[id + 5]);
+        }
+    }
+
+    /**
+     * @address 0049add0
+     */
+    void __cdecl Set_All_Colony_Auto_Select_Flags_() {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            bool found_valid = false;
+            int8_t last_selected = MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM];
+
+            if (last_selected != -1) {
+                // Note: In original code, the selection is considered valid if the colony index
+                // of the planet matches the player number.
+                if (MOX::_planet[last_selected].colony_index == MOX::_PLAYER_NUM) {
+                    found_valid = true;
+                }
+            }
+
+            if (!found_valid) {
+                for (int16_t slot = 0; slot < 5; ++slot) {
+                    int16_t planet_idx = MOX::_star[star_idx].planet_index[slot];
+                    if (planet_idx > -1) {
+                        int16_t col_idx = MOX::_planet[planet_idx].colony_index;
+                        if (col_idx > -1) {
+                            s_colony* colony = &MOX::_colony[col_idx];
+                            if (colony->outpost_flag == 0) {
+                                if (colony->owner == (int8_t)MOX::_PLAYER_NUM) {
+                                    MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM] = (int8_t)slot;
+                                } else {
+                                    MOX::_star[star_idx].last_planet_selected[MOX::_PLAYER_NUM] = -1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

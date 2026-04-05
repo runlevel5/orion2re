@@ -1128,6 +1128,9 @@ namespace HAROLD {
         out[2] = src[2];
     }
 
+    void __cdecl Planet_Data_Screen_() {
+    }
+
     void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2) {
         uint8_t base_color_idx = 1;
         uint8_t mode = 0;

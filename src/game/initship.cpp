@@ -2292,4 +2292,47 @@ void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster) 
     design->cost = 0;
 }
 
+void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+    struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
+
+    // Copy localized "Transport" name
+    const char* localized_name = &s_Transport_00558e88[MOX::_settings.language * 16];
+    strcpy(design->name, localized_name);
+
+    design->size = 0;          // Small/Transport size
+    design->ship_type = 2;      // Transport type
+    design->shield_type = 0;
+
+    design->ftl_type = (int8_t)INITSHIP::Best_Warp_Drive_(player_idx);
+    design->computer_type = 0;
+
+    int16_t best_armor = INITSHIP::Best_Armor_(player_idx);
+    if (best_armor > 1) {
+        best_armor--;
+    }
+    design->armor_type = (int8_t)best_armor;
+
+    // Clear special devices
+    design->special_device_flags[0] = 0;
+    design->special_device_flags[1] = 0;
+    design->special_device_flags[2] = 0;
+    design->special_device_flags[3] = 0;
+    design->special_device_flags[4] = 0;
+
+    // Reset all weapon slots
+    for (int16_t i = 0; i < 8; ++i) {
+        design->ship_weapon[i].type = 0;
+        design->ship_weapon[i].count = 0;
+    }
+
+    design->picture_num = 47 /* '/' */;
+
+    // Derive speeds from drive technology
+    design->speed = (int8_t)TECHDATA::_drives[design->ftl_type].warp_speed;
+    design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
+
+    // Set production cost
+    design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(2, player_idx);
+}
+
 }

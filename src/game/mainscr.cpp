@@ -3433,4 +3433,38 @@ namespace MAINSCR {
         random::Set_Random_Seed_(random_seed);
         MISC::Restore_Window_Status_(saved_window);
     }
+
+    void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width) {
+        int16_t saved_map_scale;
+        int16_t zoom_star_size;
+        int16_t string_width;
+        int8_t is_visited;
+        int16_t star_draw_x;
+        int16_t star_draw_y;
+        s_animation_header* unused_output = nullptr;
+        char name_buffer[40];
+
+        saved_map_scale = MOX::_cur_map_scale;
+        MOX::_cur_map_scale = MOX::_max_map_scale;
+
+        HAROLD::Map_Scale_To_Zoom_Level_();
+        zoom_star_size = HAROLD::Map_Scale_Star_Size_To_Zoom_Level_(star_idx);
+
+        HAROLD::Set_Player_Font_Style_(0, false);
+        fonts::Set_Font_Spacing_(1);
+
+        MAINSCR::Get_Star_Name_(star_idx, 0, &is_visited, name_buffer, &unused_output);
+        MAINSCR::Get_Star_Draw_Coords_(star_idx, &star_draw_x, &star_draw_y);
+
+        string_width = fonts::Get_String_Width_(name_buffer);
+        *out_width = string_width;
+
+        // Calculate center-aligned X position
+        *out_x = (star_draw_x - (string_width / 2)) + 1;
+
+        // Calculate Y position relative to star size and zoom
+        *out_y = (zoom_star_size / 2 - (int16_t)MOX::_star[star_idx].size) + star_draw_y;
+
+        MOX::_cur_map_scale = saved_map_scale;
+    }
 }

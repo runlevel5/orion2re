@@ -46,6 +46,12 @@ namespace fonts {
         fn(style, colors);
     }
 
+    inline void __cdecl Load_Font_File_(char* font_path) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525340});
+        fn(font_path);
+    }
+
     int16_t __cdecl Get_String_Width_(const char* str);
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);

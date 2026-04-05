@@ -8,11 +8,7 @@ namespace HACCESS {
     inline const char* const s_format_star_roman = reinterpret_cast<const char*>(0x00558014); // "%s %s"
     inline const char* const s_I = reinterpret_cast<const char*>(0x0055801C); // "I"
 
-    inline void __cdecl Race_Name_(int16_t race_idx, char* buffer) {
-        using Fn = void(__cdecl*)(int16_t, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049acd0});
-        fn(race_idx, buffer);
-    }
+    void __cdecl Race_Name_(int16_t id, char* race_name_out);
 
     void __cdecl Set_Colony_Auto_Select_For_Star_(int16_t star_idx, int16_t player_idx, int16_t* out_planet_idx);
 
@@ -55,11 +51,7 @@ namespace HACCESS {
     int16_t __cdecl Fleet_Movement_Ship_Id_(int16_t icon_idx);
 
     int16_t __cdecl Ship_Stack_From_Ship_Id_(int16_t ship_id);
-    inline int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_ptr) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B510});
-        return fn(node_ptr);
-    }
+    int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx);
 
     uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_();
 
@@ -88,10 +80,7 @@ namespace HACCESS {
 
     char* __cdecl Get_Planet_Name_No_Prime_(int16_t planet_idx);
 
-    inline int8_t __cdecl N_Star_Relocations_(int16_t player_num) {
-        using Fn = int8_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0049AB10})(player_num);
-    }
+    int8_t __cdecl N_Star_Relocations_(int16_t player_idx);
 
     int8_t __cdecl Orion_Owner_();
 
@@ -106,35 +95,15 @@ namespace HACCESS {
 
     int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords);
 
-    inline void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_num) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049A420});
-        fn(star_idx, player_num);
-    }
+    void __cdecl Clear_Star_Relocation_(int16_t star_idx, int16_t player_idx);
 
-    inline bool __cdecl Special_Is_Planet_Special_(int16_t special_id) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B5B0});
-        return fn(special_id);
-    }
+    int8_t __cdecl Special_Is_Planet_Special_(int16_t special_type);
 
     bool __cdecl Player_Has_Tech_(int16_t tech_idx, int16_t player_idx);
 
-    inline int16_t __cdecl Planet_Orbit_(int16_t planet_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049AC00});
-        return fn(planet_idx);
-    }
+    int16_t __cdecl Planet_Orbit_(int16_t planet_idx);
 
-    inline bool __cdecl Enemy_Ship_Going_To_My_Colony_() {
-        using Fn = bool(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049A730});
-        return fn();
-    }
+    bool __cdecl Enemy_Ship_Going_To_My_Colony_();
 
-    inline void __cdecl Set_All_Colony_Auto_Select_Flags_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049add0});
-        fn();
-    }
+    void __cdecl Set_All_Colony_Auto_Select_Flags_();
 }

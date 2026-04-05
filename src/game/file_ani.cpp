@@ -65,80 +65,96 @@ namespace file_ani {
     }
 
     void __cdecl Draw_File_Animation_() {
-        s_animation_header* header = init::_io_buffer;
-        animate::_animation_header = header;
-
-        if (header->flags & 0x10) {
+        animate::_animation_header = reinterpret_cast<s_animation_header*>(init::_io_buffer);
+        
+        if ((animate::_animation_header->flags & 0x10) != 0) {
             animate::Set_Animation_Palette_();
         }
-
-        int16_t current_frame = header->current_frame;
-        uint32_t frame_offset = header->frame_offsets[current_frame];
-        uint32_t next_frame_offset = header->frame_offsets[current_frame + 1];
+        
+        int16_t current_frame = animate::_animation_header->current_frame;
+        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame];
+        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame + 1];
+        
+        int32_t file_offset = _file_animation_start + frame_offset;
         uint32_t frame_size = next_frame_offset - frame_offset;
-
-        if (allocate::Get_Max_Block_Space_(_file_animation_buffer) < (int32_t)frame_size) {
-            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large);
+        
+        int32_t max_block_space = allocate::Get_Max_Block_Space_(_file_animation_buffer);
+        if (max_block_space < static_cast<int32_t>(frame_size)) {
+            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large_0055b804);
         }
-
-        uint8_t* sprite_data = _file_animation_buffer;
-        _fseek(_file_animation_fptr, _file_animation_start + frame_offset, 0 /* SEEK_SET */);
-        _fread(sprite_data, frame_size, 1, _file_animation_fptr);
-
+        
+        _fseek(_file_animation_fptr, file_offset, 0); // SEEK_SET
+        _fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
+        
         if (video::screen_refresh_flag >= 2) {
-            setvesa::Add_Square_To_Scan_List_(0, 0, header->width - 1, header->height - 1);
+            setvesa::Add_Square_To_Scan_List_(
+                0, 
+                0, 
+                animate::_animation_header->width - 1, 
+                animate::_animation_header->height - 1
+            );
         }
-
-        uint8_t flags = header->flags;
-        if (flags & 0x08) { // Glassed / Transparent
-            switch (flags & 0x03) {
-            case 0: // Animated Sprite
-                animate::Draw_Glassed_Animated_Sprite_(0, 0, sprite_data);
-                break;
-            case 1: // Bitmap Sprite
-                animate::Draw_Glassed_Bitmap_Sprite_(0, 0, sprite_data);
-                break;
-            case 2: // Screen Background
-                if (video::_copy_to_on_page_flag != 1) {
-                    animate::Draw_Glassed_Screen_Background_Off_(sprite_data);
-                }
-                if (video::screen_refresh_flag >= 2) {
-                    setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
-                }
-                break;
-            default: // Case 3: Error
-                exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
-                break;
+        
+        uint8_t flags = animate::_animation_header->flags;
+        if ((flags & 0x08) != 0) {
+            switch (flags & 3) {
+                case 0:
+                    animate::Draw_Glassed_Animated_Sprite_(0, 0, _file_animation_buffer);
+                    break;
+                case 1:
+                    animate::Draw_Glassed_Bitmap_Sprite_(0, 0, _file_animation_buffer);
+                    break;
+                case 2:
+                    if (video::_copy_to_on_page_flag != 1) {
+                        animate::Draw_Glassed_Screen_Background_Off_(_file_animation_buffer);
+                    }
+                    if (video::screen_refresh_flag >= 2) {
+                        setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
+                    }
+                    break;
+                case 3:
+                default:
+                    exitm::Exit_With_Message(s_Refresh_Mask_can_t_be_drawn_0055b10c);
+                    break;
             }
-        } else { // Normal Drawing
-            switch (flags & 0x03) {
-            case 0: // Animated Sprite
-                platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-                draw::Draw_Animated_Sprite_(0, 0, sprite_data);
-                platform::Unlock_Appropriate_Render_Buffer();
-                break;
-            case 1: // Bitmap Sprite
-                platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
-                draw::Draw_Bitmap_Sprite_(0, 0, sprite_data);
-                platform::Unlock_Appropriate_Render_Buffer();
-                break;
-            case 2: // Screen Background
-                if (video::_copy_to_on_page_flag != 1) {
-                    animate::Draw_Screen_Background_Off_(sprite_data);
-                }
-                if (video::screen_refresh_flag >= 2) {
-                    setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
-                }
-                break;
-            default: // Case 3: Error
-                exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
-                break;
+        } else {
+            switch (flags & 3) {
+                case 0:
+                    g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    draw::Draw_Animated_Sprite_(0, 0, _file_animation_buffer);
+                    platform::Unlock_Appropriate_Render_Buffer();
+                    break;
+                case 1:
+                    g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+                    draw::Draw_Bitmap_Sprite_(0, 0, _file_animation_buffer);
+                    platform::Unlock_Appropriate_Render_Buffer();
+                    break;
+                case 2:
+                    if (video::_copy_to_on_page_flag != 1) {
+                        animate::Draw_Screen_Background_Off_(_file_animation_buffer);
+                    }
+                    if (video::screen_refresh_flag >= 2) {
+                        setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
+                    }
+                    break;
+                case 3:
+                default:
+                    exitm::Exit_With_Message(s_Refresh_Mask_can_t_be_drawn_0055b10c);
+                    break;
             }
         }
-
-        header->current_frame++;
-        if (header->current_frame >= header->frame_count) {
-            header->current_frame = static_cast<int16_t>(header->loop_frame);
+        
+        animate::_animation_header->current_frame++;
+        
+        // This identical branching mimics the original compiled code accurately
+        if ((animate::_animation_header->flags & 0x20) == 0) {
+            if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+            }
+        } else {
+            if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+            }
         }
     }
 
