@@ -802,4 +802,8 @@ inline const char* s_PR_00557d9c = reinterpret_cast<const char*>(std::uintptr_t{
 inline const char* s_FP_00557da0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA0});
 inline const char* s_RP_00557da4 = reinterpret_cast<const char*>(std::uintptr_t{0x00557DA4});
 
+struct s_fleet_movement_icon;
+inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
+    *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
+
 struct s_mouse_list;

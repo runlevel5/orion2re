@@ -125,7 +125,7 @@ namespace aidudes {
                     }
                 }
 
-                int8_t weights[50];
+                uint8_t weights[50];
                 memset(weights, 0, sizeof(weights));
                 weights[49] = 55; // Default/Keep Current weight
 
@@ -216,11 +216,11 @@ namespace aidudes {
                 if (colony->pollution >= 5 && current_info->eats_minerals == 0) {
                     // TECH_APP_CORE_WASTE_DUMPS (50), BUILDING_CORE_WASTE_DUMP (13)
                     if (_p_ai->tech_applications[50] == 3 && colony->buildings[13] == 0) {
-                        weights[13] = static_cast<int8_t>(isqrt_(colony->pollution)) + 8;
+                        weights[13] = static_cast<uint8_t>(isqrt_(colony->pollution)) + 8;
                     }
                     // TECH_APP_ATMOSPHERIC_RENEWER (19), BUILDING_ATMOSPHERE_RENEWER (5)
                     if (_p_ai->tech_applications[19] == 3 && colony->buildings[5] == 0) {
-                        weights[5] = static_cast<int8_t>(isqrt_(colony->pollution)) + 8;
+                        weights[5] = static_cast<uint8_t>(isqrt_(colony->pollution)) + 8;
                     }
                     // TECH_APP_POLLUTION_PROCESSOR (142), BUILDING_POLLUTION_PROCESSOR (32)
                     if (_p_ai->tech_applications[142] == 3 && colony->buildings[32] == 0) {
@@ -246,7 +246,7 @@ namespace aidudes {
                     }
                 }
 
-                int8_t choice = static_cast<int8_t>(RUSS::Get_Weighted_Choice_Char_(weights, 50));
+                int8_t choice = RUSS::Get_Weighted_Choice_Char_(weights, 50);
                 if (choice < 49) {
                     COLBLDG::Clear_Colony_Queue_(colony_idx);
                     colony->producing[0] = static_cast<int16_t>(choice);
@@ -1063,7 +1063,7 @@ namespace aidudes {
                 local_58 = 350 - war_level * 100;
             }
 
-            int32_t choice_weights[6] = {0, 0, 0, 0, 0, 0};
+            uint32_t choice_weights[6] = {0, 0, 0, 0, 0, 0};
             choice_weights[0] = temp_44;
             choice_weights[1] = local_48;
             choice_weights[3] = local_50;
@@ -1072,7 +1072,7 @@ namespace aidudes {
 
             while (true) {
                 MOX::Mox_Update_();
-                int random_choice = MOX::Get_Weighted_Choice_Int_(choice_weights, 6);
+                int random_choice = RUSS::Get_Weighted_Choice_Int_(choice_weights, 6);
 
                 if (random_choice == -1 || random_choice == 5) {
                     colony_queue_count--;
@@ -1176,7 +1176,7 @@ namespace aidudes {
                             ship_weights[0] = 0;
                         }
 
-                        int ship_choice = MOX::Get_Weighted_Choice_Short_(ship_weights, 9);
+                        int ship_choice = RUSS::Get_Weighted_Choice_Short_(ship_weights, 9);
                         switch (ship_choice + 1) {
                             case 0:
                                 break;

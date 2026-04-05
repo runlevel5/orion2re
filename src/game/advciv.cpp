@@ -427,10 +427,10 @@ namespace ADVCIV {
             bool player_satisfied = false;
             for (int16_t j = 0; j < (int16_t)MOX::_planet_count && !player_satisfied; ++j) {
                 if (_planet_selected_flag[j] == i) {
-                    int8_t targets[3];
+                    uint8_t targets[3];
                     targets[0] = 4 - MOX::_planet[j].climate;
                     int size_diff = 8 - MOX::_planet[j].size;
-                    targets[1] = (size_diff < 0) ? 0 : (int8_t)size_diff;
+                    targets[1] = (size_diff < 0) ? 0 : size_diff;
                     targets[2] = 4 - MOX::_planet[j].mineral_class;
 
                     // If player has fewer special systems than the leader, attempt to generate one
@@ -488,7 +488,7 @@ namespace ADVCIV {
      * @param weight_choices An array of weights for size, climate, and mineral improvements.
      * @return int8_t Returns 1 if no choice was made (-1), otherwise 0.
      */
-    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, int8_t* weight_choices) {
+    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices) {
         int16_t choice = RUSS::Get_Weighted_Choice_Char_(weight_choices, 3);
 
         if (choice == -1) {

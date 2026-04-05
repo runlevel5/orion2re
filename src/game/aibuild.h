@@ -29,7 +29,7 @@ namespace AIBUILD {
 
     void __cdecl Empire_Buy_Outright_(int16_t player_idx);
 
-    void __cdecl Find_Buildable_Buildings_(struct s_colony* colony, int16_t* buildable_flags);
+    void __cdecl Find_Buildable_Buildings_(struct s_colony* colony, uint16_t* buildable_flags);
 
     short __cdecl Colony_Building_Score_(struct s_colony* colony, short building_id);
 

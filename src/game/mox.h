@@ -888,26 +888,6 @@ namespace MOX {
         fn();
     }
 
-    inline void __cdecl Push_Block_(void* screen_seg) {
-        using Fn = void(__cdecl*)(void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB30})(screen_seg);
-    }
-
-    inline void __cdecl Pop_Block_(void* screen_seg) {
-        using Fn = void(__cdecl*)(void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB70})(screen_seg);
-    }
-
-    inline int16_t __cdecl Get_Weighted_Choice_Short_(uint16_t* weights, int16_t count) {
-        using Fn = int16_t(__cdecl*)(uint16_t*, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004D78E0 })(weights, count);
-    }
-
-    inline int16_t __cdecl Get_Weighted_Choice_Int_(int32_t* weights, int count) {
-        using Fn = int16_t(__cdecl*)(int32_t*, int);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7950 })(weights, count);
-    }
-
     inline void Load_Credits_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e9b70});

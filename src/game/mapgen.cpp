@@ -143,7 +143,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     int8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index) {
-        int8_t weights[7];
+        uint8_t weights[7];
 
         for (int32_t i = 0; i < 7; ++i) {
             weights[i] = MOX::_star_class_table[i * 3 + star_type_index];
@@ -184,7 +184,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     int8_t __cdecl Generate_Orbit_(int16_t star_id) {
-        int8_t weights[5];
+        uint8_t weights[5];
 
         static const uint8_t weight_table[15] = {
             25, 20, 10,
@@ -392,7 +392,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      * If forced to be a food planet, it ensures the chosen climate supports agriculture.
      */
     int8_t __cdecl Generate_Climate_(int16_t star_type) {
-        int8_t weights[10];
+        uint8_t weights[10];
         memset(&weights, 0, sizeof(weights));
 
         // 1. Determine weights based on star type and galaxy age
@@ -550,9 +550,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
     }
 
     void __cdecl Get_A_Planet_Or_Star_Special_(int16_t star_idx, int16_t* wormhole_out, int8_t* special_out, uint8_t commit_changes, int32_t excluded_mask) {
-        int16_t valid_planets[5] = { 0 };
-        int16_t large_planets[5] = { 0 };
-        int16_t habitable_planets[5] = { 0 };
+        uint16_t valid_planets[5] = { 0 };
+        uint16_t large_planets[5] = { 0 };
+        uint16_t habitable_planets[5] = { 0 };
         bool has_large = false;
         bool has_habitable = false;
 
@@ -578,7 +578,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         int16_t tries = 0;
-        int16_t system_weights[12];
+        uint16_t system_weights[12];
         system_weights[0] = 0;
 
         while (true) {
@@ -885,7 +885,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             MOX::Mox_Update_();
             if (MOX::_NUM_NEBULAS <= placed_count) {
                 for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
-                    int16_t choice = MOX::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
+                    int16_t choice = RUSS::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
                     MOX::_nebula[i].type = (int8_t)nebula_types[i];
                     MOX::_nebula[i].x = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2]);
                     MOX::_nebula[i].y = HAROLD::Get_Up_Scaled_Value_(coord_buffer[choice * 2 + 1]);

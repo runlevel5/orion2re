@@ -2690,6 +2690,7 @@ namespace hooks {
         { 0x004906c0, &DESBOX::System_Added_Cost_And_Space_ },
         { 0x0051CA30, &farload::Farload_Library_Data_ },
         { 0x0051C780, &farload::Far_Reload_Next_Data_ },
+        { 0x004cc480, &MAINSCR::Scan_Fleet_Movement_Box_Fields_ },
     };
 
     void Install_Hooks()

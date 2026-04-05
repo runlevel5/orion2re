@@ -901,7 +901,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
     void __cdecl Filter_Explored_Planets_(short* summary_count) {
         short original_count = *summary_count;
-        MOX::Push_Block_(MOX::_screen_seg);
+        allocate::Push_Block_(MOX::_screen_seg);
 
         // Allocate buffer for 360 planets (0x2760 / 28 bytes)
         s_plntsum_planet* temp_buffer = (s_plntsum_planet*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2760);
@@ -974,7 +974,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             MOX::_scanned_field = -1;
         }
 
-        MOX::Pop_Block_(MOX::_screen_seg);
+        allocate::Pop_Block_(MOX::_screen_seg);
     }
 
     int16_t __cdecl Planet_Summary_List_Id_(int16_t param_1) {

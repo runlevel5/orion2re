@@ -1882,7 +1882,7 @@ namespace AIMOVE {
         s_ship_move_info move_info;
         int8_t visited_stars[72];
         int8_t mission_array[250];
-        int16_t scores[250];
+        uint16_t scores[250];
         int16_t ship_list[500];
 
         // Initialize copy of target_info

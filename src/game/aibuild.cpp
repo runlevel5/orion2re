@@ -497,7 +497,7 @@ namespace AIBUILD {
                 }
             }
 
-            chosen_colony = RUSS::Get_Weighted_Choice_Short_((const int16_t*)weights, (int16_t)MOX::_NUM_COLONIES);
+            chosen_colony = RUSS::Get_Weighted_Choice_Short_(weights, (int16_t)MOX::_NUM_COLONIES);
             if (chosen_colony != -1) {
                 COLCALC::Colony_Buy_Outright_(chosen_colony);
             }
@@ -518,7 +518,7 @@ namespace AIBUILD {
         }
     }
 
-    void __cdecl Find_Buildable_Buildings_(s_colony* colony, int16_t* buildable_flags) {
+    void __cdecl Find_Buildable_Buildings_(s_colony* colony, uint16_t* buildable_flags) {
         for (int16_t product_id = 1; product_id < 0x31; ++product_id) {
             // Check if the specific colony can build the product identified by product_id
             if (COLCALC::Colony_Can_Build_Product_(colony, product_id)) {
@@ -908,7 +908,7 @@ namespace AIBUILD {
     }
 
     void __cdecl Assign_Colony_New_Building_(s_colony* colony) {
-        short weights[52];
+        uint16_t weights[52];
         short max_score = 0;
 
         memset(weights, 0, 102);
@@ -952,7 +952,7 @@ namespace AIBUILD {
             weights[49] = (short)isqrt_(housing_weight_base);
         }
 
-        short choice = MOX::Get_Weighted_Choice_Short_(reinterpret_cast<uint16_t*>(weights), 51);
+        short choice = RUSS::Get_Weighted_Choice_Short_(weights, 51);
 
         if (choice < 49) {
             Delete_Prod_From_Colony_Queue_(colony_idx, choice);

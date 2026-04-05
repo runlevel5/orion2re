@@ -1266,7 +1266,7 @@ namespace SCORE {
 
         if (SCORE::_hi->raw_captured_population > 0) {
             for (int16_t i = 0; i < SCORE::_hi->raw_captured_population; ++i) {
-                int16_t choice = RUSS::Get_Weighted_Choice_Short_((const int16_t*)weights, 8);
+                int16_t choice = RUSS::Get_Weighted_Choice_Short_(weights, 8);
                 if (choice >= 0 && choice < MOX::_NUM_PLAYERS && choice != player_idx) {
                     captured_count++;
                     SCORE::_hi->captured_pop_race_ids[i] = MOX::_player[choice].race;

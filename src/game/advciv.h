@@ -38,7 +38,7 @@ namespace ADVCIV {
 
     void __cdecl Init_Non_Homeworld_Colonies_();
 
-    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, int8_t* weight_choices);
+    int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices);
 
     int __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx);
 

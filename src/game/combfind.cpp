@@ -579,7 +579,7 @@ void __cdecl Do_System_Discoveries_At_Star_(s_star_data *star)
 {
     int star_idx;
     int eligible_player_count;
-    int8_t player_present[8];
+    uint8_t player_present[8];
     int8_t player_idx;
     s_colony *colony;
     int16_t planet_idx;

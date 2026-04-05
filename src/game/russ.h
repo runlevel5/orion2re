@@ -5,9 +5,9 @@ namespace RUSS {
     inline auto PFMT_ = reinterpret_cast<void(__cdecl*)(int32_t, int32_t, const char*, ...)>(std::uintptr_t{0x004D7850});
     inline int8_t& _all_ai_game = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x005960E9 });
 
-    int16_t __cdecl Get_Weighted_Choice_Char_(int8_t* weights, int16_t count);
+    int16_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count);
 
-    int16_t __cdecl Get_Weighted_Choice_Short_(const int16_t* weights, int16_t count);
+    int16_t __cdecl Get_Weighted_Choice_Short_(const uint16_t* weights, int16_t count);
 
     inline int16_t __cdecl Get_Weighted_Choice_Int_(uint32_t* weights, int16_t num_weights) {
         using Fn = int16_t(__cdecl*)(uint32_t*, int16_t);

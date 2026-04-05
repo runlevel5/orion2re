@@ -1,7 +1,7 @@
 #include "pch.h"
 
 namespace RUSS {
-    int16_t __cdecl Get_Weighted_Choice_Char_(int8_t* weights, int16_t count) {
+    int16_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count) {
         uint32_t total_weight = 0;
         for (int16_t i = 0; i < count; ++i) {
             total_weight += weights[i];
@@ -25,7 +25,7 @@ namespace RUSS {
         return index;
     }
 
-    int16_t __cdecl Get_Weighted_Choice_Short_(const int16_t* weights, int16_t count) {
+    int16_t __cdecl Get_Weighted_Choice_Short_(const uint16_t* weights, int16_t count) {
         uint32_t total_weight = 0;
 
         // Calculate the sum of all weights

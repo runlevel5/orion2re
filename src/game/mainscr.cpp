@@ -2919,6 +2919,59 @@ namespace MAINSCR {
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
     }
 
+    /**
+     * @address 004cc480
+     */
+    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_fleet_icon_idx, int16_t* out_loop_counter) {
+        int16_t result = -1;
+        bool found = false;
+        int16_t counter = 0;
+
+        *out_loop_counter = -1;
+        *out_fleet_icon_idx = -1;
+
+        int limit = static_cast<int>(MOX::_fleet_icon_buttons_added) + static_cast<int>(MOX::_first_fleet_movement_icon);
+        if (static_cast<int>(_fleet_box.count) < limit) {
+            limit = static_cast<int>(_fleet_box.count);
+        }
+
+        int16_t i = MOX::_first_fleet_movement_icon;
+        while (i < static_cast<int16_t>(limit) && !found) {
+            if (FLEETPOP::Can_Select_Fleet_Box_Ship_(i)) {
+                if (_fleet_movement_icon[i].field == field_id_b) {
+                    found = true;
+                    result = 0;
+                    *out_loop_counter = counter;
+                    *out_fleet_icon_idx = i;
+                }
+                else if (_fleet_movement_icon[i].field + field_id_b == 0) {
+                    *out_loop_counter = counter;
+                    found = true;
+                    result = 1;
+                }
+            }
+            counter++;
+            i++;
+        }
+
+        if (result == -1) {
+            // Redundantly recalculate limit as per assembly
+            int limit2 = static_cast<int>(MOX::_fleet_icon_buttons_added) + static_cast<int>(MOX::_first_fleet_movement_icon);
+            if (static_cast<int>(_fleet_box.count) < limit2) {
+                limit2 = static_cast<int>(_fleet_box.count);
+            }
+
+            for (int16_t j = MOX::_first_fleet_movement_icon; j < static_cast<int16_t>(limit2); ++j) {
+                if (_fleet_movement_icon[j].field == field_id_a) {
+                    *out_fleet_icon_idx = j;
+                    return 4;
+                }
+            }
+        }
+
+        return result;
+    }
+
     void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4) {
         for (int16_t box_idx = 0; box_idx < 5; ++box_idx) {
             if (!MOVEBOX::Moveable_Box_Selected_(box_idx)) {

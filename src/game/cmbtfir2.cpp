@@ -919,7 +919,7 @@ namespace CMBTFIR2 {
     }
 
     void __cdecl Select_Raid_Internal_(int16_t ship_idx, int16_t* raid_type, int16_t* component_idx) {
-        int16_t weights[20];
+        uint16_t weights[20];
         int16_t total_space;
         int16_t choice;
 
@@ -993,7 +993,7 @@ namespace CMBTFIR2 {
         int16_t random_roll;
         int16_t internal_chance;
         int16_t total_internal_space;
-        int16_t weights[19];
+        uint16_t weights[19];
         int16_t choice;
         bool found;
 

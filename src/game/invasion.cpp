@@ -323,7 +323,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
         return;
     }
 
-    int8_t rebel_weights[8] = {0};
+    uint8_t rebel_weights[8] = {0};
     int total_rebel_pop = 0;
 
     if (colony->n_pops != 0) {
@@ -466,7 +466,7 @@ void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, 
 
     if (results != nullptr) {
         int16_t captured_techs[4] = { 0 };
-        int16_t weights[212];
+        uint16_t weights[212];
         int32_t captured_count = 0;
         int32_t chance_base;
 

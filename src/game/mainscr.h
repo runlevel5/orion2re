@@ -260,11 +260,7 @@ namespace MAINSCR {
 
     inline s_fleet_box& _fleet_box = *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
 
-    inline int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int32_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
-        using Fn = int16_t(__cdecl*)(int32_t, int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CC480});
-        return fn(param_1, param_2, param_3, param_4);
-    }
+    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_fleet_icon_idx, int16_t* out_loop_counter);
 
     void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4);
 }

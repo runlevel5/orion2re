@@ -1,30 +1,6 @@
 #pragma once
-#include <cstdint>
 
 namespace MAINMENU {
-#pragma pack(push, 1)
-    struct s_main_menu_button {
-        s_animation_header* field0_0x0;
-        s_animation_header* field1_0x4;
-        s_animation_header* field2_0x8;
-        int16_t field;
-    };
-
-    struct s_main_menu {
-        s_main_menu_button fields[6];
-        uint8_t field13_0x54[126];
-    };
-#pragma pack(pop)
-
-    typedef enum MAIN_MENU_BTN {
-        MAIN_MENU_BTN_CONTINUE = 0,
-        MAIN_MENU_BTN_LOAD = 1,
-        MAIN_MENU_BTN_NEW = 2,
-        MAIN_MENU_BTN_MULTIPLAY = 3,
-        MAIN_MENU_BTN_HELP = 4,
-        MAIN_MENU_BTN_QUIT = 5,
-    } MAIN_MENU_BTN;
-
     inline s_main_menu*& _mainmenu =
         *reinterpret_cast<s_main_menu**>(std::uintptr_t{0x0056ECF0});
 
@@ -93,7 +69,6 @@ namespace MAINMENU {
     int8_t __cdecl Mainmenu_Load_Game_Popup_(int16_t* save_game_list);
 
     void __cdecl Main_Menu_Screen_();
-
 
     int32_t __cdecl Get_File_Animation_Block_Space_();
 }
