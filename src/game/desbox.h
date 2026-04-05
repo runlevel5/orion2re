@@ -66,17 +66,9 @@ namespace DESBOX {
 
     void __cdecl Draw_Special_Systems_Replacement_Box();
 
-    inline void __cdecl Print_Special_System_Data_(int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048fec0});
-        fn(x, y);
-    }
+    void __cdecl Print_Special_System_Data_(int16_t param_1, int16_t param_2);
 
-    inline void __cdecl Draw_Special_Systems_Scroll_Bar_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0048dd10});
-        fn();
-    }
+    void __cdecl Draw_Special_Systems_Scroll_Bar_();
 
     void __cdecl Add_Special_System_Fields_(int16_t* btn1, int16_t* btn2);
 
@@ -102,6 +94,8 @@ namespace DESBOX {
     int8_t __cdecl Application_Type_(int16_t tech_app_id);
 
     void __cdecl Update_Weapon_Modification_Data_();
+
+    void __cdecl System_Added_Cost_And_Space_(int16_t item_slot_idx, int16_t* out_cost, int16_t* out_space);
 
     int32_t __cdecl New_Mod_Space_(uint8_t mod_bit_index);
 

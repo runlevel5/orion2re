@@ -2733,4 +2733,227 @@ namespace DESBOX {
         MOX::_scroll_bar->up_btn = (int16_t)MOX::_special_scroll_up_button;
         MOX::_scroll_bar->dn_btn = (int16_t)MOX::_special_scroll_dn_button;
     }
+
+    void __cdecl Print_Special_System_Data_(int16_t param_1, int16_t param_2) {
+        int16_t cost;
+        int16_t space;
+        int16_t item_idx;
+        int16_t j;
+        int16_t local_162 = 3;
+        s_colors sStack_160;
+        s_colors local_158;
+        s_colors local_150;
+        s_colors local_148;
+        char space_str[20];
+        char cost_str[20];
+        char special_name[80];
+        char special_desc[200];
+
+        local_158 = *MISC::Font_Colors2_(4, 'U', '\\');
+        fonts::Set_Font_Style_(4, &local_158);
+
+        int16_t local_y = param_2 + 0x46;
+        fonts::Print_(param_1 + 0x44, local_y, HAROLD::H_Message_(0x37));
+        fonts::Print_(param_1 + 0xbe, local_y, HAROLD::H_Message_(0x30));
+        fonts::Print_(param_1 + 0x106, local_y, HAROLD::H_Message_(0x2b));
+        fonts::Print_(param_1 + 0x156, local_y, HAROLD::H_Message_(0x38));
+
+        local_150 = *MISC::Font_Colors2_(2, 'U', 'W');
+        local_158 = *MISC::Font_Colors2_(2, 'U', '\\');
+        local_148 = *MISC::Font_Colors2_(3, 'U', 'Z');
+
+        local_y = param_2 + 0x59;
+
+        graphics::Set_Window_(param_1 + 0x19, param_2 + 0x40, param_1 + 0x247, _replacement_box_middle_height + param_2 + 0x45);
+        video::Clip_On_();
+
+        int16_t i = 1;
+        do {
+            fonts::Set_Font_Spacing_(1);
+            fonts::Get_Colors_(&sStack_160);
+            MISC::Set_Fitted_Font_Style_(TECHDATA::_specials[i].name, &sStack_160, local_162, 1, -1, 0xa5, 1);
+            int16_t style = MISC::Get_Font_Style_();
+            if (style < local_162) {
+                local_162 = style;
+            }
+            i++;
+        } while (i < 0x27);
+
+        j = 0;
+        int16_t total_rows = MOX::_scroll_bar->total_rows;
+        if (total_rows > 10) {
+            total_rows = 10;
+        }
+
+        if (total_rows > 0) {
+            do {
+                item_idx = j + MOX::_scroll_bar->first_visible_row;
+                int16_t special_id = MOX::_design_choice_items[item_idx];
+                if (special_id > -1) {
+                    System_Added_Cost_And_Space_(item_idx, &cost, &space);
+
+                    strcpy(special_desc, MOX::_special_desc_string[special_id]);
+                    strcpy(special_name, TECHDATA::_specials[special_id].name);
+
+                    int16_t item_space = space;
+                    if (MOX::_design_screen_replacement_slot > -1 && MOX::_design->special_devices[MOX::_design_screen_replacement_slot] > 0) {
+                        item_space -= MOX::_design->special_device_space[MOX::_design_screen_replacement_slot];
+                    }
+
+                    bool can_fit = true;
+                    if (item_idx != 0) {
+                        if (MOX::_design->space_used + item_space > MOX::_design->hull_space) {
+                            can_fit = false;
+                        }
+                        else {
+                            int16_t excl;
+                            Special_System_Exclusion_(special_id, &excl);
+                            if (excl != 0) {
+                                can_fit = false;
+                            }
+                        }
+                    }
+
+                    if (!can_fit) {
+                        fonts::Set_Font_Style_(local_162, &local_150);
+                    }
+                    else {
+                        fonts::Set_Font_Style_(local_162, &local_148);
+                    }
+
+                    if (_field_item_scanned == j && can_fit) {
+                        s_colors temp_colors;
+                        temp_colors = *MISC::Font_Colors2_(2, 'U', 'X');
+                        fonts::Set_Font_Style_(local_162, &temp_colors);
+                        MISC::Increase_Font_Color_Range_(MOX::_multi_colored_line_start);
+                    }
+
+                    if (item_idx == 0) {
+                        fonts::Print_(param_1 + 0x20, local_y, HAROLD::H_Message_(0x39));
+                        fonts::Print_Right_(param_1 + 0xe3, local_y, s_0_00556108);
+                        fonts::Print_Right_(param_1 + 0x124, local_y, s_0_00556108);
+                        fonts::Print_(param_1 + 0x13e, local_y, s_space_005510f0);
+                    }
+                    else {
+                        MISC::Get_Font_Style_();
+                        _sprintf(cost_str, s_fmt_score_simple_00556104, cost);
+                        _sprintf(space_str, s_fmt_score_simple_00556104, space);
+
+                        fonts::Set_Font_Spacing_(1);
+                        fonts::Print_(param_1 + 0x20, local_y, special_name);
+                        MISC::Set_Font_Default_Spacing_();
+
+                        fonts::Print_Right_(param_1 + 0xe3, local_y, space_str);
+                        fonts::Print_Right_(param_1 + 0x124, local_y, cost_str);
+
+                        fonts::Get_Colors_(&sStack_160);
+                        fonts::Set_Font_Style_(local_162, &sStack_160);
+
+                        fonts::Set_Font_Spacing_(1);
+                        fonts::Print_(param_1 + 0x13e, local_y, special_desc);
+                        MISC::Set_Font_Default_Spacing_();
+                    }
+                }
+
+                local_y += 0x10;
+                j++;
+
+                total_rows = MOX::_scroll_bar->total_rows;
+                if (total_rows > 10) {
+                    total_rows = 10;
+                }
+            } while (j < total_rows);
+        }
+
+        if (MOX::_scroll_bar->first_visible_row > 0) {
+            animate::Draw_(_replacement_box_width + _replacement_box_base_x - 0x20,
+                _replacement_box_base_y + 0x47,
+                MOX::_dull_d_scroll_up_button_seg);
+        }
+
+        if (MOX::_scroll_bar->total_rows > 10 &&
+            MOX::_scroll_bar->first_visible_row + 10 < MOX::_scroll_bar->total_rows) {
+            animate::Draw_(_replacement_box_width + _replacement_box_base_x - 0x20,
+                _replacement_box_height + _replacement_box_base_y - 0x1e,
+                MOX::_dull_d_scroll_dn_button_seg);
+        }
+
+        video::Clip_Off_();
+        graphics::Reset_Window_();
+
+        _wait_ctr++;
+        if (_wait_ctr > 2) {
+            _wait_ctr = 0;
+            MOX::_multi_colored_line_start += static_cast<int8_t>(_incr_value);
+
+            if (MOX::_multi_colored_line_start > 2) {
+                _incr_value = 0xff;
+                MOX::_multi_colored_line_start = 3;
+            }
+            else if (MOX::_multi_colored_line_start <= -1) {
+                _incr_value = 1;
+                MOX::_multi_colored_line_start = -1;
+            }
+        }
+    }
+
+    void __cdecl Draw_Special_Systems_Scroll_Bar_() {
+        int16_t saved_window_status;
+
+        int16_t window_x1 = _replacement_box_base_x + 0x254;
+        int16_t window_y1 = _replacement_box_base_y + 0x5C;
+        int16_t line_x = _replacement_box_base_x + 0x25A;
+        int16_t line_y1 = _replacement_box_base_y + 0x5D;
+        uint8_t color = 0x5B; /* 91 */
+
+        mouse::Mouse_Button_();
+        fields::Auto_Input_();
+        MISC::Save_Window_Status_(&saved_window_status);
+
+        int16_t window_y2 = animate::Get_Height_(MOX::_system_repl_scroll_bar_seg) + window_y1;
+        int16_t window_x2 = animate::Get_Width_(MOX::_system_repl_scroll_bar_seg) + window_x1;
+
+        graphics::Set_Window_(window_x1, window_y1, window_x2, window_y2);
+        video::Clip_On_();
+
+        int16_t offset = MOX::_scroll_bar->track_len_px - (MOX::_scroll_bar->thumb_height_px / 2) - MOX::_scroll_bar->thumb_center_y;
+        int16_t y1 = line_y1 + offset + 1;
+
+        for (int16_t i = 0; i < 9; ++i) {
+            int16_t y2 = MOX::_scroll_bar->thumb_height_px + offset + line_y1;
+            line::Line_(line_x, y1, line_x, y2, color);
+
+            if ((i % 2) == 0) {
+                color--;
+            }
+            line_x++;
+        }
+
+        animate::Draw_(window_x1, window_y1, MOX::_system_repl_scroll_bar_seg);
+        MISC::Restore_Window_Status_(saved_window_status);
+    }
+
+    void __cdecl System_Added_Cost_And_Space_(int16_t item_slot_idx, int16_t* out_cost, int16_t* out_space) {
+        int16_t choice_idx = MOX::_design_choice_items[item_slot_idx];
+        s_tech_specials_data* p_special = &TECHDATA::_specials[choice_idx];
+        int16_t ship_size = MOX::_design->ship_size;
+
+        int16_t base_cost = p_special->cost_per_ship_type[ship_size];
+        uint16_t base_space = p_special->space_per_ship_type[ship_size];
+
+        // 4 likely corresponds to ITEM_STABILIZER or similar which does not miniaturize
+        if (choice_idx == 4) {
+            *out_cost = base_cost;
+            *out_space = (int16_t)base_space;
+            return;
+        }
+
+        uint16_t tech_app_id = p_special->tech_app_id;
+        int16_t tech_level_cost = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
+        *out_cost = DESIGN::Cost_Given_M_Level_(base_cost, tech_level_cost);
+
+        int8_t miniaturization_category = DESIGN::Miniaturization_Category_(tech_app_id);
+        int16_t tech_level_space = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
+        *out_space = (int16_t)DESIGN::Space_Given_M_Level_(base_space, tech_level_space, miniaturization_category);
+    }
 }

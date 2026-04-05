@@ -2685,6 +2685,11 @@ namespace hooks {
         { 0x00490570, &DESBOX::Special_System_Exclusion_ },
         { 0x0048fe80, &DESBOX::Items_Selected_ },
         { 0x0042e060, &DESIGN::Clear_Special_System_Slot_ },
+        { 0x0048fec0, &DESBOX::Print_Special_System_Data_ },
+        { 0x0048dd10, &DESBOX::Draw_Special_Systems_Scroll_Bar_ },
+        { 0x004906c0, &DESBOX::System_Added_Cost_And_Space_ },
+        { 0x0051CA30, &farload::Farload_Library_Data_ },
+        { 0x0051C780, &farload::Far_Reload_Next_Data_ },
     };
 
     void Install_Hooks()

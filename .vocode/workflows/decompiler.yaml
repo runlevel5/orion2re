@@ -544,20 +544,21 @@ workflows:
             qsort -> _qsort
 
           # Checklist
-          * You were conservative with file reads and only read relevant chunks.
+          * You were conservative with file reads and only read relevant data.
           * You minimized a number of round-trips when patching code.
           * You did not read files that were not mentioned in the decomplation input
-          * You USED the apply_patch tool to successfully apply all changes
+          * You *USED* the apply_patch tool to successfully apply all changes
           * You did NOT print final changes to the user
-          * If you did not call apply_patch to make changes, you failed the checklist
+          * If you did not call the `apply_patch` tool to make changes, you failed the checklist
           * You confirmed to the user that all changes were applied
           * All variables that don't exist in the project were added to correct headers with correct namespaces
           * All functions that don't exist in the project were added as stubs to header files with correct namespaces
-          * If external function did not exist, you wrote a stub
-          * If external function exists in the header as a definition, you did not convert it to a stub
+          * If external function did not exist, you add a stub with an address
+          * If external function exists in the header as a declaration, you did not convert it to a stub
           * All mentioned namespaces were processed
           * No existing function signatures were changed
           * `src/hooks.cpp` was updated by reading last 20 lines and appending decompiled function address
+          * When patching, you did not erase any of the existing code
         outcomes:
           - name: done    
     edges:

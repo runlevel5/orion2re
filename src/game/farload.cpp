@@ -88,12 +88,116 @@ void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3) {
     return Farload_Library_(path, idx, param3, 1);
 }
 
+    void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size) {
+        char full_path[64];
+
+        if (idx < 0) {
+            Error_Handler_(fname, 4, idx);
+        }
+
+        bool load_header = true;
+        if (_farload_file_flag != 0) {
+            if (__strcmpi(fname, _farload_file_name) == 0) {
+                load_header = false;
+            } else {
+                if (_farload_file_flag != 0) {
+                    _fclose(_farload_fptr);
+                }
+            }
+        }
+
+        if (load_header) {
+            strcpy(_farload_file_name, fname);
+            _farload_fptr = _fopen(fname, s_rb_0055117c);
+            
+            if (_farload_fptr == nullptr) {
+                if (_secondary_drive_path[0] == '\0') {
+                    Error_Handler_(fname, 1, idx);
+                }
+
+                strcpy(full_path, _secondary_drive_path);
+                strcat(full_path, _farload_file_name);
+
+                _farload_fptr = _fopen(full_path, s_rb_0055117c);
+                if (_farload_fptr == nullptr) {
+                    Error_Handler_(fname, 1, idx);
+                }
+            }
+
+            _fread(&_lbx_header, 0x800, 1, _farload_fptr);
+            if (_lbx_header.magic != 0xfead) {
+                Error_Handler_(fname, 7, idx);
+            }
+            _farload_file_flag = 1;
+        }
+
+        // Uninitialized stack values are safely managed up to this point due to checks inside the header loader logic
+        if (_lbx_header.entry_count <= idx) {
+            Error_Handler_(fname, 8, idx);
+        }
+
+        _fseek(_farload_fptr, _lbx_header.offsets[idx], 0);
+
+        uint16_t total_count;
+        uint16_t element_size;
+
+        _fread(&total_count, 2, 1, _farload_fptr);
+        _fread(&element_size, 2, 1, _farload_fptr);
+
+        if (count == 0xFFFF) {
+            count = total_count - static_cast<uint16_t>(start_idx);
+        }
+
+        if (total_count <= start_idx) {
+            Error_Handler_(fname, 10, idx);
+        }
+
+        if (element_size != expected_element_size) {
+            Error_Handler_(fname, 9, idx);
+        }
+
+        _fseek(_farload_fptr, element_size * start_idx, 1);
+
+        uint32_t read_size = element_size * count;
+
+        switch (alloc_type) {
+            case 0:
+                out = allocate::Allocate_Space_No_Header_(read_size);
+                if (out == nullptr) {
+                    Error_Handler_(fname, 3, idx);
+                }
+                break;
+            case 1:
+                out = allocate::Allocate_First_Block_No_Header_(out, read_size);
+                if (out == nullptr) {
+                    Error_Handler_(fname, 5, idx);
+                }
+                break;
+            case 2:
+                out = allocate::Allocate_Next_Block_No_Header_(out, read_size);
+                if (out == nullptr) {
+                    Error_Handler_(fname, 5, idx);
+                }
+                break;
+            case 3:
+                break;
+            default:
+                // This preserves the unusual fallback logic from assembly exactly, loading a pointer from path buffer boundary
+                out = *reinterpret_cast<void**>(full_path);
+                break;
+        }
+
+        _fread(out, read_size, 1, _farload_fptr);
+
+        return out;
+    }
+
 void* __cdecl Far_Reload_Data_(const char* path, int32_t idx, void* out, uint32_t size, uint16_t param_5, uint16_t param_6) {
     return Farload_Library_Data_(path, idx, out, 1, size, param_5, param_6);
 }
 
-void* __cdecl Far_Reload_Next_Data_(const char* filename, int unused, void* buffer, int entry_num, int type, int size) {
-    return Farload_Library_Data_(filename, unused, buffer, 2, size, entry_num, type);
+void* __cdecl Far_Reload_Next_Data_(const char* filename, int32_t idx, void* buffer, uint32_t entry_num, uint16_t type, uint16_t size) {
+    return Farload_Library_Data_(filename, idx, buffer, 2, entry_num, type, size);
 }
 
 void __cdecl Error_Handler_(const char* filename, int error_code, int entry_num) {

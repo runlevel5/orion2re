@@ -290,12 +290,19 @@ inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
     return fn(filename, mode);
 }
 
+inline FILE* __cdecl _fopen(const char* filename, const char* mode) {
+    using Fn = FILE*(__cdecl*)(const char*, const char*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540c00 });
+    return fn(filename, mode);
+}
+
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
 inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E00});
 
 inline const char* s_fmt_modifier_full_005523a4 = reinterpret_cast<const char*>(std::uintptr_t{0x005523A4}); // "%d.%d"
 inline const char* s_fmt_score_simple_00556104 = reinterpret_cast<const char*>(std::uintptr_t{0x00556104}); // "%d"
+inline const char* s_0_00556108 = reinterpret_cast<const char*>(std::uintptr_t{0x00556108});
 inline const char* s_dot_0055632c = reinterpret_cast<const char*>(std::uintptr_t{0x0055632C}); // "."
 inline char* s_RACEOPT_LBX_00556320 = reinterpret_cast<char*>(std::uintptr_t{0x00556320}); // "RACEOPT.LBX"
 inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
