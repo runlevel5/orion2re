@@ -1702,7 +1702,7 @@ namespace CMBTFIRE {
         int16_t x1, y1, x2, y2;
         int16_t frame_count;
         s_animation_header* anim_seg;
-        void* temp_bitmap;
+        s_animation_header* temp_bitmap;
         int32_t sound_handle;
         int16_t speed_step;
         int16_t loop_counter;
@@ -1730,7 +1730,7 @@ namespace CMBTFIRE {
             }
 
             allocate::Push_Block_(MOX::_screen_seg);
-            temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
+            temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
 
             sound_handle = ERICNET::Mox_Play_Sound_(10);
             loop_counter = 0;

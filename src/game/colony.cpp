@@ -145,7 +145,7 @@ namespace COLONY {
     }
 
     void __cdecl Load_Bldg_Bitm_() {
-        COLBLDG::_bldg_bitm = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x3860);
+        COLBLDG::_bldg_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x3860);
         _bldg_bitm_n = -1;
     }
 
@@ -303,8 +303,8 @@ namespace COLONY {
             _ship_bitm_n = picture_num;
             _g_ship_pic_n = (int32_t)previous_owner;
 
-            void* picture_seg = KEN::Get_Ship_Picture_Seg_(previous_owner, picture_num);
-            bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_ship_bitm, picture_seg);
+            s_animation_header* picture_seg = KEN::Get_Ship_Picture_Seg_(previous_owner, picture_num);
+            bitmap::Draw_Picture_To_Bitmap_(_ship_bitm, picture_seg);
 
             replace::Replace_Color_Range_(_ship_bitm, palette_buffer, 1, 31);
 
@@ -2077,7 +2077,7 @@ namespace COLONY {
 
         // Draw the frame, replace color 240 with transparency/background,
         // apply the "glassed" (translucent) effect and outline it in white.
-        bitmap::Draw_Picture_To_Bitmap_(COLONY::_mouse_bitm, (void*)anim);
+        bitmap::Draw_Picture_To_Bitmap_(COLONY::_mouse_bitm, anim);
         replace::Replace_Color_All_(COLONY::_mouse_bitm, 240);
         bitmap::Set_Picture_Glassed_(COLONY::_mouse_bitm);
         bitmap::Outline_Bitmap_(COLONY::_mouse_bitm, COLONY::_mouse_bitm, 229 /* WHITE_OUTLINE */, 0);

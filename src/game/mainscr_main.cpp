@@ -775,7 +775,7 @@ namespace MAINSCR {
                     MAINSCR::Draw_Mini_Main_Screen_();
                     allocate::Push_Block_(MOX::_screen_seg);
                     uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(0x1fb, 0x191);
-                    _temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+                    _temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
                     bitmap::Screen_Bitmap_Capture_(0x16, 0x16, 0x20f, 0x1a5, _temp_bitmap);
                     allocate::Pop_Block_(MOX::_screen_seg);
                     MISC::_Darken_Fill_(0x16, 0x16, 0x20f, 0x1a5);

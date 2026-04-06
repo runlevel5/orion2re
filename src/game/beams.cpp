@@ -121,7 +121,7 @@ namespace BEAMS {
     }
 
     void __cdecl Load_Shield_Hit_() {
-        uint8_t palettes[16];
+        int8_t palettes[16];
         int entry_index = 0x43; /* 67 */
 
         for (int j = 0; j < 4; ++j) {
@@ -139,7 +139,7 @@ namespace BEAMS {
 
         // Generate 16 brightness levels for shield impact effects.
         for (int i = 0; i < 16; ++i) {
-            palettes[i] = (uint8_t)(i * 4 + 30);
+            palettes[i] = (int8_t)(i * 4 + 30);
         }
 
         bitmap::Create_Brighten_Bitmap_Palettes_(MOX::_screen_seg, palettes, 16);

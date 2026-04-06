@@ -1221,7 +1221,7 @@ namespace LOADSAVE {
         int16_t w = animate::Get_Width_(first_pic) + 1;
         uint32_t size = bitmap::Get_Bitmap_Size_(w, h);
 
-        MAINSCR::_temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+        MAINSCR::_temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
     }
 
     /**

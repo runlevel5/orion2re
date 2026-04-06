@@ -1295,7 +1295,7 @@ namespace SCORE {
         bitmap::Create_Blank_Bitmap_(600, 300, _hi->report_bitmap);
 
         bitmap_size = bitmap::Get_Bitmap_Size_(50, 50);
-        MAINSCR::_temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
+        MAINSCR::_temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
 
         _hi->main_background_anim = static_cast<s_animation_header*>(farload::Far_Reload_Next_(static_cast<const char*>(PTR_s_SCORE_LBX_0055a440), 0, MOX::_screen_seg));
         _hi->race_icon_frame_anim = static_cast<s_animation_header*>(farload::Far_Reload_Next_(static_cast<const char*>(PTR_s_SCORE_LBX_0055a440), 1, MOX::_screen_seg));

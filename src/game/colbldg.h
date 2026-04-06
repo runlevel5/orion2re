@@ -60,7 +60,7 @@ namespace COLBLDG {
 
     inline uint8_t*& _buffer = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00595388});
 
-    inline void*& _bldg_bitm = *reinterpret_cast<void**>(std::uintptr_t{0x00595384});
+    inline s_animation_header*& _bldg_bitm = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595384});
 
     inline uint8_t*& _desc_record_ptr = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00571F74});
 

@@ -458,7 +458,7 @@ namespace MAINSCR {
         int16_t max_icon_height = 0;
 
         if (has_portal) {
-            void* portal_pic = Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
+            s_animation_header* portal_pic = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
             MOX::gate_portal_icons[zoom_offset] = static_cast<s_animation_header*>(portal_pic);
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[0], portal_pic);
             int16_t h = animate::Get_Height_((s_animation_header*)portal_pic);

@@ -200,7 +200,7 @@ namespace MOX {
     inline int16_t& _design_screen_replacement_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597402});
     inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
-    inline void*& _screen_seg = *reinterpret_cast<void**>(std::uintptr_t{ 0x005973E4 });
+    inline s_animation_header*& _screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973E4 });
     inline s_animation_header*& _combat_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A94});
     inline s_animation_header*& _combat_map_planet_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596448});
@@ -590,7 +590,7 @@ namespace MOX {
     inline s_animation_header*& _darken_plasma_map = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49D0});
     inline void*& _shield_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x0059BECC});
     inline void*& _pulsar_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A2BE4});
-    inline void*& _small_tractor_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059B5B0});
+    inline s_animation_header*& _small_tractor_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5B0});
     inline void*& _tractor_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A4AA8});
     inline void*& _bhg_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A1860});
     inline void*& _plasma_web_remap_colors = *reinterpret_cast<void**>(std::uintptr_t{0x005A1CB4});

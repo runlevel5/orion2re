@@ -25,7 +25,7 @@ namespace MAINSCR {
     inline int16_t& _exit_game_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059619A});
     inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
     inline int16_t& _main_screen_grid_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596D52});
-    inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});
+    inline s_animation_header*& _temp_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596130});
     inline int16_t& _main_screen_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEB0});
     inline int8_t& _moving_a_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEB4});
     inline int8_t& _track_time_flag = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC0});

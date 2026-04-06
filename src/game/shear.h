@@ -15,10 +15,10 @@ namespace shear {
     }
 
     void __cdecl Capture_Screen_Block_(uint8_t* src, int32_t width, int32_t height, uint8_t* dst);
-    void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, int width, int height, uint8_t* dst);
+    void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst);
     void __cdecl Flip_Bitmap_Down_Same_(uint8_t* buffer, uint32_t width, uint32_t height);
-    void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, int32_t height, uint8_t* dst);
-    void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, int width, uint32_t height);
+    void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst);
+    void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, uint32_t width, uint32_t height);
 
     inline void __cdecl Interlace_Scale_Off_Page_ASM_(uint8_t* video_page, uint8_t* palette_color_list) {
         using Fn = void(__cdecl*)(uint8_t*, uint8_t*);

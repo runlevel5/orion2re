@@ -12,12 +12,12 @@ void __cdecl Capture_Screen_Block_(uint8_t* src, int32_t width, int32_t height, 
     }
 }
 
-void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, int width, int height, uint8_t* dst)
+void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst)
 {
     uint8_t* current_dst = dst + width - 1;
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
+    for (uint32_t y = 0; y < height; ++y) {
+        for (uint32_t x = 0; x < width; ++x) {
             *current_dst = *src;
             current_dst--;
             src++;
@@ -51,7 +51,7 @@ void __cdecl Flip_Bitmap_Down_Same_(uint8_t* buffer, uint32_t width, uint32_t he
     } while (height != 0);
 }
 
-void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, int32_t height, uint8_t* dst) {
+void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst) {
     uint8_t* src_ptr = src + (height * width - width);
 
     do {
@@ -62,7 +62,7 @@ void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, int32_t h
     } while (height != 0);
 }
 
-void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, int width, uint32_t height) {
+void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, uint32_t width, uint32_t height) {
     uint8_t* bottom_row = pixels + (height * width - width);
     height >>= 1;
     uint8_t* top_row = pixels;
@@ -70,7 +70,7 @@ void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, int width, uint32_t height)
     do {
         uint8_t* cur_top = top_row;
         uint8_t* cur_bottom = bottom_row;
-        int w = width;
+        uint32_t w = width;
 
         do {
             uint8_t temp = *cur_bottom;

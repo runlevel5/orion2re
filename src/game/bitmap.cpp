@@ -50,7 +50,7 @@ namespace bitmap {
     }
 
     void __cdecl Clear_Mouse_Image_(int16_t image_idx) {
-        memset(video::_mouse_palette + image_idx * 0x240, 0, 0x240);
+        struct_::Set_Memory_(video::_mouse_palette + image_idx * 0x240, 0x240, 0);
     }
 
     void __cdecl Create_Bitmap_Header_(int16_t width, int16_t height, s_animation_header* h) {
@@ -84,10 +84,10 @@ namespace bitmap {
 
         Create_Bitmap_Header_(width, height, header);
 
-        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         uint8_t* dest = reinterpret_cast<uint8_t*>(header) + 0x10;
-        uint8_t* src = video::_current_video_page + (y1 * g_screen_res_x) + x1;
+        uint8_t* src = video::_current_video_page + (static_cast<int32_t>(y1) * platform::g_screen_res_x) + static_cast<int32_t>(x1);
 
         shear::Capture_Screen_Block_(src, width, height, dest);
 
@@ -537,10 +537,10 @@ namespace bitmap {
         }
     }
 
-    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t param_2, int16_t param_3) {
+    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t start_color, int16_t end_color) {
         animate::_animation_header = anim;
         uint8_t* pixels = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
-        shear::Mask_Bitmap_Colors_Pixels_(pixels, param_2, param_3, 0, anim->width, anim->height);
+        shear::Mask_Bitmap_Colors_Pixels_(pixels, start_color, end_color, 0, anim->width, anim->height);
     }
 
     void __cdecl Mask_Brighten_Bitmap_(int32_t x, int32_t y, s_animation_header* dst_anim, s_animation_header* src_anim, uint8_t color) {
@@ -739,5 +739,151 @@ namespace bitmap {
         }
 
         struct_::Set_Memory_(src_data, intensity, 0, dest_data, width, height);
+    }
+
+    void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest) {
+        animate::_animation_header = dest;
+        int16_t dest_width = dest->width;
+        int32_t dest_width_i = dest_width;
+        int16_t dest_height = dest->height;
+        
+        if ((dest->flags & 3) != 1) {
+            exitm::Exit_With_Message(s_Add_Picture_To_Bitmap_targetmust_0055b770);
+        }
+        
+        animate::_animation_header = src;
+        int16_t src_width = src->width;
+        int32_t x_i = x;
+        int16_t end_x = x + src_width - 1;
+        int16_t end_y = src->height + y - 1;
+        
+        if (x_i < dest_width_i && y < dest_height && end_x >= 0 && end_y >= 0) {
+            int32_t frame_offset = src->frame_offsets[src->current_frame];
+            
+            int32_t dest_x;
+            int16_t src_skip_x;
+            if (x < 0) {
+                dest_x = 0;
+                src_skip_x = -x;
+            } else {
+                src_skip_x = 0;
+                dest_x = x;
+            }
+            
+            int16_t src_skip_y;
+            if (y < 0) {
+                src_skip_y = -y;
+                y = 0;
+            } else {
+                src_skip_y = 0;
+            }
+            
+            int16_t draw_width;
+            if (end_x < dest_width - 1) {
+                draw_width = end_x - dest_x + 1;
+            } else {
+                draw_width = dest_width - dest_x;
+            }
+            
+            int16_t draw_height;
+            if (end_y < dest_height - 1) {
+                draw_height = end_y - y + 1;
+            } else {
+                draw_height = dest_height - y;
+            }
+            
+            if ((src->flags & 3) == 1) {
+                int32_t src_idx = src_skip_x + src_skip_y * src_width;
+                int32_t dest_idx = y * dest_width + dest_x;
+                
+                if (draw_height > 0) {
+                    int32_t rows = draw_height;
+                    do {
+                        int32_t cols = draw_width;
+                        if (draw_width > 0) {
+                            do {
+                                uint8_t pixel = *(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + src_idx);
+                                if (pixel != 0) {
+                                    *(reinterpret_cast<uint8_t*>(dest) + 0x10 + dest_idx) = pixel;
+                                }
+                                src_idx++;
+                                dest_idx++;
+                                cols--;
+                            } while (cols != 0);
+                        }
+                        src_idx += src_width - draw_width;
+                        dest_idx += dest_width - draw_width;
+                        rows--;
+                    } while (rows != 0);
+                }
+                return;
+            } else {
+                uint32_t current_y = *(uint16_t*)(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + 2);
+                int32_t word_idx = 2;
+                int32_t dest_idx = y * dest_width + dest_x;
+                
+                while (current_y < static_cast<uint32_t>(src_skip_y)) {
+                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + word_idx * 2);
+                    int16_t val = *ptr;
+                    if (val == 0) {
+                        current_y += static_cast<uint16_t>(ptr[1]);
+                    } else {
+                        word_idx += (val + 1) / 2;
+                    }
+                    word_idx += 2;
+                }
+                
+                if (src_skip_y < static_cast<int32_t>(current_y)) {
+                    dest_idx += (current_y - src_skip_y) * dest_width;
+                }
+                
+                int32_t draw_y_idx = current_y - src_skip_y;
+                int32_t clip_left = dest_idx + src_skip_x;
+                int32_t clip_right = draw_width + src_skip_x + dest_idx;
+                int32_t line_start_idx = dest_idx;
+                
+                while (draw_y_idx < draw_height) {
+                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + word_idx * 2);
+                    word_idx += 2;
+                    int16_t val = *ptr;
+                    int32_t arg1 = ptr[1];
+                    
+                    if (val == 0) {
+                        draw_y_idx += arg1;
+                        line_start_idx += arg1 * dest_width;
+                        clip_left = src_skip_x + line_start_idx;
+                        clip_right = draw_width + src_skip_x + line_start_idx;
+                    } else {
+                        int32_t run_idx = line_start_idx + arg1;
+                        int32_t pixel_offset = word_idx * 2;
+                        int32_t run_len = val;
+                        
+                        if (run_idx < clip_right) {
+                            if (run_idx < clip_left) {
+                                int32_t over = clip_left - run_idx;
+                                if (run_len < over) {
+                                    over = run_len;
+                                }
+                                pixel_offset += over;
+                                run_idx += over;
+                            }
+                            
+                            int32_t limit = clip_right - run_idx;
+                            if (run_len <= limit) {
+                                limit = run_len;
+                            }
+                            limit += run_idx;
+                            
+                            for (; run_idx < limit; ++run_idx) {
+                                *(reinterpret_cast<uint8_t*>(dest) + 0x10 + run_idx) = 
+                                    *(reinterpret_cast<uint8_t*>(src) + 0x10 + pixel_offset + frame_offset);
+                                pixel_offset++;
+                            }
+                        }
+                        word_idx += (run_len + 1) / 2;
+                    }
+                }
+            }
+        }
     }
 }

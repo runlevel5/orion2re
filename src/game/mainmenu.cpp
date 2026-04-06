@@ -596,35 +596,35 @@ namespace MAINMENU {
                 _credits_font_style = 2;
                 _credits_font_spacing = 2;
                 _credits_column_one = 0x9a;
-                memcpy(filename, s_GERCRDTS_LBX, 13);
+                memcpy(filename, "GERCRDTS.LBX", 13);
                 return;
 
             case 2: /* French */
                 _credits_column_one = 0xa4;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, s_FRECRDTS_LBX, 13);
+                memcpy(filename, "FRECRDTS.LBX", 13);
                 return;
 
             case 3: /* Spanish */
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, s_SPACRDTS_LBX, 13);
+                memcpy(filename, "SPACRDTS.LBX", 13);
                 return;
 
             case 4:
                 _credits_column_one = 0x92;
                 _credits_font_spacing = 1;
                 _credits_font_style = 2;
-                memcpy(filename, DAT_0055A668, 13);
+                memcpy(filename, "ITACRDTS.LBX", 13);
                 return;
 
             default: /* English */
                 _credits_column_one = 0x7c;
                 _credits_font_spacing = 1;
                 _credits_font_style = 3;
-                memcpy(filename, s_CREDITS_LBX, 12);
+                memcpy(filename, "CREDITS.LBX", 12);
                 return;
         }
     }

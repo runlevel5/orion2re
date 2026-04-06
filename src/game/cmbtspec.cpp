@@ -98,7 +98,7 @@ namespace CMBTSPEC {
         allocate::Push_Block_(MOX::_screen_seg);
 
         int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
-        void* temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining_space - 100);
+        s_animation_header* temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining_space - 100);
 
         bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), MOX::_small_tractor_seg);
         bitmap::Set_Picture_Glassed_(static_cast<s_animation_header*>(temp_bitmap));
@@ -139,7 +139,7 @@ namespace CMBTSPEC {
         allocate::Push_Block_(MOX::_screen_seg);
 
         int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
-        void* temp_bmp = allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining - 100);
+        s_animation_header* temp_bmp = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, remaining - 100);
 
         bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bmp), MOX::_small_tractor_seg);
         bitmap::Set_Picture_Glassed_(static_cast<s_animation_header*>(temp_bmp));
@@ -390,7 +390,7 @@ namespace CMBTSPEC {
         int16_t step;
         int32_t sound_handle;
         s_animation_header* anim;
-        void* temp_bitmap;
+        s_animation_header* temp_bitmap;
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (!CMBTDRW1::Ship_Completely_On_Screen_(target_ship_idx)) {
@@ -402,7 +402,7 @@ namespace CMBTSPEC {
             frame_count = animate::Get_Animation_Frame_Count_(anim);
 
             allocate::Push_Block_(MOX::_screen_seg);
-            temp_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
+            temp_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000 /* 0xC350 */);
 
             COMBINIT::Ship_Center_Offsets_(source_ship_idx, &x1, &y1);
             x1 += (MOX::_combat_data[source_ship_idx].x - MOX::_cur_combat_x) * 20;
@@ -1370,7 +1370,7 @@ namespace CMBTSPEC {
         int16_t frame_count = animate::Get_Animation_Frame_Count_(anim);
 
         allocate::Push_Block_(MOX::_screen_seg);
-        uint8_t* block = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000);
+        s_animation_header* block = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 50000);
 
         COMBINIT::Ship_Center_Offsets_(param_1, &x1, &y1);
         x1 += (MOX::_combat_data[param_1].x - MOX::_cur_combat_x) * 20;
@@ -1397,7 +1397,7 @@ namespace CMBTSPEC {
 
                 anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(anim, (int32_t)frame);
-                bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)block, anim);
+                bitmap::Draw_Picture_To_Bitmap_(block, anim);
 
                 graphics::Set_Window_(0, 0, 639, 350);
                 video::Clip_On_();

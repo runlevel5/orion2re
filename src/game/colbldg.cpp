@@ -230,7 +230,7 @@ namespace COLBLDG {
             }
         }
 
-        _bldg_bitm = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FA4);
+        _bldg_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FA4);
         _colsum_pal_anim = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLSUM_LBX, 0x15, MOX::_screen_seg);
     }
 

@@ -20,7 +20,7 @@ namespace bitmap {
 
     void __cdecl Screen_Bitmap_Capture_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* header);
 
-    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t param_2, int16_t param_3);
+    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t start_color, int16_t end_color);
 
     void __cdecl Tint_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t tint_color_index);
 
