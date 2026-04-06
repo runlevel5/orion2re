@@ -219,7 +219,6 @@ inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IU
 
 inline void __cdecl FUN_526F80() {
     using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00526f80 });
     fn();
 }
 
