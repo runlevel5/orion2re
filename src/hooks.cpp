@@ -2755,6 +2755,9 @@ namespace hooks {
         { 0x0052F240, &bitmap::Clear_Mouse_Image_ },
         { 0x0052F400, &bitmap::Vanish_Bitmap_ },
         { 0x0052F270, &bitmap::Scale_Bitmap_ },
+        { 0x0052F960, &bitmap::Draw_Picture_To_Bitmap_ },
+        { 0x00537366, &shear::Flip_Bitmap_Down_Different_ },
+        { 0x00537324, &shear::Flip_Bitmap_Down_Same_ },
     };
 
     void Install_Hooks()

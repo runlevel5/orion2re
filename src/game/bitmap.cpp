@@ -802,7 +802,7 @@ namespace bitmap {
                         int32_t cols = draw_width;
                         if (draw_width > 0) {
                             do {
-                                uint8_t pixel = *(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + src_idx);
+                                uint8_t pixel = *(reinterpret_cast<uint8_t*>(src) + frame_offset + src_idx);
                                 if (pixel != 0) {
                                     *(reinterpret_cast<uint8_t*>(dest) + 0x10 + dest_idx) = pixel;
                                 }
@@ -818,12 +818,12 @@ namespace bitmap {
                 }
                 return;
             } else {
-                uint32_t current_y = *(uint16_t*)(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + 2);
+                uint32_t current_y = *(uint16_t*)(reinterpret_cast<uint8_t*>(src) + frame_offset + 2);
                 int32_t word_idx = 2;
                 int32_t dest_idx = y * dest_width + dest_x;
                 
                 while (current_y < static_cast<uint32_t>(src_skip_y)) {
-                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + word_idx * 2);
+                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + word_idx * 2);
                     int16_t val = *ptr;
                     if (val == 0) {
                         current_y += static_cast<uint16_t>(ptr[1]);
@@ -843,7 +843,7 @@ namespace bitmap {
                 int32_t line_start_idx = dest_idx;
                 
                 while (draw_y_idx < draw_height) {
-                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + 0x10 + word_idx * 2);
+                    int16_t* ptr = reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(src) + frame_offset + word_idx * 2);
                     word_idx += 2;
                     int16_t val = *ptr;
                     int32_t arg1 = ptr[1];
@@ -876,11 +876,72 @@ namespace bitmap {
                             
                             for (; run_idx < limit; ++run_idx) {
                                 *(reinterpret_cast<uint8_t*>(dest) + 0x10 + run_idx) = 
-                                    *(reinterpret_cast<uint8_t*>(src) + 0x10 + pixel_offset + frame_offset);
+                                    *(reinterpret_cast<uint8_t*>(src) + frame_offset + pixel_offset);
                                 pixel_offset++;
                             }
                         }
                         word_idx += (run_len + 1) / 2;
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Draw_Picture_To_Bitmap_(s_animation_header* h1, s_animation_header* h2) {
+        animate::_animation_header = h2;
+        int16_t width = h2->width;
+        int16_t height = h2->height;
+
+        Create_Blank_Bitmap_(width, height, h1);
+
+        animate::_animation_header = h2;
+
+        if ((h2->flags & 3) == 1) {
+            uint8_t* src = reinterpret_cast<uint8_t*>(h2) + h2->frame_offsets[h2->current_frame];
+            uint8_t* dst = reinterpret_cast<uint8_t*>(h1) + 0x10;
+            struct_::Copy_Structure_(dst, src, width * height);
+            return;
+        }
+
+        int8_t interval = static_cast<int8_t>(h2->keyframe_interval);
+        int32_t start_frame = 0;
+
+        if (interval != 0) {
+            start_frame = (h2->current_frame / interval) * interval;
+        }
+
+        if (start_frame <= h2->current_frame) {
+            uint8_t* dst = reinterpret_cast<uint8_t*>(h1) + 0x10;
+
+            for (int32_t frame = start_frame; frame <= animate::_animation_header->current_frame; ++frame) {
+                s_animation_header* anim = animate::_animation_header;
+                uint8_t* frame_data = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[frame];
+
+                int32_t y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+                int32_t word_offset = 2;
+                int32_t pixel_offset = y * width;
+
+                while (y < height) {
+                    int16_t count = *reinterpret_cast<int16_t*>(frame_data + word_offset * 2);
+                    int16_t param = *reinterpret_cast<int16_t*>(frame_data + word_offset * 2 + 2);
+                    word_offset += 2;
+
+                    if (count == 0) {
+                        y += param;
+                        pixel_offset += param * width;
+                    } else {
+                        pixel_offset += param;
+                        int32_t count_ext = count;
+                        int32_t end_offset = pixel_offset + count_ext;
+
+                        if (end_offset > pixel_offset) {
+                            int32_t src_offset = word_offset * 2;
+                            while (pixel_offset < end_offset) {
+                                dst[pixel_offset++] = frame_data[src_offset++];
+                            }
+                        }
+
+                        word_offset += (count_ext + 1) / 2;
                     }
                 }
             }

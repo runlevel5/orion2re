@@ -93,6 +93,8 @@ workflows:
             the output.
           * You are not allowed to refactor or optimize the code. Keep code as close to the original as possible outside of
             subtle cleanups or local variable renames.
+          * You must correctly determine signess of parameters and variables from disassembly hints, such as signed or unsigned
+            conditional jumps, signed divisions and so on. 
           * Cleanup:
             - You shall rename generic local variable names to better represent their semantic meaning.
             - You are allowed to remove superfluous variables.

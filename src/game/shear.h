@@ -15,8 +15,8 @@ namespace shear {
     }
 
     void __cdecl Capture_Screen_Block_(uint8_t* src, int32_t width, int32_t height, uint8_t* dst);
-    void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst);
-    void __cdecl Flip_Bitmap_Down_Same_(uint8_t* buffer, uint32_t width, uint32_t height);
+    void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, int32_t width, int32_t height, uint8_t* dst);
+    void __cdecl Flip_Bitmap_Down_Same_(uint8_t* data, uint32_t width, uint32_t height);
     void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst);
     void __cdecl Flip_Bitmap_Left_Same_(uint8_t* pixels, uint32_t width, uint32_t height);
 

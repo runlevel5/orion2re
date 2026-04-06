@@ -143,6 +143,7 @@
     <ClCompile Include="src\game\score.cpp" />
     <ClCompile Include="src\game\scroll.cpp" />
     <ClCompile Include="src\game\settler.cpp" />
+    <ClCompile Include="src\game\shear.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\shipstak.cpp" />
@@ -330,6 +331,7 @@
     <ClInclude Include="src\game\string.h" />
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
+    <ClInclude Include="src\game\swap.h" />
     <ClInclude Include="src\game\sys.h" />
     <ClInclude Include="src\game\sysfont.h" />
     <ClInclude Include="src\game\s_council.h" />

@@ -4,51 +4,53 @@ namespace shear {
 
 void __cdecl Capture_Screen_Block_(uint8_t* src, int32_t width, int32_t height, uint8_t* dst)
 {
-    while (height != 0) {
+    do {
         memcpy(dst, src, width);
-        dst += width;
         src += g_screen_res_x;
+        dst += width;
         height--;
-    }
+    } while (height != 0);
 }
 
-void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst)
+void __cdecl Flip_Bitmap_Down_Different_(uint8_t* src, int32_t width, int32_t height, uint8_t* dst)
 {
-    uint8_t* current_dst = dst + width - 1;
-
-    for (uint32_t y = 0; y < height; ++y) {
-        for (uint32_t x = 0; x < width; ++x) {
-            *current_dst = *src;
-            current_dst--;
-            src++;
-        }
-        current_dst += width * 2;
-    }
-}
-
-void __cdecl Flip_Bitmap_Down_Same_(uint8_t* buffer, uint32_t width, uint32_t height) {
-    uint8_t* row_start = buffer;
-    uint8_t* row_end = buffer + width - 1;
+    uint8_t* d = dst + width - 1;
+    int32_t w = width;
 
     do {
+        do {
+            *d = *src;
+            src++;
+            d--;
+            w--;
+        } while (w != 0);
+
+        d += width * 2;
+        height--;
+        w = width;
+    } while (height != 0);
+}
+
+void __cdecl Flip_Bitmap_Down_Same_(uint8_t* data, uint32_t width, uint32_t height) {
+    uint8_t* row_start = data;
+    uint8_t* row_end = data + width - 1;
+
+    for (uint32_t y = 0; y < height; ++y) {
         uint32_t half_width = width >> 1;
         uint8_t* left = row_start;
         uint8_t* right = row_end;
 
-        while (half_width != 0) {
+        for (uint32_t x = 0; x < half_width; ++x) {
             uint8_t temp = *right;
             *right = *left;
             *left = temp;
-
             right--;
             left++;
-            half_width--;
         }
 
-        row_end += width;
         row_start += width;
-        height--;
-    } while (height != 0);
+        row_end += width;
+    }
 }
 
 void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst) {
