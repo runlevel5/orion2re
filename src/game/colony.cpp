@@ -692,7 +692,7 @@ namespace COLONY {
 
         graphics::Set_Window_(0, 0, 639, 479);
         video::Clip_On_();
-        animate::Draw_(x, y, (s_animation_header*)COLBLDG::_bldg_bitm);
+        animate::Draw_(x, y, COLBLDG::_bldg_bitm);
         video::Clip_Off_();
     }
 

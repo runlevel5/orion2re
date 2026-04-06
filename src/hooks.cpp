@@ -1405,7 +1405,7 @@ namespace hooks {
         { 0x004f2e40, &COLCALC::Format_Quotient_ },
         { 0x00509a30, &COLCALC::N_Prods_In_Colony_Queue_ },
         { 0x004f6340, &COLCALC::Star_Has_Asteroid_Or_Gas_Giant_ },
-        { 0x004de110, &COLONY::Draw_Bldg_CR_Dark_ },
+        //{ 0x004de110, &COLONY::Draw_Bldg_CR_Dark_ },
         { 0x004e0ac0, &COLONY::Remove_Satellite_From_Array_ },
         { 0x00509800, &COLBLDG::Get_App_Description_String_ },
         { 0x004e0030, &COLONY::Add_Job_Field_For_ },
@@ -2745,7 +2745,7 @@ namespace hooks {
         { 0x0052F690, &bitmap::Mask_Out_Bitmap_With_Bitmap_ },
         { 0x0052f070, &bitmap::Copy_Bitmap_To_Bitmap_ },
         { 0x0052FE10, &bitmap::Draw_Bitmap_Line_ },
-        { 0x0052F160, &bitmap::Draw_Bitmap_To_Mouse_ },
+        { 0x0052F160, &bitmap::Draw_Bitmap_To_Mouse_ },        
         { 0x0052ebd0, &bitmap::Create_Brighten_Bitmap_Palettes_ },
         { 0x0052ed00, &bitmap::Mask_Brighten_Bitmap_ },
         { 0x0052f8a0, &bitmap::Mask_Out_Colors_ },
@@ -2755,9 +2755,6 @@ namespace hooks {
         { 0x0052F240, &bitmap::Clear_Mouse_Image_ },
         { 0x0052F400, &bitmap::Vanish_Bitmap_ },
         { 0x0052F270, &bitmap::Scale_Bitmap_ },
-        { 0x0052F960, &bitmap::Draw_Picture_To_Bitmap_ },
-        { 0x00537366, &shear::Flip_Bitmap_Down_Different_ },
-        { 0x00537324, &shear::Flip_Bitmap_Down_Same_ },
     };
 
     void Install_Hooks()
