@@ -18,8 +18,8 @@ namespace video {
 	inline uint32_t& screen_refresh_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1B4 });
 
-	inline uint32_t*& _mouse_palette =
-		*reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00578AB0 });
+	inline uint8_t*& _mouse_palette =
+		*reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00578AB0 });
 
 	inline uint32_t& _screen_pixel_size =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b0 });
@@ -30,8 +30,8 @@ namespace video {
 		*reinterpret_cast<s_glass_color(*)[16]>(std::uintptr_t{ 0x00579858 });
 
 	// Address 0x579350 is the base of the current palette status array
-	inline s_palette_entry* _current_palette =
-		reinterpret_cast<s_palette_entry*>(std::uintptr_t{ 0x00579350 });
+	inline s_palette_entry (&_current_palette)[256] =
+		*reinterpret_cast<s_palette_entry(*)[256]>(std::uintptr_t{ 0x00579350 });
 
 	inline uint8_t** _palette_list =
 		reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00579750 });

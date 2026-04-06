@@ -61,4 +61,16 @@ namespace palette {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b740 });
         fn(block);
     }
+
+    inline void __cdecl RGB_To_HLS_(uint8_t r, uint8_t g, uint8_t b, int* h, int* l, int* s) {
+        using Fn = void(__cdecl*)(uint8_t, uint8_t, uint8_t, int*, int*, int*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b930});
+        fn(r, g, b, h, l, s);
+    }
+
+    inline void __cdecl HLS_To_RGB_(int h, int l, int s, uint8_t* r, uint8_t* g, uint8_t* b) {
+        using Fn = void(__cdecl*)(int, int, int, uint8_t*, uint8_t*, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052bae0});
+        fn(h, l, s, r, g, b);
+    }
 }

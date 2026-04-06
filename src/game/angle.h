@@ -19,4 +19,10 @@ namespace angle {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531bc0});
         return fn(angle, step);
     }
+
+    inline void __cdecl Rotate_Coordinates_(int32_t angle, int32_t* x, int32_t* y) {
+        using Fn = void(__cdecl*)(int32_t, int32_t*, int32_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531CC0});
+        fn(angle, x, y);
+    }
 }

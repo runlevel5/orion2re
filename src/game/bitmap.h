@@ -1,4 +1,7 @@
 #pragma once
+#include <cstdint>
+
+struct s_animation_header;
 
 namespace bitmap {
     void __cdecl Get_Bitmap_Actual_Size_(s_animation_header* header, int16_t* out_min_x, int16_t* out_min_y, int16_t* out_actual_width, int16_t* out_actual_height);
@@ -9,102 +12,62 @@ namespace bitmap {
 
     void __cdecl Create_Blank_Bitmap_(int16_t w, int16_t h, void* sprite);
 
-    inline void __cdecl Draw_Picture_To_Bitmap_(s_animation_header* dest, void* src) {
-        using Fn = void(__cdecl*)(s_animation_header*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F960});
-        fn(dest, src);
-    }
+    void __cdecl Draw_Picture_To_Bitmap_(s_animation_header* h1, s_animation_header* h2);
 
-    inline void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052FAC0});
-        fn(x, y, src, dest);
-    }
+    inline char* s_Add_Picture_To_Bitmap_targetmust_0055b770 = reinterpret_cast<char*>(std::uintptr_t{0x0055B770});
 
-    inline void __cdecl Screen_Bitmap_Capture_(int x, int y, int w, int h, void* bmp) {
-        using Fn = void(__cdecl*)(int, int, int, int, void*);
-        reinterpret_cast<Fn>(0x0052F0C0)(x, y, w, h, bmp);
-    }
+    void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest);
 
-    inline void __cdecl Mask_Out_Colors_(void* handle, uint8_t color_low, uint8_t color_high) {
-        using Fn = void(__cdecl*)(void*, uint8_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f8a0});
-        fn(handle, color_low, color_high);
-    }
+    void __cdecl Screen_Bitmap_Capture_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* header);
 
-    inline void __cdecl Tint_Bitmap_(void* dst_bitmap, void* src_bitmap, int32_t tint_type) {
-        using Fn = void(__cdecl*)(void*, void*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f560});
-        fn(dst_bitmap, src_bitmap, tint_type);
-    }
+    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t param_2, int16_t param_3);
 
-    inline void __cdecl Clear_Mouse_Image_(int32_t image_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F240});
-        fn(image_idx);
-    }
+    void __cdecl Tint_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t tint_color_index);
 
-    inline void __cdecl Vanish_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t intensity) {
-        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052F400})(dest, src, intensity);
-    }
+    inline uint32_t& _bitmap_temp2 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D8});
 
-    inline void __cdecl Set_Picture_Glassed_(s_animation_header* anim) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EFA0});
-        fn(anim);
-    }
+    inline uint32_t& _bitmap_temp1 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0E4});
 
-    inline void __cdecl Flip_Bitmap_(s_animation_header* dst, s_animation_header* src, int32_t flag) {
-        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EFB0});
-        fn(dst, src, flag);
-    }
+    void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height);
 
-    inline void __cdecl Outline_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t color, int16_t unk) {
-        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F4C0});
-        fn(dest, src, color, unk);
-    }
+    void __cdecl Clear_Mouse_Image_(int16_t image_idx);
 
-    inline void __cdecl Mask_Out_Bitmap_With_Bitmap_(int16_t unk1, int16_t unk2, s_animation_header* dest, s_animation_header* src, int16_t unk3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F690});
-        fn(unk1, unk2, dest, src, unk3);
-    }
+    void __cdecl Vanish_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t intensity);
 
-    inline void __cdecl Copy_Bitmap_To_Bitmap_(s_animation_header* src, s_animation_header* dst) {
-        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052f070});
-        fn(src, dst);
-    }
+    void __cdecl Set_Picture_Glassed_(s_animation_header* anim);
 
-    inline void __cdecl Scale_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t scale_x, int16_t scale_y) {
-        using Fn = void(__cdecl*)(s_animation_header*, s_animation_header*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F270});
-        fn(dst, src, scale_x, scale_y);
-    }
+    void __cdecl Flip_Bitmap_(s_animation_header* dst_hdr, s_animation_header* src_hdr, int16_t flip_mode);
 
-    inline void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, void* bitmap) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052fe10});
-        fn(x1, y1, x2, y2, bitmap);
-    }
+    void __cdecl Outline_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t color, int16_t no_glass);
 
-    inline void __cdecl Draw_Bitmap_To_Mouse_(int16_t x, int16_t y, s_animation_header* anim, int16_t index) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F160});
-        fn(x, y, anim, index);
-    }
+    void __cdecl Mask_Out_Bitmap_With_Bitmap_(int16_t x, int16_t y, s_animation_header* dest, s_animation_header* src, int16_t type);
 
-    inline void __cdecl Create_Brighten_Bitmap_Palettes_(void* screen_seg, uint8_t* colors, int count) {
-        using Fn = void(__cdecl*)(void*, uint8_t*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052EBD0});
-        fn(screen_seg, colors, count);
-    }
+    void __cdecl Copy_Bitmap_To_Bitmap_(s_animation_header* dst, s_animation_header* src);
 
-    inline void __cdecl Mask_Brighten_Bitmap_(int16_t x_offset, int16_t y_offset, s_animation_header* src, s_animation_header* mask, int16_t amount) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052ED00})(x_offset, y_offset, src, mask, amount);
-    }
+    inline const char* s_Brighten_perecnt_needs_to_be_bet_0055b714 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B714}); /* "Brighten perecnt needs to be between 0 - 100" */
+
+    inline const char* s_Not_Enough_Space_For_Brighten_Pa_0055b744 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B744}); /* "Not Enough Space For Brighten Palette Block" */
+
+    inline void*& _brighten_palette_seg =
+        *reinterpret_cast<void**>(std::uintptr_t{0x0057E040});
+
+    inline int8_t& _brighten_palette_levels =
+        *reinterpret_cast<int8_t*>(std::uintptr_t{0x0057E068});
+
+    inline int32_t& _brighten_start_color =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057E06C});
+
+    void __cdecl Scale_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t scale_x, int16_t scale_y);
+
+    void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* img);
+
+    void __cdecl Draw_Bitmap_To_Mouse_(int16_t x, int16_t y, s_animation_header* anim, int16_t mouse_type);
+
+    void __cdecl Create_Brighten_Bitmap_Palettes_(s_animation_header* anim, int8_t* levels, int8_t count);
+
+    void __cdecl Mask_Brighten_Bitmap_(int32_t x, int32_t y, s_animation_header* dst_anim, s_animation_header* src_anim, uint8_t color);
 }

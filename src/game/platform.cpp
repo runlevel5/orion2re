@@ -706,7 +706,7 @@ namespace platform {
         {
             if (DAT_578AC4 != DAT_578B3C)
             {
-                FUN_526F80();
+                Update_Cursor_Image_();
                 DAT_578B3C = DAT_578AC4;
             }
 

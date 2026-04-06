@@ -116,13 +116,6 @@ namespace fonts {
         fn(x, y, text, dest);
     }
 
-    // Suggested name: fonts::Update_Palette_Internal
-    inline void __cdecl FUN_00526f80() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F80 });
-        fn();
-    }
-
     int16_t __cdecl Get_Current_Font_Style_();
 
     s_colors* __cdecl Get_Current_Font_Color_();

@@ -117,6 +117,10 @@ namespace platform {
 	HRESULT Restore_Surfaces();
 	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
+	inline void __cdecl Update_Cursor_Image_() {
+		using Fn = void(__cdecl*)();
+		reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F80 })();
+	}
 	void __cdecl Toggle_Pages_Stub_();
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
 }

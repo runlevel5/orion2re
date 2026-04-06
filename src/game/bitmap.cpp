@@ -49,6 +49,10 @@ namespace bitmap {
         return (size_with_offset / 4) * 4;
     }
 
+    void __cdecl Clear_Mouse_Image_(int16_t image_idx) {
+        memset(video::_mouse_palette + image_idx * 0x240, 0, 0x240);
+    }
+
     void __cdecl Create_Bitmap_Header_(int16_t width, int16_t height, s_animation_header* h) {
         animate::_animation_header = h;
         h->width = width;
@@ -56,7 +60,7 @@ namespace bitmap {
         h->current_frame = 0;
         h->frame_count = 1;
         h->loop_frame = 0;
-        h->field5_0x9 = 0;
+        h->keyframe_interval = 0;
         h->flags = 1;
         h->frame_offsets[0] = 0x00000010;
     }
@@ -67,5 +71,673 @@ namespace bitmap {
         uint8_t* pixels = reinterpret_cast<uint8_t*>(sprite) + 0x10;
         uint32_t pixel_count = static_cast<uint32_t>(static_cast<int32_t>(w) * static_cast<int32_t>(h));
         Set_Memory_(pixels, pixel_count, 0);
+    }
+
+    void __cdecl Screen_Bitmap_Capture_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* header) {
+        if (x2 < x1) {
+            strings::Swap_Short_(&x1, &x2);
+            strings::Swap_Short_(&y1, &y2);
+        }
+
+        int16_t width = x2 - x1 + 1;
+        int16_t height = y2 - y1 + 1;
+
+        Create_Bitmap_Header_(width, height, header);
+
+        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        uint8_t* dest = reinterpret_cast<uint8_t*>(header) + 0x10;
+        uint8_t* src = video::_current_video_page + (y1 * g_screen_res_x) + x1;
+
+        shear::Capture_Screen_Block_(src, width, height, dest);
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Set_Picture_Glassed_(s_animation_header* anim) {
+        animate::_animation_header = anim;
+        anim->flags |= 8;
+    }
+
+    void __cdecl Flip_Bitmap_(s_animation_header* dst_hdr, s_animation_header* src_hdr, int16_t flip_mode) {
+        animate::_animation_header = src_hdr;
+
+        int32_t height = src_hdr->height;
+        int32_t width = src_hdr->width;
+
+        uint8_t* src_pixels = reinterpret_cast<uint8_t*>(src_hdr) + src_hdr->frame_offsets[src_hdr->current_frame];
+
+        if (flip_mode == 0 || flip_mode == 1) {
+            if (src_hdr == dst_hdr) {
+                shear::Flip_Bitmap_Down_Same_(src_pixels, width, height);
+            } else {
+                Create_Bitmap_Header_(width, height, dst_hdr);
+                uint8_t* dst_pixels = reinterpret_cast<uint8_t*>(dst_hdr) + 0x10;
+                shear::Flip_Bitmap_Down_Different_(src_pixels, width, height, dst_pixels);
+            }
+        } else {
+            if (src_hdr == dst_hdr) {
+                shear::Flip_Bitmap_Left_Same_(src_pixels, width, height);
+            } else {
+                Create_Bitmap_Header_(width, height, dst_hdr);
+                uint8_t* dst_pixels = reinterpret_cast<uint8_t*>(dst_hdr) + 0x10;
+                shear::Flip_Bitmap_Left_Different_(src_pixels, width, height, dst_pixels);
+            }
+        }
+    }
+
+    void __cdecl Copy_Bitmap_To_Bitmap_(s_animation_header* dst, s_animation_header* src) {
+        animate::_animation_header = src;
+        int16_t width = src->width;
+        int16_t height = src->height;
+
+        Create_Bitmap_Header_(width, height, dst);
+
+        uint32_t offset = src->frame_offsets[src->current_frame];
+        uint8_t* src_ptr = reinterpret_cast<uint8_t*>(src) + offset;
+        uint8_t* dst_ptr = reinterpret_cast<uint8_t*>(dst) + 0x10;
+        uint32_t size = static_cast<uint32_t>(static_cast<int32_t>(width) * static_cast<int32_t>(height));
+
+        struct_::Copy_Structure_(dst_ptr, src_ptr, size);
+    }
+
+    void __cdecl Outline_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t color, int16_t no_glass) {
+        animate::_animation_header = src;
+
+        int16_t width = src->width;
+        int16_t height = src->height;
+        int16_t current_frame = src->current_frame;
+
+        uint8_t* src_pixels = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[current_frame];
+        uint8_t* dst_pixels = src_pixels;
+
+        if (src != dst) {
+            Create_Bitmap_Header_(width, height, dst);
+            Copy_Bitmap_To_Bitmap_(dst, src);
+            // The newly created 1-frame destination header takes up 0x10 bytes 
+            // (0xC bytes header struct + 0x4 bytes for a single frame offset entry).
+            dst_pixels = reinterpret_cast<uint8_t*>(dst) + 0x10;
+        }
+
+        if (no_glass == 0) {
+            shear::Outline_Bitmap_Pixels_(src_pixels, color, 0, dst_pixels, width, height);
+        } else {
+            shear::Outline_Bitmap_Pixels_No_Glass_(src_pixels, color, 0, dst_pixels, width, height);
+        }
+    }
+
+    void __cdecl Tint_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t tint_color_index) {
+        animate::_animation_header = src;
+        int16_t width = src->width;
+        int16_t height = src->height;
+
+        uint8_t* src_pixels = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[src->current_frame];
+        uint8_t* dest_pixels;
+
+        if (src == dest) {
+            dest_pixels = src_pixels;
+        } else {
+            // New header size + 1 frame offset (0xC + 0x4 = 0x10)
+            dest_pixels = reinterpret_cast<uint8_t*>(dest) + 0x10;
+            Create_Bitmap_Header_(width, height, dest);
+            Copy_Bitmap_To_Bitmap_(dest, src);
+        }
+
+        uint8_t* remap_table = video::_glass_remap_colors[tint_color_index];
+
+        Tint_Bitmap_Pixels_(src_pixels, remap_table, 0, dest_pixels, width, height);
+    }
+
+    void __cdecl Mask_Out_Bitmap_With_Bitmap_(int16_t x, int16_t y, s_animation_header* dest, s_animation_header* src, int16_t type) {
+        animate::_animation_header = src;
+
+        uint8_t* src_frame_data_orig = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[src->current_frame];
+        uint8_t* src_ptr = src_frame_data_orig;
+
+        if (x < 0) {
+            if (y < 0) {
+                src_ptr -= y * src->width;
+            }
+            src_ptr -= x;
+        } else if (y < 0) {
+            src_ptr -= y * src->width;
+        }
+
+        animate::_animation_header = dest;
+
+        if (y > dest->height) {
+            return;
+        }
+        if (x > dest->width) {
+            return;
+        }
+
+        uint8_t* dest_frame_data_orig = reinterpret_cast<uint8_t*>(dest) + dest->frame_offsets[dest->current_frame];
+        uint8_t* dest_ptr = dest_frame_data_orig;
+
+        if (x < 0) {
+            if (y < 0) {
+                // empty
+            } else {
+                dest_ptr += y * dest->width;
+            }
+        } else {
+            if (y < 0) {
+                dest_ptr += x;
+            } else {
+                dest_ptr += y * dest->width + x;
+            }
+        }
+
+        int src_skip = 0;
+        if (x < 0) {
+            src_skip = -x;
+        }
+
+        int draw_width = src->width + x;
+        if (draw_width > dest->width) {
+            src_skip += (x + src->width) - dest->width;
+        }
+
+        int dest_skip = (x < 0) ? 0 : x;
+        if (draw_width < dest->width) {
+            dest_skip = dest_skip - src->width + (dest->width - x);
+        }
+
+        int sub_x = (x < 0) ? 0 : x;
+        if (draw_width >= dest->width) {
+            draw_width = dest->width;
+        }
+        draw_width -= sub_x;
+
+        int draw_height = dest->height;
+        // BUG: src->width used instead of src->height for boundary check
+        if (src->width + y < dest->height) {
+            draw_height = src->height + y;
+        }
+        int sub_y = (y < 0) ? 0 : y;
+        draw_height -= sub_y;
+
+        if (src_ptr < src_frame_data_orig) {
+            src_ptr = src_frame_data_orig;
+        }
+        if (dest_ptr < dest_frame_data_orig) {
+            dest_ptr = dest_frame_data_orig;
+        }
+
+        if (type == 1) {
+            shear::Mask_Bitmap_Pixels_Inverse_(src_ptr, src_skip, dest_skip, dest_ptr, draw_width, draw_height);
+        } else {
+            shear::Mask_Bitmap_Pixels_(src_ptr, src_skip, dest_skip, dest_ptr, draw_width, draw_height);
+        }
+    }
+
+    void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* img) {
+        int32_t dx = x2 - x1;
+        int32_t dy = y2 - y1;
+        int32_t line_len = isqrt_(dy * dy + dx * dx);
+
+        uint8_t frame_offset = *(reinterpret_cast<uint8_t*>(img) + 0xC + img->current_frame);
+        uint8_t* frame_pixels = reinterpret_cast<uint8_t*>(img) + frame_offset;
+
+        if (x1 == x2 && y1 == y2) {
+            return;
+        }
+
+        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        uint8_t* video_page = reinterpret_cast<uint8_t*>(video::_current_video_page);
+
+        int32_t mid_x = (x1 + x2) / 2;
+        int32_t mid_y = (y1 + y2) / 2;
+
+        int32_t img_w = img->width;
+        int32_t img_h = img->height;
+
+        int32_t img_x1 = mid_x - img_w / 2;
+        int32_t img_x2 = img_w / 2 + mid_x;
+        int32_t img_y1 = mid_y - img_h / 2;
+        int32_t img_y2 = img_h / 2 + mid_y;
+
+        while (img_x2 - img_x1 >= img_w) {
+            img_x2--;
+        }
+
+        while (img_y2 - img_y1 >= img_h) {
+            img_y2--;
+        }
+
+        int32_t angle_val = angle::Get_Angle_(dx, dy);
+
+        int32_t ext_x1 = (img_w - line_len) / 2 + img_x1;
+        int32_t ext_x2 = (line_len - img_w) / 2 + img_x2;
+        int32_t scale_factor = (line_len * 100) / img_w;
+
+        int32_t min_x = 0x27F; // 639
+        int32_t min_y = 0x1DF; // 479
+        int32_t max_x = 0;
+        int32_t max_y = 0;
+
+        int32_t rx, ry;
+
+        // Point 1
+        rx = ext_x1 - mid_x;
+        ry = img_y1 - mid_y;
+        angle::Rotate_Coordinates_(-angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 2
+        rx = ext_x1 - mid_x;
+        ry = img_y2 - mid_y;
+        angle::Rotate_Coordinates_(-angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 3
+        rx = ext_x2 - mid_x;
+        ry = img_y1 - mid_y;
+        angle::Rotate_Coordinates_(-angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 4
+        rx = ext_x2 - mid_x;
+        ry = img_y2 - mid_y;
+        angle::Rotate_Coordinates_(-angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 5
+        rx = ext_x1 - mid_x;
+        ry = img_y1 - mid_y;
+        angle::Rotate_Coordinates_(angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 6
+        rx = ext_x1 - mid_x;
+        ry = img_y2 - mid_y;
+        angle::Rotate_Coordinates_(angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 7
+        rx = ext_x2 - mid_x;
+        ry = img_y1 - mid_y;
+        angle::Rotate_Coordinates_(angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        // Point 8
+        rx = ext_x2 - mid_x;
+        ry = img_y2 - mid_y;
+        angle::Rotate_Coordinates_(angle_val, &rx, &ry);
+        rx += mid_x;
+        ry += mid_y;
+        if (rx < min_x) min_x = rx;
+        if (ry < min_y) min_y = ry;
+        if (rx > max_x) max_x = rx;
+        if (ry > max_y) max_y = ry;
+
+        if (min_x <= video::_screen_window_x1) {
+            min_x = video::_screen_window_x1;
+        }
+        if (min_y <= video::_screen_window_y1) {
+            min_y = video::_screen_window_y1;
+        }
+        if (max_x >= video::_screen_window_x2) {
+            max_x = video::_screen_window_x2;
+        }
+        if (max_y >= video::_screen_window_y2) {
+            max_y = video::_screen_window_y2;
+        }
+
+        setvesa::Add_Square_To_Scan_List_(min_x, min_y, max_x, max_y);
+
+        if (min_y <= max_y) {
+            for (int32_t y = min_y; y <= max_y; ++y) {
+                for (int32_t x = min_x; x <= max_x; ++x) {
+                    rx = x - mid_x;
+                    ry = y - mid_y;
+                    angle::Rotate_Coordinates_(-angle_val, &rx, &ry);
+                    rx += mid_x;
+                    ry += mid_y;
+
+                    if (rx >= ext_x1 && rx <= ext_x2 && ry >= img_y1 && ry <= img_y2) {
+                        int32_t scaled_x = (rx - mid_x) * 100 / scale_factor + mid_x;
+                        uint8_t pixel = frame_pixels[(ry - img_y1) * img_w - img_x1 + scaled_x];
+                        if (pixel != 0) {
+                            video_page[y * 640 + x] = pixel;
+                        }
+                    }
+                }
+            }
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Draw_Bitmap_To_Mouse_(int16_t x, int16_t y, s_animation_header* anim, int16_t mouse_type) {
+        animate::_animation_header = anim;
+
+        int16_t draw_width = anim->width;
+        int16_t draw_height = anim->height;
+        int16_t src_skip = 0;
+
+        if (draw_width + x > 24) {
+            src_skip = draw_width + x - 24;
+            draw_width = 24 - x;
+        }
+
+        if (draw_height + y > 24) {
+            draw_height = 24 - y;
+        }
+
+        uint8_t* src = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+        int32_t src_idx = 0;
+        int32_t dst_idx = x + y * 24;
+        int32_t dst_skip = 24 - draw_width;
+
+        if (draw_height > 0) {
+            for (int16_t h = draw_height; h > 0; --h) {
+                if (draw_width > 0) {
+                    for (int16_t w = draw_width; w > 0; --w) {
+                        uint8_t pixel = src[src_idx];
+                        if (pixel != 0) {
+                            video::_mouse_palette[mouse_type * 576 + dst_idx] = pixel;
+                        }
+                        src_idx++;
+                        dst_idx++;
+                    }
+                }
+                src_idx += src_skip;
+                dst_idx += dst_skip;
+            }
+        }
+
+        platform::Update_Cursor_Image_();
+    }
+
+    void __cdecl Create_Brighten_Bitmap_Palettes_(s_animation_header* anim, int8_t* levels, int8_t count)
+    {
+        _brighten_palette_levels = count;
+        _brighten_palette_seg = allocate::Allocate_Next_Block_(anim, count * 256 + 4);
+
+        if (_brighten_palette_seg == nullptr)
+        {
+            exitm::Exit_With_Message(s_Not_Enough_Space_For_Brighten_Pa_0055b744);
+        }
+
+        for (int i = 0; i < 256; ++i)
+        {
+            int h, l, s;
+            palette::RGB_To_HLS_(
+                video::_current_palette[i].r,
+                video::_current_palette[i].g,
+                video::_current_palette[i].b,
+                &h, &l, &s
+            );
+
+            if (count > 0)
+            {
+                int level_offset = 0;
+                for (int j = 0; j < count; ++j)
+                {
+                    int8_t level = levels[j];
+                    if (level < 0 || level > 100)
+                    {
+                        exitm::Exit_With_Message(s_Brighten_perecnt_needs_to_be_bet_0055b714);
+                    }
+
+                    int l_new = l + (level * l * 10) / 1000;
+                    if (l_new > 1000)
+                    {
+                        l_new = 1000;
+                    }
+
+                    uint8_t r_new, g_new, b_new;
+                    palette::HLS_To_RGB_(h, l_new, s, &r_new, &g_new, &b_new);
+
+                    uint8_t closest_color = remap::Find_Closest_Color_(r_new, g_new, b_new);
+
+                    uint8_t* out_ptr = reinterpret_cast<uint8_t*>(_brighten_palette_seg);
+                    out_ptr[level_offset + i] = closest_color;
+
+                    level_offset += 256;
+                }
+            }
+        }
+    }
+
+    void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t param_2, int16_t param_3) {
+        animate::_animation_header = anim;
+        uint8_t* pixels = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+        shear::Mask_Bitmap_Colors_Pixels_(pixels, param_2, param_3, 0, anim->width, anim->height);
+    }
+
+    void __cdecl Mask_Brighten_Bitmap_(int32_t x, int32_t y, s_animation_header* dst_anim, s_animation_header* src_anim, uint8_t color) {
+        _brighten_start_color = static_cast<int32_t>(static_cast<int8_t>(color));
+        animate::_animation_header = src_anim;
+
+        int32_t src_height = src_anim->height;
+        int32_t src_width = src_anim->width;
+
+        uint8_t* src_pixels = reinterpret_cast<uint8_t*>(src_anim) + src_anim->frame_offsets[src_anim->current_frame];
+
+        if (x < 0 && -x >= src_width) {
+            return;
+        }
+
+        if (y < 0 && -y >= src_height) {
+            return;
+        }
+
+        uint8_t* adjusted_src_pixels = src_pixels;
+        if (x < 0) {
+            if (y < 0) {
+                adjusted_src_pixels -= (y * src_width) + x;
+            } else {
+                adjusted_src_pixels -= x;
+            }
+        } else {
+            if (y < 0) {
+                adjusted_src_pixels -= y * src_width;
+            }
+        }
+
+        animate::_animation_header = dst_anim;
+
+        int32_t dst_width = dst_anim->width;
+        int32_t dst_height = dst_anim->height;
+        uint8_t* dst_pixels = reinterpret_cast<uint8_t*>(dst_anim) + dst_anim->frame_offsets[dst_anim->current_frame];
+
+        if (y > dst_height) {
+            return;
+        }
+        if (x > dst_width) {
+            return;
+        }
+
+        uint8_t* adjusted_dst_pixels = dst_pixels;
+        if (x < 0) {
+            if (y < 0) {
+                // Do nothing
+            } else {
+                adjusted_dst_pixels += y * dst_width;
+            }
+        } else {
+            if (y < 0) {
+                adjusted_dst_pixels += x;
+            } else {
+                adjusted_dst_pixels += y * dst_width + x;
+            }
+        }
+
+        int32_t src_skip = 0;
+        if (x < 0) {
+            src_skip = -x;
+        }
+        int32_t src_right = src_width + x;
+        if (src_right > dst_width) {
+            src_skip += src_right - dst_width;
+        }
+
+        int32_t dst_skip = (x >= 0) ? x : 0;
+        if (src_right < dst_width) {
+            dst_skip = dst_skip - x + (dst_width - src_width);
+        }
+
+        int32_t max_x = (x < 0) ? 0 : x;
+        int32_t temp_width = src_width + x;
+        if (temp_width >= dst_width) {
+            temp_width = dst_width;
+        }
+        int32_t draw_width = temp_width - max_x;
+
+        int32_t max_y = (y < 0) ? 0 : y;
+        int32_t temp_height = dst_height;
+
+        // BUG: using src_width instead of src_height for clipping check
+        if (src_width + y < dst_height) {
+            temp_height = src_height + y;
+        }
+        int32_t draw_height = temp_height - max_y;
+
+        if (adjusted_src_pixels < src_pixels) {
+            adjusted_src_pixels = src_pixels;
+        }
+
+        if (adjusted_dst_pixels < dst_pixels) {
+            adjusted_dst_pixels = dst_pixels;
+        }
+
+        shear::Mask_Brighten_Bitmap_Pixels_(adjusted_src_pixels, src_skip, dst_skip, adjusted_dst_pixels, draw_width, draw_height);
+    }
+
+    void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height) {
+        _bitmap_temp1 = reinterpret_cast<uint32_t>(tint_table);
+        uint32_t count = static_cast<uint32_t>(height) * static_cast<uint32_t>(width);
+        _bitmap_temp2 = count;
+
+        do {
+            uint8_t pixel = *src++;
+            if (pixel != 0) {
+                pixel = tint_table[pixel];
+            }
+            *dest++ = pixel;
+            --count;
+        } while (count != 0);
+    }
+
+    void __cdecl Scale_Bitmap_(s_animation_header* dst, s_animation_header* src, int16_t scale_x, int16_t scale_y) {
+        animate::_animation_header = src;
+
+        int orig_scale_x = scale_x;
+        int src_width = src->width;
+        int new_width = (orig_scale_x * src_width) / 100;
+
+        int orig_scale_y = scale_y;
+        int src_height = src->height;
+        int new_height = (orig_scale_y * src_height) / 100;
+
+        if (new_width <= 0 || new_height <= 0) {
+            Create_Bitmap_Header_(1, 1, dst);
+            return;
+        }
+
+        uint8_t* src_frame_ptr = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[src->current_frame];
+        uint8_t* dst_frame_ptr;
+
+        if (src != dst) {
+            Create_Bitmap_Header_(new_width, new_height, dst);
+            dst_frame_ptr = reinterpret_cast<uint8_t*>(dst) + 0x10;
+        } else {
+            dst_frame_ptr = src_frame_ptr;
+        }
+
+        if (scale_x < 100 && scale_y > 100) {
+            scale_x = 100;
+        }
+        if (scale_x > 100 && scale_y < 100) {
+            scale_y = 100;
+        }
+
+        if (scale_x > 100 || scale_y > 100) {
+            shear::Enlarge_Bitmap_(src_frame_ptr, scale_x, scale_y, dst_frame_ptr, src_width, src_height, new_width, new_height);
+        }
+
+        if (orig_scale_x > 100) {
+            orig_scale_x = 100;
+        }
+        if (orig_scale_y > 100) {
+            orig_scale_y = 100;
+        }
+
+        // Original buggy behavior intentionally preserved: passes modified parameters 
+        // to Reduce_Bitmap_ instead of bounded original values.
+        if (orig_scale_x < 100 || orig_scale_y < 100) {
+            shear::Reduce_Bitmap_(src_frame_ptr, scale_x, scale_y, dst_frame_ptr, src_width, src_height, new_width, new_height);
+        }
+
+        if (src == dst) {
+            animate::_animation_header->width = new_width;
+            animate::_animation_header->height = new_height;
+        }
+    }
+
+    void __cdecl Vanish_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t intensity) {
+        animate::_animation_header = src;
+        int16_t current_frame = src->current_frame;
+        int16_t width = src->width;
+        uint8_t* src_data = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[current_frame];
+        int16_t height = src->height;
+
+        uint8_t* dest_data = src_data;
+        if (src != dest) {
+            bitmap::Create_Bitmap_Header_(width, height, dest);
+            dest_data = reinterpret_cast<uint8_t*>(dest) + 0x10;
+        }
+
+        if (intensity >= 100) {
+            struct_::Set_Memory_(dest, height * width, 0);
+            return;
+        }
+
+        if (intensity == 0) {
+            if (src != dest) {
+                struct_::Copy_Structure_(dest_data, src_data, height * width);
+            }
+            return;
+        }
+
+        struct_::Set_Memory_(src_data, intensity, 0, dest_data, width, height);
     }
 }

@@ -217,10 +217,6 @@ inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IU
     return fn(lpGUID, lplpDD, pUnkOuter);
 }
 
-inline void __cdecl FUN_526F80() {
-    using Fn = void(__cdecl*)();
-    fn();
-}
 
 inline void __cdecl FUN_0052b660() {
     using Fn = void(__cdecl*)();
@@ -660,12 +656,6 @@ inline char* const s_HELP_LBX_00557490 = reinterpret_cast<char*>(std::uintptr_t{
 inline const char* s_DIPLOMAT_LBX_00552350 = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); // "DIPLOMAT.LBX"
 inline const char* s_DIPLOMAT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00552350}); /* "DIPLOMAT.LBX" */
 inline const char* s_dipstars_lbx_00552374 = reinterpret_cast<const char*>(std::uintptr_t{0x00552374}); // "dipstars.lbx"
-
-inline const char* s_CREDITS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055A6A8}); // "CREDITS.LBX"
-inline const char* s_GERCRDTS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055A698}); // "GERCRDTS.LBX"
-inline const char* s_FRECRDTS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055A688}); // "FRECRDTS.LBX"
-inline const char* s_SPACRDTS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x0055A678}); // "SPACRDTS.LBX"
-inline const char* DAT_0055A668 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A668});
 
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
