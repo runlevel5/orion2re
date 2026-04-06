@@ -46,6 +46,7 @@ workflows:
           * You must read existing function implementation in the project to analyze it against provided disassembly and decompiler
             output.
           * Decompiler output could be partially incorrect, always validate it against the provided disassembled code.
+          * You must do an instruction-by-instruction trace of the disassembly and then validate if existing implementation matches it.
           * You must detect if all mentioned stub functions are defined.
           * You must analyze provided disassembly and deduce variables used. Keep in mind that original disassembly might re-use
             variables for different purposes.
