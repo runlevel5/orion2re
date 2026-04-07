@@ -91,4 +91,9 @@ namespace EVANHELP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041dea0});
         fn(total_rows, x, y, needs_racks);
     }
+
+    inline void __cdecl Set_Hotseat_Setup_Screen_Help_List_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0041e450})(x, y);
+    }
 }

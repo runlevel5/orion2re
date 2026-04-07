@@ -5,7 +5,7 @@ namespace init {
         init::Create_IO_Buffer_();
         video::Init_Video_Drivers_();
         remap::Sort_Palette_List_();
-        key::Init_Keyboard_();
+        sound::Init_Sound_();
         fields::Init_Mouse_Keyboard_();
 
         if (*font_name == '\0') {

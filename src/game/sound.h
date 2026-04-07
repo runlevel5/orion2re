@@ -132,4 +132,10 @@ namespace sound {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d560});
         fn(handle, loop_count);
     }
+
+    inline void __cdecl Init_Sound_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052d5d0 });
+        fn();
+    }
 }

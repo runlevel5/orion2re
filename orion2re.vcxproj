@@ -94,6 +94,7 @@
     <ClCompile Include="src\game\haccess.cpp" />
     <ClCompile Include="src\game\harold.cpp" />
     <ClCompile Include="src\game\homegen.cpp" />
+    <ClCompile Include="src\game\hotpop.cpp" />
     <ClCompile Include="src\game\info.cpp" />
     <ClCompile Include="src\game\init.cpp" />
     <ClCompile Include="src\game\initgame.cpp" />
@@ -122,6 +123,7 @@
     <ClCompile Include="src\game\namestar.cpp" />
     <ClCompile Include="src\game\netmox.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
+    <ClCompile Include="src\game\newtech.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
     <ClCompile Include="src\game\npcdiplo.cpp" />
     <ClCompile Include="src\game\officer.cpp" />

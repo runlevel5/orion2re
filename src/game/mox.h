@@ -1,6 +1,7 @@
 #pragma once
 
 namespace MOX {
+    inline int8_t (*_tech_categories)[2] = reinterpret_cast<int8_t(*)[2]>(std::uintptr_t{0x00558FD0});
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline uint8_t (&_first_field_in_group)[10] = *reinterpret_cast<uint8_t(*)[10]>(0x00558D30);
     inline s_animation_header* (&_fighter_seg)[15][64] =
@@ -196,6 +197,7 @@ namespace MOX {
     inline int16_t& _debug_saves_on = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059D6C2 });
     inline uint8_t& _turns_between_debug_saves = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A49F0 });
     inline void*& _sound_buffer = *reinterpret_cast<void**>(std::uintptr_t{ 0x005A1B34 });
+    inline int16_t& _hot_seat_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A182C});
     inline short& _current_screen = *reinterpret_cast<short*>(std::uintptr_t{ 0x00597302 });
     inline int16_t& _design_screen_replacement_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597402});
     inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});

@@ -2755,6 +2755,18 @@ namespace hooks {
         { 0x0052F240, &bitmap::Clear_Mouse_Image_ },
         { 0x0052F400, &bitmap::Vanish_Bitmap_ },
         { 0x0052F270, &bitmap::Scale_Bitmap_ },
+        { 0x004bbb40, &newtech::Set_Competition_Tech_Values_ },
+        { 0x004bbac0, &newtech::Get_Competition_Player_Tech_Value_ },
+        { 0x004bb2a0, &newtech::Calc_Tech_Value_ },
+        { 0x004bbcd0, &newtech::All_Gray_Boxes_Researched_ },
+        { 0x004bc030, &newtech::Choose_Hyper_Advanced_Tech_ },
+        { 0x004BBD20, &newtech::Choose_Tech_Application_ },
+        { 0x004bbc20, &newtech::Get_Competition_Tech_Values_ },
+        { 0x004db170, &HOTPOP::Hotseat_Screen_ },
+        { 0x004db050, &HOTPOP::Draw_Hotseat_Screen_ },
+        { 0x004db4e0, &HOTPOP::Init_Hotseat_Screen_ },
+        { 0x004dafb0, &HOTPOP::Reload_Hotseat_Screen_ },
+        { 0x004db600, &HOTPOP::Fade_Into_Hotseat_Screen_ },
     };
 
     void Install_Hooks()

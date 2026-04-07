@@ -13,7 +13,7 @@ namespace GENDRAW {
         return fn(message);
     }
 
-    inline int16_t __cdecl Warning_Box2_(char* text) {
+    inline int16_t __cdecl Warning_Box2_(const char* text) {
         return Warning_Box_(text);
     }
 
