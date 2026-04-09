@@ -665,6 +665,8 @@ inline const char* s_dipstars_lbx_00552374 = reinterpret_cast<const char*>(std::
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
 
+inline char* const s_MULTIGM_LBX_00558D04 = reinterpret_cast<char*>(std::uintptr_t{0x00558D04}); // "MULTIGM.LBX"
+inline const char* s_Evan_Axelrad_0055AA48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA48}); // "Evan Axelrad"
 inline char* const s_Moo_IIAlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
 inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
 

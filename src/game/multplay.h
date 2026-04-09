@@ -1,5 +1,10 @@
 #pragma once
 
+struct s_animation_header;
+struct s_mp_screen;
+struct s_player;
+struct s_colors;
+
 namespace MULTPLAY {
     void __cdecl Set_Default_Modem_Settings_();
     void __cdecl Copy_Modem_Defaults_To_Net_Struct_();
@@ -93,10 +98,23 @@ namespace MULTPLAY {
 
     void __cdecl Get_Main_Palette_Base_Colors_(int16_t player_idx, uint8_t* color_a, uint8_t* color_b, uint8_t* color_c);
 
-    inline void __cdecl Draw_Net_Next_Turn_Screen_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00502210})();
+    void __cdecl Draw_Fill_Seg_(int16_t idx, int16_t banner_pos);
+
+    void __cdecl Draw_Multi_Player_Banner_(int16_t player_idx, int16_t row_idx, int8_t is_alt_layout);
+
+    inline const char* s_name_fmt = reinterpret_cast<const char*>(0x0055AA28);
+    inline const char* s_gnn_fmt = reinterpret_cast<const char*>(0x0055AA30);
+    inline const char* s_chat_msg_fmt = reinterpret_cast<const char*>(0x0055AA3C);
+    inline const char* s_fmt_player_race = reinterpret_cast<const char*>(0x005569C0);
+
+    // Suggested name: MULTPLAY::Get_Player_Colors
+    inline void __cdecl Get_Player_Colors_(uint8_t color, s_colors* c1, s_colors* c2, s_colors* c3) {
+        using Fn = void(__cdecl*)(uint8_t, s_colors*, s_colors*, s_colors*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005039A0});
+        fn(color, c1, c2, c3);
     }
+
+    void __cdecl Draw_Net_Next_Turn_Screen_();
 
     void __cdecl Add_Net_Next_Turn_Fields_();
 
@@ -133,14 +151,23 @@ namespace MULTPLAY {
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
     inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
+    inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC);
+
+    inline void __cdecl Add_Banner_Field_(int16_t player_idx, int16_t banner_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00502150});
+        fn(player_idx, banner_idx);
+    }
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_();
 
     void __cdecl Choose_Multi_Network_Game_Screen_();
 
-    inline int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* selection, bool* connected_flags, bool flag1, bool flag2) {
-        using Fn = int16_t(__cdecl*)(int16_t*, bool*, bool, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00501c80});
-        return fn(selection, connected_flags, flag1, flag2);
-    }
+    void __cdecl Load_Choose_Net_Plyrs_Screen_();
+
+    void __cdecl Add_Choose_Net_Plyrs_Fields_();
+
+    void __cdecl Draw_Choose_Net_Plyrs_Screen_();
+
+    int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load);
 }

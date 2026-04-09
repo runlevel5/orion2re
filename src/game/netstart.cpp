@@ -65,7 +65,7 @@ namespace NETSTART {
     }
 
     int8_t __cdecl Net_Pick_Position_() {
-        bool connected_players[8];
+        int8_t connected_players[8];
         int16_t selection;
         int32_t message_buffer;
 

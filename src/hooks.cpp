@@ -2801,6 +2801,13 @@ namespace hooks {
         { 0x00503920, &MULTPLAY::Get_Main_Palette_Base_Colors_ },
         { 0x0047d830, &NETTURN::Host_Next_Turn_ },
         { 0x0047db30, &NETTURN::Client_Next_Turn_ },
+        { 0x00501c80, &MULTPLAY::Choose_Network_Plyrs_Screen_ },
+        { 0x00502210, &MULTPLAY::Draw_Net_Next_Turn_Screen_ },
+        { 0x00503260, &MULTPLAY::Draw_Multi_Player_Banner_ },
+        { 0x005031d0, &MULTPLAY::Draw_Fill_Seg_ },
+        { 0x00504a10, &MULTPLAY::Load_Choose_Net_Plyrs_Screen_ },
+        { 0x00501f50, &MULTPLAY::Add_Choose_Net_Plyrs_Fields_ },
+        { 0x00502930, &MULTPLAY::Draw_Choose_Net_Plyrs_Screen_ },
     };
 
     void Install_Hooks()
