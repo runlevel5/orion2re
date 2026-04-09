@@ -113,4 +113,164 @@ namespace NETTURN {
 
         return _have_d_of_d_chunks_fmt + strlen(_have_d_of_d_chunks_fmt) + 1;
     }
+
+    void __cdecl Host_Next_Turn_() {
+        NETMOX::_net.host_sync_counter = 0;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if (MOX::_player[i].objectives != 0x64 || MOX::_PLAYER_NUM == i || MOX::_player[i].eliminated != 0) {
+                    NETMOX::_net.host_sync_counter++;
+                    (&NETMOX::_net.field146_0x1a6)[i] = 1;
+                }
+            }
+        }
+
+        NETMOX::_net.packet_type = 9 /* SYNC_WAIT */;
+        if (NETMOX::_net.host_sync_counter >= MOX::_NUM_PLAYERS) {
+            NETMOX::_net.packet_type = 11 /* TURN_START */;
+        }
+
+        while (NETMOX::_net.packet_type != 11) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                MULTPLAY::Chat_Box_Input_Loop_();
+
+                if (NETMOX::_net.dropped_players[i] != 0 && NETMOX::_net.player_is_active_flags[i] != 0) {
+                    NETMOX::_net.player_is_active_flags[i] = 0;
+                    NETMOX::_net.host_active_player_id = static_cast<int8_t>(i);
+                }
+
+                if (NETMOX::_net.host_active_player_id != -1) {
+                    NETMOX::_net.packet_type = 10 /* PLAYER_DATA */;
+                    NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.host_active_player_id].network_player_id, 12, nullptr, 0);
+
+                    while (NETMOX::_net.packet_type == 10) {
+                        MULTPLAY::Chat_Box_Input_Loop_();
+                    }
+
+                    NETMOX::Decode_Game_Orders_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
+                    NETMOX::_net.network_data_ptr = nullptr;
+                    allocate::Pop_Block_(MOX::_screen_seg);
+                    NETMOX::_net.total_chunk_count = 0;
+                    (&NETMOX::_net.field146_0x1a6)[NETMOX::_net.host_active_player_id] = 1;
+                    NETMOX::_net.host_active_player_id = -1;
+                }
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+        COLCALC::No_Op1_();
+        NETMOX::_net.sync_phase_active_flag = 0;
+
+        memset(&NETMOX::_net.player_net_info[0].packet_sync_status, 0, 180);
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                NETMOX::_net.player_net_info[i].field6_0x9 = 0xFF;
+                NETMOX::_net.player_net_info[i].packet_sync_status = 14 /* NEXT_TURN */;
+            }
+        }
+
+        NETMOX::_net.packet_type = 14 /* NEXT_TURN */;
+        NEXTTURN::Next_Turn_();
+
+        NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
+        Net_Init_Host_Election_();
+        NETMOX::_net.field144_0x1a4 = 0;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if (MOX::_PLAYER_NUM != i && MOX::_player[i].network_player_id != -1 && MOX::_player[i].eliminated != 0) {
+                    NETMOX::Mox_Send_Message_(MOX::_player[i].network_player_id, 59 /* DISCONNECT */, nullptr, 0);
+                    MOX::_player[i].objectives = 0;
+                    MOX::_player[i].network_player_id = -1;
+                    NETMOX::_net.num_connected_players--;
+                    RUSS::Mox_Update_();
+                }
+            }
+        }
+
+        NETMOX::Broadcast_Game_Data_Differential_(0);
+
+        if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
+            NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
+            NETMOX::_net.field_1db = 0;
+            NETMOX::_net.field_1df = 0;
+            NETMOX::_net.packet_type = 4 /* SYNC */;
+
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                    NETMOX::_net.player_net_info[i].packet_sync_status = 4 /* SYNC */;
+                    NETMOX::_net.player_net_info[i].remote_player_id = -1;
+                }
+            }
+
+            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+            if (NETMOX::_net.num_connected_players == 1) {
+                NETSTART::Mox_Net_Uninit_();
+                MOX::_game_type = 0;
+                REPORT::_something_interesting_happened[MOX::_PLAYER_NUM] = 1;
+            }
+        }
+    }
+
+    void __cdecl Client_Next_Turn_() {
+        uint8_t star_has_nonplayer;
+        s_combfind_star_has_player star_has_player[8];
+
+        NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 11 /* NET_MSG_TURN_END_REQUEST */, nullptr, 0);
+
+        do {
+            MULTPLAY::Chat_Box_Input_Loop_();
+        } while (NETMOX::_net.packet_type == 8 /* NET_PACKET_BUSY */);
+
+        COMBFIND::_current_star_has_player = star_has_player;
+        COMBFIND::_current_star_has_nonplayer = &star_has_nonplayer;
+
+        while (NETTURN::Must_Broadcast_AI_Player_Data_()) {
+            MULTPLAY::Chat_Box_Input_Loop_();
+        }
+
+        NETMOX::Send_Game_Orders_();
+        COMBFIND::Client_Combat_Loop_();
+
+        COMBFIND::_current_star_has_player = nullptr;
+        COMBFIND::_current_star_has_nonplayer = nullptr;
+
+        strcpy(MOX::_temp_string, NETTURN::_waiting_fmt);
+
+        while (NETMOX::_net.total_chunk_count == 0 && MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
+            MULTPLAY::Chat_Box_Input_Loop_();
+        }
+
+        if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
+            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
+                _sprintf(MOX::_temp_string, NETTURN::_have_d_of_d_chunks_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
+                MULTPLAY::Chat_Box_Input_Loop_();
+            }
+
+            if (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
+                exitm::Exit_With_Message(s_craziness_00557680);
+            }
+
+            NETMOX::_net.field_1db = 0;
+            NETMOX::_net.field_1df = 0;
+            NETMOX::_net.network_data_ptr = nullptr;
+
+            allocate::Pop_Block_(MOX::_screen_seg);
+            NETMOX::_net.total_chunk_count = 0;
+            NETMOX::_net.packet_type = 4 /* NET_PACKET_TURN_SYNC */;
+
+            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+            if (NETMOX::_net.num_connected_players == 1) {
+                NETSTART::Mox_Net_Uninit_();
+                MOX::_game_type = 0;
+            }
+        }
+
+        COMBFIND::_current_star_has_player = nullptr;
+        COMBFIND::_current_star_has_nonplayer = nullptr;
+    }
 }

@@ -2794,6 +2794,13 @@ namespace hooks {
         { 0x004c2740, &NETSTART::Mox_Net_Uninit_ },
         { 0x004c3e70, &NETSTART::Request_Race_ },
         { 0x004c3f30, &RACESEL::Unrequest_Race_ },
+        { 0x00507ea0, &MULTPLAY::Reload_Generic_Net_Info_ },
+        { 0x00502f20, &MULTPLAY::Draw_Choose_Multi_Net_Game_Screen_ },
+        { 0x00504b40, &MULTPLAY::Load_Choose_Multi_Net_Game_Screen_ },
+        { 0x00501b30, &MULTPLAY::Add_Choose_Multi_Net_Game_Fields_ },
+        { 0x00503920, &MULTPLAY::Get_Main_Palette_Base_Colors_ },
+        { 0x0047d830, &NETTURN::Host_Next_Turn_ },
+        { 0x0047db30, &NETTURN::Client_Next_Turn_ },
     };
 
     void Install_Hooks()

@@ -54,6 +54,7 @@ namespace MULTPLAY {
     inline char* const s_Evan_Axelrad = reinterpret_cast<char*>(std::uintptr_t{0x0055AA48});
     inline const char* s_Evan_Axelrad_0055aa48 = 
         reinterpret_cast<const char*>(std::uintptr_t{0x0055AA48}); // "Evan Axelrad"
+    inline const char* s_signature_axelrad = s_Evan_Axelrad_0055aa48;
 
     inline char* const s_MULTIGM_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00558D04});
     inline const char* s_MULTIGM_LBX_00558d04 = 
@@ -90,11 +91,7 @@ namespace MULTPLAY {
 
     void __cdecl Get_Net_Next_Turn_Player_Colors_();
 
-    inline void __cdecl Get_Main_Palette_Base_Colors_(int16_t player_num, uint8_t* color_a, uint8_t* color_b, uint8_t* color_c) {
-        using Fn = void(__cdecl*)(int16_t, uint8_t*, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503920});
-        fn(player_num, color_a, color_b, color_c);
-    }
+    void __cdecl Get_Main_Palette_Base_Colors_(int16_t player_idx, uint8_t* color_a, uint8_t* color_b, uint8_t* color_c);
 
     inline void __cdecl Draw_Net_Next_Turn_Screen_() {
         using Fn = void(__cdecl*)();
@@ -109,11 +106,7 @@ namespace MULTPLAY {
 
     void __cdecl Reload_Initializing_Net_Info_();
 
-    inline void __cdecl Reload_Generic_Net_Info_(int32_t screen_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00507EA0});
-        fn(screen_id);
-    }
+    void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num);
 
     inline uint8_t& _allow_chat_mode =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059538C});
@@ -134,23 +127,14 @@ namespace MULTPLAY {
 
     void __cdecl Reload_Join_Net_Screen_();
 
-    inline void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00502F20});
-        fn();
-    }
+    void __cdecl Draw_Choose_Multi_Net_Game_Screen_();
 
-    inline void __cdecl Load_Choose_Multi_Net_Game_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504B40});
-        fn();
-    }
+    void __cdecl Load_Choose_Multi_Net_Game_Screen_();
 
-    inline void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00501B30});
-        fn();
-    }
+    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
+
+    void __cdecl Add_Choose_Multi_Net_Game_Fields_();
 
     void __cdecl Choose_Multi_Network_Game_Screen_();
 

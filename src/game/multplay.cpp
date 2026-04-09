@@ -1897,4 +1897,183 @@ void __cdecl Draw_SendGet_Net_Info_Screen_(void) {
     }
 }
 
+void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
+    MOX::_temp_string[0] = '\0';
+    MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
+
+    memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
+
+    memcpy(MOX::_mp_screen->signature, MULTPLAY::s_Evan_Axelrad_0055aa48, 13);
+    MOX::_mp_screen->lbx_entry_num = lbx_entry_num;
+
+    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, lbx_entry_num, MOX::_global_cache_seg);
+
+    int16_t width = animate::Get_Width_(MOX::_mp_screen->bg_seg);
+    int16_t height = animate::Get_Height_(MOX::_mp_screen->bg_seg);
+
+    MOX::_mp_screen->bg_height = animate::Get_Height_(MOX::_mp_screen->bg_seg);
+
+    MOX::_mp_screen->screen_x = (int16_t)((640 - width) / 2);
+    MOX::_mp_screen->screen_y = (int16_t)((480 - height) / 2);
+
+    MOX::_mp_screen->subscreen_mode = 4;
+    MOX::_mp_screen->needs_full_redraw = 1;
+}
+
+    void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
+        clock_t now = _clock();
+        if (now + 5000 > (clock_t)WINNET::_net_refresh_timer) {
+            WINNET::Refresh_Game_List_(WINNET::_game_guid);
+            WINNET::_net_refresh_timer = (uint32_t)_clock();
+        }
+
+        int32_t game_count = netcode::Net_Get_Game_Count_();
+        int16_t display_count = (game_count < 10) ? (int16_t)game_count : 10;
+
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 41 /* 0x29 */, MOX::_global_cache_seg);
+        animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
+
+        // Update green palette range for the game selection list
+        _memcpy(&video::_current_palette[144], _green_pal_colors, 16 * sizeof(s_palette_entry));
+
+        for (int16_t i = 0, row_y_offset = 0; i < display_count; ++i) {
+            char* name_ptr = netcode::Net_Get_Game_Name_(i);
+            if (name_ptr[0] != '\0') {
+                char game_name[100];
+                strcpy(game_name, name_ptr);
+
+                bool is_selected = (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id);
+                s_colors* font_colors;
+                s_colors local_colors;
+
+                if (is_selected) {
+                    MOX::_mox_font_colors_offset = 151 /* 0x97 */;
+                    font_colors = MISC::Font_Colors2_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, 145 /* 0x91 */, 153 /* 0x99 */);
+                    local_colors = *font_colors;
+                } else {
+                    MOX::_mox_font_colors_offset = 149 /* 0x95 */;
+                    font_colors = MISC::Font_Colors2_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, 145 /* 0x91 */, 151 /* 0x97 */);
+                    local_colors = *font_colors;
+                }
+
+                fonts::Set_Font_Style_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, &local_colors);
+
+                if (is_selected) {
+                    MISC::Increase_Font_Color_Range_((int16_t)MOX::_mp_screen->sel_anim_frame);
+
+                    if (MOX::_mp_screen->sel_anim_frame >= 4) {
+                        MOX::_mp_screen->sel_anim_frame = 4;
+                        MOX::_mp_screen->sel_anim_active = -1;
+                    } else if (MOX::_mp_screen->sel_anim_frame <= -3) {
+                        MOX::_mp_screen->sel_anim_frame = -3;
+                        MOX::_mp_screen->sel_anim_active = 1;
+                    }
+                    MOX::_mp_screen->sel_anim_frame += MOX::_mp_screen->sel_anim_active;
+                }
+
+                int16_t font_h = fonts::Get_Font_Height_();
+                int16_t centered_y = (22 - font_h) / 2;
+                fonts::Print_(MOX::_mp_screen->screen_x + 38 /* 0x26 */, 
+                              MOX::_mp_screen->screen_y + 67 /* 0x43 */ + row_y_offset + centered_y, 
+                              game_name);
+            }
+            row_y_offset += 27 /* 0x1b */;
+        }
+    }
+
+    void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
+        if (WINNET::_net_refresh_timer < (uint32_t)_clock() + 5000 /* 5 seconds */) {
+            WINNET::Refresh_Game_List_(WINNET::_game_guid);
+            WINNET::_net_refresh_timer = (uint32_t)_clock();
+        }
+
+        int16_t count = 10;
+        if (netcode::Net_Get_Game_Count_() < 10) {
+            count = (int16_t)netcode::Net_Get_Game_Count_();
+        }
+
+        for (int16_t i = 0; i < 10; ++i) {
+            MOX::_mp_screen->game_list_field_ids[i] = -1000;
+        }
+
+        if (count > 0) {
+            int16_t y_step = 0;
+            for (int16_t i = 0; i < count; ++i) {
+                int16_t x1 = MOX::_mp_screen->screen_x + 38 /* 0x26 */;
+                int16_t y1 = MOX::_mp_screen->screen_y + 64 /* 0x40 */ + y_step;
+                int16_t x2 = MOX::_mp_screen->screen_x + 400 /* 0x190 */;
+                int16_t y2 = MOX::_mp_screen->screen_y + 86 /* 0x56 */ + y_step;
+
+                int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, s__00551100, 41 /* 0x29 */);
+                MOX::_mp_screen->game_list_field_ids[i] = field_id;
+                y_step += 27 /* 0x1B */;
+            }
+        }
+
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
+
+        int16_t cancel_btn_id = fields::Add_Button_Field_(
+            MOX::_mp_screen->screen_x + 191 /* 0xBF */,
+            MOX::_mp_screen->screen_y + 344 /* 0x158 */,
+            s__00551100,
+            MOX::_mp_screen->anim_btn_cancel,
+            s__00551120,
+            41 /* 0x29 */
+        );
+        MOX::_mp_screen->field_id_cancel = cancel_btn_id;
+    }
+
+    void __cdecl Load_Choose_Multi_Net_Game_Screen_(void) {
+        int16_t width;
+        int16_t height;
+
+        RUSS::Mox_Update_();
+
+        MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
+
+        memset(&MULTPLAY::_g_mp_screen, 0, sizeof(s_mp_screen));
+
+        // Note: Manual 13-byte copy of the signature string "Evan Axelrad"
+        _memcpy(MOX::_mp_screen->signature, MULTPLAY::s_signature_axelrad, 13);
+
+        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
+
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0x29, MOX::_global_cache_seg);
+
+        MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX, 0x101, MOX::_screen_seg);
+
+        width = animate::Get_Width_(MOX::_mp_screen->anim_btn_unk_4);
+        MOX::_mp_screen->screen_x = (640 - width) / 2;
+
+        height = animate::Get_Height_(MOX::_mp_screen->anim_btn_unk_4);
+        MOX::_mp_screen->screen_y = ((399 - height) / 2) + 0x25;
+
+        MOX::_mp_screen->sel_anim_frame = 0;
+        MOX::_mp_screen->sel_anim_active = 1;
+    }
+
+    void __cdecl Get_Main_Palette_Base_Colors_(int16_t player_idx, uint8_t* color_a, uint8_t* color_b, uint8_t* color_c) {
+        uint8_t player_color = static_cast<uint8_t>(MOX::_player[player_idx].color);
+
+        *color_a = 0;
+        *color_b = 0;
+        *color_c = 0;
+
+        if (player_color == 3) {
+            *color_a = 10;
+            *color_b = 14;
+            *color_c = 23;
+        } else if (player_color == 4) {
+            *color_a = 59; /* 0x3b */
+            *color_b = 60; /* 0x3c */
+            *color_c = 61; /* 0x3d */
+        } else {
+            uint8_t base_color = MOX::_main_palette_player_colors[player_color];
+            *color_a = base_color;
+            *color_b = base_color + 2;
+            *color_c = base_color + 3;
+        }
+    }
+
 }

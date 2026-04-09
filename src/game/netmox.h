@@ -65,10 +65,28 @@ namespace NETMOX {
         return fn(target, type, data, len);
     }
 
-    inline void __cdecl Decode_Broadcast_Game_Data_Differential_(void* data, uint32_t size, int unknown) {
-        using Fn = void(__cdecl*)(void*, uint32_t, int);
+    inline void __cdecl Decode_Game_Orders_(void* data, uint32_t len) {
+        using Fn = void(__cdecl*)(void*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005171C0});
+        fn(data, len);
+    }
+
+    inline void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown) {
+        using Fn = void(__cdecl*)(uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00516220});
+        fn(unknown);
+    }
+
+    inline bool __cdecl Decode_Broadcast_Game_Data_Differential_(void* data, uint32_t size, int unknown) {
+        using Fn = bool(__cdecl*)(void*, uint32_t, int);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005166a0});
-        fn(data, size, unknown);
+        return fn(data, size, unknown);
+    }
+
+    inline void __cdecl Send_Game_Orders_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00516c80});
+        fn();
     }
 
     inline void __cdecl Receive_Message_(void* data) {

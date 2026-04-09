@@ -4,17 +4,9 @@
 namespace NETTURN {
     void __cdecl Net_Next_Turn_();
 
-    inline void __cdecl Host_Next_Turn_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047D830});
-        fn();
-    }
+    void __cdecl Host_Next_Turn_();
 
-    inline void __cdecl Client_Next_Turn_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047DB30});
-        fn();
-    }
+    void __cdecl Client_Next_Turn_();
 
     char* __cdecl Load_Netturn_Strings_(char* input_strings);
 
@@ -23,6 +15,12 @@ namespace NETTURN {
 
     inline char*& _have_d_of_d_chunks_fmt =
         *reinterpret_cast<char**>(std::uintptr_t{0x005662A8});
+
+    inline bool __cdecl Must_Broadcast_AI_Player_Data_() {
+        using Fn = bool(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047dd00});
+        return fn();
+    }
 
     inline void __cdecl Net_Init_Host_Election_() {
         using Fn = void(__cdecl*)();
