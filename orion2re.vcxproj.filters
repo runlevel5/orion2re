@@ -426,9 +426,6 @@
     <ClCompile Include="src\game\racerprt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\remap.cpp" />
-    <ClCompile Include="src\game\replace.cpp" />
-    <ClCompile Include="src\game\settler.cpp" />
     <ClCompile Include="src\game\init.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
@@ -442,6 +439,21 @@
       <Filter>src\game</Filter>
     </ClCompile>
     <ClCompile Include="src\game\hotpop.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\remap.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\replace.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\settler.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\netstart.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\netturn.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -986,7 +998,6 @@
     <ClInclude Include="src\game\s_score.h">
       <Filter>src\game</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\shear.h" />
     <ClInclude Include="src\game\settings.h">
       <Filter>src\game</Filter>
     </ClInclude>
@@ -994,6 +1005,18 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\swap.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\shear.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\chat.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\netstrat.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\winnet.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

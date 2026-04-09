@@ -260,7 +260,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             _race_flag[i] = 1;
                         } else {
                             if (MOX::_game_type != 0 && MOX::_game_type != 1) {
-                                NETSTART::Unrequest_Race_(i);
+                                Unrequest_Race_(i);
                             }
                             RACESEL::Set_Race_Select_Help_();
                             video::Set_Page_Back_();
@@ -286,7 +286,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             done_flag = 1;
                             _race_flag[i] = 1;
                         } else {
-                            if (MOX::_game_type != 0 && MOX::_game_type != 1) NETSTART::Unrequest_Race_(i);
+                            if (MOX::_game_type != 0 && MOX::_game_type != 1) Unrequest_Race_(i);
                             allocate::Pop_Block_(MOX::_screen_seg);
                             Reload_Race_Selection_Screen_();
                             video::Set_Page_Back_();
@@ -357,7 +357,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         done_flag = 1;
                         _race_flag[loaded_race] = 1;
                     } else {
-                        if (MOX::_game_type != 0 && MOX::_game_type != 1) NETSTART::Unrequest_Race_(loaded_race);
+                        if (MOX::_game_type != 0 && MOX::_game_type != 1) Unrequest_Race_(loaded_race);
                         allocate::Pop_Block_(MOX::_screen_seg);
                         Reload_Race_Selection_Screen_();
                         video::Set_Page_Back_();
@@ -398,6 +398,18 @@ short Race_Selection_Screen_(s_player* plr) {
     allocate::Pop_Block_(MOX::_screen_seg);
     ERIC::Fast_Fade_Out_();
     return 1;
+}
+
+/**
+ * @brief Cancels a race request for the local player and notifies the host.
+ * @param race_idx The index of the race being unrequested.
+ */
+void __cdecl Unrequest_Race_(uint8_t race_idx) {
+    NETMOX::_net.race_selection_changed = 1;
+    RACESEL::_race_flag[race_idx] = 0;
+
+    // Send network message to the host about updated race selection status
+    NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 0x3e /* NET_MSG_RACE_SELECTION_STATUS */, &race_idx, 1);
 }
 
 }

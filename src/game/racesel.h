@@ -19,7 +19,7 @@ namespace RACESEL {
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A5724});
 
     inline uint8_t* _color_flag = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A56E8});
-    inline uint8_t* _race_flag = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A5770});
+    inline uint8_t (&_race_flag)[14] = *reinterpret_cast<uint8_t(*)[14]>(std::uintptr_t{0x005A5770});
 
     inline const char* s_patch13_lbx = reinterpret_cast<const char*>(0x00556330);
     inline const char* s_lastrace_rac = reinterpret_cast<const char*>(0x00556340);
@@ -43,4 +43,5 @@ namespace RACESEL {
     short Race_Selection_Screen_(s_player *plr);
 
     void __cdecl Set_Race_Select_Help_();
+    void __cdecl Unrequest_Race_(uint8_t race_idx);
 }

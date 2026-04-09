@@ -39,6 +39,10 @@ namespace hooks {
         ASSERT(sizeof(s_palette_entry) == 4, "video::Palette_Entry");
         ASSERT(sizeof(s_skill_data) == 0x12, "MOX::s_skill_data");
         ASSERT(sizeof(s_field) == 0x37, "s_field");
+        ASSERT(sizeof(s_mp_screen) == 0x1eb, "s_mp_screen");
+        ASSERT(sizeof(s_network) == 0x20a, "s_network");
+        ASSERT(sizeof(s_net_player_info) == 0xc, "s_net_player_info");
+        ASSERT(sizeof(s_net_combat_message) == 0x10, "s_net_combat_message");
     }
 
     static hook all_hooks[] = {
@@ -2767,6 +2771,29 @@ namespace hooks {
         { 0x004db4e0, &HOTPOP::Init_Hotseat_Screen_ },
         { 0x004dafb0, &HOTPOP::Reload_Hotseat_Screen_ },
         { 0x004db600, &HOTPOP::Fade_Into_Hotseat_Screen_ },
+        // Net
+        { 0x0047d5b0, &NETTURN::Net_Next_Turn_ },
+        { 0x0047d570, &NETTURN::Load_Netturn_Strings_ },
+        { 0x00504640, &MULTPLAY::Load_Net_Next_Turn_Screen_ },
+        { 0x005080f0, &MULTPLAY::Chat_Box_Input_Loop_ },
+        { 0x005045f0, &MULTPLAY::Hotseat_Player_Status_ },
+        { 0x004c2a80, &NETSTART::Net_Select_Race_ },
+        { 0x004c2c90, &NETSTART::Net_Pick_Position_ },
+        { 0x004c2f40, &NETSTART::Do_Answer_ },
+        { 0x004c2670, &NETSTART::Load_Netstart_Strings_ },
+        { 0x00504830, &MULTPLAY::Get_Net_Next_Turn_Player_Colors_ },
+        { 0x00501730, &MULTPLAY::Add_Net_Next_Turn_Fields_ },
+        { 0x00508000, &MULTPLAY::Reload_Initializing_Net_Info_ },
+        { 0x00502d70, &MULTPLAY::Draw_Generic_Net_Info_Screen_ },
+        { 0x00508020, &MULTPLAY::Reload_Join_Net_Screen_ },
+        { 0x00501950, &MULTPLAY::Choose_Multi_Network_Game_Screen_ },
+        { 0x00507E80, &MULTPLAY::Reload_Generating_Map_Info_ },
+        { 0x00507fe0, &MULTPLAY::Reload_Getting_Data_Info_ },
+        { 0x00503390, &MULTPLAY::Draw_SendGet_Net_Info_Screen_ },
+        { 0x004c27a0, &NETSTART::Join_Net_Screen_ },
+        { 0x004c2740, &NETSTART::Mox_Net_Uninit_ },
+        { 0x004c3e70, &NETSTART::Request_Race_ },
+        { 0x004c3f30, &RACESEL::Unrequest_Race_ },
     };
 
     void Install_Hooks()

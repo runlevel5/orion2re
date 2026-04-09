@@ -122,6 +122,8 @@
     <ClCompile Include="src\game\multplay.cpp" />
     <ClCompile Include="src\game\namestar.cpp" />
     <ClCompile Include="src\game\netmox.cpp" />
+    <ClCompile Include="src\game\netstart.cpp" />
+    <ClCompile Include="src\game\netturn.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
     <ClCompile Include="src\game\newtech.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="src\game\bitmap.h" />
     <ClInclude Include="src\game\bomb.h" />
     <ClInclude Include="src\game\capture.h" />
+    <ClInclude Include="src\game\chat.h" />
     <ClInclude Include="src\game\clipped.h" />
     <ClInclude Include="src\game\cmbtai.h" />
     <ClInclude Include="src\game\cmbtdrw1.h" />
@@ -287,6 +290,7 @@
     <ClInclude Include="src\game\netcode.h" />
     <ClInclude Include="src\game\netmox.h" />
     <ClInclude Include="src\game\netstart.h" />
+    <ClInclude Include="src\game\netstrat.h" />
     <ClInclude Include="src\game\netturn.h" />
     <ClInclude Include="src\game\newgame.h" />
     <ClInclude Include="src\game\newpup.h" />
@@ -349,6 +353,7 @@
     <ClInclude Include="src\game\turnsum.h" />
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />
+    <ClInclude Include="src\game\winnet.h" />
     <ClInclude Include="src\game\_antarans.h" />
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\patch.h" />

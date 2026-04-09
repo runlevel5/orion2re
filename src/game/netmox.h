@@ -65,6 +65,18 @@ namespace NETMOX {
         return fn(target, type, data, len);
     }
 
+    inline void __cdecl Decode_Broadcast_Game_Data_Differential_(void* data, uint32_t size, int unknown) {
+        using Fn = void(__cdecl*)(void*, uint32_t, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005166a0});
+        fn(data, size, unknown);
+    }
+
+    inline void __cdecl Receive_Message_(void* data) {
+        using Fn = void(__cdecl*)(void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513f40});
+        fn(data);
+    }
+
     inline char* net_field_1be = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
 
     inline void __cdecl Net_Request_AI_Diplomacy_(int16_t player_idx) {
@@ -137,5 +149,11 @@ namespace NETMOX {
     inline int32_t __cdecl Net_Diplomacy_With_(int16_t limit) {
         using Fn = int32_t(__cdecl*)(int16_t);
         return reinterpret_cast<Fn>(std::uintptr_t{0x005199F0})(limit);
+    }
+
+    inline void __cdecl Human_Surrenders_(int player_num) {
+        using Fn = void(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519E90});
+        fn(player_num);
     }
 }

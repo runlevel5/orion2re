@@ -24,8 +24,9 @@ inline const char* s_SR_R_x_SC_LBX_00557d74 = reinterpret_cast<const char*>(0x00
 inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
 inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018);
 
-inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x00552414});
-inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x00552418});
+inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x0052414});
+inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x0052418});
+inline const char* s_format_0055aa28 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA28}); // "(%s)  "
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
@@ -158,6 +159,7 @@ inline void __cdecl FUN_533630() {
 // Suggested name: setup_screen_workspace
 inline void __cdecl Set_Page_Off_() {
     using Fn = void(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528680 });
     fn();
 }
 
@@ -661,7 +663,7 @@ inline const char* s_dipstars_lbx_00552374 = reinterpret_cast<const char*>(std::
 inline const char* s_______CLIMATE_modifier_is__d_Pla_00558a58 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558A58}); // "------CLIMATE modifier is %d Planets: %d index %d\n"
 
-inline char* const s_Moo2AlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
+inline char* const s_Moo_IIAlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
 inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
 
 inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

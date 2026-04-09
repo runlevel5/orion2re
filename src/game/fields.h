@@ -33,7 +33,7 @@ namespace fields {
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
-    inline uint32_t& _continuous_string = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00572c18});
+    inline uint8_t& _continuous_string = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
     inline uint16_t& _field_outline_color = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B020});
     inline uint16_t& _mouse_cancel_disabled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B018});
@@ -176,8 +176,16 @@ namespace fields {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0051EF40})();
     }
-    void __cdecl Set_Input_Delay_(uint16_t delay);
-    void __cdecl Set_Field_Outline_Color_(uint16_t color);
+    inline void __cdecl Set_Input_Delay_(int16_t delay) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EDD0});
+        fn(delay);
+    }
+    inline void __cdecl Set_Field_Outline_Color_(uint8_t color) {
+        using Fn = void(__cdecl*)(uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520000});
+        fn(color);
+    }
 
     inline void __cdecl Draw_Visible_Fields_Back_() {
         using Fn = void(__cdecl*)();
