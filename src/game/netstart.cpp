@@ -199,7 +199,7 @@ namespace NETSTART {
 
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
-        uint8_t fade_buffer[16];
+        uint8_t fade_status;
         const char* empty_str = s__00551100;
         const char* myname_str = s_myname_005597dc;
 
@@ -208,7 +208,7 @@ namespace NETSTART {
         NETTURN::Net_Init_Host_Election_();
         MULTPLAY::Reload_Initializing_Net_Info_();
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 1);
-        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &fade_buffer[3], 11);
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &fade_status, 11);
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
         RUSS::Mox_Update_();

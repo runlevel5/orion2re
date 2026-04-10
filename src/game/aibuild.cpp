@@ -21,9 +21,9 @@ namespace AIBUILD {
                 result_strength = (int16_t)(total_str / count);
             }
         } else {
-            uint32_t count_darlok = 0;
-            uint32_t total_darlok = 0;
-            uint32_t min_darlok = 0xffffffff;
+            uint32_t count_human = 0;
+            uint32_t total_human = 0;
+            uint32_t min_human = 0xffffffff;
 
             uint32_t count_other = 0;
             uint32_t total_other = 0;
@@ -34,11 +34,11 @@ namespace AIBUILD {
                     uint32_t str = (uint16_t)(*AIDATA::_ship_strengths)[ship_idx][i];
 
                     if (MOX::_player[i].objectives == 100 /* 'd' */) {
-                        total_darlok += str;
-                        if (str < min_darlok) {
-                            min_darlok = str;
+                        total_human += str;
+                        if (str < min_human) {
+                            min_human = str;
                         }
-                        count_darlok++;
+                        count_human++;
                     } else {
                         total_other += str;
                         if (str < min_other) {
@@ -49,18 +49,18 @@ namespace AIBUILD {
                 }
             }
 
-            if (count_darlok == 0) {
+            if (count_human == 0) {
                 if (count_other != 0) {
                     result_strength = (int16_t)(total_other / count_other);
                 }
             } else if (count_other == 0) {
-                result_strength = (int16_t)(total_darlok / count_darlok);
+                result_strength = (int16_t)(total_human / count_human);
             } else {
-                if (min_other < min_darlok) {
+                if (min_other < min_human) {
                     result_strength = (int16_t)min_other;
                 } else {
-                    int8_t bias = AIBUILD::_difficulty_intel_bias[MOX::_settings.game_difficulty];
-                    result_strength = (int16_t)((min_other + (uint32_t)bias * min_darlok) / (bias + 1));
+                    uint32_t bias = (uint8_t)AIBUILD::_difficulty_intel_bias[MOX::_settings.game_difficulty];
+                    result_strength = (int16_t)((min_other + bias * min_human) / (bias + 1));
                 }
             }
         }

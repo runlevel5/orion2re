@@ -210,19 +210,19 @@ void __cdecl Draw_Hotseat_Screen_(void)
 
     fonts::Set_Font_Style_Shadow_Down_(1, &active_colors);
 
-    if (MOX::_settings.number_of_players > 0) {
+    if ((int8_t)MOX::_settings.number_of_players > 0) {
         int16_t text_x = bg_x + 14;
         int16_t text_y = bg_y + 70;
 
-        for (uint16_t i = 0; i < (uint16_t)MOX::_settings.number_of_players; ++i) {
-            if (i < HOTPOP::_hotseat_human_players) {
+        for (int16_t i = 0; i < (int8_t)MOX::_settings.number_of_players; ++i) {
+            if (i < (int16_t)HOTPOP::_hotseat_human_players) {
                 fonts::Set_Font_Style_Shadow_Down_(1, &active_colors);
             }
             else {
                 fonts::Set_Font_Style_Shadow_Down_(1, &inactive_colors);
             }
 
-            fonts::Print_Integer_(text_x, text_y, (int)(i + 1));
+            fonts::Print_Integer_(text_x, text_y, i + 1);
             text_y += 9;
         }
     }

@@ -108,7 +108,7 @@ namespace MULTPLAY {
         int16_t mid_h;
         int16_t chat_bg_h;
         int16_t top_w;
-        uint8_t fade_palette[33];
+        uint8_t fade_palette[49];
 
         RUSS::Mox_Update_();
         MULTPLAY::_global_chat_string[0] = '\0';
@@ -139,7 +139,7 @@ namespace MULTPLAY {
 
         MOX::_mp_screen->player_field_ids[2] = (int16_t)(top_h + mid_h);
 
-        int32_t screen_y_calc = (480 - (int32_t)(top_h + mid_h + chat_bg_h)) / 2;
+        int32_t screen_y_calc = (480 - (int16_t)(top_h + mid_h + chat_bg_h)) / 2;
         if (screen_y_calc < 1) {
             screen_y_calc = 0;
         }
@@ -1775,8 +1775,9 @@ void __cdecl Add_Net_Next_Turn_Fields_()
         }
     }
 
-void __cdecl Choose_Multi_Network_Game_Screen_() {
+int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
     void* saved_auto_fn;
+    int16_t result;
     int16_t game_count;
     bool exit_screen = false;
     int16_t input_field;
@@ -1806,9 +1807,10 @@ void __cdecl Choose_Multi_Network_Game_Screen_() {
         scan_id = fields::Scan_Input_();
         MOX::_mp_screen->last_scan_id = scan_id;
 
-        game_count = (int16_t)netcode::Net_Get_Game_Count_();
-        if (game_count >= 10) {
+        if (netcode::Net_Get_Game_Count_() >= 10) {
             game_count = 10;
+        } else {
+            game_count = (int16_t)netcode::Net_Get_Game_Count_();
         }
 
         for (int16_t i = 0; i < game_count; ++i) {
@@ -1822,6 +1824,7 @@ void __cdecl Choose_Multi_Network_Game_Screen_() {
         }
 
         if (MOX::_mp_screen->field_id_cancel == input_field) {
+            result = -1;
             MOX::_current_screen = 15 /* 0xf */;
             exit_screen = true;
             netcode::Net_Uninit_();
@@ -1838,6 +1841,8 @@ void __cdecl Choose_Multi_Network_Game_Screen_() {
     MOX2::Put_Auto_Function_(&saved_auto_fn);
     fields::Clear_Fields_();
     fields::Set_Input_Delay_(3);
+
+    return result;
 }
 
 void __cdecl Reload_Generating_Map_Info_() {
@@ -1922,20 +1927,27 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 }
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
-        clock_t now = _clock();
-        if (now + 5000 > (clock_t)WINNET::_net_refresh_timer) {
+        if (WINNET::_net_refresh_timer < _clock() + 5000) {
             WINNET::Refresh_Game_List_(WINNET::_game_guid);
             WINNET::_net_refresh_timer = (uint32_t)_clock();
         }
 
-        int32_t game_count = netcode::Net_Get_Game_Count_();
-        int16_t display_count = (game_count < 10) ? (int16_t)game_count : 10;
+        int16_t display_count;
+        if (netcode::Net_Get_Game_Count_() < 10) {
+            display_count = (int16_t)netcode::Net_Get_Game_Count_();
+        } else {
+            display_count = 10;
+        }
 
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 41 /* 0x29 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
         animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
 
         // Update green palette range for the game selection list
-        _memcpy(&video::_current_palette[144], _green_pal_colors, 16 * sizeof(s_palette_entry));
+        s_palette_entry* dst = &video::_current_palette[144];
+        s_palette_entry* src = reinterpret_cast<s_palette_entry*>(_green_pal_colors);
+        for (int i = 0; i < 16; ++i) {
+            *dst++ = *src++;
+        }
 
         for (int16_t i = 0, row_y_offset = 0; i < display_count; ++i) {
             char* name_ptr = netcode::Net_Get_Game_Name_(i);
@@ -1974,7 +1986,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
                 int16_t font_h = fonts::Get_Font_Height_();
                 int16_t centered_y = (22 - font_h) / 2;
-                fonts::Print_(MOX::_mp_screen->screen_x + 38 /* 0x26 */, 
+                fonts::Print_(MOX::_mp_screen->screen_x + 47 /* 0x2F */, 
                               MOX::_mp_screen->screen_y + 67 /* 0x43 */ + row_y_offset + centered_y, 
                               game_name);
             }
@@ -2054,18 +2066,19 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     }
 
     int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load) {
-        uint32_t auto_func_data[4];
+        uint32_t unused_data[4];
+        void* saved_auto_func;
         uint8_t fade_flag = 0;
         int16_t result_status = 0;
         bool exit_loop = false;
         int16_t input_field_id;
 
-        auto_func_data[0] = 0xffffffff;
-        auto_func_data[1] = 0xffffffff;
-        auto_func_data[2] = 0xffffffff;
-        auto_func_data[3] = 0xffffffff;
+        unused_data[0] = 0xffffffff;
+        unused_data[1] = 0xffffffff;
+        unused_data[2] = 0xffffffff;
+        unused_data[3] = 0xffffffff;
 
-        MOX2::Get_Auto_Function_(auto_func_data);
+        MOX2::Get_Auto_Function_(&saved_auto_func);
 
         if (should_load != 0) {
             Load_Choose_Net_Plyrs_Screen_();
@@ -2102,15 +2115,13 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             input_field_id = fields::Get_Input_();
             MOX::_mp_screen->last_scan_id = fields::Scan_Input_();
 
-            if (!exit_loop) {
-                for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                    if ((MOX::_mp_screen->player_field_ids[i] == input_field_id ||
-                         MOX::_mp_screen->game_list_field_ids[i] == input_field_id) &&
-                         MOX::_mp_screen->player_connected_flags[i] == 0) {
-                        exit_loop = true;
-                        *out_selected_player = i;
-                        break;
-                    }
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if ((MOX::_mp_screen->player_field_ids[i] == input_field_id ||
+                     MOX::_mp_screen->game_list_field_ids[i] == input_field_id) &&
+                     MOX::_mp_screen->player_connected_flags[i] == 0) {
+                    exit_loop = true;
+                    *out_selected_player = i;
+                    break;
                 }
             }
 
@@ -2142,7 +2153,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         } while (true);
 
-        MOX2::Put_Auto_Function_(auto_func_data);
+        MOX2::Put_Auto_Function_(&saved_auto_func);
         fields::Clear_Fields_();
         fields::Set_Input_Delay_(3);
         MOX::_mp_screen = nullptr;
@@ -2189,22 +2200,21 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         }
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 42 /* 0x2a */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 42 /* 0x2a */, MOX::_global_cache_seg);
         
-        uint8_t current_frame_limit = MOX::_mp_screen->anim_frame_timer;
-        if (current_frame_limit != 0) {
-            for (int16_t i = 0; i < (int16_t)current_frame_limit; ++i) {
+        if (MOX::_mp_screen->anim_frame_timer != 0) {
+            for (int16_t i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {
                 animate::Set_Animation_Frame_(MOX::_mp_screen->anim_turn_screen_top, i);
                 animate::Draw_(screen_x, screen_y, MOX::_mp_screen->anim_turn_screen_top);
             }
         }
 
-        if (animate::Get_Animation_Frame_Count_(MOX::_mp_screen->anim_turn_screen_top) <= (int16_t)current_frame_limit) {
+        if (animate::Get_Animation_Frame_Count_(MOX::_mp_screen->anim_turn_screen_top) <= (int16_t)MOX::_mp_screen->anim_frame_timer) {
             MOX::_mp_screen->anim_frame_timer = 0;
         }
 
         int16_t current_y = screen_y + animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_top);
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 43 /* 0x2b */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 43 /* 0x2b */, MOX::_global_cache_seg);
         
         if (MOX::_mp_screen->needs_full_redraw != 0) {
             animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_turn_screen_mid);
@@ -2213,7 +2223,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         current_y += animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_mid);
         
         if (MOX::_mp_screen->needs_full_redraw != 0) {
-            MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 40 /* 0x28 */, MOX::_global_cache_seg);
+            MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40 /* 0x28 */, MOX::_global_cache_seg);
             animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_chat_msg_bg);
         }
 
@@ -2232,14 +2242,14 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
             s_player* plr = &MOX::_player[i];
             if (plr->objectives == 100 /* 'd' */ && plr->eliminated == 0) {
-                int16_t banner_x = (int16_t)((banner_active_count % 2) * 294 + screen_x + 92);
-                int16_t banner_y = (int16_t)((banner_active_count / 2) * 36 + screen_y + 63);
+                int16_t banner_x = (int16_t)((i % 2) * 294 + screen_x + 92);
+                int16_t banner_y = (int16_t)((i / 2) * 36 + screen_y + 63);
 
                 if (NETMOX::_net.dropped_players[i] == 0) {
                     MULTPLAY::Draw_Multi_Player_Banner_(i, banner_active_count, 1);
                     fonts::Set_Font_Style_(4, &font_colors_1);
                 } else {
-                    MULTPLAY::Draw_Fill_Seg_(i, banner_active_count);
+                    MULTPLAY::Draw_Fill_Seg_(i);
                     fonts::Set_Font_Style_(4, &font_colors_2);
                 }
 
@@ -2280,7 +2290,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 if (i == 0) {
                     graphics::Set_Window_(chat_x, chat_y, chat_x + 570, chat_y + 11);
                     video::Clip_On_();
-                    MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 40, MOX::_global_cache_seg);
+                    MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40, MOX::_global_cache_seg);
                     animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_chat_msg_bg);
                     video::Clip_Off_();
                     graphics::Reset_Window_();
@@ -2310,7 +2320,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen->needs_full_redraw = 0;
     }
 
-    void __cdecl Draw_Fill_Seg_(int16_t idx, int16_t banner_pos) {
+    void __cdecl Draw_Fill_Seg_(int16_t idx) {
         int16_t x;
         int16_t y;
 
@@ -2330,14 +2340,14 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         int16_t x, y;
 
         if (is_alt_layout == 0) {
-            entry_id = (int)player->race * 8 + (int)player->color + 46 /* 0x2E */;
+            entry_id = (uint8_t)player->race * 8 + (uint8_t)player->color + 46 /* 0x2E */;
             x = screen_x + 40 /* 0x28 */;
             y = screen_y + 65 /* 0x41 */ + row_idx * 36 /* 0x24 */;
 
             MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
             animate::Draw_(x, y, MOX::_mp_screen->player_banner_anims[player_idx]);
         } else {
-            entry_id = (int)player->race * 8 + (int)player->color + 150 /* 0x96 */;
+            entry_id = (uint8_t)player->race * 8 + (uint8_t)player->color + 150 /* 0x96 */;
             // Horizontal position depends on parity of player_idx (left/right column)
             x = (int16_t)(player_idx % 2) * 294 /* 0x126 */ + screen_x + 40 /* 0x28 */;
             // Vertical position depends on player_idx pair (rows of 2)
@@ -2432,7 +2442,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                         uint8_t limit_high = base_color + 5;
 
                         for (int i = 1; i < 8; ++i) {
-                            int val = (int)local_colors_1.colors[i] + (int)MOX::_mp_screen->sel_anim_frame;
+                            int val = (uint8_t)(local_colors_1.colors[i] + MOX::_mp_screen->sel_anim_frame);
                             if (val < (int)limit_low) val = limit_low;
                             if (val > (int)limit_high) val = limit_high;
                             local_colors_1.colors[i] = (uint8_t)val;
@@ -2452,7 +2462,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                     font_colors = &local_colors_2;
                 }
 
-                fonts::Set_Font_Style_((int16_t)MOX::_mp_screen->subscreen_mode, font_colors);
+                fonts::Set_Font_Style_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, font_colors);
                 char* race_name = HACCESS::Race_Name_String_(player_idx);
                 char buffer[100];
                 _sprintf(buffer, s_fmt_player_race, plr->name, race_name);

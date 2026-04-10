@@ -2766,12 +2766,12 @@ namespace hooks {
         { 0x004bc030, &newtech::Choose_Hyper_Advanced_Tech_ },
         { 0x004BBD20, &newtech::Choose_Tech_Application_ },
         { 0x004bbc20, &newtech::Get_Competition_Tech_Values_ },
+        // Net
         { 0x004db170, &HOTPOP::Hotseat_Screen_ },
         { 0x004db050, &HOTPOP::Draw_Hotseat_Screen_ },
         { 0x004db4e0, &HOTPOP::Init_Hotseat_Screen_ },
         { 0x004dafb0, &HOTPOP::Reload_Hotseat_Screen_ },
         { 0x004db600, &HOTPOP::Fade_Into_Hotseat_Screen_ },
-        // Net
         { 0x0047d5b0, &NETTURN::Net_Next_Turn_ },
         { 0x0047d570, &NETTURN::Load_Netturn_Strings_ },
         { 0x00504640, &MULTPLAY::Load_Net_Next_Turn_Screen_ },

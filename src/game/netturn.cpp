@@ -4,10 +4,7 @@ namespace NETTURN {
 
     void __cdecl Net_Next_Turn_() {
         s_net_chat chat_buffer;
-        struct {
-            int8_t flag;
-            int32_t rank;
-        } election_msg;
+        s_net_election_msg election_msg;
 
         if (MOX::_player[MOX::_PLAYER_NUM].surrender_to != -1) {
             NETMOX::Human_Surrenders_(MOX::_PLAYER_NUM);
@@ -141,20 +138,24 @@ namespace NETTURN {
                 }
 
                 if (NETMOX::_net.host_active_player_id != -1) {
-                    NETMOX::_net.packet_type = 10 /* PLAYER_DATA */;
-                    NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.host_active_player_id].network_player_id, 12, nullptr, 0);
-
-                    while (NETMOX::_net.packet_type == 10) {
-                        MULTPLAY::Chat_Box_Input_Loop_();
-                    }
-
-                    NETMOX::Decode_Game_Orders_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
-                    NETMOX::_net.network_data_ptr = nullptr;
-                    allocate::Pop_Block_(MOX::_screen_seg);
-                    NETMOX::_net.total_chunk_count = 0;
-                    NETMOX::_net.players_ready_mask[NETMOX::_net.host_active_player_id + 1] = 1;
-                    NETMOX::_net.host_active_player_id = -1;
+                    break;
                 }
+            }
+
+            if (NETMOX::_net.host_active_player_id != -1) {
+                NETMOX::_net.packet_type = 10 /* PLAYER_DATA */;
+                NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.host_active_player_id].network_player_id, 12, nullptr, 0);
+
+                while (NETMOX::_net.packet_type == 10) {
+                    MULTPLAY::Chat_Box_Input_Loop_();
+                }
+
+                NETMOX::Decode_Game_Orders_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
+                NETMOX::_net.network_data_ptr = nullptr;
+                allocate::Pop_Block_(MOX::_screen_seg);
+                NETMOX::_net.total_chunk_count = 0;
+                NETMOX::_net.players_ready_mask[NETMOX::_net.host_active_player_id + 1] = 1;
+                NETMOX::_net.host_active_player_id = -1;
             }
         }
 
@@ -250,7 +251,7 @@ namespace NETTURN {
                 MULTPLAY::Chat_Box_Input_Loop_();
             }
 
-            if (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
+            while (!NETMOX::Decode_Broadcast_Game_Data_Differential_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received, 0)) {
                 exitm::Exit_With_Message(s_craziness_00557680);
             }
 

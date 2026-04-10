@@ -1,6 +1,13 @@
 #pragma once
 #include <cstdint>
 
+#pragma pack(push, 1)
+struct s_net_election_msg {
+    int32_t rank;
+    int8_t flag;
+};
+#pragma pack(pop)
+
 namespace NETTURN {
     void __cdecl Net_Next_Turn_();
 
