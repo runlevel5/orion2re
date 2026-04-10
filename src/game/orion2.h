@@ -2722,7 +2722,7 @@ struct s_net_combat_message {
 typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {
-    uint8_t packet_sync_status;
+    uint8_t sync_state;
     undefined field1_0x1;
     int16_t sync_star_id;
     int16_t sync_planet_id;
@@ -2845,7 +2845,7 @@ struct s_network {
     undefined field106_0x178;
     undefined field107_0x179;
     undefined field108_0x17a;
-    byte packet_type;
+    uint8_t sync_state;
     int8_t combat_star_id;
     int16_t combat_defender_id;
     int16_t combat_planet_id;

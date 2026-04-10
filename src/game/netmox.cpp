@@ -41,12 +41,12 @@ namespace NETMOX {
     int8_t __cdecl Net_May_Begin_AI_Diplomacy_() {
         int8_t uninitialized_ret;
 
-        if (NETMOX::_net.packet_type >= 0x25) {
-            if (NETMOX::_net.packet_type <= 0x26) {
+        if (NETMOX::_net.sync_state >= 0x25) {
+            if (NETMOX::_net.sync_state <= 0x26) {
                 return 0;
             }
 
-            if (NETMOX::_net.packet_type == 0x28) {
+            if (NETMOX::_net.sync_state == 0x28) {
                 return 1;
             }
         }
@@ -71,7 +71,7 @@ namespace NETMOX {
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
             int32_t target_id = _net.diplomacy_target_id;
             _net.diplomacy_target_id = -1;
-            _net.packet_type = 4;
+            _net.sync_state = 4;
 
             int16_t network_player_id = MOX::_player[target_id].network_player_id;
             if (network_player_id != -1) {
@@ -82,14 +82,14 @@ namespace NETMOX {
 
     void __cdecl Net_End_Human_Diplomacy_() {
         _net.diplomacy_target_id = -1;
-        _net.packet_type = 4;
+        _net.sync_state = 4;
     }
 
     bool __cdecl Net_Human_Rejected_Diplomacy_() {
         bool result = false;
 
-        if (_net.packet_type == 0x2A /* '*' */) {
-            _net.packet_type = 0x04;
+        if (_net.sync_state == 0x2A /* '*' */) {
+            _net.sync_state = 0x04;
             result = true;
         }
 
@@ -97,7 +97,7 @@ namespace NETMOX {
     }
 
     bool __cdecl Allowed_To_Cancel_Human_Diplomacy_() {
-        return _net.packet_type == 0x29;
+        return _net.sync_state == 0x29;
     }
 
     int8_t __cdecl Human_Hit_Next_Turn_(int16_t player_idx) {
@@ -113,7 +113,7 @@ namespace NETMOX {
     int8_t __cdecl Net_May_Begin_Human_Diplomacy_() {
         int8_t local_1; // Uninitialized stack value
 
-        switch (_net.packet_type) {
+        switch (_net.sync_state) {
         case 4:
         case 41: /* ')' */
         case 42: /* '*' */
@@ -128,13 +128,13 @@ namespace NETMOX {
     }
 
     bool __cdecl Net_Cancel_AI_Diplomacy_Confirmed_() {
-        return _net.packet_type == 4;
+        return _net.sync_state == 4;
     }
 
     void __cdecl Net_Cancel_AI_Diplomacy_Request_() {
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
             _net.diplomacy_target_id = -1;
-            _net.packet_type = 0x27;
+            _net.sync_state = 0x27;
             if (_net.host_election_winner_id != -1) {
                 Mox_Send_Message_(_net.host_election_winner_id, 8, &_net.diplomacy_target_id, 1);
             }
@@ -143,14 +143,14 @@ namespace NETMOX {
 
     bool __cdecl No_AI_Diplomacy_Allowed_() {
         if (_net.host_election_winner_id == -1) {
-            _net.packet_type = 4;
+            _net.sync_state = 4;
             return true;
         }
         return false;
     }
 
     void __cdecl Net_Request_AI_Diplomacy_(int16_t player_idx) {
-        _net.packet_type = 0x25;
+        _net.sync_state = 0x25;
         _net.diplomacy_target_id = (int8_t)player_idx;
 
         if (_net.host_election_winner_id != -1) {

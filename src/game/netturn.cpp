@@ -24,7 +24,7 @@ namespace NETTURN {
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Net_Next_Turn_Screen_, 1);
         MULTPLAY::Add_Net_Next_Turn_Fields_();
 
-        NETMOX::_net.packet_type = 8 /* NET_PACKET_NEXT_TURN_SYNC */;
+        NETMOX::_net.sync_state = 8 /* NET_PACKET_NEXT_TURN_SYNC */;
         NETMOX::_net.players_hit_next_turn[MOX::_PLAYER_NUM] = 1;
 
         if (NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM] == -1) {
@@ -123,12 +123,12 @@ namespace NETTURN {
             }
         }
 
-        NETMOX::_net.packet_type = 9 /* SYNC_WAIT */;
+        NETMOX::_net.sync_state = 9 /* SYNC_WAIT */;
         if (NETMOX::_net.host_sync_counter >= MOX::_NUM_PLAYERS) {
-            NETMOX::_net.packet_type = 11 /* TURN_START */;
+            NETMOX::_net.sync_state = 11 /* TURN_START */;
         }
 
-        while (NETMOX::_net.packet_type != 11) {
+        while (NETMOX::_net.sync_state != 11) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                 MULTPLAY::Chat_Box_Input_Loop_();
 
@@ -143,10 +143,10 @@ namespace NETTURN {
             }
 
             if (NETMOX::_net.host_active_player_id != -1) {
-                NETMOX::_net.packet_type = 10 /* PLAYER_DATA */;
+                NETMOX::_net.sync_state = 10 /* PLAYER_DATA */;
                 NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.host_active_player_id].network_player_id, 12, nullptr, 0);
 
-                while (NETMOX::_net.packet_type == 10) {
+                while (NETMOX::_net.sync_state == 10) {
                     MULTPLAY::Chat_Box_Input_Loop_();
                 }
 
@@ -163,16 +163,16 @@ namespace NETTURN {
         COLCALC::No_Op1_();
         NETMOX::_net.sync_phase_active_flag = 0;
 
-        memset(&NETMOX::_net.player_net_info[0].packet_sync_status, 0, 180);
+        memset(&NETMOX::_net.player_net_info[0].sync_state, 0, 180);
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                 NETMOX::_net.player_net_info[i].field6_0x9 = 0xFF;
-                NETMOX::_net.player_net_info[i].packet_sync_status = 14 /* NEXT_TURN */;
+                NETMOX::_net.player_net_info[i].sync_state = 14 /* NEXT_TURN */;
             }
         }
 
-        NETMOX::_net.packet_type = 14 /* NEXT_TURN */;
+        NETMOX::_net.sync_state = 14 /* NEXT_TURN */;
         NEXTTURN::Next_Turn_();
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
@@ -197,11 +197,11 @@ namespace NETTURN {
             NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
             NETMOX::_net.field_1db = 0;
             NETMOX::_net.field_1df = 0;
-            NETMOX::_net.packet_type = 4 /* SYNC */;
+            NETMOX::_net.sync_state = 4 /* SYNC */;
 
             if (MOX::_NUM_PLAYERS > 0) {
                 for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                    NETMOX::_net.player_net_info[i].packet_sync_status = 4 /* SYNC */;
+                    NETMOX::_net.player_net_info[i].sync_state = 4 /* SYNC */;
                     NETMOX::_net.player_net_info[i].remote_player_id = -1;
                 }
             }
@@ -240,7 +240,7 @@ namespace NETTURN {
 
         do {
             MULTPLAY::Chat_Box_Input_Loop_();
-        } while (NETMOX::_net.packet_type == 8 /* NET_PACKET_BUSY */);
+        } while (NETMOX::_net.sync_state == 8 /* NET_PACKET_BUSY */);
 
         COMBFIND::_current_star_has_player = star_has_player;
         COMBFIND::_current_star_has_nonplayer = &star_has_nonplayer;
@@ -277,7 +277,7 @@ namespace NETTURN {
 
             allocate::Pop_Block_(MOX::_screen_seg);
             NETMOX::_net.total_chunk_count = 0;
-            NETMOX::_net.packet_type = 4 /* NET_PACKET_TURN_SYNC */;
+            NETMOX::_net.sync_state = 4 /* NET_PACKET_TURN_SYNC */;
 
             MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
