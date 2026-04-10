@@ -2755,7 +2755,7 @@ struct s_network {
     int16_t total_chunk_count;
     void *network_data_ptr;
     int8_t host_election_player_rank[8];
-    int8_t dropped_players[8];
+    int8_t players_hit_next_turn[8];
     short local_net_id;
     int8_t host_active_player_id;
     int8_t host_sync_counter;
@@ -2872,7 +2872,7 @@ struct s_network {
     undefined field133_0x1a0;
     undefined field134_0x1a1;
     int8_t is_diplomacy_initiator;
-    undefined field136_0x1a3;
+    int8_t human_diplomat_wait_flag;
     undefined field137_0x1a4;
     uint8_t players_ready_mask[8];
     undefined field139_0x1ad;

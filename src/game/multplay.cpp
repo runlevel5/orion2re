@@ -2245,7 +2245,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 int16_t banner_x = (int16_t)((i % 2) * 294 + screen_x + 92);
                 int16_t banner_y = (int16_t)((i / 2) * 36 + screen_y + 63);
 
-                if (NETMOX::_net.dropped_players[i] == 0) {
+                if (NETMOX::_net.players_hit_next_turn[i] == 0) {
                     MULTPLAY::Draw_Multi_Player_Banner_(i, banner_active_count, 1);
                     fonts::Set_Font_Style_(4, &font_colors_1);
                 } else {

@@ -669,6 +669,7 @@ inline char* const s_MULTIGM_LBX_00558D04 = reinterpret_cast<char*>(std::uintptr
 inline const char* s_Evan_Axelrad_0055AA48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA48}); // "Evan Axelrad"
 inline char* const s_Moo_IIAlreadyRunning = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1CC }); // "Moo2 is already running"
 inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
+inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
 
 inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     using Fn = LRESULT(CALLBACK*)(HWND, UINT, WPARAM, LPARAM);

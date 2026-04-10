@@ -61,6 +61,7 @@
 #include "net.h"
 #include "netmox.h"
 #include "netstrat.h"
+#include "transprt.h"
 #include "winnet.h"
 #include "timer.h"
 #include "contact.h"

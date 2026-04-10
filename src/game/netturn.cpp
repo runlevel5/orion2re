@@ -25,7 +25,7 @@ namespace NETTURN {
         MULTPLAY::Add_Net_Next_Turn_Fields_();
 
         NETMOX::_net.packet_type = 8 /* NET_PACKET_NEXT_TURN_SYNC */;
-        NETMOX::_net.dropped_players[MOX::_PLAYER_NUM] = 1;
+        NETMOX::_net.players_hit_next_turn[MOX::_PLAYER_NUM] = 1;
 
         if (NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM] == -1) {
             NETMOX::_net.host_election_player_rank[MOX::_PLAYER_NUM] = (int8_t)MOX::_PLAYER_NUM;
@@ -132,7 +132,7 @@ namespace NETTURN {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                 MULTPLAY::Chat_Box_Input_Loop_();
 
-                if (NETMOX::_net.dropped_players[i] != 0 && NETMOX::_net.player_is_active_flags[i] != 0) {
+                if (NETMOX::_net.players_hit_next_turn[i] != 0 && NETMOX::_net.player_is_active_flags[i] != 0) {
                     NETMOX::_net.player_is_active_flags[i] = 0;
                     NETMOX::_net.host_active_player_id = static_cast<int8_t>(i);
                 }
@@ -214,6 +214,22 @@ namespace NETTURN {
                 REPORT::_something_interesting_happened[MOX::_PLAYER_NUM] = 1;
             }
         }
+    }
+
+    int8_t __cdecl Must_Broadcast_AI_Player_Data_() {
+        int16_t num_players = MOX::_NUM_PLAYERS;
+
+        for (int i = 0; i < num_players; ++i) {
+            uint8_t sync_mask = NETMOX::_net.players_sync_mask[i];
+
+            for (int j = 0; j < num_players; ++j) {
+                if ((sync_mask >> j) & 1) {
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
     }
 
     void __cdecl Client_Next_Turn_() {

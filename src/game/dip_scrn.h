@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+struct s_dipscrn_net_message;
+
 namespace DIP_SCRN {
     inline s_mouse_list& _diplomacy_hand_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005569A8});
     inline s_mouse_list& _diplomacy_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00552318});
@@ -194,6 +196,12 @@ namespace DIP_SCRN {
     inline char* (&_main_repulsive_diplomacy_list)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A8230});
     inline char* (&_main_net_repulsive_diplomacy_list)[6] = *reinterpret_cast<char* (*)[6]>(std::uintptr_t{0x005A85B0});
     inline s_dipscrn_net_message& _net_diplomacy_message = *reinterpret_cast<s_dipscrn_net_message*>(std::uintptr_t{0x005A8370});
+
+    inline void __cdecl Diplomacy_Receive_Message_(int16_t net_id, uint16_t packet_id, uint32_t param_3, s_dipscrn_net_message* param_4) {
+        using Fn = void(__cdecl*)(int16_t, uint16_t, uint32_t, s_dipscrn_net_message*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041ca80});
+        fn(net_id, packet_id, param_3, param_4);
+    }
 
     void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2);
 

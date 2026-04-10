@@ -250,6 +250,12 @@ namespace MAINSCR {
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
+    inline void __cdecl Main_Receive_Message_(int32_t player_id, int16_t net_id, uint16_t packet_id, uint32_t param_3, uint8_t* param_4) {
+        using Fn = void(__cdecl*)(int32_t, int16_t, uint16_t, uint32_t, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513fd0});
+        fn(player_id, net_id, packet_id, param_3, param_4);
+    }
+
     int16_t __cdecl Scan_Galaxy_Map_Fields_(int16_t field_id_1, int16_t field_id_2, int16_t* star_idx_ptr_1, int16_t* star_idx_ptr_2);
     int __cdecl Zoom_Box_Width_(int16_t width, int16_t zoom_factor);
     int32_t __cdecl Zoom_Box_Height_(int16_t height, int16_t divisor);

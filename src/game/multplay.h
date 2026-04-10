@@ -145,6 +145,30 @@ namespace MULTPLAY {
 
     void __cdecl Reload_Join_Net_Screen_();
 
+    inline void __cdecl Reload_Waiting_For_Joiners_Screen_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005080a0});
+        fn();
+    }
+
+    inline void __cdecl Add_Waiting_For_Joiners_Field_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00501900});
+        fn();
+    }
+
+    inline void __cdecl Draw_Wait_For_New_Joiners_Screen_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503560});
+        fn();
+    }
+
+    inline void __cdecl Reload_Sending_Data_Info_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508040});
+        fn();
+    }
+
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_();
 
     void __cdecl Load_Choose_Multi_Net_Game_Screen_();

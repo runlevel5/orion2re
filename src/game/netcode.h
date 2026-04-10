@@ -38,9 +38,33 @@ namespace netcode {
         fn();
     }
 
+    inline void __cdecl Set_Null_Modem_Host_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005354f0});
+        fn();
+    }
+
+    inline int32_t __cdecl Net_Get_Users_(uint8_t* users) {
+        using Fn = int32_t(__cdecl*)(uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535440});
+        return fn(users);
+    }
+
+    inline void __cdecl Net_Disable_New_Players_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535420});
+        fn();
+    }
+
     inline int16_t __cdecl Net_Host_ID_() {
         using Fn = int16_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535510});
         return fn();
+    }
+
+    inline int32_t __cdecl Net_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len) {
+        using Fn = int32_t(__cdecl*)(int16_t, uint16_t, void*, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534C40});
+        return fn(param_1, param_2, packet, len);
     }
 }

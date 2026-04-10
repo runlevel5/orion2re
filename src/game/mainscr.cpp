@@ -2351,22 +2351,22 @@ namespace MAINSCR {
     {
         int8_t all_humans_ready_flag = 0;
         int16_t n_humans = HAROLD::Get_N_Remaining_Humans_();
-        int16_t dropped_count = 0;
+        int16_t done_count = 0;
 
         for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_game_type == 1 /* GAME_HOTSEAT */) {
                 if ((int16_t)MULTPLAY::Hotseat_Player_Status_(i) == 1) {
-                    dropped_count++;
+                    done_count++;
                 }
             }
             else if ((MOX::_game_type == 2 /* GAME_NETWORK */ || MOX::_game_type == 3 /* GAME_MODEM */)) {
-                if (NETMOX::_net.dropped_players[i] != 0) {
-                    dropped_count++;
+                if (NETMOX::_net.players_hit_next_turn[i] != 0) {
+                    done_count++;
                 }
             }
         }
 
-        if ((n_humans - 1) <= dropped_count) {
+        if ((n_humans - 1) <= done_count) {
             all_humans_ready_flag = 1;
         }
 
@@ -2375,7 +2375,7 @@ namespace MAINSCR {
             bool should_draw = false;
 
             if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-                if (NETMOX::_net.dropped_players[i] != 0) {
+                if (NETMOX::_net.players_hit_next_turn[i] != 0) {
                     should_draw = true;
                 }
             }

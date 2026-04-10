@@ -7,9 +7,18 @@ namespace NETSTART {
         return reinterpret_cast<Fn>(std::uintptr_t{0x004c36b0})();
     }
     uint8_t __cdecl Join_Net_Screen_();
-    inline uint8_t __cdecl Load_Net_Screen_() {
-        using Fn = uint8_t(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004c2fb0})();
+    uint8_t __cdecl Load_Net_Screen_();
+
+    inline int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, const char* str1, const char* str2) {
+        using Fn = int32_t(__cdecl*)(GUID, char*, int32_t, const char*, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c35b0});
+        return fn(guid, game_name, max_players, str1, str2);
+    }
+
+    inline int32_t __cdecl Do_Dial_(char* cmd) {
+        using Fn = int32_t(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c3600});
+        return fn(cmd);
     }
 
     char* __cdecl Load_Netstart_Strings_(char* buffer);

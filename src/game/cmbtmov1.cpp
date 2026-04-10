@@ -833,4 +833,55 @@ int16_t __cdecl Ship_In_Legal_Square_(int16_t ship_id, int16_t x, int16_t y, int
     return 0;
 }
 
+void __cdecl Tactical_Combat_Receive_Message_(int32_t param_1, uint16_t param_2, int32_t param_3, s_net_combat_message* param_4) {
+    if (param_2 >= 1000 && param_2 < 2000) {
+        switch (param_2) {
+            case 1000:
+                if (MOX::_new_message.f8 == 0) {
+                    struct_::Copy_Structure_(&MOX::_new_message, param_4, 16);
+                    MOX::_tactical_net_choice = MOX::_new_message.f8;
+                    return;
+                }
+                
+                // Original assembly contains duplicate block logic here
+                struct_::Copy_Structure_(&MOX::_new_message, param_4, 16);
+                MOX::_tactical_net_choice = MOX::_new_message.f8;
+                return;
+
+            case 1002: {
+                int16_t x = param_4->x;
+                MOX::_auto_combat_flag[x] = 0;
+                
+                if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) {
+                    if (x == 0) {
+                        MOX::_auto_combat = 0;
+                        return;
+                    }
+                } else {
+                    if (x == 1) {
+                        MOX::_auto_combat = 0;
+                        return;
+                    }
+                }
+                break;
+            }
+
+            case 1003:
+                MOX::_saved_msl_warn = MOX::_msl_impact_warning_flag;
+                MOX::_msl_impact_warning_flag = param_4->x;
+                return;
+
+            case 1004:
+                MOX::_combat_done_waiting++;
+                return;
+
+            case 1005:
+                if (param_4->x == 1) {
+                    MOX::_combat_init = param_4->x;
+                }
+                break;
+        }
+    }
+}
+
 }

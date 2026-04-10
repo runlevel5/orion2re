@@ -2766,7 +2766,6 @@ namespace hooks {
         { 0x004bc030, &newtech::Choose_Hyper_Advanced_Tech_ },
         { 0x004BBD20, &newtech::Choose_Tech_Application_ },
         { 0x004bbc20, &newtech::Get_Competition_Tech_Values_ },
-        // Net
         { 0x004db170, &HOTPOP::Hotseat_Screen_ },
         { 0x004db050, &HOTPOP::Draw_Hotseat_Screen_ },
         { 0x004db4e0, &HOTPOP::Init_Hotseat_Screen_ },
@@ -2808,6 +2807,30 @@ namespace hooks {
         { 0x00504a10, &MULTPLAY::Load_Choose_Net_Plyrs_Screen_ },
         { 0x00501f50, &MULTPLAY::Add_Choose_Net_Plyrs_Fields_ },
         { 0x00502930, &MULTPLAY::Draw_Choose_Net_Plyrs_Screen_ },
+        // Review
+        { 0x004c2fb0, &NETSTART::Load_Net_Screen_ },
+        { 0x0047dd00, &NETTURN::Must_Broadcast_AI_Player_Data_ },
+        { 0x00519e90, &NETMOX::Human_Surrenders_ },
+        { 0x005199F0, &NETMOX::Net_Diplomacy_With_ },
+        { 0x00519960, &NETMOX::Net_Cancel_Human_Diplomacy_Request_ },
+        { 0x005199D0, &NETMOX::Net_End_Human_Diplomacy_ },
+        { 0x00519C50, &NETMOX::Net_Human_Rejected_Diplomacy_ },
+        { 0x00519950, &NETMOX::Allowed_To_Cancel_Human_Diplomacy_ },
+        { 0x005199C0, &NETMOX::Human_Hit_Next_Turn_ },
+        { 0x005199E0, &NETMOX::Human_Diplomat_Says_Wait_ },
+        { 0x005198d0, &NETMOX::Net_May_Begin_Human_Diplomacy_ },
+        { 0x00519720, &NETMOX::Net_Cancel_AI_Diplomacy_Confirmed_ },
+        { 0x005196D0, &NETMOX::Net_Cancel_AI_Diplomacy_Request_ },
+        { 0x00519730, &NETMOX::No_AI_Diplomacy_Allowed_ },
+        { 0x00519560, &NETMOX::Net_Request_AI_Diplomacy_ },
+        { 0x004707D0, &CMBTMOV1::Tactical_Combat_Receive_Message_ },
+        { 0x00513F40, &NETMOX::Receive_Message_ },
+        { 0x00515560, &NETMOX::Mox_Send_Message_ },
+        { 0x00513e80, &NETMOX::Load_Netmox_Strings_ },
+        { 0x00519430, &NETMOX::Net_Id_To_Player_Id_ },
+        { 0x00519d50, &NETMOX::Human_Abdicates_ },
+        { 0x00518820, &NETMOX::Russ_Change_Relations_ },
+        { 0x00519c40, &NETMOX::Humans_Requesting_Diplomacy_ },
     };
 
     void Install_Hooks()
