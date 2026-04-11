@@ -2859,6 +2859,14 @@ namespace hooks {
         { 0x004c36b0, &NETSTART::Start_Net_Screen_ },
         { 0x004c35b0, &NETSTART::Russ_Net_Create_Game_ },
         { 0x004c2780, &NETSTART::Dump_Users_ },
+        { 0x005080a0, &MULTPLAY::Reload_Waiting_For_Joiners_Screen_ },
+        { 0x00501900, &MULTPLAY::Add_Waiting_For_Joiners_Field_ },
+        { 0x00503560, &MULTPLAY::Draw_Wait_For_New_Joiners_Screen_ },
+        { 0x00508040, &MULTPLAY::Reload_Sending_Data_Info_ },
+        { 0x00502150, &MULTPLAY::Add_Banner_Field_ },
+        { 0x00508080, &MULTPLAY::Reload_Wait_For_Race_Info_ },
+        { 0x00503740, &MULTPLAY::Draw_Wait_For_Race_Info_Screen_ },
+        { 0x005039a0, &MULTPLAY::Get_Player_Colors_ },
     };
 
     void Install_Hooks()

@@ -107,12 +107,7 @@ namespace MULTPLAY {
     inline const char* s_chat_msg_fmt = reinterpret_cast<const char*>(0x0055AA3C);
     inline const char* s_fmt_player_race = reinterpret_cast<const char*>(0x005569C0);
 
-    // Suggested name: MULTPLAY::Get_Player_Colors
-    inline void __cdecl Get_Player_Colors_(uint8_t color, s_colors* c1, s_colors* c2, s_colors* c3) {
-        using Fn = void(__cdecl*)(uint8_t, s_colors*, s_colors*, s_colors*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005039A0});
-        fn(color, c1, c2, c3);
-    }
+    void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary);
 
     void __cdecl Draw_Net_Next_Turn_Screen_();
 
@@ -137,37 +132,15 @@ namespace MULTPLAY {
 
     void __cdecl Draw_Generic_Net_Info_Screen_();
 
-    inline void __cdecl thunk_Draw_Generic_Net_Info_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00502F10});
-        fn();
-    }
-
     void __cdecl Reload_Join_Net_Screen_();
 
-    inline void __cdecl Reload_Waiting_For_Joiners_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005080a0});
-        fn();
-    }
+    void __cdecl Reload_Waiting_For_Joiners_Screen_();
 
-    inline void __cdecl Add_Waiting_For_Joiners_Field_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00501900});
-        fn();
-    }
+    void __cdecl Add_Waiting_For_Joiners_Field_();
 
-    inline void __cdecl Draw_Wait_For_New_Joiners_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503560});
-        fn();
-    }
+    void __cdecl Draw_Wait_For_New_Joiners_Screen_();
 
-    inline void __cdecl Reload_Sending_Data_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508040});
-        fn();
-    }
+    void __cdecl Reload_Sending_Data_Info_();
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_();
 
@@ -177,11 +150,7 @@ namespace MULTPLAY {
     inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
     inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC);
 
-    inline void __cdecl Add_Banner_Field_(int16_t player_idx, int16_t banner_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00502150});
-        fn(player_idx, banner_idx);
-    }
+    void __cdecl Add_Banner_Field_(int16_t player_idx, int16_t vertical_idx);
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_();
 
@@ -195,15 +164,7 @@ namespace MULTPLAY {
 
     int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load);
 
-    inline void __cdecl Reload_Wait_For_Race_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508080});
-        fn();
-    }
+    void __cdecl Reload_Wait_For_Race_Info_();
 
-    inline void __cdecl Draw_Wait_For_Race_Info_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503740});
-        fn();
-    }
+    void __cdecl Draw_Wait_For_Race_Info_Screen_();
 }

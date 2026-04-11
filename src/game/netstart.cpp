@@ -285,14 +285,14 @@ namespace NETSTART {
         MULTPLAY::Reload_Join_Net_Screen_();
         fields::Clear_Fields_();
         fields::Add_Hidden_Field_(0, 0, 639, 479, empty_str, 0);
-        fields::Assign_Auto_Function_(MULTPLAY::thunk_Draw_Generic_Net_Info_Screen_, 2);
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 2);
 
         memset(RACESEL::_color_flag, 0, 8);
         memset(RACESEL::_race_flag, 0, 14);
 
         while (NETMOX::_net.sync_state == 5) {
             fields::Get_Input_();
-            MULTPLAY::thunk_Draw_Generic_Net_Info_Screen_();
+            MULTPLAY::Draw_Generic_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
         }
 

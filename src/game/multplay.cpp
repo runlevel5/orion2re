@@ -2481,6 +2481,25 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
     }
 
+    void __cdecl Reload_Waiting_For_Joiners_Screen_() {
+        fields::Clear_Fields_();
+        MULTPLAY::_allow_chat_mode = 1;
+        MULTPLAY::Reload_Generic_Net_Info_(15);
+        MOX::_mp_screen->subscreen_mode = 4;
+        MOX::_mp_screen->anim_btn_begin = (struct s_animation_header*)farload::Far_Reload_(MULTPLAY::s_MULTIGM_LBX, 16, MOX::_screen_seg);
+    }
+
+    void __cdecl Add_Waiting_For_Joiners_Field_() {
+        MOX::_mp_screen->field_id_begin = fields::Add_Button_Field_(
+            MOX::_mp_screen->screen_x + 158,
+            MOX::_mp_screen->screen_y + 106,
+            s__00551100,
+            MOX::_mp_screen->anim_btn_begin,
+            s_S_005569cc,
+            40
+        );
+    }
+
     void __cdecl Add_Choose_Net_Plyrs_Fields_() {
         int16_t banner_idx = 0;
         int16_t y_offset = 0;
@@ -2533,6 +2552,146 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         } else {
             MOX::_mp_screen->field_id_begin = -1000;
         }
+    }
+
+    void __cdecl Reload_Sending_Data_Info_() {
+        uint8_t local_status;
+
+        MULTPLAY::_allow_chat_mode = 0;
+        local_status = 0;
+        fields::Clear_Fields_();
+        MULTPLAY::Reload_Generic_Net_Info_(26 /* 0x1a */);
+        MOX::_mp_screen->msg_layout_alt = 0;
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &local_status, 11 /* 0xb */);
+    }
+
+    void __cdecl Draw_Wait_For_New_Joiners_Screen_() {
+        s_colors font_colors;
+        char buffer[64];
+
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
+
+        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        animate::Draw_(0, 0, MOX::_mp_screen->pic);
+
+        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+
+        MOX::_mp_screen->anim_frame_timer++;
+        if (MOX::_mp_screen->anim_frame_timer != 0) {
+            for (int16_t i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {
+                animate::Set_Animation_Frame_(MOX::_mp_screen->bg_seg, (int)i);
+                animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->bg_seg);
+            }
+        }
+
+        if (animate::Get_Animation_Frame_Count_(MOX::_mp_screen->bg_seg) <= (int16_t)MOX::_mp_screen->anim_frame_timer) {
+            MOX::_mp_screen->anim_frame_timer = 0;
+        }
+
+        MOX::_mox_font_colors_offset = 0xF2;
+        s_colors* colors_ptr = MISC::Font_Colors2_(4, 0x9C, 0xF8);
+        _memcpy(&font_colors, colors_ptr, sizeof(s_colors));
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            // Manual loop preserved from assembly
+        }
+
+        int16_t num_users = (int16_t)netcode::Net_Get_Users_(nullptr);
+        int16_t msg_id = (num_users == 1) ? 0xF9 : 0xFA;
+        const char* format = HAROLD::H_Message_(msg_id);
+        
+        // Note: In original binary, font_colors and buffer overlap by 4 bytes on stack
+        _sprintf(buffer, format, (int)num_users);
+
+        fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
+        fonts::Print_(MOX::_mp_screen->screen_x + 120 /* 0x78 */, MOX::_mp_screen->screen_y + 71 /* 0x47 */, buffer);
+    }
+
+    void __cdecl Add_Banner_Field_(int16_t player_idx, int16_t vertical_idx) {
+        int16_t x1 = MOX::_mp_screen->screen_x + 40;
+        int16_t y1 = MOX::_mp_screen->screen_y + 65 + vertical_idx * 36;
+
+        uint8_t race = static_cast<uint8_t>(MOX::_player[player_idx].race);
+        uint8_t color = static_cast<uint8_t>(MOX::_player[player_idx].color);
+
+        int16_t lbx_entry = color + (race * 8) + 46;
+
+        s_animation_header* banner_anim = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_entry, MOX::_global_cache_seg);
+
+        int16_t width = animate::Get_Width_(banner_anim);
+        int16_t height = animate::Get_Height_(banner_anim);
+
+        int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x1 + width, y1 + height, s__00551100, 41);
+
+        MOX::_mp_screen->game_list_field_ids[player_idx] = field_id;
+    }
+
+    void __cdecl Reload_Wait_For_Race_Info_() {
+        fields::Clear_Fields_();
+        MULTPLAY::_allow_chat_mode = 1;
+        MULTPLAY::Reload_Generic_Net_Info_(0x18);
+    }
+
+    void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary) {
+        int16_t base_color_idx = player_idx * 6 + 112 /* 'p' */;
+        int16_t mode = static_cast<int16_t>(MOX::_mp_screen->subscreen_mode);
+
+        s_colors* colors1 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 4 /* 't' */));
+        *out_colors_primary = *colors1;
+
+        s_colors* colors2 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 2 /* 'r' */));
+        *out_colors_secondary = *colors2;
+
+        s_colors* colors3 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 5 /* 'u' */));
+        *out_colors_tertiary = *colors3;
+    }
+
+    void __cdecl Draw_Wait_For_Race_Info_Screen_() {
+        s_colors font_colors;
+        char msg_buffer[76];
+        int16_t connected_count = 0;
+        int16_t i;
+
+        MOX::_mox_font_colors_offset = 0xF2;
+
+        s_colors* colors_ptr = MISC::Font_Colors2_(4, 156 /* 0x9c */, 248 /* 0xf8 */);
+        _memcpy(&font_colors, colors_ptr, sizeof(s_colors));
+
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
+
+        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
+        animate::Draw_(0, 0, MOX::_mp_screen->pic);
+
+        MOX::_mp_screen->anim_frame_timer++;
+
+        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+
+        if (MOX::_mp_screen->anim_frame_timer != 0) {
+            for (i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {
+                animate::Set_Animation_Frame_(MOX::_mp_screen->bg_seg, (int32_t)i);
+                animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->bg_seg);
+            }
+        }
+
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(MOX::_mp_screen->bg_seg);
+        if (frame_count <= (int16_t)MOX::_mp_screen->anim_frame_timer) {
+            MOX::_mp_screen->anim_frame_timer = 0;
+        }
+
+        for (i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (NETMOX::_net.player_connected_flags[i] != 0) {
+                connected_count++;
+            }
+        }
+
+        int32_t total_users = netcode::Net_Get_Users_(nullptr);
+        const char* format = HAROLD::H_Message_(251 /* 0xfb */);
+        _sprintf(msg_buffer, format, (int32_t)connected_count, total_users);
+
+        fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
+        fonts::Print_(MOX::_mp_screen->screen_x + 118 /* 0x76 */, MOX::_mp_screen->screen_y + 73 /* 0x49 */, msg_buffer);
     }
 
 }
