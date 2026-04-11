@@ -2853,6 +2853,8 @@ namespace hooks {
         { 0x00516c00, &NETMOX::fread_modem_file_ },
         { 0x00515f90, &NETMOX::fseek_modem_file_ },
         { 0x00516040, &NETMOX::Open_Modem_File_ },
+        { 0x005171c0, &NETMOX::Decode_Game_Orders_ },
+        { 0x00517700, &NETMOX::Ditch_Leader_ },
     };
 
     void Install_Hooks()

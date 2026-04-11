@@ -1,63 +1,6 @@
 #pragma once
-#include <cstdint>
-#include <cstdio>
-
-struct s_network;
-struct s_player;
-struct s_net_modem_file;
 
 namespace NETMOX {
-#pragma pack(push, 1)
-    struct s_net_star_order {
-        uint32_t flags;
-        char name[15];
-        int32_t officer_index;
-        int8_t surrender_to;
-    };
-
-    struct s_packet_drop_out_info {
-        s_player player_data;
-        int8_t star_surrender_to[72];
-    };
-
-    struct s_net_pick_your_position {
-        int16_t num_players;
-        s_player players[8];
-    };
-
-    struct s_net_change_relation {
-        int16_t change;
-        int16_t attacker;
-        int16_t defender;
-        int16_t reason;
-        int16_t star_idx;
-        int16_t param6;
-    };
-
-    struct s_net_monster_update {
-        int32_t param_1;
-        int32_t param_2;
-        int32_t param_3;
-    };
-
-    struct s_netmox_chunk_count_msg {
-        int16_t chunk_count;
-    };
-
-    struct s_packet_end_ai_diplomacy {
-        int32_t target_player_id;
-        s_player target_player;
-        uint8_t surrender_to[72];
-        int32_t player_num;
-        s_player player;
-    };
-
-    struct s_packet_1B {
-        s_player player;
-        int8_t surrender_to[72];
-    };
-#pragma pack(pop)
-
     inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
 
     inline uint8_t& _sending_msg =
@@ -123,13 +66,11 @@ namespace NETMOX {
 
     void __cdecl Update_();
 
+    void __cdecl Ditch_Leader_(int32_t leader_idx);
+
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);
 
-    inline void __cdecl Decode_Game_Orders_(void* data, uint32_t len) {
-        using Fn = void(__cdecl*)(void*, uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005171C0});
-        fn(data, len);
-    }
+    void __cdecl Decode_Game_Orders_(void* data, uint32_t len);
 
     void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown);
 

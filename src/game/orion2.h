@@ -2742,6 +2742,278 @@ struct s_net_modem_file {
     uint32_t buffer_size;
 };
 
+typedef struct s_net_pack_change_relation s_net_pack_change_relation, *Ps_net_pack_change_relation;
+
+struct s_net_pack_change_relation {
+    int16_t change;
+    int16_t attacker;
+    int16_t defender;
+    int16_t reason;
+    int16_t star_idx;
+    int16_t param6;
+};
+
+typedef struct s_net_pack_drop_out_info s_net_pack_drop_out_info, *Ps_net_pack_drop_out_info;
+
+typedef struct s_player s_player, *Ps_player;
+
+typedef struct s_settler_info s_settler_info, *Ps_settler_info;
+
+typedef struct s_ship_design s_ship_design, *Ps_ship_design;
+
+typedef struct s_ship_weapons s_ship_weapons, *Ps_ship_weapons;
+
+struct s_ship_weapons {
+    short type;
+    char count;
+    char current_count;
+    char firing_arc;
+    short specials;
+    char ammo;
+};
+
+struct s_ship_design {
+    char name[16];
+    char size;
+    byte ship_type;
+    char shield_type;
+    char ftl_type;
+    char speed;
+    char computer_type;
+    char armor_type;
+    char special_device_flags[5];
+    struct s_ship_weapons ship_weapon[8];
+    sbyte picture_num;
+    char previous_owner;
+    short cost;
+    char combat_speed;
+    ushort date_of_design;
+};
+
+struct s_settler_info {
+    byte source_colony:8;
+    byte dest_planet:8;
+    byte eta:4;
+    byte player:4;
+    byte job:2;
+};
+
+struct s_player {
+    char picture;
+    char name[20];
+    char race_name[15];
+    byte eliminated;
+    char race;
+    char color;
+    char personality;
+    byte objectives;
+    short home_planet_id;
+    short network_player_id;
+    char player_done_flags;
+    short dead_field;
+    char research_breakthrough;
+    char tax_rate;
+    int bc;
+    short n_freighters;
+    short surplus_freighters;
+    short command_points;
+    short command_points_used;
+    short food_freighted;
+    short settlers_freighted;
+    struct s_settler_info settlers[25];
+    short total_pop;
+    short food_produced;
+    short industry_produced;
+    short research_produced;
+    short bc_produced;
+    short surplus_food;
+    short surplus_bc;
+    int total_maintenance;
+    short maintenance[6];
+    byte tech_fields[83];
+    byte tech_applications[212];
+    int research_accumulated;
+    char captured_orion;
+    char captured_antares;
+    char won_council_vote;
+    short player_defeated[8];
+    short captured_population;
+    int8_t last_attacker;
+    int8_t ship_design_theme;
+    char ship_special_theme;
+    char tech_apps_learned[4];
+    char tech_modifiers[17];
+    char hyper_advanced_tech[8];
+    int total_known_tech_cost;
+    char knows_racial_stats;
+    int last_tech_report_date[8];
+    char player_tech_applications[8][27];
+    char current_research_field;
+    char current_research_application;
+    char got_new_app;
+    short ship_range;
+    struct s_ship_design ship_designs[6];
+    short ships_built[6];
+    sbyte contact[8];
+    char just_established_contact;
+    char n_times_established_contact[8];
+    sbyte within_range[8];
+    char do_not_research;
+    char offensive_stagepoint;
+    char best_ftl_drive;
+    char ship_speed;
+    char officer_for_hire;
+    short n_trade_pops;
+    short current_trade_agreement_level[8];
+    short trade_agreement_goal[8];
+    short n_research_pops;
+    short current_research_agreement_level[8];
+    short research_agreement_goal[8];
+    char fighter_beam_type;
+    char fighter_bomb_type;
+    short total_research;
+    short total_ships;
+    int32_t total_ship_strength[8];
+    short total_colonies;
+    sbyte failed_to_expand;
+    char first_contact[8];
+    sbyte relations[8];
+    char base_relations[8];
+    sbyte treaty[8];
+    char trade_treaty[8];
+    char research_treaty[8];
+    short tribute_treaty[8];
+    char diplomacy_incident[8];
+    char diplomacy_message[8];
+    short diplomacy_severity[8];
+    short diplomacy_value[8];
+    short diplomacy_system[8];
+    short treaty_modifier[8];
+    short trade_modifier[8];
+    short tech_exchange_modifier[8];
+    short peace_modifier[8];
+    sbyte last_bad_diplomatic_incident[8];
+    char broken_treaties_modifier[8];
+    char last_broken_treaty[8];
+    char last_gift[8];
+    short ship_war_losses[8];
+    short colony_war_losses[8];
+    char biological_weapons_flag[8];
+    char time_since_last_attack[8];
+    char threats[8];
+    char dishonored_flag[8];
+    char peace_duration[8];
+    short last_turn_diplomacy_severity[8];
+    char last_broken_treaty_type[8];
+    sbyte last_turn_treaty[8];
+    char diplomacy_proposal_request[8];
+    char diplomacy_proposal_tribute_bribe[8];
+    char diplomacy_proposal_tech_bribe1[8];
+    char diplomacy_proposal_tech_bribe2[8];
+    short diplomacy_proposal_gold_bribe[8];
+    char diplomacy_proposal_war_player[8];
+    int diplomacy_proposal_exchange_max_value[8];
+    char diplomacy_proposal_exchange_tech[8];
+    short diplomacy_proposal_system_bribe[8];
+    short sneak_attack_planet;
+    char sneak_attack_message;
+    char sneak_attack_player;
+    char council_threat;
+    short reward_amount[8];
+    char reward_tech[8];
+    char reward_attack_player[8];
+    short food_shortage_duration;
+    char trust_worthiness[8];
+    char trust_breaker_player[8];
+    char trust_breaker_treaty[8];
+    char stop_spying_duration[8];
+    char stop_blockading_duration[8];
+    char war_buildup_duration;
+    short last_diplomacy_proposal_turn[8];
+    short diplomacy_proposal_rejection[8];
+    short opportunity_planet_num[8];
+    short opportunity_planet_value[8];
+    int opportunity_actual_attacker_ratio[8];
+    short temp_diplomacy_dummy1[8];
+    char diplomacy_demand_rejection_message[8];
+    sbyte last_diplomacy_threat_turn[8];
+    char delayed_diplomacy_orders[8];
+    int8_t traits[31];
+    int8_t evolutionary_upgrade_traits[31];
+    char picked_evolutionary_upgrade;
+    char applied_evolutionary_upgrade;
+    char fleet_history[350];
+    char tech_history[350];
+    char population_history[350];
+    char production_history[350];
+    int8_t spies[8];
+    char history_btns;
+    char ignoring;
+    char peace_flags[8];
+    int8_t cheated;
+    ushort stardate_last_offered_hero;
+    char current_zoom_level;
+    short cur_map_x;
+    short cur_map_y;
+    char council_voted_for;
+    char surrender_to;
+    short time_since_last_lucky_event;
+    char has_galactic_lore;
+    char warned_about_cheating_player;
+    char cheated_this_turn;
+    int tribute_income;
+    char filler[45];
+};
+
+struct s_net_pack_drop_out_info {
+    struct s_player player_data;
+    int8_t star_surrender_to[72];
+};
+
+typedef struct s_net_pack_end_ai_diplomacy s_net_pack_end_ai_diplomacy, *Ps_net_pack_end_ai_diplomacy;
+
+
+/* WARNING! conflicting data type names: /stdint.h/uint8_t - /orion2.h/uint8_t */
+
+struct s_net_pack_end_ai_diplomacy {
+    int32_t target_player_id;
+    struct s_player target_player;
+    uint8_t surrender_to[72];
+    int32_t player_num;
+    struct s_player player;
+};
+
+typedef struct s_net_pack_monster_update s_net_pack_monster_update, *Ps_net_pack_monster_update;
+
+struct s_net_pack_monster_update {
+    int32_t param_1;
+    int32_t param_2;
+    int32_t param_3;
+};
+
+typedef struct s_net_pack_pick_your_position s_net_pack_pick_your_position, *Ps_net_pack_pick_your_position;
+
+struct s_net_pack_pick_your_position {
+    int16_t num_players;
+    struct s_player players[8];
+};
+
+typedef struct s_net_pack_req_human_diplomacy s_net_pack_req_human_diplomacy, *Ps_net_pack_req_human_diplomacy;
+
+struct s_net_pack_req_human_diplomacy {
+    struct s_player player;
+    int8_t surrender_to[72];
+};
+
+typedef struct s_net_pack_star_order s_net_pack_star_order, *Ps_net_pack_star_order;
+
+struct s_net_pack_star_order {
+    uint32_t flags;
+    char name[15];
+    int32_t officer_index;
+    int8_t surrender_to;
+};
+
 typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {
@@ -3026,216 +3298,6 @@ struct s_planet_max_farms {
     undefined field13_0xd;
     undefined field14_0xe;
     undefined field15_0xf;
-};
-
-typedef struct s_player s_player, *Ps_player;
-
-typedef struct s_settler_info s_settler_info, *Ps_settler_info;
-
-typedef struct s_ship_design s_ship_design, *Ps_ship_design;
-
-typedef struct s_ship_weapons s_ship_weapons, *Ps_ship_weapons;
-
-struct s_ship_weapons {
-    short type;
-    char count;
-    char current_count;
-    char firing_arc;
-    short specials;
-    char ammo;
-};
-
-struct s_ship_design {
-    char name[16];
-    char size;
-    byte ship_type;
-    char shield_type;
-    char ftl_type;
-    char speed;
-    char computer_type;
-    char armor_type;
-    char special_device_flags[5];
-    struct s_ship_weapons ship_weapon[8];
-    sbyte picture_num;
-    char previous_owner;
-    short cost;
-    char combat_speed;
-    ushort date_of_design;
-};
-
-struct s_settler_info {
-    byte source_colony:8;
-    byte dest_planet:8;
-    byte eta:4;
-    byte player:4;
-    byte job:2;
-};
-
-struct s_player {
-    char picture;
-    char name[20];
-    char race_name[15];
-    byte eliminated;
-    char race;
-    char color;
-    char personality;
-    byte objectives;
-    short home_planet_id;
-    short network_player_id;
-    char player_done_flags;
-    short dead_field;
-    char research_breakthrough;
-    char tax_rate;
-    int bc;
-    short n_freighters;
-    short surplus_freighters;
-    short command_points;
-    short command_points_used;
-    short food_freighted;
-    short settlers_freighted;
-    struct s_settler_info settlers[25];
-    short total_pop;
-    short food_produced;
-    short industry_produced;
-    short research_produced;
-    short bc_produced;
-    short surplus_food;
-    short surplus_bc;
-    int total_maintenance;
-    short maintenance[6];
-    byte tech_fields[83];
-    byte tech_applications[212];
-    int research_accumulated;
-    char captured_orion;
-    char captured_antares;
-    char won_council_vote;
-    short player_defeated[8];
-    short captured_population;
-    int8_t last_attacker;
-    int8_t ship_design_theme;
-    char ship_special_theme;
-    char tech_apps_learned[4];
-    char tech_modifiers[17];
-    char hyper_advanced_tech[8];
-    int total_known_tech_cost;
-    char knows_racial_stats;
-    int last_tech_report_date[8];
-    char player_tech_applications[8][27];
-    char current_research_field;
-    char current_research_application;
-    char got_new_app;
-    short ship_range;
-    struct s_ship_design ship_designs[6];
-    short ships_built[6];
-    sbyte contact[8];
-    char just_established_contact;
-    char n_times_established_contact[8];
-    sbyte within_range[8];
-    char do_not_research;
-    char offensive_stagepoint;
-    char best_ftl_drive;
-    char ship_speed;
-    char officer_for_hire;
-    short n_trade_pops;
-    short current_trade_agreement_level[8];
-    short trade_agreement_goal[8];
-    short n_research_pops;
-    short current_research_agreement_level[8];
-    short research_agreement_goal[8];
-    char fighter_beam_type;
-    char fighter_bomb_type;
-    short total_research;
-    short total_ships;
-    int32_t total_ship_strength[8];
-    short total_colonies;
-    sbyte failed_to_expand;
-    char first_contact[8];
-    sbyte relations[8];
-    char base_relations[8];
-    sbyte treaty[8];
-    char trade_treaty[8];
-    char research_treaty[8];
-    short tribute_treaty[8];
-    char diplomacy_incident[8];
-    char diplomacy_message[8];
-    short diplomacy_severity[8];
-    short diplomacy_value[8];
-    short diplomacy_system[8];
-    short treaty_modifier[8];
-    short trade_modifier[8];
-    short tech_exchange_modifier[8];
-    short peace_modifier[8];
-    sbyte last_bad_diplomatic_incident[8];
-    char broken_treaties_modifier[8];
-    char last_broken_treaty[8];
-    char last_gift[8];
-    short ship_war_losses[8];
-    short colony_war_losses[8];
-    char biological_weapons_flag[8];
-    char time_since_last_attack[8];
-    char threats[8];
-    char dishonored_flag[8];
-    char peace_duration[8];
-    short last_turn_diplomacy_severity[8];
-    char last_broken_treaty_type[8];
-    sbyte last_turn_treaty[8];
-    char diplomacy_proposal_request[8];
-    char diplomacy_proposal_tribute_bribe[8];
-    char diplomacy_proposal_tech_bribe1[8];
-    char diplomacy_proposal_tech_bribe2[8];
-    short diplomacy_proposal_gold_bribe[8];
-    char diplomacy_proposal_war_player[8];
-    int diplomacy_proposal_exchange_max_value[8];
-    char diplomacy_proposal_exchange_tech[8];
-    short diplomacy_proposal_system_bribe[8];
-    short sneak_attack_planet;
-    char sneak_attack_message;
-    char sneak_attack_player;
-    char council_threat;
-    short reward_amount[8];
-    char reward_tech[8];
-    char reward_attack_player[8];
-    short food_shortage_duration;
-    char trust_worthiness[8];
-    char trust_breaker_player[8];
-    char trust_breaker_treaty[8];
-    char stop_spying_duration[8];
-    char stop_blockading_duration[8];
-    char war_buildup_duration;
-    short last_diplomacy_proposal_turn[8];
-    short diplomacy_proposal_rejection[8];
-    short opportunity_planet_num[8];
-    short opportunity_planet_value[8];
-    int opportunity_actual_attacker_ratio[8];
-    short temp_diplomacy_dummy1[8];
-    char diplomacy_demand_rejection_message[8];
-    sbyte last_diplomacy_threat_turn[8];
-    char delayed_diplomacy_orders[8];
-    int8_t traits[31];
-    int8_t evolutionary_upgrade_traits[31];
-    char picked_evolutionary_upgrade;
-    char applied_evolutionary_upgrade;
-    char fleet_history[350];
-    char tech_history[350];
-    char population_history[350];
-    char production_history[350];
-    int8_t spies[8];
-    char history_btns;
-    char ignoring;
-    char peace_flags[8];
-    int8_t cheated;
-    ushort stardate_last_offered_hero;
-    char current_zoom_level;
-    short cur_map_x;
-    short cur_map_y;
-    char council_voted_for;
-    char surrender_to;
-    short time_since_last_lucky_event;
-    char has_galactic_lore;
-    char warned_about_cheating_player;
-    char cheated_this_turn;
-    int tribute_income;
-    char filler[45];
 };
 
 typedef struct s_player_info s_player_info, *Ps_player_info;
