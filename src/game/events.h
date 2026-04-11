@@ -106,4 +106,10 @@ namespace EVENTS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473ED0});
         fn();
     }
+
+    inline void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00477520});
+        fn(param_1, param_2, param_3);
+    }
 }

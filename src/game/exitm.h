@@ -6,8 +6,8 @@ namespace exitm {
 
     void __cdecl Exit_With_Message(const char* str);
 
-    inline void __cdecl Exit_With_message2_(char* msg) {
-        using Fn = void(__cdecl*)(char*);
+    inline void __cdecl Exit_With_message2_(const char* msg) {
+        using Fn = void(__cdecl*)(const char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00515690});
         fn(msg);
     }

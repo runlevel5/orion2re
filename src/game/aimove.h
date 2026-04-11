@@ -1,6 +1,19 @@
 #pragma once
 
 namespace AIMOVE {
+#pragma pack(push, 1)
+    struct s_ai_stage_point {
+        uint8_t star_idx;
+        union {
+            uint32_t strength;
+            struct {
+                uint8_t pad[3];
+                uint8_t turns_left;
+            };
+        };
+    };
+#pragma pack(pop)
+
     inline s_player*& _p_ai = *reinterpret_cast<s_player**>(std::uintptr_t{0x00565E80});
     inline s_ai_colonizable_planet*& _colonizable = *reinterpret_cast<s_ai_colonizable_planet**>(std::uintptr_t{0x00565E84});
     inline int8_t (*&_nonplayer_here)[72] = *reinterpret_cast<int8_t (**)[72]>(std::uintptr_t{0x00565E88});

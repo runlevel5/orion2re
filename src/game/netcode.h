@@ -67,4 +67,10 @@ namespace netcode {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534C40});
         return fn(param_1, param_2, packet, len);
     }
+
+    inline void __cdecl Net_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534BD0});
+        fn();
+    }
 }

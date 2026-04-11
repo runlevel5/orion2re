@@ -280,6 +280,8 @@ workflows:
  
           * If you detect a structure on stack, you must put it into the header file and ensure it's correctly packed. A typical
             example would be a call to `NETMOX::Mox_Send_Message_` where third parameter accepts a primitive type or a structure.
+          * For ALL networking packets (third parameter to Mox_Send_Message_) you must generate a struct and put it into 
+            `src/game/netmox.h`. Ensure that generated struct is packed.
           * You are not allowed to rename struct fields or modify their shapes
           * You should NOT emit a new address for any structure variables, if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).

@@ -2,9 +2,9 @@
 #include <cstdint>
 
 namespace GENDRAW {
-    void __cdecl Message_Box_(char* text);
+    void __cdecl Message_Box_(const char* text);
 
-    void __cdecl Help_(char* message);
+    void __cdecl Help_(const char* message);
 
     // Suggested name: GENDRAW::Warning_Box_Prompt
     inline int16_t __cdecl Warning_Box_(const char* message) {

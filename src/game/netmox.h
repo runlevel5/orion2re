@@ -1,10 +1,30 @@
 #pragma once
 #include <cstdint>
+#include <cstdio>
 
 struct s_network;
+struct s_player;
+struct s_net_modem_file;
 
 namespace NETMOX {
-#pragma push(pack, 1)
+#pragma pack(push, 1)
+    struct s_net_star_order {
+        uint32_t flags;
+        char name[15];
+        int32_t officer_index;
+        int8_t surrender_to;
+    };
+
+    struct s_packet_drop_out_info {
+        s_player player_data;
+        int8_t star_surrender_to[72];
+    };
+
+    struct s_net_pick_your_position {
+        int16_t num_players;
+        s_player players[8];
+    };
+
     struct s_net_change_relation {
         int16_t change;
         int16_t attacker;
@@ -13,7 +33,30 @@ namespace NETMOX {
         int16_t star_idx;
         int16_t param6;
     };
-#pragma pop()
+
+    struct s_net_monster_update {
+        int32_t param_1;
+        int32_t param_2;
+        int32_t param_3;
+    };
+
+    struct s_netmox_chunk_count_msg {
+        int16_t chunk_count;
+    };
+
+    struct s_packet_end_ai_diplomacy {
+        int32_t target_player_id;
+        s_player target_player;
+        uint8_t surrender_to[72];
+        int32_t player_num;
+        s_player player;
+    };
+
+    struct s_packet_1B {
+        s_player player;
+        int8_t surrender_to[72];
+    };
+#pragma pack(pop)
 
     inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
 
@@ -31,6 +74,12 @@ namespace NETMOX {
 
     inline char*& _modem_disk_error =
         *reinterpret_cast<char**>(std::uintptr_t{0x0057237C});
+
+    inline s_net_modem_file& _secret_modem_file =
+        *reinterpret_cast<s_net_modem_file*>(std::uintptr_t{0x00572360});
+
+    inline const char* s_modem_tmp_0055ad4c =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055AD4C}); // "modem.tmp"
 
     inline char*& _sending_chunk_d_of_d_fmt =
         *reinterpret_cast<char**>(std::uintptr_t{0x00572380});
@@ -50,60 +99,29 @@ namespace NETMOX {
     inline uint8_t& _net_players_active_mask =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595300});
 
-    inline int16_t __cdecl Human_Requesting_Diplomacy_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519a00});
-        return fn();
-    }
+    int32_t __cdecl Human_Requesting_Diplomacy_();
 
-    inline void __cdecl Accept_Diplomacy_Request_(int32_t requester_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519a80});
-        fn(requester_id);
-    }
+    void __cdecl Accept_Diplomacy_Request_(int player_idx);
 
-    inline void __cdecl Refuse_Diplomacy_Request_(int32_t requester_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519b80});
-        fn(requester_id);
-    }
+    void __cdecl Refuse_Diplomacy_Request_(int player_idx);
 
-    inline void __cdecl Tell_Diplomacy_Requester_To_Wait_(int32_t requester_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519c10});
-        fn(requester_id);
-    }
+    void __cdecl Tell_Diplomacy_Requester_To_Wait_(int32_t player_idx);
 
     uint8_t Humans_Requesting_Diplomacy_();
 
     void __cdecl Russ_Change_Relations_(int32_t change, int16_t attacker, int16_t defender, int32_t reason, int16_t star_idx, int32_t param6);
 
-    inline void __cdecl Send_Drop_Out_Info_(int player_idx, int reason) {
-        using Fn = void(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00519d60});
-        fn(player_idx, reason);
-    }
+    void __cdecl Send_Drop_Out_Info_(int player_idx, uint16_t msg_type);
 
-    inline void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t p2, int16_t p3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x005187C0)(owner, p2, p3);
-    }
+    void __cdecl Russ_Event_Monster_Update_(int16_t owner, int16_t p2, int16_t p3);
 
     int32_t __cdecl Net_Id_To_Player_Id_(int32_t player_idx);
 
-    inline void __cdecl Send_Pick_Your_Position_(uint32_t net_id) {
-        using Fn = void(__cdecl*)(uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005192b0});
-        fn(net_id);
-    }
+    void __cdecl Send_Pick_Your_Position_(int16_t network_player_id);
 
     char* __cdecl Load_Netmox_Strings_(char* strings);
 
-    inline void __cdecl Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005156A0});
-        fn();
-    }
+    void __cdecl Update_();
 
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);
 
@@ -113,23 +131,37 @@ namespace NETMOX {
         fn(data, len);
     }
 
-    inline void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00516220});
-        fn(unknown);
-    }
+    void __cdecl Broadcast_Game_Data_Differential_(uint8_t unknown);
 
-    inline bool __cdecl Decode_Broadcast_Game_Data_Differential_(void* data, uint32_t size, int unknown) {
-        using Fn = bool(__cdecl*)(void*, uint32_t, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005166a0});
-        return fn(data, size, unknown);
-    }
+    int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buffer, size_t size, uint8_t flag);
 
-    inline void __cdecl Send_Game_Orders_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00516c80});
-        fn();
-    }
+    inline char* s_wb_00551178 = reinterpret_cast<char*>(std::uintptr_t{0x00551178});
+    inline char* s_rb_0055117c = reinterpret_cast<char*>(std::uintptr_t{0x0055117C});
+    inline char* s_error_decoding_broadcast_0055ad58 = reinterpret_cast<char*>(std::uintptr_t{0x0055AD58});
+    inline const char* s_p_limit_p_diff_0055ad74 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AD74}); /* "p_limit < p_diff" */
+    inline const char* s_fseek_ahead_modem_file_0055ad88 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AD88}); /* "fseek ahead modem_file" */
+    inline const char* s_fread_modem_file_0055ada0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055ADA0}); /* "fread modem_file" */
+    inline const char* s_fseek_modem_file_0055adb4 = reinterpret_cast<const char*>(std::uintptr_t{0x0055ADB4}); /* "fseek modem_file" */
+
+    s_net_modem_file* __cdecl Open_Modem_File_(char* mode, uint32_t size);
+
+    int __cdecl fseek_modem_file_(s_net_modem_file* mod_file, int offset, int origin);
+
+    size_t __cdecl fread_modem_file_(void* ptr, size_t size, size_t count, s_net_modem_file* stream);
+
+    size_t __cdecl fwrite_modem_file_(const void* buffer, size_t size, size_t count, s_net_modem_file* stream);
+
+    int __cdecl Decode_Difference_Buffer_(s_net_modem_file* modem_file, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len);
+
+    int32_t __cdecl Make_Difference_Buffer_(s_net_modem_file* file, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size);
+
+    int32_t __cdecl fgetc_modem_file_(s_net_modem_file* modem_file);
+
+    void __cdecl Close_Modem_File_(s_net_modem_file* file_handle);
+
+    void __cdecl Write_Modem_File_(s_net_modem_file* stream, const void* buffer, size_t size);
+
+    void __cdecl Send_Game_Orders_();
 
     void __cdecl Receive_Message_(int16_t net_id, uint16_t packet_id, uint32_t len, uint8_t* packet);
 
@@ -145,15 +177,9 @@ namespace NETMOX {
 
     bool __cdecl Net_Cancel_AI_Diplomacy_Confirmed_();
 
-    inline void __cdecl Net_End_AI_Diplomacy_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x005195D0})();
-    }
+    void __cdecl Net_End_AI_Diplomacy_();
 
-    inline void __cdecl Net_Request_Human_Diplomacy_(int16_t player_idx, int16_t dummy) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00519750})(player_idx, dummy);
-    }
+    void __cdecl Net_Request_Human_Diplomacy_(int16_t player_idx, int16_t dummy);
 
     int8_t __cdecl Net_May_Begin_Human_Diplomacy_();
 

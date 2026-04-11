@@ -51,6 +51,7 @@ workflows:
           * Some structure fields might be arrays - you must correctly provide an array type instead of individual fields.
           * All structures are packed.
           * Do NOT generae a new field name unless its purpose is ABSOLUTELY clear.
+          * You might also detect inline structs, such as when network packets are sent. Restore them with `s_net_` prefix.
           
           # OUTPUT:
           * You must produce C structure with explicit byte offsets in the following format:

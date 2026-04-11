@@ -131,6 +131,31 @@ namespace NETMOX {
         return _net.sync_state == 4;
     }
 
+    void __cdecl Net_End_AI_Diplomacy_() {
+        if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
+            s_packet_end_ai_diplomacy msg;
+
+            int32_t target_player_id = _net.diplomacy_target_id;
+            msg.target_player_id = target_player_id;
+            msg.target_player = MOX::_player[target_player_id];
+
+            int32_t player_num = MOX::_PLAYER_NUM;
+            msg.player_num = player_num;
+            msg.player = MOX::_player[player_num];
+
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                msg.surrender_to[i] = MOX::_star[i].surrender_to[target_player_id];
+            }
+
+            _net.diplomacy_target_id = -1;
+            _net.sync_state = 4;
+
+            if (_net.host_election_winner_id != -1) {
+                Mox_Send_Message_(_net.host_election_winner_id, 10, &msg, static_cast<int16_t>(sizeof(msg)));
+            }
+        }
+    }
+
     void __cdecl Net_Cancel_AI_Diplomacy_Request_() {
         if (MOX::_game_type >= 2 && MOX::_game_type <= 3) {
             _net.diplomacy_target_id = -1;
@@ -194,6 +219,29 @@ namespace NETMOX {
         return _net_players_active_mask;
     }
 
+    int32_t __cdecl Human_Requesting_Diplomacy_() {
+        int32_t target_player_idx = -1;
+        uint32_t ready_count = 0;
+
+        if (_net.players_ready_mask[0] != 0) {
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
+                // Check if i-th bit is set in the first byte of the mask
+                if ((_net.players_ready_mask[0] >> i) & 1) {
+                    ready_count++;
+                    // Reservoir sampling: select current index with probability 1/ready_count
+                    if (random::Random_(ready_count) == 1) {
+                        target_player_idx = i;
+                    }
+                }
+            }
+
+            // Clear the bit of the selected player index
+            _net.players_ready_mask[0] &= ~(1 << (uint8_t)target_player_idx);
+        }
+
+        return target_player_idx;
+    }
+
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len) {
         uint8_t dummy_packet;
         uint8_t skip_send;
@@ -246,5 +294,943 @@ namespace NETMOX {
 
         _sending_msg = 0;
         return result;
+    }
+
+    /**
+     * @brief Refuses a diplomacy request from another player and updates network state.
+     * @param player_idx The index of the player whose request is being refused.
+     */
+    void __cdecl Refuse_Diplomacy_Request_(int player_idx) {
+        uint8_t bit_mask = 1 << (player_idx & 0x1F);
+
+        // Mark the player as being ignored in our local player data
+        MOX::_player[MOX::_PLAYER_NUM].ignoring |= bit_mask;
+
+        uint8_t clear_mask = ~bit_mask;
+
+        // Remove player from active and ready masks in network state
+        NETMOX::_net.players_active_mask &= clear_mask;
+        NETMOX::_net.players_ready_mask[0] &= clear_mask;
+
+        // Notify the remote player that the diplomacy request was refused
+        NETMOX::Mox_Send_Message_(MOX::_player[player_idx].network_player_id, 29 /* MSG_TYPE_REFUSE_DIPLOMACY */, nullptr, 0);
+    }
+
+    void __cdecl Tell_Diplomacy_Requester_To_Wait_(int32_t player_idx) {
+        Mox_Send_Message_(MOX::_player[player_idx].network_player_id, 38, nullptr, 0);
+    }
+
+    void __cdecl Accept_Diplomacy_Request_(int player_idx) {
+        if (!((_net.players_active_mask >> player_idx) & 1)) {
+            GENDRAW::Message_Box_(_ambassador_left_before_you_arrived_fmt);
+            return;
+        }
+
+        _net.diplomacy_target_id = (int8_t)player_idx;
+        _net.diplomacy_initiator_id = (int8_t)player_idx;
+
+        uint8_t mask = ~(1 << player_idx);
+        _net.players_active_mask &= mask;
+        _net.players_ready_mask[0] &= mask;
+
+        _net.sync_state = 0x2e /* 46, '.' */;
+        _net.diplomacy_active_flag = 1;
+        _net.is_diplomacy_initiator = 0;
+
+        Mox_Send_Message_(
+            MOX::_player[player_idx].network_player_id,
+            0x1c,
+            &MOX::_player[MOX::_PLAYER_NUM],
+            0xea9 /* sizeof(s_player) */
+        );
+
+        while (_net.sync_state == 0x29 /* 41, ')' */ || _net.sync_state == 0x2e /* 46, '.' */) {
+            RUSS::Mox_Update_();
+        }
+
+        if (Net_May_Begin_Human_Diplomacy_()) {
+            DIP_SCRN::Diplomacy_Screen_(player_idx);
+            Net_End_Human_Diplomacy_();
+        } else {
+            GENDRAW::Message_Box_(_ambassador_left_before_you_arrived_fmt);
+            Net_Cancel_Human_Diplomacy_Request_();
+        }
+    }
+
+    void __cdecl Update_() {
+        sound::Sound_Update_();
+
+        // Prevent recursive updates if currently processing messages
+        if (NETMOX::_in_receive_message == 0) {
+            netcode::Net_Update_();
+        }
+    }
+
+    void __cdecl Russ_Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        if (MOX::_game_type != 2 /* GAME_TYPE_NETWORK_HOST */ &&
+            MOX::_game_type != 3 /* GAME_TYPE_NETWORK_CLIENT */) {
+            EVENTS::Event_Monster_Update_(param_1, param_2, param_3);
+            return;
+        }
+
+        s_net_monster_update msg;
+        msg.param_1 = static_cast<int32_t>(param_1);
+        msg.param_2 = static_cast<int32_t>(param_2);
+        msg.param_3 = static_cast<int32_t>(param_3);
+
+        NETMOX::Mox_Send_Message_(_net.local_net_id, 0x3c /* MSG_TYPE_MONSTER_UPDATE */, &msg, sizeof(msg));
+    }
+
+    void __cdecl Send_Pick_Your_Position_(int16_t network_player_id) {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        // Allocation size 0x754a = 30026 bytes, enough for 8 players: 2 + (8 * 3753)
+        s_net_pick_your_position* packet = (s_net_pick_your_position*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x754a);
+
+        packet->num_players = MOX::_NUM_PLAYERS;
+
+        // Copy the current player list into the network packet
+        memcpy(packet->players, MOX::_player, (uint32_t)MOX::_NUM_PLAYERS * sizeof(s_player));
+
+        uint32_t msg_size = sizeof(int16_t) + ((uint32_t)MOX::_NUM_PLAYERS * sizeof(s_player));
+        NETMOX::Mox_Send_Message_(network_player_id, 32 /* MSG_TYPE_PICK_YOUR_POSITION */, packet, (uint16_t)msg_size);
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    void __cdecl Broadcast_Game_Data_Differential_(uint8_t use_diff) {
+        allocate::Push_Block_(MOX::_screen_seg);
+        uint8_t* block = static_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xe1000));
+        uint8_t* ptr = block;
+
+        *reinterpret_cast<int16_t*>(ptr) = _net.host_election_id;
+        ptr += sizeof(int16_t);
+
+        *reinterpret_cast<uint32_t*>(ptr) = MOX::_stardate;
+        ptr += sizeof(uint32_t);
+
+        *ptr++ = MOX::_settings.random_events;
+        *ptr++ = MOX::_settings.game_difficulty;
+        *ptr++ = MOX::_settings.number_of_players;
+        *ptr++ = MOX::_settings.galaxy_size;
+        *ptr++ = MOX::_settings.galaxy_age;
+        *ptr++ = MOX::_settings.strategic_combat_flag;
+        *ptr++ = MOX::_settings.starting_civilization_level;
+        *ptr++ = MOX::_settings.xenons_exist;
+
+        MOX::Mox_Update_();
+
+        *reinterpret_cast<int32_t*>(ptr) = random::Get_Random_Seed_();
+        ptr += sizeof(int32_t);
+
+        *reinterpret_cast<uint16_t*>(ptr) = MOX::_NUM_PLAYERS;
+        ptr += sizeof(uint16_t);
+
+        uint32_t size = MOX::_NUM_PLAYERS * sizeof(s_player);
+        memcpy(ptr, MOX::_player, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = MOX::_NUM_STARS;
+        ptr += sizeof(uint16_t);
+
+        size = (MOX::_NUM_STARS + 1) * sizeof(s_star_data);
+        memcpy(ptr, MOX::_star, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = MOX::_planet_count;
+        ptr += sizeof(uint16_t);
+
+        size = MOX::_planet_count * sizeof(s_planet_data);
+        memcpy(ptr, MOX::_planet, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = MOX::_NUM_COLONIES;
+        ptr += sizeof(uint16_t);
+
+        size = 250 * sizeof(s_colony);
+        memcpy(ptr, MOX::_colony, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = MOX::_NUM_SHIPS;
+        ptr += sizeof(uint16_t);
+
+        size = 500 * sizeof(s_ship_data);
+        memcpy(ptr, MOX::_ship, size);
+        ptr += size;
+
+        MOX::Mox_Update_();
+
+        size = 71 * sizeof(s_leader_data);
+        memcpy(ptr, MOX::_leaders, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = REPORT::_n_reports;
+        ptr += sizeof(uint16_t);
+
+        size = 50 * sizeof(s_report);
+        memcpy(ptr, REPORT::_reports, size);
+        ptr += size;
+
+        size = 36 * sizeof(s_event_data);
+        memcpy(ptr, EVENTS::_event_data, size);
+        ptr += size;
+
+        size = MOX::_NUM_PLAYERS;
+        memcpy(ptr, MSG_::_first_msg, size);
+        ptr += size;
+
+        memcpy(ptr, MSG_::_max_msgs, size);
+        ptr += size;
+
+        memcpy(ptr, MSG_::_n_msgs, size);
+        ptr += size;
+
+        size = 100 * sizeof(s_MSG);
+        memcpy(ptr, MSG_::_msgs, size);
+        ptr += size;
+
+        *reinterpret_cast<uint16_t*>(ptr) = diplodef::_COUNCIL_FLAG;
+        ptr += sizeof(uint16_t);
+
+        *reinterpret_cast<uint16_t*>(ptr) = diplodef::_next_council_meeting_turn;
+        ptr += sizeof(uint16_t);
+
+        memcpy(ptr, &MOX::_antarans, sizeof(s_antaran));
+        ptr += sizeof(s_antaran);
+
+        *ptr++ = MOX::_NUM_NEBULAS;
+
+        size = MOX::_NUM_NEBULAS * sizeof(s_nebula);
+        memcpy(ptr, MOX::_nebula, size);
+        ptr += size;
+
+        *reinterpret_cast<uint32_t*>(ptr) = EVENTS::_last_event_year;
+        ptr += sizeof(uint32_t);
+
+        *reinterpret_cast<uint16_t*>(ptr) = EVENTS::_event_delay_count;
+        ptr += sizeof(uint16_t);
+
+        memcpy(ptr, MOX::_bill_savegame, 12);
+        ptr += 12;
+
+        MOX::Mox_Update_();
+
+        uint32_t block_size = ptr - block;
+        uint8_t* send_ptr;
+        int32_t send_size;
+        s_net_modem_file* file;
+
+        if (use_diff != 0) {
+            file = Open_Modem_File_(s_wb_00551178, block_size);
+            Write_Modem_File_(file, block, block_size);
+            send_ptr = block;
+            send_size = block_size;
+        }
+        else {
+            file = Open_Modem_File_(s_rb_0055117c, 0);
+            send_ptr = block + block_size;
+            send_size = Make_Difference_Buffer_(file, block, block_size, send_ptr, 0xe1000 - block_size);
+            Close_Modem_File_(file);
+
+            file = Open_Modem_File_(s_wb_00551178, block_size);
+            Write_Modem_File_(file, block, block_size);
+        }
+
+        MOX::Mox_Update_();
+        Close_Modem_File_(file);
+
+        s_netmox_chunk_count_msg pkt;
+        pkt.chunk_count = static_cast<int16_t>((send_size + 0x77ff) / 0x7800);
+        Mox_Send_Message_(0x7ffe, 2, &pkt, sizeof(pkt));
+
+        if (send_size > 0) {
+            int16_t chunk_idx = 0;
+            uint8_t* current_ptr = send_ptr;
+
+            while (current_ptr < send_ptr + send_size) {
+                uint32_t remaining = (send_ptr + send_size) - current_ptr;
+                uint32_t chunk_size = remaining > 0x7800 ? 0x7800 : remaining;
+                chunk_idx++;
+
+                _sprintf(MOX::_temp_string, _sending_chunk_d_of_d_fmt, chunk_idx, pkt.chunk_count);
+
+                do {
+                    video::Set_Page_Off_();
+                    fields::Invoke_Auto_Function_();
+                    MOX::Mox_Sync_Update_();
+                    MOX::Mox_Update_();
+                } while (netcode::Net_Is_Sending_() != 0);
+
+                Mox_Send_Message_(0x7ffe, 3, current_ptr, static_cast<uint16_t>(chunk_size));
+                current_ptr += 0x7800;
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    int8_t __cdecl Decode_Broadcast_Game_Data_Differential_(void* buf, size_t size, uint8_t flag) {
+        uint8_t* buffer = (uint8_t*)buf;
+        uint8_t* ptr = (uint8_t*)buf;
+
+        if (flag == 0) {
+            ptr = buffer + size;
+            s_net_modem_file* file_handle = NETMOX::Open_Modem_File_(NETMOX::s_rb_0055117c, 0);
+            size = NETMOX::Decode_Difference_Buffer_(file_handle, ptr, 0xE1000 - size, buffer, size);
+            NETMOX::Close_Modem_File_(file_handle);
+
+            if (size == 0) {
+                exitm::Exit_With_message2_(NETMOX::s_error_decoding_broadcast_0055ad58);
+                return 0;
+            }
+        }
+
+        s_net_modem_file* file_handle = NETMOX::Open_Modem_File_(NETMOX::s_wb_00551178, size);
+        NETMOX::Write_Modem_File_(file_handle, ptr, size);
+        NETMOX::Close_Modem_File_(file_handle);
+
+        RUSS::Mox_Update_();
+
+        _net.host_election_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        MOX::_stardate = *reinterpret_cast<uint32_t*>(ptr);
+        ptr += sizeof(uint32_t);
+
+        MOX::_settings.random_events = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.game_difficulty = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.number_of_players = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.galaxy_size = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.galaxy_age = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.strategic_combat_flag = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.starting_civilization_level = *ptr;
+        ptr += sizeof(uint8_t);
+
+        MOX::_settings.xenons_exist = *ptr;
+        ptr += sizeof(uint8_t);
+
+        random::Set_Random_Seed_(*reinterpret_cast<uint32_t*>(ptr));
+        ptr += sizeof(uint32_t);
+
+        RUSS::Mox_Update_();
+
+        MOX::_NUM_PLAYERS = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_player, ptr, MOX::_NUM_PLAYERS * sizeof(s_player));
+        ptr += MOX::_NUM_PLAYERS * sizeof(s_player);
+
+        _net.num_connected_players = 0;
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+            if (MOX::_player[i].eliminated != 0) {
+                MOX::_player[i].network_player_id = -1;
+                MOX::_player[i].objectives = 0;
+            } else {
+                if (MOX::_player[i].objectives == 'd') {
+                    _net.num_connected_players++;
+                }
+            }
+        }
+
+        MOX::_NUM_STARS = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_star, ptr, (MOX::_NUM_STARS + 1) * sizeof(s_star_data));
+        ptr += (MOX::_NUM_STARS + 1) * sizeof(s_star_data);
+
+        RUSS::Mox_Update_();
+
+        MOX::_planet_count = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_planet, ptr, MOX::_planet_count * sizeof(s_planet_data));
+        ptr += MOX::_planet_count * sizeof(s_planet_data);
+
+        MOX::_NUM_COLONIES = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_colony, ptr, 250 * sizeof(s_colony));
+        ptr += 250 * sizeof(s_colony);
+
+        MOX::_NUM_SHIPS = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_ship, ptr, 500 * sizeof(s_ship_data));
+        ptr += 500 * sizeof(s_ship_data);
+
+        memcpy(MOX::_leaders, ptr, 67 * sizeof(s_leader_data));
+        ptr += 67 * sizeof(s_leader_data);
+
+        REPORT::_n_reports = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(REPORT::_reports, ptr, 50 * sizeof(s_report));
+        ptr += 50 * sizeof(s_report);
+
+        REPORT::Client_Initialize_Reports_();
+
+        memcpy(EVENTS::_event_data, ptr, 36 * sizeof(s_event_data));
+        ptr += 36 * sizeof(s_event_data);
+
+        memcpy(MSG_::_first_msg, ptr, MOX::_NUM_PLAYERS);
+        ptr += MOX::_NUM_PLAYERS;
+
+        memcpy(MSG_::_max_msgs, ptr, MOX::_NUM_PLAYERS);
+        ptr += MOX::_NUM_PLAYERS;
+
+        memcpy(MSG_::_n_msgs, ptr, MOX::_NUM_PLAYERS);
+        ptr += MOX::_NUM_PLAYERS;
+
+        memcpy(MSG_::_msgs, ptr, 100 * sizeof(s_MSG));
+        ptr += 100 * sizeof(s_MSG);
+
+        RUSS::Mox_Update_();
+
+        diplodef::_COUNCIL_FLAG = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        diplodef::_next_council_meeting_turn = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(&MOX::_antarans, ptr, sizeof(s_antaran));
+        ptr += sizeof(s_antaran);
+
+        MOX::_NUM_NEBULAS = *ptr;
+        ptr += sizeof(uint8_t);
+
+        memcpy(MOX::_nebula, ptr, MOX::_NUM_NEBULAS * sizeof(s_nebula));
+        ptr += MOX::_NUM_NEBULAS * sizeof(s_nebula);
+
+        EVENTS::_last_event_year = *reinterpret_cast<uint32_t*>(ptr);
+        ptr += sizeof(uint32_t);
+
+        EVENTS::_event_delay_count = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        memcpy(MOX::_bill_savegame, ptr, 12);
+
+        RUSS::Mox_Update_();
+
+        return 1;
+    }
+
+    void __cdecl Send_Game_Orders_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+        uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 350000));
+
+        uint8_t* out = packet;
+        *reinterpret_cast<uint32_t*>(out) = MOX::_stardate;
+        out += sizeof(uint32_t);
+
+        *out++ = static_cast<uint8_t>(MOX::_PLAYER_NUM);
+
+        memcpy(out, &MOX::_player[MOX::_PLAYER_NUM], sizeof(s_player));
+        out += sizeof(s_player);
+
+        RUSS::Mox_Update_();
+
+        s_net_star_order star_orders[72];
+        memset(star_orders, 0, sizeof(star_orders));
+
+        if (MOX::_NUM_STARS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                s_net_star_order* order = &star_orders[i];
+
+                order->flags =
+                    (((MOX::_star[i].ignore_colony_ships >> MOX::_PLAYER_NUM) & 1) << 0) |
+                    (((MOX::_star[i].ignore_combat_ships >> MOX::_PLAYER_NUM) & 1) << 1) |
+                    (((MOX::_star[i].has_colony >> MOX::_PLAYER_NUM) & 1) << 2) |
+                    (((MOX::_star[i].has_warp_field_interdictor >> MOX::_PLAYER_NUM) & 1) << 3) |
+                    (((MOX::_star[i].has_tachyon >> MOX::_PLAYER_NUM) & 1) << 4) |
+                    (((MOX::_star[i].has_subspace >> MOX::_PLAYER_NUM) & 1) << 5) |
+                    (((MOX::_star[i].has_stargate >> MOX::_PLAYER_NUM) & 1) << 6) |
+                    (((MOX::_star[i].has_jumpgate >> MOX::_PLAYER_NUM) & 1) << 7) |
+                    (((MOX::_star[i].has_artemis_net >> MOX::_PLAYER_NUM) & 1) << 8) |
+                    (((MOX::_star[i].has_dimensional_portal >> MOX::_PLAYER_NUM) & 1) << 9);
+
+                order->officer_index = MOX::_star[i].officer_index[MOX::_PLAYER_NUM];
+
+                if (MOX::_star[i].colonize_player == MOX::_PLAYER_NUM) {
+                    strcpy(order->name, MOX::_star[i].name);
+                }
+
+                order->surrender_to = MOX::_star[i].surrender_to[MOX::_PLAYER_NUM];
+            }
+        }
+
+        memcpy(out, star_orders, MOX::_NUM_STARS * sizeof(s_net_star_order));
+        out += MOX::_NUM_STARS * sizeof(s_net_star_order);
+
+        RUSS::Mox_Update_();
+
+        *reinterpret_cast<int16_t*>(out) = (int16_t)MOX::_NUM_COLONIES;
+        out += sizeof(int16_t);
+
+        if (MOX::_NUM_COLONIES > 0) {
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+                if (MOX::_colony[i].owner == MOX::_PLAYER_NUM) {
+                    *reinterpret_cast<int16_t*>(out) = i;
+                    out += sizeof(int16_t);
+                    memcpy(out, &MOX::_colony[i], sizeof(s_colony));
+                    out += sizeof(s_colony);
+                }
+            }
+        }
+
+        *reinterpret_cast<int16_t*>(out) = -1;
+        out += sizeof(int16_t);
+
+        int16_t* p_num_ships = reinterpret_cast<int16_t*>(out);
+        out += sizeof(int16_t);
+
+        RUSS::Mox_Update_();
+
+        *p_num_ships = (int16_t)MOX::_NUM_SHIPS;
+
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+                if (MOX::_ship[i].owner == MOX::_PLAYER_NUM && MOX::_ship[i].status != 5) {
+                    *reinterpret_cast<int16_t*>(out) = i;
+                    out += sizeof(int16_t);
+                    memcpy(out, &MOX::_ship[i], sizeof(s_ship_data));
+                    out += sizeof(s_ship_data);
+                }
+            }
+        }
+
+        *reinterpret_cast<int16_t*>(out) = -1;
+        out += sizeof(int16_t);
+
+        RUSS::Mox_Update_();
+
+        for (int16_t i = 0; i < 67 /* 0x43 */; ++i) {
+            if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM) {
+                *reinterpret_cast<int16_t*>(out) = i;
+                out += sizeof(int16_t);
+                memcpy(out, &MOX::_leaders[i], sizeof(s_leader_data));
+                out += sizeof(s_leader_data);
+            }
+        }
+
+        *reinterpret_cast<int16_t*>(out) = -1;
+        out += sizeof(int16_t);
+
+        RUSS::Mox_Update_();
+
+        uint16_t num_chunks = static_cast<uint16_t>((out - packet + 0x77FF) / 0x7800);
+
+        NETMOX::Mox_Send_Message_(_net.local_net_id, 0x0D, &num_chunks, sizeof(uint16_t));
+
+        uint8_t* chunk_ptr = packet;
+        int chunk_idx = 0;
+
+        while (chunk_ptr < out) {
+            RUSS::Mox_Update_();
+
+            int32_t chunk_size = out - chunk_ptr;
+            if (chunk_size > 0x7800) {
+                chunk_size = 0x7800;
+            }
+
+            if (num_chunks - chunk_idx == 1) {
+                _net.sync_state = 0x0E;
+                _net.combat_attacker_id = -1;
+            }
+
+            chunk_idx++;
+
+            _sprintf(MOX::_temp_string, NETMOX::_sending_chunk_d_of_d_fmt, chunk_idx, num_chunks);
+
+            do {
+                MULTPLAY::Chat_Box_Input_Loop_();
+            } while (netcode::Net_Is_Sending_() != 0);
+
+            NETMOX::Mox_Send_Message_(_net.local_net_id, 0x0E, chunk_ptr, (uint16_t)chunk_size);
+            chunk_ptr += 0x7800;
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    void __cdecl Send_Drop_Out_Info_(int player_idx, uint16_t msg_type) {
+        uint8_t any_processed;
+        uint8_t player_process_flags[8];
+        s_packet_drop_out_info packet;
+
+        MOX::_player[player_idx].network_player_id = -1;
+        RUSS::Make_Player_Into_AI_(player_idx);
+
+        memcpy(&packet.player_data, &MOX::_player[player_idx], sizeof(s_player));
+
+        if (MOX::_NUM_STARS > 0) {
+            for (int i = 0; i < MOX::_NUM_STARS; ++i) {
+                packet.star_surrender_to[i] = MOX::_star[i].surrender_to[player_idx];
+            }
+        }
+
+        memset(player_process_flags, 1, MOX::_NUM_PLAYERS);
+        player_process_flags[MOX::_PLAYER_NUM] = 0;
+
+        do {
+            any_processed = 0;
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                    if (player_process_flags[i] != 0) {
+                        any_processed = 1;
+                        if (MOX::_player[i].network_player_id == -1) {
+                            player_process_flags[i] = 0;
+                        } else if (_net.player_race_selected_flags[i] != 0) {
+                            Mox_Send_Message_(MOX::_player[i].network_player_id, msg_type, &packet, sizeof(s_packet_drop_out_info));
+                            do {
+                                RUSS::Mox_Update_();
+                            } while (netcode::Net_Is_Sending_() != 0);
+                            player_process_flags[i] = 0;
+                        }
+                    }
+                }
+            }
+        } while (any_processed != 0);
+    }
+
+    int __cdecl Decode_Difference_Buffer_(s_net_modem_file* modem_file, uint8_t* out_buffer, int max_out_len, uint8_t* diff_buffer, int diff_len) {
+        uint8_t* out_ptr = out_buffer;
+        uint8_t* diff_end = diff_buffer + diff_len;
+
+        if (fseek_modem_file_(modem_file, 0, 0) != 0) {
+            exitm::Exit_With_message2_(s_fseek_modem_file_0055adb4);
+            return 0;
+        }
+
+        while (true) {
+            if (diff_buffer >= diff_end) {
+                return static_cast<int>(out_ptr - out_buffer);
+            }
+
+            uint8_t b = *diff_buffer;
+            if (b <= 0xF4) {
+                uint32_t size = b;
+                if (fread_modem_file_(out_ptr, size, 1, modem_file) != 1) {
+                    exitm::Exit_With_message2_(s_fread_modem_file_0055ada0);
+                    return 0;
+                }
+                diff_buffer++;
+                out_ptr += size;
+                RUSS::Mox_Update_();
+            } else if (b == 0xFF) {
+                diff_buffer++;
+                if (diff_buffer > diff_end || out_buffer + max_out_len < out_ptr) {
+                    exitm::Exit_With_message2_(s_p_limit_p_diff_0055ad74);
+                    return 0;
+                }
+            } else {
+                uint32_t skip = b - 0xF5;
+                if (fseek_modem_file_(modem_file, skip, 1) != 0) {
+                    exitm::Exit_With_message2_(s_fseek_ahead_modem_file_0055ad88);
+                    return 0;
+                }
+                memcpy(out_ptr, diff_buffer + 1, skip);
+                diff_buffer += skip + 1;
+                out_ptr += skip;
+                RUSS::Mox_Update_();
+            }
+        }
+    }
+
+    size_t __cdecl fread_modem_file_(void* ptr, size_t size, size_t count, s_net_modem_file* modem_file) {
+        if (modem_file->mode == 1) {
+            return _fread(ptr, size, count, modem_file->file);
+        }
+
+        if (modem_file->mode != 2) {
+            return 0;
+        }
+
+        size_t total_size = count * size;
+        memcpy(ptr, modem_file->current_ptr, total_size);
+
+        modem_file->current_ptr += total_size;
+
+        if (modem_file->buffer + modem_file->buffer_size < modem_file->current_ptr) {
+            return 0;
+        }
+
+        return count;
+    }
+
+    size_t __cdecl fwrite_modem_file_(const void* ptr, size_t size, size_t count, s_net_modem_file* stream) {
+        if (stream->mode == 1) {
+            return fwrite(ptr, size, count, stream->file);
+        }
+
+        if (stream->mode == 2) {
+            size_t total_size = count * size;
+
+            // BUG: potential overflow if total_size > (buffer + buffer_size - current_ptr)
+            memcpy(stream->current_ptr, ptr, total_size);
+
+            uint8_t* new_ptr = stream->current_ptr + total_size;
+            stream->current_ptr = new_ptr;
+
+            if (stream->buffer + stream->buffer_size < new_ptr) {
+                return 0;
+            }
+
+            return count;
+        }
+
+        return 0;
+    }
+
+    int32_t __cdecl fgetc_modem_file_(s_net_modem_file* modem_file) {
+        if (modem_file->mode == 1) {
+            return fgetc(modem_file->file);
+        }
+
+        if (modem_file->mode == 2) {
+            if (modem_file->buffer + modem_file->buffer_size == modem_file->current_ptr) {
+                return -1;
+            }
+            uint8_t val = *modem_file->current_ptr;
+            modem_file->current_ptr++;
+            return val;
+        }
+
+        return 0;
+    }
+
+    int32_t __cdecl Make_Difference_Buffer_(s_net_modem_file* file, uint8_t* buffer, int32_t buffer_size, uint8_t* diff_buffer, int32_t diff_buffer_max_size) {
+        uint32_t count = 0;
+        uint32_t state = 0;
+        uint8_t* ptr = buffer;
+        uint8_t* out_ptr = diff_buffer;
+
+        if (NETMOX::fseek_modem_file_(file, 0, 0) != 0) {
+            exitm::Exit_With_message2_(NETMOX::_modem_disk_error);
+        }
+
+        do {
+            int c = NETMOX::fgetc_modem_file_(file);
+            if (c == -1 && ptr != buffer + buffer_size) {
+                exitm::Exit_With_message2_(NETMOX::_modem_disk_error);
+            }
+
+            switch (state) {
+            case 0:
+                if (c == -1) {
+                    state = 4;
+                } else if (*ptr == c) {
+                    state = 1;
+                    count = 1;
+                } else {
+                    state = 2;
+                    count = 1;
+                }
+                break;
+
+            case 1:
+                if (*ptr == c) {
+                    count++;
+                    if (count == 0xF4) {
+                        *out_ptr++ = 0xF4;
+                        state = 0;
+                    }
+                } else {
+                    *out_ptr++ = static_cast<uint8_t>(count);
+                    if (c == -1) {
+                        state = 4;
+                    } else {
+                        state = 2;
+                        count = 1;
+                    }
+                }
+                break;
+
+            case 2:
+                if (c == -1) {
+                    *out_ptr++ = static_cast<uint8_t>(count - 11);
+                    memcpy(out_ptr, ptr - count, count);
+                    out_ptr += count;
+                    state = 4;
+                } else {
+                    count++;
+                    if (count == 9) {
+                        *out_ptr++ = 0xFE;
+                        memcpy(out_ptr, ptr - 8, 9);
+                        out_ptr += 9;
+                        state = 0;
+                    } else if (*ptr == c) {
+                        state = 3;
+                    }
+                }
+                break;
+
+            case 3:
+                if (c == -1) {
+                    *out_ptr++ = static_cast<uint8_t>(count - 11);
+                    memcpy(out_ptr, ptr - count, count);
+                    out_ptr += count;
+                    state = 4;
+                } else if (*ptr == c) {
+                    *out_ptr++ = static_cast<uint8_t>(count - 12);
+                    memcpy(out_ptr, ptr - count, count - 1);
+                    out_ptr += count - 1;
+                    count = 2;
+                    state = 1;
+                } else {
+                    count++;
+                    if (count == 9) {
+                        *out_ptr++ = 0xFE;
+                        memcpy(out_ptr, ptr - 8, 9);
+                        out_ptr += 9;
+                        state = 0;
+                    } else {
+                        state = 2;
+                    }
+                }
+                break;
+            }
+
+            if (out_ptr >= diff_buffer + diff_buffer_max_size) {
+                exitm::Exit_With_message2_(NETMOX::_modem_diff_buffer_error);
+            }
+
+            ptr++;
+
+            if (((ptr - buffer) % 256) == 0) {
+                RUSS::Mox_Update_();
+            }
+        } while (state != 4);
+
+        *out_ptr = 0xFF;
+        return static_cast<int32_t>(out_ptr + 1 - diff_buffer);
+    }
+
+    void __cdecl Write_Modem_File_(s_net_modem_file* stream, const void* buffer, size_t size) {
+        RUSS::Mox_Update_();
+
+        if (fseek_modem_file_(stream, 0, 0) != 0) {
+            exitm::Exit_With_message2_(_modem_disk_error);
+        }
+
+        RUSS::Mox_Update_();
+
+        if (fwrite_modem_file_(buffer, size, 1, stream) != 1) {
+            exitm::Exit_With_message2_(_modem_disk_error);
+        }
+
+        RUSS::Mox_Update_();
+    }
+
+    void __cdecl Net_Request_Human_Diplomacy_(int16_t target_player_id, int16_t dummy) {
+        _net.diplomacy_target_id = static_cast<int8_t>(target_player_id);
+
+        if ((_net.players_active_mask & (1 << target_player_id)) != 0) {
+            _net.sync_state = 0x2E; /* '.' */
+            _net.diplomacy_active_flag = 1;
+            _net.diplomacy_initiator_id = static_cast<int8_t>(target_player_id);
+
+            _net.players_active_mask &= static_cast<uint8_t>(~(1 << target_player_id));
+            _net.players_ready_mask[0] &= static_cast<uint8_t>(~(1 << target_player_id));
+            _net.is_diplomacy_initiator = 0;
+
+            Mox_Send_Message_(
+                MOX::_player[target_player_id].network_player_id,
+                0x1C,
+                &MOX::_player[MOX::_PLAYER_NUM],
+                0xEA9 /* sizeof(s_player) */
+            );
+        } else {
+            _net.sync_state = 0x29; /* ')' */
+            _net.diplomacy_active_flag = 0;
+
+            if (Human_Hit_Next_Turn_(target_player_id) == 0) {
+                s_packet_1B packet;
+
+                packet.player = MOX::_player[MOX::_PLAYER_NUM];
+
+                for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                    packet.surrender_to[i] = MOX::_star[i].surrender_to[MOX::_PLAYER_NUM];
+                }
+
+                Mox_Send_Message_(
+                    MOX::_player[target_player_id].network_player_id,
+                    0x1B,
+                    &packet,
+                    0xEF1 /* sizeof(s_packet_1B) */
+                );
+            }
+        }
+    }
+
+    void __cdecl Close_Modem_File_(s_net_modem_file* file_handle) {
+        RUSS::Mox_Update_();
+
+        if (file_handle->mode == 1) {
+            if (fclose(file_handle->file) != 0) {
+                exitm::Exit_With_message2_(_modem_disk_error);
+            }
+            file_handle->file = nullptr;
+            file_handle->mode = 0;
+        }
+    }
+
+    int __cdecl fseek_modem_file_(s_net_modem_file* mod_file, int offset, int origin) {
+        if (mod_file->mode == 1) {
+            return fseek(mod_file->file, offset, origin);
+        }
+
+        if (mod_file->mode == 2) {
+            if (origin == 0 /* SEEK_SET */) {
+                mod_file->current_ptr = mod_file->buffer + offset;
+                return 0;
+            }
+            if (origin == 1 /* SEEK_CUR */) {
+                mod_file->current_ptr = mod_file->current_ptr + offset;
+                return 0;
+            }
+        }
+
+        return 0;
+    }
+
+    s_net_modem_file* __cdecl Open_Modem_File_(char* mode_str, uint32_t size) {
+        RUSS::Mox_Update_();
+
+        if (_secret_modem_file.mode == 2 && size != 0 && size != _secret_modem_file.buffer_size) {
+            _free(_secret_modem_file.buffer);
+            _secret_modem_file.mode = 0;
+        }
+
+        if (_secret_modem_file.mode == 0) {
+            _secret_modem_file.buffer = static_cast<uint8_t*>(_malloc(size));
+            if (_secret_modem_file.buffer != nullptr) {
+                _secret_modem_file.buffer_size = size;
+                _secret_modem_file.current_ptr = _secret_modem_file.buffer;
+                _secret_modem_file.mode = 2;
+                return &_secret_modem_file;
+            }
+
+            _secret_modem_file.file = _fopen(s_modem_tmp_0055ad4c, mode_str);
+            if (_secret_modem_file.file == nullptr) {
+                exitm::Exit_With_message2_(_modem_disk_error);
+                return &_secret_modem_file;
+            }
+
+            _secret_modem_file.mode = 1;
+        }
+
+        return &_secret_modem_file;
     }
 }

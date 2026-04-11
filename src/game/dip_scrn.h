@@ -115,7 +115,7 @@ namespace DIP_SCRN {
 
     void __cdecl Set_Opportunity_Attacks_();
 
-    void __cdecl Diplomacy_Screen_(uint8_t current_ambassador);
+    void __cdecl Diplomacy_Screen_(int player_idx);
 
     void __cdecl Diplomacy_Fade_In_();
 

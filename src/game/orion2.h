@@ -2719,6 +2719,29 @@ struct s_net_combat_message {
     short f14;
 };
 
+typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
+
+
+
+struct _iobuf_copy {
+    char *_ptr;
+    int _cnt;
+    char *_base;
+    int _flag;
+    int _file;
+    int _charbuf;
+    int _bufsiz;
+    char *_tmpfname;
+};
+
+struct s_net_modem_file {
+    uint32_t mode;
+    FILE *file;
+    uint8_t *buffer;
+    uint8_t *current_ptr;
+    uint32_t buffer_size;
+};
+
 typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {

@@ -1243,7 +1243,7 @@ namespace DIP_SCRN {
         fields::Set_Input_Delay_(1);
     }
 
-    void __cdecl Diplomacy_Screen_(uint8_t current_ambassador) {
+    void __cdecl Diplomacy_Screen_(int player_idx) {
         _diplomacy_current_music = -1;
         _synch_up_established_flag = 0;
 
@@ -1257,7 +1257,7 @@ namespace DIP_SCRN {
 
         _old_response_message = -1;
         _net_diplomacy_esc_pressed = 0;
-        _current_ambassador = current_ambassador;
+        _current_ambassador = (uint8_t)player_idx;
 
         ERIC::Set_Fade_Percent_(0);
         Set_Fade_Speed_Perc(10);

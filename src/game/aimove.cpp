@@ -682,19 +682,6 @@ namespace AIMOVE {
         return total_attacks;
     }
 
-#pragma pack(push, 1)
-    struct StagePoint {
-        uint8_t star_idx;
-        union {
-            uint32_t strength;
-            struct {
-                uint8_t pad[3];
-                uint8_t turns_left;
-            };
-        };
-    };
-#pragma pack(pop)
-
     void __cdecl Move_To_Stage_Points_() {
         uint8_t local_5d7;
         if (EVENTS::Event_Check_Warp_Beast_() != 0 && _p_ai->traits[26] == 0) {
@@ -707,7 +694,7 @@ namespace AIMOVE {
         int16_t num_stage_points = 0;
         int16_t num_ships = 0;
         int8_t stage_point_map[72];
-        StagePoint stage_points[72];
+        s_ai_stage_point stage_points[72];
         int16_t ship_indices[500];
 
         for (int i = 0; i < 72; ++i) {
