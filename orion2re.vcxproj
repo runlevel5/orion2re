@@ -330,6 +330,7 @@
     <ClInclude Include="src\game\shipmove.h" />
     <ClInclude Include="src\game\ships.h" />
     <ClInclude Include="src\game\shipstak.h" />
+    <ClInclude Include="src\game\simmodem.h" />
     <ClInclude Include="src\game\smack.h" />
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\special.h" />
@@ -350,6 +351,7 @@
     <ClInclude Include="src\game\textbox.h" />
     <ClInclude Include="src\game\timer.h" />
     <ClInclude Include="src\game\trade.h" />
+    <ClInclude Include="src\game\transprt.h" />
     <ClInclude Include="src\game\turnsum.h" />
     <ClInclude Include="src\game\types.h" />
     <ClInclude Include="src\game\video.h" />

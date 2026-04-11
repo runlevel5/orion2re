@@ -54,6 +54,7 @@ namespace MOX {
     inline short& _fltscrn_support_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x0059776C});
     inline short& _fltscrn_combat_button_status = *reinterpret_cast<short*>(std::uintptr_t{0x00597464});
     inline s_mp_screen*& _mp_screen = *reinterpret_cast<s_mp_screen**>(std::uintptr_t{0x0059C42C});
+    inline s_network& _net = *reinterpret_cast<s_network*>(std::uintptr_t{0x00595170});
     inline int8_t (&_player_mode)[15] =
         *reinterpret_cast<int8_t(*)[15]>(std::uintptr_t{0x0059D650});
     inline int16_t& _start_of_turn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a6e10});

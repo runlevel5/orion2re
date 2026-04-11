@@ -3014,6 +3014,23 @@ struct s_net_pack_star_order {
     int8_t surrender_to;
 };
 
+typedef struct s_net_pack_start_game s_net_pack_start_game, *Ps_net_pack_start_game;
+
+struct s_net_pack_start_game {
+    int32_t net_host_id;
+    int16_t num_connected_players;
+    uint32_t net_ids[8];
+    uint8_t random_events;
+    uint8_t game_difficulty;
+    uint8_t number_of_players;
+    uint8_t galaxy_size;
+    uint8_t galaxy_age;
+    uint8_t strategic_combat_flag;
+    uint8_t starting_civilization_level;
+    uint8_t xenons_exist;
+    char version_string[50];
+};
+
 typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {

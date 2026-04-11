@@ -2855,6 +2855,10 @@ namespace hooks {
         { 0x00516040, &NETMOX::Open_Modem_File_ },
         { 0x005171c0, &NETMOX::Decode_Game_Orders_ },
         { 0x00517700, &NETMOX::Ditch_Leader_ },
+        { 0x004C3600, &NETSTART::Do_Dial_ },
+        { 0x004c36b0, &NETSTART::Start_Net_Screen_ },
+        { 0x004c35b0, &NETSTART::Russ_Net_Create_Game_ },
+        { 0x004c2780, &NETSTART::Dump_Users_ },
     };
 
     void Install_Hooks()

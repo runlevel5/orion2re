@@ -164,6 +164,38 @@ namespace NETSTART {
         return 0;
     }
 
+    bool __cdecl Do_Dial_(char* phone_number) {
+        clock_t start_time = _clock();
+        bool dial_success = simmodem::Modem_Dial_Number_(phone_number);
+
+        if (dial_success) {
+            char modem_error[80];
+            simmodem::Get_Modem_Error_(modem_error);
+
+            if (strlen(modem_error) > 1) {
+                GENDRAW::Message_Box_(modem_error);
+                netcode::Net_Uninit_();
+                return false;
+            }
+
+            while (!simmodem::Modem_Connected_()) {
+                if (_clock() - start_time >= 90000) {
+                    break;
+                }
+                RUSS::Mox_Update_();
+            }
+
+            dial_success = simmodem::Modem_Connected_() != 0;
+            if (dial_success) {
+                return true;
+            }
+        }
+
+        GENDRAW::Message_Box_(_dialing_failed_error);
+        netcode::Net_Uninit_();
+        return false;
+    }
+
     char* __cdecl Load_Netstart_Strings_(char* buffer) {
         char* current = buffer;
 
@@ -291,6 +323,278 @@ namespace NETSTART {
         }
 
         return result;
+    }
+
+    uint8_t __cdecl Start_Net_Screen_() {
+        NETMOX::_net.sync_state = 1;
+        NETTURN::Net_Init_Host_Election_();
+        MULTPLAY::Reload_Initializing_Net_Info_();
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 1);
+
+        uint8_t unused;
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &unused, 11);
+        MULTPLAY::Draw_Generic_Net_Info_Screen_();
+        RUSS::Mox_Sync_Update_();
+
+        auto receive_msg_ptr = reinterpret_cast<void*>(std::uintptr_t{0x00513f40});
+        if (WINNET::Init(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(receive_msg_ptr), &NETMOX::_net) == 0) {
+            NETMOX::_net.sync_state = 0;
+            GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
+            MOX::_current_screen = 15;
+            return 0;
+        }
+
+        if (NETMOX::_net.mode == 0) {
+            if (Russ_Net_Create_Game_(NETSTART::GUID_0054F150, NETMOX::_net.cur_game_name, 8, const_cast<char*>(s__00551100), const_cast<char*>(s_myname_005597dc)) == 0) {
+                GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
+                NETMOX::_net.sync_state = 0;
+                MOX::_current_screen = 15;
+                Mox_Net_Uninit_();
+                return 0;
+            }
+        }
+
+        if (NETMOX::_net.mode == 2 || NETMOX::_net.mode == 1) {
+            netcode::Set_Null_Modem_Host_();
+            if (NETMOX::_net.mode == 1) {
+                if (Do_Dial_(NETMOX::_net.modem_settings.cmd_reset) == 0) {
+                    NETMOX::_net.sync_state = 0;
+                    MOX::_current_screen = 15;
+                    return 0;
+                }
+            }
+        }
+
+        NETMOX::_net.is_network_active = 1;
+        NETMOX::_net.net_host_id = netcode::Net_Host_ID_();
+        NETMOX::_net.host_election_id = NETMOX::_net.net_host_id;
+
+        if (MOX::_nebula_screen_seg == 0) {
+            NETMOX::_net.network_sync_complete_flag = 0;
+        } else {
+            NETMOX::_net.network_sync_complete_flag = 1;
+        }
+
+        if (NETMOX::_net.mode == 0 || NETMOX::_net.mode == 3) {
+            MULTPLAY::Reload_Waiting_For_Joiners_Screen_();
+            fields::Clear_Fields_();
+            MULTPLAY::Add_Waiting_For_Joiners_Field_();
+            fields::Assign_Auto_Function_(MULTPLAY::Draw_Wait_For_New_Joiners_Screen_, 2);
+            MULTPLAY::Draw_Wait_For_New_Joiners_Screen_();
+            RUSS::Mox_Sync_Update_();
+
+            while (true) {
+                int32_t input = fields::Get_Input_();
+                MULTPLAY::Draw_Wait_For_New_Joiners_Screen_();
+                RUSS::Mox_Sync_Update_();
+
+                if (input != 0) {
+                    if (netcode::Net_Get_Users_(nullptr) == 1) {
+                        input = GENDRAW::Warning_Box2_(_really_start_with_only_1_msg);
+                    }
+                    if (input != 0) {
+                        break;
+                    }
+                }
+
+                if (netcode::Net_Get_Users_(nullptr) >= MOX::_settings.number_of_players) {
+                    break;
+                }
+            }
+
+            netcode::Net_Disable_New_Players_();
+        }
+
+        uint8_t users[256];
+        NETMOX::_net.num_connected_players = static_cast<int8_t>(netcode::Net_Get_Users_(users));
+
+        if (NETMOX::_net.num_connected_players > MOX::_settings.number_of_players) {
+            NETMOX::_net.num_connected_players = MOX::_settings.number_of_players;
+        }
+
+        Dump_Users_();
+
+        s_net_pack_start_game msg;
+        memset(msg.net_ids, 0, sizeof(msg.net_ids));
+
+        NETMOX::_net.sync_state = 2;
+        MOX::_PLAYER_NUM = -1;
+
+        if (NETMOX::_net.num_connected_players != 0) {
+            for (int i = 0; i < NETMOX::_net.num_connected_players; i++) {
+                MOX::_player[i].network_player_id = users[i];
+                msg.net_ids[i] = users[i];
+
+                if (NETMOX::_net.net_host_id == users[i]) {
+                    MOX::_PLAYER_NUM = static_cast<int16_t>(i);
+                }
+            }
+        }
+
+        if (MOX::_PLAYER_NUM == -1) {
+            MOX::_player[0].network_player_id = NETMOX::_net.net_host_id;
+            msg.net_ids[0] = NETMOX::_net.net_host_id;
+            MOX::_PLAYER_NUM = 0;
+        }
+
+        Dump_Users_();
+
+        MOX::_NUM_PLAYERS = MOX::_settings.number_of_players;
+
+        msg.net_host_id = NETMOX::_net.net_host_id;
+        msg.num_connected_players = NETMOX::_net.num_connected_players;
+        msg.random_events = MOX::_settings.random_events;
+        msg.game_difficulty = MOX::_settings.game_difficulty;
+        msg.number_of_players = MOX::_settings.number_of_players;
+        msg.galaxy_size = MOX::_settings.galaxy_size;
+        msg.galaxy_age = MOX::_settings.galaxy_age;
+        msg.strategic_combat_flag = MOX::_settings.strategic_combat_flag;
+        msg.starting_civilization_level = MOX::_settings.starting_civilization_level;
+        msg.xenons_exist = MOX::_settings.xenons_exist;
+
+        _sprintf(msg.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
+
+        memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
+        memset(NETMOX::_net.player_connected_flags, 0, sizeof(NETMOX::_net.player_connected_flags));
+        memset(RACESEL::_race_flag, 0, sizeof(RACESEL::_race_flag));
+        memset(NETMOX::_net.player_color_selected_flags, 0, sizeof(NETMOX::_net.player_color_selected_flags));
+
+        NETMOX::_net.sync_state = 3;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                MOX::_player[i].color = 8;
+            }
+        }
+
+        RACESEL::Race_Selection_Screen_(&MOX::_player[MOX::_PLAYER_NUM]);
+
+        NETMOX::_net.player_color_selected_flags[MOX::_PLAYER_NUM] = 1;
+        MOX::_player[MOX::_PLAYER_NUM].objectives = 100;
+
+        if (NETMOX::_net.mode == 3) {
+            WINNET::Ten_Stop(1);
+            WINNET::Ten_Flag();
+        }
+
+        RUSS::Mox_Update_();
+
+        NETMOX::Mox_Send_Message_(0x7FFE, 0, &msg, sizeof(msg));
+
+        MULTPLAY::Reload_Wait_For_Race_Info_();
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &unused, 11);
+
+        NETMOX::_net.player_connected_flags[MOX::_PLAYER_NUM] = 1;
+
+        if (NETMOX::_net.num_connected_players != 0) {
+            while (true) {
+                MULTPLAY::Draw_Wait_For_Race_Info_Screen_();
+                
+                int32_t ready_count = 0;
+                if (MOX::_NUM_PLAYERS > 0) {
+                    for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                        if (NETMOX::_net.player_connected_flags[i] != 0) {
+                            ready_count++;
+                        }
+                    }
+                }
+
+                fields::Get_Input_();
+                RUSS::Mox_Sync_Update_();
+
+                if (NETMOX::_net.num_connected_players <= ready_count) {
+                    break;
+                }
+            }
+        }
+
+        fields::Clear_Fields_();
+        fields::Deactivate_Auto_Function_();
+
+        INITGAME::Init_New_Game_(
+            (int16_t)MOX::_settings.game_difficulty,
+            (int16_t)MOX::_settings.galaxy_size,
+            (int16_t)MOX::_settings.galaxy_age,
+            (int16_t)MOX::_settings.number_of_players,
+            (int16_t)MOX::_settings.strategic_combat_flag,
+            (int16_t)MOX::_settings.starting_civilization_level
+        );
+
+        if (MOX::_NUM_PLAYERS > NETMOX::_net.num_connected_players) {
+            for (int i = NETMOX::_net.num_connected_players; i < MOX::_NUM_PLAYERS; i++) {
+                MOX::_player[i].network_player_id = -1;
+            }
+        }
+
+        uint8_t color_used[8] = {0};
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                if (MOX::_player[i].color != 8) {
+                    color_used[MOX::_player[i].color] = 1;
+                }
+            }
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                if (MOX::_player[i].color == 8) {
+                    int8_t selected_color = -1;
+                    int32_t num_available = 0;
+                    
+                    for (int j = 0; j < 8; j++) {
+                        if (color_used[j] == 0) {
+                            num_available++;
+                            if (random::Random_(num_available) == 1) {
+                                selected_color = static_cast<int8_t>(j);
+                            }
+                        }
+                    }
+                    
+                    MOX::_player[i].color = selected_color;
+                    color_used[selected_color] = 1;
+                }
+            }
+        }
+
+        MULTPLAY::Reload_Sending_Data_Info_();
+        video::Set_Page_Off_();
+        MULTPLAY::Draw_SendGet_Net_Info_Screen_();
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
+        RUSS::Mox_Sync_Update_();
+
+        if (NETMOX::_net.network_sync_complete_flag == 0) {
+            MOX::_NUM_NEBULAS = 0;
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                NETMOX::_net.player_net_info[i].sync_state = 4;
+                NETMOX::_net.player_net_info[i].remote_player_id = -1;
+            }
+        }
+
+        NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
+        transprt::_num_net_players = NETMOX::_net.num_connected_players;
+
+        NETMOX::Broadcast_Game_Data_Differential_(1);
+
+        NETMOX::_net.player_race_selected_flags[MOX::_PLAYER_NUM] = 1;
+        NETMOX::_net.field_1db = 0;
+        NETMOX::_net.field_1df = 0;
+        NETMOX::_net.sync_state = 4;
+
+        fields::Clear_Fields_();
+        fields::Deactivate_Auto_Function_();
+
+        MAPGEN::Init_Main_Screen_(MOX::_settings.galaxy_size);
+        HAROLD::Harold_Init_();
+        MOX2::Init_Map_Defaults_();
+
+        MAINSCR2::_main_screen_fade_in_flag = 1;
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+        return 1;
     }
 
     void __cdecl Mox_Net_Uninit_() {
@@ -550,5 +854,17 @@ namespace NETSTART {
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
         return 1;
+    }
+
+    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, const char* str1, const char* str2) {
+        RUSS::Mox_Update_();
+        int32_t result = netcode::Net_Create_Game_(guid, game_name, max_players, str1, str2);
+        RUSS::Mox_Update_();
+        return result;
+    }
+
+    int __cdecl Dump_Users_() {
+        uint8_t buffer[20];
+        return netcode::Net_Get_Users_(buffer);
     }
 }

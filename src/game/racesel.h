@@ -18,7 +18,7 @@ namespace RACESEL {
     inline s_animation_header*& _last_race_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A5724});
 
-    inline uint8_t* _color_flag = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A56E8});
+    inline uint8_t (&_color_flag)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A56E8});
     inline uint8_t (&_race_flag)[14] = *reinterpret_cast<uint8_t(*)[14]>(std::uintptr_t{0x005A5770});
 
     inline const char* s_patch13_lbx = reinterpret_cast<const char*>(0x00556330);

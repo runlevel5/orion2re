@@ -194,4 +194,16 @@ namespace MULTPLAY {
     void __cdecl Draw_Choose_Net_Plyrs_Screen_();
 
     int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load);
+
+    inline void __cdecl Reload_Wait_For_Race_Info_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00508080});
+        fn();
+    }
+
+    inline void __cdecl Draw_Wait_For_Race_Info_Screen_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503740});
+        fn();
+    }
 }

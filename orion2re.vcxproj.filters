@@ -1019,6 +1019,12 @@
     <ClInclude Include="src\game\winnet.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\simmodem.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\transprt.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">
