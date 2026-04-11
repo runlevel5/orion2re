@@ -33,4 +33,10 @@ namespace WINNET {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043AA90});
         fn();
     }
+
+    inline void __cdecl Init_Providers() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00538760 });
+        fn();
+    }
 }

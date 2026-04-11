@@ -135,12 +135,6 @@ namespace fields {
         return fn();
     }
 
-    inline void __cdecl Init_Mouse_Keyboard_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00538760});
-        fn();
-    }
-
     void __cdecl Enable_Mouse_Pressed_Field_Update_();
 
     void __cdecl Deactivate_Help_List_();
