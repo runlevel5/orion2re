@@ -471,6 +471,12 @@
     <ClCompile Include="src\game\transprt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\bitio.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\arith1e.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -1053,6 +1059,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\arith1e.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\bitio.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

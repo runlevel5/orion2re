@@ -19,6 +19,25 @@ typedef unsigned long long    undefined7;
 typedef unsigned long long    undefined8;
 typedef unsigned short    ushort;
 typedef unsigned short    word;
+typedef struct BIT_BUF BIT_BUF, *PBIT_BUF;
+
+
+/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
+
+typedef uchar uint8_t;
+
+
+/* WARNING! conflicting data type names: /types.h/uint - /uint */
+
+typedef uint uint32_t;
+
+struct BIT_BUF {
+    uint8_t *buf;
+    uint8_t mask;
+    uint32_t rack;
+    uint32_t bit_index;
+};
+
 
 /* WARNING! conflicting data type names: /orion2.h/dword - /dword */
 
@@ -214,11 +233,6 @@ struct s_aidudes_colony_info {
 
 typedef struct s_aimove_alien_strength s_aimove_alien_strength, *Ps_aimove_alien_strength;
 
-
-/* WARNING! conflicting data type names: /orion2.h/uchar - /uchar */
-
-typedef uchar uint8_t;
-
 struct s_aimove_alien_strength {
     uint8_t eta;
     int32_t strength;
@@ -247,11 +261,6 @@ struct s_aimove_intercept_entry {
 };
 
 typedef struct s_aimove_npc_dest s_aimove_npc_dest, *Ps_aimove_npc_dest;
-
-
-/* WARNING! conflicting data type names: /types.h/uint - /uint */
-
-typedef uint uint32_t;
 
 struct s_aimove_npc_dest {
     uint8_t star_idx;

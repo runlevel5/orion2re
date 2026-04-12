@@ -201,3 +201,4 @@
 #include "cmbtspec.h"
 #include "cmbtai.h"
 #include "beams.h"
+#include "bitio.h"

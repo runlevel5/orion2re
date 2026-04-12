@@ -2919,6 +2919,14 @@ namespace hooks {
         { 0x00539c90, &WINNET::SetPlayerLastKeepAlive_ },
         { 0x0053A450, &transprt::SendPacket_ },
         { 0x0053A050, &transprt::ReceiveLargeUserMessage_ },
+        { 0x0053a6f0, &bitio::OpenInputBitBuffer_ },
+        { 0x0053a750, &bitio::CloseInputBitBuffer_ },
+        { 0x0053a840, &bitio::BufferInputBit_ },
+        { 0x0053a6c0, &bitio::OpenOutputBitBuffer_ },
+        { 0x0053a760, &bitio::BufferOutputBit_ },
+        { 0x0053a7c0, &bitio::BufferOutputBits_ },
+        { 0x00538ab0, &arith1e::Compress_Data_ },
+        { 0x00538b80, &arith1e::Uncompress_Data_ },
     };
 
     void Install_Hooks()
