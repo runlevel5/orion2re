@@ -16,13 +16,18 @@ namespace WINNET {
 
     int32_t __cdecl Init_Connection_(int32_t mode) {
         int32_t provider_idx = -1;
+        const char* provider_name = nullptr;
 
         if (mode == 0) {
-            provider_idx = Find_Provider_(s_modem_005607dc /* "modem" */);
+            provider_name = s_modem_005607dc;
         } else if (mode == 1) {
-            provider_idx = Find_Provider_(s_ipx_005607e4 /* "ipx" */);
+            provider_name = s_ipx_005607e4;
         } else if (mode == 2) {
-            provider_idx = Find_Provider_(s_tcp_005607e8 /* "tcp" */);
+            provider_name = s_tcp_005607e8;
+        }
+
+        if (provider_name != nullptr) {
+            provider_idx = Find_Provider_(provider_name);
         }
 
         if (provider_idx == -1) {
@@ -34,14 +39,13 @@ namespace WINNET {
             netcode::_dplay = nullptr;
         }
 
-        // TODO: Replace with DirectPlayCreate from dplay.dll
-        HRESULT hr = FUN_0053a8d0(reinterpret_cast<LPGUID>(_providers[provider_idx]), &netcode::_dplay, nullptr);
-        if (hr != 0) {
-            return 0;
+        HRESULT hr = DPLAY_DLL::Ordinal_1(&_providers[provider_idx]->guid, &netcode::_dplay, nullptr);
+        if (hr == 0) {
+            netcode::_connection_type = mode;
+            return 1;
         }
 
-        netcode::_connection_type = mode;
-        return 1;
+        return 0;
     }
 
     uint32_t __cdecl Refresh_Game_List_(GUID guid) {
@@ -233,4 +237,96 @@ namespace WINNET {
         }
     }
 
+    void __cdecl Handle_Create_Player_(s_net_pack_create_player* pack) {
+        if (pack->player_type == 1) {
+            Register_Player_(pack->player_id, pack->player_name, pack->event_str);
+        }
+    }
+
+    void __cdecl Handle_Destroy_Player_(s_net_pack_destroy_player* packet) {
+        Drop_Player_(packet->player_id);
+    }
+
+    void __cdecl Drop_Player_(uint32_t player_id) {
+        uint32_t index = 0xFFFFFFFF;
+        bool found = false;
+
+        if (_player_count > 0) {
+            for (uint32_t i = 0; i < _player_count; i++) {
+                if (_player_list[i]->player_id == player_id) {
+                    index = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (found) {
+            if (index < _player_count - 1) {
+                for (uint32_t j = index; j < _player_count - 1; j++) {
+                    _player_list[j]->player_id = _player_list[j + 1]->player_id;
+                    _player_list[j]->join_time = _player_list[j + 1]->join_time;
+                    strcpy(_player_list[j]->event_string, _player_list[j + 1]->event_string);
+                    strcpy(_player_list[j]->player_name, _player_list[j + 1]->player_name);
+                }
+            }
+
+            ::_free(_player_list[_player_count - 1]);
+            _player_count--;
+        }
+    }
+
+    void __cdecl SetPlayerLastKeepAlive_(s_comcore_poll_buf* poll_buf) {
+        if (poll_buf->id_from == _local_player_id) {
+            return;
+        }
+
+        for (uint32_t i = 0; i < _player_count; i++) {
+            s_net_player* player = _player_list[i];
+            if (player->player_id == poll_buf->id_from) {
+                player->join_time = time_::_time();
+            }
+        }
+    }
+
+    void __cdecl Exit_With_Error_(HRESULT hr) {
+        char message[100];
+        char* error_string;
+
+        switch (hr) {
+        case static_cast<int32_t>(0x80004005): /* E_FAIL */
+            error_string = s_Generic_0055bfe8;
+            break;
+        case static_cast<int32_t>(0x80004001): /* E_NOTIMPL */
+            error_string = s_Unsupported_0055bfd0;
+            break;
+        case static_cast<int32_t>(0x88770014): /* DPNERR_ACTIVEPLAYERS */
+            error_string = s_Active_Players_0055bfb4;
+            break;
+        case static_cast<int32_t>(0x80070057): /* E_INVALIDARG */
+            error_string = s_Invalid_Params_0055bff0;
+            break;
+        case static_cast<int32_t>(0x88770082): /* DPNERR_INVALIDOBJECT */
+            error_string = s_Invalid_Object_0055bf8c;
+            break;
+        case static_cast<int32_t>(0x88770096): /* DPNERR_INVALIDPLAYER */
+            error_string = s_Invalid_Player_0055bf9c;
+            break;
+        case static_cast<int32_t>(0x887700FA): /* DPNERR_UNAVAILABLE */
+            error_string = s_Unavailable_0055bfdc;
+            break;
+        case static_cast<int32_t>(0x8877010E): /* DPNERR_UNINITIALIZED */
+            error_string = DAT_0055bfac;
+            break;
+        case static_cast<int32_t>(0x88770118): /* DPNERR_USERCANCEL */
+            error_string = s_User_Cancel_0055bfc4;
+            break;
+        default:
+            error_string = s_Error_Unknown_0055bf7c;
+            break;
+        }
+
+        strcpy(message, error_string);
+        exitm::Exit_With_Message(message);
+    }
 }

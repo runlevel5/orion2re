@@ -63,6 +63,7 @@
     <ClCompile Include="src\game\combat1.cpp" />
     <ClCompile Include="src\game\combfind.cpp" />
     <ClCompile Include="src\game\combinit.cpp" />
+    <ClCompile Include="src\game\comcore.cpp" />
     <ClCompile Include="src\game\council.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="src\game\textbox.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
+    <ClCompile Include="src\game\transprt.cpp" />
     <ClCompile Include="src\game\turnsum.cpp" />
     <ClCompile Include="src\game\video.cpp" />
     <ClCompile Include="src\game\winnet.cpp" />
@@ -190,6 +192,7 @@
     <ClInclude Include="src\game\animate.h" />
     <ClInclude Include="src\game\antarans.h" />
     <ClInclude Include="src\game\antaroom.h" />
+    <ClInclude Include="src\game\arith1e.h" />
     <ClInclude Include="src\game\assert.h" />
     <ClInclude Include="src\game\beams.h" />
     <ClInclude Include="src\game\bill.h" />

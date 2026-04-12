@@ -1,10 +1,9 @@
 #pragma once
-#include <cstdint>
+
 #include <guiddef.h>
 
-struct s_network;
-
 namespace WINNET {
+    void __cdecl Drop_Player_(uint32_t player_id);
     inline uint32_t& _provider_count =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560798});
 
@@ -28,7 +27,14 @@ namespace WINNET {
 
     inline DPID& _local_player_id = *reinterpret_cast<DPID*>(std::uintptr_t{0x005899F8});
 
+    inline char* s_Error_Unknown_0055bf7c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF7C}); // "Error Unknown"
     inline char* s_Invalid_Object_0055bf8c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF8C}); // "Invalid Object"
+    inline char* s_Invalid_Player_0055bf9c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF9C}); // "Invalid Player"
+    inline char* DAT_0055bfac = reinterpret_cast<char*>(std::uintptr_t{0x0055BFAC});
+    inline char* s_Active_Players_0055bfb4 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFB4}); // "Active Players"
+    inline char* s_User_Cancel_0055bfc4 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFC4}); // "User Cancel"
+    inline char* s_Unsupported_0055bfd0 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFD0}); // "Unsupported"
+    inline char* s_Unavailable_0055bfdc = reinterpret_cast<char*>(std::uintptr_t{0x0055BFDC}); // "Unavailable"
     inline char* s_Generic_0055bfe8 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFE8}); // "Generic"
     inline char* s_Invalid_Params_0055bff0 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFF0}); // "Invalid Params"
     inline char* s_Unknown_Err_00560a08 = reinterpret_cast<char*>(std::uintptr_t{0x00560A08}); // "Unknown Err"
@@ -49,6 +55,8 @@ namespace WINNET {
     void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str);
 
     void __cdecl Create_Player_(DPID* pid, char* friendly_name, char* formal_name);
+    void __cdecl Handle_Create_Player_(s_net_pack_create_player* pack);
+    void __cdecl Handle_Destroy_Player_(s_net_pack_destroy_player* pack);
 
     uint32_t __cdecl Refresh_Game_List_(GUID guid);
 
@@ -61,4 +69,8 @@ namespace WINNET {
     int32_t __cdecl Init_Providers_();
 
     void __cdecl Net_Enable_New_Players();
+
+    void __cdecl Exit_With_Error_(HRESULT hr);
+
+    void __cdecl SetPlayerLastKeepAlive_(s_comcore_poll_buf* poll_buf);
 }

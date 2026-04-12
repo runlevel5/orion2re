@@ -62,6 +62,7 @@
 #include "multplay.h"
 #include "net.h"
 #include "netmox.h"
+#include "arith1e.h"
 #include "netstrat.h"
 #include "transprt.h"
 #include "motrans.h"

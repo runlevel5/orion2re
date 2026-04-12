@@ -3,21 +3,55 @@
 #include "pch.h"
 
 namespace comcore {
-    inline void __cdecl ComDoComms_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539940});
-        fn();
-    }
+    int16_t __cdecl ComDoComms_();
 
-    inline void __cdecl ComSendUserMessage_(uint8_t* data, uint32_t size, int32_t target_id, int32_t arg4, int32_t arg5, int16_t msg_type) {
-        using Fn = void(__cdecl*)(uint8_t*, uint32_t, int32_t, int32_t, int32_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539950});
-        fn(data, size, target_id, arg4, arg5, msg_type);
-    }
+    void __cdecl GetMessages_();
 
-    inline void __cdecl ComInit_(int unk, char* session_name, void* recv_fn) {
-        using Fn = void(__cdecl*)(int, char*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539800});
-        fn(unk, session_name, recv_fn);
-    }
+    int32_t __cdecl HandleSessionMessage_(uint8_t* msg_data);
+
+    int8_t __cdecl HandleControlMessage_(s_comcore_poll_buf* poll_buf);
+
+    inline void*& _sendBuffer = *reinterpret_cast<void**>(std::uintptr_t{0x00591F28});
+
+    inline void*& _userReceiveBuffer =
+        *reinterpret_cast<void**>(std::uintptr_t{0x00591ED0});
+
+    inline s_comcore_poll_buf& _pollReq =
+        *reinterpret_cast<s_comcore_poll_buf*>(std::uintptr_t{0x00591ED8});
+
+    inline s_comcore_open_req& _openReq =
+        *reinterpret_cast<s_comcore_open_req*>(std::uintptr_t{0x00591EE8});
+
+    inline uint16_t& _recBufferLength =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00591F00});
+
+    inline s_comcore_req_buf& _sendReq =
+        *reinterpret_cast<s_comcore_req_buf*>(std::uintptr_t{0x00591F08});
+
+    inline uint32_t& _commsInitTime3 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591F18});
+
+    using RecFunc = void(__cdecl*)(uint32_t, uint32_t, uint8_t*);
+    inline RecFunc& _recFunc =
+        *reinterpret_cast<RecFunc*>(std::uintptr_t{0x00591F1C});
+
+    inline uint32_t& _commsInitTime2 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591F38});
+
+    inline uint32_t& _commsInitTime =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591F3C});
+
+    inline uint8_t*& _pollBuffer =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00591F48});
+
+    int16_t __cdecl ComSendUserMessage_(
+        void* msg_data,
+        uint16_t msg_length,
+        DPID player_id,
+        uint16_t msg_type,
+        uint8_t flags,
+        uint32_t transprt_flag
+    );
+
+    int32_t __cdecl ComInit_(uint16_t msg_size, char* name, void* rec_fn);
 }

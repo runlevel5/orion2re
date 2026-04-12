@@ -34,6 +34,8 @@ inline const char* s_format_0055aa28 = reinterpret_cast<const char*>(std::uintpt
 
 inline const char* s_Lost_Player_Connection_0055bf3c = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF3C});
 inline const char* s_REENTERING_Net_Send_Message_0055bf58 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF58});
+inline const char* s_Sending_Message_To_Individual = reinterpret_cast<const char*>(std::uintptr_t{0x005609B0});
+inline const char* s_Sending_Message_To_All = reinterpret_cast<const char*>(std::uintptr_t{0x005609D4});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
@@ -42,6 +44,12 @@ inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
 
 inline const char* s_percent_0055633c = reinterpret_cast<const char*>(0x0055633C); // "%"
+
+inline int32_t* __cdecl __errno() {
+    using Fn = int32_t*(__cdecl*)();
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542ba0});
+    return fn();
+}
 
 // CRT Internal Function Wrappers
 inline int __cdecl __heap_init() {

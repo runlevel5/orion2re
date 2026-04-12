@@ -809,84 +809,57 @@ namespace platform {
         }
     }
 
-    int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd) {
+    int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow) {
         Parse_Ten_Cmd_Parameter(lpCmdLine);
 
-        WNDCLASSA window_class;
-        window_class.cbClsExtra = 0;
-        window_class.cbWndExtra = 0;
-        window_class.hInstance = hInstance;
-        window_class.style = CS_HREDRAW | CS_VREDRAW; // 3
-        // Suggested name: main_window_proc
-        window_class.lpfnWndProc = reinterpret_cast<WNDPROC>(std::uintptr_t{ 0x00536710 });
-        window_class.hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(101)); // 0x65
-        window_class.hCursor = LoadCursorA(NULL, IDC_ARROW);              // 0x7F00
-        window_class.hbrBackground = nullptr;
-        window_class.lpszMenuName = "Microprose";
-        window_class.lpszClassName = "Microprose";
+        WNDCLASSA wc;
+        wc.cbClsExtra = 0;
+        wc.cbWndExtra = 0;
+        wc.hInstance = hInstance;
+        wc.style = 3;
+        wc.lpfnWndProc = Main_WndProc;
+        wc.hIcon = LoadIconA(hInstance, (LPCSTR)0x65);
+        wc.hCursor = LoadCursorA(NULL, (LPCSTR)0x7F00);
+        wc.hbrBackground = NULL;
+        wc.lpszMenuName = s_Microprose;
+        wc.lpszClassName = s_Microprose;
+        RegisterClassA(&wc);
 
-        RegisterClassA(&window_class);
-
-        HWND existing_window = FindWindowA("Microprose", "Microprose");
-        if (existing_window != nullptr) {
-            MessageBoxA(nullptr, "MOO II is already running.", "Microprose", MB_OK | MB_ICONHAND); // 0x10
+        if (FindWindowA(s_Microprose, s_Microprose)) {
+            MessageBoxA(NULL, s_Moo_IIAlreadyRunning, s_Microprose, 0x10u);
             __exit(1);
         }
 
-#ifdef FULSCREEN
-        int nWidth = GetSystemMetrics(SM_CXSCREEN);
-        int nHeight = GetSystemMetrics(SM_CYSCREEN);
-        DWORD flags = flags = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_EX_TOPMOST;
-#else
-        int nWidth = scaleX + 20;//800;//645;
-        int nHeight = scaleY+ 40;//600;//500;
-        //added| WS_OVERLAPPEDWINDOW | WS_SIZEBOX
-        DWORD flags = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
-#endif
-
-        HWND window_handle = CreateWindowExA(
-            0,
-            "Microprose",
-            "Microprose",
-            flags,      
-            0, 0, nWidth, nHeight,
-            nullptr, nullptr, hInstance, nullptr
-        );
-
-        if (window_handle == nullptr) {
+        g_main_window = CreateWindowExA(0, s_Microprose, s_Microprose, 0x1CF0000u, 0, 0, 660, 520, NULL, NULL, hInstance, NULL);
+        if (!g_main_window) {
             return 0;
         }
 
-        g_main_window = window_handle;
-        UpdateWindow(window_handle);
-        SetCursor(nullptr);
-
+        UpdateWindow(g_main_window);
+        SetCursor(NULL);
         Create_Direct_Draw(4);
 
-        bool has_lost_focus = false;
-        // Suggested name: worker_thread_proc
-        auto start_addr = reinterpret_cast<void(__cdecl*)(void*)>(std::uintptr_t{ 0x004C1B20 });
-        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(start_addr, 0xFFFF, nullptr));
+        g_worker_thread_handle = (HANDLE)begin_thread(MOX2::thunk_main2_, 0xFFFFu, NULL);
 
-        do {
-            if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {
-                return static_cast<int>(g_main_msg.wParam);
+        while (g_should_exit != 1) {
+            if (!GetMessageA(&g_main_msg, NULL, 0, 0)) {
+                return (int)g_main_msg.wParam;
             }
 
             TranslateMessage(&g_main_msg);
             DispatchMessageA(&g_main_msg);
 
-            // Track focus state transitions to restore surfaces when regained
             if (g_window_focus_state == 0) {
-                has_lost_focus = true;
-            }
-
-            if (has_lost_focus && g_window_focus_state == 1) {
-                has_lost_focus = false;
+                while (g_window_focus_state != 1) {
+                    if (!GetMessageA(&g_main_msg, NULL, 0, 0)) {
+                        return (int)g_main_msg.wParam;
+                    }
+                    TranslateMessage(&g_main_msg);
+                    DispatchMessageA(&g_main_msg);
+                }
                 Restore_Surfaces();
             }
-
-        } while (g_should_exit != 1);
+        }
 
         Cleanup_Surfaces();
         DestroyWindow(g_main_window);

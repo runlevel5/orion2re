@@ -1210,10 +1210,9 @@ struct s_comcore_open_req {
 typedef struct s_comcore_poll_buf s_comcore_poll_buf, *Ps_comcore_poll_buf;
 
 struct s_comcore_poll_buf {
-    undefined field0_0x0;
-    undefined field1_0x1;
-    undefined field2_0x2;
-    undefined field3_0x3;
+    uint32_t id_from;
+    uint32_t id_to;
+    uint32_t len;
     uint8_t *send_buf;
 };
 
@@ -2787,6 +2786,23 @@ struct s_net_pack_change_relation {
     int16_t reason;
     int16_t star_idx;
     int16_t param6;
+};
+
+typedef struct s_net_pack_create_player s_net_pack_create_player, *Ps_net_pack_create_player;
+
+struct s_net_pack_create_player {
+    uint32_t msg_type;
+    uint32_t player_type;
+    uint32_t player_id;
+    char event_str[52];
+    char player_name[20];
+};
+
+typedef struct s_net_pack_destroy_player s_net_pack_destroy_player, *Ps_net_pack_destroy_player;
+
+struct s_net_pack_destroy_player {
+    uint32_t msg_type;
+    uint32_t player_id;
 };
 
 typedef struct s_net_pack_drop_out_info s_net_pack_drop_out_info, *Ps_net_pack_drop_out_info;
