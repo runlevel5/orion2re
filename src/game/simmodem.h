@@ -1,7 +1,24 @@
 #pragma once
 #include <cstdint>
 
+struct s_network;
+
 namespace simmodem {
+    inline uint8_t& _connected_to_id =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00589A18});
+
+    inline void __cdecl Uninit_Modem_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535570});
+        fn();
+    }
+
+    inline int32_t __cdecl Init_Modem_(s_network* net, void* recv_fn) {
+        using Fn = int32_t(__cdecl*)(s_network*, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535530});
+        return fn(net, recv_fn);
+    }
+
     inline void __cdecl Modem_Reset_(char* reset_cmd) {
         using Fn = void(__cdecl*)(char*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005357a0});

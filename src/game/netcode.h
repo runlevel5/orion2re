@@ -1,82 +1,52 @@
 #pragma once
-#include <cstdint>
 
 namespace netcode {
-    inline int __cdecl Net_Get_Game_Count_() {
-        using Fn = int(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005350B0});
-        return fn();
-    }
+    inline uint32_t& _netInitialized = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055BF24});
 
-    inline char* __cdecl Net_Get_Game_Name_(int index) {
-        using Fn = char*(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005350C0});
-        return fn(index);
-    }
+    inline uint8_t& _inComms =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055BF34});
 
-    inline void __cdecl Net_Uninit_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534B40});
-        fn();
-    }
+    inline IDirectPlay*& _dplay = *reinterpret_cast<IDirectPlay**>(std::uintptr_t{0x0055BF28});
 
-    inline int __cdecl Net_Is_Sending_() {
-        using Fn = int(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534C30});
-        return fn();
-    }
+    inline void*& _recv_fn =
+        *reinterpret_cast<void**>(std::uintptr_t{0x00589990});
 
-    inline int __cdecl Net_Join_Game_(const char* game_name, const char* password, const char* player_name) {
-        using Fn = int(__cdecl*)(const char*, const char*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005350F0});
-        return fn(game_name, password, player_name);
-    }
+    inline int32_t& _connection_type =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00589A0C});
 
-    inline void __cdecl Set_Null_Modem_Slave_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005354D0});
-        fn();
-    }
+    inline int32_t& _in_send_message = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055BF38});
 
-    inline void __cdecl Set_Null_Modem_Host_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005354f0});
-        fn();
-    }
+    int32_t __cdecl Do_Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network);
 
-    inline int32_t __cdecl Net_Get_Users_(uint8_t* users) {
-        using Fn = int32_t(__cdecl*)(uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535440});
-        return fn(users);
-    }
+    int32_t __cdecl Net_Init_(uint32_t mode, GUID guid, void* recv_fn, s_network* network);
 
-    inline void __cdecl Net_Disable_New_Players_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535420});
-        fn();
-    }
+    int32_t __cdecl Net_Get_Game_Count_();
 
-    inline int16_t __cdecl Net_Host_ID_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535510});
-        return fn();
-    }
+    int32_t __cdecl Get_Player_Count_();
 
-    inline int32_t __cdecl Net_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len) {
-        using Fn = int32_t(__cdecl*)(int16_t, uint16_t, void*, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534C40});
-        return fn(param_1, param_2, packet, len);
-    }
+    char* __cdecl Net_Get_Game_Name_(uint32_t session_idx);
 
-    inline void __cdecl Net_Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534BD0});
-        fn();
-    }
+    int32_t __cdecl Net_Join_Game_(char* game_name, char* password, char* player_name);
 
-    inline int32_t __cdecl Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, const char* str1, const char* str2) {
-        using Fn = int32_t(__cdecl*)(GUID, char*, int32_t, const char*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535290});
-        return fn(guid, game_name, max_players, str1, str2);
-    }
+    void __cdecl Net_Uninit_();
+
+    int __cdecl Net_Is_Sending_();
+
+    void __cdecl Set_Null_Modem_Slave_();
+
+    void __cdecl Set_Null_Modem_Host_();
+
+    int32_t __cdecl Net_Get_Users_(uint8_t* users);
+
+    void __cdecl Net_Disable_New_Players_();
+
+    uint32_t __cdecl Net_Host_ID_();
+
+    uint32_t __cdecl Net_Send_Message_(int32_t target_id, int16_t msg_type, void* data, uint32_t size);
+
+    void __cdecl Net_Update_();
+
+    uint32_t __cdecl Net_Status_();
+
+    int32_t __cdecl Net_Create_Game_(GUID guid, char* name, int32_t max_players, char* password, char* player_name);
 }

@@ -6,7 +6,7 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_();
     uint8_t __cdecl Load_Net_Screen_();
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, const char* str1, const char* str2);
+    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, char* str1, char* str2);
 
     bool __cdecl Do_Dial_(char* phone_number);
 
@@ -40,8 +40,8 @@ namespace NETSTART {
 
     int8_t __cdecl Do_Answer_();
 
-    inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
-    inline const char* s_myname_005597dc = reinterpret_cast<const char*>(std::uintptr_t{0x005597DC});
+    inline char* s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
+    inline char* s_myname_005597dc = reinterpret_cast<char*>(std::uintptr_t{0x005597DC});
     inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
     inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
 

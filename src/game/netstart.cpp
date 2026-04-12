@@ -232,8 +232,8 @@ namespace NETSTART {
     uint8_t __cdecl Join_Net_Screen_() {
         uint8_t result = 0;
         uint8_t fade_status;
-        const char* empty_str = s__00551100;
-        const char* myname_str = s_myname_005597dc;
+        char* empty_str = s__00551100;
+        char* myname_str = s_myname_005597dc;
 
         NETMOX::_net.sync_state = 5;
 
@@ -246,7 +246,7 @@ namespace NETSTART {
         RUSS::Mox_Update_();
 
         // TYPE MISMATCH: Receive_Message_ signature differs from WINNET::Init expectation
-        if (!WINNET::Init(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_), &NETMOX::_net)) {
+        if (!netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_), &NETMOX::_net)) {
             RUSS::Mox_Update_();
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15 /* SCREEN_MAIN_MENU */;
@@ -337,7 +337,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         auto receive_msg_ptr = reinterpret_cast<void*>(std::uintptr_t{0x00513f40});
-        if (WINNET::Init(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(receive_msg_ptr), &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, NETSTART::GUID_0054F150, reinterpret_cast<void (*)(void*)>(receive_msg_ptr), &NETMOX::_net) == 0) {
             NETMOX::_net.sync_state = 0;
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
@@ -644,7 +644,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         void (*receive_msg_fn)(void*) = reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_);
-        if (WINNET::Init(NETMOX::_net.mode, GUID_0054F150, receive_msg_fn, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, GUID_0054F150, receive_msg_fn, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
             NETMOX::_net.sync_state = 0;
@@ -856,7 +856,7 @@ namespace NETSTART {
         return 1;
     }
 
-    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, const char* str1, const char* str2) {
+    int32_t __cdecl Russ_Net_Create_Game_(GUID guid, char* game_name, int32_t max_players, char* str1, char* str2) {
         RUSS::Mox_Update_();
         int32_t result = netcode::Net_Create_Game_(guid, game_name, max_players, str1, str2);
         RUSS::Mox_Update_();

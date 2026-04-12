@@ -1196,6 +1196,42 @@ struct s_combfind_target {
     int16_t num_player_targets;
 };
 
+typedef struct s_comcore_open_req s_comcore_open_req, *Ps_comcore_open_req;
+
+struct s_comcore_open_req {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    char name[10];
+    uint32_t msg_size;
+};
+
+typedef struct s_comcore_poll_buf s_comcore_poll_buf, *Ps_comcore_poll_buf;
+
+struct s_comcore_poll_buf {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    uint8_t *send_buf;
+};
+
+typedef struct s_comcore_req_buf s_comcore_req_buf, *Ps_comcore_req_buf;
+
+struct s_comcore_req_buf {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    undefined field2_0x2;
+    undefined field3_0x3;
+    uint8_t *send_buf;
+    undefined field5_0x8;
+    undefined field6_0x9;
+    undefined field7_0xa;
+    undefined field8_0xb;
+    int32_t buf_size;
+};
+
 typedef struct s_crew_data s_crew_data, *Ps_crew_data;
 
 struct s_crew_data {
@@ -3031,6 +3067,15 @@ struct s_net_pack_start_game {
     char version_string[50];
 };
 
+typedef struct s_net_player s_net_player, *Ps_net_player;
+
+struct s_net_player {
+    uint32_t player_id;
+    char event_string[52];
+    char player_name[20];
+    uint32_t join_time;
+};
+
 typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {
@@ -3040,7 +3085,7 @@ struct s_net_player_info {
     int16_t sync_planet_id;
     int16_t sync_colony_id;
     undefined field5_0x8;
-    undefined field6_0x9;
+    undefined sync_phase_ready_flag;
     int8_t combat_status;
     int8_t remote_player_id;
 };
@@ -3168,35 +3213,28 @@ struct s_network {
     int8_t diplomacy_target_id;
     int8_t sync_phase_active_flag;
     struct s_battle_results *combat_results_data;
-    undefined field120_0x18c;
-    undefined field121_0x18d;
-    undefined field122_0x18e;
-    undefined field123_0x18f;
+    uint8_t ai_diplomacy_done_mask;
+    uint8_t ai_diplomacy_active_mask;
+    uint8_t ai_diplomacy_cancel_mask;
+    uint8_t human_diplomacy_ignored_mask;
     uint8_t players_active_mask;
     uint8_t players_sync_mask[8];
-    undefined field126_0x199;
-    undefined field127_0x19a;
-    undefined field128_0x19b;
-    undefined field129_0x19c;
-    undefined field130_0x19d;
-    undefined field131_0x19e;
-    undefined field132_0x19f;
-    undefined field133_0x1a0;
-    undefined field134_0x1a1;
+    uint8_t diplomacy_sync_mask[8];
+    undefined field127_0x1a1;
     int8_t is_diplomacy_initiator;
     int8_t human_diplomat_wait_flag;
-    undefined field137_0x1a4;
+    undefined field130_0x1a4;
     uint8_t players_ready_mask[8];
-    undefined field139_0x1ad;
+    undefined field132_0x1ad;
     int8_t player_is_active_flags[8];
-    undefined field141_0x1b6;
-    undefined field142_0x1b7;
-    undefined field143_0x1b8;
-    undefined field144_0x1b9;
-    undefined field145_0x1ba;
-    undefined field146_0x1bb;
-    undefined field147_0x1bc;
-    undefined field148_0x1bd;
+    undefined field134_0x1b6;
+    undefined field135_0x1b7;
+    undefined field136_0x1b8;
+    undefined field137_0x1b9;
+    undefined field138_0x1ba;
+    undefined field139_0x1bb;
+    undefined field140_0x1bc;
+    undefined field141_0x1bd;
     char cur_game_name[9];
     int8_t player_color_selected_flags[8];
     undefined field165_0x1cf;
@@ -3205,45 +3243,31 @@ struct s_network {
     uint8_t is_network_active;
     int field_1db;
     int field_1df;
-    undefined field157_0x1e3;
-    undefined field158_0x1e4;
-    undefined field159_0x1e5;
-    undefined field160_0x1e6;
-    undefined field161_0x1e7;
-    undefined field162_0x1e8;
-    undefined field163_0x1e9;
-    undefined field164_0x1ea;
-    undefined field165_0x1eb;
-    undefined field166_0x1ec;
-    undefined field167_0x1ed;
-    undefined field168_0x1ee;
-    undefined field169_0x1ef;
-    undefined field170_0x1f0;
-    undefined field171_0x1f1;
-    undefined field172_0x1f2;
-    undefined field173_0x1f3;
-    undefined field174_0x1f4;
-    undefined field175_0x1f5;
-    undefined field176_0x1f6;
-    undefined field177_0x1f7;
-    undefined field178_0x1f8;
-    undefined field179_0x1f9;
-    undefined field180_0x1fa;
+    uint8_t player_race_selected_alt_flags[8];
+    uint8_t player_race_deselected_flags[8];
+    undefined field152_0x1f3;
+    undefined field153_0x1f4;
+    undefined field154_0x1f5;
+    undefined field155_0x1f6;
+    undefined field156_0x1f7;
+    undefined field157_0x1f8;
+    undefined field158_0x1f9;
+    undefined field159_0x1fa;
     uint8_t race_selection_changed;
-    undefined field182_0x1fc;
+    undefined field161_0x1fc;
     uint8_t network_sync_complete_flag;
     undefined field198_0x1fe;
     int8_t connection_timeout_flag;
     int8_t connection_state;
-    undefined field187_0x201;
-    undefined field188_0x202;
+    undefined field166_0x201;
+    undefined field167_0x202;
     int8_t diplomacy_partner_id;
     int8_t diplomacy_handshake_state;
-    undefined field191_0x205;
-    undefined field192_0x206;
+    undefined field170_0x205;
+    undefined field171_0x206;
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
-    undefined field195_0x209;
+    undefined field174_0x209;
 };
 
 typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;
@@ -4458,6 +4482,22 @@ struct s_techdata_planetary_shield {
     int8_t absorption;
 };
 
+typedef struct s_transport_packet s_transport_packet, *Ps_transport_packet;
+
+struct s_transport_packet {
+    uint32_t message_stamp;
+    uint16_t send_data_length;
+    uint8_t packet_index;
+    uint8_t total_packets;
+    uint8_t sender_host_id;
+    uint16_t current_user_type;
+    uint8_t burst_index;
+    uint8_t message_is_processed;
+    uint32_t send_immediate_burst;
+    uint16_t pad;
+    uint8_t payload[331];
+};
+
 typedef struct s_unit_data s_unit_data, *Ps_unit_data;
 
 struct s_unit_data {
@@ -4477,6 +4517,15 @@ typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item
 struct s_weapon_filter_item {
     int16_t weapon_idx;
     int32_t tech_cost;
+};
+
+typedef struct s_winnet_provider s_winnet_provider, *Ps_winnet_provider;
+
+struct s_winnet_provider {
+    GUID guid;
+    char name[100];
+    dword major_version;
+    dword minor_version;
 };
 
 

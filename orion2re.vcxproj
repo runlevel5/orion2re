@@ -114,6 +114,7 @@
     <ClCompile Include="src\game\maintain.cpp" />
     <ClCompile Include="src\game\mapgen.cpp" />
     <ClCompile Include="src\game\misc.cpp" />
+    <ClCompile Include="src\game\motrans.cpp" />
     <ClCompile Include="src\game\mouse.cpp" />
     <ClCompile Include="src\game\movebox.cpp" />
     <ClCompile Include="src\game\mox.cpp" />
@@ -121,6 +122,7 @@
     <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\multplay.cpp" />
     <ClCompile Include="src\game\namestar.cpp" />
+    <ClCompile Include="src\game\netcode.cpp" />
     <ClCompile Include="src\game\netmox.cpp" />
     <ClCompile Include="src\game\netstart.cpp" />
     <ClCompile Include="src\game\netturn.cpp" />
@@ -163,6 +165,7 @@
     <ClCompile Include="src\game\trade.cpp" />
     <ClCompile Include="src\game\turnsum.cpp" />
     <ClCompile Include="src\game\video.cpp" />
+    <ClCompile Include="src\game\winnet.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\patch.cpp" />
     <ClCompile Include="src\pch.cpp">
@@ -219,6 +222,7 @@
     <ClInclude Include="src\game\combat1.h" />
     <ClInclude Include="src\game\combfind.h" />
     <ClInclude Include="src\game\combinit.h" />
+    <ClInclude Include="src\game\comcore.h" />
     <ClInclude Include="src\game\consts.h" />
     <ClInclude Include="src\game\contact.h" />
     <ClInclude Include="src\game\council.h" />
@@ -229,6 +233,7 @@
     <ClInclude Include="src\game\diplomac.h" />
     <ClInclude Include="src\game\dip_scrn.h" />
     <ClInclude Include="src\game\dos.h" />
+    <ClInclude Include="src\game\dplay_dll.h" />
     <ClInclude Include="src\game\draw.h" />
     <ClInclude Include="src\game\eric.h" />
     <ClInclude Include="src\game\erichelp.h" />
@@ -279,6 +284,7 @@
     <ClInclude Include="src\game\maintain.h" />
     <ClInclude Include="src\game\mapgen.h" />
     <ClInclude Include="src\game\misc.h" />
+    <ClInclude Include="src\game\motrans.h" />
     <ClInclude Include="src\game\mouse.h" />
     <ClInclude Include="src\game\movebox.h" />
     <ClInclude Include="src\game\mox.h" />
@@ -349,6 +355,7 @@
     <ClInclude Include="src\game\techinit.h" />
     <ClInclude Include="src\game\ten.h" />
     <ClInclude Include="src\game\textbox.h" />
+    <ClInclude Include="src\game\time.h" />
     <ClInclude Include="src\game\timer.h" />
     <ClInclude Include="src\game\trade.h" />
     <ClInclude Include="src\game\transprt.h" />

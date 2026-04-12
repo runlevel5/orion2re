@@ -15,6 +15,8 @@ inline char* s_monster_lbx_00551250 = reinterpret_cast<char*>(std::uintptr_t{0x0
 inline char* s_cmbtshp_lbx_0055125c = reinterpret_cast<char*>(std::uintptr_t{0x0055125C});
 inline char* s_AI_trade_goods_00557670 = reinterpret_cast<char*>(std::uintptr_t{0x00557670}); // "AI trade goods"
 inline const char* s_Human_00558020 = reinterpret_cast<const char*>(std::uintptr_t{0x00558020}); // "Human"
+inline const char* s_Error_Enum_Current_Games_Invalid_0055c000 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C000}); // "Error Enum Current Games Invalid Params"
+inline const char* s_Error_Enum_Current_Games_Invalid_0055c028 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C028}); // "Error Enum Current Games Invalid Object"
 
 inline const char* const s_craziness_00557680 = reinterpret_cast<const char*>(std::uintptr_t{0x00557680});
 
@@ -29,6 +31,9 @@ inline char* const s_APP_PICS_LBX_00556018 = reinterpret_cast<char*>(0x00556018)
 inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x0052414});
 inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x0052418});
 inline const char* s_format_0055aa28 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA28}); // "(%s)  "
+
+inline const char* s_Lost_Player_Connection_0055bf3c = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF3C});
+inline const char* s_REENTERING_Net_Send_Message_0055bf58 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF58});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
@@ -94,6 +99,18 @@ inline int __cdecl __ismbblead(uint32_t c) {
     using Fn = int(__cdecl*)(uint32_t c);
     return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547ad0 })(c);
 }
+
+struct IDirectPlay;
+// Suggested name: DirectPlayCreate
+inline HRESULT __stdcall FUN_0053a8d0(LPGUID lpGUID, IDirectPlay** lplpDP, LPVOID pUnkOuter) {
+    using Fn = HRESULT(__stdcall*)(LPGUID, IDirectPlay**, LPVOID);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0053a8d0});
+    return fn(lpGUID, lplpDP, pUnkOuter);
+}
+
+inline const char* s_modem_005607dc = reinterpret_cast<const char*>(std::uintptr_t{0x005607DC});
+inline const char* s_ipx_005607e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E4});
+inline const char* s_tcp_005607e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E8});
 
 // User-defined WinMain entry point
 inline int __stdcall WinMain_Proxy(void* hInstance, void* hPrevInstance, char* lpCmdLine, int nShowCmd) {
@@ -577,7 +594,7 @@ inline const char* const s___s_0055994c = reinterpret_cast<const char*>(0x005599
 inline const char* const s___00559948 = reinterpret_cast<const char*>(0x00559948); // "@"
 inline const char* const s_0__s_00559940 = reinterpret_cast<const char*>(0x00559940); // "0 %s"
 inline const char* const s__d__s_005569f0 = reinterpret_cast<const char*>(0x005569F0); // "%d %s"
-inline const char* s__00551100 = reinterpret_cast<const char*>(0x00551100);   // ""
+inline char* s__00551100 = reinterpret_cast<char*>(0x00551100);   // ""
 inline const char* s__d_BC_00552384 = reinterpret_cast<const char*>(0x00552384);
 inline const char* s_plus_00551118 = reinterpret_cast<const char*>(0x00551118);  // "+"
 inline const char* s_minus_0055111c = reinterpret_cast<const char*>(0x0055111C);  // "-"

@@ -167,7 +167,7 @@ namespace NETTURN {
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                NETMOX::_net.player_net_info[i].field6_0x9 = 0xFF;
+                NETMOX::_net.player_net_info[i].sync_phase_ready_flag = 0xFF;
                 NETMOX::_net.player_net_info[i].sync_state = 14 /* NEXT_TURN */;
             }
         }
@@ -177,7 +177,7 @@ namespace NETTURN {
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;
         Net_Init_Host_Election_();
-        NETMOX::_net.field137_0x1a4 = 0;
+        NETMOX::_net.field130_0x1a4 = 0;
 
         if (MOX::_NUM_PLAYERS > 0) {
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {

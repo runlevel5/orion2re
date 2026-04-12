@@ -6,7 +6,7 @@ namespace init {
         video::Init_Video_Drivers_();
         remap::Sort_Palette_List_();
         sound::Init_Sound_();
-        WINNET::Init_Providers();
+        WINNET::Init_Providers_();
 
         if (*font_name == '\0') {
             sysfont::Load_System_Font_();

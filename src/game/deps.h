@@ -5,6 +5,8 @@
 #include <ddraw.h>
 #include <time.h>
 
+#include "../dplay.h"
+
 #include "funcs.h"
 #include "accss.h"
 
@@ -62,8 +64,13 @@
 #include "netmox.h"
 #include "netstrat.h"
 #include "transprt.h"
+#include "motrans.h"
+#include "netcode.h"
 #include "winnet.h"
+#include "comcore.h"
+#include "dplay_dll.h"
 #include "timer.h"
+#include "time.h"
 #include "contact.h"
 #include "coldraw.h"
 #include "colbcach.h"
@@ -156,7 +163,6 @@
 #include "design.h"
 #include "aibuild.h"
 #include "colxport.h"
-#include "netcode.h"
 #include "simmodem.h"
 #include "textbox.h"
 #include "namestar.h"

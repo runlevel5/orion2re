@@ -4,6 +4,9 @@
 namespace net {
     inline uint8_t& state = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005952EB});
 
+    inline uint32_t& _thisHost =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591EFC});
+
     // Suggested name: net::modem_settings_cmd_reset
     inline char* modem_settings_cmd_reset =
         reinterpret_cast<char*>(std::uintptr_t{0x00595181});
