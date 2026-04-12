@@ -13,4 +13,40 @@ namespace ten {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7D30 });
         fn();
     }
+
+    inline uint32_t __cdecl TEN_Get_Host_Id_() {
+        using Fn = uint32_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533960 });
+        return fn();
+    }
+
+    inline int32_t __cdecl TEN_Get_Users_(uint8_t* users) {
+        using Fn = int32_t(__cdecl*)(uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533930 });
+        return fn(users);
+    }
+
+    inline void __cdecl Init_TEN_(uint32_t mode, GUID* guid, void* recv_fn, s_network* net) {
+        using Fn = void(__cdecl*)(uint32_t, GUID*, void*, s_network*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005337F0 });
+        fn(mode, guid, recv_fn, net);
+    }
+
+    inline void __cdecl Ten_Stop(int32_t val) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043AAA0 });
+        fn(val);
+    }
+
+    inline void __cdecl Ten_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533890 });
+        fn();
+    }
+
+    inline void __cdecl Ten_Flag() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0043AA90 });
+        fn();
+    }
 }

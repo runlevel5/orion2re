@@ -13,8 +13,8 @@ namespace netcode {
         _connection_type = mode;
 
         if (mode == 0) {
-            time_::_time = 0x00534A70;  /* time::time_ */
-            time_::_time2 = 0x00534A70; /* time::time_ */
+            time_::_time = reinterpret_cast<time_::Fn>(0x00534A70);  /* time::time_ */
+            time_::_time2 = reinterpret_cast<time_::Fn>(0x00534A70); /* time::time_ */
 
             result = WINNET::Init_Connection_(1);
             WINNET::Refresh_Game_List_(guid);
@@ -24,7 +24,7 @@ namespace netcode {
             result = simmodem::Init_Modem_(network, recv_fn);
         } else if (mode == 3) {
             result = 1;
-            WINNET::Init_TEN_(mode, &guid, recv_fn, network);
+            ten::Init_TEN_(mode, &guid, recv_fn, network);
         }
 
         return result;
@@ -148,7 +148,7 @@ namespace netcode {
 
     int32_t __cdecl Net_Get_Users_(uint8_t* users) {
         if (_connection_type == 3) {
-            return WINNET::TEN_Get_Users_(users);
+            return ten::TEN_Get_Users_(users);
         }
 
         if (_connection_type == 1 || _connection_type == 2) {
@@ -180,14 +180,14 @@ namespace netcode {
 
     uint32_t __cdecl Net_Host_ID_() {
         if (_connection_type == 3) {
-            return WINNET::TEN_Get_Host_Id_();
+            return ten::TEN_Get_Host_Id_();
         }
         return net::_thisHost;
     }
 
     void __cdecl Net_Update_() {
         if (_connection_type == 3) {
-            WINNET::Ten_Update_();
+            ten::Ten_Update_();
         }
 
         if (_connection_type == 0 && _inComms == 0) {

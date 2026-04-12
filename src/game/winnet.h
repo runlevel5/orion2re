@@ -24,46 +24,29 @@ namespace WINNET {
     inline uint32_t& _player_count =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00589988});
 
-    inline s_net_player*& _player_list =
-        *reinterpret_cast<s_net_player**>(std::uintptr_t{0x005899A8});
+    inline s_net_player** _player_list = reinterpret_cast<s_net_player**>(std::uintptr_t{0x005899A8});
 
     inline DPID& _local_player_id = *reinterpret_cast<DPID*>(std::uintptr_t{0x005899F8});
 
-    inline uint32_t __cdecl TEN_Get_Host_Id_() {
-        using Fn = uint32_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533960});
-        return fn();
-    }
-
-    inline int32_t __cdecl TEN_Get_Users_(uint8_t* users) {
-        using Fn = int32_t(__cdecl*)(uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533930});
-        return fn(users);
-    }
+    inline char* s_Invalid_Object_0055bf8c = reinterpret_cast<char*>(std::uintptr_t{0x0055BF8C}); // "Invalid Object"
+    inline char* s_Generic_0055bfe8 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFE8}); // "Generic"
+    inline char* s_Invalid_Params_0055bff0 = reinterpret_cast<char*>(std::uintptr_t{0x0055BFF0}); // "Invalid Params"
+    inline char* s_Unknown_Err_00560a08 = reinterpret_cast<char*>(std::uintptr_t{0x00560A08}); // "Unknown Err"
+    inline char* s_Buffer_To_Small_00560a14 = reinterpret_cast<char*>(std::uintptr_t{0x00560A14}); // "Buffer To Small"
+    inline char* s_No_Messages_00560a24 = reinterpret_cast<char*>(std::uintptr_t{0x00560A24}); // "No Messages"
+    inline char* s_DirectPlay_ERR_00560a30 = reinterpret_cast<char*>(std::uintptr_t{0x00560A30}); // "DirectPlay ERR: "
 
     uint32_t __cdecl Get_Player_Network_Id_(int32_t player_idx);
 
     int __stdcall Refresh_Game_List_Callback_(LPDPSESSIONDESC session_desc, void* context, uint32_t* timeout, uint32_t flags);
 
-    int __cdecl Refresh_Player_List_(DWORD dwSession);
+    int32_t __cdecl Refresh_Player_List_(DWORD session_id);
 
-    inline BOOL __stdcall Player_Enumerate_Callback_(DPID dpId, LPSTR lpFriendlyName, LPSTR lpFormalName, DWORD dwFlags, LPVOID lpContext) {
-        using Fn = BOOL(__stdcall*)(DPID, LPSTR, LPSTR, DWORD, LPVOID);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00538780});
-        return fn(dpId, lpFriendlyName, lpFormalName, dwFlags, lpContext);
-    }
+    BOOL __stdcall Player_Enumerate_Callback_(DPID dp_id, char* short_name, char* long_name, DWORD flags, void* context);
 
-    inline void __cdecl Exit_With_DPlay_Error_(HRESULT error_code) {
-        using Fn = void(__cdecl*)(HRESULT);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539CE0});
-        fn(error_code);
-    }
+    void __cdecl Exit_With_DPlay_Error_(int32_t error_code);
 
-    inline void __cdecl Register_Player_(DPID pid, char* friendly_name, char* formal_name) {
-        using Fn = void(__cdecl*)(DPID, char*, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005387A0});
-        fn(pid, friendly_name, formal_name);
-    }
+    void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str);
 
     void __cdecl Create_Player_(DPID* pid, char* friendly_name, char* formal_name);
 
@@ -73,37 +56,9 @@ namespace WINNET {
 
     int32_t __cdecl Init_Connection_(int32_t mode);
 
-    inline void __cdecl Init_TEN_(uint32_t mode, GUID* guid, void* recv_fn, s_network* net) {
-        using Fn = void(__cdecl*)(uint32_t, GUID*, void*, s_network*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005337F0});
-        fn(mode, guid, recv_fn, net);
-    }
-
-    inline void __cdecl Ten_Stop(int32_t val) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043AAA0});
-        fn(val);
-    }
-
-    inline void __cdecl Ten_Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533890});
-        fn();
-    }
-
-    inline void __cdecl Ten_Flag() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043AA90});
-        fn();
-    }
-
     BOOL __stdcall Enumerate_Providers_(GUID* guid, char* name, DWORD major_version, DWORD minor_version, void* context);
 
     int32_t __cdecl Init_Providers_();
 
-    inline void __cdecl Net_Enable_New_Players() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535400});
-        fn();
-    }
+    void __cdecl Net_Enable_New_Players();
 }

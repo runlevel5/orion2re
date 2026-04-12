@@ -2894,6 +2894,10 @@ namespace hooks {
         { 0x00538940, &WINNET::Create_Player_ },
         { 0x00534DB0, &WINNET::Refresh_Player_List_ },
         { 0x00534E10, &WINNET::Get_Player_Network_Id_ },
+        { 0x00538780, &WINNET::Player_Enumerate_Callback_ },
+        { 0x00539ce0, &WINNET::Exit_With_DPlay_Error_ },
+        { 0x005387a0, &WINNET::Register_Player_ },
+        { 0x00535400, &WINNET::Net_Enable_New_Players },
     };
 
     void Install_Hooks()

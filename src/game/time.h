@@ -1,15 +1,15 @@
 #pragma once
 
 namespace time_ {
-    inline uint32_t& _time =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005897F0});
+    // TYPE MISMATCH: was uint32_t&
+    using Fn = uint32_t(__cdecl*)();
+    inline Fn& _time = *reinterpret_cast<Fn*>(std::uintptr_t{0x005897F0});
 
-    inline uint32_t& _time2 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00589A10});
+    inline Fn& _time2 = *reinterpret_cast<Fn*>(std::uintptr_t{0x00589A10});
 
-    inline void __cdecl time_() {
-        using Fn = void(__cdecl*)();
+    inline uint32_t __cdecl time_() {
+        using Fn = uint32_t(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534A70});
-        fn();
+        return fn();
     }
 }

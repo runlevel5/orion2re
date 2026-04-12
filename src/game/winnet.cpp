@@ -153,29 +153,84 @@ namespace WINNET {
         Register_Player_(*pid, friendly_name, formal_name);
     }
 
-    int __cdecl Refresh_Player_List_(DWORD dwSession) {
-        if (_player_count != 0) {
-            for (uint32_t i = 0; i < _player_count; ++i) {
-                if ((&_player_list)[i] != nullptr) {
-                    ::_free((&_player_list)[i]);
-                }
+    int32_t __cdecl Refresh_Player_List_(DWORD session_id) {
+        for (uint32_t i = 0; i < _player_count; ++i) {
+            if (_player_list[i] != nullptr) {
+                ::_free(_player_list[i]);
             }
         }
 
         _player_count = 0;
 
         netcode::_dplay->EnumPlayers(
-            dwSession,
-            reinterpret_cast<LPDPENUMPLAYERSCALLBACK>(std::uintptr_t{0x00538780}), /* WINNET::Player_Enumerate_Callback_ */
-            platform::g_main_window,
-            0x80
+            session_id,
+            Player_Enumerate_Callback_,
+            reinterpret_cast<LPVOID>(platform::g_main_window),
+            0x80 /* DPENUMPLAYERS_SESSION */
         );
+
 
         return 1;
     }
 
     uint32_t __cdecl Get_Player_Network_Id_(int32_t player_idx) {
-        return (&_player_list)[player_idx]->player_id;
+        return _player_list[player_idx]->player_id;
+    }
+
+    BOOL __stdcall Player_Enumerate_Callback_(DPID dp_id, char* short_name, char* long_name, DWORD flags, void* context) {
+        Register_Player_(dp_id, short_name, long_name);
+        return 1;
+    }
+
+    void __cdecl Register_Player_(uint32_t player_id, char* player_name, char* event_str) {
+        s_net_player* player = reinterpret_cast<s_net_player*>(_malloc(sizeof(s_net_player)));
+
+        _player_list[_player_count] = player;
+        player->player_id = player_id;
+
+        strcpy(player->event_string, event_str);
+        strcpy(player->player_name, player_name);
+
+        player->join_time = time_::_time();
+
+        _player_count++;
+    }
+
+    void __cdecl Exit_With_DPlay_Error_(int32_t error_code) {
+        char buffer[200];
+        char* err_str;
+
+        strcpy(buffer, s_DirectPlay_ERR_00560a30);
+
+        switch (error_code) {
+        case 0x80070057:
+            err_str = s_Invalid_Params_0055bff0;
+            break;
+        case 0x80004005:
+            err_str = s_Generic_0055bfe8;
+            break;
+        case 0x8877001E:
+            err_str = s_Buffer_To_Small_00560a14;
+            break;
+        case 0x88770082:
+            err_str = s_Invalid_Object_0055bf8c;
+            break;
+        case 0x887700BE:
+            err_str = s_No_Messages_00560a24;
+            break;
+        default:
+            err_str = s_Unknown_Err_00560a08;
+            break;
+        }
+
+        strcat(buffer, err_str);
+        exitm::Exit_With_Message(buffer);
+    }
+
+    void __cdecl Net_Enable_New_Players() {
+        if (netcode::_dplay != nullptr) {
+            netcode::_dplay->EnableNewPlayers(1);
+        }
     }
 
 }

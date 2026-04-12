@@ -318,8 +318,8 @@ namespace NETSTART {
         }
 
         if (NETMOX::_net.mode == 3) {
-            WINNET::Ten_Stop(1);
-            WINNET::Ten_Flag();
+            ten::Ten_Stop(1);
+            ten::Ten_Flag();
         }
 
         return result;
@@ -473,8 +473,8 @@ namespace NETSTART {
         MOX::_player[MOX::_PLAYER_NUM].objectives = 100;
 
         if (NETMOX::_net.mode == 3) {
-            WINNET::Ten_Stop(1);
-            WINNET::Ten_Flag();
+            ten::Ten_Stop(1);
+            ten::Ten_Flag();
         }
 
         RUSS::Mox_Update_();
@@ -777,8 +777,8 @@ namespace NETSTART {
         fields::Assign_Auto_Function_(score_nullsub_fn, 2);
 
         if (NETMOX::_net.mode == 3) {
-            WINNET::Ten_Stop(1);
-            WINNET::Ten_Flag();
+            ten::Ten_Stop(1);
+            ten::Ten_Flag();
         }
 
         NETMOX::_net.num_connected_players = 0;
