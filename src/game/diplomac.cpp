@@ -75,7 +75,7 @@ namespace diplomac {
         }
         score += trust_mod;
 
-        if ((Fleet_Strength_Comparison_(player_id, target_id) >= 300 || MOX::_player[player_id].total_pop * 3 > MOX::_player[player_id].total_pop * 2) && 
+        if ((Fleet_Strength_Comparison_(player_id, target_id) >= 300 || MOX::_player[player_id].total_pop * 3 <= MOX::_player[player_id].total_pop * 2) && 
             MOX::_player[player_id].personality != 5 /* PACIFIST */) {
             int16_t str_mod = (int16_t)(Fleet_Strength_Comparison_(player_id, target_id) / -40);
             if (str_mod < min_mod) {
@@ -106,7 +106,7 @@ namespace diplomac {
             score -= 10;
         }
 
-        int16_t turn = (int16_t)MOX::_stardate + 30535 /* 0x7747 */;
+        int16_t turn = (int16_t)MOX::_stardate - 35001;
         if (turn > 99) {
             int16_t comparison_turn = (turn < 350) ? turn - 40 : 309;
             int16_t source_growth = (uint8_t)MOX::_player[player_id].population_history[turn] - (uint8_t)MOX::_player[player_id].population_history[comparison_turn];
@@ -125,7 +125,7 @@ namespace diplomac {
         if (MOX::_player[player_id].treaty[target_id] == 2) score += 20;
 
         int16_t personality_idx = Get_Player_Diplomacy_Personality_(player_id, target_id);
-        score += _personality_break_peace_treaty_chance[personality_idx + 16];
+        score += _personality_break_peace_treaty_chance[personality_idx + 8];
 
         if (MOX::_player[target_id].tech_applications[200] == 3) score += 5;
         if (MOX::_player[target_id].traits[20] == 1 /* TRAIT_TELEPATHIC */) score += 10;
@@ -133,7 +133,7 @@ namespace diplomac {
         score = (score + COLCALC::Best_Leader_Diplomat_Bonus_(target_id) - MOX::_settings.game_difficulty) + 15;
 
         int16_t final_prob;
-        int8_t last_threat_turn = MOX::_player[player_id].last_diplomacy_threat_turn[target_id];
+        uint8_t last_threat_turn = MOX::_player[player_id].last_diplomacy_threat_turn[target_id];
 
         if (score < 0) {
             final_prob = -(int16_t)(last_threat_turn * score);
@@ -161,7 +161,6 @@ namespace diplomac {
                     for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                         if (i != player_id && MOX::_player[player_id].total_pop < MOX::_player[i].total_pop) {
                             is_most_populous = false;
-                            break;
                         }
                     }
 
@@ -251,7 +250,7 @@ namespace diplomac {
                     if (plr1->peace_duration[p2] != 0) {
                         int16_t personality = Get_Player_Diplomacy_Personality_(p1, p2);
                         int16_t break_chance = _personality_break_peace_treaty_chance[personality];
-                        if (random::Random_(100) >= (int32_t)break_chance) {
+                        if (random::Random_(100) > (int32_t)break_chance) {
                             if (eval_results[p2] != 0) {
                                 plr1->war_buildup_duration = (int8_t)random::Random_(20) + 20;
                             }
@@ -261,7 +260,7 @@ namespace diplomac {
 
                     if (eval_results[p2] == 2) {
                         if (Get_Player_Diplomacy_Personality_(p1, p2) != 4) {
-                            Clear_Last_Proposal_Turn_(p1, p2);
+                            Clear_Last_Threat_Turn_(p1, p2);
                             if (plr1->opportunity_planet_num[p2] == -1 || 
                                 plr1->opportunity_actual_attacker_ratio[p2] <= (int32_t)eval_ratios[p2]) 
                             {
@@ -287,7 +286,7 @@ namespace diplomac {
                             }
                         }
                     } else if (eval_results[p2] == 1) {
-                        Clear_Last_Proposal_Turn_(p1, p2);
+                        Clear_Last_Threat_Turn_(p1, p2);
                         plr1->diplomacy_demand_rejection_message[p2] = (int8_t)eval_messages[p2];
                         plr1->war_buildup_duration = (int8_t)random::Random_(20) + 20;
                         plr1->diplomacy_severity[p2] = 10000;
@@ -295,7 +294,7 @@ namespace diplomac {
                         plr1->diplomacy_message[p2] = 0x6a;
                         Set_Demands_(p1, p2);
                     } else if (eval_results[p2] == 3) {
-                        Clear_Last_Proposal_Turn_(p1, p2);
+                        Clear_Last_Threat_Turn_(p1, p2);
                         plr1->diplomacy_severity[p2] = 10000;
                         plr1->diplomacy_incident[p2] = 0;
                         plr1->diplomacy_message[p2] = 0x69;
@@ -303,7 +302,7 @@ namespace diplomac {
                         Set_Demands_(p1, p2);
                     } else if (eval_results[p2] == 4) {
                         plr1->council_threat = (int8_t)p2;
-                        Clear_Last_Proposal_Turn_(p1, p2);
+                        Clear_Last_Threat_Turn_(p1, p2);
                         plr1->diplomacy_severity[p2] = 10000;
                         plr1->diplomacy_incident[p2] = 0;
                         plr1->diplomacy_message[p2] = 0x7c;
@@ -1945,7 +1944,7 @@ namespace diplomac {
         MOX::_player[player_idx].peace_modifier[target_idx] -= 10;
     }
 
-    void __cdecl Clear_Last_Proposal_Turn_(int16_t player_idx_1, int16_t player_idx_2) {
+    void __cdecl Clear_Last_Threat_Turn_(int16_t player_idx_1, int16_t player_idx_2) {
         MOX::_player[player_idx_1].last_diplomacy_threat_turn[player_idx_2] = 0;
         MOX::_player[player_idx_2].last_diplomacy_threat_turn[player_idx_1] = 0;
     }

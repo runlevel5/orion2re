@@ -47,11 +47,11 @@ namespace AIPOWER {
         defense_bonus = Base_Generic_Dcv_(target_idx);
 
         for (int i = 0; i < 8; ++i) {
-            int16_t weapon_type = *reinterpret_cast<int16_t*>((uint8_t*)&ship->d + 0x1c + i * 8);
+            int16_t weapon_type = ship->d.ship_weapon[i].type;
             if (weapon_type <= 0) continue;
 
-            int16_t count = *reinterpret_cast<int16_t*>((uint8_t*)&ship->d + 0x1c + i * 8 + 2);
-            uint16_t slot_specials = *reinterpret_cast<uint16_t*>((uint8_t*)&ship->d + 0x1c + i * 8 + 5);
+            int16_t count = ship->d.ship_weapon[i].current_count;
+            uint16_t slot_specials = ship->d.ship_weapon[i].specials;
             uint32_t slot_strength;
 
             if (!(slot_specials & 0x40) && weapon_type != 0x22 && weapon_type != 0x0D) {
@@ -96,7 +96,7 @@ namespace AIPOWER {
                         break;
                     }
                     case 1: {
-                        uint8_t ammo = *reinterpret_cast<uint8_t*>((uint8_t*)&ship->d + 0x1c + i * 8 + 4);
+                        uint8_t ammo = ship->d.ship_weapon[i].ammo;
                         if (ammo == 2) {
                             slot_strength = (slot_strength * 3) >> 2;
                         }
@@ -118,7 +118,7 @@ namespace AIPOWER {
         }
 
         int16_t best_shield = INITSHIP::Best_Ship_Shield_(ship->owner);
-        int16_t current_shield = *reinterpret_cast<int8_t*>((uint8_t*)&ship->d + 0x12);
+        int16_t current_shield = ship->d.shield_type;
         int16_t shield_diff = best_shield - current_shield;
         int16_t shield_scale = 100;
 

@@ -116,7 +116,7 @@ namespace diplomac {
 
     void __cdecl Diplomacy_Broken_Contacts_();
 
-    void __cdecl Clear_Last_Proposal_Turn_(int16_t player_idx_1, int16_t player_idx_2);
+    void __cdecl Clear_Last_Threat_Turn_(int16_t player_idx_1, int16_t player_idx_2);
 
     int16_t __cdecl Find_Worst_Modifier_(int16_t player_idx, int16_t target_idx);
 

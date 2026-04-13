@@ -60,6 +60,11 @@ workflows:
           * Ensure that external function stubs and external variables have correct types and addresses.
           * Detect incorrect signess for parameters, variables and structure fields. If disassembly clearly uses unsigned 
             instructions, but decompiled project code has signed variable (and vice-a-versa) - mention it with explanation.
+          * Detect misnamed and incorrect functions being called.
+          * Detect potential undefined behavior around type casting and wrapping. For example, this is an example of UB:
+            ```
+            int16_t turn = (int16_t)MOX::_stardate + 30535;
+            ```
           
           # OUTPUT:
           * Your must show places where project code is different from provided disassembly with very short and concise explanation why.
@@ -69,8 +74,9 @@ workflows:
 
           # CHECKLIST
           * You found and read existing function in the codebase
-          * You analyzed and confirmed decompilation correctness
-          * You analyzed and confirmed correctness of parameter, variable and structure field types
+          * You analyzed and confirmed decompilation correctness against the disassembly
+          * You analyzed and confirmed correctness of parameter, variable and structure field types used
+          * You analyzed and confirmed variables used and functions called to match disassembly
           * You provided a list of identified discrepancies with explanations
           * You did NOT make any file changes without prior approval
         outcomes:

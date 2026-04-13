@@ -1184,7 +1184,7 @@ namespace hooks {
         { 0x00455250, &diplomac::Start_Treaty_ },
         { 0x004553b0, &diplomac::Adjust_Diplomat_Modifiers_ },
         { 0x00455590, &diplomac::Diplomacy_Broken_Contacts_ },
-        { 0x004581f0, &diplomac::Clear_Last_Proposal_Turn_ },
+        { 0x004581f0, &diplomac::Clear_Last_Threat_Turn_ },
         { 0x004573d0, &diplomac::NPC_Sneak_Attacks_ },
         { 0x00466080, &AIMOVE::Number_Of_Attacks_Underway_ },
         { 0x00454f50, &diplomac::Total_War_Loss_Comparison_ },
