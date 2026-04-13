@@ -3648,6 +3648,13 @@ struct s_saved_box {
     __int8_t f2;
 };
 
+typedef struct s_scan_list_entry s_scan_list_entry, *Ps_scan_list_entry;
+
+struct s_scan_list_entry {
+    int16_t min_x;
+    int16_t max_x;
+};
+
 typedef struct s_scroll_bar s_scroll_bar, *Ps_scroll_bar;
 
 struct s_scroll_bar {

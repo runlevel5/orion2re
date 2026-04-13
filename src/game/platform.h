@@ -115,6 +115,26 @@ namespace platform {
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void Create_Cursor_Surfaces();
 	HRESULT Restore_Surfaces();
+	inline void __cdecl Save_Mouse_(int16_t x, int16_t y) {
+		using Fn = void(__cdecl*)(int16_t, int16_t);
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005271A0});
+		fn(x, y);
+	}
+	inline void __cdecl Save_Mouse_Offscreen_(int16_t x, int16_t y) {
+		using Fn = void(__cdecl*)(int16_t, int16_t);
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527120});
+		fn(x, y);
+	}
+	inline void __cdecl Draw_Cursor_XY_Offscreen_(int16_t x, int16_t y) {
+		using Fn = void(__cdecl*)(int16_t, int16_t);
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527220});
+		fn(x, y);
+	}
+	inline void __cdecl Restore_Mouse_Off_Page_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527000});
+		fn();
+	}
 	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
 	inline void __cdecl Update_Cursor_Image_() {

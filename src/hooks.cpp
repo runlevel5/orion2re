@@ -2930,6 +2930,9 @@ namespace hooks {
         { 0x0053a3d0, &transprt::NotifyNextQueuedSender_ },
         { 0x00539f70, &transprt::SendAck_ },
         { 0x00539fd0, &transprt::AllAcknowledged_ },
+        { 0x00528a30, &video::Add_Line_To_Scan_List_ },
+        { 0x00528970, &video::Add_Dot_To_Scan_List_ },
+        { 0x00527ed0, &video::Toggle_Pages_ },
     };
 
     void Install_Hooks()

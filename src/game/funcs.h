@@ -39,6 +39,10 @@ inline const char* s_Sending_Message_To_All = reinterpret_cast<const char*>(std:
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
+inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
+inline int16_t& g_cached_mouse_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578AB8});
+inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578ABC});
+inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});

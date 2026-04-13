@@ -15,8 +15,19 @@ namespace video {
 	inline uint32_t& screen_dump_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1A0 });
 
+	struct s_scan_list_entry {
+		int16_t min_x;
+		int16_t max_x;
+	};
+
 	inline uint32_t& screen_refresh_flag =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1B4 });
+
+	inline s_scan_list_entry*& _refresh_scan_list =
+		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x00579348 });
+
+	inline s_scan_list_entry*& _refresh_stencil_list =
+		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x0057934C });
 
 	inline uint8_t*& _mouse_palette =
 		*reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00578AB0 });
@@ -80,17 +91,9 @@ namespace video {
         reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
     }
 
-    inline void __cdecl Add_Line_To_Scan_List_(int32_t start_x, int32_t y, int32_t end_x) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528A30 });
-        fn(start_x, y, end_x);
-    }
+    void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2);
 
-    inline void __cdecl Add_Dot_To_Scan_List_(int32_t x, int32_t y) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528970 });
-        fn(x, y);
-    }
+	void __cdecl Add_Dot_To_Scan_List_(int32_t x_scaled, int32_t y);
 
 	void __cdecl Set_Refresh_Differential_();
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
@@ -100,4 +103,36 @@ namespace video {
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526d10});
 		fn();
 	}
+
+    inline void __cdecl _Masked_Screen_Dump() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528030});
+        fn();
+    }
+
+    inline void __cdecl _Partial_Screen_Dump() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528040});
+        fn();
+    }
+
+    inline void __cdecl Stencil_Out_Background_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528110});
+        fn();
+    }
+
+    inline void __cdecl Clear_Stencil_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287C0});
+        fn();
+    }
+
+    inline void __cdecl Clear_Scan_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287A0});
+        fn();
+    }
+
+    void __cdecl Toggle_Pages_();
 }

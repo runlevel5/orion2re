@@ -49,4 +49,16 @@ namespace mouse {
     int __cdecl Get_Pointer_Offset_();
 
     int16_t __cdecl Get_Pointer_Image_Number_();
+
+    inline void __cdecl Disable_Mouse_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276A0});
+        fn();
+    }
+
+    inline void __cdecl Enable_Mouse_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276B0});
+        fn();
+    }
 }
