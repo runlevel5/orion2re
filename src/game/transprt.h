@@ -71,7 +71,7 @@ namespace transprt {
 
     inline uint8_t& _tpSendImmediateBurstFlag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560AA8});
 
-    inline int32_t& _queuedSenderCount = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A44});
+    inline uint32_t& _queuedSenderCount = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A44});
     inline int32_t& _tpBlockReceiving = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560AA4});
     inline uint32_t (&_queuedSenders)[20] = *reinterpret_cast<uint32_t(*)[20]>(std::uintptr_t{0x00591F50});
 
@@ -91,23 +91,11 @@ namespace transprt {
 
     void __cdecl ResetReceiving_();
 
-    inline bool __cdecl AllAcknowledged_() {
-        using Fn = bool(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539FD0});
-        return fn();
-    }
+    bool __cdecl AllAcknowledged_();
 
-    inline void __cdecl SendAck_(int32_t sender_host_id, uint32_t message_stamp, int32_t burst_index) {
-        using Fn = void(__cdecl*)(int32_t, uint32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539F70});
-        fn(sender_host_id, message_stamp, burst_index);
-    }
+    int32_t __cdecl SendAck_(uint8_t dest_player, uint32_t message_stamp, uint8_t burst_index);
 
-    inline void __cdecl NotifyNextQueuedSender_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0053A3D0});
-        fn();
-    }
+    void __cdecl NotifyNextQueuedSender_();
 
     int32_t __cdecl NumUsers_();
 

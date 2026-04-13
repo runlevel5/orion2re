@@ -1,8 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <cstdio>
-
 namespace bitio {
     BIT_BUF* __cdecl OpenInputBitBuffer_(uint8_t* buffer);
     BIT_BUF* __cdecl OpenOutputBitBuffer_(uint8_t* buffer);

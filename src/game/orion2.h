@@ -4507,6 +4507,21 @@ struct s_techdata_planetary_shield {
     int8_t absorption;
 };
 
+typedef struct s_transport_pack_ack s_transport_pack_ack, *Ps_transport_pack_ack;
+
+struct s_transport_pack_ack {
+    uint32_t message_stamp;
+    uint16_t send_data_length;
+    uint8_t packet_index;
+    uint8_t total_packets;
+    uint8_t host;
+    uint16_t current_user_type;
+    uint8_t burst_index;
+    uint8_t message_is_processed;
+    uint32_t send_immediate_burst;
+    uint16_t pad;
+};
+
 typedef struct s_transport_packet s_transport_packet, *Ps_transport_packet;
 
 struct s_transport_packet {

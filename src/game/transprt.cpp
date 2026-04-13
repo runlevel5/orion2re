@@ -303,4 +303,53 @@ namespace transprt {
         }
     }
 
+    int32_t __cdecl SendAck_(uint8_t dest_player, uint32_t message_stamp, uint8_t burst_index) {
+        s_transport_pack_ack packet;
+        packet.message_stamp = message_stamp;
+        packet.host = static_cast<uint8_t>(net::_thisHost);
+        packet.burst_index = burst_index;
+
+        return static_cast<int32_t>(comcore::ComSendUserMessage_(&packet, sizeof(packet), dest_player, 0x7bf, 1, 0));
+    }
+
+    bool __cdecl AllAcknowledged_() {
+        if (_tpDestID != 0x7FFE && _tpDestID != 0x7FFF) {
+            return _tpAckFlags[_tpDestID] != 0;
+        }
+
+        bool all_acknowledged = true;
+        for (uint32_t i = 0; i < WINNET::_player_count; ++i) {
+            uint32_t player_id = WINNET::Get_Player_Network_Id_(static_cast<int32_t>(i));
+            if (player_id != net::_thisHost) {
+                if (all_acknowledged) {
+                    all_acknowledged = true;
+                    if (_tpAckFlags[player_id] != 0) {
+                        continue;
+                    }
+                }
+                all_acknowledged = false;
+            }
+        }
+
+        return all_acknowledged;
+    }
+
+    void __cdecl NotifyNextQueuedSender_() {
+        if (_queuedSenderCount != 0) {
+            uint8_t msg[20];
+
+            *reinterpret_cast<uint32_t*>(&msg[0]) = 0;
+            msg[8] = static_cast<uint8_t>(net::_thisHost);
+            msg[11] = 0;
+
+            // Message is sent twice deliberately, likely a naive form of redundancy over UDP
+            comcore::ComSendUserMessage_(msg, 0x13, _queuedSenders[0], 0x7B1, 1, 0);
+            comcore::ComSendUserMessage_(msg, 0x13, _queuedSenders[0], 0x7B1, 1, 0);
+
+            memmove(&_queuedSenders[0], &_queuedSenders[1], 0x13 * sizeof(uint32_t));
+
+            _queuedSenderCount--;
+        }
+    }
+
 }

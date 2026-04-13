@@ -1,10 +1,6 @@
 #include "pch.h"
-#include "arith1e.h"
-#include "bitio.h"
-#include <stdlib.h>
 
 namespace arith1e {
-
     struct SYMBOL {
         uint16_t low_count;
         uint16_t high_count;

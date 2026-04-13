@@ -2927,6 +2927,9 @@ namespace hooks {
         { 0x0053a7c0, &bitio::BufferOutputBits_ },
         { 0x00538ab0, &arith1e::Compress_Data_ },
         { 0x00538b80, &arith1e::Uncompress_Data_ },
+        { 0x0053a3d0, &transprt::NotifyNextQueuedSender_ },
+        { 0x00539f70, &transprt::SendAck_ },
+        { 0x00539fd0, &transprt::AllAcknowledged_ },
     };
 
     void Install_Hooks()
