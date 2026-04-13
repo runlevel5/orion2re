@@ -3080,10 +3080,10 @@ typedef struct s_net_pack_start_game s_net_pack_start_game, *Ps_net_pack_start_g
 struct s_net_pack_start_game {
     int32_t net_host_id;
     int16_t num_connected_players;
-    uint32_t net_ids[8];
+    int32_t net_ids[8];
     uint8_t random_events;
     uint8_t game_difficulty;
-    uint8_t number_of_players;
+    int8_t number_of_players;
     uint8_t galaxy_size;
     uint8_t galaxy_age;
     uint8_t strategic_combat_flag;

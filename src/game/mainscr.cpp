@@ -3527,7 +3527,6 @@ namespace MAINSCR {
         }
         case 0x02:
         case 0x0D:
-        case 0x12:
         case 0x2E:
         case 0x32:
         case 0x34: {
@@ -3839,8 +3838,7 @@ namespace MAINSCR {
             break;
         }
         case 0x25: {
-            // Note: Ghidra mapped `_521_1_`. Match whatever valid struct name handles this byte.
-            NETMOX::_net.field69_0x153 = *(uint8_t*)data;
+            NETMOX::_net.field174_0x209 = *(uint8_t*)data;
             NETMOX::_net.player_net_info[from_player_id].sync_state = 0x1E;
             break;
         }
@@ -3958,12 +3956,11 @@ namespace MAINSCR {
             break;
         }
         case 0x40: {
-            // Unmapped network logic flag
-            NETMOX::_net.field167_0x202 = 1;
+            NETMOX::_net.field161_0x1fc = 1;
             break;
         }
         case 0x41: {
-            NETMOX::_net.field167_0x202 = 2;
+            NETMOX::_net.field161_0x1fc = 2;
             break;
         }
         case 0x42: {
@@ -3996,6 +3993,7 @@ namespace MAINSCR {
             int32_t val = *(int32_t*)data;
             diplomac::Declare_War_((int16_t)from_player_id, (int16_t)val);
             break;
+        }
         }
     }
 }
