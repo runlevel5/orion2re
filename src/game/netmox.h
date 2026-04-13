@@ -141,4 +141,18 @@ namespace NETMOX {
     void __cdecl Human_Abdicates_(int player_idx);
 
     void __cdecl Human_Surrenders_(int player_idx);
+
+    int8_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id);
+
+    void __cdecl Decode_Pick_Target_Info_(void* packet_data);
+
+    void __cdecl Decode_You_Are_Target_Info_(void* packet_data);
+
+    void __cdecl Decode_Battle_Results_(void* packet_data);
+
+    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1);
+
+    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr);
+
+    void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
 }

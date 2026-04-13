@@ -115,4 +115,8 @@ namespace COMBFIND {
 
     int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx);
 
+    void __cdecl Copy_Target_Info_(s_combfind_target* src);
+
+    void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx);
+
 }

@@ -11,4 +11,6 @@ namespace CHAT {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042CFA0});
         fn(msg);
     }
+
+    void __cdecl Receive_Chat_Msg_(uint8_t player_id, void* text);
 }

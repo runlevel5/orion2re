@@ -1101,6 +1101,10 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
  * Determines if a specific player is allowed to initiate an attack on another player 
  * based on their current relationship status, treaties, and personality.
  */
+void __cdecl Copy_Target_Info_(s_combfind_target* src) {
+    _target = *src;
+}
+
 int8_t __cdecl Player_May_Attack_Player_(int attacker_idx, int target_idx) {
     if (target_idx == attacker_idx) {
         return 0;
@@ -1154,6 +1158,27 @@ int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
     }
 
     return MOX::_colony[colony_idx].planet;
+}
+
+void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
+    s_combfind_star_has_player *dest;
+
+    if (star_idx == -1) {
+        dest = _current_star_has_player;
+    } else {
+        dest = (*_star_has_player)[star_idx];
+    }
+
+    memcpy(dest, *buffer, 88);
+    *buffer += 88;
+
+    if (star_idx == -1) {
+        *_current_star_has_nonplayer = **buffer;
+    } else {
+        (*_star_has_nonplayer)[star_idx] = **buffer;
+    }
+
+    *buffer += 1;
 }
 
 void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count) {

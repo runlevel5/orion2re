@@ -1393,4 +1393,509 @@ namespace NETMOX {
 
         return &_secret_modem_file;
     }
+
+    int8_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id) {
+        uint8_t weights[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        uint8_t max_weight = 0;
+        bool already_talking = false;
+
+        if (MOX::_NUM_PLAYERS <= 0) {
+            return -1;
+        }
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (NETMOX::_net.player_net_info[i].remote_player_id == target_player_id) {
+                if (NETMOX::_net.player_net_info[i].sync_state == '(') {
+                    already_talking = true;
+                }
+                else {
+                    // Determine diplomacy weight based on traits
+                    // traits[20] = Charismatic, traits[19] = Repulsive
+                    if (MOX::_player[i].traits[20] != 0) {
+                        weights[i] = 3;
+                    }
+                    else if (MOX::_player[i].traits[19] != 0) {
+                        weights[i] = 2;
+                    }
+                    else {
+                        weights[i] = 1;
+                    }
+
+                    if (max_weight < weights[i]) {
+                        max_weight = weights[i];
+                    }
+                }
+            }
+        }
+
+        if (already_talking) {
+            return -1;
+        }
+
+        // Filter out candidates that do not have the highest priority
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (weights[i] < max_weight) {
+                weights[i] = 0;
+            }
+        }
+
+        return RUSS::Get_Weighted_Choice_Char_(weights, MOX::_NUM_PLAYERS);
+    }
+
+    void __cdecl Decode_Pick_Target_Info_(void* packet_data) {
+        uint8_t* ptr = static_cast<uint8_t*>(packet_data);
+
+        // 1. Read Combat Star ID
+        int16_t combat_star_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t); // Advance 2 bytes
+
+        NETMOX::_net.combat_attacker_id = static_cast<int8_t>(MOX::_PLAYER_NUM);
+        NETMOX::_net.combat_star_id = static_cast<int8_t>(combat_star_id);
+
+        // 2. Read Target Info
+        s_combfind_target target_info;
+        memcpy(&target_info, ptr, sizeof(s_combfind_target)); // 44 bytes
+        ptr += sizeof(s_combfind_target);
+
+        COMBFIND::Copy_Target_Info_(&target_info);
+        RUSS::Mox_Update_();
+
+        // If we are not the host, unpack the state data
+        if (NETMOX::_net.local_net_id != NETMOX::_net.net_host_id) {
+
+            // Pass the remaining buffer pointer to Decode_Star_Player_Presence_
+            COMBFIND::Decode_Star_Player_Presence_(&ptr, -1);
+
+            // 3. Read Player Tech Applications
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                    memcpy(MOX::_player[i].tech_applications, ptr, sizeof(MOX::_player[i].tech_applications)); // 212 bytes
+                    ptr += sizeof(MOX::_player[i].tech_applications);
+                }
+            }
+
+            // 4. Read Leaders
+            for (int i = 0; i < 67 /* 0x43 */; ++i) {
+                MOX::_leaders[i].player_index = -1;
+            }
+
+            while (true) {
+                int16_t leader_id = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                if (leader_id == -1) {
+                    break;
+                }
+
+                memcpy(&MOX::_leaders[leader_id], ptr, sizeof(s_leader_data)); // 59 bytes
+                ptr += sizeof(s_leader_data);
+                RUSS::Mox_Update_();
+            }
+            RUSS::Mox_Update_();
+
+            // 5. Read Star Officer Indexes
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                    MOX::_star[combat_star_id].officer_index[i] = static_cast<char>(*ptr);
+                    ptr += 1;
+                }
+            }
+            RUSS::Mox_Update_();
+
+            // 6. Read Planets and Colonies
+            MOX::_NUM_COLONIES = *reinterpret_cast<int16_t*>(ptr);
+            ptr += sizeof(int16_t);
+
+            for (int i = 0; i < 5; ++i) {
+                int16_t planet_idx = MOX::_star[combat_star_id].planet_index[i];
+
+                if (planet_idx != -1) {
+                    int16_t dummy_col_idx = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    int8_t p_type = *reinterpret_cast<int8_t*>(ptr);
+                    ptr += sizeof(int8_t);
+
+                    char p_climate = *reinterpret_cast<char*>(ptr);
+                    ptr += sizeof(char);
+
+                    int16_t real_col_idx = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    MOX::_planet[planet_idx].colony_index = dummy_col_idx;
+                    MOX::_planet[planet_idx].planet_type = p_type;
+                    MOX::_planet[planet_idx].climate = p_climate;
+
+                    // Clear out existing colony mapping
+                    if (MOX::_planet[planet_idx].colony_index != -1) {
+                        MOX::_colony[MOX::_planet[planet_idx].colony_index].owner = -1;
+                        MOX::_colony[MOX::_planet[planet_idx].colony_index].planet = -1;
+                    }
+
+                    MOX::_planet[planet_idx].colony_index = real_col_idx;
+
+                    // Copy actual colony structure if a colony exists
+                    if (MOX::_planet[planet_idx].colony_index != -1) {
+                        memcpy(&MOX::_colony[MOX::_planet[planet_idx].colony_index], ptr, sizeof(s_colony)); // 361 bytes
+                        ptr += sizeof(s_colony);
+                    }
+                }
+            }
+            RUSS::Mox_Update_();
+
+            // 7. Read Ships
+            MOX::_NUM_SHIPS = *reinterpret_cast<int16_t*>(ptr);
+            ptr += sizeof(int16_t);
+
+            if (MOX::_NUM_SHIPS > 0) {
+                for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                    MOX::_ship[i].status = 5; // Status 5 = travelling / in combat
+                }
+            }
+
+            while (true) {
+                int16_t ship_id = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                if (ship_id == -1) {
+                    break;
+                }
+
+                memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_design) + 30 /* Size of s_ship_data is 129 */);
+                // NOTE: the code uses `sizeof(s_ship_data)` directly
+                // memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_data));
+                ptr += sizeof(s_ship_data);
+
+                RUSS::Mox_Update_();
+            }
+        }
+
+        // 8. Finalize synchronization state
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+
+        NETMOX::_net.player_net_info[MOX::_PLAYER_NUM].sync_state = 0x10;
+        NETMOX::_net.sync_state = 0x10;
+    }
+
+    void __cdecl Decode_You_Are_Target_Info_(void* packet_data) {
+        uint8_t* ptr = static_cast<uint8_t*>(packet_data);
+
+        // 1. Read Header
+        int16_t star_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int16_t attacker_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int16_t defender_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int16_t target_colony_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        NETMOX::_net.combat_star_id = static_cast<int8_t>(star_id);
+        NETMOX::_net.combat_attacker_id = static_cast<int8_t>(attacker_id);
+        NETMOX::_net.combat_defender_id = defender_id;
+        NETMOX::_net.combat_target_player_id = MOX::_PLAYER_NUM;
+
+        // If we are not the host, unpack the state data
+        if (NETMOX::_net.local_net_id != NETMOX::_net.net_host_id) {
+
+            // Pass the remaining buffer pointer
+            COMBFIND::Decode_Star_Player_Presence_(&ptr, -1);
+
+            // 2. Read Player Tech Applications
+            if (attacker_id < 8) {
+                memcpy(MOX::_player[attacker_id].tech_applications, ptr, sizeof(MOX::_player[attacker_id].tech_applications)); // 212 bytes
+                ptr += sizeof(MOX::_player[attacker_id].tech_applications);
+            }
+
+            if (MOX::_PLAYER_NUM < 8) {
+                memcpy(MOX::_player[MOX::_PLAYER_NUM].tech_applications, ptr, sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_applications)); // 212 bytes
+                ptr += sizeof(MOX::_player[MOX::_PLAYER_NUM].tech_applications);
+            }
+
+            // 3. Read Leaders
+            for (int i = 0; i < 67 /* 0x43 */; ++i) {
+                int16_t owner = MOX::_leaders[i].player_index;
+                if (owner == attacker_id || owner == MOX::_PLAYER_NUM) {
+                    MOX::_leaders[i].player_index = -1;
+                }
+            }
+
+            while (true) {
+                int16_t leader_id = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                if (leader_id == -1) {
+                    break;
+                }
+
+                memcpy(&MOX::_leaders[leader_id], ptr, sizeof(s_leader_data)); // 59 bytes
+                ptr += sizeof(s_leader_data);
+            }
+
+            // 4. Read Star Officer Indexes
+            if (attacker_id < 8) {
+                MOX::_star[star_id].officer_index[attacker_id] = static_cast<char>(*ptr);
+                ptr += 1;
+            }
+
+            if (MOX::_PLAYER_NUM < 8) {
+                MOX::_star[star_id].officer_index[MOX::_PLAYER_NUM] = static_cast<char>(*ptr);
+                ptr += 1;
+            }
+
+            // 5. Read Targeted Colony Data
+            if (target_colony_id != -1) {
+                MOX::_NUM_COLONIES = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                int16_t planet_idx = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                int16_t dummy_col_idx = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                int8_t p_type = *reinterpret_cast<int8_t*>(ptr);
+                ptr += sizeof(int8_t);
+
+                char p_climate = *reinterpret_cast<char*>(ptr);
+                ptr += sizeof(char);
+
+                MOX::_planet[planet_idx].colony_index = dummy_col_idx;
+                MOX::_planet[planet_idx].planet_type = p_type;
+                MOX::_planet[planet_idx].climate = p_climate;
+
+                memcpy(&MOX::_colony[target_colony_id], ptr, sizeof(s_colony)); // 361 bytes
+                ptr += sizeof(s_colony);
+            }
+
+            // 6. Read Ships
+            MOX::_NUM_SHIPS = *reinterpret_cast<int16_t*>(ptr);
+            ptr += sizeof(int16_t);
+
+            if (MOX::_NUM_SHIPS > 0) {
+                for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                    MOX::_ship[i].status = 5; // Status 5 = travelling / in combat
+                }
+            }
+
+            while (true) {
+                int16_t ship_id = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                if (ship_id == -1) {
+                    break;
+                }
+
+                memcpy(&MOX::_ship[ship_id], ptr, sizeof(s_ship_data)); // 129 bytes
+                ptr += sizeof(s_ship_data);
+            }
+        }
+
+        // 7. Finalize synchronization state
+        NETMOX::_net.combat_planet_id = COMBFIND::Target_Colony_To_Planet_(target_colony_id);
+        NETMOX::_net.sync_state = 0x13;
+    }
+
+    void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1) {
+        MOX::_NUM_PLAYERS = param_1->num_players;
+        memcpy(MOX::_player, param_1->players, param_1->num_players * sizeof(s_player));
+    }
+
+    void __cdecl Decode_Battle_Results_(void* packet_data) {
+        uint8_t* ptr = static_cast<uint8_t*>(packet_data);
+
+        // 1. Read Header
+        int16_t reporting_player_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int16_t attacker_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int16_t defender_id = *reinterpret_cast<int16_t*>(ptr);
+        ptr += sizeof(int16_t);
+
+        int8_t combat_status = *reinterpret_cast<int8_t*>(ptr);
+        ptr += sizeof(int8_t);
+
+        NETMOX::_net.player_net_info[attacker_id].combat_status = combat_status;
+        NETMOX::_net.player_net_info[defender_id].combat_status = combat_status;
+
+        RUSS::Mox_Update_();
+
+        // 2. Filter: Only unpack if we aren't the reporter
+        if (MOX::_PLAYER_NUM != reporting_player_id) {
+
+            bool skip_unpack = false;
+            // Do not unpack if the reporter is the defender, the attacker is a valid player,
+            // and the attacker is a human player (objective == 100 / 'd')
+            if (defender_id == reporting_player_id && attacker_id < 8) {
+                if (MOX::_player[attacker_id].objectives == 100) {
+                    skip_unpack = true;
+                }
+            }
+
+            if (!skip_unpack) {
+                int16_t combat_star_id = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                COMBFIND::Decode_Star_Player_Presence_(&ptr, combat_star_id);
+
+                int16_t combat_planet_idx = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                RUSS::Mox_Update_();
+
+                // 3. Unpack Tech Applications and Officer Indexes
+                if (attacker_id < 8) {
+                    memcpy(MOX::_player[attacker_id].tech_applications, ptr, sizeof(MOX::_player[attacker_id].tech_applications)); // 212 bytes
+                    ptr += sizeof(MOX::_player[attacker_id].tech_applications);
+
+                    MOX::_star[combat_star_id].officer_index[attacker_id] = static_cast<char>(*ptr);
+                    ptr += 1;
+                }
+
+                if (defender_id < 8) {
+                    memcpy(MOX::_player[defender_id].tech_applications, ptr, sizeof(MOX::_player[defender_id].tech_applications)); // 212 bytes
+                    ptr += sizeof(MOX::_player[defender_id].tech_applications);
+
+                    MOX::_star[combat_star_id].officer_index[defender_id] = static_cast<char>(*ptr);
+                    ptr += 1;
+                }
+
+                // 4. Unpack Surviving Leaders
+                while (true) {
+                    int16_t leader_id = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    if (leader_id == -1) {
+                        break;
+                    }
+
+                    memcpy(&MOX::_leaders[leader_id], ptr, sizeof(s_leader_data)); // 59 bytes
+                    ptr += sizeof(s_leader_data);
+                }
+                RUSS::Mox_Update_();
+
+                // 5. Unpack Colony Fate
+                if (combat_planet_idx != -1) {
+                    int16_t old_colony_index = MOX::_planet[combat_planet_idx].colony_index;
+
+                    int16_t new_colony_index = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    int8_t p_type = *reinterpret_cast<int8_t*>(ptr);
+                    ptr += sizeof(int8_t);
+
+                    char p_climate = *reinterpret_cast<char*>(ptr);
+                    ptr += sizeof(char);
+
+                    int16_t actual_col_idx = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    MOX::_planet[combat_planet_idx].colony_index = new_colony_index;
+                    MOX::_planet[combat_planet_idx].planet_type = p_type;
+                    MOX::_planet[combat_planet_idx].climate = p_climate;
+
+                    if (actual_col_idx == -1) {
+                        if (old_colony_index != -1) {
+                            BOMB::Destroy_Colony_(&MOX::_colony[old_colony_index], 1);
+                        }
+                    }
+                    else {
+                        memcpy(&MOX::_colony[actual_col_idx], ptr, sizeof(s_colony)); // 361 bytes
+                        ptr += sizeof(s_colony);
+                        COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[combat_star_id]);
+                    }
+                }
+                RUSS::Mox_Update_();
+
+                // 6. Unpack Ships and Process Casualties
+                MOX::_NUM_SHIPS = *reinterpret_cast<int16_t*>(ptr);
+                ptr += sizeof(int16_t);
+
+                int16_t current_ship_idx = 0;
+
+                while (true) {
+                    int16_t surviving_ship_id = *reinterpret_cast<int16_t*>(ptr);
+                    ptr += sizeof(int16_t);
+
+                    if (surviving_ship_id == -1) {
+                        break;
+                    }
+
+                    // Kill any ships that were skipped in the ID sequence (meaning they died)
+                    while (current_ship_idx < surviving_ship_id) {
+                        s_ship_data* ship = &MOX::_ship[current_ship_idx];
+                        if ((ship->owner == attacker_id || ship->owner == defender_id) &&
+                            ship->status != 5 && ship->location == combat_star_id) {
+                            ship->officer_index = -1;
+                            SHIPS::Kill_Ship_(current_ship_idx);
+                        }
+                        current_ship_idx++;
+                    }
+
+                    // Update the surviving ship
+                    memcpy(&MOX::_ship[surviving_ship_id], ptr, sizeof(s_ship_data)); // 129 bytes
+                    ptr += sizeof(s_ship_data);
+
+                    current_ship_idx++; // Advance past the surviving ship we just updated
+                    RUSS::Mox_Update_();
+                }
+
+                // Sweep any remaining ships at the end of the array that died
+                while (current_ship_idx < MOX::_NUM_SHIPS) {
+                    s_ship_data* ship = &MOX::_ship[current_ship_idx];
+                    if ((ship->owner == attacker_id || ship->owner == defender_id) &&
+                        ship->status != 5 && ship->location == combat_star_id) {
+                        ship->officer_index = -1;
+                        SHIPS::Kill_Ship_(current_ship_idx);
+                    }
+                    current_ship_idx++;
+                }
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+        NETMOX::_net.player_net_info[reporting_player_id].sync_state = 0x1B;
+    }
+
+    void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr) {
+        int16_t planet_idx = MOX::_colony[*colony_id_ptr].planet;
+
+        _net.combat_planet_id = planet_idx;
+        _net.combat_star_id = MOX::_planet[planet_idx].star_index;
+    }
+
+    void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info) {
+        if (MOX::_player[player_idx].network_player_id == _net.host_election_winner_id) {
+            _net.host_election_winner_id = -1;
+        }
+
+        RUSS::Make_Player_Into_AI_(player_idx);
+
+        memcpy(&MOX::_player[player_idx], &drop_out_info->player_data, sizeof(s_player));
+
+        for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+            MOX::_star[i].surrender_to[player_idx] = drop_out_info->star_surrender_to[i];
+        }
+
+        _net.num_connected_players--;
+        _net.players_hit_next_turn[player_idx] = 1;
+
+        if (_net.local_net_id == _net.net_host_id) {
+            if (_net.host_active_player_id == player_idx) {
+                _net.host_active_player_id = -1;
+            }
+
+            _net.player_is_active_flags[player_idx] = 0;
+            _net.host_sync_counter++;
+
+            if (static_cast<uint8_t>(_net.host_sync_counter) == MOX::_NUM_PLAYERS) {
+                _net.sync_state = 11;
+            }
+        }
+    }
 }

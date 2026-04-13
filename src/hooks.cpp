@@ -2933,6 +2933,17 @@ namespace hooks {
         { 0x00528a30, &video::Add_Line_To_Scan_List_ },
         { 0x00528970, &video::Add_Dot_To_Scan_List_ },
         { 0x00527ed0, &video::Toggle_Pages_ },
+        { 0x00513fd0, &MAINSCR::Main_Receive_Message_ },
+        { 0x00519470, &NETMOX::Get_Next_AI_Talker_ },
+        { 0x00517b90, &NETMOX::Decode_Pick_Target_Info_ },
+        { 0x00518440, &NETMOX::Decode_You_Are_Target_Info_ },
+        { 0x00518e30, &NETMOX::Decode_Battle_Results_ },
+        { 0x00519360, &NETMOX::Decode_Pick_Your_Position_ },
+        { 0x005193F0, &NETMOX::Decode_Dragon_Info_ },
+        { 0x0042cef0, &CHAT::Receive_Chat_Msg_ },
+        { 0x00519c70, &NETMOX::Decode_Drop_Out_Info_ },
+        { 0x004BC1B0, &COMBFIND::Copy_Target_Info_ },
+        { 0x004bc240, &COMBFIND::Decode_Star_Player_Presence_ },
     };
 
     void Install_Hooks()
