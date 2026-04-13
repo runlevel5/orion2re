@@ -771,7 +771,7 @@ namespace MULTPLAY {
             0x28 /* 40 */
         );
 
-        MOX::_mp_screen->anim_btn_help = 0;
+        MOX::_mp_screen->setup_screen_state = 0;
 
         // Cancel button
         MOX::_mp_screen->field_id_cancel = fields::Add_Button_Field_(
