@@ -45,12 +45,13 @@ workflows:
           * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory accesses.
           * You must read existing function implementation in the project to analyze it against provided disassembly and decompiler
             output.
+          * Focus on verification of the provided function and not the rest of the codebase.
           * Decompiler output could be partially incorrect, always validate it against the provided disassembled code.
           * You must do an instruction-by-instruction trace of the disassembly and then validate if existing implementation matches it.
           * You must detect if all mentioned stub functions are defined.
           * You must analyze provided disassembly and deduce variables used. Keep in mind that original disassembly might re-use
             variables for different purposes.
-          * You must flag signess issues in parameters, variables or used structures.
+          * You must flag signedness issues in parameters, variables or used structures.
           * You shall ignore subtle changes, such as possible refactors, potentially imperfect variable names, etc.
           * You shall recommend corrected names if variable is clearly misnamed.
           * You shall never rename any functions, global variables and so on. You are allowed to suggest a better name for

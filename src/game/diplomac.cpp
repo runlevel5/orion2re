@@ -2,7 +2,7 @@
 
 namespace diplomac {
     // Suggested name: Sneak_Attack_Evaluations
-    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_severity, int16_t *out_msg_id, int16_t *unused) {
+    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_severity, int16_t *out_msg_id) {
         int8_t rel = MOX::_player[player_id].relations[target_id];
         int8_t rel_divisor = (rel < 50) ? 10 : 5;
 
@@ -195,7 +195,6 @@ namespace diplomac {
         int16_t eval_results[8];
         int16_t eval_messages[8];
         int16_t eval_ratios[8];
-        int16_t eval_unknown[8];
 
         for (int16_t p1 = 0; p1 < (int16_t)MOX::_NUM_PLAYERS; ++p1) {
             s_player* plr1 = &MOX::_player[p1];
@@ -236,7 +235,7 @@ namespace diplomac {
                         plr1->last_turn_treaty[p2] != 2 &&
                         plr1->last_turn_treaty[p2] != 3) 
                     {
-                        eval_results[p2] = Sneak_Attack_Evaluations_(p1, p2, &eval_ratios[p2], &eval_messages[p2], &eval_unknown[p2]);
+                        eval_results[p2] = Sneak_Attack_Evaluations_(p1, p2, &eval_ratios[p2], &eval_messages[p2]);
                     } else {
                         eval_results[p2] = 0;
                     }
