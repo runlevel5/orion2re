@@ -2944,6 +2944,8 @@ namespace hooks {
         { 0x00519c70, &NETMOX::Decode_Drop_Out_Info_ },
         { 0x004BC1B0, &COMBFIND::Copy_Target_Info_ },
         { 0x004bc240, &COMBFIND::Decode_Star_Player_Presence_ },
+        { 0x0042cfa0, &CHAT::Send_Chat_Msg_ },
+        { 0x00534a70, &time_::time_ },
     };
 
     void Install_Hooks()

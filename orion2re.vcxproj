@@ -165,6 +165,7 @@
     <ClCompile Include="src\game\sys.cpp" />
     <ClCompile Include="src\game\tech.cpp" />
     <ClCompile Include="src\game\textbox.cpp" />
+    <ClCompile Include="src\game\time.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
     <ClCompile Include="src\game\trade.cpp" />
     <ClCompile Include="src\game\transprt.cpp" />

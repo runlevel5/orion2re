@@ -299,6 +299,7 @@ workflows:
           * You provided main decompiled function
           * All provided types match the input exactly
           * You did not provide complete structures, only structure type references.
+          * You used correct Markdown formatting with code blocks wrapped in ``` fence
         outcomes:
           - name: done
       - name: apply
