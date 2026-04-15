@@ -67,6 +67,12 @@ namespace FMTPARA {
 
     int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text);
 
+    inline int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t line_width, const char* text, int32_t flags) {
+        using Fn = int16_t(__cdecl*)(int16_t, const char*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00432EA0 });
+        return fn(line_width, text, flags);
+    }
+
     int16_t __cdecl Get_Last_Formatted_Paragraph_Max_Width_();
 
     char* __cdecl Print_Formatted_Paragraph_(int16_t x, int16_t y, int16_t width, char* str, int16_t param_5);

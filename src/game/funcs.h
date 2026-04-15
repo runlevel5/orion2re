@@ -566,6 +566,7 @@ inline void __cdecl Get_Officer_Pictures_() {
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
+inline const char* s_comma_space_00556168 = reinterpret_cast<const char*>(std::uintptr_t{0x00556168}); // ", "
 inline void __cdecl Draw_Design_Screen_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042F470});
@@ -655,6 +656,9 @@ inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
 inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
+inline const char* s__2d__s_00557f10 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00557F10}); // "%2d %s"
+
 inline const char*& s_format_string = *reinterpret_cast<const char**>(std::uintptr_t{0x00558BD8});
 
 inline const char*& PTR_s_FLEET_LBX_005584a8 = *reinterpret_cast<const char**>(std::uintptr_t{0x005584A8});
@@ -675,6 +679,9 @@ inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0
 inline const char* s___00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
 inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F8}); /* "\n" */
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
+inline const char* s__s___s_0055238c = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C}); // "%s, %s"
+inline const char* s__s_005569e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569E8}); // "%s "
+inline const char* s___s_00557f0c = reinterpret_cast<const char*>(std::uintptr_t{0x00557F0C}); // "(%s"
 inline const char* s_rstring_d_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A38}); // "rstring%d.lbx"
 inline const char* s_STARBG_LBX = reinterpret_cast<const char*>(0x005598FC); // "STARBG.LBX"
 inline const char* s_councmsg_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00559A80}); // "councmsg.lbx"
@@ -732,24 +739,6 @@ inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  //
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
 inline const char* s_combat_lbx_005599c8 = reinterpret_cast<const char*>(0x005599C8); // "combat.LBX"
-
-inline void __cdecl Set_Font_Style_(int32_t a1, const void* colors) {
-    using Fn = void(__cdecl*)(int32_t, const void*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005255A0});
-    fn(a1, colors);
-}
-
-inline int16_t __cdecl Get_Font_Height_(int32_t a1) {
-    using Fn = int16_t(__cdecl*)(int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526060});
-    return fn(a1);
-}
-
-inline int16_t __cdecl Get_String_Width_(const char* str) {
-    using Fn = int16_t(__cdecl*)(const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525470});
-    return fn(str);
-}
 
 inline void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
     using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t);

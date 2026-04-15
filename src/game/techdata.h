@@ -9,7 +9,8 @@ namespace TECHDATA {
         reinterpret_cast<s_techdata_planetary_shield*>(std::uintptr_t{ 0x0054F048 });
     inline s_tech_armor_data* _armor = reinterpret_cast<s_tech_armor_data*>(std::uintptr_t{ 0x00554d90 });
     inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
-    inline s_tech_hull_data* _hull_data = reinterpret_cast<s_tech_hull_data*>(std::uintptr_t{ 0x00555798 });
+    inline s_tech_hull_data (&_hull_data)[9] =
+        *reinterpret_cast<s_tech_hull_data(*)[9]>(std::uintptr_t{0x00555798});
     inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
     inline s_tech_app_data (&_technology_applications)[212] =
         *reinterpret_cast<s_tech_app_data(*)[212]>(std::uintptr_t{0x005537C8});

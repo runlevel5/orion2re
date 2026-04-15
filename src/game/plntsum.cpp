@@ -1534,46 +1534,46 @@ void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, bool co
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
             if (PLNTSUM::_send_choice == 1 || PLNTSUM::_send_choice == 0) {
                 if (PLNTSUM::_send_choice == 1) {
-                    Set_Font_Style_(0, colors_active);
-                    Fill_(cur_x, cur_y, cur_x + Get_String_Width_(s_oc_00556af8), cur_y + Get_Font_Height_(1), 1);
-                    Print_(cur_x, cur_y, s_o_00556af4);
-                    Set_Font_Style_(0, colors_inactive);
-                    Print_(cur_x + Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
+                    fonts::Set_Font_Style_(0, (s_colors*)colors_active);
+                    graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_oc_00556af8), cur_y + fonts::Get_Font_Height_(), 1);
+                    fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                    fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+                    fonts::Print_(cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
                     return;
                 } else {
-                    Set_Font_Style_(0, colors_inactive);
-                    Fill_(cur_x, cur_y, cur_x + Get_String_Width_(s_oc_00556af8), cur_y + Get_Font_Height_(1), 1);
-                    Print_(cur_x, cur_y, s_o_00556af4);
-                    Set_Font_Style_(0, colors_active);
-                    Print_(cur_x + Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
+                    fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+                    graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_oc_00556af8), cur_y + fonts::Get_Font_Height_(), 1);
+                    fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                    fonts::Set_Font_Style_(0, (s_colors*)colors_active);
+                    fonts::Print_(cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
                     return;
                 }
             }
         }
-        Set_Font_Style_(0, colors_inactive);
-        Print_(cur_x, cur_y, s_oc_00556af8);
+        fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+        fonts::Print_(cur_x, cur_y, s_oc_00556af8);
     } else if (outpost) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
-            Set_Font_Style_(0, colors_active);
-            Fill_(cur_x, cur_y, cur_x + Get_String_Width_(s_o_00556af4), cur_y + Get_Font_Height_(1), 1);
+            fonts::Set_Font_Style_(0, (s_colors*)colors_active);
+            graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y + fonts::Get_Font_Height_(), 1);
         } else {
-            Set_Font_Style_(0, colors_inactive);
+            fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
         }
-        Print_(cur_x, cur_y, s_o_00556af4);
+        fonts::Print_(cur_x, cur_y, s_o_00556af4);
     } else if (colony) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
-            Set_Font_Style_(0, colors_active);
-            Fill_(cur_x, cur_y, cur_x + Get_String_Width_(s_c_00556350), cur_y + Get_Font_Height_(1), 1);
+            fonts::Set_Font_Style_(0, (s_colors*)colors_active);
+            graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_c_00556350), cur_y + fonts::Get_Font_Height_(), 1);
         } else {
-            Set_Font_Style_(0, colors_inactive);
+            fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
         }
-        Print_(cur_x, cur_y, s_c_00556350);
+        fonts::Print_(cur_x, cur_y, s_c_00556350);
     }
 }
 

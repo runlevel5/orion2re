@@ -2964,6 +2964,15 @@ namespace hooks {
         { 0x004949C0, &SYS::Draw_Gate_Icons_ },
         { 0x004f15d0, &HAROLD::Star_Has_Artemis_Net_ },
         { 0x004972b0, &SYS::Print_System_Display_Box_Title_ },
+        { 0x00495330, &SYS::Get_Gate_Icon_XY_ },
+        { 0x00497f80, &SYS::Buffer_Reload_System_Ships_ },
+        { 0x00497420, &SYS::Print_System_Ship_Data_ },
+        { 0x00495bf0, &SYS::Measure_System_Ship_Data_ },
+        { 0x004953A0, &SYS::Do_Print_Planet_Info_ },
+        { 0x00494C60, &SYS::Draw_Planet_With_Pierced_Ring_ },
+        { 0x00498040, &SYS::Print_Special_Building_Data_ },
+        { 0x00495C20, &SYS::Do_Print_System_Ship_Data_ },
+        { 0x00496E20, &SYS::Print_Gate_Info_ },
     };
 
     void Install_Hooks()

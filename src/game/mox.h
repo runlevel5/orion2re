@@ -121,6 +121,10 @@ namespace MOX {
         *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597380});
     inline s_animation_header* (&_antaran_ship_icons)[24] =
         *reinterpret_cast<s_animation_header* (*)[24]>(std::uintptr_t{0x00597670});
+    inline s_animation_header* (&_o_ring_seg)[5] =
+        *reinterpret_cast<s_animation_header* (*)[5]>(std::uintptr_t{0x00596D80});
+    inline s_animation_header* (&_planet_mask_seg)[5] =
+        *reinterpret_cast<s_animation_header* (*)[5]>(std::uintptr_t{0x00596F90});
     inline s_animation_header* (& _fltscrn_small_ship_icon_seg)[8] =
         *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x005A1760});
     inline s_animation_header* (&_monster_ship_seg)[4] =
@@ -219,6 +223,7 @@ namespace MOX {
         *reinterpret_cast<uint8_t(*)[128][16]>(std::uintptr_t{0x00596450});
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
+    inline uint8_t& _player_has_ship_in_system = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4B});
     inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
