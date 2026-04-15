@@ -2946,6 +2946,20 @@ namespace hooks {
         { 0x004bc240, &COMBFIND::Decode_Star_Player_Presence_ },
         { 0x0042cfa0, &CHAT::Send_Chat_Msg_ },
         { 0x00534a70, &time_::time_ },
+        { 0x00497660, &SYS::Calculate_Remap_Gray_Palettes_ },
+        { 0x00497640, &SYS::qsort_sys_disp_ },
+        { 0x00493f50, &SYS::Clear_System_Display_Ship_Fields_ },
+        { 0x00494050, &SYS::Draw_System_Display_Popup_ },
+        { 0x00496190, &SYS::Hide_System_Display_ },
+        { 0x00494B20, &SYS::Draw_System_Display_Border_ },
+        { 0x0045A350, &SYS::Draw_System_Special_Popup_ },
+        { 0x00493F90, &SYS::Draw_Sun_Seg_ },
+        { 0x00494B60, &SYS::Draw_System_Display_Planets_ },
+        { 0x00494940, &SYS::Draw_Colony_Marker_ },
+        { 0x00494AB0, &SYS::Draw_Outpost_Marker_ },
+        { 0x00494FB0, &SYS::Draw_System_Highlight_ },
+        { 0x00495370, &SYS::Print_Planet_Info_Short_ },
+        { 0x00497270, &SYS::Print_Planet_Info_ },
     };
 
     void Install_Hooks()

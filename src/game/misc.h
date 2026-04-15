@@ -86,4 +86,10 @@ namespace MISC {
 
     void __cdecl Tint_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, bool full_bitmap, uint8_t tint_value, s_animation_header* anim);
     void __cdecl Get_Bitmap_Dimensions_(s_animation_header* header, int16_t* width, int16_t* height);
+
+    inline void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color, char edge_1, char edge_2) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, char, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049e130 });
+        fn(x1, y1, x2, y2, color, edge_1, edge_2);
+    }
 }

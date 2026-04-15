@@ -23,11 +23,7 @@ namespace SYS {
 
     void __cdecl Clear_System_Display_Loaded_Flag_();
 
-    inline void __cdecl Clear_System_Display_Ship_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493F50});
-        fn();
-    }
+    void __cdecl Clear_System_Display_Ship_Fields_();
 
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_id);
 
@@ -41,25 +37,84 @@ namespace SYS {
 
     void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx);
 
-    inline void __cdecl Calculate_Remap_Gray_Palettes_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497660});
-        fn();
-    }
+    inline int8_t (&_remap_gray_percentages)[10] =
+        *reinterpret_cast<int8_t (*)[10]>(std::uintptr_t{0x00557EE0});
 
-    inline int __cdecl qsort_sys_disp_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497640});
-        return fn(a, b);
-    }
+    inline uint8_t (&_remap_gray_mask_palette)[10][256] =
+        *reinterpret_cast<uint8_t (*)[10][256]>(std::uintptr_t{0x005A57E0});
+
+    void __cdecl Calculate_Remap_Gray_Palettes_();
+
+    int __cdecl qsort_sys_disp_(const void* a, const void* b);
 
     bool __cdecl Ok_To_View_System_(int16_t star_idx, int16_t player_idx);
 
     void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes);
 
-    inline void __cdecl Draw_System_Display_Popup_(int16_t system_id, uint8_t flag, const char* label, int32_t x, int32_t y, int32_t w, int32_t h, int32_t p8, int32_t p9) {
-        using Fn = void(__cdecl*)(int16_t, uint8_t, const char*, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00494050});
-        fn(system_id, flag, label, x, y, w, h, p8, p9);
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
+
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
+
+    void __cdecl Draw_System_Special_Popup_(int16_t x, int16_t y, int16_t special_idx, int16_t anim_idx);
+
+    void __cdecl Draw_Sun_Seg_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset);
+
+    void __cdecl Draw_System_Display_Planets_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset);
+
+    inline void __cdecl Draw_Planet_With_Pierced_Ring_(int16_t planet_idx, int16_t orbit_pos, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00494C60 });
+        fn(planet_idx, orbit_pos, base_x, base_y, content_w, content_h, y_offset, x_offset);
     }
+
+    void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner);
+
+    void __cdecl Draw_Outpost_Marker_(int16_t x, int16_t y, int16_t owner);
+
+    void __cdecl Draw_System_Highlight_(int16_t planet_idx, int16_t rect_w, int16_t rect_h, int16_t x_offset, int16_t y_offset);
+
+    void __cdecl Print_Planet_Info_Short_(int16_t planet_idx, int16_t* box_width, int16_t* box_height);
+
+    inline void __cdecl Do_Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7, int16_t* out_width, int16_t* out_height, int32_t p10) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004953a0 });
+        fn(p1, p2, p3, p4, p5, p6, p7, out_width, out_height, p10);
+    }
+
+    void __cdecl Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7);
+
+    inline void __cdecl Draw_System_Ship_Icons_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t
+        x_offset) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004951B0 });
+        fn(base_x, base_y, content_w, content_h, y_offset, x_offset);
+    }
+
+    inline void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004949C0 });
+        fn(star_idx, base_x, base_y, content_w, content_h, x_offset);
+    }
+
+    inline void __cdecl Print_Gate_Info_(int16_t star_idx, int16_t gate_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h,
+        int16_t x_offset, int16_t y_offset) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00496E20 });
+        fn(star_idx, gate_idx, base_x, base_y, content_w, content_h, x_offset, y_offset);
+    }
+
+    inline void __cdecl Print_System_Display_Box_Title_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, const char*
+        title_text) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004972B0 });
+        fn(base_x, base_y, content_w, content_h, title_text);
+    }
+
+    inline void __cdecl Print_Empty_System_Data_(int16_t star_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497E50 });
+        fn(star_idx);
+    }
+
+    void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset);
 }

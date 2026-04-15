@@ -63,7 +63,7 @@ namespace fields {
         mouse::Mouse_Buffer2_();
     }
 
-    void __cdecl Set_Field_Outline_Color_(uint16_t color) {
+    void __cdecl Set_Field_Outline_Color_(uint8_t color) {
         _field_outline_color = color;
     }
 

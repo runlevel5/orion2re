@@ -96,7 +96,7 @@ workflows:
           * You must correctly determine signess of parameters and variables from disassembly hints, such as signed or unsigned
             conditional jumps, signed divisions and so on. 
           * Cleanup:
-            - You shall rename generic local variable names to better represent their semantic meaning.
+            - You shall rename generic parameter and local variable names to better represent their semantic meaning.
             - You are allowed to remove superfluous variables.
             - You are allowed to convert explicit loops into equivalent C constructs, such as for or while loops.
             - You are NOT allowed to remove code that apparently does nothing. If it exists, there must be a reason. You
@@ -285,6 +285,19 @@ workflows:
           * You are not allowed to rename struct fields or modify their shapes
           * You should NOT emit a new address for any structure variables, if one of the inner fields it being accessed by direct address.
           * Output only the cleaned-up code (no extra explanation).
+          * When decompiling mathematical operations, prefer simplified expressions even if disassembly uses multiple instructions.
+            For example, convert bitshift and `lea` operations to a simplified mathematical expression. For example:
+
+            Prefer:
+            int a = b * 1000;
+
+            Over:
+            int a = b * 5; // lea eax, [eax + ebx*4]
+            a = a * 5; // lea eax, [eax + eax*4]
+            a = a * 5; // lea ecx, [eax + eax*4]
+            a = a * 5; // lea eax, [ecx + ecx*4]
+            a = a * 8; // shl eax, 3
+
           * If you detect manual loops that resemble standard library functions (memcpy, strcpy, memset and others),
             always prefer using library function. Never append `std::` namespace to these functions.
           * NEVER add comments, unless it is one of the following exceptions:

@@ -1,6 +1,15 @@
 #include "pch.h"
 
 namespace SYS {
+    void __cdecl Clear_System_Display_Ship_Fields_() {
+        memset(MOX::_system_display_ships, 0, sizeof(MOX::_system_display_ships));
+
+        for (int i = 0; i < 15; ++i) {
+            MOX::_system_display_ships[i].button = -1000;
+            MOX::_system_display_ships[i].ship_idx = -1;
+        }
+    }
+
     // Suggested name: Need_To_Reload_System_Display
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_index) {
         char buffer[120];
@@ -284,6 +293,345 @@ namespace SYS {
         _sprintf(title_text, fmt_text, planet_name);
 
         TEXTBOX::Text_Box_(title_text, main_text);
+    }
+
+    int __cdecl qsort_sys_disp_(const void* a, const void* b) {
+        auto p1 = static_cast<const s_sys_disp*>(a);
+        auto p2 = static_cast<const s_sys_disp*>(b);
+        return (int)p1->y - (int)p2->y;
+    }
+
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
+        MOX::_moveable_box_pict = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict);
+    }
+
+    void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner) {
+        uint8_t color = (uint8_t)MOX::_player[owner].color;
+        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x23, (void*)MOX::_global_cache_seg);
+        MOX::_colony_marker_seg[color] = anim;
+        int16_t width = animate::Get_Width_(anim);
+        animate::Draw_(x - width + 2, y, anim);
+    }
+
+    void __cdecl Draw_Outpost_Marker_(int16_t x, int16_t y, int16_t owner) {
+        uint8_t color = (uint8_t)MOX::_player[owner].color;
+        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x2b, (void*)MOX::_global_cache_seg);
+        MOX::_outpost_marker_seg[color] = anim;
+        int16_t width = animate::Get_Width_(anim);
+        animate::Draw_(x - width, y, anim);
+    }
+
+    void __cdecl Draw_System_Display_Planets_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset) {
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_sys_disp[i].orbit;
+            int8_t orbit_idx = MOX::_sys_disp[i].orbit_idx;
+            if (planet_idx > -1) {
+                if (MOX::_planet[planet_idx].planet_type == 3 || MOX::_planet[planet_idx].planet_type == 2) {
+                    Draw_Planet_With_Pierced_Ring_(planet_idx, i, base_x, base_y, content_w, content_h, y_offset, x_offset);
+                } else {
+                    MOX::_asteroid_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x5b, (void*)MOX::_global_cache_seg);
+                    animate::Set_Animation_Frame_(MOX::_asteroid_seg, (int)orbit_idx);
+                    animate::Draw_(x_offset + content_w + base_x + 0x10, y_offset + content_h + base_y + 0xc, (s_animation_header*)MOX::_asteroid_seg);
+                }
+            }
+        }
+    }
+
+    void __cdecl Draw_Sun_Seg_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset) {
+        _system_display_sun_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, MOX::_star[star_idx].spectral_class + 0x53, (void*)MOX::_global_cache_seg);
+
+        int16_t box_w = MOX::_moveable_box[0].width;
+        int16_t box_h = MOX::_moveable_box[0].height;
+        int16_t anim_h = animate::Get_Height_(_system_display_sun_seg);
+        int16_t anim_w = animate::Get_Width_(_system_display_sun_seg);
+
+        if (MOX::_current_screen == 0x1d) {
+            animate::Draw_(0x1c0, 0x5c, _system_display_sun_seg);
+        } else {
+            // BUG: original code cross-references widths/heights
+            int16_t draw_x = (int16_t)((box_w - anim_h) / 2) + content_w + base_x;
+            int16_t draw_y = (int16_t)((box_h - anim_w) / 2) + content_h + base_y;
+            animate::Draw_(draw_x, draw_y, _system_display_sun_seg);
+        }
+    }
+
+    void __cdecl Draw_System_Special_Popup_(int16_t x, int16_t y, int16_t special_idx, int16_t anim_idx) {
+        const char* desc = MAINPUPS::System_Special_Desc_(special_idx);
+        const char* name = MOX::_planet_special_string[special_idx];
+        s_animation_header* anim = MAINPUPS::System_Special_Anim_(anim_idx, special_idx);
+
+        MAINPUPS::Draw_Special_Info_Popup_(x, y, anim, name, desc);
+    }
+
+    void __cdecl Print_Planet_Info_Short_(int16_t planet_idx, int16_t* box_width, int16_t* box_height) {
+        Do_Print_Planet_Info_(0, 0, 0, 0, planet_idx, 0, 0, box_width, box_height, 0);
+    }
+
+    void __cdecl Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7) {
+        int16_t out_width;
+        int16_t out_height;
+
+        Do_Print_Planet_Info_(p1, p2, p3, p4, p5, p6, p7, &out_width, &out_height, 1);
+    }
+
+    void __cdecl Draw_System_Highlight_(short planet_idx, short rect_w, short rect_h, short x_offset, short y_offset) {
+        int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+        MOX::_o_highlight_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x4b, (void*)MOX::_global_cache_seg);
+        int16_t w = animate::Get_Width_(MOX::_o_highlight_seg);
+        int16_t h = animate::Get_Height_(MOX::_o_highlight_seg);
+
+        bool replaced = false;
+        uint8_t player_color = 0;
+
+        if (colony_idx < 0) {
+            for (int i = 0; i < 9; ++i) {
+                replace::Replace_Color_(MOX::_o_highlight_seg, (int16_t)(0x49 + i), (int8_t)(0x06 + i));
+            }
+            animate::Draw_((short)(((int)rect_w - (int)w) / 2) + x_offset, (short)(((int)rect_h - (int)h) / 2) + y_offset, MOX::_o_highlight_seg);
+            for (int i = 0; i < 9; ++i) {
+                replace::Replace_Color_(MOX::_o_highlight_seg, (int16_t)(0x06 + i), (int8_t)(0x49 + i));
+            }
+        } else {
+            player_color = (uint8_t)MOX::_player[MOX::_colony[colony_idx].owner].color;
+            if (player_color != 0) {
+                uint8_t base_color = MOX::_main_palette_player_colors[player_color];
+                for (int i = 0; i < 9; ++i) {
+                    replace::Replace_Color_(MOX::_o_highlight_seg, (int16_t)(0x49 + i), (int8_t)(base_color + i));
+                }
+                replaced = true;
+            }
+            animate::Draw_((short)(((int)rect_w - (int)w) / 2) + x_offset, (short)(((int)rect_h - (int)h) / 2) + y_offset, MOX::_o_highlight_seg);
+            if (replaced) {
+                uint8_t base_color = MOX::_main_palette_player_colors[player_color];
+                for (int i = 0; i < 9; ++i) {
+                    replace::Replace_Color_(MOX::_o_highlight_seg, (int16_t)(base_color + i), (int8_t)(0x49 + i));
+                }
+            }
+        }
+    }
+
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode)
+    {
+        int16_t x1, y1, x2, y2;
+
+        if (MOX::_current_screen == 0x1d) {
+            x1 = 0x132;
+            y1 = 0x11;
+            x2 = 0x270;
+            y2 = 0xc5;
+        } else {
+            x2 = x_offset + content_w + base_x + 0x13f;
+            x1 = x_offset + content_w + base_x - 1;
+            y2 = content_h + base_y + y_offset + 0xb6;
+            y1 = content_h + base_y + y_offset - 1;
+        }
+
+        s_colors font_colors = *MISC::Font_Colors2_(4, 'n', 's');
+
+        if (mode != 0) {
+            int16_t clipped_y2 = video::_screen_window_y2;
+            if (y2 <= clipped_y2) {
+                clipped_y2 = y2;
+            }
+            MISC::Diagonal_Line_Fill_(x1, y1, x2 - 5, clipped_y2, 0x10, '=', ';');
+            fonts::Set_Font_Style_(4, &font_colors);
+        }
+    }
+
+    void __cdecl Calculate_Remap_Gray_Palettes_() {
+        remap::Sort_Palette_List_();
+
+        for (int i = 0; i < 10; ++i) {
+            int scale = 100 - _remap_gray_percentages[i];
+            for (int j = 0; j < 256; ++j) {
+                const s_palette_entry& entry = video::_current_palette[j];
+                _remap_gray_mask_palette[i][j] = remap::Find_Closest_Color_(
+                    static_cast<uint8_t>((entry.r * scale) / 100),
+                    static_cast<uint8_t>((entry.g * scale) / 100),
+                    static_cast<uint8_t>((entry.b * scale) / 100)
+                );
+            }
+        }
+    }
+
+    void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset) {
+        char local_64[100];
+
+        MOX::_ship_frame = (short)((MOX::_ship_frame + 1) % 32000);
+        if (MOX::_current_screen == 0) {
+            graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
+            video::Clip_On_();
+        }
+
+        MOX::_system_display_base_x = base_x;
+        MOX::_system_display_base_y = base_y;
+
+        if ((MOX::_look_at_colonies == '\0') && !Ok_To_View_System_(star_idx, MOX::_PLAYER_NUM)) {
+            if (!HAROLD::Player_Sighted_Monster_(MOX::_PLAYER_NUM, star_idx)) {
+                Hide_System_Display_(base_x, base_y, content_w, content_h, x_offset, y_offset, '\0');
+                if (draw_border == '\0') {
+                    return;
+                }
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
+                const char* pcVar5;
+                if (HAROLD::Contact_With_One_Colony_(star_idx) == '\0') {
+                    pcVar5 = HAROLD::H_Message_(0x16b);
+                } else {
+                    pcVar5 = HAROLD::H_Message_(0x16a);
+                    _sprintf(local_64, pcVar5, &MOX::_star[star_idx]);
+                    pcVar5 = local_64;
+                }
+                Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, pcVar5);
+                Print_Empty_System_Data_(star_idx);
+                return;
+            }
+
+            Hide_System_Display_(base_x, base_y, content_w, content_h, x_offset, y_offset, '\x01');
+            if (draw_border != '\0') {
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 0);
+            }
+
+            if (MOX::_current_screen == 0x1d) {
+                graphics::Save_Window_();
+                graphics::Set_Window_(0, 0, 0x27f, 0x1df);
+                video::Clip_On_();
+                Draw_System_Special_Popup_(content_w + base_x - 5, y_offset + content_h + base_y + 0x28, 9, star_idx);
+                graphics::Restore_Window_();
+                video::Clip_Off_();
+                return;
+            }
+
+            Draw_System_Special_Popup_(content_w + base_x + 5, y_offset + content_h + base_y, 9, star_idx);
+            const char* pcVar5 = HAROLD::H_Message_(0x16a);
+            _sprintf(local_64, pcVar5, &MOX::_star[star_idx]);
+            Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, local_64);
+            return;
+        }
+
+        if (draw_border != '\0') {
+            Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
+        }
+
+        MOX::_system_star_id_for_auto_select = star_idx;
+        int iVar6 = (int)star_idx;
+        if (MOX::_star[iVar6].wormhole_star_id > -1) {
+            short sVar15 = (short)MOX::_star[iVar6].wormhole_star_id;
+            s_colors* psVar7 = MISC::Font_Colors2_(1, 'n', 's');
+            s_colors local_bc;
+            memcpy(&local_bc, psVar7, sizeof(s_colors));
+            fonts::Set_Font_Style_(1, &local_bc);
+
+            short local_c2;
+            short sStack_c0;
+            if (MOX::_current_screen == 0x1d) {
+                local_c2 = 0x270;
+                sStack_c0 = 0xbb;
+            } else {
+                local_c2 = base_x + 0x149 + content_w;
+                sStack_c0 = content_h;
+                short sVar11 = fonts::Get_Font_Height_();
+                sStack_c0 = (sStack_c0 - sVar11) + 0xe4 + base_y;
+            }
+
+            char local_b4[100];
+            local_b4[0] = '\0';
+
+            if (MOX::_star[iVar6].wormhole_star_id <= -1) {
+                if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, star_idx)) {
+                    const char* pcVar5 = MOX::_planet_special_string[MOX::_star[iVar6].system_special];
+                    strcpy(local_b4, pcVar5);
+                }
+            } else {
+                if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, sVar15)) {
+                    const char* pcVar5 = HAROLD::H_Message_(0x16c);
+                    _sprintf(local_b4, pcVar5, &MOX::_star[sVar15]);
+                } else {
+                    const char* pcVar5 = HAROLD::H_Message_(0x16d);
+                    strcpy(local_b4, pcVar5);
+                }
+            }
+
+            if (local_b4[0] != '\0') {
+                fonts::Print_Right_(local_c2, sStack_c0, local_b4);
+            }
+        }
+
+        if (_draw_sun_before_planet != '\0') {
+            Draw_Sun_Seg_(star_idx, base_x, base_y, content_w, content_h, y_offset, x_offset);
+        }
+
+        if (_skip_draw_system_planets == '\0') {
+            Draw_System_Display_Planets_(base_x, base_y, content_w, content_h, y_offset, x_offset);
+            animate::_clipping_flag = 1;
+        } else {
+            _skip_draw_system_planets = '\0';
+        }
+
+        if (_draw_sun_before_planet == '\0') {
+            Draw_Sun_Seg_(star_idx, base_x, base_y, content_w, content_h, y_offset, x_offset);
+        }
+
+        for (short sVar15 = 0; sVar15 < 5; ++sVar15) {
+            s_sys_disp* psVar1 = &MOX::_sys_disp[sVar15];
+            if (psVar1->orbit > -1) {
+                s_planet_data* psVar8 = &MOX::_planet[psVar1->orbit];
+                short planet_size = (short)psVar8->size;
+                if (psVar8->planet_type == '\x02') {
+                    planet_size = 4;
+                }
+                short sVar11 = psVar1->x + x_offset + content_w + 0x9f + base_x;
+                short sVar_y = psVar1->y + y_offset + content_h + 0x58 + base_y;
+
+                if (psVar8->colony_index > -1) {
+                    if (psVar8->planet_type == '\x01') {
+                        short offset = (short)(MOX::_rot_plan_dim[planet_size] >> 1);
+                        sVar11 += offset;
+                        sVar_y += offset;
+                    }
+                    short sVar4 = (short)MOX::_colony[psVar8->colony_index].owner;
+                    if (MOX::_colony[psVar8->colony_index].outpost_flag == '\0') {
+                        Draw_Colony_Marker_(sVar11, sVar_y, sVar4);
+                    } else {
+                        Draw_Outpost_Marker_(sVar11, sVar_y, sVar4);
+                    }
+                }
+            }
+        }
+
+        for (short sVar15 = 0; sVar15 < 5; ++sVar15) {
+            short sVar11 = MOX::_sys_disp[sVar15].orbit;
+            if (sVar11 > -1) {
+                short planet_size = (short)MOX::_planet[sVar11].size;
+                if (MOX::_planet[sVar11].planet_type == '\x02') {
+                    planet_size = 4;
+                }
+                short sVar4 = (short)(MOX::_sys_disp[sVar15].x + x_offset + content_w + 0x9f + base_x);
+                short sVar_y = (short)(MOX::_sys_disp[sVar15].y + y_offset + content_h + 0x58 + base_y);
+
+                if (MOX::_sys_disp[sVar15].orbit_idx == MOX::_system_icon_scanned) {
+                    if (MOX::_planet[sVar11].planet_type != '\x01') {
+                        uint16_t dim = (uint16_t)MOX::_rot_plan_dim[planet_size];
+                        Draw_System_Highlight_(sVar11, dim, dim, sVar4, sVar_y);
+                    }
+                    short local_c4, local_c6;
+                    Print_Planet_Info_Short_(sVar11, &local_c4, &local_c6);
+                    MISC::Draw_Darkened_Box_(x_offset + content_w + base_x, y_offset + content_h + base_y, local_c4 + 9, local_c6 + 4, 0x3f);
+                    Print_Planet_Info_(base_x, base_y, content_w, content_h, sVar11, x_offset, y_offset);
+                }
+            }
+        }
+
+        Draw_System_Ship_Icons_(base_x, base_y, content_w, content_h, y_offset, x_offset);
+        Draw_Gate_Icons_(star_idx, base_x, base_y, content_w, content_h, x_offset);
+
+        if ((MOX::_system_icon_scanned > 1999) && (MOX::_system_icon_scanned < 2004)) {
+            Print_Gate_Info_(star_idx, MOX::_system_icon_scanned - 2000, base_x, base_y, content_w, content_h, x_offset, y_offset);
+        }
+
+        if (MOX::_current_screen != 0x1d) {
+            Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, title_text);
+        }
     }
 
     void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes) {

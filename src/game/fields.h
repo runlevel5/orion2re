@@ -170,16 +170,8 @@ namespace fields {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x0051EF40})();
     }
-    inline void __cdecl Set_Input_Delay_(int16_t delay) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EDD0});
-        fn(delay);
-    }
-    inline void __cdecl Set_Field_Outline_Color_(uint8_t color) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520000});
-        fn(color);
-    }
+    void __cdecl Set_Input_Delay_(uint16_t delay);
+    void __cdecl Set_Field_Outline_Color_(uint8_t color);
 
     inline void __cdecl Draw_Visible_Fields_Back_() {
         using Fn = void(__cdecl*)();

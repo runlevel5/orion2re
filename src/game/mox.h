@@ -39,6 +39,9 @@ namespace MOX {
     inline uint8_t& _skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059bef0 });
     inline uint8_t& _fix_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059baac });
     inline s_animation_header*& _scrap_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597824});
+    inline s_animation_header* (&_colony_marker_seg)[8] = *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x00597800});
+    inline s_animation_header* (&_outpost_marker_seg)[8] = *reinterpret_cast<s_animation_header* (*)[8]>(std::uintptr_t{0x005A2BC0});
+    inline s_animation_header*& _o_highlight_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597708});
     inline uint8_t& _add_all_button = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B438});
     inline s_animation_header*& _fleet_all_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596D4C});
     inline s_animation_header*& _fleet_return_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597920});
@@ -203,6 +206,7 @@ namespace MOX {
     inline int16_t& _design_screen_replacement_type = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597402});
     inline int16_t& _design_screen_replacement_slot = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
+    inline s_animation_header*& _asteroid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973F4 });
     inline s_animation_header*& _screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973E4 });
     inline s_animation_header*& _combat_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A94});
     inline s_animation_header*& _combat_map_planet_seg =

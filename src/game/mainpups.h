@@ -111,4 +111,22 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045B540});
         fn(location, leader_idx);
     }
+
+    inline const char* __cdecl System_Special_Desc_(int16_t special_idx) {
+        using Fn = const char*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A430});
+        return fn(special_idx);
+    }
+
+    inline s_animation_header* __cdecl System_Special_Anim_(int16_t anim_idx, int16_t special_idx) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A3A0});
+        return fn(anim_idx, special_idx);
+    }
+
+    inline void __cdecl Draw_Special_Info_Popup_(int16_t x, int16_t y, s_animation_header* anim, const char* name, const char* desc) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, const char*, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A470});
+        fn(x, y, anim, name, desc);
+    }
 }
