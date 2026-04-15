@@ -162,7 +162,7 @@ namespace SYS {
 
         if (MOX::_look_at_colonies == 0) {
             if (!Ok_To_View_System_(star_idx, MOX::_PLAYER_NUM)) {
-                MISC::Get_LBX_Message_(spectral_class + 0xf, &DAT_00566440);
+                MISC::Get_LBX_Message_(spectral_class + 0xf, SYS::_star_description_string);
             }
         }
     }
@@ -584,7 +584,7 @@ namespace SYS {
                     pcVar5 = local_64;
                 }
                 Print_System_Display_Box_Title_(base_x, base_y, content_w, content_h, pcVar5);
-                Print_Empty_System_Data_(star_idx);
+                Print_Empty_System_Data_();
                 return;
             }
 
@@ -1419,6 +1419,68 @@ namespace SYS {
         }
 
         *total_height = static_cast<int16_t>(*total_height + 2);
+    }
+
+    void __cdecl Print_Empty_System_Data_() {
+        int16_t layout_value;
+        int16_t left_padding;
+        int16_t top_padding;
+        int16_t centering_width;
+        int16_t paragraph_max_width;
+        int16_t paragraph_height;
+        int16_t base_x;
+        int16_t base_y;
+        int16_t text_left;
+        int16_t text_y;
+        int16_t saved_window_status;
+
+        if (MOX::_current_screen == 0) {
+            left_padding = 0x000D;
+            top_padding = 0x002F;
+            centering_width = _moveable_box_0_width - 0x001A;
+            paragraph_max_width = _moveable_box_0_width - 0x0033;
+            paragraph_height = _moveable_box_0_height - 0x005B;
+            base_x = _moveable_box_0_content_offset_x + _moveable_box_0_x;
+            base_y = _moveable_box_0_content_offset_y + _moveable_box_0_y;
+        } else if (MOX::_current_screen == 0x001D) {
+            centering_width = 0x013E;
+            top_padding = 0;
+            paragraph_max_width = 0x0125;
+            paragraph_height = 0x00B4;
+            base_x = 0x0132;
+            base_y = 0x0011;
+            left_padding = 0;
+        } else {
+            // BUG: unsupported screens use an uninitialized layout value.
+            paragraph_max_width = layout_value;
+            centering_width = layout_value;
+            paragraph_height = layout_value;
+            left_padding = layout_value;
+            top_padding = layout_value;
+            base_x = layout_value;
+            base_y = layout_value;
+        }
+
+        text_left = left_padding + base_x;
+        text_y = top_padding + base_y;
+
+        MISC::Save_Window_Status_(&saved_window_status);
+        graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
+        video::Clip_On_();
+        MISC::Change_Font_Style_(3);
+
+        const int16_t paragraph_width =
+                BILL::_Get_Paragraph_Max_Width_(paragraph_max_width, SYS::_star_description_string, 3);
+
+        ERIC::Print_Paragraph_Centered_Vertically_(
+                text_left + ((static_cast<int32_t>(centering_width) - static_cast<int32_t>(paragraph_width)) / 2),
+                text_y,
+                paragraph_max_width,
+                paragraph_height,
+                SYS::_star_description_string,
+                3);
+
+        MISC::Restore_Window_Status_((uint32_t)saved_window_status);
     }
 
     void __cdecl Print_Gate_Info_(

@@ -2973,6 +2973,7 @@ namespace hooks {
         { 0x00498040, &SYS::Print_Special_Building_Data_ },
         { 0x00495C20, &SYS::Do_Print_System_Ship_Data_ },
         { 0x00496E20, &SYS::Print_Gate_Info_ },
+        { 0x00497E50, &SYS::Print_Empty_System_Data_ },
     };
 
     void Install_Hooks()

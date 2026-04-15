@@ -413,7 +413,18 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
 }
 
 inline char& DAT_00556dac = *reinterpret_cast<char*>(std::uintptr_t{ 0x00556DAC });
-inline char& DAT_00566440 = *reinterpret_cast<char*>(std::uintptr_t{0x00566440});
+inline int16_t& _moveable_box_0_height =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597864});
+inline int16_t& _moveable_box_0_width =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597866});
+inline int16_t& _moveable_box_0_x =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597868});
+inline int16_t& _moveable_box_0_y =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786A});
+inline int16_t& _moveable_box_0_content_offset_x =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597878});
+inline int16_t& _moveable_box_0_content_offset_y =
+    *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059787A});
 
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();

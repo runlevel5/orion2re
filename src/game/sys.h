@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 namespace SYS {
     inline uint32_t& _sys_data_buffer = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A57D0});
@@ -132,11 +131,10 @@ namespace SYS {
 
     void __cdecl Print_System_Display_Box_Title_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, const char* title_text);
 
-    inline void __cdecl Print_Empty_System_Data_(int16_t star_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497E50 });
-        fn(star_idx);
-    }
+    void __cdecl Print_Empty_System_Data_();
+
+    inline char (&_star_description_string)[256] =
+        *reinterpret_cast<char (*)[256]>(std::uintptr_t{0x00566440});
 
     void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset);
 }
