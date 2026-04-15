@@ -575,7 +575,7 @@ namespace MAINSCR {
 
                     if (res == 0) {
                         if (ship_idx < 0) {
-                            int16_t p_idx = HAROLD::Planet_Index_(MOX::_moveable_box[0].off_flag, planet_idx);
+                            int16_t p_idx = HAROLD::Planet_Index_(MOX::_moveable_box[0].id, planet_idx);
 
                             int16_t colony_id = MOX::_planet[p_idx].colony_index;
                             if (colony_id > -1 && colony_id < MOX::_NUM_COLONIES && MOX::_colony[colony_id].owner == MOX::_PLAYER_NUM) {
@@ -1002,7 +1002,7 @@ namespace MAINSCR {
                 int16_t box_id = MOX::_moveable_box_order[i];
                 if (MOVEBOX::Moveable_Box_Selected_(box_id)) {
                     if (box_id == 0) {
-                        Highlight_Star_(MOX::_moveable_box[0].off_flag);
+                        Highlight_Star_(MOX::_moveable_box[0].id);
                     }
                     if (box_id == 2) {
                         Draw_Fleet_Box_Selected_Ship_Seg_();

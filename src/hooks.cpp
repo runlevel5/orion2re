@@ -2960,6 +2960,10 @@ namespace hooks {
         { 0x00494FB0, &SYS::Draw_System_Highlight_ },
         { 0x00495370, &SYS::Print_Planet_Info_Short_ },
         { 0x00497270, &SYS::Print_Planet_Info_ },
+        { 0x004951B0, &SYS::Draw_System_Ship_Icons_ },
+        { 0x004949C0, &SYS::Draw_Gate_Icons_ },
+        { 0x004f15d0, &HAROLD::Star_Has_Artemis_Net_ },
+        { 0x004972b0, &SYS::Print_System_Display_Box_Title_ },
     };
 
     void Install_Hooks()

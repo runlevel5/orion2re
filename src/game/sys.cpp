@@ -173,7 +173,7 @@ namespace SYS {
             SYS::Set_System_Display_Loaded_Flag_(star_id);
             SYS::_skip_draw_system_planets = 1;
 
-            if (MOX::_moveable_box[0].off_flag < MOX::_box_off_flag[0]) {
+            if (MOX::_moveable_box[0].id < MOX::_box_off_flag[0]) {
                 SYS::_skip_draw_system_display = 1;
             }
 
@@ -683,6 +683,119 @@ namespace SYS {
             }
 
             (*total_count)++;
+        }
+    }
+
+    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unknown) {
+        int16_t out_x;
+        int16_t out_y;
+
+        SYS::Get_Gate_Icon_XY_(x, y, width, height, unknown, &out_x, &out_y);
+
+        if (MOX::_current_screen == 29 /* SCREEN_GALAXY */) {
+            out_y -= 6;
+        }
+
+        s_star_data* star = &MOX::_star[star_idx];
+
+        if (HAROLD::Star_Has_Artemis_Net_(star)) {
+            out_x -= 12;
+            MOX::_gate_icon_seg[14] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 33 /* LBX_ENTRY_ARTEMIS */, MOX::_global_cache_seg);
+            animate::Draw_(out_x, out_y, MOX::_gate_icon_seg[14]);
+        }
+
+        if (HAROLD::Star_Has_Dimensional_Portal_(star)) {
+            out_y += 1;
+            out_x -= 12;
+            MOX::_gate_icon_seg[2] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 21 /* LBX_ENTRY_DIMENSIONAL_PORTAL */, MOX::_global_cache_seg);
+            animate::Draw_(out_x, out_y, MOX::_gate_icon_seg[2]);
+        }
+    }
+
+    void __cdecl Print_System_Display_Box_Title_(int16_t x_offset, int16_t y_offset, int16_t box_x, int16_t box_y, const char* text) {
+        s_colors colors;
+        int16_t text_width;
+        int16_t current_spacing;
+        int16_t current_style;
+        int16_t font_height;
+        int16_t image_width;
+        int16_t print_x;
+        int16_t print_y;
+
+        s_colors* temp_colors = MISC::Font_Colors2_(4, 0x3c /* '<' */, 0x41 /* 'A' */);
+        colors = *temp_colors;
+
+        fonts::Set_Font_Style_(4, &colors);
+        text_width = fonts::Get_String_Width_(text);
+
+        if (text_width > 265 /* 0x109 */) {
+            fonts::Set_Font_Style_(3, &colors);
+        }
+
+        if (text_width < 60 /* 0x3c */) {
+            fonts::Set_Font_Spacing_(4);
+        } else {
+            fonts::Set_Font_Spacing_(2);
+        }
+
+        current_spacing = MISC::Get_Font_Spacing_();
+        current_style = fonts::_current_font_style;
+        font_height = fonts::Get_Font_Height_();
+
+        MOX::_moveable_box_pict = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        image_width = animate::Get_Width_(MOX::_moveable_box_pict);
+
+        print_x = x_offset + box_x + (image_width / 2);
+        print_y = ((20 - (font_height + 1)) / 2) + box_y + y_offset + 17;
+
+        MISC::Set_Fitted_Font_Style_((char*)text, &colors, current_style, current_spacing, 0, 0x131, 1);
+
+        current_style = MISC::Get_Font_Style_();
+        current_spacing = MISC::Get_Font_Spacing_();
+
+        temp_colors = MISC::Font_Colors2_(current_style, 0x3c /* '<' */, 0x41 /* 'A' */);
+        colors = *temp_colors;
+
+        fonts::Set_Font_Style_(current_style, &colors);
+        fonts::Set_Font_Spacing_(current_spacing);
+
+        if (current_style < 3) {
+            print_y = (print_y - current_style) + 3;
+        }
+
+        MISC::_Print_Centered_Shadow_Down_(print_x, print_y, 0x3d /* '=' */, text);
+    }
+
+    void __cdecl Draw_System_Ship_Icons_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset) {
+        int16_t icon_scanned = (int16_t)MOX::_system_icon_scanned;
+
+        for (int16_t i = 0; i < 15; ++i) {
+            int16_t ship_idx = MOX::_system_display_ships[i].ship_idx;
+            if (ship_idx > -1) {
+                int16_t target_x = MOX::_system_display_ships[i].x + content_w + base_x;
+                int16_t target_y = MOX::_system_display_ships[i].y + content_h + base_y;
+
+                if (icon_scanned > 999 && (ship_idx - icon_scanned == -1000)) {
+                    int16_t text_w, text_h;
+                    SYS::Measure_System_Ship_Data_(base_x, base_y, content_w, content_h, ship_idx, &text_w, &text_h);
+
+                    int16_t box_x = x_offset + content_w + base_x;
+                    int16_t box_y = y_offset + content_h + base_y;
+                    MISC::Draw_Darkened_Box_(box_x, box_y, text_w + 9, text_h + 4, 0x3F /* '?' */);
+
+                    SYS::Print_System_Ship_Data_(base_x, base_y, content_w, content_h, ship_idx);
+
+                    MOX::_system_display_ships[i].pic = SYS::Buffer_Reload_System_Ships_(i);
+                    animate::Get_Current_Frame_(MOX::_system_display_ships[i].pic);
+                } else {
+                    MOX::_system_display_ships[i].pic = SYS::Buffer_Reload_System_Ships_(i);
+                    animate::Reset_Animation_Frame_(MOX::_system_display_ships[i].pic);
+                    animate::Get_Current_Frame_(MOX::_system_display_ships[i].pic);
+                }
+
+                animate::Draw_(target_x, target_y, MOX::_system_display_ships[i].pic);
+                icon_scanned = (int16_t)MOX::_system_icon_scanned;
+            }
         }
     }
 }

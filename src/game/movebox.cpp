@@ -118,11 +118,11 @@ namespace MOVEBOX {
     }
 
     bool __cdecl Moveable_Box_Selected_(int16_t box_idx) {
-        return MOX::_box_off_flag[box_idx] < MOX::_moveable_box[box_idx].off_flag;
+        return MOX::_box_off_flag[box_idx] < MOX::_moveable_box[box_idx].id;
     }
 
     void __cdecl Vanish_Fleet_Movement_Box_() {
-        MOX::_moveable_box[2].off_flag = MOX::_box_off_flag[2];
+        MOX::_moveable_box[2].id = MOX::_box_off_flag[2];
 
         if (MOX::_fleet_box.count > 0) {
             for (int16_t i = 0; i < MOX::_fleet_box.count; ++i) {
@@ -146,7 +146,7 @@ namespace MOVEBOX {
     }
 
     void __cdecl Vanish_System_Display_Box_() {
-        MOX::_moveable_box[0].off_flag = MOX::_box_off_flag[0];
+        MOX::_moveable_box[0].id = MOX::_box_off_flag[0];
 
         for (int32_t i = 0; i < 5; ++i) {
             MOX::_planet_buttons[i] = -1000;

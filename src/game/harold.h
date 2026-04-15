@@ -160,9 +160,17 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 
+    bool __cdecl Star_Has_Artemis_Net_(s_star_data* star);
+
     bool __cdecl Player_Has_Artemis_Net_(s_player* player, s_star_data* star);
 
     bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star);
+
+    inline bool __cdecl Star_Has_Dimensional_Portal_(s_star_data* star) {
+        using Fn = bool(__cdecl*)(s_star_data*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F15C0});
+        return fn(star);
+    }
 
     int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t star_planet);
 

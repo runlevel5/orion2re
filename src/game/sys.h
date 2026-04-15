@@ -83,18 +83,33 @@ namespace SYS {
 
     void __cdecl Print_Planet_Info_(int16_t p1, int16_t p2, int16_t p3, int16_t p4, int16_t p5, int16_t p6, int16_t p7);
 
-    inline void __cdecl Draw_System_Ship_Icons_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t
-        x_offset) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004951B0 });
-        fn(base_x, base_y, content_w, content_h, y_offset, x_offset);
+    void __cdecl Draw_System_Ship_Icons_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset);
+
+    inline void __cdecl Measure_System_Ship_Data_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t ship_idx, int16_t* tw, int16_t* th) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00495BF0});
+        fn(base_x, base_y, content_w, content_h, ship_idx, tw, th);
     }
 
-    inline void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004949C0 });
-        fn(star_idx, base_x, base_y, content_w, content_h, x_offset);
+    inline void __cdecl Print_System_Ship_Data_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t ship_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497420});
+        fn(base_x, base_y, content_w, content_h, ship_idx);
     }
+
+    inline s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t index) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497F80});
+        return fn(index);
+    }
+
+    inline void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t width, int16_t height, int32_t unknown, int16_t* out_x, int16_t* out_y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int32_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00495330});
+        fn(x, y, width, height, unknown, out_x, out_y);
+    }
+
+    void __cdecl Draw_Gate_Icons_(int16_t star_idx, int16_t x, int16_t y, int16_t width, int16_t height, int32_t unknown);
 
     inline void __cdecl Print_Gate_Info_(int16_t star_idx, int16_t gate_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h,
         int16_t x_offset, int16_t y_offset) {
@@ -103,12 +118,7 @@ namespace SYS {
         fn(star_idx, gate_idx, base_x, base_y, content_w, content_h, x_offset, y_offset);
     }
 
-    inline void __cdecl Print_System_Display_Box_Title_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, const char*
-        title_text) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004972B0 });
-        fn(base_x, base_y, content_w, content_h, title_text);
-    }
+    void __cdecl Print_System_Display_Box_Title_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, const char* title_text);
 
     inline void __cdecl Print_Empty_System_Data_(int16_t star_idx) {
         using Fn = void(__cdecl*)(int16_t);

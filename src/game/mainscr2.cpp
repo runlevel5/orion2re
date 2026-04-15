@@ -260,7 +260,7 @@ namespace MAINSCR2 {
             fields::Assign_Auto_Function_(MAINSCR::Draw_Mini_Main_Screen_, 1);
             EVANHELP::Set_Scrap_Freighters_Help_List_();
             fields::Clear_Fields_();
-            MOX::_moveable_box[2].off_flag = 0;
+            MOX::_moveable_box[2].id = 0;
             fields::Disable_Draw_All_Fields_();
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
@@ -298,7 +298,7 @@ namespace MAINSCR2 {
 
         MOX::_current_screen = MOX::_return_screen;
         if (selected_box != 0) {
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
         }
 
         fields::Clear_Fields_();
@@ -363,7 +363,7 @@ namespace MAINSCR2 {
             RUSS::Mox_Sync_Update_();
             KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
 
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
 
             SHIPS::Build_Ship_Icons_();
             MOX::_eta_star_id = -1;
@@ -451,7 +451,7 @@ namespace MAINSCR2 {
             MAINSCR::Draw_Main_Screen_();
             RUSS::Mox_Sync_Update_();
             KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
             SHIPS::Build_Ship_Icons_();
             MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
 
@@ -517,7 +517,7 @@ namespace MAINSCR2 {
             }
         } else {
             if (box_2_was_open) {
-                MOX::_moveable_box[2].off_flag = 1;
+                MOX::_moveable_box[2].id = 1;
             }
             MAINSCR::Redraw_Main_Screen_(!is_main_palette);
         }
@@ -642,7 +642,7 @@ namespace MAINSCR2 {
             MAINSCR::Draw_Main_Screen_();
             RUSS::Mox_Sync_Update_();
             KEN::Load_Player_Ship_Palette_(MOX::_PLAYER_NUM);
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
 
             MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
             if (MOX::_fleet_box_ship_stack == -1) {
@@ -747,9 +747,9 @@ namespace MAINSCR2 {
         MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Saved_Array_();
 
         if (MOX::_fleet_box_ship_stack == -1) {
-            MOX::_moveable_box[2].off_flag = MOX::_box_off_flag[2];
+            MOX::_moveable_box[2].id = MOX::_box_off_flag[2];
         } else {
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
             MAINSCR::Fade_Into_Main_Screen_();
             _force_main_screen_fade = 0;
         }

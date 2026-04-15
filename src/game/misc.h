@@ -92,4 +92,10 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049e130 });
         fn(x1, y1, x2, y2, color, edge_1, edge_2);
     }
+
+    inline void __cdecl _Print_Centered_Shadow_Down_(int32_t x, int32_t y, int32_t shadow_char, const char* text) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f0e0});
+        fn(x, y, shadow_char, text);
+    }
 }

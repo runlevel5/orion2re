@@ -834,7 +834,7 @@ namespace MAINSCR {
     void __cdecl Do_System_Popup_(int16_t system_id) {
         FLEETPOP::Set_Fleet_Movement_Icon_Selections_(0, 0);
 
-        MOX::_moveable_box[0].off_flag = system_id;
+        MOX::_moveable_box[0].id = system_id;
 
         bool box_was_selected = (MOVEBOX::Moveable_Box_Selected_(2) != 0);
 
@@ -843,7 +843,7 @@ namespace MAINSCR {
             SYS::Clear_System_Display_Loaded_Flag_();
         }
 
-        SYS::Init_System_Display_(MOX::_moveable_box[0].off_flag);
+        SYS::Init_System_Display_(MOX::_moveable_box[0].id);
 
         int16_t star_x, star_y;
         Get_Star_Draw_Coords_(system_id, &star_x, &star_y);
@@ -902,7 +902,7 @@ namespace MAINSCR {
                 MOX::_settings.expanding_help = 0;
             }
             MOX::Mox_Update_();
-            MAINSCR::Do_System_Popup_(MOX::_moveable_box[0].off_flag);
+            MAINSCR::Do_System_Popup_(MOX::_moveable_box[0].id);
             if (expanding_help_enabled) {
                 MOX::_settings.expanding_help = 1;
             }
@@ -1460,7 +1460,7 @@ namespace MAINSCR {
             old_stack_owner = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]);
         }
 
-        MOX::_moveable_box[2].off_flag = 1;
+        MOX::_moveable_box[2].id = 1;
         MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Icon_(ship_icon_id);
 
         if (MOX::_fleet_box_ship_stack == -1) {
@@ -1486,7 +1486,7 @@ namespace MAINSCR {
                 HAROLD::_set_fade_for_first_fltpop = 0;
                 MAINSCR::Draw_Mini_Main_Screen_();
             }
-            MOX::_moveable_box[2].off_flag = 1;
+            MOX::_moveable_box[2].id = 1;
             int16_t force_reload = (new_stack_owner != MOX::_PLAYER_NUM);
             FLEETPOP::Reload_Fleet_Box_Palette_(new_stack_owner, force_reload);
         }
@@ -1728,7 +1728,7 @@ namespace MAINSCR {
 
         // 1. Check for clicked ships
         for (int i = 0; i < 15; ++i) {
-            if (MOX::_system_display_ships[i].field4_0x8 != 0 && MOX::_system_display_ships[i].button == input) {
+            if (MOX::_system_display_ships[i].pic != NULL && MOX::_system_display_ships[i].button == input) {
                 *ship_idx = MOX::_system_display_ships[i].ship_idx;
                 ret_val = 0;
                 break;
@@ -1738,7 +1738,7 @@ namespace MAINSCR {
         // 2. Check for hovered ships if no click hit
         if (ret_val == -1) {
             for (int i = 0; i < 15; ++i) {
-                if (MOX::_system_display_ships[i].field4_0x8 != 0 && MOX::_system_display_ships[i].button == mouse_input) {
+                if (MOX::_system_display_ships[i].pic != NULL && MOX::_system_display_ships[i].button == mouse_input) {
                     *m_ship_idx = MOX::_system_display_ships[i].ship_idx;
                     ret_val = 4;
                     break;
@@ -1923,7 +1923,7 @@ namespace MAINSCR {
 
         // Check if a specific system is selected in the UI
         if (MOVEBOX::Moveable_Box_Selected_(0) != 0) {
-            star_idx = MOX::_moveable_box[0].off_flag;
+            star_idx = MOX::_moveable_box[0].id;
             if (star_idx != -1) {
                 if (HAROLD::Player_Has_Colony_(player_num, star_idx)) {
                     return star_idx;
@@ -2708,7 +2708,7 @@ namespace MAINSCR {
                 if (colony_id > -1) {
                     MAINSCR::Do_Colony_Screen_(colony_id, flag);
                 } else {
-                    MOX::_moveable_box[0].off_flag = MOX::_system_star_id_for_auto_select;
+                    MOX::_moveable_box[0].id = MOX::_system_star_id_for_auto_select;
                     MAINSCR::Do_System_Popup_(MOX::_system_star_id_for_auto_select);
                 }
             }
@@ -2723,7 +2723,7 @@ namespace MAINSCR {
                 if (colony_id > -1) {
                     MAINSCR::Do_Colony_Screen_(colony_id, flag);
                 } else {
-                    MOX::_moveable_box[0].off_flag = MOX::_system_star_id_for_auto_select;
+                    MOX::_moveable_box[0].id = MOX::_system_star_id_for_auto_select;
                     MAINSCR::Do_System_Popup_(MOX::_system_star_id_for_auto_select);
                 }
             }
@@ -2991,7 +2991,7 @@ namespace MAINSCR {
                         MOX::_draw_main_screen_to_back = 1;
                         MOVEBOX::Vanish_Fleet_Movement_Box_();
                     } else {
-                        MOX::_moveable_box[box_idx].off_flag = MOX::_box_off_flag[box_idx];
+                        MOX::_moveable_box[box_idx].id = MOX::_box_off_flag[box_idx];
                     }
                     continue;
                 }

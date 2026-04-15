@@ -2370,7 +2370,7 @@ typedef struct s_movable_box s_movable_box, *Ps_movable_box;
 
 struct s_movable_box {
     int16_t index;
-    int16_t off_flag;
+    int16_t id;
     int16_t height;
     int16_t width;
     int16_t x;
@@ -4288,11 +4288,11 @@ struct s_sys_disp {
 typedef struct s_system_display_ships s_system_display_ships, *Ps_system_display_ships;
 
 struct s_system_display_ships {
-    short field0_0x0;
-    short field1_0x2;
+    short x;
+    short y;
     short button;
     short ship_idx;
-    int field4_0x8;
+    struct s_animation_header *pic;
 };
 
 typedef struct s_tech_app_data s_tech_app_data, *Ps_tech_app_data;

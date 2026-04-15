@@ -412,7 +412,7 @@ namespace HAROLD {
             MOX::_moveable_box[i].index = static_cast<uint16_t>(i);
             MOX::_moveable_box_order[i] = static_cast<uint16_t>(i);
 
-            MOX::_moveable_box[i].off_flag = static_cast<int16_t>(MOX::_box_off_flag[i]);
+            MOX::_moveable_box[i].id = static_cast<int16_t>(MOX::_box_off_flag[i]);
 
             MOX::_moveable_box[i].x = -1;
             MOX::_moveable_box[i].y = -1;
@@ -545,6 +545,13 @@ namespace HAROLD {
                 }
             }
         }
+    }
+
+    /**
+     * @address 004f15d0
+     */
+    bool __cdecl Star_Has_Artemis_Net_(s_star_data* star) {
+        return star->has_artemis_net != 0;
     }
 
     /**

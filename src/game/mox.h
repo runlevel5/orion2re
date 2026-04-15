@@ -620,7 +620,8 @@ namespace MOX {
     inline int16_t& _system_display_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A6});
     inline int16_t& _system_display_base_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4A8});
     inline s_sys_disp*& _sys_disp = *reinterpret_cast<s_sys_disp**>(std::uintptr_t{0x0059B5F4});
-    inline s_system_display_ships* _system_display_ships = reinterpret_cast<s_system_display_ships*>(std::uintptr_t{0x0059B624});
+    inline s_system_display_ships (&_system_display_ships)[15] =
+        *reinterpret_cast<s_system_display_ships(*)[15]>(std::uintptr_t{0x0059B620});
     inline int16_t& _system_display_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA6C});
     inline char* (&_race_names)[20] =
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
@@ -832,6 +833,10 @@ namespace MOX {
     inline uint8_t& _moving_a_stack = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEB4});
     inline uint8_t& _track_time_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CEC0});
     inline void*& _temp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00596130});
+
+    // Suggested name: MOX::_gate_icon_seg
+    inline s_animation_header* (&_gate_icon_seg)[16] =
+        *reinterpret_cast<s_animation_header* (*)[16]>(std::uintptr_t{0x0059BCD0});
 
     // Suggested name: MOX::gate_portal_icons
     inline s_animation_header** gate_portal_icons = reinterpret_cast<s_animation_header**>(0x0059BCD0);
