@@ -2,6 +2,15 @@
 
 namespace FMTPARA {
     /**
+     * @address 00432ef0
+     */
+    void __cdecl Init_() {
+        memset(_tabs, 0, sizeof(_tabs));
+        memset(&_para_global, 0, sizeof(_para_global));
+        Initialize_Formatted_Paragraph_System_();
+    }
+
+    /**
      * @address 00433de0
      */
     void __cdecl Reset_A_Paragraph_Variable_(uint16_t index) {
@@ -570,6 +579,14 @@ namespace FMTPARA {
     int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text) {
         _Print_Formatted_Paragraph_(0, 0, width, text, 0, nullptr, false);
         return (int16_t)((_para_global.max_y - _para_global.min_y) + 1);
+    }
+
+    /**
+     * @address 00432ea0
+     */
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify) {
+        _Print_Formatted_Paragraph_(0, 0, width, text, justify, nullptr, false);
+        return (int16_t)(_para_global.max_x - _para_global.min_x + 1);
     }
 
     char* __cdecl _Print_Formatted_Paragraph_(short x, short y, short width, char* str, short justify, s_animation_header* seg, bool do_render) {
@@ -2004,9 +2021,33 @@ namespace FMTPARA {
     }
 
     /**
+     * @address 00432e30
+     */
+    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* ptr) {
+        Set_Paragraph_Variable_Pointer_(index, ptr, 2);
+    }
+
+    /**
      * @address 00432e50
      */
     void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr) {
         Set_Paragraph_Variable_Pointer_(id, ptr, 4);
+    }
+
+    /**
+     * @address 00432e00
+     */
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(short param_1, short param_2, short param_3, char* param_4, short param_5, s_animation_header* param_6) {
+        _Print_Formatted_Paragraph_(param_1, param_2, param_3, param_4, param_5, param_6, true);
+    }
+
+    /**
+     * @address 00433e10
+     */
+    void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type) {
+        if (item_index < 0x10) {
+            _para_global_item_ptr[item_index] = value_ptr;
+            _para_global_item_type[item_index] = value_type;
+        }
     }
 }

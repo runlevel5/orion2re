@@ -738,7 +738,7 @@ namespace bitmap {
             return;
         }
 
-        struct_::Set_Memory_(src_data, intensity, 0, dest_data, width, height);
+        shear::Vanish_Bitmap_Pixels_(src_data, intensity, 0, dest_data, width, height);
     }
 
     void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest) {

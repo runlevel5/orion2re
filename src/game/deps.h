@@ -48,6 +48,7 @@
 #include "firepts.h"
 #include "farload.h"
 #include "s_starname.h"
+#include "s_billtext.h"
 #include "fonts.h"
 #include "jim.h"
 #include "ken.h"

@@ -66,6 +66,12 @@ namespace NETMOX {
 
     void __cdecl Update_();
 
+    inline void __cdecl Mox_Net_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005156C0});
+        fn();
+    }
+
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);

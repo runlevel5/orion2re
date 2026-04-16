@@ -7,13 +7,11 @@ struct s_colors;
 struct s_animation_header;
 
 namespace TECH {
-    inline void __cdecl Tech_Select_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483ff0});
-        fn();
-    }
+    void __cdecl Tech_Select_();
 
-    void __cdecl _Tech_Select_(char param_1);
+    void __cdecl _Tech_Select_(int32_t arg0);
+
+    void __cdecl Reset_Screen_();
 
     inline const char* _research_desc_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x00557C28});
     int32_t __cdecl New_Get_Tech_Cost_(int16_t id, uint8_t is_tech_app, int16_t player_idx);

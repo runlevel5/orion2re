@@ -65,6 +65,8 @@ namespace JIM {
 
     void __cdecl Decode_Text_Name_And_Stat_(char* text, int16_t val1, int16_t val2, int16_t val3);
 
+    void __cdecl Decode_Text_Tech_And_Other_Name_(char* text, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t other_name_3);
+
     void __cdecl Decode_Text_Race2_(char* buffer, int16_t race_idx1, int16_t race_idx2);
 
     void __cdecl Decode_Text_Race_(char* out_buffer, int16_t msg_idx, int16_t race_idx);
@@ -78,4 +80,10 @@ namespace JIM {
     }
 
     void __cdecl Decode_Text_Year_(char* buffer, int16_t year);
+
+    inline void __cdecl Decode_Text_Field_(char* text_buffer, uint16_t field_id, int max_len) {
+        using Fn = void(__cdecl*)(char*, uint16_t, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00425980 });
+        fn(text_buffer, field_id, max_len);
+    }
 }

@@ -35,12 +35,12 @@ namespace FMTPARA {
     inline uint32_t& _user_fn_arg =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x005650C0 });
 
+    inline void **_para_global_item_ptr =
+        reinterpret_cast<void **>(std::uintptr_t{0x005A7B18}); // _para_global.item_ptr[0]
+    inline int8_t *_para_global_item_type =
+        reinterpret_cast<int8_t *>(std::uintptr_t{0x005A7B58}); // _para_global.item_type[0]
 
-    inline void __cdecl Init_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432EF0});
-        fn();
-    }
+    void __cdecl Init_();
 
     void __cdecl Set_Para_Y2_();
     void __cdecl Reset_Max_Min_Values_();
@@ -67,11 +67,7 @@ namespace FMTPARA {
 
     int16_t __cdecl Get_Formatted_Paragraph_Max_Height_(int16_t width, char* text);
 
-    inline int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t line_width, const char* text, int32_t flags) {
-        using Fn = int16_t(__cdecl*)(int16_t, const char*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00432EA0 });
-        return fn(line_width, text, flags);
-    }
+    int16_t __cdecl Get_Formatted_Paragraph_Max_Width_(int16_t width, char* text, int16_t justify);
 
     int16_t __cdecl Get_Last_Formatted_Paragraph_Max_Width_();
 
@@ -191,20 +187,9 @@ namespace FMTPARA {
 
     void __cdecl Set_Paragraph_Sint_Pointer_(uint16_t id, void* ptr);
 
-    inline void __cdecl Set_Paragraph_Integer_Pointer_(int index, void* ptr) {
-        using Fn = void(__cdecl*)(int, void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00432E30})(index, ptr);
-    }
+    void __cdecl Set_Paragraph_Integer_Pointer_(uint16_t index, void* ptr);
 
-    inline void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t id, void* ptr, int32_t size) {
-        using Fn = void(__cdecl*)(uint16_t, void*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00433e10});
-        fn(id, ptr, size);
-    }
+    void __cdecl Set_Paragraph_Variable_Pointer_(uint16_t item_index, void *value_ptr, int8_t value_type);
 
-    inline void __cdecl Print_Formatted_Paragraph_To_Bitmap_(int param_1, int param_2, int param_3, char* text, int param_5, void* bitmap) {
-        using Fn = void(__cdecl*)(int, int, int, char*, int, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00432E00});
-        fn(param_1, param_2, param_3, text, param_5, bitmap);
-    }
+    void __cdecl Print_Formatted_Paragraph_To_Bitmap_(short param_1, short param_2, short param_3, char* param_4, short param_5, s_animation_header* param_6);
 }

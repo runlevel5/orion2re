@@ -483,6 +483,15 @@
     <ClCompile Include="src\game\time.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\science.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\techinit.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\reduce.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -1068,6 +1077,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\bitio.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\s_billtext.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

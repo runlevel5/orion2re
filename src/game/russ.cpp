@@ -1,6 +1,9 @@
 #include "pch.h"
 
 namespace RUSS {
+    void __cdecl Assert_Settings_() {
+    }
+
     int16_t __cdecl Get_Weighted_Choice_Char_(uint8_t* weights, int16_t count) {
         uint32_t total_weight = 0;
         for (int16_t i = 0; i < count; ++i) {
@@ -58,6 +61,29 @@ namespace RUSS {
         return index;
     }
 
+    int16_t __cdecl Get_Weighted_Choice_Int_(uint32_t* weights, int16_t count) {
+        uint32_t total_weight = 0;
+        for (int16_t i = 0; i < count; ++i) {
+            total_weight += weights[i];
+        }
+
+        if (total_weight == 0) {
+            return -1;
+        }
+
+        uint32_t roll = static_cast<uint32_t>(random::Random_(static_cast<int32_t>(total_weight)));
+        int16_t choice = 0;
+
+        if (weights[0] < roll) {
+            do {
+                roll -= weights[choice];
+                ++choice;
+            } while (weights[choice] < roll);
+        }
+
+        return choice;
+    }
+
     /**
      * @brief Releases all allocated blocks within a memory segment by resetting it.
      * 
@@ -104,6 +130,23 @@ namespace RUSS {
         }
     }
 
+    void __cdecl Shuffle_Char_(int8_t* buffer, int16_t length) {
+        int16_t index = 0;
+
+        if (length > 0) {
+            do {
+                int current = index;
+                int random_value = random::Random_(length - current);
+                int16_t swap_index = static_cast<int16_t>(index + random_value - 1);
+                ++index;
+
+                int8_t temp = buffer[current];
+                buffer[current] = buffer[swap_index];
+                buffer[swap_index] = temp;
+            } while (index < length);
+        }
+    }
+
     void __cdecl Shuffle_Int_(int32_t* array, int16_t count) {
         if (count <= 0) {
             return;
@@ -141,6 +184,13 @@ namespace RUSS {
         }
     }
 
+    char* __cdecl Star_Name_(int32_t star_idx) {
+        if (star_idx < MOX::_NUM_STARS) {
+            return MOX::_star[star_idx].name;
+        }
+        return const_cast<char*>(s_Antares_00551288);
+    }
+
     void __cdecl Shuffle_(void* buffer, int16_t element_size, int16_t num_elements) {
         if (element_size == 1) {
             RUSS::Shuffle_Char_(static_cast<int8_t*>(buffer), num_elements);
@@ -174,5 +224,68 @@ namespace RUSS {
                 }
             }
         }
+    }
+
+    void __cdecl Mox_Update_() {
+        sound::Sound_Update_();
+        NETMOX::Mox_Net_Update_();
+    }
+
+    void __cdecl Mox_Sync_Update_() {
+        Mox_Update_();
+        platform::Toggle_Pages_Stub_();
+    }
+
+    int __cdecl Compare_Ratios_(uint32_t first_numerator, uint32_t first_denominator, uint32_t second_numerator, uint32_t second_denominator) {
+        int comparison = 2;
+
+        do {
+            uint32_t saved_first_numerator = first_numerator;
+
+            if (first_numerator == 0) {
+                comparison = (second_numerator != 0) ? -1 : 0;
+            } else if (second_numerator == 0) {
+                comparison = 1;
+            } else if (first_denominator > first_numerator) {
+                if (second_denominator <= second_numerator) {
+                    comparison = -1;
+                } else {
+                    uint32_t second_quotient = second_denominator / second_numerator;
+                    uint32_t first_quotient = first_denominator / first_numerator;
+
+                    if (first_quotient > second_quotient) {
+                        comparison = -1;
+                    } else if (first_quotient < second_quotient) {
+                        comparison = 1;
+                    } else {
+                        uint32_t second_remainder = second_denominator % second_numerator;
+                        uint32_t first_remainder = first_denominator % first_numerator;
+
+                        first_numerator = second_remainder;
+                        first_denominator = second_numerator;
+                        second_numerator = first_remainder;
+                        second_denominator = saved_first_numerator;
+                    }
+                }
+            } else {
+                if (second_denominator > second_numerator) {
+                    comparison = 1;
+                } else {
+                    uint32_t first_quotient = first_numerator / first_denominator;
+                    uint32_t second_quotient = second_numerator / second_denominator;
+
+                    if (second_quotient > first_quotient) {
+                        comparison = -1;
+                    } else if (second_quotient < first_quotient) {
+                        comparison = 1;
+                    } else {
+                        first_numerator %= first_denominator;
+                        second_numerator %= second_denominator;
+                    }
+                }
+            }
+        } while (comparison == 2);
+
+        return comparison;
     }
 }

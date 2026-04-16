@@ -52,8 +52,8 @@ namespace INFO {
     inline s_animation_header*& _g_bitmap1_p =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A7B8C});
 
-    inline void*& _g_bitmap2_p =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005A7B90});
+    inline s_animation_header*& _g_bitmap2_p =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A7B90});
 
     inline int16_t& _g_prior_choice =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B94});

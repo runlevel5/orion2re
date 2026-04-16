@@ -754,7 +754,7 @@ namespace AIMOVE {
 
             for (int16_t i = 0; i < num_ships; ++i) {
                 int16_t ship_idx = ship_indices[i];
-                bool has_navigator = RUSS::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                bool has_navigator = struct_::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
                 ship_list[0] = ship_idx;
 
                 int16_t location = MOX::_ship[ship_idx].location;
@@ -822,7 +822,7 @@ namespace AIMOVE {
 
             for (int16_t i = 0; i < num_ships; ++i) {
                 int16_t ship_idx = ship_indices[i];
-                bool has_navigator = RUSS::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
+                bool has_navigator = struct_::Test_Bit_Field_(reinterpret_cast<uint8_t*>(MOX::_ship[ship_idx].d.special_device_flags), 11);
                 int16_t location = MOX::_ship[ship_idx].location;
 
                 if (location == target_star) {

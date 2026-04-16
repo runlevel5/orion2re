@@ -145,11 +145,13 @@
     <ClCompile Include="src\game\racescrn.cpp" />
     <ClCompile Include="src\game\racesel.cpp" />
     <ClCompile Include="src\game\random.cpp" />
+    <ClCompile Include="src\game\reduce.cpp" />
     <ClCompile Include="src\game\regions.cpp" />
     <ClCompile Include="src\game\remap.cpp" />
     <ClCompile Include="src\game\replace.cpp" />
     <ClCompile Include="src\game\report.cpp" />
     <ClCompile Include="src\game\russ.cpp" />
+    <ClCompile Include="src\game\science.cpp" />
     <ClCompile Include="src\game\score.cpp" />
     <ClCompile Include="src\game\scroll.cpp" />
     <ClCompile Include="src\game\settler.cpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
     <ClCompile Include="src\game\tech.cpp" />
+    <ClCompile Include="src\game\techinit.cpp" />
     <ClCompile Include="src\game\textbox.cpp" />
     <ClCompile Include="src\game\time.cpp" />
     <ClCompile Include="src\game\timer.cpp" />
@@ -355,6 +358,7 @@
     <ClInclude Include="src\game\swap.h" />
     <ClInclude Include="src\game\sys.h" />
     <ClInclude Include="src\game\sysfont.h" />
+    <ClInclude Include="src\game\s_billtext.h" />
     <ClInclude Include="src\game\s_council.h" />
     <ClInclude Include="src\game\s_score.h" />
     <ClInclude Include="src\game\s_starname.h" />

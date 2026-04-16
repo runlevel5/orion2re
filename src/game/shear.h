@@ -61,4 +61,10 @@ namespace shear {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00537561});
         fn(src_ptr, scale_x, scale_y, dst_ptr, src_w, src_h, dst_w, dst_h);
     }
+
+    inline void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, int32_t param_3, int32_t zero, void* dest, int32_t width, int32_t height) {
+        using Fn = void(__cdecl*)(uint8_t*, int32_t, int32_t, void*, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00537620 });
+        fn(src, param_3, zero, dest, width, height);
+    }
 }

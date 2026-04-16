@@ -120,4 +120,10 @@ namespace BILL {
     inline const char* const s_Error_copying_s_to_s_bytes_i = reinterpret_cast<const char*>(std::uintptr_t{0x00551154}); // "Error copying %s to %s (bytes: %i)"
     inline const char* const s_wb = reinterpret_cast<const char*>(std::uintptr_t{0x00551178}); // "wb"
     inline const char* const s_rb = reinterpret_cast<const char*>(std::uintptr_t{0x0055117c}); // "rb"
+
+    inline char* __cdecl Cache_Player_Spy_Anim_() {
+        using Fn = char*(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407A20});
+        return fn();
+    }
 }

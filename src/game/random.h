@@ -10,7 +10,7 @@ namespace random {
 
     void __cdecl Randomize_();
 
-    inline int32_t __cdecl Random_(int32_t max_val) {
+    inline int32_t __cdecl Random_(int32_t max_val) { // TYPE MISMATCH: decompiled as uint32_t(uint32_t)
         using Fn = int32_t(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D470 });
         return fn(max_val);

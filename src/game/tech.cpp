@@ -1,7 +1,19 @@
 #include "pch.h"
 
 namespace TECH {
-    void __cdecl _Tech_Select_(char param_1) {
+    void __cdecl Tech_Select_() {
+        void* animation_buffer;
+
+        palette::Save_Palette_();
+        animation_buffer = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
+        file_ani::Set_File_Animation_Buffer_(animation_buffer);
+        SCIENCE::Show_Off_Researched_Tech_(MOX::_PLAYER_NUM);
+        TECH::_Tech_Select_(0);
+        ERIC::Fast_Fade_Out_();
+        TECH::Reset_Screen_();
+    }
+
+    void __cdecl _Tech_Select_(int32_t param_1) {
         int16_t extra_fields_cnt;
         int16_t first_btn_field;
         int16_t last_btn_field;
@@ -1057,5 +1069,15 @@ namespace TECH {
         for (int i = 0; i < 8; ++i) {
             MOX::_player[player_idx].hyper_advanced_tech[i]++;
         }
+    }
+
+    void __cdecl Reset_Screen_() {
+        palette::Restore_Palette_();
+        BILL::Turn_Off_Palettes_(0, 0xff);
+        palette::Clear_Palette_Changes_(0, 0xff);
+        fields::Deactivate_Help_List_();
+        COLONY::Reset_Mouse_Picture_();
+        file_ani::Reset_File_Animation_Buffer_();
+        JIM::Play_Background_Music_();
     }
 }

@@ -4,11 +4,10 @@
 struct s_animation_header;
 
 namespace reduce {
-    inline void __cdecl Clear_Reduced_Palette_Groups_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534650});
-        fn();
-    }
+    inline uint16_t& _ncubes =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00587FE0});
+
+    void __cdecl Clear_Reduced_Palette_Groups_();
 
     inline void __cdecl Add_Reduced_Palette_Group_(s_animation_header* anim) {
         using Fn = void(__cdecl*)(s_animation_header*);

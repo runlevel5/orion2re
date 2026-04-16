@@ -252,4 +252,8 @@ namespace JIM {
     void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3) {
         Decode_Text_Message_(buffer, id1, -1, -1, -1, id2, -1, -1, id3);
     }
+
+    void __cdecl Decode_Text_Tech_And_Other_Name_(char* text, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t other_name_3) {
+        JIM::Decode_Text_Message_(text, tech_id, -1, other_name_1, -1, other_name_2, -1, -1, other_name_3);
+    }
 }

@@ -25,6 +25,9 @@ namespace TECHDATA {
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 
+    inline int16_t (&_starting_tech_field_ids)[6] =
+        *reinterpret_cast<int16_t (*)[6]>(std::uintptr_t{0x0055A960});
+
     inline s_unit_data* _units = reinterpret_cast<s_unit_data*>(std::uintptr_t{0x00555728});
 
     inline s_tech_data_rifle (&_rifles)[6] =
