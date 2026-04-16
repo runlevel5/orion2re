@@ -109,6 +109,7 @@
 #include "nextturn.h"
 #include "newgame.h"
 #include "billhelp.h"
+#include "buffer.h"
 #include "racerprt.h"
 #include "newpup.h"
 #include "score.h"
@@ -203,3 +204,4 @@
 #include "cmbtai.h"
 #include "beams.h"
 #include "bitio.h"
+#include "lbx.h"

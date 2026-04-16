@@ -240,4 +240,181 @@ namespace TEXTBOX {
     void __cdecl Text_Box_(const char* title, const char* text) {
         Do_Text_Box_(title, text, 0);
     }
+
+    void __cdecl Draw_Help_Entry_(int16_t param_1) {
+        _box_x = 0;
+        _box_y = 0;
+
+        uint8_t base_color_g = 0;
+        uint8_t base_color_b = 0;
+
+        Text_Box_Startup_(0x11B34);
+        Get_Mox_Text_Box_Base_Colors_(0, &base_color_g, &base_color_b);
+
+        s_colors* color1_ptr = MISC::Font_Colors2_(4, base_color_g, base_color_b);
+        s_colors color_1 = *color1_ptr;
+
+        s_colors* color2_ptr = MISC::Font_Colors2_(2, base_color_g, base_color_b);
+        s_colors color_2 = *color2_ptr;
+
+        fonts::Set_Remap_Font_Style_(4, &color_1);
+        fonts::Get_Font_Height_();
+        fonts::Set_Remap_Font_Style_(2, &color_2);
+
+        allocate::Push_Block_(reinterpret_cast<void*>(_textbox_seg));
+        void* lbx_header = allocate::Allocate_Next_Block_(reinterpret_cast<void*>(_textbox_seg), 0x104C);
+
+        uint16_t count = 0;
+        uint32_t help_idx = static_cast<uint16_t>(param_1);
+        uint32_t total_lbx_size = 0;
+
+        char help_lbx_name[20];
+        Get_Help_Lbx_Name_(help_lbx_name);
+
+        s_help_record records[9];
+        bool has_anim[9];
+
+        do {
+            allocate::Push_Block_(reinterpret_cast<void*>(_textbox_seg));
+            void* record_data = farload::Far_Reload_Next_Data_(help_lbx_name, 0, reinterpret_cast<void*>(_textbox_seg), help_idx, 1, 0x57B);
+            
+            memcpy(&records[count], record_data, 1403);
+
+            FMTPARA::Get_Formatted_Paragraph_Max_Height_(0x153, records[count].body);
+            allocate::Pop_Block_(reinterpret_cast<void*>(_textbox_seg));
+
+            has_anim[count] = (records[count].anim_lbx[0] != '\0');
+            if (has_anim[count]) {
+                lbx::LBX_init_(lbx_header, records[count].anim_lbx);
+                uint16_t rec_idx = static_cast<uint16_t>(records[count].anim_info & 0xFFFF);
+                total_lbx_size += lbx::LBX_getRecordLength_(reinterpret_cast<intptr_t>(lbx_header), rec_idx) + 0x400;
+                lbx::LBX_uninit_(static_cast<uint32_t*>(lbx_header));
+            }
+
+            uint32_t next_idx = records[count].next_help_idx;
+            if (next_idx == 0xFFFFFFFF) {
+                help_idx++;
+            } else {
+                help_idx = next_idx;
+            }
+            
+            count++;
+        } while (help_idx != 0 && count <= 8);
+
+        allocate::Pop_Block_(reinterpret_cast<void*>(_textbox_seg));
+
+        if (allocate::Get_Remaining_Block_Space_(reinterpret_cast<void*>(_textbox_seg)) < (int32_t)total_lbx_size) {
+            swap::Save_Block_To_Drive_(reinterpret_cast<void*>(_textbox_seg), total_lbx_size + 0x11B34);
+            _textbox_seg = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_First_Block_(MOX::_screen_seg, total_lbx_size + 0x11B34));
+            _reload_saved_block = 1;
+        }
+
+        s_animation_header* textbox_lbx_ptr = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, reinterpret_cast<void*>(_textbox_seg)));
+
+        tmp_block = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_Next_Block_(reinterpret_cast<void*>(_textbox_seg), 0x30D4));
+
+        int16_t title_y[9];
+        uint8_t anim_frames[9];
+        int16_t draw_x[9];
+        int16_t format_width[9];
+        void* anim_ptrs[9];
+        int16_t body_y[9];
+        int16_t draw_y[9];
+
+        int16_t current_y = 11;
+
+        for (int i = 0; i < count; ++i) {
+            title_y[i] = current_y;
+            format_width[i] = 0x153;
+            int16_t bmp_y_val = 0;
+
+            if (has_anim[i]) {
+                uint32_t anim_info = records[i].anim_info;
+                uint16_t rec_idx = static_cast<uint16_t>(anim_info & 0xFFFF);
+                uint8_t frame = (anim_info >> 16) & 0xFF;
+
+                anim_frames[i] = frame;
+                anim_ptrs[i] = farload::Far_Reload_Next_(records[i].anim_lbx, rec_idx, reinterpret_cast<void*>(_textbox_seg));
+                animate::Set_Animation_Frame_(static_cast<s_animation_header*>(anim_ptrs[i]), frame);
+                bitmap::Draw_Picture_To_Bitmap_(reinterpret_cast<s_animation_header*>(tmp_block), static_cast<s_animation_header*>(anim_ptrs[i]));
+
+                int16_t bmp_w, bmp_h, bmp_x;
+                bitmap::Get_Bitmap_Actual_Size_(reinterpret_cast<s_animation_header*>(tmp_block), &bmp_w, &bmp_h, &bmp_x, &bmp_y_val);
+
+                draw_x[i] = 354 - bmp_x - bmp_w;
+                draw_y[i] = current_y - bmp_h;
+                format_width[i] = 333 - bmp_x;
+            }
+
+            fonts::Set_Font_Style_(4, &color_1);
+
+            int16_t title_height = 0;
+            if (records[i].title[0] != '\x14') {
+                title_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(format_width[i], records[i].title);
+            }
+
+            if (bmp_y_val > 0 && title_height < bmp_y_val) {
+                title_height = bmp_y_val;
+            }
+
+            current_y += title_height + 4;
+            if (i == 0 && current_y < 42) {
+                current_y = 42;
+            }
+
+            body_y[i] = current_y;
+
+            fonts::Set_Font_Style_(2, &color_2);
+            int16_t body_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(0x153, records[i].body);
+            
+            current_y += body_height + 8;
+        }
+
+        int16_t box_x, box_y;
+        Box_Centered_On_XY_(&box_x, &box_y, current_y - 42, 0);
+
+        for (int i = 0; i < count; ++i) {
+            if (records[i].title[0] != '\x14') {
+                fonts::Set_Remap_Font_Style_(4, &color_1);
+                FMTPARA::Print_Formatted_Paragraph_(
+                    box_x + 20,
+                    title_y[i] + box_y,
+                    format_width[i],
+                    records[i].title,
+                    0
+                );
+                fonts::Set_Remap_Font_Style_(2, &color_2);
+            }
+            FMTPARA::Print_Formatted_Paragraph_(
+                box_x + 20,
+                body_y[i] + box_y,
+                0x153,
+                records[i].body,
+                0
+            );
+
+            if (has_anim[i]) {
+                animate::Set_Animation_Frame_(static_cast<s_animation_header*>(anim_ptrs[i]), anim_frames[i]);
+                animate::Draw_(
+                    draw_x[i] + box_x,
+                    draw_y[i] + box_y,
+                    static_cast<s_animation_header*>(anim_ptrs[i])
+                );
+            }
+        }
+
+        video::Copy_Off_To_Back_();
+        fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
+        Text_Box_Get_Input_(0);
+
+        animate::Set_Animation_Frame_(textbox_lbx_ptr, 1);
+        animate::Remap_Draw_(
+            box_x + 158,
+            _bottom_y - 27,
+            textbox_lbx_ptr
+        );
+
+        Text_Box_Cleanup_();
+        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+    }
 }

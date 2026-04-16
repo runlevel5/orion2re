@@ -1082,6 +1082,12 @@
     <ClInclude Include="src\game\s_billtext.h">
       <Filter>src\game</Filter>
     </ClInclude>
+    <ClInclude Include="src\game\lbx.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\buffer.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".vocode\workflows\agent.yaml">

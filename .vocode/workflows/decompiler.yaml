@@ -322,6 +322,7 @@ workflows:
         reasoning_effort: high
         confirmation: auto
         start_timeout: 120
+        max_rounds: 100
         #preprocessors:
         #  - name: file_read
         #    options:

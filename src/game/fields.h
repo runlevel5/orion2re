@@ -154,6 +154,12 @@ namespace fields {
 
     void __cdecl Clear_Mouse_Buffer_();
 
+    inline void __cdecl Disable_Mouse_Wait_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D190});
+        fn();
+    }
+
     inline void __cdecl Timed_Wait_For_Input_(int32_t ticks) {
         using Fn = void(__cdecl*)(int32_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523e10});

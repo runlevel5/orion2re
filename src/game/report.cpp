@@ -149,6 +149,148 @@ namespace REPORT {
         return (bool)result;
     }
 
+    int8_t __cdecl Colonization_(int16_t player_idx, char show_dialog) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (MOX::_star[star_idx].colonize_player == player_idx) {
+                if (struct_::Test_Bit_Field_(_done_colonize_check, star_idx) == 0) {
+                    s_colony* colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
+                    s_ship_data* colony_ship = Player_Ship_Type_At_Star_(player_idx, 1, star_idx, 0);
+                    s_ship_data* outpost_ship = Player_Ship_Type_At_Star_(player_idx, 4, star_idx, 0);
+
+                    bool has_ships = false;
+                    if (colony_ship != nullptr || outpost_ship != nullptr) {
+                        has_ships = true;
+                    }
+
+                    if (colony_base != nullptr || (has_ships && ((MOX::_star[star_idx].ignore_colony_ships >> player_idx) & 1) == 0)) {
+                        if (show_dialog != 0) {
+                            do {
+                                bool is_colony = false;
+                                MOVEBOX::Remove_Box_Check_();
+
+                                int16_t planet_idx;
+                                if (colony_base == nullptr && (colony_ship == nullptr || outpost_ship != nullptr)) {
+                                    planet_idx = PLNTSUM::Colony_Ship_Auto_Colonization_(outpost_ship);
+                                    if (planet_idx == -1) {
+                                        planet_idx = MAINPUPS::New_Outpost_Selection_Popup_(star_idx);
+                                    } else if (MOX::_planet[planet_idx].colony_index == -1) {
+                                        char msg[200];
+                                        _sprintf(msg, _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
+                                        if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                            planet_idx = -1;
+                                        } else {
+                                            if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
+                                                int16_t y = namestar::Star_Name_Popup_Screen_Center_Y_();
+                                                int16_t x = namestar::Star_Name_Popup_Screen_Center_X_();
+                                                namestar::Change_Star_Name_Popup_(x, y, star_idx, 0);
+                                            }
+                                        }
+                                    } else {
+                                        planet_idx = MAINPUPS::New_Outpost_Selection_Popup_(star_idx);
+                                    }
+                                } else {
+                                    is_colony = true;
+                                    bool auto_colonized = false;
+
+                                    if (colony_base == nullptr && PLNTSUM::Colony_Ship_Auto_Colonization_(colony_ship) != -1) {
+                                        planet_idx = PLNTSUM::Colony_Ship_Auto_Colonization_(colony_ship);
+                                        if (MOX::_planet[planet_idx].colony_index == -1) {
+                                            auto_colonized = true;
+                                            char msg[200];
+                                            _sprintf(msg, _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
+                                            if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                                planet_idx = -1;
+                                            } else {
+                                                if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
+                                                    int16_t y = namestar::Star_Name_Popup_Screen_Center_Y_();
+                                                    int16_t x = namestar::Star_Name_Popup_Screen_Center_X_();
+                                                    namestar::Change_Star_Name_Popup_(x, y, star_idx, 0);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!auto_colonized) {
+                                        planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, colony_base == nullptr);
+                                    }
+
+                                    while (colony_base != nullptr && planet_idx < 0) {
+                                        int refund = TECHDATA::_buildings[11].cost / 2;
+                                        char msg[200];
+                                        _sprintf(msg, _really_trash_colony_base_fmt, refund);
+                                        if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                            planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, colony_base == nullptr);
+                                        } else {
+                                            do {
+                                                MOX::_player[player_idx].bc += refund;
+                                                colony_base->buildings[11] = 0;
+                                                colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
+                                            } while (colony_base != nullptr);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (colony_ship != nullptr) {
+                                    SHIPS::Clear_Auto_Colonization_Flag_(colony_ship);
+                                }
+                                if (outpost_ship != nullptr) {
+                                    SHIPS::Clear_Auto_Colonization_Flag_(outpost_ship);
+                                }
+
+                                if (planet_idx < 0) {
+                                    struct_::Set_Bit_Field_(_done_colonize_check, star_idx);
+                                    MOX::_star[star_idx].ignore_colony_ships |= (1 << player_idx);
+                                } else {
+                                    if (is_colony) {
+                                        COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 0);
+                                        if (colony_base == nullptr) {
+                                            SHIPS::Kill_Ship_(static_cast<int16_t>(colony_ship - MOX::_ship));
+                                            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+                                            colony_base = nullptr;
+                                        } else {
+                                            ERICNET::Remove_Building_(static_cast<int16_t>(colony_base - MOX::_colony), 11);
+                                            colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
+                                        }
+
+                                        if (COLONIZE::Star_N_Colonizable_Planets_For_Player_(&MOX::_star[star_idx], player_idx) == 0) {
+                                            struct_::Set_Bit_Field_(_done_colonize_check, star_idx);
+                                            if (colony_base != nullptr) {
+                                                do {
+                                                    MOX::_player[player_idx].bc += TECHDATA::_buildings[11].cost / 2;
+                                                    colony_base->buildings[11] = 0;
+                                                    colony_base = Player_Colony_Base_At_Star_(player_idx, star_idx);
+                                                } while (colony_base != nullptr);
+                                            }
+                                        }
+
+                                        if (MOX::_settings.animations_on != 0) {
+                                            MOX::_current_screen = 0x21; /* SCR_COLONIZE */
+                                            MOX::_return_screen = 0x27; /* SCR_TURN_SUMMARY */
+                                            MOX::_screen_data = MOX::_planet[planet_idx].star_index;
+                                            MOX::_global_esc = 1;
+                                            COLONY::_orbit_temp = MOX::_planet[planet_idx].orbit;
+                                            return 3;
+                                        }
+                                        return 1;
+                                    } else {
+                                        COLONIZE::Make_New_Outpost_(planet_idx, player_idx);
+                                        SHIPS::Kill_Ship_(static_cast<int16_t>(outpost_ship - MOX::_ship));
+                                        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+                                    }
+                                }
+                            } while (colony_base != nullptr);
+                        }
+                        return 1;
+                    } else {
+                        struct_::Set_Bit_Field_(_done_colonize_check, star_idx);
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
     int8_t __cdecl Display_Report_Aux_(int16_t player_idx, uint8_t param2) {
         int8_t status;
 

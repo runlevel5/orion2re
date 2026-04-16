@@ -2993,6 +2993,9 @@ namespace hooks {
         { 0x00534650, &reduce::Clear_Reduced_Palette_Groups_ },
         { 0x00410C60, &SCIENCE::Show_Off_Researched_Tech_ },
         { 0x004259e0, &JIM::Decode_Text_Tech_And_Other_Name_ },
+        { 0x00470A90, &TEXTBOX::Draw_Help_Entry_ },
+        { 0x0052f5f0, &bitmap::Jumble_Bitmap_ },
+        { 0x00410DB0, &SCIENCE::Science_Room_ },
     };
 
     void Install_Hooks()

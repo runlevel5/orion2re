@@ -207,6 +207,7 @@
     <ClInclude Include="src\game\bitio.h" />
     <ClInclude Include="src\game\bitmap.h" />
     <ClInclude Include="src\game\bomb.h" />
+    <ClInclude Include="src\game\buffer.h" />
     <ClInclude Include="src\game\capture.h" />
     <ClInclude Include="src\game\chat.h" />
     <ClInclude Include="src\game\clipped.h" />
@@ -283,6 +284,7 @@
     <ClInclude Include="src\game\jim.h" />
     <ClInclude Include="src\game\ken.h" />
     <ClInclude Include="src\game\key.h" />
+    <ClInclude Include="src\game\lbx.h" />
     <ClInclude Include="src\game\line.h" />
     <ClInclude Include="src\game\list.h" />
     <ClInclude Include="src\game\loader.h" />

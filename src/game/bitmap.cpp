@@ -951,4 +951,28 @@ namespace bitmap {
             }
         }
     }
+
+    void __cdecl Jumble_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t param_3, int16_t param_4) {
+        uint32_t seed = random::Get_Random_Seed_();
+
+        animate::_animation_header = src;
+
+        int16_t width = src->width;
+        int16_t height = src->height;
+
+        uint8_t* src_pixels = reinterpret_cast<uint8_t*>(src) + src->frame_offsets[src->current_frame];
+        uint8_t* dest_pixels;
+
+        if (dest == src) {
+            dest_pixels = src_pixels;
+        } else {
+            Create_Bitmap_Header_(width, height, dest);
+            Copy_Bitmap_To_Bitmap_(dest, src);
+            dest_pixels = reinterpret_cast<uint8_t*>(dest) + 0x10;
+        }
+
+        shear::Jumble_Bitmap_Pixels_(src_pixels, param_4, param_3, dest_pixels, width, height);
+
+        random::Set_Random_Seed_(seed);
+    }
 }

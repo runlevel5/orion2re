@@ -67,4 +67,10 @@ namespace shear {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00537620 });
         fn(src, param_3, zero, dest, width, height);
     }
+
+    inline void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_pixels, int16_t param_4, int16_t param_3, uint8_t* dest_pixels, int16_t width, int16_t height) {
+        using Fn = void(__cdecl*)(uint8_t*, int16_t, int16_t, uint8_t*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00537ab1});
+        fn(src_pixels, param_4, param_3, dest_pixels, width, height);
+    }
 }

@@ -69,6 +69,12 @@ namespace file_ani {
         fn(idx);
     }
 
+    inline void __cdecl Draw_Multi_File_Animation_Stencil_(int32_t anim_idx) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005313A0});
+        fn(anim_idx);
+    }
+
     inline int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t idx) {
         using Fn = int16_t(__cdecl*)(int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531750});
@@ -79,5 +85,11 @@ namespace file_ani {
         using Fn = void(__cdecl*)(int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531700});
         fn(idx, frame);
+    }
+
+    inline void __cdecl Draw_Multi_File_Animation_Palette_(int32_t frame) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005317B0});
+        fn(frame);
     }
 }

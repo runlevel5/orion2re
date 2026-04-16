@@ -1,9 +1,21 @@
 #pragma once
 #include <cstdint>
 
+#pragma pack(push, 1)
+struct s_help_record {
+    char title[84];
+    char anim_lbx[10];
+    uint32_t anim_info;
+    uint8_t unknown_98;
+    uint32_t next_help_idx;
+    char body[1300];
+};
+#pragma pack(pop)
+
 namespace TEXTBOX {
     inline int16_t& _bottom_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EC8});
     inline uint32_t& _textbox_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565ED8});
+    inline uint32_t& tmp_block = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565EDC});
     inline uint16_t& _field_save_ix = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00557434});
     inline const char* s_textbox_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
     inline const char* s_textbox_lbx_00557444 = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
@@ -19,6 +31,8 @@ namespace TEXTBOX {
         reinterpret_cast<const char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
     inline int16_t& _textbox_field_save = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EA0});
     inline uint8_t& _reload_saved_block = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565ECC});
+    inline int16_t& _box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE4});
+    inline int16_t& _box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE0});
     inline uint16_t& _old_draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565ED0});
     inline void*& _textbox_af = *reinterpret_cast<void**>(std::uintptr_t{0x00565ED4});
     inline uint16_t& _old_help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565EEC});
@@ -44,9 +58,5 @@ namespace TEXTBOX {
 
     void __cdecl Text_Box_(const char* title, const char* text);
 
-    inline void __cdecl Draw_Help_Entry_(int16_t help_id) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00470A90});
-        fn(help_id);
-    }
+    void __cdecl Draw_Help_Entry_(int16_t help_id);
 }

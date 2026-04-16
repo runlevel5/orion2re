@@ -30,11 +30,7 @@ namespace REPORT {
     bool __cdecl Has_Msg_(int16_t player_idx, int8_t show_summary);
     int8_t __cdecl Antarans_(int16_t param_1, int8_t param_2);
 
-    inline int8_t __cdecl Colonization_(int16_t player_idx, uint8_t param2) {
-        using Fn = int8_t(__cdecl*)(int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004aa580});
-        return fn(player_idx, param2);
-    }
+    int8_t __cdecl Colonization_(int16_t player_idx, char show_dialog);
 
     int8_t __cdecl Has_Report_(int16_t player_idx, bool show_messages);
 
