@@ -27,7 +27,7 @@ namespace sound {
 
     inline void __cdecl Stop_Stream_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532030 });
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FE0 });
         fn();
     }
 

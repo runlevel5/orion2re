@@ -833,6 +833,28 @@ namespace SHIPMOVE {
     /**
      * @address 004368e0
      */
+    /**
+     * @address 00437910
+     */
+    bool __cdecl Player_Has_Ships_Pestering_Other_Player_(int player_idx, uint8_t colony_bit_idx) {
+        s_ship_data* ship = MOX::_ship;
+        s_ship_data* ship_end = MOX::_ship + static_cast<int16_t>(MOX::_NUM_SHIPS);
+
+        for (; ship < ship_end; ++ship) {
+            if (static_cast<int8_t>(ship->owner) == player_idx && ship->status == 0) {
+                int32_t star_idx = static_cast<int16_t>(ship->location);
+                uint8_t colony_mask = MOX::_star[star_idx].has_colony;
+
+                if (((colony_mask >> (colony_bit_idx & 0x1f)) & 1) != 0 &&
+                    ((colony_mask >> (static_cast<uint8_t>(player_idx) & 0x1f)) & 1) == 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     int16_t __cdecl Player_N_Turns_From_Star_To_Star_(int16_t player_idx, int16_t start_star_idx, int16_t end_star_idx) {
         if (start_star_idx == end_star_idx) {
             return 0;

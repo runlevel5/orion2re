@@ -82,6 +82,7 @@
 #include "file_ani.h"
 #include "palstore.h"
 #include "smack.h"
+#include "smckplay.h"
 #include "report.h"
 #include "science.h"
 #include "raceopt.h"

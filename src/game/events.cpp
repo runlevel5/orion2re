@@ -1047,8 +1047,8 @@ namespace EVENTS {
                 EVENTS::_event_data[event_type].turn_count = 0;
                 break;
             case 28:
-                EVENTS::_event_data[event_type].target_id = static_cast<int16_t>(wormhole_data.target_id);
-                EVENTS::_event_data[event_type].amount = static_cast<int16_t>(wormhole_data.amount);
+                EVENTS::_event_data[event_type].target_id = static_cast<int16_t>(wormhole_data.dest_star_idx);
+                EVENTS::_event_data[event_type].amount = static_cast<int16_t>(wormhole_data.count);
                 break;
             }
 

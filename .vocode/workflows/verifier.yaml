@@ -61,6 +61,7 @@ workflows:
           * Ensure that external function stubs and external variables have correct types and addresses.
           * Detect incorrect signess for parameters, variables and structure fields. If disassembly clearly uses unsigned 
             instructions, but decompiled project code has signed variable (and vice-a-versa) - mention it with explanation.
+          * Excessive type casting might hint that source variable types might be incorrect. 
           * Detect misnamed and incorrect functions being called.
           * Detect potential undefined behavior around type casting and wrapping. For example, this is an example of UB:
             ```

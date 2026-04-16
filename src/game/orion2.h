@@ -4575,6 +4575,14 @@ struct s_winnet_provider {
     dword minor_version;
 };
 
+typedef struct s_wormhole_data s_wormhole_data, *Ps_wormhole_data;
+
+struct s_wormhole_data {
+    uint8_t success;
+    int32_t dest_star_idx;
+    int32_t count;
+};
+
 
 /* WARNING! conflicting data type names: /orion2.h/ulonglong - /ulonglong */
 

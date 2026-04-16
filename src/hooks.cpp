@@ -2996,6 +2996,9 @@ namespace hooks {
         { 0x00470A90, &TEXTBOX::Draw_Help_Entry_ },
         { 0x0052f5f0, &bitmap::Jumble_Bitmap_ },
         { 0x00410DB0, &SCIENCE::Science_Room_ },
+        { 0x004D7500, &SMACK::Play_Cinematic_ },
+        { 0x0041fe40, &SHIPS::Deploy_Ships_To_Attack_Antares_ },
+        { 0x00437910, &SHIPMOVE::Player_Has_Ships_Pestering_Other_Player_ },
     };
 
     void Install_Hooks()

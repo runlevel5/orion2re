@@ -668,4 +668,25 @@ namespace SHIPS {
         return result;
     }
 
+    int16_t __cdecl Deploy_Ships_To_Attack_Antares_(void) {
+        int16_t selected_ship_indices[500];
+        s_ship_move_info move_info;
+        int16_t selected_ship_count = 0;
+
+        memset(selected_ship_indices, 0xFF, sizeof(selected_ship_indices));
+
+        int16_t current_node = MOX::_ship_stack_start[MOX::_fleet_box_ship_stack];
+        while (current_node != -1) {
+            if (MOX::_ship_node[current_node].selected != 0) {
+                selected_ship_indices[selected_ship_count++] = MOX::_ship_node[current_node].ship_idx;
+            }
+
+            current_node = MOX::_ship_node[current_node].next_node;
+        }
+
+        SHIPMOVE::Ships_Try_To_Move_To_(selected_ship_indices, MOX::_NUM_STARS, &move_info);
+        SHIPMOVE::Make_Ships_Move_To_(selected_ship_indices, MOX::_NUM_STARS, &move_info);
+        return selected_ship_count;
+    }
+
 } // namespace SHIPS

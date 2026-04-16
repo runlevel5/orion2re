@@ -2,14 +2,6 @@
 #include <cstdint>
 
 namespace EVENTS {
-#pragma pack(push, 1)
-    struct s_wormhole_data {
-        uint8_t success;
-        int32_t target_id;
-        int32_t amount;
-    };
-#pragma pack(pop)
-
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline void*& _jim_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A65B0});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});

@@ -159,6 +159,7 @@
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\shipstak.cpp" />
+    <ClCompile Include="src\game\smack.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\special.cpp" />
     <ClCompile Include="src\game\spy.cpp" />
@@ -351,6 +352,7 @@
     <ClInclude Include="src\game\shipstak.h" />
     <ClInclude Include="src\game\simmodem.h" />
     <ClInclude Include="src\game\smack.h" />
+    <ClInclude Include="src\game\smckplay.h" />
     <ClInclude Include="src\game\sound.h" />
     <ClInclude Include="src\game\special.h" />
     <ClInclude Include="src\game\spy.h" />
