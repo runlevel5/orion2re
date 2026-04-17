@@ -3,6 +3,8 @@
 
 namespace EVENTS {
     inline uint8_t& _current_event = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A6450});
+    inline uint32_t& _event_display_seg =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A6454});
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline void*& _jim_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A65B0});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
@@ -67,6 +69,12 @@ namespace EVENTS {
 
     void __cdecl Event_Check_General_Status_();
 
+    inline uint8_t& _event_status_flag =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A65AC});
+
+    inline char& _event_message =
+        *reinterpret_cast<char*>(std::uintptr_t{0x005A65C0});
+
     inline int8_t* s__00557509 =
         reinterpret_cast<int8_t*>(std::uintptr_t{0x00557509});
 
@@ -92,11 +100,31 @@ namespace EVENTS {
 
     void __cdecl Check_For_Event_();
 
-    inline void __cdecl Setup_Next_Event_(int16_t event_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474F60});
-        fn(event_idx);
+    inline void __cdecl Start_Main_Event_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473f80});
+        fn();
     }
+
+    inline void __cdecl Get_Event_Message_(int32_t event_id, int16_t subtype, int16_t p3, int16_t p4, int16_t p5, int16_t player_idx, int16_t p7, int16_t p8, int16_t p9, int16_t p10, int16_t p11, int16_t p12, int16_t p13, char* out_msg) {
+        using Fn = void(__cdecl*)(int32_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00475910});
+        fn(event_id, subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, out_msg);
+    }
+
+    inline void __cdecl Drive_Event_Screen_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474070});
+        fn();
+    }
+
+    inline void __cdecl Load_Event_Picture_(int16_t event_id) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474030});
+        fn(event_id);
+    }
+
+    void __cdecl Setup_Next_Event_(int16_t event_id);
 
     void __cdecl Reset_Events_();
 

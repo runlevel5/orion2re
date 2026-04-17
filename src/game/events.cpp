@@ -2012,4 +2012,304 @@ namespace EVENTS {
             EVENTS::Init_Events_();
         }
     }
+
+    void __cdecl Setup_Next_Event_(int16_t event_id) {
+        int16_t event_subtype = -1;
+        int16_t p3 = 0;
+        int16_t p4 = 0;
+        int16_t p5 = 0;
+        int16_t player_idx = static_cast<int8_t>(_event_data[event_id].player_idx);
+        int16_t p7 = 0;
+        int16_t p8 = 0;
+        int16_t p9 = 0;
+        int16_t p10 = 0;
+        int16_t p11 = 0;
+        int16_t p12 = 0;
+        int16_t p13 = 0;
+        char text_buffer[40];
+
+        switch (event_id) {
+            case 0:
+                p12 = _event_data[event_id].target_id;
+                event_subtype = 0;
+                p13 = 0;
+                if (_event_data[event_id].amount != 0) {
+                    event_subtype = 1;
+                    p13 = _event_data[event_id].amount;
+                }
+                break;
+            case 1:
+                event_subtype = 0;
+                p3 = MOX::_planet[_event_data[event_id].target_id].colony_index;
+                break;
+            case 2:
+                p3 = _event_data[event_id].target_id;
+                p4 = _event_data[event_id].turn_count;
+                p5 = ((_event_data[event_id].max_amount - _event_data[event_id].amount) * 100) / _event_data[event_id].max_amount;
+                if (_event_data[event_id].status == 4) {
+                    event_subtype = 1;
+                    if (_event_data[event_id].amount == 0) {
+                        event_subtype = -1;
+                    }
+                } else if (_event_data[event_id].status == 5) {
+                    if (_event_data[event_id].amount <= 0) {
+                        event_subtype = 2;
+                    } else {
+                        event_subtype = 3;
+                    }
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 0;
+                }
+                break;
+            case 3:
+                p4 = _event_data[event_id].target_id;
+                p7 = _event_data[event_id].amount;
+                event_subtype = 0;
+                break;
+            case 4:
+                p10 = _event_data[event_id].target_id;
+                event_subtype = 0;
+                break;
+            case 5:
+                p4 = 100;
+                p10 = _event_data[event_id].target_id;
+                event_subtype = 0;
+                break;
+            case 6:
+                p8 = player_idx;
+                p4 = _event_data[event_id].target_id;
+                event_subtype = 0;
+                break;
+            case 7:
+                p3 = _event_data[event_id].target_id;
+                p4 = _event_data[event_id].amount;
+                p5 = _event_data[event_id].max_amount;
+                event_subtype = 0;
+                if (p4 < 1) {
+                    event_subtype = 1;
+                    p4 = p5;
+                }
+                break;
+            case 8:
+                event_subtype = 0;
+                if (_event_data[event_id].amount != -1) {
+                    event_subtype = 1;
+                    p9 = _event_data[event_id].amount;
+                }
+                break;
+            case 9:
+                if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 3;
+                }
+                break;
+            case 10:
+                event_subtype = 0;
+                p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                break;
+            case 11:
+                p8 = player_idx;
+                event_subtype = 0;
+                p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                p4 = MOX::_planet[_event_data[event_id].target_id].mineral_class;
+                break;
+            case 12:
+                event_subtype = 0;
+                p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                p4 = MOX::_planet[_event_data[event_id].target_id].mineral_class;
+                break;
+            case 13:
+                p11 = _event_data[event_id].target_id;
+                if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 0;
+                }
+                break;
+            case 14:
+                p11 = _event_data[event_id].target_id;
+                p4 = _event_data[event_id].amount;
+                event_subtype = 0;
+                break;
+            case 15:
+                p3 = _event_data[event_id].target_id;
+                p4 = _event_data[event_id].amount;
+                if (_event_data[event_id].status == 4) {
+                    event_subtype = 1;
+                } else if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 0;
+                }
+                break;
+            case 16:
+                p3 = _event_data[event_id].target_id;
+                if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 0;
+                }
+                break;
+            case 17:
+                event_subtype = 0;
+                p7 = _event_data[event_id].target_id;
+                break;
+            case 18:
+                if (_event_data[event_id].status == 4) {
+                    if (_event_data[event_id].target_id != -1) {
+                        event_subtype = 3;
+                        p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                    }
+                } else if (_event_data[event_id].status == 5) {
+                    if (_event_data[event_id].amount == -1) {
+                        event_subtype = 2;
+                    } else {
+                        event_subtype = 1;
+                    }
+                } else if (_event_data[event_id].status == 6) {
+                    _event_data[event_id].target_id = -1;
+                    event_subtype = 0;
+                }
+                break;
+            case 19:
+            case 20:
+            case 21:
+                if (_event_data[event_id].status == 4) {
+                    if (_event_data[event_id].target_id != -1) {
+                        event_subtype = 3;
+                        p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                        _event_data[event_id].target_id = -1;
+                    }
+                } else if (_event_data[event_id].status == 5) {
+                    if (_event_data[event_id].amount == -1) {
+                        event_subtype = 2;
+                    } else {
+                        event_subtype = 1;
+                    }
+                } else if (_event_data[event_id].status == 6) {
+                    _event_data[event_id].target_id = -1;
+                    event_subtype = 0;
+                }
+                break;
+            case 22:
+                if (_event_data[event_id].status == 3) {
+                    if (_event_data[event_id].amount == -1) {
+                        event_subtype = 2;
+                    } else {
+                        event_subtype = 1;
+                    }
+                } else if (_event_data[event_id].status == 4) {
+                    if (_event_data[event_id].target_id != -1) {
+                        event_subtype = 3;
+                        p11 = MOX::_planet[_event_data[event_id].target_id].star_index;
+                        _event_data[event_id].target_id = -1;
+                    }
+                } else if (_event_data[event_id].status == 6) {
+                    _event_data[event_id].target_id = -1;
+                    event_subtype = 0;
+                }
+                break;
+            case 23:
+                p11 = _event_data[event_id].target_id;
+                p4 = _event_data[event_id].turn_count;
+                p5 = _event_data[event_id].amount;
+                if (_event_data[event_id].status == 4) {
+                    event_subtype = 1;
+                } else if (_event_data[event_id].status == 5) {
+                    if (p5 <= 0) {
+                        event_subtype = 2;
+                    } else {
+                        event_subtype = 3;
+                    }
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 0;
+                }
+                break;
+            case 24:
+                p11 = _event_data[event_id].target_id;
+                if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 3;
+                }
+                break;
+            case 25:
+            case 26:
+                if (_event_data[event_id].status == 5) {
+                    event_subtype = 2;
+                } else if (_event_data[event_id].status == 6) {
+                    event_subtype = 3;
+                }
+                break;
+            case 27:
+                event_subtype = 0;
+                p4 = _event_data[event_id].target_id;
+                p11 = _event_data[event_id].amount;
+                break;
+            case 28:
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                break;
+            case 29:
+                event_subtype = _event_data[event_id].amount;
+                if (event_subtype > 3) {
+                    event_subtype = 3;
+                }
+                p4 = _event_data[event_id].target_id;
+                break;
+            case 30:
+                p4 = 0;
+                event_subtype = _event_data[event_id].amount;
+                break;
+            case 31:
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                p8 = player_idx;
+                break;
+            case 32:
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                break;
+            case 33:
+                p10 = _event_data[event_id].target_id;
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                break;
+            case 34:
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                p8 = _event_data[event_id].target_id;
+                break;
+            default:
+                break;
+        }
+
+        if (event_subtype != -1) {
+            if (MOX::_settings.show_gnn_report == 1) {
+                if (_current_event == 0) {
+                    Start_Main_Event_();
+                    _event_display_seg = 0;
+                    Get_Event_Message_(0, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &_event_message);
+                } else {
+                    _event_display_seg = 0;
+                    Get_Event_Message_(1, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &_event_message);
+                    _event_status_flag = 0;
+                }
+                Drive_Event_Screen_();
+            }
+
+            _current_event++;
+
+            if (MOX::_settings.show_gnn_report == 1) {
+                Load_Event_Picture_(event_id);
+            }
+
+            Get_Event_Message_(event_id + 2, event_subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, &_event_message);
+            _event_status_flag = 0;
+
+            if (MOX::_settings.show_gnn_report == 1) {
+                Drive_Event_Screen_();
+            } else {
+                JIM::Get_Text_Message_(JIM::jimtext_lbx, 29, text_buffer, 40);
+                MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, &_event_message);
+                fields::Clear_Fields_();
+            }
+        }
+    }
 }

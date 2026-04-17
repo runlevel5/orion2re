@@ -3018,6 +3018,7 @@ namespace hooks {
         { 0x0041e670, &SHIPS::Build_Ship_Icons_ },
         { 0x004374e0, &SHIPMOVE::Do_Hyperspace_Beast_ },
         { 0x00473E50, &EVENTS::Reset_Events_ },
+        { 0x00474F60, &EVENTS::Setup_Next_Event_ },
     };
 
     void Install_Hooks()
