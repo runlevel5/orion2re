@@ -24,7 +24,7 @@ namespace bitmap {
 
     void __cdecl Tint_Bitmap_(s_animation_header* dest, s_animation_header* src, int16_t tint_color_index);
 
-    inline uint32_t& _bitmap_temp2 =
+    inline uint32_t& _pixel_count =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D8});
 
     inline uint32_t& _bitmap_temp1 =

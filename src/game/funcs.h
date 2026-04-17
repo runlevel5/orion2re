@@ -647,6 +647,9 @@ inline const char* const s_e_0055ac48 = reinterpret_cast<const char*>(std::uintp
 inline const char* const s_Null_Pointer_0055b658 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B658 }); // "Null Pointer"
 
+inline char* const s_Not_Enough_Space_For_Buffer_Spac_0055b310 =
+    reinterpret_cast<char*>(std::uintptr_t{0x0055B310}); // "Not Enough Space For Buffer Space"
+
 // Suggested name: s_allocation_error_fmt
 inline const char* const s_Couldn_t_Allocate_0055B668 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B668 }); // "Couldn't Allocate %d. Increase Virtual Memory."
@@ -847,6 +850,21 @@ inline void __cdecl Restore_Mouse_List_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F21D0});
     fn();
+}
+
+struct IDirectSound;
+struct s_smack_video;
+
+inline void __stdcall SmackSoundUseDirectSound(IDirectSound* direct_sound) {
+    using Fn = void(__stdcall*)(IDirectSound*);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA62C });
+    fn(direct_sound);
+}
+
+inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t priority) {
+    using Fn = s_smack_video*(__stdcall*)(char*, uint32_t, int32_t);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA648 });
+    return fn(path, flags, priority);
 }
 
 struct s_mouse_list;

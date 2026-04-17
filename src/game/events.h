@@ -2,6 +2,7 @@
 #include <cstdint>
 
 namespace EVENTS {
+    inline uint8_t& _current_event = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A6450});
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline void*& _jim_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A65B0});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
@@ -87,21 +88,21 @@ namespace EVENTS {
 
     void __cdecl Kill_All_Events_At_Colony_(int16_t colony_idx);
 
-    inline int16_t __cdecl Check_For_Event_Message_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473EA0});
-        return fn();
+    bool __cdecl Check_For_Event_Message_();
+
+    void __cdecl Check_For_Event_();
+
+    inline void __cdecl Setup_Next_Event_(int16_t event_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474F60});
+        fn(event_idx);
     }
 
-    inline void __cdecl Check_For_Event_() {
+    inline void __cdecl Reset_Events_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473ED0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473E50});
         fn();
     }
 
-    inline void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00477520});
-        fn(param_1, param_2, param_3);
-    }
+    void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3);
 }

@@ -645,7 +645,7 @@ namespace bitmap {
     void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height) {
         _bitmap_temp1 = reinterpret_cast<uint32_t>(tint_table);
         uint32_t count = static_cast<uint32_t>(height) * static_cast<uint32_t>(width);
-        _bitmap_temp2 = count;
+        _pixel_count = count;
 
         do {
             uint8_t pixel = *src++;

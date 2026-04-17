@@ -1,6 +1,11 @@
 #pragma once
 
+struct IDirectSound;
+
 namespace sound {
+    inline IDirectSound*& _dsound =
+        *reinterpret_cast<IDirectSound**>(std::uintptr_t{0x0057C754});
+
     inline void*& _soundBuffer =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0055B520 });
 

@@ -2999,6 +2999,22 @@ namespace hooks {
         { 0x004D7500, &SMACK::Play_Cinematic_ },
         { 0x0041fe40, &SHIPS::Deploy_Ships_To_Attack_Antares_ },
         { 0x00437910, &SHIPMOVE::Player_Has_Ships_Pestering_Other_Player_ },
+        { 0x005358A0, &smckplay::Open_Smacker_Animation_ },
+        { 0x005359c0, &smckplay::Get_Smacker_Animation_Width_ },
+        { 0x005359a0, &smckplay::Get_Smacker_Animation_Height_ },
+        { 0x004d77f0, &smckplay::Draw_Smacker_Animation_ },
+        { 0x00535A20, &smckplay::Do_Draw_Smacker_Animation_ },
+        { 0x00535bc0, &smckplay::Set_Smacker_Palette_ },
+        { 0x005359E0, &smckplay::Get_Smacker_Animation_Total_Frames_ },
+        { 0x00535a00, &smckplay::Get_Smacker_Animation_Frame_ },
+        { 0x00535ba0, &smckplay::Close_Smacker_Animation_ },
+        { 0x00473ea0, &EVENTS::Check_For_Event_Message_ },
+        { 0x00473ED0, &EVENTS::Check_For_Event_ },
+        { 0x00477520, &EVENTS::Event_Monster_Update_ },
+        { 0x004d7780, &SMACK::Smack_Fade_ },
+        { 0x0052c190, &buffer::Free_Buffer_Space_ },
+        { 0x0052c1c0, &buffer::Flush_Buffer_Space_ },
+        { 0x0052c200, &buffer::Allocate_Buffer_Space_ },
     };
 
     void Install_Hooks()

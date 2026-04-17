@@ -4195,6 +4195,25 @@ struct s_skill_data {
     char *format_str;
 };
 
+typedef struct s_smack_video s_smack_video, *Ps_smack_video;
+
+struct s_smack_video {
+    uint32_t version;
+    uint32_t width;
+    uint32_t height;
+    uint32_t frame_count;
+    undefined unk2[88];
+    uint32_t has_palette;
+    undefined unk3[30];
+    uint8_t palette[236][3];
+    undefined unk4[34];
+    uint32_t current_frame;
+    int32_t rect_left;
+    int32_t rect_top;
+    uint32_t rect_width;
+    uint32_t rect_height;
+};
+
 typedef struct s_sound_index s_sound_index, *Ps_sound_index;
 
 struct s_sound_index {

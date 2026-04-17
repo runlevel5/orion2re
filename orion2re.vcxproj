@@ -39,6 +39,7 @@
     <ClCompile Include="src\game\bitio.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
     <ClCompile Include="src\game\bomb.cpp" />
+    <ClCompile Include="src\game\buffer.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
     <ClCompile Include="src\game\chat.cpp" />
     <ClCompile Include="src\game\clipped.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\game\ships.cpp" />
     <ClCompile Include="src\game\shipstak.cpp" />
     <ClCompile Include="src\game\smack.cpp" />
+    <ClCompile Include="src\game\smckplay.cpp" />
     <ClCompile Include="src\game\sound.cpp" />
     <ClCompile Include="src\game\special.cpp" />
     <ClCompile Include="src\game\spy.cpp" />

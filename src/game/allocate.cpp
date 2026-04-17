@@ -48,7 +48,7 @@ namespace allocate {
         MOX::_nebula_screen_seg = Allocate_Space_(0x3E800);
 
         // Global cache allocation
-        MOX::_global_cache_seg = FUN_0052c200(0x174508);
+        MOX::_global_cache_seg = buffer::Allocate_Buffer_Space_(0x174508);
         MOX::_global_cache_size = 0x174508;
 
         // DOS-space allocations for low-level segments

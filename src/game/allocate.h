@@ -25,13 +25,6 @@ namespace allocate {
 
     void __cdecl Allocation_Error_(int bytes_requested);
 
-    // Suggested name: Allocate_Cache_
-    inline void* __cdecl FUN_0052c200(uint32_t size) {
-        using Fn = void*(__cdecl*)(uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052C200 });
-        return fn(size);
-    }
-
     inline uint32_t (&_mark_stack_pos)[2] =
         *reinterpret_cast<uint32_t (*)[2]>(std::uintptr_t{ 0x0055B650 });
 

@@ -1,6 +1,37 @@
 #include "pch.h"
 
 namespace SMACK {
+    void __cdecl Smack_Fade_(int16_t mode) {
+        int16_t fade_step;
+        int16_t palette_level;
+        int16_t fade_percent;
+
+        if (mode == 3) {
+            fade_step = -10;
+            fade_percent = ERIC::Get_Fade_Percent_();
+            palette_level = 100;
+            if (fade_percent == 0) {
+                return;
+            }
+        } else {
+            palette_level = 0;
+            fade_percent = ERIC::Get_Fade_Percent_();
+            fade_step = 10;
+            if (fade_percent == 100) {
+                return;
+            }
+        }
+
+        do {
+            if (palette_level >= 0 && palette_level < 100) {
+                palstore::Darken_Palette_(static_cast<int>(palette_level));
+            }
+            palette_level = static_cast<int16_t>(palette_level + fade_step);
+        } while (palette_level != 110 && palette_level != -10);
+
+        palette::Clear_Palette_Changes_(0, 0xff);
+    }
+
     void __cdecl Play_Cinematic_(const char* smacker_name, uint32_t play_flags, char use_fade)
     {
         int16_t exit_requested = 0;

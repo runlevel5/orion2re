@@ -17,11 +17,7 @@ namespace SMACK {
     inline int16_t& _smack_y =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005960F2});
 
-    inline void __cdecl Smack_Fade_(int32_t fade_percent) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7780});
-        fn(fade_percent);
-    }
+    void __cdecl Smack_Fade_(int16_t mode);
 
     void __cdecl Play_Cinematic_(const char* smacker_name, uint32_t play_flags, char use_fade);
 }

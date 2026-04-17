@@ -1916,4 +1916,86 @@ namespace EVENTS {
 
         BOMB::Apply_Bomb_Hits_(&bomb_result);
     }
+
+    bool __cdecl Check_For_Event_Message_() {
+        bool found = false;
+        for (int16_t event_idx = 0; event_idx < 36; ++event_idx) {
+            int8_t status = _event_data[event_idx].status;
+            if (status == 4 || status == 6 || status == 5) {
+                found = true;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * @address 00473ed0
+     */
+    void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3) {
+        int16_t event_index;
+
+        switch (param_1) {
+        case 10:
+            event_index = 0x13;
+            break;
+        case 11:
+            event_index = 0x14;
+            break;
+        case 12:
+            event_index = 0x15;
+            break;
+        case 13:
+            event_index = 0x16;
+            break;
+        case 14:
+            event_index = 0x17;
+            break;
+        default:
+            return;
+        }
+
+        _event_data[event_index].player_idx = static_cast<uint8_t>(param_3);
+        if (param_2 != -1) {
+            _event_data[event_index].target_id = param_2;
+            _event_data[event_index].status = 4;
+            return;
+        }
+
+        _event_data[event_index].amount = param_3;
+        if (param_3 == -1) {
+            _event_data[event_index].turn_count = 0x14;
+        }
+        _event_data[event_index].status = 4;
+    }
+
+    void __cdecl Check_For_Event_() {
+        int16_t event_idx;
+        int8_t event_status;
+
+        EVENTS::_current_event = 0;
+        for (event_idx = 0; event_idx < 36; ++event_idx) {
+            event_status = EVENTS::_event_data[event_idx].status;
+            if ((event_status == 4) || (event_status == 6) || (event_status == 5)) {
+                EVENTS::Setup_Next_Event_(event_idx);
+            }
+        }
+
+        if (EVENTS::_current_event != 0) {
+            fields::Deactivate_Auto_Function_();
+            fields::Clear_Fields_();
+            file_ani::Reset_File_Animation_Buffer_();
+            if (MOX::_settings.show_gnn_report == 1) {
+                ERIC::Set_Fade_Percent_(0);
+                Set_Fade_Speed_Perc(10);
+                ERIC::Fast_Fade_Out_();
+            }
+            JIM::Play_Background_Music_();
+            MOX::_auto_turn_exit = 1;
+            RUSS::Release_All_Blocks_(MOX::_screen_seg);
+            MOX2::Put_Auto_Function_(&EVENTS::_jim_saved_autofunction);
+        }
+
+        MOX::_auto_turn_exit = 1;
+        EVENTS::Reset_Events_();
+    }
 }
