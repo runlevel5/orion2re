@@ -19,6 +19,7 @@ workflows:
         reasoning_effort: high
         start_timeout: 600
         reset_policy: keep
+        max_rounds: 100
         tools:
           - read_files
           - list_files

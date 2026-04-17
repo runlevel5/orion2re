@@ -2611,8 +2611,8 @@ struct s_MSG_scrap_ship {
 struct s_MSG_hyperspace_beast {
     int16_t ship_idx;
     int8_t star_idx;
-    int8_t field2_0x3;
-    int8_t leader_idx;
+    int8_t officer_idx;
+    int8_t leader_status;
     int8_t fate;
     int8_t your_ship;
 };
@@ -4199,8 +4199,8 @@ typedef struct s_smack_video s_smack_video, *Ps_smack_video;
 
 struct s_smack_video {
     uint32_t version;
-    uint32_t width;
-    uint32_t height;
+    int32_t width;
+    int32_t height;
     uint32_t frame_count;
     undefined unk2[88];
     uint32_t has_palette;

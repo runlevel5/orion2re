@@ -45,7 +45,7 @@ namespace EVENTS {
         return 0;
     }
 
-    void Init_Events_() {
+    void __cdecl Init_Events_() {
         _event_delay_count = 0;
         _last_event_year = MOX::_stardate;
 
@@ -1997,5 +1997,19 @@ namespace EVENTS {
 
         MOX::_auto_turn_exit = 1;
         EVENTS::Reset_Events_();
+    }
+
+    /**
+     * @address 00473E50
+     */
+    void __cdecl Reset_Events_() {
+        if (static_cast<int32_t>(MOX::_stardate) % 20 == 0) {
+            for (int16_t i = 0; i < 36; ++i) {
+                if (EVENTS::_event_data[i].status == 0) {
+                    return;
+                }
+            }
+            EVENTS::Init_Events_();
+        }
     }
 }

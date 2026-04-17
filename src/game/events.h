@@ -11,7 +11,7 @@ namespace EVENTS {
         *reinterpret_cast<int8_t(*)[36]>(std::uintptr_t{0x00557508});
 
     int16_t __cdecl Get_Antaran_Victim_();
-    void Init_Events_();
+    void __cdecl Init_Events_();
 
     int16_t __cdecl Event_Check_Comet_(int16_t target_id);
 
@@ -98,11 +98,7 @@ namespace EVENTS {
         fn(event_idx);
     }
 
-    inline void __cdecl Reset_Events_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473E50});
-        fn();
-    }
+    void __cdecl Reset_Events_();
 
     void __cdecl Event_Monster_Update_(int16_t param_1, int16_t param_2, int16_t param_3);
 }

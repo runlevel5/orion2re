@@ -668,6 +668,129 @@ namespace SHIPS {
         return result;
     }
 
+    void __cdecl Build_Ship_Icons_() {
+        SHIPSTAK::Find_Ship_Stacks_();
+
+        allocate::Mark_Block_(MOX::_global_data_seg);
+        s_build_ship_icon_item* build_items = reinterpret_cast<s_build_ship_icon_item*>(
+            allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x168)
+        );
+        uint8_t* slot_counts = reinterpret_cast<uint8_t*>(
+            allocate::Allocate_Next_Block_(MOX::_global_data_seg, 0x120)
+        );
+        allocate::Release_Block_(MOX::_global_data_seg);
+
+        memset(slot_counts, 0x02, 0x120);
+        memset(MOX::_ship_icon, 0xFF, sizeof(s_ship_icon) * 572);
+        memset(build_items, 0xFF, 0x168);
+
+        MOX::_ship_icon_count = 0;
+        bool need_sort = false;
+
+        if (MOX::_ship_stack_count > 0) {
+            for (int16_t stack_iter = 0; stack_iter < MOX::_ship_stack_count; ++stack_iter) {
+                int16_t stack_id = MOX::_ship_stack_start[stack_iter];
+                int16_t x = HACCESS::Ship_Stack_X_(stack_id);
+                int16_t y = HACCESS::Ship_Stack_Y_(stack_id);
+                int8_t owner = static_cast<int8_t>(HACCESS::Ship_Stack_Owner_(stack_id));
+
+                int16_t ship_idx = MOX::_ship_node[stack_id].ship_idx;
+                int16_t dest_star_id = HAROLD::XY_To_Star_Id_(x, y);
+                int16_t star_id = SHIPSTAK::Ship_Stack_Star_Id_(stack_id);
+
+                if (MOX::_ship[ship_idx].status == 1) {
+                    need_sort = true;
+                    MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                    MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                    MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 5;
+                    MOX::_ship_icon_count++;
+                } else {
+                    if (star_id > -1 && star_id < 500) {
+                        s_build_ship_icon_item* item = &build_items[star_id];
+                        int8_t item_player_idx = item->player_idx;
+
+                        if (item_player_idx == -1) {
+                            item->player_idx = owner;
+                            item->ship_idx = stack_id;
+                            item->icon_idx = MOX::_ship_icon_count;
+
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 0;
+                            MOX::_ship_icon_count++;
+                        } else if (item_player_idx != MOX::_PLAYER_NUM && owner == MOX::_PLAYER_NUM) {
+                            MOX::_ship_icon[item->icon_idx].stack_slot = slot_counts[star_id];
+                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            if (slot > 3) slot = 3;
+                            slot_counts[star_id] = slot;
+
+                            item->player_idx = static_cast<int8_t>(MOX::_PLAYER_NUM);
+                            item->ship_idx = stack_id;
+                            item->icon_idx = MOX::_ship_icon_count;
+
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 0;
+                            MOX::_ship_icon_count++;
+                        } else {
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = slot_counts[star_id];
+
+                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            if (slot > 3) slot = 3;
+                            slot_counts[star_id] = slot;
+
+                            MOX::_ship_icon_count++;
+                        }
+                    } else {
+                        if (star_id - dest_star_id == 1000) {
+                            int16_t icon_index = -1;
+                            for (int16_t j = 0; j < MOX::_ship_icon_count; ++j) {
+                                if (MOX::_ship_icon[j].stack_slot == 1 &&
+                                    MOX::_ship_icon[j].node_idx == stack_id &&
+                                    MOX::_ship_icon[j].star_idx == star_id) {
+                                    icon_index = j;
+                                    break;
+                                }
+                            }
+
+                            // Bug in original code: if star_id >= 1000, this writes out of bounds into build_items.
+                            build_items[star_id].player_idx = owner;
+                            build_items[star_id].ship_idx = MOX::_ship_icon[icon_index].node_idx;
+                            MOX::_ship_icon[icon_index].stack_slot = 0;
+                        } else if (star_id >= 1000 && dest_star_id > -1) {
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 1;
+                            MOX::_ship_icon_count++;
+                        } else if (dest_star_id != star_id) {
+                            need_sort = true;
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = 5;
+                            MOX::_ship_icon_count++;
+                        } else {
+                            MOX::_ship_icon[MOX::_ship_icon_count].node_idx = stack_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].star_idx = star_id;
+                            MOX::_ship_icon[MOX::_ship_icon_count].stack_slot = slot_counts[star_id];
+
+                            uint8_t slot = static_cast<uint8_t>(slot_counts[star_id] + 1);
+                            if (slot > 3) slot = 3;
+                            slot_counts[star_id] = slot;
+
+                            MOX::_ship_icon_count++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (MOX::_ship_icon_count > 0 && need_sort) {
+            _qsort(MOX::_ship_icon, MOX::_ship_icon_count, 12, SHIPS::qsort_ship_icon_);
+        }
+    }
+
     int16_t __cdecl Deploy_Ships_To_Attack_Antares_(void) {
         int16_t selected_ship_indices[500];
         s_ship_move_info move_info;

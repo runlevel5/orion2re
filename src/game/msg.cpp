@@ -305,7 +305,7 @@ namespace MSG_ {
                 }
                 int iVar9 = _sprintf(param_1, _msg_hyperspace_beast_ate_your_ship_fmt, &MOX::_ship[sVar4],
                                          &MOX::_star[(param_2->u).hyperspace_beast.star_idx]);
-                uint8_t cVar1 = (param_2->u).hyperspace_beast.leader_idx;
+                uint8_t cVar1 = (param_2->u).hyperspace_beast.leader_status;
                 if (cVar1 != 0xFF) {
                     _sprintf(param_1 + iVar9, _leader_fate_strings[(param_2->u).hyperspace_beast.fate],
                                  &MOX::_leaders[cVar1]);

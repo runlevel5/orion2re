@@ -44,11 +44,7 @@ namespace SHIPMOVE {
     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx);
     void __cdecl Update_Ship_ETAs_(int32_t player_id);
 
-    inline void __cdecl Do_Hyperspace_Beast_(int32_t player_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004374e0});
-        fn(player_idx);
-    }
+    void __cdecl Do_Hyperspace_Beast_(int32_t player_idx);
 
     inline void __cdecl Do_Wormhole_Event_(int16_t player_idx, void* data) {
         using Fn = void(__cdecl*)(int16_t, void*);

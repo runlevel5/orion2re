@@ -3015,6 +3015,9 @@ namespace hooks {
         { 0x0052c190, &buffer::Free_Buffer_Space_ },
         { 0x0052c1c0, &buffer::Flush_Buffer_Space_ },
         { 0x0052c200, &buffer::Allocate_Buffer_Space_ },
+        { 0x0041e670, &SHIPS::Build_Ship_Icons_ },
+        { 0x004374e0, &SHIPMOVE::Do_Hyperspace_Beast_ },
+        { 0x00473E50, &EVENTS::Reset_Events_ },
     };
 
     void Install_Hooks()

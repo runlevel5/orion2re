@@ -921,4 +921,101 @@ namespace SHIPMOVE {
 
         return n_turns;
     }
+
+    /**
+     * @address 004374e0
+     */
+    void __cdecl Do_Hyperspace_Beast_(int32_t player_idx) {
+        s_MSG msg;
+        msg.msg_type = MSG_TYPE_HYPERSPACE_BEAST;
+
+        s_ship_data* selected_ship = nullptr;
+
+        if (player_idx != -1) {
+            int32_t count = 0;
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+                if (ship->owner == player_idx && ship->status == 1) {
+                    count++;
+                    if (random::Random_(count) == 1) {
+                        selected_ship = ship;
+                    }
+                }
+            }
+        }
+
+        if (selected_ship == nullptr) {
+            msg.u.hyperspace_beast.ship_idx = -1;
+        } else {
+            int16_t ship_index = static_cast<int16_t>(selected_ship - MOX::_ship);
+            int16_t officer_index = selected_ship->officer_index;
+
+            msg.u.hyperspace_beast.ship_idx = ship_index;
+            msg.u.hyperspace_beast.officer_idx = static_cast<int8_t>(officer_index);
+            msg.u.hyperspace_beast.star_idx = static_cast<int8_t>(selected_ship->location + 12);
+
+            if (officer_index != -1) {
+                OFFICER::Move_Officer_To_Pool_(officer_index);
+
+                s_leader_data* leader = &MOX::_leaders[officer_index];
+                if (leader->eta > 0) {
+                    msg.u.hyperspace_beast.leader_status = 1;
+                } else {
+                    if (MOX::_player[(uint8_t)selected_ship->owner].tech_applications[TECH_APP_SURVIVAL_PODS] == 3) {
+                        s_ship_data* replacement_ship = nullptr;
+                        bool found_similar = false;
+
+                        for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+                            s_ship_data* ship = &MOX::_ship[i];
+                            if (ship->owner == player_idx &&
+                                ship->status == selected_ship->status &&
+                                ship->x == selected_ship->x &&
+                                ship->y == selected_ship->y &&
+                                ship != selected_ship &&
+                                ship->location == selected_ship->location &&
+                                ship->travelling_speed == selected_ship->travelling_speed) {
+                                
+                                found_similar = true;
+
+                                if (ship->officer_index == -1) {
+                                    if (replacement_ship == nullptr ||
+                                        replacement_ship->d.size < ship->d.size) {
+                                        if (ship->d.ship_type == 0) {
+                                            replacement_ship = ship;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (replacement_ship != nullptr) {
+                            replacement_ship->officer_index = officer_index;
+                            leader->location = static_cast<int16_t>(replacement_ship - MOX::_ship);
+                            msg.u.hyperspace_beast.leader_status = 2;
+                            leader->status = 1;
+                        } else {
+                            msg.u.hyperspace_beast.leader_status = 1;
+                            if (!found_similar) {
+                                msg.u.hyperspace_beast.leader_status = 0;
+                            }
+                        }
+                    } else {
+                        msg.u.hyperspace_beast.leader_status = 0;
+                    }
+
+                    if (msg.u.hyperspace_beast.leader_status == 0) {
+                        OFFICER::Kill_Officer_(officer_index);
+                    }
+                }
+            }
+
+            MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+            selected_ship->status = 8;
+        }
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            msg.u.hyperspace_beast.fate = (player_idx == i) ? 1 : 0;
+            MSG_::Add_Msg_(msg, i);
+        }
+    }
 }

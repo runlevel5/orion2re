@@ -8,9 +8,12 @@ struct s_animation_header;
 namespace SHIPS {
     int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, int16_t owner);
 
-    inline void __cdecl Build_Ship_Icons_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0041e670})();
+    void __cdecl Build_Ship_Icons_();
+
+    inline int __cdecl qsort_ship_icon_(const void* a, const void* b) {
+        using Fn = int(__cdecl*)(const void*, const void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041f890});
+        return fn(a, b);
     }
 
     void __cdecl Set_Ship_Icon_XYs_();
