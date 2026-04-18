@@ -168,6 +168,7 @@
     <ClCompile Include="src\game\strings.cpp" />
     <ClCompile Include="src\game\struct.cpp" />
     <ClCompile Include="src\game\sys.cpp" />
+    <ClCompile Include="src\game\sysfont.cpp" />
     <ClCompile Include="src\game\tech.cpp" />
     <ClCompile Include="src\game\techinit.cpp" />
     <ClCompile Include="src\game\textbox.cpp" />

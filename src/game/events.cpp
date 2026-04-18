@@ -2359,6 +2359,7 @@ namespace EVENTS {
         farload::Farload_Data_Static_(lbx_name, index, buffer, 0, 1, 300);
 
         int16_t out_len = 0;
+        char temp_str[300];
 
         for (int16_t i = 0; i < 300; ++i) {
             char c = buffer[i];
@@ -2366,7 +2367,6 @@ namespace EVENTS {
                 break;
             }
 
-            char temp_str[300];
             const char* append_str = nullptr;
             int16_t fetch_player = -1;
 
@@ -2455,9 +2455,9 @@ namespace EVENTS {
             strcat(out_str, append_str);
             
             if (out_len == 0) {
-                if (c == '\x8F' || c == '\x91') {
+                if (c == '\x8F') {
                     out_str[1] -= 0x20;
-                } else if (c == '\x90' || c == '\x92') {
+                } else if (c == '\x90') {
                     out_str[0] -= 0x20;
                 }
             }
@@ -2494,14 +2494,16 @@ namespace EVENTS {
             }
 
             if (num_active > 0) {
-                for (int16_t pass = num_active - 1; pass > 0; --pass) {
-                    for (int16_t j = 0; j < pass; ++j) {
+                int16_t passes = num_active;
+                do {
+                    for (int16_t j = 0; j < num_active - 1; ++j) {
                         if (player_values[j + 1] > player_values[j]) {
                             strings::Swap_(&player_values[j], &player_values[j + 1]);
                             strings::Swap_Short_(&player_indices[j], &player_indices[j + 1]);
                         }
                     }
-                }
+                    passes--;
+                } while (passes != 0);
             }
 
             strcat(out_str, s_0_0055110c);
@@ -2547,5 +2549,31 @@ namespace EVENTS {
             RUSS::Mox_Sync_Update_();
             timer::Release_Time_(2);
         }
+    }
+
+    /**
+     * @address 00473f80
+     */
+    void __cdecl Start_Main_Event_() {
+        fields::Deactivate_Help_List_();
+        fields::Enable_Draw_All_Fields_();
+        graphics::Reset_Window_();
+        video::Clip_Off_();
+        fields::Deactivate_Auto_Function_();
+        fields::Clear_Fields_();
+        mouse::Set_Mouse_List_(&_event_blank_mouse, 1);
+        JIM::Play_Streaming_Music_(0x76, -1, 1);
+        ERIC::Set_Fade_Percent_(0);
+        Set_Fade_Speed_Perc(10);
+        ERIC::Fast_Fade_Out_();
+        fields::Set_Input_Delay_(1);
+        fields::Clear_Fields_();
+        video::Set_Refresh_Stencil_();
+        MOX2::Get_Auto_Function_(&_jim_saved_autofunction);
+        fields::Deactivate_Auto_Function_();
+        Event_Fade_In_();
+        fields::Assign_Auto_Function_(Draw_Event_Screen_, 2);
+        fonts::Set_Outline_Color_(0, 0xF8);
+        fonts::Set_Font_Style_Outline_(4, &_event_normal_colors);
     }
 }
