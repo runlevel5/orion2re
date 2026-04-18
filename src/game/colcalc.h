@@ -72,11 +72,7 @@ namespace COLCALC {
 
     uint8_t __cdecl Colony_Can_Build_Product_(s_colony* colony, int16_t product);
 
-    inline uint8_t __cdecl Room_For_Another_Dude_(s_colony* colony, int16_t pop_type) {
-        using Fn = uint8_t(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F5D70});
-        return fn(colony, pop_type);
-    }
+    bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx);
 
     int32_t __cdecl Colony_Cost_To_Buy_Given_Product_(s_colony* colony, int32_t product, int32_t production_spent);
 
@@ -120,11 +116,7 @@ namespace COLCALC {
 
     bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index);
 
-    inline void __cdecl Compute_Total_Building_Costs_(int32_t* player_scores) {
-        using Fn = void(__cdecl*)(int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f7d90});
-        fn(player_scores);
-    }
+    void __cdecl Compute_Total_Building_Costs_(int32_t* player_costs);
 
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});

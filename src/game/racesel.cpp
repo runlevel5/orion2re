@@ -3,6 +3,21 @@
 
 namespace RACESEL {
 
+void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_flags) {
+    for (int16_t i = 0; i < 9; ++i) {
+        uint8_t flag = race_flags[i + 1];
+        if (MOX::_special_bonus[i][0] == flag) {
+            race_flags[i + 1] = 1;
+        } else if (MOX::_special_bonus[i][1] == flag) {
+            race_flags[i + 1] = 2;
+        } else if (MOX::_special_bonus[i][2] == flag) {
+            race_flags[i + 1] = 3;
+        } else {
+            race_flags[i + 1] = 0;
+        }
+    }
+}
+
 void __cdecl Set_Race_Select_Help_() {
     MOX::_help_entry_list[0] = 630;
     MOX::_help_entry_list[1] = 351;

@@ -40,6 +40,18 @@ namespace strings {
         *b = temp;
     }
 
+    void __cdecl Swap_Char_(uint8_t* a, uint8_t* b) {
+        uint8_t temp = *a;
+        *a = *b;
+        *b = temp;
+    }
+
+    void __cdecl Swap_(int32_t* ptr1, int32_t* ptr2) {
+        int32_t temp = *ptr1;
+        *ptr1 = *ptr2;
+        *ptr2 = temp;
+    }
+
     void __cdecl Delete_Structure_(int32_t index, void* array_ptr, int32_t element_size, int32_t count) {
         if (index < count - 1) {
             struct_::Copy_Structure_(

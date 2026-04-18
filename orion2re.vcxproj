@@ -156,6 +156,7 @@
     <ClCompile Include="src\game\score.cpp" />
     <ClCompile Include="src\game\scroll.cpp" />
     <ClCompile Include="src\game\settler.cpp" />
+    <ClCompile Include="src\game\setvesa.cpp" />
     <ClCompile Include="src\game\shear.cpp" />
     <ClCompile Include="src\game\shipmove.cpp" />
     <ClCompile Include="src\game\ships.cpp" />

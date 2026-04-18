@@ -1,6 +1,19 @@
 #include "pch.h"
 
 namespace palstore {
+    void __cdecl Darken_Palette_(int32_t darken_percent) {
+        tagPALETTEENTRY entries[256];
+        int32_t multiplier = 100 - darken_percent;
+
+        for (int i = 1; i < 256; ++i) {
+            entries[i].peRed   = static_cast<uint8_t>(((video::_current_palette[i].r * multiplier) / 100) << 2);
+            entries[i].peGreen = static_cast<uint8_t>(((video::_current_palette[i].g * multiplier) / 100) << 2);
+            entries[i].peBlue  = static_cast<uint8_t>(((video::_current_palette[i].b * multiplier) / 100) << 2);
+        }
+
+        g_palette->SetEntries(0, 1, 255, &entries[1]);
+    }
+
     int16_t Slow_Fade_In_() {
         int16_t intensity = 100;
         int16_t input_occurred = 0;

@@ -414,7 +414,7 @@ namespace FLT1 {
         }
 
         if (MOX::_n_fltscrn_big_icons > 0) {
-            if (SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, (void*)FLT1::Fill_FltScrn_Scroll_Bar_)) {
+            if (SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, FLT1::Fill_FltScrn_Scroll_Bar_)) {
                 MOX::_scanned_big_ship = -1;
             }
         }

@@ -1973,7 +1973,7 @@ namespace EVENTS {
      */
     void __cdecl Load_Event_Picture_(int16_t event_id) {
         allocate::Mark_Block_(MOX::_screen_seg);
-        _event_display_seg = (uint8_t*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, event_id + 2, MOX::_screen_seg);
+        _event_display_seg = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, event_id + 2, MOX::_screen_seg);
         allocate::Release_Block_(MOX::_screen_seg);
     }
 
@@ -2294,10 +2294,10 @@ namespace EVENTS {
                 if (_current_event == 0) {
                     Start_Main_Event_();
                     _event_display_seg = 0;
-                    Get_Event_Message_(0, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &_event_message);
+                    Get_Event_Message_(0, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                 } else {
                     _event_display_seg = 0;
-                    Get_Event_Message_(1, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &_event_message);
+                    Get_Event_Message_(1, static_cast<int16_t>(random::Random_(4) - 1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _event_message);
                     _event_status_flag = 0;
                 }
                 Drive_Event_Screen_();
@@ -2309,14 +2309,14 @@ namespace EVENTS {
                 Load_Event_Picture_(event_id);
             }
 
-            Get_Event_Message_(event_id + 2, event_subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, &_event_message);
+            Get_Event_Message_(event_id + 2, event_subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, _event_message);
             _event_status_flag = 0;
 
             if (MOX::_settings.show_gnn_report == 1) {
                 Drive_Event_Screen_();
             } else {
                 JIM::Get_Text_Message_(JIM::jimtext_lbx, 29, text_buffer, 40);
-                MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, &_event_message);
+                MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, _event_message);
                 fields::Clear_Fields_();
             }
         }
@@ -2554,6 +2554,23 @@ namespace EVENTS {
     /**
      * @address 00473f80
      */
+    /**
+     * @address 00476160
+     */
+    int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx) {
+        int32_t strength = 0;
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+            if (MOX::_ship[i].owner == player_idx) {
+                if (MOX::_ship[i].status <= 1) {
+                    strength += MOX::_ship[i].d.size + 1;
+                }
+            }
+        }
+
+        return strength;
+    }
+
     void __cdecl Start_Main_Event_() {
         fields::Deactivate_Help_List_();
         fields::Enable_Draw_All_Fields_();
@@ -2575,5 +2592,72 @@ namespace EVENTS {
         fields::Assign_Auto_Function_(Draw_Event_Screen_, 2);
         fonts::Set_Outline_Color_(0, 0xF8);
         fonts::Set_Font_Style_Outline_(4, &_event_normal_colors);
+    }
+
+    /**
+     * @address 004740D0
+     */
+    void __cdecl Draw_Event_Screen_() {
+        video::Set_Page_Off_();
+
+        if (MOX::_settings.animations_on == 1) {
+            file_ani::Draw_File_Animation_Stencil_();
+            if (file_ani::Get_File_Animation_Frame_() == 0) {
+                file_ani::Set_File_Animation_Frame_(1);
+            }
+        }
+
+        if (_event_status_flag == 1) {
+            if (_event_display_seg != nullptr) {
+                animate::Draw_(0x140, 0xE, _event_display_seg);
+            }
+
+            int16_t height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(0x226, _event_message);
+            if (height > 0x3C) {
+                height += 0xE;
+            } else if (height > 0x12) {
+                height -= 0x4;
+            }
+
+            int16_t y = 0x1BD - (height / 2);
+            FMTPARA::Print_Formatted_Paragraph_(0x37, y, 0x226, _event_message, 2);
+        } else {
+            _event_status_flag = 1;
+            if (_event_display_seg != nullptr) {
+                animate::Draw_Palette_(_event_display_seg);
+            }
+        }
+
+        JIM::Play_Streaming_Music_(0x76, -1, 1);
+    }
+
+    /**
+     * @address 004741A0
+     */
+    void __cdecl Event_Fade_In_() {
+        _event_mouse_bitmap = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, 917 /* 0x395 */);
+        s_animation_header* h2 = (s_animation_header*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, 0, MOX::_screen_seg);
+
+        bitmap::Clear_Mouse_Image_(0);
+        bitmap::Create_Blank_Bitmap_(30, 30, _event_mouse_bitmap);
+        bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)_event_mouse_bitmap, h2);
+
+        _event_status_flag = 1;
+
+        uint8_t* buffer = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 320000);
+        file_ani::Set_File_Animation_Buffer_(buffer);
+
+        video::Set_Page_Off_();
+        animate::Draw_Palette_(h2);
+        palette::Set_Palette_Changes_(0, 255);
+        graphics::Fill_(0, 0, 639, 479, 0);
+
+        file_ani::Open_File_Animation_(s_EVENTS_LBX_0055753c, 1);
+        video::Set_Page_Off_();
+        file_ani::Draw_File_Animation_();
+        video::Copy_Off_To_Back_();
+
+        bitmap::Draw_Bitmap_To_Mouse_(0, 0, (s_animation_header*)_event_mouse_bitmap, 0);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
     }
 }

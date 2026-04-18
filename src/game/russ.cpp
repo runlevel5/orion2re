@@ -236,6 +236,20 @@ namespace RUSS {
         platform::Toggle_Pages_Stub_();
     }
 
+    void __cdecl Make_Player_Into_AI_(int32_t player_idx) {
+        MOX::_player[player_idx].objectives = static_cast<uint8_t>(random::Random_(5));
+
+        INITSHIP::Update_Player_Ship_Designs_(static_cast<int16_t>(player_idx));
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+            if (MOX::_colony[i].owner == player_idx) {
+                COLBLDG::Clear_Colony_Queue_(i);
+            }
+        }
+
+        COLCALC::Do_Player_Colony_Calculations_(static_cast<int16_t>(player_idx));
+    }
+
     int __cdecl Compare_Ratios_(uint32_t first_numerator, uint32_t first_denominator, uint32_t second_numerator, uint32_t second_denominator) {
         int comparison = 2;
 

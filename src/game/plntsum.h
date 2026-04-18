@@ -194,11 +194,7 @@ namespace PLNTSUM {
     void __cdecl Draw_Colony_ETA_(int16_t planet_sum_idx, int16_t scroll_idx);
     void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx);
 
-    inline void __cdecl Player_Colors_(int16_t player_idx, s_colors* colors, char param_3, uint8_t* out_val) {
-        using Fn = void(__cdecl*)(int16_t, s_colors*, char, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00447b20});
-        fn(player_idx, colors, param_3, out_val);
-    }
+    void __cdecl Player_Colors_(int16_t player_idx, s_colors* colors_out, int8_t type, uint8_t* base_color_out);
 
     void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char param_3);
 

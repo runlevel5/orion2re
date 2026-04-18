@@ -2649,4 +2649,65 @@ namespace COLCALC {
 
         return result_star_idx;
     }
+
+    bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx) {
+        uint8_t pop_limit_flags[42];
+        int pop_counts[10];
+        int pop_limits[10];
+        bool no_room = false;
+
+        memset(pop_limit_flags, 0, sizeof(pop_limit_flags));
+        memset(pop_counts, 0, sizeof(pop_counts));
+
+        for (int i = 0; i < 10; ++i) {
+            pop_limits[i] = -1;
+        }
+
+        int16_t race_limit = Colony_Race_Pop_Limit_(colony, (int16_t)race_idx);
+        pop_limit_flags[race_limit] = 1;
+        pop_limits[race_idx] = race_limit;
+
+        for (int i = 0; i < colony->n_pops; ++i) {
+            int race = colony->pop[i] & 0xF;
+            pop_counts[race]++;
+
+            if (pop_limits[race] == -1) {
+                int16_t limit = Colony_Race_Pop_Limit_(colony, (int16_t)race);
+                pop_limits[race] = limit;
+                pop_limit_flags[limit] = 1;
+            }
+        }
+
+        for (int limit = pop_limits[race_idx]; limit < 42; ++limit) {
+            if (pop_limit_flags[limit] != 0) {
+                int sum = 0;
+                for (int race = 0; race < 10; ++race) {
+                    if (pop_counts[race] > 0 && pop_limits[race] <= limit) {
+                        sum += pop_counts[race];
+                    }
+                }
+                if (limit <= sum) {
+                    no_room = true;
+                }
+            }
+        }
+
+        return !no_room;
+    }
+
+    void __cdecl Compute_Total_Building_Costs_(int32_t* player_costs) {
+        memset(player_costs, 0, 8 * sizeof(int32_t));
+
+        for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            s_colony* colony = &MOX::_colony[i];
+
+            if (colony->owner != -1 && colony->outpost_flag == 0) {
+                for (int b = 0; b < 49; ++b) {
+                    if (colony->buildings[b] != 0) {
+                        player_costs[colony->owner] += TECHDATA::_buildings[b].cost;
+                    }
+                }
+            }
+        }
+    }
 }

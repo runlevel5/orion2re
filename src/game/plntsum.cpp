@@ -1704,7 +1704,7 @@ void __cdecl Draw_Mini_Planet_Summary_Screen_() {
 
     PLNTSUM::Draw_Rotating_Planets_();
     PLNTSUM::Wrapper_For_Planet_Summary_Galaxy_Map_();
-    SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, (void*)PLNTSUM::Fill_Summary_Screen_Scroll_Bar_);
+    SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, PLNTSUM::Fill_Summary_Screen_Scroll_Bar_);
     PLNTSUM::Summary_Screen_Print_Data_();
 
     if (MOX::_scanned_field > -1) {
@@ -2113,6 +2113,45 @@ void __cdecl Colony_Owner_Colors_(int16_t colony_idx, s_colors* colors, char par
         Player_Colors_(MOX::_colony[colony_idx].owner, colors, param_3, &local_1);
     } else {
         Player_Colors_(-1, colors, param_3, &local_1);
+    }
+}
+
+void __cdecl Player_Colors_(int16_t player_idx, s_colors* colors_out, int8_t type, uint8_t* base_color_out) {
+    if (player_idx == -1) {
+        if (type == 1) {
+            MOX::_mox_font_colors_offset = 0x42;
+            s_colors* c = MISC::Font_Colors2_(4, 0x40, 0xFF);
+            *colors_out = *c;
+            *base_color_out = colors_out->colors[1];
+        } else if (type == 2) {
+            MOX::_mox_font_colors_offset = 0x40;
+            s_colors* c = MISC::Font_Colors2_(4, 0x00, 0x8A);
+            *colors_out = *c;
+            *base_color_out = colors_out->colors[1];
+        } else {
+            MOX::_mox_font_colors_offset = 0x43;
+            s_colors* c = MISC::Font_Colors2_(4, 0x40, 0x41);
+            *colors_out = *c;
+            *base_color_out = colors_out->colors[1];
+        }
+        return;
+    }
+
+    uint8_t base_color = static_cast<uint8_t>(MOX::_player[player_idx].color * 6) - 0x31;
+    *base_color_out = base_color;
+
+    if (type == 0) {
+        MOX::_mox_font_colors_offset = base_color + 2;
+        s_colors* c = MISC::Font_Colors2_(4, base_color, base_color + 4);
+        *colors_out = *c;
+    } else if (type == 1) {
+        MOX::_mox_font_colors_offset = base_color + 3;
+        s_colors* c = MISC::Font_Colors2_(4, base_color, base_color + 5);
+        *colors_out = *c;
+    } else if (type == 2) {
+        MOX::_mox_font_colors_offset = base_color + 1;
+        s_colors* c = MISC::Font_Colors2_(4, base_color, base_color + 3);
+        *colors_out = *c;
     }
 }
 

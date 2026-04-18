@@ -359,6 +359,9 @@ namespace MOX {
     inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
     inline int16_t& _first_fleet_movement_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D4A});
 
+    inline int16_t& _next_free_node =\
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005a4aa4});
+
     inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
 
     inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});

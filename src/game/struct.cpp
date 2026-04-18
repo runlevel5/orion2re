@@ -34,6 +34,10 @@ namespace struct_ {
         }
     }
 
+    void __cdecl Copy_Structure_Aligned_(void* dest, void* src, uint32_t size) {
+        memcpy(dest, src, (size >> 2) * 4);
+    }
+
     void __cdecl Copy_Structure_(void* dest, const void* src, uint32_t size) {
         // TODO: Just use memcpy
         uint8_t* d_ptr = static_cast<uint8_t*>(dest);

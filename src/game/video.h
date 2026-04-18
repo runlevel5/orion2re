@@ -44,8 +44,8 @@ namespace video {
 	inline s_palette_entry (&_current_palette)[256] =
 		*reinterpret_cast<s_palette_entry(*)[256]>(std::uintptr_t{ 0x00579350 });
 
-	inline uint8_t** _palette_list =
-		reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x00579750 });
+	inline uint8_t* (&_palette_list)[65] =
+		*reinterpret_cast<uint8_t*(*)[65]>(std::uintptr_t{ 0x00579750 });
 
 	inline uint8_t* _palette_reds =
 		reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579898 });

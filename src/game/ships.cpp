@@ -668,6 +668,13 @@ namespace SHIPS {
         return result;
     }
 
+    int __cdecl qsort_ship_icon_(const void* a, const void* b) {
+        // TYPE MISMATCH: decompiled as (s_ship_icon* a, s_ship_icon* b)
+        auto p1 = static_cast<const s_ship_icon*>(a);
+        auto p2 = static_cast<const s_ship_icon*>(b);
+        return p2->stack_slot - p1->stack_slot;
+    }
+
     void __cdecl Build_Ship_Icons_() {
         SHIPSTAK::Find_Ship_Stacks_();
 

@@ -40,8 +40,10 @@ inline const char* s_Sending_Message_To_Individual = reinterpret_cast<const char
 inline const char* s_Sending_Message_To_All = reinterpret_cast<const char*>(std::uintptr_t{0x005609D4});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
-inline uint32_t& g_screen_res_x = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B1A8});
+inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
+inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055B270}); /* "Add Square to scan list failed.." */
 inline int16_t& g_cached_mouse_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578AB8});
 inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578ABC});
 inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
@@ -327,6 +329,9 @@ inline FILE* __cdecl _fopen(const char* filename, const char* mode) {
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540c00 });
     return fn(filename, mode);
 }
+
+inline LPDIRECTDRAW& g_direct_draw =
+    *reinterpret_cast<LPDIRECTDRAW*>(std::uintptr_t{0x00578E04});
 
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 

@@ -1,6 +1,28 @@
 #include "pch.h"
 
 namespace SCIENCE {
+    void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1) {
+        if (MOX::_settings.animations_on != 0) {
+            file_ani::Draw_Multi_File_Animation_Stencil_(1);
+        } else {
+            file_ani::Set_File_Animation_Frame_(18);
+        }
+
+        if (draw_anim_2 == 1) {
+            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg);
+            animate::Draw_(0, 0, anim);
+        }
+
+        if (draw_multi_anim != 0) {
+            file_ani::Draw_Multi_File_Animation_(0);
+        }
+
+        if (draw_anim_1 == 1) {
+            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
+            animate::Draw_(0, 0, anim);
+        }
+    }
+
     void __cdecl Show_Off_Stolen_Tech_(uint16_t tech_idx, int16_t other_idx) {
         char message_text[0x100];
         void* animation_block;
@@ -297,6 +319,9 @@ namespace SCIENCE {
         fields::Enable_Mouse_Wait_();
         MOX2::Put_Auto_Function_(&saved_auto_function);
         ERIC::Set_Fade_Percent_(0);
+    }
+
+    void __cdecl Draw_Science_Room_() {
     }
 
     void __cdecl Show_Off_Researched_Tech_(int16_t player_idx) {

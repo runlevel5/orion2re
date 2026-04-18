@@ -29,11 +29,7 @@ namespace RACESEL {
     inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
     inline const char* s_space_00551120 = reinterpret_cast<const char*>(0x00551120);
 
-    inline void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_specials_ptr) {
-        using Fn = void(__cdecl*)(uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00498160});
-        fn(race_specials_ptr);
-    }
+    void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_flags);
 
     void __cdecl Reload_Race_Selection_Screen_();
     void __cdecl Draw_Race_Selection_Screen_();

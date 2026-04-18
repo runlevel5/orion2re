@@ -31,11 +31,7 @@ namespace RUSS {
 
     void __cdecl Make_All_AI_Game_();
 
-    inline void __cdecl Make_Player_Into_AI_(int32_t player_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7DC0});
-        fn(player_idx);
-    }
+    void __cdecl Make_Player_Into_AI_(int32_t player_idx);
 
     int __cdecl Compare_Ratios_(uint32_t first_numerator, uint32_t first_denominator, uint32_t second_numerator, uint32_t second_denominator);
 

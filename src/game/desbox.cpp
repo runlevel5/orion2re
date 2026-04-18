@@ -1006,8 +1006,7 @@ namespace DESBOX {
         video::Clip_Off_();
 
         if (_replacement_scroll_field != -1000) {
-            // TYPE MISMATCH: Draw_Generic_Vertical_Scroll_Bar_ expects void* in its current stub
-            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, (void*)Draw_Weapons_Scroll_Bar_);
+            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, Draw_Weapons_Scroll_Bar_);
         }
 
         int16_t bottom_y = current_y + mid_box_height;
@@ -2551,7 +2550,7 @@ namespace DESBOX {
         Print_Special_System_Data_(_replacement_box_base_x, _replacement_box_base_y);
 
         if (MOX::_scroll_bar->total_rows > 10 && _replacement_scroll_field != -1000) {
-            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, (void*)Draw_Special_Systems_Scroll_Bar_);
+            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, Draw_Special_Systems_Scroll_Bar_);
         }
 
         JIM::Play_Streaming_Music_(8, -1, 1);

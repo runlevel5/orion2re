@@ -37,17 +37,10 @@ namespace SCIENCE {
     inline void*& _science_mouse_bitmap =
         *reinterpret_cast<void**>(std::uintptr_t{0x005A8BB8});
 
-    inline void __cdecl Update_Science_Anims_(bool draw_room, bool update_room_anim, bool draw_mouse, bool draw_fields) {
-        using Fn = void(__cdecl*)(bool, bool, bool, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00411640});
-        fn(draw_room, update_room_anim, draw_mouse, draw_fields);
-    }
+    inline char* s_SCIENCE_LBX_00551290 = reinterpret_cast<char*>(std::uintptr_t{0x00551290});
+    void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1);
 
-    inline void __cdecl Draw_Science_Room_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004116D0});
-        fn();
-    }
+    void __cdecl Draw_Science_Room_();
 
     void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, uint16_t* discovery_data, char* footer_text);
 

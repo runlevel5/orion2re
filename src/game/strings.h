@@ -3,17 +3,9 @@
 namespace strings {
     void __cdecl Swap_Short_(int16_t* a, int16_t* b);
 
-    inline void __cdecl Swap_(int32_t* a, int32_t* b) {
-        using Fn = void(__cdecl*)(int32_t*, int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052ce40});
-        fn(a, b);
-    }
+    void __cdecl Swap_(int32_t* ptr1, int32_t* ptr2);
 
-    inline void __cdecl Swap_Char_(uint8_t* a, uint8_t* b) {
-        using Fn = void(__cdecl*)(uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CE80});
-        fn(a, b);
-    }
+    void __cdecl Swap_Char_(uint8_t* a, uint8_t* b);
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
     inline const char* s_plus_00551118 = reinterpret_cast<const char*>(std::uintptr_t{0x00551118});

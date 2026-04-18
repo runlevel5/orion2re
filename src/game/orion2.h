@@ -3673,7 +3673,7 @@ struct s_scroll_bar {
     undefined field12_0x16;
     undefined field13_0x17;
     int8_t type;
-    undefined field15_0x19;
+    undefined mouse_button_down;
     int8_t row_step;
     short thumb_y_snapshot;
 };

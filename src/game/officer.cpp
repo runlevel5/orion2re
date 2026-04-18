@@ -713,7 +713,7 @@ namespace OFFICER {
 
         if (is_fleet_screen) {
             if (!OFFICER::_offscrn_skip_draw_ships) {
-                if (SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, reinterpret_cast<void*>(FLT1::Fill_FltScrn_Scroll_Bar_))) {
+                if (SCROLL::Draw_Generic_Vertical_Scroll_Bar_(MOX::_scroll_bar, FLT1::Fill_FltScrn_Scroll_Bar_)) {
                     MOX::_scanned_big_ship = -1;
                 }
                 if (MOX::_small_ship_stack_ptr > -1) {

@@ -3,11 +3,12 @@
 
 struct s_colors;
 struct s_mouse_list;
+struct s_animation_header;
 
 namespace EVENTS {
     inline uint8_t& _current_event = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A6450});
-    inline uint8_t*& _event_display_seg =
-        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A6454});
+    inline s_animation_header*& _event_display_seg =
+        *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A6454});
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline void*& _jim_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A65B0});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
@@ -17,6 +18,7 @@ namespace EVENTS {
 
     int16_t __cdecl Get_Antaran_Victim_();
     void __cdecl Init_Events_();
+    int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx);
 
     int16_t __cdecl Event_Check_Comet_(int16_t target_id);
 
@@ -75,8 +77,11 @@ namespace EVENTS {
     inline uint8_t& _event_status_flag =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A65AC});
 
-    inline char& _event_message =
-        *reinterpret_cast<char*>(std::uintptr_t{0x005A65C0});
+    inline uint8_t*& _event_mouse_bitmap =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A65A4});
+
+    inline char* _event_message =
+        reinterpret_cast<char*>(std::uintptr_t{0x005A65C0});
 
     inline int8_t* s__00557509 =
         reinterpret_cast<int8_t*>(std::uintptr_t{0x00557509});
@@ -113,17 +118,9 @@ namespace EVENTS {
     inline s_mouse_list& _event_blank_mouse =
         *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00557530});
 
-    inline void __cdecl Event_Fade_In_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004741a0});
-        fn();
-    }
+    void __cdecl Event_Fade_In_();
 
-    inline void __cdecl Draw_Event_Screen_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004740d0});
-        fn();
-    }
+    void __cdecl Draw_Event_Screen_();
 
     inline char* s_ian_00550000 = reinterpret_cast<char*>(std::uintptr_t{0x00550000}); // "german-austrian"
     inline char* s_s_005510f4 = reinterpret_cast<char*>(std::uintptr_t{0x005510F4}); // "s"
@@ -139,12 +136,6 @@ namespace EVENTS {
     inline char* s_EVENTMSE_LBX_005575a4 = reinterpret_cast<char*>(std::uintptr_t{0x005575A4}); // "EVENTMSE.LBX"
 
     inline const char* s_EVENTS_LBX_0055753c = reinterpret_cast<const char*>(std::uintptr_t{0x0055753C});
-
-    inline int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00476160});
-        return fn(player_idx);
-    }
 
     void __cdecl Get_Event_Message_(
         int16_t event_type,

@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "types.h"
 
+struct s_wormhole_data;
+
 namespace SHIPMOVE {
     void __cdecl Allocate_New_Ship_Slots_();
     void __cdecl Move_All_Ships_Toward_Stars_();
@@ -46,9 +48,5 @@ namespace SHIPMOVE {
 
     void __cdecl Do_Hyperspace_Beast_(int32_t player_idx);
 
-    inline void __cdecl Do_Wormhole_Event_(int16_t player_idx, void* data) {
-        using Fn = void(__cdecl*)(int16_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004373A0});
-        fn(player_idx, data);
-    }
+    void __cdecl Do_Wormhole_Event_(int32_t player_idx, s_wormhole_data* wormhole);
 }

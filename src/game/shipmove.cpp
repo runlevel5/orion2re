@@ -1018,4 +1018,52 @@ namespace SHIPMOVE {
             MSG_::Add_Msg_(msg, i);
         }
     }
+
+    /**
+     * @address 004373a0
+     */
+    void __cdecl Do_Wormhole_Event_(int32_t player_idx, s_wormhole_data* wormhole) {
+        wormhole->success = 0;
+        wormhole->dest_star_idx = 0;
+        wormhole->count = 0;
+
+        int32_t random_counter = 0;
+        s_ship_data* selected_ship = nullptr;
+
+        for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+            s_ship_data* ship = &MOX::_ship[i];
+            if (ship->owner == player_idx && ship->status == 1 && ship->turns_left != 1) {
+                random_counter++;
+                if (random::Random_(random_counter) == 1) {
+                    selected_ship = ship;
+                }
+            }
+        }
+
+        if (selected_ship != nullptr) {
+            int32_t location = selected_ship->location;
+            int32_t x = selected_ship->x;
+            int32_t y = selected_ship->y;
+            int32_t star_idx = location - 500;
+
+            wormhole->success = 1;
+            wormhole->count = star_idx;
+
+            for (int32_t i = 0; i < (int32_t)MOX::_NUM_SHIPS; ++i) {
+                s_ship_data* ship = &MOX::_ship[i];
+                if (ship->owner == player_idx &&
+                    ship->status == 1 &&
+                    ship->x == x &&
+                    ship->y == y &&
+                    ship->location == location &&
+                    ship->travelling_speed == selected_ship->travelling_speed) {
+
+                    Make_Ship_Arrive_At_Star_(ship, (int16_t)star_idx);
+                    wormhole->dest_star_idx++;
+                }
+            }
+        }
+
+        MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+    }
 }
