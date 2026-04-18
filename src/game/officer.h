@@ -3,12 +3,15 @@
 struct s_scroll_bar;
 
 namespace OFFICER {
-    inline uint32_t __cdecl Load_Officer_Picture_(int32_t p1, int16_t officer_idx, uint32_t seg, char p4, int16_t mode) {
-        using Fn = uint32_t(__cdecl*)(int32_t, int16_t, uint32_t, char, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d350});
-        return fn(p1, officer_idx, seg, p4, mode);
-    }
+    s_animation_header* __cdecl Load_Officer_Picture_(
+        int32_t unused,
+        int16_t leader_idx,
+        s_animation_header* dest,
+        uint8_t use_far_reload,
+        int16_t pic_type
+    );
     inline s_colors& _normal_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569A0});
+    inline s_colors& _red_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00556998});
     inline const char* s_GEGGGGG_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0});
     inline int16_t& _officer_dismiss_btn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056566C});
     inline uint8_t& _offscrn_skip_draw_ships = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565670});
@@ -26,6 +29,8 @@ namespace OFFICER {
         *reinterpret_cast<s_prev_leader_data**>(std::uintptr_t{0x00565740});
     inline void*& _ldrpict = *reinterpret_cast<void**>(std::uintptr_t{0x005657B4});
     inline const char*& PTR_s_OFFICER_LBX = *reinterpret_cast<const char**>(std::uintptr_t{0x00556990});
+    inline char*& PTR_s_OFFICER_LBX_00556990 =
+        *reinterpret_cast<char**>(std::uintptr_t{0x00556990});
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
@@ -53,11 +58,7 @@ namespace OFFICER {
 
     void __cdecl Deassign_Officer_(int16_t leader_idx);
 
-    inline void __cdecl Move_Officer_To_Pool_(int16_t leader_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043E2C0});
-        fn(leader_idx);
-    }
+    void __cdecl Move_Officer_To_Pool_(int16_t leader_idx);
 
     void __cdecl Allocate_Adv_Civ_Game_Officers_();
 
@@ -75,30 +76,31 @@ namespace OFFICER {
 
     void __cdecl Reload_Officer_Screen_Pictures_();
 
-    inline void __cdecl Build_Captain_Id_List_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043d470})();
-    }
+    void __cdecl Build_Captain_Id_List_();
 
     inline void __cdecl Get_Officer_Pictures_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00441a40})();
     }
 
-    inline void __cdecl Load_Officer_Skill_Name_Descriptions_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00441b60})();
-    }
+    void __cdecl Load_Officer_Skill_Name_Descriptions_();
 
-    inline void __cdecl Reload_Offscrn_Small_Ship_Icons_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00441c90})();
-    }
+    void __cdecl Reload_Offscrn_Small_Ship_Icons_();
 
-    inline void __cdecl Add_Officer_Screen_Fields_(int16_t* p1, int16_t* p2, int16_t* p3, int16_t* p4, int16_t* p5, int p6, int p7, int16_t* p8, int16_t* p9, int16_t* p10, int16_t* p11, int16_t* p12) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int, int, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043F440})(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
-    }
+    void __cdecl Add_Officer_Screen_Fields_(
+        int16_t* hire_btn,
+        int16_t* cancel_hire_btn,
+        int16_t* ship_ldrs_btn,
+        int16_t* colony_ldrs_btn,
+        int16_t* return_btn,
+        int16_t* help_field_1,
+        int16_t* help_field_2,
+        int16_t* up_btn,
+        int16_t* dn_btn,
+        int16_t* next_btn,
+        int16_t* prev_btn,
+        int16_t* big_icon_fields
+    );
 
     void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* sb);
 
@@ -112,6 +114,8 @@ namespace OFFICER {
 
     int16_t __cdecl Do_Hire_Officer_(int16_t leader_idx);
 
+    int16_t __cdecl Assign_Loknar_Ship_To_Player_(int16_t player_idx);
+
     int8_t __cdecl Officer_Made_Level_Report_(int16_t player_idx, int8_t process_popups);
     void __cdecl Check_For_Officer_Level_();
     void __cdecl Decrement_Officer_ETA_();
@@ -121,11 +125,7 @@ namespace OFFICER {
 
     void __cdecl Kill_Officer_(int16_t leader_idx);
 
-    inline void __cdecl Give_Officer_XP_(int16_t player_idx, int16_t officer_idx, int16_t xp) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442ec0});
-        fn(player_idx, officer_idx, xp);
-    }
+    void __cdecl Give_Officer_XP_(int16_t player_idx, int16_t leader_idx, int16_t xp_amount);
 
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
@@ -152,39 +152,44 @@ namespace OFFICER {
 
     bool __cdecl Leader_Can_Be_Assigned_(int16_t leader_idx);
 
-    inline char* __cdecl Leader_Name_(int16_t leader_idx, int8_t flag, void* star_ptr = nullptr) {
-        using Fn = char*(__cdecl*)(int16_t, int8_t, void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00442710})(leader_idx, flag, star_ptr);
-    }
+    char* __cdecl Leader_Name_(int16_t leader_idx, char include_title, void* star_ptr = nullptr);
 
-    inline void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00440230})(leader_idx, x, y, w);
-    }
+    void __cdecl Print_ETA_On_Officer_Picture_(int16_t leader_idx, int16_t x, int16_t y, int16_t w);
 
-    inline char** _officer_skill_description_string =
-        reinterpret_cast<char**>(std::uintptr_t{0x005656D0});
+    inline char* (&_officer_skill_description_string)[27] =
+        *reinterpret_cast<char*(*)[27]>(std::uintptr_t{0x005656D0});
 
-    inline char** _officer_skill_name_string =
-        reinterpret_cast<char**>(std::uintptr_t{0x00565748});
+    inline char* (&_officer_skill_name_string)[27] =
+        *reinterpret_cast<char*(*)[27]>(std::uintptr_t{0x00565748});
 
     void __cdecl Text_Box_With_Refresh_(const char* title, const char* body);
 
+    inline void __cdecl Get_Skill_Description_LBX_Name_(char* name) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444C60});
+        fn(name);
+    }
+
     void __cdecl Print_Officer_Skill_Help_(int16_t skill_id, int16_t bonus, int16_t leader_idx);
 
-    inline void __cdecl Find_Selected_Leader_(int16_t leader_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00442f90})(leader_idx);
+    void __cdecl Find_Selected_Leader_(int16_t leader_idx);
+
+    void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id);
+
+    inline void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx, int16_t* tech_list, int16_t* num_techs) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443b00});
+        fn(player_idx, tech_list, num_techs);
     }
 
-    inline void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id) {
-        using Fn = void(__cdecl*)(int16_t, uint8_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00443760})(player_idx, techs, hero_id);
-    }
+    void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs);
 
-    inline void __cdecl Rescued_Loknar_Popup_(int16_t player_idx, int32_t techs_val, int16_t hero_id) {
-        using Fn = void(__cdecl*)(int16_t, int32_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00443890})(player_idx, techs_val, hero_id);
+    void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int32_t param_2, int16_t param_3);
+
+    inline void __cdecl Make_Loknar_Message_(char* buffer, int32_t param_2, int16_t param_3) {
+        using Fn = void(__cdecl*)(char*, int32_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004438E0});
+        fn(buffer, param_2, param_3);
     }
 
     int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_idx);
@@ -242,38 +247,37 @@ namespace OFFICER {
 
     void __cdecl Load_Officer_Skill_Icons_(void* param_1);
 
-    inline uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message) {
-        using Fn = uint8_t(__cdecl*)(int16_t, int16_t, char*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0045A680 })(player_num, officer_id, message);
-    }
+    uint8_t __cdecl Hire_Officer_Popup_(int16_t player_num, int16_t officer_id, char* message);
 
     void __cdecl Decrement_Officer_ETA_();
 
     int16_t __cdecl Select_Leader_For_Hire_(int16_t player_index);
 
-    inline bool __cdecl Leader_Available_For_Hire_(int16_t leader_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442e70});
-        return fn(leader_idx);
-    }
+    int8_t __cdecl Leader_Available_For_Hire_(int16_t leader_idx);
 
     bool __cdecl Officer_Status_Ok_(int16_t officer_index);
 
-    inline int16_t __cdecl Calculate_Officer_Cost_(int16_t player_idx, int16_t leader_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442c60});
-        return fn(player_idx, leader_idx);
+    int32_t __cdecl Calculate_Officer_Cost_(int16_t player_idx, int16_t leader_idx);
+
+    bool __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* hero_idx, int16_t player_idx);
+
+    void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star);
+
+    inline void __cdecl Wrapper_For_Offscrn_Help_Fields_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{0x004423B0})();
     }
 
-    inline void __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* result_ptr, int16_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443260});
-        fn(star_idx, result_ptr, player_idx);
-    }
+    void __cdecl Add_Display_Popup_Fields_(int16_t star_displayed);
 
-    inline void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star) {
-        using Fn = void(__cdecl*)(s_player*, s_leader_data*, s_star_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004446C0 });
-        fn(player, leader, star);
+    bool __cdecl Officer_Is_Female_(int16_t officer_idx);
+
+    inline char (&s__005510f0)[2] =
+        *reinterpret_cast<char(*)[2]>(std::uintptr_t{0x005510F0}); /* " " */
+
+    inline void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest) {
+        using Fn = void(__cdecl*)(int16_t, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444d70});
+        fn(leader_idx, dest);
     }
 }

@@ -2335,4 +2335,70 @@ void __cdecl Load_Transport_Ship_Design_(int16_t player_idx, s_ship_design* desi
     design->cost = (int16_t)COLCALC::Ship_Type_Cost_For_Player_(2, player_idx);
 }
 
+void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
+    struct_::Clear_Structure_(design, 99);
+
+    strcpy(design->name, s_Avenger_005576c4);
+
+    design->computer_type = 5;
+    design->ship_type = 0;
+    design->shield_type = 0;
+    design->size = 3;
+    design->armor_type = 6;
+    design->speed = 8;
+    design->ftl_type = 6;
+
+    design->ship_weapon[0].type = 4;
+    design->ship_weapon[0].firing_arc = 1;
+    design->ship_weapon[0].specials = 2;
+    design->ship_weapon[0].ammo = 0;
+    design->ship_weapon[0].count = 4;
+    design->ship_weapon[0].current_count = 4;
+
+    design->ship_weapon[1].type = 11;
+    design->ship_weapon[1].firing_arc = 1;
+    design->ship_weapon[1].specials = 2;
+    design->ship_weapon[1].ammo = 0;
+    design->ship_weapon[1].count = 2;
+    design->ship_weapon[1].current_count = 2;
+
+    design->ship_weapon[2].type = 4;
+    design->ship_weapon[2].firing_arc = 1;
+    design->ship_weapon[2].specials = 0;
+    design->ship_weapon[2].ammo = 0;
+    design->ship_weapon[2].count = 10;
+    design->ship_weapon[2].current_count = 10;
+
+    design->ship_weapon[3].type = 13;
+    design->ship_weapon[3].firing_arc = 15;
+    design->ship_weapon[3].specials = 0;
+    design->ship_weapon[3].ammo = 0;
+    design->ship_weapon[3].count = 2;
+    design->ship_weapon[3].current_count = 2;
+
+    design->ship_weapon[4].type = 4;
+    design->ship_weapon[4].firing_arc = 1;
+    design->ship_weapon[4].specials = 4;
+    design->ship_weapon[4].ammo = 0;
+    design->ship_weapon[4].count = 10;
+    design->ship_weapon[4].current_count = 10;
+
+    design->ship_weapon[5].type = 24;
+    design->ship_weapon[5].firing_arc = 1;
+    design->ship_weapon[5].specials = 0;
+    design->ship_weapon[5].ammo = 10;
+    design->ship_weapon[5].count = 15;
+    design->ship_weapon[5].current_count = 15;
+
+    struct_::Set_Bit_Field_(design->special_device_flags, 7);
+    struct_::Set_Bit_Field_(design->special_device_flags, 24);
+    struct_::Set_Bit_Field_(design->special_device_flags, 33);
+
+    design->picture_num = 44;
+    design->previous_owner = 8;
+
+    design->cost = 500;
+    design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 2;
+}
+
 }

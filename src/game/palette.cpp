@@ -120,6 +120,38 @@ namespace palette {
         Clear_Palette_Changes_(0, 255);
     }
 
+    void __cdecl Update_Cycle_(int16_t* bound1, int16_t* bound2) {
+        if (_cycle_direction_flag == 0) {
+            if (*bound1 < *bound2) {
+                _cycle_color_value += _cycle_step_value;
+                if (*bound2 < _cycle_color_value) {
+                    _cycle_direction_flag = 1;
+                    _cycle_color_value = *bound2 - 1;
+                }
+            } else {
+                _cycle_color_value -= _cycle_step_value;
+                if (_cycle_color_value < *bound1) {
+                    _cycle_direction_flag = 1;
+                    _cycle_color_value = *bound1 + 1;
+                }
+            }
+        } else {
+            if (*bound1 < *bound2) {
+                _cycle_color_value -= _cycle_step_value;
+                if (_cycle_color_value < *bound1) {
+                    _cycle_direction_flag = 0;
+                    _cycle_color_value = *bound1 + 1;
+                }
+            } else {
+                _cycle_color_value += _cycle_step_value;
+                if (*bound2 < _cycle_color_value) {
+                    _cycle_direction_flag = 0;
+                    _cycle_color_value = *bound2 - 1;
+                }
+            }
+        }
+    }
+
     void __cdecl Cycle_Palette_Color_(int16_t pal_idx, int16_t r1, int16_t g1, int16_t b1, int16_t r2, int16_t g2, int16_t b2, int16_t step_val) {
         int32_t delta_r = r2 - r1;
         int32_t delta_g = g2 - g1;
@@ -263,6 +295,26 @@ namespace palette {
             *s = 0;
             *h = -1;
         }
+    }
+
+    int32_t __cdecl Value_(int32_t p, int32_t q, int32_t t) {
+        if (t > 360) {
+            t -= 360;
+        } else if (t < 0) {
+            t += 360;
+        }
+
+        if (t < 60) {
+            return (((q - p) * (t * 1000 / 60)) / 1000 + p) * 63 / 1000;
+        }
+        if (t < 180) {
+            return q * 63 / 1000;
+        }
+        if (t < 240) {
+            return ((((240 - t) * 1000 / 60) * (q - p)) / 1000 + p) * 63 / 1000;
+        }
+        
+        return p * 63 / 1000;
     }
 
     void __cdecl HLS_To_RGB_(int h, int l, int s, uint8_t* r, uint8_t* g, uint8_t* b) {

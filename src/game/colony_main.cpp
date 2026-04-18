@@ -358,10 +358,10 @@ namespace COLONY {
         int8_t officer_idx = MOX::_star[COLONY::_star_handle].officer_index[MOX::_PLAYER_NUM];
 
         if (officer_idx != -1) {
-            _c_anims[30] = (s_animation_header*)OFFICER::Load_Officer_Picture_(
+            _c_anims[30] = OFFICER::Load_Officer_Picture_(
                 (int32_t)MOX::_PLAYER_NUM,
                 (int16_t)officer_idx,
-                (uint32_t)(uintptr_t)MOX::_screen_seg,
+                MOX::_screen_seg,
                 0,
                 1
             );

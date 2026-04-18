@@ -461,7 +461,7 @@ namespace MOX {
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
     inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
     inline s_animation_header*& _star_bg_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1790});
-    inline uint32_t& _detail_fleet_icon_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A49D4});
+    inline s_animation_header*& _detail_fleet_icon_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49D4});
     inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
     inline int16_t (&_weapons_count_plus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597D50});
     inline int16_t (&_weapons_count_minus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x005A1810});
@@ -669,6 +669,12 @@ namespace MOX {
 
     inline s_leader_data*& _leaders =
         *reinterpret_cast<s_leader_data**>(std::uintptr_t{ 0x0059BF40 });
+
+    inline char* (&_officer_level_names)[6] =
+        *reinterpret_cast<char*(*)[6]>(std::uintptr_t{0x00597720});
+
+    inline char* (&_star_officer_level_names)[6] =
+        *reinterpret_cast<char*(*)[6]>(std::uintptr_t{0x005A4A80});
 
     inline s_skill_data (&_skill_data)[54] = *reinterpret_cast<s_skill_data(*)[54]>(std::uintptr_t{0x00559058});
 

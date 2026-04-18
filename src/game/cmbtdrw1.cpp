@@ -188,10 +188,10 @@ namespace CMBTDRW1 {
             if (p_idx > 7) p_idx = 0;
             
             uint8_t race = (uint8_t)MOX::_player[p_idx].race;
-            MOX::_detail_fleet_icon_seg = (uint32_t)farload::Far_Reload_Next_("flticons.lbx", race, MOX::_screen_seg);
+            MOX::_detail_fleet_icon_seg = (s_animation_header*)farload::Far_Reload_Next_("flticons.lbx", race, MOX::_screen_seg);
         } else {
             int16_t mode = is_editable ? 0 : 2;
-            MOX::_detail_fleet_icon_seg = OFFICER::Load_Officer_Picture_(0, MOX::_global_combat_data.officer_idx, (uint32_t)MOX::_screen_seg, 0, mode);
+            MOX::_detail_fleet_icon_seg = (s_animation_header*)OFFICER::Load_Officer_Picture_(0, MOX::_global_combat_data.officer_idx, MOX::_screen_seg, 0, mode);
         }
 
         fields::Mark_Fields_();

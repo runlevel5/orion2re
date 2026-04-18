@@ -137,4 +137,10 @@ namespace SYS {
         *reinterpret_cast<char (*)[256]>(std::uintptr_t{0x00566440});
 
     void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset);
+
+    inline void __cdecl Add_System_Display_Popup_Fields_(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10) {
+        using Fn = void(__cdecl*)(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00493a20 });
+        fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10);
+    }
 }

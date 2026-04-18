@@ -29,11 +29,7 @@ namespace palette {
 
     void __cdecl Cycle_Palette_Color_(int16_t pal_idx, int16_t r1, int16_t g1, int16_t b1, int16_t r2, int16_t g2, int16_t b2, int16_t step_val);
 
-    inline void __cdecl Update_Cycle_(int16_t* p1, int16_t* p2) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052b5a0});
-        fn(p1, p2);
-    }
+    void __cdecl Update_Cycle_(int16_t* bound1, int16_t* bound2);
 
     void __cdecl Save_Glass_Remap_Block_(void* buffer);
 
@@ -47,9 +43,5 @@ namespace palette {
 
     void __cdecl HLS_To_RGB_(int h, int l, int s, uint8_t* r, uint8_t* g, uint8_t* b);
 
-    inline int __cdecl Value_(int n1, int n2, int hue) {
-        using Fn = int(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052bbb0});
-        return fn(n1, n2, hue);
-    }
+    int32_t __cdecl Value_(int32_t p, int32_t q, int32_t t);
 }

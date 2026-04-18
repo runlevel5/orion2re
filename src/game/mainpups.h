@@ -2,6 +2,15 @@
 #include <cstdint>
 
 namespace MAINPUPS {
+    inline uint8_t& _on_officer_screen_flag =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D38});
+
+    inline int16_t& _g_officer =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D3C});
+
+    inline char*& _g_str_ptr =
+        *reinterpret_cast<char**>(std::uintptr_t{0x00565E28});
+
     inline int16_t& _last_scanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D8C});
     inline int16_t& _g_temp_tax_rate = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565E30});
 

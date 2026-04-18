@@ -93,6 +93,10 @@ namespace INITSHIP {
 
     void __cdecl Load_Hydra_Ship_Design_(s_ship_design* design, int16_t is_monster);
 
+    void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design);
+
+    inline char* s_Avenger_005576c4 = reinterpret_cast<char*>(std::uintptr_t{0x005576C4});
+
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
     inline char* s_Colony_Ship_Localized = reinterpret_cast<char*>(std::uintptr_t{0x00558E28});

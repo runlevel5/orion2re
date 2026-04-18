@@ -569,12 +569,6 @@ inline void __cdecl Set_Multi_Player_Game_Type_() {
     fn();
 }
 
-inline void __cdecl Give_Officer_XP_(int16_t player_index, int16_t leader_index, int16_t amount) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442ec0});
-    fn(player_index, leader_index, amount);
-}
-
 inline void __cdecl Get_Officer_Pictures_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441A40});
@@ -815,6 +809,8 @@ inline void __cdecl _Squeeze_Print_Paragraph_(uint16_t p1, int16_t p2, int16_t p
     fn(p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
+inline const char* s_X_005569d0 = reinterpret_cast<const char*>(0x005569D0); // "X"
+inline const char* s_comma_005569c8 = reinterpret_cast<const char*>(0x005569C8); // ","
 inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
 inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // "N"
