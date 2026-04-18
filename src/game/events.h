@@ -1,10 +1,13 @@
 #pragma once
 #include <cstdint>
 
+struct s_colors;
+struct s_mouse_list;
+
 namespace EVENTS {
     inline uint8_t& _current_event = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A6450});
-    inline uint32_t& _event_display_seg =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A6454});
+    inline uint8_t*& _event_display_seg =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x005A6454});
     inline s_event_data (&_event_data)[36] = *reinterpret_cast<s_event_data(*)[36]>(std::uintptr_t{0x005A6460});
     inline void*& _jim_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A65B0});
     inline uint32_t& _last_event_year = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A65A8});
@@ -78,6 +81,8 @@ namespace EVENTS {
     inline int8_t* s__00557509 =
         reinterpret_cast<int8_t*>(std::uintptr_t{0x00557509});
 
+    inline char* s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
+
     int16_t __cdecl Ship_Size_Points_At_Star_(int16_t star_idx);
 
     void __cdecl Allocate_Comet_Hit_(int16_t colony_idx);
@@ -100,29 +105,66 @@ namespace EVENTS {
 
     void __cdecl Check_For_Event_();
 
-    inline void __cdecl Start_Main_Event_() {
+    void __cdecl Start_Main_Event_();
+
+    inline s_colors& _event_normal_colors =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557500});
+
+    inline s_mouse_list& _event_blank_mouse =
+        *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x00557530});
+
+    inline void __cdecl Event_Fade_In_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473f80});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004741a0});
         fn();
     }
 
-    inline void __cdecl Get_Event_Message_(int32_t event_id, int16_t subtype, int16_t p3, int16_t p4, int16_t p5, int16_t player_idx, int16_t p7, int16_t p8, int16_t p9, int16_t p10, int16_t p11, int16_t p12, int16_t p13, char* out_msg) {
-        using Fn = void(__cdecl*)(int32_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00475910});
-        fn(event_id, subtype, p3, p4, p5, player_idx, p7, p8, p9, p10, p11, p12, p13, out_msg);
-    }
-
-    inline void __cdecl Drive_Event_Screen_() {
+    inline void __cdecl Draw_Event_Screen_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474070});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004740d0});
         fn();
     }
 
-    inline void __cdecl Load_Event_Picture_(int16_t event_id) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00474030});
-        fn(event_id);
+    inline char* s_ian_00550000 = reinterpret_cast<char*>(std::uintptr_t{0x00550000}); // "german-austrian"
+    inline char* s_s_005510f4 = reinterpret_cast<char*>(std::uintptr_t{0x005510F4}); // "s"
+    inline char* s_0_0055110c = reinterpret_cast<char*>(std::uintptr_t{0x0055110C}); // " 0"
+    inline char* s_jimtext2_lbx_00552340 = reinterpret_cast<char*>(std::uintptr_t{0x00552340}); // "jimtext2.lbx"
+    inline char* s__005569f8 = reinterpret_cast<char*>(std::uintptr_t{0x005569F8}); // "\n"
+    inline char* s_X_d__d___s_00557548 = reinterpret_cast<char*>(std::uintptr_t{0x00557548}); // " X%d.%d. %s"
+    inline char* s_EVENTMSP_LBX_00557554 = reinterpret_cast<char*>(std::uintptr_t{0x00557554}); // "EVENTMSP.LBX"
+    inline char* s_EVENTMSI_LBX_00557564 = reinterpret_cast<char*>(std::uintptr_t{0x00557564}); // "EVENTMSI.LBX"
+    inline char* s_EVENTMSS_LBX_00557574 = reinterpret_cast<char*>(std::uintptr_t{0x00557574}); // "EVENTMSS.LBX"
+    inline char* s_EVENTMSF_LBX_00557584 = reinterpret_cast<char*>(std::uintptr_t{0x00557584}); // "EVENTMSF.LBX"
+    inline char* s_EVENTMSG_LBX_00557594 = reinterpret_cast<char*>(std::uintptr_t{0x00557594}); // "EVENTMSG.LBX"
+    inline char* s_EVENTMSE_LBX_005575a4 = reinterpret_cast<char*>(std::uintptr_t{0x005575A4}); // "EVENTMSE.LBX"
+
+    inline const char* s_EVENTS_LBX_0055753c = reinterpret_cast<const char*>(std::uintptr_t{0x0055753C});
+
+    inline int32_t __cdecl Event_Get_Fleet_Strength_(int16_t player_idx) {
+        using Fn = int32_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00476160});
+        return fn(player_idx);
     }
+
+    void __cdecl Get_Event_Message_(
+        int16_t event_type,
+        int16_t event_subtype,
+        int16_t planet_idx,
+        int16_t val1,
+        int16_t val2,
+        int16_t player_idx1,
+        int16_t tech_field_idx1,
+        int16_t player_idx2,
+        int16_t leader_idx,
+        int16_t player_idx3,
+        int16_t star_idx,
+        int16_t tech_app_idx1,
+        int16_t tech_app_idx2,
+        char* out_str);
+
+    void __cdecl Drive_Event_Screen_();
+
+    void __cdecl Load_Event_Picture_(int16_t event_id);
 
     void __cdecl Setup_Next_Event_(int16_t event_id);
 

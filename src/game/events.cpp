@@ -1968,6 +1968,15 @@ namespace EVENTS {
         _event_data[event_index].status = 4;
     }
 
+    /**
+     * @address 00474030
+     */
+    void __cdecl Load_Event_Picture_(int16_t event_id) {
+        allocate::Mark_Block_(MOX::_screen_seg);
+        _event_display_seg = (uint8_t*)farload::Far_Reload_Next_(s_EVENTS_LBX_0055753c, event_id + 2, MOX::_screen_seg);
+        allocate::Release_Block_(MOX::_screen_seg);
+    }
+
     void __cdecl Check_For_Event_() {
         int16_t event_idx;
         int8_t event_status;
@@ -2310,6 +2319,233 @@ namespace EVENTS {
                 MAINSCR::Mini_Main_Screen_Text_Box_(text_buffer, &_event_message);
                 fields::Clear_Fields_();
             }
+        }
+    }
+
+    void __cdecl Get_Event_Message_(
+        int16_t event_type,
+        int16_t event_subtype,
+        int16_t planet_idx,
+        int16_t val1,
+        int16_t val2,
+        int16_t player_idx1,
+        int16_t tech_field_idx1,
+        int16_t player_idx2,
+        int16_t leader_idx,
+        int16_t player_idx3,
+        int16_t star_idx,
+        int16_t tech_app_idx1,
+        int16_t tech_app_idx2,
+        char* out_str)
+    {
+        out_str[0] = '\0';
+        char* event_lbx;
+
+        switch (MOX::_settings.language) {
+            case 0: event_lbx = s_EVENTMSE_LBX_005575a4; break;
+            case 1: event_lbx = s_EVENTMSG_LBX_00557594; break;
+            case 2: event_lbx = s_EVENTMSF_LBX_00557584; break;
+            case 3: event_lbx = s_EVENTMSS_LBX_00557574; break;
+            case 4: event_lbx = s_EVENTMSI_LBX_00557564; break;
+            case 5: event_lbx = s_EVENTMSP_LBX_00557554; break;
+            default: event_lbx = s_EVENTMSE_LBX_005575a4; break;
+        }
+
+        char lbx_name[13];
+        strcpy(lbx_name, event_lbx);
+
+        char buffer[300];
+        int16_t index = event_subtype + (event_type * 4);
+        farload::Farload_Data_Static_(lbx_name, index, buffer, 0, 1, 300);
+
+        int16_t out_len = 0;
+
+        for (int16_t i = 0; i < 300; ++i) {
+            char c = buffer[i];
+            if (c == '\0') {
+                break;
+            }
+
+            char temp_str[300];
+            const char* append_str = nullptr;
+            int16_t fetch_player = -1;
+
+            if (c == '\x80') {
+                append_str = HACCESS::Get_Planet_Name_(MOX::_colony[planet_idx].planet);
+            } else if (c == '\x81') {
+                __itoa(val1, temp_str, 10);
+                append_str = temp_str;
+            } else if (c == '\x82') {
+                __itoa(val2, temp_str, 10);
+                append_str = temp_str;
+            } else if (c == '\x83') {
+                if ((val1 > 1 || val1 == 0) && MOX::_settings.language == 0) {
+                    append_str = s_s_005510f4;
+                } else {
+                    continue;
+                }
+            } else if (c == '\x84') {
+                if ((val2 > 1 || val2 == 0) && MOX::_settings.language == 0) {
+                    append_str = s_s_005510f4;
+                } else {
+                    continue;
+                }
+            } else if (c == '\x85') {
+                fetch_player = player_idx1;
+            } else if (c == '\x86') {
+                append_str = TECHDATA::_technology_fields[tech_field_idx1].name;
+            } else if (c == '\x87') {
+                append_str = TECHDATA::_technology_fields[val1].name;
+            } else if (c == '\x88') {
+                append_str = MOX::_player[player_idx2].name;
+            } else if (c == '\x89') {
+                append_str = MOX::_leaders[leader_idx].name;
+            } else if (c == '\x8A') {
+                fetch_player = player_idx3;
+            } else if (c == '\x8B') {
+                append_str = MOX::_star[star_idx].name;
+            } else if (c == '\x8C') {
+                append_str = MOX::_mineral_class_string[val1];
+            } else if (c == '\x8D') {
+                append_str = TECHDATA::_technology_applications[tech_app_idx1].name;
+            } else if (c == '\x8E') {
+                append_str = TECHDATA::_technology_applications[tech_app_idx2].name;
+            } else if (c == '\x8F') {
+                if (MOX::_PLAYER_NUM != player_idx1) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3d, temp_str, 30);
+                    append_str = temp_str;
+                } else {
+                    continue;
+                }
+            } else if (c == '\x90') {
+                if (MOX::_PLAYER_NUM == player_idx1) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3e, temp_str, 30);
+                    append_str = temp_str;
+                } else if (player_idx1 >= 0) {
+                    fetch_player = player_idx1;
+                } else {
+                    continue;
+                }
+            } else if (c == '\x91') {
+                if (MOX::_PLAYER_NUM != player_idx3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3d, temp_str, 30);
+                    append_str = temp_str;
+                } else {
+                    continue;
+                }
+            } else if (c == '\x92') {
+                if (MOX::_PLAYER_NUM == player_idx3) {
+                    JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 0x3e, temp_str, 30);
+                    append_str = temp_str;
+                } else if (player_idx3 >= 0) {
+                    fetch_player = player_idx3;
+                } else {
+                    continue;
+                }
+            } else {
+                out_str[out_len++] = c;
+                continue;
+            }
+
+            if (fetch_player >= 0) {
+                append_str = MOX::_player[fetch_player].race_name;
+            }
+
+            out_str[out_len] = '\0';
+            strcat(out_str, append_str);
+            
+            if (out_len == 0) {
+                if (c == '\x8F' || c == '\x91') {
+                    out_str[1] -= 0x20;
+                } else if (c == '\x90' || c == '\x92') {
+                    out_str[0] -= 0x20;
+                }
+            }
+            out_len = strlen(out_str);
+        }
+        out_str[out_len] = '\0';
+
+        if (event_type == 0x21) {
+            strcat(out_str, s__005569f8);
+
+            int32_t bldg_costs[8];
+            if (event_subtype == 0) {
+                COLCALC::Compute_Total_Building_Costs_(bldg_costs);
+            }
+
+            int16_t player_indices[8];
+            int32_t player_values[8];
+            int16_t num_active = 0;
+
+            for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                if (MOX::_player[p].eliminated == 0) {
+                    player_indices[num_active] = p;
+                    if (event_subtype == 0) {
+                        player_values[num_active] = bldg_costs[p];
+                    } else if (event_subtype == 1) {
+                        player_values[num_active] = MOX::_player[p].total_pop;
+                    } else if (event_subtype == 2) {
+                        player_values[num_active] = MOX::_player[p].total_known_tech_cost;
+                    } else if (event_subtype == 3) {
+                        player_values[num_active] = Event_Get_Fleet_Strength_(p);
+                    }
+                    num_active++;
+                }
+            }
+
+            if (num_active > 0) {
+                for (int16_t pass = num_active - 1; pass > 0; --pass) {
+                    for (int16_t j = 0; j < pass; ++j) {
+                        if (player_values[j + 1] > player_values[j]) {
+                            strings::Swap_(&player_values[j], &player_values[j + 1]);
+                            strings::Swap_Short_(&player_indices[j], &player_indices[j + 1]);
+                        }
+                    }
+                }
+            }
+
+            strcat(out_str, s_0_0055110c);
+
+            int16_t spacing = (MOX::_settings.show_gnn_report == 1) ? 0x78 : 0x0A;
+            int16_t initial_spacing = spacing;
+            int16_t count = (num_active > 6) ? 6 : num_active;
+
+            for (int16_t k = 0; k < count; ++k) {
+                _sprintf(temp_str, s_X_d__d___s_00557548, spacing, k + 1, MOX::_player[player_indices[k]].race_name);
+                strcat(out_str, temp_str);
+
+                if (((k + 1) % 3) == 0) {
+                    strcat(out_str, s__005569f8);
+                    spacing = initial_spacing;
+                } else {
+                    spacing += 0x7D;
+                }
+            }
+        }
+    }
+
+    void __cdecl Drive_Event_Screen_()
+    {
+        bool leave_screen = false;
+
+        while (true) {
+            timer::Mark_Time_();
+            fields::Clear_Fields_();
+
+            int16_t bg_field_id = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
+            int16_t input_id = fields::Get_Input_();
+
+            if (input_id == bg_field_id) {
+                leave_screen = true;
+            }
+
+            if (leave_screen) {
+                break;
+            }
+
+            Draw_Event_Screen_();
+            RUSS::Mox_Sync_Update_();
+            timer::Release_Time_(2);
         }
     }
 }

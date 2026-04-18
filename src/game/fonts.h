@@ -18,7 +18,7 @@ namespace fonts {
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057643C});
     inline int16_t& _current_font_style_2 = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578e1c});
 
-    inline uintptr_t& _font_data = *reinterpret_cast<uintptr_t*>(std::uintptr_t{0x00576434});
+    inline uint8_t*& _font_data = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00576434});
 
     inline s_font& _font_header =
         *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});

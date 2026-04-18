@@ -120,6 +120,12 @@ namespace COLCALC {
 
     bool __cdecl Star_Has_Asteroid_Or_Gas_Giant_(int star_index);
 
+    inline void __cdecl Compute_Total_Building_Costs_(int32_t* player_scores) {
+        using Fn = void(__cdecl*)(int32_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f7d90});
+        fn(player_scores);
+    }
+
     inline int8_t* _difficulty_bc_lookup_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1A8});
     inline int8_t* _size_climate_max_pop_lookup = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F1B0});
     inline char*& _government_bonus_msg = *reinterpret_cast<char**>(std::uintptr_t{0x00571AD4});

@@ -1,11 +1,40 @@
---- src/game/raceopt.cpp
-+++ src/game/raceopt.cpp
-@@ -239,7 +239,7 @@
-         Convert_Player_To_Flags_EM_(MOX::_player[player_idx].traits);
-         Calculate_Picks_();
+--- src/game/shear.cpp
++++ src/game/shear.cpp
+@@ -250,7 +250,8 @@
  
--        if (MOX::_player[player_idx].tech_applications[62] == 3) {
-+        if (MOX::_player[player_idx].tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3) {
-             _picks += 4;
+     uint32_t x_step = _x_step_8_8;
+ 
+-    for (uint32_t y = dst_height; y != 0; --y) {
++    uint32_t y = dst_height;
++    do {
+         uint8_t* row_src_ptr = src_ptr;
+         uint32_t x_accum = 0;
+ 
+-        for (uint32_t x = dst_width; x != 0; --x) {
++        uint32_t x = dst_width;
++        do {
+             *dst_ptr = *src_ptr;
+             dst_ptr--;
+ 
+             x_accum += x_step;
+             uint32_t step_int = x_accum >> 8;
+             src_ptr -= step_int;
+             x_accum &= 0xFF;
+-        }
++            
++            x--;
++        } while (x != 0);
+ 
+         src_ptr = row_src_ptr;
+         _y_accum_8_8 += _y_step_8_8;
+ 
+         if (((_y_accum_8_8 >> 8) & 0xFF) != 0) {
+             src_ptr -= src_width;
+             _y_accum_8_8 &= 0xFFFF00FF;
          }
- 
+-    }
++        
++        y--;
++    } while (y != 0);
+ }
+ EOF

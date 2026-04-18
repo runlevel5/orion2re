@@ -2,6 +2,42 @@
 
 namespace TECHINIT {
 
+int16_t __cdecl Tech_Is_Legal_For_Player_(int16_t player_idx, int16_t tech_id) {
+    int16_t is_legal = 1;
+
+    if (MOX::_player[player_idx].traits[0] == 6) {
+        if (tech_id == 0x56 || tech_id == 0xC3 || tech_id == 0x8D) {
+            is_legal = 0;
+        }
+    }
+
+    if (MOX::_player[player_idx].traits[23] != 0) {
+        if (tech_id == 0x8E || tech_id == 0x13 || tech_id == 0x32 || tech_id == 0x71) {
+            is_legal = 0;
+        }
+    }
+
+    if (MOX::_player[player_idx].traits[18] != 0) {
+        if (tech_id == 0x06 || tech_id == 0x1D || tech_id == 0x44 || tech_id == 0x57 || tech_id == 0xA2 || tech_id == 0xB2) {
+            is_legal = 0;
+        }
+    }
+
+    if (MOX::_settings.strategic_combat_flag == 1) {
+        if (TECHDATA::_technology_applications[tech_id].in_strategic == 0) {
+            is_legal = 0;
+        }
+    }
+
+    if (tech_id == 0x34) {
+        if (MOX::_settings.xenons_exist == 0) {
+            is_legal = 0;
+        }
+    }
+
+    return is_legal;
+}
+
 void __cdecl Init_Player_Tech_(int16_t player_idx) {
   s_player *player = &MOX::_player[player_idx];
   int16_t starting_tech_count;

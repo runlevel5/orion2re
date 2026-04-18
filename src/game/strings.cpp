@@ -40,6 +40,16 @@ namespace strings {
         *b = temp;
     }
 
+    void __cdecl Delete_Structure_(int32_t index, void* array_ptr, int32_t element_size, int32_t count) {
+        if (index < count - 1) {
+            struct_::Copy_Structure_(
+                static_cast<uint8_t*>(array_ptr) + index * element_size,
+                static_cast<uint8_t*>(array_ptr) + (index + 1) * element_size,
+                (count - index - 1) * element_size
+            );
+        }
+    }
+
     void __cdecl Trim_(char* str) {
         if (!str) {
             return;

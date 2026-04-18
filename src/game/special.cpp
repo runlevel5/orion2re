@@ -92,4 +92,66 @@ namespace special {
         }
     }
 
+    void __cdecl Absolute_Interpolate_Line_(int16_t* x_ptr, int16_t* y_ptr, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t step) {
+        if (step <= 0) {
+            return;
+        }
+
+        int16_t curr_x = *x_ptr;
+        if (curr_x == x2 && *y_ptr == y2) {
+            return;
+        }
+
+        int16_t abs_dx = x2 - x1;
+        if (abs_dx < 0) {
+            abs_dx = -abs_dx;
+        }
+
+        int16_t abs_dy = y2 - y1;
+        if (abs_dy < 0) {
+            abs_dy = -abs_dy;
+        }
+
+        if (abs_dy < abs_dx) {
+            if (x1 < x2) {
+                int16_t new_x = curr_x + step;
+                *x_ptr = new_x;
+                if (new_x > x2) {
+                    *x_ptr = x2;
+                }
+            } else {
+                int16_t new_x = curr_x - step;
+                *x_ptr = new_x;
+                if (new_x < x2) {
+                    *x_ptr = x2;
+                }
+            }
+            *y_ptr = y1 + static_cast<int16_t>(
+                static_cast<int32_t>(
+                    static_cast<uint32_t>(*x_ptr - x1) * static_cast<uint32_t>(y2 - y1)
+                ) / (x2 - x1)
+            );
+        } else {
+            int16_t curr_y = *y_ptr;
+            if (y1 < y2) {
+                int16_t new_y = curr_y + step;
+                *y_ptr = new_y;
+                if (new_y > y2) {
+                    *y_ptr = y2;
+                }
+            } else {
+                int16_t new_y = curr_y - step;
+                *y_ptr = new_y;
+                if (new_y < y2) {
+                    *y_ptr = y2;
+                }
+            }
+            *x_ptr = x1 + static_cast<int16_t>(
+                static_cast<int32_t>(
+                    static_cast<uint32_t>(x2 - x1) * static_cast<uint32_t>(*y_ptr - y1)
+                ) / (y2 - y1)
+            );
+        }
+    }
+
 }

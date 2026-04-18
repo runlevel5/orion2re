@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace struct_ {
+    void __cdecl Set_Memory_(void* dest, int32_t size, int32_t value) {
+        memset(dest, value, size);
+    }
+
     void __cdecl Clear_Structure_(void* s, uint32_t len) {
         if (len == 0) {
             return;
