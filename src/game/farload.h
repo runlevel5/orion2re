@@ -28,7 +28,7 @@ namespace farload {
     inline s_lbx_header& _lbx_header = *reinterpret_cast<s_lbx_header*>(std::uintptr_t{ 0x005723D0 });
     inline char* _secondary_drive_path = reinterpret_cast<char*>(std::uintptr_t{ 0x0055AE00 });
 
-    void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3);
+    s_animation_header* __cdecl Far_Reload_(const char* path, int32_t idx, s_animation_header* param3);
 
     // TYPE MISMATCH: originally returns void*
     inline void* __cdecl Farload_Data_Static_(const char* filename, int32_t arg2, void* dest, int32_t arg4, int32_t arg5, int32_t arg6) {
