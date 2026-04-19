@@ -28,11 +28,9 @@ namespace LIST {
 
     void __cdecl Display_Selected_List_Text_(s_list_state* state, s_list_item* item);
 
-    inline s_list_item* __cdecl Select_And_Page_By_Head_ID_(s_list_state* list, uint8_t id) {
-        using Fn = s_list_item*(__cdecl*)(s_list_state*, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460460});
-        return fn(list, id);
-    }
+    int8_t __cdecl Goto_Page_With_Entry_(s_list_state* state, s_list_item* target_item);
+
+    s_list_item* __cdecl Select_And_Page_By_Head_ID_(s_list_state* state, uint8_t head_id);
 
     inline void __cdecl Display_Selected_List_Text_For_Tech_List_(s_list_state* list, s_list_item* item) {
         using Fn = void(__cdecl*)(s_list_state*, s_list_item*);

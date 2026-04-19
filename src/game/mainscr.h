@@ -268,9 +268,5 @@ namespace MAINSCR {
 
     void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width);
 
-    inline void __cdecl Mini_Main_Screen_Text_Box_(char* text, char* title) {
-        using Fn = void(__cdecl*)(char*, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ca1c0});
-        fn(text, title);
-    }
+    void __cdecl Mini_Main_Screen_Text_Box_(char* text_1, char* text_2);
 }

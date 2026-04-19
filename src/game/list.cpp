@@ -289,4 +289,51 @@ namespace LIST {
         }
     }
 
+    int8_t __cdecl Goto_Page_With_Entry_(s_list_state* state, s_list_item* target_item) {
+        uint8_t page = 0;
+        uint16_t item_index = 0;
+        s_list_item* last_page_item;
+        s_list_item* item = state->items;
+        uint8_t item_count = (uint8_t)state->num_items;
+
+        if (item_count != 0) {
+            do {
+                if (item->stop_flag != 0) {
+                    ++page;
+                    last_page_item = item;
+                }
+
+                if (item == target_item) {
+                    state->cur_page = page;
+                    state->selected_item = last_page_item;
+                    return 1;
+                }
+
+                ++item_index;
+                ++item;
+            } while (item_index < item_count);
+        }
+
+        return 0;
+    }
+
+    s_list_item* __cdecl Select_And_Page_By_Head_ID_(s_list_state* state, uint8_t head_id) {
+        s_list_item* items = state->items;
+        s_list_item* selected_item = items;
+        uint16_t item_index = 0;
+        uint8_t item_count = (uint8_t)state->num_items;
+
+        do {
+            if (items[item_index].group_id == head_id) {
+                selected_item = items + item_index;
+                break;
+            }
+            ++item_index;
+        } while (item_count > item_index);
+
+        selected_item->is_selectable = 1;
+        LIST::Goto_Page_With_Entry_(state, selected_item);
+        return selected_item;
+    }
+
 }

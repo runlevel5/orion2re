@@ -103,6 +103,20 @@ namespace LOADSAVE {
     }
 
     /**
+     * @address 00512200
+     */
+    bool __cdecl Active_Save_Slot_Invalid_() {
+        const int8_t save_slot = static_cast<int8_t>(MOX::_settings.active_save_slot);
+
+        if (save_slot >= 0 && save_slot < 10 &&
+            LOADSAVE::_game_popup_fields->slot_occupied_flags[save_slot] > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @address 005120e0
      */
     void __cdecl Set_Up_Load_Save_Popup_() {
@@ -1626,5 +1640,127 @@ namespace LOADSAVE {
             RUSS::Mox_Sync_Update_();
             fields::Enable_Draw_All_Fields_();
         }
+    }
+
+    /**
+     * @address 005123d0
+     */
+    void __cdecl Auto_Save_Last_Saved_Game_(int16_t* result_flag) {
+        uint8_t saved_game_descriptions[0xF0];
+        char message_buffer[0xC8];
+
+        FILEDEF::Get_Saved_Game_Descriptions_(saved_game_descriptions);
+
+        int save_slot = static_cast<int>(static_cast<int8_t>(MOX::_settings.active_save_slot));
+        s_save_game_description* save_description = &MOX::_save_game_description[save_slot];
+        const char* message_format = HAROLD::H_Message_(0xCD, save_slot, save_description);
+
+        _sprintf(message_buffer, message_format);
+
+        int16_t choice = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 1);
+        if (choice != 0) {
+            FILEDEF::Load_Game_(save_slot);
+            MOX::_return_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
+            if (MOX::_game_type != 1) {
+                MOX::_return_screen = SCREEN_REPORTS;
+            }
+            *result_flag = 1;
+            return;
+        }
+
+        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+        *result_flag = 0;
+    }
+
+    /**
+     * @address 00512290
+     */
+    void __cdecl Embed_Special_Color_Codes_(char* param_1, int16_t param_2) {
+        int16_t length = static_cast<int16_t>(strlen(param_1));
+        char encoded[202];
+
+        memset(encoded, 0, sizeof(encoded) - 1);
+
+        if (length <= 0xC8 && length < param_2 - 2 && *param_1 != '\x03') {
+            encoded[0] = '\x03';
+            memcpy(encoded + 1, param_1, length);
+            encoded[length + 1] = '\x01';
+            memcpy(param_1, encoded, length + 2);
+        }
+    }
+
+    /**
+     * @address 00512230
+     */
+    void __cdecl Remove_Embedded_Special_Codes_(char* text, int max_len) {
+        if (*text == '\x03') {
+            char special_code[2] = { '\x01', '\0' };
+            int16_t copy_length = static_cast<int16_t>(strlen(text));
+            memmove(text, text + 1, static_cast<size_t>(copy_length));
+            int16_t special_code_pos = MISC::Substring_(text, special_code);
+            text[special_code_pos] = '\0';
+        }
+    }
+
+    /**
+     * @address 005124f0
+     */
+    void __cdecl Set_Music_For_Game_Popup_() {
+        short music_volume = static_cast<short>((static_cast<int32_t>(_game_popup_fields->music_level) * 100) / 0x9B);
+
+        if (music_volume <= 5) {
+            music_volume = 0;
+            sound::thunk_Stop_Stream_();
+            JIM::Stop_Background_Music_();
+            MOX::_settings.music_on = 0;
+            _game_popup_fields->music_on = 0;
+        } else {
+            _game_popup_fields->music_on = 1;
+            if (MOX::_settings.music_on == 0) {
+                sound::Stream_On_();
+                MOX::_settings.music_on = 1;
+                JIM::Play_Background_Music_();
+            }
+        }
+
+        MOX::_settings.music_level = static_cast<int8_t>(music_volume);
+        sound::Set_Stream_Max_Volume_(music_volume);
+        sound::Set_Stream_Volume_(music_volume);
+    }
+
+    /**
+     * @address 00512590
+     */
+    void __cdecl Set_Sound_For_Game_Popup_(char play_sound_effect) {
+        s_game_popup_fields* popup = LOADSAVE::_game_popup_fields;
+
+        MOX::_global_var = 0;
+
+        int32_t volume = popup->sound_fx_level;
+        volume = (volume * 100) / 0x9b;
+        volume *= 4;
+        volume = (volume * 100) / 100;
+        MOX::_settings.sound_fx_level = static_cast<int8_t>(volume);
+
+        if (MOX::_settings.sound_fx_level > 5) {
+            if (MOX::_settings.sound_fx_on == 0) {
+                sound::Sound_On_();
+            }
+
+            MOX::_settings.sound_fx_on = 1;
+            sound::Set_Sound_Max_Volume_(MOX::_settings.sound_fx_level);
+
+            if (play_sound_effect != 0) {
+                sound::Play_Sound_(0x21);
+            }
+
+            popup->sound_fx_on = 1;
+            return;
+        }
+
+        MOX::_settings.sound_fx_level = 0;
+        sound::Set_Sound_Max_Volume_(0);
+        MOX::_settings.sound_fx_on = 0;
+        popup->sound_fx_on = 0;
     }
 }

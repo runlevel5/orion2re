@@ -29,6 +29,12 @@ namespace JIM {
     void __cdecl Draw_Logos_(void);
     void Play_Background_Music_();
 
+    inline void __cdecl Stop_Background_Music_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004251b0});
+        fn();
+    }
+
     inline void __cdecl Play_Combat_Music_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004252a0 });

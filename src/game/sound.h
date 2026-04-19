@@ -36,6 +36,12 @@ namespace sound {
         fn();
     }
 
+    inline void __cdecl thunk_Stop_Stream_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532030});
+        fn();
+    }
+
     inline void __cdecl Stream_On_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532040 });

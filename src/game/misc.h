@@ -98,4 +98,10 @@ namespace MISC {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f0e0});
         fn(x, y, shadow_char, text);
     }
+
+    inline int16_t __cdecl Substring_(char* haystack, char* needle) {
+        using Fn = int16_t(__cdecl*)(char*, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049EEB0 });
+        return fn(haystack, needle);
+    }
 }

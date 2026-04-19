@@ -3115,6 +3115,18 @@ namespace hooks {
         { 0x00483C90, &MOX2::Get_Auto_Function_ },
         { 0x00483cb0, &MOX2::Execute_Auto_Function_ },
         { 0x00483ca0, &MOX2::Put_Auto_Function_ },
+        { 0x004CA1C0, &MAINSCR::Mini_Main_Screen_Text_Box_ },
+        { 0x00512200, &LOADSAVE::Active_Save_Slot_Invalid_ },
+        { 0x005123d0, &LOADSAVE::Auto_Save_Last_Saved_Game_ },
+        { 0x00512290, &LOADSAVE::Embed_Special_Color_Codes_ },
+        { 0x00512230, &LOADSAVE::Remove_Embedded_Special_Codes_ },
+        { 0x005124f0, &LOADSAVE::Set_Music_For_Game_Popup_ },
+        { 0x00512590, &LOADSAVE::Set_Sound_For_Game_Popup_ },
+        { 0x00460460, &LIST::Select_And_Page_By_Head_ID_ },
+        { 0x004603F0, &LIST::Goto_Page_With_Entry_ },
+        { 0x00533650, &init::Create_IO_Buffer_ },
+        { 0x004F1330, &HAROLD::N_Player_Ships_ },
+        { 0x004f24a0, &HAROLD::Load_Language_Fonts_ },
     };
 
     void Install_Hooks()

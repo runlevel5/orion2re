@@ -172,6 +172,13 @@ namespace HAROLD {
         _memcpy(buffer, src, 10);
     }
 
+    void __cdecl Load_Language_Fonts_() {
+        char font_file_path[20];
+        font_file_path[0] = '\0';
+        Get_Font_File_(font_file_path);
+        fonts::Load_Font_File_(font_file_path);
+    }
+
     int16_t __cdecl Get_Scaled_Value_(int16_t value) {
         return static_cast<int16_t>(static_cast<int32_t>(value * 10) / static_cast<int32_t>(MOX::_cur_map_scale));
     }
@@ -627,7 +634,7 @@ namespace HAROLD {
         }
     }
 
-    const char* __cdecl H_Message_(int16_t id) {
+    const char* __cdecl H_Message_(int16_t id, int save_slot, const s_save_game_description* save_description) {
         uint16_t buffer_offset = 0;
 
         if (id >= 0 && id < 397) {
@@ -1136,6 +1143,24 @@ namespace HAROLD {
     }
 
     void __cdecl Planet_Data_Screen_() {
+    }
+
+    /**
+     * @address 004f1330
+     */
+    int16_t __cdecl N_Player_Ships_(int16_t player_idx) {
+        int16_t ship_idx = 0;
+        int16_t ship_count = 0;
+
+        do {
+            int16_t owner_idx = HACCESS::Ship_Owner_(ship_idx);
+            if (owner_idx == player_idx && static_cast<int8_t>(MOX::_ship[ship_idx].status) < 3) {
+                ship_count = ship_count + 1;
+            }
+            ship_idx = ship_idx + 1;
+        } while (ship_idx < 500);
+
+        return ship_count;
     }
 
     void __cdecl Get_Player_Font_Colors_(int16_t player_idx, int16_t style_idx, s_colors* style_buf, bool param_2) {

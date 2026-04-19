@@ -3996,4 +3996,15 @@ namespace MAINSCR {
         }
         }
     }
+
+    void __cdecl Mini_Main_Screen_Text_Box_(char* text_1, char* text_2) {
+        video::Set_Refresh_Full_();
+        TEXTBOX::Text_Box_(text_1, text_2);
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
+        Draw_Mini_Main_Screen_();
+        RUSS::Mox_Sync_Update_();
+        video::Set_Refresh_Stencil_();
+        MOX::_draw_main_screen_to_back = 1;
+    }
 }

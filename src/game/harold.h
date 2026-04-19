@@ -40,12 +40,9 @@ namespace HAROLD {
 
     void __cdecl Init_Moving_Boxes_();
 
-    const char* __cdecl H_Message_(int16_t id);
+    const char* __cdecl H_Message_(int16_t id, int save_slot = 0, const struct s_save_game_description* save_description = nullptr);
 
-    inline int16_t __cdecl N_Player_Ships_(int16_t player_num) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004f1330})(player_num);
-    }
+    int16_t __cdecl N_Player_Ships_(int16_t player_idx);
 
     void __cdecl Get_Monetary_Unit_String_(char* buffer);
 
@@ -68,11 +65,7 @@ namespace HAROLD {
 
     void __cdecl Planet_Data_Screen_();
 
-    inline void __cdecl Load_Language_Fonts_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F24A0});
-        fn();
-    }
+    void __cdecl Load_Language_Fonts_();
 
     uint8_t* __cdecl Harold_Init_();
 

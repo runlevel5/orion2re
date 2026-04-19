@@ -45,11 +45,7 @@ namespace LOADSAVE {
 
     void __cdecl Add_Game_Popup_Fields_(int16_t *out_x, int16_t *out_y);
 
-    inline int8_t __cdecl Active_Save_Slot_Invalid_() {
-        using Fn = int8_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00512200 });
-        return fn();
-    };
+    bool __cdecl Active_Save_Slot_Invalid_();
 
     void __cdecl Set_Up_Load_Save_Popup_();
 
@@ -89,10 +85,7 @@ namespace LOADSAVE {
     inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);
     inline const char* s_format_0055ad30 = reinterpret_cast<const char*>(0x0055AD30); // "%s, %s, %d %s"
 
-    inline void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x005123D0})(flag);
-    }
+    void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag);
 
     inline void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag) {
         using Fn = void(__cdecl*)(int16_t*);
@@ -118,30 +111,16 @@ namespace LOADSAVE {
 
     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
 
-    inline void __cdecl Embed_Special_Color_Codes_(char* str, int code) {
-        using Fn = void(__cdecl*)(char*, int);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00512290 })(str, code);
-    }
+    void __cdecl Embed_Special_Color_Codes_(char* str, int16_t max_len);
 
-    inline void __cdecl Remove_Embedded_Special_Codes_(char* str, int max_len = 37) {
-        using Fn = void(__cdecl*)(char*, int);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x00512230 })(str, max_len);
-    }
+    void __cdecl Remove_Embedded_Special_Codes_(char* text, int max_len = 37);
 
     void __cdecl Draw_Popup_Pic1_();
     void __cdecl Draw_Popup_Pic2_();
 
-    inline void __cdecl Set_Music_For_Game_Popup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005124F0});
-        fn();
-    }
+    void __cdecl Set_Music_For_Game_Popup_();
 
-    inline void __cdecl Set_Sound_For_Game_Popup_(uint8_t param) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512590});
-        fn(param);
-    }
+    void __cdecl Set_Sound_For_Game_Popup_(char play_sound_effect);
 
     void __cdecl Load_Game_Popup_Pictures_();
 

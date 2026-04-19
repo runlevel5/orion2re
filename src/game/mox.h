@@ -832,11 +832,6 @@ namespace MOX {
     inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
         *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
 
-    #pragma pack(push, 1)
-    struct s_save_game_description {
-        char description[37];
-    };
-    #pragma pack(pop)
     inline s_save_game_description (&_save_game_description)[10] = *reinterpret_cast<s_save_game_description(*)[10]>(std::uintptr_t{0x005974F0});
 
     inline int16_t& _popup_base_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597710});

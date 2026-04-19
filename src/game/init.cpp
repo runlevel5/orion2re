@@ -1,6 +1,11 @@
 #include "pch.h"
 
 namespace init {
+    void __cdecl Create_IO_Buffer_() {
+        _io_buffer = (s_animation_header*)malloc(0x2000);
+        memset(_io_buffer, 0, 0x2000);
+    }
+
     int8_t __cdecl Init_Drivers_(uint32_t param_1, char* font_name) {
         init::Create_IO_Buffer_();
         video::Init_Video_Drivers_();
