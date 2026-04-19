@@ -1,7 +1,5 @@
 #pragma once
 
-struct s_scroll_bar;
-
 namespace OFFICER {
     s_animation_header* __cdecl Load_Officer_Picture_(
         int32_t unused,
@@ -27,10 +25,20 @@ namespace OFFICER {
     inline int16_t& _officer_star_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A77AA});
     inline s_prev_leader_data*& _prev_leaders =
         *reinterpret_cast<s_prev_leader_data**>(std::uintptr_t{0x00565740});
-    inline void*& _ldrpict = *reinterpret_cast<void**>(std::uintptr_t{0x005657B4});
+    inline s_officer_picture_slot*& _ldrpict = *reinterpret_cast<s_officer_picture_slot**>(std::uintptr_t{0x005657B4});
     inline const char*& PTR_s_OFFICER_LBX = *reinterpret_cast<const char**>(std::uintptr_t{0x00556990});
     inline char*& PTR_s_OFFICER_LBX_00556990 =
         *reinterpret_cast<char**>(std::uintptr_t{0x00556990});
+    inline const char* const s_ITASKLLS_LBX_005569fc =
+        reinterpret_cast<const char*>(std::uintptr_t{ 0x005569FC }); // "ITASKLLS.LBX"
+    inline const char* const s_SPASKLLS_LBX_00556a0c =
+        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A0C }); // "SPASKLLS.LBX"
+    inline const char* const s_FRESKLLS_LBX_00556a1c =
+        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A1C }); // "FRESKLLS.LBX"
+    inline const char* const s_GERSKLLS_LBX_00556a2c =
+        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A2C }); // "GERSKLLS.LBX"
+    inline const char* const s_SKILDESC_LBX_00556a3c =
+        reinterpret_cast<const char*>(std::uintptr_t{ 0x00556A3C }); // "SKILDESC.LBX"
 
     int16_t __cdecl Get_Officer_Base_Level_(int16_t xp, int8_t warlord);
 
@@ -78,9 +86,12 @@ namespace OFFICER {
 
     void __cdecl Build_Captain_Id_List_();
 
-    inline void __cdecl Get_Officer_Pictures_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00441a40})();
+    void __cdecl Get_Officer_Pictures_();
+
+    inline s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, int16_t officer_id, void* screen_seg) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441B00});
+        return fn(player_num, officer_id, screen_seg);
     }
 
     void __cdecl Load_Officer_Skill_Name_Descriptions_();
@@ -164,11 +175,7 @@ namespace OFFICER {
 
     void __cdecl Text_Box_With_Refresh_(const char* title, const char* body);
 
-    inline void __cdecl Get_Skill_Description_LBX_Name_(char* name) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444C60});
-        fn(name);
-    }
+    void __cdecl Get_Skill_Description_LBX_Name_(char* name);
 
     void __cdecl Print_Officer_Skill_Help_(int16_t skill_id, int16_t bonus, int16_t leader_idx);
 
@@ -176,21 +183,13 @@ namespace OFFICER {
 
     void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id);
 
-    inline void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx, int16_t* tech_list, int16_t* num_techs) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443b00});
-        fn(player_idx, tech_list, num_techs);
-    }
+    void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx, int16_t* available_techs, int16_t* available_count);
 
     void __cdecl Get_Random_Antaran_Tech_(int16_t player_idx, int16_t count, int16_t* tech_list, int16_t* num_techs);
 
-    void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int32_t param_2, int16_t param_3);
+    void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int16_t* param_2, int16_t param_3);
 
-    inline void __cdecl Make_Loknar_Message_(char* buffer, int32_t param_2, int16_t param_3) {
-        using Fn = void(__cdecl*)(char*, int32_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004438E0});
-        fn(buffer, param_2, param_3);
-    }
+    void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int16_t tech_app_count);
 
     int16_t __cdecl N_Fleet_Officers_Owned_By_Player_(int16_t player_idx);
 
@@ -275,9 +274,5 @@ namespace OFFICER {
     inline char (&s__005510f0)[2] =
         *reinterpret_cast<char(*)[2]>(std::uintptr_t{0x005510F0}); /* " " */
 
-    inline void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest) {
-        using Fn = void(__cdecl*)(int16_t, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00444d70});
-        fn(leader_idx, dest);
-    }
+    void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest);
 }

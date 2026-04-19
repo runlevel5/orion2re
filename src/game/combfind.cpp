@@ -1290,7 +1290,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
             if (MOX::_player[plr1_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
-                    OFFICER::Rescued_Loknar_Popup_(plr1_idx, *reinterpret_cast<int32_t*>(result->info.orion_techs), result->info.rescued_hero_id);
+                    OFFICER::Rescued_Loknar_Popup_(plr1_idx, result->info.orion_techs, result->info.rescued_hero_id);
                 }
             }
         }
@@ -1312,7 +1312,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
             if (MOX::_player[plr2_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
-                    OFFICER::Rescued_Loknar_Popup_(plr2_idx, *reinterpret_cast<int32_t*>(result->info.orion_techs), result->info.rescued_hero_id);
+                    OFFICER::Rescued_Loknar_Popup_(plr2_idx, result->info.orion_techs, result->info.rescued_hero_id);
                 }
             }
         }

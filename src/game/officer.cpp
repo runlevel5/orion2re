@@ -2104,7 +2104,7 @@ namespace OFFICER {
 
         MOX::_officer_pictures_screen_seg = allocate::Allocate_Next_Block_(MOX::_screen_seg, 85000);
         
-        _ldrpict = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
+        _ldrpict = (s_officer_picture_slot*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
         memset(_ldrpict, 0, 0x30);
 
         _prev_leaders = static_cast<s_prev_leader_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xF71));
@@ -2588,6 +2588,38 @@ namespace OFFICER {
         }
 
         MOX::_n_fltscrn_officers = count;
+    }
+
+    void __cdecl Get_Officer_Pictures_() {
+        int16_t picture_slot_index = 0;
+
+        if (MOX::_n_fltscrn_officers > 0) {
+            do {
+                const int16_t officer_id = MOX::_officer_id_list[picture_slot_index];
+
+                if (officer_id > -1) {
+                    s_animation_header* picture = OFFICER::Load_Officer_Picture_(
+                        (int32_t)MOX::_PLAYER_NUM,
+                        officer_id,
+                        reinterpret_cast<s_animation_header*>(MOX::_officer_pictures_screen_seg),
+                        static_cast<uint8_t>(picture_slot_index == 0),
+                        0);
+
+                    OFFICER::_ldrpict[picture_slot_index].pic = picture;
+                    OFFICER::_ldrpict[picture_slot_index].officer_id = MOX::_officer_id_list[picture_slot_index];
+
+                    picture = OFFICER::Load_Darkened_Officer_Picture_(
+                        MOX::_PLAYER_NUM,
+                        officer_id,
+                        MOX::_officer_pictures_screen_seg);
+
+                    OFFICER::_ldrpict[picture_slot_index + 4].pic = picture;
+                    OFFICER::_ldrpict[picture_slot_index + 4].officer_id = MOX::_officer_id_list[picture_slot_index];
+                }
+
+                ++picture_slot_index;
+            } while (picture_slot_index < MOX::_n_fltscrn_officers);
+        }
     }
 
     void __cdecl Reload_Offscrn_Small_Ship_Icons_() {
@@ -3118,7 +3150,22 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
-void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int32_t param_2, int16_t param_3) {
+void __cdecl Make_Loknar_Message_(char* output, const int16_t* tech_app_ids, int16_t tech_app_count) {
+  const int16_t message_id = (MOX::_leaders[0x41].status == 6) ? 0x25 : 0x26;
+
+  strcpy(output, HAROLD::H_Message_(message_id));
+
+  if (tech_app_count > 0) {
+    for (int16_t tech_index = 0; tech_index < tech_app_count; ++tech_index) {
+      strcat(output, s_0_0055110c);
+      strcat(output, s___00556070);
+      strcat(output, TECHDATA::_technology_applications[tech_app_ids[tech_index]].name);
+      strcat(output, s__005569f8);
+    }
+  }
+}
+
+void __cdecl Rescued_Loknar_Popup_(int16_t param_1, int16_t* param_2, int16_t param_3) {
     char buffer[500];
 
     if (param_3 > 0) {
@@ -3235,6 +3282,65 @@ void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, 
 
     int8_t eta = Get_Star_Leader_ETA_(player_idx, leader_idx, star_idx);
     Assign_Leader_To_Star_(player, leader, star, eta);
+}
+
+void __cdecl Get_Skill_Description_LBX_Name_(char* param_1) {
+    const char* skill_description_lbx_name = OFFICER::s_SKILDESC_LBX_00556a3c;
+
+    switch (MOX::_settings.language) {
+    case 1:
+        skill_description_lbx_name = OFFICER::s_GERSKLLS_LBX_00556a2c;
+        break;
+    case 2:
+        skill_description_lbx_name = OFFICER::s_FRESKLLS_LBX_00556a1c;
+        break;
+    case 3:
+        skill_description_lbx_name = OFFICER::s_SPASKLLS_LBX_00556a0c;
+        break;
+    case 4:
+        skill_description_lbx_name = OFFICER::s_ITASKLLS_LBX_005569fc;
+        break;
+    default:
+        break;
+    }
+
+    memcpy(param_1, skill_description_lbx_name, 13);
+}
+
+void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx,
+                                        int16_t *available_techs,
+                                        int16_t *available_count) {
+  *available_count = 0;
+
+  for (int16_t tech_idx = 0; tech_idx < 212; ++tech_idx) {
+    if (TECHDATA::_technology_applications[tech_idx].tech_field_id == 74) {
+      if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], tech_idx)) {
+        available_techs[*available_count] = tech_idx;
+        ++(*available_count);
+      }
+    }
+  }
+}
+
+void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
+    output[0] = '\0';
+
+    if (MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
+        strcpy(output, s___lo_00556a4c);
+        return;
+    }
+
+    if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
+        strcpy(output, s___lo_00556a4c);
+        return;
+    }
+
+    if (Officer_Is_Female_(leader_idx)) {
+        strcpy(output, HAROLD::H_Message_(0x182 /* HESTR_182_THE */));
+        return;
+    }
+
+    strcpy(output, HAROLD::H_Message_(0x110 /* HESTR_110_THE */));
 }
 
 }

@@ -3099,6 +3099,11 @@ namespace hooks {
         { 0x00443260, &OFFICER::Marooned_Hero_At_Star_Can_Join_ },
         { 0x004446C0, &OFFICER::Ai_Assign_Leader_To_Star_ },
         { 0x00442610, &OFFICER::Add_Display_Popup_Fields_ },
+        { 0x00441A40, &OFFICER::Get_Officer_Pictures_ },
+        { 0x00444C60, &OFFICER::Get_Skill_Description_LBX_Name_ },
+        { 0x00443b00, &OFFICER::Get_Available_Antaran_Tech_ },
+        { 0x004438e0, &OFFICER::Make_Loknar_Message_ },
+        { 0x00444d70, &OFFICER::Get_Italian_The_ },
     };
 
     void Install_Hooks()

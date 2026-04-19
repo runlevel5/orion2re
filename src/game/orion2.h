@@ -3302,6 +3302,13 @@ struct s_npcdiplo_tech {
     uint8_t index;
 };
 
+typedef struct s_officer_picture_slot s_officer_picture_slot, *Ps_officer_picture_slot;
+
+struct s_officer_picture_slot {
+    struct s_animation_header *pic;
+    int16_t officer_id;
+};
+
 typedef struct s_orion_candidate s_orion_candidate, *Ps_orion_candidate;
 
 struct s_orion_candidate {
