@@ -3171,6 +3171,17 @@ namespace hooks {
         { 0x0051c730, &farload::Far_Reload_Next_ },
         { 0x0051c7b0, &farload::Farload_Data_Static_ },
         { 0x00533770, &fade::Blinds_Fade_ },
+        { 0x0052d5d0, &sound::Init_Sound_ },
+        { 0x0052e4a0, &sound::Audio_Clear_Cache_ },
+        { 0x005324e0, &sound::Fade_Stream_Down_ },
+        { 0x00532040, &sound::Stream_On_ },
+        { 0x00532060, &sound::Set_Stream_Max_Volume_ },
+        { 0x00531fa0, &sound::Set_Stream_Filename_ },
+        { 0x00531fc0, &sound::Loop_Stream_ },
+        { 0x005324c0, &sound::Fade_Stream_Up_ },
+        { 0x0052e610, &sound::Sound_On_ },
+        { 0x0052e710, &sound::Stop_All_Sounds_ },
+        { 0x0052dcc0, &sound::Resume_Sound_ },
     };
 
     void Install_Hooks()

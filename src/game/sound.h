@@ -1,10 +1,31 @@
 #pragma once
 
-struct IDirectSound;
+extern "C" HRESULT WINAPI DirectSoundCreate(LPCGUID pcGuidDevice, struct IDirectSound** ppDS, IUnknown* pUnkOuter);
 
 namespace sound {
-    inline IDirectSound*& _dsound =
-        *reinterpret_cast<IDirectSound**>(std::uintptr_t{0x0057C754});
+    inline uint32_t& _audioInitialized =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B484});
+
+    inline uint8_t& _soundOn =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B488});
+
+    inline uint8_t& _soundErrorOccurred =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B48C});
+
+    inline MMRESULT& _soundTimerId =
+        *reinterpret_cast<MMRESULT*>(std::uintptr_t{0x0055B490});
+
+    inline uint8_t& _soundTimerActive =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B494});
+
+    inline const char* _default_sound_file_name =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4A8}); // "sound.lbx"
+
+    inline const char* _default_music_file_name =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4D0}); // "music.lbx"
+
+    inline const char* _stream_file_name =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B4F8}); // "stream.lbx"
 
     inline void*& _soundBuffer =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0055B520 });
@@ -12,17 +33,69 @@ namespace sound {
     inline uint32_t& _soundBufferSize =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B524 });
 
-    inline void __cdecl Audio_Clear_Cache_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E4A0 });
-        fn();
+    inline uint8_t& _soundFxActive =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B8F8});
+
+    inline int32_t& _global_stream_volume =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B8FC});
+
+    inline uint8_t& _loopStream =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B900});
+
+    inline int32_t& _doubleBufferLoops =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B904});
+
+    inline uint8_t& _command =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B908});
+
+    inline uint8_t& _streamIncVal =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B90C});
+
+    inline s_lbx_stream_header& _musicLbxHandle =
+        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057B708});
+
+    inline IDirectSound*& _dsound =
+        *reinterpret_cast<IDirectSound**>(std::uintptr_t{0x0057C754});
+
+    inline HRESULT& _dsound_hr =
+        *reinterpret_cast<HRESULT*>(std::uintptr_t{0x0057C758});
+
+    inline int32_t& _dsMasterVolume =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057C760});
+
+    inline int32_t& _dsMasterPan =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057C764});
+
+    inline s_sound_index (&_soundIndices)[33] =
+        *reinterpret_cast<s_sound_index (*)[33]>(std::uintptr_t{0x0057C768});
+
+    inline LPDIRECTSOUNDBUFFER& _dsound_buffer =
+        *reinterpret_cast<LPDIRECTSOUNDBUFFER*>(std::uintptr_t{0x0057CC90});
+
+    inline DSBUFFERDESC1& _dsound_buffer_desc =
+        *reinterpret_cast<DSBUFFERDESC1*>(std::uintptr_t{0x0057CC98});
+
+    inline s_sound_channel (&_soundChannels)[16] =
+        *reinterpret_cast<s_sound_channel (*)[16]>(std::uintptr_t{0x0057CCB0});
+
+    inline s_lbx_stream_header& _soundLbxHandle =
+        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057CEB0});
+
+    inline s_lbx_stream_header& _streamLbxHandle =
+        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x00589A20});
+
+    inline uint8_t& _musicActive =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0058AA6C});
+
+    inline void __stdcall Sound_Timer_Callback_(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2) {
+        using Fn = void(__stdcall*)(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D8C0});
+        fn(uTimerID, uMsg, dwUser, dw1, dw2);
     }
 
-    inline void __cdecl Fade_Stream_Down_(uint8_t dur) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324E0 });
-        fn(dur);
-    }
+    void __cdecl Audio_Clear_Cache_();
+
+    void __cdecl Fade_Stream_Down_(uint8_t fade_rate);
 
     inline int16_t __cdecl Get_Stream_Volume_() {
         using Fn = int16_t(__cdecl*)();
@@ -42,23 +115,11 @@ namespace sound {
         fn();
     }
 
-    inline void __cdecl Stream_On_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532040 });
-        fn();
-    }
+    void __cdecl Stream_On_();
 
-    inline void __cdecl Set_Stream_Max_Volume_(int32_t volume) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532060 });
-        fn(volume);
-    }
+    void __cdecl Set_Stream_Max_Volume_(int32_t volume);
 
-    inline void __cdecl Set_Stream_Filename_(const char* filename) {
-        using Fn = void(__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FA0 });
-        fn(filename);
-    }
+    void __cdecl Set_Stream_Filename_(const char* filename);
 
     inline void __cdecl Play_Stream_(int32_t stream_id) {
         using Fn = void(__cdecl*)(int32_t);
@@ -66,11 +127,7 @@ namespace sound {
         fn(stream_id);
     }
 
-    inline void __cdecl Loop_Stream_(int32_t loop_count) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FC0 });
-        fn(loop_count);
-    }
+    void __cdecl Loop_Stream_(int32_t count);
 
     inline void __cdecl Set_Stream_Volume_(int32_t volume) {
         using Fn = void(__cdecl*)(int32_t);
@@ -78,31 +135,15 @@ namespace sound {
         fn(volume);
     }
 
-    inline void __cdecl Fade_Stream_Up_(uint8_t duration) {
-        using Fn = void(__cdecl*)(uint32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005324C0 });
-        fn(duration);
-    }
+    void __cdecl Fade_Stream_Up_(uint8_t fade_increment);
 
     void __cdecl Set_Audio_Buffer_(void* buffer);
 
-    inline void __cdecl Sound_On_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E610 });
-        fn();
-    }
+    void __cdecl Sound_On_();
 
-    inline void __cdecl Stop_All_Sounds_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052E710 });
-        fn();
-    }
+    void __cdecl Stop_All_Sounds_();
 
-    inline void __cdecl Resume_Sound_(int32_t channel) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052DCC0 });
-        fn(channel);
-    }
+    void __cdecl Resume_Sound_(int32_t channel);
 
     inline void __cdecl Set_Sound_Max_Volume_(int32_t volume) {
         using Fn = void(__cdecl*)(int32_t);
@@ -144,9 +185,5 @@ namespace sound {
         fn(handle, loop_count);
     }
 
-    inline void __cdecl Init_Sound_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052d5d0 });
-        fn();
-    }
+    void __cdecl Init_Sound_();
 }

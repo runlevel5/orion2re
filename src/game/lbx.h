@@ -19,4 +19,10 @@ namespace lbx {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005349E0});
         fn(header);
     }
+
+    inline void __cdecl LBX_init_stream_(void* handle, const char* filename) {
+        using Fn = void(__cdecl*)(void*, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00537FC0});
+        fn(handle, filename);
+    }
 }

@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <Windows.h>
 #include <ddraw.h>
+#include <dsound.h>
+#include <mmsystem.h>
 #include <time.h>
 
 #include "../dplay.h"
