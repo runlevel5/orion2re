@@ -7,12 +7,12 @@ namespace aidudes {
 
         for (int16_t i = 0; i < num_players; ++i) {
             if (MOX::_player[i].objectives != 100) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 Colony_AI_(i);
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         int16_t num_colonies = (int16_t)MOX::_NUM_COLONIES;
         for (int i = 0; i < num_colonies; ++i) {
@@ -92,7 +92,7 @@ namespace aidudes {
         aidudes::Do_Ship_Upgrade_Cheats_();
         AIBUILD::Empire_Buy_Outright_(aidudes::_i_ai);
         aidudes::Colony_AI_Given_Tax_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         aidudes::_our_colonies = nullptr;
     }
@@ -794,7 +794,7 @@ namespace aidudes {
             isqrt_val = 10;
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (p->war_buildup_duration != 0 && war_level == 0) {
             war_level = is_objective_1 + 1;
@@ -812,7 +812,7 @@ namespace aidudes {
                     temp_colony->n_pops != 0) {
 
                     if (EVENTS::Event_Check_Space_Anomaly_(current_colony_idx) == 0) {
-                        MOX::Mox_Update_();
+                        RUSS::Mox_Update_();
 
                         if (COLCALC::Colony_Is_Blockaded(temp_colony) ||
                             (*AIDATA::_ai_colony_info)[current_colony_idx].threatened != 0 ||
@@ -882,7 +882,7 @@ namespace aidudes {
 
         for (int i = 0; i < colony_queue_count; ++i) {
             s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if ((war_level != 0 && (*AIDATA::_enroute_human_ships)[MOX::_planet[temp_colony->planet].star_index][9] != 0) ||
                 AIBUILD::Colony_Is_Conquered_(temp_colony)) {
@@ -937,7 +937,7 @@ namespace aidudes {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
 
         if (p->tech_applications[40] == 3) {
@@ -956,7 +956,7 @@ namespace aidudes {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         if (want_colony_base && p->tech_applications[41] == 3) {
             int r = 0;
             if (is_objective_2 == 0) {
@@ -994,7 +994,7 @@ namespace aidudes {
             int i = colony_queue_count - 1;
             s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if (colony_queue_count > 0 &&
                 p->bc + p->surplus_bc < p->total_maintenance &&
@@ -1071,7 +1071,7 @@ namespace aidudes {
             choice_weights[5] = local_58;
 
             while (true) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 int random_choice = RUSS::Get_Weighted_Choice_Int_(choice_weights, 6);
 
                 if (random_choice == -1 || random_choice == 5) {

@@ -248,46 +248,46 @@ namespace MAINSCR {
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Wormhole_Links_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Relocation_Links_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Stars_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Gate_Icons_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Print_Star_Names_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Black_Holes_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Set_Window_(0x16, 0x16, 0x20f, 0x1a5);
         video::Clip_On_();
         Draw_Ship_Icons_(true);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         graphics::Reset_Window_();
         video::Clip_Off_();
         Print_Main_Screen_Data_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (MOX::_game_type != 0) {
             Draw_Diplomacy_Request_Lights_();
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
     }
 
@@ -877,7 +877,7 @@ namespace MAINSCR {
             return;
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MAINSCR2::_main_screen_fade_in_flag = 0;
         MAINSCR2::_force_main_screen_fade = 0;
         _already_faded_into_main_screen = 1;
@@ -886,22 +886,22 @@ namespace MAINSCR {
         video::Set_Refresh_Stencil_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
         ERIC::Fast_Fade_Out_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         fonts::Load_Palette_(0, 0, 255);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         palstore::Darken_Palette_(100);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MAINSCR::Add_Map_Fields_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (static_cast<int8_t>(box_status) != 0) {
             bool expanding_help_enabled = (MOX::_settings.expanding_help != 0);
             if (expanding_help_enabled) {
                 MOX::_settings.expanding_help = 0;
             }
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             MAINSCR::Do_System_Popup_(MOX::_moveable_box[0].id);
             if (expanding_help_enabled) {
                 MOX::_settings.expanding_help = 1;
@@ -910,7 +910,7 @@ namespace MAINSCR {
 
         video::Set_Page_Off_();
         MAINSCR::Draw_Mini_Main_Screen_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         palette::Clear_Palette_Changes_(0, 255);
         RUSS::Mox_Sync_Update_();
 
@@ -926,7 +926,7 @@ namespace MAINSCR {
 
         if (!skip_fade_in) {
             ERIC::Fast_Fade_In_();
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
 
         MOX::_reloaded_ship_palette = 0;

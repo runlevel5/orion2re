@@ -47,7 +47,7 @@ namespace JIM {
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
             file_ani::Draw_File_Animation_();
             video::Copy_Off_To_Back_();
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             platform::Toggle_Pages_Stub_();
             _darken_palette_value = 0;
 
@@ -84,7 +84,7 @@ namespace JIM {
                 }
 
                 platform::Toggle_Pages_Stub_();
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 timer::Release_Time_(1);
             }
         } else {
@@ -104,7 +104,7 @@ namespace JIM {
             int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
             file_ani::Draw_File_Animation_();
             video::Copy_Off_To_Back_();
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             int16_t end_delay_counter = 5;
             platform::Toggle_Pages_Stub_();
@@ -138,7 +138,7 @@ namespace JIM {
                 }
 
                 platform::Toggle_Pages_Stub_();
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 timer::Release_Time_(1);
             }
         }
@@ -146,7 +146,7 @@ namespace JIM {
         allocate::Pop_Block_(MOX::_global_screen_seg);
         file_ani::Reset_File_Animation_Buffer_();
         Logo_Fadeout_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 0x27F, 0x1DF, 0);
@@ -163,7 +163,7 @@ namespace JIM {
 
         for (int16_t current_fade = _darken_palette_value; current_fade <= 100; current_fade += 10) {
             palstore::Darken_Palette_(static_cast<int32_t>(current_fade));
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
 
         video::Set_Page_Back_();
@@ -192,7 +192,7 @@ namespace JIM {
 
         // Wait for volume to reach zero while updating engine state
         while (sound::Get_Stream_Volume_() > 0) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
 
         sound::Stop_Stream_();

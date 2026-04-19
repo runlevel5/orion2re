@@ -262,7 +262,7 @@ namespace MOX2 {
 
         MOX2::Set_Mox_Alt_Path_();
         ten::init();
-        fields::Assign_Update_Function_(MOX::Mox_Update_);
+        fields::Assign_Update_Function_(RUSS::Mox_Update_);
         fonts::Load_Palette_(5, 0, 0xFF);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         fonts::Set_PSTR_Style_(2);
@@ -274,13 +274,13 @@ namespace MOX2 {
 
         if (MOX2::_skip_intro == 0) {
             JIM::Draw_Logos_();
-            fields::Assign_Update_Function_(MOX::Mox_Update_);
+            fields::Assign_Update_Function_(RUSS::Mox_Update_);
             fonts::Load_Palette_(5, 0, 0xFF);
             mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         }
 
         JIM::Play_Background_Music_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MOX2::Set_Game_Seed();
         MOX::_refresh_mode = 0;
         video::Set_Refresh_Full_();
@@ -309,7 +309,7 @@ namespace MOX2 {
         RUSS::Mox_Sync_Update_();
         LOADER::Load_Pictures_();
         strings::Load_Strings();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MOX::_temp_string[0] = 0;
 
         if (MOX2::_quick_start != 0) {

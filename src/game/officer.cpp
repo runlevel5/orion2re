@@ -2098,7 +2098,7 @@ namespace OFFICER {
         auto& player = MOX::_player[MOX::_PLAYER_NUM];
         int8_t home_star_idx = MOX::_planet[player.home_planet_id].star_index;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MAINSCR::Allocate_First_Screen_Seg_(5);
         FLT1::Allocate_Fltscrn_Next_Screen_Seg_();
 
@@ -2125,7 +2125,7 @@ namespace OFFICER {
         MOX::_officers_original_star_id = static_cast<int16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x10C));
 
         Build_Captain_Id_List_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         const char* lbx = PTR_s_OFFICER_LBX;
         MOX::_officer_main_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 0, MOX::_screen_seg));
@@ -2135,7 +2135,7 @@ namespace OFFICER {
         MOX::_officer_ship_ldrs_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 4, MOX::_screen_seg));
         MOX::_officer_up_button_seg = farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg);
         
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_officer_dn_button_seg = farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg);
         MOX::_officer_prev_button_seg = farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
@@ -2146,7 +2146,7 @@ namespace OFFICER {
         MOX::_officer_return_button_seg = farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
         MOX::_officer_cancel_hire_button_seg = farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_selected_box_seg = farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
@@ -2156,12 +2156,12 @@ namespace OFFICER {
         MOX::_dull_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
         MOX::_dull_officer_dismiss_button_seg = farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_officer_normal_window_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x8D, MOX::_screen_seg);
         MOX::_officer_bright_window_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 0x8E, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_temp_officers_pict = (s_animation_header**)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x30);
 
@@ -2611,7 +2611,8 @@ namespace OFFICER {
                     picture = OFFICER::Load_Darkened_Officer_Picture_(
                         MOX::_PLAYER_NUM,
                         officer_id,
-                        MOX::_officer_pictures_screen_seg);
+                        MOX::_officer_pictures_screen_seg,
+                        static_cast<uint8_t>(picture_slot_index == 0));
 
                     OFFICER::_ldrpict[picture_slot_index + 4].pic = picture;
                     OFFICER::_ldrpict[picture_slot_index + 4].officer_id = MOX::_officer_id_list[picture_slot_index];
@@ -3341,6 +3342,16 @@ void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
     }
 
     strcpy(output, HAROLD::H_Message_(0x110 /* HESTR_110_THE */));
+}
+
+s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, uint8_t load_now) {
+    const int16_t image_id = static_cast<int16_t>(static_cast<uint8_t>(MOX::_leaders[leader_idx].pict_num) + 0x8f);
+
+    if (load_now != 0) {
+        return (s_animation_header*)farload::Far_Reload_(PTR_s_OFFICER_LBX_00556990, image_id, buffer);
+    }
+
+    return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX_00556990, (int)image_id, buffer);
 }
 
 }

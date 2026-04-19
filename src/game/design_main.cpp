@@ -472,14 +472,14 @@ namespace DESIGN {
     }
 
     void __cdecl Load_Design_Screen_Pictures_() {
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MOX::_design_screen_seg = (s_animation_header*)farload::Far_Reload_(PTR_s_DESIGN_LBX_005560D8, 0, MOX::_screen_seg);
         MOX::_design_icon_lf_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 1, MOX::_screen_seg);
         MOX::_design_icon_rt_arrow_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 2, MOX::_screen_seg);
         MOX::_clear_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 3, MOX::_screen_seg);
         MOX::_cancel_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 4, MOX::_screen_seg);
         MOX::_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 5, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         for (int i = 0; i < 6; ++i) {
             MOX::_design_size_button_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, 6 + i, MOX::_screen_seg);
@@ -490,7 +490,7 @@ namespace DESIGN {
 
         int idx = 12;
         _dark_build_design_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_plus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_minus_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
@@ -509,13 +509,13 @@ namespace DESIGN {
         MOX::_special_filter_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_weapons_cancel_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_weapons_accept_button_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_weapons_top_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_weapons_mid_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_weapons_bot_box_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_weapons_selected_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_weapons_rack_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
 
@@ -525,7 +525,7 @@ namespace DESIGN {
         for (int i = 0; i < 5; ++i) {
             MOX::_weapons_arc_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         }
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int i = 0; i < 5; ++i) {
             MOX::_weapons_rack_text_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         }
@@ -534,7 +534,7 @@ namespace DESIGN {
         for (int i = 0; i < 18; ++i) {
             MOX::_weapons_special_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         }
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_system_repl_scroll_bar_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
         MOX::_system_repl_box_top_seg = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_DESIGN_LBX_005560D8, idx++, MOX::_screen_seg);
@@ -551,11 +551,11 @@ namespace DESIGN {
 
         for (int i = 0; i < 39; ++i) {
             MOX::_special_desc_string[i] = (char*)farload::Far_Reload_Next_Data_(tech_lbx, 1, MOX::_global_data_seg, i, 1, 100);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
         for (int i = 0; i < 40; ++i) {
             MOX::_weapon_notes_string[i] = (char*)farload::Far_Reload_Next_Data_(tech_lbx, 3, MOX::_global_data_seg, i, 1, 100);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
     }
 

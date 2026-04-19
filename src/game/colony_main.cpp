@@ -283,7 +283,7 @@ namespace COLONY {
             }
 
             Draw_Colony_Screen_();
-            MOX::Mox_Sync_Update_();
+            RUSS::Mox_Sync_Update_();
 
             input_val = fields::Get_Input_();
             scanned_val = fields::Scan_Input_();
@@ -330,20 +330,20 @@ namespace COLONY {
 
     void __cdecl Load_Colony_Screen_Seg_() {
         COLBLDG::Load_Build_Anims_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         COLXPORT::Load_Xport_Anims_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Load_Ship_Bitm_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Load_Bldg_Bitm_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Load_Officer_Anim_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         COLDRAW::Load_Road_List_Anims_();
         COLBLDG::Clear_Last_App_Desc_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Load_Galaxy_Map_Anims_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _c_anims[19] = (s_animation_header*)farload::Far_Reload_Next_(_COLPUPS_LBX, 1, MOX::_screen_seg);
         _c_anims[20] = (s_animation_header*)farload::Far_Reload_Next_(_COLPUPS_LBX, 2, MOX::_screen_seg);
@@ -420,7 +420,7 @@ namespace COLONY {
     }
 
     s_animation_header* __cdecl C_Anims_(int16_t index) {
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (index > 0x23) {
             return nullptr;

@@ -120,7 +120,7 @@ namespace AIBUILD {
     }
 
     void __cdecl Compute_Empire_Building_Needs_() {
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         memset(_player_total_strength_vs_ships, 0, sizeof(_player_total_strength_vs_ships));
         memset(_player_ship_sizes, 0, sizeof(_player_ship_sizes));
@@ -161,7 +161,7 @@ namespace AIBUILD {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_player_n_spies, 0, sizeof(_player_n_spies));
 
         if (MOX::_NUM_PLAYERS > 0) {
@@ -173,7 +173,7 @@ namespace AIBUILD {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int16_t player = 0; player < MOX::_NUM_PLAYERS; ++player) {
             Compute_Needs_(player);
         }
@@ -502,7 +502,7 @@ namespace AIBUILD {
                 COLCALC::Colony_Buy_Outright_(chosen_colony);
             }
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
         } while (chosen_colony != -1);
     }

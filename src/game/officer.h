@@ -1,6 +1,8 @@
 #pragma once
 
 namespace OFFICER {
+    inline char* s_OFFICER_LBX_00556980 = reinterpret_cast<char*>(std::uintptr_t{0x00556980});
+
     s_animation_header* __cdecl Load_Officer_Picture_(
         int32_t unused,
         int16_t leader_idx,
@@ -88,11 +90,7 @@ namespace OFFICER {
 
     void __cdecl Get_Officer_Pictures_();
 
-    inline s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, int16_t officer_id, void* screen_seg) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441B00});
-        return fn(player_num, officer_id, screen_seg);
-    }
+    s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, int16_t officer_id, void* buffer, uint8_t load_now);
 
     void __cdecl Load_Officer_Skill_Name_Descriptions_();
 

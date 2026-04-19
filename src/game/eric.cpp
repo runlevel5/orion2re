@@ -44,7 +44,7 @@ namespace ERIC {
             while (fade_level >= 0) {
                 palstore::Darken_Palette_(static_cast<int32_t>(fade_level));
                 _fade_percent = static_cast<uint8_t>(fade_level);
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 fade_level -= 10;
             }
         }
@@ -65,7 +65,7 @@ namespace ERIC {
                 do {
                     palstore::Darken_Palette_(current_fade);
                     _fade_percent = static_cast<uint8_t>(current_fade);
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     current_fade += fade_step;
                 } while (current_fade < 101);
             }

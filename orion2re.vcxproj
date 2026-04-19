@@ -135,6 +135,7 @@
     <ClCompile Include="src\game\newtech.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
     <ClCompile Include="src\game\npcdiplo.cpp" />
+    <ClCompile Include="src\game\ocpolpup.cpp" />
     <ClCompile Include="src\game\officer.cpp" />
     <ClCompile Include="src\game\palette.cpp" />
     <ClCompile Include="src\game\palstore.cpp" />

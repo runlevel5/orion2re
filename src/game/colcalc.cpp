@@ -66,7 +66,7 @@ namespace COLCALC {
         int min_command_points = 30000;
 
         CONTACT::Compute_Contacts_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
             Twiddle_Initial_Homeworld_(&MOX::_colony[i]);
@@ -90,7 +90,7 @@ namespace COLCALC {
 
             for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
                 s_player* player = &MOX::_player[i];
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
 
                 int star_idx = MOX::_planet[player->home_planet_id].star_index;
                 MOX::_star[star_idx].colonize_player = (uint8_t)i;
@@ -136,7 +136,7 @@ namespace COLCALC {
                 }
 
                 while (pool_remaining != 0) {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     int ship_design = max_design_idx;
                     if (pool_remaining - 1 < ship_design) {
                         ship_design = pool_remaining - 1;
@@ -1049,7 +1049,7 @@ namespace COLCALC {
     }
 
     void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx) {
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         for (int32_t i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
             s_colony* colony = &MOX::_colony[i];
@@ -1057,12 +1057,12 @@ namespace COLCALC {
             // Only process colonies owned by the player that are not outposts
             if (colony->owner == (int8_t)player_idx && colony->outpost_flag == 0) {
                 COLCALC::Pre_Import_Computing_(colony);
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
             }
         }
 
         COLCALC::Do_Player_Colony_Post_Production_(player_idx);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
     }
 
     void __cdecl Do_Player_Colony_Post_Production_(int16_t player_idx) {
@@ -1075,7 +1075,7 @@ namespace COLCALC {
             s_colony* colony = &colonies[i];
             if (colony->owner == player_idx && colony->outpost_flag == 0) {
                 Post_Import_Computing_(colony);
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
             }
         }
 

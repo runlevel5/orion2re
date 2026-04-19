@@ -89,38 +89,38 @@ namespace FILEDEF {
         _fwrite(&MOX::_game_type, 1, 1, fp);
         _fwrite(&MOX::_settings, 553, 1, fp); // 0x229 bytes
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&random_seed, 4, 1, fp);
         _fwrite(&MOX::_NUM_COLONIES, 2, 1, fp);
         _fwrite(MOX::_colony, sizeof(s_colony), MAX_COLONIES, fp); // 0x169 per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_planet_count, 2, 1, fp);
         _fwrite(MOX::_planet, sizeof(s_planet_data), MAX_PLANETS, fp); // 0x11 per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_NUM_STARS, 2, 1, fp);
         _fwrite(MOX::_star, sizeof(s_star_data), MAX_STARS, fp); // 0x71 per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(MOX::_leaders, sizeof(s_leader_data), MAX_LEADERS, fp); // 0x3b per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_NUM_PLAYERS, 2, 1, fp);
         _fwrite(MOX::_player, sizeof(s_player), MAX_PLAYERS, fp); // 0xea9 per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_NUM_SHIPS, 2, 1, fp);
         _fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp); // 0x81 per item
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_moveable_box, 28, 5, fp); // 0x1c per item
         _fwrite(&MOX::_moveable_box_order, 2, 5, fp);
         _fwrite(&MOX::_PLAYER_NUM, 2, 1, fp);
         _fwrite(&MOX::_max_map_scale, 2, 1, fp);
         _fwrite(&MOX::_max_zoom_count, 2, 1, fp);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_star_bg_index, 1, 1, fp);
         _fwrite(&MOX::_MAP_MAX_X, 2, 1, fp);
         _fwrite(&MOX::_MAP_MAX_Y, 2, 1, fp);
@@ -129,7 +129,7 @@ namespace FILEDEF {
         _fwrite(&MOX::_NUM_NEBULAS, 1, 1, fp);
         _fwrite(&MOX::_bill_savegame, 12, 1, fp); // 0xc size
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&REPORT::_n_reports, 2, 1, fp);
         _fwrite(&REPORT::_reports, 950, 1, fp); // 0x3b6 size
         _fwrite(&REPORT::_done_player_reports, 1, 1, fp);
@@ -137,7 +137,7 @@ namespace FILEDEF {
         _fwrite(&REPORT::_done_colonize_check, 9, 1, fp);
         _fwrite(&EVENTS::_event_data, 9, 36, fp);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MSG_::_msgs, 18, 100, fp); // 0x12 per item
         _fwrite(&MSG_::_first_msg, 8, 1, fp);
         _fwrite(&MSG_::_max_msgs, 8, 1, fp);
@@ -145,7 +145,7 @@ namespace FILEDEF {
         _fwrite(&REPORT::_displayed_msgs, 1, 1, fp);
         _fwrite(&REPORT::_displayed_gnn, 1, 1, fp);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&diplodef::_COUNCIL_FLAG, 2, 1, fp);
         _fwrite(&diplodef::_next_council_meeting_turn, 2, 1, fp);
         _fwrite(&MOX::_antaran_resource_level, 2, 1, fp);
@@ -155,7 +155,7 @@ namespace FILEDEF {
         _fwrite(&EVENTS::_event_delay_count, 2, 1, fp);
         _fwrite(&MOX::_antarans, 66, 1, fp);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fwrite(&MOX::_cur_map_scale, 2, 1, fp);
         _fwrite(&MOX::_cur_map_x, 2, 1, fp);
         _fwrite(&MOX::_cur_map_y, 2, 1, fp);
@@ -180,7 +180,7 @@ namespace FILEDEF {
 
         _sprintf(filename, "SAVE%d.GAM", save_idx + 1);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
 
         FILE* file = _wfopen(filename, "rb");
@@ -220,30 +220,30 @@ namespace FILEDEF {
         _fread(&saved_settings, 0x229, 1, file);
         _fread(&random_seed, 4, 1, file);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_NUM_COLONIES, 2, 1, file);
         for (int i = 0; i < MAX_COLONIES; ++i) {
             _fread(&MOX::_colony[i], sizeof(s_colony), 1, file);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_planet_count, 2, 1, file);
         for (int i = 0; i < MAX_PLANETS; ++i) {
             _fread(&MOX::_planet[i], sizeof(s_planet_data), 1, file);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_NUM_STARS, 2, 1, file);
         for (int i = 0; i < MAX_STARS; ++i) {
             _fread(&MOX::_star[i], sizeof(s_star_data), 1, file);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int i = 0; i < MAX_LEADERS; ++i) {
             _fread(&MOX::_leaders[i], sizeof(s_leader_data), 1, file);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_NUM_PLAYERS, 2, 1, file);
         for (int i = 0; i < MAX_PLAYERS; ++i) {
             _fread(&MOX::_player[i], sizeof(s_player), 1, file);
@@ -263,7 +263,7 @@ namespace FILEDEF {
         _fread(&MOX::_MAP_MAX_X, 2, 1, file);
         _fread(&MOX::_MAP_MAX_Y, 2, 1, file);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_fleet_icon_button_count, 2, 1, file);
         _fread(MOX::_nebula, 0x14, 1, file);
         _fread(&MOX::_NUM_NEBULAS, 1, 1, file);
@@ -273,7 +273,7 @@ namespace FILEDEF {
         }
 
         _fread(&MOX::_bill_savegame, 0xc, 1, file);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _fread(&REPORT::_n_reports, 2, 1, file);
         _fread(&REPORT::_reports, 0x3b6, 1, file);
@@ -282,7 +282,7 @@ namespace FILEDEF {
         _fread(&REPORT::_done_colonize_check, 9, 1, file);
         _fread(&EVENTS::_event_data, 9, 36, file);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MSG_::_msgs, 0x12, 100, file);
         _fread(&MSG_::_first_msg, 8, 1, file);
         _fread(&MSG_::_max_msgs, 8, 1, file);
@@ -292,7 +292,7 @@ namespace FILEDEF {
         _fread(&diplodef::_COUNCIL_FLAG, 2, 1, file);
         _fread(&diplodef::_next_council_meeting_turn, 2, 1, file);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fread(&MOX::_antaran_resource_level, 2, 1, file);
         _fread(&MOX::_chance_for_antaran_invasion, 2, 1, file);
         _fread(&MOX::_disallow_saves_code, 2, 1, file);
@@ -307,9 +307,9 @@ namespace FILEDEF {
 
         MOX2::Init_Map_Defaults_();
         random::Set_Random_Seed_(random_seed);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         BILL::Cache_Player_Scientist_Anim_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (MOX::_NUM_NEBULAS != 0) {
             MAPGEN::Load_Nebula_Pictures_();

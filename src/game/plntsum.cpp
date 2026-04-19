@@ -705,14 +705,14 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         _screen->pics[2] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 2, MOX::_screen_seg);
         _screen->pics[3] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 3, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _screen->pics[4] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 4, MOX::_screen_seg);
         _screen->pics[5] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 5, MOX::_screen_seg);
         _screen->pics[6] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 6, MOX::_screen_seg);
         _screen->pics[7] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 7, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _screen->pics[8] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 8, MOX::_screen_seg);
 
@@ -723,7 +723,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         _screen->pics[10] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 12, MOX::_screen_seg);
         _screen->pics[12] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 13, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _screen->pics[11] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 14, MOX::_screen_seg);
 
@@ -731,7 +731,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
         for (int i = 0; i < 11; ++i) {
             MOX::_planet_summary_galaxy_star_seg[i] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_PLNTSUM_LBX_00556AC0, 15 + i, MOX::_screen_seg);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
 
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
@@ -912,7 +912,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         *summary_count = 0;
 
         for (int16_t i = 0; i < (int16_t)MOX::_planet_count; ++i) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             bool passes_filter = true;
 
@@ -1678,7 +1678,7 @@ void __cdecl Load_Planet_Pictures_() {
     for (int16_t i = 0; i < 50; ++i) {
         s_animation_header* segment = Load_Planet_Segment_(i);
         _p_rotating_planet[i] = segment;
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
     }
 }
 

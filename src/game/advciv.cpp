@@ -375,15 +375,15 @@ namespace ADVCIV {
             hw_planet.worth = -32766;
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Build_Parsec_Star_Distances_(_parsec);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Choose_Adv_Civ_Planets_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Twiddle_Selected_Adv_Civ_Planets_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Init_Non_Homeworld_Colonies_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         allocate::Pop_Block_(MOX::_screen_seg);
     }

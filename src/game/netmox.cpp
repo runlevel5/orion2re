@@ -425,7 +425,7 @@ namespace NETMOX {
         *ptr++ = MOX::_settings.starting_civilization_level;
         *ptr++ = MOX::_settings.xenons_exist;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         *reinterpret_cast<int32_t*>(ptr) = random::Get_Random_Seed_();
         ptr += sizeof(int32_t);
@@ -465,7 +465,7 @@ namespace NETMOX {
         memcpy(ptr, MOX::_ship, size);
         ptr += size;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         size = 71 * sizeof(s_leader_data);
         memcpy(ptr, MOX::_leaders, size);
@@ -520,7 +520,7 @@ namespace NETMOX {
         memcpy(ptr, MOX::_bill_savegame, 12);
         ptr += 12;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         uint32_t block_size = ptr - block;
         uint8_t* send_ptr;
@@ -543,7 +543,7 @@ namespace NETMOX {
             Write_Modem_File_(file, block, block_size);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Close_Modem_File_(file);
 
         int16_t chunk_count = static_cast<int16_t>((send_size + 0x77ff) / 0x7800);
@@ -563,8 +563,8 @@ namespace NETMOX {
                 do {
                     video::Set_Page_Off_();
                     fields::Invoke_Auto_Function_();
-                    MOX::Mox_Sync_Update_();
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Sync_Update_();
+                    RUSS::Mox_Update_();
                 } while (netcode::Net_Is_Sending_() != 0);
 
                 Mox_Send_Message_(0x7ffe, 3, current_ptr, static_cast<uint16_t>(chunk_size));

@@ -1180,7 +1180,7 @@ namespace LOADSAVE {
      * @address 00511930
      */
     void __cdecl Load_Game_Popup_Pictures_() {
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _game_anims->pictures[0] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 0, MOX::_screen_seg);
         _game_anims->pictures[1] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 1, MOX::_screen_seg);
@@ -1189,7 +1189,7 @@ namespace LOADSAVE {
         _game_anims->pictures[4] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 4, MOX::_screen_seg);
         _game_anims->pictures[5] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 5, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _game_anims->pictures[6] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 6, MOX::_screen_seg);
         _game_anims->pictures[7] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 7, MOX::_screen_seg);
@@ -1197,7 +1197,7 @@ namespace LOADSAVE {
         _game_anims->pictures[9] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 9, MOX::_screen_seg);
         _game_anims->pictures[10] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 10, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _game_anims->pictures[11] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 11, MOX::_screen_seg);
         _game_anims->pictures[12] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 12, MOX::_screen_seg);
@@ -1206,7 +1206,7 @@ namespace LOADSAVE {
         _game_anims->pictures[15] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 15, MOX::_screen_seg);
         _game_anims->pictures[16] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 16, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _game_anims->pictures[17] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 17, MOX::_screen_seg);
         _game_anims->pictures[18] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 18, MOX::_screen_seg);
@@ -1214,7 +1214,7 @@ namespace LOADSAVE {
         _game_anims->pictures[23] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 27, MOX::_screen_seg);
         _game_anims->pictures[24] = (s_animation_header*)farload::Far_Reload_Next_(PTR_s_GAME_LBX_0055ac4c, 28, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         s_animation_header* first_pic = _game_anims->pictures[0];
         int16_t h = animate::Get_Height_(first_pic) + 1;

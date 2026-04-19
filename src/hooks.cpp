@@ -3104,6 +3104,13 @@ namespace hooks {
         { 0x00443b00, &OFFICER::Get_Available_Antaran_Tech_ },
         { 0x004438e0, &OFFICER::Make_Loknar_Message_ },
         { 0x00444d70, &OFFICER::Get_Italian_The_ },
+        { 0x00441b00, &OFFICER::Load_Darkened_Officer_Picture_ },
+        { 0x00460600, &SHIPSTAK::Ship_Has_Special_ },
+        { 0x004608F0, &SHIPSTAK::Remove_Non_Detected_Ships_ },
+        { 0x00460D40, &SHIPSTAK::Sort_Ships_In_Stack_ },
+        { 0x0052B7E0, &palstore::Store_Palette_Block_ },
+        { 0x0052b770, &palstore::Store_Single_Palette_Color_ },
+        { 0x00408150, &OCPOLPUP::Occupation_Policy_Popup_ },
     };
 
     void Install_Hooks()

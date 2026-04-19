@@ -124,11 +124,11 @@ namespace MAINMENU {
     void __cdecl Reload_Main_Menu_Screen_() {
         int16_t entry_index = 3;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _main_menu_background = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, 2, MOX::_screen_seg);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         for (int i = 0; i < 6; ++i) {
             _mainmenu->fields[i].field0_0x0 = (s_animation_header*)farload::Far_Reload_Next_(s_MAINMENU_LBX_0055a630, entry_index, MOX::_screen_seg);
@@ -138,7 +138,7 @@ namespace MAINMENU {
             _mainmenu->fields[i].field = -1000;
 
             entry_index += 3;
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
     }
 
@@ -389,17 +389,17 @@ namespace MAINMENU {
 
         video::Set_Refresh_Full_();
         fields::Clear_Fields_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _mainmenu_first_seg = (s_animation_header*)farload::Far_Reload_(s_MAINMENU_LBX_0055a630, 1, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         MAINMENU::Load_Credits_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_game_type = 0;
         _mainmenu = (s_main_menu*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 210); // 0xd2
         __gametype = allocate::Allocate_Next_Block_(MOX::_global_data_seg, 40); // 0x28
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         // Initialize main menu structure fields to -1
         memset(_mainmenu, 0, sizeof(s_main_menu));
@@ -407,7 +407,7 @@ namespace MAINMENU {
         LOADSAVE::_game_popup_fields = (s_game_popup_fields*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 632); // 0x278
         MOX::_save_game_dates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
         MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (MOX2::_pan_main_menu_panel != 0) {
             Reload_Main_Menu_Screen_();

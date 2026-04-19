@@ -12,7 +12,7 @@ namespace AIMOVE {
             s_player& plr = MOX::_player[i];
 
             if (plr.objectives != 100 && plr.ship_speed != 0) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
 
                 if (plr.traits[TRAIT_TRANS_DIMENSIONAL] != 0 || EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
                     Move_AI_(i);
@@ -792,7 +792,7 @@ namespace AIMOVE {
 
             int32_t best_turns = (local_5d7 == 1) ? 2 : 255;
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             for (int16_t i = 0; i < num_stage_points; ++i) {
                 uint32_t strength = stage_points[i].strength;
@@ -1160,7 +1160,7 @@ namespace AIMOVE {
                 } else if (ship_type == 2) {
                     int16_t loc = ship->location;
                     if (loc < 72) {
-                        MOX::Mox_Update_();
+                        RUSS::Mox_Update_();
                         if (MOX::_settings.game_difficulty > 0) {
                             if (((MOX::_star[loc].has_colony >> _i_ai) & 1) != 0) {
                                 if (MOX::_settings.game_difficulty >= 2 || _p_ai->objectives == 1) {
@@ -1203,7 +1203,7 @@ namespace AIMOVE {
 
             s_ship_data *ship = &MOX::_ship[ship_idx];
             int16_t loc = ship->location;
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if (loc < 72) {
                 uint8_t need_to_move = 1;

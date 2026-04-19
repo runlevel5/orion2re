@@ -125,7 +125,7 @@ namespace COLCALC {
         uint32_t* p_pop = (uint32_t*)colony->pop;
         uint32_t* p_pop_end = &p_pop[colony->n_pops];
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         // Convert all initial population to Scientists
         for (uint32_t* p = p_pop; p < p_pop_end; ++p) {

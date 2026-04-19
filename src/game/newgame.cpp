@@ -119,7 +119,7 @@ void __cdecl Globals_To_Temps_() {
 
 void __cdecl Reload_Newgame_Screen_() {
     _background_seg = farload::Far_Reload_(s_RACEOPT_LBX, 0, MOX::_screen_seg);
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     int16_t index = 0;
     for (int i = 0; i < 3; ++i) {
@@ -128,31 +128,31 @@ void __cdecl Reload_Newgame_Screen_() {
     }
 
     index++;
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     for (int i = 0; i < 5; ++i) {
         _difficulty_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
     index += 5;
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     for (int i = 0; i < 4; ++i) {
         _gal_size_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
     index += 4;
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     for (int i = 0; i < 7; ++i) {
         _num_players_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
     index += 7;
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     for (int i = 0; i < 3; ++i) {
         _tech_level_anims[i] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, index + i, MOX::_screen_seg);
     }
     index += 3;
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
 
     _anims[1] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, (int32_t)index, MOX::_screen_seg);
     _anims[0] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, (int32_t)index + 1, MOX::_screen_seg);
@@ -162,7 +162,7 @@ void __cdecl Reload_Newgame_Screen_() {
     _anims[6] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, (int32_t)index + 5, MOX::_screen_seg);
     _anims[5] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_NEWGAME_LBX, (int32_t)index + 6, MOX::_screen_seg);
 
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
     Load_New_Game_Strings_();
 }
 

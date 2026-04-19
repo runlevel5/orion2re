@@ -902,17 +902,5 @@ namespace MOX {
     inline s_animation_header* (&_fltscrn_flashing_monster_ship_icon)[8] =
         *reinterpret_cast<s_animation_header*(*)[8]>(std::uintptr_t{0x005A2C00});
 
-    // Funcs
-    inline void __cdecl Mox_Sync_Update_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x00483C80)();
-    }
-
-    inline void Mox_Update_() {
-        using Fn = void(*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004D7820 });
-        fn();
-    }
-
     void __cdecl Apply_Save_Settings(s_settings* s);
 }

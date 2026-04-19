@@ -328,7 +328,7 @@ namespace MULTPLAY {
 
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
         palette::Clear_Palette_Changes_(0, 0xFF);
-        MOX::Mox_Sync_Update_();
+        RUSS::Mox_Sync_Update_();
         ERIC::Fast_Fade_In_();
 
         video::Set_Page_Back_();
@@ -370,7 +370,7 @@ namespace MULTPLAY {
                 if (MOX::_mp_screen->flag_serial_type != 0) {
                     video::Set_Page_Off_();
                     Draw_MP_Setup_Screen_();
-                    MOX::Mox_Sync_Update_();
+                    RUSS::Mox_Sync_Update_();
                     MOX::_settings.multi_player_game_type = 3;
                     NullModem_Setup_Screen_();
                     Load_MP_Setup_Pictures_();
@@ -382,7 +382,7 @@ namespace MULTPLAY {
                 else if (MOX::_mp_screen->flag_modem_disabled != 0) {
                     video::Set_Page_Off_();
                     Draw_MP_Setup_Screen_();
-                    MOX::Mox_Sync_Update_();
+                    RUSS::Mox_Sync_Update_();
                     MOX::_settings.multi_player_game_type = 2;
                     Modem_Setup_Screen_();
                     Load_MP_Setup_Pictures_();
@@ -446,7 +446,7 @@ namespace MULTPLAY {
                 Add_MP_Setup_Screen_Fields_();
                 video::Set_Page_Off_();
                 Draw_MP_Setup_Screen_();
-                MOX::Mox_Sync_Update_();
+                RUSS::Mox_Sync_Update_();
             }
 
             timer::Release_Time_(2);

@@ -162,7 +162,7 @@ namespace AIDATA {
         _ship_refit_desirabilities = (int32_t(*)[500])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2000);
 
         memset(_ai_player_info, 0, sizeof(*_ai_player_info));
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_ship_strengths, 0, sizeof(*_ship_strengths));
         memset(_ship_strengths_in_nebula, 0, sizeof(*_ship_strengths_in_nebula));
         memset(_ship_bomb_strengths, 0, sizeof(*_ship_bomb_strengths));
@@ -201,7 +201,7 @@ namespace AIDATA {
                                 (*_ai_player_info)[p].total_ship_strength += str;
                                 (*_ship_strengths_in_nebula)[i][p] = AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
                                 AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (int16_t*)&(*_ship_bomb_strengths)[i][0]);
-                                MOX::Mox_Update_();
+                                RUSS::Mox_Update_();
                                 if (owner < 8 && turn_idx < 10) {
                                     int16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
                                     (*_enroute_ship_strengths)[star_idx][owner][p][turn_idx] += cur_str;
@@ -236,7 +236,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int s = 0; s < MOX::_NUM_STARS; ++s) {
             for (int p_o = 0; p_o < MOX::_NUM_PLAYERS; ++p_o) {
                 for (int t = 0; t < 9; ++t) {
@@ -253,7 +253,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         int32_t range_sq[8], ext_range_sq[8];
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
             int32_t r = MOX::_player[p].ship_range;
@@ -287,7 +287,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_n_turns_from_to, -1, sizeof(*_n_turns_from_to));
         memset(_n_turns_from_to_intermediate, -1, sizeof(*_n_turns_from_to_intermediate));
         for (int s1 = 0; s1 < MOX::_NUM_STARS; ++s1) {
@@ -296,14 +296,14 @@ namespace AIDATA {
                     for (int s2 = 0; s2 < MOX::_NUM_STARS; ++s2) {
                         if (((*_star_in_extended_range_of_player)[s2] >> p) & 1) {
                             (*_n_turns_from_to)[s1][s2][p] = (int8_t)SHIPMOVE::Player_N_Turns_From_Star_To_Star_((int16_t)p, (int16_t)s1, (int16_t)s2);
-                            MOX::Mox_Update_();
+                            RUSS::Mox_Update_();
                         }
                     }
                 }
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_ship_n_turns_to, -1, sizeof(*_ship_n_turns_to));
         memset(_ship_n_turns_to_intermediate, -1, sizeof(*_ship_n_turns_to_intermediate));
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
@@ -319,20 +319,20 @@ namespace AIDATA {
                         if (((*_star_in_extended_range_of_player)[s] & mask) && s != dest_star) {
                             SHIPMOVE::Ships_Try_To_Move_To_(move_info, (int16_t)s, &out_info);
                             (*_ship_n_turns_to)[i][s] = out_info.turns_left;
-                            MOX::Mox_Update_();
+                            RUSS::Mox_Update_();
                         }
                     }
                 }
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_ai_colony_info, 0, sizeof(*_ai_colony_info));
         for (int c = 0; c < MOX::_NUM_COLONIES; ++c) {
             s_colony& col = MOX::_colony[c];
             if (col.owner != -1) {
                 s_ai_colony_info& ai_col = (*_ai_colony_info)[c];
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 for (int p_idx = 0; p_idx < col.n_pops; ++p_idx) {
                     if (col.pop[p_idx] & 0x400) {
                         ai_col.n_flagged_pops++;
@@ -354,7 +354,7 @@ namespace AIDATA {
             if (col.owner != -1) {
                 int owner = col.owner;
                 int star_idx = MOX::_planet[col.planet].star_index;
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 for (int p = MOX::_NUM_PLAYERS - 1; p >= 0; --p) {
                     if (p != owner && (*_enroute_ships)[star_idx][p][9]) {
                         (*_ai_colony_info)[c].threatened = 1;
@@ -364,7 +364,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_ai_star_info, 0, sizeof(*_ai_star_info));
         for (int s = 0; s < MOX::_NUM_STARS; ++s) {
             s_ai_star_info& ai_star = (*_ai_star_info)[s];
@@ -387,9 +387,9 @@ namespace AIDATA {
 
         Compute_Star_Player_Range_Info_();
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int p1 = 0; p1 < MOX::_NUM_PLAYERS; ++p1) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             for (int s = 0; s < MOX::_NUM_STARS; ++s) {
                 if ((MOX::_star[s].has_colony >> p1) & 1) {
                     (*_ai_player_info)[p1].n_stars_with_colony++;
@@ -420,7 +420,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int c = 0; c < MOX::_NUM_COLONIES; ++c) {
             s_colony& col = MOX::_colony[c];
             if (col.owner != -1) {
@@ -431,7 +431,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         int16_t max_colonies = 0;
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
             if ((*_ai_player_info)[p].colony_count > max_colonies) {
@@ -442,13 +442,13 @@ namespace AIDATA {
             (*_ai_player_info)[p].colony_deficit = max_colonies - (*_ai_player_info)[p].colony_count;
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Compute_Base_Planet_Values_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Compute_Contextual_Planet_Values_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         aitech::Compute_AI_Tech_Info_(_aitech);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _n_all_ships = 0;
         memset(_airefit, 0, sizeof(*_airefit));
@@ -459,7 +459,7 @@ namespace AIDATA {
             if (ship->d.ship_type == 0 && ship->owner < MOX::_NUM_PLAYERS && ship->status < 3 && ship->mission != 4 /* SHIP_MISSION_SCRAP */) {
                 (*_all_ships)[_n_all_ships++] = (int16_t)i;
                 if (ship->status == 0) {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     int32_t d = Refit_Desirability_(ship);
                     (*_ship_refit_desirabilities)[i] = d;
                     s_ai_refit_player& refit_p = (*_airefit)[ship->owner];
@@ -471,11 +471,11 @@ namespace AIDATA {
         }
 
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             _qsort((*_airefit)[p].entry, (*_airefit)[p].n_entries, 6, airefit_cmp_);
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_i_all_combat_ships, -1, sizeof(*_i_all_combat_ships));
         
         _qsort(_all_ships, _n_all_ships, 2, sort_ships_);
@@ -495,7 +495,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         memset(_possible_ship_strengths, 0, sizeof(*_possible_ship_strengths));
 
@@ -506,7 +506,7 @@ namespace AIDATA {
             int owner = MOX::_ship[i].owner;
             int initial_delay = 0;
             
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if (MOX::_ship[i].status == 10) { // SHIP_STATUS_ANTARAN
                 initial_delay = 0;
@@ -541,7 +541,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_planet_stage_weights, 0, sizeof(*_planet_stage_weights));
         for (int pl = 0; pl < MOX::_planet_count; ++pl) {
             if (MOX::_planet[pl].colony_index != -1) {
@@ -550,7 +550,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         memset(_star_stage_weights, 0, sizeof(*_star_stage_weights));
         memset(_base_star_stage_weights, 0, sizeof(*_base_star_stage_weights));
         int16_t best_planet_at_star[72][8];
@@ -580,7 +580,7 @@ namespace AIDATA {
 
         for (int s = 0; s < MOX::_NUM_STARS; ++s) {
             if (MOX::_star[s].has_colony) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 for (int pl_i = 0; pl_i < 5; ++pl_i) {
                     int pl_idx = MOX::_star[s].planet_index[pl_i];
                     if (pl_idx != -1 && MOX::_planet[pl_idx].colony_index != -1) {
@@ -603,7 +603,7 @@ namespace AIDATA {
                                 if ((*_ai_player_info)[p_v].n_stars_with_colony * 5 < (*_ai_player_info)[p_o].n_stars_with_colony) {
                                     max_eta = ((*_ai_player_info)[p_v].n_stars_with_colony <= 1) ? 1 : 4;
                                 }
-                                MOX::Mox_Update_();
+                                RUSS::Mox_Update_();
                                 for (int other_s = 0; other_s < MOX::_NUM_STARS; ++other_s) {
                                     int32_t str = (*_possible_ship_strengths)[other_s][p_v][p_o][0];
                                     if (str != 0) {
@@ -618,7 +618,7 @@ namespace AIDATA {
 
                         for (int pl = 0; pl < MOX::_planet_count; ++pl) {
                             if (pl != best_planet_at_star[s][p_o] && Player_N_Turns_From_Star_To_Star_With_Intermediate_((int16_t)p_o, (int16_t)s, (int16_t)MOX::_planet[pl].star_index, nullptr, false) < 3) {
-                                MOX::Mox_Update_();
+                                RUSS::Mox_Update_();
                                 value_sum += (*_planet_stage_weights)[pl][p_o];
                             }
                         }
@@ -630,7 +630,7 @@ namespace AIDATA {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
             AISTAGE::Compute_Defensive_Stage_Points_((int16_t)p);
         }
@@ -845,7 +845,7 @@ namespace AIDATA {
                 if ((system_visibility_bits >> (player_idx & 0x1F)) & 1) {
                     int16_t col_idx = planet->colony_index;
 
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
 
                     uint16_t value;
                     if (col_idx == -1) {
@@ -888,7 +888,7 @@ namespace AIDATA {
                 s_star_data* star = &MOX::_star[(uint8_t)planet->star_index];
 
                 // Refresh UI/input during processing
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
 
                 int16_t& contextual_val = (*AIDATA::_contextual_planet_values)[p * 360 + i];
                 contextual_val = base_val;

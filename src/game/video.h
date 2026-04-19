@@ -1,5 +1,8 @@
 #pragma once
 
+struct IDirectDrawPalette;
+struct tagPALETTEENTRY;
+
 namespace video {
 	// Variables
 	inline uint32_t*& _video_memory = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x005792F0 });
@@ -39,6 +42,12 @@ namespace video {
 
 	inline s_glass_color (&_glass_colors)[16] =
 		*reinterpret_cast<s_glass_color(*)[16]>(std::uintptr_t{ 0x00579858 });
+
+	inline IDirectDrawPalette*& g_palette =
+		*reinterpret_cast<IDirectDrawPalette**>(std::uintptr_t{ 0x00578E64 });
+
+	inline tagPALETTEENTRY (&g_palette_entries)[256] =
+		*reinterpret_cast<tagPALETTEENTRY (*)[256]>(std::uintptr_t{ 0x00578EE8 });
 
 	// Address 0x579350 is the base of the current palette status array
 	inline s_palette_entry (&_current_palette)[256] =

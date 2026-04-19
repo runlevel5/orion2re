@@ -119,7 +119,7 @@ void __cdecl Reload_Race_Selection_Screen_() {
 
     for (int i = 0; i < 13; ++i) {
         _race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, i, 1, 0x1F);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
     }
 
     FILE* file = _wfopen(s_lastrace_rac, s_rb_0055117c);
@@ -130,18 +130,18 @@ void __cdecl Reload_Race_Selection_Screen_() {
         // Overwrite template with saved race data
         _fread(_race_specials[13], 31, 1, file);
         Convert_Custom_Race_Flags_(_race_specials[13]);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _fread(&dummy_byte, 1, 1, file);
         _fread(_last_race_name, 15, 1, file);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _fclose(file);
     }
 
     for (int i = 0; i < 14; ++i) {
         _race_button[i] = (s_animation_header*)farload::Far_Reload_Next_(s_RACESEL_LBX, i + 1, MOX::_screen_seg);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
     }
 
     _last_race_seg = (s_animation_header*)farload::Far_Reload_Next_(s_patch13_lbx, 1, MOX::_screen_seg);
@@ -190,7 +190,7 @@ short Race_Selection_Screen_(s_player* plr) {
     RACESEL::Set_Race_Select_Help_();
     video::Set_Page_Back_();
     auto raceopt_anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
     animate::Draw_(0, 0, raceopt_anim);
     video::Copy_Back_To_Off_();
     
@@ -200,7 +200,7 @@ short Race_Selection_Screen_(s_player* plr) {
         hotkey_field = -1000;
     }
     
-    MOX::Mox_Update_();
+    RUSS::Mox_Update_();
     for (int i = 0; i < 14; ++i) {
         field_ids[i] = fields::Add_Radio_Button_Field_(
             (i / 7) * 126 + 351, (i % 7) * 48 + 90, s_empty_00551100,

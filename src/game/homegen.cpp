@@ -137,13 +137,13 @@ namespace HOMEGEN {
 
     void __cdecl Build_Min_Star_Distances_(int32_t min_distance) {
         for (int16_t i = 0; i < (int16_t)MOX::_NUM_STARS; ++i) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             s_good_star* current_star = &_good_stars[i];
             current_star->star_count = 0;
 
             for (int16_t j = 0; j < (int16_t)MOX::_NUM_STARS; ++j) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
 
                 int32_t dist = Dist_Between_Stars_(i, j);
 
@@ -170,7 +170,7 @@ namespace HOMEGEN {
 
         if (MOX::_NUM_STARS > 1) {
             for (uint16_t current_star = 1; current_star < MOX::_NUM_STARS; ++current_star) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
 
                 CandidateList* list = &candidates[current_star]; // Note: Original code uses index up to NUM_STARS
                 list->count = 1;
@@ -188,7 +188,7 @@ namespace HOMEGEN {
                 }
 
                 for (uint16_t star_j = 1; star_j < MOX::_NUM_STARS; ++star_j) {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     if (star_j == current_star) continue;
 
                     uint8_t* field = (uint8_t*)&_good_stars[current_star];
@@ -200,7 +200,7 @@ namespace HOMEGEN {
                             uint8_t* field_k = (uint8_t*)&_good_stars[existing_star];
                             uint16_t bit = struct_::Test_Bit_Field_(field_k, star_j);
 
-                            MOX::Mox_Update_();
+                            RUSS::Mox_Update_();
                             if (existing_star != star_j && (bit == 0 || dist < min_dist)) {
                                 valid = false;
                                 break;
@@ -223,7 +223,7 @@ namespace HOMEGEN {
         int16_t selected_index = -1;
         int32_t pick_count = 1;
         for (uint16_t si = 0; si < 72; ++si) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             if (candidates[si].count >= MOX::_NUM_PLAYERS) {
                 if (random::Random_(pick_count) == 1) {
                     selected_index = (int16_t)si;
@@ -307,7 +307,7 @@ namespace HOMEGEN {
             _nearest_food_worlds[i] = -1;
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         video::Set_Refresh_Full_();
 
         int16_t base_players = (int16_t)MOX::_NUM_PLAYERS;
@@ -317,11 +317,11 @@ namespace HOMEGEN {
         }
         int16_t max_retries = adj_players + 4;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Set_Up_Home_Gen_Msg_();
 
         while (true) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                 MOX::_star[i].owner = -1;
             }
@@ -342,7 +342,7 @@ namespace HOMEGEN {
                 RUSS::Mox_Sync_Update_();
             }
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             Build_Min_Star_Distances_(min_dist_sq);
 
             if (MAPGEN::_fill_msg_ctr < (uint16_t)_HOME_WORLD_GEN_MAX_CTR) {
@@ -357,7 +357,7 @@ namespace HOMEGEN {
                 break;
             }
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             adj_players++;
             if (adj_players > max_retries) {
                 return 0;

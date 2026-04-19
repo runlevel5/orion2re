@@ -1,6 +1,22 @@
 #include "pch.h"
 
 namespace palstore {
+    void __cdecl Store_Palette_Block_(int first_entry, int entry_count) {
+        if (first_entry < first_entry + entry_count) {
+            int palette_index = first_entry;
+            int remaining = entry_count;
+
+            do {
+                video::g_palette_entries[palette_index].peRed = video::_current_palette[palette_index].r << 2;
+                video::g_palette_entries[palette_index].peGreen = video::_current_palette[palette_index].g << 2;
+                video::g_palette_entries[palette_index].peBlue = video::_current_palette[palette_index].b << 2;
+                ++palette_index;
+            } while (--remaining != 0);
+        }
+
+        video::g_palette->SetEntries(0, first_entry, entry_count, &video::g_palette_entries[first_entry]);
+    }
+
     void __cdecl Darken_Palette_(int32_t darken_percent) {
         tagPALETTEENTRY entries[256];
         int32_t multiplier = 100 - darken_percent;
@@ -11,7 +27,17 @@ namespace palstore {
             entries[i].peBlue  = static_cast<uint8_t>(((video::_current_palette[i].b * multiplier) / 100) << 2);
         }
 
-        g_palette->SetEntries(0, 1, 255, &entries[1]);
+        video::g_palette->SetEntries(0, 1, 255, &entries[1]);
+    }
+
+    void __cdecl Store_Single_Palette_Color_(int32_t palette_index, uint8_t red, uint8_t green, uint8_t blue) {
+        video::g_palette_entries[palette_index].peRed = red << 2;
+        video::g_palette_entries[palette_index].peGreen = green << 2;
+        video::g_palette_entries[palette_index].peBlue = blue * 4;
+        video::g_palette->SetEntries(0, palette_index, 1, &video::g_palette_entries[palette_index]);
+        video::_current_palette[palette_index].r = red;
+        video::_current_palette[palette_index].g = green;
+        video::_current_palette[palette_index].b = blue;
     }
 
     int16_t Slow_Fade_In_() {
@@ -34,7 +60,7 @@ namespace palstore {
             }
 
             Darken_Palette_(static_cast<int32_t>(intensity));
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if (intensity-- == 0) {
                 break;

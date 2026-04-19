@@ -75,7 +75,7 @@ namespace SYS {
         bool has_planets = false;
         palette::Set_Palette_Changes_(0, 0xff);
         reduce::Clear_Reduced_Palette_Groups_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_sys_disp = (s_sys_disp*)allocate::Allocate_Next_Block_((void*)SYS::_sys_data_buffer, 0x46);
 
@@ -90,7 +90,7 @@ namespace SYS {
         MOX::_sun_seg[spectral_class] = sun_anim;
         _system_display_sun_seg = sun_anim;
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _draw_sun_before_planet = 1;
 
         for (int16_t orbit_idx = 0; orbit_idx < 5; ++orbit_idx) {
@@ -135,7 +135,7 @@ namespace SYS {
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (has_planets) {
             reduce::Compress_Reduced_Palette_Groups_(0xc0, 0x40);
@@ -156,7 +156,7 @@ namespace SYS {
 
         allocate::Get_Remaining_Block_Space_((void*)_sys_data_buffer);
         MOX::_mainscr_palette = 0;
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _qsort(MOX::_sys_disp, 5, 0xe, qsort_sys_disp_);
 

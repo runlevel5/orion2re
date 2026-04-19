@@ -28,7 +28,7 @@ namespace BILL {
             current_chunk_size = fread(read_buffer, 1, 4096, src_fp);
             total_bytes_read += (int32_t)current_chunk_size;
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             size_t written = fwrite(read_buffer, 1, current_chunk_size, dst_fp);
             if (written != current_chunk_size) {

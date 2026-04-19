@@ -41,7 +41,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
     for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
         MAPGEN::_star_count = i;
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (MAPGEN::_num_maps_to_generate == 1) {
             fonts::Set_Font_Style_(4, &font_colors_main);
@@ -114,7 +114,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 int16_t fallback_retries = 0;
                 bool fallback_found = false;
                 do {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     int16_t fx = (int16_t)random::Random_(0x189) + 0x14;
                     int16_t fy = (int16_t)random::Random_(0x155) + 0x14;
                     MOX::_star[i].x = HAROLD::Get_Up_Scaled_Value_(fx);
@@ -791,7 +791,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         int16_t* coord_buffer = (int16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 40000);
         uint16_t* weight_buffer = (uint16_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 20000);
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         for (int i = 0; i < 12; ++i) {
             s_animation_header* anim = (s_animation_header*)farload::Far_Reload_(s_starbg_lbx, i * 4 + 6, MOX::_nebula_screen_seg);
@@ -804,14 +804,14 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 int16_t type;
                 int16_t inner_attempts = 0;
                 do {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
                     type = (int16_t)random::Random_(12) - 1;
                     inner_attempts++;
                     // Try to pick a type, loop until something allows it or too many attempts
                     if (inner_attempts > 0xF0) break;
                 } while (false); // Simplification of disassembly logic
                 nebula_types[i] = type;
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
             }
         }
 
@@ -819,7 +819,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         int16_t scaled_y_limit = HAROLD::Get_Scaled_Value_(0x82);
 
         while (true) {
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             attempts++;
             if (attempts > 100) {
                 MOX::_NUM_NEBULAS = 1;
@@ -830,7 +830,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             for (int i = 0; i < 30000; ++i) point_buffer[i] = 0;
             for (int i = 0; i < 20000; ++i) coord_buffer[i] = 0;
             for (int i = 0; i < 10000; ++i) weight_buffer[i] = 0;
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             int16_t start_x = (int16_t)random::Random_(0x1FA - widths[0]);
             int16_t start_y = (int16_t)random::Random_(400 - heights[0]);
@@ -847,7 +847,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             int32_t dist_sq_threshold = dx * dx + dy * dy;
 
             Build_Min_Point_Distances_(start_x, start_y, 10, 10, 0x1FA - scaled_x_limit, 400 - scaled_y_limit, dist_sq_threshold, point_buffer, &valid_points_count, 30000);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
 
             if (valid_points_count < MOX::_NUM_NEBULAS) {
                 min_dist_param -= 10;
@@ -882,7 +882,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                 }
             }
 
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             if (MOX::_NUM_NEBULAS <= placed_count) {
                 for (int i = 0; i < MOX::_NUM_NEBULAS; ++i) {
                     int16_t choice = RUSS::Get_Weighted_Choice_Short_(weight_buffer, placed_count);
@@ -899,7 +899,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         allocate::Pop_Block_(MOX::_screen_seg);
         Load_Nebula_Pictures_();
     }
@@ -963,9 +963,9 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             int16_t entry_counter = 0;
             for (int16_t type_val = 0; type_val < 12; ++type_val) {
                 // Update system twice per inner loop set
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 for (int16_t frame_idx = 0; frame_idx < 4; ++frame_idx) {
-                    MOX::Mox_Update_();
+                    RUSS::Mox_Update_();
 
                     // If the current nebula matches this nebula type index (0-11)
                     if (MOX::_nebula[neb_idx].type == (int8_t)type_val) {
@@ -1239,46 +1239,46 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         p = MISC::Font_Colors2_(4, 'w', '|');
         local_colors2 = *p;
         memset(_tests_failed, 0, 8);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _make_food_planet = 0;
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         start_time = _clock();
         _num_maps_to_generate = 1;
         _n_maps_generated++;
         MOX::_g_galaxy_size = gal_size;
-        MOX::Mox_Update_();
-        MOX::Mox_Update_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
+        RUSS::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_star_width = 37;
         MOX::_star_height = 37;
         _is_companion_star = 0;
 
         memset(MOX::_planet, 0, 0x5fa * 4);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
 
         _name_seg = farload::Far_Reload_Data_("starname.lbx", 1, MOX::_screen_seg, 0, 0x33D, 0xF);
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         _name_index = reinterpret_cast<uint16_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0xCF4));
-        MOX::Mox_Update_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
+        RUSS::Mox_Update_();
 
         if (MOX::_n_stats_to_generate != 0) {
             _num_maps_to_generate = MOX::_n_stats_to_generate;
             start_time = _clock();
         }
 
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
         Randomize_Star_Names_(_name_index);
 
         if (_num_maps_to_generate == 1) {
             if (ERIC::Get_Fade_Percent_() != 0) ERIC::Fast_Fade_In_();
             video::Set_Page_Back_();
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));
             animate::Draw_(0, 0, raceopt_ptr);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             video::Copy_Back_To_Off_();
 
             char* msg = (char*)HAROLD::H_Message_(0xF2);
@@ -1288,11 +1288,11 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             _fill_msg_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bsize);
             bitmap::Create_Blank_Bitmap_(325, 30, _fill_msg_bitmap);
             _fill_msg_ctr = 0;
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
             fonts::Set_Font_Style_Outline_Heavy_(4, &local_colors1);
             fonts::Set_Outline_Color_(2, 1);
             fonts::Print_To_Bitmap_(0, 0, _fill_msg, _fill_msg_bitmap);
-            MOX::Mox_Update_();
+            RUSS::Mox_Update_();
         }
 
         if (_first_time_map_is_generated != 0) {
@@ -1324,8 +1324,8 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
         }
 
         Init_Main_Screen_(gal_size);
-        MOX::Mox_Update_();
-        MOX::Mox_Update_();
+        RUSS::Mox_Update_();
+        RUSS::Mox_Update_();
 
         MOX::_planet_count = 0;
         Generate_Number_Of_Nebulas_(gal_size, nebula_freq);
@@ -1367,7 +1367,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
 
             for (_star_count = 0; _star_count < MOX::_NUM_STARS; ++_star_count) {
-                MOX::Mox_Update_();
+                RUSS::Mox_Update_();
                 for (int i = 0; i < 8; ++i) MOX::_star[_star_count].relocate_ship_to[i] = -1;
                 for (int i = 0; i < 8; ++i) MOX::_star[_star_count].officer_index[i] = -1;
                 MOX::_star[_star_count].wormhole_star_id = -1;
@@ -1393,7 +1393,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
                     int16_t n_sat = Generate_Number_Of_Satellites_(_star_count);
                     planets_per_star[_star_count] = (char)n_sat;
                     for (int i = 0; i < n_sat; ++i) {
-                        MOX::Mox_Update_();
+                        RUSS::Mox_Update_();
                         Planet_Generation_(_star_count);
                     }
                     if (MOX::_n_stats_to_generate != 0) {
