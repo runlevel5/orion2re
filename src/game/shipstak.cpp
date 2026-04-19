@@ -2,6 +2,14 @@
 #include <cstring>
 
 namespace SHIPSTAK {
+    void __cdecl Delete_Ship_Node_(int16_t stack_idx, int16_t prev_node_idx, int16_t node_idx) {
+        if (prev_node_idx == -1 /* 0xffff */) {
+            MOX::_ship_stack_start[stack_idx] = MOX::_ship_node[node_idx].next_node;
+        } else {
+            MOX::_ship_node[prev_node_idx].next_node = MOX::_ship_node[node_idx].next_node;
+        }
+    }
+
     int16_t __cdecl Ship_Has_Special_(int16_t ship_idx, int16_t special_idx) {
         int16_t has_special = 0;
 
@@ -266,5 +274,60 @@ namespace SHIPSTAK {
                 }
             }
         }
+    }
+
+    void __cdecl Build_Ship_Type_Array_(int16_t node_idx, int16_t* stack_array, int16_t* count_ptr) {
+        *count_ptr = 0;
+        int16_t current_node_idx = node_idx;
+
+        do {
+            const auto& node = MOX::_ship_node[current_node_idx];
+            int16_t ship_idx = node.ship_idx;
+
+            if (ship_idx >= 0) {
+                stack_array[*count_ptr * 2] = ship_idx;
+                const auto& ship = MOX::_ship[ship_idx];
+
+                switch (ship.d.ship_type) {
+                case 0:
+                    stack_array[*count_ptr * 2 + 1] = (int16_t)ship.d.size * 50 + (int16_t)ship.d.picture_num;
+                    break;
+                case 1:
+                    stack_array[*count_ptr * 2 + 1] = -1;
+                    break;
+                case 2:
+                    stack_array[*count_ptr * 2 + 1] = -2;
+                    break;
+                case 4:
+                    stack_array[*count_ptr * 2 + 1] = -3;
+                    break;
+                default:
+                    // case 3 and values > 4 skip setting the second array element
+                    break;
+                }
+                (*count_ptr)++;
+            }
+
+            current_node_idx = node.next_node;
+        } while (current_node_idx > 0 && current_node_idx < 500);
+    }
+
+    int __cdecl qsort_ships_by_type_(const void* param_1, const void* param_2) {
+        const int16_t* item1 = static_cast<const int16_t*>(param_1);
+        const int16_t* item2 = static_cast<const int16_t*>(param_2);
+
+        // Access the signed 16-bit word at offset 0x2 (index 1 of int16_t array)
+        return (int)item2[1] - (int)item1[1];
+    }
+
+    void __cdecl Delete_Ship_Stack_(int16_t index) {
+        strings::Delete_Structure_(
+            static_cast<int32_t>(index),
+            MOX::_ship_stack_start,
+            2,
+            static_cast<int32_t>(MOX::_ship_stack_count)
+        );
+
+        MOX::_ship_stack_count--;
     }
 }

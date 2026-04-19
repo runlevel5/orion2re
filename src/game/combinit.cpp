@@ -1403,6 +1403,28 @@ int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx) {
     return result;
 }
 
+void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
+    int16_t planet_idx = MOX::_colony[colony_idx].planet;
+    s_planet_data* planet = &MOX::_planet[planet_idx];
+
+    int8_t climate = planet->climate;
+    int8_t size = planet->size;
+
+    s_animation_header* palette_anim = (s_animation_header*)Buffer_Reload_(s_cmbtplnt_lbx, climate * 6 + 5, MOX::_global_cache_seg);
+    animate::Draw_Palette_(palette_anim);
+    RUSS::Mox_Update_();
+
+    MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx, size + (climate * 6), MOX::_screen_seg);
+    RUSS::Mox_Update_();
+
+    if (planet->size != 0) {
+        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(s_cmbtplnt_lbx, climate * 6, MOX::_screen_seg);
+        RUSS::Mox_Update_();
+    } else {
+        MOX::_combat_planet_seg2 = MOX::_combat_planet_seg;
+    }
+}
+
 void __cdecl Load_Colony_Defense_(int16_t colony_idx) {
     if (colony_idx < 0) {
         MOX::_combat_data->owner = 8;

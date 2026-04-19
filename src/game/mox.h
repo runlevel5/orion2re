@@ -811,6 +811,17 @@ namespace MOX {
 
     inline s_animation_header*& _fleet_box_close_lg_button_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597924});
+    inline s_animation_header*& _fleet_box_close_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1CAC});
+    inline s_animation_header*& _fleet_box_engage_lg_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596C54});
+    inline s_animation_header*& _fleet_box_engage_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597D74});
+    inline s_animation_header*& _fleet_box_colonize_lg_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5AC});
+    inline s_animation_header*& _fleet_box_colonize_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597494});
+    inline s_animation_header*& _fleet_box_transport_lg_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B9FC});
+    inline s_animation_header*& _fleet_box_transport_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B310});
+    inline s_animation_header*& _fleet_box_outpost_lg_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF48});
+    inline s_animation_header*& _fleet_box_outpost_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BD18});
+    inline s_animation_header*& _fleet_box_att_xenons_lg_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B5E0});
+    inline s_animation_header*& _fleet_box_att_xenons_sm_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BA68});
 
     inline s_animation_header*& _fleet_box_bottom_sm_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BA00});

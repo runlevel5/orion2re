@@ -110,4 +110,22 @@ namespace ERIC {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x004bb140})();
     }
+
+    inline void __cdecl Play_Amoeba_Flic_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004baec0});
+        fn();
+    }
+
+    inline bool __cdecl Player_Can_Mind_Control_Colony_(int8_t player_id, int16_t colony_idx) {
+        using Fn = bool(__cdecl*)(int8_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004badb0});
+        return fn(player_id, colony_idx);
+    }
+
+    inline void __cdecl Force_Fade_To_Colony_Palette_(int state) {
+        using Fn = void(__cdecl*)(int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba790});
+        fn(state);
+    }
 }

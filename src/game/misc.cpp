@@ -157,6 +157,41 @@ namespace MISC {
         }
     }
 
+    void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
+                                       uint8_t unused_flag, s_colors* old_colors, s_colors* new_colors,
+                                       int color_count, s_animation_header* anim) {
+        int16_t width;
+        int16_t height;
+
+        MISC::Get_Bitmap_Dimensions_(anim, &width, &height);
+
+        if (color_count != 0) {
+            x_start = 0;
+            y_start = 0;
+            x_end = width;
+            y_end = height;
+        }
+
+        uint8_t* pixel_data = reinterpret_cast<uint8_t*>(anim) + 16;
+
+        for (int16_t y = y_start; y < y_end; ++y) {
+            int32_t y_offset = (int32_t)y * width;
+            for (int16_t x = x_start; x < x_end; ++x) {
+                int32_t offset = y_offset + x;
+                uint8_t current_pixel = pixel_data[offset];
+
+                if (color_count > 0) {
+                    for (int i = 0; i < color_count; ++i) {
+                        if (static_cast<int8_t>(old_colors->colors[i]) == static_cast<int8_t>(current_pixel)) {
+                            current_pixel = new_colors->colors[i];
+                            pixel_data[offset] = current_pixel;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void __cdecl Fade_Into_Screen_(void (*draw_callback)(), uint8_t* status_flag, int16_t palette_id) {
         fields::Disable_Draw_All_Fields_();
 
@@ -492,6 +527,61 @@ namespace MISC {
         *out_end_y = font_height;
     }
 
+    void __cdecl Get_Advancing_Bitmap_String_Range_(int16_t tick, int16_t max_width, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, const char* text, uint8_t is_full_range) {
+        int16_t string_width = fonts::Get_String_Width_(text);
+        int16_t font_height = fonts::Get_Font_Height_();
+
+        if (string_width < max_width) {
+            *out_start_x = 0;
+            *out_end_x = 0;
+
+            int divisor = ((max_width * 10 / (int)string_width) + 9) / 10;
+            if ((tick % divisor == 0) || (is_full_range != 0)) {
+                int32_t start_x_calc = (tick * (int32_t)string_width * 10) / max_width;
+                int16_t start_x = (int16_t)(start_x_calc / 10);
+
+                if (start_x > string_width) {
+                    start_x = string_width;
+                }
+                *out_start_x = start_x;
+
+                if (is_full_range != 0) {
+                    *out_end_x = string_width;
+                } else {
+                    *out_end_x = start_x + 1;
+                }
+
+                if (*out_end_x > string_width) {
+                    *out_end_x = string_width;
+                }
+            }
+        } else {
+            int16_t current_tick;
+            if (is_full_range != 0) {
+                current_tick = max_width - 1;
+            } else {
+                current_tick = tick;
+            }
+
+            int step = ((string_width * 10 / (int)max_width) + 9) / 10;
+
+            int16_t start_x = (int16_t)(current_tick * step);
+            if (start_x > string_width) {
+                start_x = string_width;
+            }
+            *out_start_x = start_x;
+
+            int16_t end_x = start_x + (int16_t)step;
+            if (end_x > string_width) {
+                end_x = string_width;
+            }
+            *out_end_x = end_x;
+        }
+
+        *out_start_y = 0;
+        *out_end_y = font_height;
+    }
+
     void __cdecl Draw_Advancing_Fill_Message_(uint8_t font_style, int16_t* p_frame_index, int16_t total_frames,
                                               s_colors* p_colors, s_colors* target_color, int16_t x, int16_t y,
                                               char* text, s_animation_header* anim, uint8_t alignment) {
@@ -588,5 +678,88 @@ namespace MISC {
         graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
 
         RUSS::Mox_Sync_Update_();
+    }
+
+    /**
+     * @address 0049f0e0
+     */
+    void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {
+        int16_t width = fonts::Get_String_Width_(text);
+
+        // Calculate horizontal center
+        int16_t centered_x = x - (width / 2);
+
+        MISC::_Print_Shadow_Down_(centered_x, y, color, text);
+    }
+
+    int16_t __cdecl Substring_(char* haystack, char* needle) {
+        char* found_ptr = find_substring(haystack, needle);
+
+        if (found_ptr != nullptr) {
+            return static_cast<int16_t>(found_ptr - haystack);
+        }
+
+        return static_cast<int16_t>(strlen(haystack));
+    }
+
+    void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t spacing, uint8_t color1, uint8_t color2) {
+        uint16_t window_status;
+        Save_Window_Status_(&window_status);
+
+        if (spacing == 0) {
+            spacing = 16;
+        }
+
+        if (((640 / spacing) * spacing != 640) || ((480 / spacing) * spacing != 480)) {
+            spacing = 16;
+        }
+
+        graphics::Set_Window_(x1, y1, x2, y2);
+        video::Clip_On_();
+
+        int16_t num_steps_y = 480 / spacing;
+        int16_t num_steps_x = 640 / spacing;
+
+        if (num_steps_x > 0) {
+            int16_t current_x = 0;
+            for (int16_t i = num_steps_x; i > 0; --i) {
+                line::Line_(current_x - 1, 0, current_x + 479, 480, color2);
+                line::Line_(current_x + 1, 0, current_x + 481, 480, color2);
+                line::Line_(current_x, 0, current_x + 480, 480, color1);
+                current_x += spacing;
+            }
+        }
+
+        if (num_steps_y > 0) {
+            int16_t current_y = 0;
+            for (int16_t i = num_steps_y; i > 0; --i) {
+                line::Line_(-1, current_y, 479 - current_y, 480, color2);
+                line::Line_(1, current_y, 481 - current_y, 480, color2);
+                line::Line_(0, current_y, 480 - current_y, 480, color1);
+                current_y += spacing;
+            }
+
+            if (num_steps_y > 0) {
+                current_y = 0;
+                for (int16_t i = num_steps_y; i > 0; --i) {
+                    line::Line_(current_y - 1, 0, 1, current_y, color2);
+                    line::Line_(current_y + 1, 0, 1, current_y, color2);
+                    line::Line_(current_y, 0, 0, current_y, color1);
+                    current_y += spacing;
+                }
+            }
+        }
+
+        if (num_steps_x > 0) {
+            int16_t current_x = 0;
+            for (int16_t i = num_steps_x; i > 0; --i) {
+                line::Line_(current_x - 1, 480, current_x + 479, 0, color2);
+                line::Line_(current_x + 1, 480, current_x + 481, 0, color2);
+                line::Line_(current_x, 480, current_x + 480, 0, color1);
+                current_x += spacing;
+            }
+        }
+
+        Restore_Window_Status_(window_status);
     }
 }

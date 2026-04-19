@@ -88,6 +88,10 @@ void* __cdecl Far_Reload_(const char* path, int32_t idx, void* param3) {
     return Farload_Library_(path, idx, param3, 1);
 }
 
+void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* buffer) {
+    return Farload_Library_(filename, entry, buffer, 2);
+}
+
     void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size) {
         char full_path[64];
 
@@ -254,6 +258,64 @@ void __cdecl Error_Handler_(const char* filename, int error_code, int entry_num)
     }
 
     exitm::Exit_With_Message(message);
+}
+
+int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_idx) {
+    if (entry_idx < 0) {
+        Error_Handler_(file_name, 4, entry_idx);
+    }
+
+    bool need_to_open = true;
+    if (_farload_file_flag != 0) {
+        if (__strcmpi(file_name, _farload_file_name) == 0) {
+            need_to_open = false;
+        } else {
+            _fclose(_farload_fptr);
+        }
+    }
+
+    if (need_to_open) {
+        strcpy(_farload_file_name, file_name);
+        _farload_fptr = _fopen(file_name, s_rb_0055117c);
+
+        if (_farload_fptr == nullptr) {
+            if (_secondary_drive_path[0] == '\0') {
+                Error_Handler_(file_name, 1, entry_idx);
+            }
+
+            char full_path[64];
+            strcpy(full_path, _secondary_drive_path);
+            strcat(full_path, _farload_file_name);
+
+            _farload_fptr = _fopen(full_path, s_rb_0055117c);
+            if (_farload_fptr == nullptr) {
+                Error_Handler_(file_name, 1, entry_idx);
+            }
+        }
+
+        _fread(&_lbx_header, sizeof(s_lbx_header), 1, _farload_fptr);
+
+        if (_lbx_header.magic != 0xFEAD) {
+            Error_Handler_(file_name, 7, entry_idx);
+        }
+
+        _farload_file_flag = 1;
+    }
+
+    if (static_cast<uint32_t>(_lbx_header.entry_count) <= static_cast<uint32_t>(entry_idx)) {
+        Error_Handler_(file_name, 8, entry_idx);
+    }
+
+    _fseek(_farload_fptr, _lbx_header.offsets[entry_idx], 0 /* SEEK_SET */);
+
+    int16_t record_count;
+    _fread(&record_count, 2, 1, _farload_fptr);
+
+    return record_count;
+}
+
+void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, void* buffer, int32_t param_4, int32_t param_5, int32_t param_6) {
+    return farload::Farload_Library_Data_(filename, resource_id, buffer, 3, (uint32_t)param_4, (uint16_t)param_5, (uint16_t)param_6);
 }
 
 }

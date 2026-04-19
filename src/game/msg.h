@@ -19,16 +19,16 @@ namespace MSG_ {
         return fn(data);
     }
 
-    inline void __cdecl Add_Ongoing_Event_Msgs_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00473b50 });
-        fn();
-    }
+    void __cdecl Add_Ongoing_Event_Msgs_();
 
-    inline void __cdecl Add_Peace_Ended_Msg_(int player_i, int player_j) {
-        using Fn = void(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473B30});
-        fn(player_i, player_j);
+    void __cdecl Add_Peace_Ended_Msg_(int player_i, int player_j);
+
+    void __cdecl Add_Peace_Msg_(int32_t player_a_idx, int32_t player_b_idx);
+
+    inline void __cdecl Add_Diplomacy_Msg_(int32_t player_a, int32_t player_b, int32_t type) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473a10});
+        fn(player_a, player_b, type);
     }
 
     inline char*& _msg_artifacts_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565EF0});
@@ -102,39 +102,13 @@ namespace MSG_ {
 
     void __cdecl sprintf_msg_(char* param_1, s_MSG* param_2);
 
-    inline void __cdecl Add_Msg_All_(s_MSG msg) {
-        using Fn = void(__cdecl*)(s_MSG);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473900});
-        fn(msg);
-    }
+    void __cdecl Add_Msg_All_(s_MSG msg);
 
-    inline uint8_t __cdecl Goto_Msg_Colony_(s_MSG* msg) {
-        using Fn = uint8_t(__cdecl*)(s_MSG*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473940});
-        return fn(msg);
-    }
+    int8_t __cdecl Goto_Msg_Colony_(s_MSG* msg);
 
-    inline void __cdecl Add_Nonaggression_Msg_(int16_t player_a, int16_t player_b) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473B10});
-        fn(player_a, player_b);
-    }
+    void __cdecl Add_Nonaggression_Msg_(uint8_t plr_a, uint8_t plr_b);
 
-    inline void __cdecl Add_Alliance_Msg_(int16_t player_a, int16_t player_b) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473AF0});
-        fn(player_a, player_b);
-    }
+    void __cdecl Add_Alliance_Msg_(uint32_t player_a_idx, uint32_t player_b_idx);
 
-    inline void __cdecl Add_Peace_Msg_(int16_t player_a, int16_t player_b) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473AD0});
-        fn(player_a, player_b);
-    }
-
-    inline void __cdecl Add_War_Msg_(int16_t player_a, int16_t player_b) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004739F0});
-        fn(player_a, player_b);
-    }
+    void __cdecl Add_War_Msg_(int32_t player_a, int32_t player_b);
 }

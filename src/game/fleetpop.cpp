@@ -2,6 +2,52 @@
 
 namespace FLEETPOP {
 
+    void __cdecl Draw_Damage_Bars_(int16_t x, int16_t y, int16_t width, int16_t y_offset, int16_t x_offset, int16_t ship_idx) {
+        int16_t effective_width = width - 4;
+        int16_t draw_x = x_offset + x;
+        int16_t draw_y = y + y_offset - 5;
+
+        int16_t max_hits = AIPOWER::Max_Ship_Hits_(ship_idx);
+        int16_t current_hits = AIPOWER::Current_Ship_Hits_(ship_idx);
+
+        int16_t green_width = (static_cast<int>(current_hits) * effective_width) / max_hits;
+        if (green_width < 2) {
+            green_width = 2;
+        }
+
+        int16_t red_width = effective_width - green_width;
+
+        if (current_hits != max_hits) {
+            if (red_width == 1) {
+                red_width = 2;
+                green_width = width - 6;
+            }
+
+            if (green_width > 0) {
+                int16_t end_x = draw_x + green_width;
+                int16_t bottom_y = draw_y + 4;
+
+                line::Line_(draw_x, draw_y, end_x, draw_y, 0x70 /* 'p' */);
+                line::Line_(draw_x, draw_y, draw_x, bottom_y, 0x70 /* 'p' */);
+                line::Line_(end_x, draw_y + 1, end_x, bottom_y, 0x72 /* 'r' */);
+                line::Line_(end_x, bottom_y, draw_x + 1, bottom_y, 0x72 /* 'r' */);
+                graphics::Fill_(draw_x + 1, draw_y + 1, end_x - 1, draw_y + 3, 0x71 /* 'q' */);
+            }
+
+            if (red_width > 1) {
+                int16_t start_red_x = draw_x + green_width + 1;
+                int16_t end_red_x = start_red_x + red_width;
+                int16_t bottom_y = draw_y + 4;
+
+                line::Line_(start_red_x, draw_y, end_red_x, draw_y, 0x4B /* 'K' */);
+                line::Line_(start_red_x, draw_y, start_red_x, bottom_y, 0x4B /* 'K' */);
+                line::Line_(end_red_x, draw_y + 1, end_red_x, bottom_y, 0x4E /* 'N' */);
+                line::Line_(end_red_x, bottom_y, start_red_x + 1, bottom_y, 0x4E /* 'N' */);
+                graphics::Fill_(start_red_x + 1, draw_y + 1, end_red_x - 1, draw_y + 3, 0x4D /* 'M' */);
+            }
+        }
+    }
+
     int16_t __cdecl Fleet_Box_Height_(int16_t fleet_count) {
         int16_t close_btn_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
         int16_t name_height;
@@ -382,6 +428,68 @@ bool __cdecl Ship_Should_Be_Auto_Selected_(int16_t ship_idx) {
     return false;
 }
 
+void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset) {
+    int16_t btn_height;
+    int16_t x_pos;
+    int16_t y_base;
+    int16_t stack_y_offset;
+    s_animation_header* close_seg;
+    s_animation_header* engage_seg;
+    s_animation_header* colonize_seg;
+    s_animation_header* transport_seg;
+    s_animation_header* outpost_seg;
+    s_animation_header* attack_seg;
+
+    btn_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
+
+    if (MOX::_fleet_box.count > 9) {
+        attack_seg = MOX::_fleet_box_att_xenons_lg_button_seg;
+        colonize_seg = MOX::_fleet_box_colonize_lg_button_seg;
+        transport_seg = MOX::_fleet_box_transport_lg_button_seg;
+        outpost_seg = MOX::_fleet_box_outpost_lg_button_seg;
+        engage_seg = MOX::_fleet_box_engage_lg_button_seg;
+        close_seg = MOX::_fleet_box_close_lg_button_seg;
+    } else {
+        attack_seg = MOX::_fleet_box_att_xenons_sm_button_seg;
+        colonize_seg = MOX::_fleet_box_colonize_sm_button_seg;
+        transport_seg = MOX::_fleet_box_transport_sm_button_seg;
+        outpost_seg = MOX::_fleet_box_outpost_sm_button_seg;
+        engage_seg = MOX::_fleet_box_engage_sm_button_seg;
+        close_seg = MOX::_fleet_box_close_sm_button_seg;
+    }
+
+    x_pos = x_offset + 2;
+    y_base = (MOX::_fleet_box.field8_0xe - btn_height) + y_offset;
+
+    MOX::_moveable_box[2].close_btn = fields::Add_Clipped_Button_Field_(x_pos, y_base, s__00551100, close_seg, (void*)s__00551120, 40 /* 0x28 */);
+
+    stack_y_offset = btn_height;
+
+    if (MOX::_fleet_box.outpost_btn_active != 0) {
+        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, s__00551100, outpost_seg, (void*)s__00551100, 40 /* 0x28 */);
+        stack_y_offset = btn_height * 2;
+    }
+
+    if (MOX::_fleet_box.colonize_btn_active != 0) {
+        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, colonize_seg, (void*)s__00551100, 40 /* 0x28 */);
+        stack_y_offset += btn_height;
+    }
+
+    if (MOX::_fleet_box.engage_btn_active != 0) {
+        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, engage_seg, (void*)s__00551100, 40 /* 0x28 */);
+        stack_y_offset += btn_height;
+    }
+
+    if (MOX::_fleet_box.transport_btn_active != 0) {
+        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, transport_seg, (void*)s__00551100, 40 /* 0x28 */);
+        stack_y_offset += btn_height;
+    }
+
+    if (MOX::_fleet_box.attack_btn_active != 0) {
+        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, attack_seg, (void*)s__00551100, 40 /* 0x28 */);
+    }
+}
+
 /**
  * @address 004051e0
  */
@@ -396,6 +504,18 @@ int16_t __cdecl N_Fleet_Icons_(int16_t node_idx) {
     }
 
     return count;
+}
+
+/**
+ * @address 00403e90
+ */
+bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type) {
+    int16_t selected_ship_ids[500];
+
+    // HACCESS::Get_Fleet_Box_Selected_Ship_Ids_ returns the number of ships found.
+    int16_t count = HACCESS::Get_Fleet_Box_Selected_Ship_Ids_(selected_ship_ids, 500, ship_type);
+
+    return count > 0;
 }
 
 }

@@ -2387,4 +2387,89 @@ namespace DIP_SCRN {
         DIP_SCRN::_response_message = 0;
         DIP_SCRN::_old_response_message = 0;
     }
+
+    /**
+     * @address 0041ca80
+     */
+    int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id) {
+        if (msg_id >= 0x53 && msg_id <= 0x55) {
+            return 1;
+        }
+
+        if (msg_id >= 0x61 && msg_id <= 0x68) {
+            return 1;
+        }
+
+        if (msg_id == 0x7D) {
+            return 1;
+        }
+
+        if (msg_id == 0x56) {
+            return 1;
+        }
+
+        if (msg_id == 0x69) {
+            return 1;
+        }
+
+        if (msg_id == 0x6A) {
+            return 1;
+        }
+
+        if (msg_id >= 0x1C && msg_id <= 0x24) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg) {
+        if (msg_code < 2000 || msg_code >= 3000) {
+            return;
+        }
+
+        if (msg_code == 2000) {
+            _net_diplomacy_chat_message[0] = s__00551100[0];
+            _receive_chat_message[0] = s__00551100[0];
+
+            _net_diplomacy_message.sender_player_id = net_msg->sender_player_id;
+            _net_diplomacy_message.target_player_id = net_msg->target_player_id;
+            _net_diplomacy_message.msg_type = net_msg->msg_type;
+            _net_diplomacy_message.arg2 = net_msg->arg2;
+            _net_diplomacy_message.arg1 = net_msg->arg1;
+
+            switch (_net_diplomacy_message.msg_type) {
+                case 1006 /* 0x3ee */:
+                    _net_diplomacy_esc_pressed = 1;
+                    return;
+
+                case 1011 /* 0x3f3 */:
+                    _net_diplomacy_message.msg_type = 0;
+                    _response_message = 0;
+                    _old_response_message = 0;
+                    _sprintf(_diplomacy_message, s__00551100);
+                    // Fallthrough to default behavior
+                    break;
+
+                case 1012 /* 0x3f4 */:
+                    _synch_up_established_flag = 1;
+                    return;
+
+                case 1014 /* 0x3f6 */:
+                    return;
+
+                default:
+                    break;
+            }
+
+            _response_message = _net_diplomacy_message.msg_type;
+            _talker_ambassador = _net_diplomacy_message.sender_player_id;
+            _listen_ambassador = _net_diplomacy_message.target_player_id;
+            return;
+        }
+
+        if (msg_code == 2100 /* 0x834 */) {
+            strcpy(_receive_chat_message, reinterpret_cast<char*>(net_msg));
+        }
+    }
 }

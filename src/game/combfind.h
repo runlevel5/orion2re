@@ -25,12 +25,6 @@ namespace COMBFIND {
 
     void __cdecl Search_For_Battles_();
 
-    struct s_retreat_report {
-        int8_t reason;
-        int16_t count;
-        int8_t killed_officers;
-    };
-
     void __cdecl Process_Retreating_Ships_();
 
     int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx);
@@ -67,10 +61,18 @@ namespace COMBFIND {
 
     void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx);
 
-    inline void __cdecl Client_Combat_Loop_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c03e0});
-        fn();
+    void __cdecl Client_Combat_Loop_();
+
+    inline void __cdecl Bomb_Results_Popups_(s_battle_results *res) {
+        using Fn = void(__cdecl*)(s_battle_results *);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c0be0});
+        fn(res);
+    }
+
+    inline void __cdecl Strategic_Results_Popup_(s_battle_results *res) {
+        using Fn = void(__cdecl*)(s_battle_results *);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c0b70});
+        fn(res);
     }
 
     void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count);
@@ -83,10 +85,7 @@ namespace COMBFIND {
 
     void __cdecl Reset_Combat_Ships_At_Current_Star_Has_Player_(int16_t player_idx);
 
-    inline void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ships, int16_t ship_count, int16_t colony_idx, s_battle_results* result) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t, int16_t, s_battle_results*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bf0b0})(ships, ship_count, colony_idx, result);
-    }
+    void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ships, int n_ships, uint32_t colony_idx, s_battle_results* results);
 
     char* __cdecl Load_Combfind_Strings_(char* strings_block);
 
@@ -103,11 +102,7 @@ namespace COMBFIND {
     bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx);
 
 
-    inline bool __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004BCD50 });
-        return fn(star_idx);
-    }
+    int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx);
 
     int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx);
 
@@ -119,4 +114,39 @@ namespace COMBFIND {
 
     void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx);
 
+    inline int8_t __cdecl Do_Bombardment_(int8_t attacker_id, uint8_t colony_idx) {
+        using Fn = int8_t(__cdecl*)(int8_t, uint8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfd20});
+        return fn(attacker_id, colony_idx);
+    }
+
+    inline bool __cdecl Has_Stellar_Converter_(int16_t* ship_list, int n_ships) {
+        using Fn = bool(__cdecl*)(int16_t*, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfd60});
+        return fn(ship_list, n_ships);
+    }
+
+    inline int __cdecl N_Enemy_Stars_In_Range_(int8_t attacker_id, int8_t victim_id) {
+        using Fn = int(__cdecl*)(int8_t, int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bce10});
+        return fn(attacker_id, victim_id);
+    }
+
+    inline int __cdecl N_Enemy_Stars_(int8_t victim_id) {
+        using Fn = int(__cdecl*)(int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfdc0});
+        return fn(victim_id);
+    }
+
+    inline bool __cdecl Player_Owns_Transports_(int8_t player_id) {
+        using Fn = bool(__cdecl*)(int8_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfe00});
+        return fn(player_id);
+    }
+
+    inline void __cdecl Do_Net_Combat_Update_(bool message_sent) {
+        using Fn = void(__cdecl*)(bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C0CA0});
+        fn(message_sent);
+    }
 }

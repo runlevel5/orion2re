@@ -39,6 +39,10 @@ namespace NETMOX {
     inline uint8_t& _in_receive_message =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057235C});
 
+    inline uint8_t& _is_updating = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AD44});
+
+    inline uint8_t& _next_update_player_counter = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AD48});
+
     inline uint8_t& _net_players_active_mask =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00595300});
 
@@ -66,11 +70,7 @@ namespace NETMOX {
 
     void __cdecl Update_();
 
-    inline void __cdecl Mox_Net_Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005156C0});
-        fn();
-    }
+    void __cdecl Mox_Net_Update_();
 
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
@@ -161,4 +161,35 @@ namespace NETMOX {
     void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr);
 
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
+
+    inline void __cdecl Send_Battle_Results_(int star, int attacker, int defender, int p_defender, int planet, int result) {
+        using Fn = void(__cdecl*)(int, int, int, int, int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005188b0});
+        fn(star, attacker, defender, p_defender, planet, result);
+    }
+
+#pragma pack(push, 1)
+    struct s_NET_MSG_SYNC_PLAYER {
+        int32_t player1_idx;
+        s_player player1;
+        int8_t surrender_to[72];
+        int32_t player2_idx;
+        s_player player2;
+    };
+
+    struct s_NET_MSG_RANK {
+        int32_t rank;
+        int8_t hit_next_turn;
+    };
+
+    struct s_NET_MSG_COLOR {
+        int8_t color;
+        int8_t player_idx;
+    };
+
+    struct s_NET_MSG_RACE {
+        int8_t race;
+        int8_t player_idx;
+    };
+#pragma pack(pop)
 }

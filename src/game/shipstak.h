@@ -12,25 +12,13 @@ namespace SHIPSTAK {
 
     void __cdecl Remove_Non_Detected_Ships_();
 
-    inline void __cdecl Delete_Ship_Node_(int16_t stack_idx, int16_t prev_node_idx, int16_t node_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00460d00})(stack_idx, prev_node_idx, node_idx);
-    }
+    void __cdecl Delete_Ship_Node_(int16_t stack_idx, int16_t prev_node_idx, int16_t node_idx);
 
-    inline void __cdecl Delete_Ship_Stack_(int16_t stack_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00460cd0})(stack_idx);
-    }
+    void __cdecl Delete_Ship_Stack_(int16_t stack_idx);
 
-    inline void __cdecl Build_Ship_Type_Array_(int16_t ship_stack_idx, int16_t *ship_entries, int16_t *ship_count) {
-        using Fn = void(__cdecl *)(int16_t, int16_t *, int16_t *);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00460DC0})(ship_stack_idx, ship_entries, ship_count);
-    }
+    void __cdecl Build_Ship_Type_Array_(int16_t node_idx, int16_t* stack_array, int16_t* count_ptr);
 
-    inline int __cdecl qsort_ships_by_type_(const void *lhs, const void *rhs) {
-        using Fn = int(__cdecl *)(const void *, const void *);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00460E90})(lhs, rhs);
-    }
+    int __cdecl qsort_ships_by_type_(const void* param_1, const void* param_2);
 
     void __cdecl Sort_Ships_In_Stack_(int16_t stack_start_idx);
 }

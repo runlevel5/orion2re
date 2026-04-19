@@ -10,17 +10,9 @@ namespace maintain {
     inline int (*&_ship_worths)[500] =
         *reinterpret_cast<int (**)[500]>(std::uintptr_t{0x0056CD8C});
 
-    inline int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship) {
-        using Fn = int16_t(__cdecl*)(s_ship_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B42B0});
-        return fn(ship);
-    }
+    int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship);
 
-    // Suggested name: Phase1_Building_
-    inline bool __cdecl Phase1_Building_(s_player* p, int16_t a, int16_t b) {
-        using Fn = bool(__cdecl*)(s_player*, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004B4900})(p, a, b);
-    }
+    bool __cdecl Phase1_Building_(s_player* p, int16_t a, int16_t b);
 
     bool __cdecl Phase2_Building_(s_player* p, int16_t a, int16_t b);
 
@@ -31,12 +23,13 @@ namespace maintain {
 
     void __cdecl Kill_Research_Buildings_(s_player* player);
 
-    // Suggested name: Kill_Buildings_
-    inline void __cdecl Kill_Buildings_(s_player* p, bool(__cdecl* filter)(s_player*, int16_t, int16_t)) {
-        using Fn = void(__cdecl*)(s_player*, bool(__cdecl*)(s_player*, int16_t, int16_t));
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004B4980});
-        fn(p, filter);
+    inline int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx) {
+        using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4ba0});
+        return fn(colony, building_idx);
     }
+
+    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(s_player*, int16_t, int16_t));
 
     void __cdecl Kill_Ships_(s_player* player, bool at_colony_only, bool restricted_mission, int16_t ship_type);
 

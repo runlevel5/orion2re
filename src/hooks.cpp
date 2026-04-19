@@ -43,6 +43,7 @@ namespace hooks {
         ASSERT(sizeof(s_network) == 0x20a, "s_network");
         ASSERT(sizeof(s_net_player_info) == 0xc, "s_net_player_info");
         ASSERT(sizeof(s_net_combat_message) == 0x10, "s_net_combat_message");
+        ASSERT(sizeof(s_battle_results) == 0x6ce, "s_battle_results");
     }
 
     static hook all_hooks[] = {
@@ -3127,6 +3128,49 @@ namespace hooks {
         { 0x00533650, &init::Create_IO_Buffer_ },
         { 0x004F1330, &HAROLD::N_Player_Ships_ },
         { 0x004f24a0, &HAROLD::Load_Language_Fonts_ },
+        // Verify
+        { 0x004c03e0, &COMBFIND::Client_Combat_Loop_ },
+        { 0x004bcd50, &COMBFIND::Some_Star_Player_Is_Busy_ },
+        { 0x004bf0b0, &COMBFIND::Do_Attacker_Beat_Colony_Stuff_ },
+        { 0x0040d2e0, &COMBINIT::Load_Combat_Colony_Picture_ },
+        { 0x00499a20, &CONTACT::Compute_Contacts_ },
+        { 0x0042e120, &DESIGN::Clear_Weapon_Slot_ },
+        { 0x00430400, &DESIGN::One_Weapon_Space_Without_M_Level_ },
+        { 0x0042f170, &DESIGN::Design_Weapon_Damage_String_ },
+        { 0x0041ca80, &DIP_SCRN::Diplomacy_Receive_Message_ },
+        { 0x0041db60, &DIP_SCRN::Diplomacy_Message_Is_Interactive_ },
+        { 0x00460D00, &SHIPSTAK::Delete_Ship_Node_ },
+        { 0x00460cd0, &SHIPSTAK::Delete_Ship_Stack_ },
+        { 0x00460dc0, &SHIPSTAK::Build_Ship_Type_Array_ },
+        { 0x00460e90, &SHIPSTAK::qsort_ships_by_type_ },
+        { 0x00487060, &NEWPUP::Troop_Popup_ },
+        { 0x005156c0, &NETMOX::Mox_Net_Update_ },
+        { 0x00473b50, &MSG_::Add_Ongoing_Event_Msgs_ },
+        { 0x00473b30, &MSG_::Add_Peace_Ended_Msg_ },
+        { 0x00473900, &MSG_::Add_Msg_All_ },
+        { 0x00473940, &MSG_::Goto_Msg_Colony_ },
+        { 0x00473b10, &MSG_::Add_Nonaggression_Msg_ },
+        { 0x00473af0, &MSG_::Add_Alliance_Msg_ },
+        { 0x00473ad0, &MSG_::Add_Peace_Msg_ },
+        { 0x004739f0, &MSG_::Add_War_Msg_ },
+        { 0x0049e130, &MISC::Diagonal_Line_Fill_ },
+        { 0x0049f0e0, &MISC::_Print_Centered_Shadow_Down_ },
+        { 0x0049eeb0, &MISC::Substring_ },
+        { 0x0049e720, &MISC::Get_Advancing_Bitmap_String_Range_ },
+        { 0x0049ec60, &MISC::Replace_Bitmap_Colors_ },
+        { 0x004b4900, &maintain::Phase1_Building_ },
+        { 0x004b4980, &maintain::Kill_Buildings_ },
+        { 0x004b42b0, &maintain::Ship_Scrap_Value_ },
+        { 0x004b3140, &LOADER::Load_Pictures_ },
+        { 0x0043d1c0, &FILEDEF::Read_Moo_Custom_Player_Data_ },
+        { 0x00403e90, &FLEETPOP::At_Least_One_Ship_Of_Type_Selected_ },
+        { 0x00403ef0, &FLEETPOP::Draw_Damage_Bars_ },
+        { 0x00403cc0, &FLEETPOP::Add_Added_Buttons_ },
+        { 0x00489610, &FLT::Set_Fltscrn_Small_Ship_Icon_XYs_ },
+        { 0x0051cd30, &farload::Get_Farload_Data_Record_Count_ },
+        { 0x0051c730, &farload::Far_Reload_Next_ },
+        { 0x0051c7b0, &farload::Farload_Data_Static_ },
+        { 0x00533770, &fade::Blinds_Fade_ },
     };
 
     void Install_Hooks()

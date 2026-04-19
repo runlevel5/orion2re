@@ -732,6 +732,193 @@ namespace NETMOX {
         return 1;
     }
 
+    void __cdecl Mox_Net_Update_() {
+        if (MOX::_game_type != 2 && MOX::_game_type != 3) {
+            return;
+        }
+
+        if (NETMOX::_is_updating || NETMOX::_in_receive_message) {
+            return;
+        }
+
+        NETMOX::_is_updating = 1;
+
+        netcode::Net_Update_();
+
+        if (!NETMOX::_net.is_network_active) {
+            NETMOX::_is_updating = 0;
+            return;
+        }
+
+        int current_player_idx;
+        if (MOX::_NUM_PLAYERS != 0) {
+            current_player_idx = (uint32_t)NETMOX::_next_update_player_counter % (uint32_t)MOX::_NUM_PLAYERS;
+        } else {
+            current_player_idx = -1;
+        }
+
+        RUSS::Mox_Update_();
+
+        NETMOX::_next_update_player_counter++;
+
+        if (current_player_idx == -1 || netcode::Net_Is_Sending_()) {
+            NETMOX::_is_updating = 0;
+            return;
+        }
+
+        bool message_sent = false;
+
+        uint8_t* player_phase_ready_sent_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field_1db);
+
+        if ((NETMOX::_net.sync_state == 4 || NETMOX::_net.sync_state == 8) && 
+            !player_phase_ready_sent_flags[current_player_idx]) {
+            
+            player_phase_ready_sent_flags[current_player_idx] = 1;
+            if (MOX::_player[current_player_idx].network_player_id != -1) {
+                message_sent = true;
+                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x36, nullptr, 0);
+            }
+        }
+
+        if (!message_sent && (NETMOX::_net.ai_diplomacy_done_mask & (1 << current_player_idx))) {
+            int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+            NETMOX::_net.ai_diplomacy_done_mask &= ~(1 << current_player_idx);
+            message_sent = true;
+            NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 7, &remote_player_id, 1);
+        }
+
+        for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            if (NETMOX::_net.players_sync_mask[i] & (1 << current_player_idx)) {
+                s_NET_MSG_SYNC_PLAYER sync_pkt;
+                
+                sync_pkt.player1_idx = i;
+                memcpy(&sync_pkt.player1, &MOX::_player[i], sizeof(s_player));
+
+                for (int star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+                    sync_pkt.surrender_to[star_idx] = MOX::_star[star_idx].surrender_to[i];
+                }
+
+                int32_t sync_target_idx = NETMOX::_net.diplomacy_sync_mask[i];
+                sync_pkt.player2_idx = sync_target_idx;
+                memcpy(&sync_pkt.player2, &MOX::_player[sync_target_idx], sizeof(s_player));
+
+                if (MOX::_PLAYER_NUM != current_player_idx && sync_target_idx != current_player_idx) {
+                    if (MOX::_player[current_player_idx].objectives == 'd' &&
+                        !message_sent && NETMOX::_net.player_race_selected_flags[current_player_idx]) {
+                        
+                        message_sent = true;
+                        NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x22, &sync_pkt.player1_idx, 0x1DA2);
+                    }
+                }
+                NETMOX::_net.players_sync_mask[i] &= ~(1 << current_player_idx);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.ai_diplomacy_active_mask & (1 << current_player_idx)) {
+                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+                if (!(NETMOX::_net.players_sync_mask[remote_player_id] & (1 << current_player_idx))) {
+                    message_sent = true;
+                    NETMOX::_net.ai_diplomacy_active_mask &= ~(1 << current_player_idx);
+                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 6, &remote_player_id, 1);
+                }
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.ai_diplomacy_cancel_mask & (1 << current_player_idx)) {
+                int8_t remote_player_id = NETMOX::_net.player_net_info[current_player_idx].remote_player_id;
+                NETMOX::_net.ai_diplomacy_cancel_mask &= ~(1 << current_player_idx);
+                message_sent = true;
+                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 9, &remote_player_id, 1);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.human_diplomacy_ignored_mask & (1 << current_player_idx)) {
+                message_sent = true;
+                NETMOX::_net.human_diplomacy_ignored_mask &= ~(1 << current_player_idx);
+                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x1D, nullptr, 0);
+            }
+        }
+
+        if (!message_sent) {
+            int32_t player_num = MOX::_PLAYER_NUM;
+            uint8_t* player_rank_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field134_0x1b6);
+            
+            if (current_player_idx != player_num && MOX::_player[current_player_idx].objectives == 'd') {
+                int8_t local_rank = NETMOX::_net.host_election_player_rank[player_num];
+                if (player_rank_sync_flags[current_player_idx] != local_rank) {
+                    message_sent = true;
+                    s_NET_MSG_RANK rank_msg;
+                    rank_msg.rank = (int32_t)local_rank;
+                    rank_msg.hit_next_turn = NETMOX::_net.players_hit_next_turn[player_num];
+                    player_rank_sync_flags[current_player_idx] = local_rank;
+                    NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 4, &rank_msg, 5);
+                }
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.local_net_id == NETMOX::_net.net_host_id &&
+                NETMOX::_net.sync_state >= 0xE && NETMOX::_net.sync_state < 0x23) {
+                COMBFIND::Do_Net_Combat_Update_(message_sent);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.player_color_selected_flags[current_player_idx]) {
+                message_sent = true;
+                NETMOX::_net.player_color_selected_flags[current_player_idx] = 0;
+                s_NET_MSG_COLOR color_msg;
+                color_msg.color = MOX::_player[current_player_idx].color;
+                color_msg.player_idx = (int8_t)current_player_idx;
+                NETMOX::Mox_Send_Message_(0x7FFE, 0x2B, &color_msg, 2);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.player_race_selected_alt_flags[current_player_idx]) {
+                message_sent = true;
+                NETMOX::_net.player_race_selected_alt_flags[current_player_idx] = 0;
+                s_NET_MSG_RACE race_msg;
+                race_msg.race = MOX::_player[current_player_idx].race;
+                race_msg.player_idx = (int8_t)current_player_idx;
+                NETMOX::Mox_Send_Message_(0x7FFE, 0x39, &race_msg, 2);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.player_race_deselected_flags[current_player_idx]) {
+                message_sent = true;
+                NETMOX::_net.player_race_deselected_flags[current_player_idx] = 0;
+                uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field152_0x1f3);
+                player_race_selection_sync_flags[current_player_idx] = 1;
+                int8_t race = MOX::_player[current_player_idx].race;
+                NETMOX::Mox_Send_Message_(0x7FFE, 0x3D, &race, 1);
+            }
+        }
+
+        if (!message_sent) {
+            uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field152_0x1f3);
+            if (player_race_selection_sync_flags[current_player_idx]) {
+                message_sent = true;
+                player_race_selection_sync_flags[current_player_idx] = 0;
+                NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x3F, nullptr, 0);
+            }
+        }
+
+        if (!message_sent) {
+            if (NETMOX::_net.diplomacy_initiator_id != -1) {
+                int8_t target_idx = NETMOX::_net.diplomacy_target_id;
+                NETMOX::_net.diplomacy_initiator_id = -1;
+                NETMOX::Mox_Send_Message_(MOX::_player[target_idx].network_player_id, 0x44, &MOX::_player[MOX::_PLAYER_NUM], sizeof(s_player));
+            }
+        }
+
+        NETMOX::_is_updating = 0;
+    }
+
     void __cdecl Send_Game_Orders_() {
         allocate::Push_Block_(MOX::_screen_seg);
         uint8_t* packet = reinterpret_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 350000));

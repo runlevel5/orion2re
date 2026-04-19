@@ -135,6 +135,11 @@ namespace COLONY {
     inline int32_t& _sys_disp_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD4});
     inline int32_t& _sys_disp_scanned_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FEC});
 
+    inline void __cdecl Load_Colony_Anims_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dcd60});
+        fn();
+    }
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
     s_animation_header* __cdecl C_Anims_(int16_t index);

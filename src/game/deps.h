@@ -206,3 +206,5 @@
 #include "beams.h"
 #include "bitio.h"
 #include "lbx.h"
+#include "colbomb.h"
+#include "aibomb.h"

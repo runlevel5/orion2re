@@ -350,6 +350,10 @@ namespace FILEDEF {
     void __cdecl Save_Moo_Custom_Player_Data_(s_player* player) {
     }
 
+    bool __cdecl Read_Moo_Custom_Player_Data_(s_player* player) {
+        return false;
+    }
+
     void __cdecl Get_Saved_Game_Descriptions_(void* buffer) {
         using Fn = void(__cdecl*)(void*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043CE60});

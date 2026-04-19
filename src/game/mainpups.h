@@ -138,4 +138,16 @@ namespace MAINPUPS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045A470});
         fn(x, y, anim, name, desc);
     }
+
+    inline int16_t __cdecl Colony_Selection_Popup_(void* info_ptr, void* defender_info, int seed, int16_t colony_idx, int8_t bombardment_result, bool has_stellar) {
+        using Fn = int16_t(__cdecl*)(void*, void*, int, int16_t, int8_t, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045d940});
+        return fn(info_ptr, defender_info, seed, colony_idx, bombardment_result, has_stellar);
+    }
+
+    inline int16_t __cdecl Colony_Bombing_Popup_(s_combat_bomb_result* bomb, void* info_ptr, void* defender_info, int seed, int16_t colony_idx, int8_t bombardment_result, bool has_stellar) {
+        using Fn = int16_t(__cdecl*)(s_combat_bomb_result*, void*, void*, int, int16_t, int8_t, bool);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045de50});
+        return fn(bomb, info_ptr, defender_info, seed, colony_idx, bombardment_result, has_stellar);
+    }
 }

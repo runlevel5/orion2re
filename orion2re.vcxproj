@@ -68,6 +68,7 @@
     <ClCompile Include="src\game\combfind.cpp" />
     <ClCompile Include="src\game\combinit.cpp" />
     <ClCompile Include="src\game\comcore.cpp" />
+    <ClCompile Include="src\game\contact.cpp" />
     <ClCompile Include="src\game\council.cpp" />
     <ClCompile Include="src\game\desbox.cpp" />
     <ClCompile Include="src\game\design.cpp" />
@@ -83,12 +84,14 @@
     <ClCompile Include="src\game\evanhelp.cpp" />
     <ClCompile Include="src\game\events.cpp" />
     <ClCompile Include="src\game\exitm.cpp" />
+    <ClCompile Include="src\game\fade.cpp" />
     <ClCompile Include="src\game\fakebuts.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
     <ClCompile Include="src\game\fleetpop.cpp" />
+    <ClCompile Include="src\game\flt.cpp" />
     <ClCompile Include="src\game\flt1.cpp" />
     <ClCompile Include="src\game\flt2.cpp" />
     <ClCompile Include="src\game\fmtpara.cpp" />
@@ -110,6 +113,7 @@
     <ClCompile Include="src\game\key.cpp" />
     <ClCompile Include="src\game\line.cpp" />
     <ClCompile Include="src\game\list.cpp" />
+    <ClCompile Include="src\game\loader.cpp" />
     <ClCompile Include="src\game\loadsave.cpp" />
     <ClCompile Include="src\game\lostship.cpp" />
     <ClCompile Include="src\game\mainmenu.cpp" />
@@ -133,6 +137,7 @@
     <ClCompile Include="src\game\netstart.cpp" />
     <ClCompile Include="src\game\netturn.cpp" />
     <ClCompile Include="src\game\newgame.cpp" />
+    <ClCompile Include="src\game\newpup.cpp" />
     <ClCompile Include="src\game\newtech.cpp" />
     <ClCompile Include="src\game\nextturn.cpp" />
     <ClCompile Include="src\game\npcdiplo.cpp" />
@@ -192,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="src\game\accss.h" />
     <ClInclude Include="src\game\advciv.h" />
+    <ClInclude Include="src\game\aibomb.h" />
     <ClInclude Include="src\game\aibuild.h" />
     <ClInclude Include="src\game\aidata.h" />
     <ClInclude Include="src\game\aidesign.h" />
@@ -227,6 +233,7 @@
     <ClInclude Include="src\game\cmbtspec.h" />
     <ClInclude Include="src\game\colbcach.h" />
     <ClInclude Include="src\game\colbldg.h" />
+    <ClInclude Include="src\game\colbomb.h" />
     <ClInclude Include="src\game\colcalc.h" />
     <ClInclude Include="src\game\coldraw.h" />
     <ClInclude Include="src\game\colgcbt.h" />

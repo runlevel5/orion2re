@@ -894,13 +894,12 @@ struct s_battle_results {
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
-    undefined field5_0x8;
+    uint8_t combat_type;
     int8_t combat_attacker_id;
     int8_t combat_result;
-    undefined field8_0xb;
+    int8_t diplomacy_target_id;
     int8_t outpost_destroyed_flag;
-    undefined field10_0xd;
-    undefined field11_0xe;
+    int16_t planet_id;
     struct s_combat_bomb_result bomb;
     struct s_battle_results_info info;
 };
@@ -3232,9 +3231,9 @@ struct s_network {
     int16_t combat_defender_id;
     int16_t combat_planet_id;
     int16_t combat_target_player_id;
-    undefined field114_0x183;
+    uint8_t combat_type;
     int8_t combat_attacker_id;
-    undefined field116_0x185;
+    int8_t combat_result;
     int8_t diplomacy_target_id;
     int8_t sync_phase_active_flag;
     struct s_battle_results *combat_results_data;
@@ -3644,6 +3643,14 @@ struct s_report {
     undefined field11_0xf;
     short field4_0x10;
     int8_t field5_0x12;
+};
+
+typedef struct s_retreat_report s_retreat_report, *Ps_retreat_report;
+
+struct s_retreat_report {
+    int8_t reason;
+    int16_t count;
+    int8_t killed_officers;
 };
 
 typedef struct s_saved_box s_saved_box, *Ps_saved_box;

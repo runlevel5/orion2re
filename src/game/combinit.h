@@ -5,11 +5,7 @@ namespace COMBINIT {
     inline uint8_t& flux_shield_hits = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F050});
     inline uint8_t& barrier_shield_hits = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F053});
 
-    inline void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0040d2e0});
-        fn(colony_idx);
-    }
+    void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx);
 
     inline int8_t* s__00579491 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579491});
     inline int8_t* s__00579492 = reinterpret_cast<int8_t*>(std::uintptr_t{0x00579492});

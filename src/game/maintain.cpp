@@ -1,6 +1,28 @@
 #include "pch.h"
 
 namespace maintain {
+    /**
+     * Determines if a building is processed in the first maintenance phase.
+     * Buildings with no maintenance, specific AI groups, or the Star Base (index 9) are excluded.
+     */
+    bool __cdecl Phase1_Building_(s_player* p, int16_t a, int16_t b) {
+        // TYPE MISMATCH: decompiler showed bool __cdecl Phase1_Building_(int16_t building_idx)
+        if (TECHDATA::_buildings[b].maintenance <= 0) {
+            return false;
+        }
+
+        int16_t tech_app_idx = TECHDATA::_buildings[b].tech_app;
+        uint8_t ai_group = TECHDATA::_technology_applications[tech_app_idx].ai_group;
+
+        // Exclude specific AI groups (likely Orion-related or unique structures)
+        if (ai_group == 3 || ai_group == 1) {
+            return false;
+        }
+
+        // Special case: building 9 (Star Base) is handled elsewhere
+        return b != 9;
+    }
+
     // Suggested name: Player_Maintenance_
     void __cdecl Player_Maintenance_(s_player* param_1) {
         if (param_1->do_not_research) {
@@ -186,6 +208,14 @@ namespace maintain {
         return false;
     }
 
+    int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship) {
+        if (Ship_Is_At_Colony_(ship)) {
+            // Returns 1/4 of the ship's cost as scrap value
+            return (int16_t)(ship->d.cost / 4);
+        }
+        return 0;
+    }
+
     // Suggested name: MAINTAIN::Make_Scrap_Ships_Dead_
     void __cdecl Make_Scrap_Ships_Dead_() {
         int num_ships = (int)MOX::_NUM_SHIPS;
@@ -332,6 +362,67 @@ namespace maintain {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(s_player*, int16_t, int16_t)) {
+        int16_t plr_idx = (int16_t)(player - MOX::_player);
+        bool no_more_buildings = false;
+
+        while ((player->bc + player->surplus_bc < 0) && !no_more_buildings) {
+            int32_t min_worth = 0x7FFF;
+            int32_t candidates_count = 0;
+            s_colony* best_colony = nullptr;
+            int32_t best_building = 0;
+
+            for (int i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
+                s_colony* col = &MOX::_colony[i];
+                if (col->owner == (char)plr_idx) {
+                    for (int j = 0; j < 49; ++j) {
+                        if (col->buildings[j] != 0 && can_scrap(player, (int16_t)i, (int16_t)j)) {
+                            int32_t worth = Building_Worth_(col, (int16_t)j);
+                            if (worth < min_worth) {
+                                min_worth = worth;
+                                candidates_count = 1;
+                                best_colony = col;
+                                best_building = j;
+                            } else if (worth == min_worth) {
+                                candidates_count++;
+                                if (random::Random_((uint32_t)candidates_count) == 1) {
+                                    best_colony = col;
+                                    best_building = j;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (best_colony == nullptr) {
+                no_more_buildings = true;
+            } else {
+                int16_t scrap_value = (int16_t)(TECHDATA::_buildings[best_building].cost / 2);
+                int16_t colony_idx = (int16_t)(best_colony - MOX::_colony);
+                
+                ERICNET::Remove_Building_(colony_idx, (int16_t)best_building);
+                
+                player->bc += scrap_value;
+                if (player->objectives != 100 /* 'd' */) {
+                    player->bc += MOX::_settings.game_difficulty;
+                }
+
+                COLCALC::Colony_Calculation_(colony_idx);
+
+                s_MSG msg;
+                memset(&msg, 0, sizeof(s_MSG));
+                msg.msg_type = MSG_TYPE_COLONY;
+                msg.u.colony.planet_idx = (uint8_t)best_colony->planet;
+                msg.u.colony.subtype = 0 /* s_MSG_colony_scrap_building */;
+                msg.u.colony.c.scrap.building_id = (int16_t)best_building;
+                msg.u.colony.c.scrap.bc = scrap_value;
+
+                MSG_::Add_Msg_(msg, plr_idx);
             }
         }
     }

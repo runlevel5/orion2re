@@ -321,6 +321,198 @@ void __cdecl Process_Retreating_Ships_(void) {
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
+void __cdecl Client_Combat_Loop_() {
+    int8_t local_attack_confirmed[8][8];
+    s_battle_results local_battle_results_1;
+    s_battle_results local_battle_results_2;
+    s_battle_results local_battle_results_main;
+    int16_t target_colony;
+    int32_t new_star_target;
+    int16_t star_id;
+    int16_t defender_id;
+    int16_t planet_id;
+    int16_t result;
+
+    NETMOX::_net.combat_results_data = &local_battle_results_main;
+    memset(local_attack_confirmed, 0, sizeof(local_attack_confirmed));
+    COMBFIND::_attack_confirmed = (int8_t (*)[8][8])local_attack_confirmed;
+
+    while (NETMOX::_net.sync_state > 14 && NETMOX::_net.sync_state < 35 /* 0x23 */) {
+        RUSS::Mox_Update_();
+        MULTPLAY::Chat_Box_Input_Loop_();
+        RUSS::Mox_Update_();
+
+        star_id = NETMOX::_net.combat_star_id;
+        defender_id = NETMOX::_net.combat_defender_id;
+        planet_id = NETMOX::_net.combat_planet_id;
+
+        switch (NETMOX::_net.sync_state) {
+        case 15:
+            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
+                RUSS::Mox_Update_();
+            }
+            NETMOX::Decode_Pick_Target_Info_(NETMOX::_net.network_data_ptr);
+            NETMOX::_net.network_data_ptr = nullptr;
+            allocate::Pop_Block_(MOX::_screen_seg);
+            NETMOX::_net.total_chunk_count = 0;
+            break;
+
+        case 16:
+            fields::Assign_Auto_Function_(SCORE::nullsub, 1);
+            video::Set_Page_Off_();
+            MOX::_dont_draw_main_screen_to_back = 1;
+            MAINSCR::Draw_Mini_Main_Screen_();
+            video::Copy_Off_To_Back_();
+            video::Set_Refresh_Stencil_();
+            ERICNET::Mox_Play_Sound_(51 /* 0x33 */);
+            COMBFIND::Get_Local_Human_Target_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, &NETMOX::_net.combat_defender_id, &target_colony);
+            NETMOX::_net.combat_planet_id = COMBFIND::Target_Colony_To_Planet_(target_colony);
+            MULTPLAY::Load_Net_Next_Turn_Screen_(0);
+            NETMOX::_net.sync_state = 17;
+            if (target_colony == -1) {
+                if (NETMOX::_net.combat_defender_id == -1) {
+                    NETMOX::_net.combat_target_player_id = -1;
+                    NETMOX::_net.sync_state = 14;
+                } else {
+                    NETMOX::_net.combat_target_player_id = NETMOX::_net.combat_defender_id;
+                }
+            } else {
+                NETMOX::_net.combat_target_player_id = (int16_t)MOX::_colony[target_colony].owner;
+            }
+            NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 17, &NETMOX::_net.combat_defender_id, 6);
+            break;
+
+        case 18:
+            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
+                RUSS::Mox_Update_();
+            }
+            NETMOX::Decode_You_Are_Target_Info_(NETMOX::_net.network_data_ptr);
+            NETMOX::_net.network_data_ptr = nullptr;
+            allocate::Pop_Block_(MOX::_screen_seg);
+            NETMOX::_net.total_chunk_count = 0;
+            break;
+
+        case 19:
+            if (NETMOX::_net.combat_attacker_id < 8 && MOX::_player[(int)NETMOX::_net.combat_attacker_id].objectives == 100) {
+                NETMOX::_net.sync_state = 21;
+            } else {
+                NETMOX::_net.sync_state = 23;
+            }
+            ERICNET::Mox_Play_Sound_(51 /* 0x33 */);
+            break;
+
+        case 20:
+            memset(&local_battle_results_1, 0, sizeof(s_battle_results));
+            local_battle_results_1.packet_type = NETMOX::_net.sync_state;
+            local_battle_results_1.combat_star_id = NETMOX::_net.combat_star_id;
+            local_battle_results_1.combat_defender_id = NETMOX::_net.combat_defender_id;
+            local_battle_results_1.combat_planet_id = NETMOX::_net.combat_planet_id;
+            local_battle_results_1.combat_target_player_id = NETMOX::_net.combat_target_player_id;
+            local_battle_results_1.planet_id = planet_id;
+            local_battle_results_1.combat_type = NETMOX::_net.combat_type;
+            local_battle_results_1.combat_attacker_id = NETMOX::_net.combat_attacker_id;
+            local_battle_results_1.combat_result = NETMOX::_net.combat_result;
+            local_battle_results_1.diplomacy_target_id = NETMOX::_net.diplomacy_target_id;
+            result = COMBFIND::Do_1_Combat_(star_id, MOX::_PLAYER_NUM, defender_id, planet_id, &local_battle_results_1, 0);
+            local_battle_results_1.combat_result = (int8_t)result;
+            NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 24, &local_battle_results_1, 1742);
+            while (NETMOX::_net.sync_state != 14) {
+                RUSS::Mox_Update_();
+            }
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_1.combat_result);
+            break;
+
+        case 21:
+            result = COMBFIND::Do_1_Combat_(NETMOX::_net.combat_star_id, NETMOX::_net.combat_attacker_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, nullptr, 0);
+            if (NETMOX::_net.sync_state != 26) {
+                NETMOX::_net.sync_state = 14;
+                while (NETMOX::_net.sync_state != 26) {
+                    RUSS::Mox_Update_();
+                }
+            }
+            COMBFIND::Bomb_Results_Popups_(NETMOX::_net.combat_results_data);
+            NETMOX::Mox_Send_Message_(MOX::_player[(int)NETMOX::_net.combat_attacker_id].network_player_id, 25, nullptr, 0);
+            NETMOX::_net.sync_state = 14;
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, NETMOX::_net.combat_attacker_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, result);
+            break;
+
+        case 22:
+            result = COMBFIND::Do_1_Combat_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, nullptr, 0);
+            NETMOX::_net.sync_state = 14;
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, result);
+            break;
+
+        case 23:
+            result = COMBFIND::Do_1_Combat_(NETMOX::_net.combat_star_id, NETMOX::_net.combat_attacker_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, nullptr, 0);
+            NETMOX::_net.sync_state = 14;
+            MULTPLAY::Load_Net_Next_Turn_Screen_(1);
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, NETMOX::_net.combat_attacker_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, result);
+            break;
+
+        case 24:
+            memset(&local_battle_results_2, 0, sizeof(s_battle_results));
+            local_battle_results_2.packet_type = NETMOX::_net.sync_state;
+            local_battle_results_2.combat_star_id = NETMOX::_net.combat_star_id;
+            local_battle_results_2.combat_defender_id = NETMOX::_net.combat_defender_id;
+            local_battle_results_2.combat_planet_id = NETMOX::_net.combat_planet_id;
+            local_battle_results_2.combat_target_player_id = NETMOX::_net.combat_target_player_id;
+            local_battle_results_2.planet_id = planet_id;
+            local_battle_results_2.combat_type = NETMOX::_net.combat_type;
+            local_battle_results_2.combat_attacker_id = NETMOX::_net.combat_attacker_id;
+            local_battle_results_2.combat_result = NETMOX::_net.combat_result;
+            local_battle_results_2.diplomacy_target_id = NETMOX::_net.diplomacy_target_id;
+            result = COMBFIND::Do_1_Combat_(star_id, MOX::_PLAYER_NUM, defender_id, planet_id, &local_battle_results_2, 0);
+            local_battle_results_2.combat_result = (int8_t)result;
+            MULTPLAY::Load_Net_Next_Turn_Screen_(1);
+            if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {
+                NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 22, &local_battle_results_2, 1742);
+            }
+            NETMOX::_net.sync_state = 14;
+            NETMOX::Send_Battle_Results_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_target_player_id, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, (int16_t)local_battle_results_2.combat_result);
+            break;
+
+        case 25:
+            COMBFIND::Strategic_Results_Popup_(NETMOX::_net.combat_results_data);
+            COMBFIND::Bomb_Results_Popups_(NETMOX::_net.combat_results_data);
+            MULTPLAY::Load_Net_Next_Turn_Screen_(0);
+            NETMOX::_net.sync_state = 14;
+            NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 23, nullptr, 0);
+            break;
+
+        case 28:
+            result = MAINPUPS::Dragon_New_Star_Popup_(MOX::_PLAYER_NUM, NETMOX::_net.combat_star_id);
+            new_star_target = (int32_t)result;
+            MULTPLAY::Load_Net_Next_Turn_Screen_(0);
+            if (new_star_target == -1) {
+                NETMOX::_net.sync_state = 29;
+                NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 36 /* 0x24 */, nullptr, 0);
+            } else {
+                NETMOX::_net.sync_state = 14;
+                NETMOX::Mox_Send_Message_(NETMOX::_net.local_net_id, 37 /* 0x25 */, &new_star_target, 4);
+            }
+            break;
+
+        case 34:
+            while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
+                RUSS::Mox_Update_();
+            }
+            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr);
+            NETMOX::_net.network_data_ptr = nullptr;
+            allocate::Pop_Block_(MOX::_screen_seg);
+            NETMOX::_net.total_chunk_count = 0;
+            NETMOX::_net.sync_state = 14;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    NETMOX::_net.combat_results_data = nullptr;
+    COMBFIND::_attack_confirmed = nullptr;
+    RUSS::Mox_Update_();
+}
+
 void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
     int16_t ship_indices[2];
     s_ship_move_info move_info;
@@ -1160,6 +1352,32 @@ int16_t __cdecl Target_Colony_To_Planet_(int32_t colony_idx) {
     return MOX::_colony[colony_idx].planet;
 }
 
+int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx) {
+    for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+        if (MOX::_player[i].objectives == 100) {
+            s_combfind_star_has_player& star_info = (*COMBFIND::_star_has_player)[star_idx][i];
+
+            if (star_info.colony_count != 0 || star_info.has_player != 0) {
+                if (NETMOX::_net.player_net_info[i].sync_phase_ready_flag != 0xFF) {
+                    return 1;
+                }
+
+                if (MOX::_PLAYER_NUM == i) {
+                    if (NETMOX::_net.sync_state >= 33 && NETMOX::_net.sync_state <= 34) {
+                        return 1;
+                    }
+
+                    if (NETMOX::_net.network_data_ptr != nullptr) {
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx) {
     s_combfind_star_has_player *dest;
 
@@ -1734,6 +1952,309 @@ void __cdecl Get_Best_Colony_Target_(
         *best_score = best_pref_score;
         *best_colony_idx = static_cast<int16_t>(best_pref_colony);
     }
+}
+
+void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uint32_t colony_idx, s_battle_results* results) {
+    s_ship_data* ships = MOX::_ship;
+    int16_t ship_idx = *ship_list;
+    int8_t attacker_id = ships[ship_idx].owner;
+    s_colony* colony = &MOX::_colony[colony_idx];
+    int16_t planet_idx = colony->planet;
+    int8_t star_idx = MOX::_planet[planet_idx].star_index;
+    int8_t colony_owner = colony->owner;
+
+    if (colony->outpost_flag != 0) {
+        results->outpost_destroyed_flag = 1;
+        BOMB::Destroy_Colony_(colony, 1);
+        COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+    } else if (attacker_id < 8) {
+        if (MOX::_player[attacker_id].objectives == 'd' /* ECON_INDUSTRY */) {
+            bool is_active_player = false;
+            if ((MOX::_game_type != 2 && MOX::_game_type != 3) || (MOX::_PLAYER_NUM == attacker_id)) {
+                is_active_player = true;
+            }
+
+            if (is_active_player) {
+                int8_t bombardment_res = Do_Bombardment_(attacker_id, colony_idx);
+                bool has_stellar = Has_Stellar_Converter_(ship_list, n_ships);
+
+                invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &results->info.attacker_invasion, &results->info.defender_invasion);
+                int seed = random::Get_Random_Seed_();
+                int16_t selection = MAINPUPS::Colony_Selection_Popup_(&results->info, &results->info.defender_invasion, seed, (int16_t)colony_idx, bombardment_res, has_stellar);
+
+                bool loop_done = false;
+                do {
+                    switch (selection) {
+                        case 1: { // Stellar Converter
+                            results->info.planet_destroyed_flag = 1;
+                            BOMB::Destroy_Colony_(colony, 2);
+                            ERIC::Play_Planetary_Destruction_Flic_();
+                            COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+                            MOX::_planet[planet_idx].planet_type = 1 /* PLANET_TYPE_ASTEROIDS */;
+                            if (MOX::_planet[planet_idx].planet_special != 0) {
+                                MOX::_planet[planet_idx].planet_special = 0;
+                                MOX::_star[star_idx].system_special = 0;
+                            }
+                            NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, colony->n_pops);
+                            loop_done = true;
+                            break;
+                        }
+                        case 2: { // Bombing
+                            int bomb_seed = random::Get_Random_Seed_();
+                            memset(&results->bomb, 0, sizeof(s_combat_bomb_result));
+                            results->bomb.attacker_idx = attacker_id;
+                            results->bomb.colony_idx = (uint8_t)colony_idx;
+                            COMBAT::Bombardment_(&results->bomb);
+
+                            invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &results->info.attacker_invasion, &results->info.defender_invasion);
+                            selection = MAINPUPS::Colony_Bombing_Popup_(&results->bomb, &results->info, &results->info.defender_invasion, bomb_seed, (int16_t)colony_idx, bombardment_res, has_stellar);
+                            NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, results->bomb.population_killed);
+
+                            if (results->bomb.colony_wiped_out != 0) {
+                                BOMB::Destroy_Colony_(colony, 1);
+                                COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+                                loop_done = true;
+                            } else {
+                                if (results->info.attacker_invasion.unit_counts[1] == 0 && !has_stellar && !ERIC::Player_Can_Mind_Control_Colony_(attacker_id, (int16_t)colony_idx)) {
+                                    loop_done = true;
+                                }
+                            }
+                            bombardment_res = -1;
+                            break;
+                        }
+                        case 3: { // Invasion
+                            invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
+                            int combat_seed = random::Get_Random_Seed_();
+                            ERIC::Force_Fade_To_Colony_Palette_(1);
+                            COLGCBT::Colony_Combat_Screen_((int)&results->info, (int)&results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
+                            ERIC::Force_Fade_To_Colony_Palette_(0);
+                            random::Set_Random_Seed_(combat_seed);
+
+                            if (results->info.captured_tech_id != 0) {
+                                SCIENCE::Show_Off_Captured_Tech_((int)results->info.captured_techs_data, results->info.captured_tech_id, results->info.captured_tech_planet_id);
+                            }
+                            NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, 0);
+
+                            if (colony->owner == attacker_id) {
+                                COMBFIND::_current_star_has_player[attacker_id].colony_count++;
+                                COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+                            }
+                            COMBFIND::_messed_up_fleet_palette = 1;
+                            loop_done = true;
+                            break;
+                        }
+                        case 4: { // Surrender/Mind Control
+                            invasion::Change_Colony_Ownership_(colony, attacker_id, &results->info);
+                            results->info.field524_0x6cd = 1;
+                            if (results->info.captured_tech_id != 0) {
+                                SCIENCE::Show_Off_Captured_Tech_((int)results->info.captured_techs_data, results->info.captured_tech_id, colony->planet);
+                            }
+                            NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, colony->n_pops);
+                            COMBFIND::_current_star_has_player[attacker_id].colony_count++;
+                            COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+                            loop_done = true;
+                            break;
+                        }
+                        case -1:
+                        default: {
+                            loop_done = true;
+                            break;
+                        }
+                    }
+                } while (!loop_done);
+
+                if (results->bomb.bio_pop_killed != 0) {
+                    COMBINIT::Apply_Bio_Weapon_Penalty_(attacker_id, star_idx, results->bomb.bio_pop_killed);
+                }
+
+                if ((MOX::_game_type > 1 && MOX::_game_type < 4) && (MOX::_PLAYER_NUM == attacker_id || MOX::_PLAYER_NUM == colony_owner)) {
+                    MULTPLAY::Load_Net_Next_Turn_Screen_(0);
+                    MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+                    MULTPLAY::Chat_Box_Input_Loop_();
+                }
+            }
+        } else {
+            if (ERIC::Player_Can_Mind_Control_Colony_(attacker_id, (int16_t)colony_idx)) {
+                results->info.is_mind_controlled = 1;
+                invasion::Change_Colony_Ownership_(colony, attacker_id, &results->info);
+                COMBFIND::_current_star_has_player[attacker_id].colony_count++;
+                COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+            } else {
+                bool has_stellar = Has_Stellar_Converter_(ship_list, n_ships);
+                int enemy_star_idx = MOX::_planet[colony->planet].star_index;
+                bool knows_attacker = false;
+
+                for (int i = 0; i < colony->n_pops; ++i) {
+                    if ((colony->pop[i] & 0xF) == (uint32_t)attacker_id) {
+                        knows_attacker = true;
+                        break;
+                    }
+                }
+
+                memset(&results->bomb, 0, sizeof(s_combat_bomb_result));
+                results->bomb.attacker_idx = attacker_id;
+                results->bomb.colony_idx = (uint8_t)colony_idx;
+                COMBAT::Bombardment_(&results->bomb);
+
+                int bomb_hits = results->bomb.bomb_hits_remaining;
+                int bio_hits = results->bomb.bio_hits_remaining;
+
+                if (bomb_hits != 0 || bio_hits != 0 || knows_attacker) {
+                    bool surrender = false;
+                    if (MOX::_player[colony_owner].objectives != 'd' /* ECON_INDUSTRY */ && MOX::_settings.game_difficulty > 2) {
+                        if (COLCALC::May_Surrender_Star_(enemy_star_idx, colony_owner, attacker_id) && (int)(colony->n_pops * 2) <= bomb_hits) {
+                            surrender = true;
+                        }
+                    }
+
+                    if (surrender) {
+                        MOX::_star[star_idx].surrender_to[colony_owner] = attacker_id + 8;
+                        diplomac::Declare_Peace_(colony_owner, attacker_id);
+                    } else if (knows_attacker) {
+                        bool success = false;
+                        bool done = false;
+                        do {
+                            if (aibomb::AI_Invasion_Will_Succeed_(attacker_id, ship_list, n_ships, colony)) {
+                                success = true;
+                            } else {
+                                if (colony->n_pops == 1 && (colony->pop[0] & 0xF) == (uint32_t)attacker_id && 
+                                    MOX::_player[attacker_id].personality != 1 && (COMBFIND::Player_Owns_Transports_(attacker_id) || 
+                                    (MOX::_player[attacker_id].traits[25] != 0 && MOX::_player[colony_owner].traits[25] == 0))) {
+                                    done = true;
+                                } else if (bio_hits == 0) {
+                                    int used = BOMB::Resolve_Bomb_Hit_(colony, &results->bomb, bomb_hits);
+                                    if (used == 0) bomb_hits = 0; else bomb_hits -= used;
+                                } else {
+                                    BOMB::Resolve_Biological_Hit_(colony, &results->bomb);
+                                    bio_hits--;
+                                }
+                            }
+                        } while (!success && !done && (bio_hits + bomb_hits != 0));
+                    } else {
+                        int stars_in_range = N_Enemy_Stars_In_Range_(attacker_id, colony_owner);
+                        if (stars_in_range < 2 && N_Enemy_Stars_(colony_owner) != 1) {
+                            bool success = false;
+                            bool done = false;
+                            do {
+                                if (aibomb::AI_Invasion_Will_Succeed_(attacker_id, ship_list, n_ships, colony)) {
+                                    success = true;
+                                } else {
+                                    if (colony->n_pops == 1) {
+                                        done = true;
+                                    } else if (bio_hits == 0) {
+                                        int used = BOMB::Resolve_Bomb_Hit_(colony, &results->bomb, bomb_hits);
+                                        if (used == 0) bomb_hits = 0; else bomb_hits -= used;
+                                    } else {
+                                        BOMB::Resolve_Biological_Hit_(colony, &results->bomb);
+                                        bio_hits--;
+                                    }
+                                }
+                            } while (!success && !done && (bio_hits + bomb_hits != 0));
+                        } else if (has_stellar) {
+                            results->info.planet_destroyed_flag = 1;
+                            BOMB::Destroy_Colony_(colony, 2);
+                        } else {
+                            BOMB::Apply_Bomb_Hits_(&results->bomb);
+                        }
+                    }
+
+                    if (results->bomb.bio_pop_killed != 0) {
+                        COMBINIT::Apply_Bio_Weapon_Penalty_(attacker_id, star_idx, results->bomb.bio_pop_killed);
+                    }
+
+                    if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+                        (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
+                        MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
+                        COLBOMB::Colony_Bombing_Screen_(&results->bomb);
+                    }
+
+                    NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, results->bomb.population_killed);
+
+                    if (results->bomb.colony_wiped_out != 0) {
+                        BOMB::Destroy_Colony_(colony, 1);
+                    }
+                }
+
+                if (results->info.planet_destroyed_flag == 0 && MOX::_star[star_idx].surrender_to[colony_owner] == 0 && 
+                    invasion::Has_Defending_Troops_(attacker_id, ship_list, n_ships, (int16_t)colony_idx)) {
+                    invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
+                    if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+                        (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
+                        MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id)) {
+                        int invade_seed = random::Get_Random_Seed_();
+                        ERIC::Force_Fade_To_Colony_Palette_(1);
+                        COLGCBT::Colony_Combat_Screen_((int)&results->info, (int)&results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
+                        ERIC::Force_Fade_To_Colony_Palette_(0);
+                        random::Set_Random_Seed_(invade_seed);
+                    }
+
+                    NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, 0);
+
+                    if (colony->owner == attacker_id) {
+                        COMBFIND::_current_star_has_player[attacker_id].colony_count++;
+                        COMBFIND::_current_star_has_player[colony_owner].colony_count--;
+                    }
+
+                    if (MOX::_player[attacker_id].objectives == 'd' || MOX::_player[colony_owner].objectives == 'd') {
+                        COMBFIND::_messed_up_fleet_palette = 1;
+                    }
+                }
+            }
+        }
+    } else {
+        if (attacker_id > 9 && attacker_id < 15) {
+            NETMOX::Russ_Event_Monster_Update_(attacker_id, colony->planet, -1);
+        }
+
+        memset(&results->bomb, 0, sizeof(s_combat_bomb_result));
+        results->bomb.attacker_idx = attacker_id;
+        results->bomb.colony_idx = (uint8_t)colony_idx;
+        if (attacker_id == 10) { // Amoeba
+            results->bomb.bomb_hits_remaining = 20;
+            results->bomb.bio_hits_remaining = 0;
+        }
+
+        COMBAT::Bombardment_(&results->bomb);
+        BOMB::Apply_Bomb_Hits_(&results->bomb);
+
+        if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
+            (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
+            MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
+            
+            if (attacker_id == 10) {
+                ERIC::Play_Amoeba_Flic_();
+                COMBFIND::_messed_up_fleet_palette = 1;
+                if (results->bomb.colony_wiped_out == 0) {
+                    MOX::_planet[planet_idx].climate = 0;
+                    MOX::_planet[planet_idx].food_per_farmer = 0;
+                    COLCALC::Colony_Environmental_Stuff_(colony);
+                    invasion::Enforce_Population_Limits_At_Colony_(colony);
+                    COLCALC::Colony_Calculation_((int16_t)(((int)colony - (int)MOX::_colony) / sizeof(s_colony)));
+                }
+            }
+            COLBOMB::Colony_Bombing_Screen_(&results->bomb);
+        }
+
+        if (results->bomb.colony_wiped_out != 0) {
+            BOMB::Destroy_Colony_(colony, 1);
+        }
+    }
+
+    if (attacker_id == 8) { // Antarans
+        if (n_ships > 0) {
+            int count = n_ships;
+            int16_t* list = ship_list;
+            while (count > 0) {
+                antarans::Restock_Antaran_Ship_(MOX::_ship[*list].d.size);
+                SHIPS::Kill_Ship_(*list);
+                list++;
+                count--;
+            }
+        }
+        (*COMBFIND::_star_has_nonplayer)[star_idx] &= 0xFE;
+    }
+
+    MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
 } // namespace COMBFIND

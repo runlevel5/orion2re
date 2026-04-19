@@ -697,6 +697,7 @@ inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*
 
 inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintptr_t{0x00551288});
 inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
+inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
 inline const char* s_0_0055110d = reinterpret_cast<const char*>(std::uintptr_t{0x0055110D});
 inline const char* s___00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */

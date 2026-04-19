@@ -413,4 +413,131 @@ namespace MSG_ {
         }
         return;
     }
+
+    void __cdecl Add_Ongoing_Event_Msgs_() {
+        s_MSG msg;
+
+        if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
+            memset(&msg, 0, sizeof(msg));
+            msg.msg_type = 8 /* MSG_TYPE_HYPERSPACE_FLUX */;
+            msg.priority = 0;
+
+            for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                Add_Msg_(msg, player_idx);
+            }
+        }
+
+        for (int16_t colony_idx = 0; colony_idx < MOX::_NUM_COLONIES; ++colony_idx) {
+            int8_t owner = MOX::_colony[colony_idx].owner;
+            if (owner >= 0) {
+                if (EVENTS::Event_Check_Plague_(colony_idx) != 0) {
+                    memset(&msg, 0, sizeof(msg));
+                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
+                    msg.u.colony.subtype = 6;
+                    Add_Msg_(msg, owner);
+                }
+
+                if (EVENTS::Event_Check_Population_Boom_(colony_idx) != 0) {
+                    memset(&msg, 0, sizeof(msg));
+                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
+                    msg.u.colony.subtype = 7;
+                    Add_Msg_(msg, owner);
+                }
+
+                if (EVENTS::Event_Check_Comet_(colony_idx) != 0) {
+                    memset(&msg, 0, sizeof(msg));
+                    msg.msg_type = 0 /* MSG_TYPE_COLONY */;
+                    msg.u.colony.planet_idx = (uint8_t)MOX::_colony[colony_idx].planet;
+                    msg.u.colony.subtype = 8;
+                    Add_Msg_(msg, owner);
+                }
+            }
+        }
+
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (EVENTS::Event_Check_Space_Anomaly_At_Star_(star_idx) != 0) {
+                memset(&msg, 0, sizeof(msg));
+                msg.msg_type = 0x10 /* MSG_TYPE_ANOMALY */;
+                msg.u.anomaly.star_idx = (uint8_t)star_idx;
+
+                for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                    Add_Msg_(msg, player_idx);
+                }
+            }
+        }
+
+        if (MOX::_stardate == 35023) {
+            time_t current_time = time(NULL);
+            tm* time_info = localtime(&current_time);
+
+            if (time_info->tm_mon == 3 /* April */ && time_info->tm_mday == 1) {
+                memset(&msg, 0, sizeof(msg));
+                msg.msg_type = 0x15 /* MSG_TYPE_APRIL1 */;
+                Add_Msg_All_(msg);
+            }
+        }
+    }
+
+    void __cdecl Add_Peace_Ended_Msg_(int player_a_idx, int player_b_idx) {
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 4);
+    }
+
+    /**
+     * Adds a diplomacy message indicating peace has been declared between two players.
+     */
+    void __cdecl Add_Peace_Msg_(int32_t player_a_idx, int32_t player_b_idx) {
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 1 /* DIPLOMACY_PEACE */);
+    }
+
+    void __cdecl Add_Nonaggression_Msg_(uint8_t plr_a, uint8_t plr_b) {
+        Add_Diplomacy_Msg_(plr_a, plr_b, 3);
+    }
+
+    void __cdecl Add_Msg_All_(s_MSG msg) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            Add_Msg_(msg, i);
+        }
+    }
+
+    void __cdecl Add_Alliance_Msg_(uint32_t player_a_idx, uint32_t player_b_idx) {
+        // Note: The constant 2 maps to MSG_TYPE_DECLARE_WAR in the message table, 
+        // which might indicate a logic quirk or internal enumeration mismatch.
+        Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 2 /* MSG_TYPE_DECLARE_WAR */);
+    }
+
+    void __cdecl Add_War_Msg_(int32_t player_a, int32_t player_b) {
+        Add_Diplomacy_Msg_(player_a, player_b, 0);
+    }
+
+    /**
+     * @brief Transitions to the colony screen for a colony mentioned in a message.
+     *
+     * If the message is of type MSG_TYPE_COLONY and the player owns the colony,
+     * this function updates the screen state to navigate to that colony's management view.
+     */
+    int8_t __cdecl Goto_Msg_Colony_(s_MSG* msg) {
+        if (msg->msg_type == 0 /* MSG_TYPE_COLONY */) {
+            uint8_t planet_idx = msg->u.colony.planet_idx;
+            int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+            if (colony_idx != -1) {
+                s_colony* colony = &MOX::_colony[colony_idx];
+
+                if (colony->owner == MOX::_PLAYER_NUM) {
+                    MOX::_return_screen = 9;
+                    MOX::_current_screen = 1;
+
+                    s_planet_data* planet = &MOX::_planet[colony->planet];
+                    MOX::_screen_data = (int16_t)planet->star_index;
+                    COLONY::_orbit_temp = (int16_t)planet->orbit;
+
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
+    }
 }

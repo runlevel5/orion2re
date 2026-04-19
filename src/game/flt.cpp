@@ -1,0 +1,59 @@
+#include "pch.h"
+
+namespace FLT {
+
+void __cdecl Set_Fltscrn_Small_Ship_Icon_XYs_(int16_t map_x, int16_t map_y, int16_t map_w, int16_t map_h) {
+    int16_t zoom_level;
+    int16_t star_x[72];
+    int16_t star_y[72];
+    int16_t icon_w, icon_h;
+    int16_t actual_star_idx;
+    int16_t icon_x, icon_y;
+
+    zoom_level = (int16_t)HAROLD::Map_Scale_To_Zoom_Level_();
+    MOX::_cur_map_scale = MOX::_max_map_scale;
+
+    for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+        MOVEBOX::Get_Galaxy_Map_Star_XY_(i, map_x, map_y, map_w, map_h, 0, 0, 1, &star_x[i], &star_y[i]);
+    }
+
+    for (int16_t i = 0; i < MOX::_ship_icon_count; ++i) {
+        HAROLD::Actual_Star_Id_(MOX::_ship_icon[i].star_idx, &actual_star_idx);
+        FLT2::Get_Small_Icon_Animation_Size_(i, &icon_w, &icon_h);
+
+        int16_t slot = MOX::_ship_icon[i].stack_slot;
+        if (slot == 0) {
+            icon_x = star_x[actual_star_idx] + 4;
+            icon_y = star_y[actual_star_idx] - (icon_h / 2) - 3;
+        } else if (slot == 1) {
+            int16_t stack_x = HACCESS::Ship_Stack_X_(MOX::_ship_icon[i].node_idx);
+            int16_t stack_y = HACCESS::Ship_Stack_Y_(MOX::_ship_icon[i].node_idx);
+            actual_star_idx = HAROLD::XY_To_Star_Id_(stack_x, stack_y);
+            icon_x = star_x[actual_star_idx] - (icon_w / 2);
+            icon_y = star_y[actual_star_idx] - (icon_h / 2) - 3;
+        } else if (slot == 2) {
+            icon_x = star_x[actual_star_idx] - icon_w;
+            icon_y = star_y[actual_star_idx] - 5;
+        } else if (slot < 5) {
+            icon_x = star_x[actual_star_idx] - icon_w;
+            icon_y = star_y[actual_star_idx] - 5 + icon_h;
+        } else {
+            int16_t ship_idx = MOX::_ship_node[MOX::_ship_icon[i].node_idx].ship_idx;
+            int16_t scaled_x = HAROLD::Get_Scaled_Value_(MOX::_ship[ship_idx].x);
+            int16_t scaled_y = HAROLD::Get_Scaled_Value_(MOX::_ship[ship_idx].y);
+
+            SHIPS::Get_Ship_Icon_Dimensions_(zoom_level, &MOX::_ship_icon_width[zoom_level], &MOX::_ship_icon_height[zoom_level]);
+
+            int32_t x_denom = 506000 / map_w;
+            icon_x = (int16_t)((scaled_x * 1000) / x_denom) - (icon_w / 2) + map_x;
+
+            int32_t y_denom = 400000 / map_h;
+            icon_y = (int16_t)((scaled_y * 1000) / y_denom) - (icon_h / 2) + map_y;
+        }
+
+        MOX::_ship_icon[i].x = icon_x;
+        MOX::_ship_icon[i].y = icon_y;
+    }
+}
+
+} // namespace FLT

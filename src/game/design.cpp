@@ -1737,4 +1737,136 @@ namespace DESIGN {
         MOX::_design->special_device_cost[n_systems - 1] = 0;
         MOX::_design->special_device_space[n_systems - 1] = 0;
     }
+
+    int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_idx, int16_t mod_bonus_idx, int16_t param_3, int16_t rack_type, int16_t param_5, int16_t mod_flags) {
+        int32_t base_size = (int32_t)TECHDATA::_weapons[weapon_idx].size;
+        int32_t rack_size = (int32_t)DESIGN::Weapon_Rack_Size_(rack_type);
+        int32_t total_size = base_size + rack_size;
+
+        int16_t temp_bonus;
+        int16_t special_multiplier;
+        DESIGN::Bonus_For_Special_Mods_(mod_flags, &temp_bonus, &special_multiplier);
+
+        // Apply special modification multiplier
+        total_size = (total_size * (int32_t)special_multiplier) / 100;
+
+        int16_t mod_space_bonus = 0;
+        if (DESIGN::Weapon_Type_(weapon_idx) == 0) {
+            mod_space_bonus = DESIGN::Get_Weapon_Mod_Space_Bonus_(mod_bonus_idx);
+        }
+
+        int16_t regular_multiplier;
+        DESIGN::Bonus_For_Regular_Mods_(mod_flags, &temp_bonus, &regular_multiplier);
+
+        // Result is based on additive regular multipliers and the previously calculated size
+        int32_t final_multiplier = (int32_t)regular_multiplier + (int32_t)mod_space_bonus + 100;
+        return (int16_t)((total_size * final_multiplier) / 100);
+    }
+
+    void __cdecl Clear_Weapon_Slot_(int16_t slot_idx) {
+        int last_active_slot = (int)MOX::_n_weapons_loaded - 1;
+
+        if ((int)slot_idx < last_active_slot) {
+            for (int i = (int)slot_idx; i < last_active_slot; ++i) {
+                MOX::_design->weapon_type[i] = MOX::_design->weapon_type[i + 1];
+                MOX::_design->weapon_count[i] = MOX::_design->weapon_count[i + 1];
+                MOX::_design->weapon_firing_arc[i] = MOX::_design->weapon_firing_arc[i + 1];
+                MOX::_design->weapon_specials[i] = MOX::_design->weapon_specials[i + 1];
+                MOX::_design->weapon_cost[i] = MOX::_design->weapon_cost[i + 1];
+                MOX::_design->weapon_space[i] = MOX::_design->weapon_space[i + 1];
+                MOX::_design->weapon_ammo[i] = MOX::_design->weapon_ammo[i + 1];
+            }
+        }
+
+        MOX::_design->weapon_type[last_active_slot] = 0;
+        MOX::_design->weapon_count[last_active_slot] = 0;
+        MOX::_design->weapon_firing_arc[last_active_slot] = 0;
+        MOX::_design->weapon_specials[last_active_slot] = 0;
+        MOX::_design->weapon_cost[last_active_slot] = 0;
+        MOX::_design->weapon_space[last_active_slot] = 0;
+        MOX::_design->weapon_ammo[last_active_slot] = 0;
+    }
+
+    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t flag_a, int16_t flag_b) {
+        bool is_design_slot = false;
+        int16_t weapon_idx = 0;
+        int16_t weapon_id;
+
+        if (flag_b == -1 && flag_a == -1) {
+            is_design_slot = true;
+        }
+
+        if (is_design_slot) {
+            weapon_idx = weapon_id_or_slot;
+            weapon_id = MOX::_design->weapon_type[weapon_idx];
+        } else {
+            weapon_id = weapon_id_or_slot;
+        }
+
+        int16_t min_damage = TECHDATA::_weapons[weapon_id].min_damage;
+        int16_t max_damage = TECHDATA::_weapons[weapon_id].max_damage;
+
+        buffer[0] = '\0';
+        char special_msg[20];
+        special_msg[0] = '\0';
+
+        // Check for weapons with special descriptive text instead of damage numbers
+        if (weapon_id == 13 || weapon_id == 28 || weapon_id == 32 || weapon_id == 33 ||
+            weapon_id == 34 || weapon_id == 26 || weapon_id == 25 || weapon_id == 31 ||
+            weapon_id == 30 || weapon_id == 29 || weapon_id == 36 || weapon_id == 35 ||
+            weapon_id == 37 || weapon_id == 39) {
+
+            const char* msg = HAROLD::H_Message_(HESTR_065_SPECIAL);
+            strcpy(special_msg, msg);
+        } else if (weapon_id == 29 || weapon_id == 30) {
+            min_damage = INITSHIP::Best_Bomb_Weapon_(MOX::_PLAYER_NUM);
+            max_damage = min_damage;
+        } else if (weapon_id == 31) {
+            // Point Defense damage is half of its best weapon's damage
+            min_damage = INITSHIP::Best_Point_Defense_Weapon_(MOX::_PLAYER_NUM) / 2;
+            max_damage = min_damage;
+        }
+
+        if (is_design_slot) {
+            uint16_t specials = MOX::_design->weapon_specials[weapon_idx];
+            if ((specials & 0x4000) || (specials & 2)) { // Enveloping or Heavy
+                min_damage = (min_damage * 150) / 100;
+                max_damage = (max_damage * 150) / 100;
+            } else if (specials & 4) { // Continuous
+                min_damage = (min_damage * 50 + 50) / 100;
+                max_damage = (max_damage * 50) / 100;
+                if (max_damage < min_damage) {
+                    max_damage = min_damage;
+                }
+            }
+        } else {
+            if (flag_b == flag_a) {
+                if (MOX::_weapon_mod_field_status[14] > 0 || MOX::_weapon_mod_field_status[1] > 0) {
+                    min_damage = (min_damage * 150) / 100;
+                    max_damage = (max_damage * 150) / 100;
+                } else if (MOX::_weapon_mod_field_status[2] > 0) {
+                    min_damage = (min_damage * 50 + 50) / 100;
+                    max_damage = (max_damage * 50) / 100;
+                    if (max_damage < min_damage) {
+                        max_damage = min_damage;
+                    }
+                }
+            }
+        }
+
+        if (weapon_id == 0) {
+            strcpy(buffer, "0");
+            return;
+        }
+
+        if (special_msg[0] != '\0') {
+            strcpy(buffer, special_msg);
+        } else {
+            if (min_damage != max_damage) {
+                _sprintf(buffer, "%d-%d", (int)min_damage, (int)max_damage);
+            } else {
+                _sprintf(buffer, "%d", (int)max_damage);
+            }
+        }
+    }
 }

@@ -144,4 +144,22 @@ namespace video {
     }
 
     void __cdecl Toggle_Pages_();
+
+    inline void __cdecl Save_Refresh_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527c90 });
+        fn();
+    }
+
+    inline void __cdecl Set_Refresh_Differential_No_Full_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527d20 });
+        fn();
+    }
+
+    inline void __cdecl Restore_Refresh_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527cb0 });
+        fn();
+    }
 }

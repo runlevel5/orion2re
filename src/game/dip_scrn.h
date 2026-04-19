@@ -60,11 +60,7 @@ namespace DIP_SCRN {
 
     char* __cdecl An_(char* text);
 
-    inline bool __cdecl Diplomacy_Message_Is_Interactive_(uint16_t msg) {
-        using Fn = bool(__cdecl*)(uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041DB60});
-        return fn(msg);
-    }
+    int8_t __cdecl Diplomacy_Message_Is_Interactive_(int16_t msg_id);
 
     inline uint16_t& _chat_width =
             *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A85D8});
@@ -197,11 +193,7 @@ namespace DIP_SCRN {
     inline char* (&_main_net_repulsive_diplomacy_list)[6] = *reinterpret_cast<char* (*)[6]>(std::uintptr_t{0x005A85B0});
     inline s_dipscrn_net_message& _net_diplomacy_message = *reinterpret_cast<s_dipscrn_net_message*>(std::uintptr_t{0x005A8370});
 
-    inline void __cdecl Diplomacy_Receive_Message_(int16_t net_id, uint16_t packet_id, uint32_t param_3, s_dipscrn_net_message* param_4) {
-        using Fn = void(__cdecl*)(int16_t, uint16_t, uint32_t, s_dipscrn_net_message*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041ca80});
-        fn(net_id, packet_id, param_3, param_4);
-    }
+    void __cdecl Diplomacy_Receive_Message_(uint32_t param_1, uint16_t msg_code, uint32_t param_3, s_dipscrn_net_message* net_msg);
 
     void __cdecl Diplomacy_Main_Net_Chat_(int16_t param_1, int16_t param_2);
 

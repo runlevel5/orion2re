@@ -41,21 +41,11 @@ namespace MISC {
                                               s_colors* p_colors, s_colors* target_color, int16_t x, int16_t y,
                                               char* text, s_animation_header* anim, uint8_t alignment);
 
-    inline void __cdecl Get_Advancing_Bitmap_String_Range_(int16_t frame_index, int16_t total_frames,
-                                                         int16_t* x1, int16_t* y1, int16_t* x2, int16_t* y2,
-                                                         const char* text, uint8_t alignment) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t*, int16_t*, int16_t*, int16_t*, const char*, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049e720});
-        fn(frame_index, total_frames, x1, y1, x2, y2, text, alignment);
-    }
+    void __cdecl Get_Advancing_Bitmap_String_Range_(int16_t tick, int16_t max_width, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, const char* text, uint8_t is_full_range);
 
-    inline void __cdecl Replace_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
-                                             uint8_t field_4, s_colors* colors, s_colors* target_color,
-                                             int field_7, s_animation_header* anim) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t, s_colors*, s_colors*, int, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049ec60});
-        fn(x1, y1, x2, y2, field_4, colors, target_color, field_7, anim);
-    }
+    void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
+                                       uint8_t unused_flag, s_colors* old_colors, s_colors* new_colors,
+                                       int color_count, s_animation_header* anim);
 
     void __cdecl Save_Window_Status_(void* status);
 
@@ -87,21 +77,15 @@ namespace MISC {
     void __cdecl Tint_Bitmap_Colors_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, bool full_bitmap, uint8_t tint_value, s_animation_header* anim);
     void __cdecl Get_Bitmap_Dimensions_(s_animation_header* header, int16_t* width, int16_t* height);
 
-    inline void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color, char edge_1, char edge_2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, char, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049e130 });
-        fn(x1, y1, x2, y2, color, edge_1, edge_2);
+    void __cdecl Diagonal_Line_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t spacing, uint8_t color1, uint8_t color2);
+
+    void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text);
+
+    inline void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f120});
+        fn(x, y, color, text);
     }
 
-    inline void __cdecl _Print_Centered_Shadow_Down_(int32_t x, int32_t y, int32_t shadow_char, const char* text) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f0e0});
-        fn(x, y, shadow_char, text);
-    }
-
-    inline int16_t __cdecl Substring_(char* haystack, char* needle) {
-        using Fn = int16_t(__cdecl*)(char*, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049EEB0 });
-        return fn(haystack, needle);
-    }
+    int16_t __cdecl Substring_(char* haystack, char* needle);
 }

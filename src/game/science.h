@@ -45,4 +45,10 @@ namespace SCIENCE {
     void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, uint16_t* discovery_data, char* footer_text);
 
     void __cdecl Show_Off_Researched_Tech_(int16_t player_idx);
+
+    inline void __cdecl Show_Off_Captured_Tech_(int captured_techs_data, int16_t tech_id, int16_t planet_idx) {
+        using Fn = void(__cdecl*)(int, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00410bb0});
+        fn(captured_techs_data, tech_id, planet_idx);
+    }
 }

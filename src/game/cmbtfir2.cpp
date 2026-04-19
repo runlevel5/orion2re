@@ -533,8 +533,10 @@ namespace CMBTFIR2 {
                 int16_t space = DESIGN::One_Weapon_Space_Without_M_Level_(
                     ship->weapons[i].weapon_id,
                     ship->weapons[i].arc,
-                    ship->weapons[i].specials,
-                    ship->weapons[i].ammo
+                    0,
+                    ship->weapons[i].ammo,
+                    0,
+                    ship->weapons[i].specials
                 );
 
                 int16_t hits = space / 10;
