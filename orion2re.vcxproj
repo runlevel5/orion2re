@@ -127,6 +127,7 @@
     <ClCompile Include="src\game\msg.cpp" />
     <ClCompile Include="src\game\multplay.cpp" />
     <ClCompile Include="src\game\namestar.cpp" />
+    <ClCompile Include="src\game\net.cpp" />
     <ClCompile Include="src\game\netcode.cpp" />
     <ClCompile Include="src\game\netmox.cpp" />
     <ClCompile Include="src\game\netstart.cpp" />

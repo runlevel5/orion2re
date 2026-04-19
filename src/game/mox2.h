@@ -67,21 +67,9 @@ inline void FUN_004d7da0() {
 }
 
 namespace MOX2 {
-    inline void __cdecl Get_Auto_Function_(void* data) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483c90});
-        fn(data);
-    }
+    void __cdecl Get_Auto_Function_(void** param_1);
 
-    inline void __cdecl Execute_Auto_Function_(void** k_save) {
-        using Fn = void(__cdecl*)(void**);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483cb0});
-        fn(k_save);
-    }
+    void __cdecl Execute_Auto_Function_(void* function_entry);
 
-    inline void __cdecl Put_Auto_Function_(void* data) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00483ca0});
-        fn(data);
-    }
+    void __cdecl Put_Auto_Function_(void** param_1);
 }

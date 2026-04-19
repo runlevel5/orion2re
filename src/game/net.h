@@ -23,9 +23,5 @@ namespace net {
     inline char* modem_settings_dial_number =
         reinterpret_cast<char*>(std::uintptr_t{0x005951DB});
 
-    inline int32_t __cdecl NetPoll_(s_comcore_poll_buf* req) {
-        using Fn = int32_t(__cdecl*)(s_comcore_poll_buf*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00539ad0});
-        return fn(req);
-    }
+    int32_t __cdecl NetPoll_(s_comcore_poll_buf* req);
 }

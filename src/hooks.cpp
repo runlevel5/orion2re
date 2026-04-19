@@ -3111,6 +3111,10 @@ namespace hooks {
         { 0x0052B7E0, &palstore::Store_Palette_Block_ },
         { 0x0052b770, &palstore::Store_Single_Palette_Color_ },
         { 0x00408150, &OCPOLPUP::Occupation_Policy_Popup_ },
+        { 0x00539ad0, &net::NetPoll_ },
+        { 0x00483C90, &MOX2::Get_Auto_Function_ },
+        { 0x00483cb0, &MOX2::Execute_Auto_Function_ },
+        { 0x00483ca0, &MOX2::Put_Auto_Function_ },
     };
 
     void Install_Hooks()

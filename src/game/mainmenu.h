@@ -44,12 +44,6 @@ namespace MAINMENU {
 
     uint16_t __cdecl Do_Main_Menu_File_Animation_();
 
-    inline void __cdecl Draw_File_Animation_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004e95a0});
-        fn();
-    }
-
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
     inline uint8_t& _credits_column_one =

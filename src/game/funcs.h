@@ -38,6 +38,11 @@ inline const char* s_Lost_Player_Connection_0055bf3c = reinterpret_cast<const ch
 inline const char* s_REENTERING_Net_Send_Message_0055bf58 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF58});
 inline const char* s_Sending_Message_To_Individual = reinterpret_cast<const char*>(std::uintptr_t{0x005609B0});
 inline const char* s_Sending_Message_To_All = reinterpret_cast<const char*>(std::uintptr_t{0x005609D4});
+inline char const (&s_Receiving_Message_005609F0)[23] =
+    *reinterpret_cast<char const (*)[23]>(std::uintptr_t{0x005609F0}); // "Receiving Message....\n"
+
+inline void (__stdcall *&PTR_OutputDebugStringA_005aa3c0)(char const *) =
+    *reinterpret_cast<void (__stdcall **)(char const *)>(std::uintptr_t{0x005AA3C0});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});

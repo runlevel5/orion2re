@@ -38,7 +38,7 @@ namespace MAINMENU {
         int16_t hotkey_field = fields::Add_Hot_Key_(s_hotkeys_005510f0);
         int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_00551120, ')');
 
-        fields::Assign_Auto_Function_(Draw_File_Animation_, 1);
+        fields::Assign_Auto_Function_(file_ani::Draw_File_Animation_, 1);
 
         while (!finished) {
             timer::Mark_Time_();
@@ -73,7 +73,7 @@ namespace MAINMENU {
 
             if (!finished) {
                 video::Set_Page_Off_();
-                Draw_File_Animation_();
+                file_ani::Draw_File_Animation_();
                 RUSS::Mox_Sync_Update_();
             }
 
