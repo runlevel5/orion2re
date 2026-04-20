@@ -752,7 +752,7 @@ namespace NETMOX {
 
         int current_player_idx;
         if (MOX::_NUM_PLAYERS != 0) {
-            current_player_idx = (uint32_t)NETMOX::_next_update_player_counter % (uint32_t)MOX::_NUM_PLAYERS;
+            current_player_idx = NETMOX::_next_update_player_counter % MOX::_NUM_PLAYERS;
         } else {
             current_player_idx = -1;
         }
@@ -807,7 +807,7 @@ namespace NETMOX {
                         !message_sent && NETMOX::_net.player_race_selected_flags[current_player_idx]) {
                         
                         message_sent = true;
-                        NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x22, &sync_pkt.player1_idx, 0x1DA2);
+                        NETMOX::Mox_Send_Message_(MOX::_player[current_player_idx].network_player_id, 0x22, &sync_pkt, 0x1DA2);
                     }
                 }
                 NETMOX::_net.players_sync_mask[i] &= ~(1 << current_player_idx);

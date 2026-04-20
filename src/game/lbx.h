@@ -25,4 +25,10 @@ namespace lbx {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00537FC0});
         fn(handle, filename);
     }
+
+    inline void __cdecl LBX_readRecord_(s_lbx_stream_header* lbx, int32_t record_idx, void* buffer) {
+        using Fn = void(__cdecl*)(s_lbx_stream_header*, int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00534a00 });
+        fn(lbx, record_idx, buffer);
+    }
 }

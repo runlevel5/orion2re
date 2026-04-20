@@ -163,8 +163,6 @@ namespace sound {
 
     bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
 
-    void __cdecl Copy_FourCC2_(char* dest, const char* src);
-
     void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
 
     void __cdecl Resume_Timer2_();
@@ -172,8 +170,8 @@ namespace sound {
     inline s_lbx_stream_header& _soundLbxHandle =
         *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057CEB0});
 
-    inline s_lbx_stream_header& _streamLbxHandle =
-        *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x00589A20});
+    inline s_wave_stream_header& _streamLbxHandle =
+        *reinterpret_cast<s_wave_stream_header*>(std::uintptr_t{0x00589A20});
 
     inline uint8_t& _musicActive =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0058AA6C});

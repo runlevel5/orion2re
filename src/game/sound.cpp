@@ -118,9 +118,6 @@ namespace sound {
         }
     }
 
-    /**
-     * @address 00538170
-     */
     bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header) {
         char tag_buf[5];
         tag_buf[4] = '\0';
@@ -131,22 +128,22 @@ namespace sound {
         // Set data pointer to the start of raw audio data in the source buffer
         header->data_ptr = (uint8_t*)src_data + 0x2c;
 
-        sound::Copy_FourCC2_(tag_buf, header->riff_tag);
+        sound::Copy_FourCC_(tag_buf, header->riff_tag);
         if (__strcmpi(tag_buf, s_RIFF_0055c224) != 0) {
             return false;
         }
 
-        sound::Copy_FourCC2_(tag_buf, header->wave_tag);
+        sound::Copy_FourCC_(tag_buf, header->wave_tag);
         if (__strcmpi(tag_buf, s_WAVE_0055c21c) != 0) {
             return false;
         }
 
-        sound::Copy_FourCC2_(tag_buf, header->fmt_tag);
+        sound::Copy_FourCC_(tag_buf, header->fmt_tag);
         if (__strcmpi(tag_buf, s_fmt_0055c214) != 0) {
             return false;
         }
 
-        sound::Copy_FourCC2_(tag_buf, header->data_tag);
+        sound::Copy_FourCC_(tag_buf, header->data_tag);
         return __strcmpi(tag_buf, s_data_0055c20c) == 0;
     }
 
@@ -208,15 +205,15 @@ namespace sound {
                     _dsound_buffer_desc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_GETCURRENTPOSITION2 /* 0xe0 */;
                     _dsound_buffer_desc.dwBufferBytes = 16384 /* 0x4000 */;
 
-                    for (int i = 0; i < 17; ++i) {
+                    for (int i = 0; i < 16; ++i) {
+                        memset(&_sound_channels[i], 0, sizeof(s_sound_channel));
+
                         _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_sound_channels[i].buffer, nullptr);
                         if (_dsound_hr != DS_OK) {
                             _dsound->Release();
                             return;
                         }
                         
-                        // Zeros the resource_id and fields array in s_sound_channel (first 28 bytes)
-                        memset(&_sound_channels[i], 0, offsetof(s_sound_channel, buffer));
                         _sound_channels[i].buffer->Stop();
                     }
 
@@ -685,10 +682,6 @@ namespace sound {
         *static_cast<uint32_t*>(dest) = *static_cast<const uint32_t*>(src);
     }
 
-    void __cdecl Copy_FourCC2_(char* dst, const char* src) {
-        *reinterpret_cast<uint32_t*>(dst) = *reinterpret_cast<const uint32_t*>(src);
-    }
-
     void __cdecl Refill_Sound_Channel_Buffer_(int channel_idx) {
         DWORD play_cursor;
         DWORD write_cursor;
@@ -1035,11 +1028,10 @@ namespace sound {
         WAVEFORMATEX wfx;
         char error_msg[256];
         uint32_t dwBytes;
-
         Stop_Sound_Timer_And_Wait2_();
 
         if (!Init_Wave_Header_From_Memory_(wave_data, &info)) {
-^            exitm::Exit_With_Message(s_SOUND_ERROR__Reading_Wave_0055b634);
+            exitm::Exit_With_Message(s_SOUND_ERROR__Reading_Wave_0055b634);
         }
 
         _sound_channels[channel_idx].buffer->Stop();
@@ -1201,7 +1193,7 @@ namespace sound {
             return -2;
         }
 
-        Load_File_Entry_(&_soundLbxHandle, resource_id, buffer);
+        lbx::LBX_readRecord_(&_soundLbxHandle, resource_id, buffer);
         return Play_Sound_File_(channel_id, buffer, length);
     }
 

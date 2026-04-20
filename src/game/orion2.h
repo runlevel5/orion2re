@@ -2085,23 +2085,28 @@ struct s_lbx_stream_entry {
 
 typedef struct s_lbx_stream_header s_lbx_stream_header, *Ps_lbx_stream_header;
 
-typedef struct HMMIO__ HMMIO__, *PHMMIO__;
 
-typedef struct HMMIO__ *HMMIO;
 
 struct s_lbx_stream_header {
     uint16_t entry_count;
     uint16_t magic;
     uint32_t header_data;
-    HMMIO file;
+    FILE *file;
     uint32_t first_offset;
     struct s_lbx_stream_entry entries[509];
     uint32_t padding;
     char filename[80];
 };
 
-struct HMMIO__copy {
-    int unused;
+struct _iobuf_copy {
+    char *_ptr;
+    int _cnt;
+    char *_base;
+    int _flag;
+    int _file;
+    int _charbuf;
+    int _bufsiz;
+    char *_tmpfname;
 };
 
 typedef struct s_leader_data s_leader_data, *Ps_leader_data;
@@ -2791,19 +2796,6 @@ struct s_net_combat_message {
 };
 
 typedef struct s_net_modem_file s_net_modem_file, *Ps_net_modem_file;
-
-
-
-struct _iobuf_copy {
-    char *_ptr;
-    int _cnt;
-    char *_base;
-    int _flag;
-    int _file;
-    int _charbuf;
-    int _bufsiz;
-    char *_tmpfname;
-};
 
 struct s_net_modem_file {
     uint32_t mode;
@@ -4847,6 +4839,27 @@ struct s_unit_data {
     undefined field6_0x9;
     undefined field7_0xa;
     undefined field8_0xb;
+};
+
+typedef struct s_wave_stream_header s_wave_stream_header, *Ps_wave_stream_header;
+
+typedef struct HMMIO__ HMMIO__, *PHMMIO__;
+
+typedef struct HMMIO__ *HMMIO;
+
+struct s_wave_stream_header {
+    uint16_t entry_count;
+    uint16_t magic;
+    uint32_t header_data;
+    HMMIO file;
+    uint32_t first_offset;
+    struct s_lbx_stream_entry entries[509];
+    uint32_t padding;
+    char filename[80];
+};
+
+struct HMMIO__copy {
+    int unused;
 };
 
 typedef struct s_weapon_filter_item s_weapon_filter_item, *Ps_weapon_filter_item;

@@ -1829,7 +1829,7 @@ namespace DESIGN {
 
         if (is_design_slot) {
             uint16_t specials = MOX::_design->weapon_specials[weapon_idx];
-            if ((specials & 0x4000) || (specials & 2)) { // Enveloping or Heavy
+            if (specials & 0x4000) { // Overloaded
                 min_damage = (min_damage * 150) / 100;
                 max_damage = (max_damage * 150) / 100;
             } else if (specials & 4) { // Continuous
@@ -1838,10 +1838,13 @@ namespace DESIGN {
                 if (max_damage < min_damage) {
                     max_damage = min_damage;
                 }
+            } else if (specials & 2) { // Heavy Mount
+                min_damage = (min_damage * 150) / 100;
+                max_damage = (max_damage * 150) / 100;
             }
         } else {
             if (flag_b == flag_a) {
-                if (MOX::_weapon_mod_field_status[14] > 0 || MOX::_weapon_mod_field_status[1] > 0) {
+                if (MOX::_weapon_mod_field_status[14] > 0) {
                     min_damage = (min_damage * 150) / 100;
                     max_damage = (max_damage * 150) / 100;
                 } else if (MOX::_weapon_mod_field_status[2] > 0) {
@@ -1850,6 +1853,9 @@ namespace DESIGN {
                     if (max_damage < min_damage) {
                         max_damage = min_damage;
                     }
+                } else if (MOX::_weapon_mod_field_status[1] > 0) {
+                    min_damage = (min_damage * 150) / 100;
+                    max_damage = (max_damage * 150) / 100;
                 }
             }
         }

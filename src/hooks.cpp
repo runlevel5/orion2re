@@ -3217,7 +3217,7 @@ namespace hooks {
         { 0x00538170, &sound::Init_Wave_Header_From_Memory_ },
         { 0x0052e600, &sound::Resume_Timer2_ },
         { 0x005329d0, &sound::Update_Stream_Status_ },
-        { 0x00538260, &sound::Copy_FourCC2_ },
+        { 0x00538260, &sound::Copy_FourCC_ },
         { 0x0052e260, &sound::Reset_Sound_Channel_ },
         { 0x00532480, &sound::Stop_Stream_Loop_ },
     };

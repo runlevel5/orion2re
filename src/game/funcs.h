@@ -894,9 +894,3 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
 }
 
 struct s_mouse_list;
-
-inline void __cdecl Load_File_Entry_(s_lbx_stream_header* lbx, int32_t record_idx, void* buffer) {
-    using Fn = void(__cdecl*)(s_lbx_stream_header*, int32_t, void*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534a00});
-    fn(lbx, record_idx, buffer);
-}
