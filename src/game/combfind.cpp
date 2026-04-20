@@ -328,9 +328,6 @@ void __cdecl Client_Combat_Loop_() {
     s_battle_results local_battle_results_main;
     int16_t target_colony;
     int32_t new_star_target;
-    int16_t star_id;
-    int16_t defender_id;
-    int16_t planet_id;
     int16_t result;
 
     NETMOX::_net.combat_results_data = &local_battle_results_main;
@@ -341,10 +338,6 @@ void __cdecl Client_Combat_Loop_() {
         RUSS::Mox_Update_();
         MULTPLAY::Chat_Box_Input_Loop_();
         RUSS::Mox_Update_();
-
-        star_id = NETMOX::_net.combat_star_id;
-        defender_id = NETMOX::_net.combat_defender_id;
-        planet_id = NETMOX::_net.combat_planet_id;
 
         switch (NETMOX::_net.sync_state) {
         case 15:
@@ -408,12 +401,12 @@ void __cdecl Client_Combat_Loop_() {
             local_battle_results_1.combat_defender_id = NETMOX::_net.combat_defender_id;
             local_battle_results_1.combat_planet_id = NETMOX::_net.combat_planet_id;
             local_battle_results_1.combat_target_player_id = NETMOX::_net.combat_target_player_id;
-            local_battle_results_1.planet_id = planet_id;
+            local_battle_results_1.planet_id = NETMOX::_net.combat_planet_id;
             local_battle_results_1.combat_type = NETMOX::_net.combat_type;
             local_battle_results_1.combat_attacker_id = NETMOX::_net.combat_attacker_id;
             local_battle_results_1.combat_result = NETMOX::_net.combat_result;
             local_battle_results_1.diplomacy_target_id = NETMOX::_net.diplomacy_target_id;
-            result = COMBFIND::Do_1_Combat_(star_id, MOX::_PLAYER_NUM, defender_id, planet_id, &local_battle_results_1, 0);
+            result = COMBFIND::Do_1_Combat_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_1, 0);
             local_battle_results_1.combat_result = (int8_t)result;
             NETMOX::Mox_Send_Message_(MOX::_player[NETMOX::_net.combat_target_player_id].network_player_id, 24, &local_battle_results_1, 1742);
             while (NETMOX::_net.sync_state != 14) {
@@ -456,12 +449,12 @@ void __cdecl Client_Combat_Loop_() {
             local_battle_results_2.combat_defender_id = NETMOX::_net.combat_defender_id;
             local_battle_results_2.combat_planet_id = NETMOX::_net.combat_planet_id;
             local_battle_results_2.combat_target_player_id = NETMOX::_net.combat_target_player_id;
-            local_battle_results_2.planet_id = planet_id;
+            local_battle_results_2.planet_id = NETMOX::_net.combat_planet_id;
             local_battle_results_2.combat_type = NETMOX::_net.combat_type;
             local_battle_results_2.combat_attacker_id = NETMOX::_net.combat_attacker_id;
             local_battle_results_2.combat_result = NETMOX::_net.combat_result;
             local_battle_results_2.diplomacy_target_id = NETMOX::_net.diplomacy_target_id;
-            result = COMBFIND::Do_1_Combat_(star_id, MOX::_PLAYER_NUM, defender_id, planet_id, &local_battle_results_2, 0);
+            result = COMBFIND::Do_1_Combat_(NETMOX::_net.combat_star_id, MOX::_PLAYER_NUM, NETMOX::_net.combat_defender_id, NETMOX::_net.combat_planet_id, &local_battle_results_2, 0);
             local_battle_results_2.combat_result = (int8_t)result;
             MULTPLAY::Load_Net_Next_Turn_Screen_(1);
             if (NETMOX::_net.combat_target_player_id < 8 && MOX::_player[NETMOX::_net.combat_target_player_id].objectives == 100 /* 'd' */) {

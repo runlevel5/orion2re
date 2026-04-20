@@ -353,7 +353,7 @@ namespace sound {
                 volume = sound::_dsMasterVolume;
             }
 
-            if (channel_idx >= 0 && channel_idx < 17) {
+            if (channel_idx >= 0 && channel_idx < 16) {
                 int16_t ds_volume = sound::_ds_volume_table[volume];
                 LPDIRECTSOUNDBUFFER ds_buffer = _sound_channels[channel_idx].buffer;
 
@@ -372,7 +372,7 @@ namespace sound {
             return;
         }
 
-        if (channel_idx >= 0 && channel_idx < 17) {
+        if (channel_idx >= 0 && channel_idx < 16) {
             s_sound_channel* channel = &sound::_sound_channels[channel_idx];
             if ((channel->flags & 1) != 0) {
                 channel->buffer->Stop();
@@ -494,7 +494,7 @@ namespace sound {
         }
 
         Stop_Sound_Timer_();
-        int8_t volume_idx = (int8_t)Get_Stream_Volume_();
+        int32_t volume_idx = Get_Stream_Volume_();
         Stop_Stream_Loop_();
 
         if (_stream_data.ds_buffer != nullptr) {
@@ -508,7 +508,7 @@ namespace sound {
             return;
         }
 
-        _stream_data.block_size = (_stream_data.avg_bytes_per_sec * 320) / 2000;
+        _stream_data.block_size = ((_stream_data.avg_bytes_per_sec * 320) / 100) / 20;
         _stream_data.data_remaining = _stream_data.total_data_size;
         _stream_data.ds_buffer_size = _stream_data.block_size * 20;
 
@@ -523,7 +523,7 @@ namespace sound {
 
         memset(&dsbd, 0, sizeof(DSBUFFERDESC));
         dsbd.dwSize = 20; /* sizeof(DSBUFFERDESC) for older DirectX */
-        dsbd.dwFlags = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS;
+        dsbd.dwFlags = DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
         dsbd.dwBufferBytes = _stream_data.ds_buffer_size;
         dsbd.lpwfxFormat = &wfx;
 
@@ -573,13 +573,13 @@ namespace sound {
 
         if (_dsound_hr != 0) {
             if (_dsound_hr == DSERR_INVALIDPARAM) {
-                _sprintf(&msg_buf[8], s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954, _dsound_hr);
+                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954, _dsound_hr);
             } else if (_dsound_hr == DSERR_INVALIDCALL) {
-                _sprintf(&msg_buf[8], s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998, _dsound_hr);
+                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998, _dsound_hr);
             } else if (_dsound_hr == DSERR_PRIOLEVELNEEDED) {
-                _sprintf(&msg_buf[8], s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910, _dsound_hr);
+                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910, _dsound_hr);
             }
-            exitm::Exit_With_Message(&msg_buf[0]);
+            exitm::Exit_With_Message(msg_buf);
         }
 
         _stream_data.status |= 1;

@@ -141,8 +141,8 @@ namespace sound {
     inline DSBUFFERDESC1& _dsound_buffer_desc =
         *reinterpret_cast<DSBUFFERDESC1*>(std::uintptr_t{0x0057CC98});
 
-    inline s_sound_channel (&_sound_channels)[17] =
-        *reinterpret_cast<s_sound_channel (*)[17]>(std::uintptr_t{0x0057CCB0});
+    inline s_sound_channel (&_sound_channels)[16] =
+        *reinterpret_cast<s_sound_channel (*)[16]>(std::uintptr_t{0x0057CCB0});
 
     inline const char* s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538 =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055B538}); // "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
