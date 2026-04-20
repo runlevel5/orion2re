@@ -1710,7 +1710,7 @@ namespace LOADSAVE {
 
         if (music_volume <= 5) {
             music_volume = 0;
-            sound::thunk_Stop_Stream_();
+            sound::Stop_Stream_();
             JIM::Stop_Background_Music_();
             MOX::_settings.music_on = 0;
             _game_popup_fields->music_on = 0;

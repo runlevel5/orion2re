@@ -150,11 +150,11 @@ namespace NETMOX {
 
     int8_t __cdecl Get_Next_AI_Talker_(int32_t target_player_id);
 
-    void __cdecl Decode_Pick_Target_Info_(void* packet_data);
+    void __cdecl Decode_Pick_Target_Info_(void* packet_data, uint32_t len);
 
-    void __cdecl Decode_You_Are_Target_Info_(void* packet_data);
+    void __cdecl Decode_You_Are_Target_Info_(void* packet_data, uint32_t len);
 
-    void __cdecl Decode_Battle_Results_(void* packet_data);
+    void __cdecl Decode_Battle_Results_(void* packet_data, uint32_t len);
 
     void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1);
 

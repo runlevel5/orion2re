@@ -3670,7 +3670,7 @@ namespace MAINSCR {
         }
         case 0x10: {
             NETMOX::_net.sync_state = 0x10;
-            NETMOX::Decode_Pick_Target_Info_(data);
+            NETMOX::Decode_Pick_Target_Info_(data, len);
             break;
         }
         case 0x11: {
@@ -3681,7 +3681,7 @@ namespace MAINSCR {
             break;
         }
         case 0x12: {
-            NETMOX::Decode_You_Are_Target_Info_(data);
+            NETMOX::Decode_You_Are_Target_Info_(data, len);
             break;
         }
         case 0x13: {
@@ -3701,7 +3701,7 @@ namespace MAINSCR {
             break;
         }
         case 0x15: {
-            NETMOX::Decode_Battle_Results_(data);
+            NETMOX::Decode_Battle_Results_(data, len);
             break;
         }
         case 0x16:

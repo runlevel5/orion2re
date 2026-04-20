@@ -4,6 +4,7 @@
 #include <cstdint>
 
 struct s_animation_header;
+struct s_lbx_stream_header;
 
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
@@ -663,6 +664,19 @@ inline const char* const s_Couldn_t_Allocate_0055B668 =
 inline const char* const s_Unable_to_Allocate_bytes =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%s, %d)\n"
 
+typedef struct HMMIO__* HMMIO;
+inline long __stdcall mmioSeek(HMMIO hmmio, long lOffset, int iOrigin) {
+    using Fn = long(__stdcall*)(HMMIO, long, int);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5C0});
+    return fn(hmmio, lOffset, iOrigin);
+}
+
+inline long __stdcall mmioRead(HMMIO hmmio, void* pch, long cch) {
+    using Fn = long(__stdcall*)(HMMIO, void*, long);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5AC});
+    return fn(hmmio, pch, cch);
+}
+
 inline int __cdecl __strcmpi(const char* s1, const char* s2) {
     using Fn = int(__cdecl*)(const char*, const char*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005428d0 });
@@ -880,3 +894,9 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
 }
 
 struct s_mouse_list;
+
+inline void __cdecl Load_File_Entry_(s_lbx_stream_header* lbx, int32_t record_idx, void* buffer) {
+    using Fn = void(__cdecl*)(s_lbx_stream_header*, int32_t, void*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534a00});
+    fn(lbx, record_idx, buffer);
+}

@@ -779,7 +779,6 @@ struct s_battle_results_info {
     undefined field433_0x672;
     undefined field434_0x673;
     undefined field435_0x674;
-    int8_t is_mind_controlled;
     undefined field437_0x676;
     undefined field438_0x677;
     undefined field439_0x678;
@@ -867,7 +866,8 @@ struct s_battle_results_info {
     undefined field521_0x6ca;
     int8_t colony_captured_flag;
     undefined field523_0x6cc;
-    undefined field524_0x6cd;
+    undefined field510_0x674;
+    int8_t is_mind_controlled;
 };
 
 struct s_combat_bomb_result {
@@ -2098,6 +2098,10 @@ struct s_lbx_stream_header {
     struct s_lbx_stream_entry entries[509];
     uint32_t padding;
     char filename[80];
+};
+
+struct HMMIO__copy {
+    int unused;
 };
 
 typedef struct s_leader_data s_leader_data, *Ps_leader_data;
@@ -4293,7 +4297,9 @@ typedef struct _DSBUFFERDESC _DSBUFFERDESC, *P_DSBUFFERDESC;
 
 typedef struct _DSBUFFERDESC DSBUFFERDESC;
 
+
 typedef struct tWAVEFORMATEX WAVEFORMATEX;
+
 
 typedef long LONG;
 
@@ -4312,6 +4318,7 @@ typedef struct _DSCAPS *LPDSCAPS;
 typedef struct HWND__ HWND__, *PHWND__;
 
 typedef struct HWND__ *HWND;
+
 
 typedef struct IUnknownVtbl IUnknownVtbl, *PIUnknownVtbl;
 
@@ -4385,8 +4392,16 @@ struct _DSCAPS_copy {
 };
 
 struct s_sound_channel {
-    uint32_t resource_id;
-    uint32_t fields[6];
+    uint8_t *sample_data;
+    int8_t loop_count;
+    undefined field2_0x5;
+    int8_t volume_index;
+    uint32_t sample_size;
+    uint32_t sample_offset;
+    uint32_t ds_buffer_size;
+    uint32_t field7_0x13;
+    uint32_t write_cursor;
+    uint8_t flags;
     LPDIRECTSOUNDBUFFER buffer;
 };
 
@@ -4440,11 +4455,61 @@ typedef struct s_sound_index s_sound_index, *Ps_sound_index;
 struct s_sound_index {
     uint32_t buffer_offset;
     uint32_t buffer_size;
-    int priority;
-    uint8_t field3_0xc[16];
-    int resource_id;
-    int next_id;
-    int prev_id;
+    int32_t num_active_channels;
+    uint8_t active_channel_ids[16];
+    int32_t resource_id;
+    int32_t next_id;
+    int32_t prev_id;
+};
+
+typedef struct s_sound_stream s_sound_stream, *Ps_sound_stream;
+
+struct s_sound_stream {
+    char riff_tag[4];
+    uint32_t riff_size;
+    char wave_tag[4];
+    char fmt_tag[4];
+    uint32_t fmt_size;
+    uint16_t format_tag;
+    uint16_t channels;
+    uint32_t samples_per_sec;
+    uint32_t avg_bytes_per_sec;
+    uint16_t block_align;
+    uint16_t bits_per_sample;
+    char data_tag[4];
+    uint32_t total_data_size;
+    uint32_t data_start_offset;
+    undefined field14_0x30;
+    undefined field15_0x31;
+    undefined field16_0x32;
+    uint32_t data_remaining;
+    uint32_t bytes_written;
+    uint32_t last_lock_size;
+    uint32_t field20_0x3f;
+    uint32_t write_cursor;
+    uint8_t status;
+    LPDIRECTSOUNDBUFFER ds_buffer;
+    uint32_t ds_buffer_size;
+    uint32_t block_size;
+};
+
+typedef struct s_sound_wav_header s_sound_wav_header, *Ps_sound_wav_header;
+
+struct s_sound_wav_header {
+    char riff_tag[4];
+    uint32_t chunk_size;
+    char wave_tag[4];
+    char fmt_tag[4];
+    uint32_t fmt_size;
+    uint16_t audio_format;
+    uint16_t num_channels;
+    uint32_t sample_rate;
+    uint32_t byte_rate;
+    uint16_t block_align;
+    uint16_t bits_per_sample;
+    char data_tag[4];
+    uint32_t data_size;
+    void *data_ptr;
 };
 
 typedef struct s_spcl s_spcl, *Ps_spcl;

@@ -337,7 +337,7 @@ void __cdecl Client_Combat_Loop_() {
     memset(local_attack_confirmed, 0, sizeof(local_attack_confirmed));
     COMBFIND::_attack_confirmed = (int8_t (*)[8][8])local_attack_confirmed;
 
-    while (NETMOX::_net.sync_state > 14 && NETMOX::_net.sync_state < 35 /* 0x23 */) {
+    while (NETMOX::_net.sync_state >= 14 && NETMOX::_net.sync_state < 35 /* 0x23 */) {
         RUSS::Mox_Update_();
         MULTPLAY::Chat_Box_Input_Loop_();
         RUSS::Mox_Update_();
@@ -351,7 +351,7 @@ void __cdecl Client_Combat_Loop_() {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
                 RUSS::Mox_Update_();
             }
-            NETMOX::Decode_Pick_Target_Info_(NETMOX::_net.network_data_ptr);
+            NETMOX::Decode_Pick_Target_Info_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
             NETMOX::_net.network_data_ptr = nullptr;
             allocate::Pop_Block_(MOX::_screen_seg);
             NETMOX::_net.total_chunk_count = 0;
@@ -386,7 +386,7 @@ void __cdecl Client_Combat_Loop_() {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
                 RUSS::Mox_Update_();
             }
-            NETMOX::Decode_You_Are_Target_Info_(NETMOX::_net.network_data_ptr);
+            NETMOX::Decode_You_Are_Target_Info_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
             NETMOX::_net.network_data_ptr = nullptr;
             allocate::Pop_Block_(MOX::_screen_seg);
             NETMOX::_net.total_chunk_count = 0;
@@ -496,7 +496,7 @@ void __cdecl Client_Combat_Loop_() {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
                 RUSS::Mox_Update_();
             }
-            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr);
+            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
             NETMOX::_net.network_data_ptr = nullptr;
             allocate::Pop_Block_(MOX::_screen_seg);
             NETMOX::_net.total_chunk_count = 0;
@@ -2045,7 +2045,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                         }
                         case 4: { // Surrender/Mind Control
                             invasion::Change_Colony_Ownership_(colony, attacker_id, &results->info);
-                            results->info.field524_0x6cd = 1;
+                            results->info.is_mind_controlled = 1;
                             if (results->info.captured_tech_id != 0) {
                                 SCIENCE::Show_Off_Captured_Tech_((int)results->info.captured_techs_data, results->info.captured_tech_id, colony->planet);
                             }

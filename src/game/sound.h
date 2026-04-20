@@ -3,6 +3,12 @@
 extern "C" HRESULT WINAPI DirectSoundCreate(LPCGUID pcGuidDevice, struct IDirectSound** ppDS, IUnknown* pUnkOuter);
 
 namespace sound {
+    inline int16_t (&_ds_volume_table)[101] =
+        *reinterpret_cast<int16_t (*)[101]>(std::uintptr_t{0x0055B3B8});
+
+    inline int16_t* _stream_volume_table_end =
+        reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B482});
+
     inline uint32_t& _audioInitialized =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B484});
 
@@ -18,6 +24,12 @@ namespace sound {
     inline uint8_t& _soundTimerActive =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B494});
 
+    inline uint32_t& _soundTimerRunning =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B498});
+
+    inline uint32_t& _soundTimerStopFlag =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B49C});
+
     inline const char* _default_sound_file_name =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055B4A8}); // "sound.lbx"
 
@@ -32,6 +44,15 @@ namespace sound {
 
     inline uint32_t& _soundBufferSize =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B524 });
+
+    inline uint32_t& _soundTimerLock =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B534});
+
+    inline void*& _streamBuffer1 =
+        *reinterpret_cast<void**>(std::uintptr_t{0x0055B4A0});
+
+    inline void*& _streamBuffer2 =
+        *reinterpret_cast<void**>(std::uintptr_t{0x0055B4A4});
 
     inline uint8_t& _soundFxActive =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B8F8});
@@ -51,6 +72,48 @@ namespace sound {
     inline uint8_t& _streamIncVal =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B90C});
 
+    inline const char* s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B910}); // "STREAM ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
+
+    inline const char* s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B954}); // "STREAM ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
+
+    inline const char* s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B998}); // "STREAM ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
+
+    inline const char* s_STREAM_ERROR_Play_Stream_Unable_to_lock_buffer =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B9D8}); // "STREAM ERROR: (Play_Stream) Unable to lock buffer."
+
+    inline const char* s_Cant_Read = reinterpret_cast<const char*>(std::uintptr_t{0x0055BA0C});
+
+    inline const char* s_data_0055c20c = reinterpret_cast<const char*>(std::uintptr_t{0x0055C20C}); // "data"
+    inline const char* s_fmt_0055c214 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C214});  // "fmt "
+    inline const char* s_WAVE_0055c21c = reinterpret_cast<const char*>(std::uintptr_t{0x0055C21C}); // "WAVE"
+    inline const char* s_RIFF_0055c224 = reinterpret_cast<const char*>(std::uintptr_t{0x0055C224}); // "RIFF"
+
+    void __cdecl Copy_FourCC_(void* dest, const void* src);
+
+    inline MMRESULT __stdcall mmioGetInfo(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
+        using Fn = MMRESULT(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5A8});
+        return fn(hmmio, lpmmioinfo, wFlags);
+    }
+
+    inline uint32_t __stdcall mmioAdvance(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
+        using Fn = uint32_t(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5B4});
+        return fn(hmmio, lpmmioinfo, wFlags);
+    }
+
+    inline uint32_t __stdcall mmioSetInfo(HMMIO hmmio, MMIOINFO* lpmmioinfo, uint32_t wFlags) {
+        using Fn = uint32_t(__stdcall*)(HMMIO, MMIOINFO*, uint32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005AA5B8});
+        return fn(hmmio, lpmmioinfo, wFlags);
+    }
+
+    inline uint32_t& _streamAvailable2 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057B700});
+
     inline s_lbx_stream_header& _musicLbxHandle =
         *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057B708});
 
@@ -59,6 +122,9 @@ namespace sound {
 
     inline HRESULT& _dsound_hr =
         *reinterpret_cast<HRESULT*>(std::uintptr_t{0x0057C758});
+
+    inline uint32_t& _streamAvailable1 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0057C75C});
 
     inline int32_t& _dsMasterVolume =
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x0057C760});
@@ -75,8 +141,33 @@ namespace sound {
     inline DSBUFFERDESC1& _dsound_buffer_desc =
         *reinterpret_cast<DSBUFFERDESC1*>(std::uintptr_t{0x0057CC98});
 
-    inline s_sound_channel (&_soundChannels)[16] =
-        *reinterpret_cast<s_sound_channel (*)[16]>(std::uintptr_t{0x0057CCB0});
+    inline s_sound_channel (&_sound_channels)[17] =
+        *reinterpret_cast<s_sound_channel (*)[17]>(std::uintptr_t{0x0057CCB0});
+
+    inline const char* s_SOUND_ERROR_0x_x__DSERR_PRIOLEVE_0055b538 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B538}); // "SOUND ERROR:0x%x (DSERR_PRIOLEVELNEEDED) Unable to Unlock buffer. "
+    inline const char* s_SOUND_ERROR_0x_x__DSERR_INVALIDP_0055b57c =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B57C}); // "SOUND ERROR:0x%x (DSERR_INVALIDPARAM) Unable to Unlock buffer. "
+    inline const char* s_SOUND_ERROR_0x_x__DSERR_INVALIDC_0055b5bc =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B5BC}); // "SOUND ERROR:0x%x (DSERR_INVALIDCALL) Unable to Unlock buffer. "
+    inline const char* s_SOUND_ERROR___Play_Sound_File__U_0055b5fc =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B5FC}); // "SOUND ERROR: (Play_Sound_File) Unable to lock buffer."
+    inline const char* s_SOUND_ERROR__Reading_Wave_0055b634 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055B634}); // "SOUND ERROR: Reading Wave"
+
+    void __cdecl Stop_Sound_Timer_And_Wait2_();
+
+    void __cdecl mergeFreeBlocks_();
+
+    int32_t __cdecl getFreeSoundIndex_();
+
+    bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
+
+    void __cdecl Copy_FourCC2_(char* dest, const char* src);
+
+    void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
+
+    void __cdecl Resume_Timer2_();
 
     inline s_lbx_stream_header& _soundLbxHandle =
         *reinterpret_cast<s_lbx_stream_header*>(std::uintptr_t{0x0057CEB0});
@@ -87,33 +178,38 @@ namespace sound {
     inline uint8_t& _musicActive =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0058AA6C});
 
-    inline void __stdcall Sound_Timer_Callback_(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2) {
-        using Fn = void(__stdcall*)(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D8C0});
-        fn(uTimerID, uMsg, dwUser, dw1, dw2);
-    }
+    inline s_sound_stream& _stream_data =
+        *reinterpret_cast<s_sound_stream*>(std::uintptr_t{0x0057E130});
+
+    void __stdcall Sound_Timer_Callback_(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5);
+
+    void __cdecl Update_Sound_Channels_();
+
+    void __cdecl Refill_Sound_Channel_Buffer_(int channel_idx);
+
+    void __cdecl Update_Sound_Channel_Status_(int channel_idx);
+
+    void __cdecl Update_Stream_Status_();
+
+    void __cdecl Adjust_Settings_();
 
     void __cdecl Audio_Clear_Cache_();
 
     void __cdecl Fade_Stream_Down_(uint8_t fade_rate);
 
-    inline int16_t __cdecl Get_Stream_Volume_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532080 });
-        return fn();
-    }
+    int32_t __cdecl Get_Stream_Volume_();
 
-    inline void __cdecl Stop_Stream_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00531FE0 });
-        fn();
-    }
+    void __cdecl Stop_Sound_Timer_();
 
-    inline void __cdecl thunk_Stop_Stream_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532030});
-        fn();
-    }
+    void __cdecl Stop_Stream_Loop_();
+
+    void __cdecl Enable_Sound_Timer_();
+
+    int8_t __cdecl Load_Stream_Wave_Header_(int entry_index, s_sound_stream* stream);
+
+    uint8_t __cdecl Read_Stream_Data_(void* buffer, uint32_t bytes_to_read, uint32_t* bytes_read_ptr);
+
+    void __cdecl Stop_Stream_();
 
     void __cdecl Stream_On_();
 
@@ -121,19 +217,11 @@ namespace sound {
 
     void __cdecl Set_Stream_Filename_(const char* filename);
 
-    inline void __cdecl Play_Stream_(int32_t stream_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00532130 });
-        fn(stream_id);
-    }
+    void __cdecl Play_Stream_(int32_t stream_id);
 
     void __cdecl Loop_Stream_(int32_t count);
 
-    inline void __cdecl Set_Stream_Volume_(int32_t volume) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005320E0 });
-        fn(volume);
-    }
+    void __cdecl Set_Stream_Volume_(int32_t volume_percent);
 
     void __cdecl Fade_Stream_Up_(uint8_t fade_increment);
 
@@ -145,45 +233,35 @@ namespace sound {
 
     void __cdecl Resume_Sound_(int32_t channel);
 
-    inline void __cdecl Set_Sound_Max_Volume_(int32_t volume) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D500 });
-        fn(volume);
-    }
+    void __cdecl Set_Sound_Max_Volume_(int32_t volume);
 
-    inline void __cdecl Stop_Sound_(int32_t handle) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052e6b0});
-        fn(handle);
-    }
+    void __cdecl Set_Channel_Volume_(int32_t channel, int32_t volume);
 
-    inline void __cdecl Sound_Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E630});
-        fn();
-    }
+    void __cdecl Set_Master_Volume_(int32_t volume);
 
-    inline int __cdecl Play_Sound_(int16_t sound_id) {
-        using Fn = int(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052de10});
-        return fn(sound_id);
-    }
+    void __cdecl Remove_Sound_Instance_(int32_t instance_id);
 
-    inline void __cdecl Fadeout_Sound_(int32_t handle, int32_t duration) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        reinterpret_cast<Fn>(0x0052e850)(handle, duration);
-    }
+    void __cdecl Stop_Sound_(int32_t channel_idx);
 
-    inline void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052D520})(handle, pitch);
-    }
+    void __cdecl Sound_Update_();
 
-    inline void __cdecl Loop_Sound_(int handle, int loop_count) {
-        using Fn = void(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d560});
-        fn(handle, loop_count);
-    }
+    int __cdecl Get_Channel_Volume_Level_(int channel_idx);
+
+    int8_t __cdecl Find_Free_Channel_();
+
+    void __cdecl Merge_Free_Sound_Blocks_();
+
+    int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size);
+
+    void* __cdecl allocateSoundBlock_(int32_t channel, int32_t resource_id, uint32_t size);
+
+    int32_t __cdecl Play_Sound_(int32_t resource_id);
+
+    void __cdecl Fadeout_Sound_(int16_t channel_idx, int8_t volume_idx);
+
+    void __cdecl Pitch_Bend_Sound_(int32_t handle, int32_t pitch);
+
+    void __cdecl Loop_Sound_(int channel_idx, int8_t loop_count);
 
     void __cdecl Init_Sound_();
 }

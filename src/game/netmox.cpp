@@ -1629,7 +1629,7 @@ namespace NETMOX {
         return RUSS::Get_Weighted_Choice_Char_(weights, MOX::_NUM_PLAYERS);
     }
 
-    void __cdecl Decode_Pick_Target_Info_(void* packet_data) {
+    void __cdecl Decode_Pick_Target_Info_(void* packet_data, uint32_t len) {
         uint8_t* ptr = static_cast<uint8_t*>(packet_data);
 
         // 1. Read Combat Star ID
@@ -1764,7 +1764,7 @@ namespace NETMOX {
         NETMOX::_net.sync_state = 0x10;
     }
 
-    void __cdecl Decode_You_Are_Target_Info_(void* packet_data) {
+    void __cdecl Decode_You_Are_Target_Info_(void* packet_data, uint32_t len) {
         uint8_t* ptr = static_cast<uint8_t*>(packet_data);
 
         // 1. Read Header
@@ -1891,7 +1891,7 @@ namespace NETMOX {
         memcpy(MOX::_player, param_1->players, param_1->num_players * sizeof(s_player));
     }
 
-    void __cdecl Decode_Battle_Results_(void* packet_data) {
+    void __cdecl Decode_Battle_Results_(void* packet_data, uint32_t len) {
         uint8_t* ptr = static_cast<uint8_t*>(packet_data);
 
         // 1. Read Header

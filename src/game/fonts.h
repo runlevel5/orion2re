@@ -155,4 +155,10 @@ namespace fonts {
     void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors);
 
     void __cdecl Set_Alias_Color_(uint8_t color);
+
+    inline void __cdecl Disp_PSTR_(int x, int y, const char* str) {
+        using Fn = void(__cdecl*)(int, int, const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533690});
+        fn(x, y, str);
+    }
 }

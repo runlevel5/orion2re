@@ -201,7 +201,7 @@ namespace JIM {
         _jim_current_stream = static_cast<uint16_t>((_clock() % 3) + 1);
 
         sound::Set_Stream_Filename_(s_STREAM_LBX);
-        sound::Play_Stream_(static_cast<int32_t>(_jim_current_stream));
+        sound::Play_Stream_(_jim_current_stream);
         sound::Loop_Stream_(-1);
 
         _jim_old_music_id = 0xFFFF;
