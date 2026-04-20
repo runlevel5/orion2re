@@ -1787,12 +1787,12 @@ namespace DESIGN {
         MOX::_design->weapon_ammo[last_active_slot] = 0;
     }
 
-    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t flag_a, int16_t flag_b) {
+    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t field_item_chosen, int16_t row_idx) {
         bool is_design_slot = false;
         int16_t weapon_idx = 0;
         int16_t weapon_id;
 
-        if (flag_b == -1 && flag_a == -1) {
+        if (row_idx == -1 && field_item_chosen == -1) {
             is_design_slot = true;
         }
 
@@ -1843,7 +1843,7 @@ namespace DESIGN {
                 max_damage = (max_damage * 150) / 100;
             }
         } else {
-            if (flag_b == flag_a) {
+            if (row_idx == field_item_chosen) {
                 if (MOX::_weapon_mod_field_status[14] > 0) {
                     min_damage = (min_damage * 150) / 100;
                     max_damage = (max_damage * 150) / 100;

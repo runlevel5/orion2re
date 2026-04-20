@@ -12,11 +12,11 @@ namespace maintain {
 
     int16_t __cdecl Ship_Scrap_Value_(s_ship_data* ship);
 
-    bool __cdecl Phase1_Building_(s_player* p, int16_t a, int16_t b);
+    bool __cdecl Phase1_Building_(int16_t b);
 
-    bool __cdecl Phase2_Building_(s_player* p, int16_t a, int16_t b);
+    bool __cdecl Phase2_Building_(int16_t b);
 
-    bool __cdecl All_But_Capitol_(s_player* p, int16_t a, int16_t b);
+    bool __cdecl All_But_Capitol_(int16_t b);
 
     inline uint8_t (&_research_building_table)[4] =
         *reinterpret_cast<uint8_t(*)[4]>(std::uintptr_t{0x0054F088});
@@ -29,7 +29,7 @@ namespace maintain {
         return fn(colony, building_idx);
     }
 
-    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(s_player*, int16_t, int16_t));
+    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(int16_t));
 
     void __cdecl Kill_Ships_(s_player* player, bool at_colony_only, bool restricted_mission, int16_t ship_type);
 

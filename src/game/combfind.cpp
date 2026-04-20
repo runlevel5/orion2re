@@ -2099,7 +2099,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                 int bomb_hits = results->bomb.bomb_hits_remaining;
                 int bio_hits = results->bomb.bio_hits_remaining;
 
-                if (bomb_hits != 0 || bio_hits != 0 || knows_attacker) {
+                if (bomb_hits != 0 || bio_hits != 0 || has_stellar) {
                     bool surrender = false;
                     if (MOX::_player[colony_owner].objectives != 'd' /* ECON_INDUSTRY */ && MOX::_settings.game_difficulty > 2) {
                         if (COLCALC::May_Surrender_Star_(enemy_star_idx, colony_owner, attacker_id) && (int)(colony->n_pops * 2) <= bomb_hits) {
@@ -2164,7 +2164,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
                     if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
-                        MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
+                        MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
                         COLBOMB::Colony_Bombing_Screen_(&results->bomb);
                     }
 
@@ -2175,12 +2175,12 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                     }
                 }
 
-                if (results->info.planet_destroyed_flag == 0 && MOX::_star[star_idx].surrender_to[colony_owner] == 0 && 
+                if (results->info.planet_destroyed_flag == 0 && results->bomb.colony_wiped_out == 0 && MOX::_star[star_idx].surrender_to[colony_owner] == 0 && 
                     invasion::Has_Defending_Troops_(attacker_id, ship_list, n_ships, (int16_t)colony_idx)) {
                     invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
                     if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
-                        MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id)) {
+                        MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id)) {
                         int invade_seed = random::Get_Random_Seed_();
                         ERIC::Force_Fade_To_Colony_Palette_(1);
                         COLGCBT::Colony_Combat_Screen_((int)&results->info, (int)&results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
@@ -2219,7 +2219,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
         if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
             (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
-            MOX::_player[colony_owner].network_player_id == MOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
+            MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id) && results->bomb.damage_occurred != 0) {
             
             if (attacker_id == 10) {
                 ERIC::Play_Amoeba_Flic_();

@@ -5,8 +5,7 @@ namespace maintain {
      * Determines if a building is processed in the first maintenance phase.
      * Buildings with no maintenance, specific AI groups, or the Star Base (index 9) are excluded.
      */
-    bool __cdecl Phase1_Building_(s_player* p, int16_t a, int16_t b) {
-        // TYPE MISMATCH: decompiler showed bool __cdecl Phase1_Building_(int16_t building_idx)
+    bool __cdecl Phase1_Building_(int16_t b) {
         if (TECHDATA::_buildings[b].maintenance <= 0) {
             return false;
         }
@@ -125,13 +124,11 @@ namespace maintain {
      * @param b Building index.
      * @return True if maintenance > 0, false otherwise.
      */
-    bool __cdecl Phase2_Building_(s_player* p, int16_t a, int16_t b) {
-        // TYPE MISMATCH: decompiler showed bool __cdecl Phase2_Building_(short building_idx)
+    bool __cdecl Phase2_Building_(int16_t b) {
         return TECHDATA::_buildings[b].maintenance > 0;
     }
 
-    bool __cdecl All_But_Capitol_(s_player* p, int16_t a, int16_t b) {
-        // TYPE MISMATCH: decompiler showed bool __cdecl All_But_Capitol_(uint16_t building_id)
+    bool __cdecl All_But_Capitol_(int16_t b) {
         return b != BUILDING_CAPITOL;
     }
 
@@ -366,7 +363,7 @@ namespace maintain {
         }
     }
 
-    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(s_player*, int16_t, int16_t)) {
+    void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(int16_t)) {
         int16_t plr_idx = (int16_t)(player - MOX::_player);
         bool no_more_buildings = false;
 
@@ -380,7 +377,7 @@ namespace maintain {
                 s_colony* col = &MOX::_colony[i];
                 if (col->owner == (char)plr_idx) {
                     for (int j = 0; j < 49; ++j) {
-                        if (col->buildings[j] != 0 && can_scrap(player, (int16_t)i, (int16_t)j)) {
+                        if (col->buildings[j] != 0 && can_scrap((int16_t)j)) {
                             int32_t worth = Building_Worth_(col, (int16_t)j);
                             if (worth < min_worth) {
                                 min_worth = worth;

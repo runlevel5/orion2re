@@ -149,7 +149,7 @@ namespace DESIGN {
 
     int16_t __cdecl Weapon_Needs_Racks_(int16_t weapon_idx);
 
-    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t flag_a, int16_t flag_b);
+    void __cdecl Design_Weapon_Damage_String_(int16_t weapon_id_or_slot, char* buffer, int16_t field_item_chosen, int16_t row_idx);
 
     bool __cdecl Space_For_Weapon_Replacement_();
 

@@ -396,7 +396,7 @@ namespace sound {
 
     int32_t __cdecl Get_Stream_Volume_() {
         if (sound::_soundFxActive != 0 && _stream_data.ds_buffer != nullptr) {
-            LONG current_volume;
+            LONG current_volume = 0;
             _stream_data.ds_buffer->GetVolume(&current_volume);
 
             int32_t index = 0;
@@ -1174,6 +1174,8 @@ namespace sound {
                 } else if (index.num_active_channels > 0) {
                     index.active_channel_ids[index.num_active_channels] = (uint8_t)channel_id;
                     index.num_active_channels++;
+                } else {
+                    continue;
                 }
 
                 void* buffer = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_soundBuffer) + index.buffer_offset);
