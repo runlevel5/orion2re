@@ -3335,6 +3335,20 @@ struct s_orion_candidate {
     short star_idx;
 };
 
+typedef struct s_palette_cube s_palette_cube, *Ps_palette_cube;
+
+struct s_palette_cube {
+    uint16_t first_hist_index;
+    uint16_t last_hist_index;
+    uint16_t level;
+    uint8_t r_min;
+    uint8_t r_max;
+    uint8_t g_min;
+    uint8_t g_max;
+    uint8_t b_min;
+    uint8_t b_max;
+};
+
 typedef struct s_palette_entry s_palette_entry, *Ps_palette_entry;
 
 struct s_palette_entry {

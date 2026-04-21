@@ -35,6 +35,12 @@ inline char* const s_a = reinterpret_cast<char*>(std::uintptr_t{0x0052414});
 inline char* const s_an = reinterpret_cast<char*>(std::uintptr_t{0x0052418});
 inline const char* s_format_0055aa28 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AA28}); // "(%s)  "
 
+inline const char* s_Too_many_colors_to_reduce_to_ =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BE34});
+
+inline const char* s_Too_many_colors_to_reduce_from_ =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BE5C});
+
 inline const char* s_Lost_Player_Connection_0055bf3c = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF3C});
 inline const char* s_REENTERING_Net_Send_Message_0055bf58 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF58});
 inline const char* s_Sending_Message_To_Individual = reinterpret_cast<const char*>(std::uintptr_t{0x005609B0});

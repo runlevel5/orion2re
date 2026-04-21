@@ -3220,6 +3220,15 @@ namespace hooks {
         { 0x00538260, &sound::Copy_FourCC_ },
         { 0x0052e260, &sound::Reset_Sound_Channel_ },
         { 0x00532480, &sound::Stop_Stream_Loop_ },
+        { 0x00534660, &reduce::Add_Reduced_Palette_Group_ },
+        { 0x00534710, &reduce::Compress_Reduced_Palette_Groups_ },
+        { 0x00533CD0, &reduce::Reduce_Palette_ },
+        { 0x00534480, &reduce::Initial_Cube_ },
+        { 0x005345C0, &reduce::Shrink_Cube_ },
+        { 0x005344E0, &reduce::Find_Next_Lowest_Cube_Level_ },
+        { 0x00534420, &reduce::Find_Longest_Axis_ },
+        { 0x00534250, &reduce::Sort_Cube_Points_ },
+        { 0x00533e60, &reduce::Split_Cube_ },
     };
 
     void Install_Hooks()
