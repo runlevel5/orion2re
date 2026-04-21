@@ -41,10 +41,20 @@ namespace fields {
     inline uint16_t& _field_box_mode = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B044});
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
+    inline void __cdecl Save_Auto_Function_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fed0});
+        fn();
+    }
     void __cdecl Deactivate_Auto_Function_();
     inline void __cdecl Activate_Auto_Function_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FF10});
+        fn();
+    }
+    inline void __cdecl Restore_Auto_Function_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fee0});
         fn();
     }
     void __cdecl Clear_Fields_();
@@ -144,6 +154,12 @@ namespace fields {
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound);
 
     void __cdecl Invoke_Auto_Function_();
+
+    inline void __cdecl Invoke_Saved_Auto_Function_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ff40});
+        fn();
+    }
 
     inline void __cdecl Evaluate_Input_(int16_t* input, int16_t* scan) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*);

@@ -70,6 +70,12 @@ namespace EVANHELP {
         fn();
     }
 
+    inline void __cdecl Set_Input_Box_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041e400});
+        fn();
+    }
+
     inline void __cdecl Restore_Help_List_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0041e610 });

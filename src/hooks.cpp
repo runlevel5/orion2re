@@ -3229,6 +3229,16 @@ namespace hooks {
         { 0x00534420, &reduce::Find_Longest_Axis_ },
         { 0x00534250, &reduce::Sort_Cube_Points_ },
         { 0x00533e60, &reduce::Split_Cube_ },
+        { 0x004116e0, &namestar::Input_Box_Popup_Animated_ },
+        { 0x00411710, &namestar::Input_Box_Popup_ },
+        { 0x00411aa0, &namestar::Setup_Input_Box_Popup_ },
+        { 0x00411a70, &namestar::Draw_Input_Box_Popup_ },
+        { 0x00412020, &namestar::Star_Name_Popup_Screen_Center_X_ },
+        { 0x00412030, &namestar::Star_Name_Popup_Screen_Center_Y_ },
+        { 0x00412040, &namestar::Star_Name_Popup_Map_Center_X_ },
+        { 0x00412050, &namestar::Star_Name_Popup_Map_Center_Y_ },
+        { 0x00412060, &namestar::Max_Pixel_Width_Star_Name_Can_Be_ },
+        { 0x00411E10, &namestar::Can_Change_Star_Name_ },
     };
 
     void Install_Hooks()

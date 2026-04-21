@@ -6,6 +6,7 @@
 struct s_animation_header;
 struct s_lbx_stream_header;
 
+inline char* s_inbox_lbx_00551370 = reinterpret_cast<char*>(std::uintptr_t{0x00551370});
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});
 inline const char* const s_cmbtsfx_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551228});
