@@ -157,13 +157,13 @@ namespace sound {
 
     void __cdecl Stop_Sound_Timer_And_Wait2_();
 
-    void __cdecl mergeFreeBlocks_();
+    void __cdecl Merge_Free_Blocks_();
 
-    int32_t __cdecl getFreeSoundIndex_();
+    int32_t __cdecl Get_Free_Sound_Index_();
 
     bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
 
-    void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
+    void __cdecl Reset_Sound_Channel_(int8_t channel_idx);
 
     void __cdecl Resume_Timer2_();
 
@@ -251,7 +251,7 @@ namespace sound {
 
     int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size);
 
-    void* __cdecl allocateSoundBlock_(int32_t channel, int32_t resource_id, uint32_t size);
+    void* __cdecl Allocate_Sound_Block_(int32_t channel, int32_t resource_id, int32_t size);
 
     int32_t __cdecl Play_Sound_(int32_t resource_id);
 

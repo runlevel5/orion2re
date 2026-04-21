@@ -55,7 +55,7 @@ namespace sound {
         Audio_Clear_Cache_();
     }
 
-    void __cdecl Reset_Sound_Channel_(int32_t channel_idx) {
+    void __cdecl Reset_Sound_Channel_(int8_t channel_idx) {
         _sound_channels[channel_idx].sample_data = nullptr;
         _sound_channels[channel_idx].sample_size = 0;
         _sound_channels[channel_idx].sample_offset = 0;
@@ -692,75 +692,30 @@ namespace sound {
         s_sound_channel* channel = &_sound_channels[channel_idx];
 
         _dsound_hr = channel->buffer->GetCurrentPosition(&play_cursor, &write_cursor);
-        if (_dsound_hr != 0) {
-            return;
-        }
-
-        channel->buffer->GetStatus(&status);
-
-        uint32_t diff = 0;
-        if (channel->write_cursor < (uint32_t)play_cursor) {
-            diff = (uint32_t)play_cursor - channel->write_cursor;
-        } else if (play_cursor != 0 || channel->write_cursor != 0) {
-            diff = ((uint32_t)play_cursor - channel->write_cursor) + 0x4000;
-        }
-
-        if (diff == 0 || diff < 0x1555) {
-            if (channel->sample_size <= channel->sample_offset) {
-                channel->flags ^= 0x02;
-            }
-            return;
-        }
-
-        uint32_t lock_size = 0x1555;
-        uint32_t remaining = channel->sample_size - channel->sample_offset;
-        if (remaining <= 0x1555) {
-            lock_size = remaining;
-        }
-
-        _dsound_hr = channel->buffer->Lock(
-            channel->write_cursor,
-            lock_size,
-            &_streamBuffer1,
-            (LPDWORD)&_streamAvailable1,
-            &_streamBuffer2,
-            (LPDWORD)&_streamAvailable2,
-            0
-        );
-
         if (_dsound_hr == 0) {
-            if (_streamAvailable1 != 0) {
-                memcpy(_streamBuffer1, &channel->sample_data[channel->sample_offset], _streamAvailable1);
-                channel->sample_offset += _streamAvailable1;
-            }
+            channel->buffer->GetStatus(&status);
 
-            if (_streamAvailable2 != 0) {
-                memcpy(_streamBuffer2, &channel->sample_data[channel->sample_offset], _streamAvailable2);
-                channel->sample_offset += _streamAvailable2;
-            }
+            if (_dsound_hr == 0) {
+                uint32_t diff = 0;
+                if (channel->write_cursor < (uint32_t)play_cursor) {
+                    diff = (uint32_t)play_cursor - channel->write_cursor;
+                } else if (play_cursor != 0 || channel->write_cursor != 0) {
+                    diff = ((uint32_t)play_cursor - channel->write_cursor) + 0x4000;
+                }
 
-            channel->buffer->Unlock(
-                _streamBuffer1,
-                _streamAvailable1,
-                _streamBuffer2,
-                _streamAvailable2
-            );
+                if (diff == 0 || diff < 0x1555) {
+                    return;
+                }
 
-            // Assembly calls GetCurrentPosition here but result is ignored
-            _dsound_hr = channel->buffer->GetCurrentPosition(&pos1, &pos2);
-
-            channel->ds_buffer_size = lock_size;
-
-            if (lock_size < 0x1555 && (channel->flags & 0x04)) {
-                channel->sample_offset = 0;
-                channel->loop_count--;
-                if (channel->loop_count == 0) {
-                    channel->flags ^= 0x04;
+                uint32_t lock_size = 0x1555;
+                uint32_t remaining = channel->sample_size - channel->sample_offset;
+                if (remaining <= 0x1555) {
+                    lock_size = remaining;
                 }
 
                 _dsound_hr = channel->buffer->Lock(
                     channel->write_cursor,
-                    0x1555 - lock_size,
+                    lock_size,
                     &_streamBuffer1,
                     (LPDWORD)&_streamAvailable1,
                     &_streamBuffer2,
@@ -779,16 +734,57 @@ namespace sound {
                         channel->sample_offset += _streamAvailable2;
                     }
 
-                    channel->buffer->Unlock(
+                    _dsound_hr = channel->buffer->Unlock(
                         _streamBuffer1,
                         _streamAvailable1,
                         _streamBuffer2,
                         _streamAvailable2
                     );
-                    _dsound_hr = 0;
+
+                    // Assembly calls GetCurrentPosition here but result is ignored
+                    _dsound_hr = channel->buffer->GetCurrentPosition(&pos1, &pos2);
+
+                    channel->ds_buffer_size = lock_size;
+
+                    if (lock_size < 0x1555 && (channel->flags & 0x04)) {
+                        channel->sample_offset = 0;
+                        channel->loop_count--;
+                        if (channel->loop_count == 0) {
+                            channel->flags ^= 0x04;
+                        }
+
+                        _dsound_hr = channel->buffer->Lock(
+                            channel->write_cursor,
+                            0x1555 - lock_size,
+                            &_streamBuffer1,
+                            (LPDWORD)&_streamAvailable1,
+                            &_streamBuffer2,
+                            (LPDWORD)&_streamAvailable2,
+                            0
+                        );
+
+                        if (_dsound_hr == 0) {
+                            if (_streamAvailable1 != 0) {
+                                memcpy(_streamBuffer1, &channel->sample_data[channel->sample_offset], _streamAvailable1);
+                                channel->sample_offset += _streamAvailable1;
+                            }
+
+                            if (_streamAvailable2 != 0) {
+                                memcpy(_streamBuffer2, &channel->sample_data[channel->sample_offset], _streamAvailable2);
+                                channel->sample_offset += _streamAvailable2;
+                            }
+
+                            _dsound_hr = channel->buffer->Unlock(
+                                _streamBuffer1,
+                                _streamAvailable1,
+                                _streamBuffer2,
+                                _streamAvailable2
+                            );
+                        }
+                    }
+                    channel->write_cursor = (channel->write_cursor + 0x1555) & 0x3FFF;
                 }
             }
-            channel->write_cursor = (channel->write_cursor + 0x1555) & 0x3FFF;
         }
 
         if (channel->sample_size <= channel->sample_offset) {
@@ -842,7 +838,7 @@ namespace sound {
 
             for (int j = 0; j < sound_idx.num_active_channels; ++j) {
                 // Sign-extended comparison of the byte-sized instance ID
-                if ((int8_t)sound_idx.active_channel_ids[j] == (int8_t)instance_id) {
+                if ((int8_t)sound_idx.active_channel_ids[j] == instance_id) {
                     if (sound_idx.num_active_channels > 1) {
                         sound_idx.num_active_channels--;
                         // Replace removed instance with the last one in the list
@@ -866,7 +862,7 @@ namespace sound {
         if (sound::_command == 1 /* Fade In */) {
             int32_t current_vol = sound::Get_Stream_Volume_();
             if (current_vol < sound::_global_stream_volume) {
-                current_vol += (int32_t)sound::_streamIncVal;
+                current_vol += (int32_t)(int8_t)sound::_streamIncVal;
                 if (current_vol >= sound::_global_stream_volume) {
                     sound::_command = 0;
                     current_vol = sound::_global_stream_volume;
@@ -880,7 +876,7 @@ namespace sound {
         if (sound::_command == 2 /* Fade Out */) {
             int32_t current_vol = sound::Get_Stream_Volume_();
             if (current_vol > 0) {
-                current_vol -= (int32_t)sound::_streamIncVal;
+                current_vol -= (int32_t)(int8_t)sound::_streamIncVal;
                 if (current_vol <= 0) {
                     current_vol = 0;
                     sound::_command = 0;
@@ -901,7 +897,7 @@ namespace sound {
                 sound::_dsound_hr = sound::_stream_data.ds_buffer->GetCurrentPosition((LPDWORD)&play_pos, (LPDWORD)&write_pos);
                 if (sound::_dsound_hr == 0) {
                     DWORD status;
-                    sound::_dsound_hr = sound::_stream_data.ds_buffer->GetStatus(&status);
+                    sound::_stream_data.ds_buffer->GetStatus(&status);
                     if (sound::_dsound_hr == 0) {
                         uint32_t space_available = 0;
                         if (sound::_stream_data.write_cursor < play_pos) {
@@ -1042,11 +1038,11 @@ namespace sound {
         _dsound_buffer_desc.dwSize = 0x14;
         _dsound_buffer_desc.dwFlags = 0xe0;
 
-        dwBytes = 0x4000;
-        if (info.data_size < 0x4001) {
-            dwBytes = info.data_size;
+        uint32_t desc_bytes = 0x4000;
+        if ((int32_t)info.data_size <= 0x4000) {
+            desc_bytes = info.data_size;
         }
-        _dsound_buffer_desc.dwBufferBytes = dwBytes;
+        _dsound_buffer_desc.dwBufferBytes = desc_bytes;
 
         memset(&wfx, 0, sizeof(WAVEFORMATEX));
         wfx.wFormatTag = 1;
@@ -1065,8 +1061,10 @@ namespace sound {
         _sound_channels[channel_idx].sample_data = (uint8_t*)info.data_ptr;
         _sound_channels[channel_idx].volume_index = 0;
 
-        if (info.data_size > 0x4000) {
+        dwBytes = _sound_channels[channel_idx].sample_size;
+        if (dwBytes > 0x4000) {
             _sound_channels[channel_idx].flags |= 0x2;
+            dwBytes = 0x4000;
         }
 
         _dsound_hr = _sound_channels[channel_idx].buffer->Lock(0, dwBytes, &_streamBuffer1, (LPDWORD)&_streamAvailable1, &_streamBuffer2, (LPDWORD)&_streamAvailable2, 0);
@@ -1190,7 +1188,7 @@ namespace sound {
             return -2;
         }
 
-        void* buffer = allocateSoundBlock_(channel_id, resource_id, length);
+        void* buffer = Allocate_Sound_Block_(channel_id, resource_id, length);
         if (buffer == nullptr) {
             return -2;
         }
@@ -1251,20 +1249,12 @@ namespace sound {
     /**
      * @address 0052e5a0
      */
-    int32_t __cdecl getFreeSoundIndex_() {
-        int32_t i = 1;
-        s_sound_index* entry = &_soundIndices[1];
-
-        // The loop searches for an unused sound index entry where both next_id and prev_id are -1.
-        // The boundary is determined by the address of the next global array, _sound_channels.
-        while ((std::uintptr_t)entry < 0x0057CCB0) {
-            if (entry->next_id == -1 && entry->prev_id == -1) {
+    int32_t __cdecl Get_Free_Sound_Index_() {
+        for (int32_t i = 1; i < 33; ++i) {
+            if (_soundIndices[i].next_id == -1 && _soundIndices[i].prev_id == -1) {
                 return i;
             }
-            entry++;
-            i++;
         }
-
         return -1;
     }
 
@@ -1274,12 +1264,12 @@ namespace sound {
     /**
      * @address 0052e2b0
      */
-    void* __cdecl allocateSoundBlock_(int32_t channel, int32_t resource_id, uint32_t size) {
-        if (size > _soundBufferSize) {
+    void* __cdecl Allocate_Sound_Block_(int32_t channel, int32_t resource_id, int32_t size) {
+        if (size > (int32_t)_soundBufferSize) {
             return nullptr;
         }
 
-        mergeFreeBlocks_();
+        Merge_Free_Blocks_();
 
         for (int32_t attempt = 0; attempt < 3; ++attempt) {
             int32_t current_idx = 0;
@@ -1293,8 +1283,8 @@ namespace sound {
                     can_allocate = (current->num_active_channels < 1);
                 }
 
-                if (can_allocate && current->buffer_size >= size) {
-                    int32_t free_idx = getFreeSoundIndex_();
+                if (can_allocate && (int32_t)current->buffer_size >= size) {
+                    int32_t free_idx = Get_Free_Sound_Index_();
                     if (free_idx >= 0) {
                         s_sound_index* new_block = &_soundIndices[free_idx];
 
@@ -1374,7 +1364,7 @@ namespace sound {
      * 
      * A block is considered free if its num_active_channels is 0.
      */
-    void __cdecl mergeFreeBlocks_() {
+    void __cdecl Merge_Free_Blocks_() {
         int32_t current_idx = 1;
 
         while (true) {
