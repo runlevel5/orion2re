@@ -10,8 +10,5 @@ namespace timer {
 
     int32_t __cdecl Get_Time_Since_Mark_();
 
-    inline void __cdecl Release_Time_(int32_t t) {
-        using Fn = void(__cdecl*)(int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052b230})(t);
-    }
+    void __cdecl Release_Time_(int32_t t);
 }
