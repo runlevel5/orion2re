@@ -33,6 +33,10 @@ namespace video {
 		screen_dump_flag = 0;
 	}
 
+	int16_t __cdecl Get_Refresh_Mode_() {
+		return screen_refresh_flag;
+	}
+
 	void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2) {
 		if (x1 < 0) {
 			x1 = 0;

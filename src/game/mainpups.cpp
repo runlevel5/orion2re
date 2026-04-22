@@ -1120,4 +1120,59 @@ namespace MAINPUPS {
             }
         }
     }
+
+    void __cdecl Update_CCP_Display_Data_Bombing_(
+        s_colony_combat_popup_data* ccp_data,
+        s_combat_bomb_result* bomb,
+        s_invasion_side_info* attacker,
+        s_invasion_side_info* defender,
+        int32_t random_seed,
+        int16_t colony_idx,
+        int16_t bombing_result,
+        int8_t has_stellar_converter
+    ) {
+        ccp_data->bomb = bomb;
+
+        Update_CCP_Display_Data_Invasion_(
+            _g_data_ptr,
+            attacker,
+            defender,
+            random_seed,
+            colony_idx,
+            bombing_result,
+            has_stellar_converter
+        );
+
+        ccp_data->defender_unit_counts[1] -= _g_data_ptr->bomb->infantry_killed;
+        ccp_data->defender_unit_counts[0] -= _g_data_ptr->bomb->tanks_killed;
+    }
+
+    int16_t __cdecl Colony_Bombing_Popup_(
+        s_combat_bomb_result* bomb,
+        s_invasion_side_info* attacker,
+        s_invasion_side_info* defender,
+        int32_t random_seed,
+        int16_t colony_idx,
+        int16_t bombing_result,
+        int8_t has_stellar_converter)
+    {
+        s_colony_combat_popup_data local_30;
+
+        _g_data_ptr = &local_30;
+
+        Update_CCP_Display_Data_Bombing_(
+            &local_30,
+            bomb,
+            attacker,
+            defender,
+            random_seed,
+            colony_idx,
+            bombing_result,
+            has_stellar_converter
+        );
+
+        _explode_flag = 0;
+
+        return Colony_Combat_Popup_(&local_30, 1);
+    }
 }

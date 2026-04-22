@@ -3272,9 +3272,10 @@ namespace hooks {
         { 0x0045a470, &MAINPUPS::Draw_Special_Info_Popup_ },
         { 0x0045D940, &MAINPUPS::Colony_Selection_Popup_ },
         { 0x0045d9b0, &MAINPUPS::Update_CCP_Display_Data_Invasion_ },
+        { 0x0045df80, &MAINPUPS::Colony_Combat_Popup_ },
         { 0x0045de50, &MAINPUPS::Colony_Bombing_Popup_ },
         { 0x0045dab0, &MAINPUPS::Update_CCP_Display_Data_Bombing_ },
-        { 0x0045df80, &MAINPUPS::Colony_Combat_Popup_ },
+        { 0x00527CF0, &video::Get_Refresh_Mode_ },
     };
 
     void Install_Hooks()

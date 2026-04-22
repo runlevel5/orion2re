@@ -342,8 +342,8 @@ namespace MAINPUPS {
     );
 
     void __cdecl Update_CCP_Display_Data_Bombing_(
-        s_colony_combat_popup_data* popup_data,
-        s_combat_bomb_result* bomb_result,
+        s_colony_combat_popup_data* ccp_data,
+        s_combat_bomb_result* bomb,
         s_invasion_side_info* attacker,
         s_invasion_side_info* defender,
         int32_t random_seed,

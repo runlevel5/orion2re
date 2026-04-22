@@ -23,8 +23,8 @@ namespace video {
 		int16_t max_x;
 	};
 
-	inline uint32_t& screen_refresh_flag =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1B4 });
+	inline int16_t& screen_refresh_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B1B4 });
 
 	inline s_scan_list_entry*& _refresh_scan_list =
 		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x00579348 });
@@ -106,7 +106,7 @@ namespace video {
 
 	void __cdecl Set_Refresh_Differential_();
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
-	uint16_t __cdecl Get_Refresh_Mode_();
+	int16_t __cdecl Get_Refresh_Mode_();
 
 	inline void __cdecl Init_Video_Drivers_() {
 		using Fn = void(__cdecl*)();
