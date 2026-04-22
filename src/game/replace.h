@@ -4,8 +4,8 @@
 struct s_animation_header;
 
 namespace replace {
-    inline uint8_t& _graphics_buffer =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057A9A8});
+    inline uint8_t (&_graphics_buffer)[1023] =
+        *reinterpret_cast<uint8_t(*)[1023]>(std::uintptr_t{0x0057A9A8});
 
     inline uint8_t*& _palette_color_list =
         *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0057E07C});

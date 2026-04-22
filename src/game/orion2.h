@@ -1055,6 +1055,28 @@ struct s_colony_bldg {
     int32_t buildings[6];
 };
 
+typedef struct s_colony_combat_popup_data s_colony_combat_popup_data, *Ps_colony_combat_popup_data;
+
+struct s_colony_combat_popup_data {
+    int16_t colony_idx;
+    int8_t attacker_player_id;
+    int16_t attacker_unit_counts[4];
+    int8_t has_stellar_converter;
+    int8_t defender_player_id;
+    int16_t defender_unit_counts[4];
+    int16_t n_pops;
+    int16_t n_bldgs;
+    int16_t best_shield_bldg;
+    struct s_combat_bomb_result *bomb;
+    struct s_invasion_side_info *attacker;
+    struct s_invasion_side_info *defender;
+    int32_t random_seed;
+    int16_t bombardment_result;
+    undefined field14_0x2d;
+    undefined field15_0x2e;
+    undefined field16_0x2f;
+};
+
 typedef struct s_colony_job_production s_colony_job_production, *Ps_colony_job_production;
 
 struct s_colony_job_production {

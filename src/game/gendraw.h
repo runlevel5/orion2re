@@ -30,4 +30,10 @@ namespace GENDRAW {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796e0});
         fn(text);
     }
+
+    inline void __cdecl Message_Box_Exploding_(char* msg, int16_t star_idx) {
+        using Fn = void(__cdecl*)(char*, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004796D0});
+        fn(msg, star_idx);
+    }
 }

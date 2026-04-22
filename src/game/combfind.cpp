@@ -1973,7 +1973,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
                 invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &results->info.attacker_invasion, &results->info.defender_invasion);
                 int seed = random::Get_Random_Seed_();
-                int16_t selection = MAINPUPS::Colony_Selection_Popup_(&results->info, &results->info.defender_invasion, seed, (int16_t)colony_idx, bombardment_res, has_stellar);
+                int16_t selection = MAINPUPS::Colony_Selection_Popup_(&results->info.attacker_invasion, &results->info.defender_invasion, seed, (int16_t)colony_idx, bombardment_res, has_stellar);
 
                 bool loop_done = false;
                 do {
@@ -2000,7 +2000,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             COMBAT::Bombardment_(&results->bomb);
 
                             invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &results->info.attacker_invasion, &results->info.defender_invasion);
-                            selection = MAINPUPS::Colony_Bombing_Popup_(&results->bomb, &results->info, &results->info.defender_invasion, bomb_seed, (int16_t)colony_idx, bombardment_res, has_stellar);
+                            selection = MAINPUPS::Colony_Bombing_Popup_(&results->bomb, &results->info.attacker_invasion, &results->info.defender_invasion, bomb_seed, (int16_t)colony_idx, bombardment_res, has_stellar);
                             NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, results->bomb.population_killed);
 
                             if (results->bomb.colony_wiped_out != 0) {

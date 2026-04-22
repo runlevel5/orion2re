@@ -273,4 +273,10 @@ namespace OFFICER {
         *reinterpret_cast<char(*)[2]>(std::uintptr_t{0x005510F0}); /* " " */
 
     void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest);
+
+    inline void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t input, int16_t officer_idx) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004422E0});
+        fn(input, officer_idx);
+    }
 }

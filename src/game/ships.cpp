@@ -273,39 +273,35 @@ namespace SHIPS {
         }
     }
 
-    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors_ptr, int16_t color_offset) {
-        int start_index = 7 - (int)color_offset;
-        if (start_index <= 0) {
-            start_index = 0;
+    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t phase) {
+        int16_t inv_phase = 7 - phase;
+        if (inv_phase <= 0) {
+            inv_phase = 0;
         }
 
-        if (x2 > x1) {
-            if (y2 >= y1) {
-                line::Multi_Colored_Line_(x1, y1, x2, y2, colors_ptr, (int16_t)start_index);
+        if (x1 < x2) {
+            if (y1 <= y2) {
+                line::Multi_Colored_Line_(x1, y1, x2, y2, colors, inv_phase);
                 return;
             }
-
-            s_colors local_colors;
+            s_colors reversed_colors;
             for (int i = 0; i < 8; ++i) {
-                // Reverses the color array for the line direction
-                local_colors.colors[7 - i] = colors_ptr->colors[i];
+                reversed_colors.colors[7 - i] = colors->colors[i];
             }
-            line::Multi_Colored_Line_(x1, y1, x2, y2, &local_colors, color_offset);
+            line::Multi_Colored_Line_(x1, y1, x2, y2, &reversed_colors, phase);
             return;
         }
 
-        // x2 <= x1 case
-        if (y2 > y1) {
-            line::Multi_Colored_Line_(x1, y1, x2, y2, colors_ptr, (int16_t)start_index);
+        if (y1 < y2) {
+            line::Multi_Colored_Line_(x1, y1, x2, y2, colors, inv_phase);
             return;
         }
 
-        s_colors local_colors;
+        s_colors reversed_colors;
         for (int i = 0; i < 8; ++i) {
-            // Reverses the color array for the line direction
-            local_colors.colors[7 - i] = colors_ptr->colors[i];
+            reversed_colors.colors[7 - i] = colors->colors[i];
         }
-        line::Multi_Colored_Line_(x1, y1, x2, y2, &local_colors, color_offset);
+        line::Multi_Colored_Line_(x1, y1, x2, y2, &reversed_colors, phase);
     }
 
     /**

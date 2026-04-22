@@ -5,6 +5,7 @@ struct s_ship_design;
 struct s_ship_data;
 struct s_animation_header;
 struct s_ship_icon;
+struct s_colors;
 
 namespace SHIPS {
     int16_t __cdecl Build_Nonplayer_Ship_(int16_t type, int16_t system_idx, int16_t owner);
@@ -15,7 +16,7 @@ namespace SHIPS {
 
     void __cdecl Set_Ship_Icon_XYs_();
 
-    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t color_offset);
+    void __cdecl Draw_Directional_Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t phase);
 
     void __cdecl Get_Ship_Icon_Coords_(int16_t ship_idx, int16_t* x, int16_t* y);
 

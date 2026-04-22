@@ -175,7 +175,7 @@ namespace replace {
     }
 
     void __cdecl Establish_Color_Gradient_(int16_t scale, int16_t invert) {
-        _palette_color_list = &_graphics_buffer;
+        _palette_color_list = _graphics_buffer;
 
         for (int i = 0; i < 256; ++i) {
             uint8_t r = video::_current_palette[i].r;
@@ -294,7 +294,7 @@ namespace replace {
     }
 
     void __cdecl Interlaced_Gray_Scale_Off_Page_(int8_t color_offset1, int16_t gradient_start1, int8_t color_offset2, int16_t gradient_start2, int16_t gradient_end) {
-        replace::_palette_color_list = &replace::_graphics_buffer;
+        replace::_palette_color_list = replace::_graphics_buffer;
         
         replace::Establish_Color_Gradient_(gradient_start1, gradient_end);
         

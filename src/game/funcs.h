@@ -720,6 +720,7 @@ inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintp
 inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
+inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
 inline const char* s_0_0055110d = reinterpret_cast<const char*>(std::uintptr_t{0x0055110D});
 inline const char* s___00556070 = reinterpret_cast<const char*>(std::uintptr_t{0x00556070}); /* "^ " */
 inline const char* s__00556071 = reinterpret_cast<const char*>(std::uintptr_t{0x00556071});

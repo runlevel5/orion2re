@@ -268,7 +268,7 @@ namespace MAINSCR2 {
             RUSS::Mox_Sync_Update_();
             fields::Enable_Draw_All_Fields_();
 
-            int16_t count = MAINPUPS::Slider_Popup_(0, scrap_amount, 0, HAROLD::H_Message_(0xed), 0);
+            int16_t count = MAINPUPS::Slider_Popup_(0, scrap_amount, 0, (char*)HAROLD::H_Message_(0xed), 0);
             if (count >= 0) {
                 s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
                 int16_t box_result = 1;

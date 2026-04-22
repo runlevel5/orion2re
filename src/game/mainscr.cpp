@@ -2007,7 +2007,7 @@ namespace MAINSCR {
         MAINPUPS::_last_scanned_field = -1;
         fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(font_colors));
         MAINPUPS::Load_Tax_Rate_Popup_();
-        MAINPUPS::Do_Popup_Setup_(-1, DAT_00565e20);
+        MAINPUPS::Do_Popup_Setup_(-1, MAINPUPS::_anims[0x24]);
         ERICHELP::Set_Tax_Rate_Popup_Help_List_();
         fields::Deactivate_Auto_Function_();
         fields::Assign_Auto_Function_(MAINPUPS::Draw_Tax_Rate_Popup_, 1);
@@ -3402,7 +3402,7 @@ namespace MAINSCR {
                 video::Set_Page_Off_();
             }
 
-            line::Plasma_Box_(draw_x, draw_y, w_offset, h_offset, 3, color_anim, unk_color, acStack_8);
+            line::Plasma_Box_(draw_x, draw_y, (uint16_t)w_offset, h_offset, 3, color_anim, (uint8_t)unk_color, (int32_t)acStack_8);
 
             color_anim = (random::Random_(10) + color_anim) & 0xFF;
             RUSS::Mox_Sync_Update_();
@@ -3426,7 +3426,7 @@ namespace MAINSCR {
             }
         }
 
-        line::Plasma_Box_(original_x2, original_y2, param_5, param_6, 3, color_anim, unk_color, acStack_8);
+        line::Plasma_Box_(original_x2, original_y2, (uint16_t)param_5, param_6, 3, color_anim, (uint8_t)unk_color, (int32_t)acStack_8);
         RUSS::Mox_Sync_Update_();
         fields::Enable_Draw_All_Fields_();
         MOX::_draw_main_screen_to_back = 1;

@@ -94,6 +94,12 @@ namespace ERIC {
 
     void __cdecl Do_Cinematic_Popup_Cleanup_();
 
+    inline void __cdecl Set_Refresh_Mode_(uint16_t mode) {
+        using Fn = void(__cdecl*)(uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba620});
+        fn(mode);
+    }
+
     void __cdecl Play_Dimensional_Portal_Flic_();
 
     void __cdecl Play_Planetary_Destruction_Flic_();
@@ -127,5 +133,17 @@ namespace ERIC {
         using Fn = void(__cdecl*)(int);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba790});
         fn(state);
+    }
+
+    inline int16_t __cdecl Player_Capitol_World_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAAC0});
+        return fn(player_idx);
+    }
+
+    inline int16_t __cdecl Pick_Random_Colony_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAA50});
+        return fn(player_idx);
     }
 }

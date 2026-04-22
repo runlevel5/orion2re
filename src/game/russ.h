@@ -13,6 +13,12 @@ namespace RUSS {
 
     char* __cdecl Star_Name_(int32_t star_idx);
 
+    inline int16_t __cdecl Star_To_Monster_(int32_t star_idx) {
+        using Fn = int16_t(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D7C10});
+        return fn(star_idx);
+    }
+
     void __cdecl Mox_Sync_Update_();
 
     void __cdecl Mox_Update_();

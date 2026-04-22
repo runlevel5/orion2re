@@ -337,6 +337,7 @@ namespace MOX {
     inline int16_t& _fleet_movement_all_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597466});
     inline int16_t& _galaxy_map_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
+    inline uint8_t& _need_to_restore_help_list = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597D60});
     inline uint16_t& _ship_icon_player_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B322});
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
     inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});

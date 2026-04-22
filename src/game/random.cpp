@@ -31,4 +31,8 @@ namespace random {
         _random_seed = seed;
         return (seed / quotient) + 1;
     }
+
+    void __cdecl Restore_Random_Seed_() {
+        _random_seed = _saved_random_seed;
+    }
 }

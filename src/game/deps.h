@@ -210,3 +210,4 @@
 #include "lbx.h"
 #include "colbomb.h"
 #include "aibomb.h"
+#include "flcqueue.h"

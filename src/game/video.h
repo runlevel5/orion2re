@@ -106,6 +106,7 @@ namespace video {
 
 	void __cdecl Set_Refresh_Differential_();
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
+	uint16_t __cdecl Get_Refresh_Mode_();
 
 	inline void __cdecl Init_Video_Drivers_() {
 		using Fn = void(__cdecl*)();

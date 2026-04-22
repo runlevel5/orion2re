@@ -1348,7 +1348,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
 void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
     int16_t summary_idx;
-    uint8_t colors[8];
+    s_colors colors;
     uint8_t colony_selectable;
     uint8_t outpost_selectable;
     bool colony_active = false;
@@ -1360,14 +1360,14 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
 
     summary_idx = Summary_Planet_Index_(star_idx);
 
-    colors[0] = 0xE2;
-    colors[1] = 0xE3;
-    colors[2] = 0xE4;
-    colors[3] = 0xE5;
-    colors[4] = 0xE4;
-    colors[5] = 0xE3;
-    colors[6] = 0xE3;
-    colors[7] = 0xE2;
+    colors.colors[0] = 0xE2;
+    colors.colors[1] = 0xE3;
+    colors.colors[2] = 0xE4;
+    colors.colors[3] = 0xE5;
+    colors.colors[4] = 0xE4;
+    colors.colors[5] = 0xE3;
+    colors.colors[6] = 0xE3;
+    colors.colors[7] = 0xE2;
 
     colony_selectable = (uint8_t)Send_Colony_Button_Selectable_();
     outpost_selectable = (uint8_t)Send_Outpost_Button_Selectable_();
@@ -1408,7 +1408,7 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
         dist = Range_(marker_y, marker_x, star_y + 4, star_x + 3);
         if (dist > 10) {
-            line::Draw_Directional_Multi_Colored_Line_(marker_y + 7, marker_x + 2, star_y + 2, star_x + 2, colors, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 7, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             
             int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
             int32_t abs_val = (next_idx >= 0) ? next_idx : -next_idx;
@@ -1421,7 +1421,7 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
         dist = Range_(marker_y, marker_x, star_y + 4, star_x + 3);
         if (dist > 10) {
-            line::Draw_Directional_Multi_Colored_Line_(marker_y + 8, marker_x + 2, star_y + 2, star_x + 2, colors, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 8, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             
             int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
             int32_t abs_val = (next_idx >= 0) ? next_idx : -next_idx;

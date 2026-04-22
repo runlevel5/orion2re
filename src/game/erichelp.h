@@ -40,4 +40,16 @@ namespace ERICHELP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412370});
         fn();
     }
+
+    inline void __cdecl Set_Dragon_New_Star_Popup_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412400});
+        fn();
+    }
+
+    inline void __cdecl Set_Player_Attacked_Popup_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004123D0});
+        fn();
+    }
 }

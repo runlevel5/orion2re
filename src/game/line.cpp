@@ -2,6 +2,196 @@
 
 namespace line {
 
+    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t offset) {
+        if (animate::_clipping_flag == 1) {
+            if (line::Clip_Line_(&x1, &y1, &x2, &y2) == 1) {
+                return;
+            }
+        }
+
+        if (y2 < y1) {
+            strings::Swap_Short_(&y1, &y2);
+            strings::Swap_Short_(&x1, &x2);
+        }
+
+        uint8_t* local_ptr = video::_current_video_page + y1 * g_screen_res_x + x1;
+        int16_t dx = x2 - x1;
+        int16_t abs_dx = dx;
+        int16_t x_dir = 1;
+
+        if (dx < 0) {
+            abs_dx = -dx;
+            x_dir = -1;
+        }
+
+        int16_t dy = y2 - y1;
+
+        if (abs_dx == 0) {
+            int16_t count = dy + 1;
+            while (count > 0) {
+                *local_ptr = colors->colors[offset & 7];
+                offset++;
+                local_ptr += g_screen_res_x;
+                count--;
+            }
+            if (video::screen_refresh_flag >= 2 && y1 <= y2) {
+                for (int16_t cur_y = y1; cur_y <= y2; cur_y++) {
+                    video::Add_Dot_To_Scan_List_(x1, cur_y);
+                }
+            }
+            return;
+        }
+
+        if (dy == 0) {
+            int16_t count = abs_dx + 1;
+            while (count > 0) {
+                *local_ptr = colors->colors[offset & 7];
+                offset++;
+                local_ptr += x_dir;
+                count--;
+            }
+            if (video::screen_refresh_flag >= 2) {
+                if (x2 < x1) {
+                    strings::Swap_Short_(&x1, &x2);
+                }
+                setvesa::Add_Square_To_Scan_List_(x1, y1, x2, y1);
+            }
+            return;
+        }
+
+        if (abs_dx == dy) {
+            int16_t count = abs_dx + 1;
+            while (count > 0) {
+                *local_ptr = colors->colors[offset & 7];
+                offset++;
+                local_ptr += g_screen_res_x + x_dir;
+                count--;
+            }
+            if (video::screen_refresh_flag >= 2 && y1 <= y2) {
+                if (x2 <= x1) {
+                    for (int16_t cur_y = y1; cur_y <= y2; cur_y++) {
+                        video::Add_Dot_To_Scan_List_(x1 - (cur_y - y1), cur_y);
+                    }
+                } else {
+                    for (int16_t cur_y = y1; cur_y <= y2; cur_y++) {
+                        video::Add_Dot_To_Scan_List_(x1 + (cur_y - y1), cur_y);
+                    }
+                }
+            }
+            return;
+        }
+
+        if (abs_dx > dy) {
+            int16_t run_base = abs_dx / dy;
+            int16_t rem2 = (abs_dx % dy) * 2;
+            int16_t err = (abs_dx % dy) - 2 * dy;
+            int16_t first_run = (run_base / 2) + 1;
+            int16_t first_run_adj = first_run;
+
+            if (rem2 == 0 && (run_base & 1) == 0) {
+                first_run_adj--;
+            }
+            if ((run_base & 1) != 0) {
+                err += dy;
+            }
+
+            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &offset);
+
+            if (video::screen_refresh_flag >= 2) {
+                if (x_dir > 0) {
+                    setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + first_run_adj, y1);
+                    x1 += first_run_adj;
+                } else {
+                    setvesa::Add_Square_To_Scan_List_(x1 - first_run_adj, y1, x1, y1);
+                    x1 -= first_run_adj;
+                }
+                y1++;
+            }
+
+            int count = dy - 1;
+            for (int i = 0; i < count; i++) {
+                int16_t run = run_base;
+                err += rem2;
+                if (err > 0) {
+                    run++;
+                    err -= 2 * dy;
+                }
+                line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, run, colors, &offset);
+
+                if (video::screen_refresh_flag >= 2) {
+                    if (x_dir > 0) {
+                        setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + run, y1);
+                        x1 += run;
+                    } else {
+                        setvesa::Add_Square_To_Scan_List_(x1 - run, y1, x1, y1);
+                        x1 -= run;
+                    }
+                    y1++;
+                }
+            }
+
+            line::Draw_Horizontal_Run_Multi_(&local_ptr, x_dir, first_run, colors, &offset);
+
+            if (video::screen_refresh_flag >= 2) {
+                if (x_dir > 0) {
+                    setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + first_run, y1);
+                } else {
+                    setvesa::Add_Square_To_Scan_List_(x1 - first_run, y1, x1, y1);
+                }
+            }
+        } else {
+            int16_t run_base = dy / abs_dx;
+            int16_t rem2 = (dy % abs_dx) * 2;
+            int16_t err = (dy % abs_dx) - 2 * abs_dx;
+            int16_t first_run = (run_base / 2) + 1;
+            int16_t first_run_adj = first_run;
+
+            if (rem2 == 0 && (run_base & 1) == 0) {
+                first_run_adj--;
+            }
+            if ((run_base & 1) != 0) {
+                err += abs_dx;
+            }
+
+            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run_adj, colors, &offset);
+
+            if (video::screen_refresh_flag >= 2) {
+                for (int16_t i = 0; i < first_run_adj; i++) {
+                    video::Add_Dot_To_Scan_List_(x1, y1 + i);
+                }
+                y1 += first_run_adj;
+                x1 += x_dir;
+            }
+
+            int count = abs_dx - 1;
+            for (int i = 0; i < count; i++) {
+                int16_t run = run_base;
+                err += rem2;
+                if (err > 0) {
+                    run++;
+                    err -= 2 * abs_dx;
+                }
+                line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, run, colors, &offset);
+
+                if (video::screen_refresh_flag >= 2) {
+                    for (int16_t j = 0; j < run; j++) {
+                        video::Add_Dot_To_Scan_List_(x1, y1 + j);
+                    }
+                    y1 += run;
+                    x1 += x_dir;
+                }
+            }
+
+            line::Draw_Vertical_Run_Multi_(&local_ptr, x_dir, first_run, colors, &offset);
+
+            if (video::screen_refresh_flag >= 2) {
+                for (int16_t i = 0; i < first_run; i++) {
+                    video::Add_Dot_To_Scan_List_(x1, y1 + i);
+                }
+            }
+        }
+    }
+
     /**
      * @brief Clips a line segment to the screen boundaries defined in video namespace.
      *
@@ -322,6 +512,342 @@ namespace line {
 
         // Advance buffer pointer to the next line based on screen resolution
         *buf = current_pos + platform::g_screen_res_x;
+    }
+
+    void __cdecl Plasma_Box_(int16_t x, int16_t y, uint16_t w, int16_t h, int16_t thickness,
+                             int16_t val1, uint8_t val2, int32_t val3) {
+        Create_Plasma_Line_(val1, val2, reinterpret_cast<const uint8_t*>(val3));
+
+        if (thickness > 0) {
+            for (int16_t i = 0; i < thickness; ++i) {
+                int16_t y1 = y + i;
+                int16_t x2 = x - i + w - 1;
+                int16_t x1 = x + i;
+
+                Plasma_Line_(x1, y1, x2, y1, replace::_graphics_buffer, 0);
+
+                int16_t y2 = y - i + h - 1;
+                Plasma_Line_(x2, y1, x2, y2, replace::_graphics_buffer, w);
+
+                for (int j = 0; j < 511; ++j) {
+                    uint8_t tmp = replace::_graphics_buffer[j];
+                    replace::_graphics_buffer[j] = replace::_graphics_buffer[1022 - j];
+                    replace::_graphics_buffer[1022 - j] = tmp;
+                }
+
+                Plasma_Line_(x1, y1, x1, y2, replace::_graphics_buffer, h + w);
+                Plasma_Line_(x1, y2, x2, y2, replace::_graphics_buffer, h + w * 2);
+            }
+        }
+    }
+
+    void __cdecl Draw_Horizontal_Run_Multi_(uint8_t** dest_ptr, int16_t step, int16_t length, s_colors* colors, uint16_t* color_index) {
+        uint8_t* ptr = *dest_ptr;
+        if (length > 0) {
+            int32_t count = length;
+            do {
+                *ptr = colors->colors[*color_index & 7];
+                ptr += step;
+                (*color_index)++;
+                count--;
+            } while (count != 0);
+        }
+        *dest_ptr = ptr + g_screen_res_x;
+    }
+
+    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, uint16_t* color_idx) {
+        uint8_t* dest = *screen_ptr;
+
+        for (int16_t i = 0; i < height; ++i) {
+            *dest = colors->colors[*color_idx & 7];
+            (*color_idx)++;
+            dest += g_screen_res_x;
+        }
+
+        *screen_ptr = dest + offset;
+    }
+
+    void __cdecl Plasma_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_map, uint16_t color_index) {
+        if (animate::_clipping_flag == 1) {
+            if (line::Clip_Line_(&x1, &y1, &x2, &y2) == 1) {
+                return;
+            }
+        }
+
+        if (y1 > y2) {
+            strings::Swap_Short_(&y1, &y2);
+            strings::Swap_Short_(&x1, &x2);
+        }
+
+        uint8_t* ptr = video::_current_video_page + y1 * g_screen_res_x + x1;
+        int16_t dx = x2 - x1;
+        int16_t x_dir;
+
+        if (dx >= 0) {
+            x_dir = 1;
+        } else {
+            dx = -dx;
+            x_dir = -1;
+        }
+
+        int16_t dy = y2 - y1;
+
+        if (dx == 0) {
+            if (dy >= 0) {
+                int16_t count = dy + 1;
+                do {
+                    *ptr = color_map[color_index & 0x3ff];
+                    color_index++;
+                    ptr += g_screen_res_x;
+                    count--;
+                } while (count != 0);
+            }
+
+            if (video::screen_refresh_flag > 1) {
+                if (y1 <= y2) {
+                    int16_t y = y1;
+                    do {
+                        video::Add_Dot_To_Scan_List_(x1, y);
+                        y++;
+                    } while (y <= y2);
+                }
+            }
+            return;
+        }
+
+        if (dy == 0) {
+            if (dx >= 0) {
+                int16_t count = dx + 1;
+                do {
+                    *ptr = color_map[color_index & 0x3ff];
+                    color_index++;
+                    ptr += x_dir;
+                    count--;
+                } while (count != 0);
+            }
+
+            if (video::screen_refresh_flag > 1) {
+                if (x1 > x2) {
+                    strings::Swap_Short_(&x2, &x1);
+                }
+                setvesa::Add_Square_To_Scan_List_(x1, y1, x2, y1);
+            }
+            return;
+        }
+
+        if (dx == dy) {
+            if (dx >= 0) {
+                int16_t count = dx + 1;
+                do {
+                    *ptr = color_map[color_index & 0x3ff];
+                    color_index++;
+                    ptr += g_screen_res_x + x_dir;
+                    count--;
+                } while (count != 0);
+            }
+
+            if (video::screen_refresh_flag > 1) {
+                if (x1 >= x2) {
+                    if (y1 <= y2) {
+                        int16_t y = y1;
+                        do {
+                            video::Add_Dot_To_Scan_List_(x1 - (y - y1), y);
+                            y++;
+                        } while (y <= y2);
+                    }
+                } else {
+                    if (y1 <= y2) {
+                        int16_t y = y1;
+                        do {
+                            video::Add_Dot_To_Scan_List_(x1 + (y - y1), y);
+                            y++;
+                        } while (y <= y2);
+                    }
+                }
+            }
+            return;
+        }
+
+        if (dx > dy) {
+            int16_t run_len = dx / dy;
+            int16_t err_inc = (dx % dy) * 2;
+            int16_t err = (dx % dy) - dy * 2;
+            int16_t run_len_half = (run_len / 2) + 1;
+            int16_t first_run = run_len_half;
+
+            if (err_inc == 0) {
+                if ((run_len & 1) == 0) {
+                    first_run--;
+                } else {
+                    err += dy;
+                }
+            } else {
+                if ((run_len & 1) != 0) {
+                    err += dy;
+                }
+            }
+
+            line::Draw_Horizontal_Run_Plasma_(&ptr, x_dir, first_run, color_map, &color_index);
+
+            if (video::screen_refresh_flag > 1) {
+                if (x_dir <= 0) {
+                    setvesa::Add_Square_To_Scan_List_(x1 - first_run, y1, x1, y1);
+                    x1 -= first_run;
+                } else {
+                    setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + first_run, y1);
+                    x1 += first_run;
+                }
+                y1++;
+            }
+
+            int32_t num_runs = dy - 1;
+            if (num_runs > 0) {
+                for (int32_t i = 0; i < num_runs; i++) {
+                    err += err_inc;
+                    int16_t run = run_len;
+                    if (err > 0) {
+                        run++;
+                        err -= dy * 2;
+                    }
+
+                    line::Draw_Horizontal_Run_Plasma_(&ptr, x_dir, run, color_map, &color_index);
+
+                    if (video::screen_refresh_flag > 1) {
+                        if (x_dir <= 0) {
+                            setvesa::Add_Square_To_Scan_List_(x1 - run, y1, x1, y1);
+                            x1 -= run;
+                        } else {
+                            setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + run, y1);
+                            x1 += run;
+                        }
+                        y1++;
+                    }
+                }
+            }
+
+            line::Draw_Horizontal_Run_Plasma_(&ptr, x_dir, run_len_half, color_map, &color_index);
+
+            if (video::screen_refresh_flag > 1) {
+                if (x_dir <= 0) {
+                    setvesa::Add_Square_To_Scan_List_(x1 - run_len_half, y1, x1, y1);
+                } else {
+                    setvesa::Add_Square_To_Scan_List_(x1, y1, x1 + run_len_half, y1);
+                }
+            }
+        } else {
+            int16_t run_len = dy / dx;
+            int16_t err_inc = (dy % dx) * 2;
+            int16_t err = (dy % dx) - dx * 2;
+            int16_t run_len_half = (run_len / 2) + 1;
+            int16_t first_run = run_len_half;
+
+            if (err_inc == 0) {
+                if ((run_len & 1) == 0) {
+                    first_run--;
+                } else {
+                    err += dx;
+                }
+            } else {
+                if ((run_len & 1) != 0) {
+                    err += dx;
+                }
+            }
+
+            line::Draw_Vertical_Run_Plasma_(&ptr, x_dir, first_run, color_map, &color_index);
+
+            if (video::screen_refresh_flag > 1) {
+                int16_t i = 0;
+                if (first_run > 0) {
+                    do {
+                        video::Add_Dot_To_Scan_List_(x1, y1 + i);
+                        i++;
+                    } while (i < first_run);
+                }
+                y1 += first_run;
+                x1 += x_dir;
+            }
+
+            int32_t num_runs = dx - 1;
+            if (num_runs > 0) {
+                for (int32_t i = 0; i < num_runs; i++) {
+                    err += err_inc;
+                    int16_t run = run_len;
+                    if (err > 0) {
+                        run++;
+                        err -= dx * 2;
+                    }
+
+                    line::Draw_Vertical_Run_Plasma_(&ptr, x_dir, run, color_map, &color_index);
+
+                    if (video::screen_refresh_flag > 1) {
+                        int16_t j = 0;
+                        if (run > 0) {
+                            do {
+                                video::Add_Dot_To_Scan_List_(x1, y1 + j);
+                                j++;
+                            } while (j < run);
+                        }
+                        y1 += run;
+                        x1 += x_dir;
+                    }
+                }
+            }
+
+            line::Draw_Vertical_Run_Plasma_(&ptr, x_dir, run_len_half, color_map, &color_index);
+
+            if (video::screen_refresh_flag > 1) {
+                int16_t i = 0;
+                if (run_len_half > 0) {
+                    do {
+                        video::Add_Dot_To_Scan_List_(x1, y1 + i);
+                        i++;
+                    } while (i < run_len_half);
+                }
+            }
+        }
+    }
+
+    void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_val, const uint8_t* color_map) {
+        random::Save_Random_Seed_();
+        random::Set_Random_Seed_(seed);
+
+        replace::_graphics_buffer[0] = static_cast<uint8_t>(start_val & 0x7);
+
+        int8_t direction_state = static_cast<int8_t>(random::Random_(4)) - 1;
+        int8_t step_dir = (direction_state == 0) ? -1 : 1;
+
+        for (int i = 1; i < 1023; ++i) {
+            int8_t val = replace::_graphics_buffer[i - 1];
+
+            if (random::Random_(4) == 1) {
+                direction_state = 1 - direction_state;
+                step_dir = (direction_state == 0) ? -1 : 1;
+            }
+
+            if (random::Random_(4) == 1) {
+                val += step_dir;
+                if (random::Random_(4) == 1) {
+                    val += step_dir;
+                    if (random::Random_(4) == 1) {
+                        val += step_dir;
+                    }
+                }
+            }
+
+            if (val < 0) {
+                val = 0;
+            } else if (val > 7) {
+                val = 7;
+            }
+
+            replace::_graphics_buffer[i] = static_cast<uint8_t>(val);
+        }
+
+        for (int i = 1; i < 1023; ++i) {
+            replace::_graphics_buffer[i] = color_map[replace::_graphics_buffer[i]];
+        }
+
+        random::Restore_Random_Seed_();
     }
 
 } // namespace line
