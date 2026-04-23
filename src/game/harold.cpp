@@ -1231,4 +1231,109 @@ namespace HAROLD {
             style_buf->colors[i] = static_cast<uint8_t>(color_val);
         }
     }
+
+    int16_t __cdecl User_Box_(uint8_t* refresh_flag, char* message, int16_t type) {
+        char buffer[100];
+        int16_t result = -1;
+
+        switch (type) {
+        case 1:
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            result = GENDRAW::Warning_Box2_(message);
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            break;
+
+        case 2:
+            strcpy(buffer, MOX::_temp_string);
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            TEXTBOX::Text_Box_(buffer, message);
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            break;
+
+        case 3:
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            GENDRAW::Draw_Warning_Box_(message);
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            break;
+
+        case 4:
+            if (*reinterpret_cast<int8_t*>(&MOX::_global_var) < 0) {
+                *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0x7E; /* '~' */
+            }
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            Timed_Text_Box_(buffer, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            break;
+
+        case 5:
+            if (*reinterpret_cast<int8_t*>(&MOX::_global_var) < 0) {
+                *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0x7E; /* '~' */
+            }
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            Timed_Text_Box_(nullptr, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
+            break;
+
+        default:
+            video::Set_Refresh_Full_();
+            *refresh_flag = 1;
+            GENDRAW::Message_Box_(message);
+            *refresh_flag = 1;
+            video::Set_Refresh_Stencil_();
+            break;
+        }
+
+        return result;
+    }
+
+    /**
+     * @address 004f2200
+     */
+    int8_t __cdecl Was_Mouse_List_Saved_() {
+        return _saved_mouse_list_count != 0;
+    }
+
+    /**
+     * @address 004f1fb0
+     */
+    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t color_offset) {
+        int inv_offset_calc = 7 - (int)color_offset;
+        uint16_t inv_offset = (uint16_t)(inv_offset_calc < 0 ? 0 : inv_offset_calc);
+
+        s_colors rev_colors;
+        for (int i = 0; i < 8; ++i) {
+            rev_colors.colors[7 - i] = colors->colors[i];
+        }
+
+        // Top edges
+        line::Multi_Colored_Line_(x1, y1, x2, y1, colors, color_offset);
+        line::Multi_Colored_Line_(x1 + 1, y1 + 1, x2 - 1, y1 + 1, colors, inv_offset);
+        line::Multi_Colored_Line_(x1 + 2, y1 + 2, x2 - 2, y1 + 2, colors, color_offset);
+
+        // Right edges
+        line::Multi_Colored_Line_(x2, y1, x2, y2, colors, color_offset);
+        line::Multi_Colored_Line_(x2 - 1, y1 + 1, x2 - 1, y2 - 1, colors, inv_offset);
+        line::Multi_Colored_Line_(x2 - 2, y1 + 2, x2 - 2, y2 - 2, colors, color_offset);
+
+        // Bottom edges
+        line::Multi_Colored_Line_(x1, y2, x2, y2, &rev_colors, color_offset);
+        line::Multi_Colored_Line_(x1 + 1, y2 - 1, x2 - 1, y2 - 1, &rev_colors, inv_offset);
+        line::Multi_Colored_Line_(x1 + 2, y2 - 2, x2 - 2, y2 - 2, &rev_colors, color_offset);
+
+        // Left edges
+        line::Multi_Colored_Line_(x1, y1, x1, y2, &rev_colors, color_offset);
+        line::Multi_Colored_Line_(x1 + 1, y1 + 1, x1 + 1, y2 - 1, &rev_colors, inv_offset);
+        line::Multi_Colored_Line_(x1 + 2, y1 + 2, x1 + 2, y2 - 2, &rev_colors, color_offset);
+    }
 }

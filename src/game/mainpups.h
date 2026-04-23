@@ -68,6 +68,8 @@ namespace MAINPUPS {
     inline s_colony_combat_popup_data*& _g_data_ptr =
         *reinterpret_cast<s_colony_combat_popup_data**>(std::uintptr_t{0x005A6E60});
 
+    inline const char* s_str_fmt_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
+
     inline const char* s_format_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
     inline const char* s_SI_COMBATTE_NEL_SISTEMA = reinterpret_cast<const char*>(std::uintptr_t{0x00556D58});
 
@@ -143,27 +145,15 @@ namespace MAINPUPS {
 
     void __cdecl Load_Colony_Combat_Popup_();
 
-    inline void __cdecl Draw_Colony_Combat_Popup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045EA10});
-        fn();
-    }
+    void __cdecl Draw_Colony_Combat_Popup_();
 
     void __cdecl Update_Colony_Combat_Fields_(int16_t planet_idx, int16_t* fields_ptr);
 
-    inline void __cdecl Add_Colony_Combat_Fields_(int16_t planet_idx, int16_t* fields_ptr) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045e530});
-        fn(planet_idx, fields_ptr);
-    }
+    void __cdecl Add_Colony_Combat_Fields_(int16_t param_1, int16_t* param_2);
 
     void __cdecl Setup_To_Apply_Bomb_Hits_(s_combat_bomb_result* result, int16_t* p_bomb_hits_remaining, int16_t* p_bio_hits_remaining);
 
-    inline void __cdecl Apply_Next_Bomb_Hit_(s_combat_bomb_result* bomb, int16_t* var_1C, int16_t* bomb_hit_val1, int16_t* bomb_hit_val2) {
-        using Fn = void(__cdecl*)(s_combat_bomb_result*, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045DB60});
-        fn(bomb, var_1C, bomb_hit_val1, bomb_hit_val2);
-    }
+    void __cdecl Apply_Next_Bomb_Hit_(s_combat_bomb_result *bomb, int16_t *state, int16_t *bomb_hits, int16_t *bio_hits);
 
     int16_t __cdecl Evaluate_Colony_Combat_Input_(int16_t* field_id_ptr, int16_t* unused, int16_t* close_popup_flag, int16_t* selection_idx_ptr);
 

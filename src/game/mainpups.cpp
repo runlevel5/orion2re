@@ -1354,6 +1354,91 @@ namespace MAINPUPS {
         return 0;
     }
 
+    void __cdecl Apply_Next_Bomb_Hit_(s_combat_bomb_result *bomb, int16_t *state, int16_t *bomb_hits, int16_t *bio_hits) {
+        s_colony *colony = &MOX::_colony[bomb->colony_idx];
+
+        if (*state == 1 || *state == 3 || COLGCBT::_g_ctr % 5 != 0) {
+            return;
+        }
+
+        do {
+            if (*bio_hits + *bomb_hits <= 0) {
+                if (*state == 2) {
+                    *bio_hits = 0;
+                    _g_data_ptr->bombardment_result = 0;
+                }
+                *state = 3;
+            } else {
+                if (*bio_hits == 0) {
+                    int32_t hits_processed = BOMB::Resolve_Bomb_Hit_(colony, bomb, *bomb_hits);
+                    if (hits_processed == 0) {
+                        *bomb_hits = 0;
+                    } else {
+                        int loops = hits_processed;
+                        if (*bomb_hits == hits_processed) {
+                            *bomb_hits -= hits_processed;
+                            _g_data_ptr->bombardment_result -= hits_processed;
+                            loops = 1;
+                        } else {
+                            *bomb_hits -= hits_processed;
+                            _g_data_ptr->bombardment_result -= hits_processed;
+                        }
+
+                        if (loops > 5) {
+                            loops = 5;
+                        }
+
+                        for (int i = loops; i > 0; --i) {
+                            int combat_planet_w = animate::Get_Width_(MOX::_combat_planet_seg);
+                            int anim25_w = animate::Get_Width_(_anims[25]);
+                            
+                            int diff = (combat_planet_w / 2) - anim25_w;
+                            int abs_diff = diff < 0 ? -diff : diff;
+
+                            int anim3_h = animate::Get_Height_(_anims[3]);
+                            int base_y = (anim3_h + _g_y * 2 - 30) / 2;
+                            int rand_y = base_y + random::Random_(abs_diff * 2) - abs_diff;
+
+                            int anim3_w = animate::Get_Width_(_anims[3]);
+                            int base_x = (anim3_w + _g_x * 2 - 30) / 2;
+                            int rand_x = base_x + random::Random_(abs_diff * 2) - abs_diff;
+
+                            FLCQUEUE::Add_Flic_To_End_Of_Queue_(rand_x, rand_y, _anims[25], 1, 0);
+                            ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
+                        }
+                    }
+                } else {
+                    BOMB::Resolve_Biological_Hit_(colony, bomb);
+                    (*bio_hits)--;
+                    _g_data_ptr->bombardment_result--;
+
+                    int anim3_h = animate::Get_Height_(_anims[3]);
+                    int base_y = (anim3_h + _g_y * 2 - 30) / 2;
+                    int rand_y = base_y + random::Random_(40) - 20;
+
+                    int anim3_w = animate::Get_Width_(_anims[3]);
+                    int base_x = (anim3_w + _g_x * 2 - 30) / 2;
+                    int rand_x = base_x + random::Random_(40) - 20;
+
+                    FLCQUEUE::Add_Flic_To_End_Of_Queue_(rand_x, rand_y, _anims[26], 1, 0);
+                    ERICNET::Mox_Play_Sound_(32 /* 0x20 */);
+                }
+
+                Update_CCP_Display_Data_Bombing_(
+                    _g_data_ptr,
+                    _g_data_ptr->bomb,
+                    _g_data_ptr->attacker,
+                    _g_data_ptr->defender,
+                    _g_data_ptr->random_seed,
+                    _g_data_ptr->colony_idx,
+                    _g_data_ptr->bombardment_result,
+                    _g_data_ptr->has_stellar_converter
+                );
+                COLONY::_full_draw = 1;
+            }
+        } while (*state == 2);
+    }
+
     void __cdecl Setup_To_Apply_Bomb_Hits_(s_combat_bomb_result* result, int16_t* p_bomb_hits_remaining, int16_t* p_bio_hits_remaining) {
         *p_bomb_hits_remaining = result->bomb_hits_remaining;
         *p_bio_hits_remaining = result->bio_hits_remaining;
@@ -2433,5 +2518,264 @@ namespace MAINPUPS {
         fields::Deactivate_Help_List_();
 
         return result;
+    }
+
+    void __cdecl Draw_Colony_Combat_Popup_() {
+        s_colors colors_cfg = {0};
+        colors_cfg.colors[1] = 0x11;
+        colors_cfg.colors[2] = 0x13;
+        
+        char text_buffer[500];
+
+        timer::Release_Time_(1);
+        timer::Mark_Time_();
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            Mainpups_Tested_Execute_Autofunction_();
+
+            int16_t anim_w = animate::Get_Width_(_anims[3]);
+            int16_t anim_h = animate::Get_Height_(_anims[3]);
+
+            graphics::Fill_(_g_x + 5, _g_y + 5, _g_x + anim_w - 6, _g_y + anim_h - 6, 0);
+            animate::Draw_(_g_x, _g_y, _anims[3]);
+
+            int16_t x_center = (_g_x * 2 + anim_w) / 2;
+            int16_t y_center = (_g_y * 2 + anim_h) / 2;
+            ERIC::Draw_Centered_(x_center, y_center, MOX::_combat_planet_seg);
+
+            s_animation_header* c_anims = COLONY::C_Anims_(13);
+            remap::Calculate_Picture_Remap_Colors_(c_anims);
+            fonts::Set_Font_Style_(3, &colors_cfg);
+
+            if (_g_state == 0 || _g_state == 1) {
+                char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[_g_data_ptr->colony_idx].planet);
+                _sprintf(text_buffer, ESTRINGS::E_Strings_(458), planet_name);
+            } else if (_g_state == 2) {
+                char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[_g_data_ptr->colony_idx].planet);
+                _sprintf(text_buffer, ESTRINGS::E_Strings_(337), planet_name);
+            }
+
+            if (_g_state >= 0 && _g_state <= 2) {
+                fonts::Print_Centered_(x_center, _g_y + 20, text_buffer);
+            }
+
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        fonts::Set_Font_Style_(1, &colors_cfg);
+
+        int16_t list_idx = 0;
+
+        if (_g_data_ptr->n_bldgs > 0) {
+            animate::Remap_Draw_(_g_x + 20, _g_y + 50, _anims[23]);
+            _sprintf(text_buffer, ESTRINGS::E_Strings_(19), _g_data_ptr->n_bldgs);
+            fonts::Print_(_g_x + 55, _g_y + 50, text_buffer);
+            list_idx = 1;
+        }
+
+        if (_g_data_ptr->best_shield_bldg != -1) {
+            int16_t y_offs = list_idx * 30;
+            animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, _anims[24]);
+            
+            char* bldg_name = COLONY::CR_Building_Name_(_g_data_ptr->best_shield_bldg);
+            _sprintf(text_buffer, ESTRINGS::E_Strings_(70), bldg_name);
+            fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
+            list_idx++;
+        }
+
+        if (_g_data_ptr->n_pops > 0) {
+            int16_t y_offs = list_idx * 30;
+            
+            uint32_t pop_val = MOX::_colony[_g_data_ptr->colony_idx].pop[0];
+            int16_t anim_idx = (pop_val >> 7) & 3;
+            int8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
+            
+            s_animation_header* pop_anim = COLONY::People_Anim_(anim_idx, 2, race);
+            animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, pop_anim);
+            
+            _sprintf(text_buffer, ESTRINGS::E_Strings_(20), _g_data_ptr->n_pops);
+            fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
+            list_idx++;
+        }
+
+        int16_t y_offs = list_idx * 30;
+        for (int16_t unit_idx = 1; unit_idx >= 0; unit_idx--) {
+            if (_g_data_ptr->defender_unit_counts[unit_idx] > 0) {
+                int8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
+                s_animation_header* unit_anim = COLONY::Player_Troop_Anim_(_g_data_ptr->defender_player_id, unit_idx, race);
+                
+                animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, unit_anim);
+                
+                char* troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->defender_player_id, unit_idx);
+                
+                if (MOX::_settings.language == 4) {
+                    _sprintf(text_buffer, s_str_fmt_00556d98, troop_name, _g_data_ptr->defender_unit_counts[unit_idx]);
+                } else {
+                    _sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->defender_unit_counts[unit_idx], troop_name);
+                }
+                
+                fonts::Print_(_g_x + 55, _g_y + y_offs + 50, text_buffer);
+                y_offs += 30;
+            }
+        }
+
+        int16_t right_list_idx = 0;
+        if (_g_data_ptr->attacker_unit_counts[1] > 0) {
+            int8_t attacker_race = MOX::_player[_g_data_ptr->attacker_player_id].race;
+            s_animation_header* att_anim = COLONY::Player_Troop_Anim_(_g_data_ptr->attacker_player_id, 1, attacker_race);
+            
+            int16_t anim_w = animate::Get_Width_(_anims[3]);
+            animate::Remap_Draw_(_g_x + anim_w - 40, _g_y + 50, att_anim);
+            
+            char* att_troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->attacker_player_id, 1);
+            _sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->attacker_unit_counts[1], att_troop_name);
+            
+            anim_w = animate::Get_Width_(_anims[3]);
+            fonts::Print_Right_(_g_x + anim_w - 45, _g_y + 50, text_buffer);
+            right_list_idx = 1;
+        }
+
+        if (_g_data_ptr->bombardment_result >= 0) {
+            int16_t right_y_offs = right_list_idx * 30;
+            int16_t anim_w = animate::Get_Width_(_anims[3]);
+            
+            animate::Remap_Draw_(_g_x + anim_w - 40, _g_y + right_y_offs + 50, _anims[22]);
+            
+            if (_g_state == 0 || _g_state == 2) {
+                _sprintf(text_buffer, ESTRINGS::E_Strings_(21), _g_data_ptr->bombardment_result);
+            } else {
+                _sprintf(text_buffer, ESTRINGS::E_Strings_(18), _g_data_ptr->bombardment_result);
+            }
+            
+            anim_w = animate::Get_Width_(_anims[3]);
+            fonts::Print_Right_(_g_x + anim_w - 45, _g_y + right_y_offs + 50, text_buffer);
+        }
+
+        FLCQUEUE::Draw_Flic_Queue_();
+    }
+
+    void __cdecl Add_Colony_Combat_Fields_(int16_t param_1, int16_t* param_2) {
+        int16_t si = 1;
+
+        _mp_fields[6] = fields::Add_Button_Field_(
+            _g_x + 0xDD,
+            animate::Get_Height_(_anims[3]) + _g_y - 0x27,
+            ESTRINGS::E_Strings_(0xC),
+            _anims[9],
+            ESTRINGS::E_Strings_(0x87),
+            0x28
+        );
+
+        if (param_1 == 1) {
+            if (_g_data_ptr->bombardment_result < 0 || *param_2 == 0 || *param_2 == 3 || _g_data_ptr->n_pops <= 0 || *param_2 == 2) {
+                _mp_fields[18] = -1000;
+            } else {
+                _mp_fields[18] = fields::Add_Button_Field_(
+                    _g_x + 0xDD,
+                    animate::Get_Height_(_anims[3]) + _g_y - 0x40,
+                    ESTRINGS::E_Strings_(0xC),
+                    _anims[16],
+                    ESTRINGS::E_Strings_(0xC1),
+                    0x28
+                );
+                si = 2;
+            }
+
+            if (_g_data_ptr->bombardment_result <= 0 || *param_2 == 1 || *param_2 == 3 || _g_data_ptr->n_pops <= 0 || *param_2 == 2) {
+                _mp_fields[17] = -1000;
+            } else {
+                _mp_fields[17] = fields::Add_Button_Field_(
+                    _g_x + 0xDD,
+                    animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                    ESTRINGS::E_Strings_(0xC),
+                    _anims[18],
+                    ESTRINGS::E_Strings_(0x13C),
+                    0x28
+                );
+                si++;
+            }
+
+            if (_g_data_ptr->bombardment_result <= 0 || *param_2 == 2 || *param_2 == 3 || _g_data_ptr->n_pops <= 0) {
+                _mp_fields[16] = -1000;
+            } else {
+                _mp_fields[16] = fields::Add_Button_Field_(
+                    _g_x + 0xDD,
+                    animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                    ESTRINGS::E_Strings_(0xC),
+                    _anims[19],
+                    ESTRINGS::E_Strings_(0xA6),
+                    0x28
+                );
+                si++;
+            }
+        }
+
+        if (_g_data_ptr->bombardment_result < 0 || param_1 == 1 || param_1 == 2 || _g_data_ptr->n_pops <= 0) {
+            if (_mp_fields[13] != -1000) {
+                fields::Clear_Mouse_Buffer_();
+                fields::Set_Input_Delay_(3);
+            }
+            _mp_fields[13] = -1000;
+        } else {
+            _mp_fields[13] = fields::Add_Button_Field_(
+                _g_x + 0xDD,
+                animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                ESTRINGS::E_Strings_(0xC),
+                _anims[16],
+                ESTRINGS::E_Strings_(0xC1),
+                0x28
+            );
+            si++;
+        }
+
+        if (_g_data_ptr->attacker_unit_counts[1] <= 0 || _g_data_ptr->n_pops <= 0 || param_1 == 2) {
+            _mp_fields[12] = -1000;
+        } else {
+            _mp_fields[12] = fields::Add_Button_Field_(
+                _g_x + 0xDD,
+                animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                ESTRINGS::E_Strings_(0xC),
+                _anims[15],
+                ESTRINGS::E_Strings_(0x147),
+                0x28
+            );
+            si++;
+        }
+
+        if (MOX::_player[_g_data_ptr->attacker_player_id].traits[25] == 0 || param_1 == 2 || _g_data_ptr->n_pops <= 0) {
+            _mp_fields[15] = -1000;
+        } else {
+            s_animation_header* anim;
+            if (ERIC::Player_Can_Mind_Control_Colony_(_g_data_ptr->attacker_player_id, _g_data_ptr->colony_idx)) {
+                anim = _anims[20];
+            } else {
+                anim = _anims[21];
+            }
+            _mp_fields[15] = fields::Add_Button_Field_(
+                _g_x + 0xDD,
+                animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                ESTRINGS::E_Strings_(0xC),
+                anim,
+                ESTRINGS::E_Strings_(0x16D),
+                0x28
+            );
+            si++;
+        }
+
+        if (_g_data_ptr->has_stellar_converter == 0 || param_1 == 2 || _g_data_ptr->n_pops <= 0) {
+            _mp_fields[14] = -1000;
+        } else {
+            _mp_fields[14] = fields::Add_Button_Field_(
+                _g_x + 0xDD,
+                animate::Get_Height_(_anims[3]) - (si * 25) + _g_y - 0x27,
+                ESTRINGS::E_Strings_(0xC),
+                _anims[17],
+                ESTRINGS::E_Strings_(0xFB),
+                0x28
+            );
+        }
+
+        _mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, ESTRINGS::E_Strings_(0xC), 0);
     }
 }

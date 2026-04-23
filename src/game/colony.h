@@ -191,6 +191,18 @@ namespace COLONY {
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
 
+    inline s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_id, int16_t unit_idx, int16_t race) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC720});
+        return fn(player_id, unit_idx, race);
+    }
+
+    inline char* __cdecl Player_Troop_Name_(int16_t player_id, int16_t unit_idx) {
+        using Fn = char*(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC650});
+        return fn(player_id, unit_idx);
+    }
+
     void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3);
 
     s_animation_header* __cdecl Spy_Anim_(int16_t race_index);

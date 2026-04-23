@@ -3328,6 +3328,12 @@ namespace hooks {
         { 0x0052b1d0, &line::Draw_Vertical_Run_Plasma_ },
         { 0x004f15c0, &HAROLD::Star_Has_Dimensional_Portal_ },
         { 0x004f1d00, &HAROLD::First_Ship_Orbiting_Star_ },
+        { 0x004f1b50, &HAROLD::User_Box_ },
+        { 0x004f2200, &HAROLD::Was_Mouse_List_Saved_ },
+        { 0x004f1fb0, &HAROLD::Draw_Multi_Colored_Box_ },
+        { 0x0045EA10, &MAINPUPS::Draw_Colony_Combat_Popup_ },
+        { 0x0045e530, &MAINPUPS::Add_Colony_Combat_Fields_ },
+        { 0x0045db60, &MAINPUPS::Apply_Next_Bomb_Hit_ },
     };
 
     void Install_Hooks()

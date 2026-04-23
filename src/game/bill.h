@@ -83,11 +83,7 @@ namespace BILL {
         fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7);
     }
 
-    inline int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t max_width, char* text, int32_t font_style) {
-        using Fn = int16_t(__cdecl*)(int16_t, char*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00408120});
-        return fn(max_width, text, font_style);
-    }
+    int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t max_width, char* text, int16_t font_style);
 
     int16_t __cdecl _Get_Paragraph_Max_Height_(int16_t width, const char* text);
 

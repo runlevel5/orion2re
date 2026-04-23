@@ -863,8 +863,8 @@ inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040
 inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
 inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
 
-inline const char* s_Too_many_ships_in_list_00557de8 =
-    reinterpret_cast<const char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
+inline char* s_Too_many_ships_in_list_00557de8 =
+    reinterpret_cast<char*>(std::uintptr_t{0x00557DE8}); /* "Too many ships in list" */
 
 inline const char* s_i_PR_00557d84 = reinterpret_cast<const char*>(0x00557D84);
 inline const char* s_i_FP_00557d8c = reinterpret_cast<const char*>(0x00557D8C);

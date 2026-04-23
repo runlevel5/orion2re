@@ -72,7 +72,7 @@ namespace video {
 
 	// Functions
 	void __cdecl Set_Refresh_Stencil_();
-	void Set_Refresh_Full_();
+	void __cdecl Set_Refresh_Full_();
 
 	inline void __cdecl Load_Palette_(uint32_t p1, uint32_t p2, uint32_t p3) {
 		using Fn = void(__cdecl*)(uint32_t, uint32_t, uint32_t);

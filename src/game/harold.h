@@ -56,8 +56,8 @@ namespace HAROLD {
     inline uint32_t& _saved_mouse_list_offset_4 =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00571A44});
 
-    inline int16_t& _saved_mouse_list_count =
-        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571AB8});
+    inline uint16_t& _saved_mouse_list_count =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00571AB8});
 
     void __cdecl Init_Fleet_Movement_Box_();
 
@@ -87,10 +87,7 @@ namespace HAROLD {
 
     int16_t __cdecl Get_Map_Scale_(int16_t layer_type);
 
-    inline void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* colors, uint32_t color_inc) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t*, uint32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F1FB0 })(x1, y1, x2, y2, colors, color_inc);
-    }
+    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t color_offset);
 
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 
@@ -98,10 +95,7 @@ namespace HAROLD {
 
     void __cdecl Restore_Mouse_List_();
 
-    inline bool __cdecl Was_Mouse_List_Saved_() {
-        using Fn = bool(__cdecl*)();
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004F2200})();
-    }
+    int8_t __cdecl Was_Mouse_List_Saved_();
 
     bool __cdecl Player_Sighted_Monster_(int16_t player_id, int16_t star_id);
 
@@ -113,11 +107,7 @@ namespace HAROLD {
         fn();
     }
 
-    inline short __cdecl User_Box_(uint8_t* screen_ptr, const char* message, int16_t type) {
-        using Fn = short(__cdecl*)(uint8_t*, const char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1B50});
-        return fn(screen_ptr, message, type);
-    }
+    int16_t __cdecl User_Box_(uint8_t* refresh_flag, char* message, int16_t type);
 
     int16_t __cdecl Get_N_Remaining_Humans_();
 

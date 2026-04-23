@@ -2835,8 +2835,8 @@ namespace MAINSCR {
             _zoom_box_y,
             _zoom_box_x + width,
             _zoom_box_y + height,
-            color_table,
-            static_cast<uint32_t>(_zoom_box_color_increment)
+            reinterpret_cast<s_colors*>(color_table),
+            static_cast<uint16_t>(_zoom_box_color_increment)
         );
 
         _zoom_box_counter++;
