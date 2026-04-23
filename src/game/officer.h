@@ -279,4 +279,16 @@ namespace OFFICER {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004422E0});
         fn(input, officer_idx);
     }
+
+    inline void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int32_t x, int32_t y, int32_t officer_idx) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442290});
+        fn(x, y, officer_idx);
+    }
+
+    inline void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(int32_t x, int32_t y, uint16_t officer) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, uint16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442690});
+        fn(x, y, officer);
+    }
 }

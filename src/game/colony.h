@@ -48,7 +48,8 @@ namespace COLONY {
     inline const char* _DIMTVFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D38}); // "DIMTVFIN.LBX"
     inline const char* _NEWGAME_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D90}); // "NEWGAME.LBX"
     inline const char* _PLNTDFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559DA0}); // "PLNTDFIN.LBX"
-    inline const char* _MAINPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559D80}); // "MAINPUPS.LBX"
+    inline const char (&_MAINPUPS_LBX)[13] =
+        *reinterpret_cast<const char (*)[13]>(std::uintptr_t{0x00559D80});
     inline const char* _BEAMS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CC8}); // "BEAMS.LBX"
     inline const char* _CMBTSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CD8}); // "CMBTSFX.LBX"
     inline const char* _SPHERSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x00559DD0 }); // "SPHERSFX.LBX"

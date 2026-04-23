@@ -173,6 +173,7 @@
 #include "textbox.h"
 #include "namestar.h"
 #include "mainpups.h"
+#include "switchd_0045bee9.h"
 #include "erichelp.h"
 #include "flt.h"
 #include "flt2.h"

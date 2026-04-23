@@ -1,6 +1,20 @@
 #include "pch.h"
 
 namespace MAINPUPS {
+    void __cdecl Load_Colony_Fields_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+        _anims[0] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0, MOX::_screen_seg);
+    }
+
+    void __cdecl Load_SLIDER_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+        _anims[14] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x34, MOX::_screen_seg);
+        _anims[34] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x4a, MOX::_screen_seg);
+        _anims[33] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x4b, MOX::_screen_seg);
+        _anims[35] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x4c, MOX::_screen_seg);
+        _anims[4] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x4d, MOX::_screen_seg);
+    }
+
     void __cdecl Load_Tax_Rate_Popup_() {
         allocate::Push_Block_(MOX::_screen_seg);
         _anims[27] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x3E, MOX::_screen_seg);
@@ -11,6 +25,36 @@ namespace MAINPUPS {
         _anims[32] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x43, MOX::_screen_seg);
         _anims[35] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x44, MOX::_screen_seg);
         _anims[36] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x45, MOX::_screen_seg);
+    }
+
+    void __cdecl Load_Colony_Combat_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[17] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 53 /* 0x35 */, MOX::_screen_seg);
+        _anims[15] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 54 /* 0x36 */, MOX::_screen_seg);
+        _anims[16] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 55 /* 0x37 */, MOX::_screen_seg);
+        _anims[18] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 60 /* 0x3c */, MOX::_screen_seg);
+        _anims[3] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 78 /* 0x4e */, MOX::_screen_seg);
+        _anims[19] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 79 /* 0x4f */, MOX::_screen_seg);
+        _anims[20] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 80 /* 0x50 */, MOX::_screen_seg);
+        _anims[21] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 81 /* 0x51 */, MOX::_screen_seg);
+        _anims[9] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 82 /* 0x52 */, MOX::_screen_seg);
+
+        _anims[22] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY2_LBX, 46 /* 0x2e */, MOX::_screen_seg);
+        _anims[23] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY2_LBX, 47 /* 0x2f */, MOX::_screen_seg);
+        _anims[24] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_COLONY2_LBX, 48 /* 0x30 */, MOX::_screen_seg);
+
+        _anims[25] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 61 /* 0x3d */, MOX::_screen_seg);
+        _anims[26] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 73 /* 0x49 */, MOX::_screen_seg);
+
+        Load_Combat_Colony_Picture_To_Screen_Seg_(_g_data_ptr->colony_idx);
+    }
+
+    void __cdecl Load_System_Discovery_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[0] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0, MOX::_screen_seg);
+        _anims[1] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 1, MOX::_screen_seg);
     }
 
     void __cdecl Get_Picture_Draw_XY_(s_animation_header* anim) {
@@ -102,6 +146,11 @@ namespace MAINPUPS {
         }
 
         COLONY::_full_draw = 1;
+    }
+
+    void __cdecl Eric_Push_Fields_() {
+        FIELDSAV::Save_Field_Stats_(&_stats_array[_num_field_saves * 9]);
+        _num_field_saves = static_cast<int16_t>(_num_field_saves + 1);
     }
 
     void __cdecl Add_Tax_Rate_Fields_() {
@@ -200,7 +249,13 @@ namespace MAINPUPS {
 
     void __cdecl Clear_New_Officer_Slots_() {
         _anims[10] = nullptr;
-        _g_msg_ptr = nullptr;
+        MAINPUPS::_g_msg_ptr = nullptr;
+    }
+
+    void __cdecl Update_Officer_Gains_Level_Fields_() {
+        MAINPUPS::Eric_Push_Fields_();
+        MAINPUPS::Add_Officer_Gains_Level_Fields_();
+        ERICHELP::Set_Officer_Information_Popup_Help_List_();
     }
 
     void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer) {
@@ -462,6 +517,11 @@ namespace MAINPUPS {
         Do_Popup_Cleanup_();
 
         return selected_defense;
+    }
+
+    void __cdecl Load_Slider_Fields_() {
+        Eric_Push_Fields_();
+        Add_Slider_Fields_(_g_min, _g_max, &_g_var);
     }
 
     int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t var, char* msg, int16_t param_5) {
@@ -1121,6 +1181,14 @@ namespace MAINPUPS {
         }
     }
 
+    /**
+     * @address 0045e510
+     */
+    void __cdecl Update_Colony_Combat_Fields_(int16_t planet_idx, int16_t* fields_ptr) {
+        Eric_Push_Fields_();
+        Add_Colony_Combat_Fields_(planet_idx, fields_ptr);
+    }
+
     void __cdecl Update_CCP_Display_Data_Bombing_(
         s_colony_combat_popup_data* ccp_data,
         s_combat_bomb_result* bomb,
@@ -1174,5 +1242,612 @@ namespace MAINPUPS {
         _explode_flag = 0;
 
         return Colony_Combat_Popup_(&local_30, 1);
+    }
+
+    void __cdecl Setup_To_Apply_Bomb_Hits_(s_combat_bomb_result* result, int16_t* p_bomb_hits_remaining, int16_t* p_bio_hits_remaining) {
+        *p_bomb_hits_remaining = result->bomb_hits_remaining;
+        *p_bio_hits_remaining = result->bio_hits_remaining;
+
+        result->infantry_killed = 0;
+        result->tanks_killed = 0;
+        result->population_killed = 0;
+
+        memset(result->buildings_destroyed, 0, sizeof(result->buildings_destroyed));
+
+        result->bio_pop_killed = 0;
+        result->damage_occurred = 0;
+        result->colony_wiped_out = 0;
+    }
+
+    void __cdecl Update_Discovery_Fields_() {
+        Eric_Push_Fields_();
+        COLONY::Clear_Sys_Disp_Fields_();
+
+        MOX::_draw_system_display_without_button = 1;
+
+        SYS::Wrapper_For_Informational_System_Fields_(
+            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            _g_x,
+            _g_y,
+            13,
+            47,
+            nullptr
+        );
+
+        char* hotkey = ESTRINGS::E_Strings_(12);
+        _mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639, 479, hotkey, 0);
+    }
+
+    void __cdecl Draw_Discovery_Popup_() {
+        char msg_buffer[500];
+        s_star_data* star_ptr;
+        const char* format;
+        s_animation_header* anim;
+
+        video::Set_Page_Off_();
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MAINPUPS::Mainpups_Tested_Execute_Autofunction_();
+            video::Copy_Off_To_Back_();
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+            COLONY::_full_draw = 0;
+        }
+
+        star_ptr = &MOX::_star[COLONY::_sys_disp_star_handle];
+        format = ESTRINGS::E_Strings_(456 /* 0x1c8 */);
+        _sprintf(msg_buffer, format, star_ptr->name);
+
+        anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 73 /* 0x49 */, MOX::_global_cache_seg);
+        MAINPUPS::Get_Picture_Draw_XY_(anim);
+
+        SYS::Draw_System_Display_Popup_(
+            (short)COLONY::_sys_disp_star_handle,
+            1,
+            msg_buffer,
+            MAINPUPS::_g_x,
+            MAINPUPS::_g_y,
+            0,
+            0,
+            13 /* 0xd */,
+            47 /* 0x2f */
+        );
+
+        if (MAINPUPS::_g_special != 0 && MAINPUPS::_g_special != 8) {
+            SYS::Draw_System_Special_Popup_(
+                static_cast<int16_t>(MAINPUPS::_g_x + 6),
+                static_cast<int16_t>(MAINPUPS::_g_y + 76 /* 0x4c */),
+                (int16_t)MAINPUPS::_g_special,
+                MAINPUPS::_g_star_n
+            );
+        }
+    }
+
+    void __cdecl Update_Selection_Fields_() {
+        Eric_Push_Fields_();
+        COLONY::Clear_Sys_Disp_Fields_();
+        Add_Selection_Fields_();
+        ERICHELP::Set_Planet_Selection_Popup_Help_List_();
+    }
+
+    int16_t __cdecl Evaluate_Selection_Input_(int16_t* selected_field, int16_t* field_data, int16_t* refresh_flag) {
+        int16_t saved_x = _g_x;
+        int16_t saved_y = _g_y;
+        int16_t selection_result = 0;
+
+        if (_g_special == 0) {
+            if (*selected_field == _mp_fields[2]) {
+                selection_result = -1;
+                *refresh_flag = 1;
+            } else {
+                selection_result = Check_System_Display_Fields_Selection_(selected_field, field_data, refresh_flag);
+            }
+        } else if (_g_special == 8) {
+            int16_t marooned_hero_idx;
+            uint8_t can_join;
+
+            _g_special = 0;
+            can_join = OFFICER::Marooned_Hero_At_Star_Can_Join_(_g_star_n, &marooned_hero_idx, MOX::_PLAYER_NUM);
+            if (can_join == 0) {
+                Marooned_Officer_Fails_Popup_(_g_star_n, marooned_hero_idx);
+            } else {
+                Marooned_Officer_Joins_Popup_(_g_star_n, marooned_hero_idx);
+            }
+            _g_x = saved_x;
+            COLONY::_full_draw = 1;
+            _g_y = saved_y;
+            Eric_Pop_Fields_();
+            Update_Selection_Fields_();
+            video::Copy_Back_To_Off_();
+            Draw_Selection_Popup_();
+            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+            ERICHELP::Set_New_System_Discovery_Popup_Help_List_();
+        } else if (*selected_field != 0) {
+            _g_special = 0;
+            COLONY::_full_draw = 1;
+        }
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            COLONY::_full_draw = 1;
+        }
+
+        return selection_result;
+    }
+
+    void __cdecl Load_New_Officer_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[10] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x30, MOX::_screen_seg);
+        _anims[12] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x31, MOX::_screen_seg);
+        _anims[13] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x32, MOX::_screen_seg);
+        _anims[11] = OFFICER::Load_Officer_Picture_(_g_player_n, _g_officer, MOX::_screen_seg, 0, 0);
+
+        OFFICER::Load_Officer_Skill_Icons_(MOX::_screen_seg);
+    }
+
+    void __cdecl Load_New_Officer_Popup_For_Officer_Screen_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+        _anims[10] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x39, MOX::_screen_seg);
+        _anims[12] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x3A, MOX::_screen_seg);
+        _anims[13] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x3B, MOX::_screen_seg);
+        _anims[11] = OFFICER::Load_Officer_Picture_(_g_player_n, _g_officer, MOX::_screen_seg, 0, 0);
+        if (_on_officer_screen_flag == 0) {
+            OFFICER::Load_Officer_Skill_Icons_(MOX::_screen_seg);
+        }
+    }
+
+    void __cdecl Draw_Selection_Popup_() {
+        char popup_text[500];
+        bool draw_selection_popup = false;
+        int string_id = 0;
+
+        fonts::Set_Font_Style_(4, &_main_scr_font_colors);
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            Mainpups_Tested_Execute_Autofunction_();
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        switch (_selection_state_flag) {
+        case 0:
+            string_id = (_g_using_colony_ship != 0) ? 0x1ce : 0x1cd;
+            draw_selection_popup = true;
+            break;
+
+        case 1:
+            string_id = 0x1cb;
+            draw_selection_popup = true;
+            break;
+
+        case 2:
+            string_id = 0x1cf;
+            draw_selection_popup = true;
+            break;
+
+        case 3:
+            string_id = 0x1cc;
+            draw_selection_popup = true;
+            break;
+
+        default:
+            break;
+        }
+
+        if (draw_selection_popup) {
+            s_star_data* selected_star = &MOX::_star[_g_star_n];
+            const char* format = ESTRINGS::E_Strings_(static_cast<int16_t>(string_id));
+            _sprintf(popup_text, format, selected_star);
+
+            SYS::Draw_System_Display_Popup_(
+                static_cast<short>(COLONY::_sys_disp_star_handle),
+                1,
+                popup_text,
+                _g_x,
+                _g_y,
+                0,
+                0,
+                0x0d,
+                0x2f);
+        }
+
+        fonts::Set_Font_Style_(1, &_main_scr_font_colors);
+
+        if (_g_special != 0 && _g_special != 8) {
+            SYS::Draw_System_Special_Popup_(
+                _g_x,
+                static_cast<int16_t>(_g_y + 0x32),
+                _g_special,
+                _g_star_n);
+        }
+    }
+
+    void __cdecl Update_Random_New_Officer_Fields_() {
+        char* button_text;
+        char* base_text;
+        s_animation_header* animation;
+        char hotkey = '(';
+        int16_t hidden_field_id;
+
+        MAINPUPS::Eric_Push_Fields_();
+        fields::Clear_Mouse_Buffer_();
+        fields::Set_Input_Delay_(3);
+
+        if (MAINPUPS::_field_state == 0) {
+            hotkey = '(';
+            button_text = ESTRINGS::E_Strings_(0x1b4);
+            animation = MAINPUPS::_anims[12];
+            base_text = ESTRINGS::E_Strings_(0xc);
+            MAINPUPS::_mp_fields[8] = fields::Add_Button_Field_(MAINPUPS::_g_x + 0x2c, MAINPUPS::_g_y + 0xe2, base_text, animation, button_text, hotkey);
+
+            hotkey = '(';
+            button_text = ESTRINGS::E_Strings_(0x13c);
+            animation = MAINPUPS::_anims[13];
+            base_text = ESTRINGS::E_Strings_(0xc);
+            MAINPUPS::_mp_fields[7] = fields::Add_Button_Field_(MAINPUPS::_g_x + 0xaf, MAINPUPS::_g_y + 0xe2, base_text, animation, button_text, hotkey);
+
+            MAINPUPS::_mp_fields[0] = -1000;
+        } else {
+            hotkey = '(';
+            if (MAINPUPS::_field_state == 3) {
+                button_text = ESTRINGS::E_Strings_(0x180);
+                animation = MAINPUPS::_anims[12];
+                base_text = ESTRINGS::E_Strings_(0xc);
+                MAINPUPS::_mp_fields[8] = fields::Add_Button_Field_(MAINPUPS::_g_x + 0x2c, MAINPUPS::_g_y + 0xe2, base_text, animation, button_text, hotkey);
+
+                hotkey = '(';
+                button_text = ESTRINGS::E_Strings_(0x231);
+                animation = MAINPUPS::_anims[13];
+                base_text = ESTRINGS::E_Strings_(0xc);
+                MAINPUPS::_mp_fields[7] = fields::Add_Button_Field_(MAINPUPS::_g_x + 0xaf, MAINPUPS::_g_y + 0xe2, base_text, animation, button_text, hotkey);
+            } else {
+                button_text = ESTRINGS::E_Strings_(0x180);
+                animation = MAINPUPS::_anims[12];
+                base_text = ESTRINGS::E_Strings_(0xc);
+                MAINPUPS::_mp_fields[8] = fields::Add_Button_Field_(MAINPUPS::_g_x + 0x2c, MAINPUPS::_g_y + 0xe2, base_text, animation, button_text, hotkey);
+                MAINPUPS::_mp_fields[7] = -1000;
+            }
+
+            hidden_field_id = 0;
+            base_text = ESTRINGS::E_Strings_(0xc);
+            MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, base_text, hidden_field_id);
+        }
+
+        OFFICER::Wrapper_To_Add_Officer_Popup_Help_Fields_(MAINPUPS::_g_x, MAINPUPS::_g_y + 0x35, MAINPUPS::_g_officer);
+    }
+
+    void __cdecl Evaluate_Slider_Input_(int16_t* input, int16_t* scanned_field, int16_t* done) {
+        (void)scanned_field;
+
+        const int16_t value = *input;
+
+        if (value == _mp_fields_3[0]) {
+            *done = 1;
+        }
+
+        if (value == _mp_fields_2[0]) {
+            *done = 1;
+            _g_var = -1;
+        }
+
+        if (value == _mp_fields_9[0]) {
+            ++_g_var;
+        }
+
+        if (value == _mp_fields_10[0]) {
+            --_g_var;
+        }
+    }
+
+    void __cdecl Mainpups_Tested_Execute_Autofunction_() {
+        if (MAINPUPS::_autofunction_ctr == 1) {
+            MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+            COLONY::_full_draw = 1;
+            MOX::_dont_draw_main_screen_to_back = 1;
+            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction);
+        } else if (MAINPUPS::_autofunction_ctr == 2) {
+            MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+            COLONY::_full_draw = 1;
+            MAINPUPS::_autofunction_ctr = 0;
+            MOX::_dont_draw_main_screen_to_back = 1;
+            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction);
+
+            MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+            COLONY::_full_draw = 1;
+            MOX::_dont_draw_main_screen_to_back = 1;
+            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction2);
+            MAINPUPS::_autofunction_ctr = 2;
+        }
+
+        MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        MOX::_dont_draw_main_screen_to_back = 0;
+    }
+
+    void __cdecl Draw_Random_New_Officer_Popup_() {
+        char message_buffer[500];
+        char tech_buffer[500];
+        char* leader_name;
+        char* format_string;
+        int16_t officer_cost;
+        int16_t maintenance_cost;
+
+        if (COLONY::_full_draw == 0 && MOX::_FULL_DRAW_SCREEN_FLAG == 0) {
+            return;
+        }
+
+        MOX::_draw_main_screen_to_back = 1;
+        Mainpups_Tested_Execute_Autofunction_();
+
+        animate::Draw_(MAINPUPS::_g_x, MAINPUPS::_g_y, _anims[10]);
+        OFFICER::Wrapper_For_Colony_Officer_Popup_Data_(MAINPUPS::_g_x,
+                                                        MAINPUPS::_g_y + 0x35,
+                                                        MAINPUPS::_g_officer);
+        animate::Draw_(MAINPUPS::_g_x + 0x0d, MAINPUPS::_g_y + 0x37, _anims[11]);
+
+        if (MAINPUPS::_on_officer_screen_flag != 0) {
+            ERIC::Print_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
+                                            MAINPUPS::_g_y + 0x95,
+                                            0x119,
+                                            0x3e,
+                                            MAINPUPS::_g_str_ptr);
+        } else {
+            const int16_t field_state = MAINPUPS::_field_state;
+
+            if (field_state == 0) {
+                MAINPUPS::Leader_Technology_String_(MAINPUPS::_g_player_n,
+                                                    MAINPUPS::_g_officer,
+                                                    tech_buffer);
+                maintenance_cost = OFFICER::Officer_Maintenance_(MAINPUPS::_g_player_n,
+                                                                 MAINPUPS::_g_officer);
+                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                              MAINPUPS::_g_officer);
+                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+                format_string = ESTRINGS::E_Strings_(2);
+                _sprintf(message_buffer,
+                        format_string,
+                        leader_name,
+                        officer_cost,
+                        maintenance_cost,
+                        tech_buffer);
+            } else if (field_state == 1) {
+                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                              MAINPUPS::_g_officer);
+                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+                format_string = ESTRINGS::E_Strings_(6);
+                _sprintf(message_buffer, format_string, leader_name, officer_cost);
+            } else if (field_state == 2) {
+                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                              MAINPUPS::_g_officer);
+                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+                format_string = ESTRINGS::E_Strings_(5);
+                _sprintf(message_buffer, format_string, leader_name, officer_cost);
+            } else if (field_state == 3) {
+                officer_cost = (int16_t)OFFICER::Calculate_Officer_Cost_(MAINPUPS::_g_player_n,
+                                                              MAINPUPS::_g_officer);
+                leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 0);
+                format_string = ESTRINGS::E_Strings_(4);
+                _sprintf(message_buffer, format_string, leader_name, officer_cost);
+            }
+
+            BILL::Squeeze_Paragraph_Centered_(MAINPUPS::_g_x + 0x0e,
+                                              MAINPUPS::_g_y + 0x95,
+                                              0x119,
+                                              0x3e,
+                                              message_buffer,
+                                              2);
+        }
+
+        leader_name = OFFICER::Leader_Name_(MAINPUPS::_g_officer, 1);
+        ERIC::Print_Paragraph_Centered_(MAINPUPS::_g_x + 0x0b,
+                                        MAINPUPS::_g_y + 0x0c,
+                                        0x11d,
+                                        0x21,
+                                        leader_name);
+        video::Copy_Off_To_Back_();
+    }
+
+    void __cdecl Evaluate_Discovery_Input_(int16_t* input_1, int16_t* input_2) {
+        Do_Evaluate_Discovery_Input_(input_1, input_2);
+    }
+
+    /**
+     * @address 0045b470
+     */
+    void __cdecl Marooned_Officer_Fails_Popup_(int16_t star_idx, int16_t officer_idx) {
+        _officer_gains_level_state = 2;
+        Officer_Gains_Level_Popup_(star_idx, officer_idx);
+        _officer_gains_level_state = 0;
+    }
+
+    /**
+     * @address 0045b440
+     */
+    void __cdecl Marooned_Officer_Joins_Popup_(int16_t star_idx, int16_t officer_idx) {
+        _officer_gains_level_state = 1;
+        Officer_Gains_Level_Popup_(star_idx, officer_idx);
+        _officer_gains_level_state = 0;
+    }
+
+    void __cdecl Load_Dragon_New_Star_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[4] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x46, MOX::_screen_seg);
+        _anims[35] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x47, MOX::_screen_seg);
+        _anims[37] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x48, MOX::_screen_seg);
+
+        COLONY::Load_Galaxy_Map_Anims_();
+    }
+
+    /**
+     * @address 0045fa20
+     */
+    void __cdecl Update_Dragon_New_Star_Fields_() {
+        Eric_Push_Fields_();
+        COLONY::Clear_Galaxy_Map_Fields_();
+
+        _mp_fields[2] = fields::Add_Button_Field_(
+            186,
+            313,
+            ESTRINGS::E_Strings_(12),
+            _anims[4],
+            ESTRINGS::E_Strings_(135),
+            40
+        );
+
+        if (_field_mode == 0) {
+            _mp_fields[25] = fields::Add_Button_Field_(
+                381,
+                313,
+                ESTRINGS::E_Strings_(12),
+                _anims[35],
+                ESTRINGS::E_Strings_(561),
+                40
+            );
+        } else {
+            _mp_fields[25] = -1000;
+        }
+
+        MOVEBOX::Add_Galaxy_Map_Fields_2_(
+            302,
+            156,
+            148,
+            94,
+            0,
+            0,
+            0,
+            0,
+            0,
+            &COLONY::_galaxy_map_name_field,
+            MOX::_galaxy_map_star_field,
+            &MOX::_galaxy_map_grid_field
+        );
+    }
+
+    void __cdecl Load_Colony_Defense_Selection_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[8] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 2, MOX::_screen_seg);
+        _anims[9] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x2f /* 47 */, MOX::_screen_seg);
+    }
+
+    /**
+     * @address 0045c610
+     */
+    void __cdecl Update_Colony_Defense_Fields_() {
+        Eric_Push_Fields_();
+        COLONY::Clear_Sys_Disp_Fields_();
+
+        SYS::Wrapper_For_Informational_System_Fields_(
+            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            _g_x,
+            _g_y,
+            0xd,
+            0x2f,
+            &_mp_fields[6]
+        );
+    }
+
+    /**
+     * @address 0045c650
+     */
+    void __cdecl Draw_Defense_Selection_Popup_() {
+        char buffer[500];
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MAINPUPS::Mainpups_Tested_Execute_Autofunction_();
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        s_star_data* star = &MOX::_star[COLONY::_sys_disp_star_handle];
+        char* race_name = MOX::_player[MAINPUPS::_g_player_n].race_name;
+        char* format = ESTRINGS::E_Strings_(0x45);
+
+        // Disassembly passes the pointer to the s_star_data struct, which starts with the star name string.
+        _sprintf(buffer, format, race_name, star);
+
+        SYS::Draw_System_Display_Popup_(
+            static_cast<int16_t>(COLONY::_sys_disp_star_handle),
+            1,
+            buffer,
+            MAINPUPS::_g_x,
+            MAINPUPS::_g_y,
+            0,
+            0,
+            13,
+            47
+        );
+    }
+
+    /**
+     * @address 0045c710
+     */
+    int16_t __cdecl Evaluate_Defense_Selection_Input_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made) {
+        if (*field_idx == _mp_fields[6]) {
+            *selection_made = 1;
+            return -1;
+        }
+
+        return Check_System_Display_Fields_Defense_Selection_(field_idx, mouse_status, selection_made);
+    }
+
+    void __cdecl Draw_Officer_Gains_Level_Popup_() {
+        char message_buffer[500];
+
+        if (COLONY::_full_draw == 0 && MOX::_FULL_DRAW_SCREEN_FLAG == 0) {
+            return;
+        }
+
+        COLONY::_full_draw = 1;
+        MOX::_dont_draw_main_screen_to_back = 1;
+        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+
+        Mainpups_Tested_Execute_Autofunction_();
+        Get_Picture_Draw_XY_(_anim_10);
+
+        animate::Draw_(_g_x, _g_y, _anim_10);
+        OFFICER::Wrapper_For_Colony_Officer_Popup_Data_((int32_t)_g_x, (int32_t)(_g_y + 53), (int32_t)_g_officer);
+        animate::Draw_(_g_x + 13, _g_y + 55, _anim_11);
+
+        if (_officer_gains_level_state == 0) {
+            char* name = OFFICER::Leader_Name_(_g_officer, 0);
+            char* format = ESTRINGS::E_Strings_(1);
+            _sprintf(message_buffer, format, name);
+        }
+        else if (_officer_gains_level_state == 1) {
+            char* name = OFFICER::Leader_Name_(_g_officer, 0);
+            char* format = ESTRINGS::E_Strings_(584);
+            _sprintf(message_buffer, format, name);
+        }
+        else if (_officer_gains_level_state == 2) {
+            char* name = OFFICER::Leader_Name_(_g_officer, 0);
+            char* format = ESTRINGS::E_Strings_(585);
+            _sprintf(message_buffer, format, name);
+        }
+
+        ERIC::Print_Paragraph_Centered_(_g_x + 14, _g_y + 149, 281, 62, message_buffer);
+
+        char* leader_full_name = OFFICER::Leader_Name_(_g_officer, 1);
+        ERIC::Print_Paragraph_Centered_(_g_x + 11, _g_y + 12, 285, 33, leader_full_name);
+
+        video::Copy_Off_To_Back_();
+        COLONY::_full_draw = 0;
+    }
+
+    int16_t __cdecl Get_Colony_Best_Shield_Bldg_(int16_t colony_idx) {
+        int16_t best_shield_id = -1;
+
+        if (MOX::_colony[colony_idx].buildings[28] != 0) {
+            best_shield_id = 28;
+        }
+
+        if (MOX::_colony[colony_idx].buildings[24] != 0) {
+            best_shield_id = 24;
+        }
+
+        if (MOX::_colony[colony_idx].buildings[23] != 0) {
+            best_shield_id = 23;
+        }
+
+        return best_shield_id;
     }
 }

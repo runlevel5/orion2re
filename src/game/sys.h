@@ -143,4 +143,10 @@ namespace SYS {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00493a20 });
         fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10);
     }
+
+    inline void __cdecl Wrapper_For_Informational_System_Fields_(uint32_t star_idx, int16_t x, int16_t y, int16_t arg4, int16_t arg5, int16_t* arg6) {
+        using Fn = void(__cdecl*)(uint32_t, int16_t, int16_t, int16_t, int16_t, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004974f0});
+        fn(star_idx, x, y, arg4, arg5, arg6);
+    }
 }

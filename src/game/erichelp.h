@@ -52,4 +52,22 @@ namespace ERICHELP {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004123D0});
         fn();
     }
+
+    inline void __cdecl Set_Planet_Selection_Popup_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412420});
+        fn();
+    }
+
+    inline void __cdecl Set_New_System_Discovery_Popup_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412410});
+        fn();
+    }
+
+    inline void __cdecl Set_Officer_Information_Popup_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412430});
+        fn();
+    }
 }
