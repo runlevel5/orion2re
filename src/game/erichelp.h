@@ -53,6 +53,12 @@ namespace ERICHELP {
         fn();
     }
 
+    inline void __cdecl Set_New_Colony_Confirmation_Box_Help_List_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004123E0});
+        fn();
+    }
+
     inline void __cdecl Set_Planet_Selection_Popup_Help_List_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00412420});

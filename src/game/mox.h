@@ -347,8 +347,8 @@ namespace MOX {
     inline int16_t& _system_star_id_for_auto_select = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA1A});
     inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
     inline s_mouse_xy& _mouse_XY = *reinterpret_cast<s_mouse_xy*>(std::uintptr_t{0x0059B5C0});
-    inline uint16_t& _system_display_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059BFB0});
-    inline uint16_t& _system_icon_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597A98});
+    inline int16_t& _system_display_ship_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BFB0});
+    inline int16_t& _system_icon_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597A98});
     inline uint16_t& _global_exit_field = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597D7A});
     inline uint16_t& _player_design_num = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B28});
     inline int16_t& _eta_star_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BAAE});

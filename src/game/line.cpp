@@ -807,6 +807,53 @@ namespace line {
         }
     }
 
+    /**
+     * @brief Draws a vertical line segment using cyclic plasma data and updates the pixel pointer.
+     * 
+     * @param pixel_ptr_ref Pointer to the current pixel location, updated after the run.
+     * @param post_offset Offset added to the pixel pointer after the drawing loop.
+     * @param length Number of pixels to draw vertically.
+     * @param plasma_table 1024-byte table containing color/plasma values.
+     * @param plasma_index_ptr Pointer to the current index in the plasma table (cyclic).
+     */
+    void __cdecl Draw_Vertical_Run_Plasma_(uint8_t** pixel_ptr_ref, int16_t post_offset, int16_t length, uint8_t* plasma_table, uint16_t* plasma_index_ptr) {
+        uint8_t* current_pixels = *pixel_ptr_ref;
+
+        if (length > 0) {
+            int32_t count = (int32_t)length;
+            do {
+                // Look up color from plasma table using a 10-bit masked index
+                uint16_t index = *plasma_index_ptr;
+                *current_pixels = plasma_table[index & 0x3FF /* 1023 */];
+
+                // Increment cyclic index and move to the next screen row
+                *plasma_index_ptr = index + 1;
+                current_pixels += g_screen_res_x;
+
+                count--;
+            } while (count != 0);
+        }
+
+        // Apply final offset (typically to move to the next column or segment) and update output pointer
+        *pixel_ptr_ref = current_pixels + post_offset;
+    }
+
+    void __cdecl Draw_Horizontal_Run_Plasma_(uint8_t** dest_ptr, int16_t step, int16_t length, uint8_t* plasma_table, uint16_t* angle_ptr) {
+        uint8_t* dest = *dest_ptr;
+
+        if (length > 0) {
+            int32_t count = (int32_t)length;
+            do {
+                *dest = plasma_table[*angle_ptr & 0x3FF];
+                dest += step;
+                (*angle_ptr)++;
+                count--;
+            } while (count != 0);
+        }
+
+        *dest_ptr = dest + g_screen_res_x;
+    }
+
     void __cdecl Create_Plasma_Line_(int16_t seed, uint16_t start_val, const uint8_t* color_map) {
         random::Save_Random_Seed_();
         random::Set_Random_Seed_(seed);

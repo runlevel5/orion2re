@@ -779,4 +779,20 @@ namespace HACCESS {
             }
         }
     }
+
+    /**
+     * @address 0049b610
+     */
+    int16_t __cdecl System_Planet_Scanned_To_Planet_Id_(int16_t star_idx, int16_t planet_idx) {
+        return MOX::_star[star_idx].planet_index[planet_idx];
+    }
+
+    /**
+     * @address 0049b640
+     */
+    int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx) {
+        // Each s_ship_node is 5 bytes. The disassembly calculates the offset as: ship_node_idx * 5
+        // which corresponds to indexing the array of s_ship_node structures.
+        return MOX::_ship_node[ship_node_idx].ship_idx;
+    }
 }

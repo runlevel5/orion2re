@@ -129,6 +129,12 @@ namespace ERIC {
         return fn(player_id, colony_idx);
     }
 
+    inline bool __cdecl Player_Can_Mind_Control_Colony_With_Help_(int16_t player_id, int16_t colony_idx) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAC40});
+        return fn(player_id, colony_idx);
+    }
+
     inline void __cdecl Force_Fade_To_Colony_Palette_(int state) {
         using Fn = void(__cdecl*)(int);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba790});

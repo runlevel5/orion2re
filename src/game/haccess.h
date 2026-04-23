@@ -106,4 +106,8 @@ namespace HACCESS {
     bool __cdecl Enemy_Ship_Going_To_My_Colony_();
 
     void __cdecl Set_All_Colony_Auto_Select_Flags_();
+
+    int16_t __cdecl System_Planet_Scanned_To_Planet_Id_(int16_t star_idx, int16_t planet_idx);
+
+    int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx);
 }

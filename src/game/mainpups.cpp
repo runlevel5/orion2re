@@ -258,6 +258,20 @@ namespace MAINPUPS {
         ERICHELP::Set_Officer_Information_Popup_Help_List_();
     }
 
+    /**
+     * @address 0045b620
+     */
+    void __cdecl Add_Officer_Gains_Level_Fields_() {
+        char* hotkey;
+        int16_t sound;
+
+        sound = 0;
+        hotkey = ESTRINGS::E_Strings_(12 /* 0xc */);
+
+        // Creates a full-screen (640x480) hidden input field
+        MAINPUPS::_mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, hotkey, sound);
+    }
+
     void __cdecl Build_Generic_Planet_Or_Colony_Description_String_Formatted_(int16_t planet_idx, char* buffer) {
         s_planet_data* p = &MOX::_planet[planet_idx];
 
@@ -519,9 +533,84 @@ namespace MAINPUPS {
         return selected_defense;
     }
 
+    /**
+     * Adds UI fields for a slider control including the scroll bar, directional buttons, 
+     * and a background hidden field.
+     * 
+     * @param val The initial value of the slider.
+     * @param padding Unused parameter existing on the stack to maintain calling convention alignment.
+     * @param ptr Pointer to the variable that will store the slider's state.
+     * @param limit The upper limit of the slider range.
+     */
+    void __cdecl Add_Slider_Fields_(int16_t val, int16_t padding, int16_t* ptr, int16_t limit) {
+        char* tooltip_generic = ESTRINGS::E_Strings_(12);
+
+        // Main scroll bar field
+        _mp_fields[11] = fields::Add_Scroll_Field_(
+            _g_x + 37 /* 0x25 */,
+            _g_y + 149 /* 0x95 */,
+            val,
+            limit + 1,
+            val,
+            limit,
+            207 /* 0xcf */,
+            13 /* 0xd */,
+            ptr,
+            tooltip_generic,
+            0
+        );
+
+        // Slider navigation buttons
+        _mp_fields[10] = fields::Add_Button_Field_(
+            _g_x + 15 /* 0xf */,
+            _g_y + 154 /* 0x9a */,
+            tooltip_generic,
+            _anims[34],
+            ESTRINGS::E_Strings_(137 /* 0x89 */),
+            40 /* 0x28 */
+        );
+
+        _mp_fields[9] = fields::Add_Button_Field_(
+            _g_x + 256 /* 0x100 */,
+            _g_y + 154 /* 0x9a */,
+            tooltip_generic,
+            _anims[33],
+            ESTRINGS::E_Strings_(11 /* 0xb */),
+            40 /* 0x28 */
+        );
+
+        _mp_fields[2] = fields::Add_Button_Field_(
+            _g_x + 15 /* 0xf */,
+            _g_y + 174 /* 0xae */,
+            tooltip_generic,
+            _anims[35],
+            ESTRINGS::E_Strings_(135 /* 0x87 */),
+            40 /* 0x28 */
+        );
+
+        _mp_fields[3] = fields::Add_Button_Field_(
+            _g_x + 208 /* 0xd0 */,
+            _g_y + 174 /* 0xae */,
+            tooltip_generic,
+            _anims[4],
+            ESTRINGS::E_Strings_(12 /* 0xc */),
+            40 /* 0x28 */
+        );
+
+        // Hidden field covering the screen to block underlying interactions
+        _mp_fields[0] = fields::Add_Hidden_Field_(
+            0,
+            0,
+            639 /* 0x27f */,
+            479 /* 0x1df */,
+            tooltip_generic,
+            0
+        );
+    }
+
     void __cdecl Load_Slider_Fields_() {
         Eric_Push_Fields_();
-        Add_Slider_Fields_(_g_min, _g_max, &_g_var);
+        Add_Slider_Fields_(_g_min, 0, &_g_var, _g_max);
     }
 
     int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t var, char* msg, int16_t param_5) {
@@ -1244,6 +1333,27 @@ namespace MAINPUPS {
         return Colony_Combat_Popup_(&local_30, 1);
     }
 
+    /**
+     * @address 0045a290
+     */
+    int8_t __cdecl Player_Has_Colony_Or_Outpost_At_Star_(int16_t player_idx, int16_t star_idx) {
+        for (int16_t i = 0; i < 5; ++i) {
+            int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+
+            if (planet_idx != -1) {
+                int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+                if (colony_idx != -1) {
+                    if (MOX::_colony[colony_idx].owner == (int8_t)player_idx) {
+                        return 1;
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
     void __cdecl Setup_To_Apply_Bomb_Hits_(s_combat_bomb_result* result, int16_t* p_bomb_hits_remaining, int16_t* p_bio_hits_remaining) {
         *p_bomb_hits_remaining = result->bomb_hits_remaining;
         *p_bio_hits_remaining = result->bio_hits_remaining;
@@ -1650,6 +1760,29 @@ namespace MAINPUPS {
     }
 
     /**
+     * @address 0045bc00
+     */
+    void __cdecl Do_Evaluate_Discovery_Input_(int16_t* mouse_x, int16_t* mouse_y) {
+        int16_t out_val1;
+        int16_t out_val2;
+        int16_t scanned_ship_idx;
+        int16_t out_val4;
+        int16_t scanned_icon_idx;
+
+        // Scans the display fields at the given mouse coordinates.
+        // Arg order derived from disassembly: *param_2 (Y), *param_1 (X)
+        MAINSCR::Scan_System_Display_Fields_(*mouse_y, *mouse_x, MOX::_planet_buttons, 
+                                             &out_val1, &out_val2, &scanned_ship_idx, 
+                                             &out_val4, &scanned_icon_idx);
+
+        MOX::_system_display_ship_scanned = scanned_ship_idx;
+
+        if (scanned_icon_idx > -1) {
+            MOX::_system_icon_scanned = scanned_icon_idx;
+        }
+    }
+
+    /**
      * @address 0045b470
      */
     void __cdecl Marooned_Officer_Fails_Popup_(int16_t star_idx, int16_t officer_idx) {
@@ -1849,5 +1982,456 @@ namespace MAINPUPS {
         }
 
         return best_shield_id;
+    }
+
+    /**
+     * @address 0045c170
+     */
+    int16_t __cdecl Check_System_Display_Fields_Selection_(int16_t* x, int16_t* y, int16_t* selection_confirmed) {
+        int16_t planet_scanned;
+        int16_t icon_scanned;
+        int16_t ship_scanned;
+        int16_t dummy_a;
+        int16_t dummy_8;
+
+        int16_t scan_res = MAINSCR::Scan_System_Display_Fields_(
+            *y, *x, MOX::_planet_buttons,
+            &dummy_a, &planet_scanned, &ship_scanned, &dummy_8, &icon_scanned
+        );
+
+        MOX::_system_display_ship_scanned = ship_scanned;
+        if (icon_scanned > -1) {
+            MOX::_system_icon_scanned = icon_scanned;
+        }
+
+        if (scan_res == 0 && planet_scanned > -1) {
+            int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_(static_cast<int16_t>(COLONY::_sys_disp_star_handle), planet_scanned);
+
+            if (_selection_state_flag == 0) {
+                if (MOX::_planet[planet_idx].planet_type != 3 /* PLANET_TYPE_GAS_GIANT */ ||
+                    (MOX::_planet[planet_idx].colony_index != -1 && MOX::_colony[MOX::_planet[planet_idx].colony_index].outpost_flag == 0)) {
+
+                    char* help_text = ESTRINGS::E_Strings_(0x236);
+                    GENDRAW::Help_(help_text);
+                    COLONY::_full_draw = 1;
+                    Eric_Pop_Fields_();
+                    Update_Selection_Fields_();
+                    video::Copy_Back_To_Off_();
+                    Draw_Selection_Popup_();
+                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+                    goto reset_ui_and_fail;
+                }
+            }
+
+            if (_selection_state_flag == 1) {
+                int16_t col_idx = MOX::_planet[planet_idx].colony_index;
+                if (col_idx == -1 || MOX::_colony[col_idx].outpost_flag == 0) {
+                    char* help_text = ESTRINGS::E_Strings_(0x236);
+                    GENDRAW::Help_(help_text);
+                    COLONY::_full_draw = 1;
+                    Eric_Pop_Fields_();
+                    Update_Selection_Fields_();
+                    video::Copy_Back_To_Off_();
+                    Draw_Selection_Popup_();
+                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+                    goto reset_ui_and_fail;
+                }
+            }
+
+            if (_selection_state_flag == 2) {
+                int16_t col_idx = MOX::_planet[planet_idx].colony_index;
+                if (col_idx == -1 || MOX::_colony[col_idx].outpost_flag != 0 || MOX::_colony[col_idx].owner != MOX::_PLAYER_NUM) {
+                    char* help_text = ESTRINGS::E_Strings_(0x23b);
+                    GENDRAW::Help_(help_text);
+                    COLONY::_full_draw = 1;
+                    Eric_Pop_Fields_();
+                    Update_Selection_Fields_();
+                    video::Copy_Back_To_Off_();
+                    Draw_Selection_Popup_();
+                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+                    goto reset_ui_and_fail;
+                }
+            }
+
+            if (_selection_state_flag == 3) {
+                if (MOX::_planet[planet_idx].planet_type == 3 /* PLANET_TYPE_GAS_GIANT */) {
+                    char* help_text = ESTRINGS::E_Strings_(0x235);
+                    GENDRAW::Help_(help_text);
+                    goto reset_ui_and_fail;
+                }
+                *selection_confirmed = 1;
+                return planet_idx;
+            }
+
+            if (_selection_state_flag == 0) {
+                if (New_Colony_Confirmation_Box_(planet_idx)) {
+                    *selection_confirmed = 1;
+                    return planet_idx;
+                }
+            } else {
+                *selection_confirmed = 1;
+                return planet_idx;
+            }
+
+        reset_ui_and_fail:
+            Eric_Pop_Fields_();
+            Update_Selection_Fields_();
+            video::Copy_Back_To_Off_();
+            Draw_Selection_Popup_();
+            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+        }
+
+        return -1;
+    }
+
+    void __cdecl Draw_Slider_Popup_() {
+        uint8_t font_style[8];
+        int16_t slider_offset;
+        int16_t draw_x;
+
+        memset(font_style, 0, sizeof(font_style));
+        font_style[0] = 0x6e; /* 'n' */
+        font_style[1] = 0x71; /* 'q' */
+        font_style[2] = 0x73; /* 's' */
+
+        fonts::Set_Remap_Font_Style_(2, (s_colors*)font_style);
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MAINPUPS::Mainpups_Tested_Execute_Autofunction_();
+
+            s_animation_header* anim = _anims[14];
+            animate::Remap_Draw_(MAINPUPS::_g_x, MAINPUPS::_g_y, anim);
+
+            BILL::Squeeze_Formatted_Paragraph_Centered_(MAINPUPS::_g_x + 19, MAINPUPS::_g_y + 19, 252 /* 0xFC */, 92 /* 0x5C */, MAINPUPS::_g_msg, 2);
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        fonts::Print_Integer_Centered_(MAINPUPS::_g_x + 32, MAINPUPS::_g_y + 132, (int)MAINPUPS::_g_min);
+        fonts::Print_Integer_Centered_(MAINPUPS::_g_x + 145, MAINPUPS::_g_y + 130, (int)MAINPUPS::_g_var);
+        fonts::Print_Integer_Centered_(MAINPUPS::_g_x + 257, MAINPUPS::_g_y + 132, (int)MAINPUPS::_g_max);
+
+        // Calculate handle horizontal position: 207 is track width
+        slider_offset = (int16_t)((207 * (MAINPUPS::_g_var - MAINPUPS::_g_min)) / (MAINPUPS::_g_max - MAINPUPS::_g_min) + 37);
+
+        draw_x = MAINPUPS::_g_x + slider_offset;
+        line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 32 /* ' ' */);
+
+        draw_x++;
+        line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 36 /* '$' */);
+
+        draw_x++;
+        line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 40 /* '(' */);
+
+        draw_x++;
+        line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 36 /* '$' */);
+
+        draw_x++;
+        line::Line_(draw_x, MAINPUPS::_g_y + 153, draw_x, MAINPUPS::_g_y + 164, 32 /* ' ' */);
+    }
+
+    void __cdecl Leader_Technology_String_(int16_t player_idx, int16_t leader_idx, char* output_buf) {
+        char* current_dest = output_buf;
+
+        for (int16_t i = 0; i < 3; ++i) {
+            uint8_t tech_id = MOX::_leaders[leader_idx].tech_application[i];
+            if (tech_id != 0) {
+                const char* prefix;
+                if (i == 0) {
+                    prefix = ESTRINGS::E_Strings_(208 /* 0xD0 */);
+                } else {
+                    prefix = s_comma_space_00556168;
+                }
+
+                current_dest += _sprintf(current_dest, prefix);
+
+                char* tech_name = TECHDATA::_technology_applications[tech_id].name;
+                const char* format = ESTRINGS::E_Strings_(7);
+                current_dest += _sprintf(current_dest, format, tech_name);
+            }
+        }
+
+        if (leader_idx == 47 /* 0x2F */) {
+            int8_t trait0 = MOX::_player[player_idx].traits[0];
+            // Check if the trait index is even
+            if ((trait0 % 2) == 0) {
+                const char* gov_label = MOX::_government_labels[trait0 + 1];
+                const char* format = ESTRINGS::E_Strings_(207 /* 0xCF */);
+                current_dest += _sprintf(current_dest, format, gov_label);
+            }
+        }
+
+        if (current_dest == output_buf) {
+            const char* format = ESTRINGS::E_Strings_(12 /* 0xC */);
+            _sprintf(current_dest, format);
+        }
+    }
+
+    void __cdecl Add_Selection_Fields_() {
+        MOX::_draw_system_display_without_button = 1;
+
+        SYS::Wrapper_For_Informational_System_Fields_(
+            static_cast<uint32_t>(COLONY::_sys_disp_star_handle),
+            _g_x,
+            _g_y,
+            13,
+            47,
+            &_mp_fields[2]
+        );
+
+        char* hotkey = ESTRINGS::E_Strings_(12);
+        _mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 639, 479, hotkey, 0);
+    }
+
+    void __cdecl Load_Combat_Colony_Picture_To_Screen_Seg_(int16_t colony_idx) {
+        int16_t planet_idx = MOX::_colony[colony_idx].planet;
+        int16_t climate = MOX::_planet[planet_idx].climate;
+        int16_t size = MOX::_planet[planet_idx].size;
+
+        int16_t pic_idx1 = size + (climate * 6);
+        char* filename = ESTRINGS::E_Strings_(0xDF);
+        MOX::_combat_planet_seg = (s_animation_header*)farload::Far_Reload_Next_(filename, pic_idx1, MOX::_screen_seg);
+
+        int16_t pic_idx2 = (climate * 6) + 5;
+        filename = ESTRINGS::E_Strings_(0xDF);
+        MOX::_combat_planet_seg2 = (s_animation_header*)farload::Far_Reload_Next_(filename, pic_idx2, MOX::_screen_seg);
+
+        animate::Draw_Palette_(MOX::_combat_planet_seg2);
+        palette::Refresh_Palette_();
+        palette::Set_Palette_Changes_(0, 255 /* 0xFF */);
+        remap::Update_Glass_Remap_Colors_();
+    }
+
+    int16_t __cdecl Evaluate_Colony_Combat_Input_(int16_t *field_id_ptr, int16_t* unused, int16_t *close_popup_flag, int16_t *selection_idx_ptr) {
+        int16_t field_id = *field_id_ptr;
+
+        if (field_id == _mp_fields[6]) {
+            *close_popup_flag = 1;
+            return -1;
+        }
+
+        if (field_id == -_mp_fields[6]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x182), ESTRINGS::E_Strings_(0x260));
+        } else if (field_id == _mp_fields[12]) {
+            *close_popup_flag = 1;
+            return 3;
+        } else if (field_id == -_mp_fields[12]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x150), ESTRINGS::E_Strings_(0x261));
+        } else if (field_id == _mp_fields[13]) {
+            *close_popup_flag = 1;
+            MAINPUPS::_no_flicker_between_mainpups_flag = 1;
+            return 2;
+        } else if (field_id == -_mp_fields[13]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0xcd), ESTRINGS::E_Strings_(0x262));
+        } else if (field_id == _mp_fields[14]) {
+            *close_popup_flag = 1;
+            return 1;
+        } else if (field_id == -_mp_fields[14]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x108), ESTRINGS::E_Strings_(0x263));
+        } else if (field_id == _mp_fields[15]) {
+            if (ERIC::Player_Can_Mind_Control_Colony_With_Help_(MAINPUPS::_g_data_ptr->attacker_player_id, MAINPUPS::_g_data_ptr->colony_idx)) {
+                *close_popup_flag = 1;
+                return 4;
+            }
+        } else if (field_id == -_mp_fields[15]) {
+            if (ERIC::Player_Can_Mind_Control_Colony_(MAINPUPS::_g_data_ptr->attacker_player_id, MAINPUPS::_g_data_ptr->colony_idx)) {
+                TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x175), ESTRINGS::E_Strings_(0x264));
+            } else {
+                ERIC::Player_Can_Mind_Control_Colony_With_Help_(MAINPUPS::_g_data_ptr->attacker_player_id, MAINPUPS::_g_data_ptr->colony_idx);
+            }
+        } else if (field_id == _mp_fields[16]) {
+            *selection_idx_ptr = 2;
+        } else if (field_id == -_mp_fields[16]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x114), ESTRINGS::E_Strings_(0x265));
+        } else if (field_id == _mp_fields[17]) {
+            *selection_idx_ptr = 1;
+        } else if (field_id == -_mp_fields[17]) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0xd9), ESTRINGS::E_Strings_(0x266));
+        } else if (field_id == _mp_fields[18]) {
+            *selection_idx_ptr = 0;
+            fields::Clear_Mouse_Buffer_();
+            fields::Set_Input_Delay_(1);
+            timer::Mark_Time_();
+        } else if ((int32_t)_mp_fields[17] + field_id == 0) {
+            // Note: This logic seems unreachable in normal circumstances due to previous JNZ checks on the same expression.
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0xc7), ESTRINGS::E_Strings_(0x267));
+        } else {
+            *close_popup_flag = 0;
+            return 0;
+        }
+
+        COLONY::_full_draw = 1;
+        *close_popup_flag = 0;
+        return 0;
+    }
+
+    void __cdecl Draw_Dragon_New_Star_Popup_()
+    {
+        char msg_buffer[300];
+
+        if (_g_scanned_star != _g_old_scanned_star) {
+            _g_old_scanned_star = _g_scanned_star;
+            COLONY::_full_draw = 1;
+        }
+
+        if (COLONY::_full_draw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            MOX::_draw_main_screen_to_back = 1;
+            Mainpups_Tested_Execute_Autofunction_();
+            COLONY::_full_draw = 1;
+
+            animate::Draw_(0, 0, _anims[37]);
+
+            s_animation_header* anim_c = COLONY::C_Anims_(12);
+            s_animation_header* anim_b = COLONY::C_Anims_(11);
+
+            MOVEBOX::Draw_Galaxy_Map_Box_(anim_b, anim_c, 302, 156, 148, 94, 0, 0, 0, 0, 0, 0);
+
+            if (_field_mode == 1) {
+                _sprintf(msg_buffer, ESTRINGS::E_Strings_(464), MOX::_player[_g_player_n].name);
+            } else {
+                int16_t str_idx = (_field_mode == 2) ? 583 : 555;
+                _sprintf(msg_buffer, ESTRINGS::E_Strings_(str_idx), 500, MOX::_player[_g_player_n].name, MOX::_star[_g_star_n].name);
+            }
+
+            BILL::Squeeze_Formatted_Paragraph_Centered_(188, 271, 262, 35, msg_buffer, 2);
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        if (_g_scanned_star != (int16_t)-1) {
+            fonts::Print_Centered_(376, 254, MOX::_star[_g_scanned_star].name);
+        }
+    }
+
+    /**
+     * @address 0045fcf0
+     */
+    int16_t __cdecl Evaluate_Dragon_New_Star_Input_(int16_t* field_idx_ptr, int16_t* mouse_pos_ptr, int16_t* status_ptr, int16_t target_star_val) {
+        MAINPUPS::_g_scanned_star = -1;
+        int16_t field_idx = *field_idx_ptr;
+
+        if (MAINPUPS::_mp_fields[2] == field_idx) {
+            *status_ptr = 1;
+            return -1;
+        }
+
+        if (MAINPUPS::_mp_fields[25] == field_idx) {
+            // Check if player has at least 500 BC
+            if (MOX::_player[MAINPUPS::_g_player_n].bc >= 500) {
+                MAINPUPS::_field_mode = 1;
+                COLONY::_full_draw = 1;
+                return 0;
+            } else {
+                COLONY::_full_draw = 1;
+                MAINPUPS::_field_mode = 2;
+                return 0;
+            }
+        }
+
+        if (MAINPUPS::_field_mode == 1) {
+            int16_t scanned_star_id;
+            int16_t scanned_val;
+            int16_t scan_res = MAINSCR::Scan_Galaxy_Map_Fields_(*mouse_pos_ptr, field_idx, &scanned_star_id, &scanned_val);
+
+            if (scan_res == 4 /* FIELD_SCAN_STAR */) {
+                MAINPUPS::_g_scanned_star = scanned_star_id;
+            } else if (scan_res == 0 /* FIELD_SCAN_EMPTY */) {
+                if (scanned_val != target_star_val) {
+                    *status_ptr = 1;
+                    return scanned_val;
+                }
+                
+                // Show help string 576 (0x240)
+                GENDRAW::Help_(ESTRINGS::E_Strings_(576 /* 0x240 */));
+                COLONY::_full_draw = 1;
+            }
+        }
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            COLONY::_full_draw = 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @address 0045b7f0
+     */
+    void __cdecl Load_Officer_Gains_Level_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        _anims[10] = (s_animation_header*)farload::Far_Reload_Next_(COLONY::_MAINPUPS_LBX, 0x33, MOX::_screen_seg);
+
+        _anims[11] = OFFICER::Load_Officer_Picture_(
+            MOX::_PLAYER_NUM,
+            MAINPUPS::_g_officer,
+            MOX::_screen_seg,
+            0,
+            0
+        );
+
+        OFFICER::Load_Officer_Skill_Icons_(MOX::_screen_seg);
+    }
+
+    /**
+     * @address 0045d230
+     */
+    int8_t __cdecl New_Colony_Confirmation_Box_(int16_t planet_idx) {
+        s_potential_colony_info potential_info;
+        char msg_buffer[2000];
+        char* msg_ptr;
+        int len;
+        int16_t food_val;
+        int16_t food_rem;
+
+        ERICHELP::Set_New_Colony_Confirmation_Box_Help_List_();
+
+        COLCALC::Compute_Potential_Colony_Info_(
+            &MOX::_player[MOX::_PLAYER_NUM], 
+            &MOX::_planet[planet_idx], 
+            &potential_info
+        );
+
+        char* planet_name = HACCESS::Get_Planet_Name_(planet_idx);
+        char* format_title = ESTRINGS::E_Strings_(0xD1); /* 209 */
+        len = _sprintf(msg_buffer, format_title, planet_name);
+        msg_ptr = msg_buffer + len;
+
+        food_val = potential_info.food;
+        food_rem = food_val % 2;
+
+        if (food_rem != 0) {
+            char* format_food_odd = ESTRINGS::E_Strings_(0x64); /* 100 */
+            len = _sprintf(msg_ptr, format_food_odd, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2), (int)food_rem);
+        } else {
+            char* format_food_even = ESTRINGS::E_Strings_(0x65); /* 101 */
+            len = _sprintf(msg_ptr, format_food_even, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)(food_val / 2));
+        }
+        msg_ptr += len;
+
+        char* format_ind = ESTRINGS::E_Strings_(0x6B); /* 107 */
+        len = _sprintf(msg_ptr, format_ind, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.industry);
+        msg_ptr += len;
+
+        char* format_res = ESTRINGS::E_Strings_(0x73); /* 115 */
+        len = _sprintf(msg_ptr, format_res, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.research);
+        msg_ptr += len;
+
+        char* format_maint = ESTRINGS::E_Strings_(0x6C); /* 108 */
+        len = _sprintf(msg_ptr, format_maint, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.maintenance);
+        msg_ptr += len;
+
+        char* format_bonus = ESTRINGS::E_Strings_(0x78); /* 120 */
+        len = _sprintf(msg_ptr, format_bonus, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)potential_info.worker_bonus);
+        msg_ptr += len;
+
+        int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
+        char* format_pop = ESTRINGS::E_Strings_(0x6E); /* 110 */
+        _sprintf(msg_ptr, format_pop, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)max_pop);
+
+        int8_t result = GENDRAW::Warning_Box2_(msg_buffer);
+        fields::Deactivate_Help_List_();
+
+        return result;
     }
 }

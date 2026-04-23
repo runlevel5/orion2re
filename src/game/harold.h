@@ -159,11 +159,7 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Dimensional_Portal_(s_player* player, s_star_data* star);
 
-    inline bool __cdecl Star_Has_Dimensional_Portal_(s_star_data* star) {
-        using Fn = bool(__cdecl*)(s_star_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F15C0});
-        return fn(star);
-    }
+    bool __cdecl Star_Has_Dimensional_Portal_(s_star_data* star);
 
     int16_t __cdecl Planet_Type_(int16_t star_idx, int16_t star_planet);
 
@@ -191,9 +187,11 @@ namespace HAROLD {
 
     bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner);
 
-    inline int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star) {
-        using Fn = int16_t(__cdecl*)(s_star_data*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1D00});
-        return fn(star);
+    inline void __cdecl Star_XY_To_Ship_Id_(int16_t star_idx, int16_t* ship_id, int16_t* mode) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1d30});
+        fn(star_idx, ship_id, mode);
     }
+
+    int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx);
 }

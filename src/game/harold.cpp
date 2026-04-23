@@ -555,6 +555,16 @@ namespace HAROLD {
     }
 
     /**
+     * Checks if the specified star system has a dimensional portal.
+     * @param star Pointer to the star data structure.
+     * @return True if a dimensional portal is present, false otherwise.
+     * @address 004f15c0
+     */
+    bool __cdecl Star_Has_Dimensional_Portal_(s_star_data* star) {
+        return star->has_dimensional_portal != 0;
+    }
+
+    /**
      * @address 004f15d0
      */
     bool __cdecl Star_Has_Artemis_Net_(s_star_data* star) {
@@ -910,6 +920,18 @@ namespace HAROLD {
         }
 
         return winner;
+    }
+
+    /**
+     * @address 004f1d00
+     */
+    int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx) {
+        int16_t ship_id;
+        int16_t mode = 2;
+
+        Star_XY_To_Ship_Id_(star_idx, &ship_id, &mode);
+
+        return ship_id;
     }
 
     int16_t __cdecl Zoom_Level_Font_Style_() {

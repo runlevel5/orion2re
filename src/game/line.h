@@ -26,15 +26,7 @@ namespace line {
 
     void __cdecl Plasma_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_map, uint16_t color_index);
 
-    inline void __cdecl Draw_Horizontal_Run_Plasma_(uint8_t** ptr, int16_t x_dir, int16_t run_len, uint8_t* color_map, uint16_t* color_index) {
-        using Fn = void(__cdecl*)(uint8_t**, int16_t, int16_t, uint8_t*, uint16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052B180});
-        fn(ptr, x_dir, run_len, color_map, color_index);
-    }
+    void __cdecl Draw_Horizontal_Run_Plasma_(uint8_t** dest_ptr, int16_t step, int16_t length, uint8_t* plasma_table, uint16_t* angle_ptr);
 
-    inline void __cdecl Draw_Vertical_Run_Plasma_(uint8_t** ptr, int16_t x_dir, int16_t run_len, uint8_t* color_map, uint16_t* color_index) {
-        using Fn = void(__cdecl*)(uint8_t**, int16_t, int16_t, uint8_t*, uint16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052B1D0});
-        fn(ptr, x_dir, run_len, color_map, color_index);
-    }
+    void __cdecl Draw_Vertical_Run_Plasma_(uint8_t** pixel_ptr_ref, int16_t post_offset, int16_t length, uint8_t* plasma_table, uint16_t* plasma_index_ptr);
 }

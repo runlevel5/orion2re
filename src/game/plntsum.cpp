@@ -53,7 +53,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                 char special_buf[80];
 
                 if (MOX::_star[star_idx].system_special == 9 /* P_SPEC_ARTIFACTS */) {
-                    int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(&MOX::_star[star_idx]);
+                    int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(star_idx);
                     if (ship_idx != -1) {
                         special_str = MOX::_ship[ship_idx].d.name;
                     } else if (special_id == 10 /* P_SPEC_ORION */) {
