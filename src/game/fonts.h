@@ -5,6 +5,8 @@ namespace fonts {
     inline uint16_t& _font_header_current_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0057646C});
     inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
 
+    inline uint8_t*& _current_font_blob = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055B158});
+
     inline void*& _palette_block =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x005787B8 });
 
@@ -20,6 +22,9 @@ namespace fonts {
 
     inline uint8_t*& _font_data = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00576434});
 
+    inline uint8_t& _palette_block__unk =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00576447});
+
     inline s_font& _font_header =
         *reinterpret_cast<s_font*>(std::uintptr_t{0x00576448});
 
@@ -31,44 +36,22 @@ namespace fonts {
     inline s_colors& _current_font_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x005787A8});
 
-    inline void __cdecl Print_Character_No_Alias_ASM_(void* dest, void* glyph, s_font* header, int height) {
-        using Fn = void(__cdecl*)(void*, void*, s_font*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005366AE});
-        fn(dest, glyph, header, height);
-    }
-
     void __cdecl Set_PSTR_Style_(uint16_t style);
     void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors);
 
-    inline void __cdecl Set_Remap_Font_Style_(int style, s_colors* colors) {
-        using Fn = void(__cdecl*)(int, s_colors*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005254c0});
-        fn(style, colors);
-    }
+    void __cdecl Set_Remap_Font_Style_(int font_idx, s_colors* colors);
 
-    inline void __cdecl Load_Font_File_(char* font_path) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525340});
-        fn(font_path);
-    }
+    void __cdecl Load_Font_File_(char* filename);
 
     int16_t __cdecl Get_String_Width_(const char* str);
 
     int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);
 
-    inline void __cdecl Print_Integer_(int16_t x, int16_t y, int32_t value) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005257b0});
-        fn(x, y, value);
-    }
+    void __cdecl Print_Integer_(int16_t x, int16_t y, int32_t value);
 
     void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg);
 
-    inline void __cdecl Print_Clipped_Letter_To_Bitmap_(short draw_x, short draw_y, char char_idx, short src_x, short clipped_width, short src_y, short clipped_height, s_animation_header* header) {
-        using Fn = void(__cdecl*)(short, short, char, short, short, short, short, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526bd0});
-        fn(draw_x, draw_y, char_idx, src_x, clipped_width, src_y, clipped_height, header);
-    }
+    void __cdecl Print_Clipped_Letter_To_Bitmap_(int16_t x, int16_t y, char letter, int16_t clip_x, int16_t clip_width, int16_t clip_y, uint16_t clip_height, s_animation_header* anim);
 
     int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character);
 
@@ -78,10 +61,12 @@ namespace fonts {
 
     int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    inline void __cdecl Print_Display_(int16_t x, int16_t y, const char* text, int32_t flags) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525930});
-        fn(x, y, text, flags);
+    void __cdecl Print_Display_(int16_t x, int16_t y, const char* str, int16_t width);
+
+    inline void __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005260a0});
+        fn(x, y, str, process_colors, justified_width);
     }
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
@@ -90,11 +75,11 @@ namespace fonts {
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
-    inline uint16_t& _outline_color =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B148});
+    inline uint8_t& _outline_color =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B148});
 
-    inline uint16_t& _alias_outline_color =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B14C});
+    inline uint8_t& _alias_outline_color =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B14C});
 
     void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
 

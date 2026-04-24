@@ -16,6 +16,8 @@ namespace GENDRAW {
     inline uint8_t& _warning_box = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566068});
     inline int16_t& _message_box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056603C});
     inline uint8_t*& _box_bitmap = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00566040});
+    inline int16_t& _animation_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056606C});
+    inline int16_t& _direction = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566074});
     inline int16_t& _first_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566064});
     inline uint8_t* (&_image_seg)[3] = *reinterpret_cast<uint8_t*(*)[3]>(std::uintptr_t{0x00566078});
 
@@ -34,10 +36,7 @@ namespace GENDRAW {
         reinterpret_cast<Fn>(std::uintptr_t{0x00479e60})(x, y, width, str);
     }
 
-    inline void __cdecl Draw_Animating_Message_Box_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00479ba0})();
-    }
+    void __cdecl Draw_Animating_Message_Box_();
 
     inline void __cdecl Message_Box_Cleanup_() {
         using Fn = void(__cdecl*)();

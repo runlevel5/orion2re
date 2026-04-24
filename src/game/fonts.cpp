@@ -88,6 +88,30 @@ namespace fonts {
         _alias_outline_color = alias_color;
     }
 
+    void __cdecl Set_Remap_Font_Style_(int font_idx, s_colors* colors) {
+        _current_font_style = static_cast<int16_t>(font_idx);
+
+        for (int i = 0; i < 8; i++) {
+            uint8_t color = remap::_picture_remap_color_list[colors->colors[i]];
+            _font_header.normal_colors.colors[i] = color;
+            _font_header.selected_colors.colors[i] = color;
+            _current_font_color_array.colors[i] = color;
+        }
+
+        _font_header.current_height = static_cast<uint16_t>(_font_header.font_heights[font_idx]);
+        _font_header.font_style_height = _font_header.font_heights[font_idx];
+        _font_header.font_style = 0;
+        _font_header.leading_offset = static_cast<uint16_t>(_font_header.leading_extra[font_idx]);
+        _font_header.font_style_spacing = _font_header.font_spacing[font_idx];
+        _font_header.line_height = _font_header.font_style_height + _font_header.leading_offset;
+
+        // Potential bug: The loop only copies 255 characters, skipping index 255.
+        for (int i = 0; i < 255; i++) {
+            _font_header.font_style_widths[i] = static_cast<char>(_font_header.font_glyph_widths[font_idx][i]);
+            _font_header.font_style_offsets[i] = _font_header.font_glyph_offsets[font_idx][i];
+        }
+    }
+
     void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors) {
         _current_font_style = static_cast<uint16_t>(font_style);
 
@@ -252,10 +276,10 @@ namespace fonts {
 
         uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
 
-        Print_Character_No_Alias_ASM_(
+        fontdraw::Print_Character_No_Alias_ASM_(
             dest_ptr, 
             glyph_ptr, 
-            &_font_header, 
+            _font_header.selected_colors.colors, 
             static_cast<int>(_font_header.current_height)
         );
 
@@ -372,6 +396,121 @@ namespace fonts {
         Print_Display_To_Bitmap_(x, y, text, 0, (s_animation_header*)bitmap);
     }
 
+    void __cdecl Print_Display_(int16_t x, int16_t y, const char* str, int16_t width) {
+        int32_t offset = 0;
+
+        if (_font_header.font_style != 0) {
+            for (int i = 1; i < 8; ++i) {
+                _font_header.selected_colors.colors[i] = _outline_color;
+            }
+            _font_header.selected_colors.colors[0] = _alias_outline_color;
+            _draw_alias_flag = 1;
+
+            if (_font_header.font_style == 3 || _font_header.font_style == 5) {
+                offset = 2;
+            } else {
+                offset = 1;
+            }
+
+            if (_font_header.font_style != 2) {
+                if (animate::_clipping_flag == 1) {
+                    Print_String_Clipped_(x + 1, y + 1, str, 0, width);
+                    Print_String_Clipped_(x, y + 1, str, 0, width);
+                    Print_String_Clipped_(x + 1, y, str, 0, width);
+                } else {
+                    Print_String_(x + 1, y + 1, str, 0, width);
+                    Print_String_(x, y + 1, str, 0, width);
+                    Print_String_(x + 1, y, str, 0, width);
+                }
+            }
+
+            if (_font_header.font_style != 1 && _font_header.font_style != 3) {
+                if (animate::_clipping_flag == 1) {
+                    Print_String_Clipped_(x - 1, y, str, 0, width);
+                    Print_String_Clipped_(x - 1, y - 1, str, 0, width);
+                    Print_String_Clipped_(x, y - 1, str, 0, width);
+                } else {
+                    Print_String_(x - 1, y, str, 0, width);
+                    Print_String_(x - 1, y - 1, str, 0, width);
+                    Print_String_(x, y - 1, str, 0, width);
+                }
+            }
+
+            if (_font_header.font_style == 3 || _font_header.font_style == 5) {
+                if (animate::_clipping_flag == 1) {
+                    Print_String_Clipped_(x + 2, y + 2, str, 0, width);
+                    Print_String_Clipped_(x + 1, y + 2, str, 0, width);
+                    Print_String_Clipped_(x + 2, y + 1, str, 0, width);
+                } else {
+                    Print_String_(x + 2, y + 2, str, 0, width);
+                    Print_String_(x + 1, y + 2, str, 0, width);
+                    Print_String_(x + 2, y + 1, str, 0, width);
+                }
+            }
+
+            if (_font_header.font_style > 3) {
+                if (animate::_clipping_flag == 1) {
+                    Print_String_Clipped_(x + 1, y - 1, str, 0, width);
+                    Print_String_Clipped_(x - 1, y + 1, str, 0, width);
+                } else {
+                    Print_String_(x + 1, y - 1, str, 0, width);
+                    Print_String_(x - 1, y + 1, str, 0, width);
+                }
+            }
+
+            if (_font_header.font_style == 5) {
+                if (animate::_clipping_flag == 1) {
+                    Print_String_Clipped_(x + 2, y, str, 0, width);
+                    Print_String_Clipped_(x, y + 2, str, 0, width);
+                } else {
+                    Print_String_(x + 2, y, str, 0, width);
+                    Print_String_(x, y + 2, str, 0, width);
+                }
+            }
+
+            for (int i = 0; i < 8; ++i) {
+                _font_header.selected_colors.colors[i] = _font_header.normal_colors.colors[i];
+            }
+        }
+
+        _draw_alias_flag = 0;
+
+        if (animate::_clipping_flag == 1) {
+            Print_String_Clipped_(x, y, str, 1, width);
+        } else {
+            Print_String_(x, y, str, 1, width);
+        }
+
+        int32_t x_start = x - (int16_t)offset;
+        int32_t y_start = y - (int16_t)offset;
+
+        int32_t w_val = width;
+        if (w_val == 0) {
+            w_val = Get_String_Width_(str);
+        }
+
+        int32_t x_end = x + w_val + (int16_t)offset;
+        int32_t y_end = y + _font_header.font_style_height + (int16_t)offset;
+
+        if (x_start < 0) {
+            x_start = 0;
+        }
+        if (y_start < 0) {
+            y_start = 0;
+        }
+
+        if (x_end >= g_screen_res_x) {
+            x_end = g_screen_res_x - 1;
+        }
+        if (y_end >= g_screen_res_y) {
+            y_end = g_screen_res_y - 1;
+        }
+
+        if (video::screen_refresh_flag >= 2) {
+            setvesa::Add_Square_To_Scan_List_(x_start, y_start, x_end, y_end);
+        }
+    }
+
     void __cdecl Print_(int16_t x, int16_t y, const char* text) {
         Print_Display_(x, y, text, 0);
     }
@@ -431,6 +570,13 @@ namespace fonts {
         }
     }
 
+    void __cdecl Print_Integer_(int16_t x, int16_t y, int32_t value) {
+        char buffer[12];
+
+        __itoa(value, buffer, 10);
+        Print_(x, y, buffer);
+    }
+
     void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int32_t value) {
         char buffer[12];
         __itoa(value, buffer, 10);
@@ -465,6 +611,31 @@ namespace fonts {
         Disp_PSTR_(x, y, str);
     }
 
+    void __cdecl Load_Font_File_(char* filename) {
+        uint8_t* blob;
+
+        if (_current_font_blob == nullptr) {
+            blob = farload::Farload_(filename, 0);
+            _palette_block = allocate::Allocate_Space_(0x3164);
+        } else {
+            _free(_current_font_blob);
+            _current_font_blob = nullptr;
+            blob = farload::Farload_(filename, 0);
+        }
+
+        _current_font_blob = blob;
+
+        struct_::Copy_Structure_(video::_glass_colors, blob, 0x40);
+        blob += 0x40;
+
+        struct_::Copy_Structure_(&_font_header, blob, 0x235C);
+        blob += 0x235C;
+
+        _font_data = blob;
+
+        strcpy(_font_name, filename);
+    }
+
     void __cdecl Disp_PSTR_(int x, int y, const char* format, ...) {
         HDC hdc;
         char buffer[100];
@@ -488,6 +659,58 @@ namespace fonts {
             platform::g_primary_surface->ReleaseDC(hdc);
 
             setvesa::Add_Square_To_Scan_List_(x, y, x + size.cx, y + size.cy);
+        }
+    }
+
+    void __cdecl Print_Clipped_Letter_To_Bitmap_(int16_t x, int16_t y, char letter, int16_t clip_x, int16_t clip_width, int16_t clip_y, uint16_t clip_height, s_animation_header* anim) {
+        animate::_animation_header = anim;
+
+        int16_t current_frame = anim->current_frame;
+        int16_t width = anim->width;
+        int32_t dest_offset = x + y * width - clip_x;
+
+        // BUG: letter is explicitly sign-extended, which may result in a negative array index for characters >= 128
+        int16_t font_offset = static_cast<int16_t>(_font_header.font_style_offsets[static_cast<int8_t>(letter)]);
+
+        if (static_cast<int16_t>(_font_header.current_height) < static_cast<int16_t>(clip_height)) {
+            clip_height = _font_header.current_height;
+        }
+
+        for (int16_t i = 0; i < clip_y; i++) {
+            while (_font_data[font_offset] != 0x80) {
+                font_offset++;
+            }
+            font_offset++;
+        }
+
+        int16_t rows = clip_height - clip_y;
+
+        if (rows > 0) {
+            uint8_t* frame_ptr = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[current_frame];
+            do {
+                int32_t dest_clip_start = clip_x + dest_offset;
+                int32_t dest_clip_end = dest_clip_start + clip_width;
+
+                uint8_t data = _font_data[font_offset];
+                if (data != 0x80) {
+                    int32_t current_dest_offset = dest_offset;
+                    do {
+                        if (data <= 0x80) {
+                            if (data != 0 && dest_clip_start <= current_dest_offset && current_dest_offset < dest_clip_end) {
+                                frame_ptr[current_dest_offset] = (&_palette_block__unk)[data];
+                            }
+                            current_dest_offset++;
+                        } else {
+                            current_dest_offset += (data & 0x7F);
+                        }
+                        font_offset++;
+                        data = _font_data[font_offset];
+                    } while (data != 0x80);
+                }
+                font_offset++;
+                dest_offset += width;
+                rows--;
+            } while (rows != 0);
         }
     }
 }

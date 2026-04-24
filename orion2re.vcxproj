@@ -95,6 +95,7 @@
     <ClCompile Include="src\game\flt1.cpp" />
     <ClCompile Include="src\game\flt2.cpp" />
     <ClCompile Include="src\game\fmtpara.cpp" />
+    <ClCompile Include="src\game\fontdraw.cpp" />
     <ClCompile Include="src\game\fonts.cpp" />
     <ClCompile Include="src\game\gendraw.cpp" />
     <ClCompile Include="src\game\geo.cpp" />
@@ -277,11 +278,13 @@
     <ClInclude Include="src\game\filedef.h" />
     <ClInclude Include="src\game\file_ani.h" />
     <ClInclude Include="src\game\firepts.h" />
+    <ClInclude Include="src\game\flcqueue.h" />
     <ClInclude Include="src\game\fleetpop.h" />
     <ClInclude Include="src\game\flt.h" />
     <ClInclude Include="src\game\flt1.h" />
     <ClInclude Include="src\game\flt2.h" />
     <ClInclude Include="src\game\fmtpara.h" />
+    <ClInclude Include="src\game\fontdraw.h" />
     <ClInclude Include="src\game\fonts.h" />
     <ClInclude Include="src\game\gendraw.h" />
     <ClInclude Include="src\game\geo.h" />
@@ -374,6 +377,7 @@
     <ClInclude Include="src\game\strings.h" />
     <ClInclude Include="src\game\struct.h" />
     <ClInclude Include="src\game\swap.h" />
+    <ClInclude Include="src\game\switchd_0045bee9.h" />
     <ClInclude Include="src\game\sys.h" />
     <ClInclude Include="src\game\sysfont.h" />
     <ClInclude Include="src\game\s_billtext.h" />

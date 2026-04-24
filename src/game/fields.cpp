@@ -20,6 +20,10 @@ namespace fields {
         _auto_active_flag = 0;
     }
 
+    void __cdecl Activate_Auto_Function_() {
+        _auto_active_flag = 1;
+    }
+
     int16_t __cdecl Auto_Input_() {
         return _auto_input_variable;
     }
@@ -55,6 +59,15 @@ namespace fields {
                 fn();
             }
         }
+    }
+
+    void __cdecl Save_Auto_Function_() {
+        _function2 = _function;
+    }
+
+    void __cdecl Restore_Auto_Function_() {
+        _auto_active_flag = 1;
+        _function = _function2;
     }
 
     void __cdecl Set_Input_Delay_(uint16_t delay) {
@@ -602,5 +615,9 @@ namespace fields {
         _fields_count++;
 
         return _fields_count - 1;
+    }
+
+    void __cdecl Enable_Mouse_Wait_() {
+        _mouse_auto_exit = 0;
     }
 }

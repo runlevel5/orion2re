@@ -734,6 +734,9 @@ inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const ch
 inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"
 inline const char* s_Settings_file_error_00556950 = reinterpret_cast<const char*>(std::uintptr_t{0x00556950}); // "Settings file (MOX.SET) is missing..."
 
+inline int16_t (&_weapon_replacement_screen_help_list)[12][10] =
+    *reinterpret_cast<int16_t(*)[12][10]>(std::uintptr_t{0x005648D8});
+
 inline const char* s_Antares_00551288 = reinterpret_cast<const char*>(std::uintptr_t{0x00551288});
 inline const char* s_cmbtplnt_lbx_00551278 = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
 inline const char* const s_cmbtplnt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00551278});
@@ -784,6 +787,8 @@ inline const char* const s_Memory_Corruption_val_00558028 =
 
 inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"
+
+inline const char* s_Too_many_frames_for_multi_file_a_0055b83c = reinterpret_cast<const char*>(std::uintptr_t{0x0055B83C}); /* "Too many frames for multi file animation" */
 
 inline const char* s_Refresh_Mask_can_t_be_drawn_0055b10c = reinterpret_cast<const char*>(std::uintptr_t{0x0055B10C}); // "Refresh Mask can't be drawn"
 

@@ -233,4 +233,246 @@ namespace file_ani {
 
         return init::_io_buffer->frame_count - 1;
     }
+
+    void __cdecl Set_File_Animation_Frame_(int16_t frame_index) {
+        _file_animation_header = reinterpret_cast<uint8_t*>(init::_io_buffer);
+
+        int16_t max_frames = init::_io_buffer->frame_count;
+        if (frame_index >= max_frames) {
+            frame_index = max_frames - 1;
+        }
+
+        init::_io_buffer->current_frame = frame_index;
+    }
+
+    void __cdecl Open_Multi_File_Animation_(const char* filename, int16_t file_index, int16_t animation_slot) {
+        if (animation_slot >= 3) {
+            exitm::Exit_With_Message("Max 3 file animations");
+        }
+
+        int32_t slot = animation_slot;
+        _file_lbx_header = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(init::_io_buffer) + slot * 0xAAA);
+
+        if (file_index < 0) {
+            farload::Error_Handler_(filename, 4, file_index);
+        }
+
+        if (_file_animation_opened_flag[slot] == 1) {
+            _fclose(_file_animation[slot]);
+        }
+
+        _file_animation[slot] = _fopen(filename, "rb");
+
+        if (_file_animation[slot] == nullptr) {
+            if (farload::_secondary_drive_path[0] == '\0') {
+                farload::Error_Handler_(filename, 1, file_index);
+            }
+
+            char local_3c[60];
+            _sprintf(local_3c, "%s%s", farload::_secondary_drive_path, filename);
+
+            _file_animation[slot] = _fopen(local_3c, "rb");
+
+            if (_file_animation[slot] == nullptr) {
+                farload::Error_Handler_(local_3c, 1, file_index);
+            }
+        }
+
+        _file_animation_opened_flag[slot] = 1;
+
+        _fread(_file_lbx_header, 0x804, 1, _file_animation[slot]);
+
+        uint16_t* header16 = reinterpret_cast<uint16_t*>(_file_lbx_header);
+        if (header16[1] != 0xFEAD) {
+            farload::Error_Handler_(filename, 7, file_index);
+        }
+
+        if (static_cast<int16_t>(header16[0]) <= file_index) {
+            farload::Error_Handler_(filename, 8, file_index);
+        }
+
+        uint32_t* header32 = reinterpret_cast<uint32_t*>(_file_lbx_header);
+        uint32_t start_offset = header32[file_index + 2];
+        uint32_t end_offset = header32[file_index + 3];
+
+        _file_animation_start_multi[slot] = start_offset;
+        _file_animation_end_multi[slot] = end_offset;
+        _file_animation_length_multi[slot] = end_offset - start_offset;
+
+        _fseek(_file_animation[slot], start_offset, 0);
+
+        _fread(_file_lbx_header, 0xAAA, 1, _file_animation[slot]);
+    }
+
+    void __cdecl Draw_Multi_File_Animation_Stencil_(int16_t anim_idx) {
+        animate::_animation_header = reinterpret_cast<s_animation_header*>(
+            reinterpret_cast<uint8_t*>(init::_io_buffer) + anim_idx * 2730
+        );
+
+        if (animate::_animation_header->frame_count >= 678) {
+            exitm::Exit_With_Message(s_Too_many_frames_for_multi_file_a);
+        }
+
+        if (animate::_animation_header->flags & 0x10) {
+            animate::Set_Animation_Palette_();
+        }
+
+        uint32_t start_multi = _file_animation_start_multi[anim_idx];
+        int16_t current_frame = animate::_animation_header->current_frame;
+        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame];
+        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame + 1];
+
+        uint32_t frame_size = next_frame_offset - frame_offset;
+        uint32_t read_offset = start_multi + frame_offset;
+
+        if (allocate::Get_Max_Block_Space_(_file_animation_buffer) < static_cast<int32_t>(frame_size)) {
+            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large);
+        }
+
+        _fseek(_file_animation[anim_idx], read_offset, 0);
+        _fread(_file_animation_buffer, frame_size, 1, _file_animation[anim_idx]);
+
+        if (video::screen_refresh_flag >= 2) {
+            setvesa::Add_Square_To_Scan_List_(
+                0, 
+                0, 
+                animate::_animation_header->width - 1, 
+                animate::_animation_header->height - 1
+            );
+        }
+
+        switch (animate::_animation_header->flags & 3) {
+            case 0:
+                animate::Draw_Animated_Sprite_Back_Diff_(0, 0, _file_animation_buffer);
+                break;
+            case 1:
+                exitm::Exit_With_Message(s_Differentail_File_Animation_Can_n_bitmap);
+                break;
+            case 2:
+                exitm::Exit_With_Message(s_Differentail_File_Animation_Can_n_masked);
+                break;
+            case 3:
+                exitm::Exit_With_Message(s_Refresh_Mask_can_t_be_drawn);
+                break;
+        }
+
+        animate::_animation_header->current_frame++;
+
+        if (animate::_animation_header->flags & 0x20) {
+            if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                if ((static_cast<int32_t>(static_cast<int8_t>(animate::_animation_header->loop_frame)) - animate::_animation_header->frame_count) == -1) {
+                    animate::_animation_header->current_frame = 0;
+                } else {
+                    animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+                }
+            }
+        } else {
+            if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                animate::_animation_header->current_frame = animate::_animation_header->frame_count - 1;
+            }
+        }
+    }
+
+    void __cdecl Draw_Multi_File_Animation_(int16_t anim_idx) {
+        animate::_animation_header = reinterpret_cast<s_animation_header*>(
+            reinterpret_cast<uint8_t*>(init::_io_buffer) + (anim_idx * 0xAAA)
+        );
+
+        if (animate::_animation_header->frame_count >= 0x2A6) {
+            exitm::Exit_With_Message(s_Too_many_frames_for_multi_file_a_0055b83c);
+        }
+
+        if ((animate::_animation_header->flags & 0x10) != 0) {
+            animate::Set_Animation_Palette_();
+        }
+
+        uint32_t start_offset = _file_animation_start_multi[anim_idx];
+        int16_t current_frame = animate::_animation_header->current_frame;
+
+        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame];
+        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame + 1];
+
+        uint32_t read_offset = start_offset + frame_offset;
+        uint32_t frame_size = next_frame_offset - frame_offset;
+
+        int32_t max_space = allocate::Get_Max_Block_Space_(_file_animation_buffer);
+        if (max_space < static_cast<int32_t>(frame_size)) {
+            exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large_0055b804);
+        }
+
+        uint8_t* sprite = _file_animation_buffer;
+        _fseek(_file_animation[anim_idx], read_offset, 0);
+        _fread(sprite, frame_size, 1, _file_animation[anim_idx]);
+
+        if (video::screen_refresh_flag >= 2) {
+            setvesa::Add_Square_To_Scan_List_(
+                0, 0,
+                animate::_animation_header->width - 1,
+                animate::_animation_header->height - 1
+            );
+        }
+
+        uint8_t mode = animate::_animation_header->flags & 3;
+        switch (mode) {
+        case 0:
+            draw::Draw_Animated_Sprite_(0, 0, sprite);
+            break;
+        case 1:
+            draw::Draw_Bitmap_Sprite_(0, 0, sprite);
+            break;
+        case 2:
+            if (video::_copy_to_on_page_flag != 1) {
+                animate::Draw_Screen_Background_Off_(sprite);
+            }
+            if (video::screen_refresh_flag >= 2) {
+                setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
+            }
+            break;
+        case 3:
+            exitm::Exit_With_Message(s_Refresh_Mask_can_t_be_drawn_0055b10c);
+            break;
+        }
+
+        animate::_animation_header->current_frame++;
+
+        if ((animate::_animation_header->flags & 0x20) != 0) {
+            if (animate::_animation_header->frame_count <= animate::_animation_header->current_frame) {
+                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+            }
+        } else {
+            if (animate::_animation_header->frame_count <= animate::_animation_header->current_frame) {
+                animate::_animation_header->current_frame = static_cast<int16_t>(static_cast<int8_t>(animate::_animation_header->loop_frame));
+            }
+        }
+    }
+
+    int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t index) {
+        _file_animation_header = reinterpret_cast<uint8_t*>(init::_io_buffer) + index * 0xAAA;
+        return *reinterpret_cast<int16_t*>(_file_animation_header + 4);
+    }
+
+    void __cdecl Set_Multi_File_Animation_Frame_(int16_t anim_idx, int16_t frame) {
+        _file_animation_header = reinterpret_cast<uint8_t*>(init::_io_buffer) + anim_idx * 0xAAA;
+
+        int16_t max_frames = *reinterpret_cast<int16_t*>(_file_animation_header + 6);
+        if (max_frames <= frame) {
+            frame = max_frames - 1;
+        }
+
+        *reinterpret_cast<int16_t*>(_file_animation_header + 4) = frame;
+    }
+
+    void __cdecl Draw_Multi_File_Animation_Palette_(int32_t index) {
+        animate::_animation_header = reinterpret_cast<s_animation_header*>(
+            reinterpret_cast<uint8_t*>(init::_io_buffer) + index * 2730
+        );
+
+        if (animate::_animation_header->frame_count >= 678) {
+            exitm::Exit_With_Message(s_Too_many_frames_for_multi_file_a);
+        }
+
+        if ((animate::_animation_header->flags & 0x10) != 0) {
+            animate::Set_Animation_Palette_();
+        }
+    }
 }

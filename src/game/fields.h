@@ -10,8 +10,8 @@ namespace fields {
     inline int16_t& _active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B04C});
     inline int16_t& _cursor_position = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055b038});
     inline int16_t& _cursor_on = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055b03c});
-    inline uint16_t& _help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B05C});
-    inline uint16_t& _help_list_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B060});
+    inline int16_t& _help_list_active = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B05C});
+    inline int16_t& _help_list_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B060});
     inline int16_t& _multi_hotkey_active_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B064});
     inline uint16_t& _draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B078});
     inline const char* s_You_exceeded_the_max_number_of_fields = reinterpret_cast<const char*>(std::uintptr_t{0x0055B080});
@@ -32,6 +32,7 @@ namespace fields {
     inline s_colors (&_list_special_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572BD0});
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
+    inline void*& _function2 = *reinterpret_cast<void**>(std::uintptr_t{0x00572BFC});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
     inline uint8_t& _continuous_string = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
@@ -39,24 +40,13 @@ namespace fields {
     inline uint16_t& _mouse_cancel_disabled = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B018});
     inline uint16_t& _dynamic_field_refresh = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B074});
     inline uint16_t& _field_box_mode = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B044});
+    inline int16_t& _mouse_auto_exit = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B01C});
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
-    inline void __cdecl Save_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fed0});
-        fn();
-    }
+    void __cdecl Save_Auto_Function_();
     void __cdecl Deactivate_Auto_Function_();
-    inline void __cdecl Activate_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FF10});
-        fn();
-    }
-    inline void __cdecl Restore_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051fee0});
-        fn();
-    }
+    void __cdecl Activate_Auto_Function_();
+    void __cdecl Restore_Auto_Function_();
     void __cdecl Clear_Fields_();
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str);
@@ -65,11 +55,7 @@ namespace fields {
 
     int16_t __cdecl Get_Input_();
 
-    inline void __cdecl Enable_Mouse_Wait_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1A0});
-        fn();
-    }
+    void __cdecl Enable_Mouse_Wait_();
 
     inline int16_t __cdecl Interpret_Mouse_Input_() {
         using Fn = int16_t(__cdecl*)();

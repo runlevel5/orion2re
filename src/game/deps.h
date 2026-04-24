@@ -52,6 +52,7 @@
 #include "s_starname.h"
 #include "s_billtext.h"
 #include "fonts.h"
+#include "fontdraw.h"
 #include "jim.h"
 #include "ken.h"
 #include "russ.h"

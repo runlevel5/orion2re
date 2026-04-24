@@ -18,8 +18,18 @@ namespace file_ani {
     inline FILE*& _file_animation_fptr =
         *reinterpret_cast<FILE**>(std::uintptr_t{ 0x0057E0D4 });
 
+    inline uint32_t (&_file_animation_opened_flag)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0055B7F8});
+
+    inline FILE* (&_file_animation)[3] = *reinterpret_cast<FILE*(*)[3]>(std::uintptr_t{0x0057E088});
+
+    inline uint32_t (&_file_animation_start_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0A0});
+
+    inline uint32_t (&_file_animation_end_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0D8});
+
     inline uint32_t*& _file_lbx_header =
         *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x0057E0E4 });
+
+    inline uint32_t (&_file_animation_length_multi)[3] = *reinterpret_cast<uint32_t(*)[3]>(std::uintptr_t{0x0057E0E8});
 
     inline uint32_t& _file_animation_start =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E0F4 });
@@ -28,7 +38,12 @@ namespace file_ani {
         *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x0057E080 });
 
     inline const char* s_File_Animation_Frame_Too_Large = reinterpret_cast<const char*>(0x0055B804);
+    inline const char* s_Refresh_Mask_can_t_be_drawn = reinterpret_cast<const char*>(std::uintptr_t{0x0055B10C});
     inline const char* s_Refresh_Mask_cant_be_drawn = reinterpret_cast<const char*>(0x0055B10C);
+
+    inline const char* s_Too_many_frames_for_multi_file_a = reinterpret_cast<const char*>(std::uintptr_t{0x0055B83C});
+    inline const char* s_Differentail_File_Animation_Can_n_masked = reinterpret_cast<const char*>(std::uintptr_t{0x0055B868});
+    inline const char* s_Differentail_File_Animation_Can_n_bitmap = reinterpret_cast<const char*>(std::uintptr_t{0x0055B898});
 
     inline const char* s_Differential_Error_868 = reinterpret_cast<const char*>(0x0055B868);
     inline const char* s_Differential_Error_898 = reinterpret_cast<const char*>(0x0055B898);
@@ -43,17 +58,9 @@ namespace file_ani {
 
     void __cdecl Open_File_Animation_(const char* filename, int16_t entry_index);
 
-    inline void __cdecl Open_Multi_File_Animation_(const char* lbx, int16_t flag, int16_t idx) {
-        using Fn = void(__cdecl*)(const char*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00530FD0});
-        fn(lbx, flag, idx);
-    }
+    void __cdecl Open_Multi_File_Animation_(const char* filename, int16_t file_index, int16_t animation_slot);
 
-    inline void __cdecl Set_File_Animation_Frame_(int32_t frame) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005316d0});
-        fn(frame);
-    }
+    void __cdecl Set_File_Animation_Frame_(int16_t frame_index);
 
     void __cdecl Draw_File_Animation_();
 
@@ -63,33 +70,13 @@ namespace file_ani {
 
     int16_t __cdecl Get_File_Animation_Total_Frames_();
 
-    inline void __cdecl Draw_Multi_File_Animation_(int16_t idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005311e0});
-        fn(idx);
-    }
+    void __cdecl Draw_Multi_File_Animation_(int16_t anim_idx);
 
-    inline void __cdecl Draw_Multi_File_Animation_Stencil_(int32_t anim_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005313A0});
-        fn(anim_idx);
-    }
+    void __cdecl Draw_Multi_File_Animation_Stencil_(int16_t anim_idx);
 
-    inline int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531750});
-        return fn(idx);
-    }
+    int16_t __cdecl Get_Multi_File_Animation_Frame_(int16_t index);
 
-    inline void __cdecl Set_Multi_File_Animation_Frame_(int16_t idx, int16_t frame) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531700});
-        fn(idx, frame);
-    }
+    void __cdecl Set_Multi_File_Animation_Frame_(int16_t anim_idx, int16_t frame);
 
-    inline void __cdecl Draw_Multi_File_Animation_Palette_(int32_t frame) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005317B0});
-        fn(frame);
-    }
+    void __cdecl Draw_Multi_File_Animation_Palette_(int32_t index);
 }

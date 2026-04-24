@@ -758,7 +758,7 @@ namespace council {
         Get_Player_Voted_Winner_Message_(player_idx);
 
         int16_t race_anim_id = (int16_t)((uint8_t)MOX::_player[player_idx].race + 0xB8);
-        file_ani::Open_Multi_File_Animation_(s_council_lbx, race_anim_id, 1);
+        file_ani::Open_Multi_File_Animation_((char*)s_council_lbx, race_anim_id, 1);
 
         bool exit_loop = false;
         while (!exit_loop) {

@@ -291,4 +291,10 @@ namespace OFFICER {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442690});
         fn(x, y, officer);
     }
+
+    inline void __cdecl Get_N_Skills_Per_Officer_Displayed_(int32_t* skills) {
+        using Fn = void(__cdecl*)(int32_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443ec0});
+        fn(skills);
+    }
 }

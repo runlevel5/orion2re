@@ -18,6 +18,24 @@ namespace GENDRAW {
         Message_Box_Exploding_((char*)text);
     }
 
+    void __cdecl Draw_Animating_Message_Box_() {
+        int16_t box_y = _message_box_y + 0x25;
+
+        animate::Set_Animation_Frame_((s_animation_header*)_image_seg[0], _animation_frame);
+
+        if (_animation_frame == 0) {
+            _direction = 1;
+        }
+        if (_animation_frame == 6) {
+            _direction = -1;
+        }
+
+        _animation_frame += _direction;
+
+        animate::Remap_Draw_(0x9A, _message_box_y, (s_animation_header*)_image_seg[0]);
+        animate::Draw_(0xD0, box_y, (s_animation_header*)_box_bitmap);
+    }
+
     void __cdecl Message_Box_Exploding_(char* str) {
         Message_Box_Startup_();
 
