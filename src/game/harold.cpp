@@ -1240,7 +1240,7 @@ namespace HAROLD {
         case 1:
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            result = GENDRAW::Warning_Box2_(message);
+            result = GENDRAW::Confirmation_Box_(message);
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
             break;
@@ -1257,7 +1257,7 @@ namespace HAROLD {
         case 3:
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            GENDRAW::Draw_Warning_Box_(message);
+            GENDRAW::Warning_Box_(message);
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
             break;

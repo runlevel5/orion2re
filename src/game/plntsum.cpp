@@ -181,7 +181,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         
         _sprintf(msg_buffer, HAROLD::H_Message_(0x134 /* HESTR_134_YOU_ALREADY_HAVE_ONE_C */), &MOX::_star[target_star_idx]);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
-        should_continue = (GENDRAW::Warning_Box_(msg_buffer) != 0);
+        should_continue = (GENDRAW::Confirmation_Box_(msg_buffer) != 0);
         PLNTSUM::_screen->refresh_fields = true;
         if (!should_continue) {
             return;
@@ -214,7 +214,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         }
 
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
-        should_continue = (GENDRAW::Warning_Box_(msg_buffer) != 0);
+        should_continue = (GENDRAW::Confirmation_Box_(msg_buffer) != 0);
         PLNTSUM::_screen->refresh_fields = true;
     }
 
@@ -233,7 +233,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         
         if (move_info.moving == 0) {
             if (move_info.hyperspace_flux != 0) {
-                GENDRAW::Draw_Warning_Box_(HAROLD::H_Message_(0x13F /* HESTR_13F_SHIP_MOVEMENT_IS_NOT_A */));
+                GENDRAW::Warning_Box_(HAROLD::H_Message_(0x13F /* HESTR_13F_SHIP_MOVEMENT_IS_NOT_A */));
                 PLNTSUM::_screen->refresh_fields = true;
             }
         } else {
@@ -245,7 +245,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 
                 int16_t msg_id = (PLNTSUM::_send_choice == 0) ? 0x13C /* HESTR_13C_S_IS_GUARDED_BY_A_S_DO */ : 0x13B /* HESTR_13B_S_IS_GUARDED_BY_A_S_DO */;
                 _sprintf(msg_buffer, HAROLD::H_Message_(msg_id), &MOX::_star[target_star_idx], race_name_buffer);
-                user_confirmed_move = (GENDRAW::Warning_Box_(msg_buffer) != 0);
+                user_confirmed_move = (GENDRAW::Confirmation_Box_(msg_buffer) != 0);
             }
 
             if (user_confirmed_move) {
@@ -1458,7 +1458,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
                 strcpy(buffer1, msg);
                 char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
                 _sprintf(buffer2, buffer1, planet_name);
-                GENDRAW::Warning_Box_004796E0(buffer2);
+                GENDRAW::Warning_Box_(buffer2);
             }
             found = true;
         }
@@ -1493,7 +1493,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
 
             _sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
 
-            if (GENDRAW::Warning_Box_(buffer2)) {
+            if (GENDRAW::Confirmation_Box_(buffer2)) {
                 SHIPMOVE::Make_Ships_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
                 PLNTSUM::Update_Ship_Etas_();
                 SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
@@ -1963,7 +1963,7 @@ void Planet_Summary_Screen_() {
                     s_star_data *p_star = &MOX::_star[i];
                     const char *msg_fmt = HAROLD::H_Message_(0x14f /* HESTR_14F_NO_PLANETS_IN_THE_S_ST */);
                     _sprintf(warning_msg, msg_fmt, p_star);
-                    GENDRAW::Draw_Warning_Box_(warning_msg);
+                    GENDRAW::Warning_Box_(warning_msg);
                 } else {
                     MOX::_scroll_bar->first_visible_row = row;
                     MOX::_scroll_bar->thumb_center_y = ((-407 / (int)MOX::_scroll_bar->total_rows) - 1) * MOX::_scroll_bar->first_visible_row + 407;
@@ -1981,7 +1981,7 @@ void Planet_Summary_Screen_() {
         if (input_id == _screen->buttons[8] && _draw_colony_button_status != 0) {
             if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
                 const char *flux_msg = HAROLD::H_Message_(0x13f);
-                GENDRAW::Draw_Warning_Box_(flux_msg);
+                GENDRAW::Warning_Box_(flux_msg);
                 _draw_colony_button_status = 1;
                 _send_choice = -1;
             } else {
@@ -1999,7 +1999,7 @@ void Planet_Summary_Screen_() {
         if (input_id == _screen->buttons[9] && _draw_outpost_button_status != 0) {
             if (EVENTS::Event_Check_Hyperspace_Flux_() != 0) {
                 const char *flux_msg = HAROLD::H_Message_(0x13f);
-                GENDRAW::Draw_Warning_Box_(flux_msg);
+                GENDRAW::Warning_Box_(flux_msg);
                 _draw_outpost_button_status = 1;
                 _send_choice = -1;
             } else {

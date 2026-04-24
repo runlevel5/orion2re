@@ -860,7 +860,7 @@ namespace RACESCRN {
                             }
                             strcpy(message_buffer, _declare_war_buffer);
                             JIM::Decode_Text_Race_(message_buffer, target_player_idx, 120);
-                            if (GENDRAW::Warning_Box2_(message_buffer) == 1) {
+                            if (GENDRAW::Confirmation_Box_(message_buffer) == 1) {
                                 MOX::_player[MOX::_PLAYER_NUM].delayed_diplomacy_orders[target_player_idx] = 0;
                             }
                             break;

@@ -1271,7 +1271,7 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
 
         if (treaty_count != 0) {
             _sprintf(dest_ptr, _really_risk_war_msg);
-            confirmed = (int8_t)GENDRAW::Warning_Box_(message_buffer);
+            confirmed = (int8_t)GENDRAW::Confirmation_Box_(message_buffer);
 
             if (confirmed != 0) {
                 (*_attack_confirmed)[player_idx][target_idx] = 1;

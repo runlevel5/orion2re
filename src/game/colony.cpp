@@ -1436,7 +1436,7 @@ namespace COLONY {
 
                     _sprintf(local_buffer, fmt, bld_name, scrap_value);
 
-                    if (GENDRAW::Warning_Box_(local_buffer) != 0) {
+                    if (GENDRAW::Confirmation_Box_(local_buffer) != 0) {
                         MOX::_colony[_colony_handle].last_turn_building_destroyed = (short)MOX::_stardate;
                         ERICNET::Remove_Building_(static_cast<int16_t>(_colony_handle), building_idx);
                         Remove_Satellite_From_Array_(building_idx);
@@ -1806,7 +1806,7 @@ namespace COLONY {
                     int32_t refund_val = TECHDATA::_buildings[bldg_id].cost / 2;
                     _sprintf(buffer, ESTRINGS::E_Strings_(0x107), CR_Building_Name_((int16_t)bldg_id), refund_val);
                     
-                    if (GENDRAW::Warning_Box_(buffer)) {
+                    if (GENDRAW::Confirmation_Box_(buffer)) {
                         col_ref.last_turn_building_destroyed = (int16_t)MOX::_stardate;
                         Turn_To_Rubble_CR_Bldg_((int16_t)bldg_id);
                         ERICNET::Remove_Building_((int16_t)_colony_handle, (int16_t)bldg_id);

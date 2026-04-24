@@ -472,7 +472,7 @@ namespace MAINPUPS {
         }
 
         ERICHELP::Set_Player_Attacked_Popup_Help_List_();
-        GENDRAW::Message_Box_Exploding_(formatted_msg, star_idx);
+        GENDRAW::Message_Box_Exploding_Star_(formatted_msg, star_idx);
         fields::Deactivate_Help_List_();
         fields::Deactivate_Auto_Function_();
         MOX2::Put_Auto_Function_(&_eric_saved_autofunction);
@@ -2514,7 +2514,7 @@ namespace MAINPUPS {
         char* format_pop = ESTRINGS::E_Strings_(0x6E); /* 110 */
         _sprintf(msg_ptr, format_pop, ESTRINGS::s_0_0055110c, ESTRINGS::s_1_00551110, (int)max_pop);
 
-        int8_t result = GENDRAW::Warning_Box2_(msg_buffer);
+        int8_t result = GENDRAW::Confirmation_Box_(msg_buffer);
         fields::Deactivate_Help_List_();
 
         return result;

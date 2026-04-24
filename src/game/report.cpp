@@ -176,7 +176,7 @@ namespace REPORT {
                                     } else if (MOX::_planet[planet_idx].colony_index == -1) {
                                         char msg[200];
                                         _sprintf(msg, _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
-                                        if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                        if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                             planet_idx = -1;
                                         } else {
                                             if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
@@ -198,7 +198,7 @@ namespace REPORT {
                                             auto_colonized = true;
                                             char msg[200];
                                             _sprintf(msg, _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
-                                            if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                            if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                                 planet_idx = -1;
                                             } else {
                                                 if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
@@ -218,7 +218,7 @@ namespace REPORT {
                                         int refund = TECHDATA::_buildings[11].cost / 2;
                                         char msg[200];
                                         _sprintf(msg, _really_trash_colony_base_fmt, refund);
-                                        if (GENDRAW::Warning_Box2_(msg) == 0) {
+                                        if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                             planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, colony_base == nullptr);
                                         } else {
                                             do {

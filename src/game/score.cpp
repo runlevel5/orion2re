@@ -146,7 +146,7 @@ namespace SCORE {
         if (rank_index > -1) {
             if (MOX::_player[player_idx].cheated != 0) {
                 MISC::Get_LBX_Message_(0x17, buffer);
-                GENDRAW::Draw_Warning_Box_(buffer);
+                GENDRAW::Warning_Box_(buffer);
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 cheated = true;
                 rank_index = -1;
@@ -156,7 +156,7 @@ namespace SCORE {
                 } else {
                     _sprintf(buffer, HAROLD::H_Message_(0x28), MOX::_player[player_idx].name);
                 }
-                GENDRAW::Draw_Warning_Box_(buffer);
+                GENDRAW::Warning_Box_(buffer);
             }
 
             if (!cheated) {

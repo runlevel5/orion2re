@@ -743,7 +743,7 @@ namespace COLONY {
                 _sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
                     actual_buy_cost, prod_remaining);
 
-                if (GENDRAW::Warning_Box_(buf) != 0) {
+                if (GENDRAW::Confirmation_Box_(buf) != 0) {
                     COLCALC::Colony_Buy_Outright_(colony_idx);
                 }
                 COLONY::Col_Calc_Wrapper_(colony_idx);

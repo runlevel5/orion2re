@@ -363,7 +363,7 @@ namespace COMBAT1 {
                                         } else {
                                             KEN::Ken_Get_Text_Message_(57, buf, 80);
                                             palette::Refresh_Palette_();
-                                            if (GENDRAW::Warning_Box_(buf) != 0) {
+                                            if (GENDRAW::Confirmation_Box_(buf) != 0) {
                                                 MOX::_order_info_flag = 1 - MOX::_order_info_flag;
                                                 CMBTDRW1::Move_Options_Background_();
                                                 if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
@@ -599,7 +599,7 @@ namespace COMBAT1 {
                                                         KEN::Ken_Get_Text_Message_(61, buf, 80);
                                                         palette::Set_Palette_Gradient_(144, 32, 0, 0, 0, 0, 0, 0);
                                                         palette::Refresh_Palette_();
-                                                        if (GENDRAW::Warning_Box_(buf) != 0) {
+                                                        if (GENDRAW::Confirmation_Box_(buf) != 0) {
                                                             if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
                                                                 Send_Tactical_Combat_Message_(MOX::_net_destination, 10013, tgt_idx, 0, 0);
                                                             }
@@ -1673,7 +1673,7 @@ namespace COMBAT1 {
                         can_board = false;
                         KEN::Ken_Get_Text_Message_(0x45, msg_buffer, 0x50);
                         palette::Refresh_Palette_();
-                        GENDRAW::Draw_Warning_Box_(msg_buffer);
+                        GENDRAW::Warning_Box_(msg_buffer);
                         CMBTDRW1::Refresh_Combat_Screen_Full_();
                     }
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(static_cast<int16_t>(defender_idx), 0xD /* SPEC_WARP_DISSIPATOR */) != 0) {
@@ -1688,7 +1688,7 @@ namespace COMBAT1 {
             if (msg_idx != 0) {
                 KEN::Ken_Get_Text_Message_(static_cast<int16_t>(msg_idx), msg_buffer, 0x50);
                 palette::Refresh_Palette_();
-                GENDRAW::Draw_Warning_Box_(msg_buffer);
+                GENDRAW::Warning_Box_(msg_buffer);
                 CMBTDRW1::Refresh_Combat_Screen_Full_();
             }
         } else {

@@ -173,13 +173,13 @@ namespace DESBOX {
                                         const char* article_excl = MISC::Is_Vowel_(name_excl[0]) ? s_an : s_a;
                                         _sprintf(msg42, msg43_base, article_excl, name_excl, article_item, name_item);
                                     }
-                                    GENDRAW::Draw_Warning_Box_(msg42);
+                                    GENDRAW::Warning_Box_(msg42);
                                     redraw_warning = 1;
                                 }
                             } else {
                                 MISC::Get_LBX_Message_(0x41, msg41);
                                 _sprintf(msg42, msg41, TECHDATA::_specials[MOX::_design_choice_items[item_idx]].name);
-                                GENDRAW::Draw_Warning_Box_(msg42);
+                                GENDRAW::Warning_Box_(msg42);
                                 redraw_warning = 1;
                             }
                         }

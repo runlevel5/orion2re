@@ -1604,9 +1604,9 @@ namespace OFFICER {
         int16_t result = -1;
 
         if (type == 1) {
-            result = GENDRAW::Warning_Box_(const_cast<char*>(message));
+            result = GENDRAW::Confirmation_Box_(const_cast<char*>(message));
         } else if (type == 3) {
-            GENDRAW::Draw_Warning_Box_(message);
+            GENDRAW::Warning_Box_(message);
         } else if (type == 5) {
             int8_t duration = static_cast<int8_t>(MOX::_global_var & 0xFF);
             if (duration < 0) {

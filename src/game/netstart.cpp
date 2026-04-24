@@ -390,7 +390,7 @@ namespace NETSTART {
 
                 if (input != 0) {
                     if (netcode::Net_Get_Users_(nullptr) == 1) {
-                        input = GENDRAW::Warning_Box2_(_really_start_with_only_1_msg);
+                        input = GENDRAW::Confirmation_Box_(_really_start_with_only_1_msg);
                     }
                     if (input != 0) {
                         break;
@@ -752,7 +752,7 @@ namespace NETSTART {
                     if (netcode::Net_Get_Users_(nullptr) == connected_count) {
                         if (fields::Get_Input_() == MOX::_mp_screen->field_id_begin) {
                             if (NETMOX::_net.num_connected_players > connected_count) {
-                                payload[0] = GENDRAW::Warning_Box2_(_really_begin_game_with_unused_slots_msg);
+                                payload[0] = GENDRAW::Confirmation_Box_(_really_begin_game_with_unused_slots_msg);
                             } else {
                                 payload[0] = 1;
                             }

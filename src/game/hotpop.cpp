@@ -109,7 +109,7 @@ namespace HOTPOP {
 
             if (input == btn_accept) {
                 if (HOTPOP::_hotseat_human_players == 1) {
-                    if (GENDRAW::Warning_Box2_(HAROLD::H_Message_(162)) == 0) {
+                    if (GENDRAW::Confirmation_Box_(HAROLD::H_Message_(162)) == 0) {
                         video::Set_Page_Back_();
                         animate::Draw_(0, 0, _grid_background[0]);
                         video::Copy_Back_To_Off_();
@@ -131,7 +131,7 @@ namespace HOTPOP {
                             (MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players), 
                             msg_player_singular);
 
-                    if (GENDRAW::Warning_Box2_(warning_buf) == 0) {
+                    if (GENDRAW::Confirmation_Box_(warning_buf) == 0) {
                         video::Set_Page_Back_();
                         animate::Draw_(0, 0, _grid_background[0]);
                         video::Copy_Back_To_Off_();

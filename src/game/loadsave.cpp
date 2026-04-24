@@ -88,13 +88,13 @@ namespace LOADSAVE {
         } else if (type == 1) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            result = GENDRAW::Warning_Box_(message);
+            result = GENDRAW::Confirmation_Box_(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
         } else if (type == 3) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            GENDRAW::Warning_Box_004796E0(message);
+            GENDRAW::Warning_Box_(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
         }

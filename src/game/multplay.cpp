@@ -294,7 +294,7 @@ namespace MULTPLAY {
 
     int16_t __cdecl Warning_Box_Has_Opponent_Pressed_() {
         const char* message = HAROLD::H_Message_(0x1c /* HESTR_01C_HAS_YOUR_OPPONENT_PRES */);
-        return GENDRAW::Warning_Box_(message);
+        return GENDRAW::Confirmation_Box_(message);
     }
 
     void __cdecl Multi_Player_Screen_() {
@@ -643,7 +643,7 @@ namespace MULTPLAY {
         result = Do_Get_Valid_MP_Save_Games_(valid_types_out);
         if (result == 0) {
             warning_msg = HAROLD::H_Message_(0xf4 /* HESTR_0F4_NO_MULTIPLAYER_SAVED_G */);
-            GENDRAW::Draw_Warning_Box_(warning_msg);
+            GENDRAW::Warning_Box_(warning_msg);
         }
 
         return result;
@@ -1212,7 +1212,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                     } else {
                         char* fmt = const_cast<char*>(HAROLD::H_Message_(0xFD /* HESTR_0FD_SAVE_D_IS_NOT_A_VALID_ */));
                         _sprintf(warning_msg, fmt, i);
-                        GENDRAW::Draw_Warning_Box_(warning_msg);
+                        GENDRAW::Warning_Box_(warning_msg);
                         result = -1;
                     }
                 }
@@ -1506,7 +1506,7 @@ void __cdecl Change_MP_Game_Name_() {
                 
                 if (strcmp(MOX::_settings.net_game_name, netcode::Net_Get_Game_Name_(i)) == 0) {
                     _sprintf(warning_msg, HAROLD::H_Message_(0xFF /* HESTR_0FF_S_IS_ALREADY_A_GAME_NA */), MOX::_settings.net_game_name);
-                    GENDRAW::Draw_Warning_Box_(warning_msg);
+                    GENDRAW::Warning_Box_(warning_msg);
                     already_exists = true;
                     is_valid = false;
                 }
@@ -2127,7 +2127,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
             if (is_host != 0 && MOX::_mp_screen->field_id_begin == input_field_id) {
                 char* msg = const_cast<char*>(HAROLD::H_Message_(0xF5 /* HESTR_0F5_READY_TO_START_A_NETWO */));
-                if (GENDRAW::Warning_Box2_(msg) != 0) {
+                if (GENDRAW::Confirmation_Box_(msg) != 0) {
                     result_status = 1;
                     exit_loop = true;
                 } else {

@@ -107,7 +107,7 @@ namespace raceopt {
                     
                     if (group == 1 && _option_toggle[9] == 1) {
                         KEN::Ken_Get_Text_Message_(73, acStack_12c, 120);
-                        GENDRAW::Draw_Warning_Box_(acStack_12c);
+                        GENDRAW::Warning_Box_(acStack_12c);
                         video::Set_Page_Back_();
                         Draw_Race_Option_Background_();
                         video::Copy_Back_To_Off_();
@@ -123,7 +123,7 @@ namespace raceopt {
                             int cost_idx = i + (-3 - i) / 4;
                             if (_ability_costs[cost_idx] + _negative_picks < -10) {
                                 KEN::Ken_Get_Text_Message_(74, acStack_12c, 80);
-                                GENDRAW::Draw_Warning_Box_(acStack_12c);
+                                GENDRAW::Warning_Box_(acStack_12c);
                                 video::Set_Page_Back_();
                                 Draw_Race_Option_Background_();
                                 video::Copy_Back_To_Off_();
@@ -157,7 +157,7 @@ namespace raceopt {
                         Calculate_EM_Picks_();
                         if (_negative_picks < -10) {
                             KEN::Ken_Get_Text_Message_(74, acStack_12c, 80);
-                            GENDRAW::Draw_Warning_Box_(acStack_12c);
+                            GENDRAW::Warning_Box_(acStack_12c);
                             video::Set_Page_Back_();
                             Draw_Race_Option_Background_();
                             video::Copy_Back_To_Off_();
@@ -185,7 +185,7 @@ namespace raceopt {
             if (_accept == input) {
                 if (_picks < 0) {
                     KEN::Ken_Get_Text_Message_(75, acStack_12c, 80);
-                    GENDRAW::Draw_Warning_Box_(acStack_12c);
+                    GENDRAW::Warning_Box_(acStack_12c);
                     video::Set_Page_Back_();
                     Draw_Race_Option_Background_();
                     video::Copy_Back_To_Off_();

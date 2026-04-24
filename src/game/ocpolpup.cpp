@@ -22,7 +22,7 @@ namespace OCPOLPUP {
         owner_index = MOX::_colony[colony_index].owner;
 
         if (MOX::_player[owner_index].traits[0] != 4 && MOX::_player[owner_index].traits[0] != 5) {
-            if (GENDRAW::Warning_Box2_(ESTRINGS::E_Strings_(0xB4)) != 0) {
+            if (GENDRAW::Confirmation_Box_(ESTRINGS::E_Strings_(0xB4)) != 0) {
                 _value = 0;
             } else {
                 _value = 3;
