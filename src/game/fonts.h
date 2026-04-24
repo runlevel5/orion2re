@@ -86,11 +86,7 @@ namespace fonts {
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
 
-    inline void __cdecl PSTRS_(int16_t x, int16_t y, const char* str) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533670});
-        fn(x, y, str);
-    }
+    void __cdecl PSTRS_(int16_t x, int16_t y, char* str);
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
@@ -102,19 +98,19 @@ namespace fonts {
 
     void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
 
-    inline void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* text, int32_t param_4, void* bitmap) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int32_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526630});
-        fn(x, y, text, param_4, bitmap);
+    inline const char* s_Print_only_works_on_bitmaps = reinterpret_cast<const char*>(0x0055B15C);
+
+    inline void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t flag, int16_t param_4, s_animation_header* bitmap) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005268C0});
+        fn(x, y, str, flag, param_4, bitmap);
     }
+
+    void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t param_4, s_animation_header* bitmap);
 
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap);
 
-    inline void __cdecl Print_Centered_To_Bitmap_(int16_t x, int16_t y, const char* text, s_animation_header* dest) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005265A0});
-        fn(x, y, text, dest);
-    }
+    void __cdecl Print_Centered_To_Bitmap_(int16_t x, int16_t y, const char* text, s_animation_header* dest);
 
     int16_t __cdecl Get_Current_Font_Style_();
 
@@ -128,23 +124,14 @@ namespace fonts {
 
     void __cdecl Print_Centered_(int16_t x, int16_t y, const char* str);
 
-    inline void __cdecl Print_Integer_Centered_(int x, int y, int value) {
-        using Fn = void(__cdecl*)(int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005258a0});
-        fn(x, y, value);
-    }
+    void __cdecl Print_Integer_Centered_(int16_t x, int16_t y, int32_t value);
      
     void __cdecl Print_Right_(int16_t x, int16_t y, const char* text);
 
     void __cdecl Print_Integer_Right_(int16_t x, int16_t y, int32_t value);
 
     void __cdecl Set_Font_Spacing_(int16_t spacing);
-
-    inline void __cdecl Set_Font_LF_(int16_t lf) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525710});
-        fn(lf);
-    }
+    void __cdecl Set_Font_LF_(uint16_t line_height);
 
     void __cdecl Set_Font_Spacing_Width_(int spacing_width);
 
@@ -156,9 +143,5 @@ namespace fonts {
 
     void __cdecl Set_Alias_Color_(uint8_t color);
 
-    inline void __cdecl Disp_PSTR_(int x, int y, const char* str) {
-        using Fn = void(__cdecl*)(int, int, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533690});
-        fn(x, y, str);
-    }
+    void __cdecl Disp_PSTR_(int x, int y, const char* format, ...);
 }

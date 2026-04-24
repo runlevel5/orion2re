@@ -293,7 +293,7 @@ namespace MULTPLAY {
     }
 
     int16_t __cdecl Warning_Box_Has_Opponent_Pressed_() {
-        const char* message = HAROLD::H_Message_(0x1c /* HESTR_01C_HAS_YOUR_OPPONENT_PRES */);
+        char* message = (char*)HAROLD::H_Message_(0x1c /* HESTR_01C_HAS_YOUR_OPPONENT_PRES */);
         return GENDRAW::Confirmation_Box_(message);
     }
 

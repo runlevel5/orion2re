@@ -73,6 +73,11 @@ namespace fonts {
         _font_header.font_style_spacing = spacing;
     }
 
+    void __cdecl Set_Font_LF_(uint16_t line_height) {
+        _font_header.line_height = line_height;
+        _font_header.font_style_height = _font_header.current_height + line_height;
+    }
+
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data) {
         Set_Font_Style_(static_cast<int32_t>(font_index), style_data);
         _font_header.font_style = 5;
@@ -261,6 +266,58 @@ namespace fonts {
         return updated_x;
     }
 
+    void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t param_4, s_animation_header* bitmap) {
+        animate::_animation_header = bitmap;
+
+        if ((bitmap->flags & 3) != 1) {
+            exitm::Exit_With_Message(s_Print_only_works_on_bitmaps);
+        }
+
+        if (_font_header.font_style != 0) {
+            _font_header.selected_colors.colors[0] = (uint8_t)_alias_outline_color;
+            _draw_alias_flag = 1;
+
+            for (int i = 1; i < 8; ++i) {
+                _font_header.selected_colors.colors[i] = (uint8_t)_outline_color;
+            }
+
+            if (_font_header.font_style != 2) {
+                Print_String_To_Bitmap_(x + 1, y + 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x, y + 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 1, y, str, 0, param_4, bitmap);
+            }
+
+            if (_font_header.font_style != 1 && _font_header.font_style != 3) {
+                Print_String_To_Bitmap_(x - 1, y, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x - 1, y - 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x, y - 1, str, 0, param_4, bitmap);
+            }
+
+            if (_font_header.font_style == 3 || _font_header.font_style == 5) {
+                Print_String_To_Bitmap_(x + 2, y + 2, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 1, y + 2, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x + 2, y + 1, str, 0, param_4, bitmap);
+            }
+
+            if (_font_header.font_style > 3) {
+                Print_String_To_Bitmap_(x + 1, y - 1, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x - 1, y + 1, str, 0, param_4, bitmap);
+            }
+
+            if (_font_header.font_style == 5) {
+                Print_String_To_Bitmap_(x + 2, y, str, 0, param_4, bitmap);
+                Print_String_To_Bitmap_(x, y + 2, str, 0, param_4, bitmap);
+            }
+
+            for (int i = 0; i < 8; ++i) {
+                _font_header.selected_colors.colors[i] = _font_header.normal_colors.colors[i];
+            }
+        }
+
+        _draw_alias_flag = 0;
+        Print_String_To_Bitmap_(x, y, str, 1, param_4, bitmap);
+    }
+
     void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg) {
         if ((uint8_t)ch > 128) {
             return;
@@ -312,7 +369,7 @@ namespace fonts {
     }
 
     void __cdecl Print_To_Bitmap_(int16_t x, int16_t y, const char* text, void* bitmap) {
-        Print_Display_To_Bitmap_(x, y, text, 0, bitmap);
+        Print_Display_To_Bitmap_(x, y, text, 0, (s_animation_header*)bitmap);
     }
 
     void __cdecl Print_(int16_t x, int16_t y, const char* text) {
@@ -380,6 +437,13 @@ namespace fonts {
         Print_Right_(x, y, buffer);
     }
 
+    void __cdecl Print_Integer_Centered_(int16_t x, int16_t y, int32_t value) {
+        char buffer[12];
+
+        __itoa(value, buffer, 10);
+        Print_Centered_(x, y, buffer);
+    }
+
     void __cdecl Set_Font_Spacing_Width_(int spacing_width) {
         // Sets the width of the space character (ASCII 32)
         _font_header.font_style_widths[32] = (char)spacing_width;
@@ -390,5 +454,40 @@ namespace fonts {
         _font_header.highlight_colors.colors[0] = static_cast<uint8_t>(color);
         _font_header.special_colors.colors[0] = static_cast<uint8_t>(color);
         _font_header.selected_colors.colors[0] = static_cast<uint8_t>(color);
+    }
+
+    void __cdecl Print_Centered_To_Bitmap_(int16_t x, int16_t y, const char* text, s_animation_header* bitmap) {
+        int16_t width = Get_String_Width_(text);
+        Print_To_Bitmap_(x - (width / 2), y, text, bitmap);
+    }
+
+    void __cdecl PSTRS_(int16_t x, int16_t y, char* str) {
+        Disp_PSTR_(x, y, str);
+    }
+
+    void __cdecl Disp_PSTR_(int x, int y, const char* format, ...) {
+        HDC hdc;
+        char buffer[100];
+        tagSIZE size;
+
+        if (platform::g_primary_surface->GetDC(&hdc) == DD_OK) {
+            va_list args;
+            va_start(args, format);
+            vsprintf(buffer, format, args);
+            va_end(args);
+
+            PTR_SetBkMode_005aa3b4(hdc, 1);
+            PTR_SetTextColor_005aa3b0(hdc, 0xFFFFFF);
+
+            int len = PTR_lstrlenA_005aa3c4(buffer);
+            PTR_GetTextExtentPoint32A_005aa3a8(hdc, buffer, len, &size);
+
+            len = PTR_lstrlenA_005aa3c4(buffer);
+            PTR_TextOutA_005aa3ac(hdc, x, y, buffer, len);
+
+            platform::g_primary_surface->ReleaseDC(hdc);
+
+            setvesa::Add_Square_To_Scan_List_(x, y, x + size.cx, y + size.cy);
+        }
     }
 }

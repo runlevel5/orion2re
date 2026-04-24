@@ -635,7 +635,7 @@ namespace BILL {
         if (width < 0) {
             width = 0;
         }
-        fonts::Print_Display_To_Bitmap_(x, y, text, (int32_t)width, (void*)bitmap);
+        fonts::Print_Display_To_Bitmap_(x, y, text, (int32_t)width, bitmap);
     }
 
     /**

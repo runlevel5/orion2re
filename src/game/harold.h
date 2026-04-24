@@ -177,11 +177,7 @@ namespace HAROLD {
 
     bool __cdecl Star_Guarded_By_Monster_(int16_t location_idx, int16_t* monster_owner);
 
-    inline void __cdecl Star_XY_To_Ship_Id_(int16_t star_idx, int16_t* ship_id, int16_t* mode) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f1d30});
-        fn(star_idx, ship_id, mode);
-    }
+    void __cdecl Star_XY_To_Ship_Id_(s_star_data* target_star, int16_t* out_indices, int16_t* count);
 
     int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx);
 }

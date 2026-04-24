@@ -55,6 +55,21 @@ inline char const (&s_Receiving_Message_005609F0)[23] =
 inline void (__stdcall *&PTR_OutputDebugStringA_005aa3c0)(char const *) =
     *reinterpret_cast<void (__stdcall **)(char const *)>(std::uintptr_t{0x005AA3C0});
 
+inline int (__stdcall *&PTR_GetTextExtentPoint32A_005aa3a8)(HDC hdc, const char* lpString, int c, tagSIZE* psizl) =
+    *reinterpret_cast<int (__stdcall **)(HDC, const char*, int, tagSIZE*)>(std::uintptr_t{0x005AA3A8});
+
+inline int (__stdcall *&PTR_TextOutA_005aa3ac)(HDC hdc, int x, int y, const char* lpString, int c) =
+    *reinterpret_cast<int (__stdcall **)(HDC, int, int, const char*, int)>(std::uintptr_t{0x005AA3AC});
+
+inline uint32_t (__stdcall *&PTR_SetTextColor_005aa3b0)(HDC hdc, uint32_t color) =
+    *reinterpret_cast<uint32_t (__stdcall **)(HDC, uint32_t)>(std::uintptr_t{0x005AA3B0});
+
+inline int (__stdcall *&PTR_SetBkMode_005aa3b4)(HDC hdc, int mode) =
+    *reinterpret_cast<int (__stdcall **)(HDC, int)>(std::uintptr_t{0x005AA3B4});
+
+inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
+    *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
+
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
@@ -790,6 +805,7 @@ inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  //
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
 inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // ""
 inline const char* s_combat_lbx_005599c8 = reinterpret_cast<const char*>(0x005599C8); // "combat.LBX"
+inline const char* s_warning_lbx_00557650 = reinterpret_cast<const char*>(std::uintptr_t{0x00557650}); // "warning.lbx"
 
 inline void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
     using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t);
@@ -850,6 +866,8 @@ inline const char* s_comma_005569c8 = reinterpret_cast<const char*>(0x005569C8);
 inline const char* s_D_005569dc = reinterpret_cast<const char*>(0x005569DC); // "D"
 inline const char* s_O_00556afc = reinterpret_cast<const char*>(0x00556AFC); // "O"
 inline const char* s_N_0055765c = reinterpret_cast<const char*>(0x0055765C); // "N"
+inline char* s_Y_00557660 = reinterpret_cast<char*>(std::uintptr_t{0x00557660});
+inline char* s_confirm_lbx_00557664 = reinterpret_cast<char*>(std::uintptr_t{0x00557664});
 inline const char* s_A_00557ed4 = reinterpret_cast<const char*>(0x00557ED4); // "A"
 inline const char* s_dot_d_0055a528 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A528}); // ".%d"
 inline char*& PTR_s_GAME_LBX_0055ac4c =

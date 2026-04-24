@@ -926,12 +926,39 @@ namespace HAROLD {
      * @address 004f1d00
      */
     int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx) {
-        int16_t ship_id;
-        int16_t mode = 2;
+        int16_t ship_ids[4];
+        int16_t count = 2;
 
-        Star_XY_To_Ship_Id_(star_idx, &ship_id, &mode);
+        Star_XY_To_Ship_Id_(&MOX::_star[star_idx], ship_ids, &count);
 
-        return ship_id;
+        return (count > 0) ? ship_ids[0] : -1;
+    }
+
+    /**
+     * @address 004f1d30
+     */
+    void __cdecl Star_XY_To_Ship_Id_(s_star_data* target_star, int16_t* out_indices, int16_t* count) {
+        int16_t max_count = *count;
+        if (max_count < 1 || MOX::_NUM_SHIPS < max_count) {
+            max_count = (int16_t)MOX::_NUM_SHIPS;
+        }
+
+        *count = 0;
+
+        if (MOX::_NUM_SHIPS <= 0) {
+            return;
+        }
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+            if (max_count < *count) {
+                break;
+            }
+
+            if (MOX::_star[i].x == target_star->x && MOX::_star[i].y == target_star->y) {
+                out_indices[*count] = i;
+                *count += 1;
+            }
+        }
     }
 
     int16_t __cdecl Zoom_Level_Font_Style_() {

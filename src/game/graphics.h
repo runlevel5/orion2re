@@ -16,21 +16,11 @@ namespace graphics {
     void __cdecl Save_Window_();
     void __cdecl Restore_Window_();
 
-    inline void __cdecl Tint_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00529660});
-        fn(x1, y1, x2, y2, color);
-    }
+    void __cdecl Tint_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t tint_color);
 
-    inline void __cdecl Interlaced_Fill_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        reinterpret_cast<Fn>(0x00528f30)(param_1, param_2, param_3, param_4, param_5, param_6);
-    }
+    void __cdecl Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2);
 
-    inline void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color1, uint8_t color2, uint8_t color3) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t, uint8_t, uint8_t);
-        reinterpret_cast<Fn>(0x00529140)(x1, y1, x2, y2, color1, color2, color3);
-    }
+    void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3);
 
     void __cdecl Box_(int16_t x, int16_t y, int16_t width, int16_t height, int16_t thickness, uint8_t color);
 

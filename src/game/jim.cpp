@@ -256,4 +256,155 @@ namespace JIM {
     void __cdecl Decode_Text_Tech_And_Other_Name_(char* text, int16_t tech_id, int16_t other_name_1, int16_t other_name_2, int16_t other_name_3) {
         JIM::Decode_Text_Message_(text, tech_id, -1, other_name_1, -1, other_name_2, -1, -1, other_name_3);
     }
+
+    void __cdecl Decode_Text_Field_(char* text, int16_t field_id, int16_t max_len) {
+        Decode_Text_Message_(text, -1, -1, -1, -1, -1, -1, field_id, max_len);
+    }
+
+    void __cdecl Decode_Text_Message_(char* text, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len) {
+        int16_t len = 0;
+        char temp_buf[40];
+        char dest_buf[200];
+
+        for (int i = 0; i < 200; ++i) {
+            char c = text[i];
+            if (c == '\0') {
+                break;
+            }
+
+            char* src_ptr = nullptr;
+            if (static_cast<uint8_t>(c) >= 0x80 && static_cast<uint8_t>(c) <= 0x8A) {
+                dest_buf[len] = '\0';
+
+                switch (static_cast<uint8_t>(c)) {
+                    case 0x80:
+                        src_ptr = MOX::_player[player1_id].name;
+                        break;
+                    case 0x81:
+                        src_ptr = MOX::_star[star_id].name;
+                        break;
+                    case 0x82:
+                        __itoa(number, temp_buf, 10);
+                        src_ptr = temp_buf;
+                        break;
+                    case 0x83:
+                        strcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app1_id, player1_id));
+                        src_ptr = temp_buf;
+                        break;
+                    case 0x84:
+                        src_ptr = MOX::_player[player2_id].name;
+                        break;
+                    case 0x85:
+                        strcpy(temp_buf, TECH::Technology_Applications_Name_(tech_app2_id, player2_id));
+                        src_ptr = temp_buf;
+                        break;
+                    case 0x86:
+                        src_ptr = MOX::_player[player1_id].race_name;
+                        break;
+                    case 0x87:
+                        src_ptr = MOX::_player[player2_id].race_name;
+                        break;
+                    case 0x88:
+                        if (MOX::_settings.language == 0) {
+                            _sprintf(temp_buf, s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
+                        } else {
+                            _sprintf(temp_buf, s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
+                        }
+                        src_ptr = temp_buf;
+                        break;
+                    case 0x89:
+                        strcpy(temp_buf, TECH::Technology_Fields_Name_(tech_field_id));
+                        src_ptr = temp_buf;
+                        break;
+                    case 0x8A:
+                        strcpy(temp_buf, HACCESS::Get_Planet_Name_(star_id));
+                        src_ptr = temp_buf;
+                        break;
+                }
+
+                strcpy(&dest_buf[len], src_ptr);
+                len = static_cast<int16_t>(strlen(dest_buf));
+            } else {
+                dest_buf[len++] = c;
+            }
+        }
+
+        dest_buf[len] = '\0';
+
+        if (strlen(dest_buf) >= static_cast<uint32_t>(max_len - 1)) {
+            _sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, text);
+            exitm::Exit_With_Message(dest_buf);
+        } else {
+            strcpy(text, dest_buf);
+        }
+    }
+
+    void __cdecl Get_Text_Message_(const char* filename, int16_t msg_idx, char* dest, int16_t max_len) {
+        char buffer[100];
+
+        uint16_t lang = static_cast<uint8_t>(MOX::_settings.language);
+        if (lang > 5) {
+            lang = 0;
+        }
+
+        RUSS::Mox_Update_();
+
+        farload::Farload_Data_Static_(filename, static_cast<int16_t>(msg_idx * 6 + lang), buffer, 0, 1, 100);
+
+        RUSS::Mox_Update_();
+
+        int16_t len = static_cast<int16_t>(strlen(buffer));
+
+        if (max_len - 1 <= len || len >= 99) {
+            _sprintf(buffer, s_Message_too_long, msg_idx, filename, len);
+            exitm::Exit_With_Message(buffer);
+            return;
+        }
+
+        strcpy(dest, buffer);
+    }
+
+    void __cdecl Bill_Picture_To_Mouse_(s_animation_header* anim) {
+        if (animate::Get_Width_(anim) <= 24) {
+            animate::Get_Height_(anim);
+        }
+
+        bitmap::Draw_Picture_To_Bitmap_(COLONY::_mouse_bitm, anim);
+        bitmap::Clear_Mouse_Image_(0);
+        bitmap::Draw_Bitmap_To_Mouse_(0, 0, COLONY::_mouse_bitm, 0);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+    }
+
+    void __cdecl Play_Combat_Music_() {
+        if (MOX::_settings.music_on == 1) {
+            _jim_old_music_id = 0xFFFF;
+            sound::Fade_Stream_Down_(35);
+
+            if (sound::Get_Stream_Volume_() > 0) {
+                int16_t current_volume;
+                do {
+                    current_volume = static_cast<int16_t>(sound::Get_Stream_Volume_());
+                    RUSS::Mox_Update_();
+                } while (current_volume > 0);
+            }
+
+            sound::Stop_Stream_();
+
+            int32_t ticks = _clock();
+            _jim_current_stream = static_cast<uint16_t>((ticks % 3) + 4);
+
+            sound::Set_Stream_Filename_(s_STREAM_LBX);
+            sound::Play_Stream_(_jim_current_stream);
+            sound::Loop_Stream_(-1);
+            sound::Set_Stream_Volume_(0);
+            sound::Fade_Stream_Up_(30);
+        }
+    }
+
+    void __cdecl Stop_Background_Music_() {
+        _jim_old_music_id = -1;
+        _jim_current_stream = -1;
+        sound::Set_Stream_Volume_(0);
+        sound::Stop_Stream_();
+    }
 }

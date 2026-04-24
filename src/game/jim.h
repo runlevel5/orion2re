@@ -1,11 +1,14 @@
 #pragma once
 
-namespace JIM {
-    inline uint16_t& _jim_current_stream =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005558E0 });
+struct s_animation_header;
+struct s_mouse_list;
 
-    inline uint16_t& _jim_old_music_id =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005558E8 });
+namespace JIM {
+    inline int16_t& _jim_current_stream =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558E0 });
+
+    inline int16_t& _jim_old_music_id =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558E8 });
 
     // Potential string literal: "STREAM.LBX"
     inline const char* s_STREAM_LBX =
@@ -29,17 +32,9 @@ namespace JIM {
     void __cdecl Draw_Logos_(void);
     void Play_Background_Music_();
 
-    inline void __cdecl Stop_Background_Music_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004251b0});
-        fn();
-    }
+    void __cdecl Stop_Background_Music_();
 
-    inline void __cdecl Play_Combat_Music_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004252a0 });
-        fn();
-    }
+    void __cdecl Play_Combat_Music_();
 
     inline void __cdecl Play_Streaming_Music_(int32_t music_id, int32_t p2, int32_t p3) {
         using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
@@ -49,10 +44,9 @@ namespace JIM {
 
     void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3);
 
-    inline void __cdecl Get_Text_Message_(const char* lbx_name, int16_t index, char* buffer, int16_t max_len) {
-        using Fn = void(__cdecl*)(const char*, int16_t, char*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00425340})(lbx_name, index, buffer, max_len);
-    }
+    void __cdecl Get_Text_Message_(const char* filename, int16_t msg_idx, char* dest, int16_t max_len);
+
+    inline char* s_Message_too_long = reinterpret_cast<char*>(std::uintptr_t{0x00555918});
 
     void __cdecl Decode_Text_Name_And_Tech_(char* text, int16_t id1, int16_t id2, int16_t id3);
 
@@ -64,10 +58,7 @@ namespace JIM {
 
     void __cdecl Decode_Text_Name_Tech_And_Other_Tech_(char* text, int16_t val1, int16_t val2, int16_t val3, int16_t val4, int16_t val5);
 
-    inline void __cdecl Bill_Picture_To_Mouse_(s_animation_header* sprite) {
-        using Fn = void(__cdecl*)(s_animation_header*);
-        reinterpret_cast<Fn>(0x00425A10)(sprite);
-    }
+    void __cdecl Bill_Picture_To_Mouse_(s_animation_header* anim);
 
     void __cdecl Decode_Text_Name_And_Stat_(char* text, int16_t val1, int16_t val2, int16_t val3);
 
@@ -79,17 +70,13 @@ namespace JIM {
 
     void __cdecl Decode_Text_Stat_(char* buffer, int16_t stat_a, int16_t stat_b);
 
-    inline void __cdecl Decode_Text_Message_(char* buffer, int16_t a1, int16_t a2, int16_t a3, int16_t a4, int16_t a5, int16_t a6, int16_t a7, int16_t a8) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00425420});
-        fn(buffer, a1, a2, a3, a4, a5, a6, a7, a8);
-    }
+    void __cdecl Decode_Text_Message_(char* text, int16_t player1_id, int16_t star_id, int16_t tech_app1_id, int16_t number, int16_t player2_id, int16_t tech_app2_id, int16_t tech_field_id, int16_t max_len);
+
+    inline const char* s_d_comma_d_0055239c = reinterpret_cast<const char*>(0x0055239C);
+    inline const char* s_d_dot_d_005523a4 = reinterpret_cast<const char*>(0x005523A4);
+    inline const char* s_Decode_message_too_long_0055593c = reinterpret_cast<const char*>(0x0055593C);
 
     void __cdecl Decode_Text_Year_(char* buffer, int16_t year);
 
-    inline void __cdecl Decode_Text_Field_(char* text_buffer, uint16_t field_id, int max_len) {
-        using Fn = void(__cdecl*)(char*, uint16_t, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00425980 });
-        fn(text_buffer, field_id, max_len);
-    }
+    void __cdecl Decode_Text_Field_(char* text, int16_t field_id, int16_t max_len);
 }
