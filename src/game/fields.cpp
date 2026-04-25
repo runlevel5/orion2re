@@ -55,10 +55,13 @@ namespace fields {
     void __cdecl Invoke_Auto_Function_() {
         if (_auto_active_flag != 0) {
             if (_function != nullptr) {
-                auto fn = reinterpret_cast<void(__cdecl*)()>(_function);
-                fn();
+                _function();
             }
         }
+    }
+
+    void __cdecl Invoke_Saved_Auto_Function_() {
+        _function2();
     }
 
     void __cdecl Save_Auto_Function_() {
@@ -128,6 +131,10 @@ namespace fields {
         _fields_count = param_1 + 1;
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
+    }
+
+    int16_t __cdecl Get_Field_Counter_() {
+        return _fields_count;
     }
 
     void __cdecl Enable_Mouse_Pressed_Field_Update_() {
@@ -619,5 +626,74 @@ namespace fields {
 
     void __cdecl Enable_Mouse_Wait_() {
         _mouse_auto_exit = 0;
+    }
+
+    void __cdecl Disable_Mouse_Wait_() {
+        _mouse_auto_exit = 1;
+    }
+
+    void __cdecl Timed_Wait_For_Input_(int timeout) {
+        bool has_input = false;
+
+        if (timeout == 0) {
+            do {
+                if (key::Keyboard_Status_()) {
+                    has_input = true;
+                }
+                if (mouse::Mouse_Buffer_() == 1) {
+                    has_input = true;
+                }
+                Quick_Call_Auto_Function_();
+            } while (!has_input);
+        } else {
+            int ticks = 0;
+            do {
+                if (key::Keyboard_Status_()) {
+                    has_input = true;
+                }
+                if (mouse::Mouse_Buffer_() == 1) {
+                    has_input = true;
+                }
+
+                ticks++;
+                Quick_Call_Auto_Function_();
+
+                if (ticks == timeout) {
+                    has_input = true;
+                }
+            } while (!has_input);
+        }
+    }
+
+    void __cdecl Draw_All_Fields_() {
+        _draw_override_flag = 1;
+        Draw_Visible_Fields_();
+        _draw_override_flag = 0;
+    }
+
+    void __cdecl Mark_Fields_() {
+        _old_fields_count = _fields_count;
+        _old_input_delay = _input_delay;
+        _old_down_mouse_button = _down_mouse_button;
+        _old_auto_input_variable = _auto_input_variable;
+        _old_input_field_active = _input_field_active;
+        _max_fields_count -= _fields_count;
+        _old_active_input_field_number = _active_input_field_number;
+
+        _fields += _fields_count;
+
+        Clear_Fields_();
+    }
+
+    void __cdecl Clipped_Dot_(int16_t x, int16_t y, uint8_t color) {
+        if (x >= video::_screen_window_x1 && x <= video::_screen_window_x2) {
+            if (y >= video::_screen_window_y1 && y <= video::_screen_window_y2) {
+                graphics::Dot_(x, y, color);
+            }
+        }
+    }
+
+    void __cdecl Exit_List_Field_() {
+        _exit_the_list_field = 1;
     }
 }

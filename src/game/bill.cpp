@@ -2,6 +2,18 @@
 
 namespace BILL {
     /**
+     * @address 00406780
+     */
+    void __cdecl Bill_Init_() {
+        MOX::_bill_savegame[0] = 2;
+        MOX::_bill_savegame[1] = 0;
+        MOX::_bill_savegame[2] = 1;
+        MOX::_bill_savegame[3] = 1;
+        MOX::_bill_savegame[4] = 1;
+        MOX::_bill_savegame[5] = 1;
+    }
+
+    /**
      * @address 004077e0
      */
     void __cdecl Copy_File_To_File_(const char* src_path, const char* dst_path) {
@@ -40,6 +52,27 @@ namespace BILL {
         fflush(dst_fp);
         fclose(dst_fp);
         fclose(src_fp);
+    }
+
+    char* __cdecl Cache_Player_Spy_Anim_() {
+        char find_data[52];
+        char src_file_name[128];
+
+        _sprintf(_dest_file_name, SCIENCE::_spy_anim_fmt,
+                 static_cast<uint32_t>(static_cast<uint8_t>(MOX::_player[MOX::_PLAYER_NUM].race)));
+
+        if (dos::DIR_(_dest_file_name, find_data) == 0) {
+            if (dos::DIR_(SCIENCE::_spy_anim_find_pat, find_data) != 0) {
+                dos::Delete_File_(find_data);
+            }
+
+            strcpy(src_file_name, farload::_secondary_drive_path);
+            strcat(src_file_name, _dest_file_name);
+
+            Copy_File_To_File_(src_file_name, _dest_file_name);
+        }
+
+        return _dest_file_name;
     }
 
     void __cdecl Cache_Player_Scientist_Anim_() {

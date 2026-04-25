@@ -59,11 +59,11 @@ namespace MAINPUPS {
         *reinterpret_cast<int16_t(*)[27]>(std::uintptr_t{0x005A6E20});
     inline uint8_t& _explode_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D34});
     inline int16_t& _g_refresh_mode = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D80});
-    inline void*& _eric_saved_autofunction2 = *reinterpret_cast<void**>(std::uintptr_t{0x005A6E58});
-    inline void*& _eric_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A6E5C});
+    inline MOX2::action_func_t& _eric_saved_autofunction2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A6E58});
+    inline MOX2::action_func_t& _eric_saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A6E5C});
 
-    inline void*& _temp_af =
-        *reinterpret_cast<void**>(std::uintptr_t{0x00565E2C});
+    inline MOX2::action_func_t& _temp_af =
+        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00565E2C});
 
     inline s_colony_combat_popup_data*& _g_data_ptr =
         *reinterpret_cast<s_colony_combat_popup_data**>(std::uintptr_t{0x005A6E60});

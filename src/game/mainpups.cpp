@@ -98,7 +98,7 @@ namespace MAINPUPS {
 
         if (_autofunction_ctr == 0) {
             MOX2::Get_Auto_Function_(&_eric_saved_autofunction);
-            MOX2::Execute_Auto_Function_(&_eric_saved_autofunction); // TYPE MISMATCH: expected void*, got void**
+            MOX2::Execute_Auto_Function_(_eric_saved_autofunction);
 
             bool skip_update = false;
             if (_explode_flag != 0) {
@@ -110,14 +110,14 @@ namespace MAINPUPS {
             if (!skip_update && _no_flicker_between_mainpups_flag == 0) {
                 RUSS::Mox_Sync_Update_();
                 COLONY::_full_draw = 1;
-                MOX2::Execute_Auto_Function_(&_eric_saved_autofunction); // TYPE MISMATCH: expected void*, got void**
+                MOX2::Execute_Auto_Function_(_eric_saved_autofunction);
             }
         } else if (_autofunction_ctr == 1) {
             MOX2::Get_Auto_Function_(&_eric_saved_autofunction2);
             COLONY::_full_draw = 1;
-            MOX2::Execute_Auto_Function_(&_eric_saved_autofunction); // TYPE MISMATCH: expected void*, got void**
+            MOX2::Execute_Auto_Function_(_eric_saved_autofunction);
             COLONY::_full_draw = 1;
-            MOX2::Execute_Auto_Function_(&_eric_saved_autofunction2); // TYPE MISMATCH: expected void*, got void**
+            MOX2::Execute_Auto_Function_(_eric_saved_autofunction2);
         }
 
         _autofunction_ctr++;
@@ -1068,7 +1068,7 @@ namespace MAINPUPS {
         _g_data_ptr = &data;
 
         MOX2::Get_Auto_Function_(&_temp_af);
-        MOX2::Execute_Auto_Function_(&_temp_af);
+        MOX2::Execute_Auto_Function_(_temp_af);
 
         RUSS::Mox_Sync_Update_();
 
@@ -1738,18 +1738,18 @@ namespace MAINPUPS {
             MOX::_FULL_DRAW_SCREEN_FLAG = 1;
             COLONY::_full_draw = 1;
             MOX::_dont_draw_main_screen_to_back = 1;
-            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction);
+            MOX2::Execute_Auto_Function_(MAINPUPS::_eric_saved_autofunction);
         } else if (MAINPUPS::_autofunction_ctr == 2) {
             MOX::_FULL_DRAW_SCREEN_FLAG = 1;
             COLONY::_full_draw = 1;
             MAINPUPS::_autofunction_ctr = 0;
             MOX::_dont_draw_main_screen_to_back = 1;
-            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction);
+            MOX2::Execute_Auto_Function_(MAINPUPS::_eric_saved_autofunction);
 
             MOX::_FULL_DRAW_SCREEN_FLAG = 1;
             COLONY::_full_draw = 1;
             MOX::_dont_draw_main_screen_to_back = 1;
-            MOX2::Execute_Auto_Function_(&MAINPUPS::_eric_saved_autofunction2);
+            MOX2::Execute_Auto_Function_(MAINPUPS::_eric_saved_autofunction2);
             MAINPUPS::_autofunction_ctr = 2;
         }
 

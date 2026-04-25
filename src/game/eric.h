@@ -15,7 +15,7 @@ namespace ERIC {
 
     inline uint16_t& _saved_music_l = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00558B50});
 
-    inline void*& _cinematic_saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x005A4AD8});
+    inline MOX2::action_func_t& _cinematic_saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A4AD8});
 
     void __cdecl Eric_Init_();
 
@@ -41,10 +41,7 @@ namespace ERIC {
 
     void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text);
 
-    inline void __cdecl Print_Paragraph_Centered_Vertically_(int16_t x, int16_t y, int16_t w, int16_t h, void* text, int16_t unk) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, void*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004BA9A0})(x, y, w, h, text, unk);
-    }
+    void __cdecl Print_Paragraph_Centered_Vertically_(int16_t x, int16_t y, int16_t width, uint16_t box_height, char* text, int16_t color);
 
     int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus);
 
@@ -60,96 +57,59 @@ namespace ERIC {
 
     char* __cdecl Red_If_Negative_Fmt_String_(int16_t value);
 
-    inline void __cdecl Pulsing_Box_(int16_t y, int16_t x, int32_t width, int32_t height, int32_t arg5, int32_t arg6, int32_t arg7) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA950});
-        fn(y, x, width, height, arg5, arg6, arg7);
-    }
+    void __cdecl Pulsing_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int32_t param_6, int16_t param_7);
 
-    inline void __cdecl Play_Loose_Flic_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bb260})();
-    }
+    void __cdecl Play_Loose_Flic_();
 
-    inline void __cdecl Play_Normal_Win_Flic_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bb1b0})();
-    }
+    void __cdecl Play_Normal_Win_Flic_();
 
-    inline void __cdecl Play_All_Flics_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bb1f0})();
-    }
+    void __cdecl Play_All_Flics_();
 
-    inline void __cdecl Play_Take_Orion_Flic_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bb110})();
-    }
+    void __cdecl Play_Take_Orion_Flic_();
 
-    inline void __cdecl Do_Cinematic_Popup_Setup_() {
+    inline void __cdecl Cinematic_Autofunction_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAEE0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAF80});
         fn();
     }
 
+    void __cdecl Do_Cinematic_Popup_Setup_();
+
     void __cdecl Do_Cinematic_Popup_Cleanup_();
 
-    inline void __cdecl Set_Refresh_Mode_(uint16_t mode) {
-        using Fn = void(__cdecl*)(uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba620});
-        fn(mode);
-    }
+    void __cdecl Set_Refresh_Mode_(int16_t mode);
 
     void __cdecl Play_Dimensional_Portal_Flic_();
 
     void __cdecl Play_Planetary_Destruction_Flic_();
 
-    inline void __cdecl Play_Antarans_Attack_Flic_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BB0E0});
-        fn();
-    }
+    void __cdecl Play_Antarans_Attack_Flic_();
 
     bool __cdecl Sint_Is_In_List_(int16_t value, int16_t* list, uint16_t count);
 
-    inline void __cdecl Play_Diplomatic_Win_Flic_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004bb140})();
+    void __cdecl Play_Diplomatic_Win_Flic_();
+
+    void __cdecl Play_Amoeba_Flic_();
+
+    inline bool __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t size, int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004babe0});
+        return fn(player_idx, size, star_idx);
     }
 
-    inline void __cdecl Play_Amoeba_Flic_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004baec0});
-        fn();
+    inline bool __cdecl Player_Has_Leader_With_General_Skill_At_Star_(int16_t player_idx, int16_t skill_idx, int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bab40});
+        return fn(player_idx, skill_idx, star_idx);
     }
 
-    inline bool __cdecl Player_Can_Mind_Control_Colony_(int8_t player_id, int16_t colony_idx) {
-        using Fn = bool(__cdecl*)(int8_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004badb0});
-        return fn(player_id, colony_idx);
-    }
+    int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx);
 
-    inline bool __cdecl Player_Can_Mind_Control_Colony_With_Help_(int16_t player_id, int16_t colony_idx) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAC40});
-        return fn(player_id, colony_idx);
-    }
+    int8_t __cdecl Player_Can_Mind_Control_Colony_With_Help_(int16_t player_idx, int16_t colony_idx);
 
-    inline void __cdecl Force_Fade_To_Colony_Palette_(int state) {
-        using Fn = void(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba790});
-        fn(state);
-    }
+    void __cdecl Force_Fade_To_Colony_Palette_(uint8_t flag);
 
-    inline int16_t __cdecl Player_Capitol_World_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAAC0});
-        return fn(player_idx);
-    }
+    int16_t __cdecl Player_Capitol_World_(int16_t player_idx);
 
-    inline int16_t __cdecl Pick_Random_Colony_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAA50});
-        return fn(player_idx);
-    }
+    int16_t __cdecl Pick_Random_Colony_(int16_t owner);
 }

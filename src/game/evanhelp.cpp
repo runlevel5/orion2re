@@ -139,4 +139,68 @@ namespace EVANHELP {
     void __cdecl Set_Scrap_Freighters_Help_List_() {
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(&_scrap_freighters_help_list, 1);
     }
+
+    void __cdecl Set_Hotseat_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset) {
+        _memcpy(_hotseat_setup_screen_help_list, _static_hotseat_setup_screen_hel, sizeof(_static_hotseat_setup_screen_hel));
+        Offset_Help_Field_XYs_(_hotseat_setup_screen_help_list, 4, x_offset, y_offset);
+        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_hotseat_setup_screen_help_list, 4);
+    }
+
+    void __cdecl Set_Weapon_Replacement_Screen_Help_List_(int16_t total_rows, int16_t x, int16_t y, uint8_t needs_racks) {
+        int16_t help_count = 0;
+
+        int16_t height = animate::Get_Height_(MOX::_weapons_mid_box_seg);
+        if (total_rows < 7) {
+            height = 0x66;
+        }
+
+        int16_t base_y = height + animate::Get_Height_(MOX::_weapons_top_box_seg) + y;
+
+        memset(_weapon_replacement_screen_help_list, 0, 120);
+
+        int16_t y1 = base_y + 10;
+
+        int16_t h = animate::Get_Height_(MOX::_beam_filter_button_seg) + y1;
+        int16_t w = animate::Get_Width_(MOX::_beam_filter_button_seg) + x + 0x65;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x188, x + 0x65, y1, w, h);
+
+        h = animate::Get_Height_(MOX::_missile_filter_button_seg) + y1;
+        w = animate::Get_Width_(MOX::_missile_filter_button_seg) + x + 0xcb;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x189, x + 0xcb, y1, w, h);
+
+        h = animate::Get_Height_(MOX::_bomb_filter_button_seg) + y1;
+        w = animate::Get_Width_(MOX::_bomb_filter_button_seg) + x + 0x146;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x18a, x + 0x146, y1, w, h);
+
+        h = animate::Get_Height_(MOX::_special_filter_button_seg) + y1;
+        w = animate::Get_Width_(MOX::_special_filter_button_seg) + x + 0x1ad;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x18b, x + 0x1ad, y1, w, h);
+
+        int16_t btn_x = x + 0x21a;
+
+        int16_t cancel_y = base_y + 0x52;
+        h = animate::Get_Height_(MOX::_weapons_cancel_button_seg) + cancel_y;
+        w = animate::Get_Width_(MOX::_weapons_cancel_button_seg) + btn_x;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x18c, btn_x, cancel_y, w, h);
+
+        int16_t accept_y = base_y + 0x82;
+        h = animate::Get_Height_(MOX::_weapons_accept_button_seg) + accept_y;
+        w = animate::Get_Width_(MOX::_weapons_accept_button_seg) + btn_x;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, 0x18d, btn_x, accept_y, w, h);
+
+        int16_t conditional_id = (needs_racks == 0) ? 0x18e : 0x18f;
+        Append_Help_List_(&_weapon_replacement_screen_help_list[0][0], &help_count, 12, conditional_id, x + 0x18, base_y + 0x45, x + 0xd2, base_y + 0xaa);
+
+        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(&_weapon_replacement_screen_help_list[0][0], help_count);
+    }
+
+    void __cdecl Offset_Help_Field_XYs_(void* help_list, int32_t count, int16_t x_offset, int16_t y_offset) {
+        int16_t* help_fields = reinterpret_cast<int16_t*>(help_list);
+        for (int16_t i = 0; i < static_cast<int16_t>(count); ++i) {
+            help_fields[i * 5 + 1] += x_offset;
+            help_fields[i * 5 + 2] += y_offset;
+            help_fields[i * 5 + 3] += x_offset;
+            help_fields[i * 5 + 4] += y_offset;
+        }
+    }
 }

@@ -21,7 +21,7 @@ namespace TECH {
         int i;
         int16_t player_race;
         char sr_r_x_sc_lbx[64];
-        void* auto_func;
+        MOX2::action_func_t auto_func;
         s_animation_header* tech_select_lbx_images[9];
         s_animation_header* entry_buttons[8];
         s_animation_header* science_lbx = nullptr;
@@ -692,7 +692,7 @@ namespace TECH {
         char title_buf[32];
         s_animation_header* win_bg_1;
         s_animation_header* win_bg_2;
-        void* auto_funcs[11];
+        MOX2::action_func_t auto_funcs[11];
         int16_t clear_field;
         int16_t text_x;
         int16_t fill_x2;

@@ -1,8 +1,8 @@
 #pragma once
 
 namespace NEWPUP {
-    inline void*& _saved_autofunction =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005663D0});
+    inline MOX2::action_func_t& _saved_autofunction =
+        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005663D0});
 
     inline void __cdecl Draw_Troop_Popup_() {
         using Fn = void(__cdecl*)();

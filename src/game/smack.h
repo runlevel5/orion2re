@@ -8,8 +8,8 @@ namespace SMACK {
     inline s_mouse_list& _smack_mouse =
         *reinterpret_cast<s_mouse_list*>(std::uintptr_t{0x005599D8});
 
-    inline void*& _smack_auto_function =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005960EC});
+    inline MOX2::action_func_t& _smack_auto_function =
+        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005960EC});
 
     inline int16_t& _smack_x =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005960F0});

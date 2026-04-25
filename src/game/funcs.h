@@ -383,11 +383,17 @@ inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
-inline int __cdecl _clock() {
-    using Fn = int(__cdecl*)();
+inline uint32_t __cdecl _clock() {
+    using Fn = uint32_t(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540F20 });
     return fn();
 }
+
+inline const char* const s_STREAM_LBX_005558fc =
+    reinterpret_cast<const char*>(std::uintptr_t{0x005558FC}); /* "STREAM.LBX" */
+
+inline const char* const s_STREAMHD_LBX_00555908 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00555908}); /* "STREAMHD.LBX" */
 
 inline int __cdecl _strncmp(const char* s1, const char* s2, size_t n) {
     using Fn = int(__cdecl*)(const char*, const char*, size_t);

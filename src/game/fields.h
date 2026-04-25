@@ -17,6 +17,7 @@ namespace fields {
     inline const char* s_You_exceeded_the_max_number_of_fields = reinterpret_cast<const char*>(std::uintptr_t{0x0055B080});
     inline const char* s_Maximum_number_of_button_fields_e_0055b0b0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B0B0});
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
+    inline uint8_t& _exit_the_list_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AFCC});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
     inline s_field*& _old_fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD4});
     inline int16_t& _pointer_offset = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF8});
@@ -31,8 +32,8 @@ namespace fields {
     inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
     inline s_colors (&_list_special_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572BD0});
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
-    inline void*& _function = *reinterpret_cast<void**>(std::uintptr_t{0x005762F8});
-    inline void*& _function2 = *reinterpret_cast<void**>(std::uintptr_t{0x00572BFC});
+    inline MOX2::action_func_t& _function = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005762F8});
+    inline MOX2::action_func_t& _function2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00572BFC});
     inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
     inline uint8_t& _continuous_string = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
@@ -41,6 +42,7 @@ namespace fields {
     inline uint16_t& _dynamic_field_refresh = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B074});
     inline uint16_t& _field_box_mode = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B044});
     inline int16_t& _mouse_auto_exit = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B01C});
+    inline uint32_t& _draw_override_flag = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055B07C});
 
     void __cdecl Assign_Update_Function_(void (*function_ptr)());
     void __cdecl Save_Auto_Function_();
@@ -56,6 +58,7 @@ namespace fields {
     int16_t __cdecl Get_Input_();
 
     void __cdecl Enable_Mouse_Wait_();
+    void __cdecl Disable_Mouse_Wait_();
 
     inline int16_t __cdecl Interpret_Mouse_Input_() {
         using Fn = int16_t(__cdecl*)();
@@ -125,11 +128,7 @@ namespace fields {
 
     void __cdecl Clear_Fields_Above_(int16_t f);
 
-    inline int16_t __cdecl Get_Field_Counter_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051d170});
-        return fn();
-    }
+    int16_t __cdecl Get_Field_Counter_();
 
     void __cdecl Enable_Mouse_Pressed_Field_Update_();
 
@@ -140,12 +139,7 @@ namespace fields {
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound);
 
     void __cdecl Invoke_Auto_Function_();
-
-    inline void __cdecl Invoke_Saved_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ff40});
-        fn();
-    }
+    void __cdecl Invoke_Saved_Auto_Function_();
 
     inline void __cdecl Evaluate_Input_(int16_t* input, int16_t* scan) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*);
@@ -156,17 +150,13 @@ namespace fields {
 
     void __cdecl Clear_Mouse_Buffer_();
 
-    inline void __cdecl Disable_Mouse_Wait_() {
+    inline void __cdecl Quick_Call_Auto_Function_() {
         using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D190});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051ff50});
         fn();
     }
 
-    inline void __cdecl Timed_Wait_For_Input_(int32_t ticks) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523e10});
-        fn(ticks);
-    }
+    void __cdecl Timed_Wait_For_Input_(int timeout);
 
     inline void __cdecl Draw_Visible_Fields_() {
         using Fn = void(__cdecl*)();
@@ -174,10 +164,7 @@ namespace fields {
         fn();
     }
 
-    inline void __cdecl Draw_All_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x0051EF40})();
-    }
+    void __cdecl Draw_All_Fields_();
     void __cdecl Set_Input_Delay_(uint16_t delay);
     void __cdecl Set_Field_Outline_Color_(uint8_t color);
 
@@ -191,23 +178,11 @@ namespace fields {
 
     int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str);
 
-    inline void __cdecl Mark_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520120});
-        fn();
-    }
+    void __cdecl Mark_Fields_();
 
-    inline void __cdecl Clipped_Dot_(int16_t x, int16_t y, uint8_t color) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005210c0});
-        fn(x, y, color);
-    }
+    void __cdecl Clipped_Dot_(int16_t x, int16_t y, uint8_t color);
 
-    inline void __cdecl Exit_List_Field_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523df0});
-        fn();
-    }
+    void __cdecl Exit_List_Field_();
 
     void __cdecl Release_Fields_();
 

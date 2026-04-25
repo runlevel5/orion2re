@@ -34,7 +34,7 @@ namespace TEXTBOX {
     inline int16_t& _box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE4});
     inline int16_t& _box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE0});
     inline uint16_t& _old_draw_fields_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565ED0});
-    inline void*& _textbox_af = *reinterpret_cast<void**>(std::uintptr_t{0x00565ED4});
+    inline MOX2::action_func_t& _textbox_af = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00565ED4});
     inline uint16_t& _old_help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565EEC});
     inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
 

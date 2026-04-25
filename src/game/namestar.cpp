@@ -254,9 +254,9 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
 
     int8_t result;
     if (is_animated != 0) {
-        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, 15, w_max, title, x, y);
+        result = Input_Box_Popup_Animated_(title, x, y, MOX::_star[star_idx].name, 15, w_max);
     } else {
-        result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, w_max, title, x, y, 0);
+        result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, w_max, title, y, x, 0);
     }
 
     if (MOX::_star[star_idx].name[0] == '\0') {
@@ -290,6 +290,129 @@ int8_t __cdecl Can_Change_Star_Name_(int16_t star_idx) {
     } while (i < 5);
 
     return can_change;
+}
+
+int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim) {
+    EVANHELP::Save_Help_List_();
+    fields::Save_Auto_Function_();
+    EVANHELP::Set_Input_Box_Help_List_();
+
+    memset(&_input_box, 0, sizeof(s_input_box_state));
+
+    if (strlen(input_text) < 100) {
+        strcpy(_input_box.input_text, input_text);
+    } else {
+        strncpy(_input_box.input_text, input_text, 100);
+        _input_box.input_text[99] = '\0';
+    }
+
+    if (strlen(prompt_text) < 60) {
+        strcpy(_input_box.prompt_text, prompt_text);
+    } else {
+        strncpy(_input_box.prompt_text, prompt_text, 60);
+        _input_box.prompt_text[59] = '\0';
+    }
+
+    _input_box.bg_width = 0x36;
+    _input_box.input_type = input_type;
+    _input_box.x_offset1 = x + 3;
+    _input_box.show_cancel_anim = show_cancel_anim;
+    _input_box.cancel_x = x + 100;
+    _input_box.cancel_y = y + 0x60;
+    _input_box.y_offset2 = y + 0x22;
+    _input_box.x_offset3 = x + 0x36;
+
+    if (max_length == 0) {
+        _input_box.max_input_length = 205;
+    } else {
+        if (max_length >= 205) {
+            _input_box.max_input_length = 205;
+        } else {
+            _input_box.max_input_length = max_length;
+        }
+    }
+
+    _input_box.unk1 = 26;
+    _input_box.y = y;
+    _input_box.x = x;
+    _input_box.max_length = max_length;
+
+    s_colors* colors2;
+    if (MOX::_current_screen == SCREEN_NEW_GAME) {
+        MOX::_mox_font_colors_offset = 0x14;
+        colors2 = MISC::Font_Colors2_(3, 0, 0x14);
+    } else {
+        MOX::_mox_font_colors_offset = 0x10;
+        colors2 = MISC::Font_Colors2_(3, 0x0C, 0x18);
+    }
+
+    _input_box.font_colors = *colors2;
+
+    char local_text[100];
+    if (strlen(_input_box.input_text) < 100) {
+        strcpy(local_text, _input_box.input_text);
+    } else {
+        strncpy(local_text, _input_box.input_text, 100);
+        local_text[99] = '\0';
+    }
+
+    Setup_Input_Box_Popup_();
+
+    int8_t status = 1;
+    int action = 0;
+    int bp_counter = 1;
+
+    do {
+        action = 0;
+        int16_t input = fields::Get_Input_();
+
+        if (input == _input_box.accept_field_id) {
+            if (bp_counter > 0) {
+                action = 1;
+            }
+            bp_counter++;
+        }
+
+        if (input < 0) {
+            action = 1;
+            strcpy(_input_box.input_text, local_text);
+            status = 0;
+        }
+
+        if (input == _input_box.cancel_field_id) {
+            action = 2;
+        }
+
+        if (action == 0) {
+            video::Set_Page_Off_();
+            Draw_Input_Box_Popup_();
+            RUSS::Mox_Sync_Update_();
+        } else if (action == 2) {
+            if (show_cancel_anim != 0) {
+                video::Set_Page_Off_();
+                animate::Set_Animation_Frame_(_input_box.pic, 1);
+                animate::Remap_Draw_(_input_box.cancel_y, _input_box.cancel_x, _input_box.pic);
+                Draw_Input_Box_Popup_();
+                RUSS::Mox_Sync_Update_();
+            }
+        }
+    } while (action == 0);
+
+    strings::Trim_(_input_box.input_text);
+    strcpy(input_text, _input_box.input_text);
+
+    allocate::Pop_Block_(MOX::_screen_seg);
+    fields::Clear_Fields_();
+    fields::Deactivate_Auto_Function_();
+    EVANHELP::Restore_Help_List_();
+    fields::Restore_Auto_Function_();
+    MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+
+    return status;
+}
+
+int8_t __cdecl Input_Box_Popup_Animated_(char* prompt, int16_t x, int16_t y, char* buffer, int16_t param_5, int16_t param_6) {
+    return Input_Box_Popup_(buffer, param_5, param_6, prompt, y, x, 1);
 }
 
 } // namespace namestar

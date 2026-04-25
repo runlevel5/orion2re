@@ -356,21 +356,18 @@ namespace MOX2 {
         exitm::Exit_With_Message(MOX2::_leave_game_message);
     }
 
-    void __cdecl Get_Auto_Function_(void** param_1) {
+    void __cdecl Get_Auto_Function_(MOX2::action_func_t* param_1) {
         *param_1 = fields::_function;
     }
 
-    void __cdecl Put_Auto_Function_(void** param_1) {
+    void __cdecl Put_Auto_Function_(MOX2::action_func_t* param_1) {
         fields::_function = *param_1;
     }
 
-    void __cdecl Execute_Auto_Function_(void* function_entry)
+    void __cdecl Execute_Auto_Function_(MOX2::action_func_t fn)
     {
-        using Fn = void(__cdecl*)(void*);
-
-        Fn fn = reinterpret_cast<Fn>(*reinterpret_cast<void**>(function_entry));
         if (fn != nullptr) {
-            fn(function_entry);
+            fn();
         }
     }
 

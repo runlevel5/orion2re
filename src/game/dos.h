@@ -24,6 +24,12 @@ namespace dos {
 
     bool __cdecl DIR_(const char* pattern, char* output_name);
 
+    inline void __cdecl Delete_File_(char* filename) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D440});
+        fn(filename);
+    }
+
     inline void __cdecl resolve_wildcard(char* dir_buffer) {
         using Fn = void(__cdecl*)(char*);
         reinterpret_cast<Fn>(std::uintptr_t{0x0052D440})(dir_buffer);

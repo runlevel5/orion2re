@@ -159,6 +159,108 @@ namespace fonts {
         return total_width;
     }
 
+    int16_t __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
+        if (y > video::_screen_window_y2) {
+            return 1;
+        }
+
+        if (y + _font_header.font_style_height < video::_screen_window_y1) {
+            return 1;
+        }
+
+        _print_xpos = x;
+        _print_ypos = y;
+
+        int32_t spaces_remainder = 0;
+        int32_t spaces_processed = 0;
+        int32_t space_extra_width = 0;
+
+        if (justified_width != 0) {
+            int32_t str_len = 0;
+            int32_t spaces_count = 0;
+
+            if (str[0] != '\0') {
+                do {
+                    char c = str[str_len];
+                    if (c == '\r' || c == '\x14' || c == '\x19' || c == '\x15' || c == '\x1d') {
+                        break;
+                    }
+                    if (c == ' ') {
+                        spaces_count++;
+                    }
+                    str_len++;
+                } while (str[str_len] != '\0');
+            }
+
+            if (spaces_count == 0) {
+                justified_width = 0;
+            }
+
+            justified_width -= Get_String_Width_(str);
+
+            if (justified_width > 0) {
+                spaces_remainder = justified_width % spaces_count;
+                space_extra_width = justified_width / spaces_count;
+            } else {
+                justified_width = 0;
+            }
+        }
+
+        int32_t str_idx = 0;
+        while (true) {
+            char c = str[str_idx];
+            if (c == '\0') {
+                break;
+            }
+
+            switch (c) {
+                case '\x01':
+                    if (process_colors != 0) {
+                        Set_Normal_Colors_On_();
+                    }
+                    break;
+                case '\x02':
+                case '\x04':
+                    if (process_colors != 0) {
+                        Set_Highlight_Colors_On_();
+                    }
+                    break;
+                case '\x03':
+                    if (process_colors != 0) {
+                        Set_Special_Colors_On_();
+                    }
+                    break;
+                case '\x08':
+                    break;
+                case '\r':
+                case '\x14':
+                    _print_ypos += _font_header.line_height;
+                    _print_xpos = x;
+                    break;
+                case '\x15':
+                    return _print_xpos;
+                case '\x19':
+                case '\x1d':
+                    _print_xpos = x + static_cast<uint8_t>(str[str_idx + 1]);
+                    str_idx++;
+                    break;
+                default:
+                    _print_xpos = Print_Character_Clipped_(_print_xpos, _print_ypos, c);
+                    if (justified_width != 0 && c == ' ') {
+                        _print_xpos += (int16_t)space_extra_width;
+                        if (spaces_processed < spaces_remainder) {
+                            _print_xpos++;
+                        }
+                        spaces_processed++;
+                    }
+                    break;
+            }
+            str_idx++;
+        }
+
+        return _print_xpos;
+    }
+
     int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
         _print_xpos = (int16_t)x;
         _print_ypos = (int16_t)y;
@@ -288,6 +390,103 @@ namespace fonts {
         platform::Unlock_Appropriate_Render_Buffer();
 
         return updated_x;
+    }
+
+    void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* string, int16_t color_flags, int16_t max_width, s_animation_header* bitmap) {
+        _print_xpos = x;
+        _print_ypos = y;
+
+        int16_t string_width = Get_String_Width_(string);
+        int16_t bitmap_height = animate::Get_Height_(bitmap);
+
+        if (y > bitmap_height) return;
+        if (y + _font_header.font_style_height <= 0) return;
+
+        int16_t bitmap_width = animate::Get_Width_(bitmap);
+        if (x > bitmap_width) return;
+        if (x + string_width <= 0) return;
+
+        int32_t space_index = 0;
+        int32_t remainder = 0;
+        int32_t quotient = 0;
+        int16_t justify_diff = 0;
+
+        if (max_width != 0) {
+            int i = 0;
+            int space_count = 0;
+            if (string[0] != '\0') {
+                do {
+                    uint8_t c = (uint8_t)string[i];
+                    if (c == 0x0D || c == 0x14 || c == 0x19 || c == 0x15 || c == 0x1D) {
+                        break;
+                    }
+                    if (c == 0x20) {
+                        space_count++;
+                    }
+                    i++;
+                } while (string[i] != '\0');
+            }
+
+            int16_t justify_width = max_width;
+            if (space_count == 0) {
+                justify_width = 0;
+            }
+
+            justify_diff = justify_width - Get_String_Width_(string);
+
+            if (justify_diff <= 0) {
+                justify_diff = 0;
+            } else {
+                remainder = justify_diff % space_count;
+                quotient = justify_diff / space_count;
+            }
+        }
+
+        uint8_t c = (uint8_t)string[0];
+        if (c != '\0') {
+            int index = 0;
+            do {
+                switch (c) {
+                    case 1:
+                        if (color_flags != 0) {
+                            Set_Normal_Colors_On_();
+                        }
+                        break;
+                    case 2:
+                    case 4:
+                        if (color_flags != 0) {
+                            Set_Highlight_Colors_On_();
+                        }
+                        break;
+                    case 3:
+                        if (color_flags != 0) {
+                            Set_Special_Colors_On_();
+                        }
+                        break;
+                    case 8:
+                        break;
+                    case 0x0D:
+                    case 0x14:
+                    case 0x15:
+                    case 0x19:
+                    case 0x1D:
+                        return;
+                    default:
+                        Print_Character_To_Bitmap_(_print_xpos, _print_ypos, (char)c, bitmap);
+                        _print_xpos += (int16_t)_font_header.font_style_widths[c] + _font_header.font_style_spacing;
+                        if (justify_diff != 0 && c == 0x20) {
+                            _print_xpos += (int16_t)quotient;
+                            if (space_index < remainder) {
+                                _print_xpos++;
+                            }
+                            space_index++;
+                        }
+                        break;
+                }
+                index++;
+                c = (uint8_t)string[index];
+            } while (c != '\0');
+        }
     }
 
     void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t param_4, s_animation_header* bitmap) {

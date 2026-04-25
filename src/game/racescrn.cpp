@@ -632,7 +632,7 @@ namespace RACESCRN {
     void __cdecl Race_Screen_() {
         int16_t selected_race_idx = -1;
         int16_t old_mission_idx = -1;
-        void* auto_function = nullptr;
+        MOX2::action_func_t auto_function = nullptr;
 
         MOX2::Get_Auto_Function_(&auto_function);
         palette::Save_Palette_();

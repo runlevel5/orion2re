@@ -407,4 +407,83 @@ namespace JIM {
         sound::Set_Stream_Volume_(0);
         sound::Stop_Stream_();
     }
+
+    void __cdecl Play_Streaming_Music_(int16_t music_id, int16_t transition_id, int16_t loop_flag) {
+        if (MOX::_settings.music_on != 1) {
+            return;
+        }
+
+        if (music_id != _jim_old_music_id) {
+            _jim_old_music_id = music_id;
+            _jim_old_transition_id = transition_id;
+            _jim_fade_music_flag = 1;
+        }
+
+        if (_jim_fade_music_flag == 1) {
+            sound::Fade_Stream_Down_(30);
+            _jim_fade_music_flag = 2;
+            return;
+        }
+
+        if (_jim_fade_music_flag == 2) {
+            if (sound::Get_Stream_Volume_() != 0) {
+                return;
+            }
+
+            sound::Stop_Stream_();
+
+            if (_jim_old_music_id <= 100) {
+                sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                sound::Play_Stream_(_jim_old_music_id);
+            } else {
+                sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);
+                sound::Play_Stream_(_jim_old_music_id - 100);
+            }
+
+            _jim_current_stream = _jim_old_music_id;
+
+            if (_jim_old_transition_id == -1 && loop_flag == 1) {
+                sound::Loop_Stream_(-1);
+            }
+
+            sound::Set_Stream_Volume_(0);
+            sound::Fade_Stream_Up_(30);
+
+            if (_jim_old_transition_id == -1) {
+                _jim_fade_music_flag = 4;
+            } else {
+                _jim_fade_music_flag = 3;
+            }
+        } else if (_jim_fade_music_flag == 3) {
+            if (sound::Is_Stream_Playing_() != 0) {
+                return;
+            }
+
+            sound::Stop_Stream_();
+
+            if (_jim_old_transition_id == -2) {
+                int32_t ticks = static_cast<int32_t>(_clock());
+                _jim_current_stream = static_cast<int16_t>((ticks % 3) + 1);
+                sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                sound::Play_Stream_(_jim_current_stream);
+            } else {
+                if (_jim_old_transition_id <= 100) {
+                    sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
+                    sound::Play_Stream_(_jim_old_transition_id);
+                } else {
+                    sound::Set_Stream_Filename_(s_STREAMHD_LBX_00555908);
+                    sound::Play_Stream_(_jim_old_transition_id - 100);
+                }
+                _jim_current_stream = _jim_old_transition_id;
+            }
+
+            if (loop_flag == 1) {
+                sound::Loop_Stream_(-1);
+            }
+
+            sound::Set_Stream_Volume_(0);
+            sound::Fade_Stream_Up_(30);
+            _jim_fade_music_flag = 4;
+        }
+    }
 }

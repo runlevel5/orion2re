@@ -2,7 +2,7 @@
 
 namespace CMBTDRW1 {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
-    inline void*& _k_save = *reinterpret_cast<void**>(std::uintptr_t{0x005960FC});
+    inline MOX2::action_func_t& _k_save = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005960FC});
 
     inline int16_t& _g_max = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE0});
     inline int16_t& _g_min = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE4});

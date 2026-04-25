@@ -143,6 +143,11 @@ namespace ERIC {
         BILL::_Print_Paragraph_(x, y_centered, width, text, 2);
     }
 
+    void __cdecl Print_Paragraph_Centered_Vertically_(int16_t x, int16_t y, int16_t width, uint16_t box_height, char* text, int16_t color) {
+        int16_t max_height = BILL::_Get_Paragraph_Max_Height_(width, text);
+        BILL::_Print_Paragraph_(x, y + (box_height >> 1) - (max_height / 2), width, text, color);
+    }
+
     char* __cdecl Red_If_Negative_Fmt_String_(int16_t value) {
         if (value >= 0) {
             return ESTRINGS::E_Strings_(12);
@@ -186,5 +191,171 @@ namespace ERIC {
         }
 
         return false;
+    }
+
+    void __cdecl Pulsing_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int32_t param_6, int16_t param_7) {
+        graphics::Box_(x1, y1, x2, y2, param_5, 0xff);
+        palette::Cycle_Palette_Color_(0xff, 0x13, 0x10, 0x09, 0x20, 0x28, 0x15, param_7);
+    }
+
+    void __cdecl Play_Loose_Flic_() {
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x16B), 0, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+    }
+
+    void __cdecl Play_Normal_Win_Flic_() {
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x136), 0x400, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+    }
+
+    void __cdecl Play_All_Flics_() {
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0xb7), 0x400, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x136), 0, 1);
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+    }
+
+    void __cdecl Play_Take_Orion_Flic_() {
+        Do_Cinematic_Popup_Setup_();
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x194), 0, 0);
+        Do_Cinematic_Popup_Cleanup_();
+    }
+
+    void __cdecl Set_Refresh_Mode_(int16_t mode) {
+        if (mode == 0) {
+            video::Set_Refresh_Full_();
+        } else if (mode == 2) {
+            video::Set_Refresh_Differential_();
+        } else if (mode == 3) {
+            video::Set_Refresh_Stencil_();
+        }
+    }
+
+    void __cdecl Do_Cinematic_Popup_Setup_() {
+        MOX2::Get_Auto_Function_(&_cinematic_saved_autofunction);
+        fields::Deactivate_Auto_Function_();
+
+        if (MOX::_settings.sound_fx_on == 0 && MOX::_settings.music_on == 0) {
+            _saved_sfx_l = 0;
+            _saved_music_l = 0;
+        } else {
+            _saved_sfx_l = MOX::_settings.sound_fx_level;
+            _saved_music_l = MOX::_settings.music_level;
+            if (MOX::_settings.music_level <= MOX::_settings.sound_fx_level) {
+                MOX::_settings.music_level = MOX::_settings.sound_fx_level;
+            }
+        }
+
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        Cinematic_Autofunction_();
+        fields::Assign_Auto_Function_(Cinematic_Autofunction_, 1);
+        allocate::Push_Block_(MOX::_screen_seg);
+        video::Copy_Off_To_Back_();
+    }
+
+    void __cdecl Play_Antarans_Attack_Flic_() {
+        Do_Cinematic_Popup_Setup_();
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0xAE), 0, 0);
+        Do_Cinematic_Popup_Cleanup_();
+    }
+
+    void __cdecl Play_Diplomatic_Win_Flic_() {
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x22C), 0, 1);
+
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_none, 1);
+        SMACK::Play_Cinematic_(ESTRINGS::E_Strings_(0x136), 0, 1);
+
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+    }
+
+    void __cdecl Play_Amoeba_Flic_() {
+        Do_Cinematic_Popup_Setup_();
+        SMACK::Play_Cinematic_(COLONY::_AMEBAFIN_LBX, 0, 0);
+        Do_Cinematic_Popup_Cleanup_();
+    }
+
+    int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx) {
+        if (MOX::_player[player_idx].traits[25] != 0) {
+            if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, 2, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+                if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+                    // Note: The original code calls this function twice with identical arguments.
+                    if (!Player_Has_Leader_With_General_Skill_At_Star_(MOX::_colony[colony_idx].owner, 0, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
+                        if (MOX::_player[MOX::_colony[colony_idx].owner].traits[25] == 0) {
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    int8_t __cdecl Player_Can_Mind_Control_Colony_With_Help_(int16_t player_idx, int16_t colony_idx)
+    {
+        if (MOX::_player[player_idx].traits[25] == 0)
+        {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x233));
+            return 0;
+        }
+
+        int16_t planet_idx = MOX::_colony[colony_idx].planet;
+        int16_t star_idx = MOX::_planet[planet_idx].star_index;
+
+        if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, 2, star_idx) == 0)
+        {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x24C));
+            return 0;
+        }
+
+        int16_t owner_idx = MOX::_colony[colony_idx].owner;
+
+        // The original code redundantly checks the exact same condition twice
+        if (Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 0, star_idx) != 0 ||
+            Player_Has_Leader_With_General_Skill_At_Star_(owner_idx, 0, star_idx) != 0)
+        {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x200));
+            return 0;
+        }
+
+        if (MOX::_player[owner_idx].traits[25] != 0)
+        {
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x201));
+            return 0;
+        }
+
+        return 1;
+    }
+
+    void __cdecl Force_Fade_To_Colony_Palette_(uint8_t flag) {
+        _hacky_need_to_fade_to_colony_palette_flag = flag;
+    }
+
+    int16_t __cdecl Player_Capitol_World_(int16_t player_idx) {
+        for (int16_t i = 0; i < MOX::_NUM_COLONIES; ++i) {
+            if (MOX::_colony[i].buildings[9] != 0 && MOX::_colony[i].owner == player_idx) {
+                return i;
+            }
+        }
+        return Pick_Random_Colony_(player_idx);
+    }
+
+    int16_t __cdecl Pick_Random_Colony_(int16_t owner) {
+        int16_t count = 0;
+        int16_t chosen_colony = -1;
+
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_COLONIES; ++i) {
+            if (MOX::_colony[i].owner == owner) {
+                count++;
+                if (random::Random_(count) == 1) {
+                    chosen_colony = i;
+                }
+            }
+        }
+
+        return chosen_colony;
     }
 }

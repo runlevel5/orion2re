@@ -19,15 +19,7 @@ namespace namestar {
 
     void __cdecl Draw_Input_Box_Popup_();
 
-    inline int8_t __cdecl Input_Box_Popup_(char* dest, int16_t max_len, int16_t max_width, char* title, int16_t x, int16_t y, uint8_t unknown) {
-        using Fn = int8_t(__cdecl*)(char*, int16_t, int16_t, char*, int16_t, int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00411710});
-        return fn(dest, max_len, max_width, title, x, y, unknown);
-    }
+    int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim);
 
-    inline int8_t __cdecl Input_Box_Popup_Animated_(char* dest, int16_t max_len, int16_t max_width, char* title, int16_t x, int16_t y) {
-        using Fn = int8_t(__cdecl*)(char*, int16_t, int16_t, char*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004116E0});
-        return fn(dest, max_len, max_width, title, x, y);
-    }
+    int8_t __cdecl Input_Box_Popup_Animated_(char* prompt, int16_t x, int16_t y, char* buffer, int16_t param_5, int16_t param_6);
 }

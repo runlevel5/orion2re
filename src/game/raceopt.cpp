@@ -27,7 +27,7 @@ namespace raceopt {
     }
 
     void __cdecl Evolutionary_Mutation_Screen_(int8_t *traits) {
-        void *local_164;
+        MOX2::action_func_t local_164;
         int16_t asStack_160[10];
         int8_t local_14c[31];
         char acStack_12c[200];

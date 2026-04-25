@@ -223,6 +223,12 @@ namespace sound {
 
     void __cdecl Fade_Stream_Up_(uint8_t fade_increment);
 
+    inline int32_t __cdecl Is_Stream_Playing_() {
+        using Fn = int32_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532050});
+        return fn();
+    }
+
     void __cdecl Set_Audio_Buffer_(void* buffer);
 
     void __cdecl Sound_On_();

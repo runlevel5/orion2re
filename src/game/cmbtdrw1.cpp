@@ -145,7 +145,7 @@ namespace CMBTDRW1 {
         MOX2::Get_Auto_Function_(&_k_save);
         video::Set_Page_Back_();
         MOX::_ship_frame--;
-        MOX2::Execute_Auto_Function_(&_k_save);
+        MOX2::Execute_Auto_Function_(_k_save);
         fields::Draw_Visible_Fields_Back_();
         video::Copy_Back_To_Off_();
         RUSS::Mox_Sync_Update_();

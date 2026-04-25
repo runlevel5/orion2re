@@ -63,10 +63,12 @@ namespace fonts {
 
     void __cdecl Print_Display_(int16_t x, int16_t y, const char* str, int16_t width);
 
-    inline void __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005260a0});
-        fn(x, y, str, process_colors, justified_width);
+    int16_t __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
+
+    inline int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, char);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005262d0});
+        return fn(x, y, c);
     }
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
@@ -85,11 +87,7 @@ namespace fonts {
 
     inline const char* s_Print_only_works_on_bitmaps = reinterpret_cast<const char*>(0x0055B15C);
 
-    inline void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t flag, int16_t param_4, s_animation_header* bitmap) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const char*, int16_t, int16_t, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005268C0});
-        fn(x, y, str, flag, param_4, bitmap);
-    }
+    void __cdecl Print_String_To_Bitmap_(int16_t x, int16_t y, const char* string, int16_t color_flags, int16_t max_width, s_animation_header* bitmap);
 
     void __cdecl Print_Display_To_Bitmap_(int16_t x, int16_t y, const char* str, int16_t param_4, s_animation_header* bitmap);
 

@@ -67,9 +67,11 @@ inline void FUN_004d7da0() {
 }
 
 namespace MOX2 {
-    void __cdecl Get_Auto_Function_(void** param_1);
+    typedef void(__cdecl* action_func_t)();
 
-    void __cdecl Execute_Auto_Function_(void* function_entry);
+    void __cdecl Get_Auto_Function_(action_func_t* param_1);
 
-    void __cdecl Put_Auto_Function_(void** param_1);
+    void __cdecl Execute_Auto_Function_(action_func_t function_entry);
+
+    void __cdecl Put_Auto_Function_(action_func_t* param_1);
 }

@@ -10,6 +10,9 @@ namespace JIM {
     inline int16_t& _jim_old_music_id =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005558E8 });
 
+    inline int16_t& _jim_fade_music_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558E4});
+    inline int16_t& _jim_old_transition_id = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005558EC});
+
     // Potential string literal: "STREAM.LBX"
     inline const char* s_STREAM_LBX =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x005558FC });
@@ -36,11 +39,7 @@ namespace JIM {
 
     void __cdecl Play_Combat_Music_();
 
-    inline void __cdecl Play_Streaming_Music_(int32_t music_id, int32_t p2, int32_t p3) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00424FB0});
-        fn(music_id, p2, p3);
-    }
+    void __cdecl Play_Streaming_Music_(int16_t music_id, int16_t transition_id, int16_t loop_flag);
 
     void __cdecl Decode_Text_Name_And_Name_(char* buffer, int16_t id1, int16_t id2, int16_t id3);
 

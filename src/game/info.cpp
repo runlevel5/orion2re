@@ -173,7 +173,7 @@ namespace INFO {
     }
 
     void Info_Screen_() {
-        void* auto_func_var;
+        MOX2::action_func_t auto_func_var;
         int16_t current_tab;
         char stardate_str[16];
         s_animation_header* info_lbx[26];

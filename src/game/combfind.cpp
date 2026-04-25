@@ -3,7 +3,7 @@
 namespace COMBFIND {
 
 void __cdecl Search_For_Battles_() {
-    void* saved_auto_fn;
+    MOX2::action_func_t saved_auto_fn;
     MOX2::Get_Auto_Function_(&saved_auto_fn);
 
     if (MOX::_game_type < 2) {

@@ -42,7 +42,7 @@ namespace SCIENCE {
     }
 
     void __cdecl Science_Room_(char* intro_animation_name, uint16_t discovery_count, uint16_t* discovery_data, char* footer_text) {
-        void* saved_auto_function = nullptr;
+        MOX2::action_func_t saved_auto_function = nullptr;
         int16_t science_hot_key;
         uint16_t remaining_discoveries;
         uint16_t current_entry_index;

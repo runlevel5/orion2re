@@ -298,7 +298,7 @@ namespace MULTPLAY {
     }
 
     void __cdecl Multi_Player_Screen_() {
-        void* saved_auto_func;
+        MOX2::action_func_t saved_auto_func;
         int8_t valid_saves[12];
         char msg_header[300];
         char msg_body[752];
@@ -431,7 +431,7 @@ namespace MULTPLAY {
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
                         _memcpy(MOX::_settings.net_game_name, s_Moo_II_0055aa88, 8);
-                        MOX::_settings.net_game_name[6] = (char)((abs(_clock()) & 0x1F) + 'a');
+                        MOX::_settings.net_game_name[6] = (char)((abs((long)_clock()) & 0x1F) + 'a');
                     }
                     MOX::_current_screen = 0xD;
                     done = true;
@@ -1147,7 +1147,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     }
 
     int16_t __cdecl Load_Multi_Player_Game_Screen_(void) {
-        void* auto_func_state;
+        MOX2::action_func_t auto_func_state;
         s_game_popup_fields descriptions;
         s_game_popup_fields* star_date_fields; // Part of local stack
         char warning_msg[100];
@@ -1493,7 +1493,7 @@ void __cdecl Change_MP_Game_Name_() {
         y = namestar::Star_Name_Popup_Screen_Center_Y_();
         x = namestar::Star_Name_Popup_Screen_Center_X_();
         
-        namestar::Input_Box_Popup_Animated_(MOX::_settings.net_game_name, 8, 0, prompt, x, y);
+        namestar::Input_Box_Popup_Animated_(prompt, x, y, MOX::_settings.net_game_name, 8, 0);
         
         is_valid = true;
         already_exists = false;
@@ -1776,7 +1776,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     }
 
 int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
-    void* saved_auto_fn;
+    MOX2::action_func_t saved_auto_fn;
     int16_t result;
     int16_t game_count;
     bool exit_screen = false;
@@ -2067,7 +2067,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     int16_t __cdecl Choose_Network_Plyrs_Screen_(int16_t* out_selected_player, int8_t* connected_flags, int8_t is_host, int8_t should_load) {
         uint32_t unused_data[4];
-        void* saved_auto_func;
+        MOX2::action_func_t saved_auto_func;
         uint8_t fade_flag = 0;
         int16_t result_status = 0;
         bool exit_loop = false;

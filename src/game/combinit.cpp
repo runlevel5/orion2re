@@ -441,7 +441,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     int16_t has_stellar_converter = 0;
     int16_t colony_pop = 0;
     int16_t mouse_list[6] = {0, 0, 0, 0, 0x27F, 0x1DF};
-    void* auto_func;
+    MOX2::action_func_t auto_func;
     void* glass_remap_block;
     char msg_buf[80];
 

@@ -7,7 +7,7 @@ namespace COLXPORT {
 
         if (COLONY::_full_draw != 0) {
             COLMOVE::_g_hacky_dont_draw_cluster_flag = 1;
-            MOX2::Execute_Auto_Function_(&COLXPORT::_saved_autofunction);
+            MOX2::Execute_Auto_Function_(COLXPORT::_saved_autofunction);
             COLMOVE::_g_hacky_dont_draw_cluster_flag = 0;
             COLONY::_full_draw = 1;
 

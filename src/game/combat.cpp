@@ -2,7 +2,7 @@
 
 namespace COMBAT {
     int16_t __cdecl Strategic_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, char* summary, char* details) {
-        void* auto_fn;
+        MOX2::action_func_t auto_fn;
         int16_t leader_combat_bonuses[20];
 
         for (int i = 0; i < 20; i++) {

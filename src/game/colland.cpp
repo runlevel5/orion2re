@@ -157,7 +157,7 @@ namespace COLLAND {
      * @address 00429a90
      */
     void __cdecl Colony_Landing_Screen_() {
-        void* saved_auto_fn;
+        MOX2::action_func_t saved_auto_fn;
         int16_t input_result;
 
         COLONY::Set_Colony_Font_();

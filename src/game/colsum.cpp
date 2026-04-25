@@ -48,7 +48,7 @@ namespace COLSUM {
     }
 
     void __cdecl Colony_Summary_Screen_() {
-        void* saved_auto_fn = nullptr;
+        MOX2::action_func_t saved_auto_fn = nullptr;
         int16_t input_val = 0;
         int16_t scan_val = 0;
         short colony_list_buffer[250];

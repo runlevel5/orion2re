@@ -22,7 +22,7 @@ namespace TURNSUM {
     void __cdecl Turn_Summary_Popup_()
     {
         int16_t num_msgs;
-        void* auto_func;
+        MOX2::action_func_t auto_func;
         s_list_item list_items[100];
 
         MOX::_current_screen = 0;

@@ -4,10 +4,7 @@
 struct s_animation_header;
 
 namespace BILL {
-    inline void __cdecl Bill_Init_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00406780})();
-    }
+    void __cdecl Bill_Init_();
 
     void __cdecl Cache_Player_Scientist_Anim_();
     void __cdecl Record_History_();
@@ -108,7 +105,7 @@ namespace BILL {
 
     void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val);
 
-    inline char* _dest_file_name = reinterpret_cast<char*>(std::uintptr_t{0x00564738});
+    inline char (&_dest_file_name)[32] = *reinterpret_cast<char(*)[32]>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
     inline const char* s_SR_R_wildcard_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512E0}); // "SR_R?_SC.LBX"
 
@@ -117,9 +114,5 @@ namespace BILL {
     inline const char* const s_wb = reinterpret_cast<const char*>(std::uintptr_t{0x00551178}); // "wb"
     inline const char* const s_rb = reinterpret_cast<const char*>(std::uintptr_t{0x0055117c}); // "rb"
 
-    inline char* __cdecl Cache_Player_Spy_Anim_() {
-        using Fn = char*(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407A20});
-        return fn();
-    }
+    char* __cdecl Cache_Player_Spy_Anim_();
 }

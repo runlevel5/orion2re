@@ -15,7 +15,7 @@ namespace COLXPORT {
 
     inline int16_t*& _g_colony_list_ptr = *reinterpret_cast<int16_t**>(std::uintptr_t{0x005A7B74});
 
-    inline void*& _saved_autofunction = *reinterpret_cast<void**>(std::uintptr_t{0x0056501C});
+    inline MOX2::action_func_t& _saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x0056501C});
 
     inline int16_t (&_list_col)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00564DF0});
 
