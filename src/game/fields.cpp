@@ -1,13 +1,13 @@
 #include "pch.h"
 
 namespace fields {
-    void __cdecl Assign_Update_Function_(void (*function_ptr)()) {
-        _update_function = function_ptr;
+    void __cdecl Assign_Update_Function_(MOX2::action_func_t fn) {
+        _update_function = fn;
     }
 
-    void __cdecl Assign_Auto_Function_(void (*function_ptr)(), int32_t delay) {
+    void __cdecl Assign_Auto_Function_(MOX2::action_func_t fn, int32_t delay) {
         _auto_active_flag = 1;
-        _function = function_ptr;
+        _function = fn;
 
         if (delay > 0 && delay < 10) {
             _auto_function_delay = (uint16_t)delay;
@@ -178,6 +178,23 @@ namespace fields {
         return result_index;
     }
 
+    void __cdecl Quick_Call_Auto_Function_() {
+        if (_auto_active_flag == 0) {
+            platform::Toggle_Pages_Stub_();
+            return;
+        }
+
+        timer::Mark_Time_();
+        video::Set_Page_Off_();
+        Invoke_Auto_Function_();
+        platform::Toggle_Pages_Stub_();
+        timer::Release_Time_(1);
+
+        if (_update_function != nullptr) {
+            _update_function();
+        }
+    }
+
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
         s_field* field = &_fields[_fields_count];
 
@@ -292,6 +309,33 @@ namespace fields {
         _fields_count++;
 
         return current_id;
+    }
+
+    int16_t __cdecl Add_Radio_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* variable, const char* hotkey, int16_t sound) {
+        char error_msg[80];
+
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(s_You_exceeded_the_max_number_of_fields);
+        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
+        for (int i = 0; i < 11; ++i) {
+            dest[i] = src[i];
+        }
+        for (int i = 11; i < 20; ++i) {
+            dest[i] = 0;
+        }
+
+        if (_fields_count >= _max_fields_count) {
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        Add_Button_Info_(x, y, help, pic, hotkey, sound);
+
+        int16_t current_field = _fields_count;
+        _fields[current_field].field_type = FIELD_TYPE_RADIO;
+        _fields[current_field].detail.radio.selection = variable;
+
+        _fields_count++;
+
+        return current_field;
     }
 
     int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, void* highlight_color, char hotkey) {
@@ -570,7 +614,7 @@ namespace fields {
 
         s_field& current_field = _fields[_fields_count];
         current_field.field_type = FIELD_TYPE_LOCKED;
-        current_field.detail.radio.selection = (char*)selection;
+        current_field.detail.radio.selection = selection;
 
         int16_t current_index = _fields_count;
         _fields_count++;
@@ -592,7 +636,7 @@ namespace fields {
         _active_input_field_number = _old_active_input_field_number;
     }
 
-    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str) {
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str, char* param_14) {
         int16_t n = _fields_count;
 
         _fields[n].x = x;
@@ -695,5 +739,277 @@ namespace fields {
 
     void __cdecl Exit_List_Field_() {
         _exit_the_list_field = 1;
+    }
+
+    int16_t __cdecl Add_Clipped_Circle_Field_(int16_t center_x, int16_t center_y, int16_t radius, char* hotkey, int8_t sound) {
+        char msg[80] = "You exceeded the max number of fields (150)";
+
+        int32_t max_x = center_x + radius;
+        int32_t min_x = center_x - radius;
+        int32_t min_y = center_y - radius;
+        int32_t max_y = center_y + radius;
+
+        if (_max_fields_count <= _fields_count) {
+            exitm::Exit_With_Message(msg);
+        }
+
+        if (max_x < video::_screen_window_x1 ||
+            video::_screen_window_x2 < min_x ||
+            max_y < video::_screen_window_y1 ||
+            video::_screen_window_y2 < min_y) {
+            return -10000;
+        }
+
+        if (video::_screen_window_x1 > min_x) {
+            _fields[_fields_count].x = video::_screen_window_x1;
+        } else {
+            _fields[_fields_count].x = static_cast<int16_t>(min_x);
+        }
+
+        if (video::_screen_window_x2 < max_x) {
+            _fields[_fields_count].x_end = video::_screen_window_x2;
+        } else {
+            _fields[_fields_count].x_end = static_cast<int16_t>(max_x);
+        }
+
+        if (video::_screen_window_y1 > min_y) {
+            _fields[_fields_count].y = video::_screen_window_y1;
+        } else {
+            _fields[_fields_count].y = static_cast<int16_t>(min_y);
+        }
+
+        if (video::_screen_window_y2 < max_y) {
+            _fields[_fields_count].y_end = video::_screen_window_y2;
+        } else {
+            _fields[_fields_count].y_end = static_cast<int16_t>(max_y);
+        }
+
+        _fields[_fields_count].detail.circle.center_x = center_x;
+        _fields[_fields_count].detail.circle.center_y = center_y;
+        _fields[_fields_count].detail.circle.radius_squared = radius * radius;
+        _fields[_fields_count].field_type = 14;
+        _fields[_fields_count].sound = sound;
+        _fields[_fields_count].hotkey = *hotkey;
+
+        if (_fields[_fields_count].hotkey >= 'a' && _fields[_fields_count].hotkey <= 'z') {
+            _fields[_fields_count].hotkey -= 0x20;
+        }
+
+        int16_t result = _fields_count;
+        _fields_count++;
+
+        return result;
+    }
+
+    void __cdecl Disable_Draw_Field_(int16_t field_idx) {
+        switch (_fields[field_idx].field_type) {
+            case 0:
+                _fields[field_idx].field_type = -1001;
+                break;
+            case 1:
+                _fields[field_idx].field_type = -1;
+                break;
+            case 2:
+                _fields[field_idx].field_type = -2;
+                break;
+            case 3:
+                _fields[field_idx].field_type = -3;
+                break;
+            default:
+                break;
+        }
+    }
+
+    void __cdecl Enable_Draw_Field_(int16_t field_idx) {
+        int16_t field_type = _fields[field_idx].field_type;
+
+        if (field_type > -3) {
+            if (field_type == -2) {
+                _fields[field_idx].field_type = 2;
+            } else if (field_type == -1) {
+                _fields[field_idx].field_type = 1;
+            }
+        } else if (field_type == -3) {
+            _fields[field_idx].field_type = 3;
+        } else if (field_type == -1001) {
+            _fields[field_idx].field_type = 0;
+        }
+    }
+
+    int16_t __cdecl Get_List_Field_(
+        int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size,
+        int16_t* selected_index, uint8_t* item_flags, int16_t param_9, int16_t* param_10,
+        int32_t param_11, s_animation_header* pic, int32_t param_13, char* param_14)
+    {
+        _list_field_on = 1;
+        Set_Input_Delay_(1);
+        Clear_Fields_();
+        _exit_the_list_field = 0;
+
+        int16_t font_height = fonts::Get_Font_Height_();
+        int16_t font_spacing = fonts::Get_Font_Vertical_Spacing_();
+
+        int32_t local_14 = -1;
+        int16_t local_c = 0;
+        int32_t item_count = 0;
+        int32_t current_y = y;
+        int32_t y_step = font_height + font_spacing;
+
+        bool done_parsing = false;
+        do {
+            if (*list_ptr == '\0') {
+                done_parsing = true;
+            } else {
+                if (local_c == 0) {
+                    if (item_flags != nullptr && item_flags[item_count] == 0) {
+                        // Keep searching for the first unflagged item
+                    } else {
+                        local_c = 1;
+                        local_14 = item_count;
+                    }
+                }
+
+                current_y += y_step;
+
+                int16_t flags = 1;
+                if (item_flags != nullptr) {
+                    flags = (int16_t)item_flags[item_count];
+                }
+
+                Add_String_List_Field_(
+                    x, static_cast<int16_t>(current_y), width, list_ptr, flags,
+                    (char**)selected_index, static_cast<int16_t>(item_count + 1),
+                    (int16_t)(uintptr_t)param_9, (int16_t*)param_10, param_11, pic, param_13,
+                    s__00551100, param_14
+                );
+
+                item_count++;
+            }
+            list_ptr += item_size;
+        } while (!done_parsing);
+
+        int16_t font_style = fonts::Get_Current_Font_Style_();
+        s_colors* font_color = fonts::Get_Current_Font_Color_();
+        s_colors* highlight_color = fonts::Get_Current_Highlight_Color_();
+        s_colors* special_color = fonts::Get_Current_Special_Color_();
+
+        fonts::Set_Font_Style_(font_style, font_color);
+
+        for (int i = 0; i < 8; ++i) {
+            _list_normal_color.colors[i] = font_color->colors[i];
+            _list_special_colors.colors[i] = special_color->colors[i];
+            _list_highlight_colors.colors[i] = highlight_color->colors[i];
+        }
+
+        int32_t local_4 = 0;
+        int16_t help_field_id = Add_String_List_Field_(
+            x, y, width, help, 1, (char**)&local_4, 1,
+            0, nullptr, 0, nullptr, 0, s__00551100, DAT_0055afc0
+        );
+
+        int8_t sel = *selected_index;
+        if (sel < 0 || sel >= item_count || sel < local_14) {
+            if (local_14 < 0 || local_14 >= item_count) {
+                *selected_index = -1;
+            } else {
+                *selected_index = static_cast<int8_t>(_fields[local_14 + 1].detail.button.help_start);
+            }
+        }
+
+        bool bVar2 = false;
+        int16_t input = 0;
+        do {
+            timer::Mark_Time_();
+            input = Get_Input_();
+
+            if (input != 0) {
+                bVar2 = true;
+                if (input > 0 && item_flags != nullptr && item_flags[input - 1] == 0) {
+                    bVar2 = false;
+                } else if (input == help_field_id) {
+                    bVar2 = false;
+                }
+            }
+
+            if (bVar2) {
+                break;
+            }
+
+            if (_exit_the_list_field == 1) {
+                bVar2 = true;
+            }
+
+            video::Set_Page_Off_();
+            Invoke_Auto_Function_();
+
+            if (_list_field_scan_flag != 0) {
+                int16_t scan = Scan_Input_();
+                if (scan > 0) {
+                    *selected_index = static_cast<int8_t>(_fields[scan].detail.button.help_start);
+                }
+            }
+
+            palette::Refresh_Palette_();
+            platform::Toggle_Pages_Stub_();
+            timer::Release_Time_(_auto_function_delay);
+
+        } while (!bVar2);
+
+        Clear_Fields_();
+        _list_field_on = 0;
+        _list_field_scan_flag = 1;
+        mouse::Mouse_Buffer_();
+        mouse::Mouse_Buffer2_();
+
+        if (input < 0) {
+            return -1;
+        }
+        return input - 1;
+    }
+
+    int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
+        if (_fields_count >= _max_fields_count) {
+            char error_msg[80] = "You exceeded the max number of fields (150)";
+            exitm::Exit_With_Message(error_msg);
+        }
+
+        if (x_end < video::_screen_window_x1 || x > video::_screen_window_x2 ||
+            y_end < video::_screen_window_y1 || y > video::_screen_window_y2) {
+            return -10000;
+        }
+
+        if (x < video::_screen_window_x1) {
+            x = video::_screen_window_x1;
+        }
+
+        if (x_end > video::_screen_window_x2) {
+            x_end = video::_screen_window_x2;
+        }
+
+        if (y < video::_screen_window_y1) {
+            y = video::_screen_window_y1;
+        }
+
+        if (y_end > video::_screen_window_y2) {
+            y_end = video::_screen_window_y2;
+        }
+
+        _fields[_fields_count].x = x;
+        _fields[_fields_count].x_end = x_end;
+        _fields[_fields_count].y = y;
+        _fields[_fields_count].y_end = y_end;
+        _fields[_fields_count].field_type = FIELD_TYPE_HIDDEN;
+        _fields[_fields_count].sound = (int16_t)(int8_t)sound;
+        _fields[_fields_count].hotkey = *hotkey;
+
+        char c = _fields[_fields_count].hotkey;
+        if (c >= 'a' && c <= 'z') {
+            _fields[_fields_count].hotkey = c - 0x20;
+        }
+
+        int16_t result = _fields_count;
+        _fields_count++;
+
+        return result;
     }
 }

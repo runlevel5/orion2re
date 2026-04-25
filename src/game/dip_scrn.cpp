@@ -1315,10 +1315,10 @@ namespace DIP_SCRN {
         fonts::Set_Font_LF_(4);
         Setup_Diplomacy_Help_(11, _demand_help_entry);
 
-        int8_t list_index[2] = {0, 0};
+        int16_t list_index = 0;
         int16_t selection = fields::Get_List_Field_(
             10, 0x76, 0xF5, _demand_title, (char*)_diplomacy_list_choice,
-            0x32, list_index, demand_list_flags, 17,
+            0x32, &list_index, demand_list_flags, 17,
             nullptr, 0, nullptr, 0, 0
         );
 
@@ -1542,7 +1542,7 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Get_Net_Diplomacy_Choices_() {
-        char local_5f2[2];
+        int16_t selected;
         int16_t tech_count;
         int16_t done_flag;
         uint8_t options[11];
@@ -1862,12 +1862,10 @@ namespace DIP_SCRN {
                     fonts::Set_Font_LF_(4);
                     Setup_Diplomacy_Help_(11, reinterpret_cast<int16_t*>(&_main_net_diplomacy_help_entry));
 
-                    local_5f2[0] = 0;
-                    local_5f2[1] = 0;
-
+                    selected = 0;
                     int16_t main_choice = fields::Get_List_Field_(
                         10, 118, 245, _main_diplomacy_title,
-                        reinterpret_cast<char*>(_diplomacy_list_choice), 50, (int8_t*)local_5f2, options, 17,
+                        reinterpret_cast<char*>(_diplomacy_list_choice), 50, &selected, options, 17,
                         nullptr, 0, nullptr, 0, 0
                     );
 
@@ -2263,7 +2261,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_LF_(4);
 
         current_selection = 0;
-        result = fields::Get_List_Field_(10, 102, 245, list_title, _diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
+        result = fields::Get_List_Field_(10, 102, 245, list_title, (char*)_diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
 
         MOX::_star_bg_seg = (s_animation_header*)saved_bg_seg;
         COLONY::_using_colony_screen_palette = 0;

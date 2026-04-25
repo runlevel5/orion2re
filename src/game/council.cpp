@@ -216,7 +216,7 @@ namespace council {
         list_metadata = 0;
 
         int16_t selection = fields::Get_List_Field_(
-            214, 388, 180, title_msg, list_items, 25,
+            214, 388, 180, title_msg, (char*)list_items, 25,
             &list_metadata, active_mask, 17, nullptr, 0, nullptr, 0, 0
         );
 
@@ -557,7 +557,7 @@ namespace council {
         char accept_label[25];
         char refuse_label[25];
         char list_items[40];
-        uint16_t list_flags[3];
+        int16_t list_flags[3];
 
         fields::Assign_Auto_Function_(Draw_Main_Council_Screen_, 2);
 

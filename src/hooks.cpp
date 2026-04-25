@@ -3418,6 +3418,13 @@ namespace hooks {
         { 0x005210c0, &fields::Clipped_Dot_ },
         { 0x00523DF0, &fields::Exit_List_Field_ },
         { 0x00411710, &namestar::Input_Box_Popup_ },
+        { 0x0051d4d0, &fields::Add_Clipped_Hidden_Field_ },
+        { 0x00523b00, &fields::Add_Clipped_Circle_Field_ },
+        { 0x0051dc20, &fields::Add_Radio_Button_Field_ },
+        { 0x0051EEA0, &fields::Disable_Draw_Field_ },
+        { 0x0051EEF0, &fields::Enable_Draw_Field_ },
+        { 0x0051FF50, &fields::Quick_Call_Auto_Function_ },
+        { 0x00521210, &fields::Get_List_Field_ },
     };
 
     void Install_Hooks()

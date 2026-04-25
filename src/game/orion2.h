@@ -1380,6 +1380,8 @@ typedef struct s_field_multi_button s_field_multi_button, *Ps_field_multi_button
 
 typedef struct s_field_string_list s_field_string_list, *Ps_field_string_list;
 
+typedef struct s_field_circle s_field_circle, *Ps_field_circle;
+
 struct s_field_grid {
     undefined field0_0x0;
     undefined field1_0x1;
@@ -1398,6 +1400,20 @@ struct s_field_grid {
     short field14_0x20;
     undefined field15_0x22;
     undefined field16_0x23;
+};
+
+struct s_field_circle {
+    undefined field0_0x0;
+    undefined field1_0x1;
+    short field2_0x2;
+    struct s_colors *highlight_color;
+    short center_x;
+    undefined field5_0xa;
+    undefined field6_0xb;
+    short center_y;
+    undefined field8_0xe;
+    undefined field9_0xf;
+    int32_t radius_squared;
 };
 
 struct s_field_scroll {
@@ -1496,7 +1512,7 @@ struct s_field_radio {
     short help_start;
     undefined field6_0xe;
     undefined field7_0xf;
-    char *selection;
+    int16_t *selection;
     short field9_0x14;
     undefined field10_0x16;
     undefined field11_0x17;
@@ -1537,6 +1553,7 @@ union s_field_detail {
     struct s_field_cont_input cont_input;
     struct s_field_multi_button multibtn;
     struct s_field_string_list strings;
+    struct s_field_circle circle;
 };
 
 struct s_field {

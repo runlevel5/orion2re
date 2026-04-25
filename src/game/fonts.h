@@ -99,6 +99,18 @@ namespace fonts {
 
     s_colors* __cdecl Get_Current_Font_Color_();
 
+    inline s_colors* __cdecl Get_Current_Highlight_Color_() {
+        using Fn = s_colors*(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526080});
+        return fn();
+    }
+
+    inline s_colors* __cdecl Get_Current_Special_Color_() {
+        using Fn = s_colors*(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526090});
+        return fn();
+    }
+
     int16_t __cdecl Get_Font_Height_();
 
     int16_t __cdecl Get_Font_Vertical_Spacing_();
