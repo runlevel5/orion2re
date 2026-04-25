@@ -71,7 +71,7 @@ namespace MOX2 {
 
     void __cdecl Get_Auto_Function_(action_func_t* param_1);
 
-    void __cdecl Execute_Auto_Function_(action_func_t function_entry);
+    void __cdecl Execute_Auto_Function_(action_func_t* function_entry);
 
     void __cdecl Put_Auto_Function_(action_func_t* param_1);
 }

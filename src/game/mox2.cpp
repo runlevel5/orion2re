@@ -364,10 +364,10 @@ namespace MOX2 {
         fields::_function = *param_1;
     }
 
-    void __cdecl Execute_Auto_Function_(MOX2::action_func_t fn)
+    void __cdecl Execute_Auto_Function_(MOX2::action_func_t* fn)
     {
-        if (fn != nullptr) {
-            fn();
+        if (*fn != nullptr) {
+            (*fn)();
         }
     }
 

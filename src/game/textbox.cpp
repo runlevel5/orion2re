@@ -78,7 +78,7 @@ namespace TEXTBOX {
         MOX2::Get_Auto_Function_(&TEXTBOX::_textbox_af);
         fields::Deactivate_Auto_Function_();
         video::Set_Refresh_Stencil_();
-        MOX2::Execute_Auto_Function_(TEXTBOX::_textbox_af);
+        MOX2::Execute_Auto_Function_(&TEXTBOX::_textbox_af);
 
         TEXTBOX::_old_draw_fields_flag = fields::_draw_fields_flag;
         fields::Enable_Draw_All_Fields_();
