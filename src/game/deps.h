@@ -80,6 +80,7 @@
 #include "coldraw.h"
 #include "colbcach.h"
 #include "colbldg.h"
+#include "colrefit.h"
 #include "colmove.h"
 #include "key.h"
 #include "file_ani.h"

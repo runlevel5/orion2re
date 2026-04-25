@@ -1196,6 +1196,318 @@ namespace COLBLDG {
         return -1;
     }
 
+    void __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2) {
+        _scanned_prod = -1;
+        _scanned_field = *param_2;
+
+        if (_return_to_build_popup_from_custom_design != 0 || _hacky_speed_refitted_ship_flag != 0) {
+            _return_to_build_popup_from_custom_design = 0;
+            _hacky_speed_refitted_ship_flag = 0;
+            _field_mode = 0;
+            COLONY::Reset_Mouse_Picture_();
+
+            if (MOX::_temp_star_handle == 0) {
+                MOX::_refit_ship = 0;
+            } else if (MOX::_refit_ship != 0) {
+                Add_Refited_Ship_To_Queue_();
+                MOX::_refit_ship = 0;
+            }
+        }
+
+        int16_t input_field = *param_1;
+
+        if (_fields[3] == input_field) {
+            _field_mode = 0;
+            COLONY::Reset_Mouse_Picture_();
+            MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+
+            if (Something_Behind_Settting_() == 0) {
+                Do_Exit_Screen_Cleanup_();
+            } else {
+                while (true) {
+                    int16_t current_item = 0;
+                    for (int i = 0; i < 7; ++i) {
+                        int16_t item = _current_item[i];
+                        if (item == -3 /* 0xfffd */ || item == -2 /* 0xfffe */ || item == -10 /* 0xfff6 */) {
+                            if (Something_Behind_Settting_() != 0) {
+                                current_item = item;
+                                break;
+                            }
+                        }
+                    }
+
+                    char* str2 = Selection_Name_(current_item);
+                    char* str1 = Selection_Name_(current_item);
+                    char* format = ESTRINGS::E_Strings_(0x3b);
+                    char buffer[500];
+                    _sprintf(buffer, format, str1, str2);
+
+                    if (MOX::_settings.auto_delete_tg_housing == 0) {
+                        if (GENDRAW::Do_Confirmation_Box_(buffer) == 0) {
+                            Do_Draw_Build_Queue_();
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < 7; ++i) {
+                        int16_t item = _current_item[i];
+                        if (item == -3 || item == -2 || item == -10) {
+                            if (Something_Behind_Settting_() != 0) {
+                                Squish_Out_Queue_Slot_(i);
+                            }
+                        }
+                    }
+
+                    Do_Draw_Build_Queue_();
+                    if (Something_Behind_Settting_() == 0) {
+                        break;
+                    }
+                }
+                Do_Exit_Screen_Cleanup_();
+            }
+        } else if (_fields[0] == input_field || _fields[1] == input_field) {
+            if (_field_mode == 0 && _active_prod == -1) {
+                bool flag = false;
+                for (int i = 0; i < 7; ++i) {
+                    if (flag) {
+                        break;
+                    }
+                    int16_t item = _current_item[i];
+                    if (item <= -100) {
+                        if (ERIC::Sint_Is_In_List_(item, MOX::_colony[COLONY::_colony_handle].producing, 14) == 0) {
+                            if (MOX::_ship[-100 - item].status == 4) {
+                                if (GENDRAW::Do_Confirmation_Box_(ESTRINGS::E_Strings_(0x1dc)) == 0) {
+                                    *param_1 = 0;
+                                    return;
+                                }
+                                flag = true;
+                                Do_Draw_Build_Queue_();
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < 7; ++i) {
+                    int16_t item = _current_item[i];
+                    if (item <= -100) {
+                        ERIC::Sint_Is_In_List_(item, MOX::_colony[COLONY::_colony_handle].producing, 14);
+                    }
+                }
+
+                Remove_Ships_(0);
+            } else {
+                _field_mode = 0;
+                COLONY::Reset_Mouse_Picture_();
+                _active_prod = -1;
+                *param_1 = 0;
+                COLONY::Reset_Mouse_Picture_();
+            }
+        } else if (_fields[5] == input_field) {
+            mouse::Set_Mouse_List_(&_mouse_list_which_ship, 1);
+            _field_mode = 1;
+        } else if (_fields[6] == input_field) {
+            _field_mode = 2;
+            mouse::Set_Mouse_List_(&_mouse_list_what, 1);
+        } else if (_fields[4] == input_field) {
+            int owner = MOX::_colony[COLONY::_colony_handle].owner;
+            if (MOX::_player[owner].tech_fields[0x16] == 3 && MOX::_player[owner].tech_fields[0x17] == 3) {
+                _field_mode = 0;
+                COLONY::Reset_Mouse_Picture_();
+
+                int16_t refit_ship = COLREFIT::Colony_Refit_Popup_();
+                if (refit_ship != -1) {
+                    Do_Draw_Build_Queue_();
+                    int16_t popup2 = COLREFIT::Colony_Refit2_Popup_(refit_ship);
+                    if (popup2 == -3) {
+                        DAT_00571F00 = refit_ship;
+                        MOX::_temp_star_handle = 1;
+                        MOX::_refit_ship = 1;
+                        _hacky_speed_refitted_ship_flag = 1;
+                    } else if (popup2 == -2) {
+                        DAT_00571F00 = refit_ship;
+                        MOX::_refit_ship = 1;
+                        struct_::Copy_Structure_(&MOX::_player[owner].ship_designs[5], &MOX::_ship[refit_ship].d, 99);
+                        _return_to_build_popup_from_custom_design = 1;
+                        MOX::_temp_star_handle = 5;
+                    }
+                    Do_Draw_Build_Queue_();
+                } else {
+                    Do_Draw_Build_Queue_();
+                }
+            } else {
+                GENDRAW::Help_(ESTRINGS::E_Strings_(0x244));
+                Do_Draw_Build_Queue_();
+            }
+        } else if (_fields[2] != input_field) {
+            if (_fields[10] == input_field) {
+                Do_Exit_Screen_Cleanup_();
+                COLONY::Tested_Colony_Buys_Outright_(COLONY::_colony_handle);
+                Do_Draw_Build_Queue_();
+                fields::Clear_Mouse_Buffer_();
+                fields::Set_Input_Delay_(3);
+            } else if (_fields[8] == input_field) {
+                int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 0);
+                _field_mode = 0;
+                COLONY::Reset_Mouse_Picture_();
+                MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+                Do_Exit_Screen_Cleanup_();
+                if (next_colony != COLONY::_colony_handle) {
+                    COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
+                }
+                COLONY::_full_draw = 1;
+            } else if (_fields[9] == input_field) {
+                int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 1);
+                if (next_colony != COLONY::_colony_handle) {
+                    COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
+                }
+                _field_mode = 0;
+                COLONY::Reset_Mouse_Picture_();
+                MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+                Do_Exit_Screen_Cleanup_();
+                COLONY::_full_draw = 1;
+            } else if (_fields[7] == input_field) {
+                COLONY::_cheats = (COLONY::_cheats == 0) ? 1 : 0;
+                GENDRAW::Help_(ESTRINGS::E_Strings_(0xda));
+                Do_Draw_Build_Queue_();
+            }
+        }
+
+        if (_field_mode != 1) {
+            for (int i = 0; i < _n_building_indexes; ++i) {
+                if (*param_2 == _building_fields[i]) {
+                    _scanned_prod = _building_indexes[i];
+                }
+                if (*param_1 == _building_fields[i]) {
+                    int16_t bidx = _building_indexes[i];
+                    if (Has_Prod_In_Queue_(bidx)) {
+                        int16_t first_slot = First_Prod_Queue_Slot_(bidx);
+                        if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 && first_slot == 0) {
+                            GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
+                            Do_Draw_Build_Queue_();
+                            _active_prod = -1;
+                            COLONY::Reset_Mouse_Picture_();
+                            return;
+                        }
+                        Delete_From_Queue_(first_slot);
+                        if (_active_prod >= 0x31) {
+                            if ((_active_prod - first_slot) == 0x31) {
+                                _active_prod = -1;
+                            }
+                        }
+                    } else {
+                        if (Add_To_Queue_(bidx) == 0) {
+                            GENDRAW::Help_(ESTRINGS::E_Strings_(0x188));
+                            Do_Draw_Build_Queue_();
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < _n_military_indexes; ++i) {
+            if (*param_2 == _military_fields[i] && _military_indexes[i] != -9) {
+                _scanned_prod = _military_indexes[i];
+            }
+            if (*param_1 == _military_fields[i] && _military_indexes[i] != -9) {
+                if (_military_indexes[i] == 0xb) {
+                    Calculate_Military_Array_();
+                    COLONY::_full_draw = 1;
+                }
+
+                if (_military_indexes[i] == 0xb) {
+                    int16_t star_idx = MOX::_planet[MOX::_colony[COLONY::_colony_handle].planet].star_index;
+                    int16_t uncolonized = Star_N_Uncolonized_Worlds_(star_idx);
+                    int16_t in_queue = N_Prods_In_Queue_(0xb);
+
+                    if (uncolonized <= in_queue) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x232));
+                        Do_Draw_Build_Queue_();
+                        continue;
+                    }
+                }
+
+                int16_t midx = _military_indexes[i];
+                if (_field_mode == 1) {
+                    if (midx > -100 && midx <= -50) {
+                        _return_to_build_popup_from_custom_design = 1;
+                        MOX::_temp_star_handle = -50 - midx;
+                        COLONY::Reset_Mouse_Picture_();
+                        return;
+                    }
+                } else {
+                    if (Add_To_Queue_(midx) == 0) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x188));
+                        Do_Draw_Build_Queue_();
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < 7; ++i) {
+            if (*param_2 == _queue_fields[i]) {
+                _scanned_prod = _current_item[i];
+            }
+            if (*param_1 == _queue_fields[i]) {
+                if (_active_prod == -1) {
+                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0 && i == 0) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
+                        Do_Draw_Build_Queue_();
+                        return;
+                    }
+                    _active_prod = i + 0x31;
+                } else {
+                    int16_t active_idx = _active_prod - 0x31;
+                    bool do_delete = false;
+
+                    if (MOX::_colony[COLONY::_colony_handle].bought_outright != 0) {
+                        if (i == 0 || active_idx == 0) {
+                            GENDRAW::Help_(ESTRINGS::E_Strings_(0x23a));
+                            Do_Draw_Build_Queue_();
+                            _active_prod = -1;
+                            COLONY::Reset_Mouse_Picture_();
+                            return;
+                        }
+                    }
+
+                    if (i == active_idx) {
+                        do_delete = true;
+                    } else if (_current_item[active_idx] == -10 && active_idx != 0 && (active_idx - i) == 1) {
+                        do_delete = true;
+                    } else if ((active_idx + 1) < 7 && _current_item[active_idx + 1] == -10 && (active_idx - i) == -1) {
+                        do_delete = true;
+                    }
+
+                    if (do_delete) {
+                        Delete_From_Queue_(i);
+                        _active_prod = -1;
+                        COLONY::Reset_Mouse_Picture_();
+                    } else {
+                        Insert_Before_Queue_Slot_(active_idx, i);
+                        Defragment_Queue_();
+                        COLONY::Reset_Mouse_Picture_();
+                    }
+                }
+
+                if (_field_mode != 0) {
+                    _field_mode = 0;
+                    COLONY::Reset_Mouse_Picture_();
+                    _active_prod = -1;
+                    *param_1 = 0;
+                    COLONY::Reset_Mouse_Picture_();
+                }
+            }
+        }
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            Do_Draw_Build_Queue_();
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+
+        if (param_1 != nullptr) {
+            COLCALC::Colony_Calculation_(COLONY::_colony_handle);
+        }
+    }
+
     /**
      * @address 0050ae50
      */

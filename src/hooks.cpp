@@ -3428,6 +3428,8 @@ namespace hooks {
         { 0x0051DE80, &fields::Add_Scroll_Field_ },
         { 0x005214c0, &fields::Add_String_List_Field_ },
         { 0x00520220, &fields::Add_Irregular_Button_Field_ },
+        { 0x0050b520, &COLBLDG::Evaluate_Input_ },
+        { 0x00520690, &fields::Add_Multi_Hot_Key_Field_ },
     };
 
     void Install_Hooks()

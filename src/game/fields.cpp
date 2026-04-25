@@ -552,34 +552,24 @@ namespace fields {
             exitm::Exit_With_Message(s_You_exceeded_the_max_number_of_fields);
         }
 
-        // Access the current field structure (size 0x37 / 55 bytes)
-        s_field& field = _fields[_fields_count];
+        int16_t current_idx = _fields_count;
+        s_field* field = &_fields[current_idx];
 
-        field.x = -1;
-        field.y = -1;
-        field.x_end = -1;
-        field.y_end = -1;
-        field.hotkey = '\0';
-        field.field_type = FIELD_TYPE_MULTI_HOTKEY;
+        field->x = -1;
+        field->y = -1;
+        field->x_end = -1;
+        field->y_end = -1;
+        field->hotkey = '\0';
+        field->field_type = FIELD_TYPE_MULTI_HOTKEY;
 
-        field.detail.button.help = const_cast<char*>(help_text);
-        field.detail.button.help_start = 0;
-
-        // Calculate length of help string manually as seen in the assembly (SCASB)
-        uint16_t length = 0;
-        if (help_text != nullptr) {
-            while (help_text[length] != '\0') {
-                length++;
-            }
-        }
-        field.detail.button.help_end = (int16_t)length;
+        field->detail.multi_hotkey.help = const_cast<char*>(help_text);
+        field->detail.multi_hotkey.help_start = 0;
+        field->detail.multi_hotkey.help_len = strlen(help_text);
 
         _multi_hotkey_active_field = 1;
-
-        int16_t current_index = _fields_count;
         _fields_count++;
 
-        return current_index;
+        return _fields_count - 1;
     }
 
     int16_t __cdecl Scan_Field_() {

@@ -10,6 +10,12 @@ namespace GENDRAW {
 
     int16_t __cdecl Confirmation_Box_(char* text);
 
+    inline int16_t __cdecl Do_Confirmation_Box_(char* msg) {
+        using Fn = int16_t(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479700});
+        return fn(msg);
+    }
+
     void __cdecl Warning_Box_(const char* message);
 
     inline s_colors& _message_text_colors = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00557640});
