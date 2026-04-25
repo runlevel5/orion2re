@@ -1984,13 +1984,13 @@ namespace fields {
                     }
                     case 6: {
                         int16_t ret_val = _fields[i].detail.scroll.return_value;
-                        int16_t min_val = _fields[i].detail.scroll.set_value;
+                        int16_t max_val = _fields[i].detail.scroll.set_value;
                         int16_t cur_val = *_fields[i].detail.scroll.value;
                         if (cur_val < ret_val) {
                             cur_val = ret_val;
                         }
-                        if (min_val < cur_val) {
-                            cur_val = min_val;
+                        if (max_val < cur_val) {
+                            cur_val = max_val;
                         }
                         *_fields[i].detail.scroll.value = cur_val;
                         break;
@@ -2012,7 +2012,7 @@ namespace fields {
                                     _fields[i].x_end,
                                     _fields[i].y + font_height + 1,
                                     _fields[i].detail.strings.count,
-                                    _fields[i].detail.strings.strings[0],
+                                    reinterpret_cast<char*>(_fields[i].detail.strings.strings),
                                     _fields[i].detail.strings.field8_0x18,
                                     _fields[i].detail.strings.pic,
                                     _fields[i].detail.strings.special_color
