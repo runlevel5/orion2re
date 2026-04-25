@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <cstdint>
 
+inline char* s___0055b0ac = reinterpret_cast<char*>(std::uintptr_t{0x0055B0AC});
+
 struct s_animation_header;
 struct s_lbx_stream_header;
 

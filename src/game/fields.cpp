@@ -572,6 +572,39 @@ namespace fields {
         return _fields_count - 1;
     }
 
+    int16_t __cdecl Scan_Input_() {
+        mouse::Pointer_X_();
+        mouse::Pointer_Y_();
+        mouse::Check_Mouse_Shape_();
+
+        _pointer_offset = mouse::Get_Pointer_Offset_();
+
+        int16_t field_id = Scan_Field_();
+        s_field* field = &_fields[field_id];
+
+        int16_t type = field->field_type;
+
+        if (type == 9) {
+            *field->detail.scroll.value = field->detail.scroll.set_value;
+            return field->detail.scroll.return_value;
+        }
+
+        if (type == 10) {
+            if (field->detail.radio.is_active == 0) {
+                return 0;
+            }
+        }
+
+        if (type == 12) {
+            if (_down_mouse_button == -1 || _fields[_down_mouse_button].field_type != 12) {
+                *field->detail.grid.grid_x_ptr = (int16_t)((mouse::Pointer_X_() - field->x) / field->detail.grid.step_x);
+                *field->detail.grid.grid_y_ptr = (int16_t)((mouse::Pointer_Y_() - field->y) / field->detail.grid.step_y);
+            }
+        }
+
+        return field_id;
+    }
+
     int16_t __cdecl Scan_Field_() {
         int16_t mouse_x = static_cast<int16_t>(mouse::Pointer_X_());
         int16_t mouse_y = static_cast<int16_t>(mouse::Pointer_Y_());
@@ -809,6 +842,555 @@ namespace fields {
         return result;
     }
 
+    int16_t __cdecl Interpret_Mouse_Input_() {
+        int16_t field_idx = 0;
+        _down_mouse_button = -1;
+        _auto_input_variable = 0;
+
+        int16_t ptr_x = mouse::Pointer_X_();
+        int16_t ptr_y = mouse::Pointer_Y_();
+        _pointer_offset = mouse::Get_Pointer_Offset_();
+
+        if (key::Keyboard_Status_() != 0) {
+            uint16_t key_code = Interpret_Keyboard_Input_(&field_idx);
+            if (key_code == 0 || field_idx < 0 || key_code == 0xFFFF) {
+                if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                return field_idx;
+            }
+
+            if (key_code == 0x8500) {
+                if (capture::Check_Release_Version_() != 1) {
+                    F11_Key_();
+                }
+            }
+
+            if (key_code == 0x8600) {
+                mouse::Save_Mouse_State_();
+                capture::Screen_Flic_Capture_();
+                int16_t cur_y = mouse::Pointer_Y_();
+                int16_t cur_x = mouse::Pointer_X_();
+                platform::Force_Cursor_Pos(cur_x, cur_y);
+                mouse::Restore_Mouse_State_();
+            }
+
+            if (key_code == 0x011B) {
+                if (_mouse_cancel_disabled == 0) {
+                    if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                    return -1;
+                }
+            }
+
+            if (key_code == 0x00C0) {
+                if (capture::Check_Release_Version_() == 0) {
+                    if (_field_box_mode == 0) {
+                        _field_box_mode = 1;
+                    } else {
+                        _field_box_mode = 0;
+                    }
+                }
+            }
+
+            if (key_code == 0x297E) {
+                if (capture::Check_Release_Version_() == 0) {
+                    if (_help_box_mode == 0) {
+                        _help_box_mode = 1;
+                    } else {
+                        _help_box_mode = 0;
+                    }
+                }
+            }
+
+            if (field_idx != 0 && (uint16_t)(uint8_t)_fields[field_idx].hotkey == key_code) {
+                if (_fields[field_idx].field_type == 6) {
+                    return 0;
+                }
+                
+                Push_Field_Down_(field_idx, ptr_x, ptr_y);
+                int16_t field_type = _fields[field_idx].field_type;
+                
+                if (field_type == 1) {
+                    if (*_fields[field_idx].detail.radio.selection == 0) {
+                        *_fields[field_idx].detail.radio.selection = 1;
+                    } else {
+                        *_fields[field_idx].detail.radio.selection = 0;
+                    }
+                } else if (field_type == 2) {
+                    if (*_fields[field_idx].detail.radio.selection == 0) {
+                        *_fields[field_idx].detail.radio.selection = 1;
+                    }
+                } else if (field_type == 9) {
+                    _down_mouse_button = -1;
+                    return _fields[field_idx].detail.scroll.return_value;
+                }
+                
+                if (field_type != 7 && field_type != 8) {
+                    Quick_Call_Auto_Function_();
+                }
+                _down_mouse_button = -1;
+                return field_idx;
+            }
+
+            if (key_code == 0x1C0D || key_code == 0xE00D) {
+                if (_input_field_active != 0) {
+                    Copy_Continuous_String_();
+                    if (_mouse_auto_exit == 0) {
+                        Quick_Call_Auto_Function_();
+                    }
+                    _input_field_active = 0;
+                    _down_mouse_button = -1;
+                    _active_input_field_number = -1;
+                    return -1;
+                }
+                
+                int16_t scanned_field = Scan_Field_();
+                if (scanned_field == 0) {
+                    return 0;
+                }
+                
+                if (scanned_field > 0) {
+                    if (_fields[scanned_field].field_type == 11) {
+                        if (_input_field_active == 0) {
+                            if (_active_input_field_number == scanned_field) {
+                                int16_t len = 0;
+                                if (_continuous_string[0] != '\0') {
+                                    while (len < _fields[scanned_field].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                                        len++;
+                                    }
+                                }
+                                if (len != 0 && _continuous_string[len - 1] == '_') {
+                                    len--;
+                                }
+                                _continuous_string[len] = '\0';
+                                strcpy(_fields[scanned_field].detail.cont_input.buffer, _continuous_string);
+                                _active_input_field_number = -1;
+                                _cursor_position = 0;
+                            } else {
+                                Copy_Continuous_String_();
+                                _active_input_field_number = scanned_field;
+                                _cursor_position = 0;
+                                _cursor_on = 0;
+                            }
+                        } else {
+                            Copy_Continuous_String_();
+                            _input_field_active = 1;
+                            _cursor_position = 0;
+                            _cursor_on = 0;
+                            _active_input_field_number = scanned_field;
+                        }
+                    } else if (_input_field_active != 0) {
+                        int16_t len = 0;
+                        if (_continuous_string[0] != '\0') {
+                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                                len++;
+                            }
+                        }
+                        if (len != 0 && _continuous_string[len - 1] == '_') {
+                            len--;
+                        }
+                        _continuous_string[len] = '\0';
+                        strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                        _cursor_position = 0;
+                        _input_field_active = 0;
+                        _active_input_field_number = -1;
+                    }
+                }
+                
+                if (scanned_field != 0) {
+                    if (_fields[scanned_field].field_type != 6 && _fields[scanned_field].field_type != 11) {
+                        Push_Field_Down_(scanned_field, ptr_x, ptr_y);
+                    }
+                    
+                    int16_t field_type = _fields[scanned_field].field_type;
+                    if (field_type == 1) {
+                        if (*_fields[scanned_field].detail.radio.selection == 0) {
+                            *_fields[scanned_field].detail.radio.selection = 1;
+                        } else {
+                            *_fields[scanned_field].detail.radio.selection = 0;
+                        }
+                    } else if (field_type == 2) {
+                        if (*_fields[scanned_field].detail.radio.selection == 0) {
+                            *_fields[scanned_field].detail.radio.selection = 1;
+                        }
+                    } else if (field_type == 9) {
+                        _down_mouse_button = -1;
+                        return _fields[scanned_field].detail.scroll.return_value;
+                    }
+                    
+                    if (_mouse_auto_exit == 0) {
+                        Quick_Call_Auto_Function_();
+                    }
+                    _down_mouse_button = -1;
+                    return scanned_field;
+                }
+                
+                if (_list_field_on != 0) {
+                    for (int16_t i = 1; i <= _fields_count; ++i) {
+                        if (_fields[i].field_type == 10 && *_fields[i].detail.radio.selection == _fields[i].detail.radio.value && _fields[i].detail.radio.is_active != 0) {
+                            _down_mouse_button = -1;
+                            return i;
+                        }
+                    }
+                }
+            } else if (key_code == 0x0D2B || key_code == 0x0C2D) {
+                int16_t scanned_field = Scan_Field_();
+                if (scanned_field != 0 && _fields[scanned_field].field_type == 6) {
+                    if (key_code == 0x0D2B) {
+                        Increment_Scroll_Bar_(scanned_field);
+                    }
+                    if (key_code == 0x0C2D) {
+                        Decrement_Scroll_Bar_(scanned_field);
+                    }
+                    _down_mouse_button = -1;
+                    return 0;
+                }
+            }
+            
+            if (_input_field_active > 0) {
+                if (key_code == 0x011B) {
+                    strcpy(_continuous_string, _fields[_active_input_field_number].detail.cont_input.buffer);
+                    int16_t act_num = _active_input_field_number;
+                    _active_input_field_number = -1;
+                    _input_field_active = 0;
+                    _cursor_position = 0;
+                    _cursor_on = 0;
+                    return -act_num;
+                }
+                if (key_code == 0x0E7F) {
+                    _continuous_string[0] = '\0';
+                    _active_input_field_first = 0;
+                } else if (key_code == 0x0E08) {
+                    if (_active_input_field_first == 0) {
+                        int16_t len = 0;
+                        if (_continuous_string[0] != '\0') {
+                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && _continuous_string[len] != '\0') {
+                                len++;
+                            }
+                        }
+                        if (len > 0) {
+                            _cursor_position = 0;
+                            _continuous_string[len - 1] = '\0';
+                        }
+                    } else {
+                        _continuous_string[0] = '\0';
+                        _active_input_field_first = 0;
+                    }
+                } else {
+                    int16_t chr = key_code & 0xFF;
+                    if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
+                        _active_input_field_first = 0;
+                        if (_active_input_field_number >= 0 && _active_input_field_number <= _fields_count) {
+                            int16_t font_shadow = _fields[_active_input_field_number].detail.button.font_shadow_style;
+                            if (font_shadow == -1) {
+                                fonts::Set_Font_Style_Shadow_Down_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
+                            } else if (font_shadow == 0) {
+                                fonts::Set_Font_Style_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
+                            } else if (font_shadow == 1) {
+                                fonts::Set_Font_Style_Shadow_Up_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
+                            } else {
+                                fonts::Set_Font_Style_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
+                            }
+                        }
+                        int16_t len = 0;
+                        while (_continuous_string[len] != '_' && _continuous_string[len] != '\0' && len < _fields[_active_input_field_number].detail.cont_input.max_length - 1) {
+                            len++;
+                        }
+                        if (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && fonts::Get_String_Width_(_continuous_string) + _fields[_active_input_field_number].x <= _fields[_active_input_field_number].x_end) {
+                            _continuous_string[len] = (char)chr;
+                            _continuous_string[len + 1] = '\0';
+                        } else {
+                            _continuous_string[len] = '\0';
+                        }
+                        _cursor_on = 0;
+                        _cursor_position = 0;
+                    }
+                }
+            }
+            
+            _down_mouse_button = -1;
+            return 0;
+        }
+
+        int16_t mouse_btn = mouse::Mouse_Button_();
+        if (mouse_btn == 0) {
+            if (mouse::Mouse_Buffer_() == 0) {
+                _pressed_button_flag = 0;
+                return 0;
+            }
+            
+            int16_t buf_btn = mouse::Mouse_Buffer_Button_();
+            if (buf_btn == 2) {
+                if (_help_list_active != 0 && Check_Help_List_() == 0) {
+                    mouse::Mouse_Buffer_();
+                    mouse::Mouse_Buffer2_();
+                    return 0;
+                }
+                if (_mouse_cancel_disabled == 0) {
+                    mouse::Mouse_Buffer_();
+                    mouse::Mouse_Buffer2_();
+                    if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                    return -1;
+                }
+            }
+            
+            int16_t buf_x = mouse::Mouse_Buffer_X_();
+            int16_t buf_y = mouse::Mouse_Buffer_Y_();
+            if (_pressed_button_flag == 0) {
+                _pressed_button_flag = 1;
+                _pressed_mouse_x_value = buf_x;
+                _pressed_mouse_y_value = buf_y;
+            }
+            
+            field_idx = 0;
+            _pointer_offset = mouse::Get_Pointer_Offset_();
+            
+            for (int16_t i = 1; i <= _fields_count; ++i) {
+                int16_t x = buf_x + _pointer_offset;
+                int16_t y = buf_y + _pointer_offset;
+                
+                if (_fields[i].x <= x && x <= _fields[i].x_end && _fields[i].y <= y && y <= _fields[i].y_end) {
+                    if (_fields[i].field_type != 14) {
+                        field_idx = i;
+                        break;
+                    }
+                    
+                    int dx = buf_x - _fields[i].detail.circle.center_x;
+                    int dy = buf_y - _fields[i].detail.circle.center_y;
+                    if (dx * dx + dy * dy <= _fields[i].detail.circle.radius_squared) {
+                        field_idx = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (field_idx != 0) {
+                if (_fields[field_idx].field_type != 11) {
+                    _auto_input_variable = field_idx;
+                    Push_Field_Down_(field_idx, buf_x, buf_y);
+                    Quick_Call_Auto_Function_();
+                }
+                
+                switch (_fields[field_idx].field_type) {
+                    case 1:
+                        if (*_fields[field_idx].detail.radio.selection == 0) {
+                            *_fields[field_idx].detail.radio.selection = 1;
+                        } else {
+                            *_fields[field_idx].detail.radio.selection = 0;
+                        }
+                        break;
+                    case 2:
+                        if (*_fields[field_idx].detail.radio.selection == 0) {
+                            *_fields[field_idx].detail.radio.selection = 1;
+                        }
+                        break;
+                    case 4:
+                        Push_Field_Down_(field_idx, buf_x, buf_y);
+                        break;
+                    case 9:
+                        _down_mouse_button = -1;
+                        return _fields[field_idx].detail.scroll.return_value;
+                    case 11:
+                        if (_input_field_active == 0) {
+                            strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                            _input_field_active = 1;
+                        } else if (field_idx != _active_input_field_number) {
+                            strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                        }
+                        _cursor_on = 0;
+                        _cursor_position = 0;
+                        _active_input_field_number = field_idx;
+                        break;
+                    default:
+                        if (_input_field_active != 0) {
+                            int16_t len = 0;
+                            if (_continuous_string[0] != '\0') {
+                                while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                                    len++;
+                                }
+                            }
+                            if (len != 0 && _continuous_string[len - 1] == '_') {
+                                len--;
+                            }
+                            _continuous_string[len] = '\0';
+                            strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                            _input_field_active = 0;
+                            _active_input_field_number = -1;
+                        }
+                        break;
+                }
+            }
+            
+            _down_mouse_button = -1;
+            if (field_idx != 0) {
+                mouse::Mouse_Buffer2_();
+                _last_button_number = buf_btn;
+                _last_button_x = buf_x;
+                _last_button_y = buf_y;
+            }
+            
+            _auto_input_variable = 0;
+            if (buf_btn != 2) {
+                return field_idx;
+            } else {
+                return -field_idx;
+            }
+        } else {
+            if (mouse_btn == 2) {
+                if (_help_list_active != 0 && Check_Help_List_() == 0) {
+                    mouse::Mouse_Buffer_();
+                    mouse::Mouse_Buffer2_();
+                    return 0;
+                }
+                if (_mouse_cancel_disabled == 0) {
+                    while (mouse::Mouse_Button_() == 2) {
+                        Quick_Call_Auto_Function_();
+                    }
+                    mouse::Mouse_Buffer_();
+                    mouse::Mouse_Buffer2_();
+                    if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                    return -1;
+                }
+            }
+            
+            ptr_x = mouse::Pointer_X_();
+            ptr_y = mouse::Pointer_Y_();
+            if (_pressed_button_flag == 0) {
+                _pressed_button_flag = 1;
+                _pressed_mouse_x_value = ptr_x;
+                _pressed_mouse_y_value = ptr_y;
+            }
+            
+            while (mouse::Mouse_Button_() != 0) {
+                ptr_x = mouse::Pointer_X_();
+                ptr_y = mouse::Pointer_Y_();
+                _pointer_offset = mouse::Get_Pointer_Offset_();
+                
+                field_idx = 0;
+                if (_dynamic_field_refresh != 0) {
+                    field_idx = Scan_Field_();
+                    _down_mouse_button = -1;
+                }
+                
+                if (field_idx == 0) {
+                    if (_down_mouse_button != -1) {
+                        if (_fields[_down_mouse_button].field_type == 6) {
+                            Invoke_Auto_Function_();
+                        }
+                        int16_t down_type = _fields[_down_mouse_button].field_type;
+                        if (down_type != 3 && down_type != 10 && down_type != 11) {
+                            mouse::Save_Mouse_State_();
+                            Draw_Field_(_down_mouse_button, 0);
+                            platform::Force_Cursor_Pos(ptr_x, ptr_y);
+                            mouse::Restore_Mouse_State_();
+                        }
+                        _down_mouse_button = -1;
+                    }
+                    break;
+                }
+                
+                if (_down_mouse_button != field_idx && _fields[field_idx].field_type != 4 && _fields[field_idx].field_type != 11) {
+                    bool skip_push = false;
+                    if (_down_mouse_button != -1) {
+                        if (_fields[field_idx].field_type == 12 && _fields[_down_mouse_button].field_type == 12) {
+                            skip_push = true;
+                        } else if (_fields[_down_mouse_button].field_type == 6) {
+                            Invoke_Auto_Function_();
+                        }
+                    }
+                    if (!skip_push) {
+                        Push_Field_Down_(field_idx, ptr_x, ptr_y);
+                    }
+                }
+                
+                if (_fields[field_idx].field_type == 11) {
+                    if (_input_field_active == 0 || field_idx != _active_input_field_number) {
+                        strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                        _input_field_active = 1;
+                        _active_input_field_first = 1;
+                        _cursor_position = 0;
+                        _cursor_on = 0;
+                        _active_input_field_number = field_idx;
+                    }
+                } else if (_input_field_active != 0) {
+                    int16_t len = 0;
+                    if (_continuous_string[0] != '\0') {
+                        while (len < _fields[_active_input_field_number].detail.cont_input.max_length && _continuous_string[len] != '\0') {
+                            len++;
+                        }
+                    }
+                    if (len != 0 && _continuous_string[len - 1] == '_') {
+                        len--;
+                    }
+                    _continuous_string[len] = '\0';
+                    strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+                    _active_input_field_number = -1;
+                    _input_field_active = 0;
+                }
+                
+                _auto_input_variable = field_idx;
+                if (_mouse_auto_exit != 0) break;
+                
+                if (mouse::Mouse_Button_() != 0) {
+                    Call_Auto_Function_();
+                }
+                mouse::Mouse_Buffer_();
+                mouse::Mouse_Buffer2_();
+            }
+            
+            if (_auto_input_variable != 0 && _fields[_auto_input_variable].field_type == 6) {
+                Invoke_Auto_Function_();
+            }
+            _auto_input_variable = 0;
+            
+            if (field_idx != 0) {
+                mouse::Mouse_Buffer_();
+                mouse::Mouse_Buffer2_();
+                _last_button_number = mouse_btn;
+                _last_button_y = ptr_y;
+                _last_button_x = ptr_x;
+                
+                switch (_fields[field_idx].field_type) {
+                    case 1:
+                        if (*_fields[field_idx].detail.radio.selection == 0) {
+                            *_fields[field_idx].detail.radio.selection = 1;
+                        } else {
+                            *_fields[field_idx].detail.radio.selection = 0;
+                        }
+                        break;
+                    case 2:
+                        if (*_fields[field_idx].detail.radio.selection == 0) {
+                            *_fields[field_idx].detail.radio.selection = 1;
+                        }
+                        break;
+                    case 4:
+                        Push_Field_Down_(field_idx, ptr_x, ptr_y);
+                        break;
+                    case 9:
+                        _down_mouse_button = -1;
+                        if (mouse_btn != 2) {
+                            return _fields[field_idx].detail.scroll.return_value;
+                        }
+                        if (_mouse_cancel_disabled != 0) {
+                            return -_fields[field_idx].detail.scroll.return_value;
+                        }
+                        if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                        return -1;
+                }
+            }
+            
+            _down_mouse_button = -1;
+            if (mouse_btn == 1) {
+                if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                return field_idx;
+            }
+            if (mouse_btn == 2) {
+                if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
+                return -field_idx;
+            }
+            
+            return 0;
+        }
+    }
+
     void __cdecl Disable_Draw_Field_(int16_t field_idx) {
         switch (_fields[field_idx].field_type) {
             case 0:
@@ -1016,5 +1598,544 @@ namespace fields {
         _fields_count++;
 
         return result;
+    }
+
+    void __cdecl Draw_Visible_Fields_Back_() {
+        int16_t x1 = video::_screen_window_x1;
+        int16_t x2 = video::_screen_window_x2;
+        int16_t y1 = video::_screen_window_y1;
+        int16_t y2 = video::_screen_window_y2;
+
+        graphics::Reset_Window_();
+        video::Set_Page_Back_();
+
+        if (_draw_fields_flag != 0 && _fields_count > 1) {
+            for (int16_t i = 1; i < _fields_count; ++i) {
+                s_field* f = &_fields[i];
+
+                if (i == _down_mouse_button && f->field_type != 4 && f->field_type != 12 && f->field_type != 10) {
+                    Draw_Field_(i, 1);
+                    continue;
+                }
+
+                switch (f->field_type) {
+                    case 0:
+                        animate::Reset_Animation_Frame_(f->detail.button.pic);
+                        animate::Draw_(f->x, f->y, f->detail.button.pic);
+                        if (f->detail.button.help != nullptr && *f->detail.button.help != '\0') {
+                            fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            int16_t h = fonts::Get_Font_Height_() - 1;
+                            fonts::Print_Centered_(
+                                f->x + (f->x_end - f->x) / 2,
+                                f->y + (f->y_end - f->y) / 2 - h / 2,
+                                f->detail.button.help
+                            );
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        if (*f->detail.radio.selection == 0) {
+                            animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
+                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                int16_t h = fonts::Get_Font_Height_() - 1;
+                                fonts::Print_Centered_(
+                                    f->x + (f->x_end - f->x) / 2,
+                                    f->y + (f->y_end - f->y) / 2 - h / 2,
+                                    f->detail.radio.help
+                                );
+                            }
+                        } else {
+                            if (f->detail.radio.field9_0x14 == 0) {
+                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                            } else {
+                                animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                            }
+                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
+                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                int16_t h = fonts::Get_Font_Height_() - 1;
+                                fonts::Print_Centered_(
+                                    f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
+                                    f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
+                                    f->detail.radio.help
+                                );
+                            }
+                        }
+                        break;
+                    case 3:
+                        if (*f->detail.radio.selection == f->detail.radio.value) {
+                            if (f->detail.radio.field9_0x14 == 0) {
+                                animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                            } else {
+                                animate::Set_Animation_Frame_(f->detail.radio.pic, 1);
+                            }
+                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
+                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                int16_t h = fonts::Get_Font_Height_() - 1;
+                                fonts::Print_Centered_(
+                                    f->x + (f->x_end - f->x) / 2 + _selected_button_text_x_offset,
+                                    f->y + (f->y_end - f->y) / 2 - h / 2 + _selected_button_text_y_offset,
+                                    f->detail.radio.help
+                                );
+                            }
+                        } else {
+                            animate::Reset_Animation_Frame_(f->detail.radio.pic);
+                            animate::Draw_(f->x, f->y, f->detail.radio.pic);
+                            if (f->detail.radio.help != nullptr && *f->detail.radio.help != '\0') {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                                int16_t h = fonts::Get_Font_Height_() - 1;
+                                fonts::Print_Centered_(
+                                    f->x + (f->x_end - f->x) / 2,
+                                    f->y + (f->y_end - f->y) / 2 - h / 2,
+                                    f->detail.radio.help
+                                );
+                            }
+                        }
+                        break;
+                    case 4:
+                        if (_down_mouse_button != i) {
+                            fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            fonts::Set_Font_Highlight_Colors_(f->detail.button.highlight_color);
+                            if (f->detail.button.background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.button.background_color));
+                            }
+                            if (f->detail.button.draw_style == 0) {
+                                fonts::Print_(f->x, f->y, f->detail.button.help);
+                            } else {
+                                fonts::Print_Right_(f->x_end, f->y, f->detail.button.help);
+                            }
+                        }
+                        break;
+                    case 6: {
+                        int16_t return_val = f->detail.scroll.return_value;
+                        int16_t set_val = f->detail.scroll.set_value;
+                        int16_t val = *f->detail.scroll.value;
+                        
+                        if (val < return_val) {
+                            val = return_val;
+                        }
+                        if (val > set_val) {
+                            val = set_val;
+                        }
+                        *f->detail.scroll.value = val;
+                        break;
+                    }
+                    case 10: {
+                        fonts::Set_Font_Style_(f->font_style, f->font_color);
+                        int16_t spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
+                        if (spacing == 0) {
+                            spacing = 1;
+                        }
+                        int16_t font_height = fonts::Get_Font_Height_();
+
+                        if (*f->detail.strings.value == f->detail.strings.help_start) {
+                            graphics::Gradient_Fill_(
+                                f->x - 1,
+                                f->y - spacing + 1,
+                                f->x_end,
+                                f->y + font_height + 1,
+                                f->detail.strings.count,
+                                f->detail.strings.strings,
+                                f->detail.strings.field8_0x18,
+                                f->detail.strings.pic,
+                                f->detail.strings.special_color
+                            );
+                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
+                        } else if (f->detail.strings.field1_0x2 != 0) {
+                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
+                        } else {
+                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
+                            fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
+                        }
+                        break;
+                    }
+                    case 11: {
+                        int16_t shadow_style = f->detail.cont_input.font_shadow_style;
+                        if (_active_input_field_number == i) {
+                            if (shadow_style == -1) {
+                                fonts::Set_Font_Style_Shadow_Down_(f->font_style, f->font_color);
+                            } else if (shadow_style == 0) {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            } else if (shadow_style == 1) {
+                                fonts::Set_Font_Style_Shadow_Up_(f->font_style, f->font_color);
+                            } else {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            }
+
+                            fonts::Set_Font_Highlight_Colors_(f->detail.cont_input.highlight_color);
+                            fonts::Set_Highlight_Colors_On_();
+
+                            if (f->detail.cont_input.background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.cont_input.background_color));
+                            }
+
+                            int16_t pos = _cursor_position / 2;
+                            bool blink = (pos != _cursor_on);
+                            
+                            _cursor_on = pos;
+                            _cursor_position++;
+                            if (_cursor_position > 3) {
+                                _cursor_position = 0;
+                            }
+
+                            if (blink) {
+                                if (pos == 0) {
+                                    int16_t len = 0;
+                                    if (_continuous_string[0] != '_') {
+                                        while (_continuous_string[len] != '_') {
+                                            if (len >= f->detail.cont_input.max_length) break;
+                                            len++;
+                                        }
+                                    }
+                                    _continuous_string[len] = '\0';
+                                } else {
+                                    int16_t len = 0;
+                                    if (_continuous_string[0] != '\0') {
+                                        while (_continuous_string[len] != '\0') {
+                                            if (len >= f->detail.cont_input.max_length - 1) break;
+                                            len++;
+                                        }
+                                    }
+                                    if (len < f->detail.cont_input.max_length - 1) {
+                                        strcat(_continuous_string, s___0055b0ac);
+                                    }
+                                }
+                            }
+
+                            if (f->detail.cont_input.pic != nullptr) {
+                                animate::Draw_(f->x, f->y, f->detail.cont_input.pic);
+                            }
+
+                            int16_t height = f->y_end - f->y;
+                            int16_t font_height = fonts::Get_Font_Height_();
+                            if (height > font_height) {
+                                fonts::Print_(f->x + 10, f->y + (height / 2) - (font_height / 2), _continuous_string);
+                            } else {
+                                fonts::Print_(f->x + 10, f->y, _continuous_string);
+                            }
+                            fonts::Set_Normal_Colors_On_();
+
+                        } else {
+                            if (shadow_style == -1) {
+                                fonts::Set_Font_Style_Shadow_Down_(f->font_style, f->font_color);
+                            } else if (shadow_style == 0) {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            } else if (shadow_style == 1) {
+                                fonts::Set_Font_Style_Shadow_Up_(f->font_style, f->font_color);
+                            } else {
+                                fonts::Set_Font_Style_(f->font_style, f->font_color);
+                            }
+
+                            if (f->detail.cont_input.background_color != 0) {
+                                graphics::Fill_(f->x - 1, f->y, f->x_end, f->y_end, static_cast<uint8_t>(f->detail.cont_input.background_color));
+                            }
+
+                            int16_t height = f->y_end - f->y;
+                            int16_t font_height = fonts::Get_Font_Height_();
+                            if (height > font_height) {
+                                fonts::Print_(f->x + 10, f->y + (height / 2) - (font_height / 2), f->detail.cont_input.buffer);
+                            } else {
+                                fonts::Print_(f->x + 10, f->y, f->detail.cont_input.buffer);
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                if (_field_box_mode != 0 && f->field_type != 8) {
+                    video::Clip_On_();
+                    line::Line_(f->x, f->y, f->x_end, f->y, static_cast<uint8_t>(_field_outline_color));
+                    line::Line_(f->x, f->y, f->x, f->y_end, static_cast<uint8_t>(_field_outline_color));
+                    line::Line_(f->x, f->y_end, f->x_end, f->y_end, static_cast<uint8_t>(_field_outline_color));
+                    line::Line_(f->x_end, f->y, f->x_end, f->y_end, static_cast<uint8_t>(_field_outline_color));
+                    video::Clip_Off_();
+                }
+            }
+        }
+
+        if (_help_box_mode != 0 && _help_list_count > 0) {
+            for (int16_t i = 0; i < _help_list_count; ++i) {
+                s_help_box* help_box = reinterpret_cast<s_help_box*>(
+                    reinterpret_cast<uint8_t*>(_help_struct_pointer) + i * sizeof(s_help_box)
+                );
+                if (help_box->active != -1) {
+                    video::Clip_On_();
+                    line::Line_(help_box->x1, help_box->y1, help_box->x2, help_box->y1, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box->x1, help_box->y1, help_box->x1, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box->x1, help_box->y2, help_box->x2, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
+                    line::Line_(help_box->x2, help_box->y1, help_box->x2, help_box->y2, static_cast<uint8_t>(_help_field_outline_color));
+                    video::Clip_Off_();
+                }
+            }
+        }
+
+        graphics::Set_Window_(x1, y1, x2, y2);
+    }
+
+    void __cdecl Draw_Visible_Fields_() {
+        int16_t old_x1 = video::_screen_window_x1;
+        int16_t old_x2 = video::_screen_window_x2;
+        int16_t old_y1 = video::_screen_window_y1;
+        int16_t old_y2 = video::_screen_window_y2;
+
+        graphics::Reset_Window_();
+        video::Set_Page_Off_();
+
+        if (_draw_fields_flag != 0 && _fields_count > 1) {
+            for (int i = 1; i < _fields_count; i++) {
+                if (_down_mouse_button == i && _fields[i].field_type != 4 && _fields[i].field_type != 12 && _fields[i].field_type != 10) {
+                    Draw_Field_(i, 1);
+                    continue;
+                }
+
+                switch (_fields[i].field_type) {
+                    case 0: {
+                        animate::Reset_Animation_Frame_(_fields[i].detail.button.pic);
+                        animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.button.pic);
+                        if (_fields[i].detail.button.help != nullptr && _fields[i].detail.button.help[0] != '\0') {
+                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            int font_height = fonts::Get_Font_Height_();
+                            int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
+                            int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
+                            fonts::Print_Centered_(cx, cy, _fields[i].detail.button.help);
+                        }
+                        break;
+                    }
+                    case 1:
+                    case 2: {
+                        if (*_fields[i].detail.radio.selection == 0) {
+                            animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
+                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                int font_height = fonts::Get_Font_Height_();
+                                int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
+                                int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                            }
+                        } else {
+                            if (_fields[i].detail.radio.field9_0x14 == 0) {
+                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                            } else {
+                                animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                            }
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
+                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                int font_height = fonts::Get_Font_Height_();
+                                int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
+                                int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                            }
+                        }
+                        break;
+                    }
+                    case 3: {
+                        if (*_fields[i].detail.radio.selection == _fields[i].detail.radio.value) {
+                            if (_fields[i].detail.radio.field9_0x14 == 0) {
+                                animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                            } else {
+                                animate::Set_Animation_Frame_(_fields[i].detail.radio.pic, 1);
+                            }
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
+                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                int font_height = fonts::Get_Font_Height_();
+                                int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2 + _selected_button_text_x_offset;
+                                int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2) + _selected_button_text_y_offset;
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                            }
+                        } else {
+                            animate::Reset_Animation_Frame_(_fields[i].detail.radio.pic);
+                            animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.radio.pic);
+                            if (_fields[i].detail.radio.help != nullptr && _fields[i].detail.radio.help[0] != '\0') {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                                int font_height = fonts::Get_Font_Height_();
+                                int cx = _fields[i].x + (_fields[i].x_end - _fields[i].x) / 2;
+                                int cy = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - ((font_height - 1) / 2);
+                                fonts::Print_Centered_(cx, cy, _fields[i].detail.radio.help);
+                            }
+                        }
+                        break;
+                    }
+                    case 4: {
+                        if (_down_mouse_button != i) {
+                            fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.button.highlight_color);
+                            if (_fields[i].detail.button.background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.button.background_color);
+                            }
+                            if (_fields[i].detail.button.draw_style == 0) {
+                                fonts::Print_(_fields[i].x, _fields[i].y, _fields[i].detail.button.help);
+                            } else {
+                                fonts::Print_Right_(_fields[i].x_end, _fields[i].y, _fields[i].detail.button.help);
+                            }
+                        }
+                        break;
+                    }
+                    case 6: {
+                        int16_t ret_val = _fields[i].detail.scroll.return_value;
+                        int16_t min_val = _fields[i].detail.scroll.set_value;
+                        int16_t cur_val = *_fields[i].detail.scroll.value;
+                        if (cur_val < ret_val) {
+                            cur_val = ret_val;
+                        }
+                        if (min_val < cur_val) {
+                            cur_val = min_val;
+                        }
+                        *_fields[i].detail.scroll.value = cur_val;
+                        break;
+                    }
+                    case 10: {
+                        fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                        int spacing = fonts::Get_Font_Vertical_Spacing_() / 2;
+                        if (spacing == 0) {
+                            spacing = 1;
+                        }
+                        int font_height = fonts::Get_Font_Height_();
+                        if (*_fields[i].detail.strings.value == _fields[i].detail.strings.help_start) {
+                            if (_fields[i].detail.strings.count == 0x11) {
+                                fonts::Set_Font_Style_(_fields[i].font_style, &_list_highlight_colors);
+                            } else {
+                                graphics::Gradient_Fill_(
+                                    _fields[i].x - 1,
+                                    (_fields[i].y - spacing) + 1,
+                                    _fields[i].x_end,
+                                    _fields[i].y + font_height + 1,
+                                    _fields[i].detail.strings.count,
+                                    _fields[i].detail.strings.strings,
+                                    _fields[i].detail.strings.field8_0x18,
+                                    _fields[i].detail.strings.pic,
+                                    _fields[i].detail.strings.special_color
+                                );
+                            }
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
+                        } else if (_fields[i].detail.strings.field1_0x2 == 0) {
+                            fonts::Set_Font_Style_(_fields[i].font_style, &_list_special_colors);
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
+                        } else {
+                            fonts::Print_(_fields[i].x, _fields[i].y + 1, _fields[i].detail.strings.help);
+                        }
+                        break;
+                    }
+                    case 11: {
+                        int shadow_style = _fields[i].detail.cont_input.font_shadow_style;
+                        if (i != _active_input_field_number) {
+                            if (shadow_style == -1) {
+                                fonts::Set_Font_Style_Shadow_Down_(_fields[i].font_style, _fields[i].font_color);
+                            } else if (shadow_style == 0) {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            } else if (shadow_style == 1) {
+                                fonts::Set_Font_Style_Shadow_Up_(_fields[i].font_style, _fields[i].font_color);
+                            } else {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            }
+
+                            if (_fields[i].detail.cont_input.background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.cont_input.background_color);
+                            }
+
+                            int font_height = fonts::Get_Font_Height_();
+                            if (font_height < _fields[i].y_end - _fields[i].y) {
+                                int y_centered = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - (font_height / 2);
+                                fonts::Print_(_fields[i].x + 10, y_centered, _fields[i].detail.cont_input.buffer);
+                            } else {
+                                fonts::Print_(_fields[i].x + 10, _fields[i].y, _fields[i].detail.cont_input.buffer);
+                            }
+                        } else {
+                            if (shadow_style == -1) {
+                                fonts::Set_Font_Style_Shadow_Down_(_fields[i].font_style, _fields[i].font_color);
+                            } else if (shadow_style == 0) {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            } else if (shadow_style == 1) {
+                                fonts::Set_Font_Style_Shadow_Up_(_fields[i].font_style, _fields[i].font_color);
+                            } else {
+                                fonts::Set_Font_Style_(_fields[i].font_style, _fields[i].font_color);
+                            }
+
+                            fonts::Set_Font_Highlight_Colors_(_fields[i].detail.cont_input.highlight_color);
+                            fonts::Set_Highlight_Colors_On_();
+
+                            if (_fields[i].detail.cont_input.background_color != 0) {
+                                graphics::Fill_(_fields[i].x - 1, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_fields[i].detail.cont_input.background_color);
+                            }
+
+                            int cur_pos = _cursor_position / 2;
+                            bool cursor_changed = cur_pos != _cursor_on;
+                            _cursor_on = (int16_t)cur_pos;
+                            _cursor_position++;
+                            if (_cursor_position > 3) {
+                                _cursor_position = 0;
+                            }
+
+                            if (cursor_changed) {
+                                if (cur_pos == 0) {
+                                    int len = 0;
+                                    while (len < _fields[i].detail.cont_input.max_length - 1 && _continuous_string[len] != '_') {
+                                        len++;
+                                    }
+                                    _continuous_string[len] = '\0';
+                                } else {
+                                    int len = 0;
+                                    while (len < _fields[i].detail.cont_input.max_length - 2 && _continuous_string[len] != '\0') {
+                                        len++;
+                                    }
+                                    if (len < _fields[i].detail.cont_input.max_length - 1) {
+                                        strcat(_continuous_string, "_");
+                                    }
+                                }
+                            }
+
+                            if (_fields[i].detail.cont_input.pic != nullptr) {
+                                animate::Draw_(_fields[i].x, _fields[i].y, _fields[i].detail.cont_input.pic);
+                            }
+
+                            int font_height = fonts::Get_Font_Height_();
+                            if (font_height < _fields[i].y_end - _fields[i].y) {
+                                int y_centered = _fields[i].y + ((_fields[i].y_end - _fields[i].y) / 2) - (font_height / 2);
+                                fonts::Print_(_fields[i].x + 10, y_centered, _continuous_string);
+                            } else {
+                                fonts::Print_(_fields[i].x + 10, _fields[i].y, _continuous_string);
+                            }
+                            fonts::Set_Normal_Colors_On_();
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                if (_field_box_mode != 0 && _fields[i].field_type != 8) {
+                    video::Clip_On_();
+                    line::Line_(_fields[i].x, _fields[i].y, _fields[i].x_end, _fields[i].y, (uint8_t)_field_outline_color);
+                    line::Line_(_fields[i].x, _fields[i].y, _fields[i].x, _fields[i].y_end, (uint8_t)_field_outline_color);
+                    line::Line_(_fields[i].x, _fields[i].y_end, _fields[i].x_end, _fields[i].y_end, (uint8_t)_field_outline_color);
+                    line::Line_(_fields[i].x_end, _fields[i].y, _fields[i].x_end, _fields[i].y_end, (uint8_t)_field_outline_color);
+                    video::Clip_Off_();
+                }
+            }
+        }
+
+        if (_help_box_mode != 0 && _help_list_count > 0) {
+            int16_t* help_ptr = reinterpret_cast<int16_t*>(_help_struct_pointer);
+            for (int i = 0; i < _help_list_count; i++) {
+                int idx = i * 5;
+                if (help_ptr[idx] != -1) {
+                    video::Clip_On_();
+                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 2], help_ptr[idx + 3], help_ptr[idx + 2], (uint8_t)_help_field_outline_color);
+                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 2], help_ptr[idx + 1], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
+                    line::Line_(help_ptr[idx + 1], help_ptr[idx + 4], help_ptr[idx + 3], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
+                    line::Line_(help_ptr[idx + 3], help_ptr[idx + 2], help_ptr[idx + 3], help_ptr[idx + 4], (uint8_t)_help_field_outline_color);
+                    video::Clip_Off_();
+                }
+            }
+        }
+
+        graphics::Set_Window_(old_x1, old_y1, old_x2, old_y2);
     }
 }

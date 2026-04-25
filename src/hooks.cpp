@@ -3430,6 +3430,10 @@ namespace hooks {
         { 0x00520220, &fields::Add_Irregular_Button_Field_ },
         { 0x0050b520, &COLBLDG::Evaluate_Input_ },
         { 0x00520690, &fields::Add_Multi_Hot_Key_Field_ },
+        { 0x00521a60, &fields::Interpret_Mouse_Input_ },
+        { 0x0051d290, &fields::Scan_Input_ },
+        { 0x00522c80, &fields::Draw_Visible_Fields_ },
+        { 0x0051ef60, &fields::Draw_Visible_Fields_Back_ },
     };
 
     void Install_Hooks()

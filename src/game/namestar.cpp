@@ -131,7 +131,7 @@ void __cdecl Setup_Input_Box_Popup_() {
     fields::_cursor_position = 0;
     fields::_cursor_on = 0;
     
-    strcpy(reinterpret_cast<char*>(&fields::_continuous_string), _input_box.input_text);
+    strcpy(fields::_continuous_string, _input_box.input_text);
     
     MOX::_FULL_DRAW_SCREEN_FLAG = 0;
     fields::_active_input_field_first = 1;

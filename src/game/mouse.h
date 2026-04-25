@@ -50,6 +50,36 @@ namespace mouse {
 
     int16_t __cdecl Get_Pointer_Image_Number_();
 
+    inline void __cdecl Save_Mouse_State_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276D0});
+        fn();
+    }
+
+    inline void __cdecl Restore_Mouse_State_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276C0});
+        fn();
+    }
+
+    inline int16_t __cdecl Mouse_Buffer_Button_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527670});
+        return fn();
+    }
+
+    inline int16_t __cdecl Mouse_Buffer_X_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527650});
+        return fn();
+    }
+
+    inline int16_t __cdecl Mouse_Buffer_Y_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527660});
+        return fn();
+    }
+
     inline void __cdecl Disable_Mouse_() {
         using Fn = void(__cdecl*)();
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276A0});
