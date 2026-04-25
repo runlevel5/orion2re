@@ -72,37 +72,37 @@ namespace TEXTBOX {
         HAROLD::Save_Mouse_List_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
-        TEXTBOX::_old_help_list_active = fields::_help_list_active;
+        _old_help_list_active = fields::_help_list_active;
         fields::_help_list_active = 0;
 
-        MOX2::Get_Auto_Function_(&TEXTBOX::_textbox_af);
+        MOX2::Get_Auto_Function_(&_textbox_af);
         fields::Deactivate_Auto_Function_();
-        video::Set_Refresh_Stencil_();
-        MOX2::Execute_Auto_Function_(&TEXTBOX::_textbox_af);
 
-        TEXTBOX::_old_draw_fields_flag = fields::_draw_fields_flag;
+        video::Set_Refresh_Stencil_();
+
+        MOX2::Execute_Auto_Function_(&_textbox_af);
+
+        _old_draw_fields_flag = fields::_draw_fields_flag;
         fields::Enable_Draw_All_Fields_();
         fields::Draw_Visible_Fields_();
         fields::Disable_Draw_All_Fields_();
 
-        // 18 bytes per record based on assembly: (ix * 2) + (ix * 16)
-        void* save_ptr = (uint8_t*)&TEXTBOX::_textbox_field_save + (TEXTBOX::_field_save_ix * 18);
-        FIELDSAV::Save_Field_Stats_((int16_t*)save_ptr);
-        TEXTBOX::_field_save_ix++;
+        FIELDSAV::Save_Field_Stats_(&_textbox_field_save[_field_save_ix]);
+        _field_save_ix++;
 
-        int32_t remaining = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
-        if (remaining - 0x200 < size) {
+        int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
+        if ((remaining_space - 0x200) < size) {
             swap::Save_Block_To_Drive_(MOX::_screen_seg, size + 0x200);
-            TEXTBOX::_textbox_seg = (uint32_t)allocate::Allocate_First_Block_(MOX::_screen_seg, size + 0x180);
-            TEXTBOX::_reload_saved_block = 1;
+            _textbox_seg = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, size + 0x180);
+            _reload_saved_block = 1;
         } else {
             allocate::Push_Block_(MOX::_screen_seg);
-            TEXTBOX::_reload_saved_block = 0;
-            TEXTBOX::_textbox_seg = (uint32_t)allocate::Allocate_Next_Block_(MOX::_screen_seg, size + 0x180);
+            _reload_saved_block = 0;
+            _textbox_seg = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size + 0x180);
         }
 
-        s_animation_header* header = (s_animation_header*)Buffer_Reload_(TEXTBOX::s_textbox_lbx, 0, MOX::_global_cache_seg);
-        remap::Calculate_Picture_Remap_Colors_(header);
+        s_animation_header* pic = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
+        remap::Calculate_Picture_Remap_Colors_(pic);
     }
 
     void __cdecl Text_Box_Get_Input_(int16_t ticks) {
@@ -133,7 +133,7 @@ namespace TEXTBOX {
     void __cdecl Text_Box_Cleanup_() {
         RUSS::Mox_Sync_Update_();
         _field_save_ix--;
-        FIELDSAV::Restore_Field_Stats_(&_textbox_field_save);
+        FIELDSAV::Restore_Field_Stats_(&_textbox_field_save[_field_save_ix]);
         fields::Enable_Draw_All_Fields_();
 
         if (_reload_saved_block != 0) {
@@ -186,7 +186,7 @@ namespace TEXTBOX {
         Box_Centered_On_XY_(&x, &y, max_height, title != nullptr);
 
         anim = reinterpret_cast<s_animation_header*>(
-            farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, reinterpret_cast<void*>(_textbox_seg))
+            farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, _textbox_seg)
         );
 
         if (title != nullptr) {
@@ -261,8 +261,8 @@ namespace TEXTBOX {
         fonts::Get_Font_Height_();
         fonts::Set_Remap_Font_Style_(2, &color_2);
 
-        allocate::Push_Block_(reinterpret_cast<void*>(_textbox_seg));
-        void* lbx_header = allocate::Allocate_Next_Block_(reinterpret_cast<void*>(_textbox_seg), 0x104C);
+        allocate::Push_Block_(_textbox_seg);
+        void* lbx_header = allocate::Allocate_Next_Block_(_textbox_seg, 0x104C);
 
         uint16_t count = 0;
         uint32_t help_idx = static_cast<uint16_t>(param_1);
@@ -275,13 +275,13 @@ namespace TEXTBOX {
         bool has_anim[9];
 
         do {
-            allocate::Push_Block_(reinterpret_cast<void*>(_textbox_seg));
-            void* record_data = farload::Far_Reload_Next_Data_(help_lbx_name, 0, reinterpret_cast<void*>(_textbox_seg), help_idx, 1, 0x57B);
+            allocate::Push_Block_(_textbox_seg);
+            void* record_data = farload::Far_Reload_Next_Data_(help_lbx_name, 0, _textbox_seg, help_idx, 1, 0x57B);
             
             memcpy(&records[count], record_data, 1403);
 
             FMTPARA::Get_Formatted_Paragraph_Max_Height_(0x153, records[count].body);
-            allocate::Pop_Block_(reinterpret_cast<void*>(_textbox_seg));
+            allocate::Pop_Block_(_textbox_seg);
 
             has_anim[count] = (records[count].anim_lbx[0] != '\0');
             if (has_anim[count]) {
@@ -301,17 +301,17 @@ namespace TEXTBOX {
             count++;
         } while (help_idx != 0 && count <= 8);
 
-        allocate::Pop_Block_(reinterpret_cast<void*>(_textbox_seg));
+        allocate::Pop_Block_(_textbox_seg);
 
-        if (allocate::Get_Remaining_Block_Space_(reinterpret_cast<void*>(_textbox_seg)) < (int32_t)total_lbx_size) {
-            swap::Save_Block_To_Drive_(reinterpret_cast<void*>(_textbox_seg), total_lbx_size + 0x11B34);
-            _textbox_seg = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_First_Block_(MOX::_screen_seg, total_lbx_size + 0x11B34));
+        if (allocate::Get_Remaining_Block_Space_(_textbox_seg) < (int32_t)total_lbx_size) {
+            swap::Save_Block_To_Drive_(_textbox_seg, total_lbx_size + 0x11B34);
+            _textbox_seg = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, total_lbx_size + 0x11B34);
             _reload_saved_block = 1;
         }
 
-        s_animation_header* textbox_lbx_ptr = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, reinterpret_cast<void*>(_textbox_seg)));
+        s_animation_header* textbox_lbx_ptr = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, _textbox_seg));
 
-        tmp_block = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_Next_Block_(reinterpret_cast<void*>(_textbox_seg), 0x30D4));
+        tmp_block = (uint32_t)reinterpret_cast<uintptr_t>(allocate::Allocate_Next_Block_(_textbox_seg, 0x30D4));
 
         int16_t title_y[9];
         uint8_t anim_frames[9];
@@ -334,7 +334,7 @@ namespace TEXTBOX {
                 uint8_t frame = (anim_info >> 16) & 0xFF;
 
                 anim_frames[i] = frame;
-                anim_ptrs[i] = farload::Far_Reload_Next_(records[i].anim_lbx, rec_idx, reinterpret_cast<void*>(_textbox_seg));
+                anim_ptrs[i] = farload::Far_Reload_Next_(records[i].anim_lbx, rec_idx, _textbox_seg);
                 animate::Set_Animation_Frame_(static_cast<s_animation_header*>(anim_ptrs[i]), frame);
                 bitmap::Draw_Picture_To_Bitmap_(reinterpret_cast<s_animation_header*>(tmp_block), static_cast<s_animation_header*>(anim_ptrs[i]));
 

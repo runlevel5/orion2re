@@ -149,8 +149,8 @@ namespace MAINPUPS {
     }
 
     void __cdecl Eric_Push_Fields_() {
-        FIELDSAV::Save_Field_Stats_(&_stats_array[_num_field_saves * 9]);
-        _num_field_saves = static_cast<int16_t>(_num_field_saves + 1);
+        FIELDSAV::Save_Field_Stats_(&_stats_array[_num_field_saves]);
+        _num_field_saves++;
     }
 
     void __cdecl Add_Tax_Rate_Fields_() {
@@ -214,8 +214,7 @@ namespace MAINPUPS {
     void __cdecl Eric_Pop_Fields_() {
         if (_num_field_saves > 0) {
             _num_field_saves--;
-            // 9 shorts = 18 bytes per save
-            FIELDSAV::Restore_Field_Stats_(&_stats_array[_num_field_saves * 9]);
+            FIELDSAV::Restore_Field_Stats_(&_stats_array[_num_field_saves]);
         }
     }
 

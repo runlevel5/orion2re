@@ -727,7 +727,7 @@ namespace TECH {
 
         MOX2::Get_Auto_Function_(auto_funcs);
         allocate::Push_Block_(MOX::_screen_seg);
-        FIELDSAV::Save_Field_Stats_(_tech_field_save);
+        FIELDSAV::Save_Field_Stats_(&_tech_field_save);
         fields::Disable_Cancel_();
 
         if (is_select == 1) {
@@ -862,7 +862,7 @@ namespace TECH {
                     RUSS::Mox_Sync_Update_();
                     timer::Release_Time_(4);
                     MOX2::Put_Auto_Function_(auto_funcs);
-                    FIELDSAV::Restore_Field_Stats_(_tech_field_save);
+                    FIELDSAV::Restore_Field_Stats_(&_tech_field_save);
                     allocate::Pop_Block_(MOX::_screen_seg);
                     fields::Deactivate_Help_List_();
                     return input;

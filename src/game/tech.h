@@ -37,7 +37,7 @@ namespace TECH {
     inline s_list_item_research*& _g_entries_p = *reinterpret_cast<s_list_item_research**>(std::uintptr_t{0x005A6340});
     inline s_colors* _tech_color = reinterpret_cast<s_colors*>(std::uintptr_t{0x005A6350});
     inline s_list_state& _g_tech_list_header = *reinterpret_cast<s_list_state*>(std::uintptr_t{0x00557D28});
-    inline int16_t (&_tech_field_save)[32] = *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x005662C8});
+    inline s_fieldsav_data& _tech_field_save = *reinterpret_cast<s_fieldsav_data*>(std::uintptr_t{0x005662C8});
     inline s_list_item*& _g_selected_list_entry_p = *reinterpret_cast<s_list_item**>(std::uintptr_t{0x005662DC});
     inline char (&_tech_group_names)[10][20] = *reinterpret_cast<char(*)[10][20]>(std::uintptr_t{0x005A6270});
 

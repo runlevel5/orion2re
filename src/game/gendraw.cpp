@@ -34,6 +34,27 @@ namespace GENDRAW {
         animate::Remap_Draw_(0x159, 0x12e, _image_seg[2]);
     }
 
+    void __cdecl Message_Box_Startup_() {
+        HAROLD::Save_Mouse_List_();
+        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        ERIC::Fast_Fade_In_();
+        allocate::Push_Block_(MOX::_screen_seg);
+        MOX2::Get_Auto_Function_(&_gendraw_af);
+        _old_help_list_active = fields::_help_list_active;
+        fields::_help_list_active = 0;
+        MOX2::Execute_Auto_Function_(&_gendraw_af);
+        _old_draw_fields_flag = fields::_draw_fields_flag;
+        fields::Enable_Draw_All_Fields_();
+        fields::Draw_Visible_Fields_();
+        fields::Disable_Draw_All_Fields_();
+        FIELDSAV::Save_Field_Stats_(&_message_field_save);
+        video::Set_Page_Off_();
+        _save_refresh_mode = video::Get_Refresh_Mode_();
+        video::Set_Refresh_Stencil_();
+        _animation_frame = 0;
+        _direction = 1;
+    }
+
     void __cdecl Draw_Animating_Message_Box_() {
         int16_t box_y = _message_box_y + 0x25;
 
@@ -187,7 +208,46 @@ namespace GENDRAW {
         return Confirmation_Box_(msg);
     }
 
+    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, s_animation_header* bitmap) {
+        int16_t max_height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(width, text);
+        int16_t centered_y = y + (static_cast<int16_t>(fonts::_font_header.current_height) - max_height) / 2;
+
+        if (bitmap == nullptr) {
+            FMTPARA::Print_Formatted_Paragraph_(x, centered_y, width, text, 2);
+        } else {
+            FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(x, centered_y, width, text, 2, bitmap);
+        }
+    }
+
     void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text) {
         _Print_1_Or_More_Formatted_Lines_Centered_(x, y, width, text, nullptr);
+    }
+
+    void __cdecl Message_Box_Cleanup_() {
+        FIELDSAV::Restore_Field_Stats_(&_message_field_save);
+        MOX2::Put_Auto_Function_(&_gendraw_af);
+        allocate::Pop_Block_(MOX::_screen_seg);
+
+        switch (_save_refresh_mode) {
+            case 0:
+                video::Set_Refresh_Full_();
+                break;
+            case 2:
+                video::Set_Refresh_Differential_();
+                break;
+            case 3:
+                video::Set_Refresh_Stencil_();
+                break;
+            default:
+                break;
+        }
+
+        fields::_draw_fields_flag = _old_draw_fields_flag;
+        fields::_help_list_active = _old_help_list_active;
+
+        fields::Clear_Mouse_Buffer_();
+        fields::Set_Input_Delay_(3);
+
+        Restore_Mouse_List_();
     }
 }

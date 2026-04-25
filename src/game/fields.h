@@ -18,6 +18,8 @@ namespace fields {
     inline int16_t& _auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B004});
     inline uint16_t& _input_field_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B040});
     inline int16_t& _active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B04C});
+    inline int16_t& _cursor_count =\
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B034});
     inline int16_t& _cursor_position = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055b038});
     inline int16_t& _cursor_on = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055b03c});
     inline int16_t& _help_list_active = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B05C});
@@ -150,17 +152,15 @@ namespace fields {
     void __cdecl Increment_Scroll_Bar_(int16_t field_idx);
     void __cdecl Decrement_Scroll_Bar_(int16_t field_idx);
 
-    inline void __cdecl Input_String_(int16_t field_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e520});
-        fn(field_idx);
+    inline void __cdecl Display_Input_Field_(int16_t field_idx, char* buffer) {
+        using Fn = void(__cdecl*)(int16_t, char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EA80});
+        fn(field_idx, buffer);
     }
 
-    inline void __cdecl Find_Bar_Position_(int16_t field_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e0c0});
-        fn(field_idx);
-    }
+    void __cdecl Input_String_(int16_t field_idx);
+
+    void __cdecl Find_Bar_Position_(int16_t field_idx);
 
     int16_t __cdecl Check_Help_List_();
 

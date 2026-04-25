@@ -89,6 +89,7 @@
     <ClCompile Include="src\game\fakebuts.cpp" />
     <ClCompile Include="src\game\farload.cpp" />
     <ClCompile Include="src\game\fields.cpp" />
+    <ClCompile Include="src\game\fieldsav.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
     <ClCompile Include="src\game\firepts.cpp" />

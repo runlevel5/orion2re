@@ -1,8 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_colors;
-struct s_animation_header;
 
 namespace GENDRAW {
     void __cdecl Message_Box_(const char* text);
@@ -24,27 +20,32 @@ namespace GENDRAW {
     inline int16_t& _first_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566064});
     inline s_animation_header* (&_image_seg)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x00566078});
 
+    inline s_fieldsav_data& _message_field_save =
+        *reinterpret_cast<s_fieldsav_data*>(std::uintptr_t{0x00566050});
+
+    inline MOX2::action_func_t& _gendraw_af =
+        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00566044});
+
+    inline int16_t& _save_refresh_mode =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566038});
+
+    inline int16_t& _old_draw_fields_flag =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566048});
+
+    inline int16_t& _old_help_list_active =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566070});
+
     void __cdecl Draw_Confirm_Box_();
 
-    inline void __cdecl Message_Box_Startup_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00479cc0})();
-    }
+    void __cdecl Message_Box_Startup_();
 
-    inline void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t param_3, char* text, s_animation_header* anim) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, char*, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479df0});
-        fn(x, y, param_3, text, anim);
-    }
+    void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text, s_animation_header* bitmap);
 
     void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text);
 
     void __cdecl Draw_Animating_Message_Box_();
 
-    inline void __cdecl Message_Box_Cleanup_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00479d70})();
-    }
+    void __cdecl Message_Box_Cleanup_();
 
     void __cdecl Message_Box_Exploding_(char* text);
 

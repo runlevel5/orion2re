@@ -22,4 +22,10 @@ namespace key {
     uint8_t Keyboard_Status_();
 
     int32_t Read_Key_();
+
+    inline int16_t __cdecl Scan_Key_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531F60});
+        return fn();
+    }
 }

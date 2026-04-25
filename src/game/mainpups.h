@@ -55,8 +55,8 @@ namespace MAINPUPS {
     inline uint8_t& _no_flicker_between_mainpups_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D1C});
     inline int16_t& _autofunction_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D2C});
     inline int16_t& _num_field_saves = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00556D30});
-    inline int16_t(&_stats_array)[27] =
-        *reinterpret_cast<int16_t(*)[27]>(std::uintptr_t{0x005A6E20});
+    inline s_fieldsav_data (&_stats_array)[3] =
+        *reinterpret_cast<s_fieldsav_data(*)[3]>(std::uintptr_t{0x005A6E20});
     inline uint8_t& _explode_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00556D34});
     inline int16_t& _g_refresh_mode = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565D80});
     inline MOX2::action_func_t& _eric_saved_autofunction2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005A6E58});

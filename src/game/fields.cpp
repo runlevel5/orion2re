@@ -1599,6 +1599,50 @@ namespace fields {
         __exit(1);
     }
 
+    void __cdecl Find_Bar_Position_(int16_t field_idx) {
+        s_field* field = &_fields[field_idx];
+        int16_t new_value;
+
+        if (field->detail.scroll.is_vertical == 0) {
+            int16_t width = field->x_end - field->x;
+            int16_t mouse_x = mouse::Pointer_X_() + _pointer_offset;
+
+            if (mouse_x >= field->x_end) {
+                new_value = field->detail.scroll.range_max;
+            } else if (mouse_x <= field->x) {
+                new_value = field->detail.scroll.range_min;
+            } else {
+                int delta = mouse_x - field->x;
+                int range = field->detail.scroll.range_max - field->detail.scroll.range_min;
+                new_value = (int16_t)((delta * range) / width) + field->detail.scroll.range_min;
+            }
+        } else {
+            int16_t height = field->y_end - field->y;
+            int16_t mouse_y = mouse::Pointer_Y_() + _pointer_offset;
+
+            if (mouse_y >= field->y_end) {
+                new_value = field->detail.scroll.range_min;
+            } else if (mouse_y <= field->y) {
+                new_value = field->detail.scroll.range_max;
+            } else {
+                int delta = field->y_end - mouse_y;
+                int range = field->detail.scroll.range_max - field->detail.scroll.range_min;
+                // Note: Original code seems to omit adding range_min for vertical scroll calculation.
+                new_value = (int16_t)((delta * range) / height);
+            }
+        }
+
+        if (new_value < field->detail.scroll.return_value) {
+            new_value = field->detail.scroll.return_value;
+        }
+
+        if (new_value > field->detail.scroll.set_value) {
+            new_value = field->detail.scroll.set_value;
+        }
+
+        *field->detail.scroll.value = new_value;
+    }
+
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
         if (_fields_count >= _max_fields_count) {
             char error_msg[80] = "You exceeded the max number of fields (150)";
@@ -2475,7 +2519,7 @@ namespace fields {
                 break;
             }
             case 1: {
-                if (action != 0 && *field->detail.radio.selection == 1) {
+                if (action != 0 && *field->detail.radio.selection != 1) {
                     if (field->detail.button.draw_style == 0) {
                         animate::Reset_Animation_Frame_(field->detail.button.pic);
                         animate::Draw_(field->x, field->y, field->detail.button.pic);
@@ -2684,5 +2728,188 @@ namespace fields {
         }
 
         return 1;
+    }
+
+    void __cdecl Input_String_(int16_t field_idx) {
+        int16_t len = 0;
+        _cursor_count = 0;
+        _cursor_position = 0;
+
+        s_field* field = &_fields[field_idx];
+        int16_t max_length = field->detail.cont_input.max_length;
+        int16_t max_width = field->x_end - field->x;
+        bool is_editing_started = false;
+
+        mouse::Save_Mouse_State_();
+        fonts::Set_Font_Style_(field->font_style, field->font_color);
+
+        char buffer[64];
+        strcpy(buffer, field->detail.cont_input.buffer);
+
+        len = strlen(buffer);
+
+        while (max_width < fonts::Get_String_Width_(buffer) && len > 0) {
+            buffer[0] = '\0';
+            fonts::Get_String_Width_(buffer);
+            len = 0;
+        }
+
+        _cursor_count = len;
+        if (max_length <= len) {
+            _cursor_count = max_length;
+        }
+
+        strcpy(field->detail.cont_input.buffer, buffer);
+        int16_t font_height = fonts::Get_Font_Height_();
+        Display_Input_Field_(field_idx, buffer);
+
+        int16_t done = 0;
+        while (done == 0) {
+            int16_t key_code = 0;
+            while (done == 0) {
+                key_code = key::Scan_Key_();
+                if (mouse::Mouse_Button_() != 0 || mouse::Mouse_Buffer_() != 0) {
+                    done = 1;
+                    break;
+                }
+
+                _cursor_position++;
+                if (_cursor_position > font_height * 2 - 1) {
+                    _cursor_position = 0;
+                }
+
+                Display_Input_Field_(field_idx, buffer);
+                if (key_code != 0) {
+                    break;
+                }
+            }
+
+            if (done != 0) {
+                break;
+            }
+
+            if (key_code == 0x1C0D) { // Enter
+                break;
+            } else if (key_code == 0x0E08) { // Backspace
+                if (!is_editing_started) {
+                    buffer[0] = '\0';
+                    is_editing_started = true;
+                    len = 0;
+                    _cursor_count = 0;
+                    _cursor_position = 0;
+                } else if (len > 0) {
+                    if (_cursor_count < len) {
+                        if (_cursor_count > 0) {
+                            for (int16_t i = _cursor_count; i < len; i++) {
+                                buffer[i - 1] = buffer[i];
+                            }
+                            len--;
+                            _cursor_count--;
+                            buffer[len] = '\0';
+                            _cursor_position = 0;
+                        }
+                    } else {
+                        _cursor_position = 0;
+                        len--;
+                        _cursor_count--;
+                        buffer[len] = '\0';
+                    }
+                }
+            } else if (key_code == 0x4BE0) { // Left Arrow
+                is_editing_started = true;
+                if (_cursor_count > 0) {
+                    _cursor_position = 0;
+                    _cursor_count--;
+                }
+            } else if (key_code == 0x4DE0) { // Right Arrow
+                if (_cursor_count < max_length && _cursor_count < len) {
+                    _cursor_position = 0;
+                    _cursor_count++;
+                    if (_cursor_count >= len) {
+                        buffer[len] = ' ';
+                        buffer[len + 1] = '\0';
+                        if (_cursor_count >= max_length || fonts::Get_String_Width_(buffer) > max_width) {
+                            _cursor_count--;
+                        }
+                        buffer[len] = '\0';
+                    }
+                }
+            } else if (key_code == 0x53E0) { // Delete
+                if (len > 0 && _cursor_count < len) {
+                    for (int16_t i = _cursor_count; i < len; i++) {
+                        buffer[i] = buffer[i + 1];
+                    }
+                    len--;
+                    _cursor_position = 0;
+                    buffer[len] = '\0';
+                }
+            } else {
+                bool is_valid = false;
+                if (key_code == 0x011B) { // Escape
+                    done = 2;
+                } else {
+                    // Extract lower 8-bits while preserving absolute original sign logic
+                    int16_t sign = key_code >> 15;
+                    key_code = ((((key_code ^ sign) - sign) & 0xFF) ^ sign) - sign;
+
+                    if ((key_code > 0x40 && key_code < 0x5D) ||
+                        (key_code > 0x2D && key_code < 0x3B) ||
+                        key_code == 0x20 ||
+                        key_code == 0x2D ||
+                        (key_code > 0x60 && key_code < 0x7B)) {
+                        is_valid = true;
+                    }
+
+                    if (is_valid) {
+                        is_editing_started = true;
+                        char ch = static_cast<char>(key_code);
+                        buffer[len] = ch;
+                        buffer[len + 1] = '\0';
+                        if (len < max_length && fonts::Get_String_Width_(buffer) <= max_width) {
+                            buffer[len] = '\0';
+                            if (_cursor_count < len) {
+                                for (int16_t i = len; i > _cursor_count; i--) {
+                                    buffer[i] = buffer[i - 1];
+                                }
+                                len++;
+                                _cursor_position = 0;
+                                buffer[_cursor_count++] = ch;
+                                buffer[len] = '\0';
+                            } else {
+                                buffer[len] = ch;
+                                len++;
+                                buffer[len] = ' ';
+                                buffer[len + 1] = '\0';
+                                if (len < max_length && fonts::Get_String_Width_(buffer) <= max_width) {
+                                    _cursor_count++;
+                                }
+                                _cursor_position = 0;
+                                buffer[len] = '\0';
+                            }
+                        } else {
+                            buffer[len] = '\0';
+                        }
+                    }
+                }
+            }
+
+            Display_Input_Field_(field_idx, buffer);
+            if (key_code == 0x1C0D) {
+                break;
+            }
+        }
+
+        strcpy(_fields[field_idx].detail.cont_input.buffer, buffer);
+
+        if (done != 0) {
+            while (mouse::Mouse_Button_() != 0) {
+                // Wait for mouse release
+            }
+        }
+
+        mouse::Restore_Mouse_State_();
+        _cursor_count = 0;
+        _cursor_position = 0;
+        _down_mouse_button = -1;
     }
 }

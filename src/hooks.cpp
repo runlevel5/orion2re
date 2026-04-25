@@ -3456,6 +3456,13 @@ namespace hooks {
         { 0x00508480, &FIREPTS::Load_FP_Data_From_LBX_ },
         { 0x00531780, &file_ani::Reset_File_Animation_Buffer_ },
         { 0x00520460, &fields::Get_Alt_Alpha_Key_ },
+        { 0x004877e0, &FIELDSAV::Restore_Field_Stats_ },
+        { 0x00487750, &FIELDSAV::Save_Field_Stats_ },
+        { 0x00479d70, &GENDRAW::Message_Box_Cleanup_ },
+        { 0x00479cc0, &GENDRAW::Message_Box_Startup_ },
+        { 0x00479DF0, &GENDRAW::_Print_1_Or_More_Formatted_Lines_Centered_ },
+        { 0x0051E520, &fields::Input_String_ },
+        { 0x0051E0C0, &fields::Find_Bar_Position_ },
     };
 
     void Install_Hooks()

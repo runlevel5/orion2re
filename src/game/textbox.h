@@ -14,7 +14,7 @@ struct s_help_record {
 
 namespace TEXTBOX {
     inline int16_t& _bottom_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EC8});
-    inline uint32_t& _textbox_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565ED8});
+    inline uint8_t*& _textbox_seg = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00565ed8});
     inline uint32_t& tmp_block = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565EDC});
     inline uint16_t& _field_save_ix = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00557434});
     inline const char* s_textbox_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00557444});
@@ -29,7 +29,7 @@ namespace TEXTBOX {
         reinterpret_cast<const char*>(std::uintptr_t{0x00557480}); // "GER_HELP.LBX"
     inline const char* const s_HELP_LBX =
         reinterpret_cast<const char*>(std::uintptr_t{0x00557490}); // "HELP.LBX"
-    inline int16_t& _textbox_field_save = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EA0});
+    inline s_fieldsav_data* _textbox_field_save = reinterpret_cast<s_fieldsav_data*>(std::uintptr_t{0x00565ea0});
     inline uint8_t& _reload_saved_block = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00565ECC});
     inline int16_t& _box_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE4});
     inline int16_t& _box_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565EE0});
