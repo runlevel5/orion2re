@@ -2,6 +2,7 @@
 #include <cstdint>
 
 struct s_colors;
+struct s_animation_header;
 
 namespace GENDRAW {
     void __cdecl Message_Box_(const char* text);
@@ -10,11 +11,7 @@ namespace GENDRAW {
 
     int16_t __cdecl Confirmation_Box_(char* text);
 
-    inline int16_t __cdecl Do_Confirmation_Box_(char* msg) {
-        using Fn = int16_t(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479700});
-        return fn(msg);
-    }
+    int16_t __cdecl Do_Confirmation_Box_(char* msg);
 
     void __cdecl Warning_Box_(const char* message);
 
@@ -25,22 +22,22 @@ namespace GENDRAW {
     inline int16_t& _animation_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056606C});
     inline int16_t& _direction = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566074});
     inline int16_t& _first_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566064});
-    inline uint8_t* (&_image_seg)[3] = *reinterpret_cast<uint8_t*(*)[3]>(std::uintptr_t{0x00566078});
+    inline s_animation_header* (&_image_seg)[4] = *reinterpret_cast<s_animation_header*(*)[4]>(std::uintptr_t{0x00566078});
 
-    inline void __cdecl Draw_Confirm_Box_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00479c30})();
-    }
+    void __cdecl Draw_Confirm_Box_();
 
     inline void __cdecl Message_Box_Startup_() {
         using Fn = void(__cdecl*)();
         reinterpret_cast<Fn>(std::uintptr_t{0x00479cc0})();
     }
 
-    inline void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int x, int y, int width, char* str) {
-        using Fn = void(__cdecl*)(int, int, int, char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00479e60})(x, y, width, str);
+    inline void __cdecl _Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t param_3, char* text, s_animation_header* anim) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, char*, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00479df0});
+        fn(x, y, param_3, text, anim);
     }
+
+    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text);
 
     void __cdecl Draw_Animating_Message_Box_();
 

@@ -239,7 +239,7 @@ namespace platform {
     }
 
     HWND cleanup() {
-        FUN_533630();
+        Prepare_Exit_();
         if (g_main_window != nullptr) {
             DestroyWindow(g_main_window);
             g_main_window = nullptr;
@@ -422,7 +422,7 @@ namespace platform {
         }
 #endif
 
-        DAT_00578e68 = 0;
+        _need_quit = 0;
         Set_Page_Off_();
         graphics::Fill_(0, 0, 639, 479, 0);
         FUN_5286a0();

@@ -195,6 +195,23 @@ namespace fields {
         }
     }
 
+    void __cdecl Call_Auto_Function_() {
+        if (_auto_active_flag == 0) {
+            platform::Toggle_Pages_Stub_();
+            return;
+        }
+
+        timer::Mark_Time_();
+        video::Set_Page_Off_();
+        Invoke_Auto_Function_();
+        platform::Toggle_Pages_Stub_();
+        timer::Release_Time_(_auto_function_delay);
+
+        if (_update_function != nullptr) {
+            _update_function();
+        }
+    }
+
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
         s_field* field = &_fields[_fields_count];
 
@@ -1558,6 +1575,30 @@ namespace fields {
         return input - 1;
     }
 
+    void __cdecl F11_Key_() {
+        MEMORYSTATUS memory_status;
+        char buffer[80];
+
+        Clear_Fields_();
+
+        memory_status.dwLength = sizeof(MEMORYSTATUS);
+        ::GlobalMemoryStatus(&memory_status);
+
+        _sprintf(buffer, s_Avail_Mem_0055b390, (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
+
+        platform::_need_quit = 1;
+
+        video::Clear_Display_And_Release_Palette_();
+
+        ::MessageBoxA(platform::g_main_window, buffer, s_Microprose, 0x10);
+
+        platform::Prepare_Exit_();
+
+        ::DestroyWindow(platform::g_main_window);
+
+        __exit(1);
+    }
+
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
         if (_fields_count >= _max_fields_count) {
             char error_msg[80] = "You exceeded the max number of fields (150)";
@@ -1881,6 +1922,71 @@ namespace fields {
         graphics::Set_Window_(x1, y1, x2, y2);
     }
 
+    void __cdecl Push_Field_Down_(int16_t field_idx, int16_t x, int16_t y) {
+        if (x >= 0 && x < 640 && y >= 0 && y < 480) {
+            mouse::Save_Mouse_State_();
+
+            if (_down_mouse_button != field_idx) {
+                if (_down_mouse_button == -1) {
+                    _down_mouse_button = field_idx;
+                    Draw_Field_(field_idx, 1);
+
+                    if (_fields[field_idx].field_type == 4) {
+                        x = mouse::Pointer_X_();
+                        y = mouse::Pointer_Y_();
+                    }
+
+                    platform::Force_Cursor_Pos(x, y);
+                    mouse::Restore_Mouse_State_();
+                    return;
+                }
+
+                int16_t down_idx = _down_mouse_button;
+                int16_t type_down = _fields[down_idx].field_type;
+
+                if ((type_down != 3 || _fields[field_idx].field_type == 3) &&
+                    (type_down != 10 || (_fields[field_idx].field_type == 10 &&
+                                         _fields[field_idx].detail.button.field2_0x2 != 0))) {
+                    Draw_Field_(down_idx, 0);
+                }
+
+                _down_mouse_button = field_idx;
+                Draw_Field_(field_idx, 1);
+
+                if (_fields[field_idx].field_type == 4) {
+                    x = mouse::Pointer_X_();
+                    y = mouse::Pointer_Y_();
+                }
+
+                platform::Force_Cursor_Pos(x, y);
+            }
+
+            mouse::Restore_Mouse_State_();
+        }
+    }
+
+    void __cdecl Copy_Continuous_String_() {
+        int16_t len = 0;
+
+        if (_continuous_string[0] != '\0') {
+            int16_t max_len = _fields[_active_input_field_number].detail.cont_input.max_length;
+            do {
+                if (len >= max_len) {
+                    break;
+                }
+                len++;
+            } while (_continuous_string[len] != '\0');
+        }
+
+        if (len != 0 && _continuous_string[len - 1] == '_') {
+            len--;
+        }
+
+        _continuous_string[len] = '\0';
+
+        strcpy(_fields[_active_input_field_number].detail.cont_input.buffer, _continuous_string);
+    }
+
     void __cdecl Draw_Visible_Fields_() {
         int16_t old_x1 = video::_screen_window_x1;
         int16_t old_x2 = video::_screen_window_x2;
@@ -2141,5 +2247,442 @@ namespace fields {
         }
 
         graphics::Set_Window_(old_x1, old_y1, old_x2, old_y2);
+    }
+
+    int16_t __cdecl Check_Multi_Hot_Key_Fields_(int16_t hotkey) {
+        int16_t result = -1;
+
+        for (int16_t i = 0; i < _fields_count; ++i) {
+            if (result != -1) {
+                break;
+            }
+
+            if (_fields[i].field_type == FIELD_TYPE_MULTI_HOTKEY) {
+                int16_t help_start = _fields[i].detail.multi_hotkey.help_start;
+
+                if (_fields[i].detail.multi_hotkey.help[help_start] == hotkey) {
+                    _fields[i].detail.multi_hotkey.help_start++;
+
+                    if (_fields[i].detail.multi_hotkey.help_start == _fields[i].detail.multi_hotkey.help_len) {
+                        result = i;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    void __cdecl Clear_Multi_Hot_Key_Offsets_() {
+        for (int16_t i = 0; i < _fields_count; ++i) {
+            if (_fields[i].field_type == FIELD_TYPE_MULTI_HOTKEY) {
+                _fields[i].detail.multi_hotkey.help_start = 0;
+            }
+        }
+    }
+
+    int16_t __cdecl Interpret_Keyboard_Input_(int16_t* field_idx) {
+        int16_t key_val = (int16_t)key::Read_Key_();
+
+        if (_fields_count <= _selected_count) {
+            _selected_count = 0;
+        }
+
+        int16_t out_cmd = 0;
+        if (key_val <= 0x3B00) {
+            if (key_val == 0x3B00) { out_cmd = -1001; }
+            else if (key_val == 0x01F0) { out_cmd = -1500; }
+        } else if (key_val <= 0x3D00) {
+            if (key_val == 0x3D00) { out_cmd = -1003; }
+            else if (key_val == 0x3C00) { out_cmd = -1002; }
+        } else if (key_val <= 0x3F00) {
+            if (key_val == 0x3F00) { out_cmd = -1005; }
+            else if (key_val == 0x3E00) { out_cmd = -1004; }
+        } else if (key_val <= 0x4100) {
+            if (key_val == 0x4100) { out_cmd = -1007; }
+            else if (key_val == 0x4000) { out_cmd = -1006; }
+        } else if (key_val <= 0x4300) {
+            if (key_val == 0x4300) { out_cmd = -1009; }
+            else if (key_val == 0x4200) { out_cmd = -1008; }
+        } else if (key_val <= 0x6800) {
+            if (key_val == 0x6800) { out_cmd = -1101; }
+            else if (key_val == 0x4400) { out_cmd = -1010; }
+        } else if (key_val <= 0x6A00) {
+            if (key_val == 0x6A00) { out_cmd = -1103; }
+            else if (key_val == 0x6900) { out_cmd = -1102; }
+        } else if (key_val <= 0x6C00) {
+            if (key_val == 0x6C00) { out_cmd = -1105; }
+            else if (key_val == 0x6B00) { out_cmd = -1104; }
+        } else if (key_val <= 0x6E00) {
+            if (key_val == 0x6E00) { out_cmd = -1107; }
+            else if (key_val == 0x6D00) { out_cmd = -1106; }
+        } else if (key_val == 0x6F00) {
+            out_cmd = -1108;
+        } else if (key_val == 0x7000) {
+            out_cmd = -1109;
+        } else if (key_val == 0x7100) {
+            out_cmd = -1110;
+        }
+
+        if (out_cmd < 0) {
+            *field_idx = out_cmd;
+            return key_val;
+        }
+
+        if (_multi_hotkey_active_field != 0) {
+            uint8_t alt_key = Get_Alt_Alpha_Key_(key_val);
+            int16_t multi_hotkey_res = Check_Multi_Hot_Key_Fields_(alt_key);
+            if (multi_hotkey_res > -1) {
+                *field_idx = multi_hotkey_res;
+                return -1;
+            }
+        }
+
+        int32_t eax_val = key_val;
+        int32_t edx_val = (eax_val < 0) ? -1 : 0;
+        eax_val = eax_val ^ edx_val;
+        eax_val = eax_val - edx_val;
+        eax_val = eax_val & 0xFF;
+        eax_val = eax_val ^ edx_val;
+        eax_val = eax_val - edx_val;
+
+        int16_t hotkey_char = (int16_t)eax_val;
+
+        if (hotkey_char == 0) {
+            hotkey_char = key_val;
+        }
+
+        if (hotkey_char > 0x60 && hotkey_char < 0x7B) {
+            hotkey_char -= 0x20;
+        }
+
+        if (_fields_count > _fields_count) {
+            *field_idx = _fields_count;
+            if (_fields[_fields_count].x < 640 && _fields[_fields_count].y < 480) {
+                mouse::Save_Mouse_State_();
+                mouse_saved_center_x = _fields[_fields_count].x + (_fields[_fields_count].x_end - _fields[_fields_count].x) / 2;
+                mouse_saved_center_y = _fields[_fields_count].y + (_fields[_fields_count].y_end - _fields[_fields_count].y) / 2;
+                mouse::Restore_Mouse_State_();
+            }
+        }
+
+        for (int16_t i = 0; i < _fields_count; i++) {
+            if (_active_input_field_number == -1 && _fields[i].hotkey == hotkey_char) {
+                *field_idx = i;
+                break;
+            }
+        }
+
+        if (_fields[*field_idx].hotkey != hotkey_char) {
+            hotkey_char = key_val;
+        }
+
+        return hotkey_char;
+    }
+
+    void __cdecl Increment_Scroll_Bar_(int16_t field_idx) {
+        s_field* field = &_fields[field_idx];
+        int16_t range_min = field->detail.scroll.range_min;
+        int16_t* value_ptr = field->detail.scroll.value;
+        int32_t range_diff = field->detail.scroll.range_max - range_min;
+
+        int16_t percent = static_cast<int16_t>(((*value_ptr - range_min) * 100) / range_diff) + 5;
+
+        int16_t new_val;
+        if (percent <= 100) {
+            new_val = range_min + static_cast<int16_t>((percent * range_diff) / 100);
+        } else {
+            new_val = field->detail.scroll.set_value;
+        }
+
+        if (new_val > field->detail.scroll.set_value) {
+            new_val = field->detail.scroll.set_value;
+        }
+
+        *value_ptr = new_val;
+    }
+
+    void __cdecl Decrement_Scroll_Bar_(int16_t field_idx) {
+        int16_t range_min = _fields[field_idx].detail.scroll.range_min;
+        int16_t* value_ptr = _fields[field_idx].detail.scroll.value;
+        int32_t range = _fields[field_idx].detail.scroll.range_max - range_min;
+
+        int16_t pct = (((*value_ptr - range_min) * 100) / range) - 5;
+
+        int16_t new_value;
+        if (pct < 0) {
+            new_value = _fields[field_idx].detail.scroll.return_value;
+        } else {
+            new_value = range_min + (pct * range) / 100;
+        }
+
+        if (new_value < _fields[field_idx].detail.scroll.return_value) {
+            new_value = _fields[field_idx].detail.scroll.return_value;
+        }
+
+        *value_ptr = new_value;
+    }
+
+    void __cdecl Draw_Field_(int16_t field_idx, int16_t action) {
+        if (_draw_fields_flag == 0) {
+            return;
+        }
+
+        s_field* field = &_fields[field_idx];
+
+        switch (field->field_type) {
+            case 0:
+            case 13: {
+                int16_t x_pos;
+                int16_t y_pos;
+
+                if (field->field_type == 13) {
+                    x_pos = field->detail.button.help_start;
+                    y_pos = field->detail.button.background_color;
+                } else {
+                    x_pos = field->x;
+                    y_pos = field->y;
+                }
+
+                if (action == 0) {
+                    animate::Reset_Animation_Frame_(field->detail.button.pic);
+                    animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
+                        field->detail.button.help
+                    );
+                } else {
+                    if (field->detail.button.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.button.pic);
+                        animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+                    } else {
+                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                    }
+                    animate::Draw_(x_pos, y_pos, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
+                        field->detail.button.help
+                    );
+                }
+                break;
+            }
+            case 1: {
+                if (action != 0 && *field->detail.radio.selection == 1) {
+                    if (field->detail.button.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.button.pic);
+                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    } else {
+                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                    }
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
+                        field->detail.button.help
+                    );
+                } else {
+                    animate::Reset_Animation_Frame_(field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
+                        field->detail.button.help
+                    );
+                }
+                break;
+            }
+            case 2: {
+                if (*field->detail.radio.selection == 0 && action != 1) {
+                    animate::Reset_Animation_Frame_(field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
+                        field->detail.button.help
+                    );
+                } else {
+                    if (field->detail.button.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.button.pic);
+                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    } else {
+                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                    }
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
+                        field->detail.button.help
+                    );
+                }
+                break;
+            }
+            case 3: {
+                if (action == 0) {
+                    *field->detail.radio.selection = -1000;
+                } else {
+                    *field->detail.radio.selection = field->detail.button.help_start;
+                }
+
+                if (*field->detail.radio.selection != field->detail.button.help_start) {
+                    animate::Reset_Animation_Frame_(field->detail.button.pic);
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2,
+                        field->detail.button.help
+                    );
+                } else {
+                    if (field->detail.button.draw_style == 0) {
+                        animate::Reset_Animation_Frame_(field->detail.button.pic);
+                        animate::Draw_(field->x, field->y, field->detail.button.pic);
+                    } else {
+                        animate::Set_Animation_Frame_(field->detail.button.pic, 1);
+                    }
+                    animate::Draw_(field->x, field->y, field->detail.button.pic);
+
+                    fonts::Set_Font_Style_(field->font_style, field->font_color);
+                    int16_t font_height = fonts::Get_Font_Height_();
+                    fonts::Print_Centered_(
+                        field->x + (field->x_end - field->x) / 2 + _selected_button_text_x_offset,
+                        field->y + (field->y_end - field->y) / 2 - (font_height - 1) / 2 + _selected_button_text_y_offset,
+                        field->detail.button.help
+                    );
+                }
+                break;
+            }
+            case 4: {
+                if (action == 1) {
+                    Input_String_(field_idx);
+                }
+                break;
+            }
+            case 6: {
+                if (action == 1) {
+                    Find_Bar_Position_(field_idx);
+                }
+                break;
+            }
+            case 12: {
+                _pointer_offset = mouse::Get_Pointer_Offset_();
+                if (action == 1) {
+                    *field->detail.grid.grid_x_ptr = (mouse::Pointer_X_() - field->x + _pointer_offset) / field->detail.grid.step_x;
+                    *field->detail.grid.grid_y_ptr = (mouse::Pointer_Y_() - field->y + _pointer_offset) / field->detail.grid.step_y;
+
+                    int16_t max_x = (field->x_end - field->x) / field->detail.grid.step_x;
+                    if (max_x < *field->detail.grid.grid_x_ptr) {
+                        *field->detail.grid.grid_x_ptr = max_x;
+                    }
+
+                    int16_t max_y = (field->y_end - field->y) / field->detail.grid.step_y;
+                    if (max_y < *field->detail.grid.grid_y_ptr) {
+                        *field->detail.grid.grid_y_ptr = max_y;
+                    }
+
+                    if (*field->detail.grid.grid_x_ptr < 0) {
+                        *field->detail.grid.grid_x_ptr = 0;
+                    }
+
+                    if (*field->detail.grid.grid_y_ptr < 0) {
+                        *field->detail.grid.grid_y_ptr = 0;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    uint8_t __cdecl Get_Alt_Alpha_Key_(int16_t keycode) {
+        switch (keycode) {
+            case 0x1000: return 0x51; /* 'Q' */
+            case 0x1100: return 0x57; /* 'W' */
+            case 0x1200: return 0x45; /* 'E' */
+            case 0x1300: return 0x52; /* 'R' */
+            case 0x1400: return 0x54; /* 'T' */
+            case 0x1500: return 0x59; /* 'Y' */
+            case 0x1600: return 0x55; /* 'U' */
+            case 0x1700: return 0x49; /* 'I' */
+            case 0x1800: return 0x4F; /* 'O' */
+            case 0x1900: return 0x50; /* 'P' */
+            case 0x1E00: return 0x41; /* 'A' */
+            case 0x1F00: return 0x53; /* 'S' */
+            case 0x2000: return 0x44; /* 'D' */
+            case 0x2100: return 0x46; /* 'F' */
+            case 0x2200: return 0x47; /* 'G' */
+            case 0x2300: return 0x48; /* 'H' */
+            case 0x2400: return 0x4A; /* 'J' */
+            case 0x2500: return 0x4B; /* 'K' */
+            case 0x2600: return 0x4C; /* 'L' */
+            case 0x2C00: return 0x5A; /* 'Z' */
+            case 0x2D00: return 0x58; /* 'X' */
+            case 0x2E00: return 0x43; /* 'C' */
+            case 0x2F00: return 0x56; /* 'V' */
+            case 0x3000: return 0x42; /* 'B' */
+            case 0x3100: return 0x4E; /* 'N' */
+            case 0x3200: return 0x4D; /* 'M' */
+            case 0x7800: return 0x30; /* '0' */
+            case 0x7900: return 0x31; /* '1' */
+            case 0x7A00: return 0x32; /* '2' */
+            case 0x7B00: return 0x33; /* '3' */
+            case 0x7C00: return 0x34; /* '4' */
+            case 0x7D00: return 0x35; /* '5' */
+            case 0x7E00: return 0x36; /* '6' */
+            case 0x7F00: return 0x37; /* '7' */
+            default: return 0xFF;
+        }
+    }
+
+    int16_t __cdecl Check_Help_List_() {
+        int16_t mouse_x = static_cast<int16_t>(mouse::Pointer_X_());
+        int16_t mouse_y = static_cast<int16_t>(mouse::Pointer_Y_());
+
+        if (_help_list_count == 0) {
+            return 1;
+        }
+
+        int16_t* help_ptr = reinterpret_cast<int16_t*>(_help_struct_pointer);
+        for (int16_t i = 0; i < _help_list_count; ++i) {
+            // _help_struct_pointer points to an array of 5-element int16_t records:
+            // [0] = help_id
+            // [1] = x_min
+            // [2] = y_min
+            // [3] = x_max
+            // [4] = y_max
+            int16_t* entry = &help_ptr[i * 5];
+
+            if (entry[0] != -1 &&
+                entry[1] <= mouse_x && mouse_x <= entry[3] &&
+                entry[2] <= mouse_y && mouse_y <= entry[4]) {
+                TEXTBOX::Draw_Help_Entry_(entry[0]);
+                return 0;
+            }
+        }
+
+        return 1;
     }
 }

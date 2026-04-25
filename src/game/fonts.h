@@ -65,11 +65,13 @@ namespace fonts {
 
     int16_t __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    inline int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005262d0});
-        return fn(x, y, c);
+    inline void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char c, int16_t clip_x, int16_t width, int16_t clip_y, int16_t height) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, char, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526440});
+        fn(x, y, c, clip_x, width, clip_y, height);
     }
+
+    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c);
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
 
@@ -99,17 +101,9 @@ namespace fonts {
 
     s_colors* __cdecl Get_Current_Font_Color_();
 
-    inline s_colors* __cdecl Get_Current_Highlight_Color_() {
-        using Fn = s_colors*(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526080});
-        return fn();
-    }
+    s_colors* __cdecl Get_Current_Highlight_Color_();
 
-    inline s_colors* __cdecl Get_Current_Special_Color_() {
-        using Fn = s_colors*(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526090});
-        return fn();
-    }
+    s_colors* __cdecl Get_Current_Special_Color_();
 
     int16_t __cdecl Get_Font_Height_();
 

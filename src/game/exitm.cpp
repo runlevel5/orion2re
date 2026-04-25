@@ -4,14 +4,14 @@ namespace exitm {
     void Exit_With_Message(const char* message) {
         fields::Clear_Fields_();
 
-        DAT_00578e68 = 1;
+        platform::_need_quit = 1;
 
-        FUN_0052d290();
+        video::Clear_Display_And_Release_Palette_();
 
         // Show terminal error message to user
         MessageBoxA(platform::g_main_window, message, "Microprose", MB_OK);
 
-        FUN_00533630();
+        platform::Prepare_Exit_();
 
         DestroyWindow(platform::g_main_window);
         __exit(1);

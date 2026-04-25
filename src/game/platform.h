@@ -71,7 +71,7 @@ namespace platform {
 	inline uint16_t& DAT_0057931c =
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0057931c });
 
-	inline uint8_t& DAT_00578e68 =
+	inline uint8_t& _need_quit =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578e68 });
 
 	inline uint32_t& g_frame_count =
@@ -115,6 +115,16 @@ namespace platform {
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void Create_Cursor_Surfaces();
 	HRESULT Restore_Surfaces();
+	inline void __cdecl Lock_Offscreen_Surface_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005285B0 });
+		fn();
+	}
+	inline void __cdecl Unlock_Offscreen_Surface_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528640 });
+		fn();
+	}
 	inline void __cdecl Save_Mouse_(int16_t x, int16_t y) {
 		using Fn = void(__cdecl*)(int16_t, int16_t);
 		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005271A0});
@@ -137,6 +147,11 @@ namespace platform {
 	}
 	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
+	inline void __cdecl Prepare_Exit_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533630 });
+		fn();
+	}
 	inline void __cdecl Update_Cursor_Image_() {
 		using Fn = void(__cdecl*)();
 		reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F80 })();

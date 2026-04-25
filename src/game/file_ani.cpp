@@ -475,4 +475,10 @@ namespace file_ani {
             animate::Set_Animation_Palette_();
         }
     }
+
+    void __cdecl Reset_File_Animation_Buffer_() {
+        platform::Lock_Offscreen_Surface_();
+        _file_animation_buffer = reinterpret_cast<uint8_t*>(DAT_00578e54);
+        platform::Unlock_Offscreen_Surface_();
+    }
 }

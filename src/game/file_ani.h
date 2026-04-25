@@ -51,10 +51,7 @@ namespace file_ani {
 
     void __cdecl Set_File_Animation_Buffer_(void* buffer);
 
-    inline void __cdecl Reset_File_Animation_Buffer_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00531780})();
-    }
+    void __cdecl Reset_File_Animation_Buffer_();
 
     void __cdecl Open_File_Animation_(const char* filename, int16_t entry_index);
 

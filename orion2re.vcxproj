@@ -91,6 +91,7 @@
     <ClCompile Include="src\game\fields.cpp" />
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
+    <ClCompile Include="src\game\firepts.cpp" />
     <ClCompile Include="src\game\fleetpop.cpp" />
     <ClCompile Include="src\game\flt.cpp" />
     <ClCompile Include="src\game\flt1.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="src\game\colmove.h" />
     <ClInclude Include="src\game\colonize.h" />
     <ClInclude Include="src\game\colony.h" />
+    <ClInclude Include="src\game\colrefit.h" />
     <ClInclude Include="src\game\colsum.h" />
     <ClInclude Include="src\game\colsysdi.h" />
     <ClInclude Include="src\game\colxport.h" />

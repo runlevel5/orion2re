@@ -537,6 +537,9 @@
     <ClCompile Include="src\game\colbomb.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\firepts.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -1149,6 +1152,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\switchd_0045bee9.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\colrefit.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

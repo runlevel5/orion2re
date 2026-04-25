@@ -40,6 +40,9 @@ namespace fields {
     inline uint16_t& _old_input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00576308});
     inline int16_t& _old_auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576320});
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
+    inline int16_t& _selected_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE0});
+    inline int16_t& mouse_saved_center_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BE8});
+    inline int16_t& mouse_saved_center_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057630C});
     inline int16_t& _pressed_mouse_x_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B068});
     inline int16_t& _pressed_mouse_y_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B06C});
     inline int16_t& _pressed_button_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B070});
@@ -97,6 +100,7 @@ namespace fields {
     int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, char sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
+    int16_t __cdecl Check_Multi_Hot_Key_Fields_(int16_t hotkey);
 
     int16_t __cdecl Auto_Input_();
 
@@ -135,65 +139,38 @@ namespace fields {
     void __cdecl Invoke_Auto_Function_();
     void __cdecl Invoke_Saved_Auto_Function_();
 
-    inline void __cdecl F11_Key_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EE70});
-        fn();
-    }
+    void __cdecl F11_Key_();
 
-    inline void __cdecl Push_Field_Down_(int16_t field_idx, int16_t x, int16_t y) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FD10});
-        fn(field_idx, x, y);
-    }
+    void __cdecl Push_Field_Down_(int16_t field_idx, int16_t x, int16_t y);
 
-    inline void __cdecl Copy_Continuous_String_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00523A60});
-        fn();
-    }
+    void __cdecl Copy_Continuous_String_();
 
-    inline int16_t __cdecl Interpret_Keyboard_Input_(int16_t* field_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00521730});
-        return fn(field_idx);
-    }
+    int16_t __cdecl Interpret_Keyboard_Input_(int16_t* field_idx);
 
-    inline void __cdecl Increment_Scroll_Bar_(int16_t field_idx) {
+    void __cdecl Increment_Scroll_Bar_(int16_t field_idx);
+    void __cdecl Decrement_Scroll_Bar_(int16_t field_idx);
+
+    inline void __cdecl Input_String_(int16_t field_idx) {
         using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051E1C0});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e520});
         fn(field_idx);
     }
 
-    inline void __cdecl Decrement_Scroll_Bar_(int16_t field_idx) {
+    inline void __cdecl Find_Bar_Position_(int16_t field_idx) {
         using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051E240});
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051e0c0});
         fn(field_idx);
     }
 
-    inline int16_t __cdecl Check_Help_List_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520080});
-        return fn();
-    }
+    int16_t __cdecl Check_Help_List_();
 
-    inline void __cdecl Clear_Multi_Hot_Key_Offsets_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005207D0});
-        fn();
-    }
+    void __cdecl Clear_Multi_Hot_Key_Offsets_();
 
-    inline void __cdecl Draw_Field_(int16_t field_idx, int16_t unk) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005208A0});
-        fn(field_idx, unk);
-    }
+    uint8_t __cdecl Get_Alt_Alpha_Key_(int16_t keycode);
 
-    inline void __cdecl Call_Auto_Function_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051FF90});
-        fn();
-    }
+    void __cdecl Draw_Field_(int16_t field_idx, int16_t action);
+
+    void __cdecl Call_Auto_Function_();
 
     int16_t __cdecl Scan_Field_();
 

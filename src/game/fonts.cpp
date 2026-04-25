@@ -739,6 +739,14 @@ namespace fonts {
         return &_current_font_color_array;
     }
 
+    s_colors* __cdecl Get_Current_Highlight_Color_() {
+        return &_font_header.highlight_colors;
+    }
+
+    s_colors* __cdecl Get_Current_Special_Color_() {
+        return &_font_header.special_colors;
+    }
+
     int16_t __cdecl Get_Font_Height_() {
         return _font_header.font_style_height;
     }
@@ -916,5 +924,57 @@ namespace fonts {
                 rows--;
             } while (rows != 0);
         }
+    }
+
+    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c) {
+        int16_t spacing = _font_header.font_style_spacing;
+
+        if (c > 0x80) {
+            return x;
+        }
+
+        int16_t char_width = static_cast<int16_t>(_font_header.font_style_widths[static_cast<uint8_t>(c)]);
+
+        if (x >= video::_screen_window_x1 &&
+            x + char_width <= video::_screen_window_x2 &&
+            y >= video::_screen_window_y1 &&
+            y + _font_header.font_style_height <= video::_screen_window_y2)
+        {
+            Print_Character_(x, y, c);
+        } else {
+            int16_t orig_ret = spacing + char_width + x;
+            int16_t clip_x = 0;
+
+            if (x < video::_screen_window_x1) {
+                clip_x = video::_screen_window_x1 - x;
+                if (char_width <= clip_x) {
+                    return orig_ret;
+                }
+                char_width -= clip_x;
+                x = video::_screen_window_x1;
+            }
+
+            if (x + char_width > video::_screen_window_x2) {
+                char_width = video::_screen_window_x2 - x + 1;
+                if (char_width < 1) {
+                    return orig_ret;
+                }
+            }
+
+            int16_t clip_y = 0;
+            if (y < video::_screen_window_y1) {
+                clip_y = video::_screen_window_y1 - y;
+                y = video::_screen_window_y1;
+            }
+
+            int16_t print_height = _font_header.font_style_height;
+            if (y + _font_header.font_style_height > video::_screen_window_y2) {
+                print_height = video::_screen_window_y2 - y + 1;
+            }
+
+            Print_Clipped_Letter_(x, y, c, clip_x, char_width, clip_y, print_height);
+        }
+
+        return spacing + char_width + x;
     }
 }

@@ -163,4 +163,10 @@ namespace video {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527cb0 });
         fn();
     }
+
+    inline void __cdecl Clear_Display_And_Release_Palette_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D290 });
+        fn();
+    }
 }

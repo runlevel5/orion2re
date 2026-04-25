@@ -4,6 +4,7 @@
 #include <cstdint>
 
 inline char* s___0055b0ac = reinterpret_cast<char*>(std::uintptr_t{0x0055B0AC});
+inline const char* s_Avail_Mem_0055b390 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B390});
 
 struct s_animation_header;
 struct s_lbx_stream_header;
@@ -73,6 +74,7 @@ inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
     *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
+inline uint32_t& DAT_00578e54 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578E54});
 inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
 inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
@@ -217,13 +219,6 @@ inline void __cdecl FUN_528740(uint32_t stride, uint32_t height) {
     fn(stride, height);
 }
 
-// Suggested name: cleanup_video
-inline void __cdecl FUN_533630() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533630 });
-    fn();
-}
-
 // Suggested name: setup_screen_workspace
 inline void __cdecl Set_Page_Off_() {
     using Fn = void(__cdecl*)();
@@ -299,20 +294,6 @@ inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsig
     using Fn = uintptr_t(__cdecl*)(void(__cdecl*)(void*), unsigned, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005424C0 });
     return fn(start_address, stack_size, arglist);
-}
-
-// Suggested name: Reset_Graphics_State
-inline void __cdecl FUN_0052d290() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052d290 });
-    fn();
-}
-
-// Suggested name: Finalize_System_Shutdown
-inline void __cdecl FUN_00533630() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533630 });
-    fn();
 }
 
 inline FILE* __cdecl FID_conflict_wfopen(const char* filename, const char* mode) {

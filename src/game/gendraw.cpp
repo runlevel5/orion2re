@@ -18,10 +18,26 @@ namespace GENDRAW {
         Message_Box_Exploding_((char*)text);
     }
 
+    void __cdecl Draw_Confirm_Box_() {
+        animate::Set_Animation_Frame_(_image_seg[1], 0);
+        animate::Set_Animation_Frame_(_image_seg[2], 0);
+
+        int16_t input = fields::Auto_Input_();
+
+        if (_first_field == input) {
+            animate::Set_Animation_Frame_(_image_seg[1], 1);
+        } else if (_first_field - input == -1) {
+            animate::Set_Animation_Frame_(_image_seg[2], 1);
+        }
+
+        animate::Remap_Draw_(0xeb, 0x12e, _image_seg[1]);
+        animate::Remap_Draw_(0x159, 0x12e, _image_seg[2]);
+    }
+
     void __cdecl Draw_Animating_Message_Box_() {
         int16_t box_y = _message_box_y + 0x25;
 
-        animate::Set_Animation_Frame_((s_animation_header*)_image_seg[0], _animation_frame);
+        animate::Set_Animation_Frame_(_image_seg[0], _animation_frame);
 
         if (_animation_frame == 0) {
             _direction = 1;
@@ -32,7 +48,7 @@ namespace GENDRAW {
 
         _animation_frame += _direction;
 
-        animate::Remap_Draw_(0x9A, _message_box_y, (s_animation_header*)_image_seg[0]);
+        animate::Remap_Draw_(0x9A, _message_box_y, _image_seg[0]);
         animate::Draw_(0xD0, box_y, (s_animation_header*)_box_bitmap);
     }
 
@@ -42,8 +58,8 @@ namespace GENDRAW {
         fonts::Set_Font_Style_(4, &_message_text_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (uint8_t*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
-        remap::Calculate_Picture_Remap_Colors_((s_animation_header*)_image_seg[0]);
+        _image_seg[0] = (s_animation_header*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        remap::Calculate_Picture_Remap_Colors_(_image_seg[0]);
 
         uint32_t size = bitmap::Get_Bitmap_Size_(0x14B, 0xBF);
         _box_bitmap = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
@@ -74,8 +90,8 @@ namespace GENDRAW {
         fonts::Set_Remap_Font_Style_(mode, &font_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (uint8_t*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
-        animate::Remap_Draw_(0x9A, _message_box_y, (s_animation_header*)_image_seg[0]);
+        _image_seg[0] = (s_animation_header*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        animate::Remap_Draw_(0x9A, _message_box_y, _image_seg[0]);
 
         Do_Print_1_Or_More_Formatted_Lines_Centered_(0xD0, 0xE8, 0xE2, str);
         video::Copy_Off_To_Back_();
@@ -113,9 +129,9 @@ namespace GENDRAW {
         Message_Box_Startup_();
 
         for (int i = 0; i < 3; ++i) {
-            _image_seg[i] = (uint8_t*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
+            _image_seg[i] = (s_animation_header*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
             if (i == 0) {
-                remap::Calculate_Picture_Remap_Colors_((s_animation_header*)_image_seg[0]);
+                remap::Calculate_Picture_Remap_Colors_(_image_seg[0]);
             }
         }
 
@@ -123,11 +139,11 @@ namespace GENDRAW {
         int16_t second_field = fields::Add_Hidden_Field_(0x159, 0x12e, 0x18c, 0x143, s_N_0055765c, 0x29);
 
         for (int i = 0; i < 3; ++i) {
-            _image_seg[i] = (uint8_t*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
+            _image_seg[i] = (s_animation_header*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
         }
 
         int16_t font_idx = 4;
-        animate::Remap_Draw_(0xa1, 0x75, (s_animation_header*)_image_seg[0]);
+        animate::Remap_Draw_(0xa1, 0x75, _image_seg[0]);
 
         do {
             TEXTBOX::Get_Mox_Text_Box_Base_Colors_(2, &color_1, &color_2);
@@ -165,5 +181,13 @@ namespace GENDRAW {
         MOX::_FULL_DRAW_SCREEN_FLAG = 1;
 
         return (input == _first_field) ? 1 : 0;
+    }
+
+    int16_t __cdecl Do_Confirmation_Box_(char* msg) {
+        return Confirmation_Box_(msg);
+    }
+
+    void __cdecl Do_Print_1_Or_More_Formatted_Lines_Centered_(int16_t x, int16_t y, int16_t width, char* text) {
+        _Print_1_Or_More_Formatted_Lines_Centered_(x, y, width, text, nullptr);
     }
 }

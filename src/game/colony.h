@@ -40,6 +40,7 @@ namespace COLONY {
     inline int16_t (&_colony_satellites)[10] =
         *reinterpret_cast<int16_t(*)[10]>(std::uintptr_t{0x0056EBF8});
 
+    inline char* _FIREPTS_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00559D48}); // "FIREPTS.LBX"
     inline const char* _RACEICON_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C88}); // "RACEICON.LBX"
     inline const char* _PLANETS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CA8}); // "PLANETS.LBX"
     inline const char* _AMEBAFIN_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CB8}); // "AMEBAFIN.LBX"
