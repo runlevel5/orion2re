@@ -89,4 +89,6 @@ namespace shear {
     void __cdecl Vanish_Bitmap_Pixels_(uint8_t* src, uint32_t noise_threshold, uint32_t unused_param, uint8_t* dst, uint32_t width, uint32_t height);
 
     void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint32_t noise_threshold, uint8_t* dst_buf, uint32_t width, uint32_t height);
+
+    void __cdecl Gray_Scale_Fill_Pixels_(uint8_t* dst, uint8_t* color_map, uint32_t gap, uint32_t width, uint32_t height);
 }

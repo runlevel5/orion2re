@@ -3434,6 +3434,8 @@ namespace hooks {
         { 0x0051d290, &fields::Scan_Input_ },
         { 0x00522c80, &fields::Draw_Visible_Fields_ },
         { 0x0051ef60, &fields::Draw_Visible_Fields_Back_ },
+        { 0x00525690, &fonts::Set_Font_Style_Shadow_Up_ },
+        { 0x00529870, &graphics::Gradient_Fill_ },
     };
 
     void Install_Hooks()

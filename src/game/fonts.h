@@ -135,6 +135,7 @@ namespace fonts {
     void __cdecl Set_Font_Highlight_Colors_(s_colors* colors);
 
     void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors);
+    void __cdecl Set_Font_Style_Shadow_Up_(int16_t font_idx, s_colors* colors);
 
     void __cdecl Set_Alias_Color_(uint8_t color);
 

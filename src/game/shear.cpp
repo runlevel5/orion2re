@@ -573,4 +573,17 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     }
 }
 
+    void __cdecl Gray_Scale_Fill_Pixels_(uint8_t* dst, uint8_t* color_map, uint32_t gap, uint32_t width, uint32_t height) {
+        _y_step_8_8 = gap;
+        // The original assembly doesn't use the gap variable, but writes it here.
+        
+        for (uint32_t y = 0; y < height; ++y) {
+            for (uint32_t x = 0; x < width; ++x) {
+                uint8_t pixel = *dst;
+                *dst = color_map[pixel];
+                dst++;
+            }
+        }
+    }
+
 } // namespace shear

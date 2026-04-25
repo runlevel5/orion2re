@@ -757,6 +757,11 @@ namespace fonts {
         _font_header.font_style = 1;
     }
 
+    void __cdecl Set_Font_Style_Shadow_Up_(int16_t font_idx, s_colors* colors) {
+        Set_Font_Style_(font_idx, colors);
+        _font_header.font_style = 2;
+    }
+
     void __cdecl Set_Font_Special_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
             _font_header.special_colors.colors[i] = colors->colors[i];

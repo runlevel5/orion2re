@@ -437,4 +437,70 @@ namespace graphics {
 
         platform::Unlock_Appropriate_Render_Buffer();
     }
+
+    void __cdecl Gray_Scale_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t* color_ptr, int32_t extra, int32_t param_7) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        if (x2 < x1) {
+            strings::Swap_Short_(&x1, &x2);
+        }
+        if (y2 < y1) {
+            strings::Swap_Short_(&y1, &y2);
+        }
+
+        if (animate::_clipping_flag == 1) {
+            if (x1 < video::_screen_window_x1) {
+                x1 = video::_screen_window_x1;
+            }
+            if (y1 < video::_screen_window_y1) {
+                y1 = video::_screen_window_y1;
+            }
+            if (x2 > video::_screen_window_x2) {
+                x2 = video::_screen_window_x2;
+            }
+            if (y2 > video::_screen_window_y2) {
+                y2 = video::_screen_window_y2;
+            }
+        }
+
+        if (video::screen_refresh_flag >= 2) {
+            setvesa::Add_Square_To_Scan_List_(x1, y1, x2, y2);
+        }
+
+        replace::_palette_color_list = replace::_graphics_buffer;
+        replace::Establish_Color_Gradient_(static_cast<int16_t>(extra), static_cast<int16_t>(param_7));
+
+        int32_t gap = platform::g_screen_res_x - (x2 - x1) - 1;
+        int32_t color_offset = static_cast<int32_t>(reinterpret_cast<std::intptr_t>(color_ptr));
+
+        for (int i = 0; i < 256; ++i) {
+            uint8_t color_idx = replace::_palette_color_list[i];
+            replace::_palette_color_list[i] = static_cast<uint8_t>(color_idx + color_offset);
+        }
+
+        uint8_t* dest_ptr = video::_current_video_page + (y1 * platform::g_screen_res_x) + x1;
+        int32_t width = (x2 - x1) + 1;
+        int32_t height = (y2 - y1) + 1;
+
+        shear::Gray_Scale_Fill_Pixels_(dest_ptr, replace::_palette_color_list, gap, width, height);
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Gradient_Fill_(int x1, int y1, int x2, int y2, int mode, char *color_ptr, int extra, s_animation_header*pic, s_colors* colors) {
+        switch (mode) {
+        case 1:
+            Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), static_cast<int8_t>(*color_ptr));
+            break;
+        case 3:
+            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), 0);
+            break;
+        case 15:
+            Tint_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), static_cast<int8_t>(*color_ptr));
+            break;
+        case 16:
+            Gray_Scale_Fill_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), reinterpret_cast<uint8_t*>(color_ptr), extra, 0);
+            break;
+        }
+    }
 }

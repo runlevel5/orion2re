@@ -900,7 +900,7 @@ namespace fields {
                 }
             }
 
-            if (field_idx != 0 && (uint16_t)(uint8_t)_fields[field_idx].hotkey == key_code) {
+            if (field_idx != 0 && (int16_t)_fields[field_idx].hotkey == (int16_t)key_code) {
                 if (_fields[field_idx].field_type == 6) {
                     return 0;
                 }
@@ -1024,8 +1024,8 @@ namespace fields {
                 }
                 
                 if (_list_field_on != 0) {
-                    for (int16_t i = 1; i <= _fields_count; ++i) {
-                        if (_fields[i].field_type == 10 && *_fields[i].detail.radio.selection == _fields[i].detail.radio.value && _fields[i].detail.radio.is_active != 0) {
+                    for (int16_t i = 1; i < _fields_count; ++i) {
+                        if (_fields[i].field_type == 10 && *_fields[i].detail.strings.value == _fields[i].detail.strings.help_start && _fields[i].detail.strings.field1_0x2 != 0) {
                             _down_mouse_button = -1;
                             return i;
                         }
@@ -1062,7 +1062,7 @@ namespace fields {
                     if (_active_input_field_first == 0) {
                         int16_t len = 0;
                         if (_continuous_string[0] != '\0') {
-                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && _continuous_string[len] != '\0') {
+                            while (len < _fields[_active_input_field_number].detail.cont_input.max_length - 1 && _continuous_string[len] != '\0' && _continuous_string[len] != '_') {
                                 len++;
                             }
                         }
@@ -1143,7 +1143,7 @@ namespace fields {
             field_idx = 0;
             _pointer_offset = mouse::Get_Pointer_Offset_();
             
-            for (int16_t i = 1; i <= _fields_count; ++i) {
+            for (int16_t i = 1; i < _fields_count; ++i) {
                 int16_t x = buf_x + _pointer_offset;
                 int16_t y = buf_y + _pointer_offset;
                 
@@ -1192,12 +1192,17 @@ namespace fields {
                         if (_input_field_active == 0) {
                             strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
                             _input_field_active = 1;
+                            _active_input_field_first = 1;
+                            _cursor_on = 0;
+                            _cursor_position = 0;
+                            _active_input_field_number = field_idx;
                         } else if (field_idx != _active_input_field_number) {
                             strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
+                            _active_input_field_first = 1;
+                            _cursor_on = 0;
+                            _cursor_position = 0;
+                            _active_input_field_number = field_idx;
                         }
-                        _cursor_on = 0;
-                        _cursor_position = 0;
-                        _active_input_field_number = field_idx;
                         break;
                     default:
                         if (_input_field_active != 0) {
@@ -1372,7 +1377,6 @@ namespace fields {
                         if (_mouse_cancel_disabled != 0) {
                             return -_fields[field_idx].detail.scroll.return_value;
                         }
-                        if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
                         return -1;
                 }
             }
@@ -1738,7 +1742,7 @@ namespace fields {
                                 f->x_end,
                                 f->y + font_height + 1,
                                 f->detail.strings.count,
-                                f->detail.strings.strings,
+                                f->detail.strings.strings[0],
                                 f->detail.strings.field8_0x18,
                                 f->detail.strings.pic,
                                 f->detail.strings.special_color
@@ -2008,7 +2012,7 @@ namespace fields {
                                     _fields[i].x_end,
                                     _fields[i].y + font_height + 1,
                                     _fields[i].detail.strings.count,
-                                    _fields[i].detail.strings.strings,
+                                    _fields[i].detail.strings.strings[0],
                                     _fields[i].detail.strings.field8_0x18,
                                     _fields[i].detail.strings.pic,
                                     _fields[i].detail.strings.special_color
