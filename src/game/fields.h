@@ -84,7 +84,7 @@ namespace fields {
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* help, s_animation_header* pic, int16_t help_start, int16_t help_end, const char* hotkey_ptr, int16_t sound);
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, char sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
 
@@ -92,9 +92,9 @@ namespace fields {
 
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
 
-    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t min_val, int16_t max_val, int16_t pos, int16_t step, int16_t width, int16_t height, short* context_ptr, const char* hotkey_ptr, char sound);
+    int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, char sound);
 
-    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* help, int16_t max_len, int16_t unk1, int32_t unk2, int16_t sound, int16_t unk3);
+    int16_t __cdecl Add_Continuous_String_Input_Field_(int16_t x, int16_t y, int16_t width, int16_t height, char* value, int16_t max_length, int16_t background_color, s_animation_header* pic, int16_t sound, int16_t font_shadow_style);
 
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound);
 
@@ -125,11 +125,6 @@ namespace fields {
     void __cdecl Invoke_Auto_Function_();
     void __cdecl Invoke_Saved_Auto_Function_();
 
-    inline void __cdecl Evaluate_Input_(int16_t* input, int16_t* scan) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0050B520})(input, scan);
-    }
-
     int16_t __cdecl Scan_Field_();
 
     void __cdecl Clear_Mouse_Buffer_();
@@ -156,7 +151,7 @@ namespace fields {
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, char** strings, int16_t help_start, int16_t param_8, int16_t* value, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str, char* param_14);
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, int16_t* value, int16_t help_start, int16_t count, char** strings, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str, char* param_14);
 
     void __cdecl Mark_Fields_();
 
@@ -166,5 +161,5 @@ namespace fields {
 
     void __cdecl Release_Fields_();
 
-    int16_t __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char* help, char* list_ptr, int32_t item_size, int16_t* selected_index, uint8_t* item_flags, int16_t param_9, int16_t* param_10, int32_t param_11, s_animation_header* pic, int32_t param_13, char* param_14);
+    short __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char *help, char *list_ptr, int32_t item_size, int16_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10, int32_t param_11, s_animation_header *pic, int32_t param_13, char *param_14);
 }

@@ -441,7 +441,7 @@ namespace COLBLDG {
             RUSS::Mox_Sync_Update_();
             field_id = fields::Get_Input_();
             scan_code = fields::Scan_Input_();
-            fields::Evaluate_Input_(&field_id, &scan_code);
+            COLBLDG::Evaluate_Input_(&field_id, &scan_code);
 
             if (field_id == COLBLDG::_fields[3] ||
                 field_id == COLBLDG::_fields[0] ||

@@ -818,6 +818,9 @@ inline const char* s__00551120 = reinterpret_cast<const char*>(0x00551120); // "
 inline const char* s_combat_lbx_005599c8 = reinterpret_cast<const char*>(0x005599C8); // "combat.LBX"
 inline const char* s_warning_lbx_00557650 = reinterpret_cast<const char*>(std::uintptr_t{0x00557650}); // "warning.lbx"
 
+inline char* s_You_exceeded_the_max_number_of_f_0055b080 =
+    reinterpret_cast<char*>(std::uintptr_t{ 0x0055B080 });
+
 inline void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
     using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528CC0});

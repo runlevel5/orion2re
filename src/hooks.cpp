@@ -3425,6 +3425,9 @@ namespace hooks {
         { 0x0051EEF0, &fields::Enable_Draw_Field_ },
         { 0x0051FF50, &fields::Quick_Call_Auto_Function_ },
         { 0x00521210, &fields::Get_List_Field_ },
+        { 0x0051DE80, &fields::Add_Scroll_Field_ },
+        { 0x005214c0, &fields::Add_String_List_Field_ },
+        { 0x00520220, &fields::Add_Irregular_Button_Field_ },
     };
 
     void Install_Hooks()
