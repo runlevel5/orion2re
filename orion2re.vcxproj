@@ -116,6 +116,7 @@
     <ClCompile Include="src\game\jim.cpp" />
     <ClCompile Include="src\game\ken.cpp" />
     <ClCompile Include="src\game\key.cpp" />
+    <ClCompile Include="src\game\lbx.cpp" />
     <ClCompile Include="src\game\line.cpp" />
     <ClCompile Include="src\game\list.cpp" />
     <ClCompile Include="src\game\loader.cpp" />

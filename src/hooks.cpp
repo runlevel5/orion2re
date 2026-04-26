@@ -3485,6 +3485,15 @@ namespace hooks {
         { 0x00412410, &ERICHELP::Set_New_System_Discovery_Popup_Help_List_ },
         { 0x00412430, &ERICHELP::Set_Officer_Information_Popup_Help_List_ },
         { 0x00412300, &ERICHELP::Eric_Set_Help_List_ },
+        { 0x00534880, &lbx::LBX_init_ },
+        { 0x00534A50, &lbx::LBX_getRecordLength_ },
+        { 0x005349E0, &lbx::LBX_uninit_ },
+        { 0x00537FC0, &lbx::LBX_init_stream_ },
+        { 0x00534A00, &lbx::LBX_readRecord_ },
+        { 0x00501590, &aitech::Get_Max_Technology_Value_ },
+        { 0x0052EBC0, &allocate::Get_Max_Block_Space_ },
+        { 0x0052eb10, &allocate::Mark_Block_ },
+        { 0x0052eb20, &allocate::Release_Block_ },
     };
 
     void Install_Hooks()

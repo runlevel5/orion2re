@@ -24,9 +24,5 @@ namespace aitech {
 
     int16_t __cdecl System_Proximity_Count_(int16_t player_id, uint8_t other_player_id);
 
-    inline int32_t __cdecl Get_Max_Technology_Value_(int16_t player_idx) {
-        using Fn = int32_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00501590});
-        return fn(player_idx);
-    }
+    int32_t __cdecl Get_Max_Technology_Value_(int16_t player_idx);
 }

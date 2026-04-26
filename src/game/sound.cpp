@@ -1182,8 +1182,7 @@ namespace sound {
         }
 
         // Cache miss: Load from LBX
-        // TYPE MISMATCH: lbx::LBX_getRecordLength_ in lbx.h expects intptr_t and uint16_t
-        uint32_t length = (uint32_t)lbx::LBX_getRecordLength_(reinterpret_cast<intptr_t>(&_soundLbxHandle), static_cast<uint16_t>(resource_id));
+        uint32_t length = (uint32_t)lbx::LBX_getRecordLength_(&_soundLbxHandle, resource_id);
         if (length == 0) {
             return -2;
         }

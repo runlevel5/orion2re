@@ -85,6 +85,10 @@ namespace allocate {
         return block->size - block->current;
     }
 
+    uint32_t __cdecl Get_Max_Block_Space_(void* ptr) {
+        return *reinterpret_cast<uint32_t*>(static_cast<uint8_t*>(ptr) - 8);
+    }
+
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line) {
         char buffer[100];
 
@@ -245,6 +249,12 @@ namespace allocate {
         return Allocate_Next_Block_No_Header_(block_ptr, size);
     }
 
+    int32_t __cdecl Mark_Block_(void* block_ptr) {
+        uint8_t* p = static_cast<uint8_t*>(block_ptr);
+        *reinterpret_cast<uint32_t*>(p - 4) = *reinterpret_cast<uint32_t*>(p - 12);
+        return reinterpret_cast<int32_t>(p - 12);
+    }
+
     /**
      * @brief Allocates a block of memory from a pool, aligning the size if it's odd.
      * 
@@ -286,5 +296,11 @@ namespace allocate {
         new_block_header->reserved2 = 0;
 
         return static_cast<void*>(new_block_ptr);
+    }
+
+    void* __cdecl Release_Block_(void* ptr) {
+        uint8_t* p = static_cast<uint8_t*>(ptr);
+        *reinterpret_cast<uint32_t*>(p - 12) = *reinterpret_cast<uint32_t*>(p - 4);
+        return p - 12;
     }
 }

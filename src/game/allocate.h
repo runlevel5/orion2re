@@ -18,10 +18,7 @@ namespace allocate {
 
     int32_t __cdecl Get_Remaining_Block_Space_(void* block);
 
-    inline int32_t __cdecl Get_Max_Block_Space_(uint8_t* buffer) {
-        using Fn = int32_t(__cdecl*)(uint8_t*);
-        return reinterpret_cast<Fn>(std::uintptr_t{ 0x0052ebc0 })(buffer);
-    }
+    uint32_t __cdecl Get_Max_Block_Space_(void* ptr);
 
     void __cdecl Allocation_Error_(int bytes_requested);
 
@@ -41,15 +38,9 @@ namespace allocate {
 
     void __cdecl Pop_Block_(void* block);
 
-    inline void __cdecl Mark_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB10})(block);
-    }
+    int32_t __cdecl Mark_Block_(void* block_ptr);
 
-    inline void __cdecl Release_Block_(void* block) {
-        using Fn = void(__cdecl*)(void*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0052EB20})(block);
-    }
+    void* __cdecl Release_Block_(void* block);
 
     void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
 

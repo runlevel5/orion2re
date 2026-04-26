@@ -1,34 +1,19 @@
 #pragma once
 #include <cstdint>
 
+struct s_lbx_stream_header;
+struct s_wave_stream_header;
+
 namespace lbx {
-    inline void __cdecl LBX_init_(void* header, const char* filename) {
-        using Fn = void(__cdecl*)(void*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534880});
-        fn(header, filename);
-    }
+    inline const char* s_r_b_0055bf20 = reinterpret_cast<const char*>(std::uintptr_t{0x0055BF20}); /* "r+b" */
 
-    inline int32_t __cdecl LBX_getRecordLength_(intptr_t header, uint16_t rec_idx) {
-        using Fn = int32_t(__cdecl*)(intptr_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00534A50});
-        return fn(header, rec_idx);
-    }
+    void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename);
 
-    inline void __cdecl LBX_uninit_(uint32_t* header) {
-        using Fn = void(__cdecl*)(uint32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005349E0});
-        fn(header);
-    }
+    int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx);
 
-    inline void __cdecl LBX_init_stream_(void* handle, const char* filename) {
-        using Fn = void(__cdecl*)(void*, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00537FC0});
-        fn(handle, filename);
-    }
+    void __cdecl LBX_uninit_(s_lbx_stream_header* header);
 
-    inline void __cdecl LBX_readRecord_(s_lbx_stream_header* lbx, int32_t record_idx, void* buffer) {
-        using Fn = void(__cdecl*)(s_lbx_stream_header*, int32_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00534a00 });
-        fn(lbx, record_idx, buffer);
-    }
+    void __cdecl LBX_init_stream_(s_wave_stream_header* stream, const char* filename);
+
+    void __cdecl LBX_readRecord_(s_lbx_stream_header* header, int32_t record_idx, void* buffer);
 }

@@ -173,6 +173,9 @@ namespace sound {
     inline s_wave_stream_header& _streamLbxHandle =
         *reinterpret_cast<s_wave_stream_header*>(std::uintptr_t{0x00589A20});
 
+    inline uint8_t& _close_stream =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055C208});
+
     inline uint8_t& _musicActive =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0058AA6C});
 

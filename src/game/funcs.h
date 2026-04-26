@@ -697,6 +697,18 @@ inline long __stdcall mmioRead(HMMIO hmmio, void* pch, long cch) {
     return fn(hmmio, pch, cch);
 }
 
+inline MMRESULT __stdcall mmioClose(HMMIO hmmio, uint32_t uFlags) {
+    using Fn = int32_t(__stdcall*)(HMMIO, uint32_t);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5A4});
+    return fn(hmmio, uFlags);
+}
+
+inline HMMIO __stdcall mmioOpenA(const char* szFilename, void* lpmmioinfo, uint32_t dwOpenFlags) {
+    using Fn = HMMIO(__stdcall*)(const char*, void*, uint32_t);
+    auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{0x005AA5B0});
+    return fn(szFilename, lpmmioinfo, dwOpenFlags);
+}
+
 inline int __cdecl __strcmpi(const char* s1, const char* s2) {
     using Fn = int(__cdecl*)(const char*, const char*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005428d0 });

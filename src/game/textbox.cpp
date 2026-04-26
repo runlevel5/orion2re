@@ -262,7 +262,7 @@ namespace TEXTBOX {
         fonts::Set_Remap_Font_Style_(2, &color_2);
 
         allocate::Push_Block_(_textbox_seg);
-        void* lbx_header = allocate::Allocate_Next_Block_(_textbox_seg, 0x104C);
+        s_lbx_stream_header* lbx_header = (s_lbx_stream_header*)allocate::Allocate_Next_Block_(_textbox_seg, 0x104C);
 
         uint16_t count = 0;
         uint32_t help_idx = static_cast<uint16_t>(param_1);
@@ -287,8 +287,8 @@ namespace TEXTBOX {
             if (has_anim[count]) {
                 lbx::LBX_init_(lbx_header, records[count].anim_lbx);
                 uint16_t rec_idx = static_cast<uint16_t>(records[count].anim_info & 0xFFFF);
-                total_lbx_size += lbx::LBX_getRecordLength_(reinterpret_cast<intptr_t>(lbx_header), rec_idx) + 0x400;
-                lbx::LBX_uninit_(static_cast<uint32_t*>(lbx_header));
+                total_lbx_size += lbx::LBX_getRecordLength_(lbx_header, rec_idx) + 0x400;
+                lbx::LBX_uninit_(lbx_header);
             }
 
             uint32_t next_idx = records[count].next_help_idx;

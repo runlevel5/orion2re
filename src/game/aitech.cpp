@@ -322,6 +322,21 @@ namespace aitech {
         return score;
     }
 
+    int32_t __cdecl Get_Max_Technology_Value_(int16_t player_idx) {
+        int32_t max_cost = 0;
+
+        for (int i = 0; i < 83; ++i) {
+            if (MOX::_player[player_idx].tech_fields[i] == 3) {
+                int32_t cost = static_cast<int32_t>(TECHDATA::_technology_fields[i].cost);
+                if (max_cost < cost) {
+                    max_cost = cost;
+                }
+            }
+        }
+
+        return max_cost / 25;
+    }
+
     void __cdecl AI_Tech_Select_(s_player *player) {
         bool needs_new_tech = false;
 
