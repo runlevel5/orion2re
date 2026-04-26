@@ -3463,6 +3463,17 @@ namespace hooks {
         { 0x00479DF0, &GENDRAW::_Print_1_Or_More_Formatted_Lines_Centered_ },
         { 0x0051E520, &fields::Input_String_ },
         { 0x0051E0C0, &fields::Find_Bar_Position_ },
+        { 0x0051ea80, &fields::Display_Input_Field_ },
+        { 0x0045C420, &MAINPUPS::Set_G_Special_Value_ },
+        { 0x0045C740, &MAINPUPS::Check_System_Display_Fields_Defense_Selection_ },
+        { 0x0044B770, &COLBOMB::Do_Summary_String_Popup_ },
+        { 0x004babe0, &ERIC::Player_Has_Ship_Size_Or_Larger_At_Star_ },
+        { 0x004BAB40, &ERIC::Player_Has_Leader_With_General_Skill_At_Star_ },
+        { 0x0041e490, &EVANHELP::Append_Help_List_ },
+        { 0x0041e240, &EVANHELP::Set_ColOff_Screen_Help_List_ },
+        { 0x00412360, &ERICHELP::Set_Transport_Popup_Help_List_ },
+        { 0x004123f0, &ERICHELP::Set_Tax_Rate_Popup_Help_List_ },
+        { 0x00412350, &ERICHELP::Set_Building_Queue_Screen_Help_List_ },
     };
 
     void Install_Hooks()

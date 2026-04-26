@@ -78,10 +78,7 @@ namespace MAINPUPS {
 
     void __cdecl Load_Colony_Fields_();
 
-    inline void __cdecl Set_G_Special_Value_(int16_t param_1) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(0x0045c420)(param_1);
-    }
+    void __cdecl Set_G_Special_Value_(int16_t star_idx);
 
     void __cdecl Update_Selection_Fields_();
 
@@ -197,11 +194,7 @@ namespace MAINPUPS {
 
     int16_t __cdecl Evaluate_Defense_Selection_Input_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made);
 
-    inline int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045C740});
-        return fn(field_idx, mouse_status, selection_made);
-    }
+    int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* field_idx, int16_t* mouse_status, int16_t* selection_made);
 
     void __cdecl Player_Attacked_Popup_(int16_t attacker_idx, int16_t defender_idx, int16_t star_idx, int16_t colony_idx);
 

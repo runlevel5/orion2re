@@ -142,13 +142,13 @@ namespace MAINMENU {
         }
     }
 
-    void __cdecl Set_Main_Menu_Screen_Help_List_Aux_(void* help_data, int16_t count) {
+    void __cdecl Set_Main_Menu_Screen_Help_List_Aux_(s_help_box* help_data, int16_t count) {
         fields::Deactivate_Help_List_();
         fields::Set_Help_List_(help_data, count);
     }
 
     void __cdecl Set_Main_Menu_Screen_Help_List_() {
-        Set_Main_Menu_Screen_Help_List_Aux_(&EVANHELP::_main_menu_screen_help_list, 6);
+        Set_Main_Menu_Screen_Help_List_Aux_(EVANHELP::_main_menu_screen_help_list, 6);
     }
 
     void __cdecl Load_Mainmenu_Load_Game_Popup_() {

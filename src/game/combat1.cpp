@@ -1988,190 +1988,196 @@ namespace COMBAT1 {
         }
     }
 
-    void __cdecl Set_Combat_Help_Fields_(void) {
-        int16_t start_index;
+    void __cdecl Set_Combat_Help_Fields_() {
+        int16_t entry_idx = 0;
 
         if (MOX::_order_info_flag == 1) {
-            MOX::_help_entry_list[0] = 617;
-            MOX::_help_entry_list[1] = 292;
-            MOX::_help_entry_list[2] = 446;
-            MOX::_help_entry_list[3] = 374;
-            MOX::_help_entry_list[4] = 472;
-
-            MOX::_help_entry_list[5] = 623;
-            MOX::_help_entry_list[6] = 271;
-            MOX::_help_entry_list[7] = 362;
-            MOX::_help_entry_list[8] = 330;
-            MOX::_help_entry_list[9] = 386;
-
-            MOX::_help_entry_list[10] = 624;
-            MOX::_help_entry_list[11] = 332;
-            MOX::_help_entry_list[12] = 362;
-            MOX::_help_entry_list[13] = 394;
-            MOX::_help_entry_list[14] = 386;
-
-            MOX::_help_entry_list[15] = 625;
-            MOX::_help_entry_list[16] = 271;
-            MOX::_help_entry_list[17] = 389;
-            MOX::_help_entry_list[18] = 330;
-            MOX::_help_entry_list[19] = 414;
-
-            MOX::_help_entry_list[20] = 626;
-            MOX::_help_entry_list[21] = 333;
-            MOX::_help_entry_list[22] = 389;
-            MOX::_help_entry_list[23] = 394;
-            MOX::_help_entry_list[24] = 414;
-
-            MOX::_help_entry_list[25] = 627;
-            MOX::_help_entry_list[26] = 271;
-            MOX::_help_entry_list[27] = 418;
-            MOX::_help_entry_list[28] = 330;
-            MOX::_help_entry_list[29] = 441;
-
-            MOX::_help_entry_list[30] = 628;
-            MOX::_help_entry_list[31] = 333;
-            MOX::_help_entry_list[32] = 418;
-            MOX::_help_entry_list[33] = 394;
-            MOX::_help_entry_list[34] = 441;
-
-            start_index = 7;
-        }
-        else {
-            MOX::_help_entry_list[0] = 695;
-            MOX::_help_entry_list[1] = 282;
-            MOX::_help_entry_list[2] = 350;
-            MOX::_help_entry_list[3] = 384;
-            MOX::_help_entry_list[4] = 371;
-
-            MOX::_help_entry_list[5] = 696;
-            MOX::_help_entry_list[6] = 264;
-            MOX::_help_entry_list[7] = 383;
-            MOX::_help_entry_list[8] = 407;
-            MOX::_help_entry_list[9] = 396;
-
-            MOX::_help_entry_list[10] = 697;
-            MOX::_help_entry_list[11] = 264;
-            MOX::_help_entry_list[12] = 399;
-            MOX::_help_entry_list[13] = 407;
-            MOX::_help_entry_list[14] = 412;
-
-            MOX::_help_entry_list[15] = 698;
-            MOX::_help_entry_list[16] = 264;
-            MOX::_help_entry_list[17] = 415;
-            MOX::_help_entry_list[18] = 407;
-            MOX::_help_entry_list[19] = 428;
-
-            MOX::_help_entry_list[20] = 699;
-            MOX::_help_entry_list[21] = 264;
-            MOX::_help_entry_list[22] = 431;
-            MOX::_help_entry_list[23] = 407;
-            MOX::_help_entry_list[24] = 444;
-
-            MOX::_help_entry_list[25] = 700;
-            MOX::_help_entry_list[26] = 264;
-            MOX::_help_entry_list[27] = 447;
-            MOX::_help_entry_list[28] = 407;
-            MOX::_help_entry_list[29] = 460;
-
-            start_index = 6;
+            MOX::_help_entry_list[0].help_id = 0x269;
+            MOX::_help_entry_list[0].x1 = 0x124;
+            MOX::_help_entry_list[0].y1 = 0x1be;
+            MOX::_help_entry_list[0].x2 = 0x176;
+            MOX::_help_entry_list[0].y2 = 0x1d8;
+            
+            MOX::_help_entry_list[1].help_id = 0x26f;
+            MOX::_help_entry_list[1].x1 = 0x10f;
+            MOX::_help_entry_list[1].y1 = 0x16a;
+            MOX::_help_entry_list[1].x2 = 0x14a;
+            MOX::_help_entry_list[1].y2 = 0x182;
+            
+            MOX::_help_entry_list[2].help_id = 0x270;
+            MOX::_help_entry_list[2].x1 = 0x14c;
+            MOX::_help_entry_list[2].y1 = 0x16a;
+            MOX::_help_entry_list[2].x2 = 0x18a;
+            MOX::_help_entry_list[2].y2 = 0x182;
+            
+            MOX::_help_entry_list[3].help_id = 0x271;
+            MOX::_help_entry_list[3].x1 = 0x10f;
+            MOX::_help_entry_list[3].y1 = 0x185;
+            MOX::_help_entry_list[3].x2 = 0x14a;
+            MOX::_help_entry_list[3].y2 = 0x19e;
+            
+            MOX::_help_entry_list[4].help_id = 0x272;
+            MOX::_help_entry_list[4].x1 = 0x14d;
+            MOX::_help_entry_list[4].y1 = 0x185;
+            MOX::_help_entry_list[4].x2 = 0x18a;
+            MOX::_help_entry_list[4].y2 = 0x19e;
+            
+            MOX::_help_entry_list[5].help_id = 0x273;
+            MOX::_help_entry_list[5].x1 = 0x10f;
+            MOX::_help_entry_list[5].y1 = 0x1a2;
+            MOX::_help_entry_list[5].x2 = 0x14a;
+            MOX::_help_entry_list[5].y2 = 0x1b9;
+            
+            MOX::_help_entry_list[6].help_id = 0x274;
+            MOX::_help_entry_list[6].x1 = 0x14d;
+            MOX::_help_entry_list[6].y1 = 0x1a2;
+            MOX::_help_entry_list[6].x2 = 0x18a;
+            MOX::_help_entry_list[6].y2 = 0x1b9;
+            entry_idx = 7;
+        } else {
+            MOX::_help_entry_list[0].help_id = 0x2b7;
+            MOX::_help_entry_list[0].x1 = 0x11a;
+            MOX::_help_entry_list[0].y1 = 0x15e;
+            MOX::_help_entry_list[0].x2 = 0x180;
+            MOX::_help_entry_list[0].y2 = 0x173;
+            
+            MOX::_help_entry_list[1].help_id = 0x2b8;
+            MOX::_help_entry_list[1].x1 = 0x108;
+            MOX::_help_entry_list[1].y1 = 0x17f;
+            MOX::_help_entry_list[1].x2 = 0x197;
+            MOX::_help_entry_list[1].y2 = 0x18c;
+            
+            MOX::_help_entry_list[2].help_id = 0x2b9;
+            MOX::_help_entry_list[2].x1 = 0x108;
+            MOX::_help_entry_list[2].y1 = 0x18f;
+            MOX::_help_entry_list[2].x2 = 0x197;
+            MOX::_help_entry_list[2].y2 = 0x19c;
+            
+            MOX::_help_entry_list[3].help_id = 0x2ba;
+            MOX::_help_entry_list[3].x1 = 0x108;
+            MOX::_help_entry_list[3].y1 = 0x19f;
+            MOX::_help_entry_list[3].x2 = 0x197;
+            MOX::_help_entry_list[3].y2 = 0x1ac;
+            
+            MOX::_help_entry_list[4].help_id = 0x2bb;
+            MOX::_help_entry_list[4].x1 = 0x108;
+            MOX::_help_entry_list[4].y1 = 0x1af;
+            MOX::_help_entry_list[4].x2 = 0x197;
+            MOX::_help_entry_list[4].y2 = 0x1bc;
+            
+            MOX::_help_entry_list[5].help_id = 0x2bc;
+            MOX::_help_entry_list[5].x1 = 0x108;
+            MOX::_help_entry_list[5].y1 = 0x1bf;
+            MOX::_help_entry_list[5].x2 = 0x197;
+            MOX::_help_entry_list[5].y2 = 0x1cc;
+            entry_idx = 6;
         }
 
-        MOX::_help_entry_list[start_index * 5 + 0] = 618;
-        MOX::_help_entry_list[start_index * 5 + 1] = 10;
-        MOX::_help_entry_list[start_index * 5 + 2] = 360;
-        MOX::_help_entry_list[start_index * 5 + 3] = 106;
-        MOX::_help_entry_list[start_index * 5 + 4] = 471;
+        MOX::_help_entry_list[entry_idx].help_id = 0x26a;
+        MOX::_help_entry_list[entry_idx].x1 = 0x0a;
+        MOX::_help_entry_list[entry_idx].y1 = 0x168;
+        MOX::_help_entry_list[entry_idx].x2 = 0x6a;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1d7;
+        entry_idx++;
 
-        MOX::_help_entry_list[(start_index + 1) * 5 + 1] = 502;
-        MOX::_help_entry_list[(start_index + 1) * 5 + 2] = 360;
-        MOX::_help_entry_list[(start_index + 1) * 5 + 3] = 626;
-        MOX::_help_entry_list[(start_index + 1) * 5 + 4] = 471;
+        MOX::_help_entry_list[entry_idx].x1 = 0x1f6;
+        MOX::_help_entry_list[entry_idx].y1 = 0x168;
+        MOX::_help_entry_list[entry_idx].x2 = 0x272;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1d7;
         if (MOX::_missile_warning == 1) {
-            MOX::_help_entry_list[(start_index + 1) * 5 + 0] = 621;
+            MOX::_help_entry_list[entry_idx].help_id = 0x26c;
+        } else {
+            MOX::_help_entry_list[entry_idx].help_id = 0x26d;
         }
-        else {
-            MOX::_help_entry_list[(start_index + 1) * 5 + 0] = 620;
-        }
+        entry_idx++;
 
-        MOX::_help_entry_list[(start_index + 2) * 5 + 0] = 622;
-        MOX::_help_entry_list[(start_index + 2) * 5 + 1] = 399;
-        MOX::_help_entry_list[(start_index + 2) * 5 + 2] = 360;
-        MOX::_help_entry_list[(start_index + 2) * 5 + 3] = 495;
-        MOX::_help_entry_list[(start_index + 2) * 5 + 4] = 471;
-
-        int16_t ship_info_base_idx = start_index + 3;
+        MOX::_help_entry_list[entry_idx].help_id = 0x26e;
+        MOX::_help_entry_list[entry_idx].x1 = 0x18f;
+        MOX::_help_entry_list[entry_idx].y1 = 0x168;
+        MOX::_help_entry_list[entry_idx].x2 = 0x1ef;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1d7;
+        entry_idx++;
 
         if (MOX::_ship_status_display == 0) {
-            for (int i = 0; i < 8; ++i) {
-                int16_t weapon_id = MOX::_combat_data[MOX::_cur_ship].weapons[i].weapon_id;
-                int16_t tech_app_id = TECHDATA::_weapons[weapon_id].tech_app_id;
-                if (tech_app_id == 0) {
-                    tech_app_id = -1;
-                }
-                MOX::_help_entry_list[(ship_info_base_idx + i) * 5 + 0] = tech_app_id;
-            }
-        }
-        else {
-            int16_t specials_found = 0;
-            for (int i = 0; i < 39; ++i) {
-                if (struct_::Test_Bit_Field_(MOX::_combat_data[MOX::_cur_ship].special_device_flags, i) == 1) {
-                    int16_t tech_app_id = TECHDATA::_specials[i].tech_app_id;
-                    MOX::_help_entry_list[(ship_info_base_idx + specials_found) * 5 + 0] = tech_app_id;
-                    specials_found++;
+            for (int j = 0; j < 8; j++) {
+                uint16_t tech_app_id = TECHDATA::_weapons[MOX::_combat_data[MOX::_cur_ship].weapons[j].weapon_id].tech_app_id;
+                if (tech_app_id != 0) {
+                    MOX::_help_entry_list[entry_idx + j].help_id = tech_app_id;
+                } else {
+                    MOX::_help_entry_list[entry_idx + j].help_id = -1;
                 }
             }
-            for (int i = specials_found; i < specials_found + 8; ++i) {
-                MOX::_help_entry_list[(ship_info_base_idx + i) * 5 + 0] = -1;
+        } else {
+            int special_count = 0;
+            for (int j = 0; j < 39; j++) {
+                if (struct_::Test_Bit_Field_(MOX::_combat_data[MOX::_cur_ship].special_device_flags, j) == 1) {
+                    MOX::_help_entry_list[entry_idx + special_count].help_id = TECHDATA::_specials[j].tech_app_id;
+                    special_count++;
+                }
+            }
+            for (int k = 0; k < 8; k++) {
+                MOX::_help_entry_list[entry_idx + special_count + k].help_id = -1;
             }
         }
 
-        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 2] = 379;
-        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 0) * 5 + 4] = 389;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x17b;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x185;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 2] = 390;
-        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 1) * 5 + 4] = 400;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x186;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x190;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 2] = 401;
-        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 2) * 5 + 4] = 411;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x191;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x19b;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 2] = 412;
-        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 3) * 5 + 4] = 422;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x19c;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1a6;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 2] = 423;
-        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 4) * 5 + 4] = 433;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x1a7;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1b1;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 2] = 434;
-        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 5) * 5 + 4] = 444;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x1b2;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1bc;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 2] = 445;
-        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 6) * 5 + 4] = 455;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x1bd;
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1c7;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 1] = 114;
-        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 2] = 456;
-        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 3] = 264;
-        MOX::_help_entry_list[(ship_info_base_idx + 7) * 5 + 4] = 467;
+        MOX::_help_entry_list[entry_idx].x1 = 0x72;
+        MOX::_help_entry_list[entry_idx].y1 = 0x1c8;
+        // Code that apparently does nothing (flags ignored)
+        (void)(MOX::_ship_status_display == 0);
+        MOX::_help_entry_list[entry_idx].x2 = 0x108;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1d3;
+        entry_idx++;
 
-        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 0] = 629;
-        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 1] = 113;
-        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 2] = 360;
-        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 3] = 265;
-        MOX::_help_entry_list[(ship_info_base_idx + 8) * 5 + 4] = 471;
+        MOX::_help_entry_list[entry_idx].help_id = 0x275;
+        MOX::_help_entry_list[entry_idx].x1 = 0x71;
+        MOX::_help_entry_list[entry_idx].y1 = 0x168;
+        MOX::_help_entry_list[entry_idx].x2 = 0x109;
+        MOX::_help_entry_list[entry_idx].y2 = 0x1d7;
+        entry_idx++;
 
-        fields::Set_Help_List_(MOX::_help_entry_list, start_index + 12);
+        fields::Set_Help_List_(MOX::_help_entry_list, entry_idx);
     }
 
     bool __cdecl Weapon_Is_On_(int16_t ship_idx, int16_t weapon_idx) {

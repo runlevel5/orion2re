@@ -292,8 +292,8 @@ namespace OFFICER {
         fn(x, y, officer);
     }
 
-    inline void __cdecl Get_N_Skills_Per_Officer_Displayed_(int32_t* skills) {
-        using Fn = void(__cdecl*)(int32_t*);
+    inline void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skills) {
+        using Fn = void(__cdecl*)(int16_t*);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443ec0});
         fn(skills);
     }

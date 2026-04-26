@@ -91,17 +91,9 @@ namespace ERIC {
 
     void __cdecl Play_Amoeba_Flic_();
 
-    inline bool __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t size, int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004babe0});
-        return fn(player_idx, size, star_idx);
-    }
+    int8_t __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t size, int16_t star_idx);
 
-    inline bool __cdecl Player_Has_Leader_With_General_Skill_At_Star_(int16_t player_idx, int16_t skill_idx, int16_t star_idx) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bab40});
-        return fn(player_idx, skill_idx, star_idx);
-    }
+    int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(short player_idx, short skill_idx, short star_idx);
 
     int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx);
 

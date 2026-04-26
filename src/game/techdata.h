@@ -19,7 +19,8 @@ namespace TECHDATA {
     inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
     inline s_tech_shield_data* _shields = reinterpret_cast<s_tech_shield_data*>(std::uintptr_t{ 0x00554e00 });
     inline s_tech_computer_data* _computers = reinterpret_cast<s_tech_computer_data*>(std::uintptr_t{ 0x00555558 });
-    inline s_tech_specials_data* _specials = reinterpret_cast<s_tech_specials_data*>(std::uintptr_t{ 0x00554638 });
+    inline s_tech_specials_data (&_specials)[40] =
+        *reinterpret_cast<s_tech_specials_data(*)[40]>(std::uintptr_t{0x00554638});
     inline s_tech_weapon_data (&_weapons)[46] =
         *reinterpret_cast<s_tech_weapon_data(*)[46]>(std::uintptr_t{0x00554F68});
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =

@@ -2777,4 +2777,126 @@ namespace MAINPUPS {
 
         _mp_fields[0] = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, ESTRINGS::E_Strings_(0xC), 0);
     }
+
+    /**
+     * @address 0045c740
+     */
+    int16_t __cdecl Check_System_Display_Fields_Defense_Selection_(int16_t* param_1, int16_t* param_2, int16_t* param_3) {
+        int16_t scanned_planet_field;
+        int16_t scanned_planet_icon;
+        int16_t scanned_ship_field;
+        int16_t scanned_ship_icon;
+        int16_t scanned_system_icon;
+
+        int16_t scan_result = MAINSCR::Scan_System_Display_Fields_(
+            *param_2,
+            *param_1,
+            MOX::_planet_buttons,
+            &scanned_planet_field,
+            &scanned_planet_icon,
+            &scanned_ship_field,
+            &scanned_ship_icon,
+            &scanned_system_icon
+        );
+
+        MOX::_system_display_ship_scanned = scanned_ship_field;
+
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            COLONY::_full_draw = 1;
+            MAINPUPS::Eric_Pop_Fields_();
+            MAINPUPS::Update_Colony_Defense_Fields_();
+            video::Copy_Back_To_Off_();
+            MAINPUPS::Draw_Defense_Selection_Popup_();
+            fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
+        }
+
+        if (scanned_system_icon > -1) {
+            MOX::_system_icon_scanned = scanned_system_icon;
+        }
+
+        if (scan_result == 0) {
+            if (scanned_planet_icon > -1) {
+                int16_t planet_id = HACCESS::System_Planet_Scanned_To_Planet_Id_(
+                    static_cast<int16_t>(COLONY::_sys_disp_star_handle),
+                    scanned_planet_icon
+                );
+
+                int16_t colony_idx = MOX::_planet[planet_id].colony_index;
+
+                if (colony_idx == -1) {
+                    int16_t str_id;
+                    if (MOX::_planet[planet_id].planet_type == 3) {
+                        str_id = 0x250;
+                    } else {
+                        str_id = 0x24F;
+                    }
+
+                    GENDRAW::Help_(ESTRINGS::E_Strings_(str_id));
+                    COLONY::_full_draw = 1;
+                    MAINPUPS::Eric_Pop_Fields_();
+                    MAINPUPS::Update_Colony_Defense_Fields_();
+                    video::Copy_Back_To_Off_();
+                    MAINPUPS::Draw_Defense_Selection_Popup_();
+                    fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
+                } else {
+                    if (MOX::_colony[colony_idx].owner != MAINPUPS::_g_player_n) {
+                        *param_3 = 1;
+                        return colony_idx + 15;
+                    }
+
+                    GENDRAW::Help_(ESTRINGS::E_Strings_(0x252));
+                    COLONY::_full_draw = 1;
+                    MAINPUPS::Eric_Pop_Fields_();
+                    MAINPUPS::Update_Colony_Defense_Fields_();
+                    video::Copy_Back_To_Off_();
+                    MAINPUPS::Draw_Defense_Selection_Popup_();
+                    fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
+                }
+            }
+
+            if (scanned_ship_icon > -1) {
+                int16_t ship_id = HACCESS::System_Ship_Scanned_To_Ship_Id_(scanned_ship_icon);
+                int16_t owner = static_cast<int16_t>(MOX::_ship[ship_id].owner);
+
+                if (MAINPUPS::_g_player_n == owner) {
+                    GENDRAW::Help_(ESTRINGS::E_Strings_(0x253));
+                    COLONY::_full_draw = 1;
+                    MAINPUPS::Eric_Pop_Fields_();
+                    MAINPUPS::Update_Colony_Defense_Fields_();
+                    video::Copy_Back_To_Off_();
+                    MAINPUPS::Draw_Defense_Selection_Popup_();
+                    fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
+                } else {
+                    if (MAINPUPS::Player_Has_Colony_Or_Outpost_At_Star_(owner, static_cast<int16_t>(COLONY::_sys_disp_star_handle)) != 0) {
+                        GENDRAW::Help_(ESTRINGS::E_Strings_(0x24E));
+                        COLONY::_full_draw = 1;
+                        MAINPUPS::Eric_Pop_Fields_();
+                        MAINPUPS::Update_Colony_Defense_Fields_();
+                        video::Copy_Back_To_Off_();
+                        MAINPUPS::Draw_Defense_Selection_Popup_();
+                        fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
+                        return -1;
+                    } else {
+                        *param_3 = 1;
+                        return owner;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    void __cdecl Set_G_Special_Value_(int16_t star_idx) {
+        if (((MOX::_star[star_idx].just_visited >> static_cast<uint8_t>(MOX::_PLAYER_NUM)) & 1) != 0) {
+            _g_special = (uint8_t)REPORT::Draw_Special_(&MOX::_star[star_idx], MOX::_PLAYER_NUM);
+            MOX::_star[star_idx].just_visited &= static_cast<uint8_t>(~(1 << static_cast<uint8_t>(MOX::_PLAYER_NUM)));
+
+            if (MOX::_star[star_idx].system_special >= 50) {
+                MOX::_star[star_idx].system_special = 0;
+            }
+        } else {
+            _g_special = 0;
+        }
+    }
 }

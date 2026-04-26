@@ -568,6 +568,12 @@ inline void __cdecl Combat_Draw_View_Ship_() {
     fn();
 }
 
+inline bool __cdecl Officer_Has_General_Skill_(short player_idx, short officer_idx, short skill_idx) {
+    using Fn = bool(__cdecl*)(short, short, short);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043E390});
+    return fn(player_idx, officer_idx, skill_idx);
+}
+
 inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {
     using Fn = void(__cdecl*)(const char*, const char*, int16_t);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471090});

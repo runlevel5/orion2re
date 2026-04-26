@@ -4,6 +4,7 @@
 struct s_animation_header;
 struct s_colors;
 struct s_drop_area;
+struct s_help_box;
 struct s_help_topic_record;
 struct s_list_item;
 struct s_list_state;
@@ -121,8 +122,8 @@ namespace INFO {
     inline int16_t* _race_bitmap_x = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F18});
     inline int16_t* _race_bitmap_y = reinterpret_cast<int16_t*>(std::uintptr_t{0x00555F20});
     inline int16_t& _race_statistics_specials_help_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A7B96});
-    inline int16_t (&_race_statistics_specials_help)[50][5] =
-        *reinterpret_cast<int16_t (*)[50][5]>(std::uintptr_t{0x005A7BA0});
+    inline s_help_box (&_race_statistics_specials_help)[50] =
+        *reinterpret_cast<s_help_box (*)[50]>(std::uintptr_t{0x005A7BA0});
 
     int16_t __cdecl Get_Plyr_Info_Btns_();
 

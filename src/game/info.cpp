@@ -93,11 +93,11 @@ namespace INFO {
 
                 int count = INFO::_race_statistics_specials_help_count;
 
-                INFO::_race_statistics_specials_help[count][0] = help_id;
-                INFO::_race_statistics_specials_help[count][1] = x;
-                INFO::_race_statistics_specials_help[count][2] = y;
-                INFO::_race_statistics_specials_help[count][3] = x + 175;
-                INFO::_race_statistics_specials_help[count][4] = y + 9;
+                INFO::_race_statistics_specials_help[count].help_id = help_id;
+                INFO::_race_statistics_specials_help[count].x1 = x;
+                INFO::_race_statistics_specials_help[count].y1 = y;
+                INFO::_race_statistics_specials_help[count].x2 = x + 175;
+                INFO::_race_statistics_specials_help[count].y2 = y + 9;
 
                 y += 13;
                 INFO::_race_statistics_specials_help_count++;
@@ -1304,57 +1304,57 @@ namespace INFO {
     }
 
     int16_t __cdecl Race_Stats_Subscreen_(s_animation_header** param_1, int16_t param_2) {
-        char str_race_statistics[40];
-        char str_unknown[40];
-        char str_unknown2[40];
-        char str_title[40];
+        char race_name[32];
+        char title_msg[40];
+        char dead_msg[40];
+        char none_msg[40];
+        char unused_msg[40];
 
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 14, str_race_statistics, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 15, str_unknown, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 16, str_unknown2, 40);
-        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 7, str_title, 40);
+        s_animation_header* acStack_e0[8];
+        s_animation_header* sprite;
 
-        fonts::Print_Centered_(416, 31, str_title);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 14, dead_msg, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 15, none_msg, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 16, unused_msg, 40);
+        JIM::Get_Text_Message_(INFO::s_billtext_lbx, 7, title_msg, 40);
 
+        fonts::Print_Centered_(416, 31, title_msg);
         INFO::Set_Up_Player_Colors_(param_1);
 
-        MOX::_active_player[0] = static_cast<uint8_t>(MOX::_PLAYER_NUM);
-
+        MOX::_active_player[0] = static_cast<char>(MOX::_PLAYER_NUM);
         BILL::Get_Players_Dead_Or_Alive_Or_Omniscient_(1, 1);
 
-        uint32_t bmp_size = bitmap::Get_Bitmap_Size_(183, 20);
-        s_animation_header* eliminated_sprite = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
-        bitmap::Create_Blank_Bitmap_(183, 20, eliminated_sprite);
+        uint32_t size = bitmap::Get_Bitmap_Size_(183, 20);
+        sprite = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+        bitmap::Create_Blank_Bitmap_(183, 20, sprite);
 
         fonts::Set_Font_Style_Outline_(2, &INFO::_info_red_color);
-        fonts::Print_Centered_To_Bitmap_(91, 2, str_race_statistics, eliminated_sprite);
+        fonts::Print_Centered_To_Bitmap_(91, 2, dead_msg, sprite);
 
-        s_animation_header* player_sprites[8];
-        for (int16_t i = 0; i < 8; ++i) {
-            bmp_size = bitmap::Get_Bitmap_Size_(183, 164);
-            player_sprites[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bmp_size);
-            bitmap::Create_Blank_Bitmap_(183, 164, player_sprites[i]);
+        for (int i = 0; i < 8; ++i) {
+            size = bitmap::Get_Bitmap_Size_(183, 164);
+            acStack_e0[i] = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+            bitmap::Create_Blank_Bitmap_(183, 164, acStack_e0[i]);
 
             if (i < MOX::_active_count) {
-                uint8_t player_id = MOX::_active_player[i];
-                fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_id]);
+                uint8_t active_idx = MOX::_active_player[i];
+                fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[active_idx]);
 
-                char local_c0[40];
-                strcpy(local_c0, MOX::_player[player_id].race_name);
-                __strupr(local_c0);
+                strcpy(race_name, MOX::_player[active_idx].race_name);
+                __strupr(race_name);
 
-                fonts::Print_Centered_To_Bitmap_(91, 0, local_c0, player_sprites[i]);
+                fonts::Print_Centered_To_Bitmap_(91, 0, race_name, acStack_e0[i]);
 
-                fonts::Set_Font_Style_(2, INFO::_hist_graph_palettes[player_id]);
-                INFO::Print_Player_Specials_To_Bitmap_(0, 22, player_id, player_sprites[i]);
+                fonts::Set_Font_Style_(2, INFO::_hist_graph_palettes[active_idx]);
+                INFO::Print_Player_Specials_To_Bitmap_(0, 22, active_idx, acStack_e0[i]);
             } else {
                 fonts::Set_Font_Style_(4, &INFO::_info_normal_color);
-                fonts::Print_Centered_To_Bitmap_(91, 0, str_unknown, player_sprites[i]);
+                fonts::Print_Centered_To_Bitmap_(91, 0, none_msg, acStack_e0[i]);
             }
         }
 
         if (MOX::_active_count > 4) {
-            fields::Add_Button_Field_(385, 427, INFO::empty_string, param_1[20], INFO::empty_string, 40);
+            fields::Add_Button_Field_(385, 427, MOX::s__00551100, param_1[20], MOX::s__00551100, 40); // 40 = '('
         }
 
         fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(INFO::Draw_Race_Stats_Subscreen_), 2);
@@ -1364,46 +1364,46 @@ namespace INFO {
             INFO::_race_statistics_specials_help_count = 0;
             INFO::Draw_Multiple_Drop_Areas_(INFO::_race_stats_drops, 4);
 
-            int16_t offset_idx = (INFO::_race_statistics_page == 1) ? 0 : 4;
+            int offset = (INFO::_race_statistics_page == 1) ? 0 : 4;
 
-            for (int16_t i = 0; i < 4; ++i, ++offset_idx) {
-                int16_t x = INFO::_race_bitmap_x[i];
-                int16_t y = INFO::_race_bitmap_y[i];
+            for (int j = 0; j < 4; ++j) {
+                int16_t x = INFO::_race_bitmap_x[j];
+                int16_t y = INFO::_race_bitmap_y[j];
 
                 line::Line_(x + 10, y + 17, x + 173, y + 17, INFO::_info_normal_color.colors[6]);
 
-                animate::Draw_(x, y, player_sprites[offset_idx]);
+                animate::Draw_(x, y, acStack_e0[offset]);
 
-                uint8_t player_id = MOX::_active_player[offset_idx];
-                if (MOX::_player[player_id].eliminated != 0) {
-                    animate::Draw_(x, y + 11, eliminated_sprite);
-                } else {
-                    if (offset_idx < MOX::_active_count) {
-                        INFO::Race_Statistics_Specials_Help_(x, y + 22, player_id);
-                    }
+                uint8_t active_idx = MOX::_active_player[offset];
+                if (MOX::_player[active_idx].eliminated != 0) {
+                    animate::Draw_(x, y + 11, sprite);
+                } else if (offset < MOX::_active_count) {
+                    INFO::Race_Statistics_Specials_Help_(x, y + 22, active_idx);
                 }
+
+                offset++;
             }
 
-            int16_t idx = INFO::_race_statistics_specials_help_count++;
-            INFO::_race_statistics_specials_help[idx][0] = 242;
-            INFO::_race_statistics_specials_help[idx][1] = 0;
-            INFO::_race_statistics_specials_help[idx][2] = 40;
-            INFO::_race_statistics_specials_help[idx][3] = 205;
-            INFO::_race_statistics_specials_help[idx][4] = 197;
+            int count = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[count].help_id = 0xf2;
+            INFO::_race_statistics_specials_help[count].x1 = 0;
+            INFO::_race_statistics_specials_help[count].y1 = 40;
+            INFO::_race_statistics_specials_help[count].x2 = 205;
+            INFO::_race_statistics_specials_help[count].y2 = 197;
 
-            idx = INFO::_race_statistics_specials_help_count++;
-            INFO::_race_statistics_specials_help[idx][0] = 243;
-            INFO::_race_statistics_specials_help[idx][1] = 0;
-            INFO::_race_statistics_specials_help[idx][2] = 198;
-            INFO::_race_statistics_specials_help[idx][3] = 205;
-            INFO::_race_statistics_specials_help[idx][4] = 479;
+            count = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[count].help_id = 0xf3;
+            INFO::_race_statistics_specials_help[count].x1 = 0;
+            INFO::_race_statistics_specials_help[count].y1 = 198;
+            INFO::_race_statistics_specials_help[count].x2 = 205;
+            INFO::_race_statistics_specials_help[count].y2 = 479;
 
-            idx = INFO::_race_statistics_specials_help_count++;
-            INFO::_race_statistics_specials_help[idx][0] = 248;
-            INFO::_race_statistics_specials_help[idx][1] = 206;
-            INFO::_race_statistics_specials_help[idx][2] = 0;
-            INFO::_race_statistics_specials_help[idx][3] = 639;
-            INFO::_race_statistics_specials_help[idx][4] = 479;
+            count = INFO::_race_statistics_specials_help_count++;
+            INFO::_race_statistics_specials_help[count].help_id = 0xf8;
+            INFO::_race_statistics_specials_help[count].x1 = 206;
+            INFO::_race_statistics_specials_help[count].y1 = 0;
+            INFO::_race_statistics_specials_help[count].x2 = 639;
+            INFO::_race_statistics_specials_help[count].y2 = 479;
 
             fields::Deactivate_Help_List_();
             fields::Set_Help_List_(INFO::_race_statistics_specials_help, INFO::_race_statistics_specials_help_count);
@@ -1411,7 +1411,7 @@ namespace INFO {
             video::Copy_Off_To_Back_();
             INFO::Introduce_Subscreen_();
 
-            while (true) {
+            do {
                 input = fields::Get_Input_();
 
                 if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
@@ -1421,15 +1421,15 @@ namespace INFO {
                 if (input >= param_2) {
                     INFO::_race_statistics_page = (INFO::_race_statistics_page == 0) ? 1 : 0;
                     break;
+                } else if (input == 0) {
+                    timer::Mark_Time_();
+                    RUSS::Mox_Sync_Update_();
+                    timer::Release_Time_(2);
                 }
+            } while (input == 0);
 
-                if (input != 0) {
-                    return input;
-                }
-
-                timer::Mark_Time_();
-                RUSS::Mox_Sync_Update_();
-                timer::Release_Time_(2);
+            if (input < param_2) {
+                return input;
             }
         }
     }

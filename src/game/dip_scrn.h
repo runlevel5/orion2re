@@ -97,8 +97,8 @@ namespace DIP_SCRN {
     inline char (&_diplomacy_list_choice)[15][50] =
         *reinterpret_cast<char (*)[15][50]>(std::uintptr_t{0x005A86E0});
 
-    inline s_dipscrn_help_item (&_jim_help_list)[15] =
-        *reinterpret_cast<s_dipscrn_help_item(*)[15]>(std::uintptr_t{0x005A8250});
+    inline s_help_box (&_jim_help_list)[15] =
+        *reinterpret_cast<s_help_box(*)[15]>(std::uintptr_t{0x005A8250});
 
     inline uint8_t& DAT_005a8712 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8712});
     inline uint8_t& DAT_005a8744 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8744});

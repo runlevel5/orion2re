@@ -19,95 +19,95 @@ void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_flags) {
 }
 
 void __cdecl Set_Race_Select_Help_() {
-    MOX::_help_entry_list[0] = 630;
-    MOX::_help_entry_list[1] = 351;
-    MOX::_help_entry_list[2] = 90;
-    MOX::_help_entry_list[3] = 473;
-    MOX::_help_entry_list[4] = 0x86;
+    MOX::_help_entry_list[0].help_id = 630;
+    MOX::_help_entry_list[0].x1 = 351;
+    MOX::_help_entry_list[0].y1 = 90;
+    MOX::_help_entry_list[0].x2 = 473;
+    MOX::_help_entry_list[0].y2 = 134;
 
-    MOX::_help_entry_list[5] = 631;
-    MOX::_help_entry_list[6] = 351;
-    MOX::_help_entry_list[7] = 0x8a;
-    MOX::_help_entry_list[8] = 473;
-    MOX::_help_entry_list[9] = 0xb6;
+    MOX::_help_entry_list[1].help_id = 631;
+    MOX::_help_entry_list[1].x1 = 351;
+    MOX::_help_entry_list[1].y1 = 138;
+    MOX::_help_entry_list[1].x2 = 473;
+    MOX::_help_entry_list[1].y2 = 182;
 
-    MOX::_help_entry_list[10] = 0x278;
-    MOX::_help_entry_list[11] = 351;
-    MOX::_help_entry_list[12] = 0xba;
-    MOX::_help_entry_list[13] = 473;
-    MOX::_help_entry_list[14] = 0xe6;
+    MOX::_help_entry_list[2].help_id = 632;
+    MOX::_help_entry_list[2].x1 = 351;
+    MOX::_help_entry_list[2].y1 = 186;
+    MOX::_help_entry_list[2].x2 = 473;
+    MOX::_help_entry_list[2].y2 = 230;
 
-    MOX::_help_entry_list[15] = 0x279;
-    MOX::_help_entry_list[16] = 351;
-    MOX::_help_entry_list[17] = 0xea;
-    MOX::_help_entry_list[18] = 473;
-    MOX::_help_entry_list[19] = 0x116;
+    MOX::_help_entry_list[3].help_id = 633;
+    MOX::_help_entry_list[3].x1 = 351;
+    MOX::_help_entry_list[3].y1 = 234;
+    MOX::_help_entry_list[3].x2 = 473;
+    MOX::_help_entry_list[3].y2 = 278;
 
-    MOX::_help_entry_list[20] = 0x27a;
-    MOX::_help_entry_list[21] = 351;
-    MOX::_help_entry_list[22] = 0x11a;
-    MOX::_help_entry_list[23] = 473;
-    MOX::_help_entry_list[24] = 0x146;
+    MOX::_help_entry_list[4].help_id = 634;
+    MOX::_help_entry_list[4].x1 = 351;
+    MOX::_help_entry_list[4].y1 = 282;
+    MOX::_help_entry_list[4].x2 = 473;
+    MOX::_help_entry_list[4].y2 = 326;
 
-    MOX::_help_entry_list[25] = 0x27b;
-    MOX::_help_entry_list[26] = 351;
-    MOX::_help_entry_list[27] = 0x14a;
-    MOX::_help_entry_list[28] = 473;
-    MOX::_help_entry_list[29] = 0x176;
+    MOX::_help_entry_list[5].help_id = 635;
+    MOX::_help_entry_list[5].x1 = 351;
+    MOX::_help_entry_list[5].y1 = 330;
+    MOX::_help_entry_list[5].x2 = 473;
+    MOX::_help_entry_list[5].y2 = 374;
 
-    MOX::_help_entry_list[30] = 0x27c;
-    MOX::_help_entry_list[31] = 351;
-    MOX::_help_entry_list[32] = 0x17a;
-    MOX::_help_entry_list[33] = 473;
-    MOX::_help_entry_list[34] = 0x1a6;
+    MOX::_help_entry_list[6].help_id = 636;
+    MOX::_help_entry_list[6].x1 = 351;
+    MOX::_help_entry_list[6].y1 = 378;
+    MOX::_help_entry_list[6].x2 = 473;
+    MOX::_help_entry_list[6].y2 = 422;
 
-    MOX::_help_entry_list[35] = 0x27d;
-    MOX::_help_entry_list[36] = 0x1dd;
-    MOX::_help_entry_list[37] = 90;
-    MOX::_help_entry_list[38] = 0x257;
-    MOX::_help_entry_list[39] = 0x86;
+    MOX::_help_entry_list[7].help_id = 637;
+    MOX::_help_entry_list[7].x1 = 477;
+    MOX::_help_entry_list[7].y1 = 90;
+    MOX::_help_entry_list[7].x2 = 599;
+    MOX::_help_entry_list[7].y2 = 134;
 
-    MOX::_help_entry_list[40] = 0x27e;
-    MOX::_help_entry_list[41] = 0x1dd;
-    MOX::_help_entry_list[42] = 0x8a;
-    MOX::_help_entry_list[43] = 0x257;
-    MOX::_help_entry_list[44] = 0xb6;
+    MOX::_help_entry_list[8].help_id = 638;
+    MOX::_help_entry_list[8].x1 = 477;
+    MOX::_help_entry_list[8].y1 = 138;
+    MOX::_help_entry_list[8].x2 = 599;
+    MOX::_help_entry_list[8].y2 = 182;
 
-    MOX::_help_entry_list[45] = 0x27f;
-    MOX::_help_entry_list[46] = 0x1dd;
-    MOX::_help_entry_list[47] = 0xba;
-    MOX::_help_entry_list[48] = 0x257;
-    MOX::_help_entry_list[49] = 0xe6;
+    MOX::_help_entry_list[9].help_id = 639;
+    MOX::_help_entry_list[9].x1 = 477;
+    MOX::_help_entry_list[9].y1 = 186;
+    MOX::_help_entry_list[9].x2 = 599;
+    MOX::_help_entry_list[9].y2 = 230;
 
-    MOX::_help_entry_list[50] = 0x280;
-    MOX::_help_entry_list[51] = 0x1dd;
-    MOX::_help_entry_list[52] = 0xea;
-    MOX::_help_entry_list[53] = 0x257;
-    MOX::_help_entry_list[54] = 0x116;
+    MOX::_help_entry_list[10].help_id = 640;
+    MOX::_help_entry_list[10].x1 = 477;
+    MOX::_help_entry_list[10].y1 = 234;
+    MOX::_help_entry_list[10].x2 = 599;
+    MOX::_help_entry_list[10].y2 = 278;
 
-    MOX::_help_entry_list[55] = 0x281;
-    MOX::_help_entry_list[56] = 0x1dd;
-    MOX::_help_entry_list[57] = 0x11a;
-    MOX::_help_entry_list[58] = 0x257;
-    MOX::_help_entry_list[59] = 0x146;
+    MOX::_help_entry_list[11].help_id = 641;
+    MOX::_help_entry_list[11].x1 = 477;
+    MOX::_help_entry_list[11].y1 = 282;
+    MOX::_help_entry_list[11].x2 = 599;
+    MOX::_help_entry_list[11].y2 = 326;
 
-    MOX::_help_entry_list[60] = 0x282;
-    MOX::_help_entry_list[61] = 0x1dd;
-    MOX::_help_entry_list[62] = 0x14a;
-    MOX::_help_entry_list[63] = 0x257;
-    MOX::_help_entry_list[64] = 0x176;
+    MOX::_help_entry_list[12].help_id = 642;
+    MOX::_help_entry_list[12].x1 = 477;
+    MOX::_help_entry_list[12].y1 = 330;
+    MOX::_help_entry_list[12].x2 = 599;
+    MOX::_help_entry_list[12].y2 = 374;
 
-    MOX::_help_entry_list[65] = 0x283;
-    MOX::_help_entry_list[66] = 0x1dd;
-    MOX::_help_entry_list[67] = 0x17a;
-    MOX::_help_entry_list[68] = 0x257;
-    MOX::_help_entry_list[69] = 0x1a6;
+    MOX::_help_entry_list[13].help_id = 643;
+    MOX::_help_entry_list[13].x1 = 477;
+    MOX::_help_entry_list[13].y1 = 378;
+    MOX::_help_entry_list[13].x2 = 599;
+    MOX::_help_entry_list[13].y2 = 422;
 
-    MOX::_help_entry_list[70] = 0x284;
-    MOX::_help_entry_list[71] = 0;
-    MOX::_help_entry_list[72] = 0;
-    MOX::_help_entry_list[73] = 0x27f;
-    MOX::_help_entry_list[74] = 0x1df;
+    MOX::_help_entry_list[14].help_id = 644;
+    MOX::_help_entry_list[14].x1 = 0;
+    MOX::_help_entry_list[14].y1 = 0;
+    MOX::_help_entry_list[14].x2 = 639;
+    MOX::_help_entry_list[14].y2 = 479;
 
     fields::Set_Help_List_(MOX::_help_entry_list, 15);
 }

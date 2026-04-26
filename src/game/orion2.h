@@ -1593,6 +1593,19 @@ struct s_field {
     short sound;
 };
 
+typedef struct s_fieldsav_data s_fieldsav_data, *Ps_fieldsav_data;
+
+struct s_fieldsav_data {
+    int16_t field_count;
+    int16_t input_delay;
+    int16_t down_mouse_button;
+    int16_t auto_input_variable;
+    int16_t input_field_active;
+    int16_t active_input_field_number;
+    int16_t max_fields_count;
+    struct s_field *fields;
+};
+
 typedef struct s_first_field_in_group s_first_field_in_group, *Ps_first_field_in_group;
 
 struct s_first_field_in_group {
@@ -2046,6 +2059,16 @@ struct s_good_star {
     undefined field8_0x8;
     uint32_t star_distances[72];
     uint16_t star_count;
+};
+
+typedef struct s_help_box s_help_box, *Ps_help_box;
+
+struct s_help_box {
+    int16_t help_id;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
 };
 
 typedef struct s_help_topic_record s_help_topic_record, *Ps_help_topic_record;

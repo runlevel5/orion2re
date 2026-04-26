@@ -278,6 +278,18 @@ namespace ERIC {
         Do_Cinematic_Popup_Cleanup_();
     }
 
+    int8_t __cdecl Player_Has_Ship_Size_Or_Larger_At_Star_(int16_t player_idx, int16_t size, int16_t star_idx) {
+        for (int16_t i = 0; i < 500; ++i) {
+            if (MOX::_ship[i].location == star_idx &&
+                MOX::_ship[i].status == 0 &&
+                MOX::_ship[i].owner == player_idx &&
+                MOX::_ship[i].d.size >= size) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     int8_t __cdecl Player_Can_Mind_Control_Colony_(int16_t player_idx, int16_t colony_idx) {
         if (MOX::_player[player_idx].traits[25] != 0) {
             if (Player_Has_Ship_Size_Or_Larger_At_Star_(player_idx, 2, MOX::_planet[MOX::_colony[colony_idx].planet].star_index)) {
@@ -357,5 +369,23 @@ namespace ERIC {
         }
 
         return chosen_colony;
+    }
+
+    int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(short player_idx, short skill_idx, short star_idx) {
+        for (short i = 0; i < 0x43; ++i) {
+            if (MOX::_leaders[i].player_index == player_idx &&
+                MOX::_leaders[i].status == 1 &&
+                MOX::_leaders[i].eta == 0) {
+
+                if ((MOX::_leaders[i].type == 0 && MOX::_ship[MOX::_leaders[i].location].location == star_idx) ||
+                    (MOX::_leaders[i].type == 1 && MOX::_leaders[i].location == star_idx)) {
+
+                    if (Officer_Has_General_Skill_(player_idx, i, skill_idx)) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
     }
 }

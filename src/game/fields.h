@@ -1,14 +1,6 @@
 #pragma once
 
 namespace fields {
-    struct s_help_box {
-        int16_t active;
-        int16_t x1;
-        int16_t y1;
-        int16_t x2;
-        int16_t y2;
-    };
-
     inline MOX2::action_func_t& _update_function = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{ 0x0055AFD8 });
     inline uint16_t& _auto_active_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFDC });
     inline uint16_t& _list_field_on = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055AFF0});
@@ -57,7 +49,7 @@ namespace fields {
     inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
     inline MOX2::action_func_t& _function = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005762F8});
     inline MOX2::action_func_t& _function2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00572BFC});
-    inline void*& _help_struct_pointer = *reinterpret_cast<void**>(std::uintptr_t{0x00576300});
+    inline s_help_box*& _help_struct_pointer = *reinterpret_cast<s_help_box**>(std::uintptr_t{0x00576300});
     inline char* _continuous_string = reinterpret_cast<char*>(std::uintptr_t{0x00572c18});
     inline uint8_t& _active_input_field_first = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005762d8});
     inline uint16_t& _field_outline_color = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B020});
@@ -134,7 +126,7 @@ namespace fields {
 
     void __cdecl Deactivate_Help_List_();
 
-    void __cdecl Set_Help_List_(void* help_data, int16_t count);
+    void __cdecl Set_Help_List_(s_help_box* help_data, int16_t count);
 
     void __cdecl Add_Button_Info_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* hotkey, int16_t sound);
 
@@ -152,11 +144,7 @@ namespace fields {
     void __cdecl Increment_Scroll_Bar_(int16_t field_idx);
     void __cdecl Decrement_Scroll_Bar_(int16_t field_idx);
 
-    inline void __cdecl Display_Input_Field_(int16_t field_idx, char* buffer) {
-        using Fn = void(__cdecl*)(int16_t, char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051EA80});
-        fn(field_idx, buffer);
-    }
+    void __cdecl Display_Input_Field_(int16_t field_idx, char* input_buffer);
 
     void __cdecl Input_String_(int16_t field_idx);
 
