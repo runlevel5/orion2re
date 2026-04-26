@@ -241,6 +241,40 @@ namespace animate {
         }
     }
 
+    void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
+        int y_offset = *reinterpret_cast<int16_t*>(frame_data + 2);
+        int dest_line_base = (y + y_offset) * static_cast<int>(g_screen_res_x) + x;
+        int dest_ptr = dest_line_base;
+        int frame_idx = 2;
+        int height = _animation_header->height;
+
+        while (y_offset < height) {
+            int16_t run_len = *reinterpret_cast<int16_t*>(frame_data + frame_idx * 2);
+            int16_t skip_len = *reinterpret_cast<int16_t*>(frame_data + frame_idx * 2 + 2);
+            frame_idx += 2;
+
+            if (run_len == 0) {
+                y_offset += skip_len;
+                dest_line_base += skip_len * 640;
+                dest_ptr = dest_line_base;
+            } else {
+                dest_ptr += skip_len;
+                int src_idx = frame_idx * 2;
+                int end_dest = dest_ptr + run_len;
+
+                while (dest_ptr < end_dest) {
+                    uint8_t pixel = frame_data[src_idx++];
+                    if (pixel < 0xf0) {
+                        video::_current_video_page[dest_ptr] = pixel;
+                    }
+                    dest_ptr++;
+                }
+
+                frame_idx += (run_len + 1) / 2;
+            }
+        }
+    }
+
     void __cdecl Draw_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
@@ -699,5 +733,174 @@ namespace animate {
                 _animation_header->current_frame = static_cast<int16_t>(_animation_header->loop_frame);
             }
         }
+    }
+
+    void __cdecl Remap_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite_data)
+    {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        int32_t cur_y_offset = *reinterpret_cast<uint16_t*>(sprite_data + 2);
+        int32_t line_start_offset = (y + cur_y_offset) * platform::g_screen_res_x + x;
+        int32_t sprite_idx = 2;
+        int32_t screen_offset = line_start_offset;
+        int32_t header_height = _animation_header->height;
+
+        if (cur_y_offset < header_height) {
+            do {
+                int16_t run_len = *reinterpret_cast<int16_t*>(sprite_data + sprite_idx * 2);
+                int16_t skip_len = *reinterpret_cast<int16_t*>(sprite_data + sprite_idx * 2 + 2);
+                sprite_idx += 2;
+
+                if (run_len == 0) {
+                    cur_y_offset += skip_len;
+                    line_start_offset += skip_len * 640;
+                    screen_offset = line_start_offset;
+                } else {
+                    screen_offset += skip_len;
+                    int32_t end_offset = screen_offset + run_len;
+                    int32_t data_offset = sprite_idx * 2;
+
+                    if (screen_offset < end_offset) {
+                        do {
+                            uint8_t color_idx = sprite_data[data_offset++];
+                            video::_current_video_page[screen_offset++] = remap::_picture_remap_color_list[color_idx];
+                        } while (screen_offset < end_offset);
+                    }
+
+                    sprite_idx += (run_len + 1) / 2;
+                }
+            } while (cur_y_offset < header_height);
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Draw_No_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* bitmap) {
+        int16_t width = _animation_header->width;
+        int16_t height = _animation_header->height;
+        int32_t src_offset = 0;
+        int32_t dest_offset = y * g_screen_res_x + x;
+        int32_t row_skip = g_screen_res_x - width;
+
+        if (height > 0) {
+            for (int32_t h = 0; h < height; ++h) {
+                if (width > 0) {
+                    for (int32_t w = 0; w < width; ++w) {
+                        uint8_t pixel = bitmap[src_offset];
+                        if (pixel != 0 && pixel < 0xf0) {
+                            video::_current_video_page[dest_offset] = pixel;
+                        }
+                        ++src_offset;
+                        ++dest_offset;
+                    }
+                }
+                dest_offset += row_skip;
+            }
+        }
+    }
+
+    void __cdecl Remap_Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        int16_t x_off;
+        int16_t draw_x;
+        if (x < video::_screen_window_x1) {
+            x_off = video::_screen_window_x1 - x;
+            draw_x = video::_screen_window_x1;
+        } else {
+            x_off = 0;
+            draw_x = x;
+        }
+
+        int16_t y_off;
+        int16_t draw_y;
+        if (y < video::_screen_window_y1) {
+            y_off = video::_screen_window_y1 - y;
+            draw_y = video::_screen_window_y1;
+        } else {
+            y_off = 0;
+            draw_y = y;
+        }
+
+        int16_t max_x = _animation_header->width + x - 1;
+        int16_t max_y = _animation_header->height + y - 1;
+
+        if (video::_screen_window_x2 <= max_x) {
+            max_x = video::_screen_window_x2;
+        }
+        int32_t draw_width = max_x - draw_x + 1;
+
+        if (video::_screen_window_y2 <= max_y) {
+            max_y = video::_screen_window_y2;
+        }
+        int32_t draw_height = max_y - draw_y + 1;
+
+        int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+        int32_t screen_offset = x + draw_y * platform::g_screen_res_x;
+        int32_t start_y = y_off;
+        int32_t idx = 2;
+
+        while (current_y < start_y) {
+            int16_t cmd = *reinterpret_cast<int16_t*>(frame_data + idx * 2);
+            if (cmd == 0) {
+                current_y += *reinterpret_cast<uint16_t*>(frame_data + idx * 2 + 2);
+            } else {
+                idx += (cmd + 1) / 2;
+            }
+            idx += 2;
+        }
+
+        if (start_y < current_y) {
+            screen_offset += (current_y - start_y) * platform::g_screen_res_x;
+        }
+
+        current_y -= start_y;
+        int32_t right_limit_offset = x_off + draw_width;
+        int32_t clip_left = screen_offset + x_off;
+        int32_t clip_right = screen_offset + right_limit_offset;
+
+        while (current_y < draw_height) {
+            int16_t cmd = *reinterpret_cast<int16_t*>(frame_data + idx * 2);
+            int16_t skip = *reinterpret_cast<int16_t*>(frame_data + idx * 2 + 2);
+            idx += 2;
+
+            if (cmd == 0) {
+                current_y += skip;
+                // Assembly explicitly uses constant 640 instead of g_screen_res_x inside this branch
+                screen_offset += skip * 640;
+                clip_left = x_off + screen_offset;
+                clip_right = right_limit_offset + screen_offset;
+            } else {
+                screen_offset += skip;
+                int32_t data_idx = idx * 2;
+                int32_t end_x = cmd + screen_offset;
+
+                if (screen_offset < clip_right) {
+                    if (screen_offset < clip_left) {
+                        int16_t diff = clip_left - screen_offset;
+                        if (cmd <= diff) {
+                            diff = cmd;
+                        }
+                        data_idx += diff;
+                        screen_offset += diff;
+                    }
+
+                    int16_t diff2 = clip_right - screen_offset;
+                    if (end_x <= diff2 + screen_offset) {
+                        diff2 = end_x - screen_offset;
+                    }
+                    end_x = diff2 + screen_offset;
+
+                    while (screen_offset < end_x) {
+                        video::_current_video_page[screen_offset] = remap::_picture_remap_color_list[frame_data[data_idx]];
+                        data_idx++;
+                        screen_offset++;
+                    }
+                }
+                idx += (cmd + 1) / 2;
+            }
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
     }
 }

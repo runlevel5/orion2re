@@ -33,31 +33,15 @@ namespace animate {
     void __cdecl Draw_(int16_t x, int16_t y, s_animation_header* resource);
     void __cdecl Remap_Draw_(int16_t x, int16_t y, s_animation_header* anim);
 
-    inline void __cdecl Remap_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_ptr) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525010});
-        fn(x, y, frame_ptr);
-    }
+    void __cdecl Remap_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_ptr);
 
-    inline void __cdecl Remap_Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_ptr) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005250f0});
-        fn(x, y, frame_ptr);
-    }
+    void __cdecl Remap_Clipped_Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_ptr);
 
     void __cdecl Draw_No_Glass_(int16_t x, int16_t y, s_animation_header* header);
 
-    inline void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, const uint8_t* sprite) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00524340 });
-        fn(x, y, sprite);
-    }
+    void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data);
 
-    inline void __cdecl Draw_No_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, const uint8_t* sprite) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, const uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00524400 });
-        fn(x, y, sprite);
-    }
+    void __cdecl Draw_No_Glassed_Bitmap_Sprite_(int16_t x, int16_t y, uint8_t* bitmap);
 
     void __cdecl Set_Animation_Palette_();
 

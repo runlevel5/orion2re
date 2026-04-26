@@ -32,6 +32,7 @@
     <ClCompile Include="src\game\aistage.cpp" />
     <ClCompile Include="src\game\aitech.cpp" />
     <ClCompile Include="src\game\allocate.cpp" />
+    <ClCompile Include="src\game\angle.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\antarans.cpp" />
     <ClCompile Include="src\game\arith1e.cpp" />

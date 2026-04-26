@@ -3532,6 +3532,14 @@ namespace hooks {
         { 0x004b5300, &BILLHELP::Tech_Change_List_Left_Help_ },
         { 0x004b52e0, &BILLHELP::Tech_Select_List_Left_Help_ },
         { 0x004dca50, &COLONY::C_Anims_ },
+        { 0x00525010, &animate::Remap_Draw_Animated_Sprite_ },
+        { 0x005250f0, &animate::Remap_Clipped_Draw_Animated_Sprite_ },
+        { 0x00524340, &animate::Draw_No_Glassed_Animated_Sprite_ },
+        { 0x00524400, &animate::Draw_No_Glassed_Bitmap_Sprite_ },
+        { 0x00531af0, &angle::Get_Angle_ },
+        { 0x00531bc0, &angle::Sin_ },
+        { 0x00531ca0, &angle::Cos_ },
+        { 0x00531cc0, &angle::Rotate_Coordinates_ },
     };
 
     void Install_Hooks()

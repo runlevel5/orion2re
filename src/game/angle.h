@@ -2,27 +2,16 @@
 #include <cstdint>
 
 namespace angle {
-    inline int16_t __cdecl Get_Angle_(int32_t dx, int32_t dy) {
-        using Fn = int16_t(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531af0});
-        return fn(dx, dy);
-    }
+    int16_t __cdecl Get_Angle_(int32_t dx, int32_t dy);
 
-    inline int16_t __cdecl Cos_(int16_t angle, int32_t step) {
-        using Fn = int16_t(__cdecl*)(int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531ca0});
-        return fn(angle, step);
-    }
+    inline int8_t (&_atan_lookup_table)[128] =
+        *reinterpret_cast<int8_t(*)[128]>(std::uintptr_t{0x0054F4C8});
 
-    inline int16_t __cdecl Sin_(int16_t angle, int32_t step) {
-        using Fn = int16_t(__cdecl*)(int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531bc0});
-        return fn(angle, step);
-    }
+    inline uint16_t (&_sin_table)[90] =
+        *reinterpret_cast<uint16_t(*)[90]>(std::uintptr_t{0x0054F548});
 
-    inline void __cdecl Rotate_Coordinates_(int32_t angle, int32_t* x, int32_t* y) {
-        using Fn = void(__cdecl*)(int32_t, int32_t*, int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531CC0});
-        fn(angle, x, y);
-    }
+    int32_t __cdecl Cos_(int16_t angle, int32_t magnitude);
+    int32_t __cdecl Sin_(int16_t angle, int32_t magnitude);
+
+    void __cdecl Rotate_Coordinates_(int32_t angle, int32_t* x, int32_t* y);
 }
