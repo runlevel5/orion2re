@@ -939,11 +939,11 @@ namespace COLONY {
         _colony_fields[19] = fields::Add_Multi_Hot_Key_Field_(ESTRINGS::E_Strings_(0xf5));
         _colony_fields[20] = fields::Add_Multi_Hot_Key_Field_(ESTRINGS::E_Strings_(0x218));
 
-        _colony_fields[1] = fields::Add_Button_Field_(0x22c, 0x1cb, ESTRINGS::E_Strings_(0xc), animate::C_Anims_(0x15), ESTRINGS::E_Strings_(0xc), 0x28);
+        _colony_fields[1] = fields::Add_Button_Field_(0x22c, 0x1cb, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x15), ESTRINGS::E_Strings_(0xc), 0x28);
         _colony_fields[5] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(0xd5));
 
         if (MOX::_star[_star_handle].officer_index[MOX::_PLAYER_NUM] == -1) {
-            _colony_fields[17] = fields::Add_Button_Field_(0x22c, 0x1ab, ESTRINGS::E_Strings_(0xc), animate::C_Anims_(0x20), ESTRINGS::E_Strings_(0x158), 0x28);
+            _colony_fields[17] = fields::Add_Button_Field_(0x22c, 0x1ab, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x20), ESTRINGS::E_Strings_(0x158), 0x28);
         }
         else {
             _colony_fields[17] = fields::Add_Hidden_Field_(0x226, 0x165, 0x26f, 0x1bd, ESTRINGS::E_Strings_(0x158), 0);
@@ -956,16 +956,16 @@ namespace COLONY {
         _colony_fields[16] = fields::Add_Hidden_Field_(0x80, 0x7a, 0x12d, 0x97, ESTRINGS::E_Strings_(0xc), 0);
 
         if (_valid_colony != 0) {
-            _colony_fields[4] = fields::Add_Button_Field_(0x207, 0x7b, ESTRINGS::E_Strings_(0xc), animate::C_Anims_(0x13), ESTRINGS::E_Strings_(0xd5), 0x28);
+            _colony_fields[4] = fields::Add_Button_Field_(0x207, 0x7b, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x13), ESTRINGS::E_Strings_(0xd5), 0x28);
             _colony_fields[18] = fields::Add_Hidden_Field_(0x20d, 0x1a, 0x276, 0x25, ESTRINGS::E_Strings_(0xa6), 0x29);
 
             if (Colony_Can_Buy_Product_0_(_colony_handle)) {
-                _colony_fields[3] = fields::Add_Button_Field_(0x24e, 0x7b, ESTRINGS::E_Strings_(0xc), animate::C_Anims_(0x14), ESTRINGS::E_Strings_(0xc1), 0x28);
+                _colony_fields[3] = fields::Add_Button_Field_(0x24e, 0x7b, ESTRINGS::E_Strings_(0xc), COLONY::C_Anims_(0x14), ESTRINGS::E_Strings_(0xc1), 0x28);
             }
             else {
-                s_animation_header* buy_anim = animate::C_Anims_(0x14);
+                s_animation_header* buy_anim = COLONY::C_Anims_(0x14);
                 int16_t h = animate::Get_Height_(buy_anim);
-                int16_t w = animate::Get_Width_(animate::C_Anims_(0x14));
+                int16_t w = animate::Get_Width_(COLONY::C_Anims_(0x14));
                 _colony_fields[3] = fields::Add_Hidden_Field_(0x24e, 0x7b, 0x24e + w, 0x7b + h, ESTRINGS::E_Strings_(0xc1), 0x28);
             }
         }

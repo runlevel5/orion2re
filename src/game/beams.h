@@ -57,20 +57,11 @@ namespace BEAMS {
 
     int16_t __cdecl Ship_Size_To_Shield_Size_(int16_t ship_size);
 
-    inline int16_t __cdecl Rot_To_Base_Rot_(int16_t rot) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00423980})(rot);
-    }
+    int16_t __cdecl Rot_To_Base_Rot_(int16_t rot);
 
-    inline int16_t __cdecl Rot_To_Rot_Method_(int16_t rot) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00423A10})(rot);
-    }
+    int16_t __cdecl Rot_To_Rot_Method_(int16_t rot);
 
-    inline int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t size) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x004233B0})(size);
-    }
+    int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size);
 
     void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status);
 

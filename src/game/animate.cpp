@@ -400,4 +400,304 @@ namespace animate {
 
         platform::Unlock_Primary_Surface();
     }
+
+    void __cdecl Set_Animation_Palette_() {
+        uint8_t* pal_hdr = reinterpret_cast<uint8_t*>(
+            &_animation_header->frame_offsets[_animation_header->frame_count + 1]
+            );
+        _palette_header = reinterpret_cast<s_palette_header*>(pal_hdr);
+
+        int16_t start_index = reinterpret_cast<int16_t*>(pal_hdr)[0];
+        int16_t count = reinterpret_cast<int16_t*>(pal_hdr)[1];
+
+        if (count > 0) {
+            s_palette_entry* dst = &video::_current_palette[start_index];
+            uint32_t* src = reinterpret_cast<uint32_t*>(pal_hdr + 4);
+
+            for (int i = 0; i < count; ++i) {
+                uint32_t src_val = src[i];
+                uint32_t& dst_val = reinterpret_cast<uint32_t&>(dst[i]);
+
+                if (dst_val != src_val) {
+                    dst_val = src_val + 1;
+                    dst[i].changed = 1;
+                }
+            }
+        }
+    }
+
+    void __cdecl Draw_Animated_Sprite_Back_Diff_(int16_t x, int16_t y, uint8_t* frame_data) {
+        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::Lock_Offscreen_Surface_();
+
+        int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
+        int32_t draw_y = y + current_y;
+        int32_t data_offset_words = 2;
+        int32_t draw_x = x;
+        int32_t screen_offset = draw_y * g_screen_res_x + x;
+        int32_t height = _animation_header->height;
+
+        while (current_y < height) {
+            int32_t count = *reinterpret_cast<int16_t*>(frame_data + data_offset_words * 2);
+            int32_t skip = *reinterpret_cast<int16_t*>(frame_data + data_offset_words * 2 + 2);
+            data_offset_words += 2;
+
+            if (count == 0) {
+                draw_x = x;
+                draw_y += skip;
+                current_y += skip;
+                screen_offset += skip * 640;
+            } else {
+                draw_x += skip;
+                screen_offset += skip;
+
+                setvesa::Add_Square_To_Scan_List_(draw_x, draw_y, draw_x + count, draw_y);
+
+                int32_t end_screen_offset = screen_offset + count;
+                if (screen_offset < end_screen_offset) {
+                    draw_x += count;
+                    int32_t data_byte_offset = data_offset_words * 2;
+                    do {
+                        uint8_t pixel = frame_data[data_byte_offset++];
+                        platform::_offscreen_surface[screen_offset] = pixel;
+                        video::_current_video_page[screen_offset] = pixel;
+                        screen_offset++;
+                    } while (screen_offset < end_screen_offset);
+                }
+
+                data_offset_words += (count + 1) / 2;
+            }
+        }
+
+        platform::Unlock_Offscreen_Surface_();
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
+    void __cdecl Remap_Draw_(int16_t x, int16_t y, s_animation_header* anim) {
+        _animation_header = anim;
+        int16_t x2 = anim->width + x - 1;
+        int16_t y2 = anim->height + y - 1;
+        bool clipped = false;
+
+        if (_clipping_flag == 1) {
+            if (video::_screen_window_x2 < x) return;
+            if (video::_screen_window_y2 < y) return;
+            if (x2 < video::_screen_window_x1) return;
+            if (y2 < video::_screen_window_y1) return;
+
+            if (x < video::_screen_window_x1 ||
+                y < video::_screen_window_y1 ||
+                video::_screen_window_x2 < x2 ||
+                video::_screen_window_y2 < y2) {
+
+                clipped = true;
+                if (video::_screen_window_x2 < x2) {
+                    x2 = video::_screen_window_x2;
+                }
+                if (video::_screen_window_y2 < y2) {
+                    y2 = video::_screen_window_y2;
+                }
+            }
+        }
+
+        uint8_t* frame_ptr = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+
+        if (clipped) {
+            if (_dot_stencil_flag == 0) {
+                if (video::screen_refresh_flag >= 2) {
+                    setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
+                }
+
+                switch (anim->flags & 3) {
+                case 0:
+                    Remap_Clipped_Draw_Animated_Sprite_(x, y, frame_ptr);
+                    return; // Note: Returns directly without advancing frame
+                case 1:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                    break;
+                case 2:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                    break;
+                case 3:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                    break;
+                }
+            }
+        }
+        else {
+            if (video::screen_refresh_flag >= 2) {
+                setvesa::Add_Square_To_Scan_List_(x, y, x + anim->width - 1, y + anim->height - 1);
+            }
+
+            switch (anim->flags & 3) {
+            case 0:
+                Remap_Draw_Animated_Sprite_(x, y, frame_ptr);
+                break;
+            case 1:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                break;
+            case 2:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                break;
+            case 3:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                break;
+            }
+        }
+
+        anim->current_frame++;
+
+        if ((anim->flags & 0x20) == 0) {
+            if (anim->current_frame >= anim->frame_count) {
+                anim->current_frame = static_cast<int16_t>(anim->loop_frame);
+            }
+        }
+        else {
+            int32_t loop32 = static_cast<int8_t>(anim->loop_frame);
+            int32_t curr32 = anim->current_frame;
+
+            if (loop32 < curr32) {
+                if (loop32 - curr32 == -1) {
+                    anim->current_frame = 0;
+                    return;
+                }
+                if (curr32 >= anim->frame_count) {
+                    anim->current_frame = anim->frame_count - 1;
+                    return;
+                }
+            }
+        }
+    }
+
+    void __cdecl Draw_No_Glass_(int16_t x, int16_t y, s_animation_header* header) {
+        _animation_header = header;
+
+        int16_t x2 = x + header->width - 1;
+        int16_t y2 = y + header->height - 1;
+
+        if ((header->flags & 0x10) != 0) {
+            Set_Animation_Palette_();
+        }
+
+        uint8_t* sprite = reinterpret_cast<uint8_t*>(header) + header->frame_offsets[header->current_frame];
+
+        bool is_clipped = false;
+
+        if (_clipping_flag != 0 && (x > video::_screen_window_x2 || y > video::_screen_window_y2 ||
+                                    x2 < video::_screen_window_x1 || y2 < video::_screen_window_y1)) {
+            // Out of bounds, skip drawing entirely
+        } else {
+            if (_clipping_flag != 0) {
+                if (x < video::_screen_window_x1 || y < video::_screen_window_y1 ||
+                    x2 > video::_screen_window_x2 || y2 > video::_screen_window_y2) {
+                    is_clipped = true;
+                }
+            }
+
+            if (!is_clipped) {
+                if (video::screen_refresh_flag > 1) {
+                    setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
+                }
+
+                if ((header->flags & 0x8) != 0) {
+                    switch (header->flags & 3) {
+                    case 0:
+                        Draw_No_Glassed_Animated_Sprite_(x, y, sprite);
+                        break;
+                    case 1:
+                        Draw_No_Glassed_Bitmap_Sprite_(x, y, sprite);
+                        break;
+                    case 2:
+                        if (video::_copy_to_on_page_flag == 1) {
+                            Draw_Glassed_Screen_Background_On_(sprite);
+                        } else {
+                            Draw_Glassed_Screen_Background_Off_(sprite);
+                        }
+                        if (video::screen_refresh_flag > 1) {
+                            setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
+                        }
+                        break;
+                    case 3:
+                        exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
+                        break;
+                    }
+                } else {
+                    switch (header->flags & 3) {
+                    case 0:
+                        draw::Draw_Animated_Sprite_(x, y, sprite);
+                        break;
+                    case 1:
+                        draw::Draw_Bitmap_Sprite_(x, y, sprite);
+                        break;
+                    case 2:
+                        if (video::_copy_to_on_page_flag == 1) {
+                            Draw_Screen_Background_On_(reinterpret_cast<uint32_t*>(sprite));
+                        } else {
+                            Draw_Screen_Background_Off_(sprite);
+                        }
+                        if (video::screen_refresh_flag > 1) {
+                            setvesa::Add_Square_To_Scan_List_(0, 0, 0x27F, 0x1DF);
+                        }
+                        break;
+                    case 3:
+                        exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
+                        break;
+                    }
+                }
+            } else {
+                if (_dot_stencil_flag != 0) {
+                    if ((header->flags & 3) == 0) {
+                        clipped::Clipped_Draw_Stenciled_Animated_Sprite_(x, y, sprite);
+                    }
+                } else {
+                    if (video::screen_refresh_flag > 1) {
+                        setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
+                    }
+
+                    switch (header->flags & 3) {
+                    case 0:
+                        if ((header->flags & 0x8) != 0) {
+                            clipped::Clipped_Draw_Glassed_Animated_Sprite_(x, y, sprite);
+                        } else {
+                            clipped::Clipped_Draw_Animated_Sprite_(x, y, sprite);
+                        }
+                        break;
+                    case 1:
+                        if ((header->flags & 0x8) != 0) {
+                            clipped::Clipped_Draw_Glassed_Bitmap_Sprite_(x, y, sprite);
+                        } else {
+                            clipped::Clipped_Draw_Bitmap_Sprite_(x, y, sprite);
+                        }
+                        break;
+                    case 2:
+                        exitm::Exit_With_Message(s_Screen_Background_cant_be_clipp);
+                        break;
+                    case 3:
+                        exitm::Exit_With_Message(s_Refresh_Mask_cant_be_drawn);
+                        break;
+                    }
+                }
+            }
+        }
+
+        _animation_header->current_frame++;
+
+        if ((_animation_header->flags & 0x20) != 0) {
+            int8_t loop_frame = static_cast<int8_t>(_animation_header->loop_frame);
+            if (loop_frame < _animation_header->current_frame) {
+                if (loop_frame - _animation_header->current_frame == -1) {
+                    _animation_header->current_frame = 0;
+                    return;
+                }
+                if (_animation_header->current_frame >= _animation_header->frame_count) {
+                    _animation_header->current_frame = _animation_header->frame_count - 1;
+                    return;
+                }
+            }
+        } else {
+            if (_animation_header->current_frame >= _animation_header->frame_count) {
+                _animation_header->current_frame = static_cast<int16_t>(_animation_header->loop_frame);
+            }
+        }
+    }
 }

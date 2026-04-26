@@ -31,6 +31,10 @@ inline const char* const s_craziness_00557680 = reinterpret_cast<const char*>(st
 inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
 inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
 inline const char* s_INFO_LBX_00556000 = reinterpret_cast<const char*>(std::uintptr_t{0x00556000}); // "INFO.LBX"
+inline const char* s_Remap_draw_not_support_map_00557f88 = reinterpret_cast<const char*>(0x00557f88); // "Remap draw not support map"
+inline const char* s_Remap_draw_not_support_screen_00557fa4 = reinterpret_cast<const char*>(0x00557fa4); // "Remap draw not support screen"
+inline const char* s_Remap_draw_not_support_bitmaps_00557fc4 = reinterpret_cast<const char*>(0x00557fc4); // "Remap draw not support bitmaps"
+
 inline const char* s_SCIENCE_LBX_00557d68 = reinterpret_cast<const char*>(0x00557D68); // "SCIENCE.LBX"
 inline const char* s_SCIENCE_LBX_00551290 = reinterpret_cast<const char*>(std::uintptr_t{0x00551290}); /* "SCIENCE.LBX" */
 inline const char* s_TANM__03hi_LBX_005512a0 = reinterpret_cast<const char*>(std::uintptr_t{0x005512A0}); /* "TANM%03hi.LBX" */

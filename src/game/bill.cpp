@@ -140,7 +140,7 @@ namespace BILL {
     }
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t width, char* text, int16_t height) {
-        _Print_Paragraph_Bill_(0, 0, width, text, height, 0, nullptr);
+        _Print_Paragraph_Bill_(0, 0, width, text, (uint16_t)height, 0, nullptr);
         return __pp_max_width;
     }
 
@@ -156,7 +156,7 @@ namespace BILL {
      * @address 00408090
      */
     void __cdecl _Print_Paragraph_(int16_t x, int16_t y, int16_t width, const char* text, int16_t alignment) {
-        BILL::_Print_Paragraph_Bill_(x, y, width, text, alignment, 1, nullptr);
+        BILL::_Print_Paragraph_Bill_(x, y, width, text, (uint16_t)alignment, 1, nullptr);
     }
 
     void __cdecl Squeeze_Print_Centered_(int16_t x, int16_t y, const char* str, int16_t width) {
@@ -238,84 +238,81 @@ namespace BILL {
     /**
      * @address 00407480
      */
-    void __cdecl _Squeeze_Print_Paragraph_(
-        int16_t x, int16_t y, int16_t width, int16_t max_height,
-        char* text, int16_t alignment, s_animation_header* bitmap,
-        bool is_formatted, bool center_y)
-    {
-        char orig_space_width = fonts::_font_header.font_style_widths[32];
-        int16_t orig_spacing = fonts::_font_header.font_style_spacing;
-        int16_t orig_leading = fonts::_font_header.leading_offset;
-        int16_t orig_font_style = fonts::_font_header.font_style;
-
-        int16_t orig_current_font_style = fonts::_current_font_style;
+    void __cdecl _Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t max_height, char* text, int32_t param_6, s_animation_header* anim, bool is_formatted, bool center_y) {
+        char saved_space_width = fonts::_font_header.font_style_widths[32];
+        int16_t saved_spacing = fonts::_font_header.font_style_spacing;
+        uint16_t saved_leading = fonts::_font_header.leading_offset;
+        int16_t saved_font_style = fonts::_font_header.font_style;
+        int16_t saved_current_font = fonts::_current_font_style;
 
         using GetHeightFn = int16_t(__cdecl*)(int16_t, char*);
-        GetHeightFn get_height = is_formatted ? FMTPARA::Get_Formatted_Paragraph_Max_Height_ : (GetHeightFn)BILL::_Get_Paragraph_Max_Height_;
+        GetHeightFn get_height = is_formatted ? (GetHeightFn)FMTPARA::Get_Formatted_Paragraph_Max_Height_ : (GetHeightFn)BILL::_Get_Paragraph_Max_Height_;
 
         bool font_changed = false;
-        bool fits;
-        int16_t cur_height;
+        bool done_squeezing = false;
+        int16_t height = 0;
 
         do {
-            cur_height = get_height(width, text);
-            if (max_height >= cur_height) {
+            height = get_height(width, text);
+            if (max_height >= height) {
                 break;
             }
 
-            fits = true;
+            done_squeezing = true;
 
             while (true) {
-                if (get_height(width, text) <= max_height) {
+                height = get_height(width, text);
+                if (max_height >= height) {
                     break;
                 }
-                if ((int)BILL::_space_limits[fonts::_current_font_style] >= (int)fonts::_font_header.font_style_widths[32]) {
+
+                if (BILL::_space_limits[fonts::_current_font_style] >= (uint8_t)fonts::_font_header.font_style_widths[32]) {
                     break;
                 }
 
                 fonts::_font_header.font_style_widths[32]--;
-                fits = false;
+                done_squeezing = false;
             }
 
             while (true) {
-                if (get_height(width, text) <= max_height) {
+                height = get_height(width, text);
+                if (max_height >= height) {
                     break;
                 }
-                if ((int16_t)fonts::_font_header.leading_offset <= 2) {
+
+                if (static_cast<int16_t>(fonts::_font_header.leading_offset) <= 2) {
                     break;
                 }
 
                 fonts::_font_header.leading_offset--;
-                fits = false;
+                done_squeezing = false;
             }
 
-            cur_height = get_height(width, text);
-            if (cur_height > max_height) {
-                if (fonts::_current_font_style > 0) {
-                    fonts::Set_Font_Style_(fonts::_current_font_style - 1, &fonts::_font_header.normal_colors);
-                    font_changed = true;
-                    fits = false;
-                }
+            height = get_height(width, text);
+            if (max_height < height && fonts::_current_font_style > 0) {
+                fonts::Set_Font_Style_(fonts::_current_font_style - 1, &fonts::_font_header.normal_colors);
+                font_changed = true;
+                done_squeezing = false;
             }
-        } while (!fits);
+        } while (!done_squeezing);
 
         if (center_y) {
-            y = y - (cur_height / 2);
+            y = y - (height / 2);
         }
 
         if (is_formatted) {
-            FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(x, y, width, text, alignment, bitmap);
+            FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(x, y, width, text, (int16_t)param_6, anim);
         } else {
-            BILL::_Print_Paragraph_Bill_(x, y, width, text, alignment, 1, reinterpret_cast<int16_t*>(bitmap));
+            BILL::_Print_Paragraph_Bill_(x, y, width, text, (uint16_t)param_6, 1, reinterpret_cast<int16_t*>(anim));
         }
 
-        fonts::_font_header.font_style_spacing = orig_spacing;
-        fonts::_font_header.font_style_widths[32] = orig_space_width;
-        fonts::_font_header.leading_offset = orig_leading;
+        fonts::_font_header.font_style_spacing = saved_spacing;
+        fonts::_font_header.font_style_widths[32] = saved_space_width;
+        fonts::_font_header.leading_offset = saved_leading;
 
         if (font_changed) {
-            fonts::Set_Font_Style_(orig_current_font_style, &fonts::_font_header.selected_colors);
-            fonts::_font_header.font_style = orig_font_style;
+            fonts::Set_Font_Style_(saved_current_font, &fonts::_font_header.selected_colors);
+            fonts::_font_header.font_style = saved_font_style;
         }
     }
 
@@ -595,6 +592,120 @@ namespace BILL {
     }
 
     /**
+     * @address 004067d0
+     */
+    void __cdecl Record_History_()
+    {
+        uint32_t building_costs[8];
+        uint32_t fleet_history_tmp[350];
+        uint32_t pop_history_tmp[350];
+        uint32_t prod_history_tmp[350];
+        uint32_t tech_history_tmp[350];
+
+        COLCALC::Compute_Total_Building_Costs_(reinterpret_cast<int32_t*>(building_costs));
+
+        if (MOX::_bill_savegame[2] == 0) {
+            MOX::_bill_savegame[2] = 1;
+        }
+        if (MOX::_bill_savegame[3] == 0) {
+            MOX::_bill_savegame[3] = 1;
+        }
+        if (MOX::_bill_savegame[4] == 0) {
+            MOX::_bill_savegame[4] = 1;
+        }
+        if (MOX::_bill_savegame[5] == 0) {
+            MOX::_bill_savegame[5] = 1;
+        }
+
+        uint16_t savegame2 = MOX::_bill_savegame[2];
+        uint16_t savegame3 = MOX::_bill_savegame[3];
+        uint16_t savegame4 = MOX::_bill_savegame[4];
+        uint16_t savegame5 = MOX::_bill_savegame[5];
+
+        memset(fleet_history_tmp, 0, sizeof(fleet_history_tmp));
+
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int16_t ship_idx = 0; ship_idx < (int16_t)MOX::_NUM_SHIPS; ++ship_idx) {
+                if (MOX::_ship[ship_idx].status < 2) {
+                    int32_t owner = MOX::_ship[ship_idx].owner;
+                    uint32_t size = MOX::_ship[ship_idx].d.size;
+                    fleet_history_tmp[owner] += (10 << (size + 1));
+                }
+            }
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                pop_history_tmp[i] = MOX::_player[i].total_pop;
+                prod_history_tmp[i] = building_costs[i];
+                tech_history_tmp[i] = MOX::_player[i].total_known_tech_cost;
+
+                while (pop_history_tmp[i] / (uint32_t)savegame2 > 250) {
+                    savegame2++;
+                }
+                while (prod_history_tmp[i] / (uint32_t)savegame3 > 250) {
+                    savegame3++;
+                }
+                while (tech_history_tmp[i] / (uint32_t)savegame5 > 250) {
+                    savegame5++;
+                }
+                while (fleet_history_tmp[i] / (uint32_t)savegame4 > 250) {
+                    savegame4++;
+                }
+            }
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                pop_history_tmp[i] /= (uint32_t)savegame2;
+                prod_history_tmp[i] /= (uint32_t)savegame3;
+                tech_history_tmp[i] /= (uint32_t)savegame5;
+                fleet_history_tmp[i] /= (uint32_t)savegame4;
+            }
+        }
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if (savegame2 != MOX::_bill_savegame[2] ||
+                    savegame3 != MOX::_bill_savegame[3] ||
+                    savegame4 != MOX::_bill_savegame[4] ||
+                    savegame5 != MOX::_bill_savegame[5])
+                {
+                    for (int j = 0; j < 350; ++j) {
+                        MOX::_player[i].population_history[j] = (char)(
+                            ((int32_t)(uint8_t)MOX::_player[i].population_history[j] * MOX::_bill_savegame[2]) / (int32_t)savegame2
+                        );
+                        MOX::_player[i].production_history[j] = (char)(
+                            ((int32_t)(uint8_t)MOX::_player[i].production_history[j] * MOX::_bill_savegame[3]) / (int32_t)savegame3
+                        );
+                        MOX::_player[i].tech_history[j] = (char)(
+                            ((int32_t)(uint8_t)MOX::_player[i].tech_history[j] * MOX::_bill_savegame[5]) / (int32_t)savegame5
+                        );
+                        MOX::_player[i].fleet_history[j] = (char)(
+                            ((int32_t)(uint8_t)MOX::_player[i].fleet_history[j] * MOX::_bill_savegame[4]) / (int32_t)savegame4
+                        );
+                    }
+                }
+                int turn = MOX::_bill_savegame[1];
+                MOX::_player[i].population_history[turn] = (char)pop_history_tmp[i];
+                MOX::_player[i].production_history[turn] = (char)prod_history_tmp[i];
+                MOX::_player[i].tech_history[turn] = (char)tech_history_tmp[i];
+                MOX::_player[i].fleet_history[turn] = (char)fleet_history_tmp[i];
+            }
+        }
+
+        MOX::_bill_savegame[2] = savegame2;
+        MOX::_bill_savegame[3] = savegame3;
+        MOX::_bill_savegame[4] = savegame4;
+        MOX::_bill_savegame[5] = savegame5;
+
+        MOX::_bill_savegame[1]++;
+        if (MOX::_bill_savegame[1] >= 350) {
+            MOX::_bill_savegame[1] = 0;
+        }
+    }
+
+    /**
      * @address 00406CD0
      */
     int16_t __cdecl Get_History_Params_(int16_t* out_history_param) {
@@ -683,6 +794,110 @@ namespace BILL {
      * @address 004080c0
      */
     void __cdecl _Print_Paragraph_Bill_Aux_(int16_t param_1, int16_t param_2, int16_t param_3, char* param_4, int16_t param_5, int16_t* param_6) {
-        _Print_Paragraph_Bill_(param_1, param_2, param_3, param_4, param_5, 1, param_6);
+        _Print_Paragraph_Bill_(param_1, param_2, param_3, param_4, (uint16_t)param_5, 1, param_6);
+    }
+
+    /**
+     * @address 00407dd0
+     */
+    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, int32_t param_6, int16_t* param_7) {
+        if (width >= 10 && width <= 0x280 && x >= 0 && x < 0x280 && y >= 0 && y < 0x1E0 && text != nullptr) {
+            int16_t char_index = 0;
+            char break_char = 0;
+            __pp_max_width = 0;
+            int16_t out_index = 0;
+            int16_t current_width = 0;
+            int16_t last_break_char_index = 0;
+            int16_t last_break_out_index = 0;
+            int16_t current_y = y;
+            int16_t max_y = 0x1DF - (int16_t)fonts::_font_header.current_height;
+            char local_c8[184];
+
+            char current_char = text[0];
+            while (current_char != '\0') {
+                if (current_char == '\t') {
+                    current_char = ' ';
+                }
+
+                if (current_char == ' ' || (current_char == '\b' && (current_width + (uint8_t)fonts::_font_header.font_style_widths['-'] <= width))) {
+                    last_break_char_index = char_index;
+                    break_char = current_char;
+                    last_break_out_index = out_index;
+                }
+
+                bool process_line_break = false;
+
+                if (current_char == '\r' || current_char == '\n') {
+                    break_char = '\r';
+                    process_line_break = true;
+                } else if ((uint8_t)current_char >= 0x20) {
+                    current_width += (uint8_t)fonts::_font_header.font_style_widths[(uint8_t)current_char];
+
+                    if (current_char != ' ' && current_width > width) {
+                        if (last_break_out_index != 0) {
+                            out_index = last_break_out_index;
+                        }
+
+                        if (last_break_char_index != 0) {
+                            char_index = last_break_char_index;
+                        }
+                        process_line_break = true;
+                    } else {
+                        char_index++;
+                        local_c8[out_index] = current_char;
+                        out_index++;
+                        current_width += fonts::_font_header.font_style_spacing;
+                    }
+                } else {
+                    char_index++;
+                }
+
+                if (process_line_break) {
+                    if (out_index > 0 && local_c8[out_index - 1] == ' ') {
+                        while (out_index > 1) {
+                            out_index--;
+                            if (local_c8[out_index - 1] != ' ') {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (out_index > 0 || break_char == '\r') {
+                        if (break_char == '\b') {
+                            local_c8[out_index] = '-';
+                            out_index++;
+                        } else if ((uint8_t)break_char <= 0x20) {
+                            char_index++;
+                        }
+
+                        local_c8[out_index] = '\0';
+                        _Print_String_Bill_(x, current_y, width, local_c8, color, (uint8_t)param_6, reinterpret_cast<s_animation_header*>(param_7));
+
+                        current_y += (int16_t)fonts::_font_header.line_height;
+                        out_index = 0;
+                        if (current_y > max_y) {
+                            break;
+                        }
+                    }
+
+                    current_width = 0;
+                    break_char = 0;
+                    last_break_char_index = 0;
+                    last_break_out_index = 0;
+                }
+
+                current_char = text[char_index];
+            }
+
+            local_c8[out_index] = '\0';
+            if (out_index > 0) {
+                if (color == 3) {
+                    color = 0;
+                }
+                _Print_String_Bill_(x, current_y, width, local_c8, color, (uint8_t)param_6, reinterpret_cast<s_animation_header*>(param_7));
+            }
+
+            __pp_max_height = current_y - y + (int16_t)fonts::_font_header.current_height;
+        }
     }
 }

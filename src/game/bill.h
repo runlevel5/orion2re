@@ -24,7 +24,7 @@ namespace BILL {
 
     void __cdecl _Squeeze_Print_Paragraph_(
         int16_t x, int16_t y, int16_t width, int16_t max_height,
-        char* text, int16_t alignment, s_animation_header* bitmap,
+        char* text, int32_t param_6, s_animation_header* anim,
         bool is_formatted, bool center_y);
 
     void __cdecl Squeeze_Print_Paragraph_(uint16_t x, int16_t y, int16_t w, int16_t h, char* str, uint16_t align);
@@ -74,11 +74,7 @@ namespace BILL {
     inline int16_t& __pp_max_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BBE});
     inline int16_t& __pp_max_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A8BC0});
 
-    inline void __cdecl _Print_Paragraph_Bill_(int16_t param_1, int16_t param_2, int16_t param_3, const char* param_4, int16_t param_5, int16_t param_6, int16_t* param_7) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, const char*, int16_t, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407dd0});
-        fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7);
-    }
+    void __cdecl _Print_Paragraph_Bill_(int16_t x, int16_t y, int16_t width, const char* text, uint16_t color, int32_t param_6, int16_t* param_7);
 
     int16_t __cdecl _Get_Paragraph_Max_Width_(int16_t max_width, char* text, int16_t font_style);
 
@@ -97,11 +93,7 @@ namespace BILL {
 
     void __cdecl _Squeeze_Print_(int16_t x, int16_t y, const char* str, int16_t limit_w, s_animation_header* pic, int16_t p6, bool adjust_y);
 
-    inline void __cdecl Record_History_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004067d0 });
-        fn();
-    }
+    void __cdecl Record_History_();
 
     void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val);
 

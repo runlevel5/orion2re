@@ -2447,4 +2447,290 @@ namespace AIMOVE {
 
         return min_strength;
     }
+
+    int8_t __cdecl Get_Best_Escorted_Colony_Ship_(int16_t* colony_ships, int16_t* num_colony_ships, int16_t star_idx, int16_t max_turns)
+    {
+        int32_t enemy_strength[10] = { 0 };
+        int32_t enemy_strength2[10];
+        int32_t total_enemy_strength[10];
+
+        for (int i = 0; i < 10; ++i) {
+            total_enemy_strength[i] = 0;
+        }
+
+        Get_Enemy_Strength_On_Turn_(star_idx, enemy_strength, enemy_strength2);
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
+                if (p != AIMOVE::_i_ai) {
+                    int8_t treaty = AIMOVE::_p_ai->treaty[p];
+                    if (treaty < 1 || treaty > 3 || MOX::_player[p].objectives == 100) {
+                        for (int t = 0; t < 10; ++t) {
+                            total_enemy_strength[t] += (*AIDATA::_possible_ship_strengths)[star_idx][p][AIMOVE::_i_ai][t];
+                        }
+                    }
+                }
+            }
+        }
+
+        int32_t best_max_turn = 0x7FFF;
+        int8_t success = 0;
+        int32_t best_colony_ship_idx = -1;
+        int32_t best_strategy = -1;
+        int32_t best_dest = -1;
+        int32_t best_num_escorts = -1;
+        int32_t best_num_escorts_total = -1;
+        int32_t c = 0;
+
+        int16_t fleet[494];
+
+        if (*num_colony_ships > 0) {
+            do {
+                int32_t num_escorts_total = 0;
+                int32_t num_escorts = 1;
+                fleet[0] = colony_ships[c];
+                int16_t location = MOX::_ship[fleet[0]].location;
+
+                if (location < 0x48) {
+                    int16_t first_combat_ship = (*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][location];
+                    if (first_combat_ship != -1) {
+                        int32_t total_escort_strength = 0;
+                        bool is_valid_strength = false;
+                        if (max_turns < 10 || enemy_strength2[9] != 0) {
+                            is_valid_strength = true;
+                        }
+
+                        int16_t all_ship_idx = first_combat_ship;
+                        while (all_ship_idx < (int16_t)AIDATA::_n_all_ships) {
+                            int16_t s_idx = (*AIDATA::_all_ships)[all_ship_idx];
+                            if (MOX::_ship[s_idx].owner == AIMOVE::_i_ai && MOX::_ship[s_idx].location == location) {
+                                all_ship_idx++;
+                                total_escort_strength += AIMOVE::Ship_Rough_Strength_At_Star_(s_idx, star_idx);
+                                num_escorts_total++;
+                            }
+                            else {
+                                break;
+                            }
+                        }
+
+                        all_ship_idx = first_combat_ship;
+                        int32_t strength = 0;
+                        while (all_ship_idx < (int16_t)AIDATA::_n_all_ships) {
+                            int16_t s_idx = (*AIDATA::_all_ships)[all_ship_idx];
+                            if (MOX::_ship[s_idx].owner == AIMOVE::_i_ai && MOX::_ship[s_idx].location == location) {
+                                all_ship_idx++;
+                                strength += AIMOVE::Ship_Rough_Strength_At_Star_(s_idx, star_idx);
+                                fleet[num_escorts] = s_idx;
+                                fleet[num_escorts + 1] = -1;
+                                num_escorts++;
+
+                                int16_t dest_star;
+                                int16_t turns;
+                                AIMOVE::Move_Ships_With_Possible_Intermediate_(fleet, star_idx, &dest_star, &turns);
+
+                                if (dest_star == -1 || turns > max_turns) {
+                                    break;
+                                }
+
+                                if (is_valid_strength || total_escort_strength <= strength * 2) {
+                                    if (turns < 10 && turns < best_max_turn) {
+                                        int32_t t2 = turns + 2;
+                                        if (t2 > 9) {
+                                            t2 = 9;
+                                        }
+                                        if ((uint32_t)enemy_strength2[t2] < (uint32_t)strength) {
+                                            bool can_escort = true;
+                                            int32_t t = turns + 1;
+                                            if ((uint32_t)total_enemy_strength[turns] > (uint32_t)strength && (uint32_t)total_escort_strength > (uint32_t)strength) {
+                                                can_escort = false;
+                                            }
+                                            if (t < 10) {
+                                                for (; t < 10; ++t) {
+                                                    if ((uint32_t)enemy_strength[t] > (uint32_t)strength) {
+                                                        can_escort = false;
+                                                    }
+                                                }
+                                            }
+                                            if (can_escort) {
+                                                best_max_turn = turns;
+                                                best_colony_ship_idx = c;
+                                                best_num_escorts = num_escorts - 1;
+                                                best_strategy = 2;
+                                                best_dest = dest_star;
+                                                best_num_escorts_total = num_escorts_total;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!is_valid_strength && total_escort_strength <= strength * 2) {
+                                    break;
+                                }
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    int32_t strength = 0;
+                    for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+                        s_ship_data* ship = &MOX::_ship[i];
+                        if (ship->owner == AIMOVE::_i_ai && ship->location == MOX::_ship[fleet[0]].location) {
+                            if (ship->status < 3 && ship->x == MOX::_ship[fleet[0]].x && ship->y == MOX::_ship[fleet[0]].y) {
+                                strength += AIMOVE::Ship_Rough_Strength_At_Star_(i, star_idx);
+                                fleet[num_escorts] = i;
+                                num_escorts++;
+                            }
+                        }
+                    }
+                    fleet[num_escorts] = -1;
+
+                    if (MOX::_ship[fleet[0]].location - star_idx == 500) {
+                        int16_t turns = MOX::_ship[fleet[0]].turns_left;
+                        if (turns < 10 && turns <= max_turns) {
+                            if (turns < best_max_turn && (uint32_t)enemy_strength2[turns] < (uint32_t)strength) {
+                                bool can_escort = true;
+                                for (int32_t t = turns + 1; t < 10; ++t) {
+                                    if ((uint32_t)enemy_strength[t] >= (uint32_t)strength) {
+                                        can_escort = false;
+                                        break;
+                                    }
+                                }
+                                if (can_escort) {
+                                    best_max_turn = turns;
+                                    best_dest = star_idx;
+                                    best_strategy = 0;
+                                    best_colony_ship_idx = c;
+                                    best_num_escorts = num_escorts - 1;
+                                    best_num_escorts_total = num_escorts - 1;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        int16_t dest_star;
+                        int16_t turns;
+                        AIMOVE::Move_Ships_With_Possible_Intermediate_(fleet, star_idx, &dest_star, &turns);
+                        if (dest_star != -1 && turns < 10 && turns <= max_turns) {
+                            if (turns < best_max_turn && (uint32_t)enemy_strength2[turns] < (uint32_t)strength) {
+                                bool can_escort = true;
+                                for (int32_t t = turns + 1; t < 10; ++t) {
+                                    if ((uint32_t)enemy_strength[t] >= (uint32_t)strength) {
+                                        can_escort = false;
+                                        break;
+                                    }
+                                }
+                                if (can_escort) {
+                                    best_max_turn = turns;
+                                    best_dest = dest_star;
+                                    best_strategy = 1;
+                                    best_colony_ship_idx = c;
+                                    best_num_escorts = num_escorts - 1;
+                                    best_num_escorts_total = num_escorts - 1;
+                                }
+                            }
+                        }
+                    }
+                }
+                c++;
+            } while (c < *num_colony_ships);
+        }
+
+        if (best_colony_ship_idx != -1) {
+            success = 1;
+            fleet[0] = colony_ships[best_colony_ship_idx];
+
+            if (best_strategy == 1) {
+                int32_t ship_cnt = 1;
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+                    s_ship_data* ship = &MOX::_ship[i];
+                    if (ship->owner == AIMOVE::_i_ai && ship->location == MOX::_ship[fleet[0]].location) {
+                        if (ship->status < 3 && ship->x == MOX::_ship[fleet[0]].x && ship->y == MOX::_ship[fleet[0]].y) {
+                            ship->mission = 4;
+                            fleet[ship_cnt++] = i;
+                        }
+                    }
+                }
+                fleet[ship_cnt] = -1;
+            }
+            else if (best_strategy == 2) {
+                int16_t location = MOX::_ship[fleet[0]].location;
+                int16_t all_ship_idx = (*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][location];
+                int32_t ship_cnt = 1;
+                if (best_num_escorts > 0) {
+                    for (int32_t i = 0; i < best_num_escorts; ++i) {
+                        int16_t s_idx = (*AIDATA::_all_ships)[all_ship_idx++];
+                        MOX::_ship[s_idx].mission = 4;
+                        fleet[ship_cnt++] = s_idx;
+                    }
+                }
+                fleet[ship_cnt] = -1;
+                if (best_num_escorts < best_num_escorts_total) {
+                    (*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][location] += (int16_t)best_num_escorts;
+                }
+                else {
+                    (*AIDATA::_i_all_combat_ships)[AIMOVE::_i_ai][location] = -1;
+                }
+            }
+
+            if (best_strategy != 0) {
+                s_ship_move_info move_info;
+                SHIPMOVE::Ships_Try_To_Move_To_(fleet, (int16_t)best_dest, &move_info);
+                SHIPMOVE::Make_Ships_Move_To_(fleet, (int16_t)best_dest, &move_info);
+            }
+
+            int16_t count = *num_colony_ships;
+            *num_colony_ships = count - 1;
+            colony_ships[best_colony_ship_idx] = colony_ships[count - 1];
+        }
+
+        return success;
+    }
+
+    void __cdecl Find_Opportunity_Attack_Aux_(
+        int16_t player_id,
+        int16_t val1,
+        int16_t val2,
+        int16_t star_idx,
+        int16_t* out_target_star,
+        int16_t* out_param_6,
+        int32_t* out_param_7
+    ) {
+        *out_target_star = -1;
+
+        if ((*AIDATA::_i_all_combat_ships)[player_id][star_idx] != -1 &&
+            MOX::_settings.game_difficulty > 1) {
+            int8_t flee_stars[720];
+
+#pragma pack(push, 1)
+            struct {
+                int16_t val1;
+                int16_t val2;
+                int16_t target_star;
+                int16_t out_val6;
+                int16_t out_val7;
+            } attack_info;
+#pragma pack(pop)
+
+            attack_info.val1 = val1;
+            attack_info.val2 = val2;
+            attack_info.target_star = -1;
+
+            _flee_stars = flee_stars;
+            _i_ai = player_id;
+            _p_ai = &MOX::_player[player_id];
+
+            Find_Best_Attack_From_Star_(star_idx, reinterpret_cast<uint8_t*>(&attack_info), 1, 2);
+
+            if (attack_info.target_star != -1) {
+                *out_target_star = attack_info.target_star;
+                *out_param_6 = attack_info.out_val6;
+                *out_param_7 = (int32_t)attack_info.out_val7;
+            }
+
+            _flee_stars = nullptr;
+        }
+    }
 }

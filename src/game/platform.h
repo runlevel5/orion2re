@@ -80,6 +80,8 @@ namespace platform {
 	inline uint8_t& g_render_buffer =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578edc });
 
+	inline uint8_t*& _offscreen_surface = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00578E54});
+
 	inline uint16_t& DAT_578AC4 =
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578ac4 });
 

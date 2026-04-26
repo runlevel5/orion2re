@@ -1012,7 +1012,7 @@ namespace AIDATA {
         return total_worth;
     }
 
-    short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(short player, short star_a, short star_b, short* inter_star_out, bool use_extended) {
+    short __cdecl Player_N_Turns_From_Star_To_Star_With_Intermediate_(short player, short star_a, short star_b, int16_t* inter_star_out, bool use_extended) {
         uint8_t* info = (uint8_t*)&(*_n_turns_from_to_intermediate)[star_a][star_b][player];
 
         if (info[1] == 0xFF) {
@@ -1081,9 +1081,9 @@ namespace AIDATA {
         if (inter_star_out) {
             uint8_t inter_star = use_extended ? info[3] : info[1];
             if (inter_star < 0x48 /* NUM_STARS (72) */) {
-                *inter_star_out = (short)inter_star;
+                *inter_star_out = (uint16_t)inter_star;
             } else {
-                *inter_star_out = -1;
+                *inter_star_out = 0xffff;
             }
         }
 
@@ -1091,6 +1091,80 @@ namespace AIDATA {
             return (short)info[2];
         }
         return (short)info[0];
+    }
+
+    short __cdecl Ship_N_Turns_To_Star_With_Intermediate_(short ship_idx, short dest_star_idx, int16_t* intermediate_star_idx) {
+        uint8_t* cached_info = (uint8_t*)&(*_ship_n_turns_to_intermediate)[ship_idx][dest_star_idx];
+
+        bool has_stargate = struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, 11);
+
+        if (cached_info[1] == 0xff) {
+            int16_t loc = MOX::_ship[ship_idx].location;
+            if (loc >= 72 && loc < 1000) {
+                int owner = MOX::_ship[ship_idx].owner;
+                int ship_dest_star = loc - 500;
+
+                if (cached_info[0] > 1) {
+                    for (int i = MOX::_NUM_STARS - 1; i >= 0; i--) {
+                        bool in_range = ((*_star_in_range_of_player)[i] >> owner) & 1;
+                        bool in_ext_range = ((*_star_in_extended_range_of_player)[i] >> owner) & 1;
+
+                        if (in_range || (in_ext_range && has_stargate)) {
+                            if (i == dest_star_idx || i == ship_dest_star ||
+                                (MOX::_star[i].spectral_class != 6 &&
+                                    MOX::_star[i].system_special != 9 &&
+                                    (((MOX::_star[i].has_colony >> owner) & 1) != 0 || MOX::_star[i].has_colony == 0))) {
+
+                                bool blocked = GEO::Black_Hole_Blocks_Points_(
+                                    MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y,
+                                    MOX::_star[i].x, MOX::_star[i].y
+                                );
+
+                                if (!blocked) {
+                                    uint32_t total_turns = (uint8_t)(*_n_turns_from_to)[i][dest_star_idx][owner] + (uint8_t)(*_ship_n_turns_to)[ship_idx][i];
+                                    if (total_turns < cached_info[0]) {
+                                        cached_info[0] = static_cast<uint8_t>(total_turns);
+                                        cached_info[1] = static_cast<uint8_t>(i);
+                                    }
+                                }
+                            }
+                        }
+                        if (cached_info[0] <= 1) {
+                            break;
+                        }
+                    }
+                }
+
+                if (cached_info[1] == 0xff) {
+                    cached_info[1] = 72;
+                }
+            } else {
+                if (loc >= 1000) {
+                    loc = HAROLD::XY_To_Star_Id_(MOX::_ship[ship_idx].x, MOX::_ship[ship_idx].y);
+                }
+
+                cached_info[0] = static_cast<uint8_t>(AIDATA::Player_N_Turns_From_Star_To_Star_With_Intermediate_(
+                    MOX::_ship[ship_idx].owner,
+                    loc,
+                    dest_star_idx,
+                    intermediate_star_idx,
+                    has_stargate
+                ));
+
+                // BUG: intermediate_star_idx is dereferenced here without null check
+                cached_info[1] = static_cast<uint8_t>(*intermediate_star_idx);
+            }
+        }
+
+        if (intermediate_star_idx != nullptr) {
+            if (cached_info[1] < 72) {
+                *intermediate_star_idx = cached_info[1];
+            } else {
+                *intermediate_star_idx = 0xffff;
+            }
+        }
+
+        return cached_info[0];
     }
 
     int16_t __cdecl Colony_Worth_To_Player_(s_colony* colony, s_player* target_player) {

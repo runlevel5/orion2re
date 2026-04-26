@@ -671,4 +671,45 @@ namespace BEAMS {
 
         return 0;
     }
+
+    /**
+     * @address 0x00423980
+     */
+    int16_t __cdecl Rot_To_Base_Rot_(int16_t rot) {
+        int16_t base_rotations[16] = {
+            0, 1, 2, 3, 4, 3, 2, 1,
+            0, 1, 2, 3, 4, 3, 2, 1
+        };
+
+        return base_rotations[rot % 16];
+    }
+
+    /**
+     * @address 0x00423A10
+     */
+    int16_t __cdecl Rot_To_Rot_Method_(int16_t rot) {
+        int16_t methods[16] = {
+            0, 0, 0, 0, 0,
+            1, 1, 1, 1,
+            2, 2, 2,
+            3, 3, 3, 3
+        };
+
+        return methods[rot % 16];
+    }
+
+    /**
+     * @address 004233b0
+     */
+    int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size) {
+        int16_t sizes[6];
+
+        sizes[0] = 4;
+        sizes[1] = 5;
+        sizes[2] = 6;
+        sizes[3] = 7;
+        sizes[4] = 7;
+
+        return sizes[planet_size];
+    }
 }

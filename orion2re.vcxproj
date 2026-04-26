@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\game\advciv.cpp" />
+    <ClCompile Include="src\game\aibomb.cpp" />
     <ClCompile Include="src\game\aibuild.cpp" />
     <ClCompile Include="src\game\aidata.cpp" />
     <ClCompile Include="src\game\aidesign.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="src\game\arith1e.cpp" />
     <ClCompile Include="src\game\beams.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
+    <ClCompile Include="src\game\billhelp.cpp" />
     <ClCompile Include="src\game\bitio.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
     <ClCompile Include="src\game\bomb.cpp" />

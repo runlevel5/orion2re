@@ -2118,5 +2118,4 @@ namespace COLONY {
 
         return (coord_min + coord_max) / 2;
     }
-
 }

@@ -146,7 +146,12 @@ namespace COLONY {
     }
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
-    s_animation_header* __cdecl C_Anims_(int16_t index);
+    inline s_animation_header* __cdecl Cache_Load_Planet_(int16_t bg_index) {
+        using Fn = s_animation_header*(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E1BE0});
+        return fn(bg_index);
+    }
+    s_animation_header* __cdecl C_Anims_(int16_t anim_id);
 
     s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1);
 
