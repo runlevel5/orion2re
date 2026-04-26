@@ -1,9 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_invasion_side_info;
-struct s_animation_header;
-struct s_ground_unit;
 
 namespace COLGCBT {
     inline s_help_box (&_colony_ground_combat_screen_help)[3] =
@@ -15,6 +10,8 @@ namespace COLGCBT {
     inline int16_t& _old_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005583C4 });
     inline int16_t& _g_ctr = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005583B4 });
     inline s_invasion_side_info*& _g_attack_ptr = *reinterpret_cast<s_invasion_side_info**>(std::uintptr_t{ 0x0056C470 });
+    inline const char* s_t_T0_124_500_550_600_620__00558468 = 
+        reinterpret_cast<const char*>(std::uintptr_t{0x00558468}); /* " t T0,124,500,550,600,620." */
     inline s_animation_header*& _explosion_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056C474});
     inline uint16_t& _display_fast = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0056C478 });
     inline s_animation_header*& _heart_anim = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056C47C});
@@ -42,23 +39,23 @@ namespace COLGCBT {
 
     int16_t __cdecl N_Slots_Left_(uint8_t side);
 
-    inline void __cdecl Add_Initial_Unit_(uint8_t side) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a4850 });
-        fn(side);
-    }
+    s_ground_unit* __cdecl Get_First_Unit_(uint8_t side);
+
+    void __cdecl Add_Unit_(uint8_t side);
+
+    void __cdecl Add_Initial_Unit_(uint8_t side);
 
     int16_t __cdecl Get_Next_Troop_Type_(uint8_t side);
 
-    inline int16_t __cdecl N_Troop_Type_(int16_t troop_idx, uint8_t side) {
-        using Fn = int16_t(__cdecl*)(int16_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a4700 });
-        return fn(troop_idx, side);
-    }
+    int16_t __cdecl N_Troop_Type_(int16_t unit_type, uint8_t side_idx);
 
     void __cdecl Resort_Units_(uint8_t side_idx);
 
     s_animation_header* __cdecl Action_Anim_(int8_t side, uint8_t state, int8_t type);
+
+    int16_t __cdecl Top_Line_Y_();
+
+    int16_t __cdecl Top_Line_X_(uint8_t index);
 
     void __cdecl Calc_Top_Line_();
 
@@ -78,44 +75,51 @@ namespace COLGCBT {
 
     void __cdecl Draw_Summary_();
 
-    inline void __cdecl Verify_Legal_Totals_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a3580 });
-        fn();
-    }
+    void __cdecl Verify_Legal_Totals_();
 
-    inline void __cdecl Do_Unit_Turn_(s_ground_unit* unit) {
-        using Fn = void(__cdecl*)(s_ground_unit*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a3b40 });
-        fn(unit);
-    }
+    void __cdecl Do_Unit_Turn_(s_ground_unit* unit);
 
-    inline void __cdecl Force_Firing_Pairs_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a3610 });
-        fn();
-    }
+    int16_t __cdecl N_Left_Active_To_Process_(s_ground_unit* start_unit);
 
-    inline void __cdecl Reinforce_Units_(uint8_t side) {
-        using Fn = void(__cdecl*)(uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004a45f0 });
-        fn(side);
-    }
+    int16_t __cdecl N_Left_Of_Me_To_Process_(s_ground_unit* unit);
+
+    s_ground_unit* __cdecl Pick_Target_(uint8_t side);
+
+    s_ground_unit* __cdecl Find_Unshot_Target_(uint8_t side);
+
+    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t player_idx, int16_t state, uint8_t require_no_target);
+
+    void __cdecl Draw_Unit_Beam_(s_ground_unit* unit);
+
+    void __cdecl Get_Firepoint_Offsets_(s_ground_unit *unit, int16_t *x_off, int16_t *y_off);
+
+    void __cdecl Get_Target_Offsets_(s_ground_unit* unit, int16_t* out_x, int16_t* out_y);
+
+    int16_t __cdecl Get_CGCBT_Beam_Len_(uint8_t side_idx);
+
+    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int8_t side);
+
+    void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit);
+
+    void __cdecl Pick_Next_Action_(s_ground_unit* unit);
+
+    int8_t __cdecl Move_Is_Legal_(s_ground_unit* unit);
+
+    void __cdecl Do_Legal_Move_Check_(s_ground_unit* unit);
+
+    void __cdecl Do_Delta_Y_(s_ground_unit* unit);
+
+    void __cdecl Force_Firing_Pairs_();
+
+    void __cdecl Reinforce_Units_(uint8_t side);
 
     void __cdecl Draw_Troops_();
 
-    inline void __cdecl Print_Data_(char* name, uint16_t bonus, int16_t* param_2, s_invasion_side_info* param_1) {
-        using Fn = void(__cdecl*)(char*, uint16_t, int16_t*, s_invasion_side_info*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a4e10});
-        fn(name, bonus, param_2, param_1);
-    }
+    void __cdecl Print_Data_(char* str, int16_t value, int16_t* line_idx, s_invasion_side_info* side);
 
     void __cdecl Print_Best_Summary_(s_invasion_side_info* atk_ptr, int16_t* row);
 
-    inline void __cdecl Print_Race_Summary_(s_invasion_side_info* atk_ptr, int16_t* row) {
-        using Fn = void(__cdecl*)(s_invasion_side_info*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004a4ec0})(atk_ptr, row);
-    }
+    void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* y_pos);
 
     void __cdecl Print_Troop_Totals_(int16_t x, int16_t y, s_invasion_side_info* side_info);
 

@@ -110,4 +110,10 @@ namespace BEAMS {
         using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, s_beam_fx_entry*, int16_t);
         reinterpret_cast<Fn>(std::uintptr_t{0x00420D60})(source, sx, sy, target, tx, ty, fx_entries, flag);
     }
+
+    inline void __cdecl Rob_Interpolate_Line_(int16_t *x, int16_t *y, int16_t target_x, int16_t target_y, int16_t len) {
+        using Fn = void(__cdecl *)(int16_t *, int16_t *, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041ffa0});
+        fn(x, y, target_x, target_y, len);
+    }
 }

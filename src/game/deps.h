@@ -90,6 +90,7 @@
 #include "report.h"
 #include "science.h"
 #include "raceopt.h"
+#include "bolt.h"
 #include "combfind.h"
 #include "colcalc.h"
 #include "colgcbt.h"

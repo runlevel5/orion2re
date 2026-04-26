@@ -345,6 +345,27 @@ namespace COLGCBT {
         return count;
     }
 
+    s_ground_unit* __cdecl Get_First_Unit_(uint8_t side) {
+        for (int16_t i = 0; i < 40; ++i) {
+            if (_g_units[side][i].state == 0) {
+                return &_g_units[side][i];
+            }
+        }
+        return nullptr;
+    }
+
+    int16_t __cdecl N_Troop_Type_(int16_t unit_type, uint8_t side_idx) {
+        int16_t count = 0;
+
+        for (int16_t i = 0; i < 40; ++i) {
+            if (_g_units[side_idx][i].type == unit_type && _g_units[side_idx][i].state != 0) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     void __cdecl Spatter_Down_Starting_Troops_() {
         for (uint8_t side = 0; side < 2; ++side) {
             for (int16_t i = 0; i < 40; ++i) {
@@ -391,6 +412,168 @@ namespace COLGCBT {
         Draw_Summary_Box_DEF_();
     }
 
+    void __cdecl Do_Unit_Turn_(s_ground_unit* unit) {
+        COLONY::Set_Colony_Font_To_(1);
+
+        if (unit->state == 0) {
+            return;
+        }
+
+        if (unit->side == 0) {
+            if (_g_attack_ptr->round_killed_unit_type == unit->type && unit->state != 1) {
+                unit->state = 1;
+                unit->anim_frame = 0;
+                unit->is_hit = 0;
+                _g_attack_ptr->round_killed_unit_type = -1;
+                _g_attack_ptr->round_hit_unit_type = -1;
+                COLONY::_full_draw = 1;
+            } else if (_g_attack_ptr->round_hit_unit_type == unit->type && unit->state != 1 && unit->state != 5) {
+                if (random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
+                    unit->state = 5;
+                    unit->is_hit = 0;
+                    unit->anim_frame = 0;
+                    _g_attack_ptr->round_hit_unit_type = -1;
+                }
+            }
+        } else {
+            if (_g_defend_ptr->round_killed_unit_type == unit->type && unit->state != 1) {
+                unit->state = 1;
+                unit->is_hit = 0;
+                unit->anim_frame = 0;
+                _g_defend_ptr->round_killed_unit_type = -1;
+                _g_defend_ptr->round_hit_unit_type = -1;
+                COLONY::_full_draw = 1;
+            } else if (_g_defend_ptr->round_hit_unit_type == unit->type && unit->state != 1 && unit->state != 5) {
+                if (random::Random_(N_Left_Active_To_Process_(unit)) <= 1) {
+                    unit->state = 5;
+                    unit->is_hit = 0;
+                    unit->anim_frame = 0;
+                    _g_defend_ptr->round_hit_unit_type = -1;
+                }
+            }
+        }
+
+        s_animation_header* seg = Action_Anim_(unit->side, unit->state, unit->type);
+
+        if (unit->state != 3 && (unit->state == 0 || unit->target == nullptr)) {
+            if (unit->target != nullptr && unit->target->type == -1) {
+                unit->target = nullptr;
+            }
+        } else {
+            if (unit->anim_frame == 0 && unit->state == 3 && unit->action_timer >= 10) {
+                unit->target = nullptr;
+            }
+
+            if (unit->target == nullptr) {
+                unit->target = Pick_Target_(unit->side == 0);
+
+                if (unit->target == nullptr || random::Random_(N_Left_Of_Me_To_Process_(unit)) <= 2) {
+                    unit->target = nullptr;
+                    if (random::Random_(2) == 1) {
+                        unit->state = 4;
+                    } else {
+                        unit->state = 2;
+                        unit->anim_frame = 0;
+                    }
+                    seg = Action_Anim_(unit->side, unit->state, unit->type);
+                }
+
+                unit->action_timer = 0;
+                unit->sound_id = 0;
+            }
+
+            if (unit->target != nullptr) {
+                if (unit->target->type != -1) {
+                    unit->target->is_hit = 1;
+                    Draw_Unit_Beam_(unit);
+                }
+            }
+        }
+
+        if (unit->anim_frame < animate::Get_Animation_Frame_Count_(seg) - 1 && unit->state != 2) {
+            if ((abs(_g_ctr) % 2) == 0) {
+                unit->anim_frame++;
+            }
+
+            if (unit->target != nullptr) {
+                if (unit->action_timer == 5) {
+                    if (unit->target->type == 0 && unit->target->state == 1) {
+                        ERICNET::Mox_Play_Sound_(0x1E);
+                    } else {
+                        ERICNET::Mox_Play_Sound_(0x1C);
+                    }
+                }
+                if (unit->action_timer == 0) {
+                    Play_Unit_Beam_Sound_(unit);
+                }
+                if (unit->action_timer == 10) {
+                    sound::Fadeout_Sound_(unit->sound_id, 10);
+                }
+
+                unit->action_timer++;
+                if (unit->action_timer > 11) {
+                    unit->target = nullptr;
+                }
+            }
+        } else {
+            Pick_Next_Action_(unit);
+        }
+
+        if (unit->state != 0) {
+            animate::Set_Animation_Frame_(seg, unit->anim_frame);
+            animate::Draw_(unit->x, unit->y, seg);
+        }
+
+        if (unit->state == 4 && (unit->x < 0x136 || unit->x > 0x14a)) {
+            bool modify_x = false;
+
+            if (unit->type >= 1) {
+                if (unit->anim_frame % 2 == 0) {
+                    modify_x = true;
+                } else {
+                    if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] != 3) {
+                        modify_x = true;
+                    }
+                }
+            } else if (unit->type == 0) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                    if (unit->anim_frame % 2 == 0 && unit->anim_frame > 1) {
+                        modify_x = true;
+                    }
+                } else {
+                    modify_x = true;
+                }
+            } else {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] != 3) {
+                    modify_x = true;
+                }
+            }
+
+            if (modify_x) {
+                unit->x = unit->x - (unit->side * 2) + 1;
+            }
+        }
+
+        Do_Delta_Y_(unit);
+    }
+
+    void __cdecl Verify_Legal_Totals_() {
+        for (int16_t i = 0; i < 40; ++i) {
+            if ((int8_t)_g_units[0][i].state > 1 &&
+                _g_units[0][i].type < (int32_t)(uint8_t)_g_attack_ptr->current_troop_type_idx) {
+                _g_units[0][i].state = 1;
+                _g_units[0][i].anim_frame = 0;
+                _g_units[0][i].is_hit = 0;
+            }
+            if ((int8_t)_g_units[1][i].state > 1 &&
+                _g_units[1][i].type < (int32_t)(uint8_t)_g_defend_ptr->current_troop_type_idx) {
+                _g_units[1][i].state = 1;
+                _g_units[1][i].anim_frame = 0;
+                _g_units[1][i].is_hit = 0;
+            }
+        }
+    }
+
     void __cdecl Draw_Summary_() {
         bool attackers_defeated = true;
 
@@ -419,6 +602,131 @@ namespace COLGCBT {
         fonts::Print_Centered_(319, 10, buffer);
     }
 
+    void __cdecl Force_Firing_Pairs_() {
+        for (uint8_t side = 0; side < 2; ++side) {
+            s_ground_unit* target = Find_Unshot_Target_(side);
+            if (target != nullptr) {
+                bool opp_side = (side == 0);
+                s_ground_unit* shooter = Find_Lowest_Framed_Unit_(opp_side, 3, 1);
+
+                if (shooter == nullptr) {
+                    shooter = Find_Lowest_Framed_Unit_(opp_side, 2, 0);
+                    if (shooter == nullptr) {
+                        shooter = Find_Lowest_Framed_Unit_(opp_side, 4, 0);
+                    }
+                }
+
+                if (shooter == nullptr) {
+                    FLCQUEUE::Add_Flic_To_End_Of_Queue_(target->x, target->y);
+                } else {
+                    shooter->state = 3;
+                    shooter->anim_frame = 0;
+                    shooter->target = target;
+                    target->is_hit = 1;
+                }
+            }
+        }
+    }
+
+    void __cdecl Add_Initial_Unit_(uint8_t side) {
+        int16_t base_x[2] = { 0x32, 0x24e };
+
+        s_ground_unit* unit = Get_First_Unit_(side);
+        if (unit != nullptr) {
+            int8_t type = static_cast<int8_t>(Get_Next_Troop_Type_(side));
+            unit->type = type;
+
+            if (type != -1) {
+                unit->state = 2;
+                unit->x = static_cast<int16_t>(base_x[side] + random::Random_(0x32) - 0x14);
+
+                if (random::Random_(0x55) + 0x168 >= 0x1ae) {
+                    unit->y = 0x1ae;
+                } else {
+                    unit->y = static_cast<int16_t>(random::Random_(0x55) + 0x168);
+                }
+
+                unit->side = side;
+                unit->y_offset = static_cast<int16_t>(random::Random_(3)) - 2;
+                unit->anim_frame = 0;
+            } else {
+                unit->x = base_x[side];
+            }
+        }
+    }
+
+    void __cdecl Add_Unit_(uint8_t side) {
+        int16_t start_x[2] = { -10, 640 };
+
+        s_ground_unit* unit = Get_First_Unit_(side);
+        if (unit != nullptr) {
+            unit->type = static_cast<int8_t>(Get_Next_Troop_Type_(side));
+
+            if (unit->type != -1) {
+                unit->state = 2;
+                unit->x = start_x[side];
+
+                s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
+                int16_t height = animate::Get_Height_(anim);
+
+                if ((480 - height) > static_cast<int32_t>(random::Random_(85) + 360)) {
+                    unit->y = static_cast<int16_t>(random::Random_(85) + 360);
+                } else {
+                    anim = Action_Anim_(unit->side, unit->state, unit->type);
+                    height = animate::Get_Height_(anim);
+                    unit->y = 480 - height;
+                }
+
+                unit->side = static_cast<int8_t>(side);
+                unit->y_offset = static_cast<int16_t>(random::Random_(3)) - 2;
+                unit->anim_frame = 0;
+                unit->target = nullptr;
+            } else {
+                unit->x = start_x[side];
+            }
+        }
+    }
+
+    void __cdecl Print_Data_(char* str, int16_t value, int16_t* line_idx, s_invasion_side_info* side) {
+        char unused_fmt[28];
+        char text_buf[500];
+
+        // This string copy exists in the original assembly but is never used afterwards.
+        memcpy(unused_fmt, s_t_T0_124_500_550_600_620__00558468, 27);
+
+        int16_t x_pos;
+        if (_g_attack_ptr == side) {
+            x_pos = 1;
+        } else {
+            x_pos = 0x17A; /* 378 */
+        }
+
+        int16_t y_pos = (*line_idx * 11) + 0x32; /* 50 */
+
+        _sprintf(text_buf, ESTRINGS::E_Strings_(0x4B), s_0_0055110c, str, s_1_00551110, value);
+
+        FMTPARA::Print_Formatted_Paragraph_(x_pos + 9, y_pos, 0xF3 /* 243 */, text_buf, 0);
+
+        (*line_idx)++;
+    }
+
+    void __cdecl Reinforce_Units_(uint8_t side) {
+        int16_t slots_left = N_Slots_Left_(side);
+        bool done = (slots_left == 0);
+
+        if (slots_left > 10) {
+            slots_left = 10;
+        }
+
+        while (!done) {
+            Add_Unit_(side);
+            slots_left--;
+            if (slots_left == 0) {
+                done = true;
+            }
+        }
+    }
+
     void __cdecl Draw_Troops_() {
         Verify_Legal_Totals_();
 
@@ -429,6 +737,31 @@ namespace COLGCBT {
             Force_Firing_Pairs_();
             Reinforce_Units_(side);
             Resort_Units_(side);
+        }
+    }
+
+    void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* y_pos) {
+        char officer_name[52];
+
+        if (side_info->combat_modifiers.ground_combat_bonus != 0) {
+            Print_Data_(ESTRINGS::E_Strings_(0x1B5), side_info->combat_modifiers.ground_combat_bonus, y_pos, side_info);
+        }
+
+        if (side_info->combat_modifiers.low_g_penalty != 0) {
+            Print_Data_(ESTRINGS::E_Strings_(0x16C), side_info->combat_modifiers.low_g_penalty, y_pos, side_info);
+        }
+
+        if (side_info->combat_modifiers.subterranean_bonus != 0) {
+            Print_Data_(ESTRINGS::E_Strings_(0x1F1), static_cast<uint8_t>(side_info->combat_modifiers.subterranean_bonus), y_pos, side_info);
+        }
+
+        if (side_info->combat_modifiers.difficulty_bonus > 0 && capture::Check_Release_Version_() != 0) {
+            Print_Data_(ESTRINGS::E_Strings_(0x7B), side_info->combat_modifiers.difficulty_bonus, y_pos, side_info);
+        }
+
+        if (side_info->combat_modifiers.officer_idx > 0) {
+            OFFICER::Officer_Name_(officer_name, side_info->player_id, side_info->combat_modifiers.officer_idx);
+            Print_Data_(officer_name, side_info->combat_modifiers.officer_bonus, y_pos, side_info);
         }
     }
 
@@ -599,6 +932,573 @@ namespace COLGCBT {
         if (valid_troop_idx != _old_ctr) {
             COLONY::_full_draw = 1;
             _old_ctr = valid_troop_idx;
+        }
+    }
+
+    int16_t __cdecl N_Left_Active_To_Process_(s_ground_unit* start_unit) {
+        int16_t count = 0;
+        s_ground_unit* current_unit = start_unit;
+        s_ground_unit* end_unit = _g_units[start_unit->side + 1];
+
+        do {
+            if (current_unit->state != 0 && current_unit->state != 1 && current_unit->type == start_unit->type) {
+                count++;
+            }
+            current_unit++;
+        } while (current_unit < end_unit);
+
+        return count;
+    }
+
+    int16_t __cdecl N_Left_Of_Me_To_Process_(s_ground_unit* unit)
+    {
+        int16_t count = 0;
+        s_ground_unit* end_ptr = _g_units[unit->side + 1];
+
+        for (s_ground_unit* current = unit; current < end_ptr; ++current)
+        {
+            if (current->state == unit->state && current->type == unit->type)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    s_ground_unit* __cdecl Pick_Target_(uint8_t side) {
+        for (int16_t i = 0; i < 40; ++i) {
+            uint8_t state = _g_units[side][i].state;
+            if ((state == 5 || state == 1) && _g_units[side][i].is_hit == 0) {
+                return &_g_units[side][i];
+            }
+        }
+        return nullptr;
+    }
+
+    s_ground_unit* __cdecl Find_Unshot_Target_(uint8_t side) {
+        for (int16_t i = 0; i < 40; ++i) {
+            if (_g_units[side][i].state == 1 && _g_units[side][i].is_hit == 0) {
+                return &_g_units[side][i];
+            }
+        }
+        return nullptr;
+    }
+
+    s_ground_unit* __cdecl Find_Lowest_Framed_Unit_(uint8_t player_idx, int16_t state, uint8_t require_no_target) {
+        s_ground_unit* lowest_unit = nullptr;
+        int16_t lowest_frame = 100;
+
+        for (int16_t i = 0; i < 40; ++i) {
+            if (static_cast<int8_t>(_g_units[player_idx][i].state) == state) {
+                if (_g_units[player_idx][i].anim_frame <= lowest_frame) {
+                    if (require_no_target == 0 || _g_units[player_idx][i].target == nullptr) {
+                        lowest_frame = _g_units[player_idx][i].anim_frame;
+                        lowest_unit = &_g_units[player_idx][i];
+                    }
+                }
+            }
+        }
+
+        return lowest_unit;
+    }
+
+    void __cdecl Get_Firepoint_Offsets_(s_ground_unit *unit, int16_t *x_offset, int16_t *y_offset) {
+        s_animation_header *anim = Action_Anim_(unit->side, unit->state, unit->type);
+        int16_t width = animate::Get_Width_(anim);
+        animate::Get_Height_(anim);
+
+        if (unit->side == 0) {
+            if (unit->type == 0) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[24] == 3) {
+                    *x_offset = width - 9;
+                    *y_offset = 13;
+                } else {
+                    *x_offset = width - 10;
+                    *y_offset = 20;
+                }
+            } else if (unit->type >= 1 && unit->type <= 3) {
+                *x_offset = 16;
+                *y_offset = 19;
+            }
+        } else if (unit->side == 1) {
+            if (unit->type == 0) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[24] == 3) {
+                    *x_offset = 9;
+                    *y_offset = 13;
+                } else {
+                    *x_offset = 10;
+                    *y_offset = 20;
+                }
+            } else if (unit->type >= 1 && unit->type <= 3) {
+                *x_offset = 16;
+                *y_offset = 19;
+            }
+        }
+    }
+
+    void __cdecl Draw_Unit_Beam_(s_ground_unit *unit) {
+        int16_t fire_off_x;
+        int16_t fire_off_y;
+        Get_Firepoint_Offsets_(unit, &fire_off_x, &fire_off_y);
+
+        int16_t tgt_off_x;
+        int16_t tgt_off_y;
+        Get_Target_Offsets_(unit->target, &tgt_off_x, &tgt_off_y);
+
+        int16_t x1 = unit->x + fire_off_x;
+        int16_t y1 = unit->y + fire_off_y;
+        int16_t x2 = x1;
+        int16_t y2 = y1;
+
+        int16_t target_x = unit->target->x + tgt_off_x;
+        int16_t target_y = unit->target->y + tgt_off_y;
+
+        int32_t abs_dy = abs(y1 - target_y);
+        int32_t abs_dx = abs(x1 - target_x);
+
+        int16_t max_dist = (abs_dy > abs_dx) ? abs_dy : abs_dx;
+
+        int16_t beam_len = Get_CGCBT_Beam_Len_(unit->side);
+
+        int16_t act_dist = unit->action_timer * (max_dist / 5);
+
+        int16_t len1 = act_dist;
+        if (max_dist < act_dist) {
+            len1 = max_dist;
+        }
+
+        if (len1 < 0) {
+            len1 = 0;
+        }
+
+        BEAMS::Rob_Interpolate_Line_(&x1, &y1, target_x, target_y, len1);
+
+        int16_t len2 = beam_len + act_dist;
+        if (max_dist < len2) {
+            len2 = max_dist;
+        }
+
+        BEAMS::Rob_Interpolate_Line_(&x2, &y2, target_x, target_y, len2);
+
+        Draw_CGCBT_Beam_(x1, y1, x2, y2, unit->side);
+    }
+
+    void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit) {
+        // Potential bug: side_info and sound_id can be uninitialized if side is not 0 or 1
+        s_invasion_side_info* side_info;
+        int16_t sound_id;
+
+        if (unit->side == 0) {
+            side_info = _g_attack_ptr;
+        } else if (unit->side == 1) {
+            side_info = _g_defend_ptr;
+        }
+
+        switch (static_cast<uint8_t>(side_info->combat_modifiers.rifle_tech_app_id)) {
+            case 73:
+                sound_id = 9;
+                break;
+            case 101:
+                sound_id = 1;
+                break;
+            case 128:
+                sound_id = 19;
+                break;
+            case 138:
+                sound_id = 13;
+                break;
+            case 145:
+                sound_id = 12;
+                break;
+        }
+
+        unit->sound_id = ERICNET::Mox_Play_Sound_(sound_id);
+    }
+
+    void __cdecl Do_Delta_Y_(s_ground_unit* unit) {
+        s_animation_header* seg = Action_Anim_(unit->side, unit->state, unit->type);
+
+        // These function calls do not use their return values, but are kept to preserve possible side effects
+        animate::Get_Width_(seg);
+        animate::Get_Animation_Frame_Count_(seg);
+
+        int16_t local_18[11] = { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 };
+
+        if (unit->state == 4) {
+            if ((unit->type == 0 && MOX::_player[_g_defend_ptr->player_id].tech_applications[24] != 3 && unit->anim_frame % 3 == 2) ||
+                local_18[unit->anim_frame] == 1) {
+                unit->y += unit->y_offset;
+            }
+        }
+    }
+
+    void __cdecl Pick_Next_Action_(s_ground_unit* unit) {
+        unit->anim_frame = 0;
+
+        switch (unit->state) {
+            case 0:
+                if (unit->type != -1) {
+                    unit->type = -1;
+                }
+                break;
+
+            case 1:
+                sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
+                unit->state = 0;
+                COLONY::_full_draw = 1;
+                break;
+
+            case 2:
+                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
+                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                    unit->state = 3;
+                } else {
+                    unit->state = 4;
+                }
+                break;
+
+            case 3:
+                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
+                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                    uint32_t rnd = random::Random_(4);
+                    if (rnd == 1) {
+                        unit->state = 4;
+                    } else if (rnd == 2) {
+                        unit->state = 3;
+                        unit->x += static_cast<int16_t>(random::Random_(3) - 2);
+                    } else {
+                        unit->state = 4;
+                        if (rnd != 3) {
+                            unit->y_offset = static_cast<int16_t>(random::Random_(3) - 2);
+                        }
+                    }
+                } else {
+                    unit->state = 2;
+                }
+                break;
+
+            case 4: {
+                s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
+                animate::Get_Width_(anim);
+                
+                sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
+                unit->sound_handle = 0;
+
+                if (static_cast<uint8_t>(_g_attack_ptr->current_troop_type_idx) < 4 &&
+                    static_cast<uint8_t>(_g_defend_ptr->current_troop_type_idx) < 4) {
+                    if (random::Random_(2) == 1) {
+                        unit->state = 3;
+                        break;
+                    }
+                }
+
+                if (random::Random_(2) == 1) {
+                    unit->state = 2;
+                } else {
+                    unit->state = 4;
+                }
+                break;
+            }
+
+            case 5:
+                unit->state = 2;
+                break;
+
+            default:
+                break;
+        }
+
+        Do_Legal_Move_Check_(unit);
+
+        if (unit->state == 4 && unit->type == 0 && unit->sound_handle == 0) {
+            unit->sound_handle = ERICNET::Mox_Play_Sound_(31);
+        }
+    }
+
+    void __cdecl Get_Target_Offsets_(s_ground_unit* unit, int16_t* out_x, int16_t* out_y) {
+        s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
+        int16_t width = animate::Get_Width_(anim);
+        animate::Get_Height_(anim);
+
+        if (unit->side == 0) {
+            if (unit->type == 0) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                    *out_x = width - 15;
+                    *out_y = 14;
+                } else {
+                    *out_x = width - 22;
+                    *out_y = 26;
+                }
+            } else if (unit->type >= 1 && unit->type <= 3) {
+                *out_x = 14;
+                *out_y = 18;
+            }
+        } else if (unit->side == 1) {
+            if (unit->type == 0) {
+                if (MOX::_player[_g_defend_ptr->player_id].tech_applications[0x18] == 3) {
+                    *out_x = 15;
+                    *out_y = 14;
+                } else if (unit->state == 5) {
+                    *out_x = 14;
+                    *out_y = 23;
+                } else {
+                    *out_x = 22;
+                    *out_y = 26;
+                }
+            } else if (unit->type >= 1 && unit->type <= 3) {
+                *out_x = 10;
+                *out_y = 18;
+            }
+        }
+    }
+
+    int16_t __cdecl Get_CGCBT_Beam_Len_(uint8_t side_idx) {
+        s_invasion_side_info* side; // Potential bug: uninitialized if side_idx is not 0 or 1
+
+        if (side_idx == 0) {
+            side = _g_attack_ptr;
+        }
+        else if (side_idx == 1) {
+            side = _g_defend_ptr;
+        }
+
+        switch (static_cast<uint8_t>(side->combat_modifiers.rifle_tech_app_id)) {
+        case 73:
+            return 70;
+        case 101:
+            return 100;
+        case 128:
+            return 20;
+        case 138:
+            return 70;
+        case 145:
+            return 1;
+        default:
+            return 1;
+        }
+    }
+
+    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int8_t side) {
+        if (x1 == x2 && y1 == y2) {
+            return;
+        }
+
+        s_invasion_side_info* side_info = nullptr;
+        if (side == 0) {
+            side_info = _g_attack_ptr;
+        } else if (side == 1) {
+            side_info = _g_defend_ptr;
+        } else {
+            // Fallback for unexpected side value, behaves as reading uninitialized stack memory
+            uint32_t stack_garbage = 0;
+            side_info = reinterpret_cast<s_invasion_side_info*>(stack_garbage);
+        }
+
+        int16_t p5 = 0;
+        int16_t p6 = 0;
+        int16_t p7 = 0;
+        int16_t p8 = 0;
+        int16_t p9 = 0;
+        int16_t p10 = 0;
+        int16_t p11 = 0;
+        int16_t p12 = 0;
+        int16_t p13 = 0;
+        int16_t p14 = 0;
+
+        uint8_t rifle_id = static_cast<uint8_t>(side_info->combat_modifiers.rifle_tech_app_id);
+
+        switch (rifle_id) {
+            case 73:  /* Laser Rifle */
+                p6 = 11;
+                p7 = 40;
+                p5 = 183;
+                p11 = 0;
+                p10 = 189;
+                p8 = 4;
+                p9 = 186;
+                p13 = 0;
+                p14 = 0;
+                p12 = 0;
+                break;
+            case 101: /* Fusion Rifle */
+                p5 = 236;
+                p8 = 1;
+                p9 = 236;
+                p11 = 0;
+                p6 = 4;
+                p7 = 10;
+                p10 = 239;
+                p13 = 0;
+                p14 = 0;
+                p12 = 1;
+                break;
+            case 128: /* Phasor Rifle */
+                p8 = 2;
+                p5 = 236;
+                p6 = 4;
+                p9 = 236;
+                p14 = 1;
+                p7 = 40;
+                p10 = 239;
+                p11 = 0;
+                p13 = 1;
+                p12 = 1;
+                break;
+            case 138: /* Plasma Rifle */
+                p8 = 2;
+                p9 = 236;
+                p5 = 236;
+                p14 = 1;
+                p11 = 1;
+                p13 = 0;
+                p6 = 4;
+                p7 = 70;
+                p10 = 239;
+                p12 = 0;
+                break;
+            case 145: /* Disruptor Rifle */
+                p6 = 11;
+                p7 = 10;
+                p5 = 95;
+                p14 = 1;
+                p8 = 2;
+                p13 = 0;
+                p10 = 104;
+                p9 = 96;
+                p11 = 1;
+                p12 = 0;
+                break;
+            default:
+                p5 = p12;
+                p8 = p12;
+                p9 = p12;
+                p11 = p12;
+                p13 = p12;
+                p14 = p12;
+                break;
+        }
+
+        if (x1 == x2 || y1 == y2) {
+            return;
+        }
+
+        bolt::Bolt_Segment_(x1, y1, x2, y2, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
+    }
+
+    int16_t __cdecl Top_Line_Y_() {
+        int16_t y_coords[4];
+
+        y_coords[0] = 0x1CD;
+        y_coords[1] = 0x1AE;
+        y_coords[2] = 0x194;
+        y_coords[3] = 0x17D;
+
+        return y_coords[_top_line];
+    }
+
+    int16_t __cdecl Top_Line_X_(uint8_t index) {
+        int16_t coords[2];
+
+        coords[0] = 0x00F2;
+        coords[1] = 0x0187;
+
+        return coords[index];
+    }
+
+    int8_t __cdecl Move_Is_Legal_(s_ground_unit *unit) {
+        s_animation_header *anim = Action_Anim_(unit->side, unit->state, unit->type);
+        int16_t width = animate::Get_Width_(anim);
+        int16_t height = animate::Get_Height_(anim);
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(anim);
+
+        width += unit->x;
+        height += unit->y + ((unit->y_offset * frame_count) / 5);
+
+        if (unit->state == 4 && unit->type == 0) {
+            width += (unit->side * -80) + 40;
+        }
+
+        if (height < 480) {
+            if (Top_Line_Y_() < height) {
+                if (unit->state != 4) {
+                    return 1;
+                }
+                if (unit->side == 0) {
+                    if (Top_Line_X_(0) > width) {
+                        return 1;
+                    }
+                } else if (unit->side == 1) {
+                    if (Top_Line_X_(1) < width) {
+                        return 1;
+                    }
+                }
+            }
+
+            // Redundant check present in original assembly layout
+            if (height < 480) {
+                if (Top_Line_Y_() < height) {
+                    if (unit->state == 2) {
+                        return 0;
+                    }
+                    unit->state = 2;
+                    if (unit->sound_handle != 0) {
+                        sound::Fadeout_Sound_(unit->sound_handle, 10);
+                        unit->sound_handle = 0;
+                    }
+                    unit->y_offset = random::Random_(3) - 2;
+                    return 1;
+                }
+
+                if (unit->side == 0) {
+                    if (GEO::Points_On_Same_Side_Of_Line_(width, height, 0, 479, 10, 361, 225, 461) > 0) {
+                        return 1;
+                    }
+                } else {
+                    if (GEO::Points_On_Same_Side_Of_Line_(width, height, 630, 479, 406, 461, 629, 364) > 0) {
+                        return 1;
+                    }
+                }
+
+                unit->y_offset = 1;
+                return 1;
+            }
+        }
+
+        unit->y_offset = -1;
+        return 1;
+    }
+
+    void __cdecl Do_Legal_Move_Check_(s_ground_unit* unit) {
+        s_animation_header* anim = Action_Anim_(unit->side, unit->state, unit->type);
+        int16_t height = animate::Get_Height_(anim);
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(anim);
+
+        int16_t bottom = height + unit->y + (unit->y_offset * frame_count) / 5;
+
+        while (!Move_Is_Legal_(unit)) {
+            switch (random::Random_(4)) {
+                case 1:
+                    unit->y_offset = 0;
+                    break;
+                case 2:
+                    unit->y_offset = 1;
+                    break;
+                case 3:
+                    unit->y_offset = -1;
+                    break;
+                case 4:
+                    unit->state = 2;
+                    if (unit->sound_handle != 0) {
+                        sound::Fadeout_Sound_(static_cast<int16_t>(unit->sound_handle), 10); // TYPE MISMATCH: unit->sound_handle is int32_t
+                        unit->sound_handle = 0;
+                    }
+                    break;
+            }
+
+            if (bottom > 478) {
+                unit->y_offset = -1;
+            }
         }
     }
 

@@ -335,8 +335,8 @@ struct s_invasion_player_bonuses {
     int8_t low_g_penalty;
     int8_t subterranean_bonus;
     int8_t difficulty_bonus;
-    short additional_modifier;
-    int8_t field17_0x12;
+    short officer_bonus;
+    int8_t officer_idx;
 };
 
 struct s_invasion_side_info {
@@ -2071,11 +2071,11 @@ struct s_ground_unit {
     int8_t side;
     int8_t anim_frame;
     int8_t action_timer;
-    int16_t field8_0xa;
+    int16_t y_offset;
     int8_t is_hit;
     struct s_ground_unit *target;
     int32_t sound_id;
-    undefined4 field12_0x15;
+    int32_t sound_handle;
 };
 
 typedef struct s_help_box s_help_box, *Ps_help_box;

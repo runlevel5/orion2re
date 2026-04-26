@@ -297,4 +297,10 @@ namespace OFFICER {
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443ec0});
         fn(skills);
     }
+
+    inline void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx) {
+        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004426d0});
+        fn(buffer, player_id, officer_idx);
+    }
 }

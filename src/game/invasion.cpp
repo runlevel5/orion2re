@@ -74,15 +74,15 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
 
         if (leader->general_skills & 0x8) {
             int16_t level = Owned_Officer_Level_(leader_idx);
-            bonuses->additional_modifier = (level + 1) * 3;
+            bonuses->officer_bonus = (level + 1) * 3;
         } else if (leader->general_skills & 0x4) {
             int16_t level = Owned_Officer_Level_(leader_idx);
-            bonuses->additional_modifier = level * 2 + 2;
+            bonuses->officer_bonus = level * 2 + 2;
         }
 
-        if (bonuses->additional_modifier > 0) {
+        if (bonuses->officer_bonus > 0) {
             // Accessing the low byte of the officer short field
-            bonuses->field17_0x12 = static_cast<int8_t>(colony->officer);
+            bonuses->officer_idx = colony->officer;
         }
     }
 }
@@ -97,7 +97,7 @@ void __cdecl Compute_Ground_Combat_Info_(s_invasion_side_info* side, s_invasion_
                          own_mods->low_g_penalty +
                          (uint8_t)own_mods->subterranean_bonus +
                          own_mods->difficulty_bonus +
-                         own_mods->additional_modifier;
+                         own_mods->officer_bonus;
 
     for (int16_t i = 0; i < 4; ++i) {
         if (i == 3) {
@@ -161,10 +161,10 @@ void __cdecl Get_Boarding_Info_(int16_t attacker_player_id, int16_t attacker_uni
     side_b->unit_counts[1] = defender_unit_count;
 
     invasion::Compute_Player_Ground_Combat_Bonuses_(side_a->player_id, &side_a->combat_modifiers, 0);
-    side_a->combat_modifiers.additional_modifier = attacker_additional_modifier;
+    side_a->combat_modifiers.officer_bonus = attacker_additional_modifier;
 
     invasion::Compute_Player_Ground_Combat_Bonuses_(side_b->player_id, &side_b->combat_modifiers, 0);
-    side_b->combat_modifiers.additional_modifier = defender_additional_modifier;
+    side_b->combat_modifiers.officer_bonus = defender_additional_modifier;
 
     invasion::Compute_Ground_Combat_Info_(side_a, &side_a->combat_modifiers, &side_b->combat_modifiers);
     invasion::Compute_Ground_Combat_Info_(side_b, &side_b->combat_modifiers, &side_a->combat_modifiers);
@@ -409,7 +409,7 @@ void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int marines_count, 
     side_b->unit_counts[2] = Colony_N_Militia_(colony);
 
     Compute_Player_Ground_Combat_Bonuses_(side_a->player_id, &side_a->combat_modifiers, 0);
-    side_a->combat_modifiers.additional_modifier = 0;
+    side_a->combat_modifiers.officer_bonus = 0;
 
     Compute_Player_Ground_Combat_Bonuses_(side_b->player_id, &side_b->combat_modifiers, 1);
     Compute_Colony_Officer_Bonus_(colony, &side_b->combat_modifiers);
