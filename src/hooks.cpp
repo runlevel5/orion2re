@@ -3474,6 +3474,17 @@ namespace hooks {
         { 0x00412360, &ERICHELP::Set_Transport_Popup_Help_List_ },
         { 0x004123f0, &ERICHELP::Set_Tax_Rate_Popup_Help_List_ },
         { 0x00412350, &ERICHELP::Set_Building_Queue_Screen_Help_List_ },
+        { 0x00412330, &ERICHELP::Set_Colony_Summary_Screen_Help_List_ },
+        { 0x00412320, &ERICHELP::Set_Colony_Screen_Help_List_ },
+        { 0x00412380, &ERICHELP::Set_New_Game_Screen_Help_List_ },
+        { 0x00412370, &ERICHELP::Set_Occupation_Policy_Popup_Help_List_ },
+        { 0x00412400, &ERICHELP::Set_Dragon_New_Star_Popup_Help_List_ },
+        { 0x004123D0, &ERICHELP::Set_Player_Attacked_Popup_Help_List_ },
+        { 0x004123E0, &ERICHELP::Set_New_Colony_Confirmation_Box_Help_List_ },
+        { 0x00412420, &ERICHELP::Set_Planet_Selection_Popup_Help_List_ },
+        { 0x00412410, &ERICHELP::Set_New_System_Discovery_Popup_Help_List_ },
+        { 0x00412430, &ERICHELP::Set_Officer_Information_Popup_Help_List_ },
+        { 0x00412300, &ERICHELP::Eric_Set_Help_List_ },
     };
 
     void Install_Hooks()
