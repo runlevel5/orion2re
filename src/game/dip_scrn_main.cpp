@@ -1253,7 +1253,7 @@ namespace DIP_SCRN {
         _current_ambassador = (uint8_t)player_idx;
 
         ERIC::Set_Fade_Percent_(0);
-        Set_Fade_Speed_Perc(10);
+        ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
 
         fields::Set_Input_Delay_(1);
@@ -1326,7 +1326,7 @@ namespace DIP_SCRN {
         file_ani::Reset_File_Animation_Buffer_();
         RUSS::Release_All_Blocks_(MOX::_screen_seg);
         ERIC::Set_Fade_Percent_(0);
-        Set_Fade_Speed_Perc(10);
+        ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
     }
 
@@ -1346,7 +1346,7 @@ namespace DIP_SCRN {
         _current_ambassador = static_cast<uint8_t>(player_idx);
         _old_response_message = 0xFFFF;
         ERIC::Set_Fade_Percent_(0);
-        Set_Fade_Speed_Perc(10);
+        ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
         fields::Set_Input_Delay_(1);
         fields::Clear_Fields_();
@@ -1525,7 +1525,7 @@ namespace DIP_SCRN {
         file_ani::Reset_File_Animation_Buffer_();
         RUSS::Release_All_Blocks_(MOX::_screen_seg);
         ERIC::Set_Fade_Percent_(0);
-        Set_Fade_Speed_Perc(10);
+        ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
         JIM::_jim_current_stream = 0xFFFF;
         JIM::Play_Background_Music_();

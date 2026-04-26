@@ -6,7 +6,7 @@ namespace DIP_SCRN {
         fields::Deactivate_Auto_Function_();
         fields::Clear_Fields_();
         ERIC::Set_Fade_Percent_(0);
-        ERIC::Set_Fade_Speed_Perc(10);
+        ERIC::Set_Fade_Speed_Percent_(10);
         ERIC::Fast_Fade_Out_();
         DIP_SCRN::Diplomacy_Mouse_Init_(player_idx);
 

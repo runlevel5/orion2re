@@ -7,10 +7,7 @@ namespace capture {
 
     void Release_Version_();
 
-    inline void __cdecl Screen_Flic_Capture_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00534A60})();
-    }
+    void __cdecl Screen_Flic_Capture_();
 
     int16_t __cdecl Check_Release_Version_();
 }

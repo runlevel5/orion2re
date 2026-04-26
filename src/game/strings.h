@@ -18,6 +18,10 @@ namespace strings {
     inline const char* s_M_00557ed8 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED8});
     inline const char* s_fmt_plus_d_00557ed0 = reinterpret_cast<const char*>(std::uintptr_t{0x00557ED0});
     inline const char* s_ld_00558280 = reinterpret_cast<const char*>(std::uintptr_t{0x00558280}); // "%ld"
+    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); /* " 0" */
+    inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); /* " 1" */
+    inline const char* s__0055ac34 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC34}); /* "\t" */
+    inline const char* s_t_T0_5_124__0055ac38 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC38}); /* " t T0,5,124." */
 
     void Load_Strings();
 

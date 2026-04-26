@@ -827,12 +827,12 @@ namespace fonts {
         uint8_t* blob;
 
         if (_current_font_blob == nullptr) {
-            blob = farload::Farload_(filename, 0);
+            blob = (uint8_t*)farload::Farload_(filename, 0);
             _palette_block = allocate::Allocate_Space_(0x3164);
         } else {
             _free(_current_font_blob);
             _current_font_blob = nullptr;
-            blob = farload::Farload_(filename, 0);
+            blob = (uint8_t*)farload::Farload_(filename, 0);
         }
 
         _current_font_blob = blob;

@@ -3540,6 +3540,21 @@ namespace hooks {
         { 0x00531bc0, &angle::Sin_ },
         { 0x00531ca0, &angle::Cos_ },
         { 0x00531cc0, &angle::Rotate_Coordinates_ },
+        { 0x00532050, &sound::Is_Stream_Playing_ },
+        { 0x0051c6f0, &farload::Farload_ },
+        { 0x004BA650, &ERIC::Set_Fade_Speed_Percent_ },
+        { 0x00515690, &exitm::Exit_With_message2_ },
+        { 0x004BAF80, &ERIC::Cinematic_Autofunction_ },
+        { 0x004ba550, &ERIC::String_Builder2_ },
+        { 0x00534a60, &capture::Screen_Flic_Capture_ },
+        { 0x0050a5c0, &COLBLDG::Build_Ship_Design_Info_Formatted_Paragraph_ },
+        { 0x0050ceb0, &COLBLDG::Add_Refited_Ship_To_Queue_ },
+        { 0x0050c570, &COLBLDG::Something_Behind_Settting_ },
+        { 0x0050CE60, &COLBLDG::Squish_Out_Queue_Slot_ },
+        { 0x0050BFF0, &COLBLDG::Do_Draw_Build_Queue_ },
+        { 0x0050B4D0, &COLBLDG::Do_Exit_Screen_Cleanup_ },
+        { 0x0050b1c0, &COLBLDG::First_Prod_Queue_Slot_ },
+        { 0x0050CC50, &COLBLDG::Delete_From_Queue_ },
     };
 
     void Install_Hooks()

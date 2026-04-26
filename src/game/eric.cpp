@@ -21,6 +21,10 @@ namespace ERIC {
         }
     }
 
+    void __cdecl Set_Fade_Speed_Percent_(int32_t percentage) {
+        _fade_speed_in_percent = static_cast<uint8_t>(percentage);
+    }
+
     int16_t __cdecl Get_Sint_Index_From_List_(int16_t value, const int16_t* list, uint16_t count) {
         if (count == 0) {
             return -1;
@@ -66,7 +70,7 @@ namespace ERIC {
                     palstore::Darken_Palette_(current_fade);
                     _fade_percent = static_cast<uint8_t>(current_fade);
                     RUSS::Mox_Update_();
-                    current_fade += fade_step;
+                    current_fade += _fade_speed_in_percent;
                 } while (current_fade < 101);
             }
 
@@ -369,6 +373,53 @@ namespace ERIC {
         }
 
         return chosen_colony;
+    }
+
+    void __cdecl Cinematic_Autofunction_() {
+        video::Set_Page_Off_();
+
+        s_animation_header* anim = (s_animation_header*)farload::Far_Reload_Next_(
+            COLONY::_MAINPUPS_LBX, 0x53, MOX::_screen_seg);
+        int16_t width = animate::Get_Width_(anim);
+        int16_t x = ((640 - width) / 2) + 3;
+
+        anim = (s_animation_header*)farload::Far_Reload_Next_(
+            COLONY::_MAINPUPS_LBX, 0x53, MOX::_screen_seg);
+        int16_t height = animate::Get_Height_(anim);
+        int16_t y = ((480 - height) / 2) + 1;
+
+        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+        MOX::_dont_draw_main_screen_to_back = 1;
+
+        MAINSCR::Draw_Mini_Main_Screen_();
+
+        anim = (s_animation_header*)farload::Far_Reload_Next_(
+            COLONY::_MAINPUPS_LBX, 0x53, MOX::_screen_seg);
+        animate::Draw_(x, y, anim);
+
+        palette::Clear_Palette_Changes_(0, 255);
+    }
+
+    void __cdecl String_Builder2_(char* dest, int16_t mode, const char* format, ...) {
+        char local_buf[1000];
+        va_list args;
+
+        if (mode >= 0) {
+            va_start(args, format);
+            uint32_t len = vsprintf(local_buf, format, args);
+            va_end(args);
+
+            if (len > 1000) {
+                exitm::Exit_With_Message(ESTRINGS::E_Strings_(408 /* ESTR_PFMT__STRING_BUILDER */));
+                return;
+            }
+
+            if (mode == 0) {
+                strcpy(dest, local_buf);
+            } else {
+                _sprintf(dest, ESTRINGS::E_Strings_(71), dest, 13, local_buf);
+            }
+        }
     }
 
     int8_t __cdecl Player_Has_Leader_With_General_Skill_At_Star_(short player_idx, short skill_idx, short star_idx) {

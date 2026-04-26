@@ -7,7 +7,7 @@ namespace TECHDATA {
     // Correct addresses for various TECHDATA structures. If address does not match, then it points inside of structure.
     inline s_techdata_planetary_shield* _planetary_shields =
         reinterpret_cast<s_techdata_planetary_shield*>(std::uintptr_t{ 0x0054F048 });
-    inline s_tech_armor_data* _armor = reinterpret_cast<s_tech_armor_data*>(std::uintptr_t{ 0x00554d90 });
+    inline s_tech_armor_data (&_armor)[7] = *reinterpret_cast<s_tech_armor_data (*)[7]>(std::uintptr_t{0x00554D90});
     inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
     inline s_tech_hull_data (&_hull_data)[9] =
         *reinterpret_cast<s_tech_hull_data(*)[9]>(std::uintptr_t{0x00555798});
@@ -16,9 +16,9 @@ namespace TECHDATA {
         *reinterpret_cast<s_tech_app_data(*)[212]>(std::uintptr_t{0x005537C8});
     inline s_tech_field_data (&_technology_fields)[83] =
         *reinterpret_cast<s_tech_field_data (*)[83]>(std::uintptr_t{ 0x00553050 });
-    inline s_tech_drive_data* _drives = reinterpret_cast<s_tech_drive_data*>(std::uintptr_t{ 0x005555e0 });
-    inline s_tech_shield_data* _shields = reinterpret_cast<s_tech_shield_data*>(std::uintptr_t{ 0x00554e00 });
-    inline s_tech_computer_data* _computers = reinterpret_cast<s_tech_computer_data*>(std::uintptr_t{ 0x00555558 });
+    inline s_tech_drive_data (&_drives)[7] = *reinterpret_cast<s_tech_drive_data (*)[7]>(std::uintptr_t{0x005555E0});
+    inline s_tech_shield_data (&_shields)[6] = *reinterpret_cast<s_tech_shield_data (*)[6]>(std::uintptr_t{0x00554E00});
+    inline s_tech_computer_data (&_computers)[6] = *reinterpret_cast<s_tech_computer_data (*)[6]>(std::uintptr_t{0x00555558});
     inline s_tech_specials_data (&_specials)[40] =
         *reinterpret_cast<s_tech_specials_data(*)[40]>(std::uintptr_t{0x00554638});
     inline s_tech_weapon_data (&_weapons)[46] =

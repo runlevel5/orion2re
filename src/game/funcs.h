@@ -394,12 +394,6 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
     return fn(value, str, radix);
 }
 
-inline void __cdecl Set_Fade_Speed_Perc(int32_t speed) {
-    using Fn = void(__cdecl*)(int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA650});
-    fn(speed);
-}
-
 inline void __cdecl Reload_Language_Strings_() {
     using Fn = void(__cdecl*)();
     reinterpret_cast<Fn>(std::uintptr_t{0x004f2470})();

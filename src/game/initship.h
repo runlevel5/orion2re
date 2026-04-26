@@ -99,6 +99,12 @@ namespace INITSHIP {
 
     void __cdecl Load_Colony_Ship_Design_(int16_t player_idx, s_ship_design* design);
 
+    inline void __cdecl Load_Outpost_Ship_Design_(int16_t owner, s_ship_design* design_ptr) {
+        using Fn = void(__cdecl*)(int16_t, s_ship_design*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481020});
+        fn(owner, design_ptr);
+    }
+
     inline char* s_Colony_Ship_Localized = reinterpret_cast<char*>(std::uintptr_t{0x00558E28});
 
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design);

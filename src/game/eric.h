@@ -6,7 +6,7 @@ struct s_animation_header;
 namespace ERIC {
     inline uint8_t& _fade_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B40});
 
-    inline uint8_t& fade_step = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B44});
+    inline uint8_t& _fade_speed_in_percent = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B44});
 
     inline uint8_t& _hacky_need_to_fade_to_colony_palette_flag =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558B48});
@@ -31,11 +31,7 @@ namespace ERIC {
 
     bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_();
 
-    inline void __cdecl Set_Fade_Speed_Perc(int32_t percentage) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ba650});
-        fn(percentage);
-    }
+    void __cdecl Set_Fade_Speed_Percent_(int32_t percentage);
 
     void __cdecl Set_Fade_Percent_(int16_t percent);
 
@@ -47,11 +43,7 @@ namespace ERIC {
 
     void __cdecl Draw_Centered_(int16_t x, int16_t y, s_animation_header* anim);
 
-    template <typename... Args>
-    inline void __cdecl String_Builder2_(char* buffer, int index, char* format, Args... args) {
-        using Fn = void(__cdecl*)(char*, int, char*, ...);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004ba550})(buffer, index, format, args...);
-    }
+    void __cdecl String_Builder2_(char* dest, int16_t mode, const char* format, ...);
 
     inline char* const s_2_00551108 = reinterpret_cast<char*>(std::uintptr_t{0x00551108});
 
@@ -67,11 +59,7 @@ namespace ERIC {
 
     void __cdecl Play_Take_Orion_Flic_();
 
-    inline void __cdecl Cinematic_Autofunction_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BAF80});
-        fn();
-    }
+    void __cdecl Cinematic_Autofunction_();
 
     void __cdecl Do_Cinematic_Popup_Setup_();
 

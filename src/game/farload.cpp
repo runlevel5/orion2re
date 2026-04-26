@@ -92,6 +92,10 @@ void* __cdecl Far_Reload_Next_(const char* filename, int entry, void* buffer) {
     return Farload_Library_(filename, entry, buffer, 2);
 }
 
+void* __cdecl Farload_(char* file_name, int param_2) {
+    return Farload_Library_(file_name, param_2, nullptr, 0);
+}
+
     void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size) {
         char full_path[64];
 

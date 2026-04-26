@@ -1445,4 +1445,8 @@ namespace sound {
         _stream_data.write_cursor = 0;
         _stream_data.status = 0;
     }
+
+    uint8_t __cdecl Is_Stream_Playing_() {
+        return _soundFxActive;
+    }
 }
