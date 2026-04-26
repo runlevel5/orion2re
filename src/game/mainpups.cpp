@@ -2606,7 +2606,7 @@ namespace MAINPUPS {
                 
                 animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, unit_anim);
                 
-                char* troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->defender_player_id, unit_idx);
+                char* troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->defender_player_id, unit_idx, race);
                 
                 if (MOX::_settings.language == 4) {
                     _sprintf(text_buffer, s_str_fmt_00556d98, troop_name, _g_data_ptr->defender_unit_counts[unit_idx]);
@@ -2627,7 +2627,7 @@ namespace MAINPUPS {
             int16_t anim_w = animate::Get_Width_(_anims[3]);
             animate::Remap_Draw_(_g_x + anim_w - 40, _g_y + 50, att_anim);
             
-            char* att_troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->attacker_player_id, 1);
+            char* att_troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->attacker_player_id, 1, attacker_race);
             _sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->attacker_unit_counts[1], att_troop_name);
             
             anim_w = animate::Get_Width_(_anims[3]);

@@ -59,6 +59,7 @@
     <ClCompile Include="src\game\colcalc.cpp" />
     <ClCompile Include="src\game\colcalc_main.cpp" />
     <ClCompile Include="src\game\coldraw.cpp" />
+    <ClCompile Include="src\game\colgcbt.cpp" />
     <ClCompile Include="src\game\colland.cpp" />
     <ClCompile Include="src\game\colmove.cpp" />
     <ClCompile Include="src\game\colonize.cpp" />

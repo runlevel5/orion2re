@@ -99,6 +99,7 @@ namespace COLONY {
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E54});
 
     inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
+    inline const char* _COLGCBT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CF8}); // "COLGCBT.LBX"
     inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
     inline const char* _COLPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C98}); // "COLPUPS.LBX"
 
@@ -204,10 +205,10 @@ namespace COLONY {
         return fn(player_id, unit_idx, race);
     }
 
-    inline char* __cdecl Player_Troop_Name_(int16_t player_id, int16_t unit_idx) {
-        using Fn = char*(__cdecl*)(int16_t, int16_t);
+    inline char* __cdecl Player_Troop_Name_(int16_t player_id, int16_t unit_idx, int16_t race) {
+        using Fn = char*(__cdecl*)(int16_t, int16_t, int16_t);
         auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC650});
-        return fn(player_id, unit_idx);
+        return fn(player_id, unit_idx, race);
     }
 
     void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3);

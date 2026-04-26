@@ -365,6 +365,7 @@ inline const char* const s__00556a50 = reinterpret_cast<const char*>(std::uintpt
 inline char* s___0055632c = reinterpret_cast<char*>(std::uintptr_t{0x0055632C}); // "."
 inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x00556330}); // "patch13.lbx"
 inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
+inline const char* s_percent_s_percent_d_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
 inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::uintptr_t{0x00556310});
 
 inline auto _sprintf =

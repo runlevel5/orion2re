@@ -84,6 +84,15 @@ namespace COLBLDG {
         return match_count;
     }
 
+    int16_t __cdecl Get_Prod_Queue_Len_() {
+        for (int16_t i = 0; i < 7; ++i) {
+            if (_current_item[i] == -1) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     int __cdecl qsort_building_by_name_(const void* a, const void* b) {
         const int16_t* bld1 = static_cast<const int16_t*>(a);
         const int16_t* bld2 = static_cast<const int16_t*>(b);
@@ -1212,7 +1221,7 @@ namespace COLBLDG {
         for (int i = 0; i < 8; i++) {
             if (ship->d.ship_weapon[i].type != 0) {
                 char temp_weapon_str[500];
-                Build_Weapon_String_(&ship->d.ship_weapon[i].type, temp_weapon_str, '\0', ship->d.ship_weapon[i].count);
+                Build_Weapon_String_(reinterpret_cast<uint8_t*>(&ship->d.ship_weapon[i].type), temp_weapon_str, '\0', ship->d.ship_weapon[i].count);
 
                 if (fonts::Get_String_Width_(temp_weapon_str) <= 110) {
                     int str_id = ((weapons_added % 2) == 0) ? 87 : 88;
@@ -1273,6 +1282,20 @@ namespace COLBLDG {
                 buffer += _sprintf(buffer, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
             }
         }
+    }
+
+    int16_t __cdecl Colbldg_Create_Ship_(int16_t param_1) {
+        int16_t ship_idx = Create_Ship_(
+            MOX::_colony[COLONY::_colony_handle].owner,
+            param_1,
+            static_cast<int16_t>(COLONY::_colony_handle)
+        );
+
+        if (ship_idx != -1) {
+            MOX::_ship[ship_idx].status = 6;
+        }
+
+        return ship_idx;
     }
 
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx) {
@@ -2075,6 +2098,133 @@ namespace COLBLDG {
         }
 
         Squish_Out_Queue_Slot_(slot_idx);
+    }
+
+    /**
+     * @address 0050d070
+     */
+    void __cdecl Defragment_Queue_() {
+        for (int16_t pass = 2; pass != 0; --pass) {
+            for (int16_t slot = 0; slot < 7; ++slot) {
+                if (_current_item[slot] == -1) {
+                    Squish_Out_Queue_Slot_(slot);
+                }
+            }
+        }
+    }
+
+    void __cdecl Insert_Before_Queue_Slot_(int16_t param_1, int16_t param_2) {
+        int16_t item1 = _current_item[param_1];
+        int16_t item2 = _current_item[param_1 + 1];
+
+        if (_current_item[param_2] == -10) {
+            param_2--;
+        }
+
+        if (item1 == -10) {
+            param_1--;
+            item1 = _current_item[param_1];
+            item2 = _current_item[param_1 + 1];
+        }
+
+        Squish_Out_Queue_Slot_(param_1);
+
+        if (param_2 <= 5) {
+            for (int16_t i = 5; i >= param_2; i--) {
+                _current_item[i + 1] = _current_item[i];
+            }
+        }
+
+        _current_item[param_2] = item1;
+
+        if (item2 == -10) {
+            int16_t offset = (param_1 >= param_2) ? 1 : 0;
+            param_1 += offset;
+            Squish_Out_Queue_Slot_(param_1);
+
+            int16_t target = param_2 + offset;
+            if (target <= 5) {
+                for (int16_t i = 5; i >= target; i--) {
+                    _current_item[i + 1] = _current_item[i];
+                }
+            }
+
+            _current_item[target] = item2;
+        }
+
+        if (_field_mode != 2) {
+            _active_prod[0] = -1;
+        }
+    }
+
+    void __cdecl Remove_Ships_(int32_t flag) {
+        for (int16_t i = 0; i < 7; ++i) {
+            int16_t prod;
+            if (flag == 0) {
+                prod = _current_item[i];
+                if (prod <= -100) {
+                    if (First_Prod_Colony_Queue_Slot_(static_cast<int16_t>(COLONY::_colony_handle), prod) == -1) {
+                        int16_t ship_idx = -100 - prod;
+                        int16_t officer_idx = MOX::_ship[ship_idx].officer_index;
+                        if (officer_idx != -1) {
+                            OFFICER::Move_Officer_To_Pool_(officer_idx);
+                            MOX::_ship[ship_idx].officer_index = -1;
+                        }
+                        Delete_Ship_(ship_idx);
+                    }
+                }
+            } else {
+                prod = MOX::_colony[COLONY::_colony_handle].producing[i];
+                if (prod <= -100) {
+                    if (First_Prod_Queue_Slot_(prod) == -1) {
+                        int16_t ship_idx = -100 - prod;
+                        int16_t officer_idx = MOX::_ship[ship_idx].officer_index;
+                        if (officer_idx != -1) {
+                            OFFICER::Move_Officer_To_Pool_(officer_idx);
+                            MOX::_ship[ship_idx].officer_index = -1;
+                        }
+                        Delete_Ship_(ship_idx);
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Build_Weapon_String_(uint8_t* weapon_inst, char* dest, uint8_t param_3, uint8_t count) {
+        char buf1[500];
+        char buf2[500];
+        char buf3[500];
+
+        int16_t weapon_id = *reinterpret_cast<int16_t*>(weapon_inst);
+
+        char* name;
+        if (count <= 1) {
+            name = TECHDATA::_weapons[weapon_id].name;
+        } else {
+            name = TECHDATA::_weapons[weapon_id].name_plural;
+        }
+
+        strcpy(buf2, name);
+        strcpy(buf1, ESTRINGS::E_Strings_(0xC));
+        strcpy(buf3, ESTRINGS::E_Strings_(0xC));
+
+        uint8_t* mods_ptr = weapon_inst + 5;
+        for (int16_t bit = 0; bit < 15; bit++) {
+            if (struct_::Test_Bit_Field_(mods_ptr, bit)) {
+                if (bit == 1 || bit == 2) {
+                    strcat(buf1, TECHDATA::_weapon_modifications[bit].name_plural);
+                    strcat(buf1, s_space_005510f0);
+                } else {
+                    strcat(buf3, TECHDATA::_weapon_modifications[bit].name_plural);
+                }
+            }
+        }
+
+        if (param_3 != 0) {
+            _sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, buf3);
+        } else {
+            _sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, ESTRINGS::E_Strings_(0xC));
+        }
     }
 
 } // namespace COLBLDG

@@ -26,11 +26,7 @@ namespace COLBLDG {
 
     int16_t __cdecl N_Prods_In_Queue_(int16_t product_id);
 
-    inline int16_t __cdecl Get_Prod_Queue_Len_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050cc20});
-        return fn();
-    }
+    int16_t __cdecl Get_Prod_Queue_Len_();
 
     bool __cdecl Has_Prod_In_Queue_(int16_t building_id);
 
@@ -46,11 +42,7 @@ namespace COLBLDG {
 
     void __cdecl Build_Queue_Popup_();
 
-    inline int16_t __cdecl Colbldg_Create_Ship_(int16_t design_slot) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050cbd0});
-        return fn(design_slot);
-    }
+    int16_t __cdecl Colbldg_Create_Ship_(int16_t design_slot);
 
     inline uint8_t& _return_to_build_popup_from_custom_design = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AB10});
     inline uint8_t& _field_mode = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AB18});
@@ -113,11 +105,7 @@ namespace COLBLDG {
 
     void __cdecl Build_Ship_Design_Info_Formatted_Paragraph_(s_ship_data* ship, char* buffer, char show_crew);
 
-    inline void __cdecl Build_Weapon_String_(short* weapon_type, char* buffer, char param_3, char count) {
-        using Fn = void(__cdecl*)(short*, char*, char, char);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050a3b0});
-        fn(weapon_type, buffer, param_3, count);
-    }
+    void __cdecl Build_Weapon_String_(uint8_t* weapon_inst, char* dest, uint8_t param_3, uint8_t count);
 
     int16_t __cdecl First_Prod_Colony_Queue_Slot_(int16_t colony_idx, int16_t product_id);
 
@@ -161,24 +149,12 @@ namespace COLBLDG {
     void __cdecl Squish_Out_Queue_Slot_(int16_t slot_idx);
     void __cdecl Do_Draw_Build_Queue_();
     void __cdecl Do_Exit_Screen_Cleanup_();
-    inline void __cdecl Remove_Ships_(int32_t flag) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050b3e0});
-        fn(flag);
-    }
+    void __cdecl Remove_Ships_(int32_t flag);
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx);
     void __cdecl Delete_From_Queue_(int16_t slot_idx);
     int8_t __cdecl Add_To_Queue_(int16_t prod_idx);
-    inline void __cdecl Insert_Before_Queue_Slot_(int32_t slot1, int32_t slot2) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050d070});
-        fn(slot1, slot2);
-    }
-    inline void __cdecl Defragment_Queue_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0050ce20});
-        fn();
-    }
+    void __cdecl Insert_Before_Queue_Slot_(int16_t param_1, int16_t param_2);
+    void __cdecl Defragment_Queue_();
 
     void __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2);
 

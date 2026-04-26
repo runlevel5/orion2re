@@ -2019,7 +2019,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
                             int combat_seed = random::Get_Random_Seed_();
                             ERIC::Force_Fade_To_Colony_Palette_(1);
-                            COLGCBT::Colony_Combat_Screen_((int)&results->info, (int)&results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
+                            COLGCBT::Colony_Combat_Screen_(&results->info.attacker_invasion, &results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
                             ERIC::Force_Fade_To_Colony_Palette_(0);
                             random::Set_Random_Seed_(combat_seed);
 
@@ -2176,7 +2176,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                         MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id)) {
                         int invade_seed = random::Get_Random_Seed_();
                         ERIC::Force_Fade_To_Colony_Palette_(1);
-                        COLGCBT::Colony_Combat_Screen_((int)&results->info, (int)&results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
+                        COLGCBT::Colony_Combat_Screen_(&results->info.attacker_invasion, &results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
                         ERIC::Force_Fade_To_Colony_Palette_(0);
                         random::Set_Random_Seed_(invade_seed);
                     }

@@ -2060,6 +2060,24 @@ struct s_good_star {
     uint16_t star_count;
 };
 
+typedef struct s_ground_unit s_ground_unit, *Ps_ground_unit;
+
+struct s_ground_unit {
+    int16_t x;
+    int16_t y;
+    undefined1 field2_0x4;
+    uint8_t state;
+    int8_t type;
+    int8_t side;
+    int8_t anim_frame;
+    int8_t action_timer;
+    int16_t field8_0xa;
+    int8_t is_hit;
+    struct s_ground_unit *target;
+    int32_t sound_id;
+    undefined4 field12_0x15;
+};
+
 typedef struct s_help_box s_help_box, *Ps_help_box;
 
 struct s_help_box {
