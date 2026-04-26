@@ -3494,6 +3494,12 @@ namespace hooks {
         { 0x0052EBC0, &allocate::Get_Max_Block_Space_ },
         { 0x0052eb10, &allocate::Mark_Block_ },
         { 0x0052eb20, &allocate::Release_Block_ },
+        { 0x004b5640, &FAKEBUTS::Evaluate_Click_Thru_Fields_ },
+        { 0x004b55b0, &FAKEBUTS::Clear_Click_Thru_Fields_ },
+        { 0x004b5410, &FAKEBUTS::Draw_Click_Thru_Fields_ },
+        { 0x004b55d0, &FAKEBUTS::Add_Click_Thru_Field_ },
+        { 0x004b5510, &FAKEBUTS::Add_Click_Thru_Field_To_List_ },
+        { 0x004b5350, &FAKEBUTS::Draw_Fake_Buttons_ },
     };
 
     void Install_Hooks()

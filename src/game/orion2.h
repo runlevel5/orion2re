@@ -978,23 +978,23 @@ struct s_class_group {
 
 typedef struct s_click_through_field s_click_through_field, *Ps_click_through_field;
 
-
-/* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
-
 struct s_click_through_field {
-    short f0;
-    short f2;
-    short f4;
-    short f6;
-    short f8;
-    short fa;
-    int fc;
-    short f10;
-    int f12;
-    byte f16;
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t field_id1;
+    int16_t field_id2;
+    char **strings;
+    int16_t state_count;
+    int16_t *value;
+    uint8_t color;
 };
 
 typedef struct s_colony s_colony, *Ps_colony;
+
+
+/* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
 
 struct s_colony {
     char owner;
@@ -1319,16 +1319,6 @@ struct s_current_design {
     short date_of_design;
 };
 
-typedef struct s_dipscrn_help_item s_dipscrn_help_item, *Ps_dipscrn_help_item;
-
-struct s_dipscrn_help_item {
-    int16_t help_id;
-    int16_t x1;
-    int16_t y1;
-    int16_t x2;
-    int16_t y2;
-};
-
 typedef struct s_dipscrn_net_message s_dipscrn_net_message, *Ps_dipscrn_net_message;
 
 struct s_dipscrn_net_message {
@@ -1360,6 +1350,15 @@ struct s_event_data {
     short target_id;
     short amount;
     short max_amount;
+};
+
+typedef struct s_fake_button s_fake_button, *Ps_fake_button;
+
+struct s_fake_button {
+    int16_t x;
+    int16_t y;
+    int16_t field_id;
+    struct s_animation_header *pic;
 };
 
 typedef struct s_field s_field, *Ps_field;
