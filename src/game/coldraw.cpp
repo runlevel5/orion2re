@@ -429,4 +429,210 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
     return -1;
 }
 
+void __cdecl Draw_Simplest_Path_(int16_t prev_y, int16_t prev_x, int16_t local_y, int16_t local_x, uint8_t* p1, uint8_t* p2) {
+}
+
+void __cdecl Road_Back_To_Front_(int16_t index, int16_t* out_val1, int16_t* out_val2) {
+    uint8_t values[98] = {
+        6, 6, 5, 6, 6, 5, 4, 6, 5, 5, 6, 4, 3, 6, 4, 3,
+        5, 4, 6, 3, 2, 6, 3, 5, 4, 4, 5, 3, 6, 2, 1, 6,
+        2, 5, 3, 4, 4, 3, 5, 2, 6, 1, 0, 6, 1, 5, 2, 4,
+        3, 3, 4, 2, 5, 1, 6, 0, 0, 5, 1, 4, 2, 3, 3, 2,
+        4, 1, 5, 0, 0, 4, 1, 3, 2, 2, 3, 1, 4, 0, 0, 3,
+        1, 2, 2, 1, 3, 0, 0, 2, 1, 1, 2, 0, 0, 1, 1, 0,
+        0, 0
+    };
+
+    *out_val1 = values[index * 2];
+    *out_val2 = values[index * 2 + 1];
+}
+
+void __cdecl Draw_Road_List_() {
+    int16_t y;
+    int16_t x;
+    uint8_t draw_order[4] = { 3, 2, 0, 1 };
+
+    for (int16_t i = 0; i < 49; ++i) {
+        Road_Back_To_Front_(i, &y, &x);
+
+        for (uint8_t j = 0; j < 4; ++j) {
+            uint8_t dir = draw_order[j];
+
+            if (_road_list[y][x].connections[dir] != 0) {
+                s_animation_header* anim = reinterpret_cast<s_animation_header*>(::Buffer_Reload_(
+                    COLONY::_COLROADS_LBX,
+                    _road_list[y][x].anims[dir],
+                    MOX::_global_cache_seg
+                ));
+
+                animate::Draw_(0, 0, anim);
+            }
+        }
+    }
+}
+
+void __cdecl Load_Road_List_Anims_() {
+    memset(_road_list, 0, sizeof(_road_list));
+
+    int16_t anim_id = 0;
+    for (uint8_t c = 0; c < 4; c++) {
+        for (int16_t i = 0; i < 7; i++) {
+            for (int16_t j = 0; j < 7; j++) {
+                if ((i == 6 && c != 0) || (j == 6 && c != 1)) {
+                    _road_list[i][j].anims[c] = -1;
+                    _road_list[i][j].connections[c] = 0;
+                } else {
+                    _road_list[i][j].anims[c] = anim_id++;
+                    _road_list[i][j].connections[c] = 0;
+                }
+            }
+        }
+    }
+}
+
+void __cdecl Link_Buildings_() {
+    int16_t prev_y = -1;
+    int16_t prev_x = -1;
+
+    for (int16_t i = 35; i >= 0; --i) {
+        int16_t local_y;
+        int16_t local_x;
+
+        COLONY::Bldg_Back_To_Front_(i, (uint16_t*)&local_y, (uint16_t*)&local_x);
+
+        if (COLONY::_colony_bldgs[local_y].buildings[local_x] != 0) {
+            if (prev_y == -1) {
+                prev_y = local_y;
+                prev_x = local_x;
+            } else {
+                Draw_Simplest_Path_(prev_y, prev_x, local_y, local_x, &_DAT_5a7760, &_DAT_5a778a);
+            }
+        }
+    }
+}
+
+void __cdecl Build_Road_List_Based_On_Bldg_List_() {
+    Link_Buildings_();
+
+    for (int16_t x = 0; x < 6; ++x) {
+        for (int16_t y = 0; y < 6; ++y) {
+            if (COLONY::_colony_bldgs[x].buildings[y] != 0) {
+                if (random::Random_(2) == 1) {
+                    _road_list[x][y].connections[0] = 1;
+                } else {
+                    _road_list[x][y].connections[1] = 1;
+                }
+
+                if (random::Random_(2) != 1) {
+                    _road_list[x + 1][y].connections[0] = 1;
+                }
+
+                if (random::Random_(2) != 1) {
+                    _road_list[x][y + 1].connections[1] = 1;
+                }
+
+                _road_list[x][y + 1].connections[2] = 0;
+                _road_list[x][y + 1].connections[3] = 0;
+            } else {
+                if (_road_list[x][y + 1].connections[2] != 0 &&
+                    _road_list[x][y + 1].connections[3] != 0) {
+                    
+                    if (random::Random_(2) == 1) {
+                        _road_list[x][y + 1].connections[3] = 0;
+                    } else {
+                        _road_list[x][y + 1].connections[2] = 0;
+                    }
+                }
+
+                if (N_Roads_Around_CR_(x, y) == 4) {
+                    if (_road_list[x][y].connections[2] == 1 ||
+                        _road_list[x][y].connections[3] == 1) {
+                        
+                        int16_t rand_x = x;
+                        int16_t rand_y = y;
+                        int16_t rand_dir = 0;
+                        
+                        if (Do_Pick_Random_Road_At_And_Around_CR_(&rand_x, &rand_y, &rand_dir) != 0) {
+                            _road_list[rand_x][rand_y].connections[rand_dir] = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* x, int16_t* y, int16_t* conn_idx, int16_t search_count) {
+    int16_t best_x = *x;
+    int16_t best_y = *y;
+    int16_t best_conn = *conn_idx;
+    int16_t match_count = 0;
+
+    const uint8_t offsets[12] = {
+        0, 0, 0,
+        0, 0, 1,
+        0, 1, 0,
+        1, 0, 1
+    };
+
+    for (int16_t i = 0; i < search_count; ++i) {
+        int32_t base_idx = i * 3;
+        uint8_t dx = offsets[base_idx];
+        uint8_t dy = offsets[base_idx + 1];
+        uint8_t dconn = offsets[base_idx + 2];
+
+        int16_t new_x = *x + dx;
+        int16_t new_y = *y + dy;
+
+        if (_road_list[new_x][new_y].connections[dconn] == *conn_idx) {
+            match_count++;
+            if (random::Random_(match_count) == 1) {
+                best_x = new_x;
+                best_y = new_y;
+                best_conn = dconn;
+            }
+        }
+    }
+
+    *x = best_x;
+    *y = best_y;
+    *conn_idx = best_conn;
+
+    return match_count;
+}
+
+uint8_t __cdecl Do_Pick_Random_Road_At_And_Around_CR_(int16_t* c, int16_t* r, int16_t* param_3) {
+    return (uint8_t)Pick_Random_Road_At_And_Around_CR_(c, r, param_3, 4);
+}
+
+int16_t __cdecl N_Roads_Around_CR_(int16_t x, int16_t y) {
+    uint8_t offsets[4][3] = {
+        {0, 0, 0},
+        {0, 0, 1},
+        {0, 1, 0},
+        {1, 0, 1}
+    };
+
+    int16_t count = 0;
+    for (int16_t i = 0; i < 4; i++) {
+        int16_t check_x = x + offsets[i][0];
+        int16_t check_y = y + offsets[i][1];
+        uint8_t dir = offsets[i][2];
+
+        if (_road_list[check_x][check_y].connections[dir] != 0) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t x, int16_t y, int16_t width, int16_t height) {
+    Draw_Colony_Prod_Both_(colony_idx, prod_idx, x, y, width, height, 1);
+}
+
+void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width) {
+    Draw_Info_Morale_Both_(colony_idx, x, y, (int)width, 1);
+}
+
 }

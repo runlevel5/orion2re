@@ -5,6 +5,7 @@ struct s_animation_header;
 struct s_colors;
 struct s_planet_data;
 struct s_colony;
+struct s_colony_bldg;
 
 namespace COLONY {
     inline int32_t (&_building_cr)[170] =
@@ -55,6 +56,7 @@ namespace COLONY {
     inline const char* _BEAMS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CC8}); // "BEAMS.LBX"
     inline const char* _CMBTSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CD8}); // "CMBTSFX.LBX"
     inline const char* _SPHERSFX_LBX = reinterpret_cast<const char*>(std::uintptr_t{ 0x00559DD0 }); // "SPHERSFX.LBX"
+    inline char* _COLROADS_LBX = reinterpret_cast<char*>(std::uintptr_t{0x00559D08}); // "COLROADS.LBX"
 
     inline int16_t& _step_squish = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF0});
     inline int16_t& _scanned_pop = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559DF8});

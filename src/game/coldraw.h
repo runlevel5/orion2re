@@ -1,25 +1,34 @@
 #pragma once
 #include <cstdint>
 
+struct s_animation_header;
+struct s_coldraw_road;
+
 namespace COLDRAW {
     void __cdecl Calculate_Squish_Step_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
-    inline void __cdecl Draw_Road_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004df610});
-        fn();
-    }
+    inline s_coldraw_road (&_road_list)[7][7] = *reinterpret_cast<s_coldraw_road(*)[7][7]>(std::uintptr_t{0x005A71D0});
 
-    inline void __cdecl Load_Road_List_Anims_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004DC880})();
-    }
+    void __cdecl Road_Back_To_Front_(int16_t index, int16_t* y, int16_t* x);
 
-    inline void __cdecl Build_Road_List_Based_On_Bldg_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004594e0});
-        fn();
-    }
+    void __cdecl Draw_Road_List_();
+
+    void __cdecl Load_Road_List_Anims_();
+
+    void __cdecl Build_Road_List_Based_On_Bldg_List_();
+
+    inline uint8_t& _DAT_5a7760 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A7760});
+    inline uint8_t& _DAT_5a778a = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A778A});
+
+    void __cdecl Draw_Simplest_Path_(int16_t prev_y, int16_t prev_x, int16_t local_y, int16_t local_x, uint8_t* p1, uint8_t* p2);
+
+    void __cdecl Link_Buildings_();
+
+    int16_t __cdecl N_Roads_Around_CR_(int16_t x, int16_t y);
+
+    int16_t __cdecl Pick_Random_Road_At_And_Around_CR_(int16_t* x, int16_t* y, int16_t* conn_idx, int16_t search_count);
+
+    uint8_t __cdecl Do_Pick_Random_Road_At_And_Around_CR_(int16_t* c, int16_t* r, int16_t* param_3);
 
     inline void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
         using Fn = void(__cdecl*)();
@@ -52,15 +61,7 @@ namespace COLDRAW {
 
     void __cdecl Draw_Colony_PC_Bar_(int16_t x, int16_t y, int16_t total, int16_t current);
 
-    inline void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t x, int16_t y, int16_t width, int16_t height) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458c10});
-        fn(colony_idx, prod_idx, x, y, width, height);
-    }
+    void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t x, int16_t y, int16_t width, int16_t height);
 
-    inline void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00458a40});
-        fn(colony_idx, x, y, width);
-    }
+    void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width);
 }

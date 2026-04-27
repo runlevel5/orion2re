@@ -3629,6 +3629,17 @@ namespace hooks {
         { 0x00423080, &BEAMS::XY_In_Shield_Radius_ },
         { 0x00423e10, &BEAMS::XY_In_Reflection_Field_Radius_ },
         { 0x00423e70, &BEAMS::Set_Beam_Colors_ },
+        { 0x004598a0, &COLDRAW::Draw_Road_List_ },
+        { 0x00459410, &COLDRAW::Load_Road_List_Anims_ },
+        { 0x004596a0, &COLDRAW::Road_Back_To_Front_ },
+        { 0x004594E0, &COLDRAW::Build_Road_List_Based_On_Bldg_List_ },
+        { 0x00459950, &COLDRAW::Link_Buildings_ },
+        { 0x00459BD0, &COLDRAW::N_Roads_Around_CR_ },
+        { 0x00459c80, &COLDRAW::Do_Pick_Random_Road_At_And_Around_CR_ },
+        { 0x00459ca0, &COLDRAW::Pick_Random_Road_At_And_Around_CR_ },
+        { 0x004599e0, &COLDRAW::Draw_Simplest_Path_ },
+        { 0x00458c10, &COLDRAW::Draw_Colony_Wee_Prod_ },
+        { 0x00458a40, &COLDRAW::Draw_Info_Wee_Morale_ },
     };
 
     void Install_Hooks()
