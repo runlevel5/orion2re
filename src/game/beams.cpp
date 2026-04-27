@@ -810,8 +810,8 @@ namespace BEAMS {
                                         if (shield_radius <= max_radius) {
                                             max_radius = shield_radius;
                                         }
-                                        rand_offsets[i * 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
                                         rand_offsets[i * 2 + 1] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i * 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
                                     }
                                     else {
                                         apply_random = true;
@@ -822,10 +822,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                     rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
                                     rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -837,10 +837,10 @@ namespace BEAMS {
                                     if (max_radius > 30) max_radius = 30;
                                     int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
                                     int16_t base = max_radius / 2;
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                     rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
                                     rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                 }
                                 else {
                                     apply_random = true;
@@ -849,8 +849,8 @@ namespace BEAMS {
 
                             if (apply_random) {
                                 if (is_non_ship_target == 0 || fx->accum_hit_x != 0) {
-                                    rand_offsets[i * 2] = 0;
                                     rand_offsets[i * 2 + 1] = 0;
+                                    rand_offsets[i * 2] = 0;
                                 }
                                 else {
                                     int16_t max_radius = ship_range / 2;
@@ -860,10 +860,10 @@ namespace BEAMS {
                                     }
                                     int16_t radius = (shield_radius + (shield_radius >> 31 & 3)) / 4 + 1;
                                     int16_t base = shield_radius / 2;
-                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
-                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                     rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
                                     rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
                                 }
                             }
                         }
@@ -887,7 +887,7 @@ namespace BEAMS {
                                     is_non_ship_target, fp_idx_val,
                                     _g_reflection_state_flag,
                                     MOX::_combat_data[attacker_ship_id].size_class,
-                                    fx->specials, false);
+                                    fx->specials, 1);
                             }
                         }
                     }
@@ -934,7 +934,7 @@ namespace BEAMS {
                                     else {
                                         int16_t other_i = (i == 0) ? 1 : 0;
                                         if (current_fx_idx[other_i] == (int16_t)0xfc18 &&
-                                            (_ship_hit_now_flag[other_i] != 0 || current_fx_idx[i] > 0x7fff)) {
+                                            (_ship_hit_now_flag[other_i] != 0 || current_fx_idx[i] <= -1)) {
                                             _shield_hit_now_flag = 0;
                                             _shield_display_status = 0;
 
@@ -949,6 +949,8 @@ namespace BEAMS {
                                             reflected_fx[0].accum_hit_y = next_fx->accum_hit_y;
                                             reflected_fx[0].specials = next_fx->specials;
                                             reflected_fx[0].is_damage_entry = next_fx->is_damage_entry;
+                                            reflected_fx[1].weapon_id = 0;
+                                            reflected_fx[1].is_damage_entry = 0;
 
                                             _g_firing_reflected_beam_flag = 1;
                                             _g_reflection_state_flag = 2;
@@ -1000,12 +1002,12 @@ namespace BEAMS {
                     }
                 } // for i loop
 
-                if (current_fx_idx[0] > 0x7fff && current_fx_idx[1] > 0x7fff) {
+                if (current_fx_idx[0] <= -1 && current_fx_idx[1] <= -1) {
                     _shield_hit_now_flag = 0;
                     _reflection_field_hit_now_flag = 0;
                 }
 
-                if (current_fx_idx[0] > 0x7fff && current_fx_idx[1] > 0x7fff &&
+                if (current_fx_idx[0] <= -1 && current_fx_idx[1] <= -1 &&
                     _shield_display_status == 0 && _reflection_field_display_status == 0) {
                     if (Done_Drawing_Damage_Message_Queue_() != 0 && has_reflected == 0) {
                         bExitLoop = true;
@@ -1116,7 +1118,6 @@ namespace BEAMS {
                                     ERICNET::Mox_Play_Sound_(0x1c);
                                 }
                                 fx->accum_hit_x = -1;
-                                fx->accum_hit_y = -1;
                             }
                         }
                     }
