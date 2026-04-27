@@ -5013,6 +5013,17 @@ struct s_weapon_filter_item {
     int32_t tech_cost;
 };
 
+typedef struct s_weapon_visual_fx s_weapon_visual_fx, *Ps_weapon_visual_fx;
+
+struct s_weapon_visual_fx {
+    struct s_colors colors[3];
+    int32_t thickness;
+    int32_t anim_style;
+    int32_t sfx_sprite_id;
+    int32_t duration;
+    int32_t unk;
+};
+
 typedef struct s_winnet_provider s_winnet_provider, *Ps_winnet_provider;
 
 struct s_winnet_provider {

@@ -713,6 +713,467 @@ namespace BEAMS {
         return sizes[planet_size];
     }
 
+    void __cdecl Fire_Weapon_(int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y,
+                              int16_t attacker_facing, int16_t target_facing, int16_t weapon_id, int16_t current_frame,
+                              int16_t fx_slot_idx, int16_t target_size_class, int16_t hit_result_flags,
+                              int16_t special_flag, int16_t is_non_ship_target, int16_t fire_point_idx,
+                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials, bool is_mod3)
+    {
+        int16_t v_duration;
+        int16_t v_color;
+        int16_t v_mount_scale_mod;
+        int16_t v_ebx = 0;
+        int16_t v_local_58 = 0;
+        int16_t loop_count;
+        int16_t v_local_54;
+        int16_t v_local_54_2;
+        int16_t v_local_54_4;
+        int16_t v_local_54_6;
+        int16_t v_local_4c;
+        int16_t v_local_4a;
+        int16_t v_local_4a_2;
+        int16_t v_local_46;
+        int16_t v_local_46_2;
+        int16_t v_local_42;
+        int16_t v_local_42_2;
+        int16_t v_local_3e;
+        int16_t v_local_3e_2;
+        int16_t v_sfx_n;
+        int16_t v_local_38;
+        int16_t v_sfx_sprite_id;
+        int16_t v_is_multi_beam = 0;
+
+        switch (weapon_id) {
+        case 1:
+            v_color = 7;
+            v_duration = 1;
+            v_local_58 = 1;
+            v_ebx = 0;
+            v_sfx_sprite_id = 0x2D;
+            v_local_54_6 = 10;
+            v_local_3e = 0;
+            v_local_42_2 = 0;
+            v_local_42 = 1;
+            v_local_54_4 = 0;
+            v_local_54_2 = 7;
+            v_local_54 = 0;
+            v_local_46_2 = 1;
+            v_local_46 = 1;
+            v_local_38 = 1;
+            v_mount_scale_mod = 1;
+            v_local_3e_2 = 0;
+            v_sfx_n = 12;
+            v_local_4a_2 = 0;
+            v_local_4a = 0;
+            v_local_4c = 0;
+            v_is_multi_beam = 1;
+            break;
+        case 2:
+            v_color = 2;
+            v_mount_scale_mod = 1;
+            v_local_3e = 0x28;
+            v_local_42_2 = 3;
+            v_sfx_sprite_id = 0x2D;
+            v_duration = v_color;
+            v_ebx = 0;
+            v_local_54_6 = 10;
+            v_local_54_2 = 7;
+            v_local_58 = v_mount_scale_mod;
+            v_local_42 = v_mount_scale_mod;
+            v_local_54_4 = v_ebx;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_ebx;
+            v_local_38 = v_mount_scale_mod;
+            v_local_3e_2 = v_mount_scale_mod;
+            v_sfx_n = 15;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            v_is_multi_beam = v_mount_scale_mod;
+            break;
+        case 3:
+            v_color = 0;
+            v_local_3e = 10;
+            v_duration = 0x5A;
+            v_local_42_2 = 1;
+            v_sfx_sprite_id = 0x37;
+            v_local_54_4 = 7;
+            v_local_42 = v_local_42_2;
+            v_local_54_2 = v_color;
+            v_local_54 = v_color;
+            v_local_54_6 = v_local_3e;
+            v_local_46_2 = v_color;
+            v_local_46 = v_color;
+            v_local_38 = v_color;
+            v_ebx = 0;
+            v_mount_scale_mod = 0;
+            v_local_3e_2 = v_color;
+            v_local_4a_2 = v_local_42_2;
+            v_local_4a = v_color;
+            v_local_4c = v_color;
+            v_sfx_n = v_local_42_2;
+            break;
+        case 4:
+            v_duration = 0x3C;
+            v_color = 1;
+            v_local_42 = v_color;
+            v_local_42_2 = 3;
+            v_local_3e = 0x32;
+            v_sfx_sprite_id = 0x2D;
+            v_ebx = 0;
+            v_local_54_6 = 15;
+            v_local_54_4 = 7;
+            v_local_54_2 = v_local_42_2;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_color;
+            v_local_46 = v_color;
+            v_local_38 = v_color;
+            v_mount_scale_mod = v_color;
+            v_sfx_n = 23;
+            v_local_3e_2 = v_color;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 5:
+            v_color = 8;
+            v_local_3e = 0x28;
+            v_duration = 0x280;
+            v_ebx = 0;
+            v_local_42_2 = 5;
+            v_local_54_6 = 15;
+            v_local_54_4 = 10;
+            v_local_54_2 = 7;
+            v_sfx_sprite_id = v_local_3e;
+            v_local_42 = v_ebx;
+            v_local_54 = v_ebx;
+            v_local_46_2 = 1;
+            v_local_46 = 1;
+            v_local_38 = 1;
+            v_mount_scale_mod = 2;
+            v_sfx_n = 9;
+            v_local_3e_2 = 1;
+            v_local_4a_2 = 1;
+            v_local_4a = v_ebx;
+            v_local_4c = 1;
+            break;
+        case 6:
+            v_duration = 0x28;
+            v_color = 3;
+            v_local_42_2 = v_color;
+            v_mount_scale_mod = 1;
+            v_local_3e = 0x32;
+            v_sfx_sprite_id = 0x2D;
+            v_local_42 = v_mount_scale_mod;
+            v_ebx = 0;
+            v_local_54_6 = 15;
+            v_local_54_4 = 7;
+            v_local_54_2 = v_color;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_mount_scale_mod;
+            v_local_38 = v_mount_scale_mod;
+            v_sfx_n = 14;
+            v_local_3e_2 = v_mount_scale_mod;
+            v_local_4a_2 = v_mount_scale_mod;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 7:
+            v_color = 6;
+            v_local_42 = 1;
+            v_local_3e = 0x1E;
+            v_duration = 0x280;
+            v_local_54_6 = 7;
+            v_local_42_2 = 5;
+            v_sfx_sprite_id = 0x23;
+            v_ebx = 0;
+            v_local_54_2 = 3;
+            v_local_54_4 = v_local_54_6;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_local_42;
+            v_local_46 = v_ebx;
+            v_local_38 = v_local_42;
+            v_mount_scale_mod = 2;
+            v_sfx_n = 11;
+            v_local_3e_2 = v_ebx;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 8:
+            v_color = 2;
+            v_local_42_2 = 3;
+            v_duration = 0x5A;
+            v_mount_scale_mod = 1;
+            v_local_3e = 0x1E;
+            v_sfx_sprite_id = 0x2D;
+            v_local_54_6 = 15;
+            v_ebx = 0;
+            v_local_54_4 = 7;
+            v_local_42 = v_mount_scale_mod;
+            v_local_54_2 = v_local_42_2;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_mount_scale_mod;
+            v_local_38 = v_mount_scale_mod;
+            v_sfx_n = 22;
+            v_local_3e_2 = v_mount_scale_mod;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 9:
+        case 41:
+            v_color = 0;
+            v_ebx = 0;
+            v_duration = 0x5A;
+            v_local_3e = 15;
+            v_mount_scale_mod = 1;
+            v_local_42_2 = 3;
+            v_sfx_sprite_id = 0x32;
+            v_local_54_4 = 7;
+            v_local_54_2 = 6;
+            v_local_54 = 2;
+            v_local_42 = v_mount_scale_mod;
+            v_local_54_6 = v_local_3e;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_ebx;
+            v_local_38 = v_mount_scale_mod;
+            v_sfx_n = 19;
+            v_local_3e_2 = v_ebx;
+            v_local_4a_2 = v_mount_scale_mod;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 10:
+            v_color = 0;
+            v_ebx = 0;
+            v_duration = 0x28;
+            v_local_42_2 = 3;
+            v_local_3e = v_duration;
+            v_mount_scale_mod = 1;
+            v_sfx_sprite_id = 0x2D;
+            v_local_54_6 = 15;
+            v_local_54_4 = 7;
+            v_local_42 = v_mount_scale_mod;
+            v_local_54_2 = v_local_42_2;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_mount_scale_mod;
+            v_local_38 = v_mount_scale_mod;
+            v_sfx_n = 2;
+            v_local_3e_2 = v_mount_scale_mod;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 11:
+        case 42:
+            v_color = 6;
+            v_local_42_2 = 3;
+            v_duration = 0x5A;
+            v_local_42 = 1;
+            v_local_3e = 0x28;
+            v_sfx_sprite_id = 0x23;
+            v_local_54_6 = 15;
+            v_ebx = 0;
+            v_local_54_4 = 7;
+            v_local_54_2 = v_local_42_2;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_local_42;
+            v_local_46 = v_local_42;
+            v_local_38 = v_local_42;
+            v_mount_scale_mod = 2;
+            v_sfx_n = 21;
+            v_local_3e_2 = v_local_42;
+            v_local_4a_2 = v_ebx;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 12:
+            v_color = 0;
+            v_ebx = 0;
+            v_duration = 0x3C;
+            v_local_3e = 0x32;
+            v_sfx_n = 13;
+            v_local_42_2 = 5;
+            v_local_54_4 = 10;
+            v_local_54_2 = 8;
+            v_sfx_sprite_id = v_local_3e;
+            v_local_42 = 1;
+            v_local_54_6 = v_sfx_n;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_local_42;
+            v_local_46 = v_local_42;
+            v_local_38 = v_local_42;
+            v_mount_scale_mod = 2;
+            v_local_3e_2 = v_local_42;
+            v_local_4a_2 = v_local_42;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            break;
+        case 13:
+            v_mount_scale_mod = 2;
+            v_local_42 = 1;
+            v_local_3e = 0x1E;
+            v_local_42_2 = 3;
+            v_sfx_sprite_id = 0x37;
+            v_color = v_mount_scale_mod;
+            v_local_54_4 = 10;
+            v_local_54_6 = 15;
+            v_duration = 0x28;
+            v_ebx = 0;
+            v_local_54_2 = v_local_54_4;
+            v_local_54 = v_ebx;
+            v_local_46_2 = v_local_42;
+            v_local_46 = v_local_42;
+            v_local_38 = v_local_42;
+            v_local_3e_2 = v_local_42;
+            v_local_4a_2 = v_local_42;
+            v_local_4a = v_ebx;
+            v_local_4c = v_ebx;
+            v_sfx_n = v_local_42;
+            break;
+        case 27:
+        case 40:
+        case 43:
+            v_duration = 0x14;
+            v_color = 5;
+            v_local_42_2 = v_color;
+            v_mount_scale_mod = 1;
+            v_local_3e = 0x1E;
+            v_sfx_sprite_id = 0x28;
+            v_local_42 = v_mount_scale_mod;
+            v_local_54 = 0;
+            v_local_54_6 = 15;
+            v_local_54_4 = 10;
+            v_local_54_2 = 7;
+            v_local_46_2 = v_mount_scale_mod;
+            v_local_46 = v_mount_scale_mod;
+            v_local_38 = v_mount_scale_mod;
+            v_ebx = v_mount_scale_mod;
+            v_local_3e_2 = v_mount_scale_mod;
+            v_local_4a_2 = v_mount_scale_mod;
+            v_local_4a = v_local_54;
+            v_local_4c = v_local_54;
+            v_is_multi_beam = v_mount_scale_mod;
+            v_sfx_n = v_color;
+            break;
+        case 46:
+            v_color = 6;
+            v_local_3e = 10;
+            v_duration = 0x28;
+            v_local_42 = 1;
+            v_local_42_2 = 3;
+            v_sfx_sprite_id = 0x32;
+            v_local_54_6 = 15;
+            v_local_54 = 7;
+            v_local_54_4 = 10;
+            v_local_54_2 = 10;
+            v_local_46_2 = 1;
+            v_local_46 = 1;
+            v_ebx = 0;
+            v_local_38 = 1;
+            v_mount_scale_mod = 2;
+            v_sfx_n = 18;
+            v_local_3e_2 = 1;
+            v_local_4a_2 = 1;
+            v_local_4a = 1;
+            v_local_4c = 0;
+            break;
+        default:
+            return;
+        }
+
+        if (!Is_Steve_Stuff_Weapon_(weapon_id)) {
+            if (_old_color[fx_slot_idx] != v_color) {
+                _old_color[fx_slot_idx] = v_color;
+                Add_Weapon_Palette_Fragment_To_Current_Palette_(v_color, (fx_slot_idx + 9) << 4, 16);
+            }
+            if ((weapon_specials & 2) != 0) {
+                v_mount_scale_mod++;
+                if (v_mount_scale_mod >= 2) {
+                    v_mount_scale_mod = 2;
+                }
+            }
+            if ((weapon_specials & 0x80) != 0) {
+                v_sfx_sprite_id *= 2;
+                v_duration /= 2;
+            }
+            if ((weapon_specials & 4) != 0) {
+                v_mount_scale_mod--;
+                if (v_mount_scale_mod <= 0) {
+                    v_mount_scale_mod = 0;
+                }
+            }
+            if ((weapon_specials & 8) != 0) {
+                v_local_38 = 1;
+            }
+            if ((weapon_specials & 0x10) != 0) {
+                if (v_duration != 0x280) {
+                    v_duration *= 2;
+                }
+            }
+            if ((weapon_specials & 0x20) != 0) {
+                v_local_3e_2 = 0;
+            }
+            if ((weapon_specials & 0x40) != 0) {
+                v_local_38 = 1;
+            }
+        }
+
+        if (v_is_multi_beam != 0 && attacker_size_class != -1) {
+            loop_count = 3;
+        } else {
+            loop_count = 1;
+        }
+
+        _g_weapon_n = weapon_id;
+        _g_sfx_n = v_sfx_n;
+
+        s_weapon_visual_fx fx;
+        s_weapon_visual_fx* pfx = nullptr;
+
+        if (Is_Steve_Stuff_Weapon_(weapon_id)) {
+            Build_Steve_Stuff_Struct_For_Weapon_(weapon_id, weapon_specials, &fx);
+            v_sfx_sprite_id = static_cast<int16_t>(fx.sfx_sprite_id);
+            v_duration = static_cast<int16_t>(fx.duration);
+            pfx = &fx;
+        }
+
+        if (loop_count > 0) {
+            int16_t frame_idx_offset = 0;
+            int palette_offset = (fx_slot_idx + 9) << 4;
+
+            do {
+                int16_t frame_index = current_frame + frame_idx_offset;
+
+                Draw_Generic_Beam_(
+                    attacker_x, attacker_y, target_x, target_y, attacker_facing, target_facing,
+                    v_duration, palette_offset, v_local_3e, v_local_42_2, v_sfx_sprite_id, v_local_42,
+                    v_local_46_2, v_local_46, v_local_38, v_local_3e_2, v_local_4a_2, v_local_4a,
+                    v_local_4c, v_ebx, v_mount_scale_mod, v_local_54_6, v_local_54_4, v_local_54_2,
+                    v_local_54, frame_index, target_size_class, hit_result_flags, special_flag,
+                    is_non_ship_target, v_local_58, reflection_state, attacker_size_class, pfx
+                );
+
+                frame_idx_offset++;
+            } while (frame_idx_offset < loop_count);
+        }
+
+        if (fire_point_idx == current_frame || current_frame == 0) {
+            _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = ERICNET::Mox_Play_Sound_(v_sfx_n);
+        } else if (_ship_firing_now_flag[fx_slot_idx] != 0) {
+            if (Get_Max_Frames_() - 1 <= current_frame) {
+                // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
+                sound::Fadeout_Sound_((int16_t)_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
+                _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
+            }
+        }
+    }
+
     void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target) {
         int16_t current_fx_idx[2] = { 0, -1 };
         int16_t frame_idx[2] = { 0, 0 };
@@ -1132,7 +1593,8 @@ namespace BEAMS {
 
             _ship_hit_now_flag[0] = 0;
             _ship_hit_now_flag[1] = 0;
-            _ship_firing_now_flag = 0;
+            _ship_firing_now_flag[0] = 0;
+            _ship_firing_now_flag[1] = 0;
             Reset_Beam_SFX_Handles_();
             _shield_display_status = 0;
             _reflection_field_display_status = 0;

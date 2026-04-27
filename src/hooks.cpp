@@ -3609,6 +3609,7 @@ namespace hooks {
         { 0x004A44C0, &COLGCBT::Top_Line_Y_ },
         { 0x004a44f0, &COLGCBT::Top_Line_X_ },
         { 0x00420d60, &BEAMS::Beam_SFX_ },
+        { 0x00421cd0, &BEAMS::Fire_Weapon_ },
     };
 
     void Install_Hooks()
