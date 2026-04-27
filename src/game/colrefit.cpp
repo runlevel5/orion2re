@@ -176,6 +176,11 @@ namespace COLREFIT {
 
         COLREFIT::_scanned_ship_index = -1;
 
+        if (*action_field < 0) {
+            COLREFIT::_esc = 1;
+            return -1;
+        }
+
         for (int16_t i = 0; i < 15; i++) {
             int16_t ship_idx = COLREFIT::_g_ship_list_ptr[COLREFIT::_first_ship + i];
 
@@ -259,7 +264,34 @@ namespace COLREFIT {
         return -1;
     }
 
+    void __cdecl Draw_Refit2_Popup_() {
+        if (COLONY::_full_draw == 0) {
+            Draw_Ship_D_List_();
+        } else {
+            COLONY::Set_Colony_Font_();
+            video::Set_Page_Off_();
+            MOX2::Execute_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+            COLONY::_full_draw = 1;
+            animate::Draw_(0x93, 6, _anims[0]);
+            Draw_Ship_D_List_();
+            video::Copy_Off_To_Back_();
+            COLONY::_full_draw = 0;
+        }
+
+        if (_scanned_ship_d_index != -1) {
+            Show_Ship_Design_(&MOX::_player[MOX::_PLAYER_NUM].ship_designs[_scanned_ship_d_index]);
+        }
+
+        if (_lscanned_field == _fields[11]) {
+            COLONY::Set_Colony_Font_To_Reg_Blue_(4, 1);
+            char* str = ESTRINGS::E_Strings_(0x322);
+            BILL::Squeeze_Formatted_Paragraph_Centered_(0xA8, 0xF8, 0x131, 0xA9, str, 2);
+        }
+    }
+
     void __cdecl Draw_Refit_Popup_() {
+        // TODO: This is a fix to correct locked up popup
+        COLONY::_full_draw = 1;
         if (COLONY::_full_draw == 0) {
             Draw_Bar_Indicator_();
             if (_scanned_ship_index != -1) {
@@ -287,6 +319,26 @@ namespace COLREFIT {
         _anims[2] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 1, MOX::_screen_seg));
         _anims[1] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 2, MOX::_screen_seg));
         _anims[3] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 3, MOX::_screen_seg));
+    }
+
+    void __cdecl Load_Refit2_Ship_Anims_() {
+        _anims[0] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 4, MOX::_screen_seg));
+        _anims[2] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 1, MOX::_screen_seg));
+        _anims[1] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 2, MOX::_screen_seg));
+        _anims[3] = static_cast<s_animation_header*>(farload::Far_Reload_Next_(s_refitpup_LBX_00558394, 3, MOX::_screen_seg));
+    }
+
+    void __cdecl Show_Ship_Design_(s_ship_design* design) {
+        char buffer[10000];
+
+        COLONY::Set_Colony_Font_To_(1);
+        COLBLDG::Build_Ship_Design_Info_Formatted_Paragraph_((s_ship_data*)design, buffer, 0);
+        BILL::Squeeze_Print_Formatted_Paragraph_(168, 248, 305, 169, buffer, 0);
+    }
+
+    void __cdecl Do_Add2_Fields_() {
+        fields::Clear_Fields_();
+        Add2_Fields_();
     }
 
     void __cdecl Add_Fields_() {
@@ -371,6 +423,36 @@ namespace COLREFIT {
         }
     }
 
+    void __cdecl Draw_Ship2_(int16_t ship_idx, int16_t position_idx) {
+        int16_t y = (position_idx / 5) * 61;
+        int16_t x = (position_idx % 5) * 60;
+
+        COLONY::Remap_Draw_Ship_Centered_(x + 188, y + 77, ship_idx);
+
+        int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+        int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+
+        if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[colony_idx], -100 - ship_idx)) {
+            COLONY::Set_Colony_Font_To_Red_(1, 1);
+            char* text = ESTRINGS::E_Strings_(0x18B);
+            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+            return;
+        }
+
+        if (MOX::_ship[ship_idx].d.previous_owner != MOX::_PLAYER_NUM) {
+            COLONY::Set_Colony_Font_To_Red_(1, 1);
+            char* text = ESTRINGS::E_Strings_(0xD8);
+            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+            return;
+        }
+
+        if (MOX::_ship[ship_idx].d.picture_num == 44) {
+            COLONY::Set_Colony_Font_To_Red_(1, 1);
+            char* text = ESTRINGS::E_Strings_(0x16A);
+            BILL::Squeeze_Paragraph_Centered_(x + 161, y + 49, 55, 56, text, 2);
+        }
+    }
+
     /**
      * @address 004a17e0
      */
@@ -391,6 +473,159 @@ namespace COLREFIT {
                 Draw_Ship2_(ship_idx, i);
             }
         }
+    }
+
+    void __cdecl Draw_Ship_D_List_() {
+        char buffer[476];
+        int16_t player_num = MOX::_PLAYER_NUM;
+
+        for (int16_t i = 0; i < 5; ++i) {
+            int32_t font_color = 0;
+
+            if (MOX::_player[player_num].ship_designs[i].size == MOX::_ship[_g_ship_n].d.size) {
+                if (_fields[5 + i] == _lscanned_field) {
+                    font_color = 1;
+                }
+                font_color++;
+            }
+
+            COLONY::Set_Colony_Font_To_Reg_Blue_(4, font_color);
+
+            char* empty_str = ESTRINGS::E_Strings_(12);
+            char* selection_name = COLBLDG::Selection_Name_(-50 - i);
+
+            if (strcmp(selection_name, empty_str) != 0) {
+                int32_t y = ((179 * (i + 1)) / 8) + 49;
+
+                char* name_to_print = COLBLDG::Selection_Name_(-50 - i);
+                fonts::Print_(183, (int16_t)y, name_to_print);
+
+                char* hull_name = TECHDATA::_hull_data[MOX::_player[player_num].ship_designs[i].size].name;
+                fonts::Print_Right_(457, (int16_t)y, hull_name);
+
+                fonts::Print_Centered_(320, (int16_t)y, s_colon_005583a4);
+            }
+        }
+
+        int32_t bottom_font_color = 1;
+        if (_lscanned_field == _fields[11]) {
+            bottom_font_color = 2;
+        }
+
+        COLONY::Set_Colony_Font_To_Reg_Blue_(4, bottom_font_color);
+
+        char* refit_str = ESTRINGS::E_Strings_(800);
+        int32_t bottom_y = ((179 * 7) / 8) + 49;
+        fonts::Print_Centered_(320, (int16_t)bottom_y, refit_str);
+
+        char* ship_format = ESTRINGS::E_Strings_(801);
+        _sprintf(buffer, ship_format, MOX::_ship[_g_ship_n].d.name);
+
+        COLONY::Set_Colony_Font_To_Reg_Blue_(4, 1);
+        fonts::Print_Centered_(320, 20, buffer);
+    }
+
+    int16_t __cdecl Evaluate2_Input_(int16_t* get_input, int16_t* scan_input) {
+        char buffer[500];
+
+        _scanned_ship_d_index = -1;
+        _lscanned_field = -1000;
+
+        for (int16_t i = 0; i < 5; i++) {
+            if (_fields[i + 5] == *scan_input) {
+                _lscanned_field = *scan_input;
+                _scanned_ship_d_index = i;
+            }
+            if (*get_input == _fields[i + 5]) {
+                if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[i].size == MOX::_ship[_g_ship_n].d.size) {
+                    struct_::Copy_Structure_(
+                        &MOX::_player[MOX::_PLAYER_NUM].ship_designs[5],
+                        &MOX::_player[MOX::_PLAYER_NUM].ship_designs[i],
+                        sizeof(s_ship_design)
+                    );
+                    MOX::_temp_star_handle = 5;
+                    _esc = 1;
+                    return -3;
+                }
+                GENDRAW::Help_(ESTRINGS::E_Strings_(0x323));
+                _esc = 0;
+            }
+            if (*get_input + _fields[i + 5] == 0) {
+                _sprintf(
+                    buffer,
+                    ESTRINGS::E_Strings_(0x324),
+                    &MOX::_ship[_g_ship_n],
+                    &MOX::_player[MOX::_PLAYER_NUM].ship_designs[i]
+                );
+                TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x325), buffer);
+            }
+        }
+
+        if (_fields[11] == *scan_input) {
+            _lscanned_field = *scan_input;
+        }
+        if (*get_input == _fields[11]) {
+            _esc = 1;
+            return -2;
+        }
+        if (*get_input + _fields[11] == 0) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x326), ESTRINGS::E_Strings_(0x327));
+        }
+        if (*get_input == _fields[3]) {
+            _esc = 1;
+        }
+        if (*get_input + _fields[0] == 0) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x328), ESTRINGS::E_Strings_(0x329));
+        }
+        if (*get_input + _fields[3] == 0) {
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x32a), ESTRINGS::E_Strings_(0x32b));
+        }
+        if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+            COLONY::_full_draw = 1;
+            MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+        }
+
+        return -1;
+    }
+
+    void __cdecl Add2_Fields_() {
+        _fields[3] = fields::Add_Button_Field_(
+            0x112, 0x1B8, 
+            ESTRINGS::E_Strings_(0xC), 
+            _anims[3], 
+            ESTRINGS::E_Strings_(0xC), 
+            0x28
+        );
+
+        for (int i = 0; i < 5; ++i) {
+            if (strcmp(ESTRINGS::E_Strings_(0xC), COLBLDG::Selection_Name_(-50 - i)) == 0) {
+                _fields[5 + i] = -1000;
+            } else {
+                _fields[5 + i] = fields::Add_Hidden_Field_(
+                    0xA1, 
+                    ((i + 1) * 179) / 8 + 49, 
+                    0x1DE, 
+                    ((i + 2) * 179) / 8 + 48, 
+                    ESTRINGS::E_Strings_(0xC), 
+                    0x29
+                );
+            }
+        }
+
+        _fields[11] = fields::Add_Hidden_Field_(
+            0xA1, 
+            ((6 + 1) * 179) / 8 + 49, 
+            0x1DE, 
+            ((6 + 2) * 179) / 8 + 48, 
+            ESTRINGS::E_Strings_(0xC), 
+            0x29
+        );
+
+        _fields[0] = fields::Add_Hidden_Field_(
+            0, 0, 0x27F, 0x1DF, 
+            ESTRINGS::E_Strings_(0xC), 
+            0
+        );
     }
 
 }

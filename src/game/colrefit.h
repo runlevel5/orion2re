@@ -1,7 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_animation_header;
 
 namespace COLREFIT {
 #pragma pack(push, 1)
@@ -19,6 +16,9 @@ namespace COLREFIT {
     inline int16_t& _slider_bar_position =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055836C});
 
+    inline int16_t (&_fields)[12] =
+        *reinterpret_cast<int16_t(*)[12]>(std::uintptr_t{0x0056C450});
+
     inline int16_t& _esc =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558370});
 
@@ -27,6 +27,9 @@ namespace COLREFIT {
 
     inline s_animation_header* (&_anims)[4] =
         *reinterpret_cast<s_animation_header* (*)[4]>(std::uintptr_t{0x00558378});
+
+    inline int16_t& _scanned_ship_d_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055838C});
+    inline int16_t& _lscanned_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00558390});
 
     inline const char* s_refitpup_LBX_00558394 = reinterpret_cast<const char*>(std::uintptr_t{0x00558394});
 
@@ -44,9 +47,6 @@ namespace COLREFIT {
     inline int16_t& _n_ships_in_list =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C448});
 
-    inline int16_t (&_fields)[12] =
-        *reinterpret_cast<int16_t(*)[12]>(std::uintptr_t{0x0056C450});
-
     inline int16_t& _g_ship_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C468});
 
@@ -63,11 +63,7 @@ namespace COLREFIT {
 
     void __cdecl Draw_Ship_List_();
 
-    inline void __cdecl Draw_Ship2_(int16_t ship_idx, int16_t list_pos) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a18a0});
-        fn(ship_idx, list_pos);
-    }
+    void __cdecl Draw_Ship2_(int16_t ship_idx, int16_t position_idx);
 
     void __cdecl Scan_Ship_Info_(int16_t ship_idx);
 
@@ -75,31 +71,23 @@ namespace COLREFIT {
 
     void __cdecl Add_Fields_();
 
+    void __cdecl Add2_Fields_();
+
     int16_t __cdecl Evaluate_Input_(int16_t* input_id, int16_t* scan_code);
 
-    inline void __cdecl Load_Refit2_Ship_Anims_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a1d90});
-        fn();
-    }
+    void __cdecl Load_Refit2_Ship_Anims_();
 
-    inline void __cdecl Draw_Refit2_Popup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a2160});
-        fn();
-    }
+    void __cdecl Draw_Ship_D_List_();
 
-    inline void __cdecl Do_Add2_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a1fb0});
-        fn();
-    }
+    inline char* s_colon_005583a4 = reinterpret_cast<char*>(0x005583A4); // ":"
 
-    inline int16_t __cdecl Evaluate2_Input_(int16_t* get_input, int16_t* scan_input) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a2520});
-        return fn(get_input, scan_input);
-    }
+    void __cdecl Show_Ship_Design_(s_ship_design* design);
+
+    void __cdecl Draw_Refit2_Popup_();
+
+    void __cdecl Do_Add2_Fields_();
+
+    int16_t __cdecl Evaluate2_Input_(int16_t* get_input, int16_t* scan_input);
 
     int16_t __cdecl Colony_Refit_Popup_();
     int16_t __cdecl Colony_Refit2_Popup_(int16_t ship_idx);

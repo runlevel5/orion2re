@@ -427,6 +427,12 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_();
 
+    inline void __cdecl Set_Colony_Font_To_Reg_Blue_(int param1, int param2) {
+        using Fn = void(__cdecl*)(int, int);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbe80});
+        fn(param1, param2);
+    }
+
     inline int16_t& _galaxy_map_name_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});
 

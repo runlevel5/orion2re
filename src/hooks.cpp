@@ -3652,6 +3652,14 @@ namespace hooks {
         { 0x004A1850, &COLREFIT::Draw_Ship_List_ },
         { 0x004a1600, &COLREFIT::Draw_Bar_Indicator_ },
         { 0x004A1740, &COLREFIT::Update_First_Ship_ },
+        { 0x004a18a0, &COLREFIT::Draw_Ship2_ },
+        { 0x004A1D90, &COLREFIT::Load_Refit2_Ship_Anims_ },
+        { 0x004a2160, &COLREFIT::Draw_Refit2_Popup_ },
+        { 0x004a1fb0, &COLREFIT::Do_Add2_Fields_ },
+        { 0x004a2520, &COLREFIT::Evaluate2_Input_ },
+        { 0x004a2250, &COLREFIT::Show_Ship_Design_ },
+        { 0x004a22b0, &COLREFIT::Draw_Ship_D_List_ },
+        { 0x004a1fc0, &COLREFIT::Add2_Fields_ },
     };
 
     void Install_Hooks()
