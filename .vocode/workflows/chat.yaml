@@ -1,6 +1,6 @@
 workflows:
   chat:
-    description: "A LLM enabled verifier loop."
+    description: "A LLM enabled chat tool."
     need_input: False
     nodes:
       - name: input
@@ -18,6 +18,7 @@ workflows:
         temperature: 1
         reasoning_effort: high
         start_timeout: 600
+        confirmation: auto
         reset_policy: keep
         tools:
           - read_files

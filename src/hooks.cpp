@@ -3608,6 +3608,7 @@ namespace hooks {
         { 0x004a4310, &COLGCBT::Move_Is_Legal_ },
         { 0x004A44C0, &COLGCBT::Top_Line_Y_ },
         { 0x004a44f0, &COLGCBT::Top_Line_X_ },
+        { 0x00420d60, &BEAMS::Beam_SFX_ },
     };
 
     void Install_Hooks()

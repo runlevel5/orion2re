@@ -1,6 +1,8 @@
 #pragma once
 
 namespace BEAMS {
+    inline uint8_t& _g_pierced_shield_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D08});
+
     inline int16_t (&_old_color)[2] =
         *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x00552D0C});
 
@@ -13,6 +15,14 @@ namespace BEAMS {
     inline uint8_t& _shield_hit_now_flag =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D10});
 
+    inline uint8_t& _reflection_field_hit_now_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D14});
+
+    inline uint8_t (&_ship_hit_now_flag)[2] = *reinterpret_cast<uint8_t(*)[2]>(std::uintptr_t{0x00552D18});
+
+    inline uint16_t& _ship_firing_now_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D1C});
+
+    inline int32_t (&_g_beam_fire_sfx_handle)[10] = *reinterpret_cast<int32_t(*)[10]>(std::uintptr_t{0x00552D20});
+
     inline uint32_t& _g_shield_sfx_handle =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00552D48});
 
@@ -22,11 +32,21 @@ namespace BEAMS {
     inline uint8_t (&_shield_diameters)[8] =
         *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x00552D58});
 
+    inline uint16_t& _shield_hit_draw_facing = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D60});
+
+    inline uint16_t& _reflection_field_hit_draw_facing = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D64});
+
     inline uint16_t& _shield_display_status =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D68});
 
+    inline uint8_t (&_reflection_field_diameters)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00552D6C});
+
+    inline uint16_t& _reflection_field_display_status = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D70});
+
     inline uint16_t& _g_reflection_state_flag =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D74});
+
+    inline uint8_t& _g_firing_reflected_beam_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D78});
 
     inline int16_t& _n_damage_msgs =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D7C});
@@ -63,7 +83,7 @@ namespace BEAMS {
 
     int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size);
 
-    void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status);
+    void __cdecl Adjust_Shield_Display_Status_(uint16_t* shield_status);
 
     void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7);
 
@@ -91,6 +111,42 @@ namespace BEAMS {
 
     int16_t __cdecl Get_Max_Frames_();
 
+    inline int16_t __cdecl Get_Ship_Range_(int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420A50});
+        return fn(attacker_x, attacker_y, target_x, target_y);
+    }
+
+    inline void __cdecl Adjust_Reflection_Field_Display_Status_(uint16_t* draw_facing) {
+        using Fn = void(__cdecl*)(uint16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423AA0});
+        fn(draw_facing);
+    }
+
+    inline int16_t __cdecl Get_SFX_Draw_Shield_Facing2_(int16_t attacker_id, int16_t target_id) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422ED0});
+        return fn(attacker_id, target_id);
+    }
+
+    inline int16_t __cdecl Do_Get_SFX_Draw_Shield_Facing_(int16_t attacker_id, int16_t target_id) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00422E40});
+        return fn(attacker_id, target_id);
+    }
+
+    inline void __cdecl Draw_Reflection_Field_Hit_(int16_t x, int16_t y, int16_t target_size_class, int16_t hit_facing, int16_t draw_facing) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423C00});
+        fn(x, y, target_size_class, hit_facing, draw_facing);
+    }
+
+    inline void __cdecl Reset_Beam_SFX_Handles_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00421CA0});
+        fn();
+    }
+
     inline void __cdecl Fire_Weapon_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, 
                                     int16_t dir1, int16_t dir2, int16_t weapon_type, int16_t frame,
                                     int p9, int p10, int p11, int p12, int p13, int p14, int p15, int p16, int p17, bool is_mod3) {
@@ -106,10 +162,7 @@ namespace BEAMS {
 
     void __cdecl Add_Damage_Indicator_For_Biological_(int16_t x, int16_t y, uint8_t side_flag, int16_t damage);
 
-    inline void __cdecl Beam_SFX_(int16_t source, int16_t sx, int16_t sy, int16_t target, int16_t tx, int16_t ty, s_beam_fx_entry* fx_entries, int16_t flag) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, s_beam_fx_entry*, int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00420D60})(source, sx, sy, target, tx, ty, fx_entries, flag);
-    }
+    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target);
 
     inline void __cdecl Rob_Interpolate_Line_(int16_t *x, int16_t *y, int16_t target_x, int16_t target_y, int16_t len) {
         using Fn = void(__cdecl *)(int16_t *, int16_t *, int16_t, int16_t, int16_t);

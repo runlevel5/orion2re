@@ -208,7 +208,7 @@ namespace BEAMS {
         int8_t size_class = MOX::_combat_data[ship_idx].size_class;
         int16_t shield_size = Ship_Size_To_Shield_Size_(size_class);
 
-        int16_t shield_status = 0;
+        uint16_t shield_status = 0;
         int16_t offset_x;
         int16_t offset_y;
 
@@ -342,7 +342,7 @@ namespace BEAMS {
         BEAMS::Done_Drawing_Damage_Message_Queue_();
     }
 
-    void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status) {
+    void __cdecl Adjust_Shield_Display_Status_(uint16_t* shield_status) {
         s_animation_header* anim_header = BEAMS::Shield_Anims_(0, 0, 0, 0);
         int16_t total_frames = animate::Get_Animation_Frame_Count_(anim_header);
 
@@ -711,5 +711,432 @@ namespace BEAMS {
         sizes[4] = 7;
 
         return sizes[planet_size];
+    }
+
+    void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target) {
+        int16_t current_fx_idx[2] = { 0, -1 };
+        int16_t frame_idx[2] = { 0, 0 };
+        int16_t rand_offsets[6] = { 0, 0, 0, 0, 0, 0 };
+        int16_t special_timer[2] = { 0, 0 };
+        int16_t fx_idx = 0;
+
+        uint32_t seed = random::Get_Random_Seed_();
+        int16_t ship_range = Get_Ship_Range_(attacker_x, attacker_y, target_x, target_y);
+
+        _g_pierced_shield_flag = 0;
+        palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
+        Shield_Anims_(0, 0, 1, 0);
+        Reset_Beam_Swapping_Colors_();
+
+        if (param_7[0].weapon_id == 0x2e || TECHDATA::_weapons[param_7[0].weapon_id].type == 0) {
+            int16_t attacker_facing_dir = MOX::_combat_data[attacker_ship_id].facing_dir;
+            int16_t target_facing_dir = MOX::_combat_data[target_id].facing_dir;
+
+            int16_t attacker_center_x, attacker_center_y;
+            COMBINIT::Ship_Center_Offsets_(attacker_ship_id, &attacker_center_x, &attacker_center_y);
+            attacker_center_x += attacker_x;
+            attacker_center_y += attacker_y;
+
+            int16_t target_center_x, target_center_y;
+            if (is_non_ship_target == 0) {
+                COMBINIT::Ship_Center_Offsets_(target_id, &target_center_x, &target_center_y);
+                target_center_x += target_x;
+                target_center_y += target_y;
+            }
+            else {
+                target_center_x = target_x;
+                target_center_y = target_y;
+            }
+
+            for (int32_t i = 0; i < 10; ++i) {
+                _g_beam_fire_sfx_handle[i] = 0;
+            }
+
+            if ((param_7[0].specials & 0x80) != 0) {
+                special_timer[0] = 3;
+            }
+
+            bool bExitLoop = false;
+            do {
+                int16_t has_reflected = 0;
+                timer::Mark_Time_();
+                video::Set_Page_Off_();
+                CMBTDRW1::Draw_Main_Combat_Screen_();
+                graphics::Set_Window_(0, 0, 0x27f, 0x15e);
+                video::Clip_On_();
+
+                if (MOX::_dont_draw_ship == target_id && is_non_ship_target == 0) {
+                    CMBTDRW1::Draw_Ship_(target_id, target_x, target_y);
+                }
+                if (MOX::_dont_draw_ship == attacker_ship_id) {
+                    CMBTDRW1::Draw_Ship_(attacker_ship_id, attacker_x, attacker_y);
+                }
+
+                for (int16_t i = 0; i < 2; ++i) {
+                    int16_t current_fx = current_fx_idx[i];
+                    if (current_fx >= 0) {
+                        s_beam_fx_entry* fx = &param_7[current_fx];
+                        int16_t weapon_id = fx->weapon_id;
+                        int16_t shot_count = fx->shot_count;
+                        int16_t attacker_picture_num = MOX::_combat_data[attacker_ship_id].picture_num;
+                        int16_t attacker_owner = MOX::_combat_data[attacker_ship_id].owner;
+                        int16_t attacker_shield_max = MOX::_combat_data[attacker_ship_id].shield_arc_max;
+
+                        int16_t target_bearing;
+                        if (is_non_ship_target == 0) {
+                            target_bearing = CMBTDRW1::Relative_Bearing_(attacker_ship_id, target_id);
+                        }
+                        else {
+                            target_bearing = CMBTDRW1::Relative_Bearing_XY_(attacker_ship_id, target_x, target_y);
+                        }
+                        target_bearing = CMBTFIRE::Facing_Shield_(target_bearing);
+
+                        int16_t fp_count;
+                        if (attacker_ship_id <= 0 || attacker_shield_max > 7 || _g_reflection_state_flag == 2) {
+                            fp_count = 1;
+                        }
+                        else {
+                            fp_count = FIREPTS::N_Fire_Points_(weapon_id, shot_count);
+                        }
+
+                        if (frame_idx[i] == 0) {
+                            bool apply_random = false;
+                            if (fx->result_flags == 0 && fx->special_flag == 0 && fx->is_damage_entry == 0) {
+                                if (target_id != 0) {
+                                    if (is_non_ship_target == 0) {
+                                        int16_t shield_size = Ship_Size_To_Shield_Size_(MOX::_combat_data[target_id].size_class);
+                                        int16_t max_radius = ship_range / 2;
+                                        int16_t shield_radius = _shield_diameters[shield_size] / 2;
+                                        if (shield_radius <= max_radius) {
+                                            max_radius = shield_radius;
+                                        }
+                                        rand_offsets[i * 2] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                        rand_offsets[i * 2 + 1] = (int16_t)random::Random_(max_radius) - max_radius / 2;
+                                    }
+                                    else {
+                                        apply_random = true;
+                                    }
+                                }
+                                else if (fx->accum_hit_x == 0) {
+                                    int16_t max_radius = ship_range / 2;
+                                    if (max_radius > 30) max_radius = 30;
+                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
+                                    int16_t base = max_radius / 2;
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                }
+                                else {
+                                    apply_random = true;
+                                }
+                            }
+                            else {
+                                if (target_id == 0) {
+                                    int16_t max_radius = ship_range / 2;
+                                    if (max_radius > 30) max_radius = 30;
+                                    int16_t radius = (max_radius + (max_radius >> 31 & 3)) / 4;
+                                    int16_t base = max_radius / 2;
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                }
+                                else {
+                                    apply_random = true;
+                                }
+                            }
+
+                            if (apply_random) {
+                                if (is_non_ship_target == 0 || fx->accum_hit_x != 0) {
+                                    rand_offsets[i * 2] = 0;
+                                    rand_offsets[i * 2 + 1] = 0;
+                                }
+                                else {
+                                    int16_t max_radius = ship_range / 2;
+                                    int16_t shield_radius = _shield_diameters[0] / 2;
+                                    if (max_radius <= shield_radius) {
+                                        shield_radius = max_radius;
+                                    }
+                                    int16_t radius = (shield_radius + (shield_radius >> 31 & 3)) / 4 + 1;
+                                    int16_t base = shield_radius / 2;
+                                    rand_offsets[i * 2] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2] *= (int16_t)(random::Random_(2) - 1);
+                                    rand_offsets[i * 2 + 1] = base + (int16_t)random::Random_(radius);
+                                    rand_offsets[i * 2 + 1] *= (int16_t)(random::Random_(2) - 1);
+                                }
+                            }
+                        }
+
+                        if (fp_count > 0) {
+                            for (int32_t fp_idx_val = 0; fp_idx_val < fp_count; ++fp_idx_val) {
+                                int16_t fp_x = 0, fp_y = 0;
+                                if (attacker_ship_id > 0) {
+                                    FIREPTS::Calc_FP_Offsets_(&fp_x, &fp_y, weapon_id, shot_count,
+                                        attacker_owner, attacker_ship_id,
+                                        attacker_picture_num, attacker_facing_dir,
+                                        target_bearing, fp_idx_val);
+                                }
+                                Fire_Weapon_(attacker_center_x + fp_x, attacker_center_y + fp_y,
+                                    target_center_x + rand_offsets[i * 2],
+                                    target_center_y + rand_offsets[i * 2 + 1],
+                                    attacker_facing_dir, target_facing_dir,
+                                    fx->weapon_id, frame_idx[i], i,
+                                    MOX::_combat_data[target_id].size_class,
+                                    fx->result_flags, fx->special_flag,
+                                    is_non_ship_target, fp_idx_val,
+                                    _g_reflection_state_flag,
+                                    MOX::_combat_data[attacker_ship_id].size_class,
+                                    fx->specials, false);
+                            }
+                        }
+                    }
+
+                    bool skip_frame_increment = false;
+                    if (current_fx < 16) {
+                        if (current_fx <= -1) {
+                            int16_t other_i = (i == 0) ? 1 : 0;
+                            int16_t other_fx = current_fx_idx[other_i];
+                            if (other_fx != -1 && other_fx < 16) {
+                                if (param_7[other_fx].weapon_id <= 0 || frame_idx[other_i] >= 9) {
+                                    skip_frame_increment = true;
+                                }
+                            }
+                        }
+                        else {
+                            int16_t max_frames = Get_Max_Frames_();
+                            if (frame_idx[i] >= max_frames) {
+                                skip_frame_increment = true;
+                            }
+                        }
+
+                        if (skip_frame_increment) {
+                            frame_idx[i] = 0;
+                            special_timer[i]--;
+                            if (special_timer[i] <= 0) {
+                                special_timer[i] = 0;
+                                s_beam_fx_entry* next_fx = &param_7[fx_idx + 1];
+                                if (next_fx->weapon_id <= 0 || fx_idx + 1 >= 16) {
+                                    current_fx_idx[i] = (int16_t)0xffff;
+                                }
+                                else {
+                                    if (next_fx->is_damage_entry == 0) {
+                                        fx_idx++;
+                                        current_fx_idx[i] = fx_idx;
+                                        if (param_7[fx_idx + 1].is_damage_entry != 0) {
+                                            _g_reflection_state_flag = 1;
+                                            _reflection_field_display_status = 1;
+                                        }
+                                        if ((param_7[fx_idx].specials & 0x80) != 0) {
+                                            special_timer[i] = 3;
+                                        }
+                                    }
+                                    else {
+                                        int16_t other_i = (i == 0) ? 1 : 0;
+                                        if (current_fx_idx[other_i] == (int16_t)0xfc18 &&
+                                            (_ship_hit_now_flag[other_i] != 0 || current_fx_idx[i] > 0x7fff)) {
+                                            _shield_hit_now_flag = 0;
+                                            _shield_display_status = 0;
+
+                                            s_beam_fx_entry reflected_fx[16];
+                                            struct_::Clear_Structure_(reflected_fx, sizeof(reflected_fx));
+
+                                            reflected_fx[0].weapon_id = next_fx->weapon_id;
+                                            reflected_fx[0].shot_count = next_fx->shot_count;
+                                            reflected_fx[0].result_flags = next_fx->result_flags;
+                                            reflected_fx[0].special_flag = next_fx->special_flag;
+                                            reflected_fx[0].accum_hit_x = next_fx->accum_hit_x;
+                                            reflected_fx[0].accum_hit_y = next_fx->accum_hit_y;
+                                            reflected_fx[0].specials = next_fx->specials;
+                                            reflected_fx[0].is_damage_entry = next_fx->is_damage_entry;
+
+                                            _g_firing_reflected_beam_flag = 1;
+                                            _g_reflection_state_flag = 2;
+                                            Beam_SFX_(target_id, target_x, target_y, attacker_ship_id, attacker_x, attacker_y, reflected_fx, 0);
+                                            _reflection_field_display_status = 0;
+                                            _g_firing_reflected_beam_flag = 0;
+
+                                            fx_idx++;
+                                            has_reflected = 1;
+                                            current_fx_idx[other_i] = (int16_t)0xfc18;
+
+                                            timer::Mark_Time_();
+                                            video::Set_Page_Off_();
+                                            CMBTDRW1::Draw_Main_Combat_Screen_();
+                                            graphics::Set_Window_(0, 0, 0x27f, 0x15e);
+                                            video::Clip_On_();
+                                            if (MOX::_dont_draw_ship == target_id && is_non_ship_target == 0) {
+                                                CMBTDRW1::Draw_Ship_(target_id, target_x, target_y);
+                                            }
+                                            if (MOX::_dont_draw_ship == attacker_ship_id) {
+                                                CMBTDRW1::Draw_Ship_(attacker_ship_id, attacker_x, attacker_y);
+                                            }
+                                        }
+                                        else {
+                                            current_fx_idx[i] = (int16_t)0xfc18;
+                                            if (next_fx->is_damage_entry != 0) {
+                                                _g_reflection_state_flag = 1;
+                                                _reflection_field_display_status = 1;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!skip_frame_increment) {
+                        if (MOX::_speedx2_flag != 0 || MOX::_net_flag != 0) {
+                            if (frame_idx[i] + 2 < Get_Max_Frames_()) {
+                                frame_idx[i] += 2;
+                            }
+                            else {
+                                frame_idx[i]++;
+                            }
+                        }
+                        else {
+                            frame_idx[i]++;
+                        }
+                    }
+                } // for i loop
+
+                if (current_fx_idx[0] > 0x7fff && current_fx_idx[1] > 0x7fff) {
+                    _shield_hit_now_flag = 0;
+                    _reflection_field_hit_now_flag = 0;
+                }
+
+                if (current_fx_idx[0] > 0x7fff && current_fx_idx[1] > 0x7fff &&
+                    _shield_display_status == 0 && _reflection_field_display_status == 0) {
+                    if (Done_Drawing_Damage_Message_Queue_() != 0 && has_reflected == 0) {
+                        bExitLoop = true;
+                        _g_reflection_state_flag = 0;
+                    }
+                }
+
+                if (is_non_ship_target == 0) {
+                    Adjust_Shield_Display_Status_(&_shield_hit_draw_facing);
+                    int16_t special_flag = 0;
+                    if (current_fx_idx[0] > -1) {
+                        special_flag = param_7[current_fx_idx[0]].special_flag;
+                    }
+                    if (current_fx_idx[1] > -1) {
+                        special_flag += param_7[current_fx_idx[1]].special_flag;
+                    }
+                    if (_g_pierced_shield_flag != 0) {
+                        special_flag = 1;
+                    }
+
+                    if (target_id == 0) {
+                        int16_t colony_id = MOX::_cmbt_colony_id;
+                        int16_t planet_idx = MOX::_colony[colony_id].planet;
+                        int16_t planet_size = MOX::_planet[planet_idx].size;
+                        int16_t shield_size = Planet_Size_To_Shield_Size_(planet_size);
+                        int16_t shield_diam = _shield_diameters[shield_size];
+                        int16_t draw_facing = _shield_hit_draw_facing;
+                        int16_t hit_facing = Get_SFX_Draw_Shield_Facing2_(attacker_ship_id, target_id);
+                        int16_t max_radius = shield_diam / 2;
+                        int16_t dx = target_center_x - max_radius;
+                        int16_t dy = target_center_y - max_radius;
+                        Draw_Shield_Hit_(dx, dy, target_id, (special_flag != 0), 0, hit_facing, (int16_t)draw_facing);
+                    }
+                    else {
+                        int16_t shield_size = Ship_Size_To_Shield_Size_(MOX::_combat_data[target_id].size_class);
+                        int16_t shield_diam = _shield_diameters[shield_size];
+                        int16_t specials = 0;
+                        if (current_fx_idx[0] > -1) {
+                            specials = param_7[current_fx_idx[0]].specials & 0x100;
+                        }
+                        int16_t draw_facing = _shield_hit_draw_facing;
+                        int16_t hit_facing = Get_SFX_Draw_Shield_Facing2_(attacker_ship_id, target_id);
+                        int16_t max_radius = shield_diam / 2;
+                        int16_t dx = target_center_x - max_radius;
+                        int16_t dy = target_center_y - max_radius;
+                        Draw_Shield_Hit_(dx, dy, target_id, (special_flag != 0), specials, hit_facing, (int16_t)draw_facing);
+                    }
+
+                    if (_reflection_field_display_status != 0) {
+                        if (_g_reflection_state_flag == 2) {
+                            Adjust_Reflection_Field_Display_Status_(&_reflection_field_hit_draw_facing);
+                            int16_t refl_center_x, refl_center_y;
+                            COMBINIT::Ship_Center_Offsets_(attacker_ship_id, &refl_center_x, &refl_center_y);
+                            refl_center_x += attacker_x;
+                            refl_center_y += attacker_y;
+                            int16_t shield_size = Ship_Size_To_Shield_Size_(MOX::_combat_data[attacker_ship_id].size_class);
+                            int16_t refl_diam = _reflection_field_diameters[shield_size];
+                            int16_t draw_facing = _reflection_field_hit_draw_facing;
+                            int16_t hit_facing = Get_SFX_Draw_Shield_Facing2_(target_id, attacker_ship_id);
+                            int16_t refl_radius = refl_diam / 2;
+                            Draw_Reflection_Field_Hit_(refl_center_x - refl_radius, refl_center_y - refl_radius, MOX::_combat_data[attacker_ship_id].size_class, hit_facing, draw_facing);
+                        }
+                        else if (_g_reflection_state_flag == 1) {
+                            Adjust_Reflection_Field_Display_Status_(&_reflection_field_hit_draw_facing);
+                            int16_t shield_size = Ship_Size_To_Shield_Size_(MOX::_combat_data[target_id].size_class);
+                            int16_t refl_diam = _reflection_field_diameters[shield_size];
+                            int16_t refl_center_x, refl_center_y;
+                            COMBINIT::Ship_Center_Offsets_(target_id, &refl_center_x, &refl_center_y);
+                            refl_center_x += target_x;
+                            refl_center_y += target_y;
+                            int16_t draw_facing = _reflection_field_hit_draw_facing;
+                            int16_t hit_facing = Get_SFX_Draw_Shield_Facing2_(attacker_ship_id, target_id);
+                            int16_t refl_radius = refl_diam / 2;
+                            Draw_Reflection_Field_Hit_(refl_center_x - refl_radius, refl_center_y - refl_radius, MOX::_combat_data[target_id].size_class, hit_facing, draw_facing);
+                        }
+                    }
+                }
+                else {
+                    _shield_display_status = 0;
+                    _reflection_field_display_status = 0;
+                }
+
+                for (int16_t i = 0; i < 2; ++i) {
+                    if (is_non_ship_target == 0) {
+                        int16_t fx_idx_val = current_fx_idx[i];
+                        if (fx_idx_val > -1 && _ship_hit_now_flag[i] != 0) {
+                            s_beam_fx_entry* fx = &param_7[fx_idx_val];
+                            if (fx->accum_hit_x > 0 || fx->accum_hit_y > 0) {
+                                int16_t hit_facing = Do_Get_SFX_Draw_Shield_Facing_(attacker_ship_id, target_id);
+                                Add_Damage_Indicator_For_Ship_(target_x, target_y, target_id, hit_facing, fx->accum_hit_x, fx->accum_hit_y);
+                                ERICNET::Mox_Play_Sound_(0x1d);
+                                fx->accum_hit_x = -1;
+                                fx->accum_hit_y = -1;
+                            }
+                        }
+                    }
+                    else {
+                        int16_t fx_idx_val = current_fx_idx[i];
+                        if (fx_idx_val > -1 && _ship_hit_now_flag[i] != 0) {
+                            s_beam_fx_entry* fx = &param_7[fx_idx_val];
+                            if (fx->accum_hit_x > 0 || fx->accum_hit_y > 0) {
+                                Add_Damage_Indicator_For_Missile_(target_center_x, target_center_y, 1, fx->accum_hit_x);
+                                MOX::_missile[target_id].quantity -= fx->accum_hit_x;
+                                if (MOX::_missile[target_id].quantity <= 0) {
+                                    CMBTMIS::Kill_Missile_(target_id);
+                                }
+                                if (fx->accum_hit_x != 0) {
+                                    ERICNET::Mox_Play_Sound_(0x1c);
+                                }
+                                fx->accum_hit_x = -1;
+                                fx->accum_hit_y = -1;
+                            }
+                        }
+                    }
+                }
+
+                Draw_Damage_Message_Queue_();
+                timer::Release_Time_(1);
+                RUSS::Mox_Sync_Update_();
+                video::Clip_Off_();
+                graphics::Reset_Window_();
+            } while (!bExitLoop);
+
+            _ship_hit_now_flag[0] = 0;
+            _ship_hit_now_flag[1] = 0;
+            _ship_firing_now_flag = 0;
+            Reset_Beam_SFX_Handles_();
+            _shield_display_status = 0;
+            _reflection_field_display_status = 0;
+            video::Clip_Off_();
+            random::Set_Random_Seed_(seed);
+        }
     }
 }
