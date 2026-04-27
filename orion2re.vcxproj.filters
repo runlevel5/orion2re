@@ -561,6 +561,9 @@
     <ClCompile Include="src\game\colgcbt.cpp">
       <Filter>src\game</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\bolt.cpp">
+      <Filter>src\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">
@@ -1176,6 +1179,9 @@
       <Filter>src\game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\colrefit.h">
+      <Filter>src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\bolt.h">
       <Filter>src\game</Filter>
     </ClInclude>
   </ItemGroup>

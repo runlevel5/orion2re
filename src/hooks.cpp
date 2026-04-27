@@ -3621,6 +3621,14 @@ namespace hooks {
         { 0x00422ED0, &BEAMS::Get_SFX_Draw_Shield_Facing2_ },
         { 0x00422e40, &BEAMS::Do_Get_SFX_Draw_Shield_Facing_ },
         { 0x00420110, &BEAMS::Draw_Generic_Beam_ },
+        { 0x00420A80, &BEAMS::Draw_Ship_Burst_ },
+        { 0x00532a40, &bolt::Bolt_Line_ },
+        { 0x00533070, &bolt::Wide_Bolt_Line_ },
+        { 0x00424ca0, &BEAMS::Draw_Beam2_ },
+        { 0x00420AE0, &BEAMS::Draw_Ship_Explosion_ },
+        { 0x00423080, &BEAMS::XY_In_Shield_Radius_ },
+        { 0x00423e10, &BEAMS::XY_In_Reflection_Field_Radius_ },
+        { 0x00423e70, &BEAMS::Set_Beam_Colors_ },
     };
 
     void Install_Hooks()

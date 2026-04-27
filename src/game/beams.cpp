@@ -94,6 +94,21 @@ namespace BEAMS {
     }
 
     /**
+     * @address 00420ae0
+     */
+    void __cdecl Draw_Ship_Explosion_(int16_t x, int16_t y, int16_t type_idx, int16_t frame_idx, int16_t size_idx) {
+        s_animation_header* anim = _explosion_anim[size_idx][type_idx];
+        int16_t count1 = animate::Get_Animation_Frame_Count_(anim);
+        animate::Set_Animation_Frame_(anim, frame_idx % (count1 - 1));
+
+        anim = _explosion_anim[size_idx][type_idx];
+        int16_t count2 = animate::Get_Animation_Frame_Count_(anim);
+        animate::Set_Animation_Frame_(anim, frame_idx % (count2 - 1));
+
+        animate::Draw_(x - 8, y - 8, anim);
+    }
+
+    /**
      * @brief Retrieves or reloads the shield animation header based on ship size and flags.
      * @param beam_idx The type index of the beam or shield visual.
      * @param size_idx The ship size index (e.g., 0=Small, 1=Medium, etc.).
@@ -387,6 +402,9 @@ namespace BEAMS {
         }
     }
 
+    /**
+     * @address 00423370
+     */
     int16_t __cdecl Ship_Size_To_Shield_Size_(int16_t ship_size) {
         int16_t shield_sizes[6];
 
@@ -1624,6 +1642,12 @@ namespace BEAMS {
         }
     }
 
+    void __cdecl Draw_Ship_Burst_(int16_t x, int16_t y, int16_t dir, int16_t base_damage_class, int16_t frame, int16_t is_palette_not_90) {
+        s_animation_header* anim = _laser_burst_anim[base_damage_class][is_palette_not_90][dir];
+        animate::Set_Animation_Frame_(anim, frame % 3);
+        ERIC::Draw_Centered_(x, y, anim);
+    }
+
     void __cdecl Reset_Beam_SFX_Handles_() {
         _g_shield_sfx_handle = 0;
         memset(_g_beam_fire_sfx_handle, 0, sizeof(_g_beam_fire_sfx_handle));
@@ -2349,19 +2373,19 @@ namespace BEAMS {
         if (param_34 == nullptr) {
             if (bx1 != bx2 || by1 != by2) {
                 if (mount_scale_mod == 1) {
-                    Draw_Beam_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
                                is_autofiring, param_17, param_18, fx_param_1, fx_param_2, fx_param_3, fx_param_4);
                 } else if (mount_scale_mod == 2) {
                     int16_t mid3 = (fx_param_3 + fx_param_1) / 2;
                     int16_t mid4 = (fx_param_4 + fx_param_2) / 2;
-                    Draw_Beam_Midpoint_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                    bolt::Wide_Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                         draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
                                         is_autofiring, param_17, param_18, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
                 } else if (mount_scale_mod == 0) {
                     if (fx_param_2 < fx_param_4) fx_param_4 = fx_param_2;
                     if (fx_param_1 < fx_param_3) fx_param_3 = fx_param_1;
-                    Draw_Beam_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                    bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
                                is_autofiring, param_17, param_18, 0, 0, fx_param_3, fx_param_4);
                 }
@@ -2441,5 +2465,184 @@ namespace BEAMS {
             }
         }
         _reflection_field_hit_now_flag = 0;
+    }
+
+    void __cdecl Set_Beam_Colors_(
+        int32_t palette_idx,
+        int32_t r1, int32_t g1, int32_t b1,
+        int32_t r2, int32_t g2, int32_t b2,
+        int32_t intensity
+    ) {
+        LocalColor colors[16];
+
+        for (int i = 0; i < 7; ++i) {
+            int32_t val = _low_ramp_values[i];
+            colors[i].r = (r1 * val) / 100;
+            colors[i].g = (g1 * val) / 100;
+            colors[i].b = (b1 * val) / 100;
+        }
+
+        colors[7].r = r1;
+        colors[7].g = g1;
+        colors[7].b = b1;
+
+        int32_t cross_factor = 115; // 0x73
+        for (int i = 0; i < 4; ++i) {
+            if (intensity == 0 || intensity == 1 || intensity == 2) {
+                int32_t primary_weight;
+                if (intensity == 0) {
+                    primary_weight = _low_primary_cross_values[i];
+                } else if (intensity == 1) {
+                    primary_weight = _moderate_primary_cross_values[i];
+                } else {
+                    primary_weight = _high_primary_cross_values[i];
+                }
+
+                int32_t inv_weight = 100 - primary_weight;
+                int32_t scaled_weight = primary_weight * cross_factor;
+
+                colors[8 + i].r = ((r1 * scaled_weight) / 100 + r2 * inv_weight) / 100;
+                colors[8 + i].g = ((g1 * scaled_weight) / 100 + g2 * inv_weight) / 100;
+                colors[8 + i].b = ((b1 * scaled_weight) / 100 + b2 * inv_weight) / 100;
+            }
+
+            if (colors[8 + i].r > 255) colors[8 + i].r = 255;
+            if (colors[8 + i].g > 255) colors[8 + i].g = 255;
+            if (colors[8 + i].b > 255) colors[8 + i].b = 255;
+
+            cross_factor += 15; // 0xF
+        }
+
+        colors[12].r = r2;
+        colors[12].g = g2;
+        colors[12].b = b2;
+
+        for (int i = 0; i < 3; ++i) {
+            if (intensity == 0 || intensity == 1 || intensity == 2) {
+                int32_t sat_weight;
+                if (intensity == 0) {
+                    sat_weight = _low_saturated_values[i];
+                } else if (intensity == 1) {
+                    sat_weight = _moderate_saturated_values[i];
+                } else {
+                    sat_weight = _high_saturated_values[i];
+                }
+
+                colors[13 + i].r = (r2 * sat_weight) / 100;
+                colors[13 + i].g = (g2 * sat_weight) / 100;
+                colors[13 + i].b = (b2 * sat_weight) / 100;
+            }
+
+            if (colors[13 + i].r > 255) colors[13 + i].r = 255;
+            if (colors[13 + i].g > 255) colors[13 + i].g = 255;
+            if (colors[13 + i].b > 255) colors[13 + i].b = 255;
+        }
+
+        for (int i = 0; i < 16; ++i) {
+            colors[i].r /= 4;
+            colors[i].g /= 4;
+            colors[i].b /= 4;
+        }
+
+        for (int i = 0; i < 16; ++i) {
+            video::_current_palette[palette_idx + i].changed = 1;
+            video::_current_palette[palette_idx + i].r = static_cast<uint8_t>(colors[i].r);
+            video::_current_palette[palette_idx + i].g = static_cast<uint8_t>(colors[i].g);
+            video::_current_palette[palette_idx + i].b = static_cast<uint8_t>(colors[i].b);
+        }
+    }
+
+    void __cdecl Draw_Beam2_(int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y, int32_t x1, int32_t y1,
+                             int32_t x2, int32_t y2, int32_t unused_9, uint32_t thickness, int32_t color_idx, int32_t beam_color_1,
+                             int32_t beam_color_2, int32_t beam_color_3, int32_t beam_color_4, int32_t beam_color_5,
+                             int32_t beam_color_6, int32_t beam_color_7, uint32_t beam_type, int32_t condition_var,
+                             int32_t unused_21, int32_t size_multiplier)
+    {
+        if ((x1 != x2 || y1 != y2) && beam_type < 4) {
+            int32_t mod_thick = (int32_t)thickness % 2;
+
+            switch (beam_type) {
+                case 0: {
+                    int32_t arg16;
+                    int32_t arg17;
+                    if (thickness == 0) {
+                        strings::Swap_(&x1, &x2);
+                        strings::Swap_(&y1, &y2);
+                        arg17 = 3;
+                        arg16 = 10;
+                    } else if ((int32_t)thickness >= 1 && (int32_t)thickness < 2) {
+                        arg17 = 6;
+                        arg16 = 10;
+                    } else {
+                        arg17 = 3;
+                        arg16 = 12;
+                    }
+                    bolt::Bolt_Line_(x1, y1, x2, y2, color_idx, 12, 30, 3, thickness, 0, 0, 1, 1, 0, 0, arg16, arg17, 4, 0);
+                    break;
+                }
+                case 1: {
+                    int32_t cond = condition_var >= 10 ? 1 : 0;
+                    int32_t size = size_multiplier * 2 + 7;
+                    bolt::Wide_Bolt_Line_(x1, y1, x2, y2, color_idx, 12, 50, 3, thickness, 0, 1, cond, 1, 0, 0, 12, 3, size, 1, 2, 0);
+                    break;
+                }
+                case 2: {
+                    int32_t div_val = mod_thick + 1;
+                    int32_t arg18 = 4 / div_val;
+                    int32_t arg17 = 8 / div_val;
+                    int32_t arg16 = 12 / div_val;
+                    
+                    int32_t rand_y = random::Random_(5) + end_y - 3;
+                    int32_t rand_x = random::Random_(5) + end_x - 3;
+
+                    bolt::Bolt_Line_(start_x, start_y, rand_x, rand_y, color_idx, 12, 100, 4, thickness * 4, 0, 0, 0, 0, 1, 0, arg16, arg17, arg18, 0);
+                    break;
+                }
+                case 3: {
+                    int32_t div_val1 = mod_thick + 1;
+                    int32_t div_val2 = mod_thick * 2 + 1;
+                    int32_t div_val3 = mod_thick + 2;
+
+                    int32_t arg20_21 = 2 / div_val1;
+                    int32_t arg18_19 = 5 / div_val2 + 1;
+                    int32_t arg16_17 = 21 / div_val3;
+
+                    bolt::Wide_Bolt_Line_(start_x, start_y, end_x, end_y, color_idx, 16, 100, 3, thickness * 2, 1, 0, 0, 0, 1, 0, arg16_17, arg16_17, arg18_19, arg18_19, arg20_21, arg20_21);
+                    break;
+                }
+            }
+        }
+
+        Set_Beam_Colors_(color_idx, beam_color_1, beam_color_2, beam_color_3, beam_color_4, beam_color_5, beam_color_6, beam_color_7);
+        palette::Refresh_Palette_();
+    }
+
+    /**
+     * @address 00423080
+     */
+    bool __cdecl XY_In_Shield_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
+        int16_t shield_idx = Ship_Size_To_Shield_Size_(ship_size);
+        int16_t radius = _shield_diameters[shield_idx] >> 1;
+
+        if (abs(x1 - x2) <= radius && abs(y1 - y2) <= radius) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @address 00423e10
+     */
+    bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
+        int16_t shield_size = Ship_Size_To_Shield_Size_(ship_size);
+        int16_t radius = _reflection_field_diameters[shield_size] >> 1;
+
+        if (abs(static_cast<int16_t>(x1 - x2)) <= radius &&
+            abs(static_cast<int16_t>(y1 - y2)) <= radius) {
+            return true;
+        }
+
+        return false;
     }
 }

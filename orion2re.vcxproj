@@ -41,6 +41,7 @@
     <ClCompile Include="src\game\billhelp.cpp" />
     <ClCompile Include="src\game\bitio.cpp" />
     <ClCompile Include="src\game\bitmap.cpp" />
+    <ClCompile Include="src\game\bolt.cpp" />
     <ClCompile Include="src\game\bomb.cpp" />
     <ClCompile Include="src\game\buffer.cpp" />
     <ClCompile Include="src\game\capture.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="src\game\billhelp.h" />
     <ClInclude Include="src\game\bitio.h" />
     <ClInclude Include="src\game\bitmap.h" />
+    <ClInclude Include="src\game\bolt.h" />
     <ClInclude Include="src\game\bomb.h" />
     <ClInclude Include="src\game\buffer.h" />
     <ClInclude Include="src\game\capture.h" />

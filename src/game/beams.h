@@ -1,6 +1,12 @@
 #pragma once
 
 namespace BEAMS {
+    struct LocalColor {
+        int32_t g;
+        int32_t b;
+        int32_t r;
+    };
+
     inline uint8_t& _g_pierced_shield_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D08});
 
     inline int16_t (&_old_color)[2] =
@@ -73,6 +79,27 @@ namespace BEAMS {
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D74});
 
     inline uint8_t& _g_firing_reflected_beam_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00552D78});
+
+    inline int32_t (&_low_ramp_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552D80});
+
+    inline int32_t (&_low_primary_cross_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552DD0});
+
+    inline int32_t (&_low_saturated_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552E20});
+
+    inline int32_t (&_moderate_primary_cross_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552EC0});
+
+    inline int32_t (&_moderate_saturated_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552F10});
+
+    inline int32_t (&_high_primary_cross_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00552FB0});
+
+    inline int32_t (&_high_saturated_values)[20] =
+        *reinterpret_cast<int32_t(*)[20]>(std::uintptr_t{0x00553000});
 
     inline int16_t& _n_damage_msgs =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D7C});
@@ -165,45 +192,24 @@ namespace BEAMS {
 
     void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step);
 
-    inline void __cdecl Draw_Ship_Burst_(int16_t x, int16_t y, int16_t dir, int16_t base_damage_class, int16_t frame, int16_t is_palette_not_90) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420A80});
-        fn(x, y, dir, base_damage_class, frame, is_palette_not_90);
-    }
+    void __cdecl Draw_Ship_Burst_(int16_t x, int16_t y, int16_t dir, int16_t base_damage_class, int16_t frame, int16_t is_palette_not_90);
 
-    inline void __cdecl Draw_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette, int16_t angle, int16_t len, int16_t width, int16_t core, int16_t glow, int16_t particles, int16_t pierce, int16_t autofire, int16_t p17, int16_t p18, int16_t f1, int16_t f2, int16_t f3, int16_t f4) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532A40});
-        fn(x1, y1, x2, y2, palette, angle, len, width, core, glow, particles, pierce, autofire, p17, p18, f1, f2, f3, f4);
-    }
+    void __cdecl Draw_Beam2_(int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y, int32_t x1, int32_t y1,
+                             int32_t x2, int32_t y2, int32_t unused_9, uint32_t thickness, int32_t color_idx, int32_t beam_color_1,
+                             int32_t beam_color_2, int32_t beam_color_3, int32_t beam_color_4, int32_t beam_color_5,
+                             int32_t beam_color_6, int32_t beam_color_7, uint32_t beam_type, int32_t condition_var,
+                             int32_t unused_21, int32_t size_multiplier);
 
-    inline void __cdecl Draw_Beam_Midpoint_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette, int16_t angle, int16_t len, int16_t width, int16_t core, int16_t glow, int16_t particles, int16_t pierce, int16_t autofire, int16_t p17, int16_t p18, int16_t f1, int16_t f2, int16_t mid3, int16_t mid4, int16_t f3, int16_t f4) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533070});
-        fn(x1, y1, x2, y2, palette, angle, len, width, core, glow, particles, pierce, autofire, p17, p18, f1, f2, mid3, mid4, f3, f4);
-    }
+    void __cdecl Set_Beam_Colors_(
+        int32_t palette_idx,
+        int32_t r1, int32_t g1, int32_t b1,
+        int32_t r2, int32_t g2, int32_t b2,
+        int32_t intensity
+    );
 
-    inline void __cdecl Draw_Beam2_(int16_t ax, int16_t ay, int16_t tx, int16_t ty, int16_t bx1, int16_t by1, int16_t bx2, int16_t by2, uint32_t hit, int32_t frame, int32_t pal, int32_t c00, int32_t c04, int32_t c10, int32_t c14, int32_t c20, int32_t c24, int32_t thick, int32_t anim, int32_t sfx, int32_t dur, int32_t unk) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, uint32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00424CA0});
-        fn(ax, ay, tx, ty, bx1, by1, bx2, by2, hit, frame, pal, c00, c04, c10, c14, c20, c24, thick, anim, sfx, dur, unk);
-    }
+    void __cdecl Draw_Ship_Explosion_(int16_t x, int16_t y, int16_t type_idx, int16_t frame_idx, int16_t size_idx);
 
-    inline void __cdecl Draw_Ship_Explosion_(int16_t tx, int16_t ty, int16_t facing, int16_t frame, int16_t pal_not_90) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420AE0});
-        fn(tx, ty, facing, frame, pal_not_90);
-    }
+    bool __cdecl XY_In_Shield_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size);
 
-    inline bool __cdecl XY_In_Shield_Radius_(int16_t x, int16_t y, int16_t tx, int16_t ty, int16_t target_size_class) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423080});
-        return fn(x, y, tx, ty, target_size_class);
-    }
-
-    inline bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x, int16_t y, int16_t tx, int16_t ty, int16_t target_size_class) {
-        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423E10});
-        return fn(x, y, tx, ty, target_size_class);
-    }
+    bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size);
 }
