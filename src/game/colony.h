@@ -297,7 +297,7 @@ namespace COLONY {
 
     int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode);
 
-    void __cdecl Set_Colony_Font_To_(int16_t style);
+    void __cdecl Set_Colony_Font_To_(int32_t style);
 
     void __cdecl Draw_Colony_Info_Officer_();
 

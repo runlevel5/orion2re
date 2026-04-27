@@ -66,6 +66,7 @@
     <ClCompile Include="src\game\colonize.cpp" />
     <ClCompile Include="src\game\colony.cpp" />
     <ClCompile Include="src\game\colony_main.cpp" />
+    <ClCompile Include="src\game\colrefit.cpp" />
     <ClCompile Include="src\game\colsum.cpp" />
     <ClCompile Include="src\game\colsysdi.cpp" />
     <ClCompile Include="src\game\colxport.cpp" />

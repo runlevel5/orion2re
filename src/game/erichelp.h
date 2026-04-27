@@ -42,6 +42,9 @@ namespace ERICHELP {
     inline s_help_box (&_officer_information_popup_help_list)[1] =
         *reinterpret_cast<s_help_box(*)[1]>(std::uintptr_t{0x00552248});
 
+    inline s_help_box (&_refit_ship_popup_help_list)[7] =
+        *reinterpret_cast<s_help_box(*)[7]>(std::uintptr_t{0x00552050});
+
     void __cdecl Eric_Set_Help_List_(s_help_box* help_list, int16_t count);
 
     void __cdecl Set_Transport_Popup_Help_List_();
@@ -57,4 +60,5 @@ namespace ERICHELP {
     void __cdecl Set_Planet_Selection_Popup_Help_List_();
     void __cdecl Set_New_System_Discovery_Popup_Help_List_();
     void __cdecl Set_Officer_Information_Popup_Help_List_();
+    void __cdecl Set_Refit_Ship_Popup_Help_List_();
 }

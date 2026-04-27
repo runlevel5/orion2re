@@ -3640,6 +3640,18 @@ namespace hooks {
         { 0x004599e0, &COLDRAW::Draw_Simplest_Path_ },
         { 0x00458c10, &COLDRAW::Draw_Colony_Wee_Prod_ },
         { 0x00458a40, &COLDRAW::Draw_Info_Wee_Morale_ },
+        { 0x004A1180, &COLREFIT::Colony_Refit_Popup_ },
+        { 0x00412340, &ERICHELP::Set_Refit_Ship_Popup_Help_List_ },
+        { 0x004A1A10, &COLREFIT::Evaluate_Input_ },
+        { 0x004A12E0, &COLREFIT::Add_Fields_ },
+        { 0x004a1560, &COLREFIT::Draw_Refit_Popup_ },
+        { 0x004A1110, &COLREFIT::Load_Refit_Ship_Anims_ },
+        { 0x004A14C0, &COLREFIT::Build_Ship_List_ },
+        { 0x004a1420, &COLREFIT::Add_Ship_List_Fields_ },
+        { 0x004a17e0, &COLREFIT::Scan_Ship_Info_ },
+        { 0x004A1850, &COLREFIT::Draw_Ship_List_ },
+        { 0x004a1600, &COLREFIT::Draw_Bar_Indicator_ },
+        { 0x004A1740, &COLREFIT::Update_First_Ship_ },
     };
 
     void Install_Hooks()

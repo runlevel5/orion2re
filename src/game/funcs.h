@@ -892,6 +892,8 @@ inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055
 
 inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
 
+inline int16_t* _fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C450});
+
 inline char* s_fmt_d_s_s_00557e0c = reinterpret_cast<char*>(std::uintptr_t{0x00557E0C}); /* "%d %s (%s)" */
 inline char* s_fmt_s_d_EP_00557e18 = reinterpret_cast<char*>(std::uintptr_t{0x00557E18}); /* "%s (%d EP)" */
 

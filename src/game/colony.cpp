@@ -1014,7 +1014,7 @@ namespace COLONY {
     /**
      * @address 004dbf40
      */
-    void __cdecl Set_Colony_Font_To_(int16_t style) {
+    void __cdecl Set_Colony_Font_To_(int32_t style) {
         fonts::Set_Outline_Color_(0x50, 0x50);
 
         // style & 0xff extracts the lower byte as seen in the disassembly (MOV AL, byte ptr [ESP + 0xc])

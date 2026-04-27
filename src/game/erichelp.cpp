@@ -72,4 +72,8 @@ namespace ERICHELP {
         Eric_Set_Help_List_(_officer_information_popup_help_list, 1);
     }
 
+    void __cdecl Set_Refit_Ship_Popup_Help_List_() {
+        Eric_Set_Help_List_(_refit_ship_popup_help_list, 7);
+    }
+
 }
