@@ -422,6 +422,27 @@ namespace BEAMS {
     }
 
     /**
+     * @address 00420a50
+     */
+    int16_t __cdecl Get_Ship_Range_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
+        int16_t dx = x2 - x1;
+        if (dx < 0) {
+            dx = -dx;
+        }
+
+        int16_t dy = y2 - y1;
+        if (dy < 0) {
+            dy = -dy;
+        }
+
+        if (dx <= dy) {
+            dx = dy;
+        }
+
+        return dx;
+    }
+
+    /**
      * @address 004233f0
      */
     void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7) {
@@ -1599,6 +1620,566 @@ namespace BEAMS {
             _reflection_field_display_status = 0;
             video::Clip_Off_();
             random::Set_Random_Seed_(seed);
+        }
+    }
+
+    void __cdecl Reset_Beam_SFX_Handles_() {
+        _g_shield_sfx_handle = 0;
+        memset(_g_beam_fire_sfx_handle, 0, sizeof(_g_beam_fire_sfx_handle));
+    }
+
+    void __cdecl Draw_Reflection_Field_Hit_(int16_t x, int16_t y, int16_t ship_size, int16_t rotation, int16_t frame) {
+        int16_t base_rot = Rot_To_Base_Rot_(rotation);
+        int16_t rot_method = Rot_To_Rot_Method_(rotation);
+        int16_t shield_size = Ship_Size_To_Shield_Size_(ship_size);
+
+        uint32_t diameter = _shield_diameters[shield_size];
+        uint32_t size = (diameter * diameter) + 0x20;
+
+        allocate::Push_Block_(MOX::_screen_seg);
+        s_animation_header* h1 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+        s_animation_header* psVar5 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size);
+
+        if (_reflection_field_display_status == 0) {
+            allocate::Pop_Block_(MOX::_screen_seg);
+            return;
+        }
+
+        if (frame == 0 && _g_reflection_field_sfx_handle == 0) {
+            int16_t sfx_id = (_g_reflection_state_flag == 0) ? 0x26 : 0x2A;
+            _g_reflection_field_sfx_handle = ERICNET::Mox_Play_Sound_(sfx_id);
+            sound::Pitch_Bend_Sound_((int32_t)_g_reflection_field_sfx_handle, ship_size * -2500);
+        } else {
+            s_animation_header* anim = Reflection_Field_Anims_(base_rot, shield_size);
+            if ((animate::Get_Animation_Frame_Count_(anim) - 1) <= frame) {
+                // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
+                sound::Fadeout_Sound_((int16_t)_g_reflection_field_sfx_handle, 10);
+                _g_reflection_field_sfx_handle = 0;
+            }
+        }
+
+        s_animation_header* anim_frames = Reflection_Field_Anims_(base_rot, shield_size);
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(anim_frames);
+        int16_t actual_frame = frame % frame_count;
+
+        s_animation_header* anim_to_set = Reflection_Field_Anims_(base_rot, shield_size);
+        animate::Set_Animation_Frame_(anim_to_set, actual_frame);
+
+        s_animation_header* anim_to_draw = Reflection_Field_Anims_(base_rot, shield_size);
+        bitmap::Draw_Picture_To_Bitmap_(h1, anim_to_draw);
+
+        s_animation_header* draw_header = nullptr;
+        switch (rot_method) {
+            case 0:
+                bitmap::Set_Picture_Glassed_(h1);
+                draw_header = h1;
+                break;
+            case 1:
+                bitmap::Flip_Bitmap_(psVar5, h1, 0);
+                bitmap::Set_Picture_Glassed_(psVar5);
+                draw_header = psVar5;
+                break;
+            case 2:
+                bitmap::Flip_Bitmap_(psVar5, h1, 3);
+                bitmap::Flip_Bitmap_(h1, psVar5, 0);
+                bitmap::Set_Picture_Glassed_(h1);
+                draw_header = h1;
+                break;
+            case 3:
+                bitmap::Flip_Bitmap_(psVar5, h1, 3);
+                bitmap::Set_Picture_Glassed_(psVar5);
+                draw_header = psVar5;
+                break;
+            default:
+                break;
+        }
+
+        if (draw_header != nullptr) {
+            animate::Draw_(x, y, draw_header);
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    /**
+     * @address 00423aa0
+     */
+    void __cdecl Adjust_Reflection_Field_Display_Status_(int16_t* param_1) {
+        int16_t frame_count = animate::Get_Animation_Frame_Count_(Reflection_Field_Anims_(0, 0));
+
+        if (_g_reflection_state_flag == 0 && _reflection_field_display_status != 0) {
+            _reflection_field_display_status = 0;
+            return;
+        }
+
+        switch (_reflection_field_display_status) {
+            case 0:
+                if (_reflection_field_hit_now_flag != 0 || _g_reflection_state_flag >= 1) {
+                    _reflection_field_display_status = 1;
+                    *param_1 = 0;
+                }
+                break;
+            case 1:
+                (*param_1)++;
+                if (*param_1 >= 4) {
+                    _reflection_field_display_status = 2;
+                }
+                break;
+            case 2:
+                (*param_1)++;
+                if (_reflection_field_hit_now_flag != 0) {
+                    if (*param_1 >= 7) {
+                        *param_1 = 4;
+                    }
+                } else {
+                    if (*param_1 >= 7) {
+                        _reflection_field_display_status = 3;
+                    }
+                }
+                break;
+            case 3:
+                (*param_1)++;
+                if (frame_count <= *param_1) {
+                    _reflection_field_display_status = 0;
+                    _g_reflection_state_flag = 0;
+                }
+                break;
+        }
+    }
+
+    void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t param_1, uint16_t param_2, s_weapon_visual_fx* param_3) {
+        if (param_1 <= 0 || param_1 > 46) {
+            return;
+        }
+
+        s_weapon_visual_fx local_2c;
+
+        switch (param_1) {
+            case 1:
+                local_2c.colors[0] = s_colors{{0x59, 0, 0, 0, 0x6b, 0, 0, 0}};
+                local_2c.colors[1] = s_colors{{0xc3, 0, 0, 0, 0xda, 0, 0, 0}};
+                local_2c.colors[2] = s_colors{{0xfc, 0, 0, 0, 0xff, 0, 0, 0}};
+                local_2c.thickness = 1;
+                local_2c.anim_style = 1;
+                local_2c.sfx_sprite_id = 4;
+                local_2c.duration = 20;
+                local_2c.unk = 0;
+                *param_3 = local_2c;
+                break;
+
+            case 2:
+                local_2c.colors[0] = s_colors{{0x59, 0, 0, 0, 0x67, 0, 0, 0}};
+                local_2c.colors[1] = s_colors{{0x6c, 0, 0, 0, 0xb2, 0, 0, 0}};
+                local_2c.colors[2] = s_colors{{0xc8, 0, 0, 0, 0xc8, 0, 0, 0}};
+                local_2c.thickness = 1;
+                local_2c.anim_style = 1;
+                local_2c.sfx_sprite_id = 6;
+                local_2c.duration = 20;
+                local_2c.unk = 0;
+                *param_3 = local_2c;
+                break;
+
+            case 3:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0xc8, 0, 0, 0, 0x14, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x20, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0x50, 0, 0, 0, 0x0a, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 0;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0xc8, 0, 0, 0, 0x14, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x20, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0x50, 0, 0, 0, 0x0a, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 4:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0x5e, 0, 0, 0, 0x70, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0xcd, 0, 0, 0, 0xba, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xdd, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 0;
+                    local_2c.anim_style = 0;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0x5e, 0, 0, 0, 0x70, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0xcd, 0, 0, 0, 0xba, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xdd, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 0;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 5:
+                if (((param_2 & 0x10) != 0) && ((param_2 & 0x100) != 0)) {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 3;
+                    local_2c.sfx_sprite_id = 100;
+                    local_2c.duration = 25;
+                    local_2c.unk = 1;
+                } else if ((param_2 & 0x10) != 0) {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 120;
+                    local_2c.duration = 30;
+                    local_2c.unk = 0;
+                } else if ((param_2 & 0x100) != 0) {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 1;
+                    local_2c.sfx_sprite_id = 100;
+                    local_2c.duration = 25;
+                    local_2c.unk = 1;
+                } else {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x46, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa2, 0, 0, 0, 0x00, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 1;
+                    local_2c.sfx_sprite_id = 120;
+                    local_2c.duration = 30;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 6:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0x94, 0, 0, 0, 0x9b, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x49, 0, 0, 0, 0xfe, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xfe, 0, 0, 0, 0x94, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 1;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0x94, 0, 0, 0, 0x9b, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x49, 0, 0, 0, 0xfe, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xfe, 0, 0, 0, 0x94, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 7:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0x44, 0, 0, 0, 0x98, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x8f, 0, 0, 0, 0x93, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 3;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0x44, 0, 0, 0, 0x98, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x8f, 0, 0, 0, 0x93, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 3;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 8:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0x92, 0, 0, 0, 0x53, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0xba, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 1;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0x92, 0, 0, 0, 0x53, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0xba, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 9:
+            case 41:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0xa9, 0, 0, 0, 0x2b, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa6, 0, 0, 0, 0x60, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 0;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                } else {
+                    local_2c.colors[0] = s_colors{{0xa9, 0, 0, 0, 0x2b, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xa6, 0, 0, 0, 0x60, 0, 0, 0}};
+                    local_2c.thickness = 1;
+                    local_2c.anim_style = 2;
+                    local_2c.sfx_sprite_id = 200;
+                    local_2c.duration = 50;
+                    local_2c.unk = 0;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 10:
+                local_2c.colors[0] = s_colors{{0x6b, 0, 0, 0, 0xa2, 0, 0, 0}};
+                local_2c.colors[1] = s_colors{{0x16, 0, 0, 0, 0xf2, 0, 0, 0}};
+                local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x35, 0, 0, 0}};
+                local_2c.thickness = 1;
+                local_2c.anim_style = 1;
+                local_2c.sfx_sprite_id = 40;
+                local_2c.duration = 30;
+                local_2c.unk = 0;
+                *param_3 = local_2c;
+                break;
+
+            case 11:
+            case 42:
+                local_2c.colors[0] = s_colors{{0xc9, 0, 0, 0, 0x53, 0, 0, 0}};
+                local_2c.colors[1] = s_colors{{0xc4, 0, 0, 0, 0xff, 0, 0, 0}};
+                local_2c.colors[2] = s_colors{{0xb8, 0, 0, 0, 0xff, 0, 0, 0}};
+                local_2c.thickness = 1;
+                local_2c.anim_style = 3;
+                local_2c.sfx_sprite_id = 200;
+                local_2c.duration = 50;
+                local_2c.unk = 0;
+                *param_3 = local_2c;
+                break;
+
+            case 12:
+                if ((param_2 & 0x10) == 0) {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x53, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x52, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 1;
+                    local_2c.sfx_sprite_id = 100;
+                    local_2c.duration = 30;
+                    local_2c.unk = 1;
+                } else {
+                    local_2c.colors[0] = s_colors{{0xd2, 0, 0, 0, 0x53, 0, 0, 0}};
+                    local_2c.colors[1] = s_colors{{0x00, 0, 0, 0, 0xff, 0, 0, 0}};
+                    local_2c.colors[2] = s_colors{{0xff, 0, 0, 0, 0x52, 0, 0, 0}};
+                    local_2c.thickness = 2;
+                    local_2c.anim_style = 3;
+                    local_2c.sfx_sprite_id = 100;
+                    local_2c.duration = 30;
+                    local_2c.unk = 1;
+                }
+                *param_3 = local_2c;
+                break;
+
+            case 27:
+            case 40:
+            case 43:
+            case 46:
+                *param_3 = s_weapon_visual_fx{};
+                break;
+
+            default:
+                return;
+        }
+    }
+
+    int8_t __cdecl Is_Steve_Stuff_Weapon_(int16_t weapon_id) {
+        switch (weapon_id) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 41:
+            case 42:
+                return 1;
+            case 13:
+            case 27:
+            case 40:
+            case 43:
+            case 46:
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * @address 0x0041ffa0
+     */
+    void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step) {
+        int16_t start_x = *p_x;
+        int16_t start_y = *p_y;
+        int32_t low_x = 0;
+        int32_t low_y = 0;
+
+        int32_t dx = target_x - start_x;
+        int32_t dy = target_y - start_y;
+
+        if (step < 1) {
+            return;
+        }
+
+        int32_t max_dist = abs(dx);
+        if (abs(dy) > max_dist) {
+            max_dist = abs(dy);
+        }
+
+        if (max_dist <= step) {
+            *p_x = target_x;
+            *p_y = target_y;
+            return;
+        }
+
+        if (dx == 0) {
+            if (dy <= 0) {
+                *p_y = start_y - step;
+            } else {
+                *p_y = start_y + step;
+            }
+            return;
+        }
+
+        if (dy == 0) {
+            if (dx <= 0) {
+                *p_x = start_x - step;
+            } else {
+                *p_x = start_x + step;
+            }
+            return;
+        }
+
+        int32_t high_x = dx;
+        int32_t high_y = dy;
+        int32_t cur_x = dx / 2;
+        int32_t cur_y = dy / 2;
+
+        while (true) {
+            int32_t cur_dist = abs(cur_x);
+            if (abs(cur_y) > cur_dist) {
+                cur_dist = abs(cur_y);
+            }
+
+            if (cur_dist == step) {
+                break;
+            }
+
+            if (cur_dist < step) {
+                low_x = cur_x;
+                low_y = cur_y;
+                cur_x += (high_x - cur_x) / 2;
+                cur_y += (high_y - cur_y) / 2;
+            } else {
+                high_x = cur_x;
+                high_y = cur_y;
+                cur_x += (low_x - cur_x) / 2;
+                cur_y += (low_y - cur_y) / 2;
+            }
+        }
+
+        *p_x = start_x + cur_x;
+        *p_y = start_y + cur_y;
+    }
+
+    /**
+     * @address 00422e40
+     */
+    int8_t __cdecl Do_Get_SFX_Draw_Shield_Facing_(int16_t attacker_id, int16_t target_id) {
+        int32_t facing = Get_SFX_Draw_Shield_Facing2_(target_id, attacker_id);
+        return ((facing + 4) % 16) < 8;
+    }
+
+    /**
+     * @address 00422ed0
+     */
+    int16_t __cdecl Get_SFX_Draw_Shield_Facing2_(int16_t ship1_idx, int16_t ship2_idx) {
+        int16_t p1_x_offset;
+        int16_t p1_y_offset;
+        int16_t p2_x_offset;
+        int16_t p2_y_offset;
+
+        COMBINIT::Ship_Center_Offsets_(ship1_idx, &p1_x_offset, &p1_y_offset);
+        COMBINIT::Ship_Center_Offsets_(ship2_idx, &p2_x_offset, &p2_y_offset);
+
+        int16_t x1 = MOX::_combat_data[ship1_idx].x * 20 + p1_x_offset;
+        int16_t y1 = MOX::_combat_data[ship1_idx].y * 20 + p1_y_offset;
+        int16_t x2 = MOX::_combat_data[ship2_idx].x * 20 + p2_x_offset;
+        int16_t y2 = MOX::_combat_data[ship2_idx].y * 20 + p2_y_offset;
+
+        int16_t angle = angle::Get_Angle_(x1 - x2, y2 - y1);
+
+        return (angle / 22) % 16;
+    }
+
+    /**
+     * @address 00420ce0
+     */
+    void __cdecl Add_Weapon_Palette_Fragment_To_Current_Palette_(int16_t source_fragment, int16_t dest_start, int16_t count)
+    {
+        if (count > 0) {
+            for (int16_t i = 0; i < count; i++) {
+                uint8_t red;
+                uint8_t green;
+                uint8_t blue;
+
+                remap::Get_Palette_Animation_Color_(
+                    _l_anims,
+                    (source_fragment * 16) + i,
+                    &red,
+                    &green,
+                    &blue
+                );
+
+                palstore::Store_Single_Palette_Color_(
+                    dest_start + i,
+                    red,
+                    green,
+                    blue
+                );
+            }
         }
     }
 }

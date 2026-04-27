@@ -1880,7 +1880,7 @@ void Planet_Summary_Screen_() {
     //fields::Assign_Auto_Function_(Draw_Mini_Planet_Summary_Screen_, 1);
     fields::Clear_Fields_();
     MISC::Fade_To_Black_();
-    video::Load_Palette_(6, 0, 254 /* 0xfe */);
+    fonts::Load_Palette_(6, 0, 254 /* 0xfe */);
 
     Allocate_Space_For_Summary_Screen_();
     Load_Planet_Summary_Pictures_();

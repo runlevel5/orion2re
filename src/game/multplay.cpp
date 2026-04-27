@@ -315,7 +315,7 @@ namespace MULTPLAY {
         Load_MP_Setup_Pictures_();
         ERIC::Fast_Fade_Out_();
 
-        video::Load_Palette_(0xB /* LBX_PALETTE_ENTRY */, 0, 0xFF);
+        fonts::Load_Palette_(0xB /* LBX_PALETTE_ENTRY */, 0, 0xFF);
         palette::Set_Palette_Changes_(0, 0xFF);
         palette::Refresh_Palette_();
         palstore::Darken_Palette_(100);

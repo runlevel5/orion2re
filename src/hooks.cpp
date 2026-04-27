@@ -3610,6 +3610,16 @@ namespace hooks {
         { 0x004a44f0, &COLGCBT::Top_Line_X_ },
         { 0x00420d60, &BEAMS::Beam_SFX_ },
         { 0x00421cd0, &BEAMS::Fire_Weapon_ },
+        { 0x00421ca0, &BEAMS::Reset_Beam_SFX_Handles_ },
+        { 0x00423C00, &BEAMS::Draw_Reflection_Field_Hit_ },
+        { 0x00420a50, &BEAMS::Get_Ship_Range_ },
+        { 0x00423aa0, &BEAMS::Adjust_Reflection_Field_Display_Status_ },
+        { 0x0041ffa0, &BEAMS::Rob_Interpolate_Line_ },
+        { 0x00424c20, &BEAMS::Is_Steve_Stuff_Weapon_ },
+        { 0x00420ce0, &BEAMS::Add_Weapon_Palette_Fragment_To_Current_Palette_ },
+        { 0x00424250, &BEAMS::Build_Steve_Stuff_Struct_For_Weapon_ },
+        { 0x00422ED0, &BEAMS::Get_SFX_Draw_Shield_Facing2_ },
+        { 0x00422e40, &BEAMS::Do_Get_SFX_Draw_Shield_Facing_ },
     };
 
     void Install_Hooks()
