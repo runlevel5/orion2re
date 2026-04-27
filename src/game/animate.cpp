@@ -469,6 +469,7 @@ namespace animate {
         int32_t data_offset_words = 2;
         int32_t draw_x = x;
         int32_t screen_offset = draw_y * g_screen_res_x + x;
+        int32_t line_start_offset = screen_offset;
         int32_t height = _animation_header->height;
 
         while (current_y < height) {
@@ -480,7 +481,8 @@ namespace animate {
                 draw_x = x;
                 draw_y += skip;
                 current_y += skip;
-                screen_offset += skip * 640;
+                line_start_offset += skip * 640;
+                screen_offset = line_start_offset;
             } else {
                 draw_x += skip;
                 screen_offset += skip;

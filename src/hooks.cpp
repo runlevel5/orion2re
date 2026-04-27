@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-//#define SKIP_MAIN
+#define SKIP_MAIN
 
 namespace hooks {
 
@@ -86,7 +86,7 @@ namespace hooks {
         { 0x0052b220, &timer::Mark_Time_ },
         { 0x00531f80, &key::Keyboard_Status_ },
         { 0x00531f20, &key::Read_Key_ },
-        { 0x00425a70, &JIM::Draw_Logos_ },
+        //{ 0x00425a70, &JIM::Draw_Logos_ },
         { 0x00425D50, &JIM::Logo_Fadeout_ },
         { 0x0052e880, &allocate::Allocate_Space_ },
         { 0x0052ebb0, &allocate::Get_Remaining_Block_Space_ },
@@ -454,7 +454,7 @@ namespace hooks {
         { 0x0050fa10, &LOADSAVE::Load_Month_Names_ },
         { 0x005317a0, &file_ani::Set_File_Animation_Buffer_ },
         { 0x00530bf0, &file_ani::Open_File_Animation_ },
-        { 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
+        //{ 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
         { 0x004e9780, &MAINMENU::Draw_Credits_ },
         { 0x004e9a20, &MAINMENU::Fade_Credit_Colors_ },
         { 0x0050f630, &LOADSAVE::Restore_Main_Screen_ },
@@ -1410,7 +1410,7 @@ namespace hooks {
         { 0x004f2e40, &COLCALC::Format_Quotient_ },
         { 0x00509a30, &COLCALC::N_Prods_In_Colony_Queue_ },
         { 0x004f6340, &COLCALC::Star_Has_Asteroid_Or_Gas_Giant_ },
-        //{ 0x004de110, &COLONY::Draw_Bldg_CR_Dark_ },
+        { 0x004de110, &COLONY::Draw_Bldg_CR_Dark_ },
         { 0x004e0ac0, &COLONY::Remove_Satellite_From_Array_ },
         { 0x00509800, &COLBLDG::Get_App_Description_String_ },
         { 0x004e0030, &COLONY::Add_Job_Field_For_ },
@@ -2808,7 +2808,6 @@ namespace hooks {
         { 0x00504a10, &MULTPLAY::Load_Choose_Net_Plyrs_Screen_ },
         { 0x00501f50, &MULTPLAY::Add_Choose_Net_Plyrs_Fields_ },
         { 0x00502930, &MULTPLAY::Draw_Choose_Net_Plyrs_Screen_ },
-        // Review
         { 0x004c2fb0, &NETSTART::Load_Net_Screen_ },
         { 0x0047dd00, &NETTURN::Must_Broadcast_AI_Player_Data_ },
         { 0x00519e90, &NETMOX::Human_Surrenders_ },
@@ -3128,7 +3127,6 @@ namespace hooks {
         { 0x00533650, &init::Create_IO_Buffer_ },
         { 0x004F1330, &HAROLD::N_Player_Ships_ },
         { 0x004f24a0, &HAROLD::Load_Language_Fonts_ },
-        // Verify
         { 0x004c03e0, &COMBFIND::Client_Combat_Loop_ },
         { 0x004bcd50, &COMBFIND::Some_Star_Player_Is_Busy_ },
         { 0x004bf0b0, &COMBFIND::Do_Attacker_Beat_Colony_Stuff_ },
@@ -3531,7 +3529,6 @@ namespace hooks {
         { 0x004b52d0, &BILLHELP::Tech_Select_List_Right_Help_ },
         { 0x004b5300, &BILLHELP::Tech_Change_List_Left_Help_ },
         { 0x004b52e0, &BILLHELP::Tech_Select_List_Left_Help_ },
-        { 0x004dca50, &COLONY::C_Anims_ },
         { 0x00525010, &animate::Remap_Draw_Animated_Sprite_ },
         { 0x005250f0, &animate::Remap_Clipped_Draw_Animated_Sprite_ },
         { 0x00524340, &animate::Draw_No_Glassed_Animated_Sprite_ },

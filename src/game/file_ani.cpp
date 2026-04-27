@@ -325,7 +325,7 @@ namespace file_ani {
         uint32_t frame_size = next_frame_offset - frame_offset;
         uint32_t read_offset = start_multi + frame_offset;
 
-        if (allocate::Get_Max_Block_Space_(_file_animation_buffer) < static_cast<int32_t>(frame_size)) {
+        if (static_cast<int32_t>(allocate::Get_Max_Block_Space_(_file_animation_buffer)) < static_cast<int32_t>(frame_size)) {
             exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large);
         }
 
@@ -478,7 +478,7 @@ namespace file_ani {
 
     void __cdecl Reset_File_Animation_Buffer_() {
         platform::Lock_Offscreen_Surface_();
-        _file_animation_buffer = reinterpret_cast<uint8_t*>(DAT_00578e54);
+        _file_animation_buffer = platform::_offscreen_surface;
         platform::Unlock_Offscreen_Surface_();
     }
 }
