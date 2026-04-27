@@ -15,21 +15,17 @@ namespace BEAMS {
 
     void __cdecl Build_Steve_Stuff_Struct_For_Weapon_(int16_t weapon_id, uint16_t specials, s_weapon_visual_fx* out);
 
-    inline void __cdecl Draw_Generic_Beam_(
-        int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y,
-        int16_t attacker_facing, int16_t target_facing, int16_t duration, int palette_offset,
-        int16_t v_local_3e, int16_t v_local_42_2, int16_t v_sfx_sprite_id, int16_t v_local_42,
-        int16_t v_local_46_2, int16_t v_local_46, int16_t v_local_38, int16_t v_local_3e_2,
-        int16_t v_local_4a_2, int16_t v_local_4a, int16_t v_local_4c, int16_t v_ebx,
-        int16_t mount_scale_mod, int16_t v_local_54_6, int16_t v_local_54_4, int16_t v_local_54_2,
-        int16_t v_local_54, int16_t frame_index, int16_t target_size_class,
-        int16_t hit_result_flags, int16_t special_flag, int16_t is_non_ship_target,
-        int16_t v_local_58, int16_t reflection_state, int16_t attacker_size_class,
-        s_weapon_visual_fx* pfx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, s_weapon_visual_fx*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00420110 });
-        fn(attacker_x, attacker_y, target_x, target_y, attacker_facing, target_facing, duration, palette_offset, v_local_3e, v_local_42_2, v_sfx_sprite_id, v_local_42, v_local_46_2, v_local_46, v_local_38, v_local_3e_2, v_local_4a_2, v_local_4a, v_local_4c, v_ebx, mount_scale_mod, v_local_54_6, v_local_54_4, v_local_54_2, v_local_54, frame_index, target_size_class, hit_result_flags, special_flag, is_non_ship_target, v_local_58, reflection_state, attacker_size_class, pfx);
-    }
+    void __cdecl Draw_Generic_Beam_(
+        int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
+        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
+        int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
+        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t param_17,
+        int16_t param_18, int16_t param_19, int16_t param_20, int16_t mount_scale_mod, int16_t fx_param_1,
+        int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
+        int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
+        int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
+        int16_t attacker_size_class, s_weapon_visual_fx* param_34
+    );
 
     inline s_animation_header*& _mauler_ball_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00564D64});
@@ -56,6 +52,8 @@ namespace BEAMS {
 
     inline int16_t& _max_frames =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D50});
+
+    inline int16_t& _beam_angle = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D54});
 
     inline uint8_t (&_shield_diameters)[8] =
         *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x00552D58});
@@ -166,4 +164,46 @@ namespace BEAMS {
     void __cdecl Beam_SFX_(int16_t attacker_ship_id, int16_t attacker_x, int16_t attacker_y, int16_t target_id, int16_t target_x, int16_t target_y, s_beam_fx_entry* param_7, int16_t is_non_ship_target);
 
     void __cdecl Rob_Interpolate_Line_(int16_t* p_x, int16_t* p_y, int16_t target_x, int16_t target_y, int16_t step);
+
+    inline void __cdecl Draw_Ship_Burst_(int16_t x, int16_t y, int16_t dir, int16_t base_damage_class, int16_t frame, int16_t is_palette_not_90) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420A80});
+        fn(x, y, dir, base_damage_class, frame, is_palette_not_90);
+    }
+
+    inline void __cdecl Draw_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette, int16_t angle, int16_t len, int16_t width, int16_t core, int16_t glow, int16_t particles, int16_t pierce, int16_t autofire, int16_t p17, int16_t p18, int16_t f1, int16_t f2, int16_t f3, int16_t f4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532A40});
+        fn(x1, y1, x2, y2, palette, angle, len, width, core, glow, particles, pierce, autofire, p17, p18, f1, f2, f3, f4);
+    }
+
+    inline void __cdecl Draw_Beam_Midpoint_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t palette, int16_t angle, int16_t len, int16_t width, int16_t core, int16_t glow, int16_t particles, int16_t pierce, int16_t autofire, int16_t p17, int16_t p18, int16_t f1, int16_t f2, int16_t mid3, int16_t mid4, int16_t f3, int16_t f4) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00533070});
+        fn(x1, y1, x2, y2, palette, angle, len, width, core, glow, particles, pierce, autofire, p17, p18, f1, f2, mid3, mid4, f3, f4);
+    }
+
+    inline void __cdecl Draw_Beam2_(int16_t ax, int16_t ay, int16_t tx, int16_t ty, int16_t bx1, int16_t by1, int16_t bx2, int16_t by2, uint32_t hit, int32_t frame, int32_t pal, int32_t c00, int32_t c04, int32_t c10, int32_t c14, int32_t c20, int32_t c24, int32_t thick, int32_t anim, int32_t sfx, int32_t dur, int32_t unk) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, uint32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00424CA0});
+        fn(ax, ay, tx, ty, bx1, by1, bx2, by2, hit, frame, pal, c00, c04, c10, c14, c20, c24, thick, anim, sfx, dur, unk);
+    }
+
+    inline void __cdecl Draw_Ship_Explosion_(int16_t tx, int16_t ty, int16_t facing, int16_t frame, int16_t pal_not_90) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00420AE0});
+        fn(tx, ty, facing, frame, pal_not_90);
+    }
+
+    inline bool __cdecl XY_In_Shield_Radius_(int16_t x, int16_t y, int16_t tx, int16_t ty, int16_t target_size_class) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423080});
+        return fn(x, y, tx, ty, target_size_class);
+    }
+
+    inline bool __cdecl XY_In_Reflection_Field_Radius_(int16_t x, int16_t y, int16_t tx, int16_t ty, int16_t target_size_class) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00423E10});
+        return fn(x, y, tx, ty, target_size_class);
+    }
 }

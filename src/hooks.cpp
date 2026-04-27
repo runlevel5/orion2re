@@ -3620,6 +3620,7 @@ namespace hooks {
         { 0x00424250, &BEAMS::Build_Steve_Stuff_Struct_For_Weapon_ },
         { 0x00422ED0, &BEAMS::Get_SFX_Draw_Shield_Facing2_ },
         { 0x00422e40, &BEAMS::Do_Get_SFX_Draw_Shield_Facing_ },
+        { 0x00420110, &BEAMS::Draw_Generic_Beam_ },
     };
 
     void Install_Hooks()

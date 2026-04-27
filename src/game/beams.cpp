@@ -6,6 +6,7 @@
 #include "farload.h"
 #include "colony.h"
 #include "mox.h"
+#include "techdata.h"
 
 namespace BEAMS {
     void __cdecl Reset_Beam_Swapping_Colors_() {
@@ -2181,5 +2182,264 @@ namespace BEAMS {
                 );
             }
         }
+    }
+
+    /**
+     * @address 00420110
+     */
+    void __cdecl Draw_Generic_Beam_(
+        int16_t attacker_x, int16_t attacker_y, int16_t target_x, int16_t target_y, int16_t attacker_facing,
+        int16_t target_facing, int16_t duration_frames, int16_t palette_base_index, int16_t beam_length,
+        int16_t beam_width, int16_t sprite_id, int16_t draw_core_flag, int16_t draw_glow_flag,
+        int16_t draw_particles_flag, int16_t is_shield_piercing, int16_t is_autofiring, int16_t param_17,
+        int16_t param_18, int16_t param_19, int16_t param_20, int16_t mount_scale_mod, int16_t fx_param_1,
+        int16_t fx_param_2, int16_t fx_param_3, int16_t fx_param_4, int16_t frame_index,
+        int16_t target_size_class, uint16_t hit_result_flags, uint16_t special_flag,
+        int16_t is_non_ship_target, int16_t base_damage_class, int16_t reflection_state,
+        int16_t attacker_size_class, s_weapon_visual_fx* param_34
+    ) {
+        int16_t angle = angle::Get_Angle_(attacker_x - target_x, target_y - attacker_y);
+        _ship_hit_now_flag[0] = 0;
+        _ship_hit_now_flag[1] = 0;
+
+        int16_t beam_dir = ((angle / 22) + 8) % 16;
+        if (beam_dir < 0) {
+            beam_dir = -beam_dir;
+        }
+
+        int16_t is_palette_not_90 = (palette_base_index != 0x90) ? 1 : 0;
+        int16_t ship_range = Get_Ship_Range_(attacker_x, attacker_y, target_x, target_y);
+
+        if (attacker_size_class == -1) {
+            mount_scale_mod = 0;
+            if (duration_frames > 20) {
+                duration_frames = 20;
+            }
+            base_damage_class = 1;
+            sprite_id = 5;
+        }
+
+        if (param_34 != nullptr) {
+            duration_frames = static_cast<int16_t>(param_34->sfx_sprite_id);
+            sprite_id = static_cast<int16_t>(param_34->duration);
+        }
+
+        int16_t eff_duration = duration_frames;
+        if (duration_frames < 60) {
+            eff_duration = 60;
+        }
+        if (ship_range < eff_duration) {
+            eff_duration = ship_range;
+        }
+
+        int32_t min_frames = (attacker_size_class == -1) ? 2 : 3;
+        int32_t frames = (int32_t)(ship_range + eff_duration) / sprite_id;
+
+        if (frames < min_frames) {
+            frames = min_frames;
+        }
+        if (frames > 6) {
+            sprite_id *= 2;
+        }
+
+        frames = (int32_t)(ship_range + eff_duration) / sprite_id;
+        if (frames < min_frames) {
+            frames = min_frames;
+        }
+        _max_frames = static_cast<int16_t>(frames);
+
+        if (_max_frames <= frame_index) {
+            return;
+        }
+
+        if (frame_index == 0 && attacker_size_class != -1) {
+            Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, base_damage_class, 0, is_palette_not_90);
+            return;
+        }
+
+        int16_t target_len = sprite_id * frame_index;
+        int16_t attacker_len = target_len - duration_frames;
+
+        if (param_34 != nullptr && param_34->anim_style == 2) {
+            target_len = ship_range;
+            attacker_len = 0;
+        }
+
+        if (target_len < 0) {
+            target_len = 0;
+        }
+        if (ship_range < target_len) {
+            target_len = ship_range;
+        }
+
+        int16_t bx2 = attacker_x;
+        int16_t by2 = attacker_y;
+        Rob_Interpolate_Line_(&bx2, &by2, target_x, target_y, target_len);
+
+        if ((bx2 == target_x && by2 == target_y) || (_max_frames - 2 <= frame_index)) {
+            _ship_hit_now_flag[is_palette_not_90] = 1;
+            bx2 += random::Random_(3) - 1;
+            random::Random_(3);
+        } else {
+            _ship_hit_now_flag[is_palette_not_90] = 0;
+        }
+
+        bx2 = attacker_x;
+        by2 = attacker_y;
+
+        int16_t reduce_len;
+        if (hit_result_flags == 0 || special_flag != 0 || _g_pierced_shield_flag != 0 || attacker_size_class == -1) {
+            if (reflection_state == 1 && special_flag == 0 && _g_pierced_shield_flag == 0 && attacker_size_class != -1) {
+                int16_t size_idx = Ship_Size_To_Shield_Size_(target_size_class);
+                reduce_len = _reflection_field_diameters[size_idx] / 3;
+            } else {
+                _g_pierced_shield_flag = 1;
+                reduce_len = 0;
+            }
+        } else {
+            int16_t size_idx = Ship_Size_To_Shield_Size_(target_size_class);
+            reduce_len = _shield_diameters[size_idx] / 3;
+        }
+
+        int16_t cap_reduce = duration_frames - 1;
+        if (reduce_len < cap_reduce) {
+            cap_reduce = reduce_len;
+        }
+
+        int16_t dist = target_len - cap_reduce;
+        Rob_Interpolate_Line_(&bx2, &by2, target_x, target_y, dist);
+
+        int16_t bx1 = attacker_x;
+        int16_t by1 = attacker_y;
+
+        if (attacker_len < 0) {
+            attacker_len = 0;
+        }
+        if (ship_range < attacker_len) {
+            attacker_len = ship_range;
+        }
+
+        if (param_34 != nullptr && param_34->anim_style == 2) {
+            attacker_len = 0;
+        }
+
+        if (reflection_state == 2) {
+            int16_t size = attacker_size_class;
+            if (size < 0) {
+                size = 0;
+            }
+            int16_t size_idx = Ship_Size_To_Shield_Size_(size);
+            attacker_len += _reflection_field_diameters[size_idx] / 3;
+        }
+
+        if (attacker_len != 0) {
+            Rob_Interpolate_Line_(&bx1, &by1, target_x, target_y, attacker_len);
+        }
+
+        if (param_19 != 0 && param_34 == nullptr) {
+            int16_t temp_x = bx1;
+            bx1 = bx2;
+            bx2 = temp_x;
+
+            int16_t temp_y = by1;
+            by1 = by2;
+            by2 = temp_y;
+        }
+
+        if (param_34 == nullptr) {
+            if (bx1 != bx2 || by1 != by2) {
+                if (mount_scale_mod == 1) {
+                    Draw_Beam_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                               draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
+                               is_autofiring, param_17, param_18, fx_param_1, fx_param_2, fx_param_3, fx_param_4);
+                } else if (mount_scale_mod == 2) {
+                    int16_t mid3 = (fx_param_3 + fx_param_1) / 2;
+                    int16_t mid4 = (fx_param_4 + fx_param_2) / 2;
+                    Draw_Beam_Midpoint_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                                        draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
+                                        is_autofiring, param_17, param_18, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
+                } else if (mount_scale_mod == 0) {
+                    if (fx_param_2 < fx_param_4) fx_param_4 = fx_param_2;
+                    if (fx_param_1 < fx_param_3) fx_param_3 = fx_param_1;
+                    Draw_Beam_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
+                               draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
+                               is_autofiring, param_17, param_18, 0, 0, fx_param_3, fx_param_4);
+                }
+
+                if (param_20 != 0 && _ship_hit_now_flag[is_palette_not_90] == 0) {
+                    ERIC::Draw_Centered_(bx2, by2, _mauler_ball_seg);
+                }
+            }
+        } else {
+            if (reflection_state == 2) {
+                attacker_x = bx1;
+                attacker_y = by1;
+            }
+            uint32_t hit_flag = (hit_result_flags == 0) ? 1 : 0;
+            Draw_Beam2_(attacker_x, attacker_y, target_x, target_y, bx1, by1, bx2, by2, hit_flag, frame_index, palette_base_index,
+                        *reinterpret_cast<int32_t*>(&param_34->colors[0].colors[0]),
+                        *reinterpret_cast<int32_t*>(&param_34->colors[0].colors[4]),
+                        *reinterpret_cast<int32_t*>(&param_34->colors[1].colors[0]),
+                        *reinterpret_cast<int32_t*>(&param_34->colors[1].colors[4]),
+                        *reinterpret_cast<int32_t*>(&param_34->colors[2].colors[0]),
+                        *reinterpret_cast<int32_t*>(&param_34->colors[2].colors[4]),
+                        param_34->thickness, param_34->anim_style, param_34->sfx_sprite_id, param_34->duration, param_34->unk);
+        }
+
+        if (param_19 != 0 && param_34 == nullptr) {
+            int16_t temp_x = bx1;
+            bx1 = bx2;
+            bx2 = temp_x;
+
+            int16_t temp_y = by1;
+            by1 = by2;
+            by2 = temp_y;
+        }
+
+        if (frame_index < 3 || (attacker_x == bx1 && attacker_y == by1)) {
+            if (attacker_size_class != -1) {
+                Draw_Ship_Burst_(attacker_x, attacker_y, beam_dir, base_damage_class, frame_index, is_palette_not_90);
+            }
+            _ship_firing_now_flag[is_palette_not_90] = 1;
+        } else {
+            _ship_firing_now_flag[is_palette_not_90] = 0;
+        }
+
+        if (_ship_hit_now_flag[is_palette_not_90] != 0 && attacker_size_class != -1) {
+            int16_t exp_frame;
+            if (frame_index < _max_frames - 1) {
+                exp_frame = (frame_index - 1 + (-10 - ship_range) / sprite_id) % 5;
+            } else {
+                exp_frame = frame_index - _max_frames + 7;
+            }
+
+            if (exp_frame < 0) {
+                exp_frame = -exp_frame;
+            }
+
+            if (special_flag != 0 || hit_result_flags != 0) {
+                int16_t final_target_facing = target_facing;
+                if (is_non_ship_target != 0) {
+                    final_target_facing = 0;
+                }
+                Draw_Ship_Explosion_(target_x, target_y, final_target_facing, exp_frame, is_palette_not_90);
+            }
+        }
+
+        if (hit_result_flags != 0) {
+            if (XY_In_Shield_Radius_(bx2, by2, target_x, target_y, target_size_class)) {
+                _shield_hit_now_flag = 1;
+                return;
+            }
+        }
+        _shield_hit_now_flag = 0;
+
+        if (reflection_state == 1) {
+            if (XY_In_Reflection_Field_Radius_(bx2, by2, target_x, target_y, target_size_class)) {
+                _reflection_field_hit_now_flag = 1;
+                return;
+            }
+        }
+        _reflection_field_hit_now_flag = 0;
     }
 }
