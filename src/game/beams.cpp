@@ -655,9 +655,8 @@ namespace BEAMS {
                     return 0;
                 }
 
-                bool is_mod3 = (i % 3 == 0);
                 BEAMS::Fire_Weapon_(fx, fy, target_x, target_y, dir1, dir2, weapon_type, frame, 
-                                    0, 0, 0, 0, 1, 0, 0, -1, 0, is_mod3);
+                                    0, 0, 0, 0, 1, 0, 0, -1, 0);
             }
         }
 
@@ -717,7 +716,7 @@ namespace BEAMS {
                               int16_t attacker_facing, int16_t target_facing, int16_t weapon_id, int16_t current_frame,
                               int16_t fx_slot_idx, int16_t target_size_class, int16_t hit_result_flags,
                               int16_t special_flag, int16_t is_non_ship_target, int16_t fire_point_idx,
-                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials, bool is_mod3)
+                              int16_t reflection_state, int16_t attacker_size_class, uint16_t weapon_specials)
     {
         int16_t v_duration;
         int16_t v_color;
@@ -1168,7 +1167,7 @@ namespace BEAMS {
         } else if (_ship_firing_now_flag[fx_slot_idx] != 0) {
             if (Get_Max_Frames_() - 1 <= current_frame) {
                 // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
-                sound::Fadeout_Sound_((int16_t)_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
+                sound::Fadeout_Sound_(_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
                 _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
             }
         }
@@ -1348,7 +1347,7 @@ namespace BEAMS {
                                     is_non_ship_target, fp_idx_val,
                                     _g_reflection_state_flag,
                                     MOX::_combat_data[attacker_ship_id].size_class,
-                                    fx->specials, 1);
+                                    fx->specials);
                             }
                         }
                     }
