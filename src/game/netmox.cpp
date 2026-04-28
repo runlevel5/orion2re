@@ -2085,4 +2085,397 @@ namespace NETMOX {
             }
         }
     }
+
+    void __cdecl Send_Battle_Results_(int16_t star_id, int16_t player_id, int16_t target_player_id, int16_t combat_defender_id, int16_t combat_planet_id, int16_t combat_result) {
+        int16_t player_num = MOX::_PLAYER_NUM;
+
+        allocate::Push_Block_(MOX::_screen_seg);
+        uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x7800);
+        uint8_t* local_4 = packet;
+
+        *reinterpret_cast<int16_t*>(local_4) = player_num;
+        local_4 += 2;
+        *reinterpret_cast<int16_t*>(local_4) = player_id;
+        local_4 += 2;
+        *reinterpret_cast<int16_t*>(local_4) = target_player_id;
+        local_4 += 2;
+        *reinterpret_cast<int16_t*>(local_4) = combat_result;
+        local_4 += 2;
+
+        if (_net.local_net_id != _net.net_host_id &&
+            (player_num != target_player_id || player_id >= 8 || MOX::_player[player_id].objectives != 100 /* 'd' */)) {
+
+            *reinterpret_cast<int16_t*>(local_4) = star_id;
+            local_4 += 2;
+
+            COMBFIND::Send_Star_Player_Presence_(&local_4, -1);
+
+            *reinterpret_cast<int16_t*>(local_4) = combat_defender_id;
+            local_4 += 2;
+            *reinterpret_cast<int16_t*>(local_4) = combat_planet_id;
+            local_4 += 2;
+
+            RUSS::Mox_Update_();
+
+            if (player_id < 8) {
+                memcpy(local_4, MOX::_player[player_id].tech_applications, sizeof(MOX::_player[player_id].tech_applications));
+                local_4 += sizeof(MOX::_player[player_id].tech_applications);
+                *local_4 = MOX::_star[star_id].officer_index[player_id];
+                local_4++;
+            }
+
+            if (target_player_id < 8) {
+                memcpy(local_4, MOX::_player[target_player_id].tech_applications, sizeof(MOX::_player[target_player_id].tech_applications));
+                local_4 += sizeof(MOX::_player[target_player_id].tech_applications);
+                *local_4 = MOX::_star[star_id].officer_index[target_player_id];
+                local_4++;
+            }
+
+            RUSS::Mox_Update_();
+
+            for (int16_t i = 0; i < 67; i++) {
+                if (MOX::_leaders[i].player_index == player_id || MOX::_leaders[i].player_index == target_player_id) {
+                    *reinterpret_cast<int16_t*>(local_4) = i;
+                    local_4 += 2;
+                    memcpy(local_4, &MOX::_leaders[i], sizeof(s_leader_data));
+                    local_4 += sizeof(s_leader_data);
+                }
+            }
+
+            *reinterpret_cast<int16_t*>(local_4) = -1;
+            local_4 += 2;
+
+            RUSS::Mox_Update_();
+
+            if (combat_planet_id != -1) {
+                int16_t colony_idx = MOX::_planet[combat_planet_id].colony_index;
+                *reinterpret_cast<int16_t*>(local_4) = colony_idx;
+                local_4 += 2;
+                *local_4 = MOX::_planet[combat_planet_id].planet_type;
+                local_4++;
+                *local_4 = MOX::_planet[combat_planet_id].climate;
+                local_4++;
+                *reinterpret_cast<int16_t*>(local_4) = colony_idx;
+                local_4 += 2;
+
+                if (colony_idx != -1) {
+                    memcpy(local_4, &MOX::_colony[colony_idx], sizeof(s_colony));
+                    local_4 += sizeof(s_colony);
+                }
+            }
+
+            RUSS::Mox_Update_();
+
+            *reinterpret_cast<int16_t*>(local_4) = (int16_t)MOX::_NUM_SHIPS;
+            local_4 += 2;
+
+            if (MOX::_NUM_SHIPS > 0) {
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; i++) {
+                    if (MOX::_ship[i].location == star_id && MOX::_ship[i].status != 5) {
+                        if (MOX::_ship[i].owner == player_id || MOX::_ship[i].owner == target_player_id) {
+                            *reinterpret_cast<int16_t*>(local_4) = i;
+                            local_4 += 2;
+                            memcpy(local_4, &MOX::_ship[i], sizeof(s_ship_data));
+                            local_4 += sizeof(s_ship_data);
+                        }
+                    }
+                }
+            }
+
+            *reinterpret_cast<int16_t*>(local_4) = -1;
+            local_4 += 2;
+
+            RUSS::Mox_Update_();
+        }
+
+        int32_t size = local_4 - packet;
+        if (size <= 0x8000) {
+            NETMOX::Mox_Send_Message_(_net.local_net_id, 0x15, packet, (uint16_t)size);
+        } else {
+            int16_t chunks = (int16_t)((size + 0x77FF) / 0x7800);
+            _net.sync_state = 0x1F;
+            NETMOX::Mox_Send_Message_(_net.local_net_id, 0x30, nullptr, 0);
+
+            while (_net.sync_state != 0x20) {
+                RUSS::Mox_Update_();
+            }
+
+            _net.sync_state = 0x0E;
+            s_packet_32 packet_32;
+            packet_32.chunks = chunks;
+            NETMOX::Mox_Send_Message_(_net.local_net_id, 0x32, &packet_32, sizeof(s_packet_32));
+
+            uint8_t* ptr = packet;
+            while (ptr < local_4) {
+                RUSS::Mox_Update_();
+                int32_t chunk_size = local_4 - ptr;
+                if (chunk_size > 0x7800) {
+                    chunk_size = 0x7800;
+                }
+
+                do {
+                    MULTPLAY::Chat_Box_Input_Loop_();
+                } while (netcode::Net_Is_Sending_() != 0);
+
+                NETMOX::Mox_Send_Message_(_net.local_net_id, 0x33, ptr, (uint16_t)chunk_size);
+                ptr += 0x7800;
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    void __cdecl Send_You_Are_Target_Info_(
+        int16_t target_player_idx,
+        int16_t other_player_idx,
+        int16_t param_3,
+        int16_t colony_idx,
+        int16_t star_idx)
+    {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        int32_t alloc_size = (target_player_idx == MOX::_PLAYER_NUM) ? 30 : 0x7800;
+        uint8_t* packet = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size);
+
+        s_packet_0x12* hdr = reinterpret_cast<s_packet_0x12*>(packet);
+        hdr->star_idx = star_idx;
+        hdr->other_player_idx = other_player_idx;
+        hdr->param_3 = param_3;
+        hdr->colony_idx = colony_idx;
+
+        uint8_t* ptr = packet + sizeof(s_packet_0x12);
+
+        if (MOX::_player[target_player_idx].network_player_id != _net.local_net_id) {
+            COMBFIND::Send_Star_Player_Presence_(&ptr, star_idx);
+            RUSS::Mox_Update_();
+
+            if (other_player_idx < 8) {
+                memcpy(ptr, MOX::_player[other_player_idx].tech_applications, 212);
+                ptr += 212;
+            }
+
+            if (target_player_idx < 8) {
+                memcpy(ptr, MOX::_player[target_player_idx].tech_applications, 212);
+                ptr += 212;
+            }
+
+            RUSS::Mox_Update_();
+
+            for (int16_t i = 0; i < 67; ++i) {
+                if (MOX::_leaders[i].player_index == other_player_idx || MOX::_leaders[i].player_index == target_player_idx) {
+                    *reinterpret_cast<int16_t*>(ptr) = i;
+                    ptr += sizeof(int16_t);
+
+                    memcpy(ptr, &MOX::_leaders[i], sizeof(s_leader_data));
+                    ptr += sizeof(s_leader_data);
+                }
+            }
+
+            *reinterpret_cast<int16_t*>(ptr) = -1;
+            ptr += sizeof(int16_t);
+
+            if (other_player_idx < 8) {
+                *ptr = MOX::_star[star_idx].officer_index[other_player_idx];
+                ptr++;
+            }
+
+            if (target_player_idx < 8) {
+                *ptr = MOX::_star[star_idx].officer_index[target_player_idx];
+                ptr++;
+            }
+
+            RUSS::Mox_Update_();
+
+            if (colony_idx != -1) {
+                int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+                *reinterpret_cast<int16_t*>(ptr) = (int16_t)MOX::_NUM_COLONIES;
+                ptr += sizeof(int16_t);
+                *reinterpret_cast<int16_t*>(ptr) = planet_idx;
+                ptr += sizeof(int16_t);
+                *reinterpret_cast<int16_t*>(ptr) = MOX::_planet[planet_idx].colony_index;
+                ptr += sizeof(int16_t);
+
+                *ptr = MOX::_planet[planet_idx].planet_type;
+                ptr++;
+                *ptr = MOX::_planet[planet_idx].climate;
+                ptr++;
+
+                memcpy(ptr, &MOX::_colony[colony_idx], sizeof(s_colony));
+                ptr += sizeof(s_colony);
+            }
+
+            RUSS::Mox_Update_();
+
+            *reinterpret_cast<int16_t*>(ptr) = (int16_t)MOX::_NUM_SHIPS;
+            ptr += sizeof(int16_t);
+
+            if (MOX::_NUM_SHIPS > 0) {
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; ++i) {
+                    if (MOX::_ship[i].location == star_idx && MOX::_ship[i].status != 5) {
+                        if (MOX::_ship[i].owner == other_player_idx || MOX::_ship[i].owner == target_player_idx) {
+                            *reinterpret_cast<int16_t*>(ptr) = i;
+                            ptr += sizeof(int16_t);
+
+                            memcpy(ptr, &MOX::_ship[i], sizeof(s_ship_data));
+                            ptr += sizeof(s_ship_data);
+                        }
+                    }
+                }
+            }
+
+            *reinterpret_cast<int16_t*>(ptr) = -1;
+            ptr += sizeof(int16_t);
+
+            RUSS::Mox_Update_();
+        }
+
+        int32_t msg_len = ptr - packet;
+
+        if (msg_len <= 0x8000) {
+            NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 0x12, packet, (uint16_t)msg_len);
+        } else {
+            s_packet_0x34 chunk_info;
+            chunk_info.chunks = (int16_t)((msg_len + 0x77FF) / 0x7800);
+
+            NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 0x34, &chunk_info, sizeof(s_packet_0x34));
+
+            uint8_t* send_ptr = packet;
+            while (send_ptr < ptr) {
+                RUSS::Mox_Update_();
+
+                int32_t chunk_len = ptr - send_ptr;
+                if (chunk_len > 0x7800) {
+                    chunk_len = 0x7800;
+                }
+
+                do {
+                    MULTPLAY::Chat_Box_Input_Loop_();
+                } while (netcode::Net_Is_Sending_() != 0);
+
+                NETMOX::Mox_Send_Message_(MOX::_player[target_player_idx].network_player_id, 0x35, send_ptr, (uint16_t)chunk_len);
+                send_ptr += 0x7800;
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
+
+    void __cdecl Send_Pick_Target_Info_(int16_t player_idx, int16_t star_idx, s_combfind_target* target_info) {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        uint32_t alloc_size = ((player_idx == MOX::_PLAYER_NUM) ? 0xFFFF8814 : 0) + 0x7800;
+        uint8_t* packet = static_cast<uint8_t*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, alloc_size));
+        uint8_t* local_8 = packet;
+
+        *reinterpret_cast<int16_t*>(local_8) = star_idx;
+        local_8 += 2;
+
+        memcpy(local_8, target_info, sizeof(s_combfind_target));
+        local_8 += sizeof(s_combfind_target);
+
+        if (MOX::_player[player_idx].network_player_id != _net.local_net_id) {
+            COMBFIND::Send_Star_Player_Presence_(&local_8, star_idx);
+
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                    memcpy(local_8, MOX::_player[i].tech_applications, sizeof(MOX::_player[i].tech_applications));
+                    local_8 += sizeof(MOX::_player[i].tech_applications);
+                }
+            }
+
+            RUSS::Mox_Update_();
+
+            for (int16_t i = 0; i < 67; i++) {
+                *reinterpret_cast<int16_t*>(local_8) = i;
+                local_8 += 2;
+                memcpy(local_8, &MOX::_leaders[i], sizeof(s_leader_data));
+                local_8 += sizeof(s_leader_data);
+                RUSS::Mox_Update_();
+            }
+
+            *reinterpret_cast<int16_t*>(local_8) = -1;
+            local_8 += 2;
+
+            if (MOX::_NUM_PLAYERS > 0) {
+                for (int16_t i = 0; i < MOX::_NUM_PLAYERS; i++) {
+                    *local_8 = MOX::_star[star_idx].officer_index[i];
+                    local_8++;
+                }
+            }
+
+            RUSS::Mox_Update_();
+
+            *reinterpret_cast<int16_t*>(local_8) = (int16_t)MOX::_NUM_COLONIES;
+            local_8 += 2;
+
+            for (int i = 0; i < 5; i++) {
+                int16_t planet_idx = MOX::_star[star_idx].planet_index[i];
+                if (planet_idx != -1) {
+                    *reinterpret_cast<int16_t*>(local_8) = MOX::_planet[planet_idx].colony_index;
+                    local_8 += 2;
+                    *local_8 = MOX::_planet[planet_idx].planet_type;
+                    local_8++;
+                    *local_8 = MOX::_planet[planet_idx].climate;
+                    local_8++;
+                    *reinterpret_cast<int16_t*>(local_8) = MOX::_planet[planet_idx].colony_index;
+                    local_8 += 2;
+
+                    if (MOX::_planet[planet_idx].colony_index != -1) {
+                        memcpy(local_8, &MOX::_colony[MOX::_planet[planet_idx].colony_index], sizeof(s_colony));
+                        local_8 += sizeof(s_colony);
+                    }
+                }
+            }
+
+            RUSS::Mox_Update_();
+
+            *reinterpret_cast<int16_t*>(local_8) = (int16_t)MOX::_NUM_SHIPS;
+            local_8 += 2;
+
+            if (MOX::_NUM_SHIPS > 0) {
+                for (int16_t i = 0; i < (int16_t)MOX::_NUM_SHIPS; i++) {
+                    if (MOX::_ship[i].location == star_idx && MOX::_ship[i].status != 5) {
+                        *reinterpret_cast<int16_t*>(local_8) = i;
+                        local_8 += 2;
+                        memcpy(local_8, &MOX::_ship[i], sizeof(s_ship_data));
+                        local_8 += sizeof(s_ship_data);
+                        RUSS::Mox_Update_();
+                    }
+                }
+            }
+
+            *reinterpret_cast<int16_t*>(local_8) = -1;
+            local_8 += 2;
+        }
+
+        RUSS::Mox_Update_();
+
+        int32_t diff = static_cast<int32_t>(local_8 - packet);
+        if (diff <= 0x8000) {
+            NETMOX::Mox_Send_Message_(MOX::_player[player_idx].network_player_id, 0x10, packet, (uint16_t)diff);
+        } else {
+            s_packet_2E_chunks chunk_msg;
+            chunk_msg.chunks = static_cast<int16_t>((diff + 0x77FF) / 0x7800);
+            NETMOX::Mox_Send_Message_(MOX::_player[player_idx].network_player_id, 0x2E, &chunk_msg, 2);
+
+            while (packet < local_8) {
+                RUSS::Mox_Update_();
+                int32_t chunk_size = static_cast<int32_t>(local_8 - packet);
+                if (chunk_size > 0x7800) {
+                    chunk_size = 0x7800;
+                }
+
+                do {
+                    MULTPLAY::Chat_Box_Input_Loop_();
+                } while (netcode::Net_Is_Sending_() != 0);
+
+                uint8_t* current_packet = packet;
+                packet += 0x7800;
+                NETMOX::Mox_Send_Message_(MOX::_player[player_idx].network_player_id, 0x2F, current_packet, (uint16_t)chunk_size);
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+    }
 }

@@ -637,9 +637,8 @@ namespace NETSTART {
         NETTURN::Net_Init_Host_Election_();
         MULTPLAY::Reload_Initializing_Net_Info_();
 
-        auto draw_generic_fn = reinterpret_cast<void(__cdecl*)()>(std::uintptr_t{0x00502d70});
-        fields::Assign_Auto_Function_(draw_generic_fn, 1);
-        MISC::Fade_Into_Screen_(draw_generic_fn, &fade_flag, 11);
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_Generic_Net_Info_Screen_, 1);
+        MISC::Fade_Into_Screen_(MULTPLAY::Draw_Generic_Net_Info_Screen_, &fade_flag, 11);
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
@@ -706,8 +705,7 @@ namespace NETSTART {
 
         payload[0] = 0;
 
-        auto draw_wait_fn = reinterpret_cast<void(__cdecl*)()>(std::uintptr_t{0x00503560});
-        fields::Assign_Auto_Function_(draw_wait_fn, 2);
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_Wait_For_New_Joiners_Screen_, 2);
 
         MULTPLAY::Reload_Waiting_For_Joiners_Screen_();
         fields::Clear_Fields_();

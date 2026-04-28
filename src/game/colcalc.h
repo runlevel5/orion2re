@@ -91,6 +91,37 @@ namespace COLCALC {
     int16_t __cdecl Colony_N_Turns_To_Produce_(s_colony* colony);
 
     void __cdecl Apply_Colony_Changes_(s_colony* colony);
+
+    inline void __cdecl Apply_Colony_Pop_Growth_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f92d0});
+        fn(colony);
+    }
+
+    inline void __cdecl Apply_Assimilation_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f9a30});
+        fn(colony);
+    }
+
+    inline void __cdecl Produce_Ground_Military_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f9c90});
+        fn(colony);
+    }
+
+    inline void __cdecl Apply_Production_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f9d50});
+        fn(colony);
+    }
+
+    inline void __cdecl Ghost_Colony_Stuff_(s_colony* colony) {
+        using Fn = void(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fa530});
+        fn(colony);
+    }
+
     void __cdecl Apply_All_Colony_Changes_();
     void __cdecl Do_Surrenders_();
     void __cdecl All_Colony_Calculations_();

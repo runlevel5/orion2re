@@ -1592,7 +1592,7 @@ namespace DIP_SCRN {
                 return;
             }
 
-            fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(0x00413690) /* DIP_SCRN::Draw_Diplomacy_Synch_Mode_ */, 2);
+            fields::Assign_Auto_Function_(Draw_Diplomacy_Synch_Mode_, 2);
 
             if (MOX::_PLAYER_NUM != _talker_ambassador) {
                 if (_chat_mode_flag == 0) {

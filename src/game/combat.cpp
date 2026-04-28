@@ -1329,102 +1329,109 @@ namespace COMBAT {
         return MOX::_qcombat_data->structural_damage / 40 /* 0x28 */;
     }
 
-    void __cdecl Bombardment_(s_combat_bomb_result* bomb_result) {
-        int16_t ship_indices[500];
-        int16_t ship_count = 0;
-        uint16_t colony_idx;
-
+    void __cdecl Bombardment_(s_combat_bomb_result* result) {
         struct_::Clear_Structure_(&MOX::_combat_bomb_result, sizeof(s_combat_bomb_result));
 
-        colony_idx = (uint16_t)bomb_result->colony_idx;
-        int16_t planet_idx = MOX::_colony[colony_idx].planet;
-        int16_t star_idx = MOX::_planet[planet_idx].star_index;
+        int16_t num_ships = 0;
+        uint8_t colony_idx = result->colony_idx;
+        int16_t ships[500];
 
         for (int16_t i = 0; i < 500; ++i) {
-            if (MOX::_ship[i].location == star_idx &&
+            int16_t planet_idx = MOX::_colony[colony_idx].planet;
+
+            if (MOX::_planet[planet_idx].star_index == MOX::_ship[i].location &&
                 MOX::_ship[i].d.ship_type == 0 &&
                 MOX::_ship[i].status == 0 &&
-                MOX::_ship[i].owner == bomb_result->attacker_idx) {
-                ship_indices[ship_count++] = i;
+                MOX::_ship[i].owner == result->attacker_idx) {
+
+                ships[num_ships++] = i;
             }
         }
 
         if (MOX::_settings.strategic_combat_flag == 1) {
-            bomb_result->bomb_hits_remaining = Strategic_Bombardment_(ship_indices, ship_count, colony_idx);
-            bomb_result->is_planetary_hit = 1;
-            bomb_result->bio_hits_remaining = 0;
-            bomb_result->is_bio_weapon = 0;
+            int16_t remaining = Strategic_Bombardment_(ships, num_ships, colony_idx);
+
+            result->bomb_hits_remaining = remaining;
+            result->is_planetary_hit = 1;
+            result->bio_hits_remaining = 0;
+            result->is_bio_weapon = 0;
         } else {
-            Tactical_Bombardment_(ship_indices, ship_count, bomb_result);
+            Tactical_Bombardment_(ships, num_ships, result);
         }
     }
 
-    void __cdecl Tactical_Bombardment_(int16_t* ship_array, int16_t ship_count, s_combat_bomb_result* bomb_result) {
+    void __cdecl Tactical_Bombardment_(int16_t* ship_array, int16_t ship_count, s_combat_bomb_result* bomb_result)
+    {
         MOX::_cmbt_colony_id = (int16_t)bomb_result->colony_idx;
         MOX::_apply_damage_to_planet = 0;
         MOX::_combat_total_ship_count = 1;
 
         allocate::Push_Block_(MOX::_screen_seg);
 
-        MOX::_combat_data = (s_combat_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x100c2 /* 210 * sizeof(s_combat_data) */);
-        struct_::Clear_Structure_(MOX::_combat_data, 0x100c2);
+        MOX::_combat_data = static_cast<s_combat_data*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x100C2));
+        struct_::Clear_Structure_(MOX::_combat_data, 0x100C2);
 
-        MOX::_missile = (s_missile*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1e78 /* 300 * sizeof(s_missile) */);
-        struct_::Clear_Structure_(MOX::_missile, 0x1e78);
+        MOX::_missile = static_cast<s_missile*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1E78));
+        struct_::Clear_Structure_(MOX::_missile, 0x1E78);
 
-        MOX::_combat_attacker_player = (int16_t)MOX::_ship[ship_array[0]].owner;
-        MOX::_combat_defender_player = (int16_t)MOX::_colony[MOX::_cmbt_colony_id].owner;
+        MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
+        MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
 
-        _qsort(ship_array, (size_t)ship_count, 2, (int(__cdecl*)(const void*, const void*))qsort_ship_array_by_size_);
+        _qsort(ship_array, (size_t)ship_count, 2, qsort_ship_array_by_size_);
 
-        for (int16_t i = 0; i < ship_count; ++i) {
-            // d.ship_type == 0 indicates a ship that is not a fighter or similar
-            if (MOX::_ship[ship_array[i]].d.ship_type == 0) {
-                COMBINIT::Load_Combat_Ship_(ship_array[i], MOX::_combat_total_ship_count);
-                MOX::_combat_data[MOX::_combat_total_ship_count].x = 0;
-                MOX::_combat_data[MOX::_combat_total_ship_count].y = 0;
-                MOX::_combat_total_ship_count++;
+        if (ship_count > 0) {
+            for (int16_t i = 0; i < ship_count; ++i) {
+                if (MOX::_ship[ship_array[i]].d.ship_type == 0) {
+                    COMBINIT::Load_Combat_Ship_(ship_array[i], MOX::_combat_total_ship_count);
+                    MOX::_combat_data[MOX::_combat_total_ship_count].x = 0;
+                    MOX::_combat_data[MOX::_combat_total_ship_count].y = 0;
+                    MOX::_combat_total_ship_count++;
+                }
             }
         }
 
         COMBINIT::Load_Tactical_Colony_(MOX::_cmbt_colony_id, 0);
         CMBTFIR2::Set_Combat_Ordnance_Values_();
 
-        // Index 0 of combat data is assigned to the colony
         MOX::_combat_data[0].x = 0;
         MOX::_combat_data[0].y = 0;
 
-        for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-            // TYPE MISMATCH: Offensive_Combat_Bonus_ has 2 arguments in this context
-            MOX::_combat_data[i].tac_val_attack = reinterpret_cast<int16_t(__cdecl*)(int16_t, int16_t)>(CMBTFIR2::Offensive_Combat_Bonus_)(i, 0);
-            MOX::_combat_data[i].tac_val_defense = CMBTFIR2::Defensive_Combat_Bonus_(i, 0);
-            MOX::_combat_data[i].tac_val_evade = CMBTFIR2::Defensive_Combat_Bonus_(i, 1);
-            COMBINIT::Init_Special_Devices_(i);
+        if (MOX::_combat_total_ship_count > 0) {
+            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                MOX::_combat_data[i].tac_val_attack = CMBTFIR2::Offensive_Combat_Bonus_(i);
+                MOX::_combat_data[i].tac_val_defense = CMBTFIR2::Defensive_Combat_Bonus_(i, 0);
+                MOX::_combat_data[i].tac_val_evade = CMBTFIR2::Defensive_Combat_Bonus_(i, 1);
+                COMBINIT::Init_Special_Devices_(i);
+            }
         }
 
-        for (int16_t turns = 10; turns > 0; --turns) {
-            for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                for (int16_t j = 0; j < 8; ++j) {
-                    MOX::_combat_data[i].weapons[j].shots_left = MOX::_combat_data[i].weapons[j].count;
-                    MOX::_combat_data[i].weapons[j].active = 1;
+        int16_t turns = 10;
+        do {
+            if (MOX::_combat_total_ship_count > 0) {
+                for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+                    for (int16_t j = 0; j < 8; ++j) {
+                        MOX::_combat_data[i].weapons[j].shots_left = MOX::_combat_data[i].weapons[j].count;
+                        MOX::_combat_data[i].weapons[j].active = 1;
 
-                    int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
-                    if (weapon_id > 0) {
-                        // Check if weapon is not a rack type before decrementing ammo
-                        if (TECHDATA::_weapons[weapon_id].type != 1) {
-                            if (MOX::_combat_data[i].weapons[j].ammo > 0) {
-                                MOX::_combat_data[i].weapons[j].ammo--;
+                        if (MOX::_combat_data[i].weapons[j].weapon_id > 0) {
+                            if (TECHDATA::_weapons[MOX::_combat_data[i].weapons[j].weapon_id].type != 1) {
+                                if (MOX::_combat_data[i].weapons[j].ammo > 0) {
+                                    MOX::_combat_data[i].weapons[j].ammo--;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // Bombardment begins from the first ship (index 1), colony is index 0
-            for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
-                CMBTFIRE::Fire_Ship_(i, 0, 0, 0, 0, 0, 0);
+            if (MOX::_combat_total_ship_count > 1) {
+                for (int16_t i = 1; i < MOX::_combat_total_ship_count; ++i) {
+                    CMBTFIRE::Fire_Ship_(i, 0, 0, 0, 0, 0, 0);
+                }
             }
-        }
+
+            turns--;
+        } while (turns != 0);
 
         bomb_result->bomb_hits_remaining = MOX::_combat_data[0].structure_max / 100;
         bomb_result->is_planetary_hit = MOX::_combat_bomb_result.is_planetary_hit;

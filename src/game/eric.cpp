@@ -136,6 +136,18 @@ namespace ERIC {
         animate::Draw_(x_centered, y_centered, animation);
     }
 
+    void __cdecl Draw_Bottom_Centered_(int16_t x, int16_t y, s_animation_header* anim) {
+        int16_t width = animate::Get_Width_(anim);
+        int16_t height = animate::Get_Height_(anim);
+        animate::Draw_(x - (width / 2), y - height, anim);
+    }
+
+    void __cdecl Draw_Bottom_Centered_No_Glass_(int16_t x, int16_t y, s_animation_header* anim) {
+        int16_t width = animate::Get_Width_(anim);
+        int16_t height = animate::Get_Height_(anim);
+        animate::Draw_No_Glass_(x - (width / 2), y - height, anim);
+    }
+
     void __cdecl Print_Paragraph_Centered_(int16_t x, int16_t y, int16_t width, int16_t height, const char* text) {
         int16_t text_height = BILL::_Get_Paragraph_Max_Height_(width, text);
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <array>
 
-#define SKIP_MAIN
+//#define SKIP_MAIN
 
 namespace hooks {
 
@@ -86,7 +86,7 @@ namespace hooks {
         { 0x0052b220, &timer::Mark_Time_ },
         { 0x00531f80, &key::Keyboard_Status_ },
         { 0x00531f20, &key::Read_Key_ },
-        //{ 0x00425a70, &JIM::Draw_Logos_ },
+        { 0x00425a70, &JIM::Draw_Logos_ },
         { 0x00425D50, &JIM::Logo_Fadeout_ },
         { 0x0052e880, &allocate::Allocate_Space_ },
         { 0x0052ebb0, &allocate::Get_Remaining_Block_Space_ },
@@ -454,7 +454,7 @@ namespace hooks {
         { 0x0050fa10, &LOADSAVE::Load_Month_Names_ },
         { 0x005317a0, &file_ani::Set_File_Animation_Buffer_ },
         { 0x00530bf0, &file_ani::Open_File_Animation_ },
-        //{ 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
+        { 0x00531540, &file_ani::Draw_File_Animation_Stencil_ },
         { 0x004e9780, &MAINMENU::Draw_Credits_ },
         { 0x004e9a20, &MAINMENU::Fade_Credit_Colors_ },
         { 0x0050f630, &LOADSAVE::Restore_Main_Screen_ },
@@ -3657,6 +3657,26 @@ namespace hooks {
         { 0x004a2250, &COLREFIT::Show_Ship_Design_ },
         { 0x004a22b0, &COLREFIT::Draw_Ship_D_List_ },
         { 0x004a1fc0, &COLREFIT::Add2_Fields_ },
+        { 0x00532E30, &bolt::Bolt_Segment_ },
+        { 0x004ba890, &ERIC::Draw_Bottom_Centered_ },
+        { 0x004ba8e0, &ERIC::Draw_Bottom_Centered_No_Glass_ },
+        { 0x004c0be0, &COMBFIND::Bomb_Results_Popups_ },
+        { 0x004c0b70, &COMBFIND::Strategic_Results_Popup_ },
+        { 0x004bfd20, &COMBFIND::Do_Bombardment_ },
+        { 0x0048D670, &COMBAT::Tactical_Bombardment_ },
+        { 0x004bfd60, &COMBFIND::Has_Stellar_Converter_ },
+        { 0x004BFDC0, &COMBFIND::N_Enemy_Stars_ },
+        { 0x004bfe00, &COMBFIND::Player_Owns_Transports_ },
+        { 0x004C0CA0, &COMBFIND::Do_Net_Combat_Update_ },
+        { 0x004BCE10, &COMBFIND::N_Enemy_Stars_In_Range_ },
+        { 0x00402590, &COLSUM::Draw_Info_Pop_For_ },
+        { 0x0049f680, &COLMOVE::Send_Cluster_ },
+        { 0x004f9240, &COLCALC::Apply_Colony_Changes_ },
+        { 0x0043ce60, &FILEDEF::Get_Saved_Game_Descriptions_ },
+        { 0x0043D140, &FILEDEF::Get_Game_Type_From_Saved_Game_ },
+        { 0x005188B0, &NETMOX::Send_Battle_Results_ },
+        { 0x00517F50, &NETMOX::Send_You_Are_Target_Info_ },
+        { 0x00517750, &NETMOX::Send_Pick_Target_Info_ },
     };
 
     void Install_Hooks()

@@ -664,6 +664,8 @@ inline const char* const s_Monster_ship_id_cannot_mov_00552cd8 =
 inline const char* const s_Auto_Save_00556938 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00556938}); // "(Auto Save)"
 
+inline const char* s_no_description_00556920 = reinterpret_cast<const char*>(std::uintptr_t{0x00556920}); // "<< no description >>"
+
 inline const char* s_0_00551104 = reinterpret_cast<const char*>(0x00551104); // " 0"
 inline const char* s_2_00551108 = reinterpret_cast<const char*>(0x00551108); // " 2"
 inline const char* s_1_00551114 = reinterpret_cast<const char*>(0x00551114); // " 1"
@@ -934,6 +936,12 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
     using Fn = s_smack_video*(__stdcall*)(char*, uint32_t, int32_t);
     auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA648 });
     return fn(path, flags, priority);
+}
+
+inline int16_t __cdecl Ship_Has_Special_Device_(int32_t ship_idx, int32_t device_idx) {
+    using Fn = int16_t(__cdecl*)(int32_t, int32_t);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004830d0});
+    return fn(ship_idx, device_idx);
 }
 
 struct s_mouse_list;

@@ -3278,7 +3278,7 @@ typedef struct s_net_player_info s_net_player_info, *Ps_net_player_info;
 
 struct s_net_player_info {
     uint8_t sync_state;
-    undefined field1_0x1;
+    uint8_t combat_star_id;
     int16_t sync_star_id;
     int16_t sync_planet_id;
     int16_t sync_colony_id;
@@ -3843,11 +3843,9 @@ struct s_retreat_report {
 
 typedef struct s_saved_box s_saved_box, *Ps_saved_box;
 
-typedef char __int8_t;
-
 struct s_saved_box {
-    short f0;
-    __int8_t f2;
+    short field_id;
+    int8_t is_open;
 };
 
 typedef struct s_scan_list_entry s_scan_list_entry, *Ps_scan_list_entry;

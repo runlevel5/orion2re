@@ -606,46 +606,47 @@ namespace COLSUM {
         _wee_event_strings[35] = ESTRINGS::E_Strings_(0x186);
     }
 
-    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx)
-    {
-        int32_t list_val = _list_col[colony_idx];
+    void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
+        int16_t colony_idx_00 = _list_col[colony_idx];
+        int32_t esi_val = colony_idx * 31 + 38;
 
-        for (int16_t i = 0; i < 3; i++) {
-            int32_t ecx_val;
-
-            // The i == -1 block is present in the binary despite 'i' initializing to 0.
+        for (int32_t i = 0; i < 3; ++i) {
+            int32_t val1;
+            // The i == -1 check is technically unreachable because loop starts at 0,
+            // but preserved to match original logic.
             if (i == -1) {
-                ecx_val = 0x65;
+                val1 = 0x65;
             } else if (i == 0) {
-                ecx_val = 0xec;
+                val1 = 0xec;
             } else {
-                ecx_val = ((i == 1 ? -1 : 0) & (int32_t)0xffffff7a) + 0x200;
+                val1 = ((i == 1 ? -1 : 0) & 0xffffff7a) + 0x200;
             }
 
-            int32_t edx_val;
+            int32_t val2;
             if (i == 0) {
-                edx_val = 0x65;
+                val2 = 0x65;
             } else if (i == 1) {
-                edx_val = 0xec;
+                val2 = 0xec;
             } else {
-                edx_val = ((i == 2 ? -1 : 0) & (int32_t)0xffffff7a) + 0x200;
+                val2 = ((i == 2 ? -1 : 0) & 0xffffff7a) + 0x200;
             }
 
-            int32_t offset = i + colony_idx * 3;
-            ecx_val -= 10;
+            val1 -= 10;
+
+            int32_t idx = i + colony_idx * 3;
 
             COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-                list_val,
-                i,
+                colony_idx_00,
+                (int16_t)i,
                 0,
-                edx_val,
-                (colony_idx * 31) + 38,
-                ecx_val,
+                (int16_t)val2,
+                (int16_t)esi_val,
+                (int16_t)val1,
                 0,
-                _list_col_pop_ref[offset].refs,
-                &_list_col_pop_count[offset],
-                &_list_col_coord_vars[offset],
-                &_list_col_job_fields[offset]
+                _list_col_pop_ref[idx].refs,
+                &_list_col_pop_count[idx],
+                &_list_col_coord_vars[idx],
+                &_list_col_job_fields[idx]
             );
         }
     }

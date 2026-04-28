@@ -2,6 +2,7 @@
 
 namespace COMBFIND {
     inline uint8_t& _messed_up_fleet_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD0});
+    inline uint8_t& _in_net_update = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD4});
     inline s_combfind_target& _target = *reinterpret_cast<s_combfind_target*>(std::uintptr_t{0x0056CE38});
     inline int16_t (*&_player_needs_to_attack)[73] = *reinterpret_cast<int16_t (**)[73]>(std::uintptr_t{0x0056CE08});
     inline int8_t (*&_battle_stars) = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CE14});
@@ -63,17 +64,9 @@ namespace COMBFIND {
 
     void __cdecl Client_Combat_Loop_();
 
-    inline void __cdecl Bomb_Results_Popups_(s_battle_results *res) {
-        using Fn = void(__cdecl*)(s_battle_results *);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c0be0});
-        fn(res);
-    }
+    void __cdecl Bomb_Results_Popups_(s_battle_results* res);
 
-    inline void __cdecl Strategic_Results_Popup_(s_battle_results *res) {
-        using Fn = void(__cdecl*)(s_battle_results *);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c0b70});
-        fn(res);
-    }
+    void __cdecl Strategic_Results_Popup_(s_battle_results* battle_results);
 
     void __cdecl Get_Combat_Ships_(int16_t* ships, int16_t star_idx, int16_t plr1_idx, int16_t* plr1_offset, int16_t* plr1_count, int16_t plr2_idx, int16_t* plr2_offset, int16_t* plr2_count);
 
@@ -101,7 +94,6 @@ namespace COMBFIND {
 
     bool __cdecl AI_Can_Retreat_(int player_idx, int excluded_colony_idx);
 
-
     int8_t __cdecl Some_Star_Player_Is_Busy_(int16_t star_idx);
 
     int16_t __cdecl Pick_Attacker_At_Star_(int16_t star_idx);
@@ -114,39 +106,33 @@ namespace COMBFIND {
 
     void __cdecl Decode_Star_Player_Presence_(uint8_t **buffer, int16_t star_idx);
 
-    inline int8_t __cdecl Do_Bombardment_(int8_t attacker_id, uint8_t colony_idx) {
-        using Fn = int8_t(__cdecl*)(int8_t, uint8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfd20});
-        return fn(attacker_id, colony_idx);
+    int32_t __cdecl Do_Bombardment_(int8_t attacker_id, uint8_t colony_idx);
+
+    uint8_t __cdecl Has_Stellar_Converter_(int16_t* ship_list, int16_t ship_count);
+
+    int32_t __cdecl N_Enemy_Stars_In_Range_(int16_t player_idx, uint8_t enemy_player_idx);
+
+    int32_t __cdecl N_Enemy_Stars_(uint8_t player_idx);
+
+    int8_t __cdecl Player_Owns_Transports_(int player_idx);
+
+    inline void __cdecl GNN_Reports_Combat_(int32_t player_id, int32_t colony_id) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(0x004C14E0);
+        fn(player_id, colony_id);
     }
 
-    inline bool __cdecl Has_Stellar_Converter_(int16_t* ship_list, int n_ships) {
-        using Fn = bool(__cdecl*)(int16_t*, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfd60});
-        return fn(ship_list, n_ships);
+    inline void __cdecl Do_Nonhuman_Attack_Against_Human_(int32_t target_colony_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(0x004C1550);
+        fn(target_colony_id);
     }
 
-    inline int __cdecl N_Enemy_Stars_In_Range_(int8_t attacker_id, int8_t victim_id) {
-        using Fn = int(__cdecl*)(int8_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bce10});
-        return fn(attacker_id, victim_id);
-    }
+    void __cdecl Do_Net_Combat_Update_(bool message_sent);
 
-    inline int __cdecl N_Enemy_Stars_(int8_t victim_id) {
-        using Fn = int(__cdecl*)(int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfdc0});
-        return fn(victim_id);
-    }
-
-    inline bool __cdecl Player_Owns_Transports_(int8_t player_id) {
-        using Fn = bool(__cdecl*)(int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004bfe00});
-        return fn(player_id);
-    }
-
-    inline void __cdecl Do_Net_Combat_Update_(bool message_sent) {
-        using Fn = void(__cdecl*)(bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C0CA0});
-        fn(message_sent);
+    inline void __cdecl Send_Star_Player_Presence_(uint8_t** packet_ptr, int16_t a2) {
+        using Fn = void(__cdecl*)(uint8_t**, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004BC1D0 });
+        fn(packet_ptr, a2);
     }
 }

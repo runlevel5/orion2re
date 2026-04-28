@@ -79,7 +79,7 @@ namespace LOADSAVE {
 
     void __cdecl _Game_Popup_();
 
-    void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf);
+    void __cdecl Get_Star_Date_Strings_(int32_t* fields, char* output_buf);
 
     inline const char* const s_dot_GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4);
     inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC);

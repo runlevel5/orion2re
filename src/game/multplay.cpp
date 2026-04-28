@@ -1148,7 +1148,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
     int16_t __cdecl Load_Multi_Player_Game_Screen_(void) {
         MOX2::action_func_t auto_func_state;
-        s_game_popup_fields descriptions;
+        int32_t dates[10];
         s_game_popup_fields* star_date_fields; // Part of local stack
         char warning_msg[100];
         bool exit_loop = false;
@@ -1172,11 +1172,9 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         fields::Assign_Auto_Function_(MULTPLAY::Draw_Load_MP_Game_Screen_, 1);
 
         MOX::_mp_screen->subscreen_mode = 2;
-        FILEDEF::Get_Saved_Game_Descriptions_(&descriptions);
+        FILEDEF::Get_Saved_Game_Descriptions_(dates);
 
-        // Offset ESP+0x18 used as first argument for Get_Star_Date_Strings_
-        star_date_fields = &descriptions;
-        LOADSAVE::Get_Star_Date_Strings_(star_date_fields, MOX::_save_game_stardates);
+        LOADSAVE::Get_Star_Date_Strings_(dates, MOX::_save_game_stardates);
         LOADSAVE::Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
 
         if (!MULTPLAY::Add_Load_MP_Game_Screen_Fields_()) {

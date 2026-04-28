@@ -120,7 +120,7 @@ namespace LOADSAVE {
      * @address 005120e0
      */
     void __cdecl Set_Up_Load_Save_Popup_() {
-        FILEDEF::Get_Saved_Game_Descriptions_(LOADSAVE::_game_popup_fields);
+        FILEDEF::Get_Saved_Game_Descriptions_(LOADSAVE::_game_popup_fields->slot_occupied_flags);
 
         for (int i = 0; i < 10; ++i) {
             char* desc = MOX::_save_game_description[i].description;
@@ -139,7 +139,7 @@ namespace LOADSAVE {
         Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
         sound::Sound_Update_();
 
-        Get_Star_Date_Strings_(LOADSAVE::_game_popup_fields, MOX::_save_game_stardates);
+        Get_Star_Date_Strings_(LOADSAVE::_game_popup_fields->slot_occupied_flags, MOX::_save_game_stardates);
 
         for (int i = 0; i < 10; ++i) {
             char* star_date_entry = MOX::_save_game_stardates + (i * 25);
@@ -583,7 +583,7 @@ namespace LOADSAVE {
                 Save_Session_Related_Settings_();
                 saved_successfully = true;
                 Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
-                Get_Star_Date_Strings_(_game_popup_fields, (char*)MOX::_save_game_stardates);
+                Get_Star_Date_Strings_(_game_popup_fields->slot_occupied_flags, (char*)MOX::_save_game_stardates);
                 exit_popup = true;
                 *out_should_close = 1;
             }
@@ -664,12 +664,12 @@ namespace LOADSAVE {
     /**
      * @address 0050f8d0
      */
-    void __cdecl Get_Star_Date_Strings_(s_game_popup_fields* fields, char* output_buf) {
+    void __cdecl Get_Star_Date_Strings_(int32_t* dates, char* output_buf) {
         for (int16_t i = 0; i < 10; ++i) {
             char local_str_buf[25];
             memset(local_str_buf, 0, 25);
 
-            int32_t star_date_value = fields->slot_occupied_flags[i];
+            int32_t star_date_value = dates[i];
 
             if (star_date_value > 0) {
                 // Fetch the prefix (e.g., "Stardate " or "D ")
@@ -1646,12 +1646,12 @@ namespace LOADSAVE {
      * @address 005123d0
      */
     void __cdecl Auto_Save_Last_Saved_Game_(int16_t* result_flag) {
-        uint8_t saved_game_descriptions[0xF0];
+        int32_t save_slots[10];
         char message_buffer[0xC8];
 
-        FILEDEF::Get_Saved_Game_Descriptions_(saved_game_descriptions);
+        FILEDEF::Get_Saved_Game_Descriptions_(save_slots);
 
-        int save_slot = static_cast<int>(static_cast<int8_t>(MOX::_settings.active_save_slot));
+        int save_slot = MOX::_settings.active_save_slot;
         s_save_game_description* save_description = &MOX::_save_game_description[save_slot];
         const char* message_format = HAROLD::H_Message_(0xCD, save_slot, save_description);
 

@@ -72,6 +72,21 @@ namespace NETMOX {
 
     void __cdecl Mox_Net_Update_();
 
+    void __cdecl Send_You_Are_Target_Info_(
+        int16_t target_player_idx,
+        int16_t other_player_idx,
+        int16_t param_3,
+        int16_t colony_idx,
+        int16_t star_idx);
+
+    void __cdecl Send_Pick_Target_Info_(int16_t player_idx, int16_t star_idx, s_combfind_target* target_info);
+
+    inline void __cdecl Send_Dragon_Info_(int32_t target_planet_id) {
+        using Fn = void(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(0x005193A0);
+        fn(target_planet_id);
+    }
+
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);
@@ -162,13 +177,28 @@ namespace NETMOX {
 
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
 
-    inline void __cdecl Send_Battle_Results_(int star, int attacker, int defender, int p_defender, int planet, int result) {
-        using Fn = void(__cdecl*)(int, int, int, int, int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005188b0});
-        fn(star, attacker, defender, p_defender, planet, result);
-    }
+    void __cdecl Send_Battle_Results_(int16_t star_id, int16_t player_id, int16_t target_player_id, int16_t combat_defender_id, int16_t combat_planet_id, int16_t combat_result);
 
 #pragma pack(push, 1)
+    struct s_packet_0x12 {
+        int16_t star_idx;
+        int16_t other_player_idx;
+        int16_t param_3;
+        int16_t colony_idx;
+    };
+
+    struct s_packet_0x34 {
+        int16_t chunks;
+    };
+
+    struct s_packet_2E_chunks {
+        int16_t chunks;
+    };
+
+    struct s_packet_32 {
+        int16_t chunks;
+    };
+
     struct s_NET_MSG_SYNC_PLAYER {
         int32_t player1_idx;
         s_player player1;

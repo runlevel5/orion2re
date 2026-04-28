@@ -354,16 +354,56 @@ namespace FILEDEF {
         return false;
     }
 
-    void __cdecl Get_Saved_Game_Descriptions_(void* buffer) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043CE60});
-        fn(buffer);
+    void __cdecl Get_Saved_Game_Descriptions_(int32_t* save_times) {
+        char itoa_buf[8];
+        char filename[16];
+        int32_t game_type;
+
+        for (int16_t i = 0; i < 10; ++i) {
+            __itoa(i + 1, itoa_buf, 10);
+            strcpy(filename, s_SAVE_005568fc);
+            strcat(filename, itoa_buf);
+            strcat(filename, s__GAM_005568f4);
+
+            if (accss::_access_(filename, 0) == 0) {
+                FILE* file = _fopen(filename, s_rb_0055117c);
+                if (file != nullptr) {
+                    _fread(&game_type, 4, 1, file);
+                    _fread(MOX::_save_game_description[i].description, 37, 1, file);
+                    _fread(&save_times[i], 4, 1, file);
+
+                    if (LOADSAVE::Is_Valid_Game_Type_(game_type)) {
+                        if (i == 9) {
+                            strcpy(MOX::_save_game_description[i].description, s_Auto_Save_00556938);
+                        } else if (MOX::_save_game_description[i].description[0] == '\0') {
+                            strcpy(MOX::_save_game_description[i].description, s_no_description_00556920);
+                        }
+                    } else {
+                        save_times[i] = -1;
+                        strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
+                    }
+                    _fclose(file);
+                }
+            } else {
+                strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
+                save_times[i] = -1;
+            }
+        }
     }
 
-    uint8_t __cdecl Get_Game_Type_From_Saved_Game_(int slot) {
-        using Fn = uint8_t(__cdecl*)(int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043d140});
-        return fn(slot);
+    int8_t __cdecl Get_Game_Type_From_Saved_Game_(int16_t save_slot) {
+        int8_t game_type = -1;
+        char filename[16];
+
+        _sprintf(filename, s_SAVE_d_GAM_00556944, save_slot + 1);
+        FILE* file = _fopen(filename, s_rb_0055117c);
+        if (file != nullptr) {
+            if (_fseek(file, 0x2D, SEEK_SET) == 0) {
+                _fread(&game_type, 1, 1, file);
+            }
+            _fclose(file);
+        }
+        return game_type;
     }
 
     void Update_Game_Settings_Version_Number_() {

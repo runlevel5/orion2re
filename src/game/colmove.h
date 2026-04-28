@@ -17,9 +17,15 @@ namespace COLMOVE {
 
     bool __cdecl Pops_Identical_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
-    inline void __cdecl Send_Cluster_(int16_t colony_idx, int16_t param_2) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049F680});
-        fn(colony_idx, param_2);
+    void __cdecl Send_Cluster_(int16_t colony_idx, int16_t param_2);
+
+    inline void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* dest) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, char*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049f590})(colony_idx, pop_idx, dest);
+    }
+
+    inline uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t job_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t, int16_t, int16_t);
+        return reinterpret_cast<Fn>(std::uintptr_t{0x0049ff00})(colony_idx, pop_idx, job_idx);
     }
 }

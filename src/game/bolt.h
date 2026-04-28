@@ -5,15 +5,9 @@ namespace bolt {
     inline int16_t (&_head_wide_bolts)[192] = *reinterpret_cast<int16_t(*)[192]>(std::uintptr_t{0x0055BA20});
     inline int16_t (&_tail_wide_bolts)[192] = *reinterpret_cast<int16_t(*)[192]>(std::uintptr_t{0x0055BBA0});
 
-    inline void __cdecl Bolt_Segment_(int16_t p1, int16_t p2, int16_t p3, int16_t p4,
-                                      int16_t p5, int16_t p6, int16_t p7, int16_t p8,
-                                      int16_t p9, int16_t p10, int16_t p11, int16_t p12,
-                                      int16_t p13, int16_t p14) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t,
-                                  int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00532e30});
-        fn(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14);
-    }
+    void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
+                               int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,
+                               int16_t unused_11, int16_t do_sparkles, int16_t sparkle_offset, int16_t tip_fade);
 
     void __cdecl Wide_Bolt_Line_(
         int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t param_5, int16_t param_6,

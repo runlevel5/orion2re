@@ -1808,10 +1808,23 @@ namespace COLCALC {
         Eliminate_Player_(surrender_plr);
     }
 
-    inline void __cdecl Apply_Colony_Changes_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f9240});
-        fn(colony);
+    void __cdecl Apply_Colony_Changes_(s_colony* colony) {
+        if (EVENTS::Event_Check_Space_Anomaly_(static_cast<int>(colony - MOX::_colony)) == 0) {
+            if (colony->occupation_policy == 4) {
+                colony->occupation_policy = 3;
+            }
+            if (colony->n_turns_existed != -1) {
+                colony->n_turns_existed++;
+            }
+            if (colony->n_pops != 0) {
+                Apply_Colony_Pop_Growth_(colony);
+                Apply_Assimilation_(colony);
+                Produce_Ground_Military_(colony);
+                Apply_Production_(colony);
+            } else {
+                Ghost_Colony_Stuff_(colony);
+            }
+        }
     }
 
     void __cdecl Apply_All_Colony_Changes_() {

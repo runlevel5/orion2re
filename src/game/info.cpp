@@ -479,7 +479,7 @@ namespace INFO {
         );
 
         is_tech_image_loaded = false;
-        fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(Draw_Tech_Review_Subscreen_), 2);
+        fields::Assign_Auto_Function_(Draw_Tech_Review_Subscreen_, 2);
 
         int16_t field_multi_last;
         for (int i = 0; i < 4; ++i) {
@@ -1357,7 +1357,7 @@ namespace INFO {
             fields::Add_Button_Field_(385, 427, MOX::s__00551100, param_1[20], MOX::s__00551100, 40); // 40 = '('
         }
 
-        fields::Assign_Auto_Function_(reinterpret_cast<void(__cdecl*)()>(INFO::Draw_Race_Stats_Subscreen_), 2);
+        fields::Assign_Auto_Function_(INFO::Draw_Race_Stats_Subscreen_, 2);
 
         int16_t input;
         while (true) {

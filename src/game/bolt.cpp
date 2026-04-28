@@ -108,6 +108,114 @@ namespace bolt {
     }
 
 
+    void __cdecl Bolt_Segment_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color_base,
+                               int16_t color_range, int16_t rand_chance, int16_t rand_range, int16_t min_color, int16_t max_color,
+                               int16_t unused_11, int16_t do_sparkles, int16_t sparkle_offset, int16_t tip_fade)
+    {
+        int32_t rand_range2 = rand_range * 2 + 1;
+        int32_t dx = x2 - x1;
+        int32_t dy = y2 - y1;
+
+        if (dx < 0) {
+            dx = -dx;
+        }
+        if (dy < 0) {
+            dy = -dy;
+        }
+
+        int32_t max_d = dy;
+        if (max_d < dx) {
+            max_d = dx;
+        }
+
+        int32_t len = max_d + 1;
+        int32_t step_val = ((int32_t)color_range << 16) / len;
+        int32_t color_accum = 32000 / len;
+        int32_t rand_val = 0;
+
+        if (y2 < y1) {
+            if (len >= 0) {
+                for (int i = 0; i <= len; ++i) {
+                    uint8_t c = (uint8_t)((color_accum >> 16) + rand_val + color_base);
+                    replace::_graphics_buffer[len - i + 1] = c;
+                    color_accum += step_val;
+
+                    if ((int16_t)random::Random_(100) < rand_chance) {
+                        rand_val = random::Random_(rand_range2) - rand_range;
+                    } else {
+                        rand_val = 0;
+                    }
+                }
+            }
+            replace::_graphics_buffer[len] = (uint8_t)color_base;
+            replace::_graphics_buffer[0] = (uint8_t)(color_base + color_range - 1);
+        } else {
+            if (len >= 0) {
+                for (int i = 0; i <= len; ++i) {
+                    uint8_t c = (uint8_t)((color_accum >> 16) + rand_val + color_base);
+                    replace::_graphics_buffer[i + 1] = c;
+                    color_accum += step_val;
+
+                    if ((int16_t)random::Random_(100) < rand_chance) {
+                        rand_val = random::Random_(rand_range2) - rand_range;
+                    } else {
+                        rand_val = 0;
+                    }
+                }
+            }
+            replace::_graphics_buffer[0] = (uint8_t)color_base;
+            replace::_graphics_buffer[len] = (uint8_t)(color_base + color_range - 1);
+        }
+
+        if (do_sparkles == 1) {
+            int32_t i = sparkle_offset % 8;
+            int32_t end_i = len + 2;
+            if (i < end_i) {
+                do {
+                    replace::_graphics_buffer[i] += 3;
+                    i += 8;
+                } while (i < end_i);
+            }
+        }
+
+        int32_t buf_len = len + 2;
+        if (buf_len > 0) {
+            for (int i = 0; i < buf_len; ++i) {
+                if (replace::_graphics_buffer[i] < min_color) {
+                    replace::_graphics_buffer[i] = (uint8_t)min_color;
+                }
+                if (replace::_graphics_buffer[i] > max_color) {
+                    replace::_graphics_buffer[i] = (uint8_t)max_color;
+                }
+            }
+        }
+
+        if (tip_fade != 0) {
+            int32_t fade_val = 3 / tip_fade;
+            if (y2 < y1) {
+                for (int i = 0; i <= 5; ++i) {
+                    replace::_graphics_buffer[i + 1] += fade_val;
+                }
+            } else {
+                if (len > 5) {
+                    for (int i = 0; i <= 5; ++i) {
+                        replace::_graphics_buffer[len - i - 1] += fade_val;
+                    }
+                }
+            }
+        }
+
+        if (buf_len > 0) {
+            for (int i = 0; i < buf_len; ++i) {
+                if (replace::_graphics_buffer[i] > color_base + 15) {
+                    replace::_graphics_buffer[i] = (uint8_t)(color_base + 15);
+                }
+            }
+        }
+
+        line::Plasma_Line_(x1, y1, x2, y2, replace::_graphics_buffer, 0);
+    }
+
     void __cdecl Bolt_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t p5,
         int16_t p6, int16_t p7, int16_t p8, int16_t p9, int16_t draw_caps,
         int16_t unused_11, int16_t p12, int16_t p13, int16_t p14, int16_t p15,
