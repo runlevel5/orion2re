@@ -242,7 +242,7 @@ namespace animate {
     }
 
     void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
-        int y_offset = *reinterpret_cast<int16_t*>(frame_data + 2);
+        int y_offset = *reinterpret_cast<uint16_t*>(frame_data + 2);
         int dest_line_base = (y + y_offset) * static_cast<int>(g_screen_res_x) + x;
         int dest_ptr = dest_line_base;
         int frame_idx = 2;
@@ -436,19 +436,15 @@ namespace animate {
     }
 
     void __cdecl Set_Animation_Palette_() {
-        uint8_t* pal_hdr = reinterpret_cast<uint8_t*>(
+        _palette_header = reinterpret_cast<s_palette_header*>(
             &_animation_header->frame_offsets[_animation_header->frame_count + 1]
-            );
-        _palette_header = reinterpret_cast<s_palette_header*>(pal_hdr);
+        );
 
-        int16_t start_index = reinterpret_cast<int16_t*>(pal_hdr)[0];
-        int16_t count = reinterpret_cast<int16_t*>(pal_hdr)[1];
+        if (_palette_header->count > 0) {
+            s_palette_entry* dst = &video::_current_palette[_palette_header->start_index];
+            uint32_t* src = reinterpret_cast<uint32_t*>(_palette_header + 1);
 
-        if (count > 0) {
-            s_palette_entry* dst = &video::_current_palette[start_index];
-            uint32_t* src = reinterpret_cast<uint32_t*>(pal_hdr + 4);
-
-            for (int i = 0; i < count; ++i) {
+            for (int i = 0; i < _palette_header->count; ++i) {
                 uint32_t src_val = src[i];
                 uint32_t& dst_val = reinterpret_cast<uint32_t&>(dst[i]);
 
@@ -585,7 +581,7 @@ namespace animate {
 
         if ((anim->flags & 0x20) == 0) {
             if (anim->current_frame >= anim->frame_count) {
-                anim->current_frame = static_cast<int16_t>(anim->loop_frame);
+                anim->current_frame = static_cast<int8_t>(anim->loop_frame);
             }
         }
         else {
@@ -858,8 +854,9 @@ namespace animate {
 
         current_y -= start_y;
         int32_t right_limit_offset = x_off + draw_width;
-        int32_t clip_left = screen_offset + x_off;
-        int32_t clip_right = screen_offset + right_limit_offset;
+        int32_t line_start_offset = screen_offset;
+        int32_t clip_left = line_start_offset + x_off;
+        int32_t clip_right = line_start_offset + right_limit_offset;
 
         while (current_y < draw_height) {
             int16_t cmd = *reinterpret_cast<int16_t*>(frame_data + idx * 2);
@@ -869,9 +866,10 @@ namespace animate {
             if (cmd == 0) {
                 current_y += skip;
                 // Assembly explicitly uses constant 640 instead of g_screen_res_x inside this branch
-                screen_offset += skip * 640;
-                clip_left = x_off + screen_offset;
-                clip_right = right_limit_offset + screen_offset;
+                line_start_offset += skip * 640;
+                screen_offset = line_start_offset;
+                clip_left = x_off + line_start_offset;
+                clip_right = right_limit_offset + line_start_offset;
             } else {
                 screen_offset += skip;
                 int32_t data_idx = idx * 2;

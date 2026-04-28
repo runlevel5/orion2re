@@ -471,11 +471,10 @@ namespace graphics {
         replace::Establish_Color_Gradient_(static_cast<int16_t>(extra), static_cast<int16_t>(param_7));
 
         int32_t gap = platform::g_screen_res_x - (x2 - x1) - 1;
-        int32_t color_offset = static_cast<int32_t>(reinterpret_cast<std::intptr_t>(color_ptr));
 
         for (int i = 0; i < 256; ++i) {
             uint8_t color_idx = replace::_palette_color_list[i];
-            replace::_palette_color_list[i] = static_cast<uint8_t>(color_idx + color_offset);
+            replace::_palette_color_list[i] = color_ptr[color_idx];
         }
 
         uint8_t* dest_ptr = video::_current_video_page + (y1 * platform::g_screen_res_x) + x1;
