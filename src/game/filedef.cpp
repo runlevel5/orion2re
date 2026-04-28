@@ -355,24 +355,25 @@ namespace FILEDEF {
     }
 
     void __cdecl Get_Saved_Game_Descriptions_(int32_t* save_times) {
-        char itoa_buf[8];
-        char filename[16];
-        int32_t game_type;
-
         for (int16_t i = 0; i < 10; ++i) {
-            __itoa(i + 1, itoa_buf, 10);
+            char num_str[8];
+            char filename[16];
+
+            __itoa(i + 1, num_str, 10);
+
             strcpy(filename, s_SAVE_005568fc);
-            strcat(filename, itoa_buf);
-            strcat(filename, s__GAM_005568f4);
+            strcat(filename, num_str);
+            strcat(filename, s_GAM_005568f4);
 
             if (accss::_access_(filename, 0) == 0) {
-                FILE* file = _fopen(filename, s_rb_0055117c);
-                if (file != nullptr) {
-                    _fread(&game_type, 4, 1, file);
-                    _fread(MOX::_save_game_description[i].description, 37, 1, file);
-                    _fread(&save_times[i], 4, 1, file);
+                FILE* fp = _fopen(filename, s_rb_0055117c);
+                if (fp != nullptr) {
+                    int32_t type;
+                    _fread(&type, 4, 1, fp);
+                    _fread(MOX::_save_game_description[i].description, 37, 1, fp);
+                    _fread(&save_times[i], 4, 1, fp);
 
-                    if (LOADSAVE::Is_Valid_Game_Type_(game_type)) {
+                    if (LOADSAVE::Is_Valid_Game_Type_(type)) {
                         if (i == 9) {
                             strcpy(MOX::_save_game_description[i].description, s_Auto_Save_00556938);
                         } else if (MOX::_save_game_description[i].description[0] == '\0') {
@@ -382,7 +383,7 @@ namespace FILEDEF {
                         save_times[i] = -1;
                         strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
                     }
-                    _fclose(file);
+                    _fclose(fp);
                 }
             } else {
                 strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));

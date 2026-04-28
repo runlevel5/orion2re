@@ -926,6 +926,54 @@ namespace fonts {
         }
     }
 
+    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y) {
+        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+
+        int screen_idx_start = y * g_screen_res_x - clip_left + x;
+
+        if (static_cast<int16_t>(_font_header.current_height) < end_y) {
+            end_y = static_cast<int16_t>(_font_header.current_height);
+        }
+
+        int16_t offset = static_cast<int16_t>(_font_header.font_style_offsets[static_cast<int>(letter)]);
+
+        for (int i = 0; i < start_y; ++i) {
+            while (_font_data[offset] != 0x80) {
+                ++offset;
+            }
+            ++offset;
+        }
+
+        int16_t rows_to_draw = end_y - start_y;
+        if (rows_to_draw > 0) {
+            for (int16_t row = 0; row < rows_to_draw; ++row) {
+                int screen_idx = screen_idx_start;
+                int clip_start_idx = screen_idx_start + clip_left;
+                int clip_end_idx = clip_start_idx + clip_width;
+
+                uint8_t pixel = _font_data[offset];
+                if (pixel != 0x80) {
+                    do {
+                        if (pixel > 0x80) {
+                            screen_idx += (pixel & 0x7F);
+                        } else {
+                            if (screen_idx >= clip_start_idx && screen_idx < clip_end_idx) {
+                                video::_current_video_page[screen_idx] = (&_palette_block__unk)[pixel];
+                            }
+                            ++screen_idx;
+                        }
+                        ++offset;
+                        pixel = _font_data[offset];
+                    } while (pixel != 0x80);
+                }
+                ++offset;
+                screen_idx_start += g_screen_res_x;
+            }
+        }
+
+        platform::Unlock_Appropriate_Render_Buffer();
+    }
+
     int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c) {
         int16_t spacing = _font_header.font_style_spacing;
 

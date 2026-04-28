@@ -65,11 +65,7 @@ namespace fonts {
 
     int16_t __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    inline void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char c, int16_t clip_x, int16_t width, int16_t clip_y, int16_t height) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, char, int16_t, int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526440});
-        fn(x, y, c, clip_x, width, clip_y, height);
-    }
+    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y);
 
     int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c);
 

@@ -25,11 +25,7 @@ namespace MSG_ {
 
     void __cdecl Add_Peace_Msg_(int32_t player_a_idx, int32_t player_b_idx);
 
-    inline void __cdecl Add_Diplomacy_Msg_(int32_t player_a, int32_t player_b, int32_t type) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00473a10});
-        fn(player_a, player_b, type);
-    }
+    void __cdecl Add_Diplomacy_Msg_(int16_t plr_a, int16_t plr_b, int16_t diplomacy_idx);
 
     inline char*& _msg_artifacts_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565EF0});
     inline char*& _msg_colony_your_rebellion_lost_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565EF4});

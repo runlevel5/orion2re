@@ -32,9 +32,5 @@ namespace LIST {
 
     s_list_item* __cdecl Select_And_Page_By_Head_ID_(s_list_state* state, uint8_t head_id);
 
-    inline void __cdecl Display_Selected_List_Text_For_Tech_List_(s_list_state* list, s_list_item* item) {
-        using Fn = void(__cdecl*)(s_list_state*, s_list_item*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00460120});
-        fn(list, item);
-    }
+    void __cdecl Display_Selected_List_Text_For_Tech_List_(s_list_state* list_state, s_list_item* item);
 }

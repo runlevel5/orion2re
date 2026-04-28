@@ -81,12 +81,6 @@ namespace NETMOX {
 
     void __cdecl Send_Pick_Target_Info_(int16_t player_idx, int16_t star_idx, s_combfind_target* target_info);
 
-    inline void __cdecl Send_Dragon_Info_(int32_t target_planet_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(0x005193A0);
-        fn(target_planet_id);
-    }
-
     void __cdecl Ditch_Leader_(int32_t leader_idx);
 
     int32_t __cdecl Mox_Send_Message_(int16_t param_1, uint16_t param_2, void* packet, uint16_t len);
@@ -175,11 +169,17 @@ namespace NETMOX {
 
     void __cdecl Decode_Dragon_Info_(int32_t* colony_id_ptr);
 
+    void __cdecl Send_Dragon_Info_(int32_t colony_id);
+
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info);
 
     void __cdecl Send_Battle_Results_(int16_t star_id, int16_t player_id, int16_t target_player_id, int16_t combat_defender_id, int16_t combat_planet_id, int16_t combat_result);
 
 #pragma pack(push, 1)
+    struct s_packet_dragon_info {
+        int32_t colony_id;
+    };
+
     struct s_packet_0x12 {
         int16_t star_idx;
         int16_t other_player_idx;

@@ -6,11 +6,7 @@ namespace FIREPTS {
 
     void __cdecl Load_FP_Data_From_LBX_();
 
-    inline int16_t __cdecl N_Fire_Points_(int16_t weapon_id, int16_t shot_count) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005084E0});
-        return fn(weapon_id, shot_count);
-    }
+    int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2);
 
     inline void __cdecl Calc_FP_Offsets_(int16_t* fp_x, int16_t* fp_y, int16_t weapon_id, int16_t shot_count, int16_t attacker_owner, int16_t attacker_ship_id, int16_t attacker_picture_num, int16_t attacker_facing_dir, int16_t target_bearing, int32_t fp_idx) {
         using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int32_t);

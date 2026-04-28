@@ -491,6 +491,28 @@ namespace MSG_ {
         Add_Diplomacy_Msg_(player_a_idx, player_b_idx, 1 /* DIPLOMACY_PEACE */);
     }
 
+    void __cdecl Add_Diplomacy_Msg_(int16_t plr_a, int16_t plr_b, int16_t diplomacy_idx) {
+        s_MSG msg = {};
+        msg.msg_type = 17; /* MSG_TYPE_DIPLOMACY */
+        msg.u.diplomacy.diplomacy_idx = static_cast<int8_t>(diplomacy_idx);
+        msg.u.diplomacy.plr_a = static_cast<int8_t>(plr_a);
+        msg.u.diplomacy.plr_b = static_cast<int8_t>(plr_b);
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if (diplomacy_idx == 4) {
+                    if (i == plr_a || i == plr_b) {
+                        Add_Msg_(msg, i);
+                    }
+                } else {
+                    if (MOX::_player[i].contact[plr_a] != 0 || MOX::_player[i].contact[plr_b] != 0) {
+                        Add_Msg_(msg, i);
+                    }
+                }
+            }
+        }
+    }
+
     void __cdecl Add_Nonaggression_Msg_(uint8_t plr_a, uint8_t plr_b) {
         Add_Diplomacy_Msg_(plr_a, plr_b, 3);
     }

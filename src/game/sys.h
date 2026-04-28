@@ -1,7 +1,7 @@
 #pragma once
 
 namespace SYS {
-    inline uint32_t& _sys_data_buffer = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A57D0});
+    inline void*& _sys_data_buffer = *reinterpret_cast<void**>(std::uintptr_t{0x005A57D0});
     inline const char* s_fmt_star_display = reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
     inline const char* s_1 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"
     inline const char* s_percent_d_nl = reinterpret_cast<const char*>(std::uintptr_t{0x00557f20}); // "%d%%\n"

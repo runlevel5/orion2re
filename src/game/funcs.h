@@ -12,6 +12,7 @@ struct s_lbx_stream_header;
 inline s_animation_header** _anims =
     reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00565D90});
 
+inline char* s_Outpost_Ship_00558f48 = reinterpret_cast<char*>(std::uintptr_t{0x00558F48});
 inline char* s_inbox_lbx_00551370 = reinterpret_cast<char*>(std::uintptr_t{0x00551370});
 inline char* s_space_005510f0 = reinterpret_cast<char*>(std::uintptr_t{0x005510F0}); // " "
 inline char* s_cmbtsfx_lbx_00551228 = reinterpret_cast<char*>(std::uintptr_t{0x00551228});

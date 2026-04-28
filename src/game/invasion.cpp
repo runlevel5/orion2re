@@ -87,6 +87,36 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
     }
 }
 
+void __cdecl Compute_Attacker_Officer_Bonus_(int16_t* ship_indexes, int16_t count, s_invasion_player_bonuses* bonuses) {
+    if (count <= 0) {
+        return;
+    }
+
+    for (int16_t i = 0; i < count; ++i) {
+        int16_t ship_idx = ship_indexes[i];
+        int16_t officer_idx = MOX::_ship[ship_idx].officer_index;
+
+        if (officer_idx >= 0) {
+            if (MOX::_leaders[officer_idx].eta == 0) {
+                int16_t bonus = 0;
+
+                if ((MOX::_leaders[officer_idx].general_skills & 8) != 0) {
+                    int16_t level = Owned_Officer_Level_(officer_idx);
+                    bonus = (level * 15 + 16) / 2;
+                } else if ((MOX::_leaders[officer_idx].general_skills & 4) != 0) {
+                    int16_t level = Owned_Officer_Level_(officer_idx);
+                    bonus = (level + 1) * 5;
+                }
+
+                if (bonuses->officer_bonus < bonus) {
+                    bonuses->officer_bonus = bonus;
+                    bonuses->officer_idx = static_cast<int8_t>(officer_idx);
+                }
+            }
+        }
+    }
+}
+
 void __cdecl Compute_Ground_Combat_Info_(s_invasion_side_info* side, s_invasion_player_bonuses* own_mods, s_invasion_player_bonuses* opponent_mods) {
     int16_t base_strength = (uint8_t)own_mods->troop_bonus +
                             (uint8_t)own_mods->personal_shield_bonus +
@@ -435,6 +465,39 @@ void __cdecl Resolve_Rebellion_Troops_(s_invasion_side_info info) {
     COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[MOX::_planet[colony->planet].star_index]);
 }
 
+void __cdecl Resolve_Invasion_Troops_(s_invasion_side_info info) {
+    s_colony* colony = &MOX::_colony[info.colony_id];
+    int16_t limit = (int16_t)Colony_Infantry_Limit_(colony);
+
+    colony->military[0] = 1;
+    int16_t remaining_infantry = info.unit_counts[1] - 1;
+
+    if (info.n_ships > 0) {
+        for (int16_t i = 0; i < info.n_ships; ++i) {
+            int16_t ship_idx = info.ship_list[i];
+            if (MOX::_ship[ship_idx].d.ship_type == 2 /* Troop Transport */) {
+                if (remaining_infantry < 4) {
+                    SHIPS::Kill_Ship_(ship_idx);
+                } else {
+                    remaining_infantry -= 4;
+                }
+            }
+        }
+    }
+
+    int16_t final_infantry = colony->military[0] + remaining_infantry;
+    colony->military[0] = final_infantry;
+
+    if (final_infantry >= limit) {
+        colony->military[0] = limit;
+    }
+
+    int16_t planet_idx = colony->planet;
+    int8_t star_idx = MOX::_planet[planet_idx].star_index;
+
+    COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[star_idx]);
+}
+
 void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, s_battle_results_info* results) {
     int8_t old_owner_idx = colony->owner;
     int16_t colony_idx = (int16_t)(colony - MOX::_colony);
@@ -750,6 +813,87 @@ int __cdecl Colony_Tank_Barracks_Limit_(s_colony* colony) {
     }
 
     return limit;
+}
+
+void __cdecl Get_Invasion_Info_(int16_t* ship_list, int16_t n_ships, s_colony* colony, s_invasion_side_info* attacker_side, s_invasion_side_info* defender_side) {
+    memset(attacker_side, 0, sizeof(s_invasion_side_info));
+
+    attacker_side->player_id = MOX::_ship[ship_list[0]].owner;
+    attacker_side->opponent_player_id = colony->owner;
+    attacker_side->colony_id = (int16_t)(colony - MOX::_colony);
+    attacker_side->ship_list = ship_list;
+    attacker_side->n_ships = n_ships;
+
+    for (int16_t i = 0; i < n_ships; ++i) {
+        if (MOX::_ship[ship_list[i]].d.ship_type == 2 /* Transport */) {
+            attacker_side->unit_counts[1] += 4;
+        }
+    }
+
+    memset(defender_side, 0, sizeof(s_invasion_side_info));
+
+    defender_side->player_id = colony->owner;
+    defender_side->opponent_player_id = attacker_side->player_id;
+    defender_side->colony_id = (int16_t)(colony - MOX::_colony);
+    defender_side->ship_list = ship_list;
+    defender_side->n_ships = n_ships;
+
+    defender_side->unit_counts[0] = colony->military[1];
+    defender_side->unit_counts[1] = colony->military[0];
+    defender_side->unit_counts[2] = (int16_t)Colony_N_Militia_(colony);
+
+    Compute_Player_Ground_Combat_Bonuses_(attacker_side->player_id, &attacker_side->combat_modifiers, 0);
+    Compute_Attacker_Officer_Bonus_(ship_list, n_ships, &attacker_side->combat_modifiers);
+
+    Compute_Player_Ground_Combat_Bonuses_(attacker_side->opponent_player_id, &defender_side->combat_modifiers, 1);
+    Compute_Colony_Officer_Bonus_(colony, &defender_side->combat_modifiers);
+
+    Compute_Ground_Combat_Info_(attacker_side, &attacker_side->combat_modifiers, &defender_side->combat_modifiers);
+    Compute_Ground_Combat_Info_(defender_side, &defender_side->combat_modifiers, &attacker_side->combat_modifiers);
+}
+
+void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_id, s_battle_results_info* battle_results) {
+    s_invasion_side_info local_attacker;
+    s_invasion_side_info local_defender;
+
+    s_colony* colony = &MOX::_colony[colony_id];
+
+    invasion::Get_Invasion_Info_(ship_list, n_ships, colony, &local_attacker, &local_defender);
+
+    battle_results->attacker_invasion = local_attacker;
+    battle_results->defender_invasion = local_defender;
+
+    uint32_t random_seed = random::Get_Random_Seed_();
+    battle_results->captured_tech_id = 0;
+    battle_results->ground_defense_strength = (int32_t)random_seed;
+
+    invasion::Resolve_Ground_Combat_(&local_attacker, &local_defender);
+
+    if (static_cast<uint8_t>(local_attacker.current_troop_type_idx) < 4) {
+        invasion::Change_Colony_Ownership_(colony, (uint32_t)local_attacker.player_id, battle_results);
+        invasion::Resolve_Invasion_Troops_(local_attacker);
+    } else {
+        colony->military[1] = local_defender.unit_counts[0];
+        colony->military[0] = local_defender.unit_counts[1];
+
+        for (int16_t i = 0; i < n_ships; ++i) {
+            int16_t ship_idx = ship_list[i];
+            if (MOX::_ship[ship_idx].d.ship_type == 2 /* Transport */) {
+                SHIPS::Kill_Ship_(ship_idx);
+            }
+        }
+    }
+
+    MAINSCR::Update_Ship_Icons_In_Between_Turns_();
+}
+
+bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx) {
+    s_invasion_side_info side1;
+    s_invasion_side_info side2;
+
+    Get_Invasion_Info_(ship_list, (int16_t)n_ships, &MOX::_colony[colony_idx], &side1, &side2);
+
+    return side1.unit_counts[1] != 0;
 }
 
 }

@@ -90,4 +90,33 @@ namespace mouse {
     int16_t __cdecl Get_Pointer_Image_Number_() {
         return mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
     }
+
+    void __cdecl Save_Mouse_State_() {
+        _mouse_state = _mouse_enabled;
+        _mouse_enabled = 0;
+    }
+
+    void __cdecl Restore_Mouse_State_() {
+        _mouse_enabled = _mouse_state;
+    }
+
+    int16_t __cdecl Mouse_Buffer_Button_() {
+        return _mouse_buffer_button;
+    }
+
+    int16_t __cdecl Mouse_Buffer_X_() {
+        return _mouse_buffer_x;
+    }
+
+    int16_t __cdecl Mouse_Buffer_Y_() {
+        return _mouse_buffer_y;
+    }
+
+    void __cdecl Disable_Mouse_() {
+        _mouse_enabled = 0;
+    }
+
+    void __cdecl Enable_Mouse_() {
+        _mouse_enabled = 1;
+    }
 }

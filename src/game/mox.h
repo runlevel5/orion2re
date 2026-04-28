@@ -109,8 +109,8 @@ namespace MOX {
     inline int16_t& _n_fltscrn_officers = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A183A});
     inline int16_t*& _officer_id_list = *reinterpret_cast<int16_t**>(std::uintptr_t{0x00596E94});
     // Suggested name: MOX::_star_colors_seg
-    inline s_animation_header** _star_colors_seg =
-        reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597430});
+    inline s_animation_header* (&_star_colors_seg)[11] =
+        *reinterpret_cast<s_animation_header* (*)[11]>(std::uintptr_t{0x00597430});
     inline s_animation_header* (&_fleet_galaxy_star_seg)[11] =
         *reinterpret_cast<s_animation_header*(*)[11]>(std::uintptr_t{0x00596F50});
     inline s_animation_header* (&_colony_galaxy_star_seg)[10] =
@@ -224,7 +224,7 @@ namespace MOX {
     inline uint8_t (&_given_chance_to_rename_home_star)[8] =
         *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005973E8});
     inline uint8_t& _player_has_ship_in_system = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D4B});
-    inline s_animation_header*& _moveable_box_pict = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B60});
+    inline s_animation_header* (&_moveable_box_pict)[25] = *reinterpret_cast<s_animation_header* (*)[25]>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
@@ -683,6 +683,8 @@ namespace MOX {
         *reinterpret_cast<s_colony**>(std::uintptr_t{ 0x005A1828 });
 
     inline s_animation_header*& _darkened_turn_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B30});
+
+    inline s_animation_header*& _fleet_box_selection_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1784});
     inline int16_t& _ship_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A1B1C});
     inline s_animation_header*& _mainscrn_plyr_done_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A4A9C});
     inline uint16_t& _skip_fields = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1B5A});

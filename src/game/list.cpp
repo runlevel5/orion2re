@@ -336,4 +336,23 @@ namespace LIST {
         return selected_item;
     }
 
+    void __cdecl Display_Selected_List_Text_For_Tech_List_(s_list_state* list_state, s_list_item* item) {
+        if (item != nullptr && item != (s_list_item*)-7) {
+            fonts::Set_Font_Style_(list_state->group_font, list_state->active_color);
+            BILL::Squeeze_Print_(item->x, item->y, item->group_name, list_state->item_width);
+
+            if (list_state->draw_app_cb != nullptr) {
+                fonts::Set_Font_Style_(list_state->item_font, list_state->active_color);
+
+                using DrawAppCb = void(__cdecl*)(int16_t, int16_t, uint8_t);
+                auto draw_cb = reinterpret_cast<DrawAppCb>(list_state->draw_app_cb);
+
+                uint8_t app_idx = item->current_app_index;
+                draw_cb(item->app_base_x,
+                        item->app_y_offsets[app_idx] + item->y,
+                        item->tech_app_ids[app_idx]);
+            }
+        }
+    }
+
 }

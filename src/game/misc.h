@@ -81,11 +81,7 @@ namespace MISC {
 
     void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text);
 
-    inline void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t, const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049f120});
-        fn(x, y, color, text);
-    }
+    void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text);
 
     int16_t __cdecl Substring_(char* haystack, char* needle);
 }

@@ -2056,6 +2056,16 @@ namespace NETMOX {
         _net.combat_star_id = MOX::_planet[planet_idx].star_index;
     }
 
+    void __cdecl Send_Dragon_Info_(int32_t colony_id) {
+        s_packet_dragon_info packet;
+        packet.colony_id = colony_id;
+
+        int8_t owner = MOX::_colony[colony_id].owner;
+        int16_t network_player_id = MOX::_player[owner].network_player_id;
+
+        Mox_Send_Message_(network_player_id, 0x23, &packet, (uint16_t)sizeof(packet));
+    }
+
     void __cdecl Decode_Drop_Out_Info_(int32_t player_idx, s_net_pack_drop_out_info* drop_out_info) {
         if (MOX::_player[player_idx].network_player_id == _net.host_election_winner_id) {
             _net.host_election_winner_id = -1;

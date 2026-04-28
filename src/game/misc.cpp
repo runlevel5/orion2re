@@ -681,6 +681,25 @@ namespace MISC {
     }
 
     /**
+     * @address 0049f120
+     */
+    void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text) {
+        s_colors orig_colors;
+        s_colors shadow_colors;
+
+        fonts::Get_Colors_(&orig_colors);
+
+        shadow_colors.colors[0] = orig_colors.colors[0];
+        memset(&shadow_colors.colors[1], shadow_color, 7);
+
+        Set_Font_Colors_(&shadow_colors);
+        fonts::Print_(x + 1, y + 1, text);
+
+        Set_Font_Colors_(&orig_colors);
+        fonts::Print_(x, y, text);
+    }
+
+    /**
      * @address 0049f0e0
      */
     void __cdecl _Print_Centered_Shadow_Down_(int16_t x, int16_t y, uint8_t color, const char* text) {

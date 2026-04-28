@@ -12,6 +12,8 @@ namespace invasion {
 
     int __cdecl Colony_N_Militia_(s_colony* colony);
 
+    void __cdecl Compute_Attacker_Officer_Bonus_(int16_t* ship_indexes, int16_t count, s_invasion_player_bonuses* bonuses);
+
     void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_bonuses* bonuses);
 
     void __cdecl Change_Colony_Ownership_(s_colony* colony, uint32_t new_owner_idx, s_battle_results_info* results);
@@ -40,21 +42,11 @@ namespace invasion {
 
     uint32_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony);
 
-    inline void __cdecl Get_Invasion_Info_(int16_t* ship_list, int n_ships, s_colony* colony, s_invasion_side_info* attacker, s_invasion_side_info* defender) {
-        using Fn = void(__cdecl*)(int16_t*, int, s_colony*, s_invasion_side_info*, s_invasion_side_info*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042b9d0});
-        fn(ship_list, n_ships, colony, attacker, defender);
-    }
+    void __cdecl Get_Invasion_Info_(int16_t* ship_list, int16_t n_ships, s_colony* colony, s_invasion_side_info* attacker_side, s_invasion_side_info* defender_side);
 
-    inline void __cdecl Invade_(int16_t* ship_list, int n_ships, int16_t colony_idx, int16_t* info_ptr) {
-        using Fn = void(__cdecl*)(int16_t*, int, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042ca30});
-        fn(ship_list, n_ships, colony_idx, info_ptr);
-    }
+    void __cdecl Invade_(int16_t* ship_list, int16_t n_ships, int16_t colony_idx, s_battle_results_info* results);
 
-    inline bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx) {
-        using Fn = bool(__cdecl*)(int8_t, int16_t*, int, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00500ac0});
-        return fn(attacker_id, ship_list, n_ships, colony_idx);
-    }
+    void __cdecl Resolve_Invasion_Troops_(s_invasion_side_info info);
+
+    bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx);
 }

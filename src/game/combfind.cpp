@@ -2016,7 +2016,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             break;
                         }
                         case 3: { // Invasion
-                            invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
+                            invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, &results->info);
                             int combat_seed = random::Get_Random_Seed_();
                             ERIC::Force_Fade_To_Colony_Palette_(1);
                             COLGCBT::Colony_Combat_Screen_(&results->info.attacker_invasion, &results->info.defender_invasion, results->info.ground_defense_strength, (int16_t)colony_idx);
@@ -2170,7 +2170,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
 
                 if (results->info.planet_destroyed_flag == 0 && results->bomb.colony_wiped_out == 0 && MOX::_star[star_idx].surrender_to[colony_owner] == 0 && 
                     invasion::Has_Defending_Troops_(attacker_id, ship_list, n_ships, (int16_t)colony_idx)) {
-                    invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, (int16_t*)&results->info);
+                    invasion::Invade_(ship_list, n_ships, (int16_t)colony_idx, &results->info);
                     if (MOX::_player[colony_owner].objectives == 'd' /* ECON_INDUSTRY */ && 
                         (MOX::_settings.strategic_combat_flag == 0 || (MOX::_game_type != 2 && MOX::_game_type != 3) || 
                         MOX::_player[colony_owner].network_player_id == NETMOX::_net.local_net_id)) {

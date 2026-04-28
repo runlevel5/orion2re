@@ -617,7 +617,7 @@ namespace COLGCBT {
                 }
 
                 if (shooter == nullptr) {
-                    FLCQUEUE::Add_Flic_To_End_Of_Queue_(target->x, target->y);
+                    FLCQUEUE::Add_Explosion_Anim_(target->x, target->y);
                 } else {
                     shooter->state = 3;
                     shooter->anim_frame = 0;

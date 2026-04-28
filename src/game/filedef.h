@@ -8,6 +8,11 @@ namespace FILEDEF {
     void __cdecl Save_Game_(short slot_index);
     uint32_t __cdecl Load_Game_(int16_t slot_index);
     inline const char* s_SAVE_d_GAM_00556944 = reinterpret_cast<const char*>(std::uintptr_t{0x00556944});
+    inline const char* const s_rb_0055117c = reinterpret_cast<const char*>(std::uintptr_t{0x0055117C});
+    inline const char* const s_GAM_005568f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005568F4});
+    inline const char* const s_SAVE_005568fc = reinterpret_cast<const char*>(std::uintptr_t{0x005568FC});
+    inline const char* const s_no_description_00556920 = reinterpret_cast<const char*>(std::uintptr_t{0x00556920});
+    inline const char* const s_Auto_Save_00556938 = reinterpret_cast<const char*>(std::uintptr_t{0x00556938});
     int8_t __cdecl Get_Game_Type_From_Saved_Game_(int16_t save_slot);
     void __cdecl Save_Moo_Custom_Player_Data_(s_player* player);
     void __cdecl Get_Saved_Game_Descriptions_(int32_t* save_times);

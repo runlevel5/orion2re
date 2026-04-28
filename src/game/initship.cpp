@@ -735,6 +735,33 @@ namespace INITSHIP {
         design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
+    void __cdecl Load_Outpost_Ship_Design_(int16_t player_idx, s_ship_design* design) {
+        struct_::Clear_Structure_(design, 99);
+
+        strcpy(design->name, s_Outpost_Ship_00558f48 + MOX::_settings.language * 16);
+
+        design->size = 0;
+        design->ship_type = 4;
+        design->shield_type = 0;
+        design->ftl_type = static_cast<int8_t>(Best_Warp_Drive_(player_idx));
+        design->computer_type = 0;
+
+        int16_t best_armor = Best_Armor_(player_idx);
+        if (best_armor > 1) {
+            best_armor--;
+        }
+        design->armor_type = static_cast<int8_t>(best_armor);
+
+        struct_::Set_Bit_Field_(design->special_device_flags, SPECIAL_EXTENDED_FUEL_TANKS);
+
+        design->picture_num = 46 /* '.' */;
+
+        design->speed = static_cast<int8_t>(TECHDATA::_drives[design->ftl_type].warp_speed);
+        design->combat_speed = static_cast<int8_t>(TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size]);
+
+        design->cost = static_cast<int16_t>(COLCALC::Ship_Type_Cost_For_Player_(4, player_idx));
+    }
+
     void __cdecl Load_Doom_Star_Ship_Design_(int16_t owner_idx, s_ship_design* design) {
         aidesign::Auto_Design_Ship_(owner_idx, design, 5);
         strcpy(design->name, TECHDATA::_hull_data[5].name);

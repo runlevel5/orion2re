@@ -1,8 +1,23 @@
 #pragma once
 
 namespace mouse {
+    inline int16_t& _mouse_enabled =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B178 });
+
+    inline int16_t& _mouse_state =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DE4 });
+
     inline int16_t& _current_mouse_list_count =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });
+
+    inline int16_t& _mouse_buffer_button =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578AC8 });
+
+    inline int16_t& _mouse_buffer_x =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578B44 });
+
+    inline int16_t& _mouse_buffer_y =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578B48 });
 
     inline s_mouse_list*& _current_mouse_list =
         *reinterpret_cast<s_mouse_list**>(std::uintptr_t{ 0x00578A98 });
@@ -50,45 +65,17 @@ namespace mouse {
 
     int16_t __cdecl Get_Pointer_Image_Number_();
 
-    inline void __cdecl Save_Mouse_State_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276D0});
-        fn();
-    }
+    void __cdecl Save_Mouse_State_();
 
-    inline void __cdecl Restore_Mouse_State_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276C0});
-        fn();
-    }
+    void __cdecl Restore_Mouse_State_();
 
-    inline int16_t __cdecl Mouse_Buffer_Button_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527670});
-        return fn();
-    }
+    int16_t __cdecl Mouse_Buffer_Button_();
 
-    inline int16_t __cdecl Mouse_Buffer_X_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527650});
-        return fn();
-    }
+    int16_t __cdecl Mouse_Buffer_X_();
 
-    inline int16_t __cdecl Mouse_Buffer_Y_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527660});
-        return fn();
-    }
+    int16_t __cdecl Mouse_Buffer_Y_();
 
-    inline void __cdecl Disable_Mouse_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276A0});
-        fn();
-    }
+    void __cdecl Disable_Mouse_();
 
-    inline void __cdecl Enable_Mouse_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005276B0});
-        fn();
-    }
+    void __cdecl Enable_Mouse_();
 }

@@ -302,8 +302,8 @@ namespace SYS {
     }
 
     void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
-        MOX::_moveable_box_pict = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
-        animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict[0]);
     }
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner) {
@@ -853,8 +853,8 @@ namespace SYS {
         current_style = fonts::_current_font_style;
         font_height = fonts::Get_Font_Height_();
 
-        MOX::_moveable_box_pict = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
-        image_width = animate::Get_Width_(MOX::_moveable_box_pict);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        image_width = animate::Get_Width_(MOX::_moveable_box_pict[0]);
 
         print_x = x_offset + box_x + (image_width / 2);
         print_y = ((20 - (font_height + 1)) / 2) + box_y + y_offset + 17;
@@ -1066,9 +1066,9 @@ namespace SYS {
             return;
         }
 
-        MOX::_moveable_box_pict = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
-        (void)animate::Get_Width_(MOX::_moveable_box_pict);
-        (void)animate::Get_Height_(MOX::_moveable_box_pict);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
+        (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
         ship_idx = MOX::_ship_node[ship_node_num].ship_idx;
         owner = HACCESS::Ship_Owner_(ship_idx);
@@ -1244,10 +1244,10 @@ namespace SYS {
         *max_width = 0;
         *total_height = 12;
 
-        MOX::_moveable_box_pict =
+        MOX::_moveable_box_pict[0] =
                 (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
-        (void)animate::Get_Width_(MOX::_moveable_box_pict);
-        (void)animate::Get_Height_(MOX::_moveable_box_pict);
+        (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
+        (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
         _memcpy(&font_colors, MISC::Font_Colors2_(2, 0x3c, 0x43), sizeof(font_colors));
 
