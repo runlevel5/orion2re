@@ -92,7 +92,7 @@ namespace TEXTBOX {
 
         int32_t remaining_space = allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
         if ((remaining_space - 0x200) < size) {
-            swap::Save_Block_To_Drive_(MOX::_screen_seg, size + 0x200);
+            swap::Save_Block_To_Drive_((uint8_t*)MOX::_screen_seg, size + 0x200);
             _textbox_seg = (uint8_t*)allocate::Allocate_First_Block_(MOX::_screen_seg, size + 0x180);
             _reload_saved_block = 1;
         } else {

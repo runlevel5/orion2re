@@ -83,9 +83,12 @@ namespace MOVEBOX {
             int16_t* star_field_ids,
             int16_t* out_grid_field_id);
 
-    inline void __cdecl Add_Whole_Window_Field_(int16_t val) {
-        using Fn = void(__cdecl*)(int16_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00512870})(val);
+    void __cdecl Add_Whole_Window_Field_(int16_t moveable_box_index);
+
+    inline void __cdecl Moveable_Box_Dimensions_(int16_t moveable_box_index, int16_t* x, int16_t* y, int16_t* width, int16_t* height) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t*, int16_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513B00});
+        fn(moveable_box_index, x, y, width, height);
     }
 
     int16_t __cdecl N_Moveable_Boxes_Selected_(int16_t excluded_box_idx);

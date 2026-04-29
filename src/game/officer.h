@@ -207,10 +207,18 @@ namespace OFFICER {
 
     void __cdecl Print_Scanned_Ship_Name_();
 
-    inline void __cdecl Print_Officer_Data_(int16_t p1, int16_t p2, int32_t p3, int32_t p4, int32_t p5, int32_t p6, int32_t p7, int32_t p8, int32_t p9, int32_t p10) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t);
-        reinterpret_cast<Fn>(std::uintptr_t{0x004407E0})(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-    }
+    void __cdecl Print_Officer_Data_(
+        int16_t officer_list_index,
+        int16_t officer_id,
+        int16_t text_x,
+        int16_t text_y,
+        int16_t portrait_x,
+        int16_t portrait_y,
+        int16_t portrait_width,
+        int16_t portrait_status_offset_y,
+        int16_t right_column_offset_x,
+        int16_t unk_10
+    );
 
     void __cdecl Wrapper_For_Offscrn_Data_(int16_t param_1, int16_t param_2);
 
@@ -291,4 +299,12 @@ namespace OFFICER {
     void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts);
 
     void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx);
+
+    void __cdecl Draw_Officer_Skill_Icon_(int16_t x, int16_t y, int16_t skill_idx);
+
+    inline int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t officer_id) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004411A0});
+        return fn(officer_id);
+    }
 }

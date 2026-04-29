@@ -656,7 +656,7 @@ namespace SYS {
         }
     }
 
-    void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset) {
+    void __cdecl Draw_System_Display_Popup_(int16_t star_idx, int8_t draw_border, const char* title_text, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset) {
         char local_64[100];
 
         MOX::_ship_frame = (short)((MOX::_ship_frame + 1) % 32000);
@@ -1522,65 +1522,64 @@ namespace SYS {
     }
 
     void __cdecl Print_Empty_System_Data_() {
-        int16_t layout_value;
-        int16_t left_padding;
-        int16_t top_padding;
-        int16_t centering_width;
-        int16_t paragraph_max_width;
+        int16_t text_x_base;
+        int16_t paragraph_top;
+        int16_t box_width;
+        int16_t paragraph_width;
         int16_t paragraph_height;
-        int16_t base_x;
-        int16_t base_y;
-        int16_t text_left;
-        int16_t text_y;
+        int16_t left_padding;
+        int16_t origin_x;
+        int16_t origin_y;
         int16_t saved_window_status;
 
         if (MOX::_current_screen == 0) {
-            left_padding = 0x000D;
-            top_padding = 0x002F;
-            centering_width = _moveable_box_0_width - 0x001A;
-            paragraph_max_width = _moveable_box_0_width - 0x0033;
-            paragraph_height = _moveable_box_0_height - 0x005B;
-            base_x = _moveable_box_0_content_offset_x + _moveable_box_0_x;
-            base_y = _moveable_box_0_content_offset_y + _moveable_box_0_y;
-        } else if (MOX::_current_screen == 0x001D) {
-            centering_width = 0x013E;
-            top_padding = 0;
-            paragraph_max_width = 0x0125;
+            left_padding = 0x0D;
+            paragraph_top = 0x2F;
+            box_width = static_cast<int16_t>(MOX::_moveable_box[0].width - 0x1A);
+            paragraph_width = static_cast<int16_t>(box_width - 0x19);
+            paragraph_height = static_cast<int16_t>(MOX::_moveable_box[0].height - 0x5B);
+            origin_x = static_cast<int16_t>(MOX::_moveable_box[0].content_offset_x + MOX::_moveable_box[0].x);
+            origin_y = static_cast<int16_t>(MOX::_moveable_box[0].content_offset_y + MOX::_moveable_box[0].y);
+        } else if (MOX::_current_screen == 0x1D) {
+            box_width = 0x013E;
+            paragraph_top = 0;
+            paragraph_width = 0x0125;
             paragraph_height = 0x00B4;
-            base_x = 0x0132;
-            base_y = 0x0011;
+            origin_x = 0x0132;
+            origin_y = 0x0011;
             left_padding = 0;
         } else {
-            // BUG: unsupported screens use an uninitialized layout value.
-            paragraph_max_width = layout_value;
-            centering_width = layout_value;
-            paragraph_height = layout_value;
-            left_padding = layout_value;
-            top_padding = layout_value;
-            base_x = layout_value;
-            base_y = layout_value;
+            paragraph_width = text_x_base;
+            box_width = text_x_base;
+            paragraph_height = text_x_base;
+            left_padding = text_x_base;
+            paragraph_top = text_x_base;
+            origin_x = text_x_base;
+            origin_y = text_x_base;
         }
 
-        text_left = left_padding + base_x;
-        text_y = top_padding + base_y;
+        text_x_base = static_cast<int16_t>(left_padding + origin_x);
+        const int16_t text_y = static_cast<int16_t>(paragraph_top + origin_y);
 
         MISC::Save_Window_Status_(&saved_window_status);
-        graphics::Set_Window_(0x16, 0x16, 0x20F, 0x1A5);
+        graphics::Set_Window_(0x16, 0x16, 0x020F, 0x01A5);
         video::Clip_On_();
         MISC::Change_Font_Style_(3);
 
-        const int16_t paragraph_width =
-                BILL::_Get_Paragraph_Max_Width_(paragraph_max_width, SYS::_star_description_string, 3);
+        const int16_t max_width =
+            BILL::_Get_Paragraph_Max_Width_(paragraph_width, SYS::_star_description_string, 3);
 
         ERIC::Print_Paragraph_Centered_Vertically_(
-                text_left + ((static_cast<int32_t>(centering_width) - static_cast<int32_t>(paragraph_width)) / 2),
-                text_y,
-                paragraph_max_width,
-                paragraph_height,
-                SYS::_star_description_string,
-                3);
+            static_cast<int16_t>(
+                ((static_cast<int32_t>(box_width) - static_cast<int32_t>(max_width)) / 2) +
+                static_cast<int32_t>(text_x_base)),
+            text_y,
+            paragraph_width,
+            paragraph_height,
+            SYS::_star_description_string,
+            3);
 
-        MISC::Restore_Window_Status_((uint32_t)saved_window_status);
+        MISC::Restore_Window_Status_(static_cast<uint32_t>(saved_window_status));
     }
 
     void __cdecl Print_Gate_Info_(
@@ -1676,5 +1675,55 @@ namespace SYS {
                 line_width,
                 info_text,
                 0);
+    }
+
+    void __cdecl Wrapper_For_Normal_System_Popup_() {
+        const int16_t star_idx = MOX::_moveable_box[0].id;
+        const int16_t base_x = MOX::_moveable_box[0].x;
+        const int16_t base_y = MOX::_moveable_box[0].y;
+        const int16_t content_offset_x = MOX::_moveable_box[0].content_offset_x;
+        const int16_t content_offset_y = MOX::_moveable_box[0].content_offset_y;
+        s_star_data* const star = &MOX::_star[star_idx];
+        char popup_text[80];
+
+        const char* const format = HAROLD::H_Message_(0x16A);
+        _sprintf(popup_text, format, star);
+
+        SYS::Init_System_Display_(star_idx);
+        SYS::Draw_System_Display_Popup_(
+            star_idx,
+            1,
+            popup_text,
+            base_x,
+            base_y,
+            content_offset_x,
+            content_offset_y,
+            0x0D,
+            0x2F
+        );
+    }
+
+    void __cdecl Wrapper_For_Informational_System_Fields_(
+        int16_t param_1,
+        int16_t param_2,
+        int16_t param_3,
+        int16_t param_4,
+        int16_t param_5,
+        int16_t* param_6) {
+        int16_t local_4;
+        int16_t local_2;
+
+        SYS::Init_System_Display_(param_1);
+        SYS::Add_System_Display_Popup_Fields_(
+            param_1,
+            param_2,
+            param_3,
+            0,
+            0,
+            param_4,
+            param_5,
+            &local_4,
+            param_6,
+            &local_2);
     }
 }

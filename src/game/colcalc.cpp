@@ -1386,7 +1386,7 @@ namespace COLCALC {
         int owned_count = 0;
 
         s_tech_field_data* field = &TECHDATA::_technology_fields[field_idx];
-        uint16_t* techs = &field->tech1;
+        uint16_t* techs = field->tech;
 
         for (int i = 0; i < 4; ++i) {
             int tech_id = (int)(int16_t)techs[i];
@@ -1449,7 +1449,7 @@ namespace COLCALC {
             }
 
             techs_known = 0;
-            uint16_t* techs_in_field = &TECHDATA::_technology_fields[field_idx].tech1;
+            uint16_t* techs_in_field = TECHDATA::_technology_fields[field_idx].tech;
             for (int i = 0; i < 4; ++i) {
                 uint16_t tech_id = techs_in_field[i];
                 if (tech_id > 0 && player_tech_applications[tech_id] == 1) {
@@ -2002,7 +2002,7 @@ namespace COLCALC {
 
             if (get_all) {
                 // Creative players or forced breakthrough: get all available technologies in the field
-                uint16_t* techs = &TECHDATA::_technology_fields[field_id].tech1;
+                uint16_t* techs = TECHDATA::_technology_fields[field_id].tech;
                 for (int i = 0; i < 4; ++i) {
                     uint16_t tech_id = techs[i];
                     // tech_applications[id] == 1 usually means it was just researched but not yet applied
@@ -2115,12 +2115,12 @@ namespace COLCALC {
 
         // Process standard technology fields (0 to 74)
         for (int i = 0; i < 75; ++i) {
-            const s_tech_field_data& field = TECHDATA::_technology_fields[i];
+            s_tech_field_data& field = TECHDATA::_technology_fields[i];
 
             int divisor = 1;
             int numerator = (player->tech_fields[i] == 3) ? 1 : 0;
 
-            uint16_t techs[4] = { field.tech1, field.tech2, field.tech3, field.tech4 };
+            uint16_t* techs = field.tech;
 
             for (int j = 0; j < 4; ++j) {
                 uint16_t tech_id = techs[j];

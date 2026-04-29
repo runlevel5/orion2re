@@ -4834,10 +4834,7 @@ struct s_tech_field_data {
     short tech_field_id;
     short prev_field_id;
     short next_field_id;
-    ushort tech1;
-    ushort tech2;
-    ushort tech3;
-    ushort tech4;
+    ushort tech[4];
     uint cost;
     byte ai_group;
 };

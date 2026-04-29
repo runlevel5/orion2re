@@ -25,11 +25,7 @@ namespace ESTRINGS {
 
     inline const char* s_you_blew_the_array_eric = reinterpret_cast<const char*>(std::uintptr_t{0x005582f0});
 
-    inline void __cdecl Load_H_And_Pro_File_Strings_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004a02f0});
-        fn();
-    }
+    void __cdecl Load_H_And_Pro_File_Strings_(void);
 
     void __cdecl Load_E_Strings_();
 

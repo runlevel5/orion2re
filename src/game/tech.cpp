@@ -455,7 +455,7 @@ namespace TECH {
 
             if (tech_field_id < 75 /* 0x4B */) {
                 int visible_app_count = 0;
-                uint16_t* techs = &_technology_fields[tech_field_id].tech1;
+                uint16_t* techs = _technology_fields[tech_field_id].tech;
                 for (int app_index = 0; app_index < 4; ++app_index) {
                     uint16_t app_id = techs[app_index];
                     if (MOX::_cur_plyr_ptr->tech_applications[app_id] == 1) {
@@ -948,13 +948,7 @@ namespace TECH {
             if (status != 3) {
                 if (status == 0) {
                     for (int i = 0; i < 4; ++i) {
-                        uint16_t tech_id = 0;
-                        switch (i) {
-                            case 0: tech_id = _technology_fields[field_id].tech1; break;
-                            case 1: tech_id = _technology_fields[field_id].tech2; break;
-                            case 2: tech_id = _technology_fields[field_id].tech3; break;
-                            case 3: tech_id = _technology_fields[field_id].tech4; break;
-                        }
+                        uint16_t tech_id = _technology_fields[field_id].tech[i];
 
                         if (MOX::_cur_plyr_ptr->tech_applications[tech_id] == 3) {
                             status = 1;
@@ -966,13 +960,7 @@ namespace TECH {
                 if (status >= 1) {
                     uint8_t app_count = 0;
                     for (int i = 0; i < 4; ++i) {
-                        uint16_t tech_id = 0;
-                        switch (i) {
-                            case 0: tech_id = _technology_fields[field_id].tech1; break;
-                            case 1: tech_id = _technology_fields[field_id].tech2; break;
-                            case 2: tech_id = _technology_fields[field_id].tech3; break;
-                            case 3: tech_id = _technology_fields[field_id].tech4; break;
-                        }
+                        uint16_t tech_id = _technology_fields[field_id].tech[i];
 
                         uint8_t app_status = MOX::_cur_plyr_ptr->tech_applications[tech_id];
 

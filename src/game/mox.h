@@ -281,10 +281,10 @@ namespace MOX {
     inline int16_t& _design_build_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B60C});
     inline s_player*& _player = *reinterpret_cast<s_player**>(std::uintptr_t{ 0x0059B3D0 });
     inline s_player*& _cur_plyr_ptr = *reinterpret_cast<s_player**>(std::uintptr_t{0x005974E0});
-    inline char** _personality_labels = reinterpret_cast<char**>(std::uintptr_t{0x00596CC0});
-    inline char** _objective_labels = reinterpret_cast<char**>(std::uintptr_t{0x0059B3E0});
-    inline char** _treaty_labels = reinterpret_cast<char**>(std::uintptr_t{0x005A1B00});
-    inline char** _help_category_labels = reinterpret_cast<char**>(std::uintptr_t{0x0059BFE0});
+    inline char* (&_personality_labels)[7] = *reinterpret_cast<char* (*)[7]>(std::uintptr_t{0x00596CC0});
+    inline char* (&_objective_labels)[6] = *reinterpret_cast<char* (*)[6]>(std::uintptr_t{0x0059B3E0});
+    inline char* (&_treaty_labels)[7] = *reinterpret_cast<char* (*)[7]>(std::uintptr_t{0x005A1B00});
+    inline char* (&_help_category_labels)[17] = *reinterpret_cast<char* (*)[17]>(std::uintptr_t{0x0059BFE0});
     inline int16_t& _old_system_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5F8});
     inline int8_t& _selected_star_color_mod =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596C50});
@@ -445,10 +445,15 @@ namespace MOX {
 
     inline char** _roman_literals = reinterpret_cast<char**>(std::uintptr_t{0x00559424});
 
-    inline char** _planet_special_string = reinterpret_cast<char**>(std::uintptr_t{0x00597780});
-    inline char** _planet_climate_string = reinterpret_cast<char**>(std::uintptr_t{0x0059BA80});
-    inline char** _mineral_class_string = reinterpret_cast<char**>(std::uintptr_t{0x005A2C30});
-    inline char** _planet_size_string = reinterpret_cast<char**>(std::uintptr_t{0x005A47C0});
+    inline char* (&_planet_special_string)[12] = *reinterpret_cast<char* (*)[12]>(std::uintptr_t{0x00597780});
+    inline char* (&_planet_climate_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x0059BA80});
+    inline char* (&_mineral_class_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A2C30});
+    inline char* (&_planet_size_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A47C0});
+    inline char* (&_planet_type_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x00596C70});
+    inline char* (&_planet_group_string)[4] = *reinterpret_cast<char* (*)[4]>(std::uintptr_t{0x00596D00});
+    inline char* (&_planet_atmosphere_string)[3] = *reinterpret_cast<char* (*)[3]>(std::uintptr_t{0x0059B600});
+    inline char* (&_spectral_class_string)[7] = *reinterpret_cast<char* (*)[7]>(std::uintptr_t{0x0059BED0});
+    inline char* (&_admin_skill_names)[9] = *reinterpret_cast<char* (*)[9]>(std::uintptr_t{0x0059BF70});
 
     inline char* (&_planet_gravity_string)[3] =
         *reinterpret_cast<char*(*)[3]>(std::uintptr_t{0x005A49E0});
@@ -564,7 +569,7 @@ namespace MOX {
     inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
 
     inline int16_t& _NUM_PLAYERS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A2C1C });
-    inline char** _government_labels = reinterpret_cast<char**>(std::uintptr_t{0x00596FB0});
+    inline char* (&_government_labels)[8] = *reinterpret_cast<char* (*)[8]>(std::uintptr_t{0x00596FB0});
     inline char** _special_ability_names = reinterpret_cast<char**>(std::uintptr_t{0x0059B350});
     inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
     inline int16_t& _global_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4AA});

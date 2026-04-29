@@ -5,6 +5,8 @@
 
 inline char* s___0055b0ac = reinterpret_cast<char*>(std::uintptr_t{0x0055B0AC});
 inline const char* s_Avail_Mem_0055b390 = reinterpret_cast<const char*>(std::uintptr_t{0x0055B390});
+inline const char* s_tech_has_too_many_apps_0055a97c =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055A97C}); /* " tech has too many apps" */
 
 struct s_animation_header;
 struct s_lbx_stream_header;
@@ -450,19 +452,6 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
 }
 
 inline char& DAT_00556dac = *reinterpret_cast<char*>(std::uintptr_t{ 0x00556DAC });
-inline int16_t& _moveable_box_0_height =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597864});
-inline int16_t& _moveable_box_0_width =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597866});
-inline int16_t& _moveable_box_0_x =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597868});
-inline int16_t& _moveable_box_0_y =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786A});
-inline int16_t& _moveable_box_0_content_offset_x =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597878});
-inline int16_t& _moveable_box_0_content_offset_y =
-    *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059787A});
-
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });
@@ -635,6 +624,10 @@ inline const char* const s_RACENAME_LBX = reinterpret_cast<const char*>(0x005576
 inline const char* const s_RACESTUF_LBX = reinterpret_cast<const char*>(0x00557624);
 inline const char* s_WWWWWWW_0055137c = reinterpret_cast<const char*>(std::uintptr_t{0x0055137c}); // "WWWWWWW"
 inline const char* s__s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
+inline const char* s___s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130});
+inline const char* s___005569ec = reinterpret_cast<const char*>(std::uintptr_t{0x005569EC});
+struct s_colors;
+inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
 
 inline void __cdecl FUN_00443C60() {
@@ -746,6 +739,14 @@ inline const char* s_SAVE_005568fc = reinterpret_cast<const char*>(0x005568FC); 
 inline const char* s__GAM_005568f4 = reinterpret_cast<const char*>(0x005568F4); // ".GAM"
 inline const char* s_rb_0055117c = reinterpret_cast<const char*>(0x0055117C); // "rb"
 inline const char* s_wb_00551178 = reinterpret_cast<const char*>(std::uintptr_t{ 0x00551178 }); // "wb"
+inline const char* s_Error_in_swap_file_0055beb8 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BEB8}); // "Error in swap file"
+inline const char* s_TEMP_TMP_0055becc =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BECC}); // "TEMP.TMP"
+inline const char* s_Insufficient_disk_space_for_swap_0055bed8 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BED8}); // "Insufficient disk space for swap"
+inline const char* s_Drive_swap_reqd_too_large_for_bl_0055befc =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055BEFC}); // "Drive swap reqd too large for block"
 inline const char* s_mox_set_0055760c = reinterpret_cast<const char*>(std::uintptr_t{ 0x0055760C }); // "mox.set"
 inline const char* s_Unable_to_open_mox_set_005575f4 = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575F4 }); // "Unable to open mox.set"
 inline const char* s_MOX_SET_00556918 = reinterpret_cast<const char*>(std::uintptr_t{0x00556918}); // "MOX.SET"

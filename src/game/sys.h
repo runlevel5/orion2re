@@ -150,13 +150,9 @@ namespace SYS {
     inline char (&_star_description_string)[256] =
         *reinterpret_cast<char (*)[256]>(std::uintptr_t{0x00566440});
 
-    void __cdecl Draw_System_Display_Popup_(short star_idx, int8_t draw_border, char* title_text, short base_x, short base_y, short content_w, short content_h, short x_offset, short y_offset);
+    void __cdecl Draw_System_Display_Popup_(int16_t star_idx, int8_t draw_border, const char* title_text, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset);
 
-    inline void __cdecl Wrapper_For_Normal_System_Popup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004975B0});
-        fn();
-    }
+    void __cdecl Wrapper_For_Normal_System_Popup_();
 
     inline void __cdecl Add_System_Display_Popup_Fields_(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10) {
         using Fn = void(__cdecl*)(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10);
@@ -164,9 +160,5 @@ namespace SYS {
         fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10);
     }
 
-    inline void __cdecl Wrapper_For_Informational_System_Fields_(uint32_t star_idx, int16_t x, int16_t y, int16_t arg4, int16_t arg5, int16_t* arg6) {
-        using Fn = void(__cdecl*)(uint32_t, int16_t, int16_t, int16_t, int16_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004974f0});
-        fn(star_idx, x, y, arg4, arg5, arg6);
-    }
+    void __cdecl Wrapper_For_Informational_System_Fields_(int16_t star_idx, int16_t x, int16_t y, int16_t arg4, int16_t arg5, int16_t* arg6);
 }

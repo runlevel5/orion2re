@@ -725,7 +725,7 @@ namespace COLCALC {
             bool advance_field = true;
             if (plr->traits[TRAIT_CREATIVE] != 0 || Field_Is_Gray_Box_(static_cast<uint8_t>(plr->current_research_field))) {
                 auto& field_data = TECHDATA::_technology_fields[static_cast<uint8_t>(plr->current_research_field)];
-                uint16_t field_techs[4] = { field_data.tech1, field_data.tech2, field_data.tech3, field_data.tech4 };
+                uint16_t* field_techs = field_data.tech;
 
                 for (int i = 0; i < 4; ++i) {
                     if (field_techs[i] != static_cast<uint16_t>(tech_app_id) && plr->tech_applications[field_techs[i]] == 1) {

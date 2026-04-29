@@ -22,6 +22,13 @@ namespace dos {
         return fn(handle, data);
     }
 
+    inline int32_t __cdecl Disk_Free_() {
+        using Fn = int32_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D410});
+        fn();
+        return fn();
+    }
+
     bool __cdecl DIR_(const char* pattern, char* output_name);
 
     inline void __cdecl Delete_File_(char* filename) {

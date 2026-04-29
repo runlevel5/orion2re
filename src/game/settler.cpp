@@ -171,4 +171,47 @@ namespace settler {
             curr_player++;
         } while (curr_player < MOX::_player + MOX::_NUM_PLAYERS);
     }
+
+    void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
+        if (dest_colony != source_colony) {
+            s_player* owner_player = &MOX::_player[static_cast<int32_t>(source_colony->owner)];
+            const int32_t source_planet_index = static_cast<int32_t>(source_colony->planet);
+            const int32_t dest_planet_index = static_cast<int32_t>(dest_colony->planet);
+            const int16_t source_star_index =
+                    static_cast<int16_t>(static_cast<int8_t>(MOX::_planet[source_planet_index].star_index));
+            const int16_t dest_star_index =
+                    static_cast<int16_t>(static_cast<int8_t>(MOX::_planet[dest_planet_index].star_index));
+            uint32_t* pop_slot = &source_colony->pop[static_cast<int32_t>(pop_index)];
+            const uint32_t pop_value = *pop_slot;
+            uint32_t encoded_settler; // BUG: original code uses this dword without initialization
+
+            encoded_settler ^= ((pop_value << 16) ^ encoded_settler) & 0x000F0000;
+            encoded_settler ^= ((pop_value << 17) ^ encoded_settler) & 0x03000000;
+
+            if (dest_star_index == source_star_index) {
+                Add_Settler_To_Colony_(encoded_settler, dest_colony);
+            } else {
+                encoded_settler ^=
+                        (((static_cast<uint32_t>(Settler_ETA_(owner_player, source_star_index, dest_star_index)) << 20) ^
+                          encoded_settler) &
+                         0x00F00000);
+                encoded_settler ^=
+                        ((static_cast<uint32_t>(static_cast<int32_t>(source_colony - MOX::_colony)) ^ encoded_settler) &
+                         0x000000FF);
+                encoded_settler ^=
+                        (((static_cast<uint32_t>(static_cast<int32_t>(dest_colony->planet)) << 8) ^ encoded_settler) &
+                         0x0000FF00);
+
+                const int32_t freighted_index = static_cast<int32_t>(owner_player->settlers_freighted);
+                memcpy(&owner_player->settlers[freighted_index], &encoded_settler, sizeof(encoded_settler));
+                owner_player->settlers_freighted =
+                        static_cast<int16_t>(owner_player->settlers_freighted + 1);
+            }
+
+            const uint8_t last_pop_index =
+                    static_cast<uint8_t>(static_cast<uint8_t>(source_colony->n_pops) - 1);
+            source_colony->n_pops = static_cast<int8_t>(last_pop_index);
+            *pop_slot = source_colony->pop[last_pop_index];
+        }
+    }
 }

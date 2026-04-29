@@ -107,7 +107,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   player->tech_applications[0] = 0;
 
   for (int field_idx = 1; field_idx < 0x4A; ++field_idx) {
-    const uint16_t *field_tech_ids = &TECHDATA::_technology_fields[field_idx].tech1;
+    const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_idx].tech;
     int missing_count = 0;
     bool has_app = false;
 
@@ -155,7 +155,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   for (int tier = 0; tier < starting_tech_count; ++tier) {
     if (tier < 6) {
       int16_t field_id = TECHDATA::_starting_tech_field_ids[tier];
-      const uint16_t *field_tech_ids = &TECHDATA::_technology_fields[field_id].tech1;
+      const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
 
       player->tech_fields[field_id] = 3;
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
@@ -173,7 +173,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     } else {
       int16_t selected_app = static_cast<int16_t>(newtech::Choose_Tech_Application_(player_idx));
       int16_t field_id = TECHDATA::_technology_applications[selected_app].tech_field_id;
-      const uint16_t *field_tech_ids = &TECHDATA::_technology_fields[field_id].tech1;
+      const uint16_t *field_tech_ids = TECHDATA::_technology_fields[field_id].tech;
 
       player->tech_fields[field_id] = 3;
       player->tech_fields[TECHDATA::_technology_fields[field_id].next_field_id] = 2;
@@ -205,6 +205,93 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
 
   player->best_ftl_drive = static_cast<char>(INITSHIP::Best_Warp_Drive_(player_idx));
   player->ship_speed = static_cast<char>(INITSHIP::Calc_Player_FTL_Speed_(player_idx));
+}
+
+void __cdecl Init_Tech_() {
+    char message[40];
+
+    RUSS::Mox_Update_();
+    RUSS::Mox_Update_();
+
+    for (int16_t building_index = 1; building_index < 49; ++building_index) {
+        TECHDATA::_technology_applications[TECHDATA::_buildings[building_index].tech_app].type = 1;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t special_index = 1; special_index < 40; ++special_index) {
+        TECHDATA::_technology_applications[TECHDATA::_specials[special_index].tech_app_id].type = 9;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t armor_index = 1; armor_index < 7; ++armor_index) {
+        TECHDATA::_technology_applications[TECHDATA::_armor[armor_index].tech_app_id].type = 7;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t shield_index = 1; shield_index < 6; ++shield_index) {
+        TECHDATA::_technology_applications[TECHDATA::_shields[shield_index].tech_app_id].type = 2;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t weapon_index = 1; weapon_index < 46; ++weapon_index) {
+        TECHDATA::_technology_applications[TECHDATA::_weapons[weapon_index].tech_app_id].type = 3;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t computer_index = 1; computer_index < 6; ++computer_index) {
+        TECHDATA::_technology_applications[TECHDATA::_computers[computer_index].tech_app_id].type = 8;
+    }
+
+    for (int16_t drive_index = 1; drive_index < 7; ++drive_index) {
+        TECHDATA::_technology_applications[TECHDATA::_drives[drive_index].tech_app_id].type = 5;
+    }
+
+    for (int16_t fuel_index = 1; fuel_index < 6; ++fuel_index) {
+        TECHDATA::_technology_applications[TECHDATA::_fuel[fuel_index].tech_app_id].type = 4;
+    }
+
+    RUSS::Mox_Update_();
+
+    for (int16_t tech_app_index = 0; tech_app_index < 212; ++tech_app_index) {
+        int16_t tech_field_id = TECHDATA::_technology_applications[tech_app_index].tech_field_id;
+
+        if (tech_field_id != 0 && tech_field_id != -1 && tech_field_id != 0x4A) {
+            s_tech_field_data& tech_field = TECHDATA::_technology_fields[tech_field_id];
+            uint16_t* tech_slots[4] = {
+                &tech_field.tech[0],
+                &tech_field.tech[1],
+                &tech_field.tech[2],
+                &tech_field.tech[3],
+            };
+            int16_t free_slot = -1;
+
+            for (int16_t slot_index = 0; slot_index < 4; ++slot_index) {
+                if (*tech_slots[slot_index] == 0) {
+                    free_slot = slot_index;
+                    break;
+                }
+            }
+
+            if (free_slot == -1) {
+                __itoa(tech_app_index, message, 10);
+                strcat(message, s_tech_has_too_many_apps_0055a97c);
+                exitm::Exit_With_Message(message);
+            } else {
+                *tech_slots[free_slot] = static_cast<uint16_t>(tech_app_index);
+            }
+        }
+
+        RUSS::Mox_Update_();
+    }
+
+    RUSS::Mox_Update_();
+    TECHINIT::Load_Tech_Names_();
+    RUSS::Mox_Update_();
 }
 
 }

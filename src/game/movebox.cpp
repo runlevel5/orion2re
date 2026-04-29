@@ -826,4 +826,15 @@ namespace MOVEBOX {
         MOX::_draw_main_screen_to_back = 1;
         EVANHELP::Set_Main_Screen_Help_List_();
     }
+
+    void __cdecl Add_Whole_Window_Field_(int16_t moveable_box_index) {
+        int16_t height;
+        int16_t width;
+        int16_t y;
+        int16_t x;
+
+        Moveable_Box_Dimensions_(moveable_box_index, &x, &y, &width, &height);
+        _moveable_box[moveable_box_index].window_field_id =
+            fields::Add_Hidden_Field_(x, y, width, height, s__00551100, 0);
+    }
 }

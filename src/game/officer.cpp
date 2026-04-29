@@ -3390,4 +3390,267 @@ void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts) {
     }
 }
 
+void __cdecl Draw_Officer_Skill_Icon_(int16_t x, int16_t y, int16_t skill_idx) {
+    animate::Draw_(x, static_cast<int16_t>(y - 4), MOX::_officer_skill_icon_seg[skill_idx]);
+}
+
+void __cdecl Print_Officer_Data_(
+    int16_t officer_list_index,
+    int16_t officer_id,
+    int16_t text_x,
+    int16_t text_y,
+    int16_t portrait_x,
+    int16_t portrait_y,
+    int16_t portrait_width,
+    int16_t portrait_status_offset_y,
+    int16_t right_column_offset_x,
+    int16_t unk_10
+) {
+    s_leader_data& leader = MOX::_leaders[officer_id];
+    const int16_t leader_location = leader.location;
+    const int16_t officer_status = static_cast<int16_t>(leader.status);
+    const uint16_t officer_type = static_cast<uint8_t>(leader.type);
+    const int16_t officer_eta = static_cast<int16_t>(leader.eta);
+
+    int16_t status4_cost = 0;
+    int16_t other_cost = 0;
+    s_colors text_colors{};
+    char text_buffer[80];
+    char status_text[80];
+    char money_unit[24];
+    char dot_text[3];
+    int16_t current_y = text_y;
+
+    OFFICER::Get_Officer_Costs_(officer_id, &status4_cost, &other_cost);
+    fonts::Set_Outline_Color_(0, 0);
+
+    if (MOX::_current_screen == 0x1d) {
+        if (officer_list_index > -1 &&
+            MOX::_officer_id_list[officer_list_index] ==
+                static_cast<int16_t>(MOX::_officer_scanned)) {
+            text_colors = ::s__GEGGGGG_s___s__005569b8;
+        } else if (officer_list_index > -1 &&
+                   MOX::_officer_id_list[officer_list_index] ==
+                       static_cast<int16_t>(MOX::_officer_selected)) {
+            text_colors = ::s__GEGGGGG_s___s__005569b8;
+        } else {
+            text_colors = OFFICER::_normal_text_colors;
+        }
+    } else {
+        text_colors = OFFICER::_normal_text_colors;
+    }
+
+    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+        _sprintf(text_buffer, s__s_00551130, OFFICER::Leader_Name_(officer_id, false));
+        fonts::Set_Font_Style_Outline_(3, &text_colors);
+        fonts::Set_Font_Spacing_(1);
+
+        const int16_t name_width = fonts::Get_String_Width_(text_buffer);
+        const int16_t name_x =
+            static_cast<int16_t>((0xa0 - name_width) / 2 + 0x16 + text_x);
+
+        fonts::Print_(name_x, current_y, text_buffer);
+    }
+
+    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+        text_colors.colors[0] = ';';
+        fonts::Set_Font_Style_(0, &text_colors);
+
+        if (officer_status == 4) {
+            const char* label = HAROLD::H_Message_(0x108);
+            const int16_t label_width = fonts::Get_String_Width_(label);
+
+            HAROLD::Get_Monetary_Unit_String_(money_unit);
+            _sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(status4_cost), money_unit);
+
+            fonts::Print_Right_(
+                static_cast<int16_t>(text_x + right_column_offset_x - 2),
+                current_y,
+                text_buffer);
+
+            fonts::Print_(
+                static_cast<int16_t>(text_x + right_column_offset_x - label_width - 2),
+                static_cast<int16_t>(current_y + fonts::Get_Font_Height_()),
+                label);
+        } else {
+            const char* label = HAROLD::H_Message_(0x109);
+            const int16_t label_width = fonts::Get_String_Width_(label);
+
+            if (other_cost == 0) {
+                strcpy(text_buffer, HAROLD::H_Message_(0x10a));
+            } else {
+                HAROLD::Get_Monetary_Unit_String_(money_unit);
+                _sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(other_cost), money_unit);
+            }
+
+            const int16_t label_x =
+                static_cast<int16_t>(text_x + right_column_offset_x - label_width - 2);
+
+            fonts::Print_(label_x, current_y, text_buffer);
+            fonts::Print_(label_x, static_cast<int16_t>(current_y + fonts::Get_Font_Height_()), label);
+        }
+
+        text_colors.colors[0] = '=';
+    }
+
+    status_text[0] = '\0';
+
+    if (officer_status == 0) {
+        fonts::Set_Font_Style_(2, &text_colors);
+        strcpy(status_text, HAROLD::H_Message_(0x10b));
+    } else if (officer_status == 2) {
+        fonts::Set_Font_Style_(2, &text_colors);
+        strcpy(status_text, HAROLD::H_Message_(0x10c));
+    } else if (officer_status == 1) {
+        fonts::Set_Font_Style_(2, &text_colors);
+
+        if (officer_type == 0 && leader_location > -1) {
+            strcpy(status_text, MOX::_ship[leader_location].d.name);
+        } else if (officer_type == 1 && leader_location > -1) {
+            strcpy(status_text, MOX::_star[leader_location].name);
+        }
+    } else if (officer_status == 4) {
+        int16_t unused_cost_a = 0;
+        int16_t unused_cost_b = 0;
+
+        OFFICER::Get_Officer_Costs_(officer_id, &unused_cost_a, &unused_cost_b);
+
+        if (MOX::_current_screen == 0x1d) {
+            _sprintf(
+                status_text,
+                HAROLD::H_Message_(0x10d),
+                0x1e - static_cast<int32_t>(leader.eta));
+        } else {
+            strcpy(status_text, HAROLD::H_Message_(0x10e));
+        }
+
+        fonts::Set_Font_Style_(2, &OFFICER::_red_colors);
+    }
+
+    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+        int16_t centered_status_y =
+            static_cast<int16_t>(portrait_y + portrait_status_offset_y + 1);
+        s_colors saved_colors{};
+
+        fonts::Get_Colors_(&saved_colors);
+        const int16_t fitted_spacing = MISC::Get_Font_Spacing_();
+        MISC::Set_Fitted_Font_Style_(
+            status_text,
+            &saved_colors,
+            fonts::_current_font_style,
+            fitted_spacing,
+            4,
+            0x4A,
+            1);
+
+        const int32_t vertical_adjust = ((-12 - fonts::Get_Font_Height_()) / 2) + 12;
+        if (vertical_adjust < 0) {
+            centered_status_y =
+                static_cast<int16_t>(centered_status_y + vertical_adjust);
+        }
+
+        fonts::Print_Centered_(
+            static_cast<int16_t>(portrait_x + portrait_width / 2),
+            centered_status_y,
+            status_text);
+    }
+
+    status_text[0] = '\0';
+
+    if (officer_eta > 0 && officer_status == 1) {
+        OFFICER::Print_ETA_On_Officer_Picture_(
+            officer_id, portrait_x, portrait_y, portrait_width);
+    }
+
+    fonts::Set_Font_Style_Outline_(3, &text_colors);
+    fonts::Set_Font_Spacing_(1);
+
+    if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
+        current_y = static_cast<int16_t>(current_y + 0x10);
+    }
+
+    memcpy(dot_text, ::s___005569ec, 3);
+    fonts::Get_String_Width_(dot_text);
+    OFFICER::Get_Skill_Data_Max_Pixel_Width_(officer_id);
+
+    const int16_t skill_column_x = static_cast<int16_t>(text_x + 2);
+
+    for (int16_t skill_idx = 0; skill_idx < 0x36; ++skill_idx) {
+        bool has_skill = false;
+
+        if (officer_type == 0) {
+            if (MOX::_skill_data[skill_idx].skill_type == 1 &&
+                OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, officer_id, skill_idx)) {
+                has_skill = true;
+            }
+        } else if (officer_type == 1) {
+            if (MOX::_skill_data[skill_idx].skill_type == 2 &&
+                OFFICER::Officer_Has_Special_Skill_(MOX::_PLAYER_NUM, officer_id, skill_idx)) {
+                has_skill = true;
+            }
+        }
+
+        if (has_skill) {
+            OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
+
+            const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
+            _sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            fonts::Print_(name_x, current_y, text_buffer);
+            fonts::Get_String_Width_(text_buffer);
+
+            const int16_t bonus =
+                static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(MOX::_PLAYER_NUM, officer_id, skill_idx));
+
+            _sprintf(
+                text_buffer,
+                MOX::_skill_data[skill_idx].format_str,
+                static_cast<int32_t>(bonus));
+
+            const int16_t value_x =
+                (MOX::_current_screen == 0x1d)
+                    ? static_cast<int16_t>(text_x + right_column_offset_x - 3)
+                    : static_cast<int16_t>(text_x + right_column_offset_x + 3);
+
+            fonts::Print_Right_(value_x, current_y, text_buffer);
+            fonts::Set_Font_Spacing_(1);
+            current_y = static_cast<int16_t>(current_y + 0x11);
+        }
+    }
+
+    for (int16_t skill_idx = 0; skill_idx < 0x36; ++skill_idx) {
+        bool has_skill = false;
+
+        if (MOX::_skill_data[skill_idx].skill_type == 0 &&
+            OFFICER::Officer_Has_General_Skill_(MOX::_PLAYER_NUM, officer_id, skill_idx)) {
+            has_skill = true;
+        }
+
+        if (has_skill) {
+            OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
+
+            const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
+            _sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            fonts::Print_(name_x, current_y, text_buffer);
+            fonts::Get_String_Width_(text_buffer);
+
+            const int16_t bonus =
+                static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(MOX::_PLAYER_NUM, officer_id, skill_idx));
+
+            _sprintf(
+                text_buffer,
+                MOX::_skill_data[skill_idx].format_str,
+                static_cast<int32_t>(bonus));
+
+            const int16_t value_x =
+                (MOX::_current_screen == 0x1d)
+                    ? static_cast<int16_t>(text_x + right_column_offset_x - 3)
+                    : static_cast<int16_t>(text_x + right_column_offset_x + 3);
+
+            fonts::Print_Right_(value_x, current_y, text_buffer);
+            fonts::Set_Font_Spacing_(1);
+            current_y = static_cast<int16_t>(current_y + 0x11);
+        }
+    }
+}
+
 }
