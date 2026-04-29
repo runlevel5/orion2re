@@ -987,7 +987,7 @@ namespace MAINSCR {
                 if (MOVEBOX::Moveable_Box_Selected_(2)) {
                     if (FLEETPOP::Can_Select_Fleet_Box_Ship_(0) && MOVEBOX::Mouse_Within_Fleet_Box_()) {
                         int16_t scanned_field = fields::Scan_Input_();
-                        if (scanned_field != MOX::_moveable_box[2].field) {
+                        if (scanned_field != MOX::_moveable_box[2].drag_field) {
                             if (_mouse_btn_pressed == 0) {
                                 _fltpop_field_selection_status = (FLEETPOP::Icon_Selection_Status_(scanned_field) == 0);
                             }
@@ -1019,7 +1019,7 @@ namespace MAINSCR {
                 if (MOVEBOX::Moveable_Box_Selected_(box_id) && box_id != (int16_t)MOX::_stencil_box_id) {
                     int16_t btn = mouse::Mouse_Button_();
                     if (btn != 0) {
-                        int16_t target_field = MOX::_moveable_box[box_id].field;
+                        int16_t target_field = MOX::_moveable_box[box_id].drag_field;
                         if (target_field == fields::Auto_Input_() || MOX::_moveable_box[box_id].active == 1) {
                             MOVEBOX::Move_Moveable_Box_(box_id, btn);
                         }

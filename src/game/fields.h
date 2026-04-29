@@ -98,6 +98,18 @@ namespace fields {
 
     int16_t __cdecl Auto_Input_();
 
+    inline int16_t __cdecl Pressed_Mouse_X_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1B0});
+        return fn();
+    }
+
+    inline int16_t __cdecl Pressed_Mouse_Y_() {
+        using Fn = int16_t(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1C0});
+        return fn();
+    }
+
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
 
     int16_t __cdecl Add_Scroll_Field_(int16_t x, int16_t y, int16_t range_min, int16_t range_max, int16_t return_value, int16_t set_value, int16_t width, int16_t height, int16_t* value, const char* hotkey_str, char sound);
@@ -123,6 +135,12 @@ namespace fields {
     int16_t __cdecl Get_Field_Counter_();
 
     void __cdecl Enable_Mouse_Pressed_Field_Update_();
+
+    inline void __cdecl Disable_Mouse_Pressed_Field_Update_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520030});
+        fn();
+    }
 
     void __cdecl Deactivate_Help_List_();
 

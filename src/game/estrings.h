@@ -33,9 +33,5 @@ namespace ESTRINGS {
 
     void __cdecl Load_E_Strings_();
 
-    inline char* __cdecl E_Strings_(int32_t string_id) {
-        using Fn = char* (__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004A0050});
-        return fn(string_id);
-    }
+    char* __cdecl E_Strings_(int16_t string_id);
 }

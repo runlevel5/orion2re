@@ -845,6 +845,8 @@ namespace MOX {
     inline s_animation_header*& _fleet_box_scroll_up_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BA70});
     inline s_animation_header*& _fleet_box_all_button_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059C02C});
 
+    inline int8_t& _mouse_button_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A1B58});
+
     inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
         *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
 

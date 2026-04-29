@@ -134,7 +134,7 @@ namespace MOVEBOX {
 
         MOX::_fleet_movement_all_button = -1000;
         MOX::_fleet_box_colonize_button = -1000;
-        MOX::_moveable_box[2].field = -1000;
+        MOX::_moveable_box[2].drag_field = -1000;
         MOX::_moveable_box[2].close_btn = -1000;
 
         MOX::_mouse_XY.ship_icon_idx = -1;
@@ -158,7 +158,7 @@ namespace MOVEBOX {
             MOX::_system_display_ships[i].button = -1000;
         }
 
-        MOX::_moveable_box[0].field = -1000;
+        MOX::_moveable_box[0].drag_field = -1000;
         MOX::_moveable_box[0].close_btn = -1000;
     }
 
@@ -446,6 +446,88 @@ namespace MOVEBOX {
         graphics::Box_(static_cast<int16_t>(box_x), static_cast<int16_t>(box_y), 0xb, 0xc, 1, 0x71);
     }
 
+    void __cdecl Add_Galaxy_Map_Fields_2_(
+            int16_t map_x,
+            int16_t map_y,
+            int16_t map_width,
+            int16_t map_height,
+            int16_t offset_x,
+            int16_t offset_y,
+            uint32_t unused_7,
+            uint32_t unused_8,
+            int16_t field_style,
+            int16_t* out_special_field_id,
+            int16_t* star_field_ids,
+            int16_t* out_grid_field_id) {
+        const int16_t window_top = static_cast<int16_t>(map_y + offset_y);
+        const int16_t window_left = static_cast<int16_t>(map_x + offset_x);
+
+        graphics::Set_Window_(
+                window_left,
+                window_top,
+                static_cast<int16_t>(offset_x + map_width + map_x),
+                static_cast<int16_t>(offset_y + map_height + map_y));
+
+        if (MOX::_current_screen == SCREEN_COLONY) {
+            *out_special_field_id = static_cast<int16_t>(0xFC18);
+        }
+
+        if (MOX::_NUM_STARS > 0) {
+            for (int16_t star_index = 0; star_index < MOX::_NUM_STARS; ++star_index) {
+                int16_t star_y;
+                int16_t star_x;
+
+                MOVEBOX::Get_Galaxy_Map_Star_XY_(
+                        star_index,
+                        map_x,
+                        map_y,
+                        map_width,
+                        map_height,
+                        offset_x,
+                        offset_y,
+                        field_style,
+                        &star_x,
+                        &star_y);
+
+                int16_t field_id;
+                if (field_style == 0) {
+                    field_id = fields::Add_Hidden_Field_(
+                            star_x,
+                            star_y,
+                            static_cast<int16_t>(star_x + 5),
+                            static_cast<int16_t>(star_y + 5),
+                            MOVEBOX::s__00551100,
+                            0x29);
+                } else {
+                    field_id = fields::Add_Hidden_Field_(
+                            static_cast<int16_t>(star_x - 3),
+                            static_cast<int16_t>(star_y - 3),
+                            static_cast<int16_t>(star_x + 8),
+                            static_cast<int16_t>(star_y + 9),
+                            MOVEBOX::s__00551100,
+                            0x29);
+                }
+
+                star_field_ids[star_index] = field_id;
+            }
+        }
+
+        if (MOX::_current_screen == SCREEN_COLONY) {
+            *out_grid_field_id = fields::Add_Grid_Field_(
+                    window_left,
+                    window_top,
+                    1,
+                    1,
+                    map_width,
+                    map_height,
+                    &MOX::_galaxy_map_grid_y,
+                    &MOX::_galaxy_map_grid_x,
+                    0);
+        }
+
+        graphics::Reset_Window_();
+    }
+
     void __cdecl Draw_Moveable_Box_(int16_t box_id) {
         const int32_t box_index = box_id;
         s_movable_box& box = MOX::_moveable_box[box_index];
@@ -494,6 +576,29 @@ namespace MOVEBOX {
         return MOX::_saved_boxes[box_idx].is_open;
     }
 
+    void __cdecl Restore_Boxes_() {
+        for (int16_t box_index = 0; box_index < 5; ++box_index) {
+            if (MOX::_saved_boxes[box_index].field_id != -1000) {
+                const int8_t was_open = MOX::_saved_boxes[box_index].is_open;
+
+                MOVEBOX::_moveable_box[box_index].id = MOX::_saved_boxes[box_index].field_id;
+
+                if (was_open != 0) {
+                    if (box_index == 0) {
+                        SYS::Init_System_Display_(MOVEBOX::_moveable_box[0].id);
+                    } else if (box_index == 2) {
+                        if (HACCESS::Get_Stack_Start_From_Saved_Ship_Array_() == 0) {
+                            MOVEBOX::Vanish_Fleet_Movement_Box_();
+                        }
+                    }
+                }
+
+                MOX::_saved_boxes[box_index].is_open = 0;
+                MOX::_saved_boxes[box_index].field_id = -1000;
+            }
+        }
+    }
+
     void __cdecl Save_And_Remove_Boxes_() {
         for (int16_t box_idx = 0; box_idx < 5; ++box_idx) {
             const int16_t is_open = (int16_t)MOVEBOX::Moveable_Box_Selected_(box_idx);
@@ -513,5 +618,212 @@ namespace MOVEBOX {
             MOX::_moveable_box[box_idx].id =
                     static_cast<int16_t>(MOX::_box_off_flag[MOX::_moveable_box[box_idx].index]);
         }
+    }
+
+    void __cdecl Clear_Moveable_Box_Fields_(int16_t box_index) {
+        MOX::_moveable_box[box_index].close_btn = -1000;
+        MOX::_moveable_box[box_index].drag_field = -1000;
+        MOX::_moveable_box[box_index].window_field_id = -1000;
+
+        if (box_index == 0) {
+            for (int16_t i = 0; i < 5; ++i) {
+                MOX::_planet_buttons[i] = -1000;
+            }
+            return;
+        }
+
+        if (box_index == 1) {
+            MOX::_galaxy_map_grid_field = -1000;
+
+            for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
+                MOX::_galaxy_map_star_field[i] = -1000;
+            }
+            return;
+        }
+
+        if (box_index == 2) {
+            MOX::_fleet_box_scroll_up_button = -1000;
+            MOX::_fleet_box_scroll_dn_button = -1000;
+            MOX::_fleet_movement_bar_field = -1000;
+            MOX::_moveable_box[2].close_btn = -1000;
+            MOX::_moveable_box[2].drag_field = -1000;
+
+            if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+                for (int16_t i = 0; i < MOX::_fleet_box.count; ++i) {
+                    MOX::_fleet_movement_icon[i].field = -1000;
+                }
+            }
+        }
+    }
+
+    uint16_t __cdecl Box_Field_Selected_(int16_t box_index, int16_t field_id) {
+        if ((_moveable_box[box_index].drag_field == field_id) ||
+            (_moveable_box[box_index].window_field_id == field_id)) {
+            return 1;
+        }
+
+        if ((_moveable_box[1].index == box_index) &&
+            (field_id == MOX::_galaxy_map_grid_field)) {
+            return 1;
+        }
+
+        if ((_moveable_box[2].index == box_index) &&
+            ((field_id == MOX::_fleet_movement_bar_field) ||
+             (field_id == MOX::_fleet_movement_all_button))) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Move_Moveable_Box_(int16_t moveable_box_idx, int16_t mouse_button_state) {
+        int16_t special_clamp_height = 0;
+        int16_t box_height;
+        int16_t box_width;
+
+        if (moveable_box_idx == 2) {
+            special_clamp_height = 0x1c;
+
+            if (MOX::_mouse_button_pressed == 2) {
+                MOX::_fleet_box.mouse_pressed = 1;
+            } else {
+                MOX::_fleet_box.mouse_pressed = 0;
+            }
+        } else if (moveable_box_idx == 0) {
+            special_clamp_height = 0x2b;
+        }
+
+        if (moveable_box_idx == 2) {
+            box_width = MOX::_fleet_box.width;
+            box_height = MOX::_fleet_box.height;
+
+            if (MOX::_fleet_box.colonize_btn_active != 0) {
+                MOX::_fleet_box.colonize_btn_active = 2;
+            }
+        } else {
+            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+
+            if (MOVEBOX::Moveable_Box_Selected_(moveable_box_idx) != 0) {
+                box_width = movable_box.width;
+                box_height = movable_box.height;
+            } else {
+                box_width = movable_box.unselected_width;
+                box_height = movable_box.unselected_height;
+            }
+        }
+
+        if (mouse_button_state != 0) {
+            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+
+            if (fields::Auto_Input_() == movable_box.drag_field || movable_box.active == 1) {
+                fields::Deactivate_Help_List_();
+                MOX::_mouse_button_pressed = static_cast<int8_t>(mouse_button_state);
+                fields::Disable_Mouse_Pressed_Field_Update_();
+                fields::Disable_Draw_All_Fields_();
+                MOX::_skip_fields = 1;
+
+                if (MOX::_stencil_box_id == -1) {
+                    MOX::_stencil_box_id = moveable_box_idx;
+                    MOX::_draw_main_screen_stencilled = 1;
+                }
+
+                fields::Disable_Draw_All_Fields_();
+
+                movable_box.content_offset_x =
+                        static_cast<int16_t>(mouse::Pointer_X_() - fields::Pressed_Mouse_X_());
+                movable_box.content_offset_y =
+                        static_cast<int16_t>(mouse::Pointer_Y_() - fields::Pressed_Mouse_Y_());
+
+                if (static_cast<int32_t>(movable_box.content_offset_x) + movable_box.x < 0x16) {
+                    movable_box.content_offset_x = static_cast<int16_t>(0x16 - movable_box.x);
+                }
+
+                if (static_cast<int32_t>(movable_box.content_offset_x) + movable_box.x >
+                    0x20e - box_width) {
+                    movable_box.content_offset_x =
+                            static_cast<int16_t>(0x20f - movable_box.x - box_width);
+                }
+
+                if (static_cast<int32_t>(movable_box.content_offset_y) + movable_box.y < 0x16) {
+                    movable_box.content_offset_y = static_cast<int16_t>(0x16 - movable_box.y);
+                }
+
+                if (mouse_button_state == 2 && moveable_box_idx == 0) {
+                    if (static_cast<int32_t>(movable_box.content_offset_y) + special_clamp_height +
+                            movable_box.y >
+                        0x1a4) {
+                        movable_box.content_offset_y =
+                                static_cast<int16_t>(0x1a5 - special_clamp_height - movable_box.y);
+                    }
+                } else {
+                    if (static_cast<int32_t>(movable_box.content_offset_y) + movable_box.y >
+                        0x1a4 - box_height) {
+                        movable_box.content_offset_y =
+                                static_cast<int16_t>(0x1a5 - movable_box.y - box_height);
+                    }
+                }
+
+                movable_box.active = 1;
+                return;
+            }
+        }
+
+        MOX::_draw_main_screen_to_back = 1;
+        fields::Enable_Draw_All_Fields_();
+        EVANHELP::Set_Main_Screen_Help_List_();
+        fields::Clear_Fields_();
+        MOVEBOX::Clear_Moveable_Box_Fields_(moveable_box_idx);
+        MOX::_skip_fields = 1;
+
+        {
+            s_movable_box& movable_box = MOVEBOX::_moveable_box[moveable_box_idx];
+
+            if (movable_box.active == 1) {
+                movable_box.x = static_cast<int16_t>(
+                        movable_box.x + (mouse::Pointer_X_() - fields::Pressed_Mouse_X_()));
+
+                const int16_t pointer_y = mouse::Pointer_Y_();
+                const int16_t pressed_mouse_y = fields::Pressed_Mouse_Y_();
+                MOX::_stencil_box_id = -2;
+                movable_box.y =
+                        static_cast<int16_t>(movable_box.y + (pointer_y - pressed_mouse_y));
+            }
+
+            if (movable_box.x < 0x16) {
+                movable_box.x = 0x16;
+            }
+
+            if (movable_box.x > 0x20e - box_width) {
+                movable_box.x = static_cast<int16_t>(0x20f - box_width);
+            }
+
+            if (movable_box.y < 0x16) {
+                movable_box.y = 0x16;
+            }
+
+            if (MOX::_mouse_button_pressed == 2 && moveable_box_idx == 0) {
+                if (movable_box.y > 0x1a4 - special_clamp_height) {
+                    movable_box.y = static_cast<int16_t>(0x1a5 - special_clamp_height);
+                }
+            } else {
+                if (movable_box.y > 0x1a4 - box_height) {
+                    movable_box.y = static_cast<int16_t>(0x1a5 - box_height);
+                }
+            }
+
+            movable_box.content_offset_x = 0;
+            movable_box.content_offset_y = 0;
+            movable_box.active = 0;
+        }
+
+        MOVEBOX::Move_Box_To_Top_(moveable_box_idx);
+
+        if (moveable_box_idx == 2) {
+            MOX::_fleet_box.x = MOVEBOX::_moveable_box[2].x;
+            MOX::_fleet_box.y = MOVEBOX::_moveable_box[2].y;
+        }
+
+        MOX::_draw_main_screen_to_back = 1;
+        EVANHELP::Set_Main_Screen_Help_List_();
     }
 }

@@ -102,8 +102,8 @@ void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag) {
         int16_t box_y = MOX::_moveable_box[2].y;
         int16_t box_width = Fleet_Box_Width_(MOX::_fleet_box.count);
 
-        MOX::_moveable_box[2].field9_0x12 = -1000;
-        MOX::_moveable_box[2].field = fields::Add_Hidden_Field_(
+        MOX::_moveable_box[2].window_field_id = -1000;
+        MOX::_moveable_box[2].drag_field = fields::Add_Hidden_Field_(
             box_x, box_y, box_width + box_x, box_y + 0x23, (char*)s__00551100, 0
         );
 

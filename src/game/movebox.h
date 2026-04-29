@@ -2,18 +2,13 @@
 #include <cstdint>
 
 namespace MOVEBOX {
-    inline void __cdecl Clear_Moveable_Box_Fields_(int16_t order_id) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005129D0 });
-        fn(order_id);
-    }
+    inline s_movable_box (&_moveable_box)[5] =
+        *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
+
+    void __cdecl Clear_Moveable_Box_Fields_(int16_t box_index);
 
     int16_t __cdecl Moveable_Box_Selected_(int16_t index);
-    inline bool __cdecl Box_Field_Selected_(int16_t box_idx, int16_t field_id) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005128D0});
-        return (bool)fn(box_idx, field_id);
-    }
+    uint16_t __cdecl Box_Field_Selected_(int16_t box_index, int16_t field_id);
 
     int8_t __cdecl Box_Was_Open_(int16_t box_idx);
 
@@ -23,20 +18,13 @@ namespace MOVEBOX {
 
     void __cdecl Save_And_Remove_Boxes_();
 
-    inline void __cdecl Restore_Boxes_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00513C00})();
-    }
+    void __cdecl Restore_Boxes_();
 
     void __cdecl Move_Box_To_Top_(int16_t box_id);
 
     bool __cdecl Mouse_Within_Fleet_Box_();
 
-    inline void __cdecl Move_Moveable_Box_(int16_t box_id, int16_t mouse_btn) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513740});
-        fn(box_id, mouse_btn);
-    }
+    void __cdecl Move_Moveable_Box_(int16_t moveable_box_idx, int16_t mouse_button_state);
 
     void __cdecl Draw_Moveable_Box_(int16_t box_id);
 
@@ -49,6 +37,7 @@ namespace MOVEBOX {
     void __cdecl Box_Fleet_Screen_Scanned_Ship_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
 
     inline const char* s_geggggg_format = reinterpret_cast<const char*>(std::uintptr_t{0x005569C0}); // ">GEGGGGG%s (%s)"
+    inline const char* const s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
 
     void __cdecl Do_Fleet_Screen_Stuff_(int16_t map_x_off, int16_t map_y_off, int32_t scale_x, int32_t scale_y);
 
@@ -80,13 +69,19 @@ namespace MOVEBOX {
                                           int16_t* out_x,
                                           int16_t* out_y);
 
-    inline void __cdecl Add_Galaxy_Map_Fields_2_(int16_t arg1, int16_t arg2, int16_t height, int16_t grid_y,
-                                                 int16_t arg5, int16_t arg6, int16_t arg7, int16_t arg8, int16_t arg9,
-                                                 int16_t* name_field, int16_t* star_field, int16_t* grid_field) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00512640});
-        fn(arg1, arg2, height, grid_y, arg5, arg6, arg7, arg8, arg9, name_field, star_field, grid_field);
-    }
+    void __cdecl Add_Galaxy_Map_Fields_2_(
+            int16_t map_x,
+            int16_t map_y,
+            int16_t map_width,
+            int16_t map_height,
+            int16_t offset_x,
+            int16_t offset_y,
+            uint32_t unused_7,
+            uint32_t unused_8,
+            int16_t field_style,
+            int16_t* out_special_field_id,
+            int16_t* star_field_ids,
+            int16_t* out_grid_field_id);
 
     inline void __cdecl Add_Whole_Window_Field_(int16_t val) {
         using Fn = void(__cdecl*)(int16_t);

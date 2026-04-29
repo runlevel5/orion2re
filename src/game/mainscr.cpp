@@ -1055,7 +1055,7 @@ namespace MAINSCR {
         if (MOX::_zoom_in == 1) {
             Clear_Main_Screen_Fields_();
             for (int i = 0; i < 5; ++i) {
-                MOX::_moveable_box[i].field = -1000;
+                MOX::_moveable_box[i].drag_field = -1000;
                 MOX::_moveable_box[i].close_btn = -1000;
             }
 

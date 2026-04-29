@@ -3762,6 +3762,11 @@ namespace hooks {
         { 0x0052C0F0, &remap::Get_Palette_Animation_Color_ },
         { 0x004D7C10, &RUSS::Star_To_Monster_ },
         { 0x00410BB0, &SCIENCE::Show_Off_Captured_Tech_ },
+        { 0x005129D0, &MOVEBOX::Clear_Moveable_Box_Fields_ },
+        { 0x005128D0, &MOVEBOX::Box_Field_Selected_ },
+        { 0x00513C00, &MOVEBOX::Restore_Boxes_ },
+        { 0x00513740, &MOVEBOX::Move_Moveable_Box_ },
+        { 0x00512640, &MOVEBOX::Add_Galaxy_Map_Fields_2_ },
     };
 
     void Install_Hooks()

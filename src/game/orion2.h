@@ -2573,11 +2573,11 @@ struct s_movable_box {
     int16_t x;
     int16_t y;
     int16_t active;
-    int16_t field;
+    int16_t drag_field;
     int16_t close_btn;
-    int16_t field9_0x12;
-    int16_t field10_0x14;
-    int16_t field11_0x16;
+    int16_t window_field_id;
+    int16_t unselected_width;
+    int16_t unselected_height;
     int16_t content_offset_x;
     int16_t content_offset_y;
 };
