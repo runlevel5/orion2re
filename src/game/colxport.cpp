@@ -88,8 +88,7 @@ void __cdecl Load_Xport_Anims_() {
 }
 
 short __cdecl Xport_Popup_() {
-    int16_t local_colony_list[15];
-    uint32_t zeroed_buffer[117];
+    int16_t local_colony_list[250];
     short input_id;
     short selected_colony = -1;
 
@@ -97,10 +96,9 @@ short __cdecl Xport_Popup_() {
         local_colony_list[i] = -1;
     }
 
-    memset(zeroed_buffer, 0, sizeof(zeroed_buffer));
-    *reinterpret_cast<int16_t*>(&zeroed_buffer[116] + 1) = 0;
+    memset(&local_colony_list[15], 0, (250 - 15) * sizeof(local_colony_list[0]));
 
-    _g_colony_list_ptr = &local_colony_list[2];
+    _g_colony_list_ptr = local_colony_list;
     COLONY::_full_draw = 1;
 
     Build_Global_Colony_List_();
