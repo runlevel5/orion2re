@@ -7,11 +7,7 @@ namespace random {
 
     uint32_t __cdecl Get_Random_Seed_();
 
-    inline void __cdecl Save_Random_Seed_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d450});
-        fn();
-    }
+    void __cdecl Save_Random_Seed_();
 
     void __cdecl Set_Random_Seed_(uint32_t seed);
 

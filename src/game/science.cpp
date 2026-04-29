@@ -1,6 +1,26 @@
 #include "pch.h"
 
 namespace SCIENCE {
+    void __cdecl Show_Off_Captured_Tech_(int16_t* captured_tech_ids, uint16_t tech_count, int16_t message_arg) {
+        char text_buffer[0x100];
+
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        void* animation_buffer = allocate::Allocate_First_Block_(MOX::_screen_seg, 0x7C830);
+        file_ani::Set_File_Animation_Buffer_(animation_buffer);
+
+        JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 3, text_buffer, 0x100);
+        JIM::Decode_Text_System_(text_buffer, message_arg, 0x100);
+
+        char* trooper_anim = BILL::Cache_Player_Trooper_Anim_();
+        SCIENCE::Science_Room_(trooper_anim, tech_count, reinterpret_cast<uint16_t*>(captured_tech_ids), text_buffer);
+
+        file_ani::Reset_File_Animation_Buffer_();
+        allocate::Pop_Block_(MOX::_screen_seg);
+        COLONY::Reset_Mouse_Picture_();
+        JIM::Play_Background_Music_();
+    }
+
     void __cdecl Update_Science_Anims_(int unused, uint8_t draw_multi_anim, uint8_t draw_anim_2, uint8_t draw_anim_1) {
         if (MOX::_settings.animations_on != 0) {
             file_ani::Draw_Multi_File_Animation_Stencil_(1);

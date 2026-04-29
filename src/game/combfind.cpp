@@ -2024,7 +2024,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             random::Set_Random_Seed_(combat_seed);
 
                             if (results->info.captured_tech_id != 0) {
-                                SCIENCE::Show_Off_Captured_Tech_((int)results->info.captured_techs_data, results->info.captured_tech_id, results->info.captured_tech_planet_id);
+                                SCIENCE::Show_Off_Captured_Tech_(results->info.captured_techs_data, results->info.captured_tech_id, results->info.captured_tech_planet_id);
                             }
                             NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, 0);
 
@@ -2040,7 +2040,7 @@ void __cdecl Do_Attacker_Beat_Colony_Stuff_(int16_t* ship_list, int n_ships, uin
                             invasion::Change_Colony_Ownership_(colony, attacker_id, &results->info);
                             results->info.is_mind_controlled = 1;
                             if (results->info.captured_tech_id != 0) {
-                                SCIENCE::Show_Off_Captured_Tech_((int)results->info.captured_techs_data, results->info.captured_tech_id, colony->planet);
+                                SCIENCE::Show_Off_Captured_Tech_(results->info.captured_techs_data, results->info.captured_tech_id, colony->planet);
                             }
                             NETMOX::Russ_Change_Relations_(-10000, attacker_id, colony_owner, 10, star_idx, colony->n_pops);
                             COMBFIND::_current_star_has_player[attacker_id].colony_count++;

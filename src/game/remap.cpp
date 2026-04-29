@@ -200,4 +200,38 @@ namespace remap {
         // TYPE MISMATCH: index was uint8_t
         return _picture_remap_color_list[static_cast<uint8_t>(index)];
     }
+
+    void __cdecl Get_Palette_Animation_Color_(s_animation_header* animation_header,
+                                              int16_t color_index,
+                                              uint8_t* out_r,
+                                              uint8_t* out_g,
+                                              uint8_t* out_b) {
+        char error_text[100];
+
+        animate::_animation_header = animation_header;
+        if ((animation_header->flags & 0x10) == 0) {
+            exitm::Exit_With_Message(s_Get_Picture_Color_Picture_Must_H_0055b2dc);
+        }
+
+        animate::_palette_header = reinterpret_cast<animate::s_palette_header*>(
+                &animate::_animation_header
+                         ->frame_offsets[static_cast<int32_t>(animate::_animation_header->frame_count) + 1]);
+
+        const int32_t palette_start = animate::_palette_header->start_index;
+        const int32_t palette_end = palette_start + animate::_palette_header->count;
+
+        if ((static_cast<int32_t>(color_index) >= palette_start) &&
+            (static_cast<int32_t>(color_index) < palette_end)) {
+            const uint8_t* entry =
+                    reinterpret_cast<const uint8_t*>(animate::_palette_header) + 4 + (static_cast<int32_t>(color_index) - palette_start) * 4;
+
+            *out_r = entry[1];
+            *out_g = entry[2];
+            *out_b = entry[3];
+            return;
+        }
+
+        _sprintf(error_text, s__d___d___d_0055b2d0, color_index, palette_start, palette_end);
+        exitm::Exit_With_Message(error_text);
+    }
 }

@@ -117,8 +117,10 @@ namespace MOVEBOX {
         }
     }
 
-    bool __cdecl Moveable_Box_Selected_(int16_t box_idx) {
-        return MOX::_box_off_flag[box_idx] < MOX::_moveable_box[box_idx].id;
+    int16_t __cdecl Moveable_Box_Selected_(int16_t box_index) {
+        return static_cast<int16_t>(
+            MOX::_box_off_flag[box_index] < MOX::_moveable_box[box_index].id
+        );
     }
 
     void __cdecl Vanish_Fleet_Movement_Box_() {
@@ -325,6 +327,191 @@ namespace MOVEBOX {
         // Copy the reorganized local list back to the global order array
         for (int i = 0; i < 5; ++i) {
             MOX::_moveable_box_order[i] = local_order[i];
+        }
+    }
+
+    int16_t __cdecl N_Moveable_Boxes_Selected_(int16_t excluded_box_idx) {
+        int16_t box_index = 0;
+        int16_t selected_count = 0;
+
+        for (; box_index < 5; ++box_index) {
+            if (box_index != excluded_box_idx) {
+                if (MOVEBOX::Moveable_Box_Selected_(box_index) != 0) {
+                    ++selected_count;
+                }
+            }
+        }
+
+        return selected_count;
+    }
+
+    void __cdecl Remove_Box_Check_() {
+    }
+
+    void __cdecl Get_Galaxy_Map_Star_XY_(int16_t star_idx,
+                                         int16_t base_x,
+                                         int16_t base_y,
+                                         int16_t map_width,
+                                         int16_t map_height,
+                                         int16_t offset_x,
+                                         int16_t offset_y,
+                                         int16_t star_marker_mode,
+                                         int16_t* out_x,
+                                         int16_t* out_y) {
+        const int32_t x_divisor = 506000 / static_cast<int32_t>(map_width) + 1;
+        const int32_t y_divisor = 400000 / static_cast<int32_t>(map_height) + 1;
+        const int32_t map_scale = static_cast<int32_t>(MOX::_max_map_scale);
+
+        s_star_data* const star = &MOX::_star[star_idx];
+
+        const int32_t scaled_x = (static_cast<int32_t>(star->x) * 1000) / map_scale;
+        const int32_t scaled_y = (static_cast<int32_t>(star->y) * 1000) / map_scale;
+
+        const int16_t star_center_offset = (star_marker_mode == 0) ? 2 : 3;
+
+        int16_t screen_x = static_cast<int16_t>((scaled_x * 10) / x_divisor);
+        screen_x = static_cast<int16_t>(screen_x - star_center_offset);
+        screen_x = static_cast<int16_t>(screen_x + base_x);
+        screen_x = static_cast<int16_t>(screen_x + offset_x);
+        *out_x = screen_x;
+
+        int16_t screen_y = static_cast<int16_t>((scaled_y * 10) / y_divisor);
+        screen_y = static_cast<int16_t>(screen_y - star_center_offset);
+        screen_y = static_cast<int16_t>(screen_y + base_y);
+        screen_y = static_cast<int16_t>(screen_y + offset_y);
+        *out_y = screen_y;
+    }
+
+    void __cdecl Get_Galaxy_Map_Space_XY_(int16_t ship_icon_idx,
+                                          int16_t origin_x,
+                                          int16_t origin_y,
+                                          int16_t x_zoom,
+                                          int16_t y_zoom,
+                                          int16_t* out_x,
+                                          int16_t* out_y) {
+        const s_ship_icon& icon = MOX::_ship_icon[ship_icon_idx];
+
+        const int32_t scaled_y =
+            ((static_cast<int32_t>(icon.y) - 21) *
+             ((static_cast<int32_t>(y_zoom) * 1000) / 400 + 1)) /
+            1000;
+
+        const int32_t scaled_x =
+            ((static_cast<int32_t>(icon.x) - 21) *
+             ((static_cast<int32_t>(x_zoom) * 1000) / 506 + 1)) /
+            1000;
+
+        *out_x = static_cast<int16_t>(origin_x + scaled_x);
+        *out_y = static_cast<int16_t>(origin_y + scaled_y);
+    }
+
+    void __cdecl Box_Officer_Screen_Chosen_Star_(int16_t left, int16_t top, int16_t x_divisor, int16_t y_divisor) {
+        const int16_t displayed_star_index = OFFICER::_officer_star_displayed;
+        const s_star_data& star = MOX::_star[displayed_star_index];
+
+        const int32_t box_x =
+            static_cast<int32_t>(left) +
+            0x132 +
+            (((static_cast<int32_t>(star.x) * 1000) / static_cast<int32_t>(MOX::_max_map_scale)) * 10) /
+                static_cast<int32_t>(x_divisor);
+
+        const int32_t box_y =
+            static_cast<int32_t>(top) +
+            0xEB +
+            (((static_cast<int32_t>(star.y) * 1000) / static_cast<int32_t>(MOX::_max_map_scale)) * 10) /
+                static_cast<int32_t>(y_divisor);
+
+        if (displayed_star_index == OFFICER::_officer_star_chosen) {
+            graphics::Box_((int16_t)(box_x - 5), (int16_t)(box_y - 5), 0x0B, 0x0C, 1, (uint8_t)(OFFICER::_offscrn_flash_value + 0x6E));
+            return;
+        }
+
+        graphics::Box_((int16_t)(box_x - 5), (int16_t)(box_y - 5), 0x0B, 0x0C, 1, 0x1E);
+    }
+
+    void __cdecl Box_Officer_Screen_Scanned_Star_() {
+        const int32_t scanned_star_index = static_cast<int32_t>(MOX::_galaxy_map_scanned_star);
+        s_star_data* const scanned_star = &MOX::_star[scanned_star_index];
+        const int32_t map_scale = static_cast<int32_t>(MOX::_max_map_scale);
+
+        const int32_t scaled_x = ((((int32_t)scanned_star->x * 1000) / map_scale) * 10) / 0x637;
+        const int32_t scaled_y = ((((int32_t)scanned_star->y * 1000) / map_scale) * 10) / 0x93e;
+
+        uint32_t box_x = static_cast<uint32_t>(scaled_x + 0x132);
+        box_x = (box_x & 0xffff0000u) | static_cast<uint16_t>(static_cast<uint16_t>(box_x) - 5);
+
+        uint32_t box_y = static_cast<uint32_t>(scaled_y);
+        box_y = (box_y & 0xffff0000u) | static_cast<uint16_t>(static_cast<uint16_t>(box_y) + 0xe6);
+
+        graphics::Box_(static_cast<int16_t>(box_x), static_cast<int16_t>(box_y), 0xb, 0xc, 1, 0x71);
+    }
+
+    void __cdecl Draw_Moveable_Box_(int16_t box_id) {
+        const int32_t box_index = box_id;
+        s_movable_box& box = MOX::_moveable_box[box_index];
+
+        if (static_cast<int16_t>(MOX::_box_off_flag[box_index]) >= box.id) {
+            return;
+        }
+
+        if (SYS::_skip_draw_system_display != 0) {
+            SYS::_skip_draw_system_display = 0;
+            return;
+        }
+
+        if (box.index == 0) {
+            SYS::Wrapper_For_Normal_System_Popup_();
+            return;
+        }
+
+        if (box.index == 1) {
+            const int32_t pict_index = box_index * 5;
+
+            MOVEBOX::Draw_Galaxy_Map_Box_(
+                    MOX::_moveable_box_pict[pict_index],
+                    MOX::_moveable_box_pict[pict_index + 1],
+                    box.x,
+                    box.y,
+                    MOX::_galaxy_map_height,
+                    MOX::_galaxy_map_width,
+                    8,
+                    0x26,
+                    box.content_offset_x,
+                    box.content_offset_y,
+                    0,
+                    0);
+            return;
+        }
+
+        if (box.index != 2) {
+            return;
+        }
+
+        FLEETPOP::Draw_Fleet_Movement_Box_();
+    }
+
+    int8_t __cdecl Box_Was_Open_(int16_t box_idx) {
+        return MOX::_saved_boxes[box_idx].is_open;
+    }
+
+    void __cdecl Save_And_Remove_Boxes_() {
+        for (int16_t box_idx = 0; box_idx < 5; ++box_idx) {
+            const int16_t is_open = (int16_t)MOVEBOX::Moveable_Box_Selected_(box_idx);
+
+            MOX::_saved_boxes[box_idx].field_id = MOX::_moveable_box[box_idx].id;
+            MOX::_saved_boxes[box_idx].is_open = static_cast<int8_t>(is_open);
+
+            if (box_idx == 0 && is_open != 0) {
+                MOVEBOX::Vanish_System_Display_Box_();
+            }
+
+            if (box_idx == 2 && is_open != 0) {
+                MOVEBOX::Vanish_Fleet_Movement_Box_();
+            }
+
+            _mouse_XY_star_idx = -1;
+            MOX::_moveable_box[box_idx].id =
+                    static_cast<int16_t>(MOX::_box_off_flag[MOX::_moveable_box[box_idx].index]);
         }
     }
 }

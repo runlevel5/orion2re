@@ -84,6 +84,10 @@ inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
 inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055B270}); /* "Add Square to scan list failed.." */
+inline const char* s__d___d___d_0055b2d0 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055B2D0}); // "%d, %d, %d"
+inline const char* s_Get_Picture_Color_Picture_Must_H_0055b2dc =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055B2DC}); // "Get_Picture_Color  Picture Must Have Palette"
 inline int16_t& g_cached_mouse_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578AB8});
 inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578ABC});
 inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
@@ -354,6 +358,9 @@ inline LPDIRECTDRAW& g_direct_draw =
     *reinterpret_cast<LPDIRECTDRAW*>(std::uintptr_t{0x00578E04});
 
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
+
+inline int16_t& _mouse_XY_star_idx =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5C4});
 
 inline const char* s_fmt_to_00557e00 = reinterpret_cast<const char*>(std::uintptr_t{0x00557E00});
 

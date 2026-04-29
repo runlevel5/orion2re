@@ -5,6 +5,10 @@ namespace random {
         return _random_seed;
     }
 
+    void __cdecl Save_Random_Seed_() {
+        _saved_random_seed = _random_seed;
+    }
+
     void __cdecl Set_Random_Seed_(uint32_t seed) {
         _random_seed = seed;
     }

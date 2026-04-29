@@ -3748,6 +3748,20 @@ namespace hooks {
         { 0x00487270, &NEWPUP::Print_Best_Summary_ },
         { 0x004873C0, &NEWPUP::Print_Race_Summary_ },
         { 0x004874B0, &NEWPUP::Print_Troop_Totals_ },
+        { 0x00513BC0, &MOVEBOX::N_Moveable_Boxes_Selected_ },
+        { 0x00513D20, &MOVEBOX::Remove_Box_Check_ },
+        { 0x00513510, &MOVEBOX::Get_Galaxy_Map_Space_XY_ },
+        { 0x005135B0, &MOVEBOX::Get_Galaxy_Map_Star_XY_ },
+        { 0x005132B0, &MOVEBOX::Box_Officer_Screen_Chosen_Star_ },
+        { 0x005133A0, &MOVEBOX::Box_Officer_Screen_Scanned_Star_ },
+        { 0x00513440, &MOVEBOX::Draw_Moveable_Box_ },
+        { 0x00513C80, &MOVEBOX::Box_Was_Open_ },
+        { 0x00513C90, &MOVEBOX::Save_And_Remove_Boxes_ },
+        { 0x00513b90, &MOVEBOX::Moveable_Box_Selected_ },
+        { 0x0052D450, &random::Save_Random_Seed_ },
+        { 0x0052C0F0, &remap::Get_Palette_Animation_Color_ },
+        { 0x004D7C10, &RUSS::Star_To_Monster_ },
+        { 0x00410BB0, &SCIENCE::Show_Off_Captured_Tech_ },
     };
 
     void Install_Hooks()

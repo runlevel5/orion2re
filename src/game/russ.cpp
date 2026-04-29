@@ -184,6 +184,10 @@ namespace RUSS {
         }
     }
 
+    int16_t __cdecl Star_To_Monster_(int16_t star_index) {
+        return static_cast<int16_t>(star_index % 5 + 1);
+    }
+
     char* __cdecl Star_Name_(int32_t star_idx) {
         if (star_idx < MOX::_NUM_STARS) {
             return MOX::_star[star_idx].name;

@@ -359,7 +359,7 @@ struct s_battle_results_info {
     struct s_invasion_side_info attacker_invasion;
     struct s_invasion_side_info defender_invasion;
     int32_t ground_defense_strength;
-    uint8_t captured_techs_data[424];
+    int16_t captured_techs_data[212];
     int16_t captured_tech_id;
     int16_t captured_tech_planet_id;
     int8_t planet_destroyed_flag;

@@ -107,4 +107,10 @@ namespace BILL {
     inline const char* const s_rb = reinterpret_cast<const char*>(std::uintptr_t{0x0055117c}); // "rb"
 
     char* __cdecl Cache_Player_Spy_Anim_();
+
+    inline char* __cdecl Cache_Player_Trooper_Anim_() {
+        using Fn = char*(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407B20});
+        return fn();
+    }
 }

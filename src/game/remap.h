@@ -24,10 +24,6 @@ namespace remap {
 
     uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index);
 
-    inline void __cdecl Get_Palette_Animation_Color_(
-        s_animation_header* anim, int16_t index, uint8_t* red, uint8_t* green, uint8_t* blue) {
-        using Fn = void(__cdecl*)(s_animation_header*, int16_t, uint8_t*, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052c0f0});
-        fn(anim, index, red, green, blue);
-    }
+    void __cdecl Get_Palette_Animation_Color_(
+        s_animation_header* anim, int16_t index, uint8_t* red, uint8_t* green, uint8_t* blue);
 }

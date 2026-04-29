@@ -48,4 +48,10 @@ namespace FLEETPOP {
     void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset);
 
     void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag);
+
+    inline void __cdecl Draw_Fleet_Movement_Box_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404170});
+        fn();
+    }
 }

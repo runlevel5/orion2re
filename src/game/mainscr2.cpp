@@ -738,8 +738,8 @@ namespace MAINSCR2 {
 
         if (MOX::_fleet_box_ship_stack == -1) {
             MOVEBOX::Vanish_Fleet_Movement_Box_();
-            MOX::_saved_boxes[2].f2 = 0;
-            MOX::_saved_boxes[2].f0 = MOX::_box_off_flag[2];
+            MOX::_saved_boxes[2].is_open = 0;
+            MOX::_saved_boxes[2].field_id = MOX::_box_off_flag[2];
         }
     }
 
