@@ -43,7 +43,11 @@ namespace ERIC {
 
     void __cdecl Draw_Centered_(int16_t x, int16_t y, s_animation_header* anim);
 
-    void __cdecl Draw_Bottom_Centered_(int16_t x, int16_t y, s_animation_header* anim);
+    inline void __cdecl Draw_Bottom_Centered_(int32_t x, int32_t y, s_animation_header* animation) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, s_animation_header*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004BA890});
+        fn(x, y, animation);
+    }
 
     void __cdecl Draw_Bottom_Centered_No_Glass_(int16_t x, int16_t y, s_animation_header* anim);
 

@@ -3747,6 +3747,7 @@ namespace hooks {
         { 0x0042ce50, &invasion::Compute_Colony_Ground_Combat_Info_ },
         { 0x00487270, &NEWPUP::Print_Best_Summary_ },
         { 0x004873C0, &NEWPUP::Print_Race_Summary_ },
+        { 0x004874B0, &NEWPUP::Print_Troop_Totals_ },
     };
 
     void Install_Hooks()

@@ -13,11 +13,7 @@ namespace NEWPUP {
 
     void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* summary_buffer);
 
-    inline void __cdecl Print_Troop_Totals_(int32_t x, int32_t y, int16_t* info) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004874b0});
-        fn(x, y, info);
-    }
+    void __cdecl Print_Troop_Totals_(int16_t x_base, int16_t unused_param_2, s_invasion_side_info* invasion_side);
 
     void __cdecl Draw_Troop_Popup_();
 

@@ -33,38 +33,36 @@ namespace NEWPUP {
 
     // Patch: { 0x00487130, &NEWPUP::Draw_Troop_Popup_ },
     void __cdecl Draw_Troop_Popup_() {
-        s_invasion_side_info combat_info;
-        int16_t row_count;
+        int16_t summary_row;
+        s_invasion_side_info invasion_info;
+        int16_t planet_index;
 
         COLONY::Set_Colony_Font_();
 
         if (COLONY::_full_draw != 0) {
             COLONY::_full_draw = 1;
-
             MOX2::Execute_Auto_Function_(&NEWPUP::_saved_autofunction);
 
-            s_animation_header* lbx = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
-            graphics::Darken_Fill_(3, 0x14A, animate::Get_Width_(lbx) + 1, 0x1D9);
+            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
+            graphics::Darken_Fill_(3, 0x14A, (int16_t)(animate::Get_Width_(anim) + 1), 0x1D9);
 
-            _anims = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
-            animate::Draw_(2, 0x149, _anims);
+            NEWPUP::_anims = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
+            animate::Draw_(2, 0x149, NEWPUP::_anims);
 
-            row_count = 0;
+            summary_row = 0;
+            planet_index = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
 
-            int16_t planet_idx = HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
-            int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+            invasion::Compute_Colony_Ground_Combat_Info_(
+                &MOX::_colony[MOX::_planet[planet_index].colony_index],
+                &invasion_info);
 
-            invasion::Compute_Colony_Ground_Combat_Info_(&MOX::_colony[colony_idx], &combat_info);
+            Print_Best_Summary_(&invasion_info, &summary_row);
+            Print_Race_Summary_(&invasion_info, &summary_row);
 
-            Print_Best_Summary_(&combat_info, &row_count);
-            Print_Race_Summary_(&combat_info, &row_count);
-
-            row_count++;
-
-            Print_Troop_Totals_(2, (row_count * 0xB) + 0x153, (int16_t*)&combat_info);
+            ++summary_row;
+            Print_Troop_Totals_(2, summary_row * 11 + 0x153, &invasion_info);
 
             video::Copy_Off_To_Back_();
-
             COLONY::_full_draw = 0;
         }
     }
@@ -166,5 +164,92 @@ namespace NEWPUP {
         fields::Clear_Fields_();
         COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
         fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0);
+    }
+
+    // Patch: { 0x004874B0, &NEWPUP::Print_Troop_Totals_ },
+    void __cdecl Print_Troop_Totals_(int16_t x_base, int16_t unused_param_2, s_invasion_side_info* invasion_side) {
+        (void)unused_param_2;
+
+        int16_t troop_type = 0;
+        int16_t displayed_column_base = 0;
+        int16_t row_index = 2;
+        char text_buffer[500];
+
+        do {
+            const int16_t player_id = invasion_side->player_id;
+            const uint16_t race =
+                static_cast<uint16_t>(static_cast<uint8_t>(MOX::_player[player_id].race));
+            s_animation_header* troop_anim =
+                COLONY::Player_Troop_Anim_(player_id, troop_type, race);
+            const int16_t displayed_column = static_cast<int16_t>(displayed_column_base + 1);
+
+            COLONY::Set_Colony_Font_To_Player_(1, static_cast<int8_t>(player_id));
+
+            _sprintf(
+                text_buffer,
+                ESTRINGS::E_Strings_(0x0d),
+                static_cast<int32_t>(invasion_side->unit_strengths[troop_type]) -
+                static_cast<int32_t>(invasion_side->combat_modifiers.difficulty_bonus));
+
+            {
+                const int32_t width = static_cast<int32_t>(animate::Get_Width_(
+                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                const int32_t x =
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                fonts::Print_Centered_(x, 0x1d1, text_buffer);
+            }
+
+            {
+                const uint8_t hit_points =
+                    static_cast<uint8_t>(invasion_side->unit_hps[troop_type]);
+
+                _sprintf(
+                    text_buffer,
+                    ESTRINGS::E_Strings_((hit_points > 1) ? 0x17 : 0x16),
+                    static_cast<uint32_t>(hit_points));
+
+                const int32_t width = static_cast<int32_t>(animate::Get_Width_(
+                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                const int32_t x =
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                fonts::Print_Centered_(x, 0x1c8, text_buffer);
+            }
+
+            {
+                const int32_t unit_count =
+                    static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
+
+                _sprintf(
+                    text_buffer,
+                    ESTRINGS::E_Strings_(0x0e),
+                    unit_count,
+                    COLONY::Player_Troop_Name_(player_id, troop_type, race));
+
+                const int32_t width = static_cast<int32_t>(animate::Get_Width_(
+                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                const int32_t x =
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                fonts::Print_Centered_(x, 0x1d1 - row_index * 9, text_buffer);
+            }
+
+            ++row_index;
+
+            {
+                const int32_t width = static_cast<int32_t>(animate::Get_Width_(
+                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                const int32_t x =
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                ERIC::Draw_Bottom_Centered_(x, 0x1d9 - row_index * 9, troop_anim);
+            }
+
+            {
+                const int32_t unit_count =
+                    static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
+                ++troop_type;
+                _sprintf(text_buffer, ESTRINGS::E_Strings_(0x7c), unit_count);
+            }
+
+            displayed_column_base = displayed_column;
+        } while (troop_type < 3);
     }
 }
