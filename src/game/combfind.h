@@ -116,23 +116,11 @@ namespace COMBFIND {
 
     int8_t __cdecl Player_Owns_Transports_(int player_idx);
 
-    inline void __cdecl GNN_Reports_Combat_(int32_t player_id, int32_t colony_id) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(0x004C14E0);
-        fn(player_id, colony_id);
-    }
+    void __cdecl GNN_Reports_Combat_(int player1_idx, int player2_idx);
 
-    inline void __cdecl Do_Nonhuman_Attack_Against_Human_(int32_t target_colony_id) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(0x004C1550);
-        fn(target_colony_id);
-    }
+    void __cdecl Do_Nonhuman_Attack_Against_Human_(int player_idx);
 
     void __cdecl Do_Net_Combat_Update_(bool message_sent);
 
-    inline void __cdecl Send_Star_Player_Presence_(uint8_t** packet_ptr, int16_t a2) {
-        using Fn = void(__cdecl*)(uint8_t**, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004BC1D0 });
-        fn(packet_ptr, a2);
-    }
+    void __cdecl Send_Star_Player_Presence_(uint8_t **stream, int16_t star_idx);
 }

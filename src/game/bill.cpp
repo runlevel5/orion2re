@@ -89,7 +89,7 @@ namespace BILL {
 
         if (!dos::DIR_(BILL::_dest_file_name, dir_entry)) {
             if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry)) {
-                dos::resolve_wildcard(dir_entry);
+                dos::Delete_File_(dir_entry);
             }
 
             char* d = source_path;

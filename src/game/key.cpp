@@ -29,4 +29,15 @@ namespace key {
 
         return key_code;
     }
+
+    int16_t Scan_Key_() {
+        if (Keyboard_Status_() == 1) {
+            int16_t key = (int16_t)Read_Key_();
+            if (key == 0x0D) {
+                return 0x0D;
+            }
+            return key;
+        }
+        return 0;
+    }
 }

@@ -232,6 +232,24 @@ namespace NETTURN {
         return 0;
     }
 
+    void __cdecl Net_Init_Host_Election_() {
+        memset(NETMOX::_net.host_election_player_rank, -1, 8);
+        NETMOX::_net.field134_0x1b6 = -1;
+        NETMOX::_net.field135_0x1ba = -1;
+        memset(NETMOX::_net.players_hit_next_turn, 0, 8);
+
+        NETMOX::_net.local_net_id = -1;
+        NETMOX::_net.host_active_player_id = -1;
+        NETMOX::_net.field23_0xc6 = 0;
+        NETMOX::_net.diplomacy_initiator_id = -1;
+
+        memset(&NETMOX::_net.players_ready_mask[1], 0, 7);
+        NETMOX::_net.field132_0x1ad = 0;
+
+        memset(NETMOX::_net.player_is_active_flags, 0, 8);
+        memset(NETMOX::_net.player_race_selected_flags, 0, 8);
+    }
+
     void __cdecl Client_Next_Turn_() {
         uint8_t star_has_nonplayer;
         s_combfind_star_has_player star_has_player[8];

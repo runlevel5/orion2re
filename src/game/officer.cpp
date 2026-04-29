@@ -3007,6 +3007,10 @@ namespace OFFICER {
         return MOX::_temp_string;
     }
 
+    void __cdecl Officer_Name_(char* dst, int16_t player_id, int16_t officer_idx) {
+        strcpy(dst, Leader_Name_(officer_idx, 0));
+    }
+
     void __cdecl Find_Selected_Leader_(int16_t leader_idx) {
         char msg_buf1[200];
         char msg_buf2[200];
@@ -3352,6 +3356,38 @@ s_animation_header* __cdecl Load_Darkened_Officer_Picture_(int16_t player_num, i
     }
 
     return (s_animation_header*)farload::Far_Reload_Next_(PTR_s_OFFICER_LBX_00556990, (int)image_id, buffer);
+}
+
+void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int32_t officer_idx) {
+    _offscrn_ask_for_hire_popup = 1;
+    Print_Officer_Data_(-1, (int16_t)officer_idx, x + 0x5f, y + 5, x + 10, y + 2, 0x50, 0x5a, 0xc3, 0xe);
+    _offscrn_ask_for_hire_popup = 0;
+}
+
+void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts) {
+    for (int16_t i = 0; i < 4; ++i) {
+        int16_t officer_idx = MOX::_officer_id_list[i];
+        if (officer_idx > -1) {
+            int16_t player_idx = MOX::_leaders[officer_idx].player_index;
+            char type = MOX::_leaders[officer_idx].type;
+
+            if (type == 0) {
+                for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
+                    if ((MOX::_skill_data[skill_idx].skill_type == 0 && OFFICER::Officer_Has_General_Skill_(player_idx, officer_idx, skill_idx)) ||
+                        (MOX::_skill_data[skill_idx].skill_type == 1 && OFFICER::Officer_Has_Special_Skill_(player_idx, officer_idx, skill_idx))) {
+                        skill_counts[i]++;
+                    }
+                }
+            } else if (type == 1) {
+                for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
+                    if ((MOX::_skill_data[skill_idx].skill_type == 0 && OFFICER::Officer_Has_General_Skill_(player_idx, officer_idx, skill_idx)) ||
+                        (MOX::_skill_data[skill_idx].skill_type == 2 && OFFICER::Officer_Has_Special_Skill_(player_idx, officer_idx, skill_idx))) {
+                        skill_counts[i]++;
+                    }
+                }
+            }
+        }
+    }
 }
 
 }

@@ -201,6 +201,36 @@ namespace GEO {
         return disconnected_components == 1;
     }
 
+    /**
+     * Checks if a line segment between (x1, y1) and (x2, y2) is blocked by any black holes.
+     * A path is considered blocked if any black hole is within 45 coordinate units of the segment.
+     */
+    bool __cdecl Black_Hole_Blocks_Points_(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
+        int16_t black_holes[72];
+        bool is_blocked = false;
+
+        int16_t num_black_holes = Collect_Black_Holes_(black_holes);
+
+        if (x2 != x1 || y2 != y1) {
+            while (num_black_holes > 0) {
+                num_black_holes--;
+                if (Point_Within_D_Of_Seg_(
+                        MOX::_star[black_holes[num_black_holes]].x,
+                        MOX::_star[black_holes[num_black_holes]].y,
+                        45,
+                        (int16_t)x1,
+                        (int16_t)y1,
+                        (int16_t)x2,
+                        (int16_t)y2)) {
+                    is_blocked = true;
+                    break;
+                }
+            }
+        }
+
+        return is_blocked;
+    }
+
     int16_t __cdecl Collect_Black_Holes_(int16_t* black_hole_indices) {
         int16_t black_hole_count = 0;
 
@@ -517,6 +547,44 @@ namespace GEO {
         }
     }
 
+    int __cdecl Actual_Expected_Damage_(int min_damage, int max_damage, int min_chance, int base_chance, int reduction) {
+        int expected_total = 0;
+
+        if (reduction < max_damage) {
+            for (int i = 1; i <= 100; ++i) {
+                int chance;
+
+                if (i >= 96) {
+                    chance = 100;
+                } else {
+                    chance = base_chance + i;
+                    if (chance > 100) {
+                        chance = 100;
+                    }
+                }
+
+                if (min_chance <= chance) {
+                    int expected;
+
+                    if (chance == 100) {
+                        expected = max_damage;
+                    } else if (max_damage <= min_damage) {
+                        expected = min_damage;
+                    } else {
+                        expected = ((max_damage - min_damage + 1) * (chance - min_chance)) / (100 - min_chance) + min_damage;
+                    }
+
+                    int net_damage = expected - reduction;
+                    if (net_damage > 0) {
+                        expected_total += net_damage;
+                    }
+                }
+            }
+        }
+
+        return expected_total;
+    }
+
     int32_t __cdecl Points_On_Same_Side_Of_Line_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t lx1, int32_t ly1, int32_t lx2, int32_t ly2) {
         int32_t dx_line = lx2 - lx1;
         int32_t dy_line = ly2 - ly1;
@@ -535,5 +603,50 @@ namespace GEO {
         } else {
             return dy_line * dx2 - dx_line * dy2;
         }
+    }
+
+    bool __cdecl Union_Find_(int16_t node1, int16_t node2, bool do_union) {
+        int16_t root1 = node1;
+        int16_t parent1 = _dads[node1];
+        if (parent1 >= 0) {
+            do {
+                root1 = _dads[root1];
+            } while (_dads[root1] >= 0);
+        }
+
+        int16_t root2 = node2;
+        if (_dads[node2] >= 0) {
+            do {
+                root2 = _dads[root2];
+            } while (_dads[root2] >= 0);
+        }
+
+        if (parent1 >= 0) {
+            int16_t curr1 = node1;
+            do {
+                int16_t next1 = _dads[curr1];
+                _dads[curr1] = root1;
+                curr1 = next1;
+            } while (_dads[curr1] >= 0);
+        }
+
+        if (_dads[node2] >= 0) {
+            int16_t curr2 = node2;
+            do {
+                int16_t next2 = _dads[curr2];
+                _dads[curr2] = root2;
+                curr2 = next2;
+            } while (_dads[curr2] >= 0);
+        }
+
+        if (do_union && root2 != root1) {
+            if (random::Random_(2) == 1) {
+                _dads[root1] = root2;
+            } else {
+                _dads[root2] = root1;
+            }
+        }
+
+        return root2 == root1;
     }
 } // namespace GEO

@@ -696,7 +696,7 @@ namespace EVENTS {
         }
 
         int16_t derelict_count = 0;
-        int16_t derelict_apps[2] = { 0, 0 };
+        uint16_t derelict_apps[2] = { 0, 0 };
         s_wormhole_data wormhole_data;
 
         for (int16_t loop_idx = 0; loop_idx < 5; ++loop_idx) {
@@ -1061,7 +1061,7 @@ namespace EVENTS {
 
     // Suggested name: EVENTS::Get_Antaran_Victim
     int16_t __cdecl Get_Antaran_Victim_() {
-        int16_t weights[8];
+        uint16_t weights[8];
         int16_t candidates[8];
         int16_t count = 0;
 
@@ -1134,7 +1134,7 @@ namespace EVENTS {
             weights[i] = diff * diff;
         }
 
-        int16_t choice_idx = KEN::Get_Weighted_Choice_(weights, count);
+        int16_t choice_idx = (int16_t)KEN::Get_Weighted_Choice_(weights, count);
         return candidates[choice_idx];
     }
 
@@ -1814,8 +1814,7 @@ namespace EVENTS {
             }
         }
 
-        // TYPE MISMATCH: Get_Weighted_Choice_ expects int16_t* but weights is uint16_t*
-        int16_t selection_idx = KEN::Get_Weighted_Choice_(reinterpret_cast<int16_t*>(weights), num_candidates);
+        int16_t selection_idx = (int16_t)KEN::Get_Weighted_Choice_(weights, num_candidates);
         int16_t selected_player = candidates[selection_idx];
 
         // The "Lucky" trait (index 26) protects from bad events.

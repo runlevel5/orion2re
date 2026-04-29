@@ -3838,7 +3838,7 @@ namespace MAINSCR {
             break;
         }
         case 0x25: {
-            NETMOX::_net.field174_0x209 = *(uint8_t*)data;
+            NETMOX::_net.field168_0x209 = *(uint8_t*)data;
             NETMOX::_net.player_net_info[from_player_id].sync_state = 0x1E;
             break;
         }
@@ -3956,11 +3956,11 @@ namespace MAINSCR {
             break;
         }
         case 0x40: {
-            NETMOX::_net.field161_0x1fc = 1;
+            NETMOX::_net.field155_0x1fc = 1;
             break;
         }
         case 0x41: {
-            NETMOX::_net.field161_0x1fc = 2;
+            NETMOX::_net.field155_0x1fc = 2;
             break;
         }
         case 0x42: {

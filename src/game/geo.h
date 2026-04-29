@@ -14,11 +14,7 @@ namespace GEO {
     int16_t __cdecl Parsecs_Between_Stars_(int16_t star_idx1, int16_t star_idx2);
     int16_t __cdecl Parsecs_Between_Points_(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 
-    inline uint8_t __cdecl Black_Hole_Blocks_Points_(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
-        using Fn = uint8_t(__cdecl*)(int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00412840 });
-        return fn(x1, y1, x2, y2);
-    }
+    bool __cdecl Black_Hole_Blocks_Points_(int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 
     int16_t __cdecl Collect_Black_Holes_(int16_t* black_hole_indices);
 
@@ -38,15 +34,7 @@ namespace GEO {
 
     int32_t __cdecl Points_On_Same_Side_Of_Line_(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t lx1, int32_t ly1, int32_t lx2, int32_t ly2);
 
-    inline int32_t __cdecl Actual_Expected_Damage_(int32_t min_dmg, int32_t max_dmg, int32_t hit_chance, int32_t attack_def_diff, int32_t points_blocked) {
-        using Fn = int32_t(__cdecl*)(int32_t, int32_t, int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00413330});
-        return fn(min_dmg, max_dmg, hit_chance, attack_def_diff, points_blocked);
-    }
+    int __cdecl Actual_Expected_Damage_(int min_damage, int max_damage, int min_chance, int base_chance, int reduction);
 
-    inline void __cdecl Union_Find_(int16_t root1, int16_t root2, int32_t mode) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00412E20 });
-        fn(root1, root2, mode);
-    }
+    bool __cdecl Union_Find_(int16_t node1, int16_t node2, bool do_union);
 }

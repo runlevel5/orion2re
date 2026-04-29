@@ -642,8 +642,7 @@ namespace NETSTART {
         MULTPLAY::Draw_Generic_Net_Info_Screen_();
         RUSS::Mox_Sync_Update_();
 
-        void (*receive_msg_fn)(void*) = reinterpret_cast<void (*)(void*)>(NETMOX::Receive_Message_);
-        if (netcode::Do_Net_Init_(NETMOX::_net.mode, GUID_0054F150, receive_msg_fn, &NETMOX::_net) == 0) {
+        if (netcode::Do_Net_Init_(NETMOX::_net.mode, GUID_0054F150, NETMOX::Receive_Message_, &NETMOX::_net) == 0) {
             GENDRAW::Message_Box_(NETSTRAT::_comm_failure_string);
             MOX::_current_screen = 15;
             NETMOX::_net.sync_state = 0;
@@ -674,8 +673,7 @@ namespace NETSTART {
         fields::Clear_Fields_();
         fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551100, 0);
 
-        auto score_nullsub_fn = reinterpret_cast<void(__cdecl*)()>(std::uintptr_t{0x004d7840});
-        fields::Assign_Auto_Function_(score_nullsub_fn, 2);
+        fields::Assign_Auto_Function_(SCORE::nullsub, 2);
 
         NETMOX::_net.is_network_active = 1;
         NETMOX::_net.net_host_id = netcode::Net_Host_ID_();
@@ -772,7 +770,7 @@ namespace NETSTART {
             netcode::Net_Disable_New_Players_();
         }
 
-        fields::Assign_Auto_Function_(score_nullsub_fn, 2);
+        fields::Assign_Auto_Function_(SCORE::nullsub, 2);
 
         if (NETMOX::_net.mode == 3) {
             ten::Ten_Stop(1);
@@ -813,8 +811,7 @@ namespace NETSTART {
         video::Set_Page_Off_();
         MULTPLAY::Draw_SendGet_Net_Info_Screen_();
 
-        auto draw_sendget_fn = reinterpret_cast<void(__cdecl*)()>(std::uintptr_t{0x00503390});
-        fields::Assign_Auto_Function_(draw_sendget_fn, 2);
+        fields::Assign_Auto_Function_(MULTPLAY::Draw_SendGet_Net_Info_Screen_, 2);
         RUSS::Mox_Sync_Update_();
 
         if (MOX::_NUM_PLAYERS > 0) {

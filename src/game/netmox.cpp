@@ -892,7 +892,7 @@ namespace NETMOX {
             if (NETMOX::_net.player_race_deselected_flags[current_player_idx]) {
                 message_sent = true;
                 NETMOX::_net.player_race_deselected_flags[current_player_idx] = 0;
-                uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field152_0x1f3);
+                uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field146_0x1f3);
                 player_race_selection_sync_flags[current_player_idx] = 1;
                 int8_t race = MOX::_player[current_player_idx].race;
                 NETMOX::Mox_Send_Message_(0x7FFE, 0x3D, &race, 1);
@@ -900,7 +900,7 @@ namespace NETMOX {
         }
 
         if (!message_sent) {
-            uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field152_0x1f3);
+            uint8_t* player_race_selection_sync_flags = reinterpret_cast<uint8_t*>(&NETMOX::_net.field146_0x1f3);
             if (player_race_selection_sync_flags[current_player_idx]) {
                 message_sent = true;
                 player_race_selection_sync_flags[current_player_idx] = 0;

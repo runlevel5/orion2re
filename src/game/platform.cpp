@@ -794,6 +794,170 @@ namespace platform {
 #endif
     }
 
+    LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+        switch (uMsg) {
+        case WM_ACTIVATEAPP:
+            g_window_focus_state = (int32_t)wParam;
+            break;
+
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+
+        case WM_KEYDOWN: {
+            uint16_t key_char = 0;
+            uint8_t keyboardState[256];
+            uint8_t scan_code;
+
+            if (GetKeyboardState(keyboardState)) {
+                scan_code = (lParam >> 16) & 0xFF;
+                ToAscii((UINT)wParam, scan_code, keyboardState, &key_char, 0);
+            }
+            else {
+                scan_code = keyboardState[0];
+            }
+
+            if (key_char == 0) {
+                uint32_t iVar7 = 0;
+                switch (wParam) {
+                case 0x08: iVar7 = 0x0E08; break;
+                case 0x09: iVar7 = 0x0F09; break;
+                case 0x0D: iVar7 = 0x1C0D; break;
+                case 0x21: iVar7 = 0x49E0; break;
+                case 0x22: iVar7 = 0x51E0; break;
+                case 0x23: iVar7 = 0x4FE0; break;
+                case 0x24: iVar7 = 0x47E0; break;
+                case 0x25: iVar7 = 0x4BE0; break;
+                case 0x26: iVar7 = 0x48E0; break;
+                case 0x27: iVar7 = 0x4DE0; break;
+                case 0x28: iVar7 = 0x50E0; break;
+                case 0x2D: iVar7 = 0x52E0; break;
+                case 0x2E: iVar7 = 0x10000; break;
+                case 0x6B: iVar7 = 0x0D2B; break;
+                case 0x6D: iVar7 = 0x0C2D; break;
+                case 0x70: iVar7 = 0x3B00; break;
+                case 0x71: iVar7 = 0x3C00; break;
+                case 0x72: iVar7 = 0x3D00; break;
+                case 0x73: iVar7 = 0x3E00; break;
+                case 0x74: iVar7 = 0x3F00; break;
+                case 0x75: iVar7 = 0x4000; break;
+                case 0x76: iVar7 = 0x4100; break;
+                case 0x77: iVar7 = 0x4200; break;
+                case 0x78: iVar7 = 0x4300; break;
+                case 0x79: iVar7 = 0x4400; break;
+                case 0x7A: iVar7 = 0xFFFF8500; break;
+                case 0x7B: iVar7 = 0xFFFF8600; break;
+                }
+                if (iVar7 != 0) {
+                    key::_key_pressed = true;
+                    key::_last_key_pressed[key::_key_write] = (int32_t)iVar7;
+                    key::_key_write = (key::_key_write + 1) % 10;
+                    g_last_scan_code = (lParam & 0xFF0000) >> 16;
+                }
+            }
+            else {
+                key::_key_pressed = true;
+                key_char += (scan_code << 8);
+                key::_last_key_pressed[key::_key_write] = (int32_t)key_char;
+                key::_key_write = (key::_key_write + 1) % 10;
+                g_last_scan_code = (lParam & 0xFF0000) >> 16;
+            }
+            break;
+        }
+
+        case WM_SETCURSOR:
+            SetCursor(nullptr);
+            return 1;
+
+        case WM_SYSCOMMAND:
+            if (wParam == 0xF100) return 0;
+            break;
+
+        case WM_SYSKEYDOWN: {
+            if ((wParam >= 0x41 && wParam <= 0x5A) || (wParam >= 0x70 && wParam <= 0x79)) {
+                uint16_t alt_code = 0;
+                switch (wParam) {
+                case 0x41: alt_code = 0x1E00; break;
+                case 0x42: alt_code = 0x3000; break;
+                case 0x43: alt_code = 0x2E00; break;
+                case 0x44: alt_code = 0x2000; break;
+                case 0x45: alt_code = 0x1200; break;
+                case 0x46: alt_code = 0x2100; break;
+                case 0x47: alt_code = 0x2200; break;
+                case 0x48: alt_code = 0x2300; break;
+                case 0x49: alt_code = 0x1700; break;
+                case 0x4A: alt_code = 0x2400; break;
+                case 0x4B: alt_code = 0x2500; break;
+                case 0x4C: alt_code = 0x2600; break;
+                case 0x4D: alt_code = 0x3200; break;
+                case 0x4E: alt_code = 0x3100; break;
+                case 0x4F: alt_code = 0x1800; break;
+                case 0x50: alt_code = 0x1900; break;
+                case 0x51: alt_code = 0x1000; break;
+                case 0x52: alt_code = 0x1300; break;
+                case 0x53: alt_code = 0x1F00; break;
+                case 0x54: alt_code = 0x1400; break;
+                case 0x55: alt_code = 0x1600; break;
+                case 0x56: alt_code = 0x2F00; break;
+                case 0x57: alt_code = 0x1100; break;
+                case 0x58: alt_code = 0x2D00; break;
+                case 0x59: alt_code = 0x1500; break;
+                case 0x5A: alt_code = 0x2C00; break;
+                case 0x70: alt_code = 0x6800; break;
+                case 0x71: alt_code = 0x6900; break;
+                case 0x72: alt_code = 0x6A00; break;
+                case 0x73: alt_code = 0x6B00; break;
+                case 0x74: alt_code = 0x6C00; break;
+                case 0x75: alt_code = 0x6D00; break;
+                case 0x76: alt_code = 0x6E00; break;
+                case 0x77: alt_code = 0x6F00; break;
+                case 0x78: alt_code = 0x7000; break;
+                case 0x79: alt_code = 0x7100; break;
+                }
+                key::_key_pressed = true;
+                key::_last_key_pressed[key::_key_write] = alt_code;
+                key::_key_write = (key::_key_write + 1) % 10;
+            }
+            if (wParam == VK_MENU) return 0;
+            break;
+        }
+
+        case WM_MOUSEMOVE:
+            mouse::User_Mouse_Handler_((int16_t)(lParam & 0xFFFF), (int16_t)((lParam >> 16) & 0xFFFF), (uint16_t)mouse::_mouse_buttons);
+            return 1;
+
+        case WM_MENUSELECT:
+            return 0;
+
+        case 0x401: // WM_USER + 1
+            video::Toggle_Pages_();
+            if (_updating_cursor_img == 1) {
+                Update_Cursor_Image_();
+                _updating_cursor_img = 0;
+            }
+            return 1;
+
+        case 0x402: // WM_USER + 2
+            _updating_cursor_img = 1;
+            return 1;
+
+        case WM_LBUTTONDOWN:
+            mouse::User_Mouse_Handler_((int16_t)(lParam & 0xFFFF), (int16_t)((lParam >> 16) & 0xFFFF), 1);
+            return 1;
+
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+            mouse::User_Mouse_Handler_((int16_t)(lParam & 0xFFFF), (int16_t)((lParam >> 16) & 0xFFFF), 0);
+            return 1;
+
+        case WM_RBUTTONDOWN:
+            mouse::User_Mouse_Handler_((int16_t)(lParam & 0xFFFF), (int16_t)((lParam >> 16) & 0xFFFF), 2);
+            return 1;
+        }
+
+        return DefWindowProcA(hwnd, uMsg, wParam, lParam);
+    }
+
     void __cdecl Toggle_Pages_Stub_() {
         g_pending_toggle_pages = true;
 
@@ -818,7 +982,7 @@ namespace platform {
         window_class.hInstance = hInstance;
         window_class.style = CS_HREDRAW | CS_VREDRAW; // 3
         // Suggested name: main_window_proc
-        window_class.lpfnWndProc = reinterpret_cast<WNDPROC>(std::uintptr_t{ 0x00536710 });
+        window_class.lpfnWndProc = &WndProc;
         window_class.hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(101)); // 0x65
         window_class.hCursor = LoadCursorA(NULL, IDC_ARROW);              // 0x7F00
         window_class.hbrBackground = nullptr;
@@ -864,9 +1028,7 @@ namespace platform {
         Create_Direct_Draw(4);
 
         bool has_lost_focus = false;
-        // Suggested name: worker_thread_proc
-        auto start_addr = reinterpret_cast<void(__cdecl*)(void*)>(std::uintptr_t{ 0x004C1B20 });
-        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(start_addr, 0xFFFF, nullptr));
+        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(MOX2::main2_, 0xFFFF, nullptr));
 
         do {
             if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {

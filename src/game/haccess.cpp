@@ -795,4 +795,8 @@ namespace HACCESS {
         // which corresponds to indexing the array of s_ship_node structures.
         return MOX::_ship_node[ship_node_idx].ship_idx;
     }
+
+    void __cdecl Clear_Fleet_Box_Selected_Ship_Status_() {
+        memset(MOX::_fleet_icon_selection_status, 0, 63);
+    }
 }

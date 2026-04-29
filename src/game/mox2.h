@@ -43,7 +43,7 @@ namespace MOX2 {
     inline const char* s_Loading_Spanish = reinterpret_cast<const char*>(0x00557808);
     inline const char* s_Loading_Italian = reinterpret_cast<const char*>(0x005577D0);
 
-    void main2_();
+    void main2_(void *);
 
     // Suggested name: MOX2::worker_thread_main
     inline void __cdecl thunk_main2_(void* arg) {

@@ -1677,6 +1677,17 @@ struct s_fleet_movement_icon {
     short ship_node_idx;
 };
 
+typedef struct s_flic_queue_entry s_flic_queue_entry, *Ps_flic_queue_entry;
+
+struct s_flic_queue_entry {
+    int16_t x;
+    int16_t y;
+    int16_t current_frame;
+    struct s_animation_header *animation;
+    uint8_t play_mode;
+    uint8_t use_clipping;
+};
+
 typedef struct s_fmtpara_break s_fmtpara_break, *Ps_fmtpara_break;
 
 struct s_fmtpara_break {
@@ -3282,7 +3293,7 @@ struct s_net_player_info {
     int16_t sync_star_id;
     int16_t sync_planet_id;
     int16_t sync_colony_id;
-    undefined field5_0x8;
+    undefined combat_type;
     undefined sync_phase_ready_flag;
     int8_t combat_status;
     int8_t remote_player_id;
@@ -3314,7 +3325,7 @@ struct s_network {
     short local_net_id;
     int8_t host_active_player_id;
     int8_t host_sync_counter;
-    undefined field23_0xc6;
+    int8_t field23_0xc6;
     struct s_net_player_info player_net_info[8];
     undefined field25_0x127;
     undefined field26_0x128;
@@ -3425,14 +3436,8 @@ struct s_network {
     uint8_t players_ready_mask[8];
     undefined field132_0x1ad;
     int8_t player_is_active_flags[8];
-    undefined field134_0x1b6;
-    undefined field135_0x1b7;
-    undefined field136_0x1b8;
-    undefined field137_0x1b9;
-    undefined field138_0x1ba;
-    undefined field139_0x1bb;
-    undefined field140_0x1bc;
-    undefined field141_0x1bd;
+    int field134_0x1b6;
+    int field135_0x1ba;
     char cur_game_name[9];
     int8_t player_color_selected_flags[8];
     undefined field165_0x1cf;
@@ -3443,29 +3448,29 @@ struct s_network {
     int field_1df;
     uint8_t player_race_selected_alt_flags[8];
     uint8_t player_race_deselected_flags[8];
-    undefined field152_0x1f3;
-    undefined field153_0x1f4;
-    undefined field154_0x1f5;
-    undefined field155_0x1f6;
-    undefined field156_0x1f7;
-    undefined field157_0x1f8;
-    undefined field158_0x1f9;
-    undefined field159_0x1fa;
+    undefined field146_0x1f3;
+    undefined field147_0x1f4;
+    undefined field148_0x1f5;
+    undefined field149_0x1f6;
+    undefined field150_0x1f7;
+    undefined field151_0x1f8;
+    undefined field152_0x1f9;
+    undefined field153_0x1fa;
     uint8_t race_selection_changed;
-    undefined field161_0x1fc;
+    undefined field155_0x1fc;
     uint8_t network_sync_complete_flag;
     undefined field198_0x1fe;
     int8_t connection_timeout_flag;
     int8_t connection_state;
-    undefined field166_0x201;
-    undefined field167_0x202;
+    undefined field160_0x201;
+    undefined field161_0x202;
     int8_t diplomacy_partner_id;
     int8_t diplomacy_handshake_state;
-    undefined field170_0x205;
-    undefined field171_0x206;
+    undefined field164_0x205;
+    undefined field165_0x206;
     int8_t diplomacy_initiator_id;
     int8_t diplomacy_active_flag;
-    undefined field174_0x209;
+    undefined field168_0x209;
 };
 
 typedef struct s_npcdiplo_tech s_npcdiplo_tech, *Ps_npcdiplo_tech;

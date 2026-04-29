@@ -142,18 +142,10 @@ namespace COLONY {
     inline int32_t& _sys_disp_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FD4});
     inline int32_t& _sys_disp_scanned_star_handle = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595FEC});
 
-    inline void __cdecl Load_Colony_Anims_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dcd60});
-        fn();
-    }
+    void __cdecl Load_Colony_Anims_();
     void __cdecl Load_Colony_Screen_Seg_();
     void __cdecl Load_Planet_Screen_();
-    inline s_animation_header* __cdecl Cache_Load_Planet_(int16_t bg_index) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E1BE0});
-        return fn(bg_index);
-    }
+    s_animation_header* __cdecl Cache_Load_Planet_(int16_t planet_id);
     s_animation_header* __cdecl C_Anims_(int16_t anim_id);
 
     s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1);
@@ -201,19 +193,13 @@ namespace COLONY {
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
 
-    inline s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_id, int16_t unit_idx, int16_t race) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC720});
-        return fn(player_id, unit_idx, race);
-    }
+    s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_idx, int16_t anim_type, int16_t frame);
 
-    inline char* __cdecl Player_Troop_Name_(int16_t player_id, int16_t unit_idx, int16_t race) {
-        using Fn = char*(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004DC650});
-        return fn(player_id, unit_idx, race);
-    }
+    char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race);
 
     void __cdecl Remap_Draw_Ship_Seg_N_Centered_(int16_t param_1, int16_t param_2, int16_t param_3);
+
+    void __cdecl Do_Load_Colony_Anims_();
 
     s_animation_header* __cdecl Spy_Anim_(int16_t race_index);
 
@@ -419,6 +405,8 @@ namespace COLONY {
     inline s_colors& _bright_blue_font_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F88});
     inline s_colors& _font_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F90});
+    inline s_colors& _font_dim_color_array =
+        *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559F98});
     inline s_colors& _font_bright_color_array = *reinterpret_cast<s_colors*>(std::uintptr_t{0x00559FA0});
     inline s_colors (&_red_font_color_array)[2] =
         *reinterpret_cast<s_colors(*)[2]>(std::uintptr_t{0x00559FA8});
@@ -427,11 +415,7 @@ namespace COLONY {
 
     void __cdecl Set_Colony_Font_();
 
-    inline void __cdecl Set_Colony_Font_To_Reg_Blue_(int param1, int param2) {
-        using Fn = void(__cdecl*)(int, int);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbe80});
-        fn(param1, param2);
-    }
+    void __cdecl Set_Colony_Font_To_Reg_Blue_(uint8_t font_idx, uint8_t state);
 
     inline int16_t& _galaxy_map_name_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E5C});
@@ -460,11 +444,7 @@ namespace COLONY {
 
     void __cdecl Reset_Step_Squish_();
 
-    inline int16_t __cdecl N_Bldgs_(int16_t colony_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004db760});
-        return fn(colony_idx);
-    }
+    int16_t __cdecl N_Bldgs_(int16_t colony_idx);
 
     void __cdecl Draw_Pop_Dark_(int16_t x, int16_t y, int16_t colony_idx, int16_t pop_idx);
 

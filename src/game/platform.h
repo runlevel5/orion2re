@@ -12,6 +12,7 @@ namespace platform {
 	inline MSG& g_main_msg = *reinterpret_cast<MSG*>(std::uintptr_t{ 0x00579300 });
 	inline HANDLE& g_worker_thread_handle = *reinterpret_cast<HANDLE*>(std::uintptr_t{ 0x0055B1BC });
 	inline int32_t& g_window_focus_state = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00579328 });
+	inline uint32_t& _updating_cursor_img = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055C08C });
 	inline uint8_t& g_should_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055B1A4 });
 
 	// Fixed string literal "/ten" used for pattern matching.
@@ -117,6 +118,7 @@ namespace platform {
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void Create_Cursor_Surfaces();
 	HRESULT Restore_Surfaces();
+	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	inline void __cdecl Lock_Offscreen_Surface_() {
 		using Fn = void(__cdecl*)();

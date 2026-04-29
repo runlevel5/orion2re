@@ -63,7 +63,21 @@ namespace SYS {
 
     void __cdecl Draw_Planet_With_Pierced_Ring_(int16_t planet_idx, int16_t sys_disp_idx, int16_t x_offset_1, int16_t y_offset_1, int16_t x_offset_2, int16_t y_offset_2, int16_t y_offset_3, int16_t x_offset_3);
 
-    void __cdecl Remap_Draw_With_Mask_(int16_t x, int16_t y, s_animation_header* picture, s_animation_header* mask);
+    void __cdecl Remap_Draw_With_Mask_(int16_t x, int16_t y, s_animation_header* anim_hdr, s_animation_header* mask_hdr);
+
+    inline s_animation_header*& _mask_header = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A57D8});
+
+    inline void __cdecl Remap_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, uint8_t* anim_frame, uint8_t* mask_frame) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497A40});
+        fn(x, y, anim_frame, mask_frame);
+    }
+
+    inline void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, uint8_t* anim_frame, uint8_t* mask_frame) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*, uint8_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497B80});
+        fn(x, y, anim_frame, mask_frame);
+    }
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner);
 

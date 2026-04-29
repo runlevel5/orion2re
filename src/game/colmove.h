@@ -24,8 +24,5 @@ namespace COLMOVE {
         reinterpret_cast<Fn>(std::uintptr_t{0x0049f590})(colony_idx, pop_idx, dest);
     }
 
-    inline uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t job_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t, int16_t, int16_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0049ff00})(colony_idx, pop_idx, job_idx);
-    }
+    uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t new_job);
 }

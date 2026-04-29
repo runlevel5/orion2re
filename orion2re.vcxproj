@@ -35,6 +35,7 @@
     <ClCompile Include="src\game\angle.cpp" />
     <ClCompile Include="src\game\animate.cpp" />
     <ClCompile Include="src\game\antarans.cpp" />
+    <ClCompile Include="src\game\antaroom.cpp" />
     <ClCompile Include="src\game\arith1e.cpp" />
     <ClCompile Include="src\game\beams.cpp" />
     <ClCompile Include="src\game\bill.cpp" />
@@ -100,6 +101,7 @@
     <ClCompile Include="src\game\filedef.cpp" />
     <ClCompile Include="src\game\file_ani.cpp" />
     <ClCompile Include="src\game\firepts.cpp" />
+    <ClCompile Include="src\game\flcqueue.cpp" />
     <ClCompile Include="src\game\fleetpop.cpp" />
     <ClCompile Include="src\game\flt.cpp" />
     <ClCompile Include="src\game\flt1.cpp" />

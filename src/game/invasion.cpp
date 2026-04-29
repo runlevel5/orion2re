@@ -896,4 +896,23 @@ bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n
     return side1.unit_counts[1] != 0;
 }
 
+void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_side_info* side_info) {
+    memset(side_info, 0, sizeof(s_invasion_side_info));
+
+    side_info->opponent_player_id = -1;
+    side_info->player_id = colony->owner;
+    side_info->ship_list = nullptr;
+    side_info->n_ships = 0;
+
+    side_info->colony_id = static_cast<int16_t>(colony - MOX::_colony);
+
+    side_info->unit_counts[0] = colony->military[1];
+    side_info->unit_counts[1] = colony->military[0];
+    side_info->unit_counts[2] = static_cast<int16_t>(Colony_N_Militia_(colony));
+
+    Compute_Colony_Officer_Bonus_(colony, &side_info->combat_modifiers);
+    Compute_Player_Ground_Combat_Bonuses_(colony->owner, &side_info->combat_modifiers, 1);
+    Compute_Ground_Combat_Info_(side_info, &side_info->combat_modifiers, nullptr);
+}
+
 }

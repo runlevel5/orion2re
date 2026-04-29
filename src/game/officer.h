@@ -280,11 +280,7 @@ namespace OFFICER {
         fn(input, officer_idx);
     }
 
-    inline void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int32_t x, int32_t y, int32_t officer_idx) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442290});
-        fn(x, y, officer_idx);
-    }
+    void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int32_t officer_idx);
 
     inline void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(int32_t x, int32_t y, uint16_t officer) {
         using Fn = void(__cdecl*)(int32_t, int32_t, uint16_t);
@@ -292,15 +288,7 @@ namespace OFFICER {
         fn(x, y, officer);
     }
 
-    inline void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skills) {
-        using Fn = void(__cdecl*)(int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00443ec0});
-        fn(skills);
-    }
+    void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts);
 
-    inline void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx) {
-        using Fn = void(__cdecl*)(char*, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004426d0});
-        fn(buffer, player_id, officer_idx);
-    }
+    void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx);
 }

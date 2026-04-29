@@ -221,7 +221,7 @@ namespace MOX2 {
         MOX::_settings_language = 0;
     }
 
-    void main2_() {
+    void main2_(void *) {
         char font_file[16];
         char loading_buffer[64];
         char mox_set_dir[32];

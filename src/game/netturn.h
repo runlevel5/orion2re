@@ -25,9 +25,5 @@ namespace NETTURN {
 
     int8_t __cdecl Must_Broadcast_AI_Player_Data_();
 
-    inline void __cdecl Net_Init_Host_Election_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047DD40});
-        fn();
-    }
+    void __cdecl Net_Init_Host_Election_();
 }

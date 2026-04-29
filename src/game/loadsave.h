@@ -87,10 +87,7 @@ namespace LOADSAVE {
 
     void __cdecl Auto_Save_Last_Saved_Game_(int16_t* flag);
 
-    inline void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag) {
-        using Fn = void(__cdecl*)(int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x00512320})(flag);
-    }
+    void __cdecl Auto_Load_Last_Saved_Game_(int16_t* flag);
 
     inline const char* s__ALT_F1__0055ad24 = reinterpret_cast<const char*>(0x0055AD24); // "(ALT F1)"
     inline const char* s__ALT_F2__0055ad18 = reinterpret_cast<const char*>(0x0055AD18); // "(ALT F2)"

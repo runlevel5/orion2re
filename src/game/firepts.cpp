@@ -36,4 +36,32 @@ namespace FIREPTS {
 
         return result;
     }
+
+    void __cdecl Calc_FP_Offsets_(int16_t* fp_x, int16_t* fp_y, int16_t weapon_id, int16_t shot_count, int16_t attacker_owner, int16_t attacker_ship_id, int16_t attacker_picture_num, int16_t attacker_facing_dir, int16_t target_bearing, int32_t fp_idx) {
+        int16_t n_points = N_Fire_Points_(weapon_id, shot_count);
+
+        if ((n_points % 2) == 1 && (n_points - static_cast<int16_t>(fp_idx)) == 1) {
+            *fp_x = 0;
+            *fp_y = 0;
+            return;
+        }
+
+        int16_t color_idx = 0;
+        if (attacker_owner < 8) {
+            color_idx = MOX::_player[attacker_owner].color;
+        }
+
+        int point_idx = ((static_cast<int>(fp_idx) + static_cast<int>(target_bearing)) % 4) + (attacker_picture_num * 4);
+        int16_t* fp_data = reinterpret_cast<int16_t*>(_fp_data_ptr[color_idx]);
+
+        int32_t local_x = fp_data[point_idx * 2] - 0x1A;
+        int32_t local_y = fp_data[point_idx * 2 + 1] - 0x18;
+
+        int rotation_angle = (static_cast<int>(attacker_facing_dir) * -360) / 16;
+
+        angle::Rotate_Coordinates_(rotation_angle, &local_x, &local_y);
+
+        *fp_x = static_cast<int16_t>(local_x);
+        *fp_y = static_cast<int16_t>(local_y);
+    }
 }

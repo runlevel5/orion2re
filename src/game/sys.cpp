@@ -322,10 +322,110 @@ namespace SYS {
         animate::Draw_(x - width, y, anim);
     }
 
-    void __cdecl Remap_Draw_With_Mask_(int16_t x, int16_t y, s_animation_header* picture, s_animation_header* mask) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, s_animation_header*, s_animation_header*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497710 });
-        fn(x, y, picture, mask);
+    void __cdecl Remap_Draw_With_Mask_(int16_t x, int16_t y, s_animation_header* anim_hdr, s_animation_header* mask_hdr) {
+        bool is_clipped = false;
+        int16_t x2;
+        int16_t y2;
+
+        if (animate::_clipping_flag == 1) {
+            if (video::_screen_window_x2 < x) return;
+            if (video::_screen_window_y2 < y) return;
+
+            x2 = anim_hdr->width + x - 1;
+            if (x2 < video::_screen_window_x1) return;
+
+            y2 = anim_hdr->height + y - 1;
+            if (y2 < video::_screen_window_y1) return;
+
+            if (x < video::_screen_window_x1 ||
+                y < video::_screen_window_y1 ||
+                x2 > video::_screen_window_x2 ||
+                y2 > video::_screen_window_y2) {
+                is_clipped = true;
+            }
+        }
+
+        animate::_animation_header = anim_hdr;
+        SYS::_mask_header = mask_hdr;
+
+        uint8_t* anim_frame = reinterpret_cast<uint8_t*>(anim_hdr) + anim_hdr->frame_offsets[anim_hdr->current_frame];
+        uint8_t* mask_frame = reinterpret_cast<uint8_t*>(mask_hdr) + mask_hdr->frame_offsets[mask_hdr->current_frame];
+
+        if (!is_clipped) {
+            if (video::screen_refresh_flag >= 2) {
+                setvesa::Add_Square_To_Scan_List_(x, y, anim_hdr->width + x - 1, anim_hdr->height + y - 1);
+                setvesa::Add_Square_To_Scan_List_(x + 100, y + 100, anim_hdr->width + x + 99, anim_hdr->height + y + 99);
+            }
+
+            switch (static_cast<uint8_t>(anim_hdr->flags) & 3) {
+            case 0:
+                SYS::Remap_Draw_Animated_Sprite_Mask_(x, y, anim_frame, mask_frame);
+                break;
+            case 1:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                break;
+            case 2:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                break;
+            case 3:
+                exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                break;
+            }
+        } else {
+            if (animate::_dot_stencil_flag == 0) {
+                if (video::screen_refresh_flag >= 2) {
+                    setvesa::Add_Square_To_Scan_List_(x, y, x2, y2);
+                }
+
+                switch (static_cast<uint8_t>(anim_hdr->flags) & 3) {
+                case 0:
+                    SYS::Remap_Clipped_Draw_Animated_Sprite_Mask_(x, y, anim_frame, mask_frame);
+                    return; // Avoids frame advance for clipped animations
+                case 1:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
+                    break;
+                case 2:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_screen_00557fa4);
+                    break;
+                case 3:
+                    exitm::Exit_With_Message(s_Remap_draw_not_support_map_00557f88);
+                    break;
+                }
+            }
+        }
+
+        SYS::_mask_header->current_frame++;
+        animate::_animation_header->current_frame++;
+
+        if (static_cast<uint8_t>(animate::_animation_header->flags) & 0x20) {
+            int16_t loop_frame = static_cast<int8_t>(animate::_animation_header->loop_frame);
+            if (animate::_animation_header->current_frame > loop_frame) {
+                if (loop_frame - animate::_animation_header->current_frame == -1) {
+                    animate::_animation_header->current_frame = 0;
+                } else if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                    animate::_animation_header->current_frame = animate::_animation_header->frame_count - 1;
+                }
+            }
+        } else {
+            if (animate::_animation_header->current_frame >= animate::_animation_header->frame_count) {
+                animate::_animation_header->current_frame = static_cast<int8_t>(animate::_animation_header->loop_frame);
+            }
+        }
+
+        if (static_cast<uint8_t>(SYS::_mask_header->flags) & 0x20) {
+            int16_t loop_frame = static_cast<int8_t>(SYS::_mask_header->loop_frame);
+            if (SYS::_mask_header->current_frame > loop_frame) {
+                if (loop_frame - SYS::_mask_header->current_frame == -1) {
+                    SYS::_mask_header->current_frame = 0;
+                } else if (SYS::_mask_header->current_frame >= SYS::_mask_header->frame_count) {
+                    SYS::_mask_header->current_frame = SYS::_mask_header->frame_count - 1;
+                }
+            }
+        } else {
+            if (SYS::_mask_header->current_frame >= SYS::_mask_header->frame_count) {
+                SYS::_mask_header->current_frame = static_cast<int8_t>(SYS::_mask_header->loop_frame);
+            }
+        }
     }
 
     void __cdecl Draw_Planet_With_Pierced_Ring_(

@@ -1763,4 +1763,28 @@ namespace LOADSAVE {
         MOX::_settings.sound_fx_on = 0;
         popup->sound_fx_on = 0;
     }
+
+    void __cdecl Auto_Load_Last_Saved_Game_(int16_t* out_flag) {
+        int32_t save_descriptions_buffer[10];
+        char text_buffer[200];
+
+        FILEDEF::Get_Saved_Game_Descriptions_(save_descriptions_buffer);
+
+        int32_t slot = MOX::_settings.active_save_slot;
+        const char* format_str = HAROLD::H_Message_(0xcc);
+
+        _sprintf(text_buffer, format_str, slot, MOX::_save_game_description[slot].description);
+
+        int16_t box_res = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, text_buffer, 1);
+
+        if (box_res != 0) {
+            FILEDEF::Save_Game_(static_cast<int16_t>(MOX::_settings.active_save_slot));
+            MOX::_return_screen = MOX::_current_screen;
+            MAINSCR2::_force_main_screen_fade = 1;
+            *out_flag = 1;
+        } else {
+            MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+            *out_flag = 0;
+        }
+    }
 }

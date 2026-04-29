@@ -49,4 +49,6 @@ namespace invasion {
     void __cdecl Resolve_Invasion_Troops_(s_invasion_side_info info);
 
     bool __cdecl Has_Defending_Troops_(int8_t attacker_id, int16_t* ship_list, int n_ships, int16_t colony_idx);
+
+    void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_side_info* side_info);
 }

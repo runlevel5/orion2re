@@ -87,6 +87,7 @@ inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
 inline int16_t& g_cached_mouse_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578AB8});
 inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00578ABC});
 inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
+inline uint32_t& g_last_scan_code = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00589A1C });
 
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
@@ -785,12 +786,6 @@ inline char* const s_Moo_IIAlreadyRunning = reinterpret_cast<char*>(std::uintptr
 inline char* const s_Microprose = reinterpret_cast<char*>(std::uintptr_t{ 0x0055B1E8 });        // "Microprose"
 inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::uintptr_t{0x005578E0});
 
-inline LRESULT CALLBACK Main_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    using Fn = LRESULT(CALLBACK*)(HWND, UINT, WPARAM, LPARAM);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00536710 });
-    return fn(hwnd, uMsg, wParam, lParam);
-}
-
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
 
@@ -823,12 +818,6 @@ inline const char* s_warning_lbx_00557650 = reinterpret_cast<const char*>(std::u
 
 inline char* s_You_exceeded_the_max_number_of_f_0055b080 =
     reinterpret_cast<char*>(std::uintptr_t{ 0x0055B080 });
-
-inline void __cdecl Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, uint8_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528CC0});
-    fn(x1, y1, x2, y2, color);
-}
 
 inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
     using Fn = void(__cdecl*)(int16_t, int16_t, const char*);

@@ -34,6 +34,10 @@ namespace COLONY {
         ));
     }
 
+    s_animation_header* __cdecl Cache_Load_Planet_(int16_t planet_id) {
+        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_PLANETS_LBX, planet_id, MOX::_global_cache_seg));
+    }
+
     s_animation_header* __cdecl Buffer_Reload_Colony_(int16_t index) {
         return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
             _COLONY_LBX,
@@ -2117,5 +2121,86 @@ namespace COLONY {
         int coord_max = COLONY::_building_cr[index + 16];
 
         return (coord_min + coord_max) / 2;
+    }
+
+    int16_t __cdecl N_Bldgs_(int16_t colony_idx) {
+        int16_t count = 0;
+
+        for (int16_t i = 1; i < 49; ++i) {
+            if (MOX::_colony[colony_idx].buildings[i] != 0) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race) {
+        switch (troop_type) {
+            case 0:
+                if (MOX::_player[player_idx].tech_applications[0x18] != 3) {
+                    return ESTRINGS::E_Strings_(0x1F8);
+                }
+                return ESTRINGS::E_Strings_(0xC3);
+            case 1:
+                if (MOX::_player[player_idx].tech_applications[0x90] != 3) {
+                    return ESTRINGS::E_Strings_(0x14D);
+                }
+                return ESTRINGS::E_Strings_(0x1AC);
+            case 2:
+                return ESTRINGS::E_Strings_(0x174);
+            case 3:
+                return ESTRINGS::E_Strings_(0x1BC);
+            default:
+                return nullptr;
+        }
+    }
+
+    s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_idx, int16_t anim_type, int16_t frame) {
+        switch (anim_type) {
+            case 0:
+                if (MOX::_player[player_idx].tech_applications[0x18] != 3) {
+                    return Military_Anims_(3, frame);
+                }
+                return Military_Anims_(4, frame);
+            case 1:
+                if (MOX::_player[player_idx].tech_applications[0x90] != 3) {
+                    return Military_Anims_(1, frame);
+                }
+                return Military_Anims_(2, frame);
+            case 2:
+                return Military_Anims_(0, frame);
+            case 3:
+                return Military_Anims_(1, frame);
+            default:
+                return nullptr;
+        }
+    }
+
+    /**
+     * @address 004dc290
+     */
+    void __cdecl Do_Load_Colony_Anims_() {
+        _swap_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_global_screen_seg, 0x3A4);
+        _mouse_bitm = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_global_screen_seg, 0x3A4);
+    }
+
+    void __cdecl Load_Colony_Anims_() {
+        Do_Load_Colony_Anims_();
+    }
+
+    void __cdecl Set_Colony_Font_To_Reg_Blue_(uint8_t font_idx, uint8_t state) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+
+        if (state == 0) {
+            fonts::Set_Font_Style_Shadow_Down_(font_idx, &_font_dim_color_array);
+        } else if (state == 1) {
+            fonts::Set_Font_Style_Shadow_Down_(font_idx, &_font_color_array);
+        } else if (state == 2) {
+            fonts::Set_Font_Style_Shadow_Down_(font_idx, &_font_bright_color_array);
+        }
+
+        fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
+        fonts::Set_Font_Special_Colors_(&_red_font_color_array[state]);
     }
 }

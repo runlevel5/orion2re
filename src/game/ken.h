@@ -4,53 +4,30 @@
 struct s_animation_header;
 
 namespace KEN {
-    inline void __cdecl Ken_Init_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004AA050 })();
-    }
+    void __cdecl Ken_Init_();
 
     s_animation_header* __cdecl Do_Get_Ship_Picture_Seg(int16_t player_idx, int16_t ship_type);
     s_animation_header* __cdecl Get_Ship_Picture_Seg_(int16_t ship_id, int16_t frame_index);
 
-    // Suggested name: Ken_Get_Text_Message
-    inline void __cdecl Ken_Get_Text_Message_(int16_t msg_idx, char* buffer, int16_t max_len) {
-        using Fn = void(__cdecl*)(int16_t, char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c2630});
-        fn(msg_idx, buffer, max_len);
-    }
+    void __cdecl Ken_Get_Text_Message_(int32_t msg_index, char* buffer, int16_t param_3);
 
-    inline void __cdecl Init_NPC_Personalities_Objectives_Themes_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004C1FC0 })();
-    }
+    // Suggested name: KEN::s_kentext_lbx
+    inline const char* s_KENTEXT_LBX_005597c0 = reinterpret_cast<const char*>(std::uintptr_t{0x005597C0}); /* "KENTEXT.LBX" */
 
-    inline void __cdecl Ken_Init2_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004c1d50 });
-        fn();
-    }
+    // Suggested name: KEN::s_kentext1_lbx
+    inline const char* s_KENTEXT1_LBX_005597cc = reinterpret_cast<const char*>(std::uintptr_t{0x005597CC}); /* "KENTEXT1.LBX" */
 
-    inline void __cdecl Load_Player_Ship_Palette_(int16_t player) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004C1B30 });
-        fn(player);
-    }
+    inline uint8_t* _personalities = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00559728});
 
-    inline int16_t __cdecl Get_Weighted_Choice_(int16_t* weights, int16_t count) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1d60});
-        return fn(weights, count);
-    }
+    void __cdecl Init_NPC_Personalities_Objectives_Themes_();
 
-    inline void __cdecl Get_Derelict_Applications_(int16_t player_idx, int16_t* app1, int16_t* count) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C1DF0});
-        fn(player_idx, app1, count);
-    }
+    void __cdecl Ken_Init2_();
 
-    inline s_animation_header* __cdecl Get_Ship_Id_Picture_Seg_(int16_t ship_idx) {
-        using Fn = s_animation_header*(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c1c90});
-        return fn(ship_idx);
-    }
+    void __cdecl Load_Player_Ship_Palette_(int16_t player_idx);
+
+    uint16_t __cdecl Get_Weighted_Choice_(uint16_t* weights, int16_t count);
+
+    void __cdecl Get_Derelict_Applications_(int16_t player_idx, uint16_t* app_array, int16_t* app_count);
+
+    s_animation_header* __cdecl Get_Ship_Id_Picture_Seg_(int16_t ship_idx);
 }
