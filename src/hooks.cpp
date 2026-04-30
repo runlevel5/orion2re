@@ -634,8 +634,10 @@ namespace hooks {
         { 0x004c90c0, &MAINSCR::Check_Hot_Keys_ },
         { 0x004c8b80, &MAINSCR::Add_Cheats_ },
         { 0x0049a980, &HACCESS::Last_Colony_Selected_ },
+#ifndef SKIP_MAIN
         { 0x004c9670, &MAINSCR::Do_Colony_Screen_ },
         { 0x004c7720, &MAINSCR::Main_Screen_ },
+#endif
         { 0x0041e110, &EVANHELP::Set_Main_Game_Screen_Help_List_ },
         { 0x00431fb0, &DESIGN::Tech_Level_ },
         { 0x00431b10, &DESIGN::Shield_Cost_ },

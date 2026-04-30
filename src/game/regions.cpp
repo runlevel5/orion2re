@@ -63,7 +63,7 @@ namespace regions {
     void __cdecl Tint_Fill_Column_(uint8_t* tint_table, uint8_t* pixels, uint32_t width, uint32_t height) {
         uint8_t* dst = pixels;
         uint8_t* src = pixels;
-        const uint32_t row_skip = platform::g_screen_res_x - width;
+        const int32_t row_skip = platform::g_screen_res_x - static_cast<int32_t>(width);
 
         _rows_remaining = height;
         _saved_width = width;
@@ -150,14 +150,15 @@ namespace regions {
     }
 
     void __cdecl Tri_Interlaced_Fill_Column_(uint32_t color, uint8_t* dest, int32_t width, int32_t height) {
-        const uint32_t row_advance = static_cast<uint32_t>(platform::g_screen_res_x) - static_cast<uint32_t>(width);
+        const int32_t row_advance = platform::g_screen_res_x - width;
+        uint32_t rows = static_cast<uint32_t>(height);
 
-        for (;;) {
+        while (rows != 0) {
             memset(dest, static_cast<int>(static_cast<uint8_t>(color)), static_cast<size_t>(width));
             dest += width;
             dest += row_advance;
             color = (color >> 8) | (color << 24);
-            if (--height == 0) {
+            if (--rows == 0) {
                 break;
             }
 
@@ -165,7 +166,7 @@ namespace regions {
             dest += width;
             dest += row_advance;
             color = (color >> 8) | (color << 24);
-            if (--height == 0) {
+            if (--rows == 0) {
                 break;
             }
 
@@ -173,9 +174,7 @@ namespace regions {
             dest += width;
             dest += row_advance;
             color = (color >> 16) | (color << 16);
-            if (--height == 0) {
-                break;
-            }
+            --rows;
         }
     }
 
@@ -194,6 +193,7 @@ namespace regions {
         while (true) {
             memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
                    static_cast<size_t>(fill_width_bytes));
+            dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =
                 (_interlaced_fill_next_pattern >> 8) |
@@ -205,6 +205,7 @@ namespace regions {
 
             memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
                    static_cast<size_t>(fill_width_bytes));
+            dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =
                 (_interlaced_fill_next_pattern >> 8) |
@@ -216,6 +217,7 @@ namespace regions {
 
             memset(dst, static_cast<int>(static_cast<uint8_t>(_interlaced_fill_next_pattern)),
                    static_cast<size_t>(fill_width_bytes));
+            dst += fill_width_bytes;
             dst += row_advance;
             _interlaced_fill_next_pattern =
                 (_interlaced_fill_next_pattern >> 16) |

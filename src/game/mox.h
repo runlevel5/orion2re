@@ -893,11 +893,6 @@ namespace MOX {
     inline int16_t (&_box_off_flag)[5] =
         *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x0059C420});
 
-    struct s_saved_box {
-        int16_t field_id;
-        int8_t is_open;
-    };
-
     inline s_saved_box (&_saved_boxes)[5] =
         *reinterpret_cast<s_saved_box(*)[5]>(std::uintptr_t{0x005A1850});
 
