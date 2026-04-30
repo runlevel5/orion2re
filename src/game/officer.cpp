@@ -1869,13 +1869,12 @@ namespace OFFICER {
                     OFFICER::_officer_skill_help[officer_slot].skill_id[skill_index] = 0;
                 }
             } else {
-                // TYPE MISMATCH: signature in header uses different names/types for coordinates
                 OFFICER::Add_Skill_Description_Help_Fields_(
                     0x5e,
-                    (uint16_t)y,
+                    y,
                     (uint32_t)MOX::_PLAYER_NUM,
-                    (int32_t)officer_id,
-                    &OFFICER::_officer_skill_help[officer_slot]
+                    officer_id,
+                    reinterpret_cast<int16_t*>(&OFFICER::_officer_skill_help[officer_slot])
                 );
             }
 
@@ -3781,11 +3780,95 @@ void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
     memset(OFFICER::_officer_skill_help, 0, sizeof(OFFICER::_officer_skill_help));
 
     OFFICER::Add_Skill_Description_Help_Fields_(
-        static_cast<uint16_t>(skill_id_base + 0x61),
-        static_cast<uint16_t>(skill_count_minus_one + 1),
-        static_cast<uint16_t>(MOX::_PLAYER_NUM),
-        popup_param,
-        OFFICER::_officer_skill_help);
+        static_cast<int16_t>(skill_id_base + 0x61),
+        static_cast<int16_t>(skill_count_minus_one + 1),
+        static_cast<uint32_t>(MOX::_PLAYER_NUM),
+        static_cast<int16_t>(popup_param),
+        reinterpret_cast<int16_t*>(OFFICER::_officer_skill_help));
+}
+
+void __cdecl Add_Skill_Description_Help_Fields_(
+    int16_t left,
+    int16_t top,
+    uint32_t unused,
+    int16_t leader_index,
+    int16_t* help_fields
+) {
+    (void)unused;
+
+    uint16_t leader_type = static_cast<uint8_t>(MOX::_leaders[leader_index].type);
+    int16_t slot = 0;
+    int16_t current_y = top;
+
+    for (int16_t skill_index = 0; skill_index < 54; ++skill_index) {
+        bool add_field = false;
+
+        if (leader_type == 0) {
+            if (MOX::_skill_data[skill_index].skill_type == 1) {
+                add_field = OFFICER::Officer_Has_Special_Skill_(
+                    MOX::_PLAYER_NUM,
+                    leader_index,
+                    skill_index
+                );
+            }
+        } else if (leader_type == 1) {
+            if (MOX::_skill_data[skill_index].skill_type == 2) {
+                add_field = OFFICER::Officer_Has_Special_Skill_(
+                    MOX::_PLAYER_NUM,
+                    leader_index,
+                    skill_index
+                );
+            }
+        }
+
+        if (add_field) {
+            help_fields[slot] = fields::Add_Hidden_Field_(
+                left,
+                static_cast<int16_t>(current_y - 1),
+                static_cast<int16_t>(left + 0x00BE),
+                static_cast<int16_t>(current_y + 0x000F),
+                OFFICER::s__00551100,
+                0x29
+            );
+            help_fields[slot + 5] = skill_index;
+            current_y = static_cast<int16_t>(current_y + 0x11);
+            ++slot;
+        }
+    }
+
+    current_y = static_cast<int16_t>(top + slot * 0x11);
+
+    for (int16_t skill_index = 0; skill_index < 54; ++skill_index) {
+        bool add_field = false;
+
+        if (MOX::_skill_data[skill_index].skill_type == 0) {
+            add_field = OFFICER::Officer_Has_General_Skill_(
+                MOX::_PLAYER_NUM,
+                leader_index,
+                skill_index
+            );
+        }
+
+        if (add_field) {
+            help_fields[slot] = fields::Add_Hidden_Field_(
+                left,
+                current_y,
+                static_cast<int16_t>(left + 0x00BE),
+                static_cast<int16_t>(current_y + 0x000F),
+                OFFICER::s__00551100,
+                0x29
+            );
+            help_fields[slot + 5] = skill_index;
+            current_y = static_cast<int16_t>(current_y + 0x11);
+            ++slot;
+        }
+    }
+
+    while (slot < 5) {
+        help_fields[slot] = static_cast<int16_t>(0xFC18);
+        help_fields[slot + 5] = 0;
+        ++slot;
+    }
 }
 
 void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx) {

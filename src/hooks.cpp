@@ -3804,6 +3804,22 @@ namespace hooks {
         { 0x00527460, &platform::Lock_Cursor_Surface_ },
         { 0x005274B0, &platform::Unlock_Cursor_Surface_ },
         { 0x00526F80, &platform::Update_Cursor_Image_ },
+        { 0x00442440, &OFFICER::Add_Skill_Description_Help_Fields_ },
+        { 0x00528030, &video::_Masked_Screen_Dump },
+        { 0x005287C0, &video::Clear_Stencil_List_ },
+        { 0x005287A0, &video::Clear_Scan_List_ },
+        { 0x00527C90, &video::Save_Refresh_ },
+        { 0x00527CB0, &video::Restore_Refresh_ },
+        { 0x00527D20, &video::Set_Refresh_Differential_No_Full_ },
+        { 0x0052D290, &video::Clear_Display_And_Release_Palette_ },
+        { 0x0052cf53, &platform::Copy_Dwords_ },
+        { 0x00528040, &video::_Partial_Screen_Dump },
+        { 0x00528110, &video::Stencil_Out_Background_ },
+        { 0x00527C60, &video::Toggle_Pages_On_Odd_Frame_ },
+        { 0x00528700, &video::Copy_Back_To_Off_ },
+        { 0x005286A0, &video::Set_Page_Back_ },
+        { 0x005286C0, &video::Copy_Off_To_Back_ },
+        { 0x00526D10, &video::Init_Video_Drivers_ },
     };
 
     void Install_Hooks()

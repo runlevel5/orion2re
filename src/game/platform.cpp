@@ -1264,4 +1264,8 @@ namespace platform {
 
         platform::Force_Cursor_Pos(platform::g_mouse_x, platform::g_mouse_y);
     }
+
+    void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {
+        memcpy(destination, source, dword_count * sizeof(uint32_t));
+    }
 }

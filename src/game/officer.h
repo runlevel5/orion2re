@@ -298,16 +298,16 @@ namespace OFFICER {
     inline s_officer_skill_help (&_officer_skill_help)[4] =
         *reinterpret_cast<s_officer_skill_help (*)[4]>(std::uintptr_t{0x00565678});
 
-    inline void __cdecl Add_Skill_Description_Help_Fields_(
-        uint16_t first_skill_id,
-        uint16_t skill_count,
-        uint32_t player_num,
-        int32_t popup_param,
-        s_officer_skill_help* help_fields) {
-        using Fn = void(__cdecl*)(uint16_t, uint16_t, uint32_t, int32_t, s_officer_skill_help*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442440});
-        fn(first_skill_id, skill_count, player_num, popup_param, help_fields);
-    }
+    inline const char* const s__00551100 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+
+    void __cdecl Add_Skill_Description_Help_Fields_(
+        int16_t left,
+        int16_t top,
+        uint32_t unused,
+        int16_t leader_index,
+        int16_t* help_fields
+    );
 
     void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx);
 

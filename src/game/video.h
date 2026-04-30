@@ -2,9 +2,22 @@
 
 struct IDirectDrawPalette;
 struct tagPALETTEENTRY;
+struct IDirectDrawSurface;
 
 namespace video {
 	// Variables
+	inline uint32_t& g_screen_res_x =
+		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1A8 });
+
+	inline uint32_t& g_screen_res_y =
+		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1AC });
+
+	inline IDirectDrawSurface*& g_offscreen_surface_1 =
+		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00578E58 });
+
+	inline IDirectDrawSurface*& g_offscreen_surface_2 =
+		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00579334 });
+
 	inline uint32_t*& _video_memory = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x005792F0 });
 
 	inline int16_t& _current_mouse_list_ptr =
@@ -23,8 +36,14 @@ namespace video {
 		int16_t max_x;
 	};
 
-	inline int32_t& screen_refresh_flag =
-		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1B4 });
+	inline int16_t& screen_refresh_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B1B4 });
+
+	inline int16_t& _old_screen_dump_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005792F4 });
+
+	inline int16_t& _old_screen_refresh_flag =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00579340 });
 
 	inline s_scan_list_entry*& _refresh_scan_list =
 		*reinterpret_cast<s_scan_list_entry**>(std::uintptr_t{ 0x00579348 });
@@ -62,6 +81,10 @@ namespace video {
 	inline uint8_t& DAT_00579354 =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00579354 });
 
+	inline uint16_t& _is_initializing = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055B17C });
+	inline s_mouse_list& _default_mouse_list = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x0055B190 });
+	inline uint8_t& DAT_00578b58 = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578B58 });
+
 	inline int16_t& _copy_to_on_page_flag =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578e60 });
 
@@ -79,21 +102,11 @@ namespace video {
 	void __cdecl Clip_Off_();
 	void __cdecl Clip_On_();
 
-	// TODO: These were re-implemented in platform
-	inline void __cdecl Copy_Off_To_Back_() {
-		using Fn = void(__cdecl*)();
-		reinterpret_cast<Fn>(std::uintptr_t{ 0x005286c0 })();
-	}
+	void __cdecl Copy_Off_To_Back_();
 
-    inline void __cdecl Set_Page_Back_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x005286A0})();
-    }
+    void __cdecl Set_Page_Back_();
 
-    inline void __cdecl Copy_Back_To_Off_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x00528700})();
-    }
+    void __cdecl Copy_Back_To_Off_();
 
     void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2);
 
@@ -103,65 +116,26 @@ namespace video {
 	uint8_t __cdecl Get_Current_Video_Page_Flag_();
 	int16_t __cdecl Get_Refresh_Mode_();
 
-	inline void __cdecl Init_Video_Drivers_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00526d10});
-		fn();
-	}
+	void __cdecl Init_Video_Drivers_();
 
-    inline void __cdecl _Masked_Screen_Dump() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528030});
-        fn();
-    }
+    void __cdecl _Masked_Screen_Dump();
 
-    inline void __cdecl _Partial_Screen_Dump() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528040});
-        fn();
-    }
+    void __cdecl _Partial_Screen_Dump();
 
-    inline void __cdecl Stencil_Out_Background_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00528110});
-        fn();
-    }
+    void __cdecl Stencil_Out_Background_();
 
-    inline void __cdecl Clear_Stencil_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287C0});
-        fn();
-    }
-
-    inline void __cdecl Clear_Scan_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005287A0});
-        fn();
-    }
+    void __cdecl Clear_Stencil_List_();
+    void __cdecl Clear_Scan_List_();
 
     void __cdecl Toggle_Pages_();
 
-    inline void __cdecl Save_Refresh_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527c90 });
-        fn();
-    }
+    void __cdecl Save_Refresh_();
 
-    inline void __cdecl Set_Refresh_Differential_No_Full_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527d20 });
-        fn();
-    }
+    void __cdecl Set_Refresh_Differential_No_Full_();
 
-    inline void __cdecl Restore_Refresh_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00527cb0 });
-        fn();
-    }
+	void __cdecl Restore_Refresh_();
 
-    inline void __cdecl Clear_Display_And_Release_Palette_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052D290 });
-        fn();
-    }
+    void __cdecl Clear_Display_And_Release_Palette_();
+
+    void __cdecl Toggle_Pages_On_Odd_Frame_();
 }

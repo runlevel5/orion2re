@@ -82,7 +82,7 @@ namespace platform {
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578e68 });
 
 	inline uint32_t& g_frame_count =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x055b1b8 });
+		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b8 });
 
 	inline uint8_t& g_render_buffer =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578edc });
@@ -135,6 +135,11 @@ namespace platform {
 	void Draw_Cursor_XY(int16_t x, int16_t y);
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void Create_Cursor_Surfaces();
+	inline void __cdecl Create_Cursor_Surface() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005273C0 });
+		fn();
+	}
 	HRESULT Restore_Surfaces();
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -152,4 +157,19 @@ namespace platform {
 	void __cdecl Update_Cursor_Image_();
 	void __cdecl Toggle_Pages_Stub_();
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
+	void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count);
+
+	inline uint32_t*& _alt_offscreen_surface = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00579324 });
+
+	inline int32_t __cdecl Lock_Alt_Offscreen_Surface_() {
+		using Fn = int32_t(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528520 });
+		return fn();
+	}
+
+	inline void __cdecl Unlock_Alt_Offscreen_Surface_() {
+		using Fn = void(__cdecl*)();
+		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528660 });
+		fn();
+	}
 }

@@ -198,4 +198,195 @@ namespace video {
         video::Set_Page_Off_();
         platform::g_pending_toggle_pages = false;
     }
+	void __cdecl _Masked_Screen_Dump() {
+	}
+
+	void __cdecl Clear_Stencil_List_() {
+		const uint32_t scanline_count = g_screen_res_y & 0x3FFFFFFFu;
+		memset(video::_refresh_stencil_list, 0xFF, static_cast<size_t>(scanline_count) * 4u);
+	}
+
+	void __cdecl Clear_Scan_List_() {
+		const uint32_t scan_line_count = g_screen_res_y & 0x3FFFFFFFu;
+		memset(video::_refresh_scan_list, 0xFF, static_cast<size_t>(scan_line_count) * 4u);
+	}
+
+	void __cdecl Save_Refresh_() {
+		video::_old_screen_dump_flag = static_cast<int16_t>(video::screen_refresh_flag);
+		video::_old_screen_refresh_flag = static_cast<int16_t>(video::screen_dump_flag);
+	}
+
+	void __cdecl Restore_Refresh_() {
+		*reinterpret_cast<int32_t*>(&video::screen_refresh_flag) =
+			static_cast<int32_t>(video::_old_screen_dump_flag);
+		video::screen_dump_flag =
+			static_cast<uint32_t>(static_cast<int32_t>(video::_old_screen_refresh_flag));
+	}
+
+	void __cdecl Set_Refresh_Differential_No_Full_() {
+		*reinterpret_cast<uint32_t*>(&video::screen_refresh_flag) = 2;
+		video::screen_dump_flag = 2;
+	}
+
+    void __cdecl Clear_Display_And_Release_Palette_() {
+        fields::Clear_Fields_();
+        video::Set_Refresh_Full_();
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
+        platform::Toggle_Pages_Stub_();
+        video::Set_Page_Off_();
+        graphics::Fill_(0, 0, 0x27f, 0x1df, 0);
+        platform::Toggle_Pages_Stub_();
+        video::Toggle_Pages_On_Odd_Frame_();
+
+        if (video::g_palette != nullptr) {
+            video::g_palette->Release();
+            video::g_palette = nullptr;
+        }
+    }
+
+    void __cdecl _Partial_Screen_Dump() {
+        const int32_t primary_pitch_bytes = static_cast<int32_t>(platform::Lock_Primary_Surface());
+        if (primary_pitch_bytes < 0) {
+            return;
+        }
+
+        const int32_t primary_pitch_dwords = primary_pitch_bytes / 4;
+        const int32_t alt_pitch_bytes = platform::Lock_Alt_Offscreen_Surface_();
+        if (alt_pitch_bytes < 0) {
+            platform::Unlock_Primary_Surface();
+            return;
+        }
+
+        const int32_t alt_pitch_dwords = alt_pitch_bytes / 4;
+        uint32_t* const alt_surface = platform::_alt_offscreen_surface;
+        uint32_t* const video_memory = video::_video_memory;
+
+        if (g_screen_res_y > 0) {
+            int32_t dst_row_offset = 0;
+            int32_t src_row_offset = 0;
+
+            for (int32_t y = 0; y < g_screen_res_y; ++y) {
+                const s_scan_list_entry& scan = video::_refresh_scan_list[y];
+                if (scan.min_x != -1) {
+                    const int32_t min_x = scan.min_x;
+                    const int32_t count = static_cast<int32_t>(scan.max_x) - min_x + 1;
+
+                    platform::Copy_Dwords_(
+                        video_memory + (dst_row_offset + min_x),
+                        alt_surface + (src_row_offset + min_x),
+                        static_cast<uint32_t>(count));
+                }
+
+                dst_row_offset += primary_pitch_dwords;
+                src_row_offset += alt_pitch_dwords;
+            }
+        }
+
+        platform::Unlock_Primary_Surface();
+        platform::Unlock_Alt_Offscreen_Surface_();
+    }
+
+    void __cdecl Stencil_Out_Background_() {
+        platform::Lock_Offscreen_Surface_();
+        platform::Lock_Alt_Offscreen_Surface_();
+
+        uint32_t* offscreen_surface = reinterpret_cast<uint32_t*>(platform::_offscreen_surface);
+        uint32_t* alt_offscreen_surface = platform::_alt_offscreen_surface;
+        const int32_t dwords_per_row = g_screen_res_x / 4;
+
+        int32_t row_dword_offset = 0;
+        for (int32_t row = 0; row < g_screen_res_y; ++row) {
+            const s_scan_list_entry& scan = video::_refresh_stencil_list[row];
+            const int32_t min_x = scan.min_x;
+
+            if (min_x != -1) {
+                const int32_t count = static_cast<int32_t>(scan.max_x) - min_x + 1;
+                const int32_t dword_offset = row_dword_offset + min_x;
+                platform::Copy_Dwords_(
+                    alt_offscreen_surface + dword_offset,
+                    offscreen_surface + dword_offset,
+                    static_cast<uint32_t>(count)
+                );
+            }
+
+            row_dword_offset += dwords_per_row;
+        }
+
+        platform::Unlock_Alt_Offscreen_Surface_();
+        platform::Unlock_Offscreen_Surface_();
+    }
+
+    void __cdecl Toggle_Pages_On_Odd_Frame_() {
+        if ((platform::g_frame_count & 1u) != 0) {
+            Set_Page_Off_();
+            platform::Toggle_Pages_Stub_();
+        }
+    }
+
+    void __cdecl Init_Video_Drivers_() {
+        video::_is_initializing = 1;
+        ::DAT_00578dcc = static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&video::DAT_00578b58));
+        ::DAT_00578dc8 = static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&::DAT_00578820));
+
+        platform::g_mouse_x = 0;
+        ::g_cached_mouse_x = 0;
+        platform::g_mouse_y = 0;
+        ::g_cached_mouse_y = 0;
+
+        mouse::_mouse_enabled = 0;
+        mouse::_mouse_buffer_flag = 0;
+        mouse::_mouse_buffer_flag2 = 0;
+
+        platform::Create_Cursor_Surface();
+
+        video::_default_mouse_list.x2 =
+            static_cast<int16_t>(static_cast<uint16_t>(::g_screen_res_x) - 1);
+        video::_default_mouse_list.y2 =
+            static_cast<int16_t>(static_cast<uint16_t>(::g_screen_res_y) - 1);
+
+        mouse::Set_Mouse_List_(&video::_default_mouse_list, 1);
+
+        platform::Force_Cursor_Pos(::g_screen_res_x / 2, ::g_screen_res_y / 2);
+
+        video::_is_initializing = 0;
+        mouse::_mouse_enabled = 1;
+    }
+
+    void __cdecl Set_Page_Back_() {
+        platform::g_render_buffer = 2;
+        _copy_to_on_page_flag = 0;
+    }
+
+    void __cdecl Copy_Back_To_Off_() {
+        RECT source_rect;
+
+        source_rect.left = 0;
+        source_rect.top = 0;
+        source_rect.right = static_cast<LONG>(video::g_screen_res_x);
+        source_rect.bottom = static_cast<LONG>(video::g_screen_res_y);
+
+        video::g_offscreen_surface_1->BltFast(
+            0,
+            0,
+            video::g_offscreen_surface_2,
+            &source_rect,
+            DDBLTFAST_WAIT);
+    }
+
+    void __cdecl Copy_Off_To_Back_() {
+        RECT copy_rect;
+
+        copy_rect.left = 0;
+        copy_rect.top = 0;
+        copy_rect.right = static_cast<LONG>(video::g_screen_res_x);
+        copy_rect.bottom = static_cast<LONG>(video::g_screen_res_y);
+
+        video::g_offscreen_surface_2->BltFast(
+            0,
+            0,
+            video::g_offscreen_surface_1,
+            &copy_rect,
+            DDBLTFAST_WAIT);
+    }
 }

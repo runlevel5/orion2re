@@ -90,6 +90,9 @@ inline IDirectDrawSurface*& g_offscreen_surface_1 =
         *reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{0x00578E58});
 inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
+inline uint8_t& DAT_00578820 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00578820});
+inline uint32_t& DAT_00578dc8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DC8});
+inline uint32_t& DAT_00578dcc = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DCC});
 inline const char* s_Add_Square_to_scan_list_failed__0055b270 =
     reinterpret_cast<const char*>(std::uintptr_t{0x0055B270}); /* "Add Square to scan list failed.." */
 inline const char* s__d___d___d_0055b2d0 =
