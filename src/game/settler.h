@@ -9,10 +9,11 @@ namespace settler {
 
     void __cdecl Move_Settlers_();
 
-    inline void __cdecl Pop_Tries_To_Settle_(s_colony* from, int16_t pop_idx, s_colony* to, uint8_t* flags) {
-        using Fn = void(__cdecl*)(s_colony*, int16_t, s_colony*, uint8_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0043b820})(from, pop_idx, to, flags);
-    }
+    void __cdecl Pop_Tries_To_Settle_(
+            s_colony *source_colony,
+            int16_t selected_pop_idx,
+            s_colony *dest_colony,
+            s_settler_settle_result *result);
 
     int32_t __cdecl Settler_ETA_(s_player* player, int16_t source_star, int16_t dest_star);
 

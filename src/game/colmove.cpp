@@ -131,202 +131,378 @@ namespace COLMOVE {
         return true;
     }
 
-    void __cdecl Send_Cluster_(int16_t colony_idx, int16_t param_2) {
+    void __cdecl Send_Cluster_(int16_t colony_idx, int16_t requested_job) {
+        int16_t warning_state = 0;
+        bool extra_success_notice = false;
+        int16_t moved_count = 0;
+        s_settler_settle_result settle_result;
+        char source_planet_name[20];
+        char destination_planet_name[20];
+        char pop_string[52];
+        char message[1000];
+
         if (colony_idx < 0) {
             GENDRAW::Help_(ESTRINGS::E_Strings_(0x210 /* ESTR_THIS_IS_NOT_A_VALID_COLONY */));
             return;
         }
 
-        int16_t msg_state = 0;
-        int16_t moved_count = 0;
-        uint8_t changed = 0;
-        uint8_t flags[16];
-        char local_41c[52];
-        char planet1_name[20];
-        char planet2_name[20];
-        char local_3e8[1000];
+        int16_t unemployed_pop_idx = COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n);
+        if (unemployed_pop_idx == -1) {
+            COLONY::Col_Calc_Wrapper_(COLMOVE::_cluster_colony_n);
+            if (colony_idx != COLMOVE::_cluster_colony_n) {
+                COLONY::Col_Calc_Wrapper_(colony_idx);
+            }
 
-        int16_t sVar3 = Get_First_Unemployed_(_cluster_colony_n);
-        if (sVar3 != -1) {
-            Colony_Pop_String_(_cluster_colony_n, sVar3, local_41c);
+            if (COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n) == -1) {
+                COLONY::Reset_Mouse_Picture_();
+                COLONY::Reset_Field_Mode_();
+                COLMOVE::_cluster_colony_n = -1;
+            }
+            return;
+        }
 
-            while (sVar3 != -1) {
-                if (colony_idx == _cluster_colony_n) {
-                    uint32_t current_job = (MOX::_colony[_cluster_colony_n].pop[sVar3] & 0x180) >> 7;
-                    if (param_2 == -1 || current_job == (uint32_t)param_2) {
-                        MOX::_colony[_cluster_colony_n].pop[sVar3] |= 0x200;
+        COLMOVE::Colony_Pop_String_(COLMOVE::_cluster_colony_n, unemployed_pop_idx, pop_string);
+
+        while (unemployed_pop_idx != -1) {
+            if (colony_idx == COLMOVE::_cluster_colony_n) {
+                uint32_t& pop_flags = MOX::_colony[COLMOVE::_cluster_colony_n].pop[unemployed_pop_idx];
+                const int32_t current_job = static_cast<int32_t>((pop_flags & 0x180u) >> 7);
+
+                if (requested_job == -1 || current_job == requested_job) {
+                    pop_flags |= 0x200u;
+                } else {
+                    if (COLMOVE::Give_Colonist_New_Job_(
+                                COLMOVE::_cluster_colony_n,
+                                unemployed_pop_idx,
+                                requested_job) == 0) {
+                        return;
+                    }
+                }
+            } else {
+                s_colony* const source_colony = &MOX::_colony[COLMOVE::_cluster_colony_n];
+                s_colony* const destination_colony = &MOX::_colony[colony_idx];
+
+                settler::Pop_Tries_To_Settle_(
+                        source_colony,
+                        unemployed_pop_idx,
+                        destination_colony,
+                        &settle_result);
+
+                if (settle_result.can_settle != 0) {
+                    if (settle_result.eta_turns != 0 || settle_result.no_room_at_destination != 0) {
+                        bool show_confirmation = false;
+
+                        if (settle_result.eta_turns != 0) {
+                            if (settle_result.no_room_at_destination == 0) {
+                                if (warning_state != 1) {
+                                    _sprintf(
+                                            message,
+                                            ESTRINGS::E_Strings_(0x209),
+                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                    warning_state = 1;
+                                    COLONY::Reset_Mouse_Picture_();
+                                    show_confirmation = true;
+                                }
+                            } else if (warning_state != 3) {
+                                const int16_t unemployed_count =
+                                        COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
+
+                                if (moved_count == 0) {
+                                    _sprintf(
+                                            message,
+                                            ESTRINGS::E_Strings_(0x206),
+                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                } else {
+                                    _sprintf(
+                                            message,
+                                            ESTRINGS::E_Strings_(0x204),
+                                            static_cast<int32_t>(moved_count),
+                                            static_cast<int32_t>(unemployed_count),
+                                            static_cast<uint32_t>(settle_result.eta_turns));
+                                }
+
+                                warning_state = 3;
+                                COLONY::Reset_Mouse_Picture_();
+                                show_confirmation = true;
+                            }
+                        } else if (settle_result.no_room_at_destination != 0 && warning_state != 2) {
+                            const int16_t unemployed_count =
+                                    COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
+
+                            if (moved_count == 0) {
+                                _sprintf(message, ESTRINGS::E_Strings_(0x205));
+                            } else {
+                                _sprintf(
+                                        message,
+                                        ESTRINGS::E_Strings_(0x203),
+                                        static_cast<int32_t>(moved_count),
+                                        static_cast<int32_t>(unemployed_count));
+                            }
+
+                            warning_state = 2;
+                            COLONY::Reset_Mouse_Picture_();
+                            show_confirmation = true;
+                        }
+
+                        if (show_confirmation) {
+                            settle_result.can_settle = GENDRAW::Do_Confirmation_Box_(message);
+                            COLONY::_full_draw = 1;
+                            COLONY::Clear_Mouse_Picture_();
+                        }
+                    }
+
+                    if (settle_result.can_settle != 0) {
+                        if (settle_result.field10_0xa != 0) {
+                            extra_success_notice = true;
+                        }
+
+                        uint32_t& pop_flags = source_colony->pop[unemployed_pop_idx];
+                        const int32_t current_job = static_cast<int32_t>((pop_flags & 0x180u) >> 7);
+
+                        if (requested_job != -1 && current_job != requested_job) {
+                            if (COLMOVE::Give_Colonist_New_Job_(
+                                        COLMOVE::_cluster_colony_n,
+                                        unemployed_pop_idx,
+                                        requested_job) == 0) {
+                                return;
+                            }
+
+                            extra_success_notice = true;
+                            pop_flags &= 0xFFFFFDFFu;
+                        }
+
+                        settler::Settle_Pop_(source_colony, unemployed_pop_idx, destination_colony);
+                        ++moved_count;
                     } else {
-                        if (Give_Colonist_New_Job_(_cluster_colony_n, sVar3, param_2) == 0) {
-                            return;
+                        int16_t line_count = 0;
+                        unemployed_pop_idx = -1;
+
+                        if (settle_result.eta_turns != 0) {
+                            if (settle_result.no_room_at_destination == 0) {
+                                ERIC::String_Builder2_(
+                                        message,
+                                        0,
+                                        ESTRINGS::E_Strings_(0xFE),
+                                        static_cast<uint32_t>(settle_result.eta_turns));
+                                line_count = 1;
+                            } else {
+                                ERIC::String_Builder2_(
+                                        message,
+                                        0,
+                                        ESTRINGS::E_Strings_(0xFC),
+                                        static_cast<uint32_t>(settle_result.eta_turns));
+                                line_count = 1;
+                            }
+                        } else if (settle_result.no_room_at_destination != 0) {
+                            ERIC::String_Builder2_(message, 0, ESTRINGS::E_Strings_(0xFD));
+                            line_count = 1;
+                        }
+
+                        if (settle_result.dest_is_outpost != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x1FD));
+                            ++line_count;
+                        }
+
+                        if (settle_result.only_one_pop_left != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x241));
+                            ++line_count;
+                        }
+
+                        if (settle_result.max_settlers_in_transit != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x24D));
+                            ++line_count;
+                        }
+
+                        if (settle_result.source_blockaded != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x207));
+                            ++line_count;
+                        }
+
+                        if (settle_result.insufficient_freighters != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x184));
+                            ++line_count;
+                        }
+
+                        if (settle_result.dest_owner_mismatch != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x211));
+                            ++line_count;
+                        }
+
+                        if (settle_result.field10_0xa != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20F));
+                            ++line_count;
+                        }
+
+                        if (settle_result.selected_pop_flag_0x400 != 0) {
+                            ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20E));
+                            ++line_count;
+                        }
+
+                        if (line_count > 0) {
+                            if (moved_count > 0) {
+                                ERIC::String_Builder2_(
+                                        message,
+                                        line_count,
+                                        ESTRINGS::E_Strings_(0x80),
+                                        static_cast<int32_t>(moved_count));
+                            }
+
+                            COLONY::Reset_Mouse_Picture_();
+                            COLONY::_full_draw = 1;
+                            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1D6), message);
+                            COLONY::Clear_Mouse_Picture_();
+                        } else {
+                            COLONY::Reset_Mouse_Picture_();
+                            COLONY::_full_draw = 1;
+                            GENDRAW::Help_(ESTRINGS::E_Strings_(0xE4));
+                            COLONY::Clear_Mouse_Picture_();
                         }
                     }
                 } else {
-                    settler::Pop_Tries_To_Settle_(
-                        &MOX::_colony[_cluster_colony_n],
-                        sVar3,
-                        &MOX::_colony[colony_idx],
-                        flags
-                    );
+                    int16_t line_count = 0;
+                    unemployed_pop_idx = -1;
 
-                    if (flags[0] != 0) {
-                        if (flags[13] == 0 && flags[9] != 0) {
-                            if (msg_state != 2) {
-                                if (moved_count == 0) {
-                                    _sprintf(local_3e8, ESTRINGS::E_Strings_(0x205));
-                                } else {
-                                    _sprintf(local_3e8, ESTRINGS::E_Strings_(0x203), moved_count, Get_Num_Unemployed_(_cluster_colony_n));
-                                }
-                                msg_state = 2;
-                                COLONY::Reset_Mouse_Picture_();
-                                flags[0] = (uint8_t)GENDRAW::Do_Confirmation_Box_(local_3e8);
-                                COLONY::_full_draw = 1;
-                                COLONY::Clear_Mouse_Picture_();
-                            }
-                        } else if (flags[13] != 0 && flags[9] == 0) {
-                            if (msg_state != 1) {
-                                _sprintf(local_3e8, ESTRINGS::E_Strings_(0x209), flags[13]);
-                                msg_state = 1;
-                                COLONY::Reset_Mouse_Picture_();
-                                flags[0] = (uint8_t)GENDRAW::Do_Confirmation_Box_(local_3e8);
-                                COLONY::_full_draw = 1;
-                                COLONY::Clear_Mouse_Picture_();
-                            }
-                        } else if (flags[13] != 0 && flags[9] != 0) {
-                            if (msg_state != 3) {
-                                if (moved_count == 0) {
-                                    _sprintf(local_3e8, ESTRINGS::E_Strings_(0x206), flags[13]);
-                                } else {
-                                    _sprintf(local_3e8, ESTRINGS::E_Strings_(0x204), moved_count, Get_Num_Unemployed_(_cluster_colony_n), flags[13]);
-                                }
-                                msg_state = 3;
-                                COLONY::Reset_Mouse_Picture_();
-                                flags[0] = (uint8_t)GENDRAW::Do_Confirmation_Box_(local_3e8);
-                                COLONY::_full_draw = 1;
-                                COLONY::Clear_Mouse_Picture_();
-                            }
-                        }
-
-                        if (flags[0] != 0) {
-                            if (flags[10] != 0) {
-                                changed = 1;
-                            }
-
-                            uint32_t current_job = (MOX::_colony[_cluster_colony_n].pop[sVar3] & 0x180) >> 7;
-                            if (current_job != (uint32_t)param_2 && param_2 != -1) {
-                                if (Give_Colonist_New_Job_(_cluster_colony_n, sVar3, param_2) == 0) {
-                                    return;
-                                }
-                                changed = 1;
-                                MOX::_colony[_cluster_colony_n].pop[sVar3] &= 0xFFFFFDFF;
-                            }
-
-                            settler::Settle_Pop_(&MOX::_colony[_cluster_colony_n], sVar3, &MOX::_colony[colony_idx]);
-                            moved_count++;
-
-                            sVar3 = Get_First_Unemployed_(_cluster_colony_n);
-                            continue;
-                        }
-                    }
-
-                    sVar3 = -1;
-                    int msg_count = 0;
-
-                    if (flags[13] == 0) {
-                        if (flags[9] != 0) {
-                            ERIC::String_Builder2_(local_3e8, 0, ESTRINGS::E_Strings_(0xFD));
-                            msg_count = 1;
-                        }
-                    } else {
-                        if (flags[9] == 0) {
-                            ERIC::String_Builder2_(local_3e8, 0, ESTRINGS::E_Strings_(0xFE), flags[13]);
-                            msg_count = 1;
+                    if (settle_result.eta_turns != 0) {
+                        if (settle_result.no_room_at_destination == 0) {
+                            ERIC::String_Builder2_(
+                                    message,
+                                    0,
+                                    ESTRINGS::E_Strings_(0xFE),
+                                    static_cast<uint32_t>(settle_result.eta_turns));
+                            line_count = 1;
                         } else {
-                            ERIC::String_Builder2_(local_3e8, 0, ESTRINGS::E_Strings_(0xFC), flags[13]);
-                            msg_count = 1;
+                            ERIC::String_Builder2_(
+                                    message,
+                                    0,
+                                    ESTRINGS::E_Strings_(0xFC),
+                                    static_cast<uint32_t>(settle_result.eta_turns));
+                            line_count = 1;
                         }
+                    } else if (settle_result.no_room_at_destination != 0) {
+                        ERIC::String_Builder2_(message, 0, ESTRINGS::E_Strings_(0xFD));
+                        line_count = 1;
                     }
 
-                    if (flags[4] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x1FD));
-                    }
-                    if (flags[5] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x241));
-                    }
-                    if (flags[7] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x24D));
-                    }
-                    if (flags[2] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x207));
-                    }
-                    if (flags[6] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x184));
-                    }
-                    if (flags[1] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x211));
-                    }
-                    if (flags[10] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x20F));
-                    }
-                    if (flags[14] != 0) {
-                        ERIC::String_Builder2_(local_3e8, (int16_t)msg_count++, ESTRINGS::E_Strings_(0x20E));
+                    if (settle_result.dest_is_outpost != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x1FD));
+                        ++line_count;
                     }
 
-                    if (msg_count <= 0) {
+                    if (settle_result.only_one_pop_left != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x241));
+                        ++line_count;
+                    }
+
+                    if (settle_result.max_settlers_in_transit != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x24D));
+                        ++line_count;
+                    }
+
+                    if (settle_result.source_blockaded != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x207));
+                        ++line_count;
+                    }
+
+                    if (settle_result.insufficient_freighters != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x184));
+                        ++line_count;
+                    }
+
+                    if (settle_result.dest_owner_mismatch != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x211));
+                        ++line_count;
+                    }
+
+                    if (settle_result.field10_0xa != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20F));
+                        ++line_count;
+                    }
+
+                    if (settle_result.selected_pop_flag_0x400 != 0) {
+                        ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x20E));
+                        ++line_count;
+                    }
+
+                    if (line_count > 0) {
+                        if (moved_count > 0) {
+                            ERIC::String_Builder2_(
+                                    message,
+                                    line_count,
+                                    ESTRINGS::E_Strings_(0x80),
+                                    static_cast<int32_t>(moved_count));
+                        }
+
+                        COLONY::Reset_Mouse_Picture_();
+                        COLONY::_full_draw = 1;
+                        TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1D6), message);
+                        COLONY::Clear_Mouse_Picture_();
+                    } else {
                         COLONY::Reset_Mouse_Picture_();
                         COLONY::_full_draw = 1;
                         GENDRAW::Help_(ESTRINGS::E_Strings_(0xE4));
                         COLONY::Clear_Mouse_Picture_();
-                    } else {
-                        if (moved_count > 0) {
-                            ERIC::String_Builder2_(local_3e8, (int16_t)msg_count, ESTRINGS::E_Strings_(0x80), moved_count);
-                        }
-                        COLONY::Reset_Mouse_Picture_();
-                        COLONY::_full_draw = 1;
-                        TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1D6), local_3e8);
-                        COLONY::Clear_Mouse_Picture_();
                     }
                 }
-
-                if (sVar3 != -1) {
-                    sVar3 = Get_First_Unemployed_(_cluster_colony_n);
-                }
             }
+
+            if (unemployed_pop_idx == -1) {
+                break;
+            }
+
+            unemployed_pop_idx = COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n);
         }
 
-        COLONY::Col_Calc_Wrapper_(_cluster_colony_n);
-        if (colony_idx != _cluster_colony_n) {
+        COLONY::Col_Calc_Wrapper_(COLMOVE::_cluster_colony_n);
+        if (colony_idx != COLMOVE::_cluster_colony_n) {
             COLONY::Col_Calc_Wrapper_(colony_idx);
         }
 
         if (moved_count > 0) {
-            strcpy(planet1_name, HACCESS::Get_Planet_Name_(MOX::_colony[_cluster_colony_n].planet));
-            strcpy(planet2_name, HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet));
+            strcpy(
+                    source_planet_name,
+                    HACCESS::Get_Planet_Name_(MOX::_colony[COLMOVE::_cluster_colony_n].planet));
+            strcpy(
+                    destination_planet_name,
+                    HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet));
 
-            ERIC::String_Builder2_(local_3e8, 0, ESTRINGS::E_Strings_(0x1D1), moved_count, local_41c, planet1_name, planet2_name, flags[13]);
+            ERIC::String_Builder2_(
+                    message,
+                    0,
+                    ESTRINGS::E_Strings_(0x1D1),
+                    static_cast<int32_t>(moved_count),
+                    pop_string,
+                    source_planet_name,
+                    destination_planet_name,
+                    static_cast<uint32_t>(settle_result.eta_turns));
 
-            int16_t end_msg_count = 1;
-            if (flags[11] != 0) {
-                ERIC::String_Builder2_(local_3e8, end_msg_count++, ESTRINGS::E_Strings_(0x84));
+            int16_t line_count = 1;
+
+            if (settle_result.dest_blockaded != 0) {
+                ERIC::String_Builder2_(message, 1, ESTRINGS::E_Strings_(0x84));
+                line_count = 2;
             }
-            if (flags[10] != 0) {
-                ERIC::String_Builder2_(local_3e8, end_msg_count++, ESTRINGS::E_Strings_(0x85));
+
+            if (settle_result.field10_0xa != 0) {
+                ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x85));
+                ++line_count;
             }
-            if (changed != 0) {
-                ERIC::String_Builder2_(local_3e8, end_msg_count++, ESTRINGS::E_Strings_(0x83));
+
+            if (extra_success_notice) {
+                ERIC::String_Builder2_(message, line_count, ESTRINGS::E_Strings_(0x83));
             }
 
             COLONY::Reset_Mouse_Picture_();
-            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1D5), local_3e8);
+            TEXTBOX::Text_Box_(ESTRINGS::E_Strings_(0x1D5), message);
             COLONY::Clear_Mouse_Picture_();
 
-            COLCALC::Colony_Calculation_(_cluster_colony_n);
+            COLCALC::Colony_Calculation_(COLMOVE::_cluster_colony_n);
             COLCALC::Colony_Calculation_(colony_idx);
         }
 
-        if (Get_First_Unemployed_(_cluster_colony_n) == -1) {
+        if (COLMOVE::Get_First_Unemployed_(COLMOVE::_cluster_colony_n) == -1) {
             COLONY::Reset_Mouse_Picture_();
             COLONY::Reset_Field_Mode_();
-            _cluster_colony_n = -1;
+            COLMOVE::_cluster_colony_n = -1;
         }
     }
 

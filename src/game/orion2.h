@@ -4294,6 +4294,26 @@ struct s_settings {
     undefined field398_0x228;
 };
 
+typedef struct s_settler_settle_result s_settler_settle_result, *Ps_settler_settle_result;
+
+struct s_settler_settle_result {
+    uint8_t can_settle;
+    uint8_t dest_owner_mismatch;
+    uint8_t source_blockaded;
+    uint8_t source_space_anomaly;
+    uint8_t dest_is_outpost;
+    uint8_t only_one_pop_left;
+    uint8_t insufficient_freighters;
+    uint8_t max_settlers_in_transit;
+    uint8_t source_plague;
+    uint8_t no_room_at_destination;
+    uint8_t field10_0xa;
+    uint8_t dest_blockaded;
+    uint8_t dest_space_anomaly;
+    uint8_t eta_turns;
+    uint8_t selected_pop_flag_0x400;
+};
+
 typedef struct s_ship_data s_ship_data, *Ps_ship_data;
 
 struct s_ship_data {

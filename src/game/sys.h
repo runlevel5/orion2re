@@ -129,11 +129,14 @@ namespace SYS {
 
     void __cdecl Print_System_Ship_Data_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t ship_idx);
 
-    inline void __cdecl Build_System_Popup_Ships_(int16_t star_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493E60});
-        fn(star_idx);
-    }
+    void __cdecl Build_System_Popup_Ships_(int16_t star_idx);
+
+    void __cdecl Get_System_Display_Ship_Icon_XY_(
+            int16_t display_index,
+            int16_t owner_idx,
+            s_system_display_ships* display_ship,
+            int16_t* y,
+            int16_t* layout_state);
 
     s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t display_idx);
 

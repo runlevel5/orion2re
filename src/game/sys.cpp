@@ -2123,4 +2123,69 @@ namespace SYS {
             word_index += (static_cast<int32_t>(run_length) + 1) / 2;
         }
     }
+
+    void __cdecl Get_System_Display_Ship_Icon_XY_(
+        int16_t display_index,
+        int16_t owner_idx,
+        s_system_display_ships* display_ship,
+        int16_t* y,
+        int16_t* layout_state
+    ) {
+        (void)display_index;
+
+        MOX::_moveable_box_pict[0] =
+            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
+        (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
+
+        s_animation_header*& display_ship_pic = display_ship->pic;
+
+        if (MOX::_current_screen == 0x1d) {
+            display_ship_pic = SYS::Buffer_Reload_System_Ships_(owner_idx);
+            display_ship->x = static_cast<int16_t>(*layout_state + 5);
+            *y = static_cast<int16_t>(0xb1 - animate::Get_Height_(display_ship_pic));
+            *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(display_ship_pic) + 3);
+            return;
+        }
+
+        display_ship_pic = SYS::Buffer_Reload_System_Ships_(owner_idx);
+        display_ship->x = static_cast<int16_t>(*layout_state + 0x12);
+        *y = static_cast<int16_t>(((0x19 - animate::Get_Height_(display_ship_pic)) / 2) + 0xec);
+        *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(display_ship_pic) + 3);
+    }
+
+    void __cdecl Build_System_Popup_Ships_(int16_t system_idx) {
+        int16_t displayed_ship_count = 0;
+        int16_t layout_state = 0;
+
+        SYS::Clear_System_Display_Ship_Fields_();
+        MOX::_player_has_ship_in_system = 0;
+
+        if (MOX::_ship_icon_count > 0) {
+            for (int16_t ship_icon_index = 0; ship_icon_index < MOX::_ship_icon_count; ++ship_icon_index) {
+                const int16_t node_idx = MOX::_ship_icon[ship_icon_index].node_idx;
+                const int16_t ship_idx = MOX::_ship_node[node_idx].ship_idx;
+                s_ship_data* const ship = &MOX::_ship[ship_idx];
+
+                if (ship->location == system_idx && ship->status < 3) {
+                    const int16_t owner_idx = ship->owner;
+                    MOX::_system_display_ships[owner_idx].ship_idx = node_idx;
+
+                    if (owner_idx == MOX::_PLAYER_NUM) {
+                        MOX::_player_has_ship_in_system = 1;
+                    }
+
+                    const int16_t display_index = displayed_ship_count;
+                    ++displayed_ship_count;
+
+                    SYS::Get_System_Display_Ship_Icon_XY_(
+                        display_index,
+                        owner_idx,
+                        &MOX::_system_display_ships[owner_idx],
+                        &MOX::_system_display_ships[owner_idx].y,
+                        &layout_state);
+                }
+            }
+        }
+    }
 }

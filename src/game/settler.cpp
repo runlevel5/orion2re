@@ -191,6 +191,89 @@ namespace settler {
         return distance;
     }
 
+    void __cdecl Pop_Tries_To_Settle_(
+            s_colony *source_colony,
+            int16_t selected_pop_idx,
+            s_colony *dest_colony,
+            s_settler_settle_result *result) {
+        s_player *player = &MOX::_player[source_colony->owner];
+        const int32_t source_star_idx = static_cast<int32_t>(MOX::_planet[source_colony->planet].star_index);
+        const int32_t dest_star_idx = static_cast<int32_t>(MOX::_planet[dest_colony->planet].star_index);
+
+        memset(result, 0, sizeof(*result));
+
+        if (dest_colony->owner != source_colony->owner) {
+            result->dest_owner_mismatch = 1;
+            return;
+        }
+
+        if ((((uint32_t)(uint8_t)MOX::_star[source_star_idx].blockaded >>
+              (static_cast<uint32_t>(static_cast<uint8_t>(source_colony->owner)) & 0x1fU)) &
+             1U) != 0) {
+            result->source_blockaded = 1;
+            return;
+        }
+
+        if (EVENTS::Event_Check_Space_Anomaly_(static_cast<int32_t>(source_colony - MOX::_colony)) != 0) {
+            result->source_space_anomaly = 1;
+            return;
+        }
+
+        if (EVENTS::Event_Check_Plague_(static_cast<int32_t>(source_colony - MOX::_colony)) != 0) {
+            result->source_plague = 1;
+            return;
+        }
+
+        if (dest_colony->outpost_flag != 0) {
+            result->dest_is_outpost = 1;
+            return;
+        }
+
+        if (source_colony->n_pops == 1) {
+            result->only_one_pop_left = 1;
+            return;
+        }
+
+        if ((source_colony->pop[selected_pop_idx] & 0x400) != 0) {
+            result->selected_pop_flag_0x400 = 1;
+            return;
+        }
+
+        if (dest_colony == source_colony) {
+            result->can_settle = 1;
+            return;
+        }
+
+        if (dest_star_idx != source_star_idx) {
+            if (player->n_freighters < player->settlers_freighted * 5 + 5) {
+                result->insufficient_freighters = 1;
+                return;
+            }
+
+            if (player->settlers_freighted == 25) {
+                result->max_settlers_in_transit = 1;
+                return;
+            }
+        }
+
+        if (Room_For_Another_(dest_colony, source_colony->pop[selected_pop_idx] & 0x0f, 1) == 0) {
+            result->no_room_at_destination = 1;
+        }
+
+        if ((((uint32_t)(uint8_t)MOX::_star[dest_star_idx].blockaded >>
+              (static_cast<uint32_t>(static_cast<uint8_t>(dest_colony->owner)) & 0x1fU)) &
+             1U) != 0) {
+            result->dest_blockaded = 1;
+        }
+
+        if (EVENTS::Event_Check_Space_Anomaly_(static_cast<int32_t>(dest_colony - MOX::_colony)) != 0) {
+            result->dest_space_anomaly = 1;
+        }
+
+        result->eta_turns = static_cast<uint8_t>(Settler_ETA_(player, source_star_idx, dest_star_idx));
+        result->can_settle = 1;
+    }
+
     void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
         if (dest_colony != source_colony) {
             s_player* owner_player = &MOX::_player[static_cast<int32_t>(source_colony->owner)];

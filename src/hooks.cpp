@@ -3820,6 +3820,10 @@ namespace hooks {
         { 0x005286A0, &video::Set_Page_Back_ },
         { 0x005286C0, &video::Copy_Off_To_Back_ },
         { 0x00526D10, &video::Init_Video_Drivers_ },
+        { 0x00493E60, &SYS::Build_System_Popup_Ships_ },
+        { 0x00495AF0, &SYS::Get_System_Display_Ship_Icon_XY_ },
+        { 0x0043B820, &settler::Pop_Tries_To_Settle_ },
+        { 0x0049F680, &COLMOVE::Send_Cluster_ },
     };
 
     void Install_Hooks()

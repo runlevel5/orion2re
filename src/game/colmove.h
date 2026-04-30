@@ -17,7 +17,7 @@ namespace COLMOVE {
 
     bool __cdecl Pops_Identical_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
-    void __cdecl Send_Cluster_(int16_t colony_idx, int16_t param_2);
+    void __cdecl Send_Cluster_(int16_t colony_idx, int16_t requested_job);
 
     inline void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* dest) {
         using Fn = void(__cdecl*)(int16_t, int16_t, char*);
