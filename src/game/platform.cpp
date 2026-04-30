@@ -471,6 +471,12 @@ namespace platform {
         return hr;
     }
 
+    void __cdecl Prepare_Exit_() {
+        sound::Destroy_Sound_();
+        netcode::Net_Uninit_();
+        g_should_exit = 1;
+    }
+
     void Cleanup_Surfaces()
     {
         if (g_direct_draw != NULL)
@@ -543,6 +549,61 @@ namespace platform {
         Blit_Surface_To_Screen(g_backbuffer_surface);
 #endif
         g_frame_count++;
+    }
+
+    LONG __cdecl Lock_Offscreen_Surface_() {
+        platform::DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
+        platform::DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+
+        platform::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
+
+        HRESULT result = platform::g_offscreen_surface_2->Lock(
+            nullptr,
+            &platform::DDSURFACEDESC_00578e70,
+            0,
+            nullptr);
+
+        if (result == DD_OK) {
+            platform::_offscreen_surface = (uint8_t*)platform::_current_locked_page;
+            return platform::_surface_lock_flag;
+        }
+
+        if (result == E_INVALIDARG ||
+            result == E_OUTOFMEMORY ||
+            result == DDERR_SURFACELOST ||
+            result == DDERR_SURFACEBUSY ||
+            result == DDERR_CANTLOCKSURFACE ||
+            result == DDERR_WASSTILLDRAWING) {
+            return (LONG)result;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Unlock_Offscreen_Surface_() {
+        g_offscreen_surface_2->Unlock(nullptr);
+    }
+
+    void __cdecl Lock_Cursor_Surface_() {
+        HRESULT lock_result;
+
+        platform::_cursor_surface_desc.dwSize = sizeof(DDSURFACEDESC);
+        platform::_cursor_surface_desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+        platform::g_cursor_surface_1->GetSurfaceDesc(&platform::_cursor_surface_desc);
+
+        lock_result = platform::g_cursor_surface_1->Lock(
+            nullptr,
+            &platform::_cursor_surface_desc,
+            DDLOCK_SURFACEMEMORYPTR,
+            nullptr);
+
+        if (lock_result == DD_OK) {
+            platform::_cursor_surface = platform::_cursor_surface_desc.lpSurface;
+        }
+    }
+
+    void __cdecl Unlock_Cursor_Surface_() {
+        g_cursor_surface_1->Unlock(nullptr);
     }
 
     uint32_t Lock_Appropriate_Render_Buffer()
@@ -735,6 +796,137 @@ namespace platform {
             Blit_Surface_To_Screen(g_primary_surface);
 #endif
         }
+    }
+
+    void __cdecl Save_Mouse_(int16_t mouse_x, int16_t mouse_y) {
+        RECT save_rect;
+        const LONG max_x = g_screen_res_x - 1;
+        const LONG max_y = g_screen_res_y - 1;
+
+        save_rect.left = static_cast<LONG>(mouse_x);
+        save_rect.top = static_cast<LONG>(mouse_y);
+
+        save_rect.right = max_x;
+        if (save_rect.left + 0x18 < max_x) {
+            save_rect.right = save_rect.left + 0x18;
+        }
+
+        save_rect.bottom = max_y;
+        if (save_rect.top + 0x18 < max_y) {
+            save_rect.bottom = save_rect.top + 0x18;
+        }
+
+        g_cursor_surface_2->BltFast(
+            0,
+            0,
+            g_primary_surface,
+            &save_rect,
+            DDBLTFAST_WAIT
+        );
+
+        g_cached_mouse_x = mouse_x;
+        g_cached_mouse_y = mouse_y;
+    }
+
+    void __cdecl Save_Mouse_Offscreen_(int16_t mouse_x, int16_t mouse_y) {
+        RECT saved_rect;
+
+        saved_rect.left = static_cast<LONG>(mouse_x);
+        saved_rect.top = static_cast<LONG>(mouse_y);
+
+        saved_rect.right = g_screen_res_x - 1;
+        if (saved_rect.left + 0x18 < g_screen_res_x - 1) {
+            saved_rect.right = saved_rect.left + 0x18;
+        }
+
+        saved_rect.bottom = g_screen_res_y - 1;
+        if (saved_rect.top + 0x18 < g_screen_res_y - 1) {
+            saved_rect.bottom = saved_rect.top + 0x18;
+        }
+
+        g_cursor_surface_2->BltFast(
+            0,
+            0,
+            g_offscreen_surface_1,
+            &saved_rect,
+            DDBLTFAST_WAIT
+        );
+
+        g_cached_mouse_x = mouse_x;
+        g_cached_mouse_y = mouse_y;
+    }
+
+    void __cdecl Draw_Cursor_XY_Offscreen_(int16_t mouse_x, int16_t mouse_y) {
+        RECT source_rect;
+        DDCOLORKEY color_key;
+        int32_t x;
+        int32_t y;
+
+        if (video::_current_mouse_shape <= 0) {
+            return;
+        }
+
+        if (static_cast<int32_t>(video::_current_mouse_shape) != platform::_offscreen_mouse_shape) {
+            platform::Update_Cursor_Image_();
+            platform::_offscreen_mouse_shape = static_cast<int32_t>(video::_current_mouse_shape);
+        }
+
+        source_rect.left = 0;
+        source_rect.top = 0;
+
+        x = static_cast<int32_t>(mouse_x);
+        if (x + 0x18 < g_screen_res_x - 1) {
+            source_rect.right = 0x18;
+        } else {
+            source_rect.right = g_screen_res_x - x - 1;
+        }
+
+        y = static_cast<int32_t>(mouse_y);
+        if (y + 0x18 < g_screen_res_y - 1) {
+            source_rect.bottom = 0x18;
+        } else {
+            source_rect.bottom = g_screen_res_y - y - 1;
+        }
+
+        color_key.dwColorSpaceLowValue = 0;
+        color_key.dwColorSpaceHighValue = 0;
+
+        g_cursor_surface_1->SetColorKey(8, &color_key);
+        g_offscreen_surface_1->BltFast(
+            static_cast<DWORD>(x),
+            static_cast<DWORD>(y),
+            g_cursor_surface_1,
+            &source_rect,
+            DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
+    }
+
+    void __cdecl Restore_Mouse_Off_Page_() {
+        RECT src_rect;
+        const int32_t mouse_x = static_cast<int32_t>(g_cached_mouse_x);
+        const int32_t mouse_y = static_cast<int32_t>(g_cached_mouse_y);
+
+        src_rect.left = 0;
+        src_rect.top = 0;
+
+        if (mouse_x + 0x18 < g_screen_res_x - 1) {
+            src_rect.right = 0x18;
+        } else {
+            src_rect.right = g_screen_res_x - mouse_x - 1;
+        }
+
+        if (mouse_y + 0x18 < g_screen_res_y - 1) {
+            src_rect.bottom = 0x18;
+        } else {
+            src_rect.bottom = g_screen_res_y - mouse_y - 1;
+        }
+
+        g_offscreen_surface_1->BltFast(
+            static_cast<DWORD>(mouse_x),
+            static_cast<DWORD>(mouse_y),
+            platform::g_cursor_surface_2,
+            &src_rect,
+            DDBLTFAST_WAIT
+        );
     }
 
     void Force_Cursor_Pos(int16_t x, int16_t y)
@@ -1054,5 +1246,22 @@ namespace platform {
         DestroyWindow(g_main_window);
 
         return 0;
+    }
+
+    void __cdecl Update_Cursor_Image_() {
+        if (video::_current_mouse_shape > 0) {
+            platform::Lock_Cursor_Surface_();
+
+            uint8_t* const src =
+                &video::_mouse_palette[(static_cast<int32_t>(video::_current_mouse_shape) - 1) * 0x240];
+
+            for (int32_t row = 0; row < 0x18; ++row) {
+                memcpy(&((uint8_t*)platform::_cursor_surface)[row * 0x18], &src[row * 0x18], 0x18);
+            }
+
+            platform::Unlock_Cursor_Surface_();
+        }
+
+        platform::Force_Cursor_Pos(platform::g_mouse_x, platform::g_mouse_y);
     }
 }

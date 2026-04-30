@@ -1726,4 +1726,401 @@ namespace SYS {
             param_6,
             &local_2);
     }
+
+    void __cdecl Add_System_Display_Popup_Fields_(
+        int16_t star_idx,
+        int16_t base_x,
+        int16_t base_y,
+        int16_t popup_offset_x,
+        int16_t popup_offset_y,
+        int16_t orbit_offset_x,
+        int16_t orbit_offset_y,
+        int16_t* out_popup_hidden_field,
+        int16_t* out_popup_title_button,
+        int16_t* out_system_field) {
+        int16_t gate_icon_x = 0;
+        int16_t gate_icon_y = 0;
+        int32_t orbit_display_x = 0;
+        int32_t orbit_display_y = 0;
+        int32_t orbit_display_frame = 0;
+
+        if (star_idx <= -1) {
+            return;
+        }
+
+        if (star_idx >= static_cast<int16_t>(MOX::_NUM_STARS)) {
+            return;
+        }
+
+        if (SYS::_skip_draw_system_display != 0) {
+            return;
+        }
+
+        SYS::Build_System_Popup_Ships_(star_idx);
+
+        if (out_popup_title_button != nullptr) {
+            const int16_t popup_left = static_cast<int16_t>(base_x + popup_offset_x);
+            const int16_t popup_top = static_cast<int16_t>(base_y + popup_offset_y);
+
+            *out_popup_title_button = fields::Add_Clipped_Button_Field_(
+                static_cast<int16_t>(popup_left + 0x107),
+                static_cast<int16_t>(popup_top + 0xEC),
+                SYS::s__00551100,
+                SYS::_moveable_box_pict_4,
+                (void*)SYS::s__00551120,
+                (char)0x28);
+
+            *out_popup_hidden_field = fields::Add_Hidden_Field_(
+                popup_left,
+                popup_top,
+                static_cast<int16_t>(popup_left + SYS::_moveable_box_0_width),
+                static_cast<int16_t>(popup_top + 0x2F),
+                SYS::s__00551100,
+                0);
+        } else {
+            *out_popup_hidden_field = -1000;
+        }
+
+        for (int16_t orbit_slot = 4; orbit_slot >= 0; --orbit_slot) {
+            const int16_t planet_idx = MOX::_sys_disp[orbit_slot].orbit;
+
+            if (planet_idx <= -1) {
+                SYS::_planet_buttons[orbit_slot] = -1000;
+                continue;
+            }
+
+            const s_planet_data& planet = MOX::_planet[planet_idx];
+            if (planet.planet_type == 1) {
+                SYS::_planet_buttons[orbit_slot] = -1000;
+                continue;
+            }
+
+            int32_t planet_size = static_cast<int32_t>(planet.size);
+            if (planet.planet_type == 2) {
+                planet_size = 4;
+            }
+
+            GEO::Get_Orbit_Display_X_Y_(
+                star_idx,
+                static_cast<int32_t>(planet.orbit),
+                &orbit_display_x,
+                &orbit_display_y,
+                &orbit_display_frame);
+
+            const uint8_t planet_diameter = MOX::_rot_plan_dim[planet_size];
+            const int16_t half_diameter = static_cast<int16_t>(planet_diameter / 2);
+
+            const int16_t left = static_cast<int16_t>(
+                base_x + popup_offset_x + orbit_offset_x + static_cast<int16_t>(orbit_display_x) + 0xA1 -
+                half_diameter);
+            const int16_t top = static_cast<int16_t>(
+                base_y + popup_offset_y + orbit_offset_y + static_cast<int16_t>(orbit_display_y) + 0x5A -
+                half_diameter);
+
+            SYS::_planet_buttons[orbit_slot] = fields::Add_Hidden_Field_(
+                left,
+                top,
+                static_cast<int16_t>(left + planet_diameter),
+                static_cast<int16_t>(top + planet_diameter),
+                SYS::s__00551100,
+                0x29);
+        }
+
+        for (int16_t ship_slot = 0; ship_slot < 15; ++ship_slot) {
+            if (MOX::_system_display_ships[ship_slot].ship_idx <= -1) {
+                continue;
+            }
+
+            const int16_t ship_left = static_cast<int16_t>(
+                base_x + popup_offset_x + MOX::_system_display_ships[ship_slot].x);
+            const int16_t ship_top = static_cast<int16_t>(
+                base_y + popup_offset_y + MOX::_system_display_ships[ship_slot].y);
+
+            MOX::_system_display_ships[ship_slot].pic =
+                SYS::Buffer_Reload_System_Ships_(ship_slot);
+
+            const int16_t ship_bottom = static_cast<int16_t>(
+                ship_top + animate::Get_Height_(MOX::_system_display_ships[ship_slot].pic));
+            const int16_t ship_right = static_cast<int16_t>(
+                ship_left + animate::Get_Width_(MOX::_system_display_ships[ship_slot].pic));
+
+            MOX::_system_display_ships[ship_slot].button = fields::Add_Hidden_Field_(
+                ship_left,
+                ship_top,
+                ship_right,
+                ship_bottom,
+                SYS::s__00551100,
+                0x29);
+        }
+
+        for (int16_t i = 0; i < 4; ++i) {
+            MOX::_gate_icon_field[i] = -1000;
+        }
+
+        SYS::Get_Gate_Icon_XY_(
+            base_x,
+            base_y,
+            popup_offset_x,
+            popup_offset_y,
+            orbit_offset_x,
+            &gate_icon_x,
+            &gate_icon_y);
+
+        if (MOX::_current_screen == 0x1D) {
+            gate_icon_y = static_cast<int16_t>(gate_icon_y - 6);
+        }
+
+        if (HAROLD::Star_Has_Artemis_Net_(&MOX::_star[star_idx])) {
+            gate_icon_x = static_cast<int16_t>(gate_icon_x - 0x0C);
+            MOX::_gate_icon_field[3] = fields::Add_Hidden_Field_(
+                gate_icon_x,
+                gate_icon_y,
+                static_cast<int16_t>(gate_icon_x + 0x0F),
+                static_cast<int16_t>(gate_icon_y + 0x0F),
+                SYS::s__00551100,
+                0);
+        }
+
+        if (HAROLD::Star_Has_Dimensional_Portal_(&MOX::_star[star_idx])) {
+            gate_icon_x = static_cast<int16_t>(gate_icon_x - 0x0C);
+            MOX::_gate_icon_field[0] = fields::Add_Hidden_Field_(
+                gate_icon_x,
+                gate_icon_y,
+                static_cast<int16_t>(gate_icon_x + 0x0F),
+                static_cast<int16_t>(gate_icon_y + 0x0F),
+                SYS::s__00551100,
+                0);
+        }
+
+        if (MOX::_current_screen == 0x1D) {
+            *out_system_field = fields::Add_Hidden_Field_(
+                static_cast<int16_t>(base_x + popup_offset_x),
+                static_cast<int16_t>(base_y + popup_offset_y),
+                static_cast<int16_t>(base_x + popup_offset_x + 0x13E),
+                static_cast<int16_t>(base_y + popup_offset_y + 0xB4),
+                SYS::s__00551100,
+                0);
+            return;
+        }
+
+        MOX::_system_display_grid_field = fields::Add_Grid_Field_(
+            static_cast<int16_t>(base_x + popup_offset_x + 0x0D),
+            static_cast<int16_t>(base_y + popup_offset_y + 0x2F),
+            0x140,
+            0xB7,
+            1,
+            1,
+            &MOX::_system_display_grid_x[0],
+            &MOX::_system_display_grid_y[0],
+            0);
+
+        *out_system_field = fields::Add_Hidden_Field_(
+            static_cast<int16_t>(base_x + popup_offset_x),
+            static_cast<int16_t>(base_y + popup_offset_y),
+            static_cast<int16_t>(base_x + popup_offset_x + SYS::_moveable_box_0_width),
+            static_cast<int16_t>(base_y + popup_offset_y + SYS::_moveable_box_0_height),
+            SYS::s__00551100,
+            0);
+    }
+
+    void __cdecl Remap_Draw_Animated_Sprite_Mask_(
+        int16_t x,
+        int16_t y,
+        const uint8_t* sprite_data,
+        const uint8_t* mask_data) {
+      const int16_t* const sprite_words =
+          reinterpret_cast<const int16_t*>(sprite_data);
+
+      const int16_t sprite_width = animate::_animation_header->width;
+      const int32_t sprite_height = animate::_animation_header->height;
+
+      int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
+      int32_t word_index = 2;
+      int32_t dest_offset =
+          (static_cast<int32_t>(y) + current_row) * static_cast<int32_t>(g_screen_res_x) +
+          static_cast<int32_t>(x);
+      int32_t row_start_dest_offset = dest_offset;
+
+      while (current_row < sprite_height) {
+        const int16_t run_length = sprite_words[word_index];
+        const int16_t delta = sprite_words[word_index + 1];
+        word_index += 2;
+
+        if (run_length == 0) {
+          current_row += static_cast<int32_t>(delta);
+          row_start_dest_offset += static_cast<int32_t>(delta) * 640;
+          dest_offset = row_start_dest_offset;
+        } else {
+          dest_offset += static_cast<int32_t>(delta);
+
+          int32_t sprite_byte_index = word_index * 2;
+          int32_t pixel_index = 0;
+          const int32_t run_end = dest_offset + static_cast<int32_t>(run_length);
+
+          if (run_end > dest_offset) {
+            const int32_t mask_offset =
+                static_cast<int32_t>(sprite_width) * current_row + static_cast<int32_t>(delta);
+
+            do {
+              const int8_t mask_value =
+                  static_cast<int8_t>(mask_data[mask_offset + pixel_index]);
+
+              uint8_t color;
+              if (mask_value != 0) {
+                const uint8_t remapped_color =
+                    remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
+                color =
+                    video::DAT_005A56E0[(static_cast<int32_t>(mask_value) << 8) + remapped_color];
+              } else {
+                color = remap::_picture_remap_color_list[sprite_data[sprite_byte_index]];
+              }
+
+              video::_current_video_page[dest_offset] = color;
+
+              ++sprite_byte_index;
+              ++dest_offset;
+              ++pixel_index;
+            } while (run_end > dest_offset);
+          }
+
+          word_index += (run_length + 1) / 2;
+        }
+      }
+    }
+
+    void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(
+        int16_t x,
+        int16_t y,
+        const uint8_t* encoded_sprite,
+        const uint8_t* mask_bitmap) {
+        const uint16_t* const sprite_words =
+            reinterpret_cast<const uint16_t*>(encoded_sprite);
+        const int32_t sprite_width = animate::_animation_header->width;
+        const int32_t sprite_height = animate::_animation_header->height;
+
+        int16_t draw_x;
+        int32_t left_clip;
+        if (x < video::_screen_window_x1) {
+            left_clip = static_cast<int32_t>(video::_screen_window_x1) - static_cast<int32_t>(x);
+            draw_x = video::_screen_window_x1;
+        } else {
+            left_clip = 0;
+            draw_x = x;
+        }
+
+        int16_t draw_y;
+        int32_t top_clip;
+        if (video::_screen_window_y1 > y) {
+            top_clip = static_cast<int32_t>(video::_screen_window_y1) - static_cast<int32_t>(y);
+            draw_y = video::_screen_window_y1;
+        } else {
+            top_clip = 0;
+            draw_y = y;
+        }
+
+        int16_t right = static_cast<int16_t>(static_cast<int32_t>(x) + sprite_width - 1);
+        if (video::_screen_window_x2 <= right) {
+            right = video::_screen_window_x2;
+        }
+
+        int16_t bottom = static_cast<int16_t>(static_cast<int32_t>(y) + sprite_height - 1);
+        if (video::_screen_window_y2 <= bottom) {
+            bottom = video::_screen_window_y2;
+        }
+
+        int32_t word_index = 2;
+        int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
+
+        int32_t current_dest_row =
+            static_cast<int32_t>(draw_y) * static_cast<int32_t>(g_screen_res_x) +
+            static_cast<int32_t>(x);
+
+        if (current_row < top_clip) {
+            do {
+                const int16_t run_length = static_cast<int16_t>(sprite_words[word_index]);
+                if (run_length == 0) {
+                    current_row += static_cast<uint16_t>(sprite_words[word_index + 1]);
+                } else {
+                    word_index += (static_cast<int32_t>(run_length) + 1) / 2;
+                }
+                word_index += 2;
+            } while (current_row < top_clip);
+        }
+
+        if (current_row > top_clip) {
+            current_dest_row +=
+                (current_row - top_clip) * static_cast<int32_t>(g_screen_res_x);
+        }
+
+        int32_t row_index = current_row - top_clip;
+        int32_t row_clip_start = current_dest_row + left_clip;
+        const int32_t visible_width =
+            static_cast<int32_t>(right) - static_cast<int32_t>(draw_x) + 1;
+        int32_t row_clip_end = row_clip_start + visible_width;
+        const int32_t visible_height =
+            static_cast<int32_t>(bottom) - static_cast<int32_t>(draw_y) + 1;
+
+        while (row_index < visible_height) {
+            const int16_t run_length = static_cast<int16_t>(sprite_words[word_index]);
+            const int16_t run_x = static_cast<int16_t>(sprite_words[word_index + 1]);
+            word_index += 2;
+
+            if (run_length == 0) {
+                row_index += static_cast<int32_t>(run_x);
+                current_dest_row += static_cast<int32_t>(run_x) * 640;
+                row_clip_start = current_dest_row + left_clip;
+                row_clip_end = row_clip_start + visible_width;
+                continue;
+            }
+
+            int32_t dest_x = current_dest_row + static_cast<int32_t>(run_x);
+            int32_t pixel_byte_index = word_index * 2;
+            const int32_t run_end = dest_x + static_cast<int32_t>(run_length);
+            int32_t skipped_pixels = 0;
+
+            if (dest_x < row_clip_end) {
+                if (dest_x < row_clip_start) {
+                    int32_t clip_count = row_clip_start - dest_x;
+                    if (clip_count > static_cast<int32_t>(run_length)) {
+                        clip_count = static_cast<int32_t>(run_length);
+                    }
+                    skipped_pixels = clip_count;
+                    pixel_byte_index += clip_count;
+                    dest_x += clip_count;
+                }
+
+                const int32_t clipped_run_end =
+                    (row_clip_end < run_end) ? row_clip_end : run_end;
+
+                if (clipped_run_end > dest_x) {
+                    int32_t mask_index =
+                        sprite_width * row_index + static_cast<int32_t>(run_x) + skipped_pixels;
+
+                    while (dest_x < clipped_run_end) {
+                        const uint8_t mask_value = mask_bitmap[mask_index];
+                        const uint8_t remapped_color =
+                            remap::_picture_remap_color_list[encoded_sprite[pixel_byte_index]];
+
+                        uint8_t out_color;
+                        if (mask_value != 0) {
+                            const int32_t mask_lookup =
+                                static_cast<int32_t>(static_cast<int8_t>(mask_value)) << 8;
+                            out_color = video::DAT_005A56E0[
+                                mask_lookup + static_cast<int32_t>(remapped_color)];
+                        } else {
+                            out_color = remapped_color;
+                        }
+
+                        video::_current_video_page[dest_x] = out_color;
+                        ++pixel_byte_index;
+                        ++dest_x;
+                        ++skipped_pixels;
+                        ++mask_index;
+                    }
+                }
+            }
+
+            word_index += (static_cast<int32_t>(run_length) + 1) / 2;
+        }
+    }
 }

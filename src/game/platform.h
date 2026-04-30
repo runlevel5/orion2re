@@ -54,8 +54,14 @@ namespace platform {
 	inline LPDIRECTDRAWSURFACE& g_cursor_surface_1 =
 		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578810 });
 
+	inline int32_t& _offscreen_mouse_shape =
+		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00578B54 });
+
 	inline LPDIRECTDRAWSURFACE& g_cursor_surface_2 =
 		*reinterpret_cast<LPDIRECTDRAWSURFACE*>(std::uintptr_t{ 0x00578814 });
+
+	inline LPVOID& _cursor_surface =
+		*reinterpret_cast<LPVOID*>(std::uintptr_t{ 0x0057881C });
 
 	inline LPDIRECTDRAWPALETTE& g_palette =
 		*reinterpret_cast<LPDIRECTDRAWPALETTE*>(std::uintptr_t{ 0x00578e64 });
@@ -81,10 +87,22 @@ namespace platform {
 	inline uint8_t& g_render_buffer =
 		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578edc });
 
+	inline DDSURFACEDESC& DDSURFACEDESC_00578e70 =
+		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578E70 });
+
+	inline LONG& _surface_lock_flag =
+		platform::DDSURFACEDESC_00578e70.lPitch;
+
+	inline LPVOID& _current_locked_page =
+		platform::DDSURFACEDESC_00578e70.lpSurface;
+
 	inline uint8_t*& _offscreen_surface = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00578E54});
 
 	inline uint16_t& DAT_578AC4 =
 		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578ac4 });
+
+	inline DDSURFACEDESC& _cursor_surface_desc =
+		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578AD0 });
 
 	inline uint32_t& DAT_578B3C =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578b3c });
@@ -120,47 +138,18 @@ namespace platform {
 	HRESULT Restore_Surfaces();
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	inline void __cdecl Lock_Offscreen_Surface_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005285B0 });
-		fn();
-	}
-	inline void __cdecl Unlock_Offscreen_Surface_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528640 });
-		fn();
-	}
-	inline void __cdecl Save_Mouse_(int16_t x, int16_t y) {
-		using Fn = void(__cdecl*)(int16_t, int16_t);
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005271A0});
-		fn(x, y);
-	}
-	inline void __cdecl Save_Mouse_Offscreen_(int16_t x, int16_t y) {
-		using Fn = void(__cdecl*)(int16_t, int16_t);
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527120});
-		fn(x, y);
-	}
-	inline void __cdecl Draw_Cursor_XY_Offscreen_(int16_t x, int16_t y) {
-		using Fn = void(__cdecl*)(int16_t, int16_t);
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527220});
-		fn(x, y);
-	}
-	inline void __cdecl Restore_Mouse_Off_Page_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00527000});
-		fn();
-	}
+	LONG __cdecl Lock_Offscreen_Surface_();
+	void __cdecl Unlock_Offscreen_Surface_();
+	void __cdecl Save_Mouse_(int16_t mouse_x, int16_t mouse_y);
+	void __cdecl Save_Mouse_Offscreen_(int16_t mouse_x, int16_t mouse_y);
+	void __cdecl Draw_Cursor_XY_Offscreen_(int16_t mouse_x, int16_t mouse_y);
+	void __cdecl Restore_Mouse_Off_Page_();
 	void Draw_Auto_Cursor();
 	void Cleanup_Surfaces();
-	inline void __cdecl Prepare_Exit_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00533630 });
-		fn();
-	}
-	inline void __cdecl Update_Cursor_Image_() {
-		using Fn = void(__cdecl*)();
-		reinterpret_cast<Fn>(std::uintptr_t{ 0x00526F80 })();
-	}
+	void __cdecl Prepare_Exit_();
+	void __cdecl Lock_Cursor_Surface_();
+	void __cdecl Unlock_Cursor_Surface_();
+	void __cdecl Update_Cursor_Image_();
 	void __cdecl Toggle_Pages_Stub_();
 	int __stdcall WinMain_Proxy(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nShowCmd);
 }

@@ -70,6 +70,8 @@ namespace video {
 	inline int16_t& _screen_window_x1 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578DFC });
 	inline int16_t& _screen_window_x2 = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578E00 });
 
+	inline uint8_t* DAT_005A56E0 = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005A56E0 });
+
 	// Functions
 	void __cdecl Set_Refresh_Stencil_();
 	void __cdecl Set_Refresh_Full_();

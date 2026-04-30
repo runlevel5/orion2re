@@ -14,10 +14,7 @@ namespace settler {
         reinterpret_cast<Fn>(std::uintptr_t{0x0043b820})(from, pop_idx, to, flags);
     }
 
-    inline int32_t __cdecl Settler_ETA_(s_player* player, int32_t from_star_idx, int32_t to_star_idx) {
-        using Fn = int32_t(__cdecl*)(s_player*, int32_t, int32_t);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0043ba50})(player, from_star_idx, to_star_idx);
-    }
+    int32_t __cdecl Settler_ETA_(s_player* player, int16_t source_star, int16_t dest_star);
 
     void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony);
 }

@@ -3487,6 +3487,13 @@ struct s_officer_picture_slot {
     int16_t officer_id;
 };
 
+typedef struct s_officer_skill_help s_officer_skill_help, *Ps_officer_skill_help;
+
+struct s_officer_skill_help {
+    int16_t skill_help_x[5];
+    int16_t skill_id[5];
+};
+
 typedef struct s_orion_candidate s_orion_candidate, *Ps_orion_candidate;
 
 struct s_orion_candidate {

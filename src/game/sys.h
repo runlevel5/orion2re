@@ -17,6 +17,12 @@ namespace SYS {
 
     inline uint8_t& _draw_sun_before_planet = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00566438});
     inline int8_t& _skip_draw_system_planets = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A57CC});
+    inline char* const s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
+    inline char* const s__00551120 = reinterpret_cast<char*>(std::uintptr_t{0x00551120});
+    inline int16_t (&_planet_buttons)[5] = *reinterpret_cast<int16_t(*)[5]>(std::uintptr_t{0x00597470});
+    inline int16_t& _moveable_box_0_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597864});
+    inline int16_t& _moveable_box_0_width = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597866});
+    inline s_animation_header*& _moveable_box_pict_4 = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1B70});
     inline uint8_t& _skip_draw_system_display = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A57D4});
     inline s_animation_header*& _system_display_sun_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056654C});
     inline void*& _sys_disp_bitmap = *reinterpret_cast<void**>(std::uintptr_t{0x00566434});
@@ -67,17 +73,13 @@ namespace SYS {
 
     inline s_animation_header*& _mask_header = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A57D8});
 
-    inline void __cdecl Remap_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, uint8_t* anim_frame, uint8_t* mask_frame) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497A40});
-        fn(x, y, anim_frame, mask_frame);
-    }
+    void __cdecl Remap_Draw_Animated_Sprite_Mask_(
+        int16_t x,
+        int16_t y,
+        const uint8_t* sprite_data,
+        const uint8_t* mask_data);
 
-    inline void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, uint8_t* anim_frame, uint8_t* mask_frame) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00497B80});
-        fn(x, y, anim_frame, mask_frame);
-    }
+    void __cdecl Remap_Clipped_Draw_Animated_Sprite_Mask_(int16_t x, int16_t y, const uint8_t* encoded_sprite, const uint8_t* mask_bitmap);
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner);
 
@@ -127,6 +129,12 @@ namespace SYS {
 
     void __cdecl Print_System_Ship_Data_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t ship_idx);
 
+    inline void __cdecl Build_System_Popup_Ships_(int16_t star_idx) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00493E60});
+        fn(star_idx);
+    }
+
     s_animation_header* __cdecl Buffer_Reload_System_Ships_(int16_t display_idx);
 
     void __cdecl Get_Gate_Icon_XY_(int16_t x, int16_t y, int16_t off_x, int16_t off_y, int16_t unused, int16_t* out_x, int16_t* out_y);
@@ -154,11 +162,17 @@ namespace SYS {
 
     void __cdecl Wrapper_For_Normal_System_Popup_();
 
-    inline void __cdecl Add_System_Display_Popup_Fields_(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10) {
-        using Fn = void(__cdecl*)(int16_t param_1, int32_t param_2, int32_t param_3, int32_t param_4, int32_t param_5, int32_t param_6, int32_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00493a20 });
-        fn(param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9, param_10);
-    }
+    void __cdecl Add_System_Display_Popup_Fields_(
+        int16_t star_idx,
+        int16_t base_x,
+        int16_t base_y,
+        int16_t popup_offset_x,
+        int16_t popup_offset_y,
+        int16_t orbit_offset_x,
+        int16_t orbit_offset_y,
+        int16_t* out_popup_hidden_field,
+        int16_t* out_popup_title_button,
+        int16_t* out_system_field);
 
     void __cdecl Wrapper_For_Informational_System_Fields_(int16_t star_idx, int16_t x, int16_t y, int16_t arg4, int16_t arg5, int16_t* arg6);
 }

@@ -82,6 +82,12 @@ inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
 
 inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
 inline uint32_t& DAT_00578e54 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578E54});
+struct IDirectDrawSurface;
+inline IDirectDrawSurface*& g_cursor_surface_1 =
+        *reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{0x00578810});
+
+inline IDirectDrawSurface*& g_offscreen_surface_1 =
+        *reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{0x00578E58});
 inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
 inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
 inline const char* s_Add_Square_to_scan_list_failed__0055b270 =

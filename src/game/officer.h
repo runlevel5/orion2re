@@ -138,10 +138,15 @@ namespace OFFICER {
 
     void __cdecl Check_Officer_Fields_(int16_t input, int16_t scanned, short* p3, short* p4);
 
-    inline int16_t __cdecl Scan_Officer_Fields_(int16_t* out_p1, int16_t* out_p2, int16_t p2, int16_t p1, int8_t* scanned_flag, int16_t* out_field2, int16_t* out_field1) {
-        using Fn = int16_t(__cdecl*)(int16_t*, int16_t*, int16_t, int16_t, int8_t*, int16_t*, int16_t*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x00441df0})(out_p1, out_p2, p2, p1, scanned_flag, out_field2, out_field1);
-    }
+    int16_t __cdecl Scan_Officer_Fields_(
+        int16_t* field_x_a,
+        int16_t* field_x_b,
+        int16_t current_x,
+        int16_t scan_x,
+        int8_t* out_current_officer_id,
+        int16_t* out_scanned_officer_id,
+        int16_t* out_skill_id
+    );
 
     uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4);
 
@@ -268,10 +273,7 @@ namespace OFFICER {
 
     void __cdecl Ai_Assign_Leader_To_Star_(s_player* player, s_leader_data* leader, s_star_data* star);
 
-    inline void __cdecl Wrapper_For_Offscrn_Help_Fields_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{0x004423B0})();
-    }
+    void __cdecl Wrapper_For_Offscrn_Help_Fields_();
 
     void __cdecl Add_Display_Popup_Fields_(int16_t star_displayed);
 
@@ -282,29 +284,34 @@ namespace OFFICER {
 
     void __cdecl Get_Italian_The_(int16_t leader_idx, char* dest);
 
-    inline void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t input, int16_t officer_idx) {
-        using Fn = void(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004422E0});
-        fn(input, officer_idx);
-    }
+    void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx);
 
     void __cdecl Wrapper_For_Colony_Officer_Popup_Data_(int16_t x, int16_t y, int32_t officer_idx);
 
-    inline void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(int32_t x, int32_t y, uint16_t officer) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442690});
-        fn(x, y, officer);
-    }
+    void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
+        int16_t skill_id_base,
+        int16_t skill_count_minus_one,
+        int32_t popup_param);
 
     void __cdecl Get_N_Skills_Per_Officer_Displayed_(int16_t* skill_counts);
+
+    inline s_officer_skill_help (&_officer_skill_help)[4] =
+        *reinterpret_cast<s_officer_skill_help (*)[4]>(std::uintptr_t{0x00565678});
+
+    inline void __cdecl Add_Skill_Description_Help_Fields_(
+        uint16_t first_skill_id,
+        uint16_t skill_count,
+        uint32_t player_num,
+        int32_t popup_param,
+        s_officer_skill_help* help_fields) {
+        using Fn = void(__cdecl*)(uint16_t, uint16_t, uint32_t, int32_t, s_officer_skill_help*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00442440});
+        fn(first_skill_id, skill_count, player_num, popup_param, help_fields);
+    }
 
     void __cdecl Officer_Name_(char* buffer, int16_t player_id, int16_t officer_idx);
 
     void __cdecl Draw_Officer_Skill_Icon_(int16_t x, int16_t y, int16_t skill_idx);
 
-    inline int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t officer_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004411A0});
-        return fn(officer_id);
-    }
+    int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t leader_idx);
 }

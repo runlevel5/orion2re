@@ -1250,6 +1250,64 @@ namespace OFFICER {
         ship->officer_index = (short)leader_idx;
     }
 
+    int16_t __cdecl Scan_Officer_Fields_(
+        int16_t* field_x_a,
+        int16_t* field_x_b,
+        int16_t current_x,
+        int16_t scan_x,
+        int8_t* out_current_officer_id,
+        int16_t* out_scanned_officer_id,
+        int16_t* out_skill_id) {
+        int16_t match_type = -1;
+
+        *out_current_officer_id = -1;
+        *out_scanned_officer_id = -1;
+        *out_skill_id = -1;
+
+        for (int16_t officer_slot = 0; officer_slot < 4 && match_type == -1; ++officer_slot) {
+            for (int16_t skill_slot = 0; skill_slot < 5 && match_type == -1; ++skill_slot) {
+                if (OFFICER::_officer_skill_help[officer_slot].skill_help_x[skill_slot] == scan_x) {
+                    match_type = 0;
+                    *out_scanned_officer_id = MOX::_officer_id_list[officer_slot];
+                } else if (scan_x + OFFICER::_officer_skill_help[officer_slot].skill_help_x[skill_slot] == 0) {
+                    match_type = 1;
+                    *out_scanned_officer_id = MOX::_officer_id_list[officer_slot];
+                    *out_skill_id = OFFICER::_officer_skill_help[officer_slot].skill_id[skill_slot];
+                }
+            }
+        }
+
+        for (int16_t officer_slot = 0; officer_slot < 4 && match_type == -1; ++officer_slot) {
+            if (field_x_a[officer_slot] == scan_x || field_x_b[officer_slot] == scan_x) {
+                match_type = 0;
+                *out_scanned_officer_id = MOX::_officer_id_list[officer_slot];
+            } else if (scan_x + field_x_b[officer_slot] == 0) {
+                match_type = 1;
+                *out_scanned_officer_id = MOX::_officer_id_list[officer_slot];
+            }
+        }
+
+        if (match_type == -1) {
+            for (int16_t officer_slot = 0; officer_slot < 4; ++officer_slot) {
+                if (field_x_a[officer_slot] == current_x || field_x_b[officer_slot] == current_x) {
+                    match_type = 4;
+                    *out_current_officer_id = static_cast<int8_t>(MOX::_officer_id_list[officer_slot]);
+                }
+
+                if (match_type == -1) {
+                    for (int16_t skill_slot = 0; skill_slot < 5 && match_type == -1; ++skill_slot) {
+                        if (OFFICER::_officer_skill_help[officer_slot].skill_help_x[skill_slot] == current_x) {
+                            match_type = 4;
+                            *out_current_officer_id = static_cast<int8_t>(MOX::_officer_id_list[officer_slot]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return match_type;
+    }
+
     uint32_t __cdecl Scan_Offscrn_Big_Icon_Fields_(int16_t param_1, int16_t param_2, int16_t* param_3, int16_t* param_4) {
         int16_t start_idx = MOX::_scroll_bar->first_visible_row * static_cast<int16_t>(static_cast<int8_t>(MOX::_big_icon_display_columns));
         int16_t end_idx = start_idx + 20;
@@ -1798,6 +1856,34 @@ namespace OFFICER {
     /**
      * @address 00442640
      */
+    void __cdecl Wrapper_For_Offscrn_Help_Fields_() {
+        int16_t officer_slot = 0;
+        int16_t y = 0x32;
+
+        while (officer_slot < 4) {
+            const int16_t officer_id = MOX::_officer_id_list[officer_slot];
+
+            if (officer_id < 0) {
+                for (int16_t skill_index = 0; skill_index < 5; ++skill_index) {
+                    OFFICER::_officer_skill_help[officer_slot].skill_help_x[skill_index] = -1000;
+                    OFFICER::_officer_skill_help[officer_slot].skill_id[skill_index] = 0;
+                }
+            } else {
+                // TYPE MISMATCH: signature in header uses different names/types for coordinates
+                OFFICER::Add_Skill_Description_Help_Fields_(
+                    0x5e,
+                    (uint16_t)y,
+                    (uint32_t)MOX::_PLAYER_NUM,
+                    (int32_t)officer_id,
+                    &OFFICER::_officer_skill_help[officer_slot]
+                );
+            }
+
+            y = static_cast<int16_t>(y + 0x6d);
+            ++officer_slot;
+        }
+    }
+
     void __cdecl Wrapper_For_Offscrn_System_Popup_(int16_t system_id) {
         if (system_id > -1) {
             if (SYS::Ok_To_View_System_(system_id, MOX::_PLAYER_NUM)) {
@@ -3651,6 +3737,84 @@ void __cdecl Print_Officer_Data_(
             current_y = static_cast<int16_t>(current_y + 0x11);
         }
     }
+}
+
+int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t leader_idx) {
+    int16_t max_width = 0;
+    char formatted_bonus[68];
+    const int16_t player_idx = static_cast<int8_t>(MOX::_leaders[leader_idx].player_index);
+
+    for (int16_t skill_idx = 0; skill_idx < 54; ++skill_idx) {
+        const uint8_t skill_type = MOX::_skill_data[skill_idx].skill_type;
+        bool has_skill = false;
+
+        if (skill_type == 0) {
+            has_skill = OFFICER::Officer_Has_General_Skill_(player_idx, leader_idx, skill_idx);
+        } else if (skill_type >= 1 && skill_type <= 2) {
+            has_skill = OFFICER::Officer_Has_Special_Skill_(player_idx, leader_idx, skill_idx);
+        }
+
+        if (!has_skill) {
+            continue;
+        }
+
+        const int16_t bonus = (int16_t)OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_idx), leader_idx, skill_idx);
+        _sprintf(formatted_bonus, MOX::_skill_data[skill_idx].format_str, static_cast<int>(bonus));
+
+        const int16_t width = fonts::Get_String_Width_(formatted_bonus);
+        if (width > max_width) {
+            max_width = width;
+        }
+    }
+
+    if (max_width == 0) {
+        max_width = 20;
+    }
+
+    return max_width;
+}
+
+void __cdecl Wrapper_To_Add_Officer_Popup_Help_Fields_(
+    int16_t skill_id_base,
+    int16_t skill_count_minus_one,
+    int32_t popup_param) {
+    memset(OFFICER::_officer_skill_help, 0, sizeof(OFFICER::_officer_skill_help));
+
+    OFFICER::Add_Skill_Description_Help_Fields_(
+        static_cast<uint16_t>(skill_id_base + 0x61),
+        static_cast<uint16_t>(skill_count_minus_one + 1),
+        static_cast<uint16_t>(MOX::_PLAYER_NUM),
+        popup_param,
+        OFFICER::_officer_skill_help);
+}
+
+void __cdecl Wrapper_For_Officer_Popup_Help_Fields_(int16_t field_x, int16_t officer_idx) {
+    int16_t skill_id = -1;
+
+    for (int16_t skill_index = 0; skill_index < 5; ++skill_index) {
+        if (skill_id != -1) {
+            break;
+        }
+
+        if (static_cast<int32_t>(OFFICER::_officer_skill_help[0].skill_help_x[skill_index]) +
+                static_cast<int32_t>(field_x) ==
+            0) {
+            skill_id = OFFICER::_officer_skill_help[0].skill_id[skill_index];
+        }
+    }
+
+    if (skill_id == -1) {
+        return;
+    }
+
+    allocate::Push_Block_(MOX::_screen_seg);
+    OFFICER::Load_Officer_Skill_Name_Descriptions_();
+
+    const int16_t skill_bonus =
+        static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(MOX::_PLAYER_NUM), officer_idx, skill_id));
+
+    OFFICER::Print_Officer_Skill_Help_(skill_id, skill_bonus, officer_idx);
+    allocate::Pop_Block_(MOX::_screen_seg);
 }
 
 }

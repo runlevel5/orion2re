@@ -52,7 +52,6 @@ namespace COLDRAW {
 
     void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16_t x, int16_t y, int16_t width, int16_t spacing, int8_t frame);
 
-    // TYPE MISMATCH: existing stub had int32_t for some parameters, decompiled has int16_t
     void __cdecl Draw_Colony_Prod_(int16_t colony_handle, int32_t selection, int32_t p3, int16_t y_offset, int32_t p5, int32_t p6);
 
     void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, int width, char is_mini);

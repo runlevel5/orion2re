@@ -638,6 +638,8 @@ namespace MOX {
     inline s_sys_disp*& _sys_disp = *reinterpret_cast<s_sys_disp**>(std::uintptr_t{0x0059B5F4});
     inline s_system_display_ships (&_system_display_ships)[15] =
         *reinterpret_cast<s_system_display_ships(*)[15]>(std::uintptr_t{0x0059B620});
+    inline int16_t (&_system_display_grid_y)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00596D74});
+    inline int16_t (&_system_display_grid_x)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00596D94});
     inline int16_t& _system_display_grid_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA6C});
     inline char* (&_race_names)[20] =
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });

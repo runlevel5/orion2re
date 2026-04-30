@@ -172,6 +172,25 @@ namespace settler {
         } while (curr_player < MOX::_player + MOX::_NUM_PLAYERS);
     }
 
+    int32_t __cdecl Settler_ETA_(s_player* player, int16_t source_star, int16_t dest_star) {
+        int32_t distance = GEO::Parsecs_Between_Stars_(source_star, dest_star);
+        if (distance == 0) {
+            return 0;
+        }
+
+        int32_t speed = static_cast<uint8_t>(player->ship_speed);
+        if (speed < 2) {
+            speed = 2;
+        }
+
+        distance = (distance + speed - 1) / speed;
+        if (distance > 15) {
+            distance = 15;
+        }
+
+        return distance;
+    }
+
     void __cdecl Settle_Pop_(s_colony* source_colony, int16_t pop_index, s_colony* dest_colony) {
         if (dest_colony != source_colony) {
             s_player* owner_player = &MOX::_player[static_cast<int32_t>(source_colony->owner)];
