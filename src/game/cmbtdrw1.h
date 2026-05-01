@@ -96,4 +96,10 @@ namespace CMBTDRW1 {
     void __cdecl Plasma_Darken_(s_animation_header* param_1, int16_t param_2, int16_t param_3);
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage);
+
+    inline void __cdecl Combat_Draw_View_Ship_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d1f80 });
+        fn();
+    }
 }

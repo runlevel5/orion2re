@@ -1295,7 +1295,7 @@ namespace HAROLD {
             }
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            Timed_Text_Box_(buffer, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            TEXTBOX::Timed_Text_Box_(buffer, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
             break;
@@ -1306,7 +1306,7 @@ namespace HAROLD {
             }
             video::Set_Refresh_Full_();
             *refresh_flag = 1;
-            Timed_Text_Box_(nullptr, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
+            TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(*reinterpret_cast<int8_t*>(&MOX::_global_var)));
             *refresh_flag = 1;
             video::Set_Refresh_Stencil_();
             *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;

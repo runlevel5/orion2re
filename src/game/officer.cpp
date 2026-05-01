@@ -1672,7 +1672,7 @@ namespace OFFICER {
             }
 
             *reinterpret_cast<int8_t*>(&MOX::_global_var) = duration;
-            Timed_Text_Box_(nullptr, message, static_cast<int16_t>(duration));
+            TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(duration));
             *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
         } else {
             GENDRAW::Message_Box_(const_cast<char*>(message));

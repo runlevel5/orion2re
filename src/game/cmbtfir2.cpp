@@ -1475,7 +1475,7 @@ namespace CMBTFIR2 {
         }
 
         if (show_timed_box) {
-            Timed_Text_Box_(title_str, body_str, 54);
+            TEXTBOX::Timed_Text_Box_(title_str, body_str, 54);
         } else {
             TEXTBOX::Text_Box_(title_str, body_str);
         }
@@ -1601,7 +1601,7 @@ namespace CMBTFIR2 {
         if (!is_timed) {
             TEXTBOX::Text_Box_(header_buf, msg_buf);
         } else {
-            Timed_Text_Box_(header_buf, msg_buf, 54);
+            TEXTBOX::Timed_Text_Box_(header_buf, msg_buf, 54);
         }
 
         sound::Fadeout_Sound_(sound_handle, 10);

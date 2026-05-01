@@ -962,6 +962,15 @@ struct s_bomb {
     undefined field13_0xe;
 };
 
+typedef struct s_buffer_cached_segment s_buffer_cached_segment, *Ps_buffer_cached_segment;
+
+struct s_buffer_cached_segment {
+    uint8_t is_loaded;
+    int16_t buffer_seg_id;
+    int32_t last_use_counter;
+    void *data_ptr;
+};
+
 typedef struct s_build_ship_icon_item s_build_ship_icon_item, *Ps_build_ship_icon_item;
 
 struct s_build_ship_icon_item {
@@ -1650,6 +1659,14 @@ struct s_fieldsav_data {
     int16_t active_input_field_number;
     int16_t max_fields_count;
     struct s_field *fields;
+};
+
+typedef struct s_file_buffer_entry s_file_buffer_entry, *Ps_file_buffer_entry;
+
+struct s_file_buffer_entry {
+    char file_name[16];
+    struct s_buffer_cached_segment segments[410];
+    int32_t segment_count;
 };
 
 typedef struct s_first_field_in_group s_first_field_in_group, *Ps_first_field_in_group;

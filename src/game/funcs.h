@@ -352,24 +352,6 @@ namespace GLOBALS {
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
 }
 
-inline void __cdecl Combat_Draw_View_Ship_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004d1f80});
-    fn();
-}
-
-inline bool __cdecl Officer_Has_General_Skill_(short player_idx, short officer_idx, short skill_idx) {
-    using Fn = bool(__cdecl*)(short, short, short);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043E390});
-    return fn(player_idx, officer_idx, skill_idx);
-}
-
-inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {
-    using Fn = void(__cdecl*)(const char*, const char*, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471090});
-    fn(title, message, duration);
-}
-
 inline void __cdecl Delete_Prod_From_Colony_Queue_(int32_t colony_idx, int32_t choice) {
     using Fn = void(__cdecl*)(int32_t, int32_t);
     reinterpret_cast<Fn>(std::uintptr_t{0x0050b300})(colony_idx, choice);

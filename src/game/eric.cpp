@@ -443,7 +443,7 @@ namespace ERIC {
                 if ((MOX::_leaders[i].type == 0 && MOX::_ship[MOX::_leaders[i].location].location == star_idx) ||
                     (MOX::_leaders[i].type == 1 && MOX::_leaders[i].location == star_idx)) {
 
-                    if (Officer_Has_General_Skill_(player_idx, i, skill_idx)) {
+                    if (OFFICER::Officer_Has_General_Skill_(player_idx, i, skill_idx)) {
                         return 1;
                     }
                 }
