@@ -352,38 +352,10 @@ namespace GLOBALS {
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
 }
 
-inline void __cdecl Delete_Prod_From_Colony_Queue_(int32_t colony_idx, int32_t choice) {
-    using Fn = void(__cdecl*)(int32_t, int32_t);
-    reinterpret_cast<Fn>(std::uintptr_t{0x0050b300})(colony_idx, choice);
-}
-
-inline void __cdecl Build_Captain_Id_List_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043D470});
-    fn();
-}
-
-inline void __cdecl Set_Multi_Player_Game_Type_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005081D0});
-    fn();
-}
-
-inline void __cdecl Get_Officer_Pictures_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00441A40});
-    fn();
-}
-
 inline const char** g_race_names_ptrs = reinterpret_cast<const char**>(std::uintptr_t{ 0x0059D660 });
 inline char**& DAT_0059d660 = *reinterpret_cast<char***>(std::uintptr_t{ 0x0059D660 });
 inline char* s_360_00556164 = reinterpret_cast<char*>(std::uintptr_t{0x00556164}); // "360"
 inline const char* s_comma_space_00556168 = reinterpret_cast<const char*>(std::uintptr_t{0x00556168}); // ", "
-inline void __cdecl Draw_Design_Screen_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042F470});
-    fn();
-}
 
 inline uint8_t& DAT_00590000 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00590000});
 
@@ -404,11 +376,6 @@ inline const char* s___005569ec = reinterpret_cast<const char*>(std::uintptr_t{0
 struct s_colors;
 inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
-
-inline void __cdecl FUN_00443C60() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{ 0x00443C60 })();
-}
 
 // Suggested name: s_Null_Pointer
 inline const char* const s__d_c_d_0055996c = reinterpret_cast<const char*>(0x0055996C); // "%d%c%d"
@@ -571,6 +538,15 @@ inline const char* s_Mar_26_1997_005578e0 = reinterpret_cast<const char*>(std::u
 
 inline const char* const s_Memory_Corruption_val_00558028 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558028}); // "Memory Corruption! val == %d, sh == %d, pl == %d, d == %d"
+
+inline LPCSTR s_max_file_buffer_count_went_over__0055b334 =
+    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B334}); /* "max file buffer count went over.." */
+
+inline LPCSTR s_max_buffer_segs_went_over___0055b358 =
+    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B358}); /* "max buffer segs went over.." */
+
+inline LPCSTR s_Cache_Seg_Corrupted____0055b374 =
+    reinterpret_cast<LPCSTR>(std::uintptr_t{0x0055B374}); /* "Cache Seg Corrupted..." */
 
 inline const char* s_File_Animation_Frame_Too_Large_0055b804 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B804 }); // "File Animation Frame Too Large"

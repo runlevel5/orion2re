@@ -3847,6 +3847,8 @@ namespace hooks {
         { 0x00508670, &AIPOWER::Base_Generic_Dcv_ },
         { 0x00508990, &AIPOWER::Modified_Weapon_Strength_ },
         { 0x00508A50, &AIPOWER::Strength_Hits_Modifier_ },
+        { 0x00471090, &TEXTBOX::Timed_Text_Box_ },
+        { 0x0052C2E0, &buffer::Buffer_Reload_ },
     };
 
     void Install_Hooks()

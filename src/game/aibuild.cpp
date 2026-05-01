@@ -955,7 +955,7 @@ namespace AIBUILD {
         short choice = RUSS::Get_Weighted_Choice_Short_(weights, 51);
 
         if (choice < 49) {
-            Delete_Prod_From_Colony_Queue_(colony_idx, choice);
+            COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, choice);
             colony->producing[0] = choice;
         } else if (choice == 49) {
             colony->producing[0] = -3; // Housing

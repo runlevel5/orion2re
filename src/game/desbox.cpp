@@ -914,7 +914,7 @@ namespace DESBOX {
     void __cdecl Redraw_Main_Design_Screen_To_Background_() {
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639, 479, 0);
-        Draw_Design_Screen_();
+        DESIGN::Draw_Design_Screen_();
         graphics::Reset_Window_();
         video::Clip_Off_();
         remap::Update_Glass_Remap_Colors_();
@@ -1323,7 +1323,7 @@ namespace DESBOX {
         MOX::_multi_colored_line_start = 0;
 
         video::Set_Page_Off_();
-        ::Draw_Design_Screen_();
+        DESIGN::Draw_Design_Screen_();
         RUSS::Mox_Sync_Update_();
         video::Copy_Off_To_Back_();
 
@@ -1972,7 +1972,7 @@ namespace DESBOX {
 
     void __cdecl Draw_Darkened_Design_Screen_() {
         video::Set_Page_Off_();
-        Draw_Design_Screen_();
+        DESIGN::Draw_Design_Screen_();
         RUSS::Mox_Sync_Update_();
         video::Copy_Off_To_Back_();
         graphics::Reset_Window_();

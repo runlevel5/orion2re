@@ -241,6 +241,10 @@ namespace TEXTBOX {
         Do_Text_Box_(title, text, 0);
     }
 
+    void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {
+        Do_Text_Box_(title, message, duration);
+    }
+
     void __cdecl Draw_Help_Entry_(int16_t param_1) {
         _box_x = 0;
         _box_y = 0;

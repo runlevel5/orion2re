@@ -60,10 +60,6 @@ namespace TEXTBOX {
 
     void __cdecl Draw_Help_Entry_(int16_t help_id);
 
-    inline void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration) {
-        using Fn = void(__cdecl*)(const char*, const char*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00471090 });
-        fn(title, message, duration);
-    }
+    void __cdecl Timed_Text_Box_(const char* title, const char* message, int16_t duration);
 
 }

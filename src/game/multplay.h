@@ -167,4 +167,10 @@ namespace MULTPLAY {
     void __cdecl Reload_Wait_For_Race_Info_();
 
     void __cdecl Draw_Wait_For_Race_Info_Screen_();
+
+    inline void __cdecl Set_Multi_Player_Game_Type_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005081D0 });
+        fn();
+    }
 }
