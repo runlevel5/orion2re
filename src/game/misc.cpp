@@ -712,7 +712,7 @@ namespace MISC {
     }
 
     int16_t __cdecl Substring_(char* haystack, char* needle) {
-        char* found_ptr = find_substring(haystack, needle);
+        char* found_ptr = strstr(haystack, needle);
 
         if (found_ptr != nullptr) {
             return static_cast<int16_t>(found_ptr - haystack);

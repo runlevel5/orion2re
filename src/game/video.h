@@ -138,4 +138,6 @@ namespace video {
     void __cdecl Clear_Display_And_Release_Palette_();
 
     void __cdecl Toggle_Pages_On_Odd_Frame_();
+
+    void __cdecl Allocate_Refresh_Lists_(uint32_t, int32_t entry_count);
 }

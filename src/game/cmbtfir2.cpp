@@ -40,13 +40,13 @@ namespace CMBTFIR2 {
         // Check for specific leader special skills
         // Bit 0 corresponds to a skill that provides a flat (Level * 2 + 2) bonus
         if ((MOX::_leaders[leader_idx].special_skills & 0x01) != 0) {
-            bonus = Owned_Officer_Level_(leader_idx);
+            bonus = OFFICER::Owned_Officer_Level_(leader_idx);
             return bonus * 2 + 2;
         }
 
         // Bit 1 corresponds to a skill that provides a (Level + 1) * 3 bonus
         if ((MOX::_leaders[leader_idx].special_skills & 0x02) != 0) {
-            bonus = Owned_Officer_Level_(leader_idx);
+            bonus = OFFICER::Owned_Officer_Level_(leader_idx);
             bonus = (bonus + 1) * 3;
         }
 
@@ -58,12 +58,12 @@ namespace CMBTFIR2 {
         uint32_t special_skills = MOX::_leaders[leader_idx].special_skills;
 
         if (special_skills & 0x4 /* FIGHTER_PILOT */) {
-            int16_t level = Owned_Officer_Level_(leader_idx);
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
             return (level + 1) * 5;
         }
 
         if (special_skills & 0x8 /* ACE_PILOT */) {
-            int16_t level = Owned_Officer_Level_(leader_idx);
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
             // Calculation: ((level * 3 + 3) * 5) / 2
             bonus = (int16_t)(((level * 3 + 3) * 5) / 2);
         }
@@ -385,9 +385,9 @@ namespace CMBTFIR2 {
         int16_t bonus = 0;
         
         if ((MOX::_leaders[leader_idx].special_skills & 0x400) != 0) {
-            bonus = (Owned_Officer_Level_(leader_idx) + 1) * 5;
+            bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 5;
         } else if ((MOX::_leaders[leader_idx].special_skills & 0x800) != 0) {
-            int16_t level = Owned_Officer_Level_(leader_idx);
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
             bonus = (int16_t)(((level * 3 + 3) * 5) / 2);
         }
         
@@ -1632,11 +1632,11 @@ namespace CMBTFIR2 {
         const s_leader_data& leader = MOX::_leaders[leader_idx];
 
         if (leader.general_skills & 0x4) {
-            return Owned_Officer_Level_(leader_idx) * 2 + 2;
+            return OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
         }
 
         if (leader.general_skills & 0x8) {
-            return (Owned_Officer_Level_(leader_idx) + 1) * 3;
+            return (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
         }
 
         return 0;
@@ -1669,11 +1669,11 @@ namespace CMBTFIR2 {
 
     int16_t __cdecl Security_Bonus_(int16_t leader_idx) {
         if ((MOX::_leaders[leader_idx].special_skills & 0x1000) != 0) {
-            return Owned_Officer_Level_(leader_idx) * 2 + 2;
+            return OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
         }
 
         if ((MOX::_leaders[leader_idx].special_skills & 0x2000) != 0) {
-            return (Owned_Officer_Level_(leader_idx) + 1) * 3;
+            return (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
         }
 
         return 0;

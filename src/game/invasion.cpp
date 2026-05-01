@@ -73,10 +73,10 @@ void __cdecl Compute_Colony_Officer_Bonus_(s_colony* colony, s_invasion_player_b
         s_leader_data* leader = &MOX::_leaders[leader_idx];
 
         if (leader->general_skills & 0x8) {
-            int16_t level = Owned_Officer_Level_(leader_idx);
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
             bonuses->officer_bonus = (level + 1) * 3;
         } else if (leader->general_skills & 0x4) {
-            int16_t level = Owned_Officer_Level_(leader_idx);
+            int16_t level = OFFICER::Owned_Officer_Level_(leader_idx);
             bonuses->officer_bonus = level * 2 + 2;
         }
 
@@ -101,10 +101,10 @@ void __cdecl Compute_Attacker_Officer_Bonus_(int16_t* ship_indexes, int16_t coun
                 int16_t bonus = 0;
 
                 if ((MOX::_leaders[officer_idx].general_skills & 8) != 0) {
-                    int16_t level = Owned_Officer_Level_(officer_idx);
+                    int16_t level = OFFICER::Owned_Officer_Level_(officer_idx);
                     bonus = (level * 15 + 16) / 2;
                 } else if ((MOX::_leaders[officer_idx].general_skills & 4) != 0) {
-                    int16_t level = Owned_Officer_Level_(officer_idx);
+                    int16_t level = OFFICER::Owned_Officer_Level_(officer_idx);
                     bonus = (level + 1) * 5;
                 }
 

@@ -221,7 +221,7 @@ namespace platform {
         __strlwr(copy_buffer);
 
         // Search for the tag "/ten" in the lowercased buffer
-        char* match_ptr = find_substring(copy_buffer, s_slash_ten);
+        char* match_ptr = strstr(copy_buffer, s_slash_ten);
         if (match_ptr != nullptr) {
             uint32_t needle_len = 0;
             while (s_slash_ten[needle_len] != '\0') {
@@ -292,7 +292,7 @@ namespace platform {
         }
 
         video::_screen_pixel_size = g_screen_res_x * g_screen_res_y;
-        FUN_528740(video::_screen_pixel_size, g_screen_res_y);
+        video::Allocate_Refresh_Lists_(video::_screen_pixel_size, g_screen_res_y);
         DAT_0057931c = 0;
 
         DDSURFACEDESC surface_desc;
@@ -423,12 +423,12 @@ namespace platform {
 #endif
 
         _need_quit = 0;
-        Set_Page_Off_();
+        video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639, 479, 0);
-        FUN_5286a0();
+        video::Set_Page_Back_();
         graphics::Fill_(0, 0, 639, 479, 0);
-        FUN_5287a0();
-        FUN_5287c0();
+        video::Clear_Scan_List_();
+        video::Clear_Stencil_List_();
         g_frame_count = 0;
         graphics::Reset_Window_();
         return g_main_window;
@@ -450,8 +450,8 @@ namespace platform {
         if (g_offscreen_surface_2 != NULL)
             g_offscreen_surface_2->Restore();
 
-        if (g_cursor_surface_1 != NULL)
-            g_cursor_surface_1->Restore();
+        if (platform::g_cursor_surface_1 != NULL)
+            platform::g_cursor_surface_1->Restore();
 
         if (g_cursor_surface_2 != NULL)
             hr = g_cursor_surface_2->Restore();
@@ -505,10 +505,10 @@ namespace platform {
                 g_palette = NULL;
             }
 
-            if (g_cursor_surface_1 != NULL)
+            if (platform::g_cursor_surface_1 != NULL)
             {
-                g_cursor_surface_1->Release();
-                g_cursor_surface_1 = NULL;
+                platform::g_cursor_surface_1->Release();
+                platform::g_cursor_surface_1 = NULL;
             }
 
             if (g_cursor_surface_2 != NULL)
@@ -603,7 +603,7 @@ namespace platform {
     }
 
     void __cdecl Unlock_Cursor_Surface_() {
-        g_cursor_surface_1->Unlock(nullptr);
+        platform::g_cursor_surface_1->Unlock(nullptr);
     }
 
     uint32_t Lock_Appropriate_Render_Buffer()
@@ -788,9 +788,9 @@ namespace platform {
             DDCOLORKEY	key;
             key.dwColorSpaceHighValue = 0;
             key.dwColorSpaceLowValue = 0;
-            g_cursor_surface_1->SetColorKey(8, &key);
+            platform::g_cursor_surface_1->SetColorKey(8, &key);
 
-            g_primary_surface->BltFast(x, y, g_cursor_surface_1, &rect, DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
+            g_primary_surface->BltFast(x, y, platform::g_cursor_surface_1, &rect, DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
 
 #ifndef FULLSCREEN
             Blit_Surface_To_Screen(g_primary_surface);
@@ -891,11 +891,11 @@ namespace platform {
         color_key.dwColorSpaceLowValue = 0;
         color_key.dwColorSpaceHighValue = 0;
 
-        g_cursor_surface_1->SetColorKey(8, &color_key);
+        platform::g_cursor_surface_1->SetColorKey(8, &color_key);
         g_offscreen_surface_1->BltFast(
             static_cast<DWORD>(x),
             static_cast<DWORD>(y),
-            g_cursor_surface_1,
+            platform::g_cursor_surface_1,
             &source_rect,
             DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
     }
@@ -959,7 +959,7 @@ namespace platform {
         desc2.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8 | DDPF_RGB;
         desc2.ddpfPixelFormat.dwRGBBitCount = 8;
 
-        g_direct_draw->CreateSurface(&desc2, &g_cursor_surface_1, NULL);
+        g_direct_draw->CreateSurface(&desc2, &platform::g_cursor_surface_1, NULL);
         g_direct_draw->CreateSurface(&desc2, &g_cursor_surface_2, NULL);
     }
 

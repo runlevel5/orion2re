@@ -2973,7 +2973,7 @@ namespace OFFICER {
         if (MOX::_leaders[leader_idx].player_index == -1) {
             current_level = Get_Officer_Level_(leader_idx);
         } else {
-            current_level = ::Owned_Officer_Level_(leader_idx);
+            current_level = OFFICER::Owned_Officer_Level_(leader_idx);
         }
 
         MOX::_leaders[leader_idx].xp += xp_amount;
@@ -2985,7 +2985,7 @@ namespace OFFICER {
         if (MOX::_leaders[leader_idx].player_index == -1) {
             new_level = Get_Officer_Level_(leader_idx);
         } else {
-            new_level = ::Owned_Officer_Level_(leader_idx);
+            new_level = OFFICER::Owned_Officer_Level_(leader_idx);
         }
 
         if (new_level != current_level) {

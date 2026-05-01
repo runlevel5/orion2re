@@ -6,7 +6,7 @@ namespace WINNET {
         int8_t found_index = -1;
 
         for (int32_t i = 0; i < _provider_count; ++i) {
-            if (find_substring(_providers[i]->name, name) != nullptr) {
+            if (strstr(_providers[i]->name, name) != nullptr) {
                 found_index = static_cast<int8_t>(i);
             }
         }

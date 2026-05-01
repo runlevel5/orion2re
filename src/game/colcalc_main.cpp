@@ -26,10 +26,10 @@ namespace COLCALC {
             if (officer_idx != -1) {
                 s_leader_data* leader = &MOX::_leaders[officer_idx];
                 if (leader->special_skills & 0x8000) {
-                    leader_bonus = (Owned_Officer_Level_(officer_idx) * 3 + 4) / 2;
+                    leader_bonus = (OFFICER::Owned_Officer_Level_(officer_idx) * 3 + 4) / 2;
                 }
                 else if (leader->special_skills & 0x4000) {
-                    leader_bonus = Owned_Officer_Level_(officer_idx) + 1;
+                    leader_bonus = OFFICER::Owned_Officer_Level_(officer_idx) + 1;
                 }
             }
 
@@ -617,11 +617,11 @@ namespace COLCALC {
 
                 // Science skills
                 if (skills & 0x2000) {
-                    int level_bonus = Owned_Officer_Level_(i) * 5 + 5;
+                    int level_bonus = OFFICER::Owned_Officer_Level_(i) * 5 + 5;
                     total_research += (level_bonus * 15) / 10;
                 }
                 else if (skills & 0x1000) {
-                    int level_bonus = Owned_Officer_Level_(i) * 5 + 5;
+                    int level_bonus = OFFICER::Owned_Officer_Level_(i) * 5 + 5;
                     total_research += level_bonus;
                 }
             }
@@ -770,26 +770,26 @@ namespace COLCALC {
             auto& leader = MOX::_leaders[leader_idx];
             if (econ_type == 0 /* ECON_FOOD */) {
                 if (leader.special_skills & 0x8 /* Labor Leader */) {
-                    officer_bonus = (Owned_Officer_Level_(leader_idx) + 1) * 3;
+                    officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
                 else if (leader.special_skills & 0x4 /* Farmer */) {
-                    officer_bonus = Owned_Officer_Level_(leader_idx) * 2 + 2;
+                    officer_bonus = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                 }
             }
             else if (econ_type == 1 /* ECON_INDUSTRY */) {
                 if (leader.special_skills & 0x200 /* Industrialist */) {
-                    officer_bonus = (Owned_Officer_Level_(leader_idx) + 1) * 3;
+                    officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
                 else if (leader.special_skills & 0x100 /* Manufacturer */) {
-                    officer_bonus = Owned_Officer_Level_(leader_idx) * 2 + 2;
+                    officer_bonus = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                 }
             }
             else if (econ_type == 2 /* ECON_RESEARCH */) {
                 if (leader.special_skills & 0x2000 /* Science Leader */) {
-                    officer_bonus = (Owned_Officer_Level_(leader_idx) + 1) * 3;
+                    officer_bonus = (OFFICER::Owned_Officer_Level_(leader_idx) + 1) * 3;
                 }
                 else if (leader.special_skills & 0x1000 /* Researcher */) {
-                    officer_bonus = Owned_Officer_Level_(leader_idx) * 2 + 2;
+                    officer_bonus = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                 }
             }
         }
@@ -1189,11 +1189,11 @@ namespace COLCALC {
 
         if (officer_idx != -1) {
             if (MOX::_leaders[officer_idx].special_skills & 0x20) {
-                int16_t lvl = Owned_Officer_Level_(officer_idx);
+                int16_t lvl = OFFICER::Owned_Officer_Level_(officer_idx);
                 leader_bonus_bc = ((lvl + 1) * income_base * 3 + 10) / 20;
             }
             else if (MOX::_leaders[officer_idx].special_skills & 0x10) {
-                int16_t lvl = Owned_Officer_Level_(officer_idx);
+                int16_t lvl = OFFICER::Owned_Officer_Level_(officer_idx);
                 leader_bonus_bc = ((lvl + 1) * income_base + 5) / 10;
             }
         }
@@ -1550,10 +1550,10 @@ namespace COLCALC {
             if (officer_idx != -1) {
                 int32_t officer_reduction = 0;
                 if (MOX::_leaders[officer_idx].special_skills & 2) {
-                    officer_reduction = (Owned_Officer_Level_(officer_idx) * 3 + 3) * 5;
+                    officer_reduction = (OFFICER::Owned_Officer_Level_(officer_idx) * 3 + 3) * 5;
                 }
                 else if (MOX::_leaders[officer_idx].special_skills & 1) {
-                    officer_reduction = (Owned_Officer_Level_(officer_idx) * 5 + 5) * 2;
+                    officer_reduction = (OFFICER::Owned_Officer_Level_(officer_idx) * 5 + 5) * 2;
                 }
                 base_pollution += (officer_reduction * base_pollution) / -100;
             }

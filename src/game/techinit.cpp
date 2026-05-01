@@ -2,6 +2,138 @@
 
 namespace TECHINIT {
 
+namespace {
+static char* Advance_To_Next_String_(char* string_block, uint32_t& string_offset) {
+    while (string_block[string_offset] != '\0') {
+        ++string_offset;
+    }
+
+    do {
+        ++string_offset;
+    } while (string_block[string_offset] == '\0');
+
+    return string_block + string_offset;
+}
+}
+
+void __cdecl Load_Tech_Names_() {
+    LOADER::Load_Player_Special_Names_();
+    RUSS::Mox_Update_();
+
+    uint32_t string_offset = 0;
+    char* string_block = static_cast<char*>(farload::Far_Reload_(
+        s_techname_lbx_0055a96c,
+        static_cast<uint32_t>(MOX::_settings_language),
+        MOX::_techname_seg));
+
+    RUSS::Mox_Update_();
+
+    TECHDATA::_technology_fields[0].name = string_block;
+    for (uint32_t i = 1; i < 83; ++i) {
+        TECHDATA::_technology_fields[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 212; ++i) {
+        TECHDATA::_technology_applications[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 49; ++i) {
+        TECHDATA::_buildings[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 40; ++i) {
+        TECHDATA::_specials[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 7; ++i) {
+        TECHDATA::_armor[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 6; ++i) {
+        TECHDATA::_shields[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 46; ++i) {
+        TECHDATA::_weapons[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 6; ++i) {
+        TECHDATA::_computers[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    for (uint32_t i = 0; i < 7; ++i) {
+        TECHDATA::_drives[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    for (uint32_t i = 0; i < 4; ++i) {
+        TECHDATA::_units[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 6; ++i) {
+        TECHDATA::_fuel[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    for (uint32_t i = 0; i < 15; ++i) {
+        TECHDATA::_weapon_modifications[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 15; ++i) {
+        TECHDATA::_weapon_modifications[i].name_plural =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 46; ++i) {
+        TECHDATA::_weapons[i].name_plural =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 9; ++i) {
+        TECHDATA::_hull_data[i].name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+
+    RUSS::Mox_Update_();
+
+    for (uint32_t i = 0; i < 9; ++i) {
+        TECHDATA::_hull_data[i].size_name =
+            Advance_To_Next_String_(string_block, string_offset);
+    }
+}
+
 int16_t __cdecl Tech_Is_Legal_For_Player_(int16_t player_idx, int16_t tech_id) {
     int16_t is_legal = 1;
 

@@ -101,6 +101,8 @@ namespace COLONY {
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00595E54});
 
     inline const char* _COLONY_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C48}); // "COLONY.LBX"
+    inline const char* _COLVEGGIE_LBX =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00559C78}); // "COLVEGGI.LBX"
     inline const char* _COLGCBT_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559CF8}); // "COLGCBT.LBX"
     inline const char* _COLONY2_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C58}); // "COLONY2.LBX"
     inline const char* _COLPUPS_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00559C98}); // "COLPUPS.LBX"
@@ -452,9 +454,8 @@ namespace COLONY {
 
     s_animation_header* __cdecl Shadow_Farmer_Bitm_();
 
-    inline void __cdecl Set_Colony_Font_To_Player_(int16_t font_color, int8_t player_idx) {
-        using Fn = void(__cdecl*)(int16_t, int8_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004dbdb0});
-        fn(font_color, player_idx);
-    }
+    void __cdecl Set_Colony_Font_To_Player_(int16_t font_style, int16_t player_idx);
+
+    inline s_colors (&_player_font_color_array)[8] =
+        *reinterpret_cast<s_colors (*)[8]>(std::uintptr_t{0x00559FB8});
 }

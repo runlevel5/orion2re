@@ -698,11 +698,11 @@ namespace fonts {
             y_start = 0;
         }
 
-        if (x_end >= g_screen_res_x) {
-            x_end = g_screen_res_x - 1;
+        if (x_end >= platform::g_screen_res_x) {
+            x_end = platform::g_screen_res_x - 1;
         }
-        if (y_end >= g_screen_res_y) {
-            y_end = g_screen_res_y - 1;
+        if (y_end >= platform::g_screen_res_y) {
+            y_end = platform::g_screen_res_y - 1;
         }
 
         if (video::screen_refresh_flag >= 2) {
@@ -927,9 +927,9 @@ namespace fonts {
     }
 
     void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y) {
-        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        int screen_idx_start = y * g_screen_res_x - clip_left + x;
+        int screen_idx_start = y * platform::g_screen_res_x - clip_left + x;
 
         if (static_cast<int16_t>(_font_header.current_height) < end_y) {
             end_y = static_cast<int16_t>(_font_header.current_height);
@@ -967,7 +967,7 @@ namespace fonts {
                     } while (pixel != 0x80);
                 }
                 ++offset;
-                screen_idx_start += g_screen_res_x;
+                screen_idx_start += platform::g_screen_res_x;
             }
         }
 

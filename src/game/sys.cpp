@@ -1937,7 +1937,7 @@ namespace SYS {
       int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
       int32_t word_index = 2;
       int32_t dest_offset =
-          (static_cast<int32_t>(y) + current_row) * static_cast<int32_t>(g_screen_res_x) +
+          (static_cast<int32_t>(y) + current_row) * static_cast<int32_t>(platform::g_screen_res_x) +
           static_cast<int32_t>(x);
       int32_t row_start_dest_offset = dest_offset;
 
@@ -2032,7 +2032,7 @@ namespace SYS {
         int32_t current_row = static_cast<uint16_t>(sprite_words[1]);
 
         int32_t current_dest_row =
-            static_cast<int32_t>(draw_y) * static_cast<int32_t>(g_screen_res_x) +
+            static_cast<int32_t>(draw_y) * static_cast<int32_t>(platform::g_screen_res_x) +
             static_cast<int32_t>(x);
 
         if (current_row < top_clip) {
@@ -2049,7 +2049,7 @@ namespace SYS {
 
         if (current_row > top_clip) {
             current_dest_row +=
-                (current_row - top_clip) * static_cast<int32_t>(g_screen_res_x);
+                (current_row - top_clip) * static_cast<int32_t>(platform::g_screen_res_x);
         }
 
         int32_t row_index = current_row - top_clip;

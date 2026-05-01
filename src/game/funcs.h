@@ -33,6 +33,8 @@ inline const char* const s_craziness_00557680 = reinterpret_cast<const char*>(st
 
 inline const char* s_fmt_comma_00555ff0 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF0}); // "%i,%i"
 inline const char* s_fmt_dot_00555ff8 = reinterpret_cast<const char*>(std::uintptr_t{0x00555FF8}); // "%i.%i"
+inline const char* s_techname_lbx_0055a96c =
+    reinterpret_cast<const char*>(std::uintptr_t{0x0055A96C}); // "techname.lbx"
 inline const char* s_INFO_LBX_00556000 = reinterpret_cast<const char*>(std::uintptr_t{0x00556000}); // "INFO.LBX"
 inline const char* s_Remap_draw_not_support_map_00557f88 = reinterpret_cast<const char*>(0x00557f88); // "Remap draw not support map"
 inline const char* s_Remap_draw_not_support_screen_00557fa4 = reinterpret_cast<const char*>(0x00557fa4); // "Remap draw not support screen"
@@ -80,16 +82,6 @@ inline int (__stdcall *&PTR_SetBkMode_005aa3b4)(HDC hdc, int mode) =
 inline int (__stdcall *&PTR_lstrlenA_005aa3c4)(const char* lpString) =
     *reinterpret_cast<int (__stdcall **)(const char*)>(std::uintptr_t{0x005AA3C4});
 
-inline uint32_t& DAT_00565e20 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00565E20});
-inline uint32_t& DAT_00578e54 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578E54});
-struct IDirectDrawSurface;
-inline IDirectDrawSurface*& g_cursor_surface_1 =
-        *reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{0x00578810});
-
-inline IDirectDrawSurface*& g_offscreen_surface_1 =
-        *reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{0x00578E58});
-inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
-inline int32_t& g_screen_res_y = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1AC});
 inline uint8_t& DAT_00578820 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00578820});
 inline uint32_t& DAT_00578dc8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DC8});
 inline uint32_t& DAT_00578dcc = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00578DCC});
@@ -172,29 +164,9 @@ inline int __cdecl __ismbblead(uint32_t c) {
     return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547ad0 })(c);
 }
 
-struct IDirectPlay;
-// Suggested name: DirectPlayCreate
-inline HRESULT __stdcall FUN_0053a8d0(LPGUID lpGUID, IDirectPlay** lplpDP, LPVOID pUnkOuter) {
-    using Fn = HRESULT(__stdcall*)(LPGUID, IDirectPlay**, LPVOID);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0053a8d0});
-    return fn(lpGUID, lplpDP, pUnkOuter);
-}
-
 inline const char* s_modem_005607dc = reinterpret_cast<const char*>(std::uintptr_t{0x005607DC});
 inline const char* s_ipx_005607e4 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E4});
 inline const char* s_tcp_005607e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005607E8});
-
-// User-defined WinMain entry point
-inline int __stdcall WinMain_Proxy(void* hInstance, void* hPrevInstance, char* lpCmdLine, int nShowCmd) {
-    using Fn = int(__stdcall*)(void*, void*, char*, int);
-    return reinterpret_cast<Fn>(std::uintptr_t{ 0x005277b0 })(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
-}
-
-inline char* __cdecl find_substring(const char* haystack, const char* needle) {
-    using Fn = char* (__cdecl*)(const char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541b30 });
-    return fn(haystack, needle);
-}
 
 inline void* __cdecl _malloc(size_t size) {
     using Fn = void* (__cdecl*)(size_t);
@@ -230,60 +202,6 @@ inline uint32_t __cdecl _time(uint32_t* timer) {
     using Fn = uint32_t(__cdecl*)(uint32_t*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541a20});
     return fn(timer);
-}
-
-// Function wrappers
- // Suggested name: allocate_screen_buffers
-inline void __cdecl FUN_528740(uint32_t stride, uint32_t height) {
-    using Fn = void(__cdecl*)(uint32_t, uint32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528740 });
-    fn(stride, height);
-}
-
-// Suggested name: setup_screen_workspace
-inline void __cdecl Set_Page_Off_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528680 });
-    fn();
-}
-
-// Suggested name: setup_screen_workspace_alt
-inline void __cdecl FUN_5286a0() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005286a0 });
-    fn();
-}
-
-// Suggested name: init_video_subsystem_1
-inline void __cdecl FUN_5287a0() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005287a0 });
-    fn();
-}
-
-// Suggested name: init_video_subsystem_2
-inline void __cdecl FUN_5287c0() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005287c0 });
-    fn();
-}
-
-inline int16_t __cdecl Proximity_Bonus_(int16_t player_idx, int16_t planet_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac040});
-    return fn(player_idx, planet_idx);
-}
-
-inline int16_t __cdecl Owned_Officer_Level_(int32_t leader_idx) {
-    using Fn = int16_t(__cdecl*)(int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043e780});
-    return fn(leader_idx);
-}
-
-inline bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
-    using Fn = bool(__cdecl*)(int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004ac120});
-    return fn(player_idx, star_idx);
 }
 
 inline int __cdecl hgetch_() {

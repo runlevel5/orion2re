@@ -284,7 +284,7 @@ namespace bitmap {
             return;
         }
 
-        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         uint8_t* video_page = reinterpret_cast<uint8_t*>(video::_current_video_page);
 
         int32_t mid_x = (x1 + x2) / 2;

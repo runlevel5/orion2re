@@ -11,7 +11,7 @@ namespace TECHDATA {
     inline s_tech_building_data (&_buildings)[49] = *reinterpret_cast<s_tech_building_data(*)[49]>(std::uintptr_t{0x00554290});
     inline s_tech_hull_data (&_hull_data)[9] =
         *reinterpret_cast<s_tech_hull_data(*)[9]>(std::uintptr_t{0x00555798});
-    inline s_tech_fuel_data* _fuel = reinterpret_cast<s_tech_fuel_data*>(std::uintptr_t{ 0x00555758 });
+    inline s_tech_fuel_data (&_fuel)[6] = *reinterpret_cast<s_tech_fuel_data (*)[6]>(std::uintptr_t{0x00555758});
     inline s_tech_app_data (&_technology_applications)[212] =
         *reinterpret_cast<s_tech_app_data(*)[212]>(std::uintptr_t{0x005537C8});
     inline s_tech_field_data (&_technology_fields)[83] =
@@ -29,7 +29,7 @@ namespace TECHDATA {
     inline int16_t (&_starting_tech_field_ids)[6] =
         *reinterpret_cast<int16_t (*)[6]>(std::uintptr_t{0x0055A960});
 
-    inline s_unit_data* _units = reinterpret_cast<s_unit_data*>(std::uintptr_t{0x00555728});
+    inline s_unit_data (&_units)[4] = *reinterpret_cast<s_unit_data (*)[4]>(std::uintptr_t{0x00555728});
 
     inline s_tech_data_rifle (&_rifles)[6] =
         *reinterpret_cast<s_tech_data_rifle(*)[6]>(std::uintptr_t{0x0054F028});

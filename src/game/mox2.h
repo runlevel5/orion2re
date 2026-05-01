@@ -44,13 +44,6 @@ namespace MOX2 {
     inline const char* s_Loading_Italian = reinterpret_cast<const char*>(0x005577D0);
 
     void main2_(void *);
-
-    // Suggested name: MOX2::worker_thread_main
-    inline void __cdecl thunk_main2_(void* arg) {
-        using Fn = void(__cdecl*)(void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004c1b20 });
-        fn(arg);
-    }
 }
 
 inline void FUN_004d7d80() {

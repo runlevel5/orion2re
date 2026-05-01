@@ -544,4 +544,29 @@ namespace COLMOVE {
         GENDRAW::Help_(ESTRINGS::E_Strings_(0x187));
         return 0;
     }
+
+    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer) {
+        uint32_t pop_value = MOX::_colony[colony_idx].pop[pop_idx];
+
+        if (MOX::_settings_language == 4) {
+            int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
+            char* pop_state_string = COLONY::Pop_State_String_(pop_state);
+            char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));
+            char* pop_race_string = COLONY::Pop_Race_String_(colony_idx, pop_idx);
+            char* job_string = COLONY::Job_String_(static_cast<int16_t>((pop_value >> 7) & 3U));
+            char* format = ESTRINGS::E_Strings_(0x4C);
+
+            _sprintf(output_buffer, format, job_string, pop_race_string, conquered_string, pop_state_string);
+            return;
+        }
+
+        char* job_string = COLONY::Job_String_(static_cast<int16_t>((pop_value >> 7) & 3U));
+        int16_t pop_state = COLONY::Pop_To_Pop_State_(colony_idx, pop_idx);
+        char* pop_state_string = COLONY::Pop_State_String_(pop_state);
+        char* pop_race_string = COLONY::Pop_Race_String_(colony_idx, pop_idx);
+        char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));
+        char* format = ESTRINGS::E_Strings_(0x4C);
+
+        _sprintf(output_buffer, format, conquered_string, pop_race_string, pop_state_string, job_string);
+    }
 }

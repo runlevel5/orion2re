@@ -46,7 +46,7 @@ namespace ADVCIV {
         *worth = (int32_t)(raw_worth & 0xFFFF);
 
         // 2. Proximity bonus scaling
-        int16_t base_proximity = Proximity_Bonus_(player_idx, planet_idx);
+        int16_t base_proximity = ADVCIV::Proximity_Bonus_(player_idx, planet_idx);
         *proximity_bonus = (int16_t)((int32_t)base_proximity * (*worth) / 100);
 
         // 3. Penalty if player already has a colony at this star
@@ -526,6 +526,49 @@ namespace ADVCIV {
         }
 
         return 0;
+    }
+
+    int16_t __cdecl Proximity_Bonus_(int16_t plr_idx, int16_t planet_idx) {
+        int16_t proximity_bonus = 0;
+        int16_t i = 0;
+        const int16_t target_star_idx = static_cast<int16_t>(MOX::_planet[planet_idx].star_index);
+        const int16_t num_stars = MOX::_NUM_STARS;
+
+        if (num_stars > 0) {
+            do {
+                const int16_t colony_star_idx = ADVCIV::_adv_civ_player[plr_idx].stars[i].star_idx;
+
+                if (ADVCIV::Player_Has_Colony_At_Star_(plr_idx, colony_star_idx)) {
+                    const int16_t distance =
+                        static_cast<int16_t>(ADVCIV::_parsec[colony_star_idx].dist[target_star_idx]);
+
+                    if (distance <= 9) {
+                        switch (distance) {
+                        case 1:
+                        case 2:
+                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 20);
+                            break;
+
+                        case 3:
+                        case 4:
+                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 10);
+                            break;
+
+                        case 5:
+                            proximity_bonus = static_cast<int16_t>(proximity_bonus + 5);
+                            break;
+
+                        default:
+                            break;
+                        }
+                    }
+                }
+
+                ++i;
+            } while (i < num_stars);
+        }
+
+        return proximity_bonus;
     }
 
     void __cdecl Init_Non_Homeworld_Colonies_() {

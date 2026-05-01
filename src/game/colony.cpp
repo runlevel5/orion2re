@@ -2203,4 +2203,13 @@ namespace COLONY {
         fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
         fonts::Set_Font_Special_Colors_(&_red_font_color_array[state]);
     }
+
+    void __cdecl Set_Colony_Font_To_Player_(int16_t font_style, int16_t player_idx) {
+        fonts::Set_Outline_Color_(0x50, 0x50);
+        fonts::Set_Font_Style_Shadow_Down_(
+            font_style,
+            &_player_font_color_array[static_cast<uint8_t>(MOX::_player[player_idx].color)]);
+        fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
+        fonts::Set_Font_Special_Colors_(&_red_font_color_array[0]);
+    }
 }

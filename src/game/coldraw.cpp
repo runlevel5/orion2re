@@ -627,12 +627,135 @@ int16_t __cdecl N_Roads_Around_CR_(int16_t x, int16_t y) {
     return count;
 }
 
+void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
+    const int16_t initial_planet_index =
+            HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+    (void)COLONY::N_Bldgs_(MOX::_planet[initial_planet_index].colony_index);
+
+    COLDRAW::Clear_Veggie_Draw_Flags_();
+
+    for (int16_t row = 0; row < 6; ++row) {
+        for (int16_t col = 0; col < 6; ++col) {
+            if (COLONY::_colony_bldgs[row].buildings[col] != 0) {
+                continue;
+            }
+
+            const int16_t road_count = COLDRAW::N_Roads_Around_CR_(row, col);
+
+            const int16_t planet_index =
+                    HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+            const int16_t building_count =
+                    COLONY::N_Bldgs_(MOX::_planet[planet_index].colony_index);
+
+            bool should_process_cell = false;
+            if ((int32_t)random::Random_(7) - 2 < (int32_t)road_count) {
+                should_process_cell = true;
+            } else if (road_count == 0) {
+                if (random::Random_(building_count + 2) != 0) {
+                    should_process_cell = true;
+                }
+            }
+
+            if (!should_process_cell) {
+                continue;
+            }
+
+            if (COLDRAW::_road_list[row][col].connections[2] != 0) {
+                continue;
+            }
+
+            if (COLDRAW::_road_list[row][col].connections[3] != 0) {
+                continue;
+            }
+
+            for (int16_t sprite_index = 0; sprite_index < 2; ++sprite_index) {
+                COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag =
+                        static_cast<uint16_t>(random::Random_(3) == 1);
+
+                if (COLDRAW::_veggie_list[row][col].sprites[sprite_index].draw_flag == 0) {
+                    continue;
+                }
+
+                const int16_t veggie_planet_index =
+                        HAROLD::Planet_Index_(MOX::_screen_data, COLONY::_orbit_temp);
+                const int16_t anim_entry =
+                        COLDRAW::Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(
+                                MOX::_planet[veggie_planet_index].colony_index, row, col);
+
+                COLDRAW::_veggie_list[row][col].anim_entries[sprite_index] = anim_entry;
+
+                s_animation_header* const animation =
+                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX, anim_entry, MOX::_global_cache_seg);
+
+                int32_t screen_x = random::Random_(animate::Get_Width_(animation));
+                screen_x -= animate::Get_Width_(animation) / 2;
+                screen_x += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 0);
+                COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_x =
+                        static_cast<int16_t>(screen_x);
+
+                int32_t screen_y = random::Random_(animate::Get_Height_(animation));
+                screen_y -= animate::Get_Height_(animation) / 4;
+                screen_y += COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 1);
+                COLDRAW::_veggie_list[row][col].sprites[sprite_index].screen_y =
+                        static_cast<int16_t>(screen_y);
+            }
+        }
+    }
+}
+
 void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t x, int16_t y, int16_t width, int16_t height) {
     Draw_Colony_Prod_Both_(colony_idx, prod_idx, x, y, width, height, 1);
 }
 
 void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width) {
     Draw_Info_Morale_Both_(colony_idx, x, y, (int)width, 1);
+}
+
+void __cdecl Clear_Veggie_Draw_Flags_() {
+    for (int16_t row = 0; row < 6; ++row) {
+        for (int16_t column = 0; column < 6; ++column) {
+            for (int16_t sprite_index = 0; sprite_index < 2; ++sprite_index) {
+                _veggie_list[row][column].sprites[sprite_index].draw_flag = 0;
+            }
+        }
+    }
+}
+
+void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass_count) {
+    s_coldraw_veggie_cell& veggie_cell = COLDRAW::_veggie_list[row_idx][col_idx];
+    const uint16_t initial_pass_count = draw_pass_count;
+
+    for (int16_t remaining_passes = static_cast<int16_t>(initial_pass_count);
+         remaining_passes >= 0;
+         --remaining_passes) {
+        for (int16_t sprite_idx = 0; sprite_idx < 2; ++sprite_idx) {
+            if (veggie_cell.sprites[sprite_idx].draw_flag != 0) {
+                graphics::Set_Window_(0, 0, 0x27F, 0x1DF);
+                video::Clip_On_();
+
+                if (draw_pass_count != 0 &&
+                    initial_pass_count == static_cast<uint16_t>(remaining_passes)) {
+                    s_animation_header* animation =
+                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
+                                       veggie_cell.anim_entries[sprite_idx],
+                                       MOX::_global_cache_seg);
+                    ERIC::Draw_Bottom_Centered_(veggie_cell.sprites[sprite_idx].screen_x,
+                                                veggie_cell.sprites[sprite_idx].screen_y,
+                                                animation);
+                } else {
+                    s_animation_header* animation =
+                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
+                                       veggie_cell.anim_entries[sprite_idx],
+                                       MOX::_global_cache_seg);
+                    ERIC::Draw_Bottom_Centered_No_Glass_(veggie_cell.sprites[sprite_idx].screen_x,
+                                                         veggie_cell.sprites[sprite_idx].screen_y,
+                                                         animation);
+                }
+
+                video::Clip_Off_();
+            }
+        }
+    }
 }
 
 }

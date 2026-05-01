@@ -3824,6 +3824,14 @@ namespace hooks {
         { 0x00495AF0, &SYS::Get_System_Display_Ship_Icon_XY_ },
         { 0x0043B820, &settler::Pop_Tries_To_Settle_ },
         { 0x0049F680, &COLMOVE::Send_Cluster_ },
+        { 0x0049F590, &COLMOVE::Colony_Pop_String_ },
+        { 0x004DBDB0, &COLONY::Set_Colony_Font_To_Player_ },
+        { 0x004FCC40, &TECHINIT::Load_Tech_Names_ },
+        { 0x00459E50, &COLDRAW::Build_Veggie_List_Based_On_Bldg_List_ },
+        { 0x00459DF0, &COLDRAW::Clear_Veggie_Draw_Flags_ },
+        { 0x0045A100, &COLDRAW::Draw_Veggie_CR_ },
+        { 0x00528740, &video::Allocate_Refresh_Lists_ },
+        { 0x004AC040, &ADVCIV::Proximity_Bonus_ },
     };
 
     void Install_Hooks()

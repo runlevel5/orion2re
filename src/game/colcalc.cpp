@@ -1721,11 +1721,11 @@ namespace COLCALC {
                 int bonus = 0;
 
                 if (leader->general_skills & 0x20 /* DIPLOMAT */) {
-                    int16_t level = Owned_Officer_Level_(i);
+                    int16_t level = OFFICER::Owned_Officer_Level_(i);
                     bonus = (level * 3 + 3) * 5;
                 }
                 else if (leader->general_skills & 0x10 /* CHARISMA */) {
-                    int16_t level = Owned_Officer_Level_(i);
+                    int16_t level = OFFICER::Owned_Officer_Level_(i);
                     bonus = (level * 5 + 5) * 2;
                 }
 

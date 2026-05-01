@@ -55,10 +55,10 @@ namespace spy {
 
                         int32_t current_def_skill = 0;
                         if (leader->general_skills & 0x8000 /* Agent Mega-skill */) {
-                            current_def_skill = Owned_Officer_Level_(i) * 3 + 3;
+                            current_def_skill = OFFICER::Owned_Officer_Level_(i) * 3 + 3;
                         }
                         else if (leader->general_skills & 0x4000 /* Agent skill */) {
-                            current_def_skill = Owned_Officer_Level_(i) * 2 + 2;
+                            current_def_skill = OFFICER::Owned_Officer_Level_(i) * 2 + 2;
                         }
 
                         if (current_def_skill > max_leader_def_bonus) {
@@ -67,10 +67,10 @@ namespace spy {
 
                         int32_t current_atk_skill = 0;
                         if (leader->general_skills & 0x20000 /* Spy Mega-skill */) {
-                            current_atk_skill = Owned_Officer_Level_(i) * 3;
+                            current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 3;
                         }
                         else if (leader->general_skills & 0x10000 /* Spy skill */) {
-                            current_atk_skill = Owned_Officer_Level_(i) * 2;
+                            current_atk_skill = OFFICER::Owned_Officer_Level_(i) * 2;
                         }
 
                         if (current_atk_skill > max_leader_atk_bonus) {
@@ -158,12 +158,12 @@ namespace spy {
 
                     if (skill_bit != 0) {
                         int leader_idx = (int)(leader - MOX::_leaders);
-                        chance = Owned_Officer_Level_(leader_idx) * 3 + 3;
+                        chance = OFFICER::Owned_Officer_Level_(leader_idx) * 3 + 3;
                     } else {
                         // BUG: This block is unreachable in the binary because skill_bit was just confirmed to be 0
                         if (skill_bit != 0) {
                             int leader_idx = (int)(leader - MOX::_leaders);
-                            chance = Owned_Officer_Level_(leader_idx) * 2 + 2;
+                            chance = OFFICER::Owned_Officer_Level_(leader_idx) * 2 + 2;
                         }
                     }
 

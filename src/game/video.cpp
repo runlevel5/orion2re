@@ -341,13 +341,13 @@ namespace video {
         platform::Create_Cursor_Surface();
 
         video::_default_mouse_list.x2 =
-            static_cast<int16_t>(static_cast<uint16_t>(::g_screen_res_x) - 1);
+            static_cast<int16_t>(static_cast<uint16_t>(platform::g_screen_res_x) - 1);
         video::_default_mouse_list.y2 =
-            static_cast<int16_t>(static_cast<uint16_t>(::g_screen_res_y) - 1);
+            static_cast<int16_t>(static_cast<uint16_t>(platform::g_screen_res_y) - 1);
 
         mouse::Set_Mouse_List_(&video::_default_mouse_list, 1);
 
-        platform::Force_Cursor_Pos(::g_screen_res_x / 2, ::g_screen_res_y / 2);
+        platform::Force_Cursor_Pos(platform::g_screen_res_x / 2, platform::g_screen_res_y / 2);
 
         video::_is_initializing = 0;
         mouse::_mouse_enabled = 1;
@@ -388,5 +388,23 @@ namespace video {
             video::g_offscreen_surface_1,
             &copy_rect,
             DDBLTFAST_WAIT);
+    }
+
+    void __cdecl Allocate_Refresh_Lists_(uint32_t, int32_t entry_count) {
+        const uint32_t allocation_size =
+            static_cast<uint32_t>(entry_count) *
+            static_cast<uint32_t>(sizeof(s_scan_list_entry));
+
+        _refresh_scan_list =
+            reinterpret_cast<s_scan_list_entry*>(allocate::Allocate_Space_(allocation_size));
+        _refresh_stencil_list =
+            reinterpret_cast<s_scan_list_entry*>(allocate::Allocate_Space_(allocation_size));
+
+        if (entry_count > 0) {
+            for (int32_t i = 0; i < entry_count; ++i) {
+                _refresh_scan_list[i].min_x = static_cast<int16_t>(-1);
+                _refresh_stencil_list[i].max_x = static_cast<int16_t>(-1);
+            }
+        }
     }
 }

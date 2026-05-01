@@ -3,11 +3,15 @@
 
 struct s_animation_header;
 struct s_coldraw_road;
+struct s_coldraw_veggie_cell;
 
 namespace COLDRAW {
     void __cdecl Calculate_Squish_Step_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
 
     inline s_coldraw_road (&_road_list)[7][7] = *reinterpret_cast<s_coldraw_road(*)[7][7]>(std::uintptr_t{0x005A71D0});
+
+    inline s_coldraw_veggie_cell (&_veggie_list)[6][6] =
+        *reinterpret_cast<s_coldraw_veggie_cell (*)[6][6]>(std::uintptr_t{0x005A6E70});
 
     void __cdecl Road_Back_To_Front_(int16_t index, int16_t* y, int16_t* x);
 
@@ -30,23 +34,17 @@ namespace COLDRAW {
 
     uint8_t __cdecl Do_Pick_Random_Road_At_And_Around_CR_(int16_t* c, int16_t* r, int16_t* param_3);
 
-    inline void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459e50});
-        fn();
+    void __cdecl Build_Veggie_List_Based_On_Bldg_List_();
+
+    inline int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_index, int16_t row, int16_t col) {
+        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004599F0});
+        return fn(colony_index, row, col);
     }
 
-    inline void __cdecl Clear_Veggie_Draw_Flags_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459df0});
-        fn();
-    }
+    void __cdecl Clear_Veggie_Draw_Flags_();
 
-    inline void __cdecl Draw_Veggie_CR_(uint16_t col, uint16_t row, bool not_scanning_valid) {
-        using Fn = void(__cdecl*)(uint16_t, uint16_t, bool);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0045a100});
-        fn(col, row, not_scanning_valid);
-    }
+    void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass_count);
 
     int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(int16_t colony_idx, int16_t param_2, int16_t mode, int16_t x, int16_t y, int16_t x2, int16_t show_shadows, int16_t* idx_out, int16_t* count_ptr, int16_t* x_limit_ptr, int16_t* field_id_ptr);
 

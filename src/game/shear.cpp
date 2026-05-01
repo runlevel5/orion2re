@@ -6,7 +6,7 @@ void __cdecl Capture_Screen_Block_(uint8_t* src, int32_t width, int32_t height, 
 {
     do {
         memcpy(dst, src, width);
-        src += g_screen_res_x;
+        src += platform::g_screen_res_x;
         dst += width;
         height--;
     } while (height != 0);

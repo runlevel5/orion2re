@@ -47,4 +47,12 @@ namespace ADVCIV {
     void __cdecl Get_Adv_Civ_Planet_Worthiness_(int16_t player_idx, int16_t planet_idx, int32_t* worth, int8_t* has_colony, int16_t* proximity_bonus);
 
     void __cdecl Get_Worth_For_All_Planets_();
+
+    inline bool __cdecl Player_Has_Colony_At_Star_(int16_t plr_idx, int16_t star_idx) {
+        using Fn = bool(__cdecl*)(int16_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004ac120 });
+        return fn(plr_idx, star_idx);
+    }
+
+    int16_t __cdecl Proximity_Bonus_(int16_t plr_idx, int16_t planet_idx);
 }

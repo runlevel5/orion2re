@@ -243,7 +243,7 @@ namespace animate {
 
     void __cdecl Draw_No_Glassed_Animated_Sprite_(int16_t x, int16_t y, uint8_t* frame_data) {
         int y_offset = *reinterpret_cast<uint16_t*>(frame_data + 2);
-        int dest_line_base = (y + y_offset) * static_cast<int>(g_screen_res_x) + x;
+        int dest_line_base = (y + y_offset) * static_cast<int>(platform::g_screen_res_x) + x;
         int dest_ptr = dest_line_base;
         int frame_idx = 2;
         int height = _animation_header->height;
@@ -457,14 +457,14 @@ namespace animate {
     }
 
     void __cdecl Draw_Animated_Sprite_Back_Diff_(int16_t x, int16_t y, uint8_t* frame_data) {
-        g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         platform::Lock_Offscreen_Surface_();
 
         int32_t current_y = *reinterpret_cast<uint16_t*>(frame_data + 2);
         int32_t draw_y = y + current_y;
         int32_t data_offset_words = 2;
         int32_t draw_x = x;
-        int32_t screen_offset = draw_y * g_screen_res_x + x;
+        int32_t screen_offset = draw_y * platform::g_screen_res_x + x;
         int32_t line_start_offset = screen_offset;
         int32_t height = _animation_header->height;
 
@@ -777,8 +777,8 @@ namespace animate {
         int16_t width = _animation_header->width;
         int16_t height = _animation_header->height;
         int32_t src_offset = 0;
-        int32_t dest_offset = y * g_screen_res_x + x;
-        int32_t row_skip = g_screen_res_x - width;
+        int32_t dest_offset = y * platform::g_screen_res_x + x;
+        int32_t row_skip = platform::g_screen_res_x - width;
 
         if (height > 0) {
             for (int32_t h = 0; h < height; ++h) {

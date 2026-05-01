@@ -2,7 +2,7 @@
 
 namespace setvesa {
     void __cdecl Add_Square_To_Scan_List_(int x1, int y1, int x2, int y2) {
-        if (g_screen_res_x <= x1 || g_screen_res_y <= y1 || x2 <= 0 || y2 <= 0) {
+        if (platform::g_screen_res_x <= x1 || platform::g_screen_res_y <= y1 || x2 <= 0 || y2 <= 0) {
             return;
         }
 
@@ -14,12 +14,12 @@ namespace setvesa {
             y1 = 0;
         }
 
-        if (g_screen_res_x <= x2) {
-            x2 = g_screen_res_x - 1;
+        if (platform::g_screen_res_x <= x2) {
+            x2 = platform::g_screen_res_x - 1;
         }
 
-        if (g_screen_res_y <= y2) {
-            y2 = g_screen_res_y - 1;
+        if (platform::g_screen_res_y <= y2) {
+            y2 = platform::g_screen_res_y - 1;
         }
 
         x1 >>= 2;

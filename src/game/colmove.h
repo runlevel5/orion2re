@@ -19,10 +19,7 @@ namespace COLMOVE {
 
     void __cdecl Send_Cluster_(int16_t colony_idx, int16_t requested_job);
 
-    inline void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* dest) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, char*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049f590})(colony_idx, pop_idx, dest);
-    }
+    void __cdecl Colony_Pop_String_(int16_t colony_idx, int16_t pop_idx, char* output_buffer);
 
     uint8_t __cdecl Give_Colonist_New_Job_(int16_t colony_idx, int16_t pop_idx, int16_t new_job);
 }

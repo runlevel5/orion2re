@@ -302,7 +302,7 @@ namespace replace {
             replace::_palette_color_list[i] += color_offset1;
         }
         
-        ::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         shear::Interlace_Scale_Off_Page_ASM_(video::_current_video_page, replace::_palette_color_list);
         platform::Unlock_Appropriate_Render_Buffer();
         
@@ -312,7 +312,7 @@ namespace replace {
             replace::_palette_color_list[i] += color_offset2;
         }
         
-        ::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+        platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
         shear::Interlace_Scale_Off_Page_ASM_(video::_current_video_page + 0x280, replace::_palette_color_list);
         platform::Unlock_Appropriate_Render_Buffer();
     }
