@@ -194,7 +194,7 @@ namespace CMBTSPEC {
             graphics::Set_Window_(0, 0, 639, 350);
             video::Clip_On_();
             CMBTDRW1::Draw_Ship_(ship_idx, target_x_rel_center, target_y_rel_center);
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0, MOX::_global_cache_seg);
             animate::Draw_(draw_x, draw_y, anim);
             video::Clip_Off_();
             graphics::Reset_Window_();
@@ -261,7 +261,7 @@ namespace CMBTSPEC {
 
         {
             char* path = ESTRINGS::E_Strings_(0xE0);
-            s_animation_header* loaded_img = (s_animation_header*)Buffer_Reload_(path, resource_idx, MOX::_global_cache_seg);
+            s_animation_header* loaded_img = (s_animation_header*)buffer::Buffer_Reload_(path, resource_idx, MOX::_global_cache_seg);
             bitmap::Draw_Picture_To_Bitmap_(h_temp, loaded_img);
         }
 
@@ -356,7 +356,7 @@ namespace CMBTSPEC {
             goto finish_drawing;
         }
 
-        seg = static_cast<s_animation_header*>(Buffer_Reload_(ESTRINGS::E_Strings_(224), asset_id, MOX::_global_cache_seg));
+        seg = static_cast<s_animation_header*>(buffer::Buffer_Reload_(ESTRINGS::E_Strings_(224), asset_id, MOX::_global_cache_seg));
         {
             int16_t frame_count = animate::Get_Animation_Frame_Count_(seg);
             animate::Set_Animation_Frame_(seg, MOX::_ship_frame % frame_count);
@@ -397,7 +397,7 @@ namespace CMBTSPEC {
                 COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[target_ship_idx].x, MOX::_combat_data[target_ship_idx].y);
             }
 
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 1, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 1, MOX::_global_cache_seg);
             animate::Draw_Palette_(anim);
             frame_count = animate::Get_Animation_Frame_Count_(anim);
 
@@ -427,7 +427,7 @@ namespace CMBTSPEC {
                     video::Set_Page_Off_();
                     CMBTDRW1::Draw_Main_Combat_Screen_();
                     
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 1, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 1, MOX::_global_cache_seg);
                     animate::Set_Animation_Frame_(anim, frame_idx);
                     bitmap::Draw_Picture_To_Bitmap_(static_cast<s_animation_header*>(temp_bitmap), anim);
                     
@@ -699,7 +699,7 @@ namespace CMBTSPEC {
 
         if (count_destroyed > 0 && MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             ERICNET::Mox_Play_Sound_(0x1c);
-            s_animation_header* anim_seg = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 7, MOX::_global_cache_seg);
+            s_animation_header* anim_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 7, MOX::_global_cache_seg);
             int16_t frame_count = animate::Get_Animation_Frame_Count_(anim_seg);
 
             BEAMS::Add_Damage_Indicator_For_Missile_(target_x, target_y, 1, count_destroyed);
@@ -716,7 +716,7 @@ namespace CMBTSPEC {
                         CMBTDRW1::Draw_Ship_(ship_idx, ship_x - cur_combat_x_offset, ship_y - cur_combat_y_offset);
                     }
 
-                    s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 7, MOX::_global_cache_seg);
+                    s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 7, MOX::_global_cache_seg);
                     animate::Set_Animation_Frame_(anim, frame);
                     animate::Draw_(target_x - 12, target_y - 12, anim);
 
@@ -741,7 +741,7 @@ namespace CMBTSPEC {
         CMBTDRW1::Get_Ship_Center_Draw_XY_(ship_idx, &start_x, &start_y);
         graphics::Save_Window_();
 
-        anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 15, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 15, MOX::_global_cache_seg);
         animate::Draw_Palette_(anim);
 
         allocate::Push_Block_(MOX::_screen_seg);
@@ -759,7 +759,7 @@ namespace CMBTSPEC {
             graphics::Set_Window_(0, 0, 639 /* 0x27f */, 350 /* 0x15e */);
             video::Clip_On_();
 
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 15, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 15, MOX::_global_cache_seg);
             animate::Set_Animation_Frame_(anim, frame_idx % 3);
             bitmap::Draw_Picture_To_Bitmap_(buffer, anim);
             bitmap::Set_Picture_Glassed_(buffer);
@@ -895,8 +895,8 @@ namespace CMBTSPEC {
                 COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[target_idx].x, MOX::_combat_data[target_idx].y);
             }
 
-            Buffer_Reload_(COLONY::_CMBTSFX_LBX, 41, MOX::_global_cache_seg);
-            beam_anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 40, MOX::_global_cache_seg);
+            buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 41, MOX::_global_cache_seg);
+            beam_anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 40, MOX::_global_cache_seg);
             animate::Draw_Palette_(beam_anim);
             palette::Refresh_Palette_();
 
@@ -925,7 +925,7 @@ namespace CMBTSPEC {
                 video::Set_Page_Off_();
                 CMBTDRW1::Draw_Main_Combat_Screen_();
 
-                beam_anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 40, MOX::_global_cache_seg);
+                beam_anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 40, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(beam_anim, (int32_t)frame_idx);
                 bitmap::Draw_Picture_To_Bitmap_(temp_bitmap, beam_anim);
 
@@ -934,7 +934,7 @@ namespace CMBTSPEC {
                 bitmap::Draw_Bitmap_Line_(x1, y1, x2, y2, temp_bitmap);
 
                 if (frame_idx > 8) {
-                    impact_anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 41, MOX::_global_cache_seg);
+                    impact_anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 41, MOX::_global_cache_seg);
                     animate::Set_Animation_Frame_(impact_anim, frame_idx - 9);
                     palette::Restore_Glass_Remap_Block_(MOX::_stellar_converter_remap_colors);
                     animate::Draw_(x2 - 60, y2 - 60, impact_anim);
@@ -990,7 +990,7 @@ namespace CMBTSPEC {
                 COMBINIT::Snap_Center_Combat_Screen_(target_ship->x, target_ship->y);
             }
 
-            s_animation_header* travel_seg = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0xE /* Travel sprite */, MOX::_global_cache_seg);
+            s_animation_header* travel_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0xE /* Travel sprite */, MOX::_global_cache_seg);
             int16_t travel_frames = animate::Get_Animation_Frame_Count_(travel_seg);
 
             int16_t start_x, start_y;
@@ -1016,7 +1016,7 @@ namespace CMBTSPEC {
                 graphics::Set_Window_(0, 0, 639, 350);
                 video::Clip_On_();
 
-                s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0xE, MOX::_global_cache_seg);
+                s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0xE, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(anim, (int32_t)travel_frame_idx);
                 animate::Draw_(current_x, current_y, anim);
                 video::Clip_Off_();
@@ -1040,7 +1040,7 @@ namespace CMBTSPEC {
                 default: impact_entry = 0x25; break;
             }
 
-            s_animation_header* impact_seg = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, impact_entry, MOX::_global_cache_seg);
+            s_animation_header* impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, impact_entry, MOX::_global_cache_seg);
             int16_t impact_frames = animate::Get_Animation_Frame_Count_(impact_seg);
             int16_t impact_x = current_x + (20 - animate::Get_Width_(impact_seg) / 2);
             int16_t impact_y = current_y + (20 - animate::Get_Height_(impact_seg) / 2);
@@ -1068,7 +1068,7 @@ namespace CMBTSPEC {
                     default: cur_impact_entry = 0x25; break;
                 }
 
-                s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, cur_impact_entry, MOX::_global_cache_seg);
+                s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, cur_impact_entry, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(anim, (int32_t)impact_frame_idx);
                 animate::Draw_(impact_x, impact_y, anim);
 
@@ -1129,20 +1129,20 @@ namespace CMBTSPEC {
                 case 0:
                     off_x -= 12;
                     off_y -= 9;
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 3, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 3, MOX::_global_cache_seg);
                     break;
                 case 1:
                 case 2:
                     off_x -= 23;
                     off_y -= 20;
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 4, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 4, MOX::_global_cache_seg);
                     break;
                 case 3:
                 case 4:
                 case 5:
                     off_x -= 47;
                     off_y -= 44;
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 5, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 5, MOX::_global_cache_seg);
                     break;
             }
 
@@ -1260,7 +1260,7 @@ namespace CMBTSPEC {
                         break;
                 }
 
-                anim = (s_animation_header*)Buffer_Reload_(monster_lbx, entry_id, MOX::_global_cache_seg);
+                anim = (s_animation_header*)buffer::Buffer_Reload_(monster_lbx, entry_id, MOX::_global_cache_seg);
 
                 if (i == 0 && sfx_id != -1) {
                     ERICNET::Mox_Play_Sound_(sfx_id);
@@ -1363,10 +1363,10 @@ namespace CMBTSPEC {
         int16_t x2, y2;
         int16_t step;
 
-        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x44, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x44, MOX::_global_cache_seg);
         animate::Draw_Palette_(anim);
 
-        anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
         int16_t frame_count = animate::Get_Animation_Frame_Count_(anim);
 
         allocate::Push_Block_(MOX::_screen_seg);
@@ -1395,7 +1395,7 @@ namespace CMBTSPEC {
                 video::Set_Page_Off_();
                 CMBTDRW1::Draw_Main_Combat_Screen_();
 
-                anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
+                anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(anim, (int32_t)frame);
                 bitmap::Draw_Picture_To_Bitmap_(block, anim);
 
@@ -1438,7 +1438,7 @@ namespace CMBTSPEC {
             graphics::Set_Window_(0, 0, 639, 350);
             video::Clip_On_();
 
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 8, MOX::_global_cache_seg);
             animate::Set_Animation_Frame_(anim, (int32_t)((frame % 3) + frame_count - 3));
             bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)block, anim);
 
@@ -1569,16 +1569,16 @@ namespace CMBTSPEC {
         switch (sfx_type) {
         case 0:
         case 1:
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
             break;
         case 2:
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
             break;
         case 3:
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
             break;
         case 4:
-            anim = (s_animation_header*)Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
             break;
         }
 
@@ -1712,16 +1712,16 @@ namespace CMBTSPEC {
                 switch (sfx_type) {
                 case 0:
                 case 1:
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
                     break;
                 case 2:
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
                     break;
                 case 3:
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
                     break;
                 case 4:
-                    anim = (s_animation_header*)Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
+                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
                     break;
                 }
 

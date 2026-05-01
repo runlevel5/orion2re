@@ -353,7 +353,7 @@ namespace COLBLDG {
         auto& new_ship = MOX::_ship[ship_idx];
         memset(&new_ship, 0, sizeof(s_ship_data));
 
-        Copy_Structure_(&new_ship.d, &MOX::_player[player_idx].ship_designs[design_idx], 0x63);
+        struct_::Copy_Structure_(&new_ship.d, &MOX::_player[player_idx].ship_designs[design_idx], 0x63);
         new_ship.owner = (int8_t)player_idx;
         new_ship.d.previous_owner = (int8_t)player_idx;
         new_ship.status = 0;

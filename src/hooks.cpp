@@ -3839,6 +3839,14 @@ namespace hooks {
         { 0x00509880, &COLBLDG::Option_String_ },
         { 0x00497540, &MAINSCR::Wrapper_For_Normal_System_Fields_ },
         { 0x0043DEA0, &OFFICER::Get_Advanced_Government_Type_ },
+        { 0x00480EE0, &INITSHIP::Update_Ship_Names_To_New_Language_ },
+        { 0x00481CF0, &INITSHIP::Best_Missile_Damage_Special_ },
+        { 0x004E2630, &SCORE::Get_Won_Council_Score_ },
+        { 0x0052D169, &struct_::Swap_Structure_ },
+        { 0x00409370, &ERICNET::Best_Instructor_Bonus_ },
+        { 0x00508670, &AIPOWER::Base_Generic_Dcv_ },
+        { 0x00508990, &AIPOWER::Modified_Weapon_Strength_ },
+        { 0x00508A50, &AIPOWER::Strength_Hits_Modifier_ },
     };
 
     void Install_Hooks()

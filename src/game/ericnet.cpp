@@ -436,6 +436,31 @@ namespace ERICNET {
         }
     }
 
+    void __cdecl Best_Instructor_Bonus_(int16_t* instructor_bonus_by_player) {
+        for (int16_t leader_index = 0; leader_index < 0x43; ++leader_index) {
+            const s_leader_data& leader = MOX::_leaders[leader_index];
+            const int16_t player_index = static_cast<int8_t>(leader.player_index);
+
+            if ((leader.type == 1) &&
+                (static_cast<int8_t>(leader.status) >= 0) &&
+                (static_cast<int8_t>(leader.eta) == 0) &&
+                (player_index > -1) &&
+                (player_index < 8)) {
+                int16_t bonus = 0;
+
+                if (OFFICER::Officer_Has_Special_Skill_(player_index, leader_index, 0x16)) {
+                    bonus = static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_index), leader_index, 0x16));
+                } else if (OFFICER::Officer_Has_Special_Skill_(player_index, leader_index, 0x17)) {
+                    bonus = static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_index), leader_index, 0x17));
+                }
+
+                if (instructor_bonus_by_player[player_index] < bonus) {
+                    instructor_bonus_by_player[player_index] = bonus;
+                }
+            }
+        }
+    }
+
     void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_id) {
         MOX::_colony[colony_idx].buildings[building_id] = 0;
 

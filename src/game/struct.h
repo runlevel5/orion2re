@@ -10,4 +10,6 @@ namespace struct_ {
     bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index);
     void __cdecl Set_Bit_Field_(void* field, uint16_t bit);
     void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index);
+
+    void __cdecl Swap_Structure_(void* left_ptr, void* right_ptr, uint32_t byte_count);
 }

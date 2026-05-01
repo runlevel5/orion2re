@@ -1276,7 +1276,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             if (ERIC::Get_Fade_Percent_() != 0) ERIC::Fast_Fade_In_();
             video::Set_Page_Back_();
             RUSS::Mox_Update_();
-            s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));
+            s_animation_header* raceopt_ptr = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_("raceopt.lbx", 0, MOX::_global_cache_seg));
             animate::Draw_(0, 0, raceopt_ptr);
             RUSS::Mox_Update_();
             video::Copy_Back_To_Off_();

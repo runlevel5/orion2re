@@ -773,7 +773,7 @@ namespace CMBTFIRE {
             lbx_entry--;
         }
 
-        seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_00551228, (int)lbx_entry, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, (int)lbx_entry, MOX::_global_cache_seg);
         frame_count = animate::Get_Animation_Frame_Count_(seg);
         COMBINIT::Ship_Center_Offsets_(ship_idx, &off_x, &off_y);
 
@@ -818,7 +818,7 @@ namespace CMBTFIRE {
         s_animation_header* h1 = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 22500 /* 0x57e4 */);
 
         int32_t entry_num = (-1 - ship->size_class) / 2 + 46 /* 0x2e */;
-        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx, entry_num, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx, entry_num, MOX::_global_cache_seg);
 
         int16_t frame = (MOX::_ship_frame / 2) % 8;
 
@@ -1709,7 +1709,7 @@ namespace CMBTFIRE {
         const char* s_cmbtsfx_lbx_local = reinterpret_cast<const char*>(std::uintptr_t{0x00551228}); // "cmbtsfx.lbx"
 
         if (MOX::_apply_damage_to_planet != 0 && MOX::_super_fast_flag == 0) {
-            anim_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F /* 47 */, MOX::_global_cache_seg);
+            anim_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F /* 47 */, MOX::_global_cache_seg);
             animate::Draw_Palette_(anim_seg);
             frame_count = animate::Get_Animation_Frame_Count_(anim_seg);
 
@@ -1743,7 +1743,7 @@ namespace CMBTFIRE {
                 loop_counter += speed_step;
 
                 animate::Set_Animation_Frame_(anim_seg, (int32_t)current_frame);
-                anim_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F, MOX::_global_cache_seg);
+                anim_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_local, 0x2F, MOX::_global_cache_seg);
                 bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)temp_bitmap, anim_seg);
 
                 graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);

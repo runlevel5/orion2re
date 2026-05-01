@@ -11,7 +11,7 @@ namespace COLXPORT {
             COLMOVE::_g_hacky_dont_draw_cluster_flag = 0;
             COLONY::_full_draw = 1;
 
-            COLXPORT::_anims[0] = (s_animation_header*)Buffer_Reload_(COLONY::_COLPUPS_LBX, 0x10, MOX::_global_cache_seg);
+            COLXPORT::_anims[0] = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLPUPS_LBX, 0x10, MOX::_global_cache_seg);
             animate::Draw_(0, 0, COLXPORT::_anims[0]);
             video::Copy_Off_To_Back_();
 

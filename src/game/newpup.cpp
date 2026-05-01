@@ -43,10 +43,10 @@ namespace NEWPUP {
             COLONY::_full_draw = 1;
             MOX2::Execute_Auto_Function_(&NEWPUP::_saved_autofunction);
 
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
             graphics::Darken_Fill_(3, 0x14A, (int16_t)(animate::Get_Width_(anim) + 1), 0x1D9);
 
-            NEWPUP::_anims = (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
+            NEWPUP::_anims = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
             animate::Draw_(2, 0x149, NEWPUP::_anims);
 
             summary_row = 0;
@@ -193,7 +193,7 @@ namespace NEWPUP {
 
             {
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
-                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                    (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
                 const int32_t x =
                     (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
                 fonts::Print_Centered_(x, 0x1d1, text_buffer);
@@ -209,7 +209,7 @@ namespace NEWPUP {
                     static_cast<uint32_t>(hit_points));
 
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
-                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                    (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
                 const int32_t x =
                     (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
                 fonts::Print_Centered_(x, 0x1c8, text_buffer);
@@ -226,7 +226,7 @@ namespace NEWPUP {
                     COLONY::Player_Troop_Name_(player_id, troop_type, race));
 
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
-                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                    (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
                 const int32_t x =
                     (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
                 fonts::Print_Centered_(x, 0x1d1 - row_index * 9, text_buffer);
@@ -236,7 +236,7 @@ namespace NEWPUP {
 
             {
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
-                    (s_animation_header*)Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
+                    (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
                 const int32_t x =
                     (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
                 ERIC::Draw_Bottom_Centered_(x, 0x1d9 - row_index * 9, troop_anim);

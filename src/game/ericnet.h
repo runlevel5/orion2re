@@ -24,4 +24,6 @@ namespace ERICNET {
     void __cdecl Do_XP_For_Ship_(int16_t ship_index, int16_t xp_gain);
 
     void __cdecl Remove_Building_(int16_t colony_idx, int16_t building_idx);
+
+    void __cdecl Best_Instructor_Bonus_(int16_t* instructor_bonus_by_player);
 }

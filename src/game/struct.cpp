@@ -97,4 +97,81 @@ namespace struct_ {
 
         field_ptr[byte_offset] &= ~(static_cast<uint8_t>(1 << bit_in_byte));
     }
+
+    void __cdecl Swap_Structure_(void* left_ptr, void* right_ptr, uint32_t byte_count) {
+        uint8_t* left = static_cast<uint8_t*>(left_ptr);
+        uint8_t* right = static_cast<uint8_t*>(right_ptr);
+
+        if ((reinterpret_cast<std::uintptr_t>(right_ptr) & 1U) != 0) {
+            if ((reinterpret_cast<std::uintptr_t>(left_ptr) & 1U) == 0) {
+                uint32_t count = byte_count;
+                do {
+                    uint8_t temp = *right;
+                    *right++ = *left;
+                    *left++ = temp;
+                } while (--count != 0);
+                return;
+            }
+
+            {
+                uint8_t temp = *right;
+                *right++ = *left;
+                *left++ = temp;
+            }
+
+            byte_count -= 1;
+
+            uint32_t dword_count = byte_count >> 2;
+            if (dword_count != 0) {
+                do {
+                    uint32_t temp = *reinterpret_cast<uint32_t*>(right);
+                    *reinterpret_cast<uint32_t*>(right) = *reinterpret_cast<uint32_t*>(left);
+                    *reinterpret_cast<uint32_t*>(left) = temp;
+                    right += 4;
+                    left += 4;
+                } while (--dword_count != 0);
+            }
+
+            uint32_t tail_count = byte_count & 3;
+            if (tail_count != 0) {
+                do {
+                    uint8_t temp = *right;
+                    *right++ = *left;
+                    *left++ = temp;
+                } while (--tail_count != 0);
+            }
+
+            return;
+        }
+
+        if ((reinterpret_cast<std::uintptr_t>(left_ptr) & 1U) != 0) {
+            uint32_t count = byte_count;
+            do {
+                uint8_t temp = *right;
+                *right++ = *left;
+                *left++ = temp;
+            } while (--count != 0);
+            return;
+        }
+
+        uint32_t dword_count = byte_count >> 2;
+        if (dword_count != 0) {
+            do {
+                uint32_t temp = *reinterpret_cast<uint32_t*>(right);
+                *reinterpret_cast<uint32_t*>(right) = *reinterpret_cast<uint32_t*>(left);
+                *reinterpret_cast<uint32_t*>(left) = temp;
+                right += 4;
+                left += 4;
+            } while (--dword_count != 0);
+        }
+
+        uint32_t tail_count = byte_count & 3;
+        if (tail_count != 0) {
+            do {
+                uint8_t temp = *right;
+                *right++ = *left;
+                *left++ = temp;
+            } while (--tail_count != 0);
+        }
+    }
 }

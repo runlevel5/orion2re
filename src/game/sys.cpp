@@ -79,14 +79,14 @@ namespace SYS {
 
         MOX::_sys_disp = (s_sys_disp*)allocate::Allocate_Next_Block_((void*)SYS::_sys_data_buffer, 0x46);
 
-        s_animation_header* background_pic = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        s_animation_header* background_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
         MOX::_moveable_box[0].width = animate::Get_Width_(background_pic);
         MOX::_moveable_box[0].height = animate::Get_Height_(background_pic);
 
         s_star_data* star = &MOX::_star[star_idx];
         int8_t spectral_class = star->spectral_class;
 
-        s_animation_header* sun_anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, spectral_class + 0x53, (void*)MOX::_global_cache_seg);
+        s_animation_header* sun_anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, spectral_class + 0x53, (void*)MOX::_global_cache_seg);
         MOX::_sun_seg[spectral_class] = sun_anim;
         _system_display_sun_seg = sun_anim;
 
@@ -209,7 +209,7 @@ namespace SYS {
             entry_idx = (int16_t)climate * 5 + (int16_t)size;
         }
 
-        *out_ptr = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int)entry_idx + 0x5c, MOX::_global_cache_seg);
+        *out_ptr = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int)entry_idx + 0x5c, MOX::_global_cache_seg);
     }
 
     void __cdecl Potential_Colony_Info_Popup_(int16_t planet_id) {
@@ -302,13 +302,13 @@ namespace SYS {
     }
 
     void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
-        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
         animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict[0]);
     }
 
     void __cdecl Draw_Colony_Marker_(int16_t x, int16_t y, int16_t owner) {
         uint8_t color = (uint8_t)MOX::_player[owner].color;
-        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x23, (void*)MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x23, (void*)MOX::_global_cache_seg);
         MOX::_colony_marker_seg[color] = anim;
         int16_t width = animate::Get_Width_(anim);
         animate::Draw_(x - width + 2, y, anim);
@@ -316,7 +316,7 @@ namespace SYS {
 
     void __cdecl Draw_Outpost_Marker_(int16_t x, int16_t y, int16_t owner) {
         uint8_t color = (uint8_t)MOX::_player[owner].color;
-        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x2b, (void*)MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (int16_t)color + 0x2b, (void*)MOX::_global_cache_seg);
         MOX::_outpost_marker_seg[color] = anim;
         int16_t width = animate::Get_Width_(anim);
         animate::Draw_(x - width, y, anim);
@@ -465,19 +465,19 @@ namespace SYS {
         const int16_t ring_draw_y = static_cast<int16_t>(ring_base_y + 0x0c);
 
         MOX::_o_ring_seg[orbit_idx] =
-            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, orbit_idx + 0x4d, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, orbit_idx + 0x4d, MOX::_global_cache_seg);
         animate::Get_Width_(MOX::_o_ring_seg[orbit_idx]);
         animate::Get_Height_(MOX::_o_ring_seg[orbit_idx]);
 
         s_animation_header* ring_picture =
-            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, orbit_idx + 0x4d, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, orbit_idx + 0x4d, MOX::_global_cache_seg);
         bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)SYS::_sys_disp_bitmap, ring_picture);
 
         const int16_t planet_screen_x = static_cast<int16_t>(ring_base_x + planet_x + 0x9f);
         const int16_t planet_screen_y = static_cast<int16_t>(ring_base_y + planet_y + 0x58);
 
         MOX::_planet_mask_seg[planet_mask_index] =
-            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, planet_mask_index + 0x8f, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, planet_mask_index + 0x8f, MOX::_global_cache_seg);
         animate::Set_Animation_Frame_(MOX::_planet_mask_seg[planet_mask_index], orbit_pos);
 
         SYS::Get_Rotating_Planet_Segment_(
@@ -500,7 +500,7 @@ namespace SYS {
         animate::Draw_(ring_draw_x, ring_draw_y, (s_animation_header*)SYS::_sys_disp_bitmap);
 
         MOX::_planet_mask_seg[planet_mask_index] =
-            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, planet_mask_index + 0x8f, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, planet_mask_index + 0x8f, MOX::_global_cache_seg);
         animate::Set_Animation_Frame_(MOX::_planet_mask_seg[planet_mask_index], orbit_pos);
 
         SYS::Get_Rotating_Planet_Segment_(
@@ -531,7 +531,7 @@ namespace SYS {
                 if (MOX::_planet[planet_idx].planet_type == 3 || MOX::_planet[planet_idx].planet_type == 2) {
                     Draw_Planet_With_Pierced_Ring_(planet_idx, i, base_x, base_y, content_w, content_h, y_offset, x_offset);
                 } else {
-                    MOX::_asteroid_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x5b, (void*)MOX::_global_cache_seg);
+                    MOX::_asteroid_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x5b, (void*)MOX::_global_cache_seg);
                     animate::Set_Animation_Frame_(MOX::_asteroid_seg, (int)orbit_idx);
                     animate::Draw_(x_offset + content_w + base_x + 0x10, y_offset + content_h + base_y + 0xc, (s_animation_header*)MOX::_asteroid_seg);
                 }
@@ -540,7 +540,7 @@ namespace SYS {
     }
 
     void __cdecl Draw_Sun_Seg_(int16_t star_idx, int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t y_offset, int16_t x_offset) {
-        _system_display_sun_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, MOX::_star[star_idx].spectral_class + 0x53, (void*)MOX::_global_cache_seg);
+        _system_display_sun_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, MOX::_star[star_idx].spectral_class + 0x53, (void*)MOX::_global_cache_seg);
 
         int16_t box_w = MOX::_moveable_box[0].width;
         int16_t box_h = MOX::_moveable_box[0].height;
@@ -578,7 +578,7 @@ namespace SYS {
 
     void __cdecl Draw_System_Highlight_(short planet_idx, short rect_w, short rect_h, short x_offset, short y_offset) {
         int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
-        MOX::_o_highlight_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x4b, (void*)MOX::_global_cache_seg);
+        MOX::_o_highlight_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x4b, (void*)MOX::_global_cache_seg);
         int16_t w = animate::Get_Width_(MOX::_o_highlight_seg);
         int16_t h = animate::Get_Height_(MOX::_o_highlight_seg);
 
@@ -911,14 +911,14 @@ namespace SYS {
 
         if (HAROLD::Star_Has_Artemis_Net_(star)) {
             out_x -= 12;
-            MOX::_gate_icon_seg[14] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 33 /* LBX_ENTRY_ARTEMIS */, MOX::_global_cache_seg);
+            MOX::_gate_icon_seg[14] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 33 /* LBX_ENTRY_ARTEMIS */, MOX::_global_cache_seg);
             animate::Draw_(out_x, out_y, MOX::_gate_icon_seg[14]);
         }
 
         if (HAROLD::Star_Has_Dimensional_Portal_(star)) {
             out_y += 1;
             out_x -= 12;
-            MOX::_gate_icon_seg[2] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 21 /* LBX_ENTRY_DIMENSIONAL_PORTAL */, MOX::_global_cache_seg);
+            MOX::_gate_icon_seg[2] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 21 /* LBX_ENTRY_DIMENSIONAL_PORTAL */, MOX::_global_cache_seg);
             animate::Draw_(out_x, out_y, MOX::_gate_icon_seg[2]);
         }
     }
@@ -953,7 +953,7 @@ namespace SYS {
         current_style = fonts::_current_font_style;
         font_height = fonts::Get_Font_Height_();
 
-        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
         image_width = animate::Get_Width_(MOX::_moveable_box_pict[0]);
 
         print_x = x_offset + box_x + (image_width / 2);
@@ -987,17 +987,17 @@ namespace SYS {
         if (owner_idx < 8) {
             // Reload buffer based on player color
             uint8_t player_color = static_cast<uint8_t>(MOX::_player[owner_idx].color);
-            return (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, player_color + 273 /* 0x111 */, MOX::_global_cache_seg);
+            return (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, player_color + 273 /* 0x111 */, MOX::_global_cache_seg);
         }
 
         if (owner_idx == 8) {
             // Neutral or special owner case
-            return (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 281 /* 0x119 */, MOX::_global_cache_seg);
+            return (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 281 /* 0x119 */, MOX::_global_cache_seg);
         }
 
         if (owner_idx > 8 && owner_idx < 15) {
             // Other special owner ranges
-            return (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, (owner_idx - 9) + 282 /* 0x11a */, MOX::_global_cache_seg);
+            return (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, (owner_idx - 9) + 282 /* 0x11a */, MOX::_global_cache_seg);
         }
 
         return nullptr;
@@ -1166,7 +1166,7 @@ namespace SYS {
             return;
         }
 
-        MOX::_moveable_box_pict[0] = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+        MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
@@ -1345,7 +1345,7 @@ namespace SYS {
         *total_height = 12;
 
         MOX::_moveable_box_pict[0] =
-                (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+                (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
@@ -2134,7 +2134,7 @@ namespace SYS {
         (void)display_index;
 
         MOX::_moveable_box_pict[0] =
-            (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
+            (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 

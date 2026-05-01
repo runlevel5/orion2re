@@ -10,10 +10,10 @@ namespace MULTPLAY {
 
         video::Set_Page_Off_();
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
         _memcpy(MULTPLAY::_cur_pal_colors, MULTPLAY::_green_pal_colors, 64);
@@ -46,7 +46,7 @@ namespace MULTPLAY {
             int16_t bx_offset = x + 143;
             int16_t current_y = y + 81;
 
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
+            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(bx_offset, current_y, MOX::_mp_screen->btn_accept_off);
 
             current_y += 12;
@@ -57,7 +57,7 @@ namespace MULTPLAY {
                     local_colors = *sel_font;
                     fonts::Set_Font_Style_(3, &local_colors);
 
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
+                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
                     animate::Draw_(x + 148, current_y, MOX::_mp_screen->btn_accept_on);
                 }
                 else {
@@ -77,7 +77,7 @@ namespace MULTPLAY {
             int16_t bx_offset = x + 298;
             int16_t current_y = y + 81;
 
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
+            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(bx_offset, current_y, MOX::_mp_screen->btn_accept_off);
 
             current_y += 12;
@@ -88,7 +88,7 @@ namespace MULTPLAY {
                     local_colors = *sel_font;
                     fonts::Set_Font_Style_(3, &local_colors);
 
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
+                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
                     animate::Draw_(x + 303, current_y, MOX::_mp_screen->btn_accept_on);
                 }
                 else {
@@ -119,18 +119,18 @@ namespace MULTPLAY {
         // Signature copy: Evan Axelrad (12 bytes + null terminator)
         _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2A /* 42 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2A /* 42 */, MOX::_global_cache_seg);
         top_w = animate::Get_Width_(MOX::_mp_screen->anim_turn_screen_top);
         top_h = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_top);
         MOX::_mp_screen->screen_x = (int16_t)((640 - top_w) / 2);
 
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2B /* 43 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2B /* 43 */, MOX::_global_cache_seg);
         mid_h = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_mid);
 
-        MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x28 /* 40 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x28 /* 40 */, MOX::_global_cache_seg);
         chat_bg_h = animate::Get_Height_(MOX::_mp_screen->anim_chat_msg_bg);
 
-        MOX::_mp_screen->anim_unk_3 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2D /* 45 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_unk_3 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x2D /* 45 */, MOX::_global_cache_seg);
 
         MOX::_mp_screen->num_remaining_humans = HAROLD::Get_N_Remaining_Humans_();
         MOX::_mp_screen->needs_full_redraw = 1;
@@ -205,7 +205,7 @@ namespace MULTPLAY {
     void __cdecl Draw_MP_Setup_Screen_() {
         s_mp_screen* screen = MOX::_mp_screen;
 
-        screen->res_setup_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
+        screen->res_setup_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
 
         animate::Draw_(screen->screen_x, screen->screen_y, screen->res_setup_bg);
 
@@ -254,8 +254,8 @@ namespace MULTPLAY {
         MOX::_mp_screen->needs_full_redraw = 1;
         strcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48);
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-        MOX::_mp_screen->res_setup_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->res_setup_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 1, MOX::_global_cache_seg);
 
         MOX::_mp_screen->screen_x = (640 - animate::Get_Width_(MOX::_mp_screen->res_setup_bg)) / 2;
         MOX::_mp_screen->screen_y = (480 - animate::Get_Height_(MOX::_mp_screen->res_setup_bg)) / 2;
@@ -324,7 +324,7 @@ namespace MULTPLAY {
         EVANHELP::Set_Multi_Player_Setup_Screen_Help_List_();
 
         video::Set_Page_Off_();
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
 
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
         palette::Clear_Palette_Changes_(0, 0xFF);
@@ -903,7 +903,7 @@ namespace MULTPLAY {
             );
         }
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x20, MOX::_global_cache_seg);
 
         MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551100, 0x29);
     }
@@ -915,10 +915,10 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
     _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
 
-    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-    MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 32, MOX::_global_cache_seg);
-    MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
-    MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
+    MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 32, MOX::_global_cache_seg);
+    MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
+    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
 
     MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 33, MOX::_screen_seg);
     MOX::_mp_screen->anim_btn_unk_3 = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 34, MOX::_screen_seg);
@@ -958,7 +958,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
             MOX::_mp_screen->field_id_ok = fields::Add_Button_Field_(screen_x + 0xFD, btn_y, s__00551100, MOX::_mp_screen->anim_btn_unk_3, s__00551120, 40);
         }
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
         MOX::_mp_screen->field_id_close_dropdown = fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41);
     }
 
@@ -975,10 +975,10 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
 
         // Load visual assets from MULTIGM.LBX
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x23, MOX::_global_cache_seg);
-        MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x26, MOX::_global_cache_seg);
-        MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x27, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x23, MOX::_global_cache_seg);
+        MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x26, MOX::_global_cache_seg);
+        MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x27, MOX::_global_cache_seg);
 
         // Load button animations (note: indices might be specific to serial/modem setup)
         MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558d04, 0x24, MOX::_screen_seg);
@@ -1244,10 +1244,10 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
         video::Set_Page_Off_();
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 35, MOX::_global_cache_seg);
         animate::Draw_(x, y, MOX::_mp_screen->bg_seg);
 
         _memcpy(MULTPLAY::_cur_pal_colors, MULTPLAY::_green_pal_colors, 64);
@@ -1265,7 +1265,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         fonts::Print_(x + 293, y + 83, buffer);
 
         if (MOX::_mp_screen->flag_serial_type == 1) {
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
+            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(x + 129, y + 101, MOX::_mp_screen->btn_accept_off);
 
             short cur_y = y + 101;
@@ -1274,7 +1274,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                 if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
                     style_colors = *MISC::Font_Colors2_(3, 146, 154);
                     fonts::Set_Font_Style_(3, &style_colors);
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
+                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
                     animate::Draw_(x + 134, cur_y, MOX::_mp_screen->btn_accept_on);
                 } else {
                     style_colors = *MISC::Font_Colors2_(3, 146, 151);
@@ -1287,7 +1287,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         }
 
         if (MOX::_mp_screen->flag_serial_type == 2) {
-            MOX::_mp_screen->btn_accept_off = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
+            MOX::_mp_screen->btn_accept_off = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 38, MOX::_global_cache_seg);
             animate::Draw_(x + 295, y + 100, MOX::_mp_screen->btn_accept_off);
 
             short cur_y = y + 100;
@@ -1296,7 +1296,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                 if (MOX::_mp_screen->game_list_field_ids[i] == MOX::_mp_screen->last_scan_id) {
                     style_colors = *MISC::Font_Colors2_(3, 146, 154);
                     fonts::Set_Font_Style_(3, &style_colors);
-                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
+                    MOX::_mp_screen->btn_accept_on = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 39, MOX::_global_cache_seg);
                     animate::Draw_(x + 300, cur_y, MOX::_mp_screen->btn_accept_on);
                 } else {
                     style_colors = *MISC::Font_Colors2_(3, 146, 151);
@@ -1391,10 +1391,10 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
 
     _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055aa48, 13);
 
-    MOX::_save_game_dates = (char*)Allocate_First_Block_(MOX::_global_data_seg, 1000);
-    MOX::_save_game_stardates = (char*)Allocate_Next_Block_(MOX::_global_data_seg, 1000);
+    MOX::_save_game_dates = (char*)allocate::Allocate_First_Block_(MOX::_global_data_seg, 1000);
+    MOX::_save_game_stardates = (char*)allocate::Allocate_Next_Block_(MOX::_global_data_seg, 1000);
 
-    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
 
     bool load_anim = true;
 
@@ -1409,7 +1409,7 @@ void __cdecl Load_Load_MP_Game_Screen_(void) {
     }
 
     if (load_anim) {
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_index, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_index, MOX::_global_cache_seg);
     }
 
     MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX_00558d04, 0x101, MOX::_screen_seg);
@@ -1447,7 +1447,7 @@ int8_t __cdecl Add_Load_MP_Game_Screen_Fields_(void) {
             y_offset += 27;
         }
 
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 18 /* 0x12 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 18 /* 0x12 */, MOX::_global_cache_seg);
 
         field_id = fields::Add_Button_Field_(
             MOX::_mp_screen->screen_x + 191,
@@ -1566,7 +1566,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
     if (MOX::_mp_screen->needs_full_redraw != 0 || MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
         MOX::_mp_screen->needs_full_redraw = 0;
         MOX::_FULL_DRAW_SCREEN_FLAG = 0;
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(lbx_filename, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(lbx_filename, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
         video::Copy_Off_To_Back_();
     }
@@ -1581,7 +1581,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
     }
 
     if (entry != -1) {
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(lbx_filename, entry, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(lbx_filename, entry, MOX::_global_cache_seg);
     }
 
     animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
@@ -1652,7 +1652,7 @@ void __cdecl Draw_Load_MP_Game_Screen_() {
 
             if (icon_entry > 0) {
                 const char* lbx_ptr = *MULTPLAY::PTR_00558D3C;
-                s_animation_header* icon_anim = (s_animation_header*)Buffer_Reload_(lbx_ptr, icon_entry, MOX::_global_cache_seg);
+                s_animation_header* icon_anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_ptr, icon_entry, MOX::_global_cache_seg);
                 animate::Draw_(MOX::_mp_screen->screen_x + 0x17C, y_date, icon_anim);
             }
         }
@@ -1747,11 +1747,11 @@ void __cdecl Add_Net_Next_Turn_Fields_()
 
         if (ERIC::Get_Fade_Percent_() > 0) {
             graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
-            MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+            MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
             animate::Draw_(0, 0, MOX::_mp_screen->pic);
         } else if (MOX::_mp_screen->needs_full_redraw != 0) {
             graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
-            MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+            MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
             animate::Draw_(0, 0, MOX::_mp_screen->pic);
             video::Copy_Off_To_Back_();
             video::Set_Refresh_Stencil_();
@@ -1759,7 +1759,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
         }
 
         MOX::_mp_screen->anim_frame_timer++;
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, (int)MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, (int)MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
 
         if (MOX::_mp_screen->anim_frame_timer != 0) {
             for (int16_t frame_idx = 0; frame_idx < (int16_t)MOX::_mp_screen->anim_frame_timer; frame_idx++) {
@@ -1789,7 +1789,7 @@ int16_t __cdecl Choose_Multi_Network_Game_Screen_() {
     video::Set_Page_Back_();
     graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
 
-    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(lbx_filename, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(lbx_filename, 0, MOX::_global_cache_seg);
     animate::Draw_(0, 0, MOX::_mp_screen->pic);
     video::Copy_Back_To_Off_();
     RUSS::Mox_Sync_Update_();
@@ -1861,12 +1861,12 @@ void __cdecl Draw_SendGet_Net_Info_Screen_(void) {
 
     graphics::Fill_(0, 0, 639, 479, 0);
 
-    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
     animate::Draw_(0, 0, MOX::_mp_screen->pic);
 
     MOX::_mp_screen->anim_frame_timer++;
 
-    MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, (int)MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+    MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, (int)MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
 
     if (MOX::_mp_screen->anim_frame_timer != 0) {
         for (int16_t frame = 0; frame < (int16_t)MOX::_mp_screen->anim_frame_timer; ++frame) {
@@ -1909,8 +1909,8 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     memcpy(MOX::_mp_screen->signature, MULTPLAY::s_Evan_Axelrad_0055aa48, 13);
     MOX::_mp_screen->lbx_entry_num = lbx_entry_num;
 
-    MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
-    MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, lbx_entry_num, MOX::_global_cache_seg);
+    MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+    MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(MULTPLAY::s_MULTIGM_LBX_00558d04, lbx_entry_num, MOX::_global_cache_seg);
 
     int16_t width = animate::Get_Width_(MOX::_mp_screen->bg_seg);
     int16_t height = animate::Get_Height_(MOX::_mp_screen->bg_seg);
@@ -1937,7 +1937,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             display_count = 10;
         }
 
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
         animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->anim_btn_unk_4);
 
         // Update green palette range for the game selection list
@@ -2021,7 +2021,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             }
         }
 
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 41 /* 0x29 */, MOX::_global_cache_seg);
 
         int16_t cancel_btn_id = fields::Add_Button_Field_(
             MOX::_mp_screen->screen_x + 191 /* 0xBF */,
@@ -2047,9 +2047,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         // Note: Manual 13-byte copy of the signature string "Evan Axelrad"
         _memcpy(MOX::_mp_screen->signature, MULTPLAY::s_signature_axelrad, 13);
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
 
-        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0x29, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_btn_unk_4 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0x29, MOX::_global_cache_seg);
 
         MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_(s_MULTIGM_LBX, 0x101, MOX::_screen_seg);
 
@@ -2084,7 +2084,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         MOX::_mp_screen->num_remaining_humans = HAROLD::Get_N_Remaining_Humans_();
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0x1b, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0x1b, MOX::_global_cache_seg);
 
         int16_t top_w = animate::Get_Width_(MOX::_mp_screen->anim_turn_screen_top);
         MOX::_mp_screen->screen_x = (640 - top_w) / 2;
@@ -2198,7 +2198,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         }
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 42 /* 0x2a */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 42 /* 0x2a */, MOX::_global_cache_seg);
         
         if (MOX::_mp_screen->anim_frame_timer != 0) {
             for (int16_t i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {
@@ -2212,7 +2212,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         int16_t current_y = screen_y + animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_top);
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 43 /* 0x2b */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 43 /* 0x2b */, MOX::_global_cache_seg);
         
         if (MOX::_mp_screen->needs_full_redraw != 0) {
             animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_turn_screen_mid);
@@ -2221,7 +2221,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         current_y += animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_mid);
         
         if (MOX::_mp_screen->needs_full_redraw != 0) {
-            MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40 /* 0x28 */, MOX::_global_cache_seg);
+            MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40 /* 0x28 */, MOX::_global_cache_seg);
             animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_chat_msg_bg);
         }
 
@@ -2288,7 +2288,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 if (i == 0) {
                     graphics::Set_Window_(chat_x, chat_y, chat_x + 570, chat_y + 11);
                     video::Clip_On_();
-                    MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40, MOX::_global_cache_seg);
+                    MOX::_mp_screen->anim_chat_msg_bg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 40, MOX::_global_cache_seg);
                     animate::Draw_(screen_x, current_y, MOX::_mp_screen->anim_chat_msg_bg);
                     video::Clip_Off_();
                     graphics::Reset_Window_();
@@ -2325,7 +2325,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         x = (idx % 2) * 294 + MOX::_mp_screen->screen_x + 40;
         y = (idx / 2) * 36 + MOX::_mp_screen->screen_y + 65;
 
-        MOX::_mp_screen->anim_unk_3 = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 45, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_unk_3 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 45, MOX::_global_cache_seg);
 
         animate::Draw_(x, y, MOX::_mp_screen->anim_unk_3);
     }
@@ -2342,7 +2342,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             x = screen_x + 40 /* 0x28 */;
             y = screen_y + 65 /* 0x41 */ + row_idx * 36 /* 0x24 */;
 
-            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
+            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
             animate::Draw_(x, y, MOX::_mp_screen->player_banner_anims[player_idx]);
         } else {
             entry_id = (uint8_t)player->race * 8 + (uint8_t)player->color + 150 /* 0x96 */;
@@ -2351,7 +2351,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             // Vertical position depends on player_idx pair (rows of 2)
             y = (int16_t)(player_idx / 2) * 36 /* 0x24 */ + screen_y + 65 /* 0x41 */;
 
-            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
+            MOX::_mp_screen->player_banner_anims[player_idx] = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, entry_id, MOX::_global_cache_seg);
             animate::Draw_(x, y, MOX::_mp_screen->player_banner_anims[player_idx]);
         }
     }
@@ -2365,10 +2365,10 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         _memcpy(MOX::_mp_screen->signature, s_Evan_Axelrad_0055AA48, 13);
         MOX::_mp_screen->needs_full_redraw = 1;
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, 0, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, 27 /* 0x1B */, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, 28 /* 0x1C */, MOX::_global_cache_seg);
-        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558D04, 29 /* 0x1D */, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 27 /* 0x1B */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 28 /* 0x1C */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558D04, 29 /* 0x1D */, MOX::_global_cache_seg);
 
         MOX::_mp_screen->anim_btn_begin = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558D04, 16 /* 0x10 */, MOX::_screen_seg);
         MOX::_mp_screen->anim_btn_cancel = (s_animation_header*)farload::Far_Reload_Next_(s_MULTIGM_LBX_00558D04, 257 /* 0x101 */, MOX::_screen_seg);
@@ -2384,14 +2384,14 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         if (MOX::_mp_screen->needs_full_redraw != 0) {
             video::Set_Page_Off_();
-            MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
+            MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
             animate::Draw_(0, 0, MOX::_mp_screen->pic);
             video::Copy_Off_To_Back_();
             video::Set_Refresh_Stencil_();
             MOX::_mp_screen->needs_full_redraw = 0;
         }
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 27 /* 0x1B */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 27 /* 0x1B */, MOX::_global_cache_seg);
         MOX::_mp_screen->anim_frame_timer++;
 
         if (MOX::_mp_screen->anim_frame_timer != 0) {
@@ -2407,7 +2407,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         y_cursor += animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_top);
 
-        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 28 /* 0x1C */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_mid = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 28 /* 0x1C */, MOX::_global_cache_seg);
         if (MOX::_mp_screen->num_remaining_humans - 1 > 0) {
             for (int16_t i = 0; i < MOX::_mp_screen->num_remaining_humans - 1; ++i) {
                 animate::Draw_(screen_x, y_cursor, MOX::_mp_screen->anim_turn_screen_mid);
@@ -2415,7 +2415,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             }
         }
 
-        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 29 /* 0x1D */, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_bot = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 29 /* 0x1D */, MOX::_global_cache_seg);
         animate::Draw_(screen_x, y_cursor, MOX::_mp_screen->anim_turn_screen_bot);
 
         int16_t y_offset_for_player_row = 0;
@@ -2529,7 +2529,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
             }
         }
 
-        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 27, MOX::_global_cache_seg);
+        MOX::_mp_screen->anim_turn_screen_top = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 27, MOX::_global_cache_seg);
 
         int16_t h_mid = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_mid);
         int16_t h_bot = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_bot);
@@ -2570,10 +2570,10 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
 
         MOX::_mp_screen->anim_frame_timer++;
         if (MOX::_mp_screen->anim_frame_timer != 0) {
@@ -2615,7 +2615,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         int16_t lbx_entry = color + (race * 8) + 46;
 
-        s_animation_header* banner_anim = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_entry, MOX::_global_cache_seg);
+        s_animation_header* banner_anim = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, lbx_entry, MOX::_global_cache_seg);
 
         int16_t width = animate::Get_Width_(banner_anim);
         int16_t height = animate::Get_Height_(banner_anim);
@@ -2659,12 +2659,12 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
 
-        MOX::_mp_screen->pic = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
+        MOX::_mp_screen->pic = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, 0, MOX::_global_cache_seg);
         animate::Draw_(0, 0, MOX::_mp_screen->pic);
 
         MOX::_mp_screen->anim_frame_timer++;
 
-        MOX::_mp_screen->bg_seg = (s_animation_header*)Buffer_Reload_(s_MULTIGM_LBX, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
+        MOX::_mp_screen->bg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX, MOX::_mp_screen->lbx_entry_num, MOX::_global_cache_seg);
 
         if (MOX::_mp_screen->anim_frame_timer != 0) {
             for (i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {

@@ -27,7 +27,7 @@ namespace COLONY {
     }
 
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num) {
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             COLONY::_PLANETS_LBX,
             static_cast<int>(entry_num),
             MOX::_global_cache_seg
@@ -35,11 +35,11 @@ namespace COLONY {
     }
 
     s_animation_header* __cdecl Cache_Load_Planet_(int16_t planet_id) {
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_PLANETS_LBX, planet_id, MOX::_global_cache_seg));
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_PLANETS_LBX, planet_id, MOX::_global_cache_seg));
     }
 
     s_animation_header* __cdecl Buffer_Reload_Colony_(int16_t index) {
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             _COLONY_LBX,
             static_cast<int32_t>(index) + 9,
             MOX::_global_cache_seg
@@ -73,7 +73,7 @@ namespace COLONY {
     s_animation_header* __cdecl Spy_Anim_(int16_t race_index) {
         int16_t entry_index = race_index * 13 + 11;
 
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             _RACEICON_LBX,
             static_cast<int32_t>(entry_index),
             MOX::_global_cache_seg
@@ -185,7 +185,7 @@ namespace COLONY {
             index += 27;
         }
 
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_COLONY2_LBX, index, MOX::_global_cache_seg));
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_COLONY2_LBX, index, MOX::_global_cache_seg));
     }
 
     void __cdecl Reset_Mouse_Picture_() {
@@ -546,7 +546,7 @@ namespace COLONY {
         int8_t officer_idx = MOX::_star[COLONY::_star_handle].officer_index[MOX::_PLAYER_NUM];
 
         if (officer_idx != -1) {
-            MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+            MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
             remap::Calculate_Picture_Remap_Colors_(MOX::_main_screen_seg);
 
             s_animation_header* anim1 = C_Anims_(33);
@@ -1131,7 +1131,7 @@ namespace COLONY {
         // Entry calculation based on race index: each race has a set of icons starting at offset 12 with stride 13
         int16_t entry_index = (int16_t)(race_index * 13 + 12);
 
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(COLONY::_RACEICON_LBX, (int)entry_index, MOX::_global_cache_seg));
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(COLONY::_RACEICON_LBX, (int)entry_index, MOX::_global_cache_seg));
     }
 
     void __cdecl Print_Sys_Disp_Scanned_String_(char* text) {
@@ -1143,7 +1143,7 @@ namespace COLONY {
         // Calculation is done in 16-bit registers in disassembly
         int16_t entry_index = (int16_t)(param_2 * 13 + param_1 + 6);
 
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             COLONY::_RACEICON_LBX,
             (int)entry_index,
             MOX::_global_cache_seg
@@ -1228,7 +1228,7 @@ namespace COLONY {
 
         char* resource_name = ESTRINGS::E_Strings_(ESTR_CMBTPLNTLBX);
 
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             resource_name,
             anim_index,
             MOX::_global_cache_seg
@@ -1996,7 +1996,7 @@ namespace COLONY {
      * @address 004dcc90
      */
     s_animation_header* __cdecl Load_Govt_Anim_(int16_t param_1) {
-        return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, param_1 + 0x13, MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, param_1 + 0x13, MOX::_global_cache_seg);
     }
 
     /**
@@ -2026,9 +2026,9 @@ namespace COLONY {
      */
     s_animation_header* __cdecl Import_Anims_(int16_t type, int16_t is_tens, int8_t frame) {
         if (frame == 0) {
-            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 8, MOX::_global_cache_seg));
+            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 8, MOX::_global_cache_seg));
         }
-        return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 0x23, MOX::_global_cache_seg));
+        return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_COLONY2_LBX, type + is_tens * 4 + 0x23, MOX::_global_cache_seg));
     }
 
     s_animation_header* __cdecl Short_Anims_(int16_t type, int16_t is_tens, uint8_t frame) {

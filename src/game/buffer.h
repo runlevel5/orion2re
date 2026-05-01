@@ -24,4 +24,10 @@ namespace buffer {
     int8_t __cdecl Flush_Buffer_Space_(void* buffer_context);
 
     uint8_t* __cdecl Allocate_Buffer_Space_(uint32_t requested_size);
+
+    inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
+        using Fn = void* (__cdecl*)(const char*, int32_t, void*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052C2E0 });
+        return fn(filename, index, segment);
+    }
 }

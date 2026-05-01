@@ -1280,6 +1280,10 @@ namespace SCORE {
         random::Set_Random_Seed_(original_seed);
     }
 
+    uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
+        return SCORE::Won_Council_Vote_(player_idx) != 0 ? 100u : 0u;
+    }
+
     /**
      * @address 004e3540
      */

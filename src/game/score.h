@@ -131,9 +131,11 @@ namespace SCORE {
 
     void __cdecl nullsub();
 
-    inline int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004E2630 });
+    inline uint8_t __cdecl Won_Council_Vote_(int16_t player_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004E3650 });
         return fn(player_idx);
     }
+
+    uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx);
 }

@@ -395,20 +395,20 @@ namespace COLONY {
     s_animation_header* __cdecl People_Anim_(int16_t param_1, int16_t param_2, int16_t param_3) {
         if (param_2 == 2) {
             int32_t entry_num = (static_cast<int32_t>(param_3) * 13) + (static_cast<int32_t>(param_1) * 2) + 1;
-            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
+            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
         }
 
         if (param_2 == 0) {
             int32_t entry_num = (static_cast<int32_t>(param_3) * 13) + (static_cast<int32_t>(param_1) * 2);
-            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
+            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, entry_num, MOX::_global_cache_seg));
         }
 
         if (param_2 == 3) {
-            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_RACEICON_LBX, 0xAA, MOX::_global_cache_seg));
+            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, 0xAA, MOX::_global_cache_seg));
         }
 
         if (param_2 == 4) {
-            return reinterpret_cast<s_animation_header*>(Buffer_Reload_(_RACEICON_LBX, 0xA9, MOX::_global_cache_seg));
+            return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(_RACEICON_LBX, 0xA9, MOX::_global_cache_seg));
         }
 
         return nullptr;
@@ -429,7 +429,7 @@ namespace COLONY {
                     static_cast<uint8_t>(MOX::_colony[_colony_handle].climate) * 3)
                 );
             case 1:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x31, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x31, MOX::_global_cache_seg);
             case 2:
             case 11:  // 0x0B
             case 12:  // 0x0C
@@ -451,33 +451,33 @@ namespace COLONY {
             case 32:  // 0x20
                 return _c_anims[anim_id];
             case 3:
-                return (s_animation_header*)Buffer_Reload_(_COLPUPS_LBX, 5, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLPUPS_LBX, 5, MOX::_global_cache_seg);
             case 4:
-                return (s_animation_header*)Buffer_Reload_(_COLPUPS_LBX, 6, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLPUPS_LBX, 6, MOX::_global_cache_seg);
             case 5:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x10, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x10, MOX::_global_cache_seg);
             case 6:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x11, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x11, MOX::_global_cache_seg);
             case 7:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x12, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x12, MOX::_global_cache_seg);
             case 8:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x2B, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x2B, MOX::_global_cache_seg);
             case 9:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x2C, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x2C, MOX::_global_cache_seg);
             case 10:
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x2D, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x2D, MOX::_global_cache_seg);
             case 13:  // 0x0D
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x32, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x32, MOX::_global_cache_seg);
             case 14:  // 0x0E
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x33, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x33, MOX::_global_cache_seg);
             case 15:  // 0x0F
-                return (s_animation_header*)Buffer_Reload_(_COLONY2_LBX, 0x34, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY2_LBX, 0x34, MOX::_global_cache_seg);
             case 33:  // 0x21
-                return (s_animation_header*)Buffer_Reload_(_COLPUPS_LBX, 0x16, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLPUPS_LBX, 0x16, MOX::_global_cache_seg);
             case 34:  // 0x22
-                return (s_animation_header*)Buffer_Reload_(_COLONY_LBX, 0x11, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY_LBX, 0x11, MOX::_global_cache_seg);
             case 35:  // 0x23
-                return (s_animation_header*)Buffer_Reload_(_COLONY_LBX, 0x12, MOX::_global_cache_seg);
+                return (s_animation_header*)buffer::Buffer_Reload_(_COLONY_LBX, 0x12, MOX::_global_cache_seg);
             default:
                 return nullptr;
         }

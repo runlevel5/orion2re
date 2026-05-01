@@ -1,6 +1,7 @@
 #pragma once
 
 namespace MOX {
+    inline const char* _ship_type_names = reinterpret_cast<const char*>(std::uintptr_t{0x00558DC8}); // "combat ships"
     inline int8_t (*_tech_categories)[2] = reinterpret_cast<int8_t(*)[2]>(std::uintptr_t{0x00558FD0});
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
     inline uint8_t (&_first_field_in_group)[10] = *reinterpret_cast<uint8_t(*)[10]>(0x00558D30);

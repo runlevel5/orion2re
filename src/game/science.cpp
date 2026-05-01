@@ -29,7 +29,7 @@ namespace SCIENCE {
         }
 
         if (draw_anim_2 == 1) {
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg);
             animate::Draw_(0, 0, anim);
         }
 
@@ -38,7 +38,7 @@ namespace SCIENCE {
         }
 
         if (draw_anim_1 == 1) {
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
             animate::Draw_(0, 0, anim);
         }
     }
@@ -105,7 +105,7 @@ namespace SCIENCE {
         buffer::Flush_Buffer_Space_(MOX::_global_cache_seg);
 
         if (MOX::_settings.animations_on == 0) {
-            animate::Set_Animation_Frame_((s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg), 5);
+            animate::Set_Animation_Frame_((s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg), 5);
         }
 
         bitmap::Create_Blank_Bitmap_(0xAF, 0xC3, current_text_bitmap);
@@ -133,7 +133,7 @@ namespace SCIENCE {
 
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 4, bill_text, 0x50);
 
-        Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
+        buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg);
         palette::Set_Palette_Changes_(0, 0xFF);
         animate::Draw_Palette_(science_room_picture);
         BILL::Turn_Off_Palettes_(0, 0xFF);
@@ -162,7 +162,7 @@ namespace SCIENCE {
                 palstore::Darken_Palette_(fade_amount);
                 palette::Clear_Palette_Changes_(0, 0xFF);
 
-                animate::Draw_(0, 0, (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg));
+                animate::Draw_(0, 0, (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 2, MOX::_global_cache_seg));
                 RUSS::Mox_Sync_Update_();
                 timer::Release_Time_(1);
             } while (fade_amount > 0);
@@ -277,7 +277,7 @@ namespace SCIENCE {
                     }
                 } else {
                     room_animation_ready = animate::Get_Current_Frame_(
-                            (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg)) >= 5;
+                            (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg)) >= 5;
                 }
 
                 fonts::Set_Outline_Color_(0, 0xF2);
@@ -290,7 +290,7 @@ namespace SCIENCE {
 
             if (should_close) {
                 int16_t frame = animate::Get_Current_Frame_(
-                        (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg));
+                        (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg));
                 --frame;
 
                 if (frame >= 0 && MOX::_settings.animations_on != 0) {
@@ -300,7 +300,7 @@ namespace SCIENCE {
                         timer::Mark_Time_();
 
                         animate::Set_Animation_Frame_(
-                                (s_animation_header*)Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg),
+                                (s_animation_header*)buffer::Buffer_Reload_(s_SCIENCE_LBX_00551290, 1, MOX::_global_cache_seg),
                                 frame_index);
 
                         SCIENCE::Update_Science_Anims_(false, false, true, true);

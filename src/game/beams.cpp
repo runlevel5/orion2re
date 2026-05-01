@@ -26,7 +26,7 @@ namespace BEAMS {
         // The index calculation is performed in 16-bit registers in disassembly
         int16_t entry_num = (int16_t)p2 * 5 + (int16_t)p1 + 89;
 
-        return (s_animation_header*)Buffer_Reload_(
+        return (s_animation_header*)buffer::Buffer_Reload_(
             COLONY::_BEAMS_LBX,
             static_cast<int32_t>(entry_num),
             MOX::_global_cache_seg
@@ -119,12 +119,12 @@ namespace BEAMS {
     s_animation_header* __cdecl Shield_Anims_(int16_t beam_idx, int16_t size_idx, int16_t is_special, int16_t is_heavy) {
         if (size_idx >= 4) {
             // For large sizes, reload from LBX using a specific offset
-            return (s_animation_header*)Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx * 5 + beam_idx + 113 /* 0x71 */, MOX::_global_cache_seg);
+            return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx * 5 + beam_idx + 113 /* 0x71 */, MOX::_global_cache_seg);
         }
 
         if (is_heavy != 0) {
             // Heavy variant offset
-            return (s_animation_header*)Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx + 129 /* 0x81 */, MOX::_global_cache_seg);
+            return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx + 129 /* 0x81 */, MOX::_global_cache_seg);
         }
 
         if (size_idx < 4 && is_special == 0) {
@@ -133,7 +133,7 @@ namespace BEAMS {
         }
 
         // Default reload path
-        return (s_animation_header*)Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx * 5 + beam_idx + 109 /* 0x6D */, MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_BEAMS_LBX, size_idx * 5 + beam_idx + 109 /* 0x6D */, MOX::_global_cache_seg);
     }
 
     void __cdecl Load_Shield_Hit_() {

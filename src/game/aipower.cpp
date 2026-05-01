@@ -1,6 +1,53 @@
 #include "pch.h"
 
 namespace AIPOWER {
+    uint32_t __cdecl Modified_Weapon_Strength_(uint32_t weapon_strength, uint16_t modification_flags) {
+        int16_t total_space = 100;
+
+        if ((modification_flags & 0x0002) != 0) {
+            total_space = static_cast<int16_t>(TECHDATA::_weapon_modifications_1_space + 100);
+        }
+        if ((modification_flags & 0x0004) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_2_space);
+        }
+        if ((modification_flags & 0x0020) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_5_space);
+        }
+        if ((modification_flags & 0x0080) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_7_space);
+        }
+        if ((modification_flags & 0x0100) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_8_space);
+        }
+        if ((modification_flags & 0x0200) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_9_space);
+        }
+        if ((modification_flags & 0x0400) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_10_space);
+        }
+        if ((modification_flags & 0x0800) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_11_space);
+        }
+        if ((modification_flags & 0x1000) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_12_space);
+        }
+        if ((modification_flags & 0x2000) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_13_space);
+        }
+        if ((modification_flags & 0x4000) != 0) {
+            total_space = static_cast<int16_t>(total_space + TECHDATA::_weapon_modifications_14_space);
+        }
+
+        int32_t result =
+            (static_cast<int32_t>(weapon_strength & 0xFFFFu) * static_cast<int32_t>(total_space)) / 100;
+
+        if (static_cast<uint32_t>(result) > 64000u) {
+            result = 64000;
+        }
+
+        return static_cast<uint32_t>(result);
+    }
+
     int16_t __cdecl Get_Best_Ship_Shield_Value_(int16_t player_idx) {
         if (player_idx >= 8) {
             switch (player_idx) {
@@ -322,6 +369,23 @@ namespace AIPOWER {
      * @param target_player_idx Index of the attacking player.
      * @return Strength value clamped to 64000.
      */
+    int16_t __cdecl Base_Generic_Dcv_(int16_t player_idx) {
+        const int16_t best_drive_idx = INITSHIP::Best_Warp_Drive_(player_idx);
+
+        int16_t dcv =
+            static_cast<int16_t>(static_cast<int8_t>(TECHDATA::_drives[best_drive_idx].combat_speed_min[2]));
+        dcv = static_cast<int16_t>(dcv * 5);
+
+        if (player_idx < 8) {
+            dcv = static_cast<int16_t>(dcv + MOX::_player[player_idx].traits[6]);
+            if (MOX::_player[player_idx].traits[0x1d] != 0) {
+                dcv = static_cast<int16_t>(dcv + 0x14);
+            }
+        }
+
+        return dcv;
+    }
+
     uint16_t __cdecl Satelite_Strength_Vs_Ships_(int16_t building_type, int16_t player_idx, int16_t target_player_idx) {
         uint32_t total_strength = 0;
 
@@ -554,6 +618,14 @@ namespace AIPOWER {
         }
 
         return final_strength;
+    }
+
+    int16_t __cdecl Strength_Hits_Modifier_(int16_t strength) {
+        if (strength <= 100) {
+            return static_cast<int16_t>(strength + (100 - strength) / 10);
+        }
+
+        return static_cast<int16_t>(100 + (strength - 100) / 4);
     }
 
 }

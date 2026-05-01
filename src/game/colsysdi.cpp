@@ -2,7 +2,7 @@
 
 namespace COLSYSDI {
     s_animation_header* __cdecl Planet_Anims_(int16_t planet_type, int16_t planet_size) {
-        return (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, planet_type * 5 + planet_size + 11, MOX::_global_cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, planet_type * 5 + planet_size + 11, MOX::_global_cache_seg);
     }
 
     void __cdecl Draw_Col_Sys_Disp_(int16_t param_1, int16_t param_2) {
@@ -26,10 +26,10 @@ namespace COLSYSDI {
                     s_animation_header* anim = Planet_Anims_(climate, planet->size);
                     ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
                 } else if (planet->planet_type == 2) {
-                    s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3E, MOX::_global_cache_seg);
+                    s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3E, MOX::_global_cache_seg);
                     ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
                 } else if (planet->planet_type == 1) {
-                    s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3F, MOX::_global_cache_seg);
+                    s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x3F, MOX::_global_cache_seg);
                     ERIC::Draw_Centered_(param_1 + 15, param_2 + i * 24 + 14, anim);
                 }
                 
@@ -41,7 +41,7 @@ namespace COLSYSDI {
                 BILL::_Print_Paragraph_(param_1 + 28, text_y, 89 - param_1, buffer, 0);
             }
             
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x41, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x41, MOX::_global_cache_seg);
             ERIC::Draw_Centered_(param_1 + 2, param_2 + i * 24 + 12, anim);
             
             text_y += 24;
@@ -77,10 +77,10 @@ namespace COLSYSDI {
 
             int16_t frame = ERIC::Global_Cycler_(50, 6);
 
-            s_animation_header* anim_lbx = (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
+            s_animation_header* anim_lbx = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
             animate::Set_Animation_Frame_(anim_lbx, (int32_t)frame);
 
-            anim_lbx = (s_animation_header*)Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
+            anim_lbx = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
             ERIC::Draw_Centered_((int16_t)(param_1 + 2), (int16_t)(param_2 + sVar5 * 24 - 12), anim_lbx);
         }
     }

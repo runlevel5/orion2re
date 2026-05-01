@@ -59,7 +59,7 @@ namespace MAINSCR {
 
         int32_t final_index = (int32_t)result_ax;
 
-        MOX::_star_seg[final_index] = reinterpret_cast<s_animation_header*>(Buffer_Reload_(
+        MOX::_star_seg[final_index] = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             s_BUFFER0_LBX,
             final_index + 148,
             MOX::_global_cache_seg
@@ -336,21 +336,21 @@ namespace MAINSCR {
         video::Clip_On_();
 
         // Far Stars - Layer 0
-        MOX::_far_star_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 0, MOX::_global_cache_seg));
+        MOX::_far_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 0, MOX::_global_cache_seg));
         animate::Draw_(MOX::_far_star_x, MOX::_far_star_y, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x - 640, MOX::_far_star_y - 480, MOX::_far_star_seg);
         animate::Draw_(MOX::_far_star_x, MOX::_far_star_y - 480, MOX::_far_star_seg);
 
         // Mid Stars - Layer 1
-        MOX::_mid_star_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 1, MOX::_global_cache_seg));
+        MOX::_mid_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 1, MOX::_global_cache_seg));
         animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x - 640, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
         animate::Draw_(MOX::_mid_star_x, MOX::_mid_star_y - 480, MOX::_mid_star_seg);
 
         // Near Stars - Layer 2
-        MOX::_near_star_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_STARBG_LBX, 2, MOX::_global_cache_seg));
+        MOX::_near_star_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_STARBG_LBX, 2, MOX::_global_cache_seg));
         animate::Draw_(MOX::_near_star_x, MOX::_near_star_y, MOX::_near_star_seg);
         animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y, MOX::_near_star_seg);
         animate::Draw_(MOX::_near_star_x - 640, MOX::_near_star_y - 480, MOX::_near_star_seg);
@@ -458,7 +458,7 @@ namespace MAINSCR {
         int16_t max_icon_height = 0;
 
         if (has_portal) {
-            s_animation_header* portal_pic = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
+            s_animation_header* portal_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 19, MOX::_global_cache_seg);
             MOX::gate_portal_icons[zoom_offset] = portal_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[0], portal_pic);
             int16_t h = animate::Get_Height_(portal_pic);
@@ -469,7 +469,7 @@ namespace MAINSCR {
         }
 
         if (has_artemis) {
-            s_animation_header* artemis_pic = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
+            s_animation_header* artemis_pic = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, zoom_offset + 31, MOX::_global_cache_seg);
             MOX::gate_artemis_icons[zoom_offset] = artemis_pic;
             bitmap::Draw_Picture_To_Bitmap_(temp_icons[icon_count], artemis_pic);
             int16_t h = animate::Get_Height_(artemis_pic);
@@ -680,19 +680,19 @@ namespace MAINSCR {
 
         Draw_Paralax_();
 
-        MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+        MOX::_main_screen_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
         animate::Draw_(0, 0, MOX::_main_screen_seg);
 
         Draw_Wormhole_Links_();
         Draw_Relocation_Links_();
 
         if (MOX::_game_type == 2 || MOX::_game_type == 3) {
-            MOX::_mainscrn_diplo_lights_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            MOX::_mainscrn_diplo_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
             animate::Draw_(415, 0, MOX::_mainscrn_diplo_lights_seg);
         }
 
         if (MOX::_game_type == 2 || MOX::_game_type == 3 || MOX::_game_type == 1) {
-            MOX::_mainscrn_plyr_done_lights_seg = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
+            MOX::_mainscrn_plyr_done_lights_seg = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0xD, MOX::_global_cache_seg));
             animate::Draw_(74, 0, MOX::_mainscrn_plyr_done_lights_seg);
         }
 

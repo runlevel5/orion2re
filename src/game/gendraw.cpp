@@ -79,7 +79,7 @@ namespace GENDRAW {
         fonts::Set_Font_Style_(4, &_message_text_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (s_animation_header*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
         remap::Calculate_Picture_Remap_Colors_(_image_seg[0]);
 
         uint32_t size = bitmap::Get_Bitmap_Size_(0x14B, 0xBF);
@@ -111,7 +111,7 @@ namespace GENDRAW {
         fonts::Set_Remap_Font_Style_(mode, &font_colors);
         fonts::Set_Font_LF_(0x12);
 
-        _image_seg[0] = (s_animation_header*)Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
+        _image_seg[0] = (s_animation_header*)buffer::Buffer_Reload_(s_warning_lbx_00557650, 0, (uint8_t*)MOX::_global_cache_seg);
         animate::Remap_Draw_(0x9A, _message_box_y, _image_seg[0]);
 
         Do_Print_1_Or_More_Formatted_Lines_Centered_(0xD0, 0xE8, 0xE2, str);
@@ -150,7 +150,7 @@ namespace GENDRAW {
         Message_Box_Startup_();
 
         for (int i = 0; i < 3; ++i) {
-            _image_seg[i] = (s_animation_header*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
+            _image_seg[i] = (s_animation_header*)buffer::Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
             if (i == 0) {
                 remap::Calculate_Picture_Remap_Colors_(_image_seg[0]);
             }
@@ -160,7 +160,7 @@ namespace GENDRAW {
         int16_t second_field = fields::Add_Hidden_Field_(0x159, 0x12e, 0x18c, 0x143, s_N_0055765c, 0x29);
 
         for (int i = 0; i < 3; ++i) {
-            _image_seg[i] = (s_animation_header*)Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
+            _image_seg[i] = (s_animation_header*)buffer::Buffer_Reload_(s_confirm_lbx_00557664, i, (uint8_t*)MOX::_global_cache_seg);
         }
 
         int16_t font_idx = 4;

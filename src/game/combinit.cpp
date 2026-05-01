@@ -487,7 +487,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_combat_total_ship_count = 1;
     MOX::_cmbt_colony_id = colony_idx;
 
-    MOX::_combat_data = reinterpret_cast<s_combat_data*>(Allocate_First_Block_(MOX::_screen_seg, 0x100C2));
+    MOX::_combat_data = reinterpret_cast<s_combat_data*>(allocate::Allocate_First_Block_(MOX::_screen_seg, 0x100C2));
     struct_::Clear_Structure_(MOX::_combat_data, 0x100C2);
 
     MOX::_combat_attacker_player = MOX::_ship[plr1_ships[0]].owner;
@@ -805,7 +805,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
 
         MOX::_pulsar_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-        s_animation_header* pulsar_pal = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x34, MOX::_global_cache_seg));
+        s_animation_header* pulsar_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x34, MOX::_global_cache_seg));
         animate::Draw_Palette_(pulsar_pal);
         RUSS::Mox_Update_();
         int16_t pulsar_c = 53;
@@ -818,7 +818,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         palette::Save_Glass_Remap_Block_(MOX::_pulsar_remap_colors);
 
         MOX::_warp_core_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-        s_animation_header* warp_pal = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_sphersfx_lbx_00551218, 0, MOX::_global_cache_seg));
+        s_animation_header* warp_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_sphersfx_lbx_00551218, 0, MOX::_global_cache_seg));
         RUSS::Mox_Update_();
         animate::Draw_Palette_(warp_pal);
         int16_t warp_c = 53;
@@ -850,7 +850,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
         if (has_bhg != 0) {
             MOX::_bhg_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
-            s_animation_header* bhg_pal = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x2E, MOX::_global_cache_seg));
+            s_animation_header* bhg_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x2E, MOX::_global_cache_seg));
             animate::Draw_Palette_(bhg_pal);
             for (int16_t i = 1; i < 16; ++i) {
                 palette::Set_Glass_Remap_Color_(i, s__00579591[i * 4], s__00579592[i * 4], s__00579593[i * 4], i * 2 + 60);
@@ -878,7 +878,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         if (has_stellar_converter != 0) {
             MOX::_stellar_converter_remap_colors = palette::Allocate_Glass_Remap_Next_Block_(MOX::_screen_seg);
             RUSS::Mox_Update_();
-            s_animation_header* stellar_pal = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x28, MOX::_global_cache_seg));
+            s_animation_header* stellar_pal = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 0x28, MOX::_global_cache_seg));
             animate::Draw_Palette_(stellar_pal);
             int16_t stellar_c = 53;
             for (int16_t i = 1; i < 16; ++i) {
@@ -1283,7 +1283,7 @@ void __cdecl Load_Antaran_Planet_() {
     MOX::_combat_data->shield_max_hits = 0;
     MOX::_combat_data->shield_current_hits = 0;
 
-    s_animation_header* palette_anim = (s_animation_header*)Buffer_Reload_(s_cmbtplnt_lbx_00551278, 62 /* 0x3E */, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx_00551278, 62 /* 0x3E */, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     palette::Refresh_Palette_();
 
@@ -1319,7 +1319,7 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
         lbx_index = player_idx + 5;
     }
 
-    ship_anim = (s_animation_header*)Buffer_Reload_(lbx_filename, lbx_index, MOX::_global_cache_seg);
+    ship_anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_filename, lbx_index, MOX::_global_cache_seg);
 
     if (player_idx == MOX::_combat_defender_player && player_idx < 9 && (MOX::_cmbt_colony_id > -1 || player_idx == 8)) {
         if (player_idx == 8) {
@@ -1410,7 +1410,7 @@ void __cdecl Load_Combat_Colony_Picture_(int16_t colony_idx) {
     int8_t climate = planet->climate;
     int8_t size = planet->size;
 
-    s_animation_header* palette_anim = (s_animation_header*)Buffer_Reload_(s_cmbtplnt_lbx, climate * 6 + 5, MOX::_global_cache_seg);
+    s_animation_header* palette_anim = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtplnt_lbx, climate * 6 + 5, MOX::_global_cache_seg);
     animate::Draw_Palette_(palette_anim);
     RUSS::Mox_Update_();
 

@@ -2428,4 +2428,49 @@ void __cdecl Load_Loknar_Ship_Design_(s_ship_design* design) {
     design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size] + 2;
 }
 
+void __cdecl Update_Ship_Names_To_New_Language_(void) {
+    for (int32_t ship_index = 0; ship_index < 500; ++ship_index) {
+        s_ship_data* ship = &MOX::_ship[ship_index];
+        const int32_t ship_type = (int32_t)ship->d.ship_type;
+
+        if (ship_type != 0) {
+            const char* localized_name =
+                MOX::_ship_type_names +
+                ((int32_t)(uint8_t)MOX::_settings.language + ship_type * 6) * 16;
+
+            strcpy(ship->d.name, localized_name);
+        }
+    }
+}
+
+int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
+    int16_t best_special_idx = 0;
+    int16_t best_strategic_value = 0;
+
+    if (player_idx < 8) {
+        for (int16_t special_idx = 0; special_idx < 39; ++special_idx) {
+            const int16_t tech_app_id =
+                static_cast<int16_t>(TECHDATA::_specials[special_idx].tech_app_id);
+
+            if (MOX::_player[player_idx].tech_applications[tech_app_id] == 3) {
+                const int8_t category = TECHDATA::_specials[special_idx].category;
+
+                if ((category == 5 || category == 7) &&
+                    best_strategic_value < TECHDATA::_specials[special_idx].strategic) {
+                    best_special_idx = special_idx;
+                    best_strategic_value = TECHDATA::_specials[special_idx].strategic;
+                }
+            }
+        }
+    } else {
+        best_special_idx = 0;
+    }
+
+    if (best_special_idx == 34) {
+        best_special_idx = 0;
+    }
+
+    return best_special_idx;
+}
+
 }

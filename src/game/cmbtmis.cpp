@@ -1301,7 +1301,7 @@ namespace CMBTMIS {
 
         graphics::Fill_(401, 379, 488, 467, 0);
 
-        anim = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 45, MOX::_global_cache_seg);
+        anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 45, MOX::_global_cache_seg);
         animate::Draw_(401, 379, anim);
 
         CMBTMIS::Draw_Missile_(missile_idx, x_off + 44, y_off + 44, 1);

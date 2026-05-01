@@ -36,7 +36,7 @@ namespace TEXTBOX {
         }
         *y_ptr = (int16_t)centered_y;
 
-        s_animation_header* header_top = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
+        s_animation_header* header_top = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
         remap::Calculate_Picture_Remap_Colors_(header_top);
 
         graphics::Tri_Interlaced_Fill_(
@@ -52,7 +52,7 @@ namespace TEXTBOX {
         int16_t y_mid = *y_ptr + 42;
         animate::Remap_Draw_(*x_ptr, *y_ptr, header_top);
 
-        s_animation_header* header_mid = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 1, MOX::_global_cache_seg);
+        s_animation_header* header_mid = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 1, MOX::_global_cache_seg);
         int16_t y_bot = height + y_mid;
 
         int16_t window_status[4];
@@ -63,7 +63,7 @@ namespace TEXTBOX {
         animate::Remap_Draw_(*x_ptr, y_mid, header_mid);
         MISC::Restore_Window_Status_(*(uint32_t*)window_status);
 
-        s_animation_header* header_bot = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 2, MOX::_global_cache_seg);
+        s_animation_header* header_bot = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 2, MOX::_global_cache_seg);
         animate::Remap_Draw_(*x_ptr, y_bot, header_bot);
 
         _bottom_y = y_bot + 43;
@@ -101,7 +101,7 @@ namespace TEXTBOX {
             _textbox_seg = (uint8_t*)allocate::Allocate_Next_Block_(MOX::_screen_seg, size + 0x180);
         }
 
-        s_animation_header* pic = (s_animation_header*)Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
+        s_animation_header* pic = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 0, MOX::_global_cache_seg);
         remap::Calculate_Picture_Remap_Colors_(pic);
     }
 

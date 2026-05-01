@@ -16,6 +16,6 @@ namespace COLBCACH {
 
         int effective_frame = (int)base_frame + (frame_index * 36);
 
-        return (s_animation_header*)Buffer_Reload_(filename, effective_frame, cache_seg);
+        return (s_animation_header*)buffer::Buffer_Reload_(filename, effective_frame, cache_seg);
     }
 }

@@ -189,7 +189,7 @@ short Race_Selection_Screen_(s_player* plr) {
     Reload_Race_Selection_Screen_();
     RACESEL::Set_Race_Select_Help_();
     video::Set_Page_Back_();
-    auto raceopt_anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+    auto raceopt_anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
     RUSS::Mox_Update_();
     animate::Draw_(0, 0, raceopt_anim);
     video::Copy_Back_To_Off_();
@@ -233,7 +233,7 @@ short Race_Selection_Screen_(s_player* plr) {
                     KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, 100);
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
-                    auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                    auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                     animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
@@ -251,7 +251,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         do {
                             screen_state = Naming_Popup_(plr->name, i);
                             video::Set_Page_Back_();
-                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
                             RUSS::Mox_Sync_Update_();
@@ -279,7 +279,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             }
                             RACESEL::Set_Race_Select_Help_();
                             video::Set_Page_Back_();
-                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
                             _old_race = 0;
@@ -305,7 +305,7 @@ short Race_Selection_Screen_(s_player* plr) {
                             allocate::Pop_Block_(MOX::_screen_seg);
                             Reload_Race_Selection_Screen_();
                             video::Set_Page_Back_();
-                            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                            auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                             animate::Draw_(0, 0, anim);
                             video::Copy_Back_To_Off_();
                             if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
@@ -359,7 +359,7 @@ short Race_Selection_Screen_(s_player* plr) {
                     KEN::Ken_Get_Text_Message_(72, msg_buffer, 100);
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
-                    auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                    auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                     animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
@@ -376,7 +376,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         allocate::Pop_Block_(MOX::_screen_seg);
                         Reload_Race_Selection_Screen_();
                         video::Set_Page_Back_();
-                        auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+                        auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
                         animate::Draw_(0, 0, anim);
                         video::Copy_Back_To_Off_();
                         if (MOX::_game_type == 0 || MOX::_game_type == 1) hotkey_field = fields::Add_Hot_Key_(s_space_00551120);
@@ -397,7 +397,7 @@ short Race_Selection_Screen_(s_player* plr) {
         if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
             video::Set_Page_Back_();
             graphics::Fill_(0, 0, 639, 479, 0);
-            auto anim = (s_animation_header*)Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
+            auto anim = (s_animation_header*)buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 0, MOX::_global_cache_seg);
             animate::Draw_(0, 0, anim);
             video::Copy_Back_To_Off_();
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;

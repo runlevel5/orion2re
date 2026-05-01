@@ -30,4 +30,10 @@ namespace AIPOWER {
     uint32_t __cdecl Phasor_Base_Strength_(int16_t ship_idx, int16_t target_idx);
 
     uint16_t __cdecl Fighter_Garrison_Strength_(int16_t player_idx, int16_t target_player_idx);
+
+    int16_t __cdecl Base_Generic_Dcv_(int16_t player_idx);
+
+    uint32_t __cdecl Modified_Weapon_Strength_(uint32_t weapon_strength, uint16_t modification_flags);
+
+    int16_t __cdecl Strength_Hits_Modifier_(int16_t strength);
 }

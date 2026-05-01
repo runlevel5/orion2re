@@ -54,19 +54,19 @@ namespace FLEETPOP {
         int16_t bottom_height;
 
         if (MOX::_fleet_box.is_small_frame == 0) {
-            MOX::_fleet_box_name_lg_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
+            MOX::_fleet_box_name_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x33, MOX::_global_cache_seg);
             MOX::_fleet_box.name_seg = MOX::_fleet_box_name_lg_seg;
             name_height = animate::Get_Height_(MOX::_fleet_box.name_seg);
 
-            MOX::_fleet_box.bottom_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
+            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x37, MOX::_global_cache_seg);
             MOX::_fleet_box_bottom_lg_seg = MOX::_fleet_box.bottom_seg;
         }
         else {
-            MOX::_fleet_box_name_sm_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
+            MOX::_fleet_box_name_sm_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x34, MOX::_global_cache_seg);
             MOX::_fleet_box.name_seg = MOX::_fleet_box_name_sm_seg;
             name_height = animate::Get_Height_(MOX::_fleet_box.name_seg);
 
-            MOX::_fleet_box.bottom_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
+            MOX::_fleet_box.bottom_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x38, MOX::_global_cache_seg);
             MOX::_fleet_box_bottom_sm_seg = MOX::_fleet_box.bottom_seg;
         }
 
@@ -74,7 +74,7 @@ namespace FLEETPOP {
 
         int16_t grid_height;
         if (fleet_count > 9) {
-            MOX::_fleet_box_grid_lg_seg = (s_animation_header*)Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
+            MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x35, MOX::_global_cache_seg);
             grid_height = animate::Get_Height_(MOX::_fleet_box_grid_lg_seg);
         }
         else {
@@ -201,7 +201,7 @@ int16_t __cdecl Fleet_Box_Grid_Height_(int16_t grid_type) {
     }
 
     if (grid_type == 3) {
-        MOX::_fleet_box_grid_sm_seg4 = Buffer_Reload_(s_BUFFER0_LBX, 0x36, MOX::_global_cache_seg);
+        MOX::_fleet_box_grid_sm_seg4 = buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x36, MOX::_global_cache_seg);
         return animate::Get_Height_((s_animation_header*)MOX::_fleet_box_grid_sm_seg4);
     }
 

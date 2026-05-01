@@ -392,7 +392,7 @@ namespace HAROLD {
      * @address 004f0f60
      */
     void __cdecl Init_System_Display_Box_() {
-        MOX::_moveable_box_pict[0] = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
+        MOX::_moveable_box_pict[0] = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_BUFFER0_LBX, 0, MOX::_global_cache_seg));
 
         MOX::_moveable_box[0].width = animate::Get_Width_(MOX::_moveable_box_pict[0]);
         MOX::_moveable_box[0].height = animate::Get_Height_(MOX::_moveable_box_pict[0]);

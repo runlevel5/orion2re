@@ -347,76 +347,9 @@ inline uint32_t __cdecl isqrt_(uint32_t val) {
     return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
 }
 
-inline void* __cdecl Allocate_First_Block_(void* segment, uint32_t size) {
-    using Fn = void*(__cdecl*)(void*, uint32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E930});
-    return fn(segment, size);
-}
-
-inline void* __cdecl Allocate_Next_Block_(void* segment, uint32_t size) {
-    using Fn = void*(__cdecl*)(void*, uint32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052E950});
-    return fn(segment, size);
-}
-
-inline void __cdecl Copy_Structure_(void* dest, const void* src, int32_t size) {
-    using Fn = void(__cdecl*)(void*, const void*, int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052d0fa});
-    fn(dest, src, size);
-}
-
-inline void __cdecl Swap_Structure_(void* ptr1, void* ptr2, int size) {
-    using Fn = void(__cdecl*)(void*, void*, int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D169});
-    fn(ptr1, ptr2, size);
-}
-
-namespace switchD_004d0ea1 {
-    inline uint32_t* switchdataD_004d1930 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1930});
-}
-namespace switchD_004d1457 {
-    inline uint32_t* switchdataD_004d1948 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1948});
-}
-namespace switchD_004d174c {
-    inline uint32_t* switchdataD_004d1960 = reinterpret_cast<uint32_t*>(std::uintptr_t{0x004D1960});
-}
-
 namespace GLOBALS {
     inline const char* s_spaces_percent_s_0055236c = reinterpret_cast<const char*>(std::uintptr_t{0x0055236C});
     inline const char* s_percent_s_percent_s_percent_s_005574f4 = reinterpret_cast<const char*>(std::uintptr_t{0x005574F4});
-}
-
-inline void __cdecl Best_Instructor_Bonus_(int16_t* bonuses) {
-    using Fn = void(__cdecl*)(int16_t*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409370});
-    fn(bonuses);
-}
-
-inline void __cdecl Do_XP_For_Ship_(int16_t ship_idx, int16_t bonus) {
-    using Fn = void(__cdecl*)(int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00409410});
-    fn(ship_idx, bonus);
-}
-
-inline int16_t __cdecl Base_Generic_Dcv_(int16_t target_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x00508670})(target_idx);
-}
-
-inline uint32_t __cdecl Modified_Weapon_Strength_(uint32_t strength, uint16_t specials) {
-    using Fn = uint32_t(__cdecl*)(uint32_t, uint16_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x00508990})(strength, specials);
-}
-
-inline int16_t __cdecl Strength_Hits_Modifier_(int16_t hits) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x00508A50})(hits);
-}
-
-inline void* __cdecl Buffer_Reload_(const char* filename, int32_t index, void* segment) {
-    using Fn = void*(__cdecl*)(const char*, int32_t, void*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052C2E0});
-    return fn(filename, index, segment);
 }
 
 inline void __cdecl Combat_Draw_View_Ship_() {

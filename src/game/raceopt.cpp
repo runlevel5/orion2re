@@ -287,10 +287,10 @@ namespace raceopt {
         int16_t y_coords[5] = { 72, 147, 222, 297, 372 };
         s_colors color1 = {{ 0x91, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95, 0x95 }};
         
-        s_animation_header* bg1 = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_RACEOPT_LBX_00556320, 4, MOX::_global_cache_seg));
+        s_animation_header* bg1 = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_RACEOPT_LBX_00556320, 4, MOX::_global_cache_seg));
         animate::Draw_(0, 0, bg1);
         
-        s_animation_header* bg2 = reinterpret_cast<s_animation_header*>(Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg));
+        s_animation_header* bg2 = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(s_patch13_lbx_00556330, 0, MOX::_global_cache_seg));
         animate::Draw_(131 /* 0x83 */, 0, bg2);
 
         int16_t col_idx = 0;

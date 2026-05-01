@@ -170,7 +170,7 @@ namespace CMBTDRW1 {
             MOX::_draw_ship_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
             MOX::_combat_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, bitmap_size);
 
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_("Combat.lbx", 0xB, MOX::_global_cache_seg);
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_("Combat.lbx", 0xB, MOX::_global_cache_seg);
             remap::Calculate_Picture_Remap_Colors_(anim);
 
             NEWGAME::_color_ken.colors[0] = remap::Get_Remap_Palette_Color_(0x84);
@@ -429,7 +429,7 @@ namespace CMBTDRW1 {
             }
             RUSS::Mox_Update_();
 
-            MOX::_combat_background_seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx, 0, MOX::_global_cache_seg);
+            MOX::_combat_background_seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, 0, MOX::_global_cache_seg);
             RUSS::Mox_Update_();
             animate::Draw_(0, 351, MOX::_combat_background_seg);
 
@@ -450,7 +450,7 @@ namespace CMBTDRW1 {
             video::Clip_On_();
 
             int16_t star_idx = (MOX::_in_nebula_flag == 1) ? 35 : 46;
-            MOX::_combat_far_star = (s_animation_header*)Buffer_Reload_(s_combat_lbx, star_idx, MOX::_global_cache_seg);
+            MOX::_combat_far_star = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, star_idx, MOX::_global_cache_seg);
             RUSS::Mox_Update_();
 
             animate::Draw_(MOX::_combat_far_x, MOX::_combat_far_y, MOX::_combat_far_star);
@@ -468,7 +468,7 @@ namespace CMBTDRW1 {
             }
             RUSS::Mox_Update_();
 
-            MOX::_combat_mid_star = (s_animation_header*)Buffer_Reload_(s_combat_lbx, 47, MOX::_global_cache_seg);
+            MOX::_combat_mid_star = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, 47, MOX::_global_cache_seg);
             RUSS::Mox_Update_();
             animate::Draw_(MOX::_combat_mid_x, MOX::_combat_mid_y, MOX::_combat_mid_star);
             animate::Draw_(MOX::_combat_mid_x - 640, MOX::_combat_mid_y, MOX::_combat_mid_star);
@@ -477,7 +477,7 @@ namespace CMBTDRW1 {
             animate::Draw_(MOX::_combat_mid_x, MOX::_combat_mid_y - 480, MOX::_combat_mid_star);
             RUSS::Mox_Update_();
 
-            MOX::_combat_near_star = (s_animation_header*)Buffer_Reload_(s_combat_lbx, 48, MOX::_global_cache_seg);
+            MOX::_combat_near_star = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, 48, MOX::_global_cache_seg);
             RUSS::Mox_Update_();
             animate::Draw_(MOX::_combat_near_x, MOX::_combat_near_y, MOX::_combat_near_star);
             animate::Draw_(MOX::_combat_near_x - 640, MOX::_combat_near_y, MOX::_combat_near_star);
@@ -895,7 +895,7 @@ namespace CMBTDRW1 {
 
         if (MOX::_order_info_flag == 0) {
             Draw_Fake_Combat_Buttons_();
-            MOX::_combat_options_background_seg = (s_animation_header*)Buffer_Reload_("combat.lbx", 9, MOX::_global_cache_seg);
+            MOX::_combat_options_background_seg = (s_animation_header*)buffer::Buffer_Reload_("combat.lbx", 9, MOX::_global_cache_seg);
             animate::Draw_(248, 298, MOX::_combat_options_background_seg);
             Draw_Option_Panel_Lights_();
         }
@@ -909,22 +909,22 @@ namespace CMBTDRW1 {
     {
         s_animation_header* seg;
 
-        seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x2B, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2B, MOX::_global_cache_seg);
         animate::Draw_(x - 1, y - 1, seg);
 
-        seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x2C, MOX::_global_cache_seg);
+        seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2C, MOX::_global_cache_seg);
         animate::Draw_(x, y + 0x4E, seg);
 
         if (ship_idx == 0)
         {
-            seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x4F, seg);
 
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() != 0)
             {
                 int16_t struct_dmg = MOX::_combat_data[ship_idx].structure_damage;
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 int16_t armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data[0].owner);
@@ -935,12 +935,12 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -948,7 +948,7 @@ namespace CMBTDRW1 {
             }
             else
             {
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
             }
             return;
@@ -996,12 +996,12 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 video::Clip_Off_();
@@ -1021,7 +1021,7 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(x + 1, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1043,7 +1043,7 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(x - bar_len + 0x58, 0, x + 0x58, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1052,10 +1052,10 @@ namespace CMBTDRW1 {
         }
         else
         {
-            seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x59, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x59, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x4F, seg);
 
-            seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
+            seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x58, MOX::_global_cache_seg);
             animate::Draw_(x + 1, y + 0x55, seg);
 
             int16_t struct_dmg = MOX::_combat_data[ship_idx].structure_damage;
@@ -1067,12 +1067,12 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x55, seg);
 
                 video::Clip_Off_();
@@ -1090,12 +1090,12 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(0, 0, x + bar_len + 1, 0x1DF);
                 video::Clip_On_();
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 graphics::Set_Window_(x - bar_len + 0x58, 0, 0x27F, 0x1DF);
 
-                seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
+                seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x57, MOX::_global_cache_seg);
                 animate::Draw_(x + 1, y + 0x4F, seg);
 
                 video::Clip_Off_();
@@ -1453,7 +1453,7 @@ namespace CMBTDRW1 {
             Draw_Fake_Combat_Buttons_();
             video::Copy_Back_To_Off_();
             video::Set_Page_Off_();
-            MOX::_combat_options_background_seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx, 9, MOX::_global_cache_seg);
+            MOX::_combat_options_background_seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, 9, MOX::_global_cache_seg);
             animate::Draw_(248, 298, MOX::_combat_options_background_seg);
             RUSS::Mox_Sync_Update_();
         }
@@ -1481,7 +1481,7 @@ namespace CMBTDRW1 {
                 graphics::Set_Window_(0, 0, 639, 479);
                 video::Clip_On_();
 
-                MOX::_combat_options_background_seg = (s_animation_header*)Buffer_Reload_(s_combat_lbx, 9, MOX::_global_cache_seg);
+                MOX::_combat_options_background_seg = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx, 9, MOX::_global_cache_seg);
                 animate::Draw_(248, current_y, MOX::_combat_options_background_seg);
 
                 animate::Set_Animation_Frame_((s_animation_header*)MOX::_cmbt_option_seg, (int32_t)MOX::_msl_impact_warning_flag);
@@ -1751,20 +1751,20 @@ namespace CMBTDRW1 {
         }
 
         int index = (MOX::_in_nebula_flag == 1) ? 35 /* 0x23 */ : 46 /* 0x2e */;
-        MOX::_combat_far_star = (s_animation_header*)Buffer_Reload_(MOX::s_combat_lbx, index, MOX::_global_cache_seg);
+        MOX::_combat_far_star = (s_animation_header*)buffer::Buffer_Reload_(MOX::s_combat_lbx, index, MOX::_global_cache_seg);
 
         animate::Draw_(MOX::_combat_far_x, MOX::_combat_far_y, MOX::_combat_far_star);
         animate::Draw_(MOX::_combat_far_x - 640, MOX::_combat_far_y, MOX::_combat_far_star);
         animate::Draw_(MOX::_combat_far_x - 640, MOX::_combat_far_y - 480, MOX::_combat_far_star);
         animate::Draw_(MOX::_combat_far_x, MOX::_combat_far_y - 480, MOX::_combat_far_star);
 
-        MOX::_combat_mid_star = (s_animation_header*)Buffer_Reload_(MOX::s_combat_lbx, 47 /* 0x2f */, MOX::_global_cache_seg);
+        MOX::_combat_mid_star = (s_animation_header*)buffer::Buffer_Reload_(MOX::s_combat_lbx, 47 /* 0x2f */, MOX::_global_cache_seg);
         animate::Draw_(MOX::_combat_mid_x, MOX::_combat_mid_y, MOX::_combat_mid_star);
         animate::Draw_(MOX::_combat_mid_x - 640, MOX::_combat_mid_y, MOX::_combat_mid_star);
         animate::Draw_(MOX::_combat_mid_x - 640, MOX::_combat_mid_y - 480, MOX::_combat_mid_star);
         animate::Draw_(MOX::_combat_mid_x, MOX::_combat_mid_y - 480, MOX::_combat_mid_star);
 
-        MOX::_combat_near_star = (s_animation_header*)Buffer_Reload_(MOX::s_combat_lbx, 48 /* 0x30 */, MOX::_global_cache_seg);
+        MOX::_combat_near_star = (s_animation_header*)buffer::Buffer_Reload_(MOX::s_combat_lbx, 48 /* 0x30 */, MOX::_global_cache_seg);
         animate::Draw_(MOX::_combat_near_x, MOX::_combat_near_y, MOX::_combat_near_star);
         animate::Draw_(MOX::_combat_near_x - 640, MOX::_combat_near_y, MOX::_combat_near_star);
         animate::Draw_(MOX::_combat_near_x - 640, MOX::_combat_near_y - 480, MOX::_combat_near_star);
@@ -1835,7 +1835,7 @@ namespace CMBTDRW1 {
 
         if (MOX::_order_info_flag == 0) {
             Draw_Fake_Combat_Buttons_();
-            MOX::_combat_options_background_seg = (s_animation_header*)Buffer_Reload_(MOX::s_combat_lbx, 9, MOX::_global_cache_seg);
+            MOX::_combat_options_background_seg = (s_animation_header*)buffer::Buffer_Reload_(MOX::s_combat_lbx, 9, MOX::_global_cache_seg);
             animate::Draw_(248, 298, MOX::_combat_options_background_seg);
             Draw_Option_Panel_Lights_();
         }
@@ -1958,7 +1958,7 @@ namespace CMBTDRW1 {
                 }
             }
 
-            anim = (s_animation_header*)Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
 
             if (MOX::_combat_data[ship_idx].owner == MOX::_combat_attacker_player) {
                 replace::Replace_Color_Range_(anim, local_40, 0x60, 0x20);
@@ -2010,11 +2010,11 @@ namespace CMBTDRW1 {
     void __cdecl Draw_Ship_Status_(int16_t param_1, int16_t param_2, int16_t param_3) {
         if (param_1 < 0x14) {
             graphics::Fill_(0xf, 0x17b, 0x66, 0x1c5, 0);
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
             animate::Draw_(0xf, 0x17b, anim);
         } else if (param_1 > 0x17c) {
             graphics::Fill_(0x191, 0x17b, 0x1e8, 0x1d3, 0);
-            s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
             animate::Draw_(0x191, 0x17b, anim);
         }
 
@@ -2344,7 +2344,7 @@ namespace CMBTDRW1 {
             return;
         }
 
-        s_animation_header* effect_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
+        s_animation_header* effect_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
         int16_t effect_width = animate::Get_Width_(effect_seg);
         int16_t effect_height = animate::Get_Height_(effect_seg);
         int16_t frame_count = animate::Get_Animation_Frame_Count_(effect_seg);
@@ -2416,7 +2416,7 @@ namespace CMBTDRW1 {
                 video::Clip_On_();
                 graphics::Set_Window_(0, 0, 0x27F, 0x15E);
 
-                effect_seg = (s_animation_header*)Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
+                effect_seg = (s_animation_header*)buffer::Buffer_Reload_(s_cmbtsfx_lbx_00551228, 42, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(effect_seg, frame);
                 animate::Draw_(draw_x, draw_y, effect_seg);
 
@@ -2488,7 +2488,7 @@ namespace CMBTDRW1 {
                 }
             }
             
-            anim = (s_animation_header*)Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
+            anim = (s_animation_header*)buffer::Buffer_Reload_(lbx_name, picture_num, MOX::_global_cache_seg);
             
             if (owner == MOX::_combat_attacker_player) {
                 replace::Replace_Color_Range_(anim, local_40, 96 /* 0x60 */, 32 /* 0x20 */);
@@ -2687,7 +2687,7 @@ namespace CMBTDRW1 {
     void __cdecl Draw_Board_Popup_() {
         fonts::Set_Font_Style_(2, &MOX::_combat_green);
 
-        s_animation_header* anim = (s_animation_header*)Buffer_Reload_(s_combat_lbx_005599c8, 36, MOX::_global_cache_seg);
+        s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_005599c8, 36, MOX::_global_cache_seg);
         animate::Draw_(150, 100, anim);
 
         BILL::_Print_Paragraph_(165, 153, 261, _g_msg, 2);
@@ -3002,7 +3002,7 @@ namespace CMBTDRW1 {
 
             special::Absolute_Interpolate_Line_(&curr_x, &curr_y, start_x, start_y, target_x, target_y, speed);
             
-            s_animation_header* projectile_anim = (s_animation_header*)Buffer_Reload_("cmbtmisl.lbx", projectile_entry, MOX::_global_cache_seg);
+            s_animation_header* projectile_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtmisl.lbx", projectile_entry, MOX::_global_cache_seg);
             animate::Draw_(curr_x - 17, curr_y - 17, projectile_anim);
             
             RUSS::Mox_Sync_Update_();
@@ -3016,7 +3016,7 @@ namespace CMBTDRW1 {
         }
 
         int16_t sound_handle = (int16_t)ERICNET::Mox_Play_Sound_(24 /* 0x18 */);
-        s_animation_header* explosion_anim = (s_animation_header*)Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
+        s_animation_header* explosion_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
         int16_t frame_count = animate::Get_Animation_Frame_Count_(explosion_anim);
 
         for (int16_t i = 0; i < frame_count; ++i) {
@@ -3026,7 +3026,7 @@ namespace CMBTDRW1 {
             graphics::Set_Window_(0, 0, 639 /* 0x27F */, 350 /* 0x15E */);
             video::Clip_On_();
 
-            explosion_anim = (s_animation_header*)Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
+            explosion_anim = (s_animation_header*)buffer::Buffer_Reload_("cmbtsfx.lbx", 7, MOX::_global_cache_seg);
             animate::Set_Animation_Frame_(explosion_anim, i);
             animate::Draw_(target_x - 12, target_y - 12, explosion_anim);
             

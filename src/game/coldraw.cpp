@@ -459,7 +459,7 @@ void __cdecl Draw_Road_List_() {
             uint8_t dir = draw_order[j];
 
             if (_road_list[y][x].connections[dir] != 0) {
-                s_animation_header* anim = reinterpret_cast<s_animation_header*>(::Buffer_Reload_(
+                s_animation_header* anim = reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
                     COLONY::_COLROADS_LBX,
                     _road_list[y][x].anims[dir],
                     MOX::_global_cache_seg
@@ -685,7 +685,7 @@ void __cdecl Build_Veggie_List_Based_On_Bldg_List_() {
                 COLDRAW::_veggie_list[row][col].anim_entries[sprite_index] = anim_entry;
 
                 s_animation_header* const animation =
-                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX, anim_entry, MOX::_global_cache_seg);
+                        (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLVEGGIE_LBX, anim_entry, MOX::_global_cache_seg);
 
                 int32_t screen_x = random::Random_(animate::Get_Width_(animation));
                 screen_x -= animate::Get_Width_(animation) / 2;
@@ -736,7 +736,7 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
                 if (draw_pass_count != 0 &&
                     initial_pass_count == static_cast<uint16_t>(remaining_passes)) {
                     s_animation_header* animation =
-                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
+                        (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
                                        veggie_cell.anim_entries[sprite_idx],
                                        MOX::_global_cache_seg);
                     ERIC::Draw_Bottom_Centered_(veggie_cell.sprites[sprite_idx].screen_x,
@@ -744,7 +744,7 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
                                                 animation);
                 } else {
                     s_animation_header* animation =
-                        (s_animation_header*)Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
+                        (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLVEGGIE_LBX,
                                        veggie_cell.anim_entries[sprite_idx],
                                        MOX::_global_cache_seg);
                     ERIC::Draw_Bottom_Centered_No_Glass_(veggie_cell.sprites[sprite_idx].screen_x,

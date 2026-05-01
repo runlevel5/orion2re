@@ -26,6 +26,29 @@ namespace TECHDATA {
     inline s_tech_weapon_mod_data (&_weapon_modifications)[15] =
         *reinterpret_cast<s_tech_weapon_mod_data(*)[15]>(std::uintptr_t{0x00555470});
 
+    inline int16_t& _weapon_modifications_1_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055548B});
+    inline int16_t& _weapon_modifications_2_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055549A});
+    inline int16_t& _weapon_modifications_5_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554C7});
+    inline int16_t& _weapon_modifications_7_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554E5});
+    inline int16_t& _weapon_modifications_8_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005554F4});
+    inline int16_t& _weapon_modifications_9_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555503});
+    inline int16_t& _weapon_modifications_10_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555512});
+    inline int16_t& _weapon_modifications_11_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555521});
+    inline int16_t& _weapon_modifications_12_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00555530});
+    inline int16_t& _weapon_modifications_13_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055553F});
+    inline int16_t& _weapon_modifications_14_space =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055554E});
+
     inline int16_t (&_starting_tech_field_ids)[6] =
         *reinterpret_cast<int16_t (*)[6]>(std::uintptr_t{0x0055A960});
 
