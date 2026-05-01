@@ -67,6 +67,11 @@ namespace HAROLD {
 
     void __cdecl Load_Language_Fonts_();
 
+    inline void __cdecl Set_Language_Race_Names_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F2850 })();
+    }
+
     uint8_t* __cdecl Harold_Init_();
 
     inline void __cdecl Harold_Defaults_() {
@@ -180,4 +185,6 @@ namespace HAROLD {
     void __cdecl Star_XY_To_Ship_Id_(s_star_data* target_star, int16_t* out_indices, int16_t* count);
 
     int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx);
+
+    void __cdecl Write_Language_Setting_File_();
 }

@@ -222,13 +222,6 @@ inline HRESULT __stdcall DirectDrawCreate(GUID* lpGUID, LPDIRECTDRAW* lplpDD, IU
     return fn(lpGUID, lplpDD, pUnkOuter);
 }
 
-
-inline void __cdecl FUN_0052b660() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0052b660 });
-    fn();
-}
-
 inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsigned stack_size, void* arglist) {
     using Fn = uintptr_t(__cdecl*)(void(__cdecl*)(void*), unsigned, void*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005424C0 });
@@ -283,9 +276,6 @@ inline FILE* __cdecl _fopen(const char* filename, const char* mode) {
     return fn(filename, mode);
 }
 
-inline LPDIRECTDRAW& g_direct_draw =
-    *reinterpret_cast<LPDIRECTDRAW*>(std::uintptr_t{0x00578E04});
-
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
 inline int16_t& _mouse_XY_star_idx =
@@ -328,42 +318,9 @@ inline int __cdecl _strncmp(const char* s1, const char* s2, size_t n) {
 }
 
 inline char* __cdecl __itoa(int value, char* str, int radix) {
-    using Fn = char*(__cdecl*)(int, char*, int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542d10});
+    using Fn = char* (__cdecl*)(int, char*, int);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00542d10 });
     return fn(value, str, radix);
-}
-
-inline void __cdecl Reload_Language_Strings_() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{0x004f2470})();
-}
-
-inline void __cdecl Write_Language_Setting_File_() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(std::uintptr_t{0x004f25c0})();
-}
-
-inline void __cdecl Get_File_Date_String_(const char* filename, char* date_out) {
-    using Fn = void(__cdecl*)(const char*, char*);
-    reinterpret_cast<Fn>(std::uintptr_t{0x0050f650})(filename, date_out);
-}
-
-inline char* __cdecl Option_String_(int16_t id) {
-    using Fn = char*(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00509880});
-    return fn(id);
-}
-
-inline void __cdecl Wrapper_For_Normal_System_Fields_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00497540 });
-    fn();
-}
-
-inline int32_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
-    using Fn = int32_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0043dea0});
-    return fn(player_idx);
 }
 
 inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
@@ -388,30 +345,6 @@ inline void __cdecl No_Op1_() {
 inline uint32_t __cdecl isqrt_(uint32_t val) {
     using Fn = uint32_t(__cdecl*)(uint32_t);
     return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
-}
-
-inline int16_t __cdecl Range_(int16_t y1, int16_t x1, int16_t y2, int16_t x2) {
-    using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t, int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00531A50});
-    return fn(y1, x1, y2, x2);
-}
-
-inline int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00481cf0});
-    return fn(player_idx);
-}
-
-inline int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
-    using Fn = int16_t(__cdecl*)(int16_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004E2630});
-    return fn(player_idx);
-}
-
-inline void __cdecl Set_Memory_(void* dest, uint32_t size, uint8_t value) {
-    using Fn = void(__cdecl*)(void*, uint32_t, uint8_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052ced8});
-    fn(dest, size, value);
 }
 
 inline void* __cdecl Allocate_First_Block_(void* segment, uint32_t size) {
@@ -744,6 +677,7 @@ inline const char* s_L_005560e8 = reinterpret_cast<const char*>(0x005560E8);  //
 inline const char* s_P_005569d8 = reinterpret_cast<const char*>(0x005569D8);  // "P"
 inline const char* s_I_0055801c = reinterpret_cast<const char*>(0x0055801C);  // "I"
 inline const char* s_R_0055824c = reinterpret_cast<const char*>(0x0055824C);  // "R"
+inline const char* s_r_00556db0 = reinterpret_cast<const char*>(0x00556DB0); // "r"
 inline const char* s_Q_005598f0 = reinterpret_cast<const char*>(0x005598F0);  // "Q"
 inline const char* s_F_005598f4 = reinterpret_cast<const char*>(0x005598F4);  // "F"
 inline const char* s_T_005598f8 = reinterpret_cast<const char*>(0x005598F8);  // "T"
@@ -816,6 +750,7 @@ inline char*& PTR_s_GAME_LBX_0055ac4c =
 inline void*& PTR_s_OFFICER_LBX_00556990 =
     *reinterpret_cast<void**>(std::uintptr_t{0x00556990});
 inline const char* s___INVALID___0055ac58 = reinterpret_cast<const char*>(0x0055AC58); // "* INVALID *"
+inline const char* s__3s__2d____4d__2d__2d_0055ac64 = reinterpret_cast<const char*>(0x0055AC64); // "%3s %2d, %-4d  %2d:%2d"
 
 inline int16_t* _x_fields = reinterpret_cast<int16_t*>(std::uintptr_t{0x00551040});
 

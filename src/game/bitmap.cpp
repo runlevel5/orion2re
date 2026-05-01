@@ -70,7 +70,7 @@ namespace bitmap {
 
         uint8_t* pixels = reinterpret_cast<uint8_t*>(sprite) + 0x10;
         uint32_t pixel_count = static_cast<uint32_t>(static_cast<int32_t>(w) * static_cast<int32_t>(h));
-        Set_Memory_(pixels, pixel_count, 0);
+        struct_::Set_Memory_(pixels, pixel_count, 0);
     }
 
     void __cdecl Screen_Bitmap_Capture_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* header) {

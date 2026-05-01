@@ -622,7 +622,7 @@ namespace SHIPS {
             int16_t num_overlaps = 0;
             int16_t stop_searching = 0;
 
-            Set_Memory_(overlap_indices, 100 /* 50 * sizeof(short) */, 0);
+            struct_::Set_Memory_(overlap_indices, 100 /* 50 * sizeof(short) */, 0);
 
             HACCESS::Ship_Icon_Star_Id_(current_idx);
 

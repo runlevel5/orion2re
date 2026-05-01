@@ -1211,7 +1211,7 @@ namespace MAINSCR {
 
             if (order_id == 0) {
                 if (MOVEBOX::Moveable_Box_Selected_(0) != 0) {
-                    Wrapper_For_Normal_System_Fields_();
+                    MAINSCR::Wrapper_For_Normal_System_Fields_();
                 }
             }
 
@@ -3995,6 +3995,27 @@ namespace MAINSCR {
             break;
         }
         }
+    }
+
+    void __cdecl Wrapper_For_Normal_System_Fields_() {
+        int16_t content_offset_y = MAINSCR::_moveable_box_0_content_offset_y;
+        int16_t content_offset_x = MAINSCR::_moveable_box_0_content_offset_x;
+        int16_t y = MAINSCR::_moveable_box_0_y;
+        int16_t x = MAINSCR::_moveable_box_0_x;
+        int16_t movable_box_id = MAINSCR::_moveable_box_0_id;
+
+        SYS::Init_System_Display_(movable_box_id);
+        SYS::Add_System_Display_Popup_Fields_(
+                movable_box_id,
+                x,
+                y,
+                content_offset_x,
+                content_offset_y,
+                0x0D,
+                0x2F,
+                &MAINSCR::_moveable_box_0_drag_field,
+                &MAINSCR::_moveable_box_0_close_btn,
+                &MAINSCR::_moveable_box_0_window_field_id);
     }
 
     void __cdecl Mini_Main_Screen_Text_Box_(char* text_1, char* text_2) {

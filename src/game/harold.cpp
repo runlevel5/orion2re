@@ -1363,4 +1363,15 @@ namespace HAROLD {
         line::Multi_Colored_Line_(x1 + 1, y1 + 1, x1 + 1, y2 - 1, &rev_colors, inv_offset);
         line::Multi_Colored_Line_(x1 + 2, y1 + 2, x1 + 2, y2 - 2, &rev_colors, color_offset);
     }
+
+    void __cdecl Write_Language_Setting_File_() {
+        char language_text[80];
+        FILE* file = _wfopen(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
+
+        if (file != nullptr) {
+            __itoa((uint32_t)(uint8_t)MOX::_settings.language, language_text, 10);
+            fputs(language_text, file);
+            _fclose(file);
+        }
+    }
 }

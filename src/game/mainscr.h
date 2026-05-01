@@ -43,6 +43,30 @@ namespace MAINSCR {
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
     inline int16_t& _fleet_icon_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F6});
 
+    inline int16_t& _moveable_box_0_id =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597862});
+
+    inline int16_t& _moveable_box_0_x =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597868});
+
+    inline int16_t& _moveable_box_0_y =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786A});
+
+    inline int16_t& _moveable_box_0_drag_field =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059786E});
+
+    inline int16_t& _moveable_box_0_close_btn =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597870});
+
+    inline int16_t& _moveable_box_0_window_field_id =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597872});
+
+    inline int16_t& _moveable_box_0_content_offset_x =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597878});
+
+    inline int16_t& _moveable_box_0_content_offset_y =
+            *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059787A});
+
     inline int8_t& _star_name_highlight_direction =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x00559840});
 
@@ -269,4 +293,6 @@ namespace MAINSCR {
     void __cdecl Get_Star_Name_Info_(int16_t star_idx, int16_t* out_x, int16_t* out_y, int16_t* out_width);
 
     void __cdecl Mini_Main_Screen_Text_Box_(char* text_1, char* text_2);
+
+    void __cdecl Wrapper_For_Normal_System_Fields_();
 }

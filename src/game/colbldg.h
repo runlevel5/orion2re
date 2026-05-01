@@ -159,4 +159,6 @@ namespace COLBLDG {
     void __cdecl Evaluate_Input_(int16_t* param_1, int16_t* param_2);
 
     void __cdecl Print_Selection_Centered_(const char* text);
+
+    char* __cdecl Option_String_(int16_t option_id);
 }

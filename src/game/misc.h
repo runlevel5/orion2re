@@ -84,4 +84,9 @@ namespace MISC {
     void __cdecl _Print_Shadow_Down_(int16_t x, int16_t y, uint8_t shadow_color, const char* text);
 
     int16_t __cdecl Substring_(char* haystack, char* needle);
+
+    inline void __cdecl Get_Time_Stamp_(const char* file_path, int16_t* month, int16_t* day, int16_t* year, int16_t* hour, int16_t* minute, int16_t* second) {
+        using Fn = void(__cdecl*)(const char*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(std::uintptr_t{0x0049E9B0})(file_path, month, day, year, hour, minute, second);
+    }
 }

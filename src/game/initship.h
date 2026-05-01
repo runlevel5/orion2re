@@ -137,4 +137,15 @@ namespace INITSHIP {
 
     inline const char* const s_Transport_00558e88 =
         reinterpret_cast<const char*>(std::uintptr_t{0x00558E88});
+
+    inline void __cdecl Update_Ship_Names_To_New_Language_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(std::uintptr_t{ 0x00480EE0 })();
+    }
+
+    inline int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00481cf0 });
+        return fn(player_idx);
+    }
 }

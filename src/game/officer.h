@@ -314,4 +314,6 @@ namespace OFFICER {
     void __cdecl Draw_Officer_Skill_Icon_(int16_t x, int16_t y, int16_t skill_idx);
 
     int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t leader_idx);
+
+    int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx);
 }

@@ -1406,7 +1406,7 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
 
     if (colony_active && ship_idx > -1 && reinterpret_cast<int8_t*>(PLNTSUM::_can_reach_star)[star_idx] != 0 && ship_status_not_one) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
-        dist = Range_(marker_y, marker_x, star_y + 4, star_x + 3);
+        dist = special::Range_(marker_y, marker_x, star_y + 4, star_x + 3);
         if (dist > 10) {
             SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 7, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             
@@ -1419,7 +1419,7 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
 
     if (outpost_active && ship_idx > -1 && reinterpret_cast<int8_t*>(PLNTSUM::_can_reach_star)[star_idx] != 0 && ship_status_not_one) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
-        dist = Range_(marker_y, marker_x, star_y + 4, star_x + 3);
+        dist = special::Range_(marker_y, marker_x, star_y + 4, star_x + 3);
         if (dist > 10) {
             SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 8, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             

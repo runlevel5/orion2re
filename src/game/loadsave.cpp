@@ -438,8 +438,8 @@ namespace LOADSAVE {
                     if (MOX::_settings.language > 4) {
                         MOX::_settings.language = 0;
                     }
-                    Reload_Language_Strings_();
-                    Write_Language_Setting_File_();
+                    LOADSAVE::Reload_Language_Strings_();
+                    HAROLD::Write_Language_Setting_File_();
                 }
                 return;
             }
@@ -1762,6 +1762,63 @@ namespace LOADSAVE {
         sound::Set_Sound_Max_Volume_(0);
         MOX::_settings.sound_fx_on = 0;
         popup->sound_fx_on = 0;
+    }
+
+    /**
+     * @address 004f2470
+     */
+    /**
+     * @address 0050f650
+     */
+    void __cdecl Get_File_Date_String_(const char* file_path, char* out_string) {
+        FILE* file = _wfopen(file_path, s_r_00556db0);
+        if (file == nullptr) {
+            return;
+        }
+
+        _fclose(file);
+
+        int16_t second;
+        int16_t minute;
+        int16_t hour;
+        int16_t year;
+        int16_t day;
+        int16_t month;
+
+        MISC::Get_Time_Stamp_(file_path, &month, &day, &year, &hour, &minute, &second);
+
+        if ((((month == 0) && (day == 0)) && (year == 0)) && ((hour == 0) && (second == 0))) {
+            out_string[0] = '\0';
+            return;
+        }
+
+        _sprintf(
+                out_string,
+                s__3s__2d____4d__2d__2d_0055ac64,
+                LOADSAVE::_months[month],
+                static_cast<int>(day),
+                static_cast<int>(year),
+                static_cast<int>(hour),
+                static_cast<int>(minute));
+
+        if (out_string[0x0e] == ' ') {
+            out_string[0x0e] = '0';
+        }
+        if (out_string[0x11] == ' ') {
+            out_string[0x11] = '0';
+        }
+    }
+
+    void __cdecl Reload_Language_Strings_() {
+        MOX::_settings.language = 0;
+        HAROLD::Load_H_Strings_();
+        RUSS::Load_Russ_Strings_();
+        ESTRINGS::Load_E_Strings_();
+        HAROLD::Load_Language_Fonts_();
+        HAROLD::Load_Leader_Titles();
+        HAROLD::Set_Language_Race_Names_();
+        TECHINIT::Load_Tech_Names_();
+        INITSHIP::Update_Ship_Names_To_New_Language_();
     }
 
     void __cdecl Auto_Load_Last_Saved_Game_(int16_t* out_flag) {

@@ -1,6 +1,10 @@
 #include "pch.h"
 
 namespace ADVCIV {
+    bool __cdecl Player_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
+        return static_cast<int16_t>(_star_colony_owner[star_idx]) == player_idx;
+    }
+
     bool __cdecl Enemy_Has_Colony_At_Star_(int16_t player_idx, int16_t star_idx) {
         int8_t owner = _star_colony_owner[star_idx];
 

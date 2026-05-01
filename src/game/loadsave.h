@@ -16,6 +16,8 @@ namespace LOADSAVE {
 
     int16_t __cdecl Game_Popup_User_Box_(char* message, int16_t type);
 
+    void __cdecl Reload_Language_Strings_();
+
     inline uint8_t& _draw_game_popup_to_back =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722F4});
     inline uint8_t& _dont_draw_darkened_buttons = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005722C4});
@@ -107,6 +109,8 @@ namespace LOADSAVE {
     inline const char* s__ALT_F8__0055ac7c = reinterpret_cast<const char*>(0x0055AC7C); // "(ALT-F8)"
 
     void __cdecl Get_Save_Game_Date_Strings_(char* output_buffer);
+
+    void __cdecl Get_File_Date_String_(const char* file_path, char* out_string);
 
     void __cdecl Embed_Special_Color_Codes_(char* str, int16_t max_len);
 

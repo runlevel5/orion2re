@@ -842,7 +842,7 @@ namespace SCORE {
         SCORE::_hi->score_technology = SCORE::Get_Technology_Score_(player_idx);
         SCORE::_hi->score_antares = SCORE::Get_Antares_Score_(player_idx);
         SCORE::_hi->score_orion = SCORE::Get_Orion_Score_(player_idx);
-        SCORE::_hi->score_council = Get_Won_Council_Score_(player_idx);
+        SCORE::_hi->score_council = SCORE::Get_Won_Council_Score_(player_idx);
         SCORE::_hi->score_captured_colonists = SCORE::Get_Captured_Colonist_Score_(player_idx);
         SCORE::_hi->score_population = SCORE::Get_Population_Score_(player_idx);
         SCORE::_hi->score_time = SCORE::Get_Time_Score_();

@@ -130,4 +130,10 @@ namespace SCORE {
     int16_t __cdecl Get_Time_Score_();
 
     void __cdecl nullsub();
+
+    inline int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004E2630 });
+        return fn(player_idx);
+    }
 }

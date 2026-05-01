@@ -3159,41 +3159,56 @@ namespace OFFICER {
         }
     }
 
-int16_t __cdecl Assign_Loknar_Ship_To_Player_(int16_t player_idx) {
-    int16_t ship_idx = -1;
+    int16_t __cdecl Assign_Loknar_Ship_To_Player_(int16_t player_idx) {
+        int16_t ship_idx = -1;
 
-    if (MOX::_NUM_SHIPS > 0) {
-        for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
-            if (ship_idx != -1) {
-                break;
-            }
-            if (HACCESS::Ship_Owner_(i) == 9) {
-                ship_idx = i;
+        if (MOX::_NUM_SHIPS > 0) {
+            for (int16_t i = 0; i < MOX::_NUM_SHIPS; ++i) {
+                if (ship_idx != -1) {
+                    break;
+                }
+                if (HACCESS::Ship_Owner_(i) == 9) {
+                    ship_idx = i;
+                }
             }
         }
+
+        if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
+            s_ship_design design;
+            INITSHIP::Load_Loknar_Ship_Design_(&design);
+
+            s_ship_data new_ship;
+            memset(&new_ship, 0, sizeof(s_ship_data));
+
+            new_ship.d = design;
+
+            new_ship.d.previous_owner = static_cast<char>(player_idx);
+            new_ship.owner = static_cast<char>(player_idx);
+            new_ship.location = 0;
+            new_ship.x = MOX::_star[0].x;
+            new_ship.y = MOX::_star[0].y;
+            new_ship.status = 0;
+            new_ship.officer_index = 0x41;
+
+            MOX::_ship[ship_idx] = new_ship;
+        }
+
+        return ship_idx;
     }
 
-    if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
-        s_ship_design design;
-        INITSHIP::Load_Loknar_Ship_Design_(&design);
-
-        s_ship_data new_ship;
-        memset(&new_ship, 0, sizeof(s_ship_data));
-
-        new_ship.d = design;
-
-        new_ship.d.previous_owner = static_cast<char>(player_idx);
-        new_ship.owner = static_cast<char>(player_idx);
-        new_ship.location = 0;
-        new_ship.x = MOX::_star[0].x;
-        new_ship.y = MOX::_star[0].y;
-        new_ship.status = 0;
-        new_ship.officer_index = 0x41;
-
-        MOX::_ship[ship_idx] = new_ship;
+int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
+    switch (static_cast<int32_t>(MOX::_player[player_idx].traits[0]) / 2) {
+    case 0:
+        return 1;
+    case 1:
+        return 3;
+    case 2:
+        return 5;
+    case 3:
+        return 7;
+    default:
+        return 0;
     }
-
-    return ship_idx;
 }
 
 void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id) {

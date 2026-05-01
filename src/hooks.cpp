@@ -3832,6 +3832,13 @@ namespace hooks {
         { 0x0045A100, &COLDRAW::Draw_Veggie_CR_ },
         { 0x00528740, &video::Allocate_Refresh_Lists_ },
         { 0x004AC040, &ADVCIV::Proximity_Bonus_ },
+        { 0x004AC120, &ADVCIV::Player_Has_Colony_At_Star_ },
+        { 0x004f2470, &LOADSAVE::Reload_Language_Strings_ },
+        { 0x004F25C0, &HAROLD::Write_Language_Setting_File_ },
+        { 0x0050F650, &LOADSAVE::Get_File_Date_String_ },
+        { 0x00509880, &COLBLDG::Option_String_ },
+        { 0x00497540, &MAINSCR::Wrapper_For_Normal_System_Fields_ },
+        { 0x0043DEA0, &OFFICER::Get_Advanced_Government_Type_ },
     };
 
     void Install_Hooks()

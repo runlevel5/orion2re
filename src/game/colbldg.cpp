@@ -2227,4 +2227,51 @@ namespace COLBLDG {
         }
     }
 
+    char* __cdecl Option_String_(int16_t option_id) {
+        switch (option_id) {
+            case -17:
+                return ESTRINGS::E_Strings_(0x195);
+            case -16:
+                return ESTRINGS::E_Strings_(0x10F);
+            case -15:
+                return ESTRINGS::E_Strings_(0x12D);
+            case -13:
+                return ESTRINGS::E_Strings_(0x0FA);
+            case -12:
+                return ESTRINGS::E_Strings_(0x0E6);
+            case -11:
+                return ESTRINGS::E_Strings_(0x21E);
+            case -10:
+                return ESTRINGS::E_Strings_(0x088);
+            case -9:
+            case -1:
+            case 0:
+                return ESTRINGS::E_Strings_(0x00C);
+            case -8:
+                return ESTRINGS::E_Strings_(0x1BD);
+            case -7:
+                return ESTRINGS::E_Strings_(0x1EC);
+            case -6:
+                return ESTRINGS::E_Strings_(0x0B1);
+            case -5:
+                return ESTRINGS::E_Strings_(0x0B2);
+            case -4:
+                return ESTRINGS::E_Strings_(0x0B0);
+            case -3:
+                return ESTRINGS::E_Strings_(0x142);
+            case -2:
+                return ESTRINGS::E_Strings_(0x21D);
+            default:
+                break;
+        }
+
+        if ((option_id > -100) && (option_id <= -50)) {
+            const int32_t colony_owner = static_cast<int32_t>(MOX::_colony[COLONY::_colony_handle].owner);
+            const int32_t ship_design_index = -static_cast<int32_t>(option_id) - 50;
+            return reinterpret_cast<char*>(&MOX::_player[colony_owner].ship_designs[ship_design_index]);
+        }
+
+        return reinterpret_cast<char*>(std::uintptr_t{ 0xFFFFFFFFu });
+    }
+
 } // namespace COLBLDG

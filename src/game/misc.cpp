@@ -203,7 +203,7 @@ namespace MISC {
         fonts::Load_Palette_(palette_id, 0, 0xff);
         palette::Set_Palette_Changes_(0, 0xff);
 
-        FUN_0052b660();
+        palette::Refresh_Palette_();
         palstore::Darken_Palette_(100);
 
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
