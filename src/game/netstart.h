@@ -12,6 +12,7 @@ namespace NETSTART {
 
     char* __cdecl Load_Netstart_Strings_(char* buffer);
     int8_t __cdecl Request_Race_(uint8_t race_idx);
+    int8_t __cdecl Request_Banner_Color_(uint8_t requested_color);
 
     void __cdecl Mox_Net_Uninit_();
 

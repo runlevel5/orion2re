@@ -1108,4 +1108,164 @@ namespace raceopt {
         }
     }
 
+    void __cdecl Add_Race_Options_Fields_() {
+        const int16_t column_positions[4] = { 0x50, 0x00FE, 0x01BA, 0x0283 };
+        const int16_t row_positions[5] = { 0x48, 0x93, 0x00DE, 0x0129, 0x0174 };
+
+        int16_t row_index;
+        int16_t column_index;
+        int16_t group_button_index;
+        int16_t option_button_index;
+        int16_t top;
+        int16_t left;
+        int16_t right;
+        int16_t bottom;
+
+        if (raceopt::_name_button > 0) {
+            fields::Clear_Fields_Above_(raceopt::_name_button);
+        }
+        else {
+            fields::Clear_Fields_();
+            fonts::Set_Font_Style_(4, &raceopt::_color_opt);
+            raceopt::_name_button = fields::Add_Continuous_String_Input_Field_(
+                0x00F8,
+                0x000F,
+                0x0096,
+                0x000E,
+                raceopt::_cur_race_name,
+                0x000F,
+                0,
+                (s_animation_header*)0,
+                0,
+                0);
+        }
+
+        raceopt::_exit_ken = fields::Add_Hot_Key_(s__00551120);
+        raceopt::_accept = fields::Add_Button_Field_(
+            0x01FA,
+            0x01C0,
+            s__00551100,
+            (s_animation_header*)raceopt::_accept_button_seg,
+            s_a_00552414,
+            0x0028);
+        raceopt::_defalt = fields::Add_Button_Field_(
+            0x004C,
+            0x01C0,
+            s__00551100,
+            (s_animation_header*)raceopt::_default_button_seg,
+            s_c_00556350,
+            0x0028);
+
+        row_index = 0;
+        column_index = 0;
+        group_button_index = 0;
+
+        while (group_button_index < 0x24) {
+            if ((group_button_index & 3) == 0) {
+                raceopt::_group_button[group_button_index] = static_cast<int16_t>(0xFC18);
+                ++group_button_index;
+            }
+
+            bottom = static_cast<int16_t>(row_positions[row_index] + 9);
+            right = static_cast<int16_t>(column_positions[column_index + 1] - 0x32);
+            left = static_cast<int16_t>(column_positions[column_index] - 0x14);
+
+            for (int16_t i = 0; i < 3; ++i) {
+                raceopt::_group_button[group_button_index] = fields::Add_Hidden_Field_(
+                    left,
+                    static_cast<int16_t>(bottom - 9),
+                    right,
+                    bottom,
+                    s__00551100,
+                    0x0029);
+                ++group_button_index;
+                bottom = static_cast<int16_t>(bottom + 0x0D);
+            }
+
+            ++row_index;
+            if (row_index >= 5) {
+                row_index = 0;
+                ++column_index;
+            }
+        }
+
+        raceopt::_group_button[group_button_index] = static_cast<int16_t>(0xFC18);
+        ++group_button_index;
+
+        bottom = static_cast<int16_t>(row_positions[row_index] + 9);
+        right = static_cast<int16_t>(column_positions[column_index + 1] - 0x32);
+        left = static_cast<int16_t>(column_positions[column_index] - 0x14);
+
+        for (int16_t i = 0; i < 4; ++i) {
+            raceopt::_group_button[group_button_index] = fields::Add_Hidden_Field_(
+                left,
+                static_cast<int16_t>(bottom - 9),
+                right,
+                bottom,
+                s__00551100,
+                0x0029);
+            ++group_button_index;
+            bottom = static_cast<int16_t>(bottom + 0x0D);
+        }
+
+        top = 0x48;
+        ++group_button_index;
+        row_index = 0;
+        ++column_index;
+        option_button_index = 0;
+
+        while (group_button_index < 0x40) {
+            int16_t remaining = 0x16;
+            if (remaining > 0) {
+                left = static_cast<int16_t>(column_positions[column_index] - 0x14);
+                right = static_cast<int16_t>(column_positions[column_index] + 0x98);
+
+                group_button_index = static_cast<int16_t>(group_button_index + remaining);
+
+                do {
+                    raceopt::_option_button[option_button_index] = fields::Add_Hidden_Field_(
+                        left,
+                        top,
+                        right,
+                        static_cast<int16_t>(top + 9),
+                        s__00551100,
+                        0x0029);
+                    ++option_button_index;
+                    --remaining;
+                    top = static_cast<int16_t>(top + 0x10);
+                } while (remaining != 0);
+            }
+
+            top = static_cast<int16_t>(top + 9);
+            ++row_index;
+        }
+    }
+
+    void __cdecl Convert_Player_To_Flags_(s_player* player) {
+        int16_t group_shift = 0;
+        int16_t trait_index = 0;
+
+        _button_variable[9] = static_cast<int16_t>(player->traits[0] / 2);
+
+        for (trait_index = 0; trait_index < 9; ++trait_index) {
+            _button_variable[trait_index] =
+                static_cast<int16_t>(player->traits[trait_index + 1]);
+        }
+
+        for (trait_index = 10; trait_index < 31; ++trait_index) {
+            _trait_option_flags[trait_index + group_shift] =
+                static_cast<int16_t>(player->traits[trait_index]);
+
+            if (trait_index == 15) {
+                if (_trait_option_flags[trait_index] == -1) {
+                    _trait_option_flags[trait_index] = 0;
+                    _trait_option_flags[trait_index + 1] = 1;
+                } else {
+                    _trait_option_flags[trait_index + 1] = 0;
+                }
+                group_shift = 1;
+            }
+        }
+    }
+
 }

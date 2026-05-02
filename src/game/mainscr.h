@@ -291,21 +291,14 @@ namespace MAINSCR {
 
     void __cdecl Load_Reply_To_Diplomacy_Request_Popup_();
 
-    inline void __cdecl Add_Reply_To_Diplomacy_Request_Fields_(
-        int16_t* first_reply_field,
-        int16_t* second_reply_field,
-        int16_t* third_reply_field,
-        int16_t* unused_field) {
-        using Fn = void(__cdecl*)(int16_t*, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C9B00});
-        fn(first_reply_field, second_reply_field, third_reply_field, unused_field);
-    }
+    void __cdecl Add_Reply_To_Diplomacy_Request_Fields_(
+        int16_t* accept_field,
+        int16_t* invoke_field,
+        int16_t* wait_field,
+        int16_t* dismiss_field
+    );
 
-    inline void __cdecl Draw_Reply_To_Diplomacy_Request_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C9E10});
-        fn();
-    }
+    void __cdecl Draw_Reply_To_Diplomacy_Request_();
 
     void __cdecl Main_Receive_Message_(uint32_t from_player_id, int16_t param_2, uint16_t msg_type, uint32_t len, void* data);
 

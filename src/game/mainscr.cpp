@@ -4102,4 +4102,93 @@ namespace MAINSCR {
 
         MOX::_diplomacy_request_wait_seg = (uint32_t)(std::uintptr_t)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x12, MOX::_screen_seg);
     }
+
+    void __cdecl Add_Reply_To_Diplomacy_Request_Fields_(
+        int16_t* accept_field,
+        int16_t* invoke_field,
+        int16_t* wait_field,
+        int16_t* dismiss_field
+    ) {
+        const int16_t popup_left = static_cast<int16_t>(
+            ((0x1FA - animate::Get_Width_(MOX::_diplomacy_request_popup_seg)) / 2) + 0x15
+        );
+        const int16_t popup_top = static_cast<int16_t>(
+            ((0x190 - animate::Get_Height_(MOX::_diplomacy_request_popup_seg)) / 2) + 0x15
+        );
+        const int16_t button_top = static_cast<int16_t>(popup_top + 0x5A);
+
+        *accept_field = fields::Add_Button_Field_(
+            static_cast<int16_t>(popup_left + 0x40),
+            button_top,
+            s__00551100,
+            reinterpret_cast<s_animation_header*>(MOX::_diplomacy_request_accept_seg),
+            s_A_00557ed4,
+            0x28
+        );
+
+        *invoke_field = fields::Add_Button_Field_(
+            static_cast<int16_t>(popup_left + 0xBC),
+            button_top,
+            s__00551100,
+            reinterpret_cast<s_animation_header*>(MOX::_diplomacy_request_invoke_seg),
+            s_I_0055801c,
+            0x28
+        );
+
+        *wait_field = fields::Add_Button_Field_(
+            static_cast<int16_t>(popup_left + 0x13B),
+            button_top,
+            s__00551100,
+            reinterpret_cast<s_animation_header*>(MOX::_diplomacy_request_wait_seg),
+            s_W_0055992c,
+            0x28
+        );
+
+        const int16_t popup_bottom = static_cast<int16_t>(
+            animate::Get_Height_(MOX::_diplomacy_request_popup_seg) + popup_top
+        );
+        const int16_t popup_right = static_cast<int16_t>(
+            animate::Get_Width_(MOX::_diplomacy_request_popup_seg) + popup_left
+        );
+
+        fields::Add_Hidden_Field_(
+            popup_left,
+            popup_top,
+            popup_right,
+            popup_bottom,
+            s__00551100,
+            0
+        );
+
+        *dismiss_field = fields::Add_Hidden_Field_(
+            0,
+            0,
+            0x27F,
+            0x1DF,
+            s__00551120,
+            0x29
+        );
+    }
+
+    void __cdecl Draw_Reply_To_Diplomacy_Request_() {
+        int32_t popup_x = (0x1FA - animate::Get_Width_(MOX::_diplomacy_request_popup_seg)) / 2 + 0x15;
+        int32_t popup_y = (0x190 - animate::Get_Height_(MOX::_diplomacy_request_popup_seg)) / 2 + 0x15;
+        int32_t player_index = static_cast<int32_t>(MOX::_screen_data);
+        uint32_t player_color =
+                MOX::_main_palette_player_colors[static_cast<uint8_t>(MOX::_player[player_index].color)];
+        s_colors font_colors;
+
+        Draw_Mini_Main_Screen_();
+        Draw_Main_Main_Screen_();
+        animate::Draw_(static_cast<int16_t>(popup_x), static_cast<int16_t>(popup_y), MOX::_diplomacy_request_popup_seg);
+
+        MISC::Get_Mox_Font_Colors_(4, static_cast<uint8_t>(player_color), static_cast<uint8_t>(player_color + 3), &font_colors);
+        fonts::Set_Font_Style_(4, &font_colors);
+
+        s_player* player = &MOX::_player[player_index];
+        const char* message_format = HAROLD::H_Message_(0xDB);
+
+        _sprintf(MOX::_temp_string, message_format, player->name, player->race_name);
+        fonts::Print_(static_cast<int16_t>(popup_x + 0x27), static_cast<int16_t>(popup_y + 0x3C), MOX::_temp_string);
+    }
 }

@@ -862,4 +862,22 @@ namespace NETSTART {
         uint8_t buffer[20];
         return netcode::Net_Get_Users_(buffer);
     }
+
+    int8_t __cdecl Request_Banner_Color_(uint8_t requested_color) {
+        if (RACESEL::_color_flag[requested_color] != 0) {
+            return 0;
+        }
+
+        NETMOX::Mox_Send_Message_(NETMOX::_net.host_election_id, 0x2c, &requested_color, 1);
+
+        while (RACESEL::_color_flag[requested_color] == 0) {
+            int32_t unused_zero = 0;
+            (void)unused_zero;
+            RUSS::Mox_Update_();
+        }
+
+        return static_cast<int8_t>(
+            static_cast<uint8_t>(MOX::_player[MOX::_PLAYER_NUM].color) == requested_color
+        );
+    }
 }

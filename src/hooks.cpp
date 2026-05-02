@@ -3912,6 +3912,19 @@ namespace hooks {
         { 0x00402590, &COLSUM::Draw_Info_Pop_For_ },
         { 0x0052D3D0, &dos::Time_Stamp_ },
         { 0x004CA140, &MAINSCR::Load_Reply_To_Diplomacy_Request_Popup_ },
+        { 0x004C9B00, &MAINSCR::Add_Reply_To_Diplomacy_Request_Fields_ },
+        { 0x004C9E10, &MAINSCR::Draw_Reply_To_Diplomacy_Request_ },
+        { 0x00499900, &RACESEL::Naming_Popup_ },
+        { 0x004C3DE0, &NETSTART::Request_Banner_Color_ },
+        { 0x004995C0, &RACESEL::Draw_Flag_Screen_ },
+        { 0x004996C0, &RACESEL::Flag_Screen_ },
+        { 0x00439920, &raceopt::Convert_Player_To_Flags_ },
+        { 0x00439650, &raceopt::Add_Race_Options_Fields_ },
+        { 0x00438EF0, &RACESEL::Racial_Option_Screen_ },
+        { 0x004998B0, &RACESEL::Draw_Naming_Popup_ },
+        { 0x00499680, &RACESEL::Set_Flag_Screen_Help_ },
+        { 0x00498800, &RACESEL::Message_Build_ },
+        { 0x004982E0, &RACESEL::Draw_Race_Selection_Screen_ },
     };
 
     void Install_Hooks()

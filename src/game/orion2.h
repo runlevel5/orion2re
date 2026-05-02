@@ -3089,7 +3089,7 @@ struct s_player {
     char race_name[15];
     byte eliminated;
     char race;
-    char color;
+    uint8_t color;
     char personality;
     byte objectives;
     short home_planet_id;
