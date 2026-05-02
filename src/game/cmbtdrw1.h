@@ -100,15 +100,7 @@ namespace CMBTDRW1 {
 
     void __cdecl Combat_Draw_View_Ship_();
 
-    inline void __cdecl Remap_Draw_Ship_Status_(int32_t x, int32_t y, int16_t ship_data_id) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D4E80});
-        fn(x, y, ship_data_id);
-    }
+    void __cdecl Remap_Draw_Ship_Status_(int16_t x, int16_t y);
 
-    inline const char* __cdecl Crew_Quality_String_(int32_t crew_quality) {
-        using Fn = const char*(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D5C70});
-        return fn(crew_quality);
-    }
+    char* __cdecl Crew_Quality_String_(int16_t crew_quality);
 }

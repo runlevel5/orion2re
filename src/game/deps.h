@@ -215,3 +215,4 @@
 #include "colbomb.h"
 #include "aibomb.h"
 #include "flcqueue.h"
+#include "_global_combat_data.h"

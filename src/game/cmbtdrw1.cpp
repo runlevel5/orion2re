@@ -3226,7 +3226,7 @@ namespace CMBTDRW1 {
             text_colors.colors[6] = CMBTDRW1::_green[4];
             text_colors.colors[7] = CMBTDRW1::_green[4];
 
-            CMBTDRW1::Remap_Draw_Ship_Status_(view_x + 0x0A, view_y + 0x18, MOX::_ship_data_id);
+            CMBTDRW1::Remap_Draw_Ship_Status_(view_x + 0x0A, view_y + 0x18);
 
             if (MOX::_global_combat_data.player_idx < 8) {
                 if (MOX::_global_combat_data.officer_idx == -1) {
@@ -3749,6 +3749,119 @@ namespace CMBTDRW1 {
             buffer::Buffer_Reload_(s_combat_lbx_00551244, 5, MOX::_global_cache_seg);
 
         animate::Draw_(view_x - 0x09, view_y - 0x09, (s_animation_header*)MOX::_scan_ship_seg);
+    }
+
+    char* __cdecl Crew_Quality_String_(int16_t crew_quality) {
+        char format_text[80];
+
+        MOX::_temp_string[0] = '\0';
+
+        switch (crew_quality) {
+        case 0:
+            KEN::Ken_Get_Text_Message_(0x1f, format_text, 0x50);
+            _sprintf(MOX::_temp_string, format_text, 0);
+            return MOX::_temp_string;
+
+        case 1:
+            KEN::Ken_Get_Text_Message_(0x20, format_text, 0x50);
+            _sprintf(MOX::_temp_string, format_text, 100);
+            return MOX::_temp_string;
+
+        case 2:
+            KEN::Ken_Get_Text_Message_(0x21, format_text, 0x50);
+            _sprintf(MOX::_temp_string, format_text, 200);
+            return MOX::_temp_string;
+
+        case 3:
+            KEN::Ken_Get_Text_Message_(0x22, format_text, 0x50);
+            _sprintf(MOX::_temp_string, format_text, 300);
+            return MOX::_temp_string;
+
+        case 4:
+            KEN::Ken_Get_Text_Message_(0x23, format_text, 0x50);
+            _sprintf(MOX::_temp_string, format_text, 300);
+            break;
+
+        default:
+            break;
+        }
+
+        return MOX::_temp_string;
+    }
+
+    void __cdecl Remap_Draw_Ship_Status_(int16_t x, int16_t y) {
+        s_animation_header* ship_picture = KEN::Get_Ship_Id_Picture_Seg_(_global_combat_data::design_idx);
+
+        bitmap::Draw_Picture_To_Bitmap_(MOX::_draw_ship_bitmap, ship_picture);
+        bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);
+        bitmap::Add_Picture_To_Bitmap_(0x10, 0x0B, MOX::_draw_ship_bitmap, MOX::_combat_bitmap);
+
+        if (_global_combat_data::shield_type > 0) {
+            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
+            bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
+
+            switch (_global_combat_data::shield_type) {
+            case 1:
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[2]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[4]), 0);
+                break;
+
+            case 2:
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[1]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[2]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[3]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[5]), 0);
+                break;
+
+            case 3:
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[0]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[1]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[3]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[4]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[5]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[6]), 0);
+                break;
+
+            case 4:
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[0]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[1]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[2]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[3]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[4]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[5]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[6]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[7]), 0);
+                break;
+
+            case 5:
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[0]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[1]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[2]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[2]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[3]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[4]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[4]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[5]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[6]), 0);
+                bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, static_cast<uint16_t>(CMBTDRW1::_green[7]), 0);
+                break;
+
+            default:
+                break;
+            }
+
+            replace::Replace_Color_(MOX::_combat_bitmap, 1, 0);
+            replace::Replace_Color_(MOX::_combat_bitmap, 2, 0);
+        }
+
+        animate::Draw_(x, y, MOX::_combat_bitmap);
     }
 
 }

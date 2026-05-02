@@ -3870,6 +3870,9 @@ namespace hooks {
         { 0x004E3810, &SCORE::Player_Score_ },
         { 0x00504420, &MULTPLAY::Hotseat_Print_Player_Data_ },
         { 0x005043F0, &MULTPLAY::Hotseat_Get_N_Valid_Players_ },
+        { 0x004D4E80, &CMBTDRW1::Remap_Draw_Ship_Status_ },
+        { 0x004D5C70, &CMBTDRW1::Crew_Quality_String_ },
+        { 0x004FC9B0, &COLCALC::Sort_star_weights_ },
     };
 
     void Install_Hooks()

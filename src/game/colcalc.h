@@ -237,11 +237,7 @@ namespace COLCALC {
 
     bool __cdecl May_Surrender_Empire_(int16_t target_idx, int16_t player_idx);
 
-    inline int __cdecl Sort_star_weights_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004fc9b0});
-        return fn(a, b);
-    }
+    int32_t __cdecl Sort_star_weights_(const void* a, const void* b);
 
     short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode);
 

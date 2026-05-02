@@ -1449,9 +1449,7 @@ namespace AIMOVE {
             for (int i = 0; i < num_my_colony_ships; i++) {
                 RUSS::Shuffle_Char_(reinterpret_cast<int8_t*>(candidate_stars), num_candidates);
 
-                using QsortFn = int(__cdecl*)(const void*, const void*);
-                auto sort_fn = reinterpret_cast<QsortFn>(std::uintptr_t{ 0x00462BA0 });
-                ::_qsort(candidate_stars, num_candidates, 1, sort_fn);
+                _qsort(candidate_stars, num_candidates, 1, COLCALC::Sort_star_weights_);
 
                 if (num_candidates > 0) {
                     for (int j = 0; j < num_candidates; j++) {

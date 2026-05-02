@@ -3087,6 +3087,12 @@ namespace COLCALC {
         }
     }
 
+    int32_t __cdecl Sort_star_weights_(const void* a, const void* b) {
+        auto lhs = static_cast<const s_star_weight*>(a);
+        auto rhs = static_cast<const s_star_weight*>(b);
+        return static_cast<int32_t>(lhs->weight) - static_cast<int32_t>(rhs->weight);
+    }
+
     char* __cdecl Load_Colcalc_Strings_(char* strings) {
         char* cursor = strings;
 
