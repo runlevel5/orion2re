@@ -123,12 +123,6 @@ namespace MAINSCR {
 
     void __cdecl Update_Ship_Icons_In_Between_Turns_();
 
-    inline void __cdecl thunk_Clear_Main_Screen_Fields_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004C4B00});
-        fn();
-    }
-
     void __cdecl Draw_Wormhole_Links_();
 
     void __cdecl Draw_Paralax_();

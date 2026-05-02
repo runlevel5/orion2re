@@ -5,6 +5,7 @@ struct s_player;
 
 namespace raceopt {
     inline uint16_t& raceopt_flag_005a7ab6 = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7AB6});
+    inline uint16_t& DAT_005a7ab6 = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A7AB6});
     inline int16_t (&_trait_option_flags)[32] = *reinterpret_cast<int16_t(*)[32]>(std::uintptr_t{0x005A7AAC});
     inline int16_t& _negative_picks = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A78E0});
     inline int16_t& _exit_ken = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A78E2});
@@ -28,10 +29,7 @@ namespace raceopt {
 
     void __cdecl Convert_Player_To_Flags_(s_player* player);
 
-    inline void __cdecl Convert_Flags_To_Player_(s_player* player) {
-        using Fn = void(__cdecl*)(s_player*);
-        reinterpret_cast<Fn>(0x004399C0)(player);
-    }
+    void __cdecl Convert_Flags_To_Player_(s_player* player);
 
     void __cdecl Add_Race_Options_Fields_();
 
@@ -47,7 +45,7 @@ namespace raceopt {
 
     void __cdecl Reload_Racial_Option_Screen_();
 
-    void __cdecl Convert_Player_To_Flags_EM_(int8_t *player_data);
+    void __cdecl Convert_Player_To_Flags_EM_(int8_t *player_flags);
 
     void __cdecl Convert_Flags_To_Player_EM_(int8_t *flags_out);
 

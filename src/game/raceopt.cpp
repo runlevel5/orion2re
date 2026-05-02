@@ -732,36 +732,39 @@ namespace raceopt {
         fonts::Set_Font_Style_Shadow_Down_(4, &_color_opt);
     }
 
-    void __cdecl Convert_Player_To_Flags_EM_(int8_t* player_data) {
-        _button_variable[9] = player_data[0] / 2;
+    void __cdecl Convert_Player_To_Flags_EM_(int8_t* player_flags) {
+        int16_t insert_offset = 0;
 
-        for (int16_t i = 0; i < 9; i++) {
-            uint8_t val = player_data[i + 1];
-            
-            if (MOX::_special_bonus[i][0] == val) {
+        _button_variable[9] = static_cast<int16_t>(player_flags[0] / 2);
+
+        for (int16_t i = 0; i < 9; ++i) {
+            uint8_t bonus_value = static_cast<uint8_t>(player_flags[i + 1]);
+
+            if (_special_bonus[i][1] == bonus_value) {
                 _button_variable[i] = 1;
-            } else if (MOX::_special_bonus[i][1] == val) {
+            } else if (_special_bonus[i][2] == bonus_value) {
                 _button_variable[i] = 2;
             } else {
                 _button_variable[i] = 3;
-                if (MOX::_special_bonus[i][2] != val) {
+                if (_special_bonus[i + 1][0] != bonus_value) {
                     _button_variable[i] = 0;
                 }
             }
         }
 
-        int16_t offset = 0;
-        for (int16_t i = 10; i < 31; i++) {
-            raceopt::_option_toggle[i + offset - 10] = player_data[i];
-            
+        for (int16_t i = 10; i < 31; ++i) {
+            _option_toggle[i - 10 + insert_offset] =
+                    static_cast<int16_t>(player_flags[i]);
+
             if (i == 15) {
-                if (raceopt::_option_toggle[5] == -1) {
-                    raceopt::_option_toggle[5] = 0;
-                    raceopt::_option_toggle[6] = 1;
+                if (_option_toggle[5] == -1) {
+                    _option_toggle[5] = 0;
+                    _option_toggle[6] = 1;
                 } else {
-                    raceopt::_option_toggle[6] = 0;
+                    _option_toggle[6] = 0;
                 }
-                offset = 1;
+
+                insert_offset = 1;
             }
         }
     }
@@ -1238,6 +1241,43 @@ namespace raceopt {
 
             top = static_cast<int16_t>(top + 9);
             ++row_index;
+        }
+    }
+
+    void __cdecl Convert_Flags_To_Player_(s_player* player) {
+        int16_t skipped_button = 0;
+
+        player->traits[0] =
+            static_cast<int8_t>(static_cast<uint8_t>(_button_variable[9]) << 1);
+
+        for (int16_t trait_index = 1; trait_index < 10; ++trait_index) {
+            const int16_t selection = _button_variable[trait_index - 1];
+            if (selection == 0) {
+                player->traits[trait_index] = 0;
+            } else {
+                player->traits[trait_index] = static_cast<int8_t>(
+                    MOX::_special_bonus[trait_index - 1][selection - 1]);
+            }
+        }
+
+        int16_t button_index = 10;
+        while (button_index < 32) {
+            if (button_index == 15) {
+                if (_trait_option_flags[15] == 1) {
+                    skipped_button = 1;
+                    player->traits[15] = 1;
+                } else if (_trait_option_flags[16] == 1) {
+                    player->traits[15] = -1;
+                    skipped_button = 1;
+                } else {
+                    player->traits[15] = 0;
+                    skipped_button = 1;
+                }
+                button_index += 2;
+            } else {
+                player->traits[button_index - skipped_button] = _trait_option_flags[button_index];
+                ++button_index;
+            }
         }
     }
 

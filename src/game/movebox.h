@@ -5,6 +5,9 @@ namespace MOVEBOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline s_fleet_box& _fleet_box =
+        *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
+
     void __cdecl Clear_Moveable_Box_Fields_(int16_t box_index);
 
     int16_t __cdecl Moveable_Box_Selected_(int16_t index);
@@ -85,11 +88,12 @@ namespace MOVEBOX {
 
     void __cdecl Add_Whole_Window_Field_(int16_t moveable_box_index);
 
-    inline void __cdecl Moveable_Box_Dimensions_(int16_t moveable_box_index, int16_t* x, int16_t* y, int16_t* width, int16_t* height) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00513B00});
-        fn(moveable_box_index, x, y, width, height);
-    }
+    void __cdecl Moveable_Box_Dimensions_(
+        int16_t box_index,
+        int16_t* left,
+        int16_t* top,
+        int16_t* right,
+        int16_t* bottom);
 
     int16_t __cdecl N_Moveable_Boxes_Selected_(int16_t excluded_box_idx);
 

@@ -827,6 +827,25 @@ namespace MOVEBOX {
         EVANHELP::Set_Main_Screen_Help_List_();
     }
 
+    void __cdecl Moveable_Box_Dimensions_(
+        int16_t box_index,
+        int16_t* left,
+        int16_t* top,
+        int16_t* right,
+        int16_t* bottom) {
+        *left = MOVEBOX::_moveable_box[box_index].x;
+        *top = MOVEBOX::_moveable_box[box_index].y;
+
+        if (box_index == 2) {
+            *right = *left + MOVEBOX::_fleet_box.width;
+            *bottom = *top + MOVEBOX::_fleet_box.field8_0xe;
+            return;
+        }
+
+        *right = MOVEBOX::_moveable_box[box_index].width + *left;
+        *bottom = MOVEBOX::_moveable_box[box_index].height + *top;
+    }
+
     void __cdecl Add_Whole_Window_Field_(int16_t moveable_box_index) {
         int16_t height;
         int16_t width;

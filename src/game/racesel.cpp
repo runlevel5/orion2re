@@ -3,17 +3,19 @@
 
 namespace RACESEL {
 
-void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_flags) {
-    for (int16_t i = 0; i < 9; ++i) {
-        uint8_t flag = race_flags[i + 1];
-        if (MOX::_special_bonus[i][0] == flag) {
-            race_flags[i + 1] = 1;
-        } else if (MOX::_special_bonus[i][1] == flag) {
-            race_flags[i + 1] = 2;
-        } else if (MOX::_special_bonus[i][2] == flag) {
-            race_flags[i + 1] = 3;
+void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags) {
+    for (int16_t bonus_idx = 0; bonus_idx < 9; ++bonus_idx) {
+        const uint8_t bonus_value = custom_race_flags[bonus_idx + 1];
+
+        if (MOX::_special_bonus[bonus_idx][1] == bonus_value) {
+            custom_race_flags[bonus_idx + 1] = 1;
+        } else if (MOX::_special_bonus[bonus_idx][2] == bonus_value) {
+            custom_race_flags[bonus_idx + 1] = 2;
         } else {
-            race_flags[i + 1] = 0;
+            custom_race_flags[bonus_idx + 1] = 3;
+            if (MOX::_special_bonus[bonus_idx + 1][0] != bonus_value) {
+                custom_race_flags[bonus_idx + 1] = 0;
+            }
         }
     }
 }
@@ -248,7 +250,7 @@ short Race_Selection_Screen_(s_player* plr) {
                         if (screen_state == 2) {
                             for (int trait_idx = 1; trait_idx < 10; ++trait_idx) {
                                 if (plr->traits[trait_idx] != 0) {
-                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx] - 1];
+                                    plr->traits[trait_idx] = MOX::_special_bonus[trait_idx - 1][plr->traits[trait_idx]];
                                 }
                             }
                             done_flag = 1;
@@ -893,155 +895,132 @@ void __cdecl Set_Flag_Screen_Help_() {
     fields::Set_Help_List_(MOX::_help_entry_list, 1);
 }
 
-void __cdecl Draw_Race_Selection_Screen_() {
-    s_colors font_colors = {{0x78, 0x7C, 0x7C, 0x7C, 0x7C, 0x7C, 0x7C, 0x7C}};
-    char special_text[200];
-    char ken_text[100];
-    int16_t message_layout_state;
-    int16_t special_count;
-    char value_text[4];
+void __cdecl Draw_Race_Selection_Screen_(void) {
+    s_colors shadow_colors = {{0x78, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c}};
+    int16_t line_index = 0;
+    int16_t total_lines = 0;
+    char bonus_text[8];
+    char paragraph[200];
+    char text_message[100];
     s_animation_header* animation;
 
-    special_text[0] = '\0';
+    paragraph[0] = '\0';
 
     if (RACESEL::_custom_flag == 0) {
         animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0x21, MOX::_global_cache_seg);
-        animate::Draw_(0x16E, 0x34, animation);
+        animate::Draw_(0x16e, 0x34, animation);
     } else {
-        animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0x1D, MOX::_global_cache_seg);
-        animate::Draw_(0x16F, 0x30, animation);
+        animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0x1d, MOX::_global_cache_seg);
+        animate::Draw_(0x16f, 0x30, animation);
     }
 
-    {
-        const int32_t displayed_race_index = static_cast<int32_t>(RACESEL::_displayed_race);
+    if (RACESEL::_old_race != RACESEL::_displayed_race) {
+        RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_old_race)] = 0;
+        RACESEL::_race_button_status[static_cast<int32_t>(RACESEL::_displayed_race)] = 1;
 
-        if (RACESEL::_old_race != RACESEL::_displayed_race) {
-            const int32_t old_race_index = static_cast<int32_t>(RACESEL::_old_race);
-
-            RACESEL::_race_button_status[old_race_index] = 0;
-            RACESEL::_race_button_status[displayed_race_index] = 1;
-
-            if (RACESEL::_race_flag[displayed_race_index] == 0) {
-                animation = (s_animation_header*)buffer::Buffer_Reload_(
-                        s_RACESEL_LBX,
-                        displayed_race_index + 0x0F,
-                        MOX::_global_cache_seg);
-                animate::Draw_Palette_(animation);
-            }
+        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
+            animation = (s_animation_header*)buffer::Buffer_Reload_(
+                    s_RACESEL_LBX,
+                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
+                    MOX::_global_cache_seg);
+            animate::Draw_Palette_(animation);
+        }
+    } else {
+        if (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0) {
+            animation = (s_animation_header*)buffer::Buffer_Reload_(
+                    s_RACESEL_LBX,
+                    static_cast<int32_t>(RACESEL::_displayed_race) + 0x0f,
+                    MOX::_global_cache_seg);
+            animate::Draw_(0x36, 0x3f, animation);
         } else {
-            if (RACESEL::_race_flag[displayed_race_index] == 0) {
-                animation = (s_animation_header*)buffer::Buffer_Reload_(
-                        s_RACESEL_LBX,
-                        displayed_race_index + 0x0F,
-                        MOX::_global_cache_seg);
-                animate::Draw_(0x36, 0x3F, animation);
-            } else {
-                fonts::Set_Font_Style_Shadow_Down_(4, &font_colors);
-                KEN::Ken_Get_Text_Message_(0x48, ken_text, 100);
-                BILL::_Print_Paragraph_(0x3C, 0xAF, 0x118, ken_text, 2);
-            }
+            fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
+            KEN::Ken_Get_Text_Message_(0x48, text_message, 100);
+            BILL::_Print_Paragraph_(0x3c, 0xaf, 0x118, text_message, 2);
         }
     }
 
     RACESEL::_old_race = RACESEL::_displayed_race;
 
-    {
-        const int32_t displayed_race_index = static_cast<int32_t>(RACESEL::_displayed_race);
-        bool draw_specials = false;
+    if ((((RACESEL::_displayed_race == 13) && (RACESEL::_race_specials[13] != nullptr)) ||
+         ((RACESEL::_displayed_race != 13) &&
+          (RACESEL::_race_flag[static_cast<int32_t>(RACESEL::_displayed_race)] == 0))) &&
+        (((RACESEL::_custom_flag == 0) && (RACESEL::_displayed_race != 13)) ||
+         ((RACESEL::_custom_flag == 1) && (RACESEL::_displayed_race == 13)))) {
+        uint8_t* const race_specials = RACESEL::_race_specials[static_cast<int32_t>(RACESEL::_displayed_race)];
 
-        if (RACESEL::_displayed_race == 0x0D) {
-            if (RACESEL::_race_specials[13] != nullptr) {
-                if (RACESEL::_custom_flag == 1) {
-                    draw_specials = true;
-                }
-            }
-        } else {
-            if (RACESEL::_race_flag[displayed_race_index] == 0) {
-                if (RACESEL::_custom_flag == 0) {
-                    draw_specials = true;
-                }
+        line_index = 0;
+        total_lines = 0;
+
+        for (int16_t ability_id = 1; ability_id < 10; ++ability_id) {
+            if (race_specials[ability_id] != 0) {
+                ++total_lines;
             }
         }
 
-        if (draw_specials) {
-            uint8_t* const specials = RACESEL::_race_specials[displayed_race_index];
-
-            message_layout_state = 0;
-            special_count = 0;
-
-            for (int16_t ability_index = 1; ability_index < 10; ++ability_index) {
-                if (specials[ability_index] != 0) {
-                    ++special_count;
-                }
+        for (int16_t ability_id = 10; ability_id < 0x1f; ++ability_id) {
+            if (race_specials[ability_id] != 0) {
+                ++total_lines;
             }
+        }
 
-            for (int16_t ability_index = 10; ability_index < 31; ++ability_index) {
-                if (specials[ability_index] != 0) {
-                    ++special_count;
-                }
-            }
+        ++total_lines;
 
-            ++special_count;
+        for (int16_t ability_id = 1; ability_id < 10; ++ability_id) {
+            if (race_specials[ability_id] != 0) {
+                RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+                strcat(paragraph, MOX::_special_ability_names[ability_id]);
 
-            for (int16_t ability_index = 1; ability_index < 10; ++ability_index) {
-                if (specials[ability_index] != 0) {
-                    const int32_t special_level = static_cast<int8_t>(specials[ability_index]);
-                    const int32_t bonus_value =
-                            static_cast<int32_t>(MOX::_special_bonus_at_00559037[ability_index * 3 + special_level]);
+                const int32_t special_level = static_cast<int8_t>(race_specials[ability_id]);
+                const int8_t bonus =
+                        static_cast<int8_t>(MOX::_special_bonus[ability_id - 1][special_level]);
 
-                    RACESEL::Message_Build_(&message_layout_state, special_count, special_text);
-                    strcat(special_text, MOX::_special_ability_names[ability_index]);
-
-                    if (ability_index == 5) {
-                        if (bonus_value == 1) {
-                            strcpy(value_text, s_1_2_00557ff0);
-                        } else {
-                            strcpy(value_text, string::s_1);
-                        }
-                    } else if (ability_index == 2) {
-                        if (bonus_value == 1) {
-                            strcpy(value_text, s_1_2_00557ff0);
-                        } else {
-                            __itoa(bonus_value / 2, value_text, 10);
-                        }
+                if (ability_id == 5) {
+                    if (bonus == 1) {
+                        strcpy(bonus_text, s_1_2_00557ff0);
                     } else {
-                        __itoa(bonus_value, value_text, 10);
+                        strcpy(bonus_text, s_1_00556B10);
                     }
-
-                    if (bonus_value > 0) {
-                        strcat(special_text, s_plus_00551118);
+                } else if (ability_id == 2) {
+                    if (bonus == 1) {
+                        strcpy(bonus_text, s_1_2_00557ff0);
+                    } else {
+                        __itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
                     }
-
-                    strcat(special_text, value_text);
+                } else {
+                    __itoa(static_cast<int32_t>(bonus), bonus_text, 10);
                 }
-            }
 
-            for (int16_t ability_index = 10; ability_index < 31; ++ability_index) {
-                if (specials[ability_index] == 1) {
-                    RACESEL::Message_Build_(&message_layout_state, special_count, special_text);
-                    strcat(special_text, MOX::_special_ability_names[ability_index]);
+                if (bonus > 0) {
+                    strcat(paragraph, s_plus_00551118);
                 }
+
+                strcat(paragraph, bonus_text);
             }
+        }
 
-            RACESEL::Message_Build_(&message_layout_state, special_count, special_text);
-            strcat(
-                    special_text,
-                    MOX::_government_labels[static_cast<int32_t>(static_cast<int8_t>(specials[0]))]);
+        for (int16_t ability_id = 10; ability_id < 0x1f; ++ability_id) {
+            if (race_specials[ability_id] == 1) {
+                RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+                strcat(paragraph, MOX::_special_ability_names[ability_id]);
+            }
+        }
 
-            fonts::Set_Font_Style_Shadow_Down_(2, &font_colors);
+        RACESEL::Message_Build_(&line_index, total_lines, paragraph);
+        strcat(paragraph, MOX::_government_labels[static_cast<int8_t>(race_specials[0])]);
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &shadow_colors);
+        fonts::Set_Outline_Color_(0, 0);
+        BILL::_Print_Paragraph_(0x32, 0x187, 0x127, paragraph, 0);
+
+        if (RACESEL::_displayed_race == 13) {
+            fonts::Set_Font_Style_Shadow_Down_(4, &shadow_colors);
             fonts::Set_Outline_Color_(0, 0);
-            BILL::_Print_Paragraph_(0x32, 0x187, 0x127, special_text, 0);
-
-            if (RACESEL::_displayed_race == 0x0D) {
-                fonts::Set_Font_Style_Shadow_Down_(4, &font_colors);
-                fonts::Set_Outline_Color_(0, 0);
-                fonts::Print_Centered_(0xC5, 0x2A, RACESEL::_last_race_name);
-            }
+            fonts::Print_Centered_(0xc5, 0x2a, RACESEL::_last_race_name);
         }
     }
 
     animation = (s_animation_header*)buffer::Buffer_Reload_(s_RACESEL_LBX, 0, MOX::_global_cache_seg);
-    animate::Draw_(0x30, 0x3A, animation);
+    animate::Draw_(0x30, 0x3a, animation);
 }
 
 }

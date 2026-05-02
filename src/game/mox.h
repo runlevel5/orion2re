@@ -654,7 +654,8 @@ namespace MOX {
         *reinterpret_cast<char* (*)[20]>(std::uintptr_t{ 0x0059D660 });
     inline int8_t (&_class_to_num_satellites)[10][6] =
         *reinterpret_cast<int8_t (*)[10][6]>(std::uintptr_t{0x005594C8});
-    inline uint8_t (&_special_bonus)[9][3] = *reinterpret_cast<uint8_t (*)[9][3]>(std::uintptr_t{ 0x0055903B });
+    inline uint8_t (&_special_bonus)[10][3] =
+        *reinterpret_cast<uint8_t(*)[10][3]>(std::uintptr_t{0x0055903A});
     inline int8_t (&_special_bonus_at_00559037)[93] = *reinterpret_cast<int8_t (*)[93]>(std::uintptr_t{0x00559037});
     inline uint16_t (&_star_fields_dim)[6] = *reinterpret_cast<uint16_t(*)[6]>(std::uintptr_t{ 0x005A47B0 });
 

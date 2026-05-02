@@ -291,138 +291,166 @@ namespace INITGAME {
         random::Set_Random_Seed_(MOX::_settings.start_of_game_seed);
     }
 
-    void __cdecl Init_Players_() {
-        // Load race trait template data from RACESTUF.LBX
-        RACESEL::_race_specials[0] = (uint8_t*)farload::Far_Reload_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, 0, 1, 31);
-        RUSS::Mox_Update_();
+    void __cdecl Init_Players_(void) {
+      RACESEL::_race_specials[0] = static_cast<uint8_t*>(farload::Far_Reload_Data_(
+          s_RACESTUF_LBX,
+          7,
+          reinterpret_cast<void*>(static_cast<std::uintptr_t>(reinterpret_cast<std::uintptr_t>(MOX::_global_data_seg))),
+          0,
+          1,
+          31));
+      RUSS::Mox_Update_();
 
-        for (int i = 1; i < 13; ++i) {
-            RACESEL::_race_specials[i] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, (void*)MOX::_global_data_seg, i, 1, 31);
-            RUSS::Mox_Update_();
+      for (int16_t race_special_idx = 1; race_special_idx < 13; ++race_special_idx) {
+        RACESEL::_race_specials[race_special_idx] =
+            static_cast<uint8_t*>(farload::Far_Reload_Next_Data_(
+                s_RACESTUF_LBX,
+                7,
+                reinterpret_cast<void*>(static_cast<std::uintptr_t>(reinterpret_cast<std::uintptr_t>(MOX::_global_data_seg))),
+                race_special_idx,
+                1,
+                31));
+        RUSS::Mox_Update_();
+      }
+
+      RUSS::Mox_Update_();
+
+      for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+        s_player& player = MOX::_player[player_idx];
+
+        if (player.objectives == 100) {
+          struct_::Copy_Structure_(
+              player.evolutionary_upgrade_traits,
+              player.traits,
+              31);
+          continue;
         }
 
-        RUSS::Mox_Update_();
+        int16_t race_idx = 0;
+        while (true) {
+          bool unique_race = true;
+          race_idx = static_cast<int16_t>(random::Random_(13) - 1);
 
-        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            s_player* plr = &MOX::_player[i];
-
-            if (plr->objectives == 100) {
-                // Predefined or special player setup: copy traits to evolutionary upgrades
-                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &plr->traits, sizeof(plr->traits));
-            } else {
-                int16_t race_idx;
-                bool unique_race;
-                do {
-                    race_idx = (int16_t)random::Random_(13) - 1;
-                    unique_race = true;
-                    for (int16_t j = 0; j < i; ++j) {
-                        if (MOX::_player[j].race == (char)race_idx) {
-                            unique_race = false;
-                            break;
-                        }
-                    }
-                } while (!unique_race);
-
-                plr->race = (char)race_idx;
-
-                // Copy race name
-                char* src_name = MOX::_race_names[race_idx];
-                for (int k = 0; k < 15; ++k) {
-                    plr->race_name[k] = src_name[k];
-                    if (src_name[k] == '\0') break;
-                }
-
-                // Copy default traits from template
-                struct_::Copy_Structure_(&plr->traits, &RACESEL::_race_specials[race_idx], sizeof(plr->traits));
-                struct_::Copy_Structure_(&plr->evolutionary_upgrade_traits, &RACESEL::_race_specials[race_idx], sizeof(plr->evolutionary_upgrade_traits));
-
-                RUSS::Mox_Update_();
-                RACECUST::Race_Customization_(i);
-                RUSS::Mox_Update_();
-
-                // Apply special trait bonuses (lookup table)
-                for (int k = 1; k < TRAIT_COUNT; ++k) {
-                    if (plr->traits[k] != 0) {
-                        plr->traits[k] = MOX::_special_bonus[k - 1][plr->traits[k] - 1];
-                    }
-                    if (plr->evolutionary_upgrade_traits[k] != 0) {
-                        plr->evolutionary_upgrade_traits[k] = MOX::_special_bonus[k - 1][plr->evolutionary_upgrade_traits[k - 1]];
-                    }
-                }
-                RUSS::Mox_Update_();
-
-                // Assign unique player color
-                int16_t color = (int16_t)random::Random_(8) - 1;
-                bool duplicate_color;
-                do {
-                    duplicate_color = false;
-                    for (int16_t j = 0; j < i; ++j) {
-                        if (MOX::_player[j].color == (char)color) {
-                            duplicate_color = true;
-                            break;
-                        }
-                    }
-                    if (duplicate_color) {
-                        int val = color + 1;
-                        color = (val < 0 ? -val : val) % 8;
-                    }
-                } while (duplicate_color);
-
-                plr->color = (char)color;
-                RUSS::Mox_Update_();
-
-                // Load a random race name string as the player name
-                allocate::Push_Block_(MOX::_screen_seg);
-                char* name_ptr = (char*)farload::Far_Reload_Next_Data_(s_RACENAME_LBX, 0, MOX::_screen_seg, (random::Random_(8) + i * 8) - 1, 1, 20);
-                RUSS::Mox_Update_();
-                allocate::Pop_Block_(MOX::_screen_seg);
-
-                for (int k = 0; k < 20; ++k) {
-                    plr->name[k] = name_ptr[k];
-                    if (name_ptr[k] == '\0') break;
-                }
-            }
-        }
-
-        RUSS::Mox_Update_();
-        KEN::Init_NPC_Personalities_Objectives_Themes_();
-        RUSS::Mox_Update_();
-
-        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            s_player* plr = &MOX::_player[i];
-            plr->officer_for_hire = -1;
-            plr->offensive_stagepoint = -1;
-            plr->applied_evolutionary_upgrade = 1;
-            plr->player_done_flags = 0;
-            plr->bc = 50;
-
-            RUSS::Mox_Update_();
-            plr->cheated = 0;
-            plr->history_btns = 'O'; // Hex 0x4F
-            plr->ignoring = 0;
-            plr->n_freighters = 0;
-
-            for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
-                plr->last_tech_report_date[j] = MOX::_stardate;
+          for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
+            if (!unique_race) {
+              break;
             }
 
-            RUSS::Mox_Update_();
-            TECHINIT::Init_Player_Tech_(i);
-            RUSS::Mox_Update_();
-            INITSHIP::Init_Ship_Designs_(i);
-            
-            int16_t fuel_idx = INITSHIP::Best_Ship_Fuel_(i);
-            plr->ship_range = TECHDATA::_fuel[fuel_idx].ship_range;
+            if (static_cast<uint8_t>(MOX::_player[prev_player_idx].race) ==
+                static_cast<uint8_t>(race_idx)) {
+              unique_race = false;
+            }
+          }
+
+          if (unique_race) {
+            break;
+          }
         }
 
-        // Ensure current human player evolution flag is set
-        MOX::_player[MOX::_PLAYER_NUM].applied_evolutionary_upgrade = 1;
+        player.race = static_cast<char>(race_idx);
+        strcpy(player.race_name, MOX::_race_names[race_idx]);
+
+        struct_::Copy_Structure_(player.traits, RACESEL::_race_specials[race_idx], 31);
+        struct_::Copy_Structure_(player.evolutionary_upgrade_traits, RACESEL::_race_specials[race_idx], 31);
+        RUSS::Mox_Update_();
+
+        RACECUST::Race_Customization_(player_idx);
+        RUSS::Mox_Update_();
+
+        for (int16_t trait_idx = 1; trait_idx < 10; ++trait_idx) {
+          const int8_t trait_value = player.traits[trait_idx];
+          if (trait_value != 0) {
+            player.traits[trait_idx] =
+                static_cast<int8_t>(MOX::_special_bonus[trait_idx - 1][trait_value]);
+          } else {
+            player.traits[trait_idx] = 0;
+          }
+
+          const int8_t evo_trait_value = player.evolutionary_upgrade_traits[trait_idx];
+          if (evo_trait_value != 0) {
+            player.evolutionary_upgrade_traits[trait_idx] =
+                static_cast<int8_t>(MOX::_special_bonus[trait_idx - 1][evo_trait_value]);
+          } else {
+            player.evolutionary_upgrade_traits[trait_idx] = 0;
+          }
+        }
 
         RUSS::Mox_Update_();
-        HOMEGEN::Assign_Home_Star_Names_();
+
+        int16_t color_idx = static_cast<int16_t>(random::Random_(8) - 1);
+        while (true) {
+          bool duplicate_color = false;
+
+          for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
+            if (MOX::_player[prev_player_idx].color == static_cast<uint8_t>(color_idx)) {
+              duplicate_color = true;
+            }
+          }
+
+          if (!duplicate_color) {
+            break;
+          }
+
+          color_idx = static_cast<int16_t>((color_idx + 1) & 7);
+        }
+
+        player.color = static_cast<uint8_t>(color_idx);
         RUSS::Mox_Update_();
-        diplomac::Init_Diplomatic_Relations_();
+
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        char* player_name = static_cast<char*>(farload::Far_Reload_Next_Data_(
+            s_RACENAME_LBX,
+            0,
+            MOX::_screen_seg,
+            race_idx * 8 + random::Random_(8) - 1,
+            1,
+            20));
         RUSS::Mox_Update_();
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+
+        strcpy(player.name, player_name);
+      }
+
+      RUSS::Mox_Update_();
+      KEN::Init_NPC_Personalities_Objectives_Themes_();
+      RUSS::Mox_Update_();
+
+      for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+        s_player& player = MOX::_player[player_idx];
+
+        player.officer_for_hire = static_cast<char>(0xFF);
+        player.offensive_stagepoint = static_cast<char>(0xFF);
+        player.contact[player_idx] = 1;
+        player.player_done_flags = 0;
+        player.bc = 50;
+        RUSS::Mox_Update_();
+
+        player.spies[player_idx] = 0;
+        player.history_btns = 'O';
+        player.ignoring = 0;
+        player.n_freighters = 0;
+
+        for (int16_t other_player_idx = 0; other_player_idx < MOX::_NUM_PLAYERS; ++other_player_idx) {
+          player.last_tech_report_date[other_player_idx] = MOX::_stardate;
+        }
+
+        RUSS::Mox_Update_();
+        TECHINIT::Init_Player_Tech_(player_idx);
+        RUSS::Mox_Update_();
+        INITSHIP::Init_Ship_Designs_(player_idx);
+
+        const int16_t best_fuel_idx = INITSHIP::Best_Ship_Fuel_(player_idx);
+        player.ship_range = TECHDATA::_fuel_ship_range(best_fuel_idx);
+      }
+
+      MOX::_player[MOX::_PLAYER_NUM].contact[MOX::_PLAYER_NUM] = 1;
+      RUSS::Mox_Update_();
+      HOMEGEN::Assign_Home_Star_Names_();
+      RUSS::Mox_Update_();
+      diplomac::Init_Diplomatic_Relations_();
+      RUSS::Mox_Update_();
     }
 
     /**

@@ -59,4 +59,10 @@ namespace TECHDATA {
 
     inline s_tech_data_personal_shield (&_personal_shields)[6] =
         *reinterpret_cast<s_tech_data_personal_shield(*)[6]>(std::uintptr_t{0x0054F040});
+
+    inline uint16_t& _fuel_ship_range(int32_t fuel_idx) {
+      return *reinterpret_cast<uint16_t*>(
+          reinterpret_cast<uint8_t*>(std::uintptr_t{0x00555760}) +
+          fuel_idx * static_cast<int32_t>(sizeof(s_tech_fuel_data)));
+    }
 }

@@ -1341,7 +1341,7 @@ namespace INFO {
                 fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[active_idx]);
 
                 strcpy(race_name, MOX::_player[active_idx].race_name);
-                __strupr(race_name);
+                _strupr(race_name);
 
                 fonts::Print_Centered_To_Bitmap_(91, 0, race_name, acStack_e0[i]);
 

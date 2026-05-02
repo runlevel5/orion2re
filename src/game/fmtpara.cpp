@@ -1228,7 +1228,7 @@ namespace FMTPARA {
             *flag = false;
         }
 
-        *val = _atoi(_para_p->str);
+        *val = atoi(_para_p->str);
 
         // Advance current pointer past all characters that are legal in an argument
         while (strchr(_legal_fn_arg_chars, *_para_p->str) != nullptr) {

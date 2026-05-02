@@ -137,7 +137,7 @@ namespace WINNET {
             provider->major_version = major_version;
             provider->minor_version = minor_version;
 
-            __strlwr(provider->name);
+            _strlwr(provider->name);
 
             _provider_count++;
             return 1;

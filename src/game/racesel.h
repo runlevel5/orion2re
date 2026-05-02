@@ -28,10 +28,9 @@ namespace RACESEL {
     inline const char* s_empty_00551100 = reinterpret_cast<const char*>(0x00551100);
     inline const char* s_space_00551120 = reinterpret_cast<const char*>(0x00551120);
 
-    void __cdecl Convert_Custom_Race_Flags_(uint8_t* race_flags);
+    void __cdecl Convert_Custom_Race_Flags_(uint8_t* custom_race_flags);
 
     void __cdecl Reload_Race_Selection_Screen_();
-    void __cdecl Draw_Race_Selection_Screen_();
     int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx);
     int16_t __cdecl Flag_Screen_(uint8_t* color_ptr);
     int16_t __cdecl Racial_Option_Screen_(s_player* player);

@@ -213,7 +213,7 @@ namespace MOX2 {
 
                 // Convert value (offset 16 used in assembly, likely skipping a header)
                 // but the result is currently discarded in this implementation.
-                _atoi(line_buffer);
+                atoi(line_buffer);
             }
         }
 

@@ -1919,7 +1919,7 @@ namespace MAINSCR {
         bool has_selection = false;
 
         fields::Clear_Fields_();
-        MAINSCR::thunk_Clear_Main_Screen_Fields_();
+        MAINSCR::Clear_Main_Screen_Fields_();
         video::Set_Page_Off_();
         MAINSCR::Draw_Mini_Main_Screen_();
         video::Copy_Off_To_Back_();
@@ -1930,7 +1930,7 @@ namespace MAINSCR {
         MOX::_screen_data = screen_data;
 
         fields::Clear_Fields_();
-        MAINSCR::thunk_Clear_Main_Screen_Fields_();
+        MAINSCR::Clear_Main_Screen_Fields_();
         MAINSCR::Load_Reply_To_Diplomacy_Request_Popup_();
         MAINSCR::Add_Reply_To_Diplomacy_Request_Fields_(
                 &first_reply_field,

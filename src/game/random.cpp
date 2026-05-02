@@ -14,7 +14,7 @@ namespace random {
     }
 
     void __cdecl Randomize_() {
-        uint32_t current_time = _time(nullptr);
+        uint32_t current_time = (uint32_t)time(nullptr);
         Set_Random_Seed_(current_time);
     }
 

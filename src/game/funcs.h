@@ -192,49 +192,6 @@ inline void __cdecl _free(void* ptr) {
     fn(ptr);
 }
 
-inline char* __cdecl __strlwr(char* str) {
-    using Fn = char* (__cdecl*)(char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0054ecd0 });
-    return fn(str);
-}
-
-inline char* __cdecl __strupr(char* str) {
-    using Fn = char* (__cdecl*)(char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0054e910 });
-    return fn(str);
-}
-
-inline int __cdecl _atoi(const char* str) {
-    using Fn = int(__cdecl*)(const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005415a0 });
-    return fn(str);
-}
-
-struct file_info_1;
-inline intptr_t __cdecl __findfirst(LPCSTR pathname, file_info_1* file_info) {
-    using Fn = intptr_t(__cdecl*)(LPCSTR, file_info_1*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541C70});
-    return fn(pathname, file_info);
-}
-
-inline char* __cdecl _ctime(const time_t* time_value) {
-    using Fn = char*(__cdecl*)(const time_t*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542660});
-    return fn(time_value);
-}
-
-inline struct tm* __cdecl _localtime(const time_t* time_value) {
-    using Fn = struct tm*(__cdecl*)(const time_t*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541850});
-    return fn(time_value);
-}
-
-inline uint32_t __cdecl _time(uint32_t* timer) {
-    using Fn = uint32_t(__cdecl*)(uint32_t*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541a20});
-    return fn(timer);
-}
-
 inline int __cdecl hgetch_() {
     using Fn = int(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004AB400});
@@ -408,6 +365,8 @@ inline const char* s___005569ec = reinterpret_cast<const char*>(std::uintptr_t{0
 struct s_colors;
 inline s_colors& s__GEGGGGG_s___s__005569b8 = *reinterpret_cast<s_colors*>(std::uintptr_t{0x005569B8});
 inline uint8_t* g_trait_modifiers_table = reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0055903A });
+inline uint8_t (&_special_bonus)[10][3] =
+        *reinterpret_cast<uint8_t (*)[10][3]>(std::uintptr_t{0x0055903A});
 
 // Suggested name: s_Null_Pointer
 inline const char* const s__d_c_d_0055996c = reinterpret_cast<const char*>(0x0055996C); // "%d%c%d"
@@ -446,6 +405,7 @@ inline const char* s_no_description_00556920 = reinterpret_cast<const char*>(std
 inline const char* s_0_00551104 = reinterpret_cast<const char*>(0x00551104); // " 0"
 inline const char* s_2_00551108 = reinterpret_cast<const char*>(0x00551108); // " 2"
 inline const char* s_1_00551114 = reinterpret_cast<const char*>(0x00551114); // " 1"
+inline const char* const s_1_00556B10 = reinterpret_cast<const char*>(std::uintptr_t{0x00556B10}); // "1"
 
 inline const char* const s_e_0055ac48 = reinterpret_cast<const char*>(std::uintptr_t{0x0055AC48}); // "e"
 

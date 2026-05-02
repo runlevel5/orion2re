@@ -3927,6 +3927,11 @@ namespace hooks {
         { 0x004982E0, &RACESEL::Draw_Race_Selection_Screen_ },
         { 0x004CBD70, &MAINSCR::Save_Hotseat_Map_Info_ },
         { 0x0049B090, &HACCESS::Set_Hotseat_Fleet_Box_To_Last_Stack_ },
+        { 0x004399C0, &raceopt::Convert_Flags_To_Player_ },
+        { 0x0043A0F0, &raceopt::Convert_Player_To_Flags_EM_ },
+        { 0x00479000, &INITGAME::Init_Players_ },
+        { 0x00498160, &RACESEL::Convert_Custom_Race_Flags_ },
+        { 0x00513B00, &MOVEBOX::Moveable_Box_Dimensions_ },
     };
 
     void Install_Hooks()

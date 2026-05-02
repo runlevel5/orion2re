@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdint>
-#include <ctime>
 
 namespace dos {
     struct _diskfree_t {
@@ -19,8 +17,8 @@ namespace dos {
     inline struct tm*& _tmbuf =
             *reinterpret_cast<struct tm**>(std::uintptr_t{0x0057B5D0});
 
-    inline struct file_info_1& _fileinfo =
-            *reinterpret_cast<struct file_info_1*>(std::uintptr_t{0x0057B5D8});
+    inline struct _finddata_t& _fileinfo =
+            *reinterpret_cast<struct _finddata_t*>(std::uintptr_t{0x0057B5D8});
 
     inline time_t& _fileinfo_fi1_username_plus_2 =
             *reinterpret_cast<time_t*>(std::uintptr_t{0x0057B5E4});
@@ -28,12 +26,6 @@ namespace dos {
     // Suggested name: _fileinfo_name
     inline char& DAT_0057b5ec =
         *reinterpret_cast<char*>(std::uintptr_t{0x0057B5EC});
-
-    inline intptr_t __cdecl __findnext(intptr_t handle, void* data) {
-        using Fn = intptr_t(__cdecl*)(intptr_t, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541DC0});
-        return fn(handle, data);
-    }
 
     uint32_t __cdecl Disk_Free_(void);
 

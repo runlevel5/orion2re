@@ -218,7 +218,7 @@ namespace platform {
             copy_buffer[i] = input_str[i];
         }
 
-        __strlwr(copy_buffer);
+        _strlwr(copy_buffer);
 
         // Search for the tag "/ten" in the lowercased buffer
         char* match_ptr = strstr(copy_buffer, s_slash_ten);
@@ -231,7 +231,7 @@ namespace platform {
             char* target = match_ptr + needle_len;
             target[1] = '\0';
 
-            int parsed_val = _atoi(target);
+            int parsed_val = atoi(target);
             g_parsed_value = static_cast<uint8_t>(parsed_val);
         }
 

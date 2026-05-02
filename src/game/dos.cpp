@@ -13,9 +13,9 @@ namespace dos {
 
         if (pattern[0] == '\0') {
             // Note: search_handle is used uninitialized here in the original binary logic.
-            result = __findnext(search_handle, &_fileinfo);
+            result = _findnext(search_handle, &_fileinfo);
         } else {
-            result = __findfirst(pattern, &_fileinfo);
+            result = _findfirst(pattern, &_fileinfo);
         }
 
         // Check if findfirst or findnext failed (returns -1)
@@ -55,13 +55,13 @@ namespace dos {
     struct tm* __cdecl Time_Stamp_(LPCSTR pathname) {
         intptr_t search_handle;
 
-        search_handle = __findfirst(pathname, &_fileinfo);
+        search_handle = _findfirst(pathname, &_fileinfo);
         if (search_handle == -1) {
             return nullptr;
         }
 
-        _ctime(&_fileinfo_fi1_username_plus_2);
-        _tmbuf = _localtime(&_fileinfo_fi1_username_plus_2);
+        ctime(&_fileinfo_fi1_username_plus_2);
+        _tmbuf = localtime(&_fileinfo_fi1_username_plus_2);
         return _tmbuf;
     }
 }
