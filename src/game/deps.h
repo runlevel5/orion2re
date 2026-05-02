@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <io.h>
 #include <math.h>
+#include <direct.h>
 
 #include "patch.h"
 #include "hooks.h"

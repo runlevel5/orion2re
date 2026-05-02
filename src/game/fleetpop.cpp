@@ -1452,4 +1452,137 @@ void __cdecl Get_Absolute_Location_Scan_Info_(
     *info_type = 2;
 }
 
+uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
+    if (MOX::_fleet_box_ship_stack == -1) {
+        return 0;
+    }
+
+    int16_t current_node = MOX::_ship_stack_start[MOX::_fleet_box_ship_stack];
+    int16_t ship_idx = MOX::_ship_node[current_node].ship_idx;
+    int16_t ship_owner = HACCESS::Ship_Owner_(ship_idx);
+    uint8_t can_build_outpost = 0;
+
+    int16_t location = MOX::_ship[ship_idx].location;
+
+    bool valid_star_location = false;
+    if (location > -1 && location < 500) {
+        valid_star_location = true;
+    }
+
+    bool valid_offset_location = false;
+    if (location > 1000 && location < 1072) {
+        valid_offset_location = true;
+    }
+
+    if (valid_offset_location) {
+        location -= 1000;
+    }
+
+    if (MOX::_PLAYER_NUM != ship_owner) {
+        return can_build_outpost;
+    }
+
+    if (!valid_star_location && !valid_offset_location) {
+        return can_build_outpost;
+    }
+
+    if (MOX::_star[location].colonize_player != MOX::_PLAYER_NUM) {
+        return can_build_outpost;
+    }
+
+    int16_t processed_count = 0;
+    if (ship_count <= 0) {
+        return can_build_outpost;
+    }
+
+    while (processed_count < ship_count) {
+        if (can_build_outpost != 0) {
+            break;
+        }
+
+        if (current_node <= -1) {
+            break;
+        }
+
+        ship_idx = MOX::_ship_node[current_node].ship_idx;
+        if (MOX::_ship[ship_idx].d.ship_type == 4) {
+            for (int16_t planet_slot = 0; planet_slot < 5; ++planet_slot) {
+                if (FLEETPOP::Can_Build_Outpost_(MOX::_star[location].planet_index[planet_slot]) != 0) {
+                    can_build_outpost = 1;
+                    break;
+                }
+            }
+        }
+
+        current_node = MOX::_ship_node[current_node].next_node;
+        ++processed_count;
+    }
+
+    return can_build_outpost;
+}
+
+int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
+    if (MOX::_fleet_box_ship_stack == -1) {
+        return 0;
+    }
+
+    int16_t current_node_index = MOX::_ship_stack_start[MOX::_fleet_box_ship_stack];
+    int16_t ship_idx = MOX::_ship_node[current_node_index].ship_idx;
+    int16_t ship_owner = HACCESS::Ship_Owner_(ship_idx);
+    int8_t colonize_button_flag = 0;
+    bool found_colonizable_planet = false;
+
+    int16_t star_index = MOX::_ship[ship_idx].location;
+    const bool is_at_star = (star_index > -1) && (star_index < 500);
+    const bool is_in_transit_to_star = (star_index > 1000) && (star_index < 1072);
+
+    if (is_in_transit_to_star) {
+        star_index -= 1000;
+    }
+
+    if ((ship_owner == MOX::_PLAYER_NUM) &&
+        (is_at_star || is_in_transit_to_star) &&
+        (static_cast<int16_t>(MOX::_star[star_index].colonize_player) == MOX::_PLAYER_NUM) &&
+        (ship_count > 0)) {
+        int16_t processed_count = 0;
+
+        while (processed_count < ship_count) {
+            if (colonize_button_flag != 0) {
+                break;
+            }
+
+            if (current_node_index < 0) {
+                break;
+            }
+
+            ship_idx = MOX::_ship_node[current_node_index].ship_idx;
+            HACCESS::Ship_Owner_(ship_idx);
+
+            if (MOX::_ship[ship_idx].d.ship_type == 1) {
+                int16_t planet_slot = 0;
+
+                if (!found_colonizable_planet) {
+                    while (planet_slot < 5) {
+                        if (found_colonizable_planet) {
+                            break;
+                        }
+
+                        if (FLEETPOP::Planet_Is_Colonizable_(MOX::_star[star_index].planet_index[planet_slot]) != 0) {
+                            found_colonizable_planet = true;
+                            colonize_button_flag = 1;
+                        }
+
+                        ++planet_slot;
+                    }
+                }
+            }
+
+            current_node_index = MOX::_ship_node[current_node_index].next_node;
+            ++processed_count;
+        }
+    }
+
+    return colonize_button_flag;
+}
+
 }

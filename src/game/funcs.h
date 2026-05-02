@@ -253,12 +253,6 @@ inline const char* const s_STREAM_LBX_005558fc =
 inline const char* const s_STREAMHD_LBX_00555908 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00555908}); /* "STREAMHD.LBX" */
 
-inline int __cdecl _strncmp(const char* s1, const char* s2, size_t n) {
-    using Fn = int(__cdecl*)(const char*, const char*, size_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541C30});
-    return fn(s1, s2, n);
-}
-
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });

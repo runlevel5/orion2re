@@ -24,7 +24,7 @@ namespace SYS {
         if (MOX::_star_name_loaded_string != nullptr) {
             // Re-calculate length after potential truncation for the string compare
             size_t current_len = strlen(buffer);
-            if (_strncmp(buffer, MOX::_star_name_loaded_string, current_len) == 0) {
+            if (strncmp(buffer, MOX::_star_name_loaded_string, current_len) == 0) {
                 return false;
             }
         }

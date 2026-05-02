@@ -3956,6 +3956,8 @@ namespace hooks {
         { 0x00406270, &FLEETPOP::Set_Fleet_Box_Data_Dimensions_ },
         { 0x00405900, &FLEETPOP::Get_Absolute_Location_Scan_Info_ },
         { 0x00531AA0, &special::isqrt_ },
+        { 0x00405D70, &FLEETPOP::Set_Build_Outpost_Button_Flag_ },
+        { 0x00405F20, &FLEETPOP::Set_Colonize_Button_Flag_ },
     };
 
     void Install_Hooks()
