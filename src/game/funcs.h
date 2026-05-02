@@ -42,6 +42,8 @@ inline const char* s_Remap_draw_not_support_bitmaps_00557fc4 = reinterpret_cast<
 
 inline const char* s_SCIENCE_LBX_00557d68 = reinterpret_cast<const char*>(0x00557D68); // "SCIENCE.LBX"
 inline const char* s_SCIENCE_LBX_00551290 = reinterpret_cast<const char*>(std::uintptr_t{0x00551290}); /* "SCIENCE.LBX" */
+inline void* Fleet_Movement_Scroll_Callback =
+    reinterpret_cast<void*>(std::uintptr_t{0x00404080});
 inline const char* s_TANM__03hi_LBX_005512a0 = reinterpret_cast<const char*>(std::uintptr_t{0x005512A0}); /* "TANM%03hi.LBX" */
 inline const char* s_SR_R_x_SC_LBX_00557d74 = reinterpret_cast<const char*>(0x00557D74); // "SR_R%x_SC.LBX"
 inline char* const s_app_pics_lbx_00556028 = reinterpret_cast<char*>(0x00556028);
@@ -630,6 +632,19 @@ inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
 
 struct IDirectSound;
 struct s_smack_video;
+
+inline const char* s___s__String___d_Too_Long__check_t_0055A740 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A740}); // "(%s) String #%d Too Long, check terminator (strlen: %i)"
+inline const char* s_HISTRNGS_LBX_0055A778 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A778}); // "HISTRNGS.LBX"
+inline const char* s_HSSTRNGS_LBX_0055A788 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A788}); // "HSSTRNGS.LBX"
+inline const char* s_HFSTRNGS_LBX_0055A798 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A798}); // "HFSTRNGS.LBX"
+inline const char* s_HGSTRNGS_LBX_0055A7A8 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A7A8}); // "HGSTRNGS.LBX"
+inline const char* s_HESTRNGS_LBX_0055A7B8 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x0055A7B8}); // "HESTRNGS.LBX"
 
 inline void __stdcall SmackSoundUseDirectSound(IDirectSound* direct_sound) {
     using Fn = void(__stdcall*)(IDirectSound*);

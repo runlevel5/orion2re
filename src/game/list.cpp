@@ -66,8 +66,7 @@ namespace LIST {
                     }
 
                     if (state->draw_app_cb != nullptr) {
-                        using DrawAppFn = void(__cdecl*)(int16_t, int16_t, uint8_t);
-                        auto draw_fn = reinterpret_cast<DrawAppFn>(state->draw_app_cb);
+                        auto draw_fn = reinterpret_cast<draw_app_fn>(state->draw_app_cb);
                         draw_fn(item->app_base_x, item->app_y_offsets[i] + item->y, item->tech_app_ids[i]);
                     }
                 }
@@ -268,8 +267,7 @@ namespace LIST {
         if (state->draw_app_cb != nullptr) {
             fonts::Set_Font_Style_(state->item_font, state->active_color);
 
-            using DrawAppFn = void(__cdecl*)(int16_t, int16_t, uint8_t);
-            auto draw_cb = reinterpret_cast<DrawAppFn>(state->draw_app_cb);
+            auto draw_cb = reinterpret_cast<draw_app_fn>(state->draw_app_cb);
 
             int16_t current_app_y = item->app_y_offsets[item->current_app_index] + item->y;
             draw_cb(item->app_base_x, current_app_y, item->tech_app_ids[item->current_app_index]);
@@ -344,8 +342,7 @@ namespace LIST {
             if (list_state->draw_app_cb != nullptr) {
                 fonts::Set_Font_Style_(list_state->item_font, list_state->active_color);
 
-                using DrawAppCb = void(__cdecl*)(int16_t, int16_t, uint8_t);
-                auto draw_cb = reinterpret_cast<DrawAppCb>(list_state->draw_app_cb);
+                auto draw_cb = reinterpret_cast<draw_app_fn>(list_state->draw_app_cb);
 
                 uint8_t app_idx = item->current_app_index;
                 draw_cb(item->app_base_x,

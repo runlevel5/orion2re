@@ -46,6 +46,12 @@ namespace EVANHELP {
 
     void __cdecl Set_Save_Game_Screen_Help_List_();
 
+    inline void __cdecl Set_Diplomacy_Request_Help_List_(int32_t x, int32_t y) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041E410});
+        fn(x, y);
+    }
+
     void __cdecl Set_PlntSum_Screen_Help_List_();
 
     void __cdecl Set_ColOff_Screen_Help_List_(int16_t* skills);

@@ -23,11 +23,7 @@ namespace maintain {
 
     void __cdecl Kill_Research_Buildings_(s_player* player);
 
-    inline int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx) {
-        using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004b4ba0});
-        return fn(colony, building_idx);
-    }
+    int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx);
 
     void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(int16_t));
 

@@ -1364,6 +1364,22 @@ namespace HAROLD {
         line::Multi_Colored_Line_(x1 + 2, y1 + 2, x1 + 2, y2 - 2, &rev_colors, color_offset);
     }
 
+    void __cdecl Set_Language_Race_Names_() {
+        for (int16_t player_index = 0; player_index < MOX::_NUM_PLAYERS; ++player_index) {
+            s_player* const player = &MOX::_player[player_index];
+
+            if (player->objectives != 100) {
+                const int16_t race_index =
+                        static_cast<int16_t>(static_cast<uint8_t>(player->race));
+
+                if ((race_index > -1) && (race_index < 20)) {
+                    const char* const race_name = MOX::_race_names[race_index];
+                    memcpy(player->race_name, race_name, strlen(race_name) + 1);
+                }
+            }
+        }
+    }
+
     void __cdecl Write_Language_Setting_File_() {
         char language_text[80];
         FILE* file = _wfopen(MOX2::s_language_ini, MOX2::s_language_ini_write_mode);
@@ -1372,6 +1388,92 @@ namespace HAROLD {
             __itoa((uint32_t)(uint8_t)MOX::_settings.language, language_text, 10);
             fputs(language_text, file);
             _fclose(file);
+        }
+    }
+
+    void __cdecl Load_H_Strings_() {
+        int16_t string_index = 0;
+        int16_t scan_offset = 0;
+        int16_t next_string_offset = 0;
+        int32_t max_length = 0;
+        uint32_t resource_id = 0;
+        char strings_file[13];
+        char error_message[200];
+
+        if (static_cast<uint8_t>(MOX::_settings.language) >= 6) {
+            MOX::_settings.language = 0;
+        }
+
+        switch (MOX::_settings.language) {
+        case 1:
+            _memcpy(strings_file, s_HGSTRNGS_LBX_0055A7A8, sizeof(strings_file));
+            max_length = 0x1A0;
+            resource_id = 0x3D01;
+            break;
+
+        case 2:
+            _memcpy(strings_file, s_HFSTRNGS_LBX_0055A798, sizeof(strings_file));
+            max_length = 0x118;
+            resource_id = 0x408D;
+            break;
+
+        case 3:
+            _memcpy(strings_file, s_HSSTRNGS_LBX_0055A788, sizeof(strings_file));
+            max_length = 0x1A1;
+            resource_id = 0x3CE8;
+            break;
+
+        case 4:
+            _memcpy(strings_file, s_HISTRNGS_LBX_0055A778, sizeof(strings_file));
+            max_length = 0x172;
+            resource_id = 0x36CF;
+            break;
+
+        default:
+            _memcpy(strings_file, s_HESTRNGS_LBX_0055A7B8, sizeof(strings_file));
+            max_length = 0x181;
+            resource_id = 0x34D1;
+            break;
+        }
+
+        memset(MOX::_h_strings, 0, sizeof(MOX::_h_strings));
+        farload::Farload_Data_Static_(strings_file, 0, MOX::_h_strings, 0, 1, (int32_t)resource_id);
+
+        for (;;) {
+            int32_t string_length = 0;
+
+            if (static_cast<int32_t>(scan_offset) < 0x4074 &&
+                MOX::_h_strings[static_cast<int32_t>(scan_offset)] != '\0') {
+                while (static_cast<int32_t>(scan_offset) < 0x4074 &&
+                       MOX::_h_strings[static_cast<int32_t>(scan_offset)] != '\0') {
+                    ++scan_offset;
+                    ++string_length;
+                }
+            }
+
+            if (static_cast<int32_t>(scan_offset) + 1 > 0x4074) {
+                return;
+            }
+
+            if (string_length > max_length) {
+                _sprintf(
+                    error_message,
+                    s___s__String___d_Too_Long__check_t_0055A740,
+                    strings_file,
+                    static_cast<int32_t>(string_index),
+                    string_length
+                );
+                exitm::Exit_With_Message(error_message);
+            }
+
+            ++scan_offset;
+            MOX::_h_string_ix[static_cast<int32_t>(string_index)] = next_string_offset;
+            ++string_index;
+            next_string_offset = scan_offset;
+
+            if (string_index == 397) {
+                return;
+            }
         }
     }
 }

@@ -77,7 +77,7 @@ namespace COMBINIT {
     void __cdecl Apply_Bio_Weapon_Penalty_(int16_t player_idx, int16_t param_2, int16_t param_3);
 
     inline uint8_t& _real_attack_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8BBC});
-    int __cdecl qsort_ship_array_by_size_(const int16_t* param_1, const int16_t* param_2);
+    int __cdecl qsort_ship_array_by_size_(const void* param_1, const void* param_2);
 
     void __cdecl Ship_Center_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);
 }

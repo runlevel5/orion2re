@@ -143,6 +143,10 @@ namespace fields {
         mouse::Mouse_Buffer2_();
     }
 
+    void __cdecl Disable_Mouse_Pressed_Field_Update_() {
+        _dynamic_field_refresh = 0;
+    }
+
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str) {
         if (_fields_count >= _max_fields_count) {
             char error_msg[80];
@@ -2007,6 +2011,14 @@ namespace fields {
 
             mouse::Restore_Mouse_State_();
         }
+    }
+
+    uint16_t __cdecl Pressed_Mouse_X_() {
+        return _pressed_mouse_x_value;
+    }
+
+    uint16_t __cdecl Pressed_Mouse_Y_() {
+        return _pressed_mouse_y_value;
     }
 
     void __cdecl Copy_Continuous_String_() {

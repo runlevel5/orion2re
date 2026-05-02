@@ -134,12 +134,7 @@ namespace platform {
 	void Blit_To_Back_Buffer();
 	void Draw_Cursor_XY(int16_t x, int16_t y);
 	void Force_Cursor_Pos(int16_t x, int16_t y);
-	void Create_Cursor_Surfaces();
-	inline void __cdecl Create_Cursor_Surface() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005273C0 });
-		fn();
-	}
+	void __cdecl Create_Cursor_Surface();
 	HRESULT Restore_Surfaces();
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -161,15 +156,6 @@ namespace platform {
 
 	inline uint32_t*& _alt_offscreen_surface = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x00579324 });
 
-	inline int32_t __cdecl Lock_Alt_Offscreen_Surface_() {
-		using Fn = int32_t(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528520 });
-		return fn();
-	}
-
-	inline void __cdecl Unlock_Alt_Offscreen_Surface_() {
-		using Fn = void(__cdecl*)();
-		auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00528660 });
-		fn();
-	}
+	int32_t __cdecl Lock_Alt_Offscreen_Surface_();
+	void __cdecl Unlock_Alt_Offscreen_Surface_();
 }

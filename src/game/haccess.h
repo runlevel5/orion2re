@@ -88,6 +88,11 @@ namespace HACCESS {
 
     int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx);
 
+    inline void __cdecl Build_Saved_Ship_Array_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x0049A360)();
+    }
+
     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship = nullptr);
 
     int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords);
@@ -108,9 +113,5 @@ namespace HACCESS {
 
     int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx);
 
-    inline void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int32_t player_idx) {
-        using Fn = void(__cdecl*)(int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x0049B090 });
-        fn(player_idx);
-    }
+    void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int16_t player_idx);
 }

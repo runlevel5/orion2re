@@ -3,6 +3,8 @@
 struct s_animation_header;
 
 namespace FMTPARA {
+    using user_fn = void(__cdecl*)(s_fmtpara_para*, uint32_t, int32_t);
+
     inline char* const _legal_functions = reinterpret_cast<char*>(0x00556288);
     inline char* const _legal_fn_arg_chars = reinterpret_cast<char*>(0x00556298);
     inline uint8_t* _font_base_offsets = reinterpret_cast<uint8_t*>(std::uintptr_t{0x005562C8});

@@ -915,4 +915,21 @@ void __cdecl Compute_Colony_Ground_Combat_Info_(s_colony* colony, s_invasion_sid
     Compute_Ground_Combat_Info_(side_info, &side_info->combat_modifiers, nullptr);
 }
 
+int32_t __cdecl Colony_Tank_Limit_(s_colony* colony) {
+    int32_t tank_limit =
+        static_cast<int32_t>(MOX::_planet_max_population[MOX::_planet[colony->planet].size]);
+
+    if (MOX::_player[colony->owner].traits[TRAIT_WARLORD] == 0) {
+        tank_limit /= 4;
+    } else {
+        tank_limit /= 2;
+    }
+
+    if (tank_limit == 0) {
+        tank_limit = 1;
+    }
+
+    return tank_limit;
+}
+
 }

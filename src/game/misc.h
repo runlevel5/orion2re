@@ -85,8 +85,12 @@ namespace MISC {
 
     int16_t __cdecl Substring_(char* haystack, char* needle);
 
-    inline void __cdecl Get_Time_Stamp_(const char* file_path, int16_t* month, int16_t* day, int16_t* year, int16_t* hour, int16_t* minute, int16_t* second) {
-        using Fn = void(__cdecl*)(const char*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*, int16_t*);
-        reinterpret_cast<Fn>(std::uintptr_t{0x0049E9B0})(file_path, month, day, year, hour, minute, second);
-    }
+    void __cdecl Get_Time_Stamp_(
+        const char* input,
+        int16_t* out_month,
+        int16_t* out_day,
+        int16_t* out_year,
+        int16_t* out_hour,
+        int16_t* out_minute,
+        int16_t* out_second);
 }

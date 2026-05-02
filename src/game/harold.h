@@ -67,10 +67,7 @@ namespace HAROLD {
 
     void __cdecl Load_Language_Fonts_();
 
-    inline void __cdecl Set_Language_Race_Names_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(std::uintptr_t{ 0x004F2850 })();
-    }
+    void __cdecl Set_Language_Race_Names_();
 
     uint8_t* __cdecl Harold_Init_();
 
@@ -106,11 +103,7 @@ namespace HAROLD {
 
     void __cdecl Load_Leader_Titles();
 
-    inline void Load_H_Strings_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f2210});
-        fn();
-    }
+    void __cdecl Load_H_Strings_();
 
     int16_t __cdecl User_Box_(uint8_t* refresh_flag, char* message, int16_t type);
 

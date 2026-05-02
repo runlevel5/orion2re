@@ -946,21 +946,30 @@ namespace platform {
         SetCursorPos(x, y);
     }
 
-    void Create_Cursor_Surfaces()
-    {
-        DDSURFACEDESC	desc2;
-        memset(&desc2, 0, sizeof(desc2));
-        desc2.dwSize = sizeof(desc2);
-        desc2.dwWidth = 24;
-        desc2.dwHeight = 24;
-        desc2.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        desc2.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
-        desc2.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-        desc2.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8 | DDPF_RGB;
-        desc2.ddpfPixelFormat.dwRGBBitCount = 8;
+    void __cdecl Create_Cursor_Surface() {
+        DDSURFACEDESC surface_desc;
 
-        g_direct_draw->CreateSurface(&desc2, &platform::g_cursor_surface_1, NULL);
-        g_direct_draw->CreateSurface(&desc2, &g_cursor_surface_2, NULL);
+        memset(&surface_desc, 0, 0x6c);
+        surface_desc.dwWidth = 0x18;
+        surface_desc.dwHeight = 0x18;
+        surface_desc.dwSize = 0x6c;
+        surface_desc.dwFlags = 7;
+        surface_desc.ddsCaps.dwCaps = 0x840;
+        platform::g_direct_draw->CreateSurface(
+            &surface_desc,
+            &platform::g_cursor_surface_1,
+            nullptr);
+
+        memset(&surface_desc, 0, 0x6c);
+        surface_desc.dwWidth = 0x18;
+        surface_desc.dwHeight = 0x18;
+        surface_desc.dwSize = 0x6c;
+        surface_desc.dwFlags = 7;
+        surface_desc.ddsCaps.dwCaps = 0x840;
+        platform::g_direct_draw->CreateSurface(
+            &surface_desc,
+            &platform::g_cursor_surface_2,
+            nullptr);
     }
 
     void Draw_Auto_Cursor()
@@ -1267,5 +1276,38 @@ namespace platform {
 
     void __cdecl Copy_Dwords_(uint32_t* destination, const uint32_t* source, uint32_t dword_count) {
         memcpy(destination, source, dword_count * sizeof(uint32_t));
+    }
+
+    int32_t __cdecl Lock_Alt_Offscreen_Surface_() {
+        platform::DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
+        platform::DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+
+        platform::g_offscreen_surface_1->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
+
+        HRESULT lock_result = platform::g_offscreen_surface_1->Lock(
+            nullptr,
+            &platform::DDSURFACEDESC_00578e70,
+            0,
+            nullptr);
+
+        if (lock_result == DD_OK) {
+            platform::_alt_offscreen_surface = (uint32_t*)platform::_current_locked_page;
+            return platform::_surface_lock_flag;
+        }
+
+        if (lock_result == E_INVALIDARG ||
+            lock_result == E_OUTOFMEMORY ||
+            lock_result == DDERR_SURFACELOST ||
+            lock_result == DDERR_SURFACEBUSY ||
+            lock_result == DDERR_CANTLOCKSURFACE ||
+            lock_result == DDERR_WASSTILLDRAWING) {
+            return (int32_t)lock_result;
+        }
+
+        return 0;
+    }
+
+    void __cdecl Unlock_Alt_Offscreen_Surface_() {
+        platform::g_offscreen_surface_1->Unlock(nullptr);
     }
 }

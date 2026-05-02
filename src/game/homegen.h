@@ -42,10 +42,7 @@ namespace HOMEGEN {
     };
     #pragma pack(pop)
 
-    inline int __cdecl qsort_1_(const void* a, const void* b) {
-        using Fn = int(__cdecl*)(const void*, const void*);
-        return reinterpret_cast<Fn>(std::uintptr_t{0x0051C3E0})(a, b);
-    }
+    int __cdecl qsort_1_(const s_orion_candidate* candidate_a, const s_orion_candidate* candidate_b);
 
     uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist);
 

@@ -371,4 +371,95 @@ namespace MOX2 {
         }
     }
 
+    void __cdecl Set_Mox_Alt_Path_() {
+        char alternate_path[61];
+        char error_message[100];
+        char diplomat_path[80];
+        FILE* config_file;
+        int16_t path_length;
+        const char* error_text = nullptr;
+
+        if (!dos::DIR_(s_orioncd_ini_00557bec, alternate_path)) {
+            if (MOX::_settings_language == 0) {
+                error_text = s_ORIONCD_INI_not_found_005579e4;
+            }
+            else if (MOX::_settings_language == 1) {
+                error_text = s_ORIONCD_INI_nicht_gefunden_005579a4;
+            }
+            else if (MOX::_settings_language == 2) {
+                error_text = s_ORIONCD_INI_introuvable_0055796c;
+            }
+            else if (MOX::_settings_language == 3) {
+                error_text = s_ORIONCD_INI_no_se_ha_encontrado_0055792c;
+            }
+            else if (MOX::_settings_language == 4) {
+                error_text = s_Non_trovo_il_file_ORIONCD_INI_005578ec;
+            }
+
+            if (error_text != nullptr) {
+                _sprintf(error_message, error_text);
+            }
+
+            exitm::Exit_With_Message(error_message);
+            return;
+        }
+
+        config_file = _wfopen(s_orioncd_ini_00557bec, s_rt);
+        _fgets(alternate_path, 0x3c, config_file);
+        _fclose(config_file);
+
+        alternate_path[60] = '\0';
+        path_length = static_cast<int16_t>(strlen(alternate_path));
+
+        if (alternate_path[path_length - 1] == '\r') {
+            --path_length;
+            alternate_path[path_length] = '\0';
+        }
+
+        if (alternate_path[path_length - 1] == '\n') {
+            --path_length;
+            alternate_path[path_length] = '\0';
+        }
+
+        farload::Set_Alternate_Path_(alternate_path);
+
+        if (alternate_path[path_length - 1] != '\\') {
+            strcat(alternate_path, s_backslash_00557be4);
+        }
+
+        _sprintf(diplomat_path, s__sdiplomat_lbx_00557bd4, alternate_path);
+
+        if (dos::DIR_(s_diplomat_lbx_00557bc4, alternate_path)) {
+            return;
+        }
+
+        if (dos::DIR_(diplomat_path, alternate_path)) {
+            return;
+        }
+
+        error_text = nullptr;
+
+        if (MOX::_settings_language == 0) {
+            error_text = s_Cannot_locate_all_game_files_00557b84;
+        }
+        else if (MOX::_settings_language == 1) {
+            error_text = s_Nicht_alle_Spieldateien_auffindb_00557b34;
+        }
+        else if (MOX::_settings_language == 2) {
+            error_text = s_Echec_de_la_localisation_de_tous_00557ad4;
+        }
+        else if (MOX::_settings_language == 3) {
+            error_text = s_No_se_puede_localizar_todos_los_f_00557a70;
+        }
+        else if (MOX::_settings_language == 4) {
+            error_text = s_Non_riesco_a_trovare_qualche_fil_00557a18;
+        }
+
+        if (error_text != nullptr) {
+            _sprintf(error_message, error_text);
+        }
+
+        exitm::Exit_With_Message(error_message);
+    }
+
 } // namespace MOX2

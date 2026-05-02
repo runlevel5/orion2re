@@ -562,4 +562,254 @@ namespace MSG_ {
 
         return 0;
     }
+
+    char* __cdecl Load_Msg_Strings_(char* native_msg) {
+        auto next_string = [](char* s) -> char* {
+            return s + strlen(s) + 1;
+        };
+
+        char* cursor = native_msg;
+
+        _native_msg = cursor;
+        cursor = next_string(cursor);
+
+        _s_and_s_declare_alliance_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _s_and_s_declare_war_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_financial_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_ship_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_scrap_ship_bc_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_scrap_ship_hyperspace_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_or_outpost[0] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_or_outpost[1] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_colony_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_colony_leader_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_scrap_building_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_building_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_ship_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_refit_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_spy_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_android_farmer_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_android_worker_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_android_scientist_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_freighter_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_next_queue_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_built_auto_build_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_genocide_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_assimilation_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_starvation_food_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_starvation_ind_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_starvation_both_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_1_settler_arrived_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_d_settlers_arrived_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_settlers_arrived_blockaded_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_1_settler_arrived_over_limit_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_d_settlers_arrived_over_limit_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_plague_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_boom_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_comet_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_your_rebellion_won_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_your_rebellion_lost_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_1_rebel_won_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_d_rebels_won_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_1_rebel_lost_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_d_rebels_lost_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_no_room_for_android_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_colony_android_killed_organic_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_hyperspace_flux_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_hyperspace_beast_hungry_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_hyperspace_beast_ate_your_ship_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_hyperspace_beast_ate_other_ship_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_attacking_spy_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_defending_spy_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_lost_defending_spies_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_artemis_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_artemis_leader_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_1_ship_killed_retreating_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_d_ships_killed_retreating_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_defensive_spy_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_offensive_spy_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_spy_assassinated_victim_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_spy_assassinated_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_anomaly_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_diplomacy_strings[0] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_diplomacy_strings[1] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_diplomacy_strings[2] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_diplomacy_strings[3] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_diplomacy_strings[4] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_eel_spawned_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_eel_vanished_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_artifacts_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_april1_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _msg_scrap_leader_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _failed_retreat_reason_strings[0] = cursor;
+        cursor = next_string(cursor);
+
+        _failed_retreat_reason_strings[1] = cursor;
+        cursor = next_string(cursor);
+
+        _failed_retreat_reason_strings[2] = cursor;
+        cursor = next_string(cursor);
+
+        _msg_failed_retreat_leader_fmt = cursor;
+        cursor = next_string(cursor);
+
+        _leader_fate_strings[0] = cursor;
+        cursor = next_string(cursor);
+
+        _leader_fate_strings[1] = cursor;
+        cursor = next_string(cursor);
+
+        _leader_fate_strings[2] = cursor;
+        cursor = next_string(cursor);
+
+        _lost_colony_reason_strings[0] = cursor;
+        cursor = next_string(cursor);
+
+        _lost_colony_reason_strings[1] = cursor;
+        cursor = next_string(cursor);
+
+        _lost_colony_reason_strings[2] = cursor;
+        cursor = next_string(cursor);
+
+        _lost_colony_reason_strings[3] = cursor;
+        cursor = next_string(cursor);
+
+        return cursor;
+    }
 }

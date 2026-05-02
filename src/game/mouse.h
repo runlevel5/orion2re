@@ -24,11 +24,16 @@ namespace mouse {
 
     void __cdecl Check_Mouse_Shape_();
 
-    inline void __cdecl User_Mouse_Handler_(int16_t x, int16_t y, uint16_t buttons) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, uint16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00526DD0 });
-        fn(x, y, buttons);
+    inline void __cdecl Check_Mouse_Buffer_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005275C0 });
+        fn();
     }
+
+    void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons);
+
+    inline int32_t& _in_mouse_handler =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B19C });
 
     inline int16_t& _mouse_overide_flag =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B180 });

@@ -13,11 +13,7 @@ namespace MSG_ {
 
     int16_t __cdecl First_Msg_For_Player_(int16_t player_idx);
 
-    inline char* __cdecl Load_Msg_Strings_(char* data) {
-        using Fn = char*(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00472040});
-        return fn(data);
-    }
+    char* __cdecl Load_Msg_Strings_(char* native_msg);
 
     void __cdecl Add_Ongoing_Event_Msgs_();
 
@@ -66,6 +62,7 @@ namespace MSG_ {
     inline char*& _msg_colony_settlers_arrived_blockaded_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F94});
     inline char*& _msg_colony_comet_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F98});
     inline char*& _msg_colony_d_settlers_arrived_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565F9C});
+    inline char*& _msg_colony_starvation_ind_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FA0});
     inline char*& _msg_d_ships_killed_retreating_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FA4});
     inline char*& _msg_failed_retreat_leader_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FA8});
     inline char** _msg_colony_or_outpost = reinterpret_cast<char**>(std::uintptr_t{0x00565FB0});
@@ -86,7 +83,6 @@ namespace MSG_ {
     inline char*& _msg_colony_plague_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FF8});
     inline char*& _msg_anomaly_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00565FFC});
     inline char** _msg_diplomacy_strings = reinterpret_cast<char**>(std::uintptr_t{0x00566000});
-    inline char*& _msg_colony_starvation_ind_fmt = *reinterpret_cast<char**>(std::uintptr_t{ 0x00565fa0 });
     inline char*& _msg_colony_starvation_both_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00566014});
     inline char*& _msg_colony_built_spy_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x00566018});
     inline char*& _msg_colony_built_building_fmt = *reinterpret_cast<char**>(std::uintptr_t{0x0056601C});

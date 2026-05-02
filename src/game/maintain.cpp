@@ -363,6 +363,63 @@ namespace maintain {
         }
     }
 
+    int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx) {
+        const uint8_t* colony_bytes = reinterpret_cast<const uint8_t*>(colony);
+        int32_t worth = TECHDATA::_buildings[building_idx].cost;
+
+        switch (building_idx) {
+        case 2:
+        case 0x16: {
+            const int32_t owner_player_idx = static_cast<int8_t>(colony_bytes[0]);
+            const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
+
+            if (owner_trait_group >= 0 && owner_trait_group <= 1) {
+                if (building_idx == 0x16) {
+                    if (colony_bytes[0x138] == 0) {
+                        return worth * 8;
+                    }
+                } else {
+                    if (colony_bytes[0x14c] == 0) {
+                        return worth * 8;
+                    }
+                }
+            }
+            break;
+        }
+
+        case 7:
+            return worth * 8;
+
+        case 0x0c:
+            return worth * 7;
+
+        case 0x0f:
+            return worth * 8;
+
+        case 0x14:
+        case 0x1f: {
+            const int32_t owner_player_idx = static_cast<int8_t>(colony_bytes[0]);
+            const int32_t owner_trait_group = MOX::_player[owner_player_idx].traits[0] / 2;
+
+            if (owner_trait_group != 3) {
+                return worth * 7;
+            }
+            break;
+        }
+
+        case 0x15:
+            return worth * 6;
+
+        case 0x19:
+            return worth * 4;
+
+        default:
+            break;
+        }
+
+        return worth;
+    }
+
     void __cdecl Kill_Buildings_(s_player* player, bool (__cdecl* can_scrap)(int16_t)) {
         int16_t plr_idx = (int16_t)(player - MOX::_player);
         bool no_more_buildings = false;

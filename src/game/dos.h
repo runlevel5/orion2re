@@ -2,6 +2,19 @@
 #include <cstdint>
 
 namespace dos {
+    struct _diskfree_t {
+        uint32_t total_clusters;
+        uint32_t avail_clusters;
+        uint32_t sectors_per_cluster;
+        uint32_t bytes_per_sector;
+    };
+
+    inline uint32_t __cdecl __getdiskfree(uint32_t drive, _diskfree_t* disk_free_info) {
+        using Fn = uint32_t(__cdecl*)(uint32_t, _diskfree_t*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542680});
+        return fn(drive, disk_free_info);
+    }
+
     // Suggested name: _fileinfo
     inline uint8_t& _fileinfo =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057B5D8});
@@ -22,18 +35,15 @@ namespace dos {
         return fn(handle, data);
     }
 
-    inline int32_t __cdecl Disk_Free_() {
-        using Fn = int32_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D410});
-        fn();
-        return fn();
-    }
+    uint32_t __cdecl Disk_Free_(void);
 
     bool __cdecl DIR_(const char* pattern, char* output_name);
 
-    inline void __cdecl Delete_File_(char* filename) {
-        using Fn = void(__cdecl*)(char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D440});
-        fn(filename);
+    void __cdecl Delete_File_(LPCSTR path);
+
+    inline struct tm* __cdecl Time_Stamp_(const char* input) {
+        using Fn = struct tm* (__cdecl*)(const char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D3D0});
+        return fn(input);
     }
 }

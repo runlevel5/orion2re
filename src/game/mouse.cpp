@@ -119,4 +119,50 @@ namespace mouse {
     void __cdecl Enable_Mouse_() {
         _mouse_enabled = 1;
     }
+
+    void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons) {
+        if (mouse::_in_mouse_handler == 1) {
+            return;
+        }
+
+        mouse::_in_mouse_handler = 1;
+
+        if (platform::g_pending_toggle_pages) {
+            const int16_t previous_mouse_x = platform::g_mouse_x;
+            const int16_t previous_mouse_y = platform::g_mouse_y;
+
+            platform::g_mouse_x = mouse_x;
+            platform::g_mouse_y = mouse_y;
+            mouse::_mouse_buttons = (int16_t)mouse_buttons;
+
+            mouse::Check_Mouse_Buffer_();
+
+            mouse::_in_mouse_handler = 0;
+            platform::g_mouse_x = previous_mouse_x;
+            platform::g_mouse_y = previous_mouse_y;
+            return;
+        }
+
+        if (mouse::_mouse_overide_flag == 0) {
+            platform::g_mouse_x = mouse_x;
+            platform::g_mouse_y = mouse_y;
+            mouse::_mouse_buttons = (int16_t)mouse_buttons;
+        } else {
+            mouse::_mouse_buttons =
+                static_cast<int16_t>(mouse::_mouse_overide_right_button + mouse::_mouse_overide_left_button);
+        }
+
+        mouse::Check_Mouse_Buffer_();
+
+        if ((mouse::_mouse_enabled == 1) && !platform::g_pending_toggle_pages) {
+            mouse::Check_Mouse_Shape_();
+            platform::Draw_Auto_Cursor();
+            platform::Save_Mouse_(platform::g_mouse_x, platform::g_mouse_y);
+            platform::Draw_Cursor_XY(
+                (int16_t)platform::g_mouse_x,
+                (int16_t)platform::g_mouse_y);
+        }
+
+        mouse::_in_mouse_handler = 0;
+    }
 }

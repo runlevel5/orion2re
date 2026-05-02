@@ -46,4 +46,10 @@ namespace farload {
     int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_idx);
 
     void* __cdecl Farload_(char* file_name, int param_2);
+
+    inline void __cdecl Set_Alternate_Path_(char* path) {
+        using Fn = void(__cdecl*)(char*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D0F0});
+        fn(path);
+    }
 }

@@ -10,11 +10,62 @@ namespace FLEETPOP {
 
     int16_t __cdecl N_Fleet_Icons_(int16_t node_idx);
 
-    inline void __cdecl Fleet_Box_Data_(int16_t icon_count) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404D10});
-        fn(icon_count);
+    inline void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar, int32_t total_rows) {
+        using Fn = void(__cdecl*)(s_scroll_bar*, int32_t);
+        reinterpret_cast<Fn>(0x004065B0)(scroll_bar, total_rows);
     }
+
+    inline void __cdecl Buffer_Reload_Fleetpop_Frame_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00406670)();
+    }
+
+    inline void __cdecl Draw_Large_Fleet_Box_Frame_(
+        int16_t x,
+        int16_t y,
+        int16_t content_offset_x,
+        int16_t content_offset_y,
+        int16_t count,
+        int16_t* out_value
+    ) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*);
+        reinterpret_cast<Fn>(0x00404790)(x, y, content_offset_x, content_offset_y, count, out_value);
+    }
+
+    inline void __cdecl Draw_Small_Fleet_Box_Frame_(
+        int16_t x,
+        int16_t y,
+        int16_t content_offset_x,
+        int16_t content_offset_y,
+        int16_t count,
+        int16_t* out_value
+    ) {
+        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*);
+        reinterpret_cast<Fn>(0x00404910)(x, y, content_offset_x, content_offset_y, count, out_value);
+    }
+
+    inline void __cdecl Draw_Fleet_Pop_Added_Buttons_(int16_t x, int16_t y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t);
+        reinterpret_cast<Fn>(0x00404B10)(x, y);
+    }
+
+    inline void __cdecl Get_Fleet_Icon_Button_XY_(int16_t slot_idx, int16_t* out_x, int16_t* out_y) {
+        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*);
+        reinterpret_cast<Fn>(0x004050B0)(slot_idx, out_x, out_y);
+    }
+
+    inline void __cdecl Print_Fleet_Box_Info_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x00405240)();
+    }
+
+    inline void __cdecl Set_Added_Button_Stuff_() {
+        using Fn = void(__cdecl*)();
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00405AE0});
+        fn();
+    }
+
+    void __cdecl Fleet_Box_Data_(int16_t icon_count);
 
     int16_t __cdecl Fleet_Buttons_Chosen_();
     bool __cdecl At_Least_One_Ship_Of_Type_Selected_(int16_t ship_type);
@@ -49,9 +100,5 @@ namespace FLEETPOP {
 
     void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag);
 
-    inline void __cdecl Draw_Fleet_Movement_Box_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00404170});
-        fn();
-    }
+    void __cdecl Draw_Fleet_Movement_Box_();
 }

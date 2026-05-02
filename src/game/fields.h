@@ -37,8 +37,8 @@ namespace fields {
     inline int16_t& _selected_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE0});
     inline int16_t& mouse_saved_center_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BE8});
     inline int16_t& mouse_saved_center_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057630C});
-    inline int16_t& _pressed_mouse_x_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B068});
-    inline int16_t& _pressed_mouse_y_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B06C});
+    inline uint16_t& _pressed_mouse_x_value = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B068});
+    inline uint16_t& _pressed_mouse_y_value = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B06C});
     inline int16_t& _pressed_button_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B070});
     inline int16_t& _last_button_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005762DC});
     inline int16_t& _last_button_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005762E4});
@@ -98,17 +98,9 @@ namespace fields {
 
     int16_t __cdecl Auto_Input_();
 
-    inline int16_t __cdecl Pressed_Mouse_X_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1B0});
-        return fn();
-    }
+    uint16_t __cdecl Pressed_Mouse_X_();
 
-    inline int16_t __cdecl Pressed_Mouse_Y_() {
-        using Fn = int16_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0051D1C0});
-        return fn();
-    }
+    uint16_t __cdecl Pressed_Mouse_Y_();
 
     int16_t __cdecl Add_Grid_Field_(int16_t x, int16_t y, int16_t step_x, int16_t step_y, int16_t cols, int16_t rows, short* grid_x, short* grid_y, char sound);
 
@@ -135,12 +127,7 @@ namespace fields {
     int16_t __cdecl Get_Field_Counter_();
 
     void __cdecl Enable_Mouse_Pressed_Field_Update_();
-
-    inline void __cdecl Disable_Mouse_Pressed_Field_Update_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00520030});
-        fn();
-    }
+    void __cdecl Disable_Mouse_Pressed_Field_Update_();
 
     void __cdecl Deactivate_Help_List_();
 

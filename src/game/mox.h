@@ -213,6 +213,7 @@ namespace MOX {
     inline int16_t (&_weapons_field)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x0059BF20});
     inline s_animation_header*& _asteroid_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973F4 });
     inline s_animation_header*& _screen_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x005973E4 });
+    inline s_animation_header*& _diplomacy_request_popup_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059BF34});
     inline s_animation_header*& _combat_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00597A94});
     inline s_animation_header*& _combat_map_planet_seg =
         *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596448});
@@ -366,8 +367,10 @@ namespace MOX {
 
     inline uint8_t* _main_palette_player_colors = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F098});
 
-    inline uint16_t* _h_string_ix = reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B6E0});
-    inline char* _h_strings = reinterpret_cast<char*>(std::uintptr_t{0x0059D6E0});
+    inline int16_t (&_h_string_ix)[397] =
+            *reinterpret_cast<int16_t(*)[397]>(std::uintptr_t{0x0059B6E0});
+    inline char (&_h_strings)[0x4074] =
+            *reinterpret_cast<char(*)[0x4074]>(std::uintptr_t{0x0059D6E0});
 
     inline s_help_box (&_help_entry_list)[50] =
         *reinterpret_cast<s_help_box(*)[50]>(std::uintptr_t{0x005A1900});
@@ -803,6 +806,12 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline int16_t& _moveable_box_2_x =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978A0});
+
+    inline int16_t& _moveable_box_2_y =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978A2});
+
     inline uint8_t& _fleet_movement_icons_on =
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596C9C});
 
@@ -897,6 +906,9 @@ namespace MOX {
 
     inline s_saved_box (&_saved_boxes)[5] =
         *reinterpret_cast<s_saved_box(*)[5]>(std::uintptr_t{0x005A1850});
+
+    inline uint8_t& _fleet_box_scroll_first_ship =
+        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CAA});
 
     inline int16_t& _galaxy_map_grid_field =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596CAC});

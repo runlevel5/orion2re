@@ -35,4 +35,20 @@ namespace dos {
 
         return true;
     }
+
+    void __cdecl Delete_File_(LPCSTR path) {
+        remove(path);
+    }
+
+    uint32_t __cdecl Disk_Free_(void) {
+        _diskfree_t disk_free_info;
+
+        if (__getdiskfree(0, &disk_free_info) != 0) {
+            return 0;
+        }
+
+        return disk_free_info.avail_clusters *
+               disk_free_info.sectors_per_cluster *
+               disk_free_info.bytes_per_sector;
+    }
 }

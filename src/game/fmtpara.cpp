@@ -1874,8 +1874,7 @@ namespace FMTPARA {
         if (arg_index == 2 || arg_ret) {
             Update_Max_Min_Values_();
 
-            using UserFn = void(__cdecl*)(s_fmtpara_para*, uint32_t, int32_t);
-            auto fn = reinterpret_cast<UserFn>(user_fn_ptr);
+            auto fn = reinterpret_cast<user_fn>(user_fn_ptr);
             fn(_para_p, _user_fn_arg, val);
 
             return 0;

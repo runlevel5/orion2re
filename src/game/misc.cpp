@@ -711,6 +711,25 @@ namespace MISC {
         MISC::_Print_Shadow_Down_(centered_x, y, color, text);
     }
 
+    void __cdecl Get_Time_Stamp_(
+        const char* input,
+        int16_t* out_month,
+        int16_t* out_day,
+        int16_t* out_year,
+        int16_t* out_hour,
+        int16_t* out_minute,
+        int16_t* out_second) {
+        // TYPE MISMATCH: decompilation used uint16_t*
+        struct tm* time_info = dos::Time_Stamp_(input);
+
+        *out_year = static_cast<int16_t>(time_info->tm_year);
+        *out_month = static_cast<int16_t>(time_info->tm_mon);
+        *out_day = static_cast<int16_t>(time_info->tm_mday);
+        *out_hour = static_cast<int16_t>(time_info->tm_hour);
+        *out_minute = static_cast<int16_t>(time_info->tm_min);
+        *out_second = static_cast<int16_t>(time_info->tm_sec);
+    }
+
     int16_t __cdecl Substring_(char* haystack, char* needle) {
         char* found_ptr = strstr(haystack, needle);
 

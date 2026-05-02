@@ -1910,10 +1910,72 @@ namespace MAINSCR {
         fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
     }
 
-    int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t requester_id) {
-        using Fn = int16_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004c99b0});
-        return fn(requester_id);
+    int16_t __cdecl Do_Reply_To_Diplomacy_Request_(int16_t screen_data) {
+        int16_t unused_field;
+        int16_t first_reply_field;
+        int16_t second_reply_field;
+        int16_t third_reply_field;
+        int16_t selected_reply = 0;
+        bool has_selection = false;
+
+        fields::Clear_Fields_();
+        MAINSCR::thunk_Clear_Main_Screen_Fields_();
+        video::Set_Page_Off_();
+        MAINSCR::Draw_Mini_Main_Screen_();
+        video::Copy_Off_To_Back_();
+        video::Set_Refresh_Stencil_();
+        RUSS::Mox_Sync_Update_();
+
+        MOX::_temp_string[0] = '\0';
+        MOX::_screen_data = screen_data;
+
+        fields::Clear_Fields_();
+        MAINSCR::thunk_Clear_Main_Screen_Fields_();
+        MAINSCR::Load_Reply_To_Diplomacy_Request_Popup_();
+        MAINSCR::Add_Reply_To_Diplomacy_Request_Fields_(
+                &first_reply_field,
+                &second_reply_field,
+                &third_reply_field,
+                &unused_field);
+        fields::Assign_Auto_Function_(MAINSCR::Draw_Reply_To_Diplomacy_Request_, 1);
+
+        const int32_t popup_width =
+                static_cast<int32_t>(animate::Get_Width_(MOX::_diplomacy_request_popup_seg));
+        const int32_t popup_x = ((0x1FA - popup_width) / 2) + 0x15;
+
+        const int32_t popup_height =
+                static_cast<int32_t>(animate::Get_Height_(MOX::_diplomacy_request_popup_seg));
+        const int32_t popup_y = ((0x190 - popup_height) / 2) + 0x15;
+
+        EVANHELP::Set_Diplomacy_Request_Help_List_(popup_x, popup_y);
+
+        while (!has_selection) {
+            const int16_t input_field = fields::Get_Input_();
+
+            if (first_reply_field == input_field) {
+                selected_reply = 1;
+                has_selection = true;
+            } else if (second_reply_field == input_field) {
+                selected_reply = 2;
+                has_selection = true;
+            } else if (third_reply_field == input_field) {
+                selected_reply = 3;
+                has_selection = true;
+            }
+
+            if (!has_selection) {
+                video::Set_Page_Off_();
+                MAINSCR::Draw_Reply_To_Diplomacy_Request_();
+                RUSS::Mox_Sync_Update_();
+            }
+        }
+
+        allocate::Pop_Block_(MOX::_screen_seg);
+        EVANHELP::Set_Main_Screen_Help_List_();
+        MAINSCR::_already_faded_into_main_screen = 0;
+        MOX::_FULL_DRAW_SCREEN_FLAG = 1;
+
+        return selected_reply;
     }
 
     int16_t __cdecl Get_Star_Id_For_Officers_Screen_() {

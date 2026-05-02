@@ -6,6 +6,8 @@ struct s_list_state;
 struct s_colors;
 
 namespace LIST {
+    using draw_app_fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
+
     void __cdecl Display_List_Page_(s_list_state* state);
 
     void __cdecl Set_List_Page_Pointer_(s_list_state* state);
