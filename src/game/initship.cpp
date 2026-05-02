@@ -881,7 +881,7 @@ namespace INITSHIP {
 
         s_ship_data* ship = &MOX::_ship[ship_idx];
         s_ship_design design_copy;
-        _memcpy(&design_copy, &ship->d, sizeof(s_ship_design));
+        memcpy(&design_copy, &ship->d, sizeof(s_ship_design));
 
         Get_Design_Combat_Bonuses_(design_copy, &local_attack, &local_defense, &local_missile_defense);
 

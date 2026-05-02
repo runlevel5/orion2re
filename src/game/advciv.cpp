@@ -84,7 +84,7 @@ namespace ADVCIV {
                 planet.proximity_bonus = proximity_bonus;
             }
 
-            _qsort(player.planets, 360, sizeof(s_adv_civ_player_planet), qsort_planet_worth_);
+            qsort(player.planets, 360, sizeof(s_adv_civ_player_planet), qsort_planet_worth_);
         }
     }
 

@@ -1,11 +1,20 @@
 #pragma once
 
-#include <cstdint>
 #include <Windows.h>
 #include <ddraw.h>
 #include <dsound.h>
 #include <mmsystem.h>
 #include <time.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+#include <io.h>
+#include <math.h>
+
+#include "patch.h"
+#include "hooks.h"
+
 
 #include "../dplay.h"
 

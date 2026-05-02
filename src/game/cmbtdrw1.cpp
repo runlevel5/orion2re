@@ -1946,11 +1946,11 @@ namespace CMBTDRW1 {
             int32_t picture_num;
 
             if ((uint8_t)previous_owner < 8 && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
-                _memcpy(lbx_name, s_cmbtshp_lbx_0055125c, 12);
+                memcpy(lbx_name, s_cmbtshp_lbx_0055125c, 12);
                 uint8_t color = MOX::_player[(uint8_t)previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
-                _memcpy(lbx_name, s_monster_lbx_00551250, 12);
+                memcpy(lbx_name, s_monster_lbx_00551250, 12);
                 if (MOX::_combat_data[ship_idx].picture_num == 0x2C) {
                     picture_num = 25;
                 } else {

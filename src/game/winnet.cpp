@@ -104,17 +104,17 @@ namespace WINNET {
                 _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(_malloc(sizeof(DPSESSIONDESC)));
 
                 for (uint32_t j = _session_count; j > i; --j) {
-                    _memcpy(_sessions[j], _sessions[j - 1], sizeof(DPSESSIONDESC));
+                    memcpy(_sessions[j], _sessions[j - 1], sizeof(DPSESSIONDESC));
                 }
 
-                _memcpy(_sessions[i], session_desc, sizeof(DPSESSIONDESC));
+                memcpy(_sessions[i], session_desc, sizeof(DPSESSIONDESC));
                 break;
             }
         }
 
         if (insert_idx == _session_count) {
             _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(_malloc(sizeof(DPSESSIONDESC)));
-            _memcpy(_sessions[_session_count], session_desc, sizeof(DPSESSIONDESC));
+            memcpy(_sessions[_session_count], session_desc, sizeof(DPSESSIONDESC));
         }
 
         _session_count++;
@@ -133,7 +133,7 @@ namespace WINNET {
             _providers[_provider_count] = provider;
 
             provider->guid = *guid;
-            _memcpy(provider->name, name, sizeof(provider->name));
+            memcpy(provider->name, name, sizeof(provider->name));
             provider->major_version = major_version;
             provider->minor_version = minor_version;
 

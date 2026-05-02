@@ -118,7 +118,7 @@ namespace COLBLDG {
         }
 
         int count_to_sort = static_cast<int>(_n_building_indexes) - 2;
-        _qsort(&_building_indexes[2], count_to_sort, sizeof(int16_t), qsort_building_by_name_);
+        qsort(&_building_indexes[2], count_to_sort, sizeof(int16_t), qsort_building_by_name_);
     }
 
     void __cdecl Calculate_Military_Array_() {

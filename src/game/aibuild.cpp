@@ -299,7 +299,7 @@ namespace AIBUILD {
             }
 
             if ((*AIDATA::_ai_player_info)[player_idx].n_reachable_players > 0) {
-                int missing_need = (is_objective_1 ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_reachable_players + (int)isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
+                int missing_need = (is_objective_1 ? 1 : 0) + (*AIDATA::_ai_player_info)[player_idx].n_reachable_players + (int)special::isqrt_((*AIDATA::_ai_player_info)[player_idx].colony_count);
                 if (AIBUILD::_player_n_transports[player_idx][0] < missing_need) {
                     int diff = missing_need - AIBUILD::_player_n_transports[player_idx][0];
                     if (AIBUILD::_player_n_transports[player_idx][1] < diff) {
@@ -349,10 +349,10 @@ namespace AIBUILD {
         } else if (MOX::_player[player_idx].bc < 50 || MOX::_player[player_idx].surplus_bc < 50) {
             AIBUILD::_player_total_strength_vs_ships[player_idx][2] = 0;
         } else if (MOX::_player[player_idx].surplus_bc < 1024) {
-            int scaled_need = (isqrt_(MOX::_player[player_idx].surplus_bc) * current_need) >> 5;
+            int scaled_need = (special::isqrt_(MOX::_player[player_idx].surplus_bc) * current_need) >> 5;
             AIBUILD::_player_total_strength_vs_ships[player_idx][2] = scaled_need;
             if (Player_War_Level_(player_idx) == 0) {
-                AIBUILD::_player_total_strength_vs_ships[player_idx][2] = isqrt_(scaled_need) >> 4;
+                AIBUILD::_player_total_strength_vs_ships[player_idx][2] = special::isqrt_(scaled_need) >> 4;
             }
         }
 
@@ -400,7 +400,7 @@ namespace AIBUILD {
                                 AIBUILD::_player_n_spies[player_idx][1] = 1;
                             }
                         } else {
-                            AIBUILD::_player_n_spies[player_idx][1] = (int8_t)isqrt_((uint8_t)spy_need);
+                            AIBUILD::_player_n_spies[player_idx][1] = (int8_t)special::isqrt_((uint8_t)spy_need);
                         }
                     }
                 }
@@ -540,7 +540,7 @@ namespace AIBUILD {
 
         int bc_score = 0;
         if (player->bc >= 1500) {
-            bc_score = (int)isqrt_((uint32_t)((player->surplus_bc + (player->surplus_bc < 0 ? 63 : 0)) >> 6));
+            bc_score = (int)special::isqrt_((uint32_t)((player->surplus_bc + (player->surplus_bc < 0 ? 63 : 0)) >> 6));
         }
         if (bc_score > 10) bc_score = 10;
 
@@ -602,7 +602,7 @@ namespace AIBUILD {
             if (trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
                 }
             }
             break;
@@ -648,7 +648,7 @@ namespace AIBUILD {
             if (!building_focus && trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
                 }
             }
             break;
@@ -761,7 +761,7 @@ namespace AIBUILD {
             if (trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
                 }
             }
             break;
@@ -793,7 +793,7 @@ namespace AIBUILD {
 
         case 38:
             if (!building_focus && (colony->production[1] > 16 || colony->n_pops > 4 || bc_score != 0)) {
-                score = (int)isqrt_((uint32_t)((int)colony->production[1] - 15));
+                score = (int)special::isqrt_((uint32_t)((int)colony->production[1] - 15));
             }
             break;
 
@@ -949,7 +949,7 @@ namespace AIBUILD {
 
         if (colony->n_pops * 3 <= pop_limit) {
             int housing_weight_base = (pop_limit - colony->n_pops) * 3;
-            weights[49] = (short)isqrt_(housing_weight_base);
+            weights[49] = (short)special::isqrt_(housing_weight_base);
         }
 
         short choice = RUSS::Get_Weighted_Choice_Short_(weights, 51);

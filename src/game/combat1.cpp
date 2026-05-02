@@ -223,7 +223,7 @@ namespace COMBAT1 {
 
         if (order_idx != num_captured) {
             if (MOX::_combat_init != 0) {
-                _qsort(MOX::_ship_turn_order, order_idx, 2, qsort_ship_initiative_);
+                qsort(MOX::_ship_turn_order, order_idx, 2, qsort_ship_initiative_);
             }
             MOX::_ship_turn_order[order_idx++] = -10;
             while (order_idx < 210) {

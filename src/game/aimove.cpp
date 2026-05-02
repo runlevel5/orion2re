@@ -76,7 +76,7 @@ namespace AIMOVE {
 
         Get_Colonizable_Planets_(local_870, &_n_colonizable);
 
-        ::_qsort(_colonizable, _n_colonizable, 6, Sort_colonizable_);
+        qsort(_colonizable, _n_colonizable, 6, Sort_colonizable_);
 
         _flee_stars = local_b40;
         memset(_flee_stars, 0, 720);
@@ -192,7 +192,7 @@ namespace AIMOVE {
 
         Get_Colonizable_Planets_(colonizable_planets, &_n_colonizable);
 
-        _qsort(_colonizable, (uint32_t)_n_colonizable, sizeof(s_ai_colonizable_planet), Sort_colonizable_);
+        qsort(_colonizable, (uint32_t)_n_colonizable, sizeof(s_ai_colonizable_planet), Sort_colonizable_);
 
         Delete_Already_Assigned_Planets_(_colonizable, &_n_colonizable);
 
@@ -1449,7 +1449,7 @@ namespace AIMOVE {
             for (int i = 0; i < num_my_colony_ships; i++) {
                 RUSS::Shuffle_Char_(reinterpret_cast<int8_t*>(candidate_stars), num_candidates);
 
-                _qsort(candidate_stars, num_candidates, 1, COLCALC::Sort_star_weights_);
+                qsort(candidate_stars, num_candidates, 1, COLCALC::Sort_star_weights_);
 
                 if (num_candidates > 0) {
                     for (int j = 0; j < num_candidates; j++) {
@@ -2081,8 +2081,8 @@ namespace AIMOVE {
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; i++) {
             if (MOX::_player[i].eliminated == 0) {
-                uint32_t str_val = isqrt_(MOX::_player[i].bc);
-                str_val = isqrt_(str_val);
+                uint32_t str_val = special::isqrt_(MOX::_player[i].bc);
+                str_val = special::isqrt_(str_val);
                 player_str[i] = str_val +
                     MOX::_player[i].total_colonies * 4 +
                     (int16_t)(MOX::_player[i].total_research / 4) +
@@ -2115,7 +2115,7 @@ namespace AIMOVE {
             }
         }
 
-        ::_qsort(npc_dest, MOX::_NUM_STARS, sizeof(s_aimove_npc_dest), Sort_npc_dests_);
+        qsort(npc_dest, MOX::_NUM_STARS, sizeof(s_aimove_npc_dest), Sort_npc_dests_);
 
         int32_t valid_count = 0;
         for (int i = 0; i < MOX::_NUM_STARS; i++) {
@@ -2346,7 +2346,7 @@ namespace AIMOVE {
                 }
 
                 int32_t reachable = N_Enemy_Stars_Reachable_(_i_ai, owner, star_idx);
-                uint32_t reachable_sq = isqrt_(reachable * 100);
+                uint32_t reachable_sq = special::isqrt_(reachable * 100);
 
                 uint32_t temp = (colony_worth * total_space_strength) / defending_space;
                 temp = (temp * total_bomb_strength) / defending_ground;

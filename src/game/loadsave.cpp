@@ -837,7 +837,7 @@ namespace LOADSAVE {
             char stardate_buf[25];
             char date_buf[25];
 
-            _memcpy(stardate_buf, MOX::_save_game_stardates + (i * 25), 25);
+            memcpy(stardate_buf, MOX::_save_game_stardates + (i * 25), 25);
 
             bool is_valid_slot = (_game_popup_fields->slot_status[i] != 2);
             int16_t x_icon, y_icon;
@@ -908,7 +908,7 @@ namespace LOADSAVE {
                 fonts::Print_To_Bitmap_(text_x, text_y + 14, stardate_buf, _bitmap);
             }
 
-            _memcpy(date_buf, MOX::_save_game_dates + (i * 25), 25);
+            memcpy(date_buf, MOX::_save_game_dates + (i * 25), 25);
 
             if (_print_data_to_bitmap == 0) {
                 fonts::Print_(text_x + 100, text_y + 14, date_buf);
@@ -1554,7 +1554,7 @@ namespace LOADSAVE {
         fields::Clear_Fields_();
         MOX::_global_var = 0;
 
-        _memcpy(&settings_copy, &MOX::_settings, sizeof(s_settings));
+        memcpy(&settings_copy, &MOX::_settings, sizeof(s_settings));
 
         if (MOX::_screen_data < 0 || MOX::_screen_data > 3) {
             MOX::_screen_data = 0;

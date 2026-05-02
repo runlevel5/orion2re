@@ -1377,7 +1377,7 @@ namespace COMBAT {
         MOX::_combat_attacker_player = MOX::_ship[ship_array[0]].owner;
         MOX::_combat_defender_player = MOX::_colony[MOX::_cmbt_colony_id].owner;
 
-        _qsort(ship_array, (size_t)ship_count, 2, qsort_ship_array_by_size_);
+        qsort(ship_array, (size_t)ship_count, 2, qsort_ship_array_by_size_);
 
         if (ship_count > 0) {
             for (int16_t i = 0; i < ship_count; ++i) {

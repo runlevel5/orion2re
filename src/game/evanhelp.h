@@ -40,17 +40,19 @@ namespace EVANHELP {
     inline s_help_box(&_input_box_help_list)[1] =
         *reinterpret_cast<s_help_box(*)[1]>(std::uintptr_t{ 0x00552C78 });
 
+    inline s_help_box (&_static_diplomacy_request_help_list)[4] =
+        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{0x00552C88});
+
+    inline s_help_box (&_static_diplomacy_request_help_list2)[4] =
+        *reinterpret_cast<s_help_box (*)[4]>(std::uintptr_t{0x00564B50});
+
     void __cdecl Set_Load_Game_Screen_Help_List_();
 
     void __cdecl Set_Options_Game_Screen_Help_List_();
 
     void __cdecl Set_Save_Game_Screen_Help_List_();
 
-    inline void __cdecl Set_Diplomacy_Request_Help_List_(int32_t x, int32_t y) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0041E410});
-        fn(x, y);
-    }
+    void __cdecl Set_Diplomacy_Request_Help_List_(int16_t x_offset, int16_t y_offset);
 
     void __cdecl Set_PlntSum_Screen_Help_List_();
 

@@ -607,53 +607,48 @@ namespace COLSUM {
     }
 
 void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
-  const int16_t colony_list_entry = _list_col[colony_idx];
-  const int32_t colony_base_index = static_cast<int32_t>(colony_idx) * 3;
-  const int16_t row_y =
-      static_cast<int16_t>(static_cast<int32_t>(colony_idx) * 0x1f + 0x26);
+    const int16_t list_col_entry = _list_col[static_cast<int32_t>(colony_idx)];
+    const int32_t base_index = static_cast<int32_t>(colony_idx) * 3;
+    const int16_t colony_y = static_cast<int16_t>(colony_idx * 31 + 38);
 
-  int16_t pop_slot = 0;
-  do {
-    int16_t right_x_base;
-    int16_t left_x;
+    for (int16_t pop_slot = 0; pop_slot < 3; ++pop_slot) {
+        int16_t coord_a;
+        if (pop_slot == -1) {
+            coord_a = 0x65;
+        } else if (pop_slot == 0) {
+            coord_a = 0x00ec;
+        } else if (pop_slot == 1) {
+            coord_a = 0x017a;
+        } else {
+            coord_a = 0x0200;
+        }
 
-    if (pop_slot == -1) {
-      right_x_base = 0x65;
-    } else if (pop_slot == 0) {
-      right_x_base = 0xec;
-    } else if (pop_slot == 1) {
-      right_x_base = 0x17a;
-    } else {
-      right_x_base = 0x200;
+        int16_t coord_b;
+        if (pop_slot == 0) {
+            coord_b = 0x65;
+        } else if (pop_slot == 1) {
+            coord_b = 0x00ec;
+        } else if (pop_slot == 2) {
+            coord_b = 0x017a;
+        } else {
+            coord_b = 0x0200;
+        }
+
+        const int32_t item_index = base_index + static_cast<int32_t>(pop_slot);
+
+        COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+                list_col_entry,
+                pop_slot,
+                0,
+                coord_b,
+                colony_y,
+                static_cast<int16_t>(coord_a - 10),
+                0,
+                _list_col_pop_ref[item_index].refs,
+                &_list_col_pop_count[item_index],
+                &_list_col_coord_vars[item_index],
+                &_list_col_job_fields[item_index]);
     }
-
-    if (pop_slot == 0) {
-      left_x = 0x65;
-    } else if (pop_slot == 1) {
-      left_x = 0xec;
-    } else if (pop_slot == 2) {
-      left_x = 0x17a;
-    } else {
-      left_x = 0x200;
-    }
-
-    const int32_t list_index = colony_base_index + static_cast<int32_t>(pop_slot);
-
-    COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-        colony_list_entry,
-        pop_slot,
-        0,
-        left_x,
-        row_y,
-        static_cast<int16_t>(right_x_base - 10),
-        0,
-        _list_col_pop_ref[list_index].refs,
-        &_list_col_pop_count[list_index],
-        &_list_col_coord_vars[list_index],
-        &_list_col_job_fields[list_index]);
-
-    ++pop_slot;
-  } while (pop_slot < 3);
 }
 
     void __cdecl Colsum_Connect_Galaxy_Map_Stars_(int16_t star_idx1, int16_t star_idx2, s_colors* pattern) {

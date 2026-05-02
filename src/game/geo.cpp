@@ -81,7 +81,7 @@ namespace GEO {
         uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
 
         // Initial estimate for distance in parsecs
-        uint32_t parsecs = isqrt_(dist_sq / 900);
+        uint32_t parsecs = special::isqrt_(dist_sq / 900);
 
         // Correction loop to ensure we return the ceiling of the square root
         // effectively calculating: ceil(sqrt(dist_sq / 900.0))
@@ -373,7 +373,7 @@ namespace GEO {
         int32_t dx = (int32_t)target_x - (int32_t)start_x;
         int32_t dy = (int32_t)target_y - (int32_t)start_y;
         uint32_t dist_sq = (uint32_t)(dx * dx + dy * dy);
-        uint32_t dist = isqrt_(dist_sq);
+        uint32_t dist = special::isqrt_(dist_sq);
 
         int16_t turns_limit = max_turns;
         if (turns_limit == 0) {
@@ -461,7 +461,7 @@ namespace GEO {
                     break;
                 }
 
-                uint32_t sqrt_uVar8 = isqrt_(uVar8);
+                uint32_t sqrt_uVar8 = special::isqrt_(uVar8);
                 if (abs_dot <= sqrt_uVar8 * (uint32_t)d) {
                     bVar1 = true;
                     break;

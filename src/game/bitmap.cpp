@@ -275,7 +275,7 @@ namespace bitmap {
     void __cdecl Draw_Bitmap_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_animation_header* img) {
         int32_t dx = x2 - x1;
         int32_t dy = y2 - y1;
-        int32_t line_len = isqrt_(dy * dy + dx * dx);
+        int32_t line_len = special::isqrt_(dy * dy + dx * dx);
 
         uint8_t frame_offset = *(reinterpret_cast<uint8_t*>(img) + 0xC + img->current_frame);
         uint8_t* frame_pixels = reinterpret_cast<uint8_t*>(img) + frame_offset;

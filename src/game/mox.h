@@ -335,7 +335,7 @@ namespace MOX {
     inline int16_t& _saved_msl_warn = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059791A});
     inline uint8_t& _red_color_pulse_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597848});
     inline int8_t& _red_color_pulse_incr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059784C});
-    inline uint16_t& _fleet_ship_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059736A});
+    inline int16_t& _fleet_ship_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059736A});
     inline int16_t& _fleet_movement_all_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597466});
     inline int16_t& _galaxy_map_scanned_star = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597762});
     inline int8_t& _draw_system_display_without_button = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A49CA});
@@ -360,6 +360,13 @@ namespace MOX {
     inline s_mouse_list (&_mouse_list_zoom_mode)[5] = *reinterpret_cast<s_mouse_list(*)[5]>(std::uintptr_t{0x00559898});
     inline int8_t& _just_moved_stack = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B5BE});
     inline int16_t& _box_off_flag_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
+    inline int16_t& _fleet_box_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
+    inline int16_t& _fleet_box_field8_0xe = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CE});
+    inline int8_t& _fleet_box_attack_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DC});
+    inline int8_t& _fleet_box_engage_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DD});
+    inline int8_t& _fleet_box_colonize_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DE});
+    inline int8_t& _fleet_box_transport_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DF});
+    inline int8_t& _fleet_box_outpost_btn_active = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977E0});
     inline int16_t& _first_fleet_movement_icon = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D4A});
 
     inline int16_t& _next_free_node =\

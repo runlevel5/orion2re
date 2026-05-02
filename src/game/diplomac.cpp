@@ -138,7 +138,7 @@ namespace diplomac {
         if (score < 0) {
             final_prob = -(int16_t)(last_threat_turn * score);
         } else {
-            uint32_t divisor = isqrt_(score * score * score + 5);
+            uint32_t divisor = special::isqrt_(score * score * score + 5);
             final_prob = (divisor != 0) ? (int16_t)(last_threat_turn / divisor) : 0;
         }
 
@@ -171,7 +171,7 @@ namespace diplomac {
                     }
 
                     if (MOX::_player[player_id].traits[19] == 0 && MOX::_player[target_id].traits[19] == 0) {
-                        if (isqrt_(demands_count + 4) < (uint32_t)random::Random_(4)) {
+                        if (special::isqrt_(demands_count + 4) < (uint32_t)random::Random_(4)) {
                             *out_severity = severity;
                             *out_msg_id = msg_id;
                             return 3; /* DEMAND */
@@ -1507,7 +1507,7 @@ namespace diplomac {
         if (score < 0) {
             roll_threshold = -(score * base_chance);
         } else {
-            uint32_t root = isqrt_(score + 3);
+            uint32_t root = special::isqrt_(score + 3);
             roll_threshold = (int16_t)((uint32_t)base_chance / root);
         }
 

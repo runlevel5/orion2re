@@ -554,7 +554,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
             scroll_rows = 1;
         }
 
-        FLEETPOP::Initialize_Scroll_Bar_(&MOX::_fltpop_scroll_bar, scroll_rows);
+        FLEETPOP::Initialize_Scroll_Bar_(&MOX::_fltpop_scroll_bar, static_cast<int16_t>(scroll_rows));
         rebuild_saved_ship_array = true;
         HACCESS::Clear_Fleet_Box_Selected_Ship_Status_();
     }
@@ -792,6 +792,56 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     }
 }
 
+void __cdecl Set_Added_Button_Stuff_() {
+    int16_t added_buttons_height = 0;
+
+    FLEETPOP::_n_added_buttons = 1;
+
+    if (FLEETPOP::Check_For_Colonization_Button_()) {
+        added_buttons_height = animate::Get_Height_(MOX::_fleet_box_colonize_lg_button_seg);
+        ++FLEETPOP::_n_added_buttons;
+    }
+
+    if (FLEETPOP::Check_For_Transport_Troops_Button_()) {
+        added_buttons_height = static_cast<int16_t>(
+            static_cast<uint16_t>(added_buttons_height) +
+            static_cast<uint16_t>(animate::Get_Height_(MOX::_fleet_box_transport_lg_button_seg)));
+        ++FLEETPOP::_n_added_buttons;
+    }
+
+    if (FLEETPOP::Check_For_Build_Outpost_Button_()) {
+        added_buttons_height = static_cast<int16_t>(
+            static_cast<uint16_t>(added_buttons_height) +
+            static_cast<uint16_t>(animate::Get_Height_(MOX::_fleet_box_outpost_lg_button_seg)));
+        ++FLEETPOP::_n_added_buttons;
+    }
+
+    if (FLEETPOP::Check_For_Engage_Enemy_Forces_Button_()) {
+        added_buttons_height = static_cast<int16_t>(
+            static_cast<uint16_t>(added_buttons_height) +
+            static_cast<uint16_t>(animate::Get_Height_(MOX::_fleet_box_engage_lg_button_seg)));
+        ++FLEETPOP::_n_added_buttons;
+    }
+
+    if (FLEETPOP::Check_For_Attack_Antares_Button_()) {
+        added_buttons_height = static_cast<int16_t>(
+            static_cast<uint16_t>(added_buttons_height) +
+            static_cast<uint16_t>(animate::Get_Height_(MOX::_fleet_box_att_xenons_lg_button_seg)));
+        ++FLEETPOP::_n_added_buttons;
+    }
+
+    MOX::_fleet_box.height = static_cast<int16_t>(
+        static_cast<uint16_t>(MOX::_fleet_box.field8_0xe) +
+        static_cast<uint16_t>(added_buttons_height));
+
+    FLEETPOP::Set_Fleet_Box_Data_Dimensions_();
+}
+
+void __cdecl Get_Fleet_Icon_Button_XY_(int16_t fleet_icon_index, int16_t* out_x, int16_t* out_y) {
+    *out_x = static_cast<int16_t>((fleet_icon_index % 3) * 58 + 14);
+    *out_y = static_cast<int16_t>((fleet_icon_index / 3) * 56 + 38);
+}
+
 void __cdecl Draw_Small_Fleet_Box_Frame_(
         int16_t x,
         int16_t y,
@@ -919,6 +969,463 @@ void __cdecl Fleet_Box_Data_(int16_t ship_count) {
 
     if (MOX::_fleet_box.mouse_pressed == 0) {
         Set_Added_Button_Stuff_();
+    }
+}
+
+void __cdecl Print_Fleet_Box_Info_() {
+    int16_t info_value = -1;
+    int16_t destination_star = -1;
+    int16_t info_type = 9;
+    bool use_primary_colors = true;
+    char text[80];
+    s_colors font_colors;
+    s_colors fitted_colors;
+
+    const int16_t ship_idx = HACCESS::Fleet_Movement_Ship_Id_(0);
+    const bool icon_selected = FLEETPOP::Some_Icon_Selected_();
+
+    int16_t max_width;
+    int16_t text_y;
+
+    if (MOX::_fleet_box.count > 9) {
+        max_width = 0x84;
+        text_y = 0x00d6;
+    } else {
+        max_width = 0x70;
+        text_y = static_cast<int16_t>(
+                MOX::_fleet_box.map_height +
+                animate::Get_Height_(MOX::_fleet_box.name_seg) +
+                10);
+    }
+
+    const int16_t text_x = static_cast<int16_t>(
+            MOX::_fleet_box.x +
+            MOX::_moveable_box[2].content_offset_x +
+            (MOX::_fleet_box.is_small_frame == 1 ? 0x80 : 0x8a));
+
+    text_y = static_cast<int16_t>(
+            MOX::_moveable_box[2].content_offset_y +
+            MOX::_moveable_box[2].y +
+            text_y);
+
+    if (MOX::_eta_star_id == -1) {
+        if (MOX::_fleet_ship_scanned != -1) {
+            info_type = 0;
+        } else if (!icon_selected) {
+            if (MOX::_fleet_ship_scanned == -1) {
+                if (MAINSCR::_fleet_icon_chosen != -1) {
+                    MOX::_fleet_ship_scanned = MAINSCR::_fleet_icon_chosen;
+                }
+
+                if (MOX::_fleet_ship_scanned == -1) {
+                    if (MOX::_ship[ship_idx].status == 0) {
+                        info_type = 1;
+                        info_value = MOX::_ship[ship_idx].location;
+                    } else {
+                        FLEETPOP::Get_Absolute_Location_Scan_Info_(
+                                ship_idx,
+                                &info_value,
+                                &destination_star,
+                                &info_type);
+                    }
+                }
+            }
+        } else {
+            if (MOX::_ship[ship_idx].status == 0) {
+                info_type = 1;
+                info_value = MOX::_ship[ship_idx].location;
+            } else {
+                FLEETPOP::Get_Absolute_Location_Scan_Info_(
+                        ship_idx,
+                        &info_value,
+                        &destination_star,
+                        &info_type);
+            }
+        }
+    } else if ((MOX::_eta_star_id > -1) && icon_selected) {
+        if (MOX::_g_ship_move_info.moving != 0) {
+            if (MOX::_g_ship_move_info.turns_left == 0) {
+                info_type = 1;
+                info_value = MOX::_eta_star_id;
+            } else if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, MOX::_eta_star_id)) {
+                info_type = 2;
+                info_value = static_cast<uint8_t>(MOX::_g_ship_move_info.turns_left);
+                destination_star = MOX::_eta_star_id;
+            } else {
+                info_type = 3;
+                info_value = static_cast<uint8_t>(MOX::_g_ship_move_info.turns_left);
+            }
+        } else if (MOX::_g_ship_move_info.blackhole_blocks != 0) {
+            info_type = 4;
+        } else if (MOX::_g_ship_move_info.immobile != 0) {
+            info_type = 5;
+        } else if (MOX::_g_ship_move_info.out_of_range != 0) {
+            if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, MOX::_eta_star_id)) {
+                info_type = 6;
+                info_value = static_cast<uint8_t>(MOX::_g_ship_move_info.parsecs);
+                destination_star = MOX::_eta_star_id;
+            } else {
+                info_type = 7;
+                info_value = static_cast<uint8_t>(MOX::_g_ship_move_info.parsecs);
+            }
+        } else if (MOX::_g_ship_move_info.hyperspace_flux != 0) {
+            info_type = 8;
+        }
+    }
+
+    switch (info_type) {
+    case 0:
+        FLEETPOP::Get_Fleetpop_Scanned_Ship_Info_(text);
+        break;
+
+    case 1:
+        _sprintf(text, HAROLD::H_Message_(0x67), MOX::_star[info_value].name);
+        break;
+
+    case 2:
+        if (MOX::_NUM_STARS == static_cast<int16_t>(destination_star)) {
+            strcpy(text, HAROLD::H_Message_(0x68));
+        } else if (info_value == 1) {
+            _sprintf(text, HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
+        } else {
+            _sprintf(text, HAROLD::H_Message_(0x6a), info_value, MOX::_star[destination_star].name);
+        }
+        break;
+
+    case 3:
+        if (info_value == 1) {
+            _sprintf(text, HAROLD::H_Message_(0x6b), info_value);
+        } else {
+            _sprintf(text, HAROLD::H_Message_(0x6c), info_value);
+        }
+        break;
+
+    case 4:
+        strcpy(text, HAROLD::H_Message_(0x6d));
+        use_primary_colors = false;
+        break;
+
+    case 5:
+        strcpy(text, HAROLD::H_Message_(0x6e));
+        use_primary_colors = false;
+        break;
+
+    case 6:
+        if (info_value == 1) {
+            _sprintf(text, HAROLD::H_Message_(0x6f), 1, MOX::_star[destination_star].name);
+        } else {
+            _sprintf(text, HAROLD::H_Message_(0x70), info_value, MOX::_star[destination_star].name);
+        }
+        use_primary_colors = false;
+        break;
+
+    case 7:
+        if (info_value == 0) {
+            _sprintf(text, HAROLD::H_Message_(0x71));
+        } else {
+            _sprintf(text, HAROLD::H_Message_(0xeb), info_value);
+        }
+        use_primary_colors = false;
+        break;
+
+    case 8:
+        strcpy(text, HAROLD::H_Message_(0x73));
+        use_primary_colors = false;
+        break;
+
+    case 9:
+    default:
+        text[0] = '\0';
+        break;
+    }
+
+    if (text[0] == '\0') {
+        return;
+    }
+
+    MISC::Set_Fitted_Font_Style_(text, &fitted_colors, 3, 2, 0, max_width, 1);
+
+    if (use_primary_colors) {
+        MOX::_mox_font_colors_offset = 0x71;
+        MISC::Get_Mox_Font_Colors_(fonts::_current_font_style, 0x70, 0x73, &font_colors);
+    } else {
+        MISC::Get_Mox_Font_Colors_(fonts::_current_font_style, 0x4b, 0x50, &font_colors);
+    }
+
+    MISC::Set_Font_Colors_(&font_colors);
+
+    if (fonts::_current_font_style == 1) {
+        text_y = static_cast<int16_t>(text_y + 2);
+    }
+
+    const int16_t string_width = fonts::Get_String_Width_(text);
+    if (string_width > max_width) {
+        ERIC::Print_Paragraph_Centered_(
+                text_x - max_width / 2,
+                text_y - 6,
+                max_width,
+                0x14,
+                text);
+        return;
+    }
+
+    fonts::Print_Centered_(text_x, text_y, text);
+}
+
+void __cdecl Draw_Fleet_Pop_Added_Buttons_(int16_t x, int16_t y) {
+    s_animation_header* colonize_seg;
+    s_animation_header* engage_seg;
+    s_animation_header* transport_seg;
+    s_animation_header* attack_seg;
+    s_animation_header* outpost_seg;
+    s_animation_header* close_seg;
+
+    const int16_t button_height = animate::Get_Height_(MOX::_fleet_box_close_lg_button_seg);
+
+    if (MOX::_fleet_box_count > 9) {
+        attack_seg = MOX::_fleet_box_att_xenons_lg_button_seg;
+        colonize_seg = MOX::_fleet_box_colonize_lg_button_seg;
+        transport_seg = MOX::_fleet_box_transport_lg_button_seg;
+        outpost_seg = MOX::_fleet_box_outpost_lg_button_seg;
+        close_seg = MOX::_fleet_box_close_lg_button_seg;
+        engage_seg = MOX::_fleet_box_engage_lg_button_seg;
+    } else {
+        attack_seg = MOX::_fleet_box_att_xenons_sm_button_seg;
+        colonize_seg = MOX::_fleet_box_colonize_sm_button_seg;
+        transport_seg = MOX::_fleet_box_transport_sm_button_seg;
+        outpost_seg = MOX::_fleet_box_outpost_sm_button_seg;
+        close_seg = MOX::_fleet_box_close_sm_button_seg;
+        engage_seg = MOX::_fleet_box_engage_sm_button_seg;
+    }
+
+    const int16_t base_y = static_cast<int16_t>(MOX::_fleet_box_field8_0xe - button_height + y);
+
+    animate::Reset_Animation_Frame_(close_seg);
+    x = static_cast<int16_t>(x + 2);
+    animate::Draw_(x, base_y, close_seg);
+
+    int16_t next_offset = button_height;
+
+    if (MOX::_fleet_box_outpost_btn_active != 0) {
+        animate::Reset_Animation_Frame_(outpost_seg);
+        animate::Draw_(x, static_cast<int16_t>(base_y + button_height), outpost_seg);
+        next_offset = static_cast<int16_t>(button_height * 2);
+    }
+
+    if (MOX::_fleet_box_colonize_btn_active != 0) {
+        animate::Reset_Animation_Frame_(colonize_seg);
+        animate::Draw_(x, static_cast<int16_t>(base_y + next_offset), colonize_seg);
+        next_offset = static_cast<int16_t>(next_offset + button_height);
+    }
+
+    if (MOX::_fleet_box_engage_btn_active != 0) {
+        animate::Reset_Animation_Frame_(engage_seg);
+        animate::Draw_(x, static_cast<int16_t>(base_y + next_offset), engage_seg);
+        next_offset = static_cast<int16_t>(next_offset + button_height);
+    }
+
+    if (MOX::_fleet_box_transport_btn_active != 0) {
+        animate::Reset_Animation_Frame_(transport_seg);
+        animate::Draw_(x, static_cast<int16_t>(base_y + next_offset), transport_seg);
+        next_offset = static_cast<int16_t>(next_offset + button_height);
+    }
+
+    if (MOX::_fleet_box_attack_btn_active != 0) {
+        animate::Reset_Animation_Frame_(attack_seg);
+        animate::Draw_(x, static_cast<int16_t>(base_y + next_offset), attack_seg);
+    }
+}
+
+void __cdecl Draw_Large_Fleet_Box_Frame_(
+        int16_t x,
+        int16_t y,
+        int16_t x_offset,
+        int16_t y_offset,
+        uint32_t unused_param_5,
+        int16_t* current_y) {
+    s_window_status_and_height window_status;
+    s_animation_header* segment;
+    int16_t frame_left;
+    int32_t window_bottom;
+
+    frame_left = static_cast<int16_t>(x + x_offset);
+    window_status.fleet_box_inner_height = FLEETPOP::_fleet_box_field8_0xe;
+    *current_y = static_cast<int16_t>(y_offset + y);
+
+    MISC::Save_Window_Status_(&window_status);
+
+    window_bottom =
+            static_cast<int32_t>(y) +
+            static_cast<int32_t>(window_status.fleet_box_inner_height) +
+            static_cast<int32_t>(y_offset);
+    if (window_bottom >= 0x1A5) {
+        window_bottom = 0x1A5;
+    }
+
+    graphics::Set_Window_(
+            frame_left,
+            *current_y,
+            static_cast<int16_t>(x + FLEETPOP::_fleet_box_width + x_offset),
+            static_cast<int16_t>(window_bottom));
+    video::Clip_On_();
+
+    graphics::Fill_(
+            static_cast<int16_t>(frame_left + 6),
+            static_cast<int16_t>(*current_y + 0x29),
+            static_cast<int16_t>(frame_left + FLEETPOP::_fleet_box_width - 6),
+            static_cast<int16_t>(*current_y + window_status.fleet_box_inner_height + 0x1D),
+            0);
+
+    MISC::Restore_Window_Status_(*reinterpret_cast<uint32_t*>(&window_status));
+
+    segment = (s_animation_header*)buffer::Buffer_Reload_(
+            (char*)FLEETPOP::s_BUFFER0_LBX,
+            0x33,
+            MOX::_global_cache_seg);
+    animate::Draw_(frame_left, *current_y, segment);
+    *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
+
+    MOX::_fleet_box_grid_lg_seg = (s_animation_header*)buffer::Buffer_Reload_(
+            (char*)FLEETPOP::s_BUFFER0_LBX,
+            0x35,
+            MOX::_global_cache_seg);
+    animate::Draw_(frame_left, *current_y, MOX::_fleet_box_grid_lg_seg);
+    *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(MOX::_fleet_box_grid_lg_seg));
+
+    segment = (s_animation_header*)buffer::Buffer_Reload_(
+            (char*)FLEETPOP::s_BUFFER0_LBX,
+            0x37,
+            MOX::_global_cache_seg);
+    animate::Draw_(frame_left, *current_y, segment);
+    *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(segment));
+
+    (void)unused_param_5;
+}
+
+void __cdecl Initialize_Scroll_Bar_(s_scroll_bar* scroll_bar, int16_t total_rows) {
+    scroll_bar->total_rows = total_rows;
+    scroll_bar->visible_rows = 3;
+    scroll_bar->track_len_px = 102;
+    scroll_bar->first_visible_row = 0;
+
+    scroll_bar->thumb_height_px = SCROLL::Get_Vertical_Scroll_Bar_Height_(scroll_bar);
+    scroll_bar->last_thumb_center_y = -1;
+    scroll_bar->type = 2;
+    scroll_bar->row_step = 1;
+    scroll_bar->thumb_center_y =
+            static_cast<int16_t>(scroll_bar->track_len_px - (scroll_bar->thumb_height_px / 2));
+
+    MOX::_scroll_bar = scroll_bar;
+}
+
+void __cdecl Buffer_Reload_Fleetpop_Frame_() {
+    s_animation_header* seg;
+
+    if (FLEETPOP::_fleet_box_is_small_frame == 0) {
+        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x37, MOX::_global_cache_seg);
+        MOX::_fleet_box_bottom_lg_seg = seg;
+        FLEETPOP::_fleet_box_bottom_seg = seg;
+
+        seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x33, MOX::_global_cache_seg);
+        MOX::_fleet_box_name_lg_seg = seg;
+        FLEETPOP::_fleet_box_name_seg = seg;
+        return;
+    }
+
+    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x38, MOX::_global_cache_seg);
+    MOX::_fleet_box_bottom_sm_seg = seg;
+    FLEETPOP::_fleet_box_bottom_seg = seg;
+
+    seg = (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x34, MOX::_global_cache_seg);
+    MOX::_fleet_box_name_sm_seg = seg;
+    FLEETPOP::_fleet_box_name_seg = seg;
+}
+
+void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
+    out_text[0] = '\0';
+
+    if (MOX::_fleet_ship_scanned <= -1) {
+        return;
+    }
+
+    const int16_t ship_idx = HACCESS::Fleet_Movement_Ship_Id_(MOX::_fleet_ship_scanned);
+    const int16_t ship_owner = HACCESS::Ship_Owner_(ship_idx);
+    s_ship_data* const ship = &MOX::_ship[ship_idx];
+    const int16_t hull_size = static_cast<int8_t>(ship->d.size);
+
+    if (MOX::_PLAYER_NUM == ship_owner) {
+        strcpy(out_text, ship->d.name);
+        return;
+    }
+
+    if (ship_owner <= 8) {
+        if (HACCESS::Is_Combat_Ship_(ship_idx)) {
+            _sprintf(out_text, s__s_00551130, TECHDATA::_hull_data[hull_size].name);
+            return;
+        }
+    }
+
+    strcpy(out_text, ship->d.name);
+}
+
+bool __cdecl Check_For_Colonization_Button_() {
+    const uint8_t colonize_button_flag =
+            FLEETPOP::Set_Colonize_Button_Flag_(FLEETPOP::_fleet_box.count);
+
+    FLEETPOP::_fleet_box.colonize_btn_active =
+            static_cast<int8_t>(colonize_button_flag);
+
+    return colonize_button_flag != 0;
+}
+
+bool __cdecl Check_For_Transport_Troops_Button_(void) {
+    const uint8_t transport_button_state =
+        FLEETPOP::Set_Transport_Troops_Flag_(FLEETPOP::_fleet_box.count);
+
+    FLEETPOP::_fleet_box.transport_btn_active =
+        static_cast<int8_t>(transport_button_state);
+
+    return transport_button_state != 0;
+}
+
+bool __cdecl Check_For_Build_Outpost_Button_() {
+    const uint8_t outpost_button_flag =
+        FLEETPOP::Set_Build_Outpost_Button_Flag_(FLEETPOP::_fleet_box.count);
+
+    FLEETPOP::_fleet_box.outpost_btn_active =
+        static_cast<int8_t>(outpost_button_flag);
+
+    return outpost_button_flag != 0;
+}
+
+bool __cdecl Check_For_Engage_Enemy_Forces_Button_(void) {
+    const uint8_t engage_btn_active =
+        FLEETPOP::Set_Engage_Enemy_Forces_Flag_(FLEETPOP::_fleet_box_count);
+
+    FLEETPOP::_fleet_box_engage_btn_active =
+        static_cast<int8_t>(engage_btn_active);
+
+    return engage_btn_active != 0;
+}
+
+bool __cdecl Check_For_Attack_Antares_Button_() {
+    const uint8_t attack_btn_active = FLEETPOP::Set_Attack_Antares_Button_Flag_();
+    FLEETPOP::_fleet_box_attack_btn_active = static_cast<int8_t>(attack_btn_active);
+    return attack_btn_active != 0;
+}
+
+void __cdecl Set_Fleet_Box_Data_Dimensions_(void) {
+    MOX::_moveable_box[2].width = MOX::_fleet_box.width;
+    MOX::_moveable_box[2].height = MOX::_fleet_box.height;
+
+    if (MOX::_fleet_box.width + MOX::_fleet_box.x > 0x20f) {
+        MOX::_fleet_box.x = static_cast<int16_t>(0x20f - MOX::_fleet_box.width);
+        MOX::_moveable_box[2].x = MOX::_fleet_box.x;
+    }
+
+    if (MOX::_fleet_box.y + MOX::_fleet_box.height > 0x1a5) {
+        MOX::_fleet_box.y = static_cast<int16_t>(0x1a5 - MOX::_fleet_box.height);
+        MOX::_moveable_box[2].y = MOX::_fleet_box.y;
     }
 }
 

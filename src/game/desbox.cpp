@@ -1334,7 +1334,7 @@ namespace DESBOX {
         Weapon_Choices_(MOX::_PLAYER_NUM);
 
         if (MOX::_scroll_bar->total_rows > 1) {
-            _qsort(MOX::_weapon_filter, MOX::_scroll_bar->total_rows, 6, qsort_by_research_cost_);
+            qsort(MOX::_weapon_filter, MOX::_scroll_bar->total_rows, 6, qsort_by_research_cost_);
         }
 
         Space_With_Weapons_();
@@ -1508,7 +1508,7 @@ namespace DESBOX {
                 Weapon_Choices_(MOX::_PLAYER_NUM);
 
                 if (MOX::_scroll_bar->total_rows > 0) {
-                    _qsort(MOX::_weapon_filter, MOX::_scroll_bar->total_rows, 6, qsort_by_research_cost_);
+                    qsort(MOX::_weapon_filter, MOX::_scroll_bar->total_rows, 6, qsort_by_research_cost_);
                     int16_t rows = MOX::_scroll_bar->total_rows;
                     if (rows < 10) {
                         MOX::_scroll_bar->first_visible_row = 0;

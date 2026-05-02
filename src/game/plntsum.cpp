@@ -1161,13 +1161,13 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Sort_Planet_Summary_() {
         switch (_sort_choice) {
             case 0:
-                _qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_climate_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_climate_);
                 break;
             case 1:
-                _qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_max_population_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_max_population_);
                 break;
             case 2:
-                _qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_minerals_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_minerals_);
                 break;
             default:
                 break;

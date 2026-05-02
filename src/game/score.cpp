@@ -523,7 +523,7 @@ namespace SCORE {
             _hi->sort_list[i][1] = (int16_t)i;
         }
 
-        _qsort(_hi->sort_list, 10, 4, qsort_hof_scores_descending_);
+        qsort(_hi->sort_list, 10, 4, qsort_hof_scores_descending_);
 
         int16_t y = 131;
         for (int i = 0; i < 10; ++i) {
@@ -568,20 +568,14 @@ namespace SCORE {
         animate::Draw_Palette_(_hi->background_anim);
     }
 
-    /**
-     * @address 0x004E4940
-     */
     void __cdecl Sort_HOF_Scores_(int16_t sort_list[10][2]) {
         for (int16_t i = 0; i < 10; ++i) {
             sort_list[i][0] = _hof.scores[i];
             sort_list[i][1] = i;
         }
-        _qsort(sort_list, 10, 4, qsort_hof_scores_ascending_);
+        qsort(sort_list, 10, 4, qsort_hof_scores_ascending_);
     }
 
-    /**
-     * @address 0x004e49d0
-     */
     void __cdecl Move_Sorted_HOF_Data_(int16_t sort_list[10][2]) {
         s_hof local_hof;
 
@@ -1279,7 +1273,7 @@ namespace SCORE {
             }
         }
 
-        _qsort(SCORE::_hi->captured_pop_race_ids, 16, 1, SCORE::ascending_qsort_uchar_);
+        qsort(SCORE::_hi->captured_pop_race_ids, 16, 1, SCORE::ascending_qsort_uchar_);
 
         SCORE::_hi->raw_captured_population = captured_count;
         random::Set_Random_Seed_(original_seed);

@@ -158,7 +158,7 @@ namespace SYS {
         MOX::_mainscr_palette = 0;
         RUSS::Mox_Update_();
 
-        _qsort(MOX::_sys_disp, 5, 0xe, qsort_sys_disp_);
+        qsort(MOX::_sys_disp, 5, 0xe, qsort_sys_disp_);
 
         if (MOX::_look_at_colonies == 0) {
             if (!Ok_To_View_System_(star_idx, MOX::_PLAYER_NUM)) {
@@ -1349,7 +1349,7 @@ namespace SYS {
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
-        _memcpy(&font_colors, MISC::Font_Colors2_(2, 0x3c, 0x43), sizeof(font_colors));
+        memcpy(&font_colors, MISC::Font_Colors2_(2, 0x3c, 0x43), sizeof(font_colors));
 
         const int16_t colony_idx = planet->colony_index;
         s_colony* colony = nullptr;

@@ -111,7 +111,7 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Null_Modem_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset) {
-        _memcpy(&_null_modem_setup_screen_help_list, &_static_null_modem_setup_screen_help_list, 40);
+        memcpy(&_null_modem_setup_screen_help_list, &_static_null_modem_setup_screen_help_list, 40);
         Offset_Help_Field_XYs_(_null_modem_setup_screen_help_list, 4, x_offset, y_offset);
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_null_modem_setup_screen_help_list, 4);
     }
@@ -157,7 +157,7 @@ namespace EVANHELP {
     void __cdecl Set_Fleet_Screen_Help_List_(int16_t param_1) {
         int16_t help_list_count = 12;
 
-        _memcpy(EVANHELP::_fleet_screen_help_list, EVANHELP::_static_fleet_screen_help_list, 0x50 * sizeof(uint32_t));
+        memcpy(EVANHELP::_fleet_screen_help_list, EVANHELP::_static_fleet_screen_help_list, 0x50 * sizeof(uint32_t));
 
         if (param_1 == 0) {
             EVANHELP::Append_Help_List_(
@@ -190,7 +190,7 @@ namespace EVANHELP {
     }
 
     void __cdecl Set_Hotseat_Setup_Screen_Help_List_(int16_t x_offset, int16_t y_offset) {
-        _memcpy(_hotseat_setup_screen_help_list, _static_hotseat_setup_screen_help, sizeof(_static_hotseat_setup_screen_help));
+        memcpy(_hotseat_setup_screen_help_list, _static_hotseat_setup_screen_help, sizeof(_static_hotseat_setup_screen_help));
         Offset_Help_Field_XYs_(_hotseat_setup_screen_help_list, 4, x_offset, y_offset);
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_hotseat_setup_screen_help_list, 4);
     }
@@ -267,7 +267,7 @@ namespace EVANHELP {
     void __cdecl Set_ShipOff_Screen_Help_List_(int16_t* help_y_offsets, int16_t start_index) {
         int16_t count = 18;
 
-        _memcpy(_shipoff_screen_help_list, _static_shipoff_screen_help_list, sizeof(_shipoff_screen_help_list));
+        memcpy(_shipoff_screen_help_list, _static_shipoff_screen_help_list, sizeof(_shipoff_screen_help_list));
 
         for (int16_t i = 0; i < 4; i++) {
             if (help_y_offsets[i] > 0) {
@@ -286,6 +286,23 @@ namespace EVANHELP {
         }
 
         MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(_shipoff_screen_help_list, count);
+    }
+
+    void __cdecl Set_Diplomacy_Request_Help_List_(int16_t x_offset, int16_t y_offset) {
+        memcpy(
+            EVANHELP::_static_diplomacy_request_help_list2,
+            EVANHELP::_static_diplomacy_request_help_list,
+            sizeof(EVANHELP::_static_diplomacy_request_help_list));
+
+        EVANHELP::Offset_Help_Field_XYs_(
+            EVANHELP::_static_diplomacy_request_help_list2,
+            4,
+            x_offset,
+            y_offset);
+
+        MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_(
+            EVANHELP::_static_diplomacy_request_help_list2,
+            4);
     }
 
     void __cdecl Append_Help_List_(s_help_box* help_list, int16_t* list_count, int32_t unused, int16_t help_id, int16_t x1, int16_t y1, int16_t x2, int16_t y2) {

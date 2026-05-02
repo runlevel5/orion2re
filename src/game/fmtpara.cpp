@@ -1581,13 +1581,10 @@ namespace FMTPARA {
 
     void __cdecl Sort_Tabs_() {
         if (_tabs[0] > 1) {
-            _qsort(&_tabs[1], (size_t)_tabs[0], sizeof(int16_t), _Comp_Tabs_);
+            qsort(&_tabs[1], (size_t)_tabs[0], sizeof(int16_t), _Comp_Tabs_);
         }
     }
 
-    /**
-     * @address 004352f0
-     */
     void __cdecl _Justify_Line_Fully_(int16_t extra_space) {
         short space_count = _line_p->space_count;
         short char_count = _line_p->char_count;

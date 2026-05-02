@@ -2992,7 +2992,7 @@ namespace COLCALC {
             }
 
             // Sort systems by population weight
-            _qsort(star_weights, (size_t)num_stars, sizeof(s_star_weight), Sort_star_weights_);
+            qsort(star_weights, (size_t)num_stars, sizeof(s_star_weight), Sort_star_weights_);
 
             int half_count = (num_stars + 1) / 2;
             int chosen_idx;

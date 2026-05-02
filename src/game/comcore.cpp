@@ -28,7 +28,7 @@ int16_t __cdecl ComSendUserMessage_(
     }
     *static_cast<uint32_t*>(_sendBuffer) = header_val;
 
-    _memcpy(static_cast<uint8_t*>(_sendBuffer) + 4, msg_data, msg_length);
+    memcpy(static_cast<uint8_t*>(_sendBuffer) + 4, msg_data, msg_length);
 
     DPID idTo;
     if (player_id == 0x7FFF || player_id == 0x7FFE) {

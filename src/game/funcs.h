@@ -271,27 +271,10 @@ inline char* __cdecl __itoa(int value, char* str, int radix) {
     return fn(value, str, radix);
 }
 
-inline void __cdecl _memcpy(void* dest, const void* src, uint32_t n) {
-    using Fn = void* (__cdecl*)(void*, const void*, uint32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540f70 });
-    fn(dest, src, n);
-}
-
-inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl* compar)(const void*, const void*)) {
-    using Fn = void(__cdecl*)(void*, uint32_t, uint32_t, int(__cdecl*)(const void*, const void*));
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540C20 });
-    fn(base, num, size, compar);
-}
-
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });
     fn();
-}
-
-inline uint32_t __cdecl isqrt_(uint32_t val) {
-    using Fn = uint32_t(__cdecl*)(uint32_t);
-    return reinterpret_cast<Fn>(std::uintptr_t{0x00531AA0})(val);
 }
 
 namespace GLOBALS {
@@ -596,3 +579,5 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
     auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA648 });
     return fn(path, flags, priority);
 }
+
+inline const char* k_backslash = reinterpret_cast<const char*>(std::uintptr_t{0x00557BE4}); // "\\"

@@ -154,4 +154,36 @@ namespace special {
         }
     }
 
+    uint32_t __cdecl isqrt_(uint32_t value) {
+        if (value >= 0xFFFE0001u) {
+            return 0xFFFFu;
+        }
+
+        uint32_t low;
+        uint32_t high;
+
+        if (value <= 0xFFFFu) {
+            low = 0;
+            high = 0x100u;
+        }
+        else {
+            low = 0x100u;
+            high = 0xFFFFu;
+        }
+
+        while (low + 1 < high) {
+            uint32_t mid = (low + high) >> 1;
+            uint32_t square = mid * mid;
+
+            if (square <= value) {
+                low = mid;
+            }
+            else {
+                high = mid;
+            }
+        }
+
+        return low;
+    }
+
 }

@@ -216,11 +216,11 @@ namespace aidudes {
                 if (colony->pollution >= 5 && current_info->eats_minerals == 0) {
                     // TECH_APP_CORE_WASTE_DUMPS (50), BUILDING_CORE_WASTE_DUMP (13)
                     if (_p_ai->tech_applications[50] == 3 && colony->buildings[13] == 0) {
-                        weights[13] = static_cast<uint8_t>(isqrt_(colony->pollution)) + 8;
+                        weights[13] = static_cast<uint8_t>(special::isqrt_(colony->pollution)) + 8;
                     }
                     // TECH_APP_ATMOSPHERIC_RENEWER (19), BUILDING_ATMOSPHERE_RENEWER (5)
                     if (_p_ai->tech_applications[19] == 3 && colony->buildings[5] == 0) {
-                        weights[5] = static_cast<uint8_t>(isqrt_(colony->pollution)) + 8;
+                        weights[5] = static_cast<uint8_t>(special::isqrt_(colony->pollution)) + 8;
                     }
                     // TECH_APP_POLLUTION_PROCESSOR (142), BUILDING_POLLUTION_PROCESSOR (32)
                     if (_p_ai->tech_applications[142] == 3 && colony->buildings[32] == 0) {
@@ -320,7 +320,7 @@ namespace aidudes {
             }
         }
 
-        _qsort(*_our_colonies, (size_t)_n_our_colonies, sizeof(s_aidudes_colony_info), Sort_Colonies_Blockaded_);
+        qsort(*_our_colonies, (size_t)_n_our_colonies, sizeof(s_aidudes_colony_info), Sort_Colonies_Blockaded_);
 
         _our_blockaded = (s_aidudes_colony_info*)*_our_colonies;
         _our_unblockaded = &((*_our_colonies)[_n_our_blockaded]);
@@ -446,7 +446,7 @@ namespace aidudes {
         int research_mult = 18;
 
         if (aidudes::_p_ai->surplus_bc < 0) {
-            research_mult = 18 + (int)isqrt_((uint32_t)-aidudes::_p_ai->surplus_bc);
+            research_mult = 18 + (int)special::isqrt_((uint32_t)-aidudes::_p_ai->surplus_bc);
         }
 
         if (aidudes::_p_ai->do_not_research == 0) {
@@ -536,7 +536,7 @@ namespace aidudes {
         Assign_Required_Colonists_(info);
 
         _Sort_Pops_colony_data = colony;
-        _qsort(&colony->pop[info->first_assignable_pop_idx],
+        qsort(&colony->pop[info->first_assignable_pop_idx],
               (uint8_t)colony->n_pops - info->first_assignable_pop_idx,
               sizeof(uint32_t),
               _Sort_Pops_colony);
@@ -571,7 +571,7 @@ namespace aidudes {
         info->pollution_at_start = (int8_t)colony->pollution;
 
         _Sort_Pops_colony_data = colony;
-        _qsort(&colony->pop[info->first_assignable_pop_idx],
+        qsort(&colony->pop[info->first_assignable_pop_idx],
               info->pop_end_idx - info->cur_pop_idx,
               sizeof(uint32_t),
               _Sort_Pops_colony);
@@ -585,7 +585,7 @@ namespace aidudes {
 
         _Sort_Pops_colony_data = colony;
 
-        _qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
+        qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
               (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
               4,
               Sort_Pops_FR_I_);
@@ -711,7 +711,7 @@ namespace aidudes {
 
         // Sort population for AI processing
         aidudes::_Sort_Pops_colony_data = colony;
-        _qsort(colony->pop, (size_t)colony->n_pops, 4, aidudes::Sort_Pops_Fixed_);
+        qsort(colony->pop, (size_t)colony->n_pops, 4, aidudes::Sort_Pops_Fixed_);
 
         colony_info->cur_pop_idx = colony_info->first_assignable_pop_idx;
         colony_info->pop_end_idx = colony->n_pops;
@@ -787,7 +787,7 @@ namespace aidudes {
         if (low_money || p->bc < 1500) {
             isqrt_val = 0;
         } else {
-            isqrt_val = isqrt_((p->surplus_bc + ((p->surplus_bc >> 31) & 0x3f)) >> 6);
+            isqrt_val = special::isqrt_((p->surplus_bc + ((p->surplus_bc >> 31) & 0x3f)) >> 6);
         }
 
         if (isqrt_val > 10) {
@@ -938,7 +938,7 @@ namespace aidudes {
         }
 
         RUSS::Mox_Update_();
-        _qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
+        qsort(colony_queue, (uint32_t)colony_queue_count, 1, aidudes::colony_less_industry_cmp_);
 
         if (p->tech_applications[40] == 3) {
             int i = colony_queue_count;
@@ -1088,7 +1088,7 @@ namespace aidudes {
 
                         int ind_worth = AIBUILD::Industry_Worth(temp_colony);
                         if (p->surplus_bc > 5 && p->bc > 50) {
-                            ind_worth += isqrt_(p->bc) + isqrt_(p->surplus_bc);
+                            ind_worth += special::isqrt_(p->bc) + special::isqrt_(p->surplus_bc);
                         }
 
                         uint16_t ship_weights[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1377,7 +1377,7 @@ namespace aidudes {
             aidudes::_Sort_Pops_colony_data = colony;
 
             size_t n_to_sort = (size_t)(info->pop_end_idx - info->cur_pop_idx);
-            _qsort(&colony->pop[(uint8_t)info->cur_pop_idx], n_to_sort, sizeof(uint32_t), aidudes::Sort_Pops_F_IR_);
+            qsort(&colony->pop[(uint8_t)info->cur_pop_idx], n_to_sort, sizeof(uint32_t), aidudes::Sort_Pops_F_IR_);
         }
 
         if (info->n_farmers < (uint8_t)colony->max_farms && info->cur_pop_idx < (uint8_t)colony->n_pops) {
@@ -1409,7 +1409,7 @@ namespace aidudes {
                     aidudes::_Sort_Pops_colony_data = col;
                     aidudes::_Sort_Pops_colony_info = info;
 
-                    _qsort(&col->pop[(uint8_t)info->cur_pop_idx], 
+                    qsort(&col->pop[(uint8_t)info->cur_pop_idx], 
                           (uint8_t)info->pop_end_idx - (uint8_t)info->cur_pop_idx, 
                           4, 
                           aidudes::Sort_Pops_F_IR_);
@@ -1468,7 +1468,7 @@ namespace aidudes {
                     {
                         num_candidates--;
                         if (best_candidate_idx < num_candidates) {
-                            _memcpy(&candidates[best_candidate_idx], &candidates[best_candidate_idx + 1], (num_candidates - best_candidate_idx) * sizeof(s_aidudes_colony_info*));
+                            memcpy(&candidates[best_candidate_idx], &candidates[best_candidate_idx + 1], (num_candidates - best_candidate_idx) * sizeof(s_aidudes_colony_info*));
                         }
                     }
                 }

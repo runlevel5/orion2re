@@ -1030,7 +1030,7 @@ namespace npcdiplo {
         }
 
         if (sort_flag == 1 && *tech_count != 0) {
-            _qsort(_human_tech, *tech_count, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
+            qsort(_human_tech, *tech_count, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
         }
 
         if (*tech_count > 0) {
@@ -1181,7 +1181,7 @@ namespace npcdiplo {
             }
             
             if (num_elements > 0) {
-                _qsort(_human_tech, num_elements, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
+                qsort(_human_tech, num_elements, sizeof(s_npcdiplo_tech), reverse_compare_tech_);
                 int32_t rand_idx = random::Random_((num_elements + 1) / 2) - 1;
                 uint8_t selected_tech_index = _human_tech[rand_idx].index;
                 int32_t exchange_val = (_human_tech[rand_idx].value * expectation) / 100;
@@ -1255,8 +1255,8 @@ namespace npcdiplo {
             return;
         }
 
-        _qsort(_human_tech, human_count, 5, compare_tech_);
-        _qsort(_target_tech, target_count, 5, reverse_compare_tech_);
+        qsort(_human_tech, human_count, 5, compare_tech_);
+        qsort(_target_tech, target_count, 5, reverse_compare_tech_);
 
         int median_human_tech = _human_tech[human_count / 2].value;
         *out_count = 0;

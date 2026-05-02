@@ -52,7 +52,7 @@ namespace HOMEGEN {
         }
 
         if (!planet_found) {
-            _qsort(_star_list, MOX::_NUM_STARS, sizeof(s_star_dist), qsort_star_dist_list_);
+            qsort(_star_list, MOX::_NUM_STARS, sizeof(s_star_dist), qsort_star_dist_list_);
 
             int16_t list_idx = 0;
             bool target_found = false;
@@ -1212,7 +1212,7 @@ namespace HOMEGEN {
         } while (candidate_count < 4);
 
         // Potential buffer overflow if _NUM_STARS > 72
-        _qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), qsort_1_);
+        qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), qsort_1_);
 
         int valid_count = 0;
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {

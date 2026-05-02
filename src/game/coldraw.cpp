@@ -770,4 +770,67 @@ int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_inde
     return static_cast<int16_t>(random_entry + veggie_type * 8);
 }
 
+int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_idx) {
+    int16_t veggie_type = 4;
+    const int16_t planet_idx = MOX::_colony[colony_idx].planet;
+    const int32_t climate = MOX::_planet[planet_idx].climate;
+
+    switch (climate) {
+    case 0:
+        return (random::Random_(2) == 1) ? 5 : 9;
+
+    case 1:
+    case 2:
+        return (random::Random_(2) == 1) ? 6 : 4;
+
+    case 3:
+        return 8;
+
+    case 4:
+        return 4;
+
+    case 5:
+        switch (random::Random_(4)) {
+        case 1:
+            return 7;
+        case 2:
+            return 9;
+        case 3:
+            return 11;
+        case 4:
+            return 4;
+        default:
+            return veggie_type;
+        }
+
+    case 6:
+        return 10;
+
+    case 7:
+        return 1;
+
+    case 8:
+    case 9:
+        switch (random::Random_(4)) {
+        case 1:
+            return 12;
+        case 2:
+            return 3;
+        case 3:
+            return 0;
+        case 4:
+            veggie_type = 2;
+            break;
+        default:
+            break;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return veggie_type;
+}
+
 }

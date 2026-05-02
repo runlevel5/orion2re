@@ -472,13 +472,13 @@ namespace AIDATA {
 
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
             RUSS::Mox_Update_();
-            _qsort((*_airefit)[p].entry, (*_airefit)[p].n_entries, 6, airefit_cmp_);
+            qsort((*_airefit)[p].entry, (*_airefit)[p].n_entries, 6, airefit_cmp_);
         }
 
         RUSS::Mox_Update_();
         memset(_i_all_combat_ships, -1, sizeof(*_i_all_combat_ships));
         
-        _qsort(_all_ships, _n_all_ships, 2, sort_ships_);
+        qsort(_all_ships, _n_all_ships, 2, sort_ships_);
 
         for (int i = 0; i < _n_all_ships; ++i) {
             int ship_idx = (*_all_ships)[i];

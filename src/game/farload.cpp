@@ -322,4 +322,20 @@ void* __cdecl Farload_Data_Static_(const char* filename, int32_t resource_id, vo
     return farload::Farload_Library_Data_(filename, resource_id, buffer, 3, (uint32_t)param_4, (uint16_t)param_5, (uint16_t)param_6);
 }
 
+void __cdecl Set_Alternate_Path_(char* input_path) {
+    char* const secondary_drive_path = _secondary_drive_path;
+
+    strcpy(secondary_drive_path, input_path);
+
+    int32_t path_length = 0;
+    while (path_length < 100 && secondary_drive_path[path_length] != '\0') {
+        ++path_length;
+    }
+
+    // Potential bug: empty input reads one byte before _secondary_drive_path.
+    if (secondary_drive_path[path_length - 1] != '\\') {
+        strcat(secondary_drive_path, k_backslash);
+    }
+}
+
 }

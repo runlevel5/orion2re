@@ -512,7 +512,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         MOX::_in_nebula_flag = GEO::Point_Is_In_Some_Nebula_(MOX::_star[star_idx].x, MOX::_star[star_idx].y) ? 1 : 0;
     }
 
-    _qsort(plr1_ships, plr1_ship_count, 2, qsort_ship_array_by_size_);
+    qsort(plr1_ships, plr1_ship_count, 2, qsort_ship_array_by_size_);
 
     int16_t loaded_ships_1 = 0;
     for (int16_t i = 0; i < plr1_ship_count; ++i) {
@@ -730,7 +730,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             Load_Antaran_Defense_Fleet_();
             Load_Antaran_Planet_();
         } else {
-            _qsort(plr2_ships, plr2_ship_count, 2, qsort_ship_array_by_size_);
+            qsort(plr2_ships, plr2_ship_count, 2, qsort_ship_array_by_size_);
             int16_t loaded_ships_2 = 0;
             for (int16_t i = 0; i < plr2_ship_count; ++i) {
                 if (MOX::_ship[plr2_ships[i]].d.ship_type == 0 && loaded_ships_2 < 100) {
@@ -1977,7 +1977,7 @@ void __cdecl Deploy_Ships_() {
         }
     }
 
-    _qsort(MOX::_combat_data, MOX::_combat_total_ship_count, 0x139, qsort_combat_data_by_size_);
+    qsort(MOX::_combat_data, MOX::_combat_total_ship_count, 0x139, qsort_combat_data_by_size_);
 
     MOX::_combat_data[0].size_class = 3;
 

@@ -263,7 +263,7 @@ namespace SHIPSTAK {
         Build_Ship_Type_Array_(start_node, ship_entries, &ship_count);
 
         if (ship_count > 1) {
-            _qsort(ship_entries, static_cast<size_t>(ship_count), 4, qsort_ships_by_type_);
+            qsort(ship_entries, static_cast<size_t>(ship_count), 4, qsort_ships_by_type_);
 
             if (ship_count > 0) {
                 int16_t entry_idx = 0;

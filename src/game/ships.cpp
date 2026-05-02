@@ -790,7 +790,7 @@ namespace SHIPS {
         }
 
         if (MOX::_ship_icon_count > 0 && need_sort) {
-            _qsort(MOX::_ship_icon, MOX::_ship_icon_count, 12, SHIPS::qsort_ship_icon_);
+            qsort(MOX::_ship_icon, MOX::_ship_icon_count, 12, SHIPS::qsort_ship_icon_);
         }
     }
 
