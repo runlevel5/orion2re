@@ -259,12 +259,6 @@ inline int __cdecl _strncmp(const char* s1, const char* s2, size_t n) {
     return fn(s1, s2, n);
 }
 
-inline char* __cdecl __itoa(int value, char* str, int radix) {
-    using Fn = char* (__cdecl*)(int, char*, int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00542d10 });
-    return fn(value, str, radix);
-}
-
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });

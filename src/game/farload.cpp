@@ -232,7 +232,7 @@ void __cdecl Error_Handler_(const char* filename, int error_code, int entry_num)
     char* current = strcpy_custom(message, filename);
     current = strcat_custom(message, s_entry_prefix);
 
-    __itoa(entry_num, itoa_buf, 10);
+    itoa(entry_num, itoa_buf, 10);
     current = strcat_custom(message, itoa_buf);
     current = strcat_custom(message, s_entry_suffix);
 

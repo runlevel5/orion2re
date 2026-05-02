@@ -984,10 +984,10 @@ void __cdecl Draw_Race_Selection_Screen_(void) {
                     if (bonus == 1) {
                         strcpy(bonus_text, s_1_2_00557ff0);
                     } else {
-                        __itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
+                        itoa(static_cast<int32_t>(bonus / 2), bonus_text, 10);
                     }
                 } else {
-                    __itoa(static_cast<int32_t>(bonus), bonus_text, 10);
+                    itoa(static_cast<int32_t>(bonus), bonus_text, 10);
                 }
 
                 if (bonus > 0) {

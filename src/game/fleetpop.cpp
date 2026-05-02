@@ -1429,4 +1429,27 @@ void __cdecl Set_Fleet_Box_Data_Dimensions_(void) {
     }
 }
 
+void __cdecl Get_Absolute_Location_Scan_Info_(
+    int16_t ship_idx,
+    int16_t* value,
+    int16_t* star_idx,
+    int16_t* info_type
+) {
+    s_ship_data& ship = MOX::_ship[ship_idx];
+    int16_t absolute_location = HAROLD::Absolute_Location_(ship.location);
+    uint16_t turns_left = static_cast<uint16_t>(static_cast<uint8_t>(ship.turns_left));
+
+    if (static_cast<uint16_t>(absolute_location) != static_cast<uint16_t>(MOX::_NUM_STARS)) {
+        if (!HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, absolute_location)) {
+            *value = static_cast<int16_t>(turns_left);
+            *info_type = 3;
+            return;
+        }
+    }
+
+    *value = static_cast<int16_t>(turns_left);
+    *star_idx = absolute_location;
+    *info_type = 2;
+}
+
 }

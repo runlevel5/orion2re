@@ -3954,6 +3954,7 @@ namespace hooks {
         { 0x00405C00, &FLEETPOP::Check_For_Engage_Enemy_Forces_Button_ },
         { 0x00405BB0, &FLEETPOP::Check_For_Attack_Antares_Button_ },
         { 0x00406270, &FLEETPOP::Set_Fleet_Box_Data_Dimensions_ },
+        { 0x00405900, &FLEETPOP::Get_Absolute_Location_Scan_Info_ },
         { 0x00531AA0, &special::isqrt_ },
     };
 

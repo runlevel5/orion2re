@@ -566,7 +566,7 @@ namespace RACESCRN {
 
         if (_g_spy_xfer_count > 1) {
             fonts::Set_Font_Style_Outline_(2, &_race_high_color);
-            __itoa(static_cast<int32_t>(_g_spy_xfer_count), num_str, 10);
+            itoa(static_cast<int32_t>(_g_spy_xfer_count), num_str, 10);
             fonts::Print_To_Bitmap_(8, 4, num_str, _g_mouse_group_p->sprite2);
         }
 

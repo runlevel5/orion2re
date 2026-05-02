@@ -365,7 +365,7 @@ namespace CMBTDRW1 {
             } else {
                 KEN::Ken_Get_Text_Message_(14, msg_buffer, 80);
                 fonts::Print_(x_off + 4, current_y, msg_buffer);
-                __itoa(ship->drive_current_hits, itoa_buffer, 10);
+                itoa(ship->drive_current_hits, itoa_buffer, 10);
                 fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
             }
 
@@ -376,26 +376,26 @@ namespace CMBTDRW1 {
             } else {
                 KEN::Ken_Get_Text_Message_(39, msg_buffer, 80);
                 fonts::Print_(x_off + 4, current_y, msg_buffer);
-                __itoa(ship->shield_current_hits, itoa_buffer, 10);
+                itoa(ship->shield_current_hits, itoa_buffer, 10);
                 fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
             }
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(21, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            __itoa(ship->computer_current_hits, itoa_buffer, 10);
+            itoa(ship->computer_current_hits, itoa_buffer, 10);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(16, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            __itoa(ship->structure_max - ship->structure_damage, itoa_buffer, 10);
+            itoa(ship->structure_max - ship->structure_damage, itoa_buffer, 10);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y += 10;
             KEN::Ken_Get_Text_Message_(18, msg_buffer, 80);
             fonts::Print_(x_off + 4, current_y, msg_buffer);
-            __itoa(ship->armor_remaining, itoa_buffer, 10);
+            itoa(ship->armor_remaining, itoa_buffer, 10);
             fonts::Print_Right_(x_off + 85, current_y, itoa_buffer);
 
             current_y = y_off + 64;
@@ -2032,9 +2032,9 @@ namespace CMBTDRW1 {
                 strcpy(local_a0, local_50);
 
                 if (MOX::_cmbt_colony_id == -1) {
-                    __itoa(0x23, local_b4, 10);
+                    itoa(0x23, local_b4, 10);
                 } else {
-                    __itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, local_b4, 10);
+                    itoa(MOX::_colony[MOX::_cmbt_colony_id].n_pops, local_b4, 10);
                 }
                 
                 strcat(local_a0, local_b4);
@@ -2044,14 +2044,14 @@ namespace CMBTDRW1 {
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[1] > 0) {
                         KEN::Ken_Get_Text_Message_(1, local_50, 0x50);
                         strcat(local_a0, local_50);
-                        __itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
+                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[1], local_b4, 10);
                         strcat(local_a0, local_b4);
                         strcat(local_a0, s__00559998);
                     }
                     if (MOX::_colony[MOX::_cmbt_colony_id].military[0] > 0) {
                         KEN::Ken_Get_Text_Message_(2, local_50, 0x50);
                         strcat(local_a0, local_50);
-                        __itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
+                        itoa(MOX::_colony[MOX::_cmbt_colony_id].military[0], local_b4, 10);
                         strcat(local_a0, local_b4);
                         strcat(local_a0, s__00559998);
                     }

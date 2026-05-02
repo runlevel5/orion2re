@@ -624,7 +624,7 @@ namespace LOADSAVE {
         int16_t game_index = 0;
 
         do {
-            __itoa(game_index + 1, itoa_buffer, 10);
+            itoa(game_index + 1, itoa_buffer, 10);
 
             char* dest = filename_buffer;
             const char* src = s_SAVE_005568fc;
@@ -677,7 +677,7 @@ namespace LOADSAVE {
                 strcpy(local_str_buf, prefix);
 
                 char itoa_buf[12];
-                __itoa(star_date_value, itoa_buf, 10);
+                itoa(star_date_value, itoa_buf, 10);
 
                 size_t current_len = strlen(local_str_buf);
                 size_t itoa_len = strlen(itoa_buf);
@@ -710,7 +710,7 @@ namespace LOADSAVE {
         char date_str[28];
 
         for (int16_t i = 0; i < 10; ++i) {
-            __itoa(i + 1, slot_num_str, 10);
+            itoa(i + 1, slot_num_str, 10);
 
             char* dest = filename;
             const char* src = s_SAVE_005568fc;

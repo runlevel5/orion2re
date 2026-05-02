@@ -46,7 +46,7 @@ namespace FILEDEF {
         HAROLD::Save_Mouse_List_();
 
         char slot_str[20];
-        __itoa(slot + 1, slot_str, 10);
+        itoa(slot + 1, slot_str, 10);
 
         char filename[260];
         const char* prefix = reinterpret_cast<const char*>(0x005568FC); // "SAVE"

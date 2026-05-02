@@ -652,7 +652,7 @@ namespace TECH {
         int32_t cost = New_Get_Tech_Cost_(app_idx, 1, MOX::_PLAYER_NUM);
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3D, text_buffer, 0x50);
 
-        __itoa(cost, cost_str, 10);
+        itoa(cost, cost_str, 10);
         strcat(text_buffer, cost_str);
 
         const char* suffix;
@@ -1019,7 +1019,7 @@ namespace TECH {
             strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);
         } else {
             char* end_ptr = (MOX::_temp_string_buf + 1) + strlen(MOX::_temp_string_buf + 1);
-            __itoa(hyper_tech, end_ptr, 10);
+            itoa(hyper_tech, end_ptr, 10);
         }
 
         return MOX::_temp_string_buf + 1;

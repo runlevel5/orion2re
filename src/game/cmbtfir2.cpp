@@ -1342,7 +1342,7 @@ namespace CMBTFIR2 {
         KEN::Ken_Get_Text_Message_(92, temp_str, 80);
         strcpy(body_str, temp_str);
 
-        __itoa(attacker_strength, num_buf, 10);
+        itoa(attacker_strength, num_buf, 10);
         strcat(body_str, num_buf);
 
         strcat(body_str, s__0055a544);
@@ -1350,7 +1350,7 @@ namespace CMBTFIR2 {
         KEN::Ken_Get_Text_Message_(93, temp_str, 80);
         strcat(body_str, temp_str);
 
-        __itoa(target_strength, num_buf, 10);
+        itoa(target_strength, num_buf, 10);
         strcat(body_str, num_buf);
 
         strcat(body_str, s__00557e60);
@@ -1396,7 +1396,7 @@ namespace CMBTFIR2 {
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 3] > 0) {
-                    __itoa(raid_results[k + 3], num_buf, 10);
+                    itoa(raid_results[k + 3], num_buf, 10);
                     strcat(body_str, num_buf);
                     strcat(body_str, s__005510f0);
 
@@ -1414,7 +1414,7 @@ namespace CMBTFIR2 {
 
             for (int k = 0; k < 8; k++) {
                 if (raid_results[k + 11] > 0) {
-                    __itoa(raid_results[k + 11], num_buf, 10);
+                    itoa(raid_results[k + 11], num_buf, 10);
                     strcat(body_str, num_buf);
                     strcat(body_str, s__005510f0);
 
@@ -1430,7 +1430,7 @@ namespace CMBTFIR2 {
 
         if (target_raiders < *raiders) {
             int16_t lost = *raiders - target_raiders;
-            __itoa(lost, num_buf, 10);
+            itoa(lost, num_buf, 10);
             strcat(body_str, s__005569f8);
             strcat(body_str, num_buf);
             strcat(body_str, s__005510f0);
@@ -1445,7 +1445,7 @@ namespace CMBTFIR2 {
 
         if (marines < (int16_t)target->marine_count) {
             int16_t lost = target->marine_count - marines;
-            __itoa(lost, num_buf, 10);
+            itoa(lost, num_buf, 10);
             strcat(body_str, s__005569f8);
             strcat(body_str, num_buf);
             strcat(body_str, s__005510f0);

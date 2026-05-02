@@ -102,15 +102,11 @@ namespace FLEETPOP {
 
     void __cdecl Print_Fleet_Box_Info_();
 
-    inline void __cdecl Get_Absolute_Location_Scan_Info_(
+    void __cdecl Get_Absolute_Location_Scan_Info_(
         int16_t ship_idx,
         int16_t* value,
         int16_t* star_idx,
-        int16_t* info_type) {
-        using Fn = void(__cdecl*)(int16_t, int16_t*, int16_t*, int16_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00405900});
-        fn(ship_idx, value, star_idx, info_type);
-    }
+        int16_t* info_type);
 
     void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text);
 

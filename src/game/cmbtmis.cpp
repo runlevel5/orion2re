@@ -1320,7 +1320,7 @@ namespace CMBTMIS {
         strcat(status_str, target_name);
         fonts::Print_Centered_(x_off + 43, y_off + 2, status_str);
 
-        __itoa(MOX::_missile[missile_idx].quantity, status_str, 10);
+        itoa(MOX::_missile[missile_idx].quantity, status_str, 10);
 
         int16_t weapon_type = MOX::_missile[missile_idx].type;
         if (TECHDATA::_weapons[weapon_type].type == 1) {

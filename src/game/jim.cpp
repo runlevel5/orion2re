@@ -284,7 +284,7 @@ namespace JIM {
                         src_ptr = MOX::_star[star_id].name;
                         break;
                     case 0x82:
-                        __itoa(number, temp_buf, 10);
+                        itoa(number, temp_buf, 10);
                         src_ptr = temp_buf;
                         break;
                     case 0x83:

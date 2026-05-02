@@ -986,7 +986,7 @@ namespace INFO {
         }
 
         fonts::Set_Font_Style_(1, &INFO::_info_normal_color);
-        __itoa(max_scale, buffer, 10);
+        itoa(max_scale, buffer, 10);
         fonts::Print_(0xF6, 0x8A, buffer);
 
         int16_t draw_count = n_points - 1;
@@ -1292,7 +1292,7 @@ namespace INFO {
                     _sprintf(buffer, INFO::s_fmt_comma, whole, fraction);
                 }
             } else {
-                __itoa(whole, buffer, 10);
+                itoa(whole, buffer, 10);
             }
 
             fonts::Print_Centered_(label_x, 400, buffer);

@@ -2372,10 +2372,10 @@ namespace EVENTS {
             if (c == '\x80') {
                 append_str = HACCESS::Get_Planet_Name_(MOX::_colony[planet_idx].planet);
             } else if (c == '\x81') {
-                __itoa(val1, temp_str, 10);
+                itoa(val1, temp_str, 10);
                 append_str = temp_str;
             } else if (c == '\x82') {
-                __itoa(val2, temp_str, 10);
+                itoa(val2, temp_str, 10);
                 append_str = temp_str;
             } else if (c == '\x83') {
                 if ((val1 > 1 || val1 == 0) && MOX::_settings.language == 0) {

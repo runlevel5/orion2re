@@ -840,14 +840,14 @@ namespace FMTPARA {
 
         case 'B': {
             int val = Get_Item_Value_Set_Plural_(arg_idx);
-            __itoa(val, _tmp_str, 10);
+            itoa(val, _tmp_str, 10);
             Insert_String_(_tmp_str);
             break;
         }
 
         case 'C': {
             int val = Get_Item_Value_Set_Plural_(arg_idx);
-            __itoa(val, _tmp_str, 10);
+            itoa(val, _tmp_str, 10);
             int len = (int)strlen(_tmp_str);
             int digit = _tmp_str[len - 1] - '0';
             sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);
@@ -860,7 +860,7 @@ namespace FMTPARA {
             if (val >= 0 && val <= 10) {
                 Insert_String_(_ordinal_word[val]);
             } else {
-                __itoa(val, _tmp_str, 10);
+                itoa(val, _tmp_str, 10);
                 int len = (int)strlen(_tmp_str);
                 int digit = _tmp_str[len - 1] - '0';
                 sprintf(_tmp_str2, _ordinal_fmt, _tmp_str, _ordinal_ending[digit]);

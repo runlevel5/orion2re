@@ -410,7 +410,7 @@ void __cdecl Init_Tech_() {
             }
 
             if (free_slot == -1) {
-                __itoa(tech_app_index, message, 10);
+                itoa(tech_app_index, message, 10);
                 strcat(message, s_tech_has_too_many_apps_0055a97c);
                 exitm::Exit_With_Message(message);
             } else {

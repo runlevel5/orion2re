@@ -1149,7 +1149,7 @@ namespace COMBAT {
                 if (attacker_total_ships[i] == 0) {
                     strcat(stats_msg, string::s_Dash);
                 } else {
-                    __itoa(attacker_total_ships[i], itoa_buffer, 10);
+                    itoa(attacker_total_ships[i], itoa_buffer, 10);
                     strcat(stats_msg, itoa_buffer);
                 }
 
@@ -1157,7 +1157,7 @@ namespace COMBAT {
                 if (attacker_lost_ships[i] == 0) {
                     strcat(stats_msg, string::s_Dash);
                 } else {
-                    __itoa(attacker_lost_ships[i], itoa_buffer, 10);
+                    itoa(attacker_lost_ships[i], itoa_buffer, 10);
                     strcat(stats_msg, itoa_buffer);
                 }
 
@@ -1168,7 +1168,7 @@ namespace COMBAT {
                 if (defender_total_ships[i] == 0) {
                     strcat(stats_msg, string::s_Dash);
                 } else {
-                    __itoa(defender_total_ships[i], itoa_buffer, 10);
+                    itoa(defender_total_ships[i], itoa_buffer, 10);
                     strcat(stats_msg, itoa_buffer);
                 }
 
@@ -1176,7 +1176,7 @@ namespace COMBAT {
                 if (defender_lost_ships[i] == 0) {
                     strcat(stats_msg, string::s_Dash);
                 } else {
-                    __itoa(defender_lost_ships[i], itoa_buffer, 10);
+                    itoa(defender_lost_ships[i], itoa_buffer, 10);
                     strcat(stats_msg, itoa_buffer);
                 }
                 strcat(stats_msg, string::s_Newline);
