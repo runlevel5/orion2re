@@ -2512,7 +2512,7 @@ namespace EVENTS {
             int16_t count = (num_active > 6) ? 6 : num_active;
 
             for (int16_t k = 0; k < count; ++k) {
-                _sprintf(temp_str, s_X_d__d___s_00557548, spacing, k + 1, MOX::_player[player_indices[k]].race_name);
+                sprintf(temp_str, s_X_d__d___s_00557548, spacing, k + 1, MOX::_player[player_indices[k]].race_name);
                 strcat(out_str, temp_str);
 
                 if (((k + 1) % 3) == 0) {

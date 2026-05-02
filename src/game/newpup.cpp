@@ -185,7 +185,7 @@ namespace NEWPUP {
 
             COLONY::Set_Colony_Font_To_Player_(1, static_cast<int8_t>(player_id));
 
-            _sprintf(
+            sprintf(
                 text_buffer,
                 ESTRINGS::E_Strings_(0x0d),
                 static_cast<int32_t>(invasion_side->unit_strengths[troop_type]) -
@@ -203,7 +203,7 @@ namespace NEWPUP {
                 const uint8_t hit_points =
                     static_cast<uint8_t>(invasion_side->unit_hps[troop_type]);
 
-                _sprintf(
+                sprintf(
                     text_buffer,
                     ESTRINGS::E_Strings_((hit_points > 1) ? 0x17 : 0x16),
                     static_cast<uint32_t>(hit_points));
@@ -219,7 +219,7 @@ namespace NEWPUP {
                 const int32_t unit_count =
                     static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
 
-                _sprintf(
+                sprintf(
                     text_buffer,
                     ESTRINGS::E_Strings_(0x0e),
                     unit_count,
@@ -246,7 +246,7 @@ namespace NEWPUP {
                 const int32_t unit_count =
                     static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
                 ++troop_type;
-                _sprintf(text_buffer, ESTRINGS::E_Strings_(0x7c), unit_count);
+                sprintf(text_buffer, ESTRINGS::E_Strings_(0x7c), unit_count);
             }
 
             displayed_column_base = displayed_column;

@@ -1391,6 +1391,119 @@ namespace HAROLD {
         }
     }
 
+    void __cdecl Harold_Defaults_() {
+        SYS::_remap_gray_percentages[0] = 0;
+        SYS::_remap_gray_percentages[1] = 4;
+        SYS::_remap_gray_percentages[2] = 9;
+        SYS::_remap_gray_percentages[3] = 15;
+        SYS::_remap_gray_percentages[4] = 22;
+        SYS::_remap_gray_percentages[5] = 30;
+        SYS::_remap_gray_percentages[6] = 39;
+        SYS::_remap_gray_percentages[7] = 48;
+        SYS::_remap_gray_percentages[8] = 56;
+        SYS::_remap_gray_percentages[9] = 64;
+
+        MOX::_multi_colored_line_start = 0;
+        MOX::_multi_colored_box_color_start = 0;
+        MOX::_far_star_x = 0;
+        MOX::_far_star_y = 0;
+        MOX::_box_off_flag[0] = -1;
+        MOX::_mid_star_x = 0;
+        MOX::_mid_star_y = 0;
+        MOX::_near_star_x = 0;
+        MOX::_near_star_y = 0;
+        MOX::_box_off_flag[1] = 0;
+        MOX::_box_off_flag[2] = 0;
+        MOX::_box_off_flag[3] = 0;
+        MOX::_box_off_flag[4] = 0;
+
+        if (MOX::_game_type == 1) {
+            memset(MAINSCR::_hotseat_fleet_box, 0, sizeof(MAINSCR::_hotseat_fleet_box));
+            memset(MAINSCR::_hotseat_system_box, 0, sizeof(MAINSCR::_hotseat_system_box));
+            memset(MAINSCR::_hotseat_map_scale, 0, sizeof(MAINSCR::_hotseat_map_scale));
+        }
+
+        MOX::_selected_star_color_mod = 1;
+        MOX::_selected_star_color_offset = 0;
+
+        for (int16_t i = 0; i < 8; ++i) {
+            MAINSCR::_hotseat_system_box[i].system_id = -1;
+        }
+
+        for (int16_t i = 0; i < 5; ++i) {
+            MOX::_saved_boxes[i].field_id = -1000;
+            MOX::_saved_boxes[i].is_open = 0;
+            MOX::moveable_box_id_at(i) = MOX::_box_off_flag[i];
+        }
+
+        MOX::_cur_map_scale = MOX::_max_map_scale;
+        MOX::_galaxy_map_scanned_star = -1;
+        MOX::_previous_report = 0;
+        OFFICER::_officer_star_displayed = -1;
+        MAINSCR::_already_faded_into_main_screen = 0;
+        MOX::_star_bg_index = 2;
+        MOX::_screen_data = 0;
+        MOX::_animated_star = -1;
+        g_map_unknown_word = 0;
+        MOX::_first_fleet_movement_icon = 0;
+        MOX::_fleet_movement_bar_value = 0x66;
+        MOX::_first_node_ptr_in_stack_ = -1;
+        MOX::_eta_star_id = -1;
+        reinterpret_cast<uint8_t&>(MOX::_global_var) = 0;
+        MOX::_stencil_box_id = -1;
+        MOX::_mainscr_palette = 0xFF;
+        MOX::_draw_main_screen_stencilled = 0;
+        MOX::_draw_expanding_box = 0;
+        MOX::_fleet_ship_scanned = -1;
+        MOX::_just_moved_stack = 0;
+        MOX::_system_icon_scanned = -1;
+        MOX::_draw_system_display_without_button = 0;
+        MOX::_stardate_at_beg_of_turn = 0;
+        MOX::_fltscrn_support_button_status = 1;
+        MOX::_player_has_ship_in_system = 0;
+        MOX::_fltscrn_combat_button_status = 1;
+        MAINSCR::_next_turn_hit = 0;
+        MAINSCR::_main_screen_ship_icon_scanned = -1;
+        MOX::_officer_scrn_type = 1;
+        g_ui_unknown_word = 0;
+        MAINSCR2::_main_screen_fade_in_flag = 0;
+        HAROLD::_set_fade_for_first_fltpop = 1;
+        MOX::_star_fields_dim[0] = 0x21;
+        g_main_screen_unknown_flag = 1;
+        MOX::_add_help_fields = 0xFF;
+        MOX::_star_fields_dim[1] = 0x1D;
+        MOX::_star_fields_dim[2] = 0x19;
+        MOX::_star_fields_dim[3] = 0x17;
+        MOX::_star_fields_dim[5] = 0x11;
+        MOX::_system_display_ring_radius[2] = 0x2D;
+        MOX::_system_display_ring_radius[3] = 0x39;
+        MOX::_rot_plan_dim[0] = 0x13;
+        MOX::_rot_plan_dim[1] = 0x14;
+        MOX::_system_display_ring_radius[4] = 0x45;
+        MOX::_rot_plan_dim[4] = 0x18;
+        MOX::_galaxy_map_height = 0xA0;
+        MOX::_galaxy_map_width = 0x75;
+        MOX::_special_scroll_up_button_1 = 0x3B;
+        MOX::_star_fields_dim[4] = 0x15;
+        MOX::_system_display_ring_radius[0] = 0x15;
+        MOX::_system_display_ring_radius[1] = 0x21;
+        MOX::_rot_plan_dim[2] = 0x16;
+        MOX::_rot_plan_dim[3] = 0x16;
+        MOX::_blue_color2 = 0x3D;
+        MOX::_red_color_pulse_value = 0;
+        MOX::_red_color_pulse_incr = 1;
+        MOX::_red_color1 = 0x49;
+        MOX::_red_color2 = 0x4C;
+
+        for (int16_t i = 0; i < 10; ++i) {
+            MOX::_black_hole_anim_count[i] = static_cast<uint8_t>(i * 2);
+        }
+
+        g_map_unknown_flag = 0;
+        MAINSCR::Clear_Twinkling_Star_Data_();
+        memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));
+    }
+
     void __cdecl Load_H_Strings_() {
         int16_t string_index = 0;
         int16_t scan_offset = 0;
@@ -1456,7 +1569,7 @@ namespace HAROLD {
             }
 
             if (string_length > max_length) {
-                _sprintf(
+                sprintf(
                     error_message,
                     s___s__String___d_Too_Long__check_t_0055A740,
                     strings_file,

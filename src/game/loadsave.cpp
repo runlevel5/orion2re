@@ -147,7 +147,7 @@ namespace LOADSAVE {
 
             if (desc_entry[0] == '\0' && star_date_entry[0] != '\0') {
                 const char* fmt = HAROLD::H_Message_(203);
-                _sprintf(desc_entry, fmt, i);
+                sprintf(desc_entry, fmt, i);
             }
         }
 
@@ -349,7 +349,7 @@ namespace LOADSAVE {
 
                     if (load_success == 0) {
                         const char* msg = HAROLD::H_Message_(184); // 0xb8
-                        _sprintf(msg_buffer, msg, static_cast<int>(selected_slot));
+                        sprintf(msg_buffer, msg, static_cast<int>(selected_slot));
                         Game_Popup_User_Box_(msg_buffer, 3);
                         MOX::_return_screen = MOX::_previous_screen;
                     } else {
@@ -561,7 +561,7 @@ namespace LOADSAVE {
                     s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
                     const char* colony_str = HAROLD::H_Message_(colonies == 1 ? 0xbc : 0xbd);
                     
-                    _sprintf(temp_buffer, s_format_0055ad30, plr->name, plr->race_name, (int)colonies, colony_str);
+                    sprintf(temp_buffer, s_format_0055ad30, plr->name, plr->race_name, (int)colonies, colony_str);
                     
                     // Length check (max 36 chars)
                     int len = 0;
@@ -960,7 +960,7 @@ namespace LOADSAVE {
 
         if (message_id != 0) {
             const char* format = HAROLD::H_Message_(message_id);
-            _sprintf(buffer, format, (int)(file_index + 1));
+            sprintf(buffer, format, (int)(file_index + 1));
         }
 
         Game_Popup_User_Box_(buffer, 3);
@@ -1652,7 +1652,7 @@ namespace LOADSAVE {
         s_save_game_description* save_description = &MOX::_save_game_description[save_slot];
         const char* message_format = HAROLD::H_Message_(0xCD, save_slot, save_description);
 
-        _sprintf(message_buffer, message_format);
+        sprintf(message_buffer, message_format);
 
         int16_t choice = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 1);
         if (choice != 0) {
@@ -1789,7 +1789,7 @@ namespace LOADSAVE {
             return;
         }
 
-        _sprintf(
+        sprintf(
                 out_string,
                 s__3s__2d____4d__2d__2d_0055ac64,
                 LOADSAVE::_months[month],
@@ -1827,7 +1827,7 @@ namespace LOADSAVE {
         int32_t slot = MOX::_settings.active_save_slot;
         const char* format_str = HAROLD::H_Message_(0xcc);
 
-        _sprintf(text_buffer, format_str, slot, MOX::_save_game_description[slot].description);
+        sprintf(text_buffer, format_str, slot, MOX::_save_game_description[slot].description);
 
         int16_t box_res = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, text_buffer, 1);
 

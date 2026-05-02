@@ -150,7 +150,7 @@ namespace TECH {
         _g_entries_p = entries;
 
         player_race = MOX::_player[MOX::_PLAYER_NUM].race;
-        _sprintf(sr_r_x_sc_lbx, s_SR_R_x_SC_LBX_00557d74, player_race);
+        sprintf(sr_r_x_sc_lbx, s_SR_R_x_SC_LBX_00557d74, player_race);
 
         RUSS::Mox_Update_();
 
@@ -678,7 +678,7 @@ namespace TECH {
         }
         strcat(text_buffer, suffix);
 
-        _sprintf(desc_buffer, _research_desc_fmt, loaded_data + 0x67, text_buffer);
+        sprintf(desc_buffer, _research_desc_fmt, loaded_data + 0x67, text_buffer);
         TEXTBOX::Text_Box_(loaded_data, desc_buffer);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -892,7 +892,7 @@ namespace TECH {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        _sprintf(buffer, s__s__s_00558014, star->name, numeral_str);
+        sprintf(buffer, s__s__s_00558014, star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';

@@ -139,7 +139,7 @@ namespace council {
             print_x += 421; // 0x1a5
         }
 
-        _sprintf(buffer, council::s_format_votes, (int)council::_council_total_votes, council::_council_votes_total_message);
+        sprintf(buffer, council::s_format_votes, (int)council::_council_total_votes, council::_council_votes_total_message);
         fonts::Print_Centered_(320 /* 0x140 */, 30 /* 0x1e */, buffer);
 
         for (int i = 0; i < council::_council_total_members; ++i) {
@@ -195,13 +195,13 @@ namespace council {
         if (MOX::_PLAYER_NUM == council::_council_nominee_[0]) {
             JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[0], 25);
         } else {
-            _sprintf(list_items[0], "  %s", MOX::_player[council::_council_nominee_[0]].name);
+            sprintf(list_items[0], "  %s", MOX::_player[council::_council_nominee_[0]].name);
         }
 
         if (MOX::_PLAYER_NUM == council::_council_nominee_[1]) {
             JIM::Get_Text_Message_("jimtext.lbx", 24 /* ME */, list_items[1], 25);
         } else {
-            _sprintf(list_items[1], "  %s", MOX::_player[council::_council_nominee_[1]].name);
+            sprintf(list_items[1], "  %s", MOX::_player[council::_council_nominee_[1]].name);
         }
 
         JIM::Get_Text_Message_("jimtext.lbx", 25 /* ABSTAIN */, list_items[2], 25);

@@ -69,7 +69,7 @@ namespace allocate {
     void __cdecl Allocation_Error_(int bytes_requested) {
         char message_buffer[100];
 
-        _sprintf(message_buffer, s_Couldn_t_Allocate_0055B668, bytes_requested);
+        sprintf(message_buffer, s_Couldn_t_Allocate_0055B668, bytes_requested);
 
         exitm::Exit_With_Message(message_buffer);
     }
@@ -91,7 +91,7 @@ namespace allocate {
         char buffer[100];
 
         // Format: "Unable to Allocate %d bytes (%s, %d)\n"
-        _sprintf(buffer, s_Unable_to_Allocate_bytes, size, file, line);
+        sprintf(buffer, s_Unable_to_Allocate_bytes, size, file, line);
 
         exitm::Exit_With_Message(buffer);
     }

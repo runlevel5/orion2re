@@ -73,50 +73,50 @@ namespace COLCALC {
                 return;
             }
 
-            debug += _sprintf(debug, (const char*)0x00551130, (const char*)0x0055A8A4);
-            debug += _sprintf(debug, (const char*)0x00551130, (const char*)0x0055110C);
+            debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055A8A4);
+            debug += sprintf(debug, (const char*)0x00551130, (const char*)0x0055110C);
 
-            debug += _sprintf(debug, (const char*)0x0055A894,
+            debug += sprintf(debug, (const char*)0x0055A894,
                 _morale_lookup_table[govt] * 5, _government_morale_msg, msg_barracks);
 
             if (no_capital_penalty != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     no_capital_penalty * 5, _no_capital_msg);
 
             if (mixed_race_penalty != 0)
-                debug += _sprintf(debug, (const char*)0x0055A87C,
+                debug += sprintf(debug, (const char*)0x0055A87C,
                     mixed_race_penalty * 5, _mixed_races_msg);
 
             if (barracks_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     barracks_bonus * 5, TECHDATA::_buildings[BUILDING_ARMOR_BARRACKS].name);
 
             if (marine_barracks_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     marine_barracks_bonus * 5, TECHDATA::_buildings[BUILDING_MARINE_BARRACKS].name);
 
             if (psychophysics_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     psychophysics_bonus * 5, TECHDATA::_technology_applications[TECH_APP_PSIONICS].name);
 
             if (holo_simulator_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     holo_simulator_bonus * 5, TECHDATA::_buildings[BUILDING_HOLO_SIMULATOR].name);
 
             if (vr_network_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     vr_network_bonus * 5, TECHDATA::_technology_applications[TECH_APP_VIRTUAL_REALITY_NETWORK].name);
 
             if (pleasure_dome_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     pleasure_dome_bonus * 5, TECHDATA::_buildings[BUILDING_PLEASURE_DOME].name);
 
             if (leader_bonus != 0)
-                debug += _sprintf(debug, (const char*)0x0055A888,
+                debug += sprintf(debug, (const char*)0x0055A888,
                     leader_bonus * 5, _leader_bonus_msg);
 
-            debug += _sprintf(debug, (const char*)0x0055136C);
-            _sprintf(debug, (const char*)0x0055A888,
+            debug += sprintf(debug, (const char*)0x0055136C);
+            sprintf(debug, (const char*)0x0055A888,
                 colony->morale * 5, _total_morale_msg);
         }
     }
@@ -976,36 +976,36 @@ namespace COLCALC {
 
         if (debug_out) {
             char* ptr = debug_out;
-            ptr += _sprintf(ptr, s_fmt_val_msg, 5, _starting_command_points_msg);
+            ptr += sprintf(ptr, s_fmt_val_msg, 5, _starting_command_points_msg);
 
             if (n_star_bases > 0) {
-                if (n_star_bases == 1) ptr += _sprintf(ptr, _d_from_1_star_base_msg, 1);
-                else ptr += _sprintf(ptr, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
+                if (n_star_bases == 1) ptr += sprintf(ptr, _d_from_1_star_base_msg, 1);
+                else ptr += sprintf(ptr, _d_from_d_star_bases_msg, n_star_bases, n_star_bases);
             }
             if (n_battlestations > 0) {
-                if (n_battlestations == 1) ptr += _sprintf(ptr, _d_from_1_battlestation_msg, 2);
-                else ptr += _sprintf(ptr, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
+                if (n_battlestations == 1) ptr += sprintf(ptr, _d_from_1_battlestation_msg, 2);
+                else ptr += sprintf(ptr, _d_from_d_battlestations_msg, n_battlestations * 2, n_battlestations);
             }
             if (n_fortresses > 0) {
-                if (n_fortresses == 1) ptr += _sprintf(ptr, _d_from_1_fortress_msg, 3);
-                else ptr += _sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
+                if (n_fortresses == 1) ptr += sprintf(ptr, _d_from_1_fortress_msg, 3);
+                else ptr += sprintf(ptr, _d_from_d_fortresses_msg, n_fortresses * 3, n_fortresses);
             }
             if (comm_tech_total != 0) {
-                ptr += _sprintf(ptr, s_fmt_val_name, comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
+                ptr += sprintf(ptr, s_fmt_val_name, comm_tech_total, TECHDATA::_technology_applications[comm_tech_idx].name);
             }
             if (leader_cp_bonus != 0) {
-                ptr += _sprintf(ptr, s_fmt_val_name, leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
+                ptr += sprintf(ptr, s_fmt_val_name, leader_cp_bonus, MOX::_leaders[bonus_leader_idx].name);
             }
             if (warlord_bonus != 0) {
-                ptr += _sprintf(ptr, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
+                ptr += sprintf(ptr, s_fmt_val_msg, warlord_bonus, _from_warlord_msg);
             }
             if (imperium_bonus != 0) {
-                ptr += _sprintf(ptr, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
+                ptr += sprintf(ptr, s_fmt_val_msg, imperium_bonus, _from_imperium_msg);
             }
             if (plr->command_points > 5) {
-                ptr += _sprintf(ptr, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
+                ptr += sprintf(ptr, s_fmt_val_msg, (int)plr->command_points, _total_command_points_msg);
             }
-            ptr += _sprintf(ptr, s_separator);
+            ptr += sprintf(ptr, s_separator);
             debug_out = ptr;
         }
 
@@ -1038,20 +1038,20 @@ namespace COLCALC {
             for (int i = 0; i < 9; ++i) {
                 if (ship_counts[i] > 0) {
                     if (ship_counts[i] == 1) {
-                        ptr += _sprintf(ptr, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
+                        ptr += sprintf(ptr, _d_from_1_s_ship_msg, i + 1, TECHDATA::_hull_data[i].name);
                     }
                     else {
-                        ptr += _sprintf(ptr, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
+                        ptr += sprintf(ptr, _d_from_d_s_ships_msg, (i + 1) * ship_counts[i], ship_counts[i], TECHDATA::_hull_data[i].size_name);
                     }
                 }
             }
             if (noncombat_ships > 0) {
-                if (noncombat_ships == 1) ptr += _sprintf(ptr, _d_from_1_noncombat_ship_msg, 1);
-                else ptr += _sprintf(ptr, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
+                if (noncombat_ships == 1) ptr += sprintf(ptr, _d_from_1_noncombat_ship_msg, 1);
+                else ptr += sprintf(ptr, _d_from_d_noncombat_ships_msg, noncombat_ships, noncombat_ships);
             }
             const char* used_msg = (plr->command_points_used == 1) ? _total_command_point_used_msg : _total_command_points_used_msg;
-            ptr += _sprintf(ptr, s_fmt_val_msg, (int)plr->command_points_used, used_msg);
-            ptr += _sprintf(ptr, s_separator);
+            ptr += sprintf(ptr, s_fmt_val_msg, (int)plr->command_points_used, used_msg);
+            ptr += sprintf(ptr, s_separator);
             debug_out = ptr;
         }
 
@@ -1061,13 +1061,13 @@ namespace COLCALC {
                 int32_t cost_mult = (plr->objectives == 'd') ? 10 : (12 - MOX::_settings.game_difficulty);
                 plr->maintenance[2] = (int16_t)(cost_mult * diff);
                 if (debug_out) {
-                    _sprintf(debug_out, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
+                    sprintf(debug_out, s_msg_bc_calc, _ship_maintenance_costs_msg, 0, (int)plr->command_points, (int)cost_mult, (int)diff, (int)plr->maintenance[2]);
                 }
             }
             else {
                 plr->maintenance[2] = 0;
                 if (debug_out) {
-                    _sprintf(debug_out, s_msg_bc_zero, _ship_maintenance_costs_msg);
+                    sprintf(debug_out, s_msg_bc_zero, _ship_maintenance_costs_msg);
                 }
             }
         }
@@ -1205,44 +1205,44 @@ namespace COLCALC {
 
         if (debug_buf) {
             char* ptr = debug_buf;
-            ptr += _sprintf(ptr, s_fmt_s_00551130, s_T_15_65);
-            ptr += _sprintf(ptr, s_fmt_s_00551130, s_0);
+            ptr += sprintf(ptr, s_fmt_s_00551130, s_T_15_65);
+            ptr += sprintf(ptr, s_fmt_s_00551130, s_0);
 
             if (taxes_collected != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, taxes_collected, _taxes_collected_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, taxes_collected, _taxes_collected_msg);
             }
             if (morale_bonus > 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_bonus_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_bonus_msg);
             }
             else if (morale_bonus < 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_penalty_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, morale_bonus, _morale_penalty_msg);
             }
             if (special_planet_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, special_planet_bc, _special_income_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, special_planet_bc, _special_income_msg);
             }
             if (leader_bonus_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, leader_bonus_bc, _leader_bonus_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, leader_bonus_bc, _leader_bonus_msg);
             }
             if (galactic_currency_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, galactic_currency_bc, TECHDATA::_buildings[BUILDING_CURRENCY_EXCHANGE].name);
             }
             if (stock_exchange_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, stock_exchange_bc, TECHDATA::_buildings[BUILDING_STOCK_EXCHANGE].name);
             }
             if (spaceport_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, spaceport_bc, TECHDATA::_buildings[BUILDING_SPACEPORT].name);
             }
             if (gov_bonus_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, gov_bonus_bc, _government_bonus_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, gov_bonus_bc, _government_bonus_msg);
             }
             if (trade_goods_bc != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, trade_goods_bc, _trade_goods_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, trade_goods_bc, _trade_goods_msg);
             }
             if (colony->n_industry_taxed != 0) {
-                ptr += _sprintf(ptr, s_fmt_plus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                ptr += sprintf(ptr, s_fmt_plus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
             }
-            ptr += _sprintf(ptr, "%s", s_newline_0055136c);
-            _sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[ECON_BC], _total_income_msg);
+            ptr += sprintf(ptr, "%s", s_newline_0055136c);
+            sprintf(ptr, s_fmt_plus_d_s, (int)colony->production[ECON_BC], _total_income_msg);
         }
     }
 
@@ -1277,81 +1277,81 @@ namespace COLCALC {
 
         if (debug_out != nullptr) {
             char* ptr = debug_out;
-            ptr += _sprintf(ptr, s_str, s_T_15_65);
-            ptr += _sprintf(ptr, s_str, s_0);
+            ptr += sprintf(ptr, s_str, s_T_15_65);
+            ptr += sprintf(ptr, s_str, s_0);
 
             if (breakdown.base_prod != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.base_prod, _produced_by_scientists_msg);
+                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.base_prod, _produced_by_scientists_msg);
             }
             if (breakdown.artifacts_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.artifacts_bonus, _artifacts_bonus_msg);
+                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.artifacts_bonus, _artifacts_bonus_msg);
             }
             if (breakdown.intelligence_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, breakdown.intelligence_bonus, _intelligence_bonus_msg);
+                ptr += sprintf(ptr, s_tab_d_s_r, breakdown.intelligence_bonus, _intelligence_bonus_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_s_r, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    ptr += sprintf(ptr, s_tab_d_s_s_r, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.android_bonuses[0] != 0) {
-                ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.android_bonuses[0], _android_bonus_msg);
+                ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.android_bonuses[0], _android_bonus_msg);
             }
 
             for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    ptr += _sprintf(ptr, s_tab_d_s_r, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    ptr += sprintf(ptr, s_tab_d_s_r, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                ptr += sprintf(ptr, s_tab_s_s_r, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (res_lab_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
+                ptr += sprintf(ptr, s_tab_plus_d_s_r, res_lab_bonus, TECHDATA::_buildings[BUILDING_RESEARCH_LAB].name);
             }
             if (supercomp_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
+                ptr += sprintf(ptr, s_tab_plus_d_s_r, supercomp_bonus, TECHDATA::_buildings[BUILDING_SUPERCOMPUTER].name);
             }
             if (cybernet_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
+                ptr += sprintf(ptr, s_tab_plus_d_s_r, cybernet_bonus, TECHDATA::_buildings[BUILDING_GALACTIC_CYBERNET].name);
             }
             if (autolab_bonus != 0) {
-                ptr += _sprintf(ptr, s_tab_plus_d_s_r, autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
+                ptr += sprintf(ptr, s_tab_plus_d_s_r, autolab_bonus, TECHDATA::_buildings[BUILDING_AUTOLAB].name);
             }
 
-            ptr += _sprintf(ptr, s_newline);
-            _sprintf(ptr, s_tab_d_s_r, (int)total_research, _total_research_produced_msg);
+            ptr += sprintf(ptr, s_newline);
+            sprintf(ptr, s_tab_d_s_r, (int)total_research, _total_research_produced_msg);
         }
     }
 
@@ -1393,86 +1393,86 @@ namespace COLCALC {
         colony->production[ECON_FOOD] = static_cast<int16_t>(hydro_bonus + subterranean_bonus + base_job_prod);
 
         if (debug_out) {
-            int len = _sprintf(debug_out, s_fmt_s_00551130, s_T_15_65);
-            len += _sprintf(debug_out + len, s_fmt_s_00551130, s_0);
+            int len = sprintf(debug_out, s_fmt_s_00551130, s_T_15_65);
+            len += sprintf(debug_out + len, s_fmt_s_00551130, s_0);
 
             if (breakdown.base_prod != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_workers_msg);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_workers_msg);
             }
             if (breakdown.food_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, _aquatic_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, _aquatic_bonus_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 int16_t val = breakdown.racial_bonuses[i];
                 if (val > 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s_s, val / 2, MOX::_player[i].race_name, _bonus_msg);
+                    len += sprintf(debug_out + len, s_fmt_plus_d_s_s, val / 2, MOX::_player[i].race_name, _bonus_msg);
                 }
                 else if (val < 0) {
                     char* formatted = Format_Quotient_(val, 2);
-                    len += _sprintf(debug_out + len, s_fmt_s_s_s, formatted, MOX::_player[i].race_name, _bonus_msg);
+                    len += sprintf(debug_out + len, s_fmt_s_s_s, formatted, MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.android_bonuses[1] != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.android_bonuses[1] / 2, _native_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.android_bonuses[1] / 2, _native_bonus_msg);
             }
             if (breakdown.android_bonuses[0] != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.android_bonuses[0] / 2, _android_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.android_bonuses[0] / 2, _android_bonus_msg);
             }
 
             for (int i = 0; i < 212; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
+                    len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
+                    len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.buildings_prod[i] / 2, TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 40), _gravity_penalty_msg);
             }
             if (breakdown.conquered_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 40), _conquered_penalty_msg);
             }
             if (breakdown.blockaded_penalty != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 40), _blockaded_penalty_msg);
             }
             if (breakdown.morale_bonus > 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 40), _morale_penalty_msg);
             }
             if (breakdown.govt_bonus > 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 40), _government_penalty_msg);
             }
             if (breakdown.officer_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
+                len += sprintf(debug_out + len, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 40), _leader_bonus_msg);
             }
 
             if (hydro_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(hydro_bonus), TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(hydro_bonus), TECHDATA::_buildings[BUILDING_HYDROPONIC_FARM].name);
             }
             if (subterranean_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(subterranean_bonus), TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int32_t>(subterranean_bonus), TECHDATA::_buildings[BUILDING_SUBTERRANEAN_FARMS].name);
             }
 
             if (colony->n_food_replicated != 0) {
                 int replication_amount = static_cast<int>(static_cast<uint8_t>(colony->n_food_replicated));
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, replication_amount, TECHDATA::_buildings[BUILDING_FOOD_REPLICATORS].name);
                 colony->production[ECON_FOOD] += static_cast<int16_t>(replication_amount);
             }
 
-            len += _sprintf(debug_out + len, s_fmt_s_00551130, s_newline_0055136c);
-            _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), COLCALC::_total_food_produced_msg);
+            len += sprintf(debug_out + len, s_fmt_s_00551130, s_newline_0055136c);
+            sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), COLCALC::_total_food_produced_msg);
         }
     }
 
@@ -1594,99 +1594,99 @@ namespace COLCALC {
 
         if (debug_out) {
             char* p = debug_out;
-            p += _sprintf(p, s_fmt_s_00551130, s_T_15_65);
-            p += _sprintf(p, s_fmt_s_00551130, s_0);
+            p += sprintf(p, s_fmt_s_00551130, s_T_15_65);
+            p += sprintf(p, s_fmt_s_00551130, s_0);
 
             if (breakdown.base_prod != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_msg);
+                p += sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
                 if (breakdown.racial_bonuses[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s_s, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
+                    p += sprintf(p, s_fmt_plus_d_s_s, (int)breakdown.racial_bonuses[i], MOX::_player[i].race_name, _bonus_msg);
                 }
             }
 
             if (breakdown.android_bonuses[0] != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.android_bonuses[0], _android_bonus_msg);
+                p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.android_bonuses[0], _android_bonus_msg);
             }
 
             for (int i = 0; i < 212; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
+                    p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.tech_apps[i], TECHDATA::_technology_applications[i].name);
                 }
             }
 
             for (int i = 0; i < 49; ++i) {
                 if (breakdown.buildings_prod[i] != 0) {
-                    p += _sprintf(p, s_fmt_plus_d_s, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
+                    p += sprintf(p, s_fmt_plus_d_s, (int)breakdown.buildings_prod[i], TECHDATA::_buildings[i].name);
                 }
             }
 
             if (breakdown.gravity_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.gravity_penalty, 20), _gravity_penalty_msg);
             }
 
             if (breakdown.conquered_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.conquered_penalty, 20), _conquered_penalty_msg);
             }
 
             if (breakdown.blockaded_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.blockaded_penalty, 20), _blockaded_penalty_msg);
             }
 
             if (breakdown.morale_bonus > 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_bonus_msg);
             }
             else if (breakdown.morale_bonus < 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.morale_bonus, 20), _morale_penalty_msg);
             }
 
             if (breakdown.govt_bonus > 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_bonus_msg);
             }
             else if (breakdown.govt_bonus < 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.govt_bonus, 20), _government_penalty_msg);
             }
 
             if (breakdown.officer_bonus != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.officer_bonus, 20), _leader_bonus_msg);
             }
 
             if (bonus_recycling != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
+                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_recycling, TECHDATA::_buildings[BUILDING_RECYCLOTRON].name);
             }
             if (bonus_automated_factory != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
+                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_automated_factory, TECHDATA::_buildings[BUILDING_AUTOMATED_FACTORY].name);
             }
             if (bonus_robo_miner != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
+                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_robo_miner, TECHDATA::_buildings[BUILDING_ROBO_MINER_PLANT].name);
             }
             if (bonus_deep_core != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
+                p += sprintf(p, s_fmt_plus_d_s, (int)bonus_deep_core, TECHDATA::_buildings[BUILDING_DEEP_CORE_MINE].name);
             }
             if (bonus_robotic_factory != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s_s, (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
+                p += sprintf(p, s_fmt_plus_d_s_s, (int)bonus_robotic_factory, TECHDATA::_buildings[BUILDING_ROBOTIC_FACTORY].name, _used_msg);
             }
 
             if (breakdown.pollution_penalty != 0) {
-                p += _sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
+                p += sprintf(p, s_fmt_s_s, Format_Quotient_(breakdown.pollution_penalty, 20), _pollution_penalty_msg);
             }
 
             if (colony->n_food_replicated != 0) {
                 char temp[256];
-                _sprintf(temp, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
-                p += _sprintf(p, s_fmt_d_s, (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
+                sprintf(temp, _replicated_to_d_food_msg, (uint32_t)(uint8_t)colony->n_food_replicated);
+                p += sprintf(p, s_fmt_d_s, (int32_t)(uint8_t)colony->n_food_replicated * -2, temp);
                 colony->production[ECON_INDUSTRY] -= (uint16_t)(uint8_t)colony->n_food_replicated * 2;
             }
 
             if (colony->n_industry_taxed != 0) {
-                p += _sprintf(p, s_fmt_minus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
+                p += sprintf(p, s_fmt_minus_d_s, (int)colony->n_industry_taxed, _taxed_from_industry_msg);
                 colony->production[ECON_INDUSTRY] -= colony->n_industry_taxed;
             }
 
-            p += _sprintf(p, s_fmt_s_00551130, s_newline_0055136c);
-            _sprintf(p, s_fmt_plus_d_s, (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
+            p += sprintf(p, s_fmt_s_00551130, s_newline_0055136c);
+            sprintf(p, s_fmt_plus_d_s, (int)colony->production[ECON_INDUSTRY], _total_industry_produced_msg);
         }
     }
 

@@ -429,7 +429,7 @@ namespace ERIC {
             if (mode == 0) {
                 strcpy(dest, local_buf);
             } else {
-                _sprintf(dest, ESTRINGS::E_Strings_(71), dest, 13, local_buf);
+                sprintf(dest, ESTRINGS::E_Strings_(71), dest, 13, local_buf);
             }
         }
     }

@@ -137,10 +137,10 @@ namespace COLSYSDI {
 
         if (planet->planet_type != 3) {
             if (planet->planet_type == 2) {
-                _sprintf(param_1, ESTRINGS::E_Strings_(0x46), gas_giant_str);
+                sprintf(param_1, ESTRINGS::E_Strings_(0x46), gas_giant_str);
             }
             if (planet->planet_type == 1) {
-                _sprintf(param_1, ESTRINGS::E_Strings_(0x46), asteroid_str);
+                sprintf(param_1, ESTRINGS::E_Strings_(0x46), asteroid_str);
             }
             return;
         }
@@ -152,18 +152,18 @@ namespace COLSYSDI {
                 COLONY::Set_Colony_Font_To_Player_(param_3, MOX::_colony[colony_idx].owner);
             }
             short max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_colony[colony_idx].owner);
-            _sprintf(pop_str, ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);
+            sprintf(pop_str, ESTRINGS::E_Strings_(0x8), (int)MOX::_colony[colony_idx].n_pops, (int)max_pop);
         }
 
         if (colony_idx == -1) {
-            _sprintf(param_1, ESTRINGS::E_Strings_(0x2C),
+            sprintf(param_1, ESTRINGS::E_Strings_(0x2C),
                     size_str[(int)planet->size],
                     MOX::_planet_climate_string[(int)climate],
                     gravity_str[(int)planet->gravity_class],
                     mineral_str[(int)planet->mineral_class],
                     pop_str);
         } else {
-            _sprintf(param_1, ESTRINGS::E_Strings_(0x29),
+            sprintf(param_1, ESTRINGS::E_Strings_(0x29),
                     MOX::_player[(int)MOX::_colony[colony_idx].owner].race_name,
                     gravity_str[(int)planet->gravity_class],
                     mineral_str[(int)planet->mineral_class],

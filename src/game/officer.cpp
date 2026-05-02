@@ -430,7 +430,7 @@ namespace OFFICER {
 
         char* name = Leader_Name_(leader_idx, 1);
 
-        _sprintf(formatted_msg, template_str, name, (int)costs, (int)upkeep);
+        sprintf(formatted_msg, template_str, name, (int)costs, (int)upkeep);
 
         uint8_t result = Hire_Officer_Popup_(MOX::_PLAYER_NUM, leader_idx, formatted_msg);
 
@@ -490,7 +490,7 @@ namespace OFFICER {
 
         char* leader_name = Leader_Name_(leader_idx, 1);
 
-        _sprintf(output_buffer, format_string, MOX::_player[MOX::_PLAYER_NUM].bc, leader_name, (int32_t)cost);
+        sprintf(output_buffer, format_string, MOX::_player[MOX::_PLAYER_NUM].bc, leader_name, (int32_t)cost);
 
         Officer_Screen_User_Box_(output_buffer, 0);
 
@@ -507,7 +507,7 @@ namespace OFFICER {
 
         char* leader_name = Leader_Name_(officer_id, 1);
 
-        _sprintf(output_buffer, format_buffer, leader_name);
+        sprintf(output_buffer, format_buffer, leader_name);
 
         Officer_Screen_User_Box_(output_buffer, 0);
 
@@ -683,7 +683,7 @@ namespace OFFICER {
             int8_t eta = leader->eta;
 
             if (eta < 1) {
-                _sprintf(buffer, s_GEGGGGG_format, ship->d.name, leader->name);
+                sprintf(buffer, s_GEGGGGG_format, ship->d.name, leader->name);
             } else {
                 const char* format;
                 if (eta == 1) {
@@ -691,7 +691,7 @@ namespace OFFICER {
                 } else {
                     format = HAROLD::H_Message_(HESTR_093_S_S_D_TURNS);
                 }
-                _sprintf(buffer, format, ship->d.name, leader->name, (int)eta);
+                sprintf(buffer, format, ship->d.name, leader->name, (int)eta);
             }
         }
 
@@ -771,9 +771,9 @@ namespace OFFICER {
             if (MOX::_officer_scanned > -1) {
                 Get_Officer_Costs_(MOX::_officer_scanned, &hire_cost, &maint_cost);
                 if (maint_cost == 0) {
-                    _sprintf(buffer, HAROLD::H_Message_(HESTR_129_D_BCS_NO_MAINTENANCE), (int)hire_cost);
+                    sprintf(buffer, HAROLD::H_Message_(HESTR_129_D_BCS_NO_MAINTENANCE), (int)hire_cost);
                 } else {
-                    _sprintf(buffer, HAROLD::H_Message_(HESTR_121_D_BCS_AND_D_BC_TURN), (int)hire_cost, (int)maint_cost);
+                    sprintf(buffer, HAROLD::H_Message_(HESTR_121_D_BCS_AND_D_BC_TURN), (int)hire_cost, (int)maint_cost);
                 }
                 MISC::Set_Fitted_Font_Style_(buffer, &OFFICER::_normal_text_colors, 4, 2, 0, 132, 1);
                 fonts::Print_(315, 450, buffer);
@@ -788,10 +788,10 @@ namespace OFFICER {
             } else {
                 s_leader_data* leader = &MOX::_leaders[leader_idx];
                 if (leader->eta < 1) {
-                    _sprintf(buffer, MOX::s_fmt_scanned_star_info, MOX::_star[star_idx].name, leader->name);
+                    sprintf(buffer, MOX::s_fmt_scanned_star_info, MOX::_star[star_idx].name, leader->name);
                 } else {
                     int msg_id = (leader->eta == 1) ? HESTR_092_S_S_D_TURN : HESTR_093_S_S_D_TURNS;
-                    _sprintf(buffer, HAROLD::H_Message_(msg_id), MOX::_star[star_idx].name, leader->name, (int)leader->eta);
+                    sprintf(buffer, HAROLD::H_Message_(msg_id), MOX::_star[star_idx].name, leader->name, (int)leader->eta);
                 }
             }
             MISC::Set_Fitted_Font_Style_(buffer, &OFFICER::_normal_text_colors, 3, 2, 0, 203, 1);
@@ -993,7 +993,7 @@ namespace OFFICER {
                                 if (Leader_Can_Be_Assigned_((int16_t)MOX::_officer_selected) == 0) {
                                     char buffer[200];
                                     const char* fmt = HAROLD::H_Message_(0x12D /* HESTR_12D_S_CANNOT_BE_PUT_INTO_S */);
-                                    _sprintf(buffer, fmt, Leader_Name_((int16_t)MOX::_officer_selected, 0));
+                                    sprintf(buffer, fmt, Leader_Name_((int16_t)MOX::_officer_selected, 0));
                                     Officer_Screen_User_Box_(buffer, 0);
                                 } else {
                                     Assign_Officer_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
@@ -1387,7 +1387,7 @@ namespace OFFICER {
                     char final_msg[200];
                     strcpy(format_str, HAROLD::H_Message_(HESTR_126_DISMISS_S));
                     mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
-                    _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 1));
+                    sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 1));
 
                     if (Officer_Screen_User_Box_(final_msg, 1) != 0) {
                         Dismiss_Officer_(MOX::_officer_selected);
@@ -1416,7 +1416,7 @@ namespace OFFICER {
                             char format_str[200];
                             char final_msg[200];
                             strcpy(format_str, HAROLD::H_Message_(HESTR_127_S_MUST_BE_HIRED_BEFORE));
-                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
+                            sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
                             Officer_Screen_User_Box_(final_msg, 0);
                         }
                         MOX::_officer_selected = -1;
@@ -1432,10 +1432,10 @@ namespace OFFICER {
                         char final_msg[200];
                         if (MOX::_leaders[static_cast<uint8_t>(MOX::_officer_selected)].status == 4) {
                             strcpy(format_str, HAROLD::H_Message_(HESTR_127_S_MUST_BE_HIRED_BEFORE));
-                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
+                            sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0));
                         } else {
                             strcpy(format_str, HAROLD::H_Message_(HESTR_128_YOU_CANNOT_ASSIGN_S_TO));
-                            _sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0), MOX::_star[_officer_star_chosen].name);
+                            sprintf(final_msg, format_str, Leader_Name_(MOX::_officer_selected, 0), MOX::_star[_officer_star_chosen].name);
                         }
                         Officer_Screen_User_Box_(final_msg, 0);
                     }
@@ -1584,7 +1584,7 @@ namespace OFFICER {
         if (Is_Fleet_Officer_Screen_()) {
             if (HACCESS::Ship_Owner_(ship_idx) != MOX::_PLAYER_NUM) {
                 strcpy(format_buf, HAROLD::H_Message_(HESTR_117_YOU_MAY_NOT_ASSIGN_S_T));
-                _sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0));
+                sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0));
                 Officer_Screen_User_Box_(display_buf, 3);
                 return;
             }
@@ -1594,13 +1594,13 @@ namespace OFFICER {
 
             if (eta == 0) {
                 strcpy(format_buf, HAROLD::H_Message_(HESTR_119_ASSIGN_S_TO_S));
-                _sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), target_ship);
+                sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), target_ship);
             } else {
                 strcpy(format_buf, HAROLD::H_Message_(HESTR_118_IT_WILL_TAKE_D_TURNS_F));
                 if (MOX::_settings.language == 4) {
-                    _sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), (int)eta, target_ship);
+                    sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), (int)eta, target_ship);
                 } else {
-                    _sprintf(display_buf, format_buf, (int)eta, Leader_Name_(leader_idx, 0), target_ship);
+                    sprintf(display_buf, format_buf, (int)eta, Leader_Name_(leader_idx, 0), target_ship);
                 }
             }
 
@@ -1613,7 +1613,7 @@ namespace OFFICER {
                     int16_t msg_id = (leader->eta < 1) ? HESTR_11B_S_CURRENTLY_ON_S_WILL_ : HESTR_11A_S_IN_ROUTE_TO_S_WILL_B;
 
                     strcpy(format_buf, HAROLD::H_Message_(msg_id));
-                    _sprintf(display_buf, format_buf, Leader_Name_(existing_leader, 1), target_ship);
+                    sprintf(display_buf, format_buf, Leader_Name_(existing_leader, 1), target_ship);
                     proceed = Officer_Screen_User_Box_(display_buf, 1) != 0;
                 }
 
@@ -1628,13 +1628,13 @@ namespace OFFICER {
 
             if (eta == 0) {
                 strcpy(format_buf, HAROLD::H_Message_(HESTR_119_ASSIGN_S_TO_S));
-                _sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), target_star);
+                sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), target_star);
             } else {
                 strcpy(format_buf, HAROLD::H_Message_(HESTR_118_IT_WILL_TAKE_D_TURNS_F));
                 if (MOX::_settings.language == 4) {
-                    _sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), (int)eta, target_star);
+                    sprintf(display_buf, format_buf, Leader_Name_(leader_idx, 0), (int)eta, target_star);
                 } else {
-                    _sprintf(display_buf, format_buf, (int)eta, Leader_Name_(leader_idx, 0), target_star);
+                    sprintf(display_buf, format_buf, (int)eta, Leader_Name_(leader_idx, 0), target_star);
                 }
             }
 
@@ -1647,7 +1647,7 @@ namespace OFFICER {
                     int16_t msg_id = (leader->eta < 1) ? HESTR_11B_S_CURRENTLY_ON_S_WILL_ : HESTR_11A_S_IN_ROUTE_TO_S_WILL_B;
 
                     strcpy(format_buf, HAROLD::H_Message_(msg_id));
-                    _sprintf(display_buf, format_buf, Leader_Name_(existing_leader, 1), target_star);
+                    sprintf(display_buf, format_buf, Leader_Name_(existing_leader, 1), target_star);
                     proceed = Officer_Screen_User_Box_(display_buf, 1) != 0;
                 }
 
@@ -1731,7 +1731,7 @@ namespace OFFICER {
         char skill_name_buf[80];
 
         char* leader_raw_name = Leader_Name_(leader_idx, 1);
-        _sprintf(leader_name_buf, MOX::s_fmt_s, leader_raw_name);
+        sprintf(leader_name_buf, MOX::s_fmt_s, leader_raw_name);
 
         if (MOX::_settings.language != 4 && MOX::_leaders[leader_idx].title[0] != '\0') {
             strcat(leader_name_buf, ", ");
@@ -1746,7 +1746,7 @@ namespace OFFICER {
             skill_value = bonus;
         }
 
-        _sprintf(skill_desc_buf, _officer_skill_description_string[skill_id / 2], leader_name_buf, (int)skill_value);
+        sprintf(skill_desc_buf, _officer_skill_description_string[skill_id / 2], leader_name_buf, (int)skill_value);
 
         strcpy(skill_name_buf, _officer_skill_name_string[skill_id / 2]);
         MISC::Replace_Char_(skill_name_buf, '_', ' ');
@@ -1772,7 +1772,7 @@ namespace OFFICER {
             char* leader_name = Leader_Name_(leader_idx, 0);
             char final_message[200];
 
-            _sprintf(final_message, template_buffer, leader_name);
+            sprintf(final_message, template_buffer, leader_name);
 
             Officer_Screen_User_Box_(final_message, 3);
             return;
@@ -2107,31 +2107,31 @@ namespace OFFICER {
             char construction_buffer[512];
             char temp_sprintf_buf[256];
 
-            _sprintf(construction_buffer, HAROLD::H_Message_(HESTR_131_S_FLEET), race_name);
+            sprintf(construction_buffer, HAROLD::H_Message_(HESTR_131_S_FLEET), race_name);
             strings::String_To_Upper_(construction_buffer);
 
             if (n_outposts > 0) {
                 int16_t msg_id = (n_outposts == 1) ? HESTR_102_D_OUTPOST : HESTR_103_D_OUTPOSTS;
-                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_outposts);
+                sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_outposts);
                 strcat(construction_buffer, temp_sprintf_buf);
             }
 
             if (n_transports > 0) {
                 int16_t msg_id = (n_transports == 1) ? HESTR_104_D_TRANSPORT : HESTR_105_D_TRANSPORTS;
-                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_transports);
+                sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_transports);
                 strcat(construction_buffer, temp_sprintf_buf);
             }
 
             if (n_colony_ships > 0) {
                 int16_t msg_id = (n_colony_ships == 1) ? HESTR_106_D_COLONY_SHIP : HESTR_107_D_COLONY_SHIPS;
-                _sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_colony_ships);
+                sprintf(temp_sprintf_buf, HAROLD::H_Message_(msg_id), (int)n_colony_ships);
                 strcat(construction_buffer, temp_sprintf_buf);
             }
 
             for (int i = 0; i < 6; ++i) {
                 if (hull_counts[i] > 0) {
                     const char* hull_name = (hull_counts[i] == 1) ? TECHDATA::_hull_data[i].name : TECHDATA::_hull_data[i].size_name;
-                    _sprintf(temp_sprintf_buf, "%d %s, ", (int)hull_counts[i], hull_name);
+                    sprintf(temp_sprintf_buf, "%d %s, ", (int)hull_counts[i], hull_name);
                     strcat(construction_buffer, temp_sprintf_buf);
                 }
             }
@@ -3028,7 +3028,7 @@ namespace OFFICER {
         int16_t text_y = y - (font_height / 2) + 45;
 
         const char* format = HAROLD::H_Message_(303); /* 0x12F */
-        _sprintf(buffer, format, static_cast<int>(eta));
+        sprintf(buffer, format, static_cast<int>(eta));
 
         int16_t text_w = fonts::Get_String_Width_(buffer);
         int16_t text_x = x + (w / 2 - text_w / 2);
@@ -3115,7 +3115,7 @@ namespace OFFICER {
                 msg_idx = HESTR_112_S_DOES_NOT_HAVE_A_LOCA;
             }
             strcpy(msg_buf1, HAROLD::H_Message_(msg_idx));
-            _sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0));
+            sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0));
         }
 
         if (msg_buf2[0] == '\0') {
@@ -3123,18 +3123,18 @@ namespace OFFICER {
                 if (MOX::_ship[location].status == 4) {
                     int16_t abs_loc = HAROLD::Absolute_Location_(MOX::_ship[location].location);
                     strcpy(msg_buf1, HAROLD::H_Message_(HESTR_113_S_IS_LOCATED_ON_S_WHIC));
-                    _sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0), &MOX::_ship[location], &MOX::_star[abs_loc]);
+                    sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0), &MOX::_ship[location], &MOX::_star[abs_loc]);
                 } else {
                     int16_t stack_id = HACCESS::Ship_Stack_From_Ship_Id_(location);
                     if (stack_id == -1) {
                         strcpy(msg_buf1, HAROLD::H_Message_(HESTR_114_S_CANNOT_BE_LOCATED));
-                        _sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0));
+                        sprintf(msg_buf2, msg_buf1, Leader_Name_(leader_idx, 0));
                     } else {
                         bool diff = MOX::_small_ship_stack_ptr != stack_id;
                         MOX::_small_ship_stack_ptr = stack_id;
                         _fleet_icon_ship_id_to_move = location;
                         if (diff) {
-                            _sprintf(msg_buf3, HAROLD::H_Message_(HESTR_115_TRANSFERING_DISPLAY_TO), &MOX::_ship[location]);
+                            sprintf(msg_buf3, HAROLD::H_Message_(HESTR_115_TRANSFERING_DISPLAY_TO), &MOX::_ship[location]);
                         }
                     }
                 }
@@ -3143,7 +3143,7 @@ namespace OFFICER {
                 bool diff = _officer_star_displayed != _officer_star_chosen;
                 _officer_star_displayed = _officer_star_chosen;
                 if (diff) {
-                    _sprintf(msg_buf3, HAROLD::H_Message_(HESTR_116_TRANSFERING_DISPLAY_TO), &MOX::_star[_officer_star_chosen]);
+                    sprintf(msg_buf3, HAROLD::H_Message_(HESTR_116_TRANSFERING_DISPLAY_TO), &MOX::_star[_officer_star_chosen]);
                 }
             }
         }
@@ -3541,7 +3541,7 @@ void __cdecl Print_Officer_Data_(
     }
 
     if (MOX::_current_screen == 0x1d && OFFICER::_offscrn_ask_for_hire_popup == 0) {
-        _sprintf(text_buffer, s__s_00551130, OFFICER::Leader_Name_(officer_id, false));
+        sprintf(text_buffer, s__s_00551130, OFFICER::Leader_Name_(officer_id, false));
         fonts::Set_Font_Style_Outline_(3, &text_colors);
         fonts::Set_Font_Spacing_(1);
 
@@ -3561,7 +3561,7 @@ void __cdecl Print_Officer_Data_(
             const int16_t label_width = fonts::Get_String_Width_(label);
 
             HAROLD::Get_Monetary_Unit_String_(money_unit);
-            _sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(status4_cost), money_unit);
+            sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(status4_cost), money_unit);
 
             fonts::Print_Right_(
                 static_cast<int16_t>(text_x + right_column_offset_x - 2),
@@ -3580,7 +3580,7 @@ void __cdecl Print_Officer_Data_(
                 strcpy(text_buffer, HAROLD::H_Message_(0x10a));
             } else {
                 HAROLD::Get_Monetary_Unit_String_(money_unit);
-                _sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(other_cost), money_unit);
+                sprintf(text_buffer, s__d__s_005569f0, static_cast<int32_t>(other_cost), money_unit);
             }
 
             const int16_t label_x =
@@ -3616,7 +3616,7 @@ void __cdecl Print_Officer_Data_(
         OFFICER::Get_Officer_Costs_(officer_id, &unused_cost_a, &unused_cost_b);
 
         if (MOX::_current_screen == 0x1d) {
-            _sprintf(
+            sprintf(
                 status_text,
                 HAROLD::H_Message_(0x10d),
                 0x1e - static_cast<int32_t>(leader.eta));
@@ -3694,14 +3694,14 @@ void __cdecl Print_Officer_Data_(
             OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
 
             const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
-            _sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
             fonts::Print_(name_x, current_y, text_buffer);
             fonts::Get_String_Width_(text_buffer);
 
             const int16_t bonus =
                 static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(MOX::_PLAYER_NUM, officer_id, skill_idx));
 
-            _sprintf(
+            sprintf(
                 text_buffer,
                 MOX::_skill_data[skill_idx].format_str,
                 static_cast<int32_t>(bonus));
@@ -3729,14 +3729,14 @@ void __cdecl Print_Officer_Data_(
             OFFICER::Draw_Officer_Skill_Icon_(skill_column_x, current_y, skill_idx / 2);
 
             const int16_t name_x = static_cast<int16_t>(skill_column_x + 0x16);
-            _sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
+            sprintf(text_buffer, s__s_005569e8, MOX::_skill_data[skill_idx].name);
             fonts::Print_(name_x, current_y, text_buffer);
             fonts::Get_String_Width_(text_buffer);
 
             const int16_t bonus =
                 static_cast<int16_t>(OFFICER::Officer_Skill_Bonus_(MOX::_PLAYER_NUM, officer_id, skill_idx));
 
-            _sprintf(
+            sprintf(
                 text_buffer,
                 MOX::_skill_data[skill_idx].format_str,
                 static_cast<int32_t>(bonus));
@@ -3773,7 +3773,7 @@ int16_t __cdecl Get_Skill_Data_Max_Pixel_Width_(int16_t leader_idx) {
         }
 
         const int16_t bonus = (int16_t)OFFICER::Officer_Skill_Bonus_(static_cast<uint32_t>(player_idx), leader_idx, skill_idx);
-        _sprintf(formatted_bonus, MOX::_skill_data[skill_idx].format_str, static_cast<int>(bonus));
+        sprintf(formatted_bonus, MOX::_skill_data[skill_idx].format_str, static_cast<int>(bonus));
 
         const int16_t width = fonts::Get_String_Width_(formatted_bonus);
         if (width > max_width) {

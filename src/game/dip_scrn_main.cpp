@@ -659,10 +659,10 @@ namespace DIP_SCRN {
                 break;
             case 0x8E:
                 if (MOX::_settings.language == 0) {
-                    _sprintf(temp_buf, s_fmt_dot, MOX::_stardate / 10, MOX::_stardate % 10);
+                    sprintf(temp_buf, s_fmt_dot, MOX::_stardate / 10, MOX::_stardate % 10);
                 }
                 else {
-                    _sprintf(temp_buf, s_fmt_comma, MOX::_stardate / 10, MOX::_stardate % 10);
+                    sprintf(temp_buf, s_fmt_comma, MOX::_stardate / 10, MOX::_stardate % 10);
                 }
                 replacement = temp_buf;
                 break;
@@ -682,7 +682,7 @@ namespace DIP_SCRN {
                         }
                     }
                     else {
-                        _sprintf(temp_buf, s_fmt_BC, MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2]);
+                        sprintf(temp_buf, s_fmt_BC, MOX::_player[param_3].diplomacy_proposal_gold_bribe[param_2]);
                         replacement = temp_buf;
                     }
                 }
@@ -939,7 +939,7 @@ namespace DIP_SCRN {
         }
 
         for (int i = 0; i < choice_count; ++i) {
-            _sprintf(_diplomacy_list_choice[i], s__d_BC_00552384, (int)bc_options[i]);
+            sprintf(_diplomacy_list_choice[i], s__d_BC_00552384, (int)bc_options[i]);
             if (MOX::_player[player_idx].bc < (int)bc_options[i]) {
                 selection_flags[i] = 0;
             }
@@ -1603,7 +1603,7 @@ namespace DIP_SCRN {
                     fonts::Set_Outline_Color_(0xF8, 0xF8);
                     fonts::Set_Font_Style_Shadow_Down_(4, &_diplomacy_normal_colors);
 
-                    _sprintf(local_str, s_s_sez__s_00552334, MOX::_player[_current_ambassador].name, _receive_chat_message);
+                    sprintf(local_str, s_s_sez__s_00552334, MOX::_player[_current_ambassador].name, _receive_chat_message);
                     fonts::Print_Centered_(0x140, 0x1D, local_str);
                 }
             }
@@ -1758,7 +1758,7 @@ namespace DIP_SCRN {
                 for (int16_t i = 0; i < items_to_process; i++) {
                     int16_t target_idx = i + has_prev;
                     char* tech_name = TECH::Technology_Applications_Name_((uint8_t)tech_ids[start_idx + i], tech_app_player);
-                    _sprintf(_diplomacy_list_choice[target_idx], s_percent_s_0055236c, tech_name);
+                    sprintf(_diplomacy_list_choice[target_idx], s_percent_s_0055236c, tech_name);
                     item_values[target_idx] = (uint8_t)tech_ids[start_idx + i];
                 }
             }

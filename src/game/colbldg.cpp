@@ -366,10 +366,10 @@ namespace COLBLDG {
             char name_buffer[500];
             int ships_built_count = MOX::_player[player_idx].ships_built[(int)new_ship.d.size];
 
-            _sprintf(name_buffer, ESTRINGS::E_Strings_(0x2a), new_ship.d.name, ships_built_count);
+            sprintf(name_buffer, ESTRINGS::E_Strings_(0x2a), new_ship.d.name, ships_built_count);
 
             if (strlen(name_buffer) >= 15) {
-                _sprintf(name_buffer, ESTRINGS::E_Strings_(0x48), new_ship.d.name, ships_built_count);
+                sprintf(name_buffer, ESTRINGS::E_Strings_(0x48), new_ship.d.name, ships_built_count);
                 if (strlen(name_buffer) >= 15) {
                     strcpy(name_buffer, new_ship.d.name);
                 }
@@ -682,7 +682,7 @@ namespace COLBLDG {
             if (show_delete && _scanned_field >= _queue_fields[0] && _scanned_field <= _queue_fields[6] && _current_item[i] != -1) {
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 char* item_name = Selection_Name_(_current_item[i]);
-                _sprintf(buffer, ESTRINGS::E_Strings_(ESTR_DELETE_S), item_name);
+                sprintf(buffer, ESTRINGS::E_Strings_(ESTR_DELETE_S), item_name);
                 text_to_print = buffer;
             } else {
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
@@ -758,7 +758,7 @@ namespace COLBLDG {
 
         char* opt_str = Option_String_(-8);
         char* format = ESTRINGS::E_Strings_(45);
-        _sprintf(_g_msg, format, opt_str, ship);
+        sprintf(_g_msg, format, opt_str, ship);
 
         return _g_msg;
     }
@@ -828,7 +828,7 @@ namespace COLBLDG {
                 BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
                 y_line_count += 2;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
-                _sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
+                sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
                 fonts::Print_(306, (y_line_count * 13 + 21), buffer);
                 y_line_count++;
                 Print_Selection_Centered_(Selection_Name_(item_id));
@@ -840,7 +840,7 @@ namespace COLBLDG {
                 y_line_count += 2;
                 fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
                 fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
-                _sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
+                sprintf(buffer, ESTRINGS::E_Strings_(0x54), ESTRINGS::E_Strings_(0xF3), ESTRINGS::E_Strings_(0x1EA));
                 y_line_count++;
                 fonts::Print_(306, (y_line_count * 13 + 21), buffer);
                 y_line_count++;
@@ -959,7 +959,7 @@ namespace COLBLDG {
 
             char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[COLONY::_colony_handle].planet);
             char* format = ESTRINGS::E_Strings_(ESTR_BUILD_LIST_FOR_S);
-            _sprintf(buffer, format, planet_name);
+            sprintf(buffer, format, planet_name);
 
             fonts::Set_Font_Style_Shadow_Down_(3, &COLBLDG::_l_font_color_array);
             BILL::Squeeze_Paragraph_Centered_(235, 309, 194, 17, buffer, 2);
@@ -1076,7 +1076,7 @@ namespace COLBLDG {
         // 1. Draw Production Cost
         int16_t cost = COLCALC::Colony_Product_Cost_(&MOX::_colony[colony_idx], product_idx);
         format_str = ESTRINGS::E_Strings_(ESTR_COST_HERE_D);
-        _sprintf(buffer, format_str, (int32_t)cost);
+        sprintf(buffer, format_str, (int32_t)cost);
 
         y_pos = (*line_count) * 13 + 21;
         fonts::Print_(306, (int16_t)y_pos, buffer);
@@ -1086,7 +1086,7 @@ namespace COLBLDG {
         if (product_idx > 0 && product_idx < 49) {
             int32_t maint = (int32_t)TECHDATA::_buildings[product_idx].maintenance;
             format_str = ESTRINGS::E_Strings_(HESTR_16F_PENALTY);
-            _sprintf(buffer, format_str, maint);
+            sprintf(buffer, format_str, maint);
 
             y_pos = (*line_count) * 13 + 21;
             fonts::Print_(306, (int16_t)y_pos, buffer);
@@ -1096,7 +1096,7 @@ namespace COLBLDG {
         // 3. Draw Build Time
         int16_t build_time = COLONY::Calculate_Colony_Turn_Count_From_Scrap_For_Prod_(colony_idx, product_idx);
         format_str = ESTRINGS::E_Strings_(ESTR_BUILD_TIME_D);
-        _sprintf(buffer, format_str, (int32_t)build_time);
+        sprintf(buffer, format_str, (int32_t)build_time);
 
         y_pos = (*line_count) * 13 + 21;
         BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
@@ -1106,7 +1106,7 @@ namespace COLBLDG {
         if (MOX::_colony[colony_idx].producing[0] == product_idx) {
             int16_t turns_left = COLONY::Calculate_Current_Production_Turn_Count_(colony_idx);
             format_str = ESTRINGS::E_Strings_(ESTR_TURNS_LEFT_D);
-            _sprintf(buffer, format_str, (int32_t)turns_left);
+            sprintf(buffer, format_str, (int32_t)turns_left);
 
             y_pos = (*line_count) * 13 + 21;
             BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
@@ -1121,7 +1121,7 @@ namespace COLBLDG {
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];
 
             format_str = ESTRINGS::E_Strings_(ESTR_GRAVITY_HERE_S);
-            _sprintf(buffer, format_str, gravity_str);
+            sprintf(buffer, format_str, gravity_str);
 
             y_pos = (*line_count) * 13 + 21;
             BILL::Squeeze_Print_(306, (int16_t)y_pos, buffer, 156);
@@ -1174,7 +1174,7 @@ namespace COLBLDG {
         char wide_item_strings[8][200];
 
         strcpy(prefix_str, strings::s_t_T0_5_124__0055ac38);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(70), prefix_str);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(70), prefix_str);
 
         for (int i = 0; i < 8; i++) {
             wide_item_strings[i][0] = '\0';
@@ -1182,7 +1182,7 @@ namespace COLBLDG {
 
         if (show_crew != '\0') {
             if (ship->officer_index <= 0) {
-                buffer += _sprintf(
+                buffer += sprintf(
                     buffer,
                     ESTRINGS::E_Strings_(79),
                     strings::s_0_0055110c,
@@ -1196,7 +1196,7 @@ namespace COLBLDG {
                 strcpy(leader_name, OFFICER::Leader_Name_(ship->officer_index, '\0'));
                 strcpy(crew_desc, FLT2::Crew_Description_String_((int16_t)(ship - MOX::_ship)));
 
-                buffer += _sprintf(
+                buffer += sprintf(
                     buffer,
                     ESTRINGS::E_Strings_(78),
                     strings::s_0_0055110c,
@@ -1207,12 +1207,12 @@ namespace COLBLDG {
             }
         }
 
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, ship->d.cost);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[ship->d.shield_type].name);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[ship->d.computer_type].name);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[ship->d.armor_type].name);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[ship->d.ftl_type].name);
-        buffer += _sprintf(buffer, ESTRINGS::E_Strings_(130), strings::s_0_0055110c);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(99), strings::s_0_0055110c, strings::s__0055ac34, ship->d.cost);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(119), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_shields[ship->d.shield_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(98), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_computers[ship->d.computer_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(91), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_armor[ship->d.armor_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(104), strings::s_0_0055110c, strings::s__0055ac34, TECHDATA::_drives[ship->d.ftl_type].name);
+        buffer += sprintf(buffer, ESTRINGS::E_Strings_(130), strings::s_0_0055110c);
 
         int weapons_added = 0;
         int num_wide_weapons = 0;
@@ -1225,7 +1225,7 @@ namespace COLBLDG {
 
                 if (fonts::Get_String_Width_(temp_weapon_str) <= 110) {
                     int str_id = ((weapons_added % 2) == 0) ? 87 : 88;
-                    buffer += _sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)ship->d.ship_weapon[i].count, temp_weapon_str);
+                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, (int)ship->d.ship_weapon[i].count, temp_weapon_str);
                     weapons_added++;
                 } else {
                     strcpy(wide_item_strings[num_wide_weapons], temp_weapon_str);
@@ -1237,15 +1237,15 @@ namespace COLBLDG {
 
         if (num_wide_weapons > 0) {
             if ((weapons_added % 2) != 0) {
-                buffer += _sprintf(buffer, ESTRINGS::E_Strings_(127));
+                buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
             }
             for (int i = 0; i < num_wide_weapons; i++) {
-                buffer += _sprintf(buffer, ESTRINGS::E_Strings_(88), strings::s_0_0055110c, wide_weapon_counts[i], wide_item_strings[i]);
+                buffer += sprintf(buffer, ESTRINGS::E_Strings_(88), strings::s_0_0055110c, wide_weapon_counts[i], wide_item_strings[i]);
             }
         }
 
         if ((weapons_added % 2) == 1) {
-            buffer += _sprintf(buffer, ESTRINGS::E_Strings_(127));
+            buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
         }
 
         for (int i = 0; i < 8; i++) {
@@ -1260,12 +1260,12 @@ namespace COLBLDG {
             if (struct_::Test_Bit_Field_(ship->d.special_device_flags, i)) {
                 if (!has_specials_prefix) {
                     has_specials_prefix = true;
-                    buffer += _sprintf(buffer, ESTRINGS::E_Strings_(129), strings::s_0_0055110c);
+                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(129), strings::s_0_0055110c);
                 }
 
                 if (fonts::Get_String_Width_(TECHDATA::_specials[i].name) <= 115) {
                     int str_id = ((specials_added % 2) == 0) ? 89 : 90;
-                    buffer += _sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, TECHDATA::_specials[i].name);
+                    buffer += sprintf(buffer, ESTRINGS::E_Strings_(str_id), strings::s_0_0055110c, TECHDATA::_specials[i].name);
                     specials_added++;
                 } else {
                     strcpy(wide_item_strings[num_wide_specials], TECHDATA::_specials[i].name);
@@ -1276,10 +1276,10 @@ namespace COLBLDG {
 
         if (num_wide_specials > 0) {
             if ((specials_added % 2) != 0) {
-                buffer += _sprintf(buffer, ESTRINGS::E_Strings_(127));
+                buffer += sprintf(buffer, ESTRINGS::E_Strings_(127));
             }
             for (int i = 0; i < num_wide_specials; i++) {
-                buffer += _sprintf(buffer, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
+                buffer += sprintf(buffer, ESTRINGS::E_Strings_(90), strings::s_0_0055110c, wide_item_strings[i]);
             }
         }
     }
@@ -1409,7 +1409,7 @@ namespace COLBLDG {
                     char* str1 = Selection_Name_(current_item);
                     char* format = ESTRINGS::E_Strings_(0x3b);
                     char buffer[500];
-                    _sprintf(buffer, format, str1, str2);
+                    sprintf(buffer, format, str1, str2);
 
                     if (MOX::_settings.auto_delete_tg_housing == 0) {
                         if (GENDRAW::Do_Confirmation_Box_(buffer) == 0) {
@@ -2221,9 +2221,9 @@ namespace COLBLDG {
         }
 
         if (param_3 != 0) {
-            _sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, buf3);
+            sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, buf3);
         } else {
-            _sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, ESTRINGS::E_Strings_(0xC));
+            sprintf(dest, ESTRINGS::E_Strings_(0x51), buf1, buf2, ESTRINGS::E_Strings_(0xC));
         }
     }
 

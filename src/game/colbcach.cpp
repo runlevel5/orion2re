@@ -8,7 +8,7 @@ namespace COLBCACH {
         int frame_index = type_index % 10;
 
         char* format = ESTRINGS::E_Strings_(ESTR_BLDGDLBX1);
-        _sprintf(filename, format, file_number);
+        sprintf(filename, format, file_number);
 
         void* cache_seg = MOX::_global_cache_seg;
         

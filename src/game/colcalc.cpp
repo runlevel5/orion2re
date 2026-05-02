@@ -2545,7 +2545,7 @@ namespace COLCALC {
             _tmp_quotient[0] = '+';
         }
 
-        int n_chars = _sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
+        int n_chars = sprintf(&_tmp_quotient[1], DESIGN::s_pct_d, val / denominator);
         char* fraction_ptr = &_tmp_quotient[1] + n_chars;
 
         int remainder = val % denominator;
@@ -2564,7 +2564,7 @@ namespace COLCALC {
             }
 
             if (multiplier != 0) {
-                _sprintf(fraction_ptr, s_dot_d_0055a528, (remainder * multiplier) / denominator);
+                sprintf(fraction_ptr, s_dot_d_0055a528, (remainder * multiplier) / denominator);
             }
         }
 

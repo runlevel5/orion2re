@@ -71,11 +71,7 @@ namespace HAROLD {
 
     uint8_t* __cdecl Harold_Init_();
 
-    inline void __cdecl Harold_Defaults_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004f0aa0});
-        fn();
-    }
+    void __cdecl Harold_Defaults_();
 
     void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2);
 
@@ -138,6 +134,12 @@ namespace HAROLD {
     bool __cdecl Player_Has_Colony_(int16_t player_num, int16_t star_idx);
 
     bool __cdecl Player_Has_Outpost_(int16_t player_num, int16_t star_idx);
+
+    inline uint8_t __cdecl Planet_Has_Outpost_(int16_t planet_idx) {
+        using Fn = uint8_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1430});
+        return fn(planet_idx);
+    }
 
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 

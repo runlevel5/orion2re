@@ -126,7 +126,7 @@ namespace HOTPOP {
                         strcpy(msg_player_singular, HAROLD::H_Message_(165));
                     }
 
-                    _sprintf(warning_buf, HAROLD::H_Message_(163), 
+                    sprintf(warning_buf, HAROLD::H_Message_(163), 
                             HOTPOP::_hotseat_human_players, msg_players_plural, 
                             (MOX::_settings.number_of_players - HOTPOP::_hotseat_human_players), 
                             msg_player_singular);

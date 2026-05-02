@@ -730,7 +730,7 @@ namespace COLONY {
                 int prod_remaining = (int)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - (int)col->production_spent;
                 int actual_buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
 
-                _sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
+                sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
                     actual_buy_cost, prod_remaining);
 
                 if (GENDRAW::Confirmation_Box_(buf) != 0) {
@@ -745,7 +745,7 @@ namespace COLONY {
         }
         else {
             int short_by = (int)(short)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - MOX::_player[col->owner].bc;
-            _sprintf(buf, ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
+            sprintf(buf, ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
                 short_by);
             GENDRAW::Help_(buf);
             COLONY::Show_Colony_Screen_();
@@ -760,7 +760,7 @@ namespace COLONY {
         if (MOX::_colony[handle].occupation_policy == 0) {
             char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
             char* fmt = ESTRINGS::E_Strings_(ESTR_ANNIHILATING_S);
-            _sprintf(buffer, fmt, planet_name);
+            sprintf(buffer, fmt, planet_name);
             int16_t cycle_val = ERIC::Global_Cycler_(30, 2);
             Set_Colony_Font_To_Red_(4, cycle_val);
         }
@@ -768,7 +768,7 @@ namespace COLONY {
             char* planet_name = HACCESS::Get_Planet_Name_(static_cast<int16_t>(_planet_handle));
             char* colony_type = Colony_Type_(handle);
             char* fmt = ESTRINGS::E_Strings_(ESTR_SCOLONY_OF_S);
-            _sprintf(buffer, fmt, colony_type, planet_name);
+            sprintf(buffer, fmt, colony_type, planet_name);
             Set_Colony_Font_To_(4);
         }
 
@@ -817,7 +817,7 @@ namespace COLONY {
         int roundoff_rem = sum_roundoff % 1000;
 
         char* pop_fmt = ESTRINGS::E_Strings_(ESTR_POP_D03D_K_DK);
-        _sprintf(buffer, pop_fmt, total_pop, roundoff_rem, sum_growth);
+        sprintf(buffer, pop_fmt, total_pop, roundoff_rem, sum_growth);
 
         fonts::Set_Font_Style_Shadow_Down_(2, &_font_color_array);
         fonts::Print_Right_(638, 3, buffer);
@@ -1162,7 +1162,7 @@ namespace COLONY {
 
                 animate::Draw_(static_cast<int16_t>(start_n * 30), static_cast<int16_t>(0x1df - height), anim);
 
-                _sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
+                sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
                 Set_Colony_Font_To_(3);
 
                 anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));

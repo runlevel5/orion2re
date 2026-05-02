@@ -231,7 +231,7 @@ namespace remap {
             return;
         }
 
-        _sprintf(error_text, s__d___d___d_0055b2d0, color_index, palette_start, palette_end);
+        sprintf(error_text, s__d___d___d_0055b2d0, color_index, palette_start, palette_end);
         exitm::Exit_With_Message(error_text);
     }
 }

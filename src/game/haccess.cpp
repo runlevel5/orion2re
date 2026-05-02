@@ -51,7 +51,7 @@ namespace HACCESS {
         // Note: The original code accesses the array even if the index is invalid in error paths.
         int32_t current_owner = (int32_t)MOX::_ship[ship_idx].owner;
 
-        _sprintf(message, s_Memory_Corruption_val_00558028, (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
+        sprintf(message, s_Memory_Corruption_val_00558028, (int)error_code, (int)ship_idx, current_owner, MOX::_stardate);
 
         exitm::Exit_With_Message(message);
 
@@ -232,7 +232,7 @@ namespace HACCESS {
 
         s_star_data* star = &MOX::_star[star_idx];
 
-        _sprintf(buffer, s_format_star_roman, star->name, numeral_str);
+        sprintf(buffer, s_format_star_roman, star->name, numeral_str);
 
         if (strlen(buffer) > 30) {
             buffer[30] = '\0';
@@ -837,5 +837,19 @@ namespace HACCESS {
                     static_cast<uint16_t>(MOX::_ship_node[ship_node_idx].ship_idx));
             }
         }
+    }
+
+    /**
+     * @address 0049B050
+     */
+    void __cdecl Save_Hotseat_Fleet_Box_Ship_(int16_t fleet_box_idx) {
+        if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
+            const int32_t ship_node_idx = MOX::_fleet_movement_icon_0_ship_node_idx;
+            MAINSCR::_hotseat_fleet_box_stack_ship_id(fleet_box_idx) =
+                MOX::_ship_node[ship_node_idx].ship_idx;
+            return;
+        }
+
+        MAINSCR::_hotseat_fleet_box_stack_ship_id(fleet_box_idx) = -1;
     }
 }

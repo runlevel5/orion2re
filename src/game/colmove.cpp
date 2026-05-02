@@ -195,7 +195,7 @@ namespace COLMOVE {
                         if (settle_result.eta_turns != 0) {
                             if (settle_result.no_room_at_destination == 0) {
                                 if (warning_state != 1) {
-                                    _sprintf(
+                                    sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x209),
                                             static_cast<uint32_t>(settle_result.eta_turns));
@@ -208,12 +208,12 @@ namespace COLMOVE {
                                         COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
 
                                 if (moved_count == 0) {
-                                    _sprintf(
+                                    sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x206),
                                             static_cast<uint32_t>(settle_result.eta_turns));
                                 } else {
-                                    _sprintf(
+                                    sprintf(
                                             message,
                                             ESTRINGS::E_Strings_(0x204),
                                             static_cast<int32_t>(moved_count),
@@ -230,9 +230,9 @@ namespace COLMOVE {
                                     COLMOVE::Get_Num_Unemployed_(COLMOVE::_cluster_colony_n);
 
                             if (moved_count == 0) {
-                                _sprintf(message, ESTRINGS::E_Strings_(0x205));
+                                sprintf(message, ESTRINGS::E_Strings_(0x205));
                             } else {
-                                _sprintf(
+                                sprintf(
                                         message,
                                         ESTRINGS::E_Strings_(0x203),
                                         static_cast<int32_t>(moved_count),
@@ -556,7 +556,7 @@ namespace COLMOVE {
             char* job_string = COLONY::Job_String_(static_cast<int16_t>((pop_value >> 7) & 3U));
             char* format = ESTRINGS::E_Strings_(0x4C);
 
-            _sprintf(output_buffer, format, job_string, pop_race_string, conquered_string, pop_state_string);
+            sprintf(output_buffer, format, job_string, pop_race_string, conquered_string, pop_state_string);
             return;
         }
 
@@ -567,6 +567,6 @@ namespace COLMOVE {
         char* conquered_string = COLONY::Conquered_String_(static_cast<bool>((pop_value >> 10) & 1U));
         char* format = ESTRINGS::E_Strings_(0x4C);
 
-        _sprintf(output_buffer, format, conquered_string, pop_race_string, pop_state_string, job_string);
+        sprintf(output_buffer, format, conquered_string, pop_race_string, pop_state_string, job_string);
     }
 }

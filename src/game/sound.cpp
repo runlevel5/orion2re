@@ -588,11 +588,11 @@ namespace sound {
 
         if (_dsound_hr != 0) {
             if (_dsound_hr == DSERR_INVALIDPARAM) {
-                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954, _dsound_hr);
+                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b954, _dsound_hr);
             } else if (_dsound_hr == DSERR_INVALIDCALL) {
-                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998, _dsound_hr);
+                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_INVALID_0055b998, _dsound_hr);
             } else if (_dsound_hr == DSERR_PRIOLEVELNEEDED) {
-                _sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910, _dsound_hr);
+                sprintf(msg_buf, s_STREAM_ERROR_0x_x_DSERR_PRIOLEV_0055b910, _dsound_hr);
             }
             exitm::Exit_With_Message(msg_buf);
         }
@@ -1112,7 +1112,7 @@ namespace sound {
             }
 
             if (fmt) {
-                _sprintf(error_msg, fmt, _dsound_hr);
+                sprintf(error_msg, fmt, _dsound_hr);
             }
             exitm::Exit_With_Message(error_msg);
         }

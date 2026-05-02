@@ -68,7 +68,7 @@ namespace MAINSCR2 {
                             } else {
                                 fonts::Set_Outline_Color_(0, 0);
                                 fonts::Set_Font_Style_Outline_(2, &local_58);
-                                _sprintf(local_50, HAROLD::H_Message_(235), distance);
+                                sprintf(local_50, HAROLD::H_Message_(235), distance);
                             }
 
                             int16_t width = fonts::Get_String_Width_(local_50);
@@ -276,13 +276,13 @@ namespace MAINSCR2 {
                 if (plr->n_freighters <= count || plr->surplus_freighters <= count) {
                     const char* str1 = HAROLD::H_Message_((count == 1) ? 0xf0 /* HESTR_0F0_FREIGHTER */ : 0xf1 /* HESTR_0F1_FREIGHTERS */);
                     const char* str2 = HAROLD::H_Message_((plr->surplus_freighters == 1) ? 0xf0 : 0xf1);
-                    _sprintf(local_c8, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
+                    sprintf(local_c8, HAROLD::H_Message_(0xee), plr->surplus_freighters, str2, count, str1);
                     box_result = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 1);
                 }
 
                 if (box_result != 0 && count > 0) {
                     const char* str3 = HAROLD::H_Message_((count == 1) ? 0xf0 : 0xf1);
-                    _sprintf(local_c8, HAROLD::H_Message_(0xef), count, str3);
+                    sprintf(local_c8, HAROLD::H_Message_(0xef), count, str3);
                     HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
 
                     int16_t new_freighters = plr->n_freighters - count;
@@ -569,7 +569,7 @@ namespace MAINSCR2 {
             char* race_name = MOX::_player[MOX::_PLAYER_NUM].race_name;
             char* format = const_cast<char*>(HAROLD::H_Message_(0xE9));
 
-            _sprintf(msg_buffer, format, race_name, stardate_div, stardate_mod);
+            sprintf(msg_buffer, format, race_name, stardate_div, stardate_mod);
 
             int16_t str_width = fonts::Get_String_Width_(msg_buffer);
             int16_t font_height = fonts::Get_Font_Height_();

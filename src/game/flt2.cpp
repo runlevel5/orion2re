@@ -424,22 +424,22 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
 
     switch (status) {
     case 0:
-        _sprintf(local_50, HAROLD::H_Message_(0x67), MOX::_star[val].name);
+        sprintf(local_50, HAROLD::H_Message_(0x67), MOX::_star[val].name);
         local_58 = _normal_colors;
         break;
     case 1:
         if (val == 1) {
-            _sprintf(local_50, HAROLD::H_Message_(0x69), val, MOX::_star[local_5a].name);
+            sprintf(local_50, HAROLD::H_Message_(0x69), val, MOX::_star[local_5a].name);
         } else {
-            _sprintf(local_50, HAROLD::H_Message_(0x6A), val, MOX::_star[local_5a].name);
+            sprintf(local_50, HAROLD::H_Message_(0x6A), val, MOX::_star[local_5a].name);
         }
         local_58 = _normal_colors;
         break;
     case 2:
         if (val == 1) {
-            _sprintf(local_50, HAROLD::H_Message_(0x6B), val);
+            sprintf(local_50, HAROLD::H_Message_(0x6B), val);
         } else {
-            _sprintf(local_50, HAROLD::H_Message_(0x6C), val);
+            sprintf(local_50, HAROLD::H_Message_(0x6C), val);
         }
         local_58 = _normal_colors;
         break;
@@ -453,14 +453,14 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
         break;
     case 5:
         if (val == 1) {
-            _sprintf(local_50, HAROLD::H_Message_(0x6F), val, MOX::_star[local_5a].name);
+            sprintf(local_50, HAROLD::H_Message_(0x6F), val, MOX::_star[local_5a].name);
         } else {
-            _sprintf(local_50, HAROLD::H_Message_(0x70), val, MOX::_star[local_5a].name);
+            sprintf(local_50, HAROLD::H_Message_(0x70), val, MOX::_star[local_5a].name);
         }
         local_58 = _neutral_colors;
         break;
     case 6:
-        _sprintf(local_50, HAROLD::H_Message_(0xEB), val);
+        sprintf(local_50, HAROLD::H_Message_(0xEB), val);
         local_58 = _neutral_colors;
         break;
     case 7:
@@ -476,11 +476,11 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
             } else {
                 s_leader_data* leader = &MOX::_leaders[leader_idx];
                 if (leader->eta <= 0) {
-                    _sprintf(local_50, s_s_s_005569c0, MOX::_star[val].name, leader->name);
+                    sprintf(local_50, s_s_s_005569c0, MOX::_star[val].name, leader->name);
                 } else if (leader->eta == 1) {
-                    _sprintf(local_50, HAROLD::H_Message_(0x92), MOX::_star[val].name, leader->name, leader->eta);
+                    sprintf(local_50, HAROLD::H_Message_(0x92), MOX::_star[val].name, leader->name, leader->eta);
                 } else {
-                    _sprintf(local_50, HAROLD::H_Message_(0x93), MOX::_star[val].name, leader->name, leader->eta);
+                    sprintf(local_50, HAROLD::H_Message_(0x93), MOX::_star[val].name, leader->name, leader->eta);
                 }
             }
         }
@@ -584,7 +584,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     
     char* crew_desc = FLT2::Crew_Description_String_(ship_idx);
     int16_t exp = MOX::_ship[ship_idx].crew_experience;
-    _sprintf(buffer, s_fmt_s_d_EP_00557e18, crew_desc, exp);
+    sprintf(buffer, s_fmt_s_d_EP_00557e18, crew_desc, exp);
     
     fonts::Get_String_Width_(buffer);
     fonts::Print_(0x12, y_cursor + 0x11F, buffer);
@@ -601,7 +601,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     fonts::Print_(0x12, EBP_y, HAROLD::H_Message_(0x99));
     
     const char* sign1 = (bonus3 >= 0) ? s_plus_00551118 : s__00551100;
-    _sprintf(buffer, s__s_d_00556134, sign1, bonus3);
+    sprintf(buffer, s__s_d_00556134, sign1, bonus3);
     fonts::Print_Right_(0x85, EBP_y, buffer);
     
     strcpy(str_9a, HAROLD::H_Message_(0x9A));
@@ -615,7 +615,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         fonts::Print_(0xAD, EBP_y, str_9a);
         
         const char* sign2 = (bonus1 >= 0) ? s_plus_00551118 : s__00551100;
-        _sprintf(buffer, s__s_d_00556134, sign2, bonus1);
+        sprintf(buffer, s__s_d_00556134, sign2, bonus1);
         fonts::Print_(w + 0xAD, EBP_y, buffer);
     } else {
         w = fonts::Get_String_Width_(str_9a);
@@ -627,7 +627,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         fonts::Print_(0x12, EBP_y, str_9a);
         
         const char* sign2 = (bonus1 >= 0) ? s_plus_00551118 : s__00551100;
-        _sprintf(buffer, s__s_d_00556134, sign2, bonus1);
+        sprintf(buffer, s__s_d_00556134, sign2, bonus1);
         
         if (w < 0x73) {
             w = 0x73;
@@ -663,7 +663,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
             if (!has_info) {
                 loc_str = HAROLD::H_Message_(0x9C);
             } else {
-                _sprintf(buffer, (const char*)HAROLD::H_Message_(0x9B), MOX::_star[star_idx].name);
+                sprintf(buffer, (const char*)HAROLD::H_Message_(0x9B), MOX::_star[star_idx].name);
                 fonts::Get_String_Width_(buffer);
                 loc_str = buffer;
             }
@@ -709,7 +709,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
                 wep_name = TECHDATA::_weapons[wep_type].name_plural;
             }
             
-            _sprintf(buffer, s_fmt_d_s_s_00557e0c, count, wep_name, arc_str);
+            sprintf(buffer, s_fmt_d_s_s_00557e0c, count, wep_name, arc_str);
             fonts::Print_(0x17, wep_y + 0x11F, buffer);
             wep_y += fonts::Get_Font_Height_() + 1;
             weapons_printed++;
@@ -790,7 +790,7 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
 
         if (MOX::_g_ship_move_info.blackhole_blocks != 0) {
             strcpy(msg_buf2, HAROLD::H_Message_(0x21));
-            _sprintf(msg_buf, s_fmt_to_00557e00, msg_buf2, MOX::_star[target_star].name);
+            sprintf(msg_buf, s_fmt_to_00557e00, msg_buf2, MOX::_star[target_star].name);
             HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf, 3);
             return;
         }
@@ -798,7 +798,7 @@ void __cdecl Fltscrn_Move_Ships_(int16_t target_star) {
         if (MOX::_g_ship_move_info.out_of_range != 0) {
             if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, target_star) ||
                 HAROLD::Player_Is_Omniscient_(MOX::_PLAYER_NUM)) {
-                _sprintf(msg_buf, HAROLD::H_Message_(0x90), MOX::_star[target_star].name);
+                sprintf(msg_buf, HAROLD::H_Message_(0x90), MOX::_star[target_star].name);
             } else {
                 strcpy(msg_buf, HAROLD::H_Message_(0x91));
             }
@@ -850,7 +850,7 @@ uint8_t __cdecl Draw_Captains_Picture_(int16_t param_1) {
         int16_t height = animate::Get_Height_(pict);
 
         char* leader_name = OFFICER::Leader_Name_(leader_idx, 1);
-        _sprintf(local_50, s__s_00551130, leader_name);
+        sprintf(local_50, s__s_00551130, leader_name);
 
         fonts::Set_Font_Style_(0, &_normal_colors);
         ERIC::Print_Paragraph_Centered_Vertically_(0xAD, 0x11F, 0x42, height, local_50, 2);

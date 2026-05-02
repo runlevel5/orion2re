@@ -175,7 +175,7 @@ namespace REPORT {
                                         planet_idx = MAINPUPS::New_Outpost_Selection_Popup_(star_idx);
                                     } else if (MOX::_planet[planet_idx].colony_index == -1) {
                                         char msg[200];
-                                        _sprintf(msg, _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
+                                        sprintf(msg, _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
                                         if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                             planet_idx = -1;
                                         } else {
@@ -197,7 +197,7 @@ namespace REPORT {
                                         if (MOX::_planet[planet_idx].colony_index == -1) {
                                             auto_colonized = true;
                                             char msg[200];
-                                            _sprintf(msg, _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
+                                            sprintf(msg, _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
                                             if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                                 planet_idx = -1;
                                             } else {
@@ -217,7 +217,7 @@ namespace REPORT {
                                     while (colony_base != nullptr && planet_idx < 0) {
                                         int refund = TECHDATA::_buildings[11].cost / 2;
                                         char msg[200];
-                                        _sprintf(msg, _really_trash_colony_base_fmt, refund);
+                                        sprintf(msg, _really_trash_colony_base_fmt, refund);
                                         if (GENDRAW::Confirmation_Box_(msg) == 0) {
                                             planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, colony_base == nullptr);
                                         } else {
@@ -332,29 +332,29 @@ namespace REPORT {
     void __cdecl sprintf_report_(char* buffer, s_report* report) {
         if (report->type == 1 /* MSG_TYPE_REPORT_YOUR_SPY */) {
             if (report->action == 0 /* SPY_ACTION_STEAL */) {
-                buffer += _sprintf(buffer, REPORT::_your_spy_steals_fmt,
+                buffer += sprintf(buffer, REPORT::_your_spy_steals_fmt,
                                   TECHDATA::_technology_applications[report->d.steal.tech_app_id].name,
                                   MOX::_player[report->d.steal.victim_player_idx].race_name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
                 char* planet_name = HACCESS::Get_Planet_Name_(report->d.sabotage.planet_idx);
-                buffer += _sprintf(buffer, REPORT::_your_spy_destroys_fmt,
+                buffer += sprintf(buffer, REPORT::_your_spy_destroys_fmt,
                                   MOX::_player[report->d.sabotage.victim_player_idx].race_name,
                                   TECHDATA::_buildings[report->d.sabotage.building_id].name,
                                   planet_name);
             }
 
             if (report->d.steal.framed_player_idx != -1) {
-                _sprintf(buffer, REPORT::_you_framed_fmt,
+                sprintf(buffer, REPORT::_you_framed_fmt,
                         MOX::_player[report->d.steal.framed_player_idx].race_name);
             }
         } else if (report->type == 2 /* MSG_TYPE_REPORT_ENEMY_SPY */) {
             if (report->action == 0 /* SPY_ACTION_STEAL */) {
-                _sprintf(buffer, REPORT::_enemy_spy_steals_fmt,
+                sprintf(buffer, REPORT::_enemy_spy_steals_fmt,
                         MOX::_player[report->d.enemy_steal.enemy_player_idx].race_name,
                         TECHDATA::_technology_applications[report->d.enemy_steal.tech_app_id].name);
             } else if (report->action == 1 /* SPY_ACTION_SABOTAGE */) {
                 char* planet_name = HACCESS::Get_Planet_Name_(report->d.enemy_sabotage.planet_idx);
-                _sprintf(buffer, REPORT::_enemy_spy_destroys_fmt,
+                sprintf(buffer, REPORT::_enemy_spy_destroys_fmt,
                         MOX::_player[report->d.enemy_sabotage.enemy_player_idx].race_name,
                         TECHDATA::_buildings[report->d.enemy_sabotage.building_id].name,
                         planet_name);

@@ -89,7 +89,7 @@ namespace SCIENCE {
         remaining_discoveries = discovery_count;
         if (discovery_count != 0) {
             for (uint16_t i = 0; i < discovery_count; ++i) {
-                _sprintf(animation_lbx_names[i], s_TANM__03hi_LBX_005512a0, discovery_data[i] & 0x01FF);
+                sprintf(animation_lbx_names[i], s_TANM__03hi_LBX_005512a0, discovery_data[i] & 0x01FF);
             }
         }
 
@@ -369,7 +369,7 @@ namespace SCIENCE {
                 JIM::Get_Text_Message_(SCIENCE::s_billtext_lbx_0055135c, 1, decoded_text, 0xFA);
                 JIM::Decode_Text_Field_(decoded_text, research_field, 0xFA);
 
-                _sprintf(
+                sprintf(
                     science_room_lbx,
                     SCIENCE::s_SR_R_x_SC_LBX_005512b0,
                     static_cast<unsigned int>(static_cast<uint8_t>(MOX::_player[player_idx].race)));

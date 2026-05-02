@@ -287,7 +287,7 @@ void Load_New_Game_Strings_() {
     _gal_size_button_strings[0] = ESTRINGS::E_Strings_(0x1e0 /* ESTR_SMALL */);
     // Special case for Italian language
     if (MOX::_settings.language == 4) {
-        _sprintf(&_hack_msg, s_Piccola_00557dc4);
+        sprintf(&_hack_msg, s_Piccola_00557dc4);
         _gal_size_button_strings[0] = &_hack_msg;
     }
 
@@ -295,10 +295,10 @@ void Load_New_Game_Strings_() {
 
     if (MOX::_settings.language == 2) {
         char* medium_str = ESTRINGS::E_Strings_(0x173 /* ESTR_MEDIUM */);
-        _sprintf(&_hack_msg, s_sen_00557dbc, medium_str);
+        sprintf(&_hack_msg, s_sen_00557dbc, medium_str);
         _gal_size_button_strings[2] = &_hack_msg;
     } else if (MOX::_settings.language == 4) {
-        _sprintf(&_hack_msg, s_Media_00557db4);
+        sprintf(&_hack_msg, s_Media_00557db4);
         _gal_size_button_strings[2] = &_hack_msg;
     }
 

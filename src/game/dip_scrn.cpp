@@ -1096,7 +1096,7 @@ namespace DIP_SCRN {
             if (selection == offer_system_id) {
                 system_sel = Diplomacy_System_Display_(player_idx, _current_ambassador, 0);
                 if (system_sel != -1) {
-                    _sprintf(list_items[0], s_fmt_s_0055236c, MOX::_star[system_sel].name);
+                    sprintf(list_items[0], s_fmt_s_0055236c, MOX::_star[system_sel].name);
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(target_player_idx);
                         confirm = Diplomacy_Generic_System_List_(system_sel, player_idx, target_player_idx, 0);
@@ -1142,14 +1142,14 @@ namespace DIP_SCRN {
                 if (tech_list_count > 0) {
                     for (int i = 0; i < tech_list_count; i++) {
                         char* tech_name = TECH::Technology_Applications_Name_(tech_list[i], MOX::_PLAYER_NUM);
-                        _sprintf(list_items[i], s_fmt_s_0055236c, tech_name);
+                        sprintf(list_items[i], s_fmt_s_0055236c, tech_name);
                     }
                 }
                 tech_sel = Diplomacy_Generic_List_(tech_list_count, (char*)list_items, 1, _offer_title);
                 if (tech_sel != -1) {
                     tech_app_id = tech_list[tech_sel];
                     char* tech_name = TECH::Technology_Applications_Name_(tech_app_id, player_idx);
-                    _sprintf(list_items[0], s_fmt_s_0055236c, tech_name);
+                    sprintf(list_items[0], s_fmt_s_0055236c, tech_name);
 
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(player_idx);
@@ -1190,7 +1190,7 @@ namespace DIP_SCRN {
             else if (selection == offer_money_id) {
                 money_amount = Diplomacy_Offer_Money_(player_idx, target_player_idx, 0);
                 if (money_amount > 0) {
-                    _sprintf(list_items[0], s_fmt_d_bc_00552384, money_amount);
+                    sprintf(list_items[0], s_fmt_d_bc_00552384, money_amount);
                     if (MOX::_game_type == 1) {
                         Diplomacy_Load_New_Ambassador_(player_idx);
                         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 9, list_title, 40);
@@ -1326,7 +1326,7 @@ namespace DIP_SCRN {
             case 0: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_1_count; ++i) {
-                    _sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_1[i]].name);
+                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_1[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x47, title, 40);
@@ -1351,7 +1351,7 @@ namespace DIP_SCRN {
             case 1: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_2_count; ++i) {
-                    _sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_2[i]].name);
+                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_2[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x48, title, 40);
@@ -1376,7 +1376,7 @@ namespace DIP_SCRN {
             case 2: {
                 char treaties_str_list[15][40];
                 for (int i = 0; i < treaties_3_count; ++i) {
-                    _sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_3[i]].name);
+                    sprintf(treaties_str_list[i], s__s_0055236c, MOX::_player[treaties_3[i]].name);
                 }
                 char title[40];
                 JIM::Get_Text_Message_(s_jimtext_lbx_00552360, 0x49, title, 40);
@@ -1747,7 +1747,7 @@ namespace DIP_SCRN {
                         case 1008: {
                             _response_message = _old_response_message;
                             char* tech_name = TECH::Technology_Applications_Name_(_net_diplomacy_message.arg1, _talker_ambassador);
-                            _sprintf(msg_buf, s_percent_s_0055236c, tech_name);
+                            sprintf(msg_buf, s_percent_s_0055236c, tech_name);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
@@ -1807,12 +1807,12 @@ namespace DIP_SCRN {
                         case 1011: {
                             _response_message = 0;
                             _old_response_message = 0;
-                            _sprintf(_diplomacy_message, "%s", s__00551100);
+                            sprintf(_diplomacy_message, "%s", s__00551100);
                             break;
                         }
                         case 1013: {
                             _response_message = _old_response_message;
-                            _sprintf(msg_buf, s__d_BC_00552384, _net_diplomacy_message.arg1);
+                            sprintf(msg_buf, s__d_BC_00552384, _net_diplomacy_message.arg1);
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 9, title_buf, 40);
                             int16_t list_choice = Diplomacy_Generic_List_(1, msg_buf, 1, title_buf);
                             if (list_choice == -1) {
@@ -2309,7 +2309,7 @@ namespace DIP_SCRN {
                 uint8_t planet_idx = DIP_SCRN::_diplomacy_system_planet_list[i];
                 s_planet_data* planet = &MOX::_planet[planet_idx];
 
-                _sprintf(text_buffer, "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
+                sprintf(text_buffer, "%s, %s", MOX::_planet_size_string[planet->size], MOX::_planet_climate_string[planet->climate]);
 
                 if (planet_idx == (uint8_t)selected_planet_idx) {
                     strcat(text_buffer, DIP_SCRN::_system_homeworld_buffer);
@@ -2445,7 +2445,7 @@ namespace DIP_SCRN {
                     _net_diplomacy_message.msg_type = 0;
                     _response_message = 0;
                     _old_response_message = 0;
-                    _sprintf(_diplomacy_message, s__00551100);
+                    sprintf(_diplomacy_message, s__00551100);
                     // Fallthrough to default behavior
                     break;
 

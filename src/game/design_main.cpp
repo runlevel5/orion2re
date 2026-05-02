@@ -30,10 +30,10 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].warp_speed);
+        sprintf(buffer, HAROLD::H_Message_(HESTR_17E_D_PARSECS_TURN), TECHDATA::_drives[MOX::_design->ftl_type].warp_speed);
         fonts::Print_(0xFB, 0x47, buffer);
 
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), Current_Design_Combat_Speed_(MOX::_design));
+        sprintf(buffer, HAROLD::H_Message_(HESTR_054_D_COMBAT_SPEED), Current_Design_Combat_Speed_(MOX::_design));
         fonts::Print_(0xFB, 0x56, buffer);
 
         fonts::Set_Font_Style_(3, &style3_colors);
@@ -42,10 +42,10 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_055_D_STRUCTURE_POINTS), (int)Current_Design_Structural_Points_());
+        sprintf(buffer, HAROLD::H_Message_(HESTR_055_D_STRUCTURE_POINTS), (int)Current_Design_Structural_Points_());
         fonts::Print_(0xFB, 0x7A, buffer);
 
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_056_D_ARMOR_POINTS), (int)Current_Design_Armor_Absorption_());
+        sprintf(buffer, HAROLD::H_Message_(HESTR_056_D_ARMOR_POINTS), (int)Current_Design_Armor_Absorption_());
         fonts::Print_(0xFB, 0x89, buffer);
 
         fonts::Set_Font_Style_(3, &style3_colors);
@@ -66,11 +66,11 @@ namespace DESIGN {
             fonts::Get_String_Width_(TECHDATA::_shields[MOX::_design->shield].name);
             fonts::Set_Font_Style_(2, &style2_colors);
             fonts::Set_Font_Spacing_(1);
-            _sprintf(buffer, HAROLD::H_Message_(HESTR_059_D_STRENGTH), (int)Shield_Strength_());
+            sprintf(buffer, HAROLD::H_Message_(HESTR_059_D_STRENGTH), (int)Shield_Strength_());
             fonts::Print_(0x1C5, 0x47, buffer);
 
             int points = Current_Shield_Damage_Points_Blocked_();
-            _sprintf(buffer, HAROLD::H_Message_(HESTR_05A_D_DAMAGE_POINTS_BLOCKE), points, points == 1 ? "" : "s");
+            sprintf(buffer, HAROLD::H_Message_(HESTR_05A_D_DAMAGE_POINTS_BLOCKE), points, points == 1 ? "" : "s");
             fonts::Print_(0x1C5, 0x55, buffer);
         }
 
@@ -83,17 +83,17 @@ namespace DESIGN {
 
         fonts::Set_Font_Style_(2, &style2_colors);
         fonts::Set_Font_Spacing_(1);
-        _sprintf(buffer, HAROLD::H_Message_(HESTR_05B_D_BEAM_ATTACK), (int)TECHDATA::_computers[MOX::_design->computer_type].bonus);
+        sprintf(buffer, HAROLD::H_Message_(HESTR_05B_D_BEAM_ATTACK), (int)TECHDATA::_computers[MOX::_design->computer_type].bonus);
         fonts::Print_(0x1C5, 0x70, buffer);
 
         fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Set_Font_Spacing_(1);
         fonts::Print_(0x1B5, 0x7D, HAROLD::H_Message_(HESTR_05C_BEAM_DEFENSE));
-        _sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int)bonus_beam_def);
+        sprintf(buffer, "%s%d", (bonus_beam_def >= 0 ? "+" : "-"), (int)bonus_beam_def);
         fonts::Print_Right_(0x26A, 0x7D, buffer);
 
         fonts::Print_(0x1B5, 0x89, HAROLD::H_Message_(HESTR_05D_MISSILE_EVASION));
-        _sprintf(buffer, "%d%%", (int)bonus_mis_evade);
+        sprintf(buffer, "%d%%", (int)bonus_mis_evade);
         fonts::Print_Right_(0x26A, 0x89, buffer);
 
         fonts::Set_Font_Spacing_(2);
@@ -132,7 +132,7 @@ namespace DESIGN {
                     TECHDATA::_weapons[MOX::_design->weapon_type[slot]].name_plural;
 
                 if (Weapon_Needs_Racks_(MOX::_design->weapon_type[slot])) {
-                    _sprintf(buffer, "%s (%d)", base_name, (int)MOX::_design->weapon_ammo[i]);
+                    sprintf(buffer, "%s (%d)", base_name, (int)MOX::_design->weapon_ammo[i]);
                     fonts::Print_(0x55, y_pos, buffer);
                 }
                 else {
@@ -152,9 +152,9 @@ namespace DESIGN {
                 }
 
                 fonts::Print_Centered_(0x149, y_pos, arc_str);
-                _sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_space[slot] / MOX::_design->weapon_count[slot]) : 0);
+                sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_space[slot] / MOX::_design->weapon_count[slot]) : 0);
                 fonts::Print_Centered_(0x1B4, y_pos, buffer);
-                _sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_cost[slot] / MOX::_design->weapon_count[slot]) : 0);
+                sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_cost[slot] / MOX::_design->weapon_count[slot]) : 0);
                 fonts::Print_Centered_(0x179, y_pos, buffer);
                 fonts::Print_Centered_(0x211, y_pos, mod_str);
                 y_pos += 13;
@@ -370,7 +370,7 @@ namespace DESIGN {
             }
 
             if (MAINSCR::_debug_field == input_field) {
-                _sprintf(log_buf, s_cstdes_log, (int)MOX::_design->ship_size);
+                sprintf(log_buf, s_cstdes_log, (int)MOX::_design->ship_size);
             }
 
             int16_t needs_refresh = 0;

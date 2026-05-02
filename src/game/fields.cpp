@@ -399,7 +399,7 @@ namespace fields {
         char buffer[80];
 
         if (_max_fields_count <= _fields_count) {
-            _sprintf(buffer, s_Maximum_number_of_button_fields_e_0055b0b0, (int32_t)_max_fields_count);
+            sprintf(buffer, s_Maximum_number_of_button_fields_e_0055b0b0, (int32_t)_max_fields_count);
             exitm::Exit_With_Message(buffer);
         }
 
@@ -1588,7 +1588,7 @@ namespace fields {
         memory_status.dwLength = sizeof(MEMORYSTATUS);
         ::GlobalMemoryStatus(&memory_status);
 
-        _sprintf(buffer, s_Avail_Mem_0055b390, (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
+        sprintf(buffer, s_Avail_Mem_0055b390, (uint32_t)(memory_status.dwAvailPhys >> 10), (uint32_t)(memory_status.dwTotalPhys >> 10));
 
         platform::_need_quit = 1;
 

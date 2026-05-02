@@ -600,7 +600,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
             MOX::_mox_font_colors_offset = 0x71;
             MISC::Get_Mox_Font_Colors_(4, 'o', 's', &font_colors);
             HACCESS::Race_Name_(stack_owner, race_or_ship_name);
-            _sprintf(title, HAROLD::H_Message_(0x66), race_or_ship_name);
+            sprintf(title, HAROLD::H_Message_(0x66), race_or_ship_name);
             fonts::Set_Font_Style_Outline_(4, &font_colors);
             fonts::Set_Outline_Color_(2, 1);
             fonts::Set_Font_Spacing_(1);
@@ -1079,24 +1079,24 @@ void __cdecl Print_Fleet_Box_Info_() {
         break;
 
     case 1:
-        _sprintf(text, HAROLD::H_Message_(0x67), MOX::_star[info_value].name);
+        sprintf(text, HAROLD::H_Message_(0x67), MOX::_star[info_value].name);
         break;
 
     case 2:
         if (MOX::_NUM_STARS == static_cast<int16_t>(destination_star)) {
             strcpy(text, HAROLD::H_Message_(0x68));
         } else if (info_value == 1) {
-            _sprintf(text, HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
+            sprintf(text, HAROLD::H_Message_(0x69), 1, MOX::_star[destination_star].name);
         } else {
-            _sprintf(text, HAROLD::H_Message_(0x6a), info_value, MOX::_star[destination_star].name);
+            sprintf(text, HAROLD::H_Message_(0x6a), info_value, MOX::_star[destination_star].name);
         }
         break;
 
     case 3:
         if (info_value == 1) {
-            _sprintf(text, HAROLD::H_Message_(0x6b), info_value);
+            sprintf(text, HAROLD::H_Message_(0x6b), info_value);
         } else {
-            _sprintf(text, HAROLD::H_Message_(0x6c), info_value);
+            sprintf(text, HAROLD::H_Message_(0x6c), info_value);
         }
         break;
 
@@ -1112,18 +1112,18 @@ void __cdecl Print_Fleet_Box_Info_() {
 
     case 6:
         if (info_value == 1) {
-            _sprintf(text, HAROLD::H_Message_(0x6f), 1, MOX::_star[destination_star].name);
+            sprintf(text, HAROLD::H_Message_(0x6f), 1, MOX::_star[destination_star].name);
         } else {
-            _sprintf(text, HAROLD::H_Message_(0x70), info_value, MOX::_star[destination_star].name);
+            sprintf(text, HAROLD::H_Message_(0x70), info_value, MOX::_star[destination_star].name);
         }
         use_primary_colors = false;
         break;
 
     case 7:
         if (info_value == 0) {
-            _sprintf(text, HAROLD::H_Message_(0x71));
+            sprintf(text, HAROLD::H_Message_(0x71));
         } else {
-            _sprintf(text, HAROLD::H_Message_(0xeb), info_value);
+            sprintf(text, HAROLD::H_Message_(0xeb), info_value);
         }
         use_primary_colors = false;
         break;
@@ -1360,7 +1360,7 @@ void __cdecl Get_Fleetpop_Scanned_Ship_Info_(char* out_text) {
 
     if (ship_owner <= 8) {
         if (HACCESS::Is_Combat_Ship_(ship_idx)) {
-            _sprintf(out_text, s__s_00551130, TECHDATA::_hull_data[hull_size].name);
+            sprintf(out_text, s__s_00551130, TECHDATA::_hull_data[hull_size].name);
             return;
         }
     }
@@ -1593,6 +1593,49 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
     return transport_troops_flag;
 }
 
+bool __cdecl Set_Attack_Antares_Button_Flag_(void) {
+    bool found_matching_ship = false;
+    bool has_dimensional_portal = false;
+
+    if (MOX::_fleet_box_ship_stack != -1) {
+        const int16_t selected_ship_idx =
+                MOX::_ship_node[MOX::_ship_stack_start[MOX::_fleet_box_ship_stack]].ship_idx;
+        const int16_t star_idx =
+                HAROLD::XY_To_Star_Id_(MOX::_ship[selected_ship_idx].x, MOX::_ship[selected_ship_idx].y);
+
+        if (star_idx != -1) {
+            int16_t ship_slot = 0;
+
+            if (MOX::_NUM_SHIPS > 0) {
+                do {
+                    if (MOX::_ship[ship_slot].status < 3) {
+                        // BUG: selected_ship_idx is used here instead of ship_slot.
+                        if (HACCESS::Is_Combat_Ship_(selected_ship_idx)) {
+                            if (HAROLD::Absolute_Location_(MOX::_ship[selected_ship_idx].location) !=
+                                MOX::_NUM_STARS) {
+                                if (MOX::_ship[ship_slot].x == MOX::_ship[selected_ship_idx].x) {
+                                    if (MOX::_ship[ship_slot].y == MOX::_ship[selected_ship_idx].y) {
+                                        found_matching_ship = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    ++ship_slot;
+                } while (ship_slot < (int16_t)MOX::_NUM_SHIPS && !found_matching_ship);
+            }
+
+            if (found_matching_ship) {
+                has_dimensional_portal =
+                        HAROLD::Star_Has_Dimensional_Portal_(&MOX::_star[star_idx]);
+            }
+        }
+    }
+
+    return has_dimensional_portal;
+}
+
 int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
     if (MOX::_fleet_box_ship_stack == -1) {
         return 0;
@@ -1655,6 +1698,90 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
     }
 
     return colonize_button_flag;
+}
+
+uint8_t __cdecl Can_Build_Outpost_(int16_t planet_idx) {
+    if (planet_idx <= -1) {
+        return 0;
+    }
+
+    if (MOX::_planet[planet_idx].colony_index != -1) {
+        return 0;
+    }
+
+    if (HAROLD::Planet_Has_Outpost_(planet_idx) != 0) {
+        return 0;
+    }
+
+    return 1;
+}
+
+int8_t __cdecl Planet_Is_Colonizable_(int16_t planet_idx) {
+    int8_t is_colonizable = 0;
+
+    if (planet_idx > -1) {
+        s_planet_data* planet = &MOX::_planet[planet_idx];
+        if (planet->planet_type == 3) {
+            int16_t colony_idx = planet->colony_index;
+            if (colony_idx == -1 || MOX::_colony[colony_idx].outpost_flag != 0) {
+                is_colonizable = 1;
+            }
+        }
+    }
+
+    return is_colonizable;
+}
+
+int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count) {
+  bool has_owned_combat_ship = false;
+
+  if (MOX::_fleet_box_ship_stack == -1) {
+    return 0;
+  }
+
+  int8_t engage_enemy_forces = 0;
+  int16_t stack_node_idx = MOX::_ship_stack_start[MOX::_fleet_box_ship_stack];
+  int16_t primary_ship_idx = MOX::_ship_node[stack_node_idx].ship_idx;
+  int16_t primary_owner = HACCESS::Ship_Owner_(primary_ship_idx);
+  int16_t star_idx = MOX::_ship[primary_ship_idx].location;
+
+  const bool is_at_star = (star_idx > -1) && (star_idx < 500);
+  const bool is_at_xy_star = (star_idx > 1000) && (star_idx < 1072);
+
+  if (is_at_xy_star) {
+    star_idx = HAROLD::XY_To_Star_Id_(MOX::_ship[primary_ship_idx].x, MOX::_ship[primary_ship_idx].y);
+  }
+
+  if ((MOX::_PLAYER_NUM == primary_owner) && (is_at_star || is_at_xy_star)) {
+    for (int16_t i = 0; i < ship_count; ++i) {
+      if (has_owned_combat_ship) {
+        break;
+      }
+
+      if (stack_node_idx < 0) {
+        break;
+      }
+
+      const int16_t ship_idx = MOX::_ship_node[stack_node_idx].ship_idx;
+      if ((MOX::_ship[ship_idx].d.ship_type == 0) &&
+          (MOX::_ship[ship_idx].status < 3) &&
+          (HACCESS::Ship_Owner_(ship_idx) == MOX::_PLAYER_NUM)) {
+        has_owned_combat_ship = true;
+      }
+
+      stack_node_idx = MOX::_ship_node[stack_node_idx].next_node;
+    }
+
+    if (has_owned_combat_ship) {
+      if (((MOX::_star[star_idx].ignore_combat_ships >>
+            (static_cast<uint8_t>(MOX::_PLAYER_NUM) & 0x1f)) &
+           1) != 0) {
+        engage_enemy_forces = 1;
+      }
+    }
+  }
+
+  return engage_enemy_forces;
 }
 
 }

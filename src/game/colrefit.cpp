@@ -198,7 +198,7 @@ namespace COLREFIT {
                             } else {
                                 char* leader_name = OFFICER::Leader_Name_(MOX::_ship[ship_idx].officer_index, 0);
                                 char* format_str = ESTRINGS::E_Strings_(0x212);
-                                _sprintf(text, format_str, leader_name);
+                                sprintf(text, format_str, leader_name);
 
                                 if (GENDRAW::Do_Confirmation_Box_(text) != 0) {
                                     OFFICER::Move_Officer_To_Pool_(MOX::_ship[ship_idx].officer_index);
@@ -519,7 +519,7 @@ namespace COLREFIT {
         fonts::Print_Centered_(320, (int16_t)bottom_y, refit_str);
 
         char* ship_format = ESTRINGS::E_Strings_(801);
-        _sprintf(buffer, ship_format, MOX::_ship[_g_ship_n].d.name);
+        sprintf(buffer, ship_format, MOX::_ship[_g_ship_n].d.name);
 
         COLONY::Set_Colony_Font_To_Reg_Blue_(4, 1);
         fonts::Print_Centered_(320, 20, buffer);
@@ -551,7 +551,7 @@ namespace COLREFIT {
                 _esc = 0;
             }
             if (*get_input + _fields[i + 5] == 0) {
-                _sprintf(
+                sprintf(
                     buffer,
                     ESTRINGS::E_Strings_(0x324),
                     &MOX::_ship[_g_ship_n],

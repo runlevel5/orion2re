@@ -100,6 +100,11 @@ inline int16_t& g_cached_mouse_x = *reinterpret_cast<int16_t*>(std::uintptr_t{0x
 inline int& g_window_focus_state = *reinterpret_cast<int*>(std::uintptr_t{0x00579328});
 inline uint32_t& g_last_scan_code = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00589A1C });
 
+inline uint8_t& g_main_screen_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596196});
+inline int16_t& g_map_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B4});
+inline int16_t& g_ui_unknown_word = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C02A});
+inline uint8_t& g_map_unknown_flag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059701A});
+
 inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056178C});
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
 
@@ -243,9 +248,6 @@ inline const char* s_percent_s_percent_d_00556d98 = reinterpret_cast<const char*
 inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::uintptr_t{0x00556310});
 inline const char* const s_RACESTUF_lbx_00558550 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00558550}); // "RACESTUF.lbx"
-
-inline auto _sprintf =
-    reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
 inline const char* const s_STREAM_LBX_005558fc =
     reinterpret_cast<const char*>(std::uintptr_t{0x005558FC}); /* "STREAM.LBX" */

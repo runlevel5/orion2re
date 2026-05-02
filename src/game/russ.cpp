@@ -102,7 +102,7 @@ namespace RUSS {
 
         uint8_t language = MOX::_settings_language;
 
-        _sprintf(filename_buffer, s_rstring_d_lbx, (uint32_t)language);
+        sprintf(filename_buffer, s_rstring_d_lbx, (uint32_t)language);
 
         farload::Farload_Data_Static_(filename_buffer, 0, &RUSS::_russ_strings, 0, 1, 0x1964);
 

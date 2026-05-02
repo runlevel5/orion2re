@@ -558,7 +558,7 @@ namespace NETMOX {
                 uint32_t chunk_size = remaining > 0x7800 ? 0x7800 : remaining;
                 chunk_idx++;
 
-                _sprintf(MOX::_temp_string, _sending_chunk_d_of_d_fmt, chunk_idx, chunk_count);
+                sprintf(MOX::_temp_string, _sending_chunk_d_of_d_fmt, chunk_idx, chunk_count);
 
                 do {
                     video::Set_Page_Off_();
@@ -1044,7 +1044,7 @@ namespace NETMOX {
 
             chunk_idx++;
 
-            _sprintf(MOX::_temp_string, NETMOX::_sending_chunk_d_of_d_fmt, chunk_idx, num_chunks);
+            sprintf(MOX::_temp_string, NETMOX::_sending_chunk_d_of_d_fmt, chunk_idx, num_chunks);
 
             do {
                 MULTPLAY::Chat_Box_Input_Loop_();

@@ -1243,7 +1243,7 @@ namespace DESIGN {
                     int16_t colony_idx = DESIGN::Get_Colony_Handle_();
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
                     is_formatted = true;
-                    _sprintf(planet_name_buf, "%s", planet_name);
+                    sprintf(planet_name_buf, "%s", planet_name);
                 }
                 break;
             default:
@@ -1254,7 +1254,7 @@ namespace DESIGN {
             MISC::Get_LBX_Message_(message_id, lbx_msg);
             if (is_formatted) {
                 const char* hull_name = TECHDATA::_hull_data[MOX::_design->ship_size].name;
-                _sprintf(formatted_msg, lbx_msg, planet_name_buf, hull_name);
+                sprintf(formatted_msg, lbx_msg, planet_name_buf, hull_name);
                 GENDRAW::Message_Box_(formatted_msg);
             } else {
                 GENDRAW::Message_Box_(lbx_msg);
@@ -1869,9 +1869,9 @@ namespace DESIGN {
             strcpy(buffer, special_msg);
         } else {
             if (min_damage != max_damage) {
-                _sprintf(buffer, "%d-%d", (int)min_damage, (int)max_damage);
+                sprintf(buffer, "%d-%d", (int)min_damage, (int)max_damage);
             } else {
-                _sprintf(buffer, "%d", (int)max_damage);
+                sprintf(buffer, "%d", (int)max_damage);
             }
         }
     }

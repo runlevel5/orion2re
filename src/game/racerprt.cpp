@@ -18,7 +18,7 @@ void __cdecl Race_Report_Screen_(int16_t param_1) {
     if (MOX::_cur_plyr_ptr->objectives == 100) {
         strcpy(local_180, MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality]);
     } else {
-        _sprintf(local_180, RACERPRT::_PERSONALITY_FMT,
+        sprintf(local_180, RACERPRT::_PERSONALITY_FMT,
                 MOX::_personality_labels[(uint8_t)MOX::_cur_plyr_ptr->personality],
                 MOX::_objective_labels[MOX::_cur_plyr_ptr->objectives]);
     }
@@ -76,7 +76,7 @@ void __cdecl Race_Report_Screen_(int16_t param_1) {
     JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x20, acStack_2a8, 0x28);
     RUSS::Mox_Update_();
 
-    _sprintf(acStack_100, RACERPRT::_TREATIES_FMT, acStack_318, acStack_200, acStack_2a8, acStack_280);
+    sprintf(acStack_100, RACERPRT::_TREATIES_FMT, acStack_318, acStack_200, acStack_2a8, acStack_280);
 
     INFO::_g_exit_field = fields::Add_Button_Field_(0x216, 0x1B1, s__00551100, apsStack_2f0[1], s__00551120, '(');
 

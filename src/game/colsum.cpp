@@ -505,19 +505,19 @@ namespace COLSUM {
             s_star_data* star = &MOX::_star[planet->star_index];
 
             if ((star->blockaded >> (MOX::_PLAYER_NUM & 0x1F) & 1) == 0) {
-                _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x0C));
-                _sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x0C));
+                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x0C));
+                sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x0C));
             } else {
-                _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), s_2_00551108);
-                _sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x86));
+                sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), s_2_00551108);
+                sprintf(sub_buffer2, ESTRINGS::E_Strings_(0x86));
             }
 
-            _sprintf(buffer, ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
+            sprintf(buffer, ESTRINGS::E_Strings_(0x51), sub_buffer1, HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer2);
             paragraph_type = 0x59;
         } else {
             const char* event_prefix = Event_Good_(event_id) ? s_1_00551114 : s_2_00551108;
-            _sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), event_prefix);
-            _sprintf(buffer, ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
+            sprintf(sub_buffer1, ESTRINGS::E_Strings_(0x46), event_prefix);
+            sprintf(buffer, ESTRINGS::E_Strings_(0x55), HACCESS::Get_Planet_Name_No_Prime_(planet_idx), sub_buffer1, _wee_event_strings[event_id]);
             paragraph_type = 0x57;
         }
 
@@ -535,15 +535,15 @@ namespace COLSUM {
             if (item_producing != -1) {
                 if (turn_count < 1 || turn_count > 9999) {
                     if (colony->auto_building == 0) {
-                        _sprintf(buffer, ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x46), COLBLDG::Selection_Name_(item_producing));
                     } else {
-                        _sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing));
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing));
                     }
                 } else {
                     if (colony->auto_building == 0) {
-                        _sprintf(buffer, ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x27), COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     } else {
-                        _sprintf(buffer, ESTRINGS::E_Strings_(0x5C), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing), (int)turn_count);
+                        sprintf(buffer, ESTRINGS::E_Strings_(0x5C), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(item_producing), (int)turn_count);
                     }
                 }
 
@@ -554,7 +554,7 @@ namespace COLSUM {
             }
 
             if (colony->auto_building != 0) {
-                _sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(-1));
+                sprintf(buffer, ESTRINGS::E_Strings_(0x5D), s_1_00551114, s_0_00551104, COLBLDG::Selection_Name_(-1));
                 BILL::Squeeze_Print_Formatted_Paragraph_(0x200, y_pos, 0x55, 0x16, buffer, 0);
                 fonts::Set_Font_Style_Shadow_Down_(1, &COLONY::_font_color_array);
             }
@@ -607,47 +607,50 @@ namespace COLSUM {
     }
 
 void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
-    const int16_t list_col_entry = _list_col[static_cast<int32_t>(colony_idx)];
-    const int32_t base_index = static_cast<int32_t>(colony_idx) * 3;
-    const int16_t colony_y = static_cast<int16_t>(colony_idx * 31 + 38);
+    const int16_t list_col_value = COLSUM::_list_col[colony_idx];
+    const int32_t colony_pop_base = static_cast<int32_t>(colony_idx) * 3;
+    const int16_t row_coord = static_cast<int16_t>(static_cast<int32_t>(colony_idx) * 0x1f + 0x26);
 
     for (int16_t pop_slot = 0; pop_slot < 3; ++pop_slot) {
-        int16_t coord_a;
+        int16_t coord_c;
         if (pop_slot == -1) {
-            coord_a = 0x65;
+            coord_c = 0x0065;
         } else if (pop_slot == 0) {
-            coord_a = 0x00ec;
+            coord_c = 0x00ec;
+        } else if (static_cast<uint16_t>(pop_slot - 1) < 1u) {
+            coord_c = 0x017a;
+        } else {
+            coord_c = 0x0200;
+        }
+
+        int16_t coord_a;
+        if (pop_slot == 0) {
+            coord_a = 0x0065;
         } else if (pop_slot == 1) {
+            coord_a = 0x00ec;
+        } else if (static_cast<uint16_t>(pop_slot - 2) < 1u) {
             coord_a = 0x017a;
         } else {
             coord_a = 0x0200;
         }
 
-        int16_t coord_b;
-        if (pop_slot == 0) {
-            coord_b = 0x65;
-        } else if (pop_slot == 1) {
-            coord_b = 0x00ec;
-        } else if (pop_slot == 2) {
-            coord_b = 0x017a;
-        } else {
-            coord_b = 0x0200;
-        }
+        coord_c = static_cast<int16_t>(coord_c - 10);
 
-        const int32_t item_index = base_index + static_cast<int32_t>(pop_slot);
+        const int32_t pop_ref_index = colony_pop_base + pop_slot;
 
         COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
-                list_col_entry,
-                pop_slot,
-                0,
-                coord_b,
-                colony_y,
-                static_cast<int16_t>(coord_a - 10),
-                0,
-                _list_col_pop_ref[item_index].refs,
-                &_list_col_pop_count[item_index],
-                &_list_col_coord_vars[item_index],
-                &_list_col_job_fields[item_index]);
+            list_col_value,
+            pop_slot,
+            0,
+            coord_a,
+            row_coord,
+            coord_c,
+            0,
+            COLSUM::_list_col_pop_ref[pop_ref_index].refs,
+            COLSUM::_list_col_pop_count + pop_ref_index,
+            COLSUM::_list_col_coord_vars + pop_ref_index,
+            COLSUM::_list_col_job_fields + pop_ref_index
+        );
     }
 }
 
@@ -1105,7 +1108,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(planet, MOX::_PLAYER_NUM);
             char* format = ESTRINGS::E_Strings_(74 /* 0x4a */);
 
-            _sprintf(buffer, format,
+            sprintf(buffer, format,
                     sign_str,
                     MOX::_planet_size_string[planet->size],
                     MOX::_planet_climate_string[climate_idx],

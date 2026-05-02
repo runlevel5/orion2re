@@ -23,11 +23,7 @@ namespace FLEETPOP {
     inline int8_t& _fleet_box_engage_btn_active =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x005977DD});
 
-    inline uint8_t __cdecl Set_Attack_Antares_Button_Flag_() {
-        using Fn = uint8_t(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00405C40});
-        return fn();
-    }
+    bool __cdecl Set_Attack_Antares_Button_Flag_(void);
 
     int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count);
 
@@ -35,23 +31,11 @@ namespace FLEETPOP {
 
     uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count);
 
-    inline uint8_t __cdecl Can_Build_Outpost_(int16_t planet_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00405EE0});
-        return fn(planet_idx);
-    }
+    uint8_t __cdecl Can_Build_Outpost_(int16_t planet_idx);
 
-    inline uint8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t fleet_count) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00406100});
-        return fn(fleet_count);
-    }
+    int8_t __cdecl Set_Engage_Enemy_Forces_Flag_(int16_t ship_count);
 
-    inline int8_t __cdecl Planet_Is_Colonizable_(int16_t planet_idx) {
-        using Fn = int8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004060A0});
-        return fn(planet_idx);
-    }
+    int8_t __cdecl Planet_Is_Colonizable_(int16_t planet_idx);
 
     inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
 

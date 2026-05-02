@@ -1237,40 +1237,40 @@ int8_t __cdecl Human_Confirms_Attack_(int player_idx, int target_idx) {
 
     if (target_idx < 8 && (*_attack_confirmed)[player_idx][target_idx] == 0) {
         int treaty_count = 0;
-        int offset = _sprintf(message_buffer, s_format_string, _you_have_following_treaties_msg);
+        int offset = sprintf(message_buffer, s_format_string, _you_have_following_treaties_msg);
         char* dest_ptr = message_buffer + offset;
 
         // Check standard treaties (e.g., Non-Aggression, Alliance)
         int8_t treaty_type = MOX::_player[player_idx].treaty[target_idx];
         if (treaty_type > 0 && treaty_type < 4) {
             treaty_count = 1;
-            offset = _sprintf(dest_ptr, s_format_string, MOX::_treaty_labels[treaty_type]);
+            offset = sprintf(dest_ptr, s_format_string, MOX::_treaty_labels[treaty_type]);
             dest_ptr += offset;
         }
 
         // Check trade treaty
         if (MOX::_player[player_idx].trade_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = _sprintf(dest_ptr, s_format_string, _trade_treaty_msg);
+            offset = sprintf(dest_ptr, s_format_string, _trade_treaty_msg);
             dest_ptr += offset;
         }
 
         // Check research treaty
         if (MOX::_player[player_idx].research_treaty[target_idx] != 0) {
             treaty_count++;
-            offset = _sprintf(dest_ptr, s_format_string, _research_treaty_msg);
+            offset = sprintf(dest_ptr, s_format_string, _research_treaty_msg);
             dest_ptr += offset;
         }
 
         // Check if player is receiving tribute from the target
         if (MOX::_player[target_idx].tribute_treaty[player_idx] != 0) {
             treaty_count++;
-            offset = _sprintf(dest_ptr, s_format_string, _receiving_tribute_msg);
+            offset = sprintf(dest_ptr, s_format_string, _receiving_tribute_msg);
             dest_ptr += offset;
         }
 
         if (treaty_count != 0) {
-            _sprintf(dest_ptr, _really_risk_war_msg);
+            sprintf(dest_ptr, _really_risk_war_msg);
             confirmed = (int8_t)GENDRAW::Confirmation_Box_(message_buffer);
 
             if (confirmed != 0) {
@@ -1456,7 +1456,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
                 star_or_planet_name = HACCESS::Get_Planet_Name_(planet_idx);
             }
             char* attacker_name = COLCALC::Player_Name_(plr2_idx);
-            _sprintf(msg_buf, _s_attacks_you_at_s_msg, attacker_name, star_or_planet_name);
+            sprintf(msg_buf, _s_attacks_you_at_s_msg, attacker_name, star_or_planet_name);
             GENDRAW::Message_Box_(msg_buf);
         }
     }
@@ -2706,7 +2706,7 @@ void __cdecl GNN_Reports_Combat_(int player1_idx, int player2_idx) {
     char* name2 = COLCALC::Player_Name_(p2);
     char* name1 = COLCALC::Player_Name_(p1);
 
-    _sprintf(buf, _combat_is_reported_between_s_and_s_msg, name1, name2);
+    sprintf(buf, _combat_is_reported_between_s_and_s_msg, name1, name2);
 
     CHAT::Send_GNN_Chat_Msg_(buf);
 }

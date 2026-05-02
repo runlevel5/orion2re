@@ -157,9 +157,9 @@ namespace SCORE {
                 rank_index = -1;
             } else {
                 if (current_score >= max_hof_score) {
-                    _sprintf(buffer, HAROLD::H_Message_(0x27), MOX::_player[player_idx].name);
+                    sprintf(buffer, HAROLD::H_Message_(0x27), MOX::_player[player_idx].name);
                 } else {
-                    _sprintf(buffer, HAROLD::H_Message_(0x28), MOX::_player[player_idx].name);
+                    sprintf(buffer, HAROLD::H_Message_(0x28), MOX::_player[player_idx].name);
                 }
                 GENDRAW::Warning_Box_(buffer);
             }
@@ -622,7 +622,7 @@ namespace SCORE {
         int raw_population = (int)SCORE::_hi->raw_population;
         char* format = (char*)HAROLD::H_Message_(0x15C /* HESTR_15C_D_POPULATION */);
 
-        _sprintf(buffer, format, raw_population);
+        sprintf(buffer, format, raw_population);
 
         SCORE::Draw_Generic_Score_(
             SCORE::_hi->score_population,
@@ -645,7 +645,7 @@ namespace SCORE {
         } else {
             int16_t msg_id = (num_defeated == 1) ? 0x159 : 0x15a;
             const char* fmt = HAROLD::H_Message_(msg_id);
-            _sprintf(message_buffer, fmt, (int32_t)num_defeated);
+            sprintf(message_buffer, fmt, (int32_t)num_defeated);
         }
 
         SCORE::Draw_Generic_Score_(SCORE::_hi->score_elimination, message_buffer, SCORE::Draw_Eliminated_Race_Pictures_, 0x168);
@@ -679,7 +679,7 @@ namespace SCORE {
         }
 
         format = HAROLD::H_Message_(message_id);
-        _sprintf(buffer, format, (int32_t)SCORE::_hi->raw_captured_colonies);
+        sprintf(buffer, format, (int32_t)SCORE::_hi->raw_captured_colonies);
 
         SCORE::Draw_Generic_Score_(SCORE::_hi->score_captured_colonists, buffer, SCORE::Draw_Cap_Pop_, 0x168 /* 360 */);
     }
@@ -704,7 +704,7 @@ namespace SCORE {
         int16_t font_height = fonts::Get_Font_Height_();
 
         const char* format = HAROLD::H_Message_(350 /* 0x15E */);
-        _sprintf(buffer, format, (int32_t)stardate_calc);
+        sprintf(buffer, format, (int32_t)stardate_calc);
 
         SCORE::Print_Score_String_(140 /* 0x8C */, 139 /* 0x8B */, score, buffer);
 
@@ -753,7 +753,7 @@ namespace SCORE {
                     fonts::Set_Outline_Color_(2, 1);
                     fonts::Set_Font_Spacing_(1);
 
-                    _sprintf(buffer, SCORE::s__d__d_005523a4, defeated_score / 10, defeated_score % 10);
+                    sprintf(buffer, SCORE::s__d__d_005523a4, defeated_score / 10, defeated_score % 10);
 
                     int16_t centerX = current_x + (icon_width / 2);
                     fonts::Print_Centered_(centerX, base_y + 3, buffer);
@@ -874,16 +874,16 @@ namespace SCORE {
 
         char score_buffer[80];
         if (_hi->score_raw_subtotal == _hi->score_final) {
-            _sprintf(score_buffer, s_fmt_score_simple_00556104, (int)_hi->score_final);
+            sprintf(score_buffer, s_fmt_score_simple_00556104, (int)_hi->score_final);
         } else {
             char modifier_str[16];
             int16_t modifier = _hi->score_modifier_pct;
             if (modifier < 100) {
-                _sprintf(modifier_str, s_dot_d_0055a528, (int)modifier);
+                sprintf(modifier_str, s_dot_d_0055a528, (int)modifier);
             } else {
-                _sprintf(modifier_str, s_fmt_modifier_full_005523a4, (int)(modifier / 100), (int)(modifier % 100));
+                sprintf(modifier_str, s_fmt_modifier_full_005523a4, (int)(modifier / 100), (int)(modifier % 100));
             }
-            _sprintf(score_buffer, s_fmt_score_complex_0055a518, (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
+            sprintf(score_buffer, s_fmt_score_complex_0055a518, (int)_hi->score_raw_subtotal, modifier_str, (int)_hi->score_final);
         }
 
         int16_t score_width = fonts::Get_String_Width_(score_buffer);
@@ -945,7 +945,7 @@ namespace SCORE {
         label_width = fonts::Get_String_Width_(label_buf);
 
         // Format score string
-        _sprintf(score_buf, s_fmt_score_simple_00556104, (int)score);
+        sprintf(score_buf, s_fmt_score_simple_00556104, (int)score);
         score_width = fonts::Get_String_Width_(score_buf) + 3;
 
         // Print label

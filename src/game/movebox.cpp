@@ -268,7 +268,7 @@ namespace MOVEBOX {
                     int8_t status = leader.status;
 
                     if (status <= 0) {
-                        _sprintf(buffer, MOVEBOX::s_geggggg_format, star.name, leader.name);
+                        sprintf(buffer, MOVEBOX::s_geggggg_format, star.name, leader.name);
                     } else {
                         const char* fmt;
                         if (status == 1) {
@@ -276,7 +276,7 @@ namespace MOVEBOX {
                         } else {
                             fmt = HAROLD::H_Message_(147 /* 0x93 */);
                         }
-                        _sprintf(buffer, fmt, star.name, leader.name, (int)status);
+                        sprintf(buffer, fmt, star.name, leader.name, (int)status);
                     }
                 }
             } else {

@@ -281,7 +281,7 @@ namespace NETTURN {
 
         if (MOX::_player[MOX::_PLAYER_NUM].eliminated == 0) {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-                _sprintf(MOX::_temp_string, NETTURN::_have_d_of_d_chunks_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
+                sprintf(MOX::_temp_string, NETTURN::_have_d_of_d_chunks_fmt, NETMOX::_net.received_chunk_count, NETMOX::_net.total_chunk_count);
                 MULTPLAY::Chat_Box_Input_Loop_();
             }
 

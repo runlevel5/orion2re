@@ -232,6 +232,8 @@ namespace MOX {
     inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
     inline uint16_t& _special_scroll_up_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059775E});
+    inline uint8_t& _blue_color2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059775D});
+    inline uint8_t& _special_scroll_up_button_1 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597760});
     inline int16_t& _auto_msl_warning_off = *reinterpret_cast<int16_t*>(0x0059790E);
     inline s_animation_header*& _draw_ship_bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B328});
     inline int16_t& _multi_colored_line_start = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4B8});
@@ -344,7 +346,10 @@ namespace MOX {
     inline int8_t& _at_least_one_report = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005978EC});
     inline uint8_t& _previous_report = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CB2});
     inline int16_t& _first_node_ptr_in_stack_ = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597AC8});
-    inline uint8_t* _rot_plan_dim = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00597758});
+    inline int16_t (&_system_display_ring_radius)[5] =
+        *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x00597AE0});
+    inline uint8_t (&_rot_plan_dim)[5] =
+        *reinterpret_cast<uint8_t (*)[5]>(std::uintptr_t{0x00597758});
     inline uint16_t& _system_star_id = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A1CB8});
     inline int16_t& _system_star_id_for_auto_select = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059BA1A});
     inline uint8_t& _draw_fleet_screen_to_back = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059770C});
@@ -459,6 +464,7 @@ namespace MOX {
     inline char* (&_planet_special_string)[12] = *reinterpret_cast<char* (*)[12]>(std::uintptr_t{0x00597780});
     inline char* (&_planet_climate_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x0059BA80});
     inline char* (&_mineral_class_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A2C30});
+    inline uint8_t& _red_color2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A2C44});
     inline char* (&_planet_size_string)[5] = *reinterpret_cast<char* (*)[5]>(std::uintptr_t{0x005A47C0});
     inline char* (&_planet_type_string)[10] = *reinterpret_cast<char* (*)[10]>(std::uintptr_t{0x00596C70});
     inline char* (&_planet_group_string)[4] = *reinterpret_cast<char* (*)[4]>(std::uintptr_t{0x00596D00});
@@ -585,6 +591,7 @@ namespace MOX {
     inline int16_t& _main_screen_grid_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596E78});
 
     inline int16_t& _NUM_PLAYERS = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A2C1C });
+    inline uint8_t& _red_color1 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A2C1E});
     inline char* (&_government_labels)[8] = *reinterpret_cast<char* (*)[8]>(std::uintptr_t{0x00596FB0});
     inline char** _special_ability_names = reinterpret_cast<char**>(std::uintptr_t{0x0059B350});
     inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
@@ -756,7 +763,8 @@ namespace MOX {
     inline s_ship_icon (&_ship_icon)[572] =
         *reinterpret_cast<s_ship_icon(*)[572]>(std::uintptr_t{0x005A2CE0});
 
-    inline uint8_t* _black_hole_anim_count = reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596CA0});
+    inline uint8_t (&_black_hole_anim_count)[10] =
+        *reinterpret_cast<uint8_t (*)[10]>(std::uintptr_t{0x00596CA0});
 
     inline int16_t (&_bill_savegame)[6] =
         *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00559478});
@@ -819,6 +827,12 @@ namespace MOX {
     inline s_movable_box (&_moveable_box)[5] =
         *reinterpret_cast<s_movable_box(*)[5]>(std::uintptr_t{0x00597860});
 
+    inline int16_t& moveable_box_id_at(int index) {
+        return *reinterpret_cast<int16_t*>(
+            std::uintptr_t{0x00597862} +
+            static_cast<std::uintptr_t>(index) * sizeof(s_movable_box));
+    }
+
     inline int16_t& _moveable_box_2_x =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x005978A0});
 
@@ -880,6 +894,9 @@ namespace MOX {
 
     inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
         *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
+
+    inline int16_t& _fleet_movement_icon_0_ship_node_idx =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059C477});
 
     inline s_save_game_description (&_save_game_description)[10] = *reinterpret_cast<s_save_game_description(*)[10]>(std::uintptr_t{0x005974F0});
 

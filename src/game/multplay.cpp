@@ -23,16 +23,16 @@ namespace MULTPLAY {
         local_colors = *font_ptr;
         fonts::Set_Font_Style_(4, &local_colors);
 
-        _sprintf(buffer, s_COM_PORT_FMT_v2, NETMOX::_net.modem_settings.com_port_index + 1);
+        sprintf(buffer, s_COM_PORT_FMT_v2, NETMOX::_net.modem_settings.com_port_index + 1);
         fonts::Print_(x + 130, y + 63, buffer);
 
         fonts::Set_Font_Style_(4, &local_colors);
-        _sprintf(buffer, s_BAUD_RATE_FMT, NETMOX::_net.modem_settings.baud_rate);
+        sprintf(buffer, s_BAUD_RATE_FMT, NETMOX::_net.modem_settings.baud_rate);
         fonts::Print_(x + 300, y + 63, buffer);
 
         int16_t msg_id = (NETMOX::_net.modem_initialized != 0) ? 0xf7 /* HESTR_0F7_TONE */ : 0xf8 /* HESTR_0F8_PULSE */;
         const char* msg_str = HAROLD::H_Message_(msg_id);
-        _sprintf(buffer, MOX::s_fmt_s, msg_str);
+        sprintf(buffer, MOX::s_fmt_s, msg_str);
 
         MISC::Set_Fitted_Font_Style_(buffer, &local_colors, 3, 2, 0, 0x4d, 0);
         int16_t font_height = MISC::Get_Font_Style_();
@@ -66,7 +66,7 @@ namespace MULTPLAY {
                     fonts::Set_Font_Style_(3, &local_colors);
                 }
 
-                _sprintf(buffer, s_COM_PORT_FMT_v2, i + 1);
+                sprintf(buffer, s_COM_PORT_FMT_v2, i + 1);
                 fonts::Print_(x + 170, current_y + 3, buffer);
                 current_y += 15;
             }
@@ -1209,7 +1209,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                         }
                     } else {
                         char* fmt = const_cast<char*>(HAROLD::H_Message_(0xFD /* HESTR_0FD_SAVE_D_IS_NOT_A_VALID_ */));
-                        _sprintf(warning_msg, fmt, i);
+                        sprintf(warning_msg, fmt, i);
                         GENDRAW::Warning_Box_(warning_msg);
                         result = -1;
                     }
@@ -1258,10 +1258,10 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
         s_modem_settings* settings = reinterpret_cast<s_modem_settings*>(&NETMOX::_net);
 
-        _sprintf(buffer, s_COM_PORT_FMT, settings->com_port_index + 1);
+        sprintf(buffer, s_COM_PORT_FMT, settings->com_port_index + 1);
         fonts::Print_(x + 119, y + 83, buffer);
 
-        _sprintf(buffer, s_BAUD_RATE_FMT, settings->baud_rate);
+        sprintf(buffer, s_BAUD_RATE_FMT, settings->baud_rate);
         fonts::Print_(x + 293, y + 83, buffer);
 
         if (MOX::_mp_screen->flag_serial_type == 1) {
@@ -1280,7 +1280,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
                     style_colors = *MISC::Font_Colors2_(3, 146, 151);
                     fonts::Set_Font_Style_(3, &style_colors);
                 }
-                _sprintf(buffer, s_COM_PORT_FMT, i + 1);
+                sprintf(buffer, s_COM_PORT_FMT, i + 1);
                 fonts::Print_(x + 156, cur_y + 3, buffer);
             }
             return;
@@ -1503,7 +1503,7 @@ void __cdecl Change_MP_Game_Name_() {
                 }
                 
                 if (strcmp(MOX::_settings.net_game_name, netcode::Net_Get_Game_Name_(i)) == 0) {
-                    _sprintf(warning_msg, HAROLD::H_Message_(0xFF /* HESTR_0FF_S_IS_ALREADY_A_GAME_NA */), MOX::_settings.net_game_name);
+                    sprintf(warning_msg, HAROLD::H_Message_(0xFF /* HESTR_0FF_S_IS_ALREADY_A_GAME_NA */), MOX::_settings.net_game_name);
                     GENDRAW::Warning_Box_(warning_msg);
                     already_exists = true;
                     is_valid = false;
@@ -1719,7 +1719,7 @@ void __cdecl Add_Net_Next_Turn_Fields_()
     fonts::Set_Font_Special_Colors_(&local_colors2);
     
     char name_buffer[80];
-    _sprintf(name_buffer, s_format_0055aa28, MOX::_player[MOX::_PLAYER_NUM].name);
+    sprintf(name_buffer, s_format_0055aa28, MOX::_player[MOX::_PLAYER_NUM].name);
     
     int16_t name_width = fonts::Get_String_Width_(name_buffer);
     MULTPLAY::_global_chat_string[0] = '\0';
@@ -2277,12 +2277,12 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                     MOX::_mox_font_colors_offset = (uint8_t)(c2 + 1);
                     s_colors chat_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, (uint8_t)(c1 + 1), (uint8_t)(c3 + 2));
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &chat_colors);
-                    _sprintf(chat_buffer, s_chat_msg_fmt, MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
+                    sprintf(chat_buffer, s_chat_msg_fmt, MOX::_player[sender_id].name, CHAT::_chat_info->messages[i].text);
                 } else {
                     MOX::_mox_font_colors_offset = 16;
                     s_colors gnn_colors = *MISC::Font_Colors2_(MOX::_mp_screen->subscreen_mode, 12, 23);
                     fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &gnn_colors);
-                    _sprintf(chat_buffer, s_gnn_fmt, CHAT::_chat_info->messages[i].text);
+                    sprintf(chat_buffer, s_gnn_fmt, CHAT::_chat_info->messages[i].text);
                 }
 
                 if (i == 0) {
@@ -2300,7 +2300,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         char final_name_buffer[100];
-        _sprintf(final_name_buffer, s_name_fmt, MOX::_player[MOX::_PLAYER_NUM].name);
+        sprintf(final_name_buffer, s_name_fmt, MOX::_player[MOX::_PLAYER_NUM].name);
 
         uint8_t pc1, pc2, pc3;
         MULTPLAY::Get_Main_Palette_Base_Colors_(MOX::_PLAYER_NUM, &pc1, &pc2, &pc3);
@@ -2463,7 +2463,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                 fonts::Set_Font_Style_((uint16_t)(uint8_t)MOX::_mp_screen->subscreen_mode, font_colors);
                 char* race_name = HACCESS::Race_Name_String_(player_idx);
                 char buffer[100];
-                _sprintf(buffer, s_fmt_player_race, plr->name, race_name);
+                sprintf(buffer, s_fmt_player_race, plr->name, race_name);
 
                 int16_t font_h = fonts::Get_Font_Height_();
                 int16_t print_y = screen_y + 0x40 + y_offset_for_player_row + (29 - font_h) / 2;
@@ -2600,7 +2600,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         const char* format = HAROLD::H_Message_(msg_id);
         
         // Note: In original binary, font_colors and buffer overlap by 4 bytes on stack
-        _sprintf(buffer, format, (int)num_users);
+        sprintf(buffer, format, (int)num_users);
 
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
         fonts::Print_(MOX::_mp_screen->screen_x + 120 /* 0x78 */, MOX::_mp_screen->screen_y + 71 /* 0x47 */, buffer);
@@ -2686,7 +2686,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         int32_t total_users = netcode::Net_Get_Users_(nullptr);
         const char* format = HAROLD::H_Message_(251 /* 0xfb */);
-        _sprintf(msg_buffer, format, (int32_t)connected_count, total_users);
+        sprintf(msg_buffer, format, (int32_t)connected_count, total_users);
 
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
         fonts::Print_(MOX::_mp_screen->screen_x + 118 /* 0x76 */, MOX::_mp_screen->screen_y + 73 /* 0x49 */, msg_buffer);
@@ -3009,7 +3009,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         const char* const score_text = MISC::Get_Comma_String_(score);
 
         strcpy(message_format, HAROLD::H_Message_(0xFC));
-        _sprintf(line, message_format, player->name, player->race_name, score_text);
+        sprintf(line, message_format, player->name, player->race_name, score_text);
         fonts::Print_(print_x, print_y, line);
     }
 

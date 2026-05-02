@@ -397,7 +397,7 @@ namespace MOX2 {
             }
 
             if (error_text != nullptr) {
-                _sprintf(error_message, error_text);
+                sprintf(error_message, error_text);
             }
 
             exitm::Exit_With_Message(error_message);
@@ -427,7 +427,7 @@ namespace MOX2 {
             strcat(alternate_path, s_backslash_00557be4);
         }
 
-        _sprintf(diplomat_path, s__sdiplomat_lbx_00557bd4, alternate_path);
+        sprintf(diplomat_path, s__sdiplomat_lbx_00557bd4, alternate_path);
 
         if (dos::DIR_(s_diplomat_lbx_00557bc4, alternate_path)) {
             return;
@@ -456,7 +456,7 @@ namespace MOX2 {
         }
 
         if (error_text != nullptr) {
-            _sprintf(error_message, error_text);
+            sprintf(error_message, error_text);
         }
 
         exitm::Exit_With_Message(error_message);

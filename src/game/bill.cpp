@@ -24,12 +24,12 @@ namespace BILL {
         FILE* dst_fp = fopen(dst_path, s_wb);
 
         if (src_fp == nullptr) {
-            _sprintf(msg_buf, s_Could_not_open_s, src_path);
+            sprintf(msg_buf, s_Could_not_open_s, src_path);
             exitm::Exit_With_Message(msg_buf);
         }
 
         if (dst_fp == nullptr) {
-            _sprintf(msg_buf, s_Could_not_open_s, dst_path);
+            sprintf(msg_buf, s_Could_not_open_s, dst_path);
             exitm::Exit_With_Message(msg_buf);
         }
 
@@ -44,7 +44,7 @@ namespace BILL {
 
             size_t written = fwrite(read_buffer, 1, current_chunk_size, dst_fp);
             if (written != current_chunk_size) {
-                _sprintf(msg_buf, s_Error_copying_s_to_s_bytes_i, src_path, dst_path, total_bytes_read);
+                sprintf(msg_buf, s_Error_copying_s_to_s_bytes_i, src_path, dst_path, total_bytes_read);
                 exitm::Exit_With_Message(msg_buf);
             }
         } while (current_chunk_size == 4096);
@@ -58,7 +58,7 @@ namespace BILL {
         char find_data[52];
         char src_file_name[128];
 
-        _sprintf(_dest_file_name, SCIENCE::_spy_anim_fmt,
+        sprintf(_dest_file_name, SCIENCE::_spy_anim_fmt,
                  static_cast<uint32_t>(static_cast<uint8_t>(MOX::_player[MOX::_PLAYER_NUM].race)));
 
         if (dos::DIR_(_dest_file_name, find_data) == 0) {
@@ -85,7 +85,7 @@ namespace BILL {
 
         s_player* player = &MOX::_player[player_index];
 
-        _sprintf(BILL::_dest_file_name, s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
+        sprintf(BILL::_dest_file_name, s_SR_R_x_SC_LBX, (uint32_t)(uint8_t)player->race);
 
         if (!dos::DIR_(BILL::_dest_file_name, dir_entry)) {
             if (dos::DIR_(s_SR_R_wildcard_SC_LBX, dir_entry)) {
@@ -920,7 +920,7 @@ char* __cdecl Cache_Player_Trooper_Anim_() {
     char found_path[52];
     char source_path[128];
 
-    _sprintf(
+    sprintf(
         BILL::_dest_file_name,
         SCIENCE::_trooper_anim_fmt,
         static_cast<unsigned int>(static_cast<uint8_t>(MOX::_player[MOX::_PLAYER_NUM].race))

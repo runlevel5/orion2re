@@ -85,12 +85,12 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             if (planet->colony_index != -1) {
                 char* race_name = MOX::_player[MOX::_colony[planet->colony_index].owner].race_name;
-                _sprintf(owner_label, "(%s)", race_name);
+                sprintf(owner_label, "(%s)", race_name);
                 has_owner_label = true;
             } else if (HAROLD::Star_Guarded_By_Monster_(star_idx, &monster_race)) {
                 char race_buf[20];
                 HACCESS::Race_Name_(monster_race, race_buf);
-                _sprintf(owner_label, "(%s)", race_buf);
+                sprintf(owner_label, "(%s)", race_buf);
                 has_owner_label = true;
             }
 
@@ -110,7 +110,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             char work_buf[100];
             fonts::Set_Font_Style_(1, &font_colors);
-            _sprintf(work_buf, HAROLD::H_Message_(0x141), (int)summary->food_per_farmer);
+            sprintf(work_buf, HAROLD::H_Message_(0x141), (int)summary->food_per_farmer);
             fonts::Print_Centered_(0x8c, y_climate + climate_h + 4, work_buf);
 
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];
@@ -123,7 +123,7 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             } else {
                 fonts::Print_Centered_(0xd9, y_climate, gravity_str);
                 fonts::Set_Font_Style_(1, &font_colors);
-                _sprintf(work_buf, HAROLD::H_Message_(0x142), (int)penalty);
+                sprintf(work_buf, HAROLD::H_Message_(0x142), (int)penalty);
                 y_gravity = y_climate + fonts::Get_Font_Height_() + 4;
             }
             fonts::Print_Centered_(0xd9, y_gravity, (penalty == 0) ? gravity_str : work_buf);
@@ -132,14 +132,14 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             int16_t mineral_h = fonts::Get_Font_Height_();
             fonts::Print_Centered_(0x137, y_climate, MOX::_mineral_class_string[mineral_class]);
             fonts::Set_Font_Style_(1, &font_colors);
-            _sprintf(work_buf, HAROLD::H_Message_(0x152), (int)summary->minerals);
+            sprintf(work_buf, HAROLD::H_Message_(0x152), (int)summary->minerals);
             fonts::Print_Centered_(0x137, y_climate + mineral_h + 4, work_buf);
 
             fonts::Set_Font_Style_(2, &font_colors);
             int16_t size_h = fonts::Get_Font_Height_();
             fonts::Print_Centered_(0x182, y_climate, MOX::_planet_size_string[planet->size]);
             fonts::Set_Font_Style_(1, &font_colors);
-            _sprintf(work_buf, HAROLD::H_Message_(0x143), (int)summary->max_pop);
+            sprintf(work_buf, HAROLD::H_Message_(0x143), (int)summary->max_pop);
             fonts::Print_Centered_(0x182, y_climate + size_h + 4, work_buf);
 
             if (summary->colony_eta >= 0) {
@@ -179,7 +179,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     if (((ship_origin_star_idx != target_star_idx) && (ship_type == 1 /* COLONY_SHIP */) && (PLNTSUM::_planet_summary[summary_idx].colony_eta > 0)) ||
         ((ship_type == 4 /* OUTPOST_SHIP */) && (PLNTSUM::_planet_summary[summary_idx].outpost_eta > 0))) {
         
-        _sprintf(msg_buffer, HAROLD::H_Message_(0x134 /* HESTR_134_YOU_ALREADY_HAVE_ONE_C */), &MOX::_star[target_star_idx]);
+        sprintf(msg_buffer, HAROLD::H_Message_(0x134 /* HESTR_134_YOU_ALREADY_HAVE_ONE_C */), &MOX::_star[target_star_idx]);
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         should_continue = (GENDRAW::Confirmation_Box_(msg_buffer) != 0);
         PLNTSUM::_screen->refresh_fields = true;
@@ -197,20 +197,20 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         bool visited_dest = HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, target_star_idx);
 
         if (ship_origin_star_idx == target_star_idx) {
-            _sprintf(msg_buffer, HAROLD::H_Message_(0x138 /* HESTR_138_S_ALREADY_HAS_A_COURSE */), &MOX::_ship[nearest_ship_idx], &MOX::_star[target_star_idx]);
+            sprintf(msg_buffer, HAROLD::H_Message_(0x138 /* HESTR_138_S_ALREADY_HAS_A_COURSE */), &MOX::_ship[nearest_ship_idx], &MOX::_star[target_star_idx]);
             GENDRAW::Message_Box_(msg_buffer);
             PLNTSUM::_screen->refresh_fields = true;
             return;
         }
 
         if (omniscient || (visited_dest && visited_origin)) {
-            _sprintf(msg_buffer, HAROLD::H_Message_(0x139 /* HESTR_139_S_HAS_SET_A_COURSE_FOR */), &MOX::_ship[nearest_ship_idx], &MOX::_star[ship_origin_star_idx], &MOX::_star[target_star_idx]);
+            sprintf(msg_buffer, HAROLD::H_Message_(0x139 /* HESTR_139_S_HAS_SET_A_COURSE_FOR */), &MOX::_ship[nearest_ship_idx], &MOX::_star[ship_origin_star_idx], &MOX::_star[target_star_idx]);
         } else if (visited_dest) {
-            _sprintf(msg_buffer, HAROLD::H_Message_(0x13A /* HESTR_13A_S_HAS_SET_A_COURSE_SHO */), &MOX::_ship[nearest_ship_idx], &MOX::_star[target_star_idx]);
+            sprintf(msg_buffer, HAROLD::H_Message_(0x13A /* HESTR_13A_S_HAS_SET_A_COURSE_SHO */), &MOX::_ship[nearest_ship_idx], &MOX::_star[target_star_idx]);
         } else if (visited_origin) {
-            _sprintf(msg_buffer, HAROLD::H_Message_(0x139 /* HESTR_139_S_HAS_SET_A_COURSE_FOR */), &MOX::_ship[nearest_ship_idx], &MOX::_star[ship_origin_star_idx]);
+            sprintf(msg_buffer, HAROLD::H_Message_(0x139 /* HESTR_139_S_HAS_SET_A_COURSE_FOR */), &MOX::_ship[nearest_ship_idx], &MOX::_star[ship_origin_star_idx]);
         } else {
-            _sprintf(msg_buffer, HAROLD::H_Message_(0x13A /* HESTR_13A_S_HAS_SET_A_COURSE_SHO */), &MOX::_ship[nearest_ship_idx]);
+            sprintf(msg_buffer, HAROLD::H_Message_(0x13A /* HESTR_13A_S_HAS_SET_A_COURSE_SHO */), &MOX::_ship[nearest_ship_idx]);
         }
 
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
@@ -244,7 +244,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                 
                 int16_t msg_id = (PLNTSUM::_send_choice == 0) ? 0x13C /* HESTR_13C_S_IS_GUARDED_BY_A_S_DO */ : 0x13B /* HESTR_13B_S_IS_GUARDED_BY_A_S_DO */;
-                _sprintf(msg_buffer, HAROLD::H_Message_(msg_id), &MOX::_star[target_star_idx], race_name_buffer);
+                sprintf(msg_buffer, HAROLD::H_Message_(msg_id), &MOX::_star[target_star_idx], race_name_buffer);
                 user_confirmed_move = (GENDRAW::Confirmation_Box_(msg_buffer) != 0);
             }
 
@@ -252,7 +252,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 SHIPMOVE::Make_Ships_Move_To_(ship_list, target_star_idx, &move_info);
                 
                 int16_t confirm_msg_id = (move_info.turns_left == 1) ? 0x13D : 0x13E;
-                _sprintf(msg_buffer, HAROLD::H_Message_(confirm_msg_id), &MOX::_ship[best_ship_idx], &MOX::_star[target_star_idx], (uint32_t)(uint8_t)move_info.turns_left);
+                sprintf(msg_buffer, HAROLD::H_Message_(confirm_msg_id), &MOX::_ship[best_ship_idx], &MOX::_star[target_star_idx], (uint32_t)(uint8_t)move_info.turns_left);
                 
                 GENDRAW::Message_Box_(msg_buffer);
                 PLNTSUM::_screen->refresh_fields = true;
@@ -1457,7 +1457,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
                 const char* msg = HAROLD::H_Message_(msg_id);
                 strcpy(buffer1, msg);
                 char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
-                _sprintf(buffer2, buffer1, planet_name);
+                sprintf(buffer2, buffer1, planet_name);
                 GENDRAW::Warning_Box_(buffer2);
             }
             found = true;
@@ -1482,7 +1482,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
 
             int16_t eta_msg_id = (MOX::_g_ship_move_info.turns_left == 1) ? 0x14B /* HESTR_14B_ETA_D_TURN */ : 0x14C /* HESTR_14C_ETA_D_TURNS */;
             const char* eta_raw = HAROLD::H_Message_(eta_msg_id);
-            _sprintf(eta_str, eta_raw, (uint32_t)(uint8_t)MOX::_g_ship_move_info.turns_left);
+            sprintf(eta_str, eta_raw, (uint32_t)(uint8_t)MOX::_g_ship_move_info.turns_left);
 
             int16_t heading_msg_id = (order_type == 1) ? 0x14D /* HESTR_14D_COLONY_SHIP_HEADING_TO */ : 0x14E /* HESTR_14E_OUTPOST_SHIP_HEADING_T */;
             const char* heading_raw = HAROLD::H_Message_(heading_msg_id);
@@ -1491,7 +1491,7 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
             const char* eta_param = (MOX::_g_ship_move_info.turns_left == 0) ? s__00551100 : eta_str;
             char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
 
-            _sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
+            sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
 
             if (GENDRAW::Confirmation_Box_(buffer2)) {
                 SHIPMOVE::Make_Ships_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
@@ -1747,7 +1747,7 @@ void __cdecl Summary_Screen_Print_Scanned_() {
     int16_t planet_idx = Summary_Planet_Index_(scanned_field);
 
     if (PLNTSUM::_planet_summary[planet_idx].blocked == 1) {
-        _sprintf(msg_buffer, HAROLD::H_Message_(324 /* HESTR_144_BLACK_HOLE_BLOCKS_TRAV */), MOX::_star[scanned_field].name);
+        sprintf(msg_buffer, HAROLD::H_Message_(324 /* HESTR_144_BLACK_HOLE_BLOCKS_TRAV */), MOX::_star[scanned_field].name);
         fonts::Set_Font_Style_(1, &PLNTSUM::_red_colors);
         int16_t y = (fonts::Get_Font_Height_() / 2) + 143 /* 0x8F */;
         fonts::Print_Centered_(533 /* 0x215 */, y, msg_buffer);
@@ -1765,12 +1765,12 @@ void __cdecl Summary_Screen_Print_Scanned_() {
             status = 2;
             if (visited) {
                 if (MOX::_g_ship_move_info.turns_left == 1) {
-                    _sprintf(msg_buffer, HAROLD::H_Message_(105 /* HESTR_069_D_TURN_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
+                    sprintf(msg_buffer, HAROLD::H_Message_(105 /* HESTR_069_D_TURN_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
                 } else {
-                    _sprintf(msg_buffer, HAROLD::H_Message_(106 /* HESTR_06A_D_TURNS_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
+                    sprintf(msg_buffer, HAROLD::H_Message_(106 /* HESTR_06A_D_TURNS_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
                 }
             } else {
-                _sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)MOX::_g_ship_move_info.turns_left);
+                sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)MOX::_g_ship_move_info.turns_left);
             }
         } else {
             status = 1;
@@ -1789,9 +1789,9 @@ void __cdecl Summary_Screen_Print_Scanned_() {
                     int16_t eta = Get_ETA_To_Star_(star_id);
                     if (eta > 0) {
                         if (eta == 1) {
-                            _sprintf(msg_buffer, HAROLD::H_Message_(331 /* HESTR_14B_ETA_D_TURN */), (int)eta);
+                            sprintf(msg_buffer, HAROLD::H_Message_(331 /* HESTR_14B_ETA_D_TURN */), (int)eta);
                         } else {
-                            _sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)eta);
+                            sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)eta);
                         }
                     }
                     status = 2;
@@ -1814,15 +1814,15 @@ void __cdecl Summary_Screen_Print_Scanned_() {
                     int16_t eta = Get_ETA_To_Star_(star_id);
                     if (eta > 0) {
                         if (eta == 1) {
-                            _sprintf(suffix_buffer, HAROLD::H_Message_(336 /* HESTR_150_D_TURN_TO */), (int)eta);
+                            sprintf(suffix_buffer, HAROLD::H_Message_(336 /* HESTR_150_D_TURN_TO */), (int)eta);
                         } else {
-                            _sprintf(suffix_buffer, HAROLD::H_Message_(337 /* HESTR_151_D_TURNS_TO */), (int)eta);
+                            sprintf(suffix_buffer, HAROLD::H_Message_(337 /* HESTR_151_D_TURNS_TO */), (int)eta);
                         }
                     }
                     status = 2;
                 }
             }
-            _sprintf(msg_buffer, "%s%s", suffix_buffer, star_name_buffer);
+            sprintf(msg_buffer, "%s%s", suffix_buffer, star_name_buffer);
         }
     }
 
@@ -1962,7 +1962,7 @@ void Planet_Summary_Screen_() {
                 if (row <= -1) {
                     s_star_data *p_star = &MOX::_star[i];
                     const char *msg_fmt = HAROLD::H_Message_(0x14f /* HESTR_14F_NO_PLANETS_IN_THE_S_ST */);
-                    _sprintf(warning_msg, msg_fmt, p_star);
+                    sprintf(warning_msg, msg_fmt, p_star);
                     GENDRAW::Warning_Box_(warning_msg);
                 } else {
                     MOX::_scroll_bar->first_visible_row = row;

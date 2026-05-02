@@ -1,8 +1,4 @@
 #pragma once
-#include <cstdint>
-#include "types.h"
-
-struct s_animation_header;
 
 namespace COLXPORT {
     inline uint8_t& _cheezy_hack_col_count_state =

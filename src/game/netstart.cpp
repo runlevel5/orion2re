@@ -34,7 +34,7 @@ namespace NETSTART {
         RUSS::Mox_Sync_Update_();
 
         while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            _sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, 
+            sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, 
                     NETMOX::_net.received_chunk_count + 1, NETMOX::_net.total_chunk_count);
             MULTPLAY::Draw_SendGet_Net_Info_Screen_();
             fields::Get_Input_();
@@ -99,7 +99,7 @@ namespace NETSTART {
         }
 
         while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
-            _sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, (int)NETMOX::_net.received_chunk_count + 1, (int)NETMOX::_net.total_chunk_count);
+            sprintf(MOX::_temp_string, NETSTART::_receiving_chunk_d_of_d, (int)NETMOX::_net.received_chunk_count + 1, (int)NETMOX::_net.total_chunk_count);
             fields::Get_Input_();
             MULTPLAY::Draw_SendGet_Net_Info_Screen_();
             RUSS::Mox_Sync_Update_();
@@ -452,7 +452,7 @@ namespace NETSTART {
         msg.starting_civilization_level = MOX::_settings.starting_civilization_level;
         msg.xenons_exist = MOX::_settings.xenons_exist;
 
-        _sprintf(msg.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
+        sprintf(msg.version_string, s__s_00551130, s_Mar_26_1997_005578e0);
 
         memset(RACESEL::_color_flag, 0, sizeof(RACESEL::_color_flag));
         memset(NETMOX::_net.player_connected_flags, 0, sizeof(NETMOX::_net.player_connected_flags));
@@ -828,7 +828,7 @@ namespace NETSTART {
             }
         }
 
-        _sprintf(reinterpret_cast<char*>(&payload[46]), s__s_00551130, s_Mar_26_1997_005578e0);
+        sprintf(reinterpret_cast<char*>(&payload[46]), s__s_00551130, s_Mar_26_1997_005578e0);
         NETMOX::Mox_Send_Message_(0x7FFE, 42, payload, 96);
 
         NETMOX::_net.host_election_winner_id = NETMOX::_net.net_host_id;

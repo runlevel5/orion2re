@@ -6,7 +6,7 @@ namespace JIM {
         char find_buffer[80];
         char secondary_path[80];
 
-        _sprintf(secondary_path, s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
+        sprintf(secondary_path, s_fmt_ssimtex_lbx, farload::_secondary_drive_path);
 
         if (dos::DIR_(s_simtex_lbx, find_buffer)) {
             return true;
@@ -306,9 +306,9 @@ namespace JIM {
                         break;
                     case 0x88:
                         if (MOX::_settings.language == 0) {
-                            _sprintf(temp_buf, s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
+                            sprintf(temp_buf, s_d_dot_d_005523a4, MOX::_stardate / 10, MOX::_stardate % 10);
                         } else {
-                            _sprintf(temp_buf, s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
+                            sprintf(temp_buf, s_d_comma_d_0055239c, MOX::_stardate / 10, MOX::_stardate % 10);
                         }
                         src_ptr = temp_buf;
                         break;
@@ -332,7 +332,7 @@ namespace JIM {
         dest_buf[len] = '\0';
 
         if (strlen(dest_buf) >= static_cast<uint32_t>(max_len - 1)) {
-            _sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, text);
+            sprintf(dest_buf, s_Decode_message_too_long_0055593c, max_len, text);
             exitm::Exit_With_Message(dest_buf);
         } else {
             strcpy(text, dest_buf);
@@ -356,7 +356,7 @@ namespace JIM {
         int16_t len = static_cast<int16_t>(strlen(buffer));
 
         if (max_len - 1 <= len || len >= 99) {
-            _sprintf(buffer, s_Message_too_long, msg_idx, filename, len);
+            sprintf(buffer, s_Message_too_long, msg_idx, filename, len);
             exitm::Exit_With_Message(buffer);
             return;
         }

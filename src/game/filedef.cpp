@@ -175,7 +175,7 @@ namespace FILEDEF {
 
         HAROLD::Save_Mouse_List_();
 
-        _sprintf(filename, "SAVE%d.GAM", save_idx + 1);
+        sprintf(filename, "SAVE%d.GAM", save_idx + 1);
 
         RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
@@ -199,7 +199,7 @@ namespace FILEDEF {
             case 4: fmt = "Il file SAVE%d.GAM non è valido!"; break;
             }
             if (fmt) {
-                _sprintf(err_msg, fmt, save_idx + 1);
+                sprintf(err_msg, fmt, save_idx + 1);
                 GENDRAW::Warning_Box_(err_msg);
             }
             video::Set_Page_Off_();
@@ -393,7 +393,7 @@ namespace FILEDEF {
         int8_t game_type = -1;
         char filename[16];
 
-        _sprintf(filename, s_SAVE_d_GAM_00556944, save_slot + 1);
+        sprintf(filename, s_SAVE_d_GAM_00556944, save_slot + 1);
         FILE* file = fopen(filename, s_rb_0055117c);
         if (file != nullptr) {
             if (fseek(file, 0x2D, SEEK_SET) == 0) {

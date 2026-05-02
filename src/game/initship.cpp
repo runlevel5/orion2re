@@ -2103,7 +2103,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
     struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
     
     // Copy "Crystal" or specific race name from the race names array
-    _sprintf(design->name, "%s", MOX::_race_names[16]);
+    sprintf(design->name, "%s", MOX::_race_names[16]);
 
     design->ship_type = 0;
     design->computer_type = 5;

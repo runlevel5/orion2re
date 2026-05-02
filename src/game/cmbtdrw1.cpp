@@ -3041,9 +3041,9 @@ namespace CMBTDRW1 {
 
     static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
         if (value > 0) {
-            _sprintf(out_text, "%s%d", s_plus_00551118, value);
+            sprintf(out_text, "%s%d", s_plus_00551118, value);
         } else {
-            _sprintf(out_text, "%d", value);
+            sprintf(out_text, "%d", value);
         }
     }
 
@@ -3273,7 +3273,7 @@ namespace CMBTDRW1 {
         KEN::Ken_Get_Text_Message_(11, message_text, 0x50);
         fonts::Print_(view_x + 0x6F, row_y, message_text);
 
-        _sprintf(line_text, "%d%s",
+        sprintf(line_text, "%d%s",
                 static_cast<int32_t>(MOX::_global_combat_data.ship_missle_defense),
                 s_percent_0055633c);
         fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
@@ -3332,7 +3332,7 @@ namespace CMBTDRW1 {
 
         if (!is_special_target && (MOX::_global_combat_data.ftl_type > 0)) {
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-            _sprintf(
+            sprintf(
                 line_text,
                 "%s%d%s%d%s",
                 s_lparen_005599a8,
@@ -3378,7 +3378,7 @@ namespace CMBTDRW1 {
 
         if (MOX::_global_combat_data.player_idx <= 9) {
             KEN::Ken_Get_Text_Message_(15, message_text, 0x50);
-            _sprintf(
+            sprintf(
                 line_text,
                 "%s%d%s",
                 s___00556070,
@@ -3389,7 +3389,7 @@ namespace CMBTDRW1 {
 
         if (!is_special_target) {
             KEN::Ken_Get_Text_Message_(0x59, message_text, 0x50);
-            _sprintf(
+            sprintf(
                 line_text,
                 message_text,
                 static_cast<int32_t>(MOX::_global_combat_data.structure_max) -
@@ -3397,7 +3397,7 @@ namespace CMBTDRW1 {
                 static_cast<int32_t>(MOX::_global_combat_data.structure_max));
         } else {
             const int16_t best_armor = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
-            _sprintf(
+            sprintf(
                 line_text,
                 "%s%d%s%s",
                 s___00556070,
@@ -3416,7 +3416,7 @@ namespace CMBTDRW1 {
         }
 
         KEN::Ken_Get_Text_Message_(17, message_text, 0x50);
-        _sprintf(
+        sprintf(
             line_text,
             "%s%d%s",
             s___00556070,
@@ -3448,7 +3448,7 @@ namespace CMBTDRW1 {
                 }
 
                 KEN::Ken_Get_Text_Message_(0x5B, message_text, 0x50);
-                _sprintf(
+                sprintf(
                     line_text,
                     message_text,
                     static_cast<int32_t>(MOX::_global_combat_data.armor_hits_current),
@@ -3473,7 +3473,7 @@ namespace CMBTDRW1 {
             fonts::Print_(left_panel_x, row_y, message_text);
 
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-            _sprintf(
+            sprintf(
                 line_text,
                 "%s%d%s%d%s",
                 s_lparen_005599a8,
@@ -3497,7 +3497,7 @@ namespace CMBTDRW1 {
 
                 if (MOX::_global_combat_data.shield_type > 0) {
                     fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
-                    _sprintf(
+                    sprintf(
                         line_text,
                         "%s%d%s%d%s",
                         s_lparen_005599a8,
@@ -3532,7 +3532,7 @@ namespace CMBTDRW1 {
             fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
             if (MOX::_global_combat_data.computer_effectiveness_pct > 0) {
                 KEN::Ken_Get_Text_Message_(0x16, message_text, 0x50);
-                _sprintf(
+                sprintf(
                     line_text,
                     message_text,
                     static_cast<int32_t>(
@@ -3545,7 +3545,7 @@ namespace CMBTDRW1 {
 
             KEN::Ken_Get_Text_Message_(0x18, message_text, 0x50);
             if (!is_special_target) {
-                _sprintf(
+                sprintf(
                     line_text,
                     message_text,
                     static_cast<int32_t>(MOX::_global_combat_data.shield_points_base));
@@ -3559,7 +3559,7 @@ namespace CMBTDRW1 {
                         static_cast<int32_t>(TECHDATA::_shields[best_shield].shield_class) +
                         static_cast<int32_t>(MOX::_global_combat_data.shield_points_base);
                 }
-                _sprintf(line_text, message_text, shield_value);
+                sprintf(line_text, message_text, shield_value);
             }
             fonts::Print_(right_value_x, row_y, line_text);
 
@@ -3601,7 +3601,7 @@ namespace CMBTDRW1 {
                         ? TECHDATA::_weapons[weapon_id].name
                         : TECHDATA::_weapons[weapon_id].name_plural;
 
-                _sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), s_space_005510f0, weapon_name);
+                sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), s_space_005510f0, weapon_name);
 
                 strcpy(arc_text, s_space_lparen_0055999c);
                 switch (weapon_arc) {
@@ -3759,27 +3759,27 @@ namespace CMBTDRW1 {
         switch (crew_quality) {
         case 0:
             KEN::Ken_Get_Text_Message_(0x1f, format_text, 0x50);
-            _sprintf(MOX::_temp_string, format_text, 0);
+            sprintf(MOX::_temp_string, format_text, 0);
             return MOX::_temp_string;
 
         case 1:
             KEN::Ken_Get_Text_Message_(0x20, format_text, 0x50);
-            _sprintf(MOX::_temp_string, format_text, 100);
+            sprintf(MOX::_temp_string, format_text, 100);
             return MOX::_temp_string;
 
         case 2:
             KEN::Ken_Get_Text_Message_(0x21, format_text, 0x50);
-            _sprintf(MOX::_temp_string, format_text, 200);
+            sprintf(MOX::_temp_string, format_text, 200);
             return MOX::_temp_string;
 
         case 3:
             KEN::Ken_Get_Text_Message_(0x22, format_text, 0x50);
-            _sprintf(MOX::_temp_string, format_text, 300);
+            sprintf(MOX::_temp_string, format_text, 300);
             return MOX::_temp_string;
 
         case 4:
             KEN::Ken_Get_Text_Message_(0x23, format_text, 0x50);
-            _sprintf(MOX::_temp_string, format_text, 300);
+            sprintf(MOX::_temp_string, format_text, 300);
             break;
 
         default:

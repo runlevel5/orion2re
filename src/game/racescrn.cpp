@@ -130,14 +130,14 @@ namespace RACESCRN {
                                 break;
                         }
 
-                        _sprintf(string2, s_research_fmt, _research_treaty_buffer, research_level, type_str);
+                        sprintf(string2, s_research_fmt, _research_treaty_buffer, research_level, type_str);
                         strcat(buffer, string2);
                     }
 
                     if (MOX::_cur_plyr_ptr->trade_treaty[display->player_idx] != 0) {
                         int16_t trade_level = MOX::_cur_plyr_ptr->current_trade_agreement_level[display->player_idx];
                         const char* format = (MOX::_settings.language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
-                        _sprintf(string2, format, _trade_treaty_buffer, trade_level);
+                        sprintf(string2, format, _trade_treaty_buffer, trade_level);
                         strcat(buffer, string2);
                     }
 
@@ -169,10 +169,10 @@ namespace RACESCRN {
         fonts::Set_Font_Style_(3, &_race_normal_color);
         spy::Compute_Spy_Bonuses_(MOX::_cur_plyr_ptr, &spy_bonus, &agent_bonus);
 
-        _sprintf(string2, s_spy_bonus_fmt, _spy_bonus_str, spy_bonus);
+        sprintf(string2, s_spy_bonus_fmt, _spy_bonus_str, spy_bonus);
         BILL::Squeeze_Centered_Print_(0x1A1, 0x174, string2, 0x62);
 
-        _sprintf(string2, s_agent_bonus_fmt, _agent_bonus_str, agent_bonus);
+        sprintf(string2, s_agent_bonus_fmt, _agent_bonus_str, agent_bonus);
         BILL::Squeeze_Centered_Print_(0x207, 0x174, string2, 0x61);
     }
 

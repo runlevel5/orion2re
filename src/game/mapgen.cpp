@@ -61,7 +61,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             MAPGEN::Get_Star_Name_(i);
             HAROLD::Set_Player_Font_Style_(0, 0);
             char formatted_name[32];
-            _sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
+            sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
 
             // Manual check for short names to append "w"
             uint32_t name_len = 0;
@@ -1318,7 +1318,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             grid_x = 9; grid_y = 8;
             break;
         default:
-            _sprintf(error_buf, "Galaxy size %d is undefined", gal_size);
+            sprintf(error_buf, "Galaxy size %d is undefined", gal_size);
             exitm::Exit_With_Message(error_buf);
             return;
         }

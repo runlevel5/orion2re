@@ -943,7 +943,7 @@ namespace HOMEGEN {
 
         if (candidate_count == 0) {
             char error_msg[128];
-            _sprintf(error_msg, s_Found_no_satellites_after_3_MIN_e_0055adc8, (int)star_idx);
+            sprintf(error_msg, s_Found_no_satellites_after_3_MIN_e_0055adc8, (int)star_idx);
             exitm::Exit_With_Message(error_msg);
             return;
         }

@@ -93,7 +93,7 @@ namespace MAINMENU {
         char find_data[16];
 
         uint8_t game_type = FILEDEF::Get_Game_Type_From_Saved_Game_(9);
-        _sprintf(save_filename, s_save_percent_d_gam, 10);
+        sprintf(save_filename, s_save_percent_d_gam, 10);
         fields::Clear_Fields_();
 
         bool can_continue = false;

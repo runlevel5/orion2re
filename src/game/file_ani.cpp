@@ -269,7 +269,7 @@ namespace file_ani {
             }
 
             char local_3c[60];
-            _sprintf(local_3c, "%s%s", farload::_secondary_drive_path, filename);
+            sprintf(local_3c, "%s%s", farload::_secondary_drive_path, filename);
 
             _file_animation[slot] = fopen(local_3c, "rb");
 

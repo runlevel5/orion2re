@@ -539,7 +539,7 @@ namespace SHIPS {
         turns_left = (uint8_t)MOX::_ship[ship_idx].turns_left;
         format = HAROLD::H_Message_(307 /* HESTR_133_ETA_D */);
 
-        _sprintf(buffer, format, turns_left);
+        sprintf(buffer, format, turns_left);
 
         fonts::Print_Right_(width + x_offset, height + y_offset, buffer);
     }

@@ -52,6 +52,11 @@ namespace MAINSCR {
     inline s_hotseat_fleet_box_state (&_hotseat_fleet_box)[8] =
             *reinterpret_cast<s_hotseat_fleet_box_state(*)[8]>(std::uintptr_t{0x005961B0});
 
+    inline int16_t& _hotseat_fleet_box_stack_ship_id(int32_t index) {
+        return *reinterpret_cast<int16_t*>(
+            std::uintptr_t{0x005961B6} + static_cast<std::uintptr_t>(index * sizeof(s_hotseat_fleet_box_state)));
+    }
+
     inline int16_t& _moveable_box_0_id =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597862});
 
