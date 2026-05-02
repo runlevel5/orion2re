@@ -95,8 +95,7 @@ namespace hooks {
         { 0x0052ea20, &allocate::Reallocation_Error_ },
         { 0x0052e8e0, &allocate::Allocate_Dos_Space_ },
         { 0x0052e9c0, &allocate::Allocate_Far_Space_ },
-        // TODO: Why no games in menu when hooked?
-        //{ 0x0052d360, &dos::DIR_ },
+        { 0x0052d360, &dos::DIR_ },
         { 0x0051c7e0, &farload::Farload_Library_ },
         { 0x0051c710, &farload::Far_Reload_ },
         { 0x00478fb0, &INITGAME::Write_Game_Settings_ },

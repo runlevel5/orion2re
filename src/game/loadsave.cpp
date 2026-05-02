@@ -615,9 +615,6 @@ namespace LOADSAVE {
         }
     }
 
-    /**
-     * @address 0050e7e0
-     */
     void __cdecl Check_For_Saved_Games_(int8_t* games) {
         char filename_buffer[20];
         char itoa_buffer[12];

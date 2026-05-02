@@ -4,7 +4,7 @@ namespace FILEDEF {
     void __cdecl Load_Game_Settings_() {
         RUSS::Assert_Settings_();
 
-        FILE* file = FID_conflict_wfopen("MOX.SET", "rb");
+        FILE* file = fopen("MOX.SET", "rb");
         if (file != nullptr) {
             // Read 553 bytes (size of s_settings up to version/seed block)
             fread(&MOX::_settings, 0x229, 1, file);
@@ -19,7 +19,7 @@ namespace FILEDEF {
         RUSS::Assert_Settings_();
 
         // Open settings file in binary write mode
-        FILE* file = FID_conflict_wfopen("MOX.SET", "wb");
+        FILE* file = fopen("MOX.SET", "wb");
         if (file == nullptr) {
             return false;
         }
@@ -406,7 +406,7 @@ namespace FILEDEF {
 
     void Update_Game_Settings_Version_Number_() {
         bool needs_reset = false;
-        FILE* file = FID_conflict_wfopen("MOX.SET", "rb");
+        FILE* file = fopen("MOX.SET", "rb");
 
         if (file != nullptr) {
             fclose(file);

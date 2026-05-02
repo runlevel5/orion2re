@@ -221,12 +221,6 @@ inline uintptr_t __cdecl begin_thread(void(__cdecl* start_address)(void*), unsig
     return fn(start_address, stack_size, arglist);
 }
 
-inline FILE* __cdecl FID_conflict_wfopen(const char* filename, const char* mode) {
-    using Fn = FILE * (__cdecl*)(const char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540c00 });
-    return fn(filename, mode);
-}
-
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
 inline int16_t& _mouse_XY_star_idx =

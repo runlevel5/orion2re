@@ -98,8 +98,8 @@ namespace platform {
 
 	inline uint8_t*& _offscreen_surface = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x00578E54});
 
-	inline uint16_t& DAT_578AC4 =
-		*reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00578ac4 });
+	inline int16_t& DAT_578AC4 =
+		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578ac4 });
 
 	inline DDSURFACEDESC& _cursor_surface_desc =
 		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578AD0 });

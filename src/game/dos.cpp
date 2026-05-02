@@ -28,7 +28,7 @@ namespace dos {
 
         // Copy the found filename from the CRT fileinfo buffer to output_name.
         // The assembly performs an optimized string copy (strlen + memcpy).
-        char* src = &DAT_0057b5ec;
+        char* src = _fileinfo.name;
         char* dst = output_name;
         while ((*dst++ = *src++) != '\0');
         *dst = '\0';
@@ -60,8 +60,8 @@ namespace dos {
             return nullptr;
         }
 
-        ctime(&_fileinfo_fi1_username_plus_2);
-        _tmbuf = localtime(&_fileinfo_fi1_username_plus_2);
+        ctime(&_fileinfo.time_write);
+        _tmbuf = localtime(&_fileinfo.time_write);
         return _tmbuf;
     }
 }
