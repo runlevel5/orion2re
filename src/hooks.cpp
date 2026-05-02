@@ -3865,6 +3865,11 @@ namespace hooks {
         { 0x004cbc80, &MULTPLAY::Restore_Hotseat_Map_Info_ },
         { 0x00504500, &MULTPLAY::Fade_In_Function_ },
         { 0x00503E30, &MULTPLAY::Hotseat_Draw_Next_Player_ },
+        { 0x00504190, &MULTPLAY::Hotseat_Load_Next_Player_ },
+        { 0x00504300, &MULTPLAY::Hotseat_Get_Colors_ },
+        { 0x004E3810, &SCORE::Player_Score_ },
+        { 0x00504420, &MULTPLAY::Hotseat_Print_Player_Data_ },
+        { 0x005043F0, &MULTPLAY::Hotseat_Get_N_Valid_Players_ },
     };
 
     void Install_Hooks()

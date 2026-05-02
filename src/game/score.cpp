@@ -1284,6 +1284,16 @@ namespace SCORE {
         return SCORE::Won_Council_Vote_(player_idx) != 0 ? 100u : 0u;
     }
 
+    int16_t __cdecl Player_Score_(int16_t player_idx) {
+        allocate::Push_Block_(MOX::_screen_seg);
+        _hi = reinterpret_cast<s_hiscore*>(allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x125));
+        memset(_hi, 0, 0x125);
+        _hi->player_idx = static_cast<int8_t>(player_idx);
+        Calculate_Hi_Scores_(player_idx);
+        allocate::Pop_Block_(MOX::_screen_seg);
+        return _hi->score_final;
+    }
+
     /**
      * @address 004e3540
      */

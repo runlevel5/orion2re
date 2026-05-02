@@ -3357,6 +3357,278 @@ namespace COLCALC {
         colony->occupation_points = static_cast<char>(occupation_points);
     }
 
+    void __cdecl Apply_Production_(s_colony* colony) {
+        const int32_t owner_player_idx = static_cast<int32_t>(colony->owner);
+        const int32_t colony_idx = static_cast<int32_t>(colony - MOX::_colony);
+        s_player& player = MOX::_player[owner_player_idx];
+        bool removed_existing_pop = false;
+
+        if (EVENTS::Event_Check_Space_Anomaly_(static_cast<int16_t>(colony_idx)) != 0) {
+            return;
+        }
+
+        int16_t current_product = colony->producing[0];
+        if (colony->auto_building != 0 && current_product >= -3 && current_product <= -1) {
+            AIBUILD::Player_Colony_Autobuild_(colony);
+        }
+
+        const int32_t product_cost = static_cast<int32_t>(COLCALC::Colony_Producing_Product_Cost_(colony));
+        colony->just_produced = -1;
+        current_product = colony->producing[0];
+
+        if (current_product == -3) {
+            if (!COLCALC::Housing_Is_Useless_(colony)) {
+                return;
+            }
+
+            colony->just_produced = current_product;
+            colony->producing[0] = -1;
+            COLONY::Fix_Colony_Queue_(static_cast<int16_t>(colony_idx));
+            return;
+        }
+
+        if (current_product >= -2 && current_product <= -1) {
+            return;
+        }
+
+        int32_t production_pool =
+            static_cast<int32_t>(colony->production_spent) + static_cast<int32_t>(colony->bought_outright);
+        colony->bought_outright = 0;
+
+        if (static_cast<int32_t>(static_cast<uint8_t>(colony->maintenance[1])) <
+            static_cast<int32_t>(colony->production[1])) {
+            production_pool += static_cast<int32_t>(colony->production[1]) -
+                               static_cast<int32_t>(static_cast<uint8_t>(colony->maintenance[1]));
+        }
+
+        if (production_pool >= product_cost) {
+            s_MSG build_msg{};
+            build_msg.msg_type = MSG_TYPE_COLONY;
+            build_msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+            build_msg.u.colony.subtype = 1;
+            build_msg.u.colony.c.build.build_id = current_product;
+
+            if (current_product < -99) {
+                const int32_t ship_idx = -100 - current_product;
+                s_ship_data* ship = &MOX::_ship[ship_idx];
+
+                if (ship->status == 4) {
+                    build_msg.u.colony.c.build.is_refit = 1;
+                } else if (colony->buildings[0x26] != 0) {
+                    ++ship->crew_quality;
+                    ship->crew_experience =
+                        static_cast<int16_t>(MOX::_crew_data[static_cast<int32_t>(ship->crew_quality)].experience);
+                }
+            }
+
+            if (colony->producing[1] == -1) {
+                colony->just_produced = colony->producing[0];
+            }
+
+            if (current_product > 0 && current_product < 0x31) {
+                ERICNET::Add_Building_(static_cast<int16_t>(colony_idx), current_product);
+                player.bc += static_cast<int32_t>(TECHDATA::_buildings[current_product].maintenance);
+
+                if (colony->producing[1] == -10) {
+                    COLCALC::Colony_Calculation_(static_cast<int16_t>(colony_idx));
+                    if (!COLCALC::Colony_Can_Build_Product_(colony, current_product)) {
+                        colony->producing[0] = -1;
+                    }
+                } else {
+                    colony->producing[0] = -1;
+                }
+
+                if (current_product == 0x2C) {
+                    if (!COLCALC::Colony_Can_Build_Product_(colony, 0x2C)) {
+                        COLBLDG::Delete_Prod_From_Colony_Queue_(static_cast<int16_t>(colony_idx), 0x2C);
+                    }
+                } else if (current_product == 0x30) {
+                    const int32_t planet_idx = static_cast<int32_t>(colony->planet);
+                    const int32_t star_idx = static_cast<int32_t>(MOX::_planet[planet_idx].star_index);
+                    COLCALC::Delete_Obsolete_Artifical_Planets_Under_Construction_(static_cast<int16_t>(star_idx));
+                }
+            } else {
+                if (current_product < -99) {
+                    const int32_t ship_idx = -100 - current_product;
+                    s_ship_data* ship = &MOX::_ship[ship_idx];
+
+                    if (ship->status == 4) {
+                        ship->status = 0;
+                        ship->d.cost = DESIGN::Cost_Of_Design_(static_cast<int16_t>(owner_player_idx), &ship->d);
+                        colony->producing[0] = -1;
+                    } else if (ship->status == 6) {
+                        ship->status = 0;
+
+                        if (colony->producing[1] == -10) {
+                            const int16_t created_ship_idx =
+                                COLBLDG::Create_Ship_(static_cast<int16_t>(owner_player_idx), 0, static_cast<int16_t>(colony_idx));
+
+                            if (created_ship_idx != -1) {
+                                memcpy(&MOX::_ship[created_ship_idx].d, &ship->d, sizeof(s_ship_design));
+                                MOX::_ship[created_ship_idx].status = 6;
+                                colony->producing[0] = static_cast<int16_t>(-100 - created_ship_idx);
+                            } else {
+                                colony->producing[0] = -1;
+                            }
+                        } else {
+                            colony->producing[0] = -1;
+                        }
+                    }
+
+                    ship->just_built = 1;
+                    MOX::_star[static_cast<int32_t>(ship->location)].ignore_combat_ships = 0;
+
+                    if (ship->d.ship_type == 1 || ship->d.ship_type == 4) {
+                        MOX::_star[static_cast<int32_t>(ship->location)].ignore_colony_ships |=
+                            static_cast<uint8_t>(1u << static_cast<uint8_t>(ship->owner));
+                    }
+                } else {
+                    switch (current_product) {
+                    case -15:
+                        player.n_freighters = static_cast<int16_t>(player.n_freighters + 5);
+                        player.bc += 5;
+                        break;
+
+                    case -7:
+                        if (BILL::Add_Their_Spy_(static_cast<int16_t>(owner_player_idx), static_cast<int16_t>(owner_player_idx)) == 0) {
+                            player.bc += 100;
+                            COLBLDG::Delete_Prod_From_Colony_Queue_(static_cast<int16_t>(colony_idx), -7);
+                        }
+                        ++player.bc;
+                        break;
+
+                    case -6:
+                    case -5:
+                    case -4: {
+                        bool can_add_pop = true;
+                        const int32_t empire_pop_limit =
+                            static_cast<int32_t>(COLCALC::Colony_Race_Pop_Limit_(colony, 8));
+                        const int32_t empire_pop_count =
+                            COLCALC::Colony_N_Pops_Of_Empire_(colony, 8);
+
+                        if (empire_pop_limit <= empire_pop_count) {
+                            can_add_pop = false;
+                        } else if (!COLCALC::Room_For_Another_Dude_(colony, 8)) {
+                            uint32_t* type_9_pop = nullptr;
+                            uint32_t* flagged_pop = nullptr;
+                            uint32_t* foreign_pop = nullptr;
+                            uint32_t* own_pop = nullptr;
+
+                            uint32_t* pop_ptr = &colony->pop[0];
+                            uint32_t* pop_end = &colony->pop[static_cast<uint8_t>(colony->n_pops)];
+
+                            while (pop_ptr < pop_end) {
+                                const uint32_t pop_value = *pop_ptr;
+                                const uint32_t pop_type = pop_value & 0x0F;
+
+                                if (pop_type == 9) {
+                                    type_9_pop = pop_ptr;
+                                } else if (pop_type != 8) {
+                                    if ((pop_value & 0x400) != 0) {
+                                        flagged_pop = pop_ptr;
+                                    } else if (owner_player_idx != static_cast<int32_t>(pop_type)) {
+                                        foreign_pop = pop_ptr;
+                                    } else {
+                                        own_pop = pop_ptr;
+                                    }
+                                }
+
+                                ++pop_ptr;
+                            }
+
+                            uint32_t* selected_pop = type_9_pop;
+                            if (selected_pop == nullptr) {
+                                selected_pop = flagged_pop;
+                            }
+                            if (selected_pop == nullptr) {
+                                selected_pop = foreign_pop;
+                            }
+                            if (selected_pop == nullptr) {
+                                selected_pop = own_pop;
+                            }
+
+                            if (selected_pop == nullptr) {
+                                can_add_pop = false;
+                            } else {
+                                s_MSG pop_removed_msg{};
+                                pop_removed_msg.msg_type = MSG_TYPE_COLONY;
+                                pop_removed_msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+                                pop_removed_msg.u.colony.subtype = 11;
+                                pop_removed_msg.u.colony.c.android_killed.race_idx =
+                                    static_cast<int8_t>(*selected_pop & 0x0F);
+                                MSG_::Add_Msg_(pop_removed_msg, static_cast<int16_t>(owner_player_idx));
+
+                                const uint8_t last_pop_index =
+                                    static_cast<uint8_t>(static_cast<uint8_t>(colony->n_pops) - 1);
+                                colony->n_pops = static_cast<int8_t>(last_pop_index);
+                                *selected_pop = colony->pop[last_pop_index];
+                                removed_existing_pop = true;
+                            }
+                        }
+
+                        if (can_add_pop) {
+                            uint32_t& new_pop = colony->pop[static_cast<uint8_t>(colony->n_pops)];
+                            new_pop = 0;
+                            new_pop |= 0x200;
+                            new_pop = (new_pop & 0xFFFFFFF8u) | 0x8u;
+                            new_pop = ((((static_cast<uint32_t>(owner_player_idx) << 4) ^ new_pop) & 0x70u) ^ new_pop);
+
+                            if (current_product == -6) {
+                                new_pop = (new_pop & 0xFFFFFF7Fu) | 0x100u;
+                            } else if (current_product == -5) {
+                                new_pop = (new_pop & 0xFFFFFEFFu) | 0x80u;
+                            } else if (current_product == -4) {
+                                new_pop &= 0xFFFFFE7Fu;
+                            }
+
+                            colony->n_pops = static_cast<int8_t>(static_cast<uint8_t>(colony->n_pops) + 1);
+                        } else {
+                            s_MSG pop_failed_msg{};
+                            pop_failed_msg.msg_type = MSG_TYPE_COLONY;
+                            pop_failed_msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+                            pop_failed_msg.u.colony.subtype = 10;
+                            MSG_::Add_Msg_(pop_failed_msg, static_cast<int16_t>(owner_player_idx));
+
+                            production_pool += product_cost;
+                        }
+                        break;
+                    }
+
+                    default:
+                        break;
+                    }
+
+                    if (colony->producing[1] == -10) {
+                        if (removed_existing_pop) {
+                            colony->producing[0] = -1;
+                            colony->producing[1] = -1;
+                        }
+                    } else {
+                        colony->producing[0] = -1;
+                    }
+                }
+            }
+
+            production_pool -= product_cost;
+            COLONY::Fix_Colony_Queue_(static_cast<int16_t>(colony_idx));
+
+            if (colony->producing[0] == -1 && colony->auto_building != 0) {
+                AIBUILD::Player_Colony_Autobuild_(colony);
+                build_msg.field6_0xd = 1;
+            }
+
+            build_msg.u.colony.c.build.product_id = colony->producing[0];
+            MSG_::Add_Msg_(build_msg, static_cast<int16_t>(owner_player_idx));
+        }
+
+        if (production_pool >= 0x7FFF) {
+            colony->production_spent = 0x7FFF;
+            return;
+        }
+
+        colony->production_spent = static_cast<int16_t>(production_pool);
+    }
+
     void __cdecl Ghost_Colony_Stuff_(s_colony* colony) {
         int32_t building_idx = 0;
         int32_t surviving_building_count = 0;

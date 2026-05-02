@@ -2692,6 +2692,51 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         fonts::Print_(MOX::_mp_screen->screen_x + 118 /* 0x76 */, MOX::_mp_screen->screen_y + 73 /* 0x49 */, msg_buffer);
     }
 
+    void __cdecl Hotseat_Load_Next_Player_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        MOX::_mp_screen = &MULTPLAY::_g_mp_screen;
+        memset(&MULTPLAY::_g_mp_screen, 0, sizeof(MULTPLAY::_g_mp_screen));
+
+        MOX::_mp_screen->pic =
+            (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);
+
+        MOX::_mp_screen->anim_turn_screen_top =
+            (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x13, MOX::_global_cache_seg);
+
+        const int16_t top_height = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_top);
+        const int16_t top_width = animate::Get_Width_(MOX::_mp_screen->anim_turn_screen_top);
+        MOX::_mp_screen->screen_x = static_cast<int16_t>((640 - static_cast<int32_t>(top_width)) / 2);
+
+        MOX::_mp_screen->anim_turn_screen_mid =
+            (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x14, MOX::_global_cache_seg);
+
+        const int16_t mid_height = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_mid);
+
+        MOX::_mp_screen->anim_turn_screen_bot =
+            (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0x15, MOX::_global_cache_seg);
+
+        const int16_t bot_height = animate::Get_Height_(MOX::_mp_screen->anim_turn_screen_bot);
+
+        MULTPLAY::Hotseat_Set_Next_Player_Status_();
+
+        MOX::_mp_screen->num_remaining_humans = MULTPLAY::Hotseat_Get_N_Valid_Players_();
+
+        const int16_t total_height = static_cast<int16_t>(
+            static_cast<int16_t>(MOX::_mp_screen->num_remaining_humans * mid_height) +
+            bot_height +
+            top_height);
+
+        int32_t screen_y = (480 - static_cast<int32_t>(total_height)) / 2;
+        if (screen_y <= 0) {
+            screen_y = 0;
+        }
+
+        MOX::_mp_screen->screen_y = static_cast<int16_t>(screen_y);
+
+        MULTPLAY::Hotseat_Get_Colors_();
+    }
+
     void __cdecl Hotseat_Add_Next_Player_Fields_(void) {
         int16_t banner_idx = 0;
         int16_t y_offset = 0;
@@ -2907,6 +2952,77 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         MOX::_mp_screen->subscreen_mode = saved_subscreen_mode;
+    }
+
+    void __cdecl Hotseat_Get_Colors_(void) {
+        uint8_t palette_offsets[8];
+
+        palette_offsets[0] = 0;
+        palette_offsets[1] = 0;
+        palette_offsets[2] = 1;
+        palette_offsets[3] = 2;
+        palette_offsets[4] = 3;
+        palette_offsets[5] = 4;
+        palette_offsets[6] = 5;
+        palette_offsets[7] = 5;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                const int16_t palette_base =
+                        static_cast<int16_t>(static_cast<uint8_t>(MOX::_player[player_idx].color) * 6 + 0x70);
+
+                for (int16_t color_idx = 0; color_idx < 8; ++color_idx) {
+                    const uint8_t base_color = static_cast<uint8_t>(palette_base);
+                    const uint8_t color_value =
+                            static_cast<uint8_t>(palette_offsets[color_idx] + base_color);
+
+                    MOX::_mp_screen->player_font_colors_1[player_idx].colors[color_idx] = color_value;
+
+                    if (color_idx == 0) {
+                        MOX::_mp_screen->player_font_colors_3[player_idx].colors[color_idx] = base_color;
+                    } else {
+                        int32_t darker_color = static_cast<int32_t>(color_value) - 3;
+                        const int32_t min_color = static_cast<int32_t>(palette_base) + 1;
+
+                        if (darker_color <= min_color) {
+                            darker_color = min_color;
+                        }
+
+                        MOX::_mp_screen->player_font_colors_3[player_idx].colors[color_idx] =
+                                static_cast<uint8_t>(darker_color);
+                    }
+                }
+            }
+        }
+    }
+
+    void __cdecl Hotseat_Print_Player_Data_(int16_t player_idx, int16_t row_idx) {
+        char message_format[200];
+        char line[200];
+
+        const s_player* const player = &MOX::_player[player_idx];
+        const int16_t row_offset = static_cast<int16_t>(row_idx * 0x24);
+        const int16_t print_x = static_cast<int16_t>(MOX::_mp_screen->screen_x + 0x74);
+        const int16_t print_y = static_cast<int16_t>(MOX::_mp_screen->screen_y + row_offset + 0x48);
+        const int16_t score = SCORE::Player_Score_(player_idx);
+        const char* const score_text = MISC::Get_Comma_String_(score);
+
+        strcpy(message_format, HAROLD::H_Message_(0xFC));
+        _sprintf(line, message_format, player->name, player->race_name, score_text);
+        fonts::Print_(print_x, print_y, line);
+    }
+
+    int16_t __cdecl Hotseat_Get_N_Valid_Players_() {
+        int16_t valid_player_count = 0;
+
+        for (int16_t player_index = 0; player_index < 8; ++player_index) {
+            const int8_t button_status = MOX::_mp_screen->player_button_status[player_index];
+            if (button_status == 2 || button_status == 1) {
+                ++valid_player_count;
+            }
+        }
+
+        return valid_player_count;
     }
 
 }

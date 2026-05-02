@@ -102,11 +102,7 @@ namespace MULTPLAY {
 
     void __cdecl Draw_Multi_Player_Banner_(int16_t player_idx, int16_t row_idx, int8_t is_alt_layout);
 
-    inline void __cdecl Hotseat_Print_Player_Data_(int32_t player_index, int32_t row_index) {
-        using Fn = void(__cdecl*)(int32_t, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504420});
-        fn(player_index, row_index);
-    }
+    void __cdecl Hotseat_Print_Player_Data_(int16_t player_idx, int16_t row_idx);
 
     inline const char* s_name_fmt = reinterpret_cast<const char*>(0x0055AA28);
     inline const char* s_gnn_fmt = reinterpret_cast<const char*>(0x0055AA30);
@@ -123,17 +119,9 @@ namespace MULTPLAY {
 
     int16_t __cdecl Hotseat_Player_Status_(int16_t player_idx);
 
-    inline void __cdecl Hotseat_Get_Colors_() {
-      using Fn = void(__cdecl*)();
-      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504300});
-      fn();
-    }
+    void __cdecl Hotseat_Get_Colors_();
 
-    inline int16_t __cdecl Hotseat_Get_N_Valid_Players_() {
-      using Fn = int16_t(__cdecl*)();
-      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005043F0});
-      return fn();
-    }
+    int16_t __cdecl Hotseat_Get_N_Valid_Players_();
 
     inline void __cdecl Hotseat_Set_Next_Player_Status_() {
       using Fn = void(__cdecl*)();
