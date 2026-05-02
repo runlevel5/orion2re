@@ -247,12 +247,6 @@ inline const char* const s_RACESTUF_lbx_00558550 =
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
 
-inline uint32_t __cdecl _clock() {
-    using Fn = uint32_t(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540F20 });
-    return fn();
-}
-
 inline const char* const s_STREAM_LBX_005558fc =
     reinterpret_cast<const char*>(std::uintptr_t{0x005558FC}); /* "STREAM.LBX" */
 

@@ -1243,7 +1243,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         _make_food_planet = 0;
         RUSS::Mox_Update_();
-        start_time = _clock();
+        start_time = clock();
         _num_maps_to_generate = 1;
         _n_maps_generated++;
         MOX::_g_galaxy_size = gal_size;
@@ -1266,7 +1266,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         if (MOX::_n_stats_to_generate != 0) {
             _num_maps_to_generate = MOX::_n_stats_to_generate;
-            start_time = _clock();
+            start_time = clock();
         }
 
         RUSS::Mox_Update_();

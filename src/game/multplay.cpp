@@ -431,7 +431,7 @@ namespace MULTPLAY {
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
                         memcpy(MOX::_settings.net_game_name, s_Moo_II_0055aa88, 8);
-                        MOX::_settings.net_game_name[6] = (char)((abs((long)_clock()) & 0x1F) + 'a');
+                        MOX::_settings.net_game_name[6] = (char)((abs((long)clock()) & 0x1F) + 'a');
                     }
                     MOX::_current_screen = 0xD;
                     done = true;
@@ -1925,9 +1925,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 }
 
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
-        if (WINNET::_net_refresh_timer < _clock() + 5000) {
+        if (WINNET::_net_refresh_timer < clock() + 5000) {
             WINNET::Refresh_Game_List_(WINNET::_game_guid);
-            WINNET::_net_refresh_timer = (uint32_t)_clock();
+            WINNET::_net_refresh_timer = (uint32_t)clock();
         }
 
         int16_t display_count;
@@ -1993,9 +1993,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     }
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
-        if (WINNET::_net_refresh_timer < (uint32_t)_clock() + 5000 /* 5 seconds */) {
+        if (WINNET::_net_refresh_timer < (uint32_t)clock() + 5000 /* 5 seconds */) {
             WINNET::Refresh_Game_List_(WINNET::_game_guid);
-            WINNET::_net_refresh_timer = (uint32_t)_clock();
+            WINNET::_net_refresh_timer = (uint32_t)clock();
         }
 
         int16_t count = 10;

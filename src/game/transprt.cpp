@@ -110,7 +110,7 @@ namespace transprt {
         if (_tpLastBurstStartPacket < _tpBurstNum || 
             _tpForceBurstSend == 1 || 
             _tpSendImmediateBurstFlag == 1 || 
-            static_cast<uint32_t>(_clock() - _tpLastBurstClock) >= 2000) {
+            static_cast<uint32_t>(clock() - _tpLastBurstClock) >= 2000) {
 
             if (_tpSending != 0 && _tpBurstNum + 4 > _tpBurstNum) {
                 for (int32_t packet_idx = _tpBurstNum; packet_idx < _tpBurstNum + 4; ++packet_idx) {
@@ -122,7 +122,7 @@ namespace transprt {
             }
 
             _tpLastBurstTickCount = GetTickCount();
-            _tpLastBurstClock = _clock();
+            _tpLastBurstClock = clock();
             _tpLastBurstStartPacket = _tpBurstNum;
             _tpSendImmediateBurstFlag = 0;
             _tpForceBurstSend = 0;

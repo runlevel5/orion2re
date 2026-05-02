@@ -1010,7 +1010,7 @@ namespace CMBTMIS {
 
             if (combat_view_type == 0 && (MOX::_ship_frame % 3 == 0)) {
                 uint32_t old_seed = random::Get_Random_Seed_();
-                random::Set_Random_Seed_(static_cast<uint32_t>(_clock()) + i + m_idx);
+                random::Set_Random_Seed_(static_cast<uint32_t>(clock()) + i + m_idx);
                 rand_x = static_cast<int16_t>(random::Random_(3)) - 2;
                 rand_y = static_cast<int16_t>(random::Random_(3)) - 2;
                 random::Set_Random_Seed_(old_seed);

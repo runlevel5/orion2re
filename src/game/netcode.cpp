@@ -223,9 +223,9 @@ namespace netcode {
 
             comcore::ComSendUserMessage_(data, size, target_id, 0x65, 2, msg_type);
 
-            int32_t start_time = _clock();
+            int32_t start_time = clock();
             while (transprt::_tpSending != 0) {
-                if ((_clock() - start_time) >= 120000) {
+                if ((clock() - start_time) >= 120000) {
                     exitm::Exit_With_Message(s_Lost_Player_Connection_0055bf3c);
                 }
                 Net_Update_();

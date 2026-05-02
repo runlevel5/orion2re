@@ -612,8 +612,8 @@ namespace HAROLD {
                 idx1 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
                 idx2 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
             } else {
-                idx1 = static_cast<int16_t>(_clock() % static_cast<uint32_t>(size));
-                idx2 = static_cast<int16_t>(_clock() % static_cast<uint32_t>(size));
+                idx1 = static_cast<int16_t>(clock() % static_cast<uint32_t>(size));
+                idx2 = static_cast<int16_t>(clock() % static_cast<uint32_t>(size));
             }
 
             if (idx1 != idx2) {

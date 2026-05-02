@@ -87,7 +87,7 @@ namespace ERIC {
     }
 
     int16_t __cdecl Global_Cycler_(int16_t divisor, int16_t modulus) {
-        int32_t current_time = _clock();
+        int32_t current_time = clock();
         int32_t cycle_index = current_time / static_cast<int32_t>(divisor);
         return static_cast<int16_t>(cycle_index % static_cast<int32_t>(modulus));
     }

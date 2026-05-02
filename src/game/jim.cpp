@@ -198,7 +198,7 @@ namespace JIM {
         sound::Stop_Stream_();
 
         // Randomly select next track from "STREAM.LBX" (indices 1, 2, or 3)
-        _jim_current_stream = static_cast<uint16_t>((_clock() % 3) + 1);
+        _jim_current_stream = static_cast<uint16_t>((clock() % 3) + 1);
 
         sound::Set_Stream_Filename_(s_STREAM_LBX);
         sound::Play_Stream_(_jim_current_stream);
@@ -390,7 +390,7 @@ namespace JIM {
 
             sound::Stop_Stream_();
 
-            int32_t ticks = _clock();
+            int32_t ticks = clock();
             _jim_current_stream = static_cast<uint16_t>((ticks % 3) + 4);
 
             sound::Set_Stream_Filename_(s_STREAM_LBX);
@@ -462,7 +462,7 @@ namespace JIM {
             sound::Stop_Stream_();
 
             if (_jim_old_transition_id == -2) {
-                int32_t ticks = static_cast<int32_t>(_clock());
+                int32_t ticks = static_cast<int32_t>(clock());
                 _jim_current_stream = static_cast<int16_t>((ticks % 3) + 1);
                 sound::Set_Stream_Filename_(s_STREAM_LBX_005558fc);
                 sound::Play_Stream_(_jim_current_stream);

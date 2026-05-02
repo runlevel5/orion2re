@@ -121,7 +121,7 @@ namespace INITGAME {
         }
 
         // Generate default network name: MOX-<clock % 10>
-        int clock_val = _clock();
+        int clock_val = clock();
         _sprintf(MOX::_settings.net_game_name, "MOX-%d", clock_val % 10);
 
         // Finalize default settings

@@ -139,13 +139,13 @@ namespace NETSTART {
     }
 
     int8_t __cdecl Do_Answer_() {
-        clock_t start_time = _clock();
+        clock_t start_time = clock();
         simmodem::Modem_Reset_(NETMOX::_net.modem_settings.cmd_reset);
 
         int8_t is_connected = 0;
         if (simmodem::Modem_Answer_() != 0) {
             if (simmodem::Modem_Connected_() == 0) {
-                while ((_clock() - start_time) < 90000) {
+                while ((clock() - start_time) < 90000) {
                     RUSS::Mox_Update_();
                     if (simmodem::Modem_Connected_() != 0) {
                         break;
@@ -165,7 +165,7 @@ namespace NETSTART {
     }
 
     bool __cdecl Do_Dial_(char* phone_number) {
-        clock_t start_time = _clock();
+        clock_t start_time = clock();
         bool dial_success = simmodem::Modem_Dial_Number_(phone_number);
 
         if (dial_success) {
@@ -179,7 +179,7 @@ namespace NETSTART {
             }
 
             while (!simmodem::Modem_Connected_()) {
-                if (_clock() - start_time >= 90000) {
+                if (clock() - start_time >= 90000) {
                     break;
                 }
                 RUSS::Mox_Update_();
