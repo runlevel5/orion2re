@@ -4793,6 +4793,13 @@ struct s_star_data {
     byte artifacts_gave_app;
 };
 
+typedef struct s_star_weight s_star_weight, *Ps_star_weight;
+
+struct s_star_weight {
+    uint8_t star_idx;
+    uint8_t weight;
+};
+
 typedef struct s_sys_disp s_sys_disp, *Ps_sys_disp;
 
 struct s_sys_disp {

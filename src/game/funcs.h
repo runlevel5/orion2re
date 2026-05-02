@@ -335,7 +335,6 @@ inline void __cdecl _qsort(void* base, uint32_t num, uint32_t size, int(__cdecl*
     fn(base, num, size, compar);
 }
 
-inline char& DAT_00556dac = *reinterpret_cast<char*>(std::uintptr_t{ 0x00556DAC });
 inline void __cdecl No_Op1_() {
     using Fn = void(__cdecl*)();
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004fbef0 });
@@ -579,53 +578,6 @@ inline const char* s_warning_lbx_00557650 = reinterpret_cast<const char*>(std::u
 inline char* s_You_exceeded_the_max_number_of_f_0055b080 =
     reinterpret_cast<char*>(std::uintptr_t{ 0x0055B080 });
 
-inline void __cdecl Print_(int16_t x, int16_t y, const char* str) {
-    using Fn = void(__cdecl*)(int16_t, int16_t, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00525910});
-    fn(x, y, str);
-}
-
-inline void __cdecl Save_Hotseat_Map_Info_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBD70});
-    fn();
-}
-
-inline void __cdecl Restore_Hotseat_Map_Info_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CBC80});
-    fn();
-}
-
-inline void __cdecl Fade_In_Function_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504500});
-    fn();
-}
-
-inline void __cdecl Hotseat_Draw_Next_Player_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503E30});
-    fn();
-}
-
-inline void __cdecl Hotseat_Load_Next_Player_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504190});
-    fn();
-}
-
-inline void __cdecl Hotseat_Add_Next_Player_Fields_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00503D30});
-    fn();
-}
-
-inline void __cdecl _Squeeze_Print_Paragraph_(uint16_t p1, int16_t p2, int16_t p3, int16_t p4, char* p5, uint16_t p6, int16_t* p7, int8_t p8, int8_t p9) {
-    using Fn = void(__cdecl*)(uint16_t, int16_t, int16_t, int16_t, char*, uint16_t, int16_t*, int8_t, int8_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407480});
-    fn(p1, p2, p3, p4, p5, p6, p7, p8, p9);
-}
 inline const char* s_S_005569cc = reinterpret_cast<const char*>(0x005569CC); // "S"
 inline const char* s_X_005569d0 = reinterpret_cast<const char*>(0x005569D0); // "X"
 inline const char* s_comma_005569c8 = reinterpret_cast<const char*>(0x005569C8); // ","
@@ -668,12 +620,6 @@ struct s_fleet_movement_icon;
 inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
     *reinterpret_cast<s_fleet_movement_icon(*)[500]>(std::uintptr_t{0x0059C470});
 
-inline void __cdecl Restore_Mouse_List_() {
-    using Fn = void(__cdecl*)();
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F21D0});
-    fn();
-}
-
 struct IDirectSound;
 struct s_smack_video;
 
@@ -688,11 +634,3 @@ inline s_smack_video* __stdcall SmackOpen(char* path, uint32_t flags, int32_t pr
     auto fn = *reinterpret_cast<Fn*>(std::uintptr_t{ 0x005AA648 });
     return fn(path, flags, priority);
 }
-
-inline int16_t __cdecl Ship_Has_Special_Device_(int32_t ship_idx, int32_t device_idx) {
-    using Fn = int16_t(__cdecl*)(int32_t, int32_t);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004830d0});
-    return fn(ship_idx, device_idx);
-}
-
-struct s_mouse_list;

@@ -150,7 +150,7 @@ namespace TEXTBOX {
         fields::_help_list_active = _old_help_list_active;
         fields::_draw_fields_flag = _old_draw_fields_flag;
 
-        Restore_Mouse_List_();
+        HAROLD::Restore_Mouse_List_();
     }
 
     void __cdecl Do_Text_Box_(const char* title, const char* text, int16_t input_flag) {

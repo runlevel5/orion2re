@@ -63,12 +63,12 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             char formatted_name[32];
             _sprintf(formatted_name, HAROLD::s___s__00556ae4, MOX::_star[i].name);
 
-            // Manual check for short names to append DAT_00556dac
+            // Manual check for short names to append "w"
             uint32_t name_len = 0;
             while (MOX::_star[i].name[name_len] != '\0') name_len++;
 
             if (name_len < 7) {
-                char* src = &DAT_00556dac;
+                const char* src = "w";
                 uint32_t src_len = 0;
                 while (src[src_len] != '\0') src_len++;
 

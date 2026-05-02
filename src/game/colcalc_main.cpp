@@ -1099,7 +1099,7 @@ namespace COLCALC {
         if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
             colony->production[ECON_BC] = 0;
             if (debug_buf) {
-                char* src = _colony_debug_msg;
+                char* src = _anomaly_msg;
                 while ((*debug_buf++ = *src++) != '\0');
             }
             return;
@@ -1400,7 +1400,7 @@ namespace COLCALC {
                 len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_workers_msg);
             }
             if (breakdown.food_bonus != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, DAT_00571bc0);
+                len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, _aquatic_bonus_msg);
             }
 
             for (int i = 0; i < 8; ++i) {
@@ -1415,7 +1415,7 @@ namespace COLCALC {
             }
 
             if (breakdown.android_bonuses[1] != 0) {
-                len += _sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.android_bonuses[1] / 2, DAT_00571afc);
+                len += _sprintf(debug_out + len, s_fmt_plus_d_s_2, breakdown.android_bonuses[1] / 2, _native_bonus_msg);
             }
             if (breakdown.android_bonuses[0] != 0) {
                 len += _sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.android_bonuses[0] / 2, _android_bonus_msg);
@@ -1472,7 +1472,7 @@ namespace COLCALC {
             }
 
             len += _sprintf(debug_out + len, s_fmt_s_00551130, s_newline_0055136c);
-            _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), DAT_00571b80);
+            _sprintf(debug_out + len, s_fmt_plus_d_s, static_cast<int>(colony->production[ECON_FOOD]), COLCALC::_total_food_produced_msg);
         }
     }
 
@@ -1598,7 +1598,7 @@ namespace COLCALC {
             p += _sprintf(p, s_fmt_s_00551130, s_0);
 
             if (breakdown.base_prod != 0) {
-                p += _sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_industry_msg);
+                p += _sprintf(p, s_fmt_plus_d_s, breakdown.base_prod, _produced_by_workers_msg);
             }
 
             for (int i = 0; i < 8; ++i) {

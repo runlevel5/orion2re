@@ -141,4 +141,6 @@ namespace INITSHIP {
     void __cdecl Update_Ship_Names_To_New_Language_();
 
     int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx);
+
+    int16_t __cdecl Ship_Has_Weapon_(int16_t ship_index, int16_t weapon_type);
 }

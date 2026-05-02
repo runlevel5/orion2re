@@ -40,6 +40,12 @@ namespace invasion {
 
     int __cdecl Colony_Tank_Barracks_Limit_(s_colony* colony);
 
+    inline int16_t __cdecl Colony_Tank_Limit_(s_colony* colony) {
+        using Fn = int16_t(__cdecl*)(s_colony*);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042CD10});
+        return fn(colony);
+    }
+
     uint32_t __cdecl Colony_Infantry_Barracks_Limit_(s_colony* colony);
 
     void __cdecl Get_Invasion_Info_(int16_t* ship_list, int16_t n_ships, s_colony* colony, s_invasion_side_info* attacker_side, s_invasion_side_info* defender_side);

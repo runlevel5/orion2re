@@ -248,6 +248,6 @@ namespace GENDRAW {
         fields::Clear_Mouse_Buffer_();
         fields::Set_Input_Delay_(3);
 
-        Restore_Mouse_List_();
+        HAROLD::Restore_Mouse_List_();
     }
 }

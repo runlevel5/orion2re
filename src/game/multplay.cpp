@@ -2692,4 +2692,36 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         fonts::Print_(MOX::_mp_screen->screen_x + 118 /* 0x76 */, MOX::_mp_screen->screen_y + 73 /* 0x49 */, msg_buffer);
     }
 
+    void __cdecl Hotseat_Add_Next_Player_Fields_(void) {
+        int16_t banner_idx = 0;
+        int16_t y_offset = 0;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                if (MOX::_player[player_idx].objectives == 0x64) {
+                    if (MOX::_player[player_idx].eliminated != 0) {
+                        MOX::_mp_screen->player_field_ids[player_idx] = -1000;
+                        MOX::_mp_screen->game_list_field_ids[player_idx] = -1000;
+                    } else {
+                        const int16_t left = static_cast<int16_t>(MOX::_mp_screen->screen_x + 0x6a);
+                        const int16_t top = static_cast<int16_t>(MOX::_mp_screen->screen_y + y_offset + 0x40);
+                        const int16_t right = static_cast<int16_t>(MOX::_mp_screen->screen_x + 0x1b3);
+                        const int16_t bottom = static_cast<int16_t>(MOX::_mp_screen->screen_y + y_offset + 0x5d);
+
+                        if ((MOX::_mp_screen->player_button_status[player_idx] == 1) ||
+                            (MOX::_mp_screen->player_button_status[player_idx] == 2)) {
+                            y_offset = static_cast<int16_t>(y_offset + 0x24);
+
+                            MOX::_mp_screen->player_field_ids[player_idx] =
+                                    fields::Add_Hidden_Field_(left, top, right, bottom, s__00551100, 0x29);
+
+                            MULTPLAY::Add_Banner_Field_(player_idx, banner_idx);
+                            ++banner_idx;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

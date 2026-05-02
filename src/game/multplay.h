@@ -102,6 +102,12 @@ namespace MULTPLAY {
 
     void __cdecl Draw_Multi_Player_Banner_(int16_t player_idx, int16_t row_idx, int8_t is_alt_layout);
 
+    inline void __cdecl Hotseat_Print_Player_Data_(int32_t player_index, int32_t row_index) {
+        using Fn = void(__cdecl*)(int32_t, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504420});
+        fn(player_index, row_index);
+    }
+
     inline const char* s_name_fmt = reinterpret_cast<const char*>(0x0055AA28);
     inline const char* s_gnn_fmt = reinterpret_cast<const char*>(0x0055AA30);
     inline const char* s_chat_msg_fmt = reinterpret_cast<const char*>(0x0055AA3C);
@@ -116,6 +122,24 @@ namespace MULTPLAY {
     void __cdecl Chat_Box_Input_Loop_();
 
     int16_t __cdecl Hotseat_Player_Status_(int16_t player_idx);
+
+    inline void __cdecl Hotseat_Get_Colors_() {
+      using Fn = void(__cdecl*)();
+      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504300});
+      fn();
+    }
+
+    inline int16_t __cdecl Hotseat_Get_N_Valid_Players_() {
+      using Fn = int16_t(__cdecl*)();
+      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x005043F0});
+      return fn();
+    }
+
+    inline void __cdecl Hotseat_Set_Next_Player_Status_() {
+      using Fn = void(__cdecl*)();
+      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504520});
+      fn();
+    }
 
     void __cdecl Reload_Initializing_Net_Info_();
 
@@ -168,9 +192,15 @@ namespace MULTPLAY {
 
     void __cdecl Draw_Wait_For_Race_Info_Screen_();
 
-    inline void __cdecl Set_Multi_Player_Game_Type_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005081D0 });
-        fn();
-    }
+    void __cdecl Set_Multi_Player_Game_Type_();
+
+    void __cdecl Restore_Hotseat_Map_Info_();
+
+    void __cdecl Fade_In_Function_();
+
+    void __cdecl Hotseat_Draw_Next_Player_(void);
+
+    void __cdecl Hotseat_Load_Next_Player_();
+
+    void __cdecl Hotseat_Add_Next_Player_Fields_(void);
 }

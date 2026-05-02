@@ -39,7 +39,7 @@ namespace RUSS {
 
     void __cdecl Load_Russ_Strings_();
 
-    inline uint8_t& _russ_strings = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CF08});
+    inline char& _russ_strings = *reinterpret_cast<char*>(std::uintptr_t{0x0056CF08});
 
     inline const char* s_Seed_ld = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575BC }); // "Seed: %ld"
     inline const char* s_Map_d = reinterpret_cast<const char*>(std::uintptr_t{ 0x005575C8 });   // "Map: %d"

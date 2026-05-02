@@ -2473,4 +2473,23 @@ int16_t __cdecl Best_Missile_Damage_Special_(int16_t player_idx) {
     return best_special_idx;
 }
 
+int16_t __cdecl Ship_Has_Weapon_(int16_t ship_index, int16_t weapon_type) {
+    int16_t has_weapon = 0;
+    int16_t weapon_slot = 0;
+
+    while (weapon_slot < 8) {
+        if (has_weapon != 0) {
+            break;
+        }
+
+        if (MOX::_ship[ship_index].d.ship_weapon[weapon_slot].type == weapon_type) {
+            has_weapon = 1;
+        }
+
+        ++weapon_slot;
+    }
+
+    return has_weapon;
+}
+
 }

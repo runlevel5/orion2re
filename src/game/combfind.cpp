@@ -2321,7 +2321,7 @@ uint8_t __cdecl Has_Stellar_Converter_(int16_t* ship_list, int16_t ship_count) {
     for (int32_t i = 0; i < ship_count; ++i) {
         int32_t ship_idx = ship_list[i];
         if (MOX::_ship[ship_idx].status == 0) {
-            if (Ship_Has_Special_Device_(ship_idx, 0x26) != 0) {
+            if (INITSHIP::Ship_Has_Weapon_(ship_idx, 0x26) != 0) {
                 return 1;
             }
         }

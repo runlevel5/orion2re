@@ -2619,7 +2619,7 @@ namespace COLCALC {
 
     short __cdecl Get_Surrender_System_(short player_idx, short param_2, short selection_mode) {
         uint8_t possible_stars[72];
-        StarWeight star_weights[72];
+        s_star_weight star_weights[72];
         short result_star_idx = -1;
 
         // Populate potential stars to surrender
@@ -2644,7 +2644,7 @@ namespace COLCALC {
             }
 
             // Sort systems by population weight
-            _qsort(star_weights, (size_t)num_stars, sizeof(StarWeight), Sort_star_weights_);
+            _qsort(star_weights, (size_t)num_stars, sizeof(s_star_weight), Sort_star_weights_);
 
             int half_count = (num_stars + 1) / 2;
             int chosen_idx;
@@ -2722,5 +2722,189 @@ namespace COLCALC {
                 }
             }
         }
+    }
+
+    char* __cdecl Load_Colcalc_Strings_(char* strings) {
+        char* cursor = strings;
+
+        COLCALC::_anomaly_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_no_barracks_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_unification_has_no_morale_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_government_morale_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_no_capital_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_mixed_races_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_leader_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_morale_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_morale_summary_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_produced_by_farmers_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_aquatic_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_native_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_android_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_base_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_gravity_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_conquered_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_blockaded_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_morale_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_morale_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_government_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_government_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_food_produced_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_food_summary_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_produced_by_workers_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_used_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_pollution_penalty_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_replicated_to_d_food_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_taxed_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_industry_produced_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_industry_summary_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_produced_by_scientists_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_artifacts_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_intelligence_bonus_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_research_produced_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_research_summary_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_taxes_collected_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_special_income_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_trade_goods_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_taxed_from_industry_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_income_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_bc_summary_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_starting_command_points_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_d_star_bases_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_1_star_base_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_d_battlestations_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_1_battlestation_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_d_fortresses_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_1_fortress_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_from_warlord_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_from_imperium_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_command_points_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_1_s_ship_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_d_s_ships_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_1_noncombat_ship_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_d_from_d_noncombat_ships_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_command_point_used_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_total_command_points_used_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_ship_maintenance_costs_msg = cursor;
+        cursor += strlen(cursor) + 1;
+
+        COLCALC::_command_summary_msg = cursor;
+        return cursor + strlen(cursor) + 1;
     }
 }

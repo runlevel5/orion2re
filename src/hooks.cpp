@@ -3849,6 +3849,15 @@ namespace hooks {
         { 0x00508A50, &AIPOWER::Strength_Hits_Modifier_ },
         { 0x00471090, &TEXTBOX::Timed_Text_Box_ },
         { 0x0052C2E0, &buffer::Buffer_Reload_ },
+        { 0x0052C700, &buffer::Farload_Buffer_Library_ },
+        { 0x004830D0, &INITSHIP::Ship_Has_Weapon_ },
+        { 0x00503D30, &MULTPLAY::Hotseat_Add_Next_Player_Fields_ },
+        { 0x004F92D0, &COLCALC::Apply_Colony_Pop_Growth_ },
+        { 0x004F9A30, &COLCALC::Apply_Assimilation_ },
+        { 0x004F9C90, &COLCALC::Produce_Ground_Military_ },
+        { 0x004F9D50, &COLCALC::Apply_Production_ },
+        { 0x004FA530, &COLCALC::Ghost_Colony_Stuff_ },
+        { 0x004F28E0, &COLCALC::Load_Colcalc_Strings_ },
     };
 
     void Install_Hooks()

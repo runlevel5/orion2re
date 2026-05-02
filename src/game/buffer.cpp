@@ -111,7 +111,7 @@ namespace buffer {
 
           ++buffer::_global_load_count;
           segment.last_use_counter = buffer::_global_load_count;
-          segment.data_ptr = buffer::Farload_Buffer_Library_(file_name, buffer_seg_id, buffer_space_seg, 2);
+          segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
           segment.is_loaded = 1;
           return segment.data_ptr;
         }
@@ -126,7 +126,7 @@ namespace buffer {
       s_buffer_cached_segment& segment = file_entry.segments[file_entry.segment_count];
       segment.buffer_seg_id = static_cast<int16_t>(buffer_seg_id);
       segment.last_use_counter = buffer::_global_load_count;
-      segment.data_ptr = buffer::Farload_Buffer_Library_(file_name, buffer_seg_id, buffer_space_seg, 2);
+      segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
       segment.is_loaded = 1;
 
       ++file_entry.segment_count;
@@ -147,12 +147,156 @@ namespace buffer {
     s_buffer_cached_segment& segment = file_entry.segments[file_entry.segment_count];
     segment.buffer_seg_id = static_cast<int16_t>(buffer_seg_id);
     segment.last_use_counter = buffer::_global_load_count;
-    segment.data_ptr = buffer::Farload_Buffer_Library_(file_name, buffer_seg_id, buffer_space_seg, 2);
+    segment.data_ptr = Farload_Buffer_Library_(file_name, buffer_seg_id, static_cast<uint8_t*>(buffer_space_seg));
     segment.is_loaded = 1;
 
     ++file_entry.segment_count;
     ++buffer::_file_buffer_count;
 
     return file_entry.segments[file_entry.segment_count - 1].data_ptr;
+  }
+
+  void* __cdecl Farload_Buffer_Library_(const char* file_name, int32_t entry_index, uint8_t* buffer_base) {
+    char secondary_file_name[60]; // BUG: secondary_file_name is too small and can overflow
+    int32_t entry_size;
+    int32_t* used_bytes_ptr;
+    int32_t victim_file_buffer_index;
+    int32_t victim_segment_index;
+    int32_t next_file_buffer_index;
+    int32_t next_segment_index;
+    int32_t freed_size;
+    void* loaded_data;
+    bool reuse_current_file;
+
+    if (entry_index < 0) {
+      farload::Error_Handler_(file_name, 4, entry_index);
+    }
+
+    reuse_current_file = false;
+    if (farload::_farload_file_flag != 0) {
+      if (__strcmpi(file_name, farload::_farload_file_name) == 0) {
+        reuse_current_file = true;
+      } else if (farload::_farload_file_flag != 0) {
+        _fclose(farload::_farload_fptr);
+      }
+    }
+
+    if (!reuse_current_file) {
+      strcpy(farload::_farload_file_name, file_name);
+      farload::_farload_fptr = _wfopen(file_name, s_rb_0055117c);
+
+      if (farload::_farload_fptr == nullptr) {
+        if (farload::_secondary_drive_path[0] == '\0') {
+          farload::Error_Handler_(file_name, 1, entry_index);
+        }
+
+        strcpy(secondary_file_name, farload::_secondary_drive_path);
+        strcat(secondary_file_name, farload::_farload_file_name);
+        farload::_farload_fptr = _wfopen(secondary_file_name, s_rb_0055117c);
+
+        if (farload::_farload_fptr == nullptr) {
+          farload::Error_Handler_(file_name, 1, entry_index);
+        }
+      }
+
+      _fread(&farload::_lbx_header, 0x800, 1, farload::_farload_fptr);
+
+      if (farload::_lbx_header.magic != 0xFEAD) {
+        farload::Error_Handler_(file_name, 7, entry_index);
+      }
+
+      farload::_farload_file_flag = 1;
+    }
+
+    if (static_cast<int16_t>(farload::_lbx_header.entry_count) <= entry_index) {
+      farload::Error_Handler_(file_name, 8, entry_index);
+    }
+
+    entry_size = static_cast<int32_t>(
+        farload::_lbx_header.offsets[entry_index + 1] -
+        farload::_lbx_header.offsets[entry_index]);
+
+    _fseek(
+        farload::_farload_fptr,
+        static_cast<long>(farload::_lbx_header.offsets[entry_index]),
+        0);
+
+    used_bytes_ptr = reinterpret_cast<int32_t*>(buffer_base - 0x0C);
+    loaded_data = allocate::Allocate_Next_Block_No_Header_(buffer_base, entry_size);
+
+    while (loaded_data == nullptr && *used_bytes_ptr > 0) {
+      loaded_data = allocate::Allocate_Next_Block_No_Header_(buffer_base, entry_size);
+
+      if (loaded_data == nullptr) {
+        buffer::Get_Lowest_Priority_(&victim_file_buffer_index, &victim_segment_index);
+        buffer::Get_Next_Buffer_Address_(
+            victim_file_buffer_index,
+            victim_segment_index,
+            &next_file_buffer_index,
+            &next_segment_index,
+            buffer_base);
+
+        uint8_t* used_end = buffer_base + *used_bytes_ptr;
+        uint8_t* next_data_ptr = used_end;
+
+        if (next_file_buffer_index != 1000) {
+          next_data_ptr = static_cast<uint8_t*>(
+              buffer::_file_buffer[next_file_buffer_index]
+              .segments[next_segment_index]
+              .data_ptr);
+        }
+
+        uint8_t* victim_data_ptr = static_cast<uint8_t*>(
+            buffer::_file_buffer[victim_file_buffer_index]
+            .segments[victim_segment_index]
+            .data_ptr);
+
+        freed_size = static_cast<int32_t>(next_data_ptr - victim_data_ptr);
+
+        if (next_file_buffer_index != 1000) {
+          const int32_t bytes_to_move =
+              static_cast<int32_t>(used_end - next_data_ptr);
+
+          struct_::Copy_Structure_(victim_data_ptr, next_data_ptr, bytes_to_move);
+
+          if (buffer::_file_buffer_count > 0) {
+            for (int32_t file_buffer_index = 0;
+                file_buffer_index < static_cast<int16_t>(buffer::_file_buffer_count);
+                ++file_buffer_index) {
+              if (buffer::_file_buffer[file_buffer_index].segment_count > 0) {
+                for (int32_t segment_index = 0;
+                    segment_index < buffer::_file_buffer[file_buffer_index].segment_count;
+                    ++segment_index) {
+                  s_buffer_cached_segment& segment =
+                      buffer::_file_buffer[file_buffer_index].segments[segment_index];
+
+                  if (segment.is_loaded == 1) {
+                    uint8_t* segment_data_ptr =
+                        static_cast<uint8_t*>(segment.data_ptr);
+
+                    if (victim_data_ptr < segment_data_ptr) {
+                      segment.data_ptr = segment_data_ptr - freed_size;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        buffer::_file_buffer[victim_file_buffer_index]
+            .segments[victim_segment_index]
+            .is_loaded = 0;
+
+        *used_bytes_ptr -= freed_size;
+      }
+    }
+
+    if (loaded_data == nullptr) {
+      farload::Error_Handler_(file_name, 5, entry_index);
+    }
+
+    _fread(loaded_data, static_cast<size_t>(entry_size), 1, farload::_farload_fptr);
+    return loaded_data;
   }
 }

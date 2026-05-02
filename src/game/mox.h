@@ -755,7 +755,7 @@ namespace MOX {
     inline int16_t& _bill_savegame_5 =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559482});
     inline uint16_t& _antaran_resource_level = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059790C});
-    inline s_crew_data* _crew_data = reinterpret_cast<s_crew_data*>(std::uintptr_t{0x00558FA8});
+    inline s_crew_data (&_crew_data)[5] = *reinterpret_cast<s_crew_data (*)[5]>(std::uintptr_t{0x00558FA8});
     inline uint16_t& _chance_for_antaran_invasion = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D24});
     inline uint16_t& _disallow_saves_code = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597854});
 
