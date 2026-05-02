@@ -3039,4 +3039,716 @@ namespace CMBTDRW1 {
         sound::Fadeout_Sound_(sound_handle, 10);
     }
 
+    static void Build_Signed_Bonus_String(char* out_text, int32_t value) {
+        if (value > 0) {
+            _sprintf(out_text, "%s%d", s_plus_00551118, value);
+        } else {
+            _sprintf(out_text, "%d", value);
+        }
+    }
+
+    static void Copy_Crew_Quality_Without_Parenthetical(char* out_text, int32_t crew_quality) {
+        strcpy(out_text, CMBTDRW1::Crew_Quality_String_(crew_quality));
+        char* paren = strchr(out_text, '(');
+        if (paren != nullptr) {
+            *paren = '\0';
+        }
+    }
+
+    void __cdecl Combat_Draw_View_Ship_(void) {
+        char message_text[0x50];
+        char number_text[0x10];
+        char line_text[0x100];
+        char quantity_text[0x100];
+        char arc_text[0x50];
+        uint8_t grayscale_table[0x20];
+        s_colors heading_colors{};
+        s_colors text_colors{};
+        s_colors damaged_colors{};
+        uint8_t panel_color;
+        uint32_t panel_fill_color;
+        int32_t player_idx;
+        int16_t view_x;
+        int16_t view_y;
+        int16_t row_y;
+        int16_t left_panel_x;
+        int16_t right_panel_x;
+        int16_t left_panel_right_x;
+        int16_t right_panel_right_x;
+        int16_t left_value_x;
+        int16_t right_value_x;
+        bool use_remap_view;
+        bool is_special_target;
+
+        MOX::_scan_ship_seg =
+            buffer::Buffer_Reload_(s_combat_lbx_00551244, 5, MOX::_global_cache_seg);
+
+        view_x = static_cast<int16_t>(0x149 - animate::Get_Width_((s_animation_header*)MOX::_scan_ship_seg) / 2);
+        view_y = static_cast<int16_t>(0x0F9 - animate::Get_Height_((s_animation_header*)MOX::_scan_ship_seg) / 2);
+
+        is_special_target = (MOX::_global_combat_data.drive_effectiveness_pct == -666);
+        use_remap_view =
+            (MOX::_current_screen == 0) ||
+            (MOX::_current_screen == 4) ||
+            (MOX::_current_screen == 0x1D);
+
+        if (!use_remap_view) {
+            for (int32_t i = 0; i < 8; ++i) {
+                CMBTDRW1::_green[i] = static_cast<uint8_t>(0x80 + i * 2);
+            }
+
+            damaged_colors.colors[0] = 0x48;
+            for (int32_t i = 1; i < 8; ++i) {
+                damaged_colors.colors[i] = 0x4A;
+            }
+
+            panel_color = 0xC7;
+
+            graphics::Tri_Interlaced_Fill_(
+                view_x,
+                view_y,
+                view_x + 0x145,
+                view_y + 0x183,
+                CMBTDRW1::_green[1],
+                CMBTDRW1::_green[1],
+                0);
+
+            graphics::Interlaced_Fill_(
+                view_x + 0x0A,
+                view_y + 0x1A,
+                view_x + 0x5F,
+                view_y + 0x69,
+                0,
+                panel_color);
+
+            if (MOX::_global_combat_data.player_idx < 8) {
+                graphics::Interlaced_Fill_(
+                    view_x + 0xEC,
+                    view_y + 0x1A,
+                    view_x + 0x134,
+                    view_y + 0x69,
+                    0,
+                    panel_color);
+            }
+
+            heading_colors.colors[0] = CMBTDRW1::_green[2];
+            heading_colors.colors[1] = CMBTDRW1::_green[6];
+            heading_colors.colors[2] = CMBTDRW1::_green[5];
+            heading_colors.colors[3] = CMBTDRW1::_green[6];
+            heading_colors.colors[4] = CMBTDRW1::_green[6];
+            heading_colors.colors[5] = CMBTDRW1::_green[6];
+            heading_colors.colors[6] = CMBTDRW1::_green[6];
+            heading_colors.colors[7] = CMBTDRW1::_green[6];
+
+            text_colors.colors[0] = CMBTDRW1::_green[0];
+            text_colors.colors[1] = CMBTDRW1::_green[4];
+            text_colors.colors[2] = CMBTDRW1::_green[2];
+            text_colors.colors[3] = CMBTDRW1::_green[4];
+            text_colors.colors[4] = CMBTDRW1::_green[4];
+            text_colors.colors[5] = CMBTDRW1::_green[4];
+            text_colors.colors[6] = CMBTDRW1::_green[4];
+            text_colors.colors[7] = CMBTDRW1::_green[4];
+
+            CMBTDRW1::Draw_Ship_Status_(static_cast<int16_t>(view_x + 0x0A), static_cast<int16_t>(view_y + 0x18), MOX::_ship_data_id);
+
+            player_idx = MOX::_global_combat_data.player_idx;
+            if (player_idx <= 8) {
+                if (MOX::_global_combat_data.officer_idx == -1) {
+                    if (player_idx < 8) {
+                        animate::Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
+                    }
+                } else {
+                    for (int32_t i = 0; i < 0x20; ++i) {
+                        grayscale_table[i] = static_cast<uint8_t>(i);
+                    }
+
+                    allocate::Push_Block_(MOX::_screen_seg);
+                    void* gray_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2710);
+                    bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)gray_bitmap, (s_animation_header*)MOX::_detail_fleet_icon_seg);
+                    bitmap::Gray_Scale_Bitmap_(gray_bitmap, 0, 0x20, grayscale_table, 0);
+                    animate::Draw_(view_x + 0xEB, view_y + 0x19, (s_animation_header*)gray_bitmap);
+                    allocate::Pop_Block_(MOX::_screen_seg);
+                }
+            }
+        } else {
+            for (int32_t i = 0; i < 8; ++i) {
+                CMBTDRW1::_green[i] = remap::Get_Remap_Palette_Color_(0x80 + i * 2);
+            }
+
+            panel_color = remap::Get_Remap_Palette_Color_(0xC7);
+            damaged_colors.colors[0] = remap::Get_Remap_Palette_Color_(0x48);
+            for (int32_t i = 1; i < 8; ++i) {
+                damaged_colors.colors[i] = remap::Get_Remap_Palette_Color_(0x4A);
+            }
+
+            graphics::Tri_Interlaced_Fill_(
+                view_x,
+                view_y,
+                view_x + 0x145,
+                view_y + 0x183,
+                CMBTDRW1::_green[2],
+                CMBTDRW1::_green[2],
+                0);
+
+            graphics::Interlaced_Fill_(
+                view_x + 0x0A,
+                view_y + 0x1A,
+                view_x + 0x5F,
+                view_y + 0x69,
+                0,
+                panel_color);
+
+            if (MOX::_global_combat_data.player_idx < 8) {
+                graphics::Interlaced_Fill_(
+                    view_x + 0xEC,
+                    view_y + 0x1A,
+                    view_x + 0x134,
+                    view_y + 0x69,
+                    0,
+                    panel_color);
+            }
+
+            heading_colors.colors[0] = CMBTDRW1::_green[2];
+            heading_colors.colors[1] = CMBTDRW1::_green[6];
+            heading_colors.colors[2] = CMBTDRW1::_green[5];
+            heading_colors.colors[3] = CMBTDRW1::_green[6];
+            heading_colors.colors[4] = CMBTDRW1::_green[6];
+            heading_colors.colors[5] = CMBTDRW1::_green[6];
+            heading_colors.colors[6] = CMBTDRW1::_green[6];
+            heading_colors.colors[7] = CMBTDRW1::_green[6];
+
+            text_colors.colors[0] = CMBTDRW1::_green[0];
+            text_colors.colors[1] = CMBTDRW1::_green[4];
+            text_colors.colors[2] = CMBTDRW1::_green[2];
+            text_colors.colors[3] = CMBTDRW1::_green[4];
+            text_colors.colors[4] = CMBTDRW1::_green[4];
+            text_colors.colors[5] = CMBTDRW1::_green[4];
+            text_colors.colors[6] = CMBTDRW1::_green[4];
+            text_colors.colors[7] = CMBTDRW1::_green[4];
+
+            CMBTDRW1::Remap_Draw_Ship_Status_(view_x + 0x0A, view_y + 0x18, MOX::_ship_data_id);
+
+            if (MOX::_global_combat_data.player_idx < 8) {
+                if (MOX::_global_combat_data.officer_idx == -1) {
+                    animate::Remap_Draw_(view_x + 0xF6, view_y + 0x27, (s_animation_header*)MOX::_detail_fleet_icon_seg);
+                } else {
+                    animate::Draw_(view_x + 0xEC, view_y + 0x16, (s_animation_header*)MOX::_detail_fleet_icon_seg);
+                }
+            }
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+
+        KEN::Ken_Get_Text_Message_(8, message_text, 0x50);
+        row_y = static_cast<int16_t>(view_y + 0x1A);
+        fonts::Print_Centered_(view_x + 0xA7, row_y + 0x0F, message_text);
+
+        panel_fill_color = static_cast<uint8_t>(panel_color);
+
+        graphics::Interlaced_Fill_(
+            view_x + 0x6A,
+            row_y + 0x0C,
+            view_x + 0xDB,
+            row_y + 0x30,
+            0,
+            panel_fill_color);
+
+        fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+
+        row_y = static_cast<int16_t>(row_y + 0x0F);
+        KEN::Ken_Get_Text_Message_(9, message_text, 0x50);
+        fonts::Print_(view_x + 0x6F, row_y, message_text);
+
+        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.ship_attack);
+        fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
+
+        row_y = static_cast<int16_t>(row_y + 0x0C);
+        KEN::Ken_Get_Text_Message_(10, message_text, 0x50);
+        fonts::Print_(view_x + 0x6F, row_y, message_text);
+
+        Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.ship_defense);
+        fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
+
+        row_y = static_cast<int16_t>(row_y + 0x0C);
+        KEN::Ken_Get_Text_Message_(11, message_text, 0x50);
+        fonts::Print_(view_x + 0x6F, row_y, message_text);
+
+        _sprintf(line_text, "%d%s",
+                static_cast<int32_t>(MOX::_global_combat_data.ship_missle_defense),
+                s_percent_0055633c);
+        fonts::Print_Right_(view_x + 0xD6, row_y, line_text);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+            Copy_Crew_Quality_Without_Parenthetical(
+                line_text,
+                static_cast<int32_t>(MOX::_global_combat_data.crew_quality));
+            fonts::Print_Centered_(view_x + 0xA6, row_y + 0x12, line_text);
+        }
+
+        row_y = static_cast<int16_t>(row_y + 0x1A);
+        if (MOX::_global_combat_data.marine_count != -1) {
+            KEN::Ken_Get_Text_Message_(12, message_text, 0x50);
+            fonts::Print_(view_x + 0x6F, row_y, message_text);
+            fonts::Print_Integer_Right_(
+                view_x + 0xD6,
+                row_y,
+                static_cast<uint8_t>(MOX::_global_combat_data.marine_count));
+        }
+
+        left_panel_x = static_cast<int16_t>(view_x + 0x05);
+        right_panel_x = static_cast<int16_t>(view_x + 0xA5);
+        left_panel_right_x = static_cast<int16_t>(left_panel_x + 0x9B);
+        right_panel_right_x = static_cast<int16_t>(right_panel_x + 0x9B);
+        left_value_x = static_cast<int16_t>(left_panel_x + 0x03);
+        right_value_x = static_cast<int16_t>(right_panel_x + 0x03);
+
+        row_y = static_cast<int16_t>(view_y + 0x76);
+
+        if (MOX::_global_combat_data.field41_0xb0 == 1) {
+            fonts::Set_Font_Style_Shadow_Down_(4, &damaged_colors);
+            fonts::Set_Outline_Color_(0, 1);
+
+            KEN::Ken_Get_Text_Message_(13, message_text, 0x50);
+            fonts::Print_(left_panel_x, row_y + 0x03, message_text);
+            fonts::Print_Right_(view_x + 0x143, row_y + 0x03, message_text);
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(4, &heading_colors);
+        fonts::Set_Outline_Color_(0, 1);
+        graphics::Interlaced_Fill_(0x10C, 0x31, 0x17F, 0x41, 0, panel_fill_color);
+
+        if (!use_remap_view) {
+            fonts::Print_Centered_(0x145, 0x32, MOX::_global_combat_data.name);
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+
+        KEN::Ken_Get_Text_Message_(
+            (MOX::_global_combat_data.player_idx <= 9) ? 14 : 0x57,
+            message_text,
+            0x50);
+        fonts::Print_(left_panel_x, row_y, message_text);
+
+        if (!is_special_target && (MOX::_global_combat_data.ftl_type > 0)) {
+            fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+            _sprintf(
+                line_text,
+                "%s%d%s%d%s",
+                s_lparen_005599a8,
+                static_cast<int32_t>(MOX::_global_combat_data.drive_effectiveness_pct),
+                s_slash_005599a4,
+                static_cast<int32_t>(MOX::_global_combat_data.drive_hp_max),
+                s_rparen_00557f08);
+            fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            fonts::Print_(right_panel_x, row_y, TECHDATA::_armor[MOX::_global_combat_data.armor_type].name);
+        } else {
+            KEN::Ken_Get_Text_Message_(0x58, message_text, 0x50);
+            fonts::Print_(right_panel_x, row_y, message_text);
+        }
+
+        row_y = static_cast<int16_t>(row_y + 0x0E);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            row_y = static_cast<int16_t>(row_y + 0x0F);
+        }
+
+        graphics::Interlaced_Fill_(
+            left_panel_x,
+            row_y - 0x02,
+            left_panel_right_x,
+            row_y + ((MOX::_global_combat_data.player_idx <= 9) ? 0x15 : 0x08),
+            0,
+            panel_fill_color);
+
+        graphics::Interlaced_Fill_(
+            right_panel_x,
+            row_y - 0x02,
+            right_panel_right_x,
+            row_y + ((MOX::_global_combat_data.player_idx <= 9) ? 0x15 : 0x08),
+            0,
+            panel_fill_color);
+
+        fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            KEN::Ken_Get_Text_Message_(15, message_text, 0x50);
+            _sprintf(
+                line_text,
+                "%s%d%s",
+                s___00556070,
+                static_cast<int32_t>(TECHDATA::_drives[MOX::_global_combat_data.ftl_type].warp_speed),
+                message_text);
+            fonts::Print_(left_value_x, row_y, line_text);
+        }
+
+        if (!is_special_target) {
+            KEN::Ken_Get_Text_Message_(0x59, message_text, 0x50);
+            _sprintf(
+                line_text,
+                message_text,
+                static_cast<int32_t>(MOX::_global_combat_data.structure_max) -
+                    static_cast<int32_t>(MOX::_global_combat_data.structure_damage),
+                static_cast<int32_t>(MOX::_global_combat_data.structure_max));
+        } else {
+            const int16_t best_armor = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
+            _sprintf(
+                line_text,
+                "%s%d%s%s",
+                s___00556070,
+                static_cast<int32_t>(TECHDATA::_armor[best_armor].ships_bonus) + 100,
+                s_space_005510f0,
+                [&]() -> const char* {
+                    KEN::Ken_Get_Text_Message_(16, message_text, 0x50);
+                    return message_text;
+                }());
+        }
+
+        fonts::Print_(right_value_x, row_y, line_text);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            row_y = static_cast<int16_t>(row_y + 0x0C);
+        }
+
+        KEN::Ken_Get_Text_Message_(17, message_text, 0x50);
+        _sprintf(
+            line_text,
+            "%s%d%s",
+            s___00556070,
+            static_cast<int32_t>(MOX::_global_combat_data.tactical_speed),
+            message_text);
+        fonts::Print_(left_value_x, row_y, line_text);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            if (!is_special_target) {
+                int16_t hull_index;
+                if (MOX::_global_combat_data.ftl_type == 0) {
+                    if (MOX::_global_combat_data.player_idx == 8) {
+                        hull_index = 8;
+                    } else {
+                        hull_index = COMBINIT::Type_Of_Space_Station_(MOX::_cmbt_colony_id);
+                    }
+                } else {
+                    hull_index = MOX::_global_combat_data.hull_size;
+                }
+
+                int32_t armor_total = TECHDATA::_hull_data[hull_index].armor_hp;
+                armor_total +=
+                    (static_cast<int32_t>(TECHDATA::_armor[MOX::_global_combat_data.armor_type].ships_bonus) *
+                     armor_total) /
+                    100;
+
+                if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, 14) != 0) {
+                    armor_total *= 3;
+                }
+
+                KEN::Ken_Get_Text_Message_(0x5B, message_text, 0x50);
+                _sprintf(
+                    line_text,
+                    message_text,
+                    static_cast<int32_t>(MOX::_global_combat_data.armor_hits_current),
+                    armor_total);
+                fonts::Print_(right_value_x, row_y, line_text);
+            } else {
+                KEN::Ken_Get_Text_Message_(0x14, message_text, 0x50);
+                fonts::Print_(
+                    right_panel_x + fonts::Get_String_Width_(s___00556070) + 0x03,
+                    row_y,
+                    message_text);
+            }
+        } else {
+            row_y = static_cast<int16_t>(row_y + 0x0C);
+        }
+
+        row_y = static_cast<int16_t>(row_y + 0x10);
+
+        if (MOX::_global_combat_data.player_idx <= 9) {
+            fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+            KEN::Ken_Get_Text_Message_(0x15, message_text, 0x50);
+            fonts::Print_(left_panel_x, row_y, message_text);
+
+            fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+            _sprintf(
+                line_text,
+                "%s%d%s%d%s",
+                s_lparen_005599a8,
+                static_cast<int32_t>(MOX::_global_combat_data.computer_effectiveness_pct),
+                s_slash_005599a4,
+                static_cast<int32_t>(MOX::_global_combat_data.computer_hp_max),
+                s_rparen_00557f08);
+            fonts::Print_Right_(left_panel_right_x, row_y + 0x03, line_text);
+
+            fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+            if (MOX::_global_combat_data.shield_type > 6) {
+                fonts::Print_(
+                    right_panel_x,
+                    row_y,
+                    TECHDATA::_buildings[MOX::_global_combat_data.shield_type].name);
+            } else {
+                fonts::Print_(
+                    right_panel_x,
+                    row_y,
+                    TECHDATA::_shields[MOX::_global_combat_data.shield_type].name);
+
+                if (MOX::_global_combat_data.shield_type > 0) {
+                    fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+                    _sprintf(
+                        line_text,
+                        "%s%d%s%d%s",
+                        s_lparen_005599a8,
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_hp_current),
+                        s_slash_005599a4,
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_hp_max),
+                        s_rparen_00557f08);
+                    fonts::Print_Right_(right_panel_right_x, row_y + 0x03, line_text);
+                }
+            }
+
+            row_y = static_cast<int16_t>(row_y + 0x0C);
+
+            graphics::Interlaced_Fill_(
+                left_panel_x,
+                row_y,
+                left_panel_right_x,
+                row_y + 0x0D,
+                0,
+                panel_fill_color);
+
+            graphics::Interlaced_Fill_(
+                right_panel_x,
+                row_y,
+                right_panel_right_x,
+                row_y + 0x0D,
+                0,
+                panel_fill_color);
+
+            row_y = static_cast<int16_t>(row_y + 0x03);
+
+            fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+            if (MOX::_global_combat_data.computer_effectiveness_pct > 0) {
+                KEN::Ken_Get_Text_Message_(0x16, message_text, 0x50);
+                _sprintf(
+                    line_text,
+                    message_text,
+                    static_cast<int32_t>(
+                        TECHDATA::_computers[MOX::_global_combat_data.computer_type].bonus));
+                fonts::Print_(left_value_x, row_y, line_text);
+            } else {
+                KEN::Ken_Get_Text_Message_(0x17, message_text, 0x50);
+                fonts::Print_(left_value_x, row_y, message_text);
+            }
+
+            KEN::Ken_Get_Text_Message_(0x18, message_text, 0x50);
+            if (!is_special_target) {
+                _sprintf(
+                    line_text,
+                    message_text,
+                    static_cast<int32_t>(MOX::_global_combat_data.shield_points_base));
+            } else {
+                int32_t shield_value;
+                if (MOX::_global_combat_data.player_idx == 8) {
+                    shield_value = 0;
+                } else {
+                    const int16_t best_shield = INITSHIP::Best_Ship_Shield_(MOX::_global_combat_data.player_idx);
+                    shield_value =
+                        static_cast<int32_t>(TECHDATA::_shields[best_shield].shield_class) +
+                        static_cast<int32_t>(MOX::_global_combat_data.shield_points_base);
+                }
+                _sprintf(line_text, message_text, shield_value);
+            }
+            fonts::Print_(right_value_x, row_y, line_text);
+
+            row_y = static_cast<int16_t>(row_y + 0x12);
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+        KEN::Ken_Get_Text_Message_(0x19, message_text, 0x50);
+        fonts::Print_(left_panel_x, row_y, message_text);
+
+        KEN::Ken_Get_Text_Message_(0x1A, message_text, 0x50);
+        fonts::Print_(left_panel_x + 0x96, row_y, message_text);
+
+        KEN::Ken_Get_Text_Message_(0x1B, message_text, 0x50);
+        fonts::Print_(left_panel_x + 0xC8, row_y, message_text);
+
+        graphics::Interlaced_Fill_(
+            left_panel_x,
+            row_y + 0x0D,
+            right_panel_right_x,
+            row_y + 0x56,
+            0,
+            panel_fill_color);
+
+        row_y = static_cast<int16_t>(row_y + 0x10);
+
+        for (int32_t weapon_slot = 0; weapon_slot < 8; ++weapon_slot) {
+            const s_combat_weapon_slot& slot = MOX::_global_combat_data.weapons[weapon_slot];
+
+            if (slot.weapon_id != 0) {
+                const int16_t weapon_id = slot.weapon_id;
+                const int16_t weapon_arc = slot.arc;
+
+                fonts::Set_Font_Style_Shadow_Down_(1, &text_colors);
+                fonts::Set_Font_Spacing_(1);
+
+                const char* weapon_name =
+                    (slot.count == 1)
+                        ? TECHDATA::_weapons[weapon_id].name
+                        : TECHDATA::_weapons[weapon_id].name_plural;
+
+                _sprintf(quantity_text, "%d%s%s", static_cast<int32_t>(slot.count), s_space_005510f0, weapon_name);
+
+                strcpy(arc_text, s_space_lparen_0055999c);
+                switch (weapon_arc) {
+                    case 1:
+                        KEN::Ken_Get_Text_Message_(3, message_text, 0x50);
+                        strcat(arc_text, message_text);
+                        break;
+                    case 2:
+                        KEN::Ken_Get_Text_Message_(4, message_text, 0x50);
+                        strcat(arc_text, message_text);
+                        break;
+                    case 4:
+                        KEN::Ken_Get_Text_Message_(6, message_text, 0x50);
+                        strcat(arc_text, message_text);
+                        break;
+                    case 8:
+                        KEN::Ken_Get_Text_Message_(5, message_text, 0x50);
+                        strcat(arc_text, message_text);
+                        break;
+                    case 15:
+                        strcat(arc_text, s_360_00556164);
+                        break;
+                    default:
+                        break;
+                }
+                strcat(arc_text, s_rparen_00557f08);
+
+                if (weapon_arc != 1) {
+                    strcat(quantity_text, arc_text);
+                }
+
+                fonts::Print_(left_value_x, row_y, quantity_text);
+
+                switch (TECHDATA::_weapons[weapon_id].type) {
+                    case 0:
+                        fonts::Print_(left_panel_x + 0x99, row_y, s_minus_0055111c);
+                        break;
+
+                    case 1:
+                    case 3:
+                    case 4:
+                        fonts::Print_Integer_Right_(left_panel_x + 0xA1, row_y, slot.ammo);
+                        break;
+
+                    case 2:
+                        if (TECHDATA::_weapons[weapon_id].ammo > 0) {
+                            const int16_t ammo_box_x = static_cast<int16_t>(left_panel_x + 0x99);
+
+                            if (slot.ammo == 0) {
+                                KEN::Ken_Get_Text_Message_(0x1C, message_text, 0x50);
+                                fonts::Print_(ammo_box_x, row_y, message_text);
+                            } else {
+                                int16_t box_x = ammo_box_x;
+                                for (int16_t ammo_index = 0;
+                                     ammo_index < TECHDATA::_weapons[weapon_id].ammo;
+                                     ++ammo_index, box_x = static_cast<int16_t>(box_x + 0x09)) {
+                                    if (ammo_index < slot.ammo) {
+                                        graphics::Box_(box_x, row_y, 7, 7, 1, 0x49);
+                                        graphics::Box_(box_x + 1, row_y + 1, 5, 5, 1, 0x4B);
+                                        graphics::Box_(box_x + 2, row_y + 2, 3, 3, 1, 0x4B);
+                                        graphics::Box_(box_x + 3, row_y + 3, 1, 1, 1, 0x4B);
+                                    } else {
+                                        graphics::Box_(box_x, row_y, 7, 7, 1, 0x51);
+                                        graphics::Box_(box_x + 1, row_y + 1, 5, 5, 1, 0x54);
+                                        graphics::Box_(box_x + 2, row_y + 2, 3, 3, 1, 0x54);
+                                        graphics::Box_(box_x + 3, row_y + 3, 1, 1, 1, 0x54);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (slot.specials == 0) {
+                    KEN::Ken_Get_Text_Message_(0x1D, message_text, 0x50);
+                    fonts::Print_(left_panel_x + 0xCB, row_y, message_text);
+                } else {
+                    uint16_t mod_bits = slot.specials;
+                    line_text[0] = '\0';
+
+                    for (int32_t mod_index = 0; mod_index < 15; ++mod_index) {
+                        if ((mod_bits & 1) != 0) {
+                            if (line_text[0] != '\0') {
+                                strcat(line_text, s_comma_space_00556168);
+                            }
+                            strcat(line_text, TECHDATA::_weapon_modifications[mod_index].name_plural);
+                        }
+                        mod_bits >>= 1;
+                    }
+
+                    fonts::Print_(left_panel_x + 0xCB, row_y, line_text);
+                }
+            }
+
+            row_y = static_cast<int16_t>(row_y + 0x0B);
+        }
+
+        fonts::Set_Font_Style_Shadow_Down_(2, &heading_colors);
+        row_y = static_cast<int16_t>(row_y + 0x07);
+
+        KEN::Ken_Get_Text_Message_(0x1E, message_text, 0x50);
+        fonts::Print_(left_panel_x, row_y, message_text);
+
+        row_y = static_cast<int16_t>(row_y + 0x10);
+
+        graphics::Interlaced_Fill_(
+            left_panel_x,
+            row_y - 0x03,
+            right_panel_right_x,
+            row_y + 0x2B,
+            0,
+            panel_fill_color);
+
+        int16_t special_row_y = row_y;
+        int16_t displayed_specials = 0;
+
+        for (int32_t special_index = 0; special_index < 0x27; ++special_index) {
+            if (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_flags, special_index) != 0) {
+                const s_colors* active_colors =
+                    (struct_::Test_Bit_Field_(MOX::_global_combat_data.special_device_damage, special_index) == 0)
+                        ? &text_colors
+                        : &damaged_colors;
+
+                fonts::Set_Font_Style_Shadow_Down_(1, active_colors);
+                fonts::Set_Font_Spacing_(1);
+
+                if (((displayed_specials & 1) == 0) && (displayed_specials != 0)) {
+                    special_row_y = static_cast<int16_t>(special_row_y + 0x0B);
+                }
+
+                if ((displayed_specials & 1) == 0) {
+                    fonts::Print_(left_value_x, special_row_y, TECHDATA::_specials[special_index].name);
+                } else {
+                    fonts::Print_(right_value_x, special_row_y, TECHDATA::_specials[special_index].name);
+                }
+
+                ++displayed_specials;
+            }
+        }
+
+        MOX::_scan_ship_seg =
+            buffer::Buffer_Reload_(s_combat_lbx_00551244, 5, MOX::_global_cache_seg);
+
+        animate::Draw_(view_x - 0x09, view_y - 0x09, (s_animation_header*)MOX::_scan_ship_seg);
+    }
+
 }

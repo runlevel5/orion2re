@@ -259,17 +259,9 @@ namespace COLCALC {
 
     inline bool __cdecl Monster_At_Star_(int star_idx);
 
-    inline void __cdecl Delete_Obsolete_Artifical_Planets_Under_Construction_(int16_t star_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F63A0});
-        fn(star_idx);
-    }
+    void __cdecl Delete_Obsolete_Artifical_Planets_Under_Construction_(int16_t star_idx);
 
-    inline int32_t __cdecl Colony_N_Pops_Of_Empire_(s_colony* colony, int16_t empire_id) {
-        using Fn = int32_t(__cdecl*)(s_colony*, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F5D40});
-        return fn(colony, empire_id);
-    }
+    int32_t __cdecl Colony_N_Pops_Of_Empire_(s_colony* colony, uint32_t empire_id);
 
     uint8_t __cdecl Leader_At_Anomaly_(s_leader_data* leader);
 

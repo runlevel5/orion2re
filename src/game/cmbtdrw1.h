@@ -2,6 +2,7 @@
 
 namespace CMBTDRW1 {
     inline const char* s_combat_lbx = reinterpret_cast<const char*>(0x00551244);
+    inline uint8_t (&_green)[16] = *reinterpret_cast<uint8_t(*)[16]>(std::uintptr_t{0x0056CEF0});
     inline MOX2::action_func_t& _k_save = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005960FC});
 
     inline int16_t& _g_max = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CEE0});
@@ -97,9 +98,17 @@ namespace CMBTDRW1 {
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage);
 
-    inline void __cdecl Combat_Draw_View_Ship_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004d1f80 });
-        fn();
+    void __cdecl Combat_Draw_View_Ship_();
+
+    inline void __cdecl Remap_Draw_Ship_Status_(int32_t x, int32_t y, int16_t ship_data_id) {
+        using Fn = void(__cdecl*)(int32_t, int32_t, int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D4E80});
+        fn(x, y, ship_data_id);
+    }
+
+    inline const char* __cdecl Crew_Quality_String_(int32_t crew_quality) {
+        using Fn = const char*(__cdecl*)(int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004D5C70});
+        return fn(crew_quality);
     }
 }

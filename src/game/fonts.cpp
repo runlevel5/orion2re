@@ -112,7 +112,7 @@ namespace fonts {
         }
     }
 
-    void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors) {
+    void __cdecl Set_Font_Style_(int font_style, const s_colors *new_colors) {
         _current_font_style = static_cast<uint16_t>(font_style);
 
         for (int i = 0; i < 8; ++i) {
@@ -760,7 +760,7 @@ namespace fonts {
         _font_header.font_style = 4;
     }
 
-    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors) {
+    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, const s_colors* colors) {
         Set_Font_Style_(style, colors);
         _font_header.font_style = 1;
     }

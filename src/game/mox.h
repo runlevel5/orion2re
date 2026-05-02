@@ -468,6 +468,7 @@ namespace MOX {
     inline int16_t& _max_zoom_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B448});
     inline uint8_t& _star_bg_index = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A49F8});
     inline s_animation_header*& _star_bg_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A1790});
+    inline void*& _scan_ship_seg = *reinterpret_cast<void**>(std::uintptr_t{0x005973FC});
     inline s_animation_header*& _detail_fleet_icon_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x005A49D4});
     inline uint16_t& _fleet_icon_button_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596D18});
     inline int16_t (&_weapons_count_plus_button)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00597D50});

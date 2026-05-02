@@ -100,6 +100,8 @@ inline int32_t& DAT_0056178c = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056
 inline uint16_t*& PTR_DAT_00561580 = *reinterpret_cast<uint16_t**>(std::uintptr_t{0x00561580});
 
 inline const char* s_percent_0055633c = reinterpret_cast<const char*>(0x0055633C); // "%"
+inline const char* s_slash_005599a4 = reinterpret_cast<const char*>(0x005599A4); // "/"
+inline const char* s_lparen_005599a8 = reinterpret_cast<const char*>(0x005599A8); // "("
 
 inline int32_t* __cdecl __errno() {
     using Fn = int32_t*(__cdecl*)();

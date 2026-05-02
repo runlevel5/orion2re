@@ -3852,12 +3852,19 @@ namespace hooks {
         { 0x0052C700, &buffer::Farload_Buffer_Library_ },
         { 0x004830D0, &INITSHIP::Ship_Has_Weapon_ },
         { 0x00503D30, &MULTPLAY::Hotseat_Add_Next_Player_Fields_ },
-        { 0x004F92D0, &COLCALC::Apply_Colony_Pop_Growth_ },
-        { 0x004F9A30, &COLCALC::Apply_Assimilation_ },
-        { 0x004F9C90, &COLCALC::Produce_Ground_Military_ },
         { 0x004F9D50, &COLCALC::Apply_Production_ },
         { 0x004FA530, &COLCALC::Ghost_Colony_Stuff_ },
         { 0x004F28E0, &COLCALC::Load_Colcalc_Strings_ },
+        { 0x004D1F80, &CMBTDRW1::Combat_Draw_View_Ship_ },
+        { 0x004F63A0, &COLCALC::Delete_Obsolete_Artifical_Planets_Under_Construction_ },
+        { 0x004F5D40, &COLCALC::Colony_N_Pops_Of_Empire_ },
+        { 0x004F92D0, &COLCALC::Apply_Colony_Pop_Growth_ },
+        { 0x004F9A30, &COLCALC::Apply_Assimilation_ },
+        { 0x004f9c90, &COLCALC::Produce_Ground_Military_ },
+        { 0x005081d0, &MULTPLAY::Set_Multi_Player_Game_Type_ },
+        { 0x004cbc80, &MULTPLAY::Restore_Hotseat_Map_Info_ },
+        { 0x00504500, &MULTPLAY::Fade_In_Function_ },
+        { 0x00503E30, &MULTPLAY::Hotseat_Draw_Next_Player_ },
     };
 
     void Install_Hooks()

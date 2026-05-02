@@ -551,6 +551,7 @@ workflows:
           * Rename certain stdlib functions:
             sprintf -> _sprintf
             qsort -> _qsort
+          * You `never` use `git` commands.
 
           # Checklist
           * You were conservative with file reads and only read relevant data.

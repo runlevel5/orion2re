@@ -1808,6 +1808,37 @@ namespace COLCALC {
         Eliminate_Player_(surrender_plr);
     }
 
+    void __cdecl Produce_Ground_Military_(s_colony* colony) {
+        if (colony->buildings[22] != 0) {
+            if (invasion::Colony_Infantry_Barracks_Limit_(colony) > colony->military[0]) {
+                ++colony->infantry_roundoff;
+                if (colony->infantry_roundoff == 5) {
+                    colony->infantry_roundoff = 0;
+                    ++colony->military[0];
+                }
+            } else {
+                if (invasion::Colony_Infantry_Limit_(colony) < colony->military[0]) {
+                    --colony->military[0];
+                }
+            }
+        }
+
+        if (colony->buildings[2] != 0) {
+            if (invasion::Colony_Tank_Barracks_Limit_(colony) > colony->military[1]) {
+                ++colony->tank_roundoff;
+                if (colony->tank_roundoff == 5) {
+                    colony->tank_roundoff = 0;
+                    ++colony->military[1];
+                    return;
+                }
+            } else {
+                if (invasion::Colony_Tank_Limit_(colony) < colony->military[1]) {
+                    --colony->military[1];
+                }
+            }
+        }
+    }
+
     void __cdecl Apply_Colony_Changes_(s_colony* colony) {
         if (EVENTS::Event_Check_Space_Anomaly_(static_cast<int>(colony - MOX::_colony)) == 0) {
             if (colony->occupation_policy == 4) {
@@ -1823,6 +1854,309 @@ namespace COLCALC {
                 Apply_Production_(colony);
             } else {
                 Ghost_Colony_Stuff_(colony);
+            }
+        }
+    }
+
+    void __cdecl Apply_Colony_Pop_Growth_(s_colony* colony) {
+        const int32_t colony_idx = static_cast<int32_t>(colony - MOX::_colony);
+
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_idx) != 0) {
+            return;
+        }
+
+        if (colony->n_pops == 0) {
+            return;
+        }
+
+        if (colony->occupation_policy == 0) {
+            int16_t removable_count = 0;
+            uint32_t* selected_pop = nullptr;
+            const uint8_t pop_count = static_cast<uint8_t>(colony->n_pops);
+
+            for (int32_t i = 0; i < pop_count; ++i) {
+                uint32_t* pop = &colony->pop[i];
+                const uint32_t race_idx = *pop & 0x0f;
+
+                if (race_idx == 9 ||
+                    (race_idx < 8 &&
+                     static_cast<int32_t>(static_cast<int8_t>(colony->owner)) != static_cast<int32_t>(race_idx) &&
+                     ((*pop & 0x400) != 0))) {
+                    ++removable_count;
+                    if (random::Random_(removable_count) == 1) {
+                        selected_pop = pop;
+                    }
+                }
+            }
+
+            if (removable_count == 0) {
+                colony->occupation_policy = 4;
+            } else {
+                if (removable_count == 1) {
+                    colony->occupation_policy = 4;
+
+                    s_MSG msg = {};
+                    msg.msg_type = MSG_TYPE_COLONY;
+                    msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+                    msg.u.colony.subtype = 2;
+                    msg.u.colony.c.assimilation.val = static_cast<uint8_t>(*selected_pop & 0x0f);
+
+                    MSG_::Add_Msg_(msg, static_cast<int16_t>(static_cast<int8_t>(colony->owner)));
+                }
+
+                --colony->n_pops;
+                *selected_pop = colony->pop[static_cast<uint8_t>(colony->n_pops)];
+            }
+        }
+
+        if (colony->n_pops == 0) {
+            return;
+        }
+
+        const int32_t owner_idx = static_cast<int8_t>(colony->owner);
+        s_player* const owner_player = &MOX::_player[owner_idx];
+        int16_t race_counts[10] = {};
+        uint8_t protected_race[10] = {};
+        bool had_negative_growth = false;
+
+        {
+            const uint8_t pop_count = static_cast<uint8_t>(colony->n_pops);
+            for (int32_t i = 0; i < pop_count; ++i) {
+                ++race_counts[colony->pop[i] & 0x0f];
+            }
+        }
+
+        if (race_counts[owner_idx] > 0) {
+            protected_race[owner_idx] = 1;
+        } else {
+            int16_t best_race = -1;
+            int16_t best_count = 0;
+
+            for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+                if (best_count < race_counts[i]) {
+                    best_race = i;
+                    best_count = race_counts[i];
+                }
+            }
+
+            if (best_race != -1) {
+                protected_race[best_race] = 1;
+            } else if (race_counts[8] > 0) {
+                protected_race[8] = 1;
+            } else {
+                protected_race[9] = 1;
+            }
+        }
+
+        for (int32_t race_idx = 0; race_idx < 10; ++race_idx) {
+            if (race_idx >= MOX::_NUM_PLAYERS && race_idx != 8 && race_idx != 9) {
+                continue;
+            }
+
+            if (colony->pop_growth[race_idx] >= 0) {
+                continue;
+            }
+
+            had_negative_growth = true;
+            colony->pop_roundoff[race_idx] =
+                    static_cast<int16_t>(colony->pop_roundoff[race_idx] + colony->pop_growth[race_idx]);
+
+            while (colony->pop_roundoff[race_idx] < 0) {
+                if (static_cast<int32_t>(protected_race[race_idx]) >= race_counts[race_idx]) {
+                    colony->pop_roundoff[race_idx] = 0;
+                } else {
+                    int16_t selected_special = -1;
+                    int16_t selected_normal = -1;
+                    int16_t special_count = 0;
+                    int16_t normal_count = 0;
+                    const uint8_t pop_count = static_cast<uint8_t>(colony->n_pops);
+
+                    for (int16_t pop_idx = 0; pop_idx < static_cast<int16_t>(pop_count); ++pop_idx) {
+                        const uint32_t pop = colony->pop[pop_idx];
+                        if ((pop & 0x0f) != static_cast<uint32_t>(race_idx)) {
+                            continue;
+                        }
+
+                        if ((pop & 0x180) == 0) {
+                            ++normal_count;
+                            if (random::Random_(normal_count) == 1) {
+                                selected_normal = pop_idx;
+                            }
+                        } else {
+                            ++special_count;
+                            if (random::Random_(special_count) == 1) {
+                                selected_special = pop_idx;
+                            }
+                        }
+                    }
+
+                    const int16_t remove_idx = (special_count > 0) ? selected_special : selected_normal;
+
+                    --race_counts[race_idx];
+                    --colony->n_pops;
+                    colony->pop[remove_idx] = colony->pop[static_cast<uint8_t>(colony->n_pops)];
+                    colony->pop_roundoff[race_idx] =
+                            static_cast<int16_t>(colony->pop_roundoff[race_idx] + 1000);
+                }
+            }
+        }
+
+        if (had_negative_growth) {
+            int16_t food_shortage =
+                    static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[0])) -
+                    colony->production[0];
+            food_shortage = static_cast<int16_t>(food_shortage - colony->imports[0]);
+
+            const int16_t industry_shortage =
+                    static_cast<int16_t>(static_cast<uint8_t>(colony->maintenance[1])) -
+                    colony->production[1];
+
+            if (food_shortage > 0 || industry_shortage > 0) {
+                s_MSG msg = {};
+                msg.msg_type = MSG_TYPE_COLONY;
+                msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+                msg.u.colony.subtype = 4;
+
+                if (food_shortage > 0) {
+                    msg.u.colony.c.starvation.a = static_cast<int8_t>(food_shortage);
+                }
+                if (industry_shortage > 0) {
+                    msg.u.colony.c.starvation.b = static_cast<int8_t>(industry_shortage);
+                }
+
+                MSG_::Add_Msg_(msg, static_cast<int16_t>(static_cast<int8_t>(colony->owner)));
+            }
+        }
+
+        int16_t player_order[9] = {};
+
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
+            player_order[i] = i;
+        }
+
+        {
+            const int16_t temp = player_order[0];
+            player_order[0] = player_order[owner_idx];
+            player_order[owner_idx] = temp;
+        }
+
+        RUSS::Shuffle_Sint_(&player_order[1], static_cast<int16_t>(MOX::_NUM_PLAYERS - 1));
+
+        if (MOX::_NUM_PLAYERS <= 0) {
+            return;
+        }
+
+        for (int16_t order_idx = 0; order_idx < MOX::_NUM_PLAYERS; ++order_idx) {
+            const int16_t race_idx = player_order[order_idx];
+
+            if (colony->pop_growth[race_idx] <= 0) {
+                continue;
+            }
+
+            colony->pop_roundoff[race_idx] =
+                    static_cast<int16_t>(colony->pop_roundoff[race_idx] + colony->pop_growth[race_idx]);
+
+            while (colony->pop_roundoff[race_idx] >= 1000) {
+                const uint8_t pop_count = static_cast<uint8_t>(colony->n_pops);
+
+                if (COLCALC::Colony_Race_Pop_Limit_(colony, race_idx) <= static_cast<int16_t>(pop_count)) {
+                    colony->pop_roundoff[race_idx] = 999;
+                    break;
+                }
+
+                int32_t job_class = -1;
+
+                if (colony->food2_per_farmer != 0) {
+                    const int32_t food_balance =
+                            static_cast<uint8_t>(colony->food2_needed_for_our_empire) -
+                            static_cast<int32_t>(colony->production[0]) * 2 +
+                            static_cast<uint8_t>(colony->food2_needed_for_assimilated) +
+                            static_cast<uint8_t>(colony->food2_needed_for_conquered) +
+                            static_cast<uint8_t>(colony->food2_needed_for_natives);
+
+                    if (food_balance > 0) {
+                        job_class = 0;
+                    } else if (food_balance == 0) {
+                        if (MOX::_player[race_idx].traits[TRAIT_EATS_MINERALS] == 0) {
+                            job_class = 0;
+                        }
+                    } else if (food_balance == -1) {
+                        if (MOX::_player[race_idx].traits[TRAIT_EATS_MINERALS] == 0 &&
+                            MOX::_player[race_idx].traits[TRAIT_CYBERNETIC] == 0) {
+                            job_class = 0;
+                        }
+                    }
+
+                    if (job_class != 0) {
+                        if (owner_player->surplus_food < 0) {
+                            job_class = 0;
+                        } else if (owner_player->surplus_food == 0 && owner_player->traits[TRAIT_EATS_MINERALS] == 0) {
+                            bool found_later_owned_colony = false;
+
+                            for (s_colony* scan = colony + 1;
+                                 scan < MOX::_colony + MOX::_NUM_COLONIES;
+                                 ++scan) {
+                                if (scan->owner == colony->owner && scan->outpost_flag == 0) {
+                                    found_later_owned_colony = true;
+                                    break;
+                                }
+                            }
+
+                            if (found_later_owned_colony) {
+                                job_class = 0;
+                            }
+                        }
+                    }
+                }
+
+                if (job_class == -1) {
+                    const int16_t industry_output = colony->production[1];
+                    const int16_t industry_needed = static_cast<uint8_t>(colony->maintenance[1]);
+
+                    if (industry_needed > industry_output) {
+                        job_class = 1;
+                    } else if (industry_needed == industry_output &&
+                               MOX::_player[race_idx].traits[TRAIT_CYBERNETIC] != 0) {
+                        const int32_t industry_balance =
+                                static_cast<uint8_t>(colony->industry2_needed_for_our_empire) +
+                                static_cast<uint8_t>(colony->industry2_needed_for_androids) +
+                                static_cast<uint8_t>(colony->industry2_needed_for_assimilated) +
+                                static_cast<uint8_t>(colony->industry2_needed_for_conquered);
+
+                        if ((industry_balance & 1) == 0) {
+                            job_class = 1;
+                        }
+                    }
+                }
+
+                if (job_class == -1 &&
+                    EVENTS::Event_Check_Colony_Researching_(colony_idx) != 0) {
+                    job_class = 2;
+                }
+
+                if (job_class == -1) {
+                    int32_t job_counts[3] = {};
+
+                    for (int32_t i = 0; i < pop_count; ++i) {
+                        ++job_counts[(colony->pop[i] & 0x180) >> 7];
+                    }
+
+                    job_class = 1;
+                    if (job_counts[1] + job_counts[2] != 0) {
+                        job_counts[0] = 0;
+                        job_class = RUSS::Get_Weighted_Choice_Int_(reinterpret_cast<uint32_t*>(job_counts), 3);
+                    }
+                }
+
+                colony->pop[pop_count] =
+                        (static_cast<uint32_t>(job_class) << 7) |
+                        0x200 |
+                        (static_cast<uint32_t>(race_idx) & 0x0f) |
+                        ((static_cast<uint32_t>(static_cast<uint8_t>(colony->owner)) << 4) & 0x70);
+
+                ++colony->n_pops;
+                colony->pop_roundoff[race_idx] =
+                        static_cast<int16_t>(colony->pop_roundoff[race_idx] - 1000);
             }
         }
     }
@@ -2183,6 +2517,20 @@ namespace COLCALC {
 
                 // Reset the last attacker info for this turn
                 player->last_attacker = -1;
+            }
+        }
+    }
+
+    void __cdecl Delete_Obsolete_Artifical_Planets_Under_Construction_(int16_t star_idx) {
+        if (!COLCALC::Star_Has_Asteroid_Or_Gas_Giant_(star_idx)) {
+            for (int32_t planet_slot = 0; planet_slot < 5; ++planet_slot) {
+                const int16_t planet_idx = MOX::_star[star_idx].planet_index[planet_slot];
+                if (planet_idx != -1) {
+                    const int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                    if (colony_idx != -1) {
+                        COLBLDG::Delete_Prod_From_Colony_Queue_(colony_idx, 0x30);
+                    }
+                }
             }
         }
     }
@@ -2663,6 +3011,21 @@ namespace COLCALC {
         return result_star_idx;
     }
 
+    int32_t __cdecl Colony_N_Pops_Of_Empire_(s_colony* colony, uint32_t empire_id) {
+        int32_t pop_count = 0;
+        uint32_t* pop = colony->pop;
+        uint32_t* pop_end = colony->pop + static_cast<uint8_t>(colony->n_pops);
+
+        while (pop < pop_end) {
+            if ((*pop & 0xF) == empire_id) {
+                ++pop_count;
+            }
+            ++pop;
+        }
+
+        return pop_count;
+    }
+
     bool __cdecl Room_For_Another_Dude_(s_colony* colony, int race_idx) {
         uint8_t pop_limit_flags[42];
         int pop_counts[10];
@@ -2906,5 +3269,127 @@ namespace COLCALC {
 
         COLCALC::_command_summary_msg = cursor;
         return cursor + strlen(cursor) + 1;
+    }
+
+    void __cdecl Apply_Assimilation_(s_colony* colony) {
+        const int32_t colony_index = static_cast<int32_t>(colony - MOX::_colony);
+        if (EVENTS::Event_Check_Space_Anomaly_(colony_index) != 0) {
+            return;
+        }
+
+        if (colony->occupation_policy != 3) {
+            return;
+        }
+
+        const int32_t colony_owner = static_cast<int8_t>(colony->owner);
+        const uint32_t owner_bits = static_cast<uint32_t>(static_cast<uint8_t>(colony_owner)) << 4;
+        const uint8_t pop_count = static_cast<uint8_t>(colony->n_pops);
+
+        uint32_t occupation_points = static_cast<uint8_t>(colony->occupation_points);
+        uint32_t assimilation_gain =
+            static_cast<uint8_t>(
+                COLCALC::_assimilation_rate_by_government[
+                    static_cast<int8_t>(MOX::_player[colony_owner].traits[TRAIT_CURRENT_GOVERNMENT])]);
+
+        for (uint32_t* pop_record_ptr = colony->pop;
+             pop_record_ptr < colony->pop + pop_count;
+             ++pop_record_ptr) {
+            uint32_t pop_record = *pop_record_ptr;
+            const uint32_t pop_owner = (pop_record & 0x70u) >> 4;
+
+            if (MOX::_player[pop_owner].traits[TRAIT_CURRENT_GOVERNMENT] == 0) {
+                *pop_record_ptr = (((owner_bits ^ pop_record) & 0x70u) ^ pop_record);
+            }
+        }
+
+        if (colony->buildings[BUILDING_ALIEN_CONTROL_CENTER] != 0) {
+            assimilation_gain = 0x78;
+        }
+
+        if (MOX::_player[colony_owner].traits[TRAIT_CHARISMATIC] != 0) {
+            assimilation_gain *= 2;
+        } else if (MOX::_player[colony_owner].traits[TRAIT_REPULSIVE] != 0) {
+            assimilation_gain /= 2;
+        }
+
+        occupation_points += assimilation_gain;
+
+        if (occupation_points >= 0xF0) {
+            uint32_t conversions_remaining = occupation_points / 0xF0;
+            occupation_points %= 0xF0;
+
+            do {
+                int16_t candidate_count = 0;
+                int16_t chosen_pop_idx = -1;
+
+                for (int16_t pop_idx = 0; pop_idx < pop_count; ++pop_idx) {
+                    const uint32_t pop_record = colony->pop[pop_idx];
+                    if ((pop_record & 0x400u) != 0 && (pop_record & 0x0Fu) < 8) {
+                        ++candidate_count;
+                        if (random::Random_(candidate_count) == 1) {
+                            chosen_pop_idx = pop_idx;
+                        }
+                    }
+                }
+
+                if (candidate_count != 0) {
+                    if (candidate_count == 1) {
+                        colony->occupation_policy = 4;
+
+                        s_MSG msg = {};
+                        msg.msg_type = MSG_TYPE_COLONY;
+                        msg.u.colony.planet_idx = static_cast<uint8_t>(colony->planet);
+                        msg.u.colony.subtype = 3;
+                        msg.u.colony.c.assimilation.val =
+                            static_cast<uint8_t>(colony->pop[chosen_pop_idx] & 0x0Fu);
+
+                        MSG_::Add_Msg_(msg, static_cast<int16_t>(colony_owner));
+                    }
+
+                    uint32_t pop_record = colony->pop[chosen_pop_idx] & 0xFFFFFBFFu;
+                    colony->pop[chosen_pop_idx] = (((owner_bits ^ pop_record) & 0x70u) ^ pop_record);
+                }
+
+                --conversions_remaining;
+            } while (conversions_remaining != 0);
+        }
+
+        colony->occupation_points = static_cast<char>(occupation_points);
+    }
+
+    void __cdecl Ghost_Colony_Stuff_(s_colony* colony) {
+        int32_t building_idx = 0;
+        int32_t surviving_building_count = 0;
+
+        for (building_idx = 0; building_idx < 49; ++building_idx) {
+            if (colony->buildings[building_idx] != 0) {
+                if (random::Random_(10) == 1) {
+                    const int32_t colony_idx = static_cast<int32_t>(colony - MOX::_colony);
+                    ERICNET::Remove_Building_(static_cast<int16_t>(colony_idx), static_cast<int16_t>(building_idx));
+                } else {
+                    ++surviving_building_count;
+                }
+            }
+        }
+
+        if (surviving_building_count == 0) {
+            bool has_incoming_settlers = false;
+
+            for (int32_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                s_player* player = &MOX::_player[player_idx];
+
+                if (player->settlers_freighted > 0) {
+                    for (int32_t settler_idx = 0; settler_idx < player->settlers_freighted; ++settler_idx) {
+                        if (player->settlers[settler_idx].dest_planet == colony->planet) {
+                            has_incoming_settlers = true;
+                        }
+                    }
+                }
+            }
+
+            if (!has_incoming_settlers) {
+                BOMB::Destroy_Colony_(colony, 3);
+            }
+        }
     }
 }

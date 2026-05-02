@@ -14,6 +14,17 @@ namespace bitmap {
 
     void __cdecl Draw_Picture_To_Bitmap_(s_animation_header* h1, s_animation_header* h2);
 
+    inline void __cdecl Gray_Scale_Bitmap_(
+        void* bitmap,
+        int32_t x,
+        int32_t color_count,
+        const uint8_t* table,
+        int32_t flags) {
+        using Fn = void(__cdecl*)(void*, int32_t, int32_t, const uint8_t*, int32_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F8E0});
+        fn(bitmap, x, color_count, table, flags);
+    }
+
     inline char* s_Add_Picture_To_Bitmap_targetmust_0055b770 = reinterpret_cast<char*>(std::uintptr_t{0x0055B770});
 
     void __cdecl Add_Picture_To_Bitmap_(int16_t x, int16_t y, s_animation_header* src, s_animation_header* dest);

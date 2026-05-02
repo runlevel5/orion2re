@@ -37,7 +37,7 @@ namespace fonts {
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x005787A8});
 
     void __cdecl Set_PSTR_Style_(uint16_t style);
-    void __cdecl Set_Font_Style_(int font_style, s_colors *new_colors);
+    void __cdecl Set_Font_Style_(int font_style, const s_colors *new_colors);
 
     void __cdecl Set_Remap_Font_Style_(int font_idx, s_colors* colors);
 
@@ -124,7 +124,7 @@ namespace fonts {
     void __cdecl Set_Font_Special_Colors_(s_colors* colors);
     void __cdecl Set_Font_Highlight_Colors_(s_colors* colors);
 
-    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, s_colors* colors);
+    void __cdecl Set_Font_Style_Shadow_Down_(int16_t style, const s_colors* colors);
     void __cdecl Set_Font_Style_Shadow_Up_(int16_t font_idx, s_colors* colors);
 
     void __cdecl Set_Alias_Color_(uint8_t color);
