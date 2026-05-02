@@ -739,18 +739,15 @@ namespace LOADSAVE {
         }
     }
 
-    /**
-     * @address 0043d0d0
-     */
     int32_t __cdecl Check_Magic_Number_(const char* filename) {
         int32_t magic_number = 0;
-        FILE* file_ptr = _wfopen(filename, s_rb_0055117c);
+        FILE* file_ptr = fopen(filename, s_rb_0055117c);
 
         if (file_ptr != nullptr) {
-            if (_fseek(file_ptr, 0x29, SEEK_SET) == 0) {
-                _fread(&magic_number, 4, 1, file_ptr);
+            if (fseek(file_ptr, 0x29, SEEK_SET) == 0) {
+                fread(&magic_number, 4, 1, file_ptr);
             }
-            _fclose(file_ptr);
+            fclose(file_ptr);
         }
 
         return magic_number;
@@ -800,17 +797,17 @@ namespace LOADSAVE {
      */
     bool __cdecl Get_Game_Type_From_Saved_Game_(const char* filename) {
         bool is_valid = false;
-        FILE* file = _wfopen(filename, s_rb_0055117c);
+        FILE* file = fopen(filename, s_rb_0055117c);
 
         if (file != nullptr) {
             uint32_t game_type_header;
-            _fread(&game_type_header, 4, 1, file);
+            fread(&game_type_header, 4, 1, file);
 
             if (Is_Valid_Game_Type_(game_type_header)) {
                 is_valid = true;
             }
 
-            _fclose(file);
+            fclose(file);
         }
 
         return is_valid;
@@ -1067,10 +1064,10 @@ namespace LOADSAVE {
         uint8_t file_buffer[553]; // 0x229 bytes
         bool success = false;
 
-        FILE* file = _wfopen(s_MOX_SET_00556918, s_rb_0055117c);
+        FILE* file = fopen(s_MOX_SET_00556918, s_rb_0055117c);
         if (file != nullptr) {
-            _fread(file_buffer, 0x229, 1, file);
-            _fclose(file);
+            fread(file_buffer, 0x229, 1, file);
+            fclose(file);
 
             RUSS::Assert_Settings_();
 
@@ -1082,10 +1079,10 @@ namespace LOADSAVE {
             success = true;
             RUSS::Assert_Settings_();
 
-            file = _wfopen(s_MOX_SET_00556918, s_wb_00551178);
+            file = fopen(s_MOX_SET_00556918, s_wb_00551178);
             if (file != nullptr) {
-                _fwrite(file_buffer, 0x229, 1, file);
-                _fclose(file);
+                fwrite(file_buffer, 0x229, 1, file);
+                fclose(file);
             } else {
                 success = false;
             }
@@ -1771,12 +1768,12 @@ namespace LOADSAVE {
      * @address 0050f650
      */
     void __cdecl Get_File_Date_String_(const char* file_path, char* out_string) {
-        FILE* file = _wfopen(file_path, s_r_00556db0);
+        FILE* file = fopen(file_path, s_r_00556db0);
         if (file == nullptr) {
             return;
         }
 
-        _fclose(file);
+        fclose(file);
 
         int16_t second;
         int16_t minute;

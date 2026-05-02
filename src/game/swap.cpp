@@ -17,27 +17,27 @@ void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
         exitm::Exit_With_Message(s_Insufficient_disk_space_for_swap_0055bed8);
     }
 
-    swap_file = _wfopen(s_TEMP_TMP_0055becc, s_wb_00551178);
+    swap_file = fopen(s_TEMP_TMP_0055becc, s_wb_00551178);
     if (swap_file == nullptr) {
         exitm::Exit_With_Message(s_Error_in_swap_file_0055beb8);
     }
 
-    _fwrite(block_address - 0x0c, static_cast<size_t>(swap::_swap_block_size), 1, swap_file);
-    _fclose(swap_file);
+    fwrite(block_address - 0x0c, static_cast<size_t>(swap::_swap_block_size), 1, swap_file);
+    fclose(swap_file);
 
     *reinterpret_cast<int32_t*>(block_address - 8) = saved_block_size;
 }
 
 void __cdecl Restore_Block_From_Drive_() {
     uint8_t* swap_block_address = swap::_swap_block_address;
-    FILE* file = _wfopen(s_TEMP_TMP_0055becc, s_rb_0055117c);
+    FILE* file = fopen(s_TEMP_TMP_0055becc, s_rb_0055117c);
 
     if (file == nullptr) {
         exitm::Exit_With_Message(s_Error_in_swap_file_0055beb8);
     }
 
-    _fread(swap_block_address - 0x0C, static_cast<uint32_t>(swap::_swap_block_size), 1, file);
-    _fclose(file);
+    fread(swap_block_address - 0x0C, static_cast<uint32_t>(swap::_swap_block_size), 1, file);
+    fclose(file);
 }
 
 }

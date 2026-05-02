@@ -968,7 +968,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         planet_name_ptr = HACCESS::Get_Planet_Name_No_Prime_(MOX::_colony[colony_idx_2].planet);
         strcpy(name2, planet_name_ptr);
 
-        return (int16_t)__strcmpi(name1, name2);
+        return (int16_t)_strcmpi(name1, name2);
     }
 
     int16_t __cdecl cmp_(int16_t param_1, int16_t param_2) {

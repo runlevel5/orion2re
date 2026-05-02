@@ -133,15 +133,15 @@ namespace INITGAME {
      * @address 00478fb0
      */
     void Write_Game_Settings_() {
-        FILE* file = _wfopen(s_mox_set_0055760c, s_wb_00551178);
+        FILE* file = fopen(s_mox_set_0055760c, s_wb_00551178);
 
         if (file == nullptr) {
             exitm::Exit_With_Message(s_Unable_to_open_mox_set_005575f4);
         }
 
-        _fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, file);
-        _fflush(file);
-        _fclose(file);
+        fwrite(&MOX::_settings, sizeof(MOX::_settings), 1, file);
+        fflush(file);
+        fclose(file);
     }
 
     void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int16_t galaxy_age, int16_t num_players,

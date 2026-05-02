@@ -112,7 +112,7 @@ namespace buffer {
 
     if (buffer::_file_buffer_count > 0) {
       for (int32_t i = 0; i < static_cast<int32_t>(buffer::_file_buffer_count); ++i) {
-        if (__strcmpi(file_name, buffer::_file_buffer[i].file_name) == 0) {
+        if (_strcmpi(file_name, buffer::_file_buffer[i].file_name) == 0) {
           found_file = true;
           file_index = i;
           break;
@@ -198,16 +198,16 @@ namespace buffer {
 
     reuse_current_file = false;
     if (farload::_farload_file_flag != 0) {
-      if (__strcmpi(file_name, farload::_farload_file_name) == 0) {
+      if (_strcmpi(file_name, farload::_farload_file_name) == 0) {
         reuse_current_file = true;
       } else if (farload::_farload_file_flag != 0) {
-        _fclose(farload::_farload_fptr);
+        fclose(farload::_farload_fptr);
       }
     }
 
     if (!reuse_current_file) {
       strcpy(farload::_farload_file_name, file_name);
-      farload::_farload_fptr = _wfopen(file_name, s_rb_0055117c);
+      farload::_farload_fptr = fopen(file_name, s_rb_0055117c);
 
       if (farload::_farload_fptr == nullptr) {
         if (farload::_secondary_drive_path[0] == '\0') {
@@ -216,14 +216,14 @@ namespace buffer {
 
         strcpy(secondary_file_name, farload::_secondary_drive_path);
         strcat(secondary_file_name, farload::_farload_file_name);
-        farload::_farload_fptr = _wfopen(secondary_file_name, s_rb_0055117c);
+        farload::_farload_fptr = fopen(secondary_file_name, s_rb_0055117c);
 
         if (farload::_farload_fptr == nullptr) {
           farload::Error_Handler_(file_name, 1, entry_index);
         }
       }
 
-      _fread(&farload::_lbx_header, 0x800, 1, farload::_farload_fptr);
+      fread(&farload::_lbx_header, 0x800, 1, farload::_farload_fptr);
 
       if (farload::_lbx_header.magic != 0xFEAD) {
         farload::Error_Handler_(file_name, 7, entry_index);
@@ -240,7 +240,7 @@ namespace buffer {
         farload::_lbx_header.offsets[entry_index + 1] -
         farload::_lbx_header.offsets[entry_index]);
 
-    _fseek(
+    fseek(
         farload::_farload_fptr,
         static_cast<long>(farload::_lbx_header.offsets[entry_index]),
         0);
@@ -320,7 +320,7 @@ namespace buffer {
       farload::Error_Handler_(file_name, 5, entry_index);
     }
 
-    _fread(loaded_data, static_cast<size_t>(entry_size), 1, farload::_farload_fptr);
+    fread(loaded_data, static_cast<size_t>(entry_size), 1, farload::_farload_fptr);
     return loaded_data;
   }
 

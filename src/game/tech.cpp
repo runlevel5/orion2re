@@ -576,7 +576,7 @@ namespace TECH {
                 }
                 else {
                     uint8_t cur_app = static_cast<uint8_t>(MOX::_cur_plyr_ptr->current_research_application);
-                    if (__strcmpi(item->app_names[i], TECHDATA::_technology_applications[cur_app].name) == 0) {
+                    if (_strcmpi(item->app_names[i], TECHDATA::_technology_applications[cur_app].name) == 0) {
                         app_color = &TECH::_tech_color[2];
                     }
                 }

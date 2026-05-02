@@ -222,48 +222,6 @@ inline FILE* __cdecl FID_conflict_wfopen(const char* filename, const char* mode)
     return fn(filename, mode);
 }
 
-inline uint32_t __cdecl _fread(void* buffer, uint32_t size, uint32_t count, FILE* stream) {
-    using Fn = uint32_t(__cdecl*)(void*, uint32_t, uint32_t, FILE*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540a30 });
-    return fn(buffer, size, count, stream);
-}
-
-inline uint32_t __cdecl _fwrite(const void* ptr, uint32_t size, uint32_t nmemb, FILE* stream) {
-    using Fn = uint32_t(__cdecl*)(const void*, uint32_t, uint32_t, FILE*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540860 });
-    return fn(ptr, size, nmemb, stream);
-}
-
-inline int32_t __cdecl _fclose(FILE* stream) {
-    using Fn = int32_t(__cdecl*)(FILE*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005405f0 });
-    return fn(stream);
-}
-
-inline int __cdecl _fflush(FILE* stream) {
-    using Fn = int(__cdecl*)(FILE*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540690 });
-    return fn(stream);
-}
-
-inline char* __cdecl _fgets(char* str, int num, FILE* stream) {
-    using Fn = char*(__cdecl*)(char*, int, FILE*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541BB0 });
-    return fn(str, num, stream);
-}
-
-inline FILE* __cdecl _wfopen(const char* filename, const char* mode) {
-    using Fn = FILE*(__cdecl*)(const char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540C00 });
-    return fn(filename, mode);
-}
-
-inline FILE* __cdecl _fopen(const char* filename, const char* mode) {
-    using Fn = FILE*(__cdecl*)(const char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00540c00 });
-    return fn(filename, mode);
-}
-
 inline int16_t (&_screen_data)[5] = *reinterpret_cast<int16_t (*)[5]>(std::uintptr_t{0x005A1B20});
 
 inline int16_t& _mouse_XY_star_idx =
@@ -283,6 +241,8 @@ inline char* s_patch13_lbx_00556330 = reinterpret_cast<char*>(std::uintptr_t{0x0
 inline const char* s_fmt_score_complex_0055a518 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A518}); // "(%d x %s) %d"
 inline const char* s_percent_s_percent_d_00556d98 = reinterpret_cast<const char*>(std::uintptr_t{0x00556D98}); /* "%s: %d" */
 inline const char* s_racestuf_lbx_00556310 = reinterpret_cast<const char*>(std::uintptr_t{0x00556310});
+inline const char* const s_RACESTUF_lbx_00558550 =
+    reinterpret_cast<const char*>(std::uintptr_t{0x00558550}); // "RACESTUF.lbx"
 
 inline auto _sprintf =
     reinterpret_cast<int(__cdecl*)(char*, const char*, ...)>(std::uintptr_t{ 0x00540550 });
@@ -447,18 +407,6 @@ inline HMMIO __stdcall mmioOpenA(const char* szFilename, void* lpmmioinfo, uint3
     return fn(szFilename, lpmmioinfo, dwOpenFlags);
 }
 
-inline int __cdecl __strcmpi(const char* s1, const char* s2) {
-    using Fn = int(__cdecl*)(const char*, const char*);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005428d0 });
-    return fn(s1, s2);
-}
-
-inline int __cdecl _fseek(FILE* stream, long offset, int origin) {
-    using Fn = int(__cdecl*)(FILE*, long, int);
-    auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541770 });
-    return fn(stream, offset, origin);
-}
-
 inline const char* const s_fmt_00557F18 =
     reinterpret_cast<const char*>(std::uintptr_t{0x00557F18}); // "%d> %s"
 
@@ -501,6 +449,12 @@ inline const char* s__00556071 = reinterpret_cast<const char*>(std::uintptr_t{0x
 inline const char* s__005569f8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F8}); /* "\n" */
 inline const char* s__005569f9 = reinterpret_cast<const char*>(std::uintptr_t{0x005569F9});
 inline const char* s_BUFFER0_LBX = reinterpret_cast<const char*>(0x00551124); // "BUFFER0.LBX"
+inline const char* s_BUFFER0_LBX_00551124 =
+        reinterpret_cast<const char*>(std::uintptr_t{0x00551124}); // "BUFFER0.LBX"
+inline int16_t& _fleet_box_width =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977C6});
+inline int16_t& _fleet_box_field8_0xe =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CE});
 inline const char* s__s___s_0055238c = reinterpret_cast<const char*>(std::uintptr_t{0x0055238C}); // "%s, %s"
 inline const char* s__s_005569e8 = reinterpret_cast<const char*>(std::uintptr_t{0x005569E8}); // "%s "
 inline const char* s___s_00557f0c = reinterpret_cast<const char*>(std::uintptr_t{0x00557F0C}); // "(%s"

@@ -729,8 +729,8 @@ namespace MOX {
     inline int16_t (&_ship_stack_start)[500] =
         *reinterpret_cast<int16_t(*)[500]>(std::uintptr_t{0x0059C030});
 
-    inline uint32_t& _fleet_box_ship_ids =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059D610});
+    inline uint8_t (&_fleet_box_ship_ids)[63] =
+        *reinterpret_cast<uint8_t (*)[63]>(std::uintptr_t{0x0059D610});
 
     inline void*& _other_ships_screen_seg = *reinterpret_cast<void**>(std::uintptr_t{0x0059D6B0});
 

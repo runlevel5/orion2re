@@ -1739,18 +1739,18 @@ namespace COLONY {
         input_buf[0] = (char)key;
         input_buf[1] = '\0';
 
-        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_P)) == 0) {
+        if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_P)) == 0) {
             MOX::_colony[COLONY::_colony_handle].production_spent += 100;
             COLONY::_full_draw = 1;
         }
 
-        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_Q)) == 0) {
+        if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_Q)) == 0) {
             MOX::_colony[COLONY::_colony_handle].production_spent += 10000;
             COLONY::_full_draw = 1;
             return;
         }
 
-        if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_C1)) == 0) {
+        if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_C1)) == 0) {
             if (COLONY::_drawing_display == 2) {
                 if (!COLONY::Colonize_Planet_(static_cast<int16_t>(COLONY::_planet_display_handle))) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_PLANET_ALREADY_COLONIZED));
@@ -1758,10 +1758,10 @@ namespace COLONY {
                     return;
                 }
             }
-        } else if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_F)) == 0) {
+        } else if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_F)) == 0) {
             MOX::_player[MOX::_PLAYER_NUM].n_freighters += 5;
             return;
-        } else if (__strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_B)) == 0) {
+        } else if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_B)) == 0) {
             MOX::_player[MOX::_PLAYER_NUM].bc += 100;
             return;
         } else {

@@ -124,21 +124,21 @@ void __cdecl Reload_Race_Selection_Screen_() {
         RUSS::Mox_Update_();
     }
 
-    FILE* file = _wfopen(s_lastrace_rac, s_rb_0055117c);
+    FILE* file = fopen(s_lastrace_rac, s_rb_0055117c);
     if (file != nullptr) {
         // Load template for custom race (LBX entry 12) into the 14th slot
         _race_specials[13] = (uint8_t*)farload::Far_Reload_Next_Data_(s_RACESTUF_LBX, 7, MOX::_screen_seg, 12, 1, 0x1F);
 
         // Overwrite template with saved race data
-        _fread(_race_specials[13], 31, 1, file);
+        fread(_race_specials[13], 31, 1, file);
         Convert_Custom_Race_Flags_(_race_specials[13]);
         RUSS::Mox_Update_();
 
-        _fread(&dummy_byte, 1, 1, file);
-        _fread(_last_race_name, 15, 1, file);
+        fread(&dummy_byte, 1, 1, file);
+        fread(_last_race_name, 15, 1, file);
 
         RUSS::Mox_Update_();
-        _fclose(file);
+        fclose(file);
     }
 
     for (int i = 0; i < 14; ++i) {
@@ -317,7 +317,7 @@ short Race_Selection_Screen_(s_player* plr) {
         }
         
         if (input_field == field_ids[13]) {
-            FILE* f = _wfopen(s_lastrace_rac, s_rb_0055117C);
+            FILE* f = fopen(s_lastrace_rac, s_rb_0055117C);
             if (_custom_flag == 0) {
                 _custom_flag = 1;
                 fields::Clear_Fields_Above_(field_ids[12]);
@@ -325,19 +325,19 @@ short Race_Selection_Screen_(s_player* plr) {
                     field_ids[13] = -1000;
                 } else {
                     field_ids[13] = fields::Add_Radio_Button_Field_(477, 378, s_empty_00551100, (s_animation_header*)_last_race_seg, &_race_button_status[13], s_empty_00551100, 40);
-                    _fclose(f);
+                    fclose(f);
                 }
             } else if (f) {
                 uint8_t loaded_race;
                 uint8_t temp_traits[31];
-                _fread(temp_traits, 31, 1, f);
+                fread(temp_traits, 31, 1, f);
                 struct_::Copy_Structure_(plr->traits, _race_specials[13], 31);
-                _fread(&loaded_race, 1, 1, f);
+                fread(&loaded_race, 1, 1, f);
                 plr->race = loaded_race;
                 bool can_request = (MOX::_game_type == 0 || MOX::_game_type == 1) ? true : NETSTART::Request_Race_(loaded_race);
                 
                 if (!can_request) {
-                    _fclose(f);
+                    fclose(f);
                     KEN::Ken_Get_Text_Message_(72, msg_buffer, 100);
                     GENDRAW::Message_Box_(msg_buffer);
                     video::Set_Page_Back_();
@@ -345,11 +345,11 @@ short Race_Selection_Screen_(s_player* plr) {
                     animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
-                    _fread(plr->race_name, 15, 1, f);
+                    fread(plr->race_name, 15, 1, f);
                     fields::Deactivate_Auto_Function_();
                     fields::Clear_Fields_();
                     _old_race = loaded_race;
-                    _fclose(f);
+                    fclose(f);
                     if (Racial_Option_Screen_(plr) == 1) {
                         done_flag = 1;
                         _race_flag[loaded_race] = 1;
@@ -628,13 +628,13 @@ int16_t __cdecl Racial_Option_Screen_(s_player* player) {
                     }
 
                     if (popup_result == 2) {
-                        FILE* race_file = _wfopen(s_lastrace_rac, s_wb_00551178);
+                        FILE* race_file = fopen(s_lastrace_rac, s_wb_00551178);
                         if (race_file != nullptr) {
-                            _fwrite(player->traits, 0x1F, 1, race_file);
-                            _fwrite(&player->race, 1, 1, race_file);
+                            fwrite(player->traits, 0x1F, 1, race_file);
+                            fwrite(&player->race, 1, 1, race_file);
                             memcpy(player_race_name, raceopt::_cur_race_name, strlen(raceopt::_cur_race_name) + 1);
-                            _fwrite(player_race_name, 0x0F, 1, race_file);
-                            _fclose(race_file);
+                            fwrite(player_race_name, 0x0F, 1, race_file);
+                            fclose(race_file);
                         }
 
                         MOX::_current_screen = MOX::_return_screen;

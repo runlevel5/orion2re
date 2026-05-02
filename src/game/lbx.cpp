@@ -4,14 +4,14 @@ namespace lbx {
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename) {
         memset(header, 0, sizeof(s_lbx_stream_header));
 
-        header->file = _wfopen(filename, s_r_b_0055bf20);
+        header->file = fopen(filename, s_r_b_0055bf20);
         
         if (header->file == nullptr) {
             if (farload::_secondary_drive_path[0] != '\0') {
                 char full_path[80];
                 strcpy(full_path, farload::_secondary_drive_path);
                 strcat(full_path, filename);
-                header->file = _wfopen(full_path, s_r_b_0055bf20);
+                header->file = fopen(full_path, s_r_b_0055bf20);
             }
             
             if (header->file == nullptr) {
@@ -19,16 +19,16 @@ namespace lbx {
             }
         }
 
-        _fread(header, 8, 1, header->file);
+        fread(header, 8, 1, header->file);
 
         if (header->magic != 0xFEAD) {
-            _fclose(header->file);
+            fclose(header->file);
             header->file = nullptr;
             return;
         }
 
         uint32_t* temp_offsets = &header->entries[254].offset;
-        _fread(temp_offsets, 4, 510, header->file);
+        fread(temp_offsets, 4, 510, header->file);
 
         header->first_offset = temp_offsets[0];
 
@@ -47,7 +47,7 @@ namespace lbx {
 
     void __cdecl LBX_uninit_(s_lbx_stream_header* header) {
         if (header->file != nullptr) {
-            _fclose(header->file);
+            fclose(header->file);
         }
         memset(header, 0, sizeof(s_lbx_stream_header));
     }
@@ -110,8 +110,8 @@ namespace lbx {
         if (header != nullptr && header->file != nullptr) {
             if ((int16_t)header->entry_count >= record_idx + 1) {
                 // BUG: record_idx 0 leads to negative index entries[-1]
-                _fseek(header->file, header->entries[record_idx - 1].offset, SEEK_SET);
-                _fread(buffer, header->entries[record_idx].size, 1, header->file);
+                fseek(header->file, header->entries[record_idx - 1].offset, SEEK_SET);
+                fread(buffer, header->entries[record_idx].size, 1, header->file);
             }
         }
     }

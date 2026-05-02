@@ -22,6 +22,7 @@
 
 #include "random.h"
 #include "platform.h"
+#include "alloc.h"
 #include "allocate.h"
 #include "animate.h"
 #include "clipped.h"

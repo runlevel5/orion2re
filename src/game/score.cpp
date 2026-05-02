@@ -253,13 +253,13 @@ namespace SCORE {
         FILE* file;
         int16_t sort_buffer[10][2];
 
-        file = _wfopen(s_HOF_M2, s_rb_0055117c);
+        file = fopen(s_HOF_M2, s_rb_0055117c);
         if (file == nullptr) {
             return 0;
         }
 
-        _fread(&_hof, sizeof(s_hof), 1, file);
-        _fclose(file);
+        fread(&_hof, sizeof(s_hof), 1, file);
+        fclose(file);
 
         Sort_HOF_Scores_(sort_buffer);
         Move_Sorted_HOF_Data_(sort_buffer);
@@ -606,10 +606,10 @@ namespace SCORE {
     void __cdecl Write_HOF_File_() {
         FILE* file;
 
-        file = _wfopen(s_HOF_M2, s_wb);
+        file = fopen(s_HOF_M2, s_wb);
         if (file != nullptr) {
-            _fwrite(&_hof, sizeof(s_hof), 1, file);
-            _fclose(file);
+            fwrite(&_hof, sizeof(s_hof), 1, file);
+            fclose(file);
         }
     }
 

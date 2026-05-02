@@ -39,6 +39,25 @@ namespace mouse {
         return platform::g_mouse_y;
     }
 
+    void __cdecl Check_Mouse_Buffer_() {
+        uint16_t pressed_buttons = static_cast<uint16_t>(_mouse_buttons & 0x0003);
+
+        if (pressed_buttons != 0) {
+            _mouse_buffer_button = (int16_t)pressed_buttons;
+
+            if (_mouse_overide_flag == 1) {
+                _mouse_buffer_button = static_cast<int16_t>(_mouse_overide_right_button + _mouse_overide_left_button);
+            }
+
+            _mouse_buffer_flag = 1;
+            _mouse_buffer_flag2 = 1;
+            _mouse_buffer_x = platform::g_mouse_x;
+            _mouse_buffer_y = platform::g_mouse_y;
+        }
+
+        ++_num;
+    }
+
     void __cdecl Check_Mouse_Shape_() {
         video::_current_mouse_list_ptr = -1;
 

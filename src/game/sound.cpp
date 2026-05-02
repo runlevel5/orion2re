@@ -129,22 +129,22 @@ namespace sound {
         header->data_ptr = (uint8_t*)src_data + 0x2c;
 
         sound::Copy_FourCC_(tag_buf, header->riff_tag);
-        if (__strcmpi(tag_buf, s_RIFF_0055c224) != 0) {
+        if (_strcmpi(tag_buf, s_RIFF_0055c224) != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->wave_tag);
-        if (__strcmpi(tag_buf, s_WAVE_0055c21c) != 0) {
+        if (_strcmpi(tag_buf, s_WAVE_0055c21c) != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->fmt_tag);
-        if (__strcmpi(tag_buf, s_fmt_0055c214) != 0) {
+        if (_strcmpi(tag_buf, s_fmt_0055c214) != 0) {
             return false;
         }
 
         sound::Copy_FourCC_(tag_buf, header->data_tag);
-        return __strcmpi(tag_buf, s_data_0055c20c) == 0;
+        return _strcmpi(tag_buf, s_data_0055c20c) == 0;
     }
 
     /**
@@ -473,22 +473,22 @@ namespace sound {
         stream->data_start_offset = entry_offset + 0x2c;
 
         sound::Copy_FourCC_(tag_buffer, stream->riff_tag);
-        if (__strcmpi(tag_buffer, sound::s_RIFF_0055c224) != 0) {
+        if (_strcmpi(tag_buffer, sound::s_RIFF_0055c224) != 0) {
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->wave_tag);
-        if (__strcmpi(tag_buffer, sound::s_WAVE_0055c21c) != 0) {
+        if (_strcmpi(tag_buffer, sound::s_WAVE_0055c21c) != 0) {
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->fmt_tag);
-        if (__strcmpi(tag_buffer, sound::s_fmt_0055c214) != 0) {
+        if (_strcmpi(tag_buffer, sound::s_fmt_0055c214) != 0) {
             return 0;
         }
 
         sound::Copy_FourCC_(tag_buffer, stream->data_tag);
-        if (__strcmpi(tag_buffer, sound::s_data_0055c20c) != 0) {
+        if (_strcmpi(tag_buffer, sound::s_data_0055c20c) != 0) {
             return 0;
         }
 

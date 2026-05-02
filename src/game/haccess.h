@@ -88,10 +88,13 @@ namespace HACCESS {
 
     int16_t __cdecl Ship_Icon_Ship_Id_(int16_t icon_idx);
 
-    inline void __cdecl Build_Saved_Ship_Array_() {
-        using Fn = void(__cdecl*)();
-        reinterpret_cast<Fn>(0x0049A360)();
-    }
+    inline int16_t& _fleet_box_count =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x005977CC});
+
+    inline s_fleet_movement_icon (&_fleet_movement_icon)[500] =
+        *reinterpret_cast<s_fleet_movement_icon (*)[500]>(std::uintptr_t{0x0059C470});
+
+    void __cdecl Build_Saved_Ship_Array_();
 
     bool __cdecl Player_Can_Order_Ship_(int16_t player_idx, s_ship_data* ship = nullptr);
 

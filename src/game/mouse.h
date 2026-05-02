@@ -10,6 +10,9 @@ namespace mouse {
     inline int16_t& _current_mouse_list_count =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A90 });
 
+    inline uint32_t& _num =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578AC0 });
+
     inline int16_t& _mouse_buffer_button =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578AC8 });
 
@@ -24,11 +27,7 @@ namespace mouse {
 
     void __cdecl Check_Mouse_Shape_();
 
-    inline void __cdecl Check_Mouse_Buffer_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x005275C0 });
-        fn();
-    }
+    void __cdecl Check_Mouse_Buffer_();
 
     void __cdecl User_Mouse_Handler_(int16_t mouse_x, int16_t mouse_y, uint16_t mouse_buttons);
 

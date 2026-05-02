@@ -19,10 +19,10 @@ namespace file_ani {
         }
 
         if (_file_animation_open) {
-            _fclose(_file_animation_fptr);
+            fclose(_file_animation_fptr);
         }
 
-        _file_animation_fptr = _wfopen(filename, s_rb_0055117c);
+        _file_animation_fptr = fopen(filename, s_rb_0055117c);
         _file_animation_open = true;
 
         if (_file_animation_fptr == nullptr) {
@@ -39,13 +39,13 @@ namespace file_ani {
             src = filename;
             while ((*dst++ = *src++) != '\0');
 
-            _file_animation_fptr = _wfopen(full_path, s_rb_0055117c);
+            _file_animation_fptr = fopen(full_path, s_rb_0055117c);
             if (_file_animation_fptr == nullptr) {
                 farload::Error_Handler_(full_path, 1, entry_index);
             }
         }
 
-        _fread(_file_lbx_header, 0x804, 1, _file_animation_fptr);
+        fread(_file_lbx_header, 0x804, 1, _file_animation_fptr);
 
         if (*reinterpret_cast<uint16_t*>((reinterpret_cast<uint8_t*>(_file_lbx_header) + 2)) != 0xFEAD) {
             farload::Error_Handler_(filename, 7, entry_index);
@@ -59,9 +59,9 @@ namespace file_ani {
         _file_animation_end = _file_lbx_header[entry_index + 3];
         _file_animation_length = _file_animation_end - _file_animation_start;
 
-        _fseek(_file_animation_fptr, _file_animation_start, 0);
+        fseek(_file_animation_fptr, _file_animation_start, 0);
 
-        _fread(_file_lbx_header, 0x2000, 1, _file_animation_fptr);
+        fread(_file_lbx_header, 0x2000, 1, _file_animation_fptr);
     }
 
     void __cdecl Draw_File_Animation_() {
@@ -83,8 +83,8 @@ namespace file_ani {
             exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large_0055b804);
         }
         
-        _fseek(_file_animation_fptr, file_offset, 0); // SEEK_SET
-        _fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
+        fseek(_file_animation_fptr, file_offset, 0); // SEEK_SET
+        fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
         
         if (video::screen_refresh_flag >= 2) {
             setvesa::Add_Square_To_Scan_List_(
@@ -181,8 +181,8 @@ namespace file_ani {
             exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large_0055b804);
         }
 
-        _fseek(_file_animation_fptr, _file_animation_start + frame_offset, 0);
-        _fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
+        fseek(_file_animation_fptr, _file_animation_start + frame_offset, 0);
+        fread(_file_animation_buffer, frame_size, 1, _file_animation_fptr);
 
         if (animate::_animation_header->flags & 0x08) {
             exitm::Exit_With_Message(s_Differential_Error_8C8);
@@ -258,10 +258,10 @@ namespace file_ani {
         }
 
         if (_file_animation_opened_flag[slot] == 1) {
-            _fclose(_file_animation[slot]);
+            fclose(_file_animation[slot]);
         }
 
-        _file_animation[slot] = _fopen(filename, "rb");
+        _file_animation[slot] = fopen(filename, "rb");
 
         if (_file_animation[slot] == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
@@ -271,7 +271,7 @@ namespace file_ani {
             char local_3c[60];
             _sprintf(local_3c, "%s%s", farload::_secondary_drive_path, filename);
 
-            _file_animation[slot] = _fopen(local_3c, "rb");
+            _file_animation[slot] = fopen(local_3c, "rb");
 
             if (_file_animation[slot] == nullptr) {
                 farload::Error_Handler_(local_3c, 1, file_index);
@@ -280,7 +280,7 @@ namespace file_ani {
 
         _file_animation_opened_flag[slot] = 1;
 
-        _fread(_file_lbx_header, 0x804, 1, _file_animation[slot]);
+        fread(_file_lbx_header, 0x804, 1, _file_animation[slot]);
 
         uint16_t* header16 = reinterpret_cast<uint16_t*>(_file_lbx_header);
         if (header16[1] != 0xFEAD) {
@@ -299,9 +299,9 @@ namespace file_ani {
         _file_animation_end_multi[slot] = end_offset;
         _file_animation_length_multi[slot] = end_offset - start_offset;
 
-        _fseek(_file_animation[slot], start_offset, 0);
+        fseek(_file_animation[slot], start_offset, 0);
 
-        _fread(_file_lbx_header, 0xAAA, 1, _file_animation[slot]);
+        fread(_file_lbx_header, 0xAAA, 1, _file_animation[slot]);
     }
 
     void __cdecl Draw_Multi_File_Animation_Stencil_(int16_t anim_idx) {
@@ -329,8 +329,8 @@ namespace file_ani {
             exitm::Exit_With_Message(s_File_Animation_Frame_Too_Large);
         }
 
-        _fseek(_file_animation[anim_idx], read_offset, 0);
-        _fread(_file_animation_buffer, frame_size, 1, _file_animation[anim_idx]);
+        fseek(_file_animation[anim_idx], read_offset, 0);
+        fread(_file_animation_buffer, frame_size, 1, _file_animation[anim_idx]);
 
         if (video::screen_refresh_flag >= 2) {
             setvesa::Add_Square_To_Scan_List_(
@@ -401,8 +401,8 @@ namespace file_ani {
         }
 
         uint8_t* sprite = _file_animation_buffer;
-        _fseek(_file_animation[anim_idx], read_offset, 0);
-        _fread(sprite, frame_size, 1, _file_animation[anim_idx]);
+        fseek(_file_animation[anim_idx], read_offset, 0);
+        fread(sprite, frame_size, 1, _file_animation[anim_idx]);
 
         if (video::screen_refresh_flag >= 2) {
             setvesa::Add_Square_To_Scan_List_(

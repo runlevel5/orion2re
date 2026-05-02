@@ -32,17 +32,13 @@ namespace FLEETPOP {
         reinterpret_cast<Fn>(0x00404790)(x, y, content_offset_x, content_offset_y, count, out_value);
     }
 
-    inline void __cdecl Draw_Small_Fleet_Box_Frame_(
+    void __cdecl Draw_Small_Fleet_Box_Frame_(
         int16_t x,
         int16_t y,
-        int16_t content_offset_x,
-        int16_t content_offset_y,
-        int16_t count,
-        int16_t* out_value
-    ) {
-        using Fn = void(__cdecl*)(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t*);
-        reinterpret_cast<Fn>(0x00404910)(x, y, content_offset_x, content_offset_y, count, out_value);
-    }
+        int16_t x_offset,
+        int16_t y_offset,
+        int16_t fleet_count,
+        int16_t* current_y);
 
     inline void __cdecl Draw_Fleet_Pop_Added_Buttons_(int16_t x, int16_t y) {
         using Fn = void(__cdecl*)(int16_t, int16_t);

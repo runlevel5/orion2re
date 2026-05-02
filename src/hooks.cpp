@@ -3932,6 +3932,10 @@ namespace hooks {
         { 0x00479000, &INITGAME::Init_Players_ },
         { 0x00498160, &RACESEL::Convert_Custom_Race_Flags_ },
         { 0x00513B00, &MOVEBOX::Moveable_Box_Dimensions_ },
+        { 0x005275C0, &mouse::Check_Mouse_Buffer_ },
+        { 0x004B3610, &LOADER::Load_Player_Special_Names_ },
+        { 0x0049A360, &HACCESS::Build_Saved_Ship_Array_ },
+        { 0x00404910, &FLEETPOP::Draw_Small_Fleet_Box_Frame_ },
     };
 
     void Install_Hooks()

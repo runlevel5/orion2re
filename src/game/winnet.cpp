@@ -99,7 +99,7 @@ namespace WINNET {
         uint32_t insert_idx = _session_count;
 
         for (uint32_t i = 0; i < _session_count; ++i) {
-            if (__strcmpi(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
+            if (_strcmpi(session_desc->szSessionName, _sessions[i]->szSessionName) < 0) {
                 insert_idx = i;
                 _sessions[_session_count] = reinterpret_cast<LPDPSESSIONDESC>(_malloc(sizeof(DPSESSIONDESC)));
 

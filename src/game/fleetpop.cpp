@@ -792,6 +792,77 @@ void __cdecl Draw_Fleet_Movement_Box_() {
     }
 }
 
+void __cdecl Draw_Small_Fleet_Box_Frame_(
+        int16_t x,
+        int16_t y,
+        int16_t x_offset,
+        int16_t y_offset,
+        int16_t fleet_count,
+        int16_t* current_y) {
+    int32_t grid_rows = (((int32_t)fleet_count - 1) / 3) + 1;
+    if (grid_rows >= 3) {
+        grid_rows = 3;
+    }
+
+    const int16_t left_x = static_cast<int16_t>(x + x_offset);
+    const int16_t right_x = static_cast<int16_t>(left_x + ::_fleet_box_width);
+    const int16_t start_y = static_cast<int16_t>(y + y_offset);
+    uint32_t saved_window_status = 0;
+
+    *current_y = start_y;
+
+    MISC::Save_Window_Status_(&saved_window_status);
+
+    int32_t clipped_bottom = (int32_t)::_fleet_box_field8_0xe + (int32_t)y_offset + (int32_t)y;
+    if (clipped_bottom >= 0x1A5) {
+        clipped_bottom = 0x1A5;
+    }
+
+    graphics::Set_Window_(left_x, start_y, right_x, static_cast<int16_t>(clipped_bottom));
+    video::Clip_On_();
+    graphics::Fill_(
+            static_cast<int16_t>(left_x + 6),
+            static_cast<int16_t>(start_y + 0x29),
+            static_cast<int16_t>(right_x - 6),
+            static_cast<int16_t>(start_y + ::_fleet_box_field8_0xe + 0x1D),
+            0);
+    MISC::Restore_Window_Status_(saved_window_status);
+
+    *current_y = start_y;
+
+    s_animation_header* top_frame =
+            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x34, MOX::_global_cache_seg);
+    animate::Draw_(left_x, *current_y, top_frame);
+    *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(top_frame));
+
+    (void)animate::Get_Height_(top_frame);
+
+    const int16_t grid_height =
+            FLEETPOP::Fleet_Box_Grid_Height_(static_cast<int16_t>(grid_rows));
+
+    clipped_bottom = (int32_t)(*current_y) + (int32_t)grid_height;
+    if (clipped_bottom >= 0x1A5) {
+        clipped_bottom = 0x1A5;
+    }
+
+    MISC::Save_Window_Status_(&saved_window_status);
+    graphics::Set_Window_(left_x, *current_y, right_x, static_cast<int16_t>(clipped_bottom));
+    video::Clip_On_();
+
+    MOX::_fleet_box_grid_sm_seg4 =
+            buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x36, MOX::_global_cache_seg);
+    animate::Draw_(left_x, *current_y, (s_animation_header*)MOX::_fleet_box_grid_sm_seg4);
+
+    MISC::Restore_Window_Status_(saved_window_status);
+
+    *current_y = static_cast<int16_t>(*current_y + grid_height);
+
+    s_animation_header* bottom_frame =
+            (s_animation_header*)buffer::Buffer_Reload_(::s_BUFFER0_LBX_00551124, 0x38, MOX::_global_cache_seg);
+    animate::Draw_(left_x, *current_y, bottom_frame);
+    *current_y = static_cast<int16_t>(*current_y + animate::Get_Height_(bottom_frame));
+}
+
 void __cdecl Fleet_Box_Data_(int16_t ship_count) {
     if (MOX::_first_time != 0) {
         MOX::_fleet_box_scroll_first_ship = 0;

@@ -1143,7 +1143,7 @@ namespace NETMOX {
 
     size_t __cdecl fread_modem_file_(void* ptr, size_t size, size_t count, s_net_modem_file* modem_file) {
         if (modem_file->mode == 1) {
-            return _fread(ptr, size, count, modem_file->file);
+            return fread(ptr, size, count, modem_file->file);
         }
 
         if (modem_file->mode != 2) {
@@ -1569,7 +1569,7 @@ namespace NETMOX {
                 return &_secret_modem_file;
             }
 
-            _secret_modem_file.file = _fopen(s_modem_tmp_0055ad4c, mode_str);
+            _secret_modem_file.file = fopen(s_modem_tmp_0055ad4c, mode_str);
             if (_secret_modem_file.file == nullptr) {
                 exitm::Exit_With_message2_(_modem_disk_error);
                 return &_secret_modem_file;

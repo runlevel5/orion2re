@@ -99,4 +99,28 @@ namespace LOADER {
         // Initialize the start of the frame offset data area
         memset(anim_seg->frame_offsets, 0, 20);
     }
+
+    void __cdecl Load_Player_Special_Names_() {
+        char* const loaded_names = (char*)farload::Far_Reload_(
+            s_RACESTUF_lbx_00558550,
+            static_cast<int32_t>(static_cast<uint8_t>(MOX::_settings.language)) + 8,
+            (void*)alloc::_special_names_seg);
+
+        int16_t name_offset = 0;
+        int16_t name_index = 1;
+
+        MOX::_special_ability_names[0] = loaded_names;
+
+        do {
+            name_offset = static_cast<int16_t>(
+                name_offset + static_cast<int16_t>(strlen(loaded_names + name_offset)));
+
+            while (loaded_names[name_offset] == '\0') {
+                ++name_offset;
+            }
+
+            MOX::_special_ability_names[name_index] = loaded_names + name_offset;
+            ++name_index;
+        } while (name_index < 0x20);
+    }
 }

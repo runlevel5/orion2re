@@ -7,8 +7,8 @@ namespace FILEDEF {
         FILE* file = FID_conflict_wfopen("MOX.SET", "rb");
         if (file != nullptr) {
             // Read 553 bytes (size of s_settings up to version/seed block)
-            _fread(&MOX::_settings, 0x229, 1, file);
-            _fclose(file);
+            fread(&MOX::_settings, 0x229, 1, file);
+            fclose(file);
             RUSS::Assert_Settings_();
         }
 
@@ -25,14 +25,11 @@ namespace FILEDEF {
         }
 
         // Write the settings structure (size 0x229 = 553 bytes)
-        _fwrite(&MOX::_settings, 0x229, 1, file);
-        _fclose(file);
+        fwrite(&MOX::_settings, 0x229, 1, file);
+        fclose(file);
 
         // Re-assert state after saving
         RUSS::Assert_Settings_();
-
-        // Redundant file closure per original binary assembly logic
-        _fclose(file);
 
         return true;
     }
@@ -67,7 +64,7 @@ namespace FILEDEF {
 
         RUSS::Assert_Settings_();
 
-        FILE* fp = _wfopen(filename, s_wb_00551178); // "wb"
+        FILE* fp = fopen(filename, s_wb_00551178); // "wb"
 
         if (fp == nullptr) {
             char error_msg[20];
@@ -81,87 +78,87 @@ namespace FILEDEF {
 
         uint32_t save_header = 0xe0;
         MISC::Increment_Mouse_Clock_Image_();
-        _fwrite(&save_header, 4, 1, fp);
+        fwrite(&save_header, 4, 1, fp);
 
         int desc_slot = (slot > 8) ? 9 : (int)slot;
-        _fwrite(&MOX::_save_game_description[desc_slot], 37, 1, fp);
-        _fwrite(&MOX::_stardate, 4, 1, fp);
-        _fwrite(&MOX::_game_type, 1, 1, fp);
-        _fwrite(&MOX::_settings, 553, 1, fp); // 0x229 bytes
+        fwrite(&MOX::_save_game_description[desc_slot], 37, 1, fp);
+        fwrite(&MOX::_stardate, 4, 1, fp);
+        fwrite(&MOX::_game_type, 1, 1, fp);
+        fwrite(&MOX::_settings, 553, 1, fp); // 0x229 bytes
 
         RUSS::Mox_Update_();
-        _fwrite(&random_seed, 4, 1, fp);
-        _fwrite(&MOX::_NUM_COLONIES, 2, 1, fp);
-        _fwrite(MOX::_colony, sizeof(s_colony), MAX_COLONIES, fp); // 0x169 per item
+        fwrite(&random_seed, 4, 1, fp);
+        fwrite(&MOX::_NUM_COLONIES, 2, 1, fp);
+        fwrite(MOX::_colony, sizeof(s_colony), MAX_COLONIES, fp); // 0x169 per item
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_planet_count, 2, 1, fp);
-        _fwrite(MOX::_planet, sizeof(s_planet_data), MAX_PLANETS, fp); // 0x11 per item
+        fwrite(&MOX::_planet_count, 2, 1, fp);
+        fwrite(MOX::_planet, sizeof(s_planet_data), MAX_PLANETS, fp); // 0x11 per item
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_NUM_STARS, 2, 1, fp);
-        _fwrite(MOX::_star, sizeof(s_star_data), MAX_STARS, fp); // 0x71 per item
+        fwrite(&MOX::_NUM_STARS, 2, 1, fp);
+        fwrite(MOX::_star, sizeof(s_star_data), MAX_STARS, fp); // 0x71 per item
 
         RUSS::Mox_Update_();
-        _fwrite(MOX::_leaders, sizeof(s_leader_data), MAX_LEADERS, fp); // 0x3b per item
+        fwrite(MOX::_leaders, sizeof(s_leader_data), MAX_LEADERS, fp); // 0x3b per item
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_NUM_PLAYERS, 2, 1, fp);
-        _fwrite(MOX::_player, sizeof(s_player), MAX_PLAYERS, fp); // 0xea9 per item
+        fwrite(&MOX::_NUM_PLAYERS, 2, 1, fp);
+        fwrite(MOX::_player, sizeof(s_player), MAX_PLAYERS, fp); // 0xea9 per item
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_NUM_SHIPS, 2, 1, fp);
-        _fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp); // 0x81 per item
+        fwrite(&MOX::_NUM_SHIPS, 2, 1, fp);
+        fwrite(MOX::_ship, sizeof(s_ship_data), MAX_SHIPS, fp); // 0x81 per item
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_moveable_box, 28, 5, fp); // 0x1c per item
-        _fwrite(&MOX::_moveable_box_order, 2, 5, fp);
-        _fwrite(&MOX::_PLAYER_NUM, 2, 1, fp);
-        _fwrite(&MOX::_max_map_scale, 2, 1, fp);
-        _fwrite(&MOX::_max_zoom_count, 2, 1, fp);
+        fwrite(&MOX::_moveable_box, 28, 5, fp); // 0x1c per item
+        fwrite(&MOX::_moveable_box_order, 2, 5, fp);
+        fwrite(&MOX::_PLAYER_NUM, 2, 1, fp);
+        fwrite(&MOX::_max_map_scale, 2, 1, fp);
+        fwrite(&MOX::_max_zoom_count, 2, 1, fp);
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_star_bg_index, 1, 1, fp);
-        _fwrite(&MOX::_MAP_MAX_X, 2, 1, fp);
-        _fwrite(&MOX::_MAP_MAX_Y, 2, 1, fp);
-        _fwrite(&MOX::_fleet_icon_button_count, 2, 1, fp);
-        _fwrite(MOX::_nebula, 20, 1, fp); // 0x14 size
-        _fwrite(&MOX::_NUM_NEBULAS, 1, 1, fp);
-        _fwrite(&MOX::_bill_savegame, 12, 1, fp); // 0xc size
+        fwrite(&MOX::_star_bg_index, 1, 1, fp);
+        fwrite(&MOX::_MAP_MAX_X, 2, 1, fp);
+        fwrite(&MOX::_MAP_MAX_Y, 2, 1, fp);
+        fwrite(&MOX::_fleet_icon_button_count, 2, 1, fp);
+        fwrite(MOX::_nebula, 20, 1, fp); // 0x14 size
+        fwrite(&MOX::_NUM_NEBULAS, 1, 1, fp);
+        fwrite(&MOX::_bill_savegame, 12, 1, fp); // 0xc size
 
         RUSS::Mox_Update_();
-        _fwrite(&REPORT::_n_reports, 2, 1, fp);
-        _fwrite(&REPORT::_reports, 950, 1, fp); // 0x3b6 size
-        _fwrite(&REPORT::_done_player_reports, 1, 1, fp);
-        _fwrite(&REPORT::_something_interesting_happened, 8, 1, fp);
-        _fwrite(&REPORT::_done_colonize_check, 9, 1, fp);
-        _fwrite(&EVENTS::_event_data, 9, 36, fp);
+        fwrite(&REPORT::_n_reports, 2, 1, fp);
+        fwrite(&REPORT::_reports, 950, 1, fp); // 0x3b6 size
+        fwrite(&REPORT::_done_player_reports, 1, 1, fp);
+        fwrite(&REPORT::_something_interesting_happened, 8, 1, fp);
+        fwrite(&REPORT::_done_colonize_check, 9, 1, fp);
+        fwrite(&EVENTS::_event_data, 9, 36, fp);
 
         RUSS::Mox_Update_();
-        _fwrite(&MSG_::_msgs, 18, 100, fp); // 0x12 per item
-        _fwrite(&MSG_::_first_msg, 8, 1, fp);
-        _fwrite(&MSG_::_max_msgs, 8, 1, fp);
-        _fwrite(&MSG_::_n_msgs, 8, 1, fp);
-        _fwrite(&REPORT::_displayed_msgs, 1, 1, fp);
-        _fwrite(&REPORT::_displayed_gnn, 1, 1, fp);
+        fwrite(&MSG_::_msgs, 18, 100, fp); // 0x12 per item
+        fwrite(&MSG_::_first_msg, 8, 1, fp);
+        fwrite(&MSG_::_max_msgs, 8, 1, fp);
+        fwrite(&MSG_::_n_msgs, 8, 1, fp);
+        fwrite(&REPORT::_displayed_msgs, 1, 1, fp);
+        fwrite(&REPORT::_displayed_gnn, 1, 1, fp);
 
         RUSS::Mox_Update_();
-        _fwrite(&diplodef::_COUNCIL_FLAG, 2, 1, fp);
-        _fwrite(&diplodef::_next_council_meeting_turn, 2, 1, fp);
-        _fwrite(&MOX::_antaran_resource_level, 2, 1, fp);
-        _fwrite(&MOX::_chance_for_antaran_invasion, 2, 1, fp);
-        _fwrite(&MOX::_disallow_saves_code, 2, 1, fp);
-        _fwrite(&EVENTS::_last_event_year, 4, 1, fp);
-        _fwrite(&EVENTS::_event_delay_count, 2, 1, fp);
-        _fwrite(&MOX::_antarans, 66, 1, fp);
+        fwrite(&diplodef::_COUNCIL_FLAG, 2, 1, fp);
+        fwrite(&diplodef::_next_council_meeting_turn, 2, 1, fp);
+        fwrite(&MOX::_antaran_resource_level, 2, 1, fp);
+        fwrite(&MOX::_chance_for_antaran_invasion, 2, 1, fp);
+        fwrite(&MOX::_disallow_saves_code, 2, 1, fp);
+        fwrite(&EVENTS::_last_event_year, 4, 1, fp);
+        fwrite(&EVENTS::_event_delay_count, 2, 1, fp);
+        fwrite(&MOX::_antarans, 66, 1, fp);
 
         RUSS::Mox_Update_();
-        _fwrite(&MOX::_cur_map_scale, 2, 1, fp);
-        _fwrite(&MOX::_cur_map_x, 2, 1, fp);
-        _fwrite(&MOX::_cur_map_y, 2, 1, fp);
-        _fwrite(&padding, 1000, 1, fp);
+        fwrite(&MOX::_cur_map_scale, 2, 1, fp);
+        fwrite(&MOX::_cur_map_x, 2, 1, fp);
+        fwrite(&MOX::_cur_map_y, 2, 1, fp);
+        fwrite(&padding, 1000, 1, fp);
 
-        _fclose(fp);
+        fclose(fp);
 
         HAROLD::Restore_Mouse_List_();
         RUSS::Assert_Settings_();
@@ -183,14 +180,14 @@ namespace FILEDEF {
         RUSS::Mox_Update_();
         RUSS::Assert_Settings_();
 
-        FILE* file = _wfopen(filename, "rb");
+        FILE* file = fopen(filename, "rb");
         if (file == nullptr) {
             RUSS::PFMT_(0, 0, "File read error");
             hgetch_();
             return 0;
         }
 
-        _fread(&header_val, 4, 1, file);
+        fread(&header_val, 4, 1, file);
         if (header_val != 0xe0) {
             const char* fmt = nullptr;
             // TODO: Fix me
@@ -207,103 +204,103 @@ namespace FILEDEF {
             }
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 639, 479, 0);
-            _fclose(file);
+            fclose(file);
             return 0;
         }
 
         MISC::Increment_Mouse_Clock_Image_();
 
         int desc_idx = (save_idx > 9) ? 9 : (int)save_idx;
-        _fread(&MOX::_save_game_description[desc_idx], 37, 1, file);
-        _fread(&MOX::_stardate, 4, 1, file);
-        _fread(&MOX::_game_type, 1, 1, file);
-        _fread(&saved_settings, 0x229, 1, file);
-        _fread(&random_seed, 4, 1, file);
+        fread(&MOX::_save_game_description[desc_idx], 37, 1, file);
+        fread(&MOX::_stardate, 4, 1, file);
+        fread(&MOX::_game_type, 1, 1, file);
+        fread(&saved_settings, 0x229, 1, file);
+        fread(&random_seed, 4, 1, file);
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_NUM_COLONIES, 2, 1, file);
+        fread(&MOX::_NUM_COLONIES, 2, 1, file);
         for (int i = 0; i < MAX_COLONIES; ++i) {
-            _fread(&MOX::_colony[i], sizeof(s_colony), 1, file);
+            fread(&MOX::_colony[i], sizeof(s_colony), 1, file);
         }
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_planet_count, 2, 1, file);
+        fread(&MOX::_planet_count, 2, 1, file);
         for (int i = 0; i < MAX_PLANETS; ++i) {
-            _fread(&MOX::_planet[i], sizeof(s_planet_data), 1, file);
+            fread(&MOX::_planet[i], sizeof(s_planet_data), 1, file);
         }
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_NUM_STARS, 2, 1, file);
+        fread(&MOX::_NUM_STARS, 2, 1, file);
         for (int i = 0; i < MAX_STARS; ++i) {
-            _fread(&MOX::_star[i], sizeof(s_star_data), 1, file);
+            fread(&MOX::_star[i], sizeof(s_star_data), 1, file);
         }
 
         RUSS::Mox_Update_();
         for (int i = 0; i < MAX_LEADERS; ++i) {
-            _fread(&MOX::_leaders[i], sizeof(s_leader_data), 1, file);
+            fread(&MOX::_leaders[i], sizeof(s_leader_data), 1, file);
         }
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_NUM_PLAYERS, 2, 1, file);
+        fread(&MOX::_NUM_PLAYERS, 2, 1, file);
         for (int i = 0; i < MAX_PLAYERS; ++i) {
-            _fread(&MOX::_player[i], sizeof(s_player), 1, file);
+            fread(&MOX::_player[i], sizeof(s_player), 1, file);
         }
 
-        _fread(&MOX::_NUM_SHIPS, 2, 1, file);
+        fread(&MOX::_NUM_SHIPS, 2, 1, file);
         for (int i = 0; i < MAX_SHIPS; ++i) {
-            _fread(&MOX::_ship[i], sizeof(s_ship_data), 1, file);
+            fread(&MOX::_ship[i], sizeof(s_ship_data), 1, file);
         }
 
-        _fread(&MOX::_moveable_box, 0x1c, 5, file);
-        _fread(&MOX::_moveable_box_order, 2, 5, file);
-        _fread(&MOX::_PLAYER_NUM, 2, 1, file);
-        _fread(&MOX::_max_map_scale, 2, 1, file);
-        _fread(&MOX::_max_zoom_count, 2, 1, file);
-        _fread(&MOX::_star_bg_index, 1, 1, file);
-        _fread(&MOX::_MAP_MAX_X, 2, 1, file);
-        _fread(&MOX::_MAP_MAX_Y, 2, 1, file);
+        fread(&MOX::_moveable_box, 0x1c, 5, file);
+        fread(&MOX::_moveable_box_order, 2, 5, file);
+        fread(&MOX::_PLAYER_NUM, 2, 1, file);
+        fread(&MOX::_max_map_scale, 2, 1, file);
+        fread(&MOX::_max_zoom_count, 2, 1, file);
+        fread(&MOX::_star_bg_index, 1, 1, file);
+        fread(&MOX::_MAP_MAX_X, 2, 1, file);
+        fread(&MOX::_MAP_MAX_Y, 2, 1, file);
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_fleet_icon_button_count, 2, 1, file);
-        _fread(MOX::_nebula, 0x14, 1, file);
-        _fread(&MOX::_NUM_NEBULAS, 1, 1, file);
+        fread(&MOX::_fleet_icon_button_count, 2, 1, file);
+        fread(MOX::_nebula, 0x14, 1, file);
+        fread(&MOX::_NUM_NEBULAS, 1, 1, file);
 
         if (MOX::_nebula_screen_seg == 0) {
             MOX::_NUM_NEBULAS = 0;
         }
 
-        _fread(&MOX::_bill_savegame, 0xc, 1, file);
+        fread(&MOX::_bill_savegame, 0xc, 1, file);
         RUSS::Mox_Update_();
 
-        _fread(&REPORT::_n_reports, 2, 1, file);
-        _fread(&REPORT::_reports, 0x3b6, 1, file);
-        _fread(&REPORT::_done_player_reports, 1, 1, file);
-        _fread(&REPORT::_something_interesting_happened, 8, 1, file);
-        _fread(&REPORT::_done_colonize_check, 9, 1, file);
-        _fread(&EVENTS::_event_data, 9, 36, file);
+        fread(&REPORT::_n_reports, 2, 1, file);
+        fread(&REPORT::_reports, 0x3b6, 1, file);
+        fread(&REPORT::_done_player_reports, 1, 1, file);
+        fread(&REPORT::_something_interesting_happened, 8, 1, file);
+        fread(&REPORT::_done_colonize_check, 9, 1, file);
+        fread(&EVENTS::_event_data, 9, 36, file);
 
         RUSS::Mox_Update_();
-        _fread(&MSG_::_msgs, 0x12, 100, file);
-        _fread(&MSG_::_first_msg, 8, 1, file);
-        _fread(&MSG_::_max_msgs, 8, 1, file);
-        _fread(&MSG_::_n_msgs, 8, 1, file);
-        _fread(&REPORT::_displayed_msgs, 1, 1, file);
-        _fread(&REPORT::_displayed_gnn, 1, 1, file);
-        _fread(&diplodef::_COUNCIL_FLAG, 2, 1, file);
-        _fread(&diplodef::_next_council_meeting_turn, 2, 1, file);
+        fread(&MSG_::_msgs, 0x12, 100, file);
+        fread(&MSG_::_first_msg, 8, 1, file);
+        fread(&MSG_::_max_msgs, 8, 1, file);
+        fread(&MSG_::_n_msgs, 8, 1, file);
+        fread(&REPORT::_displayed_msgs, 1, 1, file);
+        fread(&REPORT::_displayed_gnn, 1, 1, file);
+        fread(&diplodef::_COUNCIL_FLAG, 2, 1, file);
+        fread(&diplodef::_next_council_meeting_turn, 2, 1, file);
 
         RUSS::Mox_Update_();
-        _fread(&MOX::_antaran_resource_level, 2, 1, file);
-        _fread(&MOX::_chance_for_antaran_invasion, 2, 1, file);
-        _fread(&MOX::_disallow_saves_code, 2, 1, file);
-        _fread(&EVENTS::_last_event_year, 4, 1, file);
-        _fread(&EVENTS::_event_delay_count, 2, 1, file);
-        _fread(&MOX::_antarans, 66, 1, file);
-        _fread(&MOX::_cur_map_scale, 2, 1, file);
-        _fread(&MOX::_cur_map_x, 2, 1, file);
-        _fread(&MOX::_cur_map_y, 2, 1, file);
-        _fread(&buffer_1000, 1000, 1, file);
-        _fclose(file);
+        fread(&MOX::_antaran_resource_level, 2, 1, file);
+        fread(&MOX::_chance_for_antaran_invasion, 2, 1, file);
+        fread(&MOX::_disallow_saves_code, 2, 1, file);
+        fread(&EVENTS::_last_event_year, 4, 1, file);
+        fread(&EVENTS::_event_delay_count, 2, 1, file);
+        fread(&MOX::_antarans, 66, 1, file);
+        fread(&MOX::_cur_map_scale, 2, 1, file);
+        fread(&MOX::_cur_map_x, 2, 1, file);
+        fread(&MOX::_cur_map_y, 2, 1, file);
+        fread(&buffer_1000, 1000, 1, file);
+        fclose(file);
 
         MOX2::Init_Map_Defaults_();
         random::Set_Random_Seed_(random_seed);
@@ -359,19 +356,19 @@ namespace FILEDEF {
             char num_str[8];
             char filename[16];
 
-            __itoa(i + 1, num_str, 10);
+            itoa(i + 1, num_str, 10);
 
             strcpy(filename, s_SAVE_005568fc);
             strcat(filename, num_str);
             strcat(filename, s_GAM_005568f4);
 
             if (accss::_access_(filename, 0) == 0) {
-                FILE* fp = _fopen(filename, s_rb_0055117c);
+                FILE* fp = fopen(filename, s_rb_0055117c);
                 if (fp != nullptr) {
                     int32_t type;
-                    _fread(&type, 4, 1, fp);
-                    _fread(MOX::_save_game_description[i].description, 37, 1, fp);
-                    _fread(&save_times[i], 4, 1, fp);
+                    fread(&type, 4, 1, fp);
+                    fread(MOX::_save_game_description[i].description, 37, 1, fp);
+                    fread(&save_times[i], 4, 1, fp);
 
                     if (LOADSAVE::Is_Valid_Game_Type_(type)) {
                         if (i == 9) {
@@ -383,7 +380,7 @@ namespace FILEDEF {
                         save_times[i] = -1;
                         strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
                     }
-                    _fclose(fp);
+                    fclose(fp);
                 }
             } else {
                 strcpy(MOX::_save_game_description[i].description, HAROLD::H_Message_(0x184));
@@ -397,12 +394,12 @@ namespace FILEDEF {
         char filename[16];
 
         _sprintf(filename, s_SAVE_d_GAM_00556944, save_slot + 1);
-        FILE* file = _fopen(filename, s_rb_0055117c);
+        FILE* file = fopen(filename, s_rb_0055117c);
         if (file != nullptr) {
-            if (_fseek(file, 0x2D, SEEK_SET) == 0) {
-                _fread(&game_type, 1, 1, file);
+            if (fseek(file, 0x2D, SEEK_SET) == 0) {
+                fread(&game_type, 1, 1, file);
             }
-            _fclose(file);
+            fclose(file);
         }
         return game_type;
     }
@@ -412,7 +409,7 @@ namespace FILEDEF {
         FILE* file = FID_conflict_wfopen("MOX.SET", "rb");
 
         if (file != nullptr) {
-            _fclose(file);
+            fclose(file);
 
             Load_Game_Settings_();
 

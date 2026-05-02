@@ -205,11 +205,11 @@ namespace MOX2 {
 
         // Check if language.ini exists
         if (dos::DIR_(s_language_ini, dir_buffer) != 0) {
-            FILE* file = _wfopen(s_language_ini, s_rt);
+            FILE* file = fopen(s_language_ini, s_rt);
             if (file) {
                 // Read language code from file
-                _fgets(line_buffer, 0x3C, file);
-                _fclose(file);
+                fgets(line_buffer, 0x3C, file);
+                fclose(file);
 
                 // Convert value (offset 16 used in assembly, likely skipping a header)
                 // but the result is currently discarded in this implementation.
@@ -404,9 +404,9 @@ namespace MOX2 {
             return;
         }
 
-        config_file = _wfopen(s_orioncd_ini_00557bec, s_rt);
-        _fgets(alternate_path, 0x3c, config_file);
-        _fclose(config_file);
+        config_file = fopen(s_orioncd_ini_00557bec, s_rt);
+        fgets(alternate_path, 0x3c, config_file);
+        fclose(config_file);
 
         alternate_path[60] = '\0';
         path_length = static_cast<int16_t>(strlen(alternate_path));
