@@ -43,14 +43,14 @@ namespace MAINSCR {
     inline int8_t& _fleet_ship_selection_status = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005961FC});
     inline int16_t& _fleet_icon_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005961F6});
 
-    inline int16_t (&_hotseat_system_box)[8][4] =
-            *reinterpret_cast<int16_t (*)[8][4]>(std::uintptr_t{0x00596140});
+    inline s_hotseat_system_box_state (&_hotseat_system_box)[8] =
+            *reinterpret_cast<s_hotseat_system_box_state(*)[8]>(std::uintptr_t{0x00596140});
 
     inline uint8_t (&_hotseat_map_scale)[8] =
             *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x005961A0});
 
-    inline int16_t (&_hotseat_fleet_box)[8][4] =
-            *reinterpret_cast<int16_t (*)[8][4]>(std::uintptr_t{0x005961B0});
+    inline s_hotseat_fleet_box_state (&_hotseat_fleet_box)[8] =
+            *reinterpret_cast<s_hotseat_fleet_box_state(*)[8]>(std::uintptr_t{0x005961B0});
 
     inline int16_t& _moveable_box_0_id =
             *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597862});
@@ -322,9 +322,5 @@ namespace MAINSCR {
 
     void __cdecl Wrapper_For_Normal_System_Fields_();
 
-    inline void __cdecl Save_Hotseat_Map_Info_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004CBD70 });
-        fn();
-    }
+    void __cdecl Save_Hotseat_Map_Info_();
 }

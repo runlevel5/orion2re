@@ -1,7 +1,7 @@
 #pragma once
 
 namespace LIST {
-    using draw_app_fn = void(__cdecl*)(int16_t, int16_t, uint8_t);
+    using draw_app_fn = void(*)(int16_t, int16_t, uint8_t);
 
     void __cdecl Display_List_Page_(s_list_state* state);
 

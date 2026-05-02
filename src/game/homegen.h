@@ -42,7 +42,7 @@ namespace HOMEGEN {
     };
     #pragma pack(pop)
 
-    int __cdecl qsort_1_(const s_orion_candidate* candidate_a, const s_orion_candidate* candidate_b);
+    int __cdecl qsort_1_(const void* candidate_a, const void* candidate_b);
 
     uint8_t __cdecl Build_Home_Star_List_(uint16_t* home_stars_out, int32_t min_dist);
 

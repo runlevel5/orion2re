@@ -114,4 +114,10 @@ namespace HACCESS {
     int16_t __cdecl System_Ship_Scanned_To_Ship_Id_(int16_t ship_node_idx);
 
     void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int16_t player_idx);
+
+    inline void __cdecl Save_Hotseat_Fleet_Box_Ship_(int16_t player_index) {
+        using Fn = void(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0049B050});
+        fn(player_index);
+    }
 }

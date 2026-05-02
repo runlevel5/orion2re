@@ -3925,6 +3925,8 @@ namespace hooks {
         { 0x00499680, &RACESEL::Set_Flag_Screen_Help_ },
         { 0x00498800, &RACESEL::Message_Build_ },
         { 0x004982E0, &RACESEL::Draw_Race_Selection_Screen_ },
+        { 0x004CBD70, &MAINSCR::Save_Hotseat_Map_Info_ },
+        { 0x0049B090, &HACCESS::Set_Hotseat_Fleet_Box_To_Last_Stack_ },
     };
 
     void Install_Hooks()

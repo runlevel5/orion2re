@@ -2814,37 +2814,38 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     }
 
     void __cdecl Restore_Hotseat_Map_Info_() {
-        const int32_t player_idx = static_cast<int32_t>(MOX::_PLAYER_NUM);
+        int32_t player_num = static_cast<int32_t>(MOX::_PLAYER_NUM);
 
-        MOX::_moveable_box[0].x = MAINSCR::_hotseat_system_box[player_idx][0];
+        MOX::_moveable_box[0].x = MAINSCR::_hotseat_system_box[player_num].x;
         if (MOX::_moveable_box[0].x <= 0x15) {
             MOX::_moveable_box[0].x = 0x16;
         }
 
-        MOX::_moveable_box[0].y = MAINSCR::_hotseat_system_box[player_idx][1];
+        MOX::_moveable_box[0].y = MAINSCR::_hotseat_system_box[player_num].y;
         if (MOX::_moveable_box[0].y <= 0x15) {
             MOX::_moveable_box[0].y = 0x16;
         }
 
-        MOX::_moveable_box[0].id = MAINSCR::_hotseat_system_box[player_idx][2];
+        MOX::_moveable_box[0].id = MAINSCR::_hotseat_system_box[player_num].system_id;
 
-        MOX::_moveable_box[2].x = MAINSCR::_hotseat_fleet_box[player_idx][0];
+        MOX::_moveable_box[2].x = MAINSCR::_hotseat_fleet_box[player_num].x;
         if (MOX::_moveable_box[2].x <= 0x15) {
             MOX::_moveable_box[2].x = 0x16;
         }
 
-        MOX::_moveable_box[2].y = MAINSCR::_hotseat_fleet_box[player_idx][1];
+        MOX::_moveable_box[2].y = MAINSCR::_hotseat_fleet_box[player_num].y;
         if (MOX::_moveable_box[2].y <= 0x71) {
             MOX::_moveable_box[2].y = 0x16;
         }
 
-        MOX::_moveable_box[2].id = MAINSCR::_hotseat_fleet_box[player_idx][2];
+        MOX::_moveable_box[2].id = MAINSCR::_hotseat_fleet_box[player_num].box_id;
 
         if (MOVEBOX::Moveable_Box_Selected_(2) != 0) {
-            HACCESS::Set_Hotseat_Fleet_Box_To_Last_Stack_(static_cast<int32_t>(MOX::_PLAYER_NUM));
+            HACCESS::Set_Hotseat_Fleet_Box_To_Last_Stack_(MOX::_PLAYER_NUM);
         }
 
-        MOX::_cur_map_scale = static_cast<int16_t>(MAINSCR::_hotseat_map_scale[player_idx]);
+        player_num = static_cast<int32_t>(MOX::_PLAYER_NUM);
+        MOX::_cur_map_scale = static_cast<int16_t>(MAINSCR::_hotseat_map_scale[player_num]);
         if (MOX::_cur_map_scale == 0) {
             MOX::_cur_map_scale = MOX::_max_map_scale;
         }

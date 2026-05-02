@@ -2245,6 +2245,24 @@ struct s_hof {
     char race_names[10][20];
 };
 
+typedef struct s_hotseat_fleet_box_state s_hotseat_fleet_box_state, *Ps_hotseat_fleet_box_state;
+
+struct s_hotseat_fleet_box_state {
+    int16_t x;
+    int16_t y;
+    int16_t box_id;
+    int16_t stack_ship_id;
+};
+
+typedef struct s_hotseat_system_box_state s_hotseat_system_box_state, *Ps_hotseat_system_box_state;
+
+struct s_hotseat_system_box_state {
+    int16_t x;
+    int16_t y;
+    int16_t system_id;
+    int16_t field3_0x6;
+};
+
 typedef struct s_input_box_state s_input_box_state, *Ps_input_box_state;
 
 struct s_input_box_state {

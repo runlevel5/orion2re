@@ -1,7 +1,9 @@
 #include "pch.h"
 
 namespace HOMEGEN {
-    int __cdecl qsort_1_(const s_orion_candidate* candidate_a, const s_orion_candidate* candidate_b) {
+    int __cdecl qsort_1_(const void* a, const void* b) {
+        const s_orion_candidate* candidate_a = (const s_orion_candidate*)a; 
+        const s_orion_candidate* candidate_b = (const s_orion_candidate*)b;
         return candidate_a->dist - candidate_b->dist;
     }
 
@@ -1210,7 +1212,7 @@ namespace HOMEGEN {
         } while (candidate_count < 4);
 
         // Potential buffer overflow if _NUM_STARS > 72
-        _qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), (int(__cdecl*)(const void*, const void*))qsort_1_);
+        _qsort(candidates, (uint32_t)MOX::_NUM_STARS, sizeof(s_orion_candidate), qsort_1_);
 
         int valid_count = 0;
         for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {

@@ -4191,4 +4191,22 @@ namespace MAINSCR {
         _sprintf(MOX::_temp_string, message_format, player->name, player->race_name);
         fonts::Print_(static_cast<int16_t>(popup_x + 0x27), static_cast<int16_t>(popup_y + 0x3C), MOX::_temp_string);
     }
+
+    void __cdecl Save_Hotseat_Map_Info_() {
+        const int16_t saved_player_num = MOX::_PLAYER_NUM;
+        const int32_t saved_player_index = saved_player_num;
+
+        _hotseat_system_box[saved_player_index].x = MOX::_moveable_box[0].x;
+        _hotseat_system_box[saved_player_index].y = MOX::_moveable_box[0].y;
+        _hotseat_system_box[saved_player_index].system_id = MOX::_moveable_box[0].id;
+
+        _hotseat_fleet_box[saved_player_index].x = MOX::_moveable_box[2].x;
+        _hotseat_fleet_box[saved_player_index].y = MOX::_moveable_box[2].y;
+        _hotseat_fleet_box[saved_player_index].box_id = MOX::_moveable_box[2].id;
+
+        HACCESS::Save_Hotseat_Fleet_Box_Ship_(saved_player_num);
+
+        const int32_t current_player_index = MOX::_PLAYER_NUM;
+        _hotseat_map_scale[current_player_index] = static_cast<uint8_t>(MOX::_cur_map_scale);
+    }
 }

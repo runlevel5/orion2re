@@ -3,7 +3,7 @@
 struct s_animation_header;
 
 namespace FMTPARA {
-    using user_fn = void(__cdecl*)(s_fmtpara_para*, uint32_t, int32_t);
+    using user_fn = void(*)(s_fmtpara_para*, uint32_t, int32_t);
 
     inline char* const _legal_functions = reinterpret_cast<char*>(0x00556288);
     inline char* const _legal_fn_arg_chars = reinterpret_cast<char*>(0x00556298);

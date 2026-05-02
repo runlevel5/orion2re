@@ -804,20 +804,14 @@ namespace HACCESS {
      * @address 0049b090
      */
     void __cdecl Set_Hotseat_Fleet_Box_To_Last_Stack_(int16_t player_idx) {
-        const int16_t ship_idx = MAINSCR::_hotseat_fleet_box[player_idx][3];
+        const int16_t ship_id = MAINSCR::_hotseat_fleet_box[player_idx].stack_ship_id;
 
         MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 
-        if (ship_idx >= 0) {
-            if (HACCESS::Ship_Owner_(ship_idx) == player_idx) {
-                if (MOX::_ship[ship_idx].status < 3) {
-                    MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Id_(ship_idx);
-                } else {
-                    MOX::_fleet_box_ship_stack = -1;
-                }
-            } else {
-                MOX::_fleet_box_ship_stack = -1;
-            }
+        if (ship_id > -1 &&
+            HACCESS::Ship_Owner_(ship_id) == player_idx &&
+            static_cast<int8_t>(MOX::_ship[ship_id].status) < 3) {
+            MOX::_fleet_box_ship_stack = HACCESS::Ship_Stack_From_Ship_Id_(ship_id);
         } else {
             MOX::_fleet_box_ship_stack = -1;
         }
@@ -825,7 +819,7 @@ namespace HACCESS {
         if (MOX::_fleet_box_ship_stack == -1) {
             MOVEBOX::Vanish_Fleet_Movement_Box_();
             MOX::_saved_boxes[2].is_open = 0;
-            MOX::_saved_boxes[2].field_id = MOX::_box_off_flag[2];
+            MOX::_saved_boxes[2].field_id = static_cast<int16_t>(MOX::_box_off_flag[2]);
         }
     }
 }
