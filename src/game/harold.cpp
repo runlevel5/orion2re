@@ -1033,6 +1033,21 @@ namespace HAROLD {
         return has_outpost;
     }
 
+    int8_t __cdecl Planet_Has_Outpost_(int16_t planet_idx) {
+        int8_t has_outpost = 0;
+
+        if (planet_idx != -1) {
+            const int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+            if (colony_idx != -1) {
+                if (MOX::_colony[colony_idx].outpost_flag != 0) {
+                    has_outpost = 1;
+                }
+            }
+        }
+
+        return has_outpost;
+    }
+
     /**
      * @address 004f1050
      */

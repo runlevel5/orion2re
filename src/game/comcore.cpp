@@ -62,7 +62,7 @@ int32_t __cdecl ComInit_(uint16_t msg_size, char* name, void* rec_fn) {
     }
 
     transprt::_userRecFunc = rec_fn;
-    _recFunc = reinterpret_cast<comcore::RecFunc>(transprt::ReceiveLargeUserMessage_);
+    _recFunc = reinterpret_cast<comcore::rec_fn>(transprt::ReceiveLargeUserMessage_);
     _recBufferLength = msg_size + 10;
 
     _userReceiveBuffer = _malloc(_recBufferLength);

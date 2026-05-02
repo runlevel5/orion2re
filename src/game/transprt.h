@@ -1,7 +1,7 @@
 #pragma once
 
 namespace transprt {
-    using user_rec_fn = void(__cdecl*)(int32_t, int32_t, int32_t, uint8_t*);
+    using user_rec_fn = void(*)(int32_t, int32_t, int32_t, uint8_t*);
 
     inline uint32_t& _num_net_players = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00596200});
 

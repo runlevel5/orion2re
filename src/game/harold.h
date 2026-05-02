@@ -135,11 +135,7 @@ namespace HAROLD {
 
     bool __cdecl Player_Has_Outpost_(int16_t player_num, int16_t star_idx);
 
-    inline uint8_t __cdecl Planet_Has_Outpost_(int16_t planet_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004F1430});
-        return fn(planet_idx);
-    }
+    int8_t __cdecl Planet_Has_Outpost_(int16_t planet_idx);
 
     bool __cdecl Player_Has_Visited_(int16_t player_idx, int16_t star_idx);
 

@@ -31,9 +31,9 @@ namespace comcore {
     inline uint32_t& _commsInitTime3 =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591F18});
 
-    using RecFunc = void(__cdecl*)(uint32_t, uint32_t, uint8_t*);
-    inline RecFunc& _recFunc =
-        *reinterpret_cast<RecFunc*>(std::uintptr_t{0x00591F1C});
+    using rec_fn = void(__cdecl*)(uint32_t, uint32_t, uint8_t*);
+    inline rec_fn& _recFunc =
+        *reinterpret_cast<rec_fn*>(std::uintptr_t{0x00591F1C});
 
     inline uint32_t& _commsInitTime2 =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00591F38});
