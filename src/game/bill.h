@@ -97,11 +97,7 @@ namespace BILL {
 
     void __cdecl Set_Plyr_Info_Btns_(int16_t btn_val);
 
-    inline int16_t __cdecl Add_Their_Spy_(int16_t player_a_idx, int16_t player_b_idx) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407180});
-        return fn(player_a_idx, player_b_idx);
-    }
+    int16_t __cdecl Add_Their_Spy_(int16_t player_idx, int16_t other_player_idx);
 
     inline char (&_dest_file_name)[32] = *reinterpret_cast<char(*)[32]>(std::uintptr_t{0x00564738});
     inline const char* s_SR_R_x_SC_LBX = reinterpret_cast<const char*>(std::uintptr_t{0x005512B0}); // "SR_R%x_SC.LBX"
@@ -114,9 +110,5 @@ namespace BILL {
 
     char* __cdecl Cache_Player_Spy_Anim_();
 
-    inline char* __cdecl Cache_Player_Trooper_Anim_() {
-        using Fn = char*(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00407B20});
-        return fn();
-    }
+    char* __cdecl Cache_Player_Trooper_Anim_();
 }

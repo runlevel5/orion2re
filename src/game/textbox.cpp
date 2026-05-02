@@ -245,6 +245,44 @@ namespace TEXTBOX {
         Do_Text_Box_(title, message, duration);
     }
 
+    void __cdecl Get_Mox_Text_Box_Base_Colors_(int16_t color_set, uint8_t *out_color_a, uint8_t *out_color_b)
+    {
+        uint8_t base_color;
+
+        if (color_set == 1) {
+            base_color = static_cast<uint8_t>(TEXTBOX::_base_colors[1]);
+        }
+        else if (color_set == 2) {
+            base_color = static_cast<uint8_t>(TEXTBOX::_base_colors[2]);
+        }
+        else {
+            base_color = static_cast<uint8_t>(TEXTBOX::_base_colors[0]);
+        }
+
+        int16_t color_group;
+        switch (MOX::_current_screen) {
+        case 1:
+        case 20:
+        case 25:
+        case 33:
+            color_group = 2;
+            break;
+        case 9:
+            color_group = 3;
+            break;
+        case 10:
+            color_group = 1;
+            break;
+        default:
+            color_group = 0;
+            break;
+        }
+
+        uint8_t color = static_cast<uint8_t>(base_color + color_group * 3);
+        *out_color_a = color;
+        *out_color_b = static_cast<uint8_t>(color + 2);
+    }
+
     void __cdecl Draw_Help_Entry_(int16_t param_1) {
         _box_x = 0;
         _box_y = 0;

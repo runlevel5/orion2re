@@ -11,13 +11,6 @@ namespace MOX2 {
     inline uint8_t& _quick_start = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005662AC });
     inline char* _leave_game_message = reinterpret_cast<char*>(std::uintptr_t{ 0x005A6380 });
 
-    // Suggested name: MOX2::Release_Version_
-    inline void __cdecl Release_Version_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00520200 });
-        fn();
-    }
-
     void __cdecl Set_Mox_Language_();
 
     inline void __cdecl Set_Mox_Alt_Path_() {

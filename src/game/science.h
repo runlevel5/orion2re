@@ -5,7 +5,9 @@ namespace SCIENCE {
         reinterpret_cast<const char*>(std::uintptr_t{ 0x005512B0 }); // "SR_R%x_SC.LBX"
 
     inline const char* _spy_anim_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x005512C0});
+    inline const char* _trooper_anim_fmt = reinterpret_cast<const char*>(std::uintptr_t{0x005512D0});
     inline const char* _spy_anim_find_pat = reinterpret_cast<const char*>(std::uintptr_t{0x005512F0});
+    inline const char* _trooper_anim_find_pat = reinterpret_cast<const char*>(std::uintptr_t{0x00551300});
 
     inline const char* const s_billtext_lbx_0055135c =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x0055135C }); // "billtext.lbx"

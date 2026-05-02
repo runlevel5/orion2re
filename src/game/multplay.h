@@ -117,17 +117,13 @@ namespace MULTPLAY {
 
     void __cdecl Chat_Box_Input_Loop_();
 
-    int16_t __cdecl Hotseat_Player_Status_(int16_t player_idx);
+    int8_t __cdecl Hotseat_Player_Status_(int16_t player_idx);
 
     void __cdecl Hotseat_Get_Colors_();
 
     int16_t __cdecl Hotseat_Get_N_Valid_Players_();
 
-    inline void __cdecl Hotseat_Set_Next_Player_Status_() {
-      using Fn = void(__cdecl*)();
-      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00504520});
-      fn();
-    }
+    void __cdecl Hotseat_Set_Next_Player_Status_(void);
 
     void __cdecl Reload_Initializing_Net_Info_();
 

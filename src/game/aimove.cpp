@@ -2731,4 +2731,44 @@ namespace AIMOVE {
             _flee_stars = nullptr;
         }
     }
+
+    int32_t __cdecl Sort_candidate_stars_(const uint8_t* candidate_star_a, const uint8_t* candidate_star_b) {
+        uint32_t weakest_strength_a = 0xffffffffu;
+        uint32_t weakest_strength_b = 0xffffffffu;
+
+        if (MOX::_NUM_PLAYERS > 0) {
+            for (int16_t player_idx = 0; player_idx < MOX::_NUM_PLAYERS; ++player_idx) {
+                if (player_idx != AIMOVE::_i_ai) {
+                    const uint8_t star_a = *candidate_star_a;
+                    if (((*AIDATA::_star_in_range_of_player)[star_a] >> (player_idx & 0x1f)) & 1) {
+                        const uint32_t strength_a =
+                            static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[star_a][AIMOVE::_i_ai][player_idx][0]);
+                        if (strength_a < weakest_strength_a) {
+                            weakest_strength_a = strength_a;
+                        }
+
+                        const uint8_t star_b = *candidate_star_b;
+                        const uint32_t strength_b =
+                            static_cast<uint32_t>((*AIDATA::_possible_ship_strengths)[star_b][AIMOVE::_i_ai][player_idx][0]);
+                        if (strength_b < weakest_strength_b) {
+                            weakest_strength_b = strength_b;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (weakest_strength_a == 0xffffffffu) {
+            weakest_strength_a = 0;
+        }
+        if (weakest_strength_b == 0xffffffffu) {
+            weakest_strength_b = 0;
+        }
+
+        if (weakest_strength_b > weakest_strength_a) {
+            return -1;
+        }
+
+        return weakest_strength_b < weakest_strength_a;
+    }
 }

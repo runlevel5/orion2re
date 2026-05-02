@@ -44,9 +44,5 @@ namespace AIBUILD {
 
     char* __cdecl Product_Name_(int16_t product_id);
 
-    inline void __cdecl Player_Colony_Autobuild_(s_colony* colony) {
-        using Fn = void(__cdecl*)(s_colony*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0047D540});
-        fn(colony);
-    }
+    void __cdecl Player_Colony_Autobuild_(s_colony* colony);
 }

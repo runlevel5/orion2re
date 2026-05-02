@@ -233,7 +233,7 @@ namespace MOX2 {
         MOX::_debug_saves_on = 1;
         MOX::_turns_between_debug_saves = 1;
 
-        MOX2::Release_Version_();
+        capture::Release_Version_();
 
         MOX::_debug_saves_on = 1;
         MOX::_max_debug_saves = 10;

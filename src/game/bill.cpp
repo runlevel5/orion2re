@@ -110,6 +110,21 @@ namespace BILL {
     }
 
     /**
+     * @address 00407180
+     */
+    int16_t __cdecl Add_Their_Spy_(int16_t player_idx, int16_t other_player_idx) {
+        const uint16_t spy_count =
+                (static_cast<uint8_t>(MOX::_player[player_idx].spies[other_player_idx]) & 0x3f) + 1;
+
+        if (spy_count < 0x40) {
+            MOX::_player[player_idx].spies[other_player_idx] = static_cast<int8_t>(spy_count);
+            return static_cast<int16_t>(spy_count);
+        }
+
+        return 0;
+    }
+
+    /**
      * @address 00406fe0
      */
     int16_t __cdecl Get_My_Spy_Number_(int16_t spy_idx) {
@@ -900,4 +915,27 @@ namespace BILL {
             __pp_max_height = current_y - y + (int16_t)fonts::_font_header.current_height;
         }
     }
+
+char* __cdecl Cache_Player_Trooper_Anim_() {
+    char found_path[52];
+    char source_path[128];
+
+    _sprintf(
+        BILL::_dest_file_name,
+        SCIENCE::_trooper_anim_fmt,
+        static_cast<unsigned int>(static_cast<uint8_t>(MOX::_player[MOX::_PLAYER_NUM].race))
+    );
+
+    if (dos::DIR_(BILL::_dest_file_name, found_path) == 0) {
+        if (dos::DIR_(SCIENCE::_trooper_anim_find_pat, found_path) != 0) {
+            dos::Delete_File_(found_path);
+        }
+
+        strcpy(source_path, farload::_secondary_drive_path);
+        strcat(source_path, BILL::_dest_file_name);
+        BILL::Copy_File_To_File_(source_path, BILL::_dest_file_name);
+    }
+
+    return BILL::_dest_file_name;
+}
 }

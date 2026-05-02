@@ -5,7 +5,9 @@ namespace SCORE {
         return;
     }
 
-    int32_t __cdecl qsort_hof_scores_descending_(int16_t* a, int16_t* b) {
+    int32_t __cdecl qsort_hof_scores_descending_(const void* p1, const void* p2) {
+        const int16_t* a = (const int16_t*)p1;
+        const int16_t* b = (const int16_t*)p2;
         if (b[0] < a[0]) {
             return -1;
         }
@@ -24,18 +26,21 @@ namespace SCORE {
     /**
      * @address 0x004e4980
      */
-    int32_t __cdecl qsort_hof_scores_ascending_(const int16_t* param_1, const int16_t* param_2) {
-        if (param_2[0] < param_1[0]) {
+    int32_t __cdecl qsort_hof_scores_ascending_(const void* param_1, const void* param_2) {
+        const int16_t* p1 = (const int16_t*)param_1;
+        const int16_t* p2 = (const int16_t*)param_2;
+
+        if (p2[0] < p1[0]) {
             return 1;
         }
-        if (param_1[0] < param_2[0]) {
+        if (p1[0] < p2[0]) {
             return -1;
         }
-        if (param_2[0] == param_1[0]) {
-            if (param_2[1] < param_1[1]) {
+        if (p2[0] == p1[0]) {
+            if (p2[1] < p1[1]) {
                 return 1;
             }
-            if (param_1[1] < param_2[1]) {
+            if (p1[1] < p2[1]) {
                 return -1;
             }
         }
@@ -518,7 +523,7 @@ namespace SCORE {
             _hi->sort_list[i][1] = (int16_t)i;
         }
 
-        _qsort(_hi->sort_list, 10, 4, (int(__cdecl*)(const void*, const void*))qsort_hof_scores_descending_);
+        _qsort(_hi->sort_list, 10, 4, qsort_hof_scores_descending_);
 
         int16_t y = 131;
         for (int i = 0; i < 10; ++i) {
@@ -571,7 +576,7 @@ namespace SCORE {
             sort_list[i][0] = _hof.scores[i];
             sort_list[i][1] = i;
         }
-        _qsort(sort_list, 10, 4, (int(__cdecl*)(const void*, const void*))qsort_hof_scores_ascending_);
+        _qsort(sort_list, 10, 4, qsort_hof_scores_ascending_);
     }
 
     /**
@@ -1278,6 +1283,10 @@ namespace SCORE {
 
         SCORE::_hi->raw_captured_population = captured_count;
         random::Set_Random_Seed_(original_seed);
+    }
+
+    int8_t __cdecl Won_Council_Vote_(int16_t player_idx) {
+        return static_cast<int8_t>(MOX::_player[player_idx].won_council_vote);
     }
 
     uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {

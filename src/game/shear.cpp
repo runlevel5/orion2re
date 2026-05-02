@@ -573,17 +573,29 @@ void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint3
     }
 }
 
-    void __cdecl Gray_Scale_Fill_Pixels_(uint8_t* dst, uint8_t* color_map, uint32_t gap, uint32_t width, uint32_t height) {
-        _y_step_8_8 = gap;
-        // The original assembly doesn't use the gap variable, but writes it here.
-        
-        for (uint32_t y = 0; y < height; ++y) {
-            for (uint32_t x = 0; x < width; ++x) {
-                uint8_t pixel = *dst;
-                *dst = color_map[pixel];
-                dst++;
-            }
-        }
-    }
+void __cdecl Gray_Scale_Fill_Pixels_(
+        uint8_t* pixels,
+        uint8_t* gray_scale_table,
+        int32_t y_step_8_8,
+        uint32_t pixels_per_row,
+        uint32_t row_count) {
+    uint8_t* src = pixels;
+    uint8_t* dst = pixels;
+
+    shear::_y_step_8_8 = y_step_8_8;
+    bitmap::_bitmap_temp1 = gray_scale_table;
+    bitmap::_bitmap_temp2 = pixels_per_row;
+
+    gray_scale_table = bitmap::_bitmap_temp1;
+
+    do {
+        uint32_t remaining = bitmap::_bitmap_temp2;
+
+        do {
+            const uint32_t index = *src++;
+            *dst++ = gray_scale_table[index];
+        } while (--remaining != 0);
+    } while (--row_count != 0);
+}
 
 } // namespace shear

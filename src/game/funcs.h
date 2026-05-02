@@ -140,6 +140,12 @@ inline void* __cdecl ___crtGetEnvironmentStringsA() {
     return reinterpret_cast<Fn>(std::uintptr_t{ 0x00547e90 })();
 }
 
+inline MMRESULT (__stdcall*& PTR_timeEndPeriod_005aa5c4)(uint32_t) =
+    *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5C4});
+
+inline MMRESULT (__stdcall*& PTR_timeKillEvent_005aa5cc)(uint32_t) =
+    *reinterpret_cast<MMRESULT (__stdcall**)(uint32_t)>(std::uintptr_t{0x005AA5CC});
+
 inline void __cdecl __exit(int code) {
     using Fn = void(__cdecl*)(int);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x00541630 });

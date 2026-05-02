@@ -37,14 +37,12 @@ namespace TEXTBOX {
     inline MOX2::action_func_t& _textbox_af = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00565ED4});
     inline uint16_t& _old_help_list_active = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565EEC});
     inline const char* s__00551120 = reinterpret_cast<const char*>(std::uintptr_t{0x00551120});
+    inline int32_t (&_base_colors)[3] =
+        *reinterpret_cast<int32_t(*)[3]>(std::uintptr_t{0x00557438});
 
     void __cdecl Get_Help_Lbx_Name_(char* help_lbx_name);
 
-    inline void __cdecl Get_Mox_Text_Box_Base_Colors_(int unknown, uint8_t* color_out_1, uint8_t* color_out_2) {
-        using Fn = void(__cdecl*)(int, uint8_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00471790});
-        fn(unknown, color_out_1, color_out_2);
-    }
+    void __cdecl Get_Mox_Text_Box_Base_Colors_(int16_t color_set, uint8_t *out_color_a, uint8_t *out_color_b);
 
     void __cdecl Text_Box_Startup_(int32_t size);
 

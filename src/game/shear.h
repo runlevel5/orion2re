@@ -11,8 +11,8 @@ namespace shear {
     inline uint32_t& _y_accum_8_8 =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0B4});
 
-    inline uint32_t& _y_step_8_8 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0B8});
+    inline int32_t& _y_step_8_8 =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055C0B8});
 
     inline uint32_t& _noise_threshold =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0BC});
@@ -90,5 +90,5 @@ namespace shear {
 
     void __cdecl Jumble_Bitmap_Pixels_(uint8_t* src_buf, uint32_t jumble_mask, uint32_t noise_threshold, uint8_t* dst_buf, uint32_t width, uint32_t height);
 
-    void __cdecl Gray_Scale_Fill_Pixels_(uint8_t* dst, uint8_t* color_map, uint32_t gap, uint32_t width, uint32_t height);
+    void __cdecl Gray_Scale_Fill_Pixels_(uint8_t* pixels, uint8_t* gray_scale_table, int32_t y_step_8_8, uint32_t pixels_per_row, uint32_t row_count);
 }

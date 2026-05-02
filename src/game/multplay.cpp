@@ -1544,11 +1544,11 @@ void __cdecl Print_Modem_Strings_() {
     fonts::Print_(screen_x + 0x9B, screen_y + 0x5C, NETMOX::_net.modem_settings.dial_number);
 }
 
-int16_t __cdecl Hotseat_Player_Status_(int16_t player_idx) {
-    int16_t status = 0;
+int8_t __cdecl Hotseat_Player_Status_(int16_t player_idx) {
+    int8_t status = 0;
 
     if (MOX::_player[player_idx].objectives == 100 && MOX::_player[player_idx].eliminated == 0) {
-        status = (MOX::_player[player_idx].player_done_flags == 0) + 1;
+        status = (int8_t)((MOX::_player[player_idx].player_done_flags == 0) + 1);
     }
 
     return status;
@@ -3023,6 +3023,35 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         }
 
         return valid_player_count;
+    }
+
+    void __cdecl Hotseat_Set_Next_Player_Status_(void) {
+        int16_t ready_player_count = 0;
+
+        for (int16_t player_idx = 0; player_idx < 8; ++player_idx) {
+            if (player_idx < MOX::_NUM_PLAYERS) {
+                const int8_t player_status = MULTPLAY::Hotseat_Player_Status_(player_idx);
+                MOX::_mp_screen->player_button_status[player_idx] = player_status;
+
+                if ((MOX::_player[player_idx].objectives == 100) &&
+                    (MOX::_player[player_idx].eliminated == 0)) {
+                    MOX::_mp_screen->forced_player_idx = player_idx;
+                    ++MOX::_mp_screen->force_player_selection;
+                }
+
+                if ((MOX::_mp_screen->player_button_status[player_idx] == 1) &&
+                    (MOX::_player[player_idx].eliminated == 0)) {
+                    ++ready_player_count;
+                }
+            }
+        }
+
+        if (MOX::_mp_screen->force_player_selection == ready_player_count) {
+            MOX::_mp_screen->exit_screen_flag = 1;
+            return;
+        }
+
+        MOX::_mp_screen->exit_screen_flag = 0;
     }
 
 }

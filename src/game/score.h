@@ -35,9 +35,9 @@ namespace SCORE {
 
     void __cdecl Init_Hall_Of_Fame_Screen_();
 
-    int32_t __cdecl qsort_hof_scores_descending_(int16_t* a, int16_t* b);
+    int __cdecl qsort_hof_scores_descending_(const void* a, const void* b);
 
-    int32_t __cdecl qsort_hof_scores_ascending_(const int16_t* param_1, const int16_t* param_2);
+    int __cdecl qsort_hof_scores_ascending_(const void* param_1, const void* param_2);
 
     void __cdecl Get_Hall_Of_Fame_Colors_();
 
@@ -131,11 +131,7 @@ namespace SCORE {
 
     void __cdecl nullsub();
 
-    inline uint8_t __cdecl Won_Council_Vote_(int16_t player_idx) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{ 0x004E3650 });
-        return fn(player_idx);
-    }
+    int8_t __cdecl Won_Council_Vote_(int16_t player_idx);
 
     uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx);
 

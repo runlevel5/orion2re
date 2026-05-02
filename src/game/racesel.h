@@ -40,4 +40,24 @@ namespace RACESEL {
 
     void __cdecl Set_Race_Select_Help_();
     void __cdecl Unrequest_Race_(uint8_t race_idx);
+
+    inline uint8_t __cdecl Naming_Popup_(char* name, int16_t race_idx) {
+        using Fn = uint8_t(__cdecl*)(char*, int16_t);
+        return reinterpret_cast<Fn>(0x00499900)(name, race_idx);
+    }
+
+    inline int16_t __cdecl Flag_Screen_(char* color_ptr) {
+        using Fn = int16_t(__cdecl*)(char*);
+        return reinterpret_cast<Fn>(0x004996C0)(color_ptr);
+    }
+
+    inline int16_t __cdecl Racial_Option_Screen_(s_player* plr) {
+        using Fn = int16_t(__cdecl*)(s_player*);
+        return reinterpret_cast<Fn>(0x00438EF0)(plr);
+    }
+
+    inline void __cdecl Draw_Race_Selection_Screen_() {
+        using Fn = void(__cdecl*)();
+        reinterpret_cast<Fn>(0x004982E0)();
+    }
 }

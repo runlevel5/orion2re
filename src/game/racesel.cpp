@@ -147,26 +147,6 @@ void __cdecl Reload_Race_Selection_Screen_() {
     _last_race_seg = (s_animation_header*)farload::Far_Reload_Next_(s_patch13_lbx, 1, MOX::_screen_seg);
 }
 
-void __cdecl Draw_Race_Selection_Screen_() {
-    using Fn = void(__cdecl*)();
-    reinterpret_cast<Fn>(0x004982E0)();
-}
-
-uint8_t __cdecl Naming_Popup_(char* name, int16_t race_idx) {
-    using Fn = uint8_t(__cdecl*)(char*, int16_t);
-    return reinterpret_cast<Fn>(0x00499900)(name, race_idx);
-}
-
-int16_t __cdecl Flag_Screen_(char* color_ptr) {
-    using Fn = int16_t(__cdecl*)(char*);
-    return reinterpret_cast<Fn>(0x004996C0)(color_ptr);
-}
-
-int16_t __cdecl Racial_Option_Screen_(s_player* plr) {
-    using Fn = int16_t(__cdecl*)(s_player*);
-    return reinterpret_cast<Fn>(0x00438EF0)(plr);
-}
-
 short Race_Selection_Screen_(s_player* plr) {
     int16_t field_ids[14];
     int16_t hotkey_field;

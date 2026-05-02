@@ -147,6 +147,21 @@ namespace sound {
         return __strcmpi(tag_buf, s_data_0055c20c) == 0;
     }
 
+    /**
+     * @address 0052DC80
+     */
+    void __cdecl Destroy_Sound_() {
+        Stop_Sound_Timer_And_Wait2_();
+        PTR_timeKillEvent_005aa5cc(_soundTimerId);
+        PTR_timeEndPeriod_005aa5c4(0xA0);
+
+        if (_soundOn == 1) {
+            _dsound->Release();
+        }
+
+        _audioInitialized = 0;
+    }
+
     void __cdecl Init_Sound_() {
         _dsound = nullptr;
         _dsound_hr = DirectSoundCreate(nullptr, &_dsound, nullptr);

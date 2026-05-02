@@ -3163,10 +3163,10 @@ namespace CMBTDRW1 {
                     }
 
                     allocate::Push_Block_(MOX::_screen_seg);
-                    void* gray_bitmap = allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2710);
-                    bitmap::Draw_Picture_To_Bitmap_((s_animation_header*)gray_bitmap, (s_animation_header*)MOX::_detail_fleet_icon_seg);
+                    s_animation_header* gray_bitmap = (s_animation_header*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x2710);
+                    bitmap::Draw_Picture_To_Bitmap_(gray_bitmap, (s_animation_header*)MOX::_detail_fleet_icon_seg);
                     bitmap::Gray_Scale_Bitmap_(gray_bitmap, 0, 0x20, grayscale_table, 0);
-                    animate::Draw_(view_x + 0xEB, view_y + 0x19, (s_animation_header*)gray_bitmap);
+                    animate::Draw_(view_x + 0xEB, view_y + 0x19, gray_bitmap);
                     allocate::Pop_Block_(MOX::_screen_seg);
                 }
             }

@@ -330,10 +330,29 @@ namespace ADVCIV {
         }
     }
 
-    int __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx) {
-        using Fn = int(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(0x004ac710);
-        return fn(player_idx);
+    int32_t __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx) {
+        int32_t total_worth = 0;
+
+        for (int16_t planet_idx = 0; planet_idx < (int16_t)MOX::_planet_count; ++planet_idx) {
+            if (ADVCIV::_planet_selected_flag[planet_idx] == player_idx) {
+                int32_t planet_worth;
+                int8_t is_homeworld;
+                int16_t proximity_bonus;
+
+                ADVCIV::Get_Adv_Civ_Planet_Worthiness_(
+                    player_idx,
+                    planet_idx,
+                    &planet_worth,
+                    &is_homeworld,
+                    &proximity_bonus
+                );
+
+                total_worth += planet_worth;
+            }
+        }
+
+        return (total_worth * 10) /
+               static_cast<int32_t>(ADVCIV::_adv_civ_player[player_idx].settled_planet_count);
     }
 
     void __cdecl Advanced_Civilization_Colonies_() {

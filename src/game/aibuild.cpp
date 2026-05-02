@@ -998,4 +998,10 @@ namespace AIBUILD {
 
         return COLBLDG::Selection_Name_(product_id);
     }
+
+    void __cdecl Player_Colony_Autobuild_(s_colony* colony) {
+        const int32_t colony_idx = static_cast<int32_t>(colony - MOX::_colony);
+        COLCALC::Colony_Calculation_(static_cast<int16_t>(colony_idx));
+        AIBUILD::Assign_Colony_New_Building_(colony);
+    }
 }

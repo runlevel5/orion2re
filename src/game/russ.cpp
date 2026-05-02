@@ -306,4 +306,7 @@ namespace RUSS {
 
         return comparison;
     }
+
+    void __cdecl PFMT_(int32_t unused1, int32_t unused2, const char* unused_str, ...) {
+    }
 }

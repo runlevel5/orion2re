@@ -14,16 +14,13 @@ namespace bitmap {
 
     void __cdecl Draw_Picture_To_Bitmap_(s_animation_header* h1, s_animation_header* h2);
 
-    inline void __cdecl Gray_Scale_Bitmap_(
-        void* bitmap,
-        int32_t x,
-        int32_t color_count,
-        const uint8_t* table,
-        int32_t flags) {
-        using Fn = void(__cdecl*)(void*, int32_t, int32_t, const uint8_t*, int32_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052F8E0});
-        fn(bitmap, x, color_count, table, flags);
-    }
+    void __cdecl Gray_Scale_Bitmap_(
+        s_animation_header* animation_header,
+        uint32_t unused,
+        int16_t start_color,
+        const uint8_t* color_translation_table,
+        int16_t end_color
+    );
 
     inline char* s_Add_Picture_To_Bitmap_targetmust_0055b770 = reinterpret_cast<char*>(std::uintptr_t{0x0055B770});
 
@@ -38,8 +35,11 @@ namespace bitmap {
     inline uint32_t& _pixel_count =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0D8});
 
-    inline uint32_t& _bitmap_temp1 =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0E4});
+    inline uint8_t*& _bitmap_temp1 =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055C0E4});
+
+    inline uint32_t& _bitmap_temp2 =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055C0E8});
 
     void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height);
 

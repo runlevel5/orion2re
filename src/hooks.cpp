@@ -3873,6 +3873,18 @@ namespace hooks {
         { 0x004D4E80, &CMBTDRW1::Remap_Draw_Ship_Status_ },
         { 0x004D5C70, &CMBTDRW1::Crew_Quality_String_ },
         { 0x004FC9B0, &COLCALC::Sort_star_weights_ },
+        { 0x0047D540, &AIBUILD::Player_Colony_Autobuild_ },
+        { 0x00462BA0, &AIMOVE::Sort_candidate_stars_ },
+        { 0x00407180, &BILL::Add_Their_Spy_ },
+        { 0x00407B20, &BILL::Cache_Player_Trooper_Anim_ },
+        { 0x0052F8E0, &bitmap::Gray_Scale_Bitmap_ },
+        { 0x00537A5D, &shear::Gray_Scale_Fill_Pixels_ },
+        { 0x004AC710, &ADVCIV::Get_Players_Planet_Worthiness_Average_ },
+        { 0x00504520, &MULTPLAY::Hotseat_Set_Next_Player_Status_ },
+        { 0x00471790, &TEXTBOX::Get_Mox_Text_Box_Base_Colors_ },
+        { 0x0052DC80, &sound::Destroy_Sound_ },
+        { 0x004E3650, &SCORE::Won_Council_Vote_ },
+        { 0x004D7850, &RUSS::PFMT_ },
     };
 
     void Install_Hooks()

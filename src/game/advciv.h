@@ -40,7 +40,7 @@ namespace ADVCIV {
 
     int8_t __cdecl Twiddle_Planet_(int16_t planet_idx, uint8_t* weight_choices);
 
-    int __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx);
+    int32_t __cdecl Get_Players_Planet_Worthiness_Average_(int16_t player_idx);
 
     int __cdecl qsort_planet_worth_(const void* a, const void* b);
 

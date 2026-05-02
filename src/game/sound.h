@@ -266,11 +266,7 @@ namespace sound {
 
     void __cdecl Loop_Sound_(int channel_idx, int8_t loop_count);
 
-    inline void __cdecl Destroy_Sound_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052DC80});
-        fn();
-    }
+    void __cdecl Destroy_Sound_();
 
     void __cdecl Init_Sound_();
 }

@@ -643,7 +643,7 @@ namespace bitmap {
     }
 
     void __cdecl Tint_Bitmap_Pixels_(uint8_t* src, uint8_t* tint_table, int unused, uint8_t* dest, int width, int height) {
-        _bitmap_temp1 = reinterpret_cast<uint32_t>(tint_table);
+        _bitmap_temp1 = tint_table;
         uint32_t count = static_cast<uint32_t>(height) * static_cast<uint32_t>(width);
         _pixel_count = count;
 
@@ -974,5 +974,37 @@ namespace bitmap {
         shear::Jumble_Bitmap_Pixels_(src_pixels, param_4, param_3, dest_pixels, width, height);
 
         random::Set_Random_Seed_(seed);
+    }
+
+    void __cdecl Gray_Scale_Bitmap_(
+        s_animation_header* animation_header,
+        uint32_t,
+        int16_t start_color,
+        const uint8_t* color_translation_table,
+        int16_t end_color
+    ) {
+        animate::_animation_header = animation_header;
+
+        const int32_t frame_index = animation_header->current_frame;
+        const int32_t width = animation_header->width;
+        const int32_t height = animation_header->height;
+        uint8_t* const frame_pixels =
+            reinterpret_cast<uint8_t*>(animation_header) + animation_header->frame_offsets[frame_index];
+
+        replace::_palette_color_list = replace::_graphics_buffer;
+        replace::Establish_Color_Gradient_(start_color, end_color);
+
+        for (int32_t i = 0; i < 0x100; ++i) {
+            replace::_palette_color_list[i] =
+                color_translation_table[replace::_palette_color_list[i]];
+        }
+
+        shear::Gray_Scale_Fill_Pixels_(
+            frame_pixels,
+            replace::_palette_color_list,
+            width,
+            width,
+            height
+        );
     }
 }
