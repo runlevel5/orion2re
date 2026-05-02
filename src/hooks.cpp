@@ -3958,6 +3958,7 @@ namespace hooks {
         { 0x00531AA0, &special::isqrt_ },
         { 0x00405D70, &FLEETPOP::Set_Build_Outpost_Button_Flag_ },
         { 0x00405F20, &FLEETPOP::Set_Colonize_Button_Flag_ },
+        { 0x004063E0, &FLEETPOP::Set_Transport_Troops_Flag_ },
     };
 
     void Install_Hooks()

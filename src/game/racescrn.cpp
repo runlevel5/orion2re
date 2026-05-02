@@ -611,8 +611,7 @@ namespace RACESCRN {
 
     void __cdecl Draw_Icon_Group_(s_racescrn_mouse_group* group) {
         if (group->render_fn != nullptr) {
-            using RenderFn = void(__cdecl*)(s_racescrn_mouse_group*);
-            auto fn = reinterpret_cast<RenderFn>(group->render_fn);
+            auto fn = reinterpret_cast<render_fn>(group->render_fn);
             fn(group);
         }
 

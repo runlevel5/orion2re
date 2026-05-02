@@ -29,11 +29,7 @@ namespace FLEETPOP {
         return fn();
     }
 
-    inline uint8_t __cdecl Set_Transport_Troops_Flag_(int16_t fleet_count) {
-        using Fn = uint8_t(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004063E0});
-        return fn(fleet_count);
-    }
+    int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count);
 
     int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count);
 

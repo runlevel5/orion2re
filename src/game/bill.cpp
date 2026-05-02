@@ -260,7 +260,7 @@ namespace BILL {
         int16_t saved_font_style = fonts::_font_header.font_style;
         int16_t saved_current_font = fonts::_current_font_style;
 
-        using GetHeightFn = int16_t(__cdecl*)(int16_t, char*);
+        using GetHeightFn = int16_t(*)(int16_t, char*);
         GetHeightFn get_height = is_formatted ? (GetHeightFn)FMTPARA::Get_Formatted_Paragraph_Max_Height_ : (GetHeightFn)BILL::_Get_Paragraph_Max_Height_;
 
         bool font_changed = false;

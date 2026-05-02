@@ -289,9 +289,8 @@ namespace transprt {
                 } else {
                     memcpy(_tpRecUserBuffer, _tpRecPacketBuffer, len);
                 }
-
-                using UserRecFunc = void(__cdecl*)(int32_t, int32_t, int32_t, uint8_t*);
-                auto user_func = reinterpret_cast<UserRecFunc>(_userRecFunc);
+                
+                auto user_func = reinterpret_cast<user_rec_fn>(_userRecFunc);
                 user_func(sender, packet->current_user_type, packet->send_data_length, _tpRecUserBuffer);
 
                 ResetReceiving_();

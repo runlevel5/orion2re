@@ -761,7 +761,7 @@ void __cdecl Draw_Fleet_Movement_Box_() {
         FLEETPOP::Print_Fleet_Box_Info_();
 
         if (MOX::_fleet_box.count > 9) {
-            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(&MOX::_fltpop_scroll_bar, (void(__cdecl*)())Fleet_Movement_Scroll_Callback);
+            SCROLL::Draw_Generic_Vertical_Scroll_Bar_(&MOX::_fltpop_scroll_bar, (void(*)())Fleet_Movement_Scroll_Callback);
         }
     }
 
@@ -1519,6 +1519,78 @@ uint8_t __cdecl Set_Build_Outpost_Button_Flag_(int16_t ship_count) {
     }
 
     return can_build_outpost;
+}
+
+int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
+    if (MOX::_fleet_box_ship_stack == -1) {
+        return 0;
+    }
+
+    int16_t current_node = MOX::_ship_stack_start[MOX::_fleet_box_ship_stack];
+    int16_t first_ship_idx = MOX::_ship_node[current_node].ship_idx;
+    int16_t first_ship_owner = HACCESS::Ship_Owner_(first_ship_idx);
+    int8_t transport_troops_flag = 0;
+
+    int16_t star_idx = MOX::_ship[first_ship_idx].location;
+    bool is_valid_star_location = false;
+    if (star_idx > -1) {
+        is_valid_star_location = (star_idx < 500);
+    }
+
+    bool needs_xy_to_star = false;
+    if (star_idx > 1000) {
+        needs_xy_to_star = (star_idx < 0x430);
+    }
+
+    if (needs_xy_to_star) {
+        star_idx = HAROLD::XY_To_Star_Id_(MOX::_ship[first_ship_idx].x, MOX::_ship[first_ship_idx].y);
+    }
+
+    if ((MOX::_PLAYER_NUM == first_ship_owner) && is_valid_star_location) {
+        int16_t processed_count = 0;
+        if (ship_count > 0) {
+            int16_t planet_slot = 0;
+
+            while (processed_count < ship_count) {
+                if (transport_troops_flag != static_cast<int8_t>(static_cast<uint8_t>(planet_slot))) {
+                    break;
+                }
+
+                if (current_node < 0) {
+                    break;
+                }
+
+                const int16_t ship_idx = MOX::_ship_node[current_node].ship_idx;
+                (void)HACCESS::Ship_Owner_(ship_idx);
+
+                if (MOX::_ship[ship_idx].d.ship_type == 2) {
+                    uint8_t stop_planet_scan = 0;
+                    planet_slot = 0;
+
+                    for (; planet_slot < 5; ++planet_slot) {
+                        if (stop_planet_scan != 0) {
+                            break;
+                        }
+
+                        const int16_t planet_idx = MOX::_star[star_idx].planet_index[planet_slot];
+                        if (planet_idx != -1) {
+                            const int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
+                            if (colony_idx != -1) {
+                                if (static_cast<int16_t>(MOX::_colony[colony_idx].owner) == MOX::_PLAYER_NUM) {
+                                    transport_troops_flag = 1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                current_node = MOX::_ship_node[current_node].next_node;
+                ++processed_count;
+            }
+        }
+    }
+
+    return transport_troops_flag;
 }
 
 int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {

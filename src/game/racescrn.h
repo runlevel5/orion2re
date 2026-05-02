@@ -1,6 +1,7 @@
 #pragma once
 
 namespace RACESCRN {
+    using render_fn = void(*)(s_racescrn_mouse_group*);
 
     inline const char* s__005510f0 = reinterpret_cast<const char*>(std::uintptr_t{0x005510F0});
     inline char* s_billtext_lbx_0055135c = reinterpret_cast<char*>(std::uintptr_t{0x0055135C});
