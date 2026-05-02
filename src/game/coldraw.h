@@ -36,11 +36,13 @@ namespace COLDRAW {
 
     void __cdecl Build_Veggie_List_Based_On_Bldg_List_();
 
-    inline int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_index, int16_t row, int16_t col) {
-        using Fn = int16_t(__cdecl*)(int16_t, int16_t, int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004599F0});
-        return fn(colony_index, row, col);
+    inline int16_t __cdecl Veggie_Type_For_Colony_(int16_t colony_index) {
+        using Fn = int16_t(__cdecl*)(int16_t);
+        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00459A40});
+        return fn(colony_index);
     }
+
+    int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_index, int16_t row, int16_t col);
 
     void __cdecl Clear_Veggie_Draw_Flags_();
 

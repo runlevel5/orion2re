@@ -208,6 +208,25 @@ inline int __cdecl _atoi(const char* str) {
     return fn(str);
 }
 
+struct file_info_1;
+inline intptr_t __cdecl __findfirst(LPCSTR pathname, file_info_1* file_info) {
+    using Fn = intptr_t(__cdecl*)(LPCSTR, file_info_1*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541C70});
+    return fn(pathname, file_info);
+}
+
+inline char* __cdecl _ctime(const time_t* time_value) {
+    using Fn = char*(__cdecl*)(const time_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00542660});
+    return fn(time_value);
+}
+
+inline struct tm* __cdecl _localtime(const time_t* time_value) {
+    using Fn = struct tm*(__cdecl*)(const time_t*);
+    auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541850});
+    return fn(time_value);
+}
+
 inline uint32_t __cdecl _time(uint32_t* timer) {
     using Fn = uint32_t(__cdecl*)(uint32_t*);
     auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541a20});

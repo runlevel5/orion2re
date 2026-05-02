@@ -289,11 +289,7 @@ namespace MAINSCR {
 
     void __cdecl Redraw_Main_Screen_(uint8_t redraw_full);
 
-    inline void __cdecl Load_Reply_To_Diplomacy_Request_Popup_() {
-        using Fn = void(__cdecl*)();
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x004CA140});
-        fn();
-    }
+    void __cdecl Load_Reply_To_Diplomacy_Request_Popup_();
 
     inline void __cdecl Add_Reply_To_Diplomacy_Request_Fields_(
         int16_t* first_reply_field,

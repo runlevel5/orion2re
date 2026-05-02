@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <ctime>
 
 namespace dos {
     struct _diskfree_t {
@@ -15,19 +16,18 @@ namespace dos {
         return fn(drive, disk_free_info);
     }
 
-    // Suggested name: _fileinfo
-    inline uint8_t& _fileinfo =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057B5D8});
+    inline struct tm*& _tmbuf =
+            *reinterpret_cast<struct tm**>(std::uintptr_t{0x0057B5D0});
+
+    inline struct file_info_1& _fileinfo =
+            *reinterpret_cast<struct file_info_1*>(std::uintptr_t{0x0057B5D8});
+
+    inline time_t& _fileinfo_fi1_username_plus_2 =
+            *reinterpret_cast<time_t*>(std::uintptr_t{0x0057B5E4});
 
     // Suggested name: _fileinfo_name
     inline char& DAT_0057b5ec =
         *reinterpret_cast<char*>(std::uintptr_t{0x0057B5EC});
-
-    inline intptr_t __cdecl __findfirst(const char* pattern, void* data) {
-        using Fn = intptr_t(__cdecl*)(const char*, void*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00541C70});
-        return fn(pattern, data);
-    }
 
     inline intptr_t __cdecl __findnext(intptr_t handle, void* data) {
         using Fn = intptr_t(__cdecl*)(intptr_t, void*);
@@ -41,9 +41,5 @@ namespace dos {
 
     void __cdecl Delete_File_(LPCSTR path);
 
-    inline struct tm* __cdecl Time_Stamp_(const char* input) {
-        using Fn = struct tm* (__cdecl*)(const char*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052D3D0});
-        return fn(input);
-    }
+    struct tm* __cdecl Time_Stamp_(LPCSTR pathname);
 }

@@ -1,9 +1,4 @@
 #pragma once
-#include <cstdint>
-
-struct s_list_item;
-struct s_list_state;
-struct s_colors;
 
 namespace LIST {
     using draw_app_fn = void(__cdecl*)(int16_t, int16_t, uint8_t);

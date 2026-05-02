@@ -51,4 +51,17 @@ namespace dos {
                disk_free_info.sectors_per_cluster *
                disk_free_info.bytes_per_sector;
     }
+
+    struct tm* __cdecl Time_Stamp_(LPCSTR pathname) {
+        intptr_t search_handle;
+
+        search_handle = __findfirst(pathname, &_fileinfo);
+        if (search_handle == -1) {
+            return nullptr;
+        }
+
+        _ctime(&_fileinfo_fi1_username_plus_2);
+        _tmbuf = _localtime(&_fileinfo_fi1_username_plus_2);
+        return _tmbuf;
+    }
 }

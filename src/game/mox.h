@@ -530,6 +530,10 @@ namespace MOX {
 
     inline s_animation_header*& _mainscrn_diplo_lights_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B464});
 
+    inline uint32_t& _diplomacy_request_wait_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00597014});
+    inline uint32_t& _diplomacy_request_invoke_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A1840});
+    inline uint32_t& _diplomacy_request_accept_seg = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x005A47D4});
+
     inline void*& _global_screen_seg =
         *reinterpret_cast<void**>(std::uintptr_t{ 0x0059B5A8 });
 

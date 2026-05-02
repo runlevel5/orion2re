@@ -74,6 +74,30 @@ namespace buffer {
     return buffer_space_segment;
   }
 
+  void __cdecl Get_Lowest_Priority_(int32_t* out_file_index, int32_t* out_segment_index) {
+    uint32_t lowest_priority = 0xFFFFFFFFu;
+
+    if (buffer::_file_buffer_count > 0) {
+      for (int32_t file_index = 0; file_index < buffer::_file_buffer_count; ++file_index) {
+        s_file_buffer_entry& file_entry = buffer::_file_buffer[file_index];
+
+        if (file_entry.segment_count > 0) {
+          for (int32_t segment_index = 0; segment_index < file_entry.segment_count; ++segment_index) {
+            s_buffer_cached_segment& segment = file_entry.segments[segment_index];
+
+            if (static_cast<uint32_t>(segment.last_use_counter) <= lowest_priority) {
+              if (segment.is_loaded == 1) {
+                *out_file_index = file_index;
+                *out_segment_index = segment_index;
+                lowest_priority = static_cast<uint32_t>(segment.last_use_counter);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   void* __cdecl Buffer_Reload_(const char* file_name, int32_t buffer_seg_id, void* buffer_space_seg) {
     if (buffer_space_seg != buffer::_buffer_space_seg) {
       exitm::Exit_With_Message(s_Cache_Seg_Corrupted____0055b374);
@@ -298,5 +322,50 @@ namespace buffer {
 
     _fread(loaded_data, static_cast<size_t>(entry_size), 1, farload::_farload_fptr);
     return loaded_data;
+  }
+
+  void __cdecl Get_Next_Buffer_Address_(int32_t current_buffer_index,
+                                        int32_t current_segment_index,
+                                        int32_t* next_buffer_index,
+                                        int32_t* next_segment_index,
+                                        uint8_t* buffer_data) {
+    uint8_t* closest_address =
+            buffer_data + *reinterpret_cast<int32_t*>(buffer_data - 0x0C);
+    const std::uintptr_t current_segment_address =
+            reinterpret_cast<std::uintptr_t>(
+                    buffer::_file_buffer[current_buffer_index]
+                            .segments[current_segment_index]
+                            .data_ptr);
+
+    *next_buffer_index = 1000;
+
+    if (buffer::_file_buffer_count > 0) {
+      for (int32_t file_buffer_index = 0;
+           file_buffer_index < buffer::_file_buffer_count;
+           ++file_buffer_index) {
+        s_file_buffer_entry& file_buffer_entry =
+                buffer::_file_buffer[file_buffer_index];
+
+        if (file_buffer_entry.segment_count > 0) {
+          for (int32_t segment_index = 0;
+               segment_index < file_buffer_entry.segment_count;
+               ++segment_index) {
+            if (file_buffer_entry.segments[segment_index].is_loaded == 1) {
+              uint8_t* segment_data = reinterpret_cast<uint8_t*>(
+                      file_buffer_entry.segments[segment_index].data_ptr);
+
+              if ((current_segment_address <
+                   reinterpret_cast<std::uintptr_t>(segment_data)) &&
+                  (reinterpret_cast<std::uintptr_t>(segment_data) <
+                   reinterpret_cast<std::uintptr_t>(closest_address))) {
+                *next_buffer_index = file_buffer_index;
+                *next_segment_index = segment_index;
+                closest_address = segment_data;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

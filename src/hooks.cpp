@@ -3906,6 +3906,12 @@ namespace hooks {
         { 0x0051D1C0, &fields::Pressed_Mouse_Y_ },
         { 0x0052D440, &dos::Delete_File_ },
         { 0x0052D410, &dos::Disk_Free_ },
+        { 0x0052CD00, &buffer::Get_Lowest_Priority_ },
+        { 0x0052CC10, &buffer::Get_Next_Buffer_Address_ },
+        { 0x004599F0, &COLDRAW::Pick_Random_Veggie_Anim_Entry_For_Colony_CR_ },
+        { 0x00402590, &COLSUM::Draw_Info_Pop_For_ },
+        { 0x0052D3D0, &dos::Time_Stamp_ },
+        { 0x004CA140, &MAINSCR::Load_Reply_To_Diplomacy_Request_Popup_ },
     };
 
     void Install_Hooks()

@@ -31,22 +31,13 @@ namespace buffer {
 
     void* __cdecl Farload_Buffer_Library_(const char* file_name, int32_t entry_index, uint8_t* buffer_base);
 
-    inline void __cdecl Get_Lowest_Priority_(int32_t* out_file_buffer_index, int32_t* out_segment_index) {
-        using Fn = void(__cdecl*)(int32_t*, int32_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CD00});
-        fn(out_file_buffer_index, out_segment_index);
-    }
+    void __cdecl Get_Lowest_Priority_(int32_t* out_file_index, int32_t* out_segment_index);
 
-    inline void __cdecl Get_Next_Buffer_Address_(
-            int32_t file_buffer_index,
-            int32_t segment_index,
-            int32_t* out_next_file_buffer_index,
-            int32_t* out_next_segment_index,
-            uint8_t* buffer_base) {
-        using Fn = void(__cdecl*)(int32_t, int32_t, int32_t*, int32_t*, uint8_t*);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0052CC10});
-        fn(file_buffer_index, segment_index, out_next_file_buffer_index, out_next_segment_index, buffer_base);
-    }
+    void __cdecl Get_Next_Buffer_Address_(int32_t current_buffer_index,
+                                          int32_t current_segment_index,
+                                          int32_t* next_buffer_index,
+                                          int32_t* next_segment_index,
+                                          uint8_t* buffer_data);
 
     void* __cdecl Buffer_Reload_(const char* file_name, int32_t buffer_seg_id, void* buffer_space_seg);
 }

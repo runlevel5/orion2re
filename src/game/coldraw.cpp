@@ -758,4 +758,16 @@ void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass
     }
 }
 
+int16_t __cdecl Pick_Random_Veggie_Anim_Entry_For_Colony_CR_(int16_t colony_index, int16_t row, int16_t col) {
+    int32_t random_entry = static_cast<int16_t>(random::Random_(8) - 1);
+    int32_t veggie_type = static_cast<int16_t>(COLDRAW::Veggie_Type_For_Colony_(colony_index));
+
+    random_entry -= (static_cast<int32_t>(row) + static_cast<int32_t>(col)) / 2;
+    if (random_entry <= 0) {
+        random_entry = 0;
+    }
+
+    return static_cast<int16_t>(random_entry + veggie_type * 8);
+}
+
 }

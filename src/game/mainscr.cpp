@@ -4090,4 +4090,16 @@ namespace MAINSCR {
         video::Set_Refresh_Stencil_();
         MOX::_draw_main_screen_to_back = 1;
     }
+
+    void __cdecl Load_Reply_To_Diplomacy_Request_Popup_() {
+        allocate::Push_Block_(MOX::_screen_seg);
+
+        MOX::_diplomacy_request_popup_seg = (s_animation_header*)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x0f, MOX::_screen_seg);
+
+        MOX::_diplomacy_request_accept_seg = (uint32_t)(std::uintptr_t)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x10, MOX::_screen_seg);
+
+        MOX::_diplomacy_request_invoke_seg = (uint32_t)(std::uintptr_t)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x11, MOX::_screen_seg);
+
+        MOX::_diplomacy_request_wait_seg = (uint32_t)(std::uintptr_t)farload::Far_Reload_Next_(s_BUFFER0_LBX, 0x12, MOX::_screen_seg);
+    }
 }
