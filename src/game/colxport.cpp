@@ -248,7 +248,7 @@ void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_i
     int16_t y_pos = entry_idx * 38 + 54;
     BILL::Squeeze_Print_Paragraph_(15, y_pos, 130, 28, planet_name, 0);
 
-    COLXPORT::Draw_Info_Pop_For_(entry_idx);
+    COLSUM::Draw_Info_Pop_For_(entry_idx);
 }
 
 void __cdecl Clear_List_Col_Array_() {

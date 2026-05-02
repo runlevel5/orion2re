@@ -28,12 +28,6 @@ namespace COLXPORT {
 
     void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_idx);
 
-    inline void __cdecl Draw_Info_Pop_For_(int16_t entry_idx) {
-        using Fn = void(__cdecl*)(int16_t);
-        auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x0042B2D0});
-        fn(entry_idx);
-    }
-
     void __cdecl Draw_Bar_Indicator_();
 
     void __cdecl Add_Fields_();
