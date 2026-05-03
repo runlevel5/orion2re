@@ -21,5 +21,5 @@ namespace namestar {
 
     int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim);
 
-    int8_t __cdecl Input_Box_Popup_Animated_(char* prompt, int16_t x, int16_t y, char* buffer, int16_t param_5, int16_t param_6);
+    int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x);
 }

@@ -1235,7 +1235,7 @@ struct s_combat_data {
     int16_t structure_max;
     int8_t crew_quality;
     int16_t officer_idx;
-    int8_t marine_count;
+    uint8_t marine_count;
     int8_t is_captured;
     int8_t ai_range_tactic;
     uint8_t special_device_damage_flags[5];
@@ -1999,7 +1999,7 @@ struct s_global_combat_data {
     int16_t structure_max;
     int8_t crew_quality;
     int16_t officer_idx;
-    int8_t marine_count;
+    uint8_t marine_count;
     undefined field41_0xb0;
     undefined field42_0xb1;
     int8_t special_device_damage[5];

@@ -738,12 +738,12 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
     const int16_t center_x = namestar::Star_Name_Popup_Screen_Center_X_();
 
     const int8_t popup_result = (int8_t)(namestar::Input_Box_Popup_Animated_(
-        popup_text,
-        center_x,
-        center_y,
         RACESEL::_temp_ruler_name,
         0x66,
-        0x14
+        0x14,
+        popup_text,
+        center_y,
+        center_x
     ) & 0xFF);
 
     strcpy(

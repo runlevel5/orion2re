@@ -254,7 +254,7 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
 
     int8_t result;
     if (is_animated != 0) {
-        result = Input_Box_Popup_Animated_(title, x, y, MOX::_star[star_idx].name, 15, w_max);
+        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, 15, w_max, title, y, x);
     } else {
         result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, w_max, title, y, x, 0);
     }
@@ -411,8 +411,8 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     return status;
 }
 
-int8_t __cdecl Input_Box_Popup_Animated_(char* prompt, int16_t x, int16_t y, char* buffer, int16_t param_5, int16_t param_6) {
-    return Input_Box_Popup_(buffer, param_5, param_6, prompt, y, x, 1);
+int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x) {
+    return Input_Box_Popup_(input_text, input_type, max_length, prompt_text, y, x, 1);
 }
 
 } // namespace namestar

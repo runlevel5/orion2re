@@ -162,36 +162,36 @@
 [X] 0040C960 - Type_Of_Space_Station_
 [X] 0040C9B0 - Load_Antaran_Planet_
 [X] 0040CB30 - Load_Colony_Defense_
-[ ] 0040CBA0 - Load_Tactical_Colony_
-[ ] 0040D2E0 - Load_Combat_Colony_Picture_
-[ ] 0040D3C0 - Does_Combat_Ship_Have_Special_
-[ ] 0040D420 - Apply_Bio_Weapon_Penalty_
-[ ] 0040D4A0 - End_Of_Combat_
-[ ] 0040DD50 - Unload_Combat_Ship_
-[ ] 0040DF10 - Load_Combat_Satelite_
-[ ] 0040F500 - Init_Special_Devices_
+[X] 0040CBA0 - Load_Tactical_Colony_
+[X] 0040D2E0 - Load_Combat_Colony_Picture_
+[X] 0040D3C0 - Does_Combat_Ship_Have_Special_
+[X] 0040D420 - Apply_Bio_Weapon_Penalty_
+[X] 0040D4A0 - End_Of_Combat_
+[X] 0040DD50 - Unload_Combat_Ship_
+[X] 0040DF10 - Load_Combat_Satelite_
+[X] 0040F500 - Init_Special_Devices_
 [ ] 0040F660 - Load_Display_Combat_Ship_
-[ ] 0040FB30 - Repair_All_Combat_Ships_
-[ ] 0040FC80 - Load_Combat_Antaran_Ship_
-[ ] 0040FCF0 - Load_Antaran_Defense_Fleet_
-[ ] 0040FD60 - Load_Antaran_Star_Fortress_
-[ ] 00410AF0 - Show_Off_Stolen_Tech_
-[ ] 00410BB0 - Show_Off_Captured_Tech_
-[ ] 00410C60 - Show_Off_Researched_Tech_
-[ ] 00410DB0 - Science_Room_
-[ ] 00411640 - Update_Science_Anims_
-[ ] 004116D0 - Draw_Science_Room_
-[ ] 004116E0 - Input_Box_Popup_Animated_
-[ ] 00411710 - Input_Box_Popup_
+[X] 0040FB30 - Repair_All_Combat_Ships_
+[X] 0040FC80 - Load_Combat_Antaran_Ship_
+[X] 0040FCF0 - Load_Antaran_Defense_Fleet_
+[X] 0040FD60 - Load_Antaran_Star_Fortress_
+[X] 00410AF0 - Show_Off_Stolen_Tech_
+[X] 00410BB0 - Show_Off_Captured_Tech_
+[X] 00410C60 - Show_Off_Researched_Tech_
+[X] 00410DB0 - Science_Room_
+[X] 00411640 - Update_Science_Anims_
+[X] 004116D0 - Draw_Science_Room_
+[X] 004116E0 - Input_Box_Popup_Animated_
+[X] 00411710 - Input_Box_Popup_
 [ ] 00411A70 - Draw_Input_Box_Popup_
-[ ] 00411AA0 - Setup_Input_Box_Popup_
-[ ] 00411E10 - Can_Change_Star_Name_
-[ ] 00411E80 - Change_Star_Name_Popup_
-[ ] 00411EB0 - Change_Home_Star_Name_Popup_
-[ ] 00411EE0 - Do_Change_Star_Name_
-[ ] 00412020 - Star_Name_Popup_Screen_Center_X_
-[ ] 00412030 - Star_Name_Popup_Screen_Center_Y_
-[ ] 00412040 - Star_Name_Popup_Map_Center_X_
+[X] 00411AA0 - Setup_Input_Box_Popup_
+[X] 00411E10 - Can_Change_Star_Name_
+[X] 00411E80 - Change_Star_Name_Popup_
+[X] 00411EB0 - Change_Home_Star_Name_Popup_
+[X] 00411EE0 - Do_Change_Star_Name_
+[X] 00412020 - Star_Name_Popup_Screen_Center_X_
+[X] 00412030 - Star_Name_Popup_Screen_Center_Y_
+[X] 00412040 - Star_Name_Popup_Map_Center_X_
 [ ] 00412050 - Star_Name_Popup_Map_Center_Y_
 [ ] 00412060 - Max_Pixel_Width_Star_Name_Can_Be_
 [ ] 004121D0 - Race_Customization_

@@ -1510,7 +1510,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         if (TECHDATA::_weapon_modifications[5].level <= mini_level_1) {
             specials_1 |= 0x20;
         }
-        specials_1 &= *reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(&TECHDATA::_weapons[weapon_id_1]) + 0x1a);
+        specials_1 &= TECHDATA::_weapons[weapon_id_1].available_mods;
 
         int32_t space_1 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_1, 1, 1, 1, specials_1);
         int32_t count_1 = 225 / space_1;
@@ -1534,7 +1534,7 @@ void __cdecl Load_Tactical_Colony_(int16_t colony_idx, int16_t load_picture) {
         if (TECHDATA::_weapon_modifications[6].level <= mini_level_2) {
             specials_2 |= 0x40;
         }
-        specials_2 &= *reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(&TECHDATA::_weapons[weapon_id_2]) + 0x1a);
+        specials_2 &= TECHDATA::_weapons[weapon_id_2].available_mods;
 
         int32_t space_2 = DESIGN::Weapon_Space_(MOX::_combat_defender_player, weapon_id_2, 1, 1, 1, specials_2);
         int32_t count_2 = 75 / space_2;
@@ -1719,7 +1719,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     int bit_count = 0;
     if (MOX::_player[defender].tech_applications[82] == 3) {
         struct_::Set_Bit_Field_(MOX::_combat_data[MOX::_combat_total_ship_count].special_device_flags, 14);
-        MOX::_combat_data[MOX::_combat_total_ship_count].structure_max *= 3;
+        MOX::_combat_data[MOX::_combat_total_ship_count].armor_remaining *= 3;
         bit_count++;
     }
     if (MOX::_player[defender].tech_applications[56] == 3 && bit_count < 8) {

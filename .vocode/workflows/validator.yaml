@@ -66,6 +66,7 @@ workflows:
             - Typecasting to a bigger type is potentially excessive and a code smell - use C++ type expansion rules
             - For example, consistent type changes around signedness is an indication that source type might be incorrect.
           * You are not allowed to make changes to the files unless explicitly confirmed.
+          * All structures are guaranteed to be packed to a byte in the project.
 
           # EXCEPTIONS
           * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.
@@ -117,6 +118,7 @@ workflows:
           - name: done
       - name: feedback
         type: input
+        alert: true
         message: "Validation failed. Provide follow-up instructions or corrected input."
         confirmation: auto
         output_mode: hide_final
