@@ -13,7 +13,7 @@ namespace COLSUM {
                         _first = colony_list_idx;
 
                         while (COLXPORT::_g_colony_list_ptr[_first + 9] == -1) {
-                            Increment_First_(10);
+                            Decrement_First_(10);
                         }
 
                         int16_t n_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
@@ -164,7 +164,7 @@ namespace COLSUM {
         }
     }
 
-    void __cdecl Increment_First_(int16_t num_items) {
+    void __cdecl Decrement_First_(int16_t num_items) {
         int16_t colonies_count = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
 
         if (colonies_count >= num_items) {
@@ -180,7 +180,7 @@ namespace COLSUM {
         }
     }
 
-    void __cdecl Decrement_First_(int16_t count) {
+    void __cdecl Increment_First_(int16_t count) {
         int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
 
         if (num_colonies >= count) {
@@ -710,13 +710,13 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         int16_t field = *field_ptr;
 
         if (field == _x_fields[1]) {
-            Increment_First_(10);
+            Decrement_First_(10);
             return true;
         }
 
         if (field == _x_fields[2]) {
             if (COLXPORT::_g_colony_list_ptr[_first + 10] != -1) {
-                Decrement_First_(10);
+                Increment_First_(10);
                 return true;
             }
         }
@@ -752,7 +752,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             Sort_Col_List_();
             Clear_List_Col_Array_();
             _first = 0;
-            Decrement_First_(10);
+            Increment_First_(10);
             Update_First_(10, &_first, &_slider_bar_position);
             Update_Col_List_();
             COLONY::_full_draw = 1;

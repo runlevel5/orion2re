@@ -17,8 +17,8 @@
 [X] 00402590 - Draw_Info_Pop_For_
 [X] 00402670 - Colsum_Connect_Galaxy_Map_Stars_
 [X] 00402720 - Draw_Galaxy_Map_
-[ ] 00402750 - Increment_First_
-[ ] 004027B0 - Decrement_First_
+[ ] 00402750 - Decrement_First_
+[ ] 004027B0 - Increment_First_
 [ ] 00402800 - Colony_Summary_Screen_
 [ ] 00402A90 - Sort_Col_List_
 [ ] 00402AF0 - Switched_cmp_

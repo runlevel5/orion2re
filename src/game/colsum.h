@@ -89,9 +89,9 @@ namespace COLSUM {
 
     void __cdecl Update_First_(int16_t param_1, int16_t* param_2, int16_t* param_3);
 
-    void __cdecl Increment_First_(int16_t num_items);
+    void __cdecl Decrement_First_(int16_t num_items);
 
-    void __cdecl Decrement_First_(int16_t count);
+    void __cdecl Increment_First_(int16_t count);
 
     inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // " 0"
     inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110}); // " 1"

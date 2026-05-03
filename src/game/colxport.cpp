@@ -116,10 +116,10 @@ short __cdecl Xport_Popup_() {
         input_id = fields::Get_Input_();
 
         if (input_id == _x_fields_array[2]) {
-            COLSUM::Increment_First_(6);
+            COLSUM::Decrement_First_(6);
         } else if (input_id == _x_fields_array[3]) {
             if (_g_colony_list_ptr[COLSUM::_first + 6] != -1) {
-                COLSUM::Decrement_First_(6);
+                COLSUM::Increment_First_(6);
             }
         } else {
             for (int i = 0; i < 6; ++i) {
