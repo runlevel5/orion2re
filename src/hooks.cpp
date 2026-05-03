@@ -3973,7 +3973,7 @@ namespace hooks {
         { 0x00402590, &COLSUM::Draw_Info_Pop_For_ },
         { 0x0049B050, &HACCESS::Save_Hotseat_Fleet_Box_Ship_ },
         { 0x00406100, &FLEETPOP::Set_Engage_Enemy_Forces_Flag_ },
-        { 0x004060A0, &FLEETPOP::Planet_Is_Colonizable_ },
+        { 0x004060A0, &FLEETPOP::Planet_Is_Colonizable`_ },
         { 0x004F1430, &HAROLD::Planet_Has_Outpost_ },
     };
 
