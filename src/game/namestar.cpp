@@ -178,17 +178,20 @@ int16_t __cdecl Max_Pixel_Width_Star_Name_Can_Be_(int16_t star_idx) {
             int16_t i_w;
             MAINSCR::Get_Star_Name_Info_(i, &i_x, &i_y, &i_w);
 
-            if (abs(i_y - target_y) < font_h) {
-                int16_t x_diff = i_x - target_x;
+            int32_t y_diff = static_cast<int32_t>(i_y) - static_cast<int32_t>(target_y);
+            if (std::abs(y_diff) < font_h) {
+                int32_t x_diff = static_cast<int32_t>(i_x) - static_cast<int32_t>(target_x);
                 if (x_diff < 0) {
-                    if (abs(x_diff) < dist_left) {
-                        dist_left = abs(x_diff);
+                    int32_t abs_x_diff = std::abs(x_diff);
+                    if (abs_x_diff < dist_left) {
+                        dist_left = static_cast<int16_t>(abs_x_diff);
                         left_star_width = i_w;
                         left_star_idx = i;
                     }
                 } else {
-                    if (abs(x_diff) < dist_right) {
-                        dist_right = abs(x_diff);
+                    int32_t abs_x_diff = std::abs(x_diff);
+                    if (abs_x_diff < dist_right) {
+                        dist_right = static_cast<int16_t>(abs_x_diff);
                         right_star_idx = i;
                     }
                 }
@@ -197,11 +200,11 @@ int16_t __cdecl Max_Pixel_Width_Star_Name_Can_Be_(int16_t star_idx) {
 
         if (left_star_idx == -1) {
             left_star_width = 0;
-            dist_left = abs(target_x - 21);
+            dist_left = static_cast<int16_t>(std::abs(static_cast<int32_t>(target_x) - 21));
         }
 
         if (right_star_idx == -1) {
-            dist_right = abs(target_x - 527);
+            dist_right = static_cast<int16_t>(std::abs(static_cast<int32_t>(target_x) - 527));
             if (dist_right < target_w) {
                 dist_right = target_w;
             }

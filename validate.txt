@@ -142,11 +142,11 @@
 [X] 00409410 - Do_XP_For_Ship_
 [X] 00409460 - Do_All_Ships_XP_Check_
 [X] 004094D0 - Colony_Has_Defenses_
-[ ] 00409540 - Tactical_Combat_
+[X] 00409540 - Tactical_Combat_
 [X] 0040ADE0 - qsort_ship_array_by_size_
 [X] 0040AE30 - Ship_Size_Offset_
 [X] 0040AE70 - Ship_Can_Deploy_At_
-[ ] 0040AF90 - Deploy_Ships_
+[X] 0040AF90 - Deploy_Ships_
 [X] 0040B390 - qsort_combat_data_by_size_
 [X] 0040B3C0 - Calc_Combat_Shield_Max_
 [X] 0040B460 - Load_Combat_Ship_
@@ -170,7 +170,7 @@
 [X] 0040DD50 - Unload_Combat_Ship_
 [X] 0040DF10 - Load_Combat_Satelite_
 [X] 0040F500 - Init_Special_Devices_
-[ ] 0040F660 - Load_Display_Combat_Ship_
+[X] 0040F660 - Load_Display_Combat_Ship_
 [X] 0040FB30 - Repair_All_Combat_Ships_
 [X] 0040FC80 - Load_Combat_Antaran_Ship_
 [X] 0040FCF0 - Load_Antaran_Defense_Fleet_
@@ -183,7 +183,7 @@
 [X] 004116D0 - Draw_Science_Room_
 [X] 004116E0 - Input_Box_Popup_Animated_
 [X] 00411710 - Input_Box_Popup_
-[ ] 00411A70 - Draw_Input_Box_Popup_
+[X] 00411A70 - Draw_Input_Box_Popup_
 [X] 00411AA0 - Setup_Input_Box_Popup_
 [X] 00411E10 - Can_Change_Star_Name_
 [X] 00411E80 - Change_Star_Name_Popup_
@@ -192,53 +192,53 @@
 [X] 00412020 - Star_Name_Popup_Screen_Center_X_
 [X] 00412030 - Star_Name_Popup_Screen_Center_Y_
 [X] 00412040 - Star_Name_Popup_Map_Center_X_
-[ ] 00412050 - Star_Name_Popup_Map_Center_Y_
-[ ] 00412060 - Max_Pixel_Width_Star_Name_Can_Be_
-[ ] 004121D0 - Race_Customization_
-[ ] 00412300 - Eric_Set_Help_List_
-[ ] 00412320 - Set_Colony_Screen_Help_List_
-[ ] 00412330 - Set_Colony_Summary_Screen_Help_List_
-[ ] 00412340 - Set_Refit_Ship_Popup_Help_List_
-[ ] 00412350 - Set_Building_Queue_Screen_Help_List_
-[ ] 00412360 - Set_Transport_Popup_Help_List_
-[ ] 00412370 - Set_Occupation_Policy_Popup_Help_List_
-[ ] 00412380 - Set_New_Game_Screen_Help_List_
-[ ] 004123D0 - Set_Player_Attacked_Popup_Help_List_
-[ ] 004123E0 - Set_New_Colony_Confirmation_Box_Help_List_
-[ ] 004123F0 - Set_Tax_Rate_Popup_Help_List_
-[ ] 00412400 - Set_Dragon_New_Star_Popup_Help_List_
-[ ] 00412410 - Set_New_System_Discovery_Popup_Help_List_
-[ ] 00412420 - Set_Planet_Selection_Popup_Help_List_
-[ ] 00412430 - Set_Officer_Information_Popup_Help_List_
-[ ] 00412440 - Points_On_Same_Side_Of_Line_
-[ ] 004124B0 - Point_Within_D_Of_Seg_
-[ ] 004127F0 - Collect_Black_Holes_
-[ ] 00412840 - Black_Hole_Blocks_Points_
-[ ] 004128E0 - Initialize_Black_Hole_Blocks_
-[ ] 00412A90 - Point_Is_In_Nebula_N_
-[ ] 00412B10 - Point_Is_In_Some_Nebula_
-[ ] 00412B70 - Star_Is_In_Some_Nebula_
-[ ] 00412BA0 - Initialize_Star_In_Nebula_Info_
-[ ] 00412BE0 - Point_Is_In_Warp_Field_Interdictor_Of_Star_
-[ ] 00412C30 - Move_Player_1_Turn_To_Star_
-[ ] 00412E20 - Union_Find_
-[ ] 00412F40 - Map_Is_Connected_
-[ ] 00413080 - Parsecs_Between_Points_
-[ ] 004130F0 - Parsecs_Between_Stars_
-[ ] 00413140 - Get_Orbit_Display_X_Y_
-[ ] 00413220 - Get_Orbit_From_X_Y_
-[ ] 00413330 - Actual_Expected_Damage_
-[ ] 004133B0 - Diplomacy_Screen_
-[ ] 00413690 - Draw_Diplomacy_Synch_Mode_
-[ ] 00413A30 - Get_Main_Repulsive_Diplomacy_Choices_
-[ ] 00413E00 - Get_Main_Diplomacy_Choices_
+[X] 00412050 - Star_Name_Popup_Map_Center_Y_
+[X] 00412060 - Max_Pixel_Width_Star_Name_Can_Be_
+[X] 004121D0 - Race_Customization_
+[X] 00412300 - Eric_Set_Help_List_
+[X] 00412320 - Set_Colony_Screen_Help_List_
+[X] 00412330 - Set_Colony_Summary_Screen_Help_List_
+[X] 00412340 - Set_Refit_Ship_Popup_Help_List_
+[X] 00412350 - Set_Building_Queue_Screen_Help_List_
+[X] 00412360 - Set_Transport_Popup_Help_List_
+[X] 00412370 - Set_Occupation_Policy_Popup_Help_List_
+[X] 00412380 - Set_New_Game_Screen_Help_List_
+[X] 004123D0 - Set_Player_Attacked_Popup_Help_List_
+[X] 004123E0 - Set_New_Colony_Confirmation_Box_Help_List_
+[X] 004123F0 - Set_Tax_Rate_Popup_Help_List_
+[X] 00412400 - Set_Dragon_New_Star_Popup_Help_List_
+[X] 00412410 - Set_New_System_Discovery_Popup_Help_List_
+[X] 00412420 - Set_Planet_Selection_Popup_Help_List_
+[X] 00412430 - Set_Officer_Information_Popup_Help_List_
+[X] 00412440 - Points_On_Same_Side_Of_Line_
+[X] 004124B0 - Point_Within_D_Of_Seg_
+[X] 004127F0 - Collect_Black_Holes_
+[X] 00412840 - Black_Hole_Blocks_Points_
+[X] 004128E0 - Initialize_Black_Hole_Blocks_
+[X] 00412A90 - Point_Is_In_Nebula_N_
+[X] 00412B10 - Point_Is_In_Some_Nebula_
+[X] 00412B70 - Star_Is_In_Some_Nebula_
+[X] 00412BA0 - Initialize_Star_In_Nebula_Info_
+[X] 00412BE0 - Point_Is_In_Warp_Field_Interdictor_Of_Star_
+[X] 00412C30 - Move_Player_1_Turn_To_Star_
+[X] 00412E20 - Union_Find_
+[X] 00412F40 - Map_Is_Connected_
+[X] 00413080 - Parsecs_Between_Points_
+[X] 004130F0 - Parsecs_Between_Stars_
+[X] 00413140 - Get_Orbit_Display_X_Y_
+[X] 00413220 - Get_Orbit_From_X_Y_
+[X] 00413330 - Actual_Expected_Damage_
+[X] 004133B0 - Diplomacy_Screen_
+[X] 00413690 - Draw_Diplomacy_Synch_Mode_
+[X] 00413A30 - Get_Main_Repulsive_Diplomacy_Choices_
+[X] 00413E00 - Get_Main_Diplomacy_Choices_
 [ ] 00414140 - Diplomacy_Set_Main_Options_
-[ ] 00414300 - Diplomacy_Declare_War_Resolution_
-[ ] 00414480 - Setup_Back_Page_
-[ ] 004144F0 - Setup_Ambassador_Pic_
-[ ] 00414560 - Diplomacy_Fade_In_
-[ ] 00414660 - Draw_Diplomacy_Fade_In_Screen_
-[ ] 00414690 - Diplomacy_Propose_Treaty_
+[X] 00414300 - Diplomacy_Declare_War_Resolution_
+[X] 00414480 - Setup_Back_Page_
+[X] 004144F0 - Setup_Ambassador_Pic_
+[X] 00414560 - Diplomacy_Fade_In_
+[X] 00414660 - Draw_Diplomacy_Fade_In_Screen_
+[X] 00414690 - Diplomacy_Propose_Treaty_
 [ ] 00414A30 - Diplomacy_Break_Treaty_
 [ ] 00414CB0 - Diplomacy_Break_Treaty_Resolution_
 [ ] 00414F00 - Get_Human_Surrender_Message_

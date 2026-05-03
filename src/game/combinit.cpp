@@ -467,7 +467,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     MOX::_draw_active_missiles = 1;
     MOX::_order_info_flag = 1;
     MOX::_super_fast_flag = 0;
-    MOX::_real_attack_flag = 0;
+    COMBINIT::_real_attack_flag = 0;
 
     MOX::_shields_flag = MOX::_settings.combat_shields_arc_flag;
     MOX::_speedx2_flag = MOX::_settings.combat_speedx2_flag;
@@ -539,7 +539,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
             }
 
             if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 23) == 0) {
-                MOX::_real_attack_flag = 1;
+                COMBINIT::_real_attack_flag = 1;
                 if (Does_Combat_Ship_Have_Special_(MOX::_combat_total_ship_count, 6) != 0) {
                     has_cloaking = 1;
                 }

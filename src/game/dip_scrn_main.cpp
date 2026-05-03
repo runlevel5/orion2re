@@ -1643,9 +1643,11 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Setup_Ambassador_Pic_(int16_t frame_selector) {
+        uint8_t race = static_cast<uint8_t>(MOX::_player[_current_ambassador].race);
+
         file_ani::Open_File_Animation_(
             s_DIPLOMAT_LBX,
-            MOX::_player[_current_ambassador].race * 2 + 14
+            race * 2 + 14
         );
 
         file_ani::Set_File_Animation_Frame_(frame_selector == 0 ? 1 : 0);
@@ -2241,7 +2243,7 @@ namespace DIP_SCRN {
                         _net_diplomacy_message.target_player_id = static_cast<uint8_t>(param_2);
                         _net_diplomacy_esc_pressed = 1;
                         _net_diplomacy_message.arg2 = -1;
-                        _net_diplomacy_message.arg1 = 0x82;
+                        _net_diplomacy_message.msg_type = 0x82;
 
                         NETMOX::Mox_Send_Message_(
                             MOX::_player[param_1].network_player_id, 2000,

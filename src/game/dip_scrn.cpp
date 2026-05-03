@@ -142,7 +142,7 @@ namespace DIP_SCRN {
             if (MOX::_player[target_id].objectives == 100 /* 'd' */) {
                 if (MOX::_game_type == 1) {
                     Diplomacy_Load_New_Ambassador_(sender_id);
-                    Get_Human_Declare_War_Message_(target_id);
+                    Get_Human_Declare_War_Message_(sender_id);
                     Diplomacy_Display_Response_();
                     Diplomacy_Load_New_Ambassador_(target_id);
                 }

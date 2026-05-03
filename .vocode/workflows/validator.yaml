@@ -75,9 +75,10 @@ workflows:
           # OUTPUT
           * You must always print the function address and function name
           * If validation passes, briefly summarize why and end with the success outcome. Be very concise.
-          * If validation fails, list the discrepancies or missing information concisely and end with the fail outcome.
+          * If validation fails, list the discrepancies or missing information concisely and end with the fail outcome. Do not mention what matched or validated in cause of failures, as this is too confusing for the user - only mention problems and related analysis.
           * For each discrepancy, provide a short explanation and a minimal suggested diff snippet without applying it.
           * Do not make changes to the codebase unless explicitly requested.
+          * Do not add superficial or excessive type casting
           * It is not your job to mark validation as completed. If there are no changes to be made - finish with the success outcome.
         outcomes:
           - name: success
