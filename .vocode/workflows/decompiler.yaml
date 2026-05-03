@@ -1,9 +1,11 @@
 variables:
   LLM_DECOMPILER_MODEL: 
-    value: gemini/gemini-3-flash-preview
+    #value: gemini/gemini-3-flash-preview
+    value: chatgpt/gpt-5.4
     type: llm_models
   LLM_DECOMPILER_CODER: 
-    value: gemini/gemini-3-flash-preview
+    #value: gemini/gemini-3-flash-preview
+    value: chatgpt/gpt-5.4-mini
     type: llm_models
 workflows:
   decompiler:

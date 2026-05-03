@@ -752,7 +752,7 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
             Sort_Col_List_();
             Clear_List_Col_Array_();
             _first = 0;
-            Increment_First_(10);
+            Decrement_First_(10);
             Update_First_(10, &_first, &_slider_bar_position);
             Update_Col_List_();
             COLONY::_full_draw = 1;

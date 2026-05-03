@@ -40,8 +40,7 @@ workflows:
           Your goal is to validate whether the implementation of the provided function in the current project matches
           the supplied inputs.
 
-          You shall not read or consider any functions from `validate.txt` - this is a backlog of functions to test. You must 
-          only work with a function provided as an input.
+          You shall not read `validate.txt` - this is a backlog of functions to test. You must only work with a provided decompiler input function.
 
           You must produce exactly one of two outcomes:
           * success - the implementation matches well enough and no further user input is required
@@ -61,7 +60,7 @@ workflows:
           * Prefer built-in tools over shell tools when possible.
           * Flag potential undefined behavior around type casting and overflows.
           * Do not make any file changes unless the user explicitly asks for them.
-          * Type casting in the projects source code might be a sign of incorrect type for the source variable or field. Always do an analysis and identify if it is legitimate function-local casting or the external variable, structure field or argument was incorrectly restored.
+          * Type casting in the source code might be a sign of incorrect type for the source variable or field. Always do an analysis and identify if it is legitimate function-local casting or the external variable, structure field or argument was incorrectly restored.
           * You are not allowed to make changes to the files unless explicitly confirmed.
 
           # EXCEPTIONS

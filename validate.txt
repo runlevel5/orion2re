@@ -29,38 +29,38 @@
 [X] 00402E70 - cmp_Pops_
 [X] 00402EC0 - cmp_Food_
 [X] 00402F10 - cmp_Industry_
-[ ] 00402F60 - cmp_Research_
-[ ] 00402FB0 - cmp_BC_
-[ ] 00403000 - Evaluate_Input_
-[ ] 004031B0 - Draw_Colony_Summary_
-[ ] 004031F0 - Evaluate_Col_List_Input_
-[ ] 00403460 - Evaluate_Colony_Pop_Input_
-[ ] 00403590 - Get_Scanned_Pop_
-[ ] 00403690 - Get_Selected_Pop_
-[ ] 00403760 - Check_Galaxy_Map_Fields_
-[ ] 004038D0 - Pick_Best_Planet_To_Goto_At_Star_
-[ ] 004039A0 - Add_Fleet_Movement_Box_Fields_
-[ ] 00403CC0 - Add_Added_Buttons_
-[ ] 00403E90 - At_Least_One_Ship_Of_Type_Selected_
-[ ] 00403EC0 - Clear_Ship_Node_Selection_Flags_
-[ ] 00403EE0 - thunk_Clear_Fleet_Box_Selected_Ship_Status_
-[ ] 00403EF0 - Draw_Damage_Bars_
-[ ] 00404170 - Draw_Fleet_Movement_Box_
-[ ] 00404790 - Draw_Large_Fleet_Box_Frame_
-[ ] 00404910 - Draw_Small_Fleet_Box_Frame_
-[ ] 00404B10 - Draw_Fleet_Pop_Added_Buttons_
-[ ] 00404CC0 - First_Unselected_Icon_
-[ ] 00404D10 - Fleet_Box_Data_
-[ ] 00404EF0 - Fleet_Box_Grid_Height_
-[ ] 00404F40 - Fleet_Box_Height_
-[ ] 00405060 - Fleet_Box_Width_
-[ ] 00405070 - Fleet_Buttons_Chosen_
-[ ] 004050B0 - Get_Fleet_Icon_Button_XY_
-[ ] 004050F0 - Get_Fleetpop_Scanned_Ship_Info_
-[ ] 004051E0 - N_Fleet_Icons_
+[X] 00402F60 - cmp_Research_
+[X] 00402FB0 - cmp_BC_
+[X] 00403000 - Evaluate_Input_
+[X] 004031B0 - Draw_Colony_Summary_
+[X] 004031F0 - Evaluate_Col_List_Input_
+[X] 00403460 - Evaluate_Colony_Pop_Input_
+[X] 00403590 - Get_Scanned_Pop_
+[X] 00403690 - Get_Selected_Pop_
+[X] 00403760 - Check_Galaxy_Map_Fields_
+[X] 004038D0 - Pick_Best_Planet_To_Goto_At_Star_
+[X] 004039A0 - Add_Fleet_Movement_Box_Fields_
+[X] 00403CC0 - Add_Added_Buttons_
+[X] 00403E90 - At_Least_One_Ship_Of_Type_Selected_
+[X] 00403EC0 - Clear_Ship_Node_Selection_Flags_
+[X] 00403EE0 - thunk_Clear_Fleet_Box_Selected_Ship_Status_
+[X] 00403EF0 - Draw_Damage_Bars_
+[X] 00404170 - Draw_Fleet_Movement_Box_
+[X] 00404790 - Draw_Large_Fleet_Box_Frame_
+[X] 00404910 - Draw_Small_Fleet_Box_Frame_
+[X] 00404B10 - Draw_Fleet_Pop_Added_Buttons_
+[X] 00404CC0 - First_Unselected_Icon_
+[X] 00404D10 - Fleet_Box_Data_
+[X] 00404EF0 - Fleet_Box_Grid_Height_
+[X] 00404F40 - Fleet_Box_Height_
+[X] 00405060 - Fleet_Box_Width_
+[X] 00405070 - Fleet_Buttons_Chosen_
+[X] 004050B0 - Get_Fleet_Icon_Button_XY_
+[X] 004050F0 - Get_Fleetpop_Scanned_Ship_Info_
+[X] 004051E0 - N_Fleet_Icons_
 [ ] 00405240 - Print_Fleet_Box_Info_
-[ ] 00405900 - Get_Absolute_Location_Scan_Info_
-[ ] 00405990 - Reload_Fleet_Box_Data_
+[X] 00405900 - Get_Absolute_Location_Scan_Info_
+[X] 00405990 - Reload_Fleet_Box_Data_
 [ ] 004059C0 - Reload_Fleet_Box_Palette_
 [ ] 004059E0 - Reload_Ship_Selection_Status_
 [ ] 00405A60 - Save_Ship_Selection_Status_
