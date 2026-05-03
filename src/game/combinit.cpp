@@ -166,11 +166,11 @@ int8_t __cdecl Colony_Has_Defenses_(int16_t colony_idx) {
 
     if (col->buildings[BUILDING_STAR_BASE] != 0 ||
         col->buildings[BUILDING_FIGHTER_GARRISON] != 0 ||
-        col->buildings[BUILDING_MISSILE_BASE] != 0 ||
         col->buildings[BUILDING_BATTLESTATION] != 0 ||
+        col->buildings[BUILDING_STAR_FORTRESS] != 0 ||
+        col->buildings[BUILDING_MISSILE_BASE] != 0 ||
         col->buildings[BUILDING_GROUND_BATTERIES] != 0 ||
-        col->buildings[BUILDING_STELLAR_CONVERTER] != 0 ||
-        col->buildings[BUILDING_STAR_FORTRESS] != 0) {
+        col->buildings[BUILDING_STELLAR_CONVERTER] != 0) {
         return 1;
     }
 
@@ -434,8 +434,9 @@ int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special
     return result;
 }
 
-int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag) {
+int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag) {
     bool skip_combat = false;
+    bool artemis_net_result = false;
     int16_t has_tractor_beam = 0;
     int16_t has_plasma_web = 0;
     int16_t has_cloaking = 0;
@@ -443,7 +444,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     int16_t has_bhg = 0;
     int16_t has_stellar_converter = 0;
     int16_t colony_pop = 0;
-    int16_t mouse_list[6] = {0, 0, 0, 0, 0x27F, 0x1DF};
+    s_mouse_list local_mouse_list = {0, 0, 0, 0, 0x27F, 0x1DF};
     MOX2::action_func_t auto_func;
     void* glass_remap_block;
     char msg_buf[80];
@@ -559,8 +560,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
     if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
         if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
-            skip_combat = CMBTFIR2::Apply_Combat_Artemis_Net_(0) != 0;
-            if (skip_combat == 0) {
+            artemis_net_result = CMBTFIR2::Apply_Combat_Artemis_Net_(0) != 0;
+            if (!artemis_net_result) {
                 KEN::Ken_Get_Text_Message_(0x53, msg_buf, 80);
             } else {
                 KEN::Ken_Get_Text_Message_(0x52, msg_buf, 80);
@@ -584,10 +585,13 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
     }
 
     if (!has_defender_ships) {
-        if (!skip_combat) {
+        if (artemis_net_result) {
+            skip_combat = true;
+        } else if (!skip_combat) {
             if (star_idx != MOX::_NUM_STARS) {
                 if (MOX::_cmbt_colony_id == -1 || Colony_Has_Defenses_(colony_idx) == 0) {
                     skip_combat = true;
+                    combat_winner = 1;
                 }
             }
         }
@@ -600,7 +604,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         RUSS::Mox_Update_();
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
-        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&local_mouse_list, 1);
         MAINSCR::Set_Reload_Fleet_Box_Palette_Flag_();
         ERIC::Fast_Fade_Out_();
         fonts::Load_Palette_(3, 0, 0xFF);
@@ -691,7 +695,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
                 grid_y += 20;
                 grid_idx++;
             }
-            grid_y += 20;
+            grid_x += 20;
         }
 
         MOX::_combat_mouse_grid[0x36d].x1 = 0;
@@ -953,7 +957,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
             for (int16_t i = 0; i < 300; ++i) {
                 if (MOX::_missile[i].type > 0) {
-                    if (MOX::_missile[i].travel_dist <= 0) {
+                    if (MOX::_missile[i].travel_dist == 0) {
                         MOX::_missile[i].travel_dist = MOX::_missile[i].speed * 20;
                     }
                     MOX::_missile[i].is_active = 1;
@@ -1015,7 +1019,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
     }
 
-    End_Of_Combat_(colony_idx, colony_pop, combat_winner);
+    End_Of_Combat_(star_idx, colony_pop, combat_winner);
 
     if (combat_winner == 1 || combat_winner == 0x29A) {
         if (MOX::_combat_attacker_player < 8 && MOX::_combat_defender_player >= 10 && MOX::_ship[plr2_ships[0]].d.ftl_type > 0) {
@@ -1033,7 +1037,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         fields::Deactivate_Help_List_();
-        mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        mouse::Set_Mouse_List_(&local_mouse_list, 1);
         ERIC::Fast_Fade_Out_();
         palette::Set_Palette_Gradient_(160, 95, 0, 0, 0, 0, 0, 0);
         MOX2::Put_Auto_Function_(&auto_func);
@@ -1359,7 +1363,7 @@ void __cdecl Load_Combat_Ship_Palette_(int16_t player_idx) {
 
 int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx) {
     int8_t result = 1;
-    int16_t size_threshold;
+    int16_t size_threshold = 0;
 
     if (MOX::_cmbt_colony_id != -1) {
         int16_t planet_idx = MOX::_colony[MOX::_cmbt_colony_id].planet;
@@ -1382,7 +1386,6 @@ int8_t __cdecl Ship_Can_Deploy_At_(int16_t x, int16_t y, int16_t ship_idx) {
             size_threshold = 8;
             break;
         default:
-            // Note: Binary reads uninitialized stack space if planet size > 4
             break;
         }
 
@@ -1944,7 +1947,7 @@ void __cdecl Deploy_Ships_() {
     int16_t defender_ship_count = 0;
     int16_t stationary_ship_idx = -1;
     int16_t defender_deploy_x;
-    int8_t attacker_deploy_x;
+    int16_t attacker_deploy_x;
     int8_t attacker_facing;
     int8_t defender_facing;
     int8_t saved_size;
@@ -2034,9 +2037,9 @@ void __cdecl Deploy_Ships_() {
                 ship->facing_dir = attacker_facing;
             } else {
                 if (!(defender_ship_count & 1)) {
+                    ship->x = (int8_t)defender_deploy_x;
+                    ship->y = (int8_t)defender_deploy_y_down;
                     while (true) {
-                        ship->x = (int8_t)defender_deploy_x;
-                        ship->y = (int8_t)defender_deploy_y_down;
                         int16_t offset = Ship_Size_Offset_(ship->size_class);
                         defender_deploy_y_down += (int16_t)(offset + 1);
                         if (defender_deploy_y_down > 64) {
@@ -2065,7 +2068,7 @@ void __cdecl Deploy_Ships_() {
                         }
                         int16_t offset = Ship_Size_Offset_(ship->size_class);
                         defender_deploy_y_up -= (int16_t)(offset + 1);
-                        if (Ship_Can_Deploy_At_(defender_deploy_x, defender_deploy_y_up, stationary_ship_idx)) {
+                        if (Ship_Can_Deploy_At_(defender_deploy_x, defender_deploy_y_down, stationary_ship_idx)) {
                             break;
                         }
                     }

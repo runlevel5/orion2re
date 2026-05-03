@@ -204,15 +204,15 @@ namespace BILL {
             return;
         }
 
-        uint8_t orig_space_width = (uint8_t)fonts::_font_header.font_style_widths[32];
+        int8_t orig_space_width = fonts::_font_header.font_style_widths[32];
         int16_t orig_spacing = fonts::_font_header.font_style_spacing;
-        uint16_t orig_current_font_style = fonts::_current_font_style;
+        int16_t orig_current_font_style = fonts::_current_font_style;
         int16_t orig_font_style = fonts::_font_header.font_style;
         int16_t y_offset = 0;
         int16_t initial_height = fonts::Get_Font_Height_();
 
         while (true) {
-            while ((uint8_t)fonts::_font_header.font_style_widths[32] > BILL::_space_limits[fonts::_current_font_style]) {
+            while (BILL::_space_limits[fonts::_current_font_style] < fonts::_font_header.font_style_widths[32]) {
                 if (fonts::Get_String_Width_(str) <= limit_w) {
                     break;
                 }
@@ -231,7 +231,7 @@ namespace BILL {
                 _Print_String_Bill_(x, y + y_offset, limit_w, str, p6, 1, pic);
 
                 fonts::_font_header.font_style_spacing = orig_spacing;
-                fonts::_font_header.font_style_widths[32] = (char)orig_space_width;
+                fonts::_font_header.font_style_widths[32] = orig_space_width;
 
                 if (resized) {
                     fonts::Set_Font_Style_(orig_current_font_style, &fonts::_font_header.selected_colors);
@@ -254,7 +254,7 @@ namespace BILL {
      * @address 00407480
      */
     void __cdecl _Squeeze_Print_Paragraph_(int16_t x, int16_t y, int16_t width, int16_t max_height, char* text, int32_t param_6, s_animation_header* anim, bool is_formatted, bool center_y) {
-        char saved_space_width = fonts::_font_header.font_style_widths[32];
+        int8_t saved_space_width = fonts::_font_header.font_style_widths[32];
         int16_t saved_spacing = fonts::_font_header.font_style_spacing;
         uint16_t saved_leading = fonts::_font_header.leading_offset;
         int16_t saved_font_style = fonts::_font_header.font_style;
@@ -281,7 +281,7 @@ namespace BILL {
                     break;
                 }
 
-                if (BILL::_space_limits[fonts::_current_font_style] >= (uint8_t)fonts::_font_header.font_style_widths[32]) {
+                if (BILL::_space_limits[fonts::_current_font_style] >= fonts::_font_header.font_style_widths[32]) {
                     break;
                 }
 
@@ -514,7 +514,7 @@ namespace BILL {
     }
 
     int16_t __cdecl Get_Their_Spy_Mission_(int16_t player_idx, int16_t target_player_idx) {
-        return static_cast<int16_t>(MOX::_player[player_idx].spies[target_player_idx] >> 6);
+        return static_cast<int16_t>(static_cast<uint8_t>(MOX::_player[player_idx].spies[target_player_idx]) >> 6);
     }
 
     /**
@@ -834,7 +834,7 @@ namespace BILL {
                     current_char = ' ';
                 }
 
-                if (current_char == ' ' || (current_char == '\b' && (current_width + (uint8_t)fonts::_font_header.font_style_widths['-'] <= width))) {
+                if (current_char == ' ' || (current_char == '\b' && (current_width + fonts::_font_header.font_style_widths['-'] <= width))) {
                     last_break_char_index = char_index;
                     break_char = current_char;
                     last_break_out_index = out_index;
@@ -846,7 +846,7 @@ namespace BILL {
                     break_char = '\r';
                     process_line_break = true;
                 } else if ((uint8_t)current_char >= 0x20) {
-                    current_width += (uint8_t)fonts::_font_header.font_style_widths[(uint8_t)current_char];
+                    current_width += fonts::_font_header.font_style_widths[(uint8_t)current_char];
 
                     if (current_char != ' ' && current_width > width) {
                         if (last_break_out_index != 0) {

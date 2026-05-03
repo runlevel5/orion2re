@@ -70,7 +70,7 @@ namespace COMBINIT {
     void __cdecl End_Of_Turn_Bookeeping_();
     void __cdecl End_Of_Combat_(int16_t param_1, int16_t param_2, int16_t param_3);
 
-    int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int32_t retreat_flag);
+    int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag);
 
     void __cdecl Unload_Combat_Ship_(int16_t combat_ship_idx);
 

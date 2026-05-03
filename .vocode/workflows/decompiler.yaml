@@ -7,6 +7,8 @@ variables:
     #value: gemini/gemini-3-flash-preview
     value: chatgpt/gpt-5.4-mini
     type: llm_models
+  LLM_DECOMPILER_PATCH:
+    value: v4a
 workflows:
   decompiler:
     description: "A LLM enabled decompiler agentic loop."

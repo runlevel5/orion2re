@@ -1549,10 +1549,8 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
     if ((MOX::_PLAYER_NUM == first_ship_owner) && is_valid_star_location) {
         int16_t processed_count = 0;
         if (ship_count > 0) {
-            int16_t planet_slot = 0;
-
             while (processed_count < ship_count) {
-                if (transport_troops_flag != static_cast<int8_t>(static_cast<uint8_t>(planet_slot))) {
+                if (transport_troops_flag != 0) {
                     break;
                 }
 
@@ -1564,14 +1562,7 @@ int8_t __cdecl Set_Transport_Troops_Flag_(int16_t ship_count) {
                 (void)HACCESS::Ship_Owner_(ship_idx);
 
                 if (MOX::_ship[ship_idx].d.ship_type == 2) {
-                    uint8_t stop_planet_scan = 0;
-                    planet_slot = 0;
-
-                    for (; planet_slot < 5; ++planet_slot) {
-                        if (stop_planet_scan != 0) {
-                            break;
-                        }
-
+                    for (int16_t planet_slot = 0; planet_slot < 5; ++planet_slot) {
                         const int16_t planet_idx = MOX::_star[star_idx].planet_index[planet_slot];
                         if (planet_idx != -1) {
                             const int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
@@ -1657,7 +1648,7 @@ int8_t __cdecl Set_Colonize_Button_Flag_(int16_t ship_count) {
 
     if ((ship_owner == MOX::_PLAYER_NUM) &&
         (is_at_star || is_in_transit_to_star) &&
-        (static_cast<int16_t>(MOX::_star[star_index].colonize_player) == MOX::_PLAYER_NUM) &&
+        (MOX::_star[star_index].colonize_player == MOX::_PLAYER_NUM) &&
         (ship_count > 0)) {
         int16_t processed_count = 0;
 

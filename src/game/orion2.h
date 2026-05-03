@@ -1850,7 +1850,7 @@ struct s_font {
     uint16_t line_height;
     uint16_t leading_offset;
     short font_style_spacing;
-    char font_style_widths[256];
+    int8_t font_style_widths[256];
     uint32_t font_style_offsets[256];
     short font_heights[8];
     short font_spacing[8];
@@ -3249,7 +3249,7 @@ struct s_player {
     char tech_history[350];
     char population_history[350];
     char production_history[350];
-    int8_t spies[8];
+    uint8_t spies[8];
     char history_btns;
     char ignoring;
     char peace_flags[8];
