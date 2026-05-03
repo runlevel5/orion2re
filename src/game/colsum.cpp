@@ -111,10 +111,10 @@ namespace COLSUM {
         COLONY::_full_draw = 0;
         ERIC::Fast_Fade_In_();
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+        video::Set_Refresh_Stencil_();
+        COLSUM::Update_Col_List_();
 
         while (true) {
-            video::Set_Refresh_Stencil_();
-            COLSUM::Update_Col_List_();
             timer::Mark_Time_();
             input_val = fields::Get_Input_();
             scan_val = fields::Scan_Input_();
@@ -976,11 +976,11 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
     }
 
     int16_t __cdecl cmp_(int16_t param_1, int16_t param_2) {
-        if (param_1 < param_2) {
+        if (param_2 < param_1) {
             return -1;
         }
 
-        return (int16_t)(param_2 < param_1);
+        return (int16_t)(param_1 < param_2);
     }
 
     int16_t __cdecl cmp_Pops_(int16_t colony_idx1, int16_t colony_idx2) {

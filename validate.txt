@@ -17,18 +17,18 @@
 [X] 00402590 - Draw_Info_Pop_For_
 [X] 00402670 - Colsum_Connect_Galaxy_Map_Stars_
 [X] 00402720 - Draw_Galaxy_Map_
-[ ] 00402750 - Decrement_First_
-[ ] 004027B0 - Increment_First_
-[ ] 00402800 - Colony_Summary_Screen_
-[ ] 00402A90 - Sort_Col_List_
-[ ] 00402AF0 - Switched_cmp_
-[ ] 00402BB0 - cmp_Alpha_
-[ ] 00402C60 - cmp_Prod_
-[ ] 00402D60 - cmp_
+[X] 00402750 - Decrement_First_
+[X] 004027B0 - Increment_First_
+[X] 00402800 - Colony_Summary_Screen_
+[X] 00402A90 - Sort_Col_List_
+[X] 00402AF0 - Switched_cmp_
+[X] 00402BB0 - cmp_Alpha_
+[X] 00402C60 - cmp_Prod_
+[X] 00402D60 - cmp_
 [ ] 00402D80 - Prod_To_Sort_Type_
-[ ] 00402E70 - cmp_Pops_
-[ ] 00402EC0 - cmp_Food_
-[ ] 00402F10 - cmp_Industry_
+[X] 00402E70 - cmp_Pops_
+[X] 00402EC0 - cmp_Food_
+[X] 00402F10 - cmp_Industry_
 [ ] 00402F60 - cmp_Research_
 [ ] 00402FB0 - cmp_BC_
 [ ] 00403000 - Evaluate_Input_
