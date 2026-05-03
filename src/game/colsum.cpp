@@ -437,7 +437,13 @@ namespace COLSUM {
         Draw_Scan_Info_();
 
         if (COLMOVE::_cluster_colony_n != -1 && COLONY::_g_colony_n != -1) {
-            s_colors colors = { 0xE8, 0xE9, 0xEA, 0xEB, 0xEA, 0xE9, 0, 0 };
+            s_colors colors;
+            colors.colors[0] = 0xE8;
+            colors.colors[1] = 0xE9;
+            colors.colors[2] = 0xEA;
+            colors.colors[3] = 0xEB;
+            colors.colors[4] = 0xEA;
+            colors.colors[5] = 0xE9;
             int16_t star1 = MOX::_planet[MOX::_colony[COLMOVE::_cluster_colony_n].planet].star_index;
             int16_t star2 = MOX::_planet[MOX::_colony[COLONY::_g_colony_n].planet].star_index;
             Colsum_Connect_Galaxy_Map_Stars_(star1, star2, &colors);
@@ -674,9 +680,9 @@ void __cdecl Draw_Info_Pop_For_(int16_t colony_idx) {
         int16_t num_colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
         COLSUM::Update_First_(10, &COLSUM::_first, &COLSUM::_slider_bar_position);
 
-        if (num_colonies > 10) {
+        if (num_colonies >= 10) {
             int32_t y1 = (271 * (int32_t)COLSUM::_first) / (int32_t)num_colonies + 40;
-            int32_t y2 = (271 * ((int32_t)COLSUM::_first + 10)) / (int32_t)num_colonies + 40;
+            int32_t y2 = (((271 * (int32_t)COLSUM::_first) + 10) / (int32_t)num_colonies) + 40;
 
             graphics::Set_Window_(0, 0, 639, 479);
             video::Clip_On_();

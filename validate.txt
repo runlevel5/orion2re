@@ -1,22 +1,22 @@
-[ ] 00401000 - Load_Colsum_Strings_
-[ ] 004012A0 - Reset_List_Col_Array_
+[X] 00401000 - Load_Colsum_Strings_
+[X] 004012A0 - Reset_List_Col_Array_
 [X] 004012C0 - Clear_List_Col_Array_
 [X] 004012E0 - Load_Col_Sum_Anims_
 [X] 00401320 - Update_First_
 [X] 004013B0 - Event_Good_
 [X] 004013C0 - Update_Col_List_
 [X] 00401430 - Update_Fields_
-[ ] 00401450 - Add_Fields_
-[ ] 00401950 - Add_Fields_Pop_For_
-[ ] 00401A40 - Draw_Colony_Scan_Info_
-[ ] 00401C20 - Draw_Scan_Info_
-[ ] 00401C70 - Draw_Colony_Summary_Screen_
-[ ] 00401E70 - Draw_Bar_Indicator_
-[ ] 00401FD0 - Draw_Empire_Info_
-[ ] 004021D0 - Draw_Colony_Summary_For_Colony_
-[ ] 00402590 - Draw_Info_Pop_For_
-[ ] 00402670 - Colsum_Connect_Galaxy_Map_Stars_
-[ ] 00402720 - Draw_Galaxy_Map_
+[X] 00401450 - Add_Fields_
+[X] 00401950 - Add_Fields_Pop_For_
+[X] 00401A40 - Draw_Colony_Scan_Info_
+[X] 00401C20 - Draw_Scan_Info_
+[X] 00401C70 - Draw_Colony_Summary_Screen_
+[X] 00401E70 - Draw_Bar_Indicator_
+[X] 00401FD0 - Draw_Empire_Info_
+[X] 004021D0 - Draw_Colony_Summary_For_Colony_
+[X] 00402590 - Draw_Info_Pop_For_
+[X] 00402670 - Colsum_Connect_Galaxy_Map_Stars_
+[X] 00402720 - Draw_Galaxy_Map_
 [ ] 00402750 - Increment_First_
 [ ] 004027B0 - Decrement_First_
 [ ] 00402800 - Colony_Summary_Screen_

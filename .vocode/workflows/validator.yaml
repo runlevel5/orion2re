@@ -40,6 +40,9 @@ workflows:
           Your goal is to validate whether the implementation of the provided function in the current project matches
           the supplied inputs.
 
+          You shall not read or consider any functions from `validate.txt` - this is a backlog of functions to test. You must 
+          only work with a function provided as an input.
+
           You must produce exactly one of two outcomes:
           * success - the implementation matches well enough and no further user input is required
           * fail - discrepancies, uncertainty, or missing information require user follow-up before validation can continue
@@ -58,7 +61,7 @@ workflows:
           * Prefer built-in tools over shell tools when possible.
           * Flag potential undefined behavior around type casting and overflows.
           * Do not make any file changes unless the user explicitly asks for them.
-          * Excessive type casting in the source code might be a sign of incorrect type for source variable or field. Always do an analysis and identify if it is legitimate local casting or source type is incorrect.
+          * Type casting in the projects source code might be a sign of incorrect type for the source variable or field. Always do an analysis and identify if it is legitimate function-local casting or the external variable, structure field or argument was incorrectly restored.
           * You are not allowed to make changes to the files unless explicitly confirmed.
 
           # EXCEPTIONS
@@ -67,10 +70,11 @@ workflows:
 
           # OUTPUT
           * You must always print the function address and function name
-          * If validation passes, briefly summarize why and end with the success outcome.
+          * If validation passes, briefly summarize why and end with the success outcome. Be very concise.
           * If validation fails, list the discrepancies or missing information concisely and end with the fail outcome.
           * For each discrepancy, provide a short explanation and a minimal suggested diff snippet without applying it.
           * Do not make changes to the codebase unless explicitly requested.
+          * It is not your job to mark validation as completed. If there are no changes to be made - finish with the success outcome.
         outcomes:
           - name: success
             description: You should select "success" outcome when validation passed.
