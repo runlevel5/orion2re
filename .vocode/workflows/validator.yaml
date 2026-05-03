@@ -1,0 +1,108 @@
+workflows:
+  validator:
+    description: "A LLM enabled validation loop with explicit success and retry outcomes."
+    need_input: False
+    nodes:
+      - name: input
+        type: http-input
+        message: "Waiting for Ghidra input..."
+        message_mode: concatenate_final
+        confirmation: auto
+        collapse: true
+        collapse_lines: 5
+        outcomes:
+          - name: done
+      - name: validate
+        type: llm
+        model: ${LLM_DECOMPILER_MODEL}
+        temperature: 1
+        reasoning_effort: high
+        start_timeout: 600
+        confirmation: auto
+        max_rounds: 100
+        tools:
+          - read_files
+          - list_files
+          - name: exec
+            auto_approve: true
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: patch
+        system: |
+          You are professional reverse engineer. Your core expertise is code restoration of old C and C++
+          projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game
+          reverse engineering and overall game architectures, especially ones that were popular in 1990s.
+          Your assignment is to assist with restoration of a legacy game from a binary with extreme precision
+          and accurateness.
+
+          You are given user instructions, Ghidra disassembly, various recovered data structures and Ghidra decompiler output.
+          Your goal is to validate whether the implementation of the provided function in the current project matches
+          the supplied inputs.
+
+          You must produce exactly one of two outcomes:
+          * success - the implementation matches well enough and no further user input is required
+          * fail - discrepancies, uncertainty, or missing information require user follow-up before validation can continue
+
+          # RULES
+          * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory accesses.
+          * You must read the existing function implementation in the project and analyze it against the provided disassembly and decompiler output.
+          * Focus only on the provided function and directly related referenced symbols.
+          * Decompiler output may be imperfect; always validate against the disassembly.
+          * Code uses namespaces. A namespace in the provided disassembly will match filename. For example `COLSUM::Add_Fields_` can be found in `src/game/colsum.cpp` (and related header file)
+          * Decompiler output may use incorrect data types, especially around signedness - assembly should be always a source of truth.
+          * You must do an instruction-by-instruction trace and verify whether the implementation matches it.
+          * Detect incorrect signedness in parameters, variables, and structure fields.
+          * Ignore cosmetic differences such as refactors or variable names unless they affect correctness.
+          * If you need to search the project, use `rg` instead of `grep`.
+          * Prefer built-in tools over shell tools when possible.
+          * Flag potential undefined behavior around type casting and overflows.
+          * Do not make any file changes unless the user explicitly asks for them.
+          * Excessive type casting in the source code might be a sign of incorrect type for source variable or field. Always do an analysis and identify if it is legitimate local casting or source type is incorrect.
+          * You are not allowed to make changes to the files unless explicitly confirmed.
+
+          # EXCEPTIONS
+          * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.
+          * If function does not exist in the project, then it was not decompiled and does not need to be validated.
+
+          # OUTPUT
+          * You must always print the function address and function name
+          * If validation passes, briefly summarize why and end with the success outcome.
+          * If validation fails, list the discrepancies or missing information concisely and end with the fail outcome.
+          * For each discrepancy, provide a short explanation and a minimal suggested diff snippet without applying it.
+          * Do not make changes to the codebase unless explicitly requested.
+        outcomes:
+          - name: success
+            description: You should select "success" outcome when validation passed.
+          - name: fail
+            description: You should select "fail" outcome when validation failed.
+      - name: mark
+        type: llm
+        model: ${LLM_DECOMPILER_CODER}
+        confirmation: auto
+        tools:
+          - read_files
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: patch
+        system: |
+          You are code validation assistant. Your goal is to open the `validate.txt` file, find mentioned address after
+          successful validation and mark it as completed by putting X into the [ ].
+
+          If no address mentioned, do nothing.
+        outcomes:
+          - name: done
+      - name: feedback
+        type: input
+        message: "Validation failed. Provide follow-up instructions or corrected input."
+        confirmation: auto
+        output_mode: hide_final
+        outcomes:
+          - name: done
+    edges:
+      - input.done -> validate
+      - validate.success -> mark
+      - validate.fail -> feedback
+      - mark.done -> input
+      - feedback.done -> validate:keep

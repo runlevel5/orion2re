@@ -1218,5 +1218,11 @@
     <None Include=".vocode\workflows\verifier.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
+    <None Include=".vocode\workflows\validator.yaml">
+      <Filter>.vocode\worklows</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="validate.txt" />
   </ItemGroup>
 </Project>
