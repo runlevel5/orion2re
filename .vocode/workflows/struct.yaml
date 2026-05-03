@@ -14,7 +14,7 @@ workflows:
           - name: done
       - name: decompile
         type: llm
-        model: ${LLM_DECOMPILER_MODEL}
+        model: ${LLM_STRONG_MODEL}
         temperature: 1
         reasoning_effort: high
         confirmation: auto

@@ -435,8 +435,8 @@ int16_t __cdecl Does_Combat_Ship_Have_Special_(int16_t ship_idx, int16_t special
 }
 
 int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, int16_t* plr2_ships, int16_t plr2_ship_count, int16_t star_idx, int16_t colony_idx, int16_t retreat_flag) {
-    bool skip_combat = false;
-    bool artemis_net_result = false;
+    int8_t abort_tactical = 0;
+    bool no_defender_ships = star_idx != MOX::_NUM_STARS;
     int16_t has_tractor_beam = 0;
     int16_t has_plasma_web = 0;
     int16_t has_cloaking = 0;
@@ -560,8 +560,8 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
 
     if (MOX::_combat_defender_player < 8 && star_idx < MOX::_NUM_STARS) {
         if (HAROLD::Player_Has_Artemis_Net_(&MOX::_player[MOX::_combat_defender_player], &MOX::_star[star_idx])) {
-            artemis_net_result = CMBTFIR2::Apply_Combat_Artemis_Net_(0) != 0;
-            if (!artemis_net_result) {
+            abort_tactical = CMBTFIR2::Apply_Combat_Artemis_Net_(0);
+            if (abort_tactical == 0) {
                 KEN::Ken_Get_Text_Message_(0x53, msg_buf, 80);
             } else {
                 KEN::Ken_Get_Text_Message_(0x52, msg_buf, 80);
@@ -572,32 +572,27 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
     }
 
-    bool has_defender_ships = false;
-    if (star_idx == MOX::_NUM_STARS) {
-        has_defender_ships = true;
-    }
-
-    for (int16_t i = 0; i < plr2_ship_count; ++i) {
-        if (MOX::_ship[plr2_ships[i]].d.ship_type == 0) {
-            has_defender_ships = true;
-            break;
+    if (no_defender_ships) {
+        for (int16_t i = 0; i < plr2_ship_count; ++i) {
+            if (MOX::_ship[plr2_ships[i]].d.ship_type == 0) {
+                no_defender_ships = false;
+                break;
+            }
         }
     }
 
-    if (!has_defender_ships) {
-        if (artemis_net_result) {
-            skip_combat = true;
-        } else if (!skip_combat) {
+    if (no_defender_ships) {
+        if (abort_tactical == 0) {
             if (star_idx != MOX::_NUM_STARS) {
                 if (MOX::_cmbt_colony_id == -1 || Colony_Has_Defenses_(colony_idx) == 0) {
-                    skip_combat = true;
                     combat_winner = 1;
+                    abort_tactical = 1;
                 }
             }
         }
     }
 
-    if (!skip_combat) {
+    if (abort_tactical == 0) {
         MOX2::Get_Auto_Function_(&auto_func);
         graphics::Reset_Window_();
         JIM::Play_Combat_Music_();
@@ -1033,7 +1028,7 @@ int16_t __cdecl Tactical_Combat_(int16_t* plr1_ships, int16_t plr1_ship_count, i
         }
     }
 
-    if (!skip_combat) {
+    if (abort_tactical == 0) {
         fields::Clear_Fields_();
         fields::Deactivate_Auto_Function_();
         fields::Deactivate_Help_List_();

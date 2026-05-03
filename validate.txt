@@ -104,12 +104,12 @@
 [X] 00407160 - Set_My_Agent_Number_
 [X] 00407180 - Add_Their_Spy_
 [X] 004071C0 - Get_History_Params_
-[ ] 004071F0 - Turn_Off_Palettes_
+[X] 004071F0 - Turn_Off_Palettes_
 [X] 00407210 - _Squeeze_Print_
 [X] 004073E0 - Squeeze_Print_
 [X] 00407410 - Squeeze_Print_Centered_
 [X] 00407450 - Squeeze_Centered_Print_
-[ ] 00407480 - _Squeeze_Print_Paragraph_
+[X] 00407480 - _Squeeze_Print_Paragraph_
 [X] 00407650 - Squeeze_Print_Paragraph_
 [X] 00407680 - Squeeze_Print_Formatted_Paragraph_
 [X] 004076B0 - Squeeze_Paragraph_Centered_
@@ -147,21 +147,21 @@
 [X] 0040AE30 - Ship_Size_Offset_
 [X] 0040AE70 - Ship_Can_Deploy_At_
 [ ] 0040AF90 - Deploy_Ships_
-[ ] 0040B390 - qsort_combat_data_by_size_
-[ ] 0040B3C0 - Calc_Combat_Shield_Max_
-[ ] 0040B460 - Load_Combat_Ship_
-[ ] 0040B9E0 - Scroll_Combat_Screen_
-[ ] 0040BCC0 - Snap_Center_Combat_Screen_
-[ ] 0040BF20 - Ship_Center_Offsets_
-[ ] 0040C030 - Load_Combat_Ship_Palette_
-[ ] 0040C230 - Load_Individual_Ship_Pictures_
-[ ] 0040C570 - Increment_Bhg_
-[ ] 0040C620 - End_Of_Turn_Bookeeping_
-[ ] 0040C690 - Plasma_Web_Damage_
-[ ] 0040C840 - Recharge_Shields_
-[ ] 0040C960 - Type_Of_Space_Station_
-[ ] 0040C9B0 - Load_Antaran_Planet_
-[ ] 0040CB30 - Load_Colony_Defense_
+[X] 0040B390 - qsort_combat_data_by_size_
+[X] 0040B3C0 - Calc_Combat_Shield_Max_
+[X] 0040B460 - Load_Combat_Ship_
+[X] 0040B9E0 - Scroll_Combat_Screen_
+[X] 0040BCC0 - Snap_Center_Combat_Screen_
+[X] 0040BF20 - Ship_Center_Offsets_
+[X] 0040C030 - Load_Combat_Ship_Palette_
+[X] 0040C230 - Load_Individual_Ship_Pictures_
+[X] 0040C570 - Increment_Bhg_
+[X] 0040C620 - End_Of_Turn_Bookeeping_
+[X] 0040C690 - Plasma_Web_Damage_
+[X] 0040C840 - Recharge_Shields_
+[X] 0040C960 - Type_Of_Space_Station_
+[X] 0040C9B0 - Load_Antaran_Planet_
+[X] 0040CB30 - Load_Colony_Defense_
 [ ] 0040CBA0 - Load_Tactical_Colony_
 [ ] 0040D2E0 - Load_Combat_Colony_Picture_
 [ ] 0040D3C0 - Does_Combat_Ship_Have_Special_

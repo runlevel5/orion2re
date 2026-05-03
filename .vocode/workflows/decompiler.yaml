@@ -1,14 +1,3 @@
-variables:
-  LLM_DECOMPILER_MODEL: 
-    #value: gemini/gemini-3-flash-preview
-    value: chatgpt/gpt-5.4
-    type: llm_models
-  LLM_DECOMPILER_CODER: 
-    #value: gemini/gemini-3-flash-preview
-    value: chatgpt/gpt-5.4-mini
-    type: llm_models
-  LLM_DECOMPILER_PATCH:
-    value: v4a
 workflows:
   decompiler:
     description: "A LLM enabled decompiler agentic loop."
@@ -24,7 +13,7 @@ workflows:
           - name: done
       - name: decompile
         type: llm
-        model: ${LLM_DECOMPILER_MODEL}
+        model: ${LLM_STRONG_MODEL}
         temperature: 1
         reasoning_effort: high
         confirmation: auto
@@ -321,7 +310,7 @@ workflows:
           - name: done
       - name: apply
         type: llm
-        model: ${LLM_DECOMPILER_CODER}
+        model: ${LLM_WEAK_MODEL}
         temperature: 1
         reasoning_effort: high
         confirmation: auto
@@ -340,7 +329,7 @@ workflows:
           - name: apply_patch
             auto_approve: true
             config:
-              format: patch
+              format: ${LLM_DIFF_FORMAT}
         system: |
           You are coding assistant and your goal is to implement requested changes. You will receive a C++ code snippet
           that you will have to apply against the codebase of the project using the `apply_patch` tool.

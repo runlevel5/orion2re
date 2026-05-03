@@ -14,7 +14,7 @@ workflows:
           - name: done
       - name: decompile
         type: llm
-        model: ${LLM_DECOMPILER_MODEL}
+        model: ${LLM_STRONG_MODEL}
         temperature: 1
         reasoning_effort: high
         start_timeout: 600
@@ -28,7 +28,7 @@ workflows:
           - name: apply_patch
             auto_approve: true
             config:
-              format: patch
+              format: ${LLM_DIFF_FORMAT}
         system: |
           You are professional reverse engineer. Your core expertise is code restoration of old C and C++
           projects compiled for Win32 platform. You are proficient in x86 assembly, binary analysis, game
