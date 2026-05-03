@@ -2,6 +2,7 @@
 #include <array>
 
 //#define SKIP_MAIN
+#define HOOK_STDIO
 
 namespace hooks {
 
@@ -47,6 +48,14 @@ namespace hooks {
     }
 
     static hook all_hooks[] = {
+#ifdef HOOK_STDIO
+        { 0x00540c00, &fopen },
+        { 0x00540a30, &fread },
+        { 0x00540860, &fwrite },
+        { 0x00541770, &fseek },
+        { 0x00542160, &fgetc },
+        { 0x005405f0, &fclose },
+#endif
 #ifndef SKIP_MAIN
         { 0x005422e0, &platform::entry },
         { 0x00483470, &MOX2::main2_ },
@@ -1741,7 +1750,7 @@ namespace hooks {
         { 0x00466a20, &COMBAT1::Send_Tactical_Combat_Message_ },
         { 0x0046a8a0, &COMBAT1::Add_Tactical_Combat_Fields_ },
         { 0x0046a0f0, &COMBAT1::Add_Missile_Fields_ },
-        { 0x0046a2c0, &COMBAT1::Set_Combat_Help_Fields_ },
+        { 0x0046a2c0, &COMBAT1::Set_Combat_Help_Fields_ },\
         { 0x004a6960, &CMBTSPEC::Draw_Cloak_ },
         { 0x0046ede0, &CMBTMOV1::Ship_Is_In_Stasis_ },
         { 0x004700d0, &CMBTMOV1::Rotate_Ship_ },

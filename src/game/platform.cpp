@@ -947,29 +947,19 @@ namespace platform {
     }
 
     void __cdecl Create_Cursor_Surface() {
-        DDSURFACEDESC surface_desc;
+        DDSURFACEDESC	desc2;
+        memset(&desc2, 0, sizeof(desc2));
+        desc2.dwSize = sizeof(desc2);
+        desc2.dwWidth = 24;
+        desc2.dwHeight = 24;
+        desc2.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+        desc2.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
+        desc2.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+        desc2.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8 | DDPF_RGB;
+        desc2.ddpfPixelFormat.dwRGBBitCount = 8;
 
-        memset(&surface_desc, 0, 0x6c);
-        surface_desc.dwWidth = 0x18;
-        surface_desc.dwHeight = 0x18;
-        surface_desc.dwSize = 0x6c;
-        surface_desc.dwFlags = 7;
-        surface_desc.ddsCaps.dwCaps = 0x840;
-        platform::g_direct_draw->CreateSurface(
-            &surface_desc,
-            &platform::g_cursor_surface_1,
-            nullptr);
-
-        memset(&surface_desc, 0, 0x6c);
-        surface_desc.dwWidth = 0x18;
-        surface_desc.dwHeight = 0x18;
-        surface_desc.dwSize = 0x6c;
-        surface_desc.dwFlags = 7;
-        surface_desc.ddsCaps.dwCaps = 0x840;
-        platform::g_direct_draw->CreateSurface(
-            &surface_desc,
-            &platform::g_cursor_surface_2,
-            nullptr);
+        g_direct_draw->CreateSurface(&desc2, &platform::g_cursor_surface_1, NULL);
+        g_direct_draw->CreateSurface(&desc2, &platform::g_cursor_surface_2, NULL);
     }
 
     void Draw_Auto_Cursor()
