@@ -260,7 +260,7 @@
 [X] 00416980 - Get_Diplomacy_Tech_List_
 [X] 00416A30 - Diplomacy_Generic_List_
 [X] 00416BA0 - Diplomacy_Generic_Exchange_Tech_List_
-[ ] 00416F30 - Diplomacy_Generic_System_List_
+[!] 00416F30 - Diplomacy_Generic_System_List_
 [X] 00417150 - Diplomacy_Generic_System_List_Draw_
 [X] 00417180 - Get_Diplomacy_Demand_Treaty_List_
 [X] 00417260 - Npc_Diplomacy_Screen_
@@ -289,12 +289,12 @@
 [X] 0041A4B0 - Diplomacy_Surrender_
 [X] 0041A600 - Diplomacy_Offer_Money_
 [X] 0041A8E0 - Get_Diplomacy_Statement_
-[ ] 0041B290 - An_
-[ ] 0041B2E0 - Get_Net_Diplomacy_Choices_
+[!] 0041B290 - An_
+[!] 0041B2E0 - Get_Net_Diplomacy_Choices_
 [X] 0041C480 - Diplomacy_Net_Switcheroo_
 [X] 0041C520 - Send_Diplomacy_Handshake_
 [X] 0041C580 - Diplomacy_Listen_Mode_
-[ ] 0041C720 - Diplomacy_Chat_
+[!] 0041C720 - Diplomacy_Chat_
 [X] 0041C8B0 - Draw_Diplomacy_Listen_Mode_
 [X] 0041C920 - Diplomacy_Synch_Mode_
 [X] 0041C970 - thunk_Draw_Diplomacy_Synch_Mode_
@@ -355,8 +355,8 @@
 [X] 0041FEF0 - Get_Ship_Icon_Dimensions_
 [X] 0041FF40 - Clear_Auto_Colonization_Flag_
 [X] 0041FF60 - Clear_All_Ships_Auto_Colonization_Flag_
-[ ] 0041FFA0 - Rob_Interpolate_Line_
-[ ] 00420110 - Draw_Generic_Beam_
+[!] 0041FFA0 - Rob_Interpolate_Line_
+[!] 00420110 - Draw_Generic_Beam_
 [X] 00420A50 - Get_Ship_Range_
 [X] 00420A80 - Draw_Ship_Burst_
 [X] 00420AE0 - Draw_Ship_Explosion_
@@ -366,24 +366,24 @@
 [X] 00420CA0 - Init_Beams_
 [X] 00420CC0 - Reset_Beam_Swapping_Colors_
 [X] 00420CE0 - Add_Weapon_Palette_Fragment_To_Current_Palette_
-[ ] 00420D60 - Beam_SFX_
+[!] 00420D60 - Beam_SFX_
 [X] 00421CA0 - Reset_Beam_SFX_Handles_
 [X] 00421CC0 - Get_Max_Frames_
-[ ] 00421CD0 - Fire_Weapon_
-[ ] 00422770 - Draw_Fighter_Beam_
-[ ] 004228F0 - Add_Damage_Message_To_Queue_
+[!] 00421CD0 - Fire_Weapon_
+[!] 00422770 - Draw_Fighter_Beam_
+[!] 004228F0 - Add_Damage_Message_To_Queue_
 [X] 00422980 - Squish_Out_Msg_Queue_Slot_
 [X] 004229D0 - Draw_Damage_Message_Queue_
 [X] 00422A60 - Done_Drawing_Damage_Message_Queue_
-[ ] 00422A70 - Draw_Damage_Indicator_
-[ ] 00422D20 - Add_Damage_Indicator_For_Ship_
+[!] 00422A70 - Draw_Damage_Indicator_
+[!] 00422D20 - Add_Damage_Indicator_For_Ship_
 [X] 00422DC0 - Add_Damage_Indicator_For_Missile_
 [X] 00422E00 - Add_Damage_Indicator_For_Biological_
 [X] 00422E40 - Do_Get_SFX_Draw_Shield_Facing_
 [X] 00422E70 - Draw_Damage_Message_Queue_Until_Done_
 [X] 00422ED0 - Get_SFX_Draw_Shield_Facing2_
-[ ] 00422FB0 - Adjust_Shield_Display_Status_
-[ ] 00423080 - XY_In_Shield_Radius_
+[!] 00422FB0 - Adjust_Shield_Display_Status_
+[!] 00423080 - XY_In_Shield_Radius_
 [X] 004230E0 - Load_Shield_Hit_
 [X] 00423170 - Shield_Anims_
 [X] 00423210 - Draw_Shield_Hit_Once_Through_
@@ -404,7 +404,7 @@
 [X] 00424F30 - Cache_Load_Bldg_
 [X] 00424FB0 - Play_Streaming_Music_
 [X] 004251B0 - Stop_Background_Music_
-[ ] 004251D0 - Play_Background_Music_
+[!] 004251D0 - Play_Background_Music_
 [X] 004252A0 - Play_Combat_Music_
 [X] 00425340 - Get_Text_Message_
 [X] 00425420 - Decode_Text_Message_
@@ -423,7 +423,7 @@
 [X] 004259B0 - Decode_Text_Year_
 [X] 004259E0 - Decode_Text_Tech_And_Other_Name_
 [X] 00425A10 - Bill_Picture_To_Mouse_
-[ ] 00425A70 - Draw_Logos_
+[!] 00425A70 - Draw_Logos_
 [X] 00425D50 - Logo_Fadeout_
 [X] 00425DC0 - Slow_Fade_In_
 [X] 00425E30 - Check_For_Simtex_Logo_
@@ -431,13 +431,13 @@
 [X] 00426300 - Draw_Maint_Income_Chart_
 [X] 00426470 - Build_Maint_Chart_Bitmaps_
 [X] 00426830 - Initialize_Maintenance_Values_
-[ ] 00426920 - Draw_The_History_Graph_
+[!] 00426920 - Draw_The_History_Graph_
 [X] 00426B90 - Smooth_History_Data_
-[ ] 00426C00 - Display_Graphed_Players_Names_
+[!] 00426C00 - Display_Graphed_Players_Names_
 [X] 00426CC0 - History_Subscreen_
 [X] 00426E50 - Get_Plyr_Hist_Btns_
 [X] 00426EA0 - Set_Plyr_Hist_Btns_
-[ ] 00426F20 - Draw_Histories_
+[!] 00426F20 - Draw_Histories_
 [X] 00427390 - Draw_History_Subscreen_
 [X] 004273E0 - Tech_Review_Subscreen_
 [X] 00427410 - _Tech_Review_Subscreen_
@@ -445,18 +445,18 @@
 [X] 00427A60 - Init_Tech_Review_List_
 [X] 00427B50 - Race_Statistics_Specials_Help_
 [X] 00427C60 - Race_Stats_Subscreen_
-[ ] 00428150 - Print_Player_Specials_To_Bitmap_
+[!] 00428150 - Print_Player_Specials_To_Bitmap_
 [X] 00428440 - Draw_Race_Stats_Subscreen_
-[ ] 004284D0 - _Init_Turn_Summary_List_
+[!] 004284D0 - _Init_Turn_Summary_List_
 [X] 004285E0 - Init_Turn_Summary_List_
 [X] 00428600 - Turn_Summary_Subscreen_
 [X] 004289A0 - Draw_Dummy_Turn_Summary_Subscreen_
 [X] 004289B0 - Draw_Turn_Summary_Subscreen_
-[ ] 00428A30 - Reference_Subscreen_
+[!] 00428A30 - Reference_Subscreen_
 [X] 00428AE0 - Reference_Main_Subscreen_
 [X] 00428E30 - Draw_Reference_Main_Subscreen_
-[ ] 00428EC0 - Reference_How_To_Subscreen_
-[ ] 00429020 - Reference_Category_Subscreen_
+[!] 00428EC0 - Reference_How_To_Subscreen_
+[!] 00429020 - Reference_Category_Subscreen_
 [X] 004295D0 - Draw_Reference_Category_Subscreen_
 [X] 00429690 - Introduce_Subscreen_
 [X] 004296E0 - Draw_Drop_Area_
@@ -471,97 +471,97 @@
 [X] 00429DA0 - Draw_Colony_Landing_Screen_
 [X] 00429F50 - Print_Planet_Data_
 [X] 0042A230 - Do_AI_Leaders_
-[ ] 0042A430 - Assign_Unassigned_Leaders_
-[ ] 0042A4A0 - Assign_Fleet_Officer_
-[ ] 0042A570 - Reassign_Fleet_Officer_
-[ ] 0042A6B0 - Assign_Star_Officer_
-[ ] 0042A920 - Main_Antaran_Room_Screen_
-[ ] 0042AA80 - Draw_Main_Antaran_Room_Screen_
-[ ] 0042AB10 - Reload_Main_Antaran_Room_Screen_
-[ ] 0042AC30 - Get_Antaran_Room_Message_
-[ ] 0042ACB0 - Load_Xport_Anims_
-[ ] 0042AD00 - N_Colonies_
-[ ] 0042AD70 - Build_Global_Colony_List_
-[ ] 0042ADF0 - Xport_Popup_
-[ ] 0042AF90 - FUN_0042af90
-[ ] 0042B110 - Draw_Xport_Popup_
-[ ] 0042B1E0 - Clear_List_Col_Array_
-[ ] 0042B200 - Draw_Colony_Summary_For_Colony_
-[ ] 0042B2D0 - FUN_0042b2d0
-[ ] 0042B330 - Draw_Bar_Indicator_
-[ ] 0042B480 - Compute_Player_Ground_Combat_Bonuses_
-[ ] 0042B610 - Ground_Combat_Round_
-[ ] 0042B6F0 - Find_Troops_
-[ ] 0042B730 - Resolve_Ground_Combat_
-[ ] 0042B760 - Get_Boarding_Info_
-[ ] 0042B820 - Compute_Ground_Combat_Info_
-[ ] 0042B9D0 - Get_Invasion_Info_
-[ ] 0042BB30 - Compute_Colony_Officer_Bonus_
-[ ] 0042BBB0 - Compute_Attacker_Officer_Bonus_
-[ ] 0042BC70 - Colony_N_Militia_
-[ ] 0042BCB0 - Enforce_Population_Limits_At_Colony_
-[ ] 0042BF20 - Assign_New_Home_Planet_
-[ ] 0042BFD0 - Change_Colony_Ownership_
-[ ] 0042C350 - Change_Pop_Ownership_
-[ ] 0042C5F0 - Check_All_Rebellions_
-[ ] 0042C650 - Check_Rebellion_
-[ ] 0042C890 - Get_Rebellion_Info_
-[ ] 0042C9B0 - Resolve_Rebellion_Troops_
-[ ] 0042CA30 - Invade_
-[ ] 0042CB80 - Resolve_Invasion_Troops_
-[ ] 0042CC70 - Colony_Infantry_Limit_
-[ ] 0042CCD0 - Colony_Infantry_Barracks_Limit_
-[ ] 0042CD10 - Colony_Tank_Limit_
-[ ] 0042CD70 - Colony_Tank_Barracks_Limit_
-[ ] 0042CDC0 - Unload_Transports_
-[ ] 0042CE50 - Compute_Colony_Ground_Combat_Info_
-[ ] 0042CEF0 - Receive_Chat_Msg_
-[ ] 0042CFA0 - Send_Chat_Msg_
-[ ] 0042D000 - Send_GNN_Chat_Msg_
-[ ] 0042D080 - Add_Design_Buttons_
-[ ] 0042D5B0 - Add_Size_Button_
-[ ] 0042D5C0 - thunk_Current_Design_Shield_
-[ ] 0042D5D0 - Build_Initial_Design_Template_
-[ ] 0042D930 - Check_Generic_Replacement_Fields_
-[ ] 0042DA90 - Has_Damper_Field_
-[ ] 0042DAD0 - Check_Plus_Minus_Buttons_
-[ ] 0042DC20 - Check_Special_System_Fields_
-[ ] 0042DDA0 - Check_Weapon_Fields_
-[ ] 0042DF20 - Clear_Design_
-[ ] 0042E060 - Clear_Special_System_Slot_
-[ ] 0042E120 - Clear_Weapon_Slot_
-[ ] 0042E270 - Computer_Cost_
-[ ] 0042E2B0 - Cost_Given_M_Level_
-[ ] 0042E320 - Cost_Of_Design_
-[ ] 0042E540 - Current_Design_Combat_Speed_
-[ ] 0042E580 - Current_Design_Has_Special_System_
-[ ] 0042E5B0 - Current_Design_Base_Combat_Speed_
-[ ] 0042E620 - Current_Design_Min_Combat_Speed_
-[ ] 0042E650 - Current_Design_Max_Combat_Speed_
-[ ] 0042E680 - Current_Design_Shield_
-[ ] 0042E690 - Base_Shield_Cost
-[ ] 0042E6A0 - Get_Shild_Space_
-[ ] 0042E6B0 - Design_Screen_
-[ ] 0042EDD0 - Design_Template_Costs_
-[ ] 0042EFC0 - Design_Template_Space_Requirements_
-[ ] 0042F170 - Design_Weapon_Damage_String_
-[ ] 0042F470 - Draw_Design_Screen_
-[ ] 0042F4A0 - Check_For_Auto_Repeat_
-[ ] 0042F670 - Draw_Down_Buttons_
-[ ] 0042F800 - Get_Colony_Handle_
-[ ] 0042F830 - Get_Ship_Design_Name_
-[ ] 0042F8B0 - Get_Ship_Size_Button_Field_XY_
-[ ] 0042F9A0 - Load_Design_Screen_Pictures_
-[ ] 00430290 - Miniaturization_Level_
-[ ] 00430360 - N_Replacements_For_Generic_Item_
-[ ] 004303A0 - Count_Special_Devices_
-[ ] 004303D0 - Count_Weapons_Loaded_
-[ ] 00430400 - One_Weapon_Space_Without_M_Level_
-[ ] 004304C0 - Bonus_For_Regular_Mods_
-[ ] 00430730 - Bonus_For_Special_Mods_
-[ ] 004307B0 - Get_Weapon_Mod_Space_Bonus_
-[ ] 004307D0 - Print_Current_Design_
-[ ] 004315D0 - Build_Design_Template_
+[X] 0042A430 - Assign_Unassigned_Leaders_
+[X] 0042A4A0 - Assign_Fleet_Officer_
+[X] 0042A570 - Reassign_Fleet_Officer_
+[X] 0042A6B0 - Assign_Star_Officer_
+[X] 0042A920 - Main_Antaran_Room_Screen_
+[X] 0042AA80 - Draw_Main_Antaran_Room_Screen_
+[X] 0042AB10 - Reload_Main_Antaran_Room_Screen_
+[X] 0042AC30 - Get_Antaran_Room_Message_
+[X] 0042ACB0 - Load_Xport_Anims_
+[!] 0042AD00 - N_Colonies_
+[!] 0042AD70 - Build_Global_Colony_List_
+[X] 0042ADF0 - Xport_Popup_
+[X] 0042AF90 - FUN_0042af90
+[X] 0042B110 - Draw_Xport_Popup_
+[X] 0042B1E0 - Clear_List_Col_Array_
+[!] 0042B200 - Draw_Colony_Summary_For_Colony_
+[!] 0042B2D0 - FUN_0042b2d0
+[X] 0042B330 - Draw_Bar_Indicator_
+[!] 0042B480 - Compute_Player_Ground_Combat_Bonuses_
+[X] 0042B610 - Ground_Combat_Round_
+[!] 0042B6F0 - Find_Troops_
+[X] 0042B730 - Resolve_Ground_Combat_
+[X] 0042B760 - Get_Boarding_Info_
+[X] 0042B820 - Compute_Ground_Combat_Info_
+[X] 0042B9D0 - Get_Invasion_Info_
+[X] 0042BB30 - Compute_Colony_Officer_Bonus_
+[X] 0042BBB0 - Compute_Attacker_Officer_Bonus_
+[X] 0042BC70 - Colony_N_Militia_
+[X] 0042BCB0 - Enforce_Population_Limits_At_Colony_
+[!] 0042BF20 - Assign_New_Home_Planet_
+[X] 0042BFD0 - Change_Colony_Ownership_
+[!] 0042C350 - Change_Pop_Ownership_
+[!] 0042C5F0 - Check_All_Rebellions_
+[X] 0042C650 - Check_Rebellion_
+[!] 0042C890 - Get_Rebellion_Info_
+[X] 0042C9B0 - Resolve_Rebellion_Troops_
+[X] 0042CA30 - Invade_
+[X] 0042CB80 - Resolve_Invasion_Troops_
+[X] 0042CC70 - Colony_Infantry_Limit_
+[X] 0042CCD0 - Colony_Infantry_Barracks_Limit_
+[X] 0042CD10 - Colony_Tank_Limit_
+[X] 0042CD70 - Colony_Tank_Barracks_Limit_
+[X] 0042CDC0 - Unload_Transports_
+[!] 0042CE50 - Compute_Colony_Ground_Combat_Info_
+[!] 0042CEF0 - Receive_Chat_Msg_
+[X] 0042CFA0 - Send_Chat_Msg_
+[X] 0042D000 - Send_GNN_Chat_Msg_
+[!] 0042D080 - Add_Design_Buttons_
+[X] 0042D5B0 - Add_Size_Button_
+[X] 0042D5C0 - thunk_Current_Design_Shield_
+[X] 0042D5D0 - Build_Initial_Design_Template_
+[X] 0042D930 - Check_Generic_Replacement_Fields_
+[X] 0042DA90 - Has_Damper_Field_
+[X] 0042DAD0 - Check_Plus_Minus_Buttons_
+[X] 0042DC20 - Check_Special_System_Fields_
+[!] 0042DDA0 - Check_Weapon_Fields_
+[X] 0042DF20 - Clear_Design_
+[X] 0042E060 - Clear_Special_System_Slot_
+[!] 0042E120 - Clear_Weapon_Slot_
+[X] 0042E270 - Computer_Cost_
+[!] 0042E2B0 - Cost_Given_M_Level_
+[!] 0042E320 - Cost_Of_Design_
+[X] 0042E540 - Current_Design_Combat_Speed_
+[!] 0042E580 - Current_Design_Has_Special_System_
+[X] 0042E5B0 - Current_Design_Base_Combat_Speed_
+[X] 0042E620 - Current_Design_Min_Combat_Speed_
+[X] 0042E650 - Current_Design_Max_Combat_Speed_
+[X] 0042E680 - Current_Design_Shield_
+[X] 0042E690 - Base_Shield_Cost
+[X] 0042E6A0 - Get_Shild_Space_
+[!] 0042E6B0 - Design_Screen_
+[X] 0042EDD0 - Design_Template_Costs_
+[!] 0042EFC0 - Design_Template_Space_Requirements_
+[X] 0042F170 - Design_Weapon_Damage_String_
+[X] 0042F470 - Draw_Design_Screen_
+[!] 0042F4A0 - Check_For_Auto_Repeat_
+[X] 0042F670 - Draw_Down_Buttons_
+[X] 0042F800 - Get_Colony_Handle_
+[!] 0042F830 - Get_Ship_Design_Name_
+[X] 0042F8B0 - Get_Ship_Size_Button_Field_XY_
+[X] 0042F9A0 - Load_Design_Screen_Pictures_
+[X] 00430290 - Miniaturization_Level_
+[X] 00430360 - N_Replacements_For_Generic_Item_
+[X] 004303A0 - Count_Special_Devices_
+[X] 004303D0 - Count_Weapons_Loaded_
+[!] 00430400 - One_Weapon_Space_Without_M_Level_
+[X] 004304C0 - Bonus_For_Regular_Mods_
+[X] 00430730 - Bonus_For_Special_Mods_
+[X] 004307B0 - Get_Weapon_Mod_Space_Bonus_
+[!] 004307D0 - Print_Current_Design_
+[X] 004315D0 - Build_Design_Template_
 [ ] 00431700 - Current_Design_Armor_Absorption_
 [ ] 00431760 - Current_Shield_Damage_Points_Blocked_
 [ ] 004317A0 - Current_Design_Structural_Points_
