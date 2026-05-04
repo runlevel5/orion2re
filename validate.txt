@@ -562,260 +562,260 @@
 [X] 004307B0 - Get_Weapon_Mod_Space_Bonus_
 [!] 004307D0 - Print_Current_Design_
 [X] 004315D0 - Build_Design_Template_
-[ ] 00431700 - Current_Design_Armor_Absorption_
-[ ] 00431760 - Current_Shield_Damage_Points_Blocked_
-[ ] 004317A0 - Current_Design_Structural_Points_
-[ ] 004317D0 - Printed_Design_Cost_
-[ ] 00431850 - Print_Ship_Size_Error_Message_
-[ ] 00431970 - Cost_Reduction_For_Govt_Type_
-[ ] 004319D0 - Replacement_Exists_
-[ ] 00431A50 - Set_Flashing_Colors_
-[ ] 00431B10 - Shield_Cost_
-[ ] 00431B50 - Shield_Space_
-[ ] 00431B90 - Shield_Space_Given_M_Level_
-[ ] 00431BE0 - Shield_Strength_
-[ ] 00431C50 - Space_For_System_Replacement_
-[ ] 00431DD0 - Space_For_Weapon_Replacement_
-[ ] 00431E60 - Space_Given_M_Level_
-[ ] 00431F30 - Tech_App_To_Tech_Id_
-[ ] 00431FB0 - Tech_Level_
-[ ] 00432040 - Total_Design_Cost_
-[ ] 00432100 - Total_Design_Space_
-[ ] 00432160 - Total_Space_Used_
-[ ] 004321E0 - Update_Calculated_Design_Data_
-[ ] 004322C0 - Update_Weapon_Count_
-[ ] 00432300 - Update_N_Spec_Systems_In_Design_
-[ ] 00432360 - Update_Player_Design_
-[ ] 00432620 - Weapon_Cost_
-[ ] 00432720 - Weapon_Needs_Racks_
-[ ] 00432740 - One_Weapon_Space_
-[ ] 00432830 - Weapon_Space_
-[ ] 00432940 - Weapon_Type_
-[ ] 00432960 - Weapon_Arc_String_
-[ ] 00432AC0 - Weapon_Mod_String_
-[ ] 00432BC0 - Miniaturization_Category_
-[ ] 00432C90 - Weapon_Rack_Size_
-[ ] 00432D00 - Get_Tech_Description_Lbx_Name_
-[ ] 00432DD0 - Print_Formatted_Paragraph_
-[ ] 00432E00 - Print_Formatted_Paragraph_To_Bitmap_
-[ ] 00432E30 - Set_Paragraph_Integer_Pointer_
-[ ] 00432E50 - Set_Paragraph_Sint_Pointer_
-[ ] 00432E70 - Get_Formatted_Paragraph_Max_Height_
-[ ] 00432EA0 - Get_Formatted_Paragraph_Max_Width_
-[ ] 00432EE0 - Get_Last_Formatted_Paragraph_Max_Width_
-[ ] 00432EF0 - Init_
-[ ] 00432F20 - _Print_Formatted_Paragraph_
-[ ] 00433120 - Process_Paragraph_Text_
-[ ] 004333E0 - Add_Character_To_Line_
-[ ] 004334A0 - Return_To_Last_Break_
-[ ] 00433600 - Record_Break_Position_
-[ ] 004337B0 - Process_Command_
-[ ] 00433950 - Quit_Context_
-[ ] 00433990 - Quit_Paragraph_
-[ ] 004339F0 - Set_Justification_
-[ ] 00433A70 - Complete_Line_
-[ ] 00433AD0 - Complete_Line_Data_
-[ ] 00433BA0 - Paragraph_HT_
-[ ] 00433BF0 - Vertical_Move_Paragraph_Advance_
-[ ] 00433C10 - Vertical_Move_Line_Advance_
-[ ] 00433C30 - Vertical_Move_
-[ ] 00433C90 - Reset_Font_Spacing_
-[ ] 00433CD0 - Reset_Font_Spacing_Width_
-[ ] 00433CF0 - Reset_Font_LF_
-[ ] 00433D30 - Reset_Parameters_
-[ ] 00433DC0 - Initialize_Formatted_Paragraph_System_
-[ ] 00433DE0 - Reset_A_Paragraph_Variable_
-[ ] 00433E10 - Set_Paragraph_Variable_Pointer_
-[ ] 00433E40 - Set_Current_Colors_
-[ ] 00433E60 - Set_Current_Style_
-[ ] 00433EC0 - Test_Item_
-[ ] 00434060 - Set_Value_
-[ ] 00434190 - Get_Next_Item_Value_
-[ ] 004341C0 - Get_Item_Value_
-[ ] 00434240 - Set_Item_Value_
-[ ] 004342E0 - Insert_Item_
-[ ] 00434640 - Get_Item_Value_Set_Plural_
-[ ] 00434670 - Insert_Next_Argument_String_
-[ ] 004346A0 - Skip_Arg_Insert_A_String_
-[ ] 004346E0 - Get_Insert_Argument_Next_
-[ ] 00434760 - Insert_String_
-[ ] 00434780 - Insert_A_String_
-[ ] 004347C0 - Previous_Nesting_Level_
-[ ] 00434800 - Process_Function_
-[ ] 00434B20 - Get_Function_Argument_
-[ ] 00434BD0 - FN_Set_Font_
-[ ] 00434CA0 - FN_Superscript_
-[ ] 00434D40 - FN_Set_Variable_
-[ ] 00434DB0 - FN_Set_Tabs_
-[ ] 00434E20 - FN_Set_X_Pos_
-[ ] 00434E70 - FN_Set_Y_Pos_
-[ ] 00434EE0 - FN_Set_H_Spacing_
-[ ] 00434F20 - FN_Set_Space_Size_
-[ ] 00434F70 - FN_Set_V_Spacing_
-[ ] 00434FB0 - FN_Set_FF_Size_
-[ ] 00435010 - FN_Set_Margins_
-[ ] 004350E0 - FN_Set_Indent_
-[ ] 00435140 - FN_Set_Origin_
-[ ] 00435210 - FN_User_Call_
-[ ] 00435290 - Justify_Line_
-[ ] 004352F0 - _Justify_Line_Fully_
-[ ] 00435440 - Print_Line_
-[ ] 00435A70 - Sort_Tabs_
-[ ] 00435AA0 - _Comp_Tabs_
-[ ] 00435AC0 - Get_Current_Color_Set_
-[ ] 00435B20 - Initialize_Line_Start_
-[ ] 00435B60 - Pick_Font_Color_
-[ ] 00435B90 - Pick_Font_Number_
-[ ] 00435C10 - Update_Max_Min_Values_
-[ ] 00435CA0 - Set_Max_Min_X_
-[ ] 00435CF0 - Set_Max_Min_Y_
-[ ] 00435D30 - Reset_Max_Min_Values_
-[ ] 00435D60 - Set_Para_Y2_
-[ ] 00435D80 - Skip_Spaces_
-[ ] 00435DB0 - Legalize_Paragraph_Y_
-[ ] 00435DE0 - Set_Line_Limits_
-[ ] 00435FC0 - Ship_Range_
-[ ] 00436030 - Star_In_Range_Of_Player_
-[ ] 004360C0 - Star_In_Range_Of_Player_Aux2_
-[ ] 00436160 - Star_In_Range_Of_Player_Aux1_
-[ ] 00436230 - Star_In_Normal_Range_Of_Player_
-[ ] 00436270 - Star_In_Extended_Range_Of_Player_
-[ ] 004362C0 - Can_Order_Ship_
-[ ] 004363E0 - Ships_Try_To_Move_To_
-[ ] 004368E0 - Player_N_Turns_From_Star_To_Star_
-[ ] 00436A50 - Make_Ships_Move_To_
-[ ] 00436B40 - Ship_Is_Moving_
-[ ] 00436B60 - Move_All_Ships_Toward_Stars_
-[ ] 00436CD0 - Make_Ship_Arrive_At_Star_
-[ ] 00436E30 - Create_Nonplayer_Ship_
-[ ] 00436F50 - Allocate_New_Ship_Slots_
-[ ] 00437170 - Update_All_Ship_Ranges_
-[ ] 00437210 - Update_Player_Ship_Range_
-[ ] 00437260 - Ship_Destination_Star_
-[ ] 00437290 - Update_Ship_ETAs_
-[ ] 004373A0 - Do_Wormhole_Event_
-[ ] 004374E0 - Do_Hyperspace_Beast_
-[ ] 00437750 - Unmark_Just_Built_AI_Ships_
-[ ] 004377D0 - Reset_Needless_Ignore_Combat_Ships_Flags_
-[ ] 00437910 - Player_Has_Ships_Pestering_Other_Player_
-[ ] 00437990 - Player_Score_Modifier_
-[ ] 00437A20 - Reload_Racial_Option_Screen_
-[ ] 00437AB0 - Calculate_Picks_
-[ ] 00437B90 - Draw_Race_Option_Background_
-[ ] 00438200 - Draw_Racial_Option_Screen_
-[ ] 00438AE0 - Set_Race_Option_Help_List_
-[ ] 00438EF0 - Racial_Option_Screen_
-[ ] 00439650 - Add_Race_Options_Fields_
-[ ] 00439920 - Convert_Player_To_Flags_
-[ ] 004399C0 - Convert_Flags_To_Player_
-[ ] 00439A90 - Reload_Option_Strings_
-[ ] 00439B20 - Real_Ability_Cost_
-[ ] 00439CA0 - Setup_Evolutionary_Upgrade_
-[ ] 00439D60 - Add_Race_Options_Fields_EM_
-[ ] 0043A0E0 - Calculate_EM_Picks_
-[ ] 0043A0F0 - Convert_Player_To_Flags_EM_
-[ ] 0043A1D0 - Convert_Flags_To_Player_EM_
-[ ] 0043A270 - Evolutionary_Mutation_Screen_
-[ ] 0043A880 - connect_to_servers
-[ ] 0043A9C0 - FUN_0043a9c0
-[ ] 0043A9D0 - Ten_Update_
-[ ] 0043AA60 - connect
-[ ] 0043AA90 - Ten_Flag
-[ ] 0043AAA0 - Ten_Stop
-[ ] 0043AB40 - FUN_0043ab40
-[ ] 0043AB60 - FUN_0043ab60
-[ ] 0043AC80 - FUN_0043ac80
-[ ] 0043ADB0 - FUN_0043adb0
-[ ] 0043AE10 - FUN_0043ae10
-[ ] 0043AE60 - FUN_0043ae60
-[ ] 0043AFC0 - FUN_0043afc0
-[ ] 0043B0B0 - FUN_0043b0b0
-[ ] 0043B110 - FUN_0043b110
-[ ] 0043B220 - FUN_0043b220
-[ ] 0043B2D0 - FUN_0043b2d0
-[ ] 0043B310 - FUN_0043b310
-[ ] 0043B450 - FUN_0043b450
-[ ] 0043B470 - FUN_0043b470
-[ ] 0043B490 - FUN_0043b490
-[ ] 0043B4F0 - FUN_0043b4f0
-[ ] 0043B550 - FUN_0043b550
-[ ] 0043B590 - FUN_0043b590
-[ ] 0043B5D0 - FUN_0043b5d0
-[ ] 0043B610 - FUN_0043b610
-[ ] 0043B690 - FUN_0043b690
-[ ] 0043B6D0 - FUN_0043b6d0
-[ ] 0043B710 - FUN_0043b710
-[ ] 0043B790 - FUN_0043b790
-[ ] 0043B7A0 - FUN_0043b7a0
-[ ] 0043B810 - FUN_0043b810
-[ ] 0043B820 - Pop_Tries_To_Settle_
-[ ] 0043BA50 - Settler_ETA_
-[ ] 0043BAA0 - Room_For_Another_
-[ ] 0043BBC0 - Settle_Pop_
-[ ] 0043BCF0 - Add_Settler_To_Colony_
-[ ] 0043BE10 - Move_Settlers_
-[ ] 0043C0C0 - N_Freighters_Player_Can_Scrap_
-[ ] 0043C0F0 - Load_Game_
-[ ] 0043C840 - Save_Game_
-[ ] 0043CDB0 - Save_Game_Settings_
-[ ] 0043CE10 - Load_Game_Settings_
-[ ] 0043CE60 - Get_Saved_Game_Descriptions_
-[ ] 0043D070 - Get_Game_Type_From_Saved_Game_
-[ ] 0043D0D0 - Check_Magic_Number_
-[ ] 0043D130 - Is_Valid_Game_Type_
-[ ] 0043D140 - Get_Game_Type_From_Saved_Game_
-[ ] 0043D1B0 - Save_Moo_Custom_Player_Data_
-[ ] 0043D1C0 - Read_Moo_Custom_Player_Data_
-[ ] 0043D1D0 - Save_Session_Related_Settings_
-[ ] 0043D290 - Apply_Save_Settings
-[ ] 0043D300 - Update_Game_Settings_Version_Number_
-[ ] 0043D350 - Load_Officer_Picture_
-[ ] 0043D3E0 - Assert_Marooned_Leaders_
-[ ] 0043D470 - Build_Captain_Id_List_
-[ ] 0043D560 - Check_For_Officer_Level_
-[ ] 0043D5B0 - Deassign_Officer_
-[ ] 0043D6C0 - Decrement_Officer_ETA_
-[ ] 0043D750 - Deselect_Offpop_Icons_
-[ ] 0043D780 - Draw_Officer_Screen_
-[ ] 0043DCA0 - Draw_Officer_Screen_To_Back_
-[ ] 0043DE10 - Draw_Colony_Box_
-[ ] 0043DE30 - Draw_Fleet_Box_
-[ ] 0043DE50 - Get_Govt_Type_Tech_App_
-[ ] 0043DEA0 - Get_Advanced_Government_Type_
-[ ] 0043DF20 - Get_Officer_Costs_
-[ ] 0043DF90 - Get_Random_Skills_
-[ ] 0043E100 - Is_Fleet_Officer_Screen_
-[ ] 0043E110 - Kill_Officer_
-[ ] 0043E1D0 - Leaders_In_Hiring_Pool_
-[ ] 0043E280 - Move_From_Limbo_To_Pool_
-[ ] 0043E2C0 - Move_Officer_To_Pool_
-[ ] 0043E390 - Officer_Has_General_Skill_
-[ ] 0043E3D0 - Officer_Has_Special_Skill_
-[ ] 0043E410 - Officer_Skill_Value_
-[ ] 0043E570 - Get_Research_Cost_Skill_Value_
-[ ] 0043E5A0 - Officer_Cost_
-[ ] 0043E630 - One_Leader_With_Galactic_Lore_
-[ ] 0043E660 - Bonus_For_Famous_Heroes_
-[ ] 0043E6F0 - Get_Officer_Level_
-[ ] 0043E730 - Get_Officer_Base_Level_
-[ ] 0043E780 - Owned_Officer_Level_
-[ ] 0043E7F0 - Officer_Made_Level_Report_
-[ ] 0043E8C0 - Officer_Maintenance_
-[ ] 0043E930 - Officer_Skill_Bonus_
-[ ] 0043E9A0 - Officers_Screen_
-[ ] 0043F440 - Add_Officer_Screen_Fields_
-[ ] 0043F890 - Check_For_Colony_Calculation_Update_
-[ ] 0043F8F0 - Check_Officer_Fields_
-[ ] 0043FE00 - Fade_Into_Leaders_Screen_
-[ ] 0043FED0 - Leader_Can_Be_Assigned_
-[ ] 0043FF00 - Move_Officer_To_Limbo_
-[ ] 00440040 - Change_Screen_Type_
-[ ] 004401A0 - Officer_Screen_User_Box_
-[ ] 00440230 - Print_ETA_On_Officer_Picture_
-[ ] 00440340 - Print_Galmap_Scanned_Ship_
-[ ] 004407E0 - Print_Officer_Data_
-[ ] 00441170 - Draw_Officer_Skill_Icon_
-[ ] 004411A0 - Get_Skill_Data_Max_Pixel_Width_
+[!] 00431700 - Current_Design_Armor_Absorption_
+[X] 00431760 - Current_Shield_Damage_Points_Blocked_
+[!] 004317A0 - Current_Design_Structural_Points_
+[!] 004317D0 - Printed_Design_Cost_
+[!] 00431850 - Print_Ship_Size_Error_Message_
+[X] 00431970 - Cost_Reduction_For_Govt_Type_
+[X] 004319D0 - Replacement_Exists_
+[1] 00431A50 - Set_Flashing_Colors_
+[X] 00431B10 - Shield_Cost_
+[X] 00431B50 - Shield_Space_
+[X] 00431B90 - Shield_Space_Given_M_Level_
+[X] 00431BE0 - Shield_Strength_
+[X] 00431C50 - Space_For_System_Replacement_
+[X] 00431DD0 - Space_For_Weapon_Replacement_
+[X] 00431E60 - Space_Given_M_Level_
+[X] 00431F30 - Tech_App_To_Tech_Id_
+[X] 00431FB0 - Tech_Level_
+[!] 00432040 - Total_Design_Cost_
+[!] 00432100 - Total_Design_Space_
+[X] 00432160 - Total_Space_Used_
+[!] 004321E0 - Update_Calculated_Design_Data_
+[X] 004322C0 - Update_Weapon_Count_
+[X] 00432300 - Update_N_Spec_Systems_In_Design_
+[X] 00432360 - Update_Player_Design_
+[!] 00432620 - Weapon_Cost_
+[X] 00432720 - Weapon_Needs_Racks_
+[X] 00432740 - One_Weapon_Space_
+[!] 00432830 - Weapon_Space_
+[X] 00432940 - Weapon_Type_
+[X] 00432960 - Weapon_Arc_String_
+[!] 00432AC0 - Weapon_Mod_String_
+[X] 00432BC0 - Miniaturization_Category_
+[X] 00432C90 - Weapon_Rack_Size_
+[X] 00432D00 - Get_Tech_Description_Lbx_Name_
+[X] 00432DD0 - Print_Formatted_Paragraph_
+[X] 00432E00 - Print_Formatted_Paragraph_To_Bitmap_
+[X] 00432E30 - Set_Paragraph_Integer_Pointer_
+[X] 00432E50 - Set_Paragraph_Sint_Pointer_
+[X] 00432E70 - Get_Formatted_Paragraph_Max_Height_
+[X] 00432EA0 - Get_Formatted_Paragraph_Max_Width_
+[X] 00432EE0 - Get_Last_Formatted_Paragraph_Max_Width_
+[X] 00432EF0 - Init_
+[X] 00432F20 - _Print_Formatted_Paragraph_
+[!] 00433120 - Process_Paragraph_Text_
+[X] 004333E0 - Add_Character_To_Line_
+[X] 004334A0 - Return_To_Last_Break_
+[X] 00433600 - Record_Break_Position_
+[X] 004337B0 - Process_Command_
+[X] 00433950 - Quit_Context_
+[X] 00433990 - Quit_Paragraph_
+[X] 004339F0 - Set_Justification_
+[X] 00433A70 - Complete_Line_
+[X] 00433AD0 - Complete_Line_Data_
+[X] 00433BA0 - Paragraph_HT_
+[X] 00433BF0 - Vertical_Move_Paragraph_Advance_
+[X] 00433C10 - Vertical_Move_Line_Advance_
+[X] 00433C30 - Vertical_Move_
+[X] 00433C90 - Reset_Font_Spacing_
+[X] 00433CD0 - Reset_Font_Spacing_Width_
+[X] 00433CF0 - Reset_Font_LF_
+[X] 00433D30 - Reset_Parameters_
+[X] 00433DC0 - Initialize_Formatted_Paragraph_System_
+[X] 00433DE0 - Reset_A_Paragraph_Variable_
+[X] 00433E10 - Set_Paragraph_Variable_Pointer_
+[X] 00433E40 - Set_Current_Colors_
+[X] 00433E60 - Set_Current_Style_
+[!] 00433EC0 - Test_Item_
+[X] 00434060 - Set_Value_
+[X] 00434190 - Get_Next_Item_Value_
+[X] 004341C0 - Get_Item_Value_
+[X] 00434240 - Set_Item_Value_
+[X] 004342E0 - Insert_Item_
+[X] 00434640 - Get_Item_Value_Set_Plural_
+[X] 00434670 - Insert_Next_Argument_String_
+[X] 004346A0 - Skip_Arg_Insert_A_String_
+[X] 004346E0 - Get_Insert_Argument_Next_
+[X] 00434760 - Insert_String_
+[!] 00434780 - Insert_A_String_
+[!] 004347C0 - Previous_Nesting_Level_
+[!] 00434800 - Process_Function_
+[X] 00434B20 - Get_Function_Argument_
+[X] 00434BD0 - FN_Set_Font_
+[X] 00434CA0 - FN_Superscript_
+[!] 00434D40 - FN_Set_Variable_
+[X] 00434DB0 - FN_Set_Tabs_
+[X] 00434E20 - FN_Set_X_Pos_
+[X] 00434E70 - FN_Set_Y_Pos_
+[X] 00434EE0 - FN_Set_H_Spacing_
+[X] 00434F20 - FN_Set_Space_Size_
+[X] 00434F70 - FN_Set_V_Spacing_
+[!] 00434FB0 - FN_Set_FF_Size_
+[X] 00435010 - FN_Set_Margins_
+[X] 004350E0 - FN_Set_Indent_
+[X] 00435140 - FN_Set_Origin_
+[X] 00435210 - FN_User_Call_
+[X] 00435290 - Justify_Line_
+[X] 004352F0 - _Justify_Line_Fully_
+[!] 00435440 - Print_Line_
+[X] 00435A70 - Sort_Tabs_
+[X] 00435AA0 - _Comp_Tabs_
+[X] 00435AC0 - Get_Current_Color_Set_
+[X] 00435B20 - Initialize_Line_Start_
+[X] 00435B60 - Pick_Font_Color_
+[X] 00435B90 - Pick_Font_Number_
+[X] 00435C10 - Update_Max_Min_Values_
+[!] 00435CA0 - Set_Max_Min_X_
+[X] 00435CF0 - Set_Max_Min_Y_
+[X] 00435D30 - Reset_Max_Min_Values_
+[X] 00435D60 - Set_Para_Y2_
+[X] 00435D80 - Skip_Spaces_
+[X] 00435DB0 - Legalize_Paragraph_Y_
+[X] 00435DE0 - Set_Line_Limits_
+[!] 00435FC0 - Ship_Range_
+[X] 00436030 - Star_In_Range_Of_Player_
+[X] 004360C0 - Star_In_Range_Of_Player_Aux2_
+[X] 00436160 - Star_In_Range_Of_Player_Aux1_
+[X] 00436230 - Star_In_Normal_Range_Of_Player_
+[X] 00436270 - Star_In_Extended_Range_Of_Player_
+[!] 004362C0 - Can_Order_Ship_
+[!] 004363E0 - Ships_Try_To_Move_To_
+[!] 004368E0 - Player_N_Turns_From_Star_To_Star_
+[X] 00436A50 - Make_Ships_Move_To_
+[X] 00436B40 - Ship_Is_Moving_
+[X] 00436B60 - Move_All_Ships_Toward_Stars_
+[X] 00436CD0 - Make_Ship_Arrive_At_Star_
+[X] 00436E30 - Create_Nonplayer_Ship_
+[!] 00436F50 - Allocate_New_Ship_Slots_
+[X] 00437170 - Update_All_Ship_Ranges_
+[X] 00437210 - Update_Player_Ship_Range_
+[X] 00437260 - Ship_Destination_Star_
+[!] 00437290 - Update_Ship_ETAs_
+[X] 004373A0 - Do_Wormhole_Event_
+[X] 004374E0 - Do_Hyperspace_Beast_
+[X] 00437750 - Unmark_Just_Built_AI_Ships_
+[X] 004377D0 - Reset_Needless_Ignore_Combat_Ships_Flags_
+[X] 00437910 - Player_Has_Ships_Pestering_Other_Player_
+[X] 00437990 - Player_Score_Modifier_
+[X] 00437A20 - Reload_Racial_Option_Screen_
+[X] 00437AB0 - Calculate_Picks_
+[X] 00437B90 - Draw_Race_Option_Background_
+[!] 00438200 - Draw_Racial_Option_Screen_
+[X] 00438AE0 - Set_Race_Option_Help_List_
+[X] 00438EF0 - Racial_Option_Screen_
+[X] 00439650 - Add_Race_Options_Fields_
+[X] 00439920 - Convert_Player_To_Flags_
+[X] 004399C0 - Convert_Flags_To_Player_
+[X] 00439A90 - Reload_Option_Strings_
+[X] 00439B20 - Real_Ability_Cost_
+[X] 00439CA0 - Setup_Evolutionary_Upgrade_
+[X] 00439D60 - Add_Race_Options_Fields_EM_
+[X] 0043A0E0 - Calculate_EM_Picks_
+[X] 0043A0F0 - Convert_Player_To_Flags_EM_
+[X] 0043A1D0 - Convert_Flags_To_Player_EM_
+[X] 0043A270 - Evolutionary_Mutation_Screen_
+[X] 0043A880 - connect_to_servers
+[X] 0043A9C0 - FUN_0043a9c0
+[!] 0043A9D0 - Ten_Update_
+[X] 0043AA60 - connect
+[X] 0043AA90 - Ten_Flag
+[X] 0043AAA0 - Ten_Stop
+[X] 0043AB40 - FUN_0043ab40
+[X] 0043AB60 - FUN_0043ab60
+[X] 0043AC80 - FUN_0043ac80
+[X] 0043ADB0 - FUN_0043adb0
+[X] 0043AE10 - FUN_0043ae10
+[X] 0043AE60 - FUN_0043ae60
+[X] 0043AFC0 - FUN_0043afc0
+[X] 0043B0B0 - FUN_0043b0b0
+[X] 0043B110 - FUN_0043b110
+[X] 0043B220 - FUN_0043b220
+[X] 0043B2D0 - FUN_0043b2d0
+[X] 0043B310 - FUN_0043b310
+[X] 0043B450 - FUN_0043b450
+[X] 0043B470 - FUN_0043b470
+[X] 0043B490 - FUN_0043b490
+[X] 0043B4F0 - FUN_0043b4f0
+[X] 0043B550 - FUN_0043b550
+[X] 0043B590 - FUN_0043b590
+[X] 0043B5D0 - FUN_0043b5d0
+[X] 0043B610 - FUN_0043b610
+[X] 0043B690 - FUN_0043b690
+[X] 0043B6D0 - FUN_0043b6d0
+[X] 0043B710 - FUN_0043b710
+[X] 0043B790 - FUN_0043b790
+[X] 0043B7A0 - FUN_0043b7a0
+[X] 0043B810 - FUN_0043b810
+[X] 0043B820 - Pop_Tries_To_Settle_
+[X] 0043BA50 - Settler_ETA_
+[X] 0043BAA0 - Room_For_Another_
+[X] 0043BBC0 - Settle_Pop_
+[X] 0043BCF0 - Add_Settler_To_Colony_
+[X] 0043BE10 - Move_Settlers_
+[X] 0043C0C0 - N_Freighters_Player_Can_Scrap_
+[!] 0043C0F0 - Load_Game_
+[X] 0043C840 - Save_Game_
+[!] 0043CDB0 - Save_Game_Settings_
+[X] 0043CE10 - Load_Game_Settings_
+[X] 0043CE60 - Get_Saved_Game_Descriptions_
+[X] 0043D070 - Get_Game_Type_From_Saved_Game_
+[X] 0043D0D0 - Check_Magic_Number_
+[X] 0043D130 - Is_Valid_Game_Type_
+[X] 0043D140 - Get_Game_Type_From_Saved_Game_
+[X] 0043D1B0 - Save_Moo_Custom_Player_Data_
+[X] 0043D1C0 - Read_Moo_Custom_Player_Data_
+[X] 0043D1D0 - Save_Session_Related_Settings_
+[X] 0043D290 - Apply_Save_Settings
+[X] 0043D300 - Update_Game_Settings_Version_Number_
+[X] 0043D350 - Load_Officer_Picture_
+[X] 0043D3E0 - Assert_Marooned_Leaders_
+[X] 0043D470 - Build_Captain_Id_List_
+[X] 0043D560 - Check_For_Officer_Level_
+[X] 0043D5B0 - Deassign_Officer_
+[X] 0043D6C0 - Decrement_Officer_ETA_
+[X] 0043D750 - Deselect_Offpop_Icons_
+[!] 0043D780 - Draw_Officer_Screen_
+[!] 0043DCA0 - Draw_Officer_Screen_To_Back_
+[X] 0043DE10 - Draw_Colony_Box_
+[X] 0043DE30 - Draw_Fleet_Box_
+[X] 0043DE50 - Get_Govt_Type_Tech_App_
+[X] 0043DEA0 - Get_Advanced_Government_Type_
+[X] 0043DF20 - Get_Officer_Costs_
+[X] 0043DF90 - Get_Random_Skills_
+[X] 0043E100 - Is_Fleet_Officer_Screen_
+[X] 0043E110 - Kill_Officer_
+[X] 0043E1D0 - Leaders_In_Hiring_Pool_
+[X] 0043E280 - Move_From_Limbo_To_Pool_
+[!] 0043E2C0 - Move_Officer_To_Pool_
+[X] 0043E390 - Officer_Has_General_Skill_
+[X] 0043E3D0 - Officer_Has_Special_Skill_
+[X] 0043E410 - Officer_Skill_Value_
+[!] 0043E570 - Get_Research_Cost_Skill_Value_
+[X] 0043E5A0 - Officer_Cost_
+[X] 0043E630 - One_Leader_With_Galactic_Lore_
+[X] 0043E660 - Bonus_For_Famous_Heroes_
+[X] 0043E6F0 - Get_Officer_Level_
+[X] 0043E730 - Get_Officer_Base_Level_
+[X] 0043E780 - Owned_Officer_Level_
+[X] 0043E7F0 - Officer_Made_Level_Report_
+[X] 0043E8C0 - Officer_Maintenance_
+[!] 0043E930 - Officer_Skill_Bonus_
+[!] 0043E9A0 - Officers_Screen_
+[X] 0043F440 - Add_Officer_Screen_Fields_
+[X] 0043F890 - Check_For_Colony_Calculation_Update_
+[!] 0043F8F0 - Check_Officer_Fields_
+[X] 0043FE00 - Fade_Into_Leaders_Screen_
+[X] 0043FED0 - Leader_Can_Be_Assigned_
+[X] 0043FF00 - Move_Officer_To_Limbo_
+[!] 00440040 - Change_Screen_Type_
+[X] 004401A0 - Officer_Screen_User_Box_
+[X] 00440230 - Print_ETA_On_Officer_Picture_
+[!] 00440340 - Print_Galmap_Scanned_Ship_
+[X] 004407E0 - Print_Officer_Data_
+[X] 00441170 - Draw_Officer_Skill_Icon_
+[X] 004411A0 - Get_Skill_Data_Max_Pixel_Width_
 [ ] 004412C0 - Print_Officer_Skill_Help_
 [ ] 00441460 - Text_Box_With_Refresh_
 [ ] 004414A0 - Print_Scanned_Ship_Name_
