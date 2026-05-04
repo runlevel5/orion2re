@@ -35,15 +35,15 @@ namespace DIP_SCRN {
         switch (offer_type) {
             case 1:
                 JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 18 /* 0x12 */, _diplomacy_message, 250);
-                JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, (uint8_t)value, 250);
+                JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, value, 250);
                 break;
 
             case 2:
                 JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 15 /* 0x0F */, _diplomacy_message, 250);
                 if (value == 1) {
-                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, 5, 250);
+                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, 5, 250);
                 } else {
-                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, (uint8_t)player_idx, 10, 250);
+                    JIM::Decode_Text_Name_And_Stat_(_diplomacy_message, player_idx, 10, 250);
                 }
                 break;
 
@@ -385,27 +385,20 @@ namespace DIP_SCRN {
     }
 
     int16_t __cdecl Get_Human_Treaty_Choice_(int16_t player_a, int16_t player_b, int16_t treaty_type) {
-        char choice1_text[40];
-        char choice2_text[40];
-        char choice3_text[40];
+        char choice_text[3][40];
         char title_text[40];
-        char* choices[3];
         int16_t num_choices = 2;
         int16_t selected_idx;
         int16_t result = 0;
 
-        choices[0] = choice1_text;
-        choices[1] = choice2_text;
-        choices[2] = choice3_text;
+        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4F, choice_text[0], 40);
+        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x50, choice_text[1], 40);
 
-        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4F, choice1_text, 40);
-        JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x50, choice2_text, 40);
+        choice_text[2][0] = DIP_SCRN::s_empty[0];
 
-        choice3_text[0] = DIP_SCRN::s_empty[0];
-
-        if (DIP_SCRN::Check_Better_Offer_Available_(player_a, player_b)) {
+        if (DIP_SCRN::Check_Better_Offer_Available_(player_a, player_b) == 1) {
             num_choices = 3;
-            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x52, choice3_text, 40);
+            JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x52, choice_text[2], 40);
         }
 
         DIP_SCRN::_response_message = 0;
@@ -416,7 +409,7 @@ namespace DIP_SCRN {
 
         JIM::Get_Text_Message_(JIM::jimtext_lbx, 0x4A, title_text, 40);
 
-        selected_idx = DIP_SCRN::Diplomacy_Generic_List_(num_choices, choice1_text, 0, title_text);
+        selected_idx = DIP_SCRN::Diplomacy_Generic_List_(num_choices, (char*)choice_text, 0, title_text);
 
         if (num_choices == 2 && selected_idx == -1) {
             selected_idx = 1;
@@ -702,7 +695,7 @@ namespace DIP_SCRN {
         return result_star_idx;
     }
 
-    int8_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx) {
+    int16_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx) {
         if (Check_Surrender_System_(player_idx, other_player_idx)) {
             return 1;
         }
@@ -915,7 +908,7 @@ namespace DIP_SCRN {
             JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 3, text_msg, 40);
 
             int16_t selected_tech_idx = Diplomacy_Generic_Exchange_Tech_List_(
-                player_1, player_2, text_msg, (int8_t*)_target_tech_list, _exchange_tech_count, 0
+                player_1, player_2, text_msg, _target_tech_list, _exchange_tech_count, 0
             );
 
             if (selected_tech_idx != -1) {
@@ -938,7 +931,7 @@ namespace DIP_SCRN {
                         );
 
                         int16_t ex_selected_tech_idx = Diplomacy_Generic_Exchange_Tech_List_(
-                            player_2, player_1, text_msg, (int8_t*)_target_tech_list, _exchange_tech_count, 0
+                            player_2, player_1, text_msg, _target_tech_list, _exchange_tech_count, 0
                         );
 
                         Diplomacy_Load_New_Ambassador_(player_2);
@@ -1440,7 +1433,7 @@ namespace DIP_SCRN {
                 return;
             }
             case 6: {
-                int16_t selection_tech = Diplomacy_Generic_Exchange_Tech_List_(player_num, ambassador_idx, _demand_title, (int8_t*)local_5b4, local_624, 0);
+                int16_t selection_tech = Diplomacy_Generic_Exchange_Tech_List_(player_num, ambassador_idx, _demand_title, local_5b4, local_624, 0);
                 if (selection_tech == -1) break;
 
                 _old_response_message = -1;
@@ -1547,7 +1540,7 @@ namespace DIP_SCRN {
         int16_t done_flag;
         uint8_t options[11];
         char title_buf[40];
-        int8_t tech_list[212];
+        uint8_t tech_list[212];
         char msg_buf[400];
         int32_t costs[212];
 
@@ -1776,7 +1769,7 @@ namespace DIP_SCRN {
                             _net_diplomacy_tech_offered = _net_diplomacy_message.arg1;
                             JIM::Get_Text_Message_(s_jimtext2_lbx, 4, title_buf, 40);
                             npcdiplo::Get_Differential_Tech_List_(_listen_ambassador, _talker_ambassador, 0, 0xC343CB00, (uint8_t*)tech_list, costs, &tech_count, 1);
-                            int16_t exch_choice = Diplomacy_Generic_Exchange_Tech_List_(_listen_ambassador, _talker_ambassador, title_buf, (int8_t*)tech_list, tech_count, 0);
+                            int16_t exch_choice = Diplomacy_Generic_Exchange_Tech_List_(_listen_ambassador, _talker_ambassador, title_buf, tech_list, tech_count, 0);
                             if (exch_choice >= 0) {
                                 exch_choice = tech_list[exch_choice];
                             }
@@ -2178,21 +2171,23 @@ namespace DIP_SCRN {
         char cancel_btn_text[40];
         char demand_text[40];
         char unused_text[40];
-        char separator;
+        char local_140;
         int16_t result;
 
         if (demand_type == 7 /* ECON_STAR_SYSTEM */) {
-            // Displays the star system selection list. Returns 1 regardless of specific system result.
-            DIP_SCRN::Diplomacy_Generic_System_List_(some_id, player_idx, other_player_idx, 1);
-            result = 1;
+            if (DIP_SCRN::Diplomacy_Generic_System_List_(some_id, player_idx, other_player_idx, 1) != -1) {
+                result = 1;
+            } else {
+                result = 0;
+            }
         } else {
             // Load demand strings and display the generic demand choice list.
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 79 /* MSG_DEMAND_HEADER */, demand_text, 40);
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 80 /* MSG_DEMAND_SUBHEADER */, unused_text, 40);
-            
-            separator = DIP_SCRN::s_empty_string[0];
+
+            local_140 = DIP_SCRN::s__00551100[0];
             fields::Deactivate_Help_List_();
-            
+
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx, 0 /* MSG_CANCEL */, cancel_btn_text, 40);
 
             // If the list result is 0 (first option or similar), we return 1 (Success/Accept).
@@ -2209,15 +2204,15 @@ namespace DIP_SCRN {
 
     short __cdecl Diplomacy_Generic_System_List_(short star_idx, short giver_player_idx, short receiver_player_idx, short mode_flag)
     {
-        uint32_t saved_bg_seg;
+        s_animation_header* saved_bg_seg;
         int16_t result;
         int16_t current_selection;
-        uint8_t enabled_flags[17];
+        uint8_t enabled_flags[10];
         char list_title[40];
 
         COLONY::_using_colony_screen_palette = 1;
         MOX::_star_bg_index = 0;
-        saved_bg_seg = (uint32_t)MOX::_star_bg_seg;
+        saved_bg_seg = MOX::_star_bg_seg;
         MOX::_current_screen = 6;
         MOX::_galaxy_map_scanned_star = star_idx;
         _diplomacy_scan_input_flag = star_idx;
@@ -2235,9 +2230,9 @@ namespace DIP_SCRN {
         JIM::Get_Text_Message_(s_jimtext2_lbx, 0x3A /* 58 */, _system_x_star_system_buffer, 0x23 /* 35 */);
         JIM::Decode_Text_System_(_system_x_star_system_buffer, star_idx, 0x23);
 
-        memset(enabled_flags, 0, sizeof(enabled_flags));
-        // Items 10-16 are enabled
-        memset(&enabled_flags[10], 1, 7);
+        memset(enabled_flags, 1, 10);
+        enabled_flags[0] = 0;
+        enabled_flags[1] = 1;
 
         JIM::Get_Text_Message_(s_jimtext_lbx, 0x4B /* 75 */, list_title, 0x28 /* 40 */);
 
@@ -2263,7 +2258,7 @@ namespace DIP_SCRN {
         current_selection = 0;
         result = fields::Get_List_Field_(10, 102, 245, list_title, (char*)_diplomacy_list_choice, 50, &current_selection, enabled_flags, 17, 0, 0, nullptr, 0, 0);
 
-        MOX::_star_bg_seg = (s_animation_header*)saved_bg_seg;
+        MOX::_star_bg_seg = saved_bg_seg;
         COLONY::_using_colony_screen_palette = 0;
 
         if (result == -1 || result == 1) {

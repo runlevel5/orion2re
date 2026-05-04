@@ -232,45 +232,45 @@
 [X] 00413690 - Draw_Diplomacy_Synch_Mode_
 [X] 00413A30 - Get_Main_Repulsive_Diplomacy_Choices_
 [X] 00413E00 - Get_Main_Diplomacy_Choices_
-[ ] 00414140 - Diplomacy_Set_Main_Options_
+[X] 00414140 - Diplomacy_Set_Main_Options_
 [X] 00414300 - Diplomacy_Declare_War_Resolution_
 [X] 00414480 - Setup_Back_Page_
 [X] 004144F0 - Setup_Ambassador_Pic_
 [X] 00414560 - Diplomacy_Fade_In_
 [X] 00414660 - Draw_Diplomacy_Fade_In_Screen_
 [X] 00414690 - Diplomacy_Propose_Treaty_
-[ ] 00414A30 - Diplomacy_Break_Treaty_
-[ ] 00414CB0 - Diplomacy_Break_Treaty_Resolution_
-[ ] 00414F00 - Get_Human_Surrender_Message_
-[ ] 00414F40 - Get_Human_Declare_War_Message_
-[ ] 00414F80 - Get_Human_Offer_Gift_Message_
-[ ] 004150A0 - Get_Human_Demand_Message_
-[ ] 004152C0 - Get_Human_Break_Treaty_Message_
-[ ] 00415400 - Get_Human_Form_Treaty_Message_
-[ ] 00415540 - Get_Human_Propose_Treaty_Message_
-[ ] 00415620 - Get_Human_Tech_Exchange_Message_
-[ ] 00415670 - Get_Human_Tech_Exchange_First_Message_
-[ ] 004156B0 - Get_Human_Tech_Exchange_Accept_Message_
-[ ] 004156D0 - Get_Human_Tech_Exchange_Decline_Message_
-[ ] 004156F0 - Diplomacy_Demand_
-[ ] 00415FF0 - Diplomacy_Offer_Gift_
-[ ] 004164B0 - Diplomacy_Display_Response_
-[ ] 00416530 - Diplomacy_Determine_Treaty_Proposal_
-[ ] 00416700 - Diplomacy_Need_Better_Offer_
-[ ] 00416980 - Get_Diplomacy_Tech_List_
+[X] 00414A30 - Diplomacy_Break_Treaty_
+[X] 00414CB0 - Diplomacy_Break_Treaty_Resolution_
+[X] 00414F00 - Get_Human_Surrender_Message_
+[X] 00414F40 - Get_Human_Declare_War_Message_
+[X] 00414F80 - Get_Human_Offer_Gift_Message_
+[X] 004150A0 - Get_Human_Demand_Message_
+[X] 004152C0 - Get_Human_Break_Treaty_Message_
+[X] 00415400 - Get_Human_Form_Treaty_Message_
+[X] 00415540 - Get_Human_Propose_Treaty_Message_
+[X] 00415620 - Get_Human_Tech_Exchange_Message_
+[X] 00415670 - Get_Human_Tech_Exchange_First_Message_
+[X] 004156B0 - Get_Human_Tech_Exchange_Accept_Message_
+[X] 004156D0 - Get_Human_Tech_Exchange_Decline_Message_
+[X] 004156F0 - Diplomacy_Demand_
+[X] 00415FF0 - Diplomacy_Offer_Gift_
+[X] 004164B0 - Diplomacy_Display_Response_
+[X] 00416530 - Diplomacy_Determine_Treaty_Proposal_
+[X] 00416700 - Diplomacy_Need_Better_Offer_
+[X] 00416980 - Get_Diplomacy_Tech_List_
 [ ] 00416A30 - Diplomacy_Generic_List_
-[ ] 00416BA0 - Diplomacy_Generic_Exchange_Tech_List_
+[X] 00416BA0 - Diplomacy_Generic_Exchange_Tech_List_
 [ ] 00416F30 - Diplomacy_Generic_System_List_
-[ ] 00417150 - Diplomacy_Generic_System_List_Draw_
-[ ] 00417180 - Get_Diplomacy_Demand_Treaty_List_
-[ ] 00417260 - Npc_Diplomacy_Screen_
-[ ] 00417C20 - Accepted_Npc_Demand_Resolution_
-[ ] 00417CA0 - Get_Non_Player_Proposals_
-[ ] 00418010 - Npc_Give_Gift_
-[ ] 00418160 - Show_Sneak_Attack_Message_
-[ ] 00418170 - Check_Human_Treaty_Proposal_
-[ ] 004182E0 - Get_Human_Treaty_Choice_
-[ ] 00418490 - Check_Better_Offer_Available_
+[X] 00417150 - Diplomacy_Generic_System_List_Draw_
+[X] 00417180 - Get_Diplomacy_Demand_Treaty_List_
+[X] 00417260 - Npc_Diplomacy_Screen_
+[X] 00417C20 - Accepted_Npc_Demand_Resolution_
+[X] 00417CA0 - Get_Non_Player_Proposals_
+[X] 00418010 - Npc_Give_Gift_
+[X] 00418160 - Show_Sneak_Attack_Message_
+[X] 00418170 - Check_Human_Treaty_Proposal_
+[X] 004182E0 - Get_Human_Treaty_Choice_
+[X] 00418490 - Check_Better_Offer_Available_
 [ ] 00418520 - Get_Human_Demand_Choice_
 [ ] 00418600 - Diplomacy_Give_In_To_Demand_
 [ ] 004187C0 - Get_Human_Demand_Response_

@@ -3216,7 +3216,7 @@ struct s_player {
     short diplomacy_proposal_gold_bribe[8];
     char diplomacy_proposal_war_player[8];
     int diplomacy_proposal_exchange_max_value[8];
-    char diplomacy_proposal_exchange_tech[8];
+    uint8_t diplomacy_proposal_exchange_tech[8];
     short diplomacy_proposal_system_bribe[8];
     short sneak_attack_planet;
     char sneak_attack_message;

@@ -67,6 +67,8 @@ workflows:
             - For example, consistent type changes around signedness is an indication that source type might be incorrect.
           * You are not allowed to make changes to the files unless explicitly confirmed.
           * All structures are guaranteed to be packed to a byte in the project.
+          * Source project inlined a lot of primitive functions, such as memset, memcpy, strcpy and others. Restored code must use existing library functions instead of hand-rolled loops.
+          * Even though this is a C++ project, we're restoring C codebase and prefer C-style type casts.
 
           # EXCEPTIONS
           * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.

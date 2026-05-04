@@ -394,7 +394,7 @@ namespace DIP_SCRN {
 
         case 2:
         {
-            int16_t tech_idx = Diplomacy_Generic_Exchange_Tech_List_(player_idx, target_idx, _offer_title, (int8_t*)local_424, local_446, 0);
+            int16_t tech_idx = Diplomacy_Generic_Exchange_Tech_List_(player_idx, target_idx, _offer_title, local_424, local_446, 0);
             if (tech_idx == -1) {
                 *_diplomacy_message = MOX::s__00551100[0];
             }
@@ -1509,7 +1509,7 @@ namespace DIP_SCRN {
                         MOX::_player[_current_ambassador].sneak_attack_message = MOX::_player[_current_ambassador].diplomacy_demand_rejection_message[MOX::_PLAYER_NUM];
                     }
                     else {
-                        diplomac::Declare_War_(_current_ambassador, MOX::_PLAYER_NUM);
+                        diplomac::Declare_War_(MOX::_PLAYER_NUM, _current_ambassador);
                         _response_message = 0xb3;
                         Diplomacy_Display_Response_();
                     }
@@ -1706,7 +1706,7 @@ namespace DIP_SCRN {
         }
     }
 
-    int16_t __cdecl Diplomacy_Generic_Exchange_Tech_List_(int16_t tech_app_player, int16_t unused_2, char* list_title, int8_t* tech_ids, int16_t num_techs, int8_t mode) {
+    int16_t __cdecl Diplomacy_Generic_Exchange_Tech_List_(int16_t tech_app_player, int16_t unused_2, char* list_title, uint8_t* tech_ids, int16_t num_techs, int8_t mode) {
         int16_t page_size = (mode == 1) ? 8 : 11;
 
         fields::Clear_Fields_();
@@ -1818,16 +1818,16 @@ namespace DIP_SCRN {
 
     int16_t __cdecl Get_Non_Player_Proposals_() {
         int16_t default_retval = 1;
-        int16_t sVar3 = -1000;
+        int16_t cancel_sentinel = -1000;
         uint8_t hotkey_flags[10];
         memset(hotkey_flags, 1, sizeof(hotkey_flags));
 
         int16_t list_pos = 0;
         char text_buffer[80];
-        char abStack_424[212];
+        uint8_t tech_list[212];
         int32_t aiStack_350[212];
         int16_t sStack_488;
-        int16_t result;
+        int16_t result = -1;
 
         fields::Deactivate_Help_List_();
         JIM::Get_Text_Message_(s_jimtext_lbx, 0x4A, text_buffer, 80);
@@ -1839,9 +1839,9 @@ namespace DIP_SCRN {
         case 0x56: case 0x61: case 0x62: case 99:
         case 100: case 0x66: case 0x67: case 0x68:
         case 0x69: case 0x6a: case 0x7d:
-            JIM::Get_Text_Message_(s_jimtext_lbx, 0x4F, reinterpret_cast<char*>(_diplomacy_list_choice), 50);
-            JIM::Get_Text_Message_(s_jimtext_lbx, 0x50, reinterpret_cast<char*>(&DAT_005a8712), 50);
-            DAT_005a8744 = 0;
+            JIM::Get_Text_Message_(s_jimtext_lbx, 0x4F, _diplomacy_list_choice[0], 50);
+            JIM::Get_Text_Message_(s_jimtext_lbx, 0x50, _diplomacy_list_choice[1], 50);
+            _diplomacy_list_choice[2][0] = '\0';
             break;
         default:
             break;
@@ -1858,14 +1858,14 @@ namespace DIP_SCRN {
 
         if (_response_message == 0x65) {
             default_retval = -1;
-            sVar3 = -1;
+            cancel_sentinel = -1;
 
             npcdiplo::Get_Differential_Tech_List_(
                 MOX::_PLAYER_NUM,
                 _current_ambassador,
                 0,
                 MOX::_player[_current_ambassador].diplomacy_proposal_exchange_max_value[MOX::_PLAYER_NUM],
-                reinterpret_cast<uint8_t*>(abStack_424),
+                tech_list,
                 aiStack_350,
                 &sStack_488,
                 1
@@ -1877,7 +1877,7 @@ namespace DIP_SCRN {
                 _current_ambassador,
                 MOX::_PLAYER_NUM,
                 text_buffer,
-                reinterpret_cast<int8_t*>(abStack_424),
+                tech_list,
                 sStack_488,
                 1
             );
@@ -1885,11 +1885,11 @@ namespace DIP_SCRN {
             if (result != -1) {
                 COLCALC::Player_Gets_Tech_App_(
                     &MOX::_player[MOX::_PLAYER_NUM],
-                    static_cast<uint8_t>(abStack_424[result])
+                    tech_list[result]
                 );
                 COLCALC::Player_Gets_Tech_App_(
                     &MOX::_player[_current_ambassador],
-                    static_cast<uint8_t>(MOX::_player[_current_ambassador].diplomacy_proposal_exchange_tech[MOX::_PLAYER_NUM])
+                    MOX::_player[_current_ambassador].diplomacy_proposal_exchange_tech[MOX::_PLAYER_NUM]
                 );
             }
         }
@@ -1917,7 +1917,7 @@ namespace DIP_SCRN {
             result = default_retval;
         }
 
-        if (sVar3 == result) {
+        if (cancel_sentinel == result) {
             result = -1;
         }
 

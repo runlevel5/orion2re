@@ -103,7 +103,7 @@ namespace DIP_SCRN {
     inline uint8_t& DAT_005a8712 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8712});
     inline uint8_t& DAT_005a8744 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8744});
 
-    int8_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx);
+    int16_t __cdecl Check_Better_Offer_Available_(int16_t player_idx, int16_t other_player_idx);
 
     void __cdecl Get_Human_Propose_Treaty_Message_(int16_t treaty_type);
 
@@ -164,7 +164,7 @@ namespace DIP_SCRN {
 
     void __cdecl Npc_Diplomacy_Screen_(int16_t player_idx, int8_t is_sneak_attack);
 
-    int16_t __cdecl Diplomacy_Generic_Exchange_Tech_List_(int16_t tech_app_player, int16_t unused_2, char* list_title, int8_t* tech_ids, int16_t num_techs, int8_t mode);
+    int16_t __cdecl Diplomacy_Generic_Exchange_Tech_List_(int16_t tech_app_player, int16_t unused_2, char* list_title, uint8_t* tech_ids, int16_t num_techs, int8_t mode);
 
     int16_t __cdecl Get_Non_Player_Proposals_();
 
