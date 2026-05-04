@@ -913,7 +913,7 @@ namespace DIP_SCRN {
 
             if (selected_tech_idx != -1) {
                 uint16_t tech_1 = _target_tech_list[selected_tech_idx];
-                uint16_t tech_2;
+                uint16_t tech_2 = 0;
 
                 if (MOX::_player[player_2].objectives == 100 /* 'd' */) {
                     if (MOX::_game_type == 1) {
@@ -922,7 +922,8 @@ namespace DIP_SCRN {
                         JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 4, text_msg, 40);
 
                         int32_t tech_categories[212];
-                        memset(tech_categories, 1, sizeof(tech_categories)); // original only sets 15 bytes
+                        memset(tech_categories, 0, sizeof(tech_categories));
+                        memset(tech_categories, 1, 15);
 
                         npcdiplo::Get_Differential_Tech_List_(
                             player_2, player_1, 0, 0xC343CB00,
@@ -975,7 +976,7 @@ namespace DIP_SCRN {
 
                         int16_t ex_selected_tech_idx = _net_diplomacy_message.arg2;
                         if (ex_selected_tech_idx != -1) {
-                            uint16_t tech_2 = ex_selected_tech_idx;
+                            tech_2 = (uint16_t)ex_selected_tech_idx;
                             Get_Human_Tech_Exchange_Message_(player_2, player_1, tech_1, tech_2);
                             JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 5, text_msg, 40);
 
@@ -1003,7 +1004,7 @@ namespace DIP_SCRN {
                     _response_message = 0xAE;
                     npcdiplo::NPC_Message_Rejection_Check_(player_2, player_1, &_response_message);
                 } else {
-                    uint8_t tech_2 = _exchange_tech_list[selected_tech_idx];
+                    tech_2 = _exchange_tech_list[selected_tech_idx];
                     Get_Human_Tech_Exchange_Message_(player_2, player_1, tech_1, tech_2);
                     JIM::Get_Text_Message_(s_jimtext2_lbx_00552340, 5, text_msg, 40);
 

@@ -258,7 +258,7 @@
 [X] 00416530 - Diplomacy_Determine_Treaty_Proposal_
 [X] 00416700 - Diplomacy_Need_Better_Offer_
 [X] 00416980 - Get_Diplomacy_Tech_List_
-[ ] 00416A30 - Diplomacy_Generic_List_
+[X] 00416A30 - Diplomacy_Generic_List_
 [X] 00416BA0 - Diplomacy_Generic_Exchange_Tech_List_
 [ ] 00416F30 - Diplomacy_Generic_System_List_
 [X] 00417150 - Diplomacy_Generic_System_List_Draw_
@@ -284,193 +284,193 @@
 [X] 00419C20 - Draw_Diplomacy_System_
 [X] 00419C80 - Draw_Diplomacy_System_Text_
 [X] 00419E70 - Diplomacy_System_Scan_
-[ ] 00419F70 - Diplomacy_Exchange_Technology_
-[ ] 0041A480 - Start_Diplomacy_Music_
-[ ] 0041A4B0 - Diplomacy_Surrender_
-[ ] 0041A600 - Diplomacy_Offer_Money_
-[ ] 0041A8E0 - Get_Diplomacy_Statement_
+[X] 00419F70 - Diplomacy_Exchange_Technology_
+[X] 0041A480 - Start_Diplomacy_Music_
+[X] 0041A4B0 - Diplomacy_Surrender_
+[X] 0041A600 - Diplomacy_Offer_Money_
+[X] 0041A8E0 - Get_Diplomacy_Statement_
 [ ] 0041B290 - An_
 [ ] 0041B2E0 - Get_Net_Diplomacy_Choices_
-[ ] 0041C480 - Diplomacy_Net_Switcheroo_
-[ ] 0041C520 - Send_Diplomacy_Handshake_
-[ ] 0041C580 - Diplomacy_Listen_Mode_
+[X] 0041C480 - Diplomacy_Net_Switcheroo_
+[X] 0041C520 - Send_Diplomacy_Handshake_
+[X] 0041C580 - Diplomacy_Listen_Mode_
 [ ] 0041C720 - Diplomacy_Chat_
-[ ] 0041C8B0 - Draw_Diplomacy_Listen_Mode_
-[ ] 0041C920 - Diplomacy_Synch_Mode_
-[ ] 0041C970 - thunk_Draw_Diplomacy_Synch_Mode_
-[ ] 0041C980 - Start_Net_Treaty_
-[ ] 0041CA80 - Diplomacy_Receive_Message_
-[ ] 0041CBC0 - Get_Listen_Mode_Message_
-[ ] 0041CC00 - Load_Diplomacy_Text_Messages_
-[ ] 0041D550 - Setup_Diplomacy_Help_
-[ ] 0041D670 - Setup_Full_Screen_Diplomacy_Help_
-[ ] 0041D6F0 - Set_Opportunity_Attacks_
-[ ] 0041D890 - Add_Diplomacy_Turn_Summary_Messages_
-[ ] 0041D9E0 - Resolve_Delayed_Diplomacy_Orders_
-[ ] 0041DAC0 - Diplomacy_Main_Net_Chat_
-[ ] 0041DB60 - Diplomacy_Message_Is_Interactive_
-[ ] 0041DBB0 - Set_Main_Screen_Help_List_
-[ ] 0041DDF0 - Set_PlntSum_Screen_Help_List_
-[ ] 0041DE00 - Set_Design_Screen_Help_List_
-[ ] 0041DEA0 - Set_Weapon_Replacement_Screen_Help_List_
-[ ] 0041E110 - Set_Main_Game_Screen_Help_List_
-[ ] 0041E120 - Set_Scrap_Freighters_Help_List_
-[ ] 0041E130 - Set_Load_Game_Screen_Help_List_
-[ ] 0041E140 - Set_Save_Game_Screen_Help_List_
-[ ] 0041E150 - Set_Options_Game_Screen_Help_List_
-[ ] 0041E160 - Set_Fleet_Screen_Help_List_
-[ ] 0041E240 - Set_ColOff_Screen_Help_List_
-[ ] 0041E2A0 - Set_ShipOff_Screen_Help_List_
-[ ] 0041E3A0 - Set_Main_Menu_Screen_Help_List_
-[ ] 0041E3B0 - Set_Multi_Player_Setup_Screen_Help_List_
-[ ] 0041E3C0 - Set_Null_Modem_Setup_Screen_Help_List_
-[ ] 0041E400 - Set_Input_Box_Help_List_
-[ ] 0041E410 - Set_Diplomacy_Request_Help_List_
-[ ] 0041E450 - Set_Hotseat_Setup_Screen_Help_List_
-[ ] 0041E490 - Append_Help_List_
-[ ] 0041E4F0 - Get_Application_Description_
-[ ] 0041E590 - Offset_Help_Field_XYs_
-[ ] 0041E5E0 - Save_Help_List_
-[ ] 0041E610 - Restore_Help_List_
-[ ] 0041E650 - Set_Main_Menu_Screen_Help_List_Aux_
-[ ] 0041E670 - Build_Ship_Icons_
-[ ] 0041EB20 - Draw_Ship_Icons_
-[ ] 0041EC00 - Set_Ship_Icon_XYs_
-[ ] 0041EC60 - Do_Ship_Destination_Lines_
-[ ] 0041EE70 - Get_Ship_Icon_Coords_
-[ ] 0041F030 - Get_XYs_For_Orbiting_Ships_
-[ ] 0041F150 - Get_Ship_Icon_Coords_In_Space_
-[ ] 0041F200 - Get_Ship_Icon_Pict_Seg_
-[ ] 0041F370 - Overlapped_Ship_Icon_Button_
-[ ] 0041F560 - Draw_Directional_Multi_Colored_Line_
-[ ] 0041F680 - Draw_Ship_Destination_Line_
-[ ] 0041F730 - Enemy_Ship_Heading_Toward_Our_Colony_
-[ ] 0041F7B0 - Print_Eta_On_Ship_Icon_
-[ ] 0041F890 - qsort_ship_icon_
-[ ] 0041F8B0 - Kill_Ship_
-[ ] 0041F940 - Build_Nonplayer_Ship_
-[ ] 0041FA50 - SHIPS::Set_Nonplayer_Ship_XY_
-[ ] 0041FD20 - Set_Nonplayer_Ship_Destination_
-[ ] 0041FE40 - Deploy_Ships_To_Attack_Antares_
-[ ] 0041FEF0 - Get_Ship_Icon_Dimensions_
-[ ] 0041FF40 - Clear_Auto_Colonization_Flag_
-[ ] 0041FF60 - Clear_All_Ships_Auto_Colonization_Flag_
+[X] 0041C8B0 - Draw_Diplomacy_Listen_Mode_
+[X] 0041C920 - Diplomacy_Synch_Mode_
+[X] 0041C970 - thunk_Draw_Diplomacy_Synch_Mode_
+[X] 0041C980 - Start_Net_Treaty_
+[X] 0041CA80 - Diplomacy_Receive_Message_
+[X] 0041CBC0 - Get_Listen_Mode_Message_
+[X] 0041CC00 - Load_Diplomacy_Text_Messages_
+[X] 0041D550 - Setup_Diplomacy_Help_
+[X] 0041D670 - Setup_Full_Screen_Diplomacy_Help_
+[X] 0041D6F0 - Set_Opportunity_Attacks_
+[X] 0041D890 - Add_Diplomacy_Turn_Summary_Messages_
+[X] 0041D9E0 - Resolve_Delayed_Diplomacy_Orders_
+[X] 0041DAC0 - Diplomacy_Main_Net_Chat_
+[X] 0041DB60 - Diplomacy_Message_Is_Interactive_
+[X] 0041DBB0 - Set_Main_Screen_Help_List_
+[X] 0041DDF0 - Set_PlntSum_Screen_Help_List_
+[X] 0041DE00 - Set_Design_Screen_Help_List_
+[X] 0041DEA0 - Set_Weapon_Replacement_Screen_Help_List_
+[X] 0041E110 - Set_Main_Game_Screen_Help_List_
+[X] 0041E120 - Set_Scrap_Freighters_Help_List_
+[X] 0041E130 - Set_Load_Game_Screen_Help_List_
+[X] 0041E140 - Set_Save_Game_Screen_Help_List_
+[X] 0041E150 - Set_Options_Game_Screen_Help_List_
+[X] 0041E160 - Set_Fleet_Screen_Help_List_
+[X] 0041E240 - Set_ColOff_Screen_Help_List_
+[X] 0041E2A0 - Set_ShipOff_Screen_Help_List_
+[X] 0041E3A0 - Set_Main_Menu_Screen_Help_List_
+[X] 0041E3B0 - Set_Multi_Player_Setup_Screen_Help_List_
+[X] 0041E3C0 - Set_Null_Modem_Setup_Screen_Help_List_
+[X] 0041E400 - Set_Input_Box_Help_List_
+[X] 0041E410 - Set_Diplomacy_Request_Help_List_
+[X] 0041E450 - Set_Hotseat_Setup_Screen_Help_List_
+[X] 0041E490 - Append_Help_List_
+[X] 0041E4F0 - Get_Application_Description_
+[X] 0041E590 - Offset_Help_Field_XYs_
+[X] 0041E5E0 - Save_Help_List_
+[X] 0041E610 - Restore_Help_List_
+[X] 0041E650 - Set_Main_Menu_Screen_Help_List_Aux_
+[X] 0041E670 - Build_Ship_Icons_
+[X] 0041EB20 - Draw_Ship_Icons_
+[X] 0041EC00 - Set_Ship_Icon_XYs_
+[X] 0041EC60 - Do_Ship_Destination_Lines_
+[X] 0041EE70 - Get_Ship_Icon_Coords_
+[X] 0041F030 - Get_XYs_For_Orbiting_Ships_
+[X] 0041F150 - Get_Ship_Icon_Coords_In_Space_
+[X] 0041F200 - Get_Ship_Icon_Pict_Seg_
+[X] 0041F370 - Overlapped_Ship_Icon_Button_
+[X] 0041F560 - Draw_Directional_Multi_Colored_Line_
+[X] 0041F680 - Draw_Ship_Destination_Line_
+[X] 0041F730 - Enemy_Ship_Heading_Toward_Our_Colony_
+[X] 0041F7B0 - Print_Eta_On_Ship_Icon_
+[X] 0041F890 - qsort_ship_icon_
+[X] 0041F8B0 - Kill_Ship_
+[X] 0041F940 - Build_Nonplayer_Ship_
+[X] 0041FA50 - SHIPS::Set_Nonplayer_Ship_XY_
+[X] 0041FD20 - Set_Nonplayer_Ship_Destination_
+[X] 0041FE40 - Deploy_Ships_To_Attack_Antares_
+[X] 0041FEF0 - Get_Ship_Icon_Dimensions_
+[X] 0041FF40 - Clear_Auto_Colonization_Flag_
+[X] 0041FF60 - Clear_All_Ships_Auto_Colonization_Flag_
 [ ] 0041FFA0 - Rob_Interpolate_Line_
 [ ] 00420110 - Draw_Generic_Beam_
-[ ] 00420A50 - Get_Ship_Range_
-[ ] 00420A80 - Draw_Ship_Burst_
-[ ] 00420AE0 - Draw_Ship_Explosion_
-[ ] 00420B70 - Load_Combat_Beam_Stuff_
-[ ] 00420BC0 - Load_Ship_Burst_
-[ ] 00420C50 - Load_Ship_Explosion_
-[ ] 00420CA0 - Init_Beams_
-[ ] 00420CC0 - Reset_Beam_Swapping_Colors_
-[ ] 00420CE0 - Add_Weapon_Palette_Fragment_To_Current_Palette_
+[X] 00420A50 - Get_Ship_Range_
+[X] 00420A80 - Draw_Ship_Burst_
+[X] 00420AE0 - Draw_Ship_Explosion_
+[X] 00420B70 - Load_Combat_Beam_Stuff_
+[X] 00420BC0 - Load_Ship_Burst_
+[X] 00420C50 - Load_Ship_Explosion_
+[X] 00420CA0 - Init_Beams_
+[X] 00420CC0 - Reset_Beam_Swapping_Colors_
+[X] 00420CE0 - Add_Weapon_Palette_Fragment_To_Current_Palette_
 [ ] 00420D60 - Beam_SFX_
-[ ] 00421CA0 - Reset_Beam_SFX_Handles_
-[ ] 00421CC0 - Get_Max_Frames_
+[X] 00421CA0 - Reset_Beam_SFX_Handles_
+[X] 00421CC0 - Get_Max_Frames_
 [ ] 00421CD0 - Fire_Weapon_
 [ ] 00422770 - Draw_Fighter_Beam_
 [ ] 004228F0 - Add_Damage_Message_To_Queue_
-[ ] 00422980 - Squish_Out_Msg_Queue_Slot_
-[ ] 004229D0 - Draw_Damage_Message_Queue_
-[ ] 00422A60 - Done_Drawing_Damage_Message_Queue_
+[X] 00422980 - Squish_Out_Msg_Queue_Slot_
+[X] 004229D0 - Draw_Damage_Message_Queue_
+[X] 00422A60 - Done_Drawing_Damage_Message_Queue_
 [ ] 00422A70 - Draw_Damage_Indicator_
 [ ] 00422D20 - Add_Damage_Indicator_For_Ship_
-[ ] 00422DC0 - Add_Damage_Indicator_For_Missile_
-[ ] 00422E00 - Add_Damage_Indicator_For_Biological_
-[ ] 00422E40 - Do_Get_SFX_Draw_Shield_Facing_
-[ ] 00422E70 - Draw_Damage_Message_Queue_Until_Done_
-[ ] 00422ED0 - Get_SFX_Draw_Shield_Facing2_
+[X] 00422DC0 - Add_Damage_Indicator_For_Missile_
+[X] 00422E00 - Add_Damage_Indicator_For_Biological_
+[X] 00422E40 - Do_Get_SFX_Draw_Shield_Facing_
+[X] 00422E70 - Draw_Damage_Message_Queue_Until_Done_
+[X] 00422ED0 - Get_SFX_Draw_Shield_Facing2_
 [ ] 00422FB0 - Adjust_Shield_Display_Status_
 [ ] 00423080 - XY_In_Shield_Radius_
-[ ] 004230E0 - Load_Shield_Hit_
-[ ] 00423170 - Shield_Anims_
-[ ] 00423210 - Draw_Shield_Hit_Once_Through_
-[ ] 00423370 - Ship_Size_To_Shield_Size_
-[ ] 004233B0 - Planet_Size_To_Shield_Size_
-[ ] 004233F0 - Draw_Shield_Hit_
-[ ] 00423980 - Rot_To_Base_Rot_
-[ ] 00423A10 - Rot_To_Rot_Method_
-[ ] 00423AA0 - Adjust_Reflection_Field_Display_Status_
-[ ] 00423BA0 - Load_Reflection_Field_Hit_
-[ ] 00423BD0 - Reflection_Field_Anims_
-[ ] 00423C00 - Draw_Reflection_Field_Hit_
-[ ] 00423E10 - XY_In_Reflection_Field_Radius_
-[ ] 00423E70 - Set_Beam_Colors_
-[ ] 00424250 - Build_Steve_Stuff_Struct_For_Weapon_
-[ ] 00424C20 - Is_Steve_Stuff_Weapon_
-[ ] 00424CA0 - Draw_Beam2_
-[ ] 00424F30 - Cache_Load_Bldg_
-[ ] 00424FB0 - Play_Streaming_Music_
-[ ] 004251B0 - Stop_Background_Music_
+[X] 004230E0 - Load_Shield_Hit_
+[X] 00423170 - Shield_Anims_
+[X] 00423210 - Draw_Shield_Hit_Once_Through_
+[X] 00423370 - Ship_Size_To_Shield_Size_
+[X] 004233B0 - Planet_Size_To_Shield_Size_
+[X] 004233F0 - Draw_Shield_Hit_
+[X] 00423980 - Rot_To_Base_Rot_
+[X] 00423A10 - Rot_To_Rot_Method_
+[X] 00423AA0 - Adjust_Reflection_Field_Display_Status_
+[X] 00423BA0 - Load_Reflection_Field_Hit_
+[X] 00423BD0 - Reflection_Field_Anims_
+[X] 00423C00 - Draw_Reflection_Field_Hit_
+[X] 00423E10 - XY_In_Reflection_Field_Radius_
+[X] 00423E70 - Set_Beam_Colors_
+[X] 00424250 - Build_Steve_Stuff_Struct_For_Weapon_
+[X] 00424C20 - Is_Steve_Stuff_Weapon_
+[X] 00424CA0 - Draw_Beam2_
+[X] 00424F30 - Cache_Load_Bldg_
+[X] 00424FB0 - Play_Streaming_Music_
+[X] 004251B0 - Stop_Background_Music_
 [ ] 004251D0 - Play_Background_Music_
-[ ] 004252A0 - Play_Combat_Music_
-[ ] 00425340 - Get_Text_Message_
-[ ] 00425420 - Decode_Text_Message_
-[ ] 00425770 - Decode_Text_Race_
-[ ] 004257A0 - Decode_Text_Name_And_Stat_
-[ ] 004257D0 - Decode_Text_Name_And_System_
-[ ] 00425800 - Decode_Text_Name_And_Tech_
-[ ] 00425830 - Decode_Text_Name_And_Other_Tech_
-[ ] 00425860 - Decode_Text_Name_Tech_And_Other_Tech_
-[ ] 00425890 - Decode_Text_Name_And_Name_
-[ ] 004258C0 - Decode_Text_Race2_
-[ ] 004258F0 - Decode_Text_Race3_
-[ ] 00425920 - Decode_Text_Stat_
-[ ] 00425950 - Decode_Text_System_
-[ ] 00425980 - Decode_Text_Field_
-[ ] 004259B0 - Decode_Text_Year_
-[ ] 004259E0 - Decode_Text_Tech_And_Other_Name_
-[ ] 00425A10 - Bill_Picture_To_Mouse_
+[X] 004252A0 - Play_Combat_Music_
+[X] 00425340 - Get_Text_Message_
+[X] 00425420 - Decode_Text_Message_
+[X] 00425770 - Decode_Text_Race_
+[X] 004257A0 - Decode_Text_Name_And_Stat_
+[X] 004257D0 - Decode_Text_Name_And_System_
+[X] 00425800 - Decode_Text_Name_And_Tech_
+[X] 00425830 - Decode_Text_Name_And_Other_Tech_
+[X] 00425860 - Decode_Text_Name_Tech_And_Other_Tech_
+[X] 00425890 - Decode_Text_Name_And_Name_
+[X] 004258C0 - Decode_Text_Race2_
+[X] 004258F0 - Decode_Text_Race3_
+[X] 00425920 - Decode_Text_Stat_
+[X] 00425950 - Decode_Text_System_
+[X] 00425980 - Decode_Text_Field_
+[X] 004259B0 - Decode_Text_Year_
+[X] 004259E0 - Decode_Text_Tech_And_Other_Name_
+[X] 00425A10 - Bill_Picture_To_Mouse_
 [ ] 00425A70 - Draw_Logos_
-[ ] 00425D50 - Logo_Fadeout_
-[ ] 00425DC0 - Slow_Fade_In_
-[ ] 00425E30 - Check_For_Simtex_Logo_
-[ ] 00425E90 - Info_Screen_
-[ ] 00426300 - Draw_Maint_Income_Chart_
-[ ] 00426470 - Build_Maint_Chart_Bitmaps_
-[ ] 00426830 - Initialize_Maintenance_Values_
+[X] 00425D50 - Logo_Fadeout_
+[X] 00425DC0 - Slow_Fade_In_
+[X] 00425E30 - Check_For_Simtex_Logo_
+[X] 00425E90 - Info_Screen_
+[X] 00426300 - Draw_Maint_Income_Chart_
+[X] 00426470 - Build_Maint_Chart_Bitmaps_
+[X] 00426830 - Initialize_Maintenance_Values_
 [ ] 00426920 - Draw_The_History_Graph_
-[ ] 00426B90 - Smooth_History_Data_
+[X] 00426B90 - Smooth_History_Data_
 [ ] 00426C00 - Display_Graphed_Players_Names_
-[ ] 00426CC0 - History_Subscreen_
-[ ] 00426E50 - Get_Plyr_Hist_Btns_
-[ ] 00426EA0 - Set_Plyr_Hist_Btns_
+[X] 00426CC0 - History_Subscreen_
+[X] 00426E50 - Get_Plyr_Hist_Btns_
+[X] 00426EA0 - Set_Plyr_Hist_Btns_
 [ ] 00426F20 - Draw_Histories_
-[ ] 00427390 - Draw_History_Subscreen_
-[ ] 004273E0 - Tech_Review_Subscreen_
-[ ] 00427410 - _Tech_Review_Subscreen_
-[ ] 00427970 - Draw_Tech_Review_Subscreen_
-[ ] 00427A60 - Init_Tech_Review_List_
-[ ] 00427B50 - Race_Statistics_Specials_Help_
-[ ] 00427C60 - Race_Stats_Subscreen_
+[X] 00427390 - Draw_History_Subscreen_
+[X] 004273E0 - Tech_Review_Subscreen_
+[X] 00427410 - _Tech_Review_Subscreen_
+[X] 00427970 - Draw_Tech_Review_Subscreen_
+[X] 00427A60 - Init_Tech_Review_List_
+[X] 00427B50 - Race_Statistics_Specials_Help_
+[X] 00427C60 - Race_Stats_Subscreen_
 [ ] 00428150 - Print_Player_Specials_To_Bitmap_
-[ ] 00428440 - Draw_Race_Stats_Subscreen_
+[X] 00428440 - Draw_Race_Stats_Subscreen_
 [ ] 004284D0 - _Init_Turn_Summary_List_
-[ ] 004285E0 - Init_Turn_Summary_List_
-[ ] 00428600 - Turn_Summary_Subscreen_
-[ ] 004289A0 - Draw_Dummy_Turn_Summary_Subscreen_
-[ ] 004289B0 - Draw_Turn_Summary_Subscreen_
+[X] 004285E0 - Init_Turn_Summary_List_
+[X] 00428600 - Turn_Summary_Subscreen_
+[X] 004289A0 - Draw_Dummy_Turn_Summary_Subscreen_
+[X] 004289B0 - Draw_Turn_Summary_Subscreen_
 [ ] 00428A30 - Reference_Subscreen_
-[ ] 00428AE0 - Reference_Main_Subscreen_
-[ ] 00428E30 - Draw_Reference_Main_Subscreen_
+[X] 00428AE0 - Reference_Main_Subscreen_
+[X] 00428E30 - Draw_Reference_Main_Subscreen_
 [ ] 00428EC0 - Reference_How_To_Subscreen_
 [ ] 00429020 - Reference_Category_Subscreen_
-[ ] 004295D0 - Draw_Reference_Category_Subscreen_
-[ ] 00429690 - Introduce_Subscreen_
-[ ] 004296E0 - Draw_Drop_Area_
-[ ] 00429910 - Draw_Multiple_Drop_Areas_
-[ ] 00429940 - Set_Up_Player_Colors_
-[ ] 004299B0 - Get_Plyr_Info_Btns_
-[ ] 004299E0 - Set_Plyr_Info_Btns_
-[ ] 00429A40 - Colorize_Bitmap_
-[ ] 00429A90 - Colony_Landing_Screen_
-[ ] 00429D40 - Load_Anims_
-[ ] 00429D60 - Add_Fields_
-[ ] 00429DA0 - Draw_Colony_Landing_Screen_
-[ ] 00429F50 - Print_Planet_Data_
-[ ] 0042A230 - Do_AI_Leaders_
+[X] 004295D0 - Draw_Reference_Category_Subscreen_
+[X] 00429690 - Introduce_Subscreen_
+[X] 004296E0 - Draw_Drop_Area_
+[X] 00429910 - Draw_Multiple_Drop_Areas_
+[X] 00429940 - Set_Up_Player_Colors_
+[X] 004299B0 - Get_Plyr_Info_Btns_
+[X] 004299E0 - Set_Plyr_Info_Btns_
+[X] 00429A40 - Colorize_Bitmap_
+[X] 00429A90 - Colony_Landing_Screen_
+[X] 00429D40 - Load_Anims_
+[X] 00429D60 - Add_Fields_
+[X] 00429DA0 - Draw_Colony_Landing_Screen_
+[X] 00429F50 - Print_Planet_Data_
+[X] 0042A230 - Do_AI_Leaders_
 [ ] 0042A430 - Assign_Unassigned_Leaders_
 [ ] 0042A4A0 - Assign_Fleet_Officer_
 [ ] 0042A570 - Reassign_Fleet_Officer_

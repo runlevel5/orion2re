@@ -149,7 +149,7 @@ workflows:
           Invalid paramerer a.
           ```
 
-          Append whole block to the `report.txt` file and a long `---------------------------------------` separator at the end to separate reports. 
+          Append whole block to the `report.txt` file and a long `---------------------------------------` separator after the report to separate individual reports. 
           
           Make sure to NOT overwrite the whole file.
 
