@@ -2169,33 +2169,25 @@ namespace DIP_SCRN {
      */
     int16_t __cdecl Get_Human_Demand_Choice_(int16_t player_idx, int16_t other_player_idx, int16_t demand_type, int16_t some_id) {
         char cancel_btn_text[40];
-        char demand_text[40];
-        char unused_text[40];
-        char local_140;
-        int16_t result;
+        char demand_text[80];
+        char separator;
+        int16_t result = 0;
 
         if (demand_type == 7 /* ECON_STAR_SYSTEM */) {
             if (DIP_SCRN::Diplomacy_Generic_System_List_(some_id, player_idx, other_player_idx, 1) != -1) {
                 result = 1;
-            } else {
-                result = 0;
             }
         } else {
-            // Load demand strings and display the generic demand choice list.
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 79 /* MSG_DEMAND_HEADER */, demand_text, 40);
-            JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 80 /* MSG_DEMAND_SUBHEADER */, unused_text, 40);
+            JIM::Get_Text_Message_(DIP_SCRN::s_jimtext_lbx, 80 /* MSG_DEMAND_SUBHEADER */, &demand_text[40], 40);
 
-            local_140 = DIP_SCRN::s__00551100[0];
+            separator = DIP_SCRN::s__00551100[0];
             fields::Deactivate_Help_List_();
 
             JIM::Get_Text_Message_(DIP_SCRN::s_jimtext2_lbx, 0 /* MSG_CANCEL */, cancel_btn_text, 40);
 
-            // If the list result is 0 (first option or similar), we return 1 (Success/Accept).
-            // Otherwise return 0 (Cancel).
             if (DIP_SCRN::Diplomacy_Generic_List_(2, demand_text, 0, cancel_btn_text) == 0) {
                 result = 1;
-            } else {
-                result = 0;
             }
         }
 
@@ -2273,7 +2265,7 @@ namespace DIP_SCRN {
         char text_buffer[80];
         bool use_special_colors = false;
 
-        if (star_idx == -1) {
+        if (selected_planet_idx == -1) {
             fonts::Set_Font_Style_Shadow_Down_(4, &DIP_SCRN::_diplomacy_normal_colors);
         } else {
             use_special_colors = true;

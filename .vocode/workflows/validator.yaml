@@ -87,7 +87,7 @@ workflows:
             description: You should select "success" outcome when validation passed.
           - name: fail
             description: You should select "fail" outcome when validation failed.
-      - name: mark
+      - name: complete
         type: llm
         model: ${LLM_WEAK_MODEL}
         confirmation: auto
@@ -119,17 +119,47 @@ workflows:
           3. You marked the corresponding line as completing by extract
         outcomes:
           - name: done
-      - name: feedback
-        type: input
-        alert: true
-        message: "Validation failed. Provide follow-up instructions or corrected input."
+      # TODO: Update me to use exec node
+      - name: report
+        type: llm
+        model: ${LLM_WEAK_MODEL}
         confirmation: auto
-        output_mode: hide_final
+        tools:
+          - read_files
+          - name: apply_patch
+            auto_approve: true
+            config:
+              format: ${LLM_DIFF_FORMAT}
+        system: |
+          You are code validation assistant. Your goal is to tail last 10 lines of the `report.txt` file and append failed analysis summary along with the function address to it.
+
+          You should be provided with the following message template:
+
+          ```
+          0x12345678 namespace::Function_Name_
+
+          <... findings ...>
+          ```
+          
+          For example:
+
+          ```
+          0x0040BF20 COMBINIT::Ship_Center_Offsets_
+
+          Invalid paramerer a.
+          ```
+
+          Append whole block to the `report.txt` file and a long `---------------------------------------` separator at the end to separate reports. 
+          
+          Make sure to NOT overwrite the whole file.
+
+          Checklist:
+          1. You appended findings to the `report.txt` file.
         outcomes:
           - name: done
     edges:
       - input.done -> validate
-      - validate.success -> mark
-      - validate.fail -> feedback
-      - mark.done -> input
-      - feedback.done -> validate:keep
+      - validate.success -> complete
+      - validate.fail -> report
+      - complete.done -> input
+      - report.done -> input

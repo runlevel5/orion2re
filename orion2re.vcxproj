@@ -430,6 +430,7 @@
     <None Include="notes.md" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="report.txt" />
     <Text Include="validate.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
