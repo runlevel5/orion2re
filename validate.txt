@@ -1225,356 +1225,356 @@
 [!] 00462D10 - Find_Best_Attack_From_Star_
 [!] 00463090 - Compute_Attack_Worthiness_
 [X] 004636A0 - Gather_Player_Ships_At_Star_
-[ ] 00463760 - Intercept_Invaders_
-[ ] 00463CE0 - Interceptions_
-[ ] 004642B0 - Ship_Min_Strength_Versus_Players_At_Star_
-[ ] 00464390 - Knock_Out_Impossible_Interceptions_
-[ ] 00464540 - Gather_Intercepting_Ships_
-[ ] 00464620 - Move_To_Stage_Points_
-[ ] 00464C40 - Move_Transports_
-[ ] 00465390 - Move_To_Unexplored_Stars_
-[ ] 00465630 - Launch_Sneak_Attack_
-[ ] 004657F0 - Mark_Flee_Stars_
-[ ] 004658A0 - Move_All_AI_
-[ ] 00465910 - Move_NPCs_
-[ ] 00465BA0 - NPC_Dest_
-[ ] 00465D90 - Sort_npc_dests_
-[ ] 00465E00 - Find_Opportunity_Attack_
-[ ] 00465E80 - Find_Opportunity_Attack_Aux_
-[ ] 00465F70 - Player_Threatens_Player_
-[ ] 00466080 - Number_Of_Attacks_Underway_
-[ ] 00466160 - Base_Trade_Agreement_Goal_
-[ ] 004661F0 - Get_Combined_Research_Points_
-[ ] 00466240 - Process_Trade_And_Research_Agreements_
-[ ] 004662F0 - Compute_N_Trade_And_Research_Pops_
-[ ] 00466430 - Process_Trade_Agreement_
-[ ] 004664C0 - Trade_Agreement_Goal_
-[ ] 00466600 - Process_Research_Agreement_
-[ ] 00466690 - Research_Agreement_Goal_
-[ ] 00466710 - Start_Trade_Agreement_
-[ ] 004667D0 - Start_Research_Agreement_
-[ ] 00466890 - Get_Number_Of_Ships_In_Stasis_
-[ ] 004668E0 - Combat_Ship_Is_Functional_
-[ ] 00466930 - Enemy_Dissipator_Exists_
-[ ] 004669B0 - Ship_Controlled_By_Computer_
-[ ] 00466A20 - Send_Tactical_Combat_Message_
-[ ] 00466AB0 - Init_Ship_For_Start_Of_Turn_
-[ ] 00466D10 - Do_Combat_Turn_
-[ ] 00468ED0 - qsort_ship_initiative_
-[ ] 00468F30 - Ship_Initiative_Value_
-[ ] 00468F70 - Seeking_Missiles_
-[ ] 004693D0 - Calc_Current_Speed_
-[ ] 004695D0 - Check_For_Winner_
-[ ] 004696B0 - Set_Cur_Ship_To_
-[ ] 00469750 - Next_Ship_
-[ ] 00469A00 - Weapon_Is_On_
-[ ] 00469A30 - Remove_Continuing_Effect_Specials_
-[ ] 00469AC0 - Ship_Done_Check_
-[ ] 00469B20 - Retreat_Ship_
-[ ] 00469BD0 - Initiate_Boarding_Action_
-[ ] 0046A0F0 - Add_Missile_Fields_
-[ ] 0046A2C0 - Set_Combat_Help_Fields_
-[ ] 0046A8A0 - Add_Tactical_Combat_Fields_
-[ ] 0046AFC0 - Assign_Combat_Grids_
-[ ] 0046B260 - Assign_Mouse_Images_
-[ ] 0046B920 - Set_Legal_Moves_
-[ ] 0046BC20 - Get_Competition_Player_Tech_Values_
-[ ] 0046BC90 - Human_Player_Best_Weapons_Are_Beams_
-[ ] 0046BCF0 - Fighters_Available_
-[ ] 0046BD40 - Special_Weapons_Available_
-[ ] 0046BDB0 - Special_Devices_Available_
-[ ] 0046BE70 - Get_Ship_Class_
-[ ] 0046C470 - Special_Legal_For_Design_
-[ ] 0046C4F0 - Add_Specials_To_Design_
-[ ] 0046C7F0 - Add_Theme_Special_To_Design_
-[ ] 0046C9E0 - Add_Fighters_To_Design_
-[ ] 0046CB80 - Determine_Missile_Weapon_Modifications_
-[ ] 0046D010 - Add_Missile_Weapon_To_Design_
-[ ] 0046D190 - Determine_Bomb_Weapon_
-[ ] 0046D3B0 - Add_Bomb_Weapon_To_Design_
-[ ] 0046D500 - Determine_Beam_Weapon_Modifications_
-[ ] 0046DF10 - Add_Beam_Weapon_To_Design_
-[ ] 0046E0E0 - Auto_Design_Ship_
-[ ] 0046EDE0 - Ship_Is_In_Stasis_
-[ ] 0046EE10 - Ship_In_Black_Hole_
-[ ] 0046EE40 - Draw_Teleporting_Ship_
-[ ] 0046F0B0 - Rotate_Ship_Until_Impact_
-[ ] 0046F350 - Ship_In_Legal_Square_
-[ ] 0046F3F0 - Test_Move_Until_Impact_
-[ ] 0046F810 - Move_Ship_
-[ ] 00470070 - Get_Facing_
-[ ] 004700D0 - Rotate_Ship_
-[ ] 00470440 - Turn_Cost_
-[ ] 00470480 - Move_Cost_
-[ ] 00470560 - Turn_To_Face_
-[ ] 004706E0 - Wait_Until_Net_Opponent_Finished_
-[ ] 004707D0 - Tactical_Combat_Receive_Message_
-[ ] 00470900 - Lose_Out_Of_Range_Ships_
-[ ] 00470960 - Compute_Stars_In_Range_Of_Player_
-[ ] 00470A00 - Player_Lose_Out_Of_Range_Ships_
-[ ] 00470A90 - Draw_Help_Entry_
-[ ] 00471070 - Text_Box_
-[ ] 00471090 - Timed_Text_Box_
-[ ] 004710B0 - Do_Text_Box_
-[ ] 004713C0 - Box_Centered_On_XY_
-[ ] 00471550 - Text_Box_Startup_
-[ ] 00471690 - Text_Box_Cleanup_
-[ ] 00471710 - Text_Box_Get_Input_
-[ ] 00471790 - Get_Mox_Text_Box_Base_Colors_
-[ ] 00471850 - Get_Help_Lbx_Name_
-[ ] 00471930 - Race_Report_Screen_
-[ ] 00472040 - Load_Msg_Strings_
-[ ] 004726E0 - Allocate_Msg_Slots_
-[ ] 004727A0 - First_Msg_For_Player_
-[ ] 004727C0 - N_Msgs_For_Player_
-[ ] 004727E0 - sprintf_msg_
-[ ] 00473810 - Add_Msg_
-[ ] 00473900 - Add_Msg_All_
-[ ] 00473940 - Goto_Msg_Colony_
-[ ] 004739F0 - Add_War_Msg_
-[ ] 00473A10 - Add_Diplomacy_Msg_
-[ ] 00473AD0 - Add_Peace_Msg_
-[ ] 00473AF0 - Add_Alliance_Msg_
-[ ] 00473B10 - Add_Nonaggression_Msg_
-[ ] 00473B30 - Add_Peace_Ended_Msg_
-[ ] 00473B50 - Add_Ongoing_Event_Msgs_
-[ ] 00473DF0 - Init_Events_
-[ ] 00473E50 - Reset_Events_
-[ ] 00473EA0 - Check_For_Event_Message_
-[ ] 00473ED0 - Check_For_Event_
-[ ] 00473F80 - Start_Main_Event_
-[ ] 00474030 - Load_Event_Picture_
-[ ] 00474070 - Drive_Event_Screen_
-[ ] 004740D0 - Draw_Event_Screen_
-[ ] 004741A0 - Event_Fade_In_
-[ ] 004742A0 - Event_Twiddle_
-[ ] 00474F60 - Setup_Next_Event_
-[ ] 00475910 - Get_Event_Message_
-[ ] 00476160 - Event_Get_Fleet_Strength_
-[ ] 004761C0 - Determine_Event_
-[ ] 00476DE0 - Get_Event_Victim_
-[ ] 00477070 - Get_Antaran_Victim_
-[ ] 00477240 - Player_Has_Bad_Event_
-[ ] 004772A0 - Get_Event_Climate_Change_Colony_
-[ ] 00477370 - Get_Event_Industrial_Accident_Colony_
-[ ] 00477440 - Get_Event_Mineral_Depletion_Colony_
-[ ] 004774B0 - Get_Event_Mineral_Deposit_Colony_
-[ ] 00477520 - Event_Monster_Update_
-[ ] 004775B0 - Event_Race_Eliminated_
-[ ] 004775D0 - Event_Orion_Discovered_
-[ ] 004775F0 - Event_Surrender_
-[ ] 00477610 - Event_Check_Hyperspace_Flux_
-[ ] 00477630 - Event_Check_Space_Anomaly_
-[ ] 00477690 - Event_Check_Pirate_Activity_
-[ ] 004776D0 - Event_Check_Plague_
-[ ] 00477700 - Event_Check_Warp_Beast_
-[ ] 00477720 - Event_Check_Population_Boom_
-[ ] 00477750 - Event_Check_Comet_
-[ ] 00477780 - Event_Check_Planet_Warning_
-[ ] 00477A00 - Event_Check_General_Status_
-[ ] 00477A50 - FUN_00477a50
-[ ] 00477B20 - FUN_00477b20
-[ ] 00477BB0 - FUN_00477bb0
-[ ] 00477CA0 - Pick_Completely_Random_Star_
-[ ] 00477DA0 - FUN_00477da0
-[ ] 00477DF0 - Colony_Research_Points_
-[ ] 00477E10 - Pick_Random_Player_In_Contact_
-[ ] 00477EB0 - Pick_Random_Star_
-[ ] 00477F90 - Pick_Random_Ship_
-[ ] 00478000 - Pick_Random_Colony_No_Outpost_
-[ ] 00478080 - Pick_Random_Colony_No_Capitol_
-[ ] 00478110 - Event_Check_Colony_Researching_
-[ ] 00478190 - Colony_Has_Event_
-[ ] 00478290 - Kill_All_Events_At_Colony_
-[ ] 004784B0 - Event_Check_Space_Anomaly_At_Star_
-[ ] 004784E0 - Star_Has_Event_
-[ ] 00478640 - Event_Pirate_Activity_Strength_
-[ ] 00478700 - Determine_Lucky_Players_Events_
-[ ] 004787C0 - Update_Lucky_Players_Events_
-[ ] 00478820 - Init_New_Game_
-[ ] 00478B30 - Init_Ships_Array_
-[ ] 00478BC0 - Make_System_Monsters_Into_Ships_
-[ ] 00478D10 - Set_Initial_Colony_Auto_Selects_
-[ ] 00478D80 - Init_Colonies_Array_
-[ ] 00478E20 - Init_Map_Pictures_Default__
-[ ] 00478E30 - Init_Map_Defaults_
-[ ] 00478E80 - Set_Default_Game_Settings_
-[ ] 00478FB0 - Write_Game_Settings_
-[ ] 00479000 - Init_Players_
-[ ] 004794B0 - Init_Colony_
-[ ] 00479580 - Init_Leaders_
-[ ] 004796B0 - Message_Box_
-[ ] 004796D0 - Message_Box_Exploding_Star_
-[ ] 004796E0 - Warning_Box_
-[ ] 00479700 - Do_Confirmation_Box_
-[ ] 00479710 - Message_Box_Exploding_
-[ ] 00479960 - Confirmation_Box_
-[ ] 00479BA0 - Draw_Animating_Message_Box_
-[ ] 00479C30 - Draw_Confirm_Box_
-[ ] 00479CC0 - Message_Box_Startup_
-[ ] 00479D70 - Message_Box_Cleanup_
-[ ] 00479DF0 - _Print_1_Or_More_Formatted_Lines_Centered_
-[ ] 00479E60 - Do_Print_1_Or_More_Formatted_Lines_Centered_
-[ ] 00479E80 - Product_Name_
-[ ] 00479EA0 - Mean_Ship_Strength_
-[ ] 0047A070 - Compute_Empire_Building_Needs_
-[ ] 0047A2E0 - Compute_Needs_
-[ ] 0047A9C0 - Compute_Colony_Ship_Need_
-[ ] 0047A9E0 - Compute_Freighter_Need_
-[ ] 0047AA40 - Colony_Is_Conquered_
-[ ] 0047AAB0 - Assign_Colony_New_Building_
-[ ] 0047AC30 - Find_Buildable_Buildings_
-[ ] 0047AC70 - Colony_Building_Score_
-[ ] 0047BA30 - Empire_Buy_Outright_
-[ ] 0047BD10 - Player_War_Level_
-[ ] 0047BDB0 - Refit_Cost_
-[ ] 0047BE10 - Assign_Empire_Building_
-[ ] 0047D420 - Industry_Worth
-[ ] 0047D450 - colony_less_industry_cmp_
-[ ] 0047D4B0 - Force_Produce_
-[ ] 0047D500 - Assign_Colony_Building_
-[ ] 0047D540 - Player_Colony_Autobuild_
-[ ] 0047D570 - Load_Netturn_Strings_
-[ ] 0047D5B0 - Net_Next_Turn_
-[ ] 0047D830 - Host_Next_Turn_
-[ ] 0047DB30 - Client_Next_Turn_
-[ ] 0047DD00 - Must_Broadcast_AI_Player_Data_
-[ ] 0047DD40 - Net_Init_Host_Election_
-[ ] 0047DDB0 - Planet_Anims_
-[ ] 0047DDF0 - Draw_Col_Sys_Disp_
-[ ] 0047DFE0 - Planet_Summary_String_
-[ ] 0047E3C0 - Add_Col_Sys_Disp_Fields_
-[ ] 0047E530 - Draw_Col_Sys_Disp_Last_Scanned_
-[ ] 0047E670 - Handle_Leader_At_Lost_Colony_
-[ ] 0047E780 - Destroy_Colony_
-[ ] 0047E8E0 - Resolve_Bomb_Hit_
-[ ] 0047EBD0 - Resolve_Biological_Hit_
-[ ] 0047EDC0 - Apply_Bomb_Hits_
-[ ] 0047EE30 - Get_Design_Combat_Bonuses_
-[ ] 0047EF30 - Get_Ship_Combat_Bonuses_
-[ ] 0047F0F0 - Init_Ship_Designs_
-[ ] 0047F290 - Load_Antaran_Ship_Design_
-[ ] 0047F300 - Load_Small_Antaran_Combat_Ship_
-[ ] 0047F600 - Load_Small_Antaran_Design_
-[ ] 0047F6E0 - Load_Medium_Antaran_Combat_Ship_
-[ ] 0047FA50 - Load_Medium_Antaran_Design_
-[ ] 0047FB50 - Load_Large_Antaran_Combat_Ship_
-[ ] 0047FF90 - Load_Large_Antaran_Design_
-[ ] 004800D0 - Load_Huge_Antaran_Combat_Ship_
-[ ] 004805B0 - Load_Huge_Antaran_Design_
-[ ] 00480720 - Load_Titan_Antaran_Combat_Ship_
-[ ] 00480CF0 - Load_Titan_Antaran_Design_
-[ ] 00480EA0 - Load_Doom_Star_Ship_Design_
-[ ] 00480EE0 - Update_Ship_Names_To_New_Language_
-[ ] 00480F50 - Load_Colony_Ship_Design_
-[ ] 00481020 - Load_Outpost_Ship_Design_
-[ ] 004810F0 - Load_Transport_Ship_Design_
-[ ] 004811D0 - Best_Warp_Drive_
-[ ] 00481280 - Best_Ship_Shield_
-[ ] 00481310 - Best_Computer_
-[ ] 00481380 - Best_Armor_
-[ ] 00481420 - Best_Beam_Weapon_
-[ ] 00481510 - Best_Point_Defense_Weapon_
-[ ] 004815E0 - FUN_004815e0
-[ ] 00481630 - Best_Point_Defense_Weapon_By_Size_
-[ ] 00481700 - Best_Missile_Weapon_
-[ ] 00481800 - Best_Missile_Weapon_NT_
-[ ] 004818F0 - Best_Bomb_Weapon_
-[ ] 00481980 - Best_Strat_Special_Weapon_
-[ ] 00481AB0 - Best_Beam_To_Hit_Special_
-[ ] 00481B40 - Best_Beam_Damage_Special_
-[ ] 00481BD0 - Best_Beam_Defense_Special_
-[ ] 00481C60 - Best_Missile_Defense_Special_
-[ ] 00481CF0 - Best_Missile_Damage_Special_
-[ ] 00481D90 - FUN_00481d90
-[ ] 00481DD0 - Best_Ship_Fuel_
-[ ] 00481E50 - Update_Player_Ship_Designs_
-[ ] 00481EF0 - Update_Equipment_On_Ships_Being_Built_
-[ ] 00482020 - Update_Automatic_Design_Equipment_
-[ ] 00482160 - Update_Player_Strategic_Ship_Designs_
-[ ] 00482220 - Cost_Of_Strategic_Design_
-[ ] 00482260 - Calc_Player_FTL_Speed_
-[ ] 004822C0 - Get_FTL_Speed_
-[ ] 00482320 - Strat_Beam_Weapon_Count_
-[ ] 00482370 - Strat_Missile_Weapon_Count_
-[ ] 00482390 - Strat_Special_Weapon_Count_
-[ ] 004823B0 - Strat_Bomb_Weapon_Count_
-[ ] 004823D0 - Update_Strategic_Design_Weapons_Specials_
-[ ] 004825C0 - Auto_Strategic_Design_Ship_
-[ ] 004826D0 - Update_Strategic_Ship_
-[ ] 00482780 - INITSHIP::Load_Dragon_Ship_Design_
-[ ] 004828D0 - INITSHIP::Load_Hydra_Ship_Design_
-[ ] 004829F0 - INITSHIP::Load_Amoeba_Ship_Design_
-[ ] 00482B30 - INITSHIP::Load_Eel_Ship_Design_
-[ ] 00482C60 - INITSHIP::Load_Crystal_Ship_Design_
-[ ] 00482DA0 - INITSHIP::Load_Guardian_Ship_Design_
-[ ] 00482F10 - Repair_Ships_At_Colonies_
-[ ] 00483050 - Repair_Ship_Full_
-[ ] 004830D0 - Ship_Has_Weapon_
-[ ] 00483120 - Get_Design_Structure_
-[ ] 004831A0 - Get_Structure_
-[ ] 004831F0 - Get_Ship_Structure_
-[ ] 004832D0 - Get_Ship_Armor_Hits_
-[ ] 00483340 - Load_Loknar_Ship_Design_
-[ ] 00483470 - main2_
-[ ] 00483830 - Screen_Control_
-[ ] 00483C80 - Mox_Sync_Update_
-[ ] 00483C90 - Get_Auto_Function_
-[ ] 00483CA0 - Put_Auto_Function_
-[ ] 00483CB0 - Execute_Auto_Function_
-[ ] 00483CC0 - Set_Game_Random_Seed_
-[ ] 00483CE0 - Set_Mox_Alt_Path_
-[ ] 00483EF0 - Set_Mox_Language_
-[ ] 00483F60 - Load_Strings
-[ ] 00483FF0 - Tech_Select_
-[ ] 00484040 - Tech_Change_
-[ ] 00484080 - Reset_Screen_
-[ ] 004840C0 - _Tech_Select_
-[ ] 004849B0 - Draw_Tech_Select_
-[ ] 00484A60 - Draw_Little_Arrow_
-[ ] 00484BC0 - _Tech_List_
-[ ] 00485240 - Draw_Tech_List_
-[ ] 004852A0 - Display_All_Entry_Text_
-[ ] 004852D0 - Display_Entry_Text_
-[ ] 00485460 - Display_Selected_Entry_Text_
-[ ] 00485550 - Set_Selected_Entry_
-[ ] 004855D0 - Get_Selected_Entry_
-[ ] 00485600 - Init_Entry_Positions_
-[ ] 004856C0 - Init_Entry_Data_
-[ ] 00485AC0 - Setup_Entry_Buttons_
-[ ] 00485B40 - Get_Group_List_
-[ ] 00485D10 - Draw_Application_Description_
-[ ] 00485EC0 - Technology_Fields_Name_
-[ ] 00485F20 - Technology_Applications_Name_
-[ ] 00486050 - New_Get_Tech_Cost_
-[ ] 004860A0 - Save_Hyper_Tech_Values_
-[ ] 004860E0 - Restore_Hyper_Tech_Values_
-[ ] 00486120 - Promote_Hyper_Field_Values_
-[ ] 00486160 - Load_New_Game_Strings_
-[ ] 00486390 - Reload_Newgame_Screen_
-[ ] 004865A0 - Draw_Newgame_Screen_
-[ ] 00486690 - Draw_Pictures_
-[ ] 004867A0 - Newgame_Screen_
-[ ] 00486AC0 - Update_Fields_
-[ ] 00486F60 - Temps_To_Globals_
-[ ] 00486FD0 - Globals_To_Temps_
-[ ] 00487060 - Troop_Popup_
-[ ] 004870F0 - Reset_Fields_
-[ ] 00487130 - Draw_Troop_Popup_
-[ ] 00487270 - Print_Best_Summary_
-[ ] 00487320 - Print_Data_
-[ ] 004873C0 - Print_Race_Summary_
-[ ] 004874B0 - Print_Troop_Totals_
-[ ] 00487750 - Save_Field_Stats_
-[ ] 004877E0 - Restore_Field_Stats_
-[ ] 00487840 - Crew_Description_String_
-[ ] 004879A0 - Add_Fltscrn_Big_Icon_Fields_
-[ ] 00487B10 - Add_Fltscrn_Small_Icon_Fields_
-[ ] 00487B90 - Build_Fltscrn_Big_Icon_Fields_
-[ ] 00487D50 - Move_Ship_To_Front_Of_List_
-[ ] 00487DE0 - Build_Fltscrn_Ship_List_
-[ ] 00487E70 - Draw_Captains_Picture_
-[ ] 00488040 - Fix_Palette_
+[!] 00463760 - Intercept_Invaders_
+[!] 00463CE0 - Interceptions_
+[!] 004642B0 - Ship_Min_Strength_Versus_Players_At_Star_
+[X] 00464390 - Knock_Out_Impossible_Interceptions_
+[X] 00464540 - Gather_Intercepting_Ships_
+[!] 00464620 - Move_To_Stage_Points_
+[!] 00464C40 - Move_Transports_
+[!] 00465390 - Move_To_Unexplored_Stars_
+[!] 00465630 - Launch_Sneak_Attack_
+[X] 004657F0 - Mark_Flee_Stars_
+[X] 004658A0 - Move_All_AI_
+[!] 00465910 - Move_NPCs_
+[X] 00465BA0 - NPC_Dest_
+[X] 00465D90 - Sort_npc_dests_
+[X] 00465E00 - Find_Opportunity_Attack_
+[X] 00465E80 - Find_Opportunity_Attack_Aux_
+[X] 00465F70 - Player_Threatens_Player_
+[!] 00466080 - Number_Of_Attacks_Underway_
+[X] 00466160 - Base_Trade_Agreement_Goal_
+[X] 004661F0 - Get_Combined_Research_Points_
+[X] 00466240 - Process_Trade_And_Research_Agreements_
+[X] 004662F0 - Compute_N_Trade_And_Research_Pops_
+[X] 00466430 - Process_Trade_Agreement_
+[X] 004664C0 - Trade_Agreement_Goal_
+[!] 00466600 - Process_Research_Agreement_
+[X] 00466690 - Research_Agreement_Goal_
+[X] 00466710 - Start_Trade_Agreement_
+[X] 004667D0 - Start_Research_Agreement_
+[!] 00466890 - Get_Number_Of_Ships_In_Stasis_
+[X] 004668E0 - Combat_Ship_Is_Functional_
+[X] 00466930 - Enemy_Dissipator_Exists_
+[X] 004669B0 - Ship_Controlled_By_Computer_
+[X] 00466A20 - Send_Tactical_Combat_Message_
+[!] 00466AB0 - Init_Ship_For_Start_Of_Turn_
+[!] 00466D10 - Do_Combat_Turn_
+[!] 00468ED0 - qsort_ship_initiative_
+[X] 00468F30 - Ship_Initiative_Value_
+[!] 00468F70 - Seeking_Missiles_
+[X] 004693D0 - Calc_Current_Speed_
+[X] 004695D0 - Check_For_Winner_
+[X] 004696B0 - Set_Cur_Ship_To_
+[X] 00469750 - Next_Ship_
+[X] 00469A00 - Weapon_Is_On_
+[!] 00469A30 - Remove_Continuing_Effect_Specials_
+[X] 00469AC0 - Ship_Done_Check_
+[!] 00469B20 - Retreat_Ship_
+[!] 00469BD0 - Initiate_Boarding_Action_
+[X] 0046A0F0 - Add_Missile_Fields_
+[!] 0046A2C0 - Set_Combat_Help_Fields_
+[!] 0046A8A0 - Add_Tactical_Combat_Fields_
+[X] 0046AFC0 - Assign_Combat_Grids_
+[X] 0046B260 - Assign_Mouse_Images_
+[X] 0046B920 - Set_Legal_Moves_
+[!] 0046BC20 - Get_Competition_Player_Tech_Values_
+[X] 0046BC90 - Human_Player_Best_Weapons_Are_Beams_
+[X] 0046BCF0 - Fighters_Available_
+[X] 0046BD40 - Special_Weapons_Available_
+[X] 0046BDB0 - Special_Devices_Available_
+[!] 0046BE70 - Get_Ship_Class_
+[!] 0046C470 - Special_Legal_For_Design_
+[!] 0046C4F0 - Add_Specials_To_Design_
+[X] 0046C7F0 - Add_Theme_Special_To_Design_
+[X] 0046C9E0 - Add_Fighters_To_Design_
+[X] 0046CB80 - Determine_Missile_Weapon_Modifications_
+[!] 0046D010 - Add_Missile_Weapon_To_Design_
+[X] 0046D190 - Determine_Bomb_Weapon_
+[X] 0046D3B0 - Add_Bomb_Weapon_To_Design_
+[!] 0046D500 - Determine_Beam_Weapon_Modifications_
+[!] 0046DF10 - Add_Beam_Weapon_To_Design_
+[!] 0046E0E0 - Auto_Design_Ship_
+[X] 0046EDE0 - Ship_Is_In_Stasis_
+[X] 0046EE10 - Ship_In_Black_Hole_
+[X] 0046EE40 - Draw_Teleporting_Ship_
+[X] 0046F0B0 - Rotate_Ship_Until_Impact_
+[X] 0046F350 - Ship_In_Legal_Square_
+[X] 0046F3F0 - Test_Move_Until_Impact_
+[!] 0046F810 - Move_Ship_
+[!] 00470070 - Get_Facing_
+[!] 004700D0 - Rotate_Ship_
+[X] 00470440 - Turn_Cost_
+[X] 00470480 - Move_Cost_
+[X] 00470560 - Turn_To_Face_
+[X] 004706E0 - Wait_Until_Net_Opponent_Finished_
+[X] 004707D0 - Tactical_Combat_Receive_Message_
+[X] 00470900 - Lose_Out_Of_Range_Ships_
+[X] 00470960 - Compute_Stars_In_Range_Of_Player_
+[X] 00470A00 - Player_Lose_Out_Of_Range_Ships_
+[!] 00470A90 - Draw_Help_Entry_
+[X] 00471070 - Text_Box_
+[X] 00471090 - Timed_Text_Box_
+[X] 004710B0 - Do_Text_Box_
+[!] 004713C0 - Box_Centered_On_XY_
+[X] 00471550 - Text_Box_Startup_
+[!] 00471690 - Text_Box_Cleanup_
+[X] 00471710 - Text_Box_Get_Input_
+[X] 00471790 - Get_Mox_Text_Box_Base_Colors_
+[X] 00471850 - Get_Help_Lbx_Name_
+[X] 00471930 - Race_Report_Screen_
+[X] 00472040 - Load_Msg_Strings_
+[!] 004726E0 - Allocate_Msg_Slots_
+[X] 004727A0 - First_Msg_For_Player_
+[X] 004727C0 - N_Msgs_For_Player_
+[!] 004727E0 - sprintf_msg_
+[X] 00473810 - Add_Msg_
+[X] 00473900 - Add_Msg_All_
+[X] 00473940 - Goto_Msg_Colony_
+[X] 004739F0 - Add_War_Msg_
+[X] 00473A10 - Add_Diplomacy_Msg_
+[X] 00473AD0 - Add_Peace_Msg_
+[X] 00473AF0 - Add_Alliance_Msg_
+[!] 00473B10 - Add_Nonaggression_Msg_
+[X] 00473B30 - Add_Peace_Ended_Msg_
+[!] 00473B50 - Add_Ongoing_Event_Msgs_
+[X] 00473DF0 - Init_Events_
+[X] 00473E50 - Reset_Events_
+[!] 00473EA0 - Check_For_Event_Message_
+[X] 00473ED0 - Check_For_Event_
+[X] 00473F80 - Start_Main_Event_
+[X] 00474030 - Load_Event_Picture_
+[X] 00474070 - Drive_Event_Screen_
+[X] 004740D0 - Draw_Event_Screen_
+[X] 004741A0 - Event_Fade_In_
+[!] 004742A0 - Event_Twiddle_
+[!] 00474F60 - Setup_Next_Event_
+[X] 00475910 - Get_Event_Message_
+[X] 00476160 - Event_Get_Fleet_Strength_
+[!] 004761C0 - Determine_Event_
+[X] 00476DE0 - Get_Event_Victim_
+[X] 00477070 - Get_Antaran_Victim_
+[X] 00477240 - Player_Has_Bad_Event_
+[X] 004772A0 - Get_Event_Climate_Change_Colony_
+[X] 00477370 - Get_Event_Industrial_Accident_Colony_
+[X] 00477440 - Get_Event_Mineral_Depletion_Colony_
+[X] 004774B0 - Get_Event_Mineral_Deposit_Colony_
+[X] 00477520 - Event_Monster_Update_
+[X] 004775B0 - Event_Race_Eliminated_
+[X] 004775D0 - Event_Orion_Discovered_
+[X] 004775F0 - Event_Surrender_
+[X] 00477610 - Event_Check_Hyperspace_Flux_
+[X] 00477630 - Event_Check_Space_Anomaly_
+[!] 00477690 - Event_Check_Pirate_Activity_
+[X] 004776D0 - Event_Check_Plague_
+[X] 00477700 - Event_Check_Warp_Beast_
+[X] 00477720 - Event_Check_Population_Boom_
+[X] 00477750 - Event_Check_Comet_
+[X] 00477780 - Event_Check_Planet_Warning_
+[X] 00477A00 - Event_Check_General_Status_
+[X] 00477A50 - FUN_00477a50
+[X] 00477B20 - FUN_00477b20
+[!] 00477BB0 - FUN_00477bb0
+[X] 00477CA0 - Pick_Completely_Random_Star_
+[X] 00477DA0 - FUN_00477da0
+[X] 00477DF0 - Colony_Research_Points_
+[X] 00477E10 - Pick_Random_Player_In_Contact_
+[!] 00477EB0 - Pick_Random_Star_
+[X] 00477F90 - Pick_Random_Ship_
+[!] 00478000 - Pick_Random_Colony_No_Outpost_
+[X] 00478080 - Pick_Random_Colony_No_Capitol_
+[X] 00478110 - Event_Check_Colony_Researching_
+[X] 00478190 - Colony_Has_Event_
+[X] 00478290 - Kill_All_Events_At_Colony_
+[X] 004784B0 - Event_Check_Space_Anomaly_At_Star_
+[X] 004784E0 - Star_Has_Event_
+[X] 00478640 - Event_Pirate_Activity_Strength_
+[X] 00478700 - Determine_Lucky_Players_Events_
+[X] 004787C0 - Update_Lucky_Players_Events_
+[!] 00478820 - Init_New_Game_
+[!] 00478B30 - Init_Ships_Array_
+[X] 00478BC0 - Make_System_Monsters_Into_Ships_
+[X] 00478D10 - Set_Initial_Colony_Auto_Selects_
+[X] 00478D80 - Init_Colonies_Array_
+[X] 00478E20 - Init_Map_Pictures_Default__
+[X] 00478E30 - Init_Map_Defaults_
+[X] 00478E80 - Set_Default_Game_Settings_
+[X] 00478FB0 - Write_Game_Settings_
+[!] 00479000 - Init_Players_
+[!] 004794B0 - Init_Colony_
+[X] 00479580 - Init_Leaders_
+[X] 004796B0 - Message_Box_
+[X] 004796D0 - Message_Box_Exploding_Star_
+[X] 004796E0 - Warning_Box_
+[X] 00479700 - Do_Confirmation_Box_
+[X] 00479710 - Message_Box_Exploding_
+[X] 00479960 - Confirmation_Box_
+[X] 00479BA0 - Draw_Animating_Message_Box_
+[X] 00479C30 - Draw_Confirm_Box_
+[X] 00479CC0 - Message_Box_Startup_
+[X] 00479D70 - Message_Box_Cleanup_
+[X] 00479DF0 - _Print_1_Or_More_Formatted_Lines_Centered_
+[X] 00479E60 - Do_Print_1_Or_More_Formatted_Lines_Centered_
+[X] 00479E80 - Product_Name_
+[X] 00479EA0 - Mean_Ship_Strength_
+[!] 0047A070 - Compute_Empire_Building_Needs_
+[X] 0047A2E0 - Compute_Needs_
+[X] 0047A9C0 - Compute_Colony_Ship_Need_
+[X] 0047A9E0 - Compute_Freighter_Need_
+[X] 0047AA40 - Colony_Is_Conquered_
+[X] 0047AAB0 - Assign_Colony_New_Building_
+[X] 0047AC30 - Find_Buildable_Buildings_
+[!] 0047AC70 - Colony_Building_Score_
+[X] 0047BA30 - Empire_Buy_Outright_
+[X] 0047BD10 - Player_War_Level_
+[X] 0047BDB0 - Refit_Cost_
+[!] 0047BE10 - Assign_Empire_Building_
+[!] 0047D420 - Industry_Worth
+[X] 0047D450 - colony_less_industry_cmp_
+[!] 0047D4B0 - Force_Produce_
+[X] 0047D500 - Assign_Colony_Building_
+[X] 0047D540 - Player_Colony_Autobuild_
+[X] 0047D570 - Load_Netturn_Strings_
+[X] 0047D5B0 - Net_Next_Turn_
+[X] 0047D830 - Host_Next_Turn_
+[X] 0047DB30 - Client_Next_Turn_
+[X] 0047DD00 - Must_Broadcast_AI_Player_Data_
+[X] 0047DD40 - Net_Init_Host_Election_
+[X] 0047DDB0 - Planet_Anims_
+[X] 0047DDF0 - Draw_Col_Sys_Disp_
+[X] 0047DFE0 - Planet_Summary_String_
+[X] 0047E3C0 - Add_Col_Sys_Disp_Fields_
+[!] 0047E530 - Draw_Col_Sys_Disp_Last_Scanned_
+[!] 0047E670 - Handle_Leader_At_Lost_Colony_
+[X] 0047E780 - Destroy_Colony_
+[X] 0047E8E0 - Resolve_Bomb_Hit_
+[X] 0047EBD0 - Resolve_Biological_Hit_
+[X] 0047EDC0 - Apply_Bomb_Hits_
+[!] 0047EE30 - Get_Design_Combat_Bonuses_
+[X] 0047EF30 - Get_Ship_Combat_Bonuses_
+[X] 0047F0F0 - Init_Ship_Designs_
+[X] 0047F290 - Load_Antaran_Ship_Design_
+[X] 0047F300 - Load_Small_Antaran_Combat_Ship_
+[X] 0047F600 - Load_Small_Antaran_Design_
+[X] 0047F6E0 - Load_Medium_Antaran_Combat_Ship_
+[X] 0047FA50 - Load_Medium_Antaran_Design_
+[X] 0047FB50 - Load_Large_Antaran_Combat_Ship_
+[!] 0047FF90 - Load_Large_Antaran_Design_
+[X] 004800D0 - Load_Huge_Antaran_Combat_Ship_
+[X] 004805B0 - Load_Huge_Antaran_Design_
+[X] 00480720 - Load_Titan_Antaran_Combat_Ship_
+[!] 00480CF0 - Load_Titan_Antaran_Design_
+[X] 00480EA0 - Load_Doom_Star_Ship_Design_
+[X] 00480EE0 - Update_Ship_Names_To_New_Language_
+[X] 00480F50 - Load_Colony_Ship_Design_
+[X] 00481020 - Load_Outpost_Ship_Design_
+[X] 004810F0 - Load_Transport_Ship_Design_
+[X] 004811D0 - Best_Warp_Drive_
+[X] 00481280 - Best_Ship_Shield_
+[X] 00481310 - Best_Computer_
+[X] 00481380 - Best_Armor_
+[X] 00481420 - Best_Beam_Weapon_
+[!] 00481510 - Best_Point_Defense_Weapon_
+[X] 004815E0 - FUN_004815e0
+[!] 00481630 - Best_Point_Defense_Weapon_By_Size_
+[X] 00481700 - Best_Missile_Weapon_
+[X] 00481800 - Best_Missile_Weapon_NT_
+[X] 004818F0 - Best_Bomb_Weapon_
+[X] 00481980 - Best_Strat_Special_Weapon_
+[X] 00481AB0 - Best_Beam_To_Hit_Special_
+[X] 00481B40 - Best_Beam_Damage_Special_
+[X] 00481BD0 - Best_Beam_Defense_Special_
+[X] 00481C60 - Best_Missile_Defense_Special_
+[X] 00481CF0 - Best_Missile_Damage_Special_
+[X] 00481D90 - FUN_00481d90
+[X] 00481DD0 - Best_Ship_Fuel_
+[!] 00481E50 - Update_Player_Ship_Designs_
+[X] 00481EF0 - Update_Equipment_On_Ships_Being_Built_
+[X] 00482020 - Update_Automatic_Design_Equipment_
+[X] 00482160 - Update_Player_Strategic_Ship_Designs_
+[X] 00482220 - Cost_Of_Strategic_Design_
+[!] 00482260 - Calc_Player_FTL_Speed_
+[X] 004822C0 - Get_FTL_Speed_
+[X] 00482320 - Strat_Beam_Weapon_Count_
+[X] 00482370 - Strat_Missile_Weapon_Count_
+[X] 00482390 - Strat_Special_Weapon_Count_
+[X] 004823B0 - Strat_Bomb_Weapon_Count_
+[X] 004823D0 - Update_Strategic_Design_Weapons_Specials_
+[X] 004825C0 - Auto_Strategic_Design_Ship_
+[X] 004826D0 - Update_Strategic_Ship_
+[X] 00482780 - INITSHIP::Load_Dragon_Ship_Design_
+[X] 004828D0 - INITSHIP::Load_Hydra_Ship_Design_
+[X] 004829F0 - INITSHIP::Load_Amoeba_Ship_Design_
+[X] 00482B30 - INITSHIP::Load_Eel_Ship_Design_
+[!] 00482C60 - INITSHIP::Load_Crystal_Ship_Design_
+[X] 00482DA0 - INITSHIP::Load_Guardian_Ship_Design_
+[X] 00482F10 - Repair_Ships_At_Colonies_
+[X] 00483050 - Repair_Ship_Full_
+[X] 004830D0 - Ship_Has_Weapon_
+[!] 00483120 - Get_Design_Structure_
+[X] 004831A0 - Get_Structure_
+[X] 004831F0 - Get_Ship_Structure_
+[!] 004832D0 - Get_Ship_Armor_Hits_
+[X] 00483340 - Load_Loknar_Ship_Design_
+[!] 00483470 - main2_
+[!] 00483830 - Screen_Control_
+[X] 00483C80 - Mox_Sync_Update_
+[X] 00483C90 - Get_Auto_Function_
+[X] 00483CA0 - Put_Auto_Function_
+[X] 00483CB0 - Execute_Auto_Function_
+[X] 00483CC0 - Set_Game_Random_Seed_
+[X] 00483CE0 - Set_Mox_Alt_Path_
+[!] 00483EF0 - Set_Mox_Language_
+[X] 00483F60 - Load_Strings
+[X] 00483FF0 - Tech_Select_
+[X] 00484040 - Tech_Change_
+[X] 00484080 - Reset_Screen_
+[X] 004840C0 - _Tech_Select_
+[X] 004849B0 - Draw_Tech_Select_
+[X] 00484A60 - Draw_Little_Arrow_
+[X] 00484BC0 - _Tech_List_
+[X] 00485240 - Draw_Tech_List_
+[X] 004852A0 - Display_All_Entry_Text_
+[X] 004852D0 - Display_Entry_Text_
+[X] 00485460 - Display_Selected_Entry_Text_
+[!] 00485550 - Set_Selected_Entry_
+[X] 004855D0 - Get_Selected_Entry_
+[X] 00485600 - Init_Entry_Positions_
+[X] 004856C0 - Init_Entry_Data_
+[X] 00485AC0 - Setup_Entry_Buttons_
+[X] 00485B40 - Get_Group_List_
+[X] 00485D10 - Draw_Application_Description_
+[X] 00485EC0 - Technology_Fields_Name_
+[!] 00485F20 - Technology_Applications_Name_
+[X] 00486050 - New_Get_Tech_Cost_
+[X] 004860A0 - Save_Hyper_Tech_Values_
+[X] 004860E0 - Restore_Hyper_Tech_Values_
+[X] 00486120 - Promote_Hyper_Field_Values_
+[X] 00486160 - Load_New_Game_Strings_
+[X] 00486390 - Reload_Newgame_Screen_
+[X] 004865A0 - Draw_Newgame_Screen_
+[!] 00486690 - Draw_Pictures_
+[X] 004867A0 - Newgame_Screen_
+[X] 00486AC0 - Update_Fields_
+[X] 00486F60 - Temps_To_Globals_
+[!] 00486FD0 - Globals_To_Temps_
+[X] 00487060 - Troop_Popup_
+[X] 004870F0 - Reset_Fields_
+[X] 00487130 - Draw_Troop_Popup_
+[X] 00487270 - Print_Best_Summary_
+[!] 00487320 - Print_Data_
+[X] 004873C0 - Print_Race_Summary_
+[!] 004874B0 - Print_Troop_Totals_
+[X] 00487750 - Save_Field_Stats_
+[X] 004877E0 - Restore_Field_Stats_
+[X] 00487840 - Crew_Description_String_
+[!] 004879A0 - Add_Fltscrn_Big_Icon_Fields_
+[X] 00487B10 - Add_Fltscrn_Small_Icon_Fields_
+[X] 00487B90 - Build_Fltscrn_Big_Icon_Fields_
+[X] 00487D50 - Move_Ship_To_Front_Of_List_
+[X] 00487DE0 - Build_Fltscrn_Ship_List_
+[X] 00487E70 - Draw_Captains_Picture_
+[X] 00488040 - Fix_Palette_
 [ ] 00488070 - Fleet_Screen_Big_Icon_Fields_
 [ ] 00488250 - Fltscrn_Move_Ships_
 [ ] 00488490 - Fltscrn_Ships_To_Be_Displayed_
