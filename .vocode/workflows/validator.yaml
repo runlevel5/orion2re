@@ -125,7 +125,8 @@ workflows:
         model: ${LLM_WEAK_MODEL}
         confirmation: auto
         tools:
-          - read_files
+          - name: exec
+            auto_approve: true
           - name: apply_patch
             auto_approve: true
             config:
