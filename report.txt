@@ -39,6 +39,325 @@ fail
 
 ---------------------------------------
 
+0x00444FA0 AIDUDES::Do_Blockaded_Colony_
+
+fail
+
+- Uses the wrong qsort comparator. Assembly calls `AIDUDES::Sort_Pops_FI_` at `0x445320`, but the implementation calls `Sort_Pops_FR_I_`. This changes ordering and downstream assignment behavior.
+  ```diff
+  -        qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
+  -              (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
+  -              4,
+  -              Sort_Pops_FR_I_);
+  +        qsort(&colony->pop[(uint8_t)colony_info->first_assignable_pop_idx],
+  +              (uint8_t)colony->n_pops - (uint8_t)colony_info->first_assignable_pop_idx,
+  +              4,
+  +              Sort_Pops_FI_);
+  ```
+
+- In the `food2_per_farmer == 0` path, the job-bit update is not equivalent to the XOR-mask sequence from assembly. The binary toggles bits `0x80/0x100` via `((x ^ mask) & 0x180) ^ x`, preserving whichever target bit is selected from `Event_Check_Colony_Researching_`; current code forcibly clears `0x80` and ORs one mask. That can differ if source state is unexpected or mixed.
+  ```diff
+  -                colony->pop[(uint8_t)colony_info->cur_pop_idx] = (colony->pop[(uint8_t)colony_info->cur_pop_idx] & 0xFFFFFE7F) | job_mask;
+  +                uint32_t& pop = colony->pop[(uint8_t)colony_info->cur_pop_idx];
+  +                pop = ((pop ^ job_mask) & 0x180) ^ pop;
+  ```
+
+- The parameter type passed to `Event_Check_Colony_Researching_` is broadened unnecessarily: assembly zero-extends the byte colony index to 32-bit before push; current code casts to `uint16_t`. Likely harmless at runtime, but it is not the precise source-level match and suggests type drift.
+  ```diff
+  -            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((uint16_t)(uint8_t)colony_info->colony_idx);
+  +            int16_t is_researching = EVENTS::Event_Check_Colony_Researching_((int)(uint8_t)colony_info->colony_idx);
+  ```
+
+fail
+
+---------------------------------------
+
+00444E80 AIDUDES::Colony_AI_Given_Tax_
+
+fail
+
+- `_n_our_blockaded` and `_n_our_unblockaded` are typed incorrectly in the project as `uint16_t`, but the assembly uses `MOVSX` and `JLE`, so both counts are signed 16-bit values. This affects exact control-flow semantics for negative values and signed comparisons.
+  Suggested diff:
+  ```diff
+  - inline uint16_t& _n_our_blockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C0});
+  - inline uint16_t& _n_our_unblockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C4});
+  + inline int16_t& _n_our_blockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C0});
+  + inline int16_t& _n_our_unblockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C4});
+  ```
+
+- Because of the wrong unsigned typing, the two `for` loops in `Colony_AI_Given_Tax_` do not preserve the original signed termination behavior. In the binary, a negative count causes the loop to be skipped due to end-pointer comparison; in the current code, a negative signed memory value reinterpreted as `uint16_t` becomes a huge positive bound.
+  Suggested diff:
+  ```diff
+  - for (int i = 0; i < aidudes::_n_our_blockaded; ++i) {
+  + for (int i = 0; i < (int)aidudes::_n_our_blockaded; ++i) {
+        aidudes::Do_Blockaded_Colony_(&aidudes::_our_blockaded[i]);
+    }
+
+  - for (int i = 0; i < aidudes::_n_our_unblockaded; ++i) {
+  + for (int i = 0; i < (int)aidudes::_n_our_unblockaded; ++i) {
+        aidudes::Do_Unblockaded_Colony_(&aidudes::_our_unblockaded[i]);
+    }
+  ```
+  But this only becomes correct once the globals are retyped signed.
+
+- The final condition also depends on signedness. The assembly does `CMP word ptr [...],0` followed by `JLE`, i.e. signed `<= 0`. With the current unsigned global type, `if (_n_our_unblockaded > 0)` is not equivalent for negative stored values.
+  Suggested diff:
+  ```diff
+  - if (aidudes::_n_our_unblockaded > 0) {
+  + if (aidudes::_n_our_unblockaded > 0) {
+        aidudes::Assign_Additional_Unblockaded_Farmers_();
+    } else {
+        COLCALC::Do_Player_Colony_Post_Production_(aidudes::_i_ai);
+    }
+  ```
+  The source text stays the same, but only after changing `_n_our_unblockaded` to `int16_t` does it match the binary.
+
+fail
+
+---------------------------------------
+
+0x00444D70 OFFICER::Get_Italian_The_
+
+fail
+
+- The first branch condition is wrong in source: assembly returns HESTR_186_S when `title[0]` is a vowel, but current code returns the literal `", lo "`.
+  Suggested diff:
+  ```cpp
+  if (MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
+      strcpy(output, HAROLD::H_Message_(HESTR_186_S));
+      return;
+  }
+  ```
+
+- The special-case leaders `0x1A`, `0x2B`, `0x34` are handled with the wrong string in the vowel path conflation. In assembly these IDs alone use the literal at `0x00556A4C` (`", lo "`), independent of the female/male message path.
+  Suggested diff:
+  ```cpp
+  if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
+      strcpy(output, s___lo_00556a4c);
+      return;
+  }
+  ```
+
+- The control flow ordering matters and is currently incorrect: assembly checks vowel first, then the three hardcoded IDs, then female, then male. Current implementation changes observable behavior for any of those three leaders whose title begins with a vowel.
+  Suggested diff:
+  ```cpp
+  output[0] = '\0';
+
+  if (MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
+      strcpy(output, HAROLD::H_Message_(HESTR_186_S));
+      return;
+  }
+
+  if (leader_idx == 0x1a || leader_idx == 0x2b || leader_idx == 0x34) {
+      strcpy(output, s___lo_00556a4c);
+      return;
+  }
+
+  if (Officer_Is_Female_(leader_idx)) {
+      strcpy(output, HAROLD::H_Message_(HESTR_182_THE));
+      return;
+  }
+
+  strcpy(output, HAROLD::H_Message_(HESTR_110_THE));
+  ```
+
+---------------------------------------
+0x00443FE0 OFFICER::Dismiss_Officer_
+
+fail
+
+- Discrepancy: star officer branch indexes `s_star_data::officer_index` with `(uint8_t)leader.player_index`, but the assembly uses `MOVSX` from byte at `+0x3A`, i.e. a signed player index. This changes behavior for `player_index == -1`: binary writes to `star[location].officer_index[-1]` after only validating `location`, while current code writes to index 255.
+  Suggested diff:
+  ```cpp
+  -                MOX::_star[location].officer_index[(uint8_t)leader.player_index] = -1;
+  +                MOX::_star[location].officer_index[(int8_t)leader.player_index] = -1;
+  ```
+
+- Discrepancy: current implementation’s indexing type may also force a different effective address computation than the original signed-extension path (`ADD ESI, EDX` after `MOVSX ESI, byte ptr [EDX + 0x3a]`). This is not just cosmetic; it affects exact out-of-bounds target on invalid player indices.
+  Suggested diff:
+  ```cpp
+  -        } else {
+  +        } else {
+               if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_STARS)) {
+  -                MOX::_star[location].officer_index[(uint8_t)leader.player_index] = -1;
+  +                int16_t player_idx = (int8_t)leader.player_index;
+  +                MOX::_star[location].officer_index[player_idx] = -1;
+               }
+           }
+  ```
+
+fail
+
+---------------------------------------
+
+0x00444080 OFFICER::Assign_Captain_
+
+fail
+
+- Function symbol mismatch: the project does not contain `OFFICER::Assign_Captain_` at this address; `src/hooks.cpp` maps `0x00444080` to `OFFICER::Assign_Officer_` instead. Per restoration fidelity rules, I cannot validate a different symbol as this function even though the body is behaviorally very close.
+  Suggested diff:
+  ```diff
+  - { 0x00444080, &OFFICER::Assign_Officer_ },
+  + { 0x00444080, &OFFICER::Assign_Captain_ },
+  ```
+
+- Missing function identity in source declarations/definition: `officer.h/cpp` expose `Assign_Officer_`, not `Assign_Captain_`. That prevents exact validation of the provided function by name/address.
+  Suggested diff:
+  ```diff
+  - void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx);
+  + void __cdecl Assign_Captain_(int16_t leader_idx, int16_t ship_idx);
+  ```
+  ```diff
+  - void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx) {
+  + void __cdecl Assign_Captain_(int16_t leader_idx, int16_t ship_idx) {
+  ```
+
+- Call sites still target the wrong symbol name for this binary function address, so downstream restoration is also inconsistent with the supplied disassembly.
+  Suggested diff:
+  ```diff
+  - Assign_Officer_(MOX::_officer_selected, ship_idx);
+  + Assign_Captain_(MOX::_officer_selected, ship_idx);
+  ```
+  ```diff
+  - Assign_Officer_(MOX::_officer_selected, _officer_star_chosen);
+  + Assign_Captain_(MOX::_officer_selected, _officer_star_chosen);
+  ```
+
+fail
+
+---------------------------------------
+0x00443380 OFFICER::Do_Hire_Officer_
+
+fail
+
+- Return/argument width mismatch around officer cost handling. The disassembly computes `Officer_Cost_`, keeps only `AX` in `DI`, sign-extends that 16-bit value for the BC comparison and passes a 16-bit cost to `Not_Enough_BCs_Message_`. Current code keeps the full 32-bit `cost` for comparison and call. If `Officer_Cost_` ever exceeds 32767, behavior diverges.
+  Suggested diff snippet:
+  ```cpp
+  int16_t result = 0;
+  int16_t cost = (int16_t)Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
+
+  mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
+
+  if (MOX::_leaders[leader_idx].status == 4) {
+      if (MOX::_player[MOX::_PLAYER_NUM].bc < (int32_t)cost) {
+          Not_Enough_BCs_Message_(leader_idx, cost);
+      } else {
+          result = (int16_t)Ask_For_Hire_(leader_idx);
+      }
+  } else {
+      Already_Hired_Message_(leader_idx);
+  }
+  ```
+
+- Declaration mismatch reinforces the above uncertainty: `Not_Enough_BCs_Message_` is declared as taking `int16_t cost`, but the current caller passes `int32_t cost` without narrowing at the call site. This obscures original 16-bit semantics visible in assembly.
+  Suggested diff snippet:
+  ```cpp
+  int16_t cost = (int16_t)Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
+  ...
+  Not_Enough_BCs_Message_(leader_idx, cost);
+  ```
+
+---------------------------------------
+
+0x00442110 OFFICER::Set_Officer_To_Player_
+
+fail
+
+Discrepancies:
+- Replacement-candidate selection uses the wrong ETA comparison direction.
+  - Assembly keeps the smallest ETA among status==4 candidates:
+    - local_4 starts at 0
+    - replace when `local_4 < leader.eta` is false, i.e. when `leader.eta <= current_best`
+    - with first candidate always accepted
+  - Current code picks the largest ETA:
+```cpp
+-                            if (leader.status == 4 && (int16_t)leader.eta > max_eta) {
++                            if (leader.status == 4 && (replace_idx == -1 || leader.eta <= max_eta)) {
+                                 replace_idx = i;
+                                 max_eta = (int16_t)leader.eta;
+                             }
+```
+
+- Local accumulator type/initialization does not match signed byte ETA semantics from assembly.
+  - Assembly stores and compares a signed 16-bit temp against sign-extended `sbyte eta`.
+  - Current `max_eta = 0` only works with the already-wrong `>` logic and obscures the original behavior.
+```cpp
+-        int16_t max_eta = 0;
++        int16_t best_eta = 0;
+```
+
+- Status assignment expression is behaviorally correct but obscures exact flag-derived assembly logic (`CMP 1; SBB; AND 4`).
+  - Assembly produces 4 when `is_instant == 0`, otherwise 0.
+  - Suggest expressing this directly to avoid ambiguity about nonzero values:
+```cpp
+-        target.status = (is_instant == 0) ? 4 : 0;
++        target.status = is_instant ? 0 : 4;
+```
+
+---------------------------------------
+0x00441A40 OFFICER::Get_Officer_Pictures_
+
+fail
+
+- The 4th argument passed to `Load_Darkened_Officer_Picture_` is wrong. Assembly always pushes `0`, but current code passes `picture_slot_index == 0`, which changes first-iteration behavior from `Far_Reload_Next_` to `Far_Reload_`.
+  Suggested diff:
+  ```diff
+  -                    picture = OFFICER::Load_Darkened_Officer_Picture_(
+  -                        MOX::_PLAYER_NUM,
+  -                        officer_id,
+  -                        MOX::_officer_pictures_screen_seg,
+  -                        static_cast<uint8_t>(picture_slot_index == 0));
+  +                    picture = OFFICER::Load_Darkened_Officer_Picture_(
+  +                        MOX::_PLAYER_NUM,
+  +                        officer_id,
+  +                        MOX::_officer_pictures_screen_seg,
+  +                        0);
+  ```
+
+- The first parameter type/use of `Load_Officer_Picture_` is suspicious against the call site. Assembly zero-extends `setz al` into `EAX` only via prior state and pushes that 32-bit register, so the decompiler-style cast to `(int32_t)MOX::_PLAYER_NUM` is not source-truth-based. In this call site the value is effectively `0/1` from `picture_slot_index == 0`, not `PLAYER_NUM`.
+  Suggested diff:
+  ```diff
+  -                    s_animation_header* picture = OFFICER::Load_Officer_Picture_(
+  -                        (int32_t)MOX::_PLAYER_NUM,
+  +                    s_animation_header* picture = OFFICER::Load_Officer_Picture_(
+  +                        static_cast<int32_t>(picture_slot_index == 0),
+                             officer_id,
+                             reinterpret_cast<s_animation_header*>(MOX::_officer_pictures_screen_seg),
+  -                        static_cast<uint8_t>(picture_slot_index == 0),
+  +                        static_cast<uint8_t>(picture_slot_index == 0),
+                             0);
+  ```
+  This also indicates the `Load_Officer_Picture_` prototype may be inaccurately restored around its first parameter semantics.
+
+- Related uncertainty remains because the restored `Load_Officer_Picture_` signature names the first argument `unused`, but the call sequence clearly passes a non-constant, flags-derived value. That type/semantic mismatch should be resolved before validation can pass.
+
+---------------------------------------
+0x004412c0 OFFICER::Print_Officer_Skill_Help_
+
+fail
+
+- Title-comma append is not an exact match to the disassembly. The binary appends the string at `0x005569C8`, whose measured copied length is 2 bytes including terminator, i.e. just `","`, not `", "`. Current code adds a comma plus space.
+  ```diff
+  -        strcat(leader_name_buf, ", ");
+  +        strcat(leader_name_buf, s_comma_005569c8);
+  ```
+
+- The language/settings global is referenced incorrectly in the decompilation context. The binary reads `_settings.language` at `0x00597152`, but current code uses `MOX::_settings.language`. If `MOX::_settings` is merely an alias to the same storage this is fine, but that alias was not established from the provided inputs, so validation cannot be completed with confidence.
+  ```diff
+  -        if (MOX::_settings.language != 4 && MOX::_leaders[leader_idx].title[0] != '\0') {
+  +        if (_settings.language != 4 && MOX::_leaders[leader_idx].title[0] != '\0') {
+  ```
+
+- Screen branch target naming differs from the binary’s direct compare against `MOX::_current_screen == 0x1d`; current code uses `SCREEN_OFFICERS`. This is only acceptable if the enum value is guaranteed to be 29 in this build, but that equivalence was not part of the provided function inputs and introduces avoidable uncertainty in strict validation.
+  ```diff
+  -        if (MOX::_current_screen == SCREEN_OFFICERS) {
+  +        if (MOX::_current_screen == 0x1d) {
+  ```
+
+fail
+
+---------------------------------------
+
 0x00440340 OFFICER::Print_Galmap_Scanned_Ship_
 
 fail
@@ -2763,6 +3082,40 @@ fail
 
 ---------------------------------------
 
+0x00443760 OFFICER::Give_Player_Loknar_Special_
+
+fail
+
+- Signature/type mismatch: the second parameter is implemented as `uint8_t*` and then reinterpreted to `int16_t*`. The assembly clearly treats `param_2` as a `short*` list (`MOV word ptr [EAX + ECX*0x2],0x2f`). This is not cosmetic; it hides the real ABI and can mislead callers.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id)
+  + void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* hero_id)
+  ```
+
+- Header/callsite mismatch propagates the same incorrect type. The declaration and COMBFIND call use a cast to `uint8_t*`, which should not be necessary for the original function contract.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id);
+  + void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* hero_id);
+  ```
+  ```cpp
+  - OFFICER::Give_Player_Loknar_Special_(plr1_idx, (uint8_t*)result->info.orion_techs, &result->info.rescued_hero_id);
+  + OFFICER::Give_Player_Loknar_Special_(plr1_idx, result->info.orion_techs, &result->info.rescued_hero_id);
+  ```
+
+- The implementation introduces a non-original reinterpretation layer and misleading local names (`num_techs = hero_id`). The assembly is straightforward: `param_3` is the count pointer zeroed and incremented, while `param_2` is the tech list. This should be represented directly to avoid restoration uncertainty.
+  Suggested diff:
+  ```cpp
+  - int16_t* techs_ptr = reinterpret_cast<int16_t*>(techs);
+  - int16_t* num_techs = hero_id;
+  + int16_t* techs_ptr = techs;
+  + int16_t* num_techs = hero_id;
+  ```
+
+fail
+
+---------------------------------------
 0x00416F30 DIP_SCRN::Diplomacy_Generic_System_List_
 
 fail

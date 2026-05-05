@@ -816,75 +816,75 @@
 [X] 004407E0 - Print_Officer_Data_
 [X] 00441170 - Draw_Officer_Skill_Icon_
 [X] 004411A0 - Get_Skill_Data_Max_Pixel_Width_
-[ ] 004412C0 - Print_Officer_Skill_Help_
-[ ] 00441460 - Text_Box_With_Refresh_
-[ ] 004414A0 - Print_Scanned_Ship_Name_
-[ ] 004415E0 - Reload_Officer_Screen_Pictures_
-[ ] 00441A40 - Get_Officer_Pictures_
-[ ] 00441B00 - Load_Darkened_Officer_Picture_
-[ ] 00441B60 - Load_Officer_Skill_Name_Descriptions_
-[ ] 00441BF0 - Load_Officer_Skill_Icons_
-[ ] 00441C40 - Load_Fleet_Galaxy_Stars_
-[ ] 00441C90 - Reload_Offscrn_Small_Ship_Icons_
-[ ] 00441D70 - Save_Officers_Original_Colony_Id_
-[ ] 00441DB0 - Save_Officers_Original_Ship_Id_
-[ ] 00441DF0 - Scan_Officer_Fields_
-[ ] 00441F90 - Scan_Offscrn_Big_Icon_Fields_
-[ ] 004420D0 - Initialize_Scroll_Bar_
-[ ] 00442110 - Set_Officer_To_Player_
-[ ] 00442240 - Ships_In_Same_Place_
-[ ] 00442290 - Wrapper_For_Colony_Officer_Popup_Data_
-[ ] 004422E0 - Wrapper_For_Officer_Popup_Help_Fields_
-[ ] 00442370 - Wrapper_For_Offscrn_Data_
-[ ] 004423B0 - Wrapper_For_Offscrn_Help_Fields_
-[ ] 00442440 - Add_Skill_Description_Help_Fields_
-[ ] 00442610 - Add_Display_Popup_Fields_
-[ ] 00442640 - Wrapper_For_Offscrn_System_Popup_
-[ ] 00442690 - Wrapper_To_Add_Officer_Popup_Help_Fields_
-[ ] 004426D0 - Officer_Name_
-[ ] 00442710 - Leader_Name_
-[ ] 00442910 - Officer_Status_Ok_
-[ ] 00442950 - N_Fleet_Officers_Owned_By_Player_
-[ ] 004429B0 - N_Star_Officers_Owned_By_Player_
-[ ] 00442A10 - Player_Can_Hire_More_Officers_
-[ ] 00442A50 - Chance_To_Hire_Hero_
-[ ] 00442BB0 - Increase_Officer_Level_By_One_
-[ ] 00442C60 - Calculate_Officer_Cost_
-[ ] 00442C80 - Random_Officer_Check_
-[ ] 00442CD0 - Generate_Random_Officer_
-[ ] 00442D50 - Select_Leader_For_Hire_
-[ ] 00442E70 - Leader_Available_For_Hire_
-[ ] 00442EC0 - Give_Officer_XP_
-[ ] 00442F90 - Find_Selected_Leader_
-[ ] 00443260 - Marooned_Hero_At_Star_Can_Join_
-[ ] 00443380 - Do_Hire_Officer_
-[ ] 00443430 - Already_Hired_Message_
-[ ] 004434C0 - Not_Enough_BCs_Message_
-[ ] 00443580 - Ask_For_Hire_
-[ ] 004436B0 - Hire_Officer_
-[ ] 00443760 - Give_Player_Loknar_Special_
-[ ] 00443890 - Rescued_Loknar_Popup_
-[ ] 004438E0 - Make_Loknar_Message_
-[ ] 00443A20 - Get_Random_Antaran_Tech_
-[ ] 00443B00 - Get_Available_Antaran_Tech_
-[ ] 00443B70 - Assign_Loknar_Ship_To_Player_
-[ ] 00443C60 - Allocate_Adv_Civ_Game_Officers_
-[ ] 00443E70 - Set_Officer_Screen_Help_
-[ ] 00443EC0 - Get_N_Skills_Per_Officer_Displayed_
-[ ] 00443FE0 - Dismiss_Officer_
-[ ] 00444080 - Assign_Captain_
-[ ] 00444650 - Ai_Assign_Leader_To_Ship_
-[ ] 004446C0 - Ai_Assign_Leader_To_Star_
-[ ] 00444730 - Assign_Leader_To_Star_
-[ ] 00444800 - Assign_Leader_To_Ship_
-[ ] 004448E0 - Get_Ship_Leader_ETA_
-[ ] 00444A00 - Get_Star_Leader_ETA_
-[ ] 00444AF0 - Give_Leader_Specials_To_Player_
-[ ] 00444C60 - Get_Skill_Description_LBX_Name_
-[ ] 00444D40 - Officer_Is_Female_
-[ ] 00444D70 - Get_Italian_The_
-[ ] 00444E80 - Colony_AI_Given_Tax_
-[ ] 00444F40 - Assign_Buildings_
+[!] 004412C0 - Print_Officer_Skill_Help_
+[X] 00441460 - Text_Box_With_Refresh_
+[X] 004414A0 - Print_Scanned_Ship_Name_
+[X] 004415E0 - Reload_Officer_Screen_Pictures_
+[!] 00441A40 - Get_Officer_Pictures_
+[X] 00441B00 - Load_Darkened_Officer_Picture_
+[X] 00441B60 - Load_Officer_Skill_Name_Descriptions_
+[X] 00441BF0 - Load_Officer_Skill_Icons_
+[X] 00441C40 - Load_Fleet_Galaxy_Stars_
+[X] 00441C90 - Reload_Offscrn_Small_Ship_Icons_
+[X] 00441D70 - Save_Officers_Original_Colony_Id_
+[X] 00441DB0 - Save_Officers_Original_Ship_Id_
+[X] 00441DF0 - Scan_Officer_Fields_
+[X] 00441F90 - Scan_Offscrn_Big_Icon_Fields_
+[X] 004420D0 - Initialize_Scroll_Bar_
+[!] 00442110 - Set_Officer_To_Player_
+[X] 00442240 - Ships_In_Same_Place_
+[X] 00442290 - Wrapper_For_Colony_Officer_Popup_Data_
+[X] 004422E0 - Wrapper_For_Officer_Popup_Help_Fields_
+[X] 00442370 - Wrapper_For_Offscrn_Data_
+[X] 004423B0 - Wrapper_For_Offscrn_Help_Fields_
+[X] 00442440 - Add_Skill_Description_Help_Fields_
+[X] 00442610 - Add_Display_Popup_Fields_
+[X] 00442640 - Wrapper_For_Offscrn_System_Popup_
+[X] 00442690 - Wrapper_To_Add_Officer_Popup_Help_Fields_
+[X] 004426D0 - Officer_Name_
+[X] 00442710 - Leader_Name_
+[X] 00442910 - Officer_Status_Ok_
+[X] 00442950 - N_Fleet_Officers_Owned_By_Player_
+[X] 004429B0 - N_Star_Officers_Owned_By_Player_
+[X] 00442A10 - Player_Can_Hire_More_Officers_
+[X] 00442A50 - Chance_To_Hire_Hero_
+[X] 00442BB0 - Increase_Officer_Level_By_One_
+[X] 00442C60 - Calculate_Officer_Cost_
+[X] 00442C80 - Random_Officer_Check_
+[X] 00442CD0 - Generate_Random_Officer_
+[X] 00442D50 - Select_Leader_For_Hire_
+[X] 00442E70 - Leader_Available_For_Hire_
+[X] 00442EC0 - Give_Officer_XP_
+[X] 00442F90 - Find_Selected_Leader_
+[X] 00443260 - Marooned_Hero_At_Star_Can_Join_
+[!] 00443380 - Do_Hire_Officer_
+[X] 00443430 - Already_Hired_Message_
+[X] 004434C0 - Not_Enough_BCs_Message_
+[X] 00443580 - Ask_For_Hire_
+[X] 004436B0 - Hire_Officer_
+[!] 00443760 - Give_Player_Loknar_Special_
+[X] 00443890 - Rescued_Loknar_Popup_
+[X] 004438E0 - Make_Loknar_Message_
+[X] 00443A20 - Get_Random_Antaran_Tech_
+[X] 00443B00 - Get_Available_Antaran_Tech_
+[X] 00443B70 - Assign_Loknar_Ship_To_Player_
+[X] 00443C60 - Allocate_Adv_Civ_Game_Officers_
+[X] 00443E70 - Set_Officer_Screen_Help_
+[X] 00443EC0 - Get_N_Skills_Per_Officer_Displayed_
+[!] 00443FE0 - Dismiss_Officer_
+[!] 00444080 - Assign_Captain_
+[X] 00444650 - Ai_Assign_Leader_To_Ship_
+[X] 004446C0 - Ai_Assign_Leader_To_Star_
+[X] 00444730 - Assign_Leader_To_Star_
+[X] 00444800 - Assign_Leader_To_Ship_
+[X] 004448E0 - Get_Ship_Leader_ETA_
+[X] 00444A00 - Get_Star_Leader_ETA_
+[X] 00444AF0 - Give_Leader_Specials_To_Player_
+[X] 00444C60 - Get_Skill_Description_LBX_Name_
+[X] 00444D40 - Officer_Is_Female_
+[!] 00444D70 - Get_Italian_The_
+[!] 00444E80 - Colony_AI_Given_Tax_
+[X] 00444F40 - Assign_Buildings_
 [ ] 00444FA0 - Do_Blockaded_Colony_
 [ ] 00445130 - Assign_Required_Colonists_
 [ ] 004452D0 - Sort_Pops_Fixed_
