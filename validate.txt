@@ -2264,128 +2264,128 @@
 [X] 004BE8F0 - Get_Combat_Ships_
 [X] 004BE9A0 - Kill_Noncombat_Ships_
 [X] 004BEA60 - Determine_Retreat_Ships_
-[ ] 004BEC80 - Russ_Combat_
-[ ] 004BF060 - AI_Can_Retreat_
-[ ] 004BF0B0 - Do_Attacker_Beat_Colony_Stuff_
-[ ] 004BFD20 - Do_Bombardment_
-[ ] 004BFD60 - Has_Stellar_Converter_
-[ ] 004BFDC0 - N_Enemy_Stars_
-[ ] 004BFE00 - Player_Owns_Transports_
-[ ] 004BFE60 - Reset_Combat_Ships_At_Current_Star_Has_Player_
-[ ] 004BFEA0 - Do_System_Discoveries_At_Star_
-[ ] 004C0310 - Planet_Has_Splinter_Colony_
-[ ] 004C0320 - Do_Dragon_Bribe_
-[ ] 004C03E0 - Client_Combat_Loop_
-[ ] 004C0B70 - Strategic_Results_Popup_
-[ ] 004C0BE0 - Bomb_Results_Popups_
-[ ] 004C0CA0 - Do_Net_Combat_Update_
-[ ] 004C14E0 - GNN_Reports_Combat_
-[ ] 004C1550 - Do_Nonhuman_Attack_Against_Human_
-[ ] 004C1710 - Init_Turn_Summary_List_
-[ ] 004C1730 - Draw_Turn_Summary_Popup_
-[ ] 004C1790 - Turn_Summary_Popup_
-[ ] 004C1B20 - thunk_main2_
-[ ] 004C1B30 - Load_Player_Ship_Palette_
-[ ] 004C1C90 - Get_Ship_Id_Picture_Seg_
-[ ] 004C1CC0 - Get_Ship_Picture_Seg_
-[ ] 004C1CE0 - Do_Get_Ship_Picture_Seg
-[ ] 004C1D40 - Ken_Init_
-[ ] 004C1D50 - Ken_Init2_
-[ ] 004C1D60 - Get_Weighted_Choice_
-[ ] 004C1DF0 - Get_Derelict_Applications_
-[ ] 004C1FC0 - Init_NPC_Personalities_Objectives_Themes_
-[ ] 004C2630 - Ken_Get_Text_Message_
-[ ] 004C2670 - Load_Netstart_Strings_
-[ ] 004C2740 - Mox_Net_Uninit_
-[ ] 004C2780 - Dump_Users_
-[ ] 004C27A0 - Join_Net_Screen_
-[ ] 004C2A40 - Do_Net_Init_
-[ ] 004C2A80 - Net_Select_Race_
-[ ] 004C2C90 - Net_Pick_Position_
-[ ] 004C2F40 - Do_Answer_
-[ ] 004C2FB0 - Load_Net_Screen_
-[ ] 004C35B0 - Russ_Net_Create_Game_
-[ ] 004C3600 - Do_Dial_
-[ ] 004C36B0 - Start_Net_Screen_
-[ ] 004C3DE0 - Request_Banner_Color_
-[ ] 004C3E70 - Request_Race_
-[ ] 004C3F30 - Unrequest_Race_
-[ ] 004C3F60 - Compute_Defensive_Stage_Points_
-[ ] 004C43E0 - Get_Star_Picture_Seg_
-[ ] 004C4430 - Add_Map_Fields_
-[ ] 004C48B0 - Add_Star_Fields_
-[ ] 004C4980 - Allocate_First_Screen_Seg_
-[ ] 004C49D0 - Center_Map_
-[ ] 004C4B00 - thunk_Clear_Main_Screen_Fields_
-[ ] 004C4B10 - Clear_Twinkling_Star_Data_
-[ ] 004C4B60 - Cycle_Ship_Icons_
-[ ] 004C4DB0 - Cycle_Star_Icons_
-[ ] 004C4E90 - Do_Next_Turn_
-[ ] 004C4FE0 - Do_System_Popup_
-[ ] 004C50C0 - Draw_Black_Holes_
-[ ] 004C5220 - Draw_Exploding_Plasma_Box_
-[ ] 004C56B0 - Draw_Game_Turn_Buttons_
-[ ] 004C5700 - Draw_Main_Main_Screen_
-[ ] 004C5830 - Draw_Diplomacy_Request_Lights_
-[ ] 004C5980 - Draw_Gate_Icons_
-[ ] 004C59B0 - Draw_A_Gate_Icon_
-[ ] 004C5E20 - Draw_Main_Screen_
-[ ] 004C61D0 - Check_Mouse_XY_Fields_
-[ ] 004C62D0 - Draw_ETA_Destination_Line_
-[ ] 004C6430 - Draw_Fleet_Box_Selected_Ship_Seg_
-[ ] 004C64B0 - Draw_Main_Screen_Before_Stencil_
-[ ] 004C6550 - Draw_Main_Screen_Filled_
-[ ] 004C6690 - Draw_Main_Screen_While_Moving_Boxes_
-[ ] 004C6780 - Draw_Mini_Main_Screen_
-[ ] 004C6880 - Draw_Nebulae_
-[ ] 004C6930 - Draw_Paralax_
-[ ] 004C6B40 - Draw_Player_Done_Lights_
-[ ] 004C6C90 - Draw_Relocation_Links_
-[ ] 004C6DA0 - Draw_Scanned_Ship_Seg_
-[ ] 004C6E50 - Draw_Stars_
-[ ] 004C6EB0 - Draw_A_Star_
-[ ] 004C6FE0 - Draw_Wormhole_Links_
-[ ] 004C70E0 - Set_Popup_Draw_XY_
-[ ] 004C7160 - Popup_XY_
-[ ] 004C7260 - Get_New_Paralax_XYs_
-[ ] 004C7440 - Get_PointXY_Draw_Coords_
-[ ] 004C7490 - Get_Ship_Stack_For_Officers_Screen_
-[ ] 004C7510 - Map_Scale_Star_Size_To_Zoom_Level_
-[ ] 004C7550 - Get_Star_Draw_Coords_
-[ ] 004C75B0 - Get_Star_Id_For_Officers_Screen_
-[ ] 004C7680 - Highlight_Star_
-[ ] 004C76E0 - MAINSCR::Is_Main_Screen_Palette_
-[ ] 004C7720 - Main_Screen_
-[ ] 004C8B80 - Add_Cheats_
-[ ] 004C8BF0 - Change_Home_Star_Name_
-[ ] 004C8C70 - Check_For_Diplomacy_Request_
-[ ] 004C8D00 - Check_Function_Keys_
-[ ] 004C90C0 - Check_Hot_Keys_
-[ ] 004C9410 - Check_Ships_XY_
-[ ] 004C9500 - Check_Stars_XY_
-[ ] 004C9650 - Clear_Mouse_XY_
-[ ] 004C9670 - Do_Colony_Screen_
-[ ] 004C9740 - Do_Fleet_Popup_
-[ ] 004C99B0 - Do_Reply_To_Diplomacy_Request_
-[ ] 004C9B00 - Add_Reply_To_Diplomacy_Request_Fields_
-[ ] 004C9C30 - Draw_Main_Screen_For_Zooming_
-[ ] 004C9E10 - Draw_Reply_To_Diplomacy_Request_
-[ ] 004C9F20 - Get_Mouse_Field_
-[ ] 004CA090 - Give_Me_All_Tech_Advances_
-[ ] 004CA140 - Load_Reply_To_Diplomacy_Request_Popup_
-[ ] 004CA1C0 - Mini_Main_Screen_Text_Box_
-[ ] 004CA210 - Print_Galaxy_Map_Scanned_Star_
-[ ] 004CA360 - Print_Highlighted_Star_Name_
-[ ] 004CA430 - Get_Star_Name_
-[ ] 004CA720 - Print_A_Star_Name_
-[ ] 004CA990 - Print_Main_Screen_Data_
-[ ] 004CB8B0 - Set_Post_Fitted_Font_Style_
-[ ] 004CB910 - Print_Star_Name_To_Bitmap_
-[ ] 004CBA80 - Print_Star_Names_
-[ ] 004CBB40 - Redraw_Main_Screen_
-[ ] 004CBC60 - Draw_Mini_Main_Offscreen_
-[ ] 004CBC80 - Restore_Hotseat_Map_Info_
-[ ] 004CBD70 - Save_Hotseat_Map_Info_
+[!] 004BEC80 - Russ_Combat_
+[X] 004BF060 - AI_Can_Retreat_
+[!] 004BF0B0 - Do_Attacker_Beat_Colony_Stuff_
+[X] 004BFD20 - Do_Bombardment_
+[X] 004BFD60 - Has_Stellar_Converter_
+[X] 004BFDC0 - N_Enemy_Stars_
+[X] 004BFE00 - Player_Owns_Transports_
+[X] 004BFE60 - Reset_Combat_Ships_At_Current_Star_Has_Player_
+[!] 004BFEA0 - Do_System_Discoveries_At_Star_
+[X] 004C0310 - Planet_Has_Splinter_Colony_
+[X] 004C0320 - Do_Dragon_Bribe_
+[X] 004C03E0 - Client_Combat_Loop_
+[X] 004C0B70 - Strategic_Results_Popup_
+[X] 004C0BE0 - Bomb_Results_Popups_
+[!] 004C0CA0 - Do_Net_Combat_Update_
+[X] 004C14E0 - GNN_Reports_Combat_
+[X] 004C1550 - Do_Nonhuman_Attack_Against_Human_
+[X] 004C1710 - Init_Turn_Summary_List_
+[X] 004C1730 - Draw_Turn_Summary_Popup_
+[X] 004C1790 - Turn_Summary_Popup_
+[X] 004C1B20 - thunk_main2_
+[X] 004C1B30 - Load_Player_Ship_Palette_
+[X] 004C1C90 - Get_Ship_Id_Picture_Seg_
+[X] 004C1CC0 - Get_Ship_Picture_Seg_
+[X] 004C1CE0 - Do_Get_Ship_Picture_Seg
+[X] 004C1D40 - Ken_Init_
+[X] 004C1D50 - Ken_Init2_
+[X] 004C1D60 - Get_Weighted_Choice_
+[X] 004C1DF0 - Get_Derelict_Applications_
+[X] 004C1FC0 - Init_NPC_Personalities_Objectives_Themes_
+[X] 004C2630 - Ken_Get_Text_Message_
+[X] 004C2670 - Load_Netstart_Strings_
+[X] 004C2740 - Mox_Net_Uninit_
+[X] 004C2780 - Dump_Users_
+[X] 004C27A0 - Join_Net_Screen_
+[X] 004C2A40 - Do_Net_Init_
+[X] 004C2A80 - Net_Select_Race_
+[X] 004C2C90 - Net_Pick_Position_
+[X] 004C2F40 - Do_Answer_
+[X] 004C2FB0 - Load_Net_Screen_
+[X] 004C35B0 - Russ_Net_Create_Game_
+[X] 004C3600 - Do_Dial_
+[X] 004C36B0 - Start_Net_Screen_
+[X] 004C3DE0 - Request_Banner_Color_
+[X] 004C3E70 - Request_Race_
+[X] 004C3F30 - Unrequest_Race_
+[!] 004C3F60 - Compute_Defensive_Stage_Points_
+[X] 004C43E0 - Get_Star_Picture_Seg_
+[X] 004C4430 - Add_Map_Fields_
+[X] 004C48B0 - Add_Star_Fields_
+[X] 004C4980 - Allocate_First_Screen_Seg_
+[X] 004C49D0 - Center_Map_
+[X] 004C4B00 - thunk_Clear_Main_Screen_Fields_
+[X] 004C4B10 - Clear_Twinkling_Star_Data_
+[X] 004C4B60 - Cycle_Ship_Icons_
+[X] 004C4DB0 - Cycle_Star_Icons_
+[X] 004C4E90 - Do_Next_Turn_
+[X] 004C4FE0 - Do_System_Popup_
+[!] 004C50C0 - Draw_Black_Holes_
+[X] 004C5220 - Draw_Exploding_Plasma_Box_
+[X] 004C56B0 - Draw_Game_Turn_Buttons_
+[X] 004C5700 - Draw_Main_Main_Screen_
+[X] 004C5830 - Draw_Diplomacy_Request_Lights_
+[!] 004C5980 - Draw_Gate_Icons_
+[X] 004C59B0 - Draw_A_Gate_Icon_
+[X] 004C5E20 - Draw_Main_Screen_
+[X] 004C61D0 - Check_Mouse_XY_Fields_
+[X] 004C62D0 - Draw_ETA_Destination_Line_
+[X] 004C6430 - Draw_Fleet_Box_Selected_Ship_Seg_
+[X] 004C64B0 - Draw_Main_Screen_Before_Stencil_
+[X] 004C6550 - Draw_Main_Screen_Filled_
+[X] 004C6690 - Draw_Main_Screen_While_Moving_Boxes_
+[X] 004C6780 - Draw_Mini_Main_Screen_
+[X] 004C6880 - Draw_Nebulae_
+[X] 004C6930 - Draw_Paralax_
+[X] 004C6B40 - Draw_Player_Done_Lights_
+[X] 004C6C90 - Draw_Relocation_Links_
+[X] 004C6DA0 - Draw_Scanned_Ship_Seg_
+[X] 004C6E50 - Draw_Stars_
+[!] 004C6EB0 - Draw_A_Star_
+[X] 004C6FE0 - Draw_Wormhole_Links_
+[X] 004C70E0 - Set_Popup_Draw_XY_
+[X] 004C7160 - Popup_XY_
+[X] 004C7260 - Get_New_Paralax_XYs_
+[X] 004C7440 - Get_PointXY_Draw_Coords_
+[!] 004C7490 - Get_Ship_Stack_For_Officers_Screen_
+[X] 004C7510 - Map_Scale_Star_Size_To_Zoom_Level_
+[X] 004C7550 - Get_Star_Draw_Coords_
+[X] 004C75B0 - Get_Star_Id_For_Officers_Screen_
+[X] 004C7680 - Highlight_Star_
+[X] 004C76E0 - MAINSCR::Is_Main_Screen_Palette_
+[!] 004C7720 - Main_Screen_
+[X] 004C8B80 - Add_Cheats_
+[X] 004C8BF0 - Change_Home_Star_Name_
+[X] 004C8C70 - Check_For_Diplomacy_Request_
+[!] 004C8D00 - Check_Function_Keys_
+[!] 004C90C0 - Check_Hot_Keys_
+[X] 004C9410 - Check_Ships_XY_
+[!] 004C9500 - Check_Stars_XY_
+[X] 004C9650 - Clear_Mouse_XY_
+[X] 004C9670 - Do_Colony_Screen_
+[!] 004C9740 - Do_Fleet_Popup_
+[X] 004C99B0 - Do_Reply_To_Diplomacy_Request_
+[X] 004C9B00 - Add_Reply_To_Diplomacy_Request_Fields_
+[X] 004C9C30 - Draw_Main_Screen_For_Zooming_
+[X] 004C9E10 - Draw_Reply_To_Diplomacy_Request_
+[X] 004C9F20 - Get_Mouse_Field_
+[X] 004CA090 - Give_Me_All_Tech_Advances_
+[X] 004CA140 - Load_Reply_To_Diplomacy_Request_Popup_
+[X] 004CA1C0 - Mini_Main_Screen_Text_Box_
+[X] 004CA210 - Print_Galaxy_Map_Scanned_Star_
+[X] 004CA360 - Print_Highlighted_Star_Name_
+[X] 004CA430 - Get_Star_Name_
+[X] 004CA720 - Print_A_Star_Name_
+[!] 004CA990 - Print_Main_Screen_Data_
+[X] 004CB8B0 - Set_Post_Fitted_Font_Style_
+[X] 004CB910 - Print_Star_Name_To_Bitmap_
+[X] 004CBA80 - Print_Star_Names_
+[X] 004CBB40 - Redraw_Main_Screen_
+[X] 004CBC60 - Draw_Mini_Main_Offscreen_
+[X] 004CBC80 - Restore_Hotseat_Map_Info_
+[X] 004CBD70 - Save_Hotseat_Map_Info_
 [ ] 004CBE00 - Scan_Galaxy_Map_Fields_
 [ ] 004CBED0 - Scan_Moveable_Box_Fields
 [ ] 004CC480 - Scan_Fleet_Movement_Box_Fields_
