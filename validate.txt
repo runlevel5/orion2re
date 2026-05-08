@@ -2827,238 +2827,238 @@
 [!] 004ED7C0 - Proximity_Worth_To_Player_
 [X] 004ED9B0 - Star_In_Range_Of_Given_Star_
 [X] 004EDA10 - airefit_cmp_
-[ ] 004EDA30 - Player_N_Turns_From_Star_To_Star_With_Intermediate_
-[ ] 004EDD30 - Ship_N_Turns_To_Star_With_Intermediate_
-[ ] 004EDF80 - Compute_AI_Data_
-[ ] 004EFB70 - Colony_Dominant_Player_
-[ ] 004EFC30 - Compute_Base_Planet_Values_
-[ ] 004EFD60 - Compute_Contextual_Planet_Values_
-[ ] 004EFFA0 - sort_ships_
-[ ] 004F0070 - Refit_Desirability_
-[ ] 004F0230 - Compute_Star_Player_Range_Info_
-[ ] 004F0430 - Find_Players_In_Range_
-[ ] 004F05A0 - Deallocate_AI_Data_
-[ ] 004F05C0 - Absolute_Location_
-[ ] 004F05F0 - Actual_Star_Id_
-[ ] 004F0640 - Confirm_Planet_And_Star_Index_Link_
-[ ] 004F0760 - Contact_With_One_Colony_
-[ ] 004F07F0 - Contact_With_Player_
-[ ] 004F0840 - Decrement_Zoom_Count_
-[ ] 004F0860 - Empty_System_
-[ ] 004F0880 - Get_Map_Scale_
-[ ] 004F0910 - Get_Player_Font_Colors_
-[ ] 004F0A30 - Get_Scaled_Value_
-[ ] 004F0A50 - Get_Up_Scaled_Value_
-[ ] 004F0A70 - Habitable_Spectral_Class_
-[ ] 004F0AA0 - Harold_Defaults_
-[ ] 004F0DD0 - Harold_Init_
-[ ] 004F0E20 - Increment_Zoom_Count_
-[ ] 004F0E50 - Increment_Zoom_Count_With_Limit_
-[ ] 004F0E90 - Init_Fleet_Movement_Box_
-[ ] 004F0ED0 - Init_Moving_Boxes_
-[ ] 004F0F60 - Init_System_Display_Box_
-[ ] 004F0FD0 - Is_Colony_Star_
-[ ] 004F1030 - Is_Home_Star_
-[ ] 004F1050 - Galaxy_Size_From_N_Stars_
-[ ] 004F1090 - Map_Scale_To_Zoom_Level_
-[ ] 004F10F0 - N_Colony_Owners_
-[ ] 004F1190 - Colony_Owners_
-[ ] 004F1270 - N_Food_Planets_In_System_
-[ ] 004F12D0 - N_Planets_In_System_
-[ ] 004F1330 - N_Player_Ships_
-[ ] 004F1380 - N_Satellites_
-[ ] 004F13D0 - N_Turns_To_Star_
-[ ] 004F1420 - Planet_Data_Screen_
-[ ] 004F1430 - Planet_Has_Outpost_
-[ ] 004F1480 - Planet_Index_
-[ ] 004F14B0 - Planet_Number_
-[ ] 004F1520 - Planet_Type_
-[ ] 004F1560 - Player_Has_Artemis_Net_
-[ ] 004F1590 - Player_Has_Colony_
-[ ] 004F15C0 - Star_Has_Dimensional_Portal_
-[ ] 004F15D0 - Star_Has_Artemis_Net_
-[ ] 004F15E0 - Player_Has_Dimensional_Portal_
-[ ] 004F1610 - Player_Has_Jumpgate_
-[ ] 004F1640 - Player_Has_Outpost_
-[ ] 004F16D0 - Player_Has_Stargate_
-[ ] 004F1700 - Player_Is_Omniscient_
-[ ] 004F1750 - Player_Has_Visited_
-[ ] 004F1780 - Player_Sighted_Monster_
-[ ] 004F17D0 - Players_Home_Star_
-[ ] 004F1860 - Randomize_List_
-[ ] 004F18F0 - Set_All_Visited_Flags_
-[ ] 004F1930 - Set_Player_Font_Style_
-[ ] 004F1970 - Set_Sound_Volume_To_Settings_
-[ ] 004F19E0 - Star_Is_Orion_
-[ ] 004F1A20 - Star_Is_Outpost_Star_
-[ ] 004F1AB0 - Star_Owner_
-[ ] 004F1B50 - User_Box_
-[ ] 004F1D00 - First_Ship_Orbiting_Star_
-[ ] 004F1D30 - Star_XY_To_Ship_Id_
-[ ] 004F1DC0 - XY_To_Star_Id_
-[ ] 004F1E30 - Zoom_Level_Font_Style_
-[ ] 004F1E80 - Star_Guarded_By_Monster_
-[ ] 004F1F50 - Get_N_Remaining_Humans_
-[ ] 004F1FB0 - Draw_Multi_Colored_Box_
-[ ] 004F2190 - Save_Mouse_List_
-[ ] 004F21D0 - Restore_Mouse_List_
-[ ] 004F2200 - Was_Mouse_List_Saved_
-[ ] 004F2210 - Load_H_Strings_
-[ ] 004F2440 - H_Message_
-[ ] 004F2470 - Reload_Language_Strings_
-[ ] 004F24A0 - Load_Language_Fonts_
+[!] 004EDA30 - Player_N_Turns_From_Star_To_Star_With_Intermediate_
+[X] 004EDD30 - Ship_N_Turns_To_Star_With_Intermediate_
+[!] 004EDF80 - Compute_AI_Data_
+[!] 004EFB70 - Colony_Dominant_Player_
+[X] 004EFC30 - Compute_Base_Planet_Values_
+[!] 004EFD60 - Compute_Contextual_Planet_Values_
+[X] 004EFFA0 - sort_ships_
+[X] 004F0070 - Refit_Desirability_
+[!] 004F0230 - Compute_Star_Player_Range_Info_
+[X] 004F0430 - Find_Players_In_Range_
+[X] 004F05A0 - Deallocate_AI_Data_
+[X] 004F05C0 - Absolute_Location_
+[X] 004F05F0 - Actual_Star_Id_
+[X] 004F0640 - Confirm_Planet_And_Star_Index_Link_
+[X] 004F0760 - Contact_With_One_Colony_
+[X] 004F07F0 - Contact_With_Player_
+[X] 004F0840 - Decrement_Zoom_Count_
+[X] 004F0860 - Empty_System_
+[X] 004F0880 - Get_Map_Scale_
+[X] 004F0910 - Get_Player_Font_Colors_
+[X] 004F0A30 - Get_Scaled_Value_
+[X] 004F0A50 - Get_Up_Scaled_Value_
+[X] 004F0A70 - Habitable_Spectral_Class_
+[!] 004F0AA0 - Harold_Defaults_
+[X] 004F0DD0 - Harold_Init_
+[X] 004F0E20 - Increment_Zoom_Count_
+[X] 004F0E50 - Increment_Zoom_Count_With_Limit_
+[X] 004F0E90 - Init_Fleet_Movement_Box_
+[X] 004F0ED0 - Init_Moving_Boxes_
+[X] 004F0F60 - Init_System_Display_Box_
+[X] 004F0FD0 - Is_Colony_Star_
+[X] 004F1030 - Is_Home_Star_
+[X] 004F1050 - Galaxy_Size_From_N_Stars_
+[!] 004F1090 - Map_Scale_To_Zoom_Level_
+[X] 004F10F0 - N_Colony_Owners_
+[X] 004F1190 - Colony_Owners_
+[!] 004F1270 - N_Food_Planets_In_System_
+[X] 004F12D0 - N_Planets_In_System_
+[X] 004F1330 - N_Player_Ships_
+[X] 004F1380 - N_Satellites_
+[!] 004F13D0 - N_Turns_To_Star_
+[X] 004F1420 - Planet_Data_Screen_
+[X] 004F1430 - Planet_Has_Outpost_
+[X] 004F1480 - Planet_Index_
+[X] 004F14B0 - Planet_Number_
+[X] 004F1520 - Planet_Type_
+[X] 004F1560 - Player_Has_Artemis_Net_
+[X] 004F1590 - Player_Has_Colony_
+[X] 004F15C0 - Star_Has_Dimensional_Portal_
+[X] 004F15D0 - Star_Has_Artemis_Net_
+[X] 004F15E0 - Player_Has_Dimensional_Portal_
+[X] 004F1610 - Player_Has_Jumpgate_
+[X] 004F1640 - Player_Has_Outpost_
+[X] 004F16D0 - Player_Has_Stargate_
+[X] 004F1700 - Player_Is_Omniscient_
+[!] 004F1750 - Player_Has_Visited_
+[X] 004F1780 - Player_Sighted_Monster_
+[X] 004F17D0 - Players_Home_Star_
+[!] 004F1860 - Randomize_List_
+[X] 004F18F0 - Set_All_Visited_Flags_
+[X] 004F1930 - Set_Player_Font_Style_
+[!] 004F1970 - Set_Sound_Volume_To_Settings_
+[X] 004F19E0 - Star_Is_Orion_
+[X] 004F1A20 - Star_Is_Outpost_Star_
+[X] 004F1AB0 - Star_Owner_
+[X] 004F1B50 - User_Box_
+[!] 004F1D00 - First_Ship_Orbiting_Star_
+[X] 004F1D30 - Star_XY_To_Ship_Id_
+[X] 004F1DC0 - XY_To_Star_Id_
+[!] 004F1E30 - Zoom_Level_Font_Style_
+[X] 004F1E80 - Star_Guarded_By_Monster_
+[X] 004F1F50 - Get_N_Remaining_Humans_
+[!] 004F1FB0 - Draw_Multi_Colored_Box_
+[X] 004F2190 - Save_Mouse_List_
+[X] 004F21D0 - Restore_Mouse_List_
+[X] 004F2200 - Was_Mouse_List_Saved_
+[X] 004F2210 - Load_H_Strings_
+[X] 004F2440 - H_Message_
+[X] 004F2470 - Reload_Language_Strings_
+[X] 004F24A0 - Load_Language_Fonts_
 [ ] 004F24D0 - Get_Font_File_
-[ ] 004F25C0 - Write_Language_Setting_File_
-[ ] 004F2610 - Get_Officer_Data_LBX_Name_
-[ ] 004F26F0 - Load_Leader_Titles_
-[ ] 004F27A0 - Get_Monetary_Unit_String_
-[ ] 004F2850 - Set_Language_Race_Names_
-[ ] 004F28E0 - Load_Colcalc_Strings_
-[ ] 004F2DE0 - Colony_Officer_
-[ ] 004F2E40 - Format_Quotient_
-[ ] 004F2F00 - Show_Morale_
-[ ] 004F2F50 - Colony_Morale_
-[ ] 004F33B0 - Mixed_Race_Morale_Penalty_
-[ ] 004F3410 - Gravity_Player_Production_Factor_
-[ ] 004F3500 - Colony_Pop_Prod_Produced_
-[ ] 004F3580 - Colony_Food2_Per_Farmer_
-[ ] 004F3630 - Colony_Empire_Base_Food2_Produced_
-[ ] 004F37A0 - Show_Food_Production_
-[ ] 004F37F0 - Colony_Food_Production_
-[ ] 004F3D50 - Colony_Job_Production_
-[ ] 004F42B0 - Colony_Pop_Base_Prod_Produced_
-[ ] 004F4310 - Colony_Industry_Per_Worker_
-[ ] 004F43F0 - Colony_Empire_Base_Industry_Produced_
-[ ] 004F44D0 - Show_Industry_Production_
-[ ] 004F4520 - Colony_Industry_Production_
-[ ] 004F4D50 - Colony_Is_Blockaded
-[ ] 004F4D90 - Colony_Research_Per_Scientist_
-[ ] 004F4E60 - Colony_Empire_Base_Research_Produced_
-[ ] 004F4F60 - Show_Research_Production_
-[ ] 004F4FB0 - Colony_Research_Production_
-[ ] 004F54D0 - Show_BC_Production_
-[ ] 004F5520 - Colony_BC_Production_
-[ ] 004F5A80 - Double_Add_Two_
-[ ] 004F5A90 - Planet_Max_Population_For_Player_
-[ ] 004F5B90 - Size_And_Climate_Race_Pop_Limit_
-[ ] 004F5C30 - Size_And_Climate_Max_Population_
-[ ] 004F5C70 - Calc_Player_Climate_
-[ ] 004F5CD0 - Colony_Race_Pop_Limit_
-[ ] 004F5D40 - Colony_N_Pops_Of_Empire_
-[ ] 004F5D70 - Room_For_Another_Dude_
-[ ] 004F5E90 - Ship_Type_Cost_For_Player_
-[ ] 004F5EE0 - Colony_Product_Cost_
-[ ] 004F6100 - Colony_Producing_Product_Cost_
-[ ] 004F6120 - Colony_N_Turns_To_Produce_
-[ ] 004F6190 - Colony_Cost_To_Buy_Given_Product_
-[ ] 004F6260 - Colony_Cost_To_Buy_Producing_Product_
-[ ] 004F6280 - Colony_Buy_Outright_
-[ ] 004F62F0 - Colony_Can_Afford_To_Buy_Product_
-[ ] 004F6340 - Star_Has_Asteroid_Or_Gas_Giant_
-[ ] 004F63A0 - Delete_Obsolete_Artifical_Planets_Under_Construction_
-[ ] 004F6410 - Colony_Can_Build_Product_
-[ ] 004F6BD0 - Colony_Environmental_Stuff_
-[ ] 004F6C50 - Pre_Import_Computing_
-[ ] 004F6D50 - Colony_Food_Maintenance_
-[ ] 004F6ED0 - Colony_Industry_Maintenance_
-[ ] 004F7030 - Colony_Replicators_
-[ ] 004F72A0 - Colony_Industry_To_Tax_
-[ ] 004F7310 - Colony_BC_Maintenance_
-[ ] 004F73E0 - Player_Research_Cost_
-[ ] 004F7430 - Chance_For_Research_Breakthrough_
-[ ] 004F7470 - Chance_For_Research_Breakthrough_Aux_
-[ ] 004F74B0 - Player_N_Turns_Until_Research_Complete_
-[ ] 004F7560 - Leader_At_Anomaly_
-[ ] 004F75A0 - Compute_Player_Maintenance_
-[ ] 004F7CE0 - Tribute_Received_From_
-[ ] 004F7D40 - Show_Command_Points_
-[ ] 004F7D90 - Compute_Total_Building_Costs_
-[ ] 004F7E20 - Player_Owns_Officer_
-[ ] 004F7E60 - Update_Player_Stats_
-[ ] 004F8230 - Colony_Calculation_
-[ ] 004F8290 - Recalculate_Colony_
-[ ] 004F82B0 - Pass_Out_Imports_
-[ ] 004F8750 - Post_Import_Computing_
-[ ] 004F8770 - Colony_Pop_Grows_
-[ ] 004F8D00 - Colony_Specialty_
-[ ] 004F8D50 - Star_Colony_Calculation_
-[ ] 004F8DF0 - All_Colony_Calculations_
-[ ] 004F90A0 - Do_Player_Colony_Post_Production_
-[ ] 004F9140 - Do_Player_Colony_Calculations_
-[ ] 004F91D0 - thunk_All_Colony_Calculations_
-[ ] 004F91E0 - Apply_All_Colony_Changes_
-[ ] 004F9240 - Apply_Colony_Changes_
-[ ] 004F92D0 - Apply_Colony_Pop_Growth_
-[ ] 004F9A30 - Apply_Assimilation_
-[ ] 004F9C90 - Produce_Ground_Military_
-[ ] 004F9D50 - Apply_Production_
-[ ] 004FA4F0 - Housing_Is_Useless_
-[ ] 004FA530 - Ghost_Colony_Stuff_
-[ ] 004FA600 - Player_May_Get_Tech_App_
-[ ] 004FA730 - Field_Is_Gray_Box_
-[ ] 004FA790 - Player_Gets_Tech_App_
-[ ] 004FAA00 - Advance_Player_Field_
-[ ] 004FAA80 - Ensure_Uncreative_Field_OK_
-[ ] 004FAB40 - Give_Player_Field_
-[ ] 004FAC60 - Check_For_Research_Breakthrough_
-[ ] 004FACD0 - Compute_Player_Total_Known_Tech_Cost_
-[ ] 004FADC0 - May_Surrender_Star_
-[ ] 004FAEB0 - Surrender_Star_
-[ ] 004FAF60 - May_Surrender_Empire_
-[ ] 004FAFB0 - Surrender_Empire_
-[ ] 004FB090 - Do_Surrenders_
-[ ] 004FB130 - Do_Surrender_Star_
-[ ] 004FB230 - Do_Surrender_Colony_
-[ ] 004FB320 - Do_Surrender_Empire_
-[ ] 004FB520 - Eliminate_Player_
-[ ] 004FB7F0 - Init_Surrenders_
-[ ] 004FB870 - Check_For_Eliminated_Players_
-[ ] 004FB920 - Apply_All_Player_Changes_
-[ ] 004FBA20 - N_Living_Players_
-[ ] 004FBA70 - N_Living_Human_Players_
-[ ] 004FBAC0 - Compute_Blockades_
-[ ] 004FBD10 - Colony_Can_Build_Large_Ships_
-[ ] 004FBD40 - Compute_Star_Colony_Stuff_
-[ ] 004FBEA0 - Do_Colony_Owner_Change_Star_Colony_Stuff_
-[ ] 004FBEF0 - No_Op1_
-[ ] 004FBF00 - Compute_All_Star_Colony_Stuff_
-[ ] 004FBF50 - Compute_Potential_Colony_Info_
-[ ] 004FC110 - Get_First_Player_Colony_Idx
-[ ] 004FC140 - Twiddle_Initial_Homeworlds_
-[ ] 004FC4B0 - Twiddle_Initial_Homeworld_
-[ ] 004FC700 - Monster_At_Star_
-[ ] 004FC750 - Colony_Planetary_Shield_
-[ ] 004FC780 - Get_Player_Max_Population_
-[ ] 004FC800 - Get_System_Population_
-[ ] 004FC880 - Get_Surrender_System_
-[ ] 004FC9B0 - Sort_star_weights_
-[ ] 004FC9D0 - Get_Possible_Surrender_Systems_
-[ ] 004FCB40 - Player_Name_
-[ ] 004FCB70 - Best_Leader_Diplomat_Bonus_
-[ ] 004FCC40 - Load_Tech_Names_
-[ ] 004FD020 - Init_Tech_
-[ ] 004FD2B0 - Tech_Is_Legal_For_Player_
-[ ] 004FD390 - Init_Player_Tech_
-[ ] 004FD8D0 - Missile_Owner_
-[ ] 004FD8F0 - Missile_Type_
-[ ] 004FD9C0 - Coord_Movement_
-[ ] 004FDA60 - Kill_Missile_
-[ ] 004FDAD0 - Did_Missile_Hit_
-[ ] 004FDB50 - Draw_Missile_
-[ ] 004FDE10 - Picture_Count_
-[ ] 004FDEB0 - Get_Multiple_Torpedo_Coords_
-[ ] 004FE040 - Get_Multiple_Missile_Coords_
-[ ] 004FE3E0 - Draw_Missile_Status_
-[ ] 004FE760 - Draw_Missiles_
-[ ] 004FE7B0 - Fire_Missile_
-[ ] 004FEC90 - Missile_Facing_To_XY_
-[ ] 004FECD0 - Missile_Facing_
-[ ] 004FED80 - Missile_Speed_
-[ ] 004FEF30 - Missile_On_Combat_Screen_
-[ ] 004FEF70 - Move_Missile_
-[ ] 004FF2B0 - Next_Missile_Id_
-[ ] 004FF300 - On_Combat_Screen_
-[ ] 004FF340 - Is_Missile_Target_Alive_
+[X] 004F25C0 - Write_Language_Setting_File_
+[X] 004F2610 - Get_Officer_Data_LBX_Name_
+[X] 004F26F0 - Load_Leader_Titles_
+[X] 004F27A0 - Get_Monetary_Unit_String_
+[X] 004F2850 - Set_Language_Race_Names_
+[X] 004F28E0 - Load_Colcalc_Strings_
+[X] 004F2DE0 - Colony_Officer_
+[X] 004F2E40 - Format_Quotient_
+[X] 004F2F00 - Show_Morale_
+[X] 004F2F50 - Colony_Morale_
+[X] 004F33B0 - Mixed_Race_Morale_Penalty_
+[!] 004F3410 - Gravity_Player_Production_Factor_
+[!] 004F3500 - Colony_Pop_Prod_Produced_
+[X] 004F3580 - Colony_Food2_Per_Farmer_
+[X] 004F3630 - Colony_Empire_Base_Food2_Produced_
+[X] 004F37A0 - Show_Food_Production_
+[!] 004F37F0 - Colony_Food_Production_
+[!] 004F3D50 - Colony_Job_Production_
+[!] 004F42B0 - Colony_Pop_Base_Prod_Produced_
+[!] 004F4310 - Colony_Industry_Per_Worker_
+[!] 004F43F0 - Colony_Empire_Base_Industry_Produced_
+[X] 004F44D0 - Show_Industry_Production_
+[X] 004F4520 - Colony_Industry_Production_
+[X] 004F4D50 - Colony_Is_Blockaded
+[X] 004F4D90 - Colony_Research_Per_Scientist_
+[X] 004F4E60 - Colony_Empire_Base_Research_Produced_
+[!] 004F4F60 - Show_Research_Production_
+[X] 004F4FB0 - Colony_Research_Production_
+[X] 004F54D0 - Show_BC_Production_
+[!] 004F5520 - Colony_BC_Production_
+[X] 004F5A80 - Double_Add_Two_
+[X] 004F5A90 - Planet_Max_Population_For_Player_
+[X] 004F5B90 - Size_And_Climate_Race_Pop_Limit_
+[X] 004F5C30 - Size_And_Climate_Max_Population_
+[X] 004F5C70 - Calc_Player_Climate_
+[X] 004F5CD0 - Colony_Race_Pop_Limit_
+[X] 004F5D40 - Colony_N_Pops_Of_Empire_
+[X] 004F5D70 - Room_For_Another_Dude_
+[X] 004F5E90 - Ship_Type_Cost_For_Player_
+[X] 004F5EE0 - Colony_Product_Cost_
+[X] 004F6100 - Colony_Producing_Product_Cost_
+[X] 004F6120 - Colony_N_Turns_To_Produce_
+[!] 004F6190 - Colony_Cost_To_Buy_Given_Product_
+[X] 004F6260 - Colony_Cost_To_Buy_Producing_Product_
+[!] 004F6280 - Colony_Buy_Outright_
+[X] 004F62F0 - Colony_Can_Afford_To_Buy_Product_
+[X] 004F6340 - Star_Has_Asteroid_Or_Gas_Giant_
+[X] 004F63A0 - Delete_Obsolete_Artifical_Planets_Under_Construction_
+[X] 004F6410 - Colony_Can_Build_Product_
+[X] 004F6BD0 - Colony_Environmental_Stuff_
+[X] 004F6C50 - Pre_Import_Computing_
+[X] 004F6D50 - Colony_Food_Maintenance_
+[!] 004F6ED0 - Colony_Industry_Maintenance_
+[!] 004F7030 - Colony_Replicators_
+[!] 004F72A0 - Colony_Industry_To_Tax_
+[X] 004F7310 - Colony_BC_Maintenance_
+[!] 004F73E0 - Player_Research_Cost_
+[X] 004F7430 - Chance_For_Research_Breakthrough_
+[X] 004F7470 - Chance_For_Research_Breakthrough_Aux_
+[X] 004F74B0 - Player_N_Turns_Until_Research_Complete_
+[X] 004F7560 - Leader_At_Anomaly_
+[!] 004F75A0 - Compute_Player_Maintenance_
+[X] 004F7CE0 - Tribute_Received_From_
+[X] 004F7D40 - Show_Command_Points_
+[X] 004F7D90 - Compute_Total_Building_Costs_
+[X] 004F7E20 - Player_Owns_Officer_
+[X] 004F7E60 - Update_Player_Stats_
+[X] 004F8230 - Colony_Calculation_
+[X] 004F8290 - Recalculate_Colony_
+[X] 004F82B0 - Pass_Out_Imports_
+[X] 004F8750 - Post_Import_Computing_
+[!] 004F8770 - Colony_Pop_Grows_
+[X] 004F8D00 - Colony_Specialty_
+[X] 004F8D50 - Star_Colony_Calculation_
+[X] 004F8DF0 - All_Colony_Calculations_
+[!] 004F90A0 - Do_Player_Colony_Post_Production_
+[!] 004F9140 - Do_Player_Colony_Calculations_
+[X] 004F91D0 - thunk_All_Colony_Calculations_
+[!] 004F91E0 - Apply_All_Colony_Changes_
+[X] 004F9240 - Apply_Colony_Changes_
+[X] 004F92D0 - Apply_Colony_Pop_Growth_
+[X] 004F9A30 - Apply_Assimilation_
+[X] 004F9C90 - Produce_Ground_Military_
+[X] 004F9D50 - Apply_Production_
+[X] 004FA4F0 - Housing_Is_Useless_
+[X] 004FA530 - Ghost_Colony_Stuff_
+[X] 004FA600 - Player_May_Get_Tech_App_
+[X] 004FA730 - Field_Is_Gray_Box_
+[X] 004FA790 - Player_Gets_Tech_App_
+[X] 004FAA00 - Advance_Player_Field_
+[X] 004FAA80 - Ensure_Uncreative_Field_OK_
+[X] 004FAB40 - Give_Player_Field_
+[X] 004FAC60 - Check_For_Research_Breakthrough_
+[X] 004FACD0 - Compute_Player_Total_Known_Tech_Cost_
+[X] 004FADC0 - May_Surrender_Star_
+[X] 004FAEB0 - Surrender_Star_
+[X] 004FAF60 - May_Surrender_Empire_
+[X] 004FAFB0 - Surrender_Empire_
+[X] 004FB090 - Do_Surrenders_
+[X] 004FB130 - Do_Surrender_Star_
+[X] 004FB230 - Do_Surrender_Colony_
+[X] 004FB320 - Do_Surrender_Empire_
+[!] 004FB520 - Eliminate_Player_
+[X] 004FB7F0 - Init_Surrenders_
+[!] 004FB870 - Check_For_Eliminated_Players_
+[!] 004FB920 - Apply_All_Player_Changes_
+[X] 004FBA20 - N_Living_Players_
+[X] 004FBA70 - N_Living_Human_Players_
+[X] 004FBAC0 - Compute_Blockades_
+[X] 004FBD10 - Colony_Can_Build_Large_Ships_
+[X] 004FBD40 - Compute_Star_Colony_Stuff_
+[X] 004FBEA0 - Do_Colony_Owner_Change_Star_Colony_Stuff_
+[X] 004FBEF0 - No_Op1_
+[!] 004FBF00 - Compute_All_Star_Colony_Stuff_
+[X] 004FBF50 - Compute_Potential_Colony_Info_
+[!] 004FC110 - Get_First_Player_Colony_Idx
+[!] 004FC140 - Twiddle_Initial_Homeworlds_
+[X] 004FC4B0 - Twiddle_Initial_Homeworld_
+[X] 004FC700 - Monster_At_Star_
+[X] 004FC750 - Colony_Planetary_Shield_
+[X] 004FC780 - Get_Player_Max_Population_
+[X] 004FC800 - Get_System_Population_
+[X] 004FC880 - Get_Surrender_System_
+[X] 004FC9B0 - Sort_star_weights_
+[X] 004FC9D0 - Get_Possible_Surrender_Systems_
+[X] 004FCB40 - Player_Name_
+[X] 004FCB70 - Best_Leader_Diplomat_Bonus_
+[X] 004FCC40 - Load_Tech_Names_
+[X] 004FD020 - Init_Tech_
+[X] 004FD2B0 - Tech_Is_Legal_For_Player_
+[!] 004FD390 - Init_Player_Tech_
+[X] 004FD8D0 - Missile_Owner_
+[X] 004FD8F0 - Missile_Type_
+[!] 004FD9C0 - Coord_Movement_
+[X] 004FDA60 - Kill_Missile_
+[X] 004FDAD0 - Did_Missile_Hit_
+[!] 004FDB50 - Draw_Missile_
+[X] 004FDE10 - Picture_Count_
+[X] 004FDEB0 - Get_Multiple_Torpedo_Coords_
+[!] 004FE040 - Get_Multiple_Missile_Coords_
+[X] 004FE3E0 - Draw_Missile_Status_
+[X] 004FE760 - Draw_Missiles_
+[!] 004FE7B0 - Fire_Missile_
+[X] 004FEC90 - Missile_Facing_To_XY_
+[X] 004FECD0 - Missile_Facing_
+[X] 004FED80 - Missile_Speed_
+[X] 004FEF30 - Missile_On_Combat_Screen_
+[X] 004FEF70 - Move_Missile_
+[X] 004FF2B0 - Next_Missile_Id_
+[X] 004FF300 - On_Combat_Screen_
+[X] 004FF340 - Is_Missile_Target_Alive_
 [ ] 004FF3C0 - Resolve_Missile_
 [ ] 004FFE00 - Find_Weakest_Shield_
 [ ] 004FFE50 - Draw_Fighter_
