@@ -1,9 +1,11 @@
 # Default Vocode configuration
 logging:
   #default_level: debug
+know_enabled: false
 variables:
 # OpenAI
   LLM_ARCHITECT_MODEL: chatgpt/gpt-5.4
+  LLM_ARCHITECT_REASONING: high
   LLM_STRONG_MODEL: chatgpt/gpt-5.4
   LLM_WEAK_MODEL: chatgpt/gpt-5.4-mini
   LLM_REASONING: high

@@ -2386,80 +2386,80 @@
 [X] 004CBC60 - Draw_Mini_Main_Offscreen_
 [X] 004CBC80 - Restore_Hotseat_Map_Info_
 [X] 004CBD70 - Save_Hotseat_Map_Info_
-[ ] 004CBE00 - Scan_Galaxy_Map_Fields_
-[ ] 004CBED0 - Scan_Moveable_Box_Fields
-[ ] 004CC480 - Scan_Fleet_Movement_Box_Fields_
-[ ] 004CC5B0 - Scan_Ships_XY_
-[ ] 004CC700 - Scan_Stars_XY_
-[ ] 004CC920 - Scan_System_Display_Fields_
-[ ] 004CCD90 - Scroll_Map_
-[ ] 004CCF30 - Clear_Main_Screen_Fields_
-[ ] 004CD040 - Set_Painted_Fleet_Fields_
-[ ] 004CD0D0 - Set_Reload_Fleet_Box_Palette_Flag_
-[ ] 004CD0F0 - Ship_Can_Be_Selected_
-[ ] 004CD120 - Star_On_Screen_
-[ ] 004CD170 - Exit_Zooming_Mode_
-[ ] 004CD1B0 - Toggle_Game_Option_
-[ ] 004CD460 - Get_Star_Name_Info_
-[ ] 004CD550 - Update_Ship_Icons_In_Between_Turns_
-[ ] 004CD560 - Update_Star_Owners_
-[ ] 004CD5B0 - Zoom_Box_Height_
-[ ] 004CD5D0 - Zoom_Box_Width_
-[ ] 004CD5F0 - Set_Player_Cheated_Flag_
-[ ] 004CD630 - Warn_About_Cheating_Players_
-[ ] 004CD7F0 - Fade_Into_Main_Screen_
-[ ] 004CD930 - Get_Research_Unit_String_
-[ ] 004CD9E0 - Draw_Super_Fast_Screen_
-[ ] 004CDA90 - Refresh_Combat_Screen_Full_
-[ ] 004CDB50 - Full_Draw_Combat_Screen_
-[ ] 004CE0E0 - Draw_Grey_Damage_Bars_
-[ ] 004CE740 - Draw_Ship_Status_
-[ ] 004CF810 - Draw_Weapon_Status_Display_
-[ ] 004D0070 - Draw_Special_Status_Display_
-[ ] 004D0220 - Draw_Blip2_
-[ ] 004D0280 - Draw_Blip3_
-[ ] 004D0340 - Draw_Blip4_
-[ ] 004D04A0 - Draw_Blip5_
-[ ] 004D06B0 - Draw_Reduced_Map_Box_
-[ ] 004D08D0 - Draw_Reduced_Combat_Map_
-[ ] 004D0AC0 - Draw_Option_Panel_Lights_
-[ ] 004D0BC0 - Draw_Crew_Level_Stars_
-[ ] 004D0CA0 - Draw_Main_Combat_Screen_
-[ ] 004D1980 - Draw_Ship_
-[ ] 004D1F80 - Combat_Draw_View_Ship_
-[ ] 004D3C10 - Detailed_View_Ship_
-[ ] 004D3F50 - Draw_Shield_Arcs_
-[ ] 004D4580 - Relative_Bearing_XY_
-[ ] 004D4630 - Relative_Bearing_
-[ ] 004D4730 - Get_Weapon_Arc_
-[ ] 004D4780 - Draw_Ship_To_Bitmap_
-[ ] 004D4A20 - Draw_Retreating_Ship_
-[ ] 004D4E40 - Get_Ship_Actual_Size_
-[ ] 004D4E80 - Remap_Draw_Ship_Status_
-[ ] 004D5370 - Scroll_Draw_Combat_Screen_
-[ ] 004D5820 - Ship_Completely_On_Screen_
-[ ] 004D59A0 - Ship_On_Screen_
-[ ] 004D5B60 - Display_Combat_View_Ship_
-[ ] 004D5C70 - Crew_Quality_String_
-[ ] 004D5DA0 - Plasma_Darken_
-[ ] 004D5FC0 - Draw_Bombs_
-[ ] 004D6380 - Create_Ship_Darken_Map_
-[ ] 004D6520 - Get_Draw_Ship_Offsets_
-[ ] 004D6650 - Get_Ship_Center_Draw_XY_
-[ ] 004D66D0 - Draw_Internals_Display_
-[ ] 004D6AB0 - Draw_Fake_Combat_Buttons_
-[ ] 004D6CB0 - Draw_Legal_Boxes_
-[ ] 004D6E60 - Move_Options_Background_
-[ ] 004D7120 - Board_Popup_
-[ ] 004D73F0 - Draw_Board_Popup_
-[ ] 004D7500 - Play_Cinematic_
-[ ] 004D7780 - Smack_Fade_
-[ ] 004D77F0 - Draw_Smacker_Animation_
-[ ] 004D7810 - Assert_Settings_
-[ ] 004D7820 - Mox_Update_
-[ ] 004D7830 - Release_All_Blocks_
-[ ] 004D7840 - nullsub
-[ ] 004D7850 - PFMT_
+[X] 004CBE00 - Scan_Galaxy_Map_Fields_
+[!] 004CBED0 - Scan_Moveable_Box_Fields
+[X] 004CC480 - Scan_Fleet_Movement_Box_Fields_
+[X] 004CC5B0 - Scan_Ships_XY_
+[X] 004CC700 - Scan_Stars_XY_
+[X] 004CC920 - Scan_System_Display_Fields_
+[X] 004CCD90 - Scroll_Map_
+[X] 004CCF30 - Clear_Main_Screen_Fields_
+[X] 004CD040 - Set_Painted_Fleet_Fields_
+[X] 004CD0D0 - Set_Reload_Fleet_Box_Palette_Flag_
+[X] 004CD0F0 - Ship_Can_Be_Selected_
+[X] 004CD120 - Star_On_Screen_
+[X] 004CD170 - Exit_Zooming_Mode_
+[!] 004CD1B0 - Toggle_Game_Option_
+[X] 004CD460 - Get_Star_Name_Info_
+[X] 004CD550 - Update_Ship_Icons_In_Between_Turns_
+[X] 004CD560 - Update_Star_Owners_
+[X] 004CD5B0 - Zoom_Box_Height_
+[X] 004CD5D0 - Zoom_Box_Width_
+[X] 004CD5F0 - Set_Player_Cheated_Flag_
+[X] 004CD630 - Warn_About_Cheating_Players_
+[X] 004CD7F0 - Fade_Into_Main_Screen_
+[X] 004CD930 - Get_Research_Unit_String_
+[X] 004CD9E0 - Draw_Super_Fast_Screen_
+[X] 004CDA90 - Refresh_Combat_Screen_Full_
+[X] 004CDB50 - Full_Draw_Combat_Screen_
+[X] 004CE0E0 - Draw_Grey_Damage_Bars_
+[!] 004CE740 - Draw_Ship_Status_
+[!] 004CF810 - Draw_Weapon_Status_Display_
+[!] 004D0070 - Draw_Special_Status_Display_
+[X] 004D0220 - Draw_Blip2_
+[X] 004D0280 - Draw_Blip3_
+[X] 004D0340 - Draw_Blip4_
+[X] 004D04A0 - Draw_Blip5_
+[X] 004D06B0 - Draw_Reduced_Map_Box_
+[!] 004D08D0 - Draw_Reduced_Combat_Map_
+[!] 004D0AC0 - Draw_Option_Panel_Lights_
+[X] 004D0BC0 - Draw_Crew_Level_Stars_
+[!] 004D0CA0 - Draw_Main_Combat_Screen_
+[X] 004D1980 - Draw_Ship_
+[!] 004D1F80 - Combat_Draw_View_Ship_
+[X] 004D3C10 - Detailed_View_Ship_
+[X] 004D3F50 - Draw_Shield_Arcs_
+[X] 004D4580 - Relative_Bearing_XY_
+[X] 004D4630 - Relative_Bearing_
+[X] 004D4730 - Get_Weapon_Arc_
+[X] 004D4780 - Draw_Ship_To_Bitmap_
+[!] 004D4A20 - Draw_Retreating_Ship_
+[X] 004D4E40 - Get_Ship_Actual_Size_
+[X] 004D4E80 - Remap_Draw_Ship_Status_
+[X] 004D5370 - Scroll_Draw_Combat_Screen_
+[X] 004D5820 - Ship_Completely_On_Screen_
+[X] 004D59A0 - Ship_On_Screen_
+[X] 004D5B60 - Display_Combat_View_Ship_
+[X] 004D5C70 - Crew_Quality_String_
+[X] 004D5DA0 - Plasma_Darken_
+[!] 004D5FC0 - Draw_Bombs_
+[X] 004D6380 - Create_Ship_Darken_Map_
+[X] 004D6520 - Get_Draw_Ship_Offsets_
+[X] 004D6650 - Get_Ship_Center_Draw_XY_
+[X] 004D66D0 - Draw_Internals_Display_
+[X] 004D6AB0 - Draw_Fake_Combat_Buttons_
+[X] 004D6CB0 - Draw_Legal_Boxes_
+[X] 004D6E60 - Move_Options_Background_
+[X] 004D7120 - Board_Popup_
+[X] 004D73F0 - Draw_Board_Popup_
+[X] 004D7500 - Play_Cinematic_
+[X] 004D7780 - Smack_Fade_
+[X] 004D77F0 - Draw_Smacker_Animation_
+[X] 004D7810 - Assert_Settings_
+[X] 004D7820 - Mox_Update_
+[X] 004D7830 - Release_All_Blocks_
+[X] 004D7840 - nullsub
+[X] 004D7850 - PFMT_
 [ ] 004D7860 - Get_Weighted_Choice_Char_
 [ ] 004D78E0 - Get_Weighted_Choice_Short_
 [ ] 004D7950 - Get_Weighted_Choice_Int_

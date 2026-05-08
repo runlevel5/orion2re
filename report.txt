@@ -14771,3 +14771,641 @@ Discrepancies:
 
 - The implementation contains extra zeroing and wider local buffers not present in assembly, which would normally be cosmetic, but here they obscure a substantive semantic mismatch in the treasury section and make current behavior inconsistent with the instruction trace.
 ---------------------------------------
+004B57E0 MAPGEN::Enforce_Planet_Max_
+
+fail
+
+Discrepancies:
+- Debug `PFMT_` call is missing two arguments from the assembly.
+  - Assembly pushes 4 formatted values after the format string: colony-planets, max, planet-count, and removing-count.
+  - Current code only passes 2 values, which is a calling/stack mismatch for varargs and not equivalent.
+
+  Suggested diff snippet:
+  ```cpp
+  if (capture::Check_Release_Version_() == 0) {
+      int32_t colony_planets = (int32_t)MOX::_planet_count - gas_giant_count;
+      int32_t removing = colony_planets - max_planets;
+      RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+          colony_planets,
+          (int32_t)max_planets,
+          (int32_t)MOX::_planet_count,
+          removing);
+      assert::hgetch_();
+  }
+  ```
+
+- Planet removal condition is wrong: assembly checks a star-slot lookup in `MOX::_star[star_index].planet_index[random_idx]`, not the selected planet’s own `planet_type`.
+  - The binary computes `star = backup_p->star_index`, then reads `MOX::_star[star].planet_index[random_idx]`.
+  - Only if that value is `> -1` does it look up `_pl[that_index].planet_type` and reject removal when that looked-up planet is a gas giant.
+  - Current code instead directly tests `backup_p->planet_type != PLANET_TYPE_GAS_GIANT`, which is materially different control flow and memory access.
+
+  Suggested diff snippet:
+  ```cpp
+  int16_t star_idx = (int16_t)backup_p->star_index;
+  int16_t linked_idx = MOX::_star[star_idx].planet_index[random_idx];
+  if (linked_idx > -1) {
+      if (_pl[linked_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
+          backup_p->colony_index = -2;
+          MOX::_planet_count--;
+      }
+  }
+  ```
+
+- Related signedness/indexing concern: the assembly sign-extends `star_index` and `orbit` when rebuilding star planet links and when testing home systems.
+  - Current code casts these fields to `uint8_t`, which changes behavior for negative values and does not match the machine code.
+  - Even if negative values are not expected here, this is not instruction-accurate.
+
+  Suggested diff snippet:
+  ```cpp
+  is_home_system[(int32_t)MOX::_planet[home_pid].star_index] = 1;
+  MOX::_star[(int32_t)MOX::_planet[new_idx].star_index]
+      .planet_index[(int32_t)MOX::_planet[new_idx].orbit] = new_idx;
+  ```
+
+- Temporary allocation for the star copy is not assigned to a typed variable, leaving uncertainty around intended side effect visibility versus the assembly’s explicit copy loop target.
+  - Assembly copies the returned `Allocate_Next_Block_` pointer into a local and fills it with star data.
+  - Current code discards the returned pointer and relies only on allocator side effects; behavior may survive in practice but is not a precise restoration.
+
+  Suggested diff snippet:
+  ```cpp
+  s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
+  memcpy(star_backup, MOX::_star, 72 * 113);
+  ```
+---------------------------------------
+004B5BF0 MAPGEN::Generate_Food_Per_Farmer_
+
+- Discrepancy: climate index signedness is wrong in the implementation.
+  - Assembly does `MOVSX EDX, byte ptr [planet + 0x8]`, so `planet->climate` is consumed as signed `int8_t`, not zero-extended.
+  - Current code forces `static_cast<uint8_t>(planet->climate)`, which changes behavior for negative climate values and does not match the binary’s effective address computation.
+  - Minimal suggested diff:
+    ```diff
+    -        uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+    -        return MOX::_food_per_farmer_table[climate_idx];
+    +        int8_t climate_idx = planet->climate;
+    +        return MOX::_food_per_farmer_table[climate_idx];
+    ```
+
+- Discrepancy: global table type is likely wrong for faithful typing.
+  - Assembly loads `AL` from `_food_per_farmer_table[...]`, and the referenced symbol is declared from Ghidra as `int8_t[10]`.
+  - Current project types `MOX::_food_per_farmer_table` as `int8_t[10]` in `mox.h`, but this function returns `uint8_t`; together with the unsigned cast on the index this obscures the signed access pattern and may hide UB if negative indices ever occur.
+  - At minimum, this function should not introduce unsigned index coercion. If broader cleanup is desired, review surrounding climate/table typing consistently.
+
+fail
+---------------------------------------
+004cbed0 MAINSCR::Scan_Moveable_Box_Fields
+
+fail
+
+Discrepancies:
+- Galaxy-map recenter math uses swapped axes in the implementation.
+  - Assembly computes the first pushed argument from `_galaxy_map_grid_x` scaled by `0xfa0 / _galaxy_map_width`, and the second from `_galaxy_map_grid_y` scaled by `0x13c4 / _galaxy_map_height`, then calls `Center_Map_(x, y)`.
+  - Current code computes `map_x` from `_galaxy_map_grid_y/_galaxy_map_height` and `map_y` from `_galaxy_map_grid_x/_galaxy_map_width`, reversing X/Y.
+  - Minimal diff snippet:
+    ```cpp
+    // wrong
+    int16_t map_x = (int16_t)(((((int32_t)MOX::_galaxy_map_grid_y * MOX::_max_map_scale) / 10) * (int16_t)(5060 / MOX::_galaxy_map_height)) / 10);
+    int16_t map_y = (int16_t)(((((int32_t)MOX::_galaxy_map_grid_x * MOX::_max_map_scale) / 10) * (int16_t)(4000 / MOX::_galaxy_map_width)) / 10);
+
+    // expected
+    int16_t map_y = (int16_t)(((((int32_t)MOX::_galaxy_map_grid_y * MOX::_max_map_scale) / 10) * (int16_t)(5060 / MOX::_galaxy_map_height)) / 10);
+    int16_t map_x = (int16_t)(((((int32_t)MOX::_galaxy_map_grid_x * MOX::_max_map_scale) / 10) * (int16_t)(4000 / MOX::_galaxy_map_width)) / 10);
+    Center_Map_(map_x, map_y);
+    ```
+
+- The fleet movement hover/click result from `Scan_Fleet_Movement_Box_Fields_` is stored into the wrong variable.
+  - Disassembly passes `&local_5e2` first and `&_fleet_icon_chosen` second; after the call it checks `local_5e2 > -1` and writes that value to `MOX::_fleet_ship_scanned`. That means `local_5e2` is the scanned/hovered icon index, while `_fleet_icon_chosen` is the loop/click counter used for detailed view.
+  - Current implementation declares `Scan_Fleet_Movement_Box_Fields_(..., &local_5e2, &_fleet_icon_chosen)` but then uses `local_5e2` as scanned result and `_fleet_icon_chosen + _first_fleet_movement_icon` for detailed view. This only matches if the callee signature is opposite of its current definition; its current definition writes the first out-arg with absolute icon index and the second with loop counter, so caller/callee disagree.
+  - Minimal diff snippet:
+    ```cpp
+    // caller should match callee/assembly roles consistently
+    int16_t scanned_idx;
+    int16_t chosen_offset;
+    int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(param_3, param_2, &chosen_offset, &scanned_idx);
+    MOX::_fleet_ship_scanned = -1;
+    if (scanned_idx > -1) {
+        MOX::_eta_star_id = -1;
+        MOX::_fleet_ship_scanned = scanned_idx;
+    }
+    if (scan_res == 1) {
+        int16_t ship_id = HACCESS::Fleet_Movement_Ship_Id_(chosen_offset + MOX::_first_fleet_movement_icon);
+        ...
+    }
+    ```
+    or equivalently fix the callee signature/assignments instead, but the current pair is inconsistent.
+
+- `Scan_Fleet_Movement_Box_Fields_` itself does not match the assembly’s out-parameter semantics.
+  - For a normal field hit, assembly stores the loop counter to the first out-pointer (`local_5e2`) and leaves `_fleet_icon_chosen` as the second out-pointer target. Current function stores absolute icon index to the first out-pointer and loop counter to the second.
+  - This is a behavioral mismatch, not cosmetic, because downstream code uses one result for hover text (`_fleet_ship_scanned`) and the other for right-click detailed view.
+  - Minimal diff snippet:
+    ```cpp
+    // on normal hit
+    *out_loop_counter = counter;
+    *out_fleet_icon_idx = i;
+    // should be swapped to match assembly/caller usage
+    *out_fleet_icon_idx = counter;
+    *out_loop_counter = i;
+    ```
+    Rename parameters accordingly if needed, but behavior must match the binary.
+
+fail
+---------------------------------------
+0x004B57E0 MAPGEN::Enforce_Planet_Max_
+
+fail
+
+Discrepancies:
+
+- The debug PFMT call is missing two arguments and therefore does not match the stack behavior.
+  - Assembly pushes 4 format args: colony-planets count, max, total planet count, and removed count.
+  - Current code only passes 2 args.
+  - Minimal suggested diff:
+    ```cpp
+    RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+        (int32_t)(original_planet_count - gas_giant_count),
+        (int32_t)max_planets,
+        (int32_t)original_planet_count,
+        (int32_t)((original_planet_count - gas_giant_count) - max_planets));
+    ```
+
+- Star backup allocation/copy is incomplete and side effects differ.
+  - Assembly allocates a second block of 0x1FC8 bytes and copies the entire MOX::_star array into it with `rep movsd`.
+  - Current code allocates the second block but discards the returned pointer and performs no copy.
+  - This is a concrete behavioral mismatch even if the backup is not later read in this function.
+  - Minimal suggested diff:
+    ```cpp
+    s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
+    memcpy(star_backup, MOX::_star, 72 * 113);
+    ```
+
+- Planet removal condition is wrong: current code checks the selected planet type directly instead of the star slot mapping used by the binary.
+  - Assembly computes `MOX::_star[star_index].planet_index[random_idx]`, tests that value `> -1`, then checks `_pl[mapped_index].planet_type != 2`.
+  - Current code simplifies this to `backup_p->planet_type != 2`, which is not equivalent to the actual memory access pattern.
+  - This changes control flow and candidate rejection behavior.
+  - Minimal suggested diff:
+    ```cpp
+    int8_t star_index = backup_p->star_index;
+    int16_t mapped_idx = MOX::_star[(uint8_t)star_index].planet_index[(uint8_t)random_idx];
+    if (mapped_idx > -1 && _pl[mapped_idx].planet_type != 2) {
+        backup_p->colony_index = -2;
+        MOX::_planet_count--;
+    }
+    ```
+
+- The random-removal loop condition is off by one relative to the assembly.
+  - Assembly continues while `(planet_count - gas_giant_count) >= max_planets` and exits only when it becomes `< max_planets`.
+  - Current code uses `while (max_planets <= MOX::_planet_count - gas_giant_count)`, which is equivalent in structure, but because the function enters only when initial `>=` and decrements inside, it can end one planet too low versus an intended “enforce max” interpretation. This should be reviewed together with the original data assumptions.
+  - Minimal suggested diff if source intent is confirmed:
+    ```cpp
+    while (MOX::_planet_count - gas_giant_count >= max_planets) {
+        ...
+    }
+    ```
+  - This item remains uncertain only in naming/intent, but the binary condition itself is `JGE`.
+
+fail
+---------------------------------------
+004B5BF0 MAPGEN::Generate_Food_Per_Farmer_
+
+- Discrepancy: return type/signedness does not match the binary. The function returns `AL` loaded from `MOX::_food_per_farmer_table`, whose declared storage is `int8_t[10]`. Current code declares the function as `uint8_t` and casts climate to `uint8_t`, which changes the C-level contract and can affect callers if negative table values ever occur or if sign-propagation is relied upon.
+  Suggested diff:
+  ```cpp
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index)
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index)
+  ```
+
+- Discrepancy: local/index type is widened to unsigned unnecessarily. The assembly does `movsx` from `planet.climate`, i.e. signed byte to signed int index. Current code uses:
+  `uint8_t climate_idx = static_cast<uint8_t>(planet->climate);`
+  That is not instruction-faithful and would reinterpret negative climates as large positive indices instead of preserving signed semantics from the binary.
+  Suggested diff:
+  ```cpp
+  - uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+  + int32_t climate_idx = (int32_t)planet->climate;
+  ```
+
+- Discrepancy: header declaration also uses the wrong return type, so the interface is inconsistent with the binary-level signed byte behavior.
+  Suggested diff:
+  ```cpp
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  ```
+
+fail
+---------------------------------------
+
+---------------------------------------
+004cd1b0 MAINSCR::Toggle_Game_Option_
+
+fail
+
+Discrepancies:
+- The local message buffers are used with the wrong starting offsets. In the binary, the option text is copied to `ESP+0x0c` and the final formatted output is written to `ESP+0x2c`, then `User_Box_` receives the full buffer start. The current code writes with `sprintf(&message[4], " ", &option_name_raw[4], status_text)`, which skips the first 4 bytes of both strings and passes a shifted/partially uninitialized message.
+  Suggested diff snippet:
+  ```cpp
+  char option_name[32];
+  char message[100];
+  ...
+  strcpy(option_name, HAROLD::H_Message_(...));
+  ...
+  sprintf(message, " ", option_name, status_text);
+  HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
+  ```
+
+- The default / case 3 path reads an uninitialized byte from the final output buffer local (`local_64[0]` in Ghidra, `ESP+0x2c` in asm), not from a valid constructed message after any offsetting. Current code maps this to `message[0]` while also using `message` later as an offset destination, compounding the mismatch.
+  Suggested diff snippet:
+  ```cpp
+  default:
+      status_flag = message[0];
+      break;
+  // and remove any shifted writes into message
+  ```
+
+- Parameter type does not match the actual calling convention usage. The function begins with `MOVSX EAX, word ptr [ESP+4]`, so the effective source argument is a signed 16-bit value, not a full `int32_t`. While most callers may pass small values, the validated signature should reflect the 16-bit input semantics.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl Toggle_Game_Option_(int16_t option_idx);
+  ```
+
+- Case dispatch intentionally excludes case 3 from any toggle target and falls through to the default/uninitialized-status behavior via `JA` + jump table layout. The current `case 3: default:` grouping is source-level similar, but because of the incorrect shifted buffer logic it does not preserve the original side effects on the stack-based locals and produced message.
+  Suggested diff snippet:
+  ```cpp
+  // keep case 3/default as non-toggle path, but ensure final formatting uses
+  // the unshifted option/status buffers exactly as above
+  ```
+---------------------------------------
+004CE740 CMBTDRW1::Draw_Ship_Status_
+
+fail
+
+- The shield bucket switch is off by one in source. Assembly switches on `min((shield_arc_max + 0x13) / 10, 10) - 1`, with buckets `{0..2},{3..4},{5..6},{7..8},{9}`. Current code switches on `shield_val - 1` but labels `case 0,1,2` for the first bucket, which incorrectly includes shield value 3.
+  ```cpp
+  // current
+  switch (shield_val - 1) {
+      case 0:
+      case 1:
+      case 2:
+
+  // expected
+  switch (shield_val - 1) {
+      case 0:
+      case 1:
+  ```
+
+- Several shield-threshold comparisons use `<=` where assembly uses strict signed `JG` fallthrough logic equivalent to “replace when value is <= threshold-1”, but with exact constants that differ from source in two places. In the 3/4 bucket, assembly checks `<= 0x15` and `<= 0x0b`; current code uses `<= 21` and `<= 11` only by decimal restatement, which is fine, but in later buckets some constants are shifted by one from disassembly/decompiler text and should be rechecked instruction-by-instruction. Most notably the first branch entry condition must remain `< 0x1f`, `< 0x33`, `< 0x47`, `< 0x5b` exactly from assembly.
+
+- The mask index math does not match assembly semantics for signed modulo/division. Assembly computes:
+  - `((i - floor_div_signed(facing,4)) + 4)` normalized via signed `% 4`
+  - plus `(signed_mod_4(facing) * 4)`
+  
+  Current code simplifies this to:
+  ```cpp
+  int mask_idx = ((i - (facing / 4) + 4) % 4) + (facing % 4) * 4;
+  ```
+  This is only equivalent for non-negative `facing`. The assembly uses signed arithmetic patterns explicitly; if `facing_dir` ever carries signed-negative values, behavior diverges.
+
+- The call to `buffer::Buffer_Reload_` introduces a non-original cast smell:
+  ```cpp
+  reinterpret_cast<void*>(MOX::_global_cache_seg)
+  ```
+  Assembly just passes the raw global value. This suggests the project declaration for `_global_cache_seg` may be wrong or the cast is papering over it; per restoration rules this is a validation concern because it may hide a bad external type.
+
+- The ship pointer is indexed as `&MOX::_combat_data[param_3]`, but assembly computes the record offset manually from a signed 16-bit index (`MOVSX` on param_3). If `param_3` is negative, C++ indexing is UB while assembly performs signed address arithmetic deterministically. The restored function should guard or preserve original signed semantics explicitly if negative indices are possible.
+  ```cpp
+  // current
+  s_combat_data* ship = &MOX::_combat_data[param_3];
+
+  // safer/original-semantics-oriented
+  int idx = (int)param_3;
+  s_combat_data* ship = &MOX::_combat_data[idx];
+  ```
+
+- The branch-local ship facing type is widened to `int16_t`, while assembly reads signed byte fields (`MOVSX byte ptr ... +0x23`). This can affect division/modulo semantics and should remain signed 8-bit derived.
+  ```cpp
+  // current
+  int16_t facing = ship->facing_dir;
+
+  // expected style
+  int8_t facing = ship->facing_dir;
+  ```
+
+---------------------------------------
+004CF810 CMBTDRW1::Draw_Weapon_Status_Display_
+
+- Uses wrong weapon-modification string field: assembly copies `_weapon_modifications[1].name_plural` / `[2].name_plural`, but implementation uses `.name`. This changes displayed text and is a direct data access mismatch.
+  ```cpp
+  // current
+  strcpy(local_a0, TECHDATA::_weapon_modifications[2].name);
+  // expected
+  strcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural);
+  ```
+
+- The singular/plural choice for the weapon base name is keyed off `shots_left == 1` in the implementation, but assembly checks byte `[slot+0x5b]`, i.e. `count == 1`. This is a logic mismatch and can display the wrong name when count and shots_left differ.
+  ```cpp
+  // current
+  if (shots_left == 1) {
+      strcat(local_a0, TECHDATA::_weapons[w_id].name);
+  } else {
+      strcat(local_a0, TECHDATA::_weapons[w_id].name_plural);
+  }
+
+  // expected
+  if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].count == 1) {
+      strcat(local_a0, TECHDATA::_weapons[w_id].name);
+  } else {
+      strcat(local_a0, TECHDATA::_weapons[w_id].name_plural);
+  }
+  ```
+
+- For `display_color_mode == 3`, assembly intentionally does not perform the second `Set_Font_Style_Shadow_Down_` before composing/printing the text line; the implementation’s `else` path collapses behavior and can preserve prior state only implicitly. This is fragile and not a precise control-flow match. It should mirror the explicit 0/1/2-only second switch.
+  ```cpp
+  // expected pattern
+  if (display_color_mode == 0) { ... }
+  else if (display_color_mode == 1) { ... }
+  else if (display_color_mode == 2) { ... }
+  // no branch for 3
+  ```
+
+- Type usage around `shots_left` is off relative to the bytewise assembly behavior. The function repeatedly uses byte loads/sign-extension distinctions; keeping `shots_left` in a signed `int8_t` local is risky for exact reproduction, especially in the `== 1` test and count-print path.
+  ```cpp
+  // safer / closer to asm intent
+  uint8_t shots_left = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].shots_left;
+  ```
+
+fail
+---------------------------------------
+
+004D0070 CMBTDRW1::Draw_Special_Status_Display_
+
+fail
+---------------------------------------
+004D08D0 CMBTDRW1::Draw_Reduced_Combat_Map_
+
+- Ship color comparison is inverted relative to assembly. The code uses `owner == _combat_attacker_player ? 0x20 : 0x60`, but the disassembly computes `0x60` for equality and `0x20` otherwise via `SBB/AND/ADD`. This changes reduced-map blip colors for all ships.
+  ```diff
+-                uint8_t color = (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) ? 0x20 : 0x60;
++                uint8_t color = (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) ? 0x60 : 0x20;
+  ```
+
+- Ship loop termination differs from the original. Assembly starts at index 1 and continues while `SI < _combat_total_ship_count` using a top `JLE`/bottom `JG` pair, i.e. it processes indices `1..count-1`. The current `for (i = 1; i < count; ++i)` is consistent, but validation cannot pass because the same function body elsewhere in the file relies on the opposite attacker-color convention, indicating a likely systemic mismatch in restored meaning of these palette bases. At minimum this function’s local behavior is currently inconsistent with the binary’s flag-derived result.
+  ```diff
+-                uint8_t color = (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) ? 0x20 : 0x60;
++                // attacker match must map to 0x60 per CMP/SBB/AND/ADD sequence
++                uint8_t color = (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) ? 0x60 : 0x20;
+  ```
+
+- There is unnecessary type shaping around coordinate math that obscures the original signed division-by-2 sequence `(x*3 - sign)/2`. While current results are usually equivalent on this compiler for signed `int8_t`, this should be treated with caution because the assembly explicitly sign-extends byte fields before arithmetic. The restored code should avoid casts that could hide a signedness bug if field types change.
+  ```diff
+-                y_pos = (static_cast<int16_t>(MOX::_combat_data[i].y) * 3 >> 1) + 364;
+-                x_pos = (static_cast<int16_t>(MOX::_combat_data[i].x) * 3 >> 1) + 500;
++                y_pos = (MOX::_combat_data[i].y * 3) / 2 + 364;
++                x_pos = (MOX::_combat_data[i].x * 3) / 2 + 500;
+  ```
+
+fail
+---------------------------------------
+004D0AC0 CMBTDRW1::Draw_Option_Panel_Lights_
+
+- Discrepancy: signedness/type of `_grid_flag` and `_speedx2_flag` in `mox.h` does not match the call site semantics. The assembly uses `MOVSX` from 16-bit memory for both flags before passing them to `animate::Set_Animation_Frame_`, but the project declares them as `uint16_t&`. That changes C++ integer promotion to zero-extension instead of sign-extension for values with bit 15 set, which is a behavioral mismatch.
+  Minimal suggested diff snippet:
+  ```cpp
+  - inline uint16_t& _grid_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597300});
+  - inline uint16_t& _speedx2_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597400});
+  + inline int16_t& _grid_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597300});
+  + inline int16_t& _speedx2_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597400});
+  ```
+
+- Discrepancy: the `animate::Set_Animation_Frame_` prototype is noted as mismatched and currently takes `int32_t frame`, while the original callee at `0x00524d90` is documented in-project as having a type mismatch from `int16_t`. For this function specifically, the assembly passes a sign-extended 16-bit value; the current signature obscures the original ABI/data-width semantics and interacts with the incorrect unsigned globals above.
+  Minimal suggested diff snippet:
+  ```cpp
+  - void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame);
+  + void __cdecl Set_Animation_Frame_(s_animation_header* anim, int16_t frame);
+  ```
+
+Fail
+---------------------------------------
+0x004D0CA0 CMBTDRW1::Draw_Main_Combat_Screen_
+
+fail
+
+Discrepancies:
+- Cursor highlight switch default behavior is changed.
+  - Assembly skips drawing for invalid `size_class > 5`; current code forces `box_size = 0` and adds a guard. This is safer, but not an exact restoration of the switch/jump structure.
+  - Minimal diff snippet:
+    ```cpp
+    switch (size_class) {
+        case 0: box_w = 20; box_h = 20; break;
+        case 1:
+        case 2: box_w = 40; box_h = 40; break;
+        case 3:
+        case 4:
+        case 5: box_w = 60; box_h = 60; break;
+        default:
+            goto skip_box;
+    }
+    graphics::Box_(grid_x * 20, grid_y * 20, box_w, box_h, 1, 0xB1);
+    skip_box:;
+    ```
+
+- Status redraw ordering for hovered destroyed/non-normal ship is not assembly-faithful.
+  - Assembly always calls `Draw_Weapon_Status_Display_(hov_ship, -1)` before checking `unit_status`, then if `unit_status != 0` it redraws only the internals pane. Current code does this too, but stores `_last_ship_status = hov_ship` inside the destroyed/internals branch rather than via the shared post-branch assignment flow. This changes exact control-flow/state update semantics.
+  - Minimal diff snippet:
+    ```cpp
+    Draw_Weapon_Status_Display_(hov_ship, -1);
+    if (hov_ship != MOX::_last_ship_status) {
+        if (MOX::_combat_data[hov_ship].unit_status != 0) {
+            video::Set_Page_Back_();
+            graphics::Interlaced_Fill_(401, 362, 489, 374, 0, 199);
+            graphics::Interlaced_Fill_(401, 379, 488, 467, 0, 199);
+            Draw_Internals_Display_(401, 379);
+            if (page_flag == 1) video::Set_Page_Off_();
+            goto set_last_status;
+        }
+        ...
+    }
+    set_last_status:
+    MOX::_last_ship_status = hov_ship;
+    ```
+
+- `_last_ship_status` update pattern differs from the assembly’s shared-register behavior.
+  - Original code carries a local/status register through multiple branches and writes `_last_ship_status` once after the main status-pane logic in several paths; current restoration writes the global directly in multiple branches. This may be functionally equivalent in common cases, but it is not precise enough for validation against the provided instruction flow.
+  - Minimal diff snippet:
+    ```cpp
+    int16_t new_last_status = MOX::_last_ship_status;
+    ...
+    new_last_status = -1;      // missile hover
+    ...
+    new_last_status = hov_ship; // ship hover
+    ...
+    new_last_status = 0x29A;   // default internals pane
+    ...
+    MOX::_last_ship_status = new_last_status;
+    ```
+
+- Reduced-map branch for current ship assumes `_cur_ship` is always valid after the main ship-status block.
+  - Assembly accesses `_combat_data[_cur_ship]` unconditionally in the reduced-map/missile-warning section after ship drawing. Since `_cur_ship` may be negative on some paths, exact restored source usually mirrors that unsafe assumption or proves an invariant elsewhere. Current code adds `MOX::_cur_ship >= 0` to the missile-warning branch only, but still dereferences `_combat_data[_cur_ship]` in the fallback reduced-map branch. This inconsistency makes the restoration uncertain rather than exact.
+  - Minimal diff snippet:
+    ```cpp
+    // Either rely on proven invariant everywhere, or guard both branches consistently.
+    if (MOX::_cur_ship < 0) {
+        goto after_reduced_map;
+    }
+    ```
+
+- Blip color computation is semantically equivalent but not assembly-shaped, and signedness is obscured.
+  - Assembly computes attacker color via `SBB/AND/ADD`, producing `0x20` or `0x60` based on `(owner - _combat_attacker_player) < 1` with signed 16-bit compare behavior. Current ternary `owner == _combat_attacker_player ? 0x20 : 0x60` is likely correct for valid owners, but it does not preserve the original compare semantics exactly.
+  - Minimal diff snippet:
+    ```cpp
+    int16_t diff = (int16_t)MOX::_combat_data[MOX::_cur_ship].owner - MOX::_combat_attacker_player;
+    int16_t blip_color = (diff < 1) ? 0x20 : 0x60;
+    ```
+
+These are enough to make the current implementation not precise enough for binary-level validation.
+
+---------------------------------------
+004D1F80 CMBTDRW1::Combat_Draw_View_Ship_
+
+fail
+
+Discrepancies:
+- Branch logic for remap/non-remap path is inverted relative to the disassembly.
+  - Assembly uses the remap palette path when `_current_screen` is 0, 4, or 0x1D, and the direct palette path otherwise.
+  - Current code does the opposite with `if (!use_remap_view)`.
+  - Minimal suggested diff:
+    ```cpp
+    bool use_remap_view =
+        (MOX::_current_screen == 0) ||
+        (MOX::_current_screen == 4) ||
+        (MOX::_current_screen == 0x1D);
+
+    - if (!use_remap_view) {
+    + if (use_remap_view) {
+          // remap path
+      } else {
+          // non-remap path
+      }
+    ```
+
+- Palette index used for the large triangular fill is wrong in both branches.
+  - Non-remap assembly passes `_green[0]`/palette 0x80 (`push 0x80`) to `graphics::Tri_Interlaced_Fill_`.
+  - Remap assembly passes `_green[2]`.
+  - Current code uses `_green[1]` in the non-remap branch.
+  - Minimal suggested diff:
+    ```cpp
+    - CMBTDRW1::_green[1],
+    - CMBTDRW1::_green[1],
+    + CMBTDRW1::_green[0],
+    + CMBTDRW1::_green[0],
+    ```
+
+- Fleet/officer icon handling is attached to the wrong branch and wrong conditions.
+  - Assembly non-remap branch:
+    - calls `Draw_Ship_Status_`
+    - if `player_idx > 8` skip entirely
+    - if `officer_idx == -1` and `player_idx < 8`, draw normal fleet icon via `animate::Draw_(view_x+0xF6, view_y+0x27, ...)`
+    - else grayscale officer/icon bitmap and draw at `(view_x+0xEB, view_y+0x19)`
+  - Assembly remap branch:
+    - calls `Remap_Draw_Ship_Status_`
+    - if `player_idx >= 8` skip
+    - if `officer_idx == -1`, call `animate::Remap_Draw_(view_x+0xF6, view_y+0x27, ...)`
+    - else draw normal icon at `(view_x+0xEC, view_y+0x16)`
+  - Current code has this whole behavior swapped because of the inverted branch.
+  - Minimal suggested diff:
+    ```cpp
+    - if (!use_remap_view) {
+    + if (use_remap_view) {
+          CMBTDRW1::Remap_Draw_Ship_Status_(...);
+          // remap icon logic
+      } else {
+          CMBTDRW1::Draw_Ship_Status_(...);
+          // grayscale/non-remap icon logic
+      }
+    ```
+
+- `player_idx` comparison in the non-remap branch is too broad.
+  - Assembly uses `CMP CL,0x8 / JG` so the branch executes for `player_idx <= 8`, then further distinguishes `< 8` vs `== 8`.
+  - Current code behavior is structurally swapped with the remap path, so the `<= 8` vs `< 8` semantics are not preserved in the correct place.
+  - Minimal suggested diff:
+    ```cpp
+    // in non-remap path
+    if (player_idx <= 8) {
+        if (MOX::_global_combat_data.officer_idx == -1) {
+            if (player_idx < 8) {
+                animate::Draw_(view_x + 0xF6, view_y + 0x27, ...);
+            }
+        } else {
+            // grayscale draw
+        }
+    }
+    ```
+
+- The helper-based signed bonus formatting is not instruction-faithful for zero/negative handling at the byte level and introduces uncertainty.
+  - Assembly explicitly writes `'+'` only for positive values and writes a single `' '` byte otherwise before concatenating the `itoa` output.
+  - Current helper uses `sprintf`, which is likely functionally equivalent, but this function requires exact restoration validation and the helper obscures direct matching.
+  - Minimal suggested diff:
+    ```cpp
+    - Build_Signed_Bonus_String(line_text, MOX::_global_combat_data.ship_attack);
+    + itoa(MOX::_global_combat_data.ship_attack, number_text, 10);
+    + if (MOX::_global_combat_data.ship_attack > 0) {
+    +     strcpy(line_text, s_plus_00551118);
+    + } else {
+    +     line_text[0] = ' ';
+    + }
+    + strcat(line_text, number_text);
+    ```
+
+The primary blocker is the inverted top-level control flow, which swaps major side effects and drawing behavior.
+
+
+---------------------------------------
+004D4A20 CMBTDRW1::Draw_Retreating_Ship_
+
+fail
+
+Discrepancies:
+- Saved window status is typed/stored too narrowly.
+  - Assembly saves a 32-bit cookie at `[ESP+0x18]` and restores that exact dword. Current code uses `int16_t window_status`, but `MISC::Restore_Window_Status_` takes `uint32_t`. This is not a cosmetic mismatch; it can truncate the saved window state.
+  - Minimal suggested diff snippet:
+    ```cpp
+    -        int16_t window_status;
+    +        uint32_t window_status;
+             MISC::Save_Window_Status_(&window_status);
+    ...
+             MISC::Restore_Window_Status_(window_status);
+    ```
+
+- One field name/type in related data access is suspicious and should be confirmed before validation can pass with high confidence.
+  - Assembly reads `size_class` as signed byte at offset `+0x25` and uses it in signed arithmetic for pitch bend. Current code uses `MOX::_combat_data[ship_idx].size_class`, which is logically correct, but given broader project typing inconsistencies and explicit cast/sign rules, this function depends on `size_class` remaining signed `int8_t` exactly. Please confirm no alternate struct aliasing or mismatched field definitions exist elsewhere for this combat struct.
+  - Minimal suggested diff snippet if mismatch exists elsewhere:
+    ```cpp
+    // ensure s_combat_data::size_class is declared as:
+    int8_t size_class;
+    ```
+
+---------------------------------------
+004D5FC0 CMBTDRW1::Draw_Bombs_
+
+fail
+
+Discrepancies:
+- Transporter-bomb interpolation updates the line origin each iteration, but the assembly keeps the original attacker position fixed and only advances the current point. This changes the projectile/beam path.
+  ```diff
+  -                do {
+  -                    special::Absolute_Interpolate_Line_(&start_x, &start_y, start_x, start_y, target_x, target_y, 20);
+  +                int16_t base_x = start_x;
+  +                int16_t base_y = start_y;
+  +                do {
+  +                    special::Absolute_Interpolate_Line_(&start_x, &start_y, base_x, base_y, target_x, target_y, 20);
+                       range = special::Range_(start_x, start_y, target_x, target_y);
+                   } while ((int32_t)range * range > limit_sq);
+  ```
+
+- The on-screen check/snap logic is applied to the wrong combat unit. Assembly checks `Ship_Completely_On_Screen_(attacker_idx)` but snaps to `combat_data[attacker_idx].x/y` taken from `param_1`, which is the first argument register path in the binary. In the current source, this is modeled as attacker consistently; given the mixed naming, this remains ambiguous and cannot be validated confidently without confirming parameter semantics at call sites.
+  ```diff
+  -        if (Ship_Completely_On_Screen_(attacker_idx) == 0) {
+  -            COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[attacker_idx].x, MOX::_combat_data[attacker_idx].y);
+  +        // verify whether binary param_1 here is attacker_idx or target_idx
+  +        if (Ship_Completely_On_Screen_(/* binary param_1 */) == 0) {
+  +            COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[/* binary param_1 */].x, MOX::_combat_data[/* binary param_1 */].y);
+           }
+  ```
+
+---------------------------------------
