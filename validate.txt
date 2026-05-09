@@ -3221,21 +3221,21 @@
 [X] 0050CC50 - Delete_From_Queue_
 [X] 0050CE20 - Defragment_Queue_
 [X] 0050CE60 - Squish_Out_Queue_Slot_
-[ ] 0050CEB0 - Add_Refited_Ship_To_Queue_
-[ ] 0050D070 - Insert_Before_Queue_Slot_
-[ ] 0050D170 - Selection_Name_
-[ ] 0050D220 - Draw_Icon_
-[ ] 0050D240 - Draw_Current_Selection_
-[ ] 0050DC10 - Print_Setting_Description_
-[ ] 0050DC80 - Print_Selection_Centered_
-[ ] 0050DCA0 - Draw_Cost_And_Time_Info_
-[ ] 0050DEB0 - Draw_Build_Queue_Popup_
-[ ] 0050E060 - Draw_Build_Queue_
-[ ] 0050E240 - Update_Fields_
-[ ] 0050E440 - Add_Build_Queue_Fields_
-[ ] 0050E490 - Build_Queue_Popup_
-[ ] 0050E7D0 - Build_Arrays_
-[ ] 0050E7E0 - Check_For_Saved_Games_
+[X] 0050CEB0 - Add_Refited_Ship_To_Queue_
+[X] 0050D070 - Insert_Before_Queue_Slot_
+[X] 0050D170 - Selection_Name_
+[X] 0050D220 - Draw_Icon_
+[!] 0050D240 - Draw_Current_Selection_
+[!] 0050DC10 - Print_Setting_Description_
+[X] 0050DC80 - Print_Selection_Centered_
+[X] 0050DCA0 - Draw_Cost_And_Time_Info_
+[!] 0050DEB0 - Draw_Build_Queue_Popup_
+[X] 0050E060 - Draw_Build_Queue_
+[!] 0050E240 - Update_Fields_
+[X] 0050E440 - Add_Build_Queue_Fields_
+[!] 0050E490 - Build_Queue_Popup_
+[X] 0050E7D0 - Build_Arrays_
+[X] 0050E7E0 - Check_For_Saved_Games_
 [ ] 0050E910 - Do_Load_Game_Popup_
 [ ] 0050EBF0 - Add_Game_Popup_Fields_
 [ ] 0050F4C0 - Bad_Game_File_Message_

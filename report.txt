@@ -19925,3 +19925,232 @@ Discrepancies:
 fail
 
 ---------------------------------------
+004B57E0 MAPGEN::Enforce_Planet_Max_
+
+fail
+
+Discrepancies:
+- Debug PFMT call is missing two arguments from the original format usage.
+  - Assembly pushes 4 integers after the format string: colony planets, max, planet count, removing count.
+  - Current code passes only 2 integers, which does not match calling convention/stack usage and truncates debug output semantics.
+  - Suggested diff:
+```cpp
+- RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d, (int32_t)(original_planet_count - gas_giant_count), (int32_t)max_planets);
++ RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
++     (int32_t)(original_planet_count - gas_giant_count),
++     (int32_t)max_planets,
++     (int32_t)original_planet_count,
++     (int32_t)((original_planet_count - gas_giant_count) - max_planets));
+```
+
+- Star backup block is allocated but never copied from MOX::_star.
+  - Assembly allocates 0x1fc8 bytes and performs `rep movsd` from `MOX::_star` into that block.
+  - Current implementation allocates the block and discards the returned pointer; this misses a required side effect and diverges from exact memory behavior.
+  - Suggested diff:
+```cpp
+- allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
++ s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
++ for (int32_t i = 0; i < (72 * 113) / 4; ++i) {
++     ((uint32_t*)star_backup)[i] = ((uint32_t*)MOX::_star)[i];
++ }
+```
+
+- Removal condition is materially incorrect: current code checks the candidate planet type directly instead of the original star-structure mapping entry.
+  - Assembly logic:
+    1. candidate must not already be removed
+    2. candidate star must not be a home system
+    3. `MOX::_star[candidate.star_index].planet_index[candidate.orbit]` must be non-negative
+    4. `_pl[that_planet_index].planet_type != PLANET_TYPE_GAS_GIANT`
+    5. then mark candidate removed
+  - Current code skips steps 3-4 and instead tests `backup_p->planet_type != 2 /* PLANET_TYPE_GAS_GIANT */`, which is not equivalent to the binary.
+  - Suggested diff:
+```cpp
+- if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
+-     if (backup_p->planet_type != 2 /* PLANET_TYPE_GAS_GIANT */) {
+-         backup_p->colony_index = -2;
+-         MOX::_planet_count--;
+-     }
+- }
++ if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
++     int16_t mapped_idx = MOX::_star[(uint8_t)backup_p->star_index].planet_index[(uint8_t)backup_p->orbit];
++     if (mapped_idx >= 0 && _pl[mapped_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
++         backup_p->colony_index = -2;
++         MOX::_planet_count--;
++     }
++ }
+```
+
+- The current implementation relies on whole-struct assignment for the final copy, while the binary performs an explicit 17-byte copy.
+  - This is only safe if `s_planet_data` remains byte-packed exactly as guaranteed; otherwise behavior diverges. Given project rules this may be acceptable, but with the other issues above validation cannot pass.
+  - Minimal conservative form:
+```cpp
+MOX::_planet[new_idx] = _pl[old_idx];
+```
+
+---------------------------------------
+
+0x004B5BF0 MAPGEN::Generate_Food_Per_Farmer_
+
+- Return type signedness does not match the binary. The assembly returns the raw byte loaded into AL from MOX::_food_per_farmer_table, and that table is declared as int8_t[10]. Current code exposes uint8_t, which changes the C-level contract for negative entries.
+  ```diff
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  ```
+
+- Climate index signedness is wrong. The disassembly does MOVSX EDX, byte ptr [planet+0x8], so planet->climate is consumed as signed int8_t, not zero-extended. Current code forces static_cast<uint8_t>(planet->climate), changing behavior for negative climate values and hiding upstream typing/state issues.
+  ```diff
+  -     uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+  -     return MOX::_food_per_farmer_table[climate_idx];
+  +     return MOX::_food_per_farmer_table[planet->climate];
+  ```
+
+- Header declaration has the same return-type mismatch and must agree with the implementation/callers.
+  ```diff
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  ```
+
+fail
+---------------------------------------
+0x004F24D0 HAROLD::Get_Font_File_
+
+- The default branch copies only 10 bytes, but the binary copies 11 bytes for language values 1..4 and stores `out[10]` explicitly. The current implementation uses a single `memcpy(buffer, src, 10);`, so German/French/Spanish/Italian leave the terminator byte untouched.
+  Suggested diff:
+  ```cpp
+  void __cdecl HAROLD::Get_Font_File_(char* buffer) {
+      switch (MOX::_settings.language) {
+      case 1:
+          memcpy(buffer, "fontsg.lbx", 11);
+          return;
+      case 2:
+          memcpy(buffer, "fontsf.lbx", 11);
+          return;
+      case 3:
+          memcpy(buffer, "fontss.lbx", 11);
+          return;
+      case 4:
+          memcpy(buffer, "fontsi.lbx", 11);
+          return;
+      default:
+          memcpy(buffer, "fonts.lbx", 10);
+          return;
+      }
+  }
+  ```
+
+- The language-specific cases therefore do not match the binary’s side effects on `buffer[10]`. In the disassembly, cases 1–4 always execute the final byte copy; the current code never does.
+
+fail
+---------------------------------------
+0x0050D240 COLBLDG::Draw_Current_Selection_
+
+fail
+
+Discrepancies:
+- Cases `-7` and `-3` omit `fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array)` before the subsequent detail rendering. The assembly does this in both cases; current code skips it, changing font state and side effects.
+  ```diff
+  case -7: {
+      fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+      fonts::Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id));
+      y_line_count += 2;
+  +   fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+      Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+      ...
+  }
+
+  case -3: {
+      fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+      BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+      y_line_count += 2;
+  +   fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
+      Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+      ...
+  }
+  ```
+
+- `case -2` has incorrect call ordering. In the binary, the production animation is drawn before `Draw_Cost_And_Time_Info_`; current code matches that part, but unlike the binary it never re-establishes font style 3 before later text because the assembly never changed it after the initial title path structure. This case is borderline tied to the missing explicit state management pattern and should be checked together with the missing style transitions above if nearby helpers depend on current font state.
+  ```diff
+  case -2: {
+      fonts::Set_Font_Style_Shadow_Down_(4, &_l_font_color_array);
+      BILL::Squeeze_Print_(306, (y_line_count * 13 + 21), Selection_Name_(item_id), 156);
+      y_line_count += 2;
+  +   // verify font state against original surrounding sequence if helper expectations require it
+      animate::Draw_(235, 54, COLONY::Prod_Anims_(3, 1, 0));
+      Draw_Cost_And_Time_Info_(COLONY::_colony_handle, item_id, &y_line_count);
+      ...
+  }
+  ```
+
+- Type/calling-convention accuracy issue in race argument sourcing for `Spy_Anim_` / `People_Anim_`: assembly computes the race byte via explicit packed-structure offset arithmetic and zeroes upper bits with `AND EAX,0xffff00ff` before passing it. Current code passes `MOX::_player[MOX::_PLAYER_NUM].race` directly as a `char`, relying on implicit promotion/sign behavior. If `char` is signed on the host compiler, this can sign-extend and differ from the original zero-extended byte argument.
+  ```diff
+  - Draw_Icon_(COLONY::Spy_Anim_(MOX::_player[MOX::_PLAYER_NUM].race));
+  + Draw_Icon_(COLONY::Spy_Anim_((uint8_t)MOX::_player[MOX::_PLAYER_NUM].race));
+
+  - Draw_Icon_(COLONY::People_Anim_(0, 4, MOX::_player[MOX::_PLAYER_NUM].race));
+  + Draw_Icon_(COLONY::People_Anim_(0, 4, (uint8_t)MOX::_player[MOX::_PLAYER_NUM].race));
+  ```
+
+fail
+---------------------------------------
+0050E240 COLBLDG::Update_Fields_
+
+fail
+
+- `_colony_auto_building` is typed as `uint8_t&`, but the binary passes `0x00571F78` to `fields::Add_Radio_Button_Field_`, whose project prototype takes `int16_t*` and whose field logic dereferences/stores through a 16-bit pointer. The current implementation compensates with `(int16_t*)&_colony_auto_building`, which is a strong type mismatch and risks clobbering the neighboring byte at `0x00571F79`. This is directly in the validated function.
+  ```diff
+  - inline uint8_t& _colony_auto_building = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00571F78});
+  + inline int16_t& _colony_auto_building = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F78});
+  ...
+  - _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+  + _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], &_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+  ```
+
+- Because of that incorrect external type, all nearby stores/loads of `_colony_auto_building` in related code become semantically uncertain: the binary field system treats the storage as a 16-bit selection variable, while current code narrows it to 8-bit and relies on casts. This prevents precise validation of side effects for this function without fixing the underlying symbol type first.
+  ```diff
+  - COLBLDG::_colony_auto_building = static_cast<uint8_t>(MOX::_colony[colony_idx].auto_building);
+  + COLBLDG::_colony_auto_building = (int16_t)MOX::_colony[colony_idx].auto_building;
+  ```
+
+---------------------------------------
+0x0050E490 COLBLDG::Build_Queue_Popup_
+
+fail
+
+Discrepancies:
+- `_colony_auto_building` is typed/stored as `uint8_t`, but the assembly stores a 16-bit value (`MOV [0x00571f78],AX`) after masking `EAX` to keep only the low byte. This symbol is used through `int16_t*` in `Add_Radio_Button_Field_`, so the current 8-bit declaration is not faithful and risks adjacent-memory semantics.
+  ```diff
+  - inline uint8_t& _colony_auto_building = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00571F78});
+  + inline int16_t& _colony_auto_building = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F78});
+  ```
+
+- The assignment to `_colony_auto_building` in `Build_Queue_Popup_` uses an 8-bit cast/store, while the binary performs a 16-bit store of zero-extended `auto_building`.
+  ```diff
+  - COLBLDG::_colony_auto_building = static_cast<uint8_t>(MOX::_colony[colony_idx].auto_building);
+  + COLBLDG::_colony_auto_building = (uint8_t)MOX::_colony[colony_idx].auto_building;
+  ```
+
+- The call target for planet-screen loading does not match the hooked address from the supplied disassembly. Binary calls `COLONY::thunk_Load_Planet_Screen_` at `0x004DCA30`, while project code calls `COLONY::Load_Planet_Screen_` hooked at `0x004DCA40`. Since this validation requires exact call flow, this mismatch needs clarification or correction.
+  ```diff
+  - COLONY::Load_Planet_Screen_();
+  + COLONY::thunk_Load_Planet_Screen_();
+  ```
+
+- There is type uncertainty in the random seed handoff: the binary preserves/restores the return value from `Get_Random_Seed_` in a 32-bit register, but the project uses `uint32_t original_seed` while `Set_Random_Seed_` is driven elsewhere by signed/int32-style globals. This may be benign, but with the existing symbol/type inconsistencies above, exact validation cannot be completed confidently.
+  ```diff
+  - uint32_t original_seed = random::Get_Random_Seed_();
+  + int32_t original_seed = random::Get_Random_Seed_();
+  ```
+
+---------------------------------------
+
+---------------------------------------
+
+- There is type uncertainty in the random seed handoff: the binary preserves/restores the return value from `Get_Random_Seed_` in a 32-bit register, but the project uses `uint32_t original_seed` while `Set_Random_Seed_` is driven elsewhere by signed/int32-style globals. This may be benign, but with the existing symbol/type inconsistencies above, exact validation cannot be completed confidently.
+  ```diff
+  - uint32_t original_seed = random::Get_Random_Seed_();
+  + int32_t original_seed = random::Get_Random_Seed_();
+  ```
+
+---------------------------------------
+
+---------------------------------------
