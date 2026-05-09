@@ -116,3 +116,614 @@ fail
   ```
 
 ---------------------------------------
+
+---------------------------------------
+00504D20 MULTPLAY::Load_Multi_Player_Game_Screen_
+
+fail
+
+Discrepancies:
+- Default game-name initialization does not match the binary’s exact memory writes.
+  - Assembly copies 7 bytes from "MooII " including the terminator at `[+6]`, then overwrites `[+5]` with `'a' + (clock() % 0x19)`. Current code uses `strcpy("MooII ")` and only overwrites `[5]`, which likely leaves `[6]` as `'\0'` as intended, but it does not explicitly reflect the byte-for-byte sequence from the disassembly and hides the separate `[4..6]` writes.
+  - Minimal suggested diff snippet:
+    ```cpp
+    memcpy(NETMOX::_net.cur_game_name, "MooII ", 7);
+    NETMOX::_net.cur_game_name[5] = (char)(clock() % 0x19) + 'a';
+    ```
+
+- Invalid-save warning uses a normal local buffer, but the binary uses a 16-bit stack slot at `ESP+0x48` as the eventual return value and also as part of the warning-message scratch area. This stack aliasing is not reproduced, so the current source does not reflect the original stack behavior closely enough for precise restoration.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // preserve original overlapping stack behavior with a shared local layout
+    union {
+        char warning_msg[...];
+        int16_t result_slot;
+    } local;
+    ```
+
+- Unused local stack layout does not match recovered function shape closely enough.
+  - The binary clearly reserves `0xA4` bytes and passes `ESP+0x10`, `ESP+0x18`, and reads `word ptr [ESP+0x48]` after fade-in. Current code replaces this with abstract locals (`dates`, `warning_msg`, `result`) and an unused pointer, which obscures the verified stack aliasing and makes exact validation uncertain.
+  - Minimal suggested diff snippet:
+    ```cpp
+    MOX2::action_func_t auto_func_state;
+    int32_t dates[10];
+    int16_t result;
+    char warning_msg[...];
+    ```
+    with locals arranged/documented to preserve the original overlap.
+
+- The current implementation restores the auto function and clears fields on the early `Add_Load_MP_Game_Screen_Fields_() == 0` path, whereas the assembly returns immediately with `AX = -1` and performs no such cleanup on that branch.
+  - Minimal suggested diff snippet:
+    ```cpp
+    if (!MULTPLAY::Add_Load_MP_Game_Screen_Fields_()) {
+        return -1;
+    }
+    ```
+0x005050D0 MULTPLAY::Draw_Load_MP_Game_Screen_
+
+fail
+
+Discrepancies:
+- The icon selection switch is wrong for save_slot_valid==0. Assembly only reaches the switch when `save_slot_valid[i] != 0`, so case 0 is unreachable and `DX` stays 0 for invalid slots. Current code maps case 0 to icon entry `0x102`, which changes behavior if slot validity typing/contents ever differ.
+  Suggested diff:
+  ```cpp
+  if (MOX::_save_game_description[i].description[0] != '\0') {
+      int16_t icon_entry = 0;
+      switch (MOX::_mp_screen->save_slot_valid[i]) {
+          case 1: icon_entry = 0x103; break;
+          case 2:
+          case 3: icon_entry = 0x104; break;
+      }
+  }
+  ```
+
+- The selected-row glow animation uses implementation-defined signed behavior on `int8_t` fields. Assembly does signed byte comparisons on `sel_anim_frame` (`JL 4`, `JG -2`) after byte adds, and clamps at `4` / `-2`. Current code compares `int8_t` fields directly against negative literals and passes them through implicit promotions; this is likely okay on common compilers but is not precise enough for validation under strict restoration rules.
+  Suggested diff:
+  ```cpp
+  int16_t sel = (int8_t)MOX::_mp_screen->sel_anim_frame;
+  MISC::Increase_Font_Color_Range_(sel);
+  if (sel >= 4) {
+      MOX::_mp_screen->sel_anim_frame = 4;
+      MOX::_mp_screen->sel_anim_active = -1;
+  } else if (sel <= -2) {
+      MOX::_mp_screen->sel_anim_frame = -2;
+      MOX::_mp_screen->sel_anim_active = 1;
+  }
+  MOX::_mp_screen->sel_anim_frame =
+      (int8_t)(MOX::_mp_screen->sel_anim_frame + MOX::_mp_screen->sel_anim_active);
+  ```
+
+- The function relies on pointer arithmetic over `MOX::_save_game_stardates` and `MOX::_save_game_dates` with `reinterpret_cast<void*>`, but the globals are typed inconsistently elsewhere and the assembly clearly copies fixed 25-byte records (`0x19`) from raw byte buffers. This should be expressed as byte-pointer access to avoid type ambiguity during restoration.
+  Suggested diff:
+  ```cpp
+  memcpy(stardate_buf, &MOX::_save_game_stardates[string_buffer_offset], 25);
+  memcpy(date_buf, &MOX::_save_game_dates[string_buffer_offset], 25);
+  ```
+
+---------------------------------------
+005056F0 MULTPLAY::Multi_Player_Screen_
+
+fail
+
+- `done` is not reset each loop iteration. In the binary, `BP` is a per-iteration exit flag that starts at 0 and is only set when the current action exits. The current code initializes `done` once before the loop, which is fragile and does not match the original control flow semantics.
+  ```diff
+  -        bool done = false;
+  +        bool done;
+           while (true) {
+  +            done = false;
+               timer::Mark_Time_();
+  ```
+
+- The auto-function save slot is undersized. The disassembly reserves a local object at `[esp+0x18]` before the loop, and surrounding code uses `MOX2::action_func_t` storage patterns that can be wider than a bare function pointer in this restoration. Using a single pointer type here may not preserve exact stack/state expectations.
+  ```diff
+  -        MOX2::action_func_t saved_auto_func;
+  +        /* use the same saved auto-function storage shape as original */
+  +        /* e.g. dedicated backing storage matching Get_Auto_Function_/Put_Auto_Function_ expectations */
+  ```
+
+- The random suffix generation for `net_game_name[6]` is not a faithful translation. The binary computes a signed absolute-value style transform with `cdq/xor/sub`, then masks with `0x1f`, then re-applies the sign transform before adding `'a'`. Replacing this with `abs((long)clock()) & 0x1F` changes edge-case behavior, especially around signed overflow / `LONG_MIN`.
+  ```diff
+  -                        MOX::_settings.net_game_name[6] = (char)((abs((long)clock()) & 0x1F) + 'a');
+  +                        clock_t t = clock();
+  +                        int32_t v = (int32_t)t;
+  +                        int32_t s = v >> 31;
+  +                        v = ((v ^ s) - s) & 0x1F;
+  +                        v = (v ^ s) - s;
+  +                        MOX::_settings.net_game_name[6] = (char)(v + 'a');
+  ```
+
+- The help-text construction was collapsed to `strcpy/strcat`, which is not equivalent enough for strict restoration. The binary performs explicit length-scans and copies including terminators between three distinct stack buffers; while the visible output is usually the same, this is not an instruction-faithful restoration and obscures original memory behavior.
+  ```diff
+  -                strcpy(msg_header, HAROLD::H_Message_(0x1D));
+  -                strcpy(msg_body, HAROLD::H_Message_(0x1E));
+  -                strcat(msg_body, HAROLD::H_Message_(0x1F));
+  +                /* restore explicit copy/append flow matching original stack-buffer operations */
+  ```
+
+---------------------------------------
+
+005064F0 MULTPLAY::Copy_Modem_Defaults_To_Net_Struct_
+
+fail
+
+Discrepancies:
+- Copies wrong byte of `serial_cfg_ext`.
+  - Assembly copies only byte at offset `+0x10` from base `com_port_index` (`serial_cfg_ext._3_1_` / address `...B0` to `...80`), i.e. the high byte of `serial_cfg_ext`, not byte 0.
+  - Current code writes `*reinterpret_cast<uint8_t*>(&serial_cfg_ext)`, which is offset 0 and incorrect.
+  - Minimal suggested diff:
+    ```cpp
+    reinterpret_cast<uint8_t*>(&NETMOX::_net.modem_settings.serial_cfg_ext)[3] =
+        reinterpret_cast<uint8_t*>(&MOX::_settings.modem_settings.serial_cfg_ext)[3];
+    ```
+
+- Uses incorrect raw 32-bit copy over `parity` region, then redundantly overwrites `data_bits`.
+  - Assembly does `MOV EBP,[settings+8]` then stores to `[net+8]`, which copies 4 bytes starting at `parity`; with packed layout this spans `parity` + low 3 bytes of `data_bits`.
+  - Current code does a 32-bit copy starting at `parity`, but then separately assigns full `data_bits`, which changes the exact write pattern and hides the intended partial-field semantics. This is especially important because the following parity-fix path in decompiler is misleading; the assembly itself only validates parity after the copy.
+  - Minimal suggested diff:
+    ```cpp
+    *reinterpret_cast<uint32_t*>(&NETMOX::_net.modem_settings.parity) =
+        *reinterpret_cast<uint32_t*>(&MOX::_settings.modem_settings.parity);
+    /* remove separate full assignment of data_bits here */
+    ```
+
+- Signed range checks on `com_port_index` are not faithful to source type/behavior.
+  - Assembly loads and compares as signed (`TEST/JL`, `CMP/JLE`) even though the project types `com_port_index` as `uint32_t`. The current code casts unsigned fields to `int32_t`, which works operationally here but strongly suggests the field type is wrong in the project for this usage.
+  - This creates type uncertainty that blocks precise validation.
+  - Minimal suggested diff:
+    ```cpp
+    // likely source type should be signed 32-bit, not uint32_t
+    int32_t com_port_index;
+    ```
+
+- The implementation contains non-source-faithful casting patterns that obscure exact memory semantics.
+  - The explicit `reinterpret_cast<uint8_t*>(&serial_cfg_ext)` and `reinterpret_cast<uint32_t*>(&parity)` are being used against a probably mis-typed packed struct layout. Given the assembly’s exact byte/word accesses, the current restoration is too uncertain to validate as accurate without correcting the underlying field typing/copy intent.
+  - Minimal suggested diff:
+    ```cpp
+    // restore with exact packed-byte semantics or correct source field types first
+    ```
+
+---------------------------------------
+00507510 MULTPLAY::NullModem_Setup_Screen_
+
+fail
+
+Discrepancies:
+- Cancel path restore order/values is semantically wrong in the decompiled logic.
+  - Assembly restores `_net.com_port_index` from the saved original EAX at `[ESP+0x14]` and `_net.baud_rate` from the saved original ECX at `[ESP+0x18]` only when Cancel is pressed.
+  - Current code restores those fields in source order, but because locals are named/typed independently this is only safe if they exactly mirror the saved register values. The bigger issue is the decompiler-derived interpretation around `uVar4/uVar5`; this function should be validated against explicit saved originals, not mixed temporary logic.
+  - Minimal suggested diff snippet:
+    ```cpp
+    int32_t orig_com_port = NETMOX::_net.modem_settings.com_port_index;
+    int32_t orig_baud_rate = NETMOX::_net.modem_settings.baud_rate;
+    ...
+    if (MOX::_mp_screen->field_id_cancel == input_field) {
+        NETMOX::_net.modem_settings.com_port_index = orig_com_port;
+        NETMOX::_net.modem_settings.baud_rate = orig_baud_rate;
+        exit_screen = 1;
+    }
+    ```
+
+- Final copy back to settings uses suspicious type-punning for `serial_cfg_ext`.
+  - Assembly copies:
+    - dword at `_net+0x0C` to `_settings+0x2C` (`data_bits`)
+    - byte at `_net+0x10` to `_settings+0x30` (low byte of `serial_cfg_ext` per actual packed memory access)
+  - Current code writes byte index `[3]` of `serial_cfg_ext`, which does not match the assembly memory write at offset `+0x10`.
+  - Minimal suggested diff snippet:
+    ```cpp
+    MOX::_settings.modem_settings.data_bits = NETMOX::_net.modem_settings.data_bits;
+    *(uint8_t *)&MOX::_settings.modem_settings.serial_cfg_ext =
+        *(uint8_t *)&NETMOX::_net.modem_settings.serial_cfg_ext;
+    ```
+
+- The same offset interpretation issue exists nearby in related modem copy code, increasing uncertainty about the underlying field typing/layout.
+  - This function’s correctness depends on the packed layout of `s_modem_settings`; current nearby code suggests the project may be modeling `parity/data_bits/serial_cfg_ext` inconsistently.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // verify packed layout and use direct byte-at-offset semantics
+    // instead of reinterpret_cast(...)[3]
+    ```
+
+- Use of `reinterpret_cast` here is a code smell for likely incorrect source typing.
+  - Per the assembly, no cast gymnastics are needed; the function is doing raw packed-struct copies at fixed offsets.
+  - Minimal suggested diff snippet:
+    ```cpp
+    *(uint8_t *)&MOX::_settings.modem_settings.serial_cfg_ext =
+        *(uint8_t *)&NETMOX::_net.modem_settings.serial_cfg_ext;
+    ```
+
+---------------------------------------
+0x00507CE0 MULTPLAY::Load_NullModem_Setup_Screen_
+
+fail
+
+Discrepancies:
+- Missing `RUSS::Mox_Update_()` prologue call. The binary starts directly with register saves, zeroing `_g_mp_screen`, and asset loads. Current implementation adds an extra side effect not present in the disassembly.
+- `screen_x`/`screen_y` centering semantics are not matched exactly. The assembly uses signed divide-by-2 with `cdq; sub eax, edx; sar eax,1`, i.e. truncation toward zero for signed values. Current `(640 - width) / 2` and `(480 - height) / 2` rely on C++ division and are usually equivalent for positive values, but the restoration is not exact enough for validation against the binary’s signed arithmetic pattern.
+- The modem-settings tail copy is expressed with suspicious raw casts instead of matching the actual memory operations. The assembly copies 131 bytes from `_settings.modem_settings.cmd_reset` to `_net.modem_settings.cmd_reset`, dwords at offsets `0x0,0x4,0x8,0xC`, and one byte at offset `0x10`. Current code writes `parity` separately, then uses `reinterpret_cast<uint32_t*>`/`uint8_t*` on the struct body. This is not faithful source restoration and obscures the exact accessed fields/offsets.
+- Related type/layout concern: the assembly copies a dword starting at modem-settings offset `0x08` and then one byte at `0x10`. With the current declared struct fields, the implementation should reflect that exact packed memory contract explicitly. The present hand-written field assignment plus raw offset writes leaves uncertainty about intended source types and packed accesses.
+
+---------------------------------------
+0x005080F0 MULTPLAY::Chat_Box_Input_Loop_
+
+fail
+
+Discrepancies:
+- `fields::_continuous_string` is treated as a full pointer lvalue in source, but the assembly only writes its first byte at `0x00572C18` (`MOV byte ptr [0x00572c18],DL/BL`). The current code assigns `fields::_continuous_string = 0;`, which nulls the pointer variable representation, not the pointed buffer byte. That is a semantic mismatch and can break later string handling.
+  Suggested diff snippet:
+  ```cpp
+  -            fields::_continuous_string = 0;
+  +            fields::_continuous_string[0] = '\0';
+  ...
+  -                fields::_continuous_string = 0;
+  +                fields::_continuous_string[0] = '\0';
+  ```
+
+- The type of `fields::_continuous_string` in the project is likely wrong for this binary usage pattern. This function, and the assembly, clearly access a fixed global buffer at `0x00572C18`, not a mutable pointer object. The current declaration invites incorrect assignments like the above and is inconsistent with the binary.
+  Suggested diff snippet:
+  ```cpp
+  -    inline char* _continuous_string = reinterpret_cast<char*>(std::uintptr_t{0x00572c18});
+  +    inline char (&_continuous_string)[/* correct size */] =
+  +        *reinterpret_cast<char(*)[/* correct size */]>(std::uintptr_t{0x00572c18});
+  ```
+  Minimal local workaround if full size is unknown:
+  ```cpp
+  -    inline char* _continuous_string = reinterpret_cast<char*>(std::uintptr_t{0x00572c18});
+  +    inline char* const _continuous_string = reinterpret_cast<char*>(std::uintptr_t{0x00572c18});
+  ```
+
+- Because of the incorrect `_continuous_string` typing/usage, nearby field/input code likely has the same latent mismatch; validation of this function cannot be considered precise enough until that global is represented consistently with the binary’s byte-buffer semantics.
+
+---------------------------------------
+005084E0 FIREPTS::N_Fire_Points_
+
+fail
+
+- The current implementation initializes `result` to `0`, but the disassembly does not initialize the local at all. For `param_2 > 99` and `param_2 != 99`, execution falls through `MOV AX, [ESP+0x2]`, returning uninitialized stack data. The current code instead deterministically returns `0`, which changes behavior.
+  Suggested diff snippet:
+  ```cpp
+  int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2) {
+      int16_t result; // intentionally uninitialized to match original
+      ...
+  }
+  ```
+
+- The source comment acknowledges the bug but the implementation still does not reproduce it, so validation cannot pass as-is. This matters because the function’s exact side effects and return value semantics for out-of-range `param_2` do not match the binary.
+  Suggested diff snippet:
+  ```cpp
+  -    int16_t result = 0; // BUG: Original code uses uninitialized stack memory if param_2 > 99
+  +    int16_t result; // BUG: Original code uses uninitialized stack memory if param_2 > 99
+  ```
+
+---------------------------------------
+0x00508550 FIREPTS::Calc_FP_Offsets_
+
+- Validation is blocked by a directly related dependency mismatch: `FIREPTS::N_Fire_Points_` at `0x005084E0` does not match the binary. `Calc_FP_Offsets_` depends on its exact return semantics for the odd-count/center-point early return path, and the current project initializes the local result to `0` instead of preserving the binary's uninitialized return behavior for `shot_count > 99`.
+  Suggested diff snippet:
+  ```cpp
+  int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2) {
+      int16_t result; // intentionally uninitialized to match original
+      ...
+  }
+  ```
+
+- `attacker_facing_dir` and `target_bearing` are typed too wide/signed in the project interface. The binary reads each as a byte (`MOV AL,[...attacker_facing_dir]`, `MOV DL,[...target_bearing]`) and zero-extends them. Current signature uses `int16_t`, which obscures exact byte semantics and can admit values outside the original domain.
+  Suggested diff snippet:
+  ```cpp
+  -void __cdecl Calc_FP_Offsets_(..., int16_t attacker_facing_dir, int16_t target_bearing, int32_t fp_idx);
+  +void __cdecl Calc_FP_Offsets_(..., uint8_t attacker_facing_dir, uint8_t target_bearing, int16_t fp_idx);
+  ```
+
+- `fp_idx` is typed too wide in the project interface. The assembly reads it as a 16-bit signed value (`MOVSX ... word ptr [...]`), not a 32-bit parameter. Current `int32_t fp_idx` weakens exact wrap/sign behavior.
+  Suggested diff snippet:
+  ```cpp
+  -void __cdecl Calc_FP_Offsets_(..., int32_t fp_idx);
+  +void __cdecl Calc_FP_Offsets_(..., int16_t fp_idx);
+  ```
+
+- `attacker_ship_id` is unused in the implementation and in the binary body. That may be harmless for calling convention compatibility, but combined with the signature/type mismatches above it leaves source-level restoration uncertainty around the true original prototype.
+  Suggested diff snippet:
+  ```cpp
+  // keep parameter for ABI compatibility, but document as unused if retained
+  ```
+
+fail
+---------------------------------------
+00508F00 AIPOWER::Ship_Strength_Vs_Planetary_Shield_
+
+fail
+
+Discrepancies:
+- Strategic branch uses unsigned hull size in source, but assembly does `movsx` from `ship->d.size` before squaring. Current code changes behavior for negative signed values.
+  Suggested diff:
+  ```cpp
+  int32_t size = (int32_t)MOX::_ship[ship_idx].d.size;
+  uint32_t base_strength = (uint32_t)(size * size * 10);
+  ```
+
+- Non-strategic branch halves damage incorrectly for rack type 0 and 2. Assembly halves when `weapon.type == 0 || weapon.type == 2`, but via signed division semantics:
+  - type 0 or 2: `((int16_t)max_damage + sign) >> 1`
+  - other types: full `max_damage`
+  Current code uses unsigned field directly and `/ 2`, which is not instruction-accurate if high bit/sign matters.
+  Suggested diff:
+  ```cpp
+  int16_t weapon_damage;
+  if (rack_type == 0 || rack_type == 2) {
+      int32_t dmg = (int16_t)TECHDATA::_weapons[weapon_type].max_damage;
+      weapon_damage = (int16_t)((dmg - (dmg >> 31)) >> 1); // or equivalent signed-halving form
+  } else {
+      weapon_damage = (int16_t)TECHDATA::_weapons[weapon_type].max_damage;
+  }
+  ```
+
+- `current_count` is treated as `int32_t`/implicitly unsigned in multiplication path, but assembly uses `movsx` from byte at `[ESI+0x1f]`, so it is signed 8-bit. Negative counts would behave differently.
+  Suggested diff:
+  ```cpp
+  int16_t count = MOX::_ship[ship_idx].d.ship_weapon[i].current_count;
+  int32_t weapon_power = damage_vs_shield * count;
+  ```
+
+- Final scaling uses unsigned arithmetic in source:
+  `((uint32_t)current_hits * strengths[i]) / (uint32_t)max_hits`
+  Assembly performs unsigned `div`, but the multiplicand comes from signed-extended `Current_Ship_Hits_` and raw accumulated dword. If `current_hits` is negative, the register value becomes large unsigned after sign-extension into EBP and changes behavior; current C++ does not reflect that exact register-level behavior.
+  Suggested diff:
+  ```cpp
+  uint32_t final_power = (uint32_t)((int32_t)current_hits * (int32_t)strengths[i]) / (uint32_t)(int32_t)max_hits;
+  ```
+  or otherwise document and preserve the exact original signed-to-unsigned transition explicitly.
+
+- Source relies on `MOX::_settings.strategic_combat_flag == 1`, while assembly only checks `!= 1` and falls through to strategic only for exactly 1. This matters if the byte contains other nonzero values.
+  Suggested diff:
+  ```cpp
+  if (MOX::_settings.strategic_combat_flag == 1) {
+  ```
+
+---------------------------------------
+0x00509080 AIPOWER::Missile_Base_Strength_
+
+fail
+
+- Zero-clamp condition is not instruction-faithful. The assembly uses `TEST ECX,ECX` / `JG`, then zeroes for `<= 0`. Current code uses `if (net_damage < 0)`, so an exact zero result is handled by fallthrough rather than the same branch semantics. This is usually numerically equivalent here, but under strict validation it is a control-flow discrepancy.
+  Suggested diff:
+  ```cpp
+  -        if (net_damage < 0) {
+  +        if (net_damage <= 0) {
+              net_damage = 0;
+          }
+  ```
+
+- The damage load/subtract path should preserve explicit signed 16-bit semantics from the binary. Assembly does `MOVSX` from `_weapons[weapon].max_damage` and from shield return `AX`, then subtracts signed 32-bit values. Current source uses the unsigned declared field directly, which hides the recovered register behavior and depends on project typing being correct.
+  Suggested diff:
+  ```cpp
+  -        int32_t net_damage = (int32_t)TECHDATA::_weapons[weapon_idx].max_damage - (int32_t)shield_val;
+  +        int32_t net_damage = (int32_t)(int16_t)TECHDATA::_weapons[weapon_idx].max_damage - (int32_t)shield_val;
+  ```
+
+- Capacity computation should mirror the signed divide shape more explicitly. The binary does `EAX=300; CDQ; IDIV ECX`, then stores quotient in `SI` as signed 16-bit. Current source casts only the divisor to `int16_t` and performs C division on an `int32_t`, which is probably equivalent for normal positive values but does not preserve the exact signed-divide intent closely enough.
+  Suggested diff:
+  ```cpp
+  -        int16_t capacity = 300 / (int16_t)weapon_space;
+  +        int16_t capacity = (int16_t)((int32_t)300 / (int32_t)weapon_space);
+  ```
+
+- Return type/prototype remains uncertain relative to the machine code. The function computes in 32-bit `EAX` and returns unclamped `0xFA00`/product in `EAX`, while parameters are 16-bit. Current `uint32_t` return may be acceptable, but without confirming call-site expectations this remains not strict enough for precise validation. A minimal source note or consistency check with neighboring declarations is needed.
+  Suggested diff:
+  ```cpp
+  // verify canonical return type against original ABI/callers; assembly returns value in EAX after 32-bit math
+  uint32_t __cdecl Missile_Base_Strength_(int16_t player_idx, int16_t target_idx)
+  ```
+
+---------------------------------------
+
+0x00509110 AIPOWER::Phasor_Base_Strength_
+
+fail
+
+- Signed 16-bit semantics are not preserved for `_weapons[weapon_idx].max_damage`. The binary does `MOVSX` from the 16-bit field before arithmetic, but the source uses the declared `uint16_t` field directly via `int32_t max_damage = TECHDATA::_weapons[weapon_idx].max_damage;`. That changes behavior if the stored value has bit 15 set and is not instruction-faithful.
+  Suggested diff:
+  ```cpp
+  -        int32_t max_damage = TECHDATA::_weapons[weapon_idx].max_damage;
+  +        int32_t max_damage = (int32_t)(int16_t)TECHDATA::_weapons[weapon_idx].max_damage;
+  ```
+
+- Zero clamp condition is weaker than the assembly. The binary does `TEST EAX,EAX` / `JG` and zeroes the value for `<= 0`; the source only clamps when `< 0`. Numeric result is usually the same for zero, but under strict control-flow validation this is still a discrepancy.
+  Suggested diff:
+  ```cpp
+  -        if (base_damage < 0) {
+  +        if (base_damage <= 0) {
+              base_damage = 0;
+          }
+  ```
+
+- The heavy-beam ×1.5 computation does not explicitly mirror the signed divide sequence from the assembly (`lea eax,[eax+eax*2] ; cdq ; sub eax,edx ; sar eax,1`), which is a signed `(x*3)/2` shape. Current C++ relies on ordinary arithmetic over a value sourced from an unsigned field, compounding the signedness issue and leaving the exact register behavior under-specified.
+  Suggested diff:
+  ```cpp
+  -        int32_t base_damage = ((max_damage * 3) / 2) - shield_value;
+  +        int32_t base_damage = ((max_damage * 3) / 2) - (int32_t)shield_value;
+  ```
+  and combine with the signed `max_damage` fix above.
+
+---------------------------------------
+
+0x005093F0 AIPOWER::Get_Best_Ship_Shield_Value_
+
+fail
+
+Discrepancies:
+- Default case behavior for `player_idx > 14` is wrong. The assembly returns the uninitialized 16-bit local/stack residue (`MOV AX,[ESP+2]`) after reserving 4 bytes, not a forced zero. Current code changes behavior by deterministically returning `0`.
+  Minimal suggested diff snippet:
+  ```cpp
+  default:
+      // current code wrongly forces 0
+      // assembly returns undefined stack garbage here
+      return local_2; // or equivalent documented UB-preserving form
+  ```
+
+Analysis:
+- Control flow for `player_idx < 8` matches: call `INITSHIP::Best_Ship_Shield_`, sign-extend result, index `_shields`, return `shield_class`.
+- Special cases match exactly:
+  - `8 -> 6`
+  - `9 -> 8`
+  - `10..14 -> 0`
+- Return type/signing is acceptable: function returns `int16_t`, and `shield_class` is loaded as a 16-bit word.
+
+---------------------------------------
+
+0x00509A80 COLBLDG::Calculate_Building_Array_
+
+- Discrepancy: `can_build` is typed as `bool`, but `COLCALC::Colony_Can_Build_Product_` returns `uint8_t` and the assembly explicitly tests `AX == 1` after masking high bits (`AND EAX,0xffff00ff` / `CMP AX,0x1`). This preserves the special return value `2` as “not buildable for this list” unless cheats are enabled. Using `bool` collapses `2` to true and changes behavior.
+  Suggested diff:
+  ```cpp
+  -    bool can_build = COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], building_id);
+  +    uint8_t can_build = COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], building_id);
+  ...
+  -    if ((((_n_building_indexes <= 54) && can_build) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
+  +    if ((((_n_building_indexes <= 54) && can_build == 1) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
+  ```
+
+- Discrepancy: current source accepts buildings when `Colony_Can_Build_Product_` returns `2`; assembly does not. This is a control-flow mismatch, not cosmetic. Examples include products intentionally returning `2` in `colcalc.cpp` (e.g. building IDs 1, 3, 11, 25, 46), which would incorrectly enter `_building_indexes`.
+  Suggested diff:
+  ```cpp
+  -    if ((((_n_building_indexes <= 54) && can_build) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
+  +    if ((((_n_building_indexes <= 54) && can_build == 1) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
+  ```
+
+fail
+
+---------------------------------------
+00509d60 COLBLDG::Draw_Militarys_List_
+
+fail
+
+Discrepancies:
+- Wrong `_field_mode` global address/type binding used by this function.
+  - Disassembly accesses `COLBLDG::_field_mode @ 0x0055AB18`, but the implementation may resolve `_field_mode` ambiguously because `src/game/colony_main.cpp` also uses `_field_mode` unqualified while `colony.h` defines `COLONY::_field_mode @ 0x00559DF4`. This function must use the COLBLDG one at `0x0055AB18`.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // ensure all references in COLBLDG::Draw_Militarys_List_ bind to COLBLDG::_field_mode
+    if (COLBLDG::_field_mode == 1 && mil_idx == COLBLDG::_scanned_prod && ...)
+    ```
+
+- Incorrect ship-design availability check for entries `-100 < mil_idx <= -50`.
+  - Assembly computes a byte from `MOX::_player[MOX::_PLAYER_NUM]` using a nontrivial negative offset and compares it against `2`. The current code comments “TODO: This does not seem to be correct check” and uses `ship_designs[design_idx].size < 2`, which is explicitly uncertain and almost certainly not the original field/logic.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // current check is not validated against the binary
+    // if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size < 2)
+    // replace with the exact field corresponding to the assembly byte load and cmp al, 0x2
+    ```
+
+- Missing/incorrect special-case dimming behavior for auto-design military items.
+  - Assembly only enters the `Auto_Design_Type_` block for exactly `-11, -12, -13, -17, -16`, and if `Auto_Design_Type_` returns 0 it dims immediately for `-11/-12/-13/-17`; for `-16` it additionally checks `Colony_Can_Build_Product_(..., -55)` before deciding.
+  - Current code only dims inside the `mil_idx == -16` nested case, and leaves `-11/-12/-13/-17` undimmed when `Auto_Design_Type_(mil_idx) == 0`, which contradicts the branch to `LAB_00509f2d`.
+  - Minimal suggested diff snippet:
+    ```cpp
+    if (mil_idx == -11 || mil_idx == -12 || mil_idx == -13 || mil_idx == -17 || mil_idx == -16) {
+        if (Auto_Design_Type_(mil_idx) == 0) {
+            if (mil_idx != -16 || !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
+                use_dimmed_font = true;
+            }
+        }
+    }
+    ```
+
+- Potentially incorrect signedness/range expression for the scanned blinking condition.
+  - Binary uses `CMP CX,-0x64` then `JLE` and `CMP CX,-0x32` then `JG`, i.e. strict range `-100 < mil_idx <= -50`. The current source expresses this correctly in practice, but because the function already has a wrong ship-design check and ambiguous `_field_mode`, the surrounding control flow cannot be considered validated with confidence.
+  - Minimal suggested diff snippet:
+    ```cpp
+    const bool is_design_entry = (mil_idx > -100 && mil_idx <= -50);
+    ```
+
+---------------------------------------
+0050B3E0 COLBLDG::Remove_Ships_
+
+- Signature/type mismatch: the binary reads the argument as a byte (`MOV BL, [ESP+10h]`, `TEST BL,BL`), but the project declares/defines it as `int32_t flag`. This can affect caller/callee expectations and obscures the original ABI.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Remove_Ships_(int32_t flag);
+  + void __cdecl Remove_Ships_(char flag);
+  ```
+
+- Condition signedness/threshold mismatch: the assembly deletes only when `prod <= -100` via `CMP BP,-0x64` followed by `JG skip`. The implementation uses `prod <= -100`, which is behaviorally right, but the decompiler prose and current type choices around `flag`/locals make the restoration uncertain enough that the original narrow signed semantics are not preserved explicitly.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Remove_Ships_(int32_t flag) {
+  + void __cdecl Remove_Ships_(char flag) {
+        for (int16_t i = 0; i < 7; ++i) {
+            int16_t prod;
+  -         if (flag == 0) {
+  +         if (flag == '\0') {
+  ```
+
+- There is unnecessary casting around `COLONY::_colony_handle` in the `flag == 0` branch (`static_cast<int16_t>(COLONY::_colony_handle)`). The assembly passes the raw 32-bit handle value, and only the callee parameter type truncates if needed. This is a restoration smell and may hide an external type mismatch.
+  Suggested diff:
+  ```cpp
+  - if (First_Prod_Colony_Queue_Slot_(static_cast<int16_t>(COLONY::_colony_handle), prod) == -1) {
+  + if (First_Prod_Colony_Queue_Slot_(COLONY::_colony_handle, prod) == -1) {
+  ```
+
+fail
+
+---------------------------------------
+
+0050c5c0 COLBLDG::Add_To_Queue_
+
+fail
+
+Discrepancies:
+
+- Wrong handling of `param_1 == -7` due to control-flow collapse.
+  - In assembly, `-7` is accepted immediately at 0x0050c65c/0x0050cb17 and written into `_current_item[q_len]`.
+  - Current code routes `-7` into the population-cap branch group and can never reach that branch, so behavior is altered.
+  - Minimal suggested diff:
+    ```cpp
+    -        } else if (param_1 == -6 || param_1 == -4 || param_1 == -5) {
+    +        } else if (param_1 == -6 || param_1 == -4 || param_1 == -5) {
+                 ...
+    +        } else if (param_1 == -7) {
+    +            add_to_queue = true;
+    ```
+
+- Invalid range check for ship design products `-99..-50`.
+  - Assembly accepts only `-99 <= param_1 <= -50`; otherwise it shows string `0x14c` and returns 0.
+  - Current code uses `else if (param_1 > -50)`, so values `< -99` incorrectly fall through into ship-design logic.
+  - Minimal suggested diff:
+    ```cpp
+    -        } else if (param_1 > -50) {
+    +        } else if (param_1 < -99 || param_1 > -50) {
+    ```
+
+- Incorrect `field_mode == 2` cleanup/recursion behavior when `_active_prod[0] != -1`.
+  - Assembly always clears `_field_mode` and resets the mouse whenever `_field_mode == 2`, regardless of `_active_prod`.
+  - Current code only enters that block when `_field_mode == 2` after a separate `if (_active_prod[0] != -1 && _field_mode != 2)` branch, but misses the exact assembly structure where insert handling and mode-2 handling are sequenced from a common join.
+  - More importantly, assembly also clears `_field_mode` before the recursive `Add_To_Queue_(-10)` attempt in all mode-2 cases.
+  - Minimal suggested diff:
+    ```cpp
+    -        if (COLBLDG::_active_prod[0] != -1 && COLBLDG::_field_mode != 2) {
+    +        if (COLBLDG::_active_prod[0] != -1 && COLBLDG::_field_mode != 2) {
+                 ...
+             }
+    -        
+    -        if (COLBLDG::_field_mode == 2) {
+    +
+    +        if (COLBLDG::_field_mode == 2) {
+                 ...
+             }
+    ```
+    Review the surrounding flow against 0x0050cb22–0x0050cbb2 to preserve exact sequencing.
+
+- Confirmation threshold expression is reversed relative to the assembly’s compare.
+  - Assembly computes `queued(-6,-5,-4) + n_pops + 1`, compares against `Planet_Max_Population_For_Player_`, and confirms when `sum >= max_pop`.
+  - Current code uses `if ((n_terra + n_rad + n_grav + pops + 1) > max_pop)`, missing the equality case.
+  - Minimal suggested diff:
+    ```cpp
+    -            if ((n_terra + n_rad + n_grav + pops + 1) > max_pop) {
+    +            if ((n_terra + n_rad + n_grav + pops + 1) >= max_pop) {
+    ```
+
+- Return-path semantics around special military/custom-design branch are not preserved precisely enough.
+  - Assembly returns `AL=1` early for custom-design launch (`param_1 != -16` with `Auto_Design_Type_ == 0`) and for Doom Star tech-failure help (`param_1 == -16` cannot build `-55`), before any post-processing.
+  - Current high-level code approximates this, but because of the other range/control-flow issues above, the overall function behavior is not reliable enough to validate as matching.
+
+fail
+
+---------------------------------------

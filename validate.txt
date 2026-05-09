@@ -3118,109 +3118,109 @@
 [X] 00504A10 - Load_Choose_Net_Plyrs_Screen_
 [X] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
 [X] 00504C70 - Set_Default_Modem_Settings_
-[ ] 00504D20 - Load_Multi_Player_Game_Screen_
-[ ] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
-[ ] 005050A0 - Get_Valid_MP_Save_Games_
-[ ] 005050D0 - Draw_Load_MP_Game_Screen_
-[ ] 00505510 - Do_Get_Valid_MP_Save_Games_
-[ ] 00505560 - Load_Load_MP_Game_Screen_
-[ ] 005056F0 - Multi_Player_Screen_
-[ ] 00505C10 - Add_MP_Setup_Screen_Fields_
-[ ] 00506010 - Warning_Box_Has_Opponent_Pressed_
-[ ] 00506030 - Draw_MP_Setup_Screen_
-[ ] 005062B0 - Load_MP_Setup_Pictures_
-[ ] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
-[ ] 00506600 - Modem_Setup_Screen_
-[ ] 005069A0 - Add_Modem_Setup_Fields2_
-[ ] 00506BD0 - Add_Modem_Setup_Fields_
-[ ] 00506D40 - Check_Modem_Init_Help_Fields_
-[ ] 00506E50 - Draw_Modem_Setup_Screen_
-[ ] 005072B0 - Print_Modem_Strings_
-[ ] 005073A0 - Load_Modem_Setup_Screen_
-[ ] 00507510 - NullModem_Setup_Screen_
-[ ] 00507720 - Add_NullModem_Setup_Fields_
-[ ] 00507920 - Draw_NullModem_Setup_Screen_
-[ ] 00507CE0 - Load_NullModem_Setup_Screen_
-[ ] 00507E80 - Reload_Generating_Map_Info_
-[ ] 00507EA0 - Reload_Generic_Net_Info_
-[ ] 00507FE0 - Reload_Getting_Data_Info_
-[ ] 00508000 - Reload_Initializing_Net_Info_
-[ ] 00508020 - Reload_Join_Net_Screen_
-[ ] 00508040 - Reload_Sending_Data_Info_
-[ ] 00508080 - Reload_Wait_For_Race_Info_
-[ ] 005080A0 - Reload_Waiting_For_Joiners_Screen_
-[ ] 005080F0 - Chat_Box_Input_Loop_
-[ ] 005081D0 - Set_Multi_Player_Game_Type_
-[ ] 00508300 - Change_MP_Game_Name_
-[ ] 00508480 - Load_FP_Data_From_LBX_
-[ ] 005084E0 - N_Fire_Points_
-[ ] 00508550 - Calc_FP_Offsets_
-[ ] 00508670 - Base_Generic_Dcv_
-[ ] 005086E0 - Base_Generic_Ocv_
-[ ] 00508730 - Satelite_Strength_Vs_Ships_
-[ ] 00508990 - Modified_Weapon_Strength_
-[ ] 00508A50 - Strength_Hits_Modifier_
-[ ] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
-[ ] 00508AB0 - Ship_Strength_Vs_Ships_
-[ ] 00508AD0 - Ship_Strength_Vs_Shield_
-[ ] 00508E10 - Current_Ship_Hits_
-[ ] 00508E50 - Max_Ship_Hits_
-[ ] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
-[ ] 00509080 - Missile_Base_Strength_
-[ ] 00509110 - Phasor_Base_Strength_
-[ ] 005091C0 - Fighter_Garrison_Strength_
-[ ] 005092D0 - Colony_Ground_Strength_Vs_Player_
-[ ] 00509390 - Colony_Space_Strength_Vs_Player_
-[ ] 005093F0 - Get_Best_Ship_Shield_Value_
-[ ] 00509480 - Clear_Last_App_Desc_
-[ ] 005094A0 - Create_Ship_
-[ ] 00509750 - Has_Prod_In_Queue_
-[ ] 00509780 - Get_Setting_Description_String_
-[ ] 005097F0 - Clear_Last_App_Description_String_
-[ ] 00509800 - Get_App_Description_String_
-[ ] 00509880 - Option_String_
-[ ] 00509A30 - N_Prods_In_Colony_Queue_
-[ ] 00509A80 - Calculate_Building_Array_
-[ ] 00509B30 - qsort_building_by_name_
-[ ] 00509B80 - Draw_Buildings_List_
-[ ] 00509C80 - Calc_Font_Off_
-[ ] 00509CA0 - Get_Font_Off_For_Buildings_
-[ ] 00509D60 - Draw_Militarys_List_
-[ ] 00509FA0 - Get_Font_Off_For_Military_
-[ ] 0050A020 - Add_Buildings_Fields_
-[ ] 0050A0B0 - Add_Militarys_Fields_
-[ ] 0050A140 - Load_Build_Anims_
-[ ] 0050A1B0 - Draw_Building_Info_
-[ ] 0050A290 - Print_App_Description_
-[ ] 0050A370 - Draw_Building_Centered_In_Window_
-[ ] 0050A3B0 - Build_Weapon_String_
-[ ] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
-[ ] 0050ABE0 - Draw_Ship_Design_Info_
-[ ] 0050AD10 - Draw_Ship_Design_Info2_
-[ ] 0050AD80 - Draw_Ship_Info_
-[ ] 0050AE50 - Draw_Active_Prod_
-[ ] 0050B090 - Auto_Design_Type_
-[ ] 0050B0C0 - First_Prod_Colony_Queue_Slot_
-[ ] 0050B1C0 - First_Prod_Queue_Slot_
-[ ] 0050B270 - Delete_From_Colony_Queue_
-[ ] 0050B2D0 - Delete_Ship_
-[ ] 0050B300 - Delete_Prod_From_Colony_Queue_
-[ ] 0050B340 - Clear_Colony_Queue_
-[ ] 0050B360 - Squish_Out_Colony_Queue_Slot_
-[ ] 0050B3E0 - Remove_Ships_
-[ ] 0050B4D0 - Do_Exit_Screen_Cleanup_
-[ ] 0050B520 - Evaluate_Input_
-[ ] 0050BFF0 - Do_Draw_Build_Queue_
-[ ] 0050C020 - N_Prods_In_Queue_
-[ ] 0050C050 - Star_N_Uncolonized_Worlds_
-[ ] 0050C0E0 - Calculate_Military_Array_
-[ ] 0050C570 - Something_Behind_Settting_
-[ ] 0050C5C0 - Add_To_Queue_
-[ ] 0050CBD0 - Colbldg_Create_Ship_
-[ ] 0050CC20 - Get_Prod_Queue_Len_
-[ ] 0050CC50 - Delete_From_Queue_
-[ ] 0050CE20 - Defragment_Queue_
-[ ] 0050CE60 - Squish_Out_Queue_Slot_
+[!] 00504D20 - Load_Multi_Player_Game_Screen_
+[X] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
+[X] 005050A0 - Get_Valid_MP_Save_Games_
+[!] 005050D0 - Draw_Load_MP_Game_Screen_
+[X] 00505510 - Do_Get_Valid_MP_Save_Games_
+[X] 00505560 - Load_Load_MP_Game_Screen_
+[!] 005056F0 - Multi_Player_Screen_
+[X] 00505C10 - Add_MP_Setup_Screen_Fields_
+[X] 00506010 - Warning_Box_Has_Opponent_Pressed_
+[X] 00506030 - Draw_MP_Setup_Screen_
+[X] 005062B0 - Load_MP_Setup_Pictures_
+[!] 005064F0 - Copy_Modem_Defaults_To_Net_Struct_
+[X] 00506600 - Modem_Setup_Screen_
+[X] 005069A0 - Add_Modem_Setup_Fields2_
+[X] 00506BD0 - Add_Modem_Setup_Fields_
+[X] 00506D40 - Check_Modem_Init_Help_Fields_
+[X] 00506E50 - Draw_Modem_Setup_Screen_
+[X] 005072B0 - Print_Modem_Strings_
+[X] 005073A0 - Load_Modem_Setup_Screen_
+[!] 00507510 - NullModem_Setup_Screen_
+[X] 00507720 - Add_NullModem_Setup_Fields_
+[X] 00507920 - Draw_NullModem_Setup_Screen_
+[!] 00507CE0 - Load_NullModem_Setup_Screen_
+[X] 00507E80 - Reload_Generating_Map_Info_
+[X] 00507EA0 - Reload_Generic_Net_Info_
+[X] 00507FE0 - Reload_Getting_Data_Info_
+[X] 00508000 - Reload_Initializing_Net_Info_
+[X] 00508020 - Reload_Join_Net_Screen_
+[X] 00508040 - Reload_Sending_Data_Info_
+[X] 00508080 - Reload_Wait_For_Race_Info_
+[X] 005080A0 - Reload_Waiting_For_Joiners_Screen_
+[!] 005080F0 - Chat_Box_Input_Loop_
+[X] 005081D0 - Set_Multi_Player_Game_Type_
+[X] 00508300 - Change_MP_Game_Name_
+[X] 00508480 - Load_FP_Data_From_LBX_
+[!] 005084E0 - N_Fire_Points_
+[!] 00508550 - Calc_FP_Offsets_
+[X] 00508670 - Base_Generic_Dcv_
+[X] 005086E0 - Base_Generic_Ocv_
+[X] 00508730 - Satelite_Strength_Vs_Ships_
+[X] 00508990 - Modified_Weapon_Strength_
+[X] 00508A50 - Strength_Hits_Modifier_
+[X] 00508A90 - Ship_Strength_Vs_Ships_In_Nebula_
+[X] 00508AB0 - Ship_Strength_Vs_Ships_
+[X] 00508AD0 - Ship_Strength_Vs_Shield_
+[X] 00508E10 - Current_Ship_Hits_
+[X] 00508E50 - Max_Ship_Hits_
+[!] 00508F00 - Ship_Strength_Vs_Planetary_Shield_
+[!] 00509080 - Missile_Base_Strength_
+[!] 00509110 - Phasor_Base_Strength_
+[X] 005091C0 - Fighter_Garrison_Strength_
+[X] 005092D0 - Colony_Ground_Strength_Vs_Player_
+[X] 00509390 - Colony_Space_Strength_Vs_Player_
+[!] 005093F0 - Get_Best_Ship_Shield_Value_
+[X] 00509480 - Clear_Last_App_Desc_
+[X] 005094A0 - Create_Ship_
+[X] 00509750 - Has_Prod_In_Queue_
+[X] 00509780 - Get_Setting_Description_String_
+[X] 005097F0 - Clear_Last_App_Description_String_
+[X] 00509800 - Get_App_Description_String_
+[X] 00509880 - Option_String_
+[X] 00509A30 - N_Prods_In_Colony_Queue_
+[!] 00509A80 - Calculate_Building_Array_
+[X] 00509B30 - qsort_building_by_name_
+[X] 00509B80 - Draw_Buildings_List_
+[X] 00509C80 - Calc_Font_Off_
+[X] 00509CA0 - Get_Font_Off_For_Buildings_
+[!] 00509D60 - Draw_Militarys_List_
+[X] 00509FA0 - Get_Font_Off_For_Military_
+[X] 0050A020 - Add_Buildings_Fields_
+[X] 0050A0B0 - Add_Militarys_Fields_
+[X] 0050A140 - Load_Build_Anims_
+[X] 0050A1B0 - Draw_Building_Info_
+[X] 0050A290 - Print_App_Description_
+[X] 0050A370 - Draw_Building_Centered_In_Window_
+[X] 0050A3B0 - Build_Weapon_String_
+[X] 0050A5C0 - Build_Ship_Design_Info_Formatted_Paragraph_
+[X] 0050ABE0 - Draw_Ship_Design_Info_
+[X] 0050AD10 - Draw_Ship_Design_Info2_
+[X] 0050AD80 - Draw_Ship_Info_
+[X] 0050AE50 - Draw_Active_Prod_
+[X] 0050B090 - Auto_Design_Type_
+[X] 0050B0C0 - First_Prod_Colony_Queue_Slot_
+[X] 0050B1C0 - First_Prod_Queue_Slot_
+[X] 0050B270 - Delete_From_Colony_Queue_
+[X] 0050B2D0 - Delete_Ship_
+[X] 0050B300 - Delete_Prod_From_Colony_Queue_
+[X] 0050B340 - Clear_Colony_Queue_
+[X] 0050B360 - Squish_Out_Colony_Queue_Slot_
+[!] 0050B3E0 - Remove_Ships_
+[X] 0050B4D0 - Do_Exit_Screen_Cleanup_
+[X] 0050B520 - Evaluate_Input_
+[X] 0050BFF0 - Do_Draw_Build_Queue_
+[X] 0050C020 - N_Prods_In_Queue_
+[X] 0050C050 - Star_N_Uncolonized_Worlds_
+[X] 0050C0E0 - Calculate_Military_Array_
+[X] 0050C570 - Something_Behind_Settting_
+[!] 0050C5C0 - Add_To_Queue_
+[X] 0050CBD0 - Colbldg_Create_Ship_
+[X] 0050CC20 - Get_Prod_Queue_Len_
+[X] 0050CC50 - Delete_From_Queue_
+[X] 0050CE20 - Defragment_Queue_
+[X] 0050CE60 - Squish_Out_Queue_Slot_
 [ ] 0050CEB0 - Add_Refited_Ship_To_Queue_
 [ ] 0050D070 - Insert_Before_Queue_Slot_
 [ ] 0050D170 - Selection_Name_
