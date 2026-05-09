@@ -3395,92 +3395,92 @@
 [X] 00517B90 - Decode_Pick_Target_Info_
 [X] 00517F50 - Send_You_Are_Target_Info_
 [X] 00518440 - Decode_You_Are_Target_Info_
-[ ] 005187C0 - Russ_Event_Monster_Update_
-[ ] 00518820 - Russ_Change_Relations_
-[ ] 005188B0 - Send_Battle_Results_
-[ ] 00518E30 - Decode_Battle_Results_
-[ ] 005192B0 - Send_Pick_Your_Position_
-[ ] 00519360 - Decode_Pick_Your_Position_
-[ ] 005193A0 - Send_Dragon_Info_
-[ ] 005193F0 - Decode_Dragon_Info_
-[ ] 00519430 - Net_Id_To_Player_Id_
-[ ] 00519470 - Get_Next_AI_Talker_
-[ ] 00519560 - Net_Request_AI_Diplomacy_
-[ ] 005195A0 - Net_May_Begin_AI_Diplomacy_
-[ ] 005195D0 - Net_End_AI_Diplomacy_
-[ ] 005196D0 - Net_Cancel_AI_Diplomacy_Request_
-[ ] 00519720 - Net_Cancel_AI_Diplomacy_Confirmed_
-[ ] 00519730 - No_AI_Diplomacy_Allowed_
-[ ] 00519750 - Net_Request_Human_Diplomacy_
-[ ] 005198D0 - Net_May_Begin_Human_Diplomacy_
-[ ] 00519950 - Allowed_To_Cancel_Human_Diplomacy_
-[ ] 00519960 - Net_Cancel_Human_Diplomacy_Request_
-[ ] 005199C0 - Human_Hit_Next_Turn_
-[ ] 005199D0 - Net_End_Human_Diplomacy_
-[ ] 005199E0 - Human_Diplomat_Says_Wait_
-[ ] 005199F0 - Net_Diplomacy_With_
-[ ] 00519A00 - Human_Requesting_Diplomacy_
-[ ] 00519A80 - Accept_Diplomacy_Request_
-[ ] 00519B80 - Refuse_Diplomacy_Request_
-[ ] 00519C10 - Tell_Diplomacy_Requester_To_Wait_
-[ ] 00519C40 - Humans_Requesting_Diplomacy_
-[ ] 00519C50 - Net_Human_Rejected_Diplomacy_
-[ ] 00519C70 - Decode_Drop_Out_Info_
-[ ] 00519D50 - Human_Abdicates_
-[ ] 00519D60 - Send_Drop_Out_Info_
-[ ] 00519E90 - Human_Surrenders_
-[ ] 00519EA0 - Assign_Home_Star_Names_
-[ ] 00519F90 - Dist_Between_Stars_
-[ ] 00519FE0 - Dist_Between_Points_
-[ ] 0051A010 - Enforce_3_Planet_Minimum_
-[ ] 0051A150 - Enforce_Planet_Abundant_Mineral_Class
-[ ] 0051A170 - Enforce_Climate_
-[ ] 0051A410 - Enforce_Gravity_
-[ ] 0051A490 - Enforce_Medium_Planet_Size_
-[ ] 0051A4D0 - Enforce_Mineral_Richness_
-[ ] 0051A5C0 - Enforce_Planet_Type_
-[ ] 0051A620 - Generate_Home_Worlds_
-[ ] 0051A950 - Build_Home_Star_List_
-[ ] 0051ACA0 - Build_Min_Star_Distances_
-[ ] 0051AD50 - Generate_Orion_
-[ ] 0051AF90 - Get_Orion_Star_Id_
-[ ] 0051B190 - Is_Added_Food_World_
-[ ] 0051B1D0 - Make_One_Planet_
-[ ] 0051B300 - Modify_Home_Worlds_
-[ ] 0051B530 - Set_System_Planet_Artifact_Special
-[ ] 0051B570 - Set_Planet_Size
-[ ] 0051B590 - Ensure_At_Least_1_Food_Planet_
-[ ] 0051B870 - Add_Non_Food_Planets_To_List_
-[ ] 0051B8C0 - Guarantee_A_Planet_At_Min_Dist_
-[ ] 0051BBC0 - Randomize_Home_Worlds_
-[ ] 0051BC20 - Remove_Specials_
-[ ] 0051BC90 - Set_Up_Home_Gen_Msg_
-[ ] 0051BE20 - Star_Has_Planet_
-[ ] 0051BEA0 - Random_Planet_
-[ ] 0051BF50 - Upgrade_Planet_Guarded_By_Monster_
-[ ] 0051C160 - Set_Special_For_Star_Guarded_By_Monster_
-[ ] 0051C2B0 - Usable_Orbit_
-[ ] 0051C3B0 - qsort_star_dist_list_
-[ ] 0051C3E0 - qsort_1_
-[ ] 0051C3F0 - Make_System_Monsters_
-[ ] 0051C6F0 - Farload_
-[ ] 0051C710 - Far_Reload_
-[ ] 0051C730 - Far_Reload_Next_
-[ ] 0051C750 - Far_Reload_Data_
-[ ] 0051C780 - Far_Reload_Next_Data_
-[ ] 0051C7B0 - Farload_Data_Static_
-[ ] 0051C7E0 - Farload_Library_
-[ ] 0051CA30 - Farload_Library_Data_
-[ ] 0051CD30 - Get_Farload_Data_Record_Count_
-[ ] 0051CF00 - Error_Handler_
-[ ] 0051D0F0 - Set_Alternate_Path_
-[ ] 0051D170 - Get_Field_Counter_
-[ ] 0051D180 - Disable_Cancel_
-[ ] 0051D190 - Disable_Mouse_Wait_
-[ ] 0051D1A0 - Enable_Mouse_Wait_
-[ ] 0051D1B0 - Pressed_Mouse_X_
-[ ] 0051D1C0 - Pressed_Mouse_Y_
-[ ] 0051D1D0 - Auto_Input_
+[X] 005187C0 - Russ_Event_Monster_Update_
+[X] 00518820 - Russ_Change_Relations_
+[X] 005188B0 - Send_Battle_Results_
+[!] 00518E30 - Decode_Battle_Results_
+[!] 005192B0 - Send_Pick_Your_Position_
+[X] 00519360 - Decode_Pick_Your_Position_
+[X] 005193A0 - Send_Dragon_Info_
+[X] 005193F0 - Decode_Dragon_Info_
+[X] 00519430 - Net_Id_To_Player_Id_
+[!] 00519470 - Get_Next_AI_Talker_
+[!] 00519560 - Net_Request_AI_Diplomacy_
+[X] 005195A0 - Net_May_Begin_AI_Diplomacy_
+[X] 005195D0 - Net_End_AI_Diplomacy_
+[X] 005196D0 - Net_Cancel_AI_Diplomacy_Request_
+[X] 00519720 - Net_Cancel_AI_Diplomacy_Confirmed_
+[X] 00519730 - No_AI_Diplomacy_Allowed_
+[!] 00519750 - Net_Request_Human_Diplomacy_
+[X] 005198D0 - Net_May_Begin_Human_Diplomacy_
+[X] 00519950 - Allowed_To_Cancel_Human_Diplomacy_
+[X] 00519960 - Net_Cancel_Human_Diplomacy_Request_
+[X] 005199C0 - Human_Hit_Next_Turn_
+[X] 005199D0 - Net_End_Human_Diplomacy_
+[X] 005199E0 - Human_Diplomat_Says_Wait_
+[!] 005199F0 - Net_Diplomacy_With_
+[!] 00519A00 - Human_Requesting_Diplomacy_
+[X] 00519A80 - Accept_Diplomacy_Request_
+[X] 00519B80 - Refuse_Diplomacy_Request_
+[X] 00519C10 - Tell_Diplomacy_Requester_To_Wait_
+[X] 00519C40 - Humans_Requesting_Diplomacy_
+[X] 00519C50 - Net_Human_Rejected_Diplomacy_
+[X] 00519C70 - Decode_Drop_Out_Info_
+[X] 00519D50 - Human_Abdicates_
+[X] 00519D60 - Send_Drop_Out_Info_
+[X] 00519E90 - Human_Surrenders_
+[X] 00519EA0 - Assign_Home_Star_Names_
+[X] 00519F90 - Dist_Between_Stars_
+[X] 00519FE0 - Dist_Between_Points_
+[X] 0051A010 - Enforce_3_Planet_Minimum_
+[X] 0051A150 - Enforce_Planet_Abundant_Mineral_Class
+[!] 0051A170 - Enforce_Climate_
+[X] 0051A410 - Enforce_Gravity_
+[X] 0051A490 - Enforce_Medium_Planet_Size_
+[X] 0051A4D0 - Enforce_Mineral_Richness_
+[!] 0051A5C0 - Enforce_Planet_Type_
+[!] 0051A620 - Generate_Home_Worlds_
+[X] 0051A950 - Build_Home_Star_List_
+[X] 0051ACA0 - Build_Min_Star_Distances_
+[X] 0051AD50 - Generate_Orion_
+[X] 0051AF90 - Get_Orion_Star_Id_
+[X] 0051B190 - Is_Added_Food_World_
+[X] 0051B1D0 - Make_One_Planet_
+[X] 0051B300 - Modify_Home_Worlds_
+[X] 0051B530 - Set_System_Planet_Artifact_Special
+[X] 0051B570 - Set_Planet_Size
+[!] 0051B590 - Ensure_At_Least_1_Food_Planet_
+[X] 0051B870 - Add_Non_Food_Planets_To_List_
+[!] 0051B8C0 - Guarantee_A_Planet_At_Min_Dist_
+[X] 0051BBC0 - Randomize_Home_Worlds_
+[X] 0051BC20 - Remove_Specials_
+[!] 0051BC90 - Set_Up_Home_Gen_Msg_
+[X] 0051BE20 - Star_Has_Planet_
+[X] 0051BEA0 - Random_Planet_
+[X] 0051BF50 - Upgrade_Planet_Guarded_By_Monster_
+[X] 0051C160 - Set_Special_For_Star_Guarded_By_Monster_
+[!] 0051C2B0 - Usable_Orbit_
+[X] 0051C3B0 - qsort_star_dist_list_
+[X] 0051C3E0 - qsort_1_
+[!] 0051C3F0 - Make_System_Monsters_
+[X] 0051C6F0 - Farload_
+[X] 0051C710 - Far_Reload_
+[X] 0051C730 - Far_Reload_Next_
+[X] 0051C750 - Far_Reload_Data_
+[X] 0051C780 - Far_Reload_Next_Data_
+[X] 0051C7B0 - Farload_Data_Static_
+[X] 0051C7E0 - Farload_Library_
+[!] 0051CA30 - Farload_Library_Data_
+[!] 0051CD30 - Get_Farload_Data_Record_Count_
+[X] 0051CF00 - Error_Handler_
+[X] 0051D0F0 - Set_Alternate_Path_
+[X] 0051D170 - Get_Field_Counter_
+[X] 0051D180 - Disable_Cancel_
+[X] 0051D190 - Disable_Mouse_Wait_
+[X] 0051D1A0 - Enable_Mouse_Wait_
+[X] 0051D1B0 - Pressed_Mouse_X_
+[X] 0051D1C0 - Pressed_Mouse_Y_
+[X] 0051D1D0 - Auto_Input_
 [ ] 0051D1E0 - Scan_Field_
 [ ] 0051D290 - Scan_Input_
 [ ] 0051D370 - Add_Hidden_Field_
