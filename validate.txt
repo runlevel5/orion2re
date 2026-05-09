@@ -3059,65 +3059,65 @@
 [X] 004FF2B0 - Next_Missile_Id_
 [X] 004FF300 - On_Combat_Screen_
 [X] 004FF340 - Is_Missile_Target_Alive_
-[ ] 004FF3C0 - Resolve_Missile_
-[ ] 004FFE00 - Find_Weakest_Shield_
-[ ] 004FFE50 - Draw_Fighter_
-[ ] 00500070 - Retarget_Missile_
-[ ] 00500280 - Fighter_Ocv_
-[ ] 005002F0 - Missile_Dcv_
-[ ] 00500410 - Get_Missile_Hits_
-[ ] 00500580 - Fighter_Combat_SFX_
-[ ] 005009A0 - AI_Invasion_Will_Succeed_
-[ ] 00500AC0 - Has_Defending_Troops_
-[ ] 00500B20 - Allocate_Data_Space_
-[ ] 00500C80 - AI_Tech_Select_
-[ ] 00500D00 - Player_Best_Ship_Shield_
-[ ] 00500D30 - Player_Best_Armor_
-[ ] 00500D60 - Player_Best_Computer_
-[ ] 00500D90 - Player_Best_Fuel_
-[ ] 00500DC0 - Player_Best_Planetary_Shield_
-[ ] 00500E00 - Player_Best_Drive_
-[ ] 00500E30 - Player_Best_Rifle_
-[ ] 00500E60 - Player_Best_Personal_Shield_
-[ ] 00500E90 - Compute_AI_Tech_Info_
-[ ] 005014C0 - All_AI_Tech_Select_
-[ ] 00501590 - Get_Max_Technology_Value_
-[ ] 005015F0 - System_Proximity_Count_
-[ ] 00501690 - Apply_Evolutionary_Upgrades_
-[ ] 00501730 - Add_Net_Next_Turn_Fields_
-[ ] 00501900 - Add_Waiting_For_Joiners_Field_
-[ ] 00501950 - Choose_Multi_Network_Game_Screen_
-[ ] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
-[ ] 00501C80 - Choose_Network_Plyrs_Screen_
-[ ] 00501F50 - Add_Choose_Net_Plyrs_Fields_
-[ ] 00502150 - Add_Banner_Field_
-[ ] 00502210 - Draw_Net_Next_Turn_Screen_
-[ ] 00502930 - Draw_Choose_Net_Plyrs_Screen_
-[ ] 00502D70 - Draw_Generic_Net_Info_Screen_
-[ ] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
-[ ] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
-[ ] 005031D0 - Draw_Fill_Seg_
-[ ] 00503260 - Draw_Multi_Player_Banner_
-[ ] 00503390 - Draw_SendGet_Net_Info_Screen_
-[ ] 00503560 - Draw_Wait_For_New_Joiners_Screen_
-[ ] 00503740 - Draw_Wait_For_Race_Info_Screen_
-[ ] 00503920 - Get_Main_Palette_Base_Colors_
-[ ] 005039A0 - Get_Player_Colors_
-[ ] 00503A50 - Hotseat_Select_Player_
-[ ] 00503D30 - Hotseat_Add_Next_Player_Fields_
-[ ] 00503E30 - Hotseat_Draw_Next_Player_
-[ ] 00504190 - Hotseat_Load_Next_Player_
-[ ] 00504300 - Hotseat_Get_Colors_
-[ ] 005043F0 - Hotseat_Get_N_Valid_Players_
-[ ] 00504420 - Hotseat_Print_Player_Data_
-[ ] 00504500 - Fade_In_Function_
-[ ] 00504520 - Hotseat_Set_Next_Player_Status_
-[ ] 005045F0 - Hotseat_Player_Status_
-[ ] 00504640 - Load_Net_Next_Turn_Screen_
-[ ] 00504830 - Get_Net_Next_Turn_Player_Colors_
-[ ] 00504A10 - Load_Choose_Net_Plyrs_Screen_
-[ ] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
-[ ] 00504C70 - Set_Default_Modem_Settings_
+[X] 004FF3C0 - Resolve_Missile_
+[X] 004FFE00 - Find_Weakest_Shield_
+[X] 004FFE50 - Draw_Fighter_
+[X] 00500070 - Retarget_Missile_
+[X] 00500280 - Fighter_Ocv_
+[X] 005002F0 - Missile_Dcv_
+[!] 00500410 - Get_Missile_Hits_
+[X] 00500580 - Fighter_Combat_SFX_
+[X] 005009A0 - AI_Invasion_Will_Succeed_
+[X] 00500AC0 - Has_Defending_Troops_
+[X] 00500B20 - Allocate_Data_Space_
+[X] 00500C80 - AI_Tech_Select_
+[X] 00500D00 - Player_Best_Ship_Shield_
+[X] 00500D30 - Player_Best_Armor_
+[X] 00500D60 - Player_Best_Computer_
+[X] 00500D90 - Player_Best_Fuel_
+[!] 00500DC0 - Player_Best_Planetary_Shield_
+[X] 00500E00 - Player_Best_Drive_
+[X] 00500E30 - Player_Best_Rifle_
+[X] 00500E60 - Player_Best_Personal_Shield_
+[!] 00500E90 - Compute_AI_Tech_Info_
+[!] 005014C0 - All_AI_Tech_Select_
+[X] 00501590 - Get_Max_Technology_Value_
+[X] 005015F0 - System_Proximity_Count_
+[X] 00501690 - Apply_Evolutionary_Upgrades_
+[X] 00501730 - Add_Net_Next_Turn_Fields_
+[X] 00501900 - Add_Waiting_For_Joiners_Field_
+[X] 00501950 - Choose_Multi_Network_Game_Screen_
+[!] 00501B30 - Add_Choose_Multi_Net_Game_Fields_
+[X] 00501C80 - Choose_Network_Plyrs_Screen_
+[X] 00501F50 - Add_Choose_Net_Plyrs_Fields_
+[X] 00502150 - Add_Banner_Field_
+[!] 00502210 - Draw_Net_Next_Turn_Screen_
+[X] 00502930 - Draw_Choose_Net_Plyrs_Screen_
+[X] 00502D70 - Draw_Generic_Net_Info_Screen_
+[X] 00502F10 - thunk_Draw_Generic_Net_Info_Screen_
+[!] 00502F20 - Draw_Choose_Multi_Net_Game_Screen_
+[X] 005031D0 - Draw_Fill_Seg_
+[X] 00503260 - Draw_Multi_Player_Banner_
+[X] 00503390 - Draw_SendGet_Net_Info_Screen_
+[!] 00503560 - Draw_Wait_For_New_Joiners_Screen_
+[!] 00503740 - Draw_Wait_For_Race_Info_Screen_
+[X] 00503920 - Get_Main_Palette_Base_Colors_
+[!] 005039A0 - Get_Player_Colors_
+[X] 00503A50 - Hotseat_Select_Player_
+[X] 00503D30 - Hotseat_Add_Next_Player_Fields_
+[X] 00503E30 - Hotseat_Draw_Next_Player_
+[X] 00504190 - Hotseat_Load_Next_Player_
+[X] 00504300 - Hotseat_Get_Colors_
+[X] 005043F0 - Hotseat_Get_N_Valid_Players_
+[X] 00504420 - Hotseat_Print_Player_Data_
+[X] 00504500 - Fade_In_Function_
+[X] 00504520 - Hotseat_Set_Next_Player_Status_
+[X] 005045F0 - Hotseat_Player_Status_
+[X] 00504640 - Load_Net_Next_Turn_Screen_
+[!] 00504830 - Get_Net_Next_Turn_Player_Colors_
+[X] 00504A10 - Load_Choose_Net_Plyrs_Screen_
+[X] 00504B40 - Load_Choose_Multi_Net_Game_Screen_
+[X] 00504C70 - Set_Default_Modem_Settings_
 [ ] 00504D20 - Load_Multi_Player_Game_Screen_
 [ ] 00504FA0 - Add_Load_MP_Game_Screen_Fields_
 [ ] 005050A0 - Get_Valid_MP_Save_Games_
