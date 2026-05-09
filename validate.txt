@@ -3236,165 +3236,165 @@
 [!] 0050E490 - Build_Queue_Popup_
 [X] 0050E7D0 - Build_Arrays_
 [X] 0050E7E0 - Check_For_Saved_Games_
-[ ] 0050E910 - Do_Load_Game_Popup_
-[ ] 0050EBF0 - Add_Game_Popup_Fields_
-[ ] 0050F4C0 - Bad_Game_File_Message_
-[ ] 0050F530 - Game_Popup_User_Box_
-[ ] 0050F5D0 - Restore_Game_Popup_
-[ ] 0050F630 - Restore_Main_Screen_
-[ ] 0050F650 - Get_File_Date_String_
-[ ] 0050F730 - Get_Game_Popup_Colors_
-[ ] 0050F7D0 - Get_Save_Game_Date_Strings_
-[ ] 0050F8D0 - Get_Star_Date_Strings_
-[ ] 0050FA10 - Load_Month_Names_
-[ ] 0050FC70 - Animate_Game_Popup_Pic_Height_
-[ ] 0050FCA0 - Animate_Game_Popup_
-[ ] 0050FE50 - _Draw_Load_Save_Game_Popup_To_Bitmap_
-[ ] 0050FE70 - _Draw_Main_Game_Popup_To_Bitmap_
-[ ] 0050FEC0 - _Draw_Options_Game_Popup_To_Bitmap_
-[ ] 0050FEE0 - _Draw_Load_Save_Game_Popup_
-[ ] 00510420 - _Draw_Main_Game_Popup_
-[ ] 00510750 - _Draw_Options_Game_Popup_
-[ ] 00510DB0 - _Game_Popup_
-[ ] 00511020 - Allocate_Data_Space_For_Game_Popup_
-[ ] 005110A0 - Do_Main_Game_Popup_
-[ ] 005113F0 - Do_Options_Game_Popup_
-[ ] 00511530 - Do_Save_Game_Popup_
-[ ] 00511930 - Load_Game_Popup_Pictures_
-[ ] 00511C50 - Animate_Game_Popup_Pic_
-[ ] 00511C70 - Set_Current_Game_Option_Flags_
-[ ] 00511E80 - Update_Game_Settings_
-[ ] 00511F40 - Mainmenu_Load_Game_Popup_
-[ ] 00511FF0 - Load_Mainmenu_Load_Game_Popup_
-[ ] 005120E0 - Set_Up_Load_Save_Popup_
-[ ] 00512200 - Active_Save_Slot_Invalid_
-[ ] 00512230 - Remove_Embedded_Special_Codes_
-[ ] 00512290 - Embed_Special_Color_Codes_
-[ ] 00512320 - Auto_Load_Last_Saved_Game_
-[ ] 005123D0 - Auto_Save_Last_Saved_Game_
-[ ] 00512490 - Draw_Popup_Pic1_
-[ ] 005124C0 - Draw_Popup_Pic2_
-[ ] 005124F0 - Set_Music_For_Game_Popup_
-[ ] 00512590 - Set_Sound_For_Game_Popup_
-[ ] 00512640 - Add_Galaxy_Map_Fields_2_
-[ ] 005127B0 - Add_Moveable_Box_Fields_
-[ ] 00512870 - Add_Whole_Window_Field_
-[ ] 005128D0 - Box_Field_Selected_
-[ ] 00512940 - Box_Fleet_Screen_Scanned_Star_
-[ ] 005129D0 - Clear_Moveable_Box_Fields_
-[ ] 00512AB0 - Draw_Galaxy_Map_Box_
-[ ] 00512F40 - Do_Fleet_Screen_Stuff_
-[ ] 00512F90 - Box_Fleet_Screen_Scanned_Ship_
-[ ] 00512FD0 - Do_Officer_Screen_Stuff_
-[ ] 005132B0 - Box_Officer_Screen_Chosen_Star_
-[ ] 005133A0 - Box_Officer_Screen_Scanned_Star_
-[ ] 00513440 - Draw_Moveable_Box_
-[ ] 00513510 - Get_Galaxy_Map_Space_XY_
-[ ] 005135B0 - Get_Galaxy_Map_Star_XY_
-[ ] 00513680 - Move_Box_To_Top_
-[ ] 00513740 - Move_Moveable_Box_
-[ ] 00513B00 - Moveable_Box_Dimensions_
-[ ] 00513B90 - Moveable_Box_Selected_
-[ ] 00513BC0 - N_Moveable_Boxes_Selected_
-[ ] 00513C00 - Restore_Boxes_
-[ ] 00513C80 - Box_Was_Open_
-[ ] 00513C90 - Save_And_Remove_Boxes_
-[ ] 00513D20 - Remove_Box_Check_
-[ ] 00513D30 - Vanish_Fleet_Movement_Box_
-[ ] 00513DB0 - Vanish_System_Display_Box_
-[ ] 00513E10 - Mouse_Within_Fleet_Box_
-[ ] 00513E80 - Load_Netmox_Strings_
-[ ] 00513F40 - Receive_Message_
-[ ] 00513FD0 - Main_Receive_Message_
-[ ] 00514157 - caseD_1
-[ ] 005141EC - caseD_2
-[ ] 00514251 - caseD_3
-[ ] 005142AC - caseD_4
-[ ] 00514300 - caseD_5
-[ ] 0051437F - caseD_6
-[ ] 005143A2 - caseD_7
-[ ] 005143C1 - caseD_8
-[ ] 00514455 - caseD_9
-[ ] 0051446E - caseD_a
-[ ] 0051455F - caseD_b
-[ ] 00514578 - caseD_c
-[ ] 0051458A - caseD_d
-[ ] 005145DB - caseD_e
-[ ] 00514675 - caseD_f
-[ ] 00514695 - caseD_10
-[ ] 005146C4 - caseD_11
-[ ] 00514702 - caseD_12
-[ ] 0051472A - caseD_13
-[ ] 0051473C - caseD_14
-[ ] 005147AC - caseD_15
-[ ] 005147D4 - caseD_16
-[ ] 005147FE - caseD_17
-[ ] 0051482B - caseD_18
-[ ] 00514855 - caseD_19
-[ ] 00514867 - caseD_1a
-[ ] 00514879 - caseD_1b
-[ ] 005149B7 - caseD_1c
-[ ] 00514AAA - caseD_1d
-[ ] 00514ABC - caseD_1f
-[ ] 00514B4E - caseD_20
-[ ] 00514B8B - caseD_21
-[ ] 00514BCE - caseD_22
-[ ] 00514C6A - caseD_23
-[ ] 00514C99 - caseD_24
-[ ] 00514CB6 - caseD_25
-[ ] 00514CE3 - caseD_26
-[ ] 00514D16 - caseD_27
-[ ] 00514D46 - caseD_2a
-[ ] 00514DFB - caseD_2b
-[ ] 00514E3D - caseD_2c
-[ ] 00514E8E - caseD_2d
-[ ] 00514EB8 - caseD_2e
-[ ] 00514F10 - caseD_2f
-[ ] 00514F6B - caseD_30
-[ ] 00514F88 - caseD_31
-[ ] 00514F9A - caseD_32
-[ ] 00514FF2 - caseD_33
-[ ] 0051504D - caseD_34
-[ ] 005150A5 - caseD_35
-[ ] 00515100 - caseD_36
-[ ] 00515119 - caseD_37
-[ ] 0051513C - caseD_38
-[ ] 0051515F - caseD_39
-[ ] 005151BE - caseD_3a
-[ ] 0051520F - caseD_3b
-[ ] 0051523E - caseD_3c
-[ ] 00515264 - caseD_3d
-[ ] 00515282 - caseD_3e
-[ ] 005152AF - caseD_3f
-[ ] 005152C1 - caseD_40
-[ ] 005152D3 - caseD_41
-[ ] 005152E5 - caseD_42
-[ ] 00515308 - caseD_43
-[ ] 00515340 - caseD_44
-[ ] 005153BB - caseD_64
-[ ] 005153D6 - caseD_1e
-[ ] 00515560 - Mox_Send_Message_
-[ ] 00515690 - Exit_With_message2_
-[ ] 005156A0 - Update_
-[ ] 005156C0 - Mox_Net_Update_
-[ ] 00515D10 - Make_Difference_Buffer_
-[ ] 00515F90 - fseek_modem_file_
-[ ] 00515FF0 - fgetc_modem_file_
-[ ] 00516040 - Open_Modem_File_
-[ ] 00516100 - Close_Modem_File_
-[ ] 00516140 - Write_Modem_File_
-[ ] 005161A0 - fwrite_modem_file_
-[ ] 00516220 - Broadcast_Game_Data_Differential_
-[ ] 005166A0 - Decode_Broadcast_Game_Data_Differential_
-[ ] 00516AB0 - Decode_Difference_Buffer_
-[ ] 00516C00 - fread_modem_file_
-[ ] 00516C80 - Send_Game_Orders_
-[ ] 005171C0 - Decode_Game_Orders_
-[ ] 00517700 - Ditch_Leader_
-[ ] 00517750 - Send_Pick_Target_Info_
-[ ] 00517B90 - Decode_Pick_Target_Info_
-[ ] 00517F50 - Send_You_Are_Target_Info_
-[ ] 00518440 - Decode_You_Are_Target_Info_
+[!] 0050E910 - Do_Load_Game_Popup_
+[X] 0050EBF0 - Add_Game_Popup_Fields_
+[X] 0050F4C0 - Bad_Game_File_Message_
+[!] 0050F530 - Game_Popup_User_Box_
+[X] 0050F5D0 - Restore_Game_Popup_
+[X] 0050F630 - Restore_Main_Screen_
+[X] 0050F650 - Get_File_Date_String_
+[X] 0050F730 - Get_Game_Popup_Colors_
+[X] 0050F7D0 - Get_Save_Game_Date_Strings_
+[X] 0050F8D0 - Get_Star_Date_Strings_
+[X] 0050FA10 - Load_Month_Names_
+[X] 0050FC70 - Animate_Game_Popup_Pic_Height_
+[X] 0050FCA0 - Animate_Game_Popup_
+[X] 0050FE50 - _Draw_Load_Save_Game_Popup_To_Bitmap_
+[X] 0050FE70 - _Draw_Main_Game_Popup_To_Bitmap_
+[X] 0050FEC0 - _Draw_Options_Game_Popup_To_Bitmap_
+[!] 0050FEE0 - _Draw_Load_Save_Game_Popup_
+[X] 00510420 - _Draw_Main_Game_Popup_
+[X] 00510750 - _Draw_Options_Game_Popup_
+[!] 00510DB0 - _Game_Popup_
+[X] 00511020 - Allocate_Data_Space_For_Game_Popup_
+[X] 005110A0 - Do_Main_Game_Popup_
+[!] 005113F0 - Do_Options_Game_Popup_
+[!] 00511530 - Do_Save_Game_Popup_
+[X] 00511930 - Load_Game_Popup_Pictures_
+[X] 00511C50 - Animate_Game_Popup_Pic_
+[!] 00511C70 - Set_Current_Game_Option_Flags_
+[X] 00511E80 - Update_Game_Settings_
+[X] 00511F40 - Mainmenu_Load_Game_Popup_
+[X] 00511FF0 - Load_Mainmenu_Load_Game_Popup_
+[X] 005120E0 - Set_Up_Load_Save_Popup_
+[X] 00512200 - Active_Save_Slot_Invalid_
+[!] 00512230 - Remove_Embedded_Special_Codes_
+[X] 00512290 - Embed_Special_Color_Codes_
+[X] 00512320 - Auto_Load_Last_Saved_Game_
+[!] 005123D0 - Auto_Save_Last_Saved_Game_
+[X] 00512490 - Draw_Popup_Pic1_
+[X] 005124C0 - Draw_Popup_Pic2_
+[X] 005124F0 - Set_Music_For_Game_Popup_
+[!] 00512590 - Set_Sound_For_Game_Popup_
+[X] 00512640 - Add_Galaxy_Map_Fields_2_
+[!] 005127B0 - Add_Moveable_Box_Fields_
+[X] 00512870 - Add_Whole_Window_Field_
+[X] 005128D0 - Box_Field_Selected_
+[X] 00512940 - Box_Fleet_Screen_Scanned_Star_
+[X] 005129D0 - Clear_Moveable_Box_Fields_
+[!] 00512AB0 - Draw_Galaxy_Map_Box_
+[X] 00512F40 - Do_Fleet_Screen_Stuff_
+[X] 00512F90 - Box_Fleet_Screen_Scanned_Ship_
+[!] 00512FD0 - Do_Officer_Screen_Stuff_
+[X] 005132B0 - Box_Officer_Screen_Chosen_Star_
+[X] 005133A0 - Box_Officer_Screen_Scanned_Star_
+[X] 00513440 - Draw_Moveable_Box_
+[X] 00513510 - Get_Galaxy_Map_Space_XY_
+[X] 005135B0 - Get_Galaxy_Map_Star_XY_
+[X] 00513680 - Move_Box_To_Top_
+[X] 00513740 - Move_Moveable_Box_
+[X] 00513B00 - Moveable_Box_Dimensions_
+[X] 00513B90 - Moveable_Box_Selected_
+[X] 00513BC0 - N_Moveable_Boxes_Selected_
+[X] 00513C00 - Restore_Boxes_
+[X] 00513C80 - Box_Was_Open_
+[X] 00513C90 - Save_And_Remove_Boxes_
+[X] 00513D20 - Remove_Box_Check_
+[X] 00513D30 - Vanish_Fleet_Movement_Box_
+[X] 00513DB0 - Vanish_System_Display_Box_
+[X] 00513E10 - Mouse_Within_Fleet_Box_
+[X] 00513E80 - Load_Netmox_Strings_
+[X] 00513F40 - Receive_Message_
+[X] 00513FD0 - Main_Receive_Message_
+[X] 00514157 - caseD_1
+[X] 005141EC - caseD_2
+[X] 00514251 - caseD_3
+[X] 005142AC - caseD_4
+[X] 00514300 - caseD_5
+[X] 0051437F - caseD_6
+[X] 005143A2 - caseD_7
+[X] 005143C1 - caseD_8
+[X] 00514455 - caseD_9
+[X] 0051446E - caseD_a
+[X] 0051455F - caseD_b
+[X] 00514578 - caseD_c
+[X] 0051458A - caseD_d
+[X] 005145DB - caseD_e
+[X] 00514675 - caseD_f
+[X] 00514695 - caseD_10
+[X] 005146C4 - caseD_11
+[X] 00514702 - caseD_12
+[X] 0051472A - caseD_13
+[X] 0051473C - caseD_14
+[X] 005147AC - caseD_15
+[X] 005147D4 - caseD_16
+[X] 005147FE - caseD_17
+[X] 0051482B - caseD_18
+[X] 00514855 - caseD_19
+[X] 00514867 - caseD_1a
+[X] 00514879 - caseD_1b
+[X] 005149B7 - caseD_1c
+[X] 00514AAA - caseD_1d
+[X] 00514ABC - caseD_1f
+[X] 00514B4E - caseD_20
+[X] 00514B8B - caseD_21
+[X] 00514BCE - caseD_22
+[X] 00514C6A - caseD_23
+[X] 00514C99 - caseD_24
+[X] 00514CB6 - caseD_25
+[X] 00514CE3 - caseD_26
+[X] 00514D16 - caseD_27
+[X] 00514D46 - caseD_2a
+[X] 00514DFB - caseD_2b
+[X] 00514E3D - caseD_2c
+[X] 00514E8E - caseD_2d
+[X] 00514EB8 - caseD_2e
+[X] 00514F10 - caseD_2f
+[X] 00514F6B - caseD_30
+[X] 00514F88 - caseD_31
+[X] 00514F9A - caseD_32
+[X] 00514FF2 - caseD_33
+[X] 0051504D - caseD_34
+[X] 005150A5 - caseD_35
+[X] 00515100 - caseD_36
+[X] 00515119 - caseD_37
+[X] 0051513C - caseD_38
+[X] 0051515F - caseD_39
+[X] 005151BE - caseD_3a
+[X] 0051520F - caseD_3b
+[X] 0051523E - caseD_3c
+[X] 00515264 - caseD_3d
+[X] 00515282 - caseD_3e
+[X] 005152AF - caseD_3f
+[X] 005152C1 - caseD_40
+[X] 005152D3 - caseD_41
+[X] 005152E5 - caseD_42
+[X] 00515308 - caseD_43
+[X] 00515340 - caseD_44
+[X] 005153BB - caseD_64
+[X] 005153D6 - caseD_1e
+[X] 00515560 - Mox_Send_Message_
+[X] 00515690 - Exit_With_message2_
+[X] 005156A0 - Update_
+[X] 005156C0 - Mox_Net_Update_
+[X] 00515D10 - Make_Difference_Buffer_
+[X] 00515F90 - fseek_modem_file_
+[X] 00515FF0 - fgetc_modem_file_
+[X] 00516040 - Open_Modem_File_
+[X] 00516100 - Close_Modem_File_
+[X] 00516140 - Write_Modem_File_
+[X] 005161A0 - fwrite_modem_file_
+[X] 00516220 - Broadcast_Game_Data_Differential_
+[X] 005166A0 - Decode_Broadcast_Game_Data_Differential_
+[X] 00516AB0 - Decode_Difference_Buffer_
+[X] 00516C00 - fread_modem_file_
+[X] 00516C80 - Send_Game_Orders_
+[X] 005171C0 - Decode_Game_Orders_
+[X] 00517700 - Ditch_Leader_
+[X] 00517750 - Send_Pick_Target_Info_
+[X] 00517B90 - Decode_Pick_Target_Info_
+[X] 00517F50 - Send_You_Are_Target_Info_
+[X] 00518440 - Decode_You_Are_Target_Info_
 [ ] 005187C0 - Russ_Event_Monster_Update_
 [ ] 00518820 - Russ_Change_Relations_
 [ ] 005188B0 - Send_Battle_Results_
