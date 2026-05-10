@@ -23024,3 +23024,2722 @@ Discrepancies:
   ```
 
 ---------------------------------------
+
+---------------------------------------
+0x005277B0 WinMain_Proxy
+
+fail
+
+- Window creation path does not match the disassembly. The binary calls `GetSystemMetrics(1)` and `GetSystemMetrics(0)` and passes style `0x90080008` directly to `CreateWindowExA`. The current implementation instead uses `#ifdef FULSCREEN` / windowed custom sizes (`scaleX + 20`, `scaleY + 40`) and different style flags, which changes behavior and is explicitly not a cosmetic difference.
+  ```cpp
+  // expected shape
+  int nHeight = GetSystemMetrics(SM_CYSCREEN);
+  int nWidth = GetSystemMetrics(SM_CXSCREEN);
+  HWND window_handle = CreateWindowExA(
+      0, "Microprose", "Microprose", 0x90080008,
+      0, 0, nWidth, nHeight, nullptr, nullptr, hInstance, nullptr);
+  ```
+
+- The worker-thread startup call target/value does not match the supplied binary. Assembly calls `__beginthread` with function pointer `0x004c1b20` (`MOX2::thunk_main2_`), but the project calls wrapper `begin_thread(MOX2::main2_, ...)` mapped to `0x00483470`. That is a materially different code target and may change calling behavior.
+  ```cpp
+  // current
+  g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(MOX2::main2_, 0xFFFF, nullptr));
+  // expected binary target is thunk_main2_ / 0x004c1b20
+  ```
+
+- Function naming/signature linkage is inconsistent with the validated symbol set. The binary calls `platform::parse_ten_cmd_parameter` at `0x005276f0`, but the project exposes `Parse_Ten_Cmd_Parameter`. This may be only naming, but without the exact `0x005276f0` implementation/body comparison here, validation remains uncertain for the first call site in this function.
+  ```cpp
+  // verify exact 0x005276f0 body and linkage, not just a renamed helper
+  Parse_Ten_Cmd_Parameter(lpCmdLine);
+  ```
+
+00527960 platform::Create_Direct_Draw
+
+fail
+
+Discrepancies:
+- Cooperative level is wrong for the validated function body. Assembly always calls `SetCooperativeLevel(g_main_window, 0x11)` (`DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN`). Current implementation can call `DDSCL_NORMAL` in the active build path, which changes behavior materially.
+  ```diff
+  - if (g_direct_draw->SetCooperativeLevel(g_main_window, DDSCL_NORMAL) != DD_OK) {
+  + if (g_direct_draw->SetCooperativeLevel(g_main_window, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) != DD_OK) {
+  ```
+
+- Control flow for video mode selection is incorrect. Assembly handles only modes `0`, `2`, and `4`; all other values leave resolution unchanged and fall through. Current code adds mode `5` handling and uses the parameter variable directly rather than the stored signed global load pattern.
+  ```diff
+    switch (video_mode) {
+      case 0: g_screen_res_x = 320; g_screen_res_y = 200; break;
+      case 2: g_screen_res_x = 320; g_screen_res_y = 240; break;
+      case 4: g_screen_res_x = 640; g_screen_res_y = 480; break;
+  -   case 5: g_screen_res_x = scaleX; g_screen_res_y = scaleY; break;
+      default: break;
+    }
+  ```
+
+- Surface creation path is substantially different due to windowed-mode adaptation. Assembly creates a fullscreen flipping primary surface (`dwFlags=0x21`, `ddsCaps=0x218`, `dwBackBufferCount=1`), then retrieves attached backbuffer with `GetAttachedSurface`. Current implementation in active path creates separate windowed surfaces, clippers, temporary conversion surface, and fake backbuffer, which does not match the original function’s side effects or DirectDraw object graph.
+  ```diff
+  - // windowed primary / fake primary / clipper / temp surface path
+  + surface_desc.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
+  + surface_desc.dwBackBufferCount = 1;
+  + surface_desc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+  + g_direct_draw->CreateSurface(&surface_desc, &g_primary_surface, nullptr);
+  + caps.dwCaps = DDSCAPS_BACKBUFFER;
+  + g_primary_surface->GetAttachedSurface(&caps, &g_backbuffer_surface);
+  ```
+
+- Offscreen surface descriptors are wrong. Assembly zeroes the whole `DDSURFACEDESC`, then sets only `dwSize=0x6c`, `dwWidth`, `dwHeight`, `dwFlags=7`, `ddsCaps=0x840`. It does not initialize pixel format fields. Current code sets `DDSD_PIXELFORMAT` and fills 8-bit pixel format fields, changing structure contents passed to `CreateSurface`.
+  ```diff
+    memset(&surface_desc, 0, sizeof(surface_desc));
+    surface_desc.dwSize = sizeof(DDSURFACEDESC);
+  - surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
+  + surface_desc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
+    surface_desc.dwWidth = g_screen_res_x;
+    surface_desc.dwHeight = g_screen_res_y;
+    surface_desc.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+  - surface_desc.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+  - surface_desc.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8 | DDPF_RGB;
+  - surface_desc.ddpfPixelFormat.dwRGBBitCount = 8;
+  ```
+
+- Palette application differs. Assembly always calls `g_primary_surface->SetPalette(g_palette)` after successful `CreatePalette`. Current implementation does this only under `FULLSCREEN`, so the active build path can skip a required side effect.
+  ```diff
+  - #ifdef FULLSCREEN
+    if (g_primary_surface->SetPalette(g_palette) != DD_OK) {
+        return cleanup();
+    }
+  - #endif
+  ```
+
+- Post-initialization global write is wrong. Assembly stores `0` to `video::screen_refresh_flag` at `0x0055B1B4`. Current code stores `0` to `g_frame_count` instead, which is a different global and changes later rendering behavior.
+  ```diff
+  - g_frame_count = 0;
+  + video::screen_refresh_flag = 0;
+  ```
+
+- Error cleanup behavior differs slightly in-window teardown sequencing. Assembly always calls `Prepare_Exit_`, then `DestroyWindow(g_main_window)`, then clears `g_main_window` unconditionally before returning `0`. Current helper guards `DestroyWindow` with a null check; this is usually benign but is still not an exact match for the original control flow.
+  ```diff
+    HWND cleanup() {
+        Prepare_Exit_();
+  -     if (g_main_window != nullptr) {
+  -         DestroyWindow(g_main_window);
+  -         g_main_window = nullptr;
+  -     }
+  +     DestroyWindow(g_main_window);
+  +     g_main_window = nullptr;
+        return nullptr;
+    }
+  ```
+---------------------------------------
+0x00527C80 video::Set_Refresh_Full_
+
+- Discrepancy: the binary performs a 32-bit store to `video::screen_refresh_flag` at `0x0055B1B4` (`MOV [addr], EAX`), while the project types it as `int16_t&` and the function writes `screen_refresh_flag = 0;`, which in C++ is only a 16-bit store. This can affect adjacent packed globals/aliasing and does not match the memory access width from the disassembly.
+  Suggested diff snippet:
+  ```cpp
+  void Set_Refresh_Full_() {
+      *reinterpret_cast<uint32_t*>(&screen_refresh_flag) = 0;
+      screen_dump_flag = 0;
+  }
+  ```
+
+- Discrepancy: the current declaration of `video::screen_refresh_flag` is likely mis-typed for code that relies on exact store width. The decompiler warning about overlapping globals matches the assembly’s full dword write.
+  Suggested diff snippet:
+  ```cpp
+  // investigate surrounding overlapped globals / split fields at 0x0055B1B4
+  inline int16_t& screen_refresh_flag =
+      *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B1B4 });
+  // use a dword alias where exact binary stores must be preserved
+  ```
+
+---------------------------------------
+0x00527CD0 video::Set_Refresh_Stencil_
+
+fail
+
+- `screen_refresh_flag` is declared as `int16_t&` at `0x0055B1B4`, but the disassembly performs `MOV dword ptr [0x0055b1b4],0x3`, i.e. a 32-bit store, not a 16-bit store. The current implementation `screen_refresh_flag = 3;` will normally compile to a 16-bit write and does not match the binary side effect on overlapping adjacent storage.
+  Suggested diff snippet:
+  ```cpp
+  void Set_Refresh_Stencil_() {
+      *reinterpret_cast<uint32_t*>(&screen_refresh_flag) = 3;
+      screen_dump_flag = 0;
+  }
+  ```
+
+- The Ghidra warning about overlapping globals is relevant here, and nearby code already relies on 32-bit stores through `screen_refresh_flag` in the same module (`Restore_Refresh_`, `Set_Refresh_Differential_No_Full_`). That inconsistency indicates the current source type/use is not validated for this function as written.
+  Suggested diff snippet:
+  ```cpp
+  // if kept as overlapping storage, use the same access width consistently
+  *reinterpret_cast<uint32_t*>(&screen_refresh_flag) = 3;
+  ```
+
+---------------------------------------
+0x00527D00 video::Set_Refresh_Differential_
+
+- `screen_refresh_flag` is typed as `int16_t&` in `src/game/video.h`, but the disassembly writes a full 32-bit dword to `0x0055B1B4` (`MOV dword ptr [video::screen_refresh_flag],0x2`). The current implementation uses `screen_refresh_flag = 2;`, which only expresses a 16-bit store in C++ terms and does not match the actual memory access width.
+- The decompiler warning about overlapping globals is relevant here; the current header typing likely hides a larger overlapping object or requires explicit 32-bit access for correctness.
+
+Minimal suggested diff snippet:
+```cpp
+// video.h / video.cpp usage pattern should reflect 32-bit write semantics
+*reinterpret_cast<uint32_t*>(&video::screen_refresh_flag) = 2;
+video::screen_dump_flag = 0;
+```
+
+---------------------------------------
+0x00527E60 platform::Flip_Surface
+
+- Control flow does not match the binary in the current build path: the source is compiled under `#ifdef FULLSCREEN` / `#else`, and the active non-fullscreen branch does not execute the DirectDraw `Flip` loop from the disassembly at all. Instead it calls `Blit_Surface_To_Screen(g_backbuffer_surface)` and then increments `g_frame_count`.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl Flip_Surface()
+  {
+      HRESULT hr;
+      do {
+          hr = g_primary_surface->Flip(NULL, 0);
+          if (hr == DDERR_SURFACELOST)
+              hr = Restore_Surfaces();
+      } while (hr == DDERR_WASSTILLDRAWING);
+
+      if (hr == DD_OK)
+          g_frame_count++;
+  }
+  ```
+
+- Success-side frame counter behavior is wrong for the active path: assembly increments `g_frame_count` only when `Flip` returns `0` (`DD_OK`). Current non-fullscreen implementation increments unconditionally after blitting, so it cannot preserve the original error-path behavior.
+  Suggested diff snippet:
+  ```cpp
+  if (hr == DD_OK) {
+      g_frame_count++;
+  }
+  ```
+
+- The active implementation has different side effects than the binary: the assembly references only `g_primary_surface`, `Restore_Surfaces`, and `g_frame_count`, while the current non-fullscreen path performs a much larger blit pipeline involving other surfaces and window scaling helpers. This is explicitly outside the original memory-access pattern for this function, so the function cannot be validated as matching.
+  Suggested diff snippet:
+  ```cpp
+  // Remove windowed blit path from this function and keep original flip loop here.
+  ```
+
+fail
+
+---------------------------------------
+0x00527EA0 platform::Toggle_Pages_Stub_
+
+- Discrepancy: the spin loop in the implementation does not match the actual assembly semantics. The disassembly loads `g_pending_toggle_pages` once into `AL` after `SendMessageA` returns, then loops on `CMP AL,1 / JZ` without reloading memory, which is an infinite loop if the flag is still 1 at that point. The current code reloads `g_pending_toggle_pages` every iteration with `while (g_pending_toggle_pages)`, which changes control flow and observable behavior.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl platform::Toggle_Pages_Stub_() {
+      g_pending_toggle_pages = true;
+      SendMessageA(g_main_window, 0x401, 0, 0);
+
+      uint8_t al = g_pending_toggle_pages;
+      do {
+      } while (al == 1);
+  }
+  ```
+
+- Discrepancy: the current implementation includes explanatory comments asserting an “original assembly bug” and intentionally preserves a different high-level busy-wait form. For validation, comments are not the issue; the problem is that the code documents behavior different from the machine code and implements the non-matching variant instead of the exact stub semantics.
+
+fail
+
+---------------------------------------
+0x00527ED0 video::Toggle_Pages_
+
+- Discrepancy: `platform::Draw_Cursor_XY` is declared with `int16_t` parameters, but this call site uses explicit `static_cast<int>`s. The assembly pushes sign-extended 32-bit values derived from 16-bit globals (`MOVSX`), while the callee prototype is 16-bit. This is likely a source type/prototype mismatch and should not be validated as-is.
+  Suggested diff snippet:
+  ```cpp
+  // avoid widening casts here; use the native parameter type
+  platform::Draw_Cursor_XY(platform::g_mouse_x, platform::g_mouse_y);
+  ```
+
+- Discrepancy: `setvesa::Add_Square_To_Scan_List_` call uses unnecessary widening casts on `platform::g_mouse_x/y`. Assembly does signed extension at the call boundary from 16-bit globals; the current source bakes in `int` casts, which is a red flag under the restoration rules and may be compensating for surrounding type issues rather than matching source intent.
+  Suggested diff snippet:
+  ```cpp
+  setvesa::Add_Square_To_Scan_List_(
+      platform::g_mouse_x,
+      platform::g_mouse_y,
+      platform::g_mouse_x + 24,
+      platform::g_mouse_y + 24
+  );
+  ```
+
+- Discrepancy: `struct_::Copy_Structure_` size expression is written as `g_screen_res_y * sizeof(s_scan_list_entry)`. The assembly computes `platform::g_screen_res_y << 2` explicitly. While numerically equal with the current packed struct, this validation requires exactness around memory sizing and dependence on packed layout; the implementation is not exact enough to approve without user follow-up.
+  Suggested diff snippet:
+  ```cpp
+  struct_::Copy_Structure_(
+      video::_refresh_scan_list,
+      video::_refresh_stencil_list,
+      platform::g_screen_res_y << 2
+  );
+  ```
+
+fail
+
+---------------------------------------
+0x00528040 video::_Partial_Screen_Dump
+
+fail
+
+Discrepancies:
+- Pitch conversion is not instruction-equivalent. The binary uses signed round-toward-zero division by 4 via:
+  `(x + ((x >> 31) & 3)) >> 2`
+  for both primary and alt pitches. The current code uses plain `/ 4`, which differs for negative values. While the loop is skipped on negative lock failure, this is still not a faithful restoration of the binary’s arithmetic sequence.
+  Suggested diff:
+  ```cpp
+  const int32_t primary_pitch_dwords =
+      (primary_pitch_bytes + ((primary_pitch_bytes >> 31) & 3)) >> 2;
+  const int32_t alt_pitch_dwords =
+      (alt_pitch_bytes + ((alt_pitch_bytes >> 31) & 3)) >> 2;
+  ```
+
+- Global screen height is typed incorrectly for this function’s signed comparisons. The assembly uses `CMP [g_screen_res_y], 0 / JLE` and `CMP [g_screen_res_y], ESI / JG`, i.e. signed logic. In `video.h`, `video::g_screen_res_y` is `uint32_t&`, which is inconsistent and can affect decompiled intent around this function and nearby code.
+  Suggested diff:
+  ```cpp
+  inline int32_t& g_screen_res_y =
+      *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1AC });
+  ```
+
+- The current implementation relies on the wrongly typed unsigned `g_screen_res_y` in:
+  `for (int32_t y = 0; y < g_screen_res_y; ++y)`
+  This is not type-faithful to the signed loop control in the assembly and should be normalized after correcting the global type.
+  Suggested diff:
+  ```cpp
+  if (platform::g_screen_res_y > 0) {
+      for (int32_t y = 0; y < platform::g_screen_res_y; ++y) {
+  ```
+---------------------------------------
+0x00528110 video::Stencil_Out_Background_
+
+- `dwords_per_row` is computed incorrectly. The assembly performs signed rounded division by 4:
+  `((g_screen_res_x + ((g_screen_res_x >> 31) & 3)) >> 2)`, not plain `g_screen_res_x / 4`. While screen width is usually positive, validation must match exact arithmetic and flags-dependent behavior.
+  Suggested diff:
+  ```cpp
+  -        const int32_t dwords_per_row = g_screen_res_x / 4;
+  +        const int32_t dwords_per_row =
+  +            (g_screen_res_x + ((g_screen_res_x >> 31) & 3)) >> 2;
+  ```
+
+- The local type of `offscreen_surface` is less precise than the actual global/source usage. `platform::_offscreen_surface` is a byte pointer in the platform layer and the assembly computes a byte address with `((row_dword_offset + min_x) * 4) + base`, only then passing it as a pointer to `Copy_Dwords_`. Using a `uint32_t*` base and dword indexing happens to produce the same address, but it hides the original memory access pattern and makes validation uncertain given the cross-namespace type mismatch.
+  Suggested diff:
+  ```cpp
+  -        uint32_t* offscreen_surface = reinterpret_cast<uint32_t*>(platform::_offscreen_surface);
+  +        uint8_t* offscreen_surface = platform::_offscreen_surface;
+  ...
+  -                platform::Copy_Dwords_(
+  -                    alt_offscreen_surface + dword_offset,
+  -                    offscreen_surface + dword_offset,
+  +                platform::Copy_Dwords_(
+  +                    alt_offscreen_surface + dword_offset,
+  +                    reinterpret_cast<uint32_t*>(offscreen_surface + dword_offset * 4),
+                       static_cast<uint32_t>(count)
+                    );
+  ```
+fail
+
+---------------------------------------
+0x005281A0 platform::Unlock_Appropriate_Render_Buffer_
+
+fail
+
+- The implementation adds extra side effects for `g_render_buffer == 0` in windowed mode: it calls `Blit_Surface_To_Screen(g_primary_surface)` after `g_primary_surface->Unlock(NULL)`. The disassembly performs only `Unlock` and then branches into HRESULT handling. This changes control flow and observable behavior.
+  Suggested diff snippet:
+  ```cpp
+  case 0:
+      hr = g_primary_surface->Unlock(NULL);
+      break;
+  ```
+
+- The current source leaves `hr` initialized to `S_OK` and has no default path for unexpected `g_render_buffer` values. In the assembly, any value other than 0/1/2 skips the unlock call and falls through with an uninitialized local/ESI-derived return value, effectively not forcing success. The restored code therefore masks invalid state by returning success.
+  Suggested diff snippet:
+  ```cpp
+  HRESULT hr;
+  if (g_render_buffer == 0) {
+      hr = g_primary_surface->Unlock(NULL);
+  } else if (g_render_buffer == 1) {
+      hr = g_offscreen_surface_1->Unlock(NULL);
+  } else if (g_render_buffer == 2) {
+      hr = g_offscreen_surface_2->Unlock(NULL);
+  }
+  ```
+
+- Error handling uses `SUCCEEDED(hr)` instead of the assembly’s exact `if (hr != 0)` / signed ordered comparisons over specific HRESULT constants. While equivalent for the listed negative DirectDraw failures, this is less exact and, combined with the invalid-buffer issue above, contributes to mismatched behavior.
+  Suggested diff snippet:
+  ```cpp
+  if (hr == 0)
+      return hr;
+  ```
+
+---------------------------------------
+0x005282D0 platform::Lock_Appropriate_Render_Buffer
+
+fail
+
+Discrepancies:
+- Uses a local `DDSURFACEDESC desc` instead of the global `DDSURFACEDESC_00578e70`. The assembly writes directly to the fixed global fields at `0x00578E70`, `0x00578E80`, and `0x00578E94`, and returns/exports results through those aliases.
+  ```diff
+  - DDSURFACEDESC desc;
+  - memset(&desc, 0, sizeof(desc));
+  - desc.dwSize = sizeof(desc);
+  - desc.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+  - desc.lPitch = 0;
+  + DDSURFACEDESC_00578e70.lPitch = 0;
+  + DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
+  + DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+  ```
+
+- Wrong handling of invalid `g_render_buffer` values. The assembly does not assign an error code in the default path; it falls through with an uninitialized stack local `hr`, then may still store `_current_locked_page` to `video::_current_video_page` and return `_surface_lock_flag`. The current code forces `DDERR_INVALIDMODE`, changing control flow and side effects.
+  ```diff
+  - default:
+  -     hr = DDERR_INVALIDMODE;
+  -     break;
+  + default:
+  +     break;
+  ```
+
+- Success test is not assembly-accurate. The binary checks `TEST ESI,ESI` / `JZ`, i.e. only exact zero is success. `SUCCEEDED(hr)` accepts positive nonzero HRESULTs, which would diverge.
+  ```diff
+  - if (SUCCEEDED(hr))
+  + if (hr == 0)
+  ```
+
+- Writes result to `g_surface_mem` alias instead of explicitly to `video::_current_video_page`, and sources it from local `desc.lpSurface` instead of global `_current_locked_page`. While same address today, validation must match the fixed memory access pattern.
+  ```diff
+  - g_surface_mem = desc.lpSurface;
+  - return desc.lPitch;
+  + video::_current_video_page = (uint8_t*)_current_locked_page;
+  + return (uint32_t)_surface_lock_flag;
+  ```
+
+- Error mapping/messages are wrong for this function: current code uses "lock ..." strings, but the assembly uses the "Unlock ..." string table for all fatal cases in this function.
+  ```diff
+  - exitm::Exit_With_Message("lock Surface Lost");
+  + exitm::Exit_With_Message("Unlock Surface Lost");
+  ```
+
+- Error classification differs from the binary’s signed-compare tree. Current code handles `DDERR_SURFACEBUSY` as "Invalid Rect" and `DDERR_OUTOFMEMORY` as "Not Locked", but the assembly only special-cases:
+  - `0x80070057` → Invalid Params
+  - `0x8007000E` → Not Locked
+  - `0x88760082` → Invalid Object
+  - `0x887601AE` → Invalid Rect
+  - `0x887601C2` → Surface Lost
+  - `0x8876021C` → Generic
+  Any other nonzero result falls through without message and still updates `video::_current_video_page` / returns `_surface_lock_flag`.
+  ```diff
+  - case DDERR_SURFACEBUSY:
+  -     exitm::Exit_With_Message("lock Invalid Rect");
+  -     return DDERR_SURFACEBUSY;
+  + case DDERR_INVALIDRECT:
+  +     exitm::Exit_With_Message("Unlock Invalid Rect");
+  +     return DDERR_INVALIDRECT;
+  ```
+
+- The function should call `GetSurfaceDesc` and ignore its return value before calling `Lock`; current implementation effectively matches that part structurally, but because it uses the local desc and altered success/error flow, the observable behavior is still not faithful.
+
+---------------------------------------
+0x00528470 platform::Lock_Primary_Surface
+
+- Error filtering is incorrect. The assembly returns the original HRESULT for any of six specific values: `0x80070057`, `0x8007000E`, `0x88760082`, `0x887601AE`, `0x887601C2`, `0x8876021C`; otherwise it returns `0`. The current code zeroes `hr` through three independent `if` statements, making all non-success paths return `0`, including recognized errors.
+  Suggested diff snippet:
+  ```cpp
+  if (hr == DDERR_INVALIDPARAMS ||
+      hr == DDERR_OUTOFMEMORY ||
+      hr == DDERR_SURFACEBUSY ||
+      hr == DDERR_CANTLOCKSURFACE ||
+      hr == DDERR_INVALIDOBJECT ||
+      hr == DDERR_WASSTILLDRAWING) {
+      return (uint32_t)hr;
+  }
+  return 0;
+  ```
+
+- Success path uses a local stack `DDSURFACEDESC`, but the binary uses the global `platform::DDSURFACEDESC_00578e70` and reads back `platform::_current_locked_page` and `platform::_surface_lock_flag` from fixed addresses. For `platform`, this difference is relevant per the exception note and should not be assumed equivalent without preserving the exact global side effects.
+  Suggested diff snippet:
+  ```cpp
+  platform::DDSURFACEDESC_00578e70.dwSize = sizeof(DDSURFACEDESC);
+  platform::DDSURFACEDESC_00578e70.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+  g_primary_surface->GetSurfaceDesc(&platform::DDSURFACEDESC_00578e70);
+  hr = g_primary_surface->Lock(nullptr, &platform::DDSURFACEDESC_00578e70, 0, nullptr);
+  if (hr == DD_OK) {
+      video::_video_memory = (uint32_t*)platform::_current_locked_page;
+      return (uint32_t)platform::_surface_lock_flag;
+  }
+  ```
+
+- Lock flags do not match the disassembly. The binary pushes `0` for the `Lock` flags parameter; current code passes `DDLOCK_SURFACEMEMORYPTR`.
+  Suggested diff snippet:
+  ```cpp
+  hr = g_primary_surface->Lock(nullptr, &platform::DDSURFACEDESC_00578e70, 0, nullptr);
+  ```
+
+- Return type/signedness is suspect. The function returns negative HRESULT values on failure and pitch on success. Declaring it as `uint32_t` obscures the signed HRESULT behavior seen in assembly and decompiler (`int`). Nearby code casts it back to `int32_t`, which is a code smell indicating the interface type is likely wrong.
+  Suggested diff snippet:
+  ```cpp
+  int32_t Lock_Primary_Surface();
+  ```
+
+fail
+
+---------------------------------------
+
+0x00528500 platform::Unlock_Primary_Surface
+
+- Extra side effect in current implementation: the binary performs only `g_primary_surface->Unlock(NULL)` and returns, but the project adds a conditional `Blit_Surface_To_Screen(g_primary_surface)` in windowed builds. This changes control flow and observable behavior for this function.
+  Suggested diff:
+  ```cpp
+  void Unlock_Primary_Surface()
+  {
+      g_primary_surface->Unlock(NULL);
+  }
+  ```
+
+- Build-configuration mismatch risk: because the added blit is under `#ifndef FULLSCREEN`, the function no longer has one binary-stable behavior. The provided disassembly for 0x00528500 has no conditional compilation equivalent and no extra call.
+  Suggested diff:
+  ```cpp
+  void Unlock_Primary_Surface()
+  {
+      g_primary_surface->Unlock(NULL);
+  }
+  ```
+
+fail
+
+---------------------------------------
+0x00528970 video::Add_Dot_To_Scan_List_
+
+fail
+
+Discrepancies:
+- The control flow is wrong for `screen_refresh_flag == 2`. In the binary, the function returns immediately after updating `_refresh_scan_list` and never touches `_refresh_stencil_list`. The current code updates `_refresh_scan_list` first regardless of the flag, then only conditionally skips stencil updates. That is source-level equivalent in result, but not a faithful match to the original branch structure and side-effect ordering required for validation.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl video::Add_Dot_To_Scan_List_(int32_t x_scaled, int32_t y) {
+      int32_t x32 = x_scaled >> 2;
+      int16_t x = (int16_t)x32;
+      s_scan_list_entry* scan_entry = &_refresh_scan_list[y];
+
+      if (screen_refresh_flag == 2) {
+          if (scan_entry->min_x == -1) {
+              scan_entry->min_x = x;
+              scan_entry->max_x = x;
+              return;
+          }
+          if (scan_entry->min_x > x32) {
+              scan_entry->min_x = x;
+              return;
+          }
+          if (scan_entry->max_x < x32) {
+              scan_entry->max_x = x;
+          }
+          return;
+      }
+
+      // existing non-2 path, then stencil update
+  }
+  ```
+
+- The implementation uses explicit casts in comparisons:
+  `x < (int32_t)scan_entry->min_x`, `x > (int32_t)scan_entry->max_x`, etc. The assembly performs signed 16-bit load with `MOVSX` and compares against full 32-bit `ECX`; this indicates the structure fields are signed 16-bit and comparisons should naturally rely on integer promotion, not forced casts. Per project rules, these casts are a type-smell and may hide typing mistakes elsewhere.
+  Suggested diff snippet:
+  ```cpp
+  if (scan_entry->min_x > x32) {
+  ```
+---------------------------------------
+0x00528A30 video::Add_Line_To_Scan_List_
+
+fail
+
+Discrepancies:
+- `screen_refresh_flag` is typed as `int16_t`, but the assembly compares a 32-bit value at `0x0055B1B4` (`CMP dword ptr [0x0055b1b4],0x2`). That means the function’s memory access width does not match the binary.
+  Suggested diff:
+  ```cpp
+  // video.h
+  - inline int16_t& screen_refresh_flag =
+  -     *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B1B4 });
+  + inline int32_t& screen_refresh_flag =
+  +     *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1B4 });
+  ```
+
+- Because of that incorrect global type, `if (screen_refresh_flag == 2)` currently compiles as a 16-bit load/compare in source terms, while the original function performs a 32-bit compare. This is a real behavioral/type-restoration mismatch, not cosmetic.
+  Suggested diff:
+  ```cpp
+  // after fixing the global type, keep:
+  if (screen_refresh_flag == 2) {
+      ...
+  }
+  ```
+
+- Related nearby code strongly suggests the same width problem propagates elsewhere: the project uses `reinterpret_cast<int32_t*>(&video::screen_refresh_flag)` and `reinterpret_cast<uint32_t*>(&video::screen_refresh_flag)` to force 32-bit stores, which is a code smell indicating the declared type is wrong at the source of truth.
+  Suggested diff:
+  ```cpp
+  // video.h
+  - inline int16_t& screen_refresh_flag = ...
+  + inline int32_t& screen_refresh_flag = ...
+  ```
+---------------------------------------
+00528B30 platform::Restore_Surfaces
+
+fail
+
+Discrepancies:
+- Extra surface restores not present in the original function.
+  - Assembly restores exactly 6 surfaces: primary, backbuffer, offscreen 1, offscreen 2, cursor 1, cursor 2.
+  - Current code additionally restores `l_primary_window_surface` and `l_temp_surface`, which changes side effects and call sequence in this function.
+  - Minimal suggested diff:
+    ```cpp
+    HRESULT Restore_Surfaces()
+    {
+        HRESULT hr = S_OK;
+        ...
+    -   if (l_primary_window_surface != NULL)
+    -       l_primary_window_surface->Restore();
+    -
+    -   if (l_temp_surface != NULL)
+    -       l_temp_surface->Restore();
+        g_frame_count = 0;
+        ...
+    }
+    ```
+
+- Null-guarded calls do not match the original unconditional COM dispatches.
+  - The assembly dereferences each global surface pointer and calls vtable slot `+0x6c` unconditionally. Current code wraps every restore in `if (... != NULL)`.
+  - This is a control-flow and fault-behavior difference; original code would crash on null, current code would silently skip.
+  - Minimal suggested diff:
+    ```cpp
+    HRESULT Restore_Surfaces()
+    {
+    -   if (g_primary_surface != NULL)
+    -       g_primary_surface->Restore();
+    +   g_primary_surface->Restore();
+        ...
+    }
+    ```
+
+- Return value provenance is altered under some states.
+  - In assembly, returned `EAX` is always the result of the last original restore call, i.e. `g_cursor_surface_2->Restore()`, preserved across `g_frame_count = 0` and optional `Set_Refresh_Stencil_()`.
+  - With the added restores of `l_primary_window_surface` / `l_temp_surface`, `hr` may still happen to be from cursor 2, but the function performs extra calls after that point, which is not faithful to original sequencing and may invalidate assumptions about side effects surrounding the returned status.
+
+- Type/layout concern around `video::screen_refresh_flag`.
+  - The disassembly compares `dword ptr [0x0055b1b4], 0x3`, while the project types `screen_refresh_flag` as `int16_t`. Nearby code also performs 32-bit writes through `reinterpret_cast<int32_t*>(&video::screen_refresh_flag)`, indicating overlapping state at `0x55B1B4`.
+  - This needs clarification before validation can pass, because the exact 32-bit storage semantics at `0x55B1B4` affect whether `if (video::screen_refresh_flag == 3)` is fully faithful to the original `CMP dword ptr`.
+  - Minimal suggested diff if storage is truly 32-bit:
+    ```cpp
+    -inline int16_t& screen_refresh_flag =
+    -    *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055B1B4 });
+    +inline int32_t& screen_refresh_flag =
+    +    *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1B4 });
+    ```
+  - Or, if overlap is intentional, this function should at least document/handle that the original comparison is 32-bit.
+---------------------------------------
+0x00529140 graphics::Tri_Interlaced_Fill_
+
+fail
+
+Discrepancies:
+- Parameter types for `color1/color2/color3` are too wide in the project. Assembly reads each as `word` then `MOVSX` to 32-bit before packing, so the source type should be byte-sized unsigned color components, not `int16_t`. Current signature can produce different results for values outside `0..255` and hides the original ABI intent.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3);
+  + void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color1, uint8_t color2, uint8_t color3);
+  ```
+
+- Color packing uses explicit casts to `uint32_t`, which changes semantics relative to the assembly when negative `int16_t` values are passed. The binary does signed-extension first, then forms `((c3 << 8) + c2) << 8 + c1`; with current source, negative 16-bit values are converted to large unsigned 32-bit values before shifting. This only becomes harmless if the parameters are corrected to `uint8_t`.
+  Suggested diff:
+  ```cpp
+  - uint32_t color = (static_cast<uint32_t>(color3) << 16) + (static_cast<uint32_t>(color2) << 8) + static_cast<uint32_t>(color1);
+  + uint32_t color = ((color3 << 8) + color2) << 8;
+  + color += color1;
+  ```
+
+- The declaration in `graphics.h` has the same incorrect color parameter widths and should match the restored ABI precisely.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t color1, int16_t color2, int16_t color3);
+  + void __cdecl Tri_Interlaced_Fill_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color1, uint8_t color2, uint8_t color3);
+  ```
+
+---------------------------------------
+0x00529370 graphics::Gray_Scale_Fill_
+
+- `gap` is computed with the wrong sign in source. Assembly does `x1 - x2 + g_screen_res_x - 1`, but the implementation uses `g_screen_res_x - (x2 - x1) - 1`. Those differ by `2 * (x1 - x2)` and change the row advance passed to `shear::Gray_Scale_Fill_Pixels_`.
+  Suggested diff:
+  ```cpp
+  - int32_t gap = platform::g_screen_res_x - (x2 - x1) - 1;
+  + int32_t gap = (int32_t)x1 - (int32_t)x2 + platform::g_screen_res_x - 1;
+  ```
+
+- `shear::Gray_Scale_Fill_Pixels_` does not match the call contract implied by this function. The caller passes the signed row skip in the 3rd argument, but the current callee ignores `y_step_8_8` entirely and walks the buffer linearly, so the fill behavior cannot match the binary for multi-row rectangles.
+  Suggested diff:
+  ```cpp
+  void __cdecl Gray_Scale_Fill_Pixels_(
+      uint8_t* pixels, uint8_t* gray_scale_table, int32_t y_step_8_8,
+      uint32_t pixels_per_row, uint32_t row_count) {
+  -    uint8_t* src = pixels;
+  -    uint8_t* dst = pixels;
+  -    ...
+  -    do {
+  -        uint32_t remaining = bitmap::_bitmap_temp2;
+  -        do {
+  -            const uint32_t index = *src++;
+  -            *dst++ = gray_scale_table[index];
+  -        } while (--remaining != 0);
+  -    } while (--row_count != 0);
+  +    // must advance by y_step_8_8 after each row, not process as one flat span
+  }
+  ```
+
+- The implementation adds unnecessary explicit narrowing casts on the gradient parameters. Assembly passes the raw 32-bit stack args to `Establish_Color_Gradient_`, and truncation happens only by the callee signature; the current casts are a type smell and may hide incorrect external typing.
+  Suggested diff:
+  ```cpp
+  - replace::Establish_Color_Gradient_(static_cast<int16_t>(extra), static_cast<int16_t>(param_7));
+  + replace::Establish_Color_Gradient_(extra, param_7);
+  ```
+
+fail
+
+---------------------------------------
+0x00529660 graphics::Tint_Fill_
+
+- The multicolumn branch does not preserve the tint-color-dependent remap table. In assembly, the left/middle parts always use base `video::_glass_remap_colors`, but the final right partial uses `video::_glass_remap_colors + (tint_color << 8)`. Current code always uses the base table in that branch, so nonzero `tint_color` is wrong on the trailing partial.
+  ```diff
+  -                regions::Tint_Fill_Column_(
+  -                    (uint8_t*)&video::_glass_remap_colors,
+  +                regions::Tint_Fill_Column_(
+  +                    (uint8_t*)&video::_glass_remap_colors + (tint_color << 8),
+                       video::_current_video_page + offset_y + end_col * 4,
+                       end_pixels,
+                       height
+                   );
+  ```
+
+- The trailing partial width is off by one. Assembly computes `EDI = param_3 & 3` and passes that directly as width for the final `Tint_Fill_Column_`; current code uses `x2 & 3` too, which matches that, but the implementation comment claims uncertainty while the real issue is that this width intentionally excludes the aligned case and is controlled by `TEST EDI,EDI`. The function remains behaviorally suspect because the comment indicates a known mismatch and the branch was not restored with confidence.
+
+- The current implementation contains speculative “Potential bug” comments instead of a precise restoration. For validation, that is unresolved uncertainty in the function logic, especially around:
+  - left aligned case (`start_pixels == 4`)
+  - omitted tint table offset in the split-path tail
+  These comments indicate the code was knowingly left as a guess rather than matched to the binary.
+  ```diff
+  -            // Potential bug: original game completely ignores tint_color in this branch, defaulting to offset 0
+  ...
+  -                // Potential bug: start block is skipped if middle_blocks is 0
+  ...
+  -            // Potential bug: end_pixels logic misses the +1 offset, often skipping the final pixel at x2
+  +            // restore exact binary behavior here
+  ```
+
+fail
+
+---------------------------------------
+
+0x00529F40 line::Clip_Line_
+
+fail
+
+Discrepancies:
+- Early-return behavior is wrong after X-clipping. The assembly always proceeds into the Y-phase with `local_8` preserved; it does not jump to final return just because `is_clipped` became 1 after the first phase. Current code does `if (is_clipped) goto result_clipped;`, which skips the horizontal/Y pass entirely.
+  Suggested diff snippet:
+  ```cpp
+  -        if (is_clipped) goto result_clipped;
+  -
+           // Y-clipping logic
+  ```
+- Return value propagation is wrong for lines rejected in the first phase but still passing through the second phase. In the binary, `local_8` is a state flag returned at `0052A1B6`; current code collapses all such cases to `return 1`, losing the preserved flag flow.
+  Suggested diff snippet:
+  ```cpp
+  -    result_clipped:
+  -        return 1;
+  +    result_clipped:
+  +        return is_clipped;
+  ```
+  and keep the final hard failure path only where the assembly sets the local flag immediately before exit.
+- Final Y-phase failure path is not modeled exactly. In assembly, several Y-phase failures set `local_8 = 1` at `0052A1AE` and then return the local; current function merges this with the earlier `result_clipped` label, obscuring distinct control flow and making the first discrepancy observable.
+  Suggested diff snippet:
+  ```cpp
+  +    result_mark_clipped:
+  +        is_clipped = 1;
+  +        return is_clipped;
+  ```
+  then route only true Y-phase reject branches there.
+
+---------------------------------------
+0x0052B280 palette::Set_Palette_Changes_
+
+fail
+
+Discrepancies:
+- Parameter types do not match the binary ABI. The assembly uses `MOVSX` from 16-bit stack arguments for both parameters, but the project declares and defines them as `int32_t`. This changes signed-width semantics and can affect callers passing values outside the 16-bit range.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Set_Palette_Changes_(int32_t start, int32_t end);
+  + void __cdecl Set_Palette_Changes_(int16_t start, int16_t end);
+
+  - void __cdecl Set_Palette_Changes_(int32_t start_index, int32_t end_index) {
+  -     int32_t start = start_index;
+  -     int32_t end = end_index;
+  + void __cdecl Set_Palette_Changes_(int16_t start_index, int16_t end_index) {
+  +     int32_t start = start_index;
+  +     int32_t end = end_index;
+  ```
+
+- Related call sites and signature usage are therefore currently validated only under an implicit narrowing assumption, not the actual function interface recovered from the binary. This must be corrected before the function can be considered an exact match.
+  Suggested diff snippet:
+  ```cpp
+  - palette::Set_Palette_Changes_(0, 0xFF);
+  + palette::Set_Palette_Changes_(0, 255);
+  ```
+  or keep existing literals, but update the callee signature to `int16_t, int16_t` so calls bind to the correct ABI semantics.
+
+---------------------------------------
+0x0052B2B0 palette::Clear_Palette_Changes_
+
+- Parameter types do not match the binary. The disassembly uses `MOVSX` from `word ptr [ESP+4]` and `word ptr [ESP+8]`, so both arguments are 16-bit signed (`short`/`int16_t`), not `int32_t`. Current declaration/definition widens the ABI-visible parameter type and loses the exact signedness/width contract required by the original function.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end);
+  + void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end);
+  ```
+
+- The same type mismatch exists in the implementation signature. While the loop body is structurally equivalent, validation cannot pass with an imprecise function prototype because the original code explicitly sign-extends 16-bit stack arguments before comparison and indexing.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end) {
+  + void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end) {
+        if (start <= end) {
+  -         int count = (int)end - (int)start + 1;
+  +         int32_t count = end - start + 1;
+            s_palette_entry* entry = &video::_current_palette[start];
+  ```
+
+- Related sibling API `Set_Palette_Changes_` appears to be the same pattern at `0x0052B280` and is also currently typed as `int32_t`; this is a nearby indication the palette range APIs were restored with the wrong external argument width. That increases uncertainty for exact matching of this function family.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Set_Palette_Changes_(int32_t start, int32_t end);
+  + void __cdecl Set_Palette_Changes_(int16_t start, int16_t end);
+  ```
+
+fail
+---------------------------------------
+0x0052C0E0 remap::Get_Remap_Palette_Color_
+
+fail
+
+Discrepancies:
+- Parameter type is too wide in the project. Assembly reads only `byte ptr [ESP+4]`, so the ABI-visible argument is an 8-bit value. Current declaration/definition uses `int32_t index`, which is not an exact match and can hide caller/type issues.
+  Suggested diff:
+  ```cpp
+  - uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index);
+  + uint8_t __cdecl Get_Remap_Palette_Color_(uint8_t index);
+  ```
+
+- Implementation contains an explicit narrowing cast that compensates for the wrong signature instead of matching the original function semantics directly.
+  Suggested diff:
+  ```cpp
+  - uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index) {
+  -     // TYPE MISMATCH: index was uint8_t
+  -     return _picture_remap_color_list[static_cast<uint8_t>(index)];
+  - }
+  + uint8_t __cdecl Get_Remap_Palette_Color_(uint8_t index) {
+  +     return _picture_remap_color_list[index];
+  + }
+  ```
+
+- Instruction-level note: `xor eax,eax` before loading `AL` guarantees zero-extension of the return value. While C return type `uint8_t` is appropriate, the current source comment acknowledges a known mismatch rather than restoring the exact source contract.
+---------------------------------------
+0x0052cdb0 strings::String_To_Lower_
+
+fail
+
+Discrepancies:
+- Added null-pointer check not present in assembly. The binary immediately dereferences `param_1` with `CMP byte ptr [EAX],CL`; passing `nullptr` would fault, but current code returns.
+  ```diff
+   void __cdecl String_To_Lower_(char* str) {
+-      if (str == nullptr || *str == '\0') {
++      if (*str == '\0') {
+           return;
+       }
+  ```
+
+- Character comparisons are performed on `char`, which may be signed in C++. The assembly loads the byte and compares its raw 8-bit value against `0x41..0x5A`. Using plain `char` introduces implementation-defined signedness in the relational checks.
+  ```diff
+-      for (int32_t i = 0; str[i] != '\0'; ++i) {
+-          if (str[i] >= 0x41 && str[i] <= 0x5A) {
+-              str[i] += 0x20;
++      for (int32_t i = 0; str[i] != '\0'; ++i) {
++          uint8_t c = (uint8_t)str[i];
++          if (c >= 0x41 && c <= 0x5A) {
++              str[i] = (char)(c + 0x20);
+           }
+       }
+  ```
+---------------------------------------
+0052cde0 strings::Trim_
+
+- The implementation adds a null-pointer guard that is not present in the binary. The original immediately dereferences the argument (`CMP byte ptr [EDX],0x20`), so passing `nullptr` would fault. This changes behavior.
+  ```diff
+   void __cdecl Trim_(char* str) {
+  -    if (!str) {
+  -        return;
+  -    }
+  -
+       int first_non_space = 0;
+  ```
+
+- The left-shift logic does not match the binary’s copy semantics closely enough. The assembly computes the remaining byte count including the null terminator using `repne scasb`, then performs a bulk forward copy (`rep movsd` / `rep movsb`) from `str + first_non_space` back to `str`. The current hand-rolled loop may work in many cases, but it is not the restored implementation style required here and does not reflect the exact memory-copy behavior from the binary.
+  ```diff
+  -    if (first_non_space > 0) {
+  -        int i = 0;
+  -        while (true) {
+  -            str[i] = str[first_non_space + i];
+  -            if (str[i] == ' ') {
+  -                break;
+  -            }
+  -            i++;
+  -        }
+  -    }
+  +    char* src = str + first_non_space;
+  +    size_t n = strlen(src) + 1;
+  +    memcpy(str, src, n);
+  ```
+
+- Because this project is supposed to restore the original C closely and use existing library primitives instead of handwritten loops, the manual leading-shift loop is itself a restoration discrepancy.
+
+fail
+---------------------------------------
+0052CFB5 struct_::Test_Bit_Field_
+
+- Return type mismatch: the binary returns the extracted bit in `EAX`/`AX` and the decompiler signature is `short __cdecl`. The project declares/defines it as `bool`, which introduces C++ boolean normalization at the source level and does not precisely match the original calling contract.
+  Suggested diff:
+  ```cpp
+  - bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index);
+  + int16_t __cdecl Test_Bit_Field_(void* field, int16_t bit_index);
+  ```
+
+- Parameter signedness/type mismatch: the binary loads the second argument with `MOV DX, word ptr [EBP+0xc]`, `MOV BX, word ptr [EBP+0xc]`, `MOV CX, word ptr [EBP+0xc]` and then uses the 16-bit value as raw bits/offset source. Current code uses `uint16_t`, while the recovered signature is `short`; this matters for accurate source restoration and consistency with sibling bitfield helpers (`Clear_Bit_Field_` already uses `int16_t`).
+  Suggested diff:
+  ```cpp
+  - bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index) {
+  + int16_t __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
+  ```
+
+- Unnecessary widened temporaries/retyping obscure the original instruction behavior. The binary effectively does:
+  `byte_ptr = (uint8_t*)field + ((uint16_t)bit >> 3);`
+  `return ((*byte_ptr >> (bit & 7)) & 1);`
+  The current `uint32_t` temporaries plus `reinterpret_cast<const uint8_t*>` are functionally close but not source-accurate for this tiny helper.
+  Suggested diff:
+  ```cpp
+  -     const uint8_t* data = reinterpret_cast<const uint8_t*>(field);
+  -     uint32_t byte_offset = bit_index >> 3;
+  -     uint32_t bit_in_byte = bit_index & 7;
+  -     return (data[byte_offset] >> bit_in_byte) & 1;
+  +     return *((uint8_t*)field + (((uint16_t)bit_index) >> 3)) >> (bit_index & 7) & 1;
+  ```
+
+fail
+---------------------------------------
+
+0052d027 struct_::Clear_Bit_Field_
+
+- Discrepancy: parameter signedness does not match the binary-level contract. The assembly loads the second argument with `MOV DX,[EBP+0xC]`, `MOV BX,[EBP+0xC]`, `MOV CX,[EBP+0xC]` and uses `SHR`/`AND` on the zero-extended 16-bit value, so the effective input is an unsigned 16-bit bit index. The current declaration/definition uses `int16_t`, which is misleading and can propagate incorrect signedness to callers.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index);
+  + void __cdecl Clear_Bit_Field_(void* bit_field, uint16_t bit_index);
+
+  - void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index) {
+  + void __cdecl Clear_Bit_Field_(void* bit_field, uint16_t bit_index) {
+  ```
+- Discrepancy: the implementation adds an explicit cast workaround (`static_cast<uint16_t>(bit_index)`) to recover the binary behavior from the wrong signed type. In this codebase that is a sign the external type is wrong rather than the local arithmetic needing a cast.
+  Suggested diff snippet:
+  ```cpp
+  -     uint16_t unsigned_index = static_cast<uint16_t>(bit_index);
+  -     uint32_t byte_offset = unsigned_index >> 3;
+  -     uint32_t bit_in_byte = unsigned_index & 7;
+  +     uint32_t byte_offset = bit_index >> 3;
+  +     uint32_t bit_in_byte = bit_index & 7;
+  ```
+
+fail
+---------------------------------------
+0x0052d0fa struct_::Copy_Structure_
+
+fail
+
+Discrepancies:
+- Zero-size behavior is not preserved. The assembly enters the odd/odd path solely from pointer parity and executes an unconditional initial `MOVSB`, then decrements `size`. If `size == 0` and both `src` and `dest` are odd, it still copies 1 byte and underflows the local size before the tail copies. Current code adds `if (size > 0)` and suppresses that side effect.
+  Suggested diff snippet:
+  ```cpp
+  -            if ((u_src & 1) != 0) {
+  -                if (size > 0) {
+  -                    *d_ptr++ = *s_ptr++;
+  -                    size--;
+  -                }
+  -            }
+  +            if ((u_src & 1) != 0) {
+  +                *d_ptr++ = *s_ptr++;
+  +                size--;
+  +            }
+  ```
+
+- Parameter type differs from the decompiled/binary intent. The binary treats `src` as mutable `void *` locally and performs parity tests on the raw argument slot; current signature uses `const void*`. While reads-only at source level are fine for normal copying, this makes the source-level contract stricter than the recovered function and obscures the exact raw-pointer semantics being restored.
+  Suggested diff snippet:
+  ```cpp
+  -    void __cdecl Copy_Structure_(void* dest, const void* src, uint32_t size);
+  +    void __cdecl Copy_Structure_(void* dest, void* src, uint32_t size);
+  ```
+
+- The implementation uses typed 32-bit lvalue loads/stores via `reinterpret_cast<uint32_t*>`, which introduces potential UB on unaligned 4-byte accesses when both pointers are even but not 4-byte aligned. The binary explicitly uses `rep movsd` under only 1-bit parity alignment, so exact restoration should use an existing primitive/library form that preserves byte-copy semantics without depending on C++ alignment rules.
+  Suggested diff snippet:
+  ```cpp
+  -            for (uint32_t i = 0; i < dword_count; ++i) {
+  -                *reinterpret_cast<uint32_t*>(d_ptr) = *reinterpret_cast<const uint32_t*>(s_ptr);
+  -                d_ptr += 4;
+  -                s_ptr += 4;
+  -            }
+  +            memcpy(d_ptr, s_ptr, dword_count * 4);
+  +            d_ptr += dword_count * 4;
+  +            s_ptr += dword_count * 4;
+  ```
+---------------------------------------
+0052d360 dos::DIR_
+
+- The current implementation writes past the copied terminator on success. The assembly computes the string length including the NUL (`REPNE SCASB`, `NOT ECX`) and copies exactly that many bytes into `out`; it does not append an extra byte afterward. Current code performs a full NUL-terminated copy in the loop, then does `*dst = '\0';`, producing one extra store beyond the binary’s memory access pattern and potentially overflowing a tight buffer by 1.
+  ```diff
+  -        char* src = _fileinfo.name;
+  -        char* dst = output_name;
+  -        while ((*dst++ = *src++) != '\0');
+  -        *dst = '\0';
+  +        strcpy(output_name, _fileinfo.name);
+  ```
+
+- The global file info type is not validated precisely against the binary input. The supplied binary uses `_finddata32_t` with a 280-byte layout and 32-bit timestamps/sizes at `0x0057B5D8`, but the project binds that address as CRT `_finddata_t`, whose exact layout depends on toolchain/macros. The project file does not define `_USE_32BIT_TIME_T`, so this is a real ABI/layout uncertainty for strict restoration.
+  ```diff
+  -    inline struct _finddata_t& _fileinfo =
+  -            *reinterpret_cast<struct _finddata_t*>(std::uintptr_t{0x0057B5D8});
+  +    inline struct _finddata32_t& _fileinfo =
+  +            *reinterpret_cast<struct _finddata32_t*>(std::uintptr_t{0x0057B5D8});
+  ```
+
+fail
+---------------------------------------
+
+0052D3D0 dos::Time_Stamp_
+
+- Type/layout mismatch on `_fileinfo`: the binary uses `_finddata32_t` with `time_write` at `+0x0C` and pushes address `0x0057B5E4`. The project binds the global as `_finddata_t`, whose layout depends on CRT settings and may not match the required 32-bit Win32 layout exactly.
+  Suggested diff snippet:
+  ```cpp
+  inline struct _finddata32_t& _fileinfo =
+      *reinterpret_cast<struct _finddata32_t*>(std::uintptr_t{0x0057B5D8});
+  ```
+
+- Type mismatch on `_fileinfo.time_write` / `_fileinfo_fi1_username_plus_2`: the binary passes a pointer to a 32-bit `time_t` value to `_ctime` and `_localtime`, but the project exposes this storage as `time_t&`, and in this build `time_t` is not forced to 32-bit. That breaks exact ABI/layout validation.
+  Suggested diff snippet:
+  ```cpp
+  inline __time32_t& _fileinfo_time_write =
+      *reinterpret_cast<__time32_t*>(std::uintptr_t{0x0057B5E4});
+  ```
+
+- CRT entry points do not match exactly: the binary calls `_ctime` and `_localtime`; the project calls `ctime` and `localtime`. With the current `time_t` mismatch, this is not just cosmetic and can change parameter expectations and memory access width.
+  Suggested diff snippet:
+  ```cpp
+  _ctime((time_t *)&_fileinfo_time_write);
+  _tmbuf = _localtime((time_t *)&_fileinfo_time_write);
+  ```
+
+fail
+---------------------------------------
+0x0052D470 random::Random_
+
+- Zero-input behavior does not match the disassembly. The binary executes `DIV ESI` before `TEST ESI,ESI`, so `param_1 == 0` would fault instead of returning `1`. Current source adds a guard and changes observable behavior.
+  ```diff
+   uint32_t __cdecl Random_(uint32_t max_val) {
+  -    if (max_val == 0) {
+  -        return 1;
+  -    }
+  -
+       uint32_t quotient = 0xFFFFFFFF / max_val;
+  ```
+
+- The source comment explicitly documents non-original behavior and confirms the mismatch rather than a restoration choice.
+  ```diff
+  -    // Original assembly performed division before checking for zero, potentially causing a divide-by-zero trap.
+  ```
+
+- Because the function’s first instructions are not matched exactly, validation cannot be accepted under the required instruction-accurate standard, especially for exception/fault behavior on zero input.
+
+fail
+---------------------------------------
+0x0052D4C0 random::Set_Random_Seed_
+
+Discrepancies:
+- Return type does not match the binary. The assembly is a plain `MOV EAX, [ESP+4] ; MOV [_random_seed], EAX ; RET`, so it returns the seed in `EAX`. The project declares and defines it as `void`, which does not preserve the original observable return-value behavior and calling contract.
+- Header/implementation mismatch against decompiler-confirmed signature. The binary/decompiler indicate `uint32_t __cdecl random::Set_Random_Seed_(uint32_t)`, but both `random.h` and `random.cpp` use `void`.
+- This can affect callers that rely on the returned value, even if current in-project callers ignore it.
+
+Minimal suggested diff snippet:
+```cpp
+// random.h
+uint32_t __cdecl Set_Random_Seed_(uint32_t seed);
+
+// random.cpp
+uint32_t __cdecl Set_Random_Seed_(uint32_t seed) {
+    _random_seed = seed;
+    return seed;
+}
+```
+
+fail
+---------------------------------------
+0x0052D5D0 sound::Init_Sound_
+
+fail
+
+Discrepancies:
+- Wrong channel array symbol used in implementation.
+  - Disassembly operates on `sound::_soundChannels @ 0x0057CCB0`, but code uses `sound::_sound_channels`. This is only safe if they are exactly the same alias; from the provided externals the validated symbol is `_soundChannels`, so the implementation is not demonstrably exact from the supplied inputs.
+  - Minimal suggested diff:
+    ```cpp
+    // use the exact validated symbol/alias for this function
+    _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_soundChannels[i].buffer, nullptr);
+    ```
+
+- Missing exact global write on DirectSound buffer creation failure path.
+  - At `0x0052D80E` the assembly stores `EAX` into `sound::_dsound_hr` before testing and branching to release+return. In source, the primary buffer create ignores HRESULT entirely, and while the per-channel path does store `_dsound_hr`, exact failure-side effects for the earlier create are not preserved.
+  - Minimal suggested diff:
+    ```cpp
+    _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_dsound_buffer, nullptr);
+    ```
+
+- Primary buffer play result is not captured.
+  - Assembly calls `_dsound_buffer->Play(0,0,1)` without preserving the result, which is acceptable; however this relies on `_dsound_buffer` being valid after an unchecked create. Source keeps the same unchecked behavior, leaving uncertainty because exact error behavior of the preceding ignored HRESULT is not represented explicitly.
+  - Minimal suggested diff:
+    ```cpp
+    _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_dsound_buffer, nullptr);
+    if (_dsound_buffer != nullptr) {
+        _dsound_buffer->Play(0, 0, DSBPLAY_LOOPING);
+    }
+    ```
+
+- Type/symbol exactness around packed `s_sound_channel` field accesses is obscured by whole-struct `memset`.
+  - Assembly zeros specific packed fields before each channel `Stop`, after the buffer pointer has been written by `CreateSoundBuffer`. Source does `memset(&_sound_channels[i], 0, sizeof(s_sound_channel))` before the create call instead. Final state is similar on success, but the instruction-level ordering and memory writes differ, and with packed odd offsets this should be matched exactly for validation confidence.
+  - Minimal suggested diff:
+    ```cpp
+    _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_soundChannels[i].buffer, nullptr);
+    if (_dsound_hr != DS_OK) { _dsound->Release(); return; }
+    _soundChannels[i].sample_data = nullptr;
+    _soundChannels[i].sample_size = 0;
+    _soundChannels[i].sample_offset = 0;
+    _soundChannels[i].ds_buffer_size = 0;
+    _soundChannels[i].field7_0x13 = 0;
+    _soundChannels[i].write_cursor = 0;
+    _soundChannels[i].flags = 0;
+    _soundChannels[i].buffer->Stop();
+    ```
+
+- Uncertainty around exact WAVEFORMATEX stack layout writes.
+  - Assembly writes only the first 16 bytes relevant to PCM and leaves `cbSize` as zero because of prior zeroing of the local area. Source uses `memset(&wfx, 0, sizeof(WAVEFORMATEX))` then field assignments, which is probably equivalent, but exact stack/local write pattern differs and cannot be instruction-for-instruction validated as-is.
+  - Minimal suggested diff:
+    ```cpp
+    WAVEFORMATEX wfx = {};
+    wfx.wFormatTag = 1;
+    wfx.nChannels = 2;
+    wfx.nSamplesPerSec = 22050;
+    wfx.nAvgBytesPerSec = 88200;
+    wfx.nBlockAlign = 4;
+    wfx.wBitsPerSample = 16;
+    ```
+
+---------------------------------------
+0x0052D8C0 sound::Sound_Timer_Callback_
+
+- Calling convention/signature mismatch: disassembly ends with `RET 0x14`, so this is a callee-cleanup 5-argument callback (`__stdcall`-style). Ghidra decompiler mislabeled it `__cdecl`, but the project implementation already uses `__stdcall`, which is good. However, the hook site casts it through `LPTIMECALLBACK`; validation of this function depends on preserving that exact ABI, and the user-provided decompiler text conflicts with the real calling convention. This requires treating assembly as source of truth.
+  Suggested snippet:
+  ```cpp
+  void __stdcall Sound_Timer_Callback_(uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5);
+  ```
+
+- Control-flow precision concern: the assembly explicitly reloads `_soundTimerStopFlag` into `ECX` after each optional call (`Update_Sound_Channels_`, `Adjust_Settings_`) and uses that reloaded value for the final stop check. The current C++ re-reads the global in each `if`, which is usually equivalent, but exact validation is uncertain without confirming compiler output for the target toolchain/settings. This is especially relevant because those callees may mutate the flag.
+  Suggested snippet:
+  ```cpp
+  uint32_t stopFlag;
+  ...
+  if (_soundOn == 1 && _audioInitialized == 1) {
+      Update_Sound_Channels_();
+  }
+  stopFlag = _soundTimerStopFlag;
+  if (_soundFxActive == 1 && _musicActive == 1) {
+      Adjust_Settings_();
+  }
+  stopFlag = _soundTimerStopFlag;
+  if (stopFlag != 0) {
+      _soundTimerRunning = 0;
+  }
+  ```
+
+fail
+---------------------------------------
+0052DF30 sound::Play_Sound_File_
+
+fail
+
+Discrepancies:
+- `Reset_Sound_Channel_` call argument handling is not faithfully matched. The assembly passes the full 32-bit `channel_idx` from stack, while the current declaration/trampoline uses `int8_t`, and the decompiler’s `unaff_retaddr` is wrong noise. This narrowing is risky and changes calling semantics for out-of-range values.
+  ```cpp
+  - void __cdecl Reset_Sound_Channel_(int8_t channel_idx);
+  + void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
+  ```
+
+- Return value does not match. The assembly returns the original `channel_idx` argument from `[esp+0x11c]`; current code returns `channel_idx`, which is fine only if no narrowing occurred first. Because the function and callee currently use mixed signed widths, this is not fully validated.
+  ```cpp
+  - int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size)
+  + int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size)
+    ...
+  -     return channel_idx;
+  +     return channel_idx; // only correct if channel_idx is preserved as full 32-bit throughout
+  ```
+
+- The third parameter is unused in both assembly and source. That is acceptable for control flow, but without confirming the broader original prototype usage this remains uncertain and prevents clean validation of the exact interface semantics.
+  ```cpp
+   int32_t __cdecl Play_Sound_File_(int32_t channel_idx, void* wave_data, uint32_t size);
+   // size is unused
+  ```
+
+- There is type/field layout uncertainty around `s_sound_channel` packed offsets versus C++ member accesses (`sample_size`, `sample_offset`, `ds_buffer_size`, `flags`, `buffer`). The source appears to rely on the packed project layout, but because `Reset_Sound_Channel_` is currently typed as `int8_t`, full instruction-accurate validation of adjacent channel-field accesses is not reliable until the channel index type mismatch is resolved.
+  ```cpp
+  - void __cdecl Reset_Sound_Channel_(int8_t channel_idx)
+  + void __cdecl Reset_Sound_Channel_(int32_t channel_idx)
+  ```
+---------------------------------------
+0052E880 allocate::Allocate_Space_
+
+fail
+
+Discrepancies:
+- The fallback path is effectively unreachable in the current project because `Allocate_Far_Space_` does not match the call contract implied by this function. In assembly, `Allocate_Space_` tests the return of `Allocate_Far_Space_` and only then falls back to `Allocate_Dos_Space_`. Current `Allocate_Far_Space_` exits on failure instead of returning `nullptr`, so `Allocate_Space_` can never execute its second allocation attempt.
+  Suggested diff snippet:
+  ```cpp
+  void* __cdecl Allocate_Far_Space_(size_t size) {
+      void* ptr = ::_malloc(size);
+      return ptr;
+  }
+  ```
+
+- The current `Allocate_Dos_Space_` implementation also does not match the behavior required by this caller. Assembly expects `Allocate_Dos_Space_` to return a raw block pointer for `EBX` bytes and lets `Allocate_Space_` initialize the 12-byte header itself. Current code adds its own 12-byte header and returns `header + 1`, which would double-wrap allocations if the fallback were ever reached.
+  Suggested diff snippet:
+  ```cpp
+  void* __cdecl Allocate_Dos_Space_(uint32_t size) {
+      uint32_t allocation_size = size;
+      if (size & 1) {
+          allocation_size = (size & 0xFFFFFFFC) + 4;
+      }
+      return Allocate_Far_Space_(allocation_size);
+  }
+  ```
+
+- Because of the above mismatch, the inferred shared type/signature usage between `Allocate_Space_`, `Allocate_Far_Space_`, and `Allocate_Dos_Space_` is inconsistent with the binary’s control flow and memory layout. Validation of this function cannot pass in isolation until those related symbols are corrected or confirmed from their own disassembly.
+---------------------------------------
+0052E8E0 allocate::Allocate_Dos_Space_
+
+fail
+
+Discrepancies:
+- `Allocate_Dos_Space_` calls `Allocate_Far_Space_`, but the current `Allocate_Far_Space_` unconditionally terminates on allocation failure. In the disassembly, `Allocate_Dos_Space_` explicitly tests the returned pointer and only then calls `Allocation_Error_` if it is null. That control flow is not reproducible with the current callee behavior, so the implementation does not match the binary-level semantics.
+  Suggested diff snippet:
+  ```cpp
+  void* __cdecl Allocate_Far_Space_(size_t size) {
+      return ::_malloc(size);
+  }
+  ```
+
+- Because of the above, the null-check path in `Allocate_Dos_Space_` is effectively dead in the current project, whereas it is real and required by the assembly at `0052e904`..`0052e90e`.
+  Suggested diff snippet:
+  ```cpp
+  auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
+  if (header == nullptr) {
+      Allocation_Error_(size);
+  }
+  ```
+
+- Related allocator functions in the same file (`Allocate_Space_`, `Allocate_Space_No_Header_`) also assume `Allocate_Far_Space_` may return null, which conflicts with the current implementation and indicates broader inconsistency in restored allocator semantics that prevents confident validation of this function in isolation.
+  Suggested diff snippet:
+  ```cpp
+  // Make Allocate_Far_Space_ nullable and keep error handling at callers,
+  // matching the call/test pattern seen in the disassembly.
+  ```
+---------------------------------------
+0x0052E950 allocate::Allocate_Next_Block_
+
+- Error-path arguments to `Reallocation_Error_` do not match the assembly. The binary pushes `(size, (*current - capacity) + size, capacity)`, but the current code passes `__FILE__` and `__LINE__`. This changes side effects and observable error text.
+  Suggested diff:
+  ```cpp
+  if (total_required > capacity) {
+      Reallocation_Error_(size, __FILE__, __LINE__);
+  }
+  ```
+  ->
+  ```cpp
+  if (total_required > capacity) {
+      Reallocation_Error_(size, (const char*)((current_offset - capacity) + (int32_t)size), capacity);
+  }
+  ```
+  Short explanation: disassembly clearly uses computed integers in the 2nd/3rd pushed args, not source-location metadata.
+
+- `Reallocation_Error_` is typed incompatibly with how this call site uses it. At this call site, the 2nd and 3rd arguments are integer values from registers, but the declaration/definition takes `const char* file, int line`, forcing an incorrect interpretation of the pushed value in `ECX`.
+  Suggested diff:
+  ```cpp
+  void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
+  ```
+  ->
+  ```cpp
+  void __cdecl Reallocation_Error_(uint32_t size, int32_t arg2, int32_t arg3);
+  ```
+  Short explanation: the validated call site proves current parameter types are wrong.
+
+- The current implementation introduces misleading signed casts around header fields and capacity check. The assembly compares signed `EDX` and `EAX` directly, with `pool_header->size` loaded raw from memory; current code materializes `int32_t capacity = static_cast<int32_t>(pool_header->size)` and similarly casts `current`. This is not provably wrong for normal sizes, but it is a restoration risk and obscures the original raw-field semantics.
+  Suggested diff:
+  ```cpp
+  int32_t current_offset = static_cast<int32_t>(pool_header->current);
+  int32_t capacity = static_cast<int32_t>(pool_header->size);
+  int32_t total_required = current_offset + (int32_t)aligned_size + sizeof(s_alloc_header);
+  ```
+  ->
+  ```cpp
+  uint32_t current_offset = pool_header->current;
+  uint32_t total_required = current_offset + aligned_size + sizeof(s_alloc_header);
+  uint32_t capacity = pool_header->size;
+  ```
+  Short explanation: restore raw header-field arithmetic first, then only justify signedness if corroborated elsewhere.
+
+fail
+---------------------------------------
+0x0052EA20 allocate::Reallocation_Error_
+
+- Signature is wrong. Assembly loads three plain 32-bit values and formats them as three `%d` integers; current code declares `(uint32_t size, const char* file, int line)` and treats the second argument as a string.
+  ```diff
+  - void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
+  + void __cdecl Reallocation_Error_(int bytes_requested, int bytes_short, int block_size);
+  ```
+
+- Format string meaning is wrong. Provided external at `0x0055B690` is "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n", but project names/comments/use expect "Unable to Allocate %d bytes (%s, %d)\n". This changes observable output and argument interpretation.
+  ```diff
+  - inline const char* const s_Unable_to_Allocate_bytes =
+  -     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%s, %d)\n"
+  + inline const char* const s_Unable_to_Allocate_bytes =
+  +     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (short by %d bytes) in a block size of %d!\n\n"
+  ```
+
+- Current implementation’s call shape does not match the instruction trace. The assembly is exactly `sprintf(local_64, fmt, param1, param2, param3); Exit_With_Message(local_64);` with no file/line semantics. Current code bakes in source-location semantics instead.
+  ```diff
+  - sprintf(buffer, s_Unable_to_Allocate_bytes, size, file, line);
+  + sprintf(buffer, s_Unable_to_Allocate_bytes, bytes_requested, bytes_short, block_size);
+  ```
+
+- Direct caller behavior is inconsistent with this function’s validated ABI/semantics. `Allocate_Next_Block_` currently passes `__FILE__`/`__LINE__`, which cannot match the validated integer-only error routine and indicates surrounding restoration is also off.
+  ```diff
+  - Reallocation_Error_(size, __FILE__, __LINE__);
+  + Reallocation_Error_(size, short_by, pool_header->size);
+  ```
+
+fail
+---------------------------------------
+0052EA60 allocate::Allocate_Space_No_Header_
+
+fail
+
+- `Allocate_Far_Space_` is used as a nullable probe here, but the current project implementation unconditionally aborts on failure. In the target assembly, control explicitly falls through to `Allocate_Dos_Space_` when `Allocate_Far_Space_` returns null, so this function cannot behave as shown with the current callee.
+  ```diff
+  void* __cdecl Allocate_Far_Space_(size_t size) {
+      void* ptr = ::_malloc(size);
+  -   if (ptr == nullptr) {
+  -       exitm::Exit_With_Message(s_Null_Pointer_0055b658);
+  -   }
+      return ptr;
+  }
+  ```
+
+- `Allocate_Dos_Space_` is also treated as a nullable probe by the target function, but the current project implementation calls `Allocation_Error_` internally on failure. In the target assembly, `Allocate_Space_No_Header_` itself performs the final error path only after both allocation attempts return null.
+  ```diff
+  void* __cdecl Allocate_Dos_Space_(uint32_t size) {
+      ...
+      auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
+  -   if (header == nullptr) {
+  -       Allocation_Error_(size);
+  -   }
+      ...
+  }
+  ```
+
+- Because both callees currently terminate instead of returning `nullptr`, the fallback and final error handling visible in `0052EA60` are effectively unreachable in the restored code, so the validated behavior does not match the supplied control flow.
+---------------------------------------
+
+---------------------------------------
+0x0052EAC0 allocate::Allocate_Next_Block_No_Header_
+
+fail
+
+- Return value semantics are wrong. The assembly returns the start of the newly carved region (`EAX = ESI + old_current`) and writes metadata at `[EAX]`, `[EAX+4]`, `[EAX+8]`; it does not skip a 12-byte header. The current implementation’s comments/model imply a headered sub-block API and are therefore misleading for restoration accuracy.
+  ```diff
+  -        // Initialize the new block's internal structure (12 bytes).
+  -        auto* new_block_header = reinterpret_cast<s_alloc_header*>(new_block_ptr);
+  -        new_block_header->current = 0;
+  -        new_block_header->size = size;   // Stores the original requested size
+  -        new_block_header->reserved2 = 0;
+  -
+  -        return static_cast<void*>(new_block_ptr);
+  +        // Returned pointer is the block start itself; metadata is written in-place.
+  +        auto* new_block = reinterpret_cast<s_alloc_header*>(new_block_ptr);
+  +        new_block->current = 0;
+  +        new_block->size = size;
+  +        new_block->reserved2 = 0;
+  +        return new_block;
+  ```
+
+- Type/sign handling does not match the instruction-level comparison. The assembly performs `CMP [EBX+4], ECX` followed by `JGE`, which is a signed compare. Current code uses `uint32_t current_offset`, `uint32_t pool_capacity`, `uint32_t next_offset`, and `if (next_offset > pool_capacity)`, changing edge-case behavior if the header fields ever hold values with bit 31 set.
+  ```diff
+  -        uint32_t current_offset = pool_header->current;
+  -        uint32_t pool_capacity = pool_header->size;
+  -        uint32_t next_offset = current_offset + aligned_size;
+  -
+  -        if (next_offset > pool_capacity) {
+  +        int32_t current_offset = (int32_t)pool_header->current;
+  +        int32_t pool_capacity = (int32_t)pool_header->size;
+  +        int32_t next_offset = current_offset + (int32_t)aligned_size;
+  +
+  +        if (pool_capacity < next_offset) {
+             return nullptr;
+         }
+  ```
+
+- The structure typing is likely incorrect for this API family. This no-header allocator still writes three dwords into the allocated region, but those are payload-internal fields, not necessarily a true `s_alloc_header`. Reusing `s_alloc_header*` here obscures the actual memory contract and risks propagating wrong assumptions to callers.
+  ```diff
+  -        auto* new_block_header = reinterpret_cast<s_alloc_header*>(new_block_ptr);
+  -        new_block_header->current = 0;
+  -        new_block_header->size = size;
+  -        new_block_header->reserved2 = 0;
+  +        uint32_t* new_block_words = reinterpret_cast<uint32_t*>(new_block_ptr);
+  +        new_block_words[0] = 0;
+  +        new_block_words[1] = size;
+  +        new_block_words[2] = 0;
+  ```
+---------------------------------------
+0x0052EB30 allocate::Push_Block_
+
+- `_mark_stack` is typed with the wrong bound in the project: disassembly uses index range up to `0x27` inclusive check and stores at `base + pos*8`, so the backing storage is 40 entries, but header declares `uint32_t (&_mark_stack)[39][2]`. This is an out-of-bounds type mismatch and affects correctness at the stack limit.
+  ```diff
+  - inline uint32_t (&_mark_stack)[39][2] =
+  -     *reinterpret_cast<uint32_t (*)[39][2]>(std::uintptr_t{ 0x0057DF00 });
+  + inline uint32_t (&_mark_stack)[40][2] =
+  +     *reinterpret_cast<uint32_t (*)[40][2]>(std::uintptr_t{ 0x0057DF00 });
+  ```
+
+- The source uses `reinterpret_cast<uint32_t>(block)` for pointer storage. On Win32 this happens to fit, but for this restoration effort it is a code smell around external storage typing; the original behavior is a plain 32-bit store, so the backing object should ideally be modeled as pointer-sized/address-typed storage rather than forcing an explicit cast.
+  ```diff
+  - _mark_stack[pos][0] = reinterpret_cast<uint32_t>(block);
+  + _mark_stack[pos][0] = (uint32_t)block;
+  ```
+  or preferably retype the stack element appropriately if project conventions allow it.
+
+fail
+---------------------------------------
+0x0052EBB0 allocate::Get_Remaining_Block_Space_
+
+fail
+
+- Null check was added that is not present in the binary. Assembly unconditionally dereferences `block - 8` and `block - 0xC`; current code returns `0` for null, which changes control flow and fault behavior.
+  ```diff
+   int32_t __cdecl Get_Remaining_Block_Space_(void* addr) {
+  -    if (!addr) {
+  -        return 0;
+  -    }
+  -
+       const auto* header = static_cast<s_alloc_header*>(addr) - 1;
+       return header->size - header->current;
+   }
+  ```
+
+- Parameter naming suggests an address rather than a block pointer, which is minor cosmetically, but the real issue is the implementation now implies safety semantics not present in the original due to the null guard. Remove the guard to restore exact memory access behavior.
+---------------------------------------
+0052F070 bitmap::Copy_Bitmap_To_Bitmap_
+
+- The implementation materializes `src->frame_offsets[src->current_frame]` only after `Create_Bitmap_Header_`, while the assembly fetches the current-frame offset before that call. This matters because the original ordering guarantees the source frame offset is resolved from the pre-call `ECX` state before any callee side effects. Even if current code is likely behaviorally fine today, it is not an instruction-faithful match.
+  ```diff
+   void __cdecl bitmap::Copy_Bitmap_To_Bitmap_(s_animation_header* dst, s_animation_header* src) {
+       animate::_animation_header = src;
+       int16_t width = src->width;
+       int16_t height = src->height;
+  +    uint32_t offset = src->frame_offsets[src->current_frame];
+   
+       Create_Bitmap_Header_(width, height, dst);
+   
+  -    uint32_t offset = src->frame_offsets[src->current_frame];
+       uint8_t* src_ptr = reinterpret_cast<uint8_t*>(src) + offset;
+       uint8_t* dst_ptr = reinterpret_cast<uint8_t*>(dst) + 0x10;
+       uint32_t size = static_cast<uint32_t>(static_cast<int32_t>(width) * static_cast<int32_t>(height));
+   ```
+
+- The function uses `uint32_t` for the byte count, but the assembly computes the size in signed 32-bit registers via `movsx` + `imul` and passes that raw 32-bit value onward. If width/height are negative due to malformed data, current code changes the exact value seen by `Copy_Structure_` through unsigned conversion. This is a signedness mismatch relative to the machine code.
+  ```diff
+  -    uint32_t size = static_cast<uint32_t>(static_cast<int32_t>(width) * static_cast<int32_t>(height));
+  +    int32_t size = (int32_t)height * (int32_t)width;
+   
+       struct_::Copy_Structure_(dst_ptr, src_ptr, size);
+  ```
+
+fail
+---------------------------------------
+
+---------------------------------------
+0x00530570 replace::Replace_Color_
+
+- Case 2 signedness is wrong for the color compare. The assembly uses `MOVSX` from `byte ptr [ESI + EBP]` then compares that signed value against `param_2` as a 16-bit signed value. Current code compares via `int8_t` read wrapped in casts, which is plausible, but the write-side type and loop count handling rely on `int16_t ax = val2 << 2;` and can invoke implementation-defined narrowing before the signed compare path. This is not precise enough for validation.
+  Suggested diff snippet:
+  ```cpp
+  int32_t count = (int32_t)val2 << 2;
+  if (count > 0) {
+      for (int32_t i = 0; i < count; ++i) {
+          if ((int16_t)*(int8_t *)(frame_data + offset + i) == old_color) {
+              frame_data[offset + i] = (uint8_t)new_color;
+          }
+      }
+  }
+  offset += count;
+  ```
+
+- Case 2 count computation is typed too narrowly. Assembly does `SHL AX,2`, tests/sign-extends AX, then uses the sign-extended 16-bit result both for loop bound and `offset += count`. Current `int16_t ax = val2 << 2;` performs an explicit narrowing cast pattern that may not preserve the exact intended 16-bit ALU semantics across compilers and is a restoration smell under the project rules.
+  Suggested diff snippet:
+  ```cpp
+  int16_t count16 = (int16_t)(val2 << 2);
+  int32_t count = count16;
+  ```
+
+- Parameter typing for `new_color` is uncertain versus callsites. The binary reads only `BL` for stores, but the source prototype uses `int8_t new_color`, while many callsites pass promoted ints or uint8_t palette values. This may be source-compatible, but without a stricter project-wide convention match for this function family, I cannot confirm exact restoration.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl Replace_Color_(s_animation_header *anim, int16_t old_color, char new_color);
+  ```
+
+fail
+00530BF0 file_ani::Open_File_Animation_
+
+fail
+
+- Uses `fopen` instead of `_wfopen` despite the binary calling `_wfopen` at both open sites. This is a calling/ABI mismatch against the supplied disassembly and decompiler.
+  ```diff
+  -        _file_animation_fptr = fopen(filename, s_rb_0055117c);
+  +        _file_animation_fptr = _wfopen(filename, s_rb_0055117c);
+  ...
+  -            _file_animation_fptr = fopen(full_path, s_rb_0055117c);
+  +            _file_animation_fptr = _wfopen(full_path, s_rb_0055117c);
+  ```
+
+- `_file_animation_open` is declared as `bool`, but the binary treats `0x0055B7F0` as a 32-bit dword: `CMP dword ptr [...],0x1` and `MOV dword ptr [...],0x1`. This is a global type mismatch and can affect surrounding memory because packed globals are assumed.
+  ```diff
+  -    inline bool& _file_animation_open =
+  -        *reinterpret_cast<bool*>(std::uintptr_t{ 0x0055B7F0 });
+  +    inline uint32_t& _file_animation_open =
+  +        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B7F0 });
+  ```
+
+- Entry-count validation is typed incorrectly: the binary compares `word ptr [header]` against `BX` with signed semantics (`JG` after `CMP word ptr [EAX],BX`), while the implementation forces an unsigned 16-bit load and then casts it. That is not the same if the stored count has the high bit set.
+  ```diff
+  -        if (static_cast<int16_t>(*reinterpret_cast<uint16_t*>(_file_lbx_header)) <= entry_index) {
+  +        if (*reinterpret_cast<int16_t*>(_file_lbx_header) <= entry_index) {
+               farload::Error_Handler_(filename, 8, entry_index);
+           }
+  ```
+
+- Header magic check also uses an unsigned reinterpret cast where the binary simply tests the raw 16-bit field against `0xFEAD`. The current code happens to compare the same bit pattern, but the project typing around `_file_lbx_header` is inconsistent with the binary’s 16-bit header access and contributes to uncertainty. Minimal safer form:
+  ```diff
+  -        if (*reinterpret_cast<uint16_t*>((reinterpret_cast<uint8_t*>(_file_lbx_header) + 2)) != 0xFEAD) {
+  +        if (*reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(_file_lbx_header) + 2) != 0xFEAD) {
+               farload::Error_Handler_(filename, 7, entry_index);
+           }
+  ```
+
+---------------------------------------
+0x00531540 file_ani::Draw_File_Animation_Stencil_
+
+fail
+
+Discrepancies:
+- Frame index/offset typing does not match the signed 16-bit access pattern. The assembly uses `MOVSX` from `current_frame` and `frame_count`, but the implementation promotes `current_frame` to `uint32_t` before indexing `frame_offsets`. This can change behavior for negative values and does not reflect the original signed addressing.
+  ```diff
+-        uint32_t current_frame_idx = animate::_animation_header->current_frame;
+-        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame_idx];
+-        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame_idx + 1];
+-        size_t frame_size = next_frame_offset - frame_offset;
++        int16_t current_frame = animate::_animation_header->current_frame;
++        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame];
++        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame + 1];
++        int32_t frame_size = (int32_t)(next_frame_offset - frame_offset);
+  ```
+
+- Saved refresh flag has the wrong type/width. The binary reads and restores `video::screen_refresh_flag` through a 32-bit register/memory access (`MOV ESI, dword ptr [...]` / `MOV dword ptr [...]`), while the implementation stores it in `uint32_t` but writes back through the `int16_t` reference type. Given the overlapped globals and the codebase’s own 32-bit aliasing in `video.cpp`, this is not precise enough to validate.
+  ```diff
+-        uint32_t saved_refresh_flag = video::screen_refresh_flag;
++        uint32_t saved_refresh_flag = *reinterpret_cast<uint32_t*>(&video::screen_refresh_flag);
+...
+-        video::screen_refresh_flag = saved_refresh_flag;
++        *reinterpret_cast<uint32_t*>(&video::screen_refresh_flag) = saved_refresh_flag;
+  ```
+
+- The implementation uses substitute symbol names instead of the exact referenced message symbols for three exits in this function, which makes validation uncertain without confirming they alias the same addresses in all translation units.
+  ```diff
+-            exitm::Exit_With_Message(s_Differential_Error_8C8);
++            exitm::Exit_With_Message(s_Differentail_File_Animation_Can_n_0055b8c8);
+...
+-            exitm::Exit_With_Message(s_Differential_Error_898);
++            exitm::Exit_With_Message(s_Differentail_File_Animation_Can_n_0055b898);
+...
+-            exitm::Exit_With_Message(s_Differential_Error_868);
++            exitm::Exit_With_Message(s_Differentail_File_Animation_Can_n_0055b868);
+  ```
+
+- The refresh-mask error symbol differs from the provided external reference. Assembly uses the global at `0x0055B10C`; implementation routes through `animate::s_Refresh_Mask_cant_be_drawn`. It may alias the same address, but this function should reference the exact symbol or an unambiguous same-address constant to validate cleanly.
+  ```diff
+-            exitm::Exit_With_Message(animate::s_Refresh_Mask_cant_be_drawn);
++            exitm::Exit_With_Message(s_Refresh_Mask_can_t_be_drawn_0055b10c);
+  ```
+
+---------------------------------------
+0x00531800 special::Interpolate_Line_
+
+- The large-delta path computes half-magnitudes incorrectly for negative deltas. The assembly does not use C/C++ signed division by 2; it computes `abs(delta) >> 1` and passes a non-negative half-value to `angle::Get_Angle_`. Current code uses `angle_dx /= 2; angle_dy /= 2;`, which preserves sign and changes the angle quadrant for negative `dx`/`dy`.
+  Suggested diff:
+  ```cpp
+  int32_t angle_dx = dx;
+  int32_t angle_dy = dy;
+  if (abs(dx) > 255 || abs(dy) > 255) {
+      angle_dx = abs(dx) >> 1;
+      angle_dy = abs(dy) >> 1;
+  }
+  ```
+
+- Related signedness/control-flow issue: in the small-delta path the assembly passes signed `dx` and `dy` directly, but in the large-delta path it intentionally passes absolute half-values. The current implementation treats both paths uniformly as signed vectors except for scaling, which is not equivalent.
+
+- The current use of `abs(dx)` / `abs(dy)` obscures the exact 16-bit-derived behavior from assembly. The disassembly forms deltas via 16-bit subtraction (`SUB CX,DX`, `SUB BX,[ESI]`) then sign-extends, so correctness depends on preserving that exact signed 16-bit result before later widening. Current code widens operands before subtraction:
+  ```cpp
+  int32_t dx = (int32_t)target_x - (int32_t)current_x;
+  int32_t dy = (int32_t)target_y - (int32_t)current_y;
+  ```
+  Minimal correction:
+  ```cpp
+  int16_t dx16 = target_x - current_x;
+  int16_t dy16 = target_y - current_y;
+  int32_t dx = dx16;
+  int32_t dy = dy16;
+  ```
+
+fail
+---------------------------------------
+0x00531AF0 angle::Get_Angle_
+
+fail
+
+Discrepancies:
+- The source introduces signed-overflow UB on `-dx`/`-dy` before conversion to unsigned. The assembly does `NEG` in 32-bit registers and then uses the resulting bit pattern directly; in C++, `u = -dx;` and similar expressions are undefined for `INT32_MIN`.
+  Suggested diff:
+  ```cpp
+  uint32_t u, v;
+  ...
+  u = (uint32_t)(- (uint32_t)dx);
+  v = (uint32_t)(- (uint32_t)dy);
+  ```
+  or equivalently via unsigned temporaries preserving two's-complement bit behavior.
+
+- The implementation uses `static_cast<uint8_t>` when reading `_atan_lookup_table`, which is declared as `int8_t[128]`. Assembly uses `MOVZX` from memory, so the table element is semantically an unsigned byte. The current declaration/type pairing is inconsistent and relies on casts to repair it.
+  Suggested diff:
+  ```cpp
+  inline uint8_t (&_atan_lookup_table)[128] =
+      *reinterpret_cast<uint8_t(*)[128]>(std::uintptr_t{0x0054F4C8});
+  ```
+  and then remove the element casts in `Get_Angle_`.
+
+- Because of the mismatched signed table type, the current implementation obscures the exact dataflow from the assembly and leaves uncertainty whether nearby users may accidentally sign-extend the same table elsewhere.
+  Suggested diff:
+  ```cpp
+  angle = 90 - _atan_lookup_table[(u << 7) / v];
+  angle = _atan_lookup_table[(v << 7) / u];
+  ```
+  after fixing the table declaration to `uint8_t`.
+---------------------------------------
+0x00531BC0 angle::Sin_
+
+fail
+
+Discrepancies:
+- The implementation replaces the exact quadrant-specific table/address accesses with `_sin_table` formulas. While mathematically similar, this is not an instruction-accurate restoration of the binary’s memory accesses and referenced symbols. The assembly explicitly reads from four regions:
+  - `angle::_sin_table` for 0..89
+  - `PTR_FUN_0054f6b0 - angle*2` for 91..179
+  - `_torpedo_group_offset[1][4] + angle*2` for 180..269
+  - `DAT_0054f818 - angle*2` for 271..359
+
+  Minimal suggested diff snippet:
+  ```cpp
+  if (angle < 180) {
+      if (angle < 90) {
+          return ((uint32_t)(uint16_t)_sin_table[angle] * (uint32_t)magnitude + 0x8000) >> 16;
+      }
+      if (angle != 90) {
+          return ((uint32_t)*(uint16_t *)((uintptr_t)0x0054F6B0 - angle * 2) * (uint32_t)magnitude + 0x8000) >> 16;
+      }
+  } else {
+      if (angle < 270) {
+          return -(((uint32_t)*(uint16_t *)((uintptr_t)0x0054F3E0 + angle * 2) * (uint32_t)magnitude + 0x8000) >> 16);
+      }
+      if (angle != 270) {
+          return -(((uint32_t)*(uint16_t *)((uintptr_t)0x0054F818 - angle * 2) * (uint32_t)magnitude + 0x8000) >> 16);
+      }
+  }
+  ```
+
+- The third-quadrant implementation uses `_sin_table[angle - 180]`, but the binary reads from absolute address `0x0054F3E0 + angle*2`, decompiled as `CMBTMIS::_torpedo_group_offset[1][angle + 4]`. This is a different symbol and a different effective address pattern, so the current code cannot be validated as matching the binary.
+
+  Minimal suggested diff snippet:
+  ```cpp
+  if (angle < 270) {
+      return -static_cast<int32_t>(
+          ((uint32_t)*(uint16_t *)((uintptr_t)0x0054F3E0 + angle * 2) * (uint32_t)magnitude + 0x8000) >> 16
+      );
+  }
+  ```
+
+- The second- and fourth-quadrant implementations derive mirrored indices from `_sin_table`, but the binary performs reverse-address loads from `0x0054F6B0` and `0x0054F818`. Without restoring those exact accesses or proving those symbols alias the same layout in-project, the implementation is not precise enough.
+
+  Minimal suggested diff snippet:
+  ```cpp
+  return ((uint32_t)*(uint16_t *)((uintptr_t)0x0054F6B0 - angle * 2) * (uint32_t)magnitude + 0x8000) >> 16;
+  // ...
+  return -static_cast<int32_t>(
+      ((uint32_t)*(uint16_t *)((uintptr_t)0x0054F818 - angle * 2) * (uint32_t)magnitude + 0x8000) >> 16
+  );
+  ```
+---------------------------------------
+00531CC0 angle::Rotate_Coordinates_
+
+- Prototype/type mismatch: the binary reads `param_1` as a 16-bit value (`MOV AX,[ESP+4]`) and normalizes/wraps it as a signed short. The project uses `int32_t angle`, which changes calling-contract semantics for out-of-range values outside signed 16-bit truncation behavior.
+  Suggested diff:
+  ```diff
+  - void __cdecl Rotate_Coordinates_(int32_t angle, int32_t* x, int32_t* y);
+  + void __cdecl Rotate_Coordinates_(int16_t angle, int32_t* x, int32_t* y);
+  ```
+
+- Table/source mismatch in quadrants II–IV: the binary does not use `_sin_table` for all reflected cosine/sine lookups. It reads from specific reverse-addressed tables at DAT_0054f5fc, PTR_FUN_0054f6b0, PTR_FUN_0054f764, DAT_0054f818, and from slices of CMBTMIS::_torpedo_group_offset / CMBTMIS::_missile_group_offset. The current implementation substitutes these with `_sin_table[...]` identities. That is not restoration-grade equivalent without proving the backing data is byte-for-byte identical at those addresses.
+  Suggested diff:
+  ```diff
+  - int32_t cos_val = _sin_table[90 - angle_deg];
+  + int32_t cos_val = *(uint16_t *)((uintptr_t)0x0054F5FC - angle_deg * 2);
+  ```
+
+- Signedness of lookup values is modeled incorrectly/uncertainly. Assembly zero-extends 16-bit table entries (`MOV BX`, `MOV DI`, then 32-bit `IMUL`), so lookup factors are unsigned 0..65535. Current code mixes `uint16_t _sin_table` with `int32_t` temporaries and alternative tables typed as `int16_t` elsewhere (`CMBTMIS` arrays), obscuring the required zero-extension behavior for this function.
+  Suggested diff:
+  ```diff
+  - int32_t sin_val_abs = _sin_table[angle_deg - 180];
+  + uint32_t sin_val_abs = (uint16_t)_sin_table[angle_deg - 180];
+  ```
+
+- Negative-rounding path is only approximated through unsigned casts and does not transparently express the exact assembly operation `0x8000 - value; >> 16; NEG`. Because `x_prime`/`y_prime` are signed and the code relies on reinterpretation via `uint32_t`, this is too implicit for validation.
+  Suggested diff:
+  ```diff
+  - *x_ptr = -static_cast<int32_t>((0x8000 - static_cast<uint32_t>(x_prime)) >> 16);
+  + *x_ptr = -((0x8000 - x_prime) >> 16); /* with exact signed/unsigned intent made explicit per asm */
+  ```
+
+- The implementation hoists `*x_ptr`/`*y_ptr` into locals before quadrant-special cases, whereas the binary reloads/stores through pointers in those branches and only uses the stack locals as scratch for the general path. This matters because aliasing `x_ptr == y_ptr` would behave differently.
+  Suggested diff:
+  ```diff
+  - int32_t x = *x_ptr;
+  - int32_t y = *y_ptr;
+  + /* load through pointers in the same branches/order as the assembly */
+  ```
+
+fail
+---------------------------------------
+00531F20 key::Read_Key_
+
+- Return type/signature mismatch: assembly returns the full 32-bit value from `_last_key_pressed[index]` in `EAX`, while the provided decompiler shows `char` and the implementation uses `int32_t`. This likely means the implementation is correct but the supplied decompiler signature is wrong; validation cannot be completed unambiguously without confirming the intended source-level signature.
+  Suggested diff snippet:
+  ```cpp
+  // if matching decompiler text literally was intended:
+  - int32_t Read_Key_();
+  + char Read_Key_();
+  ```
+  But this would contradict the assembly and nearby call sites.
+
+- Index signedness/extension ambiguity must be resolved from source intent: assembly uses `MOVSX ECX, AL`, so `_key_read` is treated as signed 8-bit before indexing `_last_key_pressed`. Current code uses `uint8_t current_index`. For normal 0..9 ring-buffer values behavior is identical, but this is still a real type discrepancy against the instruction stream.
+  Suggested diff snippet:
+  ```cpp
+  - uint8_t current_index = _key_read;
+  + int8_t current_index = (int8_t)_key_read;
+  ```
+
+- Global `_key_pressed` is typed as `bool&`, but assembly reads/writes exact byte values `0` and `1`. While current stores compile plausibly, this type choice introduces source-level uncertainty for exact data semantics and aliasing with byte memory.
+  Suggested diff snippet:
+  ```cpp
+  - inline bool& _key_pressed =
+  -     *reinterpret_cast<bool*>(std::uintptr_t{0x0057E120});
+  + inline uint8_t& _key_pressed =
+  +     *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0057E120});
+  ```
+
+fail
+---------------------------------------
+0x00534710 reduce::Compress_Reduced_Palette_Groups_
+
+- `_ncubes` is typed incorrectly in the project as `int16_t`, but the disassembly uses `MOV AX,[reduce::_ncubes]` and compares with `JGE` against a signed `count`; the storage width matches 16-bit, but the header currently exposes it via a reference whose exact signedness becomes important in surrounding calls. This is a validation blocker because the function’s signed compare behavior depends on consistent 16-bit signed interpretation across related code.
+  Suggested diff snippet:
+  ```cpp
+  // verify and align with original 16-bit signed semantics everywhere _ncubes is used
+  inline int16_t& _ncubes =
+      *reinterpret_cast<int16_t*>(std::uintptr_t{0x00587FE0});
+  ```
+
+- The current C++ implementation relies on high-level indexing and does not make the sign-extension behavior explicit for both parameters. The assembly explicitly uses `MOVSX` on `start_index` and loop index arithmetic in 16-bit (`AX`/`SI`) before widening. If any nearby declarations or callsites use wider unsigned types, the restored source could silently diverge for negative inputs or overflowed 16-bit values. This needs confirmation before validation can pass.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl Compress_Reduced_Palette_Groups_(int16_t start_index, int16_t count) {
+      int16_t i = 0;
+      if (count < _ncubes) {
+          Reduce_Palette_(_reduced_palette_list, 0, _ncubes, count);
+      }
+      while (i < count) {
+          int32_t dest_idx = (int16_t)(start_index + i);
+          ...
+          ++i;
+      }
+  }
+  ```
+
+- There is insufficient confirmation that `s_palette_entry` packing and aliasing are preserved exactly at all translation units touching `video::_current_palette` and `reduce::_reduced_palette_list`. This function performs byte-accurate writes at offsets `+0,+1,+2,+3`; if packing is not globally enforced exactly as assumed, the implementation cannot be validated with “extreme precision”.
+  Suggested diff snippet:
+  ```cpp
+  static_assert(sizeof(s_palette_entry) == 4, "s_palette_entry must be packed to 4 bytes");
+  ```
+
+fail
+---------------------------------------
+0x00534790 swap::Save_Block_To_Drive_
+
+fail
+
+Discrepancies:
+- Wrong global/type mapping in source: the binary writes `0x00587FE8 = block_address` and `0x00587FE4 = block_size + 0x18`, but the source names them `_swap_block_address` and `_swap_block_size` respectively. The supplied externals also show both symbols mislabeled as `_swap_block_address`. Validation cannot pass with the current symbol interpretation because side effects would be described incorrectly.
+  ```diff
+  - inline int32_t& _swap_block_size = *reinterpret_cast<int32_t*>(0x00587FE4);
+  - inline uint8_t*& _swap_block_address = *reinterpret_cast<uint8_t**>(0x00587FE8);
+  + inline int32_t& _swap_saved_size = *reinterpret_cast<int32_t*>(0x00587FE4);
+  + inline uint8_t*& _swap_block_address = *reinterpret_cast<uint8_t**>(0x00587FE8);
+  ```
+
+- File open call target/name mismatch versus disassembly/decompiler input: the binary calls the hook at `0x00540c00`, labeled `_wfopen` in the supplied listing, while the project binds that address to `fopen` and implements `fopen(...)`. This may be an annotation issue in the input, but without clarification it is not possible to validate this call with high confidence.
+  ```diff
+  - swap_file = fopen(s_TEMP_TMP_0055becc, s_wb_00551178);
+  + swap_file = /* clarify whether original is fopen or _wfopen */ fopen(s_TEMP_TMP_0055becc, s_wb_00551178);
+  ```
+
+- The current implementation introduces an unnecessary explicit cast in the `fwrite` size argument. For this codebase, explicit widening casts are a red flag and should be justified from surrounding types; here the assembly simply pushes a 32-bit value from memory.
+  ```diff
+  - fwrite(block_address - 0x0c, static_cast<size_t>(swap::_swap_block_size), 1, swap_file);
+  + fwrite(block_address - 0x0c, swap::_swap_block_size, 1, swap_file);
+  ```
+
+---------------------------------------
+
+00534A50 lbx::LBX_getRecordLength_
+
+- Parameter type mismatch: assembly reads the second argument as a full 32-bit value from `[esp+8]`, but the project declares `uint16_t rec_idx`. While the generated body still indexes correctly in common cases, this is not an exact match to the calling convention / parameter width and can affect out-of-range high-word inputs.
+  Suggested diff:
+  ```cpp
+  - int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx);
+  + uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx);
+  ```
+
+- Return type mismatch: assembly returns the raw 32-bit dword loaded from `entries[index].size` in `EAX`. The project uses `int32_t` and an explicit cast from an unsigned field, which changes the function’s signed interface.
+  Suggested diff:
+  ```cpp
+  - int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx) {
+  -     return (int32_t)header->entries[rec_idx].size;
+  - }
+  + uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx) {
+  +     return header->entries[rec_idx].size;
+  + }
+  ```
+
+fail
+---------------------------------------
+00534a70 time::time_
+
+- Namespace/name mismatch: project implements `time_::time_()` in `src/game/time.cpp`, while the provided symbol is `time::time_`. Given the restoration rules, namespace maps to file/module identity and this prevents confident validation of the exact target function.
+  ```diff
+  -namespace time_ {
+  +namespace time {
+  
+  -int32_t __cdecl time_() {
+  +int32_t __cdecl time_() {
+  ```
+
+- Arithmetic type/overflow semantics are not preserved explicitly. The assembly performs 32-bit signed integer arithmetic with `CDQ; IDIV ECX` after computing a multiplied value in `EAX`. Current code relies on C++ signed `int32_t` overflow in `(cVar1 * 1000)`, which is undefined behavior and not equivalent to the original machine behavior under strict validation.
+  ```diff
+   int32_t __cdecl time_() {
+  -    int32_t cVar1 = clock();
+  -    return (cVar1 * 1000) / 1000;
+  +    int32_t cVar1 = clock();
+  +    int32_t scaled = (int32_t)((uint32_t)cVar1 * 1000u);
+  +    return scaled / 1000;
+   }
+  ```
+
+fail
+---------------------------------------
+
+---------------------------------------
+0x00534A90 netcode::Net_Init_
+
+fail
+
+Discrepancies:
+- Wrong control-flow structure for mode 3. The assembly executes the modem path for modes 1 and 2, then performs a separate `if (mode == 3)` check. The current code uses `else if`, which suppresses that sequential structure. It happens to behave the same for current mode values, but it does not match the original control flow precisely.
+- `WINNET::Init_Connection_` is declared/implemented with the wrong signature relative to the call site evidenced by the disassembly. `Net_Init_` passes five stack arguments total to `005386D0` (`1` plus the 16-byte GUID by value), but the project prototype is `Init_Connection_(int32_t mode)`. This is not ABI-accurate and prevents validating the call semantics as restored source.
+- The TEN call hardcodes the first argument from the source variable, while the assembly passes `ESI` after explicitly comparing it to `3` and setting `EDI = 1` separately. Because of the surrounding incorrect `else if` collapse and the mismatched restoration style, this function cannot be considered instruction-accurate without correcting the control flow above.
+---------------------------------------
+
+00534C30 netcode::Net_Is_Sending_
+fail
+
+Discrepancies:
+- Global binding does not match provided symbol/address. The input specifies `transprt::_tpSending @ 0x0055BF30 : bool`, but project defines `transprt::_tpSending` at `0x00560A78` as `uint32_t&`. This is not a cosmetic issue: the assembly does a `MOVSX` from a byte at the specified address, so both storage location and width/signedness differ.
+  Suggested diff snippet:
+  ```cpp
+  // transprt.h
+  - inline uint32_t& _tpSending = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A78});
+  + inline int8_t& _tpSending = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0055BF30});
+  ```
+
+- Return value semantics differ from the assembly. The function body currently returns a `uint32_t`-backed lvalue converted to `int`, while the assembly sign-extends a single byte (`MOVSX EAX, byte ptr [...]`). If the flag ever contains values with bit 7 set, current code would not reproduce original behavior.
+  Suggested diff snippet:
+  ```cpp
+  // netcode.cpp
+  - int __cdecl Net_Is_Sending_() { return transprt::_tpSending; }
+  + int __cdecl Net_Is_Sending_() { return (int)transprt::_tpSending; }
+  ```
+  and only after correcting `_tpSending` to a signed 8-bit type.
+
+- Header type likely incorrect as well. `transprt::_tpSending` is treated project-wide as a 32-bit integer flag, but the validated function proves at least this accessor reads it as a byte. This requires follow-up against the actual transport-layer binary/disassembly before validation can pass.
+---------------------------------------
+0x00535780 simmodem::Modem_Connected_
+
+fail
+
+- The function does not exist as restored source implementation in the project; `src/game/simmodem.h` only contains a trampoline that calls the binary at `0x00535780`, so there is nothing to validate instruction-by-instruction against the provided disassembly.
+  Suggested diff snippet:
+  ```cpp
+  // current
+  inline int32_t __cdecl Modem_Connected_() {
+      using Fn = int32_t(__cdecl*)();
+      auto fn = reinterpret_cast<Fn>(std::uintptr_t{0x00535780});
+      return fn();
+  }
+
+  // needed for validation
+  inline int32_t __cdecl Modem_Connected_() {
+      if (_open_game_port != 0) {
+          // exact recovered call target required here
+      }
+      return 0;
+  }
+  ```
+
+- The referenced callee `D_GETM::GetCd_` is also not restored in the project, so the second half of the control flow and calling semantics cannot be checked from source.
+  Suggested diff snippet:
+  ```cpp
+  namespace D_GETM {
+      int32_t __cdecl GetCd_(/* exact params */);
+  }
+  ```
+
+- The decompiler shows a bogus argument (`unaff_retaddr`) to `GetCd_`, while the disassembly shows `ECX` loaded from `_open_game_port` immediately before the call. Without a restored source target/callee declaration, the effective calling convention and whether `ECX` is an implicit object/context parameter cannot be validated.
+  Suggested diff snippet:
+  ```cpp
+  // declaration must make the ECX-based call semantics explicit
+  // e.g. thiscall-like or equivalent wrapper, depending on recovered target
+  ```
+---------------------------------------
+00535D20 clipped::Clipped_Draw_Bitmap_Sprite_
+
+fail
+
+Discrepancies:
+- Dirty-rectangle coordinates are wrong when left/top clipping occurs. In assembly, `ECX`/`EAX` remain the original signed `x`/`y` values for `Add_Square_To_Scan_List_`, and only the end coordinates use `x + left_clip` / `y + top_clip` via `ECX + EBX - 1` and `EAX + EBP - 1`. Current code overwrites `scan_x`/`scan_y` with clip deltas, so the rectangle starts at the clip amount instead of the original draw position.
+  Suggested diff snippet:
+  ```cpp
+  int32_t draw_x = (int32_t)x;
+  int32_t draw_y = (int32_t)y;
+  ...
+  if (x < video::_screen_window_x1) {
+      int32_t left_clip = (int32_t)video::_screen_window_x1 - draw_x;
+      dst += left_clip;
+      pixels += left_clip;
+  }
+  if (y < video::_screen_window_y1) {
+      int32_t top_clip = (int32_t)video::_screen_window_y1 - draw_y;
+      pixels += top_clip * sprite_width;
+      dst += top_clip * platform::g_screen_res_x;
+  }
+  if (video::screen_refresh_flag >= 2) {
+      setvesa::Add_Square_To_Scan_List_(
+          draw_x, draw_y,
+          draw_x + visible_width - 1 + ((x < video::_screen_window_x1) ? ((int32_t)video::_screen_window_x1 - draw_x) : 0),
+          draw_y + visible_height - 1 + ((y < video::_screen_window_y1) ? ((int32_t)video::_screen_window_y1 - draw_y) : 0));
+  }
+  ```
+
+- The current source itself marks these lines as BUG, which is consistent with the assembly mismatch and confirms the implementation is not yet validated:
+  ```cpp
+  scan_x = left_clip; // BUG: this should likely be video::_screen_window_x1
+  scan_y = top_clip;  // BUG: this should likely be video::_screen_window_y1
+  ```
+
+- Signedness/type handling around the destination base pointer should stay explicitly signed like the assembly (`MOVSX` from `short` x/y before address math). Current code uses `(uint32_t)y` and `(uint32_t)x` in the initial `dst` computation, which can misrepresent negative inputs at source level and obscures the true semantics even if later clipping usually compensates.
+  Suggested diff snippet:
+  ```cpp
+  uint8_t* dst = video::_current_video_page
+      + (int32_t)y * platform::g_screen_res_x
+      + (int32_t)x;
+  ```
+---------------------------------------
+0x00535E50 clipped::Clipped_Draw_Glassed_Animated_Sprite_
+
+fail
+
+Discrepancies:
+- Vertical loop termination is off by one. Assembly draws while `start_y <= end_y`; current code uses `current_line_idx < draw_height`, which excludes the last visible row.
+  ```diff
+  - while (current_line_idx < draw_height) {
+  + while (current_line_idx <= draw_height) {
+  ```
+  or, more faithfully, keep absolute `start_y`/`end_y` variables and compare them directly.
+
+- Initial destination row/base is computed from the clipped Y start instead of the sprite’s own starting row plus `y`. Assembly uses:
+  `start_y = *(int16_t*)(sprite + 2) + y;`
+  and builds the initial pointer from that absolute row. Current code instead uses `draw_y_start`, then later tries to compensate. That changes control flow and pointer math.
+  ```diff
+  - int16_t current_sprite_y = *(int16_t*)(sprite + 2);
+  - int32_t line_base = x + (int32_t)draw_y_start * platform::g_screen_res_x;
+  + int32_t start_y = *(int16_t*)(sprite + 2) + y;
+  + int32_t line_base = x + start_y * platform::g_screen_res_x;
+  ```
+
+- Left-clip/window state is modeled incorrectly. Assembly keeps absolute clipped X (`max(x, window_x1)`) and current run X separately, with the destination pointer starting at the unclipped `x` position. Current code mixes this into `clip_x_skip_count` and initializes `cursor_abs` to `line_base + clip_x_skip_count`, which changes horizontal segment placement.
+  ```diff
+  - int32_t win_start_abs = line_base + clip_x_skip_count;
+  - int32_t cursor_abs = line_base + clip_x_skip_count;
+  + int32_t win_start_abs = line_base + clipped_x_start;
+  + int32_t cursor_abs = line_base;
+  ```
+
+- Vertical-skip command handling uses the current screen pitch, but assembly uses a hardcoded `0x280` stride (`640`) in the `count == 0` branch.
+  ```diff
+  - line_base += (int32_t)val * platform::g_screen_res_x;
+  + line_base += (int32_t)val * 640;
+  ```
+
+- Glassed pixel semantics are wrong for palette indices `< 0xF0`. Assembly still writes nonzero pixels directly; only zero is transparent. Current code writes only `< 0xF0` and always remaps `>= 0xF0`, but the branch structure should be “if pixel != 0 then maybe remap if pixel >= 0xF0, then store”.
+  ```diff
+  - if (pixel < 0xF0) {
+  -     *screen_ptr++ = pixel;
+  - } else {
+  -     uint8_t background_pixel = *screen_ptr;
+  -     *screen_ptr++ = video::_glass_remap_colors[pixel - 0xF0][background_pixel];
+  - }
+  + if (pixel != 0) {
+  +     if (pixel >= 0xF0) {
+  +         pixel = ((uint8_t*)draw::_glass_lookup_table)[((uint32_t)pixel << 8) + *screen_ptr];
+  +     }
+  +     *screen_ptr = pixel;
+  + }
+  + ++screen_ptr;
+  ```
+
+- Right-edge clipping count differs. Assembly draws `local_10 - x_current + 1` pixels when the run crosses the right boundary; current code uses an exclusive end derived from `draw_width`. Because the rest of the function is not using the same absolute variables as assembly, this changes inclusive clipping behavior at the right edge.
+  ```diff
+  - int32_t run_clipped_end = win_end_abs;
+  + int32_t visible_count = right_clip - run_x + 1;
+  ```
+
+- The implementation is explicitly described in source comments as an “updated version” because the “original implementation was not handling clipping correctly.” That is incompatible with validating against this original binary routine at `0x00535E50`.
+  ```diff
+  - // This is updated version of Clipped_Draw_Animated_Sprite_ because original implementation was not
+  - // handling clipping correctly.
+  + // Restore original binary behavior for 0x00535E50.
+  ```
+---------------------------------------
+
+0x00536040 clipped::Clipped_Draw_Animated_Sprite_
+
+- Vertical skip branch does not match the assembly’s memory access/update behavior. The disassembly uses `LEA EAX,[EAX + EAX*0x4]` / `SHL EAX,0x7`, i.e. `skip_val * 640`, but the implementation uses `skip_val * platform::g_screen_res_x`. This changes behavior if the render buffer pitch differs.
+  Suggested diff snippet:
+  ```cpp
+  if (count == 0) {
+      current_line_idx += val;
+      line_base += (int32_t)val * 640;
+      win_start_abs = line_base + clip_x_skip_count;
+      cursor_abs = line_base;
+      win_end_abs = win_start_abs + draw_width;
+  }
+  ```
+
+- Type/sign handling for the initial sprite Y offset does not match. Assembly zero-extends `word ptr [sprite + 2]` into 32-bit (`MOV AX ...`, then stores EAX), but the implementation reads it as `int16_t`. Negative values would behave differently, and the project should preserve the original unsigned interpretation here.
+  Suggested diff snippet:
+  ```cpp
+  uint32_t current_sprite_y = *(uint16_t*)(sprite + 2);
+  ```
+
+- The file itself documents a known mismatch pattern nearby (“updated version ... original implementation was not handling clipping correctly”), which increases uncertainty that this function was restored strictly from the original control/data semantics rather than matched instruction-for-instruction.
+---------------------------------------
+00536280 clipped::Clipped_Draw_Stenciled_Animated_Sprite_
+
+fail
+
+Discrepancies:
+- The main loop termination is wrong. Assembly compares `current_row_rel - top_excess` against `draw_height_limit` (`while (iVar2 < draw_height)`), but the implementation uses `while (current_row_rel < draw_height_limit + top_excess)`. This changes behavior whenever `top_excess != 0`.
+  ```diff
+- while (current_row_rel < draw_height_limit + top_excess) {
++ int32_t current_line_idx = current_row_rel - top_excess;
++ while (current_line_idx < draw_height_limit) {
+      ...
+      if (count == 0) {
+-         current_row_rel += x_offset;
++         current_row_rel += x_offset;
++         current_line_idx = current_row_rel - top_excess;
+      }
+  }
+  ```
+
+- The implementation does not preserve the row-start scan marker semantics used by the assembly. In the original, the start passed to `video::Add_Line_To_Scan_List_` is the first actually drawn pixel of the row (`local_18`, set when drawing begins), and the end is the last drawn pixel (`local_1c`). The current code passes `render_x_start_offset % 640` as the start, which is only the clipped window left edge, not the first touched pixel.
+  ```diff
+- video::Add_Line_To_Scan_List_(
+-     render_x_start_offset % 640,
+-     first_run_pixel_offset / 640,
+-     last_run_pixel_offset % 640
+- );
++ video::Add_Line_To_Scan_List_(
++     first_run_pixel_offset % 640,
++     first_run_pixel_offset / 640,
++     last_run_pixel_offset % 640
++ );
+  ```
+
+- `last_run_pixel_offset` is maintained as the last written pixel index, but the assembly keeps an exclusive end during drawing and only converts to inclusive form implicitly via `-1` on the store. The current bookkeeping works only because of the incorrect scan-list call above; once fixed, the exact lifetime and meaning of these variables should be aligned with the assembly to avoid off-by-one mistakes.
+  ```diff
+- last_run_pixel_offset = run_screen_start - 1;
++ // track exactly the assembly's inclusive/exclusive value usage
+  ```
+
+- Signedness/types do not match the instruction behavior in the command stream. The assembly uses signed 16-bit loads (`MOVSX`) for run length and x-offset in the drawing path; the current code uses `uint16_t count` and `uint16_t x_offset`. That can mis-handle negative values and hides the intended signed semantics.
+  ```diff
+- uint16_t count = *reinterpret_cast<uint16_t*>(sprite + sprite_word_idx * 2 - 4);
+- uint16_t x_offset = *reinterpret_cast<uint16_t*>(sprite + sprite_word_idx * 2 - 2);
++ int16_t count = *reinterpret_cast<int16_t*>(sprite + sprite_word_idx * 2 - 4);
++ int16_t x_offset = *reinterpret_cast<int16_t*>(sprite + sprite_word_idx * 2 - 2);
+  ```
+
+- The left-clip branch does not advance the row cursor the same way as the assembly. Original code updates both the run start and the current cursor (`EDI`) after left clipping; the current code updates only `run_screen_start`. This can affect subsequent calculations if the variable is reused as the row cursor.
+  ```diff
+      run_byte_idx += clip_left;
+      run_screen_start += clip_left;
++     current_row_offset = run_screen_start; // or use a separate cursor variable matching assembly
+  ```
+---------------------------------------
+0x00536508 draw::Draw_Animated_Sprite_
+
+fail
+
+- The implementation does not match the function’s locking behavior. The assembly performs a raw draw directly to `video::_current_video_page` and never calls render-buffer lock/unlock helpers, but the surrounding code path in `animate::Draw_` already locks before calling this function. In the current project this function itself is still raw, but related call sites such as `animate::Draw_No_Glass_` call it without the lock that the original non-clipped path used elsewhere, creating uncertainty about intended side effects and execution context for exact validation.
+  ```diff
+  - draw::Draw_Animated_Sprite_(x, y, sprite);
+  + platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+  + draw::Draw_Animated_Sprite_(x, y, sprite);
+  + platform::Unlock_Appropriate_Render_Buffer();
+  ```
+
+- The code uses `reinterpret_cast<uint16_t*>` / `reinterpret_cast<uint32_t*>` typed accesses and manual loops instead of the original REP MOVS semantics. While logically similar, this introduces potential UB on unaligned reads/writes and does not precisely preserve the original byte-stream memory behavior expected from x86 `MOVSD`/`MOVSB`.
+  ```diff
+  - *reinterpret_cast<uint32_t*>(dest_ptr) = *reinterpret_cast<uint32_t*>(src_pixels);
+  + memcpy(dest_ptr, src_pixels, 4);
+  ```
+
+- The current implementation’s signedness and promotion model is not an exact match to the assembly. The assembly zero-extends `x`, `y`, sprite Y offset, and header height through 16-bit register moves, effectively treating them as unsigned in address/height arithmetic. The C++ uses `int16_t` plus mixed signed arithmetic and casts to `int32_t`, which can diverge for negative inputs.
+  ```diff
+  - uint8_t* dest_row_start = video::_current_video_page +
+  -     (static_cast<int32_t>(y) + sprite_y_offset) * 640 + x;
+  - int32_t remaining_height = static_cast<int32_t>(animate::_animation_header->height) - sprite_y_offset;
+  + uint8_t* dest_row_start = video::_current_video_page +
+  +     ((uint32_t)(uint16_t)y + (uint32_t)sprite_y_offset) * 640 + (uint32_t)(uint16_t)x;
+  + int32_t remaining_height = (uint32_t)(uint16_t)animate::_animation_header->height - (uint32_t)sprite_y_offset;
+  ```
+---------------------------------------
+0x005365B0 draw::Draw_Bitmap_Sprite_
+
+fail
+
+Discrepancies:
+- Null-check added that is not present in the assembly.
+  - The binary immediately dereferences `animate::_animation_header`; current code returns early when it is null, changing control flow and fault behavior.
+  - Minimal suggested diff:
+    ```cpp
+    -        if (!animate::_animation_header) {
+    -            return;
+    -        }
+    ```
+
+- Destination pointer setup does not match instruction sequence.
+  - Assembly computes `EDI = video::_current_video_page + x + y*640 - 640 + width`, then per row does `EDI += 640 - width - 1`, followed by pre-increment before each pixel store. Current code starts directly at row base `video_page + y*640 + x` and indexes `dest_row[w]`. Although superficially similar for normal positive dimensions, this is not an instruction-faithful restoration and changes exact pointer progression.
+  - Minimal suggested diff:
+    ```cpp
+    -        uint8_t* dest_row = video_page + (static_cast<int32_t>(y) * 640) + static_cast<int32_t>(x);
+    +        uint8_t* dst = video_page + (uint16_t)x + (uint16_t)y * 640 - 640 + (uint16_t)animate::_animation_header->width;
+    ```
+
+- Signedness/width handling of `x`, `y`, `width`, and `height` is inaccurate.
+  - Assembly zero-extends all four 16-bit values (`MOV AX/CX/DX` into zeroed registers), so negative `short` inputs are treated as unsigned 16-bit values, not sign-extended `int32_t`. Current code uses `static_cast<int32_t>(x/y/width/height)`, which sign-extends and therefore diverges for values with bit 15 set.
+  - Minimal suggested diff:
+    ```cpp
+    -        int32_t width = static_cast<int32_t>(animate::_animation_header->width);
+    -        int32_t height = static_cast<int32_t>(animate::_animation_header->height);
+    +        uint32_t width = (uint16_t)animate::_animation_header->width;
+    +        uint32_t height = (uint16_t)animate::_animation_header->height;
+    ```
+    and likewise use `(uint16_t)x`, `(uint16_t)y`.
+
+- Inner/outer loop structure is not restored precisely.
+  - Assembly uses decrement-to-zero loops with `DEC/JZ`, `LODSB`, and only advances the destination by `INC EDI` inside the pixel loop. Current indexed `for` loops are a higher-level rewrite that obscures exact memory access order required for validation against the binary.
+  - Minimal suggested diff:
+    ```cpp
+    -        for (int32_t h = 0; h < height; ++h) {
+    -            for (int32_t w = 0; w < width; ++w) {
+    -                uint8_t pixel = *sprite++;
+    -                if (pixel != 0) {
+    -                    dest_row[w] = pixel;
+    -                }
+    -            }
+    -            dest_row += 640;
+    -        }
+    +        while (height != 0) {
+    +            --height;
+    +            dst += 639 - width;
+    +            uint32_t count = width;
+    +            while ((++dst, count != 0)) {
+    +                --count;
+    +                uint8_t pixel = *sprite++;
+    +                if (pixel != 0) {
+    +                    *dst = pixel;
+    +                }
+    +            }
+    +        }
+    ```
+---------------------------------------
+0x0053665C fonts::Print_Character_ASM_
+
+fail
+
+Discrepancies:
+- Pixel/run interpretation is reversed relative to the assembly.
+  - In the binary, bytes with sign bit set (`>= 0x80`, except `0x80` terminator) are color indices and emit one pixel; non-negative bytes (`< 0x80`) are transparent skips of that many pixels.
+  - Current code does the opposite: `< 0x80` writes `selected_colors[cmd - 1]`, and `>= 0x80` skips.
+  - This changes both rendered output and glyph stream consumption semantics.
+
+  Minimal suggested diff snippet:
+  ```cpp
+  if (cmd & 0x80) {
+      *dest++ = selected_colors[cmd - 1];
+  } else {
+      dest += (cmd & 0x7F);
+  }
+  ```
+
+- The current implementation can index `selected_colors[-1]` for `cmd == 0`.
+  - Assembly never uses zero as a color index path because `0x00` falls into the skip branch.
+  - Current code routes `0x00` through the draw branch and reads `selected_colors[cmd - 1]`, which is out-of-bounds and not binary-accurate.
+
+  Minimal suggested diff snippet:
+  ```cpp
+  if (cmd == 0x80) {
+      break;
+  }
+  if (cmd & 0x80) {
+      *dest++ = selected_colors[cmd - 1];
+  } else {
+      dest += cmd;
+  }
+  ```
+
+- Signedness/control-flow intent is not preserved.
+  - The assembly uses `JS` after `CMP EAX,0x80`, i.e. the branch is determined by the sign of the loaded byte value after zero-extension, which effectively separates `0x81..0xFF` from `0x00..0x7F`.
+  - Current C source expresses the inverse condition using `cmd < 0x80`, which is not equivalent to the actual behavior of the binary implementation.
+
+  Minimal suggested diff snippet:
+  ```cpp
+  uint8_t cmd = *data++;
+  if (cmd == 0x80) {
+      break;
+  }
+  if ((int8_t)cmd < 0) {
+      *dest++ = selected_colors[cmd - 1];
+  } else {
+      dest += cmd;
+  }
+  ```
+---------------------------------------
+0x00536EE8 regions::Fill_Column_
+
+- Zero-height handling is incorrect/uncertain: the assembly uses a do-while shape with `DEC ESI / JNZ`, so `width == 0` would underflow and loop massively instead of returning. The current C++ uses `for (y = 0; y < fill_height; ++y)`, which returns immediately for zero. If callers can ever pass zero, behavior does not match.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl regions::Fill_Column_(uint8_t color, uint8_t* surface, uint32_t fill_width, uint32_t fill_height) {
+      int32_t stride_skip = platform::g_screen_res_x - fill_width;
+      uint32_t remaining = fill_height;
+      do {
+          uint32_t x = fill_width;
+          while (x != 0) {
+              *surface++ = color;
+              --x;
+          }
+          surface += stride_skip;
+          --remaining;
+      } while (remaining != 0);
+  }
+  ```
+
+- Zero-width handling is similarly mismatched in form: assembly reloads `ECX = param_3` and uses `REP STOSB`; with `param_3 == 0` the inner fill is skipped but the outer do-while still executes at least once. Current `for` form suppresses all work if height is zero and expresses different control flow. This needs confirmation that zero dimensions are impossible, otherwise exact validation cannot be completed.
+  Suggested diff snippet:
+  ```cpp
+  uint32_t remaining = fill_height;
+  do {
+      memset(surface, color, fill_width);
+      surface += fill_width;
+      surface += stride_skip;
+      --remaining;
+  } while (remaining != 0);
+  ```
+
+fail
+
+---------------------------------------
+00536F23 regions::Fill_Region_
+
+Discrepancies:
+- Prototype width type is widened from byte to 32-bit. The assembly reads the 3rd arg, shifts the stack slot left/right by 2, and callers pass `static_cast<uint8_t>(mid_blocks)`, which strongly indicates an original 8-bit width-block count. Current signature uses `uint32_t width_blocks`, which can change behavior for out-of-range callers and obscures the true ABI intent.
+  ```diff
+  - void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height);
+  + void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint8_t width_blocks, uint32_t height);
+  ```
+
+- The implementation does not preserve the assembly’s exact width masking/byte semantics. The machine code effectively operates on the low-width value used for `REP STOSD` after stack-slot shift/unshift; current C++ uses full 32-bit `width_blocks` directly in loop bounds and stride math. This is only equivalent if all callers are guaranteed in-range.
+  ```diff
+  - void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {
+  + void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint8_t width_blocks, uint32_t height) {
+        ...
+  -     int32_t stride_skip = platform::g_screen_res_x - static_cast<int32_t>(width_blocks * 4);
+  +     int32_t stride_skip = platform::g_screen_res_x - ((uint32_t)width_blocks << 2);
+        ...
+  -     for (uint32_t x = 0; x < width_blocks; ++x) {
+  +     for (uint32_t x = 0; x < (uint32_t)width_blocks; ++x) {
+  ```
+
+Reason: control flow is otherwise close, but the restored source does not match the original parameter width/signature closely enough to validate with high confidence.
+
+fail
+
+---------------------------------------
+0053701E regions::Tri_Interlaced_Fill_Column_
+
+- The loop structure does not match the assembly’s guaranteed three-row cycle. In the binary, after the third fill there is an unconditional `DEC ESI`; if `height` enters as 0, the function underflows and loops indefinitely, and after a third-row pass it only exits when the decremented counter becomes 0. The current C++ version uses `while (rows != 0)` and `uint32_t rows`, which changes control flow for zero/negative heights and changes the exact decrement/branch behavior.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl Tri_Interlaced_Fill_Column_(uint32_t color, uint8_t* dest, int32_t width, int32_t height) {
+      int32_t row_advance = platform::g_screen_res_x - width;
+      do {
+          memset(dest, (uint8_t)color, width);
+          dest += width + row_advance;
+          color = (color >> 8) | (color << 24);
+          if (--height == 0) return;
+
+          memset(dest, (uint8_t)color, width);
+          dest += width + row_advance;
+          color = (color >> 8) | (color << 24);
+          if (--height == 0) return;
+
+          memset(dest, (uint8_t)color, width);
+          dest += width + row_advance;
+          color = (color >> 16) | (color << 16);
+      } while (--height != 0);
+  }
+  ```
+
+- `height` is effectively treated as signed in the original control flow, but the implementation converts it to `uint32_t rows`. That masks invalid negative input and materially changes behavior for nonpositive values.
+  Suggested diff snippet:
+  ```cpp
+  -    uint32_t rows = static_cast<uint32_t>(height);
+  -    while (rows != 0) {
+  +    do {
+  ...
+  -            if (--rows == 0) {
+  +            if (--height == 0) {
+                   break;
+               }
+  ...
+  -            if (--rows == 0) {
+  +            if (--height == 0) {
+                   break;
+               }
+  ...
+  -            --rows;
+  -        }
+  +        } while (--height != 0);
+  ```
+
+fail
+
+---------------------------------------
+0053717A regions::Tint_Fill_Region_
+
+- Parameter 4 signedness is inconsistent with the disassembly. The function stores `ECX` into `_rows_remaining` and loops with `DEC/JNZ`; nearby analogous functions use signed `int32_t`/`int` for row counts. Current prototype uses `uint32_t row_count`, which can hide invalid negative callers and is not faithful to the recovered signature.
+  Suggested diff:
+
+  ```cpp
+  - void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, uint32_t row_count);
+
+  + void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, int32_t row_count);
+  ```
+
+
+- The implementation uses `while (_rows_remaining != 0)` / `while (remaining_dwords != 0)` structure, which does not preserve the exact do-while entry behavior implied by the assembly. The assembly always enters the inner body once after loading `_saved_width`, and would underflow if `width_dwords == 0`; likewise it enters the outer body once after storing `_rows_remaining`. Current code silently skips on zero values, so control flow is not instruction-faithful.
+
+  Suggested diff:
+  ```cpp
+
+  - while (_rows_remaining != 0) {
+  -     uint32_t remaining_dwords = _saved_width;
+
+  -     while (remaining_dwords != 0) {
+  + do {
+
+  +     uint32_t remaining_dwords = _saved_width;
+  +     do {
+
+  ...
+  + } while (_rows_remaining != 0);
+
+  ```
+
+
+- `row_skip` is typed as `uint32_t`, but the disassembly computes it in a 32-bit register with signed semantics possible (`screen_res_x - width_bytes`). Other nearby functions use signed stride/advance variables for the same pattern. Using unsigned here can mask negative stride behavior and is less accurate to the machine code.
+  Suggested diff:
+
+  ```cpp
+  - uint32_t row_skip = platform::g_screen_res_x - width_bytes;
+
+  + int32_t row_skip = platform::g_screen_res_x - static_cast<int32_t>(width_bytes);
+  ```
+
+
+fail
+
+
+---------------------------------------
+
+
+---------------------------------------
+
+
+00537324 shear::Flip_Bitmap_Down_Same_
+
+- Signature mismatch: the validated function at 0x00537324 takes 3 parameters in assembly (`data`, `width`, `height`), but the supplied decompiler prototype shows 5 parameters and mis-types `param_3` as a pointer used as a loop counter. This creates uncertainty in the source-to-binary mapping and means the provided input is internally inconsistent.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl shear::Flip_Bitmap_Down_Same_(uint8_t *param_1,uint param_2,uint8_t *param_3,uint param_4,int param_5)
+  + void __cdecl shear::Flip_Bitmap_Down_Same_(uint8_t* data, uint32_t width, uint32_t height)
+  ```
+
+- The decompiler output’s control variable is wrong enough to obscure exact semantics: assembly decrements `[EBP+0x10]` as an integer height counter, while the decompiler represents it as `param_3 = param_3 + -1; while (param_3 != (uint8_t *)0x0);`. The project implementation itself looks correct, but because the provided validation inputs disagree on the function interface, I cannot conclusively mark the supplied inputs as matched without user clarification on which input is authoritative.
+
+---------------------------------------
+0x00537B62 shear::Mask_Bitmap_Pixels_
+
+- Inner loop control differs for `width == 0`: the assembly uses `LOOP`, which decrements `ECX` first and will execute 2^32 iterations if `width` is zero, while the current C++ `for (x = 0; x < width; ++x)` executes zero iterations. This is a real control-flow mismatch.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl shear::Mask_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, int32_t dst_row_skip, uint8_t* dst, int32_t width, int32_t height)
+  {
+      _src_row_skip = src_row_skip;
+      _dst_row_skip = dst_row_skip;
+
+      do {
+          int32_t count = width;
+          do {
+              if (*src != 0) {
+                  *dst = 0;
+              }
+              ++src;
+              ++dst;
+              --count;
+          } while (count != 0);
+          src += _src_row_skip;
+          dst += _dst_row_skip;
+          --height;
+      } while (height != 0);
+  }
+  ```
+
+- Outer loop control differs for `height == 0`: the assembly decrements `param_6` after completing a row and loops until it becomes zero, so a zero height still causes execution and underflows; the current `for (y = 0; y < height; ++y)` skips entirely. This is another semantic mismatch for zero input.
+  Suggested diff snippet:
+  ```cpp
+  // preserve original do/while structure instead of count-up for loops
+  do {
+      int32_t count = width;
+      do {
+          if (*src != 0) {
+              *dst = 0;
+          }
+          ++src;
+          ++dst;
+          --count;
+      } while (count != 0);
+
+      src += _src_row_skip;
+      dst += _dst_row_skip;
+      --height;
+  } while (height != 0);
+  ```
+
+fail
+---------------------------------------
+0x00537BB5 shear::Mask_Brighten_Bitmap_Pixels_
+
+Discrepancies:
+- Row transition is off by one source byte. The assembly consumes one byte with `LODSB` each iteration, so after the inner loop `ESI` already points past the row; then it does `ADD ESI, _src_row_skip`. Current code also post-increments `src` in-loop, but then adds `_src_row_skip` to that advanced pointer while its caller appears to supply a skip value intended for the original asm convention; this needs explicit confirmation because the surrounding clipping code computes skip values in a fragile way and this function relies on exact caller contract.
+  Suggested diff snippet:
+  ```cpp
+  // clarify exact contract; if skip is total row delta-from-end, keep as-is,
+  // otherwise:
+  src = row_src_end + _src_row_skip;
+  ```
+
+- Signedness / type semantics around `bitmap::_brighten_start_color` are uncertain and potentially wrong. The asm does `SUB EAX, dword ptr [bitmap::_brighten_start_color]` after zeroing `AH`, meaning the low byte participates as an unsigned 0..255 value, then wraps before `MOV CL, AL`. Current code uses `static_cast<uint8_t>(src_pixel - bitmap::_brighten_start_color)`, while the caller stores `_brighten_start_color` via `static_cast<int32_t>(static_cast<int8_t>(color))`. That signed storage may be intentional, but without confirming the binary behavior for colors >= 0x80 this restoration remains ambiguous.
+  Suggested diff snippet:
+  ```cpp
+  uint32_t color_offset =
+      ((uint8_t)((uint32_t)src_pixel - (uint32_t)bitmap::_brighten_start_color) << 8) + *dst;
+  ```
+
+- The implementation uses an explicit cast on `_brighten_palette_seg`, which is a likely sign the global is typed imprecisely rather than the function. Given restoration rules, this should be validated against the actual global type instead of compensating locally.
+  Suggested diff snippet:
+  ```cpp
+  // prefer correcting global declaration:
+  inline uint8_t*& _brighten_palette_seg = ...;
+  // then:
+  *dst = bitmap::_brighten_palette_seg[color_offset];
+  ```
+
+fail
+---------------------------------------
+  Suggested diff snippet:
+  ```cpp
+  // prefer correcting global declaration:
+  inline uint8_t*& _brighten_palette_seg = ...;
+  // then:
+  *dst = bitmap::_brighten_palette_seg[color_offset];
+  ```
+
+fail
+---------------------------------------
+0x00537C2F shear::Mask_Bitmap_Pixels_Inverse_
+
+- Inner loop shape does not match the assembly’s `LOOP`-driven width counter. The current C `for (int32_t x = 0; x < width; ++x)` is only equivalent when `width > 0`; the original code unconditionally enters the loop body and uses `LOOP`, so `width <= 0` produces very different behavior, especially `width == 0` becoming a 2^32-iteration walk.
+  Suggested diff snippet:
+  ```cpp
+  // current
+  for (int32_t x = 0; x < width; ++x) {
+
+  // closer to asm semantics
+  int32_t x = width;
+  do {
+- Outer loop shape also differs for `height <= 0`. Assembly executes the row body before decrement/testing `param_6`, so `height == 0` still runs and then decrements to `-1`, continuing indefinitely. Current `for (int32_t y = 0; y < height; ++y)` suppresses all work for non-positive heights.
+  Suggested diff snippet:
+  ```cpp
+  // current
+  for (int32_t y = 0; y < height; ++y) {
+
+  // closer to asm semantics
+  do {
+      ...
+      --height;
+  } while (height != 0);
+  ```
+- Because validation requires flags-dependent/control-flow accuracy, these zero/negative-dimension semantics are material and cannot be treated as cosmetic, even if callers usually pass positive sizes.
+fail
+---------------------------------------
+00537C82 shear::Mask_Bitmap_Colors_Pixels_
+
+- The parameter type for `pixels` does not match the actual implementation semantics. The assembly uses `LODSD`/`STOSD` on a dword stream from `param_1`, so this function operates on `uint32_t*`, not a byte-oriented pointer. The current `uint8_t*` signature works only via a cast inside the function, but it is still a type discrepancy against the recovered implementation and can hide alignment/aliasing issues.
+  Suggested diff snippet:
+  ```cpp
+  - void __cdecl Mask_Bitmap_Colors_Pixels_(uint8_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height)
+  + void __cdecl Mask_Bitmap_Colors_Pixels_(uint32_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height)
+  ```
+
+- The header comment explicitly notes a type mismatch (“original stub used int16_t for parameters”), which indicates unresolved uncertainty in the restored prototype. For validation, this function’s interface should be settled from callsites/ABI rather than left flagged as mismatched.
+  Suggested diff snippet:
+  ```cpp
+  - // TYPE MISMATCH: original stub used int16_t for parameters
+    void __cdecl Mask_Bitmap_Colors_Pixels_(...)
+  ```
+
+- The implementation introduces unnecessary explicit casts (`reinterpret_cast<uint32_t*>`, repeated `static_cast<uint8_t>`), which are code smells under the restoration rules and likely stem from the incorrect source parameter typing rather than real source intent.
+  Suggested diff snippet:
+  ```cpp
+  - uint32_t* ptr = reinterpret_cast<uint32_t*>(pixels);
+  - uint8_t min_c = static_cast<uint8_t>(min_color);
+  - uint8_t max_c = static_cast<uint8_t>(max_color);
+  + uint8_t min_c = min_color;
+  + uint8_t max_c = max_color;
+  ```
+
+fail
+---------------------------------------
+00537e1c FUN_00537e1c
+
+- No matching function could be confidently located in the current source tree. The only nearby candidate by behavior is `shear::Enlarge_Bitmap_` in `src/game/shear.cpp`, but it is an 8-parameter routine and its control flow does not match the provided binary’s 10-parameter stack layout.
+  Suggested diff snippet:
+  ```cpp
+  // Missing/incorrectly identified function near 00537e1c.
+  // Need the actual restored symbol corresponding to FUN_00537e1c before validation.
+  ```
+
+- The candidate implementation differs materially from the disassembly: the binary uses `ECX` as a loop counter from stack param 4, conditionally stores only nonzero source bytes, advances destination by exactly 1 per iteration, adds two extra step accumulators from params 5/6 into `EDX/EAX`, then repeatedly subtracts param 8 from the source pointer while `param_1 >= 0x10000`. `shear::Enlarge_Bitmap_` instead writes every pixel unconditionally, decrements destination, and uses different accumulator/state handling.
+  Suggested diff snippet:
+  ```cpp
+  // Binary shape requires something closer to:
+  for (; count != 0; --count) {
+      uint8_t px = *src;
+      if (px != 0) *dst = px;
+      ++dst;
+      step_y += add_y;
+      step_x += add_x;
+      src -= (stride_accum >> 16);
+      stride_accum &= 0xFFFF;
+      while (frac_accum >= 0x10000) {
+          src -= row_advance;
+          frac_accum -= 0x10000;
+      }
+  }
+  ```
+
+- The Ghidra decompiler output is also incomplete/misleading versus the assembly: it drops the `ADD EDX,[param_5]` and `ADD EAX,[param_6]` effects entirely and misrepresents parameter usage, so validation cannot rely on it without a confirmed source counterpart.
+  Suggested diff snippet:
+  ```cpp
+  // Do not model this as:
+  param_3 = param_3 + -(param_2 >> 0x10);
+  param_2 = 0;
+  // Missing fixed-point accumulator updates from params 5 and 6.
+  ```
+
+fail
+---------------------------------------
+
+0x00538680 WINNET::Find_Provider_
+
+- `_provider_count` is typed as `uint32_t`, but the assembly uses `CMP [count],0` + `JLE` and loop back `CMP EBX,EAX` + `JL`, i.e. signed comparisons. Current source uses `for (int32_t i = 0; i < _provider_count; ++i)`, which forces the comparison through an unsigned `uint32_t` bound and does not preserve original signed semantics for negative values.
+  Suggested diff snippet:
+  ```cpp
+  // in winnet.h
+  inline int32_t& _provider_count =
+      *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560798});
+  ```
+
+- The function body uses the CRT/global `strstr`, while the binary calls `ERIC::strstr` at `0x00541b30`. That may be equivalent, but it is not validated from this project, and the assignment requires matching the called symbol/behavior precisely.
+  Suggested diff snippet:
+  ```cpp
+  if (ERIC::strstr(_providers[i]->name, name) != nullptr) {
+      found_index = (int8_t)i;
+  }
+  ```
+
+fail
+---------------------------------------
+005386d0 WINNET::Init_Connection_
+
+fail
+
+Discrepancies / blockers:
+- Global target for `netcode::_connection_type` does not match the supplied disassembly.
+  - Assembly writes `mode` to `0x0058998C`.
+  - Project declares `netcode::_connection_type` at `0x00589A0C`.
+  - This is a correctness issue because the validated function’s final side effect is a concrete global store.
+  - Minimal suggested diff:
+    ```cpp
+    // src/game/netcode.h
+    inline int32_t& _connection_type =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0058998C});
+    ```
+
+Notes on analysis:
+- Control flow in `Init_Connection_` otherwise matches the disassembly: mode 0/1/2 string selection, invalid mode falling through with provider index `-1`, early return on `-1`, releasing existing `_dplay`, calling `DPLAY_DLL::Ordinal_1` with provider GUID and `&netcode::_dplay`, returning 1 only on `HRESULT == 0`.
+- The extra decompiler `GUID guid` parameter is not present in the real function; project signature `int32_t __cdecl Init_Connection_(int32_t mode)` matches the assembly.
+
+---------------------------------------
+00538B80 arith1e::Uncompress_Data_
+
+fail
+
+Discrepancies:
+- `*dst_len_ptr` write is unconditional in the disassembly, but the implementation guards it with `if (dst_len_ptr != nullptr)`. Original code dereferences param_4 directly at `00538c23`, so the null check changes behavior.
+  Suggested diff:
+  ```cpp
+  -            if (dst_len_ptr != nullptr) {
+  -                *dst_len_ptr = out_pos;
+  -            }
+  +            *dst_len_ptr = out_pos;
+  ```
+
+- Cleanup order does not match. Disassembly calls `bitio::CloseInputBitBuffer_(stream)` first, stores output length, then calls `uninit_model_()`. Current code stores length before closing the bit buffer. While usually harmless, this is a real side-effect ordering mismatch and should be preserved exactly for validation.
+  Suggested diff:
+  ```cpp
+  -            *dst_len_ptr = out_pos;
+  -            
+  -            bitio::CloseInputBitBuffer_(stream);
+  -            uninit_model_();
+  +            bitio::CloseInputBitBuffer_(stream);
+  +            *dst_len_ptr = out_pos;
+  +            uninit_model_();
+  ```
+
+- Local type/sign handling is slightly off versus the assembly contract. `get_current_count_` returns a 16-bit signed value (`AX` sign-extended by `MOVSX EAX,AX` before the call), but the implementation stores it in `int count` directly from the function call. This relies on the helper prototype already doing the sign extension and obscures the exact original behavior. Given the restoration rules, this should be expressed explicitly or verified through the helper signature path.
+  Suggested diff:
+  ```cpp
+  -                    int count = get_current_count_(&s);
+  +                    int count = (int)(int16_t)get_current_count_(&s);
+  ```
+
+---------------------------------------
+  ```
+
+- Local type/sign handling is slightly off versus the assembly contract. `get_current_count_` returns a 16-bit signed value (`AX` sign-extended by `MOVSX EAX,AX` before the call), but the implementation stores it in `int count` directly from the function call. This relies on the helper prototype already doing the sign extension and obscures the exact original behavior. Given the restoration rules, this should be expressed explicitly or verified through the helper signature path.
+  Suggested diff:
+  ```cpp
+  -                    int count = get_current_count_(&s);
+  +                    int count = (int)(int16_t)get_current_count_(&s);
+  ```
+
+---------------------------------------
+
+0x00538C40 arith1e::uninit_model_
+
+Fail:
+- The implementation performs an extra store after each free: it sets `totals[context] = nullptr;`, but the assembly only loads each pointer, calls `_free`, increments the pointer slot iterator, and returns. That is an observable side effect mismatch on global memory.
+- The recovered global layout in code does not match the binary layout implied by the loop bound. The assembly iterates contiguous dwords from `DAT_0058d7a8` up to but not including `arith1e::_code` at `0x0058DBAC`, i.e. exactly the `totals` table in memory. In source, `totals` is declared as `int* totals[END_OF_STREAM];` followed by `uint16_t code;`; this is plausible, but the explicit nulling means the generated code cannot match the shown instruction sequence.
+
+Minimal suggested diff snippet:
+```cpp
+static void __cdecl uninit_model_() {
+    for (int context = 0; context < END_OF_STREAM; context++) {
+        free(totals[context]);
+    }
+}
+```
+---------------------------------------
