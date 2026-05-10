@@ -25743,3 +25743,503 @@ static void __cdecl uninit_model_() {
 }
 ```
 ---------------------------------------
+
+---------------------------------------
+0x004B57E0 MAPGEN::Enforce_Planet_Max_
+
+fail
+
+Discrepancies:
+
+1. Removal predicate is missing the star-slot validation done through `MOX::_star[star_index].planet_index[orbit]`.
+   - Assembly computes `star_index` and `orbit` from the candidate backup planet, loads `MOX::_star[star_index].planet_index[orbit]`, and only proceeds when that value is `> -1`.
+   - Current code instead tests `backup_p->planet_type != 2`, which is a different condition and changes which planets may be removed.
+
+   Minimal suggested diff snippet:
+   ```cpp
+   if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
+       int16_t linked_idx =
+           MOX::_star[(uint8_t)backup_p->star_index].planet_index[(uint8_t)backup_p->orbit];
+       if (linked_idx > -1 &&
+           _pl[linked_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
+           backup_p->colony_index = -2;
+           MOX::_planet_count--;
+       }
+   }
+   ```
+
+2. Star backup allocation/copy side effect is incomplete.
+   - Assembly allocates a second block of size `0x1FC8` and copies the entire `MOX::_star` array into it with `rep movsd`.
+   - Current code calls `Allocate_Next_Block_(..., 72 * 113)` but discards the returned pointer and performs no copy at all.
+   - Even though this temporary copy is not read later in the current source, the original function performs the allocation and memory write; omitting it is a behavioral mismatch and may affect allocator/block layout or debugging assumptions.
+
+   Minimal suggested diff snippet:
+   ```cpp
+   s_star_data* star_backup =
+       (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
+   for (int32_t i = 0; i < (72 * 113) / 4; ++i) {
+       ((uint32_t*)star_backup)[i] = ((uint32_t*)MOX::_star)[i];
+   }
+   ```
+
+3. Debug `PFMT_` call has wrong argument list.
+   - Assembly pushes four formatted integers after the format string:
+     `colony_planets = planet_count - gas_giants`,
+     `max_planets`,
+     `planet_count`,
+     `removed = (planet_count - gas_giants) - max_planets`.
+   - Current source only passes two integers, which does not match the format string shown in the provided data and changes stack/varargs behavior.
+
+   Minimal suggested diff snippet:
+   ```cpp
+   if (capture::Check_Release_Version_() == 0) {
+       int32_t colony_planets = original_planet_count - gas_giant_count;
+       int32_t removed = colony_planets - max_planets;
+       RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+           colony_planets, (int32_t)max_planets,
+           (int32_t)original_planet_count, removed);
+       assert::hgetch_();
+   }
+   ```
+
+0x004B5BF0 MAPGEN::Generate_Food_Per_Farmer_
+
+- Return type signedness is wrong. The binary returns the raw byte loaded from `MOX::_food_per_farmer_table` into `AL`, and that table is declared as `int8_t[10]`. The current implementation/header use `uint8_t`, which changes the function contract for negative table entries.
+  ```diff
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  ```
+
+- Climate index signedness does not match the assembly. The binary does `MOVSX` from `planet->climate` before indexing the table, so the field is consumed as signed `int8_t`. Current code forces `static_cast<uint8_t>(planet->climate)`, which zero-extends instead and changes behavior for negative values.
+  ```diff
+  - uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+  - return MOX::_food_per_farmer_table[climate_idx];
+  + return MOX::_food_per_farmer_table[planet->climate];
+  ```
+
+- The same return-type mismatch exists in the definition and declaration, so callers may observe different signedness than the original binary.
+  ```diff
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index) {
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index) {
+  ```
+
+fail
+
+---------------------------------------0x004F24D0 HAROLD::Get_Font_File_
+
+fail
+
+- Default case copy length is wrong for exact binary behavior. The binary copies 10 bytes for the default "fonts.lbx" path and does not write `out[10]`, while the non-default paths copy 11 bytes including the terminating NUL at offset `+0xa`. The current implementation always does `memcpy(buffer, src, 10)`, so languages 1..4 fail to copy the final byte.
+  ```diff
+    void __cdecl Get_Font_File_(char* buffer) {
+  -     const char* src;
+  +     const char* src;
+  +     int len;
+  
+        switch (MOX::_settings.language) {
+        case 1:
+            src = "fontsg.lbx";
+  +         len = 11;
+            break;
+        case 2:
+            src = "fontsf.lbx";
+  +         len = 11;
+            break;
+        case 3:
+            src = "fontss.lbx";
+  +         len = 11;
+            break;
+        case 4:
+            src = "fontsi.lbx";
+  +         len = 11;
+            break;
+        default:
+            src = "fonts.lbx";
+  +         len = 10;
+            break;
+        }
+  
+  -     memcpy(buffer, src, 10);
+  +     memcpy(buffer, src, len);
+    }
+  ```
+
+- The current high-level implementation obscures the binary’s asymmetric memory writes: default copies 4+4+2 bytes only, while cases 1..4 also write byte `+0xa`. This matters because `buffer[10]` remains untouched in default but is explicitly written in localized cases. A uniform string copy is only valid if it preserves that exact side effect.
+
+---------------------------------------
+0x00524BB0 animate::Draw_Glassed_Screen_Background_Off_
+
+fail
+
+Discrepancies:
+- Current implementation writes 32-bit pixels from a `uint32_t*` interpretation in the non-glassed sibling style, but the disassembly is strictly byte-stream based: `MOVSX` reads signed bytes for skip/count and each copied source element is a single byte written to `video::_current_video_page[EDI]`.
+  Suggested diff snippet:
+  ```cpp
+  - uint32_t sprite_idx = 0;
+  + int sprite_idx = 0;
+  ...
+  - int8_t skip_count = static_cast<int8_t>(sprite[sprite_idx]);
+  - int8_t run_length = static_cast<int8_t>(sprite[sprite_idx + 1]);
+  + int skip_count = (int8_t)sprite[sprite_idx];
+  + int run_length = (int8_t)sprite[sprite_idx + 1];
+  ```
+- The source stream index type is wrong. Assembly uses signed arithmetic in `EDX` and computes run end as `edx + run_length * 4`; current code uses `uint32_t`, which can mis-handle negative signed byte expansion and changes comparison semantics.
+  Suggested diff snippet:
+  ```cpp
+  - uint32_t bytes_to_copy = static_cast<uint32_t>(run_length) * 4;
+  - for (uint32_t i = 0; i < bytes_to_copy; ++i) {
+  + int run_end = sprite_idx + run_length * 4;
+  + while (sprite_idx < run_end) {
+        video::_current_video_page[current_out_pos++] = sprite[sprite_idx++];
+  - }
+  + }
+  ```
+- Destination position type/semantics are off. Assembly keeps destination in signed/int register `EDI`, starting from the page base in `ESI`, then adds signed skip. Current `uint32_t current_out_pos` changes behavior if skip is negative.
+  Suggested diff snippet:
+  ```cpp
+  - for (uint32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+  -     uint32_t current_out_pos = page_offset;
+  + for (int page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+  +     int current_out_pos = page_offset;
+  ```
+- The implementation omits the explicit per-byte load/store structure seen in the assembly and therefore has unresolved signedness correctness for malformed/edge stream data. This needs to be restored exactly before validation can pass.
+
+---------------------------------------
+
+---------------------------------------
+0x00524C30 animate::Draw_Glassed_Screen_Background_On_
+
+Discrepancies:
+- Uses the wrong glass lookup table symbol/address. The disassembly indexes `draw::_glass_lookup_table` at `0x0056A998`, but the implementation uses `video::_glass_remap_colors` at `0x00579998`. These are different tables and different layouts; this is a behavioral mismatch.
+  ```diff
+  - *dst = video::_glass_remap_colors[color - 0xF0][*dst];
+  + *dst = draw::_glass_lookup_table[(color << 8) + *dst];
+  ```
+
+- The implementation computes the glass-table row indirectly as `color - 0xF0`, while the assembly uses the full byte value in the high byte (`color << 8`) after branching on `color >= 0xF0`. That only matches if the table is specifically laid out for colors `0xF0..0xFF`; with the current symbol/address mismatch this is not validated.
+  ```diff
+  - *dst = video::_glass_remap_colors[color - 0xF0][*dst];
+  + *dst = draw::_glass_lookup_table[((uint32_t)color << 8) + *dst];
+  ```
+
+- Type setup around `video::_video_memory` is inconsistent with this function’s actual byte-wise access pattern. The assembly treats `video::_video_memory` as a byte-addressed framebuffer base for `ADD EDI, EDX` / `MOV DL,[EDI]` / `MOV [EDI],AL`, but the project types it as `uint32_t*` and relies on a cast here. That makes validation of exact memory semantics uncertain and suggests the global type is wrong for this call site.
+  ```diff
+  - uint8_t* dst = reinterpret_cast<uint8_t*>(video::_video_memory) + (y * pitch) + x;
+  + uint8_t* dst = video::_video_memory + (y * pitch) + x;
+  ```
+
+fail
+0x00534790 swap::Save_Block_To_Drive_
+
+fail
+
+Discrepancies:
+- Uses `fopen` instead of the binary-mapped `_wfopen` entry at `0x00540c00`. The hook table maps that address to `fopen`, so behavior may be equivalent in this project, but it is not a precise source match and remains ambiguous without confirming the import wrapper intent.
+  ```diff
+  -    swap_file = fopen(s_TEMP_TMP_0055becc, s_wb_00551178);
+  +    swap_file = _wfopen(s_TEMP_TMP_0055becc, s_wb_00551178);
+  ```
+
+- Size argument type on `fwrite` is widened via explicit cast to `size_t`, while the binary passes the 32-bit global value directly. This is likely harmless on Win32, but per restoration rules the cast is a code smell and creates avoidable type uncertainty around `_swap_block_size`.
+  ```diff
+  -    fwrite(block_address - 0x0c, static_cast<size_t>(swap::_swap_block_size), 1, swap_file);
+  +    fwrite(block_address - 0x0c, swap::_swap_block_size, 1, swap_file);
+  ```
+
+- Global naming/types differ from the binary’s two adjacent globals and obscure the exact memory role split (`0x00587FE8` = address, `0x00587FE4` = written byte count). Current code is probably functionally aligned, but validation cannot be called precise enough without resolving whether `_swap_block_size` is definitively the intended original symbol/type rather than a project reinterpretation.
+  ```diff
+  -    swap::_swap_block_size = saved_block_size + 0x0c;
+  +    /* confirm 0x00587FE4 is the byte-count global written from EAX = param_2 + 0x18 */
+  +    swap::_swap_block_size = block_size + 0x18;
+  ```
+
+---------------------------------------
+
+00534A50 lbx::LBX_getRecordLength_
+
+- Signature mismatch: disassembly reads the second argument as a 32-bit stack value (`MOV ECX,[ESP+0x8]`), but the project declares it as `uint16_t`. This can affect caller ABI expectations and index semantics.
+  Suggested diff:
+  ```diff
+  - int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx);
+  + uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx);
+  ```
+
+- Return type mismatch: assembly returns the raw 32-bit `size` field in `EAX`; the current code returns `int32_t` with an explicit cast from `uint32_t`. That introduces incorrect signedness for sizes >= 0x80000000 and the cast is unnecessary.
+  Suggested diff:
+  ```diff
+  - int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx) {
+  -     return (int32_t)header->entries[rec_idx].size;
+  + uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx) {
+  +     return header->entries[rec_idx].size;
+    }
+  ```
+
+- Type reconstruction inconsistency with decompiler input: Ghidra decompiler also shows `uint32_t` return and `int` index parameter. Current restoration narrows both.
+  Suggested diff:
+  ```diff
+  - int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx)
+  + uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx)
+  ```
+
+fail
+
+---------------------------------------
+0x00534A70 time::time_
+
+- Namespace/name mismatch: the project defines `time_::time_()` instead of `time::time_()`. If symbol binding depends on namespace identity, this is not the same function.
+  ```diff
+  - namespace time_ {
+  + namespace time {
+  ```
+
+- Arithmetic does not match the assembly. The binary multiplies the `_clock()` result by 1000 before signed division by 1000, using `cdq`/`idiv`, so overflow and signed-division behavior are preserved from the intermediate product. Current source simplifies to an identity expression `(cVar1 * 1000) / 1000`, which is only equivalent mathematically, not at the machine-behavior level when 32-bit signed overflow occurs.
+  ```diff
+   int32_t __cdecl time_() {
+  -    int32_t cVar1 = clock();
+  -    return (cVar1 * 1000) / 1000;
+  +    // needs an implementation that preserves the original signed 32-bit
+  +    // multiply/divide behavior from the assembly path
+   }
+  ```
+
+fail
+
+---------------------------------------
+
+0x00534A90 netcode::Net_Init_
+
+- `mode == 0` path does not preserve the binary’s explicit GUID argument passing into `WINNET::Init_Connection_`. The assembly pushes the full by-value `GUID` plus leading `1` before calling `0x005386d0`; current code only calls `WINNET::Init_Connection_(1)`. This is a calling-sequence/signature mismatch and cannot be validated as equivalent without reconciling the callee prototype or wrapper semantics.
+  ```cpp
+  // current
+  result = WINNET::Init_Connection_(1);
+
+  // binary-shaped expectation
+  result = WINNET::Init_Connection_(1, guid);
+  ```
+
+- Because of that mismatch, the recovered source does not match the instruction-by-instruction stack behavior in the `mode == 0` branch: the binary pushes 5 arguments total for `Init_Connection_`, then separately pushes the same GUID again for `Refresh_Game_List_`. Current code only performs the second GUID pass. This leaves uncertainty whether the current `WINNET::Init_Connection_` implementation/prototype is restored correctly or whether `Net_Init_` is relying on an unmodeled custom wrapper.
+  ```cpp
+  if (mode == 0) {
+      time_::_time = reinterpret_cast<time_::Fn>(0x00534A70);
+      time_::_time2 = reinterpret_cast<time_::Fn>(0x00534A70);
+
+      // missing GUID participation here relative to binary call sequence
+      result = WINNET::Init_Connection_(1);
+      WINNET::Refresh_Game_List_(guid);
+  }
+  ```
+
+- Type/prototype uncertainty remains for `WINNET::Init_Connection_` itself: project declaration/definition is `int32_t __cdecl Init_Connection_(int32_t mode)`, but the provided disassembly for its only caller shows a by-value GUID being passed as part of the call. This requires follow-up before strict validation can continue.
+  ```cpp
+  // current declaration
+  int32_t __cdecl Init_Connection_(int32_t mode);
+
+  // possible intended shape implied by caller disassembly
+  int32_t __cdecl Init_Connection_(int32_t mode, GUID guid);
+  ```
+
+fail
+
+---------------------------------------
+0x00534C30 netcode::Net_Is_Sending_
+
+fail
+
+Discrepancies:
+- Referenced global does not match the supplied input. The disassembly reads a signed byte from `transprt::_tpSending` at `0x0055BF30` via `MOVSX EAX, byte ptr [...]`, but the project defines `transprt::_tpSending` as `uint32_t&` at `0x00560A78` and `netcode::Net_Is_Sending_()` returns that 32-bit value directly.
+  Suggested diff snippet:
+  ```cpp
+  namespace transprt {
+      // was: inline uint32_t& _tpSending = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A78});
+      inline int8_t& _tpSending = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0055BF30});
+  }
+
+  namespace netcode {
+      int __cdecl Net_Is_Sending_() {
+          return transprt::_tpSending; // sign-extends int8_t to int
+      }
+  }
+  ```
+
+- Signedness/width behavior is currently wrong for this function. `MOVSX` requires sign-extension from 8 bits; the current code returns an unsigned 32-bit lvalue, which changes behavior if the stored byte has bit 7 set and also changes the exact memory access width.
+  Suggested diff snippet:
+  ```cpp
+  int __cdecl Net_Is_Sending_() {
+      return (int)transprt::_tpSending; // with _tpSending typed as int8_t
+  }
+  ```
+
+- There is unresolved project inconsistency around `transprt::_tpSending` usage elsewhere, because current transport code treats it as a wider field at a different address. This must be reconciled before this function can be validated with confidence.
+  Suggested diff snippet:
+  ```cpp
+  // Re-audit transprt globals against the binary before validating this wrapper.
+  ```
+---------------------------------------
+0x00538F10 arith1e::initialize_model_
+
+- Missing allocation failure handling present in disassembly. The binary tests each `calloc` result and calls an error/reporting routine with the context index when null; current source silently proceeds into `update_model_`, which would dereference a null pointer.
+  ```diff
+   static void __cdecl initialize_model_() {
+       for (int context = 0; context < END_OF_STREAM; context++) {
+           totals[context] = (int*)calloc(END_OF_STREAM + 2, sizeof(int));
+  +        if (totals[context] == nullptr) {
+  +            FUN_0053a8a0("Failure allocating context %d", context);
+  +        }
+           update_model_(ESCAPE, context);
+       }
+  ```
+
+- The decompiler output shown is slightly wrong for the failure call signature, and the current project has no visible definition/reference for the reporting routine, so exact restoration of that side effect cannot be validated from source alone. This blocks a full match claim.
+  ```diff
+  -        // no failure side effect
+  +        // binary calls error/report function with format string and context index
+  ```
+
+---------------------------------------
+0053A050 transprt::ReceiveLargeUserMessage_
+
+fail
+
+Discrepancies:
+- `_tpPacketsReceived` is typed and used incorrectly. Assembly accesses it as a byte array (`byte ptr [..]`), but the project declares it as `uint32_t[256]` and indexes it as 32-bit elements. This changes memory layout and all packet-received tests/stores from `base + idx` to `base + idx*4`, which is not equivalent.
+  Suggested diff:
+  ```cpp
+  - inline uint32_t (&_tpPacketsReceived)[256] =
+  -     *reinterpret_cast<uint32_t(*)[256]>(std::uintptr_t{0x00591FA0});
+  + inline uint8_t (&_tpPacketsReceived)[256] =
+  +     *reinterpret_cast<uint8_t(*)[256]>(std::uintptr_t{0x00591FA0});
+  ...
+  - memset(_tpPacketsReceived, 0, 0x100 * sizeof(uint32_t));
+  + memset(_tpPacketsReceived, 0, sizeof(_tpPacketsReceived));
+  ```
+
+- Because of the wrong `_tpPacketsReceived` type, the receive-state logic does not match instruction-by-instruction: duplicate-packet detection, burst-complete checks, full-message completeness checks, and packet mark writes all read/write the wrong addresses.
+  Suggested diff:
+  ```cpp
+  - if (_tpPacketsReceived[pkt_idx] == 1) {
+  + if (_tpPacketsReceived[pkt_idx] == 1) {
+        ...
+  -     if (_tpPacketsReceived[i] == 0) {
+  +     if (_tpPacketsReceived[i] == 0) {
+            ...
+  - _tpPacketsReceived[pkt_idx] = 1;
+  + _tpPacketsReceived[pkt_idx] = 1;
+  ```
+  Note: source syntax may stay similar, but only after fixing the backing type to byte.
+
+- ACK burst-index comparison is not restored with the same signed arithmetic shape. Assembly computes `(_tpBurstNum + ((_tpBurstNum >> 31) & 3)) >> 2` via `cdq/and/add/sar`, i.e. signed division by 4 with truncation toward zero. Current code uses `_tpBurstNum / 4`. It is likely equivalent for non-negative values, but `_tpBurstNum` is signed and the binary explicitly preserves signed semantics.
+  Suggested diff:
+  ```cpp
+  - if (packet->burst_index != static_cast<uint32_t>(_tpBurstNum / 4)) {
+  + if (packet->burst_index != (uint8_t)((_tpBurstNum + ((_tpBurstNum >> 31) & 3)) >> 2)) {
+        return;
+    }
+  ```
+
+- Queue-full test is expressed differently from the binary boundary. Assembly rejects when `_queuedSenderCount >= 0x13` before enqueueing; current code only enters enqueue path when `_queuedSenderCount < 19`. Although numerically related, the restored condition should mirror the original boundary exactly for correctness and maintenance.
+  Suggested diff:
+  ```cpp
+  - if (_queuedSenderCount < 19) {
+  -     bool found = false;
+  -     ...
+  -     if (!found) {
+  -         _queuedSenders[_queuedSenderCount++] = sender;
+  -     }
+  - }
+  + if (_queuedSenderCount >= 0x13) {
+  +     return;
+  + }
+  + bool found = false;
+  + ...
+  + if (!found) {
+  +     _queuedSenders[_queuedSenderCount++] = sender;
+  + }
+  ```
+
+---------------------------------------
+0053A560 transprt::SendLargeUserMessage_
+
+- Wrong global written at send setup. The assembly stores `0` to `transprt::_tpSendImmediateBurst` at `0x00560A84`, but the implementation writes `_tpSendImmediateBurstFlag` at `0x00560AA8`. This is a different variable and changes runtime packet header behavior.
+  ```diff
+  -        _tpSendImmediateBurstFlag = 0;
+  +        _tpSendImmediateBurst = 0;
+  ```
+
+- Header/global naming indicates a likely underlying type/address mix-up around immediate-burst state. The validated function never touches `0x00560AA8`; it explicitly clears the dword at `0x00560A84`. Current implementation therefore does not match the memory side effects required by the binary.
+  ```diff
+  -    inline uint8_t& _tpSendImmediateBurstFlag = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560AA8});
+  +    // SendLargeUserMessage_ must clear _tpSendImmediateBurst at 0x00560A84 here
+  ```
+
+- `transprt::_tpMessageIsProcessed` is declared as `uint8_t&`, but the assembly performs `mov dword ptr [0x00560a80],0x0/0x1`. Because globals are packed/overlapping in this codebase, this may corrupt/ignore adjacent bytes if other code relies on full 32-bit stores exactly as in the original. Needs confirmation/correction of the true storage model at `0x00560A80`.
+  ```diff
+  -    inline uint8_t& _tpMessageIsProcessed =
+  -        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560A80});
+  +    inline uint32_t& _tpMessageIsProcessed =
+  +        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A80});
+  ```
+
+fail
+---------------------------------------
+0x0053A760 bitio::BufferOutputBit_
+
+Discrepancies:
+- Missing `_putc('.', (FILE *)&DAT_00561998)` progress side effect every 0x800 bytes written. The assembly tests the post-incremented `bit_index` with `0x7ff` and emits `'.'` when it becomes a multiple of 2048; current code omits this entirely, so observable behavior differs.
+  Suggested diff snippet:
+  ```cpp
+  bit_buf->bit_index++;
+  if ((bit_buf->bit_index & 0x7ff) == 0) {
+      _putc(0x2e, (FILE*)&DAT_00561998);
+  }
+  ```
+
+- Validation uncertainty due to source-level field typing/layout for `BIT_BUF`: assembly uses packed offsets `buf@+0`, `mask@+4`, `rack@+5`, `bit_index@+9`, while the current C++ declaration as plain struct would normally place `rack` at `+8` and `bit_index` at `+12` unless packing is enforced globally. This function depends on exact packed layout.
+  Suggested diff snippet:
+  ```cpp
+  #pragma pack(push, 1)
+  struct BIT_BUF {
+      uint8_t* buf;
+      uint8_t mask;
+      uint32_t rack;
+      uint32_t bit_index;
+  };
+  #pragma pack(pop)
+  ```
+
+fail
+---------------------------------------
+0x0053A7C0 bitio::BufferOutputBits_
+
+- Missing side effect: the binary emits `_putc('.', (FILE *)&DAT_00561998)` whenever `bit_index` becomes a multiple of `0x800` bytes. Current implementation omits this entirely, so observable I/O behavior does not match.
+  Suggested diff:
+  ```cpp
+  bit_buf->bit_index++;
+  if ((bit_buf->bit_index & 0x7FF) == 0) {
+      _putc(0x2e, (FILE *)&DAT_00561998);
+  }
+  ```
+
+- Type/control-flow mismatch on the `count` parameter: assembly loads only `CL`, does `DEC CL`, then `SHL EBX,CL` from `EBX=1`, so the effective shift count is the x86 register form using the low 8 bits and produces `0` for `count == 0`. Current code uses `1 << (count - 1)` in C++, which invokes undefined behavior for `count == 0` and is not instruction-equivalent.
+  Suggested diff:
+  ```cpp
+  uint32_t bit_selector = 1;
+  bit_selector <<= (uint8_t)(count - 1);
+  ```
+
+- Related semantic uncertainty: the binary’s `SHL EBX,CL` uses the hardware shift-count masking behavior, while the current high-level expression does not preserve that exact behavior for out-of-range counts. Even if callers usually pass small values, this is not precise enough for validation.
+  Suggested diff:
+  ```cpp
+  uint8_t shift = (uint8_t)(count - 1);
+  uint32_t bit_selector = 1;
+  bit_selector <<= shift;
+  ```
+
+fail
+---------------------------------------
+0x0053A840 bitio::BufferInputBit_
+
+- Missing side effect: the original function emits `_putc('.', DAT_00561998)` whenever `(bit_index + 1) & 0x7ff == 0` after loading a new byte. The current implementation omits this entirely, so behavior does not match.
+- Nearby bit I/O functions suggest the same progress/reporting convention may also be absent elsewhere, increasing uncertainty about intended external behavior around this stream.
+
+fail
+---------------------------------------

@@ -3934,7 +3934,7 @@
 [X] 005345C0 - Shrink_Cube_
 [X] 00534650 - Clear_Reduced_Palette_Groups_
 [X] 00534660 - Add_Reduced_Palette_Group_
-[ ] 00534710 - Compress_Reduced_Palette_Groups_
+[X] 00534710 - Compress_Reduced_Palette_Groups_
 [ ] 00534790 - Save_Block_To_Drive_
 [X] 00534830 - Restore_Block_From_Drive_
 [X] 00534880 - LBX_init_
@@ -3969,7 +3969,7 @@
 [X] 00535590 - Modem_Answer_
 [X] 005355C0 - Modem_Dial_Number_
 [X] 00535660 - Get_Modem_Error_
-[ ] 00535780 - Modem_Connected_
+[X] 00535780 - Modem_Connected_
 [X] 005357A0 - Modem_Reset_
 [X] 00535820 - FUN_00535820
 [X] 00535830 - Modem_Open_Port_
@@ -4056,128 +4056,128 @@
 [X] 00538D40 - buffer_initialize_arithmetic_decoder_
 [X] 00538D90 - buffer_encode_symbol_
 [X] 00538EA0 - buffer_flush_arithmetic_encoder_
-[ ] 00538F10 - initialize_model_
-[ ] 00538F70 - update_model_
-[ ] 00539000 - convert_int_to_symbol_
-[ ] 00539060 - get_symbol_scale_
-[ ] 00539080 - convert_symbol_to_int_
-[ ] 005390C0 - initialize_arithmetic_encoder_
-[ ] 005390E0 - get_current_count_
-[ ] 00539120 - InitModemTransportLayer_
-[ ] 005391B0 - FUN_005391b0
-[ ] 005391E0 - Send_Receive_Ack_
-[ ] 00539220 - Send_Receive_Nack_
-[ ] 00539260 - Modem_Send_Message_
-[ ] 00539290 - Modem_Status_
-[ ] 005392B0 - Send_Modem_Message_
-[ ] 005394C0 - FUN_005394c0
-[ ] 005394F0 - Modem_Update_
-[ ] 00539570 - Receive_Modem_Packet_
-[ ] 00539800 - ComInit_
-[ ] 00539940 - ComDoComms_
-[ ] 00539950 - ComSendUserMessage_
-[ ] 00539A60 - GetMessages_
-[ ] 00539AD0 - NetPoll_
-[ ] 00539B80 - HandleSessionMessage_
-[ ] 00539BC0 - Handle_Destroy_Player_
-[ ] 00539BE0 - Handle_Create_Player_
-[ ] 00539C00 - HandleControlMessage_
-[ ] 00539C90 - SetPlayerLastKeepAlive_
-[ ] 00539CE0 - Exit_With_DPlay_Error_
-[ ] 00539DB0 - InitTransportLayer_
-[ ] 00539E50 - UpdateTransportLayer_
-[ ] 00539F00 - ResetSending_
-[ ] 00539F50 - ResetReceiving_
-[ ] 00539F70 - SendAck_
-[ ] 00539FC0 - NumUsers_
-[ ] 00539FD0 - AllAcknowledged_
-[ ] 0053A050 - ReceiveLargeUserMessage_
-[ ] 0053A3D0 - NotifyNextQueuedSender_
-[ ] 0053A450 - SendPacket_
-[ ] 0053A560 - SendLargeUserMessage_
-[ ] 0053A6C0 - OpenOutputBitBuffer_
-[ ] 0053A6F0 - OpenInputBitBuffer_
-[ ] 0053A720 - CloseOutputBitBuffer_
-[ ] 0053A750 - CloseInputBitBuffer_
-[ ] 0053A760 - BufferOutputBit_
-[ ] 0053A7C0 - BufferOutputBits_
-[ ] 0053A840 - BufferInputBit_
-[ ] 0053A8A0 - FUN_0053a8a0
-[ ] 0053A8CA - DirectDrawCreate
-[ ] 0053A8D0 - Ordinal_1
-[ ] 0053A8D6 - Ordinal_2
-[ ] 0053A8DC - DirectSoundCreate
-[ ] 0053A8F0 - FUN_0053a8f0
-[ ] 0053A920 - FUN_0053a920
-[ ] 0053A9D0 - FUN_0053a9d0
-[ ] 0053A9F0 - FUN_0053a9f0
-[ ] 0053AAF0 - FUN_0053aaf0
-[ ] 0053AB30 - FUN_0053ab30
-[ ] 0053AC10 - ClearRXBuffer_
-[ ] 0053AC40 - GetCd_
-[ ] 0053AC50 - FUN_0053ac50
-[ ] 0053AD00 - FUN_0053ad00
-[ ] 0053AD40 - FUN_0053ad40
-[ ] 0053AD70 - FUN_0053ad70
-[ ] 0053ADA0 - FUN_0053ada0
-[ ] 0053AE30 - FUN_0053ae30
-[ ] 0053AEA0 - FUN_0053aea0
-[ ] 0053AF00 - FUN_0053af00
-[ ] 0053B020 - FUN_0053b020
-[ ] 0053B040 - FUN_0053b040
-[ ] 0053B140 - FUN_0053b140
-[ ] 0053B190 - FUN_0053b190
-[ ] 0053B200 - FUN_0053b200
-[ ] 0053B280 - FUN_0053b280
-[ ] 0053B390 - FUN_0053b390
-[ ] 0053B4E0 - FUN_0053b4e0
-[ ] 0053B530 - FUN_0053b530
-[ ] 0053B680 - SetDefaultBufferSize_
-[ ] 0053B690 - FUN_0053b690
-[ ] 0053B6A0 - FUN_0053b6a0
-[ ] 0053B6B0 - FUN_0053b6b0
-[ ] 0053B6E0 - FUN_0053b6e0
-[ ] 0053B760 - GetTickCount
-[ ] 0053B770 - FUN_0053b770
-[ ] 0053B7D0 - FUN_0053b7d0
-[ ] 0053B880 - FUN_0053b880
-[ ] 0053B8A0 - FUN_0053b8a0
-[ ] 0053B950 - FUN_0053b950
-[ ] 0053B980 - FUN_0053b980
-[ ] 0053B9C0 - FUN_0053b9c0
-[ ] 0053BC40 - FUN_0053bc40
-[ ] 0053BC50 - FUN_0053bc50
-[ ] 0053BC60 - FUN_0053bc60
-[ ] 0053BC70 - FUN_0053bc70
-[ ] 0053BD30 - FUN_0053bd30
-[ ] 0053BD50 - FUN_0053bd50
-[ ] 0053BD91 - FUN_0053bd91
-[ ] 0053BDF9 - FUN_0053bdf9
-[ ] 0053BE10 - FUN_0053be10
-[ ] 0053BE7E - FUN_0053be7e
-[ ] 0053BE90 - FUN_0053be90
-[ ] 0053C060 - FUN_0053c060
-[ ] 0053C070 - FUN_0053c070
-[ ] 0053C120 - FUN_0053c120
-[ ] 0053C2F0 - FUN_0053c2f0
-[ ] 0053C3A0 - FUN_0053c3a0
-[ ] 0053C410 - FUN_0053c410
-[ ] 0053C490 - FUN_0053c490
-[ ] 0053C4E0 - FUN_0053c4e0
-[ ] 0053C590 - FUN_0053c590
-[ ] 0053C640 - FUN_0053c640
-[ ] 0053C6B0 - FUN_0053c6b0
-[ ] 0053C740 - FUN_0053c740
-[ ] 0053CAD0 - FUN_0053cad0
-[ ] 0053CB70 - FUN_0053cb70
-[ ] 0053CBB0 - FUN_0053cbb0
-[ ] 0053CC20 - FUN_0053cc20
-[ ] 0053CD40 - FUN_0053cd40
-[ ] 0053CE21 - FUN_0053ce21
-[ ] 0053CE30 - FUN_0053ce30
-[ ] 0053CEE7 - FUN_0053cee7
-[ ] 0053CEF0 - FUN_0053cef0
-[ ] 0053CFA4 - FUN_0053cfa4
+[!] 00538F10 - initialize_model_
+[X] 00538F70 - update_model_
+[X] 00539000 - convert_int_to_symbol_
+[X] 00539060 - get_symbol_scale_
+[X] 00539080 - convert_symbol_to_int_
+[X] 005390C0 - initialize_arithmetic_encoder_
+[X] 005390E0 - get_current_count_
+[X] 00539120 - InitModemTransportLayer_
+[X] 005391B0 - FUN_005391b0
+[X] 005391E0 - Send_Receive_Ack_
+[X] 00539220 - Send_Receive_Nack_
+[X] 00539260 - Modem_Send_Message_
+[X] 00539290 - Modem_Status_
+[X] 005392B0 - Send_Modem_Message_
+[X] 005394C0 - FUN_005394c0
+[X] 005394F0 - Modem_Update_
+[X] 00539570 - Receive_Modem_Packet_
+[X] 00539800 - ComInit_
+[X] 00539940 - ComDoComms_
+[X] 00539950 - ComSendUserMessage_
+[X] 00539A60 - GetMessages_
+[X] 00539AD0 - NetPoll_
+[X] 00539B80 - HandleSessionMessage_
+[X] 00539BC0 - Handle_Destroy_Player_
+[X] 00539BE0 - Handle_Create_Player_
+[X] 00539C00 - HandleControlMessage_
+[X] 00539C90 - SetPlayerLastKeepAlive_
+[X] 00539CE0 - Exit_With_DPlay_Error_
+[X] 00539DB0 - InitTransportLayer_
+[X] 00539E50 - UpdateTransportLayer_
+[X] 00539F00 - ResetSending_
+[X] 00539F50 - ResetReceiving_
+[X] 00539F70 - SendAck_
+[X] 00539FC0 - NumUsers_
+[X] 00539FD0 - AllAcknowledged_
+[!] 0053A050 - ReceiveLargeUserMessage_
+[X] 0053A3D0 - NotifyNextQueuedSender_
+[X] 0053A450 - SendPacket_
+[!] 0053A560 - SendLargeUserMessage_
+[X] 0053A6C0 - OpenOutputBitBuffer_
+[X] 0053A6F0 - OpenInputBitBuffer_
+[X] 0053A720 - CloseOutputBitBuffer_
+[X] 0053A750 - CloseInputBitBuffer_
+[!] 0053A760 - BufferOutputBit_
+[!] 0053A7C0 - BufferOutputBits_
+[!] 0053A840 - BufferInputBit_
+[X] 0053A8A0 - FUN_0053a8a0
+[X] 0053A8CA - DirectDrawCreate
+[X] 0053A8D0 - Ordinal_1
+[X] 0053A8D6 - Ordinal_2
+[X] 0053A8DC - DirectSoundCreate
+[X] 0053A8F0 - FUN_0053a8f0
+[X] 0053A920 - FUN_0053a920
+[X] 0053A9D0 - FUN_0053a9d0
+[X] 0053A9F0 - FUN_0053a9f0
+[X] 0053AAF0 - FUN_0053aaf0
+[X] 0053AB30 - FUN_0053ab30
+[X] 0053AC10 - ClearRXBuffer_
+[!] 0053AC40 - GetCd_
+[X] 0053AC50 - FUN_0053ac50
+[X] 0053AD00 - FUN_0053ad00
+[X] 0053AD40 - FUN_0053ad40
+[!] 0053AD70 - FUN_0053ad70
+[X] 0053ADA0 - FUN_0053ada0
+[X] 0053AE30 - FUN_0053ae30
+[X] 0053AEA0 - FUN_0053aea0
+[X] 0053AF00 - FUN_0053af00
+[X] 0053B020 - FUN_0053b020
+[X] 0053B040 - FUN_0053b040
+[X] 0053B140 - FUN_0053b140
+[X] 0053B190 - FUN_0053b190
+[X] 0053B200 - FUN_0053b200
+[X] 0053B280 - FUN_0053b280
+[X] 0053B390 - FUN_0053b390
+[X] 0053B4E0 - FUN_0053b4e0
+[X] 0053B530 - FUN_0053b530
+[X] 0053B680 - SetDefaultBufferSize_
+[X] 0053B690 - FUN_0053b690
+[X] 0053B6A0 - FUN_0053b6a0
+[X] 0053B6B0 - FUN_0053b6b0
+[X] 0053B6E0 - FUN_0053b6e0
+[X] 0053B760 - GetTickCount
+[X] 0053B770 - FUN_0053b770
+[X] 0053B7D0 - FUN_0053b7d0
+[X] 0053B880 - FUN_0053b880
+[X] 0053B8A0 - FUN_0053b8a0
+[X] 0053B950 - FUN_0053b950
+[X] 0053B980 - FUN_0053b980
+[X] 0053B9C0 - FUN_0053b9c0
+[X] 0053BC40 - FUN_0053bc40
+[X] 0053BC50 - FUN_0053bc50
+[X] 0053BC60 - FUN_0053bc60
+[X] 0053BC70 - FUN_0053bc70
+[X] 0053BD30 - FUN_0053bd30
+[X] 0053BD50 - FUN_0053bd50
+[X] 0053BD91 - FUN_0053bd91
+[X] 0053BDF9 - FUN_0053bdf9
+[X] 0053BE10 - FUN_0053be10
+[X] 0053BE7E - FUN_0053be7e
+[X] 0053BE90 - FUN_0053be90
+[X] 0053C060 - FUN_0053c060
+[X] 0053C070 - FUN_0053c070
+[X] 0053C120 - FUN_0053c120
+[X] 0053C2F0 - FUN_0053c2f0
+[X] 0053C3A0 - FUN_0053c3a0
+[X] 0053C410 - FUN_0053c410
+[X] 0053C490 - FUN_0053c490
+[X] 0053C4E0 - FUN_0053c4e0
+[X] 0053C590 - FUN_0053c590
+[X] 0053C640 - FUN_0053c640
+[X] 0053C6B0 - FUN_0053c6b0
+[X] 0053C740 - FUN_0053c740
+[X] 0053CAD0 - FUN_0053cad0
+[X] 0053CB70 - FUN_0053cb70
+[X] 0053CBB0 - FUN_0053cbb0
+[X] 0053CC20 - FUN_0053cc20
+[X] 0053CD40 - FUN_0053cd40
+[X] 0053CE21 - FUN_0053ce21
+[X] 0053CE30 - FUN_0053ce30
+[X] 0053CEE7 - FUN_0053cee7
+[X] 0053CEF0 - FUN_0053cef0
+[X] 0053CFA4 - FUN_0053cfa4
 [ ] 0053CFB0 - FUN_0053cfb0
 [ ] 0053D07F - FUN_0053d07f
 [ ] 0053D090 - FUN_0053d090
