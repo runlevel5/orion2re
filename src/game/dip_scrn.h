@@ -14,7 +14,7 @@ namespace DIP_SCRN {
     inline int16_t* _propose_treaty_help_entry = reinterpret_cast<int16_t*>(std::uintptr_t{0x005522D0});
     inline char*& _main_diplomacy_title = *reinterpret_cast<char**>(std::uintptr_t{ 0x005A82E8 });
     inline char*& _propose_treaty_title = *reinterpret_cast<char**>(std::uintptr_t{0x005A85DC});
-    inline int8_t& _talker_ambassador = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A8378});
+    inline uint8_t& _talker_ambassador = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A8378});
     inline int16_t& _diplomacy_current_music = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89EC});
     inline int16_t& _net_diplomacy_esc_pressed = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005A89FC});
     inline uint8_t (&_target_tech_list)[212] = *reinterpret_cast<uint8_t(*)[212]>(std::uintptr_t{ 0x005A85E0 });

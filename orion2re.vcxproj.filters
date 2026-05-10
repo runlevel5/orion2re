@@ -1218,7 +1218,7 @@
     <None Include=".vocode\workflows\verifier.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
-    <None Include=".vocode\workflows\validator.yaml">
+    <None Include=".vocode\workflows\mass-validator.yaml">
       <Filter>.vocode\worklows</Filter>
     </None>
   </ItemGroup>

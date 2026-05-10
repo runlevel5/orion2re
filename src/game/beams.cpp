@@ -2119,8 +2119,8 @@ namespace BEAMS {
 
         int32_t high_x = dx;
         int32_t high_y = dy;
-        int32_t cur_x = dx / 2;
-        int32_t cur_y = dy / 2;
+        int32_t cur_x = dx >> 1;
+        int32_t cur_y = dy >> 1;
 
         while (true) {
             int32_t cur_dist = abs(cur_x);
@@ -2146,7 +2146,7 @@ namespace BEAMS {
         }
 
         *p_x = start_x + cur_x;
-        *p_y = start_y + cur_y;
+        *p_y += (int16_t)cur_y;
     }
 
     /**
@@ -2383,8 +2383,8 @@ namespace BEAMS {
                                         draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
                                         is_autofiring, param_17, param_18, fx_param_1, fx_param_2, mid3, mid4, fx_param_3, fx_param_4);
                 } else if (mount_scale_mod == 0) {
-                    if (fx_param_2 < fx_param_4) fx_param_4 = fx_param_2;
-                    if (fx_param_1 < fx_param_3) fx_param_3 = fx_param_1;
+                    if (fx_param_4 < fx_param_2) fx_param_4 = fx_param_2;
+                    if (fx_param_3 < fx_param_1) fx_param_3 = fx_param_1;
                     bolt::Bolt_Line_(bx1, by1, bx2, by2, palette_base_index, _beam_angle, beam_length, beam_width,
                                draw_core_flag, draw_glow_flag, draw_particles_flag, is_shield_piercing,
                                is_autofiring, param_17, param_18, 0, 0, fx_param_3, fx_param_4);
@@ -2401,13 +2401,7 @@ namespace BEAMS {
             }
             uint32_t hit_flag = (hit_result_flags == 0) ? 1 : 0;
             Draw_Beam2_(attacker_x, attacker_y, target_x, target_y, bx1, by1, bx2, by2, hit_flag, frame_index, palette_base_index,
-                        *reinterpret_cast<int32_t*>(&param_34->colors[0].colors[0]),
-                        *reinterpret_cast<int32_t*>(&param_34->colors[0].colors[4]),
-                        *reinterpret_cast<int32_t*>(&param_34->colors[1].colors[0]),
-                        *reinterpret_cast<int32_t*>(&param_34->colors[1].colors[4]),
-                        *reinterpret_cast<int32_t*>(&param_34->colors[2].colors[0]),
-                        *reinterpret_cast<int32_t*>(&param_34->colors[2].colors[4]),
-                        param_34->thickness, param_34->anim_style, param_34->sfx_sprite_id, param_34->duration, param_34->unk);
+                        *param_34);
         }
 
         if (param_19 != 0 && param_34 == nullptr) {
@@ -2553,37 +2547,37 @@ namespace BEAMS {
     }
 
     void __cdecl Draw_Beam2_(int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y, int32_t x1, int32_t y1,
-                             int32_t x2, int32_t y2, int32_t unused_9, uint32_t thickness, int32_t color_idx, int32_t beam_color_1,
-                             int32_t beam_color_2, int32_t beam_color_3, int32_t beam_color_4, int32_t beam_color_5,
-                             int32_t beam_color_6, int32_t beam_color_7, uint32_t beam_type, int32_t condition_var,
-                             int32_t unused_21, int32_t size_multiplier)
+                             int32_t x2, int32_t y2, int32_t hit_flag, int32_t frame_index, int32_t palette_base_index,
+                             s_weapon_visual_fx fx)
     {
-        if ((x1 != x2 || y1 != y2) && beam_type < 4) {
-            int32_t mod_thick = (int32_t)thickness % 2;
+        (void)hit_flag;
 
-            switch (beam_type) {
+        if ((x1 != x2 || y1 != y2) && fx.anim_style < 4) {
+            int32_t mod_thick = frame_index % 2;
+
+            switch (fx.anim_style) {
                 case 0: {
                     int32_t arg16;
                     int32_t arg17;
-                    if (thickness == 0) {
+                    if (frame_index == 0) {
                         strings::Swap_(&x1, &x2);
                         strings::Swap_(&y1, &y2);
                         arg17 = 3;
                         arg16 = 10;
-                    } else if ((int32_t)thickness >= 1 && (int32_t)thickness < 2) {
+                    } else if (frame_index == 1) {
                         arg17 = 6;
                         arg16 = 10;
                     } else {
                         arg17 = 3;
                         arg16 = 12;
                     }
-                    bolt::Bolt_Line_(x1, y1, x2, y2, color_idx, 12, 30, 3, thickness, 0, 0, 1, 1, 0, 0, arg16, arg17, 4, 0);
+                    bolt::Bolt_Line_(x1, y1, x2, y2, palette_base_index, 12, 30, 3, frame_index, 0, 0, 1, 1, 0, 0, arg16, arg17, 4, 0);
                     break;
                 }
                 case 1: {
-                    int32_t cond = condition_var >= 10 ? 1 : 0;
-                    int32_t size = size_multiplier * 2 + 7;
-                    bolt::Wide_Bolt_Line_(x1, y1, x2, y2, color_idx, 12, 50, 3, thickness, 0, 1, cond, 1, 0, 0, 12, 3, size, 1, 2, 0);
+                    int32_t cond = fx.sfx_sprite_id >= 10 ? 1 : 0;
+                    int32_t size = fx.unk * 2 + 7;
+                    bolt::Wide_Bolt_Line_(x1, y1, x2, y2, palette_base_index, 12, 50, 3, (uint16_t)frame_index, 0, 1, cond, 1, 0, 0, 12, 3, size, 1, 2, 0);
                     break;
                 }
                 case 2: {
@@ -2595,7 +2589,7 @@ namespace BEAMS {
                     int32_t rand_y = random::Random_(5) + end_y - 3;
                     int32_t rand_x = random::Random_(5) + end_x - 3;
 
-                    bolt::Bolt_Line_(start_x, start_y, rand_x, rand_y, color_idx, 12, 100, 4, thickness * 4, 0, 0, 0, 0, 1, 0, arg16, arg17, arg18, 0);
+                    bolt::Bolt_Line_(start_x, start_y, rand_x, rand_y, palette_base_index, 12, 100, 4, frame_index * 4, 0, 0, 0, 0, 1, 0, arg16, arg17, arg18, 0);
                     break;
                 }
                 case 3: {
@@ -2607,13 +2601,20 @@ namespace BEAMS {
                     int32_t arg18_19 = 5 / div_val2 + 1;
                     int32_t arg16_17 = 21 / div_val3;
 
-                    bolt::Wide_Bolt_Line_(start_x, start_y, end_x, end_y, color_idx, 16, 100, 3, thickness * 2, 1, 0, 0, 0, 1, 0, arg16_17, arg16_17, arg18_19, arg18_19, arg20_21, arg20_21);
+                    bolt::Wide_Bolt_Line_(start_x, start_y, end_x, end_y, palette_base_index, 16, 100, 3, (uint16_t)(frame_index * 2), 1, 0, 0, 0, 1, 0, arg16_17, arg16_17, arg18_19, arg18_19, arg20_21, arg20_21);
                     break;
                 }
             }
         }
 
-        Set_Beam_Colors_(color_idx, beam_color_1, beam_color_2, beam_color_3, beam_color_4, beam_color_5, beam_color_6, beam_color_7);
+        Set_Beam_Colors_(palette_base_index,
+                         *(int32_t*)&fx.colors[0].colors[0],
+                         *(int32_t*)&fx.colors[0].colors[4],
+                         *(int32_t*)&fx.colors[1].colors[0],
+                         *(int32_t*)&fx.colors[1].colors[4],
+                         *(int32_t*)&fx.colors[2].colors[0],
+                         *(int32_t*)&fx.colors[2].colors[4],
+                         fx.thickness);
         palette::Refresh_Palette_();
     }
 

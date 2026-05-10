@@ -1,5 +1,5 @@
 workflows:
-  validator:
+  mass-validator:
     description: "A LLM enabled validation loop with explicit success and retry outcomes."
     need_input: False
     nodes:

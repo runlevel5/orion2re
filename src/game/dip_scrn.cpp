@@ -1701,7 +1701,7 @@ namespace DIP_SCRN {
                             int16_t demand_choice = Get_Human_Demand_Choice_(_listen_ambassador, _talker_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
                             _response_message = 0xA8;
                             if (demand_choice == 1) {
-                                Diplomacy_Give_In_To_Demand_(_talker_ambassador, _listen_ambassador, _net_diplomacy_message.arg1, static_cast<uint16_t>(_net_diplomacy_message.arg2));
+                                Diplomacy_Give_In_To_Demand_(_talker_ambassador, _listen_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
                                 _response_message = 0xA9;
                             }
                             _old_response_message = _response_message;
@@ -1908,7 +1908,7 @@ namespace DIP_SCRN {
                         fields::Clear_Fields_();
                         break;
                     case 7:
-                        Diplomacy_Main_Net_Chat_(_listen_ambassador, _talker_ambassador);
+                        Diplomacy_Main_Net_Chat_(_talker_ambassador, _listen_ambassador);
                         if (_net_diplomacy_esc_pressed == 1) {
                             done_flag = 1;
                         }
@@ -2037,6 +2037,9 @@ namespace DIP_SCRN {
     }
 
     char* __cdecl An_(char* text) {
+        static char s_a_local[] = "a";
+        static char s_an_local[] = "an";
+
         if (MOX::_settings.language != 0) {
             return const_cast<char*>(s__00551100);
         }
@@ -2049,10 +2052,10 @@ namespace DIP_SCRN {
             first_char == 'I' || first_char == 'i' ||
             first_char == 'O' || first_char == 'o' ||
             first_char == 'U' || first_char == 'u') {
-            return s_an;
+            return s_an_local;
         }
 
-        return s_a;
+        return s_a_local;
     }
 
     void __cdecl Diplomacy_Give_In_To_Demand_(int16_t asking_player_idx, int16_t giving_player_idx, int16_t demand_type, int16_t demand_data) {
@@ -2224,8 +2227,6 @@ namespace DIP_SCRN {
         JIM::Decode_Text_System_(_system_x_star_system_buffer, star_idx, 0x23);
 
         memset(enabled_flags, 1, 10);
-        enabled_flags[0] = 0;
-        enabled_flags[1] = 1;
 
         JIM::Get_Text_Message_(s_jimtext_lbx, 0x4B /* 75 */, list_title, 0x28 /* 40 */);
 
@@ -2352,7 +2353,7 @@ namespace DIP_SCRN {
         DIP_SCRN::_net_diplomacy_message.arg2 = -1;
 
         // Perform Ambassador swap
-        DIP_SCRN::_talker_ambassador = (int8_t)original_listen;
+        DIP_SCRN::_talker_ambassador = original_listen;
         DIP_SCRN::_listen_ambassador = original_talker;
 
         // Populate message with original state before variables were swapped

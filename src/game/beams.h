@@ -195,10 +195,8 @@ namespace BEAMS {
     void __cdecl Draw_Ship_Burst_(int16_t x, int16_t y, int16_t dir, int16_t base_damage_class, int16_t frame, int16_t is_palette_not_90);
 
     void __cdecl Draw_Beam2_(int16_t start_x, int16_t start_y, int16_t end_x, int16_t end_y, int32_t x1, int32_t y1,
-                             int32_t x2, int32_t y2, int32_t unused_9, uint32_t thickness, int32_t color_idx, int32_t beam_color_1,
-                             int32_t beam_color_2, int32_t beam_color_3, int32_t beam_color_4, int32_t beam_color_5,
-                             int32_t beam_color_6, int32_t beam_color_7, uint32_t beam_type, int32_t condition_var,
-                             int32_t unused_21, int32_t size_multiplier);
+                             int32_t x2, int32_t y2, int32_t hit_flag, int32_t frame_index, int32_t palette_base_index,
+                             s_weapon_visual_fx fx);
 
     void __cdecl Set_Beam_Colors_(
         int32_t palette_idx,

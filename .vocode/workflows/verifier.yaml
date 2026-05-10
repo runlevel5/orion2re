@@ -41,11 +41,9 @@ workflows:
           Your goal is to validate whether the implementation of the provided function in the current project matches
           the supplied inputs by locating it in the codebase using available tools.
 
-          You shall not read `validate.txt` - this is a backlog of functions to test. You must only work with a provided decompiler input function.
+          You shall not read `validate.txt` or `report.txt` - this is a backlog of functions to test. You must only work with a provided decompiler input function.
 
-          You must produce exactly one of two outcomes:
-          * success - the implementation matches well enough and no further user input is required
-          * fail - discrepancies, uncertainty, or missing information require user follow-up before validation can continue
+          You MUST follow the non-exhaustive list of rules below.
 
           # RULES
           * Correctness first: match control flow, calling convention, side effects, flags-dependent behavior, and memory accesses.
@@ -69,6 +67,10 @@ workflows:
           * All structures are guaranteed to be packed to a byte in the project.
           * Source project inlined a lot of primitive functions, such as memset, memcpy, strcpy and others. Restored code must use existing library functions instead of hand-rolled loops.
           * Even though this is a C++ project, we're restoring C codebase and prefer C-style type casts.
+          * For every non-leaf call in the target function, reconstruct argument order from pushes/register setup and compare against source call expression before declaring pass.
+          * If a global/field is loaded via MOV AL (or AX) / zero-extension / masked to 0xFF, treat unsignedness as suspect and verify the declaration.”
+          * Exclude validate.txt, report.txt, and similar validation artifacts from search commands.
+          * Make sure to verify all switch case side effects and loop exits.
 
           # EXCEPTIONS
           * Be extra careful with `platform` namespace - there were custom adjustments to support windowed mode and implementation might be slightly different from original code.
@@ -77,7 +79,7 @@ workflows:
           # OUTPUT
           * You must always print the function address and function name
           * If validation passes, briefly summarize why and end with the success outcome. Be very concise.
-          * If validation fails, list the discrepancies or missing information concisely and end with the fail outcome. Do not mention what matched or validated in cause of failures, as this is too confusing for the user - only mention problems and related analysis.
+          * If validation fails, provide an explanation why it failed.
           * For each discrepancy, provide a short explanation and a minimal suggested diff snippet without applying it.
           * Do not make changes to the codebase unless explicitly requested.
           * Do not add superficial or excessive type casting

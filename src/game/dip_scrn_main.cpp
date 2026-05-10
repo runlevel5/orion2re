@@ -1291,7 +1291,7 @@ namespace DIP_SCRN {
 
         if (do_net_logic) {
             if (NETMOX::_net.is_diplomacy_initiator == 1) {
-                _talker_ambassador = static_cast<int8_t>(MOX::_PLAYER_NUM);
+                _talker_ambassador = static_cast<uint8_t>(MOX::_PLAYER_NUM);
                 _listen_ambassador = static_cast<uint8_t>(NETMOX::_net.diplomacy_target_id);
             }
             else {
