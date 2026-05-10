@@ -3561,97 +3561,97 @@
 [X] 00524AE0 - Draw_Screen_Background_On_
 [ ] 00524BB0 - Draw_Glassed_Screen_Background_Off_
 [ ] 00524C30 - Draw_Glassed_Screen_Background_On_
-[ ] 00524D00 - Clip_On_
-[ ] 00524D10 - Clip_Off_
-[ ] 00524D20 - Get_Width_
-[ ] 00524D30 - Get_Height_
-[ ] 00524D40 - Get_Current_Frame_
-[ ] 00524D50 - Get_Animation_Frame_Count_
-[ ] 00524D60 - Get_Full_Store_Flag_
-[ ] 00524D80 - Reset_Animation_Frame_
-[ ] 00524D90 - Set_Animation_Frame_
-[ ] 00524DB0 - Draw_Palette_
-[ ] 00524DD0 - Remap_Draw_
-[ ] 00525010 - Remap_Draw_Animated_Sprite_
-[ ] 005250F0 - Remap_Clipped_Draw_Animated_Sprite_
-[ ] 00525340 - Load_Font_File_
-[ ] 00525400 - Load_Palette_
-[ ] 00525470 - Get_String_Width_
-[ ] 005254C0 - Set_Remap_Font_Style_
-[ ] 005255A0 - Set_Font_Style_
-[ ] 00525670 - Set_Font_Style_Shadow_Down_
-[ ] 00525690 - Set_Font_Style_Shadow_Up_
-[ ] 005256B0 - Set_Font_Style_Outline_
-[ ] 005256D0 - Set_Font_Style_Outline_Heavy_
-[ ] 005256F0 - Set_Outline_Color_
-[ ] 00525710 - Set_Font_LF_
-[ ] 00525730 - Set_Font_Spacing_Width_
-[ ] 00525740 - Set_Font_Spacing_
-[ ] 00525750 - Set_Font_Highlight_Colors_
-[ ] 00525770 - Set_Font_Special_Colors_
-[ ] 00525790 - Set_Alias_Color_
-[ ] 005257B0 - Print_Integer_
-[ ] 005257F0 - Print_Right_
-[ ] 00525820 - Print_Centered_
-[ ] 00525860 - Print_Integer_Right_
-[ ] 005258A0 - Print_Integer_Centered_
-[ ] 005258E0 - Print_Display_Auto_Width_
-[ ] 00525910 - Print_
-[ ] 00525930 - Print_Display_
-[ ] 00525CF0 - Print_String_
-[ ] 00525F00 - Set_Normal_Colors_On_
-[ ] 00525F20 - Set_Highlight_Colors_On_
-[ ] 00525F40 - Set_Special_Colors_On_
-[ ] 00525F60 - Print_Character_
-[ ] 00525FD0 - Print_Character_No_Alias_
-[ ] 00526040 - Get_Current_Font_Style_
-[ ] 00526050 - Get_Current_Font_Color_
-[ ] 00526060 - Get_Font_Height_
-[ ] 00526070 - Get_Font_Vertical_Spacing_
-[ ] 00526080 - Get_Current_Highlight_Color_
-[ ] 00526090 - Get_Current_Special_Color_
-[ ] 005260A0 - Print_String_Clipped_
-[ ] 005262D0 - Print_Character_Clipped_
-[ ] 00526440 - Print_Clipped_Letter_
-[ ] 00526560 - Print_Right_Aligned_To_Bitmap_
-[ ] 005265A0 - Print_Centered_To_Bitmap_
-[ ] 005265E0 - Print_Display_To_Bitmap_Auto_Width_
-[ ] 00526610 - Print_To_Bitmap_
-[ ] 00526630 - Print_Display_To_Bitmap_
-[ ] 005268C0 - Print_String_To_Bitmap_
-[ ] 00526AE0 - Print_Character_To_Bitmap_
-[ ] 00526BD0 - Print_Clipped_Letter_To_Bitmap_
-[ ] 00526D00 - Set_PSTR_Style_
-[ ] 00526D10 - Init_Video_Drivers_
-[ ] 00526DD0 - User_Mouse_Handler_
-[ ] 00526EF0 - Force_Cursor_Pos
-[ ] 00526F20 - Pointer_X_
-[ ] 00526F30 - Get_Pointer_Offset_
-[ ] 00526F50 - Get_Pointer_Image_Number_
-[ ] 00526F70 - Pointer_Y_
-[ ] 00526F80 - Update_Cursor_Image_
-[ ] 00527000 - Restore_Mouse_Off_Page_
-[ ] 00527090 - Draw_Auto_Cursor
-[ ] 00527120 - Save_Mouse_Offscreen_
-[ ] 005271A0 - Save_Mouse_
-[ ] 00527220 - Draw_Cursor_XY_Offscreen_
-[ ] 005272F0 - Draw_Cursor_XY
-[ ] 005273C0 - Create_Cursor_Surface
-[ ] 00527460 - Lock_Cursor_Surface_
-[ ] 005274B0 - Unlock_Cursor_Surface_
-[ ] 005274D0 - Set_Mouse_List_
-[ ] 00527510 - Check_Mouse_Shape_
-[ ] 005275C0 - Check_Mouse_Buffer_
-[ ] 00527630 - Mouse_Buffer_
-[ ] 00527640 - Mouse_Buffer2_
-[ ] 00527650 - Mouse_Buffer_X_
-[ ] 00527660 - Mouse_Buffer_Y_
-[ ] 00527670 - Mouse_Buffer_Button_
-[ ] 00527680 - Mouse_Button_
-[ ] 005276A0 - Disable_Mouse_
-[ ] 005276B0 - Enable_Mouse_
-[ ] 005276C0 - Restore_Mouse_State_
-[ ] 005276D0 - Save_Mouse_State_
+[X] 00524D00 - Clip_On_
+[X] 00524D10 - Clip_Off_
+[X] 00524D20 - Get_Width_
+[X] 00524D30 - Get_Height_
+[X] 00524D40 - Get_Current_Frame_
+[X] 00524D50 - Get_Animation_Frame_Count_
+[X] 00524D60 - Get_Full_Store_Flag_
+[X] 00524D80 - Reset_Animation_Frame_
+[X] 00524D90 - Set_Animation_Frame_
+[X] 00524DB0 - Draw_Palette_
+[X] 00524DD0 - Remap_Draw_
+[X] 00525010 - Remap_Draw_Animated_Sprite_
+[X] 005250F0 - Remap_Clipped_Draw_Animated_Sprite_
+[X] 00525340 - Load_Font_File_
+[X] 00525400 - Load_Palette_
+[!] 00525470 - Get_String_Width_
+[X] 005254C0 - Set_Remap_Font_Style_
+[X] 005255A0 - Set_Font_Style_
+[X] 00525670 - Set_Font_Style_Shadow_Down_
+[X] 00525690 - Set_Font_Style_Shadow_Up_
+[X] 005256B0 - Set_Font_Style_Outline_
+[X] 005256D0 - Set_Font_Style_Outline_Heavy_
+[!] 005256F0 - Set_Outline_Color_
+[X] 00525710 - Set_Font_LF_
+[!] 00525730 - Set_Font_Spacing_Width_
+[X] 00525740 - Set_Font_Spacing_
+[X] 00525750 - Set_Font_Highlight_Colors_
+[X] 00525770 - Set_Font_Special_Colors_
+[X] 00525790 - Set_Alias_Color_
+[X] 005257B0 - Print_Integer_
+[X] 005257F0 - Print_Right_
+[X] 00525820 - Print_Centered_
+[X] 00525860 - Print_Integer_Right_
+[X] 005258A0 - Print_Integer_Centered_
+[X] 005258E0 - Print_Display_Auto_Width_
+[X] 00525910 - Print_
+[X] 00525930 - Print_Display_
+[!] 00525CF0 - Print_String_
+[X] 00525F00 - Set_Normal_Colors_On_
+[X] 00525F20 - Set_Highlight_Colors_On_
+[X] 00525F40 - Set_Special_Colors_On_
+[X] 00525F60 - Print_Character_
+[!] 00525FD0 - Print_Character_No_Alias_
+[X] 00526040 - Get_Current_Font_Style_
+[X] 00526050 - Get_Current_Font_Color_
+[X] 00526060 - Get_Font_Height_
+[X] 00526070 - Get_Font_Vertical_Spacing_
+[X] 00526080 - Get_Current_Highlight_Color_
+[X] 00526090 - Get_Current_Special_Color_
+[X] 005260A0 - Print_String_Clipped_
+[!] 005262D0 - Print_Character_Clipped_
+[X] 00526440 - Print_Clipped_Letter_
+[X] 00526560 - Print_Right_Aligned_To_Bitmap_
+[X] 005265A0 - Print_Centered_To_Bitmap_
+[X] 005265E0 - Print_Display_To_Bitmap_Auto_Width_
+[X] 00526610 - Print_To_Bitmap_
+[X] 00526630 - Print_Display_To_Bitmap_
+[X] 005268C0 - Print_String_To_Bitmap_
+[!] 00526AE0 - Print_Character_To_Bitmap_
+[X] 00526BD0 - Print_Clipped_Letter_To_Bitmap_
+[X] 00526D00 - Set_PSTR_Style_
+[X] 00526D10 - Init_Video_Drivers_
+[X] 00526DD0 - User_Mouse_Handler_
+[!] 00526EF0 - Force_Cursor_Pos
+[X] 00526F20 - Pointer_X_
+[X] 00526F30 - Get_Pointer_Offset_
+[!] 00526F50 - Get_Pointer_Image_Number_
+[X] 00526F70 - Pointer_Y_
+[X] 00526F80 - Update_Cursor_Image_
+[X] 00527000 - Restore_Mouse_Off_Page_
+[!] 00527090 - Draw_Auto_Cursor
+[X] 00527120 - Save_Mouse_Offscreen_
+[X] 005271A0 - Save_Mouse_
+[X] 00527220 - Draw_Cursor_XY_Offscreen_
+[!] 005272F0 - Draw_Cursor_XY
+[!] 005273C0 - Create_Cursor_Surface
+[X] 00527460 - Lock_Cursor_Surface_
+[X] 005274B0 - Unlock_Cursor_Surface_
+[X] 005274D0 - Set_Mouse_List_
+[X] 00527510 - Check_Mouse_Shape_
+[X] 005275C0 - Check_Mouse_Buffer_
+[X] 00527630 - Mouse_Buffer_
+[X] 00527640 - Mouse_Buffer2_
+[X] 00527650 - Mouse_Buffer_X_
+[X] 00527660 - Mouse_Buffer_Y_
+[X] 00527670 - Mouse_Buffer_Button_
+[X] 00527680 - Mouse_Button_
+[X] 005276A0 - Disable_Mouse_
+[X] 005276B0 - Enable_Mouse_
+[X] 005276C0 - Restore_Mouse_State_
+[X] 005276D0 - Save_Mouse_State_
 [ ] 005276F0 - parse_ten_cmd_parameter
 [ ] 005277B0 - WinMain_Proxy
 [ ] 00527950 - Get_Current_Video_Page_Flag_

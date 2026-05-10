@@ -22425,3 +22425,602 @@ _animation_header->current_frame = (int16_t)(int8_t)_animation_header->loop_fram
 
 fail
 ---------------------------------------
+0x00524BB0 animate::Draw_Glassed_Screen_Background_Off_
+
+fail
+
+Discrepancies:
+- The project implementation decodes the sprite stream as signed 8-bit header bytes with 1-byte payload copies, but the disassembly copies `run_length * 4` bytes per command while only the skip and count headers are signed bytes. The current code's outer shape is similar, but it does not preserve the exact instruction-level stream semantics because it treats the destination/page logic as a simple byte stream without validating the signed LEA/CMP flow against negative counts.
+  Suggested diff snippet:
+  ```cpp
+  int32_t src = 0;
+  for (int32_t page = 0; page < 0x50000; page += 0x10000) {
+      int32_t dst = page;
+      int32_t skip = (int8_t)sprite[src];
+      int32_t count = (int8_t)sprite[src + 1];
+      src += 2;
+      while (count != 0) {
+          dst += skip;
+          int32_t end = src + count * 4;
+          while (src < end) {
+              video::_current_video_page[dst++] = sprite[src++];
+          }
+          skip = (int8_t)sprite[src];
+          count = (int8_t)sprite[src + 1];
+          src += 2;
+      }
+  }
+  ```
+
+- The restored code uses `uint32_t` for `sprite_idx`, `page_offset`, `current_out_pos`, and `bytes_to_copy`, which obscures the original signed comparisons and can misrepresent edge cases from `MOVSX`/`JLE`/`JG`. The assembly clearly uses signed 32-bit temporaries derived from signed bytes.
+  Suggested diff snippet:
+  ```cpp
+  int32_t sprite_idx = 0;
+  for (int32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+      int32_t current_out_pos = page_offset;
+      // ...
+      int32_t skip_count = (int8_t)sprite[sprite_idx];
+      int32_t run_length = (int8_t)sprite[sprite_idx + 1];
+  }
+  ```
+
+- There is unresolved global alias uncertainty: the function stores the return value of `platform::Lock_Appropriate_Render_Buffer()` into `platform::g_screen_res_x`, but the disassembly never uses that value afterwards in this function. Because the project/report already notes address aliasing concerns at `0x0055B1A8`, this needs confirmation before validation can be considered exact.
+  Suggested diff snippet:
+  ```cpp
+  // confirm the 0x0055B1A8 alias/type ownership used by this function
+  platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
+  ```
+
+---------------------------------------
+0x004B57E0 MAPGEN::Enforce_Planet_Max_
+
+fail
+
+Discrepancies:
+- Backup star array allocation/copy is missing.
+  - The assembly allocates a second block of 0x1FC8 bytes and copies the entire `MOX::_star` array into it before planet removal. Current code calls `Allocate_Next_Block_` but discards the returned pointer and performs no copy. This is a real side-effect mismatch.
+  - Minimal suggested diff snippet:
+    ```cpp
+    s_star_data* backup_star = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FC8);
+    memcpy(backup_star, MOX::_star, 0x1FC8);
+    ```
+
+- Planet removal condition is incorrect: it checks the candidate planet type directly instead of using the backed-up star `planet_index[orbit]` indirection from assembly.
+  - Assembly computes:
+    - candidate planet’s `star_index`
+    - reads `backup_star[star].planet_index[candidate.orbit]`
+    - if that value is `<= -1`, skip
+    - otherwise reads `_pl[that_index].planet_type`
+    - if that type is gas giant, skip removal
+  - Current code simplifies this to `backup_p->planet_type != 2`, which is not equivalent to the instruction sequence and can change behavior if star orbit bookkeeping differs from linear planet index.
+  - Minimal suggested diff snippet:
+    ```cpp
+    int16_t linked_idx = backup_star[(uint8_t)backup_p->star_index].planet_index[(uint8_t)backup_p->orbit];
+    if (linked_idx >= 0 && _pl[linked_idx].planet_type != PLANET_TYPE_GAS_GIANT) {
+        backup_p->colony_index = -2;
+        MOX::_planet_count--;
+    }
+    ```
+
+- Debug `PFMT_` call arguments are incomplete.
+  - Assembly pushes four format values: colony-planets count, max, original planet count, and number removed. Current code only passes two values.
+  - Minimal suggested diff snippet:
+    ```cpp
+    RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+        (int32_t)(original_planet_count - gas_giant_count),
+        (int32_t)max_planets,
+        (int32_t)original_planet_count,
+        (int32_t)((original_planet_count - gas_giant_count) - max_planets));
+    ```
+
+- The current implementation uses a different operation order than the binary around home-system marking and temporary block setup.
+  - Assembly zeroes the local 72-byte array, marks home systems, performs the release-version debug branch, then allocates/copies `_pl` and backup stars. Current code allocates `_pl` and copies planets before home-system marking and debug print. While this may not always alter results, it is not a precise restoration and increases uncertainty because exact side effects/order are part of validation.
+  - Minimal suggested diff snippet:
+    ```cpp
+    // reorder to:
+    // 1) zero is_home_system
+    // 2) mark player home systems
+    // 3) debug PFMT_/hgetch
+    // 4) allocate/copy _pl
+    // 5) allocate/copy star backup
+    ```
+
+---------------------------------------
+0x004B5BF0 MAPGEN::Generate_Food_Per_Farmer_
+
+- Discrepancy: return type signedness does not match the binary. The function returns the raw byte loaded from `MOX::_food_per_farmer_table`, and that table is declared as `int8_t[10]`. Current code/header use `uint8_t`, which changes the C-level contract for negative entries.
+  ```diff
+  - uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  + int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+  ```
+
+- Discrepancy: climate is sign-extended in assembly (`MOVSX` from `planet->climate`), but current code forces `uint8_t` with an explicit cast. That changes index semantics for negative values and obscures the original signed access pattern.
+  ```diff
+  - uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+  - return MOX::_food_per_farmer_table[climate_idx];
+  + return MOX::_food_per_farmer_table[planet->climate];
+  ```
+
+- Discrepancy: implementation introduces a local pointer and cast not present in the original access pattern. While control flow matches, this extra unsigned cast is exactly the kind of type drift that can hide a bad restored field type/use.
+  ```diff
+  - s_planet_data* planet = &MOX::_planet[planet_index];
+  - uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+  - return MOX::_food_per_farmer_table[climate_idx];
+  + return MOX::_food_per_farmer_table[MOX::_planet[planet_index].climate];
+  ```
+
+fail
+
+---------------------------------------
+0x004F24D0 HAROLD::Get_Font_File_
+
+- Current implementation copies the wrong number of bytes. The binary copies 11 bytes for languages 1..4 (`"font?g/f/s/i.lbx"` including the byte at offset `+0xa`, i.e. the terminator), but only 10 bytes for the default `"fonts.lbx"` case. The project currently does `memcpy(buffer, src, 10);` for all cases, so non-default cases miss the last byte.
+  Suggested diff snippet:
+  ```cpp
+  void __cdecl HAROLD::Get_Font_File_(char* buffer) {
+      switch (MOX::_settings.language) {
+      case 1:
+          memcpy(buffer, "fontsg.lbx", 11);
+          break;
+      case 2:
+          memcpy(buffer, "fontsf.lbx", 11);
+          break;
+      case 3:
+          memcpy(buffer, "fontss.lbx", 11);
+          break;
+      case 4:
+          memcpy(buffer, "fontsi.lbx", 11);
+          break;
+      default:
+          memcpy(buffer, "fonts.lbx", 10);
+          break;
+      }
+  }
+  ```
+
+- Control flow in the binary is not a uniform “select pointer then copy fixed size” pattern. Default path intentionally omits the final byte copy (`out[10]`), while cases 1..4 explicitly copy it. The current implementation collapses these into one fixed-size memcpy and therefore does not preserve exact side effects.
+
+fail
+
+---------------------------------------0x00524BB0 animate::Draw_Glassed_Screen_Background_Off_
+
+- The implementation uses `uint32_t sprite_idx`/`uint32_t current_out_pos`, but the assembly uses signed 32-bit arithmetic with `MOVSX` on both control bytes. `skip_count` is sign-extended and added to the destination offset as a signed value. In the current code, adding negative `int8_t skip_count` to unsigned `current_out_pos` changes semantics via unsigned wraparound.
+  Suggested diff snippet:
+  ```cpp
+  int32_t sprite_idx = 0;
+  for (int32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+      int32_t current_out_pos = page_offset;
+      ...
+      int32_t skip_count = (int8_t)sprite[sprite_idx];
+      int32_t run_length = (int8_t)sprite[sprite_idx + 1];
+      ...
+      current_out_pos += skip_count;
+  }
+  ```
+
+- The copy loop is not validated instruction-for-instruction because the assembly computes an end index as `edx + run_length*4` using signed `run_length`, then loops while `edx < end`. The current code converts `run_length` to `uint32_t` before multiplying by 4, which is only equivalent if `run_length > 0`. Since the assembly only tests `run_length == 0`, negative values would behave differently.
+  Suggested diff snippet:
+  ```cpp
+  int32_t end_idx = sprite_idx + run_length * 4;
+  while (sprite_idx < end_idx) {
+      video::_current_video_page[current_out_pos++] = sprite[sprite_idx++];
+  }
+  ```
+
+- The project stores the lock return value through `platform::g_screen_res_x`, while the provided symbol listing identifies the write target as `platform::g_screen_res_x @ 0x0055B1A8 : undefined4`; however the codebase also aliases the same address as `video::g_screen_res_x` with a different signedness/type. This global alias/type ambiguity at the exact written address prevents exact validation of the external side effect.
+  Suggested diff snippet:
+  ```cpp
+  // confirm single canonical declaration/type for 0x0055B1A8
+  inline int32_t& g_screen_res_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B1A8});
+  ```
+
+fail
+
+---------------------------------------
+0x00524C30 animate::Draw_Glassed_Screen_Background_On_
+
+fail
+
+Discrepancies:
+- Uses the wrong remap table symbol/address. The binary reads from `draw::_glass_lookup_table` at `0x0056A998` via a flat `(color << 8) + background` index. The implementation instead uses `video::_glass_remap_colors` at `0x00579998`. Those are different globals, so behavior can differ even if layouts look similar.
+  ```cpp
+  - *dst = video::_glass_remap_colors[color - 0xF0][*dst];
+  + *dst = draw::_glass_lookup_table[(color << 8) + *dst];
+  ```
+
+- The source index/end computation uses mixed signed/unsigned arithmetic, which does not faithfully match the assembly. In the binary, `count` is sign-extended (`MOVSX`) and `pixel_run_end = sprite_idx + count * 4` is computed in signed 32-bit arithmetic. Current code stores the end in `uint32_t`, so negative counts would wrap instead of producing the signed comparison behavior from `CMP/JL`.
+  ```cpp
+  - uint32_t sprite_idx = 0;
+  + int32_t sprite_idx = 0;
+
+  - uint32_t pixel_run_end = sprite_idx + (count * 4);
+  + int32_t pixel_run_end = sprite_idx + (int32_t)count * 4;
+  ```
+
+- `video::_video_memory` is typed as `uint32_t*`, forcing a compensating cast here. The assembly treats it as a byte-addressed framebuffer pointer in this function. This type mismatch obscures the exact memory access pattern and is a restoration concern for this call site.
+  ```cpp
+  - uint8_t* dst = reinterpret_cast<uint8_t*>(video::_video_memory) + (y * pitch) + x;
+  + uint8_t* dst = (uint8_t*)video::_video_memory + y * pitch + x;
+  ```
+
+---------------------------------------
+0x00525470 fonts::Get_String_Width_
+
+- The implementation adds a null-pointer guard that is not present in the assembly. Original code dereferences `str` immediately (`CMP byte ptr [ESI],DL`), so `nullptr` must fault instead of returning 0. This changes observable behavior.
+
+  Suggested diff:
+  ```cpp
+  int16_t __cdecl Get_String_Width_(const char* str) {
+      int16_t total_width = 0;
+  -   if (str == nullptr || *str == '\0') {
+  +   if (*str == '\0') {
+          return 0;
+      }
+  ```
+
+- The character load/type flow does not match the original signed indexing semantics for control decisions. Assembly loads each byte through `MOV CL,[...]`, then sign-extends with `MOVSX CX,CL`; the `>= 0x20` check is therefore signed on `char`. Current code uses `char c`, which is implementation-defined signedness in C++. On a compiler/setting where `char` is unsigned, bytes `0x80..0xFF` would incorrectly pass the `>= 0x20` test and be accumulated, unlike the original.
+
+  Suggested diff:
+  ```cpp
+  -   for (int32_t i = 0; str[i] != '\0'; ++i) {
+  -       char c = str[i];
+  +   for (int16_t i = 0; str[i] != '\0'; ++i) {
+  +       int8_t c = (int8_t)str[i];
+  
+          if (c == 0x15) {
+              break;
+          }
+  
+          if (c >= 0x20) {
+  -           uint8_t char_idx = static_cast<uint8_t>(c);
+  -           total_width += static_cast<int16_t>(_font_header.font_style_widths[char_idx]) +
+  +           total_width += (int16_t)_font_header.font_style_widths[(int16_t)c] +
+                             _font_header.font_style_spacing;
+          }
+      }
+  ```
+
+- The loop index width in the restoration is widened to `int32_t`, while the assembly uses `DX` as the running index with repeated `MOVSX ECX,DX`. This means original indexing wraps modulo 16 bits for very long strings; current code does not. For strict binary-faithful validation, this is a control-flow/overflow mismatch.
+
+  Suggested diff:
+  ```cpp
+  -   for (int32_t i = 0; str[i] != '\0'; ++i) {
+  +   for (int16_t i = 0; str[i] != '\0'; ++i) {
+  ```
+
+fail
+
+---------------------------------------
+005256F0 fonts::Set_Outline_Color_
+
+- Global types are wrong: disassembly performs two 16-bit stores (`MOV [0x0055B148],AX` and `MOV word ptr [0x0055B14C],CX`), but the project declares both `fonts::_outline_color` and `fonts::_alias_outline_color` as `uint8_t&`. The current implementation therefore truncates each argument to 8 bits before storing, which does not match the binary side effects.
+- Ghidra also flags overlapping globals, consistent with 16-bit storage at these addresses. Using byte-typed globals hides the upper byte writes entirely and can affect any code observing the full words at `0x0055B148` / `0x0055B14C`.
+
+fail
+
+---------------------------------------
+00525730 fonts::Set_Font_Spacing_Width_
+
+- Parameter type is wrong. Disassembly reads only `AL` from `[ESP+4]` and stores that byte directly, so the source parameter should be an 8-bit type (`char`/`int8_t`), not `int`. Current prototype widens the ABI-level intent and adds an unnecessary narrowing cast.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Set_Font_Spacing_Width_(int spacing_width);
+  + void __cdecl Set_Font_Spacing_Width_(char spacing_width);
+  ```
+
+- Implementation contains an explicit cast that is a code smell here and likely compensates for the wrong parameter type rather than reflecting original behavior.
+  Suggested diff:
+  ```cpp
+  - void __cdecl Set_Font_Spacing_Width_(int spacing_width) {
+  -     _font_header.font_style_widths[32] = (char)spacing_width;
+  + void __cdecl Set_Font_Spacing_Width_(char spacing_width) {
+  +     _font_header.font_style_widths[32] = spacing_width;
+    }
+  ```
+
+fail
+
+---------------------------------------
+
+---------------------------------------
+0x00525CF0 fonts::Print_String_
+
+fail
+
+- Control-code `0x19/0x1D` handling has incorrect signedness. Assembly uses `MOVZX` on the following byte, so the offset added to `x` is unsigned `0..255`. Current code uses `(int8_t)str[i + 1]`, which sign-extends values `>= 0x80` and can move `_print_xpos` left incorrectly.
+  Suggested diff:
+  ```cpp
+  - _print_xpos = (int16_t)((int8_t)str[i + 1] + x);
+  + _print_xpos = (int16_t)((uint8_t)str[i + 1] + x);
+  ```
+
+- Parameter signedness/type does not match the binary at entry. Disassembly loads `x` with `MOV AX,[ESP+4]` and treats it as a 16-bit value; Ghidra also recovered `ushort x`. Current declaration uses `int16_t x`. While many callers may behave the same, this matters specifically because the control-code path above adds an unsigned byte to `x`, and the original arithmetic is 16-bit/unsigned-oriented.
+  Suggested diff:
+  ```cpp
+  - int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width)
+  + int16_t __cdecl Print_String_(uint16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width)
+  ```
+
+- The same unsigned-byte reset-x behavior is implemented differently in the related clipped variant, indicating inconsistency around the shared control-code semantics. In `Print_String_Clipped_` the code uses `static_cast<uint8_t>(str[str_idx + 1])`, but `Print_String_` uses signed cast. This inconsistency strongly suggests the current `Print_String_` restoration is not binary-faithful.
+  Suggested diff:
+  ```cpp
+  - _print_xpos = (int16_t)((int8_t)str[i + 1] + x);
+  + _print_xpos = x + static_cast<uint8_t>(str[i + 1]);
+  ```
+
+0x00525FD0 fonts::Print_Character_No_Alias_
+
+- Character index signedness is wrong for both glyph offset lookup and width lookup. The assembly uses `MOVSX EDI, byte ptr [ESP + 0x14]`, so `character` is sign-extended to compute `_font_header.font_style_offsets[character]` and `_font_header.font_style_widths[character]`. Current code casts to `uint8_t`, changing behavior for values `0x80..0xFF` and producing different memory accesses.
+  Suggested diff:
+  ```diff
+  -        uint8_t char_idx = static_cast<uint8_t>(character);
+  -
+  -        uint32_t pixel_offset = static_cast<uint32_t>(y) * (uint32_t)platform::g_screen_res_x + static_cast<uint32_t>(x);
+  +        int32_t char_idx = (int32_t)character;
+  +
+  +        int32_t pixel_offset = (int32_t)y * (int32_t)platform::g_screen_res_x + (int32_t)x;
+           uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + pixel_offset;
+
+           uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
+  ...
+  -        int16_t updated_x = x + static_cast<int16_t>(_font_header.font_style_widths[char_idx]) + _font_header.font_style_spacing;
+  +        int16_t updated_x = x + (int16_t)_font_header.font_style_widths[char_idx] + _font_header.font_style_spacing;
+  ```
+
+- Coordinate arithmetic signedness is not faithful. The assembly sign-extends both `x` and `y` (`MOVSX`) before computing `y * g_screen_res_x + x`. Current code converts to `uint32_t`, which changes behavior for negative coordinates by wrapping instead of preserving signed offset arithmetic before pointer addition.
+  Suggested diff:
+  ```diff
+  -        uint32_t pixel_offset = static_cast<uint32_t>(y) * (uint32_t)platform::g_screen_res_x + static_cast<uint32_t>(x);
+  +        int32_t pixel_offset = (int32_t)y * (int32_t)platform::g_screen_res_x + (int32_t)x;
+  ```
+
+fail
+---------------------------------------
+005262D0 fonts::Print_Character_Clipped_
+
+fail
+
+Discrepancies:
+- Character upper-bound check is off by one and uses the wrong signedness/indexing model. Assembly does `MOVSX` then `CMP AX,0x80 / JLE`, so `c == 0x80` is allowed and the glyph width lookup uses the sign-extended value. Current code rejects only `c > 0x80` but then indexes widths with `static_cast<uint8_t>(c)`, which changes behavior for negative chars and for `0x80`.
+  ```diff
+  - if (c > 0x80) {
+  + if ((int16_t)c > 0x80) {
+        return x;
+    }
+  - int16_t char_width = static_cast<int16_t>(_font_header.font_style_widths[static_cast<uint8_t>(c)]);
+  + int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
+  ```
+
+- Fast-path bounds test does not match the assembly’s strict comparisons. Original code takes the fast path only when:
+  - `x >= x1`
+  - `x + width <= x2`
+  - `y >= y1`
+  - `y + height <= y2`
+  using signed widened arithmetic. The current source expresses this similarly, but because `char_width` is derived with unsigned indexing, the control flow can diverge for signed chars. This is not just cosmetic; it affects whether `Print_Character_` or `Print_Clipped_Letter_` is called.
+  ```diff
+  - int16_t char_width = static_cast<int16_t>(_font_header.font_style_widths[static_cast<uint8_t>(c)]);
+  + int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
+  ```
+
+- Return value computation must use the mutated values exactly as in assembly: after clipping, return `spacing + final_visible_width + possibly_adjusted_x`; on early clipped-out exits, return the precomputed original `spacing + original_width + original_x`. Current structure is close, but because width/indexing can differ for signed chars, the returned advance can be wrong.
+  ```diff
+  - int16_t orig_ret = spacing + char_width + x;
+  + int16_t orig_ret = spacing + char_width + x; // with char_width from signed index
+  ```
+
+fail
+---------------------------------------
+0x00526AE0 fonts::Print_Character_To_Bitmap_
+
+fail
+
+Discrepancies:
+- Character bounds check uses unsigned semantics in current code, but assembly uses signed compare after `MOVSX`/`JG`.
+  - Assembly accepts all signed char values `<= 0x80`, including negative chars; current code rejects any byte value `> 128`, so bytes `0x81..0xFF` are incorrectly rejected instead of being sign-extended and passed through.
+  - Minimal suggested diff:
+    ```cpp
+    -    if ((uint8_t)ch > 128) {
+    +    if (ch > 0x80) {
+             return;
+         }
+    ```
+
+- Width lookup index uses zero-extension in current code, but assembly uses sign-extended index.
+  - `MOVSX EAX,AX` then `MOVSX SI,byte ptr [EAX + _font_header.font_style_widths]` means negative `char` values index before `font_style_widths[0]`. Current code forces `(uint8_t)ch`, which changes memory access behavior for negative chars.
+  - Minimal suggested diff:
+    ```cpp
+    -    short glyph_w = (short)_font_header.font_style_widths[(uint8_t)ch];
+    +    short glyph_w = (short)_font_header.font_style_widths[(int16_t)ch];
+    ```
+
+- Height clipping lacks the original non-positive-height guard.
+  - Assembly can produce `DI = ((anim_h - 1) - draw_y) + 1` and still call the callee even if zero/negative after vertical clipping; however if `draw_y` starts negative there is no early return. More importantly, the current code never checks whether the final clipped height became non-positive before the call, relying on callee behavior. This is ambiguous against the exact control flow and should be reviewed together with the callee contract.
+  - Minimal suggested diff if matching caller-side clipping strictly is desired:
+    ```cpp
+         short clipped_h = font_h;
+         if ((int)draw_y + (int)clipped_h > (int)max_y_idx) {
+             clipped_h = max_y_idx - draw_y + 1;
+         }
+    +    if (clipped_h < 1) {
+    +        return;
+    +    }
+    ```
+
+Main blocking issue is the signedness mismatch on `ch`, which changes both branch behavior and memory accesses, so validation cannot pass.
+---------------------------------------
+0x00526EF0 platform::Force_Cursor_Pos
+
+fail
+
+Discrepancies:
+- Extra window-coordinate adjustment exists that is not in the binary. The assembly writes the 16-bit args to globals, sign-extends them, and passes those exact values to `SetCursorPos`; current code conditionally calls `ClientToScreen` and offsets `x/y` before the call.
+  Suggested diff snippet:
+  ```cpp
+  void Force_Cursor_Pos(int16_t x, int16_t y)
+  {
+      g_mouse_x = x;
+      g_mouse_y = y;
+      SetCursorPos(x, y);
+  }
+  ```
+
+- Preprocessor guard typo changes behavior from the intended build configuration. The function uses `#ifndef FULSCREEN` while the file elsewhere uses `FULLSCREEN`; this makes the adjustment block compile unexpectedly and further diverges from the original.
+  Suggested diff snippet:
+  ```cpp
+  -#ifndef FULSCREEN
+  -    POINT p = { 0, 0 };
+  -    ClientToScreen(g_main_window, &p);
+  -    x += (int16_t)p.x;
+  -    y += (int16_t)p.y;
+  -#endif
+  ```
+---------------------------------------
+0x00526F50 mouse::Get_Pointer_Image_Number_
+
+- Return type does not match the binary. The disassembly ends with `RET` after loading a sign-extended 16-bit value into `EAX`, so the function returns a 32-bit `int`, not `int16_t`. The current signature narrows the value at the C++ boundary and does not faithfully model the original ABI.
+  Suggested diff:
+  ```cpp
+  - int16_t __cdecl Get_Pointer_Image_Number_();
+  + int __cdecl Get_Pointer_Image_Number_();
+  ```
+  ```cpp
+  - int16_t __cdecl Get_Pointer_Image_Number_() {
+  + int __cdecl Get_Pointer_Image_Number_() {
+        return mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+    }
+  ```
+
+- The implementation relies on `icon` being `int16_t` to induce sign extension implicitly, but the restored source should reflect the explicit 32-bit return seen in `MOVSX EAX, word ptr [...]`. As written, this is source-level/ABI ambiguity that needs correction before validation can pass.
+  Suggested diff:
+  ```cpp
+  - return mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+  + return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+  ```
+
+fail
+---------------------------------------
+0x00527090 platform::Draw_Auto_Cursor
+
+- Extra side effect in current implementation: it conditionally calls `Blit_Surface_To_Screen(g_primary_surface)` under `#ifndef FULLSCREEN`, but the disassembly ends immediately after the `BltFast` call and `RET`. This is not present in the target function and changes behavior in the `platform` namespace where windowed-mode adjustments are explicitly sensitive.
+  Suggested diff snippet:
+  ```cpp
+  void Draw_Auto_Cursor()
+  {
+      RECT rect;
+      rect.left = 0;
+      rect.top = 0;
+      ...
+      g_primary_surface->BltFast(g_cached_mouse_x, g_cached_mouse_y, g_cursor_surface_2, &rect, DDBLTFAST_WAIT);
+  -#ifndef FULLSCREEN
+  -    Blit_Surface_To_Screen(g_primary_surface);
+  -#endif
+  }
+  ```
+
+- Type/semantics mismatch versus assembly: the function uses signed 16-bit cached mouse coordinates (`MOVSX` from `word ptr`), but the call currently passes `g_cached_mouse_x` / `g_cached_mouse_y` directly to `BltFast`, whose parameters are `DWORD`. While this may compile to equivalent code in practice, the source does not make the signed extension behavior explicit, which is important here because the binary clearly sign-extends both coordinates before use.
+  Suggested diff snippet:
+  ```cpp
+  void Draw_Auto_Cursor()
+  {
+      RECT rect;
+  +   const int32_t mouse_x = g_cached_mouse_x;
+  +   const int32_t mouse_y = g_cached_mouse_y;
+      rect.left = 0;
+      rect.top = 0;
+
+  -   if (g_cached_mouse_x + 24 >= g_screen_res_x - 1)
+  -       rect.right = g_screen_res_x - g_cached_mouse_x - 1;
+  +   if (mouse_x + 24 >= g_screen_res_x - 1)
+  +       rect.right = g_screen_res_x - mouse_x - 1;
+      else
+          rect.right = 24;
+
+  -   if (g_cached_mouse_y + 24 >= g_screen_res_y - 1)
+  -       rect.bottom = g_screen_res_y - g_cached_mouse_y - 1;
+  +   if (mouse_y + 24 >= g_screen_res_y - 1)
+  +       rect.bottom = g_screen_res_y - mouse_y - 1;
+      else
+          rect.bottom = 24;
+
+  -   g_primary_surface->BltFast(g_cached_mouse_x, g_cached_mouse_y, g_cursor_surface_2, &rect, DDBLTFAST_WAIT);
+  +   g_primary_surface->BltFast(mouse_x, mouse_y, g_cursor_surface_2, &rect, DDBLTFAST_WAIT);
+  }
+  ```
+
+fail
+---------------------------------------
+005272F0 platform::Draw_Cursor_XY
+
+fail
+
+- Extra side effect not present in the target function: current implementation calls Blit_Surface_To_Screen(g_primary_surface) under #ifndef FULLSCREEN after the BltFast call, but the disassembly returns immediately after g_primary_surface->BltFast(...). In platform, this windowed-mode difference is explicitly sensitive and changes behavior.
+  ```diff
+   g_primary_surface->BltFast(x, y, platform::g_cursor_surface_1, &rect, DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
+  -#ifndef FULLSCREEN
+  -    Blit_Surface_To_Screen(g_primary_surface);
+  -#endif
+  ```
+
+- Parameter signedness/calling contract is not exact. The target compares and computes using full 32-bit register values loaded from stack params, while the project declares the function as `void Draw_Cursor_XY(int16_t x, int16_t y)`. This narrows arguments before the function body and can change behavior for out-of-range callers.
+  ```diff
+  -void Draw_Cursor_XY(int16_t x, int16_t y);
+  +void Draw_Cursor_XY(DWORD x, DWORD y);
+  ```
+  ```diff
+  -void Draw_Cursor_XY(int16_t x, int16_t y)
+  +void Draw_Cursor_XY(DWORD x, DWORD y)
+  ```
+
+- Current comparisons rely on 16-bit signed parameters mixed with 32-bit globals, instead of preserving the target’s 32-bit arithmetic path from stack arguments through the clipping math. This is tied to the wrong parameter types and should be corrected together rather than via local casts.
+  ```diff
+  -if (x + 24 >= g_screen_res_x - 1)
+  +if ((int32_t)(x + 24) >= g_screen_res_x - 1)
+       rect.right = g_screen_res_x - x - 1;
+
+---------------------------------------
+0x005273C0 platform::Create_Cursor_Surface
+
+fail
+
+Discrepancies:
+- The current implementation creates 8-bit palettized cursor surfaces, but the disassembly constructs a minimal `DDSURFACEDESC` with only `dwSize`, `dwFlags = 7`, `dwWidth = 0x18`, `dwHeight = 0x18`, and `ddsCaps.dwCaps = 0x840`. It does not initialize any pixel format fields.
+  - This changes the DirectDraw `CreateSurface` contract and may alter chosen surface format and behavior.
+
+---------------------------------------
+0x005276f0 platform::parse_ten_cmd_parameter
+
+fail
+
+Discrepancies:
+- Wrong empty-input handling source behavior. The original does not check for `nullptr`; it only checks whether the first byte is `' '` by scanning the string. The current function adds a null-pointer early return not present in the binary.
+  ```diff
+-    if (input_str == nullptr) {
+-        return;
+-    }
+  ```
+
+- Global symbol/write target naming is inconsistent with the recovered symbol and may indicate wrong restoration intent. The binary writes `AL` to `g_ten_game_number @ 0x0055B1C0`, but the code writes to `g_parsed_value`. Same address, but this should be restored to the actual symbol to avoid semantic drift.
+  ```diff
+-            g_parsed_value = static_cast<uint8_t>(parsed_val);
++            g_ten_game_number = (uint8_t)parsed_val;
+  ```
+
+- String API symbol does not match the binary. The disassembly calls `ERIC::strstr` at `0x00541b30`; the current code calls plain `strstr`. Even if behavior is likely equivalent, this is not validated exactly enough for a restoration check.
+  ```diff
+-        char* match_ptr = strstr(copy_buffer, s_slash_ten);
++        char* match_ptr = ERIC::strstr(copy_buffer, s_slash_ten);
+  ```
+
+- Lowercasing call name differs from the binary import/call target. The binary calls `__strlwr` at `0x0054ecd0`, while the code uses `_strlwr`. This may alias in headers/toolchain, but without direct confirmation it is a validation mismatch.
+  ```diff
+-        _strlwr(copy_buffer);
++        __strlwr(copy_buffer);
+  ```
+
+- Type/signature precision is not exact. The binary takes a mutable `char *` and mutates only the copied buffer; current signature uses `const char*`. This is source-safe but not exact restoration of the original calling contract.
+  ```diff
+-    void __cdecl Parse_Ten_Cmd_Parameter(const char* input_str)
++    void __cdecl Parse_Ten_Cmd_Parameter(char* input_str)
+  ```
+
+---------------------------------------

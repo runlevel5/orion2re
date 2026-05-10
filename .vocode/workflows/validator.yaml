@@ -20,6 +20,8 @@ workflows:
         start_timeout: 600
         confirmation: auto
         max_rounds: 100
+        max_retries: 10
+        hard_error_retries: 3
         tools:
           - read_files
           - list_files
