@@ -52,7 +52,7 @@ namespace JIM {
             _darken_palette_value = 0;
 
             // Slow fade in for the first logo
-            palstore::Slow_Fade_In_();
+            skip_flag = palstore::Slow_Fade_In_();
 
             int16_t end_delay_counter = 15; // 0xF
             mouse::Set_Mouse_List_(&_logo_mouse_list, 1);
@@ -61,7 +61,7 @@ namespace JIM {
                 if (skip_flag != 0) break;
 
                 timer::Mark_Time_();
-                if (key::Keyboard_Status_()) {
+                if (key::Keyboard_Status_() == 1) {
                     key::Read_Key_();
                     skip_flag = 1;
                     user_interrupted = true;
@@ -88,7 +88,7 @@ namespace JIM {
                 timer::Release_Time_(1);
             }
         } else {
-            // Play Simtex cinematic if check failed
+            // Play Simtex cinematic if Simtex logo is present
             SMACK::Play_Cinematic_(s_simtex_lbx, 0, 0);
             sound::Stop_Stream_();
             _jim_current_stream = 0xFFFF;
@@ -115,7 +115,7 @@ namespace JIM {
 
             while (!user_interrupted) {
                 timer::Mark_Time_();
-                if (key::Keyboard_Status_()) {
+                if (key::Keyboard_Status_() == 1) {
                     key::Read_Key_();
                     skip_flag = 1;
                     user_interrupted = true;
@@ -191,14 +191,18 @@ namespace JIM {
         sound::Fade_Stream_Down_(25);
 
         // Wait for volume to reach zero while updating engine state
-        while (sound::Get_Stream_Volume_() > 0) {
-            RUSS::Mox_Update_();
+        if (sound::Get_Stream_Volume_() > 0) {
+            int16_t current_volume;
+            do {
+                current_volume = (int16_t)sound::Get_Stream_Volume_();
+                RUSS::Mox_Update_();
+            } while (current_volume > 0);
         }
 
         sound::Stop_Stream_();
 
         // Randomly select next track from "STREAM.LBX" (indices 1, 2, or 3)
-        _jim_current_stream = static_cast<uint16_t>((clock() % 3) + 1);
+        _jim_current_stream = (int16_t)((clock() % 3) + 1);
 
         sound::Set_Stream_Filename_(s_STREAM_LBX);
         sound::Play_Stream_(_jim_current_stream);

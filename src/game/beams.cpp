@@ -224,7 +224,7 @@ namespace BEAMS {
         int8_t size_class = MOX::_combat_data[ship_idx].size_class;
         int16_t shield_size = Ship_Size_To_Shield_Size_(size_class);
 
-        uint16_t shield_status = 0;
+        int16_t shield_status = 0;
         int16_t offset_x;
         int16_t offset_y;
 
@@ -363,7 +363,7 @@ namespace BEAMS {
         BEAMS::Done_Drawing_Damage_Message_Queue_();
     }
 
-    void __cdecl Adjust_Shield_Display_Status_(uint16_t* shield_status) {
+    void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status) {
         s_animation_header* anim_header = BEAMS::Shield_Anims_(0, 0, 0, 0);
         int16_t total_frames = animate::Get_Animation_Frame_Count_(anim_header);
 
@@ -2625,9 +2625,10 @@ namespace BEAMS {
      */
     bool __cdecl XY_In_Shield_Radius_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t ship_size) {
         int16_t shield_idx = Ship_Size_To_Shield_Size_(ship_size);
-        int16_t radius = _shield_diameters[shield_idx] >> 1;
+        int16_t radius = (int16_t)((uint8_t)_shield_diameters[shield_idx] >> 1);
 
-        if (abs(x1 - x2) <= radius && abs(y1 - y2) <= radius) {
+        if (abs((int16_t)(x1 - x2)) <= radius &&
+            abs((int16_t)(y1 - y2)) <= radius) {
             return true;
         }
 

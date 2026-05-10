@@ -64,12 +64,12 @@ namespace BEAMS {
     inline uint8_t (&_shield_diameters)[8] =
         *reinterpret_cast<uint8_t (*)[8]>(std::uintptr_t{0x00552D58});
 
-    inline uint16_t& _shield_hit_draw_facing = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D60});
+    inline int16_t& _shield_hit_draw_facing = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D60});
 
     inline int16_t& _reflection_field_hit_draw_facing = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D64});
 
-    inline uint16_t& _shield_display_status =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00552D68});
+    inline int16_t& _shield_display_status =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x00552D68});
 
     inline uint8_t (&_reflection_field_diameters)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x00552D6C});
 
@@ -136,7 +136,7 @@ namespace BEAMS {
 
     int16_t __cdecl Planet_Size_To_Shield_Size_(int16_t planet_size);
 
-    void __cdecl Adjust_Shield_Display_Status_(uint16_t* shield_status);
+    void __cdecl Adjust_Shield_Display_Status_(int16_t* shield_status);
 
     void __cdecl Draw_Shield_Hit_(int16_t x, int16_t y, int16_t ship_idx, int16_t param_4, int16_t param_5, int16_t param_6, int16_t param_7);
 

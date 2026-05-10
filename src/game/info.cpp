@@ -2,11 +2,12 @@
 
 namespace INFO {
     void __cdecl Print_Player_Specials_To_Bitmap_(int16_t x, int16_t y, int16_t player_idx, s_animation_header* bitmap) {
-        if (player_idx >= MOX::_NUM_PLAYERS) {
+        uint16_t idx = (uint16_t)player_idx;
+        if (idx >= (uint16_t)MOX::_NUM_PLAYERS) {
             return;
         }
 
-        int8_t* traits = MOX::_player[player_idx].traits;
+        int8_t* traits = MOX::_player[idx].traits;
 
         for (int trait_idx = 0; trait_idx < 31; ++trait_idx) {
             int8_t trait_val = traits[trait_idx];
@@ -1012,7 +1013,7 @@ namespace INFO {
         int16_t x_pos = 351;
         int16_t y_pos = 64;
         int16_t spacing;
-        uint16_t active_count = (uint16_t)MOX::_active_count;
+        int16_t active_count = MOX::_active_count;
 
         if (active_count > 3) {
             spacing = 150;
@@ -1025,8 +1026,10 @@ namespace INFO {
         }
 
         if (active_count > 0) {
-            for (int16_t i = 0; i < (int16_t)active_count; ++i) {
-                int8_t player_idx = (int8_t)MOX::_active_player[i];
+            int16_t i = 0;
+
+            do {
+                uint8_t player_idx = (uint8_t)MOX::_active_player[i];
 
                 fonts::Set_Font_Style_(4, INFO::_hist_graph_palettes[player_idx]);
 
@@ -1035,11 +1038,12 @@ namespace INFO {
                 y_pos += 19;
 
                 if (i == 2 || i == 5) {
-                    // BUG: spacing might be uninitialized if active_count is exactly 3
                     x_pos += spacing;
                     y_pos = 64;
                 }
-            }
+
+                ++i;
+            } while (i < MOX::_active_count);
         }
     }
 
@@ -1249,7 +1253,7 @@ namespace INFO {
                 offset_idx = 0;
             }
 
-            graphics::Dot_(0xed - offset - 1, y, 0xb1);
+            graphics::Dot_(0xed - offset, y, 0xb1);
             line::Line_(0xee - offset, y, 0xef /* 239 */, y, 0xb9);
             y -= 10;
         } while (y >= 0x8c /* 140 */);
@@ -1541,7 +1545,7 @@ namespace INFO {
 
     int16_t __cdecl Reference_How_To_Subscreen_(s_animation_header** turn_summary_data_ptrs, int16_t param_2) {
         char help_lbx_name[20];
-        char title_combined[128];
+        char title_combined[80];
         char* loaded_help_text;
         int16_t input_code;
 
@@ -1549,12 +1553,10 @@ namespace INFO {
         INFO::Draw_Multiple_Drop_Areas_(INFO::_how_to_drops, 2);
 
         loaded_help_text = (char*)farload::Far_Reload_Next_Data_(
-            help_lbx_name, 0, MOX::_screen_seg, (uint32_t)INFO::_g_reference_ix, 1, 0x57B
+            help_lbx_name, 0, MOX::_screen_seg, (int32_t)INFO::_g_reference_ix, 1, 0x57B
         );
 
-        title_combined[0] = '\0';
-        JIM::Get_Text_Message_(s_billtext_lbx, 13, &title_combined[24], 80);
-
+        JIM::Get_Text_Message_(s_billtext_lbx, 13, title_combined, 80);
         strcat(title_combined, loaded_help_text);
 
         fonts::Print_Centered_(414, 67, title_combined);
@@ -1598,12 +1600,12 @@ namespace INFO {
         }
 
         if (_g_reference_screen_type == 1) {
-            BILLHELP::Ref_Category_Help_();
+            BILLHELP::Ref_How_To_Help_();
             return Reference_Category_Subscreen_(param_1, param_2);
         }
 
         if (_g_reference_screen_type == 2) {
-            BILLHELP::Ref_How_To_Help_();
+            BILLHELP::Ref_Category_Help_();
             return Reference_How_To_Subscreen_(param_1, param_2);
         }
 
@@ -1635,11 +1637,13 @@ namespace INFO {
                 int16_t height = FMTPARA::Get_Formatted_Paragraph_Max_Height_(state->item_width, buffer);
                 item->app_count = (uint8_t)(height / font_lf);
 
-                // Initialize applications for the list item based on paragraph height
-                for (int i = 0; i < (int)item->app_count; ++i) {
+                // Binary executes this initialization loop at least once.
+                int i = 0;
+                do {
                     item->tech_app_status[i] = 0;
                     item->tech_app_ids[i + 1] = 0xff;
-                }
+                    ++i;
+                } while (i < item->app_count);
 
                 msg_idx++;
                 item++;
