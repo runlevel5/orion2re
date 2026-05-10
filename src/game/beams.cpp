@@ -180,15 +180,15 @@ namespace BEAMS {
         if (BEAMS::_n_damage_msgs < 35 /* 0x23 */) {
             // Check if there is any positive damage value to report
             if (total_dmg > 0 || struct_dmg > 0 || shield_dmg > 0) {
-                uint16_t current_index = BEAMS::_n_damage_msgs;
+                int16_t current_index = BEAMS::_n_damage_msgs;
                 s_beam_dmg_msg& msg = BEAMS::_msg_queue[current_index];
 
                 msg.anim_timer = 0;
                 msg.x = x;
                 msg.y = y;
-                msg.total_dmg = (uint16_t)total_dmg;
-                msg.hull_dmg = (uint16_t)struct_dmg;
-                msg.shield_dmg = (uint16_t)shield_dmg;
+                msg.total_dmg = total_dmg;
+                msg.hull_dmg = struct_dmg;
+                msg.shield_dmg = shield_dmg;
                 msg.side = side;
 
                 BEAMS::_n_damage_msgs++;
@@ -196,7 +196,7 @@ namespace BEAMS {
         }
     }
 
-    void __cdecl Add_Damage_Indicator_For_Ship_(int32_t dx, int32_t dy, int16_t ship_idx, int32_t flag, int16_t total_damage, int16_t struct_damage) {
+    void __cdecl Add_Damage_Indicator_For_Ship_(int16_t dx, int16_t dy, int16_t ship_idx, uint8_t side, int16_t total_damage, int16_t struct_damage) {
         int16_t x_center;
         int16_t y_center;
         int16_t size_offset;
@@ -206,10 +206,10 @@ namespace BEAMS {
 
         COMBINIT::Ship_Center_Offsets_(ship_idx, &x_center, &y_center);
 
-        x_center += static_cast<int16_t>(dx);
-        y_center += static_cast<int16_t>(dy);
+        x_center += dx;
+        y_center += dy;
 
-        if (flag != 0) {
+        if (side != 0) {
             x_center += size_offset;
         } else {
             x_center -= size_offset;
@@ -217,7 +217,7 @@ namespace BEAMS {
 
         y_center -= size_offset;
 
-        BEAMS::Add_Damage_Message_To_Queue_(x_center, y_center, total_damage, struct_damage, 0, (uint8_t)(flag != 0));
+        BEAMS::Add_Damage_Message_To_Queue_(x_center, y_center, total_damage, struct_damage, 0, side);
     }
 
     void __cdecl Draw_Shield_Hit_Once_Through_(int16_t ship_idx, int16_t param_2, int16_t draw_x, int16_t draw_y) {
@@ -271,30 +271,35 @@ namespace BEAMS {
      * @address 00422a70
      */
     void __cdecl Draw_Damage_Indicator_(int16_t x, int16_t y, int16_t total_dmg, int16_t hull_dmg, int16_t shield_dmg, uint8_t side, int16_t anim_timer) {
-        uint8_t total_dmg_colors[27] = {
+        const uint8_t total_dmg_colors[27] = {
             0xb0, 0xb9, 0xba, 0xb0, 0xb8, 0xb9, 0xb0, 0xb7, 0xb8,
             0xb0, 0xb6, 0xb7, 0xb0, 0xb5, 0xb6, 0xb0, 0xb4, 0xb5,
             0xb0, 0xb3, 0xb4, 0xb0, 0xb2, 0xb3, 0xb0, 0xb1, 0xb2
         };
 
-        uint8_t shield_dmg_colors[27] = {
+        const uint8_t shield_dmg_colors[27] = {
             0x50, 0x57, 0x57, 0x50, 0x56, 0x57, 0x50, 0x55, 0x56,
             0x50, 0x54, 0x55, 0x50, 0x53, 0x54, 0x50, 0x52, 0x53,
             0x50, 0x51, 0x52, 0x50, 0x50, 0x51, 0x50, 0x50, 0x50
         };
 
-        uint8_t hull_dmg_colors[27] = {
+        const uint8_t hull_dmg_colors[27] = {
             0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5, 0xc0, 0xcc, 0xc5,
             0xc0, 0xc4, 0xcc, 0xc0, 0xcb, 0xc4, 0xc0, 0xc3, 0xcb,
             0xc0, 0xc3, 0xcb, 0xc0, 0xca, 0xc3, 0xc0, 0xc2, 0xca
         };
+        uint8_t dmg_color_blob[0x53];
+
+        memcpy(&dmg_color_blob[0x00], total_dmg_colors, sizeof(total_dmg_colors));
+        memcpy(&dmg_color_blob[0x1c], shield_dmg_colors, sizeof(shield_dmg_colors));
+        memcpy(&dmg_color_blob[0x38], hull_dmg_colors, sizeof(hull_dmg_colors));
 
         y -= anim_timer;
 
-        if (side == 1) {
-            x += anim_timer;
-        } else {
+        if (side != 1) {
             x -= anim_timer;
+        } else {
+            x += anim_timer;
         }
 
         if (anim_timer >= 9) {
@@ -305,17 +310,17 @@ namespace BEAMS {
         video::Clip_On_();
 
         if (total_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(&total_dmg_colors[anim_timer * 3]));
+            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[anim_timer * 3]);
             fonts::Print_Integer_(x, y, total_dmg);
         }
 
         if (shield_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(&shield_dmg_colors[anim_timer * 3]));
+            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[0x1c + anim_timer * 3]);
             fonts::Print_Integer_(x - 10, y, shield_dmg);
         }
 
         if (hull_dmg > 0) {
-            fonts::Set_Font_Style_Shadow_Down_(1, reinterpret_cast<s_colors*>(&hull_dmg_colors[anim_timer * 3]));
+            fonts::Set_Font_Style_Shadow_Down_(1, (s_colors*)&dmg_color_blob[0x38 + anim_timer * 3]);
             fonts::Print_Integer_(x - 20, y, hull_dmg);
         }
 
@@ -683,13 +688,13 @@ namespace BEAMS {
                 int16_t fx = fighter_coords[i * 2];
                 int16_t fy = fighter_coords[i * 2 + 1];
 
-                int q1 = angle::Get_Angle_(fx - target_x, target_y - fy) / 22 + 8;
-                int16_t dir1 = (abs(q1) & 0xF);
-                if (q1 < 0) dir1 = -dir1;
+                int16_t q1 = angle::Get_Angle_(fx - target_x, target_y - fy);
+                q1 = (int16_t)(q1 / 22 + 8);
+                int16_t dir1 = (q1 < 0) ? -(int16_t)((-q1) & 0xF) : (int16_t)(q1 & 0xF);
 
-                int q2 = angle::Get_Angle_(target_x - fx, fy - target_y) / 22 + 8;
-                int16_t dir2 = (abs(q2) & 0xF);
-                if (q2 < 0) dir2 = -dir2;
+                int16_t q2 = angle::Get_Angle_(target_x - fx, fy - target_y);
+                q2 = (int16_t)(q2 / 22 + 8);
+                int16_t dir2 = (q2 < 0) ? -(int16_t)((-q2) & 0xF) : (int16_t)(q2 & 0xF);
 
                 if (BEAMS::Get_Max_Frames_() < frame) {
                     return 0;
@@ -1204,12 +1209,10 @@ namespace BEAMS {
 
         if (fire_point_idx == current_frame || current_frame == 0) {
             _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = ERICNET::Mox_Play_Sound_(v_sfx_n);
-        } else if (_ship_firing_now_flag[fx_slot_idx] != 0) {
-            if (Get_Max_Frames_() - 1 <= current_frame) {
-                // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
-                sound::Fadeout_Sound_(_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
-                _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
-            }
+        } else if (_ship_firing_now_flag[fx_slot_idx] == 0 || Get_Max_Frames_() - 1 <= current_frame) {
+            // TYPE MISMATCH: Fadeout_Sound_ signature in sound.h is (int16_t, int8_t)
+            sound::Fadeout_Sound_(_g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx], 10);
+            _g_beam_fire_sfx_handle[fx_slot_idx * 5 + fire_point_idx] = 0;
         }
     }
 
@@ -1280,7 +1283,6 @@ namespace BEAMS {
                         int16_t shot_count = fx->shot_count;
                         int16_t attacker_picture_num = MOX::_combat_data[attacker_ship_id].picture_num;
                         int16_t attacker_owner = MOX::_combat_data[attacker_ship_id].owner;
-                        int16_t attacker_shield_max = MOX::_combat_data[attacker_ship_id].shield_arc_max;
 
                         int16_t target_bearing;
                         if (is_non_ship_target == 0) {
@@ -1292,7 +1294,7 @@ namespace BEAMS {
                         target_bearing = CMBTFIRE::Facing_Shield_(target_bearing);
 
                         int16_t fp_count;
-                        if (attacker_ship_id <= 0 || attacker_shield_max > 7 || _g_reflection_state_flag == 2) {
+                        if (attacker_ship_id <= 0 || attacker_owner >= 8 || _g_reflection_state_flag == 2) {
                             fp_count = 1;
                         }
                         else {
@@ -1517,15 +1519,15 @@ namespace BEAMS {
 
                 if (is_non_ship_target == 0) {
                     Adjust_Shield_Display_Status_(&_shield_hit_draw_facing);
-                    int16_t special_flag = 0;
+                    uint8_t shield_special = 0;
                     if (current_fx_idx[0] > -1) {
-                        special_flag = param_7[current_fx_idx[0]].special_flag;
+                        shield_special = (uint8_t)param_7[current_fx_idx[0]].special_flag;
                     }
                     if (current_fx_idx[1] > -1) {
-                        special_flag += param_7[current_fx_idx[1]].special_flag;
+                        shield_special = (uint8_t)(shield_special + (uint8_t)param_7[current_fx_idx[0] == 0].special_flag);
                     }
                     if (_g_pierced_shield_flag != 0) {
-                        special_flag = 1;
+                        shield_special = 1;
                     }
 
                     if (target_id == 0) {
@@ -1539,7 +1541,7 @@ namespace BEAMS {
                         int16_t max_radius = shield_diam / 2;
                         int16_t dx = target_center_x - max_radius;
                         int16_t dy = target_center_y - max_radius;
-                        Draw_Shield_Hit_(dx, dy, target_id, (special_flag != 0), 0, hit_facing, (int16_t)draw_facing);
+                        Draw_Shield_Hit_(dx, dy, target_id, shield_special != 0, 0, hit_facing, (int16_t)draw_facing);
                     }
                     else {
                         int16_t shield_size = Ship_Size_To_Shield_Size_(MOX::_combat_data[target_id].size_class);
@@ -1553,7 +1555,7 @@ namespace BEAMS {
                         int16_t max_radius = shield_diam / 2;
                         int16_t dx = target_center_x - max_radius;
                         int16_t dy = target_center_y - max_radius;
-                        Draw_Shield_Hit_(dx, dy, target_id, (special_flag != 0), specials, hit_facing, (int16_t)draw_facing);
+                        Draw_Shield_Hit_(dx, dy, target_id, shield_special != 0, specials, hit_facing, (int16_t)draw_facing);
                     }
 
                     if (_reflection_field_display_status != 0) {
