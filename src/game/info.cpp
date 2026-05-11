@@ -672,7 +672,7 @@ namespace INFO {
         int i, j;
 
         Draw_Drop_Area_(INFO::_category_drops);
-        JIM::Get_Text_Message_("billtext.lbx", 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
+        JIM::Get_Text_Message_(s_billtext_lbx, 12 /* BILL_MSG_CATEGORY_HEADER */, header_text, 80);
         strcat(header_text, MOX::_help_category_labels[INFO::_g_reference_ix]);
         fonts::Print_Centered_(416, 67, header_text);
 
@@ -711,9 +711,9 @@ namespace INFO {
         }
 
         LIST::Init_List_Data_(&INFO::_g_category_header);
-        short close_btn_id = fields::Add_Button_Field_(386, 427, "", anims[21], "", '(');
-        short up_btn_id = fields::Add_Button_Field_(398, 96, "", anims[14], " ", '(');
-        short down_btn_id = fields::Add_Button_Field_(398, 396, "", anims[15], " ", '(');
+        short close_btn_id = fields::Add_Button_Field_(386, 427, s__00551100, anims[21], s__00551100, '(');
+        short up_btn_id = fields::Add_Button_Field_(398, 96, s__00551100, anims[14], s__00551120, '(');
+        short down_btn_id = fields::Add_Button_Field_(398, 396, s__00551100, anims[15], s__00551120, '(');
 
         fields::Assign_Auto_Function_(reinterpret_cast<void(*)()>(0x004295D0 /* INFO::Draw_Reference_Category_Subscreen_ */), 2);
         INFO::_g_reference_screen_type = 0;
@@ -752,7 +752,6 @@ namespace INFO {
 
                     fonts::Set_Font_Style_(3, &INFO::_info_normal_color);
                     FMTPARA::Print_Formatted_Paragraph_To_Bitmap_(0, 64, 186, data + 103 /* 0x67 */, 3, INFO::_g_bitmap1_p);
-                    INFO::_g_list_update_needed = 0;
                 }
 
                 short input = fields::Get_Input_();

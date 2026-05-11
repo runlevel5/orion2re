@@ -13,7 +13,15 @@ namespace COLXPORT {
 
     inline MOX2::action_func_t& _saved_autofunction = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x0056501C});
 
-    inline int16_t (&_list_col)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00564DF0});
+    inline int16_t (&_list_col)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00564DF0});
+
+    inline int16_t (&_list_col_pop_ref)[252] = *reinterpret_cast<int16_t(*)[252]>(std::uintptr_t{0x00564E00});
+
+    inline int16_t (&_list_col_coord_vars)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00565010});
+
+    inline int16_t (&_list_col_pop_count)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00565020});
+
+    inline int16_t (&_list_col_job_fields)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00565030});
 
     inline int16_t (&_list_fields)[6] = *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00565000});
 
@@ -29,6 +37,8 @@ namespace COLXPORT {
     void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_idx);
 
     void __cdecl Draw_Bar_Indicator_();
+
+    void __cdecl Draw_Info_Pop_For_(int16_t entry_index);
 
     void __cdecl Add_Fields_();
 

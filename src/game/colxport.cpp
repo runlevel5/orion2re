@@ -43,7 +43,7 @@ namespace COLXPORT {
  */
 short __cdecl N_Colonies_(short player_idx) {
     if (_cheezy_hack_col_count_state != 0) {
-        return _cheezy_hack_col_count[player_idx];
+        return _cheezy_hack_col_count[(int16_t)player_idx];
     }
 
     short colony_count = 0;
@@ -51,7 +51,7 @@ short __cdecl N_Colonies_(short player_idx) {
         s_colony* colony = &MOX::_colony[i];
 
         // Only count colonies owned by player_idx that are NOT outposts
-        if (colony->owner == (char)player_idx && colony->outpost_flag == 0) {
+        if ((int16_t)colony->owner == player_idx && colony->outpost_flag == 0) {
             colony_count++;
         }
     }
@@ -248,7 +248,7 @@ void __cdecl Draw_Colony_Summary_For_Colony_(int16_t colony_idx, int16_t entry_i
     int16_t y_pos = entry_idx * 38 + 54;
     BILL::Squeeze_Print_Paragraph_(15, y_pos, 130, 28, planet_name, 0);
 
-    COLSUM::Draw_Info_Pop_For_(entry_idx);
+    COLXPORT::Draw_Info_Pop_For_(entry_idx);
 }
 
 void __cdecl Clear_List_Col_Array_() {
@@ -283,6 +283,26 @@ void __cdecl Draw_Bar_Indicator_() {
         // Full bar if 6 or fewer colonies
         graphics::Fill_(449 /* 0x1c1 */, 75 /* 0x4b */, 457 /* 0x1c9 */, 239 /* 0xef */, 80 /* 0x50 / 'P' */);
     }
+}
+
+void __cdecl Draw_Info_Pop_For_(int16_t entry_index) {
+    const int32_t index = static_cast<int32_t>(entry_index);
+    int16_t y = static_cast<int16_t>(entry_index * 0x26);
+    y = static_cast<int16_t>(y + 0x36);
+
+    COLDRAW::Do_Colony_Info_Pop_Stuff_For_Pop_(
+        COLXPORT::_list_col[index],
+        -1,
+        0,
+        0x94,
+        y,
+        0x1B9,
+        0,
+        &COLXPORT::_list_col_pop_ref[index * 42],
+        &COLXPORT::_list_col_pop_count[index],
+        &COLXPORT::_list_col_coord_vars[index],
+        &COLXPORT::_list_col_job_fields[index]
+    );
 }
 
 } // namespace COLXPORT

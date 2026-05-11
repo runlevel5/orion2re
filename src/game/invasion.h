@@ -8,7 +8,7 @@ namespace invasion {
 
     void __cdecl Check_Rebellion_(s_colony* colony);
 
-    void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int marines_count, s_colony* colony, s_invasion_side_info* side_a, s_invasion_side_info* side_b);
+    void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int16_t marines_count, s_colony* colony, s_invasion_side_info* side_a, s_invasion_side_info* side_b);
 
     int __cdecl Colony_N_Militia_(s_colony* colony);
 

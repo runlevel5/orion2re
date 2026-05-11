@@ -23,14 +23,14 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
 
     s_player* player = &MOX::_player[player_idx];
 
-    if (player->tech_applications[76 /* TECH_APP_ANTI_GRAV_HARNESS */] == 3) {
+    if (player->tech_applications[TECH_APP_ANTI_GRAV_HARNESS] == 3) {
         bonuses->antigrav_bonus = 10;
     }
-    if (player->tech_applications[91 /* TECH_APP_BATTLEOIDS */] == 3) {
+    if (player->tech_applications[TECH_APP_BATTLEOIDS] == 3) {
         bonuses->battleoids_bonus = 10;
         bonuses->has_battleoids = 1;
     }
-    if (player->tech_applications[211 /* TECH_APP_POWERED_ARMOR */] == 3) {
+    if (player->tech_applications[TECH_APP_POWERED_ARMOR] == 3) {
         bonuses->powered_armor_bonus = 10;
         bonuses->has_powered_armor = 1;
     }
@@ -202,9 +202,8 @@ void __cdecl Get_Boarding_Info_(int16_t attacker_player_id, int16_t attacker_uni
 
 void __cdecl Check_All_Rebellions_() {
     s_colony* colony = MOX::_colony;
-    s_colony* end = &colony[MOX::_NUM_COLONIES];
 
-    while (colony < end) {
+    while (colony < MOX::_colony + MOX::_NUM_COLONIES) {
         if (colony->owner != -1 && colony->outpost_flag == 0) {
             Check_Rebellion_(colony);
         }
@@ -265,13 +264,20 @@ void __cdecl Resolve_Ground_Combat_(s_invasion_side_info* side_a, s_invasion_sid
 }
 
 void __cdecl Find_Troops_(s_invasion_side_info* side_info) {
-    while (side_info->unit_counts[side_info->current_troop_type_idx] == 0) {
-        // Potential bug: out-of-bounds access to unit_counts[4] if current_troop_type_idx reaches 4
-        if (side_info->current_troop_type_idx >= 4) {
-            break;
-        }
-        side_info->current_troop_type_idx++;
+    if (side_info->unit_counts[(uint8_t)side_info->current_troop_type_idx] == 0) {
+        uint8_t idx = 0;
+        do {
+            idx = (uint8_t)side_info->current_troop_type_idx;
+
+            if (idx >= 4) {
+                break;
+            }
+
+            idx++;
+            side_info->current_troop_type_idx = (int8_t)idx;
+        } while (side_info->unit_counts[idx] == 0);
     }
+
     side_info->current_unit_damage = 0;
 }
 
@@ -417,7 +423,7 @@ void __cdecl Check_Rebellion_(s_colony* colony) {
     }
 }
 
-void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int marines_count, s_colony* colony, s_invasion_side_info* side_a, s_invasion_side_info* side_b) {
+void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int16_t marines_count, s_colony* colony, s_invasion_side_info* side_a, s_invasion_side_info* side_b) {
     memset(side_a, 0, sizeof(s_invasion_side_info));
 
     side_a->player_id = attacker_player_id;
@@ -425,7 +431,7 @@ void __cdecl Get_Rebellion_Info_(int16_t attacker_player_id, int marines_count, 
     side_a->ship_list = nullptr;
     side_a->n_ships = 0;
     side_a->colony_id = (int16_t)(colony - MOX::_colony);
-    side_a->unit_counts[3] = (int16_t)marines_count;
+    side_a->unit_counts[3] = marines_count;
 
     memset(side_b, 0, sizeof(s_invasion_side_info));
 
@@ -621,7 +627,7 @@ void __cdecl Change_Pop_Ownership_(int16_t colony_idx, uint32_t new_owner) {
 
     BOMB::Handle_Leader_At_Lost_Colony_(colony);
 
-    MOX::_player[old_owner].colony_war_losses[new_owner] += (int16_t)colony->n_pops;
+    MOX::_player[old_owner].colony_war_losses[new_owner] += (uint8_t)colony->n_pops;
 
     if (colony->buildings[9 /* BUILDING_CAPITOL */] != 0) {
         ERICNET::Remove_Building_(colony_idx, 9 /* BUILDING_CAPITOL */);

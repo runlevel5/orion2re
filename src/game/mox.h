@@ -447,8 +447,8 @@ namespace MOX {
 
     inline uint8_t& _NUM_NEBULAS = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596D10});
 
-    inline uint16_t& _NUM_COLONIES =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x00597856 });
+    inline int16_t& _NUM_COLONIES =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00597856 });
 
     inline uint16_t& _planet_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059700E });
 
