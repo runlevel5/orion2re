@@ -359,6 +359,8 @@ namespace FMTPARA {
                 _tabs[0] = 0;
             }
 
+            sort_tabs = false;
+
             char c = cmd;
 
             int16_t arg_index = 0;
@@ -424,7 +426,7 @@ namespace FMTPARA {
 
             } while (*_para_p->str == ',');
 
-            if (cmd == 'O') {
+            if (c == 'O') {
                 _para_p->str = _Print_Formatted_Paragraph_(
                     _para_p->x1,
                     _para_p->y,
@@ -498,16 +500,16 @@ namespace FMTPARA {
             Record_Break_Position_(0);
 
             while (!_line_p->line_done && !stop_processing) {
-                char c = *_para_p->str;
+                uint8_t c = (uint8_t)*_para_p->str;
 
                 if (c >= 0x20) {
                     uint32_t type = isalpha(c);
 
                     if (type != 0 && _insert_case != 0) {
                         if (_insert_case == 1 || _insert_case == 3) {
-                            c = _toupper(c);
+                            c = (uint8_t)_toupper(c);
                         } else if (_insert_case == 2) {
-                            c = _tolower(c);
+                            c = (uint8_t)_tolower(c);
                         }
                     }
 
@@ -521,7 +523,7 @@ namespace FMTPARA {
 
                     if (_line_p->char_count < 150 && (char_x_end <= _line_p->right_limit_x || _line_p->line_started != 0)) {
                         _line_p->x_candidate = char_x_end;
-                        Add_Character_To_Line_(c);
+                        Add_Character_To_Line_((char)c);
                         _line_p->prev_x = _line_p->x;
                         _line_p->x = _line_p->font_spacing + char_x_end + 1;
                         _line_p->line_started = 0;
@@ -554,7 +556,7 @@ namespace FMTPARA {
                 }
 
                 if (c < 0x20) {
-                    stop_processing = Process_Command_(c);
+                    stop_processing = Process_Command_((char)c);
                 }
 
                 _para_p->str++;
@@ -1064,7 +1066,7 @@ namespace FMTPARA {
                 uint32_t cond_val = (uint32_t)_para_global.cond_flag;
                 uint16_t arg;
                 if (Get_Insert_Argument_Next_(&arg)) {
-                    _para_global.cond_flag = Set_Item_Value_(arg, cond_val);
+                    _para_global.cond_flag = Set_Item_Value_(cond_val, arg);
                 }
                 break;
             }
@@ -1072,7 +1074,7 @@ namespace FMTPARA {
             case '4': {
                 uint16_t arg;
                 if (Get_Insert_Argument_Next_(&arg)) {
-                    _para_global.cond_flag = Set_Item_Value_(arg, val1);
+                    _para_global.cond_flag = Set_Item_Value_(val1, arg);
                 }
                 break;
             }
