@@ -396,9 +396,9 @@ namespace DESIGN {
                 if (MOX::_weapons_count_plus_button[i] == input_field) {
                     int32_t new_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_slot],
                         MOX::_design->weapon_count[weapon_slot] + 1,
-                        MOX::_design->weapon_specials[weapon_slot],
-                        static_cast<uint16_t>(MOX::_design->weapon_firing_arc[weapon_slot]),
-                        MOX::_design->ship_size);
+                        (uint8_t)MOX::_design->weapon_firing_arc[weapon_slot],
+                        (uint8_t)MOX::_design->weapon_ammo[weapon_slot],
+                        MOX::_design->weapon_specials[weapon_slot]);
                     if (MOX::_design->space_used + (new_space - MOX::_design->weapon_space[weapon_slot]) <= MOX::_design->hull_space) {
                         if (MOX::_design->weapon_count[weapon_slot] < 99) {
                             MOX::_design->weapon_count[weapon_slot]++;
@@ -599,9 +599,9 @@ namespace DESIGN {
 
                 int32_t next_weapon_space = Weapon_Space_(MOX::_PLAYER_NUM, MOX::_design->weapon_type[weapon_idx],
                     MOX::_design->weapon_count[weapon_idx] + 1,
-                    MOX::_design->weapon_specials[weapon_idx],
-                    MOX::_design->weapon_firing_arc[weapon_idx],
-                    MOX::_design->ship_size);
+                    (uint8_t)MOX::_design->weapon_firing_arc[weapon_idx],
+                    (uint8_t)MOX::_design->weapon_ammo[weapon_idx],
+                    MOX::_design->weapon_specials[weapon_idx]);
 
                 if (MOX::_design->weapon_type[weapon_idx] < 1 ||
                     ((MOX::_design->hull_space - MOX::_design->space_used) - (int32_t)next_weapon_space + (int32_t)MOX::_design->weapon_space[weapon_idx] < 0)) {

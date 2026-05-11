@@ -51,15 +51,15 @@ namespace DESIGN {
 
     int16_t __cdecl Get_Colony_Handle_();
 
-    int8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design);
+    uint8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design);
 
-    int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design);
+    uint8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design);
 
-    int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design);
+    uint8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design);
 
-    int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design);
+    uint8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design);
 
-    uint8_t __cdecl Current_Design_Has_Special_System_(s_current_design* design, uint32_t system_id);
+    uint8_t __cdecl Current_Design_Has_Special_System_(s_current_design* design, int16_t system_id);
 
     bool __cdecl Has_Damper_Field_();
 
@@ -75,7 +75,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_();
 
-    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size);
+    int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity, uint8_t firing_arc, uint8_t ammo, uint16_t specials);
 
     int32_t __cdecl Total_Space_Used_();
 
@@ -119,7 +119,7 @@ namespace DESIGN {
 
     void __cdecl Check_Generic_Replacement_Fields_(int16_t field, int16_t* refresh, int16_t* flag);
 
-    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* refresh, int16_t* out_flag);
+    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, /* unused */ int16_t* refresh, int16_t* out_flag);
 
     void __cdecl Check_Special_System_Fields_(int16_t clicked_field_id, int16_t *unused, int16_t* out_status);
 
@@ -177,7 +177,7 @@ namespace DESIGN {
 
     int16_t __cdecl Shield_Cost_(int16_t shield_type);
 
-    int16_t __cdecl Cost_Given_M_Level_(int32_t base_cost, int16_t m_level);
+    int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t m_level);
 
     int16_t __cdecl Computer_Cost_(int16_t computer_type);
 

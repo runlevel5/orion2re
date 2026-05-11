@@ -169,7 +169,7 @@ namespace MOX {
     inline int8_t& _officer_selected = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059D6D0 });
 
     inline uint16_t& _special_scroll_dn_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596434});
-    inline uint8_t& _n_weapons_loaded = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596E7A});
+    inline int8_t& _n_weapons_loaded = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596E7A});
     inline uint8_t& _n_special_systems = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059BD2A});
 
     inline int8_t*& _fltscrn_icon_selection_status =
@@ -303,7 +303,7 @@ namespace MOX {
     // Suggested name: MOX::_planet_summary_galaxy_star_seg
     inline s_animation_header** _planet_summary_galaxy_star_seg =
         reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059B470});
-    inline uint8_t& _first_weapon_ctr = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6C8});
+    inline int8_t& _first_weapon_ctr = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059D6C8});
     inline int16_t& _fleet_box_colonize_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059D6BA});
     inline uint8_t& _reloaded_ship_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059D6BC});
     inline uint8_t& _settings_language = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00597152 });

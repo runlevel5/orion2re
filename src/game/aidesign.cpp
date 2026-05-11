@@ -464,7 +464,7 @@ namespace aidesign {
         int16_t weapon_specials = specials[weapon_class];
         int16_t weapon_arc = arcs[weapon_class];
 
-        int32_t unit_space = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, weapon_specials, (uint16_t)weapon_arc, (uint16_t)design->size);
+        int32_t unit_space = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, (uint8_t)weapon_arc, 0, weapon_specials);
         if (unit_space == 0) {
             return 0;
         }
@@ -508,7 +508,7 @@ namespace aidesign {
 
         (*weapon_index_ptr)++;
 
-        int32_t final_unit_space = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, weapon_specials, (uint16_t)weapon_arc, (uint16_t)design->size);
+        int32_t final_unit_space = DESIGN::Weapon_Space_(player_idx, weapon_type, 1, (uint8_t)weapon_arc, 0, weapon_specials);
         return static_cast<int16_t>(final_unit_space * total_added);
     }
 

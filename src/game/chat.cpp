@@ -5,7 +5,7 @@ namespace CHAT {
         const char* text = (const char*)pack;
 
         if (_chat_info->count == 14) {
-            memcpy(_chat_info->messages, &_chat_info->messages[1], 1066);
+            memmove(_chat_info, _chat_info->messages + 1, 0x42A);
             _chat_info->count = 13;
         }
 

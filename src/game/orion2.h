@@ -1053,7 +1053,7 @@ typedef struct s_colony s_colony, *Ps_colony;
 /* WARNING! conflicting data type names: /rpcndr.h/byte - /byte */
 
 struct s_colony {
-    char owner;
+    int8_t owner;
     char allocated_to;
     short planet;
     short officer;

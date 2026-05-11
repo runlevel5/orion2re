@@ -150,8 +150,8 @@ namespace DESIGN {
         return count;
     }
 
-    int8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design) {
-        int8_t speed = Current_Design_Base_Combat_Speed_(design);
+    uint8_t __cdecl Current_Design_Combat_Speed_(s_current_design* design) {
+        uint8_t speed = Current_Design_Base_Combat_Speed_(design);
 
         if (Current_Design_Has_Special_System_(design, SPECIAL_AUGMENTED_ENGINES) != 0) {
             if (_use_augmented_engines != 0) {
@@ -162,15 +162,15 @@ namespace DESIGN {
         return speed;
     }
 
-    int8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design) {
+    uint8_t __cdecl Current_Design_Min_Combat_Speed_(s_current_design* design) {
         return TECHDATA::_drives[design->ftl_type].combat_speed_min[design->ship_size];
     }
 
-    int8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
+    uint8_t __cdecl Current_Design_Max_Combat_Speed_(s_current_design* design) {
         return TECHDATA::_drives[design->ftl_type].combat_speed_max[design->ship_size];
     }
 
-    int8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
+    uint8_t __cdecl Current_Design_Base_Combat_Speed_(s_current_design* design) {
         uint8_t base_speed = (uint8_t)Current_Design_Min_Combat_Speed_(design);
         uint8_t speed_mod = (uint8_t)Current_Design_Max_Combat_Speed_(design);
 
@@ -186,16 +186,19 @@ namespace DESIGN {
             final_speed = (int16_t)base_speed;
         }
 
-        return (int8_t)final_speed;
+        return (uint8_t)final_speed;
     }
 
-    uint8_t __cdecl Current_Design_Has_Special_System_(s_current_design* design, uint32_t system_id) {
-        for (int16_t i = 0; i < 8; ++i) {
-            if (design->special_devices[i] == static_cast<int16_t>(system_id)) {
-                return 1;
+    uint8_t __cdecl Current_Design_Has_Special_System_(s_current_design* design, int16_t system_id) {
+        uint8_t found = 0;
+
+        for (int16_t i = 0; i < 8 && found == 0; ++i) {
+            if (design->special_devices[i] == system_id) {
+                found = 1;
             }
         }
-        return 0;
+
+        return found;
     }
 
     int8_t __cdecl Count_Special_Devices_() {
@@ -381,9 +384,9 @@ namespace DESIGN {
                     MOX::_PLAYER_NUM,
                     design->weapon_type[i],
                     design->weapon_count[i],
-                    design->weapon_specials[i],
-                    static_cast<uint16_t>(design->weapon_firing_arc[i]),
-                    design->ship_size
+                    (uint8_t)design->weapon_firing_arc[i],
+                    (uint8_t)design->weapon_ammo[i],
+                    design->weapon_specials[i]
                 );
             }
         }
@@ -583,25 +586,25 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Weapon_Space_(int16_t player_idx, int16_t weapon_idx, int16_t quantity,
-                                  uint16_t mod_flags, uint16_t arc_type, uint16_t ship_size) {
+                                  uint8_t firing_arc, uint8_t ammo, uint16_t specials) {
         int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
         int32_t rack_size = 0;
 
         if (Weapon_Needs_Racks_(weapon_idx) != 0) {
-            rack_size = Weapon_Rack_Size_(arc_type);
+            rack_size = Weapon_Rack_Size_(ammo);
         }
 
         int16_t dummy_out;
         int16_t special_mod_mult;
-        Bonus_For_Special_Mods_(mod_flags, &dummy_out, &special_mod_mult);
+        Bonus_For_Special_Mods_(specials, &dummy_out, &special_mod_mult);
 
         int16_t mod_rack_offset = 0;
         if (DESIGN::Weapon_Type_(weapon_idx) == 0) {
-            mod_rack_offset = Get_Weapon_Mod_Space_Bonus_(mod_flags);
+            mod_rack_offset = Get_Weapon_Mod_Space_Bonus_(firing_arc);
         }
 
         int16_t regular_mod_add;
-        Bonus_For_Regular_Mods_(mod_flags, &dummy_out, &regular_mod_add);
+        Bonus_For_Regular_Mods_(specials, &dummy_out, &regular_mod_add);
 
         int16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
         uint32_t miniaturization_cat = Miniaturization_Category_(tech_app_id);
@@ -679,9 +682,9 @@ namespace DESIGN {
                         MOX::_PLAYER_NUM,
                         MOX::_design->weapon_type[slot_idx],
                         1,
-                        MOX::_design->weapon_specials[slot_idx],
-                        (uint16_t)MOX::_design->weapon_firing_arc[slot_idx],
-                        MOX::_design->ship_size
+                        (uint8_t)MOX::_design->weapon_firing_arc[slot_idx],
+                        (uint8_t)MOX::_design->weapon_ammo[slot_idx],
+                        MOX::_design->weapon_specials[slot_idx]
                     );
 
                     if (MOX::_design->space_used + space <= MOX::_design->hull_space) {
@@ -807,12 +810,12 @@ namespace DESIGN {
         }
     }
 
-    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* refresh, int16_t* out_flag) {
+    void __cdecl Check_Weapon_Fields_(int16_t clicked_field, int16_t* /* refresh */, int16_t* out_flag) {
         char description_buffer[1332];
 
         for (int16_t i = 0; i < 8; ++i) {
             int16_t weapon_field_id = MOX::_weapons_field[i];
-            int16_t design_weapon_index = i;
+            int16_t design_weapon_index = (int16_t)MOX::_first_weapon_ctr + i;
 
             if (MOX::_scanned_field == weapon_field_id) {
                 MOX::_scanned_field = i + 1000;
@@ -834,7 +837,7 @@ namespace DESIGN {
                 MOX::_design_screen_replacement_type = 3;
                 _printed_space_avail += MOX::_design->weapon_space[design_weapon_index];
                 _printed_cost -= MOX::_design->weapon_cost[design_weapon_index];
-                _selected_weapon_index = design_weapon_index;
+                MOX::_design_screen_replacement_slot = design_weapon_index;
 
                 fields::Deactivate_Help_List_();
                 DESBOX::Weapons_Replacement_Box_();
@@ -842,7 +845,7 @@ namespace DESIGN {
                 MOX::_design->show_help = 1;
                 MOX::_current_screen = SCREEN_DESIGN;
                 *out_flag = 99;
-                return;
+                continue;
             } else if (clicked_field + weapon_field_id == 0) {
                 int16_t weapon_type = MOX::_design->weapon_type[i];
                 if (weapon_type > 0) {
@@ -1430,7 +1433,7 @@ namespace DESIGN {
         return cost;
     }
 
-    int16_t __cdecl Cost_Given_M_Level_(int32_t base_cost, int16_t m_level) {
+    int16_t __cdecl Cost_Given_M_Level_(int16_t base_cost, int16_t m_level) {
         int16_t multiplier;
 
         switch (m_level) {
@@ -1454,13 +1457,13 @@ namespace DESIGN {
                 break;
         }
 
-        int16_t result = (int16_t)((multiplier * base_cost) / 100);
+        int32_t result = ((int32_t)multiplier * (int32_t)base_cost) / 100;
 
-        if (result == 0 && base_cost > 0) {
+        if ((int16_t)result == 0 && base_cost > 0) {
             result = 1;
         }
 
-        return result;
+        return (int16_t)result;
     }
 
     void __cdecl Weapon_Mod_String_(int16_t mod_mask, char* out_buffer, int p3) {
