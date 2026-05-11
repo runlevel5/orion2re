@@ -19,11 +19,6 @@ namespace DESIGN {
         MISC::Get_Mox_Font_Colors_(3, 'U', '[', &style3_colors);
         MISC::Get_Mox_Font_Colors_(2, 'U', '[', &style2_colors);
 
-        for (int i = 1; i < 8; ++i) {
-            style3_colors.colors[i] += 2;
-            style2_colors.colors[i] += 2;
-        }
-
         fonts::Set_Font_Style_(3, &style3_colors);
         fonts::Set_Font_Spacing_(1);
         fonts::Print_(0xEC, 0x38, TECHDATA::_drives[MOX::_design->ftl_type].name);
@@ -132,7 +127,7 @@ namespace DESIGN {
                     TECHDATA::_weapons[MOX::_design->weapon_type[slot]].name_plural;
 
                 if (Weapon_Needs_Racks_(MOX::_design->weapon_type[slot])) {
-                    sprintf(buffer, "%s (%d)", base_name, (int)MOX::_design->weapon_ammo[i]);
+                    sprintf(buffer, "%s (%d)", base_name, (int)MOX::_design->weapon_ammo[slot]);
                     fonts::Print_(0x55, y_pos, buffer);
                 }
                 else {
@@ -152,9 +147,23 @@ namespace DESIGN {
                 }
 
                 fonts::Print_Centered_(0x149, y_pos, arc_str);
-                sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_space[slot] / MOX::_design->weapon_count[slot]) : 0);
+                int per_space = 0;
+                if (MOX::_design->weapon_count[slot] != 0) {
+                    per_space = MOX::_design->weapon_space[slot] / MOX::_design->weapon_count[slot];
+                }
+                if (per_space <= 1) {
+                    per_space = 1;
+                }
+                sprintf(buffer, "%d", per_space);
                 fonts::Print_Centered_(0x1B4, y_pos, buffer);
-                sprintf(buffer, "%d", (MOX::_design->weapon_count[slot] > 0) ? (MOX::_design->weapon_cost[slot] / MOX::_design->weapon_count[slot]) : 0);
+                int per_cost = 0;
+                if (MOX::_design->weapon_count[slot] != 0) {
+                    per_cost = MOX::_design->weapon_cost[slot] / MOX::_design->weapon_count[slot];
+                }
+                if (per_cost <= 1) {
+                    per_cost = 1;
+                }
+                sprintf(buffer, "%d", per_cost);
                 fonts::Print_Centered_(0x179, y_pos, buffer);
                 fonts::Print_Centered_(0x211, y_pos, mod_str);
                 y_pos += 13;
@@ -165,7 +174,7 @@ namespace DESIGN {
             int remaining = 8 - MOX::_n_weapons_loaded;
             if (remaining > 0) {
                 int centered_y = y_pos;
-                if (remaining > 1) centered_y += (remaining * -13 + 0x7F) / 2 - 14;
+                if (remaining > 1) centered_y += ((int)MOX::_n_weapons_loaded * -13 + 0x7F) / 2 - 14;
 
                 if (Space_For_Weapon_Replacement_()) {
                     fonts::Set_Font_Style_(2, &style2_colors);
@@ -219,7 +228,7 @@ namespace DESIGN {
             int remaining = 8 - MOX::_n_special_systems;
             if (remaining > 0) {
                 int centered_y = y_pos;
-                if (remaining > 1) centered_y += (remaining * -13 + 0x7D) / 2 - 14;
+                if (remaining > 1) centered_y += ((int)MOX::_n_special_systems * -13 + 0x7D) / 2 - 14;
 
                 if (Space_For_System_Replacement_()) {
                     fonts::Set_Font_Style_(2, &style2_colors);
@@ -261,7 +270,8 @@ namespace DESIGN {
     }
 
     void __cdecl Design_Screen_() {
-        int16_t current_design_idx = _player_design_num;
+        video::Set_Refresh_Full_();
+        int16_t design = MOX::_temp_star_handle;
         char log_buf[100];
         MOX::_first_weapon_ctr = 0;
         MOX::_multi_colored_line_start = 0;
@@ -353,7 +363,7 @@ namespace DESIGN {
 
             if (MOX::_design_cancel_button == input_field) {
                 screen_exit_flag = 1;
-                _player_design_num = 0;
+                MOX::_temp_star_handle = 0;
                 MOX::_current_screen = static_cast<SCREEN>(MOX::_return_screen);
             }
 
@@ -363,10 +373,10 @@ namespace DESIGN {
             }
 
             if (MOX::_design_build_button == input_field) {
-                Update_Player_Design_(MOX::_PLAYER_NUM, current_design_idx);
+                Update_Player_Design_(MOX::_PLAYER_NUM, design);
                 MOX::_current_screen = static_cast<SCREEN>(MOX::_return_screen);
                 screen_exit_flag = 1;
-                _player_design_num = 1;
+                MOX::_temp_star_handle = 1;
             }
 
             if (MAINSCR::_debug_field == input_field) {
@@ -399,9 +409,12 @@ namespace DESIGN {
                         (uint8_t)MOX::_design->weapon_firing_arc[weapon_slot],
                         (uint8_t)MOX::_design->weapon_ammo[weapon_slot],
                         MOX::_design->weapon_specials[weapon_slot]);
-                    if (MOX::_design->space_used + (new_space - MOX::_design->weapon_space[weapon_slot]) <= MOX::_design->hull_space) {
-                        if (MOX::_design->weapon_count[weapon_slot] < 99) {
-                            MOX::_design->weapon_count[weapon_slot]++;
+                    int16_t delta = (int16_t)new_space - (int16_t)MOX::_design->weapon_space[weapon_slot];
+                    int16_t candidate = (int16_t)MOX::_design->space_used + delta;
+                    if ((int32_t)candidate <= MOX::_design->hull_space) {
+                        MOX::_design->weapon_count[weapon_slot]++;
+                        if (MOX::_design->weapon_count[weapon_slot] > 99) {
+                            MOX::_design->weapon_count[weapon_slot] = 99;
                         }
                         _replacement_wait_ctr = 0;
                         needs_refresh = 1;
@@ -409,8 +422,9 @@ namespace DESIGN {
                     break;
                 }
                 else if (MOX::_weapons_count_minus_button[i] == input_field) {
-                    if (MOX::_design->weapon_count[weapon_slot] > 1) {
-                        MOX::_design->weapon_count[weapon_slot]--;
+                    MOX::_design->weapon_count[weapon_slot]--;
+                    if (MOX::_design->weapon_count[weapon_slot] < 1) {
+                        MOX::_design->weapon_count[weapon_slot] = 1;
                     }
                     _replacement_wait_ctr = 0;
                     needs_refresh = 1;
@@ -433,8 +447,11 @@ namespace DESIGN {
                 if (MOX::_design_ship_size_field[i] == input_field) {
                     if (_add_size_button_flag[i] < 241) {
                         _changed_design_name = 0;
-                        int16_t pic_val = (MOX::_design->picture_type & 7);
-                        Get_Ship_Design_Name_(MOX::_player[MOX::_PLAYER_NUM].race, MOX::_design->ship_size, pic_val, MOX::_design->name);
+                        int16_t pic = MOX::_design->picture_type;
+                        int16_t sign = pic >> 15;
+                        int16_t pic_val = ((((pic ^ sign) - sign) & 7) ^ sign) - sign;
+                        int16_t race = (uint8_t)MOX::_player[MOX::_PLAYER_NUM].race;
+                        Get_Ship_Design_Name_(race, MOX::_design->ship_size, pic_val, MOX::_design->name);
                     }
                     else {
                         Print_Ship_Size_Error_Message_(i);
@@ -442,17 +459,22 @@ namespace DESIGN {
                 }
             }
 
-            if (screen_exit_flag == 0 || screen_exit_flag == 99) {
+            if (screen_exit_flag == 0) {
                 video::Set_Page_Off_();
                 _printed_space_avail = MOX::_design->hull_space - MOX::_design->space_used;
                 _printed_cost = MOX::_design->total_cost;
                 Draw_Design_Screen_();
                 RUSS::Mox_Sync_Update_();
             }
+            else if (screen_exit_flag == 99) {
+                video::Set_Page_Off_();
+                Draw_Design_Screen_();
+                RUSS::Mox_Sync_Update_();
+            }
 
             strings::Trim_(MOX::_design->name);
             if (MOX::_design->name[0] == '\0') {
-                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, current_design_idx);
+                char* default_name = HACCESS::Design_Name_(MOX::_PLAYER_NUM, design);
                 char* dst = MOX::_design->name;
                 while ((*dst++ = *default_name++));
             }

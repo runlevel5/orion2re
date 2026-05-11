@@ -243,11 +243,10 @@ namespace DESIGN {
     }
 
     int32_t __cdecl Total_Design_Space_() {
-        // Access hull_size from TECHDATA::_hull_data array based on current design's ship size
-        int32_t hull_size = static_cast<int32_t>(TECHDATA::_hull_data[MOX::_design->ship_size].size);
+        int16_t ship_size = MOX::_design->ship_size;
+        int32_t hull_size = TECHDATA::_hull_data[ship_size].size;
 
         if (MOX::_player[MOX::_PLAYER_NUM].tech_applications[TECH_APP_MEGAFLUXERS] == 3) {
-            // Apply 25% hull space bonus: (hull_size * 125) / 100
             hull_size = (hull_size * 125) / 100;
         }
 
@@ -268,7 +267,7 @@ namespace DESIGN {
         MOX::_n_special_systems = Count_Special_Devices_();
 
         _printed_space_avail = _design->hull_space - _design->space_used;
-        _printed_cost = static_cast<uint16_t>(_design->total_cost);
+        _printed_cost = _design->total_cost;
 
         Update_N_Spec_Systems_In_Design_();
         Update_Weapon_Count_();
@@ -335,6 +334,7 @@ namespace DESIGN {
 
     int32_t __cdecl Total_Design_Cost_() {
         int16_t shield_cost = Base_Shield_Cost();
+        int16_t ship_size = _design->ship_size;
         int weapon_total_cost = 0;
 
         for (int i = 0; i < 8; ++i) {
@@ -350,11 +350,11 @@ namespace DESIGN {
             }
         }
 
-        int total_cost = (int)TECHDATA::_hull_data[_design->ship_size].cost +
+        int total_cost = (int32_t)(int16_t)TECHDATA::_hull_data[ship_size].cost +
                          (int)_design->computer_cost +
                          (int)_design->drive_cost +
                          (int)_design->armor_cost +
-                         (int)shield_cost +
+                         (int32_t)(int16_t)shield_cost +
                          weapon_total_cost +
                          special_device_total_cost;
 
@@ -373,7 +373,7 @@ namespace DESIGN {
         int16_t drive_tech_level = Tech_Level_(player_num, drive_tech_app);
 
         int16_t base_drive_space = TECHDATA::_drives[ftl_type].space_per_ship_type[design->ship_size];
-        design->base_space = (int8_t)Space_Given_M_Level_(base_drive_space, drive_tech_level, drive_min_cat);
+        design->base_space = Space_Given_M_Level_(base_drive_space, drive_tech_level, drive_min_cat);
 
         design->field18_0x29 = 0;
 
@@ -625,7 +625,7 @@ namespace DESIGN {
         return total_space;
     }
 
-    int32_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
+    int16_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials) {
         int32_t rack_size = 0;
         if (Weapon_Needs_Racks_(weapon_idx) != 0) {
             rack_size = static_cast<int32_t>(Weapon_Rack_Size_(ammo));
@@ -640,18 +640,21 @@ namespace DESIGN {
             space_bonus = Get_Weapon_Mod_Space_Bonus_(arc);
         }
 
-        int16_t regular_bonus_pct;
-        Bonus_For_Regular_Mods_(specials, &regular_bonus_pct, &local_4);
+        int16_t regular_bonus_add;
+        int16_t regular_bonus_space;
+        Bonus_For_Regular_Mods_(specials, &regular_bonus_add, &regular_bonus_space);
 
         const auto& weapon = TECHDATA::_weapons[weapon_idx];
 
-        int32_t base_scaled_cost = (static_cast<int32_t>(special_bonus_pct) * (static_cast<int32_t>(weapon.cost) + rack_size)) / 100;
+        int32_t base_scaled_cost =
+            (static_cast<int32_t>(special_bonus_pct) * (static_cast<int32_t>(weapon.cost) + rack_size)) / 100;
 
-        int32_t total_modified_cost = (static_cast<int32_t>(space_bonus) + regular_bonus_pct + 100) * base_scaled_cost / 100;
+        int32_t total_modified_cost =
+            (static_cast<int32_t>(space_bonus) + regular_bonus_add + 100) * base_scaled_cost / 100;
 
         int16_t tech_level = Tech_Level_(MOX::_PLAYER_NUM, weapon.tech_app_id);
 
-        return (int32_t)Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
+        return Cost_Given_M_Level_(total_modified_cost * static_cast<int32_t>(count), tech_level);
     }
 
     void __cdecl Draw_Design_Screen_() {
@@ -674,38 +677,40 @@ namespace DESIGN {
         bool updated = false;
         bool done = false;
 
-        for (int i = 0; i < 8 && !done; ++i) {
-            int slot_idx = (int16_t)MOX::_first_weapon_ctr + i;
+        for (int16_t i = 0; i < 8 && !done; ++i) {
+            int16_t count_idx = (int16_t)MOX::_first_weapon_ctr + i;
             if (MOX::_weapons_count_plus_button[i] != -1000 && input_id == MOX::_weapons_count_plus_button[i]) {
-                if (MOX::_design->weapon_type[slot_idx] > 0 && _repeat_count > 4) {
-                    int32_t space = Weapon_Space_(
+                if (MOX::_design->weapon_type[i] > 0 && _repeat_count > 4) {
+                    done = true;
+
+                    int16_t space = (int16_t)Weapon_Space_(
                         MOX::_PLAYER_NUM,
-                        MOX::_design->weapon_type[slot_idx],
+                        MOX::_design->weapon_type[i],
                         1,
-                        (uint8_t)MOX::_design->weapon_firing_arc[slot_idx],
-                        (uint8_t)MOX::_design->weapon_ammo[slot_idx],
-                        MOX::_design->weapon_specials[slot_idx]
+                        (int8_t)MOX::_design->weapon_firing_arc[i],
+                        (int8_t)MOX::_design->weapon_ammo[i],
+                        MOX::_design->weapon_specials[i]
                     );
 
                     if (MOX::_design->space_used + space <= MOX::_design->hull_space) {
-                        if (MOX::_design->weapon_count[slot_idx] < 99) {
-                            MOX::_design->weapon_count[slot_idx]++;
+                        if (MOX::_design->weapon_count[count_idx] < 99) {
+                            MOX::_design->weapon_count[count_idx]++;
                         } else {
-                            MOX::_design->weapon_count[slot_idx] = 99;
+                            MOX::_design->weapon_count[count_idx] = 99;
                         }
                         updated = true;
-                        done = true;
                     }
                 }
             } else if (MOX::_weapons_count_minus_button[i] != -1000 && input_id == MOX::_weapons_count_minus_button[i]) {
-                if (MOX::_design->weapon_type[slot_idx] > 0 && _repeat_count > 5) {
-                    if (MOX::_design->weapon_count[slot_idx] > 1) {
-                        MOX::_design->weapon_count[slot_idx]--;
+                if (MOX::_design->weapon_type[i] > 0 && _repeat_count > 5) {
+                    done = true;
+
+                    if (MOX::_design->weapon_count[count_idx] > 1) {
+                        MOX::_design->weapon_count[count_idx]--;
                     } else {
-                        MOX::_design->weapon_count[slot_idx] = 1;
+                        MOX::_design->weapon_count[count_idx] = 1;
                     }
                     updated = true;
-                    done = true;
                 }
             }
         }
@@ -1084,27 +1089,22 @@ namespace DESIGN {
     void __cdecl Get_Ship_Design_Name_(int16_t race_idx, int16_t design_idx, int16_t variant_idx, char* out_name) {
         allocate::Push_Block_(MOX::_global_data_seg);
 
-        // The index in shipname.lbx is calculated based on race, design slot, and a variant offset.
-        // Each race has 6 design slots, and each slot appears to have 8 name variants.
-        int32_t entry_idx = (int16_t)(variant_idx + race_idx * 48 + design_idx * 8);
+        // shipname.lbx entry: variant_idx + ((race_idx * 6 + design_idx) * 8)
+        // original code performs this through 16-bit arithmetic before sign-extension
+        int16_t entry_idx = (int16_t)(variant_idx + (int16_t)((int16_t)(race_idx * 6) + design_idx) * 8);
 
         char* loaded_name = (char*)farload::Far_Reload_Next_Data_(
             s_SHIPNAME_LBX_0055610C,
             0,
             MOX::_global_data_seg,
-            entry_idx,
+            (int32_t)entry_idx,
             1,
             0x10
         );
 
         allocate::Pop_Block_(MOX::_global_data_seg);
 
-        // Copy the retrieved string to the output buffer.
-        if (loaded_name != nullptr && out_name != nullptr) {
-            char* src = loaded_name;
-            char* dst = out_name;
-            while ((*dst++ = *src++) != '\0');
-        }
+        strcpy(out_name, loaded_name);
     }
 
     void __cdecl Set_Flashing_Colors_(int16_t font_style, int16_t spacing) {
@@ -1246,7 +1246,7 @@ namespace DESIGN {
                     int16_t colony_idx = DESIGN::Get_Colony_Handle_();
                     char* planet_name = HACCESS::Get_Planet_Name_(MOX::_colony[colony_idx].planet);
                     is_formatted = true;
-                    sprintf(planet_name_buf, "%s", planet_name);
+                    sprintf(planet_name_buf, planet_name);
                 }
                 break;
             default:
@@ -1741,9 +1741,9 @@ namespace DESIGN {
         MOX::_design->special_device_space[n_systems - 1] = 0;
     }
 
-    int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_idx, int16_t mod_bonus_idx, int16_t param_3, int16_t rack_type, int16_t param_5, int16_t mod_flags) {
-        int32_t base_size = (int32_t)TECHDATA::_weapons[weapon_idx].size;
-        int32_t rack_size = (int32_t)DESIGN::Weapon_Rack_Size_(rack_type);
+    int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_idx, int16_t mod_bonus_idx, int16_t rack_type, int16_t mod_flags) {
+        int16_t base_size = TECHDATA::_weapons[weapon_idx].size;
+        int32_t rack_size = DESIGN::Weapon_Rack_Size_(rack_type);
         int32_t total_size = base_size + rack_size;
 
         int16_t temp_bonus;

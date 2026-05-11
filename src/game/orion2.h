@@ -4861,7 +4861,7 @@ struct s_tech_armor_data {
     short tech_app_id;
     undefined field3_0x8;
     uint8_t troops_bonus;
-    uint16_t ships_bonus;
+    int16_t ships_bonus;
     uint16_t cost_percent;
     uint8_t strategic_hp;
 };
@@ -4944,7 +4944,7 @@ typedef struct s_tech_hull_data s_tech_hull_data, *Ps_tech_hull_data;
 
 struct s_tech_hull_data {
     uint16_t cost;
-    uint16_t size;
+    int16_t size;
     uint16_t marines;
     uint16_t armor_hp;
     uint16_t structure_hp;
@@ -5027,7 +5027,7 @@ struct s_tech_weapon_data {
     uint8_t type;
     int8_t ammo;
     uint16_t size;
-    uint16_t cost;
+    int16_t cost;
     uint16_t natural_mods;
     uint16_t min_damage;
     uint16_t max_damage;

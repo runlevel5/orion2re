@@ -11,6 +11,7 @@ namespace DESIGN {
     inline int32_t& _printed_space_avail = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565054});
     inline int16_t& _design_shield_replacement_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056505C});
     inline int16_t& _design_computer_replacement_field = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565060});
+    // 0x004321e0 stores EAX directly to 0x00565058, so this global is 32-bit here.
     inline int32_t& _printed_cost = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00565058});
     inline int16_t& _selected_weapon_index = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059799C});
     inline uint8_t& _changed_design_name = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056504C});
@@ -153,7 +154,7 @@ namespace DESIGN {
 
     bool __cdecl Space_For_Weapon_Replacement_();
 
-    int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_idx, int16_t mod_bonus_idx, int16_t param_3, int16_t rack_type, int16_t param_5, int16_t mod_flags);
+    int16_t __cdecl One_Weapon_Space_Without_M_Level_(int16_t weapon_idx, int16_t mod_bonus_idx, int16_t rack_type, int16_t mod_flags);
 
     int16_t __cdecl Tech_App_To_Tech_Id_(int16_t app_id, int16_t category);
 
@@ -181,7 +182,7 @@ namespace DESIGN {
 
     int16_t __cdecl Computer_Cost_(int16_t computer_type);
 
-    int32_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials);
+    int16_t __cdecl Weapon_Cost_(int16_t weapon_idx, int16_t count, int16_t arc, int16_t ammo, int16_t specials);
 
     int8_t __cdecl Miniaturization_Category_(int16_t tech_app);
 
