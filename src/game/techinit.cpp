@@ -336,7 +336,7 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
   }
 
   player->best_ftl_drive = static_cast<char>(INITSHIP::Best_Warp_Drive_(player_idx));
-  player->ship_speed = static_cast<char>(INITSHIP::Calc_Player_FTL_Speed_(player_idx));
+  player->ship_speed = static_cast<uint8_t>(INITSHIP::Calc_Player_FTL_Speed_(player_idx));
 }
 
 void __cdecl Init_Tech_() {

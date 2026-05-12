@@ -1246,17 +1246,22 @@ namespace FMTPARA {
     char __cdecl FN_Set_Variable_(char func_char, int32_t val, int16_t arg_index, bool arg_ret, bool flag) {
         if (arg_index == 1 /* Case 1: Initialize index */) {
             if (arg_ret == 0) {
-                _var_index = (uint16_t)abs(val);
+                uint32_t value = (uint32_t)val;
+                uint32_t sign = 0u - (value >> 31);
+
+                _var_index = (uint16_t)((value ^ sign) - sign);
             }
             return func_char;
         }
 
         if (arg_index == 2 /* Case 2: Update item value */) {
             if (_var_index < 0x10) {
-                int32_t value = val;
+                uint32_t value = (uint32_t)val;
+
                 if (flag) {
                     value += Get_Item_Value_(_var_index);
                 }
+
                 Set_Item_Value_(_var_index, value);
             }
         }
@@ -1391,19 +1396,11 @@ namespace FMTPARA {
         if (arg_ret != 0) {
             _para_p->para_advance_y = _para_p->line_advance_y;
         } else {
-            int32_t value;
-            if (flag) {
-                value = val + (int32_t)_para_p->para_advance_y;
-            } else {
-                value = val;
-            }
+            int32_t value = flag ? val + _para_p->para_advance_y : val;
+            uint32_t sign = 0u - ((uint32_t)value >> 31);
+            uint32_t absolute_value = ((uint32_t)value ^ sign) - sign;
 
-            int32_t absolute_value = value;
-            if (absolute_value < 0) {
-                absolute_value = -absolute_value;
-            }
-
-            if (absolute_value < 64 /* 0x40 */) {
+            if ((absolute_value ^ 0x80000000u) < (0x40u ^ 0x80000000u)) {
                 _para_p->para_advance_y = (int16_t)value;
             }
         }
@@ -1728,7 +1725,7 @@ namespace FMTPARA {
             }
 
             do {
-                if (_char_p->fg_and_attr != _last_fg_and_attr) {
+                if ((int32_t)(int8_t)_char_p->fg_and_attr != (int32_t)_last_fg_and_attr) {
                     fonts::_font_header.font_style = _char_p->fg_and_attr & 0xF;
                     if (((_char_p->fg_and_attr ^ _last_fg_and_attr) & 0xE0) != 0) {
                         Pick_Font_Color_(_char_p->fg_and_attr);
@@ -1736,7 +1733,7 @@ namespace FMTPARA {
                     _last_fg_and_attr = _char_p->fg_and_attr;
                 }
 
-                if (_last_font_id != _char_p->font_id) {
+                if ((int32_t)_last_font_id != (int32_t)(int8_t)_char_p->font_id) {
                     Pick_Font_Number_(_char_p->font_id);
                     _last_font_id = _char_p->font_id;
                 }
@@ -1748,7 +1745,6 @@ namespace FMTPARA {
                 if (_para_p->do_render) {
                     if (fonts::_font_header.font_style != 0) {
                         uint8_t outline_byte = static_cast<uint8_t>(fonts::_outline_color);
-                        uint32_t color_val = (outline_byte << 24) | (outline_byte << 16) | (outline_byte << 8) | outline_byte;
 
                         for (int i = 0; i < 8; i++) {
                             fonts::_font_header.selected_colors.colors[i] = outline_byte;
@@ -1906,10 +1902,8 @@ namespace FMTPARA {
         memcpy(saved_selected_colors, &fonts::_font_header.selected_colors, 8);
         saved_current_colors = fonts::_current_font_color_array;
 
-        if (font_id & 0x80) {
-            // Apply new font style using the normal_colors array as a reference
-            fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), &fonts::_font_header.normal_colors);
-        }
+        // Apply the font selection for all font ids; the high bit is an attribute flag.
+        fonts::Set_Remap_Font_Style_(static_cast<int>(font_id & 0x7F), &fonts::_font_header.normal_colors);
 
         // Restore the original font color states that might have been modified by Set_Remap_Font_Style_
         memcpy(&fonts::_font_header.selected_colors, saved_selected_colors, 8);

@@ -572,12 +572,12 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         for (short i = 0; i < (short)PLNTSUM::_n_ships_in_summary; ++i) {
             if (choice_mode == 1) {
                 short ship_idx = PLNTSUM::_ship_summary[i].colony_ship_idx;
-                if (ship_idx > -1 && (uint16_t)ship_idx < MOX::_NUM_SHIPS) {
+                if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Colony_Ship_To_Star_Distances_(i, ship_idx);
                 }
             } else if (choice_mode == 4) {
                 short ship_idx = PLNTSUM::_ship_summary[i].outpost_ship_idx;
-                if (ship_idx > -1 && (uint16_t)ship_idx < MOX::_NUM_SHIPS) {
+                if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
                     PLNTSUM::Set_Outpost_Ship_To_Star_Distances_(i, ship_idx);
                 }
             }

@@ -44,7 +44,7 @@ namespace SHIPMOVE {
     bool __cdecl Ship_Is_Moving_(s_ship_data* ship);
 
     void __cdecl Make_Ship_Arrive_At_Star_(s_ship_data* ship, int16_t star_idx);
-    void __cdecl Update_Ship_ETAs_(int32_t player_id);
+    void __cdecl Update_Ship_ETAs_(int16_t player_id);
 
     void __cdecl Do_Hyperspace_Beast_(int32_t player_idx);
 

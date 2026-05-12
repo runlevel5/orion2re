@@ -512,7 +512,7 @@ namespace raceopt {
         local_64.colors[6] = 0x91;
         local_64.colors[7] = 0x91;
 
-        char local_50[12];
+        char local_50[12] = { 0 };
         memset(&local_50[1], 0x95, 7);
 
         fonts::Set_Font_Style_Shadow_Down_(3, &_color_opt);
@@ -561,7 +561,9 @@ namespace raceopt {
                 } else if (btn_var - loop1_j == 1) {
                     animate::Set_Animation_Frame_(_special_button_seg, 1);
                     animate::Draw_(x_coords[col_idx] - 0x14, y, _special_button_seg);
-                } else if (item_idx > 3 && item_idx < 8 && _option_toggle[9] == 1) {
+                }
+
+                if (item_idx > 3 && item_idx < 8 && _option_toggle[9] == 1) {
                     animate::Draw_(x_coords[col_idx] - 0x14, y, _off_button_seg);
                 }
 
@@ -584,7 +586,7 @@ namespace raceopt {
                     char local_5c[12];
                     local_50[0] = s__00551100[0];
                     itoa(_ability_costs[neg_idx], local_5c, 10);
-                    strcpy(local_50, local_5c);
+                    strcpy(local_50 + 1, local_5c);
 
                     fonts::Print_(x_coords[col_idx], y, _opt_string[item_idx]);
                     int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
@@ -649,7 +651,6 @@ namespace raceopt {
                 itoa(_ability_costs[neg_idx], local_5c, 10);
                 strcpy(local_50, local_5c);
 
-                fonts::Print_(x_coords[col_idx], y2, _opt_string[item_idx]);
                 int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 
                 int dots_start = x_coords[col_idx] - 1 + str_w;
@@ -659,6 +660,7 @@ namespace raceopt {
                     fonts::Print_(x, y2, s_dot_0055632c);
                 }
 
+                fonts::Print_(x_coords[col_idx], y2, _opt_string[item_idx]);
                 fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y2, local_50);
             }
 
@@ -674,9 +676,11 @@ namespace raceopt {
 
         item_idx++;
         if (item_idx < 64) {
+            int16_t block_sizes[4] = { 0x16, 0, 0, 0 };
+
             do {
                 int16_t k = 0;
-                int16_t limit = (stack_vars[2] == 0) ? 22 : 0;
+                int16_t limit = block_sizes[stack_vars[2]];
 
                 if (limit > 0) {
                     do {
@@ -704,7 +708,6 @@ namespace raceopt {
                             itoa(_ability_costs[item_idx - 11], local_5c, 10);
                             strcpy(local_50, local_5c);
 
-                            fonts::Print_(x_coords[col_idx], y3, _opt_string[item_idx]);
                             int16_t str_w = fonts::Get_String_Width_(_opt_string[item_idx]);
 
                             int dots_start = x_coords[col_idx] - 1 + str_w;
@@ -714,6 +717,7 @@ namespace raceopt {
                                 fonts::Print_(x, y3, s_dot_0055632c);
                             }
 
+                            fonts::Print_(x_coords[col_idx], y3, _opt_string[item_idx]);
                             fonts::Print_Right_(x_coords[col_idx + 1] - 0x32, y3, local_50);
                         }
 

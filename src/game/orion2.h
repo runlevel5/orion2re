@@ -3164,7 +3164,7 @@ struct s_player {
     char do_not_research;
     char offensive_stagepoint;
     char best_ftl_drive;
-    char ship_speed;
+    uint8_t ship_speed;
     char officer_for_hire;
     short n_trade_pops;
     short current_trade_agreement_level[8];
@@ -3240,7 +3240,7 @@ struct s_player {
     short temp_diplomacy_dummy1[8];
     char diplomacy_demand_rejection_message[8];
     sbyte last_diplomacy_threat_turn[8];
-    char delayed_diplomacy_orders[8];
+    int8_t delayed_diplomacy_orders[8];
     int8_t traits[31];
     int8_t evolutionary_upgrade_traits[31];
     char picked_evolutionary_upgrade;

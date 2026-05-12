@@ -190,21 +190,19 @@ namespace FILEDEF {
         fread(&header_val, 4, 1, file);
         if (header_val != 0xe0) {
             const char* fmt = nullptr;
-            // TODO: Fix me
             switch (MOX::_settings.language) {
-            case 0: fmt = "SAVE%d.GAM is invalid! Try another."; break;
-            case 1: fmt = "SAVE%d.GAM ist ungültig! Wählen Sie..."; break;
-            case 2: fmt = "SAUVEGARDER%d.GAM n'est pas valide..."; break;
-            case 3: fmt = "#SAVE%d.GAM no es válido! Prueba..."; break;
-            case 4: fmt = "Il file SAVE%d.GAM non è valido!"; break;
+            case 0: fmt = reinterpret_cast<const char*>(0x005568A0); break;
+            case 1: fmt = reinterpret_cast<const char*>(0x00556844); break;
+            case 2: fmt = reinterpret_cast<const char*>(0x005567D4); break;
+            case 3: fmt = reinterpret_cast<const char*>(0x0055677C); break;
+            case 4: fmt = reinterpret_cast<const char*>(0x00556720); break;
             }
             if (fmt) {
                 sprintf(err_msg, fmt, save_idx + 1);
-                GENDRAW::Warning_Box_(err_msg);
             }
+            GENDRAW::Warning_Box_(err_msg);
             video::Set_Page_Off_();
             graphics::Fill_(0, 0, 639, 479, 0);
-            fclose(file);
             return 0;
         }
 
@@ -327,13 +325,13 @@ namespace FILEDEF {
 
         for (int i = 0; i < 8; ++i) {
             if (MOX::_player[i].dead_field != 0) {
-                MOX::_player[i].research_accumulated = (int32_t)MOX::_player[i].dead_field;
+                MOX::_player[i].research_accumulated = (uint16_t)MOX::_player[i].dead_field;
                 MOX::_player[i].dead_field = 0;
             }
         }
 
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            for (int j = 0; j < 8; ++j) {
+            for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 MOX::_player[i].delayed_diplomacy_orders[j] = -1;
             }
         }

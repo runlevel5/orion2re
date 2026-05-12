@@ -102,7 +102,7 @@ namespace SHIPMOVE {
             Update_Player_Ship_Range_(current_player);
 
             current_player->best_ftl_drive = (char)INITSHIP::Best_Warp_Drive_(i);
-            current_player->ship_speed = (char)INITSHIP::Calc_Player_FTL_Speed_(i);
+            current_player->ship_speed = (uint8_t)INITSHIP::Calc_Player_FTL_Speed_(i);
         }
     }
 
@@ -262,7 +262,9 @@ namespace SHIPMOVE {
      * @return True if the ship can be ordered.
      */
     bool __cdecl Can_Order_Ship_(s_ship_data* ship) {
-        if (ship->owner < 0 || ship->owner >= (int32_t)MOX::_NUM_PLAYERS) {
+        int16_t owner = (int8_t)ship->owner;
+
+        if (owner >= MOX::_NUM_PLAYERS) {
             return false;
         }
 
@@ -274,7 +276,7 @@ namespace SHIPMOVE {
             return false;
         }
 
-        s_player* player = &MOX::_player[(uint8_t)ship->owner];
+        s_player* player = &MOX::_player[owner];
 
         // Check for Hyperspace Communications
         if (player->tech_applications[TECH_APP_HYPERSPACE_COMMUNICATIONS] == 3) {
@@ -282,11 +284,11 @@ namespace SHIPMOVE {
         }
 
         // Check if player has simpler comms tech and is near a relay
-        if (player->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3 ||
-            player->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3) {
-            
-            uint8_t player_mask = 1 << (ship->owner & 0x1F);
-            
+        if (player->tech_applications[TECH_APP_TACHYON_COMMUNICATIONS] == 3 ||
+            player->tech_applications[TECH_APP_SUB_SPACE_COMMUNICATIONS] == 3) {
+
+            uint8_t player_mask = (uint8_t)((uint32_t)1 << ((uint8_t)ship->owner & 0x1F));
+
             for (int i = 0; i < (int)MOX::_NUM_STARS; ++i) {
                 s_star_data* star = &MOX::_star[i];
                 int dist = GEO::Parsecs_Between_Points_(star->x, star->y, ship->x, ship->y);
@@ -315,7 +317,7 @@ namespace SHIPMOVE {
             return 0xFF;
         }
 
-        int16_t range = MOX::_player[(uint8_t)ship->owner].ship_range;
+        int16_t range = MOX::_player[ship->owner].ship_range;
 
         if (struct_::Test_Bit_Field_(ship->d.special_device_flags, 11)) {
             range = (range * 3 + 1) / 2;
@@ -732,7 +734,7 @@ namespace SHIPMOVE {
         }
     }
 
-    void __cdecl Update_Ship_ETAs_(int32_t player_id) {
+    void __cdecl Update_Ship_ETAs_(int16_t player_id) {
         int num_ships = (int)MOX::_NUM_SHIPS;
         s_ship_data* ships = MOX::_ship;
 
@@ -744,8 +746,8 @@ namespace SHIPMOVE {
                 int16_t dest_star_idx = SHIPMOVE::Ship_Destination_Star_(ship);
                 s_star_data* star = &MOX::_star[dest_star_idx];
 
-                int32_t target_x = (int32_t)star->x;
-                int32_t target_y = (int32_t)star->y;
+                int16_t target_x = star->x;
+                int16_t target_y = star->y;
 
                 int16_t current_x = ship->x;
                 int16_t current_y = ship->y;
@@ -755,16 +757,16 @@ namespace SHIPMOVE {
                 int8_t local_9;
 
                 // Simulate movement turn by turn until destination is reached
-                while ((int32_t)current_x != target_x || (int32_t)current_y != target_y) {
+                while (current_x != target_x || current_y != target_y) {
                     turn_count++;
 
                     int8_t* navigator_ptr = nullptr;
-                    if (ship->group_has_navigator != 1) {
+                    if (ship->group_has_navigator == 0) {
                         navigator_ptr = &local_a;
                     }
 
                     GEO::Move_Player_1_Turn_To_Star_(
-                        (uint8_t)ship->owner,
+                        ship->owner,
                         current_x,
                         current_y,
                         dest_star_idx,
@@ -862,10 +864,11 @@ namespace SHIPMOVE {
 
         s_star_data* start_star = &MOX::_star[start_star_idx];
         s_star_data* target_star = &MOX::_star[end_star_idx];
+        uint8_t player_bit = (uint8_t)player_idx & 0x1F;
 
         // Check stargate connectivity (player bitmask)
-        if (((start_star->has_stargate >> player_idx) & 1) &&
-            ((target_star->has_stargate >> player_idx) & 1)) {
+        if (((start_star->has_stargate >> player_bit) & 1) &&
+            ((target_star->has_stargate >> player_bit) & 1)) {
             return 1;
         }
 
@@ -878,8 +881,8 @@ namespace SHIPMOVE {
         bool is_jumpgate_used = false;
 
         // Check jumpgate connectivity (player bitmask)
-        if (((start_star->has_jumpgate >> player_idx) & 1) &&
-            ((target_star->has_jumpgate >> player_idx) & 1)) {
+        if (((start_star->has_jumpgate >> player_bit) & 1) &&
+            ((target_star->has_jumpgate >> player_bit) & 1)) {
             speed += 3;
             is_jumpgate_used = true;
         }

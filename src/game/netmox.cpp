@@ -458,7 +458,7 @@ namespace NETMOX {
         memcpy(ptr, MOX::_colony, size);
         ptr += size;
 
-        *reinterpret_cast<uint16_t*>(ptr) = MOX::_NUM_SHIPS;
+        *reinterpret_cast<int16_t*>(ptr) = MOX::_NUM_SHIPS;
         ptr += sizeof(uint16_t);
 
         size = 500 * sizeof(s_ship_data);
