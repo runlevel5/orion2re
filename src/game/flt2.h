@@ -16,7 +16,7 @@ namespace FLT2 {
 
     void __cdecl Clear_All_Selection_Status_();
 
-    void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx);
+    void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_visible_row = 0);
 
     bool __cdecl Ok_To_Add_Ship_(int16_t ship_idx);
 

@@ -1497,7 +1497,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
 
         if (plr2_idx == 9) { // Guardian defeated
             MOX::_player[plr1_idx].captured_orion = 1;
-            OFFICER::Give_Player_Loknar_Special_(plr1_idx, (uint8_t*)result->info.orion_techs, &result->info.rescued_hero_id);
+            OFFICER::Give_Player_Loknar_Special_(plr1_idx, result->info.orion_techs, &result->info.rescued_hero_id);
             if (MOX::_player[plr1_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();
@@ -1519,7 +1519,7 @@ short __cdecl Do_1_Combat_(short star_idx, short plr2_idx, short plr1_idx, short
     } else {
         if (plr1_idx == 9) { // Guardian defeated by attacker
             MOX::_player[plr2_idx].captured_orion = 1;
-            OFFICER::Give_Player_Loknar_Special_(plr2_idx, (uint8_t*)result->info.orion_techs, &result->info.rescued_hero_id);
+            OFFICER::Give_Player_Loknar_Special_(plr2_idx, result->info.orion_techs, &result->info.rescued_hero_id);
             if (MOX::_player[plr2_idx].objectives == 100) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1 || MOX::_settings.strategic_combat_flag == 0) {
                     ERIC::Play_Take_Orion_Flic_();

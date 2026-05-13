@@ -1165,8 +1165,8 @@ namespace COLCALC {
         return 4; 
     }
 
-    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const s_colony* pop_unit, int16_t mode) {
-        uint32_t pop_mask = reinterpret_cast<const uint32_t&>(*pop_unit);
+    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode) {
+        uint32_t pop_mask = *pop_unit;
 
         // Call the empire-specific base production function
         int16_t base_prod = _colony_empire_base_functions[mode](

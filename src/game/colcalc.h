@@ -287,7 +287,7 @@ namespace COLCALC {
 
     int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const s_colony* pop_unit, int16_t mode);
+    int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode);
 
     inline char (&_tmp_quotient)[20] = *reinterpret_cast<char (*)[20]>(std::uintptr_t{0x00571AC0});
     char* __cdecl Format_Quotient_(int value, int divisor);

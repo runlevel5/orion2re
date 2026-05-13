@@ -58,7 +58,7 @@ namespace OFFICER {
 
     bool __cdecl Officer_Has_Special_Skill_(int16_t player_num, int16_t leader_idx, int16_t skill_idx);
 
-    int16_t __cdecl Get_Research_Cost_Skill_Value_(uint32_t cost);
+    int16_t __cdecl Get_Research_Cost_Skill_Value_(int32_t cost);
 
     void __cdecl Get_Random_Skills_(uint32_t* primary_mask, uint32_t* secondary_mask, int16_t skill_class, int16_t count, int8_t randomize_class);
 
@@ -154,7 +154,7 @@ namespace OFFICER {
 
     void __cdecl Dismiss_Officer_(int16_t leader_idx);
 
-    void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx);
+    void __cdecl Assign_Captain_(int16_t leader_idx, int16_t ship_idx);
 
     int8_t __cdecl Get_Ship_Leader_ETA_(int16_t player_num, int16_t leader_idx, int16_t ship_idx);
 
@@ -184,7 +184,7 @@ namespace OFFICER {
 
     void __cdecl Find_Selected_Leader_(int16_t leader_idx);
 
-    void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id);
+    void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* num_techs);
 
     void __cdecl Get_Available_Antaran_Tech_(int16_t player_idx, int16_t* available_techs, int16_t* available_count);
 

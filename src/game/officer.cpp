@@ -42,8 +42,8 @@ namespace OFFICER {
         }
 
         int32_t current_level_val = static_cast<int32_t>(level) + 1;
-        int32_t skill_div = static_cast<int32_t>(MOX::_skill_data[skill_idx].level_up);
-        int32_t bonus_base = static_cast<int32_t>(MOX::_skill_data[skill_idx].strength);
+        int32_t skill_div = (int32_t)MOX::_skill_data[skill_idx].level_up;
+        int32_t bonus_base = (int32_t)MOX::_skill_data[skill_idx].strength;
 
         int32_t intermediate = (current_level_val + skill_div - 1) / skill_div;
 
@@ -206,7 +206,7 @@ namespace OFFICER {
         return (mask & leader_skills) != 0;
     }
 
-    int16_t __cdecl Get_Research_Cost_Skill_Value_(uint32_t cost) {
+    int16_t __cdecl Get_Research_Cost_Skill_Value_(int32_t cost) {
         if (cost < 1000) {
             return 1;
         }
@@ -232,7 +232,7 @@ namespace OFFICER {
 
         // Check if the officer's owner has the Warlord trait
         if (leader.player_index != -1) {
-            if (MOX::_player[(uint8_t)leader.player_index].traits[TRAIT_WARLORD] != 0) {
+            if (MOX::_player[leader.player_index].traits[TRAIT_WARLORD] != 0) {
                 warlord = 1;
             }
         }
@@ -310,7 +310,7 @@ namespace OFFICER {
                 int16_t leader_idx = leader_indices[repulsive_pool_idx++];
                 if (leader_idx >= 0) {
                     MOX::_leaders[leader_idx].status = 4;
-                    MOX::_leaders[leader_idx].player_index = (char)player_idx;
+                    MOX::_leaders[leader_idx].player_index = (int8_t)player_idx;
                     is_leader_assigned[leader_idx] = 1;
                 }
             }
@@ -344,7 +344,7 @@ namespace OFFICER {
 
                     if (leader_idx >= 0) {
                         MOX::_leaders[leader_idx].status = 4;
-                        MOX::_leaders[leader_idx].player_index = (char)player_idx;
+                        MOX::_leaders[leader_idx].player_index = (int8_t)player_idx;
                         is_leader_assigned[leader_idx] = 1;
                     }
                 }
@@ -454,7 +454,7 @@ namespace OFFICER {
 
     int16_t __cdecl Do_Hire_Officer_(int16_t leader_idx) {
         int16_t result = 0;
-        int32_t cost = Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
+        int16_t cost = (int16_t)Officer_Cost_(MOX::_PLAYER_NUM, leader_idx);
 
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
 
@@ -463,7 +463,7 @@ namespace OFFICER {
 
         if (leader->status == 4) {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            if (player->bc < cost) {
+            if (player->bc < (int32_t)cost) {
                 Not_Enough_BCs_Message_(leader_idx, cost);
             } else {
                 result = (int16_t)Ask_For_Hire_(leader_idx);
@@ -594,9 +594,8 @@ namespace OFFICER {
             int16_t y_screen_offset = 0;
             for (int16_t i = 0; i < MOX::_n_fltscrn_officers; ++i) {
                 int16_t leader_id = MOX::_officer_id_list[i];
-                if (leader_id != -1) {
-                    uint8_t* ldrpict_base = reinterpret_cast<uint8_t*>(OFFICER::_ldrpict);
-                    s_animation_header* portrait_anim = *reinterpret_cast<s_animation_header**>(ldrpict_base + i * 6);
+                if (leader_id > -1) {
+                    s_animation_header* portrait_anim = OFFICER::_ldrpict[i].pic;
                     
                     int16_t anim_w = animate::Get_Width_(portrait_anim);
                     int16_t anim_h = animate::Get_Height_(portrait_anim);
@@ -607,7 +606,7 @@ namespace OFFICER {
                     if (leader.eta <= 0 && leader.status != 4) {
                         draw_anim = portrait_anim;
                     } else {
-                        draw_anim = *reinterpret_cast<s_animation_header**>(ldrpict_base + i * 6 + 24);
+                        draw_anim = OFFICER::_ldrpict[i + 4].pic;
                     }
 
                     int16_t x = (75 - anim_w) / 2 + 12;
@@ -749,25 +748,25 @@ namespace OFFICER {
         }
 
         if (OFFICER::_officer_button_mode == 2) {
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg), 1);
-            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_dismiss_button_seg));
+            animate::Set_Animation_Frame_(MOX::_officer_dismiss_button_seg, 1);
+            animate::Draw_(463, 441, MOX::_officer_dismiss_button_seg);
         } else if (OFFICER::_officer_dismiss_btn == -1000) {
-            animate::Draw_(463, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_dismiss_button_seg));
+            animate::Draw_(463, 441, MOX::_dull_officer_dismiss_button_seg);
         }
 
         if (OFFICER::_officer_button_mode == 1) {
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg), 1);
-            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_pool_button_seg));
+            animate::Set_Animation_Frame_(MOX::_officer_pool_button_seg, 1);
+            animate::Draw_(388, 441, MOX::_officer_pool_button_seg);
         } else if (OFFICER::_officer_pool_btn == -1000) {
-            animate::Draw_(388, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_pool_button_seg));
+            animate::Draw_(388, 441, MOX::_dull_officer_pool_button_seg);
         }
 
         if (!Leaders_In_Hiring_Pool_()) {
-            animate::Draw_(313, 441, reinterpret_cast<s_animation_header*>(MOX::_dull_officer_hire_button_seg));
+            animate::Draw_(313, 441, MOX::_dull_officer_hire_button_seg);
         }
 
         if (OFFICER::_officer_button_mode == 0) {
-            animate::Draw_(300, 441, reinterpret_cast<s_animation_header*>(MOX::_officer_hire_replace_seg));
+            animate::Draw_(300, 441, MOX::_officer_hire_replace_seg);
             if (MOX::_officer_scanned > -1) {
                 Get_Officer_Costs_(MOX::_officer_scanned, &hire_cost, &maint_cost);
                 if (maint_cost == 0) {
@@ -798,18 +797,18 @@ namespace OFFICER {
             fonts::Print_Centered_(466, 210, buffer);
         }
 
-        if ((char)MOX::_global_var == 'c') {
-            void* seg = is_fleet_screen ? MOX::_officer_colony_ldrs_button_seg_fleet : MOX::_officer_colony_ldrs_button_seg_system;
-            animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(seg), 1);
-            animate::Draw_(is_fleet_screen ? 156 : 10, 11, reinterpret_cast<s_animation_header*>(seg));
+        if (MOX::_global_var_byte == 'c') {
+            s_animation_header* seg = is_fleet_screen ? MOX::_officer_ship_ldrs_button_seg : MOX::_officer_colony_ldrs_button_seg;
+            animate::Set_Animation_Frame_(seg, 1);
+            animate::Draw_(is_fleet_screen ? 156 : 10, 11, seg);
         }
 
         bool type_not_one = MOX::_officer_scrn_type != 1;
-        animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_colony_ldrs_button_seg_fleet), type_not_one);
-        animate::Draw_(160, 10, reinterpret_cast<s_animation_header*>(MOX::_officer_colony_ldrs_button_seg_fleet));
+        animate::Set_Animation_Frame_(MOX::_officer_ship_ldrs_button_seg, type_not_one);
+        animate::Draw_(160, 10, MOX::_officer_ship_ldrs_button_seg);
 
-        animate::Set_Animation_Frame_(reinterpret_cast<s_animation_header*>(MOX::_officer_colony_ldrs_button_seg_system), !type_not_one);
-        animate::Draw_(7, 10, reinterpret_cast<s_animation_header*>(MOX::_officer_colony_ldrs_button_seg_system));
+        animate::Set_Animation_Frame_(MOX::_officer_colony_ldrs_button_seg, !type_not_one);
+        animate::Draw_(7, 10, MOX::_officer_colony_ldrs_button_seg);
 
         OFFICER::_offscrn_flash_incr++;
         if (OFFICER::_offscrn_flash_incr % 25 == 0) {
@@ -820,13 +819,16 @@ namespace OFFICER {
             OFFICER::_offscrn_flash_value += OFFICER::_offscrn_flash_dir;
         }
 
-        MOX::_multi_colored_line_start = (abs(MOX::_multi_colored_line_start + 1)) % 8;
+        int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
+        int32_t sign = next_idx >> 31;
+        MOX::_multi_colored_line_start =
+            (int16_t)(((((next_idx ^ sign) - sign) & 7) ^ sign) - sign);
     }
 
     void Officers_Screen_() {
         uint16_t saved_map_scale = (uint16_t)MOX::_cur_map_scale;
         int8_t needs_help_reset = 0;
-        int16_t hire_btn, cancel_btn, fleet_view_btn, star_view_btn, ok_btn, scroll_up_btn, scroll_down_btn, prev_btn, next_btn, dummy_field;
+        int16_t hire_btn, cancel_btn, fleet_view_btn, colony_view_btn, ok_btn, scroll_up_btn, scroll_down_btn, prev_btn, next_btn, dummy_field;
         int16_t big_icons_scanned[4], big_icons_ids[4];
 
         graphics::Reset_Window_();
@@ -862,8 +864,8 @@ namespace OFFICER {
 
         if (MOX::_previous_screen == 1) {
             MOX::_officer_scrn_type = 1;
-            if (DESIGN::_player_design_num > -1) {
-                MOX::_small_ship_stack_ptr = DESIGN::_player_design_num;
+            if (MOX::_temp_star_handle > -1) {
+                MOX::_small_ship_stack_ptr = MOX::_temp_star_handle;
             }
         }
         if (MOX::_officer_scrn_type == -1) {
@@ -879,12 +881,12 @@ namespace OFFICER {
                 FLT2::Set_Initial_Stack_Pointer_();
             }
         } else {
-            _officer_star_displayed = DESIGN::_player_design_num;
-            _officer_star_chosen = DESIGN::_player_design_num;
-            if (DESIGN::_player_design_num == -1) {
+            _officer_star_displayed = MOX::_temp_star_handle;
+            _officer_star_chosen = MOX::_temp_star_handle;
+            if (MOX::_temp_star_handle == -1) {
                 _officer_star_chosen = MOX::_planet[MOX::_player[MOX::_PLAYER_NUM].home_planet_id].star_index;
             }
-            SYS::Init_System_Display_(DESIGN::_player_design_num);
+            SYS::Init_System_Display_(MOX::_temp_star_handle);
         }
 
         MOX::_draw_officer_to_back = 1;
@@ -901,7 +903,7 @@ namespace OFFICER {
         MOX::_big_icon_x_offset = 0x12E;
         MOX::_big_icon_y_offset = 0x13;
 
-        Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, &star_view_btn, &fleet_view_btn, &ok_btn, big_icons_scanned, big_icons_ids, &scroll_up_btn, &scroll_down_btn, &prev_btn, &next_btn, &dummy_field);
+        Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, &fleet_view_btn, &colony_view_btn, &ok_btn, big_icons_scanned, big_icons_ids, &scroll_up_btn, &scroll_down_btn, &prev_btn, &next_btn, &dummy_field);
         OFFICER::Initialize_Scroll_Bar_(MOX::_scroll_bar);
 
         MOX::_offpop_big_icon_selected = -1;
@@ -914,10 +916,10 @@ namespace OFFICER {
         Save_Officers_Original_Colony_Id_();
         Save_Officers_Original_Ship_Id_();
         MOX::_draw_officer_to_back = 1;
-        MOX::_global_var = 1;
+        MOX::_global_var_byte = 1;
         MOX::_return_screen = (int16_t)MOX::_previous_screen;
         Fade_Into_Leaders_Screen_();
-        MOX::_global_var = 0;
+        MOX::_global_var_byte = 0;
 
         int16_t exit_screen = 0;
         EVANHELP::Set_Officer_Screen_Help_();
@@ -996,7 +998,7 @@ namespace OFFICER {
                                     sprintf(buffer, fmt, Leader_Name_((int16_t)MOX::_officer_selected, 0));
                                     Officer_Screen_User_Box_(buffer, 0);
                                 } else {
-                                    Assign_Officer_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
+                                    Assign_Captain_((int16_t)MOX::_officer_selected, MOX::_fltscrn_big_icon[(int16_t)b_idx].ship_idx);
                                     MOX::_draw_officer_to_back = 1;
                                     Deselect_Offpop_Icons_();
                                 }
@@ -1109,12 +1111,12 @@ namespace OFFICER {
 
             if (_officer_button_mode == -1) {
                 bool screen_toggle = false;
-                if (fleet_view_btn == input) {
+                if (colony_view_btn == input) {
                     if (MOX::_officer_scrn_type != 1) {
                         MOX::_officer_scrn_type = 1;
                         screen_toggle = true;
                     }
-                } else if (star_view_btn == input) {
+                } else if (fleet_view_btn == input) {
                     if (MOX::_officer_scrn_type != 0) {
                         MOX::_officer_scrn_type = 0;
                         screen_toggle = true;
@@ -1131,7 +1133,7 @@ namespace OFFICER {
             }
 
             fields::Clear_Fields_();
-            Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, &star_view_btn, &fleet_view_btn, &ok_btn, big_icons_scanned, big_icons_ids, &scroll_up_btn, &scroll_down_btn, &prev_btn, &next_btn, &dummy_field);
+            Add_Officer_Screen_Fields_(&hire_btn, &cancel_btn, &fleet_view_btn, &colony_view_btn, &ok_btn, big_icons_scanned, big_icons_ids, &scroll_up_btn, &scroll_down_btn, &prev_btn, &next_btn, &dummy_field);
 
             if (needs_help_reset != 0) {
                 needs_help_reset = 0;
@@ -1379,7 +1381,7 @@ namespace OFFICER {
                 if (mode == 0 || (mode == -1 && MOX::_leaders[field2].status == 4 /* Limbo */)) {
                     Do_Hire_Officer_(field2);
                     MOX::_draw_officer_to_back = 1;
-                    if (mode != 0) {
+                    if (_officer_button_mode != 0) {
                         MOX::_officer_selected = -1;
                     }
                 } else if (mode == 2 /* Dismiss */) {
@@ -1409,7 +1411,7 @@ namespace OFFICER {
                     if (MOX::_offpop_big_icon_selected >= 0) {
                         int16_t ship_idx = MOX::_fltscrn_big_icon[MOX::_offpop_big_icon_selected].ship_idx;
                         if (Leader_Can_Be_Assigned_(field2) != 0) {
-                            Assign_Officer_(MOX::_officer_selected, ship_idx);
+                            Assign_Captain_(MOX::_officer_selected, ship_idx);
                             MOX::_draw_officer_to_back = 1;
                             Deselect_Offpop_Icons_();
                         } else {
@@ -1424,7 +1426,7 @@ namespace OFFICER {
                 } else if (_officer_star_chosen != -1 && HAROLD::Player_Has_Colony_(MOX::_PLAYER_NUM, _officer_star_chosen)) {
                     if (Leader_Can_Be_Assigned_(MOX::_officer_selected) != 0) {
                         if (MOX::_leaders[static_cast<uint8_t>(MOX::_officer_selected)].location != _officer_star_chosen) {
-                            Assign_Officer_(MOX::_officer_selected, _officer_star_chosen);
+                            Assign_Captain_(MOX::_officer_selected, _officer_star_chosen);
                             MOX::_draw_officer_to_back = 1;
                         }
                     } else {
@@ -1467,7 +1469,7 @@ namespace OFFICER {
         } else {
             if (location > -1 && location < static_cast<int16_t>(MOX::_NUM_STARS)) {
                 // Remove leader reference from the star system
-                MOX::_star[location].officer_index[(uint8_t)leader.player_index] = -1;
+                MOX::_star[location].officer_index[leader.player_index] = -1;
             }
         }
 
@@ -1576,7 +1578,7 @@ namespace OFFICER {
         return 5;
     }
 
-    void __cdecl Assign_Officer_(int16_t leader_idx, int16_t ship_idx) {
+    void __cdecl Assign_Captain_(int16_t leader_idx, int16_t ship_idx) {
         char format_buf[200];
         char display_buf[200];
         int8_t eta;
@@ -1666,14 +1668,14 @@ namespace OFFICER {
         } else if (type == 3) {
             GENDRAW::Warning_Box_(message);
         } else if (type == 5) {
-            int8_t duration = static_cast<int8_t>(MOX::_global_var & 0xFF);
+            int8_t duration = MOX::_global_var_byte;
             if (duration < 0) {
                 duration = 0x7E;
             }
 
-            *reinterpret_cast<int8_t*>(&MOX::_global_var) = duration;
+            MOX::_global_var_byte = duration;
             TEXTBOX::Timed_Text_Box_(nullptr, message, static_cast<int16_t>(duration));
-            *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
+            MOX::_global_var_byte = 0;
         } else {
             GENDRAW::Message_Box_(const_cast<char*>(message));
         }
@@ -1734,7 +1736,7 @@ namespace OFFICER {
         sprintf(leader_name_buf, MOX::s_fmt_s, leader_raw_name);
 
         if (MOX::_settings.language != 4 && MOX::_leaders[leader_idx].title[0] != '\0') {
-            strcat(leader_name_buf, ", ");
+            strcat(leader_name_buf, s_comma_005569c8);
         }
 
         int16_t skill_value;
@@ -1789,7 +1791,7 @@ namespace OFFICER {
             }
         } else {
             if (location > -1) {
-                MOX::_star[location].officer_index[(uint8_t)player_idx] = -1;
+                MOX::_star[location].officer_index[player_idx] = -1;
             }
         }
 
@@ -1812,7 +1814,7 @@ namespace OFFICER {
             if (OFFICER::_officer_star_displayed == -1) {
                 if (static_cast<uint8_t>(MOX::_previous_screen) == 1) {
                     MOX::_officer_selected = -1;
-                    OFFICER::_officer_star_displayed = DESIGN::_player_design_num;
+                    OFFICER::_officer_star_displayed = MOX::_temp_star_handle;
                 } else {
                     OFFICER::_officer_star_displayed = MAINSCR::Get_Star_Id_For_Officers_Screen_();
                     MOX::_officer_selected = -1;
@@ -1838,7 +1840,10 @@ namespace OFFICER {
             }
         }
 
-        FLT2::Build_Fltscrn_Big_Icon_Fields_(MOX::_small_ship_stack_ptr);
+        FLT2::Build_Fltscrn_Big_Icon_Fields_(
+            MOX::_small_ship_stack_ptr,
+            MOX::_scroll_bar->first_visible_row
+        );
         OFFICER::Reload_Officer_Screen_Pictures_();
 
         MOX::_draw_officer_to_back = 1;
@@ -2000,7 +2005,7 @@ namespace OFFICER {
         for (int16_t i = 0; i < MAX_LEADERS; ++i) {
             if (i != officer_idx) {
                 auto& leader = MOX::_leaders[i];
-                if (leader.player_index == (char)player_idx) {
+                if (leader.player_index == (int8_t)player_idx) {
                     if (leader.status != -2 && leader.status != -1) {
                         if (MOX::_leaders[officer_idx].type == leader.type) {
                             if (leader.status == 4 && (int16_t)leader.eta > max_eta) {
@@ -2023,7 +2028,7 @@ namespace OFFICER {
 
         auto& target = MOX::_leaders[officer_idx];
         target.eta = 0;
-        target.player_index = (char)player_idx;
+        target.player_index = (int8_t)player_idx;
         target.status = (is_instant == 0) ? 4 : 0;
 
         if (is_instant != 0) {
@@ -2041,7 +2046,7 @@ namespace OFFICER {
         s_ship_data* ship = &MOX::_ship[ship_idx];
         int16_t ship_x = ship->x;
         int16_t ship_y = ship->y;
-        int16_t owner = (int16_t)(uint8_t)ship->owner;
+        int16_t owner = (int16_t)ship->owner;
 
         fonts::Set_Outline_Color_(0, 0);
 
@@ -2218,28 +2223,28 @@ namespace OFFICER {
         MOX::_officer_colony_box_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 2, MOX::_screen_seg));
         MOX::_officer_colony_ldrs_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 3, MOX::_screen_seg));
         MOX::_officer_ship_ldrs_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 4, MOX::_screen_seg));
-        MOX::_officer_up_button_seg = farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg);
+        MOX::_officer_up_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 5, MOX::_screen_seg));
         
         RUSS::Mox_Update_();
 
-        MOX::_officer_dn_button_seg = farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg);
-        MOX::_officer_prev_button_seg = farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg);
-        MOX::_officer_next_button_seg = farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg);
-        MOX::_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg);
-        MOX::_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg);
-        MOX::_officer_dismiss_button_seg = farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg);
-        MOX::_officer_return_button_seg = farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg);
-        MOX::_officer_cancel_hire_button_seg = farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg);
+        MOX::_officer_dn_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 6, MOX::_screen_seg));
+        MOX::_officer_prev_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 7, MOX::_screen_seg));
+        MOX::_officer_next_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 8, MOX::_screen_seg));
+        MOX::_officer_hire_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 9, MOX::_screen_seg));
+        MOX::_officer_pool_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 10, MOX::_screen_seg));
+        MOX::_officer_dismiss_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 11, MOX::_screen_seg));
+        MOX::_officer_return_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 12, MOX::_screen_seg));
+        MOX::_officer_cancel_hire_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 13, MOX::_screen_seg));
 
         RUSS::Mox_Update_();
 
         MOX::_selected_box_seg = farload::Far_Reload_Next_(lbx, 14, MOX::_screen_seg);
         MOX::_scanned_box_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 15, MOX::_screen_seg);
         MOX::_fleet_scroll_anim_seg = (s_animation_header*)farload::Far_Reload_Next_(lbx, 16, MOX::_screen_seg);
-        MOX::_officer_hire_replace_seg = farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg);
-        MOX::_dull_officer_hire_button_seg = farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg);
-        MOX::_dull_officer_pool_button_seg = farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg);
-        MOX::_dull_officer_dismiss_button_seg = farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg);
+        MOX::_officer_hire_replace_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 17, MOX::_screen_seg));
+        MOX::_dull_officer_hire_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 18, MOX::_screen_seg));
+        MOX::_dull_officer_pool_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 19, MOX::_screen_seg));
+        MOX::_dull_officer_dismiss_button_seg = reinterpret_cast<s_animation_header*>(farload::Far_Reload_Next_(lbx, 20, MOX::_screen_seg));
 
         RUSS::Mox_Update_();
 
@@ -2635,7 +2640,7 @@ namespace OFFICER {
                     MOX::_ship[location].officer_index = -1;
                 }
             } else if (MOX::_leaders[leader_idx].type == 1) {
-                MOX::_star[location].officer_index[(uint8_t)player_idx] = -1;
+                MOX::_star[location].officer_index[player_idx] = -1;
             }
         }
 
@@ -2697,7 +2702,7 @@ namespace OFFICER {
                         MOX::_PLAYER_NUM,
                         officer_id,
                         MOX::_officer_pictures_screen_seg,
-                        static_cast<uint8_t>(picture_slot_index == 0));
+                        0);
 
                     OFFICER::_ldrpict[picture_slot_index + 4].pic = picture;
                     OFFICER::_ldrpict[picture_slot_index + 4].officer_id = MOX::_officer_id_list[picture_slot_index];
@@ -2778,8 +2783,8 @@ namespace OFFICER {
             _officer_dismiss_btn = fields::Add_Hidden_Field_(
                 0x1cf, 
                 0x1b9, 
-                animate::Get_Width_((s_animation_header*)MOX::_officer_dismiss_button_seg) + 0x1cf, 
-                animate::Get_Height_((s_animation_header*)MOX::_officer_dismiss_button_seg) + 0x1b9, 
+                animate::Get_Width_(MOX::_officer_dismiss_button_seg) + 0x1cf, 
+                animate::Get_Height_(MOX::_officer_dismiss_button_seg) + 0x1b9, 
                 s_D_005569dc, 
                 0x29
             );
@@ -2791,8 +2796,8 @@ namespace OFFICER {
             _officer_pool_btn = fields::Add_Hidden_Field_(
                 0x184, 
                 0x1b9, 
-                animate::Get_Width_((s_animation_header*)MOX::_officer_pool_button_seg) + 0x184, 
-                animate::Get_Height_((s_animation_header*)MOX::_officer_pool_button_seg) + 0x1b9, 
+                animate::Get_Width_(MOX::_officer_pool_button_seg) + 0x184, 
+                animate::Get_Height_(MOX::_officer_pool_button_seg) + 0x1b9, 
                 s_P_005569d8, 
                 0x29
             );
@@ -2805,7 +2810,7 @@ namespace OFFICER {
                 0x139, 
                 0x1b9, 
                 MOX::s__00551100, 
-                (s_animation_header*)MOX::_officer_hire_button_seg, 
+                MOX::_officer_hire_button_seg, 
                 s_H_005569d4, 
                 0x28
             );
@@ -2818,7 +2823,7 @@ namespace OFFICER {
                 0x1cc, 
                 0x1b7, 
                 MOX::s__00551100, 
-                (s_animation_header*)MOX::_officer_cancel_hire_button_seg, 
+                MOX::_officer_cancel_hire_button_seg, 
                 s_X_005569d0, 
                 0x28
             );
@@ -2848,7 +2853,7 @@ namespace OFFICER {
             0x21a, 
             0x1b9, 
             MOX::s__00551100, 
-            (s_animation_header*)MOX::_officer_return_button_seg, 
+            MOX::_officer_return_button_seg, 
             s__00551120, 
             0x28
         );
@@ -2890,7 +2895,7 @@ namespace OFFICER {
                 0x265, 
                 0x16, 
                 MOX::s__00551100, 
-                (s_animation_header*)MOX::_officer_up_button_seg, 
+                MOX::_officer_up_button_seg, 
                 s_minus_0055111c, 
                 0x28
             );
@@ -2898,7 +2903,7 @@ namespace OFFICER {
                 0x265, 
                 0xaa, 
                 MOX::s__00551100, 
-                (s_animation_header*)MOX::_officer_dn_button_seg, 
+                MOX::_officer_dn_button_seg, 
                 s_plus_00551118, 
                 0x28
             );
@@ -2915,7 +2920,7 @@ namespace OFFICER {
             0x238, 
             0xcd, 
             MOX::s__00551100, 
-            (s_animation_header*)MOX::_officer_next_button_seg, 
+            MOX::_officer_next_button_seg, 
             s_dot_0055632c, 
             0x28
         );
@@ -2924,7 +2929,7 @@ namespace OFFICER {
             0x147, 
             0xcd, 
             MOX::s__00551100, 
-            (s_animation_header*)MOX::_officer_prev_button_seg, 
+            MOX::_officer_prev_button_seg, 
             s_comma_005569c8, 
             0x28
         );
@@ -3151,9 +3156,9 @@ namespace OFFICER {
         if (msg_buf2[0] != '\0') {
             Officer_Screen_User_Box_(msg_buf2, 3);
         } else if (msg_buf3[0] != '\0') {
-            reinterpret_cast<uint8_t&>(MOX::_global_var) = 0;
+            MOX::_global_var_byte = 0;
             if (MOX::_settings.game_difficulty != 0) {
-                reinterpret_cast<uint8_t&>(MOX::_global_var) = 0xf;
+                MOX::_global_var_byte = 0xf;
             }
             Officer_Screen_User_Box_(msg_buf3, 5);
         }
@@ -3211,11 +3216,7 @@ int16_t __cdecl Get_Advanced_Government_Type_(int16_t player_idx) {
     }
 }
 
-void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int16_t* hero_id) {
-    // TYPE MISMATCH: techs is used as int16_t*, hero_id as num_techs
-    int16_t* techs_ptr = reinterpret_cast<int16_t*>(techs);
-    int16_t* num_techs = hero_id;
-
+void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, int16_t* techs, int16_t* num_techs) {
     bool dont_assign = false;
     int16_t ship_idx = Assign_Loknar_Ship_To_Player_(player_idx);
 
@@ -3237,7 +3238,7 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int
     } else {
         if (ship_idx != -1) {
             MOX::_leaders[0x41].location = ship_idx;
-            MOX::_leaders[0x41].player_index = static_cast<char>(player_idx);
+            MOX::_leaders[0x41].player_index = static_cast<int8_t>(player_idx);
             MOX::_leaders[0x41].status = 1;
             Give_Leader_Specials_To_Player_(0x41, player_idx);
         }
@@ -3247,11 +3248,11 @@ void __cdecl Give_Player_Loknar_Special_(int16_t player_idx, uint8_t* techs, int
 
     if (COLCALC::Player_May_Get_Tech_App_(&MOX::_player[player_idx], 0x2F)) {
         COLCALC::Player_Gets_Tech_App_(&MOX::_player[player_idx], 0x2F);
-        techs_ptr[*num_techs] = 0x2F;
+        techs[*num_techs] = 0x2F;
         *num_techs += 1;
     }
 
-    Get_Random_Antaran_Tech_(player_idx, 3, techs_ptr, num_techs);
+    Get_Random_Antaran_Tech_(player_idx, 3, techs, num_techs);
     MAINSCR::Update_Ship_Icons_In_Between_Turns_();
 }
 
@@ -3371,7 +3372,7 @@ bool __cdecl Marooned_Hero_At_Star_Can_Join_(int16_t star_idx, int16_t* hero_idx
     }
 
     if (*hero_idx != -1) {
-        MOX::_leaders[*hero_idx].player_index = static_cast<char>(player_idx);
+        MOX::_leaders[*hero_idx].player_index = static_cast<int8_t>(player_idx);
         MOX::_leaders[*hero_idx].location = -1;
         Set_Officer_To_Player_(*hero_idx, player_idx, 1);
         Move_Officer_To_Pool_(*hero_idx);
@@ -3431,7 +3432,7 @@ void __cdecl Get_Italian_The_(int16_t leader_idx, char* output) {
     output[0] = '\0';
 
     if (MISC::Is_Vowel_(MOX::_leaders[leader_idx].title[0])) {
-        strcpy(output, s___lo_00556a4c);
+        strcpy(output, HAROLD::H_Message_(HESTR_186_S));
         return;
     }
 

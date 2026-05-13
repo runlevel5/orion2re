@@ -761,7 +761,7 @@ namespace hooks {
         { 0x00443580, &OFFICER::Ask_For_Hire_ },
         { 0x00441f90, &OFFICER::Scan_Offscrn_Big_Icon_Fields_ },
         { 0x00444730, &OFFICER::Assign_Leader_To_Star_ },
-        { 0x00444080, &OFFICER::Assign_Officer_ },
+        { 0x00444080, &OFFICER::Assign_Captain_ },
         { 0x0049ed60, &MISC::Replace_Char_ },
         { 0x004412c0, &OFFICER::Print_Officer_Skill_Help_ },
         { 0x00441460, &OFFICER::Text_Box_With_Refresh_ },

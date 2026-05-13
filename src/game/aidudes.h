@@ -4,8 +4,8 @@ struct s_colony;
 struct s_aidudes_colony_info;
 
 namespace aidudes {
-    inline uint16_t& _n_our_blockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C0});
-    inline uint16_t& _n_our_unblockaded = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657C4});
+    inline int16_t& _n_our_blockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C0});
+    inline int16_t& _n_our_unblockaded = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657C4});
     inline s_aidudes_colony_info*& _our_blockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657C8});
 
     inline s_player*& _p_ai =
@@ -43,7 +43,7 @@ namespace aidudes {
 
     int __cdecl Sort_Pops_F_IR_(const void* a, const void* b);
 
-    int16_t __cdecl FI_Worthiness_(const s_colony* colony, const s_colony* pop);
+    int16_t __cdecl FI_Worthiness_(const s_colony* colony, const uint32_t* pop);
 
     int __cdecl F_IR_Worthiness_(s_aidudes_colony_info* info, uint32_t* flags);
 

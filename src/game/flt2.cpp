@@ -200,7 +200,9 @@ void __cdecl Fix_Palette_(int16_t player_idx) {
     palette::Refresh_Palette_();
 }
 
-void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx) {
+void __cdecl Build_Fltscrn_Big_Icon_Fields_(int16_t stack_idx, int16_t first_visible_row) {
+    (void)first_visible_row;
+
     int16_t ship_idx_list[250];
     int16_t selected_count = 0;
     int16_t target_icon_idx = -1;

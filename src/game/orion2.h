@@ -218,17 +218,17 @@ struct s_aidesign_ship_design {
 typedef struct s_aidudes_colony_info s_aidudes_colony_info, *Ps_aidudes_colony_info;
 
 struct s_aidudes_colony_info {
-    int8_t colony_idx;
-    int8_t n_farmers;
-    int8_t n_workers;
-    int8_t first_assignable_pop_idx;
-    int8_t cur_pop_idx;
-    int8_t pop_end_idx;
-    int8_t pop_tail_idx;
+    uint8_t colony_idx;
+    uint8_t n_farmers;
+    uint8_t n_workers;
+    uint8_t first_assignable_pop_idx;
+    uint8_t cur_pop_idx;
+    uint8_t pop_end_idx;
+    uint8_t pop_tail_idx;
     int8_t pollution_at_start;
     short best_worker_to_farmer_score;
     short worst_worker_to_farmer_score;
-    int8_t eats_minerals;
+    uint8_t eats_minerals;
 };
 
 typedef struct s_aimove_alien_strength s_aimove_alien_strength, *Ps_aimove_alien_strength;
@@ -2349,7 +2349,7 @@ struct s_leader_data {
     sbyte eta;
     char display_level_popup;
     sbyte status;
-    char player_index;
+    int8_t player_index;
 };
 
 typedef struct s_list_item s_list_item, *Ps_list_item;
@@ -4376,7 +4376,7 @@ typedef struct s_ship_data s_ship_data, *Ps_ship_data;
 
 struct s_ship_data {
     struct s_ship_design d;
-    char owner;
+    int8_t owner;
     sbyte status;
     short location;
     short x;
@@ -4478,8 +4478,8 @@ struct s_skill_data {
     uint8_t skill_id;
     uint skill_mask;
     uint8_t skill_type;
-    uint16_t strength;
-    uint8_t level_up;
+    int16_t strength;
+    int8_t level_up;
     uint8_t cost;
     char *name;
     char *format_str;
@@ -4800,7 +4800,7 @@ struct s_star_data {
     byte has_artemis_net;
     byte has_dimensional_portal;
     byte is_stagepoint;
-    char officer_index[8];
+    int8_t officer_index[8];
     short planet_index[5];
     short relocate_ship_to[8];
     int8_t twinkling1;
