@@ -1496,7 +1496,7 @@ namespace EVENTS {
         if ((_event_data[16].status == 2 || _event_data[16].status == 4 || _event_data[16].status == 6)) {
             int16_t colony_idx = _event_data[16].target_id;
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            if (MOX::_planet[planet_idx].star_index == (int8_t)star_idx) {
+            if ((int16_t)MOX::_planet[planet_idx].star_index == star_idx) {
                 return 16 /* 0x10 */;
             }
         }
@@ -1505,7 +1505,7 @@ namespace EVENTS {
         if ((_event_data[17].status == 2 || _event_data[17].status == 4 || _event_data[17].status == 6)) {
             int16_t colony_idx = _event_data[17].target_id;
             int16_t planet_idx = MOX::_colony[colony_idx].planet;
-            if (MOX::_planet[planet_idx].star_index == (int8_t)star_idx) {
+            if ((int16_t)MOX::_planet[planet_idx].star_index == star_idx) {
                 return 17 /* 0x11 */;
             }
         }

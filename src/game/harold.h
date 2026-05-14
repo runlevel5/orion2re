@@ -175,7 +175,7 @@ namespace HAROLD {
 
     void __cdecl Star_XY_To_Ship_Id_(s_star_data* target_star, int16_t* out_indices, int16_t* count);
 
-    int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx);
+    int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star);
 
     void __cdecl Write_Language_Setting_File_();
 }

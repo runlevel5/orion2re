@@ -12,7 +12,7 @@ namespace aidudes {
         *reinterpret_cast<s_player**>(std::uintptr_t{0x005657CC});
 
     inline s_aidudes_colony_info*& _our_unblockaded = *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657D0});
-    inline uint16_t& _n_our_colonies = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005657D4});
+    inline int16_t& _n_our_colonies = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005657D4});
     inline s_aidudes_colony_info*& _Sort_Pops_colony_info =
         *reinterpret_cast<s_aidudes_colony_info**>(std::uintptr_t{0x005657BC});
 

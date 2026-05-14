@@ -982,7 +982,7 @@ void __cdecl Get_AI_Target_(int16_t star_idx, int16_t player_idx, int16_t* targe
         int16_t sneak_attack_target = -1;
 
         if (player->sneak_attack_planet != -1) {
-            if (MOX::_planet[player->sneak_attack_planet].star_index == (int8_t)star_idx) {
+            if ((int16_t)MOX::_planet[player->sneak_attack_planet].star_index == star_idx) {
                 sneak_attack_target = (int16_t)player->sneak_attack_player;
                 player->sneak_attack_planet = -1;
                 player->sneak_attack_player = -1;

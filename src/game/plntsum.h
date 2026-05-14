@@ -33,8 +33,8 @@ namespace PLNTSUM {
     inline s_plntsum_ship*& _ship_summary =
         *reinterpret_cast<s_plntsum_ship**>(std::uintptr_t{0x005658A0});
 
-    inline uint16_t& _n_ships_in_summary = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00565898});
-    inline uint32_t (&_can_reach_star)[18] = *reinterpret_cast<uint32_t(*)[18]>(std::uintptr_t{0x00565848});
+    inline int16_t& _n_ships_in_summary = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00565898});
+    inline int8_t (&_can_reach_star)[72] = *reinterpret_cast<int8_t(*)[72]>(std::uintptr_t{0x00565848});
 
     inline uint8_t (&_explored_bitmap)[45] =
         *reinterpret_cast<uint8_t(*)[45]>(std::uintptr_t{0x005657F8});
@@ -95,7 +95,7 @@ namespace PLNTSUM {
     void __cdecl Set_Planet_Explored_Flags_();
 
     bool __cdecl Planet_Has_Adverse_Gravity_(int16_t planet_idx, int16_t player_idx);
-    bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx);
+    bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx, int16_t player_idx);
     bool __cdecl Planet_Has_Hostile_Environment_(short planet_idx);
 
     bool __cdecl Planet_Is_Mineral_Scarce_(short planet_idx);
@@ -167,7 +167,7 @@ namespace PLNTSUM {
 
     void __cdecl Get_Colony_Outpost_Marker_XY_(int16_t summary_idx, int16_t* out_x, int16_t* out_y);
 
-    void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, bool colony, bool outpost);
+    void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t colony, int8_t outpost);
 
     inline bool& _recalc_first_planet =
         *reinterpret_cast<bool*>(std::uintptr_t{0x005658C0});

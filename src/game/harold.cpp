@@ -925,11 +925,11 @@ namespace HAROLD {
     /**
      * @address 004f1d00
      */
-    int16_t __cdecl First_Ship_Orbiting_Star_(int16_t star_idx) {
+    int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star) {
         int16_t ship_ids[4];
         int16_t count = 2;
 
-        Star_XY_To_Ship_Id_(&MOX::_star[star_idx], ship_ids, &count);
+        Star_XY_To_Ship_Id_(star, ship_ids, &count);
 
         return (count > 0) ? ship_ids[0] : -1;
     }

@@ -7,10 +7,9 @@ namespace PLNTSUM {
 void __cdecl Summary_Screen_Print_Data_(void) {
     int16_t monster_race = -1;
     int first_visible = static_cast<int>(MOX::_scroll_bar->first_visible_row);
-    int total_visible = static_cast<int>(MOX::_scroll_bar->visible_rows);
-    int end_index = first_visible + total_visible;
+    int end_index = first_visible + static_cast<int>(MOX::_scroll_bar->total_rows);
 
-    if (first_visible + 8 < end_index) {
+    if (first_visible + 8 <= end_index) {
         end_index = first_visible + 8;
     }
 
@@ -52,13 +51,15 @@ void __cdecl Summary_Screen_Print_Data_(void) {
                 char* special_str = nullptr;
                 char special_buf[80];
 
-                if (MOX::_star[star_idx].system_special == 9 /* P_SPEC_ARTIFACTS */) {
-                    int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(star_idx);
+                if (MOX::_star[star_idx].system_special == 9) {
+                    int16_t ship_idx = HAROLD::First_Ship_Orbiting_Star_(&MOX::_star[star_idx]);
                     if (ship_idx != -1) {
                         special_str = MOX::_ship[ship_idx].d.name;
-                    } else if (special_id == 10 /* P_SPEC_ORION */) {
-                        strcpy(special_buf, HAROLD::H_Message_(140 /* HESTR_140_ARTIFACTS */));
+                    } else if (special_id == 10) {
+                        strcpy(special_buf, HAROLD::H_Message_(140));
                         special_str = special_buf;
+                    } else {
+                        special_str = MOX::_planet_special_string[special_id];
                     }
                 } else if (planet->planet_special == special_id) {
                     special_str = MOX::_planet_special_string[special_id];
@@ -78,7 +79,8 @@ void __cdecl Summary_Screen_Print_Data_(void) {
             char planet_name_buf[32];
             strcpy(planet_name_buf, HACCESS::Get_Planet_Name_No_Prime_(summary->explored));
             MISC::Set_Fitted_Font_Style_(planet_name_buf, &font_colors, 2, 2, 0, 0x56, 1);
-            fonts::Print_Centered_(0x3d, y_base + (25 - font_h) * 2, planet_name_buf);
+            int16_t fitted_name_h = fonts::Get_Font_Height_();
+            fonts::Print_Centered_(0x3d, y_base + (25 - fitted_name_h) * 2, planet_name_buf);
 
             char owner_label[100];
             bool has_owner_label = false;
@@ -115,16 +117,17 @@ void __cdecl Summary_Screen_Print_Data_(void) {
 
             char* gravity_str = MOX::_planet_gravity_string[gravity_class];
             fonts::Set_Font_Style_(2, &font_colors);
+            int16_t gravity_h = fonts::Get_Font_Height_();
             int16_t penalty = Productivity_Penalty_(MOX::_PLAYER_NUM, gravity_class);
             int16_t y_gravity;
 
             if (penalty == 0) {
-                y_gravity = y_climate + (fonts::Get_Font_Height_() / 2);
+                y_gravity = y_climate + (gravity_h / 2);
             } else {
                 fonts::Print_Centered_(0xd9, y_climate, gravity_str);
                 fonts::Set_Font_Style_(1, &font_colors);
                 sprintf(work_buf, HAROLD::H_Message_(0x142), (int)penalty);
-                y_gravity = y_climate + fonts::Get_Font_Height_() + 4;
+                y_gravity = y_climate + gravity_h + 4;
             }
             fonts::Print_Centered_(0xd9, y_gravity, (penalty == 0) ? gravity_str : work_buf);
 
@@ -362,7 +365,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         return MOX::_planet[planet_idx].food_per_farmer <= 0;
     }
 
-    bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx) {
+    bool __cdecl Planet_Is_Enemy_Controlled_(int16_t planet_idx, int16_t) {
         bool result = false;
         int8_t star_idx = MOX::_planet[planet_idx].star_index;
 
@@ -504,7 +507,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
             int16_t planet_idx = PLNTSUM::_planet_summary[i].explored;
 
-            if (MOX::_planet[planet_idx].star_index == (int8_t)star_index) {
+            if ((int16_t)MOX::_planet[planet_idx].star_index == star_index) {
                 result = i;
             }
         }
@@ -555,7 +558,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
     void __cdecl Reset_Ship_To_Star_Distances_() {
         int choice_mode;
 
-        if (PLNTSUM::_send_choice < 1) {
+        if (PLNTSUM::_send_choice == 0) {
             choice_mode = 1;
         } else {
             choice_mode = 4;
@@ -569,7 +572,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             }
         }
 
-        for (short i = 0; i < (short)PLNTSUM::_n_ships_in_summary; ++i) {
+        for (int16_t i = 0; i < PLNTSUM::_n_ships_in_summary; ++i) {
             if (choice_mode == 1) {
                 short ship_idx = PLNTSUM::_ship_summary[i].colony_ship_idx;
                 if (ship_idx > -1 && ship_idx < MOX::_NUM_SHIPS) {
@@ -748,26 +751,29 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         _draw_outpost_button_status = 0;
 
         if (MOX::_scroll_bar->total_rows > 0 && EVENTS::Event_Check_Hyperspace_Flux_() == 0) {
-            // Check both colony and outpost viability
-            if (Send_Colony_Button_Selectable_() && Send_Outpost_Button_Selectable_()) {
-                _draw_colony_button_status = 2;
-                _send_choice = 0;
+            if (Send_Outpost_Button_Selectable_()) {
+                if (Send_Colony_Button_Selectable_()) {
+                    _draw_colony_button_status = 2;
+                    _send_choice = 0;
 
-                // Redundant check in original binary
-                if (Send_Outpost_Button_Selectable_()) {
+                    if (!Send_Outpost_Button_Selectable_()) {
+                        return;
+                    }
+
                     _draw_outpost_button_status = 1;
+                    return;
                 }
-                return;
             }
 
-            // Handle mutually exclusive or single-option scenarios
-            if (Send_Outpost_Button_Selectable_()) {
-                if (!Send_Colony_Button_Selectable_()) {
+            if (Send_Colony_Button_Selectable_()) {
+                if (!Send_Outpost_Button_Selectable_()) {
                     _draw_colony_button_status = 2;
                     _send_choice = 0;
                     return;
                 }
-            } else if (Send_Outpost_Button_Selectable_()) {
+            }
+
+            if (!Send_Colony_Button_Selectable_() && Send_Outpost_Button_Selectable_()) {
                 _draw_outpost_button_status = 2;
                 _send_choice = 1;
             }
@@ -810,7 +816,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                     if (can_order && ship->status != 1) {
                         if (Ship_Is_Not_Colonizing_(ship)) {
                             _draw_outpost_button_status = 1;
-                            _found_colony_ship = 1; // BUG: Should it be _found_outpost_ship?
+                            _found_outpost_ship = 1;
                         }
                     }
                 }
@@ -839,7 +845,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
         // Clears the whole summary buffer (500 entries of 8 bytes = 4000 bytes)
         memset(_ship_summary, 0xFF, 4000);
         // Clears star reachability flags (18 entries of 4 bytes = 72 bytes)
-        memset(_can_reach_star, 0, 18 * sizeof(uint32_t));
+        memset(_can_reach_star, 0, sizeof(_can_reach_star));
 
         _found_colony_ship = 0;
         _found_outpost_ship = 0;
@@ -942,7 +948,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 if (passes_filter && PLNTSUM::_filter_out_adverse_gravity_planets != 0 && Planet_Has_Adverse_Gravity_(i, MOX::_PLAYER_NUM)) {
                     passes_filter = false;
                 }
-                if (passes_filter && PLNTSUM::_filter_out_enemy_controlled_planets != 0 && Planet_Is_Enemy_Controlled_(i)) {
+                if (passes_filter && PLNTSUM::_filter_out_enemy_controlled_planets != 0 && Planet_Is_Enemy_Controlled_(i, MOX::_PLAYER_NUM)) {
                     passes_filter = false;
                 }
                 if (passes_filter && PLNTSUM::_filter_out_hostile_environment_planets != 0 && Planet_Has_Hostile_Environment_(i)) {
@@ -957,7 +963,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             if (passes_filter) {
                 s_plntsum_planet* p_sum = &temp_buffer[*summary_count];
                 p_sum->max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[i], MOX::_PLAYER_NUM);
-                p_sum->food_per_farmer = (int16_t)MOX::_planet[i].food_per_farmer;
+                p_sum->food_per_farmer = (int16_t)(int8_t)MOX::_planet[i].food_per_farmer;
                 p_sum->minerals = (int16_t)COLCALC::_minerals_per_mine[(uint8_t)MOX::_planet[i].mineral_class];
                 p_sum->mineral_class = (int16_t)MOX::_planet[i].mineral_class;
                 p_sum->climate = (int16_t)MOX::_planet[i].climate;
@@ -1027,7 +1033,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
 
                 if (move_info.moving != 0) {
                     int16_t turns = (uint8_t)move_info.turns_left;
-                    reinterpret_cast<int8_t*>(_can_reach_star)[star_idx] = 1;
+                    _can_reach_star[star_idx] = 1;
 
                     if (in_stasis_1000) {
                         turns += 1000;
@@ -1086,7 +1092,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 SHIPMOVE::Ships_Try_To_Move_To_(moving_ships, star_idx, &move_info);
 
                 if (move_info.moving != 0) {
-                    reinterpret_cast<int8_t*>(_can_reach_star)[star_idx] = 1;
+                    _can_reach_star[star_idx] = 1;
                     int16_t turns = (uint8_t)move_info.turns_left;
 
                     if (in_stasis_1000) {
@@ -1164,10 +1170,10 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
                 qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_climate_);
                 break;
             case 1:
-                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_max_population_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_minerals_);
                 break;
             case 2:
-                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_minerals_);
+                qsort(_planet_summary, (uint32_t)MOX::_scroll_bar->total_rows, 0x1c, qsort_by_max_population_);
                 break;
             default:
                 break;
@@ -1304,7 +1310,7 @@ void __cdecl Send_Nearest_Ship_(int16_t planet_idx) {
             graphics::Box_(star_x - 1, star_y - 1, 9, 9, 1, (uint8_t)color);
         }
 
-        for (short i = 0; i < (short)PLNTSUM::_n_ships_in_summary; ++i) {
+        for (int16_t i = 0; i < PLNTSUM::_n_ships_in_summary; ++i) {
             bool found_colony = Summary_Found_Colony_Ship_(i);
             bool found_outpost = Summary_Found_Outpost_Ship_(i);
 
@@ -1400,15 +1406,15 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
         return;
     }
 
-    bool ship_status_not_one = (MOX::_ship[ship_idx].status != 1);
+    bool ship_status_is_one = (MOX::_ship[ship_idx].status == 1);
 
     Get_Colony_Outpost_Marker_XY_(PLNTSUM::_planet_summary[summary_idx].ship_summary_idx, &marker_x, &marker_y);
 
-    if (colony_active && ship_idx > -1 && reinterpret_cast<int8_t*>(PLNTSUM::_can_reach_star)[star_idx] != 0 && ship_status_not_one) {
+    if (colony_active && ship_idx > -1 && PLNTSUM::_can_reach_star[star_idx] != 0 && !ship_status_is_one) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
-        dist = special::Range_(marker_y, marker_x, star_y + 4, star_x + 3);
+        dist = special::Range_(marker_x, marker_y, star_x + 4, star_y + 3);
         if (dist > 10) {
-            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 7, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 7, marker_y + 2, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             
             int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
             int32_t abs_val = (next_idx >= 0) ? next_idx : -next_idx;
@@ -1417,11 +1423,11 @@ void __cdecl Draw_Nearest_Ship_Directional_Line_(int16_t star_idx) {
         }
     }
 
-    if (outpost_active && ship_idx > -1 && reinterpret_cast<int8_t*>(PLNTSUM::_can_reach_star)[star_idx] != 0 && ship_status_not_one) {
+    if (outpost_active && ship_idx > -1 && PLNTSUM::_can_reach_star[star_idx] != 0 && !ship_status_is_one) {
         MOVEBOX::Get_Galaxy_Map_Star_XY_(star_idx, 0x1BB, 0x11, 0xB4, 0x74, 0, 0, 0, &star_x, &star_y);
-        dist = special::Range_(marker_y, marker_x, star_y + 4, star_x + 3);
+        dist = special::Range_(marker_x, marker_y, star_x + 4, star_y + 3);
         if (dist > 10) {
-            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 2, marker_y + 8, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
+            SHIPS::Draw_Directional_Multi_Colored_Line_(marker_x + 8, marker_y + 2, star_x + 2, star_y + 2, &colors, MOX::_multi_colored_line_start);
             
             int32_t next_idx = (int32_t)MOX::_multi_colored_line_start + 1;
             int32_t abs_val = (next_idx >= 0) ? next_idx : -next_idx;
@@ -1476,103 +1482,119 @@ void __cdecl Undo_Send_Order_(int16_t planet_idx, int16_t order_type) {
             }
         }
 
-        if (star_id != -1) {
-            ships[0] = ship_idx;
-            SHIPMOVE::Ships_Try_To_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
+        if (star_id == -1) {
+            return;
+        }
 
-            int16_t eta_msg_id = (MOX::_g_ship_move_info.turns_left == 1) ? 0x14B /* HESTR_14B_ETA_D_TURN */ : 0x14C /* HESTR_14C_ETA_D_TURNS */;
-            const char* eta_raw = HAROLD::H_Message_(eta_msg_id);
-            sprintf(eta_str, eta_raw, (uint32_t)(uint8_t)MOX::_g_ship_move_info.turns_left);
+        ships[0] = ship_idx;
+        SHIPMOVE::Ships_Try_To_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
 
-            int16_t heading_msg_id = (order_type == 1) ? 0x14D /* HESTR_14D_COLONY_SHIP_HEADING_TO */ : 0x14E /* HESTR_14E_OUTPOST_SHIP_HEADING_T */;
-            const char* heading_raw = HAROLD::H_Message_(heading_msg_id);
-            strcpy(buffer1, heading_raw);
+        int16_t eta_msg_id = (MOX::_g_ship_move_info.turns_left == 1) ? 0x14B /* HESTR_14B_ETA_D_TURN */ : 0x14C /* HESTR_14C_ETA_D_TURNS */;
+        const char* eta_raw = HAROLD::H_Message_(eta_msg_id);
+        sprintf(eta_str, eta_raw, (uint32_t)(uint8_t)MOX::_g_ship_move_info.turns_left);
 
-            const char* eta_param = (MOX::_g_ship_move_info.turns_left == 0) ? s__00551100 : eta_str;
-            char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
+        int16_t heading_msg_id = (order_type == 1) ? 0x14D /* HESTR_14D_COLONY_SHIP_HEADING_TO */ : 0x14E /* HESTR_14E_OUTPOST_SHIP_HEADING_T */;
+        const char* heading_raw = HAROLD::H_Message_(heading_msg_id);
+        strcpy(buffer1, heading_raw);
 
-            sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
+        const char* eta_param = (MOX::_g_ship_move_info.turns_left == 0) ? s__00551100 : eta_str;
+        char* planet_name = HACCESS::Get_Planet_Name_No_Prime_(planet_idx);
 
-            if (GENDRAW::Confirmation_Box_(buffer2)) {
-                SHIPMOVE::Make_Ships_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
-                PLNTSUM::Update_Ship_Etas_();
-                SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
-            }
+        sprintf(buffer2, buffer1, planet_name, &MOX::_star[star_id], eta_param);
+
+        if (GENDRAW::Do_Confirmation_Box_(buffer2)) {
+            SHIPMOVE::Make_Ships_Move_To_(ships, star_id, &MOX::_g_ship_move_info);
+            PLNTSUM::Update_Ship_Etas_();
+            SHIPS::Clear_Auto_Colonization_Flag_(&MOX::_ship[ship_idx]);
         }
         PLNTSUM::_screen->refresh_fields = true;
     }
 }
 
-void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, bool colony, bool outpost) {
-    uint8_t color_buf[32];
-    memset(color_buf, 0, 16);
+void __cdecl Print_Colony_Outpost_Marker_(short x, short y, short index, int8_t colony, int8_t outpost) {
+    s_colors inactive_colors;
+    s_colors active_colors;
 
-    color_buf[0] = 0;
-    color_buf[5] = 0x3a;
-    color_buf[10] = 0x3a;
-    color_buf[15] = 0x43;
-    color_buf[16] = 0x42;
-    color_buf[17] = 0x41;
-    color_buf[22] = 0x3f;
-    color_buf[23] = 0x3f;
-    color_buf[24] = 0;
+    inactive_colors.colors[0] = 0;
+    inactive_colors.colors[1] = ':';
+    inactive_colors.colors[2] = ':';
+    inactive_colors.colors[3] = 'C';
+    inactive_colors.colors[4] = 'B';
+    inactive_colors.colors[5] = 'A';
+    inactive_colors.colors[6] = '?';
+    inactive_colors.colors[7] = '?';
+    active_colors.colors[0] = 0;
 
     for (int16_t i = 1; i < 8; ++i) {
         int16_t color_idx = PLNTSUM::_planet_summary->scan_highlight_pulse + i;
-        if (color_idx < 1) color_idx = 1;
-        if (color_idx > 7) color_idx = 7;
-        color_buf[24 + i] = color_buf[16 + color_idx];
+        if (color_idx < 1) {
+            color_idx = 1;
+        }
+        if (color_idx > 7) {
+            color_idx = 7;
+        }
+        active_colors.colors[i] = inactive_colors.colors[color_idx];
     }
 
-    uint8_t* colors_inactive = &color_buf[16];
-    uint8_t* colors_active = &color_buf[24];
-
-    if (outpost && colony) {
+    if (outpost != 0 && colony != 0) {
         int16_t cur_x = x + 3;
         int16_t cur_y = y - 1;
 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
-            if (PLNTSUM::_send_choice == 1 || PLNTSUM::_send_choice == 0) {
-                if (PLNTSUM::_send_choice == 1) {
-                    fonts::Set_Font_Style_(0, (s_colors*)colors_active);
-                    graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_oc_00556af8), cur_y + fonts::Get_Font_Height_(), 1);
-                    fonts::Print_(cur_x, cur_y, s_o_00556af4);
-                    fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
-                    fonts::Print_(cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
-                    return;
-                } else {
-                    fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
-                    graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_oc_00556af8), cur_y + fonts::Get_Font_Height_(), 1);
-                    fonts::Print_(cur_x, cur_y, s_o_00556af4);
-                    fonts::Set_Font_Style_(0, (s_colors*)colors_active);
-                    fonts::Print_(cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y, s_c_00556350);
-                    return;
-                }
+            if (PLNTSUM::_send_choice == 1) {
+                fonts::Set_Font_Style_(0, &active_colors);
+                int16_t bottom = fonts::Get_Font_Height_() + cur_y;
+                int16_t right = fonts::Get_String_Width_(s_oc_00556af8) + cur_x;
+                graphics::Fill_(cur_x, cur_y, right, bottom, 1);
+                fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                fonts::Set_Font_Style_(0, &inactive_colors);
+                int16_t text_x = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
+                fonts::Print_(text_x, cur_y, s_c_00556350);
+                return;
+            }
+
+            if (PLNTSUM::_send_choice == 0) {
+                fonts::Set_Font_Style_(0, &inactive_colors);
+                int16_t bottom = fonts::Get_Font_Height_() + cur_y;
+                int16_t right = fonts::Get_String_Width_(s_oc_00556af8) + cur_x;
+                graphics::Fill_(cur_x, cur_y, right, bottom, 1);
+                fonts::Print_(cur_x, cur_y, s_o_00556af4);
+                fonts::Set_Font_Style_(0, &active_colors);
+                int16_t text_x = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
+                fonts::Print_(text_x, cur_y, s_c_00556350);
+                return;
             }
         }
-        fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+
+        fonts::Set_Font_Style_(0, &inactive_colors);
         fonts::Print_(cur_x, cur_y, s_oc_00556af8);
-    } else if (outpost) {
+    } else if (outpost != 0) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
-            fonts::Set_Font_Style_(0, (s_colors*)colors_active);
-            graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_o_00556af4), cur_y + fonts::Get_Font_Height_(), 1);
+            fonts::Set_Font_Style_(0, &active_colors);
+            int16_t bottom = fonts::Get_Font_Height_() + cur_y;
+            int16_t right = fonts::Get_String_Width_(s_o_00556af4) + cur_x;
+            graphics::Fill_(cur_x, cur_y, right, bottom, 1);
         } else {
-            fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+            fonts::Set_Font_Style_(0, &inactive_colors);
         }
+
         fonts::Print_(cur_x, cur_y, s_o_00556af4);
-    } else if (colony) {
+    } else if (colony != 0) {
         int16_t cur_x = x + 6;
         int16_t cur_y = y - 1;
 
         if (MOX::_scanned_field > -1 && MOX::_scanned_field < 1000) {
-            fonts::Set_Font_Style_(0, (s_colors*)colors_active);
-            graphics::Fill_(cur_x, cur_y, cur_x + fonts::Get_String_Width_(s_c_00556350), cur_y + fonts::Get_Font_Height_(), 1);
+            fonts::Set_Font_Style_(0, &active_colors);
+            int16_t bottom = fonts::Get_Font_Height_() + cur_y;
+            int16_t right = fonts::Get_String_Width_(s_c_00556350) + cur_x;
+            graphics::Fill_(cur_x, cur_y, right, bottom, 1);
         } else {
-            fonts::Set_Font_Style_(0, (s_colors*)colors_inactive);
+            fonts::Set_Font_Style_(0, &inactive_colors);
         }
+
         fonts::Print_(cur_x, cur_y, s_c_00556350);
     }
 }
@@ -1765,12 +1787,12 @@ void __cdecl Summary_Screen_Print_Scanned_() {
             status = 2;
             if (visited) {
                 if (MOX::_g_ship_move_info.turns_left == 1) {
-                    sprintf(msg_buffer, HAROLD::H_Message_(105 /* HESTR_069_D_TURN_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
+                    sprintf(msg_buffer, HAROLD::H_Message_(105 /* HESTR_069_D_TURN_TO_S */), (int)(uint8_t)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
                 } else {
-                    sprintf(msg_buffer, HAROLD::H_Message_(106 /* HESTR_06A_D_TURNS_TO_S */), (int)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
+                    sprintf(msg_buffer, HAROLD::H_Message_(106 /* HESTR_06A_D_TURNS_TO_S */), (int)(uint8_t)MOX::_g_ship_move_info.turns_left, MOX::_star[scanned_field].name);
                 }
             } else {
-                sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)MOX::_g_ship_move_info.turns_left);
+                sprintf(msg_buffer, HAROLD::H_Message_(332 /* HESTR_14C_ETA_D_TURNS */), (int)(uint8_t)MOX::_g_ship_move_info.turns_left);
             }
         } else {
             status = 1;
@@ -1877,7 +1899,7 @@ void Planet_Summary_Screen_() {
         _draw_outpost_button_status = 1;
     }
 
-    //fields::Assign_Auto_Function_(Draw_Mini_Planet_Summary_Screen_, 1);
+    fields::Assign_Auto_Function_(Draw_Mini_Planet_Summary_Screen_, 1);
     fields::Clear_Fields_();
     MISC::Fade_To_Black_();
     fonts::Load_Palette_(6, 0, 254 /* 0xfe */);
@@ -2097,7 +2119,7 @@ int16_t __cdecl Get_ETA_To_Star_(int32_t star_idx) {
         return HAROLD::N_Turns_To_Star_(best_ship, (int16_t)star_idx);
     }
 
-    return -1;
+    return 0;
 }
 
 void __cdecl Draw_Outpost_ETA_(int16_t planet_sum_idx, int16_t scroll_idx) {

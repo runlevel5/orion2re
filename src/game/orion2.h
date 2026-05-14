@@ -225,7 +225,7 @@ struct s_aidudes_colony_info {
     uint8_t cur_pop_idx;
     uint8_t pop_end_idx;
     uint8_t pop_tail_idx;
-    int8_t pollution_at_start;
+    uint8_t pollution_at_start;
     short best_worker_to_farmer_score;
     short worst_worker_to_farmer_score;
     uint8_t eats_minerals;
@@ -1174,7 +1174,7 @@ typedef struct s_combat_weapon_slot s_combat_weapon_slot, *Ps_combat_weapon_slot
 
 struct s_combat_weapon_slot {
     int16_t weapon_id;
-    uint8_t count;
+    int8_t count;
     int8_t arc;
     uint16_t specials;
     int16_t ammo;
@@ -3592,7 +3592,7 @@ typedef struct s_planet_data s_planet_data, *Ps_planet_data;
 
 struct s_planet_data {
     short colony_index;
-    char star_index;
+    int8_t star_index;
     char orbit;
     int8_t planet_type;
     int8_t size;
@@ -3601,7 +3601,7 @@ struct s_planet_data {
     char climate;
     char climate_bg_type;
     char mineral_class;
-    uint8_t food_per_farmer;
+    int8_t food_per_farmer;
     char n_terraforms;
     char max_farms;
     char max_population;

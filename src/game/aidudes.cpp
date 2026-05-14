@@ -436,7 +436,7 @@ namespace aidudes {
             refit_player->n_entries--;
             int entries_to_move = refit_player->n_entries - (i - 1);
             if (entries_to_move > 0) {
-                memcpy(&refit_player->entry[i - 1], &refit_player->entry[i], entries_to_move * sizeof(s_ai_refit_entry));
+                memmove(&refit_player->entry[i - 1], &refit_player->entry[i], entries_to_move * sizeof(s_ai_refit_entry));
             }
         }
     }
@@ -569,7 +569,7 @@ namespace aidudes {
         }
 
         info->pop_end_idx = info->pop_tail_idx;
-        info->pollution_at_start = (int8_t)colony->pollution;
+        info->pollution_at_start = (uint8_t)colony->pollution;
 
         _Sort_Pops_colony_data = colony;
         qsort(&colony->pop[info->first_assignable_pop_idx],
@@ -1326,7 +1326,7 @@ namespace aidudes {
         int score1;
         if ((*param_1 & 0x180) == 0x80 /* Farmer */) {
             score1 = prod1 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_1, 1);
-            if ((int)_Sort_Pops_colony_info->pollution_at_start < (int)_Sort_Pops_colony_data->pollution) {
+            if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score1 += 1000;
             }
         } else {
@@ -1336,7 +1336,7 @@ namespace aidudes {
         int score2;
         if ((*param_2 & 0x180) == 0x80 /* Farmer */) {
             score2 = prod2 - (int)COLCALC::Colony_Pop_Prod_Produced_(_Sort_Pops_colony_data, param_2, 1);
-            if ((int)_Sort_Pops_colony_info->pollution_at_start < (int)_Sort_Pops_colony_data->pollution) {
+            if (_Sort_Pops_colony_info->pollution_at_start < _Sort_Pops_colony_data->pollution) {
                 score2 += 1000;
             }
         } else {
@@ -1469,7 +1469,7 @@ namespace aidudes {
                     {
                         num_candidates--;
                         if (best_candidate_idx < num_candidates) {
-                            memcpy(&candidates[best_candidate_idx], &candidates[best_candidate_idx + 1], (num_candidates - best_candidate_idx) * sizeof(s_aidudes_colony_info*));
+                            memmove(&candidates[best_candidate_idx], &candidates[best_candidate_idx + 1], (num_candidates - best_candidate_idx) * sizeof(s_aidudes_colony_info*));
                         }
                     }
                 }
@@ -1493,7 +1493,7 @@ namespace aidudes {
             worthiness = (int)base_production - (int)mode1_production;
 
             // If pollution has increased since the start of evaluation
-            if (colony->pollution > (int16_t)info->pollution_at_start) {
+            if (colony->pollution > info->pollution_at_start) {
                 return worthiness + 1000;
             }
         } else {
