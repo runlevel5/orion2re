@@ -12,7 +12,7 @@ namespace CMBTAI {
 
     int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* beam_strength);
 
-    int32_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6);
+    int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6);
 
     int16_t __cdecl Get_Long_Range_Beam_Strength_(int16_t player_idx);
 

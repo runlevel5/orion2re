@@ -477,14 +477,14 @@ namespace diplomac {
         DIP_SCRN::Add_Diplomacy_Turn_Summary_Messages_();
 
         // Store current treaties as last turn's state
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            for (int j = 0; j < (int)MOX::_NUM_PLAYERS; ++j) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 MOX::_player[i].last_turn_treaty[j] = MOX::_player[i].treaty[j];
             }
         }
 
         // Adjust food shortage duration
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].surplus_food < 0) {
                 MOX::_player[i].food_shortage_duration++;
             } else {
@@ -493,8 +493,8 @@ namespace diplomac {
         }
 
         // Decay diplomatic modifiers towards zero
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            for (int j = 0; j < (int)MOX::_NUM_PLAYERS; ++j) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 MOX::_player[i].treaty_modifier[j] += 10;
                 if (MOX::_player[i].treaty_modifier[j] > 0) {
                     MOX::_player[i].treaty_modifier[j] = 0;
@@ -518,15 +518,15 @@ namespace diplomac {
         }
 
         // Decay war buildup duration
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
             if (MOX::_player[i].war_buildup_duration != 0) {
                 MOX::_player[i].war_buildup_duration--;
             }
         }
 
         // Update diplomacy counters for living players regarding dead players they have contact with
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            for (int j = 0; j < (int)MOX::_NUM_PLAYERS; ++j) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 if (MOX::_player[i].objectives != 100 /* 'd' */ && MOX::_player[j].objectives == 100 /* 'd' */) {
                     if (MOX::_player[i].contact[j] != 0) {
                         if (MOX::_player[i].last_diplomacy_proposal_turn[j] < 250) {
@@ -541,11 +541,11 @@ namespace diplomac {
         }
 
         // Terminate specific peace treaties (Type 3) under special conditions
-        for (int i = 0; i < (int)MOX::_NUM_PLAYERS; ++i) {
-            for (int j = 0; j < (int)MOX::_NUM_PLAYERS; ++j) {
+        for (int16_t i = 0; i < (int16_t)MOX::_NUM_PLAYERS; ++i) {
+            for (int16_t j = 0; j < (int16_t)MOX::_NUM_PLAYERS; ++j) {
                 if (MOX::_player[i].treaty[j] == 3) {
-                    // BUG: specific debug check from original binary comparison that seems broken/invalid
-                    if (&MOX::_player[i] == reinterpret_cast<s_player*>(std::uintptr_t{0xFFFFF8D1})) {
+                    // Preserve original bogus pointer comparison as compiled.
+                    if ((MOX::_player + i) == (s_player*)0xFFFFF8D1) {
                         MOX::_player[i].treaty[j] = 0;
                         MOX::_player[j].treaty[i] = 0;
                         MSG_::Add_Peace_Ended_Msg_(i, j);
@@ -1837,9 +1837,9 @@ namespace diplomac {
         for (int p1 = 0; p1 < (int)MOX::_NUM_PLAYERS; ++p1) {
             for (int p2 = 0; p2 < (int)MOX::_NUM_PLAYERS; ++p2) {
                 if (MOX::_player[p1].objectives == 100 && MOX::_player[p2].objectives != 100 && MOX::_player[p1].treaty[p2] != 2) {
-                    int star_id, threat_val;
+                    int star_id = -1;
+                    int threat_val;
                     int planet_id = -1;
-                    // TODO: Fix me!
                     AIMOVE::Player_Threatens_Player_(p1, p2, &star_id, &threat_val, &planet_id);
 
                     if (planet_id != -1) {
@@ -1847,7 +1847,7 @@ namespace diplomac {
                         if (col_idx != -1) {
                             if (star_id != -1 && MOX::_colony[col_idx].n_pops > 4 && threat_val > 100) {
                                 int amount = -((MOX::_colony[col_idx].n_pops - 4) + (threat_val / 50));
-                                Change_Relations_(amount, p1, p2, 5, planet_id, 0);
+                                Change_Relations_(amount, p1, p2, 5, star_id, 0);
                             }
                         }
                     }
@@ -1902,7 +1902,7 @@ namespace diplomac {
                 if (p1 == p2) {
                     MOX::_player[p1].relations[p2] = 0;
                 } else {
-                    MOX::_player[p2].relations[p1] = MOX::_player[p1].relations[p2];
+                    MOX::_player[p1].relations[p2] = MOX::_player[p2].relations[p1];
                 }
             }
         }

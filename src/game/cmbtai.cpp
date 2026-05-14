@@ -1276,6 +1276,7 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_param, int16_t target_idx) {
             int rnd_idx = random::Random_((int)num_possible_moves) - 1;
             int16_t mx = move_x_coords[rnd_idx];
             int16_t my = move_y_coords[rnd_idx];
+            CMBTMOV1::Move_Cost_(cur_ship_idx, mx, my);
             int16_t movement_used = CMBTMOV1::Move_Ship_(cur_ship_idx, mx, my);
 
             if (movement_used > 0) {
@@ -1319,7 +1320,7 @@ int16_t __cdecl Boarding_Action_Type_(int16_t attacker_idx, int16_t target_idx) 
     if (MOX::_combat_data[target_idx].owner > 8 ||
         attacker_owner > 8 ||
         !COMBAT1::Combat_Ship_Is_Functional_(target_idx) ||
-        (MOX::_combat_data[target_idx].combat_status_flags & 0x04) ||
+        MOX::_combat_data[target_idx].special_status_flag == 4 ||
         CMBTFIR2::Already_Boarded_(attacker_idx) != 0 ||
         target_idx == 0 ||
         MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_data[target_idx].owner ||
@@ -1996,7 +1997,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
     int16_t range;
     int16_t m_idx = (int16_t)missile_idx;
 
-    if (m_idx > 0) {
+    if (param_3 > 0) {
         range = Range_To_Missile_(unit_idx, m_idx);
         if (range < 1) {
             range = 1;
@@ -2055,7 +2056,7 @@ int32_t __cdecl Target_Missile_Value_(int16_t unit_idx, int32_t missile_idx, int
         effective_missile_hits /= 4;
     }
 
-    int32_t final_value = (int32_t)(weapon_damage - shield_blocked) * effective_missile_hits;
+    int32_t final_value = (int16_t)(uint16_t)((weapon_damage - shield_blocked) * effective_missile_hits);
 
     if (TECHDATA::_weapons[missile->type].type != 4) {
         final_value /= 2;
@@ -2146,13 +2147,15 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
                     ordinal = ordinal_map[weapon_id - 14];
                 }
 
-                if (ordinal != -1 && ordinal != 9) {
-                    if (ordinal >= 4 && ordinal <= 6) {
+                if (ordinal >= 0 && ordinal <= 6) {
+                    if (ordinal >= 4) {
                         missile_counts[ordinal] += (count * 4);
                     } else {
                         missile_counts[ordinal] += count;
                     }
                     total_quantity += count;
+                } else if (ordinal == 7 || ordinal == 8) {
+                    missile_counts[ordinal] += count;
                 }
             }
         }
@@ -2164,12 +2167,14 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
         if (msl->type > 0 && TECHDATA::_weapons[msl->type].type == 4 && MOX::_combat_data[msl->source_unit_idx].owner == player_idx) {
             if (msl->type == 29 /* WEAP_FIGHTER */) {
                 missile_counts[4] += msl->quantity;
+                total_quantity += msl->quantity;
             } else if (msl->type == 30 /* WEAP_BOMBER */) {
                 missile_counts[5] += msl->quantity;
+                total_quantity += msl->quantity;
             } else if (msl->type == 31 /* WEAP_HEAVY_BOMBER */) {
                 missile_counts[6] += msl->quantity;
+                total_quantity += msl->quantity;
             }
-            total_quantity += msl->quantity;
         }
         RUSS::Mox_Update_();
     }
@@ -2184,8 +2189,16 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
         int16_t msl_type = Convert_Ordinal_To_Msl_Type_(current_ordinal);
 
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
+            if (current_ordinal > 6) {
+                break;
+            }
+
             if (MOX::_combat_data[i].unit_status == 0 && MOX::_combat_data[i].is_captured == 0 && MOX::_combat_data[i].owner != player_idx) {
                 for (int16_t j = 0; j < 8; ++j) {
+                    if (current_ordinal > 6) {
+                        break;
+                    }
+
                     int16_t weapon_id = MOX::_combat_data[i].weapons[j].weapon_id;
                     int16_t remaining_pd_count = 0;
 
@@ -2193,7 +2206,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
                         if (TECHDATA::_weapons[weapon_id].type == 0) {
                             remaining_pd_count = MOX::_combat_data[i].weapons[j].count;
                             while (current_ordinal <= 6 && remaining_pd_count > 0) {
-                                int32_t kills = Average_Missile_Kills_(i, j, missile_counts[current_ordinal], msl_type, &remaining_pd_count, -1);
+                                int16_t kills = Average_Missile_Kills_(i, j, missile_counts[current_ordinal], msl_type, &remaining_pd_count, -1);
                                 missile_counts[current_ordinal] -= (int16_t)kills;
 
                                 while (missile_counts[current_ordinal] == 0 && current_ordinal < 7) {
@@ -2221,12 +2234,13 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
     for (int16_t i = 0; i <= 9; ++i) {
         int16_t msl_id = Convert_Ordinal_To_Msl_Type_(i);
         int16_t dmg_per;
+        int16_t max_damage = (int16_t)TECHDATA::_weapons[msl_id].max_damage;
         if (shield_points == 100) {
-            dmg_per = (TECHDATA::_weapons[msl_id].max_damage + (TECHDATA::_weapons[msl_id].max_damage < 0 ? 3 : 0)) / 4;
+            dmg_per = (max_damage + (max_damage < 0 ? 3 : 0)) / 4;
         } else {
             dmg_per = 0;
-            if (TECHDATA::_weapons[msl_id].max_damage > shield_points) {
-                dmg_per = TECHDATA::_weapons[msl_id].max_damage - shield_points;
+            if (max_damage > shield_points) {
+                dmg_per = max_damage - shield_points;
             }
         }
         total_effective_strength += dmg_per * missile_counts[i];
@@ -2235,7 +2249,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
     return total_effective_strength;
 }
 
-int32_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6) {
+int16_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx, int16_t msl_count, int16_t msl_type, int16_t* remaining_pd_count, int16_t param6) {
     int16_t kills = 0;
     int16_t slot_weapon_id = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].weapon_id;
     uint16_t specials = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].specials;
@@ -2269,7 +2283,7 @@ int32_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx
             hit_chance = 95;
         }
 
-        int32_t base_dmg = (TECHDATA::_weapons[slot_weapon_id].min_damage + TECHDATA::_weapons[slot_weapon_id].max_damage) * 5;
+        int16_t base_dmg = (int16_t)((TECHDATA::_weapons[slot_weapon_id].min_damage + TECHDATA::_weapons[slot_weapon_id].max_damage) * 5);
 
         if (!((specials & 0x20) || (TECHDATA::_weapons[slot_weapon_id].natural_mods & 0x4) || COMBINIT::Does_Combat_Ship_Have_Special_(ship_idx, 0xF))) {
             int16_t penalty = MOX::_ranged_damage_penalty[range];
@@ -2277,7 +2291,7 @@ int32_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx
         }
 
         int16_t avg_dmg_per_missile = ((100 - hit_chance) * base_dmg) / 100;
-        int16_t total_hits = CMBTMIS::Get_Missile_Hits_(msl_type, 0, 0) * 10;
+        int16_t total_hits = (int16_t)(CMBTMIS::Get_Missile_Hits_(msl_type, 0, 0) * 10);
         int16_t divisor;
 
         if (total_hits < avg_dmg_per_missile) {
@@ -2291,7 +2305,7 @@ int32_t __cdecl Average_Missile_Kills_(int16_t ship_idx, int16_t weapon_slot_idx
         kills = current_health / divisor;
 
         if (msl_count < kills) {
-            *remaining_pd_count = current_health - (msl_count * divisor);
+            *remaining_pd_count = current_health - (int16_t)(msl_count * divisor);
             return msl_count;
         } else {
             *remaining_pd_count = 0;

@@ -3239,7 +3239,7 @@ struct s_player {
     int opportunity_actual_attacker_ratio[8];
     short temp_diplomacy_dummy1[8];
     char diplomacy_demand_rejection_message[8];
-    sbyte last_diplomacy_threat_turn[8];
+    uint8_t last_diplomacy_threat_turn[8];
     int8_t delayed_diplomacy_orders[8];
     int8_t traits[31];
     int8_t evolutionary_upgrade_traits[31];
