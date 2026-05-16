@@ -896,37 +896,6 @@ Discrepancies:
 
 ---------------------------------------
 
-0045EA10 MAINPUPS::Draw_Colony_Combat_Popup_
-
-fail
-
-- Background fill arguments do not match the assembly. The binary computes width/height deltas from `_anims[3]` and calls `graphics::Fill_(_g_x + 5, _g_y + 5, anim_w - 10, anim_h - 10, 0)`. Current code instead passes absolute bottom-right coordinates `_g_x + anim_w - 6, _g_y + anim_h - 6`. Since `graphics::Fill_` is used elsewhere as `(x1, y1, x2, y2, color)`, this is a behavioral mismatch and overfills the region.
-  Suggested diff:
-  ```cpp
-  int16_t anim_w = animate::Get_Width_(_anims[3]);
-  int16_t anim_h = animate::Get_Height_(_anims[3]);
-- graphics::Fill_(_g_x + 5, _g_y + 5, _g_x + anim_w - 6, _g_y + anim_h - 6, 0);
-+ graphics::Fill_(_g_x + 5, _g_y + 5, anim_w - 10, anim_h - 10, 0);
-  ```
-
-- Right-side attacker label formatting order is not validated against the call sequence strongly enough in source style. Assembly pushes troop name first, then count, then localized format string `ESTRINGS::E_Strings_(0xE)`, relying on that format’s argument order. Current code hardcodes `sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->attacker_unit_counts[1], att_troop_name);`. If string 14 differs by language/order from assumed `%d %s`, this may be fragile. Need confirmation of `ESTRINGS[14]` semantics or mirror the exact assembly intent more explicitly.
-  Suggested diff:
-  ```cpp
-  char* fmt = ESTRINGS::E_Strings_(14);
-- sprintf(text_buffer, fmt, _g_data_ptr->attacker_unit_counts[1], att_troop_name);
-+ sprintf(text_buffer, fmt, _g_data_ptr->attacker_unit_counts[1], att_troop_name); // verify ESTRINGS[14] is count-then-name in all languages
-  ```
-
-- The title path for invalid `_g_state` values is only incidentally suppressed. Assembly jumps around `_sprintf` entirely for states other than 0,1,2, leaving the buffer untouched and still calling `fonts::Print_Centered_`. Current code adds an explicit `_g_state >= 0 && _g_state <= 2` guard before printing. This is safer C++, but not an exact restoration of the original control flow and side effects. If exactness is required, this needs user confirmation whether this cleanup is acceptable.
-  Suggested diff:
-  ```cpp
-- if (_g_state >= 0 && _g_state <= 2) {
--     fonts::Print_Centered_(x_center, _g_y + 20, text_buffer);
-- }
-+ fonts::Print_Centered_(x_center, _g_y + 20, text_buffer); // if matching original flow exactly is required
-  ```
-
----------------------------------------
 0x0045FE20 LIST::Init_List_Data_
 
 fail

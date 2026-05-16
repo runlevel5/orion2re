@@ -2544,7 +2544,7 @@ namespace MAINPUPS {
             int16_t anim_w = animate::Get_Width_(_anims[3]);
             int16_t anim_h = animate::Get_Height_(_anims[3]);
 
-            graphics::Fill_(_g_x + 5, _g_y + 5, _g_x + anim_w - 6, _g_y + anim_h - 6, 0);
+            graphics::Fill_(_g_x + 5, _g_y + 5, anim_w - 10, anim_h - 10, 0);
             animate::Draw_(_g_x, _g_y, _anims[3]);
 
             int16_t x_center = (_g_x * 2 + anim_w) / 2;
@@ -2563,9 +2563,7 @@ namespace MAINPUPS {
                 sprintf(text_buffer, ESTRINGS::E_Strings_(337), planet_name);
             }
 
-            if (_g_state >= 0 && _g_state <= 2) {
-                fonts::Print_Centered_(x_center, _g_y + 20, text_buffer);
-            }
+            fonts::Print_Centered_(x_center, _g_y + 20, text_buffer);
 
             video::Copy_Off_To_Back_();
             COLONY::_full_draw = 0;
@@ -2597,7 +2595,7 @@ namespace MAINPUPS {
             
             uint32_t pop_val = MOX::_colony[_g_data_ptr->colony_idx].pop[0];
             int16_t anim_idx = (pop_val >> 7) & 3;
-            int8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
+            uint8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
             
             s_animation_header* pop_anim = COLONY::People_Anim_(anim_idx, 2, race);
             animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, pop_anim);
@@ -2610,7 +2608,7 @@ namespace MAINPUPS {
         int16_t y_offs = list_idx * 30;
         for (int16_t unit_idx = 1; unit_idx >= 0; unit_idx--) {
             if (_g_data_ptr->defender_unit_counts[unit_idx] > 0) {
-                int8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
+                uint8_t race = MOX::_player[_g_data_ptr->defender_player_id].race;
                 s_animation_header* unit_anim = COLONY::Player_Troop_Anim_(_g_data_ptr->defender_player_id, unit_idx, race);
                 
                 animate::Remap_Draw_(_g_x + 20, _g_y + y_offs + 50, unit_anim);
@@ -2630,14 +2628,15 @@ namespace MAINPUPS {
 
         int16_t right_list_idx = 0;
         if (_g_data_ptr->attacker_unit_counts[1] > 0) {
-            int8_t attacker_race = MOX::_player[_g_data_ptr->attacker_player_id].race;
+            uint8_t attacker_race = MOX::_player[_g_data_ptr->attacker_player_id].race;
             s_animation_header* att_anim = COLONY::Player_Troop_Anim_(_g_data_ptr->attacker_player_id, 1, attacker_race);
             
             int16_t anim_w = animate::Get_Width_(_anims[3]);
             animate::Remap_Draw_(_g_x + anim_w - 40, _g_y + 50, att_anim);
             
             char* att_troop_name = COLONY::Player_Troop_Name_(_g_data_ptr->attacker_player_id, 1, attacker_race);
-            sprintf(text_buffer, ESTRINGS::E_Strings_(14), _g_data_ptr->attacker_unit_counts[1], att_troop_name);
+            char* fmt = ESTRINGS::E_Strings_(14);
+            sprintf(text_buffer, fmt, _g_data_ptr->attacker_unit_counts[1], att_troop_name);
             
             anim_w = animate::Get_Width_(_anims[3]);
             fonts::Print_Right_(_g_x + anim_w - 45, _g_y + 50, text_buffer);

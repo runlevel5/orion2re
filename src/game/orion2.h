@@ -3106,7 +3106,7 @@ struct s_player {
     char name[20];
     char race_name[15];
     byte eliminated;
-    char race;
+    uint8_t race;
     uint8_t color;
     char personality;
     byte objectives;
