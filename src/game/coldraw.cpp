@@ -290,8 +290,9 @@ void __cdecl Draw_Colony_PC_Bar_(int16_t x, int16_t y, int16_t total, int16_t cu
 
 int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
     int16_t colony_idx, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5,
-    int16_t param_6, int16_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10, int16_t* param_11)
+    int16_t param_6, uint8_t param_7, int16_t* param_8, int16_t* param_9, int16_t* param_10, int16_t* param_11)
 {
+    const uint8_t colony_n_pops = MOX::_colony[colony_idx].n_pops;
     int16_t pop_order[10];
     pop_order[0] = 9;
     pop_order[1] = 0;
@@ -329,57 +330,64 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
         }
     }
 
+    bool found_match = false;
+
     for (int16_t state_idx = 0; state_idx < 7; state_idx++) {
         for (int16_t race_idx = 0; race_idx < 2; race_idx++) {
             for (int16_t job_idx = start_idx; job_idx < end_idx; job_idx++) {
                 for (int16_t order_idx = 0; order_idx < 10; order_idx++) {
                     int16_t current_order = pop_order[order_idx];
-                    for (int16_t pop_idx = 0; pop_idx < MOX::_colony[colony_idx].n_pops; pop_idx++) {
+                    for (int16_t pop_idx = 0; pop_idx < (int16_t)colony_n_pops; pop_idx++) {
                         uint32_t pop_val = MOX::_colony[colony_idx].pop[pop_idx];
-                        if ((pop_val & 0xf) == current_order &&
-                            COLONY::Pop_To_Pop_State_(colony_idx, pop_idx) == state_idx &&
-                            ((pop_val & 0x180) >> 7) == job_idx &&
-                            (pop_val & 0x200) != 0 &&
-                            ((pop_val & 0x400) >> 10) == race_idx) {
-                            
-                            switch (param_3) {
-                                case 0:
-                                    COLONY::Set_Colony_Font_To_(2);
-                                    if (pop_idx == COLONY::_scanned_pop && COLONY::_g_colony_n == colony_idx) {
-                                        if (ERIC::Global_Cycler_(30, 2) != 0) {
-                                            COLONY::Draw_Pop_Dark_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, colony_idx, pop_idx);
-                                            break;
+                        if ((pop_val & 0xf) == current_order) {
+                            if (COLONY::Pop_To_Pop_State_(colony_idx, pop_idx) == state_idx) {
+                                if (((pop_val & 0x180) >> 7) == job_idx) {
+                                    if ((pop_val & 0x200) != 0) {
+                                        if (((pop_val & 0x400) >> 10) == race_idx) {
+                                            switch (param_3) {
+                                                case 0:
+                                                    COLONY::Set_Colony_Font_To_(2);
+                                                    if (pop_idx == COLONY::_scanned_pop && COLONY::_g_colony_n == colony_idx) {
+                                                        if (ERIC::Global_Cycler_(30, 2) != 0) {
+                                                            COLONY::Draw_Pop_Dark_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, colony_idx, pop_idx);
+                                                            break;
+                                                        }
+                                                    }
+                                                    {
+                                                        s_animation_header *anim = COLONY::Colony_Pop_Anim_(colony_idx, pop_idx);
+                                                        animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, anim);
+                                                    }
+                                                    break;
+
+                                                case 1:
+                                                    param_8[pop_draw_index] = pop_idx;
+                                                    break;
+
+                                                case 2:
+                                                    break;
+
+                                                case 3:
+                                                    if (*param_10 <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
+                                                        found_match = true;
+                                                    }
+                                                    break;
+
+                                                case 4:
+                                                    if (mouse::Pointer_X_() <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
+                                                        found_match = true;
+                                                    }
+                                                    break;
+                                            }
+
+                                            if (found_match) {
+                                                goto post_loop_dispatch;
+                                            }
+
+                                            pop_draw_index++;
                                         }
                                     }
-                                    {
-                                        s_animation_header *anim = COLONY::Colony_Pop_Anim_(colony_idx, pop_idx);
-                                        animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, anim);
-                                    }
-                                    break;
-
-                                case 1:
-                                    param_8[pop_draw_index] = pop_idx;
-                                    break;
-
-                                case 2:
-                                    break;
-
-                                case 3:
-                                    if (*param_10 <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
-                                        if (COLONY::_debug_flag != 0) {
-                                            assert::hgetch_();
-                                        }
-                                        return param_8[pop_draw_index];
-                                    }
-                                    break;
-
-                                case 4:
-                                    if (mouse::Pointer_X_() <= (30 - COLONY::_step_squish) * (pop_draw_index + 1) + param_4 || *param_9 == pop_draw_index) {
-                                        return param_8[pop_draw_index];
-                                    }
-                                    break;
+                                }
                             }
-                            pop_draw_index++;
                         }
                     }
                 }
@@ -387,13 +395,15 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
         }
     }
 
+post_loop_dispatch:
     switch (param_3) {
         case 0:
             if (param_7 != 0 && param_2 == 0) {
-                if (MOX::_colony[colony_idx].max_farms != (char)0xff) {
-                    if (pop_draw_index < MOX::_colony[colony_idx].max_farms) {
+                const uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
+                if (max_farms != 0xff) {
+                    if (pop_draw_index < (int16_t)max_farms) {
                         COLONY::Create_Shadow_Farmer_(MOX::_PLAYER_NUM);
-                        while (pop_draw_index < MOX::_colony[colony_idx].max_farms) {
+                        while (pop_draw_index < (int16_t)max_farms) {
                             s_animation_header *anim = COLONY::Shadow_Farmer_Bitm_();
                             animate::Draw_((30 - COLONY::_step_squish) * pop_draw_index + param_4, param_5, anim);
                             pop_draw_index++;
@@ -401,31 +411,44 @@ int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(
                     }
                 }
             }
-            COLONY::Reset_Step_Squish_();
-            break;
+            goto reset_step_squish_and_return;
 
         case 1:
             *param_9 = pop_draw_index - 1;
             *param_11 = fields::Add_Scroll_Field_(param_4, param_5, param_4, param_6 + 8, param_4, param_6, param_6 - param_4 + 8, 30, param_10, ESTRINGS::E_Strings_(12 /* ESTR_SCROLL_BAR_EMPTY */), 0);
-            COLONY::Reset_Step_Squish_();
-            break;
+            goto reset_step_squish_and_return;
 
         case 2:
             {
                 int16_t squish_count = pop_draw_index;
-                if (param_7 != 0 && param_2 == 0 && MOX::_colony[colony_idx].max_farms != (char)0xff) {
-                    squish_count = MOX::_colony[colony_idx].max_farms;
+                const uint8_t max_farms = MOX::_colony[colony_idx].max_farms;
+                if (param_7 != 0 && param_2 == 0 && max_farms != 0xff) {
+                    squish_count = (int16_t)max_farms;
                 }
                 COLDRAW::Calculate_Squish_Step_(param_4, param_6, squish_count, 30);
             }
             break;
 
         case 3:
+            if (found_match) {
+                if (COLONY::_debug_flag != 0) {
+                    assert::hgetch_();
+                }
+                return param_8[pop_draw_index];
+            }
+            goto reset_step_squish_and_return;
+
         case 4:
-            COLONY::Reset_Step_Squish_();
-            break;
+            if (found_match) {
+                return param_8[pop_draw_index];
+            }
+            goto reset_step_squish_and_return;
     }
 
+    return -1;
+
+reset_step_squish_and_return:
+    COLONY::Reset_Step_Squish_();
     return -1;
 }
 
@@ -707,8 +730,8 @@ void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t
     Draw_Colony_Prod_Both_(colony_idx, prod_idx, x, y, width, height, 1);
 }
 
-void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width) {
-    Draw_Info_Morale_Both_(colony_idx, x, y, (int)width, 1);
+void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int width) {
+    Draw_Info_Morale_Both_(colony_idx, x, y, width, 1);
 }
 
 void __cdecl Clear_Veggie_Draw_Flags_() {

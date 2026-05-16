@@ -68,9 +68,9 @@ namespace diplomac {
 
     void __cdecl Determine_Bad_Message_(int16_t current_player, int16_t target_player);
 
-    void __cdecl Determine_Good_Message_(int16_t player_idx, int16_t other_player_idx, int incident);
+    void __cdecl Determine_Good_Message_(int16_t player_idx, int16_t other_player_idx);
 
-    void __cdecl Peace_Proposal_(int16_t player_idx, int16_t target_idx);
+    void __cdecl Peace_Proposal_(int16_t player_idx, int16_t target_idx, int16_t unused = 0);
 
     void __cdecl Required_Alliances_(int16_t player_idx, int16_t other_player_idx);
 
@@ -80,11 +80,11 @@ namespace diplomac {
 
     void __cdecl End_Of_Turn_Diplomacy_Adjustments_();
 
-    void __cdecl Reward_Check_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4);
+    void __cdecl Reward_Check_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5);
 
     void __cdecl NPC_Sneak_Attacks_();
 
-    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_severity, int16_t *out_msg_id);
+    int16_t __cdecl Sneak_Attack_Evaluations_(int16_t player_id, int16_t target_id, int16_t *out_eval_threshold, int16_t *out_msg_id, int16_t *out_unused);
 
     int16_t __cdecl Get_Player_Diplomacy_Personality_(int16_t player_idx, int16_t target_idx);
 

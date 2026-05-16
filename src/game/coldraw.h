@@ -44,7 +44,7 @@ namespace COLDRAW {
 
     void __cdecl Draw_Veggie_CR_(int16_t row_idx, int16_t col_idx, uint8_t draw_pass_count);
 
-    int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(int16_t colony_idx, int16_t param_2, int16_t mode, int16_t x, int16_t y, int16_t x2, int16_t show_shadows, int16_t* idx_out, int16_t* count_ptr, int16_t* x_limit_ptr, int16_t* field_id_ptr);
+    int16_t __cdecl Do_Colony_Info_Pop_Stuff_For_Pop_(int16_t colony_idx, int16_t param_2, int16_t mode, int16_t x, int16_t y, int16_t x2, uint8_t show_shadows, int16_t* idx_out, int16_t* count_ptr, int16_t* x_limit_ptr, int16_t* field_id_ptr);
 
     void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16_t x, int16_t y, int16_t width, int16_t spacing, int8_t frame);
 
@@ -58,5 +58,5 @@ namespace COLDRAW {
 
     void __cdecl Draw_Colony_Wee_Prod_(int16_t colony_idx, int16_t prod_idx, int16_t x, int16_t y, int16_t width, int16_t height);
 
-    void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int16_t width);
+    void __cdecl Draw_Info_Wee_Morale_(int16_t colony_idx, int16_t x, int16_t y, int width);
 }

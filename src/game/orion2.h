@@ -1060,7 +1060,7 @@ struct s_colony {
     byte outpost_flag;
     char morale;
     short pollution;
-    int8_t n_pops;
+    uint8_t n_pops;
     char specialty;
     uint32_t pop[42];
     short pop_roundoff[10];
@@ -1069,7 +1069,7 @@ struct s_colony {
     char food2_per_farmer;
     char industry_per_worker;
     char research_per_scientist;
-    char max_farms;
+    uint8_t max_farms;
     char max_population;
     char climate;
     short ground_strength;
@@ -3186,7 +3186,7 @@ struct s_player {
     char trade_treaty[8];
     char research_treaty[8];
     short tribute_treaty[8];
-    char diplomacy_incident[8];
+    uint8_t diplomacy_incident[8];
     char diplomacy_message[8];
     short diplomacy_severity[8];
     short diplomacy_value[8];
@@ -3603,7 +3603,7 @@ struct s_planet_data {
     char mineral_class;
     int8_t food_per_farmer;
     char n_terraforms;
-    char max_farms;
+    uint8_t max_farms;
     char max_population;
     int8_t planet_special;
     char environmental_alterations;
