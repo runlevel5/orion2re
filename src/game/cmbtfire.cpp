@@ -1408,13 +1408,13 @@ namespace CMBTFIRE {
                         return;
                     }
                 } else {
-                    if (target_type == 0 && static_cast<uint16_t>(static_cast<uint8_t>(MOX::_combat_data[ship_idx].special_cooldown)) != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
+                    if (target_type == 0 && static_cast<uint16_t>(MOX::_combat_data[ship_idx].special_cooldown) != target_idx && MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left > 0) {
                         CMBTSPEC::Tractor_Beam_(ship_idx, target_idx);
                         MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                     }
                 }
 
-                if (MOX::_combat_data[ship_idx].special_cooldown != -1) {
+                if (MOX::_combat_data[ship_idx].special_cooldown != 0xFF) {
                     MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left = 0;
                 }
                 break;

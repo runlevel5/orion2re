@@ -491,8 +491,8 @@ namespace CMBTDRW1 {
 
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 if (MOX::_combat_data[i].unit_status == 0 && i != MOX::_dont_draw_ship) {
-                    int8_t cooldown = MOX::_combat_data[i].special_cooldown;
-                    if (cooldown != -1 && (int16_t)(uint8_t)cooldown != MOX::_dont_draw_ship) {
+                    uint8_t cooldown = MOX::_combat_data[i].special_cooldown;
+                    if (cooldown != 0xFF && (int16_t)cooldown != MOX::_dont_draw_ship) {
                         CMBTSPEC::Draw_Continuing_Tractor_(i);
                     }
                 }

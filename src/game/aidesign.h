@@ -21,7 +21,7 @@ namespace aidesign {
     inline s_spcl (&_defense_specials_f_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556EC0});
     inline s_spcl (&_defense_specials_t_spcl)[20] = *reinterpret_cast<s_spcl(*)[20]>(std::uintptr_t{0x00556F10});
 
-    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
+    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int16_t count, int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
 
     int16_t __cdecl Add_Theme_Special_To_Design_(int16_t player_idx, struct s_ship_design* design, int16_t space, int16_t* weapon_index_ptr);
 
@@ -33,7 +33,7 @@ namespace aidesign {
 
     int16_t __cdecl Special_Devices_Available_(int16_t player_idx);
 
-    uint16_t __cdecl Get_Competition_Player_Tech_Values_(uint32_t player_idx, uint32_t tech_type);
+    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t player_idx, int16_t tech_type);
 
     bool __cdecl Human_Player_Best_Weapons_Are_Beams_();
 

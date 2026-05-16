@@ -124,13 +124,13 @@ namespace MSG_ {
                             sprintf(param_1, _msg_colony_built_building_fmt, pcVar6, TECHDATA::_buildings[sVar4].name);
                         }
 
-                        int16_t ship_idx = (param_2->u).colony.c.build.build_id;
-                        if (ship_idx != -1) {
+                        int16_t product_id = (param_2->u).colony.c.build.product_id;
+                        if (product_id != -1) {
                             char* pcVar6_fmt = _msg_colony_built_next_queue_fmt;
-                            if ((param_2->u).colony.c.build.is_refit != 0) {
+                            if ((param_2->u).colony.c.build.append_fmt != 0) {
                                 pcVar6_fmt = _msg_colony_built_auto_build_fmt;
                             }
-                            char* pcVar7 = AIBUILD::Product_Name_(ship_idx);
+                            char* pcVar7 = AIBUILD::Product_Name_(product_id);
                             sprintf(param_1 + strlen(param_1), pcVar6_fmt, pcVar7);
                             return;
                         }
@@ -305,9 +305,9 @@ namespace MSG_ {
                 }
                 int iVar9 = sprintf(param_1, _msg_hyperspace_beast_ate_your_ship_fmt, &MOX::_ship[sVar4],
                                          &MOX::_star[(param_2->u).hyperspace_beast.star_idx]);
-                uint8_t cVar1 = (param_2->u).hyperspace_beast.leader_status;
+                uint8_t cVar1 = (param_2->u).hyperspace_beast.officer_idx;
                 if (cVar1 != 0xFF) {
-                    sprintf(param_1 + iVar9, _leader_fate_strings[(param_2->u).hyperspace_beast.fate],
+                    sprintf(param_1 + iVar9, _leader_fate_strings[(uint8_t)(param_2->u).hyperspace_beast.leader_status],
                                  &MOX::_leaders[cVar1]);
                     return;
                 }
@@ -513,7 +513,7 @@ namespace MSG_ {
         }
     }
 
-    void __cdecl Add_Nonaggression_Msg_(uint8_t plr_a, uint8_t plr_b) {
+    void __cdecl Add_Nonaggression_Msg_(int16_t plr_a, int16_t plr_b) {
         Add_Diplomacy_Msg_(plr_a, plr_b, 3);
     }
 

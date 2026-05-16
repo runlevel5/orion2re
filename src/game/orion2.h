@@ -1221,7 +1221,7 @@ struct s_combat_data {
     int8_t target_type_flag;
     int8_t special_status_flag;
     int8_t special_status_timer;
-    int8_t special_cooldown;
+    uint8_t special_cooldown;
     int16_t plasma_web_damage;
     short reflected_damage_pool;
     int8_t field40_0x47;
@@ -3142,7 +3142,7 @@ struct s_player {
     short player_defeated[8];
     short captured_population;
     int8_t last_attacker;
-    int8_t ship_design_theme;
+    uint8_t ship_design_theme;
     char ship_special_theme;
     char tech_apps_learned[4];
     char tech_modifiers[17];

@@ -98,7 +98,7 @@ namespace MSG_ {
 
     int8_t __cdecl Goto_Msg_Colony_(s_MSG* msg);
 
-    void __cdecl Add_Nonaggression_Msg_(uint8_t plr_a, uint8_t plr_b);
+    void __cdecl Add_Nonaggression_Msg_(int16_t plr_a, int16_t plr_b);
 
     void __cdecl Add_Alliance_Msg_(uint32_t player_a_idx, uint32_t player_b_idx);
 

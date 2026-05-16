@@ -198,7 +198,6 @@ namespace aidesign {
 
                 if ((TECHDATA::_weapons[weapon_id[0]].available_mods & 2) == 0) {
                     *type2 = 0;
-                    *spec2 = 0;
                 } else {
                     *type2 = weapon_id[0];
                     *spec2 = spec2_mods[0] & 0x7ffb;
@@ -229,7 +228,7 @@ namespace aidesign {
                         for (int16_t i = 0; i < weapon_count; i++) {
                             int16_t w_id = weapon_id[i];
                             if (w_id != 0) {
-                                int16_t space = static_cast<int16_t>(DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 0));
+                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 0);
                                 uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage;
 
@@ -276,7 +275,7 @@ namespace aidesign {
                         for (int16_t i = 0; i < weapon_count; i++) {
                             int16_t w_id = weapon_id[i];
                             if (w_id != 0) {
-                                int16_t space = static_cast<int16_t>(DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 2));
+                                int32_t space = DESIGN::Weapon_Space_(player_idx, w_id, 1, 1, 1, 2);
                                 uint16_t natural_mods = TECHDATA::_weapons[w_id].natural_mods;
                                 int32_t damage = TECHDATA::_weapons[w_id].max_damage * 3;
 
@@ -319,7 +318,7 @@ namespace aidesign {
         *arc0 = 1;
 
         int16_t comp_tech = Get_Competition_Player_Tech_Values_(player_idx, 0x12);
-        int16_t r_base = (0x14 - comp_tech) * hull_size;
+        int16_t r_base = (int16_t)((0x14 - comp_tech) * hull_size);
 
         int16_t cnt_4 = 0;
         for (uint16_t m = 8; m < 0x200; m *= 2) {
@@ -359,12 +358,12 @@ namespace aidesign {
         }
     }
 
-    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
+    int16_t __cdecl Add_Specials_To_Design_(struct s_spcl* list, int16_t count, int16_t player_idx, struct s_ship_design* design, int16_t space_available, int16_t* weapon_slot_idx_ptr) {
         int16_t total_space_used = 0;
         int16_t already_has_fighter_bay = 0;
         s_spcl_item* spcl = reinterpret_cast<s_spcl_item*>(list);
 
-        for (int i = 0; i < count; ++i) {
+        for (int16_t i = 0; i < count; ++i) {
             int16_t item_id = spcl[i].id;
 
             if (spcl[i].type == 0) {
@@ -392,19 +391,17 @@ namespace aidesign {
                 // Processing Weapon
                 if (*weapon_slot_idx_ptr < 8) {
                     if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
-                        already_has_fighter_bay = 0;
                         for (int16_t slot = 0; slot < *weapon_slot_idx_ptr; ++slot) {
                             if (design->ship_weapon[slot].type == 0x21 /* WPN_FIGHTER_BAY */) {
                                 already_has_fighter_bay = 1;
-                                break;
                             }
                         }
                     }
 
                     int16_t weapon_tech_app_id = TECHDATA::_weapons[item_id].tech_app_id;
                     if (MOX::_player[player_idx].tech_applications[weapon_tech_app_id] == 3 /* LEARNED */ && !already_has_fighter_bay) {
-                        int16_t weapon_unit_space = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
-                        int16_t max_count = space_available / weapon_unit_space;
+                        int32_t weapon_unit_space = DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
+                        int16_t max_count = (int16_t)(space_available / weapon_unit_space);
 
                         if (item_id == 0x21 /* WPN_FIGHTER_BAY */) {
                             if (max_count > (int16_t)design->size * 10) {
@@ -415,25 +412,42 @@ namespace aidesign {
                         if (max_count > 0) {
                             int16_t items_this_type = 0;
 
-                            // Split weapons into multiple slots if count > 99
-                            while (max_count > 0 && *weapon_slot_idx_ptr < 8) {
-                                int16_t count_in_slot = (max_count > 99) ? 99 : max_count;
+                            design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
+                            design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
+                            design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
+                            design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
 
-                                design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
-                                design->ship_weapon[*weapon_slot_idx_ptr].count = (int8_t)count_in_slot;
-                                design->ship_weapon[*weapon_slot_idx_ptr].current_count = (int8_t)count_in_slot;
-                                design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
-                                design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
-                                design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
+                            while (max_count > 99) {
+                                if (*weapon_slot_idx_ptr >= 8) {
+                                    break;
+                                }
 
-                                items_this_type += count_in_slot;
-                                max_count -= count_in_slot;
-                                (*weapon_slot_idx_ptr)++;
+                                items_this_type += 99;
+                                design->ship_weapon[*weapon_slot_idx_ptr].count = 99;
+                                design->ship_weapon[*weapon_slot_idx_ptr].current_count = 99;
+                                max_count -= 99;
+                                ++(*weapon_slot_idx_ptr);
+
+                                if (*weapon_slot_idx_ptr < 8) {
+                                    design->ship_weapon[*weapon_slot_idx_ptr].type = item_id;
+                                    design->ship_weapon[*weapon_slot_idx_ptr].firing_arc = 16;
+                                    design->ship_weapon[*weapon_slot_idx_ptr].specials = 0;
+                                    design->ship_weapon[*weapon_slot_idx_ptr].ammo = 1;
+                                }
                             }
 
+                            if (*weapon_slot_idx_ptr < 8) {
+                                items_this_type += max_count;
+                                design->ship_weapon[*weapon_slot_idx_ptr].count = (int8_t)max_count;
+                                design->ship_weapon[*weapon_slot_idx_ptr].current_count = (int8_t)max_count;
+                            }
+
+                            ++(*weapon_slot_idx_ptr);
+
                             int16_t space_calc = (int16_t)DESIGN::Weapon_Space_(player_idx, item_id, 1, 16 /* ARC_360 */, 1, 0);
-                            total_space_used += space_calc * items_this_type;
-                            space_available -= space_calc * items_this_type;
+                            int16_t used_space = (int16_t)(space_calc * items_this_type);
+                            total_space_used = (int16_t)(total_space_used + used_space);
+                            space_available = (int16_t)(space_available - used_space);
                         }
                     }
                 }
@@ -522,75 +536,182 @@ namespace aidesign {
         }
 
         s_player* player = &MOX::_player[player_idx];
+        int16_t result = 0;
 
         auto get_default_class = [&]() -> int16_t {
-            return (player->tech_applications[TECH_APP_NUCLEAR_DRIVE] == 3) ? 0 : 3;
+            return (player->tech_applications[TECH_APP_LASER_CANNON] == 3) ? 0 : 3;
         };
 
         auto get_fighters_fallback = [&]() -> int16_t {
-            return (fighters_avail >= 1) ? 1 : 2;
+            return (fighters_avail != 0) ? 1 : 2;
         };
 
-        int16_t theme = player->ship_design_theme;
-        int16_t r = random::Random_(20);
-
-        switch (theme) {
+        switch ((uint8_t)player->ship_design_theme) {
             case 0:
-            case 100:
-                if (r <= 13) return get_default_class();
-                if (r == 14) return 3;
-                if (r == 15) return fighters_avail ? 4 : get_default_class();
-                if (r == 16) return fighters_avail ? 1 : get_default_class();
-                if (r == 17) return 2;
-                if (r <= 19) return special_weapons_avail ? 6 : get_default_class();
-                return special_devices_avail ? 5 : get_default_class();
+            case 100: {
+                switch ((int16_t)random::Random_(20)) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                        return get_default_class();
+                    case 14:
+                        return 3;
+                    case 15:
+                        return (fighters_avail != 0) ? 4 : get_default_class();
+                    case 16:
+                        return (fighters_avail != 0) ? 1 : get_default_class();
+                    case 17:
+                        return 2;
+                    case 18:
+                    case 19:
+                        return (special_weapons_avail != 0) ? 6 : get_default_class();
+                    case 20:
+                        return (special_devices_avail != 0) ? 5 : get_default_class();
+                    default:
+                        return 0;
+                }
+            }
 
-            case 1:
-                if (r == 1) return get_default_class();
-                if (r == 2) return 3;
-                if (r <= 15) return fighters_avail ? 4 : get_default_class();
-                if (r <= 18) return get_fighters_fallback();
-                if (r == 19) return special_weapons_avail ? 6 : get_fighters_fallback();
-                return special_devices_avail ? 5 : get_fighters_fallback();
+            case 1: {
+                switch ((int16_t)random::Random_(20)) {
+                    case 1:
+                        return get_default_class();
+                    case 2:
+                        return 3;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                        return (fighters_avail != 0) ? 4 : get_default_class();
+                    case 16:
+                    case 17:
+                    case 18:
+                        return get_fighters_fallback();
+                    case 19:
+                        return (special_weapons_avail != 0) ? 6 : get_fighters_fallback();
+                    case 20:
+                        return (special_devices_avail != 0) ? 5 : get_fighters_fallback();
+                    default:
+                        return 0;
+                }
+            }
 
             case 2:
-                if (r == 1) return get_default_class();
-                if (r <= 14) return 3;
-                if (r == 15) return fighters_avail ? 4 : 3;
-                if (r <= 18) return 2;
-                if (r == 19) return special_weapons_avail ? 6 : 2;
-                return special_devices_avail ? 5 : 2;
+                switch ((int16_t)random::Random_(20)) {
+                    case 1:
+                        result = get_default_class();
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                    case 13:
+                    case 14:
+                        result = 3;
+                        break;
+                    case 15:
+                        result = (fighters_avail != 0) ? 4 : 3;
+                        break;
+                    case 16:
+                    case 17:
+                    case 18:
+                        result = 2;
+                        break;
+                    case 19:
+                        result = (special_weapons_avail != 0) ? 6 : 2;
+                        break;
+                    case 20:
+                        result = (special_devices_avail != 0) ? 5 : 2;
+                        break;
+                    default:
+                        break;
+                }
+                [[fallthrough]];
 
             case 3:
-                if (r == 1) return get_default_class();
-                if (r == 2) return 3;
-                if (r == 3) return fighters_avail ? 4 : get_default_class();
-                if (r <= 5) return get_fighters_fallback();
-                if (r <= 7) return 2;
-                if (r <= 11) return special_weapons_avail ? 6 : get_fighters_fallback();
-                if (r <= 15) return special_weapons_avail ? 6 : 2;
-                if (r <= 17) return special_devices_avail ? 5 : get_fighters_fallback();
-                return special_devices_avail ? 5 : 2;
+                switch ((int16_t)random::Random_(20)) {
+                    case 1:
+                        return get_default_class();
+                    case 2:
+                        return 3;
+                    case 3:
+                        return (fighters_avail != 0) ? 4 : get_default_class();
+                    case 4:
+                    case 5:
+                        return get_fighters_fallback();
+                    case 6:
+                    case 7:
+                        return 2;
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                        return (special_weapons_avail != 0) ? 6 : get_fighters_fallback();
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                        return (special_weapons_avail != 0) ? 6 : 2;
+                    case 16:
+                    case 17:
+                        return (special_devices_avail != 0) ? 5 : get_fighters_fallback();
+                    case 18:
+                    case 19:
+                    case 20:
+                        result = (special_devices_avail != 0) ? 5 : 2;
+                        break;
+                    default:
+                        break;
+                }
+                break;
 
             default:
-                return 0;
+                break;
         }
+
+        return result;
     }
 
-    uint16_t __cdecl Get_Competition_Player_Tech_Values_(uint32_t player_idx, uint32_t tech_type) {
-        uint16_t max_ai_group = 0;
+    int16_t __cdecl Get_Competition_Player_Tech_Values_(int16_t, int16_t tech_type) {
+        int16_t max_ai_group = 0;
         int16_t i = 0;
 
         do {
             auto& app = TECHDATA::_technology_applications[i];
 
-            if (app.ai_group == (uint8_t)tech_type) {
-                if (MOX::_player[player_idx].tech_applications[i] == 3) {
+            if (app.ai_group == tech_type) {
+                if (MOX::_player->tech_applications[i] == 3) {
                     int16_t field_id = app.tech_field_id;
                     uint8_t field_group = TECHDATA::_technology_fields[field_id].ai_group;
 
-                    if (max_ai_group < (uint16_t)field_group) {
-                        max_ai_group = (uint16_t)field_group;
+                    if (max_ai_group < field_group) {
+                        max_ai_group = field_group;
                     }
                 }
             }
@@ -1066,10 +1187,7 @@ namespace aidesign {
             return 0;
         }
 
-        int32_t space_per_missile = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, (uint16_t)modified_ammo, specials);
-        if (space_per_missile <= 0) {
-            return 0;
-        }
+        int32_t space_per_missile = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, modified_ammo, specials);
 
         int16_t total_possible = (int16_t)(space_limit / space_per_missile);
 
@@ -1115,7 +1233,7 @@ namespace aidesign {
     finalize_index:
         (*weapon_index_ptr)++;
 
-        int32_t final_space_coeff = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, (uint16_t)modified_ammo, specials);
+        int32_t final_space_coeff = DESIGN::Weapon_Space_(player_idx, (int16_t)weapon_type, 1, 1, modified_ammo, specials);
         return (int16_t)(final_space_coeff * total_missiles_added);
     }
 
@@ -1150,7 +1268,7 @@ namespace aidesign {
             strcpy(design->name, TECHDATA::_hull_data[5].name);
         } else {
             design->picture_num = (int8_t)random::Random_(8) + (int8_t)hull_idx * 8 - 1;
-            int16_t player_race = player->race;
+            uint8_t player_race = player->race;
             DESIGN::Get_Ship_Design_Name_(player_race, hull_idx, (int16_t)(design->picture_num % 8), design->name);
         }
 
@@ -1177,7 +1295,8 @@ namespace aidesign {
 
         remaining_space -= DESIGN::Shield_Space_Given_M_Level_((int16_t)design->shield_type, (int16_t)design->size, player_idx);
 
-        const s_aidesign_ship_design* table = &_ship_design_tables[ship_class][hull_idx];
+        const int16_t table_class = (ship_class == 7) ? 0 : ship_class;
+        const s_aidesign_ship_design* table = &_ship_design_tables[table_class][hull_idx];
         current_budget = 0;
 
         switch (ship_class) {
@@ -1386,12 +1505,11 @@ namespace aidesign {
         int16_t result = 1;
         int16_t bit = 0;
 
-        while (bit < 40 && result == 1) {
+        while (bit < 39 && result == 1) {
             if (struct_::Test_Bit_Field_(design->special_device_flags, bit)) {
                 for (int i = 0; i < 6; ++i) {
                     if (TECHDATA::_specials[bit].exclude[i] == tech_id) {
                         result = 0;
-                        break;
                     }
                 }
             }

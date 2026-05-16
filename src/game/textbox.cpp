@@ -20,9 +20,9 @@ namespace TEXTBOX {
                 break;
         }
     }
-    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height, int32_t flag) {
+    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height) {
         int16_t total_height = height + 85;
-        int centered_y;
+        int16_t centered_y;
 
         if (MOX::_current_screen == 0) {
             *x_ptr = 84;
@@ -49,19 +49,21 @@ namespace TEXTBOX {
             remap::color_4
         );
 
-        int16_t y_mid = *y_ptr + 42;
+        int16_t y_mid = *y_ptr;
+        y_mid += 42;
         animate::Remap_Draw_(*x_ptr, *y_ptr, header_top);
 
         s_animation_header* header_mid = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 1, MOX::_global_cache_seg);
-        int16_t y_bot = height + y_mid;
+        int16_t y_bot = height;
+        y_bot += y_mid;
 
-        int16_t window_status[4];
-        MISC::Save_Window_Status_(window_status);
+        uint32_t window_status;
+        MISC::Save_Window_Status_(&window_status);
 
         graphics::Set_Window_(*x_ptr, y_mid, *x_ptr + 380, y_bot);
         video::Clip_On_();
         animate::Remap_Draw_(*x_ptr, y_mid, header_mid);
-        MISC::Restore_Window_Status_(*(uint32_t*)window_status);
+        MISC::Restore_Window_Status_(window_status);
 
         s_animation_header* header_bot = (s_animation_header*)buffer::Buffer_Reload_(s_textbox_lbx, 2, MOX::_global_cache_seg);
         animate::Remap_Draw_(*x_ptr, y_bot, header_bot);
@@ -133,7 +135,7 @@ namespace TEXTBOX {
     void __cdecl Text_Box_Cleanup_() {
         RUSS::Mox_Sync_Update_();
         _field_save_ix--;
-        FIELDSAV::Restore_Field_Stats_(&_textbox_field_save[_field_save_ix]);
+        FIELDSAV::Restore_Field_Stats_(_textbox_field_save);
         fields::Enable_Draw_All_Fields_();
 
         if (_reload_saved_block != 0) {
@@ -183,7 +185,7 @@ namespace TEXTBOX {
             width = 339;
         }
 
-        Box_Centered_On_XY_(&x, &y, max_height, title != nullptr);
+        Box_Centered_On_XY_(&x, &y, max_height);
 
         anim = reinterpret_cast<s_animation_header*>(
             farload::Far_Reload_Next_(s_textbox_lbx_00557444, 3, _textbox_seg)
@@ -307,7 +309,7 @@ namespace TEXTBOX {
         s_lbx_stream_header* lbx_header = (s_lbx_stream_header*)allocate::Allocate_Next_Block_(_textbox_seg, 0x104C);
 
         uint16_t count = 0;
-        uint32_t help_idx = static_cast<uint16_t>(param_1);
+        uint32_t help_idx = (uint32_t)param_1;
         uint32_t total_lbx_size = 0;
 
         char help_lbx_name[20];
@@ -413,7 +415,7 @@ namespace TEXTBOX {
         }
 
         int16_t box_x, box_y;
-        Box_Centered_On_XY_(&box_x, &box_y, current_y - 42, 0);
+        Box_Centered_On_XY_(&box_x, &box_y, current_y - 42);
 
         for (int i = 0; i < count; ++i) {
             if (records[i].title[0] != '\x14') {

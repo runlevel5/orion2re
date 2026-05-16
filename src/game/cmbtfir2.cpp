@@ -1741,7 +1741,7 @@ namespace CMBTFIR2 {
         }
 
         combat_ship->is_retreating = 0;
-        combat_ship->special_cooldown = -1;
+        combat_ship->special_cooldown = 0xFF;
 
         int16_t i = 0;
         while (MOX::_ship_turn_order[i] != -10) {

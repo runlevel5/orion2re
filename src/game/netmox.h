@@ -218,7 +218,7 @@ namespace NETMOX {
     };
 
     struct s_NET_MSG_RACE {
-        int8_t race;
+        uint8_t race;
         int8_t player_idx;
     };
 #pragma pack(pop)

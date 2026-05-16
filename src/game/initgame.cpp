@@ -347,7 +347,7 @@ namespace INITGAME {
           }
         }
 
-        player.race = static_cast<char>(race_idx);
+        player.race = static_cast<uint8_t>(race_idx);
         strcpy(player.race_name, MOX::_race_names[race_idx]);
 
         struct_::Copy_Structure_(player.traits, RACESEL::_race_specials[race_idx], 31);

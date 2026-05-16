@@ -346,7 +346,7 @@ void __cdecl Init_Special_Devices_(int16_t combat_ship_idx) {
     ship->combat_status_flags = 0;
     ship->field42_0x49 = 0;
     ship->plasma_web_damage = 0;
-    ship->special_cooldown = -1;
+    ship->special_cooldown = 0xFF;
     ship->special_status_timer = 0;
 
     if (COMBINIT::Does_Combat_Ship_Have_Special_(combat_ship_idx, 6)) {

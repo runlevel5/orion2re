@@ -38,7 +38,7 @@ namespace COMBAT1 {
 
     int16_t __cdecl Enemy_Dissipator_Exists_(int16_t player_idx);
 
-    void __cdecl Initiate_Boarding_Action_(int16_t attacker_idx, uint16_t defender_idx);
+    void __cdecl Initiate_Boarding_Action_(int16_t attacker_idx, int16_t defender_idx);
 
     void __cdecl Seeking_Missiles_(int16_t player_idx);
 

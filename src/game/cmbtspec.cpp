@@ -610,7 +610,7 @@ namespace CMBTSPEC {
             allocate::Pop_Block_(MOX::_screen_seg);
         }
 
-        MOX::_combat_data[param_1].special_cooldown = (int8_t)param_2;
+        MOX::_combat_data[param_1].special_cooldown = (uint8_t)param_2;
         int16_t current_speed = COMBAT1::Calc_Current_Speed_(param_2);
         MOX::_combat_data[param_2].current_speed = current_speed;
         CMBTDRW1::Refresh_Combat_Screen_Full_();

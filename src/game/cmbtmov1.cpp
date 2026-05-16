@@ -70,7 +70,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
                     move_speed = 2;
                 }
 
-                if (CMBTMIS::Move_Missile_(i, center_x, center_y, (int8_t)move_speed) != 0) {
+                if (CMBTMIS::Move_Missile_(i, center_x, center_y, move_speed) != 0) {
                     moved_missiles[moved_count++] = i;
                 }
             }
@@ -79,7 +79,7 @@ void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t scree
         if (MOX::_super_fast_flag == 0 && CMBTDRW1::Ship_On_Screen_(ship_idx) != 0) {
             video::Set_Page_Off_();
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-                if (MOX::_combat_data[i].unit_status == 0 && MOX::_combat_data[i].special_cooldown != -1) {
+                if (MOX::_combat_data[i].unit_status == 0 && MOX::_combat_data[i].special_cooldown != 0xFF) {
                     CMBTSPEC::Draw_Continuing_Tractor_(i);
                 }
             }
@@ -219,7 +219,7 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
             int16_t center_x, center_y;
             COMBINIT::Ship_Center_Offsets_(ship_idx, &center_x, &center_y);
 
-            if (ship->special_cooldown != -1) {
+            if (ship->special_cooldown != 0xFF) {
                 tractor_ships[tractor_count++] = ship_idx;
             }
 
@@ -324,7 +324,6 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                     );
 
                     int16_t hit_missile_count = 0;
-                    facing_dir &= 0xFFFF0000;
                     facing_dir = Get_Facing_(cur_x_px, cur_y_px, dest_x_px, dest_y_px);
 
                     for (int16_t m = 0; m < 300; ++m) {
@@ -393,9 +392,10 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                     defensive_fire_counter++;
                 }
 
-                if (MOX::_super_fast_flag == 0) {
-                    CMBTSPEC::End_Ship_Engine_SFX_();
-                }
+            }
+
+            if (MOX::_super_fast_flag == 0) {
+                CMBTSPEC::End_Ship_Engine_SFX_();
             }
         }
 
@@ -410,8 +410,8 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
                 int16_t t_ship_idx = tractor_ships[t];
                 s_combat_data* t_ship = &MOX::_combat_data[t_ship_idx];
                 if (t_ship->unit_status == 0) {
-                    if (CMBTAI::Range_To_Ship_(t_ship_idx, (uint8_t)t_ship->special_cooldown) > 4) {
-                        t_ship->special_cooldown = -1;
+                    if (CMBTAI::Range_To_Ship_(t_ship_idx, t_ship->special_cooldown) > 4) {
+                        t_ship->special_cooldown = 0xFF;
                     }
                 }
             }
@@ -489,34 +489,21 @@ bool __cdecl Ship_In_Black_Hole_(int16_t ship_idx) {
 }
 
 int16_t __cdecl Get_Facing_(int16_t x1, int16_t y1, int16_t x2, int16_t y2) {
-    // Calculate the relative angle between the two points
-    int16_t angle = angle::Get_Angle_(x2 - x1, y2 - y1);
+    int16_t dx = (int16_t)(x2 - x1);
+    int16_t dy = (int16_t)(y2 - y1);
+    int16_t angle = angle::Get_Angle_(dx, dy);
 
-    // Invert the angle and normalize to the range [0, 359]
     angle = -angle;
     if (angle < 0) {
         angle += 360;
     }
 
-    // Convert the angle (0-360) to 16 discrete facing segments (0-15).
-    // The formula used is roughly (angle / 22.5) with rounding logic:
-    // (angle * 4 + 45) / 90
-    int32_t val = (int32_t)(int16_t)(angle << 2);
-    val = (val + 45) / 90;
+    int16_t scaled = (int16_t)((uint16_t)angle << 2);
+    int16_t quotient16 = (int16_t)(((int32_t)scaled + 45) / 90);
+    int32_t result = quotient16;
+    int32_t sign = result >> 31;
 
-    // Perform a sign-aware modulo 16 operation.
-    // Even though val is non-negative in this context, the compiled code
-    // uses a generic absolute value and sign restoration pattern.
-    int32_t truncated_val = (int32_t)(int16_t)val;
-    int32_t sign = (truncated_val < 0) ? -1 : 0;
-
-    // Compute abs(truncated_val)
-    int32_t result = (truncated_val ^ sign) - sign;
-
-    // Apply the 16-direction mask
-    result &= 0x0F;
-
-    // Restore the sign
+    result = ((result ^ sign) - sign) & 0x0F;
     result = (result ^ sign) - sign;
 
     return (int16_t)result;

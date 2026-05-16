@@ -46,7 +46,7 @@ namespace TEXTBOX {
 
     void __cdecl Text_Box_Startup_(int32_t size);
 
-    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height, int32_t flag);
+    void __cdecl Box_Centered_On_XY_(int16_t* x_ptr, int16_t* y_ptr, int16_t height);
 
     void __cdecl Text_Box_Get_Input_(int16_t ticks);
 
