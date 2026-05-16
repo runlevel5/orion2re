@@ -231,17 +231,17 @@ namespace AIPOWER {
      * Calculates the combat strength of an attacking ship against a target ship by first 
      * determining the target's best shield value and then calculating strength vs that shield.
      */
-    int16_t __cdecl Ship_Strength_Vs_Ships_(int16_t attacker_idx, int16_t target_idx) {
+    uint16_t __cdecl Ship_Strength_Vs_Ships_(int16_t attacker_idx, int16_t target_idx) {
         int16_t shield_value = Get_Best_Ship_Shield_Value_(target_idx);
-        return Ship_Strength_Vs_Shield_(attacker_idx, target_idx, shield_value);
+        return (uint16_t)Ship_Strength_Vs_Shield_(attacker_idx, target_idx, shield_value);
     }
 
     /**
      * Calculates the combat strength of an attacking ship against a target ship in a nebula.
      * In a nebula, shields are disabled, so the shield value is set to 0.
      */
-    int16_t __cdecl Ship_Strength_Vs_Ships_In_Nebula_(int16_t attacker_idx, int16_t target_idx) {
-        return AIPOWER::Ship_Strength_Vs_Shield_(attacker_idx, target_idx, 0);
+    uint16_t __cdecl Ship_Strength_Vs_Ships_In_Nebula_(int16_t attacker_idx, int16_t target_idx) {
+        return (uint16_t)AIPOWER::Ship_Strength_Vs_Shield_(attacker_idx, target_idx, 0);
     }
 
     int16_t __cdecl Current_Ship_Hits_(int16_t ship_idx) {

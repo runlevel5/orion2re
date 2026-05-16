@@ -14,7 +14,7 @@ namespace LIST {
         s_list_item* current = items_start;
         // The list item count is treated as an unsigned 8-bit value (0-255).
         // Each list item occupies 158 (0x9E) bytes.
-        s_list_item* items_end = &items_start[(uint8_t)list->num_items];
+        s_list_item* items_end = &items_start[list->num_items];
 
         while (current < items_end) {
             if (target_page <= 1) {
@@ -30,9 +30,6 @@ namespace LIST {
                 list->cur_page++;
             }
         }
-
-        // Fallback: if the target page was not found, default to the start of the list.
-        list->selected_item = items_start;
     }
 
     void __cdecl Display_List_Text_(s_list_state* state, s_list_item* item) {
@@ -97,7 +94,7 @@ namespace LIST {
 
         while (item < end_item) {
             if (item->app_count != 0) {
-                for (int i = 0; i < (int)item->app_count; ++i) {
+                for (uint16_t i = 0; i < item->app_count; ++i) {
                     int16_t field_id = fields::Add_Hidden_Field_(
                         item->x,
                         state->app_ymin_offsets[i] + item->y,
@@ -107,7 +104,7 @@ namespace LIST {
                         0
                     );
 
-                    reinterpret_cast<uint8_t*>(&item->app_y_offsets[16])[i] = (uint8_t)field_id;
+                    item->app_ids[i] = (uint8_t)field_id;
                 }
             }
 
@@ -158,20 +155,17 @@ namespace LIST {
         s_list_item* item = state->selected_item;
         s_list_item* end_item = &state->items[state->num_items];
         s_list_item* found_item = nullptr;
-        bool still_searching = true;
 
         while (item < end_item) {
             item->is_selectable = 0;
 
-            if (still_searching) {
+            if (found_item == nullptr) {
                 for (uint8_t i = 0; i < item->app_count; ++i) {
                     // Sign-extend app_id byte to match int16 target_app_id (MOVSX in assembly)
-                    if (static_cast<int16_t>(static_cast<int8_t>(item->app_ids[i])) == target_app_id) {
-                        still_searching = false;
+                    if ((int16_t)(int8_t)item->app_ids[i] == target_app_id) {
                         item->is_selectable = 1;
                         item->current_app_index = i;
                         found_item = item;
-                        break;
                     }
                 }
             }
@@ -218,9 +212,9 @@ namespace LIST {
         state->cur_page = 1;
 
         // Size of s_list_item is 0x9E (158 bytes)
-        s_list_item* end_item = &state->items[(uint8_t)state->num_items];
+        s_list_item* end_item = &state->items[state->num_items];
 
-        while (item < end_item) {
+        do {
             item->x = state->x;
             item->app_base_x = state->x + (int16_t)state->app_x_offset;
             item->app_x_max = (state->item_width - (int16_t)state->app_x_offset) + state->x;
@@ -250,7 +244,7 @@ namespace LIST {
             }
 
             item++;
-        }
+        } while (item < end_item);
 
         // The first item always starts a page
         state->items[0].stop_flag = 1;
@@ -292,7 +286,7 @@ namespace LIST {
         uint16_t item_index = 0;
         s_list_item* last_page_item;
         s_list_item* item = state->items;
-        uint8_t item_count = (uint8_t)state->num_items;
+        uint8_t item_count = state->num_items;
 
         if (item_count != 0) {
             do {
@@ -319,7 +313,7 @@ namespace LIST {
         s_list_item* items = state->items;
         s_list_item* selected_item = items;
         uint16_t item_index = 0;
-        uint8_t item_count = (uint8_t)state->num_items;
+        uint8_t item_count = state->num_items;
 
         do {
             if (items[item_index].group_id == head_id) {

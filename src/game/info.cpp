@@ -683,7 +683,7 @@ namespace INFO {
 
         TEXTBOX::Get_Help_Lbx_Name_(lbx_name);
         int count = farload::Get_Farload_Data_Record_Count_(lbx_name, INFO::_g_reference_ix);
-        INFO::_g_category_header.num_items = (int8_t)count;
+        INFO::_g_category_header.num_items = (uint8_t)count;
 
         for (i = 0; i < count; i++) {
             char* data = (char*)farload::Far_Reload_Data_(lbx_name, INFO::_g_reference_ix, out_buffer, i, 1, 84 /* 0x54 */);
@@ -1614,7 +1614,7 @@ namespace INFO {
     // Suggested name: INFO::Init_Turn_Summary_List
     void __cdecl _Init_Turn_Summary_List_(s_list_state* state, int16_t num_items, int16_t font_style, int16_t font_lf) {
         if (num_items != 0) {
-            state->num_items = (int8_t)num_items;
+            state->num_items = (uint8_t)num_items;
 
             int16_t msg_idx = MSG_::First_Msg_For_Player_(MOX::_PLAYER_NUM);
             int16_t end_msg_idx = msg_idx + num_items;

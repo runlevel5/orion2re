@@ -134,13 +134,13 @@ namespace AIDATA {
     void Compute_AI_Data_() {
         RUSS::Assert_Settings_();
         allocate::Push_Block_(MOX::_screen_seg);
-        _ship_strengths = (int16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
-        _ship_strengths_in_nebula = (int16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
+        _ship_strengths = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
+        _ship_strengths_in_nebula = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
         _ship_bomb_strengths = (int32_t(*)[500][2])allocate::Allocate_Next_Block_(MOX::_screen_seg, 4000);
         _planet_stage_weights = (int16_t(*)[360][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 5760);
         _base_star_stage_weights = (int32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
         _star_stage_weights = (int32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
-        _n_turns_from_to = (int8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 41472 /* 0xA200 */);
+        _n_turns_from_to = (uint8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 41472 /* 0xA200 */);
         _n_turns_from_to_intermediate = (int32_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 165888 /* 0x28800 */);
         _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 36000);
         _ship_n_turns_to_intermediate = (int16_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 72000);
@@ -196,14 +196,14 @@ namespace AIDATA {
                     for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                         if (owner != p && MOX::_player[p].eliminated == 0) {
                             if (ship.d.ship_type == 0) {
-                                int16_t str = AIPOWER::Ship_Strength_Vs_Ships_(i, p);
+                                uint16_t str = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(i, p);
                                 (*_ship_strengths)[i][p] = str;
                                 (*_ai_player_info)[p].total_ship_strength += str;
-                                (*_ship_strengths_in_nebula)[i][p] = AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
+                                (*_ship_strengths_in_nebula)[i][p] = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
                                 AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (int16_t*)&(*_ship_bomb_strengths)[i][0]);
                                 RUSS::Mox_Update_();
                                 if (owner < 8 && turn_idx < 10) {
-                                    int16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
+                                    uint16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
                                     (*_enroute_ship_strengths)[star_idx][owner][p][turn_idx] += cur_str;
                                 }
                             }
@@ -295,7 +295,7 @@ namespace AIDATA {
                 if (((*_star_in_extended_range_of_player)[s1] >> p) & 1) {
                     for (int s2 = 0; s2 < MOX::_NUM_STARS; ++s2) {
                         if (((*_star_in_extended_range_of_player)[s2] >> p) & 1) {
-                            (*_n_turns_from_to)[s1][s2][p] = (int8_t)SHIPMOVE::Player_N_Turns_From_Star_To_Star_((int16_t)p, (int16_t)s1, (int16_t)s2);
+                            (*_n_turns_from_to)[s1][s2][p] = (uint8_t)SHIPMOVE::Player_N_Turns_From_Star_To_Star_((int16_t)p, (int16_t)s1, (int16_t)s2);
                             RUSS::Mox_Update_();
                         }
                     }
@@ -529,7 +529,7 @@ namespace AIDATA {
                             if (turns != -1) {
                                 int eta = initial_delay + turns;
                                 if (eta < 10) {
-                                    int16_t str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
+                                    uint16_t str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
                                     for (int t = eta; t < 10; ++t) {
                                         (*_possible_ship_strengths)[s][owner][p][t] += str;
                                     }
@@ -1024,7 +1024,7 @@ namespace AIDATA {
                 plr->tech_applications[TECH_APP_STAR_GATE] != 3 &&
                 MOX::_star[star_a].wormhole_star_id == -1 &&
                 MOX::_star[star_b].wormhole_star_id == -1 &&
-                (*_n_turns_from_to)[star_a][star_b][player] != -1) {
+                (*_n_turns_from_to)[star_a][star_b][player] != 0xFF) {
 
                 int dist = GEO::Parsecs_Between_Stars_(star_a, star_b);
                 int turns = (dist + (uint8_t)plr->ship_speed - 1) / (uint8_t)plr->ship_speed;

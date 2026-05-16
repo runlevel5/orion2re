@@ -928,7 +928,7 @@ namespace TECH {
     }
 
     void __cdecl Get_Group_List_(s_list_state *state, int16_t group_idx) {
-        int8_t num_items = 0;
+        uint8_t num_items = 0;
         s_list_item *item = state->items;
         uint16_t u_group_idx = static_cast<uint16_t>(group_idx);
         int16_t field_id = static_cast<int8_t>(MOX::_first_field_in_group[u_group_idx]);

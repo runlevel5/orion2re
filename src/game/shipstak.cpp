@@ -114,7 +114,7 @@ namespace SHIPSTAK {
     }
 
     void __cdecl Remove_Non_Detected_Ships_() {
-        const int16_t player_num = MOX::_PLAYER_NUM;
+        const int16_t player_num = (int16_t)MOX::_PLAYER_NUM;
         int16_t scan_range = 2;
 
         if ((int8_t)MOX::_player[player_num].tech_applications[0xB5] == 3) {
@@ -131,19 +131,13 @@ namespace SHIPSTAK {
             int16_t* stack_head_ptr = &MOX::_ship_stack_start[stack_idx];
             int16_t stack_head_node = *stack_head_ptr;
 
-            if (stack_head_node == -1) {
-                SHIPSTAK::Delete_Ship_Stack_(stack_idx);
-                --stack_idx;
-                continue;
-            }
-
             const s_ship_data& stack_head_ship = MOX::_ship[MOX::_ship_node[stack_head_node].ship_idx];
-            if ((int8_t)stack_head_ship.owner != player_num) {
+            if ((int16_t)(int8_t)stack_head_ship.owner != player_num) {
                 int16_t best_detection = -300;
 
                 for (int16_t colony_idx = 0; colony_idx < (int16_t)MOX::_NUM_COLONIES; ++colony_idx) {
                     const s_colony& colony = MOX::_colony[colony_idx];
-                    if ((int8_t)colony.owner == player_num) {
+                    if ((int16_t)(int8_t)colony.owner == player_num) {
                         const s_star_data& colony_star =
                             MOX::_star[MOX::_planet[colony.planet].star_index];
 
@@ -178,7 +172,7 @@ namespace SHIPSTAK {
 
                 for (int16_t other_ship_idx = 0; other_ship_idx < (int16_t)MOX::_NUM_SHIPS; ++other_ship_idx) {
                     const s_ship_data& other_ship = MOX::_ship[other_ship_idx];
-                    if ((int8_t)other_ship.owner == player_num && (int8_t)other_ship.status < 3) {
+                    if ((int16_t)(int8_t)other_ship.owner == player_num && (int8_t)other_ship.status < 3) {
                         int16_t range_steps = (int16_t)((special::Range_(
                                                              stack_head_ship.x,
                                                              stack_head_ship.y,
@@ -204,9 +198,10 @@ namespace SHIPSTAK {
                 int16_t prev_node = -1;
                 for (int16_t node_idx = *stack_head_ptr; node_idx != -1; ) {
                     int16_t current_node = node_idx;
+                    int16_t next_node = MOX::_ship_node[current_node].next_node;
                     int16_t node_ship_idx = MOX::_ship_node[current_node].ship_idx;
                     s_ship_data& ship = MOX::_ship[node_ship_idx];
-                    int8_t owner = (int8_t)ship.owner;
+                    int16_t owner = (int16_t)(int8_t)ship.owner;
 
                     if (owner < 9 || ship.d.speed != 0) {
                         int16_t detection = 0;
@@ -239,12 +234,10 @@ namespace SHIPSTAK {
                     } else {
                         if (!HAROLD::Player_Has_Visited_(player_num, ship.location)) {
                             SHIPSTAK::Delete_Ship_Node_(stack_idx, prev_node, current_node);
-                        } else {
-                            prev_node = current_node;
                         }
                     }
 
-                    node_idx = MOX::_ship_node[current_node].next_node;
+                    node_idx = next_node;
                 }
 
                 if (*stack_head_ptr == -1) {

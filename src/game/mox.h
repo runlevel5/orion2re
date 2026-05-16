@@ -736,8 +736,8 @@ namespace MOX {
     inline s_ship_node (&_ship_node)[500] =
         *reinterpret_cast<s_ship_node(*)[500]>(std::uintptr_t{0x00597DA0});
 
-    inline uint16_t& _ship_stack_count =
-        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059B3F8});
+    inline int16_t& _ship_stack_count =
+        *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B3F8});
 
     inline int16_t (&_ship_stack_start)[500] =
         *reinterpret_cast<int16_t(*)[500]>(std::uintptr_t{0x0059C030});

@@ -115,5 +115,5 @@ namespace AIMOVE {
         int32_t* out_param_7
     );
 
-    int32_t __cdecl Sort_candidate_stars_(const uint8_t* candidate_star_a, const uint8_t* candidate_star_b);
+    int __cdecl Sort_candidate_stars_(const void* candidate_star_a, const void* candidate_star_b);
 }

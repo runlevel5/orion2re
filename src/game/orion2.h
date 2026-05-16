@@ -2357,7 +2357,7 @@ typedef struct s_list_item s_list_item, *Ps_list_item;
 struct s_list_item {
     int16_t x;
     int16_t y;
-    int8_t stop_flag;
+    uint8_t stop_flag;
     uint8_t is_selectable;
     uint8_t current_app_index;
     char group_name[64];
@@ -2409,7 +2409,7 @@ struct s_list_state {
     int16_t *app_ymin_offsets;
     int16_t *app_ymax_offsets;
     uint8_t item_spacing;
-    int8_t num_items;
+    uint8_t num_items;
     struct s_list_item *items;
     struct s_list_item *selected_item;
     uint8_t max_page;
@@ -4383,7 +4383,7 @@ struct s_ship_data {
     short y;
     char group_has_navigator;
     char travelling_speed;
-    char turns_left;
+    uint8_t turns_left;
     char shield_damage_percent;
     char drive_damage_percent;
     char computer_damage;
@@ -4453,7 +4453,7 @@ struct s_ship_move_info {
     int8_t insufficient_fuel;
     int8_t immobile;
     int8_t pad;
-    int8_t turns_left;
+    uint8_t turns_left;
     int8_t moving;
     int8_t out_of_range;
     int8_t has_navigator;
@@ -4785,7 +4785,7 @@ struct s_star_data {
     int8_t wormhole_star_id;
     byte blockaded;
     char blockaded_by[8];
-    int8_t visited;
+    uint8_t visited;
     byte just_visited;
     byte ignore_colony_ships;
     byte ignore_combat_ships;

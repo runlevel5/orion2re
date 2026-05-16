@@ -778,7 +778,7 @@ namespace SHIPMOVE {
                     );
                 }
 
-                ship->turns_left = (char)turn_count;
+                ship->turns_left = turn_count;
             }
         }
     }
