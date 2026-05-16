@@ -1276,8 +1276,8 @@ int16_t __cdecl Auto_Move_Ship_(int16_t ship_param, int16_t target_idx) {
             int rnd_idx = random::Random_((int)num_possible_moves) - 1;
             int16_t mx = move_x_coords[rnd_idx];
             int16_t my = move_y_coords[rnd_idx];
-            CMBTMOV1::Move_Cost_(cur_ship_idx, mx, my);
-            int16_t movement_used = CMBTMOV1::Move_Ship_(cur_ship_idx, mx, my);
+            int16_t move_cost = CMBTMOV1::Move_Cost_(cur_ship_idx, mx, my);
+            int16_t movement_used = CMBTMOV1::Move_Ship_(cur_ship_idx, mx, my, move_cost);
 
             if (movement_used > 0) {
                 moved = 1;

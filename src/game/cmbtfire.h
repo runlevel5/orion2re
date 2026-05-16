@@ -33,7 +33,7 @@ namespace CMBTFIRE {
 
     void __cdecl Retarget_Missiles_Aimed_At_(int16_t unit_idx);
 
-    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int8_t source_idx);
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, uint8_t source_idx);
 
     int16_t __cdecl Does_Combat_Planet_Have_Defenses_();
 

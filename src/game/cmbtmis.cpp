@@ -1154,7 +1154,7 @@ namespace CMBTMIS {
                 MOX::_missile[missile_idx].fighter_count = 0;
             }
 
-            MOX::_missile[missile_idx].speed = (int8_t)Missile_Speed_(MOX::_missile[missile_idx].type,
+            MOX::_missile[missile_idx].speed = (uint8_t)Missile_Speed_(MOX::_missile[missile_idx].type,
                                                                     MOX::_missile[missile_idx].specials,
                                                                     MOX::_missile[missile_idx].owner);
             MOX::_missile[missile_idx].travel_dist = (int16_t)((uint16_t)(uint8_t)MOX::_missile[missile_idx].speed * 20);

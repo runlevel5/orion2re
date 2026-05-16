@@ -176,7 +176,7 @@ namespace CMBTFIRE {
         for (int i = 0; i < 8; ++i) {
             MOX::_combat_data[ship_idx].weapons[i].shots_left = 0;
         }
-        MOX::_combat_data[ship_idx].stasis_source_idx = -1;
+        MOX::_combat_data[ship_idx].stasis_source_idx = 0xFF;
     }
 
     void __cdecl Destroy_Ship_(int16_t ship_idx, int16_t param_2, int16_t param_3, int16_t param_4) {
@@ -1693,7 +1693,7 @@ namespace CMBTFIRE {
         }
     }
 
-    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, int8_t source_idx) {
+    void __cdecl Place_Ship_In_Stasis_(int16_t ship_idx, uint8_t source_idx) {
         MOX::_combat_data[ship_idx].stasis_source_idx = source_idx;
         CMBTFIRE::Retarget_Missiles_Aimed_At_(ship_idx);
     }

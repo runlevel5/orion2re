@@ -14,7 +14,7 @@ namespace CMBTMOV1 {
 
     int16_t __cdecl Turn_Cost_(int16_t ship_idx);
 
-    int16_t __cdecl Move_Ship_(int16_t ship_idx, int16_t dest_x, int16_t dest_y);
+    int16_t __cdecl Move_Ship_(int16_t ship_idx, int16_t dest_x, int16_t dest_y, int16_t move_cost_unused);
 
     void __cdecl Turn_To_Face_(int16_t ship_idx, int16_t target_x, int16_t target_y);
 

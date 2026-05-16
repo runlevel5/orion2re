@@ -46,7 +46,7 @@ namespace COMBAT1 {
     int16_t __cdecl Check_For_Winner_();
     int16_t __cdecl Calc_Current_Speed_(int16_t ship_idx);
 
-    void __cdecl Retreat_Ship_(uint16_t ship_idx);
+    void __cdecl Retreat_Ship_(int16_t ship_idx);
 
     void __cdecl Remove_Continuing_Effect_Specials_(int16_t source_idx);
 

@@ -1227,7 +1227,7 @@ struct s_combat_data {
     int8_t field40_0x47;
     uint8_t combat_status_flags;
     undefined field42_0x49;
-    int8_t stasis_source_idx;
+    uint8_t stasis_source_idx;
     int8_t is_retreating;
     uint8_t special_device_flags[5];
     undefined field46_0x51;
@@ -2580,7 +2580,7 @@ struct s_missile {
     uint16_t specials;
     int16_t travel_dist;
     int8_t facing_dir;
-    int8_t speed;
+    uint8_t speed;
     int8_t fighter_count;
     undefined field14_0x18;
     int8_t is_active;

@@ -363,7 +363,7 @@ namespace COMBAT1 {
                                         } else {
                                             KEN::Ken_Get_Text_Message_(57, buf, 80);
                                             palette::Refresh_Palette_();
-                                            if (GENDRAW::Confirmation_Box_(buf) != 0) {
+                                            if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
                                                 MOX::_order_info_flag = 1 - MOX::_order_info_flag;
                                                 CMBTDRW1::Move_Options_Background_();
                                                 if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
@@ -542,6 +542,19 @@ namespace COMBAT1 {
                                         COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[MOX::_cur_ship].x, MOX::_combat_data[MOX::_cur_ship].y);
                                     }
 
+                                    if ((int16_t)(input_val + MOX::_space_field) == 0) {
+                                        int16_t face_x = MOX::_cur_combat_x + MOX::_xpos / 2;
+                                        int16_t face_y = MOX::_cur_combat_y + MOX::_ypos / 2;
+                                        if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
+                                            Send_Tactical_Combat_Message_(MOX::_net_destination, 10012, face_x, face_y, 0);
+                                        }
+                                        CMBTMOV1::Turn_To_Face_(MOX::_cur_ship, face_x, face_y);
+                                        if (MOX::_net_flag != 0) {
+                                            CMBTMOV1::Wait_Until_Net_Opponent_Finished_(1);
+                                        }
+                                        input_val = 0;
+                                    }
+
                                     if (input_val == MOX::_space_field) {
                                         int16_t tx = MOX::_cur_combat_x + MOX::_xpos / 2;
                                         int16_t ty = MOX::_cur_combat_y + MOX::_ypos / 2;
@@ -564,11 +577,12 @@ namespace COMBAT1 {
                                                 if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
                                                     Send_Tactical_Combat_Message_(MOX::_net_destination, 10005, tx, ty, 0);
                                                 }
+                                                int16_t move_cost = CMBTMOV1::Move_Cost_(MOX::_cur_ship, tx, ty);
                                                 if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
                                                 }
                                                 int16_t used_tp1 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
-                                                int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, tx, ty);
+                                                int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, tx, ty, move_cost);
                                                 int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                 if (used_tp1 == used_tp2) {
                                                     MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
@@ -599,7 +613,7 @@ namespace COMBAT1 {
                                                         KEN::Ken_Get_Text_Message_(61, buf, 80);
                                                         palette::Set_Palette_Gradient_(144, 32, 0, 0, 0, 0, 0, 0);
                                                         palette::Refresh_Palette_();
-                                                        if (GENDRAW::Confirmation_Box_(buf) != 0) {
+                                                        if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
                                                             if (MOX::_net_flag != 0 && MOX::_PLAYER_NUM != MOX::_net_destination) {
                                                                 Send_Tactical_Combat_Message_(MOX::_net_destination, 10013, tgt_idx, 0, 0);
                                                             }
@@ -731,11 +745,12 @@ namespace COMBAT1 {
                                                     break;
                                                 case 10005: {
                                                     int8_t orig_owner = MOX::_combat_data[MOX::_cur_ship].owner;
+                                                    int16_t move_cost = CMBTMOV1::Move_Cost_(MOX::_cur_ship, f10, f12);
                                                     if (MOX::_combat_data[MOX::_cur_ship].movement_left < 0) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left = 0;
                                                     }
                                                     int16_t used_tp1 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
-                                                    int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, f10, f12);
+                                                    int16_t act_cost = CMBTMOV1::Move_Ship_(MOX::_cur_ship, f10, f12, move_cost);
                                                     int16_t used_tp2 = CMBTFIR2::Used_Teleporter_(MOX::_cur_ship);
                                                     if (used_tp1 == used_tp2) {
                                                         MOX::_combat_data[MOX::_cur_ship].movement_left -= act_cost;
@@ -1004,6 +1019,7 @@ namespace COMBAT1 {
 
     void __cdecl Init_Ship_For_Start_Of_Turn_(int16_t ship_idx) {
         int16_t is_captured_now = CMBTFIR2::Being_Captured_(ship_idx);
+        uint8_t capture_flag8 = (uint8_t)is_captured_now;
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         ship->combat_status_flags = 0;
@@ -1044,14 +1060,14 @@ namespace COMBAT1 {
 
         for (int i = 0; i < 8; ++i) {
             s_combat_weapon_slot* slot = &ship->weapons[i];
-            uint8_t count = slot->count;
+            int8_t count = slot->count;
 
             if (slot->weapon_id == 0x20 /* Stasis Field */) {
                 if ((int16_t)count < stasis_count) {
                     slot->shots_left = 0;
                     stasis_count -= (int16_t)count;
                 } else {
-                    slot->shots_left = count - (uint8_t)is_captured_now;
+                    slot->shots_left = (int8_t)((uint8_t)count - capture_flag8);
                 }
             } else {
                 slot->shots_left = count;
@@ -1082,22 +1098,20 @@ namespace COMBAT1 {
     }
 
     int __cdecl qsort_ship_initiative_(const void* p1, const void* p2) {
-        const int16_t* ship1_ptr = reinterpret_cast<const int16_t*>(p1);
-        const int16_t* ship2_ptr = reinterpret_cast<const int16_t*>(p2);
+        const int16_t* ship1_ptr = (const int16_t*)p1;
+        const int16_t* ship2_ptr = (const int16_t*)p2;
 
-        // First pass: check for equality
-        int16_t init1 = Ship_Initiative_Value_(*ship1_ptr);
         int16_t init2 = Ship_Initiative_Value_(*ship2_ptr);
+        int16_t init1 = Ship_Initiative_Value_(*ship1_ptr);
 
-        if (init1 == init2) {
+        if (init2 == init1) {
             return 0;
         }
 
-        // Second pass: identify order (re-calculating values as per assembly)
-        init1 = Ship_Initiative_Value_(*ship1_ptr);
         init2 = Ship_Initiative_Value_(*ship2_ptr);
+        init1 = Ship_Initiative_Value_(*ship1_ptr);
 
-        if (init1 < init2) {
+        if (init2 < init1) {
             return -1;
         }
 
@@ -1260,7 +1274,7 @@ namespace COMBAT1 {
         return done;
     }
 
-    void __cdecl Retreat_Ship_(uint16_t ship_idx) {
+    void __cdecl Retreat_Ship_(int16_t ship_idx) {
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (CMBTDRW1::Ship_On_Screen_(ship_idx) == 0) {
                 COMBINIT::Snap_Center_Combat_Screen_(MOX::_combat_data[ship_idx].x, MOX::_combat_data[ship_idx].y);
@@ -1342,13 +1356,13 @@ namespace COMBAT1 {
             }
 
             // Check if this ship is affected by a black hole created by the source ship
-            if (MOX::_combat_data[i].black_hole_source_idx == (int8_t)source_idx) {
+            if ((uint8_t)MOX::_combat_data[i].black_hole_source_idx == source_idx) {
                 MOX::_combat_data[i].black_hole_flag = 0;
                 MOX::_combat_data[i].black_hole_source_idx = -1;
             }
 
             // Check if special cooldown (or effect tracking) matches the source ship
-            if (MOX::_combat_data[i].special_cooldown == (int8_t)source_idx) {
+            if ((uint8_t)MOX::_combat_data[i].special_cooldown == source_idx) {
                 MOX::_combat_data[i].special_cooldown = -1;
             }
         }
@@ -1832,7 +1846,7 @@ namespace COMBAT1 {
                     if (target_ship->unit_status == 0) {
                         int16_t owner = CMBTMIS::Missile_Owner_(m_idx);
                         if (owner != target_ship->owner || missile->source_unit_idx == t_idx) {
-                            if (missile->is_anti_missile_rocket == 0) {
+                            if (MOX::_missile[j].is_anti_missile_rocket == 0) {
                                 COMBINIT::Ship_Center_Offsets_(t_idx, &target_x, &target_y);
                                 target_x += target_ship->x * 20;
                                 target_y += target_ship->y * 20;

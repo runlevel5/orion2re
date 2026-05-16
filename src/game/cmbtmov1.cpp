@@ -17,7 +17,7 @@ namespace CMBTMOV1 {
     }
 
     int8_t __cdecl Ship_Is_In_Stasis_(int16_t ship_idx) {
-        return MOX::_combat_data[ship_idx].stasis_source_idx != -1;
+        return MOX::_combat_data[ship_idx].stasis_source_idx != 0xFF;
     }
 
 void __cdecl Rotate_Ship_(int16_t ship_idx, int16_t target_facing, int16_t screen_x, int16_t screen_y)
@@ -186,7 +186,8 @@ int16_t __cdecl Move_Cost_(int16_t ship_idx, int16_t target_x, int16_t target_y)
     return dist + (int16_t)((int32_t)turn_unit_cost * abs_diff);
 }
 
-    int16_t __cdecl Move_Ship_(int16_t ship_idx, int16_t dest_x, int16_t dest_y) {
+    int16_t __cdecl Move_Ship_(int16_t ship_idx, int16_t dest_x, int16_t dest_y, int16_t move_cost_unused) {
+        (void)move_cost_unused;
         int16_t tractor_count = 0;
         int16_t test_move_result = 0;
         int16_t used_teleporter = CMBTFIR2::Used_Teleporter_(ship_idx) != 0;
