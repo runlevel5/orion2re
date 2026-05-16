@@ -58,7 +58,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     }
 
     int16_t prod_val = colony->production[prod_type];
-    int16_t shortage = (int16_t)colony->maintenance[prod_type] - colony->imports[prod_type] - prod_val;
+    int16_t shortage = colony->maintenance[prod_type] - colony->imports[prod_type] - prod_val;
     if (shortage < 1) {
         shortage = 0;
     }
@@ -70,9 +70,9 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     int16_t net_tens;
     int16_t net_units;
 
-    if (colony->imports[prod_type] < 0) {
+    if ((int8_t)colony->imports[prod_type] < 0) {
         if (prod_type == 1) {
-            int32_t adj_prod = (int32_t)prod_val - (uint8_t)colony->maintenance[prod_type];
+            int32_t adj_prod = (int32_t)prod_val - colony->maintenance[prod_type];
             if (adj_prod < 0) adj_prod = 0;
             net_tens = (int16_t)(adj_prod / 10);
             net_units = (int16_t)(adj_prod % 10);
@@ -86,7 +86,7 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
             net_tens = prod_val / 10;
             net_units = prod_val % 10;
         } else {
-            int32_t adj_prod = (int32_t)prod_val - (uint8_t)colony->maintenance[prod_type];
+            int32_t adj_prod = (int32_t)prod_val - colony->maintenance[prod_type];
             if (adj_prod < 0) adj_prod = 0;
             net_tens = (int16_t)(adj_prod / 10);
             net_units = (int16_t)(adj_prod % 10);
@@ -180,8 +180,8 @@ void __cdecl Draw_Colony_Prod_Both_(int16_t colony_idx, int16_t prod_type, int16
     video::Clip_Off_();
 }
 
-void __cdecl Draw_Colony_Prod_(int16_t colony_handle, int32_t selection, int32_t p3, int16_t y_offset, int32_t p5, int32_t p6) {
-    Draw_Colony_Prod_Both_(colony_handle, (int16_t)selection, (int16_t)p3, y_offset, (int16_t)p5, (int16_t)p6, 0);
+void __cdecl Draw_Colony_Prod_(int16_t param_1, int16_t param_2, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
+    Draw_Colony_Prod_Both_(param_1, param_2, param_3, param_4, param_5, param_6, 0);
 }
 
 void __cdecl Draw_Info_Morale_Both_(int16_t colony_idx, int16_t x, int16_t y, int width, char is_mini) {

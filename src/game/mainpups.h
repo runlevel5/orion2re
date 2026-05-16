@@ -92,7 +92,7 @@ namespace MAINPUPS {
 
     void __cdecl Load_SLIDER_Popup_();
     void __cdecl Load_Slider_Fields_();
-    void __cdecl Add_Slider_Fields_(int16_t val, int16_t padding, int16_t* ptr, int16_t limit);
+    void __cdecl Add_Slider_Fields_(int16_t min_val, int16_t max_val, int16_t* value_ptr);
 
     void __cdecl Do_Popup_Setup_(int16_t param_1, s_animation_header* param_2);
 

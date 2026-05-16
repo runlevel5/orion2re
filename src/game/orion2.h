@@ -1075,7 +1075,7 @@ struct s_colony {
     short ground_strength;
     short space_strength;
     short production[4];
-    char maintenance[4];
+    uint8_t maintenance[4];
     short imports[4];
     char n_industry_recyclers;
     char food2_needed_for_our_empire;

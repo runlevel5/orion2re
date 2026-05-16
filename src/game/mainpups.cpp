@@ -120,7 +120,9 @@ namespace MAINPUPS {
             MOX2::Execute_Auto_Function_(&_eric_saved_autofunction2);
         }
 
-        _autofunction_ctr++;
+        if (_autofunction_ctr == 0 || _autofunction_ctr == 1) {
+            _autofunction_ctr++;
+        }
 
         if (_explode_flag != 0) {
             int16_t draw_x, draw_y;
@@ -536,25 +538,24 @@ namespace MAINPUPS {
      * Adds UI fields for a slider control including the scroll bar, directional buttons, 
      * and a background hidden field.
      * 
-     * @param val The initial value of the slider.
-     * @param padding Unused parameter existing on the stack to maintain calling convention alignment.
-     * @param ptr Pointer to the variable that will store the slider's state.
-     * @param limit The upper limit of the slider range.
+     * @param min_val The lower limit and initial value of the slider.
+     * @param max_val The upper limit of the slider range.
+     * @param value_ptr Pointer to the variable that will store the slider's state.
      */
-    void __cdecl Add_Slider_Fields_(int16_t val, int16_t padding, int16_t* ptr, int16_t limit) {
+    void __cdecl Add_Slider_Fields_(int16_t min_val, int16_t max_val, int16_t* value_ptr) {
         char* tooltip_generic = ESTRINGS::E_Strings_(12);
 
         // Main scroll bar field
         _mp_fields[11] = fields::Add_Scroll_Field_(
             _g_x + 37 /* 0x25 */,
             _g_y + 149 /* 0x95 */,
-            val,
-            limit + 1,
-            val,
-            limit,
+            min_val,
+            max_val + 1,
+            min_val,
+            max_val,
             207 /* 0xcf */,
             13 /* 0xd */,
-            ptr,
+            value_ptr,
             tooltip_generic,
             0
         );
@@ -609,7 +610,7 @@ namespace MAINPUPS {
 
     void __cdecl Load_Slider_Fields_() {
         Eric_Push_Fields_();
-        Add_Slider_Fields_(_g_min, 0, &_g_var, _g_max);
+        Add_Slider_Fields_(_g_min, _g_max, &_g_var);
     }
 
     int16_t __cdecl Slider_Popup_(int16_t min, int16_t max, int16_t var, char* msg, int16_t param_5) {
@@ -851,8 +852,6 @@ namespace MAINPUPS {
                     Update_Random_New_Officer_Fields_();
 
                     COLONY::_full_draw = 1;
-                } else if (input > 0) {
-                    done = true;
                 }
             } else if (input > 0) {
                 done = true;
@@ -1343,7 +1342,7 @@ namespace MAINPUPS {
                 int16_t colony_idx = MOX::_planet[planet_idx].colony_index;
 
                 if (colony_idx != -1) {
-                    if (MOX::_colony[colony_idx].owner == (int8_t)player_idx) {
+                    if (MOX::_colony[colony_idx].owner == player_idx) {
                         return 1;
                     }
                 }
@@ -2089,75 +2088,84 @@ namespace MAINPUPS {
         }
 
         if (scan_res == 0 && planet_scanned > -1) {
-            int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_(static_cast<int16_t>(COLONY::_sys_disp_star_handle), planet_scanned);
+            int16_t planet_idx = HACCESS::System_Planet_Scanned_To_Planet_Id_((int16_t)COLONY::_sys_disp_star_handle, planet_scanned);
 
             if (_selection_state_flag == 0) {
-                if (MOX::_planet[planet_idx].planet_type != 3 /* PLANET_TYPE_GAS_GIANT */ ||
-                    (MOX::_planet[planet_idx].colony_index != -1 && MOX::_colony[MOX::_planet[planet_idx].colony_index].outpost_flag == 0)) {
+                if (MOX::_planet[planet_idx].planet_type != 3 /* PLANET_TYPE_GAS_GIANT */) {
+                    goto help_236_inline_redraw;
+                }
 
-                    char* help_text = ESTRINGS::E_Strings_(0x236);
-                    GENDRAW::Help_(help_text);
-                    COLONY::_full_draw = 1;
-                    Eric_Pop_Fields_();
-                    Update_Selection_Fields_();
-                    video::Copy_Back_To_Off_();
-                    Draw_Selection_Popup_();
-                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
-                    goto reset_ui_and_fail;
+                int16_t col_idx = MOX::_planet[planet_idx].colony_index;
+                if (col_idx != -1) {
+                    if (MOX::_colony[col_idx].outpost_flag == 0) {
+                        goto help_236_inline_redraw;
+                    }
                 }
             }
 
             if (_selection_state_flag == 1) {
-                int16_t col_idx = MOX::_planet[planet_idx].colony_index;
-                if (col_idx == -1 || MOX::_colony[col_idx].outpost_flag == 0) {
-                    char* help_text = ESTRINGS::E_Strings_(0x236);
-                    GENDRAW::Help_(help_text);
-                    COLONY::_full_draw = 1;
-                    Eric_Pop_Fields_();
-                    Update_Selection_Fields_();
-                    video::Copy_Back_To_Off_();
-                    Draw_Selection_Popup_();
-                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
-                    goto reset_ui_and_fail;
+                if (MOX::_planet[planet_idx].colony_index != -1) {
+                    goto help_236_inline_redraw;
                 }
             }
 
             if (_selection_state_flag == 2) {
                 int16_t col_idx = MOX::_planet[planet_idx].colony_index;
-                if (col_idx == -1 || MOX::_colony[col_idx].outpost_flag != 0 || MOX::_colony[col_idx].owner != MOX::_PLAYER_NUM) {
-                    char* help_text = ESTRINGS::E_Strings_(0x23b);
-                    GENDRAW::Help_(help_text);
-                    COLONY::_full_draw = 1;
-                    Eric_Pop_Fields_();
-                    Update_Selection_Fields_();
-                    video::Copy_Back_To_Off_();
-                    Draw_Selection_Popup_();
-                    fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
-                    goto reset_ui_and_fail;
+                if (col_idx == -1) {
+                    goto help_23b_inline_redraw;
+                }
+
+                if (MOX::_colony[col_idx].outpost_flag != 0) {
+                    goto help_23b_inline_redraw;
+                }
+
+                if (MOX::_colony[col_idx].owner != MOX::_PLAYER_NUM) {
+                    goto help_23b_inline_redraw;
                 }
             }
 
             if (_selection_state_flag == 3) {
                 if (MOX::_planet[planet_idx].planet_type == 3 /* PLANET_TYPE_GAS_GIANT */) {
-                    char* help_text = ESTRINGS::E_Strings_(0x235);
-                    GENDRAW::Help_(help_text);
-                    goto reset_ui_and_fail;
+                    GENDRAW::Help_(ESTRINGS::E_Strings_(0x235));
+                    goto common_redraw_and_fail;
                 }
+
                 *selection_confirmed = 1;
                 return planet_idx;
             }
 
-            if (_selection_state_flag == 0) {
-                if (New_Colony_Confirmation_Box_(planet_idx)) {
-                    *selection_confirmed = 1;
-                    return planet_idx;
-                }
-            } else {
+            if (_selection_state_flag != 0) {
                 *selection_confirmed = 1;
                 return planet_idx;
             }
 
-        reset_ui_and_fail:
+            if (New_Colony_Confirmation_Box_(planet_idx) != 0) {
+                *selection_confirmed = 1;
+                return planet_idx;
+            }
+
+        common_redraw_and_fail:
+            Eric_Pop_Fields_();
+            Update_Selection_Fields_();
+            video::Copy_Back_To_Off_();
+            Draw_Selection_Popup_();
+            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+
+            goto function_fail;
+
+        help_236_inline_redraw:
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x236));
+            COLONY::_full_draw = 1;
+            Eric_Pop_Fields_();
+            Update_Selection_Fields_();
+            video::Copy_Back_To_Off_();
+            Draw_Selection_Popup_();
+            fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
+            goto common_redraw_and_fail;
+
+        help_23b_inline_redraw:
+            GENDRAW::Help_(ESTRINGS::E_Strings_(0x23b));
+            COLONY::_full_draw = 1;
             Eric_Pop_Fields_();
             Update_Selection_Fields_();
             video::Copy_Back_To_Off_();
@@ -2165,6 +2173,7 @@ namespace MAINPUPS {
             fields::Assign_Auto_Function_(Draw_Selection_Popup_, 1);
         }
 
+    function_fail:
         return -1;
     }
 
