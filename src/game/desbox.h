@@ -4,9 +4,9 @@ namespace DESBOX {
     inline uint16_t& _weapon_replacement_mods =
         *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00566428});
 
-    inline uint8_t& _incr_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A61E0});
+    inline int8_t& _incr_value = *reinterpret_cast<int8_t*>(std::uintptr_t{0x005A61E0});
 
-    inline uint16_t& _field_item_scanned = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005663F0});
+    inline int16_t& _field_item_scanned = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005663F0});
     inline int16_t& _field_item_chosen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056640C});
     inline int16_t& _replacement_box_middle_height =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x00566410});
@@ -99,7 +99,7 @@ namespace DESBOX {
 
     int32_t __cdecl New_Mod_Space_(uint8_t mod_bit_index);
 
-    int16_t __cdecl Valid_Modifications_(int8_t* mod_status_list);
+    int16_t __cdecl Valid_Modifications_(uint8_t* mod_status_list);
 
     void __cdecl Print_Shield_Data_(int16_t x, int16_t y);
 

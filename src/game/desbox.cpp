@@ -3,7 +3,9 @@
 namespace DESBOX {
 
     int16_t __cdecl Special_System_Choices_() {
-        memset(MOX::_design->item_unlocked, 0, 41);
+        memset(MOX::_design->item_unlocked, 0, 40);
+
+        const int16_t replacement_slot = MOX::_design_screen_replacement_slot;
 
         for (int i = 0; i < 40; ++i) {
             MOX::_design_choice_items[i] = -1;
@@ -44,14 +46,15 @@ namespace DESBOX {
                 int choice_special_idx = (int)MOX::_design_choice_items[i];
                 uint16_t tech_app_id = TECHDATA::_specials[choice_special_idx].tech_app_id;
                 
-                int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
+                int category = DESIGN::Miniaturization_Category_(tech_app_id);
                 int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 
                 uint16_t base_space = TECHDATA::_specials[choice_special_idx].space_per_ship_type[MOX::_design->ship_size];
                 int space_required = DESIGN::Space_Given_M_Level_(base_space, tech_level, category);
 
-                if (MOX::_design->special_devices[MOX::_design_screen_replacement_slot] > 0) {
-                    space_required -= MOX::_design->special_device_space[MOX::_design_screen_replacement_slot];
+                if (replacement_slot > -1 &&
+                    MOX::_design->special_devices[replacement_slot] > 0) {
+                    space_required -= MOX::_design->special_device_space[replacement_slot];
                 }
 
                 if ((MOX::_design->space_used + space_required <= MOX::_design->hull_space) &&
@@ -252,8 +255,8 @@ namespace DESBOX {
     void __cdecl Add_Replacement_Weapon_Fields_(int16_t* param_1, int16_t* param_2) {
         int16_t rack_quantities[5] = {2, 5, 10, 15, 20};
         int16_t mod_fields[15] = {0};
-        int16_t mod_ys[15] = {0};
         int16_t mod_xs[15] = {0};
+        int16_t mod_ys[15] = {0};
         char choice_str[80];
 
         int16_t mid_box_h = animate::Get_Height_(MOX::_weapons_mid_box_seg);
@@ -279,7 +282,7 @@ namespace DESBOX {
         if (visible_count > 0) {
             int16_t field_y = repl_y + 0x13;
             for (int16_t i = 0; i < visible_count; i++) {
-                int16_t weapon_idx = Weapon_Index_(MOX::_scroll_bar->first_visible_row + i);
+                (void)Weapon_Index_(MOX::_scroll_bar->first_visible_row + i);
                 MOX::_repl_fields[i] = fields::Add_Hidden_Field_(
                     _replacement_box_base_x + 0x1c,
                     field_y,
@@ -383,7 +386,8 @@ namespace DESBOX {
 
         if (_field_item_chosen > -1) {
             int16_t weapon_idx = Weapon_Index_(_field_item_chosen);
-            int16_t loop_y_offset = total_top_mid_h;
+            int16_t arc_y_offset = total_top_mid_h;
+            int16_t rack_y_offset = total_top_mid_h;
 
             for (int16_t i = 0; i < 5; i++) {
                 int16_t type = DESIGN::Weapon_Type_(weapon_idx);
@@ -392,7 +396,7 @@ namespace DESBOX {
                 if (needs_racks) {
                     DESIGN::Weapon_Space_(MOX::_PLAYER_NUM, weapon_idx, 1, _weapon_replacement_arcs, rack_quantities[i], _weapon_replacement_mods);
                     int16_t rx = _replacement_box_base_x + 0x77;
-                    int16_t ry = _replacement_box_base_y + loop_y_offset + 0x54;
+                    int16_t ry = _replacement_box_base_y + rack_y_offset + 0x54;
                     MOX::_weapon_rack_field[i] = fields::Add_Hidden_Field_(
                         rx,
                         ry,
@@ -405,7 +409,7 @@ namespace DESBOX {
                 } else {
                     if (_field_item_chosen > -1 && type == 0) {
                         int16_t rx = _replacement_box_base_x + 0x77;
-                        int16_t ry = _replacement_box_base_y + loop_y_offset + 0x54;
+                        int16_t ry = _replacement_box_base_y + arc_y_offset + 0x54;
                         New_Arc_Space_(i);
                         MOX::_weapon_arc_field[i] = fields::Add_Hidden_Field_(
                             rx,
@@ -419,7 +423,8 @@ namespace DESBOX {
                     }
                     _weapon_replacement_rack = 0;
                 }
-                loop_y_offset += 0x10;
+                arc_y_offset += 0x10;
+                rack_y_offset += 0x0f;
             }
         }
 
@@ -434,8 +439,8 @@ namespace DESBOX {
             0x29
         );
 
-        Valid_Modifications_(reinterpret_cast<int8_t*>(&_valid_mods));
-        Get_Weapon_Mod_Field_XYs_(mod_fields, mod_ys, mod_xs);
+        Valid_Modifications_(_valid_mods);
+        Get_Weapon_Mod_Field_XYs_(mod_fields, mod_xs, mod_ys);
 
         int16_t mods_base_y = _replacement_box_base_y + total_top_mid_h;
 
@@ -1156,7 +1161,7 @@ namespace DESBOX {
         return 0;
     }
 
-    int16_t __cdecl Valid_Modifications_(int8_t* mod_status_list) {
+    int16_t __cdecl Valid_Modifications_(uint8_t* mod_status_list) {
         int16_t valid_count = 0;
 
         memset(mod_status_list, 0, 15);
@@ -1805,30 +1810,33 @@ namespace DESBOX {
     }
 
     int16_t __cdecl Space_With_Weapon_(int16_t weapon_idx) {
-        int16_t extra_space = 0;
+        int16_t local_2;
         int16_t weapon_space;
-        int16_t result_extra;
 
         if (weapon_idx > 0) {
-            uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
-            int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
-            int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
-
             if (DESIGN::Weapon_Needs_Racks_(weapon_idx)) {
+                uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
+                int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
+                int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 weapon_space = (int16_t)DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[weapon_idx].size, tech_level, category);
 
+                tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
+                category = DESIGN::Miniaturization_Category_(tech_app_id);
+                tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 int16_t rack_base_size = DESIGN::Weapon_Rack_Size_(2);
-                result_extra = (int16_t)DESIGN::Space_Given_M_Level_(rack_base_size, tech_level, category);
+                local_2 = (int16_t)DESIGN::Space_Given_M_Level_(rack_base_size, tech_level, category);
             } else {
+                uint16_t tech_app_id = TECHDATA::_weapons[weapon_idx].tech_app_id;
+                int8_t category = DESIGN::Miniaturization_Category_(tech_app_id);
+                int16_t tech_level = DESIGN::Tech_Level_(MOX::_PLAYER_NUM, tech_app_id);
                 weapon_space = (int16_t)DESIGN::Space_Given_M_Level_(TECHDATA::_weapons[weapon_idx].size, tech_level, category);
-                result_extra = 0;
+                local_2 = 0;
             }
         } else {
-            weapon_space = extra_space;
-            result_extra = extra_space;
+            weapon_space = local_2;
         }
 
-        int16_t total_space = (int16_t)MOX::_design->space_used + result_extra + weapon_space;
+        int16_t total_space = (int16_t)MOX::_design->space_used + local_2 + weapon_space;
 
         if (MOX::_design_screen_replacement_slot > -1) {
             int slot = MOX::_design_screen_replacement_slot;
@@ -2051,18 +2059,20 @@ namespace DESBOX {
             weapon_type = DESIGN::Weapon_Type_(weapon_index);
         }
 
+        uint8_t shift = mod_idx & 0x1F;
+
         // Check if the specific weapon modification is allowed based on the weapon type.
         // Each weapon type (0, 1, 2) has a bitmask defining allowed modifications.
         if (weapon_type == 0) {
-            return (int8_t)((0x01FE >> mod_idx) & 1);
+            return (int8_t)((0x01FE >> shift) & 1);
         }
 
         if (weapon_type == 1) {
-            return (int8_t)((0x3E00 >> mod_idx) & 1);
+            return (int8_t)((0x3E00 >> shift) & 1);
         }
 
         if (weapon_type == 2) {
-            return (int8_t)((0x6520 >> mod_idx) & 1);
+            return (int8_t)((0x6520 >> shift) & 1);
         }
 
         return 0;
@@ -2383,10 +2393,10 @@ namespace DESBOX {
         DESBOX::_wait_ctr++;
         if (DESBOX::_wait_ctr >= 2) {
             DESBOX::_wait_ctr = 0;
-            MOX::_multi_colored_line_start += static_cast<int16_t>(static_cast<int8_t>(DESBOX::_incr_value));
+            MOX::_multi_colored_line_start += (int16_t)DESBOX::_incr_value;
 
             if (MOX::_multi_colored_line_start >= 3) {
-                DESBOX::_incr_value = static_cast<uint8_t>(-1);
+                DESBOX::_incr_value = -1;
                 MOX::_multi_colored_line_start = 3;
             } else if (MOX::_multi_colored_line_start <= -1) {
                 DESBOX::_incr_value = 1;
@@ -2491,7 +2501,7 @@ namespace DESBOX {
         _wait_ctr++;
         if (_wait_ctr >= 2) {
             _wait_ctr = 0;
-            MOX::_multi_colored_line_start += static_cast<int16_t>(_incr_value);
+            MOX::_multi_colored_line_start += (int16_t)_incr_value;
 
             if (MOX::_multi_colored_line_start >= 3) {
                 _incr_value = -1;
@@ -2617,17 +2627,9 @@ namespace DESBOX {
 
     int16_t __cdecl Items_Selected_() {
         int16_t selected_count = 0;
-        int16_t row_limit = MOX::_scroll_bar->total_rows;
-
-        if (row_limit > 10) {
-            row_limit = 10;
-        }
-
-        if (row_limit > 0) {
-            for (int16_t i = 0; i < row_limit; ++i) {
-                if (MOX::_design_choice_item_selected[i] != 0) {
-                    selected_count++;
-                }
+        for (int16_t i = 0; i < MOX::_scroll_bar->total_rows; ++i) {
+            if (MOX::_design_choice_item_selected[i] != 0) {
+                selected_count++;
             }
         }
 
@@ -2655,6 +2657,11 @@ namespace DESBOX {
                     strings::s__00551100,
                     41 /* 0x29 */
                 );
+
+                loop_limit = MOX::_scroll_bar->total_rows;
+                if (loop_limit > 10) {
+                    loop_limit = 10;
+                }
             }
         }
 
@@ -2806,8 +2813,7 @@ namespace DESBOX {
                         }
                         else {
                             int16_t excl;
-                            Special_System_Exclusion_(special_id, &excl);
-                            if (excl != 0) {
+                            if (Special_System_Exclusion_(special_id, &excl) != 0) {
                                 can_fit = false;
                             }
                         }
@@ -2845,7 +2851,7 @@ namespace DESBOX {
                         fonts::Print_Right_(param_1 + 0xe3, local_y, space_str);
                         fonts::Print_Right_(param_1 + 0x124, local_y, cost_str);
 
-                        fonts::Get_Colors_(&sStack_160);
+                        fonts::Get_Colors_(&local_158);
                         fonts::Set_Font_Style_(local_162, &sStack_160);
 
                         fonts::Set_Font_Spacing_(1);
@@ -2871,7 +2877,7 @@ namespace DESBOX {
         }
 
         if (MOX::_scroll_bar->total_rows > 10 &&
-            MOX::_scroll_bar->first_visible_row + 10 < MOX::_scroll_bar->total_rows) {
+            MOX::_scroll_bar->first_visible_row + 10 > MOX::_scroll_bar->total_rows) {
             animate::Draw_(_replacement_box_width + _replacement_box_base_x - 0x20,
                 _replacement_box_height + _replacement_box_base_y - 0x1e,
                 MOX::_dull_d_scroll_dn_button_seg);
@@ -2886,7 +2892,7 @@ namespace DESBOX {
             MOX::_multi_colored_line_start += static_cast<int8_t>(_incr_value);
 
             if (MOX::_multi_colored_line_start > 2) {
-                _incr_value = 0xff;
+                _incr_value = -1;
                 MOX::_multi_colored_line_start = 3;
             }
             else if (MOX::_multi_colored_line_start <= -1) {

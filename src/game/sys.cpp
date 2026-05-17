@@ -301,7 +301,7 @@ namespace SYS {
         return (int)p1->y - (int)p2->y;
     }
 
-    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode) {
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h) {
         MOX::_moveable_box_pict[0] = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, (void*)MOX::_global_cache_seg);
         animate::Draw_(content_w + base_x, content_h + base_y, MOX::_moveable_box_pict[0]);
     }
@@ -674,7 +674,7 @@ namespace SYS {
                 if (draw_border == '\0') {
                     return;
                 }
-                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
                 const char* pcVar5;
                 if (HAROLD::Contact_With_One_Colony_(star_idx) == '\0') {
                     pcVar5 = HAROLD::H_Message_(0x16b);
@@ -690,7 +690,7 @@ namespace SYS {
 
             Hide_System_Display_(base_x, base_y, content_w, content_h, x_offset, y_offset, '\x01');
             if (draw_border != '\0') {
-                Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 0);
+                Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
             }
 
             if (MOX::_current_screen == 0x1d) {
@@ -711,7 +711,7 @@ namespace SYS {
         }
 
         if (draw_border != '\0') {
-            Draw_System_Display_Border_(base_x, base_y, content_w, content_h, x_offset, y_offset, 1);
+            Draw_System_Display_Border_(base_x, base_y, content_w, content_h);
         }
 
         MOX::_system_star_id_for_auto_select = star_idx;
@@ -1095,9 +1095,6 @@ namespace SYS {
         return visible_count;
     }
 
-    /**
-     * @address 004953a0
-     */
     void __cdecl Do_Print_System_Ship_Data_(
         int16_t base_x,
         int16_t base_y,
@@ -1178,13 +1175,13 @@ namespace SYS {
             s_player* const player = &MOX::_player[owner];
             const uint8_t palette_color =
                 MOX::_main_palette_player_colors[static_cast<uint8_t>(player->color)];
-            const int8_t line_step =
-                static_cast<int8_t>(static_cast<uint8_t>(fonts::Get_Font_Height_()) + 1);
             int16_t visible_detail_lines;
 
             font_colors = *MISC::Font_Colors2_(1, palette_color, static_cast<int32_t>(palette_color) + 5);
             fonts::Set_Font_Style_(2, &font_colors);
             fonts::Set_Font_Spacing_(1);
+            const int8_t line_step =
+                static_cast<int8_t>(static_cast<uint8_t>(fonts::Get_Font_Height_()) + 1);
 
             SYS::N_Ships_By_Type_At_Location_(
                 ship->x,
@@ -1906,10 +1903,10 @@ namespace SYS {
         MOX::_system_display_grid_field = fields::Add_Grid_Field_(
             static_cast<int16_t>(base_x + popup_offset_x + 0x0D),
             static_cast<int16_t>(base_y + popup_offset_y + 0x2F),
+            1,
+            1,
             0x140,
             0xB7,
-            1,
-            1,
             &MOX::_system_display_grid_x[0],
             &MOX::_system_display_grid_y[0],
             0);
@@ -2125,33 +2122,33 @@ namespace SYS {
     }
 
     void __cdecl Get_System_Display_Ship_Icon_XY_(
-        int16_t display_index,
-        int16_t owner_idx,
-        s_system_display_ships* display_ship,
+        int32_t unused,
+        int16_t display_slot,
+        int16_t* x,
         int16_t* y,
         int16_t* layout_state
     ) {
-        (void)display_index;
+        (void)unused;
 
         MOX::_moveable_box_pict[0] =
             (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, 0x49, MOX::_global_cache_seg);
         (void)animate::Get_Width_(MOX::_moveable_box_pict[0]);
         (void)animate::Get_Height_(MOX::_moveable_box_pict[0]);
 
-        s_animation_header*& display_ship_pic = display_ship->pic;
+        s_animation_header** display_ship_pic = &MOX::_system_display_ships[display_slot].pic;
 
         if (MOX::_current_screen == 0x1d) {
-            display_ship_pic = SYS::Buffer_Reload_System_Ships_(owner_idx);
-            display_ship->x = static_cast<int16_t>(*layout_state + 5);
-            *y = static_cast<int16_t>(0xb1 - animate::Get_Height_(display_ship_pic));
-            *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(display_ship_pic) + 3);
+            *display_ship_pic = SYS::Buffer_Reload_System_Ships_(display_slot);
+            *x = static_cast<int16_t>(*layout_state + 5);
+            *y = static_cast<int16_t>(0xb1 - animate::Get_Height_(*display_ship_pic));
+            *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(*display_ship_pic) + 3);
             return;
         }
 
-        display_ship_pic = SYS::Buffer_Reload_System_Ships_(owner_idx);
-        display_ship->x = static_cast<int16_t>(*layout_state + 0x12);
-        *y = static_cast<int16_t>(((0x19 - animate::Get_Height_(display_ship_pic)) / 2) + 0xec);
-        *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(display_ship_pic) + 3);
+        *display_ship_pic = SYS::Buffer_Reload_System_Ships_(display_slot);
+        *x = static_cast<int16_t>(*layout_state + 0x12);
+        *y = static_cast<int16_t>(((0x19 - animate::Get_Height_(*display_ship_pic)) / 2) + 0xec);
+        *layout_state = static_cast<int16_t>(*layout_state + animate::Get_Width_(*display_ship_pic) + 3);
     }
 
     void __cdecl Build_System_Popup_Ships_(int16_t system_idx) {
@@ -2181,7 +2178,7 @@ namespace SYS {
                     SYS::Get_System_Display_Ship_Icon_XY_(
                         display_index,
                         owner_idx,
-                        &MOX::_system_display_ships[owner_idx],
+                        &MOX::_system_display_ships[owner_idx].x,
                         &MOX::_system_display_ships[owner_idx].y,
                         &layout_state);
                 }

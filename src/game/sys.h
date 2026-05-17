@@ -59,7 +59,7 @@ namespace SYS {
 
     void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
 
-    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
+    void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h);
 
     void __cdecl Draw_System_Special_Popup_(int16_t x, int16_t y, int16_t special_idx, int16_t anim_idx);
 
@@ -132,9 +132,9 @@ namespace SYS {
     void __cdecl Build_System_Popup_Ships_(int16_t star_idx);
 
     void __cdecl Get_System_Display_Ship_Icon_XY_(
-            int16_t display_index,
-            int16_t owner_idx,
-            s_system_display_ships* display_ship,
+            int32_t unused,
+            int16_t display_slot,
+            int16_t* x,
             int16_t* y,
             int16_t* layout_state);
 

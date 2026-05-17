@@ -4889,7 +4889,7 @@ struct s_tech_computer_data {
     uint16_t computer_id;
     uint16_t tech_app_id;
     uint16_t cost_by_ship_type[6];
-    uint16_t bonus;
+    int16_t bonus;
 };
 
 typedef struct s_tech_data_personal_shield s_tech_data_personal_shield, *Ps_tech_data_personal_shield;
