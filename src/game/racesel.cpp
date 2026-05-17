@@ -209,7 +209,8 @@ short Race_Selection_Screen_(s_player* plr) {
         
         for (int i = 0; i < 13; ++i) {
             if (input_field == field_ids[i] && _race_flag[i] == 0) {
-                bool can_request = (MOX::_game_type == 0 || MOX::_game_type == 1) ? true : NETSTART::Request_Race_(i);
+                uint8_t can_request =
+                    (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_((uint8_t)i);
                 
                 if (!can_request) {
                     KEN::Ken_Get_Text_Message_(72 /* 0x48 */, msg_buffer, 100);
@@ -219,14 +220,13 @@ short Race_Selection_Screen_(s_player* plr) {
                     animate::Draw_(0, 0, anim);
                     video::Copy_Back_To_Off_();
                 } else {
-                    struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
-                    plr->race = i;
-                    strcpy(plr->race_name, MOX::_race_names[i]);
-                    
                     if (_custom_flag == 0) {
                         timer::Mark_Time_();
                         timer::Release_Time_(5);
                         fields::Clear_Fields_();
+                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        plr->race = (uint8_t)i;
+                        strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Help_List_();
                         
                         int screen_state;
@@ -258,6 +258,8 @@ short Race_Selection_Screen_(s_player* plr) {
                         } else {
                             if (MOX::_game_type != 0 && MOX::_game_type != 1) {
                                 Unrequest_Race_(i);
+                            } else {
+                                _race_flag[i] = 0;
                             }
                             RACESEL::Set_Race_Select_Help_();
                             video::Set_Page_Back_();
@@ -277,13 +279,20 @@ short Race_Selection_Screen_(s_player* plr) {
                             fields::Assign_Auto_Function_(Draw_Race_Selection_Screen_, 2);
                         }
                     } else {
+                        struct_::Copy_Structure_(plr->traits, _race_specials[i], 31);
+                        plr->race = (uint8_t)i;
+                        strcpy(plr->race_name, MOX::_race_names[i]);
                         fields::Deactivate_Auto_Function_();
                         fields::Clear_Fields_();
                         if (Racial_Option_Screen_(plr) == 1) {
                             done_flag = 1;
                             _race_flag[i] = 1;
                         } else {
-                            if (MOX::_game_type != 0 && MOX::_game_type != 1) Unrequest_Race_(i);
+                            if (MOX::_game_type != 0 && MOX::_game_type != 1) {
+                                Unrequest_Race_(i);
+                            } else {
+                                _race_flag[i] = 0;
+                            }
                             allocate::Pop_Block_(MOX::_screen_seg);
                             Reload_Race_Selection_Screen_();
                             video::Set_Page_Back_();
@@ -334,7 +343,8 @@ short Race_Selection_Screen_(s_player* plr) {
                 struct_::Copy_Structure_(plr->traits, _race_specials[13], 31);
                 fread(&loaded_race, 1, 1, f);
                 plr->race = loaded_race;
-                bool can_request = (MOX::_game_type == 0 || MOX::_game_type == 1) ? true : NETSTART::Request_Race_(loaded_race);
+                uint8_t can_request =
+                    (MOX::_game_type == 0 || MOX::_game_type == 1) ? 1 : NETSTART::Request_Race_(13);
                 
                 if (!can_request) {
                     fclose(f);
@@ -354,7 +364,11 @@ short Race_Selection_Screen_(s_player* plr) {
                         done_flag = 1;
                         _race_flag[loaded_race] = 1;
                     } else {
-                        if (MOX::_game_type != 0 && MOX::_game_type != 1) Unrequest_Race_(loaded_race);
+                        if (MOX::_game_type != 0 && MOX::_game_type != 1) {
+                            Unrequest_Race_(loaded_race);
+                        } else {
+                            _race_flag[loaded_race] = 0;
+                        }
                         allocate::Pop_Block_(MOX::_screen_seg);
                         Reload_Race_Selection_Screen_();
                         video::Set_Page_Back_();
@@ -737,14 +751,14 @@ int8_t __cdecl Naming_Popup_(char* output_name, int16_t race_idx) {
     const int16_t center_y = namestar::Star_Name_Popup_Screen_Center_Y_();
     const int16_t center_x = namestar::Star_Name_Popup_Screen_Center_X_();
 
-    const int8_t popup_result = (int8_t)(namestar::Input_Box_Popup_Animated_(
+    const int8_t popup_result = namestar::Input_Box_Popup_Animated_(
         RACESEL::_temp_ruler_name,
-        0x66,
         0x14,
+        0x66,
         popup_text,
-        center_y,
-        center_x
-    ) & 0xFF);
+        center_x,
+        center_y
+    );
 
     strcpy(
         output_name,

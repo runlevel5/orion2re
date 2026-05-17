@@ -1326,22 +1326,23 @@ namespace NETMOX {
         RUSS::Mox_Update_();
     }
 
-    void __cdecl Net_Request_Human_Diplomacy_(int16_t target_player_id, int16_t dummy) {
-        _net.diplomacy_target_id = static_cast<int8_t>(target_player_id);
+    void __cdecl Net_Request_Human_Diplomacy_(uint8_t target_player_id) {
+        _net.diplomacy_target_id = (int8_t)target_player_id;
 
-        if ((_net.players_active_mask & (1 << target_player_id)) != 0) {
+        if (((_net.players_active_mask >> (target_player_id & 0x1F)) & 1) != 0) {
             _net.sync_state = 0x2E; /* '.' */
             _net.diplomacy_active_flag = 1;
-            _net.diplomacy_initiator_id = static_cast<int8_t>(target_player_id);
+            _net.diplomacy_initiator_id = (int8_t)target_player_id;
 
-            _net.players_active_mask &= static_cast<uint8_t>(~(1 << target_player_id));
-            _net.players_ready_mask[0] &= static_cast<uint8_t>(~(1 << target_player_id));
+            uint8_t mask = (uint8_t)~(1 << (target_player_id & 0x1F));
+            _net.players_active_mask &= mask;
+            _net.players_ready_mask[0] &= mask;
             _net.is_diplomacy_initiator = 0;
 
             Mox_Send_Message_(
                 MOX::_player[target_player_id].network_player_id,
                 0x1C,
-                &MOX::_player[MOX::_PLAYER_NUM],
+                MOX::_player + MOX::_PLAYER_NUM,
                 0xEA9 /* sizeof(s_player) */
             );
         } else {
@@ -1351,7 +1352,7 @@ namespace NETMOX {
             if (Human_Hit_Next_Turn_(target_player_id) == 0) {
                 s_net_pack_req_human_diplomacy packet;
 
-                packet.player = MOX::_player[MOX::_PLAYER_NUM];
+                memcpy(&packet.player, MOX::_player + MOX::_PLAYER_NUM, sizeof(s_player));
 
                 for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                     packet.surrender_to[i] = MOX::_star[i].surrender_to[MOX::_PLAYER_NUM];

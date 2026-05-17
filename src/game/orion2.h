@@ -3251,7 +3251,7 @@ struct s_player {
     char production_history[350];
     uint8_t spies[8];
     char history_btns;
-    char ignoring;
+    uint8_t ignoring;
     char peace_flags[8];
     int8_t cheated;
     ushort stardate_last_offered_hero;

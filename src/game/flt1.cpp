@@ -564,7 +564,7 @@ namespace FLT1 {
                 _relocate_button_mode = 0;
                 mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
             } else if (input == (int16_t)0xFBAF) {
-                HACCESS::Player_Can_Order_Ship_(MOX::_PLAYER_NUM);
+                HACCESS::Clear_All_Star_Relocations_(MOX::_PLAYER_NUM);
                 char msg_buf_76[200];
                 strcpy(msg_buf_76, HAROLD::H_Message_(0x76));
                 HAROLD::User_Box_(&MOX::_draw_fleet_screen_to_back, msg_buf_76, 0);

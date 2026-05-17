@@ -135,7 +135,7 @@ namespace NETMOX {
 
     void __cdecl Net_End_AI_Diplomacy_();
 
-    void __cdecl Net_Request_Human_Diplomacy_(int16_t player_idx, int16_t dummy);
+    void __cdecl Net_Request_Human_Diplomacy_(uint8_t player_idx);
 
     int8_t __cdecl Net_May_Begin_Human_Diplomacy_();
 

@@ -2875,7 +2875,7 @@ namespace MAINPUPS {
                     MAINPUPS::Draw_Defense_Selection_Popup_();
                     fields::Assign_Auto_Function_(MAINPUPS::Draw_Defense_Selection_Popup_, 1);
                 } else {
-                    if (MAINPUPS::Player_Has_Colony_Or_Outpost_At_Star_(owner, static_cast<int16_t>(COLONY::_sys_disp_star_handle)) != 0) {
+                    if (MAINPUPS::Player_Has_Colony_Or_Outpost_At_Star_(owner, COLONY::_sys_disp_star_handle) != 0) {
                         GENDRAW::Help_(ESTRINGS::E_Strings_(0x24E));
                         COLONY::_full_draw = 1;
                         MAINPUPS::Eric_Pop_Fields_();

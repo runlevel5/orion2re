@@ -28,7 +28,7 @@ namespace HACCESS {
 
     int16_t __cdecl Design_Weapon_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx);
 
-    int16_t __cdecl Design_Weapon_Count_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx);
+    int8_t __cdecl Design_Weapon_Count_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx);
 
     int16_t __cdecl Design_Weapon_Specials_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx);
 
@@ -48,14 +48,16 @@ namespace HACCESS {
 
     void __cdecl Set_All_Star_Relocations_(int16_t target_star_idx, int16_t player_idx);
 
+    void __cdecl Clear_All_Star_Relocations_(int16_t player_idx);
+
     int16_t __cdecl Fleet_Movement_Ship_Id_(int16_t icon_idx);
 
     int16_t __cdecl Ship_Stack_From_Ship_Id_(int16_t ship_id);
     int16_t __cdecl Ship_Stack_Star_Id_(int16_t node_idx);
 
-    uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_();
+    int8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_();
 
-    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int max, int filter);
+    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* out, int16_t max, int16_t filter);
 
     void __cdecl Clear_Fleet_Box_Selected_Ship_Status_();
 

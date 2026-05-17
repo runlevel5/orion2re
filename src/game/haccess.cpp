@@ -297,6 +297,17 @@ namespace HACCESS {
         }
     }
 
+    /**
+     * @address 0049A3C0
+     */
+    void __cdecl Clear_All_Star_Relocations_(int16_t player_idx) {
+        for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (Star_Has_Relocation_(star_idx, player_idx)) {
+                Clear_Star_Relocation_(star_idx, player_idx);
+            }
+        }
+    }
+
     char* __cdecl Design_Name_(int16_t player_idx, int16_t design) {
         // Redundant operation from original code
         *(uint16_t*)MOX::_temp_string = *reinterpret_cast<const uint16_t*>(s__005510f0);
@@ -310,7 +321,7 @@ namespace HACCESS {
         return MOX::_player[player_idx].ship_designs[design_idx].ship_weapon[weapon_idx].type;
     }
 
-    int16_t __cdecl Design_Weapon_Count_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx) {
+    int8_t __cdecl Design_Weapon_Count_(int16_t player_idx, int16_t design_idx, int16_t weapon_idx) {
         return MOX::_player[player_idx].ship_designs[design_idx].ship_weapon[weapon_idx].count;
     }
 
@@ -470,7 +481,7 @@ namespace HACCESS {
         return n_colonies;
     }
 
-    uint8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_() {
+    int8_t __cdecl Get_Stack_Start_From_Saved_Ship_Array_() {
         MOX::_fleet_box_ship_stack = -1;
         int16_t stack_idx = 0;
         bool found = false;
@@ -479,15 +490,14 @@ namespace HACCESS {
         while (!finished) {
             int16_t node_idx = MOX::_ship_stack_start[stack_idx];
 
-            while (node_idx != -1) {
+            do {
                 // Check if ship from this stack is in the saved ship collection
                 if (struct_::Test_Bit_Field_(&MOX::_fleet_box_ship_ids, MOX::_ship_node[node_idx].ship_idx)) {
                     MOX::_fleet_box_ship_stack = stack_idx;
                     found = true;
-                    break;
                 }
                 node_idx = MOX::_ship_node[node_idx].next_node;
-            }
+            } while (node_idx != -1 && !found);
 
             if (found) {
                 break;
@@ -555,7 +565,7 @@ namespace HACCESS {
 
     int16_t __cdecl Nearest_Star_To_XY_(int16_t* coords) {
         int16_t best_star_idx = -1;
-        uint16_t min_turns = 255; /* 0xff */
+        uint8_t min_turns = 0xff;
         s_ship_move_info move_info;
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
@@ -568,8 +578,8 @@ namespace HACCESS {
                     // If ships can actually move to this star
                     if (move_info.moving != 0) {
                         // Update best candidate if this star is closer in terms of turns
-                        if (static_cast<uint8_t>(move_info.turns_left) < min_turns) {
-                            min_turns = static_cast<uint16_t>(static_cast<uint8_t>(move_info.turns_left));
+                        if (move_info.turns_left < min_turns) {
+                            min_turns = move_info.turns_left;
                             best_star_idx = i;
                         }
                     }
@@ -580,7 +590,7 @@ namespace HACCESS {
         return best_star_idx;
     }
 
-    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int max, int filter) {
+    int16_t __cdecl Get_Fleet_Box_Selected_Ship_Ids_(int16_t* selected_ids_out, int16_t max, int16_t filter) {
         // Initialize output buffer with 0xFFFF (-1)
         memset(selected_ids_out, 0xff, max * sizeof(int16_t));
 
@@ -598,20 +608,18 @@ namespace HACCESS {
 
             bool is_match = false;
             // Verify ownership and optional ship type filter
-            if (ship.owner == (char)MOX::_PLAYER_NUM) {
-                if (filter == 0x00FF || (int8_t)ship.d.ship_type == (int8_t)filter) {
+            if ((int16_t)(int8_t)ship.owner == MOX::_PLAYER_NUM) {
+                if (filter == 0x00FF || (int16_t)(int8_t)ship.d.ship_type == filter) {
                     is_match = true;
                 }
             }
 
             // If node is selected and criteria matches, record the index
             if (MOX::_ship_node[i].selected != 0 && is_match) {
-                // BUG: Potential overflow if selected_count reached max capacity and original logic used hardcoded 500
                 selected_ids_out[selected_count] = ship_idx;
                 selected_count++;
 
-                // Stop recording if count exceeds limit (safety check)
-                if (selected_count >= max) {
+                if (selected_count > 500) {
                     stop_flag = true;
                 }
             }

@@ -654,7 +654,6 @@ namespace RACESCRN {
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x39, _research_treaty_buffer, 30);
         RUSS::Mox_Update_();
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3A, _trade_treaty_buffer, 30);
-        RUSS::Mox_Update_();
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3B, _giving_treaty_buffer, 80);
         RUSS::Mox_Update_();
         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 0x3C, _receiving_treaty_buffer, 80);
@@ -674,10 +673,10 @@ namespace RACESCRN {
 
             s_racescrn_race_display race_display_data[7];
             s_racescrn_mouse_group agent_group;
-            char message_buffer[80];
+            char message_buffer[120];
             s_racescrn_mouse_group mouse_group;
 
-            MOX::_cur_plyr_ptr = &MOX::_player[MOX::_PLAYER_NUM];
+            MOX::_cur_plyr_ptr = MOX::_player + MOX::_PLAYER_NUM;
             _g_display_p = race_display_data;
             _g_mouse_group_p = &mouse_group;
             _g_agent_group_p = &agent_group;
@@ -759,7 +758,7 @@ namespace RACESCRN {
             int16_t btn_report;
             int16_t btn_ignoring;
             int16_t btn_war;
-            int16_t cancel_field = 0;
+            int16_t who_cancel_field = 0;
 
             int16_t state_diplomacy = 0;
             int16_t state_report = 0;
@@ -771,7 +770,7 @@ namespace RACESCRN {
 
             Setup_Race_Display_Fields_(race_display_data, display_base);
 
-            int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+            who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
 
             fields::Assign_Auto_Function_(Draw_Race_Screen_, 2);
             RUSS::Mox_Update_();
@@ -787,7 +786,8 @@ namespace RACESCRN {
             _g_in_who_mode = 0;
 
             int16_t active_action_field = 0;
-            int8_t net_flags = 0;
+            uint8_t net_cancel_requested = 0;
+            uint8_t human_rejected = 0;
 
             while (true) {
                 int16_t input = fields::Get_Input_();
@@ -834,7 +834,7 @@ namespace RACESCRN {
 
                 if (input > display_base) {
                     if (_g_in_who_mode) {
-                        if (input == cancel_field) {
+                        if (input == who_cancel_field) {
                             break;
                         }
 
@@ -843,7 +843,7 @@ namespace RACESCRN {
                         int16_t target_player_idx = race_display_data[race_display_idx].player_idx;
 
                         if (active_action_field == btn_ignoring) {
-                            MOX::_cur_plyr_ptr->ignoring ^= (1 << target_player_idx);
+                            MOX::_cur_plyr_ptr->ignoring ^= (uint8_t)(1 << (target_player_idx & 0x1F));
                             break;
                         } else if (active_action_field == btn_report) {
                             JIM::Bill_Picture_To_Mouse_(_g_mouse_seg);
@@ -859,46 +859,46 @@ namespace RACESCRN {
                             }
                             strcpy(message_buffer, _declare_war_buffer);
                             JIM::Decode_Text_Race_(message_buffer, target_player_idx, 120);
-                            if (GENDRAW::Confirmation_Box_(message_buffer) == 1) {
+                            if (GENDRAW::Do_Confirmation_Box_(message_buffer) == 1) {
                                 MOX::_player[MOX::_PLAYER_NUM].delayed_diplomacy_orders[target_player_idx] = 0;
                             }
                             break;
                         } else if (active_action_field == btn_diplomacy) {
                             Update_Spy_Stuff_(race_display_data);
-                            MOX::_cur_plyr_ptr->ignoring &= ~(1 << target_player_idx);
+                            MOX::_cur_plyr_ptr->ignoring &= (uint8_t)~(1 << (target_player_idx & 0x1F));
                             
                             if (MOX::_game_type != 2 && MOX::_game_type != 3) {
                                 DIP_SCRN::Diplomacy_Screen_(target_player_idx);
                                 break;
                             }
 
-                            if (MOX::_player[target_player_idx].objectives == 100) {
+                            if (MOX::_player[target_player_idx].objectives != 100) {
                                 _net_state = 1;
-                                net_flags = 0;
+                                net_cancel_requested = 0;
                                 NETMOX::Net_Request_AI_Diplomacy_(target_player_idx);
                                 if (NETMOX::Net_May_Begin_AI_Diplomacy_() == 0) {
-                                    if (net_flags == 0) {
+                                    if (net_cancel_requested == 0) {
                                         if (NETMOX::No_AI_Diplomacy_Allowed_() == 0) {
                                             while (true) {
                                                 timer::Mark_Time_();
                                                 fields::Clear_Fields_();
                                                 fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
                                                 if (fields::Get_Input_() != 0) {
-                                                    net_flags = 1;
+                                                    net_cancel_requested = 1;
                                                 }
                                                 Draw_Race_Screen_();
                                                 RUSS::Mox_Sync_Update_();
                                                 RUSS::Mox_Update_();
                                                 timer::Release_Time_(2);
                                                 if (NETMOX::Net_May_Begin_AI_Diplomacy_() != 0) break;
-                                                if (net_flags != 0) break;
+                                                if (net_cancel_requested != 0) break;
                                                 if (NETMOX::No_AI_Diplomacy_Allowed_() != 0) break;
                                             }
                                         }
                                     }
                                 }
                                 _net_state = 0;
-                                if (net_flags == 0) {
+                                if (net_cancel_requested == 0) {
                                     if (NETMOX::No_AI_Diplomacy_Allowed_() != 0) {
                                         JIM::Get_Text_Message_(s_billtex2_lbx_00556038, 27, message_buffer, 80);
                                         GENDRAW::Message_Box_(message_buffer);
@@ -914,12 +914,12 @@ namespace RACESCRN {
                                 }
                                 break;
                             } else {
-                                cancel_field = 0;
-                                net_flags = 0;
+                                human_rejected = 0;
+                                net_cancel_requested = 0;
                                 _net_state = 1;
-                                NETMOX::Net_Request_Human_Diplomacy_(target_player_idx, 2);
+                                NETMOX::Net_Request_Human_Diplomacy_((uint8_t)target_player_idx);
                                 if (NETMOX::Net_May_Begin_Human_Diplomacy_() == 0) {
-                                    if (net_flags == 0) {
+                                    if (net_cancel_requested == 0) {
                                         if (NETMOX::Human_Hit_Next_Turn_(target_player_idx) == 0) {
                                             while (true) {
                                                 timer::Mark_Time_();
@@ -927,22 +927,22 @@ namespace RACESCRN {
                                                 fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
                                                 if (fields::Get_Input_() != 0) {
                                                     if (NETMOX::Allowed_To_Cancel_Human_Diplomacy_() != 0) {
-                                                        net_flags = 1;
+                                                        net_cancel_requested = 1;
                                                     }
                                                 }
                                                 if (NETMOX::Human_Diplomat_Says_Wait_() != 0) {
                                                     _net_state = 2;
                                                 }
                                                 if (NETMOX::Net_Human_Rejected_Diplomacy_() != 0) {
-                                                    cancel_field = 1;
+                                                    human_rejected = 1;
                                                 }
                                                 Draw_Race_Screen_();
                                                 RUSS::Mox_Sync_Update_();
                                                 RUSS::Mox_Update_();
                                                 timer::Release_Time_(2);
-                                                if (cancel_field != 0) break;
+                                                if (human_rejected != 0) break;
                                                 if (NETMOX::Net_May_Begin_Human_Diplomacy_() != 0) break;
-                                                if (net_flags != 0) break;
+                                                if (net_cancel_requested != 0) break;
                                                 if (NETMOX::Human_Hit_Next_Turn_(target_player_idx) != 0) break;
                                             }
                                         }
@@ -954,7 +954,7 @@ namespace RACESCRN {
                                     GENDRAW::Message_Box_(message_buffer);
                                     NETMOX::Net_End_Human_Diplomacy_();
                                 } else {
-                                    if (cancel_field != 0) {
+                                    if (human_rejected != 0) {
                                         JIM::Get_Text_Message_(s_billtext_lbx_0055135c, 56, message_buffer, 80);
                                         GENDRAW::Message_Box_(message_buffer);
                                         NETMOX::Net_End_Human_Diplomacy_();
@@ -976,14 +976,13 @@ namespace RACESCRN {
                         state_ignoring = 0;
                         state_war = 0;
 
-                        s_racescrn_mouse_group* spy_group = Get_Spy_Group_For_Field_(input, &selected_race_idx);
+                        int16_t hover_race_idx = 0;
+                        s_racescrn_mouse_group* spy_group = Get_Spy_Group_For_Field_(input, &hover_race_idx);
                         
                         if (_g_in_spy_mode) {
                             if (spy_group == nullptr) {
                                 spy_group = active_spy_group;
-                            }
-                            if (spy_group != active_spy_group) {
-                                if (active_spy_group == &agent_group) {
+                                if (active_spy_group != &agent_group) {
                                     race_display_data[selected_race_idx].agent_mission_idx = old_mission_idx;
                                 }
                             }
@@ -994,6 +993,7 @@ namespace RACESCRN {
                             }
                         } else {
                             if (spy_group != nullptr && spy_group->count > 0) {
+                                selected_race_idx = hover_race_idx;
                                 Move_Spies_Group_(spy_group, _arrow_seg);
                                 _g_in_spy_mode = 1;
                                 old_mission_idx = race_display_data[selected_race_idx].agent_mission_idx;
@@ -1020,7 +1020,7 @@ namespace RACESCRN {
                         state_ignoring = 0;
                         state_war = 0;
                         Setup_Race_Display_Fields_(race_display_data, display_base);
-                        hidden_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
                         _g_in_who_mode = 0;
                     } else {
                         if (input == btn_ignoring) {
@@ -1041,7 +1041,7 @@ namespace RACESCRN {
                         video::Copy_Off_To_Back_();
 
                         Setup_Race_Who_Fields_(race_display_data, display_base);
-                        hidden_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
+                        who_cancel_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s__005510f0, 0);
                         COLONY::Picture_To_Mouse_(mouse_pic);
                         _g_in_who_mode = 1;
                     }
