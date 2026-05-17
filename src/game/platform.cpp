@@ -1219,7 +1219,7 @@ namespace platform {
         Create_Direct_Draw(4);
 
         bool has_lost_focus = false;
-        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(MOX2::main2_, 0xFFFF, nullptr));
+        g_worker_thread_handle = reinterpret_cast<HANDLE>(begin_thread(MOX2::thunk_main2_, 0xFFFF, nullptr));
 
         do {
             if (!GetMessageA(&g_main_msg, nullptr, 0, 0)) {

@@ -3566,7 +3566,7 @@ namespace COLCALC {
 
                                 const uint8_t last_pop_index =
                                     static_cast<uint8_t>(static_cast<uint8_t>(colony->n_pops) - 1);
-                                colony->n_pops = static_cast<int8_t>(last_pop_index);
+                                colony->n_pops = last_pop_index;
                                 *selected_pop = colony->pop[last_pop_index];
                                 removed_existing_pop = true;
                             }
@@ -3587,7 +3587,7 @@ namespace COLCALC {
                                 new_pop &= 0xFFFFFE7Fu;
                             }
 
-                            colony->n_pops = static_cast<int8_t>(static_cast<uint8_t>(colony->n_pops) + 1);
+                            colony->n_pops = static_cast<uint8_t>(colony->n_pops + 1);
                         } else {
                             s_MSG pop_failed_msg{};
                             pop_failed_msg.msg_type = MSG_TYPE_COLONY;

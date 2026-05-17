@@ -1400,7 +1400,7 @@ struct s_drop_area {
 typedef struct s_event_data s_event_data, *Ps_event_data;
 
 struct s_event_data {
-    uint8_t player_idx;
+    int8_t player_idx;
     int8_t status;
     int8_t turn_count;
     short target_id;
@@ -3077,10 +3077,10 @@ struct s_ship_weapons {
 
 struct s_ship_design {
     char name[16];
-    char size;
+    int8_t size;
     byte ship_type;
     char shield_type;
-    char ftl_type;
+    int8_t ftl_type;
     char speed;
     char computer_type;
     char armor_type;
@@ -3089,7 +3089,7 @@ struct s_ship_design {
     sbyte picture_num;
     char previous_owner;
     short cost;
-    char combat_speed;
+    byte combat_speed;
     ushort date_of_design;
 };
 
@@ -3600,7 +3600,7 @@ struct s_planet_data {
     char group;
     char climate;
     char climate_bg_type;
-    char mineral_class;
+    int8_t mineral_class;
     int8_t food_per_farmer;
     char n_terraforms;
     uint8_t max_farms;
@@ -4016,11 +4016,11 @@ struct s_settings {
     int8_t language;
     byte xenons_exist;
     int8_t game_difficulty;
-    byte number_of_players;
-    byte galaxy_size;
-    byte galaxy_age;
+    int8_t number_of_players;
+    int8_t galaxy_size;
+    int8_t galaxy_age;
     byte strategic_combat_flag;
-    byte starting_civilization_level;
+    int8_t starting_civilization_level;
     uint32_t start_of_game_seed;
     short sound_driver_id;
     short music_driver_id;
@@ -4946,7 +4946,7 @@ struct s_tech_hull_data {
     uint16_t cost;
     int16_t size;
     uint16_t marines;
-    uint16_t armor_hp;
+    int16_t armor_hp;
     uint16_t structure_hp;
     uint16_t computer_hp;
     uint16_t drive_hp;
@@ -5042,7 +5042,7 @@ struct s_tech_weapon_mod_data {
     char *name;
     char *name_plural;
     uint8_t mod_id;
-    uint8_t level;
+    int8_t level;
     int16_t cost;
     int16_t space;
     uint8_t col5;

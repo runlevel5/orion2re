@@ -6,7 +6,7 @@ namespace AIBUILD {
         *reinterpret_cast<int8_t (*)[12]>(std::uintptr_t{0x0054F054});
     inline int8_t (&_difficulty_intel_bias)[8] =
         *reinterpret_cast<int8_t (*)[8]>(std::uintptr_t{0x0054F060});
-    inline int8_t* _player_ship_size_table = reinterpret_cast<int8_t*>(std::uintptr_t{0x0054F068});
+    inline uint8_t* _player_ship_size_table = reinterpret_cast<uint8_t*>(std::uintptr_t{0x0054F068});
     inline int (&_player_ship_sizes)[8][14] = *reinterpret_cast<int (*)[8][14]>(std::uintptr_t{0x00566088});
     inline int (&_player_total_strength_vs_colonies)[8] = *reinterpret_cast<int (*)[8]>(std::uintptr_t{0x00566248});
     inline int8_t (&_player_n_transports)[8][2] = *reinterpret_cast<int8_t (*)[8][2]>(std::uintptr_t{0x00566268});

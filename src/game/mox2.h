@@ -1,7 +1,11 @@
 #pragma once
 
 namespace MOX2 {
-    void __cdecl Set_Game_Seed();
+    void __cdecl Set_Game_Random_Seed_();
+
+    inline void __cdecl Set_Game_Seed() {
+        Set_Game_Random_Seed_();
+    }
 
     void __cdecl Init_Map_Defaults_();
     void __cdecl Init_Map_Pictures_Default__();
@@ -48,7 +52,8 @@ namespace MOX2 {
     inline const char* s_backslash_00557be4 = reinterpret_cast<const char*>(0x00557BE4);
     inline const char* s_orioncd_ini_00557bec = reinterpret_cast<const char*>(0x00557BEC);
 
-    void main2_(void *);
+    void __cdecl main2_();
+    void __cdecl thunk_main2_(void*);
 }
 
 inline void FUN_004d7d80() {

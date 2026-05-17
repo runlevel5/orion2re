@@ -1236,7 +1236,7 @@ namespace COLONY {
     }
 
     bool __cdecl Colony_Has_Natives_(int16_t colony_idx) {
-        int8_t n_pops = MOX::_colony[colony_idx].n_pops;
+        uint8_t n_pops = MOX::_colony[colony_idx].n_pops;
 
         if (n_pops != 0) {
             for (int16_t i = 0; i < (int16_t)n_pops; i++) {

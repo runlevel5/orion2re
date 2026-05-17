@@ -11,15 +11,15 @@
 
 namespace BOMB {
 
-    int16_t __cdecl Handle_Leader_At_Lost_Colony_(s_colony* colony) {
-        int owner_idx = (int)colony->owner;
-        int star_idx = (int)MOX::_planet[colony->planet].star_index;
-        int16_t killed_leader_idx = -1;
-        int16_t leader_idx = (int16_t)MOX::_star[star_idx].officer_index[owner_idx];
+    int __cdecl Handle_Leader_At_Lost_Colony_(s_colony* colony) {
+        int owner_idx = colony->owner;
+        int star_idx = MOX::_planet[colony->planet].star_index;
+        int killed_leader_idx = -1;
+        int leader_idx = MOX::_star[star_idx].officer_index[owner_idx];
 
         if (leader_idx != -1) {
             bool other_colony_found = false;
-            int16_t current_colony_idx = (int16_t)(colony - MOX::_colony);
+            int current_colony_idx = ((int)((char*)colony - (char*)MOX::_colony)) / 0x169;
 
             for (int i = 0; i < 5; ++i) {
                 int16_t p_idx = MOX::_star[star_idx].planet_index[i];
@@ -27,7 +27,6 @@ namespace BOMB {
                     int16_t c_idx = MOX::_planet[p_idx].colony_index;
                     if (c_idx != -1 && MOX::_colony[c_idx].owner == owner_idx && c_idx != current_colony_idx) {
                         other_colony_found = true;
-                        break;
                     }
                 }
             }

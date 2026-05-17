@@ -829,6 +829,7 @@ namespace aidudes {
                                 if (prod > -4) {
                                     if (prod == -2) {
                                         recalculate_colony = true;
+                                        delete_from_queue = true;
                                     }
                                 } else {
                                     delete_from_queue = true;
@@ -881,30 +882,43 @@ namespace aidudes {
         s_ship_design ship_design;
         ship_design.cost = 0;
 
-        for (int i = 0; i < colony_queue_count; ++i) {
+        for (int i = 0; i < colony_queue_count;) {
             s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
             RUSS::Mox_Update_();
+            bool changed = false;
 
             if ((war_level != 0 && (*AIDATA::_enroute_human_ships)[MOX::_planet[temp_colony->planet].star_index][9] != 0) ||
                 AIBUILD::Colony_Is_Conquered_(temp_colony)) {
 
                 if (COLCALC::Colony_Can_Build_Product_(temp_colony, 26)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 26);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 27)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 27);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 40)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 40);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 8)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 8);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 41)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 41);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 28)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 28);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 24)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 24);
+                    changed = true;
                 } else if (COLCALC::Colony_Can_Build_Product_(temp_colony, 23)) {
                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, 23);
+                    changed = true;
                 }
+            }
+
+            if (!changed) {
+                ++i;
             }
         }
 
@@ -918,15 +932,16 @@ namespace aidudes {
                 if (p->tech_applications[41] == 3 && !no_range_or_speed) {
                     int val = (*AIDATA::_contextual_planet_values)[player_idx * 360 + best_planet];
                     if (war_level > 0) {
-                        val >>= 2;
+                        val /= 4;
                     }
 
-                    int deficit = (*AIDATA::_ai_player_info)[player_idx].colony_deficit * 10;
-                    if (val / 2 < deficit) {
-                        val += val / 2;
-                    } else {
-                        val += deficit;
+                    int deficit = (*AIDATA::_ai_player_info)[player_idx].colony_deficit;
+                    int bonus = deficit * 10;
+                    int half_adjusted = (val - deficit * 5) / 2;
+                    if (half_adjusted < bonus) {
+                        bonus = half_adjusted;
                     }
+                    val += bonus;
 
                     int rand_val = random::Random_(700);
                     int adjusted_rand = rand_val + 100 + (is_objective_2 ? 0 : 100);
@@ -960,12 +975,10 @@ namespace aidudes {
         RUSS::Mox_Update_();
         if (want_colony_base && p->tech_applications[41] == 3) {
             int r = 0;
-            if (is_objective_2 == 0) {
+            if (is_objective_2 != 0) {
                 if (random::Random_(5) == 1) {
                     r = 1;
                 }
-            } else {
-                r = 1;
             }
 
             if (AIBUILD::_player_n_colony_ships[player_idx][0] <= r) {
@@ -974,7 +987,7 @@ namespace aidudes {
                     i--;
                     s_colony* temp_colony = &MOX::_colony[colony_queue[i]];
                     if (!COLCALC::Colony_Is_Blockaded(temp_colony) && AIBUILD::Industry_Worth(temp_colony) >= 20) {
-                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 > random::Random_(100)) {
+                        if ((*AIDATA::_ai_player_info)[player_idx].colony_deficit + 50 < random::Random_(100)) {
                             INITSHIP::Load_Colony_Ship_Design_(player_idx, &p->ship_designs[5]);
                             int16_t ship_idx = COLBLDG::Create_Ship_(player_idx, 5, (int16_t)colony_queue[i]);
                             if (ship_idx == -1) {
@@ -1002,8 +1015,9 @@ namespace aidudes {
                 p->surplus_bc < 0 &&
                 temp_colony->maintenance[1] < temp_colony->production[1]) {
 
+                int current_colony_idx = colony_queue[i];
                 AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -37);
-                COLCALC::Colony_Calculation_(colony_queue[i]);
+                COLCALC::Colony_Calculation_((int16_t)current_colony_idx);
                 continue;
             }
 
@@ -1034,22 +1048,17 @@ namespace aidudes {
                     if (war_level > 0) {
                         local_48 /= (war_level * war_level);
                     }
-                } else if (AIBUILD::_player_n_spies[player_idx][1] != 0) {
+                }
+
+                if (AIBUILD::_player_n_spies[player_idx][1] != 0) {
                     local_50 = (AIBUILD::_player_n_spies[player_idx][1] * 4 + 40) * 25;
                     if (war_level > 0) {
                         local_50 /= (war_level * war_level);
                     }
-                } else if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
-                           p->tech_applications[52] == 3 &&
-                           !no_range_or_speed) {
-                    local_54 = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
-                    if (war_level > 0) {
-                        local_54 /= 2;
-                    }
                 }
-            } else {
+
                 if (AIBUILD::_player_n_transports[player_idx][1] != 0 &&
-                    p->tech_applications[52] == 3 &&
+                    p->tech_applications[189] == 3 &&
                     !no_range_or_speed) {
                     local_54 = (AIBUILD::_player_n_transports[player_idx][1] * 4 + 20) * 25;
                     if (war_level > 0) {
@@ -1089,7 +1098,7 @@ namespace aidudes {
 
                         int ind_worth = AIBUILD::Industry_Worth(temp_colony);
                         if (p->surplus_bc > 5 && p->bc > 50) {
-                            ind_worth += special::isqrt_(p->bc) + special::isqrt_(p->surplus_bc);
+                            ind_worth += special::isqrt_(special::isqrt_(p->bc)) + special::isqrt_(p->surplus_bc);
                         }
 
                         uint16_t ship_weights[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1099,6 +1108,7 @@ namespace aidudes {
                             int cost_threshold_1 = (war_level * 2 + 33) * ind_worth;
                             if (p->ship_designs[1].cost <= cost_threshold_1) {
                                 ship_weights[1] = 16;
+                                ship_weights[0] = 1;
 
                                 if (temp_colony->buildings[41] == 0) {
                                     if (p->tech_applications[169] == 3 &&
@@ -1148,6 +1158,7 @@ namespace aidudes {
                                 ship_weights[1] /= 5;
                                 if (size_9 >= 3 && p->ship_designs[3].cost <= (war_level * 2 + 55) * ind_worth) {
                                     ship_weights[3] = 64;
+                                    ship_weights[2] = 5;
                                     if (p->tech_applications[186] == 3 && size_9 >= 4 && p->ship_designs[4].cost <= (war_level * 2 + 48) * ind_worth) {
                                         ship_weights[4] = 100;
                                     }
@@ -1270,7 +1281,7 @@ namespace aidudes {
                                     AIBUILD::Force_Produce_(colony_queue, (int16_t)i, (int32_t*)&colony_queue_count, -100 - ship_idx);
 
                                     p_refit->n_entries--;
-                                    memcpy(&p_refit->entry[j], &p_refit->entry[j + 1], (p_refit->n_entries - j) * sizeof(s_ai_refit_entry));
+                                    memmove(&p_refit->entry[j], &p_refit->entry[j + 1], (p_refit->n_entries - j) * sizeof(s_ai_refit_entry));
                                     refitted = true;
                                     break;
                                 }

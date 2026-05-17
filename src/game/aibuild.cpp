@@ -131,7 +131,7 @@ namespace AIBUILD {
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
 
-            if ((ship->status < 5 || ship->status == 6) && (uint8_t)ship->owner < 8) {
+            if ((ship->status < 5 || ship->status == 6) && ship->owner < 8) {
                 int8_t owner = (int8_t)ship->owner;
 
                 if (ship->d.ship_type == SHIP_TYPE_COMBAT) {
@@ -139,7 +139,7 @@ namespace AIBUILD {
                     _player_total_strength_vs_ships[owner][0] += strength;
 
                     if (ship->status != 6) {
-                        _player_total_strength_vs_ships[owner][1] += strength;
+                        _player_total_strength_vs_ships[owner][1] += (int)Mean_Ship_Strength_(ship);
                     }
 
                     _player_ship_sizes[owner][(int)ship->d.size]++;
@@ -540,7 +540,7 @@ namespace AIBUILD {
 
         int bc_score = 0;
         if (player->bc >= 1500) {
-            bc_score = (int)special::isqrt_((uint32_t)((player->surplus_bc + (player->surplus_bc < 0 ? 63 : 0)) >> 6));
+            bc_score = (int)special::isqrt_((int16_t)((player->surplus_bc + ((player->surplus_bc >> 31) & 0x3f)) >> 6));
         }
         if (bc_score > 10) bc_score = 10;
 
@@ -552,7 +552,7 @@ namespace AIBUILD {
         int trait_score = (uint8_t)ai_colony->trait_tolerant + (uint8_t)ai_colony->trait_environment_immune;
         
         bool is_industrial_focus = false;
-        if (colony->auto_building == 0 && player->tech_applications[22 /* TECH_APP_AUTOMATED_FACTORIES */] == 3 && planet->mineral_class <= 2) {
+        if (colony->buildings[7 /* BUILDING_AUTOMATED_FACTORY */] == 0 && player->tech_applications[22 /* TECH_APP_AUTOMATED_FACTORIES */] == 3 && planet->mineral_class <= 2) {
             is_industrial_focus = true;
         }
 
@@ -602,7 +602,7 @@ namespace AIBUILD {
             if (trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = obj_5 + (int)special::isqrt_((uint32_t)colony->pollution);
                 }
             }
             break;
@@ -623,7 +623,7 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+            if (base_threat != 0) score = base_threat + obj_1 + bc_score;
         } break;
 
         case 9:
@@ -634,7 +634,7 @@ namespace AIBUILD {
 
         case 10:
             if (!building_focus) {
-                if (player->traits[5 /* TRAIT_POP_GROWTH_BONUS */] < 0) score = obj_5;
+                if (player->traits[1 /* TRAIT_POP_GROWTH_BONUS */] < 0) score = obj_5;
                 bc_score /= 2;
                 score += bc_score;
             }
@@ -648,7 +648,7 @@ namespace AIBUILD {
             if (!building_focus && trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = obj_5 + (int)special::isqrt_((uint32_t)colony->pollution);
                 }
             }
             break;
@@ -660,7 +660,7 @@ namespace AIBUILD {
         case 16:
             if (ai_colony->trait_eats_minerals != 0) {
                 score = (player->surplus_food < 0) ? 8 : 4;
-                score += obj_5 + bc_score;
+                score += obj_5;
             }
             break;
 
@@ -713,9 +713,9 @@ namespace AIBUILD {
 
         case 25: {
             int grav = planet->gravity_class;
-            if (player->traits[10 /* TRAIT_HEAVY_G_WORLD */] != 0) {
+            if (player->traits[11 /* TRAIT_HEAVY_G_WORLD */] != 0) {
                 if (grav == 0) score = obj_5 + 3;
-            } else if (player->traits[9 /* TRAIT_LOW_G_WORLD */] != 0) {
+            } else if (player->traits[10 /* TRAIT_LOW_G_WORLD */] != 0) {
                 if (grav == 1) score = obj_5 + 3;
                 else if (grav == 2) score = obj_5 + 6;
             } else {
@@ -728,7 +728,7 @@ namespace AIBUILD {
         case 27: {
             if (building_focus && ai_colony->threatened == 0) break;
             int base_threat = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
-            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+            if (base_threat != 0) score = base_threat + obj_1 + bc_score;
         } break;
 
         case 28: {
@@ -761,7 +761,7 @@ namespace AIBUILD {
             if (trait_score != 0 && colony->pollution > 5) {
                 score = obj_5;
                 if (colony->pollution >= 11) {
-                    score = (int)special::isqrt_((uint32_t)colony->pollution) + bc_score;
+                    score = obj_5 + (int)special::isqrt_((uint32_t)colony->pollution);
                 }
             }
             break;
@@ -793,7 +793,7 @@ namespace AIBUILD {
 
         case 38:
             if (!building_focus && (colony->production[1] > 16 || colony->n_pops > 4 || bc_score != 0)) {
-                score = (int)special::isqrt_((uint32_t)((int)colony->production[1] - 15));
+                score = (int)special::isqrt_((int)colony->production[1] - 15);
             }
             break;
 
@@ -813,13 +813,13 @@ namespace AIBUILD {
             if (player->command_points <= player->command_points_used) {
                 base_threat += (player->command_points_used - player->command_points) + 1;
             }
-            if (base_threat != 0) score = base_threat + obj_5 + bc_score;
+            if (base_threat != 0) score = base_threat + obj_1 + bc_score;
         } break;
 
         case 42: {
             if (building_focus && ai_colony->threatened == 0) break;
             int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
+            if (threatened_score != 0) score = threatened_score + obj_1 + bc_score;
         } break;
 
         case 43:
@@ -830,7 +830,7 @@ namespace AIBUILD {
                 else if (colony->food2_per_farmer == 2) base_val = 10;
 
                 if (player->surplus_food < 0) base_val -= (int)player->surplus_food;
-                score = base_val + obj_5 * 3 + bc_score;
+                score = base_val + obj_5 * 3;
             }
             break;
 
@@ -838,7 +838,7 @@ namespace AIBUILD {
             if (!building_focus) {
                 int base_climate_score = 0;
                 bool valid_climate = true;
-                bool is_aquatic = (player->traits[11 /* TRAIT_AQUATIC */] != 0);
+                bool is_aquatic = (player->traits[12 /* TRAIT_AQUATIC */] != 0);
                 switch (planet->climate) {
                 case 2: base_climate_score = 2; break;
                 case 3: base_climate_score = 1; break;
@@ -872,7 +872,7 @@ namespace AIBUILD {
         case 47: {
             if (building_focus && ai_colony->threatened == 0) break;
             int threatened_score = ai_colony->threatened * 10 + (ps_star_player->out_of_range_count + (ps_star_player->neutral_count + ps_star_player->alliance_count * 2) * 2 + ps_star_player->enemy_count) * 4;
-            if (threatened_score != 0) score = threatened_score + obj_5 + bc_score;
+            if (threatened_score != 0) score = threatened_score + obj_1 + bc_score;
         } break;
         }
 
@@ -978,11 +978,11 @@ namespace AIBUILD {
         int32_t items_to_move = *list_count - index;
 
         // Shift the list left to remove the entry at the specified index
-        memcpy(&id_list[index], &id_list[index + 1], items_to_move);
+        memmove(&id_list[index], &id_list[index + 1], items_to_move);
     }
 
     int16_t __cdecl Industry_Worth(s_colony* colony) {
-        return (int16_t)(((uint16_t)colony->n_pops >> 3) - (uint16_t)colony->maintenance[1] + colony->production[1]);
+        return (int16_t)(((uint8_t)colony->n_pops >> 3) - (uint8_t)colony->maintenance[1] + colony->production[1]);
     }
 
     /**

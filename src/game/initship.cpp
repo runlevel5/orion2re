@@ -97,7 +97,7 @@ namespace INITSHIP {
         Update_Equipment_On_Ships_Being_Built_(player_idx);
 
         for (int16_t i = 0; i < 5; ++i) {
-            Auto_Strategic_Design_Ship_(player_idx, i, &MOX::_player[player_idx].ship_designs[i]);
+            aidesign::Auto_Design_Ship_(player_idx, &MOX::_player[player_idx].ship_designs[i], i);
         }
     }
 
@@ -156,8 +156,18 @@ namespace INITSHIP {
     }
 
     int16_t __cdecl Calc_Player_FTL_Speed_(int16_t player_idx) {
-        int16_t drive_idx = Best_Warp_Drive_(player_idx);
-        return Get_FTL_Speed_(player_idx, drive_idx);
+        int16_t speed = 1;
+
+        if (player_idx < 8) {
+            int16_t drive_idx = Best_Warp_Drive_(player_idx);
+            speed = TECHDATA::_drives[drive_idx].warp_speed;
+
+            if (MOX::_player[player_idx].traits[TRAIT_TRANS_DIMENSIONAL] != 0) {
+                speed += 2;
+            }
+        }
+
+        return speed;
     }
 
     int16_t __cdecl Get_FTL_Speed_(int16_t player_idx, int16_t drive_idx) {
@@ -530,12 +540,12 @@ namespace INITSHIP {
         design->picture_num = 3;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Large_Antaran_Design_(s_ship_design* design) {
         struct_::Clear_Structure_(design, 99);
-        strcpy(reinterpret_cast<char*>(design), global::s_Intruder_005576a0);
+        memcpy(design->name, global::s_Intruder_005576a0, 9);
 
         // Indices into the s_ship_design structure based on disassembly offsets
         design->ship_type = 0;
@@ -596,7 +606,7 @@ namespace INITSHIP {
         design->picture_num = 2;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Titan_Antaran_Design_(s_ship_design* design) {
@@ -622,13 +632,14 @@ namespace INITSHIP {
         design->ship_weapon[1].count = 5;
         design->ship_weapon[1].current_count = 5;
         design->ship_weapon[1].firing_arc = 1;
-        design->ship_weapon[1].ammo = 2;
+        design->ship_weapon[1].specials = 2;
+        design->ship_weapon[1].ammo = 0;
 
         design->ship_weapon[2].type = 24;
         design->ship_weapon[2].count = 30;
         design->ship_weapon[2].current_count = 30;
         design->ship_weapon[2].firing_arc = 1;
-        design->ship_weapon[2].ammo = 0;
+        design->ship_weapon[2].ammo = 10;
 
         design->ship_weapon[3].type = 13;
         design->ship_weapon[3].count = 3;
@@ -640,13 +651,15 @@ namespace INITSHIP {
         design->ship_weapon[4].count = 20;
         design->ship_weapon[4].current_count = 20;
         design->ship_weapon[4].firing_arc = 1;
-        design->ship_weapon[4].ammo = 4;
+        design->ship_weapon[4].specials = 4;
+        design->ship_weapon[4].ammo = 0;
 
         design->ship_weapon[5].type = 11;
         design->ship_weapon[5].count = 5;
         design->ship_weapon[5].current_count = 5;
         design->ship_weapon[5].firing_arc = 1;
-        design->ship_weapon[5].ammo = 2;
+        design->ship_weapon[5].specials = 2;
+        design->ship_weapon[5].ammo = 0;
 
         design->ship_weapon[6].type = 37;
         design->ship_weapon[6].count = 1;
@@ -682,7 +695,7 @@ namespace INITSHIP {
         design->picture_num = 4;
         design->previous_owner = 8;
         design->cost = 500;
-        design->combat_speed = global::_drives[design->ftl_type].combat_speed_min[design->size];
+        design->combat_speed = TECHDATA::_drives[design->ftl_type].combat_speed_min[design->size];
     }
 
     void __cdecl Load_Antaran_Ship_Design_(s_ship_design* design, int16_t hull_size) {
@@ -807,13 +820,12 @@ namespace INITSHIP {
     int16_t __cdecl Get_Ship_Armor_Hits_(int16_t ship_idx) {
         s_ship_data* ship = &MOX::_ship[ship_idx];
 
-        int16_t armor_absorption_pct = TECHDATA::_armor[(uint8_t)ship->d.armor_type].ships_bonus;
-        int16_t hull_absorption = TECHDATA::_hull_data[(uint8_t)ship->d.size].armor_hp;
+        int16_t armor_absorption_pct = TECHDATA::_armor[(int16_t)ship->d.armor_type].ships_bonus;
+        int16_t base_armor_hp = TECHDATA::_hull_data[(int16_t)ship->d.size].armor_hp;
 
-        bool has_special_armor = struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
+        int16_t has_special_armor = (int16_t)struct_::Test_Bit_Field_(ship->d.special_device_flags, 14);
 
-        int32_t calc = ((int32_t)armor_absorption_pct * (int32_t)hull_absorption) / 100;
-        int16_t total_hits = (int16_t)calc + hull_absorption;
+        int16_t total_hits = (int16_t)(((int32_t)armor_absorption_pct * base_armor_hp) / 100) + base_armor_hp;
 
         if (has_special_armor) {
             total_hits *= 3;
@@ -1054,13 +1066,14 @@ namespace INITSHIP {
 
     int16_t __cdecl Get_Design_Structure_(s_ship_design d) {
         int16_t has_special = (int16_t)struct_::Test_Bit_Field_(d.special_device_flags, 27 /* 0x1b */);
+        int16_t hull_idx = (int16_t)d.size;
+        int16_t absorption = TECHDATA::_armor[(int16_t)d.armor_type].ships_bonus;
 
         if (MOX::_settings.strategic_combat_flag != 0) {
-            return TECHDATA::_hull_data[(int16_t)d.size].strat_hits;
+            return TECHDATA::_hull_data[hull_idx].strat_hits;
         }
 
-        int16_t base_structure = TECHDATA::_hull_data[(int16_t)d.size].structure_hp;
-        int16_t absorption = TECHDATA::_armor[(uint8_t)d.armor_type].ships_bonus;
+        int16_t base_structure = TECHDATA::_hull_data[hull_idx].structure_hp;
 
         // Calculate structure bonus from armor
         int32_t total_structure = base_structure + (absorption * base_structure) / 100;
@@ -1592,13 +1605,13 @@ void __cdecl Load_Medium_Antaran_Combat_Ship_(int16_t ship_idx) {
 
 void __cdecl Get_Design_Combat_Bonuses_(s_ship_design design, int16_t* attack_bonus_out, int16_t* defense_rating_out, int16_t* missile_defense_out) {
     int16_t missile_defense = 0;
-    int16_t attack_bonus = TECHDATA::_computers[(uint8_t)design.computer_type].bonus;
+    int16_t attack_bonus = TECHDATA::_computers[design.computer_type].bonus;
 
     if (struct_::Test_Bit_Field_(design.special_device_flags, 5)) {
         attack_bonus += 50 /* 0x32 */;
     }
 
-    int16_t current_speed = static_cast<uint8_t>(design.combat_speed);
+    int16_t current_speed = design.combat_speed;
     if (struct_::Test_Bit_Field_(design.special_device_flags, 2)) {
         current_speed += 5;
     }
@@ -2103,7 +2116,7 @@ void __cdecl Load_Crystal_Ship_Design_(s_ship_design *design, int16_t variant) {
     struct_::Clear_Structure_(design, 99 /* sizeof(s_ship_design) */);
     
     // Copy "Crystal" or specific race name from the race names array
-    sprintf(design->name, "%s", MOX::_race_names[16]);
+    strcpy(design->name, MOX::_race_names[16]);
 
     design->ship_type = 0;
     design->computer_type = 5;

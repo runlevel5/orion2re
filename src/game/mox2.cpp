@@ -1,12 +1,14 @@
 #include "pch.h"
 
+namespace ALLOC = allocate;
+
 namespace MOX2 {
     void __cdecl Init_Map_Pictures_Default__() {
         MAPGEN::Load_Nebula_Pictures_();
         Init_Map_Defaults_();
     }
 
-    void __cdecl Set_Game_Seed() {
+    void __cdecl Set_Game_Random_Seed_() {
         capture::Check_Release_Version_();
 
         if (MOX::_cmd_line_seed != 0) {
@@ -221,9 +223,9 @@ namespace MOX2 {
         MOX::_settings_language = 0;
     }
 
-    void main2_(void *) {
+    void __cdecl main2_() {
         char font_file[16];
-        char loading_buffer[64];
+        char loading_buffer[66];
         char mox_set_dir[32];
 
         MOX::_previous_screen = SCREEN_UNKNOWN;
@@ -269,7 +271,7 @@ namespace MOX2 {
         MOX::_game_type = 0;
 
         HAROLD::Set_Sound_Volume_To_Settings_();
-        allocate::Allocate_Data_Space_();
+        ALLOC::Allocate_Data_Space_();
         MOX2::_pan_main_menu_panel = 1;
 
         if (MOX2::_skip_intro == 0) {
@@ -281,7 +283,7 @@ namespace MOX2 {
 
         JIM::Play_Background_Music_();
         RUSS::Mox_Update_();
-        MOX2::Set_Game_Seed();
+        MOX2::Set_Game_Random_Seed_();
         MOX::_refresh_mode = 0;
         video::Set_Refresh_Full_();
         MOX::_mox_font_colors_offset = 0x75;
@@ -301,9 +303,7 @@ namespace MOX2 {
         default: loading_src = MOX2::s_Loading_English; copy_len = 44; break;   // 0xb * 4
         }
 
-        for (int i = 0; i < copy_len; ++i) {
-            loading_buffer[i] = loading_src[i];
-        }
+        memcpy(loading_buffer, loading_src, copy_len);
 
         fonts::Print_(5, 10, loading_buffer);
         RUSS::Mox_Sync_Update_();
@@ -342,18 +342,20 @@ namespace MOX2 {
         const char* thanks_src = nullptr;
         int thanks_len = 0;
         switch (MOX::_settings.language) {
-        case 1: thanks_src = MOX2::s_Thanks_German; thanks_len = 48; break; // 0xc * 4
+        case 1: thanks_src = MOX2::s_Thanks_German; thanks_len = 49; break; // 0xc * 4 + 1
         case 2: thanks_src = MOX2::s_Thanks_French; thanks_len = 36; break; // 0x9 * 4
-        case 3: thanks_src = MOX2::s_Thanks_Spanish; thanks_len = 40; break; // 0xa * 4
+        case 3: thanks_src = MOX2::s_Thanks_Spanish; thanks_len = 41; break; // 0xa * 4 + 1
         case 4: thanks_src = MOX2::s_Thanks_Italian; thanks_len = 44 + 3; break; // 0xb * 4 + 3
         default: thanks_src = MOX2::s_Thanks_English; thanks_len = 36 + 2; break; // 0x9 * 4 + 2
         }
 
-        for (int i = 0; i < thanks_len; ++i) {
-            MOX2::_leave_game_message[i] = thanks_src[i];
-        }
+        memcpy(MOX2::_leave_game_message, thanks_src, thanks_len);
 
         exitm::Exit_With_Message(MOX2::_leave_game_message);
+    }
+
+    void __cdecl thunk_main2_(void*) {
+        main2_();
     }
 
     void __cdecl Get_Auto_Function_(MOX2::action_func_t* param_1) {

@@ -871,7 +871,7 @@ namespace AIDATA {
      */
     void __cdecl Compute_Contextual_Planet_Values_() {
         // Clear all contextual values for all players (8 players * 360 planets)
-        memset(*AIDATA::_contextual_planet_values, 0, 8 * 360 * sizeof(int16_t));
+        memset(*AIDATA::_contextual_planet_values, 0, 8 * 360 * sizeof(uint16_t));
 
         if (MOX::_NUM_PLAYERS <= 0) {
             return;
@@ -879,7 +879,7 @@ namespace AIDATA {
 
         for (int p = 0; p < (int)MOX::_NUM_PLAYERS; ++p) {
             for (int i = 0; i < (int)MOX::_planet_count; ++i) {
-                int16_t base_val = (*AIDATA::_base_planet_values)[p][i];
+                uint16_t base_val = (*AIDATA::_base_planet_values)[p][i];
                 if (base_val <= 0) {
                     continue;
                 }
@@ -890,7 +890,7 @@ namespace AIDATA {
                 // Refresh UI/input during processing
                 RUSS::Mox_Update_();
 
-                int16_t& contextual_val = (*AIDATA::_contextual_planet_values)[p * 360 + i];
+                uint16_t& contextual_val = (*AIDATA::_contextual_planet_values)[p * 360 + i];
                 contextual_val = base_val;
 
                 int uncolonized_system_base_sum = 0;

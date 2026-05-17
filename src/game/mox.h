@@ -227,7 +227,7 @@ namespace MOX {
     inline s_animation_header* (&_moveable_box_pict)[25] = *reinterpret_cast<s_animation_header* (*)[25]>(std::uintptr_t{0x005A1B60});
     inline uint8_t& _game_type = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x005974DD });
     inline s_antaran& _antarans = *reinterpret_cast<s_antaran*>(std::uintptr_t{0x0059BA20});
-    inline uint8_t& _maps_to_generate = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0059791C });
+    inline int8_t& _maps_to_generate = *reinterpret_cast<int8_t*>(std::uintptr_t{ 0x0059791C });
     inline uint8_t& _auto_turn_exit = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059B320});
     inline uint16_t& _special_scroll_up_button = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0059775E});
     inline uint8_t& _blue_color2 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0059775D});

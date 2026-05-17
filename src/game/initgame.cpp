@@ -8,17 +8,14 @@ namespace INITGAME {
      * location, and officer values for each.
      */
     void Init_Ships_Array_() {
-        // Zero out the entire ship array.
-        // Array size: 500 ships * 129 bytes (sizeof(s_ship_data)) = 64,500 bytes.
-        // The assembly clears 16,125 DWORDS (64,500 bytes).
-        uint32_t* raw_ship_data = reinterpret_cast<uint32_t*>(MOX::_ship);
-        for (int i = 0; i < 16125; ++i) {
-            raw_ship_data[i] = 0;
-        }
+        // Clear 500 packed 0x81-byte ship slots.
+        memset(MOX::_ship, 0, 500 * sizeof(s_ship_data));
 
-        // Initialize default values for all 500 ship slots
+        // After the clear, initialize:
+        //   status        @ +0x64 = 5
+        //   location      @ +0x65 = -1
+        //   officer_index @ +0x74 = -1
         for (MOX::_NUM_SHIPS = 0; MOX::_NUM_SHIPS < 500; ++MOX::_NUM_SHIPS) {
-            // Note: s_ship_data structure size is 129 bytes.
             s_ship_data& ship = MOX::_ship[MOX::_NUM_SHIPS];
             ship.status = 5;
             ship.location = -1;
@@ -147,8 +144,8 @@ namespace INITGAME {
     void __cdecl Init_New_Game_(int16_t game_difficulty, int16_t galaxy_size, int16_t galaxy_age, int16_t num_players,
                                 int16_t strategic_combat_flag, int16_t starting_civ_level) {
         bool extra_maps_generated = false;
-        int map_index = 0;
-        uint16_t generation_success;
+        int16_t map_index = 0;
+        int16_t generation_success;
 
         MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
         MOX2::Set_Game_Seed();
@@ -176,11 +173,11 @@ namespace INITGAME {
         RUSS::Mox_Update_();
         MSG_::Allocate_Msg_Slots_();
 
-        do {
-            MOX2::Set_Game_Seed();
-            MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
+        MOX2::Set_Game_Seed();
+        MOX::_settings.start_of_game_seed = random::Get_Random_Seed_();
 
-            MAPGEN::Universe_Generation_((uint8_t)galaxy_size, (uint8_t)galaxy_age, (uint8_t)game_difficulty);
+        do {
+            MAPGEN::Universe_Generation_((uint8_t)galaxy_size, (uint8_t)galaxy_age, (int8_t)game_difficulty);
             RUSS::Mox_Update_();
 
             generation_success = HOMEGEN::Generate_Home_Worlds_();
@@ -200,7 +197,7 @@ namespace INITGAME {
                 }
             }
 
-            if (map_index < (int)MOX::_maps_to_generate) {
+            if (map_index < MOX::_maps_to_generate) {
                 extra_maps_generated = true;
                 MOX::_star_fields_dim[0] = 33;
                 MOX::_star_fields_dim[1] = 29;
@@ -215,8 +212,9 @@ namespace INITGAME {
                 MAINSCR::Draw_Mini_Main_Screen_();
                 RUSS::Mox_Sync_Update_();
 
-                RUSS::PFMT_(0, 0x17, RUSS::s_Map_d, map_index);
+                const int16_t map_no = map_index;
                 map_index++;
+                RUSS::PFMT_(0, 0x17, RUSS::s_Map_d, map_no);
 
                 RUSS::PFMT_(0, 0x18, RUSS::s_Seed_ld, MOX::_settings.start_of_game_seed);
                 capture::Screen_Flic_Capture_();
@@ -292,24 +290,24 @@ namespace INITGAME {
     }
 
     void __cdecl Init_Players_(void) {
-      RACESEL::_race_specials[0] = static_cast<uint8_t*>(farload::Far_Reload_Data_(
+      RACESEL::_race_specials[0] = (uint8_t*)farload::Far_Reload_Data_(
           s_RACESTUF_LBX,
           7,
-          reinterpret_cast<void*>(static_cast<std::uintptr_t>(reinterpret_cast<std::uintptr_t>(MOX::_global_data_seg))),
+          MOX::_global_data_seg,
           0,
           1,
-          31));
+          31);
       RUSS::Mox_Update_();
 
       for (int16_t race_special_idx = 1; race_special_idx < 13; ++race_special_idx) {
         RACESEL::_race_specials[race_special_idx] =
-            static_cast<uint8_t*>(farload::Far_Reload_Next_Data_(
+            (uint8_t*)farload::Far_Reload_Next_Data_(
                 s_RACESTUF_LBX,
                 7,
-                reinterpret_cast<void*>(static_cast<std::uintptr_t>(reinterpret_cast<std::uintptr_t>(MOX::_global_data_seg))),
+                MOX::_global_data_seg,
                 race_special_idx,
                 1,
-                31));
+                31);
         RUSS::Mox_Update_();
       }
 
@@ -358,31 +356,23 @@ namespace INITGAME {
         RUSS::Mox_Update_();
 
         for (int16_t trait_idx = 1; trait_idx < 10; ++trait_idx) {
-          const int8_t trait_value = player.traits[trait_idx];
-          if (trait_value != 0) {
-            player.traits[trait_idx] =
-                static_cast<int8_t>(MOX::_special_bonus[trait_idx - 1][trait_value]);
-          } else {
-            player.traits[trait_idx] = 0;
-          }
+          uint8_t v = (uint8_t)player.traits[trait_idx];
+          player.traits[trait_idx] =
+              v ? MOX::_special_bonus_at_00559037[trait_idx * 3 + v] : 0;
 
-          const int8_t evo_trait_value = player.evolutionary_upgrade_traits[trait_idx];
-          if (evo_trait_value != 0) {
-            player.evolutionary_upgrade_traits[trait_idx] =
-                static_cast<int8_t>(MOX::_special_bonus[trait_idx - 1][evo_trait_value]);
-          } else {
-            player.evolutionary_upgrade_traits[trait_idx] = 0;
-          }
+          v = (uint8_t)player.evolutionary_upgrade_traits[trait_idx];
+          player.evolutionary_upgrade_traits[trait_idx] =
+              v ? MOX::_special_bonus_at_00559037[trait_idx * 3 + v] : 0;
         }
 
         RUSS::Mox_Update_();
 
-        int16_t color_idx = static_cast<int16_t>(random::Random_(8) - 1);
+        int16_t color_idx = (int16_t)(random::Random_(8) - 1);
         while (true) {
           bool duplicate_color = false;
 
           for (int16_t prev_player_idx = 0; prev_player_idx < player_idx; ++prev_player_idx) {
-            if (MOX::_player[prev_player_idx].color == static_cast<uint8_t>(color_idx)) {
+            if (MOX::_player[prev_player_idx].color == (uint8_t)color_idx) {
               duplicate_color = true;
             }
           }
@@ -391,10 +381,12 @@ namespace INITGAME {
             break;
           }
 
-          color_idx = static_cast<int16_t>((color_idx + 1) & 7);
+          int32_t t = (int16_t)color_idx + 1;
+          int32_t s = t >> 31;
+          color_idx = (int16_t)((((t ^ s) - s) & 7 ^ s) - s);
         }
 
-        player.color = static_cast<uint8_t>(color_idx);
+        player.color = (uint8_t)color_idx;
         RUSS::Mox_Update_();
 
         allocate::Push_Block_(MOX::_screen_seg);
@@ -442,7 +434,7 @@ namespace INITGAME {
         INITSHIP::Init_Ship_Designs_(player_idx);
 
         const int16_t best_fuel_idx = INITSHIP::Best_Ship_Fuel_(player_idx);
-        player.ship_range = TECHDATA::_fuel_ship_range(best_fuel_idx);
+        player.ship_range = TECHDATA::_fuel[best_fuel_idx].ship_range;
       }
 
       MOX::_player[MOX::_PLAYER_NUM].contact[MOX::_PLAYER_NUM] = 1;
@@ -460,7 +452,7 @@ namespace INITGAME {
     /**
      * @address 004794b0
      */
-    void __cdecl Init_Colony_(int colony_idx, int planet_idx, int player_num) {
+    void __cdecl Init_Colony_(int colony_idx, int planet_idx, uint8_t player_num) {
         s_colony* colony = &MOX::_colony[colony_idx];
 
         // Zero-initialize the entire colony structure
@@ -470,12 +462,13 @@ namespace INITGAME {
         planet->colony_index = (int16_t)colony_idx;
 
         colony->planet = (int16_t)planet_idx;
-        colony->owner = (int8_t)player_num;
+        colony->owner = player_num;
         colony->officer = -1;
 
         int8_t star_idx = planet->star_index;
         // Mark the star system as visited/seen by the player
-        MOX::_star[star_idx].visited |= (1 << player_num);
+        uint8_t player_bit = (uint8_t)(1u << (player_num & 0x1f));
+        MOX::_star[star_idx].visited |= player_bit;
 
         for (int i = 0; i < 7; ++i) {
             colony->producing[i] = -1;

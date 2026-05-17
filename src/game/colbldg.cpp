@@ -1941,7 +1941,7 @@ namespace COLBLDG {
             int16_t n_terra = COLBLDG::N_Prods_In_Queue_(-6);
             int16_t n_rad = COLBLDG::N_Prods_In_Queue_(-5);
             int16_t n_grav = COLBLDG::N_Prods_In_Queue_(-4);
-            int8_t pops = MOX::_colony[COLONY::_colony_handle].n_pops;
+            uint8_t pops = MOX::_colony[COLONY::_colony_handle].n_pops;
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
             
             if ((n_terra + n_rad + n_grav + pops + 1) > max_pop) {

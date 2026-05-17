@@ -473,7 +473,6 @@ namespace MSG_ {
             tm* time_info = localtime(&current_time);
 
             if (time_info->tm_mon == 3 /* April */ && time_info->tm_mday == 1) {
-                memset(&msg, 0, sizeof(msg));
                 msg.msg_type = 0x15 /* MSG_TYPE_APRIL1 */;
                 Add_Msg_All_(msg);
             }

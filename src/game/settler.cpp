@@ -312,7 +312,7 @@ namespace settler {
 
             const uint8_t last_pop_index =
                     static_cast<uint8_t>(static_cast<uint8_t>(source_colony->n_pops) - 1);
-            source_colony->n_pops = static_cast<int8_t>(last_pop_index);
+            source_colony->n_pops = last_pop_index;
             *pop_slot = source_colony->pop[last_pop_index];
         }
     }

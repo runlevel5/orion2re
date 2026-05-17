@@ -48,7 +48,7 @@ namespace COLSYSDI {
         }
     }
 
-    void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int32_t param_1, int32_t param_2) {
+    void __cdecl Draw_Col_Sys_Disp_Last_Scanned_(int16_t param_1, int16_t param_2) {
         s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
 
         if (colony->planet != -1) {
@@ -71,7 +71,7 @@ namespace COLSYSDI {
                 } while (sVar5 <= planet->orbit);
             }
 
-            s_animation_header* anim = Planet_Anims_((uint16_t)climate, planet->size);
+            s_animation_header* anim = Planet_Anims_(climate, planet->size);
             animate::Get_Height_(anim);
             animate::Get_Width_(anim);
 
@@ -81,7 +81,7 @@ namespace COLSYSDI {
             animate::Set_Animation_Frame_(anim_lbx, (int32_t)frame);
 
             anim_lbx = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLSYSDI_LBX, 0x40, MOX::_global_cache_seg);
-            ERIC::Draw_Centered_((int16_t)(param_1 + 2), (int16_t)(param_2 + sVar5 * 24 - 12), anim_lbx);
+            ERIC::Draw_Centered_(param_1 + 2, (int16_t)(param_2 + sVar5 * 24 - 12), anim_lbx);
         }
     }
 

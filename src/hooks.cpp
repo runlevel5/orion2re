@@ -188,7 +188,7 @@ namespace hooks {
         { 0x0043d1b0, &FILEDEF::Save_Moo_Custom_Player_Data_ },
         { 0x00478e30, &MOX2::Init_Map_Defaults_ },
         { 0x00478e20, &MOX2::Init_Map_Pictures_Default__ },
-        { 0x00483cc0, &MOX2::Set_Game_Seed },
+        { 0x00483cc0, &MOX2::Set_Game_Random_Seed_ },
         { 0x00407910, &BILL::Cache_Player_Scientist_Anim_ },
         { 0x00407920, &BILL::Cache_Player_Scientist_Anim_Imp_ },
         { 0x004baa40, &ERIC::Eric_Defaults_ },

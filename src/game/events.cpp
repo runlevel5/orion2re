@@ -87,7 +87,7 @@ namespace EVENTS {
         uint8_t event_status = _event_data[14].status;
 
         if (event_status == 2 || event_status == 4 || event_status == 6) {
-            uint16_t star_idx = (uint16_t)_event_data[14].target_id;
+            int16_t star_idx = _event_data[14].target_id;
             s_star_data* star = &MOX::_star[star_idx];
 
             if ((star->has_colony >> (player_idx & 0x1F)) & 1) {
@@ -383,7 +383,7 @@ namespace EVENTS {
                 case 11:
                 {
                     int8_t mineral = MOX::_planet[_event_data[i].target_id].mineral_class - 1;
-                    if (mineral < 0) mineral = 0;
+                    if (mineral <= 0) mineral = 0;
                     MOX::_planet[_event_data[i].target_id].mineral_class = mineral;
                     int16_t colony_idx = MOX::_planet[_event_data[i].target_id].colony_index;
                     if (colony_idx != -1) {
@@ -396,7 +396,7 @@ namespace EVENTS {
                 case 12:
                 {
                     int8_t mineral = MOX::_planet[_event_data[i].target_id].mineral_class + 2;
-                    if (mineral > 3) mineral = 4;
+                    if (mineral >= 4) mineral = 4;
                     MOX::_planet[_event_data[i].target_id].mineral_class = mineral;
                     int16_t colony_idx = MOX::_planet[_event_data[i].target_id].colony_index;
                     if (colony_idx != -1) {
@@ -582,7 +582,7 @@ namespace EVENTS {
                         }
                         if (_event_data[i].status != 5) {
                             SHIPMOVE::Do_Hyperspace_Beast_((int)_event_data[i].player_idx);
-                            _event_data[i].player_idx = (int8_t)Get_Event_Victim_(s__00557509[i]);
+                            _event_data[i].player_idx = (int8_t)Get_Event_Victim_(_event_good_array[i]);
                         }
                         _event_data[i].turn_count++;
                     }
@@ -1672,10 +1672,12 @@ namespace EVENTS {
             }
         }
 
-        int16_t total_targets = building_count + (int16_t)MOX::_colony[colony_idx].n_pops;
+        uint8_t population = MOX::_colony[colony_idx].n_pops;
+        int16_t total_targets = building_count + population;
 
-        int32_t hits = (random::Random_(2) + random::Random_(3)) * total_targets;
-        int16_t final_hits = (int16_t)(hits / 10);
+        int32_t random1 = random::Random_(2);
+        int32_t random2 = random::Random_(3);
+        int16_t final_hits = (int16_t)(((random1 + random2) * total_targets) / 10);
 
         if (final_hits == 0) {
             final_hits = 1;
@@ -1917,14 +1919,13 @@ namespace EVENTS {
     }
 
     bool __cdecl Check_For_Event_Message_() {
-        bool found = false;
         for (int16_t event_idx = 0; event_idx < 36; ++event_idx) {
             int8_t status = _event_data[event_idx].status;
             if (status == 4 || status == 6 || status == 5) {
-                found = true;
+                return true;
             }
         }
-        return found;
+        return false;
     }
 
     /**
@@ -2128,6 +2129,8 @@ namespace EVENTS {
                 p4 = MOX::_planet[_event_data[event_id].target_id].mineral_class;
                 break;
             case 13:
+                break;
+            case 14:
                 p11 = _event_data[event_id].target_id;
                 if (_event_data[event_id].status == 5) {
                     event_subtype = 2;
@@ -2135,12 +2138,12 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 14:
+            case 15:
                 p11 = _event_data[event_id].target_id;
                 p4 = _event_data[event_id].amount;
                 event_subtype = 0;
                 break;
-            case 15:
+            case 16:
                 p3 = _event_data[event_id].target_id;
                 p4 = _event_data[event_id].amount;
                 if (_event_data[event_id].status == 4) {
@@ -2151,7 +2154,7 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 16:
+            case 17:
                 p3 = _event_data[event_id].target_id;
                 if (_event_data[event_id].status == 5) {
                     event_subtype = 2;
@@ -2159,11 +2162,11 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 17:
+            case 18:
                 event_subtype = 0;
                 p7 = _event_data[event_id].target_id;
                 break;
-            case 18:
+            case 19:
                 if (_event_data[event_id].status == 4) {
                     if (_event_data[event_id].target_id != -1) {
                         event_subtype = 3;
@@ -2180,9 +2183,9 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 19:
             case 20:
             case 21:
+            case 22:
                 if (_event_data[event_id].status == 4) {
                     if (_event_data[event_id].target_id != -1) {
                         event_subtype = 3;
@@ -2200,7 +2203,7 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 22:
+            case 23:
                 if (_event_data[event_id].status == 3) {
                     if (_event_data[event_id].amount == -1) {
                         event_subtype = 2;
@@ -2218,7 +2221,7 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 23:
+            case 24:
                 p11 = _event_data[event_id].target_id;
                 p4 = _event_data[event_id].turn_count;
                 p5 = _event_data[event_id].amount;
@@ -2234,7 +2237,7 @@ namespace EVENTS {
                     event_subtype = 0;
                 }
                 break;
-            case 24:
+            case 25:
                 p11 = _event_data[event_id].target_id;
                 if (_event_data[event_id].status == 5) {
                     event_subtype = 2;
@@ -2242,45 +2245,45 @@ namespace EVENTS {
                     event_subtype = 3;
                 }
                 break;
-            case 25:
             case 26:
+            case 27:
                 if (_event_data[event_id].status == 5) {
                     event_subtype = 2;
                 } else if (_event_data[event_id].status == 6) {
                     event_subtype = 3;
                 }
                 break;
-            case 27:
+            case 28:
                 event_subtype = 0;
                 p4 = _event_data[event_id].target_id;
                 p11 = _event_data[event_id].amount;
                 break;
-            case 28:
+            case 29:
                 event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
                 break;
-            case 29:
+            case 30:
                 event_subtype = _event_data[event_id].amount;
                 if (event_subtype > 3) {
                     event_subtype = 3;
                 }
                 p4 = _event_data[event_id].target_id;
                 break;
-            case 30:
+            case 31:
                 p4 = 0;
                 event_subtype = _event_data[event_id].amount;
                 break;
-            case 31:
+            case 32:
                 event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
                 p8 = player_idx;
                 break;
-            case 32:
-                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
-                break;
             case 33:
-                p10 = _event_data[event_id].target_id;
                 event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
                 break;
             case 34:
+                p10 = _event_data[event_id].target_id;
+                event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
+                break;
+            case 35:
                 event_subtype = static_cast<int16_t>(random::Random_(4) - 1);
                 p8 = _event_data[event_id].target_id;
                 break;
