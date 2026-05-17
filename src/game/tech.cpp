@@ -230,7 +230,7 @@ namespace TECH {
                 if (input_val < 0) {
                     input_val = -input_val;
                     if (input_val < first_btn_field || input_val > last_btn_field) {
-                        if (Set_Selected_Entry_(entries, input_val) != 0) {
+                        if (Set_Selected_Entry_(entries, input_val) != nullptr) {
                             _g_selected_entry_p = Get_Selected_Entry_(_g_entries_p);
                             int16_t app_id = _g_selected_entry_p->app_ids[_g_selected_entry_p->selected_app_index];
                             if (app_id != 0) {
@@ -396,23 +396,25 @@ namespace TECH {
         } while (current_item != end_item);
     }
 
-    int __cdecl Set_Selected_Entry_(s_list_item_research* items, int16_t target_field_id) {
+    s_list_item_research* __cdecl Set_Selected_Entry_(s_list_item_research* items, int16_t target_field_id) {
         bool is_searching = true;
+        s_list_item_research* result = nullptr;
 
         for (int i = 0; i < 8; ++i) {
             items[i].current_app_index = 0;
 
-            if (is_searching && items[i].tech_field_id != 0) {
-                for (int j = 0; j < (int)(int8_t)items[i].visible_app_count; ++j) {
+            if (is_searching && items[i].tech_field_id != 0 && items[i].visible_app_count > 0) {
+                for (int16_t j = 0; j < items[i].visible_app_count; ++j) {
                     if (items[i].app_click_field_ids[j] == target_field_id) {
                         is_searching = false;
+                        result = &items[i];
                         items[i].current_app_index = 1;
-                        items[i].selected_app_index = (int16_t)j;
+                        items[i].selected_app_index = j;
                     }
                 }
             }
         }
-        return !is_searching;
+        return result;
     }
 
     s_list_item_research* __cdecl Get_Selected_Entry_(s_list_item_research* entries) {
@@ -586,7 +588,7 @@ namespace TECH {
             BILL::Squeeze_Print_(item->label_x, item->app_label_y[i], item->app_names[i], 208);
 
             i++;
-        } while (i < static_cast<int8_t>(item->visible_app_count));
+        } while (i < item->visible_app_count);
     }
 
     void __cdecl Draw_Little_Arrow_(s_list_item_research* param_1) {
@@ -1010,7 +1012,7 @@ namespace TECH {
             return TECHDATA::_technology_applications[param_1].name;
         }
 
-        int8_t hyper_tech = MOX::_player[param_2].hyper_advanced_tech[param_1 - 204];
+        uint8_t hyper_tech = MOX::_player[param_2].hyper_advanced_tech[param_1 - 204];
 
         strcpy(MOX::_temp_string_buf + 1, TECHDATA::_technology_applications[param_1].name);
         strcat(MOX::_temp_string_buf + 1, s__005510f0);
@@ -1019,7 +1021,7 @@ namespace TECH {
             strcat(MOX::_temp_string_buf + 1, MOX::_roman_literals[hyper_tech]);
         } else {
             char* end_ptr = (MOX::_temp_string_buf + 1) + strlen(MOX::_temp_string_buf + 1);
-            itoa(hyper_tech, end_ptr, 10);
+            itoa((int)hyper_tech, end_ptr, 10);
         }
 
         return MOX::_temp_string_buf + 1;

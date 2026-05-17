@@ -17,7 +17,7 @@ namespace TECH {
     int32_t __cdecl New_Get_Tech_Cost_(int16_t id, uint8_t is_tech_app, int16_t player_idx);
 
     inline s_tech_field_data* _technology_fields = reinterpret_cast<s_tech_field_data*>(0x00553050);
-    inline int8_t (&_saved_hyper_advanced_tech)[8] = *reinterpret_cast<int8_t(*)[8]>(std::uintptr_t{0x005A6338});
+    inline uint8_t (&_saved_hyper_advanced_tech)[8] = *reinterpret_cast<uint8_t(*)[8]>(std::uintptr_t{0x005A6338});
     inline char* _tech_select_lbx = reinterpret_cast<char*>(std::uintptr_t{0x00557BF8});
     inline int32_t* _tech_select_pos = reinterpret_cast<int32_t*>(std::uintptr_t{0x00557C40});
     inline int32_t* _tech_change_pos = reinterpret_cast<int32_t*>(std::uintptr_t{0x00557C60});
@@ -48,7 +48,7 @@ namespace TECH {
     void __cdecl Draw_Tech_Select_();
     void __cdecl Display_Entry_Text_(s_list_item_research* item);
     void __cdecl Display_All_Entry_Text_(s_list_item_research* entries);
-    int __cdecl Set_Selected_Entry_(s_list_item_research* research_list, int16_t field_id);
+    s_list_item_research* __cdecl Set_Selected_Entry_(s_list_item_research* research_list, int16_t field_id);
     s_list_item_research* __cdecl Get_Selected_Entry_(s_list_item_research* entries);
     void __cdecl Display_Selected_Entry_Text_(s_list_item_research* entry);
     void __cdecl Draw_Little_Arrow_(s_list_item_research* entry);

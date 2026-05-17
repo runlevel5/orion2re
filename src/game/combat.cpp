@@ -350,7 +350,7 @@ namespace COMBAT {
     }
 
     // Suggested name: COMBAT::Qload_Ships_
-    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t param_beam_def, int16_t param_damage, int16_t param_ocv, int16_t param_unused) {
+    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6) {
         int16_t player_idx;
         int16_t warp_bonus;
         int16_t best_armor_id;
@@ -403,22 +403,16 @@ namespace COMBAT {
                     q->shield_id = best_shield;
 
                     if (static_cast<uint8_t>(q->player) < 10) {
-                        q->max_hits = static_cast<int16_t>((static_cast<int32_t>(TECHDATA::_hull_data[ship_size].size) * (armor_absorption + 100)) / 100);
+                        q->max_hits = (int16_t)(((int32_t)TECHDATA::_hull_data[ship_size].strat_hits * (armor_absorption + 100)) / 100);
                     } else {
-                        q->max_hits = TECHDATA::_hull_data[ship_size].size;
+                        q->max_hits = TECHDATA::_hull_data[ship_size].strat_hits;
                     }
 
                     q->missile_defense_bonus = 0;
-                    q->beam_defense_bonus = TECHDATA::_hull_data[ship_size].cost + warp_bonus;
+                    q->beam_defense_bonus = TECHDATA::_hull_data[ship_size].strat_def_bonus + warp_bonus;
                     q->base_ocv = base_ocv;
                     q->missile_damage_modifier = 0;
                     q->beam_damage_modifier = 0;
-
-                    special_ocv = 0;
-                    special_missile_dmg = 0;
-                    special_beam_def = 0;
-                    special_missile_def = 0;
-                    special_beam_dmg = 0;
 
                     for (int16_t device_idx = 0; device_idx < 39; ++device_idx) {
                         if (struct_::Test_Bit_Field_(MOX::_ship[ship_idx].d.special_device_flags, device_idx) != 0 &&
@@ -430,7 +424,7 @@ namespace COMBAT {
                                     if (special_ocv < bonus) special_ocv = bonus;
                                     break;
                                 case 2:
-                                    if (special_missile_dmg < bonus) special_missile_dmg = bonus;
+                                    if (special_beam_dmg < bonus) special_beam_dmg = bonus;
                                     break;
                                 case 3:
                                     if (special_beam_def < bonus) special_beam_def = bonus;
@@ -439,7 +433,7 @@ namespace COMBAT {
                                     if (special_missile_def < bonus) special_missile_def = bonus;
                                     break;
                                 case 5:
-                                    if (special_beam_dmg < bonus) special_beam_dmg = bonus;
+                                    if (special_missile_dmg < bonus) special_missile_dmg = bonus;
                                     break;
                                 case 6:
                                     if (special_beam_def < bonus) special_beam_def = bonus;
@@ -453,11 +447,11 @@ namespace COMBAT {
                         }
                     }
 
-                    q->base_ocv += param_ocv + special_ocv;
-                    q->beam_defense_bonus += param_beam_def + special_beam_def;
+                    q->base_ocv += param_5 + special_ocv;
+                    q->beam_defense_bonus += param_3 + special_beam_def;
                     q->missile_defense_bonus += special_missile_def;
-                    q->beam_damage_modifier += param_damage + special_beam_dmg;
-                    q->missile_damage_modifier += param_damage + special_missile_dmg;
+                    q->beam_damage_modifier += param_4 + special_beam_dmg;
+                    q->missile_damage_modifier += param_4 + special_missile_dmg;
                     q->officer_idx = MOX::_ship[ship_idx].officer_index;
                     q->structural_damage = MOX::_ship[ship_idx].structural_damage;
                     
@@ -489,15 +483,15 @@ namespace COMBAT {
 
             if (MOX::_colony[MOX::_cmbt_colony_id].buildings[28] != 0) {
                 q0->missile_defense_bonus += 10;
-                q0->beam_defense_bonus *= 10;
+                q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 10);
             }
             if (MOX::_colony[MOX::_cmbt_colony_id].buildings[23] != 0) {
                 q0->missile_defense_bonus += 30;
-                q0->beam_defense_bonus *= 30;
+                q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 30);
             }
             if (MOX::_colony[MOX::_cmbt_colony_id].buildings[24] != 0) {
                 q0->missile_defense_bonus += 20;
-                q0->beam_defense_bonus *= 20;
+                q0->beam_defense_bonus = (int16_t)(q0->beam_defense_bonus * 20);
             }
 
             q0->missile_weapon_id = 0;
@@ -536,9 +530,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[6].size)) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[6].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[6].cost;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[6].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -556,9 +550,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[7].size)) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[7].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[7].cost;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[7].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -576,9 +570,9 @@ namespace COMBAT {
                 qs->bomb_weapon_id = best_bomb;
                 qs->special_weapon_id = best_colony_strat_special;
                 qs->shield_id = best_shield;
-                qs->max_hits = static_cast<int16_t>(((armor_absorption + 100) * static_cast<int32_t>(TECHDATA::_hull_data[8].size)) / 100);
+                qs->max_hits = (int16_t)(((armor_absorption + 100) * (int32_t)TECHDATA::_hull_data[8].strat_hits) / 100);
                 qs->missile_defense_bonus = 0;
-                qs->beam_defense_bonus = TECHDATA::_hull_data[8].cost;
+                qs->beam_defense_bonus = TECHDATA::_hull_data[8].strat_def_bonus;
                 qs->base_ocv = base_ocv;
                 qs->structural_damage = 0;
                 MOX::_combat_total_ship_count++;
@@ -701,6 +695,7 @@ namespace COMBAT {
         qship->base_ocv = AIPOWER::Base_Generic_Ocv_(8) + 45 /* 0x2d */;
         qship->missile_damage_modifier = 0;
         qship->beam_damage_modifier = 105 /* 0x69 */;
+        qship->officer_idx = -1;
         qship->structural_damage = 0;
 
         MOX::_combat_total_ship_count++;
@@ -1054,7 +1049,7 @@ namespace COMBAT {
         int16_t defender_total_ships[6];
         int16_t defender_lost_ships[6];
         int16_t special_hull_idx = -1;
-        int16_t is_special_active = 1;
+        int16_t special_alive = 1;
         char attacker_race_name[20];
         char defender_race_name[20];
         char itoa_buffer[12];
@@ -1087,7 +1082,7 @@ namespace COMBAT {
                     }
                 } else {
                     special_hull_idx = (int16_t)size;
-                    is_special_active = (ship->status == 0);
+                    special_alive = (ship->status == 0);
                 }
             }
         }
@@ -1189,10 +1184,10 @@ namespace COMBAT {
             strcat(stats_msg, string::s_X250);
             strcat(stats_msg, string::s_1);
             strcat(stats_msg, string::s_X312);
-            if (is_special_active) {
-                strcat(stats_msg, string::s_1);
-            } else {
+            if (special_alive) {
                 strcat(stats_msg, string::s_Dash);
+            } else {
+                strcat(stats_msg, string::s_1);
             }
             strcat(stats_msg, string::s_Newline);
         }

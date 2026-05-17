@@ -8,7 +8,7 @@ namespace COMBAT {
                                             int16_t* ordnance_max, int16_t* engineer_max, 
                                             int16_t* weaponry_max, int16_t* lore_max);
 
-    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t param_beam_def, int16_t param_damage, int16_t param_ocv, int16_t param_unused);
+    void __cdecl Qload_Ships_(int16_t* ship_indices, int16_t num_ships, int16_t param_3, int16_t param_4, int16_t param_5, int16_t param_6);
 
     int16_t __cdecl Get_Colony_Hits_();
 

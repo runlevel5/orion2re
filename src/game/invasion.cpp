@@ -11,11 +11,11 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
         bonuses->has_battleoids = 1;
         bonuses->powered_armor_bonus = 10;
         bonuses->has_powered_armor = 1;
-        bonuses->best_armor_tech_app_id = (int8_t)TECHDATA::_armor[6].tech_app_id;
+        bonuses->best_armor_tech_app_id = (uint8_t)TECHDATA::_armor[6].tech_app_id;
         bonuses->troop_bonus = TECHDATA::_armor[6].troops_bonus;
-        bonuses->rifle_tech_app_id = (int8_t)TECHDATA::_rifles[5].tech_app_id;
+        bonuses->rifle_tech_app_id = (uint8_t)TECHDATA::_rifles[5].tech_app_id;
         bonuses->rifle_bonus = TECHDATA::_rifles[5].bonus;
-        bonuses->personal_shield_tech_app_id = (int8_t)TECHDATA::_personal_shields[1].tech_app_id;
+        bonuses->personal_shield_tech_app_id = (uint8_t)TECHDATA::_personal_shields[1].tech_app_id;
         bonuses->personal_shield_bonus = TECHDATA::_personal_shields[1].bonus;
         bonuses->difficulty_bonus = (MOX::_settings.game_difficulty * 2) - 4;
         return;
@@ -36,15 +36,15 @@ void __cdecl Compute_Player_Ground_Combat_Bonuses_(int player_idx, s_invasion_pl
     }
 
     int armor_idx = aitech::Player_Best_Armor_(player);
-    bonuses->best_armor_tech_app_id = (int8_t)TECHDATA::_armor[armor_idx].tech_app_id;
+    bonuses->best_armor_tech_app_id = (uint8_t)TECHDATA::_armor[armor_idx].tech_app_id;
     bonuses->troop_bonus = TECHDATA::_armor[armor_idx].troops_bonus;
 
     int rifle_idx = aitech::Player_Best_Rifle_(player);
-    bonuses->rifle_tech_app_id = (int8_t)TECHDATA::_rifles[rifle_idx].tech_app_id;
+    bonuses->rifle_tech_app_id = (uint8_t)TECHDATA::_rifles[rifle_idx].tech_app_id;
     bonuses->rifle_bonus = TECHDATA::_rifles[rifle_idx].bonus;
 
     int shield_idx = aitech::Player_Best_Personal_Shield_(player);
-    bonuses->personal_shield_tech_app_id = (int8_t)TECHDATA::_personal_shields[shield_idx].tech_app_id;
+    bonuses->personal_shield_tech_app_id = (uint8_t)TECHDATA::_personal_shields[shield_idx].tech_app_id;
     bonuses->personal_shield_bonus = TECHDATA::_personal_shields[shield_idx].bonus;
 
     bonuses->ground_combat_bonus = player->traits[TRAIT_GROUND_COMBAT_BONUS];

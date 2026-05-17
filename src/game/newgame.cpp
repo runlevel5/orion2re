@@ -114,7 +114,7 @@ void __cdecl Globals_To_Temps_() {
     _combat_button_variable = (uint16_t)(MOX::_settings.strategic_combat_flag == 0);
     _civ_button_variable = (int16_t)(int8_t)MOX::_settings.starting_civilization_level;
     _random_events_button_variable = (uint8_t)MOX::_settings.random_events;
-    _xenon_attacks_button_variable = (uint8_t)MOX::_settings.xenons_exist;
+    _xenon_attacks_button_variable = MOX::_settings.xenons_exist;
 }
 
 void __cdecl Reload_Newgame_Screen_() {
@@ -188,13 +188,11 @@ void __cdecl Draw_Pictures_() {
                     anim = _tech_level_anims[_civ_button_variable];
                 }
 
-                if (anim != nullptr) {
-                    animate::Draw_(
-                        x_offset + _g_x + 121,
-                        _g_y + y_offset + 119,
-                        anim
-                    );
-                }
+                animate::Draw_(
+                    x_offset + _g_x + 121,
+                    _g_y + y_offset + 119,
+                    anim
+                );
             }
             y_offset += 140;
             row++;
@@ -235,9 +233,8 @@ void __cdecl Update_Fields_() {
     _fields[5] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0x15D, gx + 0x169, gy + 0x171, _civ_button_strings, 3, &_civ_button_variable, 0, common_str, 0, h4);
 
     // Radio Buttons: Random Events, Xenon Attacks, Strategic Combat
-    // TYPE MISMATCH: passing uint8_t* or uint16_t* where int16_t* is expected
-    fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x127, ESTRINGS::E_Strings_(0x0C), _anims[0], (int16_t*)&_random_events_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
-    fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings_(0x0C), _anims[2], (int16_t*)&_xenon_attacks_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
+    fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x127, ESTRINGS::E_Strings_(0x0C), _anims[0], &_random_events_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
+    fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x14A, ESTRINGS::E_Strings_(0x0C), _anims[2], &_xenon_attacks_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
     fields::Add_Radio_Button_Field_(gx + 0x17C, gy + 0x103, ESTRINGS::E_Strings_(0x0C), _anims[1], (int16_t*)&_combat_button_variable, ESTRINGS::E_Strings_(0x0C), 0x29);
 
     if (MOX::_game_type == 2 /* NET_GAME */) {

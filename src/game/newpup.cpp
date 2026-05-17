@@ -67,10 +67,32 @@ namespace NEWPUP {
         }
     }
 
-    // Patch: { 0x00487270, &NEWPUP::Print_Best_Summary_ },
+    void __cdecl Print_Data_(char* str, int16_t value, int16_t* y_pos, s_invasion_side_info* side_info) {
+        (void)side_info;
+
+        char text_buffer[500];
+        s_animation_header* anim;
+
+        sprintf(
+            text_buffer,
+            ESTRINGS::E_Strings_(0x4B),
+            s_0_0055110c,
+            str,
+            s_1_00551110,
+            value);
+
+        COLONY::Set_Colony_Font_To_(2);
+
+        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg);
+
+        FMTPARA::Print_Formatted_Paragraph_(11, *y_pos * 11 + 0x153, animate::Get_Width_(anim) - 0x12, text_buffer, 0);
+
+        ++(*y_pos);
+    }
+
     void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* y_pos) {
         if (side_info->combat_modifiers.antigrav_bonus != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 TECHDATA::_technology_applications[9].name,
                 static_cast<uint8_t>(side_info->combat_modifiers.antigrav_bonus),
                 y_pos,
@@ -79,7 +101,7 @@ namespace NEWPUP {
         }
 
         if (side_info->combat_modifiers.best_armor_tech_app_id != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 TECHDATA::_technology_applications[side_info->combat_modifiers.best_armor_tech_app_id].name,
                 static_cast<uint8_t>(side_info->combat_modifiers.troop_bonus),
                 y_pos,
@@ -88,7 +110,7 @@ namespace NEWPUP {
         }
 
         if (side_info->combat_modifiers.personal_shield_tech_app_id != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 TECHDATA::_technology_applications[side_info->combat_modifiers.personal_shield_tech_app_id].name,
                 static_cast<uint8_t>(side_info->combat_modifiers.personal_shield_bonus),
                 y_pos,
@@ -97,7 +119,7 @@ namespace NEWPUP {
         }
 
         if (side_info->combat_modifiers.rifle_tech_app_id != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 TECHDATA::_technology_applications[side_info->combat_modifiers.rifle_tech_app_id].name,
                 static_cast<uint8_t>(side_info->combat_modifiers.rifle_bonus),
                 y_pos,
@@ -111,7 +133,7 @@ namespace NEWPUP {
         char officer_name[52];
 
         if (side_info->combat_modifiers.ground_combat_bonus != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 ESTRINGS::E_Strings_(0x1B5),
                 static_cast<int16_t>(side_info->combat_modifiers.ground_combat_bonus),
                 summary_buffer,
@@ -119,7 +141,7 @@ namespace NEWPUP {
         }
 
         if (side_info->combat_modifiers.low_g_penalty != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 ESTRINGS::E_Strings_(0x16C),
                 static_cast<int16_t>(side_info->combat_modifiers.low_g_penalty),
                 summary_buffer,
@@ -129,7 +151,7 @@ namespace NEWPUP {
         const int16_t subterranean_bonus =
             static_cast<int16_t>(static_cast<uint8_t>(side_info->combat_modifiers.subterranean_bonus));
         if (subterranean_bonus != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 ESTRINGS::E_Strings_(0x1F1),
                 subterranean_bonus,
                 summary_buffer,
@@ -138,7 +160,7 @@ namespace NEWPUP {
 
         if (side_info->combat_modifiers.difficulty_bonus > 0 &&
             capture::Check_Release_Version_() != 0) {
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 ESTRINGS::E_Strings_(0x007B),
                 static_cast<int16_t>(side_info->combat_modifiers.difficulty_bonus),
                 summary_buffer,
@@ -151,7 +173,7 @@ namespace NEWPUP {
                 side_info->player_id,
                 static_cast<int16_t>(side_info->combat_modifiers.officer_idx));
 
-            COLGCBT::Print_Data_(
+            Print_Data_(
                 officer_name,
                 side_info->combat_modifiers.officer_bonus,
                 summary_buffer,
@@ -172,7 +194,6 @@ namespace NEWPUP {
 
         int16_t troop_type = 0;
         int16_t displayed_column_base = 0;
-        int16_t row_index = 2;
         char text_buffer[500];
 
         do {
@@ -182,8 +203,9 @@ namespace NEWPUP {
             s_animation_header* troop_anim =
                 COLONY::Player_Troop_Anim_(player_id, troop_type, race);
             const int16_t displayed_column = static_cast<int16_t>(displayed_column_base + 1);
+            const int16_t row_index = 2;
 
-            COLONY::Set_Colony_Font_To_Player_(1, static_cast<int8_t>(player_id));
+            COLONY::Set_Colony_Font_To_Player_(1, player_id);
 
             sprintf(
                 text_buffer,
@@ -194,8 +216,8 @@ namespace NEWPUP {
             {
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
                     (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
-                const int32_t x =
-                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                const int16_t x = (int16_t)(
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base);
                 fonts::Print_Centered_(x, 0x1d1, text_buffer);
             }
 
@@ -210,45 +232,44 @@ namespace NEWPUP {
 
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
                     (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
-                const int32_t x =
-                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                const int16_t x = (int16_t)(
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base);
                 fonts::Print_Centered_(x, 0x1c8, text_buffer);
             }
 
             {
                 const int32_t unit_count =
                     static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
+                char* troop_name = COLONY::Player_Troop_Name_(player_id, troop_type, race);
 
                 sprintf(
                     text_buffer,
                     ESTRINGS::E_Strings_(0x0e),
                     unit_count,
-                    COLONY::Player_Troop_Name_(player_id, troop_type, race));
+                    troop_name);
 
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
                     (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
-                const int32_t x =
-                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
+                const int16_t x = (int16_t)(
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base);
                 fonts::Print_Centered_(x, 0x1d1 - row_index * 9, text_buffer);
             }
-
-            ++row_index;
 
             {
                 const int32_t width = static_cast<int32_t>(animate::Get_Width_(
                     (s_animation_header*)buffer::Buffer_Reload_(COLONY::_COLGCBT_LBX, 0x15, MOX::_global_cache_seg)));
-                const int32_t x =
-                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base;
-                ERIC::Draw_Bottom_Centered_(x, 0x1d9 - row_index * 9, troop_anim);
+                const int16_t x = (int16_t)(
+                    (((width + ((width >> 31) & 3)) >> 2) * displayed_column) + x_base);
+                ERIC::Draw_Bottom_Centered_(x, 0x1d9 - (row_index + 1) * 9, troop_anim);
             }
 
             {
                 const int32_t unit_count =
                     static_cast<int32_t>(invasion_side->unit_counts[troop_type]);
-                ++troop_type;
                 sprintf(text_buffer, ESTRINGS::E_Strings_(0x7c), unit_count);
             }
 
+            ++troop_type;
             displayed_column_base = displayed_column;
         } while (troop_type < 3);
     }

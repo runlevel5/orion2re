@@ -324,11 +324,11 @@ struct s_invasion_player_bonuses {
     int8_t has_battleoids;
     int8_t powered_armor_bonus;
     int8_t has_powered_armor;
-    int8_t best_armor_tech_app_id;
+    uint8_t best_armor_tech_app_id;
     int8_t troop_bonus;
-    int8_t personal_shield_tech_app_id;
+    uint8_t personal_shield_tech_app_id;
     int8_t personal_shield_bonus;
-    int8_t rifle_tech_app_id;
+    uint8_t rifle_tech_app_id;
     int8_t rifle_bonus;
     int8_t ground_combat_bonus;
     int8_t heavy_g_bonus;
@@ -2389,7 +2389,7 @@ struct s_list_item_research {
     int16_t tech_field_id;
     int32_t research_cost_remaining;
     char buf[20];
-    uint8_t visible_app_count;
+    int8_t visible_app_count;
     char app_names[4][64];
     int16_t label_x;
     int16_t app_label_y[4];
@@ -3146,7 +3146,7 @@ struct s_player {
     char ship_special_theme;
     char tech_apps_learned[4];
     char tech_modifiers[17];
-    char hyper_advanced_tech[8];
+    uint8_t hyper_advanced_tech[8];
     int total_known_tech_cost;
     char knows_racial_stats;
     int last_tech_report_date[8];
@@ -3944,7 +3944,7 @@ struct s_scroll_bar {
     undefined field13_0x17;
     int8_t type;
     undefined mouse_button_down;
-    int8_t row_step;
+    uint8_t row_step;
     short thumb_y_snapshot;
 };
 
@@ -4458,7 +4458,7 @@ struct s_ship_move_info {
     int8_t out_of_range;
     int8_t has_navigator;
     int8_t traveling_speed;
-    int8_t parsecs;
+    uint8_t parsecs;
     short uses_wormhole;
     int8_t has_stargate_route;
     int8_t hyperspace_flux;
@@ -4956,7 +4956,7 @@ struct s_tech_hull_data {
     uint16_t strat_special;
     uint16_t strat_bomb;
     int16_t strat_def_bonus;
-    uint16_t strat_hits;
+    int16_t strat_hits;
     char *name;
     char *size_name;
 };

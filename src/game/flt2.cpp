@@ -60,7 +60,7 @@ void Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y,
     {
         MOX::_old_small_ship_stack_ptr = MOX::_small_ship_stack_ptr;
         MOX::_old_first_fltscrn_icon = MOX::_scroll_bar->first_visible_row;
-        FLT2::Build_Fltscrn_Big_Icon_Fields_(MOX::_small_ship_stack_ptr);
+        FLT2::Build_Fltscrn_Big_Icon_Fields_(MOX::_small_ship_stack_ptr, MOX::_scroll_bar->first_visible_row);
         
         int16_t ship_idx = MOX::_ship_stack_start[MOX::_small_ship_stack_ptr];
         int16_t owner = HACCESS::Ship_Stack_Owner_(ship_idx);
@@ -78,8 +78,8 @@ void Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y,
     }
 
     if (MOX::_n_fltscrn_big_icons > 0) {
-        MOX::_n_fltscrn_rows = (uint8_t)(MOX::_n_fltscrn_big_icons / (int16_t)MOX::_big_icon_display_columns);
-        if ((MOX::_n_fltscrn_big_icons % (int16_t)MOX::_big_icon_display_columns) > 0) {
+        MOX::_n_fltscrn_rows = (int8_t)(MOX::_n_fltscrn_big_icons / MOX::_big_icon_display_columns);
+        if ((MOX::_n_fltscrn_big_icons % MOX::_big_icon_display_columns) > 0) {
             MOX::_n_fltscrn_rows++;
         }
 
@@ -92,12 +92,12 @@ void Fleet_Screen_Big_Icon_Fields_(int16_t* button_id_ptr, int16_t x, int16_t y,
         MOX::_scroll_bar->first_visible_row = 0;
     }
 
-    if ((int16_t)MOX::_n_fltscrn_rows <= MOX::_scroll_bar->first_visible_row) {
+    if (MOX::_n_fltscrn_rows <= MOX::_scroll_bar->first_visible_row) {
         MOX::_scroll_bar->first_visible_row = 0;
     }
 
     *button_id_ptr = -1000;
-    if ((int16_t)MOX::_big_icon_display_columns < MOX::_n_fltscrn_big_icons) {
+    if (MOX::_big_icon_display_columns < MOX::_n_fltscrn_big_icons) {
         *button_id_ptr = fields::Add_Scroll_Field_(x, y, 0, h, 0, h, w, h, &MOX::_scroll_bar->thumb_center_y, s__00551100, 0);
     }
 }
@@ -112,11 +112,14 @@ void __cdecl Get_Fltscrn_Big_Icon_XY_(int16_t icon_idx, int16_t* out_x, int16_t*
     // This comparison is present in the original binary but its result is not used.
     (void)(MOX::_current_screen == 4);
 
-    int16_t columns = (int16_t)MOX::_big_icon_display_columns;
+    int16_t columns = MOX::_big_icon_display_columns;
 
-    // The original code performs division/modulo operations twice.
-    *out_x = (icon_idx % columns) * 62 + MOX::_big_icon_x_offset;
-    *out_y = (icon_idx / columns) * 60 + MOX::_big_icon_y_offset;
+    // The original code performs division/modulo operations twice with 16-bit intermediates.
+    int16_t remainder = (int16_t)(icon_idx % columns);
+    *out_x = (int16_t)((int16_t)(remainder * 62) + MOX::_big_icon_x_offset);
+
+    int16_t quotient = (int16_t)(icon_idx / columns);
+    *out_y = (int16_t)((int16_t)(quotient * 60) + MOX::_big_icon_y_offset);
 }
 
 int16_t __cdecl Get_Filter_Button_Status_()
@@ -294,9 +297,8 @@ void __cdecl Add_Fltscrn_Big_Icon_Fields_(int16_t base_index) {
     MOX::_n_fltscrn_big_icons_added = 0;
 
     if (MOX::_big_icon_display_max_icons > 0) {
-        while (MOX::_n_fltscrn_big_icons_added < (int16_t)MOX::_n_fltscrn_big_icons) {
-            // Check if we reached display capacity or array bounds
-            if (MOX::_n_fltscrn_big_icons_added >= (int16_t)MOX::_big_icon_display_max_icons) {
+        do {
+            if (MOX::_n_fltscrn_big_icons_added >= MOX::_n_fltscrn_big_icons) {
                 break;
             }
             if (MOX::_n_fltscrn_big_icons_added + base_index >= MOX::_n_fltscrn_big_icons) {
@@ -324,11 +326,7 @@ void __cdecl Add_Fltscrn_Big_Icon_Fields_(int16_t base_index) {
 
             MOX::_n_fltscrn_big_icons_added++;
 
-            // Final check against display limit after increment
-            if (MOX::_n_fltscrn_big_icons_added >= (int16_t)MOX::_big_icon_display_max_icons) {
-                break;
-            }
-        }
+        } while (MOX::_n_fltscrn_big_icons_added < MOX::_big_icon_display_max_icons);
     }
 }
 
@@ -518,11 +516,11 @@ void __cdecl Print_Fltscrn_Scanned_Star_Name_() {
 }
 
 void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
-    int16_t bonus2;
-    int16_t bonus3;
-    int16_t bonus1;
+    int16_t defense_bonus;
+    int16_t missile_defense_bonus;
+    int16_t attack_bonus;
     char str_9a[20];
-    char buffer[116];
+    char buffer[120];
     char unused_msg_95[20];
     char unused_msg_96[20];
     char unused_msg_97[20];
@@ -539,9 +537,7 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     strcpy(unused_msg_97, HAROLD::H_Message_(0x97));
     strcpy(unused_msg_98, HAROLD::H_Message_(0x98));
 
-    // TYPE MISMATCH: signature in initship.h is (idx, def, miss_ev, att)
-    // Decompilation wants: bonus1=attack, bonus3=missile_evasion.
-    INITSHIP::Get_Ship_Combat_Bonuses_(ship_idx, &bonus2, &bonus3, &bonus1);
+    INITSHIP::Get_Ship_Combat_Bonuses_(ship_idx, &defense_bonus, &missile_defense_bonus, &attack_bonus);
 
     if (is_ship_type_2 || is_ship_type_1 || is_ship_type_4) {
         allocate::Push_Block_(MOX::_screen_seg);
@@ -602,8 +598,8 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
     
     fonts::Print_(0x12, EBP_y, HAROLD::H_Message_(0x99));
     
-    const char* sign1 = (bonus3 >= 0) ? s_plus_00551118 : s__00551100;
-    sprintf(buffer, s__s_d_00556134, sign1, bonus3);
+    const char* sign1 = (attack_bonus >= 0) ? s_plus_00551118 : s__00551100;
+    sprintf(buffer, s__s_d_00556134, sign1, attack_bonus);
     fonts::Print_Right_(0x85, EBP_y, buffer);
     
     strcpy(str_9a, HAROLD::H_Message_(0x9A));
@@ -616,8 +612,8 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         }
         fonts::Print_(0xAD, EBP_y, str_9a);
         
-        const char* sign2 = (bonus1 >= 0) ? s_plus_00551118 : s__00551100;
-        sprintf(buffer, s__s_d_00556134, sign2, bonus1);
+        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : s__00551100;
+        sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
         fonts::Print_(w + 0xAD, EBP_y, buffer);
     } else {
         w = fonts::Get_String_Width_(str_9a);
@@ -628,8 +624,8 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         
         fonts::Print_(0x12, EBP_y, str_9a);
         
-        const char* sign2 = (bonus1 >= 0) ? s_plus_00551118 : s__00551100;
-        sprintf(buffer, s__s_d_00556134, sign2, bonus1);
+        const char* sign2 = (defense_bonus >= 0) ? s_plus_00551118 : s__00551100;
+        sprintf(buffer, s__s_d_00556134, sign2, defense_bonus);
         
         if (w < 0x73) {
             w = 0x73;
@@ -672,7 +668,6 @@ void __cdecl Print_Scanned_Ship_Data_(int16_t ship_idx) {
         }
         fonts::Print_(0x12, y_cursor + 0x11F, loc_str);
         fonts::Set_Font_Style_(2, &FLT2::_normal_colors);
-        y_cursor = fonts::Get_Font_Height_() + y_cursor;
     }
     
     fh = fonts::Get_Font_Height_();

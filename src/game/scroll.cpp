@@ -32,8 +32,8 @@ namespace SCROLL {
 
     void __cdecl Scroll_Down_One_Item_(s_scroll_bar* sb) {
         if (sb->total_rows > sb->visible_rows) {
-            uint16_t step = (uint16_t)sb->row_step;
-            sb->first_visible_row += step;
+            uint8_t step = sb->row_step;
+            sb->first_visible_row = (int16_t)((uint16_t)sb->first_visible_row + step);
 
             if ((sb->total_rows - sb->visible_rows) < sb->first_visible_row) {
                 // Clamp to bottom

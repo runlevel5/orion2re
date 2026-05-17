@@ -9,6 +9,8 @@ namespace NEWPUP {
 
     inline s_animation_header*& _anims = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00557DCC});
 
+    void __cdecl Print_Data_(char* str, int16_t value, int16_t* y_pos, s_invasion_side_info* side_info);
+
     void __cdecl Print_Best_Summary_(s_invasion_side_info* side_info, int16_t* y_pos);
 
     void __cdecl Print_Race_Summary_(s_invasion_side_info* side_info, int16_t* summary_buffer);
@@ -20,6 +22,8 @@ namespace NEWPUP {
     void __cdecl Reset_Fields_();
 
     inline const char* s__00551100 = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
+    inline const char* s_0_0055110c = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C});
+    inline const char* s_1_00551110 = reinterpret_cast<const char*>(std::uintptr_t{0x00551110});
 
     void __cdecl Troop_Popup_();
 }

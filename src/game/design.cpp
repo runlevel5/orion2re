@@ -1706,7 +1706,7 @@ namespace DESIGN {
 
         while (next_id != 0) {
             if (next_id >= 75) {
-                level += (int16_t)(uint8_t)MOX::_player[player_idx].hyper_advanced_tech[next_id - 75];
+                level += (int16_t)MOX::_player[player_idx].hyper_advanced_tech[next_id - 75];
                 break;
             }
 

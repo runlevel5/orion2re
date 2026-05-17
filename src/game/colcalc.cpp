@@ -2471,7 +2471,7 @@ namespace COLCALC {
 
         // Process hyper-advanced technology fields (75 to 82)
         for (int i = 75; i < 83; ++i) {
-            uint8_t level = static_cast<uint8_t>(player->hyper_advanced_tech[i - 75]);
+            uint8_t level = player->hyper_advanced_tech[i - 75];
             if (level > 0) {
                 const s_tech_field_data& field = TECHDATA::_technology_fields[i];
                 // Cost calculation: Base Cost + (Level - 1) * 10000

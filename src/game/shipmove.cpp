@@ -642,7 +642,7 @@ namespace SHIPMOVE {
             if (!SHIPMOVE::Star_In_Range_Of_Player_(target_star, (int16_t)player_idx, (int16_t)min_range)) {
                 int16_t closest_star = COMBFIND::Closest_Other_Colony_Star_((int16_t)player_idx, target_star_idx);
                 if (closest_star != -1) {
-                    move_info->parsecs = (int8_t)GEO::Parsecs_Between_Stars_(closest_star, target_star_idx);
+                    move_info->parsecs = (uint8_t)GEO::Parsecs_Between_Stars_(closest_star, target_star_idx);
                 }
                 move_info->out_of_range = 1;
             }
