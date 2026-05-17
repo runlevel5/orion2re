@@ -38,7 +38,7 @@ namespace SYS {
         }
     }
 
-    void __cdecl Set_System_Display_Loaded_Flag_(short star_idx) {
+    void __cdecl Set_System_Display_Loaded_Flag_(int16_t star_idx) {
         char temp_buffer[120];
 
         char* allocated = (char*)allocate::Allocate_First_Block_((void*)SYS::_sys_data_buffer, 20);
@@ -50,8 +50,8 @@ namespace SYS {
 
         sprintf(temp_buffer, SYS::s_fmt_star_display, (int)star_idx, star->name);
 
-        if (strlen(temp_buffer) > 19) {
-            temp_buffer[19] = '\0';
+        if (strlen(temp_buffer) >= 20) {
+            temp_buffer[20] = '\0';
         }
 
         sprintf(MOX::_star_name_loaded_string, temp_buffer);
@@ -88,7 +88,7 @@ namespace SYS {
 
         s_animation_header* sun_anim = (s_animation_header*)buffer::Buffer_Reload_(s_BUFFER0_LBX, spectral_class + 0x53, (void*)MOX::_global_cache_seg);
         MOX::_sun_seg[spectral_class] = sun_anim;
-        _system_display_sun_seg = sun_anim;
+        _system_display_sun_seg = MOX::_sun_seg[spectral_class];
 
         RUSS::Mox_Update_();
         _draw_sun_before_planet = 1;
@@ -101,7 +101,7 @@ namespace SYS {
                 MOX::_sys_disp[orbit_idx].y = 999;
             } else {
                 s_planet_data* planet = &MOX::_planet[planet_idx];
-                int16_t planet_size = planet->size;
+                int8_t planet_size = planet->size;
                 if (planet->planet_type == PLANET_TYPE_GAS_GIANT) {
                     planet_size = 4;
                 }
@@ -125,7 +125,7 @@ namespace SYS {
                 MOX::_sys_disp[orbit_idx].oribit_pos = (int8_t)orbit_pos_out;
 
                 allocate::Get_Remaining_Block_Space_((void*)_sys_data_buffer);
-                Get_Rotating_Planet_Segment_(&MOX::_sys_disp[orbit_idx].pic, planet_idx, 0, 0);
+                Get_Rotating_Planet_Segment_(&MOX::_sys_disp[orbit_idx].pic, planet_idx, star_idx, 0);
 
                 int16_t frame_count = animate::Get_Animation_Frame_Count_(MOX::_sys_disp[orbit_idx].pic);
                 MOX::_sys_disp[orbit_idx].current_frame = (int16_t)((orbit_idx * 5) % frame_count);
@@ -162,7 +162,7 @@ namespace SYS {
 
         if (MOX::_look_at_colonies == 0) {
             if (!Ok_To_View_System_(star_idx, MOX::_PLAYER_NUM)) {
-                MISC::Get_LBX_Message_(spectral_class + 0xf, SYS::_star_description_string);
+                MISC::Get_LBX_Message_(MOX::_star[star_idx].spectral_class + 0xf, SYS::_star_description_string);
             }
         }
     }
@@ -186,7 +186,10 @@ namespace SYS {
         }
     }
 
-    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t orbit_pos, int32_t arg4) {
+    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t arg3, int32_t arg4) {
+        (void)arg3;
+        (void)arg4;
+
         s_planet_data* planet = &MOX::_planet[planet_idx];
         int16_t colony_idx = planet->colony_index;
         uint16_t climate = (uint16_t)(uint8_t)planet->climate;
@@ -331,10 +334,10 @@ namespace SYS {
             if (video::_screen_window_x2 < x) return;
             if (video::_screen_window_y2 < y) return;
 
-            x2 = anim_hdr->width + x - 1;
+            x2 = animate::_animation_header->width + x - 1;
             if (x2 < video::_screen_window_x1) return;
 
-            y2 = anim_hdr->height + y - 1;
+            y2 = animate::_animation_header->height + y - 1;
             if (y2 < video::_screen_window_y1) return;
 
             if (x < video::_screen_window_x1 ||
@@ -380,7 +383,7 @@ namespace SYS {
                 switch (static_cast<uint8_t>(anim_hdr->flags) & 3) {
                 case 0:
                     SYS::Remap_Clipped_Draw_Animated_Sprite_Mask_(x, y, anim_frame, mask_frame);
-                    return; // Avoids frame advance for clipped animations
+                    break;
                 case 1:
                     exitm::Exit_With_Message(s_Remap_draw_not_support_bitmaps_00557fc4);
                     break;
@@ -612,7 +615,7 @@ namespace SYS {
         }
     }
 
-    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode)
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, char mode)
     {
         int16_t x1, y1, x2, y2;
 
@@ -628,7 +631,8 @@ namespace SYS {
             y1 = content_h + base_y + y_offset - 1;
         }
 
-        s_colors font_colors = *MISC::Font_Colors2_(4, 'n', 's');
+        s_colors font_colors;
+        memcpy(&font_colors, MISC::Font_Colors2_(4, 'n', 's'), sizeof(font_colors));
 
         if (mode != 0) {
             int16_t clipped_y2 = video::_screen_window_y2;
@@ -777,7 +781,7 @@ namespace SYS {
             s_sys_disp* psVar1 = &MOX::_sys_disp[sVar15];
             if (psVar1->orbit > -1) {
                 s_planet_data* psVar8 = &MOX::_planet[psVar1->orbit];
-                short planet_size = (short)psVar8->size;
+                int8_t planet_size = psVar8->size;
                 if (psVar8->planet_type == '\x02') {
                     planet_size = 4;
                 }
@@ -803,7 +807,7 @@ namespace SYS {
         for (short sVar15 = 0; sVar15 < 5; ++sVar15) {
             short sVar11 = MOX::_sys_disp[sVar15].orbit;
             if (sVar11 > -1) {
-                short planet_size = (short)MOX::_planet[sVar11].size;
+                int8_t planet_size = MOX::_planet[sVar11].size;
                 if (MOX::_planet[sVar11].planet_type == '\x02') {
                     planet_size = 4;
                 }
@@ -1519,7 +1523,7 @@ namespace SYS {
     }
 
     void __cdecl Print_Empty_System_Data_() {
-        int16_t text_x_base;
+        int16_t local_4_stack;
         int16_t paragraph_top;
         int16_t box_width;
         int16_t paragraph_width;
@@ -1546,16 +1550,16 @@ namespace SYS {
             origin_y = 0x0011;
             left_padding = 0;
         } else {
-            paragraph_width = text_x_base;
-            box_width = text_x_base;
-            paragraph_height = text_x_base;
-            left_padding = text_x_base;
-            paragraph_top = text_x_base;
-            origin_x = text_x_base;
-            origin_y = text_x_base;
+            paragraph_width = local_4_stack;
+            box_width = local_4_stack;
+            paragraph_height = local_4_stack;
+            left_padding = local_4_stack;
+            paragraph_top = local_4_stack;
+            origin_x = local_4_stack;
+            origin_y = local_4_stack;
         }
 
-        text_x_base = static_cast<int16_t>(left_padding + origin_x);
+        local_4_stack = static_cast<int16_t>(left_padding + origin_x);
         const int16_t text_y = static_cast<int16_t>(paragraph_top + origin_y);
 
         MISC::Save_Window_Status_(&saved_window_status);
@@ -1569,7 +1573,7 @@ namespace SYS {
         ERIC::Print_Paragraph_Centered_Vertically_(
             static_cast<int16_t>(
                 ((static_cast<int32_t>(box_width) - static_cast<int32_t>(max_width)) / 2) +
-                static_cast<int32_t>(text_x_base)),
+                static_cast<int32_t>(local_4_stack)),
             text_y,
             paragraph_width,
             paragraph_height,
@@ -1792,7 +1796,7 @@ namespace SYS {
                 continue;
             }
 
-            int32_t planet_size = static_cast<int32_t>(planet.size);
+            int8_t planet_size = planet.size;
             if (planet.planet_type == 2) {
                 planet_size = 4;
             }

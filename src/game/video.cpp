@@ -34,7 +34,7 @@ namespace video {
 	}
 
 	int16_t __cdecl Get_Refresh_Mode_() {
-		return screen_refresh_flag;
+		return static_cast<int16_t>(screen_refresh_flag);
 	}
 
 	void __cdecl Add_Line_To_Scan_List_(int32_t x1, int32_t y, int32_t x2) {
@@ -212,19 +212,17 @@ namespace video {
 	}
 
 	void __cdecl Save_Refresh_() {
-		video::_old_screen_dump_flag = static_cast<int16_t>(video::screen_refresh_flag);
-		video::_old_screen_refresh_flag = static_cast<int16_t>(video::screen_dump_flag);
+		video::_old_screen_dump_flag = video::screen_refresh_flag;
+		video::_old_screen_refresh_flag = static_cast<int32_t>(video::screen_dump_flag);
 	}
 
 	void __cdecl Restore_Refresh_() {
-		*reinterpret_cast<int32_t*>(&video::screen_refresh_flag) =
-			static_cast<int32_t>(video::_old_screen_dump_flag);
-		video::screen_dump_flag =
-			static_cast<uint32_t>(static_cast<int32_t>(video::_old_screen_refresh_flag));
+		video::screen_refresh_flag = video::_old_screen_dump_flag;
+		video::screen_dump_flag = static_cast<uint32_t>(video::_old_screen_refresh_flag);
 	}
 
 	void __cdecl Set_Refresh_Differential_No_Full_() {
-		*reinterpret_cast<uint32_t*>(&video::screen_refresh_flag) = 2;
+		video::screen_refresh_flag = 2;
 		video::screen_dump_flag = 2;
 	}
 

@@ -33,7 +33,7 @@ namespace SYS {
 
     bool __cdecl Need_To_Reload_System_Display_(int16_t star_id);
 
-    void __cdecl Set_System_Display_Loaded_Flag_(short star_idx);
+    void __cdecl Set_System_Display_Loaded_Flag_(int16_t star_idx);
 
     void __cdecl Load_New_System_Display_(int16_t star_idx);
 
@@ -41,7 +41,7 @@ namespace SYS {
 
     void __cdecl Potential_Colony_Info_Popup_(int16_t planet_idx);
 
-    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t orbit_pos, int32_t arg4);
+    void __cdecl Get_Rotating_Planet_Segment_(s_animation_header** out_ptr, int16_t planet_idx, int16_t arg3, int32_t arg4);
 
     inline int8_t (&_remap_gray_percentages)[10] =
         *reinterpret_cast<int8_t (*)[10]>(std::uintptr_t{0x00557EE0});
@@ -57,7 +57,7 @@ namespace SYS {
 
     void __cdecl N_Ships_By_Type_At_Location_(int16_t x, int16_t y, int16_t target_owner, int16_t *total_count, int16_t *bases_count, int16_t *colony_ships_count, int16_t *transports_count, int16_t *ship_sizes);
 
-    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, int16_t mode);
+    void __cdecl Hide_System_Display_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h, int16_t x_offset, int16_t y_offset, char mode);
 
     void __cdecl Draw_System_Display_Border_(int16_t base_x, int16_t base_y, int16_t content_w, int16_t content_h);
 

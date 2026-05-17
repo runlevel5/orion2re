@@ -44,6 +44,6 @@ namespace RACESEL {
     inline char*& _temp_ruler_name = *reinterpret_cast<char**>(std::uintptr_t{0x005A57C8});
 
     void __cdecl Draw_Naming_Popup_();
-    void __cdecl Message_Build_(int16_t* message_count, int32_t split_at_count, char* output);
+    void __cdecl Message_Build_(int16_t* message_count, int16_t split_at_count, char* output);
     void __cdecl Draw_Race_Selection_Screen_();
 }
