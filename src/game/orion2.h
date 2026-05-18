@@ -5053,7 +5053,7 @@ typedef struct s_techdata_planetary_shield s_techdata_planetary_shield, *Ps_tech
 struct s_techdata_planetary_shield {
     undefined field0_0x0;
     undefined field1_0x1;
-    int8_t absorption;
+    uint8_t absorption;
 };
 
 typedef struct s_transport_pack_ack s_transport_pack_ack, *Ps_transport_pack_ack;

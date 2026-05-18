@@ -687,7 +687,7 @@ namespace CMBTFIRE {
 
         if ((weapon_flags & 0x10) != 0) {
             if (!COMBINIT::Does_Combat_Ship_Have_Special_(target_ship_idx, 7)) {
-                if (MOX::_combat_data[target_ship_idx].marine_count != -1) {
+                if (MOX::_combat_data[target_ship_idx].marine_count != 0xFF) {
                     CMBTFIR2::Kill_Crew_(target_ship_idx, *dmg_out / 5);
                 }
             }
@@ -862,15 +862,17 @@ namespace CMBTFIRE {
 
     int16_t __cdecl Apply_Damage_To_Planet_(int16_t* damage, uint16_t specials, uint16_t flags) {
         s_combat_bomb_result bomb_stats;
-        int16_t structural_hits = 0;
-        int16_t planetary_damage_hits = 0;
-        uint16_t shield_hit_flag = 0;
+        int16_t defense_hits = 0;
+        int16_t colony_hits = 0;
+        int16_t shield_hit_flag = 0;
 
         struct_::Clear_Structure_(&bomb_stats, 0x49);
 
         int16_t best_armor_idx = INITSHIP::Best_Armor_(MOX::_combat_data->owner);
         int16_t armor_threshold = (int16_t)(((TECHDATA::_armor[best_armor_idx].ships_bonus * 4 + 400) * 25) /
             100);
+
+        (void)specials;
 
         if (flags & 0x80 /* BIO_WEAPON */) {
             MOX::_bio_weapon_flag = 1;
@@ -880,15 +882,15 @@ namespace CMBTFIRE {
             if (MOX::_combat_data->shield_type != 0x17) {
                 s_player* defender = &MOX::_player[MOX::_combat_defender_player];
 
-                if (reinterpret_cast<int8_t*>(defender)[0x182] == 3 /* TECH_APP_MICROBIOTICS */) {
+                if (defender->tech_applications[TECH_APP_MICROBIOTICS] == 3) {
                     *damage = *damage / 2;
                 }
-                else if (reinterpret_cast<int8_t*>(defender)[0x1d8] == 3 /* TECH_APP_UNIVERSAL_ANTIDOTE */) {
-                    *damage = *damage / 4;
+                else if (defender->tech_applications[TECH_APP_UNIVERSAL_ANTIDOTE] == 3) {
+                    *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
                 }
 
                 if (random::Random_(100) <= *damage) {
-                    planetary_damage_hits = 1;
+                    colony_hits = 1;
                     bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                     _combat_bomb_result.bio_hits_remaining += 1;
                     bomb_stats.bomb_hits_remaining = 0;
@@ -904,56 +906,53 @@ namespace CMBTFIRE {
             }
         }
         else {
-            if (COMBINIT::Does_Combat_Ship_Have_Special_(0, 7 /* ARMOR_PIERCING */) == 1) {
-                *damage = (*damage / 4) - 1;
+            if (COMBINIT::Does_Combat_Ship_Have_Special_(0, 7 /* HARD_SHIELDS */) == 1) {
+                *damage = (int16_t)((*damage + (((int32_t)*damage >> 31) & 3)) >> 2);
+                *damage -= 1;
             }
 
             if (CMBTFIRE::Does_Combat_Planet_Have_Defenses_() > 0) {
-                structural_hits = *damage - MOX::_combat_data->shield_arc_current[0];
+                defense_hits = *damage - MOX::_combat_data->shield_arc_current[0];
                 if (MOX::_combat_data->shield_type > 0) {
                     shield_hit_flag = 1;
                 }
-                planetary_damage_hits = 0;
+                colony_hits = 0;
             }
             else {
-                structural_hits = 0;
+                defense_hits = 0;
                 if (MOX::_combat_data->shield_type > 0) {
                     shield_hit_flag = 1;
                 }
-                planetary_damage_hits = *damage - MOX::_combat_data->shield_arc_current[1];
+                colony_hits = *damage - MOX::_combat_data->shield_arc_current[1];
             }
 
-            if (structural_hits > 0 && !(flags & 0x8)) {
+            if (defense_hits > 0 && !(flags & 0x8)) {
                 if (flags & 0x20 /* HEAVY_MOUNT */) {
-                    structural_hits *= 2;
+                    defense_hits *= 2;
                 }
-                MOX::_combat_data->structure_damage += structural_hits;
-                if (MOX::_combat_data->structure_damage >= armor_threshold) {
+                MOX::_combat_data->structure_damage += defense_hits;
+                if (MOX::_combat_data->structure_damage > armor_threshold) {
                     int16_t hits = MOX::_combat_data->structure_damage / armor_threshold;
                     *damage = hits;
                     CMBTFIRE::Destroy_Colony_Defense_(hits);
                     MOX::_combat_data->structure_damage %= armor_threshold;
-                    structural_hits = hits;
-                }
-                else {
-                    structural_hits = 0;
                 }
             }
             else {
-                structural_hits = 0;
+                defense_hits = 0;
             }
 
-            if (planetary_damage_hits > 0) {
+            if (colony_hits > 0) {
                 if (MOX::_cmbt_colony_id != -1 && !(flags & 0x8)) {
                     if (flags & 0x20 /* HEAVY_MOUNT */) {
-                        planetary_damage_hits *= 2;
+                        colony_hits *= 2;
                     }
 
                     if (MOX::_combat_data->structure_max < 32000) {
-                        MOX::_combat_data->structure_max += planetary_damage_hits;
+                        MOX::_combat_data->structure_max += colony_hits;
                     }
 
-                    if (MOX::_combat_data->structure_max >= 100) {
+                    if (MOX::_combat_data->structure_max > 100) {
                         bomb_stats.attacker_idx = (int8_t)MOX::_combat_attacker_player;
                         bomb_stats.colony_idx = (uint8_t)MOX::_cmbt_colony_id;
                         bomb_stats.is_planetary_hit = 1;
@@ -963,35 +962,37 @@ namespace CMBTFIRE {
                         if (MOX::_apply_damage_to_planet != 0 && MOX::_cmbt_colony_id != -1) {
                             BOMB::Apply_Bomb_Hits_(&bomb_stats);
 
-                            if (bomb_stats.buildings_destroyed[28 /* BARRIER_SHIELD */] != 0) {
+                            if (bomb_stats.buildings_destroyed[BUILDING_RADIATION_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
                                 MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[1].absorption;
                                 MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[1].absorption;
                             }
-                            else if (bomb_stats.buildings_destroyed[19 /* RADIATION_SHIELD */] != 0) {
+                            else if (bomb_stats.buildings_destroyed[BUILDING_BARRIER_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
                                 MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[3].absorption;
                                 MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[3].absorption;
                             }
-                            else if (bomb_stats.buildings_destroyed[20 /* FLUX_SHIELD */] != 0) {
+                            else if (bomb_stats.buildings_destroyed[BUILDING_FLUX_SHIELD] != 0) {
                                 MOX::_combat_data->shield_type = 0;
                                 MOX::_combat_data->shield_arc_current[0] -= TECHDATA::_planetary_shields[2].absorption;
                                 MOX::_combat_data->shield_arc_current[1] -= TECHDATA::_planetary_shields[2].absorption;
                             }
                         }
-                        MOX::_combat_data->structure_max -= (int16_t)bomb_stats.total_hits_processed * 100;
+                        MOX::_combat_data->structure_max += (int16_t)((int16_t)bomb_stats.total_hits_processed * -100);
                     }
                 }
                 else {
-                    planetary_damage_hits = 0;
+                    if (MOX::_cmbt_colony_id != -1) {
+                        colony_hits = 0;
+                    }
                 }
             }
             else {
-                planetary_damage_hits = 0;
+                colony_hits = 0;
             }
         }
 
-        *damage = structural_hits + planetary_damage_hits;
+        *damage = defense_hits + colony_hits;
         return shield_hit_flag;
     }
 

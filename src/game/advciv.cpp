@@ -146,7 +146,7 @@ namespace ADVCIV {
                     for (int16_t i = 0; i < 5; ++i) {
                         int16_t planet_idx = star->planet_index[i];
 
-                        if (planet_idx != -1) {
+                        if (planet_idx > -1) {
                             s_planet_data* planet = &MOX::_planet[planet_idx];
 
                             if (planet->planet_type == PLANET_TYPE_PLANET &&
@@ -219,7 +219,7 @@ namespace ADVCIV {
 
     void __cdecl Build_Parsec_Star_Distances_(s_parsec* parsec) {
         for (int16_t i = 0; i < 72; ++i) {
-            memset(&parsec[i].dist, 0, sizeof(parsec[i].dist));
+            memset(parsec[i].dist, 0xFF, sizeof(parsec[i].dist));
 
             if (i < MOX::_NUM_STARS) {
                 for (int16_t j = 0; j < MOX::_NUM_STARS; ++j) {
@@ -451,10 +451,10 @@ namespace ADVCIV {
             for (int16_t j = 0; j < (int16_t)MOX::_planet_count && !player_satisfied; ++j) {
                 if (_planet_selected_flag[j] == i) {
                     uint8_t targets[3];
-                    targets[0] = 4 - MOX::_planet[j].climate;
-                    int size_diff = 8 - MOX::_planet[j].size;
-                    targets[1] = (size_diff < 0) ? 0 : size_diff;
-                    targets[2] = 4 - MOX::_planet[j].mineral_class;
+                    targets[0] = (uint8_t)(4 - MOX::_planet[j].size);
+                    int climate_diff = 8 - MOX::_planet[j].climate;
+                    targets[1] = (climate_diff < 0) ? 0 : (uint8_t)climate_diff;
+                    targets[2] = (uint8_t)(4 - MOX::_planet[j].mineral_class);
 
                     // If player has fewer special systems than the leader, attempt to generate one
                     if (player_special_count[i] < player_special_count[best_player_idx] &&
@@ -462,7 +462,7 @@ namespace ADVCIV {
                         MOX::_star[MOX::_planet[j].star_index].system_special == 0)
                     {
                         int8_t generated_special = 0;
-                        // Skip special generation for home planets of "Fantastic Traders" trait (trait 16)
+                        // Skip special generation for Ancient Home World home planets (trait 16)
                         if (!(MOX::_player[i].home_planet_id == j && MOX::_player[i].traits[TRAIT_ANCIENT_HOME_WORLD] != 0)) {
                             int attempts = 0;
                             do {
