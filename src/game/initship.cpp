@@ -362,7 +362,7 @@ namespace INITSHIP {
             design->picture_num = static_cast<int8_t>(design_idx) << 3;
         }
 
-        design->previous_owner = static_cast<int8_t>(player_idx);
+        design->previous_owner = (uint8_t)player_idx;
         design->speed = static_cast<int8_t>(Get_FTL_Speed_(player_idx, static_cast<int16_t>(design->ftl_type)));
         design->date_of_design = static_cast<uint16_t>(MOX::_stardate);
     }

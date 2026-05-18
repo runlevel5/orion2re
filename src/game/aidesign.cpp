@@ -1080,7 +1080,7 @@ namespace aidesign {
         if (count > 0) {
             for (int16_t i = 0; i < count; ++i) {
                 uint16_t w_idx = weapon_indices[i];
-                if ((int16_t)TECHDATA::_weapons[w_idx].max_damage < max_shield + 4) {
+                if (TECHDATA::_weapons[w_idx].max_damage < max_shield + 4) {
                     weapon_indices[i] = 0;
                     sort_keys[i] = 0;
                     // Note: Potentially a memory corruption bug in original game where parameter pointer 
@@ -1132,7 +1132,7 @@ namespace aidesign {
                     uint16_t w_idx = weapon_indices[i];
                     if (w_idx != 0) {
                         int32_t space = DESIGN::Weapon_Space_(player_idx, w_idx, 1, 1, 5, 0);
-                        int32_t score = (((int32_t)(int16_t)TECHDATA::_weapons[w_idx].max_damage - max_shield) * 10) / space;
+                        int32_t score = (((int32_t)TECHDATA::_weapons[w_idx].max_damage - max_shield) * 10) / space;
                         if (best_score < score) {
                             best_index = i;
                             best_score = score;
@@ -1496,7 +1496,7 @@ namespace aidesign {
         }
 
         design->combat_speed = (int8_t)TECHDATA::_drives[design->ftl_type].combat_speed_min[hull_idx];
-        design->previous_owner = (int8_t)player_idx;
+        design->previous_owner = (uint8_t)player_idx;
         design->cost = DESIGN::Cost_Of_Design_(player_idx, design);
         design->date_of_design = (uint16_t)MOX::_stardate;
     }

@@ -798,7 +798,7 @@ namespace CMBTSPEC {
         int16_t max_dist;
         int16_t step;
         int16_t dist_acc;
-        uint8_t hit_flag;
+        int16_t hit_flag;
         int sound_handle;
         s_missile* missile;
         int16_t target_unit_idx;
@@ -872,7 +872,8 @@ namespace CMBTSPEC {
                         CMBTMIS::Retarget_Missile_(missile_idx);
                     }
                 } else {
-                    if (MOX::_combat_data[target_unit_idx].unit_status == 0) {
+                    int16_t current_target_unit_idx = MOX::_missile[missile_idx].target_unit_idx;
+                    if (MOX::_combat_data[current_target_unit_idx].unit_status != 0) {
                         hit_flag = 0;
                         CMBTMIS::Retarget_Missile_(missile_idx);
                     }
@@ -992,7 +993,7 @@ namespace CMBTSPEC {
         int16_t shots_left = source_ship->weapons[param_3].shots_left;
         int16_t weapon_id = source_ship->weapons[param_3].weapon_id;
 
-        if (MOX::_apply_damage_to_planet != 1 && MOX::_super_fast_flag == 0) {
+        if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
             if (!CMBTDRW1::Ship_Completely_On_Screen_(param_2)) {
                 COMBINIT::Snap_Center_Combat_Screen_(target_ship->x, target_ship->y);
             }
@@ -1011,7 +1012,7 @@ namespace CMBTSPEC {
             dest_y += (target_ship->y - MOX::_cur_combat_y) * 20 - 20;
 
             int32_t travel_sound = ERICNET::Mox_Play_Sound_(0x1B);
-            int16_t step = (MOX::_auto_combat == 0) ? 6 : 24;
+            int16_t step = (MOX::_auto_combat == 1) ? 24 : 6;
 
             int16_t current_x = start_x;
             int16_t current_y = start_y;
@@ -1036,25 +1037,24 @@ namespace CMBTSPEC {
 
             sound::Fadeout_Sound_(travel_sound, 10);
 
-            int16_t impact_entry;
+            s_animation_header* impact_seg = travel_seg;
             switch (target_ship->size_class) {
-                case 0: impact_entry = 0x24; break;
+                case 0: impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x24, MOX::_global_cache_seg); break;
                 case 1:
-                case 2: impact_entry = 0x25; break;
-                case 3: impact_entry = 0x26; break;
+                case 2: impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x25, MOX::_global_cache_seg); break;
+                case 3: impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x26, MOX::_global_cache_seg); break;
                 case 4:
-                case 5: impact_entry = 0x27; break;
-                default: impact_entry = 0x25; break;
+                case 5: impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x27, MOX::_global_cache_seg); break;
+                default: break;
             }
 
-            s_animation_header* impact_seg = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, impact_entry, MOX::_global_cache_seg);
             int16_t impact_frames = animate::Get_Animation_Frame_Count_(impact_seg);
             int16_t impact_x = current_x + (20 - animate::Get_Width_(impact_seg) / 2);
             int16_t impact_y = current_y + (20 - animate::Get_Height_(impact_seg) / 2);
 
             int32_t hit_sound = ERICNET::Mox_Play_Sound_(0x44);
             int16_t impact_frame_idx = 0;
-            int16_t frame_inc = (MOX::_auto_combat == 0) ? 1 : 2;
+            int16_t frame_inc = (MOX::_auto_combat == 1) ? 2 : 1;
 
             while (impact_frame_idx < impact_frames) {
                 video::Set_Page_Off_();
@@ -1064,18 +1064,17 @@ namespace CMBTSPEC {
 
                 palette::Restore_Glass_Remap_Block_(MOX::_plasma_web_remap_colors);
 
-                int16_t cur_impact_entry;
+                s_animation_header* anim = impact_seg;
                 switch (target_ship->size_class) {
-                    case 0: cur_impact_entry = 0x24; break;
+                    case 0: anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x24, MOX::_global_cache_seg); break;
                     case 1:
-                    case 2: cur_impact_entry = 0x25; break;
-                    case 3: cur_impact_entry = 0x26; break;
+                    case 2: anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x25, MOX::_global_cache_seg); break;
+                    case 3: anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x26, MOX::_global_cache_seg); break;
                     case 4:
-                    case 5: cur_impact_entry = 0x27; break;
-                    default: cur_impact_entry = 0x25; break;
+                    case 5: anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x27, MOX::_global_cache_seg); break;
+                    default: break;
                 }
 
-                s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, cur_impact_entry, MOX::_global_cache_seg);
                 animate::Set_Animation_Frame_(anim, (int32_t)impact_frame_idx);
                 animate::Draw_(impact_x, impact_y, anim);
 
@@ -1091,13 +1090,13 @@ namespace CMBTSPEC {
         }
 
         int16_t ord_bonus = MOX::_ordnance_bonus[source_ship->owner];
-        int16_t min_dmg = (TECHDATA::_weapons[weapon_id].min_damage * ord_bonus) / 100;
-        int16_t max_dmg = (TECHDATA::_weapons[weapon_id].max_damage * ord_bonus) / 100;
-        int16_t diff = max_dmg - min_dmg;
+        int32_t min_dmg = ((int32_t)TECHDATA::_weapons[weapon_id].min_damage * ord_bonus) / 100;
+        int32_t max_dmg = ((int32_t)TECHDATA::_weapons[weapon_id].max_damage * ord_bonus) / 100;
+        int32_t diff = max_dmg - min_dmg;
 
         if (shots_left > 0) {
             for (int16_t i = 0; i < shots_left; ++i) {
-                accumulated_damage += (random::Random_(100) * diff / 100) + min_dmg;
+                accumulated_damage += (int16_t)(((int32_t)random::Random_(100) * diff) / 100 + min_dmg);
             }
         }
 
@@ -1111,7 +1110,7 @@ namespace CMBTSPEC {
         int16_t step;
         int16_t i;
         int16_t old_dont_draw;
-        s_animation_header* anim = nullptr;
+        s_animation_header* anim;
         s_combat_data* ship = &MOX::_combat_data[ship_idx];
 
         if (CMBTDRW1::Ship_Completely_On_Screen_(ship_idx) == 0) {
@@ -1125,8 +1124,8 @@ namespace CMBTSPEC {
         if (ship->previous_owner < 10) {
             if (explosion_type != 1) {
                 int16_t damage = CMBTFIR2::Damage_From_Ship_Exploding_(ship_idx);
-                ship->unit_status = 5 /* DESTROYED */;
                 Do_Spherical_SFX_(ship_idx, x, y, explosion_type, damage);
+                ship->unit_status = 5 /* DESTROYED */;
                 return;
             }
 
@@ -1188,6 +1187,21 @@ namespace CMBTSPEC {
 
                 if (ship->unit_status == 0) {
                     CMBTDRW1::Draw_Ship_(ship_idx, (MOX::_cur_combat_x * -20) + x, (MOX::_cur_combat_y * -20) + y);
+                }
+
+                switch (ship->size_class) {
+                    case 0:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 3, MOX::_global_cache_seg);
+                        break;
+                    case 1:
+                    case 2:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 4, MOX::_global_cache_seg);
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 5, MOX::_global_cache_seg);
+                        break;
                 }
 
                 animate::Set_Animation_Frame_(anim, i);
@@ -1647,117 +1661,119 @@ namespace CMBTSPEC {
             int16_t ship_collapse_3_val = 100;
             int16_t ship_collapse_4_val = 132;
 
-            for (int16_t frame = 0; frame < frame_count; frame += step) {
-                graphics::Reset_Window_();
-                timer::Mark_Time_();
-                video::Set_Page_Off_();
-                graphics::Set_Window_(0, 0, 639, 350);
-                video::Clip_On_();
+            if (frame_count >= 0) {
+                for (int16_t frame = 0; frame <= frame_count; frame += step) {
+                    graphics::Reset_Window_();
+                    timer::Mark_Time_();
+                    video::Set_Page_Off_();
+                    graphics::Set_Window_(0, 0, 639, 350);
+                    video::Clip_On_();
 
-                if (!draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
-                    if (sfx_type == 1 || sfx_type == 0) {
-                        CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
-                    }
-                    else if (sfx_type == 3) {
-                        Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
-                    }
-                    else if (sfx_type == 4) {
-                        Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_4_val, (int8_t)frame);
-                    }
-                }
-
-                int32_t frame_offset = sfx_type * 25;
-                int16_t frame_val = anim_frames[frame_offset + frame];
-                int32_t frame_val_sq = (int32_t)frame_val * frame_val;
-
-                for (int32_t j = 0; j < ships_in_range_count; ++j) {
-                    bool draw_ship = true;
-                    if ((sfx_type == 0 || sfx_type == 1 || sfx_type == 2) &&
-                        ((frame < 5 && ship_dist_ratios[j] == 1) ||
-                            (frame > 0 && frame < 7 && ship_dist_ratios[j] == 2) ||
-                            (frame > 4 && frame < 13 && ship_dist_ratios[j] == 3) ||
-                            (frame > 8 && ship_dist_ratios[j] == 4)))
-                    {
-                        int16_t ship_idx = ship_indices[j];
-                        int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
-                        cx = cx * 20 - 3 + (int16_t)random::Random_(5);
-                        int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
-                        cy = cy * 20 - 3 + (int16_t)random::Random_(5);
-                        CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
-                        draw_ship = false;
-                    }
-                    else if (sfx_type != 0 && sfx_type != 1) {
-                        int32_t dist_sq = ship_dist_sq[j];
-                        int32_t size_bonus = (int32_t)MOX::_combat_data[ship_indices[j]].size_class * 25;
-                        int32_t max_dist = frame_val_sq + size_bonus;
-
-                        if (dist_sq <= max_dist) {
-                            if (frame_val < 85 || (frame_val >= 85 && dist_sq <= frame_val_sq - 625)) {
-                                int16_t ship_idx = ship_indices[j];
-                                int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
-                                cx = cx * 20 - 3 + (int16_t)random::Random_(5);
-                                int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
-                                cy = cy * 20 - 3 + (int16_t)random::Random_(5);
-                                CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
-                                draw_ship = false;
-                            }
+                    if (!draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
+                        if (sfx_type == 1 || sfx_type == 0) {
+                            CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
+                        }
+                        else if (sfx_type == 3) {
+                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
+                        }
+                        else if (sfx_type == 4) {
+                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_4_val, (int8_t)frame);
                         }
                     }
 
-                    if (draw_ship) {
-                        int16_t ship_idx = ship_indices[j];
-                        int16_t cx = (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20;
-                        int16_t cy = (MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y) * 20;
-                        CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
+                    int32_t frame_offset = sfx_type * 25;
+                    int16_t frame_val = anim_frames[frame_offset + frame];
+                    int32_t frame_val_sq = (int32_t)frame_val * frame_val;
+
+                    for (int32_t j = 0; j < ships_in_range_count; ++j) {
+                        bool draw_ship = true;
+                        if ((sfx_type == 0 || sfx_type == 1 || sfx_type == 2) &&
+                            ((frame < 5 && ship_dist_ratios[j] == 1) ||
+                                (frame > 0 && frame < 7 && ship_dist_ratios[j] == 2) ||
+                                (frame > 4 && frame < 13 && ship_dist_ratios[j] == 3) ||
+                                (frame > 8 && ship_dist_ratios[j] == 4)))
+                        {
+                            int16_t ship_idx = ship_indices[j];
+                            int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
+                            cx = cx * 20 - 3 + (int16_t)random::Random_(5);
+                            int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
+                            cy = cy * 20 - 3 + (int16_t)random::Random_(5);
+                            CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
+                            draw_ship = false;
+                        }
+                        else if (sfx_type != 0 && sfx_type != 1) {
+                            int32_t dist_sq = ship_dist_sq[j];
+                            int32_t size_bonus = (int32_t)MOX::_combat_data[ship_indices[j]].size_class * 25;
+                            int32_t max_dist = frame_val_sq + size_bonus;
+
+                            if (dist_sq <= max_dist) {
+                                if (frame_val < 85 || (frame_val >= 85 && dist_sq <= frame_val_sq - 625)) {
+                                    int16_t ship_idx = ship_indices[j];
+                                    int16_t cx = MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x;
+                                    cx = cx * 20 - 3 + (int16_t)random::Random_(5);
+                                    int16_t cy = MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y;
+                                    cy = cy * 20 - 3 + (int16_t)random::Random_(5);
+                                    CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
+                                    draw_ship = false;
+                                }
+                            }
+                        }
+
+                        if (draw_ship) {
+                            int16_t ship_idx = ship_indices[j];
+                            int16_t cx = (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20;
+                            int16_t cy = (MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y) * 20;
+                            CMBTDRW1::Draw_Ship_(ship_idx, cx, cy);
+                        }
                     }
-                }
 
-                if (sfx_type != 2) {
-                    palette::Restore_Glass_Remap_Block_(remap_colors);
-                }
-
-                switch (sfx_type) {
-                case 0:
-                case 1:
-                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
-                    break;
-                case 2:
-                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
-                    break;
-                case 3:
-                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
-                    break;
-                case 4:
-                    anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
-                    break;
-                }
-
-                animate::Set_Animation_Frame_(anim, (int32_t)frame);
-                ERIC::Draw_Centered_(center_x, center_y, anim);
-
-                if (sfx_type != 2) {
-                    palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
-                }
-
-                if (draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
-                    if (sfx_type == 1 || sfx_type == 0 || sfx_type == 2) {
-                        CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
+                    if (sfx_type != 2) {
+                        palette::Restore_Glass_Remap_Block_(remap_colors);
                     }
-                    else if (sfx_type == 3) {
-                        Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
+
+                    switch (sfx_type) {
+                    case 0:
+                    case 1:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 0x34, MOX::_global_cache_seg);
+                        break;
+                    case 2:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_CMBTSFX_LBX, 6, MOX::_global_cache_seg);
+                        break;
+                    case 3:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 0, MOX::_global_cache_seg);
+                        break;
+                    case 4:
+                        anim = (s_animation_header*)buffer::Buffer_Reload_(COLONY::_SPHERSFX_LBX, 1, MOX::_global_cache_seg);
+                        break;
                     }
-                    else if (sfx_type == 4) {
-                        Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val + 40, (int8_t)frame);
+
+                    animate::Set_Animation_Frame_(anim, (int32_t)frame);
+                    ERIC::Draw_Centered_(center_x, center_y, anim);
+
+                    if (sfx_type != 2) {
+                        palette::Restore_Glass_Remap_Block_(MOX::_shield_remap_colors);
                     }
+
+                    if (draw_ships_collapsing_flag && MOX::_combat_data[param_1].unit_status != 5) {
+                        if (sfx_type == 1 || sfx_type == 0 || sfx_type == 2) {
+                            CMBTDRW1::Draw_Ship_(param_1, center_x - center_dx_2, center_y - center_dy_2);
+                        }
+                        else if (sfx_type == 3) {
+                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val, (int8_t)frame);
+                        }
+                        else if (sfx_type == 4) {
+                            Draw_Ship_Collapsing_(param_1, center_x - center_dx_2, center_y - center_dy_2, ship_collapse_3_val + 40, (int8_t)frame);
+                        }
+                    }
+
+                    video::Clip_Off_();
+                    graphics::Reset_Window_();
+                    RUSS::Mox_Sync_Update_();
+                    timer::Release_Time_(1);
+
+                    ship_collapse_3_val -= step * 10;
+                    ship_collapse_4_val -= step * 8;
                 }
-
-                video::Clip_Off_();
-                graphics::Reset_Window_();
-                RUSS::Mox_Sync_Update_();
-                timer::Release_Time_(1);
-
-                ship_collapse_3_val -= step * 10;
-                ship_collapse_4_val -= step * 8;
             }
 
             MOX::_dont_draw_ship = -1;
@@ -1861,7 +1877,7 @@ namespace CMBTSPEC {
                 chance = 1;
             }
 
-            dummy_hits = 0;
+            int16_t damage_out = 0;
             int16_t struct_damage = 0;
             int16_t ship_idx = ship_indices[j];
 
@@ -1869,10 +1885,10 @@ namespace CMBTSPEC {
                 for (int16_t k = 0; k < MOX::_combat_data[ship_idx].size_class + 1; ++k) {
                     int32_t rnd = random::Random_((int32_t)chance);
                     if (rnd <= 1) {
-                        dummy_hits++; // Original game bug: increments an unused stack variable here
+                        damage_out++;
                     }
                     else {
-                        center_dx_2 += (int16_t)random::Random_((int32_t)chance); // Original game bug: accumulates in center_dx_2
+                        damage_out += (int16_t)random::Random_((int32_t)chance);
                     }
                 }
             }
@@ -1880,19 +1896,19 @@ namespace CMBTSPEC {
             if (sfx_type == 2) {
                 MOX::_combat_data[ship_idx].structure_damage += (int16_t)chance;
                 struct_damage = 0;
-                dummy_hits = (int16_t)chance;
+                damage_out = (int16_t)chance;
             }
             else {
                 int16_t facing = CMBTDRW1::Relative_Bearing_(ship_idx, param_1);
                 facing = CMBTFIRE::Facing_Shield_(facing);
-                CMBTFIRE::Apply_Ship_Damage_(ship_idx, &center_dx_2, &struct_damage, facing, 0, 0, 0, 0, 0);
+                CMBTFIRE::Apply_Ship_Damage_(ship_idx, &damage_out, &struct_damage, facing, 0, 0, 0, 0, 0);
             }
 
             if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
                 BEAMS::Add_Damage_Indicator_For_Ship_(
                     (MOX::_combat_data[ship_idx].x - MOX::_cur_combat_x) * 20,
                     (MOX::_combat_data[ship_idx].y - MOX::_cur_combat_y) * 20,
-                    ship_idx, 1, center_dx_2, struct_damage);
+                    ship_idx, 1, damage_out, struct_damage);
             }
         }
 

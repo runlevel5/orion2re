@@ -375,7 +375,7 @@ namespace SHIPMOVE {
         }
 
         MOX::_ship[i].owner = (char)owner;
-        MOX::_ship[i].d.previous_owner = (char)owner;
+        MOX::_ship[i].d.previous_owner = (uint8_t)owner;
         MOX::_ship[i].status = 0;
 
         // Set orbital position and coordinates

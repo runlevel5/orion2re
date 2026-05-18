@@ -355,7 +355,7 @@ namespace COLBLDG {
 
         struct_::Copy_Structure_(&new_ship.d, &MOX::_player[player_idx].ship_designs[design_idx], 0x63);
         new_ship.owner = (int8_t)player_idx;
-        new_ship.d.previous_owner = (int8_t)player_idx;
+        new_ship.d.previous_owner = (uint8_t)player_idx;
         new_ship.status = 0;
         new_ship.location = star_idx;
         new_ship.x = MOX::_star[star_idx].x;

@@ -386,7 +386,7 @@ namespace KEN {
                 }
 
                 int16_t weapon_idx = INITSHIP::Best_Beam_Weapon_(i);
-                if (static_cast<int16_t>(TECHDATA::_weapons[max_weapon_idx].max_damage) < static_cast<int16_t>(TECHDATA::_weapons[weapon_idx].max_damage)) {
+                if (TECHDATA::_weapons[max_weapon_idx].max_damage < TECHDATA::_weapons[weapon_idx].max_damage) {
                     max_weapon_idx = weapon_idx;
                 }
             }
@@ -402,7 +402,7 @@ namespace KEN {
             if (TECHDATA::_weapons[i].type == 0 &&
                 TECHDATA::_technology_applications[TECHDATA::_weapons[i].tech_app_id].tech_field_id != 0x4A) {
 
-                int16_t diff = static_cast<int16_t>(TECHDATA::_weapons[i].max_damage) - static_cast<int16_t>(TECHDATA::_weapons[max_weapon_idx].max_damage);
+                int16_t diff = TECHDATA::_weapons[i].max_damage - TECHDATA::_weapons[max_weapon_idx].max_damage;
 
                 if (diff >= 0 && diff <= min_diff && diff <= 50) {
                     if (MOX::_player[player_idx].tech_applications[TECHDATA::_weapons[i].tech_app_id] != 3) {

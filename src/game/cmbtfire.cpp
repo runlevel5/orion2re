@@ -236,7 +236,7 @@ namespace CMBTFIRE {
             is_legal = 0;
         } else {
             if ((TECHDATA::_weapons[weapon_id].natural_mods & 0x8) != 0) {
-                int8_t prev_owner = MOX::_combat_data[target_idx].previous_owner;
+                uint8_t prev_owner = MOX::_combat_data[target_idx].previous_owner;
                 if (prev_owner >= 8 && prev_owner != 9) {
                     is_legal = 0;
                 }

@@ -43,23 +43,8 @@ namespace REPORT {
         return nullptr;
     }
 
-    bool __cdecl Has_Msg_(int16_t player_idx, int8_t show_summary) {
-#pragma pack(push, 1)
-        struct s_MSG_internal {
-            int8_t msg_type;     // 0x00
-            int8_t field1_0x1;   // 0x01
-            int16_t field2_0x2;  // 0x02
-            int8_t val;          // 0x04
-            int8_t field5_0x5;   // 0x05
-            int8_t field6_0x6;   // 0x06
-            int8_t field7_0x7;   // 0x07
-            int32_t field2_0x8;  // 0x08
-            int32_t field3_0xc;  // 0x0c
-            int16_t field4_0x10; // 0x10
-        };
-#pragma pack(pop)
-
-        uint8_t result = 0;
+    int8_t __cdecl Has_Msg_(int16_t player_idx, int8_t show_summary) {
+        int8_t result = 0;
 
         // Check if the summary for this player hasn't been displayed yet
         if (!((REPORT::_displayed_msgs >> (player_idx & 0x1F)) & 1)) {
@@ -71,11 +56,11 @@ namespace REPORT {
 
                 // Scan messages backwards from newest to oldest
                 for (int i = num_msgs - 1; i >= 0; --i) {
-                    s_MSG_internal* msg = reinterpret_cast<s_MSG_internal*>(&MSG_::_msgs[first_idx + i]);
+                    s_MSG* msg = &MSG_::_msgs[first_idx + i];
 
                     switch (msg->msg_type) {
                     case 0:
-                        switch (msg->val) {
+                        switch (msg->u.colony.subtype) {
                         case 4:
                         case 9:
                             should_show = true;
@@ -105,7 +90,7 @@ namespace REPORT {
 
                     case 9:
                         // Check specific criteria for message type 9
-                        if (msg->field2_0x2 != -1 && msg->field7_0x7 != 0) {
+                        if (msg->u.hyperspace_beast.ship_idx != -1 && msg->u.hyperspace_beast.fate != 0) {
                             should_show = true;
                         }
                         else {
@@ -114,7 +99,7 @@ namespace REPORT {
                         break;
 
                     case 17:
-                        if (msg->val == (int8_t)MOX::_PLAYER_NUM) {
+                        if ((uint8_t)msg->u.diplomacy.plr_a == (uint8_t)MOX::_PLAYER_NUM) {
                             should_show = false;
                         }
                         else {
@@ -146,7 +131,7 @@ namespace REPORT {
             }
         }
 
-        return (bool)result;
+        return result;
     }
 
     int8_t __cdecl Colonization_(int16_t player_idx, char show_dialog) {
@@ -176,7 +161,7 @@ namespace REPORT {
                                     } else if (MOX::_planet[planet_idx].colony_index == -1) {
                                         char msg[200];
                                         sprintf(msg, _outpost_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
-                                        if (GENDRAW::Confirmation_Box_(msg) == 0) {
+                                        if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
                                             planet_idx = -1;
                                         } else {
                                             if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
@@ -198,7 +183,7 @@ namespace REPORT {
                                             auto_colonized = true;
                                             char msg[200];
                                             sprintf(msg, _colonize_preselected_planet_fmt, HACCESS::Get_Planet_Name_(planet_idx));
-                                            if (GENDRAW::Confirmation_Box_(msg) == 0) {
+                                            if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
                                                 planet_idx = -1;
                                             } else {
                                                 if (namestar::Can_Change_Star_Name_(star_idx) != 0 && MOX::_settings.animations_on == 0) {
@@ -218,7 +203,7 @@ namespace REPORT {
                                         int refund = TECHDATA::_buildings[11].cost / 2;
                                         char msg[200];
                                         sprintf(msg, _really_trash_colony_base_fmt, refund);
-                                        if (GENDRAW::Confirmation_Box_(msg) == 0) {
+                                        if (GENDRAW::Do_Confirmation_Box_(msg) == 0) {
                                             planet_idx = MAINPUPS::New_Colony_Selection_Popup_(star_idx, colony_base == nullptr);
                                         } else {
                                             do {
@@ -243,7 +228,7 @@ namespace REPORT {
                                     MOX::_star[star_idx].ignore_colony_ships |= (1 << player_idx);
                                 } else {
                                     if (is_colony) {
-                                        COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 0);
+                                        COLONIZE::Make_New_Colony_(planet_idx, player_idx);
                                         if (colony_base == nullptr) {
                                             SHIPS::Kill_Ship_(static_cast<int16_t>(colony_ship - MOX::_ship));
                                             MAINSCR::Update_Ship_Icons_In_Between_Turns_();
@@ -570,11 +555,11 @@ namespace REPORT {
             } else if (special >= 70) {
                 result = 7;
             } else {
-                result = (special >= 60) ? 3 : 2;
+                result = (special >= 60) + 2;
             }
 
-            int8_t remainder = special % 10;
-            if (remainder == (int8_t)param_2 || result == 10) {
+            int16_t remainder = special % 10;
+            if (remainder == param_2 || result == 10) {
                 return result;
             }
 
@@ -841,8 +826,9 @@ namespace REPORT {
                             REPORT::sprintf_report_(buf, &REPORT::_reports[i]);
                             GENDRAW::Message_Box_(buf);
                         }
+
+                        REPORT::_reports[i].player_idx = -1;
                     }
-                    REPORT::_reports[i].player_idx = -1;
                 }
             }
         }

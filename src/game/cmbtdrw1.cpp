@@ -954,7 +954,7 @@ namespace CMBTDRW1 {
             return;
         }
 
-        int8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
+        uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
         
         if (previous_owner <= 9)
         {
@@ -1931,9 +1931,9 @@ namespace CMBTDRW1 {
     void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t x, int16_t y) {
         int16_t facing_dir = MOX::_combat_data[ship_idx].facing_dir;
         s_animation_header* anim = MOX::_combat_data[ship_idx].ship_image_seg;
-        int8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
+        uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
 
-        if (anim == nullptr || MOX::_combat_data[ship_idx].owner != (uint8_t)previous_owner) {
+        if (anim == nullptr || MOX::_combat_data[ship_idx].owner != previous_owner) {
             uint8_t local_40[32];
             uint8_t local_20[32];
 
@@ -1945,9 +1945,9 @@ namespace CMBTDRW1 {
             char lbx_name[12];
             int32_t picture_num;
 
-            if ((uint8_t)previous_owner < 8 && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
+            if (previous_owner < 8 && MOX::_combat_data[ship_idx].picture_num != 0x2C) {
                 memcpy(lbx_name, s_cmbtshp_lbx_0055125c, 12);
-                uint8_t color = MOX::_player[(uint8_t)previous_owner].color;
+                uint8_t color = MOX::_player[previous_owner].color;
                 picture_num = color * 45 + MOX::_combat_data[ship_idx].picture_num;
             } else {
                 memcpy(lbx_name, s_monster_lbx_00551250, 12);

@@ -1118,7 +1118,7 @@ void __cdecl Load_Antaran_Star_Fortress_() {
     ship->size_class = 4;
     ship->picture_num = 5;
     ship->owner = static_cast<int8_t>(MOX::_combat_defender_player);
-    ship->previous_owner = static_cast<int8_t>(MOX::_combat_defender_player);
+    ship->previous_owner = (uint8_t)MOX::_combat_defender_player;
     ship->ship_idx = -1;
     ship->ftl_type = 0;
     ship->shield_type = 0;
@@ -1705,7 +1705,7 @@ void __cdecl Load_Combat_Satelite_(int16_t station_type) {
     }
 
     MOX::_combat_data[MOX::_combat_total_ship_count].owner = (int8_t)defender;
-    MOX::_combat_data[MOX::_combat_total_ship_count].previous_owner = (int8_t)defender;
+    MOX::_combat_data[MOX::_combat_total_ship_count].previous_owner = (uint8_t)defender;
     MOX::_combat_data[MOX::_combat_total_ship_count].ship_idx = -1;
     MOX::_combat_data[MOX::_combat_total_ship_count].ftl_type = 0;
     MOX::_combat_data[MOX::_combat_total_ship_count].shield_type = (int8_t)INITSHIP::Best_Ship_Shield_(defender);

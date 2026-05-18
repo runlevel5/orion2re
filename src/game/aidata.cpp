@@ -68,7 +68,7 @@ namespace AIDATA {
         int32_t desirability = 0;
         int owner = (int)ship->owner;
 
-        if ((int)ship->d.previous_owner != owner) {
+        if (ship->d.previous_owner != owner) {
             return 0;
         }
 

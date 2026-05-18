@@ -3187,7 +3187,7 @@ namespace OFFICER {
 
             new_ship.d = design;
 
-            new_ship.d.previous_owner = static_cast<char>(player_idx);
+            new_ship.d.previous_owner = (uint8_t)player_idx;
             new_ship.owner = static_cast<char>(player_idx);
             new_ship.location = 0;
             new_ship.x = MOX::_star[0].x;

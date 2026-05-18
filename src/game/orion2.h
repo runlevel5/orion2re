@@ -1259,7 +1259,7 @@ struct s_combat_data {
     short shield_current_hits;
     int8_t black_hole_flag;
     int8_t black_hole_source_idx;
-    int8_t previous_owner;
+    uint8_t previous_owner;
 };
 
 typedef struct s_combfind_star_has_player s_combfind_star_has_player, *Ps_combfind_star_has_player;
@@ -2116,7 +2116,7 @@ struct s_global_combat_data {
     int16_t shield_hp_current;
     undefined field155_0x136;
     undefined field156_0x137;
-    int8_t previous_owner;
+    uint8_t previous_owner;
 };
 
 typedef struct s_good_star s_good_star, *Ps_good_star;
@@ -3087,7 +3087,7 @@ struct s_ship_design {
     char special_device_flags[5];
     struct s_ship_weapons ship_weapon[8];
     sbyte picture_num;
-    char previous_owner;
+    uint8_t previous_owner;
     short cost;
     byte combat_speed;
     ushort date_of_design;
@@ -3863,7 +3863,7 @@ struct s_report_enemy_sabotage {
 
 struct s_report_sabotage {
     int8_t framed_player_idx;
-    int8_t victim_player_idx;
+    uint8_t victim_player_idx;
     uint8_t planet_idx;
     uint8_t building_id;
 };
@@ -3875,7 +3875,7 @@ struct s_report_enemy_steal {
 
 struct s_report_steal {
     int8_t framed_player_idx;
-    int8_t victim_player_idx;
+    uint8_t victim_player_idx;
     int16_t tech_app_id;
 };
 
@@ -5029,8 +5029,8 @@ struct s_tech_weapon_data {
     uint16_t size;
     int16_t cost;
     uint16_t natural_mods;
-    uint16_t min_damage;
-    uint16_t max_damage;
+    int16_t min_damage;
+    int16_t max_damage;
     uint8_t strat_min_damage;
     uint8_t strat_max_damage;
     uint16_t available_mods;

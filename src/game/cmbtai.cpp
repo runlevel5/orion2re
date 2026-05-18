@@ -188,8 +188,8 @@ int16_t __cdecl Expected_Weapon_Damage_(int16_t source_idx, int16_t weapon_slot,
             } else if (rack == 0 || rack == 3) {
                 expected_damage = Expected_Beam_Bomb_Damage_(source_idx, weapon_slot, target_idx, count, range, target_type);
             } else if (rack == 5) {
-                int16_t min_dam = (int16_t)TECHDATA::_weapons[weapon_id].min_damage;
-                int16_t max_dam = (int16_t)TECHDATA::_weapons[weapon_id].max_damage;
+                int16_t min_dam = TECHDATA::_weapons[weapon_id].min_damage;
+                int16_t max_dam = TECHDATA::_weapons[weapon_id].max_damage;
                 int avg_dam = (min_dam + max_dam) / 2;
 
                 switch (weapon_id) {
@@ -2234,7 +2234,7 @@ int16_t __cdecl Get_Effective_Missile_Strength_(int16_t player_idx, int16_t* bea
     for (int16_t i = 0; i <= 9; ++i) {
         int16_t msl_id = Convert_Ordinal_To_Msl_Type_(i);
         int16_t dmg_per;
-        int16_t max_damage = (int16_t)TECHDATA::_weapons[msl_id].max_damage;
+        int16_t max_damage = TECHDATA::_weapons[msl_id].max_damage;
         if (shield_points == 100) {
             dmg_per = (max_damage + (max_damage < 0 ? 3 : 0)) / 4;
         } else {

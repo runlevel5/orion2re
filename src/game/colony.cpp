@@ -301,7 +301,7 @@ namespace COLONY {
 
         s_ship_data* ship = &MOX::_ship[ship_index];
         int16_t picture_num = (int16_t)ship->d.picture_num;
-        int16_t previous_owner = (int16_t)ship->d.previous_owner;
+        uint8_t previous_owner = ship->d.previous_owner;
 
         if (picture_num != _ship_bitm_n || (int32_t)previous_owner != _g_ship_pic_n) {
             _ship_bitm_n = picture_num;

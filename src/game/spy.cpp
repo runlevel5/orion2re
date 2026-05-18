@@ -580,7 +580,7 @@ namespace spy {
             report.type = 1; /* MSG_TYPE_STEAL */
             report.player_idx = (int16_t)attacker_idx;
             report.action = 0;
-            report.d.steal.victim_player_idx = (int8_t)victim_idx;
+            report.d.steal.victim_player_idx = (uint8_t)victim_idx;
             if (framed_player_idx == (int16_t)attacker_idx) {
                 report.d.steal.framed_player_idx = -1;
             } else {
@@ -730,7 +730,7 @@ namespace spy {
             report.player_idx = framed_player_idx;
             report.action = 1;
             report.d.sabotage.framed_player_idx = (framed_player_idx == (int16_t)acting_player_idx) ? -1 : (int8_t)acting_player_idx;
-            report.d.sabotage.victim_player_idx = (int8_t)victim_player_idx;
+            report.d.sabotage.victim_player_idx = (uint8_t)victim_player_idx;
             report.d.sabotage.planet_idx = (uint8_t)planet_idx;
             report.d.sabotage.building_id = (uint8_t)target_building;
             REPORT::Add_Report_(&report);
