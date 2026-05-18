@@ -1,6 +1,11 @@
 #include "pch.h"
 
+#include <cstddef>
+
 namespace CMBTSPEC {
+    static_assert(sizeof(s_combat_weapon_slot) == 11);
+    static_assert(sizeof(s_missile) == 0x1A);
+
     void __cdecl Draw_Cloak_(int16_t ship_idx, int16_t cloak_type) {
         int16_t unused_x, unused_y;
         int16_t offset_x, offset_y;
@@ -30,7 +35,9 @@ namespace CMBTSPEC {
                 duration = 36;
                 break;
             default:
-                duration = ship_idx;
+                // Preserve the original stack-slot aliasing bug: the binary reads the
+                // future sound-handle local here before it is initialized.
+                duration = (int16_t)sound_handle;
                 break;
         }
 
@@ -538,13 +545,13 @@ namespace CMBTSPEC {
             MOX::_dont_draw_ship = saved_dont_draw;
         }
 
-        int32_t total_damage_accum = 0;
+        int16_t total_damage_accum = 0;
         if (attack_count > 0) {
             int16_t range = TECHDATA::_weapons[34].max_damage - TECHDATA::_weapons[34].min_damage + 1;
             for (int i = 0; i < attack_count; ++i) {
                 int32_t roll = random::Random_(range);
                 int16_t base_dmg = TECHDATA::_weapons[34].min_damage + (int16_t)roll - 1;
-                total_damage_accum += base_dmg * (MOX::_combat_data[target_idx].size_class + 1);
+                total_damage_accum += (int16_t)(base_dmg * (MOX::_combat_data[target_idx].size_class + 1));
             }
         }
 
@@ -567,7 +574,7 @@ namespace CMBTSPEC {
 
             BEAMS::Add_Damage_Indicator_For_Ship_(screen_x, screen_y, target_idx, 1, applied_damage, 0);
             BEAMS::Draw_Damage_Message_Queue_Until_Done_();
-            sound::Fadeout_Sound_((int16_t)sound_handle, 10);
+            sound::Fadeout_Sound_(sound_handle, 10);
         }
     }
 
@@ -616,7 +623,7 @@ namespace CMBTSPEC {
         CMBTDRW1::Refresh_Combat_Screen_Full_();
     }
 
-    void __cdecl Draw_Anti_Missile_Rockets_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx) {
+    void __cdecl Draw_Anti_Missile_Rockets_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx, int16_t) {
         int16_t x_offset = MOX::_cur_combat_x * 20;
         int16_t y_offset = MOX::_cur_combat_y * 20;
 
@@ -671,11 +678,11 @@ namespace CMBTSPEC {
         int16_t target_y = MOX::_missile[missile_idx].y - cur_combat_y_offset;
 
         if (MOX::_apply_damage_to_planet == 1 && MOX::_super_fast_flag == 0) {
-            Draw_Anti_Missile_Rockets_(ship_idx, ship_x, ship_y, missile_idx);
+            Draw_Anti_Missile_Rockets_(ship_idx, ship_x, ship_y, missile_idx, tech_level);
         }
 
         int16_t hit_chance = (int16_t)(((-2 - tech_level) * 10) / 3) + 71;
-        int16_t shots_avail = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left;
+        int8_t shots_avail = MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left;
 
         if (shots_avail > 0) {
             for (int16_t i = 0; i < shots_avail; ++i) {
@@ -683,11 +690,11 @@ namespace CMBTSPEC {
                     break;
                 }
 
-                int roll = random::Random_(100);
+                int16_t roll = (int16_t)random::Random_(100);
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].shots_left--;
                 MOX::_combat_data[ship_idx].weapons[weapon_slot_idx].ammo--;
 
-                if (roll < hit_chance) {
+                if (hit_chance > roll) {
                     MOX::_missile[missile_idx].quantity--;
                     if (MOX::_missile[missile_idx].quantity <= 0) {
                         CMBTMIS::Kill_Missile_(missile_idx);

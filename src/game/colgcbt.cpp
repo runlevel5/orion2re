@@ -144,7 +144,7 @@ namespace COLGCBT {
         Set_Up_Troops_();
 
         if (COLONY::_valid_colony != 0) {
-            COLONY::Make_Bldg_Array_For_Colony_(static_cast<int16_t>(COLONY::_colony_handle), 1);
+            COLONY::Make_Bldg_Array_For_Colony_(COLONY::_colony_handle, 1);
         }
 
         mouse::Set_Mouse_List_(&_mouse_list_blank, 1);
@@ -199,12 +199,12 @@ namespace COLGCBT {
                 else {
                     is_exit = true;
                 }
-            }
 
-            if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
-                COLONY::_full_draw = 1;
-                MOX::_FULL_DRAW_SCREEN_FLAG = 0;
-                Set_Help_List_();
+                if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
+                    COLONY::_full_draw = 1;
+                    MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+                    Set_Help_List_();
+                }
             }
 
             timer::Release_Time_(1);
@@ -234,7 +234,7 @@ namespace COLGCBT {
         if (COLONY::_full_draw != 0) {
             graphics::Darken_Fill_(2, 0x29, 0x103, 0xb8);
             animate::Draw_(1, 0x28, _frame_anim);
-            COLONY::Set_Colony_Font_To_Player_(2, static_cast<int8_t>(_g_attack_ptr->player_id));
+            COLONY::Set_Colony_Font_To_Player_(2, _g_attack_ptr->player_id);
             char* str = ESTRINGS::E_Strings_(0xbb);
             fonts::Print_Centered_(0x82, row * 11 + 50, str);
 
@@ -262,7 +262,7 @@ namespace COLGCBT {
         return -1;
     }
 
-    s_animation_header* __cdecl Action_Anim_(int8_t side, uint8_t state, int8_t type) {
+    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, uint8_t type) {
         switch (state) {
             case 0:
                 return _explosion_anim;
@@ -768,28 +768,34 @@ namespace COLGCBT {
     void __cdecl Print_Best_Summary_(s_invasion_side_info* param_1, int16_t* param_2) {
         if (param_1->combat_modifiers.antigrav_bonus != 0) {
             Print_Data_(TECHDATA::_technology_applications[9].name,
-                        static_cast<uint16_t>(static_cast<uint8_t>(param_1->combat_modifiers.antigrav_bonus)),
+                        (uint8_t)param_1->combat_modifiers.antigrav_bonus,
                         param_2,
                         param_1);
         }
 
         if (param_1->combat_modifiers.best_armor_tech_app_id != 0) {
-            Print_Data_(TECHDATA::_technology_applications[param_1->combat_modifiers.best_armor_tech_app_id].name,
-                        static_cast<uint16_t>(static_cast<uint8_t>(param_1->combat_modifiers.troop_bonus)),
+            uint8_t tech_app_id = param_1->combat_modifiers.best_armor_tech_app_id;
+
+            Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
+                        (uint8_t)param_1->combat_modifiers.troop_bonus,
                         param_2,
                         param_1);
         }
 
         if (param_1->combat_modifiers.personal_shield_tech_app_id != 0) {
-            Print_Data_(TECHDATA::_technology_applications[param_1->combat_modifiers.personal_shield_tech_app_id].name,
-                        static_cast<uint16_t>(static_cast<uint8_t>(param_1->combat_modifiers.personal_shield_bonus)),
+            uint8_t tech_app_id = param_1->combat_modifiers.personal_shield_tech_app_id;
+
+            Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
+                        (uint8_t)param_1->combat_modifiers.personal_shield_bonus,
                         param_2,
                         param_1);
         }
 
         if (param_1->combat_modifiers.rifle_tech_app_id != 0) {
-            Print_Data_(TECHDATA::_technology_applications[param_1->combat_modifiers.rifle_tech_app_id].name,
-                        static_cast<uint16_t>(static_cast<uint8_t>(param_1->combat_modifiers.rifle_bonus)),
+            uint8_t tech_app_id = param_1->combat_modifiers.rifle_tech_app_id;
+
+            Print_Data_(TECHDATA::_technology_applications[tech_app_id].name,
+                        (uint8_t)param_1->combat_modifiers.rifle_bonus,
                         param_2,
                         param_1);
         }
@@ -1085,17 +1091,16 @@ namespace COLGCBT {
     }
 
     void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit) {
-        // Potential bug: side_info and sound_id can be uninitialized if side is not 0 or 1
-        s_invasion_side_info* side_info;
+        uint32_t side_info_bits;
         int16_t sound_id;
 
         if (unit->side == 0) {
-            side_info = _g_attack_ptr;
+            side_info_bits = (uint32_t)(uintptr_t)_g_attack_ptr;
         } else if (unit->side == 1) {
-            side_info = _g_defend_ptr;
+            side_info_bits = (uint32_t)(uintptr_t)_g_defend_ptr;
         }
 
-        switch (static_cast<uint8_t>(side_info->combat_modifiers.rifle_tech_app_id)) {
+        switch (((s_invasion_side_info*)(uintptr_t)side_info_bits)->combat_modifiers.rifle_tech_app_id) {
             case 73:
                 sound_id = 9;
                 break;
@@ -1110,6 +1115,9 @@ namespace COLGCBT {
                 break;
             case 145:
                 sound_id = 12;
+                break;
+            default:
+                sound_id = (int16_t)side_info_bits;
                 break;
         }
 
@@ -1263,7 +1271,7 @@ namespace COLGCBT {
             side = _g_defend_ptr;
         }
 
-        switch (static_cast<uint8_t>(side->combat_modifiers.rifle_tech_app_id)) {
+        switch (side->combat_modifiers.rifle_tech_app_id) {
         case 73:
             return 70;
         case 101:
@@ -1279,34 +1287,30 @@ namespace COLGCBT {
         }
     }
 
-    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int8_t side) {
+    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t side) {
         if (x1 == x2 && y1 == y2) {
             return;
         }
 
-        s_invasion_side_info* side_info = nullptr;
+        s_invasion_side_info* side_info;
         if (side == 0) {
             side_info = _g_attack_ptr;
         } else if (side == 1) {
             side_info = _g_defend_ptr;
-        } else {
-            // Fallback for unexpected side value, behaves as reading uninitialized stack memory
-            uint32_t stack_garbage = 0;
-            side_info = reinterpret_cast<s_invasion_side_info*>(stack_garbage);
         }
 
-        int16_t p5 = 0;
-        int16_t p6 = 0;
-        int16_t p7 = 0;
-        int16_t p8 = 0;
-        int16_t p9 = 0;
-        int16_t p10 = 0;
-        int16_t p11 = 0;
-        int16_t p12 = 0;
-        int16_t p13 = 0;
-        int16_t p14 = 0;
+        int16_t p5;
+        int16_t p6;
+        int16_t p7;
+        int16_t p8;
+        int16_t p9;
+        int16_t p10;
+        int16_t p11;
+        int16_t p12;
+        int16_t p13;
+        int16_t p14;
 
-        uint8_t rifle_id = static_cast<uint8_t>(side_info->combat_modifiers.rifle_tech_app_id);
+        uint8_t rifle_id = side_info->combat_modifiers.rifle_tech_app_id;
 
         switch (rifle_id) {
             case 73:  /* Laser Rifle */
@@ -1374,6 +1378,7 @@ namespace COLGCBT {
                 p8 = p12;
                 p9 = p12;
                 p11 = p12;
+                p12 = p12;
                 p13 = p12;
                 p14 = p12;
                 break;

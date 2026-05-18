@@ -727,7 +727,7 @@ namespace fonts {
 
     void __cdecl Get_Colors_(s_colors* colors) {
         for (int i = 0; i < 8; ++i) {
-            colors->colors[i] = _font_header.normal_colors.colors[i];
+            colors->colors[i] = _font_header.selected_colors.colors[i];
         }
     }
 

@@ -44,7 +44,7 @@ namespace MULTPLAY {
 
     int8_t __cdecl Add_Load_MP_Game_Screen_Fields_();
 
-    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, int8_t language);
+    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, uint8_t language);
 
     int16_t __cdecl Load_Multi_Player_Game_Screen_();
     void __cdecl Load_Load_MP_Game_Screen_();

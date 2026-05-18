@@ -3810,7 +3810,7 @@ struct s_racescrn_mouse_group {
     int16_t y2;
     int16_t total_height;
     int16_t total_width;
-    int16_t count;
+    uint16_t count;
     int16_t field7_0xe;
     int16_t icon_width;
     int16_t spacing_x;
@@ -4013,7 +4013,7 @@ struct s_settings {
     undefined field59_0xcf;
     undefined field60_0xd0;
     undefined field61_0xd1;
-    int8_t language;
+    uint8_t language;
     byte xenons_exist;
     int8_t game_difficulty;
     int8_t number_of_players;

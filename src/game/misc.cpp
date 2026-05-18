@@ -158,8 +158,8 @@ namespace MISC {
     }
 
     void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
-                                       uint8_t unused_flag, s_colors* old_colors, s_colors* new_colors,
-                                       int color_count, s_animation_header* anim) {
+                                       uint8_t unused_flag, uint8_t* old_colors, uint8_t* new_colors,
+                                       int8_t color_count, s_animation_header* anim) {
         int16_t width;
         int16_t height;
 
@@ -182,8 +182,8 @@ namespace MISC {
 
                 if (color_count > 0) {
                     for (int i = 0; i < color_count; ++i) {
-                        if (static_cast<int8_t>(old_colors->colors[i]) == static_cast<int8_t>(current_pixel)) {
-                            current_pixel = new_colors->colors[i];
+                        if ((int8_t)old_colors[i] == current_pixel) {
+                            current_pixel = new_colors[i];
                             pixel_data[offset] = current_pixel;
                         }
                     }
@@ -209,9 +209,7 @@ namespace MISC {
         mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
         video::Set_Page_Off_();
 
-        if (draw_callback) {
-            draw_callback();
-        }
+        draw_callback();
 
         palette::Clear_Palette_Changes_(0, 0xff);
 
@@ -598,7 +596,7 @@ namespace MISC {
 
         RUSS::Mox_Update_();
 
-        MISC::Replace_Bitmap_Colors_(0, 0, rect_x2, rect_y2, 0, p_colors, target_color, 8, anim);
+        MISC::Replace_Bitmap_Colors_(0, 0, rect_x2, rect_y2, 0, p_colors->colors, target_color->colors, 8, anim);
 
         RUSS::Mox_Update_();
 
@@ -616,8 +614,9 @@ namespace MISC {
             separator = ' ';
         }
 
-        // Calculate absolute value manually as in assembly sequence
-        int32_t abs_val = (val < 0) ? -val : val;
+        // Calculate absolute value with the same bit pattern behavior as the binary.
+        int32_t sign = val >> 31;
+        int32_t abs_val = (val ^ sign) - sign;
 
         char raw_buf[32];
         sprintf(raw_buf, strings::s_ld_00558280, abs_val);
@@ -662,7 +661,7 @@ namespace MISC {
         if (val < 0) {
             size_t current_len = strlen(MOX::_temp_string);
             // Shift string to the right by 1 to make room for '-'
-            memcpy(&MOX::_temp_string[1], MOX::_temp_string, current_len);
+            memmove(&MOX::_temp_string[1], MOX::_temp_string, current_len);
             MOX::_temp_string[0] = '-';
             MOX::_temp_string[current_len + 1] = '\0';
         }

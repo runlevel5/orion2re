@@ -2,11 +2,8 @@
 
 namespace COLREFIT {
 #pragma pack(push, 1)
-    struct s_scroll_data {
-        int32_t unknown1[3];
-        int16_t scan_input;
-        int16_t get_input;
-        int32_t unknown2[2];
+    struct s_scroll_state {
+        int32_t data[6];
     };
 #pragma pack(pop)
 
@@ -38,8 +35,8 @@ namespace COLREFIT {
     inline int16_t*& _g_ship_field_list_ptr =
         *reinterpret_cast<int16_t**>(std::uintptr_t{0x0056C438});
 
-    inline void*& _saved_autofunction =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0056C43C});
+    inline MOX2::action_func_t& _saved_autofunction =
+        *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x0056C43C});
 
     inline int16_t*& _g_ship_list_ptr =
         *reinterpret_cast<int16_t**>(std::uintptr_t{0x0056C440});
@@ -50,8 +47,8 @@ namespace COLREFIT {
     inline int16_t& _g_ship_n =
         *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056C468});
 
-    inline void*& _g_scroll_ptr =
-        *reinterpret_cast<void**>(std::uintptr_t{0x005A5320});
+    inline s_scroll_state*& _g_scroll_ptr =
+        *reinterpret_cast<s_scroll_state**>(std::uintptr_t{0x005A5320});
 
     void __cdecl Build_Ship_List_();
 

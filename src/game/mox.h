@@ -250,8 +250,8 @@ namespace MOX {
     inline int16_t& _take_control_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597D62});
     inline int16_t& _auto_cmbt_button_value = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596C60});
     inline int16_t& _PLAYER_NUM = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x005A18F2 });
-    inline char (&_active_player)[9] =
-        *reinterpret_cast<char (*)[9]>(std::uintptr_t{0x00597360});
+    inline uint8_t (&_active_player)[9] =
+        *reinterpret_cast<uint8_t (*)[9]>(std::uintptr_t{0x00597360});
     inline int16_t& _active_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B5B6});
     inline int16_t& _ai_retreat_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B436});
     inline int16_t& _bio_weapon_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B446});

@@ -44,8 +44,8 @@ namespace MISC {
     void __cdecl Get_Advancing_Bitmap_String_Range_(int16_t tick, int16_t max_width, int16_t* out_start_x, int16_t* out_start_y, int16_t* out_end_x, int16_t* out_end_y, const char* text, uint8_t is_full_range);
 
     void __cdecl Replace_Bitmap_Colors_(int16_t x_start, int16_t y_start, int16_t x_end, int16_t y_end,
-                                       uint8_t unused_flag, s_colors* old_colors, s_colors* new_colors,
-                                       int color_count, s_animation_header* anim);
+                                       uint8_t unused_flag, uint8_t* old_colors, uint8_t* new_colors,
+                                       int8_t color_count, s_animation_header* anim);
 
     void __cdecl Save_Window_Status_(void* status);
 

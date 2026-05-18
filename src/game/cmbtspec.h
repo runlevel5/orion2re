@@ -27,7 +27,7 @@ namespace CMBTSPEC {
 
     void __cdecl Draw_Stasis_Beam_(int16_t source_ship_idx, int16_t target_ship_idx);
 
-    void __cdecl Draw_Anti_Missile_Rockets_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx);
+    void __cdecl Draw_Anti_Missile_Rockets_(int16_t ship_idx, int16_t target_x, int16_t target_y, int16_t missile_idx, int16_t tech_level);
 
     void __cdecl Draw_Anti_Missile_Rocket_Picture_(int16_t x, int16_t y);
 

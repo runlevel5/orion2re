@@ -398,7 +398,7 @@ namespace LOADSAVE {
      * @address 005113f0
      */
     void __cdecl Do_Options_Game_Popup_(int16_t* exit_code) {
-        int8_t initial_language = MOX::_settings.language;
+        uint8_t initial_language = MOX::_settings.language;
         bool exit_loop = false;
         int16_t dummy_x;
         int16_t dummy_y;
@@ -433,8 +433,8 @@ namespace LOADSAVE {
             }
 
             if (exit_loop) {
-                if ((uint16_t)(uint8_t)initial_language != _game_popup_fields->language) {
-                    MOX::_settings.language = (int8_t)_game_popup_fields->language;
+                if ((uint16_t)initial_language != _game_popup_fields->language) {
+                    MOX::_settings.language = (uint8_t)_game_popup_fields->language;
                     if (MOX::_settings.language > 4) {
                         MOX::_settings.language = 0;
                     }
@@ -1139,7 +1139,7 @@ namespace LOADSAVE {
         MOX::_settings.only_show_serious_turn_summary_reports = static_cast<int8_t>(fields->options[11]);
         MOX::_settings.ship_initiative = static_cast<int8_t>(fields->options[12]);
 
-        MOX::_settings.language = (int8_t)fields->language;
+        MOX::_settings.language = (uint8_t)fields->language;
 
         if (static_cast<uint8_t>(MOX::_settings.language) >= 5) {
             MOX::_settings.language = 0;

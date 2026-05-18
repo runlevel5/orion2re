@@ -94,34 +94,40 @@ namespace NEWPUP {
         if (side_info->combat_modifiers.antigrav_bonus != 0) {
             Print_Data_(
                 TECHDATA::_technology_applications[9].name,
-                static_cast<uint8_t>(side_info->combat_modifiers.antigrav_bonus),
+                (uint8_t)side_info->combat_modifiers.antigrav_bonus,
                 y_pos,
                 side_info
             );
         }
 
         if (side_info->combat_modifiers.best_armor_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.best_armor_tech_app_id;
+
             Print_Data_(
-                TECHDATA::_technology_applications[side_info->combat_modifiers.best_armor_tech_app_id].name,
-                static_cast<uint8_t>(side_info->combat_modifiers.troop_bonus),
+                TECHDATA::_technology_applications[tech_app_id].name,
+                (uint8_t)side_info->combat_modifiers.troop_bonus,
                 y_pos,
                 side_info
             );
         }
 
         if (side_info->combat_modifiers.personal_shield_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.personal_shield_tech_app_id;
+
             Print_Data_(
-                TECHDATA::_technology_applications[side_info->combat_modifiers.personal_shield_tech_app_id].name,
-                static_cast<uint8_t>(side_info->combat_modifiers.personal_shield_bonus),
+                TECHDATA::_technology_applications[tech_app_id].name,
+                (uint8_t)side_info->combat_modifiers.personal_shield_bonus,
                 y_pos,
                 side_info
             );
         }
 
         if (side_info->combat_modifiers.rifle_tech_app_id != 0) {
+            uint8_t tech_app_id = side_info->combat_modifiers.rifle_tech_app_id;
+
             Print_Data_(
-                TECHDATA::_technology_applications[side_info->combat_modifiers.rifle_tech_app_id].name,
-                static_cast<uint8_t>(side_info->combat_modifiers.rifle_bonus),
+                TECHDATA::_technology_applications[tech_app_id].name,
+                (uint8_t)side_info->combat_modifiers.rifle_bonus,
                 y_pos,
                 side_info
             );

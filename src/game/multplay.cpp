@@ -1012,7 +1012,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
     }
 
     void __cdecl Modem_Setup_Screen_() {
-        int8_t original_lang = MOX::_settings.language;
+        uint8_t original_lang = MOX::_settings.language;
         int16_t help_anchor_field;
         bool exit_loop = false;
         bool save_on_exit = false;
@@ -1341,7 +1341,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         );
     }
 
-    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, int8_t language) {
+    bool __cdecl Check_Modem_Init_Help_Fields_(int16_t field_id, uint8_t language) {
         int16_t help_id = -1;
 
         if (MOX::_mp_screen->game_list_field_ids[0] + field_id == 0) {

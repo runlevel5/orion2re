@@ -77,7 +77,7 @@ namespace RACESCRN {
                     MOX::_player[MOX::_PLAYER_NUM].contact[display->player_idx] == 0) 
                 {
                     fonts::Set_Font_Style_Outline_(2, &_race_high_color);
-                    BILL::Squeeze_Print_Centered_(
+                    BILL::Squeeze_Centered_Print_(
                         _race_picture[i * 2],
                         _race_picture[i * 2 + 1] + 0x4C,
                         display->player_name,
@@ -86,7 +86,7 @@ namespace RACESCRN {
                 }
             } else {
                 fonts::Set_Font_Style_Outline_(2, &_race_high_color);
-                BILL::Squeeze_Print_Centered_(
+                BILL::Squeeze_Centered_Print_(
                     _race_picture[i * 2],
                     _race_picture[i * 2 + 1] + 0x4C,
                     display->player_name,
@@ -109,7 +109,7 @@ namespace RACESCRN {
                         int16_t research_level = MOX::_cur_plyr_ptr->current_research_agreement_level[display->player_idx];
                         const char* type_str;
 
-                        switch (MOX::_settings.language) {
+                        switch (MOX::_settings_language) {
                             case 0:
                                 type_str = research_level >= 0 ? s_rp_str : s_bc_str;
                                 break;
@@ -136,7 +136,7 @@ namespace RACESCRN {
 
                     if (MOX::_cur_plyr_ptr->trade_treaty[display->player_idx] != 0) {
                         int16_t trade_level = MOX::_cur_plyr_ptr->current_trade_agreement_level[display->player_idx];
-                        const char* format = (MOX::_settings.language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
+                        const char* format = (MOX::_settings_language == 1) ? s_trade_mc_fmt : s_trade_bc_fmt;
                         sprintf(string2, format, _trade_treaty_buffer, trade_level);
                         strcat(buffer, string2);
                     }
@@ -238,7 +238,7 @@ namespace RACESCRN {
             race_display[i].relationship_slider_img = slider_sprite;
 
             if (i < MOX::_active_count) {
-                int16_t active_player_idx = MOX::_active_player[i];
+                uint8_t active_player_idx = MOX::_active_player[i];
                 s_player* player = &MOX::_player[active_player_idx];
                 int16_t relations_val = MOX::_cur_plyr_ptr->relations[active_player_idx] + 100;
 
@@ -248,7 +248,8 @@ namespace RACESCRN {
                 }
 
                 race_display[i].relationship_text = RACESCRN::_relation_text[relation_idx];
-                uint8_t slider_remap_idx = RACESCRN::_slider_remap_list[relations_val >> 3];
+                int16_t remap_index = relations_val / 8;
+                uint8_t slider_remap_idx = RACESCRN::_slider_remap_list[remap_index];
 
                 race_display[i].list_idx = i;
                 race_display[i].player_idx = active_player_idx;
@@ -317,7 +318,7 @@ namespace RACESCRN {
         return (int16_t)(fields::Get_Field_Counter_() - 1);
     }
 
-    void __cdecl Move_Icon_Group_Icons_(s_racescrn_mouse_group* src, s_racescrn_mouse_group* dst, int16_t count) {
+    void __cdecl Move_Icon_Group_Icons_(s_racescrn_mouse_group* src, s_racescrn_mouse_group* dst, uint16_t count) {
         if (src->count < count) {
             count = src->count;
         }

@@ -46,18 +46,14 @@ namespace COLREFIT {
     int16_t __cdecl Colony_Refit_Popup_() {
         int16_t scan_code;
         int16_t input_id;
-        int32_t scroll_data[6];
+        s_scroll_state scroll_data = {0};
         int16_t ship_field_list[500];
         int16_t ship_list[500];
         int16_t eval_result = 0;
 
         input_id = 0;
-        
-        for (int i = 0; i < 6; i++) {
-            scroll_data[i] = 0;
-        }
-        
-        _g_scroll_ptr = scroll_data;
+
+        _g_scroll_ptr = &scroll_data;
         _g_ship_list_ptr = ship_list;
         _g_ship_field_list_ptr = ship_field_list;
         
@@ -114,7 +110,9 @@ namespace COLREFIT {
 
     int16_t __cdecl Colony_Refit2_Popup_(int16_t ship_idx) {
         int16_t match_count = 0;
-        s_scroll_data scroll_data = {0};
+        int16_t get_input = 0;
+        int16_t scan_input;
+        s_scroll_state scroll_data = {0};
         int16_t ship_field_list[500];
         int16_t ship_list[500];
 
@@ -152,10 +150,10 @@ namespace COLREFIT {
 
         int16_t result = 0;
         do {
-            scroll_data.get_input = fields::Get_Input_();
-            scroll_data.scan_input = fields::Scan_Input_();
+            get_input = fields::Get_Input_();
+            scan_input = fields::Scan_Input_();
             Draw_Refit2_Popup_();
-            result = Evaluate2_Input_(&scroll_data.get_input, &scroll_data.scan_input);
+            result = Evaluate2_Input_(&get_input, &scan_input);
             RUSS::Mox_Sync_Update_();
         } while (_esc == 0);
 
@@ -175,11 +173,6 @@ namespace COLREFIT {
         char text[500];
 
         COLREFIT::_scanned_ship_index = -1;
-
-        if (*action_field < 0) {
-            COLREFIT::_esc = 1;
-            return -1;
-        }
 
         for (int16_t i = 0; i < 15; i++) {
             int16_t ship_idx = COLREFIT::_g_ship_list_ptr[COLREFIT::_first_ship + i];
@@ -237,7 +230,7 @@ namespace COLREFIT {
             }
             COLREFIT::_first_ship = (int16_t)next_first;
             COLONY::_full_draw = 1;
-            COLREFIT::_slider_bar_position = (int16_t)(((((int32_t)COLREFIT::_n_ships_in_list + 5) / 5) - 3) * 5 - COLREFIT::_first_ship);
+            COLREFIT::_slider_bar_position = (((COLREFIT::_n_ships_in_list + 5) / 5) - 3) * 5 - COLREFIT::_first_ship;
             COLREFIT::Update_First_Ship_(&COLREFIT::_first_ship, &COLREFIT::_slider_bar_position);
         }
 
@@ -247,7 +240,7 @@ namespace COLREFIT {
                 next_first = 0;
             }
             COLREFIT::_first_ship = (int16_t)next_first;
-            COLREFIT::_slider_bar_position = (int16_t)(((((int32_t)COLREFIT::_n_ships_in_list + 5) / 5) - 3) * 5 - COLREFIT::_first_ship);
+            COLREFIT::_slider_bar_position = (((COLREFIT::_n_ships_in_list + 5) / 5) - 3) * 5 - COLREFIT::_first_ship;
             COLREFIT::Update_First_Ship_(&COLREFIT::_first_ship, &COLREFIT::_slider_bar_position);
             COLONY::_full_draw = 1;
         }
@@ -270,7 +263,7 @@ namespace COLREFIT {
         } else {
             COLONY::Set_Colony_Font_();
             video::Set_Page_Off_();
-            MOX2::Execute_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+            MOX2::Execute_Auto_Function_(&_saved_autofunction);
             COLONY::_full_draw = 1;
             animate::Draw_(0x93, 6, _anims[0]);
             Draw_Ship_D_List_();
@@ -300,7 +293,7 @@ namespace COLREFIT {
         } else {
             COLONY::Set_Colony_Font_();
             video::Set_Page_Off_();
-            MOX2::Execute_Auto_Function_(reinterpret_cast<MOX2::action_func_t*>(&_saved_autofunction));
+            MOX2::Execute_Auto_Function_(&_saved_autofunction);
             COLONY::_full_draw = 1;
             animate::Draw_(0x93, 6, _anims[0]);
             Draw_Bar_Indicator_();

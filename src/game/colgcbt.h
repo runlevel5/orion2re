@@ -51,7 +51,7 @@ namespace COLGCBT {
 
     void __cdecl Resort_Units_(uint8_t side_idx);
 
-    s_animation_header* __cdecl Action_Anim_(int8_t side, uint8_t state, int8_t type);
+    s_animation_header* __cdecl Action_Anim_(uint8_t side, uint8_t state, uint8_t type);
 
     int16_t __cdecl Top_Line_Y_();
 
@@ -97,7 +97,7 @@ namespace COLGCBT {
 
     int16_t __cdecl Get_CGCBT_Beam_Len_(uint8_t side_idx);
 
-    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int8_t side);
+    void __cdecl Draw_CGCBT_Beam_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t side);
 
     void __cdecl Play_Unit_Beam_Sound_(s_ground_unit* unit);
 

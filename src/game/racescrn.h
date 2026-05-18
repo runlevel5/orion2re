@@ -89,7 +89,7 @@ namespace RACESCRN {
     int16_t __cdecl Draw_Icon_Group_Cursor_(s_racescrn_mouse_group* group, int16_t x_pos, uint8_t color, bool show_count);
 
     void __cdecl Move_Spy_Group_From_Mouse_(s_racescrn_mouse_group* target_group);
-    void __cdecl Move_Icon_Group_Icons_(s_racescrn_mouse_group* src, s_racescrn_mouse_group* dst, int16_t count);
+    void __cdecl Move_Icon_Group_Icons_(s_racescrn_mouse_group* src, s_racescrn_mouse_group* dst, uint16_t count);
     void __cdecl Redraw_Spy_Mouse_(s_animation_header* spy_icon);
     int8_t __cdecl Setup_Race_Who_Fields_(s_racescrn_race_display* race_displays, int16_t field_id_base);
     s_racescrn_mouse_group* __cdecl Get_Spy_Group_For_Field_(int16_t field_id, int16_t* out_index);
