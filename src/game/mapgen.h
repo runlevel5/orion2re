@@ -43,7 +43,7 @@ namespace MAPGEN {
     int16_t __cdecl Home_Planet_(int16_t planet_id);
 
     int8_t __cdecl Generate_Spectral_Class_(int16_t star_type_index);
-    uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
+    int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index);
     uint8_t __cdecl Generate_Max_Farms_(int16_t star_idx, int16_t planet_idx);
     int8_t __cdecl Generate_Orbit_(int16_t star_id);
     uint8_t __cdecl Generate_Satellite_Type_(int16_t star_idx, int8_t orbit);

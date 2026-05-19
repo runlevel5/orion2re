@@ -501,7 +501,7 @@ namespace FLT1 {
         FLT2::Set_Initial_Stack_Pointer_();
 
         MOX::_old_small_ship_stack_ptr = -1;
-        MOX::_global_var = 0;
+        MOX::_global_var_byte = 0;
         MOX::_skip_draw_ships = 1;
         _fleet_screen_bad_ship_id = -1;
 
@@ -693,7 +693,7 @@ namespace FLT1 {
                     MOX::_current_screen = 29;
                     MOX::_return_screen = 4;
                     exit_flag = 1;
-                    _screen_data[4] = MOX::_system_star_id;
+                    MOX::_temp_star_handle = MOX::_system_star_id;
                 }
             }
 
@@ -966,31 +966,30 @@ namespace FLT1 {
     }
 
     void __cdecl Next_Ship_Icon_() {
-        uint16_t initial_ptr = (uint16_t)MOX::_small_ship_stack_ptr;
+        int16_t initial_ptr = MOX::_small_ship_stack_ptr;
         int16_t original_owner = HACCESS::Ship_Stack_Owner_(MOX::_ship_stack_start[initial_ptr]);
-        uint16_t current_ptr = initial_ptr + 1;
+        int16_t current_ptr = initial_ptr;
         bool done = false;
 
         do {
-            if (current_ptr >= MOX::_ship_stack_count) {
+            current_ptr++;
+            if (MOX::_ship_stack_count <= current_ptr) {
                 current_ptr = 0;
             }
 
             int16_t current_ship_stack = MOX::_ship_stack_start[current_ptr];
             int16_t current_owner = HACCESS::Ship_Stack_Owner_(current_ship_stack);
 
-            if (current_owner == MOX::_PLAYER_NUM) {
-                if (original_owner == MOX::_PLAYER_NUM) {
-                    if (FLT2::Fltscrn_Ships_To_Be_Displayed_(current_ship_stack) > 0) {
-                        MOX::_small_ship_stack_ptr = (int16_t)current_ptr;
-                        done = true;
-                    }
+            if (current_owner == MOX::_PLAYER_NUM && original_owner == MOX::_PLAYER_NUM) {
+                if (FLT2::Fltscrn_Ships_To_Be_Displayed_(current_ship_stack) > 0) {
+                    MOX::_small_ship_stack_ptr = current_ptr;
+                    done = true;
                 }
             } else {
-                if (HACCESS::Ship_Stack_Owner_(current_ship_stack) != MOX::_PLAYER_NUM &&
-                    original_owner != MOX::_PLAYER_NUM) {
+                current_owner = HACCESS::Ship_Stack_Owner_(current_ship_stack);
+                if (current_owner != MOX::_PLAYER_NUM && original_owner != MOX::_PLAYER_NUM) {
                     if (FLT2::Fltscrn_Ships_To_Be_Displayed_(current_ship_stack) > 0) {
-                        MOX::_small_ship_stack_ptr = (int16_t)current_ptr;
+                        MOX::_small_ship_stack_ptr = current_ptr;
                         done = true;
                     }
                 }
@@ -999,8 +998,6 @@ namespace FLT1 {
             if (current_ptr == initial_ptr) {
                 done = true;
             }
-
-            current_ptr++;
         } while (!done);
     }
 
@@ -1144,8 +1141,8 @@ namespace FLT1 {
         FLT1::Load_Galaxy_Stars_();
     }
 
-    void* __cdecl Load_Fltscrn_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, int16_t reload_flag) {
-        int16_t entry_num = (int16_t)(uint8_t)MOX::_leaders[leader_idx].pict_num + 0x2d;
+    void* __cdecl Load_Fltscrn_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, uint8_t reload_flag) {
+        int16_t entry_num = (int16_t)MOX::_leaders[leader_idx].pict_num + 0x2d;
 
         if (reload_flag != 0) {
             return farload::Far_Reload_(PTR_s_FLEET_LBX_005584a8, entry_num, buffer);
@@ -1288,8 +1285,10 @@ namespace FLT1 {
      * @return true if at least one active officer is found, false otherwise.
      */
     bool __cdecl At_Least_One_Officer_(int16_t player_num) {
+        (void)player_num;
+
         for (int16_t i = 0; i < 67; ++i) {
-            if (MOX::_leaders[i].player_index == player_num && MOX::_leaders[i].status >= 0) {
+            if (MOX::_leaders[i].player_index == MOX::_PLAYER_NUM && MOX::_leaders[i].status >= 0) {
                 return true;
             }
         }

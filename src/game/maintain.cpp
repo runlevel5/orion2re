@@ -265,7 +265,7 @@ namespace maintain {
             if (cheapest_ship == nullptr) {
                 no_more_ships_found = true;
             } else {
-                int scrap_cost = maintain::Ship_Scrap_Value_(cheapest_ship);
+                int16_t scrap_cost = maintain::Ship_Scrap_Value_(cheapest_ship);
                 player->bc += scrap_cost;
 
                 if (player->objectives != 100) {
@@ -274,10 +274,10 @@ namespace maintain {
 
                 COLCALC::Do_Player_Colony_Post_Production_(player_idx);
 
-                // TODO: Fix me
-                uint16_t ship_index = (uint16_t)(cheapest_ship - MOX::_ship);
+                int16_t ship_index = (int16_t)(cheapest_ship - MOX::_ship);
 
                 s_MSG msg;
+                memset(&msg, 0, sizeof(msg));
                 msg.msg_type = MSG_TYPE_SCRAP_SHIP;
                 msg.u.scrap_ship.where = cheapest_ship->location;
                 msg.u.scrap_ship.ship_idx = ship_index;
@@ -334,33 +334,36 @@ namespace maintain {
     }
 
     void __cdecl Kill_Leaders_(s_player* p) {
-        int16_t player_idx = (int16_t)(p - MOX::_player);
-        bool no_more_candidates = false;
+        int player_idx = (int)(p - MOX::_player);
+        bool searched_without_removal = false;
+        int balance = (int)p->surplus_bc + p->bc;
 
-        while ((p->bc + (int)p->surplus_bc) < 0) {
-            if (no_more_candidates) {
-                break;
+        do {
+            if (balance >= 0 || searched_without_removal) {
+                return;
             }
 
-            no_more_candidates = true;
+            searched_without_removal = true;
             for (int16_t leader_idx = 0; leader_idx < MAX_LEADERS; ++leader_idx) {
-                if (MOX::_leaders[leader_idx].player_index == (int8_t)player_idx) {
-                    if (OFFICER::Officer_Maintenance_(player_idx, leader_idx) > 0) {
+                if (MOX::_leaders[leader_idx].player_index == player_idx) {
+                    if (OFFICER::Officer_Maintenance_((int16_t)player_idx, leader_idx) > 0) {
                         OFFICER::Deassign_Officer_(leader_idx);
-                        COLCALC::Do_Player_Colony_Calculations_(player_idx);
+                        searched_without_removal = false;
+                        COLCALC::Do_Player_Colony_Calculations_((int16_t)player_idx);
 
                         s_MSG msg;
+                        memset(&msg, 0, sizeof(msg));
                         msg.msg_type = MSG_TYPE_SCRAP_LEADER;
                         msg.u.scrap_leader.leader_idx = (int8_t)leader_idx;
 
-                        MSG_::Add_Msg_(msg, player_idx);
-
-                        no_more_candidates = false;
+                        MSG_::Add_Msg_(msg, (int16_t)player_idx);
                         break;
                     }
                 }
             }
-        }
+
+            balance = (int)p->surplus_bc + p->bc;
+        } while (true);
     }
 
     int32_t __cdecl Building_Worth_(s_colony* colony, int16_t building_idx) {

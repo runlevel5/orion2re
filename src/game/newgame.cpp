@@ -213,23 +213,23 @@ void __cdecl Update_Fields_() {
     int16_t gy = _g_y;
 
     // Difficulty
-    uint16_t h0 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_str, 0);
+    int16_t h0 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x77, gx + 0xBC, gy + 0xB8, common_str, 0);
     _fields[0] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0xCC, gx + 0xCD, gy + 0xE0, _diff_button_strings, 5, &_diff_button_variable, 0, common_str, 0, h0);
 
     // Galaxy Size
-    uint16_t h1 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_str, 0);
+    int16_t h1 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x77, gx + 0x157, gy + 0xB8, common_str, 0);
     _fields[1] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0xCC, gx + 0x169, gy + 0xE0, _gal_size_button_strings, 4, &_gal_size_button_variable, 0, common_str, 0, h1);
 
     // Galaxy Age
-    uint16_t h2 = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_str, 0);
+    int16_t h2 = fields::Add_Hidden_Field_(gx + 0x1AF, gy + 0x77, gx + 0x1F2, gy + 0xB8, common_str, 0);
     _fields[2] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x1A1, gy + 0xCC, gx + 0x205, gy + 0xE0, _gal_age_button_strings, 3, &_gal_age_button_variable, 0, common_str, 0, h2);
 
     // Opponents
-    uint16_t h3 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_str, 0);
+    int16_t h3 = fields::Add_Hidden_Field_(gx + 0x79, gy + 0x103, gx + 0xBC, gy + 0x144, common_str, 0);
     _fields[3] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x69, gy + 0x15D, gx + 0xCD, gy + 0x171, _opp_button_strings, 7, &_opp_button_variable, 0, common_str, 0, h3);
 
     // Starting Civilization Level
-    uint16_t h4 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_str, 0);
+    int16_t h4 = fields::Add_Hidden_Field_(gx + 0x114, gy + 0x103, gx + 0x157, gy + 0x144, common_str, 0);
     _fields[5] = FAKEBUTS::Add_Click_Thru_Field_(gx + 0x105, gy + 0x15D, gx + 0x169, gy + 0x171, _civ_button_strings, 3, &_civ_button_variable, 0, common_str, 0, h4);
 
     // Radio Buttons: Random Events, Xenon Attacks, Strategic Combat

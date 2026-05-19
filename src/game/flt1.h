@@ -29,7 +29,7 @@ namespace FLT1 {
 
     void __cdecl Set_Small_Ship_Stack_Pointer_(bool check_box);
 
-    void* __cdecl Load_Fltscrn_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, int16_t reload_flag);
+    void* __cdecl Load_Fltscrn_Officer_Picture_(int16_t player_num, int16_t leader_idx, void* buffer, uint8_t reload_flag);
 
     void __cdecl Reload_Small_Ship_Icons_();
 

@@ -5,7 +5,7 @@ namespace antarans {
         return MOX::_stardate - 35000;
     }
 
-    int16_t __cdecl Delay_() {
+    int16_t __cdecl Antaran_Delay_() {
         int8_t level = static_cast<int8_t>(MOX::_settings.starting_civilization_level);
 
         switch (level) {
@@ -91,7 +91,7 @@ namespace antarans {
 
     bool __cdecl Antaran_Defensive_Force_At_Maximum_() {
         for (int i = 0; i < 9; ++i) {
-            uint8_t max_val = static_cast<uint8_t>(_n_max_antaran_def_ships[i]);
+            uint8_t max_val = _n_max_antaran_def_ships[i];
 
             // If a ship type has a maximum threshold specified, check if current count meets it
             if (max_val != 0) {
@@ -105,35 +105,35 @@ namespace antarans {
 
     void __cdecl Increment_Antaran_Resource_Level_() {
         int32_t delta_stardate = Delta_Stardate_();
-        int16_t antaran_delay = Delay_();
+        int16_t antaran_delay = Antaran_Delay_();
         int32_t diff_stardate = delta_stardate - (int32_t)antaran_delay;
 
         // Perform resource increment every 25 stardates after the delay period
         if (diff_stardate > 0 && (diff_stardate % 25 == 0)) {
             int32_t intervals = diff_stardate / 25;
-            int16_t def_bonus_base = Antarans_Defensive_Resource_Bonus_();
-            int16_t off_bonus_base = Antarans_Offensive_Resource_Bonus_();
+            int16_t defensive_bonus = Antarans_Defensive_Resource_Bonus_();
+            int16_t offensive_bonus = Antarans_Offensive_Resource_Bonus_();
 
             // Calculate increases using a rounding-up approach (add 99 then divide by 100)
-            int16_t def_inc = (int16_t)((def_bonus_base * intervals + 99) / 100);
-            int16_t off_inc = (int16_t)((off_bonus_base * intervals + 99) / 100);
+            int16_t def_inc = (int16_t)((defensive_bonus * intervals + 99) / 100);
+            int16_t off_inc = (int16_t)((offensive_bonus * intervals + 99) / 100);
 
-            // Offensive resource always gains the defensive bonus
+            // Offensive resource always gains the defensive-bonus-derived increment.
             MOX::_antarans.resource_offensive += def_inc;
 
             if (Antaran_Defensive_Force_At_Maximum_()) {
-                // If defensive resource is capped, offensive resource gains the offensive bonus instead
-                MOX::_antarans.resource_defensive += off_inc;
+                // If defensive force is already at maximum, route the second increment to offensive resources.
+                MOX::_antarans.resource_offensive += off_inc;
             } else {
-                // Otherwise, defensive resource gains its corresponding bonus
-                MOX::_antarans.attack_pressure += off_inc;
+                // Otherwise, route the second increment to defensive resources.
+                MOX::_antarans.resource_defensive += off_inc;
             }
         }
     }
 
-    void __cdecl Build_Antaran_Ships_(short *resources, short *ships, int8_t *max_ships, char is_offensive) {
+    void __cdecl Build_Antaran_Ships_(short *resources, short *ships, uint8_t *max_ships, char is_offensive) {
         int32_t stardate_delta = Delta_Stardate_();
-        int32_t antaran_delay = (int32_t)Delay_();
+        int32_t antaran_delay = (int32_t)Antaran_Delay_();
         int32_t time_ref = stardate_delta - antaran_delay;
 
         bool debug_headers_printed = false;
@@ -162,8 +162,8 @@ namespace antarans {
                 }
 
                 if (is_allowed_by_time) {
-                    int32_t cost = (uint8_t)_antaran_ship_cost[size];
-                    if (cost != 0 && *resources >= (short)cost && (short)(uint8_t)max_ships[size] > ships[size]) {
+                    uint8_t cost = _antaran_ship_cost[size];
+                    if (cost != 0 && *resources >= (short)cost && max_ships[size] > ships[size]) {
                         if (!debug_headers_printed) {
                             debug_headers_printed = true;
                             const char* side = is_offensive ? "Offensive" : "Defensive";
@@ -171,36 +171,33 @@ namespace antarans {
                                     (int)MOX::_stardate / 10, (int)MOX::_stardate % 10, side);
 
                             if (!is_offensive) {
-                                strcat(MOX::_temp_string, ">> current def ships (by size) : ");
+                                sprintf(MOX::_temp_string, ">> current def ships (by size) : ");
                                 for (int i = 0; i < 9; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.defensive_ships[i]);
-                                    strcat(MOX::_temp_string, buf);
+                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
                                 }
                             } else {
-                                strcat(MOX::_temp_string, ">> current off ships (by size) : ");
+                                sprintf(MOX::_temp_string, ">> current off ships (by size) : ");
                                 for (int i = 0; i < 9; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.offensive_ships[i]);
-                                    strcat(MOX::_temp_string, buf);
+                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
                                 }
-                                strcat(MOX::_temp_string, ">> off ships deployed (by size): ");
+                                sprintf(MOX::_temp_string, ">> off ships deployed (by size): ");
                                 for (int i = 0; i < 9; ++i) {
                                     char buf[20];
                                     sprintf(buf, "%2d ", MOX::_antarans.offensive_deployed[i]);
-                                    strcat(MOX::_temp_string, buf);
+                                    strcpy(MOX::_temp_string + strlen(MOX::_temp_string), buf);
                                 }
                             }
                         }
 
-                        char build_info[512];
-                        sprintf(build_info, "-------- building size %d, resources = %d, n_ships[%d] = %d",
+                        sprintf(MOX::_temp_string, "-------- building size %d, resources = %d, n_ships[%d] = %d",
                                 (int)size, (int)*resources, (int)size, (int)ships[size]);
-                        strcat(MOX::_temp_string, build_info);
 
-                        sprintf(build_info, "-------- n_max_ships[%d] = %d, cost = %d",
-                                (int)size, (int)(uint8_t)max_ships[size], (int)(uint8_t)_antaran_ship_cost[size]);
-                        strcat(MOX::_temp_string, build_info);
+                        sprintf(MOX::_temp_string, "-------- n_max_ships[%d] = %d, cost = %d",
+                                (int)size, (int)max_ships[size], (int)_antaran_ship_cost[size]);
 
                         chosen_size = (int32_t)size;
                         break;
@@ -221,19 +218,17 @@ namespace antarans {
                 _n_max_antaran_off_ships[chosen_size] = 0;
             }
 
-            short cost = _antaran_ship_cost[chosen_size];
-            *resources -= cost;
+            uint8_t cost = _antaran_ship_cost[chosen_size];
+            *resources = (short)(*resources - cost);
 
-            char build_final[128];
-            sprintf(build_final, "-------- after build: resources = %3d, n_ships[%d] = %2d",
+            sprintf(MOX::_temp_string, "-------- after build: resources = %3d, n_ships[%d] = %2d",
                     (int)*resources, (int)chosen_size, (int)ships[chosen_size]);
-            strcat(MOX::_temp_string, build_final);
 
             // Special Titan logic (size 4) on Hard/Impossible difficulty
             if (chosen_size == 4 && _offensive_titan_ship_built == 0 && MOX::_settings.game_difficulty > 2) {
                 _offensive_titan_ship_built = 1;
                 for (int i = 0; i < 9; ++i) {
-                    _antaran_ship_cost[i] = (int8_t)(( (int)_antaran_ship_cost[i] * 90) / 100);
+                    _antaran_ship_cost[i] = (uint8_t)((_antaran_ship_cost[i] * 90) / 100);
                 }
             }
         }
@@ -324,7 +319,7 @@ namespace antarans {
     int16_t __cdecl Antaran_Defensive_Force_() {
         int16_t total_force = 0;
         for (int32_t i = 0; i < 9; ++i) {
-            total_force += (int16_t)(MOX::_antarans.defensive_ships[i] * (uint16_t)(uint8_t)_antaran_ship_cost[i]);
+            total_force += (int16_t)(MOX::_antarans.defensive_ships[i] * (uint16_t)_antaran_ship_cost[i]);
         }
         return total_force;
     }
@@ -418,7 +413,7 @@ namespace antarans {
 
         for (int i = 0; i < 9; ++i) {
             // Ship cost is treated as an unsigned byte value (0-255) in the calculation.
-            uint8_t ship_cost = static_cast<uint8_t>(_antaran_ship_cost[i]);
+            uint8_t ship_cost = _antaran_ship_cost[i];
             int16_t ship_count = MOX::_antarans.offensive_ships[i];
 
             total_force += (int16_t)(ship_count * ship_cost);
@@ -461,13 +456,13 @@ namespace antarans {
     }
 
     void __cdecl Restock_Antaran_Ship_(int16_t ship_type_idx) {
-        int16_t count = MOX::_antarans.offensive_deployed[ship_type_idx] - 1;
+        int32_t count = (int32_t)MOX::_antarans.offensive_deployed[ship_type_idx] - 1;
 
         if (count < 1) {
             count = 0;
         }
 
-        MOX::_antarans.offensive_deployed[ship_type_idx] = count;
+        MOX::_antarans.offensive_deployed[ship_type_idx] = (int16_t)count;
     }
 
     bool __cdecl Antarans_Should_Attack_() {

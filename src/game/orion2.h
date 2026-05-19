@@ -2342,7 +2342,7 @@ struct s_leader_data {
     uint32_t general_skills;
     uint32_t special_skills;
     byte tech_application[3];
-    char pict_num;
+    uint8_t pict_num;
     short skill_value;
     char level;
     short location;
@@ -3598,7 +3598,7 @@ struct s_planet_data {
     int8_t size;
     char gravity_class;
     char group;
-    char climate;
+    int8_t climate;
     char climate_bg_type;
     int8_t mineral_class;
     int8_t food_per_farmer;

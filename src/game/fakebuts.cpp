@@ -56,9 +56,9 @@ namespace FAKEBUTS {
         }
     }
 
-    int16_t __cdecl Add_Click_Thru_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, void* data, int count, void* var, int unk, const char* str, int16_t unk2, uint16_t hidden_id) {
+    int16_t __cdecl Add_Click_Thru_Field_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, char **data, int16_t count, int16_t *var, uint8_t color, const char* str, int16_t unk2, int16_t hidden_id) {
         int16_t field_id = fields::Add_Hidden_Field_(x1, y1, x2, y2, str, unk2);
-        Add_Click_Thru_Field_To_List_(x1, y1, x2, y2, field_id, (char**)data, (int16_t)count, (int16_t*)var, (uint8_t)unk, (int16_t)hidden_id);
+        Add_Click_Thru_Field_To_List_(x1, y1, x2, y2, field_id, data, count, var, color, hidden_id);
         return field_id;
     }
 
@@ -74,13 +74,14 @@ namespace FAKEBUTS {
         _click_thru_fields[idx].x2 = x2;
         _click_thru_fields[idx].y2 = y2;
         _click_thru_fields[idx].field_id1 = field_id1;
-        _click_thru_fields[idx].field_id2 = field_id2;
         _click_thru_fields[idx].strings = strings;
+
+        _n_click_thru_fields = idx + 1;
+
         _click_thru_fields[idx].state_count = state_count;
         _click_thru_fields[idx].value = value;
         _click_thru_fields[idx].color = color;
-
-        _n_click_thru_fields = idx + 1;
+        _click_thru_fields[idx].field_id2 = field_id2;
     }
 
     void __cdecl Draw_Fake_Buttons_() {

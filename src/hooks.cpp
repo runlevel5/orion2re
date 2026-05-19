@@ -1063,7 +1063,7 @@ namespace hooks {
         { 0x0049a240, &NEXTTURN::Get_Winner_ },
         { 0x00499e50, &NEXTTURN::Next_Turn_Calc_ },
         { 0x004b3cb0, &antarans::Delta_Stardate_ },
-        { 0x004b3c80, &antarans::Delay_ },
+        { 0x004b3c80, &antarans::Antaran_Delay_ },
         { 0x004b4100, &antarans::Antarans_Defensive_Resource_Bonus_ },
         { 0x004b4040, &antarans::Increment_Antaran_Resource_Level_ },
         { 0x004b38c0, &antarans::Build_Antaran_Ships_ },

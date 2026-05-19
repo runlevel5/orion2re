@@ -158,7 +158,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
      * Planets in systems with non-habitable spectral classes produce no food
      * unless the system contains the Orion star special.
      */
-    uint8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index) {
+    int8_t __cdecl Generate_Food_Per_Farmer_(int16_t star_index, int16_t planet_index) {
         bool habitable = HAROLD::Habitable_Spectral_Class_(star_index);
 
         // Check if the system is either habitable or is the Orion system
@@ -166,8 +166,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             return 0;
         }
 
-        s_planet_data* planet = &MOX::_planet[planet_index];
-        uint8_t climate_idx = static_cast<uint8_t>(planet->climate);
+        int8_t climate_idx = MOX::_planet[planet_index].climate;
 
         return MOX::_food_per_farmer_table[climate_idx];
     }
@@ -447,16 +446,7 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
 
         if (max_planets <= original_planet_count - gas_giant_count) {
             uint8_t is_home_system[72];
-            for (int32_t i = 0; i < 18; ++i) {
-                ((uint32_t*)is_home_system)[i] = 0;
-            }
-
-            _pl = (s_planet_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, 360 * 17);
-            for (int32_t i = 0; i < (360 * 17) / 4; ++i) {
-                ((uint32_t*)_pl)[i] = ((uint32_t*)MOX::_planet)[i];
-            }
-
-            allocate::Allocate_Next_Block_(MOX::_screen_seg, 72 * 113);
+            memset(is_home_system, 0, sizeof(is_home_system));
 
             for (int32_t i = 0; i < 8; ++i) {
                 if (i < MOX::_NUM_PLAYERS) {
@@ -466,16 +456,27 @@ bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, in
             }
 
             if (capture::Check_Release_Version_() == 0) {
-                RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d, (int32_t)(original_planet_count - gas_giant_count), (int32_t)max_planets);
+                RUSS::PFMT_(0, 1, s_Colony_Planets_d_Max_d,
+                    (int32_t)(original_planet_count - gas_giant_count),
+                    (int32_t)max_planets,
+                    (int32_t)original_planet_count,
+                    (int32_t)((original_planet_count - gas_giant_count) - max_planets));
                 assert::hgetch_();
             }
+
+            _pl = (s_planet_data*)allocate::Allocate_First_Block_(MOX::_screen_seg, 0x17E8);
+            memcpy(_pl, MOX::_planet, 0x17E8);
+
+            s_star_data* star_backup = (s_star_data*)allocate::Allocate_Next_Block_(MOX::_screen_seg, 0x1FC8);
+            memcpy(star_backup, MOX::_star, 0x1FC8);
 
             while (max_planets <= MOX::_planet_count - gas_giant_count) {
                 int32_t random_idx = random::Random_(static_cast<int32_t>(MOX::_planet_count)) - 1;
                 s_planet_data* backup_p = &_pl[random_idx];
 
                 if (backup_p->colony_index != -2 && is_home_system[(uint8_t)backup_p->star_index] == 0) {
-                    if (backup_p->planet_type != 2 /* PLANET_TYPE_GAS_GIANT */) {
+                    int16_t mapped_idx = ((int16_t*)MOX::_star[(int8_t)backup_p->star_index].planet_index)[random_idx];
+                    if (mapped_idx > -1 && _pl[mapped_idx].planet_type != 2 /* PLANET_TYPE_GAS_GIANT */) {
                         backup_p->colony_index = -2;
                         MOX::_planet_count--;
                     }

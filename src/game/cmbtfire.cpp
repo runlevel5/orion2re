@@ -1588,7 +1588,7 @@ namespace CMBTFIRE {
     }
 
     void __cdecl Energy_Absorber_Attack_(int16_t param_1, int16_t param_2) {
-        s_beam_fx_entry local_f0[15];
+        s_beam_fx_entry local_f0[16];
         struct_::Clear_Structure_(local_f0, sizeof(local_f0));
 
         int16_t local_f8 = 0;
