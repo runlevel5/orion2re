@@ -14,7 +14,7 @@ void __cdecl Search_For_Battles_() {
 
     s_combfind_star_has_player star_has_player_stack[73][8];
     uint8_t star_has_nonplayer_stack[73];
-    int16_t player_needs_to_attack_stack[73];
+    uint16_t player_needs_to_attack_stack[73];
     int8_t battle_stars_stack[76];
     int8_t attack_confirmed_buf[8][8];
 
@@ -1791,7 +1791,7 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
             int16_t owner = (int16_t)ship->owner;
             
             if (player_idx == owner) {
-                ship_size_sum += (1U << ship->d.size);
+                ship_size_sum += 1U << (ship->d.size & 0x1F);
 
                 for (int16_t p = 0; p < MOX::_NUM_PLAYERS; ++p) {
                     if (player_idx != p) {
@@ -1809,11 +1809,11 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
                     }
                 }
 
-                int16_t shield[4];
+                uint16_t shield[4];
                 AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, shield);
                 
                 for (int j = 0; j < 4; ++j) {
-                    shield_strength[j] += (uint32_t)shield[j];
+                    shield_strength[j] += shield[j];
                 }
             } else {
                 enemy_strength[owner] += AIPOWER::Ship_Strength_Vs_Ships_(i, player_idx);
@@ -1825,8 +1825,9 @@ void __cdecl Get_Ship_Strength_Info_(uint32_t* enemy_strength, uint32_t* player_
         for (int i = 0; i < 15; ++i) {
             uint32_t val = player_strength[i];
             uint32_t new_val = (val / 150) * ship_size_sum;
-            if (new_val > val) {
-                player_strength[i] = new_val;
+            player_strength[i] = new_val;
+            if (val > new_val) {
+                player_strength[i] = val;
             }
         }
     }

@@ -200,7 +200,7 @@ namespace AIDATA {
                                 (*_ship_strengths)[i][p] = str;
                                 (*_ai_player_info)[p].total_ship_strength += str;
                                 (*_ship_strengths_in_nebula)[i][p] = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
-                                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (int16_t*)&(*_ship_bomb_strengths)[i][0]);
+                                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (uint16_t*)&(*_ship_bomb_strengths)[i][0]);
                                 RUSS::Mox_Update_();
                                 if (owner < 8 && turn_idx < 10) {
                                     uint16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];

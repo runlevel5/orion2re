@@ -4,7 +4,7 @@ namespace COMBFIND {
     inline uint8_t& _messed_up_fleet_palette = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD0});
     inline uint8_t& _in_net_update = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00558BD4});
     inline s_combfind_target& _target = *reinterpret_cast<s_combfind_target*>(std::uintptr_t{0x0056CE38});
-    inline int16_t (*&_player_needs_to_attack)[73] = *reinterpret_cast<int16_t (**)[73]>(std::uintptr_t{0x0056CE08});
+    inline uint16_t (*&_player_needs_to_attack)[73] = *reinterpret_cast<uint16_t (**)[73]>(std::uintptr_t{0x0056CE08});
     inline int8_t (*&_battle_stars) = *reinterpret_cast<int8_t**>(std::uintptr_t{0x0056CE14});
     inline uint8_t (*&_star_has_nonplayer)[73] = *reinterpret_cast<uint8_t (**)[73]>(std::uintptr_t{0x0056CE20});
     inline int16_t& _n_battle_stars = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CE2C});

@@ -11,7 +11,7 @@ namespace AIPOWER {
 
     uint16_t __cdecl Ship_Strength_Vs_Ships_In_Nebula_(int16_t attacker_idx, int16_t target_idx);
 
-    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, int16_t* results);
+    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, uint16_t* results);
 
     int16_t __cdecl Max_Ship_Hits_(int16_t ship_idx);
 

@@ -264,7 +264,7 @@ namespace AIPOWER {
      * Calculates ship strength against 4 levels of planetary shields.
      * results[0..3] corresponds to the 4 shield levels.
      */
-    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, int16_t* results) {
+    void __cdecl Ship_Strength_Vs_Planetary_Shield_(int16_t ship_idx, uint16_t* results) {
         uint32_t strengths[4];
         uint16_t shield_reductions[4] = { 2, 7, 12, 22 };
 
@@ -314,9 +314,9 @@ namespace AIPOWER {
             // Scale strength by current ship health
             uint32_t final_power = (uint32_t)current_hits * strengths[i] / (uint32_t)max_hits;
 
-            results[i] = (int16_t)0xfa00; /* 64000 */
+            results[i] = 0xfa00; /* 64000 */
             if (final_power <= 0xfa00) {
-                results[i] = (int16_t)final_power;
+                results[i] = (uint16_t)final_power;
             }
         }
     }
