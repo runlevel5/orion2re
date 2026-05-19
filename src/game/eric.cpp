@@ -21,8 +21,8 @@ namespace ERIC {
         }
     }
 
-    void __cdecl Set_Fade_Speed_Percent_(int32_t percentage) {
-        _fade_speed_in_percent = static_cast<uint8_t>(percentage);
+    void __cdecl Set_Fade_Speed_Percent_(uint8_t percentage) {
+        _fade_speed_in_percent = percentage;
     }
 
     int16_t __cdecl Get_Sint_Index_From_List_(int16_t value, const int16_t* list, uint16_t count) {

@@ -271,8 +271,8 @@ namespace HAROLD {
             if (invalidated_count < count) {
                 int iters = (count * 5) / 3;
                 for (int i = 0; i < iters; ++i) {
-                    int idx1 = random::Random_(count) - 1;
-                    int idx2 = random::Random_(count) - 1;
+                    int idx1 = random::Random_(count);
+                    int idx2 = random::Random_(count);
                     if (idx1 != idx2 && candidates[idx1] != -1 && candidates[idx2] != -1) {
                         int16_t temp = candidates[idx1];
                         candidates[idx1] = candidates[idx2];

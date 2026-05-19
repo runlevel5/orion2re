@@ -31,7 +31,7 @@ namespace ERIC {
 
     bool __cdecl Fast_Fade_Out_Needed_For_Colony_Palette_();
 
-    void __cdecl Set_Fade_Speed_Percent_(int32_t percentage);
+    void __cdecl Set_Fade_Speed_Percent_(uint8_t percentage);
 
     void __cdecl Set_Fade_Percent_(int16_t percent);
 

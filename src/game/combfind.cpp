@@ -529,27 +529,26 @@ void __cdecl Do_Dragon_Bribe_(int player_idx, int star_idx, int16_t dest_idx) {
 }
 
 int16_t __cdecl Closest_Other_Colony_Star_(int16_t player_idx, int16_t star_idx) {
-    int32_t min_dist_sq = -1;
+    uint32_t min_dist_sq = 0xFFFFFFFF;
     int16_t closest_star_idx = -1;
 
     s_star_data* src_star = &MOX::_star[star_idx];
     int32_t src_x = src_star->x;
     int32_t src_y = src_star->y;
 
-    int num_colonies = (int32_t)MOX::_NUM_COLONIES;
-    for (int i = 0; i < num_colonies; ++i) {
+    for (int i = 0; i < MOX::_NUM_COLONIES; ++i) {
         s_colony* colony = &MOX::_colony[i];
 
-        if (colony->owner == (int8_t)player_idx) {
-            int16_t target_star_idx = (int16_t)MOX::_planet[colony->planet].star_index;
+        if (colony->owner == player_idx) {
+            int8_t target_star_idx = MOX::_planet[colony->planet].star_index;
 
             if (target_star_idx != star_idx && target_star_idx != closest_star_idx) {
-                if (!struct_::Test_Bit_Field_((uint8_t*)src_star->black_hole_blocks, (int)target_star_idx)) {
+                if (!struct_::Test_Bit_Field_(src_star->black_hole_blocks, target_star_idx)) {
                     s_star_data* target_star = &MOX::_star[target_star_idx];
 
                     int32_t dx = (int32_t)target_star->x - src_x;
                     int32_t dy = (int32_t)target_star->y - src_y;
-                    int32_t dist_sq = dx * dx + dy * dy;
+                    uint32_t dist_sq = (uint32_t)dx * (uint32_t)dx + (uint32_t)dy * (uint32_t)dy;
 
                     if (dist_sq < min_dist_sq) {
                         min_dist_sq = dist_sq;

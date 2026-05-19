@@ -293,7 +293,7 @@ namespace MOX {
     inline int8_t& _selected_star_color_offset = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059C454});
     inline int16_t* _antarans_ship_counts = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA38 });
     inline int16_t* _antarans_ship_counts_end = reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059BA4A });
-    inline uint32_t& _stardate = *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0059BA64 });
+    inline int32_t& _stardate = *reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0059BA64 });
     inline s_settings& _settings = *reinterpret_cast<s_settings*>(std::uintptr_t{ 0x00597080 });
     inline char*& _hyper_field_title = *reinterpret_cast<char**>(std::uintptr_t{0x00598764});
     inline const char* s_Harbinger = reinterpret_cast<const char*>(std::uintptr_t{0x005576B8}); // "Harbinger"
@@ -448,7 +448,7 @@ namespace MOX {
     inline int16_t& _NUM_COLONIES =
         *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00597856 });
 
-    inline uint16_t& _planet_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0059700E });
+    inline int16_t& _planet_count = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0059700E });
 
     // Suggested name: MOX::_climate_modifier_table
     inline int8_t (&_climate_modifier_table)[5] =
@@ -592,7 +592,7 @@ namespace MOX {
     inline uint8_t& _red_color1 = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A2C1E});
     inline char* (&_government_labels)[8] = *reinterpret_cast<char* (*)[8]>(std::uintptr_t{0x00596FB0});
     inline char** _special_ability_names = reinterpret_cast<char**>(std::uintptr_t{0x0059B350});
-    inline uint32_t& _stardate_at_beg_of_turn = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0059B344});
+    inline int32_t& _stardate_at_beg_of_turn = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0059B344});
     inline int16_t& _global_var = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059B4AA});
     inline int8_t& _global_var_byte = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0059B4AA});
     inline uint16_t& _FULL_DRAW_SCREEN_FLAG = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A2C24});
@@ -805,7 +805,7 @@ namespace MOX {
 
     #pragma pack(push, 1)
     struct s_class_group {
-        uint8_t group[5];
+        int8_t group[5];
     };
     #pragma pack(pop)
 

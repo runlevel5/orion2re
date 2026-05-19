@@ -60,17 +60,15 @@ namespace COLONIZE {
     }
 
     void Find_Colonize_Players_() {
-        uint8_t outpost_bits[72]; // Bitmask: bit i set if player i has an outpost ship here
-        uint8_t colony_bits[72];  // Bitmask: bit i set if player i has a colony ship or base here
+        uint8_t colony_bits[72];
+        uint8_t outpost_bits[72];
 
-        for (int i = 0; i < 72; ++i) {
-            outpost_bits[i] = 0;
-            colony_bits[i] = 0;
-        }
+        memset(colony_bits, 0, sizeof(colony_bits));
+        memset(outpost_bits, 0, sizeof(outpost_bits));
 
         // Reset priority for all stars
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
-            MOX::_star[i].colonize_player = 8; // Default: unassigned
+            MOX::_star[i].colonize_player = 8;
         }
 
         // Phase 1: Check ships (Colony and Outpost ships)
@@ -78,8 +76,8 @@ namespace COLONIZE {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0) { // Active
                 if (ship->d.ship_type == SHIP_TYPE_COLONY || ship->d.ship_type == SHIP_TYPE_OUTPOST) {
-                    int star_idx = ship->location;
-                    if (star_idx >= 0 && star_idx < 72) {
+                    int16_t star_idx = ship->location;
+                    if (star_idx < 72) {
                         s_star_data* star = &MOX::_star[star_idx];
                         if (star->colonize_player == 8) {
                             star->colonize_player = ship->owner;
@@ -115,22 +113,21 @@ namespace COLONIZE {
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
             int8_t priority_player = star->colonize_player;
-            if (priority_player != 8 && priority_player != -1) {
-                bool valid = false;
-                // Check if player has a colony asset and colonizable planets
+            if (priority_player == 8) {
+                star->colonize_player = -1;
+            } else {
+                bool keep = false;
                 if ((colony_bits[i] >> (priority_player & 0x1F)) & 1) {
                     if (Star_N_Colonizable_Planets_For_Player_(star, priority_player) > 0) {
-                        valid = true;
+                        keep = true;
                     }
-                }
-                // If not valid yet, check outpost assets and outpostable planets
-                if (!valid && ((outpost_bits[i] >> (priority_player & 0x1F)) & 1)) {
+                } else if ((outpost_bits[i] >> (priority_player & 0x1F)) & 1) {
                     if (Star_N_Outpostable_Planets_For_Player_(star, priority_player) > 0) {
-                        valid = true;
+                        keep = true;
                     }
                 }
 
-                if (!valid) {
+                if (!keep) {
                     star->colonize_player = -1;
                 }
             }
@@ -140,8 +137,8 @@ namespace COLONIZE {
         for (int i = 0; i < MOX::_NUM_SHIPS; ++i) {
             s_ship_data* ship = &MOX::_ship[i];
             if (ship->status == 0 && ship->d.ship_type == SHIP_TYPE_COMBAT) {
-                int star_idx = ship->location;
-                if (star_idx >= 0 && star_idx < 72) {
+                int16_t star_idx = ship->location;
+                if (star_idx < 72) {
                     s_star_data* star = &MOX::_star[star_idx];
                     int8_t colonizer = star->colonize_player;
                     if (colonizer >= 0 && colonizer < 8 && ship->owner != colonizer) {
@@ -174,25 +171,27 @@ namespace COLONIZE {
                 }
 
                 if (remove_base) {
+                    int16_t owner = colony->owner;
                     int refund = TECHDATA::_buildings[BUILDING_COLONY_BASE].cost / 2;
                     colony->buildings[BUILDING_COLONY_BASE] = 0;
-                    MOX::_player[colony->owner].bc += refund;
+                    MOX::_player[owner].bc += refund;
 
-                    s_MSG msg;
+                    s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_COLONY;
                     msg.u.colony.planet_idx = (uint8_t)colony->planet;
+                    msg.u.colony.subtype = 0;
                     msg.u.colony.c.scrap.bc = refund;
                     msg.u.colony.c.scrap.building_id = BUILDING_COLONY_BASE;
-                    MSG_::Add_Msg_(msg, colony->owner);
+                    MSG_::Add_Msg_(msg, owner);
                 }
             }
         }
     }
 
     void Allocate_New_Colony_Slots_() {
-        uint16_t uncolonized_counts[8] = { 0 };
-        uint16_t allocated_counts[8] = { 0 };
-        uint8_t free_slots_indices[250] = { 0 };
+        int16_t uncolonized_counts[8] = { 0 };
+        int16_t allocated_counts[8] = { 0 };
+        uint8_t free_slots_indices[250];
 
         int16_t free_slots_count = 0;
 
@@ -200,9 +199,9 @@ namespace COLONIZE {
 
         for (int i = 0; i < MOX::_NUM_STARS; ++i) {
             s_star_data* star = &MOX::_star[i];
-            if (star->colonize_player >= 0 && star->colonize_player < 8) {
+            if (star->colonize_player != -1) {
                 int16_t count = Star_N_Uncolonized_Planets_(star);
-                uncolonized_counts[star->colonize_player] += count;
+                uncolonized_counts[(int8_t)star->colonize_player] += count;
             }
         }
 
@@ -217,7 +216,7 @@ namespace COLONIZE {
             return;
         }
 
-        int16_t current_player = (int16_t)(MOX::_stardate % MOX::_NUM_PLAYERS);
+        int16_t current_player = (int16_t)(MOX::_stardate % (int32_t)MOX::_NUM_PLAYERS);
         int16_t skipped_players = 0;
         int16_t free_slot_ptr = 0;
 
@@ -377,16 +376,10 @@ namespace COLONIZE {
         COLCALC::Compute_Star_Colony_Stuff_(&MOX::_star[planet->star_index]);
     }
 
-    /**
-     * @address 004b9820
-     */
     void __cdecl Make_New_Colony_(int16_t planet_idx, int16_t player_idx) {
         COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 0);
     }
 
-    /**
-     * @address 004b9a80
-     */
     void __cdecl Make_New_Outpost_(int16_t planet_idx, int16_t player_idx) {
         COLONIZE::Make_New_Colony_Or_Outpost_(planet_idx, player_idx, 1);
     }

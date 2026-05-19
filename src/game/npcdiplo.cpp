@@ -364,7 +364,7 @@ namespace npcdiplo {
             s_player* p1 = &MOX::_player[p1_idx];
 
             if (p1->objectives != 100 && p1->traits[TRAIT_REPULSIVE] == 0) {
-                if (MOX::_stardate % (uint32_t)MOX::_NUM_PLAYERS == (uint32_t)p1_idx) {
+                if (MOX::_stardate % (int32_t)MOX::_NUM_PLAYERS == (int32_t)p1_idx) {
                     for (int16_t p2_idx = 0; p2_idx < (int16_t)MOX::_NUM_PLAYERS; ++p2_idx) {
                         if (p1_idx == p2_idx) continue;
 

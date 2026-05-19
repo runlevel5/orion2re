@@ -29,7 +29,7 @@ namespace spy {
 
     void __cdecl Steal_App_(s_player* attacker, s_player* victim, int8_t frame_flag);
 
-    bool __cdecl Frame_Another_(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t victim_idx);
+    bool __cdecl Frame_Another_(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t tech_app_id);
 
     void __cdecl Destroy_Random_Building_(int16_t framed_player_idx, int16_t victim_player_idx, int acting_player_idx);
 }

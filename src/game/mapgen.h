@@ -6,7 +6,8 @@ namespace MAPGEN {
     inline uint8_t& _n_wormholes = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005589A0});
     inline uint8_t& _make_food_planet = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4AF4});
     inline uint8_t& _n_space_monsters = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x005A4B56});
-    inline uint16_t& _is_companion_star = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A4B18});
+    inline uint16_t& _companion_star_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005A4B18});
+    inline uint16_t& _is_companion_star = _companion_star_flag;
     inline char* _companion_star = reinterpret_cast<char*>(std::uintptr_t{0x0055632C});
     inline uint8_t& _n_maps_generated = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CD90});
     inline uint16_t (&_tests_failed)[4] = *reinterpret_cast<uint16_t(*)[4]>(std::uintptr_t{0x0056CD98});
@@ -24,11 +25,14 @@ namespace MAPGEN {
     inline int16_t& _t_roll = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056CDA4});
     inline uint32_t& DAT_0056CDC8 = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0056CDC8});
     inline uint32_t (&_satellite_stat)[6] = *reinterpret_cast<uint32_t (*)[6]>(std::uintptr_t{0x005A4B00});
-    inline uint32_t (&_nebula_stat)[20] = *reinterpret_cast<uint32_t (*)[20]>(std::uintptr_t{0x005A4AE0});
+    inline uint32_t (&_nebula_stat)[5] = *reinterpret_cast<uint32_t (*)[5]>(std::uintptr_t{0x005A4AE0});
     inline uint16_t& _star_count = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0056CDB4});
     inline s_planet_data*& _pl = *reinterpret_cast<s_planet_data**>(std::uintptr_t{0x005A4B1C});
     inline const char* s_raceopt_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B24}); // "RACEOPT.LBX"
+    inline const char* s_starname_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558B30}); // "starname.lbx"
     inline const char* s_starbg_lbx = reinterpret_cast<const char*>(std::uintptr_t{0x00558A10}); // "starbg.lbx"
+    inline const char* s_Stat_d__start_d__diff_d__total_d_d = reinterpret_cast<const char*>(std::uintptr_t{0x00558A90}); // "Stat %d  (start: %d)  (diff %d)  (total: %d.%d)"
+    inline const char* s_Blank_Stat_Line = reinterpret_cast<const char*>(std::uintptr_t{0x00558AC0}); // "                                                                      "
     inline const char* s_Moving_planet_d_to_planet_d = 
         reinterpret_cast<const char*>(std::uintptr_t{0x005589AC}); // "Moving planet %d to planet %d"
     inline const char* s_Colony_Planets_d_Max_d = 
@@ -66,13 +70,13 @@ namespace MAPGEN {
 
     void __cdecl Randomize_Star_Names_(uint16_t* star_name_indices);
 
-    void __cdecl Init_Main_Screen_(uint8_t size);
+    void __cdecl Init_Main_Screen_(uint8_t gal_size);
     
     void __cdecl Generate_Number_Of_Nebulas_(int16_t galaxy_size, int16_t nebula_freq);
 
     void __cdecl Generate_Nebulas_();
 
-    void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, void* out_points, int16_t* count, int32_t max_count);
+    void __cdecl Build_Min_Point_Distances_(int16_t x, int16_t y, int16_t min_x, int16_t min_y, int16_t max_x, int16_t max_y, int32_t dist_sq, int16_t* out_points, int16_t* count, int16_t max_count);
 
     bool __cdecl Set_Star_XYs_(int16_t x_cells, int16_t y_cells, int16_t param_3, int8_t generate_spectral, int8_t use_names);
 

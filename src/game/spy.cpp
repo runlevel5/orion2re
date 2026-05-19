@@ -617,10 +617,10 @@ namespace spy {
      * @param player_idx_a The player performing the spy action.
      * @param player_idx_b The victim player being spied upon.
      * @param framed_player_idx Output pointer for the player index to be framed.
-     * @param victim_idx The player index whose tech knowledge is checked against candidates.
+     * @param tech_app_id Tech application id to exclude candidates who already know it, or -1.
      * @return true if any candidates were found, false otherwise.
      */
-    bool __cdecl Frame_Another_(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t victim_idx) {
+    bool __cdecl Frame_Another_(int16_t player_idx_a, int16_t player_idx_b, int16_t* framed_player_idx, int32_t tech_app_id) {
         int32_t candidate_count = 0;
         uint8_t treaty_counts[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
         int8_t framed_candidates[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
@@ -631,18 +631,18 @@ namespace spy {
                 continue;
             }
 
-            // Both the actor and the victim must have contact with the potential candidate
-            if (MOX::_player[player_idx_a].contact[i] == 0) {
+            // The potential candidate must have contact with both the actor and the victim
+            if (MOX::_player[i].contact[player_idx_a] == 0) {
                 continue;
             }
 
-            if (MOX::_player[player_idx_b].contact[i] == 0) {
+            if (MOX::_player[i].contact[player_idx_b] == 0) {
                 continue;
             }
 
-            // If a victim index is provided, ensure the candidate doesn't already know everything about them
-            if (victim_idx != -1) {
-                if (MOX::_player[i].tech_applications[victim_idx] == 3) {
+            // If a tech application id is provided, ensure the candidate doesn't already know it
+            if (tech_app_id != -1) {
+                if (MOX::_player[i].tech_applications[tech_app_id] == 3) {
                     continue;
                 }
             }
@@ -650,7 +650,7 @@ namespace spy {
             candidate_count++;
 
             // Get the treaty level between the actor and the potential frame candidate
-            int8_t treaty_type = MOX::_player[player_idx_a].treaty[i];
+            uint8_t treaty_type = (uint8_t)MOX::_player[player_idx_a].treaty[i];
 
             // Reservoir sampling: select one candidate per treaty category at random
             treaty_counts[treaty_type]++;

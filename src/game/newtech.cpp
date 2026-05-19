@@ -15,7 +15,7 @@ namespace newtech {
 
                 // Iterate through first 75 technology applications
                 for (int app_idx = 0; app_idx < 75; ++app_idx) {
-                    if (TECHDATA::_technology_applications[app_idx].ai_group == (uint8_t)target_ai_group) {
+                    if (TECHDATA::_technology_applications[app_idx].ai_group == target_ai_group) {
                         // Check if the player knows the application (3 usually represents fully researched)
                         if (plr->tech_applications[app_idx] == 3) {
                             int16_t field_id = TECHDATA::_technology_applications[app_idx].tech_field_id;
