@@ -32,7 +32,7 @@ namespace MAINSCR {
     inline int8_t& _clear_fleet_fields = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC4});
     inline int8_t& _mouse_btn_pressed = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CEC8});
     inline int8_t& _merging_relocations = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED0});
-    inline int8_t& _warn_about_cheaters = *reinterpret_cast<int8_t*>(std::uintptr_t{0x0056CED4});
+    inline uint8_t& _warn_about_cheaters = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056CED4});
     inline uint8_t& _zoom_box_counter = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEA4 });
     inline uint8_t& _zoom_box_color_increment = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CEAC });
     inline uint8_t& _zoom_box_increment_value = *reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x0056CED8 });
@@ -197,7 +197,7 @@ namespace MAINSCR {
 
     void __cdecl Give_Me_All_Tech_Advances_();
 
-    inline uint16_t& _omniscience_cheat_alt = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00559860});
+    inline int16_t& _omniscient_hot_key = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559860});
     inline int16_t& _all_tech_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559864});
     inline int16_t& _leader_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00559868});
     inline int16_t& _more_money_cheat = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055986C});

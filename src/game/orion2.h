@@ -3972,7 +3972,7 @@ struct s_settings {
     sbyte sound_fx_level;
     sbyte music_on;
     int8_t music_level;
-    char active_save_slot;
+    int8_t active_save_slot;
     byte multi_player_game_type;
     char net_game_name[9];
     struct s_modem_settings modem_settings;
@@ -4775,7 +4775,7 @@ struct s_star_data {
     char name[15];
     short x;
     short y;
-    char size;
+    int8_t size;
     int8_t owner;
     char pict_type;
     int8_t spectral_class;

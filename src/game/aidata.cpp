@@ -138,8 +138,8 @@ namespace AIDATA {
         _ship_strengths_in_nebula = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
         _ship_bomb_strengths = (int32_t(*)[500][2])allocate::Allocate_Next_Block_(MOX::_screen_seg, 4000);
         _planet_stage_weights = (int16_t(*)[360][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 5760);
-        _base_star_stage_weights = (int32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
-        _star_stage_weights = (int32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
+        _base_star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
+        _star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
         _n_turns_from_to = (uint8_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 41472 /* 0xA200 */);
         _n_turns_from_to_intermediate = (int32_t(*)[72][72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 165888 /* 0x28800 */);
         _ship_n_turns_to = (int8_t(*)[500][72])allocate::Allocate_Next_Block_(MOX::_screen_seg, 36000);

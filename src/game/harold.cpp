@@ -1511,7 +1511,7 @@ namespace HAROLD {
         MOX::_red_color2 = 0x4C;
 
         for (int16_t i = 0; i < 10; ++i) {
-            MOX::_black_hole_anim_count[i] = static_cast<uint8_t>(i * 2);
+            MOX::_black_hole_anim_count[i] = (int8_t)(i * 2);
         }
 
         g_map_unknown_flag = 0;

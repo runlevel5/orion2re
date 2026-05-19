@@ -6,8 +6,8 @@ namespace AIDATA {
     inline uint16_t(*&_ship_strengths_in_nebula)[500][8] = *reinterpret_cast<uint16_t(**)[500][8]>(std::uintptr_t{ 0x005953AC });
     inline int32_t(*&_ship_bomb_strengths)[500][2] = *reinterpret_cast<int32_t(**)[500][2]>(std::uintptr_t{ 0x005953D8 });
     inline int16_t(*&_planet_stage_weights)[360][8] = *reinterpret_cast<int16_t(**)[360][8]>(std::uintptr_t{ 0x0056ED20 });
-    inline int32_t(*&_base_star_stage_weights)[72][8] = *reinterpret_cast<int32_t(**)[72][8]>(std::uintptr_t{ 0x0059539C });
-    inline int32_t(*&_star_stage_weights)[72][8] = *reinterpret_cast<int32_t(**)[72][8]>(std::uintptr_t{ 0x005953E4 });
+    inline uint32_t(*&_base_star_stage_weights)[72][8] = *reinterpret_cast<uint32_t(**)[72][8]>(std::uintptr_t{ 0x0059539C });
+    inline uint32_t(*&_star_stage_weights)[72][8] = *reinterpret_cast<uint32_t(**)[72][8]>(std::uintptr_t{ 0x005953E4 });
     inline uint8_t(*&_n_turns_from_to)[72][72][8] = *reinterpret_cast<uint8_t(**)[72][72][8]>(std::uintptr_t{ 0x005953D0 });
     inline int32_t(*&_n_turns_from_to_intermediate)[72][72][8] = *reinterpret_cast<int32_t(**)[72][72][8]>(std::uintptr_t{ 0x00571A28 });
     inline int8_t(*&_ship_n_turns_to)[500][72] = *reinterpret_cast<int8_t(**)[500][72]>(std::uintptr_t{ 0x005953A8 });

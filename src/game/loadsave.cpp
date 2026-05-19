@@ -327,9 +327,9 @@ namespace LOADSAVE {
 
             if (_game_popup_fields->screen_cancel_field_id + 256 == input_id || _game_popup_fields->btn_popup_load_id == input_id) {
                 if (selected_slot == -1) {
-                    if (MOX::_settings.active_save_slot < 10) {
+                    if (MOX::_settings.active_save_slot > -1 && MOX::_settings.active_save_slot < 10) {
                         _draw_down = 1;
-                        selected_slot = static_cast<int16_t>((uint8_t)MOX::_settings.active_save_slot);
+                        selected_slot = static_cast<int16_t>(MOX::_settings.active_save_slot);
                     }
                 }
             }
@@ -344,7 +344,7 @@ namespace LOADSAVE {
                     }
 
                     load_success = static_cast<int8_t>(FILEDEF::Load_Game_(selected_slot));
-                    MOX::_settings.active_save_slot = static_cast<char>(selected_slot);
+                    MOX::_settings.active_save_slot = static_cast<int8_t>(selected_slot);
                     Save_Session_Related_Settings_();
 
                     if (load_success == 0) {
@@ -519,7 +519,7 @@ namespace LOADSAVE {
 
             if (input_id == _game_popup_fields->btn_main_save_id) { // Save button / Space
                 if (active_slot_idx < 0 || active_slot_idx >= 10) {
-                    if (MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10) {
+                    if (MOX::_settings.active_save_slot > -1 && MOX::_settings.active_save_slot < 10) {
                         active_slot_idx = (int16_t)MOX::_settings.active_save_slot;
                         trigger_save = true;
                     }
@@ -530,7 +530,7 @@ namespace LOADSAVE {
 
             if (trigger_save && active_slot_idx >= 0 && active_slot_idx < 10) {
                 trigger_save = false;
-                MOX::_settings.active_save_slot = (char)active_slot_idx;
+                MOX::_settings.active_save_slot = static_cast<int8_t>(active_slot_idx);
                 char* target_desc = MOX::_save_game_description[active_slot_idx].description;
 
                 bool is_empty = (target_desc[0] == '\0');
@@ -868,7 +868,7 @@ namespace LOADSAVE {
                 text_y = MOX::_popup_base_y + 0x18 + (i * 31);
                 if (MOX::_screen_data == 2) {
                     Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-                    s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+                    s_colors* color = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
                     fonts::Set_Font_Style_(2, color);
                     const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
                     fonts::Print_(text_x, text_y, desc);
@@ -877,7 +877,7 @@ namespace LOADSAVE {
                 text_x = 0x20;
                 text_y = (i * 31) + 0x18;
                 Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-                s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+                s_colors* color = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
                 fonts::Set_Font_Style_(2, color);
 
                 int16_t print_x = (MOX::_screen_data == 3) ? 0x24 : 0x20;
@@ -892,7 +892,7 @@ namespace LOADSAVE {
 
             // Print stardate and real-world date
             Get_Game_Popup_Colors_(1, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-            s_colors* color_1 = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+            s_colors* color_1 = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
             fonts::Set_Font_Style_(1, color_1);
 
             if (MOX::_screen_data == 3) text_x += 2;

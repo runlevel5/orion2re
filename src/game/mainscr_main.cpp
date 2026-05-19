@@ -32,36 +32,18 @@ namespace MAINSCR {
             int16_t flux_width = fonts::Get_String_Width_(flux_buffer);
             int16_t flux_x = 526 - flux_width; // 0x20e
 
-            uint32_t line_color1 = *(uint32_t*)colors1.colors;
-            uint32_t line_color2 = *((uint32_t*)colors1.colors + 1);
-
-            line::Line_(flux_x, 21, 526, 21, line_color1);
-            line::Line_(flux_x, 22, 526, 22, line_color2);
+            line::Line_(flux_x, 21, 526, 21, colors1.colors[0]);
+            line::Line_(flux_x, 22, 526, 22, colors1.colors[1]);
             fonts::Print_Right_(526, 24, flux_buffer);
 
             int16_t fh = fonts::Get_Font_Height_();
-            line::Line_(flux_x, fh + 25, 526, fh + 25, line_color2);
-            line::Line_(flux_x, fh + 26, 526, fh + 26, line_color1);
+            line::Line_(flux_x, fh + 25, 526, fh + 25, colors1.colors[1]);
+            line::Line_(flux_x, fh + 26, 526, fh + 26, colors1.colors[0]);
         }
 
-        fonts::Get_Font_Height_();
+        int16_t treasury_font_height = fonts::Get_Font_Height_();
         HAROLD::Get_Monetary_Unit_String_(monetary_unit);
         s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
-
-        char* bc_comma = MISC::Get_Comma_String_(plr->bc);
-        sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
-
-        if (plr->bc < 0) {
-            MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
-            Set_Post_Fitted_Font_Style_('K', 'M');
-            MISC::Increase_Font_Color_Range_(((int)MOX::_red_color_pulse_value * 4) / 7);
-            fonts::Set_Outline_Color_(0x49, 0x49);
-        }
-        else {
-            MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
-            fonts::Set_Outline_Color_(2, 1);
-        }
-        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
 
         char* surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
         const char* bc_sign = (plr->surplus_bc < 0) ? s__00551100 : s_plus_00551118;
@@ -83,7 +65,22 @@ namespace MAINSCR {
             fonts::Set_Outline_Color_(2, 1);
             fonts::Set_Font_Spacing_(bc_spacing);
         }
-        fonts::Print_Centered_(579, fonts::Get_Font_Height_() + 96, buffer);
+        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
+
+        char* bc_comma = MISC::Get_Comma_String_(plr->bc);
+        sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
+
+        if (plr->bc < 0) {
+            MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_('K', 'M');
+            MISC::Increase_Font_Color_Range_(((int)MOX::_red_color_pulse_value * 4) / 7);
+            fonts::Set_Outline_Color_(0x49, 0x49);
+        }
+        else {
+            MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
+            fonts::Set_Outline_Color_(2, 1);
+        }
+        fonts::Print_Centered_(579, treasury_font_height + 96, buffer);
 
         int16_t cp_surplus = plr->command_points - plr->command_points_used;
         const char* cp_sign = (cp_surplus < 0) ? s__00551100 : s_plus_00551118;
@@ -261,7 +258,7 @@ namespace MAINSCR {
         MAINSCR::Allocate_First_Screen_Seg_(5);
         SYS::Clear_System_Display_Loaded_Flag_();
         mouse::Clear_Mouse_XY_();
-        EVANHELP::Set_Main_Game_Screen_Help_List_();
+        EVANHELP::Set_Main_Screen_Help_List_();
         MAINSCR::Clear_Twinkling_Star_Data_();
         MOX::_fleet_ship_scanned = -1;
         MOX::_galaxy_map_scanned_star = -1;
@@ -340,7 +337,7 @@ namespace MAINSCR {
             if (MOX::_stardate == 35000) {
                 fields::Deactivate_Help_List_();
                 MAINSCR::Change_Home_Star_Name_();
-                EVANHELP::Set_Main_Game_Screen_Help_List_();
+                EVANHELP::Set_Main_Screen_Help_List_();
             }
             MOX::_given_chance_to_rename_home_star[MOX::_PLAYER_NUM] = 1;
         }
@@ -409,20 +406,18 @@ namespace MAINSCR {
             if (MOX::_main_screen_grid_field == input || (-MOX::_main_screen_grid_field == input)) {
                 int mx = mouse::Pointer_X_();
                 int my = mouse::Pointer_Y_();
-                int box_mode = (input <= 0) + 1;
+                icon_selected_flag = static_cast<uint8_t>((input <= 0) + 1);
 
-                icon_selected_flag = box_mode;
-
-                if (MOVEBOX::Moveable_Box_Selected_(box_mode)) {
-                    MAINSCR::Check_Ships_XY_(mx, my, icon_selected_flag);
-                    if (MOX::_mouse_XY.ship_icon_idx == -1) {
-                        MAINSCR::Check_Stars_XY_(mx, my, icon_selected_flag);
+                if (MOVEBOX::Moveable_Box_Selected_(2)) {
+                    MAINSCR::Check_Stars_XY_(mx, my, static_cast<int8_t>(icon_selected_flag));
+                    if (MOX::_mouse_XY.star_idx == -1) {
+                        MAINSCR::Check_Ships_XY_(mx, my, static_cast<int8_t>(icon_selected_flag));
                     }
                 }
                 else {
-                    MAINSCR::Check_Stars_XY_(mx, my, icon_selected_flag);
-                    if (MOX::_mouse_XY.star_idx == -1) {
-                        MAINSCR::Check_Ships_XY_(mx, my, icon_selected_flag);
+                    MAINSCR::Check_Ships_XY_(mx, my, static_cast<int8_t>(icon_selected_flag));
+                    if (MOX::_mouse_XY.ship_icon_idx == -1) {
+                        MAINSCR::Check_Stars_XY_(mx, my, static_cast<int8_t>(icon_selected_flag));
                     }
                 }
             }
@@ -430,8 +425,6 @@ namespace MAINSCR {
                 MOX::_mouse_XY.ship_icon_idx = -1;
                 MOX::_mouse_XY.star_idx = -1;
             }
-
-            bool process_star_eta = false;
 
             if (MOX::_skip_fields == 0) {
                 icon_selected_flag = 0;
@@ -450,7 +443,7 @@ namespace MAINSCR {
 
                     const char* msg = HAROLD::H_Message_(HESTR_0DD_ALL_NEW_SHIPS_BUILT_WI);
                     sprintf(text_buffer, msg, &MOX::_star[mouse_field_2]);
-                    HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, text_buffer, 0);
+                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, text_buffer, 0);
                 }
                 else {
                     if (mouse_status == 0 && mouse_field_2 >= 0) {
@@ -466,38 +459,10 @@ namespace MAINSCR {
                                 MAINSCR::Do_Colony_Screen_(colony_idx, &exit_flag);
                             }
                         }
-                        else {
-                            process_star_eta = true;
-                        }
-                    }
-                    else {
-                        process_star_eta = true;
-                    }
-                }
-
-                // Icon selected processing
-                if (icon_selected_flag) {
-                    process_star_eta = true;
-                }
-
-                if (process_star_eta) {
-                    bool valid_target = false;
-                    if (mouse_field_2 < 0 || mouse_status != 0 || MOX::_star[mouse_field_2].spectral_class == STAR_CLASS_BLACK_HOLE) {
-                        if (icon_selected_flag && mouse_status != 0 && MOVEBOX::Moveable_Box_Selected_(2)) {
-                            MOX::_fleet_ship_scanned = -1;
-                            if (MOX::_star[mouse_field_1].spectral_class == STAR_CLASS_BLACK_HOLE) {
-                                MOX::_eta_star_id = -1;
-                            }
-                            else {
-                                MOX::_eta_star_id = mouse_field_1;
-                            }
-                        }
-                    }
-                    else {
-                        valid_target = true;
                     }
 
-                    if (valid_target) {
+                    if (icon_selected_flag) {
+                        if (mouse_field_2 > -1 && mouse_status == 0 && MOX::_star[mouse_field_2].spectral_class != STAR_CLASS_BLACK_HOLE) {
                         HACCESS::Get_Fleet_Box_Selected_Ship_Ids_((int16_t*)ship_ids, 500, 0xff);
                         SHIPMOVE::Ships_Try_To_Move_To_(ship_ids, mouse_field_2, &SHIPMOVE::_g_ship_move_info);
 
@@ -511,7 +476,7 @@ namespace MAINSCR {
                             if (msg_id != 0) {
                                 const char* msg = HAROLD::H_Message_(msg_id);
                                 strcpy(msg_buffer, msg);
-                                HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, msg_buffer, 3);
+                                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 3);
                             }
                         }
                         else {
@@ -520,7 +485,7 @@ namespace MAINSCR {
                             MOX::_eta_star_id = -1;
 
                             int16_t next_icon = 0;
-                            if (ships_count == MOX::_box_off_flag_) {
+                            if (ships_count == MOX::_fleet_box.count) {
                                 MOX::_just_moved_stack = 1;
                             }
                             else {
@@ -531,7 +496,7 @@ namespace MAINSCR {
                             SHIPS::Set_Ship_Icon_XYs_();
 
                             int16_t stack_ship = next_icon;
-                            if (ships_count == MOX::_box_off_flag_) {
+                            if (ships_count == MOX::_fleet_box.count) {
                                 stack_ship = 0; // Use dummy or 0
                             }
 
@@ -547,6 +512,16 @@ namespace MAINSCR {
 
                             MOX::_draw_main_screen_to_back = 1;
                             MOX::_first_node_ptr_in_stack_ = -1;
+                        }
+                        }
+                        else if (mouse_status == 4 && MOVEBOX::Moveable_Box_Selected_(2)) {
+                            MOX::_fleet_ship_scanned = -1;
+                            if (MOX::_star[mouse_field_1].spectral_class == STAR_CLASS_BLACK_HOLE) {
+                                MOX::_eta_star_id = -1;
+                            }
+                            else {
+                                MOX::_eta_star_id = mouse_field_1;
+                            }
                         }
                     }
                 }
@@ -568,8 +543,8 @@ namespace MAINSCR {
                     }
 
                     // Boundary check against moveable box
-                    if (mx < MOX::_moveable_box[0].x || mx >= MOX::_moveable_box[0].x + MOX::_moveable_box[0].width ||
-                        my < MOX::_moveable_box[0].y || my >= MOX::_moveable_box[0].y + MOX::_moveable_box[0].height) {
+                    if (mx < MOX::_moveable_box[0].x || mx > MOX::_moveable_box[0].x + MOX::_moveable_box[0].width ||
+                        my < MOX::_moveable_box[0].y || my > MOX::_moveable_box[0].y + MOX::_moveable_box[0].height) {
                         MOX::_system_icon_scanned = -1;
                     }
 
@@ -615,21 +590,23 @@ namespace MAINSCR {
             if (input == _game_button && MOX::_skip_fields == 0) {
                 MOX::_current_screen = 8;
                 exit_flag = 1;
+                MOX::_screen_data = 0;
                 MOX::_return_screen = 0;
             }
 
-            if (MOX::_skip_fields == 0 && MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10 && input == -0x455) {
+            const int8_t active_save_slot = MOX::_settings.active_save_slot;
+            if (MOX::_skip_fields == 0 && active_save_slot > -1 && active_save_slot < 10 && input == -0x455) {
                 if (MOX::_game_type == 0 || MOX::_game_type == 1) {
                     LOADSAVE::Auto_Save_Last_Saved_Game_(&exit_flag);
                 }
                 else {
                     const char* msg = HAROLD::H_Message_(0x20);
                     strcpy(msg_buffer, msg);
-                    HAROLD::User_Box_((uint8_t*)MOX::_draw_main_screen_to_back, msg_buffer, 3);
+                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 3);
                 }
             }
 
-            if (MOX::_skip_fields == 0 && MOX::_settings.active_save_slot >= 0 && MOX::_settings.active_save_slot < 10 && input == -0x456) {
+            if (MOX::_skip_fields == 0 && active_save_slot > -1 && active_save_slot < 10 && input == -0x456) {
                 LOADSAVE::Auto_Load_Last_Saved_Game_(&exit_flag);
             }
 
@@ -691,7 +668,7 @@ namespace MAINSCR {
                 else {
                     design_num = MAINSCR::Get_Star_Id_For_Officers_Screen_();
                 }
-                DESIGN::_player_design_num = design_num;
+                MOX::_temp_star_handle = design_num;
                 _officer_screen_return_screen = 0;
                 MOX::_current_screen = SCREEN_OFFICERS;
                 exit_flag = 1;
@@ -719,8 +696,7 @@ namespace MAINSCR {
                 if (MOX::_player[MOX::_PLAYER_NUM].n_freighters < 1) {
                     const char* msg = HAROLD::H_Message_(HESTR_0DF_YOU_DO_NOT_HAVE_ANY_FR);
                     strcpy(msg_buffer, msg);
-                    HAROLD::User_Box_((uint8_t*)&MOX::_draw_main_screen_to_back, msg_buffer, 3);
-                    exit_flag = 1;
+                    HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, msg_buffer, 3);
                 }
                 else {
                     MOX::_return_screen = 0;
@@ -847,7 +823,7 @@ namespace MAINSCR {
                             MOVEBOX::Restore_Boxes_();
                             boxes_saved_flag = 0;
                             MOX::_zoom_in = 0;
-                            EVANHELP::Set_Main_Game_Screen_Help_List_();
+                            EVANHELP::Set_Main_Screen_Help_List_();
                             mouse::Set_Mouse_List_(&MOX::_mouse_list_arrow, 1);
                             fields::Assign_Auto_Function_(MAINSCR::Draw_Main_Screen_, 1);
 

@@ -762,8 +762,8 @@ namespace MOX {
     inline s_ship_icon (&_ship_icon)[572] =
         *reinterpret_cast<s_ship_icon(*)[572]>(std::uintptr_t{0x005A2CE0});
 
-    inline uint8_t (&_black_hole_anim_count)[10] =
-        *reinterpret_cast<uint8_t (*)[10]>(std::uintptr_t{0x00596CA0});
+    inline int8_t (&_black_hole_anim_count)[10] =
+        *reinterpret_cast<int8_t (*)[10]>(std::uintptr_t{0x00596CA0});
 
     inline int16_t (&_bill_savegame)[6] =
         *reinterpret_cast<int16_t(*)[6]>(std::uintptr_t{0x00559478});

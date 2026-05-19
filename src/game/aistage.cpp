@@ -6,7 +6,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
     uint8_t processed_stars[72];
     int picked_count = 0;
     bool finished;
-    int32_t best_weight;
+    uint32_t best_weight;
     int16_t best_star;
 
     if (MOX::_player[player_idx].eliminated != 0) {
@@ -27,7 +27,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
 
         for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
             if (processed_stars[i] == 0) {
-                int32_t weight = (*AIDATA::_star_stage_weights)[i][player_idx];
+                uint32_t weight = (*AIDATA::_star_stage_weights)[i][player_idx];
                 if (best_weight < weight) {
                     best_weight = weight;
                     best_star = i;
@@ -63,7 +63,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
     } while (!finished);
 
     if (picked_count == 0) {
-        int32_t max_weight = 0;
+        uint32_t max_weight = 0;
         int16_t candidate_star = -1;
         int speed = (uint8_t)MOX::_player[player_idx].ship_speed;
 
@@ -75,7 +75,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
                         for (int other_player = 0; other_player < MOX::_NUM_PLAYERS; ++other_player) {
                             if (other_player != player_idx && ((in_range_mask >> (other_player & 0x1F)) & 1) != 0) {
                                 if (SHIPMOVE::Star_In_Range_Of_Player_(&MOX::_star[i], (int16_t)other_player, (int16_t)speed)) {
-                                    int32_t weight = (*AIDATA::_base_star_stage_weights)[i][player_idx];
+                                    uint32_t weight = (*AIDATA::_base_star_stage_weights)[i][player_idx];
                                     if (max_weight < weight) {
                                         max_weight = weight;
                                         candidate_star = i;
@@ -98,7 +98,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
                     for (int16_t s9 = 0; s9 < MOX::_NUM_STARS; ++s9) {
                         if (((MOX::_star[s9].has_colony & ~(1 << (player_idx & 0x1F))) != 0)) {
                             if (GEO::Parsecs_Between_Stars_(s6, s9) <= ship_range) {
-                                int32_t weight = (*AIDATA::_base_star_stage_weights)[s6][player_idx];
+                                uint32_t weight = (*AIDATA::_base_star_stage_weights)[s6][player_idx];
                                 if (max_weight < weight) {
                                     max_weight = weight;
                                     candidate_star = s6;
@@ -112,7 +112,7 @@ void __cdecl Compute_Defensive_Stage_Points_(int16_t player_idx) {
             if (candidate_star == -1) {
                 for (int16_t i = 0; i < MOX::_NUM_STARS; ++i) {
                     if (((MOX::_star[i].has_colony >> (player_idx & 0x1F)) & 1) != 0) {
-                        int32_t weight = (*AIDATA::_base_star_stage_weights)[i][player_idx];
+                        uint32_t weight = (*AIDATA::_base_star_stage_weights)[i][player_idx];
                         if (max_weight <= weight) {
                             max_weight = weight;
                             candidate_star = i;

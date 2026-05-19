@@ -165,19 +165,23 @@ namespace MAINSCR {
             animate::Reset_Animation_Frame_(star_seg);
             animate::Draw_(screen_x, screen_y, star_seg);
         } else {
-            star->twinkling1++;
+            int8_t twinkling1 = (int8_t)(star->twinkling1 + 1);
+            star->twinkling1 = twinkling1;
 
             int16_t frame_count = animate::Get_Animation_Frame_Count_(star_seg);
+            int16_t current_frame = (int16_t)(((int16_t)twinkling1 / 2) % frame_count);
 
-            if (static_cast<int8_t>(star->twinkling2) <= static_cast<int8_t>(star->twinkling1)) {
-                int32_t remaining = static_cast<int32_t>(_n_twinkling_stars) - 1;
-                _n_twinkling_stars = static_cast<int16_t>((remaining < 1) ? 0 : remaining);
+            if (static_cast<int8_t>(star->twinkling2) <= twinkling1) {
+                int16_t remaining = _n_twinkling_stars - 1;
+                if (remaining < 1) {
+                    remaining = 0;
+                }
+                _n_twinkling_stars = remaining;
 
                 star->twinkling1 = -1;
                 star->twinkling2 = -1;
             }
 
-            int32_t current_frame = (static_cast<int16_t>(star->twinkling1) / 2) % frame_count;
             animate::Set_Animation_Frame_(star_seg, current_frame);
             animate::Draw_(screen_x, screen_y, star_seg);
         }
@@ -386,7 +390,7 @@ namespace MAINSCR {
         int16_t zoom_dist[4] = { 0x27, 0x21, 0x21, 0x18 };
         int16_t window_status;
         int16_t star_idx;
-        int16_t bh_anim_idx = 0;
+        int16_t black_hole_slot = 0;
         int16_t x, y;
 
         int16_t zoom_level = HAROLD::Map_Scale_To_Zoom_Level_();
@@ -396,31 +400,32 @@ namespace MAINSCR {
 
         if (MOX::_NUM_STARS > 0) {
             for (star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
-                auto& star = MOX::_star[star_idx];
-
-                if (star.spectral_class == STAR_CLASS_BLACK_HOLE) {
+                if (MOX::_star[star_idx].spectral_class == STAR_CLASS_BLACK_HOLE) {
                     Get_Star_Draw_Coords_(star_idx, &x, &y);
 
                     int16_t offset = zoom_dist[zoom_level] / 2;
                     x -= offset;
                     y -= offset;
 
-                    s_animation_header* seg = Get_Star_Picture_Seg_(star.spectral_class, star.pict_type, star.size);
+                    s_animation_header* seg = Get_Star_Picture_Seg_(
+                        MOX::_star[star_idx].spectral_class,
+                        MOX::_star[star_idx].pict_type,
+                        MOX::_star[star_idx].size
+                    );
 
-                    uint8_t count = MOX::_black_hole_anim_count[bh_anim_idx];
-                    int16_t num_frames = animate::Get_Animation_Frame_Count_(seg);
+                    int16_t slot = black_hole_slot;
+                    int8_t count = MOX::_black_hole_anim_count[slot];
+                    int16_t frame_count = animate::Get_Animation_Frame_Count_(seg);
 
-                    // Update and wrap animation counter
-                    uint8_t new_count = (count + 1) % (num_frames * 2);
-                    MOX::_black_hole_anim_count[bh_anim_idx] = new_count;
+                    int8_t new_count = (int8_t)((count + 1) % (frame_count * 2));
+                    MOX::_black_hole_anim_count[slot] = new_count;
 
                     animate::Set_Animation_Frame_(seg, new_count / 2);
                     animate::Draw_(x, y, seg);
 
-                    // Clamp black hole animation index for the next star to array capacity
-                    bh_anim_idx++;
-                    if (bh_anim_idx >= 10) {
-                        bh_anim_idx = 10;
+                    black_hole_slot++;
+                    if (black_hole_slot >= 10) {
+                        black_hole_slot = 10;
                     }
                 }
             }
@@ -541,13 +546,12 @@ namespace MAINSCR {
 
     void __cdecl Draw_Gate_Icons_() {
         int16_t star_idx = 0;
-        int16_t num_stars = MOX::_NUM_STARS;
 
-        if (num_stars > 0) {
+        if (MOX::_NUM_STARS > 0) {
             do {
                 Draw_A_Gate_Icon_(star_idx);
                 star_idx++;
-            } while (star_idx < num_stars);
+            } while (star_idx < MOX::_NUM_STARS);
         }
     }
 
@@ -1135,30 +1139,27 @@ namespace MAINSCR {
     }
 
     void __cdecl Check_Hot_Keys_(int16_t key, int param_2) {
-        char buffer[200];
-        char small_buffer[80];
+        char local_118[80];
+        char local_c8[200];
 
-        if (key == _omniscience_cheat_alt) {
-            if (capture::Check_Release_Version_() == 0) {
+        if ((key == _omniscient_hot_key && capture::Check_Release_Version_() == 0) ||
+            key == _omniscience_cheat) {
+            s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
+            player->traits[TRAIT_OMNISCIENCE] = (player->traits[TRAIT_OMNISCIENCE] == 0);
 
-                s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-                player->traits[TRAIT_OMNISCIENCE] = (player->traits[TRAIT_OMNISCIENCE] == 0);
-
-                const char* msg_src;
-                if (player->traits[TRAIT_OMNISCIENCE] == 0) {
-                    msg_src = HAROLD::H_Message_(214); // HESTR_0D6_YOU_HAVE_CHOSEN_POORLY
-                }
-                else {
-                    msg_src = HAROLD::H_Message_(213); // HESTR_0D5_USE_THE_FORCE_LUKE_OMN
-                    Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 1);
-                }
-
-                strcpy(buffer, msg_src);
-                HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
-                MOX::_draw_main_screen_to_back = 1;
-                Update_Star_Owners_();
-                return;
+            const char* msg_src;
+            if (player->traits[TRAIT_OMNISCIENCE] == 0) {
+                msg_src = HAROLD::H_Message_(214); // HESTR_0D6_YOU_HAVE_CHOSEN_POORLY
             }
+            else {
+                msg_src = HAROLD::H_Message_(213); // HESTR_0D5_USE_THE_FORCE_LUKE_OMN
+                Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 1);
+            }
+
+            strcpy(local_c8, msg_src);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
+            MOX::_draw_main_screen_to_back = 1;
+            Update_Star_Owners_();
         }
 
         if (key == _all_tech_cheat) {
@@ -1171,8 +1172,8 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             player->bc += 1000;
             const char* msg_fmt = HAROLD::H_Message_(215); // HESTR_0D7_S_HAS_BEEN_GIVEN_A_GIF
-            sprintf(small_buffer, msg_fmt, player->race_name, 1000);
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, small_buffer, 0);
+            sprintf(local_118, msg_fmt, player->race_name, 1000);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_118, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 3);
             return;
         }
@@ -1181,9 +1182,9 @@ namespace MAINSCR {
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
             const char* tech_name = TECHDATA::_technology_applications[(uint8_t)player->current_research_application].name;
             const char* msg_fmt = HAROLD::H_Message_(216); // HESTR_0D8_S_WILL_BE_KNOWN
-            sprintf(small_buffer, msg_fmt, tech_name);
+            sprintf(local_118, msg_fmt, tech_name);
             player->research_accumulated = 9999;
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, small_buffer, 0);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_118, 0);
             Set_Player_Cheated_Flag_(MOX::_PLAYER_NUM, 4);
             return;
         }
@@ -1196,8 +1197,8 @@ namespace MAINSCR {
         if (key == _hi_score_cheat) {
             int16_t score = SCORE::Do_Calculate_Hi_Score_(MOX::_PLAYER_NUM);
             s_player* player = &MOX::_player[MOX::_PLAYER_NUM];
-            sprintf(buffer, s_Current_score_for_s_is_d, player->name, (int)score);
-            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, buffer, 0);
+            sprintf(local_c8, s_Current_score_for_s_is_d, player->name, (int)score);
+            HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, local_c8, 0);
         }
     }
 
@@ -1358,6 +1359,12 @@ namespace MAINSCR {
 
     void __cdecl Check_Stars_XY_(int16_t x, int16_t y, int8_t selected) {
         static const int32_t thresholds[3] = { 12, 10, 8 };
+        char local_name1[0x26] = "None";
+        char local_name2[0x26] = "None";
+        bool found = false;
+
+        (void)local_name1;
+        (void)local_name2;
 
         MOX::_mouse_XY.star_idx = -1;
         MOX::_mouse_XY.ship_icon_idx = -1;
@@ -1367,6 +1374,10 @@ namespace MAINSCR {
         }
 
         for (int16_t star_idx = 0; star_idx < MOX::_NUM_STARS; ++star_idx) {
+            if (found) {
+                return;
+            }
+
             int16_t screen_x, screen_y;
             Get_Star_Draw_Coords_(star_idx, &screen_x, &screen_y);
             HAROLD::Map_Scale_To_Zoom_Level_();
@@ -1381,12 +1392,12 @@ namespace MAINSCR {
             int32_t dy = (int32_t)screen_y - (int32_t)y;
             int32_t dist_sq = dx * dx + dy * dy;
 
-            int32_t threshold = thresholds[static_cast<uint8_t>(star.size)];
+            int32_t threshold = thresholds[(int32_t)star.size];
             if (dist_sq <= threshold * threshold) {
                 MOX::_mouse_XY.star_idx = star_idx;
                 MOX::_mouse_XY.selected = selected;
                 ERICNET::Mox_Play_Sound_(0x29);
-                return;
+                found = true;
             }
         }
     }
@@ -1504,7 +1515,7 @@ namespace MAINSCR {
             int16_t box_x2 = box_x1 + (int16_t)MOX::_moveable_box[2].width;
             int16_t box_y2 = box_y1 + (int16_t)MOX::_moveable_box[2].height;
 
-            if (MISC::Occluded_(box_x1, box_y1, box_x2, box_y2, icon_x, icon_y, icon_x + 10, icon_y + 13)) {
+            if (MISC::Occluded_(box_x1, box_y1, box_x2, box_y2, icon_x, icon_y, icon_x + 13, icon_y + 10)) {
                 MOX::_moveable_box[2].x = 619;
                 MOX::_moveable_box[2].y = 421;
             }
@@ -2021,7 +2032,7 @@ namespace MAINSCR {
         int16_t first_stack_idx = MOX::_ship_stack_start[0];
 
         // 0xFFFF is -1, indicating an empty/invalid stack entry
-        if (first_stack_idx != -1) {
+        if (first_stack_idx > -1) {
             // Note: _ship_node[first_stack_idx].ship_idx maps stack index to global ship array index
             // owner is at offset 0x63 in s_ship_data
             int16_t ship_idx = MOX::_ship_node[first_stack_idx].ship_idx;
@@ -2032,7 +2043,7 @@ namespace MAINSCR {
                     int16_t current_stack_idx = MOX::_ship_stack_start[i];
                     int16_t current_ship_idx = MOX::_ship_node[current_stack_idx].ship_idx;
 
-                    if (MOX::_ship[current_ship_idx].owner == (uint8_t)MOX::_PLAYER_NUM) {
+                    if (MOX::_ship[current_ship_idx].owner == MOX::_PLAYER_NUM) {
                         return current_stack_idx;
                     }
                 }
@@ -2354,7 +2365,7 @@ namespace MAINSCR {
         MOX::_just_moved_stack = 0;
         MOX::_animated_star = 0xFFFF;
 
-        _warn_about_cheaters = (int8_t)(1 << (MOX::_PLAYER_NUM & 0x1F));
+        _warn_about_cheaters = static_cast<uint8_t>(1 << (MOX::_PLAYER_NUM & 0x1F));
 
         if (MOX::_game_type == 1 /* Hotseat */) {
             Save_Hotseat_Map_Info_();
@@ -2732,7 +2743,7 @@ namespace MAINSCR {
             return;
         }
 
-        if (key > -1110 && key < -1100 /* 0xfbb3 */) {
+        if (key > -1109 && key < -1100 /* 0xfbb3 */) {
             MAINSCR::Toggle_Game_Option_(-1101 - key);
         }
 
@@ -2756,9 +2767,7 @@ namespace MAINSCR {
         case 1: /* DI = -1009 */
             MOX::_current_screen = SCREEN_DISTANCE_BETWEEN_STARS;
             MOX::_return_screen = SCREEN_MAIN;
-            if (flag) {
-                *flag = 1;
-            }
+            *flag = 1;
             break;
 
         case 4: /* DI = -1006 (Next Star) */
