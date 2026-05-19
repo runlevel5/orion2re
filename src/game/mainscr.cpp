@@ -4018,11 +4018,11 @@ namespace MAINSCR {
             break;
         }
         case 0x40: {
-            NETMOX::_net.field155_0x1fc = 1;
+            NETMOX::_net.tactical_combat_sync_state = 1;
             break;
         }
         case 0x41: {
-            NETMOX::_net.field155_0x1fc = 2;
+            NETMOX::_net.tactical_combat_sync_state = 2;
             break;
         }
         case 0x42: {

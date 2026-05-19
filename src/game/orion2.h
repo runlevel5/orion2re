@@ -3515,7 +3515,7 @@ struct s_network {
     undefined field152_0x1f9;
     undefined field153_0x1fa;
     uint8_t race_selection_changed;
-    undefined field155_0x1fc;
+    uint8_t tactical_combat_sync_state;
     uint8_t network_sync_complete_flag;
     undefined field198_0x1fe;
     int8_t connection_timeout_flag;
