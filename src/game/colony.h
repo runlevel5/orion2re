@@ -195,6 +195,8 @@ namespace COLONY {
 
     char* __cdecl Real_Building_Name_(int16_t building_id);
 
+    char* __cdecl Real_Building_Name2_(int16_t building_id);
+
     s_animation_header* __cdecl Player_Troop_Anim_(int16_t player_idx, int16_t anim_type, int16_t frame);
 
     char* __cdecl Player_Troop_Name_(int16_t player_idx, int16_t troop_type, int16_t race);
@@ -399,6 +401,8 @@ namespace COLONY {
 
     void __cdecl Show_Colony_Screen_();
 
+    void __cdecl Restore_Control_();
+
     void __cdecl Draw_Current_Building2_(int16_t x, int16_t y, int16_t building_id);
     void __cdecl Draw_Current_Building_(int16_t building_id);
     void __cdecl Draw_Current_Ship_(int16_t ship_id);
@@ -424,7 +428,7 @@ namespace COLONY {
 
     void __cdecl Clear_Galaxy_Map_Fields_();
 
-    inline int16_t& _g_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00595E4C});
+    inline int32_t& _g_count = *reinterpret_cast<int32_t*>(std::uintptr_t{0x00595E4C});
 
     void __cdecl Draw_Planet_Summary_(int16_t x, int16_t y, int16_t planet_index);
 

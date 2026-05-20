@@ -133,7 +133,7 @@ namespace SCORE {
 
     int8_t __cdecl Won_Council_Vote_(int16_t player_idx);
 
-    uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx);
+    int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx);
 
     int16_t __cdecl Player_Score_(int16_t player_idx);
 }

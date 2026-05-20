@@ -151,6 +151,10 @@ namespace COLONY {
         ERICHELP::Set_Colony_Screen_Help_List_();
     }
 
+    void __cdecl Restore_Control_() {
+        Show_Colony_Screen_();
+    }
+
     void __cdecl Draw_Colony_Info_() {
         Draw_Colony_Info_Military_();
         Draw_Colony_Info_Officer_();
@@ -314,7 +318,7 @@ namespace COLONY {
         _using_colony_screen_palette = 0;
 
         if (!quit_flag) {
-            Fix_Colony_Queue_(_colony_handle);
+            Cleanup_Colony_Queue_((int16_t)_colony_handle);
             if (MOX::_return_screen == MOX::_current_screen) {
                 MOX::_current_screen = _colony_saved_screen;
                 MOX::_return_screen = _colony_saved_screen;
@@ -726,13 +730,13 @@ namespace COLONY {
 
         if (COLCALC::Colony_Can_Afford_To_Buy_Product_(colony_idx)) {
             if (COLONY::Colony_Can_Buy_Product_0_(colony_idx)) {
-                int prod_remaining = (int)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - (int)col->production_spent;
+                int prod_remaining = (int)(int16_t)COLCALC::Colony_Producing_Product_Cost_(col) - (int)col->production_spent;
                 int actual_buy_cost = COLCALC::Colony_Cost_To_Buy_Producing_Product_(col);
 
                 sprintf(buf, ESTRINGS::E_Strings_(ESTR_DO_YOU_WANT_TO_SPEND_D_BC_TO_BUY_D_PRODUCTION),
                     actual_buy_cost, prod_remaining);
 
-                if (GENDRAW::Confirmation_Box_(buf) != 0) {
+                if (GENDRAW::Do_Confirmation_Box_(buf) != 0) {
                     COLCALC::Colony_Buy_Outright_(colony_idx);
                 }
                 COLONY::Col_Calc_Wrapper_(colony_idx);
@@ -743,7 +747,8 @@ namespace COLONY {
             }
         }
         else {
-            int short_by = (int)(short)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) - MOX::_player[col->owner].bc;
+            int16_t short_by = (int16_t)((uint16_t)COLCALC::Colony_Cost_To_Buy_Producing_Product_(col) -
+                (uint16_t)MOX::_player[col->owner].bc);
             sprintf(buf, ESTRINGS::E_Strings_(ESTR_YOU_CANNOT_AFFORD_THIS_INCREASE_IN_PRODUCTION_YOU_ARE_SHORT_BY_D_BC),
                 short_by);
             GENDRAW::Help_(buf);

@@ -1102,7 +1102,7 @@ struct s_colony {
     char tank_roundoff;
     char infantry_roundoff;
     byte buildings[49];
-    short last_turn_building_destroyed;
+    uint16_t last_turn_building_destroyed;
 };
 
 typedef struct s_colony_bldg s_colony_bldg, *Ps_colony_bldg;
@@ -2218,7 +2218,7 @@ struct s_hiscore {
     int16_t score_modifier_pct;
     int8_t flash_color_offset;
     int8_t flash_direction;
-    int8_t flash_timer_ticks;
+    uint8_t flash_timer_ticks;
     int8_t highlighted_entry_idx;
     undefined field40_0xbc;
     struct s_hiscore_pop pop_units[16];
@@ -3139,7 +3139,7 @@ struct s_player {
     char captured_orion;
     char captured_antares;
     char won_council_vote;
-    short player_defeated[8];
+    uint16_t player_defeated[8];
     short captured_population;
     int8_t last_attacker;
     uint8_t ship_design_theme;

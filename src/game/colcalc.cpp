@@ -2669,7 +2669,7 @@ namespace COLCALC {
 
         // Record the date of defeat for the attacker
         if (player->last_attacker >= 0 && player->last_attacker < 8) {
-            MOX::_player[player->last_attacker].player_defeated[player_idx] = static_cast<int16_t>(MOX::_stardate);
+            MOX::_player[player->last_attacker].player_defeated[player_idx] = static_cast<uint16_t>(MOX::_stardate);
         }
     }
 

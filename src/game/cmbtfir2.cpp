@@ -119,7 +119,7 @@ namespace CMBTFIR2 {
         if (mode == 1) {
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 s_combat_data* ship = &MOX::_combat_data[i];
-                if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
+                if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
                     if (COMBINIT::Does_Combat_Ship_Have_Special_(i, 38 /* 0x26 */)) {
                         *bonus_val_ptr = 70 /* 0x46 */;
                     }
@@ -136,7 +136,7 @@ namespace CMBTFIR2 {
             int16_t extra_bonus = 0;
             for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
                 s_combat_data* ship = &MOX::_combat_data[i];
-                if (ship->owner == (int8_t)player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
+                if ((int16_t)ship->owner == player_idx && ship->is_captured == 0 && ship->unit_status == 0) {
                     if (ship->officer_idx > -1) {
                         int16_t bonus = Helmsman_Bonus_(ship->officer_idx);
                         if (bonus > max_helmsman_bonus) {
@@ -321,10 +321,10 @@ namespace CMBTFIR2 {
         int16_t max_bonus = 0;
 
         for (int16_t i = 0; i < MOX::_combat_total_ship_count; ++i) {
-            if (MOX::_combat_data[i].owner == (int8_t)owner &&
+            if (MOX::_combat_data[i].owner == owner &&
                 MOX::_combat_data[i].is_captured == 0 &&
                 MOX::_combat_data[i].unit_status == 0 &&
-                MOX::_combat_data[i].officer_idx != -1) {
+                MOX::_combat_data[i].officer_idx > -1) {
 
                 int16_t bonus = Leader_Ordnance_Bonus_(MOX::_combat_data[i].officer_idx);
 
@@ -364,10 +364,10 @@ namespace CMBTFIR2 {
             // MOX::_combat_data is pointer to array of s_combat_data (size 313 / 0x139)
             s_combat_data& ship = MOX::_combat_data[i];
 
-            if (ship.owner == (int8_t)owner_idx) {
+            if ((int16_t)ship.owner == owner_idx) {
                 if (ship.is_captured == 0) {
                     if (ship.unit_status == 0 /* ACTIVE */) {
-                        if (ship.officer_idx != -1) {
+                        if (ship.officer_idx > -1) {
                             int16_t bonus = Fighter_Pilot_Bonus_(ship.officer_idx);
                             if (bonus > max_bonus) {
                                 max_bonus = bonus;
@@ -1232,7 +1232,7 @@ namespace CMBTFIR2 {
 
         int16_t damage_absorbed = initial_damage - *remaining_damage;
 
-        if (flag == 1 && ship->marine_count != -1 && damage_absorbed > 0) {
+        if (flag == 1 && ship->marine_count != 0xFF && damage_absorbed > 0) {
             for (int16_t i = 0; i < damage_absorbed; ++i) {
                 if (random::Random_(100) <= 1) {
                     Kill_Crew_(target_ship_idx, 1);
@@ -1263,12 +1263,12 @@ namespace CMBTFIR2 {
         int16_t marines = target->marine_count;
         int16_t target_raiders = *raiders;
 
-        int16_t target_commando_bonus = Get_Fleet_Commando_Bonus_(target_owner);
+        int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_(attacker_owner);
         int16_t attacker_boarding_bonus = Crew_Boarding_Combat_Bonus_(attacker_idx);
         int16_t target_boarding_bonus = Crew_Boarding_Combat_Bonus_(target_idx);
         int16_t has_special_1d = COMBINIT::Does_Combat_Ship_Have_Special_(target_idx, 0x1d);
-        int16_t attacker_commando_bonus = Get_Fleet_Commando_Bonus_(attacker_owner);
-        int16_t attacker_security_bonus = Get_Fleet_Security_Bonus_(attacker_owner);
+        int16_t target_commando_bonus = Get_Fleet_Commando_Bonus_(target_owner);
+        int16_t target_security_bonus = Get_Fleet_Security_Bonus_(target_owner);
 
         s_invasion_side_info side1;
         s_invasion_side_info side2;;
@@ -1276,10 +1276,10 @@ namespace CMBTFIR2 {
         invasion::Get_Boarding_Info_(
             attacker_owner,
             *raiders,
-            target_commando_bonus + attacker_boarding_bonus,
+            attacker_commando_bonus + attacker_boarding_bonus,
             target_owner,
             marines,
-            target_boarding_bonus + has_special_1d * 20 + attacker_commando_bonus + attacker_security_bonus,
+            target_boarding_bonus + has_special_1d * 20 + target_commando_bonus + target_security_bonus,
             &side1,
             &side2
         );
@@ -1291,8 +1291,8 @@ namespace CMBTFIR2 {
         if (*raiders > 0) {
             do {
                 int16_t raid_target = 50;
-                attacker_strength += random::Random_(100);
-                int16_t diff = attacker_strength - (target_strength + (int16_t)random::Random_(100));
+                int16_t diff = (int16_t)(attacker_strength + (int16_t)random::Random_(100));
+                diff -= (int16_t)(target_strength + (int16_t)random::Random_(100));
 
                 if (diff > 20) {
                     int16_t hits = 2;
@@ -1371,7 +1371,7 @@ namespace CMBTFIR2 {
                 KEN::Ken_Get_Text_Message_(44, temp_str, 80);
                 strcat(body_str, temp_str);
 
-                if (target->computer_current_hits < 1) {
+                if (target->shield_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, 80);
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, 80);
@@ -1384,7 +1384,7 @@ namespace CMBTFIR2 {
                 strcat(body_str, temp_str);
                 strcat(body_str, s__005510f0);
 
-                if (target->drive_current_hits < 1) {
+                if (target->computer_current_hits < 1) {
                     KEN::Ken_Get_Text_Message_(46, temp_str, 80);
                 } else {
                     KEN::Ken_Get_Text_Message_(45, temp_str, 80);
@@ -1459,16 +1459,16 @@ namespace CMBTFIR2 {
         int sound_handle = ERICNET::Mox_Play_Sound_(67); // 0x43
 
         int16_t is_auto;
-        if (MOX::_combat_attacker_player == attacker_owner) {
+        if (MOX::_combat_attacker_player == target_owner) {
             is_auto = MOX::_auto_combat_flag[1];
         } else {
             is_auto = MOX::_auto_combat_flag[0];
         }
 
         bool show_timed_box = true;
-        if (is_auto == 0 && target_owner < 8 && MOX::_player[target_owner].objectives == 'd') {
+        if (is_auto == 0 && target_owner < 8 && MOX::_player[target_owner].objectives == 100) {
             show_timed_box = false;
-        } else if (MOX::_auto_combat == 0 && attacker_owner < 8 && MOX::_player[attacker_owner].objectives == 'd') {
+        } else if (MOX::_auto_combat == 0 && attacker_owner < 8 && MOX::_player[attacker_owner].objectives == 100) {
             show_timed_box = false;
         }
 
@@ -1542,16 +1542,16 @@ namespace CMBTFIR2 {
         strcpy(header_buf, tmp_buf);
         strcat(header_buf, defender->name);
 
-        if (attacker->owner >= 8 || MOX::_player[attacker->owner].objectives != 100) {
+        if (attacker->owner >= 8 || MOX::_player[attacker->owner].objectives != 'd') {
             side1.unit_strengths[1] -= side1.combat_modifiers.difficulty_bonus;
         }
 
-        if (defender->owner >= 8 || MOX::_player[defender->owner].objectives != 100) {
+        if (defender->owner >= 8 || MOX::_player[defender->owner].objectives != 'd') {
             side2.unit_strengths[1] -= side2.combat_modifiers.difficulty_bonus;
         }
 
         FMTPARA::Set_Paragraph_Sint_Pointer_(0, &attacker_marines_start);
-        FMTPARA::Set_Paragraph_Sint_Pointer_(1, (int16_t*)nullptr);
+        FMTPARA::Set_Paragraph_Sint_Pointer_(1, &defender_marines_start);
         FMTPARA::Set_Paragraph_Sint_Pointer_(2, &attacker_marines);
         FMTPARA::Set_Paragraph_Sint_Pointer_(3, &defender_marines_start);
         FMTPARA::Set_Paragraph_Sint_Pointer_(4, &attacker_marines_lost);
@@ -1566,23 +1566,24 @@ namespace CMBTFIR2 {
         KEN::Ken_Get_Text_Message_(0x5D, tmp_buf, 0x50);
         strcat(msg_buf, tmp_buf);
         KEN::Ken_Get_Text_Message_(0x64, tmp_buf, 0x50);
-        strcat(msg_buf, tmp_buf);
         strcat(msg_buf, const_cast<char*>(s__0055a5a0));
-        strcat(msg_buf, header_buf);
+        strcat(msg_buf, tmp_buf);
         strcat(msg_buf, const_cast<char*>(s__0055a588));
+        strcat(msg_buf, tmp_buf);
+        strcat(msg_buf, const_cast<char*>(s__0055a550));
 
         bool is_timed = true;
-        int16_t auto_combat_flag = (attacker->owner == MOX::_combat_attacker_player) ? MOX::_auto_combat_flag[0] : MOX::_auto_combat_flag[1];
+        int16_t auto_combat_flag = (defender->owner == MOX::_combat_attacker_player) ? MOX::_auto_combat_flag[0] : MOX::_auto_combat_flag[1];
 
-        if (auto_combat_flag == 0 && attacker->owner < 8 && MOX::_player[attacker->owner].objectives == 100) {
+        if (auto_combat_flag == 0 && defender->owner < 8 && MOX::_player[defender->owner].objectives == 'd') {
             is_timed = false;
-        } else if (MOX::_auto_combat == 0 && defender->owner < 8 && MOX::_player[defender->owner].objectives == 100) {
+        } else if (MOX::_auto_combat == 0 && attacker->owner < 8 && MOX::_player[attacker->owner].objectives == 'd') {
             is_timed = false;
         }
 
         int16_t result_msg_id;
         if (attacker_marines > 0) {
-            defender->marine_count = (int8_t)attacker_marines;
+            defender->marine_count = (int8_t)(attacker_marines - defender_marines_current);
             Capture_Ship_(defender_idx, param_4, param_5);
             result_msg_id = (defender->unit_status == 0) ? 0x32 : 0x31;
         } else {
@@ -1592,7 +1593,6 @@ namespace CMBTFIR2 {
 
         KEN::Ken_Get_Text_Message_(result_msg_id, tmp_buf, 0x50);
         strcat(msg_buf, tmp_buf);
-        strcat(msg_buf, const_cast<char*>(s__0055a550));
 
         int32_t sound_handle = ERICNET::Mox_Play_Sound_(0x43);
 

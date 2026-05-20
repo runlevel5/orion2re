@@ -26,6 +26,10 @@ namespace COLONY {
         return TECHDATA::_buildings[building_id].name;
     }
 
+    char* __cdecl Real_Building_Name2_(int16_t building_id) {
+        return TECHDATA::_buildings[building_id].name;
+    }
+
     s_animation_header* __cdecl Buffer_Reload_Planets_(int16_t entry_num) {
         return reinterpret_cast<s_animation_header*>(buffer::Buffer_Reload_(
             COLONY::_PLANETS_LBX,
@@ -1262,7 +1266,7 @@ namespace COLONY {
                 7,
                 24,
                 MOX::_galaxy_map_height,
-                MOX::_galaxy_map_grid_y,
+                MOX::_galaxy_map_width,
                 11,
                 31,
                 0,
@@ -1424,32 +1428,33 @@ namespace COLONY {
             if (_colony_satellite_fields[i] == *param_1) {
                 int16_t building_idx = _colony_satellites[i];
 
-                if (MOX::_colony[_colony_handle].last_turn_building_destroyed == (short)MOX::_stardate) {
+                if (MOX::_colony[_colony_handle].last_turn_building_destroyed == MOX::_stardate) {
                     char* help_text = ESTRINGS::E_Strings_(0x243);
                     GENDRAW::Help_(help_text);
-                    Show_Colony_Screen_();
+                    Restore_Control_();
+                    Restore_Control_();
                 } else {
                     int32_t scrap_value = TECHDATA::_buildings[building_idx].cost / 2;
-                    char* bld_name = Real_Building_Name_(building_idx);
+                    char* bld_name = Real_Building_Name2_(building_idx);
                     char* fmt = ESTRINGS::E_Strings_(0x107);
 
                     sprintf(local_buffer, fmt, bld_name, scrap_value);
 
-                    if (GENDRAW::Confirmation_Box_(local_buffer) != 0) {
-                        MOX::_colony[_colony_handle].last_turn_building_destroyed = (short)MOX::_stardate;
+                    if (GENDRAW::Do_Confirmation_Box_(local_buffer) != 0) {
+                        MOX::_colony[_colony_handle].last_turn_building_destroyed = (uint16_t)MOX::_stardate;
                         ERICNET::Remove_Building_(static_cast<int16_t>(_colony_handle), building_idx);
                         Remove_Satellite_From_Array_(building_idx);
                         COLCALC::Colony_Calculation_(static_cast<int16_t>(_colony_handle));
                         MOX::_player[MOX::_PLAYER_NUM].bc += scrap_value;
-                        Show_Colony_Screen_();
+                        Restore_Control_();
                     } else {
-                        Show_Colony_Screen_();
+                        Restore_Control_();
                     }
                 }
             } else if (_colony_satellite_fields[i] + *param_1 == 0) {
                 int16_t building_idx = _colony_satellites[i];
                 COLBLDG::Get_App_Description_String_(local_buffer, TECHDATA::_buildings[building_idx].tech_app);
-                char* bld_name = Real_Building_Name_(building_idx);
+                char* bld_name = Real_Building_Name2_(building_idx);
                 TEXTBOX::Text_Box_(bld_name, local_buffer);
             }
 
@@ -1548,18 +1553,18 @@ namespace COLONY {
             {0, 0}, {0, 1}, {1, 0}, {1, 1}, {0, 2}, {2, 0}, {1, 2}, {2, 1},
             {0, 3}, {3, 0}, {2, 2}, {1, 3}, {3, 1}, {0, 4}, {4, 0}, {3, 2},
             {2, 3}, {1, 4}, {4, 1}, {0, 5}, {5, 0}, {3, 3}, {2, 4}, {4, 2},
-            {1, 5}, {5, 1}, {4, 4}, {3, 4}, {4, 3}, {2, 5}, {5, 2},
+            {1, 5}, {5, 1}, {3, 4}, {4, 3}, {2, 5}, {5, 2}, {4, 4},
             {3, 5}, {5, 3}, {4, 5}, {5, 4}, {5, 5}
         };
 
         for (int i = 0; i < 36; ++i) {
-            uint8_t row = building_coords[i][0];
-            uint8_t col = building_coords[i][1];
-            int index = row * 6 + col;
+            uint8_t grid_y = building_coords[i][0];
+            uint8_t grid_x = building_coords[i][1];
+            int index = grid_y * 6 + grid_x;
 
-            if (COLONY::_colony_bldgs[row].buildings[col] != 0) {
-                int center_x = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 0);
-                int center_y = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(row, col, 1);
+            if (COLONY::_colony_bldgs[grid_y].buildings[grid_x] != 0) {
+                int center_x = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(grid_y, grid_x, 0);
+                int center_y = COLONY::Bldg_Coords_To_Centered_Screen_Coord_(grid_y, grid_x, 1);
                 char* hotkey_label = ESTRINGS::E_Strings_(12);
 
                 COLONY::_colony_bldg_fields[index] = fields::Add_Hidden_Field_(
@@ -1723,24 +1728,34 @@ namespace COLONY {
         // Copy menu title into buffer
         strcpy(input_buf, ESTRINGS::E_Strings_(12));
 
-        RUSS::PFMT_(0, ESTR_ELSE__COL_CALC_WRAPPER, ESTRINGS::E_Strings_(ESTR_ELSE__COL_CALC_WRAPPER));
-        RUSS::PFMT_(0, ESTR_Q__PRODUCTION__10000, ESTRINGS::E_Strings_(ESTR_Q__PRODUCTION__10000));
-        RUSS::PFMT_(0, ESTR_P__PRODUCTION__100, ESTRINGS::E_Strings_(ESTR_P__PRODUCTION__100));
-        RUSS::PFMT_(0, ESTR_C__COLONIZE_PLANET_SUMMARY_HANDLE, ESTRINGS::E_Strings_(ESTR_C__COLONIZE_PLANET_SUMMARY_HANDLE));
-        RUSS::PFMT_(0, ESTR_F__ADD_FREIGHTERS_TO_POOL, ESTRINGS::E_Strings_(ESTR_F__ADD_FREIGHTERS_TO_POOL));
-        RUSS::PFMT_(0, ESTR_B__ADD_BCS_TO_TREASURY, ESTRINGS::E_Strings_(ESTR_B__ADD_BCS_TO_TREASURY));
+        RUSS::PFMT_(0, 0x17, ESTRINGS::E_Strings_(ESTR_ELSE__COL_CALC_WRAPPER));
+        RUSS::PFMT_(0, 0x16, ESTRINGS::E_Strings_(ESTR_Q__PRODUCTION__10000));
+        RUSS::PFMT_(0, 0x15, ESTRINGS::E_Strings_(ESTR_P__PRODUCTION__100));
+        RUSS::PFMT_(0, 0x14, ESTRINGS::E_Strings_(ESTR_C__COLONIZE_PLANET_SUMMARY_HANDLE));
+        RUSS::PFMT_(0, 0x13, ESTRINGS::E_Strings_(ESTR_F__ADD_FREIGHTERS_TO_POOL));
+        RUSS::PFMT_(0, 0x12, ESTRINGS::E_Strings_(ESTR_B__ADD_BCS_TO_TREASURY));
 
-        int key = hgetch_();
+        int key = __getch();
         input_buf[0] = (char)key;
         input_buf[1] = '\0';
 
         if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_P)) == 0) {
-            MOX::_colony[COLONY::_colony_handle].production_spent += 100;
+            uint16_t production_spent;
+
+            memcpy(&production_spent, &MOX::_colony[COLONY::_colony_handle].production_spent, sizeof(production_spent));
+            production_spent += 100;
+            memcpy(&MOX::_colony[COLONY::_colony_handle].production_spent, &production_spent, sizeof(production_spent));
+
             COLONY::_full_draw = 1;
         }
 
         if (_strcmpi(input_buf, ESTRINGS::E_Strings_(ESTR_Q)) == 0) {
-            MOX::_colony[COLONY::_colony_handle].production_spent += 10000;
+            uint16_t production_spent;
+
+            memcpy(&production_spent, &MOX::_colony[COLONY::_colony_handle].production_spent, sizeof(production_spent));
+            production_spent += 10000;
+            memcpy(&MOX::_colony[COLONY::_colony_handle].production_spent, &production_spent, sizeof(production_spent));
+
             COLONY::_full_draw = 1;
             return;
         }
@@ -1749,7 +1764,7 @@ namespace COLONY {
             if (COLONY::_drawing_display == 2) {
                 if (!COLONY::Colonize_Planet_(static_cast<int16_t>(COLONY::_planet_display_handle))) {
                     GENDRAW::Help_(ESTRINGS::E_Strings_(ESTR_PLANET_ALREADY_COLONIZED));
-                    COLONY::Show_Colony_Screen_();
+                    COLONY::Restore_Control_();
                     return;
                 }
             }
@@ -1796,7 +1811,7 @@ namespace COLONY {
                     }
 
                     s_colony& col_ref = MOX::_colony[_colony_handle];
-                    if (col_ref.last_turn_building_destroyed == (int16_t)MOX::_stardate) {
+                    if (col_ref.last_turn_building_destroyed == MOX::_stardate) {
                         GENDRAW::Help_(ESTRINGS::E_Strings_(0x243));
                         Show_Colony_Screen_();
                         return;
@@ -1806,7 +1821,7 @@ namespace COLONY {
                     sprintf(buffer, ESTRINGS::E_Strings_(0x107), CR_Building_Name_((int16_t)bldg_id), refund_val);
                     
                     if (GENDRAW::Confirmation_Box_(buffer)) {
-                        col_ref.last_turn_building_destroyed = (int16_t)MOX::_stardate;
+                        col_ref.last_turn_building_destroyed = (uint16_t)MOX::_stardate;
                         Turn_To_Rubble_CR_Bldg_((int16_t)bldg_id);
                         ERICNET::Remove_Building_((int16_t)_colony_handle, (int16_t)bldg_id);
                         COLCALC::Colony_Calculation_((int16_t)_colony_handle);

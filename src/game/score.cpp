@@ -97,7 +97,8 @@ namespace SCORE {
 
         if (0 < MOX::_NUM_PLAYERS) {
             for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-                if (MOX::_player[player_idx].player_defeated[i] > 0) {
+                uint16_t defeated = MOX::_player[player_idx].player_defeated[i];
+                if (defeated != 0) {
                     score += 50;
                     SCORE::_hi->num_opponents_defeated++;
                 }
@@ -447,10 +448,11 @@ namespace SCORE {
                 _hi->flash_color_offset += _hi->flash_direction;
                 if (_hi->flash_color_offset == -1) {
                     _hi->flash_direction = 1;
+                    _hi->flash_timer_ticks = 0;
                 } else if (_hi->flash_color_offset == 6) {
                     _hi->flash_direction = -1;
+                    _hi->flash_timer_ticks = 0;
                 }
-                _hi->flash_timer_ticks = 0;
             }
         }
 
@@ -736,8 +738,8 @@ namespace SCORE {
 
         if (MOX::_NUM_PLAYERS > 0) {
             do {
-                int16_t defeated_score = MOX::_player[player_idx].player_defeated[i];
-                if (defeated_score > 0) {
+                uint16_t defeated_score = MOX::_player[player_idx].player_defeated[i];
+                if (defeated_score != 0) {
                     uint8_t race = (uint8_t)MOX::_player[i].race;
                     s_animation_header* icon_anim = SCORE::_hi->race_icon_anims[race];
 
@@ -1066,19 +1068,11 @@ namespace SCORE {
      * Returns 0 if the player has no population.
      */
     int16_t __cdecl Get_Time_Score_() {
-        // Calculation: (galaxy_size + 5) * num_players * 20
-        int32_t base_calc = ((int16_t)MOX::_settings.galaxy_size + 5) * MOX::_NUM_PLAYERS * 20;
+        int32_t time_score =
+            (((int8_t)MOX::_settings.galaxy_size + 5) * MOX::_NUM_PLAYERS * 20) -
+            (int16_t)((uint16_t)MOX::_stardate + 30536);
 
-        // The stardate is adjusted by 30536 and truncated to 16-bit before subtraction
-        int16_t adjusted_stardate = (int16_t)(MOX::_stardate + 30536);
-        int32_t time_score = base_calc - adjusted_stardate;
-
-        // If population is zero, the time score is negated/zeroed
-        if (SCORE::_hi->raw_population < 1) {
-            return 0;
-        }
-
-        return (int16_t)time_score;
+        return (SCORE::_hi->raw_population != 0) ? (int16_t)time_score : 0;
     }
 
     /**
@@ -1190,7 +1184,7 @@ namespace SCORE {
         }
 
         // Use the actual collected count for the shuffle and distribution phases
-        int16_t final_count = (limit_reached) ? total_pop_limit : collected_count;
+        int16_t final_count = total_pop_limit;
 
         if (final_count > 0) {
             for (int16_t i = final_count; i > 0; --i) {
@@ -1251,7 +1245,7 @@ namespace SCORE {
                 weights[i] = 2;
             }
 
-            if (MOX::_player[player_idx].player_defeated[i] > 0) {
+            if (MOX::_player[player_idx].player_defeated[i] != 0) {
                 weights[i] = 5;
             }
         }
@@ -1283,8 +1277,8 @@ namespace SCORE {
         return static_cast<int8_t>(MOX::_player[player_idx].won_council_vote);
     }
 
-    uint32_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
-        return SCORE::Won_Council_Vote_(player_idx) != 0 ? 100u : 0u;
+    int16_t __cdecl Get_Won_Council_Score_(int16_t player_idx) {
+        return SCORE::Won_Council_Vote_(player_idx) != 0 ? 100 : 0;
     }
 
     int16_t __cdecl Player_Score_(int16_t player_idx) {
