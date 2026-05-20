@@ -93,11 +93,11 @@ namespace animate {
         return animation->current_frame;
     }
 
-    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int32_t frame) {
-        if (frame >= static_cast<int32_t>(anim->frame_count)) {
-            frame = static_cast<int32_t>(anim->frame_count) - 1;
+    void __cdecl Set_Animation_Frame_(s_animation_header* anim, int16_t frame) {
+        if (frame >= anim->frame_count) {
+            frame = anim->frame_count - 1;
         }
-        anim->current_frame = static_cast<int16_t>(frame);
+        anim->current_frame = frame;
     }
 
     int16_t __cdecl Get_Animation_Frame_Count_(s_animation_header* anim) {

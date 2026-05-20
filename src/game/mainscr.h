@@ -268,7 +268,7 @@ namespace MAINSCR {
 
     void __cdecl Check_Function_Keys_(int16_t key, int16_t* flag);
 
-    void __cdecl Toggle_Game_Option_(int32_t option_idx);
+    void __cdecl Toggle_Game_Option_(int16_t option_idx);
 
     void __cdecl Do_Next_Turn_(int16_t* exit_flag, int8_t auto_mode);
 
@@ -311,7 +311,7 @@ namespace MAINSCR {
 
     inline s_fleet_box& _fleet_box = *reinterpret_cast<s_fleet_box*>(std::uintptr_t{0x005977C0});
 
-    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_fleet_icon_idx, int16_t* out_loop_counter);
+    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx);
 
     void __cdecl Scan_Moveable_Box_Fields(int16_t param_1, int16_t param_2, int32_t param_3, int16_t* param_4);
 

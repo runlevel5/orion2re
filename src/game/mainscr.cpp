@@ -2925,45 +2925,45 @@ namespace MAINSCR {
         random::Set_Random_Seed_(saved_seed);
     }
 
-    void __cdecl Toggle_Game_Option_(int32_t option_idx) {
-        char option_name_raw[32];
+    void __cdecl Toggle_Game_Option_(int16_t option_idx) {
+        char option_name[32];
         char message[100];
         int8_t status_flag;
 
         switch (option_idx) {
             case 0:
                 MOX::_settings.end_of_turn_summary = (MOX::_settings.end_of_turn_summary == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xa6));
+                strcpy(option_name, HAROLD::H_Message_(0xa6));
                 status_flag = MOX::_settings.end_of_turn_summary;
                 break;
 
             case 1:
                 MOX::_settings.end_of_turn_wait = (MOX::_settings.end_of_turn_wait == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xa7));
+                strcpy(option_name, HAROLD::H_Message_(0xa7));
                 status_flag = MOX::_settings.end_of_turn_wait;
                 break;
 
             case 2:
                 MOX::_settings.enemy_moves = (MOX::_settings.enemy_moves == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xa8));
+                strcpy(option_name, HAROLD::H_Message_(0xa8));
                 status_flag = MOX::_settings.enemy_moves;
                 break;
 
             case 4:
                 MOX::_settings.auto_select_ships = (MOX::_settings.auto_select_ships == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xaa));
+                strcpy(option_name, HAROLD::H_Message_(0xaa));
                 status_flag = MOX::_settings.auto_select_ships;
                 break;
 
             case 5:
                 MOX::_settings.animations_on = (MOX::_settings.animations_on == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xab));
+                strcpy(option_name, HAROLD::H_Message_(0xab));
                 status_flag = MOX::_settings.animations_on;
                 break;
 
             case 6:
                 MOX::_settings.auto_select_colony = (MOX::_settings.auto_select_colony == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xac));
+                strcpy(option_name, HAROLD::H_Message_(0xac));
                 status_flag = MOX::_settings.auto_select_colony;
                 if (status_flag != 0) {
                     HACCESS::Set_All_Colony_Auto_Select_Flags_();
@@ -2972,7 +2972,7 @@ namespace MAINSCR {
 
             case 7:
                 MOX::_settings.show_relocation_lines = (MOX::_settings.show_relocation_lines == 0);
-                strcpy(option_name_raw, HAROLD::H_Message_(0xad));
+                strcpy(option_name, HAROLD::H_Message_(0xad));
                 status_flag = MOX::_settings.show_relocation_lines;
                 break;
 
@@ -2984,7 +2984,7 @@ namespace MAINSCR {
 
         const char* status_text = HAROLD::H_Message_(status_flag ? 0xe7 /* ON */ : 0xe8 /* OFF */);
 
-        sprintf(&message[4], "%s %s", &option_name_raw[4], status_text);
+        sprintf(message, "%s %s", option_name, status_text);
 
         LOADSAVE::Save_Session_Related_Settings_();
         HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message, 0);
@@ -2993,13 +2993,13 @@ namespace MAINSCR {
     /**
      * @address 004cc480
      */
-    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_fleet_icon_idx, int16_t* out_loop_counter) {
+    int16_t __cdecl Scan_Fleet_Movement_Box_Fields_(int16_t field_id_a, int16_t field_id_b, int16_t* out_chosen_offset, int16_t* out_scanned_icon_idx) {
         int16_t result = -1;
         bool found = false;
         int16_t counter = 0;
 
-        *out_loop_counter = -1;
-        *out_fleet_icon_idx = -1;
+        *out_scanned_icon_idx = -1;
+        *out_chosen_offset = -1;
 
         int limit = static_cast<int>(MOX::_fleet_icon_buttons_added) + static_cast<int>(MOX::_first_fleet_movement_icon);
         if (static_cast<int>(_fleet_box.count) < limit) {
@@ -3012,11 +3012,11 @@ namespace MAINSCR {
                 if (_fleet_movement_icon[i].field == field_id_b) {
                     found = true;
                     result = 0;
-                    *out_loop_counter = counter;
-                    *out_fleet_icon_idx = i;
+                    *out_chosen_offset = counter;
+                    *out_scanned_icon_idx = i;
                 }
                 else if (_fleet_movement_icon[i].field + field_id_b == 0) {
-                    *out_loop_counter = counter;
+                    *out_chosen_offset = counter;
                     found = true;
                     result = 1;
                 }
@@ -3034,7 +3034,7 @@ namespace MAINSCR {
 
             for (int16_t j = MOX::_first_fleet_movement_icon; j < static_cast<int16_t>(limit2); ++j) {
                 if (_fleet_movement_icon[j].field == field_id_a) {
-                    *out_fleet_icon_idx = j;
+                    *out_scanned_icon_idx = j;
                     return 4;
                 }
             }
@@ -3112,7 +3112,7 @@ namespace MAINSCR {
                 }
 
                 int16_t local_5e2;
-                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(param_3, param_2, &local_5e2, &_fleet_icon_chosen);
+                int16_t scan_res = Scan_Fleet_Movement_Box_Fields_(param_3, param_2, &_fleet_icon_chosen, &local_5e2);
                 MOX::_fleet_ship_scanned = -1;
                 if (local_5e2 > -1) {
                     MOX::_eta_star_id = -1;

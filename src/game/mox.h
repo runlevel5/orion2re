@@ -613,8 +613,8 @@ namespace MOX {
     inline void*& _auto_button_seg = *reinterpret_cast<void**>(std::uintptr_t{0x00596FA8});
     inline s_animation_header*& _combat_options_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0059741C});
     inline int16_t& _cur_combat_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059706E});
-    inline uint16_t& _grid_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597300});
-    inline uint16_t& _speedx2_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00597400});
+    inline int16_t& _grid_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597300});
+    inline int16_t& _speedx2_flag = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00597400});
     inline int16_t (&_auto_combat_flag)[2] =
         *reinterpret_cast<int16_t(*)[2]>(std::uintptr_t{0x0059740C});
     inline int16_t& _combat_clock_frame = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0059745E});

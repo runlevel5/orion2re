@@ -41,7 +41,7 @@ namespace MAINSCR {
             line::Line_(flux_x, fh + 26, 526, fh + 26, colors1.colors[0]);
         }
 
-        int16_t treasury_font_height = fonts::Get_Font_Height_();
+        fonts::Get_Font_Height_();
         HAROLD::Get_Monetary_Unit_String_(monetary_unit);
         s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
 
@@ -50,6 +50,30 @@ namespace MAINSCR {
         sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
         MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
         int16_t bc_style = MISC::Get_Font_Style_();
+        MISC::Get_Font_Spacing_();
+        MISC::Get_Mox_Font_Colors_(bc_style, 75, 77, &colors1);
+        MISC::Get_Mox_Font_Colors_(bc_style, 14, 23, &colors2);
+
+        char* bc_comma = MISC::Get_Comma_String_(plr->bc);
+        sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
+
+        if (plr->bc < 0) {
+            MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
+            Set_Post_Fitted_Font_Style_('K', 'M');
+            MISC::Increase_Font_Color_Range_(((int)MOX::_red_color_pulse_value * 4) / 7);
+            fonts::Set_Outline_Color_(0x49, 0x49);
+        }
+        else {
+            MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
+            fonts::Set_Outline_Color_(2, 1);
+        }
+        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
+
+        surplus_bc_comma = MISC::Get_Comma_String_(plr->surplus_bc);
+        bc_sign = (plr->surplus_bc < 0) ? s__00551100 : s_plus_00551118;
+        sprintf(buffer, s__s_s__s_00559964, bc_sign, surplus_bc_comma, monetary_unit);
+        MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
+        bc_style = MISC::Get_Font_Style_();
         int16_t bc_spacing = MISC::Get_Font_Spacing_();
         MISC::Get_Mox_Font_Colors_(bc_style, 75, 77, &colors1);
         MISC::Get_Mox_Font_Colors_(bc_style, 14, 23, &colors2);
@@ -65,22 +89,7 @@ namespace MAINSCR {
             fonts::Set_Outline_Color_(2, 1);
             fonts::Set_Font_Spacing_(bc_spacing);
         }
-        fonts::Print_Centered_(579, 96, buffer); // 0x243, 0x60
-
-        char* bc_comma = MISC::Get_Comma_String_(plr->bc);
-        sprintf(buffer, s__s__s_00558014, bc_comma, monetary_unit);
-
-        if (plr->bc < 0) {
-            MISC::Set_Fitted_Font_Style_(buffer, &colors1, 2, 2, 4, 0x43, 1);
-            Set_Post_Fitted_Font_Style_('K', 'M');
-            MISC::Increase_Font_Color_Range_(((int)MOX::_red_color_pulse_value * 4) / 7);
-            fonts::Set_Outline_Color_(0x49, 0x49);
-        }
-        else {
-            MISC::Set_Fitted_Font_Style_(buffer, &colors2, 2, 2, 4, 0x43, 1);
-            fonts::Set_Outline_Color_(2, 1);
-        }
-        fonts::Print_Centered_(579, treasury_font_height + 96, buffer);
+        fonts::Print_Centered_(579, fonts::Get_Font_Height_() + 96, buffer);
 
         int16_t cp_surplus = plr->command_points - plr->command_points_used;
         const char* cp_sign = (cp_surplus < 0) ? s__00551100 : s_plus_00551118;

@@ -536,12 +536,11 @@ namespace CMBTDRW1 {
         memset(color_active.colors, 0x53 /* 'S' */, 8);
         color_active.colors[0] = 0x50; /* 'P' */
 
-        memset(color_inactive.colors, 0x53 /* 'S' */, 8);
         color_inactive.colors[0] = 0xdf;
+        memset(&color_inactive.colors[1], 0xdc, 6);
 
-        memset(color_damaged.colors, 0xdc, 8);
         color_damaged.colors[0] = 0x48; /* 'H' */
-        color_damaged.colors[7] = 0x4a; /* 'J' */
+        memset(&color_damaged.colors[1], 0x4a /* 'J' */, 7);
 
         graphics::Interlaced_Fill_(0x72, 0x17a, 0x107, 0x1d2, 0, 0xc7 /* 199 */);
 
@@ -616,6 +615,8 @@ namespace CMBTDRW1 {
         }
 
         if (MOX::_cur_ship >= 0) {
+            int16_t new_last_ship_status = MOX::_last_ship_status;
+
             if (ptr_x / 20 < 32 && ptr_y / 20 < 18) {
                 graphics::Set_Window_(0, 0, 639, 350);
                 video::Clip_On_();
@@ -637,7 +638,7 @@ namespace CMBTDRW1 {
                     MOX::_skan_flag == 0 &&
                     (MOX::_game_type == 1 || MOX::_combat_data[MOX::_cur_ship].owner == MOX::_PLAYER_NUM) &&
                     MOX::_order_info_flag == 1) {
-                    
+
                     int16_t box_size;
                     switch (size_class) {
                         case 0:
@@ -653,14 +654,13 @@ namespace CMBTDRW1 {
                             box_size = 60;
                             break;
                         default:
-                            box_size = 0;
-                            break;
+                            goto skip_box;
                     }
-                    
-                    if (box_size > 0) {
-                        graphics::Box_(grid_x * 20, grid_y * 20, box_size, box_size, 1, 177 /* 0xb1 */);
-                    }
+
+                    graphics::Box_(grid_x * 20, grid_y * 20, box_size, box_size, 1, 177 /* 0xb1 */);
                 }
+
+skip_box:
                 video::Clip_Off_();
                 graphics::Reset_Window_();
 
@@ -683,7 +683,7 @@ namespace CMBTDRW1 {
                         BILL::Squeeze_Print_Centered_(445, 365, weapon_name, 89);
 
                         CMBTMIS::Draw_Missile_Status_(401, 379, hovered_missile);
-                        MOX::_last_ship_status = -1;
+                        new_last_ship_status = -1;
                     } else {
                         if ((ptr_img == 12 || ptr_img == 1) && hov_ship != -1 && hov_ship < MOX::_combat_total_ship_count) {
                             Draw_Weapon_Status_Display_(hov_ship, -1);
@@ -705,7 +705,7 @@ namespace CMBTDRW1 {
                                     if (page_flag == 1) {
                                         video::Set_Page_Off_();
                                     }
-                                    MOX::_last_ship_status = hov_ship;
+                                    new_last_ship_status = hov_ship;
                                 } else {
                                     video::Set_Page_Back_();
                                     graphics::Interlaced_Fill_(401, 362, 489, 374, 0, 199);
@@ -715,7 +715,7 @@ namespace CMBTDRW1 {
                                     if (page_flag == 1) {
                                         video::Set_Page_Off_();
                                     }
-                                    MOX::_last_ship_status = hov_ship;
+                                    new_last_ship_status = 666; /* 0x29A */
                                 }
                             }
                         } else {
@@ -729,7 +729,7 @@ namespace CMBTDRW1 {
                                 if (page_flag == 1) {
                                     video::Set_Page_Off_();
                                 }
-                                MOX::_last_ship_status = 666;
+                                new_last_ship_status = 666; /* 0x29A */
                             }
                         }
                     }
@@ -749,9 +749,11 @@ namespace CMBTDRW1 {
                     if (page_flag == 1) {
                         video::Set_Page_Off_();
                     }
-                    MOX::_last_ship_status = 666;
+                    new_last_ship_status = 666; /* 0x29A */
                 }
             }
+
+            MOX::_last_ship_status = new_last_ship_status;
 
             if (MOX::_shields_flag == 1) {
                 graphics::Set_Window_(0, 0, 639, 350);
@@ -776,13 +778,14 @@ namespace CMBTDRW1 {
             }
         }
 
-        if (MOX::_cur_ship >= 0 && MOX::_dont_draw_ship != MOX::_cur_ship) {
+        if (MOX::_dont_draw_ship != MOX::_cur_ship && MOX::_cur_ship != 0) {
             if (MOX::_combat_data[MOX::_cur_ship].unit_status == 0) {
                 if (COMBAT1::Ship_Controlled_By_Computer_(MOX::_cur_ship) == 0) {
                     if (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_PLAYER_NUM || MOX::_game_type == 1) {
                         int16_t frame = (MOX::_ship_frame / 2) % 4;
-                        int16_t draw_x, draw_y;
-                        s_animation_header* cursor_anim = nullptr;
+                        int16_t draw_x;
+                        int16_t draw_y;
+                        s_animation_header* cursor_anim;
 
                         switch (MOX::_combat_data[MOX::_cur_ship].size_class) {
                             case 0:
@@ -803,16 +806,18 @@ namespace CMBTDRW1 {
                                 draw_x = (MOX::_combat_data[MOX::_cur_ship].x - MOX::_cur_combat_x) * 20 - 8;
                                 draw_y = (MOX::_combat_data[MOX::_cur_ship].y - MOX::_cur_combat_y) * 20 - 8;
                                 break;
+                            default:
+                                goto skip_cursor;
                         }
 
-                        if (cursor_anim != nullptr) {
-                            animate::Set_Animation_Frame_(cursor_anim, frame);
-                            animate::Draw_(draw_x, draw_y, cursor_anim);
-                        }
+                        animate::Set_Animation_Frame_(cursor_anim, frame);
+                        animate::Draw_(draw_x, draw_y, cursor_anim);
                     }
                 }
             }
         }
+
+skip_cursor:
 
         CMBTMIS::Draw_Missiles_();
         video::Clip_Off_();
@@ -822,7 +827,6 @@ namespace CMBTDRW1 {
         fonts::Set_Outline_Color_(0, 0);
 
         if (MOX::_missile_warning > 0 && 
-            MOX::_cur_ship >= 0 && 
             MOX::_combat_data[MOX::_cur_ship].owner < 8 && 
             MOX::_player[MOX::_combat_data[MOX::_cur_ship].owner].objectives == 100 /* 'd' */) {
             
@@ -866,7 +870,8 @@ namespace CMBTDRW1 {
                     allocate::Pop_Block_(MOX::_screen_seg);
                 }
             } else {
-                int16_t blip_color = (MOX::_combat_data[MOX::_cur_ship].owner == MOX::_combat_attacker_player) ? 0x20 : 0x60;
+                int16_t diff = (int16_t)MOX::_combat_data[MOX::_cur_ship].owner - MOX::_combat_attacker_player;
+                int16_t blip_color = (diff < 1) ? 0x20 : 0x60;
 
                 switch (MOX::_combat_data[MOX::_cur_ship].size_class) {
                     case 0:
@@ -1136,8 +1141,8 @@ namespace CMBTDRW1 {
         int8_t planet_size;
 
         if (MOX::_cmbt_colony_id != -1) {
-            y_pos = (static_cast<int16_t>(MOX::_combat_data[0].y) * 3 >> 1) + 364 /* 0x16c */;
-            x_pos = (static_cast<int16_t>(MOX::_combat_data[0].x) * 3 >> 1) + 500 /* 0x1f4 */;
+            y_pos = (MOX::_combat_data[0].y * 3) / 2 + 364 /* 0x16c */;
+            x_pos = (MOX::_combat_data[0].x * 3) / 2 + 500 /* 0x1f4 */;
 
             planet_size = MOX::_planet[MOX::_colony[MOX::_cmbt_colony_id].planet].size;
 
@@ -1152,8 +1157,8 @@ namespace CMBTDRW1 {
             if (MOX::_combat_data[i].unit_status == 0) {
                 uint8_t color = (MOX::_combat_data[i].owner == MOX::_combat_attacker_player) ? 0x20 : 0x60;
 
-                y_pos = (static_cast<int16_t>(MOX::_combat_data[i].y) * 3 >> 1) + 364 /* 0x16c */;
-                x_pos = (static_cast<int16_t>(MOX::_combat_data[i].x) * 3 >> 1) + 500 /* 0x1f4 */;
+                y_pos = (MOX::_combat_data[i].y * 3) / 2 + 364 /* 0x16c */;
+                x_pos = (MOX::_combat_data[i].x * 3) / 2 + 500 /* 0x1f4 */;
 
                 switch (MOX::_combat_data[i].size_class) {
                 case 0:
@@ -1178,8 +1183,8 @@ namespace CMBTDRW1 {
 
         for (int16_t i = 0; i < 300; ++i) {
             if (MOX::_missile[i].type > 0) {
-                y_pos = (static_cast<int16_t>(MOX::_missile[i].y / 20) * 3 >> 1) + 364 /* 0x16c */;
-                x_pos = (static_cast<int16_t>(MOX::_missile[i].x / 20) * 3 >> 1) + 500 /* 0x1f4 */;
+                y_pos = ((MOX::_missile[i].y / 20) * 3) / 2 + 364 /* 0x16c */;
+                x_pos = ((MOX::_missile[i].x / 20) * 3) / 2 + 500 /* 0x1f4 */;
                 graphics::Dot_(x_pos, y_pos, 0x1c);
             }
         }
@@ -2010,11 +2015,11 @@ namespace CMBTDRW1 {
     void __cdecl Draw_Ship_Status_(int16_t param_1, int16_t param_2, int16_t param_3) {
         if (param_1 < 0x14) {
             graphics::Fill_(0xf, 0x17b, 0x66, 0x1c5, 0);
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0xf, 0x17b, anim);
         } else if (param_1 > 0x17c) {
             graphics::Fill_(0x191, 0x17b, 0x1e8, 0x1d3, 0);
-            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, reinterpret_cast<void*>(MOX::_global_cache_seg));
+            s_animation_header* anim = (s_animation_header*)buffer::Buffer_Reload_(s_combat_lbx_00551244, 0x2d, MOX::_global_cache_seg);
             animate::Draw_(0x191, 0x17b, anim);
         }
 
@@ -2083,8 +2088,9 @@ namespace CMBTDRW1 {
             Draw_Ship_To_Bitmap_(param_3, 0, 0, 0);
             bitmap::Create_Blank_Bitmap_(0x62, 0x62, MOX::_combat_bitmap);
             
-            s_combat_data* ship = &MOX::_combat_data[param_3];
-            int16_t facing = ship->facing_dir;
+            int idx = (int)param_3;
+            s_combat_data* ship = &MOX::_combat_data[idx];
+            int8_t facing = ship->facing_dir;
             int dir = (facing - 1) / 4;
             if (dir < 0) {
                 dir = 0;
@@ -2106,7 +2112,6 @@ namespace CMBTDRW1 {
                     switch (shield_val - 1) {
                         case 0:
                         case 1:
-                        case 2:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x51, 0);
@@ -2124,8 +2129,8 @@ namespace CMBTDRW1 {
                                 }
                             }
                             break;
+                        case 2:
                         case 3:
-                        case 4:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x50, 0);
@@ -2151,8 +2156,8 @@ namespace CMBTDRW1 {
                                 }
                             }
                             break;
+                        case 4:
                         case 5:
-                        case 6:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 1, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 2, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x50, 0);
@@ -2186,8 +2191,8 @@ namespace CMBTDRW1 {
                                 }
                             }
                             break;
+                        case 6:
                         case 7:
-                        case 8:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x50, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x51, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x52, 0);
@@ -2227,6 +2232,7 @@ namespace CMBTDRW1 {
                                 }
                             }
                             break;
+                        case 8:
                         case 9:
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x50, 0);
                             bitmap::Outline_Bitmap_(MOX::_combat_bitmap, MOX::_combat_bitmap, 0x51, 0);
@@ -2793,9 +2799,9 @@ namespace CMBTDRW1 {
                 fonts::Set_Outline_Color_(0, 0);
                 fonts::Set_Font_Spacing_(1);
 
-                uint8_t count_to_print = (uint8_t)shots_left;
+                int32_t count_to_print = shots_left;
                 if (count_to_print == 0 && status == 1) {
-                    count_to_print = (uint8_t)MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].count;
+                    count_to_print = MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].count;
                 }
 
                 fonts::Print_Integer_Right_(127, y_pos, count_to_print);
@@ -2806,15 +2812,15 @@ namespace CMBTDRW1 {
                     if ((specials & 4) == 0) {
                         local_a0[0] = '\0';
                     } else {
-                        strcpy(local_a0, TECHDATA::_weapon_modifications[2].name);
+                        strcpy(local_a0, TECHDATA::_weapon_modifications[2].name_plural);
                         strcat(local_a0, s_space_005510f0);
                     }
                 } else {
-                    strcpy(local_a0, TECHDATA::_weapon_modifications[1].name);
+                    strcpy(local_a0, TECHDATA::_weapon_modifications[1].name_plural);
                     strcat(local_a0, s_space_005510f0);
                 }
 
-                if (shots_left == 1) {
+                if (MOX::_combat_data[MOX::_cur_ship].weapons[weapon_slot_idx].count == 1) {
                     strcat(local_a0, TECHDATA::_weapons[w_id].name);
                 } else {
                     strcat(local_a0, TECHDATA::_weapons[w_id].name_plural);
@@ -3241,7 +3247,7 @@ namespace CMBTDRW1 {
 
         KEN::Ken_Get_Text_Message_(8, message_text, 0x50);
         row_y = static_cast<int16_t>(view_y + 0x1A);
-        fonts::Print_Centered_(view_x + 0xA7, row_y + 0x0F, message_text);
+        fonts::Print_Centered_(view_x + 0xA7, row_y, message_text);
 
         panel_fill_color = static_cast<uint8_t>(panel_color);
 
@@ -3310,8 +3316,8 @@ namespace CMBTDRW1 {
             fonts::Set_Outline_Color_(0, 1);
 
             KEN::Ken_Get_Text_Message_(13, message_text, 0x50);
-            fonts::Print_(left_panel_x, row_y + 0x03, message_text);
-            fonts::Print_Right_(view_x + 0x143, row_y + 0x03, message_text);
+            fonts::Print_(left_panel_x, view_y + 0x03, message_text);
+            fonts::Print_Right_(view_x + 0x143, view_y + 0x03, message_text);
         }
 
         fonts::Set_Font_Style_Shadow_Down_(4, &heading_colors);
@@ -3353,10 +3359,6 @@ namespace CMBTDRW1 {
         }
 
         row_y = static_cast<int16_t>(row_y + 0x0E);
-
-        if (MOX::_global_combat_data.player_idx <= 9) {
-            row_y = static_cast<int16_t>(row_y + 0x0F);
-        }
 
         graphics::Interlaced_Fill_(
             left_panel_x,
