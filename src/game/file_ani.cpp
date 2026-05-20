@@ -64,6 +64,10 @@ namespace file_ani {
         fread(_file_lbx_header, 0x2000, 1, _file_animation_fptr);
     }
 
+    void __cdecl thunk_Draw_File_Animation_() {
+        Draw_File_Animation_();
+    }
+
     void __cdecl Draw_File_Animation_() {
         animate::_animation_header = reinterpret_cast<s_animation_header*>(init::_io_buffer);
         

@@ -9,15 +9,15 @@ namespace MAINMENU {
         animate::Draw_(0, 0, reinterpret_cast<s_animation_header*>(_mainmenu_first_seg));
     }
 
-    uint16_t __cdecl Do_Main_Menu_File_Animation_() {
+    int16_t __cdecl Do_Main_Menu_File_Animation_() {
         bool finished = false;
         bool input_detected = false;
-        uint16_t result_code = 0xFFFF;
-        int32_t current_sound_handle = 0;
+        int16_t result_code = -1;
+        int32_t current_sound_handle;
 
         file_ani::Open_File_Animation_(s_MAINMENU_LBX_0055a630, 0);
         uint32_t buffer_size = MAINMENU::Get_File_Animation_Block_Space_();
-        uint16_t total_frames = (uint16_t)file_ani::Get_File_Animation_Total_Frames_();
+        int16_t total_frames = file_ani::Get_File_Animation_Total_Frames_();
 
         void* buffer = allocate::Allocate_Next_Block_(MOX::_screen_seg, buffer_size);
         file_ani::Set_File_Animation_Buffer_(buffer);
@@ -38,14 +38,13 @@ namespace MAINMENU {
         int16_t hotkey_field = fields::Add_Hot_Key_(s_hotkeys_005510f0);
         int16_t fullscreen_field = fields::Add_Hidden_Field_(0, 0, 639, 479, s_empty_00551120, ')');
 
-        fields::Assign_Auto_Function_(file_ani::Draw_File_Animation_, 1);
+        fields::Assign_Auto_Function_(file_ani::thunk_Draw_File_Animation_, 1);
 
         while (!finished) {
             timer::Mark_Time_();
 
-            int32_t input_raw = fields::Get_Input_();
-            int16_t input = (int16_t)input_raw;
-            uint16_t current_frame = (uint16_t)file_ani::Get_File_Animation_Frame_();
+            int16_t input = fields::Get_Input_();
+            int16_t current_frame = file_ani::Get_File_Animation_Frame_();
 
             if (current_frame == 5) {
                 current_sound_handle = ERICNET::Mox_Play_Sound_(0x35); // 53
@@ -73,7 +72,7 @@ namespace MAINMENU {
 
             if (!finished) {
                 video::Set_Page_Off_();
-                file_ani::Draw_File_Animation_();
+                file_ani::thunk_Draw_File_Animation_();
                 RUSS::Mox_Sync_Update_();
             }
 
@@ -238,7 +237,7 @@ namespace MAINMENU {
             video::Copy_Off_To_Back_();
             RUSS::Mox_Sync_Update_();
             _credit_x = 0x42;
-            _credit_y = 0x1A6;
+            _credit_y_slot.dword = 0x1A6;
             _delay_count = 10;
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         }
@@ -330,21 +329,21 @@ namespace MAINMENU {
         s_colors active_palette;
 
         if (MAINMENU::_delay_count <= 0) {
-            MAINMENU::_credit_y -= 2;
-            MAINMENU::_credit_count = 0x1A6 /* 422 */ - MAINMENU::_credit_y;
+            MAINMENU::_credit_y_slot.y -= 2;
+            MAINMENU::_credit_count = 0x1A6 /* 422 */ - MAINMENU::_credit_y_slot.y;
 
             int16_t fade_in_line_idx = -1;
-            if (MAINMENU::_credit_y < 0xB3 /* 179 */) {
-                fade_in_line_idx = (int16_t)((0xB3 - MAINMENU::_credit_y) / 14);
+            if (MAINMENU::_credit_y_slot.y <= 0xB3 /* 179 */) {
+                fade_in_line_idx = (int16_t)((0xB3 - MAINMENU::_credit_y_slot.y) / 14);
             }
 
             int16_t fade_out_line_idx = (int16_t)(MAINMENU::_credit_count / 14);
-            int16_t current_y = MAINMENU::_credit_y;
+            int16_t current_y = MAINMENU::_credit_y_slot.y;
 
             for (int16_t i = 0; i < MAINMENU::_max_credits; ++i) {
                 if (i == fade_in_line_idx) {
                     active_palette = fade_in_palette;
-                    int16_t remainder = (MAINMENU::_credit_y - 0xB3) % 14;
+                    int16_t remainder = (MAINMENU::_credit_y_slot.y - 0xB3) % 14;
                     int8_t step = (int8_t)((remainder / 3) * 2);
                     MAINMENU::Fade_Credit_Colors_(step, &active_palette);
                 } else if (i == fade_out_line_idx) {
@@ -376,9 +375,9 @@ namespace MAINMENU {
         }
 
         // Check if credits have finished scrolling off the top
-        if (abs(MAINMENU::_credit_y - 179) > MAINMENU::_max_credits * 14) {
+        if (abs(MAINMENU::_credit_y_slot.y - 179) > MAINMENU::_max_credits * 14) {
             MAINMENU::_credit_x = 0x42 /* 66 */;
-            MAINMENU::_credit_y = 0x1A6 /* 422 */;
+            MAINMENU::_credit_y_slot.dword = 0x1A6 /* 422 */;
             MAINMENU::_delay_count = 10;
         }
     }
@@ -454,7 +453,7 @@ namespace MAINMENU {
         fields::Assign_Auto_Function_(Draw_Main_Menu_Screen_, 2);
         Set_Main_Menu_Screen_Help_List_();
         _credit_x = 66; // 0x42
-        _credit_y = 422; // 0x1a6
+        _credit_y_slot.y = 422; // 0x1a6
         _delay_count = 10;
 
         do {
@@ -574,7 +573,7 @@ namespace MAINMENU {
         _delay_count = 0;
         _credit_count = 0;
         _fade_in_count = 0;
-        _credit_y = 422;
+        _credit_y_slot.dword = 0x1A6;
         _fade_out_count = 0;
 
         uint32_t bitmap_size = bitmap::Get_Bitmap_Size_(289, 14);

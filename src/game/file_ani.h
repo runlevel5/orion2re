@@ -59,6 +59,8 @@ namespace file_ani {
 
     void __cdecl Set_File_Animation_Frame_(int16_t frame_index);
 
+    void __cdecl thunk_Draw_File_Animation_();
+
     void __cdecl Draw_File_Animation_();
 
     void __cdecl Draw_File_Animation_Stencil_();

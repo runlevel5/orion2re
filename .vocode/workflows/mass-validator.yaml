@@ -56,6 +56,7 @@ workflows:
           * Decompiler output may be imperfect; always validate against the disassembly.
           * Code uses namespaces. A namespace in the provided disassembly will match filename. For example `COLSUM::Add_Fields_` can be found in `src/game/colsum.cpp` (and related header file)
           * Decompiler output may use incorrect data types, especially around signedness - assembly should be always a source of truth.
+            - Enforce platform independent types, such as int8_t. For example, `int` is platform dependent and should be avoided.
           * You must do an instruction-by-instruction trace and verify whether the implementation matches it.
           * Detect incorrect signedness in parameters, variables, and structure fields.
           * Ignore cosmetic differences such as refactors or variable names unless they affect correctness.

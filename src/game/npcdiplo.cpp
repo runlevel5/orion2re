@@ -157,6 +157,7 @@ namespace npcdiplo {
 
             int16_t flux = EVENTS::Event_Check_Hyperspace_Flux_();
             if (flux != 0) {
+                flux = EVENTS::Event_Check_Hyperspace_Flux_();
                 if (flux != 1 || p_source.traits[29 /* TRAIT_TRANS_DIMENSIONAL */] != 1) {
                     continue;
                 }
@@ -194,8 +195,8 @@ namespace npcdiplo {
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
                 if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
-                    if (p_source.contact[j] == 1 && p_source.within_range[j] == 1 &&
-                        p_source.peace_duration[j] < 1 && decision[j] == 0) {
+                    if (p_source.within_range[j] == 1 && p_source.peace_duration[j] < 1 &&
+                        decision[j] == 0) {
                         
                         if (diplomac::Fleet_Strength_Comparison_(i, j) >= 100 && (int)MOX::_stardate % MOX::_NUM_PLAYERS == j) {
                             int diff = MOX::_settings.game_difficulty;
@@ -258,7 +259,22 @@ namespace npcdiplo {
                 }
             }
 
-            // Case 6: Detailed personality threshold comparison
+            // Case 6: Suppress declarations against targets already at war with an objective player
+            for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
+                auto& p_target = MOX::_player[j];
+                if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
+                    for (int k = 0; k < MOX::_NUM_PLAYERS; ++k) {
+                        auto& p_other = MOX::_player[k];
+                        if (k != i && k != j && p_other.objectives == 100 && !p_other.eliminated) {
+                            if (p_other.treaty[j] >= 4) {
+                                decision[j] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Case 7: Detailed personality threshold comparison
             for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                 auto& p_target = MOX::_player[j];
                 if (j != i && p_target.objectives != 100 && !p_target.eliminated) {
@@ -285,7 +301,7 @@ namespace npcdiplo {
                                 
                                 int strength = diplomac::Fleet_Strength_Comparison_(k, i);
                                 if (strength > 100) {
-                                    threshold -= strength;
+                                    threshold -= diplomac::Fleet_Strength_Comparison_(k, i);
                                 }
                             }
                         }
@@ -298,7 +314,7 @@ namespace npcdiplo {
                 }
             }
 
-            // Case 7: Alliance protection logic (Difficulty >= Average)
+            // Case 8: Alliance protection logic (Difficulty >= Average)
             if (MOX::_settings.game_difficulty >= 3 /* HARD */) {
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     if (j != i && !MOX::_player[j].eliminated && MOX::_player[j].objectives != 100) {
@@ -341,14 +357,13 @@ namespace npcdiplo {
                 int target_idx = random::Random_(potential_targets_count);
                 for (int j = 0; j < MOX::_NUM_PLAYERS; ++j) {
                     if (j != i && decision[j] == 1) {
-                        if (target_idx == 0) {
+                        if (--target_idx == 0) {
                             if (MOX::_player[j].objectives == 100 /* HUMAN */) {
                                 diplomac::Change_Relations_(-10000, j, i, reason[j], 0, 0);
                             }
                             diplomac::Declare_War_(i, j);
                             break;
                         }
-                        target_idx--;
                     }
                 }
             }
@@ -787,9 +802,9 @@ namespace npcdiplo {
                     int32_t common_score = score_base;
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
                         if (k != i && k != j) {
-                            if (MOX::_player[k].treaty[i] >= 4) common_score += 10;
-                            if (MOX::_player[k].treaty[j] >= 4) common_score += 20;
-                            if (MOX::_player[k].threats[i] > 0) common_score += 5;
+                            if (plr_i.treaty[k] >= 4) common_score += 10;
+                            if (plr_j.treaty[k] >= 4) common_score += 20;
+                            if (plr_j.threats[k] > 0) common_score += 5;
                         }
                     }
 
@@ -797,7 +812,14 @@ namespace npcdiplo {
                     int32_t num_ai_allies = 0;
                     for (int16_t k = 0; k < (int16_t)MOX::_NUM_PLAYERS; ++k) {
                         if (k != i && k != j) {
-                            if (MOX::_player[k].treaty[j] >= 4 || MOX::_player[k].treaty[i] >= 4) {
+                            if (plr_j.treaty[k] >= 4) {
+                                if (MOX::_player[k].objectives == 100 /* HUMAN_PLAYER */) {
+                                    num_human_allies++;
+                                } else {
+                                    num_ai_allies++;
+                                }
+                            }
+                            if (plr_i.treaty[k] >= 4) {
                                 if (MOX::_player[k].objectives == 100 /* HUMAN_PLAYER */) {
                                     num_human_allies++;
                                 } else {
@@ -856,7 +878,7 @@ namespace npcdiplo {
                                 diplomac::Start_Tribute_Treaty_(i, j, 2);
                                 
                                 int32_t rel_change = random::Random_(3) + 3;
-                                diplomac::Change_Relations_((int16_t)rel_change, j, i, 14 /* TRIBUTE_START */, 0, 0);
+                                diplomac::Change_Relations_((int16_t)rel_change, i, j, 14 /* TRIBUTE_START */, 0, 0);
                             }
                         }
                     }
@@ -882,21 +904,21 @@ namespace npcdiplo {
      * @param other_player_idx The index of the other involved player.
      * @param accepted Whether the proposal was accepted (1) or rejected (0).
      */
-    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int32_t accepted) {
+    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int8_t accepted) {
         s_player* player = &MOX::_player[player_idx];
         int16_t rejection_val = player->diplomacy_proposal_rejection[other_player_idx];
 
         if (accepted == 1) {
             if (rejection_val < 0) {
                 switch (player->personality) {
-                    case 0: /* Ruthless */
+                    case 0:
                         rejection_val++;
                         break;
-                    case 1: /* Aggressive */
-                    case 2: /* Erratic */
-                    case 3: /* Honorable */
-                    case 4: /* Pacific */
-                    case 5: /* Xenophobic */
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
                         rejection_val = 1;
                         break;
                 }
@@ -909,20 +931,20 @@ namespace npcdiplo {
                 rejection_val--;
             } else {
                 switch (player->personality) {
-                    case 0: /* Ruthless */
+                    case 0:
                         rejection_val = -1;
                         break;
-                    case 1: /* Aggressive */
-                    case 2: /* Erratic */
-                    case 3: /* Honorable */
+                    case 1:
+                    case 2:
+                    case 3:
                         rejection_val /= 2;
                         break;
-                    case 4: /* Pacific */
+                    case 4:
                         if (player->dishonored_flag[other_player_idx] == 1) {
                             rejection_val = -1;
                         }
                         break;
-                    case 5: /* Xenophobic */
+                    case 5:
                         rejection_val--;
                         break;
                 }
@@ -979,11 +1001,11 @@ namespace npcdiplo {
     }
 
     int __cdecl compare_tech_(const void* a, const void* b) {
-        return static_cast<const s_npcdiplo_tech*>(a)->value - static_cast<const s_npcdiplo_tech*>(b)->value;
+        return ((const s_npcdiplo_tech*)a)->value - ((const s_npcdiplo_tech*)b)->value;
     }
 
     int __cdecl reverse_compare_tech_(const void* a, const void* b) {
-        return static_cast<const s_npcdiplo_tech*>(b)->value - static_cast<const s_npcdiplo_tech*>(a)->value;
+        return ((const s_npcdiplo_tech*)b)->value - ((const s_npcdiplo_tech*)a)->value;
     }
 
     void __cdecl Get_Differential_Tech_List_(

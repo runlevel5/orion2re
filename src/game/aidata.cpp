@@ -979,11 +979,8 @@ namespace AIDATA {
 
                         // Score is 120 if others are present, 80 otherwise
                         int score = other_players_present ? 120 : 80;
-                        int eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
-
-                        if (eta != 0) {
-                            total_worth += (short)(score / eta);
-                        }
+                        uint8_t eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
+                        total_worth += (short)(score / eta);
                     }
                 }
             }
@@ -993,18 +990,16 @@ namespace AIDATA {
                 if (Star_In_Range_Of_Given_Star_(i, colony_star_idx, ship_range)) {
                     // Check if target player has a colony at star i
                     if (MOX::_star[i].has_colony & (1 << target_player_idx)) {
-                        int eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
-                        if (eta != 0) {
-                            total_worth += (short)(100 / eta);
-                            if ((uint32_t)eta < min_eta) {
-                                min_eta = eta;
-                            }
+                        uint8_t eta = (*_ai_star_info)[i].per_player[owner_idx].nearest_eta;
+                        total_worth += (short)(100 / eta);
+                        if ((uint32_t)eta < min_eta) {
+                            min_eta = eta;
                         }
                     }
                 }
             }
 
-            if (total_worth != 0 && min_eta != 0) {
+            if (total_worth != 0) {
                 total_worth += (short)(400 / min_eta);
             }
         }
@@ -1214,19 +1209,19 @@ namespace AIDATA {
                 growth_mult = (avg_max_pop + colony->n_pops * 4) * 20;
                 break;
             default:
-                growth_mult = max_pop_target;
+                growth_mult = food;
                 break;
         }
 
         int worth = (avg_max_pop - colony->n_pops + 100) * growth_mult * prod_mult / 100;
 
-        if (!is_hostile || race_player->traits[12 /* TRAIT_ENVIRONMENT_IMMUNE */] != 0) {
+        if (!is_hostile || race_player->traits[12] == 0) {
             int climate_modifier = COLCALC::_climate_maintenance_modifiers[(int)planet->climate] >> 2;
             worth = worth * (100 - climate_modifier) / 100;
-        }
 
-        if (is_hostile) {
-            worth = (worth * 3) / 4;
+            if (is_hostile) {
+                worth = (worth * 3) / 4;
+            }
         }
 
         if (target_player_idx != colony->owner || colony->buildings[BUILDING_GRAVITY_GENERATOR] == 0) {
@@ -1287,7 +1282,7 @@ namespace AIDATA {
 
         if (planet->planet_type == PLANET_TYPE_PLANET) {
             int16_t subterranean_bonus = 0;
-            if (plr->evolutionary_upgrade_traits[TRAIT_SUBTERRANEAN] != 0) {
+            if (plr->traits[TRAIT_SUBTERRANEAN] != 0) {
                 subterranean_bonus = COLCALC::Double_Add_Two_(planet->size);
             }
 
@@ -1322,8 +1317,8 @@ namespace AIDATA {
                 food_per_farmer = 1;
             }
 
-            if (plr->evolutionary_upgrade_traits[TRAIT_EATS_MINERALS] == 0) {
-                if (plr->evolutionary_upgrade_traits[TRAIT_CYBERNETIC] == 0) {
+            if (plr->traits[TRAIT_EATS_MINERALS] == 0) {
+                if (plr->traits[TRAIT_CYBERNETIC] == 0) {
                     worth += food_per_farmer * 150;
                 }
                 else {
@@ -1342,7 +1337,7 @@ namespace AIDATA {
             worth = (mineral_bonus + 7) * total_pop_sum * worth / 10;
 
             bool is_swamp_ocean = (planet->climate == PLANET_CLIMATE_OCEAN || planet->climate == PLANET_CLIMATE_SWAMP);
-            bool is_aquatic = (plr->evolutionary_upgrade_traits[TRAIT_AQUATIC] != 0);
+            bool is_aquatic = (plr->traits[TRAIT_AQUATIC] != 0);
 
             if (!is_swamp_ocean || !is_aquatic) {
                 int32_t maintenance_reduction = COLCALC::_climate_maintenance_modifiers[planet->climate] >> 2;
@@ -1357,21 +1352,21 @@ namespace AIDATA {
             bool apply_penalty = false;
 
             if (planet->gravity_class == PLANET_GRAVITY_LOW_G) {
-                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] == 0) {
+                if (plr->traits[TRAIT_LOW_G_WORLD] == 0) {
                     divisor = 20;
                     penalty_factor += 18;
                     apply_penalty = true;
                 }
             }
             else if (planet->gravity_class == PLANET_GRAVITY_NORMAL_G) {
-                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] != 0) {
+                if (plr->traits[TRAIT_LOW_G_WORLD] != 0) {
                     divisor = 20;
                     penalty_factor += 18;
                     apply_penalty = true;
                 }
             }
             else if (planet->gravity_class == PLANET_GRAVITY_HEAVY_G) {
-                if (plr->evolutionary_upgrade_traits[TRAIT_LOW_G_WORLD] == 0) {
+                if (plr->traits[TRAIT_HEAVY_G_WORLD] == 0) {
                     divisor = 6;
                     penalty_factor += 4;
                     apply_penalty = true;
@@ -1383,7 +1378,7 @@ namespace AIDATA {
             }
         }
 
-        int32_t final_worth = worth >> 6;
+        int32_t final_worth = (worth + ((worth >> 31) & 0x3F)) >> 6;
         if (final_worth > 0xFFFE) {
             final_worth = 0xFFFF;
         }

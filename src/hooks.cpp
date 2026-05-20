@@ -457,6 +457,7 @@ namespace hooks {
         { 0x0041e650, &MAINMENU::Set_Main_Menu_Screen_Help_List_Aux_ },
         { 0x0041E3A0, &MAINMENU::Set_Main_Menu_Screen_Help_List_ },
         { 0x004e94d0, &MAINMENU::Do_Mainmenu_Load_Screen_ },
+        { 0x004e95a0, &file_ani::thunk_Draw_File_Animation_ },
         { 0x00530db0, &file_ani::Draw_File_Animation_ },
         { 0x00524db0, &animate::Draw_Palette_ },
         { 0x0050fa10, &LOADSAVE::Load_Month_Names_ },

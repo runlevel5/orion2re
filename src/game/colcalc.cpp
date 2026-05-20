@@ -697,10 +697,6 @@ namespace COLCALC {
 
         int16_t pop_limit = Size_And_Climate_Race_Pop_Limit_(planet->size, planet->climate, player_idx);
 
-        if (MOX::_player[player_idx].tech_applications[TECH_APP_ADVANCED_CITY_PLANNING] == 3) {
-            pop_limit += 5;
-        }
-
         return pop_limit;
     }
 

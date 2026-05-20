@@ -4,8 +4,8 @@
 
 namespace npcdiplo {
     struct s_npcdiplo_tech {
-        uint8_t index;
         int32_t value;
+        uint8_t index;
     };
 
     inline s_npcdiplo_tech (&_human_tech)[212] = 
@@ -24,7 +24,7 @@ namespace npcdiplo {
 
     void __cdecl Clear_Last_Proposal_Turn_(int16_t player_id_1, int16_t player_id_2);
 
-    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int32_t accepted);
+    void __cdecl NPC_Proposal_Rejection_Accept_(int16_t player_idx, int16_t other_player_idx, int8_t accepted);
 
     bool __cdecl NPC_Good_Proposal_Check_(int16_t npc_idx, int16_t player_idx);
 

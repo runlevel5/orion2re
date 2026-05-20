@@ -1,6 +1,18 @@
 #pragma once
 
 namespace MAINMENU {
+ #pragma pack(push, 1)
+    struct s_credit_y_slot {
+        union {
+            int32_t dword;
+            struct {
+                int16_t y;
+                int16_t upper_word;
+            };
+        };
+    };
+ #pragma pack(pop)
+
     inline s_main_menu*& _mainmenu =
         *reinterpret_cast<s_main_menu**>(std::uintptr_t{0x0056ECF0});
 
@@ -16,7 +28,7 @@ namespace MAINMENU {
     inline uint8_t& _credit_num = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECF8});
     inline uint8_t& _credits_font_spacing = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0056ECFC});
     inline s_animation_header*& _bitmap = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x0056ED00});
-    inline int16_t& _credit_y = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ED0C});
+    inline s_credit_y_slot& _credit_y_slot = *reinterpret_cast<s_credit_y_slot*>(std::uintptr_t{0x0056ED0C});
     inline int32_t& _credit_x = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0056ed10});
     inline int16_t& _delay_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0056ed18});
     inline int16_t& _fade_in_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055A5E4});
@@ -42,7 +54,7 @@ namespace MAINMENU {
     void __cdecl Add_Main_Menu_Fields_();
     void __cdecl Reload_Main_Menu_Screen_();
 
-    uint16_t __cdecl Do_Main_Menu_File_Animation_();
+    int16_t __cdecl Do_Main_Menu_File_Animation_();
 
     void __cdecl Fade_Credit_Colors_(int8_t amount, s_colors* colors);
 
