@@ -2389,7 +2389,7 @@ skip_cursor:
             draw_y = 0x15A - effect_height;
         }
 
-        int16_t window_status;
+        uint32_t window_status = 0;
         MISC::Save_Window_Status_(&window_status);
 
         int16_t x1, y1, x2, y2;
@@ -2405,7 +2405,7 @@ skip_cursor:
             y2 = draw_y + effect_height;
         }
 
-        int16_t sound_id = (int16_t)ERICNET::Mox_Play_Sound_(52 /* 0x34 */);
+        int32_t sound_id = ERICNET::Mox_Play_Sound_(52 /* 0x34 */);
         sound::Pitch_Bend_Sound_(sound_id, (2 - MOX::_combat_data[ship_idx].size_class) * 2500);
 
         if (MOX::_speedx2_flag == 1 || MOX::_net_flag != 0) {

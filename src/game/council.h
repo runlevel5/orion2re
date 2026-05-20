@@ -14,7 +14,7 @@ namespace council {
         *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596028});
     inline char*& _council_vote_message = *reinterpret_cast<char**>(std::uintptr_t{0x0059602C});
     inline s_animation_header** _council_dark_race_seg = reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596030});
-    inline uint8_t& _council_voter = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00596050});
+    inline int8_t& _council_voter = *reinterpret_cast<int8_t*>(std::uintptr_t{0x00596050});
     inline char*& _council_no_votes_message = *reinterpret_cast<char**>(std::uintptr_t{0x00596054});
     inline int16_t& _council_vote_cast = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596080});
     inline int16_t (&_council_member_votes)[8] = *reinterpret_cast<int16_t(*)[8]>(std::uintptr_t{0x00596090});
@@ -43,7 +43,7 @@ namespace council {
     inline const char* s_empty_string = reinterpret_cast<const char*>(std::uintptr_t{0x00551100});
     inline s_mouse_list& _council_blank_mouse = *reinterpret_cast<s_mouse_list*>(std::uintptr_t{ 0x00559A48 });
 
-    void Drive_Council_Player_Voted_Winner_(int16_t player_idx);
+    void Drive_Council_Player_Voted_Winner_(int16_t player_idx, int16_t unused);
 
     void Check_For_Council_Meeting_();
 
@@ -59,7 +59,7 @@ namespace council {
 
     int16_t __cdecl Get_Num_Votes_(uint8_t player_idx);
 
-    void __cdecl Council_Vote_Result_(int16_t vote_option, int16_t player_idx);
+    void __cdecl Council_Vote_Result_(int8_t vote_option, uint8_t player_idx);
 
     bool __cdecl Vote_Check_(int16_t candidate_idx, int16_t voter_idx, int16_t opponent_idx);
 

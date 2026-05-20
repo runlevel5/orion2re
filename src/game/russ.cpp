@@ -124,7 +124,7 @@ namespace RUSS {
                 Make_Player_Into_AI_(static_cast<int32_t>(MOX::_PLAYER_NUM));
             }
 
-            _all_ai_game = 1;
+            NETMOX::_net.all_ai_game_sync_flag = 1;
         } else {
             GENDRAW::Message_Box_(const_cast<char*>(s_This_isnt_a_single_player_game));
         }

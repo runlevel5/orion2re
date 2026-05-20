@@ -3498,7 +3498,7 @@ struct s_network {
     int field135_0x1ba;
     char cur_game_name[9];
     int8_t player_color_selected_flags[8];
-    undefined field165_0x1cf;
+    undefined all_ai_game_sync_flag;
     int8_t player_race_selected_flags[8];
     short host_election_winner_id;
     uint8_t is_network_active;

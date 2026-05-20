@@ -253,7 +253,7 @@ namespace COLONY {
 
     void __cdecl Turn_To_Rubble_CR_Bldg_(int16_t param_1);
 
-    void __cdecl Bldg_Back_To_Front_(int16_t building_type, uint16_t* out_val1, uint16_t* out_val2);
+    void __cdecl Bldg_Back_To_Front_(int16_t building_type, int16_t* out_val1, int16_t* out_val2);
 
     void __cdecl Draw_Colony_Bldg_(int16_t col, int16_t row);
 
@@ -413,7 +413,7 @@ namespace COLONY {
     inline s_colors (&_red_font_color_array)[2] =
         *reinterpret_cast<s_colors(*)[2]>(std::uintptr_t{0x00559FA8});
 
-    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint32_t is_bright);
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint8_t is_bright);
 
     void __cdecl Set_Colony_Font_();
 
@@ -438,7 +438,7 @@ namespace COLONY {
 
     char* __cdecl Colony_Type_(int32_t colony_idx);
 
-    void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx);
+    void __cdecl Set_Colony_Font_To_Red_(uint8_t style, uint8_t color_idx);
 
     short __cdecl Get_Next_Colony_(short current_idx, short direction);
 
@@ -454,7 +454,7 @@ namespace COLONY {
 
     s_animation_header* __cdecl Shadow_Farmer_Bitm_();
 
-    void __cdecl Set_Colony_Font_To_Player_(int16_t font_style, int16_t player_idx);
+    void __cdecl Set_Colony_Font_To_Player_(uint8_t font_style, uint8_t player_idx);
 
     inline s_colors (&_player_font_color_array)[8] =
         *reinterpret_cast<s_colors (*)[8]>(std::uintptr_t{0x00559FB8});

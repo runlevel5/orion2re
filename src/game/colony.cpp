@@ -301,11 +301,11 @@ namespace COLONY {
 
         s_ship_data* ship = &MOX::_ship[ship_index];
         int16_t picture_num = (int16_t)ship->d.picture_num;
-        uint8_t previous_owner = ship->d.previous_owner;
+        int16_t previous_owner = (int16_t)(int8_t)ship->d.previous_owner;
 
-        if (picture_num != _ship_bitm_n || (int32_t)previous_owner != _g_ship_pic_n) {
+        if (picture_num != _ship_bitm_n || (int32_t)previous_owner != _g_ship_player_n) {
             _ship_bitm_n = picture_num;
-            _g_ship_pic_n = (int32_t)previous_owner;
+            _g_ship_player_n = (int32_t)previous_owner;
 
             s_animation_header* picture_seg = KEN::Get_Ship_Picture_Seg_(previous_owner, picture_num);
             bitmap::Draw_Picture_To_Bitmap_(_ship_bitm, picture_seg);
@@ -341,7 +341,7 @@ namespace COLONY {
         return house_count;
     }
 
-    void __cdecl Bldg_Back_To_Front_(int16_t building_type, uint16_t* out_val1, uint16_t* out_val2) {
+    void __cdecl Bldg_Back_To_Front_(int16_t building_type, int16_t* out_val1, int16_t* out_val2) {
         const uint8_t lookup_table[72] = {
             5, 5, 5, 4, 4, 5, 5, 3, 3, 5, 4, 4, 5, 2, 2, 5, 4, 3,
             3, 4, 5, 1, 1, 5, 4, 2, 2, 4, 3, 3, 5, 0, 0, 5, 4, 1,
@@ -349,13 +349,8 @@ namespace COLONY {
             0, 3, 2, 1, 1, 2, 2, 0, 0, 2, 1, 1, 1, 0, 0, 1, 0, 0
         };
 
-        if (out_val1) {
-            *out_val1 = static_cast<uint16_t>(lookup_table[building_type * 2]);
-        }
-
-        if (out_val2) {
-            *out_val2 = static_cast<uint16_t>(lookup_table[building_type * 2 + 1]);
-        }
+        *out_val1 = lookup_table[building_type * 2];
+        *out_val2 = lookup_table[building_type * 2 + 1];
     }
 
     void __cdecl Allocate_Mini_Planet_Cache_() {
@@ -371,7 +366,7 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint32_t is_bright) {
+    void __cdecl Set_Colony_Font_To_Blue_(int16_t style, uint8_t is_bright) {
         fonts::Set_Outline_Color_(0x50, 0x50);
 
         s_colors* primary_colors;
@@ -381,9 +376,9 @@ namespace COLONY {
             primary_colors = &_font_bright_color_array;
         }
 
-        fonts::Set_Font_Style_Shadow_Down_(static_cast<int32_t>(is_bright), primary_colors);
+        fonts::Set_Font_Style_Shadow_Down_(style & 0xFF, primary_colors);
         fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
-        fonts::Set_Font_Special_Colors_(&_red_font_color_array[is_bright & 1]);
+        fonts::Set_Font_Special_Colors_(&_red_font_color_array[is_bright]);
     }
 
     void __cdecl Set_Colony_Font_() {
@@ -510,7 +505,7 @@ namespace COLONY {
             7,
             24,
             MOX::_galaxy_map_height,
-            MOX::_galaxy_map_grid_y,
+            MOX::_galaxy_map_width,
             11,
             31,
             0,
@@ -1005,12 +1000,12 @@ namespace COLONY {
         }
     }
 
-    void __cdecl Set_Colony_Font_To_Red_(int16_t style, int16_t color_idx) {
+    void __cdecl Set_Colony_Font_To_Red_(uint8_t style, uint8_t color_idx) {
         fonts::Set_Outline_Color_(0x50, 0x50);
 
-        s_colors* colors_ptr = &_red_font_color_array[color_idx];
+        s_colors* colors_ptr = &_red_font_color_array[(uint8_t)color_idx];
 
-        fonts::Set_Font_Style_Shadow_Down_(style, colors_ptr);
+        fonts::Set_Font_Style_Shadow_Down_(style & 0xFF, colors_ptr);
         fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
         fonts::Set_Font_Special_Colors_(colors_ptr);
     }
@@ -2204,11 +2199,13 @@ namespace COLONY {
         fonts::Set_Font_Special_Colors_(&_red_font_color_array[state]);
     }
 
-    void __cdecl Set_Colony_Font_To_Player_(int16_t font_style, int16_t player_idx) {
+    void __cdecl Set_Colony_Font_To_Player_(uint8_t font_style, uint8_t player_idx) {
         fonts::Set_Outline_Color_(0x50, 0x50);
+        uint8_t color = MOX::_player[player_idx].color;
+
         fonts::Set_Font_Style_Shadow_Down_(
             font_style,
-            &_player_font_color_array[static_cast<uint8_t>(MOX::_player[player_idx].color)]);
+            &_player_font_color_array[color]);
         fonts::Set_Font_Highlight_Colors_(&_bright_blue_font_color_array);
         fonts::Set_Font_Special_Colors_(&_red_font_color_array[0]);
     }

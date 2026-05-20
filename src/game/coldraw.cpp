@@ -521,7 +521,7 @@ void __cdecl Link_Buildings_() {
         int16_t local_y;
         int16_t local_x;
 
-        COLONY::Bldg_Back_To_Front_(i, (uint16_t*)&local_y, (uint16_t*)&local_x);
+        COLONY::Bldg_Back_To_Front_(i, &local_y, &local_x);
 
         if (COLONY::_colony_bldgs[local_y].buildings[local_x] != 0) {
             if (prev_y == -1) {

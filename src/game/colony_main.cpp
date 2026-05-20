@@ -37,7 +37,7 @@ namespace COLONY {
         bool is_scanning_valid = (_scanned_bldg_C != -1 && _scanned_bldg_R != -1);
 
         for (int16_t i = 0; i < 36 /* 0x24 */; ++i) {
-            uint16_t row, col;
+            int16_t row, col;
             Bldg_Back_To_Front_(i, &col, &row);
 
             if (_full_draw != 0 || (_scanned_bldg_C != -1 && _scanned_bldg_R != -1)) {
@@ -80,7 +80,7 @@ namespace COLONY {
             }
 
             if (_drawing_display == 0 || _drawing_display == 2) {
-                if (MAINSCR::_debug_enabled != 0) {
+                if (_debug_flag != 0) {
                     char* msg = ESTRINGS::E_Strings_(274 /* ESTR_DRAW_SYSTEM */);
                     fonts::PSTRS_(0, 0, msg);
                 }
@@ -88,17 +88,17 @@ namespace COLONY {
                 COLSYSDI::Draw_Col_Sys_Disp_(7, 24 /* 0x18 */);
             }
             else if (_drawing_display == 1) {
-                if (MAINSCR::_debug_enabled != 0) {
+                if (_debug_flag != 0) {
                     char* msg = ESTRINGS::E_Strings_(273 /* ESTR_DRAW_GALAXY */);
                     fonts::PSTRS_(0, 0, msg);
                 }
 
+                int16_t width = MOX::_galaxy_map_width;
                 int16_t height = MOX::_galaxy_map_height;
-                int16_t grid_y = MOX::_galaxy_map_grid_y;
                 s_animation_header* anim_c = C_Anims_(12 /* 0xc */);
                 s_animation_header* anim_b = C_Anims_(11 /* 0xb */);
 
-                MOVEBOX::Draw_Galaxy_Map_Box_(anim_b, anim_c, 7, 24 /* 0x18 */, height, grid_y, 11 /* 0xb */, 31 /* 0x1f */, 0, 0, 3, 0);
+                MOVEBOX::Draw_Galaxy_Map_Box_(anim_b, anim_c, 7, 24 /* 0x18 */, height, width, 11 /* 0xb */, 31 /* 0x1f */, 0, 0, 3, 0);
             }
 
             if (_valid_colony != 0) {
@@ -592,8 +592,7 @@ namespace COLONY {
 
         if (bldg_type < 36 /* 0x24 */) {
             if (use_back_to_front == 1) {
-                // TYPE MISMATCH: existing Bldg_Back_To_Front_ uses uint16_t*
-                COLONY::Bldg_Back_To_Front_(bldg_type, (uint16_t*)&row, (uint16_t*)&col);
+                COLONY::Bldg_Back_To_Front_(bldg_type, &row, &col);
             }
             else {
                 int16_t empty_count = 0;
@@ -1122,14 +1121,14 @@ namespace COLONY {
 
     int __cdecl Do_Colony_Info_Military_Stuff_For_(int military_index, int start_n, int param_3, int mode) {
         int military_count;
-        int owner;
-        int local_n;
+        int16_t owner;
+        int16_t local_n;
         char buffer[256];
         s_animation_header* anim;
         int16_t height;
 
         military_count = MOX::_colony[_colony_handle].military[military_index];
-        owner = MOX::_colony[_colony_handle].owner;
+        owner = (int16_t)MOX::_colony[_colony_handle].owner;
         _step_squish = 0;
 
         if (mode != 2) {
@@ -1143,10 +1142,13 @@ namespace COLONY {
             if (military_count > 0) {
                 do {
                     if (mode == 0) {
-                        int race = MOX::_player[owner].race;
-                        anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                        height = animate::Get_Height_(anim);
-                        animate::Draw_(static_cast<int16_t>((local_n + start_n) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), anim);
+                        uint8_t race = MOX::_player[owner].race;
+                        s_animation_header* height_anim;
+
+                        anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                        height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                        height = animate::Get_Height_(height_anim);
+                        animate::Draw_((int16_t)(((int16_t)(local_n + start_n)) * (30 - _step_squish)), (int16_t)(0x1df - height), anim);
                     }
                     local_n++;
                 } while (local_n < military_count);
@@ -1156,36 +1158,40 @@ namespace COLONY {
             _step_squish = 0;
             local_n = 0;
             if (military_count > 0) {
-                int race = MOX::_player[owner].race;
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                height = animate::Get_Height_(anim);
+                uint8_t race = MOX::_player[owner].race;
+                s_animation_header* height_anim;
 
-                animate::Draw_(static_cast<int16_t>(start_n * 30), static_cast<int16_t>(0x1df - height), anim);
+                anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                height = animate::Get_Height_(height_anim);
+
+                animate::Draw_((int16_t)((int16_t)start_n * 30), (int16_t)(0x1df - height), anim);
 
                 sprintf(buffer, ESTRINGS::E_Strings_(0x7c /* "x %d" */), military_count);
                 Set_Colony_Font_To_(3);
 
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
-                height = animate::Get_Height_(anim);
+                anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                height_anim = Military_Anim_((int16_t)military_index, (int16_t)race);
+                height = animate::Get_Height_(height_anim);
 
-                fonts::Print_(static_cast<int16_t>((start_n + 1) * (30 - _step_squish)), static_cast<int16_t>(0x1df - height), buffer);
+                fonts::Print_((int16_t)(((int16_t)start_n + 1) * (30 - _step_squish)), (int16_t)(0x1df - height), buffer);
                 local_n = 3;
             }
         }
 
         if (mode == 1) {
             if (local_n > 0) {
-                int step = 30 - _step_squish;
-                int race = MOX::_player[owner].race;
-                anim = Military_Anim_(static_cast<int16_t>(military_index), static_cast<int16_t>(race));
+                int16_t step = 30 - _step_squish;
+                uint8_t race = MOX::_player[owner].race;
+                anim = Military_Anim_((int16_t)military_index, (int16_t)race);
                 height = animate::Get_Height_(anim);
 
-                int x1 = start_n * step;
-                int y1 = 0x1df - height;
-                int x2 = (local_n + start_n) * step - 1;
-                int y2 = 0x1df;
+                int16_t x1 = (int16_t)start_n * step;
+                int16_t y1 = (int16_t)(0x1df - height);
+                int16_t x2 = (int16_t)(((int16_t)(local_n + start_n)) * step - 1);
+                int16_t y2 = 0x1df;
 
-                _military_fields[military_index] = fields::Add_Hidden_Field_(static_cast<int16_t>(x1), static_cast<int16_t>(y1), static_cast<int16_t>(x2), static_cast<int16_t>(y2), ESTRINGS::E_Strings_(0xc), 0);
+                _military_fields[military_index] = fields::Add_Hidden_Field_(x1, y1, x2, y2, ESTRINGS::E_Strings_(0xc), 0);
             }
             else {
                 _military_fields[military_index] = -1000;

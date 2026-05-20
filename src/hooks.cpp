@@ -2523,6 +2523,8 @@ namespace hooks {
         { 0x004259b0, &JIM::Decode_Text_Year_ },
         { 0x00425920, &JIM::Decode_Text_Stat_ },
         { 0x004258c0, &JIM::Decode_Text_Race2_ },
+        { 0x00425770, &JIM::Decode_Text_Race_ },
+        { 0x004257a0, &JIM::Decode_Text_Name_And_Stat_ },
         { 0x004258f0, &JIM::Decode_Text_Race_ },
         { 0x00425860, &JIM::Decode_Text_Name_Tech_And_Other_Tech_ },
         { 0x004257d0, &JIM::Decode_Text_Name_And_System_ },

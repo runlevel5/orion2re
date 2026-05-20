@@ -4,7 +4,7 @@
 struct s_animation_header;
 
 namespace HOTPOP {
-    inline uint16_t& _hotseat_human_players = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00596004});
+    inline int16_t& _hotseat_human_players = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00596004});
     inline s_animation_header*& _hot_pop_background_seg = *reinterpret_cast<s_animation_header**>(std::uintptr_t{0x00596008});
     inline s_animation_header** _grid_background = reinterpret_cast<s_animation_header**>(std::uintptr_t{ 0x00595FF4 });
 
