@@ -11,7 +11,7 @@ namespace CMBTMIS {
 
     int8_t __cdecl On_Combat_Screen_(int16_t x, int16_t y);
 
-    void __cdecl Coord_Movement_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t dist, int16_t* dx, int16_t* dy);
+    void __cdecl Coord_Movement_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t dist, int16_t* dx, int16_t* dy);
 
     int16_t __cdecl Missile_Owner_(int16_t missile_idx);
 

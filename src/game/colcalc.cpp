@@ -78,7 +78,7 @@ namespace COLCALC {
         for (int i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             s_player* player = &MOX::_player[i];
             int star_idx = MOX::_planet[player->home_planet_id].star_index;
-            MOX::_star[star_idx].colonize_player = (uint8_t)i;
+            MOX::_star[star_idx].colonize_player = (int8_t)i;
 
             if (player->command_points < (int16_t)min_command_points) {
                 min_command_points = player->command_points;
@@ -93,9 +93,9 @@ namespace COLCALC {
                 RUSS::Mox_Update_();
 
                 int star_idx = MOX::_planet[player->home_planet_id].star_index;
-                MOX::_star[star_idx].colonize_player = (uint8_t)i;
+                MOX::_star[star_idx].colonize_player = (int8_t)i;
 
-                player->bc = (player->traits[TRAIT_CURRENT_GOVERNMENT] * 100 + 200);
+                player->bc = (player->traits[TRAIT_TAX_BONUS] * 100 + 200);
 
                 for (int s = 0; s < MOX::_NUM_STARS; ++s) {
                     s_star_data* star = &MOX::_star[s];
@@ -120,8 +120,11 @@ namespace COLCALC {
                 if (player->surplus_food < 0) freighter_pool -= player->surplus_food;
                 player->n_freighters = (int16_t)((freighter_pool + 4) / 5) * 5;
 
-                int first_colony = Get_First_Player_Colony_Idx(i);
+                short first_colony = Get_First_Player_Colony_Idx(i);
                 int pool_remaining = min_command_points;
+                if (pool_remaining < 0) {
+                    pool_remaining = 0;
+                }
 
                 int max_design_idx = 0;
                 if (starting_ship_points >= 0) {
@@ -135,8 +138,12 @@ namespace COLCALC {
                     }
                 }
 
-                while (pool_remaining != 0) {
+                for (;;) {
                     RUSS::Mox_Update_();
+                    if (pool_remaining == 0) {
+                        break;
+                    }
+
                     int ship_design = max_design_idx;
                     if (pool_remaining - 1 < ship_design) {
                         ship_design = pool_remaining - 1;
@@ -144,7 +151,7 @@ namespace COLCALC {
 
                     MOX::_ship[MOX::_NUM_SHIPS].owner = (int8_t)i;
                     INITSHIP::Update_Player_Ship_Designs_((int16_t)i);
-                    COLBLDG::Create_Ship_((int16_t)i, (int16_t)ship_design, (int16_t)first_colony);
+                    COLBLDG::Create_Ship_((int16_t)i, (int16_t)ship_design, first_colony);
 
                     pool_remaining -= (ship_design + 1);
                 }
@@ -818,18 +825,16 @@ namespace COLCALC {
             colony->industry2_needed_for_empire[i] = 0;
         }
 
-        int8_t owner_race_idx = colony->owner;
+        int16_t owner_race_idx = (int8_t)colony->owner;
         int n_pops = (uint8_t)colony->n_pops;
 
         if (n_pops != 0) {
             for (int i = 0; i < n_pops; ++i) {
-                // Accessing Pop_Info as a uint32 for manual bit extraction as per assembly
-                uint32_t pop_data = *reinterpret_cast<uint32_t*>(&colony->pop[i]);
-                uint32_t race = pop_data & 0xF;
+                uint32_t pop_data = colony->pop[i];
+                int16_t race = (int16_t)(pop_data & 0xF);
 
                 if (race < 8) {
-                    // If trait is set, the population adds 1 to its industry maintenance requirement
-                    int8_t cost = (MOX::_player[race].traits[TRAIT_PRODUCTION_BONUS] != 0) ? 1 : 0;
+                    int8_t cost = (MOX::_player[race].traits[TRAIT_CYBERNETIC] != 0) ? 1 : 0;
 
                     if (race == owner_race_idx) {
                         colony->industry2_needed_for_our_empire += cost;
@@ -858,15 +863,15 @@ namespace COLCALC {
 
     void __cdecl Colony_Industry_To_Tax_(s_colony* colony) {
         int16_t industry_prod = colony->production[ECON_INDUSTRY];
-        int32_t taxable_industry = (int32_t)industry_prod - (int32_t)colony->maintenance[ECON_INDUSTRY];
+        int32_t taxable_industry = (int32_t)industry_prod - (int32_t)(uint8_t)colony->maintenance[ECON_INDUSTRY];
 
         if (taxable_industry < 1) {
             colony->n_industry_taxed = 0;
             return;
         }
 
-        uint8_t tax_rate = (uint8_t)MOX::_player[(uint8_t)colony->owner].tax_rate;
-        int16_t taxed_amount = (int16_t)((tax_rate * taxable_industry) / 100);
+        uint8_t tax_rate = MOX::_player[(int8_t)colony->owner].tax_rate;
+        int16_t taxed_amount = (int16_t)(((int32_t)tax_rate * taxable_industry) / 100);
 
         colony->n_industry_taxed = taxed_amount;
         colony->production[ECON_INDUSTRY] = industry_prod - taxed_amount;
@@ -1052,14 +1057,17 @@ namespace COLCALC {
     void __cdecl Do_Player_Colony_Calculations_(int16_t player_idx) {
         RUSS::Mox_Update_();
 
-        for (int32_t i = 0; i < (int32_t)MOX::_NUM_COLONIES; ++i) {
-            s_colony* colony = &MOX::_colony[i];
+        s_colony* colony = MOX::_colony;
+        s_colony* end = &MOX::_colony[MOX::_NUM_COLONIES];
 
-            // Only process colonies owned by the player that are not outposts
-            if (colony->owner == (int8_t)player_idx && colony->outpost_flag == 0) {
+        while (colony < end) {
+            if (colony->owner == player_idx && colony->outpost_flag == 0) {
                 COLCALC::Pre_Import_Computing_(colony);
                 RUSS::Mox_Update_();
             }
+
+            colony++;
+            end = &MOX::_colony[MOX::_NUM_COLONIES];
         }
 
         COLCALC::Do_Player_Colony_Post_Production_(player_idx);
@@ -1069,15 +1077,17 @@ namespace COLCALC {
     void __cdecl Do_Player_Colony_Post_Production_(int16_t player_idx) {
         Pass_Out_Imports_(player_idx, nullptr);
 
-        s_colony* colonies = MOX::_colony;
-        int num_colonies = MOX::_NUM_COLONIES;
+        s_colony* colony = MOX::_colony;
+        s_colony* end = &MOX::_colony[MOX::_NUM_COLONIES];
 
-        for (int i = 0; i < num_colonies; ++i) {
-            s_colony* colony = &colonies[i];
+        while (colony < end) {
             if (colony->owner == player_idx && colony->outpost_flag == 0) {
                 Post_Import_Computing_(colony);
                 RUSS::Mox_Update_();
             }
+
+            colony++;
+            end = &MOX::_colony[MOX::_NUM_COLONIES];
         }
 
         Update_Player_Stats_(&MOX::_player[player_idx]);
@@ -1240,7 +1250,7 @@ namespace COLCALC {
                 break;
 
             default: {
-                int32_t total_cost = Colony_Product_Cost_(colony, (int16_t)product);
+                int32_t total_cost = (int16_t)Colony_Product_Cost_(colony, (int16_t)product);
                 int32_t half_cost = total_cost / 2;
                 int32_t tenth_cost = total_cost / 10;
 
@@ -1302,7 +1312,7 @@ namespace COLCALC {
 
     void __cdecl Colony_Buy_Outright_(int16_t colony_idx) {
         s_colony* colony = &MOX::_colony[colony_idx];
-        s_player* player = &MOX::_player[(uint8_t)colony->owner];
+        s_player* player = &MOX::_player[colony->owner];
 
         int32_t buy_cost = Colony_Cost_To_Buy_Producing_Product_(colony);
         player->bc -= buy_cost;
@@ -1595,7 +1605,7 @@ namespace COLCALC {
     }
 
     void __cdecl Apply_All_Player_Changes_() {
-        for (int i = 0; i < static_cast<int>(MOX::_NUM_PLAYERS); ++i) {
+        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
             s_player* plr = &MOX::_player[i];
 
             if (plr->eliminated == 0) {
@@ -1610,11 +1620,11 @@ namespace COLCALC {
 
                 // Notify if the player is running out of money
                 if (plr->surplus_bc < 0 && plr->bc < 50) {
-                    s_MSG msg;
+                    s_MSG msg = {};
                     msg.msg_type = MSG_TYPE_FINANCIAL;
-                    msg.u.financial.a = plr->bc;
+                    msg.u.financial.a = (int16_t)plr->bc;
                     msg.u.financial.b = plr->surplus_bc;
-                    MSG_::Add_Msg_(msg, i);
+                    MSG_::Add_Msg_(msg, (int16_t)i);
                 }
 
                 // Flag interesting events like food or freighter shortages
@@ -2363,7 +2373,7 @@ namespace COLCALC {
         }
     }
 
-    int __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
+    int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id) {
         if (product_id >= 1 && product_id < BUILDING_COUNT) {
             int base_cost = TECHDATA::_buildings[product_id].cost;
 
@@ -2618,7 +2628,7 @@ namespace COLCALC {
         }
 
         // Release all leaders hired by the eliminated player
-        for (int i = 0; i < 65; ++i) {
+        for (int i = 0; i < 67; ++i) {
             s_leader_data* leader = &MOX::_leaders[i];
             if (leader->player_index == player_idx) {
                 leader->status = -2 /* STATUS_RELEASED? */;

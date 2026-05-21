@@ -80,7 +80,7 @@ namespace COLCALC {
 
     bool __cdecl Colony_Can_Afford_To_Buy_Product_(int16_t colony_idx);
 
-    int __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id);
+    int16_t __cdecl Colony_Product_Cost_(s_colony* colony, int16_t product_id);
 
     int32_t __cdecl Colony_Producing_Product_Cost_(s_colony* colony);
 

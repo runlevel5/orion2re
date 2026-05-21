@@ -201,9 +201,9 @@ namespace MAINPUPS {
     void __cdecl Evaluate_Tax_Rate_Input_(int16_t* input_val, int16_t* scan_val, int16_t* exit_flag) {
         if (_mp_fields[25] == *input_val) {
             *exit_flag = 1;
-            MOX::_player[MOX::_PLAYER_NUM].tax_rate = static_cast<char>(_g_temp_tax_rate);
+            MOX::_player[MOX::_PLAYER_NUM].tax_rate = static_cast<uint8_t>(_g_temp_tax_rate);
         } else if (*input_val != 0) {
-            MOX::_player[MOX::_PLAYER_NUM].tax_rate = static_cast<char>(_g_temp_tax_rate);
+            MOX::_player[MOX::_PLAYER_NUM].tax_rate = static_cast<uint8_t>(_g_temp_tax_rate);
             COLCALC::Do_Player_Colony_Calculations_(MOX::_PLAYER_NUM);
             COLONY::_full_draw = 1;
         }
