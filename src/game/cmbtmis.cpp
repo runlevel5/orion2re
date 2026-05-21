@@ -682,7 +682,7 @@ namespace CMBTMIS {
     }
 
     void __cdecl Get_Multiple_Missile_Coords_(int16_t missile_idx, int16_t quantity, int16_t* out_x, int16_t* out_y) {
-        int dir = MOX::_missile[missile_idx].facing_dir;
+        uint8_t dir = (uint8_t)MOX::_missile[missile_idx].facing_dir;
 
         // Initialize output arrays with zeros (9 elements each)
         memset(out_x, 0, 18);
@@ -694,10 +694,10 @@ namespace CMBTMIS {
 
         switch (quantity) {
             case 2:
-                out_x[0] = CMBTMIS::_missile_group_offset[dir][2] / 2;
-                out_y[0] = CMBTMIS::_missile_group_offset[dir][3] / 2;
-                out_x[1] = CMBTMIS::_missile_group_offset[dir][10] / 2;
-                out_y[1] = CMBTMIS::_missile_group_offset[dir][11] / 2;
+                out_x[0] = (int16_t)((int32_t)CMBTMIS::_missile_group_offset[dir][2] / 2);
+                out_y[0] = (int16_t)((int32_t)CMBTMIS::_missile_group_offset[dir][3] / 2);
+                out_x[1] = (int16_t)((int32_t)CMBTMIS::_missile_group_offset[dir][10] / 2);
+                out_y[1] = (int16_t)((int32_t)CMBTMIS::_missile_group_offset[dir][11] / 2);
                 break;
 
             case 3:
@@ -1201,7 +1201,7 @@ namespace CMBTMIS {
     }
 
     int16_t __cdecl Get_Missile_Hits_(int16_t missile_id, int16_t ship_idx, uint16_t flags) {
-        int16_t hits = 0;
+        int16_t hits;
         int16_t armor_idx;
         int16_t absorption;
 

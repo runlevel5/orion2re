@@ -96,18 +96,15 @@ namespace aitech {
     }
 
     int __cdecl Player_Best_Planetary_Shield_(s_player* player) {
-        // TECH_APP_PLANETARY_BARRIER_SHIELD = 0x198 (408)
-        if (player->tech_applications[0x198] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_BARRIER_SHIELD] == 3) {
             return 3;
         }
 
-        // TECH_APP_PLANETARY_FLUX_SHIELD = 0x199 (409)
-        if (player->tech_applications[0x199] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_FLUX_SHIELD] == 3) {
             return 2;
         }
 
-        // TECH_APP_PLANETARY_RADIATION_SHIELD = 0x19d (413)
-        if (player->tech_applications[0x19d] == 3) {
+        if (player->tech_applications[TECH_APP_PLANETARY_RADIATION_SHIELD] == 3) {
             return 1;
         }
 
@@ -189,18 +186,23 @@ namespace aitech {
             }
 
             s_invasion_player_bonuses grnd_bonuses;
-            invasion::Compute_Player_Ground_Combat_Bonuses_(static_cast<int16_t>(p_idx), &grnd_bonuses, 1);
+            invasion::Compute_Player_Ground_Combat_Bonuses_((int16_t)p_idx, &grnd_bonuses, 1);
 
-            int16_t bonus = grnd_bonuses.powered_armor_bonus + grnd_bonuses.troop_bonus + 
-                            (int8_t)grnd_bonuses.personal_shield_bonus + grnd_bonuses.antigrav_bonus + 
-                            grnd_bonuses.low_g_penalty + (int8_t)grnd_bonuses.subterranean_bonus + 
-                            grnd_bonuses.ground_combat_bonus;
-            // space_academy_bonus is missing in existing structures, so it's ignored.
-            bonus += static_cast<int16_t>(grnd_bonuses.rifle_bonus) >> 2;
+            int16_t bonus =
+                (uint8_t)grnd_bonuses.powered_armor_bonus +
+                (uint8_t)grnd_bonuses.troop_bonus +
+                (uint8_t)grnd_bonuses.personal_shield_bonus +
+                (uint8_t)grnd_bonuses.rifle_bonus +
+                grnd_bonuses.ground_combat_bonus +
+                grnd_bonuses.low_g_penalty +
+                (uint8_t)grnd_bonuses.antigrav_bonus;
             plr_info->ground_bonus = bonus;
+            plr_info->ground_bonus += (uint8_t)grnd_bonuses.subterranean_bonus >> 1;
+            plr_info->ground_bonus += (uint8_t)grnd_bonuses.battleoids_bonus >> 2;
 
-            plr_info->groun_tech_bonus = grnd_bonuses.has_battleoids + 
-                                         (grnd_bonuses.has_powered_armor + (int8_t)grnd_bonuses.heavy_g_bonus) * 4 + 4;
+            plr_info->groun_tech_bonus =
+                (uint8_t)(grnd_bonuses.has_battleoids +
+                          (grnd_bonuses.has_powered_armor + grnd_bonuses.heavy_g_bonus) * 4 + 4);
         }
 
         // Galactic comparison pass
@@ -211,68 +213,102 @@ namespace aitech {
             s_ai_tech_info_player* plr_info = &info->players[p_idx];
 
             for (int other_idx = 0; other_idx < MOX::_NUM_PLAYERS; ++other_idx) {
-                if (p_idx == other_idx || MOX::_player[other_idx].eliminated) continue;
+                if (p_idx != other_idx && MOX::_player[other_idx].eliminated == 0) {
+                    s_ai_tech_info_player* other_info = &info->players[other_idx];
+                    bool has_contact = plr->contact[other_idx] != 0;
 
-                s_ai_tech_info_player* other_info = &info->players[other_idx];
-                bool has_contact = (plr->contact[other_idx] != 0);
-
-                // Tech difference accumulation (comparing how far behind current player is)
-                auto accumulate_delta = [&](int16_t delta, int8_t& target, bool contact_only = false) {
-                    if (delta > 0) {
-                        if (has_contact) target += static_cast<int8_t>(delta * 3);
-                        else if (!contact_only) target += static_cast<int8_t>(delta);
-                    } else if (delta == 0 && !contact_only) {
-                        target += static_cast<int8_t>(random::Random_(2) - 1);
-                    }
-                };
-
-                accumulate_delta(static_cast<int16_t>(other_info->best_shield) - plr_info->best_shield, plr_info->best_shield_delta);
-                accumulate_delta(static_cast<int16_t>(other_info->best_armor) - plr_info->best_armor, plr_info->armor_delta);
-                accumulate_delta(static_cast<int16_t>(other_info->best_computer) - plr_info->best_computer, plr_info->best_computer_delta);
-                accumulate_delta(static_cast<int16_t>(other_info->best_weapon1) - plr_info->best_weapon1, plr_info->best_weapon1_delta);
-                accumulate_delta(static_cast<int16_t>(other_info->best_weapon2) - plr_info->best_weapon2, plr_info->best_weapon2_delta);
-
-                if (has_contact) {
-                    plr_info->contact_count++;
-                    
-                    // Planetary Shield Delta
-                    int16_t ps_delta = static_cast<int16_t>(other_info->best_planet_shield) - plr_info->best_planet_shield;
-                    if (ps_delta > 0) plr_info->planet_shield_delta += static_cast<int8_t>(ps_delta);
-
-                    // Ground Tech/Bonus Delta
-                    int16_t tech_delta = static_cast<int16_t>(other_info->groun_tech_bonus) - plr_info->groun_tech_bonus;
-                    int16_t bonus_delta = other_info->ground_bonus - plr_info->ground_bonus;
-                    
-                    int32_t ground_accum = 0;
-                    if (tech_delta > 0 && bonus_delta > 0) {
-                        ground_accum = (static_cast<int32_t>(bonus_delta) * tech_delta) / 20;
-                    } else if (tech_delta > 0) {
-                        ground_accum = (tech_delta + (tech_delta < 0 ? 3 : 0)) >> 2; // Divide by 4
-                    } else if (bonus_delta > 0) {
-                        ground_accum = bonus_delta / 5;
+                    int16_t best_shield_delta = (uint8_t)other_info->best_shield - (uint8_t)plr_info->best_shield;
+                    if (best_shield_delta > 0) {
+                        int value = has_contact ? best_shield_delta * 3 : best_shield_delta;
+                        plr_info->best_shield_delta += (int8_t)value;
+                    } else if (best_shield_delta == 0) {
+                        int value = random::Random_(2) - 1;
+                        plr_info->best_shield_delta += (int8_t)value;
                     }
 
-                    if (ground_accum == 0 && (tech_delta > 0 || bonus_delta > 0)) ground_accum = 1;
-                    plr_info->ground_bonus_delta += static_cast<int8_t>(ground_accum);
+                    int16_t best_armor_delta = (uint8_t)other_info->best_armor - (uint8_t)plr_info->best_armor;
+                    if (best_armor_delta > 0) {
+                        int value = has_contact ? best_armor_delta * 3 : best_armor_delta;
+                        plr_info->armor_delta += (int8_t)value;
+                    } else if (best_armor_delta == 0) {
+                        int value = random::Random_(2) - 1;
+                        plr_info->armor_delta += (int8_t)value;
+                    }
+
+                    int16_t best_computer_delta = (uint8_t)other_info->best_computer - (uint8_t)plr_info->best_computer;
+                    if (best_computer_delta > 0) {
+                        int value = has_contact ? best_computer_delta * 3 : best_computer_delta;
+                        plr_info->best_computer_delta += (int8_t)value;
+                    } else if (best_computer_delta == 0) {
+                        int value = random::Random_(2) - 1;
+                        plr_info->best_computer_delta += (int8_t)value;
+                    }
+
+                    int16_t best_planet_shield_delta = (uint8_t)other_info->best_planet_shield - (uint8_t)plr_info->best_planet_shield;
+                    if (best_planet_shield_delta > 0 && has_contact) {
+                        plr_info->planet_shield_delta += (int8_t)best_planet_shield_delta;
+                    }
+
+                    int16_t best_weapon1_delta = (uint8_t)other_info->best_weapon1 - (uint8_t)plr_info->best_weapon1;
+                    if (best_weapon1_delta > 0) {
+                        int value = has_contact ? best_weapon1_delta * 3 : best_weapon1_delta;
+                        plr_info->best_weapon1_delta += (int8_t)value;
+                    } else if (best_weapon1_delta == 0) {
+                        int value = random::Random_(2) - 1;
+                        plr_info->best_weapon1_delta += (int8_t)value;
+                    }
+
+                    int16_t best_weapon2_delta = (uint8_t)other_info->best_weapon2 - (uint8_t)plr_info->best_weapon2;
+                    if (best_weapon2_delta > 0) {
+                        int value = has_contact ? best_weapon2_delta * 3 : best_weapon2_delta;
+                        plr_info->best_weapon2_delta += (int8_t)value;
+                    } else if (best_weapon2_delta == 0) {
+                        int value = random::Random_(2) - 1;
+                        plr_info->best_weapon2_delta += (int8_t)value;
+                    }
+
+                    if (has_contact) {
+                        plr_info->contact_count++;
+
+                        int16_t tech_delta = (uint8_t)other_info->groun_tech_bonus - (uint8_t)plr_info->groun_tech_bonus;
+                        int16_t ground_bonus_delta = other_info->ground_bonus - plr_info->ground_bonus;
+                        int16_t value = 1;
+
+                        if (tech_delta > 0) {
+                            if (ground_bonus_delta > 0) {
+                                value = (int16_t)((ground_bonus_delta * tech_delta) / 20);
+                            } else {
+                                value = (int16_t)(tech_delta / 4);
+                            }
+                        } else if (ground_bonus_delta > 0) {
+                            value = (int16_t)(ground_bonus_delta / 5);
+                        }
+
+                        if (value == 0) {
+                            value = 1;
+                        }
+
+                        plr_info->ground_bonus_delta += (int8_t)value;
+                    }
+                }
+
+                if (plr->objectives == 1) {
+                    plr_info->best_shield_delta++;
+                    plr_info->best_computer_delta++;
+                } else if (plr->objectives == 3) {
+                    plr_info->best_computer_delta++;
+                }
+
+                if (plr->personality == 2) {
+                    plr_info->best_shield_delta++;
+                    plr_info->best_computer_delta++;
                 }
             }
 
-            // Adjustments for AI Objectives and Personality
-            if (plr->objectives == 1 /* CONQUEROR */) {
-                plr_info->best_shield_delta++;
-                plr_info->best_computer_delta++;
-            } else if (plr->objectives == 3 /* TECHNOLOGIST */) {
-                plr_info->best_computer_delta++;
-            }
-
-            if (plr->personality == 2 /* AGGRESSIVE */) {
-                plr_info->best_shield_delta++;
-                plr_info->best_computer_delta++;
-            }
-
             // Check for Colonization status
-            bool can_colonize = (plr->tech_applications[129 /* THORIUM_FUEL_CELLS */] == 3) || 
-                                (AIMOVE::Best_Uncolonized_Undestined_Planet_(static_cast<int16_t>(p_idx)) != -1);
+            bool can_colonize =
+                (plr->tech_applications[TECH_APP_THORIUM_FUEL_CELLS] == 3) ||
+                (AIMOVE::Best_Uncolonized_Undestined_Planet_((int16_t)p_idx) != -1);
             
             plr_info->colonization_idle = can_colonize ? 0 : 1;
         }
@@ -290,8 +326,7 @@ namespace aitech {
             if (plr->eliminated == 0 && plr->objectives != 100) {
                 aitech::AI_Tech_Select_(plr);
 
-                // Index 211 is TECH_APP_EVOLUTIONARY_MUTATION (last element of tech_applications[212])
-                if (plr->tech_applications[211] == 3 && plr->picked_evolutionary_upgrade == 0) {
+                if (plr->tech_applications[TECH_APP_EVOLUTIONARY_MUTATION] == 3 && plr->picked_evolutionary_upgrade == 0) {
                     raceopt::Setup_Evolutionary_Upgrade_((short)i);
                 }
             }

@@ -172,26 +172,26 @@ typedef struct s_ai_tech_info s_ai_tech_info, *Ps_ai_tech_info;
 typedef struct s_ai_tech_info_player s_ai_tech_info_player, *Ps_ai_tech_info_player;
 
 struct s_ai_tech_info_player {
-    int8_t best_shield;
+    uint8_t best_shield;
     int8_t best_shield_delta;
-    int8_t best_armor;
+    uint8_t best_armor;
     int8_t armor_delta;
-    int8_t best_computer;
+    uint8_t best_computer;
     int8_t best_computer_delta;
-    int8_t best_fuel;
-    int8_t best_planet_shield;
+    uint8_t best_fuel;
+    uint8_t best_planet_shield;
     int8_t planet_shield_delta;
     int8_t personality_mod;
-    int8_t contact_count;
-    int8_t best_drive;
-    int8_t best_weapon1;
+    uint8_t contact_count;
+    uint8_t best_drive;
+    uint8_t best_weapon1;
     int8_t best_weapon1_delta;
-    int8_t best_weapon2;
+    uint8_t best_weapon2;
     int8_t best_weapon2_delta;
-    int8_t groun_tech_bonus;
+    uint8_t groun_tech_bonus;
     short ground_bonus;
     int8_t ground_bonus_delta;
-    int8_t colonization_idle;
+    uint8_t colonization_idle;
 };
 
 struct s_ai_tech_info {
@@ -319,17 +319,17 @@ typedef struct s_invasion_side_info s_invasion_side_info, *Ps_invasion_side_info
 typedef struct s_invasion_player_bonuses s_invasion_player_bonuses, *Ps_invasion_player_bonuses;
 
 struct s_invasion_player_bonuses {
-    int8_t antigrav_bonus;
-    int8_t battleoids_bonus;
+    uint8_t antigrav_bonus;
+    uint8_t battleoids_bonus;
     int8_t has_battleoids;
-    int8_t powered_armor_bonus;
+    uint8_t powered_armor_bonus;
     int8_t has_powered_armor;
     uint8_t best_armor_tech_app_id;
-    int8_t troop_bonus;
+    uint8_t troop_bonus;
     uint8_t personal_shield_tech_app_id;
-    int8_t personal_shield_bonus;
+    uint8_t personal_shield_bonus;
     uint8_t rifle_tech_app_id;
-    int8_t rifle_bonus;
+    uint8_t rifle_bonus;
     int8_t ground_combat_bonus;
     int8_t heavy_g_bonus;
     int8_t low_g_penalty;
@@ -2728,7 +2728,7 @@ struct s_mp_screen {
     uint8_t is_host_flag;
     uint8_t player_connected_flags[8];
     int16_t bg_height;
-    int8_t subscreen_mode;
+    uint8_t subscreen_mode;
     int8_t msg_layout_alt;
     int8_t player_button_status[8];
     struct s_colors player_font_colors_1[8];

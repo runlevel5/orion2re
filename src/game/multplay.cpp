@@ -1927,7 +1927,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     void __cdecl Draw_Choose_Multi_Net_Game_Screen_() {
         if (WINNET::_net_refresh_timer < clock() + 5000) {
             WINNET::Refresh_Game_List_(WINNET::_game_guid);
-            WINNET::_net_refresh_timer = (uint32_t)clock();
+            WINNET::_net_refresh_timer = clock();
         }
 
         int16_t display_count;
@@ -1993,9 +1993,9 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     }
 
     void __cdecl Add_Choose_Multi_Net_Game_Fields_() {
-        if (WINNET::_net_refresh_timer < (uint32_t)clock() + 5000 /* 5 seconds */) {
+        if (WINNET::_net_refresh_timer < clock() + 5000 /* 5 seconds */) {
             WINNET::Refresh_Game_List_(WINNET::_game_guid);
-            WINNET::_net_refresh_timer = (uint32_t)clock();
+            WINNET::_net_refresh_timer = clock();
         }
 
         int16_t count = 10;
@@ -2247,7 +2247,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
                     MULTPLAY::Draw_Multi_Player_Banner_(i, banner_active_count, 1);
                     fonts::Set_Font_Style_(4, &font_colors_1);
                 } else {
-                    MULTPLAY::Draw_Fill_Seg_(i);
+                    MULTPLAY::Draw_Fill_Seg_(i, banner_active_count);
                     fonts::Set_Font_Style_(4, &font_colors_2);
                 }
 
@@ -2318,12 +2318,14 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         MOX::_mp_screen->needs_full_redraw = 0;
     }
 
-    void __cdecl Draw_Fill_Seg_(int16_t idx) {
+    void __cdecl Draw_Fill_Seg_(int16_t player_idx, int16_t row_idx) {
         int16_t x;
         int16_t y;
 
-        x = (idx % 2) * 294 + MOX::_mp_screen->screen_x + 40;
-        y = (idx / 2) * 36 + MOX::_mp_screen->screen_y + 65;
+        (void)row_idx;
+
+        x = (player_idx % 2) * 294 + MOX::_mp_screen->screen_x + 40;
+        y = (player_idx / 2) * 36 + MOX::_mp_screen->screen_y + 65;
 
         MOX::_mp_screen->anim_unk_3 = (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 45, MOX::_global_cache_seg);
 
@@ -2565,7 +2567,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     void __cdecl Draw_Wait_For_New_Joiners_Screen_() {
         s_colors font_colors;
-        char buffer[64];
+        char buffer[80];
 
         video::Set_Page_Off_();
         graphics::Fill_(0, 0, 639 /* 0x27f */, 479 /* 0x1df */, 0);
@@ -2591,15 +2593,10 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
         s_colors* colors_ptr = MISC::Font_Colors2_(4, 0x9C, 0xF8);
         memcpy(&font_colors, colors_ptr, sizeof(s_colors));
 
-        for (int16_t i = 0; i < MOX::_NUM_PLAYERS; ++i) {
-            // Manual loop preserved from assembly
-        }
-
         int16_t num_users = (int16_t)netcode::Net_Get_Users_(nullptr);
         int16_t msg_id = (num_users == 1) ? 0xF9 : 0xFA;
         const char* format = HAROLD::H_Message_(msg_id);
-        
-        // Note: In original binary, font_colors and buffer overlap by 4 bytes on stack
+
         sprintf(buffer, format, (int)num_users);
 
         fonts::Set_Font_Style_(MOX::_mp_screen->subscreen_mode, &font_colors);
@@ -2647,7 +2644,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
     void __cdecl Draw_Wait_For_Race_Info_Screen_() {
         s_colors font_colors;
-        char msg_buffer[76];
+        char msg_buffer[100];
         int16_t connected_count = 0;
         int16_t i;
 
@@ -2668,7 +2665,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
 
         if (MOX::_mp_screen->anim_frame_timer != 0) {
             for (i = 0; i < (int16_t)MOX::_mp_screen->anim_frame_timer; ++i) {
-                animate::Set_Animation_Frame_(MOX::_mp_screen->bg_seg, (int32_t)i);
+                animate::Set_Animation_Frame_(MOX::_mp_screen->bg_seg, i);
                 animate::Draw_(MOX::_mp_screen->screen_x, MOX::_mp_screen->screen_y, MOX::_mp_screen->bg_seg);
             }
         }
@@ -2856,7 +2853,7 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     void __cdecl Hotseat_Draw_Next_Player_(void) {
         int16_t x = MOX::_mp_screen->screen_x;
         int16_t y = MOX::_mp_screen->screen_y;
-        int8_t saved_subscreen_mode = MOX::_mp_screen->subscreen_mode;
+        uint8_t saved_subscreen_mode = MOX::_mp_screen->subscreen_mode;
 
         MOX::_mp_screen->pic =
                 (s_animation_header*)buffer::Buffer_Reload_(s_MULTIGM_LBX_00558d04, 0, MOX::_global_cache_seg);

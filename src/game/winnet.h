@@ -10,8 +10,8 @@ namespace WINNET {
     inline s_winnet_provider* (&_providers)[9] =
         *reinterpret_cast<s_winnet_provider*(*)[9]>(std::uintptr_t{0x0058D770});
 
-    inline uint32_t& _net_refresh_timer =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x0055A99C});
+    inline clock_t& _net_refresh_timer =
+        *reinterpret_cast<clock_t*>(std::uintptr_t{0x0055A99C});
 
     inline GUID& _game_guid = *reinterpret_cast<GUID*>(std::uintptr_t{0x0054F150});
 

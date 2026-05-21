@@ -218,6 +218,15 @@ void __cdecl Init_Player_Tech_(int16_t player_idx) {
     }
   }
 
+  for (int slot = 0; slot < 4; ++slot) {
+    int16_t tech_app_id = (int16_t)TECHDATA::_technology_fields[6].tech[slot];
+    if (tech_app_id <= 0) {
+      break;
+    }
+
+    player->tech_applications[tech_app_id] = 0;
+  }
+
   switch (player->traits[0]) {
   case 0:
     player->tech_applications[0x2A] = 1;

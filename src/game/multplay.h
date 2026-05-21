@@ -98,7 +98,7 @@ namespace MULTPLAY {
 
     void __cdecl Get_Main_Palette_Base_Colors_(int16_t player_idx, uint8_t* color_a, uint8_t* color_b, uint8_t* color_c);
 
-    void __cdecl Draw_Fill_Seg_(int16_t idx);
+    void __cdecl Draw_Fill_Seg_(int16_t player_idx, int16_t row_idx);
 
     void __cdecl Draw_Multi_Player_Banner_(int16_t player_idx, int16_t row_idx, int8_t is_alt_layout);
 
