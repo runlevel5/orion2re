@@ -1160,7 +1160,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
 
             if (NETMOX::_net.cur_game_name[0] == '\0') {
                 // Initialize default game name "MooII " with a random letter at the end
-                strcpy(NETMOX::_net.cur_game_name, "MooII "); /* s_MooII_0055aa80 */
+                memcpy(NETMOX::_net.cur_game_name, "MooII ", 7); /* s_MooII_0055aa80 */
                 NETMOX::_net.cur_game_name[5] = (char)(clock() % 25) + 'a';
             }
         }
@@ -1178,9 +1178,6 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         LOADSAVE::Get_Save_Game_Date_Strings_(MOX::_save_game_dates);
 
         if (!MULTPLAY::Add_Load_MP_Game_Screen_Fields_()) {
-            MOX2::Put_Auto_Function_(&auto_func_state);
-            fields::Clear_Fields_();
-            fields::Set_Input_Delay_(3);
             return -1;
         }
 
@@ -2629,16 +2626,16 @@ void __cdecl Reload_Generic_Net_Info_(int16_t lbx_entry_num) {
     }
 
     void __cdecl Get_Player_Colors_(int16_t player_idx, s_colors* out_colors_primary, s_colors* out_colors_secondary, s_colors* out_colors_tertiary) {
-        int16_t base_color_idx = player_idx * 6 + 112 /* 'p' */;
-        int16_t mode = static_cast<int16_t>(MOX::_mp_screen->subscreen_mode);
+        uint16_t base_color_idx = (uint16_t)((uint16_t)player_idx * 6u + 0x70u);
+        uint16_t mode = (uint8_t)MOX::_mp_screen->subscreen_mode;
 
-        s_colors* colors1 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 4 /* 't' */));
+        s_colors* colors1 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 4));
         *out_colors_primary = *colors1;
 
-        s_colors* colors2 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 2 /* 'r' */));
+        s_colors* colors2 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 2));
         *out_colors_secondary = *colors2;
 
-        s_colors* colors3 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 5 /* 'u' */));
+        s_colors* colors3 = MISC::Font_Colors2_(mode, (uint8_t)base_color_idx, (uint8_t)(base_color_idx + 5));
         *out_colors_tertiary = *colors3;
     }
 
