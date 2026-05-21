@@ -1037,14 +1037,6 @@ namespace COLONY {
         TEXTBOX::Text_Box_(COLCALC::_bc_summary_msg, local_buffer);
     }
 
-    void __cdecl Show_Research_Production_(int32_t colony_handle) {
-        char buffer[3000];
-
-        COLCALC::Colony_Research_Production_(&MOX::_colony[colony_handle], buffer);
-
-        TEXTBOX::Text_Box_(COLCALC::_research_summary_msg, buffer);
-    }
-
     void __cdecl Show_Morale_(int16_t colony_idx) {
         char buffer[2000];
 

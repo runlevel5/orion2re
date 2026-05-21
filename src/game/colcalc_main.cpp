@@ -801,7 +801,7 @@ namespace COLCALC {
                 short gravity_factor = Gravity_Player_Production_Factor_(colony, race);
 
                 memset(&cur_stat, 0, sizeof(s_colony_job_production));
-                short pop_base_prod = Colony_Pop_Base_Prod_Produced_(colony, colony->pop[i], econ_type, out ? &cur_stat : nullptr);
+                short pop_base_prod = Colony_Pop_Base_Prod_Produced_(colony, &colony->pop[i], econ_type, out ? &cur_stat : nullptr);
 
                 if (out) {
                     final.base_prod += cur_stat.base_prod;
@@ -1397,7 +1397,7 @@ namespace COLCALC {
             len += sprintf(debug_out + len, s_fmt_s_00551130, s_0);
 
             if (breakdown.base_prod != 0) {
-                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_workers_msg);
+                len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.base_prod / 2, _produced_by_farmers_msg);
             }
             if (breakdown.food_bonus != 0) {
                 len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.food_bonus / 2, _aquatic_bonus_msg);
@@ -1421,7 +1421,7 @@ namespace COLCALC {
                 len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.android_bonuses[0] / 2, _android_bonus_msg);
             }
 
-            for (int i = 0; i < 212; ++i) {
+            for (int i = 0; i < 204; ++i) {
                 if (breakdown.tech_apps[i] != 0) {
                     len += sprintf(debug_out + len, s_fmt_plus_d_s, breakdown.tech_apps[i] / 2, TECHDATA::_technology_applications[i].name);
                 }
@@ -1691,7 +1691,8 @@ namespace COLCALC {
     }
 
 
-    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, uint32_t pop_masked, s_colony_job_production* out) {
+        int32_t player_idx = (int32_t)(pop_masked & 0x0F);
         int16_t food_per_farmer;
 
         if (colony->owner == (int8_t)owner_idx && out == nullptr) {
@@ -1711,7 +1712,7 @@ namespace COLCALC {
             memset(_colony_calc_food_cache, 0x63, 10);
         }
 
-        int idx = (int)player_idx;
+        int idx = player_idx;
         if (_colony_calc_food_cache[idx] == 0x63) {
             int16_t trait_bonus = 0;
             int32_t extra_food = 0;
@@ -1762,11 +1763,12 @@ namespace COLCALC {
         return (int16_t)_colony_calc_food_cache[idx];
     }
 
-    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, uint32_t pop_masked, s_colony_job_production* out) {
+        int32_t player_idx = (int32_t)(pop_masked & 0x0F);
         int16_t base_industry;
 
         if ((int16_t)colony->owner == (int16_t)type && out == nullptr) {
-            base_industry = (int16_t)colony->industry_per_worker;
+            base_industry = (int16_t)(uint8_t)colony->industry_per_worker;
         }
         else {
             base_industry = Colony_Industry_Per_Worker_(colony, type, out);
@@ -1778,7 +1780,7 @@ namespace COLCALC {
             memset(_colony_calc_industry_cache, 0x63, 10);
         }
 
-        int32_t idx = (int32_t)player_idx;
+        int32_t idx = player_idx;
         if (_colony_calc_industry_cache[idx] == 0x63) {
             int16_t bonus = 0;
             if (player_idx < 8) {
@@ -1789,12 +1791,7 @@ namespace COLCALC {
             }
 
             if (out != nullptr) {
-                if (idx < 8) {
-                    out->racial_bonuses[idx] = bonus;
-                }
-                else if (idx < 10) {
-                    out->android_bonuses[idx - 8] = bonus;
-                }
+                out->racial_bonuses[idx] = bonus;
             }
 
             int16_t total_produced = base_industry + bonus;
@@ -1802,9 +1799,10 @@ namespace COLCALC {
             return total_produced;
         }
 
-        return (int16_t)_colony_calc_industry_cache[idx];
+        return (int16_t)(int8_t)_colony_calc_industry_cache[idx];
     }
-    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, uint32_t pop_masked, s_colony_job_production* out) {
+        int32_t player_idx = (int32_t)(pop_masked & 0x0F);
         uint16_t base_research_per_scientist;
 
         if (colony->owner == (int8_t)research_type && out == nullptr) {
@@ -1823,7 +1821,7 @@ namespace COLCALC {
             memset(_colony_calc_research_cache, 0x63, 10);
         }
 
-        int32_t idx = (int32_t)player_idx;
+        int32_t idx = player_idx;
         if (_colony_calc_research_cache[idx] == 0x63) {
             int16_t trait_bonus = 0;
             int32_t intelligence_bonus = 0;

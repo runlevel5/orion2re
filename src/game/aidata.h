@@ -4,7 +4,7 @@ namespace AIDATA {
     inline uint16_t(&_g_base_planet_values)[8][360] = *reinterpret_cast<uint16_t(*)[8][360]>(std::uintptr_t{ 0x0056ed28 });
     inline uint16_t(*&_ship_strengths)[500][8] = *reinterpret_cast<uint16_t(**)[500][8]>(std::uintptr_t{ 0x005953D4 });
     inline uint16_t(*&_ship_strengths_in_nebula)[500][8] = *reinterpret_cast<uint16_t(**)[500][8]>(std::uintptr_t{ 0x005953AC });
-    inline int32_t(*&_ship_bomb_strengths)[500][2] = *reinterpret_cast<int32_t(**)[500][2]>(std::uintptr_t{ 0x005953D8 });
+    inline uint16_t(*&_ship_bomb_strengths)[500][4] = *reinterpret_cast<uint16_t(**)[500][4]>(std::uintptr_t{ 0x005953D8 });
     inline int16_t(*&_planet_stage_weights)[360][8] = *reinterpret_cast<int16_t(**)[360][8]>(std::uintptr_t{ 0x0056ED20 });
     inline uint32_t(*&_base_star_stage_weights)[72][8] = *reinterpret_cast<uint32_t(**)[72][8]>(std::uintptr_t{ 0x0059539C });
     inline uint32_t(*&_star_stage_weights)[72][8] = *reinterpret_cast<uint32_t(**)[72][8]>(std::uintptr_t{ 0x005953E4 });
@@ -28,8 +28,8 @@ namespace AIDATA {
     inline s_ai_refit_player(*&_airefit)[8] = *reinterpret_cast<s_ai_refit_player(**)[8]>(std::uintptr_t{ 0x005953A4 });
     inline int32_t(*&_ship_refit_desirabilities)[500] = *reinterpret_cast<int32_t(**)[500]>(std::uintptr_t{ 0x005953C4 });
     inline uint16_t(*&_base_planet_values)[8][360] = *reinterpret_cast<uint16_t(**)[8][360]>(std::uintptr_t{ 0x0055A6B4 });
-    inline uint16_t(&_g_contextual_planet_values)[2880] =
-        *reinterpret_cast<uint16_t(*)[2880]>(std::uintptr_t{ 0x0056ed28 });
+    inline int16_t(&_g_contextual_planet_values)[2880] =
+        *reinterpret_cast<int16_t(*)[2880]>(std::uintptr_t{ 0x005703A8 });
     inline uint16_t (*&_contextual_planet_values)[2880] =
         *reinterpret_cast<uint16_t (**)[2880]>(std::uintptr_t{0x0055A6B8});
     inline uint16_t& _n_all_ships = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x005953E0 });

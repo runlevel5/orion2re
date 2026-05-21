@@ -1,7 +1,7 @@
 #pragma once
 
 namespace COLCALC {
-    typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, int32_t masked_param2, s_colony_job_production* out);
+    typedef int16_t (__cdecl *ColonyBaseFunc)(const s_colony* colony, int16_t owner, uint32_t pop_masked, s_colony_job_production* out);
 
     inline ColonyBaseFunc (&_colony_empire_base_functions)[3] =
         *reinterpret_cast<ColonyBaseFunc (*)[3]>(std::uintptr_t{0x0055A858});
@@ -176,19 +176,19 @@ namespace COLCALC {
     inline const char* const s_T_15_65 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8A4}); // "T+15,+65."
     inline const char* const s_fmt_s_00551130 = reinterpret_cast<const char*>(std::uintptr_t{0x00551130}); // "%s"
     inline const char* const s_0 = reinterpret_cast<const char*>(std::uintptr_t{0x0055110C}); // "0"
-    inline const char* const s_fmt_plus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "%+d %s"
-    inline const char* const s_fmt_plus_d_s_2 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B8}); // "%+d %s"
-    inline const char* const s_fmt_plus_d_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8D0}); // "%+d %s %s"
-    inline const char* const s_fmt_s_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8C4}); // "%s %s %s"
-    inline const char* const s_fmt_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B0}); // "%s %s"
+    inline const char* const s_fmt_plus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8DC}); // "\t%+d\t%s\r"
+    inline const char* const s_fmt_plus_d_s_2 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B8}); // "\t%+d\t %s\r"
+    inline const char* const s_fmt_plus_d_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8D0}); // "\t%+d\t%s %s\r"
+    inline const char* const s_fmt_s_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8C4}); // "\t%s\t%s %s\r"
+    inline const char* const s_fmt_s_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8B0}); // "\t%s\t%s\r"
     inline const char* const s_fmt_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8F4}); // "%d %s"
     inline const char* const s_fmt_minus_d_s = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8E8}); // "-%d %s"
     inline const char* const s_fmt_plus_d_s_3 = reinterpret_cast<const char*>(std::uintptr_t{0x0055A8FC}); // "+%d %s"
-    inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // ""
+    inline const char* const s_newline_0055136c = reinterpret_cast<const char*>(std::uintptr_t{0x0055136C}); // "\r"
 
     char* __cdecl Load_Colcalc_Strings_(char* strings);
 
-    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, uint16_t player_idx, s_colony_job_production* out);
+    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, s_colony_job_production* out);
     int16_t __cdecl Colony_Food2_Per_Farmer_(s_colony* colony, int16_t player_idx, void* out);
     inline s_colony*& _colony_calc_research_colony =
         *reinterpret_cast<s_colony**>(std::uintptr_t{0x0055A874});
@@ -283,9 +283,11 @@ namespace COLCALC {
 
     void __cdecl Show_Industry_Production_(short colony_idx);
 
+    void __cdecl Show_Research_Production_(int16_t colony_idx);
+
     int __cdecl Colony_Job_Production_(s_colony* colony, short econ_type, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out);
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, const uint32_t* pop, int16_t job_type, s_colony_job_production* out);
 
     int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode);
 
@@ -294,11 +296,11 @@ namespace COLCALC {
 
     void __cdecl Colony_Food_Production_(s_colony* colony, char* buffer);
 
-    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, int16_t player_idx, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Food2_Produced_(s_colony* colony, int16_t owner_idx, uint32_t pop_masked, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, int16_t player_idx, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Industry_Produced_(s_colony* colony, uint16_t type, uint32_t pop_masked, s_colony_job_production* out);
 
-    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, int16_t player_idx, s_colony_job_production* out);
+    int16_t __cdecl Colony_Empire_Base_Research_Produced_(s_colony* colony, int16_t research_type, uint32_t pop_masked, s_colony_job_production* out);
 
     void __cdecl Colony_Food_Maintenance_(s_colony* colony);
 

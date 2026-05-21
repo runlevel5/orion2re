@@ -136,7 +136,7 @@ namespace AIDATA {
         allocate::Push_Block_(MOX::_screen_seg);
         _ship_strengths = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
         _ship_strengths_in_nebula = (uint16_t(*)[500][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 8000);
-        _ship_bomb_strengths = (int32_t(*)[500][2])allocate::Allocate_Next_Block_(MOX::_screen_seg, 4000);
+        _ship_bomb_strengths = (uint16_t(*)[500][4])allocate::Allocate_Next_Block_(MOX::_screen_seg, 4000);
         _planet_stage_weights = (int16_t(*)[360][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 5760);
         _base_star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
         _star_stage_weights = (uint32_t(*)[72][8])allocate::Allocate_Next_Block_(MOX::_screen_seg, 2304);
@@ -198,9 +198,9 @@ namespace AIDATA {
                             if (ship.d.ship_type == 0) {
                                 uint16_t str = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_(i, p);
                                 (*_ship_strengths)[i][p] = str;
-                                (*_ai_player_info)[p].total_ship_strength += str;
+                                (*_ai_player_info)[owner].total_ship_strength[p] += str;
                                 (*_ship_strengths_in_nebula)[i][p] = (uint16_t)AIPOWER::Ship_Strength_Vs_Ships_In_Nebula_(i, p);
-                                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (uint16_t*)&(*_ship_bomb_strengths)[i][0]);
+                                AIPOWER::Ship_Strength_Vs_Planetary_Shield_(i, (*_ship_bomb_strengths)[i]);
                                 RUSS::Mox_Update_();
                                 if (owner < 8 && turn_idx < 10) {
                                     uint16_t cur_str = in_nebula ? (*_ship_strengths_in_nebula)[i][p] : (*_ship_strengths)[i][p];
@@ -258,7 +258,7 @@ namespace AIDATA {
         for (int p = 0; p < MOX::_NUM_PLAYERS; ++p) {
             int32_t r = MOX::_player[p].ship_range;
             range_sq[p] = (r * 30) * (r * 30);
-            int32_t ext_r = (r * 45) * (r * 45);
+            int32_t ext_r = r * 45;
             ext_range_sq[p] = ext_r * ext_r;
         }
 
@@ -402,6 +402,7 @@ namespace AIDATA {
                 if (p1 == p2) continue;
                 if (MOX::_player[p1].contact[p2]) {
                     (*_ai_player_info)[p1].n_contacts++;
+                    (*_ai_player_info)[p1].n_reachable_players++;
                     (*_ai_player_info)[p1].reachable_players[p2] = 1;
                 } else {
                     bool reachable = false;
@@ -463,9 +464,11 @@ namespace AIDATA {
                     int32_t d = Refit_Desirability_(ship);
                     (*_ship_refit_desirabilities)[i] = d;
                     s_ai_refit_player& refit_p = (*_airefit)[ship->owner];
-                    refit_p.entry[refit_p.n_entries].desirability = (int16_t)d;
-                    refit_p.entry[refit_p.n_entries].ship_idx = (int16_t)i;
-                    refit_p.n_entries++;
+                    refit_p.entry[refit_p.n_entries].desirability = d;
+                    if (d != 0) {
+                        refit_p.entry[refit_p.n_entries].ship_idx = (int16_t)i;
+                        refit_p.n_entries++;
+                    }
                 }
             }
         }
@@ -489,8 +492,8 @@ namespace AIDATA {
                     (*_i_all_combat_ships)[owner][loc] = (int16_t)i;
                 }
             } else {
-                if ((*_i_all_combat_ships)[owner][MOX::_NUM_STARS + loc - 500] == -1) {
-                    (*_i_all_combat_ships)[owner][MOX::_NUM_STARS + loc - 500] = (int16_t)i;
+                if ((*_i_all_combat_ships)[owner][MOX::_NUM_STARS] == -1) {
+                    (*_i_all_combat_ships)[owner][MOX::_NUM_STARS] = (int16_t)i;
                 }
             }
         }
@@ -667,14 +670,14 @@ namespace AIDATA {
             // Evaluate colony owner ship range threats to this star
             for (int colony_idx = 0; colony_idx < (int)MOX::_NUM_COLONIES; ++colony_idx) {
                 s_colony& col = MOX::_colony[colony_idx];
-                int8_t owner = col.owner;
+                int owner = (int)col.owner;
 
                 if (owner != -1) {
-                    short col_star_idx = MOX::_planet[col.planet].star_index;
+                    int16_t col_star_idx = MOX::_planet[(int16_t)col.planet].star_index;
                     int ship_range = (int)MOX::_player[owner].ship_range;
 
                     if (Star_In_Range_Of_Given_Star_((short)star_idx, col_star_idx, ship_range)) {
-                        ai_info.per_player[owner].enemy_enroute_or_threat++;
+                        ai_info.per_player[owner].nearest_eta++;
                     }
                 }
             }
@@ -698,17 +701,17 @@ namespace AIDATA {
                         }
 
                         if (in_range[other_idx]) {
-                            int8_t treaty = plr.treaty[other_idx];
+                            int treaty = (int)plr.treaty[other_idx];
                             switch (treaty) {
-                                case 0: /* Neutral/None */
+                                case 0:
                                     block.neutral_count++;
                                     break;
-                                case 1: /* War */
-                                case 2: /* Armistice */
+                                case 1:
+                                case 2:
                                 case 3:
                                     block.enemy_count++;
                                     break;
-                                case 4: /* Alliance */
+                                case 4:
                                 case 5:
                                 case 6:
                                     block.alliance_count++;
@@ -885,7 +888,7 @@ namespace AIDATA {
                 }
 
                 s_planet_data* planet = &MOX::_planet[i];
-                s_star_data* star = &MOX::_star[(uint8_t)planet->star_index];
+                s_star_data* star = &MOX::_star[planet->star_index];
 
                 // Refresh UI/input during processing
                 RUSS::Mox_Update_();
@@ -1048,7 +1051,7 @@ namespace AIDATA {
 
                             uint8_t dist_a_i = (uint8_t)(*_n_turns_from_to)[star_a][i][player];
                             uint8_t dist_i_b = (uint8_t)(*_n_turns_from_to)[i][star_b][player];
-                            uint8_t total_turns = dist_a_i + dist_i_b;
+                            int total_turns = dist_a_i + dist_i_b;
 
                             if ((((*_star_in_range_of_player)[i] >> player) & 1) && total_turns < info[0]) {
                                 info[0] = total_turns;
@@ -1179,10 +1182,10 @@ namespace AIDATA {
             return AIDATA::Proximity_Worth_To_Player_(colony, target_player);
         }
 
-        int food_base = COLCALC::Colony_Empire_Base_Food2_Produced_(colony, (int16_t)target_player_idx, (int16_t)colony_race, nullptr);
+        int food_base = COLCALC::Colony_Empire_Base_Food2_Produced_(colony, (int16_t)target_player_idx, (uint32_t)colony_race, nullptr);
         int food = food_base / 2;
-        int industry = COLCALC::Colony_Empire_Base_Industry_Produced_(colony, (uint16_t)target_player_idx, (int16_t)colony_race, nullptr);
-        int research = COLCALC::Colony_Empire_Base_Research_Produced_(colony, (int16_t)target_player_idx, (int16_t)colony_race, nullptr);
+        int industry = COLCALC::Colony_Empire_Base_Industry_Produced_(colony, (uint16_t)target_player_idx, (uint32_t)colony_race, nullptr);
+        int research = COLCALC::Colony_Empire_Base_Research_Produced_(colony, (int16_t)target_player_idx, (uint32_t)colony_race, nullptr);
 
         int prod_mult;
         if (race_player->traits[TRAIT_EATS_MINERALS] != 0) {

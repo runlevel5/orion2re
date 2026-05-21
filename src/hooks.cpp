@@ -1412,7 +1412,7 @@ namespace hooks {
         { 0x004e0130, &COLONY::Add_Screen_Fields_ },
         { 0x004f2f00, &COLONY::Show_Morale_ },
         { 0x004f54d0, &COLONY::Show_BC_Production_ },
-        { 0x004f4f60, &COLONY::Show_Research_Production_ },
+        { 0x004f4f60, &COLCALC::Show_Research_Production_ },
         { 0x004dfb30, &COLONY::Set_Colony_Screen_To_New_Colony_ },
         { 0x004dc270, &COLONY::Clear_Move_Military_ },
         { 0x004e08e0, &COLONY::Check_Satellite_Fields_ },

@@ -2,7 +2,7 @@
 
 namespace line {
 
-    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t offset) {
+    void __cdecl Multi_Colored_Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t offset) {
         if (animate::_clipping_flag == 1) {
             if (line::Clip_Line_(&x1, &y1, &x2, &y2) == 1) {
                 return;
@@ -541,7 +541,7 @@ namespace line {
         }
     }
 
-    void __cdecl Draw_Horizontal_Run_Multi_(uint8_t** dest_ptr, int16_t step, int16_t length, s_colors* colors, uint16_t* color_index) {
+    void __cdecl Draw_Horizontal_Run_Multi_(uint8_t** dest_ptr, int16_t step, int16_t length, s_colors* colors, int16_t* color_index) {
         uint8_t* ptr = *dest_ptr;
         if (length > 0) {
             int32_t count = length;
@@ -555,7 +555,7 @@ namespace line {
         *dest_ptr = ptr + g_screen_res_x;
     }
 
-    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, uint16_t* color_idx) {
+    void __cdecl Draw_Vertical_Run_Multi_(uint8_t** screen_ptr, int16_t offset, int16_t height, s_colors* colors, int16_t* color_idx) {
         uint8_t* dest = *screen_ptr;
 
         for (int16_t i = 0; i < height; ++i) {

@@ -1072,7 +1072,7 @@ namespace COLONY {
         }
 
         if (_colony_fields[16] == field_val) {
-            Show_Research_Production_(_colony_handle);
+            COLCALC::Show_Research_Production_(static_cast<int16_t>(_colony_handle));
             Show_Colony_Screen_();
             return 1;
         }

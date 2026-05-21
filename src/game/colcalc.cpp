@@ -481,7 +481,7 @@ namespace COLCALC {
     }
 
     // Suggested name: Colony_Industry_Per_Worker
-    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, uint16_t player_idx, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Industry_Per_Worker_(s_colony* colony, int16_t player_idx, s_colony_job_production* out) {
         int16_t industry;
 
         int8_t mineral_class = MOX::_planet[colony->planet].mineral_class;
@@ -519,12 +519,10 @@ namespace COLCALC {
             }
         }
 
-        // Tech: Microlite Construction
         if (MOX::_player[player_idx].tech_applications[TECH_APP_MICROLITE_CONSTRUCTION] == 3) {
             industry += 1;
             if (out != nullptr) {
-                *reinterpret_cast<int16_t*>(reinterpret_cast<uintptr_t>(out) + 0x208) = 2;
-                reinterpret_cast<int16_t*>(out)[0xf0] = 2;
+                out->tech_apps[TECH_APP_MICROLITE_CONSTRUCTION] = 1;
             }
         }
 
@@ -900,6 +898,13 @@ namespace COLCALC {
         TEXTBOX::Text_Box_(_industry_summary_msg, buffer);
     }
 
+    void __cdecl Show_Research_Production_(int16_t colony_idx) {
+        char buffer[3000];
+
+        Colony_Research_Production_(&MOX::_colony[colony_idx], buffer);
+        TEXTBOX::Text_Box_(_research_summary_msg, buffer);
+    }
+
     void __cdecl Colony_Food_Maintenance_(s_colony* colony) {
         int16_t colony_idx = static_cast<int16_t>(colony - MOX::_colony);
 
@@ -1136,6 +1141,7 @@ namespace COLCALC {
     }
 
     int16_t __cdecl Gravity_Player_Production_Factor_(const s_colony* colony, int16_t player_idx) {
+        int16_t local_4;
         const s_colony* c = colony;
         if (c->buildings[BUILDING_GRAVITY_GENERATOR] != 0 || player_idx >= 8) {
             return 4;
@@ -1158,7 +1164,7 @@ namespace COLCALC {
             return (player.traits[TRAIT_HEAVY_G_WORLD] == 0) ? 2 : 4;
         }
 
-        return 4; 
+        return local_4;
     }
 
     int16_t __cdecl Colony_Pop_Prod_Produced_(const s_colony* colony, const uint32_t* pop_unit, int16_t mode) {
@@ -1193,14 +1199,14 @@ namespace COLCALC {
         return base_prod;
     }
 
-    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, uint32_t pop, int16_t job_type, s_colony_job_production* out) {
+    int16_t __cdecl Colony_Pop_Base_Prod_Produced_(const s_colony* colony, const uint32_t* pop, int16_t job_type, s_colony_job_production* out) {
         int16_t base_produced;
         int16_t min_limit = 0;
 
         base_produced = _colony_empire_base_functions[job_type](
             colony, 
             static_cast<int16_t>(colony->owner), 
-            pop & 0xffff000f, 
+            *pop & 0xffff000f, 
             out
         );
 

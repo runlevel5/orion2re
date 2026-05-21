@@ -149,27 +149,23 @@ namespace HAROLD {
     }
 
     void __cdecl Get_Font_File_(char* buffer) {
-        const char* src;
-
         switch (MOX::_settings.language) {
         case 1: // German
-            src = "fontsg.lbx";
-            break;
+            memcpy(buffer, "fontsg.lbx", 11);
+            return;
         case 2: // French
-            src = "fontsf.lbx";
-            break;
+            memcpy(buffer, "fontsf.lbx", 11);
+            return;
         case 3: // Spanish
-            src = "fontss.lbx";
-            break;
+            memcpy(buffer, "fontss.lbx", 11);
+            return;
         case 4: // Italian
-            src = "fontsi.lbx";
-            break;
+            memcpy(buffer, "fontsi.lbx", 11);
+            return;
         default: // English or Other
-            src = "fonts.lbx";
-            break;
+            memcpy(buffer, "fonts.lbx", 10);
+            return;
         }
-
-        memcpy(buffer, src, 10);
     }
 
     void __cdecl Load_Language_Fonts_() {
@@ -316,8 +312,8 @@ namespace HAROLD {
     /**
      * @address 004f1270
      */
-    uint8_t __cdecl N_Food_Planets_In_System_(int16_t system_index) {
-        uint8_t food_planet_count = 0;
+    int16_t __cdecl N_Food_Planets_In_System_(int16_t system_index) {
+        int16_t food_planet_count = 0;
 
         for (int16_t i = 0; i < 5; ++i) {
             int16_t planet_idx = MOX::_star[system_index].planet_index[i];
@@ -346,8 +342,8 @@ namespace HAROLD {
     }
 
     void __cdecl Set_Sound_Volume_To_Settings_() {
-        uint8_t music_lvl = static_cast<uint8_t>(MOX::_settings.music_level);
-        if (music_lvl > 100) {
+        int8_t music_lvl = MOX::_settings.music_level;
+        if (music_lvl >= 100) {
             music_lvl = 100;
         }
 
@@ -358,7 +354,7 @@ namespace HAROLD {
             sound::Stream_On_();
         }
 
-        int32_t volume_param = static_cast<int32_t>(music_lvl);
+        int32_t volume_param = music_lvl;
         sound::Set_Stream_Max_Volume_(volume_param);
         sound::Set_Stream_Volume_(volume_param);
 
@@ -370,7 +366,7 @@ namespace HAROLD {
             sound::Resume_Sound_(-1);
         }
 
-        sound::Set_Sound_Max_Volume_(static_cast<int32_t>(MOX::_settings.sound_fx_level));
+        sound::Set_Sound_Max_Volume_(MOX::_settings.sound_fx_level);
     }
 
     /**
@@ -595,7 +591,7 @@ namespace HAROLD {
      * @param use_clock If non-zero, uses clock() % size for indices; otherwise uses Random_(size) - 1.
      * @address 004f1860
      */
-    void __cdecl Randomize_List_(int16_t* list, int16_t size, int8_t use_clock) {
+    void __cdecl Randomize_List_(int16_t* list, int16_t size, uint8_t use_clock) {
         // The number of shuffle iterations is 1.5 * size
         int32_t iterations = (static_cast<int32_t>(size) * 3) / 2;
 
@@ -612,8 +608,8 @@ namespace HAROLD {
                 idx1 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
                 idx2 = static_cast<int16_t>(random::Random_(static_cast<int32_t>(size))) - 1;
             } else {
-                idx1 = static_cast<int16_t>(clock() % static_cast<uint32_t>(size));
-                idx2 = static_cast<int16_t>(clock() % static_cast<uint32_t>(size));
+                idx1 = (int16_t)(clock() % (int32_t)size);
+                idx2 = (int16_t)(clock() % (int32_t)size);
             }
 
             if (idx1 != idx2) {
@@ -926,12 +922,12 @@ namespace HAROLD {
      * @address 004f1d00
      */
     int16_t __cdecl First_Ship_Orbiting_Star_(s_star_data* star) {
-        int16_t ship_ids[4];
+        int16_t ship_ids[2];
         int16_t count = 2;
 
         Star_XY_To_Ship_Id_(star, ship_ids, &count);
 
-        return (count > 0) ? ship_ids[0] : -1;
+        return ship_ids[0];
     }
 
     /**
@@ -976,10 +972,8 @@ namespace HAROLD {
             return 1;
         }
 
-        // BUG: the function returns an uninitialized value if no conditions are met
-        //int16_t uninitialized_result;
-        //return uninitialized_result;
-        return 0;
+        int16_t local_2;
+        return local_2;
     }
 
     /**
@@ -1089,7 +1083,7 @@ namespace HAROLD {
         }
     }
 
-    int8_t __cdecl Map_Scale_To_Zoom_Level_() {
+    int16_t __cdecl Map_Scale_To_Zoom_Level_() {
         int16_t max_zoom = MOX::_max_zoom_count;
         int16_t scale = MOX::_cur_map_scale;
 
@@ -1109,7 +1103,7 @@ namespace HAROLD {
             return 3;
         }
 
-        return (int8_t)max_zoom;
+        return max_zoom;
     }
 
     /**
@@ -1131,11 +1125,11 @@ namespace HAROLD {
 
         MOX::_zoom_count = (int16_t)next_zoom;
 
-        int8_t mapped_zoom = Map_Scale_To_Zoom_Level_();
+        int16_t mapped_zoom = Map_Scale_To_Zoom_Level_();
 
         // Check if the mapped zoom level is lower or equal to the incremented zoom count
-        if ((int16_t)mapped_zoom <= MOX::_zoom_count) {
-            MOX::_zoom_count = (int16_t)mapped_zoom;
+        if (mapped_zoom <= MOX::_zoom_count) {
+            MOX::_zoom_count = mapped_zoom;
             return 0;
         }
 
@@ -1349,9 +1343,11 @@ namespace HAROLD {
     /**
      * @address 004f1fb0
      */
-    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t color_offset) {
-        int inv_offset_calc = 7 - (int)color_offset;
-        uint16_t inv_offset = (uint16_t)(inv_offset_calc < 0 ? 0 : inv_offset_calc);
+    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t color_offset) {
+        int16_t inv_offset = 7 - color_offset;
+        if (inv_offset <= 0) {
+            inv_offset = 0;
+        }
 
         s_colors rev_colors;
         for (int i = 0; i < 8; ++i) {
@@ -1516,7 +1512,7 @@ namespace HAROLD {
 
         g_map_unknown_flag = 0;
         MAINSCR::Clear_Twinkling_Star_Data_();
-        memset(MOX::_fleet_icon_selection_status, 0, sizeof(MOX::_fleet_icon_selection_status));
+        memset(MOX::_fleet_icon_selection_status, 0, 63);
     }
 
     void __cdecl Load_H_Strings_() {

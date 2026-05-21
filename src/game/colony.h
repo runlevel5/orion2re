@@ -357,8 +357,6 @@ namespace COLONY {
 
     void __cdecl Show_Food_Production_(int16_t colony_idx);
 
-    void __cdecl Show_Research_Production_(int32_t colony_handle);
-
     void __cdecl Set_Colony_Screen_To_New_Colony_(int16_t colony_idx);
 
     int8_t __cdecl Evaluate_Screen_Input_(int16_t* input_field);

@@ -2244,7 +2244,7 @@ namespace AIMOVE {
                     (*AIDATA::_ship_strengths)[ship_idx][owner];
                 total_space_strength += space_str;
 
-                uint16_t bomb_str = reinterpret_cast<int16_t*>((*AIDATA::_ship_bomb_strengths)[ship_idx])[shield];
+                uint16_t bomb_str = (*AIDATA::_ship_bomb_strengths)[ship_idx][shield];
                 total_bomb_strength += bomb_str;
 
                 total_ship_size += (1 << (MOX::_ship[ship_idx].d.size & 0x1F));

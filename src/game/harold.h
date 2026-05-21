@@ -19,7 +19,7 @@ namespace HAROLD {
 
     void __cdecl Set_Wormhole_Id_(int16_t star_idx, uint8_t* star_bitmap);
 
-    uint8_t __cdecl N_Food_Planets_In_System_(int16_t system_index);
+    int16_t __cdecl N_Food_Planets_In_System_(int16_t system_index);
 
     bool __cdecl Star_Is_Orion_(int16_t star_idx);
 
@@ -46,7 +46,7 @@ namespace HAROLD {
 
     void __cdecl Get_Monetary_Unit_String_(char* buffer);
 
-    void __cdecl Randomize_List_(int16_t* list, int16_t size, int8_t use_clock);
+    void __cdecl Randomize_List_(int16_t* list, int16_t size, uint8_t use_clock);
 
     void __cdecl Save_Mouse_List_();
 
@@ -75,7 +75,7 @@ namespace HAROLD {
 
     void __cdecl Set_Player_Font_Style_(int16_t player_idx, bool param_2);
 
-    int8_t __cdecl Map_Scale_To_Zoom_Level_();
+    int16_t __cdecl Map_Scale_To_Zoom_Level_();
 
     void __cdecl Decrement_Zoom_Count_();
 
@@ -85,7 +85,7 @@ namespace HAROLD {
 
     int16_t __cdecl Get_Map_Scale_(int16_t layer_type);
 
-    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, uint16_t color_offset);
+    void __cdecl Draw_Multi_Colored_Box_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, s_colors* colors, int16_t color_offset);
 
     int16_t __cdecl Map_Scale_Star_Size_To_Zoom_Level_(int16_t star_idx);
 
