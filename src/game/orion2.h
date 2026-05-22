@@ -1553,7 +1553,7 @@ struct s_field_string_list {
     char *help;
     int16_t help_start;
     undefined2 field5_0xe;
-    int16_t *value;
+    int8_t *value;
     char **strings;
     undefined4 field8_0x18;
     struct s_animation_header *pic;

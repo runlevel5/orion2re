@@ -110,7 +110,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_LF_(4);
         Setup_Diplomacy_Help_(7, _break_treaty_help_entry);
 
-        int16_t list_pos = 0;
+        int8_t list_pos = 0;
         int16_t choice = fields::Get_List_Field_(
             10, 118, 245,
             _break_treaty_title,
@@ -281,7 +281,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
         fonts::Set_Font_LF_(4);
 
-        int16_t selected_idx = 0;
+        int8_t selected_idx = 0;
 
         int16_t result = fields::Get_List_Field_(
             10, 0x76, 0xf5, (char*)background, (char*)_diplomacy_list_choice, 50,
@@ -354,7 +354,7 @@ namespace DIP_SCRN {
 
         Setup_Diplomacy_Help_(7, &_offer_help_entry);
 
-        int16_t title = 0;
+        int8_t title = 0;
 
         int16_t choice = fields::Get_List_Field_(
             10, 0x76, 0xf5,
@@ -787,7 +787,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_Special_Colors_(&_diplomacy_special_colors);
         fonts::Set_Font_LF_(4);
 
-        int16_t current_idx = 0;
+        int8_t current_idx = 0;
         int16_t result = fields::Get_List_Field_(
             10, 118, 245, text_buffer, _diplomacy_list_choice[0], 50,
             &current_idx, selectable, 17, nullptr, 0, nullptr, 0, 0
@@ -902,7 +902,7 @@ namespace DIP_SCRN {
         int16_t result_bc = -1;
         int16_t choice_count;
         int16_t bc_options[5];
-        int16_t selection_idx = 0;
+        int8_t selection_idx = 0;
         uint8_t selection_flags[15];
         char title_text[40];
 
@@ -1180,7 +1180,7 @@ namespace DIP_SCRN {
 
                 Setup_Diplomacy_Help_(9, &_main_diplomacy_help_entry);
 
-                int16_t search_string = 0;
+                int8_t search_string = 0;
 
                 int16_t choice = fields::Get_List_Field_(
                     10, 0x76, 0xF5,
@@ -1784,7 +1784,7 @@ namespace DIP_SCRN {
             fonts::Set_Font_LF_(4);
             Setup_Diplomacy_Help_(list_idx + 2, item_values);
 
-            int16_t selection_buffer = 0;
+            int8_t selection_buffer = 0;
 
             int16_t action = fields::Get_List_Field_(
                 10, 118, 245, list_title,
@@ -1822,7 +1822,7 @@ namespace DIP_SCRN {
         uint8_t hotkey_flags[10];
         memset(hotkey_flags, 1, sizeof(hotkey_flags));
 
-        int16_t list_pos = 0;
+        int8_t list_pos = 0;
         char text_buffer[80];
         uint8_t tech_list[212];
         int32_t aiStack_350[212];
@@ -2014,7 +2014,7 @@ namespace DIP_SCRN {
 
     void __cdecl Diplomacy_Propose_Treaty_(int16_t player_idx, int16_t target_idx) {
         uint8_t valid_treaties[7];
-        int16_t hotkeys = 0;
+        int8_t hotkeys = 0;
 
         valid_treaties[0] = 1;
         valid_treaties[1] = 1;
@@ -2189,7 +2189,7 @@ namespace DIP_SCRN {
 
                 Setup_Diplomacy_Help_(list_size, help_entry);
 
-                int16_t list_pos = 0;
+                int8_t list_pos = 0;
                 int16_t choice = fields::Get_List_Field_(
                     10, 0x76, 0xF5,
                     _main_diplomacy_title,

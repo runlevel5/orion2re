@@ -1309,7 +1309,7 @@ namespace DIP_SCRN {
         fonts::Set_Font_LF_(4);
         Setup_Diplomacy_Help_(11, _demand_help_entry);
 
-        int16_t list_index = 0;
+        int8_t list_index = 0;
         int16_t selection = fields::Get_List_Field_(
             10, 0x76, 0xF5, _demand_title, (char*)_diplomacy_list_choice,
             0x32, &list_index, demand_list_flags, 17,
@@ -1536,7 +1536,7 @@ namespace DIP_SCRN {
     }
 
     void __cdecl Get_Net_Diplomacy_Choices_() {
-        int16_t selected;
+        int8_t selected;
         int16_t tech_count;
         int16_t done_flag;
         uint8_t options[11];
@@ -2202,7 +2202,7 @@ namespace DIP_SCRN {
     {
         s_animation_header* saved_bg_seg;
         int16_t result;
-        int16_t current_selection;
+        int8_t current_selection;
         uint8_t enabled_flags[10];
         char list_title[40];
 

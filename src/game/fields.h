@@ -184,7 +184,7 @@ namespace fields {
 
     int16_t __cdecl Add_Locked_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* selection, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, int16_t* value, int16_t help_start, int16_t count, char** strings, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str, char* param_14);
+    int16_t __cdecl Add_String_List_Field_(int16_t x, int16_t y, int16_t width, char* help, int16_t param_5, int8_t* value, int16_t help_start, int16_t count, char** strings, int32_t param_10, s_animation_header* pic, int32_t param_12, char* hotkey_str, char* param_14);
 
     void __cdecl Mark_Fields_();
 
@@ -194,5 +194,5 @@ namespace fields {
 
     void __cdecl Release_Fields_();
 
-    short __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char *help, char *list_ptr, int32_t item_size, int16_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10, int32_t param_11, s_animation_header *pic, int32_t param_13, char *param_14);
+    short __cdecl Get_List_Field_(int16_t x, int16_t y, int16_t width, char *help, char *list_ptr, int32_t item_size, int8_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10, int32_t param_11, s_animation_header *pic, int32_t param_13, char *param_14);
 }

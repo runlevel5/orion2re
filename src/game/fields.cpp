@@ -677,7 +677,7 @@ namespace fields {
         int16_t width,
         char* help,
         int16_t param_5,
-        int16_t* value,
+        int8_t* value,
         int16_t help_start,
         int16_t count,
         char** strings,
@@ -1444,7 +1444,7 @@ namespace fields {
 
     short __cdecl Get_List_Field_(
         int16_t x, int16_t y, int16_t width, char *help, char *list_ptr, int32_t item_size,
-        int16_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10,
+        int8_t *selected_index, uint8_t *item_flags, int16_t param_9, char **param_10,
         int32_t param_11, s_animation_header *pic, int32_t param_13, char *param_14)
     {
         _list_field_on = 1;
@@ -1481,7 +1481,7 @@ namespace fields {
 
                 Add_String_List_Field_(
                     x, cur_y, width, list_ptr, flag, 
-                    reinterpret_cast<int16_t*>(selected_index), index, param_9, 
+                    selected_index, index, param_9,
                     param_10, param_11, pic, param_13, 
                     s__00551100, param_14
                 );
@@ -1504,9 +1504,9 @@ namespace fields {
             _list_highlight_colors.colors[i] = cur_highlight->colors[i];
         }
 
-        int32_t local_4 = 0;
+        int8_t local_4 = 0;
         int16_t help_field_idx = Add_String_List_Field_(
-            x, y, width, help, 1, reinterpret_cast<int16_t*>(&local_4), 1, 0, nullptr, 0, nullptr, 0, s__00551100, DAT_0055afc0
+            x, y, width, help, 1, &local_4, 1, 0, nullptr, 0, nullptr, 0, s__00551100, DAT_0055afc0
         );
 
         int8_t cur_selection = *selected_index;

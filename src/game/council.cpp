@@ -189,7 +189,7 @@ namespace council {
         char title_msg[48];
         int16_t result_code = 0;
 
-        int16_t list_metadata;
+        int8_t list_metadata;
         uint8_t active_mask[4];
 
         fields::Assign_Auto_Function_(council::Draw_Main_Council_Screen_, 2);
@@ -570,7 +570,7 @@ namespace council {
     void Council_Accept_Ruling_() {
         char choice_labels[2][25];
         char list_items[40];
-        int16_t list_metadata;
+        int8_t list_metadata;
         uint8_t active_mask[4];
 
         fields::Assign_Auto_Function_(Draw_Main_Council_Screen_, 2);
