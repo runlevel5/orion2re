@@ -506,7 +506,6 @@ namespace hooks {
         { 0x00526F20, &mouse::Pointer_X_ },
         { 0x00526F70, &mouse::Pointer_Y_ },
         { 0x0051db80, &fields::Add_Button_Field_ },
-        { 0x0051d370, &fields::Add_Hidden_Field_ },
         { 0x00520220, &fields::Add_Irregular_Button_Field_ },
         { 0x00520690, &fields::Add_Multi_Hot_Key_Field_ },
         { 0x0051d7f0, &fields::Add_Grid_Field_ },
@@ -3977,6 +3976,7 @@ namespace hooks {
         { 0x00406100, &FLEETPOP::Set_Engage_Enemy_Forces_Flag_ },
         { 0x004060A0, &FLEETPOP::Planet_Is_Colonizable_ },
         { 0x004F1430, &HAROLD::Planet_Has_Outpost_ },
+        { 0x0051d370, &fields::Add_Hidden_Field_ },
     };
 
     void Install_Hooks()

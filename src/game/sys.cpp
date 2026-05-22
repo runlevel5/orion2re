@@ -1768,8 +1768,8 @@ namespace SYS {
                 static_cast<int16_t>(popup_top + 0xEC),
                 SYS::s__00551100,
                 SYS::_moveable_box_pict_4,
-                (void*)SYS::s__00551120,
-                (char)0x28);
+                SYS::s__00551120,
+                0x28);
 
             *out_popup_hidden_field = fields::Add_Hidden_Field_(
                 popup_left,

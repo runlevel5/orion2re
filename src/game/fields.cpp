@@ -5,12 +5,12 @@ namespace fields {
         _update_function = fn;
     }
 
-    void __cdecl Assign_Auto_Function_(MOX2::action_func_t fn, int32_t delay) {
+    void __cdecl Assign_Auto_Function_(MOX2::action_func_t fn, int16_t delay) {
         _auto_active_flag = 1;
         _function = fn;
 
         if (delay > 0 && delay < 10) {
-            _auto_function_delay = (uint16_t)delay;
+            _auto_function_delay = delay;
         } else {
             _auto_function_delay = 2;
         }
@@ -54,9 +54,7 @@ namespace fields {
 
     void __cdecl Invoke_Auto_Function_() {
         if (_auto_active_flag != 0) {
-            if (_function != nullptr) {
-                _function();
-            }
+            _function();
         }
     }
 
@@ -73,13 +71,13 @@ namespace fields {
         _function = _function2;
     }
 
-    void __cdecl Set_Input_Delay_(uint16_t delay) {
+    void __cdecl Set_Input_Delay_(int16_t delay) {
         _input_delay = delay;
         mouse::Mouse_Buffer_();
         mouse::Mouse_Buffer2_();
     }
 
-    void __cdecl Set_Field_Outline_Color_(uint8_t color) {
+    void __cdecl Set_Field_Outline_Color_(uint16_t color) {
         _field_outline_color = color;
     }
 
@@ -239,23 +237,19 @@ namespace fields {
         }
     }
 
-    int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound) {
-        char error_msg[80];
+    int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound) {
+        char error_message[44];
+        uint32_t local_24[9];
 
-        const uint32_t* src = reinterpret_cast<const uint32_t*>("You exceeded the max number of fields (150)");
-        uint32_t* dest = reinterpret_cast<uint32_t*>(error_msg);
-        for (int i = 0; i < 11; ++i) {
-            dest[i] = src[i];
-        }
-        for (int i = 11; i < 20; ++i) {
-            dest[i] = 0;
-        }
+        memcpy(error_message, s_You_exceeded_the_max_number_of_fields, sizeof(error_message));
+        memset(local_24, 0, sizeof(local_24));
 
         if (_fields_count >= _max_fields_count) {
-            exitm::Exit_With_Message(error_msg);
+            exitm::Exit_With_Message(error_message);
         }
 
-        s_field* field = &_fields[_fields_count];
+        const int16_t field_index = _fields_count;
+        s_field* const field = &_fields[field_index];
 
         field->x = x;
         field->y = y;
@@ -269,10 +263,8 @@ namespace fields {
             field->hotkey -= 0x20;
         }
 
-        int16_t added_index = _fields_count;
-        _fields_count++;
-
-        return added_index;
+        ++_fields_count;
+        return field_index;
     }
 
     int16_t __cdecl Add_Multi_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, int16_t* value, int16_t count, const char* hotkey, int16_t sound) {
@@ -358,7 +350,7 @@ namespace fields {
         return current_field;
     }
 
-    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, void* highlight_color, char hotkey) {
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int16_t sound) {
         char error_msg[80];
         // The original code manually copies the error message into a local buffer.
         for (int i = 0; i < 11; ++i) {
@@ -381,11 +373,11 @@ namespace fields {
             }
         }
 
-        if (_fields_count >= _max_fields_count) {
+        if ((int32_t)_fields_count >= _max_fields_count_raw) {
             exitm::Exit_With_Message(error_msg);
         }
 
-        Add_Button_Info_(x, y, help, pic, (const char*)highlight_color, (int16_t)hotkey);
+        Add_Button_Info_(x, y, help, pic, hotkey, sound);
 
         _fields[_fields_count].field_type = FIELD_TYPE_BUTTON;
         
@@ -395,10 +387,10 @@ namespace fields {
         return current_index;
     }
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, char sound) {
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, int8_t sound) {
         char buffer[80];
 
-        if (_max_fields_count <= _fields_count) {
+        if (_max_fields_count < _fields_count) {
             sprintf(buffer, s_Maximum_number_of_button_fields_e_0055b0b0, (int32_t)_max_fields_count);
             exitm::Exit_With_Message(buffer);
         }
@@ -414,7 +406,7 @@ namespace fields {
         field.font_style = fonts::Get_Current_Font_Style_();
         field.font_color = fonts::Get_Current_Font_Color_();
 
-        field.sound = sound;
+        field.sound = (int16_t)sound;
         field.detail.button.pic = pic;
         field.detail.button.draw_style = animate::Get_Full_Store_Flag_(pic);
 
@@ -671,8 +663,7 @@ namespace fields {
         _input_delay = _old_input_delay;
         _down_mouse_button = _old_down_mouse_button;
 
-        // Disassembly uses a 32-bit move here, despite the symbol being a short.
-        *reinterpret_cast<int32_t*>(&_max_fields_count) = 0xfa;
+        _max_fields_count_raw = 0xfa;
 
         _auto_input_variable = _old_auto_input_variable;
         _input_field_active = _old_input_field_active;
@@ -1831,16 +1822,16 @@ namespace fields {
                                 f->x_end,
                                 f->y + font_height + 1,
                                 f->detail.strings.count,
-                                f->detail.strings.strings[0],
+                                (char*)f->detail.strings.strings,
                                 f->detail.strings.field8_0x18,
                                 f->detail.strings.pic,
                                 f->detail.strings.special_color
                             );
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
-                        } else if (f->detail.strings.field1_0x2 != 0) {
+                        } else if (f->detail.strings.field1_0x2 == 0) {
+                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         } else {
-                            fonts::Set_Font_Style_(f->font_style, f->detail.strings.highlight_color);
                             fonts::Print_(f->x, f->y + 1, f->detail.strings.help);
                         }
                         break;
@@ -1878,8 +1869,7 @@ namespace fields {
                                 if (pos == 0) {
                                     int16_t len = 0;
                                     if (_continuous_string[0] != '_') {
-                                        while (_continuous_string[len] != '_') {
-                                            if (len >= f->detail.cont_input.max_length) break;
+                                        while (len < f->detail.cont_input.max_length && _continuous_string[len] != '_') {
                                             len++;
                                         }
                                     }
@@ -1887,8 +1877,7 @@ namespace fields {
                                 } else {
                                     int16_t len = 0;
                                     if (_continuous_string[0] != '\0') {
-                                        while (_continuous_string[len] != '\0') {
-                                            if (len >= f->detail.cont_input.max_length - 1) break;
+                                        while (len < f->detail.cont_input.max_length - 1 && _continuous_string[len] != '\0') {
                                             len++;
                                         }
                                     }
@@ -2461,15 +2450,15 @@ namespace fields {
     void __cdecl Decrement_Scroll_Bar_(int16_t field_idx) {
         int16_t range_min = _fields[field_idx].detail.scroll.range_min;
         int16_t* value_ptr = _fields[field_idx].detail.scroll.value;
-        int32_t range = _fields[field_idx].detail.scroll.range_max - range_min;
+        int16_t range = _fields[field_idx].detail.scroll.range_max - range_min;
 
-        int16_t pct = (((*value_ptr - range_min) * 100) / range) - 5;
+        int16_t pct = (int16_t)((((*value_ptr - range_min) * 100) / range) - 5);
 
         int16_t new_value;
         if (pct < 0) {
             new_value = _fields[field_idx].detail.scroll.return_value;
         } else {
-            new_value = range_min + (pct * range) / 100;
+            new_value = range_min + (int16_t)(((int32_t)pct * range) / 100);
         }
 
         if (new_value < _fields[field_idx].detail.scroll.return_value) {

@@ -4,7 +4,7 @@ namespace fields {
     inline MOX2::action_func_t& _update_function = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{ 0x0055AFD8 });
     inline uint16_t& _auto_active_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFDC });
     inline uint16_t& _list_field_on = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055AFF0});
-    inline uint16_t& _auto_function_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{ 0x0055AFF4 });
+    inline int16_t& _auto_function_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{ 0x0055AFF4 });
     inline uint16_t& _list_field_scan_flag = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B008});
     inline int16_t& _down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE4});
     inline int16_t& _auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055B004});
@@ -23,6 +23,7 @@ namespace fields {
     inline char* s__00551100 = reinterpret_cast<char*>(std::uintptr_t{0x00551100});
     inline char*& DAT_0055afc0 = *reinterpret_cast<char**>(std::uintptr_t{0x0055AFC0});
     inline int16_t& _max_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFC4});
+    inline int32_t& _max_fields_count_raw = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055AFC4});
     inline uint8_t& _exit_the_list_field = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055AFCC});
     inline s_field*& _fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD0});
     inline s_field*& _old_fields = *reinterpret_cast<s_field**>(std::uintptr_t{0x0055AFD4});
@@ -31,7 +32,7 @@ namespace fields {
     inline int16_t& _old_active_input_field_number = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572BF4});
     inline int16_t& _old_down_mouse_button = *reinterpret_cast<int16_t*>(std::uintptr_t{0x005762E0});
     inline int16_t& _old_fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576304});
-    inline uint16_t& _old_input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00576308});
+    inline int16_t& _old_input_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576308});
     inline int16_t& _old_auto_input_variable = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00576320});
     inline int16_t& _fields_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572D18});
     inline int16_t& _selected_count = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0055AFE0});
@@ -46,7 +47,7 @@ namespace fields {
     inline s_colors (&_list_normal_color) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572C08});
     inline s_colors (&_list_highlight_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x005762F0});
     inline s_colors (&_list_special_colors) = *reinterpret_cast<s_colors(*)>(std::uintptr_t{0x00572BD0});
-    inline uint16_t& _input_delay = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x00572C00});
+    inline int16_t& _input_delay = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00572C00});
     inline MOX2::action_func_t& _function = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x005762F8});
     inline MOX2::action_func_t& _function2 = *reinterpret_cast<MOX2::action_func_t*>(std::uintptr_t{0x00572BFC});
     inline s_help_box*& _help_struct_pointer = *reinterpret_cast<s_help_box**>(std::uintptr_t{0x00576300});
@@ -72,7 +73,7 @@ namespace fields {
 
     int16_t __cdecl Add_Hot_Key_(const char* hotkey_str);
 
-    void __cdecl Assign_Auto_Function_(MOX2::action_func_t fn, int32_t delay);
+    void __cdecl Assign_Auto_Function_(MOX2::action_func_t fn, int16_t delay);
 
     int16_t __cdecl Get_Input_();
 
@@ -85,13 +86,13 @@ namespace fields {
 
     int16_t __cdecl Add_Button_Field_(int16_t x, int16_t y, const char* help, s_animation_header* pic, const char* text, int16_t key);
 
-    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, void* highlight_color, char hotkey);
+    int16_t __cdecl Add_Clipped_Button_Field_(int16_t x, int16_t y, char* help, s_animation_header* pic, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound);
+    int16_t __cdecl Add_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Clipped_Hidden_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, const char* hotkey, int16_t sound);
 
-    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, char sound);
+    int16_t __cdecl Add_Irregular_Button_Field_(int16_t x, int16_t y, int16_t x_end, int16_t y_end, char* help, s_animation_header* pic, int16_t help_start, int16_t background_color, const char* hotkey, int8_t sound);
 
     int16_t __cdecl Add_Multi_Hot_Key_Field_(const char* help_text);
     int16_t __cdecl Check_Multi_Hot_Key_Fields_(int16_t hotkey);
@@ -176,8 +177,8 @@ namespace fields {
     void __cdecl Draw_Visible_Fields_();
 
     void __cdecl Draw_All_Fields_();
-    void __cdecl Set_Input_Delay_(uint16_t delay);
-    void __cdecl Set_Field_Outline_Color_(uint8_t color);
+    void __cdecl Set_Input_Delay_(int16_t delay);
+    void __cdecl Set_Field_Outline_Color_(uint16_t color);
 
     void __cdecl Draw_Visible_Fields_Back_();
 

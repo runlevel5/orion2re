@@ -460,32 +460,32 @@ void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset) {
     x_pos = x_offset + 2;
     y_base = (MOX::_fleet_box.field8_0xe - btn_height) + y_offset;
 
-    MOX::_moveable_box[2].close_btn = fields::Add_Clipped_Button_Field_(x_pos, y_base, s__00551100, close_seg, (void*)s__00551120, 40 /* 0x28 */);
+    MOX::_moveable_box[2].close_btn = fields::Add_Clipped_Button_Field_(x_pos, y_base, s__00551100, close_seg, s__00551120, 40 /* 0x28 */);
 
     stack_y_offset = btn_height;
 
     if (MOX::_fleet_box.outpost_btn_active != 0) {
-        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, s__00551100, outpost_seg, (void*)s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_outpost_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + btn_height, s__00551100, outpost_seg, s__00551100, 40 /* 0x28 */);
         stack_y_offset = btn_height * 2;
     }
 
     if (MOX::_fleet_box.colonize_btn_active != 0) {
-        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, colonize_seg, (void*)s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_colonize_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, colonize_seg, s__00551100, 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.engage_btn_active != 0) {
-        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, engage_seg, (void*)s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_engage_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, engage_seg, s__00551100, 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.transport_btn_active != 0) {
-        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, transport_seg, (void*)s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_transport_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, transport_seg, s__00551100, 40 /* 0x28 */);
         stack_y_offset += btn_height;
     }
 
     if (MOX::_fleet_box.attack_btn_active != 0) {
-        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, attack_seg, (void*)s__00551100, 40 /* 0x28 */);
+        MOX::_fleet_box_attack_button = fields::Add_Clipped_Button_Field_(x_pos, y_base + stack_y_offset, s__00551100, attack_seg, s__00551100, 40 /* 0x28 */);
     }
 }
 
