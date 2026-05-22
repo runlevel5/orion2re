@@ -151,7 +151,7 @@ namespace NETMOX {
 
     void __cdecl Net_Cancel_Human_Diplomacy_Request_();
 
-    int32_t __cdecl Net_Diplomacy_With_(int16_t limit);
+    int32_t __cdecl Net_Diplomacy_With_();
 
     void __cdecl Human_Abdicates_(int player_idx);
 

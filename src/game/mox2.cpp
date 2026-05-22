@@ -231,7 +231,7 @@ namespace MOX2 {
         MOX::_previous_screen = SCREEN_UNKNOWN;
         MOX::_max_debug_saves = 20;
         MOX::_first_debug_save = 20;
-        MOX2::_user_wants_n_space_monsters = 0xFF;
+        MOX2::_user_wants_n_space_monsters = -1;
         MOX::_debug_saves_on = 1;
         MOX::_turns_between_debug_saves = 1;
 

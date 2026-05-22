@@ -97,7 +97,7 @@ void* __cdecl Farload_(char* file_name, int param_2) {
 }
 
     void* __cdecl Farload_Library_Data_(const char* fname, int32_t idx, void* out, int16_t alloc_type, uint32_t start_idx, uint16_t count, uint16_t expected_element_size) {
-        char full_path[64];
+        char full_path[60];
 
         if (idx < 0) {
             Error_Handler_(fname, 4, idx);
@@ -151,10 +151,6 @@ void* __cdecl Farload_(char* file_name, int param_2) {
 
         fread(&total_count, 2, 1, _farload_fptr);
         fread(&element_size, 2, 1, _farload_fptr);
-
-        if (count == 0xFFFF) {
-            count = total_count - static_cast<uint16_t>(start_idx);
-        }
 
         if (total_count <= start_idx) {
             Error_Handler_(fname, 10, idx);
@@ -287,7 +283,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_
                 Error_Handler_(file_name, 1, entry_idx);
             }
 
-            char full_path[64];
+            char full_path[60];
             strcpy(full_path, _secondary_drive_path);
             strcat(full_path, _farload_file_name);
 
@@ -297,7 +293,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_
             }
         }
 
-        fread(&_lbx_header, sizeof(s_lbx_header), 1, _farload_fptr);
+        fread(&_lbx_header, 0x800, 1, _farload_fptr);
 
         if (_lbx_header.magic != 0xFEAD) {
             Error_Handler_(file_name, 7, entry_idx);
@@ -306,7 +302,7 @@ int16_t __cdecl Get_Farload_Data_Record_Count_(const char* file_name, int entry_
         _farload_file_flag = 1;
     }
 
-    if (static_cast<uint32_t>(_lbx_header.entry_count) <= static_cast<uint32_t>(entry_idx)) {
+    if ((int32_t)_lbx_header.entry_count <= entry_idx) {
         Error_Handler_(file_name, 8, entry_idx);
     }
 

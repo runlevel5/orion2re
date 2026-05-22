@@ -70,7 +70,7 @@ namespace NETMOX {
         MOX::_leaders[leader_idx].player_index = -1;
     }
 
-    int32_t __cdecl Net_Diplomacy_With_(int16_t limit) {
+    int32_t __cdecl Net_Diplomacy_With_() {
         return _net.diplomacy_target_id;
     }
 
@@ -227,22 +227,21 @@ namespace NETMOX {
 
     int32_t __cdecl Human_Requesting_Diplomacy_() {
         int32_t target_player_idx = -1;
-        uint32_t ready_count = 0;
+        int32_t ready_count = 0;
 
         if (_net.players_ready_mask[0] != 0) {
             for (int32_t i = 0; i < (int32_t)MOX::_NUM_PLAYERS; ++i) {
-                // Check if i-th bit is set in the first byte of the mask
-                if ((_net.players_ready_mask[0] >> i) & 1) {
-                    ready_count++;
-                    // Reservoir sampling: select current index with probability 1/ready_count
+                uint8_t ready_mask = _net.players_ready_mask[0];
+                if (((uint8_t)(ready_mask >> ((uint8_t)i & 0x1F)) & 1) != 0) {
+                    ++ready_count;
                     if (random::Random_(ready_count) == 1) {
                         target_player_idx = i;
                     }
                 }
             }
 
-            // Clear the bit of the selected player index
-            _net.players_ready_mask[0] &= ~(1 << (uint8_t)target_player_idx);
+            uint8_t mask = (uint8_t)~((uint8_t)(1u << ((uint8_t)target_player_idx & 0x1F)));
+            _net.players_ready_mask[0] &= mask;
         }
 
         return target_player_idx;

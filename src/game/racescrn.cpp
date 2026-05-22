@@ -547,13 +547,13 @@ namespace RACESCRN {
         if (RACESCRN::_net_state == 1) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
             strcpy(text_buffer, RACESCRN::_diplomacy_net_requeting_buffer);
-            race_idx = NETMOX::Net_Diplomacy_With_(100);
+            race_idx = NETMOX::Net_Diplomacy_With_();
             JIM::Decode_Text_Race_(text_buffer, (int16_t)race_idx, 100);
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xDA, 0x15E, text_buffer, 2);
         } else if (RACESCRN::_net_state == 2) {
             animate::Draw_(0x85, 0xBF, (s_animation_header*)RACESCRN::_netbox_seg);
             strcpy(text_buffer, RACESCRN::_diplomacy_net_wait_buffer);
-            race_idx = NETMOX::Net_Diplomacy_With_(100);
+            race_idx = NETMOX::Net_Diplomacy_With_();
             JIM::Decode_Text_Race2_(text_buffer, (int16_t)race_idx, 100);
             FMTPARA::Print_Formatted_Paragraph_(0x8F, 0xD1, 0x15E, text_buffer, 2);
         }
