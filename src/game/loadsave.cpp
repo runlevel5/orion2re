@@ -88,7 +88,7 @@ namespace LOADSAVE {
         } else if (type == 1) {
             video::Set_Refresh_Full_();
             _draw_game_popup_to_back = 1;
-            result = GENDRAW::Confirmation_Box_(message);
+            result = GENDRAW::Do_Confirmation_Box_(message);
             fields::Clear_Fields_();
             Restore_Game_Popup_();
         } else if (type == 3) {
@@ -306,13 +306,13 @@ namespace LOADSAVE {
         if (!from_menu) {
             EVANHELP::Set_Load_Game_Screen_Help_List_();
             fields::Clear_Fields_();
-            MOX::_global_var = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
+            MOX::_global_var_byte = static_cast<int8_t>(fields::Add_Hidden_Field_(0, 0, 639, 479, s__00551120, 41));
         }
 
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
         fields::Clear_Fields_();
         Add_Game_Popup_Fields_(&unused1, &unused2);
-        MOX::_global_var = 0;
+        MOX::_global_var_byte = 0;
 
         do {
             int16_t input_id = fields::Get_Input_();
@@ -325,7 +325,7 @@ namespace LOADSAVE {
                 }
             }
 
-            if (_game_popup_fields->screen_cancel_field_id + 256 == input_id || _game_popup_fields->btn_popup_load_id == input_id) {
+            if (_game_popup_fields->btn_popup_load_id == input_id) {
                 if (selected_slot == -1) {
                     if (MOX::_settings.active_save_slot > -1 && MOX::_settings.active_save_slot < 10) {
                         _draw_down = 1;
@@ -811,7 +811,7 @@ namespace LOADSAVE {
     }
 
     void __cdecl _Draw_Load_Save_Game_Popup_() {
-        void* popup_frame;
+        s_animation_header* popup_frame;
         if (MOX::_screen_data == 2) {
             popup_frame = _game_anims->pictures[0xB];
         } else {
@@ -820,14 +820,16 @@ namespace LOADSAVE {
 
         if (MOX::_current_screen == SCREEN_MAIN_MENU) {
             animate::Draw_(0, 0, (s_animation_header*)MAINMENU::_mainmenu_first_seg);
-            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, (s_animation_header*)popup_frame);
+            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, popup_frame);
             MOX::_FULL_DRAW_SCREEN_FLAG = 0;
         } else if (_print_data_to_bitmap == 0) {
             if (MOX::_FULL_DRAW_SCREEN_FLAG != 0) {
                 Restore_Main_Screen_();
                 MOX::_FULL_DRAW_SCREEN_FLAG = 0;
+                animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, popup_frame);
+            } else if (_print_data_to_bitmap == 0) {
+                animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, popup_frame);
             }
-            animate::Draw_(MOX::_popup_base_x, MOX::_popup_base_y, (s_animation_header*)popup_frame);
         }
 
         for (int i = 0; i < 10; ++i) {
@@ -846,7 +848,7 @@ namespace LOADSAVE {
                 y_icon = (i * 31) + 0x24;
             }
 
-            void* game_type_icon = nullptr;
+            s_animation_header* game_type_icon = 0;
             switch (_game_popup_fields->saved_game_types[i]) {
             case 0: game_type_icon = _game_anims->pictures[0x10]; break;
             case 1: game_type_icon = _game_anims->pictures[0x11]; break;
@@ -856,9 +858,9 @@ namespace LOADSAVE {
 
             if (game_type_icon) {
                 if (_print_data_to_bitmap == 0) {
-                    animate::Draw_(x_icon, y_icon, (s_animation_header*)game_type_icon);
+                    animate::Draw_(x_icon, y_icon, game_type_icon);
                 } else {
-                    bitmap::Add_Picture_To_Bitmap_(x_icon, y_icon, (s_animation_header*)game_type_icon, _bitmap);
+                    bitmap::Add_Picture_To_Bitmap_(x_icon, y_icon, game_type_icon, _bitmap);
                 }
             }
 
@@ -868,7 +870,7 @@ namespace LOADSAVE {
                 text_y = MOX::_popup_base_y + 0x18 + (i * 31);
                 if (MOX::_screen_data == 2) {
                     Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-                    s_colors* color = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+                    s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_active : &_game_popup_fields->color_normal;
                     fonts::Set_Font_Style_(2, color);
                     const char* desc = is_valid_slot ? MOX::_save_game_description[i].description : s_INVALID_STR;
                     fonts::Print_(text_x, text_y, desc);
@@ -877,7 +879,7 @@ namespace LOADSAVE {
                 text_x = 0x20;
                 text_y = (i * 31) + 0x18;
                 Get_Game_Popup_Colors_(2, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-                s_colors* color = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+                s_colors* color = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_active : &_game_popup_fields->color_normal;
                 fonts::Set_Font_Style_(2, color);
 
                 int16_t print_x = (MOX::_screen_data == 3) ? 0x24 : 0x20;
@@ -885,14 +887,14 @@ namespace LOADSAVE {
                     if (MOX::_save_game_description[i].description[0] != '\0') {
                         fonts::Print_To_Bitmap_(print_x, text_y, MOX::_save_game_description[i].description, _bitmap);
                     }
-                } else {
+                } else if (MOX::_save_game_description[i].description[0] != '\0') {
                     fonts::Print_To_Bitmap_(print_x, text_y, s_INVALID_STR, _bitmap);
                 }
             }
 
             // Print stardate and real-world date
             Get_Game_Popup_Colors_(1, &_game_popup_fields->color_normal, &_game_popup_fields->color_active);
-            s_colors* color_1 = (MOX::_settings.active_save_slot == static_cast<int8_t>(i)) ? &_game_popup_fields->color_normal : &_game_popup_fields->color_active;
+            s_colors* color_1 = (MOX::_settings.active_save_slot == (char)i) ? &_game_popup_fields->color_active : &_game_popup_fields->color_normal;
             fonts::Set_Font_Style_(1, color_1);
 
             if (MOX::_screen_data == 3) text_x += 2;

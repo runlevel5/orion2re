@@ -61,10 +61,10 @@ namespace AIPOWER {
                 case 13:
                 case 14:
                     return 0;
-                default:
-                    // Assembly at 0x00509451 returns uninitialized value from stack
-                    int16_t uninitialized_ret = 0;
-                    return uninitialized_ret;
+                default: {
+                    int16_t local_2;
+                    return local_2;
+                }
             }
         }
 
@@ -273,12 +273,12 @@ namespace AIPOWER {
         }
 
         if (MOX::_settings.strategic_combat_flag == 1) {
-            uint32_t base_strength = (uint32_t)MOX::_ship[ship_idx].d.size * (uint32_t)MOX::_ship[ship_idx].d.size * 10;
+            int32_t size = MOX::_ship[ship_idx].d.size;
+            uint32_t base_strength = (uint32_t)(size * size * 10);
             strengths[0] = base_strength;
 
             for (int i = 1; i < 4; ++i) {
-                // ceil(base_strength / (i + 1))
-                strengths[i] = (base_strength + i) / (i + 1);
+                strengths[i] = (base_strength + (uint32_t)i - 1) / (uint32_t)i;
             }
         } else {
             for (int i = 0; i < 8; ++i) {
@@ -484,14 +484,14 @@ namespace AIPOWER {
         int32_t weapon_space = DESIGN::Weapon_Space_(player_idx, weapon_idx, 1, 16 /* 0x10 */, 5, 0);
 
         // Calculate number of weapon mounts based on base space 300
-        int16_t capacity = 300 / (int16_t)weapon_space;
+        int16_t capacity = (int16_t)(300 / weapon_space);
 
         int16_t shield_val = AIPOWER::Get_Best_Ship_Shield_Value_(target_idx);
 
         // Calculate base damage per weapon mount minus shield reduction
         int32_t net_damage = (int32_t)TECHDATA::_weapons[weapon_idx].max_damage - (int32_t)shield_val;
 
-        if (net_damage < 0) {
+        if (net_damage <= 0) {
             net_damage = 0;
         }
 

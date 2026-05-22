@@ -16,7 +16,7 @@ namespace FIREPTS {
     }
 
     int16_t __cdecl N_Fire_Points_(int16_t param_1, int16_t param_2) {
-        int16_t result = 0; // BUG: Original code uses uninitialized stack memory if param_2 > 99
+        int16_t result; // BUG: Original code uses uninitialized stack memory if param_2 > 99
 
         if (param_2 <= 10 || BEAMS::_g_firing_reflected_beam_flag != 0) {
             result = 1;
@@ -37,7 +37,9 @@ namespace FIREPTS {
         return result;
     }
 
-    void __cdecl Calc_FP_Offsets_(int16_t* fp_x, int16_t* fp_y, int16_t weapon_id, int16_t shot_count, int16_t attacker_owner, int16_t attacker_ship_id, int16_t attacker_picture_num, int16_t attacker_facing_dir, int16_t target_bearing, int32_t fp_idx) {
+    void __cdecl Calc_FP_Offsets_(int16_t* fp_x, int16_t* fp_y, int16_t weapon_id, int16_t shot_count, int16_t attacker_owner, int16_t attacker_ship_id, int16_t attacker_picture_num, uint8_t attacker_facing_dir, uint8_t target_bearing, int16_t fp_idx) {
+        (void)attacker_ship_id;
+
         int16_t n_points = N_Fire_Points_(weapon_id, shot_count);
 
         if ((n_points % 2) == 1 && (n_points - static_cast<int16_t>(fp_idx)) == 1) {

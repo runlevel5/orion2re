@@ -1093,7 +1093,7 @@ struct s_colony {
     short just_produced;
     short production_spent;
     short n_industry_taxed;
-    char auto_building;
+    uint8_t auto_building;
     short production_surplus;
     short bought_outright;
     char occupation_points;
@@ -2589,7 +2589,7 @@ struct s_missile {
 typedef struct s_modem_settings s_modem_settings, *Ps_modem_settings;
 
 struct s_modem_settings {
-    uint32_t com_port_index;
+    int32_t com_port_index;
     uint32_t baud_rate;
     uint8_t parity;
     uint32_t data_bits;

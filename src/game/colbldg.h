@@ -55,7 +55,7 @@ namespace COLBLDG {
     inline int16_t& _colony_bldg_saved_screen = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EDC});
     inline int16_t& _scanned_prod = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571EFC});
     inline int16_t& _refitting_ship_n = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F00});
-    inline uint8_t& _colony_auto_building = *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00571F78});
+    inline int16_t& _colony_auto_building = *reinterpret_cast<int16_t*>(std::uintptr_t{0x00571F78});
     inline int16_t (&_fields)[11] = *reinterpret_cast<int16_t (*)[11]>(std::uintptr_t{0x00571F80});
     inline s_colors& _l_font_color_array =
         *reinterpret_cast<s_colors*>(std::uintptr_t{0x0055AB00});
@@ -121,7 +121,7 @@ namespace COLBLDG {
 
     void __cdecl Print_App_Description_(uint16_t x, int16_t y, uint16_t width, int16_t app_id);
 
-    void __cdecl Print_Setting_Description_(uint16_t x, int16_t y, uint16_t width, int16_t setting_id);
+    void __cdecl Print_Setting_Description_(int16_t x, int16_t y, int16_t width, int16_t setting_id);
 
     void __cdecl Draw_Ship_Design_Info_(int16_t id);
 
@@ -149,7 +149,7 @@ namespace COLBLDG {
     void __cdecl Squish_Out_Queue_Slot_(int16_t slot_idx);
     void __cdecl Do_Draw_Build_Queue_();
     void __cdecl Do_Exit_Screen_Cleanup_();
-    void __cdecl Remove_Ships_(int32_t flag);
+    void __cdecl Remove_Ships_(int8_t flag);
     int16_t __cdecl First_Prod_Queue_Slot_(int16_t prod_idx);
     void __cdecl Delete_From_Queue_(int16_t slot_idx);
     int8_t __cdecl Add_To_Queue_(int16_t prod_idx);

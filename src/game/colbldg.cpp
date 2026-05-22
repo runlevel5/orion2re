@@ -108,9 +108,9 @@ namespace COLBLDG {
         _n_building_indexes = 2;
 
         for (int16_t building_id = 1; building_id < BUILDING_COUNT; ++building_id) {
-            bool can_build = COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], building_id);
+            uint8_t can_build = COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], building_id);
 
-            if ((((_n_building_indexes <= 54) && can_build) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
+            if ((((_n_building_indexes <= 54) && can_build == 1) || COLONY::_cheats) && building_id != BUILDING_COLONY_BASE) {
                 int16_t current_index = _n_building_indexes;
                 _n_building_indexes++;
                 _building_indexes[current_index] = building_id;
@@ -304,7 +304,7 @@ namespace COLBLDG {
         _fields[9] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(140));
         _fields[10] = fields::Add_Hot_Key_(ESTRINGS::E_Strings_(193));
 
-        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], (int16_t*)&_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
+        _fields[2] = fields::Add_Radio_Button_Field_(490, 342, ESTRINGS::E_Strings_(12), _anims[2], &_colony_auto_building, ESTRINGS::E_Strings_(12), 41);
 
         if (MOX::_settings.strategic_combat_flag != 0) {
             _fields[4] = -1000;
@@ -424,7 +424,7 @@ namespace COLBLDG {
         COLBLDG::Build_Arrays_();
 
         if (COLBLDG::_return_to_build_popup_from_custom_design == 0) {
-            COLBLDG::_colony_auto_building = static_cast<uint8_t>(MOX::_colony[colony_idx].auto_building);
+            COLBLDG::_colony_auto_building = MOX::_colony[colony_idx].auto_building;
         }
 
         COLONY::Make_Bldg_Array_For_Colony_(COLONY::_colony_handle, 0);
@@ -551,9 +551,8 @@ namespace COLBLDG {
                 s_colony* colony = &MOX::_colony[COLONY::_colony_handle];
 
                 if (colony->buildings[40] == 0 && colony->buildings[41] == 0 && colony->buildings[8] == 0) {
-                    int design_idx = -(mil_idx + 50);
-                    // TODO: This does not seem to be correct check
-                    if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size < 2) {
+                    int design_idx = -50 - mil_idx;
+                    if (MOX::_player[MOX::_PLAYER_NUM].ship_designs[design_idx].size >= 2) {
                         if (_field_mode != 1) {
                             use_dimmed_font = true;
                         }
@@ -580,10 +579,8 @@ namespace COLBLDG {
             if (!use_dimmed_font) {
                 if (mil_idx == -11 || mil_idx == -12 || mil_idx == -13 || mil_idx == -17 || mil_idx == -16) {
                     if (Auto_Design_Type_(mil_idx) == 0) {
-                        if (mil_idx == -16) {
-                            if (!COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
-                                use_dimmed_font = true;
-                            }
+                        if (mil_idx != -16 || !COLCALC::Colony_Can_Build_Product_(&MOX::_colony[COLONY::_colony_handle], -55)) {
+                            use_dimmed_font = true;
                         }
                     }
                 }
@@ -765,7 +762,7 @@ namespace COLBLDG {
 
     void __cdecl Draw_Current_Selection_() {
         int16_t y_line_count = 0;
-        char buffer[480];
+        char buffer[500];
         int16_t item_id = (_scanned_prod != -1) ? _scanned_prod : _current_item[0];
 
         switch (item_id) {
@@ -906,6 +903,9 @@ namespace COLBLDG {
                 Print_Setting_Description_(209, 119, 248, 12 /* 0xC */);
                 break;
             }
+            case -1:
+            case 0:
+                return;
             default: {
                 if (item_id > 0 && item_id < 49 /* 0x31 */) {
                     Draw_Building_Info_(item_id);
@@ -919,7 +919,7 @@ namespace COLBLDG {
                     Draw_Ship_Design_Info_(item_id);
                     return;
                 }
-                RUSS::PFMT_(0, 0, ESTRINGS::E_Strings_(248 /* 0xF8 */));
+                RUSS::PFMT_(0, 0, ESTRINGS::E_Strings_(248 /* 0xF8 */), item_id);
                 assert::hgetch_();
                 break;
             }
@@ -991,7 +991,7 @@ namespace COLBLDG {
     /**
      * @address 0050dc10
      */
-    void __cdecl Print_Setting_Description_(uint16_t x, int16_t y, uint16_t width, int16_t setting_id) {
+    void __cdecl Print_Setting_Description_(int16_t x, int16_t y, int16_t width, int16_t setting_id) {
         fonts::Set_Font_Style_Shadow_Down_(3, &_l_font_color_array);
         fonts::Set_Font_Spacing_(1);
         fonts::Set_Font_Spacing_Width_(2);
@@ -1388,7 +1388,7 @@ namespace COLBLDG {
         if (_fields[3] == input_field) {
             _field_mode = 0;
             COLONY::Reset_Mouse_Picture_();
-            MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+            MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
 
             if (Something_Behind_Settting_() == 0) {
                 Do_Exit_Screen_Cleanup_();
@@ -1518,7 +1518,7 @@ namespace COLBLDG {
                 int16_t next_colony = COLONY::Get_Next_Colony_(COLONY::_colony_handle, 0);
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 if (next_colony != COLONY::_colony_handle) {
                     COLONY::Set_Colony_Screen_To_New_Colony_(next_colony);
@@ -1531,7 +1531,7 @@ namespace COLBLDG {
                 }
                 _field_mode = 0;
                 COLONY::Reset_Mouse_Picture_();
-                MOX::_colony[COLONY::_colony_handle].auto_building = (char)_colony_auto_building;
+                MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)_colony_auto_building;
                 Do_Exit_Screen_Cleanup_();
                 COLONY::_full_draw = 1;
             } else if (_fields[7] == input_field) {
@@ -1944,7 +1944,7 @@ namespace COLBLDG {
             uint8_t pops = MOX::_colony[COLONY::_colony_handle].n_pops;
             int16_t max_pop = COLCALC::Planet_Max_Population_For_Player_(&MOX::_planet[planet_idx], MOX::_PLAYER_NUM);
             
-            if ((n_terra + n_rad + n_grav + pops + 1) > max_pop) {
+            if ((n_terra + n_rad + n_grav + pops + 1) >= max_pop) {
                 if (GENDRAW::Do_Confirmation_Box_(ESTRINGS::E_Strings_(0x208))) {
                     add_to_queue = true;
                 }
@@ -1976,7 +1976,7 @@ namespace COLBLDG {
                 } else {
                     MOX::_temp_star_handle = 4;
                     COLBLDG::_return_to_build_popup_from_custom_design = 1;
-                    MOX::_colony[COLONY::_colony_handle].auto_building = COLBLDG::_colony_auto_building;
+                    MOX::_colony[COLONY::_colony_handle].auto_building = (uint8_t)COLBLDG::_colony_auto_building;
                     return 1;
                 }
             }
@@ -2157,13 +2157,13 @@ namespace COLBLDG {
         }
     }
 
-    void __cdecl Remove_Ships_(int32_t flag) {
+    void __cdecl Remove_Ships_(int8_t flag) {
         for (int16_t i = 0; i < 7; ++i) {
             int16_t prod;
             if (flag == 0) {
                 prod = _current_item[i];
                 if (prod <= -100) {
-                    if (First_Prod_Colony_Queue_Slot_(static_cast<int16_t>(COLONY::_colony_handle), prod) == -1) {
+                    if (First_Prod_Colony_Queue_Slot_(COLONY::_colony_handle, prod) == -1) {
                         int16_t ship_idx = -100 - prod;
                         int16_t officer_idx = MOX::_ship[ship_idx].officer_index;
                         if (officer_idx != -1) {

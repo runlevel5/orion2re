@@ -165,7 +165,7 @@ namespace MULTPLAY {
 
         if (MOX::_mp_screen->bg_height == 0) {
             fields::_active_input_field_number = MOX::_mp_screen->player_field_ids[0];
-            fields::_continuous_string = 0;
+            fields::_continuous_string[0] = '\0';
             fields::_cursor_position = 0;
             fields::_input_field_active = 1;
             fields::_active_input_field_first = 1;
@@ -179,7 +179,7 @@ namespace MULTPLAY {
                 CHAT::Send_Chat_Msg_(MULTPLAY::_global_chat_string);
                 fields::_cursor_position = 0;
                 fields::_cursor_on = 0;
-                fields::_continuous_string = 0;
+                fields::_continuous_string[0] = '\0';
                 MULTPLAY::_global_chat_string[0] = '\0';
             }
             fields::_input_field_active = 1;
@@ -431,7 +431,11 @@ namespace MULTPLAY {
                 else {
                     if (MOX::_settings.net_game_name[0] == '\0') {
                         memcpy(MOX::_settings.net_game_name, s_Moo_II_0055aa88, 8);
-                        MOX::_settings.net_game_name[6] = (char)((abs((long)clock()) & 0x1F) + 'a');
+                        int32_t v = (int32_t)clock();
+                        int32_t s = v >> 31;
+                        v = ((v ^ s) - s) & 0x1F;
+                        v = (v ^ s) - s;
+                        MOX::_settings.net_game_name[6] = (char)(v + 'a');
                     }
                     MOX::_current_screen = 0xD;
                     done = true;
@@ -626,12 +630,9 @@ namespace MULTPLAY {
 
         MOX::_settings.modem_settings.com_port_index = NETMOX::_net.modem_settings.com_port_index;
         MOX::_settings.modem_settings.baud_rate = NETMOX::_net.modem_settings.baud_rate;
-        MOX::_settings.modem_settings.parity = NETMOX::_net.modem_settings.parity;
-
-        MOX::_settings.modem_settings.data_bits = NETMOX::_net.modem_settings.data_bits;
-
-        reinterpret_cast<uint8_t*>(&MOX::_settings.modem_settings.serial_cfg_ext)[3] = 
-            reinterpret_cast<uint8_t*>(&NETMOX::_net.modem_settings.serial_cfg_ext)[3];
+        memcpy(&MOX::_settings.modem_settings.parity,
+            &NETMOX::_net.modem_settings.parity,
+            9);
 
         FILEDEF::Save_Game_Settings_();
     }
@@ -673,13 +674,9 @@ namespace MULTPLAY {
         NETMOX::_net.modem_settings.com_port_index = MOX::_settings.modem_settings.com_port_index;
         NETMOX::_net.modem_settings.baud_rate = MOX::_settings.modem_settings.baud_rate;
 
-        *reinterpret_cast<uint32_t*>(&NETMOX::_net.modem_settings.parity) =
-            *reinterpret_cast<uint32_t*>(&MOX::_settings.modem_settings.parity);
-
-        NETMOX::_net.modem_settings.data_bits = MOX::_settings.modem_settings.data_bits;
-
-        *reinterpret_cast<uint8_t*>(&NETMOX::_net.modem_settings.serial_cfg_ext) =
-            *reinterpret_cast<uint8_t*>(&MOX::_settings.modem_settings.serial_cfg_ext);
+        memcpy(&NETMOX::_net.modem_settings.parity,
+            &MOX::_settings.modem_settings.parity,
+            9);
 
         if ((int32_t)NETMOX::_net.modem_settings.com_port_index < 0 || (int32_t)NETMOX::_net.modem_settings.com_port_index > 7) {
             NETMOX::_net.modem_settings.com_port_index = 1;
@@ -995,20 +992,7 @@ void __cdecl Load_Modem_Setup_Screen_(void) {
         // This copies 131 bytes starting from cmd_reset, which likely includes the init string.
         memcpy(NETMOX::_net.modem_settings.cmd_reset, MOX::_settings.modem_settings.cmd_reset, 131);
 
-        // Sync the leading fields of the modem configuration manually
-        auto& src = MOX::_settings.modem_settings;
-        auto& dst = NETMOX::_net.modem_settings;
-
-        dst.com_port_index = src.com_port_index;
-        dst.baud_rate = src.baud_rate;
-        dst.parity = src.parity;
-
-        // Copy data bits and serial configuration extension manually (offsets 0xC and 0x10)
-        *reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(&dst) + 0x0C) = 
-            *reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(&src) + 0x0C);
-        
-        *reinterpret_cast<uint8_t*>(reinterpret_cast<uint8_t*>(&dst) + 0x10) = 
-            *reinterpret_cast<uint8_t*>(reinterpret_cast<uint8_t*>(&src) + 0x10);
+        memcpy(&NETMOX::_net.modem_settings, &MOX::_settings.modem_settings, 17);
     }
 
     void __cdecl Modem_Setup_Screen_() {
