@@ -144,7 +144,7 @@ namespace FLEETPOP {
 
     void __cdecl Add_Added_Buttons_(int16_t x_offset, int16_t y_offset);
 
-    void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag);
+    void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag);
 
     void __cdecl Draw_Fleet_Movement_Box_();
 }

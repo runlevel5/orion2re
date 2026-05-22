@@ -65,15 +65,15 @@ namespace MOVEBOX {
                 int8_t owner = MOX::_star[i].owner;
                 uint16_t color_idx;
 
-                if (MOX::_star[i].pict_type == STAR_CLASS_BLACK_HOLE) {
+                if (MOX::_star[i].spectral_class == STAR_CLASS_BLACK_HOLE) {
                     color_idx = COLONY::_using_colony_screen_palette ? 9 : 10;
-                } else if (MOX::_star[i].pict_type == STAR_CLASS_DWARF) {
+                } else if (MOX::_star[i].spectral_class == STAR_CLASS_DWARF) {
                     color_idx = 8;
                 } else if (owner < 0 || owner > 7) {
                     if (HAROLD::Player_Has_Visited_(MOX::_PLAYER_NUM, i) || owner == -1 || owner == -2) {
                         color_idx = 8;
                     } else {
-                        color_idx = font_colors.colors[0];
+                        color_idx = 0;
                     }
                 } else {
                     color_idx = (uint8_t)MOX::_player[owner].color;

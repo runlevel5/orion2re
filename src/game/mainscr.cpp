@@ -1222,7 +1222,7 @@ namespace MAINSCR {
                     if (node_ptr == -1) {
                         MOVEBOX::Vanish_Fleet_Movement_Box_();
                     } else {
-                        int32_t flag = (MOX::_moveable_box[2].active < 1) ? 1 : 0;
+                        int16_t flag = (MOX::_moveable_box[2].active == 0) ? 1 : 0;
                         FLEETPOP::Add_Fleet_Movement_Box_Fields_(node_ptr, flag);
                     }
                 }
@@ -3772,7 +3772,7 @@ namespace MAINSCR {
             break;
         }
         case 0x15: {
-            NETMOX::Decode_Battle_Results_(data, len);
+            NETMOX::Decode_Battle_Results_(data);
             break;
         }
         case 0x16:

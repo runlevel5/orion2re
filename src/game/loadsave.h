@@ -114,7 +114,7 @@ namespace LOADSAVE {
 
     void __cdecl Embed_Special_Color_Codes_(char* str, int16_t max_len);
 
-    void __cdecl Remove_Embedded_Special_Codes_(char* text, int max_len = 37);
+    void __cdecl Remove_Embedded_Special_Codes_(char* text);
 
     void __cdecl Draw_Popup_Pic1_();
     void __cdecl Draw_Popup_Pic2_();

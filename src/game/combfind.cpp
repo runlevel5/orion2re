@@ -489,7 +489,7 @@ void __cdecl Client_Combat_Loop_() {
             while (NETMOX::_net.received_chunk_count < NETMOX::_net.total_chunk_count) {
                 RUSS::Mox_Update_();
             }
-            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr, NETMOX::_net.total_bytes_received);
+            NETMOX::Decode_Battle_Results_(NETMOX::_net.network_data_ptr);
             NETMOX::_net.network_data_ptr = nullptr;
             allocate::Pop_Block_(MOX::_screen_seg);
             NETMOX::_net.total_chunk_count = 0;

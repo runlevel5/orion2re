@@ -123,7 +123,7 @@ namespace NETMOX {
 
     inline char* net_field_1be = reinterpret_cast<char*>(std::uintptr_t{0x0059532E});
 
-    void __cdecl Net_Request_AI_Diplomacy_(int16_t player_idx);
+    void __cdecl Net_Request_AI_Diplomacy_(uint8_t player_idx);
 
     int8_t __cdecl Net_May_Begin_AI_Diplomacy_();
 
@@ -163,7 +163,7 @@ namespace NETMOX {
 
     void __cdecl Decode_You_Are_Target_Info_(void* packet_data, uint32_t len);
 
-    void __cdecl Decode_Battle_Results_(void* packet_data, uint32_t len);
+    void __cdecl Decode_Battle_Results_(void* packet_data);
 
     void __cdecl Decode_Pick_Your_Position_(s_net_pack_pick_your_position* param_1);
 

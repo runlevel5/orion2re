@@ -181,13 +181,12 @@ namespace NETMOX {
         return false;
     }
 
-    void __cdecl Net_Request_AI_Diplomacy_(int16_t player_idx) {
+    void __cdecl Net_Request_AI_Diplomacy_(uint8_t player_idx) {
         _net.sync_state = 0x25;
-        _net.diplomacy_target_id = (int8_t)player_idx;
+        _net.diplomacy_target_id = player_idx;
 
         if (_net.host_election_winner_id != -1) {
-            int8_t target_id = (int8_t)player_idx;
-            Mox_Send_Message_(_net.host_election_winner_id, 5, &target_id, 1);
+            Mox_Send_Message_(_net.host_election_winner_id, 5, &player_idx, 1);
         }
     }
 
@@ -396,10 +395,12 @@ namespace NETMOX {
 
         packet->num_players = MOX::_NUM_PLAYERS;
 
-        // Copy the current player list into the network packet
-        memcpy(packet->players, MOX::_player, (uint32_t)MOX::_NUM_PLAYERS * sizeof(s_player));
+        int32_t num_players = MOX::_NUM_PLAYERS;
 
-        uint32_t msg_size = sizeof(s_net_pack_pick_your_position);
+        // Copy the current player list into the network packet
+        memcpy(packet->players, MOX::_player, num_players * (int32_t)sizeof(s_player));
+
+        uint16_t msg_size = (uint16_t)(2 + num_players * (int32_t)sizeof(s_player));
         NETMOX::Mox_Send_Message_(network_player_id, 32 /* MSG_TYPE_PICK_YOUR_POSITION */, packet, (uint16_t)msg_size);
 
         allocate::Pop_Block_(MOX::_screen_seg);
@@ -1597,16 +1598,16 @@ namespace NETMOX {
                     already_talking = true;
                 }
                 else {
-                    // Determine diplomacy weight based on traits
-                    // traits[20] = Charismatic, traits[19] = Repulsive
+                    // Preserve assembly logic exactly:
+                    // traits[20] != 0 => 3, else traits[19] == 0 => 2, else 1
                     if (MOX::_player[i].traits[20] != 0) {
                         weights[i] = 3;
                     }
-                    else if (MOX::_player[i].traits[19] != 0) {
-                        weights[i] = 2;
-                    }
                     else {
                         weights[i] = 1;
+                        if (MOX::_player[i].traits[19] == 0) {
+                            weights[i] = 2;
+                        }
                     }
 
                     if (max_weight < weights[i]) {
@@ -1892,7 +1893,7 @@ namespace NETMOX {
         memcpy(MOX::_player, param_1->players, param_1->num_players * sizeof(s_player));
     }
 
-    void __cdecl Decode_Battle_Results_(void* packet_data, uint32_t len) {
+    void __cdecl Decode_Battle_Results_(void* packet_data) {
         uint8_t* ptr = static_cast<uint8_t*>(packet_data);
 
         // 1. Read Header
@@ -1906,7 +1907,7 @@ namespace NETMOX {
         ptr += sizeof(int16_t);
 
         int8_t combat_status = *reinterpret_cast<int8_t*>(ptr);
-        ptr += sizeof(int8_t);
+        ptr += sizeof(int16_t);
 
         NETMOX::_net.player_net_info[attacker_id].combat_status = combat_status;
         NETMOX::_net.player_net_info[defender_id].combat_status = combat_status;
@@ -1930,6 +1931,8 @@ namespace NETMOX {
                 ptr += sizeof(int16_t);
 
                 COMBFIND::Decode_Star_Player_Presence_(&ptr, combat_star_id);
+
+                ptr += sizeof(int16_t);
 
                 int16_t combat_planet_idx = *reinterpret_cast<int16_t*>(ptr);
                 ptr += sizeof(int16_t);
@@ -2011,6 +2014,7 @@ namespace NETMOX {
                     ptr += sizeof(int16_t);
 
                     if (surviving_ship_id == -1) {
+                        RUSS::Mox_Update_();
                         break;
                     }
 

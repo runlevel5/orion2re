@@ -388,7 +388,7 @@ namespace LOADSAVE {
         } while (exit_loop == 0);
 
         for (int i = 0; i < 10; ++i) {
-            Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description, 37);
+            Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
         }
 
         return load_success;
@@ -406,13 +406,13 @@ namespace LOADSAVE {
         EVANHELP::Set_Options_Game_Screen_Help_List_();
         fields::Clear_Fields_();
         int16_t hidden_field = fields::Add_Hidden_Field_(0, 0, 0x27F, 0x1DF, s__00551120, 0x29);
-        MOX::_global_var = hidden_field;
+        MOX::_global_var_byte = (int8_t)hidden_field;
 
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Options_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&dummy_x, &dummy_y);
 
-        MOX::_global_var = 0;
+        MOX::_global_var_byte = 0;
 
         while (true) {
             int16_t input = fields::Get_Input_();
@@ -454,44 +454,40 @@ namespace LOADSAVE {
      * @address 00511530
      */
     void __cdecl Do_Save_Game_Popup_(int16_t* out_should_close) {
-        char temp_buffer[36];
+        char temp_buffer[37];
         int16_t sStack_6c, sStack_6a;
+        int16_t exit_popup = 0;
         bool saved_successfully = false;
-        bool confirm_save = false;
-        bool trigger_save = false;
         int16_t active_slot_idx = -1;
 
-        const char* msg = HAROLD::H_Message_(0x184); // "Empty Slot" message
-        // Inline strcpy for _empty_save_slot_message
-        {
-            char* dst = _empty_save_slot_message;
-            const char* src = msg;
-            while ((*dst++ = *src++) != '\0');
-        }
+        strcpy(_empty_save_slot_message, HAROLD::H_Message_(0x184));
 
         Load_Month_Names_();
         EVANHELP::Set_Save_Game_Screen_Help_List_();
         fields::Clear_Fields_();
 
-        MOX::_global_var = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
+        *reinterpret_cast<int8_t*>(&MOX::_global_var) = (int8_t)fields::Add_Hidden_Field_(0, 0, 0x27f, 0x1df, s__00551120, 0x29);
         fields::Clear_Fields_();
         fields::Assign_Auto_Function_(_Draw_Load_Save_Game_Popup_, 1);
         Add_Game_Popup_Fields_(&sStack_6c, &sStack_6a);
-        MOX::_global_var = 0;
+        *reinterpret_cast<int8_t*>(&MOX::_global_var) = 0;
 
-        bool exit_popup = false;
         do {
+            bool copy_continuous_string = false;
+            bool trigger_save = false;
             int16_t input_id = fields::Get_Input_();
+
             if (input_id != 0) {
                 for (int16_t i = 0; i < 10; ++i) {
                     if (input_id == _game_popup_fields->saved_game_fields[i]) {
                         if (active_slot_idx == i) {
-                            confirm_save = true;
+                            copy_continuous_string = true;
                             trigger_save = true;
                         }
                         active_slot_idx = i;
                         break;
                     }
+
                     if (input_id == _game_popup_fields->save_slot_fields[i]) {
                         if (active_slot_idx == i) {
                             trigger_save = true;
@@ -502,14 +498,9 @@ namespace LOADSAVE {
                         fields::_cursor_position = 0;
                         fields::_cursor_on = 0;
                         fields::_active_input_field_number = _game_popup_fields->saved_game_fields[i];
-                        
-                        // Inline strcpy to fields::_continuous_string
-                        {
-                            char* dst = reinterpret_cast<char*>(&fields::_continuous_string);
-                            char* src = MOX::_save_game_description[i].description;
-                            while ((*dst++ = *src++) != '\0');
-                        }
-                        
+
+                        strcpy(fields::_continuous_string, MOX::_save_game_description[i].description);
+
                         fields::_active_input_field_first = 1;
                         active_slot_idx = i;
                         break;
@@ -517,10 +508,11 @@ namespace LOADSAVE {
                 }
             }
 
-            if (input_id == _game_popup_fields->btn_main_save_id) { // Save button / Space
+            if (input_id == _game_popup_fields->btn_popup_save_id) {
                 if (active_slot_idx < 0 || active_slot_idx >= 10) {
-                    if (MOX::_settings.active_save_slot > -1 && MOX::_settings.active_save_slot < 10) {
-                        active_slot_idx = (int16_t)MOX::_settings.active_save_slot;
+                    int8_t save_slot = MOX::_settings.active_save_slot;
+                    if (save_slot >= 0 && save_slot < 10) {
+                        active_slot_idx = save_slot;
                         trigger_save = true;
                     }
                 } else {
@@ -529,54 +521,21 @@ namespace LOADSAVE {
             }
 
             if (trigger_save && active_slot_idx >= 0 && active_slot_idx < 10) {
-                trigger_save = false;
                 MOX::_settings.active_save_slot = static_cast<int8_t>(active_slot_idx);
                 char* target_desc = MOX::_save_game_description[active_slot_idx].description;
 
-                bool is_empty = (target_desc[0] == '\0');
-                if (!is_empty) {
-                    // Manual strcmp logic with _empty_save_slot_message
-                    const char* empty_msg = _empty_save_slot_message;
-                    char* ptr1 = target_desc;
-                    const char* ptr2 = empty_msg;
-                    int diff = 0;
-                    while (true) {
-                        if (*ptr1 != *ptr2) {
-                            diff = (*ptr1 < *ptr2) ? -1 : 1;
-                            break;
-                        }
-                        if (*ptr1 == '\0') break;
-                        if (ptr1[1] != ptr2[1]) {
-                            diff = (ptr1[1] < ptr2[1]) ? -1 : 1;
-                            break;
-                        }
-                        ptr1 += 2; ptr2 += 2;
-                        if (ptr1[-1] == '\0') break;
-                    }
-                    if (diff == 0) is_empty = true;
-                }
-
-                if (is_empty) {
+                if (target_desc[0] == '\0' || strcmp(target_desc, _empty_save_slot_message) == 0) {
                     int16_t colonies = COLXPORT::N_Colonies_(MOX::_PLAYER_NUM);
                     s_player* plr = &MOX::_player[MOX::_PLAYER_NUM];
                     const char* colony_str = HAROLD::H_Message_(colonies == 1 ? 0xbc : 0xbd);
-                    
+
                     sprintf(temp_buffer, s_format_0055ad30, plr->name, plr->race_name, (int)colonies, colony_str);
-                    
-                    // Length check (max 36 chars)
-                    int len = 0;
-                    while (temp_buffer[len] != '\0') len++;
-                    if (len > 0x24) temp_buffer[0x24] = '\0';
-                    
-                    // strcpy result to target_desc
-                    char* src = temp_buffer;
-                    char* dst = target_desc;
-                    while ((*dst++ = *src++) != '\0');
-                } else if (confirm_save) {
-                    // strcpy from fields::_continuous_string to target_desc
-                    char* src = reinterpret_cast<char*>(&fields::_continuous_string);
-                    char* dst = target_desc;
-                    while ((*dst++ = *src++) != '\0');
+                    if (strlen(temp_buffer) >= 0x25) {
+                        temp_buffer[0x24] = '\0';
+                    }
+                    strcpy(target_desc, temp_buffer);
+                } else if (copy_continuous_string) {
+                    strcpy(target_desc, fields::_continuous_string);
                 }
 
                 FILEDEF::Save_Game_(active_slot_idx);
@@ -584,25 +543,27 @@ namespace LOADSAVE {
                 saved_successfully = true;
                 Get_Save_Game_Date_Strings_((char*)MOX::_save_game_dates);
                 Get_Star_Date_Strings_(_game_popup_fields->slot_occupied_flags, (char*)MOX::_save_game_stardates);
-                exit_popup = true;
+                exit_popup = 1;
                 *out_should_close = 1;
             }
 
-            if (input_id == _game_popup_fields->btn_main_options_id || (input_id < 0 && (active_slot_idx = -input_id) >= 0)) {
-                // Potential check against popup field range omitted for clarity as per decompiler
+            if (input_id == _game_popup_fields->btn_popup_close_id ||
+                (input_id < 0 &&
+                 _game_popup_fields->saved_game_fields[0] <= -(int)input_id &&
+                 -(int)input_id <= _game_popup_fields->saved_game_fields[9])) {
                 MOX::_screen_data = 0;
-                exit_popup = true;
-            } else if (input_id == _game_popup_fields->btn_main_close_id) {
-                exit_popup = true;
+                exit_popup = 1;
+            } else if (input_id == _game_popup_fields->screen_cancel_field_id) {
+                exit_popup = 1;
                 *out_should_close = 1;
             }
 
-            if (!exit_popup) {
+            if (exit_popup == 0) {
                 video::Set_Page_Off_();
                 _Draw_Load_Save_Game_Popup_();
                 RUSS::Mox_Sync_Update_();
             }
-        } while (!exit_popup);
+        } while (exit_popup == 0);
 
         for (int i = 0; i < 10; ++i) {
             Remove_Embedded_Special_Codes_(MOX::_save_game_description[i].description);
@@ -1127,19 +1088,19 @@ namespace LOADSAVE {
     void __cdecl Update_Game_Settings_() {
         s_game_popup_fields* fields = LOADSAVE::_game_popup_fields;
 
-        MOX::_settings.end_of_turn_summary = static_cast<int8_t>(fields->options[0]);
-        MOX::_settings.end_of_turn_wait = static_cast<int8_t>(fields->options[1]);
-        MOX::_settings.enemy_moves = static_cast<int8_t>(fields->options[2]);
-        MOX::_settings.expanding_help = static_cast<int8_t>(fields->options[3]);
-        MOX::_settings.auto_select_ships = static_cast<int8_t>(fields->options[4]);
-        MOX::_settings.animations_on = static_cast<int8_t>(fields->options[5]);
-        MOX::_settings.auto_select_colony = static_cast<int8_t>(fields->options[6]);
-        MOX::_settings.show_relocation_lines = static_cast<int8_t>(fields->options[7]);
-        MOX::_settings.show_gnn_report = static_cast<int8_t>(fields->options[8]);
-        MOX::_settings.auto_delete_tg_housing = static_cast<int8_t>(fields->options[9]);
-        MOX::_settings.auto_saves = static_cast<int8_t>(fields->options[10]);
-        MOX::_settings.only_show_serious_turn_summary_reports = static_cast<int8_t>(fields->options[11]);
-        MOX::_settings.ship_initiative = static_cast<int8_t>(fields->options[12]);
+        MOX::_settings.end_of_turn_summary = (uint8_t)fields->options[0];
+        MOX::_settings.end_of_turn_wait = (uint8_t)fields->options[1];
+        MOX::_settings.enemy_moves = (uint8_t)fields->options[2];
+        MOX::_settings.expanding_help = (uint8_t)fields->options[3];
+        MOX::_settings.auto_select_ships = (uint8_t)fields->options[4];
+        MOX::_settings.animations_on = (uint8_t)fields->options[5];
+        MOX::_settings.auto_select_colony = (uint8_t)fields->options[6];
+        MOX::_settings.show_relocation_lines = (uint8_t)fields->options[7];
+        MOX::_settings.show_gnn_report = (uint8_t)fields->options[8];
+        MOX::_settings.auto_delete_tg_housing = (uint8_t)fields->options[9];
+        MOX::_settings.auto_saves = (uint8_t)fields->options[10];
+        MOX::_settings.only_show_serious_turn_summary_reports = (uint8_t)fields->options[11];
+        MOX::_settings.ship_initiative = (uint8_t)fields->options[12];
 
         MOX::_settings.language = (uint8_t)fields->language;
 
@@ -1157,30 +1118,30 @@ namespace LOADSAVE {
         _game_popup_fields->music_level = (int16_t)(((int32_t)MOX::_settings.music_level * 155) / 100);
         _game_popup_fields->sound_fx_level = (int16_t)(((int32_t)MOX::_settings.sound_fx_level * 155) / 100);
 
-        _game_popup_fields->music_on = (int16_t)MOX::_settings.music_on;
-        _game_popup_fields->sound_fx_on = (uint16_t)MOX::_settings.sound_fx_on;
+        _game_popup_fields->music_on = MOX::_settings.music_on;
+        _game_popup_fields->sound_fx_on = MOX::_settings.sound_fx_on;
 
-        _game_popup_fields->options[0] = (uint16_t)MOX::_settings.end_of_turn_summary;
+        _game_popup_fields->options[0] = MOX::_settings.end_of_turn_summary;
 
         if (MOX::_game_type == 0) {
-            _game_popup_fields->options[1] = (uint16_t)MOX::_settings.end_of_turn_wait;
+            _game_popup_fields->options[1] = MOX::_settings.end_of_turn_wait;
         } else {
             _game_popup_fields->options[1] = 0;
         }
 
-        _game_popup_fields->options[2] = (uint16_t)MOX::_settings.enemy_moves;
-        _game_popup_fields->options[3] = (uint16_t)MOX::_settings.expanding_help;
-        _game_popup_fields->options[4] = (uint16_t)MOX::_settings.auto_select_ships;
-        _game_popup_fields->options[5] = (uint16_t)MOX::_settings.animations_on;
-        _game_popup_fields->options[6] = (uint16_t)MOX::_settings.auto_select_colony;
-        _game_popup_fields->options[7] = (uint16_t)MOX::_settings.show_relocation_lines;
-        _game_popup_fields->options[8] = (uint16_t)MOX::_settings.show_gnn_report;
-        _game_popup_fields->options[9] = (uint16_t)MOX::_settings.auto_delete_tg_housing;
-        _game_popup_fields->options[10] = (uint16_t)MOX::_settings.auto_saves;
-        _game_popup_fields->options[11] = (uint16_t)MOX::_settings.only_show_serious_turn_summary_reports;
-        _game_popup_fields->options[12] = (uint16_t)MOX::_settings.ship_initiative;
+        _game_popup_fields->options[2] = MOX::_settings.enemy_moves;
+        _game_popup_fields->options[3] = MOX::_settings.expanding_help;
+        _game_popup_fields->options[4] = MOX::_settings.auto_select_ships;
+        _game_popup_fields->options[5] = MOX::_settings.animations_on;
+        _game_popup_fields->options[6] = MOX::_settings.auto_select_colony;
+        _game_popup_fields->options[7] = MOX::_settings.show_relocation_lines;
+        _game_popup_fields->options[8] = MOX::_settings.show_gnn_report;
+        _game_popup_fields->options[9] = MOX::_settings.auto_delete_tg_housing;
+        _game_popup_fields->options[10] = MOX::_settings.auto_saves;
+        _game_popup_fields->options[11] = MOX::_settings.only_show_serious_turn_summary_reports;
+        _game_popup_fields->options[12] = MOX::_settings.ship_initiative;
 
-        _game_popup_fields->language = (uint16_t)MOX::_settings.language;
+        _game_popup_fields->language = MOX::_settings.language;
         if (_game_popup_fields->language >= 5) {
             _game_popup_fields->language = 0;
         }
@@ -1546,14 +1507,14 @@ namespace LOADSAVE {
         bool first_loop_drawn = true;
         int16_t dummy_p1;
         int16_t dummy_p2;
-        s_settings settings_copy;
+        uint8_t settings_copy[0x229];
 
         MOX::_first_time_drawn = 1;
         _loaded_new_game = 0;
         fields::Clear_Fields_();
         MOX::_global_var = 0;
 
-        memcpy(&settings_copy, &MOX::_settings, sizeof(s_settings));
+        memcpy(settings_copy, &MOX::_settings, 0x229);
 
         if (MOX::_screen_data < 0 || MOX::_screen_data > 3) {
             MOX::_screen_data = 0;
@@ -1564,9 +1525,7 @@ namespace LOADSAVE {
         Load_Game_Popup_Pictures_();
         allocate::Get_Remaining_Block_Space_(MOX::_screen_seg);
 
-        for (int i = 0; i < 158; ++i) {
-            ((int32_t*)_game_popup_fields)[i] = -1;
-        }
+        memset(_game_popup_fields, 0xFF, 0x278);
 
         Set_Current_Game_Option_Flags_();
 
@@ -1590,7 +1549,7 @@ namespace LOADSAVE {
             if (MOX::_screen_data == 2 || MOX::_screen_data == 3) {
                 sound::Sound_Update_();
                 Set_Up_Load_Save_Popup_();
-                MOX::_return_screen = static_cast<SCREEN>(static_cast<int8_t>(MOX::_previous_screen));
+                MOX::_return_screen = (int16_t)(int8_t)MOX::_previous_screen;
             }
 
             fields::Clear_Fields_();
@@ -1624,7 +1583,7 @@ namespace LOADSAVE {
             Animate_Game_Popup_Pic_Height_(_game_anims->pictures[0], 0);
         }
 
-        if (MOX::_current_screen == SCREEN_NEW_GAME) {
+        if (MOX::_current_screen == 0x0D) {
             ERIC::Fast_Fade_Out_();
         } else if (_loaded_new_game == 0) {
             fields::Clear_Fields_();
@@ -1647,15 +1606,15 @@ namespace LOADSAVE {
 
         FILEDEF::Get_Saved_Game_Descriptions_(save_slots);
 
-        int save_slot = MOX::_settings.active_save_slot;
+        int save_slot = (int8_t)MOX::_settings.active_save_slot;
         s_save_game_description* save_description = &MOX::_save_game_description[save_slot];
-        const char* message_format = HAROLD::H_Message_(0xCD, save_slot, save_description);
+        const char* message_format = HAROLD::H_Message_(0xCD);
 
-        sprintf(message_buffer, message_format);
+        sprintf(message_buffer, message_format, save_slot, save_description);
 
         int16_t choice = HAROLD::User_Box_(&MOX::_draw_main_screen_to_back, message_buffer, 1);
         if (choice != 0) {
-            FILEDEF::Load_Game_(save_slot);
+            FILEDEF::Load_Game_((int8_t)MOX::_settings.active_save_slot);
             MOX::_return_screen = SCREEN_HOTSEAT_SELECT_PLAYER;
             if (MOX::_game_type != 1) {
                 MOX::_return_screen = SCREEN_REPORTS;
@@ -1688,7 +1647,7 @@ namespace LOADSAVE {
     /**
      * @address 00512230
      */
-    void __cdecl Remove_Embedded_Special_Codes_(char* text, int max_len) {
+    void __cdecl Remove_Embedded_Special_Codes_(char* text) {
         if (*text == '\x03') {
             char special_code[2] = { '\x01', '\0' };
             int16_t copy_length = static_cast<int16_t>(strlen(text));
@@ -1730,13 +1689,10 @@ namespace LOADSAVE {
     void __cdecl Set_Sound_For_Game_Popup_(char play_sound_effect) {
         s_game_popup_fields* popup = LOADSAVE::_game_popup_fields;
 
-        MOX::_global_var = 0;
+        *reinterpret_cast<uint8_t*>(&MOX::_global_var) = 0;
 
-        int32_t volume = popup->sound_fx_level;
-        volume = (volume * 100) / 0x9b;
-        volume *= 4;
-        volume = (volume * 100) / 100;
-        MOX::_settings.sound_fx_level = static_cast<int8_t>(volume);
+        int32_t volume = ((int32_t)popup->sound_fx_level * 100) / 0x9b;
+        MOX::_settings.sound_fx_level = (int8_t)volume;
 
         if (MOX::_settings.sound_fx_level > 5) {
             if (MOX::_settings.sound_fx_on == 0) {

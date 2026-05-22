@@ -88,11 +88,10 @@ namespace FLEETPOP {
         return grid_height + close_btn_height + bottom_height + name_height;
     }
 
-void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t ship_icon, int16_t flag) {
+void __cdecl Add_Fleet_Movement_Box_Fields_(int16_t node_ptr, int16_t flag) {
     int16_t local_a = -1;
     int16_t local_8 = -1;
 
-    int16_t node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
     if (node_ptr == MOX::_first_node_ptr_in_stack_) {
         node_ptr = HACCESS::Node_Ptr_From_Ship_Stack_(MOX::_fleet_box_ship_stack);
         int16_t num_icons = N_Fleet_Icons_(node_ptr);
