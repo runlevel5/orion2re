@@ -13,7 +13,7 @@ namespace MAINMENU {
         bool finished = false;
         bool input_detected = false;
         int16_t result_code = -1;
-        int32_t current_sound_handle;
+        int32_t current_sound_handle = 0;
 
         file_ani::Open_File_Animation_(s_MAINMENU_LBX_0055a630, 0);
         uint32_t buffer_size = MAINMENU::Get_File_Animation_Block_Space_();

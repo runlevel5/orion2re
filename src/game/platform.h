@@ -84,8 +84,8 @@ namespace platform {
 	inline uint32_t& g_frame_count =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055b1b8 });
 
-	inline uint8_t& g_render_buffer =
-		*reinterpret_cast<uint8_t*>(std::uintptr_t{ 0x00578edc });
+	inline int8_t& g_render_buffer =
+		*reinterpret_cast<int8_t*>(std::uintptr_t{ 0x00578edc });
 
 	inline DDSURFACEDESC& DDSURFACEDESC_00578e70 =
 		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578E70 });
@@ -118,9 +118,6 @@ namespace platform {
 
 	inline int16_t& g_cached_mouse_y =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578ab8 });
-
-	inline void*& g_surface_mem =
-		*reinterpret_cast<void**>(std::uintptr_t{ 0x005792F8 });
 
 	// Functions
 	void __cdecl entry();

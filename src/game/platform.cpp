@@ -644,60 +644,69 @@ namespace platform {
             hr = DDERR_INVALIDMODE;
             break;
         }
-        if (SUCCEEDED(hr))
+        if (hr == DD_OK)
         {
-            g_surface_mem = desc.lpSurface;
-            return desc.lPitch;
+            video::_current_video_page = static_cast<uint8_t*>(desc.lpSurface);
+            return static_cast<uint32_t>(desc.lPitch);
         }
+
         switch (hr)
         {
         case DDERR_SURFACELOST:
-            exitm::Exit_With_Message("lock Surface Lost");
-            return DDERR_SURFACELOST;
+            exitm::Exit_With_Message("Unlock Surface Lost");
+            break;
 
-        case DDERR_SURFACEBUSY:
-            exitm::Exit_With_Message("lock Invalid Rect");
-            return DDERR_SURFACEBUSY;
+        case DDERR_INVALIDRECT:
+            exitm::Exit_With_Message("Unlock Invalid Rect");
+            break;
+
         case DDERR_INVALIDOBJECT:
-            exitm::Exit_With_Message("lock Invalid Object");
-            return DDERR_INVALIDOBJECT;
+            exitm::Exit_With_Message("Unlock Invalid Object");
+            break;
+
         case DDERR_INVALIDPARAMS:
-            exitm::Exit_With_Message("lock Invalid Params");
-            return DDERR_INVALIDPARAMS;
+            exitm::Exit_With_Message("Unlock Invalid Params");
+            break;
+
         case DDERR_OUTOFMEMORY:
-            exitm::Exit_With_Message("lock Not Locked");
-            return DDERR_OUTOFMEMORY;
-        case DDERR_WASSTILLDRAWING:
-        default:
-            exitm::Exit_With_Message("lock Generic");
-            return DDERR_WASSTILLDRAWING;
+            exitm::Exit_With_Message("Unlock Not Locked");
+            break;
+
+        case DDERR_GENERIC:
+            exitm::Exit_With_Message("Unlock Generic");
+            break;
         }
-        return 0;
+
+        return static_cast<uint32_t>(hr);
     }
 
 
     HRESULT __cdecl	Unlock_Appropriate_Render_Buffer()
     {
-        HRESULT hr = S_OK;
+        HRESULT hr;
 
-        switch (g_render_buffer)
+        if (g_render_buffer == 0)
         {
-        case 0:
             hr = g_primary_surface->Unlock(NULL);
 
 #ifndef FULLSCREEN
             Blit_Surface_To_Screen(g_primary_surface);
 #endif
-            break;
-        case 1:
+        }
+        else if (g_render_buffer == 1)
+        {
             hr = g_offscreen_surface_1->Unlock(NULL);
-            break;
-        case 2:
+        }
+        else if (g_render_buffer == 2)
+        {
             hr = g_offscreen_surface_2->Unlock(NULL);
-            break;
+        }
+        else
+        {
+            return DDERR_GENERIC;
         }
 
-        if (SUCCEEDED(hr))
+        if (hr == DD_OK)
             return hr;
 
         switch (hr)
@@ -735,21 +744,23 @@ namespace platform {
 
         g_primary_surface->GetSurfaceDesc(&desc);
 
-        hr = g_primary_surface->Lock(NULL, &desc, DDLOCK_SURFACEMEMORYPTR, NULL);
+        hr = g_primary_surface->Lock(NULL, &desc, 0, NULL);
 
-        if (SUCCEEDED(hr)) {
+        if (hr == DD_OK) {
             video::_video_memory = (uint8_t*)desc.lpSurface;
             return desc.lPitch;
         }
 
-        if (hr != DDERR_SURFACELOST && hr != DDERR_WASSTILLDRAWING)
-            hr = 0;
-        if (hr != DDERR_SURFACEBUSY && hr != DDERR_INVALIDOBJECT)
-            hr = 0;
-        if (hr != DDERR_INVALIDPARAMS && hr != DDERR_OUTOFMEMORY)
-            hr = 0;
+        if (hr == E_INVALIDARG ||
+            hr == E_OUTOFMEMORY ||
+            hr == DDERR_INVALIDOBJECT ||
+            hr == DDERR_SURFACEBUSY ||
+            hr == DDERR_CANTLOCKSURFACE ||
+            hr == DDERR_WASSTILLDRAWING) {
+            return hr;
+        }
 
-        return hr;
+        return 0;
     }
 
     void Unlock_Primary_Surface()
