@@ -196,9 +196,8 @@ namespace remap {
         Create_Picture_Remap_Palette_(reinterpret_cast<uint8_t*>(animate::_palette_header) + 4, _picture_remap_color_list);
     }
 
-    uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index) {
-        // TYPE MISMATCH: index was uint8_t
-        return _picture_remap_color_list[static_cast<uint8_t>(index)];
+    uint8_t __cdecl Get_Remap_Palette_Color_(uint8_t index) {
+        return _picture_remap_color_list[index];
     }
 
     void __cdecl Get_Palette_Animation_Color_(s_animation_header* animation_header,

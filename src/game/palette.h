@@ -8,9 +8,9 @@ namespace palette {
 
     void __cdecl Save_Palette_();
 
-    void __cdecl Set_Palette_Changes_(int32_t start, int32_t end);
+    void __cdecl Set_Palette_Changes_(int16_t start, int16_t end);
 
-    void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end);
+    void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end);
 
     inline int32_t& _cycle_direction_flag =
         *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055B2A8});

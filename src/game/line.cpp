@@ -205,90 +205,100 @@ namespace line {
         int16_t is_clipped = 0;
 
         if (*x2 == *x1) {
-            // Vertical line optimization
             if (*x1 < video::_screen_window_x1 || *x1 > video::_screen_window_x2) {
                 is_clipped = 1;
             } else {
-                if (*y2 < *y1) {
-                    int16_t temp = *y1;
-                    *y1 = *y2;
-                    *y2 = temp;
+                if (*y1 > *y2) {
+                    strings::Swap_Short_(y1, y2);
                 }
+
                 if (*y2 < video::_screen_window_y1 || *y1 > video::_screen_window_y2) {
                     is_clipped = 1;
                 } else {
-                    if (*y1 < video::_screen_window_y1) *y1 = video::_screen_window_y1;
-                    if (*y2 > video::_screen_window_y2) *y2 = video::_screen_window_y2;
+                    if (*y1 < video::_screen_window_y1) {
+                        *y1 = video::_screen_window_y1;
+                    }
+                    if (*y2 > video::_screen_window_y2) {
+                        *y2 = video::_screen_window_y2;
+                    }
                 }
             }
         } else {
-            // X-clipping logic
             if (*x2 < *x1) {
-                int16_t temp_x = *x1; *x1 = *x2; *x2 = temp_x;
-                int16_t temp_y = *y1; *y1 = *y2; *y2 = temp_y;
+                strings::Swap_Short_(x1, x2);
+                strings::Swap_Short_(y1, y2);
             }
 
-            int32_t dx = (int32_t)*x2 - (int32_t)*x1;
             int32_t dy = (int32_t)*y2 - (int32_t)*y1;
+            int32_t dx = (int32_t)*x2 - (int32_t)*x1;
 
             if (*x1 < video::_screen_window_x1) {
-                *y1 = *y1 + (int16_t)(((int32_t)video::_screen_window_x1 - (int32_t)*x1) * dy / dx);
+                *y1 = (int16_t)(*y1 + ((((int32_t)video::_screen_window_x1 - (int32_t)*x1) * dy) / dx));
                 *x1 = video::_screen_window_x1;
             }
 
-            if (*x1 > *x2 || *x1 > video::_screen_window_x2) {
+            if (*x2 < *x1) {
                 is_clipped = 1;
             } else {
                 if (*x2 > video::_screen_window_x2) {
-                    *y2 = *y1 + (int16_t)(((int32_t)video::_screen_window_x2 - (int32_t)*x1) * dy / dx);
+                    *y2 = (int16_t)(*y1 + ((((int32_t)video::_screen_window_x2 - (int32_t)*x1) * dy) / dx));
                     *x2 = video::_screen_window_x2;
                 }
-                if (*x1 > *x2) is_clipped = 1;
+
+                if (*x2 < *x1) {
+                    is_clipped = 1;
+                }
             }
         }
 
-        if (is_clipped) goto result_clipped;
-
-        // Y-clipping logic
         if (*y1 == *y2) {
-            // Horizontal line check (after X clipping)
             if (*y1 < video::_screen_window_y1 || *y1 > video::_screen_window_y2) {
-                goto result_clipped;
+                is_clipped = 1;
+            } else {
+                if (*x2 < *x1) {
+                    strings::Swap_Short_(x1, x2);
+                }
+
+                if (*x2 < video::_screen_window_x1 || *x1 > video::_screen_window_x2) {
+                    is_clipped = 1;
+                } else {
+                    if (*x1 < video::_screen_window_x1) {
+                        *x1 = video::_screen_window_x1;
+                    }
+                    if (*x2 > video::_screen_window_x2) {
+                        *x2 = video::_screen_window_x2;
+                    }
+                }
             }
-            if (*x2 < *x1) {
-                int16_t temp = *x1; *x1 = *x2; *x2 = temp;
-            }
-            if (*x2 < video::_screen_window_x1 || *x1 > video::_screen_window_x2) {
-                goto result_clipped;
-            }
-            if (*x1 < video::_screen_window_x1) *x1 = video::_screen_window_x1;
-            if (*x2 > video::_screen_window_x2) *x2 = video::_screen_window_x2;
-            return is_clipped;
         } else {
             if (*y2 < *y1) {
-                int16_t temp_y = *y1; *y1 = *y2; *y2 = temp_y;
-                int16_t temp_x = *x1; *x1 = *x2; *x2 = temp_x;
+                strings::Swap_Short_(y1, y2);
+                strings::Swap_Short_(x1, x2);
             }
 
             int32_t dx = (int32_t)*x2 - (int32_t)*x1;
             int32_t dy = (int32_t)*y2 - (int32_t)*y1;
 
             if (*y1 < video::_screen_window_y1) {
-                *x1 = *x1 + (int16_t)(((int32_t)video::_screen_window_y1 - (int32_t)*y1) * dx / dy);
+                *x1 = (int16_t)(*x1 + ((((int32_t)video::_screen_window_y1 - (int32_t)*y1) * dx) / dy));
                 *y1 = video::_screen_window_y1;
             }
 
-            if (*y1 <= *y2) {
+            if (*y1 > *y2) {
+                is_clipped = 1;
+            } else {
                 if (*y2 > video::_screen_window_y2) {
-                    *x2 = *x1 + (int16_t)(((int32_t)video::_screen_window_y2 - (int32_t)*y1) * dx / dy);
+                    *x2 = (int16_t)(*x1 + ((((int32_t)video::_screen_window_y2 - (int32_t)*y1) * dx) / dy));
                     *y2 = video::_screen_window_y2;
                 }
-                if (*y1 <= *y2) return is_clipped;
+
+                if (*y2 < *y1) {
+                    is_clipped = 1;
+                }
             }
         }
 
-    result_clipped:
-        return 1;
+        return is_clipped;
     }
 
     void __cdecl Line_(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color) {

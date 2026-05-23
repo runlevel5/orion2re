@@ -38,28 +38,24 @@ namespace struct_ {
         memcpy(dest, src, (size >> 2) * 4);
     }
 
-    void __cdecl Copy_Structure_(void* dest, const void* src, uint32_t size) {
+    void __cdecl Copy_Structure_(void* dest, void* src, uint32_t size) {
         // TODO: Just use memcpy
         uint8_t* d_ptr = static_cast<uint8_t*>(dest);
-        const uint8_t* s_ptr = static_cast<const uint8_t*>(src);
+        uint8_t* s_ptr = static_cast<uint8_t*>(src);
 
         std::uintptr_t u_src = reinterpret_cast<std::uintptr_t>(s_ptr);
         std::uintptr_t u_dest = reinterpret_cast<std::uintptr_t>(d_ptr);
 
         if ((u_src & 1) == (u_dest & 1)) {
             if ((u_src & 1) != 0) {
-                if (size > 0) {
-                    *d_ptr++ = *s_ptr++;
-                    size--;
-                }
+                *d_ptr++ = *s_ptr++;
+                size--;
             }
 
             uint32_t dword_count = size >> 2;
-            for (uint32_t i = 0; i < dword_count; ++i) {
-                *reinterpret_cast<uint32_t*>(d_ptr) = *reinterpret_cast<const uint32_t*>(s_ptr);
-                d_ptr += 4;
-                s_ptr += 4;
-            }
+            memcpy(d_ptr, s_ptr, dword_count * 4);
+            d_ptr += dword_count * 4;
+            s_ptr += dword_count * 4;
 
             uint32_t remaining_bytes = size & 3;
             for (uint32_t i = 0; i < remaining_bytes; ++i) {
@@ -73,9 +69,9 @@ namespace struct_ {
         }
     }
 
-    bool __cdecl Test_Bit_Field_(void* field, uint16_t bit_index) {
+    int16_t __cdecl Test_Bit_Field_(void* field, int16_t bit_index) {
         const uint8_t* data = reinterpret_cast<const uint8_t*>(field);
-        uint32_t byte_offset = bit_index >> 3;
+        uint32_t byte_offset = static_cast<uint16_t>(bit_index) >> 3;
         uint32_t bit_in_byte = bit_index & 7;
 
         return (data[byte_offset] >> bit_in_byte) & 1;
@@ -87,13 +83,11 @@ namespace struct_ {
         data[bit >> 3] |= static_cast<uint8_t>(1 << (bit & 0x7));
     }
 
-    void __cdecl Clear_Bit_Field_(void* bit_field, int16_t bit_index) {
+    void __cdecl Clear_Bit_Field_(void* bit_field, uint16_t bit_index) {
         uint8_t* field_ptr = reinterpret_cast<uint8_t*>(bit_field);
 
-        // Bit index is treated as unsigned 16-bit to calculate byte offset.
-        uint16_t unsigned_index = static_cast<uint16_t>(bit_index);
-        uint32_t byte_offset = unsigned_index >> 3;
-        uint32_t bit_in_byte = unsigned_index & 7;
+        uint32_t byte_offset = bit_index >> 3;
+        uint32_t bit_in_byte = bit_index & 7;
 
         field_ptr[byte_offset] &= ~(static_cast<uint8_t>(1 << bit_in_byte));
     }

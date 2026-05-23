@@ -8,7 +8,7 @@ namespace strings {
     }
 
     void __cdecl String_To_Lower_(char* str) {
-        if (str == nullptr || *str == '\0') {
+        if (*str == '\0') {
             return;
         }
 
@@ -63,10 +63,6 @@ namespace strings {
     }
 
     void __cdecl Trim_(char* str) {
-        if (!str) {
-            return;
-        }
-
         // Skip leading spaces
         int first_non_space = 0;
         while (str[first_non_space] == ' ') {
@@ -75,14 +71,7 @@ namespace strings {
 
         // If there are leading spaces, shift the string to the left (including null terminator)
         if (first_non_space > 0) {
-            int i = 0;
-            while (true) {
-                str[i] = str[first_non_space + i];
-                if (str[i] == '\0') {
-                    break;
-                }
-                i++;
-            }
+            memmove(str, str + first_non_space, strlen(str + first_non_space) + 1);
         }
 
         // Find the new end of the string

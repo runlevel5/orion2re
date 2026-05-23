@@ -1002,7 +1002,7 @@ namespace bitmap {
         shear::Gray_Scale_Fill_Pixels_(
             frame_pixels,
             replace::_palette_color_list,
-            width,
+            0,
             width,
             height
         );

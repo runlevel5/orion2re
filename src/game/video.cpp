@@ -106,33 +106,50 @@ namespace video {
 	}
 
 	void __cdecl Add_Dot_To_Scan_List_(int32_t x_scaled, int32_t y) {
-		int16_t x = (int16_t)(x_scaled >> 2);
+		int32_t x32 = x_scaled >> 2;
+		int16_t x = (int16_t)x32;
 		s_scan_list_entry* scan_entry = &_refresh_scan_list[y];
+
+		if (screen_refresh_flag == 2) {
+			if (scan_entry->min_x == -1) {
+				scan_entry->min_x = x;
+				scan_entry->max_x = x;
+				return;
+			}
+			if (scan_entry->min_x > x32) {
+				scan_entry->min_x = x;
+				return;
+			}
+			if (scan_entry->max_x < x32) {
+				scan_entry->max_x = x;
+			}
+			return;
+		}
 
 		if (scan_entry->min_x == -1) {
 			scan_entry->min_x = x;
 			scan_entry->max_x = x;
 		}
-		else if (x < (int32_t)scan_entry->min_x) {
+		else if (scan_entry->min_x > x32) {
 			scan_entry->min_x = x;
 		}
-		else if (x > (int32_t)scan_entry->max_x) {
+		else if (scan_entry->max_x < x32) {
 			scan_entry->max_x = x;
 		}
 
-		if (screen_refresh_flag != 2) {
-			s_scan_list_entry* stencil_entry = &_refresh_stencil_list[y];
+		s_scan_list_entry* stencil_entry = &_refresh_stencil_list[y];
 
-			if (stencil_entry->min_x == -1) {
-				stencil_entry->min_x = x;
-				stencil_entry->max_x = x;
-			}
-			else if (x < (int32_t)stencil_entry->min_x) {
-				stencil_entry->min_x = x;
-			}
-			else if (x > (int32_t)stencil_entry->max_x) {
-				stencil_entry->max_x = x;
-			}
+		if (stencil_entry->min_x == -1) {
+			stencil_entry->min_x = x;
+			stencil_entry->max_x = x;
+			return;
+		}
+		if (stencil_entry->min_x > x32) {
+			stencil_entry->min_x = x;
+			return;
+		}
+		if (stencil_entry->max_x < x32) {
+			stencil_entry->max_x = x;
 		}
 	}
 

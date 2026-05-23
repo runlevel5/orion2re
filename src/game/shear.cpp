@@ -579,9 +579,6 @@ void __cdecl Gray_Scale_Fill_Pixels_(
         int32_t y_step_8_8,
         uint32_t pixels_per_row,
         uint32_t row_count) {
-    uint8_t* src = pixels;
-    uint8_t* dst = pixels;
-
     shear::_y_step_8_8 = y_step_8_8;
     bitmap::_bitmap_temp1 = gray_scale_table;
     bitmap::_bitmap_temp2 = pixels_per_row;
@@ -592,9 +589,11 @@ void __cdecl Gray_Scale_Fill_Pixels_(
         uint32_t remaining = bitmap::_bitmap_temp2;
 
         do {
-            const uint32_t index = *src++;
-            *dst++ = gray_scale_table[index];
+            const uint32_t index = *pixels;
+            *pixels++ = gray_scale_table[index];
         } while (--remaining != 0);
+
+        pixels += shear::_y_step_8_8;
     } while (--row_count != 0);
 }
 

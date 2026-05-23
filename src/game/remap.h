@@ -22,7 +22,7 @@ namespace remap {
 
     void __cdecl Calculate_Picture_Remap_Colors_(s_animation_header* header);
 
-    uint8_t __cdecl Get_Remap_Palette_Color_(int32_t index);
+    uint8_t __cdecl Get_Remap_Palette_Color_(uint8_t index);
 
     void __cdecl Get_Palette_Animation_Color_(
         s_animation_header* anim, int16_t index, uint8_t* red, uint8_t* green, uint8_t* blue);

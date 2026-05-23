@@ -5,7 +5,7 @@ namespace palette {
         struct_::Copy_Structure_Aligned_(_saved_palette, video::_current_palette, 0x400);
     }
 
-    void __cdecl Set_Palette_Changes_(int32_t start_index, int32_t end_index) {
+    void __cdecl Set_Palette_Changes_(int16_t start_index, int16_t end_index) {
         int32_t start = start_index;
         int32_t end = end_index;
 
@@ -27,10 +27,10 @@ namespace palette {
         }
     }
 
-    void __cdecl Clear_Palette_Changes_(int32_t start, int32_t end) {
+    void __cdecl Clear_Palette_Changes_(int16_t start, int16_t end) {
         if (start <= end) {
             // Calculate how many entries to clear
-            int count = (int)end - (int)start + 1;
+            int32_t count = end - start + 1;
             s_palette_entry* entry = &video::_current_palette[start];
 
             do {

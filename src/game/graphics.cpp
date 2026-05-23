@@ -204,7 +204,7 @@ namespace graphics {
             uint8_t* color_map = (uint8_t*)&video::_glass_remap_colors + (tint_color * 256);
             regions::Tint_Fill_Column_(color_map, dest, width, height);
         } else {
-            // Potential bug: original game completely ignores tint_color in this branch, defaulting to offset 0
+            // Exact binary behavior: split-path uses base glass remap table; tint_color offset is only used in the single-block path.
             int start_pixels = 4 - (x1 & 3);
             int middle_blocks = end_col - start_col - 1;
             int height = y2 - y1 + 1;
@@ -212,7 +212,7 @@ namespace graphics {
             int offset_y = y1 * platform::g_screen_res_x;
 
             if (start_pixels == 4) {
-                // Potential bug: start block is skipped if middle_blocks is 0
+                // Exact binary behavior: if x1 is 4-byte aligned and there are no middle dword blocks, no region call is made.
                 if (middle_blocks != 0) {
                     regions::Tint_Fill_Region_(
                         (uint8_t*)&video::_glass_remap_colors,
@@ -236,7 +236,7 @@ namespace graphics {
                 );
             }
 
-            // Potential bug: end_pixels logic misses the +1 offset, often skipping the final pixel at x2
+            // Exact binary behavior: trailing partial width is (x2 & 3); zero suppresses the tail call.
             if (end_pixels != 0) {
                 regions::Tint_Fill_Column_(
                     (uint8_t*)&video::_glass_remap_colors,
