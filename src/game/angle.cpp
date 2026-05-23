@@ -19,12 +19,12 @@ namespace angle {
 
         if (dx < 0) {
             if (dy < 0) {
-                u = -dx;
-                v = -dy;
+                u = 0u - (uint32_t)dx;
+                v = 0u - (uint32_t)dy;
                 offset = 180;
             } else {
                 u = dy;
-                v = -dx;
+                v = 0u - (uint32_t)dx;
                 offset = 90;
             }
         } else {
@@ -33,7 +33,7 @@ namespace angle {
                 v = dy;
                 offset = 0;
             } else {
-                u = -dy;
+                u = 0u - (uint32_t)dy;
                 v = dx;
                 offset = 270;
             }
@@ -43,9 +43,9 @@ namespace angle {
         if (v == u) {
             angle = 45;
         } else if (v > u) {
-            angle = 90 - static_cast<uint8_t>(_atan_lookup_table[(u << 7) / v]);
+            angle = 90 - _atan_lookup_table[(u << 7) / v];
         } else {
-            angle = static_cast<uint8_t>(_atan_lookup_table[(v << 7) / u]);
+            angle = _atan_lookup_table[(v << 7) / u];
         }
 
         angle += offset;
@@ -61,39 +61,53 @@ namespace angle {
     }
 
     int32_t __cdecl Sin_(int16_t angle, int32_t magnitude) {
+        int32_t angle_deg = angle;
+
         if (magnitude < 0) {
-            magnitude = -magnitude;
-            angle += 180;
+            if (magnitude != INT32_MIN) {
+                magnitude = -magnitude;
+            }
+
+            uint16_t angle_bits = (uint16_t)angle;
+            angle_bits = (uint16_t)(angle_bits + 180u);
+            if (angle_bits < 0x8000u) {
+                angle_deg = angle_bits;
+            } else {
+                angle_deg = (int32_t)angle_bits - 0x10000;
+            }
         }
 
-        if (angle >= 360) {
+        if (angle_deg >= 360) {
             do {
-                angle -= 360;
-            } while (angle >= 360);
+                angle_deg -= 360;
+            } while (angle_deg >= 360);
         } else {
-            while (angle < 0) {
-                angle += 360;
+            while (angle_deg < 0) {
+                angle_deg += 360;
             }
         }
 
-        if (angle < 180) {
-            if (angle < 90) {
-                return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+        if (angle_deg < 180) {
+            if (angle_deg < 90) {
+                return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
             }
-            if (angle == 90) {
+            if (angle_deg == 90) {
                 return magnitude;
             }
-            return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[180 - angle])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+            return static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[180 - angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
         }
 
-        if (angle < 270) {
-            return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle - 180])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+        if (angle_deg < 270) {
+            return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[angle_deg - 180])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
         }
-        if (angle == 270) {
+        if (angle_deg == 270) {
+            if (magnitude == INT32_MIN) {
+                return INT32_MIN;
+            }
             return -magnitude;
         }
 
-        return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[360 - angle])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
+        return -static_cast<int32_t>((static_cast<uint32_t>(static_cast<uint16_t>(_sin_table[360 - angle_deg])) * static_cast<uint32_t>(magnitude) + 0x8000) >> 16);
     }
 
     void __cdecl Rotate_Coordinates_(int32_t angle_deg, int32_t* x_ptr, int32_t* y_ptr) {

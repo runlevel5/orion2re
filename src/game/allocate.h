@@ -10,6 +10,11 @@ namespace allocate {
         uint32_t size;
         uint32_t reserved2;
     };
+
+    struct s_mark_stack_entry {
+        void* block;
+        uint32_t current;
+    };
 #pragma pack(pop)
 
     void* __cdecl Allocate_Space_(uint32_t size);
@@ -22,11 +27,11 @@ namespace allocate {
 
     void __cdecl Allocation_Error_(int bytes_requested);
 
-    inline uint32_t (&_mark_stack_pos)[2] =
-        *reinterpret_cast<uint32_t (*)[2]>(std::uintptr_t{ 0x0055B650 });
+    inline int32_t (&_mark_stack_pos)[2] =
+        *reinterpret_cast<int32_t (*)[2]>(std::uintptr_t{ 0x0055B650 });
 
-    inline uint32_t (&_mark_stack)[39][2] =
-        *reinterpret_cast<uint32_t (*)[39][2]>(std::uintptr_t{ 0x0057DF00 });
+    inline s_mark_stack_entry (&_mark_stack)[40] =
+        *reinterpret_cast<s_mark_stack_entry (*)[40]>(std::uintptr_t{ 0x0057DF00 });
 
     inline const char* s_Mark_Block_Stack_Size_Exceeded_0055b6dc =
         reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B6DC }); // "Mark Block Stack Size Exceeded"

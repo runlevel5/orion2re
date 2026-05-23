@@ -45,14 +45,16 @@ namespace special {
             return;
         }
 
-        int32_t dx = (int32_t)target_x - (int32_t)current_x;
-        int32_t dy = (int32_t)target_y - (int32_t)current_y;
+        int16_t dx16 = (int16_t)(target_x - current_x);
+        int16_t dy16 = (int16_t)(target_y - current_y);
+        int32_t dx = dx16;
+        int32_t dy = dy16;
 
         int32_t angle_dx = dx;
         int32_t angle_dy = dy;
 
         // Downscale coordinates if delta is too large to fit in Get_Angle_ precision
-        if (abs(dx) > 255 || abs(dy) > 255) {
+        if (dx < -255 || dx > 255 || dy < -255 || dy > 255) {
             angle_dx /= 2;
             angle_dy /= 2;
         }

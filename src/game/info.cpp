@@ -265,7 +265,7 @@ namespace INFO {
 
             allocate::Push_Block_(MOX::_screen_seg);
 
-            uint32_t saved_mark_pos = allocate::_mark_stack_pos[0];
+            int32_t saved_mark_pos = allocate::_mark_stack_pos[0];
 
             fields::Clear_Fields_Above_(field_counter - 1);
             palette::Reset_Cycle_Palette_Color_();

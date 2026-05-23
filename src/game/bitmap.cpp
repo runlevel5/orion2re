@@ -130,13 +130,13 @@ namespace bitmap {
         animate::_animation_header = src;
         int16_t width = src->width;
         int16_t height = src->height;
+        uint32_t offset = src->frame_offsets[src->current_frame];
 
         Create_Bitmap_Header_(width, height, dst);
 
-        uint32_t offset = src->frame_offsets[src->current_frame];
         uint8_t* src_ptr = reinterpret_cast<uint8_t*>(src) + offset;
         uint8_t* dst_ptr = reinterpret_cast<uint8_t*>(dst) + 0x10;
-        uint32_t size = static_cast<uint32_t>(static_cast<int32_t>(width) * static_cast<int32_t>(height));
+        int32_t size = (int32_t)height * (int32_t)width;
 
         struct_::Copy_Structure_(dst_ptr, src_ptr, size);
     }

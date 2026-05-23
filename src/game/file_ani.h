@@ -6,8 +6,8 @@ namespace file_ani {
     inline uint8_t*& _file_animation_buffer =
         *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x0057E0AC });
 
-    inline bool& _file_animation_open =
-        *reinterpret_cast<bool*>(std::uintptr_t{ 0x0055B7F0 });
+    inline uint32_t& _file_animation_open =
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B7F0 });
 
     inline uint32_t& _file_animation_length =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0057E094 });

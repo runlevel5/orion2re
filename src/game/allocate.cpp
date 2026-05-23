@@ -69,12 +69,8 @@ namespace allocate {
         exitm::Exit_With_Message(message_buffer);
     }
 
-    int32_t __cdecl Get_Remaining_Block_Space_(void* addr) {
-        if (!addr) {
-            return 0;
-        }
-
-        const auto* header = static_cast<s_alloc_header*>(addr) - 1;
+    int32_t __cdecl Get_Remaining_Block_Space_(void* block) {
+        const auto* header = static_cast<s_alloc_header*>(block) - 1;
         return header->size - header->current;
     }
 
@@ -145,7 +141,7 @@ namespace allocate {
             Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
 
         if (header == nullptr) {
-            Allocation_Error_(size);
+            return nullptr;
         }
 
         header->current = 0;
@@ -164,32 +160,32 @@ namespace allocate {
             exitm::Exit_With_Message(s_Mark_Block_Stack_Size_Exceeded_0055b6dc);
         }
 
-        uint32_t pos = _mark_stack_pos[0];
-        _mark_stack[pos][0] = reinterpret_cast<uint32_t>(block);
+        int32_t pos = _mark_stack_pos[0];
+        _mark_stack[pos].block = block;
 
-        _mark_stack[pos][1] = (static_cast<s_alloc_header*>(block) - 1)->current;
+        _mark_stack[pos].current = (static_cast<s_alloc_header*>(block) - 1)->current;
 
         _mark_stack_pos[0]++;
     }
 
     /**
      * @brief Pops a block marker from the stack and restores the original value at the target address.
-     * The target address is stored at _mark_stack[idx][0], and the value to restore is at _mark_stack[idx][1].
+     * The target address is stored at _mark_stack[idx].block, and the value to restore is at _mark_stack[idx].current.
      * The restoration occurs at (target_address - 12).
      */
     void __cdecl Pop_Block_(void* block) {
-        if (static_cast<int32_t>(_mark_stack_pos[0]) < 1) {
+        if (_mark_stack_pos[0] < 1) {
             exitm::Exit_With_Message(s_Mark_Block_Stack_Empty_0055b6fc);
         }
 
         _mark_stack_pos[0]--;
-        uint32_t index = _mark_stack_pos[0];
+        int32_t index = _mark_stack_pos[0];
 
-        uint32_t target_base = _mark_stack[index][0];
-        uint32_t original_value = _mark_stack[index][1];
+        void* target_base = _mark_stack[index].block;
+        uint32_t original_value = _mark_stack[index].current;
 
         // Restore the value relative to the block address
-        (reinterpret_cast<s_alloc_header*>(target_base) - 1)->current = original_value;
+        (static_cast<s_alloc_header*>(target_base) - 1)->current = original_value;
     }
 
     void* __cdecl Allocate_Space_No_Header_(uint32_t size) {
@@ -223,7 +219,7 @@ namespace allocate {
      * 
      * @param block_ptr Start address of the memory pool. A header exists 12 bytes before this address.
      * @param size The requested size of the block.
-     * @return void* Pointer to the newly allocated block, or nullptr if capacity is exceeded.
+     * @return void* Pointer to the start of the newly allocated region, or nullptr if capacity is exceeded.
      */
     void* __cdecl Allocate_Next_Block_No_Header_(void* block_ptr, uint32_t size) {
         uint8_t* base_ptr = reinterpret_cast<uint8_t*>(block_ptr);
@@ -252,11 +248,11 @@ namespace allocate {
         // Update the current offset in the pool header.
         pool_header->current = next_offset;
 
-        // Initialize the new block's internal structure (12 bytes).
-        auto* new_block_header = reinterpret_cast<s_alloc_header*>(new_block_ptr);
-        new_block_header->current = 0;
-        new_block_header->size = size;   // Stores the original requested size
-        new_block_header->reserved2 = 0;
+        // Returned pointer is the block start itself; metadata is written in-place.
+        uint32_t* new_block_words = reinterpret_cast<uint32_t*>(new_block_ptr);
+        new_block_words[0] = 0;
+        new_block_words[1] = size;
+        new_block_words[2] = 0;
 
         return static_cast<void*>(new_block_ptr);
     }

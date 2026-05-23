@@ -18,12 +18,12 @@ namespace file_ani {
             farload::Error_Handler_(filename, 4, entry_index);
         }
 
-        if (_file_animation_open) {
+        if (_file_animation_open == 1) {
             fclose(_file_animation_fptr);
         }
 
         _file_animation_fptr = fopen(filename, s_rb_0055117c);
-        _file_animation_open = true;
+        _file_animation_open = 1;
 
         if (_file_animation_fptr == nullptr) {
             if (farload::_secondary_drive_path[0] == '\0') {
@@ -51,7 +51,7 @@ namespace file_ani {
             farload::Error_Handler_(filename, 7, entry_index);
         }
 
-        if (static_cast<int16_t>(*reinterpret_cast<uint16_t*>(_file_lbx_header)) <= entry_index) {
+        if (*reinterpret_cast<int16_t*>(_file_lbx_header) <= entry_index) {
             farload::Error_Handler_(filename, 8, entry_index);
         }
 
@@ -175,10 +175,10 @@ namespace file_ani {
             animate::Set_Animation_Palette_();
         }
 
-        uint32_t current_frame_idx = animate::_animation_header->current_frame;
-        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame_idx];
-        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame_idx + 1];
-        size_t frame_size = next_frame_offset - frame_offset;
+        int16_t current_frame = animate::_animation_header->current_frame;
+        uint32_t frame_offset = animate::_animation_header->frame_offsets[current_frame];
+        uint32_t next_frame_offset = animate::_animation_header->frame_offsets[current_frame + 1];
+        uint32_t frame_size = next_frame_offset - frame_offset;
 
         int32_t available_space = allocate::Get_Max_Block_Space_(_file_animation_buffer);
         if (available_space < (int32_t)frame_size) {

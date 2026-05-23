@@ -143,23 +143,25 @@ namespace replace {
                         int32_t offset = 0;
                         while (loop_count != 0) {
                             while (true) {
-                                int16_t val1 = *reinterpret_cast<int16_t*>(frame_data + offset);
-                                int16_t val2 = *reinterpret_cast<int16_t*>(frame_data + offset + 4);
+                                int16_t chunk_header_word0 = *reinterpret_cast<int16_t*>(frame_data + offset);
+                                int16_t chunk_quad_count = *reinterpret_cast<int16_t*>(frame_data + offset + 4);
                                 offset += 8;
 
-                                if (val2 == 0 && val1 == 0) {
+                                if (chunk_quad_count == 0 && chunk_header_word0 == 0) {
                                     break;
                                 }
 
-                                int16_t ax = val2 << 2;
-                                if (ax > 0) {
-                                    for (int32_t i = 0; i < ax; ++i) {
+                                uint16_t chunk_byte_count_bits = (uint16_t)chunk_quad_count << 2;
+                                int16_t chunk_byte_count16 = (int16_t)chunk_byte_count_bits;
+                                int32_t chunk_byte_count = chunk_byte_count16;
+                                if (chunk_byte_count > 0) {
+                                    for (int32_t i = 0; i < chunk_byte_count; ++i) {
                                         if (static_cast<int16_t>(*reinterpret_cast<int8_t*>(frame_data + offset + i)) == old_color) {
                                             frame_data[offset + i] = static_cast<uint8_t>(new_color);
                                         }
                                     }
                                 }
-                                offset += ax;
+                                offset += chunk_byte_count;
                             }
                             loop_count--;
                         }
