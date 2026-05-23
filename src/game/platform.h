@@ -66,8 +66,8 @@ namespace platform {
 	inline LPDIRECTDRAWPALETTE& g_palette =
 		*reinterpret_cast<LPDIRECTDRAWPALETTE*>(std::uintptr_t{ 0x00578e64 });
 
-	inline uint32_t& g_palette_entries =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578ee8 });
+	inline tagPALETTEENTRY (&g_palette_entries)[256] =
+		*reinterpret_cast<tagPALETTEENTRY(*)[256]>(std::uintptr_t{ 0x00578ee8 });
 
 	inline uint32_t& DAT_00578e20 =
 		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578e20 });
@@ -104,8 +104,8 @@ namespace platform {
 	inline DDSURFACEDESC& _cursor_surface_desc =
 		*reinterpret_cast<DDSURFACEDESC*>(std::uintptr_t{ 0x00578AD0 });
 
-	inline uint32_t& DAT_578B3C =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x00578b3c });
+	inline int32_t& DAT_578B3C =
+		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x00578b3c });
 
 	inline int16_t& g_mouse_x =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578aa0 });
@@ -129,10 +129,10 @@ namespace platform {
 	void __cdecl Flip_Surface();
 	uint32_t Lock_Appropriate_Render_Buffer();
 	HRESULT	Unlock_Appropriate_Render_Buffer();
-	uint32_t Lock_Primary_Surface();
+	int32_t Lock_Primary_Surface();
 	void Unlock_Primary_Surface();
 	void Blit_To_Back_Buffer();
-	void Draw_Cursor_XY(int16_t x, int16_t y);
+	void Draw_Cursor_XY(int32_t x, int32_t y);
 	void Force_Cursor_Pos(int16_t x, int16_t y);
 	void __cdecl Create_Cursor_Surface();
 	HRESULT Restore_Surfaces();

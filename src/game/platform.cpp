@@ -412,7 +412,7 @@ namespace platform {
         }
 
         // Create Palette (DDPCAPS_8BIT | DDPCAPS_ALLOW256)
-        if (g_direct_draw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, reinterpret_cast<LPPALETTEENTRY>(&g_palette_entries), &g_palette, nullptr) != DD_OK) {
+        if (g_direct_draw->CreatePalette(DDPCAPS_8BIT | DDPCAPS_ALLOW256, g_palette_entries, &g_palette, nullptr) != DD_OK) {
             return cleanup();
         }
 
@@ -429,7 +429,7 @@ namespace platform {
         graphics::Fill_(0, 0, 639, 479, 0);
         video::Clear_Scan_List_();
         video::Clear_Stencil_List_();
-        g_frame_count = 0;
+        video::screen_refresh_flag = 0;
         graphics::Reset_Window_();
         return g_main_window;
     }
@@ -542,13 +542,24 @@ namespace platform {
         do
         {
             hr = g_primary_surface->Flip(NULL, 0);
+            if (hr == DD_OK)
+            {
+                g_frame_count++;
+                return;
+            }
+
             if (hr == DDERR_SURFACELOST)
-                hr = Restore_Surfaces();
+            {
+                if (Restore_Surfaces() != DD_OK)
+                    return;
+
+                return;
+            }
         } while (hr == DDERR_WASSTILLDRAWING);
 #else
         Blit_Surface_To_Screen(g_backbuffer_surface);
-#endif
         g_frame_count++;
+#endif
     }
 
     LONG __cdecl Lock_Offscreen_Surface_() {
@@ -714,7 +725,7 @@ namespace platform {
         return hr;
     }
 
-    uint32_t Lock_Primary_Surface()
+    int32_t Lock_Primary_Surface()
     {
         HRESULT hr = S_OK;
         DDSURFACEDESC	desc;
@@ -761,7 +772,7 @@ namespace platform {
         while (g_backbuffer_surface->BltFast(0, 0, g_offscreen_surface_1, &rect, DDBLTFAST_WAIT) != DD_OK);
     }
 
-    void	Draw_Cursor_XY(int16_t x, int16_t y)
+    void	Draw_Cursor_XY(int32_t x, int32_t y)
     {
         if (DAT_578AC4 > 0)
         {
@@ -965,20 +976,22 @@ namespace platform {
     void Draw_Auto_Cursor()
     {
         RECT rect;
+        const int32_t mouse_x = g_cached_mouse_x;
+        const int32_t mouse_y = g_cached_mouse_y;
         rect.left = 0;
         rect.top = 0;
 
-        if (g_cached_mouse_x + 24 >= g_screen_res_x - 1)
-            rect.right = g_screen_res_x - g_cached_mouse_x - 1;
+        if (mouse_x + 24 >= g_screen_res_x - 1)
+            rect.right = g_screen_res_x - mouse_x - 1;
         else
             rect.right = 24;
 
-        if (g_cached_mouse_y + 24 >= g_screen_res_y - 1)
-            rect.bottom = g_screen_res_y - g_cached_mouse_y - 1;
+        if (mouse_y + 24 >= g_screen_res_y - 1)
+            rect.bottom = g_screen_res_y - mouse_y - 1;
         else
             rect.bottom = 24;
 
-        g_primary_surface->BltFast(g_cached_mouse_x, g_cached_mouse_y, g_cursor_surface_2, &rect, DDBLTFAST_WAIT);
+        g_primary_surface->BltFast(mouse_x, mouse_y, g_cursor_surface_2, &rect, DDBLTFAST_WAIT);
 
 #ifndef FULLSCREEN
         Blit_Surface_To_Screen(g_primary_surface);

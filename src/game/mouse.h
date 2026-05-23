@@ -73,7 +73,7 @@ namespace mouse {
 
     int __cdecl Get_Pointer_Offset_();
 
-    int16_t __cdecl Get_Pointer_Image_Number_();
+    int __cdecl Get_Pointer_Image_Number_();
 
     void __cdecl Save_Mouse_State_();
 

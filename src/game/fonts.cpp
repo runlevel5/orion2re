@@ -98,7 +98,7 @@ namespace fonts {
             _current_font_color_array.colors[i] = color;
         }
 
-        _font_header.current_height = static_cast<uint16_t>(_font_header.font_heights[font_idx]);
+        _font_header.current_height = _font_header.font_heights[font_idx];
         _font_header.font_style_height = _font_header.font_heights[font_idx];
         _font_header.font_style = 0;
         _font_header.leading_offset = static_cast<uint16_t>(_font_header.leading_extra[font_idx]);
@@ -249,7 +249,7 @@ namespace fonts {
                     return _print_xpos;
                 case '\x19':
                 case '\x1d':
-                    _print_xpos = x + static_cast<uint8_t>(str[str_idx + 1]);
+                    _print_xpos = (int16_t)((uint16_t)x + (uint8_t)str[str_idx + 1]);
                     str_idx++;
                     break;
                 default:
@@ -269,7 +269,7 @@ namespace fonts {
         return _print_xpos;
     }
 
-    int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
+    int16_t __cdecl Print_String_(uint16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width) {
         _print_xpos = (int16_t)x;
         _print_ypos = (int16_t)y;
 
@@ -290,22 +290,21 @@ namespace fonts {
 
             if (space_count == 0) {
                 justified_width = 0;
-            } else {
-                int16_t text_width = Get_String_Width_(str);
-                int32_t extra_width = (int32_t)justified_width - (int32_t)text_width;
+            }
 
-                if (extra_width < 1) {
-                    justified_width = 0;
-                } else {
-                    pixels_per_space = extra_width / space_count;
-                    remainder_pixels = extra_width % space_count;
-                }
+            justified_width = (int16_t)(justified_width - Get_String_Width_(str));
+
+            if (justified_width < 1) {
+                justified_width = 0;
+            } else {
+                pixels_per_space = justified_width / space_count;
+                remainder_pixels = justified_width % space_count;
             }
         }
 
         int32_t i = 0;
         while (str[i] != '\0') {
-            char c = str[i];
+            int8_t c = (int8_t)str[i];
             
             switch (c) {
             case '\x01':
@@ -329,7 +328,7 @@ namespace fonts {
                 return _print_xpos;
             case '\x19':
             case '\x1D':
-                _print_xpos = (int16_t)((int8_t)str[i + 1] + x);
+                _print_xpos = (int16_t)((uint16_t)x + (uint8_t)str[i + 1]);
                 i++;
                 break;
             case '\x08':
@@ -356,18 +355,18 @@ namespace fonts {
         return _print_xpos;
     }
 
-    int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c) {
+    int16_t __cdecl Print_Character_(int16_t x, int16_t y, int8_t c) {
         uint32_t res_x = (uint32_t)platform::Lock_Appropriate_Render_Buffer();
         platform::g_screen_res_x = (int32_t)res_x;
 
         uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + (static_cast<int32_t>(y) * res_x) + x;
 
-        uint32_t offset = _font_header.font_style_offsets[c];
+        uint32_t offset = _font_header.font_style_offsets[(int16_t)c];
         uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + offset;
 
         Print_Character_ASM_(dest_ptr, glyph_ptr, reinterpret_cast<uint8_t*>(&_font_header), (int16_t)_font_header.current_height);
 
-        int16_t char_width = static_cast<int16_t>(_font_header.font_style_widths[c]);
+        int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
         int16_t total_width = char_width + _font_header.font_style_spacing;
         int16_t next_x = x + total_width;
 
@@ -379,9 +378,9 @@ namespace fonts {
     int16_t __cdecl Print_Character_No_Alias_(int16_t x, int16_t y, char character) {
         platform::g_screen_res_x = (int32_t)platform::Lock_Appropriate_Render_Buffer();
 
-        uint8_t char_idx = static_cast<uint8_t>(character);
+        int32_t char_idx = (int32_t)character;
 
-        uint32_t pixel_offset = static_cast<uint32_t>(y) * (uint32_t)platform::g_screen_res_x + static_cast<uint32_t>(x);
+        int32_t pixel_offset = (int32_t)y * (int32_t)platform::g_screen_res_x + (int32_t)x;
         uint8_t* dest_ptr = reinterpret_cast<uint8_t*>(video::_current_video_page) + pixel_offset;
 
         uint8_t* glyph_ptr = reinterpret_cast<uint8_t*>(_font_data) + _font_header.font_style_offsets[char_idx];
@@ -393,7 +392,7 @@ namespace fonts {
             static_cast<int>(_font_header.current_height)
         );
 
-        int16_t updated_x = x + static_cast<int16_t>(_font_header.font_style_widths[char_idx]) + _font_header.font_style_spacing;
+        int16_t updated_x = x + (int16_t)_font_header.font_style_widths[char_idx] + _font_header.font_style_spacing;
 
         platform::Unlock_Appropriate_Render_Buffer();
 
@@ -550,12 +549,12 @@ namespace fonts {
     }
 
     void __cdecl Print_Character_To_Bitmap_(int16_t x, int16_t y, char ch, s_animation_header* seg) {
-        if ((uint8_t)ch > 128) {
+        if ((int16_t)(int8_t)ch > 0x80) {
             return;
         }
 
         short font_h = _font_header.font_style_height;
-        short glyph_w = (short)_font_header.font_style_widths[(uint8_t)ch];
+        short glyph_w = (short)_font_header.font_style_widths[(int16_t)(int8_t)ch];
 
         short anim_w = animate::Get_Width_(seg);
         short anim_h = animate::Get_Height_(seg);
@@ -934,7 +933,7 @@ namespace fonts {
         }
     }
 
-    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y) {
+    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, int8_t letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
         int screen_idx_start = y * platform::g_screen_res_x - clip_left + x;
@@ -943,7 +942,7 @@ namespace fonts {
             end_y = static_cast<int16_t>(_font_header.current_height);
         }
 
-        int16_t offset = static_cast<int16_t>(_font_header.font_style_offsets[static_cast<int>(letter)]);
+        int16_t offset = static_cast<int16_t>(_font_header.font_style_offsets[(int16_t)letter]);
 
         for (int i = 0; i < start_y; ++i) {
             while (_font_data[offset] != 0x80) {
@@ -982,14 +981,14 @@ namespace fonts {
         platform::Unlock_Appropriate_Render_Buffer();
     }
 
-    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c) {
+    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, int8_t c) {
         int16_t spacing = _font_header.font_style_spacing;
 
-        if (c > 0x80) {
+        if ((int16_t)c > 0x80) {
             return x;
         }
 
-        int16_t char_width = static_cast<int16_t>(_font_header.font_style_widths[static_cast<uint8_t>(c)]);
+        int16_t char_width = (int16_t)_font_header.font_style_widths[(int16_t)c];
 
         if (x >= video::_screen_window_x1 &&
             x + char_width <= video::_screen_window_x2 &&

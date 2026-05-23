@@ -6,11 +6,11 @@ struct IDirectDrawSurface;
 
 namespace video {
 	// Variables
-	inline uint32_t& g_screen_res_x =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1A8 });
+	inline int32_t& g_screen_res_x =
+		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1A8 });
 
-	inline uint32_t& g_screen_res_y =
-		*reinterpret_cast<uint32_t*>(std::uintptr_t{ 0x0055B1AC });
+	inline int32_t& g_screen_res_y =
+		*reinterpret_cast<int32_t*>(std::uintptr_t{ 0x0055B1AC });
 
 	inline IDirectDrawSurface*& g_offscreen_surface_1 =
 		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00578E58 });

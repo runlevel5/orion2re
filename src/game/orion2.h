@@ -1846,7 +1846,7 @@ struct s_font {
     struct s_colors normal_colors;
     struct s_colors highlight_colors;
     struct s_colors special_colors;
-    uint16_t current_height;
+    int16_t current_height;
     uint16_t line_height;
     uint16_t leading_offset;
     short font_style_spacing;

@@ -244,27 +244,29 @@ namespace video {
     }
 
     void __cdecl _Partial_Screen_Dump() {
-        const int32_t primary_pitch_bytes = static_cast<int32_t>(platform::Lock_Primary_Surface());
+        const int32_t primary_pitch_bytes = platform::Lock_Primary_Surface();
         if (primary_pitch_bytes < 0) {
             return;
         }
 
-        const int32_t primary_pitch_dwords = primary_pitch_bytes / 4;
+        const int32_t primary_pitch_dwords =
+            (primary_pitch_bytes + ((primary_pitch_bytes >> 31) & 3)) >> 2;
         const int32_t alt_pitch_bytes = platform::Lock_Alt_Offscreen_Surface_();
         if (alt_pitch_bytes < 0) {
             platform::Unlock_Primary_Surface();
             return;
         }
 
-        const int32_t alt_pitch_dwords = alt_pitch_bytes / 4;
+        const int32_t alt_pitch_dwords =
+            (alt_pitch_bytes + ((alt_pitch_bytes >> 31) & 3)) >> 2;
         uint32_t* const alt_surface = platform::_alt_offscreen_surface;
         uint32_t* const video_memory = (uint32_t*)video::_video_memory;
 
-        if (g_screen_res_y > 0) {
+        if (platform::g_screen_res_y > 0) {
             int32_t dst_row_offset = 0;
             int32_t src_row_offset = 0;
 
-            for (int32_t y = 0; y < g_screen_res_y; ++y) {
+            for (int32_t y = 0; y < platform::g_screen_res_y; ++y) {
                 const s_scan_list_entry& scan = video::_refresh_scan_list[y];
                 if (scan.min_x != -1) {
                     const int32_t min_x = scan.min_x;
@@ -289,9 +291,10 @@ namespace video {
         platform::Lock_Offscreen_Surface_();
         platform::Lock_Alt_Offscreen_Surface_();
 
-        uint32_t* offscreen_surface = reinterpret_cast<uint32_t*>(platform::_offscreen_surface);
+        uint8_t* offscreen_surface = platform::_offscreen_surface;
         uint32_t* alt_offscreen_surface = platform::_alt_offscreen_surface;
-        const int32_t dwords_per_row = g_screen_res_x / 4;
+        const int32_t dwords_per_row =
+            (g_screen_res_x + ((g_screen_res_x >> 31) & 3)) >> 2;
 
         int32_t row_dword_offset = 0;
         for (int32_t row = 0; row < g_screen_res_y; ++row) {
@@ -303,7 +306,7 @@ namespace video {
                 const int32_t dword_offset = row_dword_offset + min_x;
                 platform::Copy_Dwords_(
                     alt_offscreen_surface + dword_offset,
-                    offscreen_surface + dword_offset,
+                    (uint32_t*)(offscreen_surface + dword_offset * 4),
                     static_cast<uint32_t>(count)
                 );
             }

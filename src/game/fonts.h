@@ -2,7 +2,7 @@
 #include "misc.h"
 
 namespace fonts {
-    inline uint16_t& _font_header_current_height = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0057646C});
+    inline int16_t& _font_header_current_height = *reinterpret_cast<int16_t*>(std::uintptr_t{0x0057646C});
     inline uint16_t& _PSTR_style = *reinterpret_cast<uint16_t*>(std::uintptr_t{0x005787B4});
 
     inline uint8_t*& _current_font_blob = *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0055B158});
@@ -45,7 +45,7 @@ namespace fonts {
 
     int16_t __cdecl Get_String_Width_(const char* str);
 
-    int16_t __cdecl Print_Character_(int16_t x, int16_t y, char c);
+    int16_t __cdecl Print_Character_(int16_t x, int16_t y, int8_t c);
 
     void __cdecl Print_Integer_(int16_t x, int16_t y, int32_t value);
 
@@ -59,15 +59,15 @@ namespace fonts {
     void __cdecl Set_Highlight_Colors_On_(void);
     void __cdecl Set_Special_Colors_On_(void);
 
-    int16_t __cdecl Print_String_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
+    int16_t __cdecl Print_String_(uint16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
     void __cdecl Print_Display_(int16_t x, int16_t y, const char* str, int16_t width);
 
     int16_t __cdecl Print_String_Clipped_(int16_t x, int16_t y, const char* str, int16_t process_colors, int16_t justified_width);
 
-    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, char letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y);
+    void __cdecl Print_Clipped_Letter_(int16_t x, int16_t y, int8_t letter, int16_t clip_left, int16_t clip_width, int16_t start_y, int16_t end_y);
 
-    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, char c);
+    int16_t __cdecl Print_Character_Clipped_(int16_t x, int16_t y, int8_t c);
 
     void __cdecl Print_(int16_t x, int16_t y, const char* str);
 

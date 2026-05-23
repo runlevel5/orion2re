@@ -106,8 +106,8 @@ namespace mouse {
      * @brief Retrieves the icon index for the currently active mouse pointer from the current mouse list.
      * @return The icon index of the current mouse pointer.
      */
-    int16_t __cdecl Get_Pointer_Image_Number_() {
-        return mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
+    int __cdecl Get_Pointer_Image_Number_() {
+        return (int)mouse::_current_mouse_list[video::_current_mouse_list_ptr].icon;
     }
 
     void __cdecl Save_Mouse_State_() {
