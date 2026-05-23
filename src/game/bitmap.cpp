@@ -489,7 +489,7 @@ namespace bitmap {
     void __cdecl Create_Brighten_Bitmap_Palettes_(s_animation_header* anim, int8_t* levels, int8_t count)
     {
         _brighten_palette_levels = count;
-        _brighten_palette_seg = allocate::Allocate_Next_Block_(anim, count * 256 + 4);
+        _brighten_palette_seg = (uint8_t*)allocate::Allocate_Next_Block_(anim, count * 256 + 4);
 
         if (_brighten_palette_seg == nullptr)
         {
@@ -528,8 +528,7 @@ namespace bitmap {
 
                     uint8_t closest_color = remap::Find_Closest_Color_(r_new, g_new, b_new);
 
-                    uint8_t* out_ptr = reinterpret_cast<uint8_t*>(_brighten_palette_seg);
-                    out_ptr[level_offset + i] = closest_color;
+                    _brighten_palette_seg[level_offset + i] = closest_color;
 
                     level_offset += 256;
                 }
@@ -539,7 +538,7 @@ namespace bitmap {
 
     void __cdecl Mask_Out_Colors_(s_animation_header* anim, int16_t start_color, int16_t end_color) {
         animate::_animation_header = anim;
-        uint8_t* pixels = reinterpret_cast<uint8_t*>(anim) + anim->frame_offsets[anim->current_frame];
+        uint32_t* pixels = (uint32_t*)((uint8_t*)anim + anim->frame_offsets[anim->current_frame]);
         shear::Mask_Bitmap_Colors_Pixels_(pixels, start_color, end_color, 0, anim->width, anim->height);
     }
 

@@ -17,6 +17,16 @@ namespace arith1e {
     static uint16_t high;
     static int32_t underflow_bits;
 
+    static void __cdecl Fatal_Error_(const char* format, ...) {
+        va_list args;
+
+        va_start(args, format);
+        printf(s_Fatal_error__00560ab0);
+        vprintf(format, args);
+        va_end(args);
+        __exit(-1);
+    }
+
     static void __cdecl update_model_(int symbol, int context) {
         for (int i = symbol + 1; i <= (END_OF_STREAM + 1); i++) {
             totals[context][i]++;
@@ -34,6 +44,9 @@ namespace arith1e {
     static void __cdecl initialize_model_() {
         for (int context = 0; context < END_OF_STREAM; context++) {
             totals[context] = (int*)calloc(END_OF_STREAM + 2, sizeof(int));
+            if (totals[context] == nullptr) {
+                Fatal_Error_(s_Failure_allocating_context__d_00560838, context);
+            }
             update_model_(ESCAPE, context);
         }
         for (int i = 0; i <= (END_OF_STREAM + 1); i++) {
@@ -44,7 +57,6 @@ namespace arith1e {
     static void __cdecl uninit_model_() {
         for (int context = 0; context < END_OF_STREAM; context++) {
             free(totals[context]);
-            totals[context] = nullptr;
         }
     }
 
@@ -218,11 +230,8 @@ namespace arith1e {
                 context = c;
             }
             
-            if (dst_len_ptr != nullptr) {
-                *dst_len_ptr = out_pos;
-            }
-            
             bitio::CloseInputBitBuffer_(stream);
+            *dst_len_ptr = out_pos;
             uninit_model_();
         }
     }

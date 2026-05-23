@@ -63,8 +63,8 @@ namespace bitmap {
     inline const char* s_Not_Enough_Space_For_Brighten_Pa_0055b744 =
         reinterpret_cast<const char*>(std::uintptr_t{0x0055B744}); /* "Not Enough Space For Brighten Palette Block" */
 
-    inline void*& _brighten_palette_seg =
-        *reinterpret_cast<void**>(std::uintptr_t{0x0057E040});
+    inline uint8_t*& _brighten_palette_seg =
+        *reinterpret_cast<uint8_t**>(std::uintptr_t{0x0057E040});
 
     inline int8_t& _brighten_palette_levels =
         *reinterpret_cast<int8_t*>(std::uintptr_t{0x0057E068});

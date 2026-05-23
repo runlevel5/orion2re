@@ -96,8 +96,9 @@ namespace bitio {
      * @param count The number of bits to output (usually 1-32).
      */
     void __cdecl BufferOutputBits_(BIT_BUF* bit_buf, uint32_t data, uint8_t count) {
-        // Calculate the initial selector mask based on bit count
-        uint32_t bit_selector = 1 << (count - 1);
+        // Match x86 CL-based shift semantics from the original binary.
+        uint8_t shift = (uint8_t)(count - 1);
+        uint32_t bit_selector = 1u << (shift & 0x1f);
 
         while (bit_selector != 0) {
             // If the bit at the current selector position is set in data,

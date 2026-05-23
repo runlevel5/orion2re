@@ -2,62 +2,54 @@
 
 namespace regions {
     void __cdecl Fill_Region_(uint8_t color, uint8_t* surface, uint32_t width_blocks, uint32_t height) {
-        uint32_t fill_pattern = color;
-        fill_pattern |= (fill_pattern << 8);
-        fill_pattern |= (fill_pattern << 16);
+        const uint32_t width_bytes = width_blocks << 2;
+        const int32_t stride_skip = platform::g_screen_res_x - (int32_t)width_bytes;
+        uint32_t remaining = height;
 
-        uint8_t* current_row = surface;
-        int32_t stride_skip = platform::g_screen_res_x - static_cast<int32_t>(width_blocks * 4);
-
-        for (uint32_t y = 0; y < height; ++y) {
-            uint32_t* dword_ptr = reinterpret_cast<uint32_t*>(current_row);
-
-            for (uint32_t x = 0; x < width_blocks; ++x) {
-                *dword_ptr++ = fill_pattern;
-            }
-
-            current_row = reinterpret_cast<uint8_t*>(dword_ptr) + stride_skip;
-        }
+        do {
+            memset(surface, color, width_bytes);
+            surface += width_bytes;
+            surface += stride_skip;
+            --remaining;
+        } while (remaining != 0);
     }
 
     void __cdecl Fill_Column_(uint8_t color, uint8_t* surface, uint32_t fill_width, uint32_t fill_height) {
-        int32_t stride_skip = platform::g_screen_res_x - static_cast<int32_t>(fill_width);
+        int32_t stride_skip = platform::g_screen_res_x - (int32_t)fill_width;
+        uint32_t remaining = fill_height;
 
-        for (uint32_t y = 0; y < fill_height; ++y) {
-            for (uint32_t x = 0; x < fill_width; ++x) {
-                *surface = color;
-                surface++;
-            }
+        do {
+            memset(surface, color, fill_width);
+            surface += fill_width;
             surface += stride_skip;
-        }
+            --remaining;
+        } while (remaining != 0);
     }
 
-    void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, uint32_t row_count) {
+    void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, int32_t row_count) {
         uint8_t* dst = pixels;
         uint8_t* src = pixels;
 
         _rows_remaining = row_count;
 
         uint32_t width_bytes = width_dwords << 2;
-        uint32_t row_skip = platform::g_screen_res_x - width_bytes;
+        int32_t row_skip = platform::g_screen_res_x - (int32_t)width_bytes;
 
         _saved_width = width_bytes >> 2;
 
-        while (_rows_remaining != 0) {
+        do {
             uint32_t remaining_dwords = _saved_width;
 
-            while (remaining_dwords != 0) {
+            do {
                 *dst++ = tint_table[*src++];
                 *dst++ = tint_table[*src++];
                 *dst++ = tint_table[*src++];
                 *dst++ = tint_table[*src++];
-                --remaining_dwords;
-            }
+            } while (--remaining_dwords != 0);
 
             dst += row_skip;
             src += row_skip;
-            --_rows_remaining;
-        }
+        } while (--_rows_remaining != 0);
     }
 
     void __cdecl Tint_Fill_Column_(uint8_t* tint_table, uint8_t* pixels, uint32_t width, uint32_t height) {
@@ -151,31 +143,29 @@ namespace regions {
 
     void __cdecl Tri_Interlaced_Fill_Column_(uint32_t color, uint8_t* dest, int32_t width, int32_t height) {
         const int32_t row_advance = platform::g_screen_res_x - width;
-        uint32_t rows = static_cast<uint32_t>(height);
 
-        while (rows != 0) {
-            memset(dest, static_cast<int>(static_cast<uint8_t>(color)), static_cast<size_t>(width));
+        do {
+            memset(dest, (uint8_t)color, width);
             dest += width;
             dest += row_advance;
             color = (color >> 8) | (color << 24);
-            if (--rows == 0) {
-                break;
+            if (--height == 0) {
+                return;
             }
 
-            memset(dest, static_cast<int>(static_cast<uint8_t>(color)), static_cast<size_t>(width));
+            memset(dest, (uint8_t)color, width);
             dest += width;
             dest += row_advance;
             color = (color >> 8) | (color << 24);
-            if (--rows == 0) {
-                break;
+            if (--height == 0) {
+                return;
             }
 
-            memset(dest, static_cast<int>(static_cast<uint8_t>(color)), static_cast<size_t>(width));
+            memset(dest, (uint8_t)color, width);
             dest += width;
             dest += row_advance;
             color = (color >> 16) | (color << 16);
-            --rows;
-        }
+        } while (--height != 0);
     }
 
     void __cdecl Tri_Interlaced_Fill_Region_(

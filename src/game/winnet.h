@@ -4,8 +4,8 @@
 
 namespace WINNET {
     void __cdecl Drop_Player_(uint32_t player_id);
-    inline uint32_t& _provider_count =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560798});
+    inline int32_t& _provider_count =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560798});
 
     inline s_winnet_provider* (&_providers)[9] =
         *reinterpret_cast<s_winnet_provider*(*)[9]>(std::uintptr_t{0x0058D770});
@@ -62,7 +62,7 @@ namespace WINNET {
 
     int8_t __cdecl Find_Provider_(const char* name);
 
-    int32_t __cdecl Init_Connection_(int32_t mode, GUID guid);
+    int32_t __cdecl Init_Connection_(int32_t mode);
 
     BOOL __stdcall Enumerate_Providers_(GUID* guid, char* name, DWORD major_version, DWORD minor_version, void* context);
 

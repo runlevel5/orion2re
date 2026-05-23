@@ -12,7 +12,7 @@ namespace netcode {
         *reinterpret_cast<void**>(std::uintptr_t{0x00589990});
 
     inline int32_t& _connection_type =
-        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00589A0C});
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x0058998C});
 
     inline int32_t& _in_send_message = *reinterpret_cast<int32_t*>(std::uintptr_t{0x0055BF38});
 

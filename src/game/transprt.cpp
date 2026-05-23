@@ -71,7 +71,7 @@ namespace transprt {
         }
 
         _tpSendDataLength = len;
-        _tpSendImmediateBurstFlag = 0;
+        _tpSendImmediateBurst = 0;
         _tpDestID = dest;
         _tpBurstNum = 0;
         _tpSending = 1;
@@ -99,7 +99,7 @@ namespace transprt {
     void __cdecl ResetReceiving_() {
         _tpRecNum = 0;
         _tpRecSrc = 0;
-        memset(_tpPacketsReceived, 0, 0x100 * sizeof(uint32_t));
+        memset(_tpPacketsReceived, 0, sizeof(_tpPacketsReceived));
     }
 
     int32_t __cdecl NumUsers_() {
@@ -217,18 +217,22 @@ namespace transprt {
 
         if (_tpRecSrc != 0 || _tpRecNum != 0) {
             if (_tpRecSrc != sender) {
-                if (_queuedSenderCount < 19) {
-                    bool found = false;
-                    for (int32_t i = 0; i < _queuedSenderCount; ++i) {
-                        if (_queuedSenders[i] == sender) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        _queuedSenders[_queuedSenderCount++] = sender;
+                if (_queuedSenderCount >= 0x13) {
+                    return;
+                }
+
+                bool found = false;
+                for (int32_t i = 0; i < _queuedSenderCount; ++i) {
+                    if (_queuedSenders[i] == sender) {
+                        found = true;
+                        break;
                     }
                 }
+
+                if (!found) {
+                    _queuedSenders[_queuedSenderCount++] = sender;
+                }
+
                 return;
             }
             if (_tpRecNum < packet->message_stamp) {

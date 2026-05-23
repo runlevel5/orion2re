@@ -61,6 +61,12 @@ Do not send JSON unless the server documentation explicitly requires it. The `/e
 
 Prefer the built-in `web_fetch` tool if it is available in the current environment. If it is not available, use `curl` through the shell.
 
+When recovering jump tables, pointer tables, or individual code/data pointers, resolve each recovered address to an existing symbol in the current project instead of leaving it as a raw address.
+
+If a recovered target does not have a corresponding local project symbol, treat that as an error and report it explicitly rather than guessing, inventing a name, or silently returning the address.
+
+When reporting recovered targets, prefer the existing symbol name and include the raw address only as supporting detail.
+
 ## Core endpoints
 
 ### Check server status
@@ -213,6 +219,8 @@ When using this skill:
 - summarize the intent before the request
 - keep snippets small and inspectable
 - prefer printing structured intermediate values for clarity
+- when inspecting jump tables or pointers, validate that each recovered target maps to an existing local symbol before returning results
+- if any recovered target lacks a local symbol, surface it as an error instead of returning unresolved addresses
 - if the server times out, note that the remote snippet may still be running
 - if connectivity fails, verify the host, port, and bearer token first
 

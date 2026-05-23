@@ -5,14 +5,14 @@ namespace transprt {
 
     inline uint32_t& _num_net_players = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00596200});
 
-    inline int8_t& _tpSending =
-        *reinterpret_cast<int8_t*>(std::uintptr_t{0x0055BF30});
+    inline int32_t& _tpSending =
+        *reinterpret_cast<int32_t*>(std::uintptr_t{0x00560A78});
 
     inline uint32_t& _tpRecNum =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A7C});
 
-    inline uint8_t& _tpMessageIsProcessed = 
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x00560A80});
+    inline uint32_t& _tpMessageIsProcessed = 
+        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A80});
 
     inline uint32_t& _tpSendImmediateBurst = 
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A84});
@@ -83,8 +83,8 @@ namespace transprt {
     inline uint8_t (&_tpAckFlags)[128] =
         *reinterpret_cast<uint8_t(*)[128]>(std::uintptr_t{0x005923A8});
 
-    inline uint32_t (&_tpPacketsReceived)[256] =
-        *reinterpret_cast<uint32_t(*)[256]>(std::uintptr_t{0x00591FA0});
+    inline uint8_t (&_tpPacketsReceived)[256] =
+        *reinterpret_cast<uint8_t(*)[256]>(std::uintptr_t{0x00591FA0});
 
     inline uint32_t (&_tpOldMessages)[128] = 
         *reinterpret_cast<uint32_t(*)[128]>(std::uintptr_t{0x00592590});

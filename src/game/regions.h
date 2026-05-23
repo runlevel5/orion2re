@@ -16,7 +16,7 @@ namespace regions {
 
     void __cdecl Tint_Fill_Column_(uint8_t* tint_table, uint8_t* pixels, uint32_t width, uint32_t height);
 
-    void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, uint32_t row_count);
+    void __cdecl Tint_Fill_Region_(uint8_t* tint_table, uint8_t* pixels, uint32_t width_dwords, int32_t row_count);
 
     void __cdecl Interlaced_Fill_Column_(uint32_t interlace_pattern, uint8_t* dst, int32_t span, int32_t row_count);
 

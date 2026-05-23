@@ -14,11 +14,9 @@ namespace WINNET {
         return found_index;
     }
 
-    int32_t __cdecl Init_Connection_(int32_t mode, GUID guid) {
+    int32_t __cdecl Init_Connection_(int32_t mode) {
         int32_t provider_idx = -1;
         const char* provider_name = nullptr;
-
-        (void)guid;
 
         if (mode == 0) {
             provider_name = s_modem_005607dc;

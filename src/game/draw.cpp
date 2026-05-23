@@ -7,28 +7,31 @@ namespace draw {
      * The function performs basic transparency (skips pixel value 0).
      */
     void __cdecl Draw_Bitmap_Sprite_(short x, short y, uint8_t* sprite) {
-        if (!animate::_animation_header) {
-            return;
-        }
-
-        int32_t width = static_cast<int32_t>(animate::_animation_header->width);
-        int32_t height = static_cast<int32_t>(animate::_animation_header->height);
+        uint32_t width = (uint16_t)animate::_animation_header->width;
+        uint32_t height = (uint16_t)animate::_animation_header->height;
         uint8_t* video_page = video::_current_video_page;
 
-        // Screen is 640 pixels wide. Calculate starting destination.
-        uint8_t* dest_row = video_page + (static_cast<int32_t>(y) * 640) + static_cast<int32_t>(x);
+        uint8_t* dst = video_page + (uint16_t)x + (uint16_t)y * 640u - 640 + width;
 
-        for (int32_t h = 0; h < height; ++h) {
-            for (int32_t w = 0; w < width; ++w) {
+        while (height != 0) {
+            --height;
+            dst += 640;
+            dst -= width;
+            --dst;
+
+            uint32_t count = width;
+            while (true) {
+                ++dst;
+                if (count == 0) {
+                    break;
+                }
+
+                --count;
                 uint8_t pixel = *sprite++;
-                
-                // Color 0 is treated as transparent.
                 if (pixel != 0) {
-                    dest_row[w] = pixel;
+                    *dst = pixel;
                 }
             }
-            // Move to the same X position on the next scanline.
-            dest_row += 640;
         }
     }
 
@@ -57,53 +60,49 @@ namespace draw {
      * - If length > 0: Skip 'skip' pixels on current line, then draw 'length' pixels.
      */
     void __cdecl Draw_Animated_Sprite_(int16_t x, int16_t y, uint8_t* sprite) {
-        uint16_t sprite_y_offset = *reinterpret_cast<uint16_t*>(sprite + 2);
+        uint16_t sprite_y_offset;
+        memcpy(&sprite_y_offset, sprite + 2, sizeof(sprite_y_offset));
+
+        uint32_t x_pos = (uint16_t)x;
+        uint32_t y_pos = (uint16_t)y;
+        uint32_t sprite_y_pos = sprite_y_offset;
+        int32_t remaining_height =
+            (int32_t)(uint16_t)animate::_animation_header->height - (int32_t)sprite_y_offset;
 
         // Initial destination row start (including x/y and internal sprite y-offset)
         // Screen width is assumed to be 640 (0x280)
         uint8_t* dest_row_start = video::_current_video_page +
-            (static_cast<int32_t>(y) + sprite_y_offset) * 640 + x;
+            (y_pos + sprite_y_pos) * 640u + x_pos;
         uint8_t* dest_ptr = dest_row_start;
 
         // Loop continues for the remaining height of the animation
-        int32_t remaining_height = static_cast<int32_t>(animate::_animation_header->height) - sprite_y_offset;
-        uint16_t* stream = reinterpret_cast<uint16_t*>(sprite + 4);
+        uint8_t* stream = sprite + 4;
 
         while (remaining_height > 0) {
-            uint16_t length = *stream++;
-            uint16_t skip = *stream++;
+            uint16_t length;
+            uint16_t skip;
+            memcpy(&length, stream, sizeof(length));
+            memcpy(&skip, stream + 2, sizeof(skip));
+            stream += 4;
 
             if (length == 0) {
                 // Skip lines command
                 remaining_height -= skip;
-                dest_row_start += static_cast<int32_t>(skip) * 640;
+                dest_row_start += (uint32_t)skip * 640u;
                 dest_ptr = dest_row_start;
             }
             else {
                 // Draw pixels command
                 dest_ptr += skip;
 
-                uint8_t* src_pixels = reinterpret_cast<uint8_t*>(stream);
-
-                // Manual memory copy (optimized as REP MOVSD/MOVSB in assembly)
-                uint32_t dword_count = length >> 2;
-                uint32_t byte_count = length & 3;
-
-                for (uint32_t i = 0; i < dword_count; ++i) {
-                    *reinterpret_cast<uint32_t*>(dest_ptr) = *reinterpret_cast<uint32_t*>(src_pixels);
-                    dest_ptr += 4;
-                    src_pixels += 4;
-                }
-
-                for (uint32_t i = 0; i < byte_count; ++i) {
-                    *dest_ptr++ = *src_pixels++;
-                }
+                memcpy(dest_ptr, stream, length);
+                dest_ptr += length;
+                stream += length;
 
                 // Source stream maintains 2-byte alignment for command headers
-                if (reinterpret_cast<std::uintptr_t>(src_pixels) & 1) {
-                    src_pixels++;
+                if ((uintptr_t)stream & 1) {
+                    stream++;
                 }
-                stream = reinterpret_cast<uint16_t*>(src_pixels);
             }
         }
     }

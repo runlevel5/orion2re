@@ -79,8 +79,7 @@ namespace shear {
 
     void __cdecl Mask_Brighten_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, int32_t dst_row_skip, uint8_t* dst, int32_t width, int32_t height);
 
-    // TYPE MISMATCH: original stub used int16_t for parameters
-    void __cdecl Mask_Bitmap_Colors_Pixels_(uint8_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height);
+    void __cdecl Mask_Bitmap_Colors_Pixels_(uint32_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height);
 
     void __cdecl Enlarge_Bitmap_(uint8_t* src_ptr, uint32_t scale_x, uint32_t scale_y, uint8_t* dst_ptr, uint32_t src_width, uint32_t src_height, uint32_t dst_width, uint32_t dst_height);
 

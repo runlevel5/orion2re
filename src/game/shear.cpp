@@ -35,22 +35,22 @@ void __cdecl Flip_Bitmap_Down_Same_(uint8_t* data, uint32_t width, uint32_t heig
     uint8_t* row_start = data;
     uint8_t* row_end = data + width - 1;
 
-    for (uint32_t y = 0; y < height; ++y) {
+    do {
         uint32_t half_width = width >> 1;
         uint8_t* left = row_start;
         uint8_t* right = row_end;
 
-        for (uint32_t x = 0; x < half_width; ++x) {
+        do {
             uint8_t temp = *right;
             *right = *left;
             *left = temp;
             right--;
             left++;
-        }
+        } while (--half_width != 0);
 
         row_start += width;
         row_end += width;
-    }
+    } while (--height != 0);
 }
 
 void __cdecl Flip_Bitmap_Left_Different_(uint8_t* src, uint32_t width, uint32_t height, uint8_t* dst) {
@@ -284,89 +284,105 @@ void __cdecl Mask_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, int32_t dst
     _src_row_skip = src_row_skip;
     _dst_row_skip = dst_row_skip;
 
-    for (int32_t y = 0; y < height; ++y) {
-        for (int32_t x = 0; x < width; ++x) {
+    uint32_t row_count = static_cast<uint32_t>(height);
+
+    do {
+        uint32_t col_count = static_cast<uint32_t>(width);
+
+        do {
             if (*src != 0) {
                 *dst = 0;
             }
-            src++;
-            dst++;
-        }
+            ++src;
+            ++dst;
+        } while (--col_count != 0);
+
         src += _src_row_skip;
         dst += _dst_row_skip;
-    }
+    } while (--row_count != 0);
 }
 
 void __cdecl Mask_Bitmap_Pixels_Inverse_(uint8_t* src, int32_t src_row_skip, int32_t dst_row_skip, uint8_t* dst, int32_t width, int32_t height) {
     _src_row_skip = src_row_skip;
     _dst_row_skip = dst_row_skip;
 
-    for (int32_t y = 0; y < height; ++y) {
-        for (int32_t x = 0; x < width; ++x) {
+    uint32_t row_count = (uint32_t)height;
+
+    do {
+        uint32_t col_count = (uint32_t)width;
+
+        do {
             if (*src == 0) {
                 *dst = 0;
             }
-            src++;
-            dst++;
-        }
+            ++src;
+            ++dst;
+        } while (--col_count != 0);
+
         src += _src_row_skip;
         dst += _dst_row_skip;
-    }
+    } while (--row_count != 0);
 }
 
 void __cdecl Mask_Brighten_Bitmap_Pixels_(uint8_t* src, int32_t src_row_skip, int32_t dst_row_skip, uint8_t* dst, int32_t width, int32_t height) {
     _src_row_skip = src_row_skip;
     _dst_row_skip = dst_row_skip;
 
-    for (int32_t h = height; h != 0; --h) {
-        for (int32_t w = width; w != 0; --w) {
+    uint32_t row_count = static_cast<uint32_t>(height);
+
+    do {
+        uint32_t col_count = static_cast<uint32_t>(width);
+
+        do {
             uint8_t src_pixel = *src++;
             if (src_pixel != 0 && *dst != 0) {
-                uint32_t color_offset = (static_cast<uint8_t>(src_pixel - bitmap::_brighten_start_color) << 8) + *dst;
-                *dst = static_cast<uint8_t*>(bitmap::_brighten_palette_seg)[color_offset];
+                uint32_t color_offset =
+                    (static_cast<uint32_t>(static_cast<uint8_t>(src_pixel - bitmap::_brighten_start_color)) << 8) + *dst;
+                *dst = bitmap::_brighten_palette_seg[color_offset];
             }
-            dst++;
-        }
+            ++dst;
+        } while (--col_count != 0);
+
         src += _src_row_skip;
         dst += _dst_row_skip;
-    }
+    } while (--row_count != 0);
 }
 
-void __cdecl Mask_Bitmap_Colors_Pixels_(uint8_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height) {
+void __cdecl Mask_Bitmap_Colors_Pixels_(uint32_t* pixels, uint32_t min_color, uint32_t max_color, uint32_t unused_param, uint32_t width, uint32_t height) {
     _col_temp = min_color;
     _row_temp = max_color;
 
-    uint32_t count = (width * height) / 4;
-    uint32_t* ptr = reinterpret_cast<uint32_t*>(pixels);
+    uint32_t count = width * height >> 2;
 
-    uint8_t min_c = static_cast<uint8_t>(min_color);
-    uint8_t max_c = static_cast<uint8_t>(max_color);
+    uint8_t min_c = min_color;
+    uint8_t max_c = max_color;
 
-    for (uint32_t i = 0; i < count; ++i) {
-        uint32_t val = ptr[i];
+    do {
+        uint32_t val = *pixels;
 
-        if (static_cast<uint8_t>(val) >= min_c && static_cast<uint8_t>(val) <= max_c) {
+        if ((uint8_t)val >= min_c && (uint8_t)val <= max_c) {
             val &= 0xFFFFFF00;
         }
         val = (val >> 8) | (val << 24);
 
-        if (static_cast<uint8_t>(val) >= min_c && static_cast<uint8_t>(val) <= max_c) {
+        if ((uint8_t)val >= min_c && (uint8_t)val <= max_c) {
             val &= 0xFFFFFF00;
         }
         val = (val >> 8) | (val << 24);
 
-        if (static_cast<uint8_t>(val) >= min_c && static_cast<uint8_t>(val) <= max_c) {
+        if ((uint8_t)val >= min_c && (uint8_t)val <= max_c) {
             val &= 0xFFFFFF00;
         }
         val = (val >> 8) | (val << 24);
 
-        if (static_cast<uint8_t>(val) >= min_c && static_cast<uint8_t>(val) <= max_c) {
+        if ((uint8_t)val >= min_c && (uint8_t)val <= max_c) {
             val &= 0xFFFFFF00;
         }
         val = (val >> 8) | (val << 24);
 
-        ptr[i] = val;
-    }
+        *pixels++ = val;
+        count--;
+    } while (count != 0);
 }
 
 void __cdecl Enlarge_Bitmap_(uint8_t* src_ptr, uint32_t scale_x, uint32_t scale_y, uint8_t* dst_ptr, uint32_t src_width, uint32_t src_height, uint32_t dst_width, uint32_t dst_height) {

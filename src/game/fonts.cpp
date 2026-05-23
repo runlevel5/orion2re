@@ -20,10 +20,11 @@ namespace fonts {
     }
 
     void __cdecl Print_Character_ASM_(void* screen, const uint8_t* glyph_data, const uint8_t* selected_colors, uint32_t height) {
-        uint8_t* current_row = static_cast<uint8_t*>(screen);
+        uint8_t* current_row = (uint8_t*)screen;
         const uint8_t* data = glyph_data;
+        uint32_t rows = height;
 
-        for (int h = 0; h < (int)height; ++h) {
+        do {
             uint8_t* dest = current_row;
 
             while (true) {
@@ -41,7 +42,7 @@ namespace fonts {
             }
 
             current_row += platform::g_screen_res_x;
-        }
+        } while (--rows != 0);
     }
 
     void Load_Palette_(int16_t palette_id, int16_t start_index, int16_t end_index) {
