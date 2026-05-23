@@ -9,29 +9,20 @@ namespace dos {
      */
     bool __cdecl DIR_(const char* pattern, char* output_name) {
         intptr_t result;
-        intptr_t search_handle = NULL; // local_4: Allocated but uninitialized in original assembly
+        intptr_t search_handle;
 
         if (pattern[0] == '\0') {
-            // Note: search_handle is used uninitialized here in the original binary logic.
-            result = _findnext(search_handle, &_fileinfo);
+            result = _findnext32(search_handle, &_fileinfo);
         } else {
-            result = _findfirst(pattern, &_fileinfo);
+            result = _findfirst32(pattern, &_fileinfo);
         }
 
-        // Check if findfirst or findnext failed (returns -1)
         if (result == -1) {
-            if (output_name) {
-                output_name[0] = '\0';
-            }
+            output_name[0] = '\0';
             return false;
         }
 
-        // Copy the found filename from the CRT fileinfo buffer to output_name.
-        // The assembly performs an optimized string copy (strlen + memcpy).
-        char* src = _fileinfo.name;
-        char* dst = output_name;
-        while ((*dst++ = *src++) != '\0');
-        *dst = '\0';
+        strcpy(output_name, _fileinfo.name);
 
         return true;
     }
@@ -55,13 +46,13 @@ namespace dos {
     struct tm* __cdecl Time_Stamp_(LPCSTR pathname) {
         intptr_t search_handle;
 
-        search_handle = _findfirst(pathname, &_fileinfo);
+        search_handle = _findfirst32(pathname, &_fileinfo);
         if (search_handle == -1) {
             return nullptr;
         }
 
-        ctime(&_fileinfo.time_write);
-        _tmbuf = localtime(&_fileinfo.time_write);
+        _ctime32(&_fileinfo_time_write);
+        _tmbuf = _localtime32(&_fileinfo_time_write);
         return _tmbuf;
     }
 }

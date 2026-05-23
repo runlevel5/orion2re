@@ -9,8 +9,9 @@ namespace random {
         _saved_random_seed = _random_seed;
     }
 
-    void __cdecl Set_Random_Seed_(uint32_t seed) {
+    uint32_t __cdecl Set_Random_Seed_(uint32_t seed) {
         _random_seed = seed;
+        return seed;
     }
 
     void __cdecl Randomize_() {
@@ -19,12 +20,7 @@ namespace random {
     }
 
     uint32_t __cdecl Random_(uint32_t max_val) {
-        // Original assembly performed division before checking for zero, potentially causing a divide-by-zero trap.
-        if (max_val == 0) {
-            return 1;
-        }
-
-        uint32_t quotient = 0xFFFFFFFF / max_val;
+        uint32_t quotient = 0xFFFFFFFFu / max_val;
         uint32_t limit = max_val * quotient;
 
         uint32_t seed = _random_seed;

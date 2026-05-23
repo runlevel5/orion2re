@@ -341,7 +341,7 @@ inline const char* const s_Couldn_t_Allocate_0055B668 =
     reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B668 }); // "Couldn't Allocate %d. Increase Virtual Memory."
 
 inline const char* const s_Unable_to_Allocate_bytes =
-    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%s, %d)\n"
+    reinterpret_cast<const char*>(std::uintptr_t{ 0x0055B690 }); // "Unable to Allocate %d bytes (%d, %d)\n"
 
 typedef struct HMMIO__* HMMIO;
 inline long __stdcall mmioSeek(HMMIO hmmio, long lOffset, int iOrigin) {

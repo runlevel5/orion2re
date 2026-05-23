@@ -14,12 +14,7 @@ namespace allocate {
 
         auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(total_alloc_size));
         if (header == nullptr) {
-            header = static_cast<s_alloc_header*>(Allocate_Dos_Space_(total_alloc_size));
-            if (header == nullptr) {
-                // Potential Bug: If Allocation_Error_ returns, the code will null-dereference 
-                // when writing to the header fields.
-                allocate::Allocation_Error_(size);
-            }
+            return Allocate_Dos_Space_(size);
         }
 
         header->current = 0;
@@ -87,11 +82,11 @@ namespace allocate {
         return (static_cast<s_alloc_header*>(ptr) - 1)->size;
     }
 
-    void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line) {
+    void __cdecl Reallocation_Error_(uint32_t size, int32_t arg2, int32_t arg3) {
         char buffer[100];
 
-        // Format: "Unable to Allocate %d bytes (%s, %d)\n"
-        sprintf(buffer, s_Unable_to_Allocate_bytes, size, file, line);
+        // Format: "Unable to Allocate %d bytes (%d, %d)\n"
+        sprintf(buffer, s_Unable_to_Allocate_bytes, size, arg2, arg3);
 
         exitm::Exit_With_Message(buffer);
     }
@@ -114,7 +109,7 @@ namespace allocate {
         int32_t total_required = current_offset + (int32_t)aligned_size + sizeof(s_alloc_header);
 
         if (total_required > capacity) {
-            Reallocation_Error_(size, __FILE__, __LINE__);
+            Reallocation_Error_(size, (current_offset - capacity) + (int32_t)size, capacity);
         }
 
         // Pointer to the start of the new sub-block (header starts here)
@@ -139,49 +134,29 @@ namespace allocate {
         return Allocate_Next_Block_(block, size);
     }
 
-    /**
-     * @brief Allocates space with a 12-byte header, aligning odd sizes to the next 4-byte boundary.
-     * @param size The requested memory size in bytes.
-     * @return Pointer to the usable memory area (skipping the 12-byte header).
-     */
     void* __cdecl Allocate_Dos_Space_(uint32_t size) {
         uint32_t allocation_size = size;
 
-        // If the size is odd, align it to the next 4-byte boundary
         if ((size & 1) != 0) {
             allocation_size = (size & 0xFFFFFFFC) + 4;
         }
 
-        // Allocate block with overhead for metadata
-        auto* header = static_cast<s_alloc_header*>(Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
+        auto* header = static_cast<s_alloc_header*>(
+            Allocate_Far_Space_(allocation_size + sizeof(s_alloc_header)));
 
         if (header == nullptr) {
             Allocation_Error_(size);
-            // Allocation_Error_ is expected to terminate execution.
         }
 
-        // Initialize metadata header
         header->current = 0;
         header->size = size;
         header->reserved2 = 0;
 
-        // Return pointer to memory after the header
         return header + 1;
     }
 
-    /**
-     * Allocates a block of memory and terminates the application if allocation fails.
-     * @param size Number of bytes to allocate.
-     * @return Pointer to the allocated memory block.
-     */
-    void* __cdecl Allocate_Far_Space_(size_t size) {
-        void* ptr = ::_malloc(size);
-
-        if (ptr == nullptr) {
-            exitm::Exit_With_Message(s_Null_Pointer_0055b658);
-        }
-
-        return ptr;
+    void* __cdecl Allocate_Far_Space_(uint32_t size) {
+        return ::_malloc(size);
     }
 
     void __cdecl Push_Block_(void* block) {

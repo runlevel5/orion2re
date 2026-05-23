@@ -55,7 +55,7 @@ namespace sound {
         Audio_Clear_Cache_();
     }
 
-    void __cdecl Reset_Sound_Channel_(int8_t channel_idx) {
+    void __cdecl Reset_Sound_Channel_(int32_t channel_idx) {
         _sound_channels[channel_idx].sample_data = nullptr;
         _sound_channels[channel_idx].sample_size = 0;
         _sound_channels[channel_idx].sample_offset = 0;
@@ -221,14 +221,20 @@ namespace sound {
                     _dsound_buffer_desc.dwBufferBytes = 16384 /* 0x4000 */;
 
                     for (int i = 0; i < 16; ++i) {
-                        memset(&_sound_channels[i], 0, sizeof(s_sound_channel));
-
                         _dsound_hr = _dsound->CreateSoundBuffer((LPCDSBUFFERDESC)&_dsound_buffer_desc, &_sound_channels[i].buffer, nullptr);
                         if (_dsound_hr != DS_OK) {
                             _dsound->Release();
                             return;
                         }
                         
+                        _sound_channels[i].sample_data = nullptr;
+                        _sound_channels[i].sample_size = 0;
+                        _sound_channels[i].sample_offset = 0;
+                        _sound_channels[i].ds_buffer_size = 0;
+                        _sound_channels[i].field7_0x13 = 0;
+                        _sound_channels[i].write_cursor = 0;
+                        _sound_channels[i].flags = 0;
+
                         _sound_channels[i].buffer->Stop();
                     }
 

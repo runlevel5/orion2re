@@ -9,7 +9,7 @@ namespace random {
 
     void __cdecl Save_Random_Seed_();
 
-    void __cdecl Set_Random_Seed_(uint32_t seed);
+    uint32_t __cdecl Set_Random_Seed_(uint32_t seed);
 
     void __cdecl Randomize_();
 

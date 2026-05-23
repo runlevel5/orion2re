@@ -42,13 +42,13 @@ namespace allocate {
 
     void* __cdecl Release_Block_(void* block);
 
-    void __cdecl Reallocation_Error_(uint32_t size, const char* file, int line);
+    void __cdecl Reallocation_Error_(uint32_t size, int32_t arg2, int32_t arg3);
 
     void* __cdecl Allocate_Next_Block_(void* block, uint32_t size);
 
     void* __cdecl Allocate_Dos_Space_(uint32_t size);
 
-    void* __cdecl Allocate_Far_Space_(size_t size);
+    void* __cdecl Allocate_Far_Space_(uint32_t size);
 
     void* __cdecl Allocate_Space_No_Header_(uint32_t size);
 

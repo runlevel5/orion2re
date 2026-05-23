@@ -163,7 +163,7 @@ namespace sound {
 
     bool __cdecl Init_Wave_Header_From_Memory_(const void* src_data, s_sound_wav_header* header);
 
-    void __cdecl Reset_Sound_Channel_(int8_t channel_idx);
+    void __cdecl Reset_Sound_Channel_(int32_t channel_idx);
 
     void __cdecl Resume_Timer2_();
 
