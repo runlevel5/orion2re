@@ -137,22 +137,30 @@ namespace fonts {
 
     int16_t __cdecl Get_String_Width_(const char* str) {
         int16_t total_width = 0;
+        uint16_t i = 0;
 
-        if (str == nullptr || *str == '\0') {
+        if (*str == '\0') {
             return 0;
         }
 
-        for (int32_t i = 0; str[i] != '\0'; ++i) {
-            char c = str[i];
+        while (true) {
+            int8_t c = (int8_t)str[(int16_t)i];
 
             if (c == 0x15) {
                 break;
             }
 
             if (c >= 0x20) {
-                uint8_t char_idx = static_cast<uint8_t>(c);
-                total_width += static_cast<int16_t>(_font_header.font_style_widths[char_idx]) +
-                               _font_header.font_style_spacing;
+                total_width = (int16_t)(
+                    total_width +
+                    _font_header.font_style_widths[(uint8_t)c] +
+                    _font_header.font_style_spacing
+                );
+            }
+
+            ++i;
+            if (str[(int16_t)i] == '\0') {
+                break;
             }
         }
 
@@ -802,9 +810,9 @@ namespace fonts {
         Print_Centered_(x, y, buffer);
     }
 
-    void __cdecl Set_Font_Spacing_Width_(int spacing_width) {
+    void __cdecl Set_Font_Spacing_Width_(int8_t spacing_width) {
         // Sets the width of the space character (ASCII 32)
-        _font_header.font_style_widths[32] = (char)spacing_width;
+        _font_header.font_style_widths[32] = spacing_width;
     }
 
     void __cdecl Set_Alias_Color_(uint8_t color) {

@@ -17,7 +17,7 @@ namespace animate {
     void __cdecl Draw_Screen_Background_On_(uint32_t* sprite) {
         int pitch = platform::Lock_Primary_Surface();
         int stride = (pitch + (pitch < 0 ? 3 : 0)) >> 2;
-        uint32_t* vram = video::_video_memory;
+        uint32_t* vram = (uint32_t*)video::_video_memory;
 
         int sprite_idx = 0;
 
@@ -170,9 +170,11 @@ namespace animate {
         }
         else {
             if (video::screen_refresh_flag > 1) {
-                if (anim->width != 0 && anim->height != 0) {
-                    setvesa::Add_Square_To_Scan_List_(x, y, x_end, y_end);
+                if (anim->width == 0 || anim->height == 0) {
+                    return;
                 }
+
+                setvesa::Add_Square_To_Scan_List_(x, y, x_end, y_end);
             }
 
             uint8_t type = anim->flags & 0x3;
@@ -365,14 +367,14 @@ namespace animate {
     void __cdecl Draw_Glassed_Screen_Background_Off_(uint8_t* sprite) {
         platform::g_screen_res_x = platform::Lock_Appropriate_Render_Buffer();
 
-        uint32_t sprite_idx = 0;
+        int32_t sprite_idx = 0;
 
-        for (uint32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
-            uint32_t current_out_pos = page_offset;
+        for (int32_t page_offset = 0; page_offset < 0x50000; page_offset += 0x10000) {
+            int32_t current_out_pos = page_offset;
 
             while (true) {
-                int8_t skip_count = static_cast<int8_t>(sprite[sprite_idx]);
-                int8_t run_length = static_cast<int8_t>(sprite[sprite_idx + 1]);
+                int32_t skip_count = static_cast<int8_t>(sprite[sprite_idx]);
+                int32_t run_length = static_cast<int8_t>(sprite[sprite_idx + 1]);
                 sprite_idx += 2;
 
                 if (run_length == 0) {
@@ -381,9 +383,8 @@ namespace animate {
 
                 current_out_pos += skip_count;
 
-                uint32_t bytes_to_copy = static_cast<uint32_t>(run_length) * 4;
-
-                for (uint32_t i = 0; i < bytes_to_copy; ++i) {
+                int32_t end = sprite_idx + run_length * 4;
+                while (sprite_idx < end) {
                     video::_current_video_page[current_out_pos++] = sprite[sprite_idx++];
                 }
             }
@@ -394,7 +395,7 @@ namespace animate {
 
     void __cdecl Draw_Glassed_Screen_Background_On_(uint8_t* sprite) {
         int32_t pitch = static_cast<int32_t>(platform::Lock_Primary_Surface());
-        uint32_t sprite_idx = 0;
+        int32_t sprite_idx = 0;
 
         for (int32_t base_pixel_offset = 0; base_pixel_offset < 0x50000; base_pixel_offset += 0x10000) {
             int32_t current_pixel = base_pixel_offset;
@@ -409,21 +410,20 @@ namespace animate {
                 }
 
                 current_pixel += skip;
-                uint32_t pixel_run_end = sprite_idx + (count * 4);
+                int32_t pixel_run_end = sprite_idx + (int32_t)count * 4;
 
                 while (sprite_idx < pixel_run_end) {
                     uint8_t color = sprite[sprite_idx];
 
                     int32_t x = current_pixel % 640;
                     int32_t y = current_pixel / 640;
-                    // TYPE MISMATCH: video::_video_memory is uint32_t* but used as uint8_t* here
-                    uint8_t* dst = reinterpret_cast<uint8_t*>(video::_video_memory) + (y * pitch) + x;
+                    uint8_t* dst = video::_video_memory + y * pitch + x;
 
                     if (color < 0xF0) {
                         *dst = color;
                     }
                     else {
-                        *dst = video::_glass_remap_colors[color - 0xF0][*dst];
+                        *dst = draw::_glass_lookup_table[(color << 8) + *dst];
                     }
 
                     current_pixel++;

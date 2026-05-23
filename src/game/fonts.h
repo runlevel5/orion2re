@@ -75,11 +75,11 @@ namespace fonts {
 
     void __cdecl Set_Font_Style_Outline_Heavy_(int16_t font_index, s_colors* style_data);
 
-    inline uint8_t& _outline_color =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B148});
+    inline uint16_t& _outline_color =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B148});
 
-    inline uint8_t& _alias_outline_color =
-        *reinterpret_cast<uint8_t*>(std::uintptr_t{0x0055B14C});
+    inline uint16_t& _alias_outline_color =
+        *reinterpret_cast<uint16_t*>(std::uintptr_t{0x0055B14C});
 
     void __cdecl Set_Outline_Color_(uint16_t color, uint16_t alias_color);
 
@@ -118,7 +118,7 @@ namespace fonts {
     void __cdecl Set_Font_Spacing_(int16_t spacing);
     void __cdecl Set_Font_LF_(uint16_t line_height);
 
-    void __cdecl Set_Font_Spacing_Width_(int spacing_width);
+    void __cdecl Set_Font_Spacing_Width_(int8_t spacing_width);
 
     void __cdecl Get_Colors_(s_colors* colors);
     void __cdecl Set_Font_Special_Colors_(s_colors* colors);

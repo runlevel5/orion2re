@@ -18,7 +18,7 @@ namespace video {
 	inline IDirectDrawSurface*& g_offscreen_surface_2 =
 		*reinterpret_cast<IDirectDrawSurface**>(std::uintptr_t{ 0x00579334 });
 
-	inline uint32_t*& _video_memory = *reinterpret_cast<uint32_t**>(std::uintptr_t{ 0x005792F0 });
+	inline uint8_t*& _video_memory = *reinterpret_cast<uint8_t**>(std::uintptr_t{ 0x005792F0 });
 
 	inline int16_t& _current_mouse_list_ptr =
 		*reinterpret_cast<int16_t*>(std::uintptr_t{ 0x00578A94 });

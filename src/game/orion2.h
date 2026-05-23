@@ -288,7 +288,7 @@ struct s_animation_header {
     int16_t height;
     int16_t current_frame;
     int16_t frame_count;
-    uint8_t loop_frame;
+    int8_t loop_frame;
     short keyframe_interval;
     undefined1 flags;
     uint32_t frame_offsets[0];

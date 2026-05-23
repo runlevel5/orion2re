@@ -258,7 +258,7 @@ namespace video {
 
         const int32_t alt_pitch_dwords = alt_pitch_bytes / 4;
         uint32_t* const alt_surface = platform::_alt_offscreen_surface;
-        uint32_t* const video_memory = video::_video_memory;
+        uint32_t* const video_memory = (uint32_t*)video::_video_memory;
 
         if (g_screen_res_y > 0) {
             int32_t dst_row_offset = 0;

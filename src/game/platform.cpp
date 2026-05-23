@@ -727,7 +727,7 @@ namespace platform {
         hr = g_primary_surface->Lock(NULL, &desc, DDLOCK_SURFACEMEMORYPTR, NULL);
 
         if (SUCCEEDED(hr)) {
-            video::_video_memory = (uint32_t*)desc.lpSurface;
+            video::_video_memory = (uint8_t*)desc.lpSurface;
             return desc.lPitch;
         }
 

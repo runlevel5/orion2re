@@ -172,7 +172,7 @@ namespace fields {
 
     void __cdecl Quick_Call_Auto_Function_();
 
-    void __cdecl Timed_Wait_For_Input_(int timeout);
+    void __cdecl Timed_Wait_For_Input_(int32_t timeout);
 
     void __cdecl Draw_Visible_Fields_();
 

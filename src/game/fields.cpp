@@ -729,7 +729,7 @@ namespace fields {
         _mouse_auto_exit = 1;
     }
 
-    void __cdecl Timed_Wait_For_Input_(int timeout) {
+    void __cdecl Timed_Wait_For_Input_(int32_t timeout) {
         bool has_input = false;
 
         if (timeout == 0) {
@@ -864,19 +864,19 @@ namespace fields {
         _pointer_offset = mouse::Get_Pointer_Offset_();
 
         if (key::Keyboard_Status_() != 0) {
-            uint16_t key_code = Interpret_Keyboard_Input_(&field_idx);
-            if (key_code == 0 || field_idx < 0 || key_code == 0xFFFF) {
+            int16_t key_code = Interpret_Keyboard_Input_(&field_idx);
+            if (key_code == 0 || field_idx < 0 || key_code == -1) {
                 if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
                 return field_idx;
             }
 
-            if (key_code == 0x8500) {
+            if (key_code == (int16_t)0x8500) {
                 if (capture::Check_Release_Version_() != 1) {
                     F11_Key_();
                 }
             }
 
-            if (key_code == 0x8600) {
+            if (key_code == (int16_t)0x8600) {
                 mouse::Save_Mouse_State_();
                 capture::Screen_Flic_Capture_();
                 int16_t cur_y = mouse::Pointer_Y_();
@@ -942,8 +942,9 @@ namespace fields {
                 return field_idx;
             }
 
-            if (key_code == 0x1C0D || key_code == 0xE00D) {
+            if (key_code == 0x1C0D || key_code == (int16_t)0xE00D) {
                 if (_input_field_active != 0) {
+                    int16_t ret = _active_input_field_number;
                     Copy_Continuous_String_();
                     if (_mouse_auto_exit == 0) {
                         Quick_Call_Auto_Function_();
@@ -951,7 +952,7 @@ namespace fields {
                     _input_field_active = 0;
                     _down_mouse_button = -1;
                     _active_input_field_number = -1;
-                    return -1;
+                    return ret;
                 }
                 
                 int16_t scanned_field = Scan_Field_();
@@ -1053,7 +1054,7 @@ namespace fields {
                         Decrement_Scroll_Bar_(scanned_field);
                     }
                     _down_mouse_button = -1;
-                    return 0;
+                    return scanned_field;
                 }
             }
             
@@ -1090,7 +1091,7 @@ namespace fields {
                     int16_t chr = key_code & 0xFF;
                     if (chr >= 0x20 && chr <= 0x7E && chr != 0x5F) {
                         _active_input_field_first = 0;
-                        if (_active_input_field_number >= 0 && _active_input_field_number <= _fields_count) {
+                        if (_active_input_field_number >= 0 && _active_input_field_number < _fields_count) {
                             int16_t font_shadow = _fields[_active_input_field_number].detail.button.font_shadow_style;
                             if (font_shadow == -1) {
                                 fonts::Set_Font_Style_Shadow_Down_(_fields[_active_input_field_number].font_style, _fields[_active_input_field_number].font_color);
@@ -1156,8 +1157,8 @@ namespace fields {
             _pointer_offset = mouse::Get_Pointer_Offset_();
             
             for (int16_t i = 1; i < _fields_count; ++i) {
-                int16_t x = buf_x + _pointer_offset;
-                int16_t y = buf_y + _pointer_offset;
+                int32_t x = (int32_t)buf_x + _pointer_offset;
+                int32_t y = (int32_t)buf_y + _pointer_offset;
                 
                 if (_fields[i].x <= x && x <= _fields[i].x_end && _fields[i].y <= y && y <= _fields[i].y_end) {
                     if (_fields[i].field_type != 14) {
@@ -1204,13 +1205,11 @@ namespace fields {
                         if (_input_field_active == 0) {
                             strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
                             _input_field_active = 1;
-                            _active_input_field_first = 1;
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
                         } else if (field_idx != _active_input_field_number) {
                             strcpy(_continuous_string, _fields[field_idx].detail.cont_input.buffer);
-                            _active_input_field_first = 1;
                             _cursor_on = 0;
                             _cursor_position = 0;
                             _active_input_field_number = field_idx;
@@ -1263,7 +1262,6 @@ namespace fields {
                     }
                     mouse::Mouse_Buffer_();
                     mouse::Mouse_Buffer2_();
-                    if (_multi_hotkey_active_field != 0) Clear_Multi_Hot_Key_Offsets_();
                     return -1;
                 }
             }
