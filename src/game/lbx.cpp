@@ -41,8 +41,8 @@ namespace lbx {
         strcpy(header->filename, filename);
     }
 
-    int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx) {
-        return (int32_t)header->entries[rec_idx].size;
+    uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx) {
+        return header->entries[rec_idx].size;
     }
 
     void __cdecl LBX_uninit_(s_lbx_stream_header* header) {

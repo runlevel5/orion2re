@@ -14,7 +14,7 @@ namespace dos {
     inline char& DAT_0057b5ec =
         *reinterpret_cast<char*>(std::uintptr_t{0x0057B5EC});
 
-    uint32_t __cdecl Disk_Free_(void);
+    int32_t __cdecl Disk_Free_(void);
 
     bool __cdecl DIR_(const char* pattern, char* output_name);
 

@@ -3882,7 +3882,7 @@
 [X] 00531BC0 - Sin_
 [X] 00531CA0 - Cos_
 [X] 00531CC0 - Rotate_Coordinates_
-[!] 00531F20 - Read_Key_
+[X] 00531F20 - Read_Key_
 [X] 00531F60 - Scan_Key_
 [X] 00531F80 - Keyboard_Status_
 [X] 00531FA0 - Set_Stream_Filename_
@@ -3935,18 +3935,18 @@
 [X] 00534650 - Clear_Reduced_Palette_Groups_
 [X] 00534660 - Add_Reduced_Palette_Group_
 [X] 00534710 - Compress_Reduced_Palette_Groups_
-[ ] 00534790 - Save_Block_To_Drive_
+[X] 00534790 - Save_Block_To_Drive_
 [X] 00534830 - Restore_Block_From_Drive_
 [X] 00534880 - LBX_init_
 [X] 005349E0 - LBX_uninit_
 [X] 00534A00 - LBX_readRecord_
-[ ] 00534A50 - LBX_getRecordLength_
+[X] 00534A50 - LBX_getRecordLength_
 [X] 00534A60 - Screen_Flic_Capture_
-[ ] 00534A70 - time_
-[ ] 00534A90 - Net_Init_
+[X] 00534A70 - time_
+[X] 00534A90 - Net_Init_
 [X] 00534B40 - Net_Uninit_
 [X] 00534BD0 - Net_Update_
-[ ] 00534C30 - Net_Is_Sending_
+[X] 00534C30 - Net_Is_Sending_
 [X] 00534C40 - Net_Send_Message_
 [X] 00534D50 - Net_Status_
 [X] 00534DB0 - Refresh_Player_List_
@@ -3983,10 +3983,10 @@
 [X] 00535BA0 - Close_Smacker_Animation_
 [X] 00535BC0 - Set_Smacker_Palette_
 [X] 00535C00 - Clipped_Draw_Glassed_Bitmap_Sprite_
-[!] 00535D20 - Clipped_Draw_Bitmap_Sprite_
-[!] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
-[!] 00536040 - Clipped_Draw_Animated_Sprite_
-[!] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
+[X] 00535D20 - Clipped_Draw_Bitmap_Sprite_
+[X] 00535E50 - Clipped_Draw_Glassed_Animated_Sprite_
+[X] 00536040 - Clipped_Draw_Animated_Sprite_
+[X] 00536280 - Clipped_Draw_Stenciled_Animated_Sprite_
 [!] 00536508 - Draw_Animated_Sprite_
 [!] 005365B0 - Draw_Bitmap_Sprite_
 [X] 00536623 - Color_Stream_Copy_

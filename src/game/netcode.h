@@ -30,7 +30,7 @@ namespace netcode {
 
     void __cdecl Net_Uninit_();
 
-    int __cdecl Net_Is_Sending_();
+    int32_t __cdecl Net_Is_Sending_();
 
     void __cdecl Set_Null_Modem_Slave_();
 

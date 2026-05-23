@@ -62,7 +62,7 @@ namespace WINNET {
 
     int8_t __cdecl Find_Provider_(const char* name);
 
-    int32_t __cdecl Init_Connection_(int32_t mode);
+    int32_t __cdecl Init_Connection_(int32_t mode, GUID guid);
 
     BOOL __stdcall Enumerate_Providers_(GUID* guid, char* name, DWORD major_version, DWORD minor_version, void* context);
 

@@ -31,7 +31,7 @@ namespace dos {
         remove(path);
     }
 
-    uint32_t __cdecl Disk_Free_(void) {
+    int32_t __cdecl Disk_Free_(void) {
         _diskfree_t disk_free_info;
 
         if (_getdiskfree(0, &disk_free_info) != 0) {

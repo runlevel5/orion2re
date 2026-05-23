@@ -13,5 +13,5 @@ namespace angle {
     int32_t __cdecl Cos_(int16_t angle, int32_t magnitude);
     int32_t __cdecl Sin_(int16_t angle, int32_t magnitude);
 
-    void __cdecl Rotate_Coordinates_(int32_t angle, int32_t* x, int32_t* y);
+    void __cdecl Rotate_Coordinates_(int16_t angle, int32_t* x, int32_t* y);
 }

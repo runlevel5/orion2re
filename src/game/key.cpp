@@ -10,7 +10,7 @@ namespace key {
     }
 
     int32_t Read_Key_() {
-        uint8_t current_index = _key_read;
+        int8_t current_index = _key_read;
 
         // Retrieve the key code at the current read position.
         // Note: There is no explicit bounds check on 'current_index' before access.
@@ -22,9 +22,9 @@ namespace key {
         // Update the key_pressed status based on whether more keys are available.
         // If the read pointer has caught up to the write pointer, the buffer is empty.
         if (_key_read == _key_write) {
-            _key_pressed = false;
+            _key_pressed = 0;
         } else {
-            _key_pressed = true;
+            _key_pressed = 1;
         }
 
         return key_code;

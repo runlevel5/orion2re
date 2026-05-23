@@ -5,8 +5,8 @@ namespace transprt {
 
     inline uint32_t& _num_net_players = *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00596200});
 
-    inline uint32_t& _tpSending =
-        *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A78});
+    inline int8_t& _tpSending =
+        *reinterpret_cast<int8_t*>(std::uintptr_t{0x0055BF30});
 
     inline uint32_t& _tpRecNum =
         *reinterpret_cast<uint32_t*>(std::uintptr_t{0x00560A7C});

@@ -16,13 +16,17 @@ namespace netcode {
             time_::_time = reinterpret_cast<time_::Fn>(0x00534A70);  /* time::time_ */
             time_::_time2 = reinterpret_cast<time_::Fn>(0x00534A70); /* time::time_ */
 
-            result = WINNET::Init_Connection_(1);
+            result = WINNET::Init_Connection_(1, guid);
             WINNET::Refresh_Game_List_(guid);
 
             _recv_fn = recv_fn;
-        } else if (mode == 1 || mode == 2) {
+        }
+
+        if (mode == 1 || mode == 2) {
             result = simmodem::Init_Modem_(network, recv_fn);
-        } else if (mode == 3) {
+        }
+
+        if (mode == 3) {
             result = 1;
             ten::Init_TEN_(mode, &guid, recv_fn, network);
         }
@@ -79,7 +83,7 @@ namespace netcode {
         }
     }
 
-    int __cdecl Net_Is_Sending_() {
+    int32_t __cdecl Net_Is_Sending_() {
         return transprt::_tpSending;
     }
 

@@ -22,7 +22,7 @@ void __cdecl Save_Block_To_Drive_(uint8_t* block_address, int32_t block_size) {
         exitm::Exit_With_Message(s_Error_in_swap_file_0055beb8);
     }
 
-    fwrite(block_address - 0x0c, static_cast<size_t>(swap::_swap_block_size), 1, swap_file);
+    fwrite(block_address - 0x0c, swap::_swap_block_size, 1, swap_file);
     fclose(swap_file);
 
     *reinterpret_cast<int32_t*>(block_address - 8) = saved_block_size;

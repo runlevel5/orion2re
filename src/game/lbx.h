@@ -9,7 +9,7 @@ namespace lbx {
 
     void __cdecl LBX_init_(s_lbx_stream_header* header, const char* filename);
 
-    int32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, uint16_t rec_idx);
+    uint32_t __cdecl LBX_getRecordLength_(s_lbx_stream_header* header, int32_t rec_idx);
 
     void __cdecl LBX_uninit_(s_lbx_stream_header* header);
 

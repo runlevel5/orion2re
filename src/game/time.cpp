@@ -4,7 +4,8 @@ namespace time_ {
 
 int32_t __cdecl time_() {
     int32_t cVar1 = clock();
-    return (cVar1 * 1000) / 1000;
+    uint32_t scaled = (uint32_t)cVar1 * 1000u;
+    return (int32_t)scaled / 1000;
 }
 
 }
