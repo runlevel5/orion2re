@@ -1933,7 +1933,7 @@ skip_cursor:
         *out_y -= 3;
     }
 
-    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t x, int16_t y) {
+    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t plasma_mode, int16_t plasma_progress) {
         int16_t facing_dir = MOX::_combat_data[ship_idx].facing_dir;
         s_animation_header* anim = MOX::_combat_data[ship_idx].ship_image_seg;
         uint8_t previous_owner = MOX::_combat_data[ship_idx].previous_owner;
@@ -2002,8 +2002,8 @@ skip_cursor:
                 break;
         }
 
-        if (x != 0) {
-            Plasma_Darken_(MOX::_draw_ship_bitmap, y, x);
+        if (plasma_mode != 0) {
+            Plasma_Darken_(MOX::_draw_ship_bitmap, plasma_progress, plasma_mode);
         }
     }
 
@@ -2880,44 +2880,44 @@ skip_cursor:
         }
     }
 
-    void __cdecl Plasma_Darken_(s_animation_header* param_1, int16_t param_2, int16_t param_3) {
-        int frame = param_2 % 16;
+    void __cdecl Plasma_Darken_(s_animation_header* bitmap, int16_t progress, int16_t mode) {
+        int frame = progress % 16;
         animate::Set_Animation_Frame_(MOX::_darken_plasma_map, frame);
 
         int32_t* darken_frame_offsets = reinterpret_cast<int32_t*>(MOX::_darken_plasma_map + 1);
         uint8_t* darken_data = reinterpret_cast<uint8_t*>(MOX::_darken_plasma_map) + darken_frame_offsets[MOX::_darken_plasma_map->current_frame];
 
-        int32_t* param_1_frame_offsets = reinterpret_cast<int32_t*>(param_1 + 1);
-        uint8_t* param_1_data = reinterpret_cast<uint8_t*>(param_1) + param_1_frame_offsets[param_1->current_frame];
+        int32_t* bitmap_frame_offsets = reinterpret_cast<int32_t*>(bitmap + 1);
+        uint8_t* bitmap_data = reinterpret_cast<uint8_t*>(bitmap) + bitmap_frame_offsets[bitmap->current_frame];
 
         int16_t darkness = 0;
-        switch (param_3) {
+        switch (mode) {
             case 0:
                 darkness = 0;
                 break;
             case 1:
-                darkness = param_2 / 4;
+                darkness = progress / 4;
                 if (darkness > 6) darkness = 6;
                 break;
             case 2:
-                darkness = 6 - (param_2 / 4);
+                darkness = 6 - (progress / 4);
                 if (darkness < 0) darkness = 0;
                 break;
             case 3:
                 darkness = 6;
                 break;
             case 4:
-                darkness = param_2 / 3;
+                darkness = progress / 3;
                 if (darkness > 20) darkness = 20;
                 break;
             case 5:
-                darkness = (param_2 / -3) + 12;
+                darkness = (progress / -3) + 12;
                 if (darkness < 0) darkness = 0;
                 break;
             default:
                 // The original code has a bug where it reads an uninitialized variable for darkness.
-                // Due to compiler stack layout mapping, it accidentally reads the lower 16 bits of the param_1_data pointer.
-                darkness = static_cast<int16_t>(reinterpret_cast<std::uintptr_t>(param_1_data) & 0xFFFF);
+                // Due to compiler stack layout mapping, it accidentally reads the lower 16 bits of the bitmap_data pointer.
+                darkness = static_cast<int16_t>(reinterpret_cast<std::uintptr_t>(bitmap_data) & 0xFFFF);
                 break;
         }
 
@@ -2925,18 +2925,18 @@ skip_cursor:
 
         int16_t darken_w = animate::Get_Width_(MOX::_darken_plasma_map);
         int16_t darken_h = animate::Get_Height_(MOX::_darken_plasma_map);
-        int16_t param_1_w = animate::Get_Width_(param_1);
-        int16_t param_1_h = animate::Get_Height_(param_1);
+        int16_t bitmap_w = animate::Get_Width_(bitmap);
+        int16_t bitmap_h = animate::Get_Height_(bitmap);
 
-        if (param_1_h <= 0) return;
+        if (bitmap_h <= 0) return;
 
         int32_t dst_offset = 0;
         int32_t src_offset = 0;
 
-        for (int16_t y = 0; y < param_1_h; ++y) {
+        for (int16_t y = 0; y < bitmap_h; ++y) {
             if (y < darken_h) {
-                if (param_1_w > 0) {
-                    for (int16_t x = 0; x < param_1_w; ++x) {
+                if (bitmap_w > 0) {
+                    for (int16_t x = 0; x < bitmap_w; ++x) {
                         if (x < darken_w) {
                             uint8_t darken_pixel = darken_data[src_offset + x];
                             uint32_t val;
@@ -2948,13 +2948,13 @@ skip_cursor:
                             if (val > 15) {
                                 val = 15;
                             }
-                            uint8_t param_1_pixel = param_1_data[dst_offset + x];
-                            param_1_data[dst_offset + x] = MOX::_ship_darken_map[param_1_pixel][val];
+                            uint8_t bitmap_pixel = bitmap_data[dst_offset + x];
+                            bitmap_data[dst_offset + x] = MOX::_ship_darken_map[bitmap_pixel][val];
                         }
                     }
                 }
             }
-            dst_offset += param_1_w;
+            dst_offset += bitmap_w;
             src_offset += darken_w;
         }
     }

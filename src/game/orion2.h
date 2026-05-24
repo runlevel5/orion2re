@@ -2273,13 +2273,13 @@ struct s_input_box_state {
     char prompt_text[60];
     int16_t bg_width;
     uint8_t show_cancel_anim;
-    int16_t x_offset1;
-    int16_t cancel_y;
     int16_t cancel_x;
-    int16_t y_offset2;
-    int16_t x_offset3;
-    int16_t y;
+    int16_t prompt_y;
+    int16_t cancel_y;
+    int16_t input_y;
+    int16_t input_x;
     int16_t x;
+    int16_t y;
     int16_t input_type;
     int16_t max_length;
     int16_t max_input_length;

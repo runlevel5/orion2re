@@ -37,14 +37,14 @@ void __cdecl Setup_Input_Box_Popup_() {
     animate::Get_Height_(_input_box.bg);
     
     if (_input_box.show_cancel_anim == 0) {
-        animate::Draw_(_input_box.y, _input_box.x, _input_box.bg);
+        animate::Draw_(_input_box.x, _input_box.y, _input_box.bg);
         _input_box.colors2 = _input_box.font_colors;
     } else {
         remap::Calculate_Picture_Remap_Colors_(_input_box.bg);
         remap::Calculate_Picture_Remap_Colors_(_input_box.pic);
-        animate::Remap_Draw_(_input_box.y, _input_box.x, _input_box.bg);
+        animate::Remap_Draw_(_input_box.x, _input_box.y, _input_box.bg);
         animate::Reset_Animation_Frame_(_input_box.pic);
-        animate::Remap_Draw_(_input_box.cancel_y, _input_box.cancel_x, _input_box.pic);
+        animate::Remap_Draw_(_input_box.cancel_x, _input_box.cancel_y, _input_box.pic);
     }
     
     MISC::Set_Fitted_Font_Style_(_input_box.prompt_text, &_input_box.font_colors, 4, 2, 0, animate_width - 54, 1);
@@ -73,8 +73,8 @@ void __cdecl Setup_Input_Box_Popup_() {
     int16_t string_width = fonts::Get_String_Width_(_input_box.prompt_text);
     int16_t font_height = fonts::Get_Font_Height_();
     
-    int16_t text_x = _input_box.y + (animate_width - string_width) / 2;
-    int16_t text_y = _input_box.x_offset1 + (_input_box.bg_width - font_height) / 2;
+    int16_t text_x = _input_box.x + (animate_width - string_width) / 2;
+    int16_t text_y = _input_box.prompt_y + (_input_box.bg_width - font_height) / 2;
     
     fonts::Print_(text_x, text_y, _input_box.prompt_text);
     
@@ -92,8 +92,8 @@ void __cdecl Setup_Input_Box_Popup_() {
     
     if (_input_box.show_cancel_anim == 0) {
         _input_box.cancel_field_id = fields::Add_Button_Field_(
-            _input_box.cancel_y,
             _input_box.cancel_x,
+            _input_box.cancel_y,
             MOX::s__00551100,
             _input_box.pic,
             MOX::s__00551100,
@@ -104,18 +104,18 @@ void __cdecl Setup_Input_Box_Popup_() {
         int16_t pic_width = animate::Get_Width_(_input_box.pic);
         
         _input_box.cancel_field_id = fields::Add_Hidden_Field_(
-            _input_box.cancel_y,
             _input_box.cancel_x,
-            _input_box.cancel_y + pic_width,
+            _input_box.cancel_y,
             _input_box.cancel_x + pic_height,
+            _input_box.cancel_y + pic_width,
             MOX::s__00551100,
             40
         );
     }
     
     _input_box.accept_field_id = fields::Add_Continuous_String_Input_Field_(
-        _input_box.y_offset2,
-        _input_box.x_offset3,
+        _input_box.input_x,
+        _input_box.input_y,
         _input_box.max_input_length,
         _input_box.unk1,
         _input_box.input_text,
@@ -257,9 +257,9 @@ int8_t __cdecl Do_Change_Star_Name_(int16_t x, int16_t y, int16_t star_idx, int8
 
     int8_t result;
     if (is_animated != 0) {
-        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, 15, w_max, title, y, x);
+        result = Input_Box_Popup_Animated_(MOX::_star[star_idx].name, 15, w_max, title, x, y);
     } else {
-        result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, w_max, title, y, x, 0);
+        result = Input_Box_Popup_(MOX::_star[star_idx].name, 15, w_max, title, x, y, 0);
     }
 
     if (MOX::_star[star_idx].name[0] == '\0') {
@@ -295,7 +295,7 @@ int8_t __cdecl Can_Change_Star_Name_(int16_t star_idx) {
     return can_change;
 }
 
-int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim) {
+int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim) {
     EVANHELP::Save_Help_List_();
     fields::Save_Auto_Function_();
     EVANHELP::Set_Input_Box_Help_List_();
@@ -318,12 +318,12 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
 
     _input_box.bg_width = 0x36;
     _input_box.input_type = input_type;
-    _input_box.x_offset1 = x + 3;
+    _input_box.prompt_y = y + 3;
     _input_box.show_cancel_anim = show_cancel_anim;
     _input_box.cancel_x = x + 100;
     _input_box.cancel_y = y + 0x60;
-    _input_box.y_offset2 = y + 0x22;
-    _input_box.x_offset3 = x + 0x36;
+    _input_box.input_y = y + 0x22;
+    _input_box.input_x = x + 0x36;
 
     if (max_length == 0) {
         _input_box.max_input_length = 205;
@@ -394,7 +394,7 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
             if (show_cancel_anim != 0) {
                 video::Set_Page_Off_();
                 animate::Set_Animation_Frame_(_input_box.pic, 1);
-                animate::Remap_Draw_(_input_box.cancel_y, _input_box.cancel_x, _input_box.pic);
+                animate::Remap_Draw_(_input_box.cancel_x, _input_box.cancel_y, _input_box.pic);
                 Draw_Input_Box_Popup_();
                 RUSS::Mox_Sync_Update_();
             }
@@ -414,8 +414,8 @@ int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t ma
     return status;
 }
 
-int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x) {
-    return Input_Box_Popup_(input_text, input_type, max_length, prompt_text, y, x, 1);
+int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y) {
+    return Input_Box_Popup_(input_text, input_type, max_length, prompt_text, x, y, 1);
 }
 
 } // namespace namestar

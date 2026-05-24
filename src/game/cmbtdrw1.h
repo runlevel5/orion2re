@@ -82,7 +82,7 @@ namespace CMBTDRW1 {
 
     void __cdecl Get_Draw_Ship_Offsets_(int16_t ship_idx, int16_t* out_x, int16_t* out_y);
 
-    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t x, int16_t y);
+    void __cdecl Draw_Ship_To_Bitmap_(int16_t ship_idx, int16_t layer, int16_t plasma_mode, int16_t plasma_progress);
 
     void __cdecl Draw_Retreating_Ship_(int16_t ship_idx);
 
@@ -94,7 +94,7 @@ namespace CMBTDRW1 {
 
     int16_t __cdecl Board_Popup_(int16_t min_val, int16_t max_val, char* msg, int16_t* out_val);
 
-    void __cdecl Plasma_Darken_(s_animation_header* param_1, int16_t param_2, int16_t param_3);
+    void __cdecl Plasma_Darken_(s_animation_header* bitmap, int16_t progress, int16_t mode);
 
     void __cdecl Draw_Bombs_(int16_t attacker_idx, int16_t target_idx, int16_t weapon_id, int16_t damage);
 

@@ -19,7 +19,7 @@ namespace namestar {
 
     void __cdecl Draw_Input_Box_Popup_();
 
-    int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x, int8_t show_cancel_anim);
+    int8_t __cdecl Input_Box_Popup_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y, int8_t show_cancel_anim);
 
-    int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t y, int16_t x);
+    int8_t __cdecl Input_Box_Popup_Animated_(char* input_text, int16_t input_type, int16_t max_length, char* prompt_text, int16_t x, int16_t y);
 }

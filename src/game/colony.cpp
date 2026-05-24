@@ -513,11 +513,11 @@ namespace COLONY {
             11,
             31,
             0,
-            &y,
-            &x
+            &x,
+            &y
         );
 
-        ERIC::Pulsing_Box_(y, x, 5, 5, 1, 1, 2);
+        ERIC::Pulsing_Box_(x, y, 5, 5, 1, 1, 2);
         timer::Release_Time_(2);
     }
 

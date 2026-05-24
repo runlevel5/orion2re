@@ -1674,6 +1674,8 @@ namespace DIP_SCRN {
                             break;
                         }
                         case 1004: {
+                            _response_message = 0;
+                            _old_response_message = 0;
                             Get_Human_Offer_Gift_Message_(_talker_ambassador, _net_diplomacy_message.arg1, _net_diplomacy_message.arg2);
                             _response_message = 0;
                             _old_response_message = 0;
@@ -1908,7 +1910,7 @@ namespace DIP_SCRN {
                         fields::Clear_Fields_();
                         break;
                     case 7:
-                        Diplomacy_Main_Net_Chat_(_talker_ambassador, _listen_ambassador);
+                        Diplomacy_Main_Net_Chat_(_listen_ambassador, _talker_ambassador);
                         if (_net_diplomacy_esc_pressed == 1) {
                             done_flag = 1;
                         }

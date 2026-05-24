@@ -2450,13 +2450,11 @@ namespace BEAMS {
             }
         }
 
-        if (hit_result_flags != 0) {
-            if (XY_In_Shield_Radius_(bx2, by2, target_x, target_y, target_size_class)) {
-                _shield_hit_now_flag = 1;
-                return;
-            }
+        if (hit_result_flags != 0 && XY_In_Shield_Radius_(bx2, by2, target_x, target_y, target_size_class)) {
+            _shield_hit_now_flag = 1;
+        } else {
+            _shield_hit_now_flag = 0;
         }
-        _shield_hit_now_flag = 0;
 
         if (reflection_state == 1) {
             if (XY_In_Reflection_Field_Radius_(bx2, by2, target_x, target_y, target_size_class)) {
